@@ -648,6 +648,41 @@ export class PracticeQuestionSubmitter extends BaseUser {
       value
     );
   }
+
+  /**
+   * This is a composite function that starts a question suggestion and completes it.
+   * @param {string} [skill] - The skill to suggest questions for.
+   * @param {string} [topic] - The topic to suggest questions for.
+   * @param {'Easy' | 'Medium' | 'Hard'} [difficulty] - The difficulty level of the question.
+   * @param {string} [question] - The question to be added to the question.
+   * @param {string[]} [multipleChoiceOptions] - The options to be added to the multiple choice interaction.
+   * @param {string} [defaultResponseFeedback] - The feedback for the default responses.
+   * @param {string} [hint] - The hint to be added to the current state card.
+   */
+  async startAndCompleteQuestionSuggestion(
+    skill: string,
+    topic: string,
+    question: string,
+    multipleChoiceOptions?: string[],
+    difficulty?: 'Easy' | 'Medium' | 'Hard',
+    defaultResponseFeedback?: string,
+    hint?: string
+  ): Promise<void> {
+    await this.suggestQuestionsForSkillandTopic(skill, topic);
+    await this.selectQuestionDifficulty(difficulty ?? 'Medium');
+    await this.seedTextToQuestion(question);
+    await this.addMultipleChoiceInteractionByQuestionSubmitter(
+      multipleChoiceOptions ?? ['5', '-1', '6', '1.5']
+    );
+    await this.editDefaultResponseFeedbackInQuestionEditorPage(
+      defaultResponseFeedback ?? 'Wrong Answer'
+    );
+    await this.addHintToState(
+      hint ??
+        'If you have 2 apples and someone gives you 3 apples, how many apples do you have?'
+    );
+    await this.submitQuestionSuggestion();
+  }
 }
 
 export let QuestionSubmitterFactory = (): PracticeQuestionSubmitter =>
