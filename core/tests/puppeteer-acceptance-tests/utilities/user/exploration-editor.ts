@@ -5677,7 +5677,7 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Navigates to the help tab in the exploration editor (both desktop and mobile viewport).
+   * Navigates to the help tab in the exploration editor.
    */
   async clickOnHelpButton(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
