@@ -236,57 +236,6 @@ export class TranslationSubmitter extends BaseUser {
   }
 
   /**
-   * Expects the contribution table to contain a row with the given topic name,
-   * accepted cards, and accepted words.
-   * @param topicName - The topic name to search for.
-   * @param acceptedCards - The number of accepted cards.
-   * @param acceptedWords - The number of accepted words.
-   */
-  async expectContributionTableToContainRow(
-    topicName: string,
-    acceptedCards: number,
-    acceptedWords: number
-  ): Promise<void> {
-    const rowSelector = this.isViewportAtMobileWidth()
-      ? '.e2e-test-mobile-stats-row'
-      : 'tr';
-    const cellSelector = this.isViewportAtMobileWidth()
-      ? '.e2e-test-mobile-stats-cell'
-      : 'td';
-    await this.expectElementToBeVisible(rowSelector);
-
-    const tableRows = await this.page.$$(rowSelector);
-    if (!tableRows || tableRows.length === 0) {
-      throw new Error('No rows found in the contribution table.');
-    }
-
-    for (const row of tableRows) {
-      const rowCells = await row.$$(cellSelector);
-      if (rowCells.length === 0) {
-        continue;
-      }
-
-      const cellValues = await row.$$eval(cellSelector, cells =>
-        cells.map(cell => cell.textContent?.trim())
-      );
-
-      console.log(`[debug]: cellValues: "${cellValues.join('", "')}"`);
-
-      const found =
-        cellValues[1] === topicName &&
-        cellValues[2] === acceptedCards.toString() &&
-        cellValues[3] === acceptedWords.toString();
-      if (found) {
-        return;
-      }
-    }
-
-    throw new Error(
-      `Row with topic name ${topicName} not found in the contribution table.`
-    );
-  }
-
-  /**
    * Fills the value in the customize component.
    * @param inputType - The type of the component.
    * @param value - The value to fill.

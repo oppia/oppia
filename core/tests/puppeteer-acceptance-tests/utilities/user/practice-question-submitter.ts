@@ -193,6 +193,7 @@ export class PracticeQuestionSubmitter extends BaseUser {
    */
   async seedTextToQuestion(text: string): Promise<void> {
     await this.expectElementToBeVisible(textStateEditSelector);
+    await this.waitForElementToStabilize(textStateEditSelector);
     await this.clickOn(textStateEditSelector);
     await this.page.waitForSelector(stateContentInputField, {visible: true});
     await this.clickOn(stateContentInputField);

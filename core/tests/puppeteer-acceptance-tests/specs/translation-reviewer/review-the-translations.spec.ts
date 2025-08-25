@@ -181,9 +181,14 @@ describe('Translation Reviewer', function () {
       'Translation Reviews'
     );
 
-    await translationReviewer.expectContributionTableToContainRowInTranslationReview(
-      [null, 'Fractions', '3', '6', '2', '4']
-    );
+    await translationReviewer.expectContributionTableToContainRow([
+      null,
+      'Fractions',
+      '3',
+      '6',
+      '2',
+      '4',
+    ]);
 
     // Download certificate.
     // TODO(#22743): Unable to download certificate when To date is of today

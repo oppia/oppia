@@ -309,7 +309,11 @@ export class Contributor extends BaseUser {
    * @param contributionType - The contribution type to select.
    */
   async selectContributionTypeInContributionDashboard(
-    contributionType: 'Translation Contributions' | 'Translation Reviews'
+    contributionType:
+      | 'Translation Contributions'
+      | 'Translation Reviews'
+      | 'Question Contributions'
+      | 'Question Reviews'
   ): Promise<void> {
     const dropdownSelector = this.isViewportAtMobileWidth()
       ? `${topicSelector}${mobileElementSelector}`
@@ -409,6 +413,66 @@ export class Contributor extends BaseUser {
     } else {
       await this.expectElementToBeVisible(activeTabNameSelector, false);
     }
+  }
+
+  /**
+   * Expects the contribution table to contain a row with the given topic name,
+   * accepted cards, and accepted words.
+   * @param topicName - The topic name to search for.
+   * @param acceptedCards - The number of accepted cards.
+   * @param acceptedWords - The number of accepted words.
+   */
+  async expectContributionTableToContainRow(
+    rowValues: (string | null)[]
+  ): Promise<void> {
+    const rowSelector = this.isViewportAtMobileWidth()
+      ? '.e2e-test-mobile-stats-row'
+      : 'tr';
+    const cellSelector = this.isViewportAtMobileWidth()
+      ? '.e2e-test-mobile-stats-cell'
+      : 'td';
+    await this.expectElementToBeVisible(rowSelector);
+
+    const tableRows = await this.page.$$(rowSelector);
+    if (!tableRows || tableRows.length === 0) {
+      throw new Error('No rows found in the contribution table.');
+    }
+
+    console.log('[debug] found rows:' + tableRows.length);
+    for (const row of tableRows) {
+      const rowCells = await row.$$(cellSelector);
+      if (rowValues.length !== rowCells.length) {
+        continue;
+      }
+
+      let match = true;
+
+      for (let i = 0; i < rowValues.length; i++) {
+        if (!rowValues[i]) {
+          // If row cell from input is null, we skip comparing it.
+          console.log('[debug] row cell from input is null');
+          continue;
+        }
+        const cellValue = await rowCells[i].evaluate((el: Element) =>
+          el.textContent?.trim()
+        );
+        console.log('[debug] cell value: ' + cellValue);
+        console.log('[debug] row value: ' + rowValues[i]);
+        if (cellValue !== rowValues[i]) {
+          console.log('[debug] cell value does not match');
+          match = false;
+          break;
+        }
+      }
+
+      console.log('[debug] match: ' + match);
+
+      if (match) {
+        return;
+      }
+    }
+
+    throw new Error('Row not found in the contribution table with values.');
   }
 
   /**

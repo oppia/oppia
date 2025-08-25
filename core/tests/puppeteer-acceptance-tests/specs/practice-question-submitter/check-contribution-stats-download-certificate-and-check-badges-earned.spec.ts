@@ -159,6 +159,24 @@ describe('Practice Question Submitter', function () {
     await questionSubmitter.navigateToTabInMyContributions(
       'Contribution Stats'
     );
+    await questionSubmitter.selectContributionTypeInContributionDashboard(
+      'Question Contributions'
+    );
+    await questionSubmitter.expectContributionTableToContainRow([
+      'Addition',
+      '2',
+      '1',
+    ]);
+  });
+
+  it('should be able to download contribution certificate', async function () {
+    // TODO(ISSUE_NUMBER): Currently, the download certificate functionality is not working
+    // when "To" date is of today and only contribution is made today.
+  });
+
+  it('should be able to check for badges earned', async function () {
+    await questionSubmitter.navigateToTabInMyContributions('Badges');
+    await questionSubmitter.expectBadgesToContain('1', 'Submission');
   });
 
   afterAll(async function () {
