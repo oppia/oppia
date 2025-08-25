@@ -29,7 +29,7 @@ from core import utils
 from core.tests import test_utils
 from scripts import run_portserver
 
-from typing import List, Union
+from typing import List, Union, cast
 
 
 class MockSocket:
@@ -387,8 +387,9 @@ class RunPortserverTests(test_utils.GenericTestBase):
             socket, 'socket', lambda *unused_args: mock_socket)
 
         with swap_socket, swap_hasattr:
+            cast_socket = cast(socket.SocketType, mock_socket)
             server = run_portserver.Server(dummy_handler, '\08181')
-            run_portserver.Server.handle_connection(MockSocket(), dummy_handler)
+            run_portserver.Server.handle_connection(cast_socket, dummy_handler)
 
             self.assertFalse(server.socket.server_closed)
             server.close()

@@ -31,14 +31,13 @@ class Copier(value_generators_domain.BaseValueGenerator):
 
     default_value: str = ''
 
-    # Here we use MyPy ignore because the signature of this method doesn't
-    # match with super class's generate_value method, because in the super
-    # class's method we are allowing arbitrary numbers of arguments with
-    # *args and **kwargs but here we are specifying only limited arguments.
-    # So, due to this conflict in arguments definitions, a conflict in
-    # signatures occurred which causes MyPy to throw an error. Thus, to
-    # avoid the error, we used ignore here.
-    def generate_value(  # type: ignore[override]
+    # The following method previously had a non-matching signature
+    # with its superclass's generate_value method due to the use of
+    # *args and **kwargs in the superclass. However, as of MyPy 1.0.1,
+    # this override is now correctly handled by the type checker, making
+    # the # type: ignore[override] directive unnecessary. It has been
+    # removed to maintain a clean and explicit type definition.
+    def generate_value(
         self,
         unused_context_params: Optional[Dict[str, str]],
         value: str,
@@ -65,14 +64,13 @@ class RandomSelector(value_generators_domain.BaseValueGenerator):
 
     default_value: str = ''
 
-    # Here we use MyPy ignore because the signature of this method doesn't
-    # match with super class's generate_value method, because in the super
-    # class's method we are allowing arbitrary numbers of arguments with
-    # *args and **kwargs but here we are specifying only limited arguments.
-    # So, due to this conflict in arguments definitions, a conflict in
-    # signatures occurred which causes MyPy to throw an error. Thus, to
-    # avoid the error, we used ignore here.
-    def generate_value(  # type: ignore[override]
+    # The following method previously had a non-matching signature
+    # with its superclass's generate_value method due to the use of
+    # *args and **kwargs in the superclass. However, as of MyPy 1.0.1,
+    # this override is now correctly handled by the type checker, making
+    # the # type: ignore[override] directive unnecessary. It has been
+    # removed to maintain a clean and explicit type definition.
+    def generate_value(
         self,
         unused_context_params: Dict[str, str],
         list_of_values: List[str]

@@ -58,7 +58,7 @@ import sys
 import threading
 
 from core import utils
-from typing import Callable, Deque, Final, List, Optional, Sequence
+from typing import Callable, Deque, Final, List, Optional, Sequence, Any
 
 _PROTOCOLS: Final = [
     (socket.SOCK_STREAM, socket.IPPROTO_TCP),
@@ -428,7 +428,7 @@ class Server:
             socket_path: str. Path to socket file.
         """
         self.socket_path = socket_path
-        self.socket = self._start_server(self.socket_path)
+        self.socket: Any = self._start_server(self.socket_path)
         self.handler = handler
 
     def run(self) -> None:
@@ -470,7 +470,7 @@ class Server:
     @staticmethod
     def handle_connection(
         connection: socket.SocketType,
-        handler: Callable[[bytes], socket.SocketType]
+        handler: Callable[[bytes], bytes]
     ) -> None:
         """Handle a socket connection.
 
@@ -486,7 +486,8 @@ class Server:
         """
         request = connection.recv(Server.message_size)
         response = handler(request)
-        connection.sendall(response)
+        if response is not None:
+            connection.sendall(response)
         connection.close()
 
     def _start_server(self, path: str) -> socket.SocketType:
