@@ -726,12 +726,6 @@ export class ExplorationEditor extends BaseUser {
    * @param numberOfItems The expected number of history items.
    */
   async expectNumberOfHistoryItemsToBe(numberOfItems: number): Promise<void> {
-    // TODO(#22976): In mobile view the number of items displayed exceeds the
-    // maximum number of items allowed per page. So, skip this check for mobile
-    // view.
-    if (this.isViewportAtMobileWidth()) {
-      return;
-    }
     if (numberOfItems === 0) {
       await this.expectElementToBeVisible(historyListItemSelector, false);
       return;
