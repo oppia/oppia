@@ -221,7 +221,6 @@ import {PopulateRuleContentIdsService} from 'pages/exploration-editor-page/servi
 import {PretestQuestionBackendApiService} from 'domain/question/pretest-question-backend-api.service';
 import {ProfilePageBackendApiService} from 'pages/profile-page/profile-page-backend-api.service';
 import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
-import {QuestionObjectFactory} from 'domain/question/QuestionObjectFactory';
 import {RatingComputationService} from 'components/ratings/rating-computation/rating-computation.service';
 import {
   RatioExpressionInputRulesService,
@@ -907,8 +906,7 @@ export class UpgradedServices {
     upgradedServices['QuestionBackendApiService'] =
       new QuestionBackendApiService(
         upgradedServices['HttpClient'],
-        upgradedServices['UrlInterpolationService'],
-        upgradedServices['QuestionObjectFactory']
+        upgradedServices['UrlInterpolationService']
       );
     upgradedServices['ReadOnlyCollectionBackendApiService'] =
       new ReadOnlyCollectionBackendApiService(
@@ -1094,7 +1092,6 @@ export class UpgradedServices {
 
     // Topological level: 8.
     upgradedServices['StatesObjectFactory'] = new StatesObjectFactory();
-    upgradedServices['QuestionObjectFactory'] = new QuestionObjectFactory();
 
     // Topological level: 9.
     upgradedServices['ExplorationObjectFactory'] = new ExplorationObjectFactory(
@@ -1105,8 +1102,7 @@ export class UpgradedServices {
     upgradedServices['PretestQuestionBackendApiService'] =
       new PretestQuestionBackendApiService(
         upgradedServices['UrlInterpolationService'],
-        upgradedServices['HttpClient'],
-        upgradedServices['QuestionObjectFactory']
+        upgradedServices['HttpClient']
       );
 
     /* eslint-enable dot-notation */
