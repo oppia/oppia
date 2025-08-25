@@ -67,7 +67,7 @@ export class SkillEditorNavabarComponent implements OnInit {
     return this.skillEditorRoutingService.getActiveTabName();
   }
 
-  private confirmBeforeLeavingQuestions(run: () => void): void {
+  confirmBeforeLeavingQuestions(run: () => void): void {
     const routeTab = this.getActiveTabName();
     const hasQuestionDraft = this.questionUndoRedoService.hasChanges();
 

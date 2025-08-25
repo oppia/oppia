@@ -86,7 +86,7 @@ export class TopicEditorPageComponent implements OnInit, OnDestroy {
     return !activeTab.startsWith('subtopic');
   }
 
-  private confirmBeforeLeavingQuestions(run: () => void): void {
+  confirmBeforeLeavingQuestions(run: () => void): void {
     const active = this.getActiveTabName();
 
     if (active === 'questions' && this.questionUndoRedoService.hasChanges()) {

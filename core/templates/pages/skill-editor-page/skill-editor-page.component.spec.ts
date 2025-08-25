@@ -235,7 +235,7 @@ describe('Skill editor page', () => {
     spyOn(ngbModal, 'open').and.callFake(() => {
       return {
         componentInstance: {},
-        result: Promise.resolve(), // simulate confirm
+        result: Promise.resolve(),
       } as NgbModalRef;
     });
 

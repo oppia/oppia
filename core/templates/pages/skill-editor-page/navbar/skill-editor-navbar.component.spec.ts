@@ -152,7 +152,7 @@ describe('Skill Editor Navbar Component', () => {
     spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(false);
     const runSpy = jasmine.createSpy('runSpy');
 
-    component['confirmBeforeLeavingQuestions'](runSpy);
+    component.confirmBeforeLeavingQuestions(runSpy);
 
     expect(runSpy).toHaveBeenCalled();
   });
@@ -164,7 +164,7 @@ describe('Skill Editor Navbar Component', () => {
     spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(false);
     const runSpy = jasmine.createSpy('runSpy');
 
-    component['confirmBeforeLeavingQuestions'](runSpy);
+    component.confirmBeforeLeavingQuestions(runSpy);
 
     expect(runSpy).toHaveBeenCalled();
   });
@@ -181,7 +181,7 @@ describe('Skill Editor Navbar Component', () => {
     };
     spyOn(ngbModal, 'open').and.returnValue(modalRef);
 
-    component['confirmBeforeLeavingQuestions'](runSpy);
+    component.confirmBeforeLeavingQuestions(runSpy);
     tick();
 
     expect(clearSpy).toHaveBeenCalled();
