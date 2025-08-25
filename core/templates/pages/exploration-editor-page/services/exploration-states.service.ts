@@ -32,11 +32,7 @@ import {
   StatePropertyNames,
   StatePropertyValues,
 } from 'pages/exploration-editor-page/services/change-list.service';
-import {
-  StateObjectsBackendDict,
-  States,
-  StatesObjectFactory,
-} from 'domain/exploration/StatesObjectFactory';
+import {StateObjectsBackendDict, States} from 'domain/exploration/states.model';
 import {SolutionValidityService} from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import {AnswerClassificationService} from 'pages/exploration-player-page/services/answer-classification.service';
 import {AngularNameService} from 'pages/exploration-editor-page/services/angular-name.service';
@@ -114,7 +110,6 @@ export class ExplorationStatesService {
     private solutionValidityService: SolutionValidityService,
     private stateEditorService: StateEditorService,
     private stateEditorRefreshService: StateEditorRefreshService,
-    private statesObjectFactory: StatesObjectFactory,
     private validatorsService: ValidatorsService,
     private generateContentIdService: GenerateContentIdService,
     private explorationNextContentIdIndexService: ExplorationNextContentIdIndexService,
@@ -525,8 +520,7 @@ export class ExplorationStatesService {
     statesBackendDict: StateObjectsBackendDict,
     contentChangesCanAffectTranslations: boolean
   ): void {
-    this._states =
-      this.statesObjectFactory.createFromBackendDict(statesBackendDict);
+    this._states = States.createFromBackendDict(statesBackendDict);
     this.contentChangesCanAffectTranslations =
       contentChangesCanAffectTranslations;
     // Initialize the solutionValidityService.

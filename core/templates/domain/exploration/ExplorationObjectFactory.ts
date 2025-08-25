@@ -39,11 +39,7 @@ import {
 } from 'interactions/customization-args-defs';
 import {Interaction} from 'domain/exploration/interaction.model';
 import {State} from 'domain/state/state.model';
-import {
-  StateObjectsBackendDict,
-  States,
-  StatesObjectFactory,
-} from 'domain/exploration/StatesObjectFactory';
+import {StateObjectsBackendDict, States} from 'domain/exploration/states.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
@@ -209,7 +205,6 @@ export class Exploration extends BaseTranslatableObject {
 export class ExplorationObjectFactory {
   constructor(
     private logger: LoggerService,
-    private statesObjectFactory: StatesObjectFactory,
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
@@ -220,9 +215,7 @@ export class ExplorationObjectFactory {
       explorationBackendDict.init_state_name,
       ParamChanges.createFromBackendList(explorationBackendDict.param_changes),
       ParamSpecs.createFromBackendDict(explorationBackendDict.param_specs),
-      this.statesObjectFactory.createFromBackendDict(
-        explorationBackendDict.states
-      ),
+      States.createFromBackendDict(explorationBackendDict.states),
       explorationBackendDict.title,
       explorationBackendDict.next_content_id_index,
       explorationBackendDict.language_code,

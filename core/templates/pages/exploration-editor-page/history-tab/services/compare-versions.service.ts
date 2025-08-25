@@ -23,10 +23,7 @@ import {
   ExplorationMetadataObjectFactory,
 } from 'domain/exploration/ExplorationMetadataObjectFactory';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
-import {
-  StateObjectsDict,
-  StatesObjectFactory,
-} from 'domain/exploration/StatesObjectFactory';
+import {StateObjectsDict, States} from 'domain/exploration/states.model';
 import {ExplorationDataService} from 'pages/exploration-editor-page/services/exploration-data.service';
 import {
   ExplorationDiffService,
@@ -56,7 +53,6 @@ export class CompareVersionsService {
     private explorationDiffService: ExplorationDiffService,
     private explorationMetadataObjectFactory: ExplorationMetadataObjectFactory,
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
-    private statesObjectFactory: StatesObjectFactory,
     private versionTreeService: VersionTreeService
   ) {}
 
@@ -144,12 +140,10 @@ export class CompareVersionsService {
       // Track changes from v1 to LCA, and then from LCA to v2.
       let lca = this.versionTreeService.findLCA(v1, v2);
 
-      let v1States = this.statesObjectFactory
-        .createFromBackendDict(v1StatesDict)
-        .getStateObjects();
-      let v2States = this.statesObjectFactory
-        .createFromBackendDict(v2StatesDict)
-        .getStateObjects();
+      let v1States =
+        States.createFromBackendDict(v1StatesDict).getStateObjects();
+      let v2States =
+        States.createFromBackendDict(v2StatesDict).getStateObjects();
 
       let diffGraphData = this.explorationDiffService.getDiffGraphData(
         v1States,

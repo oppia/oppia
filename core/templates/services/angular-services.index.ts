@@ -66,7 +66,6 @@ import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { EmailDashboardBackendApiService } from 'domain/email-dashboard/email-dashboard-backend-api.service';
 import { ExplorationObjectFactory } from 'domain/exploration/ExplorationObjectFactory';
 import { LostChangeObjectFactory } from 'domain/exploration/LostChangeObjectFactory';
-import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
 import { CuratedExplorationValidationService } from 'domain/exploration/curated-exploration-validation.service';
 import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
@@ -815,7 +814,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['StateTutorialFirstTimeService', StateTutorialFirstTimeService],
   ['TutorialEventsBackendApiService',
     TutorialEventsBackendApiService],
-  ['StatesObjectFactory', StatesObjectFactory],
   ['StatsReportingBackendApiService', StatsReportingBackendApiService],
   ['StatsReportingService', StatsReportingService],
   ['StoryCreationBackendApiService', StoryCreationBackendApiService],
