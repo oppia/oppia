@@ -1589,7 +1589,6 @@
 	"I18N_SUBTOPIC_VIEWER_BACK_TO_TOPIC": "Text that appears before the name of the topic to navigate to the topic viewer page.",
 	"I18N_SUBTOPIC_VIEWER_GO_TO_NEXT_STUDY_GUIDE_BUTTON": "Text that appears in the second next action button to go to the next study guide.",
 	"I18N_SUBTOPIC_VIEWER_GO_TO_PRACTICE": "Text that appears in the button that takes the user to the practice page.",
-	"I18N_SUBTOPIC_VIEWER_GO_TO_PRACTICE_BUTTON_DESCRIPTION": "Text that appears as the description of the go to practice page button.",
 	"I18N_SUBTOPIC_VIEWER_GO_TO_STUDY_GUIDE_MENU_BUTTON": "Text that appears in the first next action button to go to the study guides menu.",
 	"I18N_SUBTOPIC_VIEWER_NEXT_ACTIONS_HEADING": "Text that appears on top of the next action buttons.",
 	"I18N_SUBTOPIC_VIEWER_NEXT_SKILL": "Text appears next to a skill summary card, labelling it as the next skill to complete",
