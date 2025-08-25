@@ -537,7 +537,7 @@ p:last-child {
   color: inherit;
   text-decoration: none;
 }
-.open > a {
+.show > a {
   outline: 0;
 }
 
@@ -573,7 +573,7 @@ p:last-child {
   text-decoration: none;
 }
 
-.oppia-navbar-nav .open > a {
+.oppia-navbar-nav .show > a {
   background-color: #fff;
   color: #009688;
 }
@@ -840,7 +840,7 @@ textarea {
   padding: 5px 0;
 }
 
-.open > .dropdown-menu {
+.show > .dropdown-menu {
   display: block;
 }
 
@@ -2516,7 +2516,7 @@ div#ng-curtain {
   top: 28px;
   width: 100%;
 }
-.oppia-editor-sidebar ngb-accordion .accordion-iteam {
+.oppia-editor-sidebar ngb-accordion .accordion-item {
   border-radius: 0;
 }
 .oppia-editor-sidebar ngb-accordion .accordion .accordion-heading {

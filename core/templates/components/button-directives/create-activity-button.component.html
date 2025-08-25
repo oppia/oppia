@@ -14,7 +14,7 @@
                         *ngIf="'userIsLoggedIn'"
                         [buttonText]="'+ ' + ('I18N_CREATE_EXPLORATION' | translate)">
   </oppia-primary-button>
-  <button class="btn nav-link oppia-navbar-button oppia-navbar-hide-on-small-collapse-horizontal oppia-transition-200"
+  <button class="btn nav-link oppia-navbar-button oppia-navbar-hide-on-small-width oppia-transition-200"
           (click)="showUploadExplorationModal()"
           [disabled]="creationInProgress"
           *ngIf="allowYamlFileUpload && userIsLoggedIn">
