@@ -272,7 +272,7 @@ describe('Practice Question Submitter', function () {
     );
     await questionSubmitter.selectQuestionDifficulty('Easy');
     await questionSubmitter.seedTextToQuestion('What is 10 + 11?');
-    await questionSubmitter.addImageInteraction();
+    await questionSubmitter.addImageInteractionInQuestionEditor();
     await questionSubmitter.editDefaultResponseFeedbackInQuestionEditorPage(
       'Wrong Answer.'
     );
