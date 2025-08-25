@@ -205,10 +205,9 @@ describe('Skill Editor Navbar Component', () => {
       },
     });
 
-    component[`confirmBeforeLeavingQuestions`](runFn);
+    component.confirmBeforeLeavingQuestions(runFn);
     tick();
 
-    // Expectations: nothing should happen
     expect(runFn).not.toHaveBeenCalled();
     expect(questionUndoRedoService.hasChanges).toHaveBeenCalled();
   }));
