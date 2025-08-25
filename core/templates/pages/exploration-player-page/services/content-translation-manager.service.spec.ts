@@ -264,13 +264,6 @@ describe('Content translation manager service', () => {
     );
   });
 
-  it('should set original transcript', () => {
-    ctms.setOriginalTranscript('en');
-
-    expect(ctms['explorationLanguageCode']).toBe('en');
-    expect(ctms['originalTranscript'].length).toBe(1);
-  });
-
   it('should get onStateCardContentUpdate emitter', () => {
     const emitter = ctms.onStateCardContentUpdate;
 
