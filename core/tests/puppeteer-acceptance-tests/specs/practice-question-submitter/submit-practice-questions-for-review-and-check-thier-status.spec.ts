@@ -353,7 +353,7 @@ describe('Practice Question Submitter', function () {
     );
     await questionSubmitter.addHintToState('Test Hint 3');
     await questionSubmitter.addSolutionToState(
-      'Answer',
+      'Correct Answer',
       'Test Solution 1',
       false
     );
