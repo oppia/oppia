@@ -19,7 +19,7 @@
 import {Component, OnInit} from '@angular/core';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
-import {Question} from 'domain/question/question.model.';
+import {Question} from 'domain/question/question.model';
 import {QuestionUndoRedoService} from 'domain/editor/undo_redo/question-undo-redo.service';
 import {Skill} from 'domain/skill/skill.model.ts';
 import {SkillOpportunity} from 'domain/opportunity/skill-opportunity.model';

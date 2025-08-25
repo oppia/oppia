@@ -38,7 +38,7 @@ import {PageContextService} from 'services/page-context.service';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import cloneDeep from 'lodash/cloneDeep';
-import {Question, QuestionBackendDict} from 'domain/question/question.model.';
+import {Question, QuestionBackendDict} from 'domain/question/question.model';
 import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
 import {PlayerTranscriptService} from './player-transcript.service';
 

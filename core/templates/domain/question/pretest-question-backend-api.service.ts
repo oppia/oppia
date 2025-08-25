@@ -22,7 +22,7 @@ import {Injectable} from '@angular/core';
 import cloneDeep from 'lodash/cloneDeep';
 
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {Question, QuestionBackendDict} from 'domain/question/question.model.';
+import {Question, QuestionBackendDict} from 'domain/question/question.model';
 import {QuestionDomainConstants} from 'domain/question/question-domain.constants';
 
 import {AppConstants} from 'app.constants';

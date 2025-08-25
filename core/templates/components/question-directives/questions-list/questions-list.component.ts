@@ -43,7 +43,7 @@ import {
   Misconception,
   MisconceptionSkillMap,
 } from 'domain/skill/misconception.model';
-import {Question} from 'domain/question/question.model.';
+import {Question} from 'domain/question/question.model';
 import {State} from 'domain/state/state.model';
 import {Rubric} from 'domain/skill/rubric.model';
 import {EditableQuestionBackendApiService} from 'domain/question/editable-question-backend-api.service';

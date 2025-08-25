@@ -23,7 +23,7 @@ import {
   Misconception,
   MisconceptionSkillMap,
 } from 'domain/skill/misconception.model';
-import {Question, QuestionBackendDict} from 'domain/question/question.model.';
+import {Question, QuestionBackendDict} from 'domain/question/question.model';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {State} from 'domain/state/state.model';
 import {ThreadMessage} from 'domain/feedback_message/ThreadMessage.model';
