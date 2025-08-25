@@ -278,6 +278,8 @@ const editWorkedExampleModalAnswerRte =
 const rteComponentSaveButton = '.e2e-test-close-rich-text-component-editor';
 const topicPreviewTab = '.e2e-test-topic-preview-tab';
 const expandWorkedExampleButton = '.e2e-test-expand-workedexample';
+const subtopicExpandHeaderSelector = '.e2e-test-show-subtopics-list';
+const practiceTabToggle = '.e2e-test-toggle-practice-tab';
 
 const createNewSkillButton = '.e2e-test-create-skill-button';
 const createSkillButton = '.e2e-test-confirm-skill-creation-button';
@@ -2413,14 +2415,16 @@ export class CurriculumAdmin extends BaseUser {
     );
     await this.saveTopicDraft(topicName);
 
-    await this.createSkillForTopic(skillName, topicName, true);
-    await this.createQuestionsForSkill(skillName, 3);
+    await this.createSkillForTopic(skillName, topicName);
+    await this.createQuestionsForSkill(skillName, 10);
     await this.assignSkillToSubtopicInTopicEditor(
       skillName,
       subtopicName,
       topicName
     );
     await this.addSkillToDiagnosticTest(skillName, topicName);
+    await this.togglePracticeTabCheckbox();
+    await this.saveTopicDraft(topicName);
 
     await this.createSubtopicWithStudyGuideForTopic(
       'Subtracting Numbers',
@@ -2440,6 +2444,37 @@ export class CurriculumAdmin extends BaseUser {
     );
 
     await this.publishDraftTopic(topicName);
+  }
+
+  /**
+   * Toggles the "Show practice tab to learners" in Topic Editor.
+   */
+  async togglePracticeTabCheckbox(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeVisible(subtopicExpandHeaderSelector);
+      await this.clickOn(subtopicExpandHeaderSelector);
+    }
+    try {
+      await this.page.waitForSelector(practiceTabToggle);
+      const practiceTabToggleElement = await this.page.$(practiceTabToggle);
+      if (!practiceTabToggleElement) {
+        throw new Error('Practice tab toggle not found.');
+      }
+      await this.waitForElementToBeClickable(practiceTabToggleElement);
+      await practiceTabToggleElement.click();
+
+      await this.page.waitForFunction(
+        (selector: string) => {
+          const element = document.querySelector(selector);
+          return (element as HTMLInputElement).checked === true;
+        },
+        {},
+        practiceTabToggle
+      );
+    } catch (error) {
+      console.error(error.stack);
+      throw error;
+    }
   }
 
   /**

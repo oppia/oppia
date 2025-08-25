@@ -293,6 +293,7 @@
 /core/templates/components/common-layout-directives/common-elements/sharing-links.component*.ts @oppia/lace-frontend-reviewers
 /core/templates/components/common-layout-directives/common-elements/common-elements.module.ts @oppia/lace-frontend-reviewers
 /core/templates/components/custom-snackbar/ @oppia/lace-frontend-reviewers
+/core/templates/components/progress-bar/ @oppia/lace-frontend-reviewers
 /core/templates/components/language-banner/ @oppia/lace-frontend-reviewers
 /core/templates/components/profile-link-directives/ @oppia/lace-frontend-reviewers
 /core/templates/components/summary-tile/ @oppia/lace-frontend-reviewers
