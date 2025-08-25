@@ -32,6 +32,14 @@ expect.extend({toMatchImageSnapshot});
 const backgroundBanner = '.oppia-background-image';
 const libraryBanner = '.e2e-test-library-banner';
 
+const commonModalTitleSelector = '.e2e-test-modal-header';
+const commonModalBodySelector = '.e2e-test-modal-body';
+const commonModalConfirmBtnSelector = '.e2e-test-confirm-action-button';
+const commonModalCancelBtnSelector = '.e2e-test-cancel-action-button';
+const uploadErrorMessageDivSelector = '.e2e-test-upload-error-message';
+const currentMatTabHeaderSelector = '.mat-tab-label-active';
+const actionStatusMessageSelector = '.e2e-test-status-message';
+
 const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
 const baseURL = testConstants.URLs.BaseURL;
 
@@ -63,14 +71,12 @@ export type ModalUserInteractions = (
   container: string
 ) => Promise<void>;
 
-const actionStatusMessageSelector = '.e2e-test-status-message';
-
 export class BaseUser {
   page!: Page;
   browserObject!: Browser;
   userHasAcceptedCookies: boolean = false;
-  email: string = '';
-  username: string = '';
+  email: string | null = null;
+  username: string | null = null;
   startTimeInMilliseconds: number = -1;
   screenRecorder!: PuppeteerScreenRecorder;
   static instances: BaseUser[] = []; // Track instances.
@@ -143,12 +149,17 @@ export class BaseUser {
         if (process.env.VIDEO_RECORDING_IS_ENABLED === '1') {
           const uniqueString = Math.random().toString(36).substring(2, 8);
           const outputFileName =
-            `${mobile ? 'mobile' : 'desktop'}-${specName}-${new Date().toISOString()}-${uniqueString}.mp4`.replace(
+            `${this.username}-${new Date().toISOString()}-${uniqueString}.mp4`.replace(
               /[^a-z0-9.-]/gi,
               '_'
             );
 
-          const outputDir = testConstants.TEST_VIDEO_DIR;
+          const folderName =
+            `${mobile ? 'mobile' : 'desktop'}-${specName}`.replace(
+              /[^a-z0-9.-]/gi,
+              '_'
+            );
+          const outputDir = path.join(testConstants.TEST_VIDEO_DIR, folderName);
           if (!fs.existsSync(outputDir)) {
             fs.mkdirSync(outputDir, {recursive: true});
           }
@@ -417,14 +428,15 @@ export class BaseUser {
     selector: string | ElementHandle<Element>
   ): Promise<void> {
     showMessage(`Checking if element ${selector} is clickable...`);
+    const element =
+      typeof selector === 'string'
+        ? await this.page.waitForSelector(selector)
+        : selector;
     try {
-      const element =
-        typeof selector === 'string'
-          ? await this.page.waitForSelector(selector)
-          : selector;
       await this.page.waitForFunction(isElementClickable, {}, element);
     } catch (error) {
       if (error instanceof Error) {
+        await this.page.evaluate(isElementClickable, element, true, true);
         error.message =
           `Element with selector ${selector} took too long to be clickable.\n` +
           'Original Error:\n' +
@@ -434,20 +446,22 @@ export class BaseUser {
     }
     showMessage(`Element (${selector}) is clickable, as expected.`);
   }
-
   /**
    * The function clicks the element using the text on the button.
    * @param selector The text of the button to click on.
    * @param forceSelector If true, the function will try to find the element by its CSS selector.
+   * @param parentElement The parent element to search within.
    */
   async clickOn(
     selector: string,
-    forceSelector: boolean = false
+    forceSelector: boolean = false,
+    parentElement?: puppeteer.ElementHandle
   ): Promise<void> {
+    const context = parentElement ?? this.page;
     /** Normalize-space is used to remove the extra spaces in the text.
      * Check the documentation for the normalize-space function here :
      * https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space */
-    const [button] = await this.page.$x(
+    const [button] = await context.$x(
       `\/\/*[contains(text(), normalize-space('${selector}'))]`
     );
     // If we fail to find the element by its XPATH, then the button is undefined and
@@ -458,10 +472,13 @@ export class BaseUser {
       await button.click();
       showMessage(`Button (text: ${selector}) is clicked.`);
     } else {
-      showMessage(`Clicking on button with selector: ${selector}`);
-      await this.waitForElementToBeClickable(selector);
+      const element = await context.waitForSelector(selector, {visible: true});
+      if (!element) {
+        throw new Error(`Element not found for selector ${selector}`);
+      }
+      await this.waitForElementToBeClickable(element);
       showMessage(`Element (selector: ${selector}) is clickable, as expected.`);
-      await this.page.click(selector);
+      await element.click();
       showMessage(`Element (selector: ${selector}) is clicked.`);
     }
   }
@@ -493,31 +510,12 @@ export class BaseUser {
    * and wait until the new page is fully loaded.
    */
   async clickAndWaitForNavigation(selector: string): Promise<void> {
-    /** Normalize-space is used to remove the extra spaces in the text.
-     * Check the documentation for the normalize-space function here :
-     * https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space */
-    const [button] = await this.page.$x(
-      `\/\/*[contains(text(), normalize-space('${selector}'))]`
-    );
-    // If we fail to find the element by its XPATH, then the button is undefined and
-    // we try to find it by its CSS selector.
-    if (button !== undefined) {
-      await this.waitForElementToBeClickable(button);
-      await Promise.all([
-        this.page.waitForNavigation({
-          waitUntil: ['networkidle2', 'load'],
-        }),
-        button.click(),
-      ]);
-    } else {
-      await this.waitForElementToBeClickable(selector);
-      await Promise.all([
-        this.page.waitForNavigation({
-          waitUntil: ['networkidle2', 'load'],
-        }),
-        this.page.click(selector),
-      ]);
-    }
+    const navigationPromise = this.page.waitForNavigation({
+      waitUntil: ['networkidle2', 'load'],
+    });
+
+    await this.clickOn(selector, false);
+    await navigationPromise;
   }
 
   /**
@@ -538,6 +536,47 @@ export class BaseUser {
     const element = await this.getElementInParent(selector);
     await element.click({clickCount: 3});
     await this.page.keyboard.press('Backspace');
+  }
+
+  /**
+   * The function selects all text content and copies it.
+   * @param {string} selector - The element from which the text is to
+   * be copied.
+   */
+  async copyTextFrom(selector: string): Promise<void> {
+    await this.waitForElementToBeClickable(selector);
+    await this.page.click(selector, {clickCount: 3});
+    await this.page.keyboard.down('ControlLeft');
+    await this.page.keyboard.press('C');
+    await this.page.keyboard.up('ControlLeft');
+  }
+
+  /**
+   * The function selects all text content using Control+A and copies it.
+   * @param {string} selector - The element from which the text is to
+   * be copied.
+   */
+  async copyAllTextFrom(selector: string): Promise<void> {
+    await this.waitForElementToBeClickable(selector);
+    await this.page.click(selector);
+    await this.page.keyboard.down('ControlLeft');
+    await this.page.keyboard.press('A');
+    await this.page.keyboard.press('C');
+    await this.page.keyboard.up('ControlLeft');
+  }
+
+  /**
+   * The function pastes all the text on the clipboard to
+   * the given selector.
+   * @param {string} selector - The element to which the text is to
+   * be pasted.
+   */
+  async pasteTextTo(selector: string): Promise<void> {
+    await this.waitForElementToBeClickable(selector);
+    await this.page.click(selector);
+    await this.page.keyboard.down('ControlLeft');
+    await this.page.keyboard.press('V');
+    await this.page.keyboard.up('ControlLeft');
   }
 
   /**
@@ -564,10 +603,13 @@ export class BaseUser {
   async goto(url: string, verifyURL: boolean = true): Promise<void> {
     await this.page.goto(url, {waitUntil: ['networkidle0', 'load']});
 
-    if (verifyURL && this.page.url() !== url) {
-      // If the URL is not the expected one, throw an error.
-      throw new Error(
-        `Failed to navigate to ${url}. Current URL is ${this.page.url()}.`
+    if (verifyURL) {
+      await this.page.waitForFunction(
+        (url: string) => {
+          return window.location.href.includes(url);
+        },
+        {},
+        url
       );
     }
   }
@@ -736,14 +778,19 @@ export class BaseUser {
           visible: true,
           timeout: timeout,
         });
+        showMessage(`Element (selector: ${selector}) is visible.`);
       } else {
         await this.page.waitForSelector(selector, {
           hidden: true,
           timeout: timeout,
         });
+        showMessage(`Element (selector: ${selector}) is hidden.`);
       }
       return true;
     } catch {
+      showMessage(
+        `Element (selector: ${selector}) is not ${visible ? 'visible' : 'hidden'}.`
+      );
       return false;
     }
   }
@@ -881,9 +928,6 @@ export class BaseUser {
             )
           : path.join(testPath, dirName, 'diff-snapshots'),
       });
-      if (typeof newPage !== 'undefined') {
-        await newPage.close();
-      }
     } catch (error) {
       if (__dirname.startsWith('/home/runner')) {
         throw new Error(
@@ -933,18 +977,48 @@ export class BaseUser {
    */
   async clickLinkAnchorToNewTab(
     anchorInnerText: string,
-    expectedDestinationPageUrl: string
-  ): Promise<void> {
-    await this.page.waitForXPath(`//a[contains(text(),"${anchorInnerText}")]`);
-    const pageTarget = this.page.target();
-    await this.clickOn(anchorInnerText);
+    expectedDestinationPageUrl: string,
+    closePage: boolean = true,
+    context: Page = this.page
+  ): Promise<Page | null> {
+    const xpath = `//a[normalize-space(.)="${anchorInnerText}"]`;
+    const element = await context.waitForXPath(xpath);
+    const pageTarget = context.target();
+    await element?.click();
     const newTarget = await this.browserObject.waitForTarget(
       target => target.opener() === pageTarget
     );
     const newTabPage = await newTarget.page();
+    if (!newTabPage) {
+      throw new Error('No new tab opened.');
+    }
+    await newTabPage.bringToFront();
     expect(newTabPage).toBeDefined();
-    expect(newTabPage?.url()).toBe(expectedDestinationPageUrl);
-    await newTabPage?.close();
+    expect(newTabPage.url()).toBe(expectedDestinationPageUrl);
+    if (closePage) {
+      await newTabPage.close();
+      return null;
+    }
+    return newTabPage;
+  }
+
+  /**
+   * Verify that the anchor tag with the given inner text is present on the page.
+   * @param {string} anchorInnerText - The inner text of the anchor tag.
+   * @param {string} targetPageUrl - The URL of the page to which the anchor tag should link.
+   * @param {puppeteer.Page} context - The page on which the anchor tag should be verified.
+   */
+  async verifyAnchorTagIsPresent(
+    anchorInnerText: string,
+    targetPageUrl: string,
+    context: puppeteer.Page = this.page
+  ): Promise<void> {
+    const anchor = await context.waitForSelector(`a[href="${targetPageUrl}"]`);
+    expect(anchor).toBeTruthy();
+    const anchorText = await anchor?.evaluate(el =>
+      (el as HTMLAnchorElement).innerText.trim()
+    );
+    expect(anchorText).toEqual(anchorInnerText);
   }
 
   /**
@@ -1039,6 +1113,7 @@ export class BaseUser {
   ): Promise<void> {
     const options = visibility ? {visible: true} : {hidden: true};
     await this.page.waitForSelector(selector, options);
+    showMessage(`Element ${selector} is ${visibility ? 'visible' : 'hidden'}.`);
   }
 
   /**
@@ -1124,7 +1199,6 @@ export class BaseUser {
     selector: string,
     text: string
   ): Promise<void> {
-    await this.expectElementToBeVisible(selector);
     try {
       await this.page.waitForFunction(
         (selector: string, text: string) => {
@@ -1268,7 +1342,7 @@ export class BaseUser {
   /**
    * This function checks if the page URL contains the given URL.
    * @param {string} url - The URL to check.
-   * @param {Page} context - The context in which the URL is checked.
+   * @param {Page} context - The page on which the URL should be checked.
    */
   async expectPageURLToContain(
     url: string,
@@ -1485,6 +1559,39 @@ export class BaseUser {
   }
 
   /**
+   * Checks if the modal title matches the expected title.
+   * @param expectedTitle The expected title of the modal.
+   */
+  async expectModalTitleToBe(expectedTitle: string): Promise<void> {
+    await this.expectElementToBeVisible(commonModalTitleSelector);
+    await this.expectTextContentToBe(commonModalTitleSelector, expectedTitle);
+  }
+
+  /**
+   * Checks if the modal body contains the expected text.
+   * @param expectedText The expected text of the modal body.
+   */
+  async expectModalBodyToContain(expectedText: string): Promise<void> {
+    await this.expectElementToBeVisible(commonModalBodySelector);
+    await this.expectTextContentToContain(
+      commonModalBodySelector,
+      expectedText
+    );
+  }
+
+  /**
+   * Checks if the current mat tab header matches the expected header.
+   * @param expectedHeader The expected header of the mat tab.
+   */
+  async expectCurrentMatTabHeaderToBe(expectedHeader: string): Promise<void> {
+    await this.expectElementToBeVisible(currentMatTabHeaderSelector);
+    await this.expectTextContentToBe(
+      currentMatTabHeaderSelector,
+      expectedHeader
+    );
+  }
+
+  /**
    * Returns all elements matching the given selector.
    * @param selector - The selector to find elements for.
    * @param parentElement - The parent element to search within.
@@ -1552,6 +1659,41 @@ export class BaseUser {
       await this.expectPageURLToContain(targetPageUrl, context);
       await context.goBack();
     }
+  }
+  /**
+   * Clicks on the button in the modal with the given title and action.
+   * @param title - The title of the modal.
+   * @param action - The action to click on the button in the modal.
+   */
+  async clickButtonInModal(
+    title: string,
+    action: 'confirm' | 'cancel'
+  ): Promise<void> {
+    await this.expectElementToBeVisible(commonModalTitleSelector);
+    await this.expectTextContentToBe(commonModalTitleSelector, title);
+
+    const currentActionBtnSelector =
+      action === 'confirm'
+        ? commonModalConfirmBtnSelector
+        : commonModalCancelBtnSelector;
+    await this.expectElementToBeVisible(currentActionBtnSelector);
+    await this.clickOn(currentActionBtnSelector);
+
+    await this.expectElementToBeVisible(currentActionBtnSelector, false);
+  }
+
+  /**
+   * Checks if the upload error message contains the expected text.
+   * @param expectedErrorMessage The expected text of the upload error message.
+   */
+  async expectUploadErrorMessageToBe(
+    expectedErrorMessage: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(uploadErrorMessageDivSelector);
+    await this.expectTextContentToContain(
+      uploadErrorMessageDivSelector,
+      expectedErrorMessage
+    );
   }
 }
 

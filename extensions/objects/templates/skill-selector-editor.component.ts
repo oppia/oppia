@@ -28,7 +28,7 @@ import {ObjectFormValidityChangeEvent} from 'app-events/app-events';
 import {EventBusGroup, EventBusService} from 'app-events/event-bus.service';
 import {AppConstants} from 'app.constants';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
-import {SkillBackendDict} from 'domain/skill/SkillObjectFactory';
+import {SkillBackendDict} from 'domain/skill/skill.model.ts';
 import {PageContextService} from 'services/page-context.service';
 
 @Component({

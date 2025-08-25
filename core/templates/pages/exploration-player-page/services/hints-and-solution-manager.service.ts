@@ -23,6 +23,7 @@ import {Solution} from 'domain/exploration/solution.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {ExplorationPlayerConstants} from 'pages/exploration-player-page/current-lesson-player/exploration-player-page.constants';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
+import {BehaviorSubject} from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -43,7 +44,9 @@ export class HintsAndSolutionManagerService {
   private _timeoutElapsedEventEmitter = new EventEmitter();
   onTimeoutElapsed$ = this._timeoutElapsedEventEmitter.asObservable();
 
-  numHintsReleased: number = 0;
+  private _numHintsReleased$ = new BehaviorSubject<number>(0);
+  public readonly numHintsReleased$ = this._numHintsReleased$.asObservable();
+
   numHintsConsumed: number = 0;
   solutionReleased: boolean = false;
   solutionConsumed: boolean = false;
@@ -103,7 +106,9 @@ export class HintsAndSolutionManagerService {
 
   releaseHint(): void {
     if (!this.correctAnswerSubmitted) {
-      this.numHintsReleased++;
+      const updatedValue = this._numHintsReleased$.value + 1;
+      this._numHintsReleased$.next(updatedValue);
+
       if (!this.hintsDiscovered && !this.tooltipTimeout) {
         this.tooltipTimeout = setTimeout(
           this.showTooltip.bind(this),
@@ -132,11 +137,11 @@ export class HintsAndSolutionManagerService {
   }
 
   areAllHintsExhausted(): boolean {
-    return this.numHintsReleased === this.hintsForLatestCard.length;
+    return this._numHintsReleased$.value === this.hintsForLatestCard.length;
   }
 
   isAHintWaitingToBeViewed(): boolean {
-    return this.numHintsConsumed < this.numHintsReleased;
+    return this.numHintsConsumed < this._numHintsReleased$.value;
   }
 
   consumeHint(): void {
@@ -165,7 +170,7 @@ export class HintsAndSolutionManagerService {
   }
 
   reset(newHints: Hint[], newSolution: Solution | null): void {
-    this.numHintsReleased = 0;
+    this._numHintsReleased$.next(0);
     this.numHintsConsumed = 0;
     this.solutionReleased = false;
     this.solutionConsumed = false;
@@ -201,13 +206,13 @@ export class HintsAndSolutionManagerService {
   displayHint(index: number): SubtitledHtml | null {
     if (
       index === this.numHintsConsumed &&
-      this.numHintsConsumed < this.numHintsReleased
+      this.numHintsConsumed < this._numHintsReleased$.value
     ) {
       // The latest hint has been consumed. Start the timer.
       this.consumeHint();
     }
 
-    if (index < this.numHintsReleased) {
+    if (index < this._numHintsReleased$.value) {
       return this.hintsForLatestCard[index].hintContent;
     }
     return null;
@@ -231,7 +236,7 @@ export class HintsAndSolutionManagerService {
   }
 
   isHintViewable(index: number): boolean {
-    return index < this.numHintsReleased;
+    return index < this._numHintsReleased$.value;
   }
 
   isHintConsumed(index: number): boolean {
@@ -262,12 +267,12 @@ export class HintsAndSolutionManagerService {
     this.wrongAnswersSinceLastHintConsumed++;
     if (!this.areAllHintsExhausted()) {
       if (
-        this.numHintsReleased === 0 &&
+        this._numHintsReleased$.value === 0 &&
         this.wrongAnswersSinceLastHintConsumed >= 2
       ) {
         this.accelerateHintRelease();
       } else if (
-        this.numHintsReleased > 0 &&
+        this._numHintsReleased$.value > 0 &&
         this.wrongAnswersSinceLastHintConsumed >= 1
       ) {
         this.accelerateHintRelease();

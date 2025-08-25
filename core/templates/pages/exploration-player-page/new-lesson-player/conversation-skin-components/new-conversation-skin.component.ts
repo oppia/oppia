@@ -44,7 +44,7 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {ExplorationInitializationService} from '../../services/exploration-initialization.service';
-import {ExplorationPlayerConstants} from '../../current-lesson-player/exploration-player-page.constants';
+import {NewLessonPlayerConstants} from '../../new-lesson-player/lesson-player-page.constants';
 import {CollectionPlayerBackendApiService} from 'pages/collection-player-page/services/collection-player-backend-api.service';
 import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
@@ -571,7 +571,7 @@ export class NewConversationSkinComponent {
   canWindowShowTwoCards(): boolean {
     return (
       this.windowDimensionsService.getWidth() >
-      ExplorationPlayerConstants.TWO_CARD_THRESHOLD_PX
+      NewLessonPlayerConstants.TWO_CARD_THRESHOLD_PX
     );
   }
 

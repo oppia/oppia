@@ -542,6 +542,7 @@ export class TopicManager extends BaseUser {
       await this.page.waitForSelector(
         `${closeSaveModalButton}:not([disabled])`
       );
+      await this.waitForElementToStabilize(closeSaveModalButton);
       await this.clickOn(closeSaveModalButton);
       await this.page.waitForSelector(modalDiv, {hidden: true});
     }
@@ -1059,6 +1060,8 @@ export class TopicManager extends BaseUser {
         if (!checkbox) {
           throw new Error(`Checkbox not found for topic "${topicName}"`);
         }
+
+        await this.waitForElementToStabilize(checkbox);
         await checkbox.click();
         topicFound = true;
         break;
