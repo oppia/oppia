@@ -288,7 +288,10 @@ describe('Practice Question Submitter', function () {
     );
     await questionSubmitter.selectQuestionDifficulty('Medium');
     await questionSubmitter.seedTextToQuestion('What is 14 + 12?');
-    await questionSubmitter.addInteraction(INTERACTION_TYPES.ITEM_SELECTION);
+    await questionSubmitter.addInteraction(
+      INTERACTION_TYPES.ITEM_SELECTION,
+      false
+    );
     await questionSubmitter.customizeItemSelectionInteraction(
       ['Option 1', 'Option 2', 'Correct Option 1', 'Correct Option 2'],
       1,
@@ -425,7 +428,10 @@ describe('Practice Question Submitter', function () {
     );
     await questionSubmitter.selectQuestionDifficulty('Hard');
     await questionSubmitter.seedTextToQuestion('What is 10/11?');
-    await questionSubmitter.addInteraction(INTERACTION_TYPES.FRACTION_INPUT);
+    await questionSubmitter.addInteraction(
+      INTERACTION_TYPES.FRACTION_INPUT,
+      false
+    );
     await questionSubmitter.customizeFractionInputInteraction(
       true,
       false,
@@ -453,7 +459,10 @@ describe('Practice Question Submitter', function () {
     );
     await questionSubmitter.selectQuestionDifficulty('Hard');
     await questionSubmitter.seedTextToQuestion('What is 10km + 11km?');
-    await questionSubmitter.addInteraction(INTERACTION_TYPES.NUMBER_WITH_UNITS);
+    await questionSubmitter.addInteraction(
+      INTERACTION_TYPES.NUMBER_WITH_UNITS,
+      false
+    );
     await questionSubmitter.fillValueInInteractionResponseModal(
       '21km',
       'input'
