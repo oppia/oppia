@@ -152,7 +152,7 @@ describe('Translation Submitter', function () {
     );
     await translationSubmitter.expectTranslationOpportunitiesToBePresent();
 
-    await translationSubmitter.expectTranslationOpportunityToBePresent(
+    await translationSubmitter.expectOpportunityToBePresent(
       'Cutting the Pies',
       'Fractions - The Picnic Problem'
     );
@@ -170,7 +170,7 @@ describe('Translation Submitter', function () {
     );
     await translationSubmitter.expectPaginationButtonToBeVisible('next', false);
     await translationSubmitter.expectPaginationButtonToBeVisible('previous');
-    await translationSubmitter.expectTranslationOpportunityToBePresent(
+    await translationSubmitter.expectOpportunityToBePresent(
       'Cutting the Pies',
       'Fractions - The Picnic Problem',
       false
@@ -312,7 +312,7 @@ describe('Translation Submitter', function () {
     );
 
     // Check for awaiting review.
-    await translationSubmitter.expectTranslationStatusToBe(
+    await translationSubmitter.expectContributionStatusToBe(
       'बोल्ड टेक्स्ट इटैलिक टेक्स्...',
       'Fractions / The Picnic',
       'Awaiting review'
