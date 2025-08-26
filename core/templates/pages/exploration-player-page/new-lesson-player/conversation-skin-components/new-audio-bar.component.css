@@ -22,7 +22,7 @@
 .oppia-new-audio-bar p {
   color: #205d86;
   flex-shrink: 0;
-  font-family: Roboto;
+  font-family: 'Roboto', Arial, sans-serif;
   font-size: 16px;
   font-weight: 500;
   margin-left: 8px;
@@ -32,12 +32,12 @@
 
 .oppia-new-audio-bar span {
   color: #c55f45;
-  font-family: Roboto;
+  font-family: 'Roboto', Arial, sans-serif;
   font-size: 16px;
   font-weight: 500;
 }
 
-.oppia-new-audio-header-select select{
+.oppia-new-audio-header-select select {
   background-color: #fff8e5;
   border: 2px solid #205d86;
   border-radius: 4px;
@@ -55,8 +55,8 @@
 .audio-new-header-control-icons i {
   color: #205d86;
   font-size: 15px;
-  margin-right: 12px;
   margin-left: 12px;
+  margin-right: 12px;
 }
 
 .new-slider-section {

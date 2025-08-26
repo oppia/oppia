@@ -52,7 +52,7 @@ export class NewAudioBarComponent {
   progressBarIsShown: boolean = false;
   audioLoadingIndicatorIsShown: boolean = false;
   languageAccentCodesToDescriptions!: LanguageAccentToDescription;
-  languageAccentDecriptions: string[] = [];
+  languageAccentDescriptions: string[] = [];
   selectedLanguageAccentDescription!: string;
   voiceoverToBePlayed!: Voiceover | undefined;
   currentVoiceoverTime: number = 0;
@@ -111,7 +111,7 @@ export class NewAudioBarComponent {
       this.onFinishedLoadingAudio.bind(this)
     );
 
-    this.languageAccentDecriptions =
+    this.languageAccentDescriptions =
       this.voiceoverPlayerService.getLanguageAccentDescriptions();
   }
 
@@ -140,7 +140,7 @@ export class NewAudioBarComponent {
   }
 
   isAudioBarAvailable(): boolean {
-    return this.languageAccentDecriptions.length > 0;
+    return this.languageAccentDescriptions.length > 0;
   }
 
   isLanguageRTL(): boolean {
@@ -160,12 +160,12 @@ export class NewAudioBarComponent {
   }
 
   updateDisplayableLanguageAccentDescription(): void {
-    this.languageAccentDecriptions =
+    this.languageAccentDescriptions =
       this.voiceoverPlayerService.getLanguageAccentDescriptions();
 
-    if (this.languageAccentDecriptions.length > 0) {
+    if (this.languageAccentDescriptions.length > 0) {
       this.selectedLanguageAccentDescription =
-        this.languageAccentDecriptions[0];
+        this.languageAccentDescriptions[0];
       this.updateSelectedLanguageAccent();
     }
   }
