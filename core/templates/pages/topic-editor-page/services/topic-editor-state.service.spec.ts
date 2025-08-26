@@ -80,6 +80,8 @@ describe('Topic editor state service', () => {
   let storySummaryBackendDict: StorySummaryBackendDict;
   let subtopicPage: SubtopicPageBackendDict;
   let studyGuide: StudyGuideBackendDict;
+  let topicMock: Topic;
+  let savedTopicMock: Topic;
 
   class MockEditableTopicBackendApiService {
     fetchTopicAsync(topicId: string): Promise<FetchTopicResponse> {
@@ -273,6 +275,22 @@ describe('Topic editor state service', () => {
       ],
       next_content_id_index: 2,
       language_code: 'en',
+    };
+
+    topicMock = {
+      id: 'topic1',
+      name: 'Topic 1',
+      description: 'Description 1',
+      version: 1,
+      subtopicList: [],
+    };
+
+    savedTopicMock = {
+      id: 'topic2',
+      name: 'Saved Topic',
+      description: 'Saved Description',
+      version: 2,
+      subtopicList: [],
     };
   });
 
@@ -777,4 +795,18 @@ describe('Topic editor state service', () => {
       );
     })
   );
+
+  it('should return the saved topic if it exists', () => {
+    topicEditorStateService.setTopicForTesting(topicMock);
+    topicEditorStateService.setSavedTopicForTesting(savedTopicMock);
+
+    expect(topicEditorStateService.getSavedTopic()).toBe(savedTopicMock);
+  });
+
+  it('should return the topic if saved topic does not exist', () => {
+    topicEditorStateService.setTopicForTesting(topicMock);
+    topicEditorStateService.setSavedTopicForTesting(undefined);
+
+    expect(topicEditorStateService.getSavedTopic()).toBe(topicMock);
+  });
 });

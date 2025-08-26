@@ -318,6 +318,14 @@ export class TopicEditorStateService {
     this._topicWithUrlFragmentExists = topicWithUrlFragmentExists;
   }
 
+  setTopicForTesting(topic: Topic): void {
+    this._topic = topic;
+  }
+
+  setSavedTopicForTesting(savedTopic: Topic | undefined): void {
+    this._savedTopic = savedTopic;
+  }
+
   /**
    * Loads, or reloads, the topic stored by this service given a
    * specified topic ID. See setTopic() for more information on
