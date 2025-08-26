@@ -1,1 +1,51 @@
-<div class="oppia-new-audio-bar"></div>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha512-DxV+EoADOkOygM4IR9yXP8Sb2qwgidEmeqAEmDKIOfPRQZOWbXCzLC6vjbZyy0vPisbH2SyW27+ddLVCN+OMzQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+<div class="oppia-new-audio-bar">
+	<i class="fa-solid fa-headphones"></i>
+	<p>Listen to this lesson in <span>{{selectedLanguageAccentDescription}}</span></p>
+
+	<div class="oppia-new-audio-header-control-buttons" #audioControls>
+
+		<!-- <div class="oppia-new-audio-header-select">
+			<select class="audio-language-select e2e-test-audio-lang-select"
+							[(ngModel)]="selectedLanguageAccentDescription"
+							(change)="updateSelectedLanguageAccent()">
+				<option *ngFor="let opt of languageAccentDecriptions" [value]="opt">{{ opt }}</option>
+			</select>
+		</div> -->
+
+		<div class="audio-new-header-control-icons">
+				<a (click)="onPlayButtonClicked()" (keydown.enter)="onPlayButtonClicked()"
+						[ngbTooltip]="!isAudioAvailableInCurrentLanguageAccent() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:selectedLanguageAccentDescription}) : ''"
+						placement="right">
+					<i class="fa-solid fa-play"></i>
+					<!-- <i class="fa-solid fa-pause"></i> -->
+				<!-- <i class="fas oppia-audio-controls-button-icon" tabindex="0" aria-label="Press enter to Listen to the Lesson"
+						[ngClass]="{'fa-ellipsis-h': audioLoadingIndicatorIsShown, 'fa-play-circle': !isAudioPlaying(), 'fa-pause-circle': isAudioPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguageAccent()}">
+				</i> -->
+				</a>
+		</div>
+
+		<div class="new-slider-section">
+				<mat-progress-bar mode="indeterminate" *ngIf="audioLoadingIndicatorIsShown"></mat-progress-bar>
+				<oppia-audio-slider class="audio-progress-bar" [value]="this.currentVoiceoverTime" *ngIf="!audioLoadingIndicatorIsShown"
+														[dir]="isLanguageRTL() ? 'rtl' : 'ltr'"
+														[max]="this.totalVoiceoverDurationSecs"
+														(valueChange)="setProgress($event)"
+														aria-label="audio-slider">
+				</oppia-audio-slider>
+				<span *ngIf="audioLoadingIndicatorIsShown && !doesCurrentAudioTranslationNeedUpdate()"
+						class="audio-controls-message">
+						{{ 'I18N_PLAYER_AUDIO_LOADING_AUDIO' | translate }}
+				</span>
+				<span *ngIf="isAudioAvailableInCurrentLanguageAccent() && doesCurrentAudioTranslationNeedUpdate()"
+						class="audio-controls-message">
+				{{ 'I18N_PLAYER_AUDIO_MIGHT_NOT_MATCH_TEXT' | translate }}
+				</span>
+				<!--Filler space for message-->
+				<span class="audio-controls-message">&zwnj;</span>
+		</div>
+
+	</div>
+
+</div>

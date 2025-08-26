@@ -5,8 +5,68 @@
 */
 
 .oppia-new-audio-bar {
-  background-color: #f00;
-  height: 40px;
+  background-color: #fff8e5;
+  height: 44px;
   position: relative;
   width: 100%;
+  padding: 10px 8px;
+  padding-right: 48px;
+  display: flex;
+}
+
+.oppia-new-audio-bar i {
+  font-size: 24px;
+  color: #C55F45;
+}
+
+.oppia-new-audio-bar p {
+  font-family: Roboto;
+  font-weight: 500;
+  font-size: 16px;
+  color: #205D86;
+  margin-left: 8px;
+  margin-right: 8px;
+  min-width: 161px;
+}
+
+.oppia-new-audio-bar span {
+  font-family: Roboto;
+  font-weight: 500;
+  font-size: 16px;
+  color: #C55F45;
+}
+
+.oppia-new-audio-header-select select{
+  border: 2px solid #205D86;
+  border-radius: 4px;
+  width: 89px;
+  height: 28px;
+}
+
+.oppia-new-audio-header-control-buttons {
+  display: flex;
+  width: 85%;
+}
+
+.audio-new-header-control-icons i {
+  font-size: 15px;
+  color: #205D86;
+  margin-right: 12px;
+  margin-left: 12px;
+}
+
+.new-slider-section {
+  width: 100%;
+}
+
+oppia-new-audio-bar .mat-slider-horizontal {
+  height: 0;
+}
+
+oppia-new-audio-bar .mat-slider {
+  padding: 0;
+}
+
+oppia-new-audio-bar .mat-slider-wrapper {
+  position: static;
 }
