@@ -119,7 +119,7 @@ export class TopicEditorStateService {
 
   private _questionEditorOpenedEventEmitter: EventEmitter<boolean> =
     new EventEmitter<boolean>();
-  private _savedTopic: Topic = this._topic;
+  private _savedTopic: Topic | null = this._topic;
 
   constructor(
     private alertsService: AlertsService,
@@ -322,7 +322,7 @@ export class TopicEditorStateService {
     this._topic = topic;
   }
 
-  setSavedTopicForTesting(savedTopic: Topic | undefined): void {
+  setSavedTopicForTesting(savedTopic: Topic | null): void {
     this._savedTopic = savedTopic;
   }
 

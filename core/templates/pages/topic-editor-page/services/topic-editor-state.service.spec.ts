@@ -805,7 +805,7 @@ describe('Topic editor state service', () => {
 
   it('should return the topic if saved topic does not exist', () => {
     topicEditorStateService.setTopicForTesting(topicMock);
-    topicEditorStateService.setSavedTopicForTesting(undefined);
+    topicEditorStateService.setSavedTopicForTesting(null);
 
     expect(topicEditorStateService.getSavedTopic()).toBe(topicMock);
   });
