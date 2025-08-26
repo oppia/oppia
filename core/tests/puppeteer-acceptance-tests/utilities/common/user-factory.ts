@@ -23,7 +23,7 @@ import {LoggedOutUserFactory, LoggedOutUser} from '../user/logged-out-user';
 import {BlogAdminFactory, BlogAdmin} from '../user/blog-admin';
 import {QuestionAdminFactory} from '../user/question-admin';
 import {BlogPostEditorFactory} from '../user/blog-post-editor';
-import {VoiceoverAdminFactory} from '../user/voiceover-admin';
+import {VoiceoverAdmin, VoiceoverAdminFactory} from '../user/voiceover-admin';
 import {
   ExplorationEditorFactory,
   ExplorationEditor,
@@ -48,6 +48,7 @@ import {
 } from '../user/contributor-admin';
 import {TranslationCoordinatorFactory} from '../user/translation-coordinator';
 import {QuestionCoordinatorFactory} from '../user/practice-question-coordinator';
+import {VoiceoverSubmitterFactory} from '../user/voiceover-submitter';
 
 const ROLES = testConstants.Roles;
 const cookieBannerAcceptButton =
@@ -68,6 +69,7 @@ const USER_ROLE_MAPPING = {
   [ROLES.TOPIC_MANAGER]: TopicManagerFactory,
   [ROLES.MODERATOR]: ModeratorFactory,
   [ROLES.RELEASE_COORDINATOR]: ReleaseCoordinatorFactory,
+  [ROLES.VOICEOVER_SUBMITTER]: VoiceoverSubmitterFactory,
 } as const;
 
 /**
@@ -90,7 +92,7 @@ type OptionalRoles<TRoles extends (keyof typeof USER_ROLE_MAPPING)[]> =
 /**
  * Global user instances that are created and can be reused again.
  */
-let superAdminInstance: (SuperAdmin & BlogAdmin) | null = null;
+let superAdminInstance: (SuperAdmin & BlogAdmin & VoiceoverAdmin) | null = null;
 let activeUsers: BaseUser[] = [];
 
 export class UserFactory {
@@ -126,8 +128,9 @@ export class UserFactory {
    * @param {TRoles} roles - The roles to assign to the user.
    * @param {string | string[]} args - The arguments to pass to the role
    *     assignment function. For Topic Manager, it should be the topic
-   *     name. For Translation Coordinator, it should be the array of
-   *     language code.
+   *     name (as string). For Translation Coordinator, it should be the
+   *     array of language code (as string[]). For Voiceover Submitter,
+   *     it should be the exploration ID (as string).
    * @returns {TUser & MultipleRoleIntersection<TRoles>} - The user with
    *     the roles assigned.
    */
@@ -142,6 +145,10 @@ export class UserFactory {
     for (const role of roles) {
       if (superAdminInstance === null) {
         superAdminInstance = await UserFactory.createNewSuperAdmin('superAdm');
+      }
+
+      if (!user.username) {
+        throw new Error('Username is null while adding roles');
       }
 
       switch (role) {
@@ -170,12 +177,25 @@ export class UserFactory {
             args
           );
           break;
+        case ROLES.VOICEOVER_SUBMITTER:
+          if (typeof args !== 'string') {
+            throw new Error(
+              'Exploration ID is required to assign a voiceover submitter.'
+            );
+          }
+          await superAdminInstance.addVoiceoverArtistToExplorationWithID(
+            args as string,
+            user.username
+          );
+          break;
         default:
           await superAdminInstance.assignRoleToUser(user.username, role);
           break;
       }
 
-      await superAdminInstance.expectUserToHaveRole(user.username, role);
+      if (role !== ROLES.VOICEOVER_SUBMITTER) {
+        await superAdminInstance.expectUserToHaveRole(user.username, role);
+      }
 
       UserFactory.composeUserWithRoles(user, [USER_ROLE_MAPPING[role]()]);
     }
@@ -238,7 +258,11 @@ export class UserFactory {
       TopicManagerFactory(),
       CurriculumAdminFactory(),
       ContributorAdminFactory(),
+      VoiceoverSubmitterFactory(),
     ]);
+
+    user.username = username;
+    user.email = email;
 
     await user.openBrowser();
     await user.signUpNewUser(username, email);
@@ -253,7 +277,7 @@ export class UserFactory {
    */
   static createNewSuperAdmin = async function (
     username: string
-  ): Promise<SuperAdmin & BlogAdmin> {
+  ): Promise<SuperAdmin & BlogAdmin & VoiceoverAdmin> {
     if (superAdminInstance !== null) {
       return superAdminInstance;
     }
@@ -266,9 +290,11 @@ export class UserFactory {
       SuperAdminFactory(),
     ]);
     await superAdmin.assignRoleToUser(username, ROLES.BLOG_ADMIN);
+    await superAdmin.assignRoleToUser(username, ROLES.VOICEOVER_ADMIN);
     await superAdmin.expectUserToHaveRole(username, ROLES.BLOG_ADMIN);
     superAdminInstance = UserFactory.composeUserWithRoles(superAdmin, [
       BlogAdminFactory(),
+      VoiceoverAdminFactory(),
     ]);
 
     return superAdminInstance;

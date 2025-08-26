@@ -29,7 +29,7 @@ import {
   ParamChange,
   ParamChangeBackendDict,
 } from 'domain/exploration/param-change.model';
-import {ParamSpecs} from 'domain/exploration/ParamSpecsObjectFactory';
+import {ParamSpecs} from 'domain/exploration/param-specs.model';
 import isEqual from 'lodash/isEqual';
 
 export type ExplorationPropertyValues =

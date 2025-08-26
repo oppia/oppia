@@ -154,6 +154,7 @@ export default {
     MODERATOR: 'moderator',
     RELEASE_COORDINATOR: 'release coordinator',
     COLLECTION_EDITOR: 'collection editor',
+    VOICEOVER_SUBMITTER: 'voiceover submitter',
   } as const,
 
   ViewportWidthBreakpoints: {
@@ -189,6 +190,14 @@ export default {
     LongVoiceoverInHindi: path.resolve(
       __dirname,
       '../../data/audio/voiceover_hindi_25secs.mp3'
+    ),
+    VoiceoverEnglishIndia: path.resolve(
+      __dirname,
+      '../../data/audio/voiceover_english_india_15secs.mp3'
+    ),
+    VoiceoverEnglishIndiaOver5Min: path.resolve(
+      __dirname,
+      '../../data/audio/voiceover_en_in_over5m.mp3'
     ),
   },
   SocialsShare: {

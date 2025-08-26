@@ -61,7 +61,7 @@ describe('Blog Admin', function () {
 
     // Assign blog editor role to guestUser1.
     await blogAdmin.assignUserToRoleFromBlogAdminPage(
-      guestUser1.username,
+      'guestUser1',
       BLOG_RIGHTS.BLOG_POST_EDITOR
     );
     await blogAdmin.expectActionStatusMessageToBe(
@@ -70,7 +70,7 @@ describe('Blog Admin', function () {
 
     // Assign blog admin role to guestUser1.
     await blogAdmin.assignUserToRoleFromBlogAdminPage(
-      guestUser1.username,
+      'guestUser1',
       BLOG_RIGHTS.BLOG_ADMIN
     );
     await blogAdmin.expectActionStatusMessageToBe(
@@ -80,7 +80,7 @@ describe('Blog Admin', function () {
 
   it('should be able to remove blog editor role', async function () {
     // Remove blog editor role from guestUser1.
-    await blogAdmin.removeBlogEditorRoleFromUsername(guestUser1.username);
+    await blogAdmin.removeBlogEditorRoleFromUsername('guestUser1');
     await blogAdmin.expectActionStatusMessageToBe('Success.');
   });
 
