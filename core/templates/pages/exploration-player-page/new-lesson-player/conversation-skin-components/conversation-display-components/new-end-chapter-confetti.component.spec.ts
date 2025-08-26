@@ -1,0 +1,69 @@
+// Copyright 2025 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for the end chapter celebration
+ * confetti component.
+ */
+
+import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
+import {NewEndChapterConfettiComponent} from './new-end-chapter-confetti.component';
+import {UrlInterpolationService} from '../../../../../domain/utilities/url-interpolation.service';
+
+describe('End chapter confetti component', function () {
+  let component: NewEndChapterConfettiComponent;
+  let fixture: ComponentFixture<NewEndChapterConfettiComponent>;
+
+  class MockUrlInterpolationService {
+    getStaticAudioUrl(audioPath: string): string {
+      return 'audio_url.mp3';
+    }
+  }
+
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [NewEndChapterConfettiComponent],
+      providers: [
+        {
+          provide: UrlInterpolationService,
+          useClass: MockUrlInterpolationService,
+        },
+      ],
+    }).compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(NewEndChapterConfettiComponent);
+    component = fixture.componentInstance;
+  });
+
+  it('should obtain the audio URL upon initialization', () => {
+    expect(component.endChapterCelebratoryAudio.src).toBe('');
+
+    component.ngOnInit();
+
+    expect(component.endChapterCelebratoryAudio.src).toContain('audio_url.mp3');
+  });
+
+  it('should animate the confetti and play audio', () => {
+    expect(component.confettiIsShown).toBe(false);
+
+    spyOn(component.endChapterCelebratoryAudio, 'play');
+
+    component.animateConfetti();
+
+    expect(component.confettiIsShown).toBe(true);
+    expect(component.endChapterCelebratoryAudio.play).toHaveBeenCalled();
+  });
+});

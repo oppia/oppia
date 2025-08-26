@@ -220,6 +220,11 @@ import {DisplayNewHintModalComponent} from 'pages/exploration-player-page/new-le
 import {DisplayNewSolutionModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/display-new-solution-modal.component';
 import {DisplayNewSolutionInterstititalModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/display-new-solution-interstitial-modal.component';
 import {ShareLessonModalComponent} from 'pages/exploration-player-page/new-lesson-player/sidebar-components/share-lesson-modal.component';
+import {NewCorrectnessFooterComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/new-correctness-footer.component';
+import {NewEndChapterConfettiComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/new-end-chapter-confetti.component';
+import {NewEndChapterCheckMarkComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/new-end-chapter-check-mark.component';
+import {PlayerHeaderComponent} from 'pages/exploration-player-page/new-lesson-player/header-components/player-header.component';
+import {ProgressBarComponent} from './progress-bar/progress-bar.component';
 import {ProgressTrackerComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/progress-tracker.component';
 import {CheckpointBarComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/checkpoint-bar.component';
 import {SaveProgressModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/save-progress-modal.component';
@@ -274,6 +279,7 @@ import {SaveProgressModalComponent} from 'pages/exploration-player-page/new-less
     AttributionGuideComponent,
     CompletionGraphComponent,
     CorrectnessFooterComponent,
+    NewCorrectnessFooterComponent,
     ConfirmLeaveModalComponent,
     ConfirmQuestionExitModalComponent,
     ContinueButtonComponent,
@@ -281,11 +287,15 @@ import {SaveProgressModalComponent} from 'pages/exploration-player-page/new-less
     ConversationSkinComponent,
     ConversationDisplayComponent,
     CardNavigationControlComponent,
+    ProgressBarComponent,
     NewConversationSkinComponent,
     ProgressTrackerComponent,
     CheckpointBarComponent,
     EndChapterCheckMarkComponent,
+    NewEndChapterCheckMarkComponent,
     EndChapterConfettiComponent,
+    NewEndChapterConfettiComponent,
+    PlayerHeaderComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
     CustomizeInteractionModalComponent,
@@ -437,7 +447,9 @@ import {SaveProgressModalComponent} from 'pages/exploration-player-page/new-less
     AudioFileUploaderComponent,
     CompletionGraphComponent,
     CorrectnessFooterComponent,
+    NewCorrectnessFooterComponent,
     ConfirmLeaveModalComponent,
+    PlayerHeaderComponent,
     ConfirmQuestionExitModalComponent,
     ContinueButtonComponent,
     ConceptCardComponent,
@@ -449,7 +461,10 @@ import {SaveProgressModalComponent} from 'pages/exploration-player-page/new-less
     CheckpointBarComponent,
     NewConversationSkinComponent,
     EndChapterCheckMarkComponent,
+    NewEndChapterCheckMarkComponent,
+    ProgressBarComponent,
     EndChapterConfettiComponent,
+    NewEndChapterConfettiComponent,
     CreateNewSkillModalComponent,
     SaveProgressModalComponent,
     CreateActivityModalComponent,
@@ -623,6 +638,7 @@ import {SaveProgressModalComponent} from 'pages/exploration-player-page/new-less
     AudioFileUploaderComponent,
     CompletionGraphComponent,
     CorrectnessFooterComponent,
+    NewCorrectnessFooterComponent,
     ConfirmLeaveModalComponent,
     ConfirmQuestionExitModalComponent,
     SaveProgressModalComponent,
@@ -630,13 +646,17 @@ import {SaveProgressModalComponent} from 'pages/exploration-player-page/new-less
     CheckpointBarComponent,
     ContinueButtonComponent,
     ContentLanguageSelectorComponent,
+    ProgressBarComponent,
     ConversationSkinComponent,
     ConversationDisplayComponent,
     CardNavigationControlComponent,
     NewConversationSkinComponent,
     EndChapterCheckMarkComponent,
+    NewEndChapterCheckMarkComponent,
     EndChapterConfettiComponent,
+    NewEndChapterConfettiComponent,
     CreateNewSkillModalComponent,
+    PlayerHeaderComponent,
     CreateActivityModalComponent,
     CustomizeInteractionModalComponent,
     DeleteAnswerGroupModalComponent,
