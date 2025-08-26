@@ -75,7 +75,7 @@ describe('Translation Submitter', function () {
     await curriculumAdm.navigateToCard('Last Card');
     await curriculumAdm.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
     await curriculumAdm.addImageRTEToCardContent(
-      FILEPATHS.PROFILE_PHOTO_PNG,
+      testConstants.data.profilePicture,
       'Profile Photo',
       'Profile Photo'
     );
