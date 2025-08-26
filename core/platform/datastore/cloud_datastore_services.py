@@ -210,7 +210,6 @@ def not_equal(prop: ndb.Property, value: Union[str, int, float]) -> ndb.Node:
         datastore_services.Node. A node representing "not equals" as a "greater
         than" condition and a "less than" condition, combined by boolean OR.
     """
-
     return any_of(prop > value, prop < value)
 
 

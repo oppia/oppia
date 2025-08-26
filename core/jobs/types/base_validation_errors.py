@@ -111,8 +111,8 @@ class ModelMutatedDuringJobError(BaseValidationError):
 
     def __init__(self, model: base_models.BaseModel) -> None:
         message = (
-            'last_updated=%r is later than the audit job\'s start time' % (
-                model.last_updated))
+            'last_updated=%s is later than the audit job\'s start time' % (
+                model.last_updated.strftime('%Y-%m-%d %H:%M:%S')))
         super().__init__(message, model)
 
 

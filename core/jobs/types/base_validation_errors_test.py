@@ -270,8 +270,8 @@ class ModelMutatedDuringJobErrorTests(AuditErrorsTestBase):
         self.assertEqual(
             error.stderr,
             'ModelMutatedDuringJobError in BaseModel(id="123"): '
-            'last_updated=%r is later than the audit job\'s start time' % (
-                model.last_updated))
+            'last_updated=%s is later than the audit job\'s start time' % (
+                model.last_updated.strftime('%Y-%m-%d %H:%M:%S')))
 
 
 class ModelIdRegexErrorTests(AuditErrorsTestBase):

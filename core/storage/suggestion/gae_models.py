@@ -604,7 +604,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         return cls.get_all().filter(datastore_services.all_of(
             cls.status == STATUS_IN_REVIEW,
             cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            cls.author_id != user_id,
+            datastore_services.not_equal(cls.author_id, user_id),
             cls.language_code.IN(language_codes)
         )).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
 
@@ -1007,7 +1007,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 offset
             )
 
-        filters.append(cls.author_id != user_id)
+        filters.append(datastore_services.not_equal(cls.author_id, user_id))
         suggestion_query = cls.get_all().filter(
             datastore_services.all_of(*filters))
 
