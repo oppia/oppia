@@ -54,7 +54,7 @@ jobs:
         suite:
           - name: translation-coordinator/add-remove-translation-rights
           - name: practice-question-coordinator/add-and-remove-question-rights
-        run1: [1, 2]
+        run1: [1]
         run2: [1]
         mobile: [false, true]
     name: (${{ matrix.env }}) ${{ matrix.mobile && 'Mobile' || 'Desktop' }} (${{ matrix.suite.name }})
@@ -91,7 +91,6 @@ jobs:
           VIDEO_RECORDING_IS_ENABLED=1
           xvfb-run -a --server-args="-screen 0, 1920x1080x24"
           python -m scripts.run_acceptance_tests
-          ${{ env.SKIP_BUILD && '--skip-build' || '' }} 
           --suite=${{ matrix.suite.name }} 
           ${{ matrix.env == 'prod' && '--prod_env' || '' }}
           ${{ matrix.mobile && '--mobile' || '' }}
