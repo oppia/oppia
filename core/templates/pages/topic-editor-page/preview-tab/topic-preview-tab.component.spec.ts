@@ -63,6 +63,9 @@ describe('Topic Preview Tab Component', () => {
     setPracticeTabDisplayed(value: boolean) {
       this.practiceTabDisplayed = value;
     }
+    getSavedTopic() {
+      return this.getTopic();
+    }
     getTopic() {
       return {
         getName(): string {
