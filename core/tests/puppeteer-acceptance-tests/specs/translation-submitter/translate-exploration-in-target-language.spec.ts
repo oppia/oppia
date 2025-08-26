@@ -283,13 +283,12 @@ describe('Translation Submitter', function () {
     );
     await translationSubmitter.clickOnSaveButtonInCustomizeRTEModal();
     await translationSubmitter.page.keyboard.press('Enter');
-
-    await translationSubmitter.clickOn('Save and translate another');
-    await translationSubmitter.clickOnDiscardChangesButton();
   });
 
   it('should be able to use copy tool', async function () {
     // Check if anchor text for copy tool works properly.
+    await translationSubmitter.clickOn('Save and translate another');
+    await translationSubmitter.clickOnDiscardChangesButton();
     await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.clickAndVerifyAnchorWithInnerText(
       'here',
@@ -299,7 +298,9 @@ describe('Translation Submitter', function () {
       'छवि विवरण',
       'तस्वीर का शीर्षक'
     );
+  });
 
+  it('should be able to submit the translation', async function () {
     await translationSubmitter.clickOn('Save and close');
     await translationSubmitter.expectToastMessage(
       'Submitted translation for review.'
