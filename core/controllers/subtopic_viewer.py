@@ -119,6 +119,7 @@ class SubtopicPageDataHandler(
             'sections': study_guide_sections_dicts_list,
             'page_contents': subtopic_page_contents_dict,
             'subtopic_title': subtopic_title,
+            'current_subtopic_id': subtopic_id,
             'next_subtopic_dict': next_subtopic_dict,
             'prev_subtopic_dict': prev_subtopic_dict,
         })

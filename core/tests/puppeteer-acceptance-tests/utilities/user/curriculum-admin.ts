@@ -71,7 +71,6 @@ const submitSolutionButton = 'button.e2e-test-submit-solution-button';
 const saveQuestionButton = 'button.e2e-test-save-question-button';
 
 const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
-const dropdownToggleIcon = '.e2e-test-mobile-options-dropdown';
 
 const topicsTab = 'a.e2e-test-topics-tab';
 const desktopTopicSelector = 'a.e2e-test-topic-name';
@@ -268,6 +267,9 @@ const closeSaveModalButtonSelector = '.e2e-test-close-save-modal-button';
 const settingsContainerSelector =
   '.oppia-editor-card.oppia-settings-card-container';
 const deleteButtonSelector = 'button.oppia-delete-button';
+const navigationDropdownInMobileVisibleSelector =
+  '.oppia-exploration-editor-tabs-dropdown.show';
+
 const insertWorkedExampleButton = '.cke_button__oppiaworkedexample';
 const editWorkedExampleModalQuestionRte =
   '.e2e-test-arg-editor-inner-0 .e2e-test-rte';
@@ -276,9 +278,9 @@ const editWorkedExampleModalAnswerRte =
 const rteComponentSaveButton = '.e2e-test-close-rich-text-component-editor';
 const topicPreviewTab = '.e2e-test-topic-preview-tab';
 const expandWorkedExampleButton = '.e2e-test-expand-workedexample';
+const subtopicExpandHeaderSelector = '.e2e-test-show-subtopics-list';
+const practiceTabToggle = '.e2e-test-toggle-practice-tab';
 
-const openExplorationEditorNavigationMobile =
-  '.oppia-exploration-editor-tabs-dropdown.show';
 const createNewSkillButton = '.e2e-test-create-skill-button';
 const createSkillButton = '.e2e-test-confirm-skill-creation-button';
 const editConceptCard = '.e2e-test-edit-concept-card';
@@ -1316,6 +1318,16 @@ export class CurriculumAdmin extends BaseUser {
       await this.clickOn(mobileNavToggleButton);
       await this.clickOn(mobileOptionsDropdown);
       await this.clickOn(mobileSettingsButton);
+
+      // Close dropdown if it doesn't automatically close.
+      const isVisible = await this.isElementVisible(
+        navigationDropdownInMobileVisibleSelector
+      );
+      if (isVisible) {
+        // We are using page.click as this button might be overlapped by the
+        // dropdown. Thus, it will fail with onClick.
+        this.page.click(mobileOptionsDropdown);
+      }
     } else {
       await this.page.waitForSelector(explorationSettingsTab, {visible: true});
       await this.clickOn(explorationSettingsTab);
@@ -1355,28 +1367,6 @@ export class CurriculumAdmin extends BaseUser {
       showMessage('Tutorial pop-up closed successfully.');
     } catch (error) {
       showMessage(`welcome modal not found: ${error.message}`);
-    }
-  }
-
-  /**
-   * Function to close editor navigation dropdown. Can be done by clicking
-   * on the dropdown toggle.
-   */
-  async closeEditorNavigationDropdownOnMobile(): Promise<void> {
-    try {
-      await this.page.waitForSelector(dropdownToggleIcon, {
-        visible: true,
-        timeout: 5000,
-      });
-      await this.clickOn(dropdownToggleIcon);
-
-      await this.expectElementToBeVisible(
-        openExplorationEditorNavigationMobile,
-        false
-      );
-      showMessage('Editor navigation closed successfully.');
-    } catch (error) {
-      throw new Error(`Dropdown Toggle Icon not found: ${error.message}`);
     }
   }
 
@@ -2425,14 +2415,16 @@ export class CurriculumAdmin extends BaseUser {
     );
     await this.saveTopicDraft(topicName);
 
-    await this.createSkillForTopic(skillName, topicName, true);
-    await this.createQuestionsForSkill(skillName, 3);
+    await this.createSkillForTopic(skillName, topicName);
+    await this.createQuestionsForSkill(skillName, 10);
     await this.assignSkillToSubtopicInTopicEditor(
       skillName,
       subtopicName,
       topicName
     );
     await this.addSkillToDiagnosticTest(skillName, topicName);
+    await this.togglePracticeTabCheckbox();
+    await this.saveTopicDraft(topicName);
 
     await this.createSubtopicWithStudyGuideForTopic(
       'Subtracting Numbers',
@@ -2452,6 +2444,37 @@ export class CurriculumAdmin extends BaseUser {
     );
 
     await this.publishDraftTopic(topicName);
+  }
+
+  /**
+   * Toggles the "Show practice tab to learners" in Topic Editor.
+   */
+  async togglePracticeTabCheckbox(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeVisible(subtopicExpandHeaderSelector);
+      await this.clickOn(subtopicExpandHeaderSelector);
+    }
+    try {
+      await this.page.waitForSelector(practiceTabToggle);
+      const practiceTabToggleElement = await this.page.$(practiceTabToggle);
+      if (!practiceTabToggleElement) {
+        throw new Error('Practice tab toggle not found.');
+      }
+      await this.waitForElementToBeClickable(practiceTabToggleElement);
+      await practiceTabToggleElement.click();
+
+      await this.page.waitForFunction(
+        (selector: string) => {
+          const element = document.querySelector(selector);
+          return (element as HTMLInputElement).checked === true;
+        },
+        {},
+        practiceTabToggle
+      );
+    } catch (error) {
+      console.error(error.stack);
+      throw error;
+    }
   }
 
   /**
