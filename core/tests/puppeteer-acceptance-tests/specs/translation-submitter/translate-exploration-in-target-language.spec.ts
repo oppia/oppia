@@ -146,9 +146,7 @@ describe('Translation Submitter', function () {
     );
 
     // Change the translation language to hindi.
-    await translationSubmitter.selectLanguageInTranslateTextTab(
-      'हिन्दी (Hindi)'
-    );
+    await translationSubmitter.selectLanguageFilter('हिन्दी (Hindi)');
     await translationSubmitter.expectTranslationOpportunitiesToBePresent();
 
     await translationSubmitter.expectOpportunityToBePresent(

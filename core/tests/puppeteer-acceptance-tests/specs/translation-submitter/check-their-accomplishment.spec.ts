@@ -79,9 +79,7 @@ describe('Translation Submitter', function () {
     await translationSubmitter.switchToTabInContributionDashboard(
       'Translate Text'
     );
-    await translationSubmitter.selectLanguageInTranslateTextTab(
-      'हिन्दी (Hindi)'
-    );
+    await translationSubmitter.selectLanguageFilter('हिन्दी (Hindi)');
 
     await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
       'Cutting the Pies',

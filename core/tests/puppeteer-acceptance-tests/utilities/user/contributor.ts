@@ -55,6 +55,11 @@ const opportunityStatusLabelSelector = '.e2e-test-opportunity-list-item-label';
 
 const reviewCommentTextareaSelector = '.e2e-test-suggestion-review-message';
 
+const languageSelector = '.e2e-test-language-selector';
+const selectedLanguageSelector = '.e2e-test-language-selector-selected';
+const featuredLanguageOptionSelector = '.e2e-test-featured-language';
+const languageOptionSelector = '.e2e-test-language-selector-option';
+
 export class Contributor extends BaseUser {
   /**
    * Checks if the active tab name is visible and matches the expected values.
@@ -538,6 +543,50 @@ export class Contributor extends BaseUser {
     await this.type(reviewCommentTextareaSelector, comment);
 
     await this.expectElementValueToBe(reviewCommentTextareaSelector, comment);
+  }
+
+  /**
+   * Clicks on language selection dropdown and selects the given language.
+   * @param language - The language to select.
+   */
+  async selectLanguageFilter(language: string): Promise<void> {
+    // Open the language selector dropdown.
+    await this.expectElementToBeVisible(languageSelector);
+    await this.clickOn(languageSelector);
+    await this.waitForPageToFullyLoad();
+
+    // Find the language option in the dropdown.
+    let languageOption: ElementHandle<Element> | null = null;
+    for (const optionSelector of [
+      featuredLanguageOptionSelector,
+      languageOptionSelector,
+    ]) {
+      await this.expectElementToBeVisible(optionSelector);
+      // Get the language option element.
+      for (const option of await this.page.$$(optionSelector)) {
+        const optionText = await option.evaluate(el => el.textContent?.trim());
+        if (optionText?.includes(language)) {
+          languageOption = option;
+          break;
+        }
+      }
+
+      // If the language option is found, break the loop.
+      if (languageOption) {
+        break;
+      }
+    }
+
+    if (!languageOption) {
+      throw new Error(`Language ${language} not found.`);
+    }
+
+    // Click on the language option.
+    await languageOption.click();
+
+    // Verify language is selected.
+    await this.expectElementToBeVisible(opportunityItemSelector, false);
+    await this.expectTextContentToContain(selectedLanguageSelector, language);
   }
 }
 

@@ -16,7 +16,7 @@
  * @fileoverview Acceptance test from CUJv3 Doc
  * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
  *
- * TR.CD. Filter the translations.
+ * TR.CD.01 Filter the translations.
  */
 
 import testConstants from '../../utilities/common/test-constants';
@@ -109,31 +109,29 @@ describe('Translation Reviewer', function () {
     );
 
     // Add translations to "Cutting the Pies" in Hindi.
-    await translationSubmitter.selectLanguageInTranslateTextTab(
-      'हिन्दी (Hindi)'
-    );
+    await translationSubmitter.selectLanguageFilter('हिन्दी (Hindi)');
     await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
       'Cutting the Pies',
       'The Picnic Problem'
     );
-    await translationSubmitter.typeTextForRTE('सामग्री 0');
+    await translationSubmitter.typeTextForRTE('सामग्री 0 (पाई काटना)');
     await translationSubmitter.clickOn('Save and close');
     await translationSubmitter.clickOnDiscardChangesButton();
 
     // Add translations to "Trading Slices" in Akan.
-    await translationSubmitter.selectLanguageInTranslateTextTab('Ákán (Akan)');
+    await translationSubmitter.selectLanguageFilter('Ákán (Akan)');
     await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
       'Trading Slices',
       'The Picnic Problem'
     );
-    await translationSubmitter.typeTextForRTE('सामग्री 0');
+    await translationSubmitter.typeTextForRTE(
+      'emu nsɛm 0 (slices a wɔde sesa wɔn ho wɔn ho)'
+    );
     await translationSubmitter.clickOn('Save and close');
     await translationSubmitter.clickOnDiscardChangesButton();
 
     // Add translations to "Chemical Reactions" in Hindi.
-    await translationSubmitter.selectLanguageInTranslateTextTab(
-      'हिन्दी (Hindi)'
-    );
+    await translationSubmitter.selectLanguageFilter('हिन्दी (Hindi)');
     await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
       'Chemical Reactions',
       'The Ideal Gas Law'
@@ -147,15 +145,39 @@ describe('Translation Reviewer', function () {
     await translationReviewer.navigateToContributorDashboardUsingProfileDropdown();
     await translationReviewer.filterContentByTopic('Fractions');
 
-    await translationReviewer.expectTranslationOpportunityToBePresent(
+    // Translation of "States of Matter" should not be present.
+    await translationReviewer.expectOpportunityToBePresent(
       'सामग्री 0',
       'States of Matter',
       false
     );
-    await translationReviewer.expectTranslationOpportunityToBePresent(
+    // Translation of "Fractions" should be present.
+    await translationReviewer.expectOpportunityToBePresent(
+      'emu nsɛm 0 (slices a wɔde sesa wɔn ho wɔn ho)',
+      'Fractions',
+      true
+    );
+    await translationReviewer.expectOpportunityToBePresent(
+      'सामग्री 0 (पाई काटना)',
+      'Fractions',
+      true
+    );
+  });
+
+  it('should be able to filter translations by language', async function () {
+    await translationReviewer.selectLanguageFilter('हिन्दी (Hindi)');
+
+    // Translation in Hindi should be present.
+    await translationReviewer.expectOpportunityToBePresent(
       'सामग्री 0',
       'Fractions',
       true
+    );
+    // Translation in Akan should not be present.
+    await translationReviewer.expectOpportunityToBePresent(
+      'emu nsɛm 0 (slices a wɔde sesa wɔn ho wɔn ho)',
+      'Fractions',
+      false
     );
   });
 

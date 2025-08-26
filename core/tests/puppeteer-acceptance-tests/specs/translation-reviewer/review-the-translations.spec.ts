@@ -92,9 +92,7 @@ describe('Translation Reviewer', function () {
     );
 
     // Add translations to "Cutting the Pies" in Hindi.
-    await translationSubmitter.selectLanguageInTranslateTextTab(
-      'हिन्दी (Hindi)'
-    );
+    await translationSubmitter.selectLanguageFilter('हिन्दी (Hindi)');
     await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
       'Cutting the Pies',
       'The Picnic Problem'
@@ -112,7 +110,7 @@ describe('Translation Reviewer', function () {
     await translationSubmitter.clickOnDiscardChangesButton();
 
     // Add translations to "Trading Slices" in Akan.
-    await translationSubmitter.selectLanguageInTranslateTextTab('Ákán (Akan)');
+    await translationSubmitter.selectLanguageFilter('Ákán (Akan)');
     await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
       'Trading Slices',
       'The Picnic Problem'
