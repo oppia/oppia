@@ -31,6 +31,8 @@ const languageSelectorInAdminPageSelector = '.e2e-test-language-selector';
 const languageOptionInAdminPageSelector = '.e2e-test-language-selector-option';
 const languageSelectorSelectedInAdminPageSelector =
   '.e2e-test-language-selector-selected';
+const languageSelectorInMobileAdminPageSelector =
+  '.e2e-test-tab-selection-dropdown';
 
 export class TranslationCoordinator extends BaseUser {
   /**

@@ -127,10 +127,10 @@
           </button>
         </div>
         <div class="language-selector-container" *ngIf="(activeTab === TAB_NAME_TRANSLATION_SUBMITTER) || (activeTab === TAB_NAME_TRANSLATION_REVIEWER)">
-          <div class="oppia-filter-selector-container e2e-test-topic-selector" (click)="toggleLanguageDropdown()">
+          <div class="oppia-filter-selector-container e2e-test-topic-selector e2e-test-language-selector" (click)="toggleLanguageDropdown()">
             <div class="oppia-filter-selector-inner-container e2e-test-topic-selector-selected">
               <b class="required">Language: </b>
-              <div class="selector-icon-div">
+              <div class="selector-icon-div e2e-test-language-selector-selected">
                 {{selectedLanguage.language}}
                 <span class="fas fa-caret-down oppia-filter-selector-inner-container-arrow"
                   [@languageDropdownTrigger]="languageDropdownShown ? 'expanded' : 'collapsed'">
@@ -139,7 +139,7 @@
             </div>
             <div *ngIf="languageDropdownShown"
                  class="oppia-filter-selector-dropdown-container e2e-test-topic-selector-dropdown">
-              <div class="oppia-filter-selector-dropdown-option e2e-test-topic-selector-option"
+              <div class="oppia-filter-selector-dropdown-option e2e-test-topic-selector-option e2e-test-language-selector-option"
                    *ngFor="let option of languageChoices"
                    (click)="selectLanguage(option.language)"
                    [ngClass]="{'oppia-filter-selector-dropdown-option-selected' : option === selectedLanguage.language}">
