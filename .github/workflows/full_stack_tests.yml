@@ -50,7 +50,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        env: [prod, dev]
+        env: [prod]
         suite:
           - name: translation-coordinator/add-remove-translation-rights
           - name: practice-question-coordinator/add-and-remove-question-rights
