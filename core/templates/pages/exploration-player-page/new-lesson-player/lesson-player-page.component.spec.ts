@@ -35,6 +35,7 @@ import {UrlService} from '../../../services/contextual/url.service';
 import {KeyboardShortcutService} from '../../../services/keyboard-shortcut.service';
 import {PageTitleService} from '../../../services/page-title.service';
 import {EntityVoiceoversService} from '../../../services/entity-voiceovers.services';
+import {I18nLanguageCodeService} from '../../../services/i18n-language-code.service';
 import {ContentTranslationManagerService} from '../services/content-translation-manager.service';
 import {ContentTranslationLanguageService} from '../services/content-translation-language.service';
 import {PlayerTranscriptService} from '../services/player-transcript.service';
@@ -88,6 +89,7 @@ describe('New Lesson Player Page', () => {
   let fixture: ComponentFixture<NewLessonPlayerPageComponent>;
   let componentInstance: NewLessonPlayerPageComponent;
   let pageContextService: PageContextService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
   let keyboardShortcutService: KeyboardShortcutService;
   let metaTagCustomizationService: MetaTagCustomizationService;
   let pageTitleService: PageTitleService;
@@ -128,6 +130,7 @@ describe('New Lesson Player Page', () => {
     pageContextService = TestBed.inject(PageContextService);
     keyboardShortcutService = TestBed.inject(KeyboardShortcutService);
     metaTagCustomizationService = TestBed.inject(MetaTagCustomizationService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     pageTitleService = TestBed.inject(PageTitleService);
     readOnlyExplorationBackendApiService = TestBed.inject(
       ReadOnlyExplorationBackendApiService
@@ -168,6 +171,10 @@ describe('New Lesson Player Page', () => {
     };
 
     spyOn(pageContextService, 'getExplorationId').and.returnValue(expId);
+    spyOn(
+      i18nLanguageCodeService,
+      'getCurrentI18nLanguageCode'
+    ).and.returnValue('en');
     spyOn(
       readOnlyExplorationBackendApiService,
       'fetchExplorationAsync'
