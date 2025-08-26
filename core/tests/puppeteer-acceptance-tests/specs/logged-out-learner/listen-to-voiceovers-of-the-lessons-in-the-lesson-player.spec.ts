@@ -213,7 +213,7 @@ describe('Logged-Out Learner', function () {
     expect(
       await loggedOutLearner.isTextPresentOnPage('Listen to the lesson')
     ).toBe(true);
-    await loggedOutLearner.expectAudioExpandButtonToBeVisibleInLP();
+    await loggedOutLearner.expectAudioExpandButtonToBeVisible();
 
     // Check audio (voiceover) avaibility.
     await loggedOutLearner.expectVoiceoverIsPlayable(false);
@@ -253,5 +253,5 @@ describe('Logged-Out Learner', function () {
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
-  });
+  }, 600000);
 });

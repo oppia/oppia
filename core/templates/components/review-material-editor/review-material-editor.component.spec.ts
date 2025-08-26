@@ -21,19 +21,46 @@ import {ChangeDetectorRef, NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {ReviewMaterialEditorComponent} from './review-material-editor.component';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+
+class MockPlatformFeatureService {
+  status = {
+    EnableWorkedExamplesRteComponent: {
+      isEnabled: false,
+    },
+  };
+}
 
 describe('Review Material Editor Component', () => {
   let component: ReviewMaterialEditorComponent;
   let fixture: ComponentFixture<ReviewMaterialEditorComponent>;
+  let platformFeatureService: PlatformFeatureService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [ReviewMaterialEditorComponent],
-      providers: [ChangeDetectorRef],
+      providers: [
+        ChangeDetectorRef,
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService,
+        },
+      ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(ReviewMaterialEditorComponent);
+    component = fixture.componentInstance;
+    platformFeatureService = TestBed.inject(PlatformFeatureService);
+
+    component.bindableDict = {
+      displayedConceptCardExplanation: 'Explanation',
+    };
+    fixture.detectChanges();
+  });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(ReviewMaterialEditorComponent);
@@ -49,7 +76,7 @@ describe('Review Material Editor Component', () => {
     expect(component.HTML_SCHEMA).toEqual({
       type: 'html',
       ui_config: {
-        rte_components: 'ALL_COMPONENTS',
+        rte_components: 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS',
       },
     });
     expect(component.editableExplanation).toBe('Explanation');
@@ -91,8 +118,35 @@ describe('Review Material Editor Component', () => {
     );
   });
 
+  it('should return true if there are more than 2 workedexamples', () => {
+    expect(
+      component.checkExtraWorkedexample(
+        '<oppia-noninteractive-workedexample>aasdfasdf</oppia-noninteractive-workedexample><oppia-noninteractive-workedexample>aasdfasdf</oppia-noninteractive-workedexample><oppia-noninteractive-workedexample>aasdfasdf</oppia-noninteractive-workedexample>'
+      )
+    ).toEqual(true);
+  });
+
+  it('should return false if there are 2 or fewer workedexamples', () => {
+    expect(
+      component.checkExtraWorkedexample(
+        '<oppia-noninteractive-workedexample>example1</oppia-noninteractive-workedexample><oppia-noninteractive-workedexample>example2</oppia-noninteractive-workedexample>'
+      )
+    ).toEqual(false);
+  });
+
   it('should get schema', () => {
     expect(component.getSchema()).toEqual(component.HTML_SCHEMA);
+  });
+
+  it('should get schema with ALL_COMPONENTS when feature is disabled', () => {
+    const schema = component.getSchema();
+
+    expect(schema).toEqual({
+      type: 'html',
+      ui_config: {
+        rte_components: 'ALL_COMPONENTS',
+      },
+    });
   });
 
   it('should update editableExplanation', () => {
@@ -102,5 +156,60 @@ describe('Review Material Editor Component', () => {
     component.updateLocalExp(exp);
 
     expect(component.editableExplanation).toEqual(exp);
+  });
+
+  it('should not update editableExplanation if it is the same', () => {
+    component.editableExplanation = 'Same Explanation';
+
+    component.updateLocalExp('Same Explanation');
+
+    expect(component.editableExplanation).toEqual('Same Explanation');
+  });
+
+  it('should not update editableExplanation if extra worked examples are found', () => {
+    component.editableExplanation = 'Old Explanation';
+    const htmlWithExtraWorkedExamples =
+      '<oppia-noninteractive-workedexample>1</oppia-noninteractive-workedexample><oppia-noninteractive-workedexample>2</oppia-noninteractive-workedexample><oppia-noninteractive-workedexample>3</oppia-noninteractive-workedexample>';
+
+    component.updateLocalExp(htmlWithExtraWorkedExamples);
+
+    expect(component.editableExplanation).toEqual('Old Explanation');
+  });
+
+  it('should get schema with SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS when feature is enabled', () => {
+    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled =
+      true;
+
+    const schema = component.getSchema();
+
+    expect(schema).toEqual({
+      type: 'html',
+      ui_config: {
+        rte_components: 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS',
+      },
+    });
+  });
+
+  it('should return correct value for isEnableWorkedexamplesRteComponentFeatureEnabled', () => {
+    expect(component.isEnableWorkedexamplesRteComponentFeatureEnabled()).toBe(
+      false
+    );
+  });
+
+  it('should save explanation memento when opening editor', () => {
+    component.editableExplanation = 'Current Explanation';
+
+    component.openConceptCardExplanationEditor();
+
+    expect(component.explanationMemento).toBe('Current Explanation');
+  });
+
+  it('should restore explanation from memento when closing editor', () => {
+    component.editableExplanation = 'Modified Explanation';
+    component.explanationMemento = 'Original Explanation';
+
+    component.closeConceptCardExplanationEditor();
+
+    expect(component.editableExplanation).toBe('Original Explanation');
   });
 });

@@ -1,23 +1,25 @@
-<div class="modal-header">
-  <h3>Exploration Navigation</h3>
-</div>
+<div class="e2e-test-exploration-state-graph-modal">
+  <div class="modal-header">
+    <h3>Exploration Navigation</h3>
+  </div>
 
-<div class="modal-body oppia-state-graph-visualization-container">
-  <state-graph-visualization class="oppia-state-graph-visualization"
-                             [allowPanning]="true"
-                             [currentStateId]="currentStateName"
-                             [versionGraphData]="null"
-                             (onClickFunction)="selectState($event)"
-                             (onDeleteFunction)="deleteState($event)"
-                             [centerAtCurrentState]="true"
-                             [isEditable]="isEditable">
-  </state-graph-visualization>
-</div>
+  <div class="modal-body oppia-state-graph-visualization-container">
+    <state-graph-visualization class="oppia-state-graph-visualization"
+                               [allowPanning]="true"
+                               [currentStateId]="currentStateName"
+                               [versionGraphData]="null"
+                               (onClickFunction)="selectState($event)"
+                               (onDeleteFunction)="deleteState($event)"
+                               [centerAtCurrentState]="true"
+                               [isEditable]="isEditable">
+    </state-graph-visualization>
+  </div>
 
-<div class="modal-footer oppia-close-button-container">
-  <span class="float-right">
-    <button class="btn btn-secondary" (click)="cancel()">Close</button>
-  </span>
+  <div class="modal-footer oppia-close-button-container">
+    <span class="float-right">
+      <button class="btn btn-secondary e2e-test-modal-close-button" (click)="cancel()">Close</button>
+    </span>
+  </div>
 </div>
 
 <style>

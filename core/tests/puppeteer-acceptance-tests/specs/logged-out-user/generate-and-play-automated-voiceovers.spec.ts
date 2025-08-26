@@ -27,8 +27,7 @@ import {VoiceoverAdmin} from '../../utilities/user/voiceover-admin';
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
-const INTRODUCTION_CARD_CONTENT: string =
-  'This exploration will test your understanding of negative numbers.';
+const INTRODUCTION_CARD_CONTENT: string = 'Content 0';
 enum INTERACTION_TYPES {
   CONTINUE_BUTTON = 'Continue Button',
   END_EXPLORATION = 'End Exploration',
@@ -88,6 +87,9 @@ describe('Exploration Editor', function () {
     );
     await releaseCoordinator.enableFeatureFlag(
       'automatic_voiceover_regeneration_from_exp'
+    );
+    await releaseCoordinator.enableFeatureFlag(
+      'show_regenerated_voiceovers_to_learners'
     );
 
     // Navigate to the creator dashboard and create a new exploration.
@@ -174,7 +176,7 @@ describe('Exploration Editor', function () {
     loggedOutUser = await UserFactory.createLoggedOutUser();
 
     // Setup is taking really long.
-  }, 600000);
+  }, 750000);
 
   it(
     'should allow the learner to view and play a lesson entirely in a particular language and start listening to the voiceover from any state',

@@ -102,10 +102,14 @@ export class StateContentEditorComponent implements OnInit {
   }
 
   isCardHeightLimitReached(): boolean {
-    let shadowPreviewCard = $(
+    const shadowPreviewCard = document.querySelector(
       '.oppia-shadow-preview-card .oppia-learner-view-card-top-section'
-    );
-    let height = shadowPreviewCard.height() as number;
+    ) as HTMLElement | null;
+
+    if (!shadowPreviewCard) {
+      return false;
+    }
+    const height = shadowPreviewCard.offsetHeight;
     return height > 630;
   }
 

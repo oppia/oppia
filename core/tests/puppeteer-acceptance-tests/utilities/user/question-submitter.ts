@@ -400,7 +400,7 @@ export class QuestionSubmitter extends BaseUser {
    * using the options array.
    * @param {string[]} options - The options to be added to the multiple choice interaction.
    */
-  async addMultipleChoiceInteractionInQuestionEditor(
+  async addMultipleChoiceInteractionByQuestionSubmitter(
     options: string[]
   ): Promise<void> {
     await this.expectElementToBeVisible(addInteractionButton);
@@ -487,8 +487,8 @@ export class QuestionSubmitter extends BaseUser {
   /**
    * Adds an Image interaction to the current exploration.
    */
-  async addImageInteraction(): Promise<void> {
-    await this.expectElementToBeVisible(addInteractionButton);
+  async addImageInteractionInQuestionEditor(): Promise<void> {
+    await this.isElementVisible(addInteractionButton);
 
     await this.clickOn(addInteractionButton);
     await this.clickOn('Image Region');

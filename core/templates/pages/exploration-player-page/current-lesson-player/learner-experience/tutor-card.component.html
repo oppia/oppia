@@ -32,7 +32,7 @@
     <div *ngIf="inputOutputHistoryIsShown && (displayedCard.getInputResponsePairs().length > 1 && isInteractionInline()) || (displayedCard.getInputResponsePairs().length > 0 && !isInteractionInline())">
       <h4 class="conversation-skin-responses-dropdown-container"
           (click)="toggleShowPreviousResponses()">
-        <span class="conversation-skin-responses-dropdown-text">
+        <span class="conversation-skin-responses-dropdown-text e2e-test-previous-responses-text">
           <span>
             {{ 'I18N_PLAYER_PREVIOUS_RESPONSES' | translate:{previousResponses: displayedCard.getInputResponsePairs().length - (isInteractionInline() ? 1 : 0)} }}
           </span>
@@ -53,7 +53,8 @@
                                      [oppiaAvatarImageUrl]="OPPIA_AVATAR_IMAGE_URL"
                                      [inputResponsePairId]="getInputResponsePairId($index)"
                                      [isLastPair]="false"
-                                     [feedbackIsEnabled]="feedbackIsEnabled">
+                                     [feedbackIsEnabled]="feedbackIsEnabled"
+                                     class="e2e-test-input-response-pair">
           </oppia-input-response-pair>
         </div>
       </div>
@@ -68,7 +69,8 @@
                                  [oppiaAvatarImageUrl]="OPPIA_AVATAR_IMAGE_URL"
                                  [inputResponsePairId]="getInputResponsePairId(displayedCard.getInputResponsePairs().length - 1)"
                                  [isLastPair]="true"
-                                 [feedbackIsEnabled]="feedbackIsEnabled">
+                                 [feedbackIsEnabled]="feedbackIsEnabled"
+                                 class="e2e-test-input-response-pair">
       </oppia-input-response-pair>
     </div>
 

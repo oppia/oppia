@@ -58,7 +58,7 @@
                    (keydown.enter)="changeActiveHintIndex(index)"
                    class="oppia-rule-tab e2e-test-hint-tab"
                    ngClass="{'oppia-rule-tab-active': stateHintsService.getActiveHintIndex() === index}">
-                  <oppia-response-header class="oppia-response-header-center"
+                  <oppia-response-header class="oppia-response-header-center e2e-test-current-hint-box"
                                          [defaultOutcome]="false"
                                          [index]="index"
                                          [summary]="getHintSummary(hint)"

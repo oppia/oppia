@@ -21,7 +21,7 @@ import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
 import {QuestionObjectFactory} from 'domain/question/QuestionObjectFactory';
 import {QuestionUndoRedoService} from 'domain/editor/undo_redo/question-undo-redo.service';
-import {Skill} from 'domain/skill/SkillObjectFactory';
+import {Skill} from 'domain/skill/skill.model.ts';
 import {SkillOpportunity} from 'domain/opportunity/skill-opportunity.model';
 import {QuestionsOpportunitiesSelectDifficultyModalComponent} from 'pages/topic-editor-page/modal-templates/questions-opportunities-select-difficulty-modal.component';
 import {QuestionSuggestionEditorModalComponent} from '../modal-templates/question-suggestion-editor-modal.component';
