@@ -1,87 +1,88 @@
-<div>
-  <div class="skill-editor-preview e2e-test-skill-preview-container">
-    <div class="content-box">
-      <div class="question-filter-box">
-        <div><span class="headings">Selection</span></div>
-        <div class="question-box">
-          <div><span class="heading-secondary">Questions</span></div>
-          <div *ngIf="questionsFetched">
-            <div class="question-filters">
-              <input type="text"
-                     class="e2e-test-question-text-input"
-                     [(ngModel)]="questionTextFilter"
-                     (change)="applyFilters()">
-              <select [(ngModel)]="interactionFilter"
-                      class="form-control"
-                      (change)="applyFilters()">
-                <option *ngFor="let interaction of ALLOWED_QUESTION_INTERACTIONS" [value]="interaction">
-                  {{ interaction }}
-                </option>
-              </select>
-            </div>
-            <div *ngFor="let question of displayedQuestions; index as idx" class="question-list-item">
-              <div (click)="selectQuestionToPreview(idx)">
-                <div class="question-data">
-                  <oppia-rte-output-display class="question-text"
-                                            [rteString]="question.question_state_data.content.html">
-                  </oppia-rte-output-display>
-                  <span *ngIf="question.question_state_data.interaction.id==='TextInput'">
-                    {{"Text Input"}}
-                  </span>
-                  <span *ngIf="question.question_state_data.interaction.id==='ItemSelectionInput'">
-                    {{"Item Selection"}}
-                  </span>
-                  <span *ngIf="question.question_state_data.interaction.id==='MultipleChoiceInput'">
-                    {{"Multiple Choice"}}
-                  </span>
-                  <span *ngIf="question.question_state_data.interaction.id==='NumericInput'">
-                    {{"Numeric Input"}}
-                  </span>
-                </div>
+<div class="skill-editor-preview e2e-test-skill-preview-container">
+  <div class="content-box">
+    <div class="question-filter-box">
+      <div><span class="headings">Selection</span></div>
+      <div class="question-box">
+        <div><span class="heading-secondary">Questions</span></div>
+        <div *ngIf="questionsFetched">
+          <div class="question-filters">
+            <input type="text"
+                   class="e2e-test-question-text-input"
+                   [(ngModel)]="questionTextFilter"
+                   (change)="applyFilters()">
+            <select [(ngModel)]="interactionFilter"
+                    class="form-control"
+                    (change)="applyFilters()">
+              <option *ngFor="let interaction of ALLOWED_QUESTION_INTERACTIONS"
+                      [value]="interaction">
+                {{ interaction }}
+              </option>
+            </select>
+          </div>
+          <div *ngFor="let question of displayedQuestions; index as idx"
+               class="question-list-item">
+            <div (click)="selectQuestionToPreview(idx)">
+              <div class="question-data">
+                <oppia-rte-output-display class="question-text"
+                                          [rteString]="question.question_state_data.content.html">
+                </oppia-rte-output-display>
+                <span *ngIf="question.question_state_data.interaction.id==='TextInput'">
+                  {{"Text Input"}}
+                </span>
+                <span *ngIf="question.question_state_data.interaction.id==='ItemSelectionInput'">
+                  {{"Item Selection"}}
+                </span>
+                <span *ngIf="question.question_state_data.interaction.id==='MultipleChoiceInput'">
+                  {{"Multiple Choice"}}
+                </span>
+                <span *ngIf="question.question_state_data.interaction.id==='NumericInput'">
+                  {{"Numeric Input"}}
+                </span>
               </div>
             </div>
           </div>
         </div>
-        <div class="skill-description-box">
-          <div class="skill-description">
-            <div class="content-text-box">
-              <span class="heading-secondary">
-                Content
-              </span>
-            </div>
-            <div *ngIf="htmlData">
-              <oppia-rte-output-display [rteString]="htmlData">
-              </oppia-rte-output-display>
-            </div>
+      </div>
+      <div class="skill-description-box">
+        <div class="skill-description">
+          <div class="content-text-box">
+            <span class="heading-secondary">
+              Content
+            </span>
+          </div>
+          <div *ngIf="skill">
+            <oppia-rte-output-display [rteString]="skill.getConceptCardExplanation().getHtml()">
+            </oppia-rte-output-display>
           </div>
         </div>
       </div>
-      <div class="seperator-block">
-        <div class="seperator"></div>
-      </div>
-      <div class="skill-question-container">
-        <div><span class="headings">Preview</span></div>
-        <div class="preview-box" *ngIf="displayCardIsInitialized">
-          <oppia-tutor-card [displayedCard]="displayedCard"
-                            [avatarImageIsShown]="false">
-          </oppia-tutor-card>
-          <div *ngIf="isCurrentSupplementalCardNonEmpty() && !canWindowShowTwoCards()">
-            <oppia-supplemental-card [displayedCard]="displayedCard">
+    </div>
+    <div class="seperator-block">
+      <div class="seperator"></div>
+    </div>
+    <div class="skill-question-container">
+      <span class="headings">Preview</span>
+      <div class="preview-box">
+        <oppia-tutor-card *ngIf="skill && question"
+                          [avatarImageIsShown]="false">
+        </oppia-tutor-card>
+        <div *ngIf="!skill || !question">
+          <oppia-loading-message [message]="'Loading preview page'">
+          </oppia-loading-message>
+        </div>
+        <div *ngIf="canWindowShowTwoCards"
+             class="conversation-skin-supplemental-card-container">
+          <div class="supplemental-card-parent-container">
+            <oppia-supplemental-card *ngIf="explorationContentHtml"
+                                     [cardIsShown]="cardIsShown"
+                                     [directiveDict]="getSupplementalCardAsDict()">
             </oppia-supplemental-card>
-          </div>
-          <div *ngIf="isCurrentSupplementalCardNonEmpty() && canWindowShowTwoCards()"
-               class="conversation-skin-supplemental-card-container">
-            <div class="supplemental-card-parent-container">
-              <oppia-supplemental-card [displayedCard]="displayedCard">
-              </oppia-supplemental-card>
-            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 </div>
-
 
 <style>
   .content-box {
@@ -90,28 +91,23 @@
     justify-content: center;
     margin-top: 50px;
   }
-
   .question-filter-box {
     width: 25%;
   }
-
   .seperator-block {
     text-align: center;
     width: 10%;
   }
-
   .seperator {
     background-color: #707070;
     display: inline-block;
     height: 60vh;
     width: 2px;
   }
-
   .content-heading {
     border-bottom: 1px solid #707070;
     width: 100%;
   }
-
   .question-box {
     background-color: #fff;
     border-radius: 7px;
@@ -120,21 +116,17 @@
     overflow-y: scroll;
     padding: 30px;
   }
-
   .skill-description-box {
     margin-top: 30px;
   }
-
   .skill-description {
     background-color: #fff;
     border-radius: 7px;
     padding: 30px;
   }
-
   .skill-question-container {
     width: 40%;
   }
-
   .question-text {
     display: inline-block;
     overflow: hidden;
@@ -142,7 +134,6 @@
     white-space: nowrap;
     width: 60%;
   }
-
   .question-data {
     align-items: center;
     cursor: pointer;
@@ -150,73 +141,66 @@
     flex-wrap: wrap;
     justify-content: space-between;
   }
-
   .question-filters {
     align-items: center;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
   }
-
   .question-filters input {
     width: 60%;
   }
-
   .question-filters select {
     width: 38%;
   }
-
   .preview-box {
     margin-top: -40px;
     padding: 30px 0;
   }
-
   .content-text-box {
     border-bottom: 2px solid #707070;
     margin-bottom: 15px;
   }
-
   .question-list-item {
     border-bottom: 1px solid #e6e6e6;
     margin: 12px 0;
   }
-
   .headings {
     font-size: 30px;
     font-weight: bold;
   }
-
   .heading-secondary {
     font-size: 20px;
     font-weight: bold;
   }
-
   @media screen and (max-width: 1250px) {
     .question-filter-box {
       width: 35%;
     }
-
     .skill-question-container {
       width: 45%;
     }
   }
-
   @media screen and (max-width: 1000px) {
     .seperator-block {
       width: 5%;
     }
   }
-
   @media screen and (max-width: 700px) {
+    .content-box {
+      flex-direction: column;
+    }
     .question-filter-box {
       width: 90%;
     }
-
-    .seperator-block,
-    .skill-description-box {
+    .seperator-block {
       display: none;
     }
-
+    .skill-description-box {
+      display: block;
+      width: 90%;
+      order: 2;
+    }
     .skill-question-container {
       margin: 0;
       width: 90%;
