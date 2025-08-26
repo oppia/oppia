@@ -27,7 +27,7 @@ jobs:
       - name: Merge develop branch into the current branch
         uses: ./.github/actions/merge
       - name: Github Actions from Oppiabot
-        uses: oppia/oppiabot@1.4.0
+        uses: oppia/oppiabot
         with:
           repo-token: ${{secrets.GITHUB_TOKEN}}
         env:
