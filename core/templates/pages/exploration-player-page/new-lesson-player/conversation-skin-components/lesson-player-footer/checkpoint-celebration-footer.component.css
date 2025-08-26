@@ -1,4 +1,4 @@
-.inner-container {
+oppia-checkpoint-celebration-footer .inner-container {
   -webkit-animation-delay: 0.5s;
   -ms-animation-delay: 0.5s;
   -webkit-animation-direction: normal;
@@ -37,134 +37,135 @@
   text-align: center;
 }
 
-.inner-container-alignment {
+oppia-checkpoint-celebration-footer .inner-container-alignment {
   padding-left: 30px;
   padding-right: 30px;
+  margin-bottom: 20px;
 }
-.tick-symbol {
+oppia-checkpoint-celebration-footer .tick-symbol {
   font-size: 42px;
   vertical-align: middle;
 }
 
-.inner-content {
+oppia-checkpoint-celebration-footer .inner-content {
   padding-left: 8px;
   text-transform: uppercase;
 }
 
-.inner-container-fade-out {
+oppia-checkpoint-celebration-footer .inner-container-fade-out {
   animation: fadeout 5s 1;
 }
 
-.sprinkle-dot {
+oppia-checkpoint-celebration-footer .sprinkle-dot {
   border-radius: 50%;
   height: 10px;
   position: absolute;
   width: 10px;
 }
 
-.dot1 {
+oppia-checkpoint-celebration-footer .dot1 {
   -webkit-animation: flasha 2s 1;
   animation: flasha 2s 1;
   opacity: 0;
 }
 
-.dot2 {
+oppia-checkpoint-celebration-footer .dot2 {
   -webkit-animation: flashb 2s 1;
   animation: flashb 2s 1;
   opacity: 0;
 }
 
-.dot3 {
+oppia-checkpoint-celebration-footer .dot3 {
   -webkit-animation: flashc 2s 1;
   animation: flashc 2s 1;
   opacity: 0;
 }
 
-.dot4 {
+oppia-checkpoint-celebration-footer .dot4 {
   -webkit-animation: flashd 2s 1;
   animation: flashd 2s 1;
   opacity: 0;
 }
 
-.dot5 {
+oppia-checkpoint-celebration-footer .dot5 {
   -webkit-animation: flashe 2s 1;
   animation: flashe 2s 1;
   opacity: 0;
 }
 
-.dot6 {
+oppia-checkpoint-celebration-footer .dot6 {
   -webkit-animation: flashf 2s 1;
   animation: flashf 2s 1;
   opacity: 0;
 }
 
-.dot7 {
+oppia-checkpoint-celebration-footer .dot7 {
   -webkit-animation: flashg 2s 1;
   animation: flashg 2s 1;
   opacity: 0;
 }
 
-.dot8 {
+oppia-checkpoint-celebration-footer .dot8 {
   -webkit-animation: flashh 2s 1;
   animation: flashh 2s 1;
   opacity: 0;
 }
 
-.dot9 {
+oppia-checkpoint-celebration-footer .dot9 {
   -webkit-animation: flashi 2s 1;
   animation: flashi 2s 1;
   opacity: 0;
 }
 
-.dot10 {
+oppia-checkpoint-celebration-footer .dot10 {
   -webkit-animation: flashra 2s 1;
   animation: flashra 2s 1;
   opacity: 0;
 }
 
-.dot11 {
+oppia-checkpoint-celebration-footer .dot11 {
   -webkit-animation: flashrb 2s 1;
   animation: flashrb 2s 1;
   opacity: 0;
 }
 
-.dot12 {
+oppia-checkpoint-celebration-footer .dot12 {
   -webkit-animation: flashrc 2s 1;
   animation: flashrc 2s 1;
   opacity: 0;
 }
 
-.dot13 {
+oppia-checkpoint-celebration-footer .dot13 {
   -webkit-animation: flashrd 2s 1;
   animation: flashrd 2s 1;
   opacity: 0;
 }
 
-.dot14 {
+oppia-checkpoint-celebration-footer .dot14 {
   -webkit-animation: flashre 2s 1;
   animation: flashre 2s 1;
   opacity: 0;
 }
 
-.dot15 {
+oppia-checkpoint-celebration-footer .dot15 {
   -webkit-animation: flashrf 2s 1;
   animation: flashrf 2s 1;
   opacity: 0;
 }
 
-.dot16 {
+oppia-checkpoint-celebration-footer .dot16 {
   -webkit-animation: flashrg 2s 1;
   animation: flashrg 2s 1;
   opacity: 0;
 }
 
-.dot17 {
+oppia-checkpoint-celebration-footer .dot17 {
   -webkit-animation: flashrh 2s 1;
   animation: flashrh 2s 1;
   opacity: 0;
 }
 
-.dot18 {
+oppia-checkpoint-celebration-footer .dot18 {
   -webkit-animation: flashri 2s 1;
   animation: flashri 2s 1;
   opacity: 0;
@@ -396,18 +397,18 @@
 /* Some mobile devices have CSS width below 520px, use a responsive min-width
     when under 520px to prevent pushing things offscreen. */
 @media(max-width: 500px) {
-  .inner-container {
+  oppia-checkpoint-celebration-footer .inner-container {
     min-width: 250px;
   }
 }
 
 @media(max-width: 959px) {
-  .inner-container-alignment {
+  oppia-checkpoint-celebration-footer .inner-container-alignment {
     padding-left: 30px;
     padding-right: 30px;
   }
 
-  .inner-container {
+  oppia-checkpoint-celebration-footer .inner-container {
     max-width: 650px;
   }
 }

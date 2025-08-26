@@ -1,19 +1,19 @@
 <div class="stage">
-  <div class="confetti" [ngClass]="{'confetti-animation-class-1': confettiIsShown}"></div>
-  <div class="confetti" [ngClass]="{'confetti-animation-class-2': confettiIsShown}"></div>
-  <div class="confetti" [ngClass]="{'confetti-animation-class-3': confettiIsShown}"></div>
-  <div class="confetti" [ngClass]="{'confetti-animation-class-4': confettiIsShown}"></div>
-  <div class="confetti" [ngClass]="{'confetti-animation-class-5': confettiIsShown}"></div>
-  <div class="confetti" [ngClass]="{'confetti-animation-class-6': confettiIsShown}"></div>
-  <div class="confetti" [ngClass]="{'confetti-animation-class-7': confettiIsShown}"></div>
-  <div class="confetti" [ngClass]="{'confetti-animation-class-8': confettiIsShown}"></div>
-  <div class="confetti" [ngClass]="{'confetti-animation-class-9': confettiIsShown}"></div>
-  <div class="confetti" [ngClass]="{'confetti-animation-class-10': confettiIsShown}"></div>
-  <div class="confetti" [ngClass]="{'confetti-animation-class-11': confettiIsShown}"></div>
-  <div class="confetti" [ngClass]="{'confetti-animation-class-12': confettiIsShown}"></div>
-  <div class="confetti" [ngClass]="{'confetti-animation-class-13': confettiIsShown}"></div>
-  <div class="confetti" [ngClass]="{'confetti-animation-class-14': confettiIsShown}"></div>
-  <svg class="coiled-confetti" [ngClass]="{'coiled-confetti-animation-class-1': confettiIsShown}" viewBox="0 0 489.932 489.932"><path fill="none" stroke="red" stroke-linecap="round" stroke-width="55.2" d="M37.409 31.375c.46 41.363-34.942 128.28 30.41 131.385 37.554-6.366 89.23-27.658 116.91 9.15 17.12 38.515-17.224 85.525 13.359 121.557 38.94 42.216 92.29-24.79 134.66 5.718 38.952 38.487-17.765 104.545 28.36 139.69 30.937 22.68 68.08-3.105 99.863-9.883"/></svg>
-  <svg class="coiled-confetti" [ngClass]="{'coiled-confetti-animation-class-2': confettiIsShown}" viewBox="0 0 489.932 489.932"><path fill="none" stroke="green" stroke-linecap="round" stroke-width="55.2" d="M37.409 31.375c.46 41.363-34.942 128.28 30.41 131.385 37.554-6.366 89.23-27.658 116.91 9.15 17.12 38.515-17.224 85.525 13.359 121.557 38.94 42.216 92.29-24.79 134.66 5.718 38.952 38.487-17.765 104.545 28.36 139.69 30.937 22.68 68.08-3.105 99.863-9.883"/></svg>
-  <svg class="coiled-confetti" [ngClass]="{'coiled-confetti-animation-class-3': confettiIsShown}" viewBox="0 0 489.932 489.932"><path fill="none" stroke="blue" stroke-linecap="round" stroke-width="55.2" d="M37.409 31.375c.46 41.363-34.942 128.28 30.41 131.385 37.554-6.366 89.23-27.658 116.91 9.15 17.12 38.515-17.224 85.525 13.359 121.557 38.94 42.216 92.29-24.79 134.66 5.718 38.952 38.487-17.765 104.545 28.36 139.69 30.937 22.68 68.08-3.105 99.863-9.883"/></svg>
+  <div class="confetti" [style.top]="topOffset" [ngClass]="{'confetti-animation-class-1': confettiIsShown}"></div>
+  <div class="confetti" [style.top]="topOffset" [ngClass]="{'confetti-animation-class-2': confettiIsShown}"></div>
+  <div class="confetti" [style.top]="topOffset" [ngClass]="{'confetti-animation-class-3': confettiIsShown}"></div>
+  <div class="confetti" [style.top]="topOffset" [ngClass]="{'confetti-animation-class-4': confettiIsShown}"></div>
+  <div class="confetti" [style.top]="topOffset" [ngClass]="{'confetti-animation-class-5': confettiIsShown}"></div>
+  <div class="confetti" [style.top]="topOffset" [ngClass]="{'confetti-animation-class-6': confettiIsShown}"></div>
+  <div class="confetti" [style.top]="topOffset" [ngClass]="{'confetti-animation-class-7': confettiIsShown}"></div>
+  <div class="confetti" [style.top]="topOffset" [ngClass]="{'confetti-animation-class-8': confettiIsShown}"></div>
+  <div class="confetti" [style.top]="topOffset" [ngClass]="{'confetti-animation-class-9': confettiIsShown}"></div>
+  <div class="confetti" [style.top]="topOffset" [ngClass]="{'confetti-animation-class-10': confettiIsShown}"></div>
+  <div class="confetti" [style.top]="topOffset" [ngClass]="{'confetti-animation-class-11': confettiIsShown}"></div>
+  <div class="confetti" [style.top]="topOffset" [ngClass]="{'confetti-animation-class-12': confettiIsShown}"></div>
+  <div class="confetti" [style.top]="topOffset" [ngClass]="{'confetti-animation-class-13': confettiIsShown}"></div>
+  <div class="confetti" [style.top]="topOffset" [ngClass]="{'confetti-animation-class-14': confettiIsShown}"></div>
+  <svg class="coiled-confetti" [style.top]="topOffset" [ngClass]="{'coiled-confetti-animation-class-1': confettiIsShown}" viewBox="0 0 489.932 489.932"><path fill="none" stroke="red" stroke-linecap="round" stroke-width="55.2" d="M37.409 31.375c.46 41.363-34.942 128.28 30.41 131.385 37.554-6.366 89.23-27.658 116.91 9.15 17.12 38.515-17.224 85.525 13.359 121.557 38.94 42.216 92.29-24.79 134.66 5.718 38.952 38.487-17.765 104.545 28.36 139.69 30.937 22.68 68.08-3.105 99.863-9.883"/></svg>
+  <svg class="coiled-confetti" [style.top]="topOffset" [ngClass]="{'coiled-confetti-animation-class-2': confettiIsShown}" viewBox="0 0 489.932 489.932"><path fill="none" stroke="green" stroke-linecap="round" stroke-width="55.2" d="M37.409 31.375c.46 41.363-34.942 128.28 30.41 131.385 37.554-6.366 89.23-27.658 116.91 9.15 17.12 38.515-17.224 85.525 13.359 121.557 38.94 42.216 92.29-24.79 134.66 5.718 38.952 38.487-17.765 104.545 28.36 139.69 30.937 22.68 68.08-3.105 99.863-9.883"/></svg>
+  <svg class="coiled-confetti" [style.top]="topOffset" [ngClass]="{'coiled-confetti-animation-class-3': confettiIsShown}" viewBox="0 0 489.932 489.932"><path fill="none" stroke="blue" stroke-linecap="round" stroke-width="55.2" d="M37.409 31.375c.46 41.363-34.942 128.28 30.41 131.385 37.554-6.366 89.23-27.658 116.91 9.15 17.12 38.515-17.224 85.525 13.359 121.557 38.94 42.216 92.29-24.79 134.66 5.718 38.952 38.487-17.765 104.545 28.36 139.69 30.937 22.68 68.08-3.105 99.863-9.883"/></svg>
 </div>

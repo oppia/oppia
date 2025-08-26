@@ -74,6 +74,7 @@ export class CheckpointBarComponent implements OnInit {
     this.directiveSubscriptions.add(
       this.playerPositionService.onNewCardOpened.subscribe(() => {
         this.updateLessonProgressBar();
+        console.log('New card opened');
       })
     );
   }

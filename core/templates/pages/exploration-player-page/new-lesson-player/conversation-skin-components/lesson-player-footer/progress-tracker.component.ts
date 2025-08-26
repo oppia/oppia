@@ -61,6 +61,7 @@ export class ProgressTrackerComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.directiveSubscriptions.add(
       this.playerPositionService.onLoadedMostRecentCheckpoint.subscribe(() => {
+        console.log('Loaded most recent checkpoint');
         if (this.checkpointCount) {
           this.showProgressReminderModal();
         } else {

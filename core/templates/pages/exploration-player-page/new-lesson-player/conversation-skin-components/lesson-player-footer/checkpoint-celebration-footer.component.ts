@@ -13,18 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the correctness footer in the exploration player.
+ * @fileoverview Component for the correctness footer in the lesson player.
  */
 
 import {AfterViewInit, Component, ViewChild} from '@angular/core';
-import {EndChapterConfettiComponent} from '../learner-experience/end-chapter-confetti.component';
+import {NewEndChapterConfettiComponent} from '../conversation-display-components/new-end-chapter-confetti.component';
 
 @Component({
-  selector: 'oppia-correctness-footer',
-  templateUrl: './correctness-footer.component.html',
+  selector: 'oppia-checkpoint-celebration-footer',
+  templateUrl: './checkpoint-celebration-footer.component.html',
 })
-export class CorrectnessFooterComponent implements AfterViewInit {
-  @ViewChild('confetti') confettiComponent!: EndChapterConfettiComponent;
+export class CheckpointCelebrationFooterComponent implements AfterViewInit {
+  @ViewChild('confetti') confettiComponent!: NewEndChapterConfettiComponent;
 
   ngAfterViewInit(): void {
     setTimeout(() => {

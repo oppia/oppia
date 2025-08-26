@@ -228,6 +228,7 @@ import {ProgressBarComponent} from './progress-bar/progress-bar.component';
 import {ProgressTrackerComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/progress-tracker.component';
 import {CheckpointBarComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/checkpoint-bar.component';
 import {SaveProgressModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/save-progress-modal.component';
+import {CheckpointCelebrationFooterComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/checkpoint-celebration-footer.component';
 @NgModule({
   imports: [
     BackgroundBannerModule,
@@ -280,6 +281,7 @@ import {SaveProgressModalComponent} from 'pages/exploration-player-page/new-less
     CompletionGraphComponent,
     CorrectnessFooterComponent,
     NewCorrectnessFooterComponent,
+    CheckpointCelebrationFooterComponent,
     ConfirmLeaveModalComponent,
     ConfirmQuestionExitModalComponent,
     ContinueButtonComponent,
@@ -448,6 +450,7 @@ import {SaveProgressModalComponent} from 'pages/exploration-player-page/new-less
     CompletionGraphComponent,
     CorrectnessFooterComponent,
     NewCorrectnessFooterComponent,
+    CheckpointCelebrationFooterComponent,
     ConfirmLeaveModalComponent,
     PlayerHeaderComponent,
     ConfirmQuestionExitModalComponent,
@@ -625,6 +628,7 @@ import {SaveProgressModalComponent} from 'pages/exploration-player-page/new-less
     FormsModule,
     MaterialModule,
     NgBootstrapModule,
+    CheckpointCelebrationFooterComponent,
     RichTextComponentsModule,
     ObjectComponentsModule,
     OppiaCkEditor4Module,
