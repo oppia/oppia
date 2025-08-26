@@ -30,6 +30,8 @@ const commonModalContainerSelector = '.e2e-test-modal-container';
 const addRightsButtonSelector = '.e2e-test-add-rights-button';
 const contributorCountSelector = '.e2e-test-contributor-count';
 const tabSelectionDropdownMobileSelector = '.e2e-test-tab-selection-dropdown';
+const newContributorAdminDashboardPageSelector =
+  '.e2e-test-new-contributor-admin-dashboard-page';
 
 export class ContributorAdmin extends BaseUser {
   /**
@@ -37,6 +39,9 @@ export class ContributorAdmin extends BaseUser {
    */
   async navigateToContributorDashboardAdminPage(): Promise<void> {
     await this.goto(ContributorDashboardAdminUrl);
+    await this.expectElementToBeVisible(
+      newContributorAdminDashboardPageSelector
+    );
   }
 
   /**
@@ -47,8 +52,13 @@ export class ContributorAdmin extends BaseUser {
     tabName: 'Translation Submitters' | 'Translation Reviewers'
   ) {
     if (this.isViewportAtMobileWidth()) {
+      // Remove last 's' from the tab name.
+      const modifiedName = tabName.replace(/s$/, '');
       await this.expectElementToBeVisible(tabSelectionDropdownMobileSelector);
-      await this.updateMatOption(tabSelectionDropdownMobileSelector, tabName);
+      await this.updateMatOption(
+        tabSelectionDropdownMobileSelector,
+        modifiedName
+      );
     } else {
       const tabNameInLowerCase = tabName.toLocaleLowerCase().replace(' ', '-');
       const tabSelector = `.e2e-test-${tabNameInLowerCase}-tab`;
