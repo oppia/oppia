@@ -123,6 +123,7 @@ export class TranslationModalComponent {
     type: string;
     ui_config: UiConfig;
   };
+  skipUnsavedCheck = false;
 
   // Language description is null when active language code is invalid.
   languageDescription: string | null = null;
@@ -318,6 +319,10 @@ export class TranslationModalComponent {
   }
 
   private checkForUnsavedChanges(action: () => void): void {
+    if (this.skipUnsavedCheck) {
+      action();
+      return;
+    }
     if (
       this.activeWrittenTranslation &&
       this.activeWrittenTranslation.length > 0
@@ -532,6 +537,7 @@ export class TranslationModalComponent {
         'Translation'
       );
       this.uploadingTranslation = true;
+      this.skipUnsavedCheck = true;
       const imagesData = this.imageLocalStorageService.getStoredImagesData();
       this.imageLocalStorageService.flushStoredImagesData();
       this.translateTextService.suggestTranslatedText(
@@ -543,12 +549,14 @@ export class TranslationModalComponent {
           this.alertsService.addSuccessMessage(
             'Submitted translation for review.'
           );
+          this.activeWrittenTranslation = '';
           this.uploadingTranslation = false;
+          this.skipUnsavedCheck = false;
           if (this.moreAvailable) {
             this.skipActiveTranslation();
             this.resetEditor();
           } else {
-            this.activeWrittenTranslation = '';
+            this.close();
           }
         },
         (errorReason: string) => {
