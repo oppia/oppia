@@ -1,5 +1,7 @@
-<background-banner></background-banner>
-<div class="oppia-practice-session-container position-relative e2e-test-practice-session-container">
+<background-banner *ngIf="!isNewLessonPlayerEnabled()"></background-banner>
+<div class="oppia-practice-session-container position-relative e2e-test-practice-session-container"
+     [ngClass]="{'new-oppia-practice-session-container': isNewLessonPlayerEnabled()}">
+
   <oppia-question-player *ngIf="questionPlayerConfig && questionPlayerConfig.skillList.length > 0"
                          [questionPlayerConfig]="questionPlayerConfig">
   </oppia-question-player>
@@ -23,9 +25,33 @@
     text-decoration: none;
   }
 
+  .new-oppia-practice-session-container {
+    background-color: #eeebea;
+    height: 100vh;
+    overflow: hidden;
+    z-index: 0;
+  }
+
+  .new-oppia-practice-session-container::before {
+    background-image: url('/assets/images/background/conversation_skin.svg');
+    background-position: center;
+    content: '';
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: -1;
+  }
+
   @media(max-width: 925px) {
     .oppia-practice-session-container {
       max-width: 95%;
     }
+
+    .new-oppia-practice-session-container {
+      max-width: 100%;
+    }
   }
+
 </style>

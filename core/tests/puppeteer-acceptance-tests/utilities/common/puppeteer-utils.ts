@@ -32,7 +32,13 @@ expect.extend({toMatchImageSnapshot});
 const backgroundBanner = '.oppia-background-image';
 const libraryBanner = '.e2e-test-library-banner';
 
+const commonModalTitleSelector = '.e2e-test-modal-header';
+const commonModalBodySelector = '.e2e-test-modal-body';
+const commonModalConfirmBtnSelector = '.e2e-test-confirm-action-button';
+const commonModalCancelBtnSelector = '.e2e-test-cancel-action-button';
+const uploadErrorMessageDivSelector = '.e2e-test-upload-error-message';
 const currentMatTabHeaderSelector = '.mat-tab-label-active';
+const actionStatusMessageSelector = '.e2e-test-status-message';
 
 const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
 const baseURL = testConstants.URLs.BaseURL;
@@ -65,16 +71,12 @@ export type ModalUserInteractions = (
   container: string
 ) => Promise<void>;
 
-const actionStatusMessageSelector = '.e2e-test-status-message';
-const commonModalTitleSelector = '.e2e-test-modal-header';
-const commonModalBodySelector = '.e2e-test-modal-body';
-
 export class BaseUser {
   page!: Page;
   browserObject!: Browser;
   userHasAcceptedCookies: boolean = false;
-  email: string = '';
-  username: string = '';
+  email: string | null = null;
+  username: string | null = null;
   startTimeInMilliseconds: number = -1;
   screenRecorder!: PuppeteerScreenRecorder;
   static instances: BaseUser[] = []; // Track instances.
@@ -147,12 +149,17 @@ export class BaseUser {
         if (process.env.VIDEO_RECORDING_IS_ENABLED === '1') {
           const uniqueString = Math.random().toString(36).substring(2, 8);
           const outputFileName =
-            `${mobile ? 'mobile' : 'desktop'}-${specName}-${new Date().toISOString()}-${uniqueString}.mp4`.replace(
+            `${this.username}-${new Date().toISOString()}-${uniqueString}.mp4`.replace(
               /[^a-z0-9.-]/gi,
               '_'
             );
 
-          const outputDir = testConstants.TEST_VIDEO_DIR;
+          const folderName =
+            `${mobile ? 'mobile' : 'desktop'}-${specName}`.replace(
+              /[^a-z0-9.-]/gi,
+              '_'
+            );
+          const outputDir = path.join(testConstants.TEST_VIDEO_DIR, folderName);
           if (!fs.existsSync(outputDir)) {
             fs.mkdirSync(outputDir, {recursive: true});
           }
@@ -439,7 +446,6 @@ export class BaseUser {
     }
     showMessage(`Element (${selector}) is clickable, as expected.`);
   }
-
   /**
    * The function clicks the element using the text on the button.
    * @param selector The text of the button to click on.
@@ -504,31 +510,12 @@ export class BaseUser {
    * and wait until the new page is fully loaded.
    */
   async clickAndWaitForNavigation(selector: string): Promise<void> {
-    /** Normalize-space is used to remove the extra spaces in the text.
-     * Check the documentation for the normalize-space function here :
-     * https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space */
-    const [button] = await this.page.$x(
-      `\/\/*[contains(text(), normalize-space('${selector}'))]`
-    );
-    // If we fail to find the element by its XPATH, then the button is undefined and
-    // we try to find it by its CSS selector.
-    if (button !== undefined) {
-      await this.waitForElementToBeClickable(button);
-      await Promise.all([
-        this.page.waitForNavigation({
-          waitUntil: ['networkidle2', 'load'],
-        }),
-        button.click(),
-      ]);
-    } else {
-      await this.waitForElementToBeClickable(selector);
-      await Promise.all([
-        this.page.waitForNavigation({
-          waitUntil: ['networkidle2', 'load'],
-        }),
-        this.page.click(selector),
-      ]);
-    }
+    const navigationPromise = this.page.waitForNavigation({
+      waitUntil: ['networkidle2', 'load'],
+    });
+
+    await this.clickOn(selector, false);
+    await navigationPromise;
   }
 
   /**
@@ -1672,6 +1659,42 @@ export class BaseUser {
     const elements = await this.page.$$(selector);
 
     return elements;
+  }
+
+  /**
+   * Clicks on the button in the modal with the given title and action.
+   * @param title - The title of the modal.
+   * @param action - The action to click on the button in the modal.
+   */
+  async clickButtonInModal(
+    title: string,
+    action: 'confirm' | 'cancel'
+  ): Promise<void> {
+    await this.expectElementToBeVisible(commonModalTitleSelector);
+    await this.expectTextContentToBe(commonModalTitleSelector, title);
+
+    const currentActionBtnSelector =
+      action === 'confirm'
+        ? commonModalConfirmBtnSelector
+        : commonModalCancelBtnSelector;
+    await this.expectElementToBeVisible(currentActionBtnSelector);
+    await this.clickOn(currentActionBtnSelector);
+
+    await this.expectElementToBeVisible(currentActionBtnSelector, false);
+  }
+
+  /**
+   * Checks if the upload error message contains the expected text.
+   * @param expectedErrorMessage The expected text of the upload error message.
+   */
+  async expectUploadErrorMessageToBe(
+    expectedErrorMessage: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(uploadErrorMessageDivSelector);
+    await this.expectTextContentToContain(
+      uploadErrorMessageDivSelector,
+      expectedErrorMessage
+    );
   }
 }
 
