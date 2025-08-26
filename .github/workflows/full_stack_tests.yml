@@ -46,11 +46,11 @@ jobs:
     needs: [build]
     runs-on: ubuntu-22.04
     env:
-      SKIP_BUILD: true
+      SKIP_BUILD: false
     strategy:
       fail-fast: false
       matrix:
-        env: [prod]
+        env: [prod, dev]
         suite:
           - name: translation-coordinator/add-remove-translation-rights
           - name: practice-question-coordinator/add-and-remove-question-rights
