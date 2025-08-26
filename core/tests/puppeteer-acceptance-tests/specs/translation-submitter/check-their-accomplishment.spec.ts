@@ -16,7 +16,7 @@
  * @fileoverview Acceptance test from CUJv3 Doc
  * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
  *
- * TS.TA??. Check their accomplishment.
+ * TS.CD.02 Check their accomplishment.
  */
 
 import testConstants from '../../utilities/common/test-constants';
@@ -111,7 +111,7 @@ describe('Translation Submitter', function () {
     await translationReviewer.submitTranslationReview('accept');
   }, 900000);
 
-  it('should be able to check contribution stats', async function () {
+  it('should be able to verify contribution stats', async function () {
     // Check contribution stats.
     await translationSubmitter.navigateToTabInMyContributions(
       'Contribution Stats'
@@ -123,11 +123,12 @@ describe('Translation Submitter', function () {
       'translationSubmitterAccomplishment',
       __dirname
     );
-    await translationSubmitter.expectContributionTableToContainRow(
-      'Fractions',
-      2,
-      4
-    );
+    await translationSubmitter.expectContributionTableToContainRow([
+      null, // Date can't be compared as it will be different every time.
+      'Fractions', // Topic.
+      '2', // Accepted translations.
+      '4', // Words translated.
+    ]);
 
     // Download Certificate.
     // TODO(#22743): Unable to download certificate when To date is of today
