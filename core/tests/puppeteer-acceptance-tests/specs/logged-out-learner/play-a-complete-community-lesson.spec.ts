@@ -158,7 +158,7 @@ describe('Logged-Out Learner', function () {
     // Link RTE.
     await loggedOutLearner.clickAndVerifyAnchorWithInnerText(
       'Go to Oppia.org website',
-      'https://www.oppia.org'
+      'https://www.oppia.org/'
     );
 
     // Collapsible RTE.
