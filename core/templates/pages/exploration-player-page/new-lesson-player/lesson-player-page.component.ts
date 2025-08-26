@@ -38,6 +38,7 @@ import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {ContentTranslationLanguageService} from '../services/content-translation-language.service';
 import {PlayerTranscriptService} from '../services/player-transcript.service';
 import {I18nService} from 'i18n/i18n.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
 require('interactions/interactionsRequires.ts');
 
@@ -65,6 +66,7 @@ export class NewLessonPlayerPageComponent implements OnDestroy {
     private urlService: UrlService,
     private translateService: TranslateService,
     private ngbModal: NgbModal,
+    private i18nLanguageCodeService: I18nLanguageCodeService,
     private i18nService: I18nService,
     private contentTranslationLanguageService: ContentTranslationLanguageService,
     private playerTranscriptService: PlayerTranscriptService,
@@ -82,11 +84,13 @@ export class NewLessonPlayerPageComponent implements OnDestroy {
         // manually, and the onLangChange subscription is added after
         // the exploration is fetch from the backend.
         this.setPageTitle();
+        const currentSiteLanugage =
+          this.i18nLanguageCodeService.getCurrentI18nLanguageCode();
         this.entityVoiceoversService.init(
           explorationId,
           'exploration',
           response.version,
-          response.exploration.language_code
+          currentSiteLanugage
         );
 
         this.entityVoiceoversService.fetchEntityVoiceovers().then(() => {

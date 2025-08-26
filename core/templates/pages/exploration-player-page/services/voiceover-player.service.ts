@@ -91,6 +91,7 @@ export class VoiceoverPlayerService {
   ): void {
     let retrievedLanguageAccentCodes =
       this.languageAccentMasterList[languageCode] || {};
+
     let languageAccentDescriptions = [];
     this.languageAccentDescriptions = [];
     this.languageAccentDescriptionsToCodes = {};

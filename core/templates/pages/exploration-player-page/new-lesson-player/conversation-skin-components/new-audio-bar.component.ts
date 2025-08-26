@@ -147,10 +147,6 @@ export class NewAudioBarComponent {
     return this.I18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
-  focusOnAudioControls(): void {
-    this.audioControlsRef?.nativeElement.focus();
-  }
-
   isAudioPlaying(): boolean {
     return this.audioPlayerService.isPlaying();
   }
@@ -161,14 +157,6 @@ export class NewAudioBarComponent {
 
   doesCurrentAudioTranslationNeedUpdate(): boolean {
     return this.voiceoverToBePlayed?.needsUpdate ?? false;
-  }
-
-  onBackwardButtonClicked(): void {
-    this.audioPlayerService.rewind(5);
-  }
-
-  onForwardButtonClicked(): void {
-    this.audioPlayerService.forward(5);
   }
 
   updateDisplayableLanguageAccentDescription(): void {

@@ -6,51 +6,55 @@
 
 .oppia-new-audio-bar {
   background-color: #fff8e5;
+  display: flex;
   height: 44px;
-  position: relative;
-  width: 100%;
   padding: 10px 8px;
   padding-right: 48px;
-  display: flex;
+  position: relative;
+  width: 100%;
 }
 
 .oppia-new-audio-bar i {
+  color: #c55f45;
   font-size: 24px;
-  color: #C55F45;
 }
 
 .oppia-new-audio-bar p {
+  color: #205d86;
+  flex-shrink: 0;
   font-family: Roboto;
-  font-weight: 500;
   font-size: 16px;
-  color: #205D86;
+  font-weight: 500;
   margin-left: 8px;
   margin-right: 8px;
-  min-width: 161px;
+  margin-top: 4px;
 }
 
 .oppia-new-audio-bar span {
+  color: #c55f45;
   font-family: Roboto;
-  font-weight: 500;
   font-size: 16px;
-  color: #C55F45;
+  font-weight: 500;
 }
 
 .oppia-new-audio-header-select select{
-  border: 2px solid #205D86;
+  background-color: #fff8e5;
+  border: 2px solid #205d86;
   border-radius: 4px;
-  width: 89px;
+  color: #205d86;
+  font-weight: 500;
   height: 28px;
+  width: 89px;
 }
 
 .oppia-new-audio-header-control-buttons {
   display: flex;
-  width: 85%;
+  width: 100%;
 }
 
 .audio-new-header-control-icons i {
+  color: #205d86;
   font-size: 15px;
-  color: #205D86;
   margin-right: 12px;
   margin-left: 12px;
 }
@@ -61,6 +65,7 @@
 
 oppia-new-audio-bar .mat-slider-horizontal {
   height: 0;
+  min-width: 120px;
 }
 
 oppia-new-audio-bar .mat-slider {
@@ -69,4 +74,18 @@ oppia-new-audio-bar .mat-slider {
 
 oppia-new-audio-bar .mat-slider-wrapper {
   position: static;
+}
+
+oppia-new-audio-bar .mobile-mode {
+  display: none;
+}
+
+@media (max-width: 480px) {
+  oppia-new-audio-bar .desktop-mode {
+    display: none;
+  }
+  oppia-new-audio-bar .mobile-mode {
+    display: block;
+    margin-left: 30px;
+  }
 }
