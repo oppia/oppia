@@ -556,6 +556,7 @@ export class TranslationModalComponent {
             this.skipActiveTranslation();
             this.resetEditor();
           } else {
+            this.activeWrittenTranslation = '';
             this.close();
           }
         },
