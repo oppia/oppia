@@ -16,7 +16,7 @@
  * @fileoverview Acceptance test from CUJv3 Doc
  * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
  *
- * TS.CD.??. Translate exploration in target language.
+ * TS.CD Translate exploration in target language.
  */
 
 import {RTE_BUTTON_TITLES} from '../../utilities/common/rte-editor';
@@ -125,11 +125,11 @@ describe('Translation Submitter', function () {
   it('should be able to navigate to contribution page', async function () {
     // Navigate to the contributor dashboard.
     await translationSubmitter.navigateToContributorDashboardUsingProfileDropdown();
+    await translationSubmitter.expectUsernameToBe('translator');
     await translationSubmitter.expectScreenshotToMatch(
       'contributorDashboard',
       __dirname
     );
-    await translationSubmitter.expectUsernameToBe('translator');
 
     // Switch to the translation tab.
     await translationSubmitter.switchToTabInContributionDashboard(
@@ -139,14 +139,13 @@ describe('Translation Submitter', function () {
     await translationSubmitter.expectActiveTabDescriptionToBe(
       'Translate the lesson text to help non-English speakers follow the lessons.'
     );
+    await translationSubmitter.expectTranslationOpportunitiesToBePresent(false);
     await translationSubmitter.expectScreenshotToMatch(
       'translationTabInContributionDashboard',
       __dirname
     );
 
-    await translationSubmitter.expectTranslationOpportunitiesToBePresent(false);
-
-    // Change the translation language.
+    // Change the translation language to hindi.
     await translationSubmitter.selectLanguageInTranslateTextTab(
       'हिन्दी (Hindi)'
     );
@@ -182,6 +181,10 @@ describe('Translation Submitter', function () {
     );
     await translationSubmitter.selectSubjectInTranslateTextTab('Fractions');
     await translationSubmitter.expectPaginationButtonToBeVisible('next', false);
+    await translationSubmitter.expectOpportunityToBePresent(
+      'Cutting the Pies',
+      'Fractions - The Picnic Problem'
+    );
   });
 
   it('should be able to use RTE', async function () {
