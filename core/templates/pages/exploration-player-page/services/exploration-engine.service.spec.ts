@@ -23,9 +23,9 @@ import {MockTranslateService} from '../../../components/forms/schema-based-edito
 import {AnswerClassificationResult} from '../../../domain/classifier/answer-classification-result.model';
 import {Interaction} from '../../../domain/exploration/interaction.model';
 import {
+  Exploration,
   ExplorationBackendDict,
-  ExplorationObjectFactory,
-} from '../../../domain/exploration/ExplorationObjectFactory';
+} from '../../../domain/exploration/exploration.model';
 import {Outcome} from '../../../domain/exploration/outcome.model';
 import {
   ParamChangeBackendDict,
@@ -39,6 +39,8 @@ import {StateCard} from '../../../domain/state_card/state-card.model';
 import {ExpressionInterpolationService} from '../../../expressions/expression-interpolation.service';
 import {TextInputRulesService} from '../../../../../extensions/interactions/TextInput/directives/text-input-rules.service';
 import {AlertsService} from '../../../services/alerts.service';
+import {LoggerService} from '../../../services/contextual/logger.service';
+import {UrlInterpolationService} from '../../../domain/utilities/url-interpolation.service';
 import {PageContextService} from '../../../services/page-context.service';
 import {UrlService} from '../../../services/contextual/url.service';
 import {AnswerClassificationService} from './answer-classification.service';
@@ -59,7 +61,8 @@ describe('Exploration engine service ', () => {
   let contentTranslationLanguageService: ContentTranslationLanguageService;
   let expressionInterpolationService: ExpressionInterpolationService;
   let explorationEngineService: ExplorationEngineService;
-  let explorationObjectFactory: ExplorationObjectFactory;
+  let loggerService: LoggerService;
+  let urlInterpolationService: UrlInterpolationService;
   let imagePreloaderService: ImagePreloaderService;
   let learnerParamsService: LearnerParamsService;
   let playerTranscriptService: PlayerTranscriptService;
@@ -375,7 +378,8 @@ describe('Exploration engine service ', () => {
     );
     imagePreloaderService = TestBed.inject(ImagePreloaderService);
     learnerParamsService = TestBed.inject(LearnerParamsService);
-    explorationObjectFactory = TestBed.inject(ExplorationObjectFactory);
+    loggerService = TestBed.inject(LoggerService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
     readOnlyExplorationBackendApiService = TestBed.inject(
       ReadOnlyExplorationBackendApiService
@@ -499,7 +503,7 @@ describe('Exploration engine service ', () => {
       getInitialState: () => ({name: null}),
     };
 
-    spyOn(explorationObjectFactory, 'createFromBackendDict').and.returnValue(
+    spyOn(Exploration, 'createFromBackendDict').and.returnValue(
       mockExploration
     );
 
