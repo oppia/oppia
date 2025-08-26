@@ -204,7 +204,6 @@ import {
   // eslint-disable-next-line max-len
 } from 'interactions/NumericExpressionInput/directives/numeric-expression-input-validation.service';
 import {PageTitleService} from 'services/page-title.service';
-import {ParamSpecsObjectFactory} from 'domain/exploration/ParamSpecsObjectFactory';
 import {PencilCodeEditorRulesService} from 'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
 import {
   PencilCodeEditorValidationService,
@@ -327,7 +326,6 @@ import {VersionTreeService} from 'pages/exploration-editor-page/history-tab/serv
 import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import {WrittenTranslationObjectFactory} from 'domain/exploration/WrittenTranslationObjectFactory';
 import {WrittenTranslationsObjectFactory} from 'domain/exploration/WrittenTranslationsObjectFactory';
 import {
   SolutionVerificationService,
@@ -476,8 +474,6 @@ export class UpgradedServices {
     upgradedServices['UtilsService'] = new UtilsService();
     upgradedServices['VersionTreeService'] = new VersionTreeService();
     upgradedServices['WindowRef'] = new WindowRef();
-    upgradedServices['WrittenTranslationObjectFactory'] =
-      new WrittenTranslationObjectFactory();
     upgradedServices['BaseInteractionValidationService'] =
       new BaseInteractionValidationService();
     upgradedServices['ɵangular_packages_common_http_http_d'] =
@@ -656,9 +652,7 @@ export class UpgradedServices {
       upgradedServices['WindowRef']
     );
     upgradedServices['WrittenTranslationsObjectFactory'] =
-      new WrittenTranslationsObjectFactory(
-        upgradedServices['WrittenTranslationObjectFactory']
-      );
+      new WrittenTranslationsObjectFactory();
 
     // Topological level: 2.
     upgradedServices['CsrfTokenService'] = new CsrfTokenService(
@@ -715,7 +709,6 @@ export class UpgradedServices {
       new NumberWithUnitsValidationService(
         upgradedServices['BaseInteractionValidationService']
       );
-    upgradedServices['ParamSpecsObjectFactory'] = new ParamSpecsObjectFactory();
     upgradedServices['PencilCodeEditorRulesService'] =
       new PencilCodeEditorRulesService(
         upgradedServices['NormalizeWhitespacePipe'],
@@ -1112,7 +1105,6 @@ export class UpgradedServices {
     // Topological level: 9.
     upgradedServices['ExplorationObjectFactory'] = new ExplorationObjectFactory(
       upgradedServices['LoggerService'],
-      upgradedServices['ParamSpecsObjectFactory'],
       upgradedServices['StatesObjectFactory'],
       upgradedServices['UrlInterpolationService']
     );

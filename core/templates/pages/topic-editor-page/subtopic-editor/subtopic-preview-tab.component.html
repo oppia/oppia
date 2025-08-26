@@ -14,11 +14,11 @@
   <p class="content-title">{{ editableTitle }}</p>
   <div class="content-box">
     <div class="content">
-      <div class="accordion" *ngFor="let section of sections">
-        <div class="accordion-header">
-          <h3 class="accordion-title">{{ section.heading.unicode }}</h3>
+      <div class="card" *ngFor="let section of sections">
+        <div class="card-header">
+          <h3 class="card-title">{{ section.heading.unicode }}</h3>
         </div>
-        <div class="accordion-content">
+        <div class="card-content">
           <oppia-rte-output-display [rteString]="section.content.html">
           </oppia-rte-output-display>
         </div>
@@ -59,29 +59,29 @@
     padding: 15px 25px;
   }
 
-  .accordion {
+  .card {
     background-color: #fff;
     border: none !important;
     overflow: hidden;
   }
 
-  .accordion-header {
+  .card-header {
     background-color: #003b36;
-    padding: 15px 20px;
+    padding: 10px 10px;
   }
 
-  .accordion-title {
+  .card-title {
     color: #fff;
     font-family: Roboto, Arial, sans-serif;
-    font-size: 20px;
-    font-weight: 300;
+    font-size: 18px;
+    font-weight: 700;
     margin: 0;
     text-align: center;
   }
 
   .card-content {
     border: none !important;
-    padding: 20px;
+    padding: 18px 6px;
   }
 
   .oppia-subtopic-viewer-container {
@@ -113,11 +113,11 @@
       padding: 30px;
     }
 
-    .accordion-header {
-      padding: 12px 15px;
+    .card-header {
+      padding: 15px 15px;
     }
 
-    .accordion-title {
+    .card-title {
       font-size: 18px;
     }
 

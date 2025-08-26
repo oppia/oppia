@@ -1,5 +1,5 @@
 <div class="modal-header">
-  <h3 tabindex="0">Add Voiceover</h3>
+  <h3 tabindex="0" class="e2e-test-modal-header">Add Voiceover</h3>
 </div>
 
 <div class="modal-body">
@@ -22,7 +22,7 @@
               <strong>Note:</strong> Uploading a new audio file will replace the existing audio file.
             </div>
             <div *ngIf="errorMessage"
-                 class="oppia-audio-file-upload-field-error-message e2e-test-audio-file-upload-field-error-message">
+                 class="oppia-audio-file-upload-field-error-message e2e-test-audio-file-upload-field-error-message e2e-test-upload-error-message">
               <i class="fas fa-exclamation-triangle"></i>
               {{ errorMessage }}
             </div>

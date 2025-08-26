@@ -34,7 +34,7 @@ import {StateInteractionIdService} from 'components/state-editor/state-editor-pr
 import {
   TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
   TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING,
-} from 'domain/exploration/WrittenTranslationObjectFactory';
+} from 'domain/exploration/written-translation.model';
 
 interface LanguageCodeToContentTranslations {
   [languageCode: string]: TranslatedContent;

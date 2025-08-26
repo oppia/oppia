@@ -404,7 +404,15 @@
             <li *ngFor="let voiceArtistName of explorationRightsService.voiceArtistNames; let index = index">
               <div class="oppia-user-list-item e2e-test-voiceArtist-role-names e2e-test-voice-artist-{{voiceArtistName}}">
                 <span tabindex="0">{{voiceArtistName}}</span>
-                <span [hidden]="!(isVoiceoverFormOpen)" type="button" [ngbTooltip]="'Remove user'" class="far fa-times-circle" tabindex="0" aria-label="remove user" role="button" (keydown.enter)="removeVoiceArtist(voiceArtistName)" (click)="removeVoiceArtist(voiceArtistName)">
+                <span [hidden]="!(isVoiceoverFormOpen)"
+                      type="button"
+                      [ngbTooltip]="'Remove user'"
+                      class="far fa-times-circle e2e-test-remove-voice-artist-button"
+                      tabindex="0"
+                      aria-label="remove user"
+                      role="button"
+                      (keydown.enter)="removeVoiceArtist(voiceArtistName)"
+                      (click)="removeVoiceArtist(voiceArtistName)">
                 </span>
               </div>
             </li>

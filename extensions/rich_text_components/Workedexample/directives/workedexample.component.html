@@ -7,10 +7,16 @@
 </div>
 
 <div class="solution-box">
-  <strong class="solution-title">
+  <strong class="solution-title"
+          (click)="allowSolutionToBeCollapsed ? changeSolutionState() : null"
+          [attr.tabindex]="allowSolutionToBeCollapsed ? '0' : null"
+          [attr.role]="allowSolutionToBeCollapsed ? 'button' : null"
+          [attr.aria-expanded]="allowSolutionToBeCollapsed ? !isSolutionCollapsed : null"
+          (keydown.enter)="allowSolutionToBeCollapsed ? changeSolutionState() : null"
+          (keydown.space)="allowSolutionToBeCollapsed ? changeSolutionState() : null">
     Solution
-    <i *ngIf="allowSolutionToBeCollapsed && isSolutionCollapsed" class="material-icons e2e-test-expand-workedexample icon-expand-workedexample" (click)="allowSolutionToBeCollapsed ? changeSolutionState() : null">expand_more</i>
-    <i *ngIf="allowSolutionToBeCollapsed && !isSolutionCollapsed" class="material-icons e2e-test-collapse-workedexample icon-collapse-workedexample" (click)="allowSolutionToBeCollapsed ? changeSolutionState() : null">expand_less</i>
+    <i *ngIf="allowSolutionToBeCollapsed && isSolutionCollapsed" class="material-icons e2e-test-expand-workedexample icon-expand-workedexample">expand_more</i>
+    <i *ngIf="allowSolutionToBeCollapsed && !isSolutionCollapsed" class="material-icons e2e-test-collapse-workedexample icon-collapse-workedexample">expand_less</i>
   </strong>
   <div class="protractor-panel-body" *ngIf="!isSolutionCollapsed">
     <oppia-rte-output-display class="e2e-test-workedexample-answer" [rteString]="answer">
@@ -44,12 +50,13 @@
   .solution-title {
     align-items: center;
     color: #c55f45;
+    cursor: pointer;
     display: flex;
     justify-content: space-between;
     margin-bottom: 10px;
   }
 
-  .icon-expand-workedexample .icon-collapse-workedexample {
+  .icon-expand-workedexample, .icon-collapse-workedexample {
     cursor: pointer;
     margin-left: auto;
   }
