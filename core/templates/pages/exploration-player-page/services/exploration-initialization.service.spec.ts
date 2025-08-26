@@ -30,10 +30,7 @@ import {UrlService} from '../../../services/contextual/url.service';
 import {ExplorationModeService} from './exploration-mode.service';
 import {StatsReportingService} from './stats-reporting.service';
 import {PlaythroughService} from '../../../services/playthrough.service';
-import {
-  Question,
-  QuestionBackendDict,
-} from '../../../domain/question/question.model';
+import {QuestionBackendDict} from '../../../domain/question/question.model';
 import {ReadOnlyExplorationBackendApiService} from '../../../domain/exploration/read-only-exploration-backend-api.service';
 import {PretestQuestionBackendApiService} from '../../../domain/question/pretest-question-backend-api.service';
 import {CurrentEngineService} from './current-engine.service';
