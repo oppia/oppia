@@ -46,30 +46,30 @@
           </oppia-rte-output-display>
         </div>
       </div>
-      <button (click)="openPracticeMenu()" class="btn btn-next-actions e2e-test-go-to-practice-section-button btn-practice-section">
+      <button *ngIf="isPracticeTabDisplayed" (click)="openPracticeMenu()" class="btn btn-next-actions e2e-test-go-to-practice-section-button btn-practice-section">
         <p class="text-practice-section-fixed">
           <img [src]="getStaticImageUrl('/icons/practice-button-edit.png')" alt="Practice button icon" width="15px" height="15px">
-          {{ 'I18N_SUBTOPIC_VIEWER_GO_TO_PRACTICE' | translate }}
+          {{ 'I18N_SUBTOPIC_VIEWER_GO_TO_PRACTICE' | translate }} {{ subtopicTitle }}
         </p>
-        <span class="practice-button-subtitle">{{ 'I18N_SUBTOPIC_VIEWER_GO_TO_PRACTICE_BUTTON_DESCRIPTION' | translate }}</span>
       </button>
     </div>
   </div>
-  <div class="next-actions-section">
-    <h4 class="next-actions-title">{{ I18N_SUBTOPIC_VIEWER_NEXT_ACTIONS_HEADING | translate }}</h4>
-    <div class="next-actions-buttons-container">
-      <button (click)="openStudyGuideMenu()" class="btn btn-next-actions e2e-test-go-to-study-guide-menu-button btn-study-guide-menu">
-        <i class="material-icons icon-study-guide-menu">exit_to_app</i>
-        {{ 'I18N_SUBTOPIC_VIEWER_GO_TO_STUDY_GUIDE_MENU_BUTTON' | translate }}
-      </button>
-      <button (click)="openStudyGuide()" *ngIf="nextSubtopic" [title]="nextSubtopic.getTitle()" class="btn btn-next-actions e2e-test-go-to-next-study-guide-button btn-next-study-guide">
-        <p class="text-next-study-guide-fixed">
-          <i class="material-icons icon-next-study-guide">arrow_forward</i>
-          {{ 'I18N_SUBTOPIC_VIEWER_GO_TO_NEXT_STUDY_GUIDE_BUTTON' | translate }}
-        </p>
-        <span class="revision-subtitle">"{{ checkNextSubtopicTitleLengthAndModify() }}"</span>
-      </button>
-    </div>
+  <div class="next-actions-buttons-container">
+    <button (click)="openStudyGuideMenu()" class="btn btn-next-actions e2e-test-go-to-study-guide-menu-button btn-study-guide-menu">
+      <i class="material-icons icon-study-guide-menu">exit_to_app</i>
+      <p class="text-go-to-study-guides-fixed"> {{ 'I18N_SUBTOPIC_VIEWER_GO_TO_STUDY_GUIDE_MENU_BUTTON' | translate }}</p>
+    </button>
+    <button (click)="openStudyGuide()" *ngIf="nextSubtopic" [title]="nextSubtopic.getTitle()" class="btn btn-next-actions e2e-test-go-to-next-study-guide-button btn-next-study-guide">
+      <i class="material-icons icon-next-study-guide next-study-guide-forward-arrow">arrow_forward</i>
+      <div>
+        <div>
+          <p class="text-next-study-guide-fixed">{{ 'I18N_SUBTOPIC_VIEWER_GO_TO_NEXT_STUDY_GUIDE_BUTTON' | translate }}</p>
+        </div>
+        <div>
+          <p class="revision-subtitle">{{ checkNextSubtopicTitleLengthAndModify() }}</p>
+        </div>
+      </div>
+    </button>
   </div>
 </div>
 
@@ -135,21 +135,21 @@
 
   .card-header {
     background-color: #003b36;
-    padding: 15px 20px;
+    padding: 10px 10px;
   }
 
   .card-title {
     color: #fff;
     font-family: Roboto, Arial, sans-serif;
-    font-size: 20px;
-    font-weight: 300;
+    font-size: 18px;
+    font-weight: 700;
     margin: 0;
     text-align: center;
   }
 
   .card-content {
     border: none !important;
-    padding: 20px;
+    padding: 18px 6px;
   }
 
   .new-subtopic-viewer-container {
@@ -158,15 +158,12 @@
     flex-direction: column;
   }
 
-  .next-actions-section {
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-    margin: 10px;
-  }
-
   .next-actions-buttons-container {
-    margin-bottom: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin: 30px 0 10px;
+    width: 45%;
   }
 
   .btn-next-actions {
@@ -175,17 +172,25 @@
     gap: 5px;
     height: 60px;
     padding: 8px;
-    width: 180px;
+    width: 250px;
   }
 
   .btn-next-study-guide {
+    align-items: center;
     background-color: #0d48a1;
     color: #fff;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
     margin-left: 5px;
   }
   .text-next-study-guide-fixed {
     font-weight: 500;
     margin: 0 !important;
+  }
+  .text-go-to-study-guides-fixed {
+    display: inline;
+    font-weight: 500;
   }
 
   .btn-study-guide-menu {
@@ -196,22 +201,17 @@
   }
 
   .btn-back-to-topic {
+    align-self: flex-start;
     color: #003c34;
     display: block;
     font-family: Capriola, Arial, sans-serif;
-    font-size: 16px;
-    margin-bottom: 30px;
+    font-size: 15px;
+    padding: 0;
     text-align: center;
   }
 
-  .next-actions-title {
-    color: #333;
-    font-family: Capriola, Arial, sans-serif;
-    font-size: 20px;
-    font-weight: 400;
-  }
-
   .btn-practice-section {
+    align-items: center;
     align-self: center;
     background-color: #f4fafb;
     border: 1px solid #008098;
@@ -219,14 +219,27 @@
     border-width: 1px;
     box-shadow: 0 0 10px 0 #00000026;
     color: #008098;
+    display: flex;
     gap: 16px;
+    justify-content: center;
+    margin-top: 30px;
     padding-left: 16px;
     padding-right: 16px;
-    width: 200px;
+    width: 250px;
   }
   .text-practice-section-fixed {
+    font-size: 15px;
     font-weight: 500;
     margin: 0 !important;
+  }
+
+  .next-study-guide-forward-arrow {
+    align-self: flex-start;
+    padding-top: 2px;
+  }
+
+  .icon-study-guide-menu {
+    transform: scaleX(-1);
   }
 
   @media screen and (max-width: 1100px) {
@@ -236,14 +249,11 @@
   }
 
   @media screen and (max-width: 700px) {
-    .back-to-subtopic-container {
-      margin-bottom: 20px;
-      margin-left: 1%;
-      margin-top: 40px;
+    .oppia-subtopic-viewer-container {
+      padding-top: 40px;
     }
-    .btn-next-study-guide,
-    .btn-study-guide-menu {
-      width: 160px;
+    .next-actions-buttons-container {
+      width: 100%;
     }
     .content,
     .content-box {
@@ -254,11 +264,7 @@
     }
 
     .card-header {
-      padding: 12px 15px;
-    }
-
-    .content-title {
-      font-size: 18.2px;
+      padding: 15px 15px;
     }
 
     .card-title {
@@ -268,8 +274,11 @@
     .card-content {
       padding: 15px;
     }
-    .next-actions-section {
-      margin: 10px 0;
+
+    .btn-back-to-topic {
+      align-self: center;
+      font-size: 16px;
+      margin-bottom: 30px;
     }
   }
 </style>

@@ -54,8 +54,8 @@ import {
 import {CollectionSummary} from 'domain/collection/collection-summary.model';
 import {ConversationFlowService} from '../../../services/conversation-flow.service';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
-import {EndChapterCheckMarkComponent} from '../../../current-lesson-player/learner-experience/end-chapter-check-mark.component';
-import {EndChapterConfettiComponent} from '../../../current-lesson-player/learner-experience/end-chapter-confetti.component';
+import {NewEndChapterCheckMarkComponent} from '../../../new-lesson-player/conversation-skin-components/conversation-display-components/new-end-chapter-check-mark.component';
+import {NewEndChapterConfettiComponent} from '../../../new-lesson-player/conversation-skin-components/conversation-display-components/new-end-chapter-confetti.component';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {ChapterProgressService} from '../../../services/chapter-progress.service';
 import {ExplorationModeService} from '../../../services/exploration-mode.service';
@@ -112,8 +112,8 @@ export class ConversationDisplayComponent {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  @ViewChild('checkMark') checkMarkComponent!: EndChapterCheckMarkComponent;
-  @ViewChild('confetti') confettiComponent!: EndChapterConfettiComponent;
+  @ViewChild('checkMark') checkMarkComponent!: NewEndChapterCheckMarkComponent;
+  @ViewChild('confetti') confettiComponent!: NewEndChapterConfettiComponent;
   @Input() displayedCard!: StateCard;
   @Input() displayedCardWasCompletedInPrevSession!: boolean;
   @Input() avatarImageIsShown!: boolean;
@@ -502,15 +502,33 @@ export class ConversationDisplayComponent {
     return true;
   }
 
-  isCurrentCardAtEndOfTranscript(): boolean {
-    return !this.displayedCard.isCompleted();
-  }
-
   isOnTerminalCard(): boolean {
     return this.displayedCard.isTerminal();
   }
 
   getInputResponsePairId(index: number): string {
     return 'input-response-pair-' + index;
+  }
+
+  shouldInteractionBeDisplayed(): boolean {
+    const card = this.displayedCard;
+    const interactionHasHtml = card.getInteractionHtml();
+    const cardIsCompleted = card.isCompleted();
+
+    const interactionConditionIsMet =
+      (interactionHasHtml && !cardIsCompleted) || cardIsCompleted;
+
+    const terminalCardCondition =
+      !this.isOnTerminalCard() || !this.isIframed || cardIsCompleted;
+
+    return (
+      !this.displayedCardWasCompletedInPrevSession &&
+      !this.shouldHideInteraction &&
+      !cardIsCompleted &&
+      !this.waitingForOppiaFeedback &&
+      this.isInteractionInline() &&
+      interactionConditionIsMet &&
+      terminalCardCondition
+    );
   }
 }

@@ -52,6 +52,10 @@ interface Metadata {
   v2Metadata: ExplorationMetadata;
 }
 
+interface VersionMetadataWithTooltip extends VersionMetadata {
+  tooltipText: string;
+}
+
 @Component({
   selector: 'oppia-history-tab',
   templateUrl: './history-tab.component.html',
@@ -63,6 +67,7 @@ export class HistoryTabComponent implements OnInit, OnDestroy {
   secondVersion: string;
   hideHistoryGraph: boolean;
   selectedVersionsArray: number[];
+  filteredVersionMetadata: VersionMetadataWithTooltip[] = [];
 
   // Letiable explorationSnapshots is a list of all snapshots for the
   // exploration in ascending order.
@@ -225,6 +230,9 @@ export class HistoryTabComponent implements OnInit, OnDestroy {
               this.explorationVersionMetadata
             );
             this.totalExplorationVersionMetadata.reverse();
+            this.filteredVersionMetadata = cloneDeep(
+              this.totalExplorationVersionMetadata
+            );
             this.loaderService.hideLoadingScreen();
             this.changeItemsPerPage();
           });
@@ -248,26 +256,24 @@ export class HistoryTabComponent implements OnInit, OnDestroy {
 
   filterByUsername(): void {
     if (!this.username && this.totalExplorationVersionMetadata) {
-      this.explorationVersionMetadata = cloneDeep(
+      this.filteredVersionMetadata = cloneDeep(
         this.totalExplorationVersionMetadata
       );
-      this.versionNumbersToDisplay = this.explorationVersionMetadata.length;
-      return;
+    } else {
+      this.filteredVersionMetadata =
+        this.totalExplorationVersionMetadata.filter(metadata => {
+          return (
+            metadata &&
+            metadata.committerId
+              .trim()
+              .toLowerCase()
+              .includes(this.username.trim().toLowerCase())
+          );
+        });
     }
-
-    this.explorationVersionMetadata =
-      this.totalExplorationVersionMetadata.filter(metadata => {
-        return (
-          metadata &&
-          metadata.committerId
-            .trim()
-            .toLowerCase()
-            .includes(this.username.trim().toLowerCase())
-        );
-      });
-    if (this.explorationVersionMetadata) {
-      this.versionNumbersToDisplay = this.explorationVersionMetadata.length;
-    }
+    this.versionNumbersToDisplay = this.filteredVersionMetadata.length;
+    this.displayedCurrentPageNumber = 1;
+    this.changeItemsPerPage();
   }
 
   // Function to set compared version metadata, download YAML and
@@ -412,16 +418,18 @@ export class HistoryTabComponent implements OnInit, OnDestroy {
   }
 
   changeItemsPerPage(): void {
-    this.explorationVersionMetadata =
-      this.totalExplorationVersionMetadata.slice(
-        (this.displayedCurrentPageNumber - 1) * this.VERSIONS_PER_PAGE,
-        this.displayedCurrentPageNumber * this.VERSIONS_PER_PAGE
-      );
-    this.startingIndex =
-      (this.displayedCurrentPageNumber - 1) * this.VERSIONS_PER_PAGE + 1;
-    this.endIndex = this.displayedCurrentPageNumber * this.VERSIONS_PER_PAGE;
+    const startVersionIndex =
+      (this.displayedCurrentPageNumber - 1) * this.VERSIONS_PER_PAGE;
+    const endVersionIndex =
+      this.displayedCurrentPageNumber * this.VERSIONS_PER_PAGE;
 
-    this.versionNumbersToDisplay = this.explorationVersionMetadata.length;
+    this.explorationVersionMetadata = this.filteredVersionMetadata.slice(
+      startVersionIndex,
+      endVersionIndex
+    );
+
+    this.startingIndex = startVersionIndex + 1;
+    this.endIndex = Math.min(endVersionIndex, this.versionNumbersToDisplay);
   }
 
   isEditable(): boolean {

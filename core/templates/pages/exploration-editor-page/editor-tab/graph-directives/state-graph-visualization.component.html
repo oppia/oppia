@@ -47,7 +47,7 @@ with the same id on the page. -->
               <g *ngIf="getNodeErrorMessage(node.label) && (showWarningSign || showTranslationWarnings)"
                  ngbTooltip="{{getNodeErrorMessage(node.label)}}"
                  placement="top">
-                <rect (click)="sendOnClickFunctionData(node.id)" class="oppia-graph-warning-message clickable oppia-error-message-fill"
+                <rect (click)="sendOnClickFunctionData(node.id)" class="oppia-graph-warning-message clickable oppia-error-message-fill e2e-test-node-warning-sign"
                       role="alertdialog"
                       width="22" height="22"
                       [attr.x]="node.x0" [attr.y]="node.y0 - 8"
