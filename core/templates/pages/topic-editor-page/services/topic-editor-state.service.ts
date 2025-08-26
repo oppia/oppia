@@ -67,6 +67,7 @@ export class TopicEditorStateService {
   // where we need to do non-null assertion. For more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   private _topic!: Topic;
+
   private _topicRights!: TopicRights;
   private _subtopicPage!: SubtopicPage;
   private _studyGuide!: StudyGuide;
@@ -118,6 +119,7 @@ export class TopicEditorStateService {
 
   private _questionEditorOpenedEventEmitter: EventEmitter<boolean> =
     new EventEmitter<boolean>();
+  private _savedTopic: Topic = this._topic;
 
   constructor(
     private alertsService: AlertsService,
@@ -492,6 +494,13 @@ export class TopicEditorStateService {
     return this._topic;
   }
 
+  getSavedTopic(): Topic {
+    if (!this._savedTopic) {
+      return this._topic;
+    }
+    return this._savedTopic;
+  }
+
   /**
    * Returns whether the user can create a skill via the topic editor.
    */
@@ -768,6 +777,7 @@ export class TopicEditorStateService {
               );
             }
           }
+          this._savedTopic = cloneDeep(this._topic);
           this.undoRedoService.clearChanges();
           this._topicIsBeingSaved = false;
           if (successCallback) {

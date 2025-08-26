@@ -58,7 +58,7 @@ export class TopicPreviewTabComponent {
   ) {}
 
   ngOnInit(): void {
-    this.topic = this.topicEditorStateService.getTopic();
+    this.topic = this.topicEditorStateService.getSavedTopic();
     this.topicUrlFragment = this.topicEditorStateService
       .getTopic()
       .getUrlFragment();
