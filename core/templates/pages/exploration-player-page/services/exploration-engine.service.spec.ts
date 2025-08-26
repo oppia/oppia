@@ -61,8 +61,6 @@ describe('Exploration engine service ', () => {
   let contentTranslationLanguageService: ContentTranslationLanguageService;
   let expressionInterpolationService: ExpressionInterpolationService;
   let explorationEngineService: ExplorationEngineService;
-  let loggerService: LoggerService;
-  let urlInterpolationService: UrlInterpolationService;
   let imagePreloaderService: ImagePreloaderService;
   let learnerParamsService: LearnerParamsService;
   let playerTranscriptService: PlayerTranscriptService;
@@ -378,8 +376,6 @@ describe('Exploration engine service ', () => {
     );
     imagePreloaderService = TestBed.inject(ImagePreloaderService);
     learnerParamsService = TestBed.inject(LearnerParamsService);
-    loggerService = TestBed.inject(LoggerService);
-    urlInterpolationService = TestBed.inject(UrlInterpolationService);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
     readOnlyExplorationBackendApiService = TestBed.inject(
       ReadOnlyExplorationBackendApiService

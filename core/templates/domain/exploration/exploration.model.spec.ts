@@ -26,6 +26,7 @@ import {
 import {StateBackendDict, State} from 'domain/state/state.model';
 import {Interaction} from 'domain/exploration/interaction.model';
 import {LoggerService} from 'services/contextual/logger.service';
+import {UrlInterpolationService} from '../utilities/url-interpolation.service';
 import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 import {SubtitledHtmlBackendDict} from 'domain/exploration/subtitled-html.model';
 import {FetchExplorationBackendResponse} from './read-only-exploration-backend-api.service';
@@ -33,6 +34,7 @@ import {FetchExplorationBackendResponse} from './read-only-exploration-backend-a
 describe('Exploration', () => {
   let exploration: Exploration;
   let ls: LoggerService;
+  let urlInterpolationService: UrlInterpolationService;
   let loggerErrorSpy: jasmine.Spy<(msg: string) => void>;
   let firstState: StateBackendDict;
   let secondState: StateBackendDict;
@@ -43,6 +45,7 @@ describe('Exploration', () => {
       providers: [CamelCaseToHyphensPipe],
     });
     ls = TestBed.get(LoggerService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
 
     firstState = {
       content: {
@@ -196,7 +199,11 @@ describe('Exploration', () => {
       },
     };
 
-    exploration = Exploration.createFromBackendDict(explorationDict);
+    exploration = Exploration.createFromBackendDict(
+      explorationDict,
+      ls,
+      urlInterpolationService
+    );
     exploration.setInitialStateName('first state');
     loggerErrorSpy = spyOn(ls, 'error').and.callThrough();
   });
@@ -318,7 +325,9 @@ describe('Exploration', () => {
     () => {
       const responseExploration =
         Exploration.createFromExplorationBackendResponse(
-          mockReadOnlyExplorationData
+          mockReadOnlyExplorationData,
+          ls,
+          urlInterpolationService
         );
 
       expect(responseExploration.getLanguageCode()).toBe('en');

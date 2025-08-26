@@ -40,7 +40,7 @@ import {Component, EventEmitter, NO_ERRORS_SCHEMA, Pipe} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 
 import {AlertsService} from 'services/alerts.service';
-import {LoggerService} from '../../../services/contextual/logger.service';
+import {LoggerService} from 'services/contextual/logger.service';
 import {CsrfTokenService} from 'services/csrf-token.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {DateTimeFormatService} from 'services/date-time-format.service';
