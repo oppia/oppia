@@ -43,7 +43,7 @@ import {ListSchema, UnicodeSchema} from 'services/schema-default-value.service';
 import {
   TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
   TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING,
-} from 'domain/exploration/WrittenTranslationObjectFactory';
+} from 'domain/exploration/written-translation.model';
 // This throws "TS2307". We need to
 // suppress this error because rte-output-display is not strictly typed yet.
 // @ts-ignore

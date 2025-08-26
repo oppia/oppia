@@ -21,6 +21,7 @@ import {Injectable} from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {LocalStorageService} from './local-storage.service';
 import {ContentIdToVoiceoversAudioOffsetsMsecs} from 'domain/voiceover/entity-voiceovers.model';
+import {VoiceoverPlayerService} from 'pages/exploration-player-page/services/voiceover-player.service';
 
 interface SentenceHighlightInterval {
   highlightSentenceId: string;
@@ -43,7 +44,10 @@ export class AutomaticVoiceoverHighlightService {
   } = {};
   public sentenceHighlightIntervalList: SentenceHighlightInterval[] = [];
 
-  constructor(private localStorageService: LocalStorageService) {
+  constructor(
+    private localStorageService: LocalStorageService,
+    private voiceoverPlayerService: VoiceoverPlayerService
+  ) {
     this.languageCode =
       this.localStorageService.getLastSelectedTranslationLanguageCode() as string;
   }
@@ -59,7 +63,7 @@ export class AutomaticVoiceoverHighlightService {
       automatedVoiceoversAudioOffsetsMsecs;
   }
 
-  setHighlightIdToSenetenceMap(highlightIdToSentenceMap: {
+  setHighlightIdToSentenceMap(highlightIdToSentenceMap: {
     [highlightId: string]: string;
   }): void {
     this.highlightIdToSentenceMap = highlightIdToSentenceMap;
@@ -224,13 +228,15 @@ export class AutomaticVoiceoverHighlightService {
     let maxOffsetMsecs = 0.0;
     this.sentenceHighlightIntervalList = [];
 
-    let hightlightIds = Object.keys(this.highlightIdToSentenceWithoutSpacesMap);
+    let highlightIds = Object.keys(this.highlightIdToSentenceWithoutSpacesMap);
 
-    let currentHighlightId = hightlightIds.shift();
+    let currentHighlightId = highlightIds.shift();
     let currentSentence =
       this.highlightIdToSentenceWithoutSpacesMap[currentHighlightId as string];
 
     minOffsetMsecs = 0.0;
+    let remainingSentence = '';
+    let isRemainingSentenceUsed = false;
 
     audioOffsets?.forEach(tokenToAudioOffsetMsecs => {
       let token = tokenToAudioOffsetMsecs.token;
@@ -242,20 +248,26 @@ export class AutomaticVoiceoverHighlightService {
 
       token = token.split(/\s+/).join('').trim();
 
-      currentSentence = currentSentence?.startsWith(token)
-        ? currentSentence.slice(token.length)
-        : currentSentence;
+      if (currentSentence?.startsWith(token)) {
+        currentSentence = currentSentence.slice(token.length);
+      } else {
+        if (token.length > currentSentence.length) {
+          remainingSentence = currentSentence;
+          currentSentence = '';
+          isRemainingSentenceUsed = true;
+        }
+      }
 
-      if (currentSentence.length === 0) {
+      if (currentSentence?.length === 0) {
         maxOffsetMsecs = audioOffsetMsecs;
 
         this.sentenceHighlightIntervalList.push({
           highlightSentenceId: currentHighlightId as string,
-          startTimeInSecs: Math.round(minOffsetMsecs / 1000),
-          endTimeInSecs: Math.round(maxOffsetMsecs / 1000),
+          startTimeInSecs: minOffsetMsecs / 1000,
+          endTimeInSecs: maxOffsetMsecs / 1000,
         });
 
-        currentHighlightId = hightlightIds.shift();
+        currentHighlightId = highlightIds.shift();
 
         if (currentHighlightId === undefined) {
           return;
@@ -265,6 +277,14 @@ export class AutomaticVoiceoverHighlightService {
             currentHighlightId as string
           ];
         minOffsetMsecs = 0.0;
+
+        currentSentence = remainingSentence + currentSentence;
+        if (isRemainingSentenceUsed) {
+          currentSentence = currentSentence.slice(token.length);
+          remainingSentence = '';
+          minOffsetMsecs = audioOffsetMsecs;
+          isRemainingSentenceUsed = false;
+        }
       }
     });
   }

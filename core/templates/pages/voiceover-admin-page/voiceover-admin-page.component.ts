@@ -306,6 +306,7 @@ export class VoiceoverAdminPageComponent implements OnInit {
       () => {
         this.languageAccentCodesToSupportsAutogeneration[languageAccentCode] =
           !supportsAutogeneration;
+        this.cdr.detectChanges();
       }
     );
   }
