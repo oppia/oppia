@@ -16,7 +16,7 @@
  * @fileoverview Acceptance test from CUJv3 Doc
  * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
  *
- * QR.CD. Review submitted questions.
+ * QR.CD.02 Check contribution stats and badges earned.
  */
 
 import testConstants from '../../utilities/common/test-constants';
@@ -135,16 +135,10 @@ describe('Practice Question Reviewer', function () {
     );
   });
 
-  it('should be able to navigate between questions to review', async function () {
+  it('should be able to check contribution stats', async function () {
     await questionReviewer.navigateToContributorDashboardUsingProfileDropdown();
     await questionReviewer.navigateToTabInMyContributions('Review Questions');
 
-    await questionReviewer.startQuestionReview('What is 2 + 3?', 'Addition');
-    await questionReviewer.clickOn('Next');
-    await questionReviewer.expectQuestionInReviewModalToBe('12 + 14');
-  });
-
-  it('should be able to review the submitted quesions', async function () {
     // Reject the question suggestion.
     await questionReviewer.submitReview(
       'reject',
@@ -157,11 +151,9 @@ describe('Practice Question Reviewer', function () {
       'Addition',
       false
     );
-
     // Modify and accept the question suggestion.
     await questionReviewer.startQuestionReview('What is 2 + 3?', 'Addition');
     await questionReviewer.editQuestionInReview('Updated Question');
-    // TODO: Update interaction type.
     await questionReviewer.submitReview(
       'accept',
       'Please make sure to use full sentences.'
@@ -171,13 +163,29 @@ describe('Practice Question Reviewer', function () {
       'Updated Question',
       'Addition'
     );
-    // TODO: View math interaction.
-
     // Accept the question suggestion.
     await questionReviewer.startQuestionReview('What is 231 + 12?', 'Addition');
     await questionReviewer.submitReview('accept', 'Test Review Message');
-    // TODO: Verify as topic manager.
+
+    // Check contribution stats.
+    await questionSubmitter.navigateToTabInMyContributions(
+      'Contribution Stats'
+    );
+    await questionSubmitter.selectContributionTypeInContributionDashboard(
+      'Question Reviews'
+    );
+    await questionSubmitter.expectContributionTableToContainRow([
+      'Addition', // Skill.
+      '3', // Questions reviewed.
+      '2', // Questions accepted.
+    ]);
   });
+
+  it('should be able to check badges earned', async function () {
+    await questionSubmitter.navigateToTabInMyContributions('Badges');
+    await questionSubmitter.expectBadgesToContain('1', 'Review');
+  });
+
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
