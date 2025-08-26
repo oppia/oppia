@@ -146,7 +146,6 @@ describe('Translation Reviewer', function () {
     await translationReviewer.expectPaginationButtonToBeDisabled('previous');
 
     await translationReviewer.clickOnPaginationButton('next');
-    await translationReviewer.clickOnPaginationButton('previous');
   });
 
   it('should be able to accept the translation', async function () {
@@ -157,6 +156,16 @@ describe('Translation Reviewer', function () {
     await translationReviewer.submitTranslationReview(
       'accept',
       'Review comment'
+    );
+
+    // Accept the translation with adding review comment.
+    await translationReviewer.clickOn('Edit');
+    // TODO(FILE_ISSUE): RTE not usable.
+    // await translationReviewer.typeTextForRTE('Review comment');
+    await translationReviewer.clickOn('Update');
+    await translationReviewer.submitTranslationReview(
+      'accept',
+      'I have added some changes.'
     );
   });
 
