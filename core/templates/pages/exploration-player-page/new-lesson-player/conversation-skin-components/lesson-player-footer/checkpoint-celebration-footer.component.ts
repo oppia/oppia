@@ -18,10 +18,12 @@
 
 import {AfterViewInit, Component, ViewChild} from '@angular/core';
 import {NewEndChapterConfettiComponent} from '../conversation-display-components/new-end-chapter-confetti.component';
+import './checkpoint-celebration-footer.component.css';
 
 @Component({
   selector: 'oppia-checkpoint-celebration-footer',
   templateUrl: './checkpoint-celebration-footer.component.html',
+  styleUrls: ['./checkpoint-celebration-footer.component.css'],
 })
 export class CheckpointCelebrationFooterComponent implements AfterViewInit {
   @ViewChild('confetti') confettiComponent!: NewEndChapterConfettiComponent;

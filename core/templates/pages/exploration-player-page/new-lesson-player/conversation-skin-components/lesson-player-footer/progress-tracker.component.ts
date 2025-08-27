@@ -26,11 +26,13 @@ import {Subscription} from 'rxjs';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 import {CheckpointProgressService} from 'pages/exploration-player-page/services/checkpoint-progress.service';
 import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
-import {ProgressReminderModalComponent} from 'pages/exploration-player-page/current-lesson-player/templates/progress-reminder-modal.component';
+import {NewProgressReminderModalComponent} from './new-progress-reminder-modal.component';
 import {ExplorationEngineService} from 'pages/exploration-player-page/services/exploration-engine.service';
 import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
 import {PageContextService} from 'services/page-context.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {AttributionService} from 'services/attribution.service';
+import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 
 @Component({
   selector: 'oppia-progress-tracker',
@@ -44,6 +46,7 @@ export class ProgressTrackerComponent implements OnInit, OnDestroy {
   loggedOutProgressUniqueUrl!: string;
   checkpointCount: number = 0;
   completedCheckpointsCount: number = 0;
+  explorationTitle: string = '';
 
   constructor(
     private ngbModal: NgbModal,
@@ -55,13 +58,24 @@ export class ProgressTrackerComponent implements OnInit, OnDestroy {
     private explorationEngineService: ExplorationEngineService,
     private editableExplorationBackendApiService: EditableExplorationBackendApiService,
     private pageContextService: PageContextService,
-    private windowRef: WindowRef
+    private windowRef: WindowRef,
+    private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService
   ) {}
 
   ngOnInit(): void {
+    const explorationId = this.pageContextService.getExplorationId();
+    this.readOnlyExplorationBackendApiService
+      .fetchExplorationAsync(
+        explorationId,
+        this.urlService.getExplorationVersionFromUrl(),
+        this.urlService.getPidFromUrl()
+      )
+      .then(response => {
+        this.explorationTitle = response.exploration.title;
+      });
+
     this.directiveSubscriptions.add(
       this.playerPositionService.onLoadedMostRecentCheckpoint.subscribe(() => {
-        console.log('Loaded most recent checkpoint');
         if (this.checkpointCount) {
           this.showProgressReminderModal();
         } else {
@@ -72,6 +86,7 @@ export class ProgressTrackerComponent implements OnInit, OnDestroy {
         }
       })
     );
+
     const urlParams = this.urlService.getUrlParams();
     this.loggedOutProgressUniqueUrlId =
       urlParams.pid || this.progressUrlService.getUniqueProgressUrlId();
@@ -102,7 +117,7 @@ export class ProgressTrackerComponent implements OnInit, OnDestroy {
 
   openProgressReminderModal(): void {
     const explorationId = this.pageContextService.getExplorationId();
-    let modalRef = this.ngbModal.open(ProgressReminderModalComponent, {
+    let modalRef = this.ngbModal.open(NewProgressReminderModalComponent, {
       windowClass: 'oppia-progress-reminder-modal',
     });
     this.conversationFlowService.onShowProgressModal.emit();
@@ -121,17 +136,22 @@ export class ProgressTrackerComponent implements OnInit, OnDestroy {
     modalRef.componentInstance.checkpointCount = this.checkpointCount;
     modalRef.componentInstance.completedCheckpointsCount =
       this.completedCheckpointsCount;
-    // modalRef.componentInstance.explorationTitle = this.expInfo.title;
+    modalRef.componentInstance.explorationTitle = this.explorationTitle;
 
     modalRef.result.then(
       () => {
         // This callback is used for when the learner chooses to restart
         // the exploration.
-        this.editableExplorationBackendApiService
-          .resetExplorationProgressAsync(explorationId)
-          .then(() => {
-            this.windowRef.nativeWindow.location.reload();
-          });
+        if (!this.userIsLoggedIn) {
+          const url = this.urlService.getOrigin() + '/lesson/' + explorationId;
+          this.windowRef.nativeWindow.location.href = url;
+        } else {
+          this.editableExplorationBackendApiService
+            .resetExplorationProgressAsync(explorationId)
+            .then(() => {
+              this.windowRef.nativeWindow.location.reload();
+            });
+        }
       },
       () => {
         // This callback is used for when the learner chooses to resume
@@ -154,7 +174,6 @@ export class ProgressTrackerComponent implements OnInit, OnDestroy {
   }
 
   async saveLoggedOutProgress(): Promise<void> {
-    console.log(this.loggedOutProgressUniqueUrlId);
     if (!this.loggedOutProgressUniqueUrlId) {
       this.progressUrlService.setUniqueProgressUrlId().then(() => {
         this.loggedOutProgressUniqueUrlId =
