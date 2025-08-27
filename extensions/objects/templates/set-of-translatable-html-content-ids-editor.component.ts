@@ -60,13 +60,16 @@ export class SetOfTranslatableHtmlContentIdsEditorComponent implements OnInit {
   }
 
   toggleSelection(choiceListIndex: number): void {
+    let newValue = [...this.value]; // copy banaya
     const choiceContentId = this.choices[choiceListIndex].val;
     const selectedChoicesIndex = this.value.indexOf(choiceContentId);
     if (selectedChoicesIndex > -1) {
-      this.value.splice(selectedChoicesIndex, 1);
+      newValue.splice(selectedChoicesIndex, 1);
     } else {
-      this.value.push(this.choices[choiceListIndex].val);
+      newValue.push(this.choices[choiceListIndex].val);
     }
+    //  console.log("Emitting newValue:", JSON.stringify(newValue));
+    this.value = newValue;
     this.valueChanged.emit(this.value);
   }
 }

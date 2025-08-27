@@ -293,6 +293,7 @@ export class ObjectEditorComponent
           componentRef.instance.valueChanged.subscribe(newValue => {
             // Changes to array are not caught if the array reference doesn't
             // change. This is a hack for change detection.
+            console.log('Parent Recieved :', JSON.stringify(newValue));
             if (Array.isArray(newValue)) {
               this.value = [...newValue];
               return;
