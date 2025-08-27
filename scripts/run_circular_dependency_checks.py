@@ -43,7 +43,7 @@ _PARSER.add_argument(
     '--files',
     nargs='*',
     help='Specific files or directories to check for circular dependencies. '
-         'If not specified, checks default directories (core, extensions, assets).')
+         'If not specified, checks default directories.')
 
 _PARSER.add_argument(
     '--verbose', '-v',
@@ -84,7 +84,7 @@ _PARSER.add_argument(
 DEFAULT_EXCLUDE_PATTERNS: Final[List[str]] = [
     'node_modules/',
     '**/*.spec.ts',
-    '**/*.spec.js', 
+    '**/*.spec.js',
     '**/test/**',
     '**/tests/**',
     '**/*.test.ts',
@@ -103,7 +103,7 @@ DEFAULT_EXCLUDE_PATTERNS: Final[List[str]] = [
 # Default target directories when no specific files provided
 DEFAULT_TARGET_DIRECTORIES: Final[List[str]] = [
     'core',
-    'extensions', 
+    'extensions',
     'assets'
 ]
 
@@ -113,18 +113,18 @@ def get_madge_config(
     output_format: str = 'text'
 ) -> Dict[str, any]:
     """Get the Madge configuration optimized for Oppia codebase.
-    
+
     Args:
         exclude_patterns: Additional exclusion patterns beyond defaults.
         output_format: Output format ('text' or 'json').
-        
+
     Returns:
         Dict containing Madge configuration options.
     """
     all_excludes = DEFAULT_EXCLUDE_PATTERNS[:]
     if exclude_patterns:
         all_excludes.extend(exclude_patterns)
-    
+
     config = {
         'extensions': ['ts', 'js'],
         'exclude_patterns': all_excludes,
@@ -136,31 +136,31 @@ def get_madge_config(
             }
         }
     }
-    
+
     return config
 
 
 def check_madge_installation(skip_check: bool = False) -> Optional[str]:
     """Check if Madge is installed and return the command to execute it.
-    
+
     Args:
         skip_check: If True, skips installation check and returns default command.
-        
+
     Returns:
         String command to run Madge, or None if not available.
-        
+
     Raises:
         RuntimeError: If Madge is not installed and skip_check is False.
     """
     if skip_check:
         return 'madge'
-    
+
     # Check for global Madge installation first
     try:
         result = subprocess.run(
-            ['madge', '--version'], 
-            capture_output=True, 
-            text=True, 
+            ['madge', '--version'],
+            capture_output=True,
+            text=True,
             timeout=10
         )
         if result.returncode == 0:
@@ -169,7 +169,7 @@ def check_madge_installation(skip_check: bool = False) -> Optional[str]:
             return 'madge'
     except (subprocess.CalledProcessError, FileNotFoundError, subprocess.TimeoutExpired):
         pass
-    
+
     # Check for local Madge via npx
     try:
         if hasattr(common, 'NPX_BIN_PATH') and os.path.exists(common.NPX_BIN_PATH):
@@ -186,7 +186,7 @@ def check_madge_installation(skip_check: bool = False) -> Optional[str]:
                 return f'{common.NPX_BIN_PATH} madge'
     except (subprocess.CalledProcessError, FileNotFoundError, subprocess.TimeoutExpired):
         pass
-    
+
     # Check for local Madge via node_modules
     try:
         madge_path = os.path.join(common.CURR_DIR, 'node_modules', '.bin', 'madge')
@@ -204,7 +204,7 @@ def check_madge_installation(skip_check: bool = False) -> Optional[str]:
                 return madge_path
     except (subprocess.CalledProcessError, FileNotFoundError, subprocess.TimeoutExpired):
         pass
-    
+
     # If we reach here, Madge is not available
     raise RuntimeError(
         'Madge is not installed or not accessible. Please install it using:\n'
@@ -216,22 +216,22 @@ def check_madge_installation(skip_check: bool = False) -> Optional[str]:
 
 def validate_target_paths(targets: List[str], verbose: bool = False) -> List[str]:
     """Validate and filter target paths, returning only existing ones.
-    
+
     Args:
         targets: List of file or directory paths to validate.
         verbose: Whether to print warnings for non-existent paths.
-        
+
     Returns:
         List of existing target paths.
     """
     valid_targets = []
-    
+
     for target in targets:
         if os.path.exists(target):
             valid_targets.append(target)
         elif verbose:
             print(f'Warning: Target path "{target}" does not exist, skipping.')
-    
+
     return valid_targets
 
 
@@ -243,41 +243,41 @@ def run_madge_command(
     verbose: bool = False
 ) -> Tuple[bool, str]:
     """Execute Madge command with the provided configuration.
-    
+
     Args:
         madge_cmd: Base Madge command to execute.
         targets: List of target directories/files to check.
         config: Madge configuration dictionary.
         timeout: Command timeout in seconds.
         verbose: Whether to print verbose execution details.
-        
+
     Returns:
         Tuple of (success: bool, output: str).
     """
     # Build command arguments
     cmd_parts = madge_cmd.split()
     cmd_args = cmd_parts + ['--circular']
-    
+
     # Add file extensions
     extensions = ','.join(config['extensions'])
     cmd_args.extend(['--extensions', extensions])
-    
+
     # Add exclusion patterns
     for pattern in config['exclude_patterns']:
         cmd_args.extend(['--exclude', pattern])
-    
+
     # Add output format if JSON requested
     if config.get('format') == 'json':
         cmd_args.append('--json')
-    
+
     # Add target paths
     cmd_args.extend(targets)
-    
+
     if verbose:
         print(f'Executing command: {" ".join(cmd_args)}')
         print(f'Working directory: {common.CURR_DIR}')
         print(f'Timeout: {timeout} seconds')
-    
+
     try:
         # Execute Madge command
         result = subprocess.run(
@@ -287,12 +287,12 @@ def run_madge_command(
             text=True,
             timeout=timeout
         )
-        
+
         if verbose:
             print(f'Command completed with return code: {result.returncode}')
             print(f'Stdout length: {len(result.stdout)} characters')
             print(f'Stderr length: {len(result.stderr)} characters')
-        
+
         # Handle command results
         if result.returncode == 0:
             if result.stdout.strip():
@@ -309,7 +309,7 @@ def run_madge_command(
             if result.stdout:
                 error_msg += f'\nOutput:\n{result.stdout}'
             return False, error_msg
-            
+
     except subprocess.TimeoutExpired:
         return False, f'Madge execution timed out after {timeout} seconds.'
     except Exception as e:
@@ -326,9 +326,9 @@ def check_circular_dependencies(
     timeout: int = 300
 ) -> Tuple[bool, str]:
     """Main function to check for circular dependencies.
-    
+
     This function can be imported and used by other modules (linters, hooks).
-    
+
     Args:
         files: Specific files or directories to check. If None, uses defaults.
         verbose: Enable verbose output.
@@ -337,54 +337,54 @@ def check_circular_dependencies(
         output_format: Output format ('text' or 'json').
         config_file: Path to custom Madge config (not implemented yet).
         timeout: Execution timeout in seconds.
-        
+
     Returns:
         Tuple of (success: bool, message: str).
     """
     try:
         # Determine target directories/files
         targets = files if files else DEFAULT_TARGET_DIRECTORIES
-        
+
         # Validate target paths
         valid_targets = validate_target_paths(targets, verbose)
         if not valid_targets:
             return False, 'No valid target files or directories found to check.'
-        
+
         # Check Madge installation
         try:
             madge_cmd = check_madge_installation(skip_install_check)
         except RuntimeError as e:
             return False, str(e)
-        
+
         # Get Madge configuration
         config = get_madge_config(exclude_patterns, output_format)
-        
+
         # Execute circular dependency check
         if verbose:
             print('Starting circular dependency analysis...')
             print(f'Targets: {valid_targets}')
-        
+
         success, output = run_madge_command(
             madge_cmd, valid_targets, config, timeout, verbose
         )
-        
+
         return success, output
-        
+
     except Exception as e:
         return False, f'Unexpected error during circular dependency check: {str(e)}'
 
 
 def main(args: Optional[List[str]] = None) -> None:
     """Main entry point for the circular dependency checker.
-    
+
     Args:
         args: Command line arguments. If None, uses sys.argv.
     """
     parsed_args = _PARSER.parse_args(args=args)
-    
+
     print('Oppia Circular Dependency Checker')
     print('=' * 50)
-    
+
     # Run circular dependency check
     success, message = check_circular_dependencies(
         files=parsed_args.files,
@@ -395,7 +395,7 @@ def main(args: Optional[List[str]] = None) -> None:
         config_file=parsed_args.config,
         timeout=parsed_args.timeout
     )
-    
+
     # Handle results
     if success:
         print(f'✅ SUCCESS: {message}')

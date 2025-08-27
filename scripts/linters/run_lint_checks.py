@@ -4,14 +4,14 @@
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
+# You may obtain a copy of the License at.
 #
 #      http://www.apache.org/licenses/LICENSE-2.0
 #
-# Unless required by applicable law or agreed to in writing, software
+# Unless required by applicable law or agreed to in writing, software.
 # distributed under the License is distributed on an "AS-IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
+# See the License for the specific language governing permissions and.
 # limitations under the License.
 
 """Pre-commit script for Oppia.
@@ -68,25 +68,25 @@ from scripts import common
 from typing import Dict, List, Optional, Set, Tuple
 
 # Install third party dependencies before proceeding.
-from . import circular_dependency_linter  # isort:skip
-from . import codeowner_linter  # isort:skip
-from . import css_linter  # isort:skip
-from . import general_purpose_linter  # isort:skip
-from . import html_linter  # isort:skip
-from . import js_ts_linter  # isort:skip
-from . import linter_utils  # isort:skip
-from . import other_files_linter  # isort:skip
-from . import python_linter  # isort:skip
-from .. import concurrent_task_utils  # isort:skip
-from .. import install_third_party_libs  # isort:skip
+from . import circular_dependency_linter  # isort:skip.
+from . import codeowner_linter  # isort:skip.
+from . import css_linter  # isort:skip.
+from . import general_purpose_linter  # isort:skip.
+from . import html_linter  # isort:skip.
+from . import js_ts_linter  # isort:skip.
+from . import linter_utils  # isort:skip.
+from . import other_files_linter  # isort:skip.
+from . import python_linter  # isort:skip.
+from .. import concurrent_task_utils  # isort:skip.
+from .. import install_third_party_libs  # isort:skip.
 
 OTHER_SHARD_NAME = 'other'
 
-# Shards are specified by a mapping from shard name to a list of the
-# paths in that shard. For example, `'1': ['core/domain/']` will create a
-# shard named `'1'` that contains all the files under core/domain/. A
-# shard name matching OTHER_SHARD_NAME includes all files not under
-# another shard.  Currently we are not sharding the lint checks, so the
+# Shards are specified by a mapping from shard name to a list of the.
+# paths in that shard. For example, `'1': ['core/domain/']` will create a.
+# shard named `'1'` that contains all the files under core/domain/. A.
+# shard name matching OTHER_SHARD_NAME includes all files not under.
+# another shard.  Currently we are not sharding the lint checks, so the.
 # only shard is the `other` shard that contains all files.
 SHARDS: Dict[str, List[str]] = {
     'other': [],
@@ -228,12 +228,10 @@ def _get_linters_for_file_extension(
         third_party_linters.append(third_party_js_ts_linter)
 
         # Add circular dependency checks for JS/TS files.
-        circular_dependency_custom_linter, circular_dependency_third_party_linter = (
-            circular_dependency_linter.get_linters(
-                files['.js'], files['.ts'], file_cache)
-        )
-        custom_linters.append(circular_dependency_custom_linter)
-        third_party_linters.append(circular_dependency_third_party_linter)
+        cd_custom, cd_third_party = circular_dependency_linter.get_linters(
+            files['.js'], files['.ts'], file_cache)
+        custom_linters.append(cd_custom)
+        third_party_linters.append(cd_third_party)
 
     elif file_extension_to_lint == 'html':
         html_lint_check_manager, third_party_html_linter = (
@@ -409,10 +407,10 @@ def _get_filepaths_from_non_other_shard(
             if filepaths.count(filepath) > 1:
                 raise RuntimeError(
                     '%s in multiple shards.' % filepath)
-        # We exempt this line from test coverage because it is
-        # un-testable. It should never be reached, but we raise an
+        # We exempt this line from test coverage because it is.
+        # un-testable. It should never be reached, but we raise an.
         # assertion error to catch coding errors above.
-        raise AssertionError(  # pragma: no cover
+        raise AssertionError(  # pragma: no cover.
             'There is a file duplicated across shards. '
             'We should have been able to find it but failed.')
     return filepaths
@@ -621,8 +619,8 @@ def main(args: Optional[List[str]] = None) -> None:
     """Main method for pre commit linter script that lints Python, JavaScript,
     HTML, and CSS files.
     """
-    # Namespace is used to share values between multiple processes. This cannot
-    # be used as a global variable since then it leads to hanging of some
+    # Namespace is used to share values between multiple processes. This cannot.
+    # be used as a global variable since then it leads to hanging of some.
     # processes.
     namespace = multiprocessing.Manager().Namespace()
 
@@ -631,7 +629,7 @@ def main(args: Optional[List[str]] = None) -> None:
     file_extension_types = _get_file_extensions(
         parsed_args.only_check_file_extensions
     )
-    # Default mode is non-verbose mode, if arguments contains --verbose flag it
+    # Default mode is non-verbose mode, if arguments contains --verbose flag it.
     # will be made True, which will represent verbose mode.
     verbose_mode_enabled = bool(parsed_args.verbose)
     all_filepaths = _get_all_filepaths(
@@ -702,10 +700,10 @@ def main(args: Optional[List[str]] = None) -> None:
         tasks_third_party.append(task_third_party)
 
     # Execute tasks.
-    # Here we set Concurrency limit for custom task to 25 because we need to
+    # Here we set Concurrency limit for custom task to 25 because we need to.
     # parallelize the tasks to work on full capacity of CPU.
-    # Concurrency limit for third party tasks is set to 2 because these
-    # third party libraries have their own ways to lint at their fastest
+    # Concurrency limit for third party tasks is set to 2 because these.
+    # third party libraries have their own ways to lint at their fastest.
     # (ie. might parallelize on their own)
 
     # Concurrency limit: 25.
@@ -743,8 +741,8 @@ def main(args: Optional[List[str]] = None) -> None:
             '---------------------------']))
 
 
-# The 'no coverage' pragma is used as this line is un-testable. This is because
-# it will only be called when run_lint_checks.py is used as a
+# The 'no coverage' pragma is used as this line is un-testable. This is because.
+# it will only be called when run_lint_checks.py is used as a.
 # script.
-if __name__ == '__main__': # pragma: no cover
+if __name__ == '__main__': # pragma: no cover.
     main()

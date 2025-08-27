@@ -4,14 +4,14 @@
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
+# You may obtain a copy of the License at.
 #
 #      http://www.apache.org/licenses/LICENSE-2.0
 #
-# Unless required by applicable law or agreed to in writing, software
+# Unless required by applicable law or agreed to in writing, software.
 # distributed under the License is distributed on an "AS-IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
+# See the License for the specific language governing permissions and.
 # limitations under the License.
 
 """Lint checks for circular dependencies in Js and Ts files."""
@@ -27,10 +27,10 @@ from .. import common
 from .. import concurrent_task_utils
 
 MYPY = False
-if MYPY:  # pragma: no cover
+if MYPY:  # pragma: no cover.
     from scripts.linters import run_lint_checks
 
-# Exclusion patterns for files that should not be checked for circular 
+# Exclusion patterns for files that should not be checked for circular.
 # dependencies. These patterns are passed to Madge's exclude option.
 CIRCULAR_DEPENDENCY_EXCLUDE_PATTERNS = [
     'node_modules/',
@@ -89,7 +89,7 @@ class CircularDependencyLintChecksManager(linter_utils.BaseLinter):
             list(TaskResult). A list of TaskResult objects representing the
             results of the lint checks.
         """
-        # Currently, all circular dependency checks are handled by the
+        # Currently, all circular dependency checks are handled by the.
         # third-party linter (Madge), so custom checks return empty results.
         if not self.all_filepaths:
             return [
@@ -119,7 +119,7 @@ class ThirdPartyCircularDependencyLintChecksManager(linter_utils.BaseLinter):
 
     def _check_madge_installation(self) -> bool:
         """Checks if Madge is installed and accessible.
-        
+
         Returns:
             bool. True if Madge is available, False otherwise.
         """
@@ -127,12 +127,13 @@ class ThirdPartyCircularDependencyLintChecksManager(linter_utils.BaseLinter):
             madge_path = os.path.join('node_modules', '.bin', 'madge')
             if os.path.exists(madge_path):
                 return True
-            
-            # Try global installation
+
+            # Try global installation.
             proc = subprocess.run(
                 [common.NPX_BIN_PATH, 'madge', '--version'],
                 capture_output=True,
                 text=True,
+                check=False,
                 timeout=10
             )
             return proc.returncode == 0
@@ -143,12 +144,12 @@ class ThirdPartyCircularDependencyLintChecksManager(linter_utils.BaseLinter):
         """Check for circular dependencies using Madge.
 
         Returns:
-            TaskResult. A TaskResult object representing the result of the 
+            TaskResult. A TaskResult object representing the result of the
             circular dependency check.
         """
         name = 'Circular Dependencies'
         files_to_lint = self.all_filepaths
-        
+
         if not files_to_lint:
             return concurrent_task_utils.TaskResult(
                 name, False, [],
@@ -156,51 +157,54 @@ class ThirdPartyCircularDependencyLintChecksManager(linter_utils.BaseLinter):
 
         if not self._check_madge_installation():
             return concurrent_task_utils.TaskResult(
-                name, True, 
-                ['ERROR: Madge is not installed. Please run start.py to install dependencies.'],
-                ['ERROR: Madge is not installed. Please run start.py to install dependencies.'])
+                name, True,
+                ['ERROR: Madge is not installed. Please run start.py to '
+                 'install dependencies.'],
+                ['ERROR: Madge is not installed. Please run start.py to '
+                 'install dependencies.'])
 
         try:
-            # Prepare Madge command
+            # Prepare Madge command.
             madge_cmd = [
                 common.NODE_BIN_PATH,
                 os.path.join('node_modules', '.bin', 'madge'),
                 '--circular',
                 '--extensions', 'ts,js'
             ]
-            
-            # Add exclusion patterns
+
+            # Add exclusion patterns.
             for pattern in CIRCULAR_DEPENDENCY_EXCLUDE_PATTERNS:
                 madge_cmd.extend(['--exclude', pattern])
-            
-            # Analyze the main TypeScript directories
+
+            # Analyze the main TypeScript directories.
             directories_to_check = [
                 'core/templates/',
                 'extensions/',
                 'assets/'
             ]
-            
-            # Only check directories that exist
-            existing_dirs = [d for d in directories_to_check if os.path.exists(d)]
+
+            # Only check directories that exist.
+            existing_dirs = [
+                d for d in directories_to_check if os.path.exists(d)]
             madge_cmd.extend(existing_dirs)
-            
-            # Run Madge
+
+            # Run Madge.
             proc = subprocess.Popen(
                 madge_cmd,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE
             )
-            
+
             encoded_stdout, encoded_stderr = proc.communicate()
             stdout = encoded_stdout.decode('utf-8')
             stderr = encoded_stderr.decode('utf-8')
-            
+
             if stderr:
                 return concurrent_task_utils.TaskResult(
                     name, True, [stderr], [stderr])
-            
+
             if stdout.strip():
-                # Circular dependencies found
+                # Circular dependencies found.
                 error_messages = [f'Circular dependencies detected:\n{stdout}']
                 full_error_messages = [
                     f'Circular dependencies detected:\n{stdout}\n\n'
@@ -213,10 +217,10 @@ class ThirdPartyCircularDependencyLintChecksManager(linter_utils.BaseLinter):
                 return concurrent_task_utils.TaskResult(
                     name, True, error_messages, full_error_messages)
             else:
-                # No circular dependencies found
+                # No circular dependencies found.
                 return concurrent_task_utils.TaskResult(
                     name, False, [], ['No circular dependencies found.'])
-                    
+
         except (FileNotFoundError, OSError) as e:
             error_msg = f'Error running Madge: {e}'
             return concurrent_task_utils.TaskResult(
@@ -237,8 +241,9 @@ def get_linters(
     js_filepaths: List[str],
     ts_filepaths: List[str],
     file_cache: run_lint_checks.FileCache
-) -> tuple[CircularDependencyLintChecksManager, ThirdPartyCircularDependencyLintChecksManager]:
-    """Creates CircularDependencyLintChecksManager and 
+) -> tuple[CircularDependencyLintChecksManager,
+           ThirdPartyCircularDependencyLintChecksManager]:
+    """Creates CircularDependencyLintChecksManager and
     ThirdPartyCircularDependencyLintChecksManager objects and return them.
 
     Args:
@@ -248,7 +253,7 @@ def get_linters(
             file content.
 
     Returns:
-        tuple(CircularDependencyLintChecksManager, 
+        tuple(CircularDependencyLintChecksManager,
         ThirdPartyCircularDependencyLintChecksManager). A 2-tuple
         of custom and third_party linter objects.
     """

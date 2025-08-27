@@ -802,3 +802,7 @@
 /core/templates/pages/license-page/license-page.component.html @oppia/core-reviewers
 /core/domain/takeout_*.py @oppia/core-reviewers
 /core/domain/wipeout_*.py @oppia/core-reviewers
+
+# Circular dependency implementation files
+./CIRCULAR_DEPENDENCIES_CHECK_IMPLEMENTATION_PLAN.md @oppia/core-reviewers
+./context.md @oppia/core-reviewers
