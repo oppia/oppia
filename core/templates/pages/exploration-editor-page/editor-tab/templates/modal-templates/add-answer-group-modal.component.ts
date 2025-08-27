@@ -163,7 +163,6 @@ export class AddAnswerGroupModalComponent
     this.stateEditorService.onSaveOutcomeDestIfStuckDetails.emit();
 
     this.editorFirstTimeEventsService.registerFirstSaveRuleEvent();
-    console.log('DEBUG tmpRule before close', JSON.stringify(this.tmpRule));
 
     // Close the modal and save it afterwards.
     this.ngbActiveModal.close({
