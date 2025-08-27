@@ -1,7 +1,5 @@
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css">
-
 <div class="oppia-new-audio-bar" *ngIf="isAudioBarAvailable()">
-  <i class="fa-solid fa-headphones desktop-mode"></i>
+  <i class="fas fa-headphones desktop-mode"></i>
   <p class=" desktop-mode">Listen to this lesson in <span *ngIf="languageAccentDescriptions.length === 1">{{selectedLanguageAccentDescription}}</span></p>
 
   <div class="oppia-new-audio-header-control-buttons" #audioControls>
@@ -15,7 +13,7 @@
 
     <div class="audio-new-header-control-icons">
       <a (click)="onPlayButtonClicked()" (keydown.enter)="onPlayButtonClicked()" [ngbTooltip]="!isAudioAvailableInCurrentLanguageAccent() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:selectedLanguageAccentDescription}) : ''" placement="right">
-        <i class="fa-solid" tabindex="0" aria-label="Press enter to Listen to the Lesson"
+        <i class="fas" tabindex="0" aria-label="Press enter to Listen to the Lesson"
             [ngClass]="{'fa-ellipsis-h': audioLoadingIndicatorIsShown, 'fa-play': !isAudioPlaying(), 'fa-pause': isAudioPlaying()}">
         </i>
       </a>
