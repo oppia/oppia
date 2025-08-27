@@ -63,7 +63,7 @@ export class SetOfTranslatableHtmlContentIdsEditorComponent
 
   ngOnChanges(changes: SimpleChanges): void {
     // Handle external value changes (from parent component)
-    if (changes['value'] && !changes['value'].firstChange) {
+    if (changes.value && !changes.value.firstChange) {
       this.updateSelections();
     }
   }
@@ -78,7 +78,6 @@ export class SetOfTranslatableHtmlContentIdsEditorComponent
     // Update the selections array first (for immediate UI feedback)
     this.selections[choiceListIndex] = !this.selections[choiceListIndex];
 
-    // Then update the value array
     let newValue = [...this.value];
     const choiceContentId = this.choices[choiceListIndex].val;
     const selectedChoicesIndex = this.value.indexOf(choiceContentId);
