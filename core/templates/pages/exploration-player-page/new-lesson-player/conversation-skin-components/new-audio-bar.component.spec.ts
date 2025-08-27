@@ -29,7 +29,6 @@ import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
 import {NewAudioBarComponent} from './new-audio-bar.component';
 import {Voiceover} from '../../../../domain/exploration/voiceover.model';
 import {AssetsBackendApiService} from '../../../../services/assets-backend-api.service';
-import {AudioBarStatusService} from '../../../../services/audio-bar-status.service';
 import {AudioPlayerService} from '../../../../services/audio-player.service';
 import {AudioPreloaderService} from '../../../../pages/exploration-player-page/services/audio-preloader.service';
 import {PlayerPositionService} from '../../../../pages/exploration-player-page/services/player-position.service';
@@ -39,14 +38,12 @@ import {VoiceoverPlayerService} from '../../../../pages/exploration-player-page/
 import {EntityVoiceoversService} from '../../../../services/entity-voiceovers.services';
 import {StateEditorService} from '../../../../components/state-editor/state-editor-properties-services/state-editor.service';
 import {SiteAnalyticsService} from '../../../../services/site-analytics.service';
-import {LocalStorageService} from '../../../../services/local-storage.service';
 
-fdescribe('NewAudioBarComponent', () => {
+describe('NewAudioBarComponent', () => {
   let component: NewAudioBarComponent;
   let fixture: ComponentFixture<NewAudioBarComponent>;
 
   let assetsBackendApiService: AssetsBackendApiService;
-  let audioBarStatusService: AudioBarStatusService;
   let audioPlayerService: AudioPlayerService;
   let audioPreloaderService: AudioPreloaderService;
   let playerPositionService: PlayerPositionService;
@@ -56,7 +53,6 @@ fdescribe('NewAudioBarComponent', () => {
   let entityVoiceoversService: EntityVoiceoversService;
   let stateEditorService: StateEditorService;
   let siteAnalyticsService: SiteAnalyticsService;
-  let localStorageService: LocalStorageService;
 
   let mockOnTranslationLanguageChanged: EventEmitter<void>;
   let mockOnActiveVoiceoverChanged: EventEmitter<void>;
@@ -76,7 +72,6 @@ fdescribe('NewAudioBarComponent', () => {
     component = fixture.componentInstance;
 
     audioPlayerService = TestBed.inject(AudioPlayerService);
-    audioBarStatusService = TestBed.inject(AudioBarStatusService);
     audioPreloaderService = TestBed.inject(AudioPreloaderService);
     assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
     playerPositionService = TestBed.inject(PlayerPositionService);
@@ -86,7 +81,6 @@ fdescribe('NewAudioBarComponent', () => {
     entityVoiceoversService = TestBed.inject(EntityVoiceoversService);
     stateEditorService = TestBed.inject(StateEditorService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
-    localStorageService = TestBed.inject(LocalStorageService);
 
     mockOnTranslationLanguageChanged = new EventEmitter<void>();
     mockOnActiveVoiceoverChanged = new EventEmitter<void>();

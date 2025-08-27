@@ -14,9 +14,7 @@
     </div>
 
     <div class="audio-new-header-control-icons">
-      <a (click)="onPlayButtonClicked()" (keydown.enter)="onPlayButtonClicked()"
-          [ngbTooltip]="!isAudioAvailableInCurrentLanguageAccent() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:selectedLanguageAccentDescription}) : ''"
-          placement="right">
+      <a (click)="onPlayButtonClicked()" (keydown.enter)="onPlayButtonClicked()" [ngbTooltip]="!isAudioAvailableInCurrentLanguageAccent() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:selectedLanguageAccentDescription}) : ''" placement="right">
         <i class="fa-solid" tabindex="0" aria-label="Press enter to Listen to the Lesson"
             [ngClass]="{'fa-ellipsis-h': audioLoadingIndicatorIsShown, 'fa-play': !isAudioPlaying(), 'fa-pause': isAudioPlaying()}">
         </i>
@@ -31,12 +29,10 @@
                           (valueChange)="setProgress($event)"
                           aria-label="audio-slider">
       </oppia-audio-slider>
-      <span *ngIf="audioLoadingIndicatorIsShown && !doesCurrentAudioTranslationNeedUpdate()"
-          class="audio-controls-message">
+      <span *ngIf="audioLoadingIndicatorIsShown && !doesCurrentAudioTranslationNeedUpdate()" class="audio-controls-message">
           {{ 'I18N_PLAYER_AUDIO_LOADING_AUDIO' | translate }}
       </span>
-      <span *ngIf="isAudioAvailableInCurrentLanguageAccent() && doesCurrentAudioTranslationNeedUpdate()"
-          class="audio-controls-message">
+      <span *ngIf="isAudioAvailableInCurrentLanguageAccent() && doesCurrentAudioTranslationNeedUpdate()" class="audio-controls-message">
       {{ 'I18N_PLAYER_AUDIO_MIGHT_NOT_MATCH_TEXT' | translate }}
       </span>
       <!--Filler space for message-->
