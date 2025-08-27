@@ -30,6 +30,8 @@ import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 import {LoaderService} from 'services/loader.service';
+import {I18nService} from 'i18n/i18n.service';
+
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 import {
   BackendPreferenceUpdateType,
@@ -113,7 +115,8 @@ export class PreferencesPageComponent {
     private preventPageUnloadEventService: PreventPageUnloadEventService,
     private urlInterpolationService: UrlInterpolationService,
     private userBackendApiService: UserBackendApiService,
-    private userService: UserService
+    private userService: UserService,
+    private i18nService: I18nService
   ) {}
 
   getStaticImageUrl(imagePath: string): string {
@@ -368,11 +371,26 @@ export class PreferencesPageComponent {
     this.userBackendApiService
       .updateMultiplePreferencesDataAsync(updates)
       .then(returnData => {
-        if (this.preferencesForm.controls.preferredSiteLanguageCode.dirty) {
-          this.i18nLanguageCodeService.setI18nLanguageCode(
-            this.preferencesForm.controls.preferredSiteLanguageCode.value
-          );
+        const languageChanged =
+          this.preferencesForm.controls.preferredSiteLanguageCode.dirty;
+        const profilePicChanged =
+          this.preferencesForm.controls.profilePicturePngDataUrl.dirty;
+
+        if (languageChanged) {
+          const newLangCode =
+            this.preferencesForm.controls.preferredSiteLanguageCode.value;
+          this.i18nService.setLocalStorageKeys(newLangCode);
+          this.preventPageUnloadEventService.removeListener();
+          this.windowRef.nativeWindow.location.reload();
+          return;
         }
+
+        if (profilePicChanged) {
+          this.preventPageUnloadEventService.removeListener();
+          this.windowRef.nativeWindow.location.reload();
+          return;
+        }
+
         if (returnData.bulk_email_signup_message_should_be_shown) {
           const formGrp = this.preferencesForm.controls
             .emailPreferences as FormGroup;
@@ -381,19 +399,6 @@ export class PreferencesPageComponent {
         } else {
           this.alertsService.addInfoMessage('Saved!', 3000);
         }
-        if (this.preferencesForm.controls.profilePicturePngDataUrl.dirty) {
-          // TODO(#19737): Remove the following 'if' condition.
-          if (AssetsBackendApiService.EMULATOR_MODE) {
-            this._saveProfileImageToLocalStorage(
-              this.preferencesForm.controls.profilePicturePngDataUrl.value
-            );
-          }
-          // The reload is needed in order to update the profile picture
-          // in the top-right corner(Nav Bar).
-          this.preventPageUnloadEventService.removeListener();
-          this.windowRef.nativeWindow.location.reload();
-        }
-        // Marks all the preferences as unchanged and updates the form status.
         this.preferencesForm.markAsPristine();
         this.preferencesForm.updateValueAndValidity();
       });
