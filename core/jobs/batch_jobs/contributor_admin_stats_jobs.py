@@ -34,7 +34,7 @@ import apache_beam as beam
 
 import result
 
-from typing import Iterable, List, Optional, Tuple
+from typing import Callable, Dict, Iterable, List, Optional, Tuple, Union, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -1418,16 +1418,35 @@ class ValidateTotalContributionStatsJob(base_jobs.JobBase):
             s.author_id, s))
 
         # Group for translation validation.
-        translation_grouped = ({
+        translation_groups = ({
             'total': trans_totals_kv,
             'contribs': trans_contribs_kv,
             'suggestions': trans_suggestions_kv
         } | 'Group Translation Data' >> beam.CoGroupByKey())
 
+        filtered_translation_groups = (
+            translation_groups
+            | 'Mark translation groups Ok/Err' >> beam.Map(
+                self._make_check_missing_total_fn(
+                    total_model_name=(
+                        'TranslationSubmitterTotalContributionStatsModel'
+                    ),
+                    contrib_model_name='TranslationContributionStatsModel',
+                    suggestion_model_name='Translation GeneralSuggestionModel'
+                )
+            )
+        )
+
+        valid_translation_groups = (
+            filtered_translation_groups
+            | 'Filter translation Ok' >> beam.Filter(lambda r: r.is_ok())
+            | 'Unwrap translation Ok (kv)' >> beam.Map(lambda r: r.unwrap())
+        )
+
         translation_validaion_results = (
-            translation_grouped
+            valid_translation_groups
             | 'Validate Translation Stats' >> beam.Map(
-                lambda kv, topics: self._validate_translation_prefetched(
+                lambda kv, topics: self._validate_translation(
                     kv[1]['total'][0],
                     kv[1]['contribs'],
                     kv[1]['suggestions'],
@@ -1438,16 +1457,35 @@ class ValidateTotalContributionStatsJob(base_jobs.JobBase):
         )
 
         # Group for question validation.
-        question_grouped = ({
+        question_groups = ({
             'total': quest_totals_kv,
             'contribs': quest_contribs_kv,
             'suggestions': quest_suggestions_kv
         } | 'Group Question Data' >> beam.CoGroupByKey())
 
+        filtered_question_groups = (
+            question_groups
+            | 'Mark questions groups Ok/Err' >> beam.Map(
+                self._make_check_missing_total_fn(
+                    total_model_name=(
+                        'QuestionSubmitterTotalContributionStatsModel'
+                    ),
+                    contrib_model_name='QuestionContributionStatsModel',
+                    suggestion_model_name='Question GeneralSuggestionModel'
+                )
+            )
+        )
+
+        valid_question_groups = (
+            filtered_question_groups
+            | 'Filter questions Ok' >> beam.Filter(lambda r: r.is_ok())
+            | 'Unwrap questions Ok (kv)' >> beam.Map(lambda r: r.unwrap())
+        )
+
         question_validaion_results = (
-            question_grouped
+            valid_question_groups
             | 'Validate Question Stats' >> beam.Map(
-                lambda kv, topics: self._validate_question_prefetched(
+                lambda kv, topics: self._validate_question(
                     kv[1]['total'][0],
                     kv[1]['contribs'],
                     kv[1]['suggestions'],
@@ -1469,6 +1507,32 @@ class ValidateTotalContributionStatsJob(base_jobs.JobBase):
             )
         )
 
+        translation_groups_with_no_total = (
+            filtered_translation_groups
+            | 'Filter translation Err' >> beam.Filter(lambda r: r.is_err())
+        )
+
+        translation_groups_with_no_total_count_results = (
+            translation_groups_with_no_total
+            | 'Count missing total translations' >> (
+                beam.combiners.Count.Globally())
+            | 'Filter missing total translations count > 0' >> beam.Filter(
+                lambda x: x > 0)
+            | 'Map missing total translations count' >> beam.Map(
+                lambda count: job_run_result.JobRunResult.as_stdout(
+                    'Missing Total Translation Submitter Models FAILED: '
+                    f'{count}'
+                )
+            )
+        )
+
+        translation_groups_with_no_total_logs = (
+            translation_groups_with_no_total
+            | 'Map missing total translations to logs' >> (
+                job_result_transforms.ResultsToJobRunResults()
+            )
+        )
+
         error_translation_validaition = (
             translation_validaion_results
             | 'Filter ERR translations' >> beam.Filter(
@@ -1482,7 +1546,8 @@ class ValidateTotalContributionStatsJob(base_jobs.JobBase):
                 lambda x: x > 0)
             | 'Map ERR translations count' >> beam.Map(
                 lambda count: job_run_result.JobRunResult.as_stdout(
-                    f'Invalid Translation Submitter Models FAILED: {count}'
+                    'Invalid Total Translation Submitter Models FAILED: '
+                    f'{count}'
                 )
             )
         )
@@ -1505,6 +1570,31 @@ class ValidateTotalContributionStatsJob(base_jobs.JobBase):
             )
         )
 
+        question_groups_with_no_total = (
+            filtered_question_groups
+            | 'Filter question Err' >> beam.Filter(lambda r: r.is_err())
+        )
+
+        question_groups_with_no_total_count_results = (
+            question_groups_with_no_total
+            | 'Count missing total questions' >> (
+                beam.combiners.Count.Globally())
+            | 'Filter missing total questions count > 0' >> beam.Filter(
+                lambda x: x > 0)
+            | 'Map missing total questions count' >> beam.Map(
+                lambda count: job_run_result.JobRunResult.as_stdout(
+                    f'Missing Total Question Submitter Models FAILED: {count}'
+                )
+            )
+        )
+
+        question_groups_with_no_total_logs = (
+            question_groups_with_no_total
+            | 'Map missing total questions to logs' >> (
+                job_result_transforms.ResultsToJobRunResults()
+            )
+        )
+
         error_question_validaition = (
             question_validaion_results
             | 'Filter ERR questions' >> beam.Filter(lambda res: res.is_err())
@@ -1516,7 +1606,7 @@ class ValidateTotalContributionStatsJob(base_jobs.JobBase):
             | 'Filter ERR questions count > 0' >> beam.Filter(lambda x: x > 0)
             | 'Map ERR questions count' >> beam.Map(
                 lambda count: job_run_result.JobRunResult.as_stdout(
-                    f'Invalid Question Submitter Models FAILED: {count}'
+                    f'Invalid Total Question Submitter Models FAILED: {count}'
                 )
             )
         )
@@ -1531,9 +1621,13 @@ class ValidateTotalContributionStatsJob(base_jobs.JobBase):
         return (
             (
                 success_translation_validaition_count_results,
+                translation_groups_with_no_total_count_results,
+                translation_groups_with_no_total_logs,
                 error_translation_validaition_count_results,
                 error_translation_validaition_logs,
                 success_question_validaition_count_results,
+                question_groups_with_no_total_count_results,
+                question_groups_with_no_total_logs,
                 error_question_validaition_count_results,
                 error_question_validaition_logs
             )
@@ -1541,7 +1635,112 @@ class ValidateTotalContributionStatsJob(base_jobs.JobBase):
         )
 
     @staticmethod
-    def _validate_translation_prefetched(
+    def _make_check_missing_total_fn(
+        total_model_name: str,
+        contrib_model_name: str,
+        suggestion_model_name: str
+    ) -> Callable[[Tuple[Union[Tuple[str, str], str], Dict[
+        str,
+        Union[
+            List[suggestion_models
+                .TranslationSubmitterTotalContributionStatsModel],
+            List[suggestion_models.TranslationContributionStatsModel],
+            List[suggestion_models.GeneralSuggestionModel]
+        ]
+    ]]], result.Result[Union[tuple, str]]]:
+        """Generic function that returns a check function for finding missing
+        total contribution stats models.
+
+        Args:
+            total_model_name: str.
+                A label for total contribution stats models.
+            contrib_model_name: str.
+                A label for contribution stats models.
+            suggestion_model_name: str.
+                A label for suggestion models.
+
+        Returns:
+            callable. A function that takes a 2-tuple (key, group) and returns
+            a result.Ok with the same 2-tuple if the group contains at least
+            one total model, or a result.Err with a string containing error
+            logs if the group contains no total model.
+        """
+        def _check_missing_total_fn(
+            kv: Tuple[Union[Tuple[str, str], str], Dict[
+                str,
+                Union[
+                    List[suggestion_models
+                        .TranslationSubmitterTotalContributionStatsModel],
+                    List[suggestion_models.TranslationContributionStatsModel],
+                    List[suggestion_models.GeneralSuggestionModel]
+                ]]]) -> result.Result[Union[tuple, str]]:
+            """Check for missing total contribution stats models.
+
+            Args:
+                kv: 2-tuple.
+                    A 2-tuple (key, group) where key is the group key and
+                    group is a dictionary containing a list of total
+                    contribution stats models, list of contribution stats model
+                    and list of suggestions.
+
+            Returns:
+                result.Result[tuple | str].
+                A result.Ok with the same 2-tuple if the group contains at least
+                one total model, or a result.Err with a string containing error
+                logs if the group contains no total model.
+            """
+            key, group = kv
+
+            # Here we use cast because we are narrowing down the type of
+            # totals to interpret fallback alike.
+            totals = cast(
+                List[suggestion_models
+                    .TranslationSubmitterTotalContributionStatsModel],
+                group.get('total') or []
+            )
+
+            # Here we use cast because we are narrowing down the type of
+            # totals to interpret fallback alike.
+            contribs = cast(
+                List[suggestion_models.TranslationContributionStatsModel],
+                group.get('contribs') or []
+            )
+
+            # Here we use cast because we are narrowing down the type of
+            # totals to interpret fallback alike.
+            suggestions = cast(
+                List[suggestion_models.GeneralSuggestionModel],
+                group.get('suggestions') or []
+            )
+
+            if len(totals) > 0:
+                return result.Ok(kv)
+
+            # Generate Logs.
+            contrib_ids = [str(getattr(c, 'id', None)) for c in contribs]
+            suggestion_ids = [str(getattr(s, 'id', None)) for s in suggestions]
+
+            err_logs = ''
+            err_logs += (f'Missing {total_model_name} for key {key}:\n')
+            err_logs += ('-> ' + f'{contrib_model_name}:\n')
+            if contrib_ids:
+                for cid in contrib_ids:
+                    err_logs += (f'--{cid}\n')
+            else:
+                err_logs += ('--None\n')
+            err_logs += (f'-> {suggestion_model_name}:\n')
+            if suggestion_ids:
+                for sid in suggestion_ids:
+                    err_logs += (f'--{sid}\n')
+            else:
+                err_logs += ('--None\n')
+
+            return result.Err(err_logs)
+
+        return _check_missing_total_fn
+
+    @staticmethod
+    def _validate_translation(
         total: (
             suggestion_models.TranslationSubmitterTotalContributionStatsModel
         ),
@@ -1673,7 +1872,7 @@ class ValidateTotalContributionStatsJob(base_jobs.JobBase):
             f'{total.id}:\n{error_logs}')
 
     @staticmethod
-    def _validate_question_prefetched(
+    def _validate_question(
         total: suggestion_models.QuestionSubmitterTotalContributionStatsModel,
         contributions: List[
             suggestion_models.QuestionContributionStatsModel],

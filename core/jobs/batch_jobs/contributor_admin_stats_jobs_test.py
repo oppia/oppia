@@ -2201,7 +2201,7 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
         self.assert_job_output_is([
             # Count of invalid totals.
             job_run_result.JobRunResult(
-                stdout='Invalid Translation Submitter Models FAILED: 1'
+                stdout='Invalid Total Translation Submitter Models FAILED: 1'
             ),
             # The detailed validation error log itself.
             job_run_result.JobRunResult(
@@ -2330,7 +2330,7 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
         self.assert_job_output_is([
             # Count of invalids (always on stdout, even for errors).
             job_run_result.JobRunResult(
-                stdout='Invalid Question Submitter Models FAILED: 1'
+                stdout='Invalid Total Question Submitter Models FAILED: 1'
             ),
             # The detailed stderr log.
             job_run_result.JobRunResult(
@@ -2742,4 +2742,150 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
         self.assert_job_output_is([
             job_run_result.JobRunResult(
                 stdout='Valid Question Submitter Models SUCCESS: 1')
+        ])
+
+    def test_translation_missing_total_emits_missing_log(self) -> None:
+        # Test missing TranslationSubmitterTotalContributionStatsModel.
+
+        # Here we use type Any because this list contains models of various
+        # kinds.
+        models_to_put: List[Any] = []
+
+        # 1) Create an exploration opportunity so the suggestion is considered.
+        exp_opportunity = self.create_model(
+            opportunity_models.ExplorationOpportunitySummaryModel,
+            id='exp_missing_total',
+            topic_id='topic_missing',
+            chapter_title='irrelevant',
+            content_count=1,
+            story_id='story_missing',
+            story_title='story title',
+            topic_name='topic_missing'
+        )
+        exp_opportunity.update_timestamps()
+        models_to_put.append(exp_opportunity)
+
+        # 2) TranslationContributionStatsModel.
+        contrib = self.create_model(
+            suggestion_models.TranslationContributionStatsModel,
+            id=101,
+            contributor_user_id='u1',
+            language_code='lang1',
+            topic_id='topic_missing',
+            submitted_translations_count=2,
+            submitted_translation_word_count=20,
+            accepted_translations_count=1,
+            accepted_translations_without_reviewer_edits_count=0,
+            accepted_translation_word_count=10,
+            rejected_translations_count=1,
+            rejected_translation_word_count=10,
+            contribution_dates=self.CONTRIBUTION_DATES
+        )
+        contrib.update_timestamps()
+        models_to_put.append(contrib)
+
+        # 3) One GeneralSuggestionModel for translation authored by u1/lang1.
+        sugg = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            id=102,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id='exp_missing_total',
+            target_version_at_submission=1,
+            status='accepted',
+            author_id='u1',
+            final_reviewer_id='rev',
+            change_cmd={},
+            score_category='translation.X',
+            language_code='lang1',
+            edited_by_reviewer=False,
+            created_on=datetime.datetime.utcnow()
+        )
+        models_to_put.append(sugg)
+
+        self.put_multi(models_to_put)
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout='Missing Total Translation Submitter Models FAILED: 1'),
+            job_run_result.JobRunResult(
+                stderr=(
+                    'ERROR: \"Missing '
+                    'TranslationSubmitterTotalContributionStatsModel for key '
+                    '(\'u1\', \'lang1\'):\n'
+                    '-> TranslationContributionStatsModel:\n'
+                    '--101\n'
+                    '-> Translation GeneralSuggestionModel:\n'
+                    '--102\n\": 1'
+                )
+            )
+        ])
+
+    def test_question_missing_total_emits_missing_log(self) -> None:
+        # Test missing QuestionSubmitterTotalContributionStatsModel.
+
+        # Here we use type Any because this list contains models of various
+        # kinds.
+        models_to_put: List[Any] = []
+
+        # 1) Create a skill opportunity so the suggestion is considered.
+        skill_opportunity = self.create_model(
+            opportunity_models.SkillOpportunityModel,
+            id='exp_q_missing',
+            skill_description='A skill description',
+            question_count=1,
+        )
+        skill_opportunity.update_timestamps()
+        models_to_put.append(skill_opportunity)
+
+        # 2) QuestionContributionStatsModel (no matching total intentionally).
+        q_contrib = self.create_model(
+            suggestion_models.QuestionContributionStatsModel,
+            id=202,
+            contributor_user_id='uq',
+            topic_id='topic_q_missing',
+            submitted_questions_count=1,
+            accepted_questions_count=1,
+            accepted_questions_without_reviewer_edits_count=0,
+            first_contribution_date=self.CONTRIBUTION_DATES[0],
+            last_contribution_date=self.CONTRIBUTION_DATES[1]
+        )
+        q_contrib.update_timestamps()
+        models_to_put.append(q_contrib)
+
+        # 3) One GeneralSuggestionModel for question authored by uq.
+        qsugg = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            id=203,
+            suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id='exp_q_missing',
+            target_version_at_submission=1,
+            status='accepted',
+            author_id='uq',
+            final_reviewer_id='rev_q',
+            change_cmd={},
+            score_category='question.X',
+            language_code=None,
+            edited_by_reviewer=False,
+            created_on=datetime.datetime.utcnow()
+        )
+        models_to_put.append(qsugg)
+
+        self.put_multi(models_to_put)
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout='Missing Total Question Submitter Models FAILED: 1'),
+            job_run_result.JobRunResult(
+                stderr=(
+                    'ERROR: \"Missing '
+                    'QuestionSubmitterTotalContributionStatsModel for '
+                    'key uq:\n'
+                    '-> QuestionContributionStatsModel:\n'
+                    '--202\n'
+                    '-> Question GeneralSuggestionModel:\n'
+                    '--203\n\": 1'
+                )
+            )
         ])
