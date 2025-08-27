@@ -19,6 +19,7 @@
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
+import {TopicManager} from './topic-manager';
 
 const curriculumAdminThumbnailImage =
   testConstants.data.curriculumAdminThumbnailImage;
@@ -293,8 +294,9 @@ const toggleSkillEditOptionsButton =
 const mobileSaveSkillButton = '.e2e-test-mobile-save-skill-changes';
 const mobilePreviewTab = '.e2e-test-mobile-preview-tab';
 const navigationDropdown = '.e2e-test-mobile-skill-nav-dropdown-icon';
+const addNewSkillButton = '.e2e-test-create-skill-button-circle';
 
-export class CurriculumAdmin extends BaseUser {
+export class CurriculumAdmin extends TopicManager {
   /**
    * Navigate to the topic and skills dashboard page.
    */
@@ -305,32 +307,21 @@ export class CurriculumAdmin extends BaseUser {
   }
 
   /**
-   * Create a skill for a particular topic.
-   * @param {string} description - The description of the skill to be created.
-   * @param {string} topicName - The name of the topic for which the skill is
-   * to be created.
-   * @param {boolean} addWorkedExample - True if the skill should have a
-   * WorkedExample, false otherwise.
+   * Fills the skill info and submits the form.
+   * @param skillName The name of the skill.
+   * @param reviewMaterial The review material text content.
+   * @param addWorkedExample Whether to add a worked example.
    */
-  async createSkillForTopic(
-    description: string,
-    topicName: string,
+  async fillSkillInfoAndSubmit(
+    skillName: string,
+    reviewMaterial: string,
     addWorkedExample: boolean = false
   ): Promise<void> {
-    await this.openTopicEditor(topicName);
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(subtopicReassignHeader);
-    }
-    await this.page.waitForSelector(addSkillButton);
-    await this.clickOn(addSkillButton);
-    await this.type(skillDescriptionField, description);
+    await this.type(skillDescriptionField, skillName);
     await this.page.waitForSelector(skillReviewMaterialHeader);
     await this.clickOn(skillReviewMaterialHeader);
     await this.clickOn(richTextAreaField);
-    await this.type(
-      richTextAreaField,
-      `Review material text content for ${description}.`
-    );
+    await this.type(richTextAreaField, reviewMaterial);
     if (addWorkedExample) {
       await this.clickOn(insertWorkedExampleButton);
       await this.page.waitForSelector(editWorkedExampleModalQuestionRte, {
@@ -355,6 +346,32 @@ export class CurriculumAdmin extends BaseUser {
       hidden: true,
     });
     await this.page.bringToFront();
+  }
+
+  /**
+   * Create a skill for a particular topic.
+   * @param {string} description - The description of the skill to be created.
+   * @param {string} topicName - The name of the topic for which the skill is
+   * to be created.
+   * @param {boolean} addWorkedExample - True if the skill should have a
+   * WorkedExample, false otherwise.
+   */
+  async createSkillForTopic(
+    description: string,
+    topicName: string,
+    addWorkedExample: boolean = false
+  ): Promise<void> {
+    await this.openTopicEditor(topicName);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(subtopicReassignHeader);
+    }
+    await this.page.waitForSelector(addSkillButton);
+    await this.clickOn(addSkillButton);
+    await this.fillSkillInfoAndSubmit(
+      description,
+      `Review material text content for ${description}.`,
+      addWorkedExample
+    );
   }
 
   /**
@@ -2497,6 +2514,23 @@ export class CurriculumAdmin extends BaseUser {
     );
     await this.addTopicToClassroom(classroomName, topicToBeAssigned);
     await this.publishClassroom(classroomName);
+  }
+
+  /**
+   * Create a skill.
+   * @param {string} skillName - The name of the skill.
+   * @param {string} reviewMaterial - The review material of the skill.
+   */
+  async createSkillFromSkillsDashboard(
+    skillName: string,
+    reviewMaterial: string
+  ) {
+    await this.navigateToTopicAndSkillsDashboardPage();
+
+    await this.navigateToSkillsTab();
+    await this.expectElementToBeVisible(addNewSkillButton);
+    await this.clickOn(addNewSkillButton);
+    await this.fillSkillInfoAndSubmit(skillName, reviewMaterial);
   }
 }
 

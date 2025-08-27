@@ -257,7 +257,40 @@ const removeSkillModalHeaderSelector =
 const addMisconceptionHeaderSelector =
   '.e2e-test-oppia-misconception-card-header';
 
+const topicAndSkillsOptionInProfileMenu =
+  '.e2e-test-topics-and-skills-dashboard-link';
+const topicAndSkillsDashboardPageSelector =
+  '.e2e-test-topic-and-skills-dashboard';
+const navbarBreadcrumbSelector = 'oppia-navbar-breadcrumb';
+const resetTopicFilterButtonSelector = '.e2e-test-topic-filter-reset';
+
 export class TopicManager extends BaseUser {
+  /**
+   * Resets the topic filter in Topic and Skills Dashboard.
+   */
+  async resetTopicFilter(): Promise<void> {
+    await this.expectElementToBeVisible(resetTopicFilterButtonSelector);
+    await this.clickOn(resetTopicFilterButtonSelector);
+  }
+  /**
+   * Clicks on Topics and Skills Dashboard option in the profile menu.
+   * It does not open the menu.
+   */
+  async clickOnTopicAndSkillsOptionInProfileMenu(): Promise<void> {
+    await this.expectElementToBeVisible(topicAndSkillsOptionInProfileMenu);
+    await this.clickOn(topicAndSkillsOptionInProfileMenu);
+    await this.expectElementToBeVisible(topicAndSkillsDashboardPageSelector);
+  }
+
+  /**
+   * Checks if the breadcrumb in the navbar contains the given text.
+   * @param text The text to check for.
+   */
+  async expectNavbarBreadcrumbToContain(text: string): Promise<void> {
+    await this.expectElementToBeVisible(navbarBreadcrumbSelector);
+    await this.expectTextContentToContain(navbarBreadcrumbSelector, text);
+  }
+
   /**
    * Navigate to the topic and skills dashboard page.
    */
@@ -265,6 +298,25 @@ export class TopicManager extends BaseUser {
     await this.page.bringToFront();
     await this.waitForNetworkIdle();
     await this.goto(topicAndSkillsDashboardUrl);
+    await this.expectElementToBeVisible(topicAndSkillsDashboardPageSelector);
+  }
+
+  /**
+   * Checks if the topic name field and topic url field are disabled.
+   */
+  async expectTopicNameAndTopicURLInputToBeDisabled(): Promise<void> {
+    await this.page.waitForFunction(
+      (selector1: string, selector2: string) => {
+        const element1: HTMLInputElement | null =
+          document.querySelector(selector1);
+        const element2: HTMLInputElement | null =
+          document.querySelector(selector2);
+        return element1 && element1.disabled && element2 && element2.disabled;
+      },
+      {},
+      topicNameField,
+      topicEditorUrlFragmentField
+    );
   }
 
   /**
@@ -550,9 +602,11 @@ export class TopicManager extends BaseUser {
 
   /**
    * Filters topics by status.
-   * @param {string} status - The status to filter by.
+   * @param {'Published' | 'Not Published' | 'All'} status - The status to filter by.
    */
-  async filterTopicsByStatus(status: string): Promise<void> {
+  async filterTopicsByStatus(
+    status: 'Published' | 'Not Published' | 'All'
+  ): Promise<void> {
     try {
       await this.navigateToTopicAndSkillsDashboardPage();
       if (this.isViewportAtMobileWidth()) {
@@ -633,11 +687,44 @@ export class TopicManager extends BaseUser {
     }
   }
 
+  async expectKeywordsSelectedToBe(keywords: string[]) {
+    if (keywords.length === 0) {
+      await this.expectElementToBeVisible(
+        multiSelectionInputChipSelector,
+        false
+      );
+
+      return;
+    }
+    const keywordChips = await this.page.$$eval(
+      multiSelectionInputChipSelector,
+      chips => chips.map(chip => chip.textContent?.trim())
+    );
+    expect(keywordChips.length).toBe(keywords.length);
+
+    const missedKeywords = keywords.filter(
+      keyword => !keywordChips.includes(`${keyword} cancel`)
+    );
+
+    if (missedKeywords.length > 0) {
+      throw new Error(
+        `Keywords ${missedKeywords.join(', ')} were not found in the multi-selection input.\n` +
+          `Keywords found: ${keywordChips.join(', ')}`
+      );
+    }
+  }
+
   /**
    * Sorts topics by a given option.
    * @param {string} sortOption - The option to sort by.
    */
-  async sortTopics(sortOption: string): Promise<void> {
+  async sortTopics(
+    sortOption:
+      | 'Least Recently Updated'
+      | 'Most Recently Updated'
+      | 'Newly Created'
+      | 'Oldest Created'
+  ): Promise<void> {
     try {
       await this.navigateToTopicAndSkillsDashboardPage();
       if (this.isViewportAtMobileWidth()) {
@@ -662,49 +749,50 @@ export class TopicManager extends BaseUser {
   /**
    * Checks if the filtered topics match the expected topics.
    * @param {string[]} expectedTopics - The expected topics.
+   * @param {boolean} visible - Whether the topics should be visible.
    */
-  async expectFilteredTopics(expectedTopics: string[]): Promise<void> {
-    const isMobileViewport = this.isViewportAtMobileWidth();
-    const topicNameSelector = isMobileViewport
+  async expectFilteredTopics(
+    expectedTopics: string[],
+    visible: boolean = true
+  ): Promise<void> {
+    const topicNameSelector = this.isViewportAtMobileWidth()
       ? mobileTopicSelector
       : desktopTopicSelector;
-    try {
-      await this.waitForStaticAssetsToLoad();
-      const topicElements = await this.page.$$(topicNameSelector);
+    await this.waitForStaticAssetsToLoad();
+    const topicElements = await this.page.$$(topicNameSelector);
 
-      if (expectedTopics.length === 0) {
-        if (topicElements.length !== 0) {
-          throw new Error('Expected no topics, but some were found.');
-        }
-        showMessage('No topics found, as expected.');
-        return;
-      }
-
-      if (!topicElements || topicElements.length === 0) {
-        throw new Error(`No elements found for selector ${topicNameSelector}`);
-      }
-
-      const topicNames = await Promise.all(
-        topicElements.map(element =>
-          this.page.evaluate(el => el.textContent.trim(), element)
-        )
-      );
-
-      const missingTopics = expectedTopics.filter(
-        topic => !topicNames.includes(topic)
-      );
-
-      if (missingTopics.length > 0) {
-        throw new Error(
-          `Expected topics ${missingTopics.join(', ')} to be present, but they were not found.`
-        );
-      }
-
-      showMessage('Filtered topics match the expected topics.');
-    } catch (error) {
-      console.error(error.stack);
-      throw error;
+    if (expectedTopics.length == 0) {
+      throw new Error("Topics list can't be empty");
     }
+
+    const topicNames = await Promise.all(
+      topicElements.map(element =>
+        this.page.evaluate(el => el.textContent.trim(), element)
+      )
+    );
+
+    const missingTopics = expectedTopics.filter(
+      topic => !topicNames.includes(topic)
+    );
+    const matchedTopics = topicNames.filter(topic =>
+      expectedTopics.includes(topic)
+    );
+
+    if (visible && missingTopics.length > 0) {
+      throw new Error(
+        `Expected topics "${missingTopics.join('", "')}" to be present, but they were not found.\n` +
+          `Found topics: "${topicNames.join('", "')}"`
+      );
+    }
+
+    if (!visible && matchedTopics.length > 0) {
+      throw new Error(
+        `Expected topics "${matchedTopics.join('", "')}" to not be present, but they were found.\n` +
+          `Found topics: "${topicNames.join('", "')}"`
+      );
+    }
+
+    showMessage('Filtered topics match the expected topics.');
   }
 
   /**
@@ -712,28 +800,26 @@ export class TopicManager extends BaseUser {
    * @param {string[]} expectedOrder - The expected order of topics.
    */
   async expectFilteredTopicsInOrder(expectedOrder: string[]): Promise<void> {
-    const isMobileViewport = this.isViewportAtMobileWidth();
-    const topicNameSelector = isMobileViewport
+    const topicNameSelector = this.isViewportAtMobileWidth()
       ? mobileTopicSelector
       : desktopTopicSelector;
 
-    try {
-      await this.waitForStaticAssetsToLoad();
-      await this.page.waitForSelector(topicNameSelector);
-      const topicElements = await this.page.$$(topicNameSelector);
-      const topicNames = await Promise.all(
-        topicElements.map(element =>
-          this.page.evaluate(el => el.textContent.trim(), element)
-        )
+    await this.waitForStaticAssetsToLoad();
+    await this.page.waitForSelector(topicNameSelector);
+    const topicElements = await this.page.$$(topicNameSelector);
+    const topicNames = await Promise.all(
+      topicElements.map(element =>
+        this.page.evaluate(el => el.textContent.trim(), element)
+      )
+    );
+    if (!topicNames.every((name, index) => name === expectedOrder[index])) {
+      throw new Error(
+        'Topics are not in the expected order.\n' +
+          `Expected topics: "${expectedOrder.join('", "')}"\n` +
+          `Found topics: "${topicNames.join('", "')}"`
       );
-      if (!topicNames.every((name, index) => name === expectedOrder[index])) {
-        throw new Error('Topics are not in the expected order.');
-      }
-      showMessage('Topics are in the expected order.');
-    } catch (error) {
-      console.error(error.stack);
-      throw error;
     }
+    showMessage('Topics are in the expected order.');
   }
 
   /**
@@ -1610,50 +1696,47 @@ export class TopicManager extends BaseUser {
   /**
    * Expects the filtered skills to match the provided list.
    * @param {string[]} expectedSkills - The expected list of skills.
-   * @returns {Promise<void>}
+   * @param {boolean} visible - Whether the skills should be visible or not.
    */
-  async expectFilteredSkills(expectedSkills: string[]): Promise<void> {
-    const isMobileViewport = this.isViewportAtMobileWidth();
-    const skillNameSelector = isMobileViewport
+  async expectFilteredSkills(
+    expectedSkills: string[],
+    visible: boolean = true
+  ): Promise<void> {
+    const skillNameSelector = this.isViewportAtMobileWidth()
       ? mobileSkillSelector
       : desktopSkillSelector;
-    try {
-      await this.waitForStaticAssetsToLoad();
-      const topicElements = await this.page.$$(skillNameSelector);
+    await this.waitForStaticAssetsToLoad();
+    const topicElements = await this.page.$$(skillNameSelector);
 
-      if (expectedSkills.length === 0) {
-        if (topicElements.length !== 0) {
-          throw new Error('Expected no skills, but some were found.');
-        }
-        showMessage('No skills found, as expected.');
-        return;
-      }
-
-      if (!topicElements || topicElements.length === 0) {
-        throw new Error(`No elements found for selector ${skillNameSelector}`);
-      }
-
-      const topicNames = await Promise.all(
-        topicElements.map(element =>
-          this.page.evaluate(el => el.textContent.trim(), element)
-        )
-      );
-
-      const missingTopics = expectedSkills.filter(
-        topic => !topicNames.includes(topic)
-      );
-
-      if (missingTopics.length > 0) {
-        throw new Error(
-          `Expected skill ${missingTopics.join(', ')} to be present, but they were not found.`
-        );
-      }
-
-      showMessage('Filtered skills match the expected skills.');
-    } catch (error) {
-      console.error(error.stack);
-      throw error;
+    if (expectedSkills.length === 0) {
+      throw new Error(`Expected skills should not be empty`);
     }
+
+    const skillNames = await Promise.all(
+      topicElements.map(element =>
+        this.page.evaluate(el => el.textContent.trim(), element)
+      )
+    );
+
+    const missingSkills = expectedSkills.filter(
+      topic => !skillNames.includes(topic)
+    );
+    const matchedSkills = skillNames.filter(topic =>
+      expectedSkills.includes(topic)
+    );
+
+    if (visible && missingSkills.length > 0) {
+      throw new Error(
+        `Expected skill ${missingSkills.join(', ')} to be present, but they were not found.`
+      );
+    }
+    if (!visible && matchedSkills.length > 0) {
+      throw new Error(
+        `Expected skill ${matchedSkills.join(', ')} to not be present, but they were found.`
+      );
+    }
+
+    showMessage('Filtered skills match the expected skills.');
   }
 
   /**

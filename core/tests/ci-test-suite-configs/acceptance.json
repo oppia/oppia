@@ -555,6 +555,14 @@
     {
       "name": "blog-post-writer/create-and-edit-blog-post",
       "module": "core/tests/puppeteer-acceptance-tests/specs/blog-post-writer/create-and-edit-blog-post.spec.ts"
+    },
+    {
+      "name": "topic-manager/access-dashboard-using-profile-dropdown",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/access-dashboard-using-profile-dropdown.spec.ts"
+    },
+    {
+      "name": "topic-manager/edit-the-topic",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/edit-the-topic.spec.ts"
     }
   ],
   "docker_suites": []
