@@ -2,7 +2,6 @@
 	align-items: center;
 	display: flex;
 	position: relative;
-	width: 448px;
 }
 
 .multiple-checkpoints-bar {
@@ -61,3 +60,4 @@
 	width: 12px;
 	z-index: 111;
 }
+

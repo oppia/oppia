@@ -16,3 +16,32 @@
   align-items: center;
   justify-content: space-between;
 }
+
+oppia-checkpoint-bar {
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .progress-tracker-container button {
+    margin-left: 10px;
+    margin-right: 22px;
+  }
+
+  .progress-tracker-container button mat-icon {
+    display: none;
+  }
+}
+
+/* @media (max-width: 480px) {
+
+} */
+
+@media (max-width: 320px) {
+  .progress-tracker-container button {
+    font-size: 13px;
+    margin-left: 5px;
+    margin-right: 43px;
+    padding: 5px;
+    width: 40px;
+  }
+}
