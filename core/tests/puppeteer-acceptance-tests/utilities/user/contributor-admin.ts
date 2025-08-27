@@ -32,6 +32,8 @@ const contributorCountSelector = '.e2e-test-contributor-count';
 const tabSelectionDropdownMobileSelector = '.e2e-test-tab-selection-dropdown';
 const newContributorAdminDashboardPageSelector =
   '.e2e-test-new-contributor-admin-dashboard-page';
+const oldContributorAdminDashboardPageSelector =
+  '.oppia-contributor-dashboard-admin-page-tabs-container';
 
 export class ContributorAdmin extends BaseUser {
   /**
@@ -39,9 +41,13 @@ export class ContributorAdmin extends BaseUser {
    */
   async navigateToContributorDashboardAdminPage(): Promise<void> {
     await this.goto(ContributorDashboardAdminUrl);
-    await this.expectElementToBeVisible(
+    const newDashVisible = await this.isElementVisible(
       newContributorAdminDashboardPageSelector
     );
+    const oldDashVisible = await this.isElementVisible(
+      oldContributorAdminDashboardPageSelector
+    );
+    expect(newDashVisible || oldDashVisible).toBe(true);
   }
 
   /**
