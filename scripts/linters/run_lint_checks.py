@@ -68,6 +68,7 @@ from scripts import common
 from typing import Dict, List, Optional, Set, Tuple
 
 # Install third party dependencies before proceeding.
+from . import circular_dependency_linter  # isort:skip
 from . import codeowner_linter  # isort:skip
 from . import css_linter  # isort:skip
 from . import general_purpose_linter  # isort:skip
@@ -225,6 +226,14 @@ def _get_linters_for_file_extension(
         )
         custom_linters.append(js_ts_lint_check_manager)
         third_party_linters.append(third_party_js_ts_linter)
+
+        # Add circular dependency checks for JS/TS files.
+        circular_dependency_custom_linter, circular_dependency_third_party_linter = (
+            circular_dependency_linter.get_linters(
+                files['.js'], files['.ts'], file_cache)
+        )
+        custom_linters.append(circular_dependency_custom_linter)
+        third_party_linters.append(circular_dependency_third_party_linter)
 
     elif file_extension_to_lint == 'html':
         html_lint_check_manager, third_party_html_linter = (

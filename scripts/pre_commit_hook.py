@@ -190,6 +190,48 @@ def check_changes_in_config() -> None:
                 CONSTANTS_FILEPATH))
 
 
+def run_circular_dependency_checks() -> None:
+    """Runs circular dependency checks on modified JS/TS files."""
+    import subprocess
+    import os
+    
+    # Get list of modified JS/TS files.
+    try:
+        staged_files = subprocess.check_output([
+            'git', 'diff', '--cached', '--name-only',
+            '--diff-filter=ACM'
+        ]).decode('utf-8').splitlines()
+        
+        js_ts_files = [
+            f for f in staged_files 
+            if f.endswith(('.ts', '.js')) and not f.endswith(('.spec.ts', '.test.ts'))
+        ]
+        
+        if js_ts_files:
+            print(f'Checking {len(js_ts_files)} modified JS/TS files for circular dependencies...')
+            # Run our circular dependency check script.
+            result = subprocess.run([
+                'python', '-m', 'scripts.run_circular_dependency_checks',
+                '--files'] + js_ts_files,
+                capture_output=True, text=True
+            )
+            
+            if result.returncode != 0:
+                print('-----------COMMIT ABORTED-----------')
+                print('Circular dependencies detected in modified files:')
+                print(result.stdout)
+                print(result.stderr)
+                print('Please fix the circular dependencies before committing.')
+                sys.exit(1)
+            else:
+                print('✓ No circular dependencies found in modified files.')
+        else:
+            print('No JS/TS files modified, skipping circular dependency check.')
+    except subprocess.CalledProcessError as e:
+        print(f'Error checking for modified files: {e}')
+        print('Skipping circular dependency check.')
+
+
 def run_prettier() -> None:
     """Runs prettier formatter."""
     subprocess.run([NPX_CMD, 'lint-staged'], check=True)
@@ -210,6 +252,8 @@ def main(args: Optional[List[str]] = None) -> None:
 
     print('Running pre-commit check for feconf and constants ...')
     check_changes_in_config()
+    print('Running circular dependency checks...')
+    run_circular_dependency_checks()
     print('Running pre-commit check for package-lock.json ...')
     if does_diff_include_package_lock_file() and (
             does_current_folder_contain_have_package_lock_file()):

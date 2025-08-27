@@ -106,6 +106,7 @@
     "karma-webpack": "^4.0.0-rc.3",
     "lint-staged": "~13.0.3",
     "loader-utils": "^2.0.0",
+    "madge": "^6.1.0",
     "mini-css-extract-plugin": "^1.6.2",
     "mocha": "^9.0.0",
     "nyc": "^15.1.0",
