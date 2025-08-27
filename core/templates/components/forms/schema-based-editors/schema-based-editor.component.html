@@ -1,4 +1,4 @@
-<form #hybridForm="ngForm" [class.disabled]="disabled">
+<form #hybridForm="ngForm">
   <!-- Choices-based editor -->
   <schema-based-choices-editor *ngIf="schema['choices']"
                                [(ngModel)]="localValue"
