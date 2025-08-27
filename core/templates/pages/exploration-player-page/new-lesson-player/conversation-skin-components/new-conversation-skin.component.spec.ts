@@ -101,7 +101,7 @@ class MockWindowRef {
   };
 }
 
-describe('Conversation skin component', () => {
+describe('New Conversation skin component', () => {
   let fixture: ComponentFixture<NewConversationSkinComponent>;
   let componentInstance: NewConversationSkinComponent;
   let chapterProgressService: ChapterProgressService;

@@ -19,25 +19,25 @@
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
-import {ProgressReminderModalComponent} from './progress-reminder-modal.component';
-import {I18nLanguageCodeService} from '../../../../services/i18n-language-code.service';
+import {MockTranslatePipe} from '../../../../../tests/unit-test-utils';
+import {NewProgressReminderModalComponent} from './new-progress-reminder-modal.component';
+import {I18nLanguageCodeService} from '../../../../../services/i18n-language-code.service';
 
 describe('Progress reminder modal component', () => {
-  let fixture: ComponentFixture<ProgressReminderModalComponent>;
-  let component: ProgressReminderModalComponent;
+  let fixture: ComponentFixture<NewProgressReminderModalComponent>;
+  let component: NewProgressReminderModalComponent;
   let i18nLanguageCodeService: I18nLanguageCodeService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ProgressReminderModalComponent, MockTranslatePipe],
+      declarations: [NewProgressReminderModalComponent, MockTranslatePipe],
       providers: [NgbActiveModal, I18nLanguageCodeService],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ProgressReminderModalComponent);
+    fixture = TestBed.createComponent(NewProgressReminderModalComponent);
     component = fixture.componentInstance;
     i18nLanguageCodeService = TestBed.get(I18nLanguageCodeService);
   });
