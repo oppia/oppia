@@ -1079,9 +1079,10 @@ class CsrfTokenHandler(BaseHandler[Dict[str, str], Dict[str, str]]):
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-    # Here we use MyPy ignore because the signature of 'get' method is not
-    # compatible with super class's (BaseHandler) 'get' method.
-    def get(self) -> None:  # type: ignore[override]
+    # Previously this method used `# type: ignore[override]` to silence
+    # a false-positive in older versions of mypy (<1.0). Since mypy ≥1.0
+    # correctly recognizes this override, the ignore is no longer needed.
+    def get(self) -> None:
         csrf_token = CsrfTokenManager.create_csrf_token(
             self.user_id)
         self.render_json({

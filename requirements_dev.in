@@ -18,3 +18,7 @@ pyyaml==6.0
 rcssmin==1.1.1
 webtest==3.0.0
 xmltodict==0.13.0
+types-PyYAML==6.0.12.20250822
+types-bleach==6.2.0.20250809
+types-protobuf==6.30.2.20250822
+types-requests==2.32.4.20250809

@@ -35,7 +35,7 @@ class EntityVoiceoversDict(TypedDict):
     entity_version: int
     language_accent_code: str
     voiceovers_mapping: Dict[str, Dict[
-        feconf.VoiceoverType.value, Optional[state_domain.VoiceoverDict]]]
+        str, Optional[state_domain.VoiceoverDict]]]
     automated_voiceovers_audio_offsets_msecs: Dict[
         str, List[Dict[str, Union[str, float]]]]
 
@@ -100,7 +100,7 @@ class EntityVoiceovers:
             EntityVoiceovers object.
         """
         content_id_to_voiceovers_dict: Dict[str, Dict[
-            feconf.VoiceoverType.value, Optional[state_domain.VoiceoverDict]]
+            str, Optional[state_domain.VoiceoverDict]]
         ] = {}
 
         for content_id, voiceover_type_to_voiceover in (

@@ -2104,7 +2104,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
         user_services.record_user_started_state_editor_tutorial(user_id)
         user_settings = user_services.get_user_settings(user_id)
-        
+
         assert user_settings.last_started_state_editor_tutorial is not None
         assert prev_started_state is not None
 
@@ -3263,7 +3263,8 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
         self.get_html_response(feconf.LIBRARY_INDEX_URL)
 
         assert last_logged_in is not None
-        new_last_logged_in = user_services.get_user_settings(self.viewer_id).last_logged_in
+        user_settings = user_services.get_user_settings(self.viewer_id)
+        new_last_logged_in = user_settings.last_logged_in
         assert new_last_logged_in is not None
         
         self.assertLess(
@@ -3295,8 +3296,9 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
         with self.mock_datetime_utcnow(mocked_datetime_utcnow):
             self.login(self.VIEWER_EMAIL)
             self.get_html_response(feconf.LIBRARY_INDEX_URL)
-            
-            last_logged_in = user_services.get_user_settings(self.viewer_id).last_logged_in
+
+            user_settings = user_services.get_user_settings(self.viewer_id)
+            last_logged_in = user_settings.last_logged_in
             assert last_logged_in is not None
             assert previous_last_logged_in_datetime is not None
             
@@ -3374,7 +3376,7 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
                 'property_name': 'objective',
                 'new_value': 'new objective'
             })], 'Test edit 2')
-
+        
         # Make sure last exploration edited time gets updated.
         editor_settings = user_services.get_user_settings(self.editor_id)
         

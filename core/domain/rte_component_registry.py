@@ -131,11 +131,9 @@ class Registry:
                 module = importlib.util.module_from_spec(spec)
                 # Ruling out the possibility of None for mypy type checking.
                 assert spec.loader is not None
-                # Here we use cast because we are narrowing down the type of
-                # 'spec.loader' from Optional[_Loader] to the more specific
-                # importlib.abc.Loader type.
-                loader_with_exec = cast(importlib.abc.Loader, spec.loader)
-                loader_with_exec.exec_module(module)
+                # Since mypy ≥1.0 correctly infers spec.loader as Loader after the
+                # None-check above, no cast is needed anymore.
+                spec.loader.exec_module(module)
                 break
         else:
             return {}

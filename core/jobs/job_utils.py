@@ -25,7 +25,7 @@ from core.platform import models
 from apache_beam.io.gcp.datastore.v1new import types as beam_datastore_types
 from google.cloud.ndb import model as ndb_model
 from google.cloud.ndb import query as ndb_query
-from typing import Any, List, Optional, Tuple, Type, Union
+from typing import Any, List, Optional, Tuple, Type, Union, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -102,8 +102,11 @@ def get_model_class(kind: Optional[str]) -> Type[datastore_services.Model]:
     # separate workers and some parts of the jobs are probably not available
     # to all the workers.
     models.Registry.get_all_storage_model_classes()
-    return datastore_services.Model._lookup_model( # pylint: disable=protected-access
-        kind
+    # Here use cast because _lookup_model returns Optional[Model] or a less
+    # precise type, but we know it will return a Model subclass type here,
+    # so we cast to clarify the type.
+    return cast(Type[datastore_services.Model],
+        datastore_services.Model._lookup_model(kind) # pylint: disable=protected-access
     )
 
 

@@ -40,7 +40,11 @@ INVALID_DOCSTRING_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_docstring.py')
 
 NAME_SPACE = multiprocessing.Manager().Namespace()
-PROCESSES: Dict[str, List[str]] = multiprocessing.Manager().dict()
+# Here we use MyPy ignore because multiprocessing.Manager().dict()
+# returns a proxy dict incompatible with Dict[str, List[str]].
+PROCESSES: Dict[
+    str, List[str]
+] = multiprocessing.Manager().dict() # type: ignore[assignment]
 NAME_SPACE.files = run_lint_checks.FileCache()
 FILE_CACHE = NAME_SPACE.files
 

@@ -396,7 +396,10 @@ class Question(translation_domain.BaseTranslatableObject):
         Returns:
             dict. The converted question_state_dict.
         """
-        voiceovers_mapping = question_state_dict.pop(
+        # Here we use MyPy ignore because 'content_ids_to_audio_translations'
+        # key existed only in schema v27 and is removed in the latest StateDict.
+        # This migration accesses v27 data, so ignoring is safe.
+        voiceovers_mapping = question_state_dict.pop( # type: ignore[typeddict-item]
             'content_ids_to_audio_translations')
 
         # Here we use MyPy ignore because the latest schema of state

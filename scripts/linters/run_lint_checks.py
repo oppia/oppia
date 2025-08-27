@@ -643,7 +643,11 @@ def main(args: Optional[List[str]] = None) -> None:
         return
 
     read_files(all_filepaths, namespace=namespace)
-    files: Dict[str, List[str]] = multiprocessing.Manager().dict()
+    # Here we use MyPy ignore because multiprocessing.Manager().dict()
+    # returns a proxy dict incompatible with Dict[str, List[str]].
+    files: Dict[
+        str, List[str]
+    ] = multiprocessing.Manager().dict() # type: ignore[assignment]
     categorize_files(all_filepaths, files)
 
     # Prepare custom tasks.

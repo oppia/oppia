@@ -1593,10 +1593,11 @@ class VersionedModel(BaseModel):
         version: Optional[int] = None
     ) -> Optional[SELF_VERSIONED_MODEL]: ...
 
-    # Here we use MyPy ignore because the signature of this method
-    # doesn't match with BaseModel.get().
+    # Previously this method used `# type: ignore[override]` to silence
+    # a false-positive in older versions of mypy (<1.0). Since mypy ≥1.0
+    # correctly recognizes this override, the ignore is no longer needed.
     @classmethod
-    def get(  # type: ignore[override]
+    def get(
         cls: Type[SELF_VERSIONED_MODEL],
         entity_id: str,
         strict: bool = True,

@@ -115,12 +115,11 @@ class JobMetaclass(type):
 
         job_cls = super(JobMetaclass, mcs).__new__(mcs, name, bases, namespace)
 
-        # Here we use cast because the return value of '__new__' method
-        # is 'type' but we want to return a more narrower type 'JobMetaclass'.
-        # So, to narrow down the type from 'type' to 'JobMetaclass', we used
-        # cast here.
+        # In mypy <1.0 we needed a cast(JobMetaclass, job_cls) here,
+        # because mypy treated super().__new__ as returning only `type`.
+        # Since mypy ≥1.0 correctly infers `JobMetaclass`, the cast is redundant.
         if name == 'JobBase':
-            return cast(JobMetaclass, job_cls)
+            return job_cls
 
         if not name.endswith('Base'):
             if issubclass(job_cls, JobBase):
@@ -132,11 +131,10 @@ class JobMetaclass(type):
             else:
                 raise TypeError('%s must inherit from JobBase' % name)
 
-        # Here we use cast because the return value of '__new__' method
-        # is 'type' but we want to return a more narrower type 'JobMetaclass'.
-        # So, to narrow down the type from 'type' to 'JobMetaclass', we used
-        # cast here.
-        return cast(JobMetaclass, job_cls)
+        # In mypy <1.0 we needed a cast(JobMetaclass, job_cls) here,
+        # because mypy treated super().__new__ as returning only `type`.
+        # Since mypy ≥1.0 correctly infers `JobMetaclass`, the cast is redundant.
+        return job_cls
 
     @classmethod
     def get_all_jobs(mcs) -> List[Type[JobBase]]:

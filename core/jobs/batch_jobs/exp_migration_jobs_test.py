@@ -1290,8 +1290,14 @@ class ExpSnapshotsMigrationAuditJobTests(
 
         # Make a mock conversion function that raises an error when trying to
         # convert the old snapshot.
+        # Here we use MyPy ignore because this lambda intentionally returns Any
+        # to simulate an error during migration and does not conform
+        # to the declared return type.
         mock_conversion = classmethod(
-            lambda cls, exploration_dict: exploration_dict['property_that_dne'])
+            lambda cls, exploration_dict: (
+                exploration_dict['property_that_dne'] # type: ignore[no-any-return]
+            )
+        )
 
         with self.swap(
             exp_domain.Exploration, '_convert_states_v46_dict_to_v47_dict',
@@ -1732,8 +1738,14 @@ class ExpSnapshotsMigrationJobTests(
 
         # Make a mock conversion function that raises an error when trying to
         # convert the old snapshot.
+        # Here we use MyPy ignore because this lambda intentionally returns Any
+        # to simulate an error during migration and does not conform
+        # to the declared return type.
         mock_conversion = classmethod(
-            lambda cls, exploration_dict: exploration_dict['property_that_dne'])
+            lambda cls, exploration_dict: (
+                exploration_dict['property_that_dne'] # type: ignore[no-any-return]
+            )
+        )
 
         with self.swap(
             exp_domain.Exploration, '_convert_states_v46_dict_to_v47_dict',

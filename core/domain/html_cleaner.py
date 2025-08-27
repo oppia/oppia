@@ -114,8 +114,16 @@ def clean(user_submitted_html: str) -> str:
 
     # TODO(sll): Alert the caller if the input was changed due to this call.
     # TODO(sll): Add a log message if bad HTML is detected.
+    
+     # Here we use MyPy ignore because core_tags comes from external registry
+     # functions that return Dict[str, object] but bleach.clean expects
+     # Dict[str, List[str]]. The actual runtime values are compatible but
+     # MyPy cannot verify this due to the complex union types in bleach's
+     # type annotations.
     return bleach.clean(
-        user_submitted_html, tags=tag_names, attributes=core_tags, strip=True)
+        user_submitted_html, tags=tag_names,
+        attributes=core_tags, strip=True # type: ignore[arg-type]
+    )
 
 
 def strip_html_tags(html_string: str) -> str:
@@ -128,7 +136,12 @@ def strip_html_tags(html_string: str) -> str:
         str. The HTML string that results after all the tags and attributes are
         stripped out.
     """
-    return bleach.clean(html_string, tags=[], attributes={}, strip=True)
+    # Here we use MyPy ignore because bleach.clean's attributes parameter
+    # has a complex union type that doesn't include Dict[<nothing>, <nothing>]
+    # for empty dicts, but this is safe at runtime.
+    return bleach.clean(
+        html_string, tags=[], attributes={}, strip=True # type: ignore[arg-type]
+    )
 
 
 def get_image_filenames_from_html_strings(html_strings: List[str]) -> List[str]:
