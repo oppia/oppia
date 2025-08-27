@@ -1216,7 +1216,7 @@ export class BaseUser {
       error.message =
         `Text content of "${selector}" does not match the expected text.\n` +
         `Expected: "${text}", Found: "${actualTextContent}"\n` +
-        `Original Error:\n}` +
+        'Original Error:\n' +
         error.message;
       throw error;
     }

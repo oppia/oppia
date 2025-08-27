@@ -90,7 +90,7 @@ describe('Translation Coordinator', function () {
   it('should be able to remove translation rights', async function () {
     await translationCoordinator.clickOnAddReviewerOrSubmitterButton();
     await translationCoordinator.addUsernameInUsernameInputModal(
-      'loggedInUser1'
+      loggedInUser1.username ?? 'loggedInUser1'
     );
 
     await translationCoordinator.removeLanguageFromLanguageSelectorModal(

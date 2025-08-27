@@ -163,11 +163,10 @@ export class UserFactory {
           if (typeof args !== 'string') {
             throw new Error('Expected additional argument to be string.');
           }
-          const topic = args as string;
           await superAdminInstance.assignRoleToUser(
             user.username,
             ROLES.TOPIC_MANAGER,
-            topic
+            args as string
           );
           break;
         case ROLES.TRANSLATION_COORDINATOR:

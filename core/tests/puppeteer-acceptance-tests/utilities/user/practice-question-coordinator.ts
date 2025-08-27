@@ -16,21 +16,7 @@
  * @fileoverview Practice Question Coordinator role utility file.
  */
 
-import {ElementHandle} from 'puppeteer';
 import {BaseUser} from '../common/puppeteer-utils';
-import testConstants from '../common/test-constants';
-
-const languageSelectorModalSelector = '.e2e-test-language-selector-modal-body';
-const addLanguageButtonSelector = '.e2e-test-language-selector-add-button';
-const selectedLangaugeContainerSelector =
-  '.e2e-test-selected-language-container';
-const selectedLanguageSelector = '.e2e-test-selected-language';
-const closeButtonSelector = '.e2e-test-close-button';
-
-const languageSelectorInAdminPageSelector = '.e2e-test-language-selector';
-const languageOptionInAdminPageSelector = '.e2e-test-language-selector-option';
-const languageSelectorSelectedInAdminPageSelector =
-  '.e2e-test-language-selector-selected';
 
 const questionRoleEditorModalSelector =
   '.e2e-test-question-role-editor-container';

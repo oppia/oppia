@@ -61,7 +61,9 @@ describe('Practice Question Coordinator', function () {
 
     // Add translation rights.
     await questionCoordinator.clickOnAddReviewerOrSubmitterButton();
-    await questionCoordinator.addUsernameInUsernameInputModal('loggedInUser1');
+    await questionCoordinator.addUsernameInUsernameInputModal(
+      loggedInUser1.username ?? ''
+    );
     await questionCoordinator.expectScreenshotToMatch(
       'addQuestionRightsModal',
       __dirname

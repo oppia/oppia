@@ -56,7 +56,7 @@ export class ContributorAdmin extends BaseUser {
    */
   async switchToTabInContributorAdminPage(
     tabName: 'Translation Submitters' | 'Translation Reviewers'
-  ) {
+  ): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       // Remove last 's' from the tab name.
       const modifiedName = tabName.replace(/s$/, '');
