@@ -3386,10 +3386,10 @@ export class TopicManager extends BaseUser {
   }
 
   /**
-   * Check if the save changes button is enabled or disabled.
+   * Check if the save changes button is enabled or disabled in topic editor.
    * @param {'enabled' | 'disabled'} status - The status to check.
    */
-  async expectSaveChangesButtonToBe(
+  async expectSaveChangesButtonInTopicEditorToBe(
     status: 'enabled' | 'disabled'
   ): Promise<void> {
     await this.expectElementToBeVisible(saveTopicButton);
@@ -3417,6 +3417,19 @@ export class TopicManager extends BaseUser {
     await this.expectTextContentToBe(
       `.${previewSubtabClass}${activeTabSelector}`,
       tabName
+    );
+  }
+
+  /**
+   * Checks if the save changes button is enabled or disabled in the skill editor.
+   * @param {'enabled' | 'disabled'} status - The status to check.
+   */
+  async expectSaveChangesInSkillEditorToBe(
+    status: 'enabled' | 'disabled'
+  ): Promise<void> {
+    await this.expectElementToBeClickable(
+      saveOrPublishSkillSelector,
+      status === 'enabled'
     );
   }
 }
