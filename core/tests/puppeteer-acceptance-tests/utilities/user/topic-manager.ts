@@ -58,6 +58,8 @@ const confirmMoveButton = '.e2e-test-confirm-move-button';
 const mergeSkillsButtonMobile = '.e2e-test-mobile-merge-skills-button';
 const mergeSkillsButtonDesktop = '.e2e-test-merge-skills-button';
 const skillsTab = 'a.e2e-test-skills-tab';
+const skillsAssignmentSelector = '.e2e-test-skill-assignments';
+const skillNameAndStatusContainer = '.e2e-test-open-skill-editor';
 
 // Story Creation Modal.
 const saveStoryButton = 'button.e2e-test-save-story-button';
@@ -443,7 +445,9 @@ export class TopicManager extends BaseUser {
       );
 
       throw new Error(
-        `Text did not match within the specified time. Actual message: "${actualMessage}", expected message: "${expectedMessage}"`
+        'Text did not match within the specified time.\n' +
+          `Actual message: "${actualMessage}"\n` +
+          `Expected message: "${expectedMessage}"\n`
       );
     }
   }
@@ -1413,15 +1417,110 @@ export class TopicManager extends BaseUser {
   }
 
   /**
+   * Checks if the skill is visible in the skill selection modal.
+   * @param skillName The name of the skill.
+   * @param visible Whether the skill should be visible or not.
+   */
+  async expectSkillInSkillSelectionModalToBeVisible(
+    skillName: string,
+    visible: boolean = true
+  ): Promise<ElementHandle | null> {
+    const skillVisible = await this.isElementVisible(skillItem);
+    if (!skillVisible) {
+      if (visible) {
+        throw new Error(
+          `Skill ${skillName} is not visible in the skill selection modal.`
+        );
+      } else {
+        showMessage(
+          `Skill ${skillName} is not visible in the skill selection modal.`
+        );
+        return null;
+      }
+    }
+
+    const skillElements = await this.page.$$(skillItem);
+    for (const skillElement of skillElements) {
+      const foundSkillName = await this.page.evaluate(
+        (skillElement: Element) => skillElement.textContent?.trim(),
+        skillElement
+      );
+      if (skillName === foundSkillName) {
+        if (visible) {
+          return skillElement;
+        } else {
+          throw new Error(
+            `Skill ${skillName} is visible in the skill selection modal.`
+          );
+        }
+      }
+    }
+
+    if (visible) {
+      throw new Error(
+        `Skill ${skillName} is not visible in the skill selection modal.`
+      );
+    } else {
+      showMessage(
+        `Skill ${skillName} is visible in the skill selection modal.`
+      );
+      return null;
+    }
+  }
+
+  /**
+   * Fills the skill name input field with the given skill name.
+   * @param {string} skillName - The skill name to fill the input field with.
+   */
+  async fillSkillNameInSkillSelectionModal(skillName: string): Promise<void> {
+    await this.expectElementToBeVisible(skillNameInputSelector);
+    await this.type(skillNameInputSelector, skillName);
+    await this.expectElementValueToBe(skillNameInputSelector, skillName);
+  }
+
+  /**
+   * Selects the skill with the given name and clicks on the "Done" button in
+   * the Skill Selection Modal.
+   * @param {string} skillName - The name of the skill to select.
+   */
+  async selectSkillAndClickOnDoneInSkillSelectionModal(
+    skillName: string
+  ): Promise<void> {
+    const skillElement =
+      await this.expectSkillInSkillSelectionModalToBeVisible(skillName);
+
+    if (!skillElement) {
+      throw new Error(`Skill ${skillName} not found in Skill Selection Modal`);
+    }
+    const radioInnerCircleSelectorElement = await skillElement.waitForSelector(
+      radioInnerCircleSelector
+    );
+
+    if (!radioInnerCircleSelectorElement) {
+      throw new Error('Radio inner circle selector not found');
+    }
+
+    await this.page.evaluate(selector => {
+      document.querySelector(selector).click();
+    }, radioInnerCircleSelector);
+
+    await this.clickOn(confirmSkillSelectionButtonSelector);
+    await this.expectElementToBeVisible(
+      confirmSkillSelectionButtonSelector,
+      false
+    );
+  }
+
+  /**
    * Filters skills by name and selects the first matching skill.
    *
    * @param {string} skillName - The name of the skill to select.
    */
   async filterAndSelectSkillInSkillSelector(skillName: string): Promise<void> {
     // Searching by skill name.
-    await this.expectElementToBeVisible(skillNameInputSelector);
-    await this.type(skillNameInputSelector, skillName);
+    await this.fillSkillNameInSkillSelectionModal(skillName);
 
+    // TODO: replace this with new function, once checked that new function works.
     await this.page.waitForSelector(radioInnerCircleSelector);
     const radioInnerCircleSelectorElement = await this.page.$(
       radioInnerCircleSelector
@@ -1448,12 +1547,10 @@ export class TopicManager extends BaseUser {
   }
 
   /**
-   * Function to merge two skills with the given names.
-   * @param {string} skillName1 - The name of the first skill to merge.
-   * @param {string} skillName2 - The name of the second skill to merge.
+   * Clicks on the merge skill button.
+   * @param {string} skillName - The name of the skill to merge.
    */
-
-  async mergeSkills(skillName1: string, skillName2: string): Promise<void> {
+  async clickOnMergeSkill(skillName: string): Promise<void> {
     const isMobileWidth = this.isViewportAtMobileWidth();
     const skillOptions = isMobileWidth ? mobileSkillsOption : skillEditBox;
     const mergeSkillsButton = isMobileWidth
@@ -1463,16 +1560,16 @@ export class TopicManager extends BaseUser {
     await this.navigateToTopicAndSkillsDashboardPage();
     await this.navigateToSkillsTab();
 
-    const skillItem1 = await this.getSkillElementFromSelection(skillName1);
+    const skillItem1 = await this.getSkillElementFromSelection(skillName);
     if (!skillItem1) {
-      throw new Error(`Skill "${skillName1}" not found`);
+      throw new Error(`Skill "${skillName}" not found`);
     }
 
     await this.page.waitForSelector(skillOptions);
     const skillOptionsElement1 = await skillItem1.$(skillOptions);
     if (!skillOptionsElement1) {
       throw new Error(
-        `Skill options element not found for skill "${skillName1}"`
+        `Skill options element not found for skill "${skillName}"`
       );
     }
     await this.waitForElementToBeClickable(skillOptionsElement1);
@@ -1487,6 +1584,15 @@ export class TopicManager extends BaseUser {
     await mergeSkillsButtonElement.click();
 
     await this.page.waitForSelector(skillNameInputSelector);
+  }
+
+  /**
+   * Function to merge two skills with the given names.
+   * @param {string} skillName1 - The name of the first skill to merge.
+   * @param {string} skillName2 - The name of the second skill to merge.
+   */
+  async mergeSkills(skillName1: string, skillName2: string): Promise<void> {
+    await this.clickOnMergeSkill(skillName1);
     const skillNameInputSelectorElement = await this.page.$(
       skillNameInputSelector
     );
@@ -3431,6 +3537,41 @@ export class TopicManager extends BaseUser {
       saveOrPublishSkillSelector,
       status === 'enabled'
     );
+  }
+
+  /**
+   * Checks if the skill is assigned to the given topics.
+   * @param {string} skillName - The name of the skill.
+   * @param {string} topicNames - The names of the topics, separated by comma.
+   */
+  async expectSkillAssignedToTopic(
+    skillName: string,
+    topicNames: string
+  ): Promise<void> {
+    const skillDescriptionSelector = this.isViewportAtMobileWidth()
+      ? mobileSkillDescriptionSelector
+      : desktopSkillDescriptionSelector;
+    await this.expectElementToBeVisible(skillNameAndStatusContainer);
+
+    const skillContainers = await this.page.$$(skillsAssignmentSelector);
+    const skillContainer = skillContainers.find(async container => {
+      const foundSkillName = await container.$eval(
+        skillDescriptionSelector,
+        element => element.textContent?.trim()
+      );
+      return foundSkillName === skillName;
+    });
+
+    if (!skillContainer) {
+      throw new Error(`Skill ${skillName} not found in topic.`);
+    }
+
+    const skillStatus = await skillContainer.$eval(
+      skillsAssignmentSelector,
+      element => element.textContent?.trim()
+    );
+
+    expect(skillStatus).toBe(topicNames);
   }
 }
 

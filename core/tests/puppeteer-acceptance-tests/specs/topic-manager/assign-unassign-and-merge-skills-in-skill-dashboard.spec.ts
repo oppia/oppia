@@ -19,12 +19,111 @@
  * TM.SE Assign, unassign, merge skills in skills dashboard.
  */
 
+import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
+import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
+import {ExplorationEditor} from '../../utilities/user/exploration-editor';
+import {TopicManager} from '../../utilities/user/topic-manager';
+
+const ROLES = testConstants.Roles;
 
 describe('Topic Manager', function () {
-  beforeAll(async function () {});
+  let topicManager: TopicManager;
+  let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
 
-  it('should be able to assign a skill to topic', async function () {});
+  beforeAll(async function () {
+    curriculumAdmin = await UserFactory.createNewUser(
+      'curriculumAdm',
+      'curriculum_adm@example.com',
+      [ROLES.CURRICULUM_ADMIN]
+    );
+
+    const explorationId =
+      await curriculumAdmin.createAndPublishExplorationWithCards(
+        'Solving problems without a calculator',
+        'Mathematics'
+      );
+    await curriculumAdmin.createAndPublishTopic(
+      'Arithmetic Operations',
+      'Addition',
+      'Addition'
+    );
+    await curriculumAdmin.addStoryToTopic(
+      'The Broken Calculator',
+      'the-broken-calculator',
+      'Arithmetic Operations'
+    );
+    await curriculumAdmin.addChapter(
+      'Solving problems without a calculator',
+      explorationId
+    );
+    await curriculumAdmin.createAndPublishClassroom(
+      'Maths',
+      'maths',
+      'Arithmetic Operations'
+    );
+
+    // Create more topics and skills.
+    await curriculumAdmin.createTopic('Whole Numbers', 'whole-numbers');
+    await curriculumAdmin.createSkillFromSkillsDashboard(
+      'Subtraction',
+      'Review Material for Subtraction'
+    );
+    await curriculumAdmin.createSkillFromSkillsDashboard(
+      'Word Problems',
+      'Review Material for Word Problems'
+    );
+
+    // Create topic manager user.
+    topicManager = await UserFactory.createNewUser(
+      'topicManager',
+      'topic_manager@example.com',
+      [ROLES.TOPIC_MANAGER],
+      'Arithmetic Operations'
+    );
+  }, 600000);
+
+  it('should be able to assign a skill to topic', async function () {
+    await topicManager.navigateToTopicAndSkillsDashboardPage();
+    await topicManager.navigateToSkillsTab();
+    await topicManager.assignSkillToTopic(
+      'Subtraction',
+      'Arithmetic Operations'
+    );
+    await topicManager.expectToastMessageToBe(
+      'The skill has been assigned to the topic.'
+    );
+    await topicManager.expectSkillAssignedToTopic(
+      'Subtraction',
+      'Arithmetic Operations'
+    );
+  });
+
+  it('should be able to unassign a skill from a topic', async function () {
+    await topicManager.unassignSkillFromTopic(
+      'Subtraction',
+      'Arithmetic Operations'
+    );
+    await topicManager.expectToastMessageToBe(
+      'The skill has been unassigned from the topic.'
+    );
+    await topicManager.expectSkillAssignedToTopic('Subtraction', 'Unassigned');
+  });
+
+  it('should be able to merge skills', async function () {
+    await topicManager.clickOnMergeSkill('Subtraction');
+    await topicManager.fillSkillNameInSkillSelectionModal('Addition');
+    await topicManager.expectSkillInSkillSelectionModalToBeVisible('Addition');
+    await topicManager.expectSkillInSkillSelectionModalToBeVisible(
+      'Subtraction',
+      false
+    );
+    await topicManager.selectSkillAndClickOnDoneInSkillSelectionModal(
+      'Addition'
+    );
+    await topicManager.expectToastMessageToBe('Merged Skills.');
+    await topicManager.expectFilteredSkills(['Subtration'], false);
+  });
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
