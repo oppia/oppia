@@ -264,6 +264,41 @@ const topicAndSkillsDashboardPageSelector =
 const navbarBreadcrumbSelector = 'oppia-navbar-breadcrumb';
 const resetTopicFilterButtonSelector = '.e2e-test-topic-filter-reset';
 
+const floatTextField = '.e2e-test-rule-details .e2e-test-float-form-input';
+const solutionFloatTextField =
+  'oppia-add-or-update-solution-modal .e2e-test-float-form-input';
+const textStateEditSelector = 'div.e2e-test-state-edit-content';
+const saveContentButton = 'button.e2e-test-save-state-content';
+const createQuestionButton = 'div.e2e-test-create-question';
+const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
+const interactionNumberInputButton =
+  'div.e2e-test-interaction-tile-NumericInput';
+const interactionNameDiv = 'div.oppia-interaction-tile-name';
+const saveInteractionButton = 'button.e2e-test-save-interaction';
+const responseRuleDropdown =
+  'oppia-rule-type-selector.e2e-test-answer-description';
+const equalsRuleButtonText = 'is equal to ... ';
+const answersInGroupAreCorrectToggle =
+  'input.e2e-test-editor-correctness-toggle';
+const saveResponseButton = 'button.e2e-test-add-new-response';
+const defaultFeedbackTab = 'a.e2e-test-default-response-tab';
+const openOutcomeFeedBackEditor = 'div.e2e-test-open-outcome-feedback-editor';
+const saveOutcomeFeedbackButton = 'button.e2e-test-save-outcome-feedback';
+const openAnswerGroupFeedBackEditor = 'i.e2e-test-open-feedback-editor';
+const addHintButton = 'button.e2e-test-oppia-add-hint-button';
+const saveHintButton = 'button.e2e-test-save-hint';
+const addSolutionButton = 'button.e2e-test-oppia-add-solution-button';
+const answerTypeDropdown = 'select.e2e-test-answer-is-exclusive-select';
+const submitAnswerButton = 'button.e2e-test-submit-answer-button';
+const submitSolutionButton = 'button.e2e-test-submit-solution-button';
+const saveQuestionButton = 'button.e2e-test-save-question-button';
+
+// Topic Editor > Preview Tab.
+const previewSubtabClass = 'e2e-test-preview-subtab';
+
+// Other Selectors.
+const activeTabSelector = '.e2e-test-active-tab';
+
 export class TopicManager extends BaseUser {
   /**
    * Resets the topic filter in Topic and Skills Dashboard.
@@ -565,10 +600,96 @@ export class TopicManager extends BaseUser {
   }
 
   /**
+   * Add any number of questions to a particular skill.
+   */
+  async createQuestionsForSkill(
+    skillName: string,
+    questionCount: number
+  ): Promise<void> {
+    for (let i = 0; i < questionCount; i++) {
+      await this.addBasicAlgebraQuestionToSkill(skillName);
+    }
+  }
+
+  /**
+   * Create a basic algebra question in the skill editor page.
+   */
+  async addBasicAlgebraQuestionToSkill(skillName: string): Promise<void> {
+    await this.openSkillEditor(skillName);
+    await this.clickOn(createQuestionButton);
+    await this.clickOn(textStateEditSelector);
+    await this.page.waitForSelector(richTextAreaField, {visible: true});
+    await this.type(richTextAreaField, 'Add 1+2');
+    await this.page.waitForSelector(`${saveContentButton}:not([disabled])`);
+    await this.clickOn(saveContentButton);
+
+    await this.clickOn(addInteractionButton);
+    await this.page.waitForSelector(interactionNumberInputButton, {
+      visible: true,
+    });
+    await this.page.evaluate(interactionNameDiv => {
+      const interactionDivs = Array.from(
+        document.querySelectorAll(interactionNameDiv)
+      );
+      const element = interactionDivs.find(
+        element => element.textContent?.trim() === 'Number Input'
+      ) as HTMLElement;
+      if (element) {
+        element.click();
+      } else {
+        throw new Error('Cannot find number input interaction option.');
+      }
+    }, interactionNameDiv);
+
+    await this.clickOn(saveInteractionButton);
+    await this.page.waitForSelector('oppia-add-answer-group-modal-component', {
+      visible: true,
+    });
+    await this.clickOn(responseRuleDropdown);
+    await this.clickOn(equalsRuleButtonText);
+    await this.type(floatTextField, '3');
+    await this.clickOn(answersInGroupAreCorrectToggle);
+    await this.clickOn(openAnswerGroupFeedBackEditor);
+    await this.type(richTextAreaField, 'Good job!');
+    await this.clickOn(saveResponseButton);
+    await this.page.waitForSelector(modalDiv, {hidden: true});
+
+    await this.clickOn(defaultFeedbackTab);
+    await this.clickOn(openOutcomeFeedBackEditor);
+    await this.clickOn(richTextAreaField);
+    await this.type(richTextAreaField, 'The answer is 3');
+    await this.clickOn(saveOutcomeFeedbackButton);
+
+    await this.clickOn(addHintButton);
+    await this.page.waitForSelector(modalDiv, {visible: true});
+    await this.type(richTextAreaField, '3');
+    await this.clickOn(saveHintButton);
+    await this.page.waitForSelector(modalDiv, {hidden: true});
+
+    await this.clickOn(addSolutionButton);
+    await this.page.waitForSelector(modalDiv, {visible: true});
+    await this.page.waitForSelector(answerTypeDropdown);
+    await this.page.select(answerTypeDropdown, 'The only');
+    await this.page.waitForSelector(solutionFloatTextField);
+    await this.type(solutionFloatTextField, '3');
+    await this.page.waitForSelector(`${submitAnswerButton}:not([disabled])`);
+    await this.clickOn(submitAnswerButton);
+    await this.type(richTextAreaField, '1+2 is 3');
+    await this.page.waitForSelector(`${submitSolutionButton}:not([disabled])`);
+    await this.clickOn(submitSolutionButton);
+    await this.page.waitForSelector(modalDiv, {hidden: true});
+
+    await this.clickOn(saveQuestionButton);
+
+    await this.waitForNetworkIdle();
+    await this.page.waitForSelector(modalDiv, {hidden: true});
+  }
+
+  /**
    * Save a topic draft.
    * @param {string} topicName - name of the topic to be saved.
    */
-  async saveTopicDraft(topicName: string): Promise<void> {
+  async saveTopicDraft(topicName: string, description?: string): Promise<void> {
     await this.page.waitForSelector(modalDiv, {hidden: true});
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileOptionsSelector);
@@ -590,7 +711,10 @@ export class TopicManager extends BaseUser {
       await this.openTopicEditor(topicName);
     } else {
       await this.clickOn(saveTopicButton);
-      await this.page.waitForSelector(modalDiv, {visible: true});
+      if (description) {
+        await this.type(saveChangesMessageInput, description);
+        await this.expectElementValueToBe(saveChangesMessageInput, description);
+      }
       await this.page.waitForSelector(
         `${closeSaveModalButton}:not([disabled])`
       );
@@ -687,7 +811,7 @@ export class TopicManager extends BaseUser {
     }
   }
 
-  async expectKeywordsSelectedToBe(keywords: string[]) {
+  async expectKeywordsSelectedToBe(keywords: string[]): Promise<void> {
     if (keywords.length === 0) {
       await this.expectElementToBeVisible(
         multiSelectionInputChipSelector,
@@ -761,7 +885,7 @@ export class TopicManager extends BaseUser {
     await this.waitForStaticAssetsToLoad();
     const topicElements = await this.page.$$(topicNameSelector);
 
-    if (expectedTopics.length == 0) {
+    if (expectedTopics.length === 0) {
       throw new Error("Topics list can't be empty");
     }
 
@@ -888,11 +1012,9 @@ export class TopicManager extends BaseUser {
   }
 
   /**
-   * Opens the topic editor for a given topic and previews it by clicking on the third navbar-tab-icon.
-   * @param {string} topicName - The name of the topic to be opened in the topic editor.
+   * Navigates to preview tab from the topic editor.
    */
-  async navigateToTopicPreviewTab(topicName: string): Promise<void> {
-    await this.openTopicEditor(topicName);
+  async navigateToTopicPreviewTab(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileOptionsSelector);
       await this.clickOn(mobileNavbarDropdown);
@@ -903,6 +1025,17 @@ export class TopicManager extends BaseUser {
     }
 
     await this.expectElementToBeVisible(topicPreviewContainerSelector);
+  }
+
+  /**
+   * It's a composite function that opens the topic editor for a given topic
+   * and navigates to the preview tab.
+   * @param {string} topicName - The name of the topic to be opened in the
+   *     topic editor.
+   */
+  async navigateToTopicPreviewTabOfTopic(topicName: string): Promise<void> {
+    await this.openTopicEditor(topicName);
+    await this.navigateToTopicPreviewTab();
   }
 
   /**
@@ -1709,7 +1842,7 @@ export class TopicManager extends BaseUser {
     const topicElements = await this.page.$$(skillNameSelector);
 
     if (expectedSkills.length === 0) {
-      throw new Error(`Expected skills should not be empty`);
+      throw new Error('Expected skills should not be empty');
     }
 
     const skillNames = await Promise.all(
@@ -3250,6 +3383,41 @@ export class TopicManager extends BaseUser {
       newError.stack = error.stack;
       throw newError;
     }
+  }
+
+  /**
+   * Check if the save changes button is enabled or disabled.
+   * @param {'enabled' | 'disabled'} status - The status to check.
+   */
+  async expectSaveChangesButtonToBe(
+    status: 'enabled' | 'disabled'
+  ): Promise<void> {
+    await this.expectElementToBeVisible(saveTopicButton);
+    const buttonIsEnabled = await this.page.$eval(
+      saveTopicButton,
+      el => !(el as HTMLButtonElement).disabled
+    );
+    expect(buttonIsEnabled).toBe(status === 'enabled');
+  }
+
+  /**
+   * Navigates to the tab in the preview tab.
+   * @param {'Learn' | 'Practice' | 'Study'} tabName - The name of the tab.
+   */
+  async navigateToTabInPreview(
+    tabName: 'Learn' | 'Practice' | 'Study'
+  ): Promise<void> {
+    const xpath = `//*[contains(text(), '${tabName}')]`;
+    const tabElement = await this.page.waitForXPath(xpath);
+    if (!tabElement) {
+      throw new Error(`Tab ${tabName} not found.`);
+    }
+    await tabElement.click();
+
+    await this.expectTextContentToBe(
+      `.${previewSubtabClass}${activeTabSelector}`,
+      tabName
+    );
   }
 }
 

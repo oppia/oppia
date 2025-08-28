@@ -23,12 +23,13 @@ import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
+import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {TopicManager} from '../../utilities/user/topic-manager';
 
 const ROLES = testConstants.Roles;
 
 describe('Topic Manager', function () {
-  let topicManager: TopicManager;
+  let topicManager: TopicManager & LoggedOutUser;
   let curriculumAdmin: CurriculumAdmin & TopicManager & ExplorationEditor;
 
   beforeAll(async function () {
@@ -84,8 +85,53 @@ describe('Topic Manager', function () {
   }, 600000);
 
   it('should be able to edit the topic', async function () {
+    // Edit basic topic details.
     await topicManager.navigateToTopicAndSkillsDashboardPage();
-  });
+    await topicManager.openTopicEditor('Arithmetic Operations');
+    await topicManager.editTopicDetails(
+      'Arithmetic Operations (New): This is the new topic description.', // Description.
+      'Arithmetic Operations (New) • Oppia', // Title Fragment.
+      'TODOFILEPATHHERE', // Thumbnail.
+      'AO 101', // Title.
+      'arithmetic-101' // URL fragment.
+    );
+    await topicManager.saveTopicDraft(
+      'A0 101',
+      'Moved Arithmetic Operations to A0 101'
+    );
+    await topicManager.expectToastMessageToBe('Changes Saved.');
+
+    await topicManager.expectScreenshotToMatch(
+      'changedTopicArithmeticOperations',
+      __dirname
+    );
+
+    // Enable practice tab.
+    await curriculumAdmin.createQuestionsForSkill('A0 101', 10);
+    await topicManager.openTopicEditor('A0 101');
+    await topicManager.togglePracticeTabCheckbox();
+    await topicManager.expectSaveChangesButtonToBe('enabled');
+    await topicManager.expectScreenshotToMatch(
+      'arithmeticOperationsWithPracticeTab',
+      __dirname
+    );
+
+    // Check topic preview.
+    await topicManager.saveTopicDraft('A0 101', 'Enabled practice tab.');
+    await topicManager.navigateToTopicPreviewTab();
+    await topicManager.expectTopicPreviewToHaveTitleAndDescription(
+      'Arithmetic Operations',
+      'Arithmetic Operations (New): This is the new topic description.'
+    );
+
+    await topicManager.navigateToTabInPreview('Practice');
+    await topicManager.expectTabTitleInTopicPageToBe(
+      'Master Skills for AO 101 Beta' // We are adding "Beta" is beta tag is present inside the element.
+    );
+
+    await topicManager.navigateToTabInPreview('Study');
+    await topicManager.expectTabTitleInTopicPageToBe('Study Skills for AO 101');
+  }, 600000);
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();

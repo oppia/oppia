@@ -5,8 +5,8 @@
   <div class="topic-preview-container">
     <div class="topic-preview-nav">
       <div class="topic-preview-navbar-tabs">
-        <div class="topic-preview-navbar-tab"
-             [ngClass]="{'topic-preview-nav-active': activeTab === 'story'}"
+        <div class="topic-preview-navbar-tab e2e-test-preview-subtab"
+             [ngClass]="{'topic-preview-nav-active e2e-test-active-tab': activeTab === 'story'}"
              (click)="changePreviewTab('story')">
           <div class="topic-preview-icon">
             <img alt="" class="tab-icon"
@@ -16,8 +16,8 @@
             Learn
           </div>
         </div>
-        <div class="topic-preview-navbar-tab"
-             [ngClass]="{'topic-preview-nav-active': activeTab === 'practice'}"
+        <div class="topic-preview-navbar-tab e2e-test-preview-subtab"
+             [ngClass]="{'topic-preview-nav-active e2e-test-active-tab': activeTab === 'practice'}"
              (click)="changePreviewTab('practice')">
           <div class="topic-preview-icon">
             <img alt="" class="tab-icon" [src]="getStaticImageUrl('/icons/train_icon_24px.svg')">
@@ -26,8 +26,8 @@
             Practice
           </div>
         </div>
-        <div class="topic-preview-navbar-tab"
-             [ngClass]="{'topic-preview-nav-active': activeTab === 'subtopic'}"
+        <div class="topic-preview-navbar-tab e2e-test-preview-subtab"
+             [ngClass]="{'topic-preview-nav-active e2e-test-active-tab': activeTab === 'subtopic'}"
              (click)="changePreviewTab('subtopic')">
           <div class="topic-preview-icon">
             <img alt="" class="tab-icon"

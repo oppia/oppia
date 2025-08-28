@@ -16,7 +16,6 @@
  * @fileoverview Curriculum Admin users utility file.
  */
 
-import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import {TopicManager} from './topic-manager';
@@ -30,11 +29,6 @@ const baseURL = testConstants.URLs.BaseURL;
 
 const richTextAreaField = 'div.e2e-test-rte';
 const richTextParagraphTag = 'div.e2e-test-rte p';
-const floatTextField = '.e2e-test-rule-details .e2e-test-float-form-input';
-const solutionFloatTextField =
-  'oppia-add-or-update-solution-modal .e2e-test-float-form-input';
-const textStateEditSelector = 'div.e2e-test-state-edit-content';
-const saveContentButton = 'button.e2e-test-save-state-content';
 
 const modalDiv = 'div.modal-content';
 const closeSaveModalButton = '.e2e-test-close-save-modal-button';
@@ -44,32 +38,8 @@ const subtopicPhotoBoxButton =
   '.e2e-test-subtopic-thumbnail .e2e-test-photo-button';
 const uploadPhotoButton = 'button.e2e-test-photo-upload-submit';
 const photoUploadModal = 'edit-thumbnail-modal';
-
-const createQuestionButton = 'div.e2e-test-create-question';
 const removeQuestionConfirmationButton =
   '.e2e-test-remove-question-confirmation-button';
-const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
-const interactionNumberInputButton =
-  'div.e2e-test-interaction-tile-NumericInput';
-const interactionNameDiv = 'div.oppia-interaction-tile-name';
-const saveInteractionButton = 'button.e2e-test-save-interaction';
-const responseRuleDropdown =
-  'oppia-rule-type-selector.e2e-test-answer-description';
-const equalsRuleButtonText = 'is equal to ... ';
-const answersInGroupAreCorrectToggle =
-  'input.e2e-test-editor-correctness-toggle';
-const saveResponseButton = 'button.e2e-test-add-new-response';
-const defaultFeedbackTab = 'a.e2e-test-default-response-tab';
-const openOutcomeFeedBackEditor = 'div.e2e-test-open-outcome-feedback-editor';
-const saveOutcomeFeedbackButton = 'button.e2e-test-save-outcome-feedback';
-const openAnswerGroupFeedBackEditor = 'i.e2e-test-open-feedback-editor';
-const addHintButton = 'button.e2e-test-oppia-add-hint-button';
-const saveHintButton = 'button.e2e-test-save-hint';
-const addSolutionButton = 'button.e2e-test-oppia-add-solution-button';
-const answerTypeDropdown = 'select.e2e-test-answer-is-exclusive-select';
-const submitAnswerButton = 'button.e2e-test-submit-answer-button';
-const submitSolutionButton = 'button.e2e-test-submit-solution-button';
-const saveQuestionButton = 'button.e2e-test-save-question-button';
 
 const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
 
@@ -402,92 +372,6 @@ export class CurriculumAdmin extends TopicManager {
       await this.page.waitForSelector(skillQuestionTab, {visible: true});
       await this.clickAndWaitForNavigation(skillQuestionTab);
     }
-  }
-
-  /**
-   * Add any number of questions to a particular skill.
-   */
-  async createQuestionsForSkill(
-    skillName: string,
-    questionCount: number
-  ): Promise<void> {
-    for (let i = 0; i < questionCount; i++) {
-      await this.addBasicAlgebraQuestionToSkill(skillName);
-    }
-  }
-
-  /**
-   * Create a basic algebra question in the skill editor page.
-   */
-  async addBasicAlgebraQuestionToSkill(skillName: string): Promise<void> {
-    await this.openSkillEditor(skillName);
-    await this.clickOn(createQuestionButton);
-    await this.clickOn(textStateEditSelector);
-    await this.page.waitForSelector(richTextAreaField, {visible: true});
-    await this.type(richTextAreaField, 'Add 1+2');
-    await this.page.waitForSelector(`${saveContentButton}:not([disabled])`);
-    await this.clickOn(saveContentButton);
-
-    await this.clickOn(addInteractionButton);
-    await this.page.waitForSelector(interactionNumberInputButton, {
-      visible: true,
-    });
-    await this.page.evaluate(interactionNameDiv => {
-      const interactionDivs = Array.from(
-        document.querySelectorAll(interactionNameDiv)
-      );
-      const element = interactionDivs.find(
-        element => element.textContent?.trim() === 'Number Input'
-      ) as HTMLElement;
-      if (element) {
-        element.click();
-      } else {
-        throw new Error('Cannot find number input interaction option.');
-      }
-    }, interactionNameDiv);
-
-    await this.clickOn(saveInteractionButton);
-    await this.page.waitForSelector('oppia-add-answer-group-modal-component', {
-      visible: true,
-    });
-    await this.clickOn(responseRuleDropdown);
-    await this.clickOn(equalsRuleButtonText);
-    await this.type(floatTextField, '3');
-    await this.clickOn(answersInGroupAreCorrectToggle);
-    await this.clickOn(openAnswerGroupFeedBackEditor);
-    await this.type(richTextAreaField, 'Good job!');
-    await this.clickOn(saveResponseButton);
-    await this.page.waitForSelector(modalDiv, {hidden: true});
-
-    await this.clickOn(defaultFeedbackTab);
-    await this.clickOn(openOutcomeFeedBackEditor);
-    await this.clickOn(richTextAreaField);
-    await this.type(richTextAreaField, 'The answer is 3');
-    await this.clickOn(saveOutcomeFeedbackButton);
-
-    await this.clickOn(addHintButton);
-    await this.page.waitForSelector(modalDiv, {visible: true});
-    await this.type(richTextAreaField, '3');
-    await this.clickOn(saveHintButton);
-    await this.page.waitForSelector(modalDiv, {hidden: true});
-
-    await this.clickOn(addSolutionButton);
-    await this.page.waitForSelector(modalDiv, {visible: true});
-    await this.page.waitForSelector(answerTypeDropdown);
-    await this.page.select(answerTypeDropdown, 'The only');
-    await this.page.waitForSelector(solutionFloatTextField);
-    await this.type(solutionFloatTextField, '3');
-    await this.page.waitForSelector(`${submitAnswerButton}:not([disabled])`);
-    await this.clickOn(submitAnswerButton);
-    await this.type(richTextAreaField, '1+2 is 3');
-    await this.page.waitForSelector(`${submitSolutionButton}:not([disabled])`);
-    await this.clickOn(submitSolutionButton);
-    await this.page.waitForSelector(modalDiv, {hidden: true});
-
-    await this.clickOn(saveQuestionButton);
-
-    await this.waitForNetworkIdle();
-    await this.page.waitForSelector(modalDiv, {hidden: true});
   }
 
   /**
@@ -2524,7 +2408,7 @@ export class CurriculumAdmin extends TopicManager {
   async createSkillFromSkillsDashboard(
     skillName: string,
     reviewMaterial: string
-  ) {
+  ): Promise<void> {
     await this.navigateToTopicAndSkillsDashboardPage();
 
     await this.navigateToSkillsTab();
