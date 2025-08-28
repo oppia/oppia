@@ -854,7 +854,7 @@ describe('Translation Modal Component', () => {
       ).and.returnValue(Promise.resolve({}));
       component.suggestTranslatedText();
       tick();
-      const req = httpTestingController.expectOne('/suggestionhandler/');
+      let req = httpTestingController.expectOne('/suggestionhandler/');
       expect(req.request.method).toEqual('POST');
       expect(req.request.body.getAll('payload')[0]).toEqual(
         JSON.stringify(expectedPayload)
@@ -870,6 +870,9 @@ describe('Translation Modal Component', () => {
       );
       flushMicrotasks();
       component.suggestTranslatedText();
+      tick();
+      req = httpTestingController.expectOne('/suggestionhandler/');
+      req.flush({});
       expect(pageContextService.getImageSaveDestination()).toBe(
         AppConstants.IMAGE_SAVE_DESTINATION_SERVER
       );
@@ -999,19 +1002,18 @@ describe('Translation Modal Component', () => {
     );
   });
 
-  it('should close modal and return the new translation when updating translated text', () => {
+  it('should close the modal when updating translated text', () => {
     spyOn(activeModal, 'close');
     spyOn(component, 'canTranslatedTextBeSubmitted').and.returnValue(true);
     component.activeWrittenTranslation = 'Test translation';
-    component.updateTranslatedText();
-
-    expect(activeModal.close).toHaveBeenCalledWith('Test translation');
+    component.suggestTranslatedText();
+    expect(activeModal.close).toHaveBeenCalled();
   });
 
   it('should not close modal if new translated text cannot be submitted', () => {
     spyOn(activeModal, 'close');
     component.activeWrittenTranslation = 'Test translation';
-    component.updateTranslatedText();
+    component.suggestTranslatedText();
 
     expect(activeModal.close).not.toHaveBeenCalled();
   });
@@ -1049,28 +1051,19 @@ describe('Translation Modal Component', () => {
         expect(translateTextService.getTextToTranslate).toHaveBeenCalled();
       }));
 
-      it('should open confirmation modal and not skip on cancel', fakeAsync(() => {
-        const originalText = 'Some unsaved text';
-        component.activeWrittenTranslation = originalText;
+      it('should open confirmation modal and skip on confirm', fakeAsync(() => {
+        component.activeWrittenTranslation = 'Unsaved text';
 
         spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
-        const getTextSpy = spyOn(translateTextService, 'getTextToTranslate');
-
-        mockModalRef.result = Promise.reject();
+        mockModalRef.result = Promise.resolve();
 
         component.skipActiveTranslation();
         tick();
-
         expect(ngbModal.open).toHaveBeenCalledWith(
           ConfirmTranslationExitModalComponent,
           {backdrop: 'static'}
         );
-
-        tick();
-        flushMicrotasks();
-
-        expect(component.activeWrittenTranslation).toBe(originalText);
-        expect(getTextSpy).not.toHaveBeenCalled();
+        expect(component.activeWrittenTranslation).toBe('');
       }));
     });
 

@@ -289,6 +289,15 @@ export class TranslationModalComponent {
     this.computeTranslationEditorOverflowState();
   }
 
+  ngOnDestroy(): void {
+    if (this.beforeUnloadHandler) {
+      this.windowRef.nativeWindow.removeEventListener(
+        'beforeunload',
+        this.beforeUnloadHandler
+      );
+    }
+  }
+
   computeTranslationEditorOverflowState(): void {
     const windowHeight = this.wds.getHeight();
     const heightLimit = (windowHeight * this.cutoff_height) / 100;
@@ -431,11 +440,13 @@ export class TranslationModalComponent {
   }
 
   skipActiveTranslation(): void {
-    this.clearTranslation();
-    const translatableItem = this.translateTextService.getTextToTranslate();
-    this.updateActiveState(translatableItem);
-    ({more: this.moreAvailable} = translatableItem);
-    this.resetEditor();
+    this.checkForUnsavedChanges(() => {
+      this.clearTranslation();
+      const translatableItem = this.translateTextService.getTextToTranslate();
+      this.updateActiveState(translatableItem);
+      ({more: this.moreAvailable} = translatableItem);
+      this.resetEditor();
+    });
   }
 
   isSubmitted(): boolean {
