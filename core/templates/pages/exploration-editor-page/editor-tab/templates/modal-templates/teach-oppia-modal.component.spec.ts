@@ -26,10 +26,7 @@ import {
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import {
-  StateBackendDict,
-  StateObjectFactory,
-} from 'domain/state/StateObjectFactory';
+import {StateBackendDict, State} from 'domain/state/state.model';
 import {TrainingDataService} from '../../training-panel/training-data.service';
 import {TrainingModalService} from '../../training-panel/training-modal.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -59,7 +56,6 @@ describe('Teach Oppia Modal Component', () => {
   let explorationHtmlFormatterService: ExplorationHtmlFormatterService;
   let stateEditorService: StateEditorService;
   let stateInteractionIdService: StateInteractionIdService;
-  let stateObjectFactory: StateObjectFactory;
   let explorationStatesService: ExplorationStatesService;
   let responsesService: ResponsesService;
   let trainingDataService: TrainingDataService;
@@ -192,7 +188,6 @@ describe('Teach Oppia Modal Component', () => {
     component = fixture.componentInstance;
     injector = TestBed.inject(Injector);
     stateInteractionIdService = TestBed.inject(StateInteractionIdService);
-    stateObjectFactory = TestBed.inject(StateObjectFactory);
     trainingDataService = TestBed.inject(TrainingDataService);
     trainingModalService = TestBed.inject(TrainingModalService);
     teachOppiaModalBackendApiService = TestBed.inject(
@@ -246,7 +241,7 @@ describe('Teach Oppia Modal Component', () => {
         stateName
       );
       spyOn(explorationStatesService, 'getState').and.returnValue(
-        stateObjectFactory.createFromBackendDict(stateName, state)
+        State.createFromBackendDict(stateName, state)
       );
       stateInteractionIdService.init(stateName, 'TextInput');
       spyOn(
