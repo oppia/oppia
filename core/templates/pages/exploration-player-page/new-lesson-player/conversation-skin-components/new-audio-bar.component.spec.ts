@@ -232,8 +232,6 @@ describe('NewAudioBarComponent', () => {
   });
 
   it('should return false if audio bar is not available', () => {
-    component.languageAccentDescriptions = [];
-
     expect(component.isAudioBarAvailable()).toBe(false);
   });
 
