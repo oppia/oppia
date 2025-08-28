@@ -18,7 +18,6 @@
     "extensions/rich_text_components/richTextComponentsRequires.ts",
     "core/templates/domain/exploration/LostChangeObjectFactorySpec.ts",
     "core/templates/domain/exploration/StatesObjectFactorySpec.ts",
-    "core/templates/domain/state/StateObjectFactorySpec.ts",
     "core/templates/domain/collection/search-explorations-backend-api.service.ts",
     "core/README.md",
     "core/templates/karma.module.ts",

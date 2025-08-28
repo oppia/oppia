@@ -27,7 +27,7 @@ import {
   discardPeriodicTasks,
 } from '@angular/core/testing';
 import {ParamChange} from 'domain/exploration/param-change.model';
-import {StateObjectFactory} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {TranslateService} from '@ngx-translate/core';
@@ -91,7 +91,6 @@ describe('Preview Tab Component', () => {
   let graphDataService: GraphDataService;
   let routerService: RouterService;
   let stateEditorService: StateEditorService;
-  let stateObjectFactory: StateObjectFactory;
   let parameterMetadataService: ParameterMetadataService;
   let mockUpdateActiveStateIfInEditorEventEmitter = new EventEmitter();
   let mockPlayerStateChangeEventEmitter = new EventEmitter();
@@ -164,7 +163,7 @@ describe('Preview Tab Component', () => {
                   ParamChange.createEmpty(changeObjectName).toBackendDict(),
                 ],
                 states: [
-                  stateObjectFactory.createDefaultState(
+                  State.createDefaultState(
                     stateName,
                     'content_0',
                     'default_outcome_1'
@@ -188,7 +187,6 @@ describe('Preview Tab Component', () => {
     component = fixture.componentInstance;
     numberAttemptsService = TestBed.inject(NumberAttemptsService);
     routerService = TestBed.inject(RouterService);
-    stateObjectFactory = TestBed.inject(StateObjectFactory);
     explorationEngineService = TestBed.inject(ExplorationEngineService);
     editableExplorationBackendApiService = TestBed.inject(
       EditableExplorationBackendApiService

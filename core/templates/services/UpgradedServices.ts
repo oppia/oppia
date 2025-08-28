@@ -272,7 +272,6 @@ import {
 import {StateInteractionStatsBackendApiService} from 'domain/exploration/state-interaction-stats-backend-api.service';
 import {StateInteractionStatsService} from 'services/state-interaction-stats.service';
 import {StateNameService} from 'components/state-editor/state-editor-properties-services/state-name.service';
-import {StateObjectFactory} from 'domain/state/StateObjectFactory';
 import {
   StateParamChangesService,
   // eslint-disable-next-line max-len
@@ -1092,15 +1091,10 @@ export class UpgradedServices {
       new InteractionAttributesExtractorService(
         upgradedServices['HtmlEscaperService']
       );
-    upgradedServices['StateObjectFactory'] = new StateObjectFactory();
 
     // Topological level: 8.
-    upgradedServices['StatesObjectFactory'] = new StatesObjectFactory(
-      upgradedServices['StateObjectFactory']
-    );
-    upgradedServices['QuestionObjectFactory'] = new QuestionObjectFactory(
-      upgradedServices['StateObjectFactory']
-    );
+    upgradedServices['StatesObjectFactory'] = new StatesObjectFactory();
+    upgradedServices['QuestionObjectFactory'] = new QuestionObjectFactory();
 
     // Topological level: 9.
     upgradedServices['ExplorationObjectFactory'] = new ExplorationObjectFactory(

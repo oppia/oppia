@@ -19,7 +19,7 @@
 import {TestBed} from '@angular/core/testing';
 import {DiagnosticTestQuestionsModel} from 'domain/question/diagnostic-test-questions.model';
 import {Question} from 'domain/question/QuestionObjectFactory';
-import {StateObjectFactory} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 import {
   DiagnosticTestCurrentTopicStatusModel,
   SkillIdToQuestionsDict,
@@ -28,18 +28,16 @@ import {
 describe('Diagnostic test current topic status model', () => {
   let question1: Question, question2: Question, question3: Question;
   let question4: Question, question5: Question, question6: Question;
-  let stateObject: StateObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [],
       providers: [],
     });
-    stateObject = TestBed.inject(StateObjectFactory);
 
     question1 = new Question(
       'question1',
-      stateObject.createDefaultState('state', 'content_0', 'default_outcome_1'),
+      State.createDefaultState('state', 'content_0', 'default_outcome_1'),
       '',
       1,
       ['skillID1'],
@@ -48,7 +46,7 @@ describe('Diagnostic test current topic status model', () => {
     );
     question2 = new Question(
       'question2',
-      stateObject.createDefaultState('state', 'content_0', 'default_outcome_1'),
+      State.createDefaultState('state', 'content_0', 'default_outcome_1'),
       '',
       1,
       ['skillID2'],
@@ -57,7 +55,7 @@ describe('Diagnostic test current topic status model', () => {
     );
     question3 = new Question(
       'question3',
-      stateObject.createDefaultState('state', 'content_0', 'default_outcome_1'),
+      State.createDefaultState('state', 'content_0', 'default_outcome_1'),
       '',
       1,
       ['skillID3'],
@@ -66,7 +64,7 @@ describe('Diagnostic test current topic status model', () => {
     );
     question4 = new Question(
       'question4',
-      stateObject.createDefaultState('state', 'content_0', 'default_outcome_1'),
+      State.createDefaultState('state', 'content_0', 'default_outcome_1'),
       '',
       1,
       ['skillID4'],
@@ -75,7 +73,7 @@ describe('Diagnostic test current topic status model', () => {
     );
     question5 = new Question(
       'question5',
-      stateObject.createDefaultState('state', 'content_0', 'default_outcome_1'),
+      State.createDefaultState('state', 'content_0', 'default_outcome_1'),
       '',
       1,
       ['skillID5'],
@@ -84,7 +82,7 @@ describe('Diagnostic test current topic status model', () => {
     );
     question6 = new Question(
       'question6',
-      stateObject.createDefaultState('state', 'content_0', 'default_outcome_1'),
+      State.createDefaultState('state', 'content_0', 'default_outcome_1'),
       '',
       1,
       ['skillID6'],
