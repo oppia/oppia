@@ -123,7 +123,6 @@ export class TranslationModalComponent {
     type: string;
     ui_config: UiConfig;
   };
-  skipUnsavedCheck = false;
 
   // Language description is null when active language code is invalid.
   languageDescription: string | null = null;
@@ -319,10 +318,6 @@ export class TranslationModalComponent {
   }
 
   private checkForUnsavedChanges(action: () => void): void {
-    if (this.skipUnsavedCheck) {
-      action();
-      return;
-    }
     if (
       this.activeWrittenTranslation &&
       this.activeWrittenTranslation.length > 0
@@ -436,12 +431,11 @@ export class TranslationModalComponent {
   }
 
   skipActiveTranslation(): void {
-    this.checkForUnsavedChanges(() => {
-      const translatableItem = this.translateTextService.getTextToTranslate();
-      this.updateActiveState(translatableItem);
-      ({more: this.moreAvailable} = translatableItem);
-      this.resetEditor();
-    });
+    this.clearTranslation();
+    const translatableItem = this.translateTextService.getTextToTranslate();
+    this.updateActiveState(translatableItem);
+    ({more: this.moreAvailable} = translatableItem);
+    this.resetEditor();
   }
 
   isSubmitted(): boolean {
@@ -450,6 +444,7 @@ export class TranslationModalComponent {
 
   returnToPreviousTranslation(): void {
     this.checkForUnsavedChanges(() => {
+      this.clearTranslation();
       const translatableItem =
         this.translateTextService.getPreviousTextToTranslate();
       this.updateActiveState(translatableItem);
@@ -537,7 +532,6 @@ export class TranslationModalComponent {
         'Translation'
       );
       this.uploadingTranslation = true;
-      this.skipUnsavedCheck = true;
       const imagesData = this.imageLocalStorageService.getStoredImagesData();
       this.imageLocalStorageService.flushStoredImagesData();
       this.translateTextService.suggestTranslatedText(
@@ -549,41 +543,37 @@ export class TranslationModalComponent {
           this.alertsService.addSuccessMessage(
             'Submitted translation for review.'
           );
-          this.activeWrittenTranslation = '';
+          this.clearTranslation();
           this.uploadingTranslation = false;
-          this.skipUnsavedCheck = false;
+
           if (this.moreAvailable) {
             this.skipActiveTranslation();
             this.resetEditor();
           } else {
-            this.activeWrittenTranslation = '';
-            this.close();
+            this.closeWithoutUnsavedCheck();
           }
         },
         (errorReason: string) => {
+          this.uploadingTranslation = false;
           this.pageContextService.resetImageSaveDestination();
           this.alertsService.clearWarnings();
           this.alertsService.addWarning(errorReason);
-          this.close();
+          this.closeWithoutUnsavedCheck();
         }
       );
     }
     if (!this.moreAvailable) {
       this.pageContextService.resetImageSaveDestination();
-      this.close();
+      this.closeWithoutUnsavedCheck();
     }
-  }
-  updateTranslatedText(): void {
-    if (!this.canTranslatedTextBeSubmitted()) {
-      return;
-    }
-    this.activeModal.close(this.activeWrittenTranslation);
   }
 
-  ngOnDestroy(): void {
-    this.windowRef.nativeWindow.removeEventListener(
-      'beforeunload',
-      this.beforeUnloadHandler
-    );
+  private clearTranslation(): void {
+    this.activeWrittenTranslation = '';
+  }
+
+  private closeWithoutUnsavedCheck(): void {
+    this.activeModal.close();
+    this.ckEditorCopyContentService.copyModeActive = false;
   }
 }
