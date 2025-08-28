@@ -26,7 +26,7 @@ from core.platform import models
 from google.cloud import ndb
 
 from typing import (
-    Any, ContextManager, Dict, List, Optional, Sequence, Tuple, TypeVar)
+    Any, ContextManager, Dict, List, Optional, Sequence, Tuple, TypeVar, Union)
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -193,6 +193,24 @@ def any_of(*nodes: ndb.Node) -> ndb.Node:
         OR.
     """
     return ndb.OR(*nodes)
+
+
+def not_equal(prop: ndb.Property, value: Union[str, int, float]) -> ndb.Node:
+    """Returns a query node which represents the condition of the property not
+    being equal to the value.
+
+    See the guidance in the NDB 2.3.0 upgrade notes for why this is needed:
+    https://github.com/googleapis/python-ndb/wiki/Upgrade-Notes
+
+    Args:
+        prop: ndb.Property. The property to compare.
+        value: Union[str, int, float]. The value to compare it to.
+
+    Returns:
+        datastore_services.Node. A node representing "not equals" as a "greater
+        than" condition and a "less than" condition, combined by boolean OR.
+    """
+    return any_of(prop > value, prop < value)
 
 
 def make_cursor(urlsafe_cursor: Optional[str] = None) -> Cursor:
