@@ -18,11 +18,7 @@
  */
 import {Injectable} from '@angular/core';
 
-import {
-  StateBackendDict,
-  StateObjectFactory,
-  State,
-} from 'domain/state/StateObjectFactory';
+import {StateBackendDict, State} from 'domain/state/state.model';
 import {Voiceover} from 'domain/exploration/voiceover.model';
 import {WrittenTranslation} from 'domain/exploration/written-translation.model';
 
@@ -46,10 +42,7 @@ export interface WrittenTranslationObjectsDict {
 }
 
 export class States {
-  constructor(
-    private _stateObject: StateObjectFactory,
-    private _states: StateObjectsDict
-  ) {}
+  constructor(private _states: StateObjectsDict) {}
 
   getState(stateName: string): State {
     return this._states[stateName];
@@ -68,7 +61,7 @@ export class States {
     contentIdForContent: string,
     contentIdForDefaultOutcome: string
   ): void {
-    this._states[newStateName] = this._stateObject.createDefaultState(
+    this._states[newStateName] = State.createDefaultState(
       newStateName,
       contentIdForContent,
       contentIdForDefaultOutcome
@@ -76,7 +69,7 @@ export class States {
   }
 
   setState(stateName: string, stateData: State): void {
-    // We use the copy method defined in the StateObjectFactory to make
+    // We use the copy method defined in the State to make
     // sure that this._states[stateName] remains a State object as opposed to
     // Object.assign(..) which returns an object with the content of stateData.
     this._states[stateName].copy(stateData);
@@ -160,15 +153,14 @@ export class States {
   providedIn: 'root',
 })
 export class StatesObjectFactory {
-  constructor(private stateObject: StateObjectFactory) {}
   createFromBackendDict(statesBackendDict: StateObjectsBackendDict): States {
     let stateObjectsDict: StateObjectsDict = {};
     for (let stateName in statesBackendDict) {
-      stateObjectsDict[stateName] = this.stateObject.createFromBackendDict(
+      stateObjectsDict[stateName] = State.createFromBackendDict(
         stateName,
         statesBackendDict[stateName]
       );
     }
-    return new States(this.stateObject, stateObjectsDict);
+    return new States(stateObjectsDict);
   }
 }
