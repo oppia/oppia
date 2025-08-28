@@ -18,11 +18,7 @@
  */
 
 import {Injectable} from '@angular/core';
-import {
-  State,
-  StateBackendDict,
-  StateObjectFactory,
-} from 'domain/state/StateObjectFactory';
+import {State, StateBackendDict} from 'domain/state/state.model';
 import {AppConstants} from 'app.constants';
 import {MisconceptionSkillMap} from 'domain/skill/misconception.model';
 import cloneDeep from 'lodash/cloneDeep';
@@ -192,19 +188,13 @@ export class Question {
   providedIn: 'root',
 })
 export class QuestionObjectFactory {
-  constructor(private stateObject: StateObjectFactory) {}
-
   // TODO(#14312): Remove the createDefaultQuestion so that full question can be
   // created from start.
   // Create a default question until the actual question is saved.
   createDefaultQuestion(skillIds: string[]): Question {
     return new Question(
       null,
-      this.stateObject.createDefaultState(
-        null,
-        'content_0',
-        'default_outcome_1'
-      ),
+      State.createDefaultState(null, 'content_0', 'default_outcome_1'),
       AppConstants.DEFAULT_LANGUAGE_CODE,
       1,
       skillIds,
@@ -216,7 +206,7 @@ export class QuestionObjectFactory {
   createFromBackendDict(questionBackendDict: QuestionBackendDict): Question {
     return new Question(
       questionBackendDict.id,
-      this.stateObject.createFromBackendDict(
+      State.createFromBackendDict(
         'question',
         questionBackendDict.question_state_data
       ),
