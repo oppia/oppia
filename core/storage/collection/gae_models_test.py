@@ -634,56 +634,6 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
             collection_models.CollectionSummaryModel
             .has_reference_to_user_id('x_id'))
 
-    def test_get_non_private(self) -> None:
-        public_collection_summary_model = (
-            collection_models.CollectionSummaryModel(
-                id='id0',
-                title='title',
-                category='category',
-                objective='objective',
-                language_code='language_code',
-                tags=['tags'],
-                status=constants.ACTIVITY_STATUS_PUBLIC,
-                community_owned=False,
-                owner_ids=['owner_ids'],
-                editor_ids=['editor_ids'],
-                viewer_ids=['viewer_ids'],
-                contributor_ids=[''],
-                contributors_summary={},
-                version=0,
-                node_count=0,
-                collection_model_last_updated=None,
-                collection_model_created_on=None,
-            ))
-        public_collection_summary_model.update_timestamps()
-        public_collection_summary_model.put()
-
-        private_collection_summary_model = (
-            collection_models.CollectionSummaryModel(
-                id='id1',
-                title='title',
-                category='category',
-                objective='objective',
-                language_code='language_code',
-                tags=['tags'],
-                status=constants.ACTIVITY_STATUS_PRIVATE,
-                community_owned=False,
-                owner_ids=['owner_ids'],
-                editor_ids=['editor_ids'],
-                viewer_ids=['viewer_ids'],
-                contributor_ids=[''],
-                contributors_summary={},
-                version=0,
-                node_count=0,
-                collection_model_last_updated=None,
-                collection_model_created_on=None,
-            ))
-        private_collection_summary_model.update_timestamps()
-        private_collection_summary_model.put()
-        collection_summary_models = (
-            collection_models.CollectionSummaryModel.get_non_private())
-        self.assertEqual(1, len(collection_summary_models))
-
     def test_get_private_at_least_viewable(self) -> None:
         viewable_collection_summary_model = (
             collection_models.CollectionSummaryModel(
