@@ -19,7 +19,7 @@
 import {Injectable} from '@angular/core';
 
 import {AppConstants} from 'app.constants';
-import {State} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 import {LearnerAnswerDetailsBackendApiService} from 'domain/statistics/learner-answer-details-backend-api.service';
 import {
   AnswerClassificationService,

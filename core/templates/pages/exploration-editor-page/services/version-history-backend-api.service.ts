@@ -24,11 +24,7 @@ import {
   ExplorationMetadataBackendDict,
   ExplorationMetadataObjectFactory,
 } from 'domain/exploration/ExplorationMetadataObjectFactory';
-import {
-  State,
-  StateBackendDict,
-  StateObjectFactory,
-} from 'domain/state/StateObjectFactory';
+import {State, StateBackendDict} from 'domain/state/state.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 interface StateVersionHistoryBackendResponse {
@@ -70,7 +66,6 @@ export class VersionHistoryBackendApiService {
   constructor(
     private explorationMetadataObjectFactory: ExplorationMetadataObjectFactory,
     private http: HttpClient,
-    private stateObjectFactory: StateObjectFactory,
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
@@ -94,11 +89,10 @@ export class VersionHistoryBackendApiService {
       .then(response => {
         let stateInPreviousVersion: State | null = null;
         if (response.state_dict_in_previous_version) {
-          stateInPreviousVersion =
-            this.stateObjectFactory.createFromBackendDict(
-              response.state_name_in_previous_version,
-              response.state_dict_in_previous_version
-            );
+          stateInPreviousVersion = State.createFromBackendDict(
+            response.state_name_in_previous_version,
+            response.state_dict_in_previous_version
+          );
         }
         return {
           lastEditedVersionNumber: response.last_edited_version_number,
