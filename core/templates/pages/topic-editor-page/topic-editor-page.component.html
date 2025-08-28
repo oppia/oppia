@@ -59,7 +59,7 @@
           class="nav-item icon nav-list-item"
           role="menu"
           (click)="selectQuestionsTab()">
-        <a class="nav-link  navbar-tab e2e-test-questions-tab-button"
+        <a class="nav-link  navbar-tab e2e-test-questions-tab-button e2e-test-topic-questions-tab"
            ngbTooltip="Questions Editor"
            placement="bottom"
            aria-label="Question editor"
@@ -73,10 +73,10 @@
       </li>
 
       <li [ngClass]="{'navbar-tab-active': isInPreviewTab()}"
-          class="nav-item icon nav-list-item e2e-test-topic-preview-tab"
+          class="nav-item icon nav-list-item"
           role="menu"
           (click)="openTopicViewer()">
-        <a class="nav-link navbar-tab"
+        <a class="nav-link navbar-tab e2e-test-topic-preview-tab"
            ngbTooltip="Preview"
            placement="bottom"
            tabindex="0"

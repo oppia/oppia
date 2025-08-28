@@ -839,8 +839,8 @@ export class ExplorationEditor extends BaseUser {
    */
   async addResponseDetailsInResponseModal(
     feedback: string,
-    destination: string,
-    responseIsCorrect: boolean,
+    destination?: string,
+    responseIsCorrect?: boolean,
     isLastResponse: boolean = true
   ): Promise<void> {
     await this.clickOn(feedbackEditorSelector);
@@ -6621,6 +6621,43 @@ export class ExplorationEditor extends BaseUser {
     }
 
     await this.expectElementToBeVisible(nodeWarningSignSelector, visible);
+  }
+
+  /**
+   * Fills the value in the response modal.
+   * @param {string} value - The value to be filled in the response modal.
+   * @param {'input' | 'textarea'} inputType - The type of the input.
+   * @param {number} index - The index of the input.
+   */
+  async fillValueInInteractionResponseModal(
+    value: string,
+    inputType: 'input' | 'textarea',
+    index: number = 0
+  ): Promise<void> {
+    const selector = `${responseModalBodySelector} ${inputType}`;
+    await this.expectElementToBeVisible(selector);
+
+    const elements = await this.page.$$(selector);
+    if (elements.length < index + 1) {
+      throw new Error(`Element ${index} not found.`);
+    }
+
+    const element = elements[index];
+
+    // Clear all text from the element.
+    await element.click({clickCount: 3});
+    await this.page.keyboard.press('Backspace');
+
+    await element.type(value);
+
+    await this.page.waitForFunction(
+      (element: HTMLInputElement, value: string) => {
+        return (element as HTMLInputElement).value === value;
+      },
+      {},
+      element,
+      value
+    );
   }
 }
 

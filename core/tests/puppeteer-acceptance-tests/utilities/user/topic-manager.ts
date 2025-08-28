@@ -298,6 +298,11 @@ const saveQuestionButton = 'button.e2e-test-save-question-button';
 // Topic Editor > Preview Tab.
 const previewSubtabClass = 'e2e-test-preview-subtab';
 
+// Topic Editor > Questions Tab.
+const skillSelectInQuestionTabSelector =
+  '.e2e-test-select-skill-dropdown mat-select';
+const addQuestionButtonSelector = '.e2e-test-create-question-button';
+
 // Other Selectors.
 const activeTabSelector = '.e2e-test-active-tab';
 
@@ -687,6 +692,14 @@ export class TopicManager extends BaseUser {
 
     await this.waitForNetworkIdle();
     await this.page.waitForSelector(modalDiv, {hidden: true});
+  }
+
+  /**
+   * Clicks on "Save" button in the question editor.
+   */
+  async saveQuestion(): Promise<void> {
+    await this.clickOn(saveQuestionButton);
+    await this.expectElementToBeVisible(saveQuestionButton, false);
   }
 
   /**
@@ -3572,6 +3585,56 @@ export class TopicManager extends BaseUser {
     );
 
     expect(skillStatus).toBe(topicNames);
+  }
+
+  /**
+   * Navigates to the tab in the topic editor page.
+   * @param {'Preview Tab' | 'Questions Tab'} tabName - The name of the tab.
+   */
+  async navigateToTabInTopicEditorPage(
+    tabName: 'Preview Tab' | 'Questions Tab'
+  ): Promise<void> {
+    const tabSelector = `.e2e-test-topic-${tabName.toLocaleLowerCase().replace(' ', '-')}`;
+    await this.expectElementToBeVisible(tabSelector);
+    await this.clickOn(tabSelector);
+  }
+
+  /**
+   * Selects a skill in the questions tab.
+   * @param {string} skillName - The name of the skill to select.
+   */
+  async selectSkillInQuestionsTab(skillName: string): Promise<void> {
+    await this.expectElementToBeVisible(skillSelectInQuestionTabSelector);
+    await this.clickOn(skillSelectInQuestionTabSelector);
+
+    await this.selectMatOption(skillName);
+    await this.expectTextContentToBe(
+      skillSelectInQuestionTabSelector,
+      skillName
+    );
+  }
+
+  /**
+   * Checks if the question is visible in the questions tab.
+   * @param {string} question - The question to check.
+   */
+  async expectQuestionToBeVisible(question: string): Promise<void> {
+    await this.expectElementToBeVisible(questionTextSelector);
+
+    const questions = await this.page.$$eval(questionTextSelector, elements =>
+      elements.map(element => element.textContent?.trim())
+    );
+
+    expect(questions).toContain(question);
+  }
+
+  /**
+   * Clicks on the add question button in the questions tab.
+   */
+  async clickOnAddQuestionButton(): Promise<void> {
+    await this.expectElementToBeVisible(addQuestionButtonSelector);
+    await this.clickOn(addQuestionButtonSelector);
+    await this.expectElementToBeVisible(addQuestionButtonSelector, false);
   }
 }
 
