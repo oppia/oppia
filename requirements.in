@@ -3,9 +3,9 @@
 #    python -m scripts.install_third_party_libs
 #
 # to update `requirements.txt` and `third_party/python_libs` accordingly.
-apache-beam[gcp]==2.43.0
+apache-beam[gcp]==2.54.0
 azure-cognitiveservices-speech==1.41.1
-beautifulsoup4==4.10.0
+beautifulsoup4==4.12.3
 bleach==4.1.0
 certifi==2023.7.22
 deepdiff==5.8.1
@@ -19,10 +19,10 @@ google-auth==2.35.0
 google-cloud-bigquery==3.26.0
 google-cloud-dataflow-client==0.8.13
 google-cloud-logging==3.11.3
-google-cloud-ndb==1.11.1
+google-cloud-ndb==2.3.4
 google-cloud-secret-manager==2.21.0
 google-cloud-tasks==2.17.0
-google-cloud-translate==3.17.0
+google-cloud-translate==3.21.1
 gunicorn==20.1.0
 html5lib==1.1
 mailchimp3==3.0.15
