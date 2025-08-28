@@ -37,7 +37,7 @@ import {
 } from './answer-classification.service';
 import {QuestionBackendApiService} from '../../../domain/question/question-backend-api.service.ts';
 import {QuestionPlayerEngineService} from './question-player-engine.service';
-import {StateObjectFactory} from '../../../domain/state/StateObjectFactory';
+import {State} from '../../../domain/state/state.model';
 
 describe('Question player engine service', () => {
   let alertsService: AlertsService;
@@ -55,7 +55,6 @@ describe('Question player engine service', () => {
   let textInputService: InteractionRulesService;
 
   let questionId = 'question_id';
-  let stateObject: StateObjectFactory;
   let question: Question;
 
   beforeEach(() => {
@@ -384,7 +383,6 @@ describe('Question player engine service', () => {
         QuestionPlayerEngineService,
         QuestionObjectFactory,
         QuestionBackendApiService,
-        StateObjectFactory,
         ExpressionInterpolationService,
         FocusManagerService,
         AlertsService,
@@ -395,7 +393,6 @@ describe('Question player engine service', () => {
     });
 
     alertsService = TestBed.inject(AlertsService);
-    stateObject = TestBed.inject(StateObjectFactory);
     answerClassificationService = TestBed.inject(AnswerClassificationService);
     pageContextService = TestBed.inject(PageContextService);
     expressionInterpolationService = TestBed.inject(
@@ -417,7 +414,7 @@ describe('Question player engine service', () => {
     );
     question = new Question(
       questionId,
-      stateObject.createDefaultState('state', 'content_0', 'default_outcome_1'),
+      State.createDefaultState('state', 'content_0', 'default_outcome_1'),
       '',
       7,
       [],

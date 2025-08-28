@@ -36,7 +36,7 @@ import {QuestionUpdateService} from 'domain/question/question-update.service';
 import {Solution} from 'domain/exploration/solution.model';
 import {Hint} from 'domain/exploration/hint-object.model';
 import {AnswerGroup} from 'domain/exploration/answer-group.model';
-import {State} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {SolutionValidityService} from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
