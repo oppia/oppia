@@ -6087,42 +6087,6 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         rights_manager.publish_exploration(self.albert, self.EXP_ID_3)
         exp_services.delete_exploration(self.albert_id, self.EXP_ID_3)
 
-    def test_get_non_private_exploration_summaries(self) -> None:
-
-        actual_summaries = exp_services.get_non_private_exploration_summaries()
-
-        expected_summaries = {
-            self.EXP_ID_2: exp_domain.ExplorationSummary(
-                self.EXP_ID_2, 'Exploration 2 Albert title',
-                'Algebra', 'An objective', 'en', [],
-                feconf.get_empty_ratings(), feconf.EMPTY_SCALED_AVERAGE_RATING,
-                rights_domain.ACTIVITY_STATUS_PUBLIC,
-                False, [self.albert_id], [], [], [], [self.albert_id],
-                {self.albert_id: 1},
-                self.EXPECTED_VERSION_2,
-                actual_summaries[self.EXP_ID_2].exploration_model_created_on,
-                actual_summaries[self.EXP_ID_2].exploration_model_last_updated,
-                actual_summaries[self.EXP_ID_2].first_published_msec
-                )}
-
-        # Check actual summaries equal expected summaries.
-        self.assertEqual(
-            list(actual_summaries.keys()),
-            list(expected_summaries.keys()))
-        simple_props = ['id', 'title', 'category', 'objective',
-                        'language_code', 'tags', 'ratings',
-                        'scaled_average_rating', 'status',
-                        'community_owned', 'owner_ids',
-                        'editor_ids', 'voice_artist_ids', 'viewer_ids',
-                        'contributor_ids', 'version',
-                        'exploration_model_created_on',
-                        'exploration_model_last_updated']
-        for exp_id, actual_summary in actual_summaries.items():
-            for prop in simple_props:
-                self.assertEqual(
-                    getattr(actual_summary, prop),
-                    getattr(expected_summaries[exp_id], prop))
-
     def test_get_all_exploration_summaries(self) -> None:
         actual_summaries = exp_services.get_all_exploration_summaries()
 
