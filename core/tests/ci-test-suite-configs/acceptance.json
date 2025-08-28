@@ -358,47 +358,47 @@
     },
     {
       "name": "topic-manager/browse-skills-on-topics-and-skills-dashboard",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/browse-skills-on-topics-and-skills-dashboard.spec.ts"
+      "module": "core/tests/puppeteer-acceptance-tests/specs-old/topic-manager/browse-skills-on-topics-and-skills-dashboard.spec.ts"
     },
     {
       "name": "topic-manager/browse-topics-on-topics-and-skills-dashboard",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/browse-topics-on-topics-and-skills-dashboard.spec.ts"
+      "module": "core/tests/puppeteer-acceptance-tests/specs-old/topic-manager/browse-topics-on-topics-and-skills-dashboard.spec.ts"
     },
     {
       "name": "topic-manager/create-and-delete-questions-in-skill-editor",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/create-and-delete-questions-in-skill-editor.spec.ts"
+      "module": "core/tests/puppeteer-acceptance-tests/specs-old/topic-manager/create-and-delete-questions-in-skill-editor.spec.ts"
     },
     {
       "name": "topic-manager/assign-unassign-and-merge-skills",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/assign-unassign-and-merge-skills.spec.ts"
+      "module": "core/tests/puppeteer-acceptance-tests/specs-old/topic-manager/assign-unassign-and-merge-skills.spec.ts"
     },
     {
       "name": "topic-manager/cannot-do-curriculum-admin-actions",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/cannot-do-curriculum-admin-actions.spec.ts"
+      "module": "core/tests/puppeteer-acceptance-tests/specs-old/topic-manager/cannot-do-curriculum-admin-actions.spec.ts"
     },
     {
       "name": "topic-manager/edit-and-republish-a-skill",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/edit-and-republish-a-skill.spec.ts"
+      "module": "core/tests/puppeteer-acceptance-tests/specs-old/topic-manager/edit-and-republish-a-skill.spec.ts"
     },
     {
       "name": "topic-manager/edit-and-republish-story-with-mobile-supported-explorations",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/edit-and-republish-story-with-mobile-supported-explorations.spec.ts"
+      "module": "core/tests/puppeteer-acceptance-tests/specs-old/topic-manager/edit-and-republish-story-with-mobile-supported-explorations.spec.ts"
     },
     {
       "name": "topic-manager/edit-and-preview-a-subtopic",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/edit-and-preview-a-subtopic.spec.ts"
+      "module": "core/tests/puppeteer-acceptance-tests/specs-old/topic-manager/edit-and-preview-a-subtopic.spec.ts"
     },
     {
       "name": "topic-manager/edit-and-preview-a-topic",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/edit-and-preview-a-topic.spec.ts"
+      "module": "core/tests/puppeteer-acceptance-tests/specs-old/topic-manager/edit-and-preview-a-topic.spec.ts"
     },
     {
       "name": "topic-manager/edit-preview-and-save-a-chapter",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/edit-preview-and-save-a-chapter.spec.ts"
+      "module": "core/tests/puppeteer-acceptance-tests/specs-old/topic-manager/edit-preview-and-save-a-chapter.spec.ts"
     },
     {
       "name": "topic-manager/create-and-delete-subtopic-and-story",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/create-and-delete-subtopic-and-story.spec.ts"
+      "module": "core/tests/puppeteer-acceptance-tests/specs-old/topic-manager/create-and-delete-subtopic-and-story.spec.ts"
     },
     {
       "name": "voiceover-admin/assign-unassign-voiceover-artist-to-an-exploration",
@@ -563,6 +563,14 @@
     {
       "name": "topic-manager/edit-the-topic",
       "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/edit-the-topic.spec.ts"
+    },
+    {
+      "name": "topic-manager/assign-unassign-and-merge-skills-in-skill-dashboard",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/assign-unassign-and-merge-skills-in-skill-dashboard.spec.ts"
+    },
+    {
+      "name": "topic-manager/edit-and-republish-the-skill",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/edit-and-republish-the-skill.spec.ts"
     }
   ],
   "docker_suites": []

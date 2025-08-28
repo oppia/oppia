@@ -54,6 +54,8 @@ jobs:
         suite:
           - name: topic-manager/access-dashboard-using-profile-dropdown
           - name: topic-manager/edit-the-topic
+          - name: topic-manager/assign-unassign-and-merge-skills-in-skill-dashboard
+          - name: topic-manager/edit-and-republish-the-skill
         run1: [1, 2]
         run2: [1]
         mobile: [false, true]
