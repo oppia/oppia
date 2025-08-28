@@ -34,7 +34,7 @@ import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {UserBackendApiService} from 'services/user-backend-api.service';
 import {UserService} from 'services/user.service';
 import {I18nService} from './i18n.service';
-import {LanguageBannerService} from '../components/language-banner/language-banner.service';
+import {LanguageBannerService} from 'components/language-banner/language-banner.service';
 
 describe('I18n service', () => {
   let i18nService: I18nService;

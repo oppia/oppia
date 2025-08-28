@@ -20,10 +20,10 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {TestBed} from '@angular/core/testing';
 
 import {ContentTranslationLanguageService} from './content-translation-language.service';
-import {UrlService} from '../../../services/contextual/url.service';
-import {PlatformFeatureService} from '../../../services/platform-feature.service';
-import {I18nLanguageCodeService} from '../../../services/i18n-language-code.service';
-import {LanguageUtilService} from '../../../domain/utilities/language-util.service';
+import {UrlService} from 'services/contextual/url.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {LanguageUtilService} from 'domain/utilities/language-util.service';
 
 class MockPlatformFeatureService {
   status = {

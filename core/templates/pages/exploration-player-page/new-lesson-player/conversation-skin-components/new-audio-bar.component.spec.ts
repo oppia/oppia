@@ -25,19 +25,19 @@ import {
   tick,
   waitForAsync,
 } from '@angular/core/testing';
-import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {NewAudioBarComponent} from './new-audio-bar.component';
-import {Voiceover} from '../../../../domain/exploration/voiceover.model';
-import {AssetsBackendApiService} from '../../../../services/assets-backend-api.service';
-import {AudioPlayerService} from '../../../../services/audio-player.service';
-import {AudioPreloaderService} from '../../../../pages/exploration-player-page/services/audio-preloader.service';
-import {PlayerPositionService} from '../../../../pages/exploration-player-page/services/player-position.service';
-import {PageContextService} from '../../../../services/page-context.service';
-import {I18nLanguageCodeService} from '../../../../services/i18n-language-code.service';
-import {VoiceoverPlayerService} from '../../../../pages/exploration-player-page/services/voiceover-player.service';
-import {EntityVoiceoversService} from '../../../../services/entity-voiceovers.services';
-import {StateEditorService} from '../../../../components/state-editor/state-editor-properties-services/state-editor.service';
-import {SiteAnalyticsService} from '../../../../services/site-analytics.service';
+import {Voiceover} from 'domain/exploration/voiceover.model';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {AudioPlayerService} from 'services/audio-player.service';
+import {AudioPreloaderService} from 'pages/exploration-player-page/services/audio-preloader.service';
+import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
+import {PageContextService} from 'services/page-context.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {VoiceoverPlayerService} from 'pages/exploration-player-page/services/voiceover-player.service';
+import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
 
 describe('NewAudioBarComponent', () => {
   let component: NewAudioBarComponent;

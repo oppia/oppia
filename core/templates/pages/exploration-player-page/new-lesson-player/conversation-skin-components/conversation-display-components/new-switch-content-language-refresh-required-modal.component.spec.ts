@@ -23,8 +23,8 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {NewSwitchContentLanguageRefreshRequiredModalComponent} from './new-switch-content-language-refresh-required-modal.component';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
-import {MockTranslatePipe} from '../../../../../tests/unit-test-utils';
-import {WindowRef} from '../../../../../services/contextual/window-ref.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {WindowRef} from 'services/contextual/window-ref.service';
 import {CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
 
 class MockActiveModal {

@@ -19,28 +19,28 @@
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {fakeAsync, TestBed, tick} from '@angular/core/testing';
 import {TranslateService} from '@ngx-translate/core';
-import {MockTranslateService} from '../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
-import {AnswerClassificationResult} from '../../../domain/classifier/answer-classification-result.model';
-import {Interaction} from '../../../domain/exploration/interaction.model';
+import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
+import {AnswerClassificationResult} from 'domain/classifier/answer-classification-result.model';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {
   ExplorationBackendDict,
   ExplorationObjectFactory,
-} from '../../../domain/exploration/ExplorationObjectFactory';
-import {Outcome} from '../../../domain/exploration/outcome.model';
+} from 'domain/exploration/ExplorationObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {
   ParamChangeBackendDict,
   ParamChange,
-} from '../../../domain/exploration/param-change.model';
+} from 'domain/exploration/param-change.model';
 import {
   FetchExplorationBackendResponse,
   ReadOnlyExplorationBackendApiService,
-} from '../../../domain/exploration/read-only-exploration-backend-api.service';
-import {StateCard} from '../../../domain/state_card/state-card.model';
-import {ExpressionInterpolationService} from '../../../expressions/expression-interpolation.service';
-import {TextInputRulesService} from '../../../../../extensions/interactions/TextInput/directives/text-input-rules.service';
-import {AlertsService} from '../../../services/alerts.service';
-import {PageContextService} from '../../../services/page-context.service';
-import {UrlService} from '../../../services/contextual/url.service';
+} from 'domain/exploration/read-only-exploration-backend-api.service';
+import {StateCard} from 'domain/state_card/state-card.model';
+import {ExpressionInterpolationService} from 'expressions/expression-interpolation.service';
+import {TextInputRulesService} from 'extensions/interactions/TextInput/directives/text-input-rules.service';
+import {AlertsService} from 'services/alerts.service';
+import {PageContextService} from 'services/page-context.service';
+import {UrlService} from 'services/contextual/url.service';
 import {AnswerClassificationService} from './answer-classification.service';
 import {AudioPreloaderService} from './audio-preloader.service';
 import {ContentTranslationLanguageService} from './content-translation-language.service';
@@ -49,7 +49,7 @@ import {ImagePreloaderService} from './image-preloader.service';
 import {LearnerParamsService} from './learner-params.service';
 import {PlayerTranscriptService} from './player-transcript.service';
 import {StatsReportingService} from './stats-reporting.service';
-import {PlatformFeatureService} from '../../../services/platform-feature.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 import {ContentTranslationManagerService} from './content-translation-manager.service';
 
 class MockPlatformFeatureService {

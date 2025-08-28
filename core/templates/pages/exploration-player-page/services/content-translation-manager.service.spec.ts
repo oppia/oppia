@@ -24,26 +24,26 @@ import {
 } from '@angular/core/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 
-import {Interaction} from '../../../domain/exploration/interaction.model';
-import {SubtitledUnicode} from '../../../domain/exploration/subtitled-unicode.model';
-import {StateCard} from '../../../domain/state_card/state-card.model';
+import {Interaction} from 'domain/exploration/interaction.model';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model';
+import {StateCard} from 'domain/state_card/state-card.model';
 import {ContentTranslationManagerService} from './content-translation-manager.service';
 import {PlayerTranscriptService} from './player-transcript.service';
-import {ExplorationHtmlFormatterService} from '../../../services/exploration-html-formatter.service';
-import {EntityTranslationsService} from '../../../services/entity-translations.services';
-import {EntityTranslation} from '../../../domain/translation/EntityTranslationObjectFactory';
+import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
+import {EntityTranslationsService} from 'services/entity-translations.services';
+import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
 import {ImagePreloaderService} from './image-preloader.service';
-import {ExtensionTagAssemblerService} from '../../../services/extension-tag-assembler.service';
-import {PageContextService} from '../../../services/page-context.service';
-import {EntityVoiceoversService} from '../../../services/entity-voiceovers.services';
+import {ExtensionTagAssemblerService} from 'services/extension-tag-assembler.service';
+import {PageContextService} from 'services/page-context.service';
+import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {VoiceoverPlayerService} from '../services/voiceover-player.service';
-import {AutomaticVoiceoverHighlightService} from '../../../services/automatic-voiceover-highlight-service';
+import {AutomaticVoiceoverHighlightService} from 'services/automatic-voiceover-highlight-service';
 import {PlayerPositionService} from '../services/player-position.service';
-import {StateEditorService} from '../../../components/state-editor/state-editor-properties-services/state-editor.service';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {ContentTranslationLanguageService} from '../services/content-translation-language.service';
 import {AudioPreloaderService} from '../services/audio-preloader.service';
-import {VoiceoverBackendApiService} from '../../../domain/voiceover/voiceover-backend-api.service';
-import {I18nLanguageCodeService} from '../../../services/i18n-language-code.service';
+import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
 describe('Content translation manager service', () => {
   let ctms: ContentTranslationManagerService;

@@ -27,19 +27,19 @@ import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {
   FetchExplorationBackendResponse,
   ReadOnlyExplorationBackendApiService,
-} from '../../../domain/exploration/read-only-exploration-backend-api.service';
-import {ExplorationPermissionsBackendApiService} from '../../../domain/exploration/exploration-permissions-backend-api.service';
-import {PageContextService} from '../../../services/page-context.service';
-import {MetaTagCustomizationService} from '../../../services/contextual/meta-tag-customization.service';
-import {UrlService} from '../../../services/contextual/url.service';
-import {KeyboardShortcutService} from '../../../services/keyboard-shortcut.service';
-import {PageTitleService} from '../../../services/page-title.service';
-import {EntityVoiceoversService} from '../../../services/entity-voiceovers.services';
-import {I18nLanguageCodeService} from '../../../services/i18n-language-code.service';
+} from 'domain/exploration/read-only-exploration-backend-api.service';
+import {ExplorationPermissionsBackendApiService} from 'domain/exploration/exploration-permissions-backend-api.service';
+import {PageContextService} from 'services/page-context.service';
+import {MetaTagCustomizationService} from 'services/contextual/meta-tag-customization.service';
+import {UrlService} from 'services/contextual/url.service';
+import {KeyboardShortcutService} from 'services/keyboard-shortcut.service';
+import {PageTitleService} from 'services/page-title.service';
+import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {ContentTranslationManagerService} from '../services/content-translation-manager.service';
 import {ContentTranslationLanguageService} from '../services/content-translation-language.service';
 import {PlayerTranscriptService} from '../services/player-transcript.service';
-import {I18nService} from '../../../i18n/i18n.service';
+import {I18nService} from 'i18n/i18n.service';
 import {NewLessonPlayerPageComponent} from './lesson-player-page.component';
 import {NewSwitchContentLanguageRefreshRequiredModalComponent} from './conversation-skin-components/conversation-display-components/new-switch-content-language-refresh-required-modal.component';
 import {CookieService} from 'ngx-cookie';
