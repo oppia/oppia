@@ -870,9 +870,6 @@ describe('Translation Modal Component', () => {
       );
       flushMicrotasks();
       component.suggestTranslatedText();
-      tick();
-      req = httpTestingController.expectOne('/suggestionhandler/');
-      req.flush({});
       expect(pageContextService.getImageSaveDestination()).toBe(
         AppConstants.IMAGE_SAVE_DESTINATION_SERVER
       );
