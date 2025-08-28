@@ -19,16 +19,14 @@
 import {TestBed} from '@angular/core/testing';
 import {ExplorationMetadata} from 'domain/exploration/ExplorationMetadataObjectFactory';
 import {ParamSpecs} from 'domain/exploration/param-specs.model';
-import {StateObjectFactory} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 import {VersionHistoryService} from './version-history.service';
 
 describe('Version history service', () => {
   let versionHistoryService: VersionHistoryService;
-  let stateObjectFactory: StateObjectFactory;
 
   beforeEach(() => {
     versionHistoryService = TestBed.inject(VersionHistoryService);
-    stateObjectFactory = TestBed.inject(StateObjectFactory);
 
     versionHistoryService.init(4);
   });
@@ -149,10 +147,7 @@ describe('Version history service', () => {
         },
       },
     };
-    const stateData = stateObjectFactory.createFromBackendDict(
-      'State',
-      stateObject
-    );
+    const stateData = State.createFromBackendDict('State', stateObject);
     versionHistoryService.insertStateVersionHistoryData(3, stateData, '');
 
     expect(versionHistoryService.fetchedStateData.length).toEqual(1);
@@ -213,10 +208,7 @@ describe('Version history service', () => {
         },
       },
     };
-    const stateData = stateObjectFactory.createFromBackendDict(
-      'State',
-      stateObject
-    );
+    const stateData = State.createFromBackendDict('State', stateObject);
     versionHistoryService.insertStateVersionHistoryData(3, stateData, '');
 
     expect(versionHistoryService.fetchedStateData.length).toEqual(1);
@@ -319,10 +311,7 @@ describe('Version history service', () => {
         },
       },
     };
-    const stateData = stateObjectFactory.createFromBackendDict(
-      'State',
-      stateObject
-    );
+    const stateData = State.createFromBackendDict('State', stateObject);
     versionHistoryService.insertStateVersionHistoryData(3, stateData, '');
 
     expect(
@@ -390,10 +379,7 @@ describe('Version history service', () => {
         },
       },
     };
-    const stateData = stateObjectFactory.createFromBackendDict(
-      'State',
-      stateObject
-    );
+    const stateData = State.createFromBackendDict('State', stateObject);
     versionHistoryService.insertStateVersionHistoryData(3, stateData, '');
     versionHistoryService.insertStateVersionHistoryData(4, stateData, '');
 
@@ -485,10 +471,7 @@ describe('Version history service', () => {
         },
       },
     };
-    const stateData = stateObjectFactory.createFromBackendDict(
-      'State',
-      stateObject
-    );
+    const stateData = State.createFromBackendDict('State', stateObject);
     versionHistoryService.insertStateVersionHistoryData(3, stateData, '');
     versionHistoryService.insertStateVersionHistoryData(4, stateData, '');
     versionHistoryService.insertStateVersionHistoryData(5, stateData, '');
@@ -588,10 +571,7 @@ describe('Version history service', () => {
         },
       },
     };
-    const stateData = stateObjectFactory.createFromBackendDict(
-      'State',
-      stateObject
-    );
+    const stateData = State.createFromBackendDict('State', stateObject);
     versionHistoryService.insertStateVersionHistoryData(3, stateData, '');
     versionHistoryService.insertStateVersionHistoryData(2, stateData, '');
     const diffData = versionHistoryService.getBackwardStateDiffData();
@@ -651,10 +631,7 @@ describe('Version history service', () => {
         },
       },
     };
-    const stateData = stateObjectFactory.createFromBackendDict(
-      'State',
-      stateObject
-    );
+    const stateData = State.createFromBackendDict('State', stateObject);
     versionHistoryService.insertStateVersionHistoryData(3, stateData, '');
     versionHistoryService.insertStateVersionHistoryData(2, stateData, '');
     versionHistoryService.insertStateVersionHistoryData(1, stateData, '');

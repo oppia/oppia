@@ -47,7 +47,7 @@ import {
   Question,
   QuestionObjectFactory,
 } from 'domain/question/QuestionObjectFactory';
-import {State} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 import {Rubric} from 'domain/skill/rubric.model';
 import {EditableQuestionBackendApiService} from 'domain/question/editable-question-backend-api.service';
 import {

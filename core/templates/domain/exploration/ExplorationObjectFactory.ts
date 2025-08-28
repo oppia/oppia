@@ -38,7 +38,7 @@ import {
   InteractionCustomizationArgs,
 } from 'interactions/customization-args-defs';
 import {Interaction} from 'domain/exploration/interaction.model';
-import {State} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 import {
   StateObjectsBackendDict,
   States,

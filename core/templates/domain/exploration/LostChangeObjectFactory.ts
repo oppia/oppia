@@ -32,7 +32,7 @@ import {InteractionBackendDict} from './interaction.model';
 import {ParamChangeBackendDict} from './param-change.model';
 import {ParamSpecBackendDict} from './param-spec.model';
 import {RecordedVoiceOverBackendDict} from './recorded-voiceovers.model';
-import {WrittenTranslationsBackendDict} from './WrittenTranslationsObjectFactory';
+import {WrittenTranslationsBackendDict} from './written-translations.model';
 import {AppConstants} from 'app.constants';
 
 interface LostChangeValues {
