@@ -854,7 +854,7 @@ describe('Translation Modal Component', () => {
       ).and.returnValue(Promise.resolve({}));
       component.suggestTranslatedText();
       tick();
-      let req = httpTestingController.expectOne('/suggestionhandler/');
+      const req = httpTestingController.expectOne('/suggestionhandler/');
       expect(req.request.method).toEqual('POST');
       expect(req.request.body.getAll('payload')[0]).toEqual(
         JSON.stringify(expectedPayload)
@@ -1002,18 +1002,19 @@ describe('Translation Modal Component', () => {
     );
   });
 
-  it('should close the modal when updating translated text', () => {
+  it('should close modal and return the new translation when updating translated text', () => {
     spyOn(activeModal, 'close');
     spyOn(component, 'canTranslatedTextBeSubmitted').and.returnValue(true);
     component.activeWrittenTranslation = 'Test translation';
-    component.suggestTranslatedText();
-    expect(activeModal.close).toHaveBeenCalled();
+    component.updateTranslatedText();
+
+    expect(activeModal.close).toHaveBeenCalledWith('Test translation');
   });
 
   it('should not close modal if new translated text cannot be submitted', () => {
     spyOn(activeModal, 'close');
     component.activeWrittenTranslation = 'Test translation';
-    component.suggestTranslatedText();
+    component.updateTranslatedText();
 
     expect(activeModal.close).not.toHaveBeenCalled();
   });
@@ -1051,19 +1052,26 @@ describe('Translation Modal Component', () => {
         expect(translateTextService.getTextToTranslate).toHaveBeenCalled();
       }));
 
-      it('should open confirmation modal and skip on confirm', fakeAsync(() => {
-        component.activeWrittenTranslation = 'Unsaved text';
+      it('should open confirmation modal and not skip on cancel', fakeAsync(() => {
+        const originalText = 'Some unsaved text';
+        component.activeWrittenTranslation = originalText;
 
         spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
-        mockModalRef.result = Promise.resolve();
+        const getTextSpy = spyOn(translateTextService, 'getTextToTranslate');
 
+        mockModalRef.result = Promise.reject();
         component.skipActiveTranslation();
         tick();
         expect(ngbModal.open).toHaveBeenCalledWith(
           ConfirmTranslationExitModalComponent,
           {backdrop: 'static'}
         );
-        expect(component.activeWrittenTranslation).toBe('');
+
+        tick();
+        flushMicrotasks();
+
+        expect(component.activeWrittenTranslation).toBe(originalText);
+        expect(getTextSpy).not.toHaveBeenCalled();
       }));
     });
 
