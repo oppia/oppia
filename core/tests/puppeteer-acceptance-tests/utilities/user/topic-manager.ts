@@ -305,6 +305,9 @@ const addQuestionButtonSelector = '.e2e-test-create-question-button';
 
 // Other Selectors.
 const activeTabSelector = '.e2e-test-active-tab';
+const addSubtopicButton = 'button.e2e-test-add-subtopic-button';
+const subtopicDescriptionEditorToggle = 'div.e2e-test-show-schema-editor';
+const createSubtopicButton = '.e2e-test-confirm-subtopic-creation-button';
 
 export class TopicManager extends BaseUser {
   /**
@@ -2675,7 +2678,7 @@ export class TopicManager extends BaseUser {
     title: string,
     urlFragment: string,
     explanation: string,
-    thumbnail: string
+    thumbnail?: string
   ): Promise<void> {
     await this.expectElementToBeVisible(subtopicTitleField);
     await this.clearAllTextFrom(subtopicTitleField);
@@ -2693,11 +2696,14 @@ export class TopicManager extends BaseUser {
     await this.clearAllTextFrom(richTextAreaField);
     await this.type(richTextAreaField, explanation);
 
-    await this.clickOn(subtopicPhotoBoxButton);
-    await this.page.waitForSelector(photoUploadModal, {visible: true});
-    await this.uploadFile(thumbnail);
-    await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
-    await this.clickOn(uploadPhotoButton);
+    // Update the thumbnail if it is provided.
+    if (thumbnail) {
+      await this.clickOn(subtopicPhotoBoxButton);
+      await this.page.waitForSelector(photoUploadModal, {visible: true});
+      await this.uploadFile(thumbnail);
+      await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
+      await this.clickOn(uploadPhotoButton);
+    }
 
     await this.expectElementToBeVisible(photoUploadModal, false);
   }
@@ -3635,6 +3641,47 @@ export class TopicManager extends BaseUser {
     await this.expectElementToBeVisible(addQuestionButtonSelector);
     await this.clickOn(addQuestionButtonSelector);
     await this.expectElementToBeVisible(addQuestionButtonSelector, false);
+  }
+
+  /**
+   * Create a subtopic as a curriculum admin.
+   * @param {string} title - The title of the Subtopic.
+   * @param {string} urlFragment - The url fragment of the Subtopic.
+   * @param {string} topicName - The name of the Topic which storing the new Subtopic.
+   */
+  async createSubtopicForTopic(
+    title: string,
+    urlFragment: string,
+    topicName: string
+  ): Promise<void> {
+    await this.openTopicEditor(topicName);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(subtopicReassignHeader);
+    }
+    await this.clickOn(addSubtopicButton);
+    await this.type(subtopicTitleField, title);
+    await this.page.waitForSelector(subtopicUrlFragmentField, {
+      visible: true,
+    });
+    await this.page.type(subtopicUrlFragmentField, urlFragment);
+
+    await this.clickOn(subtopicDescriptionEditorToggle);
+    await this.page.waitForSelector(richTextAreaField, {visible: true});
+    await this.type(
+      richTextAreaField,
+      `Subtopic creation description text for ${title}`
+    );
+
+    await this.clickOn(subtopicPhotoBoxButton);
+    await this.page.waitForSelector(photoUploadModal, {visible: true});
+    await this.uploadFile(curriculumAdminThumbnailImage);
+    await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
+    await this.clickOn(uploadPhotoButton);
+
+    await this.page.waitForSelector(photoUploadModal, {hidden: true});
+    await this.clickOn(createSubtopicButton);
+    await this.saveTopicDraft(topicName);
+    showMessage(`Subtopic ${title} is created.`);
   }
 }
 
