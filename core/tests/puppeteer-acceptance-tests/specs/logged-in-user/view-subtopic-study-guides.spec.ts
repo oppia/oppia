@@ -106,6 +106,7 @@ describe('Logged-in User', function () {
       await loggedInUser1.selectReviewCardToLearn('Adding Numbers');
       await loggedInUser1.clickOnPracticeButton();
       await loggedInUser1.expectToBeOnPage('practice');
+      await loggedInUser1.navigateToPracticeTabUsingURL('addition-and-subtrac');
       await loggedInUser1.navigateToStudyTab();
       await loggedInUser1.selectReviewCardToLearn('Adding Numbers');
       await loggedInUser1.clickOnBackToTopicButton();

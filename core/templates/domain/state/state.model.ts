@@ -13,10 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of State
+ * @fileoverview Model class for creating new frontend instances of State
  * domain objects.
  */
-import {Injectable} from '@angular/core';
 
 import {
   InteractionBackendDict,
@@ -129,13 +128,8 @@ export class State extends BaseTranslatableObject {
     this.solicitAnswerDetails = otherState.solicitAnswerDetails;
     this.cardIsCheckpoint = otherState.cardIsCheckpoint;
   }
-}
 
-@Injectable({
-  providedIn: 'root',
-})
-export class StateObjectFactory {
-  get NEW_STATE_TEMPLATE(): StateBackendDict {
+  static get NEW_STATE_TEMPLATE(): StateBackendDict {
     return AppConstants.NEW_STATE_TEMPLATE as StateBackendDict;
   }
 
@@ -143,7 +137,7 @@ export class StateObjectFactory {
   // created from start.
   // Create a default state until the actual state is saved.
   // Passes name as null before saving a state.
-  createDefaultState(
+  static createDefaultState(
     newStateName: string | null,
     contentIdForContent: string,
     contentIdForDefaultOutcome: string
@@ -174,7 +168,7 @@ export class StateObjectFactory {
   }
 
   // Passes name as null before saving a state.
-  createFromBackendDict(
+  static createFromBackendDict(
     stateName: string | null,
     stateDict: StateBackendDict
   ): State {
