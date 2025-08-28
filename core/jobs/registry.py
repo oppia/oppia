@@ -52,6 +52,7 @@ from core.jobs.batch_jobs import exp_migration_jobs                  # pylint: d
 from core.jobs.batch_jobs import (                                   # pylint: disable=unused-import  # isort: skip
     exp_recommendation_computation_jobs)
 from core.jobs.batch_jobs import exp_search_indexing_jobs            # pylint: disable=unused-import  # isort: skip
+from core.jobs.batch_jobs import delete_duplicate_content_ids_jobs   # pylint: disable=unused-import # isort: skip
 from core.jobs.batch_jobs import model_validation_jobs               # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import opportunity_management_jobs         # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import question_migration_jobs             # pylint: disable=unused-import  # isort: skip
