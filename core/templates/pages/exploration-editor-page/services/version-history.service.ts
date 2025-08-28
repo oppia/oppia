@@ -18,7 +18,7 @@
 
 import {Injectable} from '@angular/core';
 import {ExplorationMetadata} from 'domain/exploration/exploration-metadata.model';
-import {State} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 
 export interface StateDiffData {
   oldState: State | null;

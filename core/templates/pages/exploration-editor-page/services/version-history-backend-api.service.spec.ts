@@ -22,26 +22,24 @@ import {
 } from '@angular/common/http/testing';
 import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
 import {ExplorationMetadata} from 'domain/exploration/exploration-metadata.model';
-import {StateObjectFactory} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {VersionHistoryBackendApiService} from './version-history-backend-api.service';
 
 describe('Version history backend api service', () => {
   let versionHistoryBackendApiService: VersionHistoryBackendApiService;
   let http: HttpTestingController;
-  let stateObjectFactory: StateObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [StateObjectFactory, UrlInterpolationService],
+      providers: [UrlInterpolationService],
     });
 
     versionHistoryBackendApiService = TestBed.inject(
       VersionHistoryBackendApiService
     );
     http = TestBed.inject(HttpTestingController);
-    stateObjectFactory = TestBed.inject(StateObjectFactory);
   });
 
   it('should correctly fetch the version history of a state', fakeAsync(() => {
@@ -50,15 +48,17 @@ describe('Version history backend api service', () => {
     const sampleStateVersionHistoryDict = {
       last_edited_version_number: 1,
       state_name_in_previous_version: 'Introduction',
-      state_dict_in_previous_version: stateObjectFactory
-        .createDefaultState('Introduction', 'content_0', 'default_outcome_1')
-        .toBackendDict(),
+      state_dict_in_previous_version: State.createDefaultState(
+        'Introduction',
+        'content_0',
+        'default_outcome_1'
+      ).toBackendDict(),
       last_edited_committer_username: 'user1',
     };
     const sampleStateVersionHistory = {
       lastEditedVersionNumber: 1,
       stateNameInPreviousVersion: 'Introduction',
-      stateInPreviousVersion: stateObjectFactory.createDefaultState(
+      stateInPreviousVersion: State.createDefaultState(
         'Introduction',
         'content_0',
         'default_outcome_1'

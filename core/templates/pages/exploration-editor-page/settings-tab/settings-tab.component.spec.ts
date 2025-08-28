@@ -54,7 +54,7 @@ import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {SettingsTabComponent} from './settings-tab.component';
 import {UserInfo} from 'domain/user/user-info.model';
 import {ExplorationPermissions} from 'domain/exploration/exploration-permissions.model';
-import {State} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 import {MatChipInputEvent} from '@angular/material/chips';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {

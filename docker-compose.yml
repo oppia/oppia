@@ -61,6 +61,7 @@ services:
       - DATASTORE_USE_PROJECT_ID_AS_APP_ID=true
       - GOOGLE_CLOUD_PROJECT=dev-project-id
       - REDIS_HOST=redis
+      - ES_HOST=oppia-elasticsearch
     depends_on:
       - angular-build
       - webpack-compiler
@@ -139,8 +140,10 @@ services:
     command: redis-server /app/oppia/redis_docker.conf
 
   elasticsearch:
-    image: elasticsearch:7.17.0
+    image: elasticsearch:7.17.27
     container_name: oppia-elasticsearch
+    ports:
+      - "9200:9200"
     environment:
       - ES_JAVA_OPTS=-Xms100m -Xmx500m
       - ES_PATH_CONF=/usr/share/elasticsearch/config
