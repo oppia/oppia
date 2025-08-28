@@ -209,7 +209,6 @@ export class UserFactory {
       QuestionSubmitterFactory(),
       TopicManagerFactory(),
       CurriculumAdminFactory(),
-      VoiceoverSubmitterFactory(),
     ]);
 
     user.username = username;
@@ -219,12 +218,18 @@ export class UserFactory {
     await user.signUpNewUser(username, email);
     activeUsers.push(user);
 
-    return await UserFactory.assignRolesToUser(
+    return (await UserFactory.assignRolesToUser(
       user,
       roles,
       topic ?? '',
       explorationId
-    );
+    )) as LoggedOutUser &
+      LoggedInUser &
+      ExplorationEditor &
+      QuestionSubmitter &
+      TopicManager &
+      CurriculumAdmin &
+      MultipleRoleIntersection<TRoles>;
   };
 
   /**
