@@ -27,7 +27,7 @@ import {PlayerPositionService} from './player-position.service';
 import {ConceptCardManagerService} from './concept-card-manager.service';
 import {ExplorationEngineService} from './exploration-engine.service';
 import {PlayerTranscriptService} from './player-transcript.service';
-import {StateObjectFactory} from '../../../domain/state/StateObjectFactory';
+import {State} from '../../../domain/state/state.model';
 import {Interaction} from '../../../domain/exploration/interaction.model';
 import {RecordedVoiceovers} from '../../../domain/exploration/recorded-voiceovers.model';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
@@ -44,7 +44,6 @@ describe('ConceptCardManager service', () => {
   let pps: PlayerPositionService;
   let ees: ExplorationEngineService;
   let pts: PlayerTranscriptService;
-  let stateObjectFactory: StateObjectFactory;
   let mockNewCardOpenedEmitter = new EventEmitter<StateCard>();
   let mockNewCardAvailableEmitter = new EventEmitter();
   let stateCard: StateCard;
@@ -69,7 +68,6 @@ describe('ConceptCardManager service', () => {
     pps = TestBed.inject(PlayerPositionService);
     ees = TestBed.inject(ExplorationEngineService);
     pts = TestBed.inject(PlayerTranscriptService);
-    stateObjectFactory = TestBed.inject(StateObjectFactory);
     spyOn(pps, 'onNewCardAvailable').and.returnValue(
       mockNewCardAvailableEmitter
     );
@@ -288,9 +286,7 @@ describe('ConceptCardManager service', () => {
     };
     spyOn(ees, 'getStateFromStateName')
       .withArgs('State 2')
-      .and.returnValue(
-        stateObjectFactory.createFromBackendDict('End', endState)
-      );
+      .and.returnValue(State.createFromBackendDict('End', endState));
 
     ccms.hintsAvailable = 0;
     ccms.reset(stateCard);
@@ -338,10 +334,7 @@ describe('ConceptCardManager service', () => {
     spyOn(ees, 'getStateFromStateName')
       .withArgs('State 2')
       .and.returnValue(
-        stateObjectFactory.createFromBackendDict(
-          'State2',
-          stateWithoutLinkedSkill
-        )
+        State.createFromBackendDict('State2', stateWithoutLinkedSkill)
       );
 
     expect(ccms.conceptCardForStateExists(stateCard)).toBe(false);

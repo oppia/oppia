@@ -33,7 +33,7 @@ import {ImprovementsConstants} from 'domain/improvements/improvements.constants'
 import {IneffectiveFeedbackLoopTask} from 'domain/improvements/ineffective-feedback-loop-task.model';
 import {NeedsGuidingResponsesTask} from 'domain/improvements/needs-guiding-response-task.model';
 import {SuccessiveIncorrectAnswersTask} from 'domain/improvements/successive-incorrect-answers-task.model';
-import {State} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 import {
   PlaythroughIssue,
   PlaythroughIssueType,

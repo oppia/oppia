@@ -37,7 +37,7 @@ ConsoleReporter.setConsoleErrorsToIgnore([/.*404.*Not Found.*/]);
 describe('Exploration Creator', function () {
   let explorationEditor: ExplorationEditor;
   let voiceoverAdmin: VoiceoverAdmin & ExplorationEditor;
-  let curriculumAdmin: CurriculumAdmin;
+  let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
   let explorationId: string | null;
 
   beforeAll(async function () {

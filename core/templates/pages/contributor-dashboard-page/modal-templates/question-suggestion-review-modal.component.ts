@@ -29,7 +29,7 @@ import {
   QuestionObjectFactory,
 } from 'domain/question/QuestionObjectFactory';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
-import {State} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 import {ThreadMessage} from 'domain/feedback_message/ThreadMessage.model';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {QuestionSuggestionEditorModalComponent} from './question-suggestion-editor-modal.component';

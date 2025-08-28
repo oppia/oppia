@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for StateDiffModalComponent.
  */
 
-import {State, StateObjectFactory} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 import {
   ComponentFixture,
   fakeAsync,
@@ -34,7 +34,6 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {HistoryTabYamlConversionService} from '../services/history-tab-yaml-conversion.service';
 
 describe('State Diff Modal Component', () => {
-  let stateObjectFactory: StateObjectFactory;
   let component: StateDiffModalComponent;
   let fixture: ComponentFixture<StateDiffModalComponent>;
   let historyTabYamlConversionService: HistoryTabYamlConversionService;
@@ -57,19 +56,18 @@ describe('State Diff Modal Component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(StateDiffModalComponent);
     component = fixture.componentInstance;
-    stateObjectFactory = TestBed.inject(StateObjectFactory);
     historyTabYamlConversionService = TestBed.inject(
       HistoryTabYamlConversionService
     );
   });
 
   beforeEach(() => {
-    newState = stateObjectFactory.createDefaultState(
+    newState = State.createDefaultState(
       newStateName,
       'content_0',
       'default_outcome_1'
     );
-    oldState = stateObjectFactory.createDefaultState(
+    oldState = State.createDefaultState(
       oldStateName,
       'content_0',
       'default_outcome_1'

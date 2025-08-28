@@ -1114,20 +1114,6 @@ class ExpSummaryModel(base_models.BaseModel):
         )).get(keys_only=True) is not None
 
     @classmethod
-    def get_non_private(cls) -> Sequence[ExpSummaryModel]:
-        """Returns an iterable with non-private ExpSummary models.
-
-        Returns:
-            iterable. An iterable with non-private ExpSummary models.
-        """
-        return ExpSummaryModel.query().filter(
-            ExpSummaryModel.status != constants.ACTIVITY_STATUS_PRIVATE
-        ).filter(
-            ExpSummaryModel.deleted # pylint: disable=singleton-comparison
-            == False
-        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
-
-    @classmethod
     def get_top_rated(cls, limit: int) -> Sequence[ExpSummaryModel]:
         """Fetches the top-rated exp summaries that are public in descending
         order of scaled_average_rating.
