@@ -202,11 +202,16 @@ def run_circular_dependency_checks() -> None:
 
         js_ts_files = [
             f for f in staged_files
-            if f.endswith(('.ts', '.js')) and not f.endswith(('.spec.ts', '.test.ts'))
+            if f.endswith(('.ts', '.js')) and not f.endswith((
+                '.spec.ts', '.test.ts'
+            ))
         ]
 
         if js_ts_files:
-            print(f'Checking {len(js_ts_files)} modified JS/TS files for circular dependencies...')
+            print(
+                f'Checking {len(js_ts_files)} modified JS/TS files for '
+                f'circular dependencies...'
+            )
             # Run our circular dependency check script.
             cmd = [
                 'python', '-m', 'scripts.run_circular_dependency_checks',
@@ -220,7 +225,9 @@ def run_circular_dependency_checks() -> None:
                 print('Circular dependencies detected in modified files:')
                 print(result.stdout)
                 print(result.stderr)
-                print('Please fix the circular dependencies before committing.')
+                print(
+                    'Please fix the circular dependencies before committing.'
+                )
                 sys.exit(1)
             else:
                 print('✓ No circular dependencies found in modified files.')
