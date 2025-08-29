@@ -45,7 +45,7 @@ import {VoiceoverLanguageManagementService} from 'services/voiceover-language-ma
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {FeatureStatusChecker} from 'domain/feature-flag/feature-status-summary.model';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
-import {StateObjectFactory} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 import {AdminBackendApiService} from 'domain/admin/admin-backend-api.service';
 
 @Pipe({name: 'formatTime'})
@@ -87,7 +87,6 @@ describe('Voiceover card component', () => {
   let platformFeatureService: PlatformFeatureService;
   let explorationStatesService: ExplorationStatesService;
   let adminBackendApiService: AdminBackendApiService;
-  let sof: StateObjectFactory;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -132,7 +131,6 @@ describe('Voiceover card component', () => {
     platformFeatureService = TestBed.inject(PlatformFeatureService);
     explorationStatesService = TestBed.inject(ExplorationStatesService);
     adminBackendApiService = TestBed.inject(AdminBackendApiService);
-    sof = TestBed.inject(StateObjectFactory);
 
     spyOn(
       translationLanguageService,
@@ -869,7 +867,7 @@ describe('Voiceover card component', () => {
       solicit_answer_details: false,
       card_is_checkpoint: false,
     };
-    const state = sof.createFromBackendDict('State name', stateObject);
+    const state = State.createFromBackendDict('State name', stateObject);
     component.activeContentId = 'content_0';
     component.languageCode = 'en';
 

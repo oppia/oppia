@@ -214,6 +214,14 @@ class CloudDatastoreServicesTests(test_utils.GenericTestBase):
 
         self.assertEqual(result, user_query_model1)
 
+        result = user_models.UserQueryModel.query(
+            cloud_datastore_services.not_equal(
+                user_models.UserQueryModel.query_status,
+                feconf.USER_QUERY_STATUS_PROCESSING
+            )).fetch()
+
+        self.assertEqual(result, [user_query_model2])
+
         results: Tuple[
             Sequence[cloud_datastore_services.Model],
             cloud_datastore_services.Cursor, bool

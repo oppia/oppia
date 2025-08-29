@@ -27,7 +27,7 @@ import {
 } from 'pages/exploration-editor-page/history-tab/services/version-tree.service';
 import {ExplorationDataService} from 'pages/exploration-editor-page/services/exploration-data.service';
 import {CompareVersionsService} from './compare-versions.service';
-import {StateBackendDict} from 'domain/state/StateObjectFactory';
+import {StateBackendDict} from 'domain/state/state.model';
 
 interface stateDetails {
   contentStr: string;

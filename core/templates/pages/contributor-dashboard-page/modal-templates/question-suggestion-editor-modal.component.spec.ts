@@ -37,7 +37,7 @@ import {Skill} from 'domain/skill/skill.model';
 import {AlertsService} from 'services/alerts.service';
 import {CsrfTokenService} from 'services/csrf-token.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
-import {State} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 
 class MockNgbModalRef {
   componentInstance!: {

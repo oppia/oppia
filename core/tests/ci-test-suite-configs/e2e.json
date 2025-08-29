@@ -49,10 +49,6 @@
       "module": "core/tests/webdriverio_desktop/embedding.js"
     },
     {
-      "name": "explorationFeedbackTab",
-      "module": "core/tests/webdriverio_desktop/explorationFeedbackTab.js"
-    },
-    {
       "name": "explorationImprovementsTab",
       "module": "core/tests/webdriverio_desktop/explorationImprovementsTab.js"
     },
@@ -67,14 +63,6 @@
     {
       "name": "explorationTranslationTab",
       "module": "core/tests/webdriverio_desktop/explorationTranslationTab.js"
-    },
-    {
-      "name": "extensions",
-      "module": "core/tests/webdriverio_desktop/extensions.js"
-    },
-    {
-      "name": "fileUploadExtensions",
-      "module": "core/tests/webdriverio_desktop/fileUploadExtensions.js"
     },
     {
       "name": "fileUploadFeatures",

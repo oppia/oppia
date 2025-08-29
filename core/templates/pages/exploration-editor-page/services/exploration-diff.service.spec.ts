@@ -12,8 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {TestBed} from '@angular/core/testing';
-import {StateObjectFactory} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 import {
   ExplorationDiffService,
   ExplorationGraphChangeList,
@@ -26,24 +25,22 @@ import {ExplorationChange} from 'domain/exploration/exploration-draft.model';
 
 describe('Exploration Diff Service', () => {
   let explorationDiffService: ExplorationDiffService;
-  let stateObjectFactory: StateObjectFactory;
   let explorationGraphChangeList: ExplorationGraphChangeList[];
 
   beforeEach(() => {
     explorationDiffService = new ExplorationDiffService();
-    stateObjectFactory = TestBed.inject(StateObjectFactory);
   });
 
   it(
     'should throw error if try to access graph ' +
       'diff data with invalid command',
     () => {
-      let newState = stateObjectFactory.createDefaultState(
+      let newState = State.createDefaultState(
         'newState',
         'content_0',
         'default_outcome_1'
       );
-      let oldState = stateObjectFactory.createDefaultState(
+      let oldState = State.createDefaultState(
         'oldState',
         'content_0',
         'default_outcome_1'

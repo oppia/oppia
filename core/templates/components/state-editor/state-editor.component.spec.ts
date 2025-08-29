@@ -28,7 +28,7 @@ import {
 import {Outcome} from 'domain/exploration/outcome.model';
 import {Solution} from 'domain/exploration/solution.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {State} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {StateEditorService} from './state-editor-properties-services/state-editor.service';
 import {StateInteractionIdService} from './state-editor-properties-services/state-interaction-id.service';

@@ -34,7 +34,7 @@ import {IneffectiveFeedbackLoopTask} from 'domain/improvements/ineffective-feedb
 import {NeedsGuidingResponsesTask} from 'domain/improvements/needs-guiding-response-task.model';
 import {SuccessiveIncorrectAnswersTask} from 'domain/improvements/successive-incorrect-answers-task.model';
 import {ExplorationImprovementsConfig} from 'domain/improvements/exploration-improvements-config.model';
-import {StateBackendDict} from 'domain/state/StateObjectFactory';
+import {StateBackendDict} from 'domain/state/state.model';
 import {
   ExplorationStats,
   ExplorationStatsBackendDict,
