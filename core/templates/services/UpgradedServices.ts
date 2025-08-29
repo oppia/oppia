@@ -324,6 +324,7 @@ import {VersionTreeService} from 'pages/exploration-editor-page/history-tab/serv
 import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {WrittenTranslationsObjectFactory} from 'domain/exploration/WrittenTranslationsObjectFactory';
 import {
   SolutionVerificationService,
   // eslint-disable-next-line max-len
@@ -648,6 +649,8 @@ export class UpgradedServices {
     upgradedServices['WindowDimensionsService'] = new WindowDimensionsService(
       upgradedServices['WindowRef']
     );
+    upgradedServices['WrittenTranslationsObjectFactory'] =
+      new WrittenTranslationsObjectFactory();
 
     // Topological level: 2.
     upgradedServices['CsrfTokenService'] = new CsrfTokenService(
