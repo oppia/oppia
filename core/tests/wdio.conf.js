@@ -77,10 +77,6 @@ var suites = {
     './core/tests/webdriverio_desktop/embedding.js'
   ],
 
-  explorationFeedbackTab: [
-    './core/tests/webdriverio_desktop/explorationFeedbackTab.js'
-  ],
-
   explorationImprovementsTab: [
     './core/tests/webdriverio_desktop/explorationImprovementsTab.js'
   ],
@@ -95,14 +91,6 @@ var suites = {
 
   explorationTranslationTab: [
     './core/tests/webdriverio_desktop/explorationTranslationTab.js'
-  ],
-
-  extensions: [
-    './core/tests/webdriverio_desktop/extensions.js'
-  ],
-
-  fileUploadExtensions: [
-    './core/tests/webdriverio_desktop/fileUploadExtensions.js'
   ],
 
   fileUploadFeatures: [
