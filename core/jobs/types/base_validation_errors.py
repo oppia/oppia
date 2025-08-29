@@ -72,8 +72,9 @@ class InconsistentTimestampsError(BaseValidationError):
     """Error class for models with inconsistent timestamps."""
 
     def __init__(self, model: base_models.BaseModel) -> None:
-        message = 'created_on=%r is later than last_updated=%r' % (
-            model.created_on, model.last_updated)
+        message = 'created_on=%s is later than last_updated=%s' % (
+            model.created_on.strftime('%Y-%m-%d %H:%M:%S'),
+            model.last_updated.strftime('%Y-%m-%d %H:%M:%S'))
         super().__init__(message, model)
 
 
@@ -110,8 +111,8 @@ class ModelMutatedDuringJobError(BaseValidationError):
 
     def __init__(self, model: base_models.BaseModel) -> None:
         message = (
-            'last_updated=%r is later than the audit job\'s start time' % (
-                model.last_updated))
+            'last_updated=%s is later than the audit job\'s start time' % (
+                model.last_updated.strftime('%Y-%m-%d %H:%M:%S')))
         super().__init__(message, model)
 
 
