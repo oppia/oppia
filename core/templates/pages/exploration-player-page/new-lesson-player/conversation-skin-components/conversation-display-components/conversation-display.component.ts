@@ -510,6 +510,10 @@ export class ConversationDisplayComponent {
     return 'input-response-pair-' + index;
   }
 
+  isCurrentCardAtEndOfTranscript(): boolean {
+    return !this.displayedCard.isCompleted();
+  }
+
   shouldInteractionBeDisplayed(): boolean {
     const card = this.displayedCard;
     const interactionHasHtml = card.getInteractionHtml();

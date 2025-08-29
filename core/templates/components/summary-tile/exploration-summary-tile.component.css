@@ -69,3 +69,58 @@ oppia-exploration-summary-tile .views-text {
 oppia-exploration-summary-tile .thumbnail-image {
   display: block;
 }
+
+oppia-exploration-summary-tile .exploration-summary-btn {
+  width: 325px;
+  height: 78px;
+  padding: 16px;
+  border-width: 1px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  border: none;
+  background-color: #fff;
+  color: #0D48A1;
+  justify-content: space-between;
+}
+
+oppia-exploration-summary-tile a:hover {
+  text-decoration: none;
+}
+
+oppia-exploration-summary-tile .exploration-summary-btn p {
+  text-align: right;
+}
+
+oppia-exploration-summary-tile .arrow-icon {
+  font-size: 24px;
+  margin-right: 10px;
+}
+
+oppia-exploration-summary-tile .star-icon {
+  margin-right: 5px;
+}
+
+oppia-exploration-summary-tile .exploration-summary-btn span {
+  font-family: "Roboto", Arial, sans-serif;
+  font-size: 16px;
+}
+
+@media (max-width: 480px) {
+  oppia-exploration-summary-tile .exploration-summary-btn {
+    width: 240px;
+    font-size: 13px;
+  }
+
+  oppia-exploration-summary-tile .arrow-icon {
+    font-size: 18px;
+  }
+
+  oppia-exploration-summary-tile .exploration-summary-btn span {
+    font-size: 13px;
+  }
+}

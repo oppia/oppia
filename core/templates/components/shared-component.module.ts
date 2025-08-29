@@ -225,6 +225,7 @@ import {NewEndChapterConfettiComponent} from 'pages/exploration-player-page/new-
 import {NewEndChapterCheckMarkComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/new-end-chapter-check-mark.component';
 import {PlayerHeaderComponent} from 'pages/exploration-player-page/new-lesson-player/header-components/player-header.component';
 import {ProgressBarComponent} from './progress-bar/progress-bar.component';
+import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/new-ratings-and-recommendations.component';
 @NgModule({
   imports: [
     BackgroundBannerModule,
@@ -336,6 +337,7 @@ import {ProgressBarComponent} from './progress-bar/progress-bar.component';
     QuestionEditorSaveModalComponent,
     RatingDisplayComponent,
     RatingsAndRecommendationsComponent,
+    NewRatingsAndRecommendationsComponent,
     ResponseHeaderComponent,
     RubricsEditorComponent,
     ScoreRingComponent,
@@ -513,6 +515,7 @@ import {ProgressBarComponent} from './progress-bar/progress-bar.component';
     QuestionDifficultySelectorComponent,
     RatingDisplayComponent,
     RatingsAndRecommendationsComponent,
+    NewRatingsAndRecommendationsComponent,
     ResponseHeaderComponent,
     RubricsEditorComponent,
     StateContentEditorComponent,
@@ -679,6 +682,7 @@ import {ProgressBarComponent} from './progress-bar/progress-bar.component';
     PreviewThumbnailComponent,
     RatingDisplayComponent,
     RatingsAndRecommendationsComponent,
+    NewRatingsAndRecommendationsComponent,
     ResponseHeaderComponent,
     RubricsEditorComponent,
     OnScreenKeyboardComponent,

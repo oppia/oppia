@@ -26,6 +26,19 @@
   align-items: flex-end;
   display: flex;
   flex: 1;
+  z-index: 0;
+}
+
+.conversation-wrapper::before {
+  background-image: url(/assets/images/background/conversation_skin.svg);
+  background-position: center;
+  content: '';
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  z-index: -1;
 }
 
 oppia-new-conversation-skin {
@@ -34,4 +47,12 @@ oppia-new-conversation-skin {
 
 .card-navigation-control {
   width: 100% ;
+}
+
+oppia-new-audio-bar {
+  z-index: 2;
+}
+
+oppia-player-header {
+  z-index: 2;
 }
