@@ -18,7 +18,6 @@
  */
 
 import {StateBackendDict, State} from 'domain/state/state.model';
-import {StateBackendDict, State} from 'domain/state/state.model';
 import {Voiceover} from 'domain/exploration/voiceover.model';
 import {WrittenTranslation} from 'domain/exploration/written-translation.model';
 
