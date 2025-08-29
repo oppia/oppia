@@ -88,9 +88,8 @@ export class SchemaBasedHtmlEditorComponent
   ngOnInit(): void {}
 
   updateValue(value: string): void {
+    this.localValue = value;
     this.onChange(value);
-    setTimeout(() => {
-      this.onChange(value);
-    });
+    this.localValueChange.emit(value);
   }
 }
