@@ -804,5 +804,5 @@
 /core/domain/wipeout_*.py @oppia/core-reviewers
 
 # Circular dependency implementation files
-./CIRCULAR_DEPENDENCIES_CHECK_IMPLEMENTATION_PLAN.md @oppia/core-reviewers
-./context.md @oppia/core-reviewers
+/scripts/run_circular_dependency_checks.py @oppia/core-reviewers
+/scripts/linters/circular_dependency_linter.py @oppia/core-reviewers

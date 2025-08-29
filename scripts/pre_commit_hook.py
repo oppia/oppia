@@ -1,4 +1,4 @@
-#!/usr/bin/env python.
+#!/usr/bin/env python3
 #
 # Copyright 2019 The Oppia Authors. All Rights Reserved.
 #

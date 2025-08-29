@@ -72,6 +72,8 @@ CODEOWNER_IMPORTANT_PATHS: Final = [
     '/core/templates/pages/license-page/license-page.component.html',
     '/core/domain/takeout_*.py',
     '/core/domain/wipeout_*.py',
+    '/scripts/run_circular_dependency_checks.py',
+    '/scripts/linters/circular_dependency_linter.py',
 ]
 
 
