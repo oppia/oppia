@@ -16,7 +16,14 @@
  * @fileoverview Component for a schema-based editor for HTML.
  */
 
-import {Component, forwardRef, Input, OnInit} from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  forwardRef,
+  Input,
+  OnInit,
+  Output,
+} from '@angular/core';
 import {
   NG_VALUE_ACCESSOR,
   NG_VALIDATORS,
@@ -52,6 +59,7 @@ export class SchemaBasedHtmlEditorComponent
   @Input() labelForFocusTarget!: string;
   @Input() uiConfig!: {add_element_text: string};
   localValue!: string;
+  @Output() localValueChange = new EventEmitter<string>();
   onChange: (val: string) => void = () => {};
 
   // Implemented as a part of ControlValueAccessor interface.
