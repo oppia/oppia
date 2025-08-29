@@ -2,7 +2,7 @@
   <form class="search-bar-float-start oppia-search-bar-form" role="search">
     <div class="mb-3">
       <div class="input-group oppia-input-group inptcls" [ngClass]="{'classroom-page-input-group': isSearchButtonActive()}">
-        <div class="input-group-addon oppia-search-bar-icon">
+        <div class="input-group-text oppia-search-bar-icon">
           <i class="fas fa-search oppia-translate-icon-down md-18" *ngIf="!isSearchInProgress()"></i>
           <span *ngIf="isSearchInProgress()">
             <i class="fas fa-sync oppia-animate-spin"></i>
