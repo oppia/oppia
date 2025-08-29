@@ -232,7 +232,9 @@ def run_circular_dependency_checks() -> None:
             else:
                 print('✓ No circular dependencies found in modified files.')
         else:
-            print('No JS/TS files modified, skipping circular dependency check.')
+            print(
+                'No JS/TS files modified, skipping circular dependency check.'
+            )
     except subprocess.CalledProcessError as e:
         print(f'Error checking for modified files: {e}')
         print('Skipping circular dependency check.')
