@@ -47,7 +47,7 @@ import {StateEditorService} from 'components/state-editor/state-editor-propertie
 import {StateEditorRefreshService} from 'pages/exploration-editor-page/services/state-editor-refresh.service';
 import {State} from 'domain/state/state.model';
 import {NormalizeWhitespacePipe} from 'filters/string-utility-filters/normalize-whitespace.pipe';
-import {WrittenTranslations} from 'domain/exploration/WrittenTranslationsObjectFactory';
+import {WrittenTranslations} from 'domain/exploration/written-translations.model';
 import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {Hint} from 'domain/exploration/hint-object.model';
