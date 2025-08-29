@@ -304,7 +304,7 @@ export class AdminMiscTabComponent implements OnInit {
   }
 
   updateAutomaticVoiceoverSynthesisUsingAzure(): void {
-    this.setStatusMessage.emit('Communicating with Firebase server...');
+    this.setStatusMessage.emit('Updating Azure Text-to-Speech config...');
     this.adminBackendApiService
       .updateAutomaticVoiceoverSynthesisConfigAsync(
         this.voiceoverAutogenerationIsEnabled

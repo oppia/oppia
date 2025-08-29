@@ -126,15 +126,8 @@ oppia-conversation-display .end-chapter-check-mark {
   transition-property: opacity;
 }
 
-oppia-conversation-display .learner-view-card-transition-class {
-  transition-duration: 1s;
-  transition-property: transform, opacity;
-}
-
 oppia-conversation-display .card-content-hidden {
   opacity: 0;
-  position: fixed;
-  transform: translate(0, 7px);
 }
 
 .conversation-skin-responses-dropdown-container {
@@ -183,7 +176,7 @@ oppia-conversation-display .conversation-skin-inline-interaction .form-control {
   padding: 0;
 }
 
-input.form-control:focus {
+oppia-conversation-display input.form-control:focus {
   border: none;
   box-shadow: none;
   outline: none;
@@ -311,12 +304,6 @@ oppia-conversation-display .oppia-mcq-question-description-text {
   oppia-conversation-display .oppia-learner-view-card button.mat-button.mat-default-theme.instructions-button:hover {
     background-color: #115fd4;
   }
-
-  oppia-conversation-display .oppia-learner-view-card {
-    margin-left: 0;
-    padding-bottom: 0;
-    padding-left: 0;
-  }
 }
 
 /* ============================This comment has been placed to segregate the old code and the new CSS media queries=================================================== */
@@ -365,5 +352,21 @@ oppia-conversation-display .oppia-mcq-question-description-text {
     margin-left: 55px;
     margin-top: 30px;
     padding-bottom: 30px;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1023px) {
+  oppia-conversation-display .oppia-learner-view-card-top-section .conversation-skin-oppia-avatar {
+    height: 64px;
+    left: -68px;
+    width: 64px;
+  }
+
+  oppia-conversation-display .oppia-learner-view-card-top-section .left-side-curve {
+    height: 39px;
+    left: -28px;
+    position: absolute;
+    top: -8px;
+    width: 29px;
   }
 }

@@ -40,7 +40,11 @@ describe('Question Submitter', function () {
     // Create a skill and link it to a Topic.
     await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
     await curriculumAdmin.createTopic('Test Topic 1', 'test-topic-one');
-    await curriculumAdmin.createSkillForTopic('Test Skill 1', 'Test Topic 1');
+    await curriculumAdmin.createSkillForTopic(
+      'Test Skill 1',
+      'Test Topic 1',
+      false
+    );
 
     // Add difficulty rubrics to the skill.
     await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
@@ -93,7 +97,7 @@ describe('Question Submitter', function () {
       await questionSubmitter.addMathExpressionToQuestion();
       await questionSubmitter.addImageToQuestion();
 
-      await questionSubmitter.addImageInteraction();
+      await questionSubmitter.addImageInteractionInQuestionEditor();
 
       await questionSubmitter.addHintToState('Test Hint 1');
       await questionSubmitter.editDefaultResponseFeedbackInQuestionEditorPage(
@@ -122,7 +126,7 @@ describe('Question Submitter', function () {
       await questionSubmitter.addMathExpressionToQuestion();
       await questionSubmitter.addImageToQuestion();
 
-      await questionSubmitter.addMultipleChoiceInteraction([
+      await questionSubmitter.addMultipleChoiceInteractionByQuestionSubmitter([
         'Option 1',
         'Option 2',
         'Option 3',
@@ -156,7 +160,7 @@ describe('Question Submitter', function () {
       await questionSubmitter.addMathExpressionToQuestion();
       await questionSubmitter.addImageToQuestion();
 
-      await questionSubmitter.addTextInputInteraction('Answer');
+      await questionSubmitter.addTextInputInteractionInQuestionEditor('Answer');
 
       await questionSubmitter.editDefaultResponseFeedbackInQuestionEditorPage(
         'Wrong Answer'

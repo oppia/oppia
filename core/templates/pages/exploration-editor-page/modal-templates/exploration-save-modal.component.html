@@ -1,6 +1,6 @@
-<div [ngClass]="{'oppia-save-exploration-wide-modal':showDiff}">
+<div [ngClass]="{'oppia-save-exploration-wide-modal':showDiff}" class="e2e-test-save-exploration-modal-container">
   <div class="modal-header">
-    <h3>
+    <h3 class="e2e-test-save-draft-heading">
       <span *ngIf="isExplorationPrivate" tabindex="0">Save Draft</span>
       <span *ngIf="!isExplorationPrivate" tabindex="0">Publish Changes</span>
     </h3>

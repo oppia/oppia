@@ -116,31 +116,31 @@ describe('PracticeSessionAccessGuard', () => {
     const navigateSpy = spyOn(router, 'navigate').and.callThrough();
 
     const routeSnapshot = new ActivatedRouteSnapshot();
-    routeSnapshot.queryParams = {selected_subtopic_ids: '[1,2,3]'};
-    (routeSnapshot.params as {[key: string]: string}) = {
-      classroom_url_fragment: 'math',
-      topic_url_fragment: 'algebra',
-    };
+
+    Object.defineProperty(routeSnapshot, 'params', {
+      get: () => ({
+        classroom_url_fragment: 'math',
+        topic_url_fragment: 'algebra',
+      }),
+    });
+
+    Object.defineProperty(routeSnapshot, 'queryParams', {
+      get: () => ({
+        selected_subtopic_ids: '[1,2,3]',
+      }),
+    });
 
     guard
-      .canActivate(
-        {
-          queryParams: {},
-          paramMap: new Map([
-            ['classroom_url_fragment', 'math'],
-            ['topic_url_fragment', 'algebra'],
-            ['selected_subtopic_ids', '[1,2,3]'],
-          ]),
-        } as unknown as ActivatedRouteSnapshot,
-        {
-          url: '/practice/session?selected_subtopic_ids=[1,2,3]',
-        } as RouterStateSnapshot
-      )
+      .canActivate(routeSnapshot, {
+        url: '/practice/session?selected_subtopic_ids=[1,2,3]',
+      } as RouterStateSnapshot)
       .then(canActivate => {
-        expect(canActivate).toBeFalse();
+        expect(canActivate).toBeFalsy();
         expect(navigateSpy).toHaveBeenCalledWith([
           `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
         ]);
       });
+
+    tick();
   }));
 });

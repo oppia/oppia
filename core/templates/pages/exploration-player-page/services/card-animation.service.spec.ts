@@ -32,6 +32,8 @@ describe('CardAnimationService', () => {
   let playerTranscriptService: jasmine.SpyObj<PlayerTranscriptService>;
   let playerPositionService: jasmine.SpyObj<PlayerPositionService>;
   let windowRef: WindowRef;
+  let windowDimensionsService: jasmine.SpyObj<WindowDimensionsService>;
+  let messengerService: jasmine.SpyObj<MessengerService>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -87,6 +89,12 @@ describe('CardAnimationService', () => {
       PlayerPositionService
     ) as jasmine.SpyObj<PlayerPositionService>;
     windowRef = TestBed.inject(WindowRef);
+    windowDimensionsService = TestBed.inject(
+      WindowDimensionsService
+    ) as jasmine.SpyObj<WindowDimensionsService>;
+    messengerService = TestBed.inject(
+      MessengerService
+    ) as jasmine.SpyObj<MessengerService>;
   });
 
   it('should animate to two cards and reset animation flag after timeout', fakeAsync(() => {
@@ -100,6 +108,22 @@ describe('CardAnimationService', () => {
     );
 
     expect(service.getIsAnimatingToTwoCards()).toBeFalse();
+  }));
+
+  it('should tell if window can show two cards', () => {
+    windowDimensionsService.getWidth.and.returnValue(
+      ExplorationPlayerConstants.TWO_CARD_THRESHOLD_PX + 1
+    );
+
+    expect(service.canWindowShowTwoCards()).toBeTrue();
+  });
+
+  it('should adjust page height on scroll', fakeAsync(() => {
+    service.lastRequestedHeight = document.body.scrollHeight + 100;
+    service.adjustPageHeight();
+    tick(150);
+
+    expect(messengerService.sendMessage).toHaveBeenCalled();
   }));
 
   it('should animate to one card and update displayed card index after timeout', fakeAsync(() => {
@@ -123,9 +147,9 @@ describe('CardAnimationService', () => {
     expect(playerPositionService.setDisplayedCardIndex).toHaveBeenCalledWith(4);
   }));
 
-  it('should call scrollTo if tutor card is partially out of view', fakeAsync(() => {
-    const mockTutorCard = document.createElement('div');
-    mockTutorCard.getBoundingClientRect = () => ({
+  it('should call scrollTo if cardNavigationControl is partially out of view', fakeAsync(() => {
+    const mockCardNavigationControl = document.createElement('div');
+    mockCardNavigationControl.getBoundingClientRect = () => ({
       top: 100,
       height: 100,
       bottom: 200,
@@ -137,7 +161,7 @@ describe('CardAnimationService', () => {
       toJSON: () => {},
     });
 
-    spyOn(document, 'querySelector').and.returnValue(mockTutorCard);
+    spyOn(document, 'querySelector').and.returnValue(mockCardNavigationControl);
     spyOnProperty(window, 'scrollY', 'get').and.returnValue(50);
     spyOnProperty(window, 'innerHeight', 'get').and.returnValue(120);
 
@@ -149,9 +173,9 @@ describe('CardAnimationService', () => {
     expect(scrollSpy).toHaveBeenCalled();
   }));
 
-  it('should not scroll if tutor card is already visible', fakeAsync(() => {
-    const mockTutorCard = document.createElement('div');
-    mockTutorCard.getBoundingClientRect = () => ({
+  it('should not scroll if cardNavigationControl is already visible', fakeAsync(() => {
+    const mockCardNavigationControl = document.createElement('div');
+    mockCardNavigationControl.getBoundingClientRect = () => ({
       top: 100,
       height: 100,
       bottom: 200,
@@ -163,7 +187,7 @@ describe('CardAnimationService', () => {
       toJSON: () => {},
     });
 
-    spyOn(document, 'querySelector').and.returnValue(mockTutorCard);
+    spyOn(document, 'querySelector').and.returnValue(mockCardNavigationControl);
     spyOnProperty(window, 'scrollY', 'get').and.returnValue(200);
     spyOnProperty(window, 'innerHeight', 'get').and.returnValue(200);
 
@@ -175,7 +199,7 @@ describe('CardAnimationService', () => {
     expect(scrollSpy).not.toHaveBeenCalled();
   }));
 
-  it('should not scroll if tutor card is missing', fakeAsync(() => {
+  it('should not scroll if cardNavigationControl is missing', fakeAsync(() => {
     spyOn(document, 'querySelector').and.returnValue(null);
     const scrollSpy = spyOn(window, 'scrollTo');
 

@@ -81,20 +81,25 @@ export class CardAnimationService {
    */
   scrollToBottom(): void {
     setTimeout(() => {
-      const tutorCard = document.querySelector(
-        '.conversation-skin-main-tutor-card'
+      const cardNavigationControl = document.querySelector(
+        '.card-navigation-control'
       );
 
-      if (!tutorCard) {
+      if (!cardNavigationControl) {
         return;
       }
-      const tutorCardRect = tutorCard.getBoundingClientRect();
-      const tutorCardBottom =
-        tutorCardRect.top + window.scrollY + tutorCardRect.height;
+
+      const cardNavigationControlRect =
+        cardNavigationControl.getBoundingClientRect();
+      const cardNavigationControlBottom =
+        cardNavigationControlRect.top +
+        window.scrollY +
+        cardNavigationControlRect.height;
       const windowBottom = window.scrollY + window.innerHeight;
 
-      if (windowBottom < tutorCardBottom) {
-        const targetScrollY = tutorCardBottom - window.innerHeight + 12;
+      if (windowBottom < cardNavigationControlBottom) {
+        const targetScrollY =
+          cardNavigationControlBottom - window.innerHeight + 12;
         this.smoothScrollTo(
           targetScrollY,
           ExplorationPlayerConstants.TIME_SCROLL_MSEC,
@@ -210,6 +215,7 @@ export class CardAnimationService {
         const progress = elapsedTime / duration;
         window.scrollTo(0, startY + difference * easingFunction(progress));
         requestAnimationFrame(step);
+        /* istanbul ignore else */
       } else {
         window.scrollTo(0, targetY);
       }

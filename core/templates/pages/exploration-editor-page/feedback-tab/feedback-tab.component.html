@@ -2,7 +2,7 @@
   <div *ngIf="!activeThread">
     <div class="float-right">
       <button *ngIf="userIsLoggedIn"
-              class="btn btn-success float-right oppia-thread-button oppia-autofocus"
+              class="btn btn-success float-right oppia-thread-button oppia-autofocus e2e-test-start-new-thread-button"
               (click)="showCreateThreadModal()"
               (focus)="newThreadButton">
         Start new thread

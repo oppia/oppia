@@ -101,7 +101,7 @@ export class MusicNotesInputComponent
   NOTE_NAMES_TO_MIDI_VALUES =
     InteractionsExtensionsConstants.NOTE_NAMES_TO_MIDI_VALUES;
 
-  staffContainerElt: JQuery<HTMLElement>;
+  staffContainerElt: HTMLElement | null;
 
   constructor(
     private interactionAttributesExtractorService: InteractionAttributesExtractorService,
@@ -134,9 +134,8 @@ export class MusicNotesInputComponent
     this.initialSequence = this.interactionIsActive
       ? initialSequence
       : this.lastAnswer;
-    // TODO(#14340): Remove some usages of jQuery from the codebase.
-    this.staffContainerElt = $(
-      this.elementRef.nativeElement.querySelectorAll('.oppia-music-input-staff')
+    this.staffContainerElt = this.elementRef.nativeElement.querySelector(
+      '.oppia-music-input-staff'
     );
 
     this.directiveSubscriptions.add(
@@ -211,7 +210,6 @@ export class MusicNotesInputComponent
   // Staff has to be reinitialized every time that the staff is resized or
   // displayed. The staffContainerElt and all subsequent measurements
   // must be recalculated in order for the grid to work properly.
-  // TODO(#14340): Remove some usages of jQuery from the codebase.
   reinitStaff(): void {
     var elem = document.querySelector('.oppia-music-input-valid-note-area');
 
@@ -226,7 +224,10 @@ export class MusicNotesInputComponent
   }
 
   init(): void {
-    this.CONTAINER_WIDTH = this.staffContainerElt.width();
+    if (this.staffContainerElt) {
+      this.CONTAINER_WIDTH =
+        this.staffContainerElt.getBoundingClientRect().width;
+    }
     this.CONTAINER_HEIGHT = 0.2 * this.CONTAINER_WIDTH;
 
     // The grid rectangle dimensions defining the grid which the notes
@@ -267,43 +268,46 @@ export class MusicNotesInputComponent
   }
 
   // Removes all notes from staff.
-  // TODO(#14340): Remove some usages of jQuery from the codebase.
   clearNotesFromStaff(): void {
-    $(
-      this.elementRef.nativeElement.querySelectorAll(
-        '.oppia-music-input-note-choices div'
-      )
-    ).remove();
+    const noteChoiceDivs = this.elementRef.nativeElement.querySelectorAll(
+      '.oppia-music-input-note-choices > div'
+    );
+    noteChoiceDivs.forEach((div: Element) => {
+      if (div.parentNode) {
+        this.renderer.removeChild(div.parentNode, div);
+      }
+    });
   }
 
   // Removes all droppable staff lines.
-  // TODO(#14340): Remove some usages of jQuery from the codebase.
   clearDroppableStaff(): void {
-    $(
-      this.elementRef.nativeElement.querySelectorAll(
-        '.oppia-music-input-staff div'
-      )
-    ).remove();
+    const staffDivs = this.elementRef.nativeElement.querySelectorAll(
+      '.oppia-music-input-staff div'
+    );
+    staffDivs.forEach((div: Element) => {
+      if (div.parentNode) {
+        this.renderer.removeChild(div.parentNode, div);
+      }
+    });
   }
 
   // Returns an Object containing the baseNoteMidiValues (81, 79, 77...)
   // as keys and the vertical positions of the staff lines as values.
-  // TODO(#14340): Remove some usages of jQuery from the codebase.
   getStaffLinePositions(): Object {
-    let staffLinePositionsArray = [];
-    let staffLinePositions = {};
-    let elements = $(
+    const staffLinePositionsArray: number[] = [];
+    const staffLinePositions: {[key: string]: number} = {};
+    const elements: NodeListOf<HTMLElement> =
       this.elementRef.nativeElement.querySelectorAll(
         '.oppia-music-input-staff div.oppia-music-staff-position'
-      )
-    );
-    elements.each((el, val) => {
-      staffLinePositionsArray.push($(val).position().top);
+      );
+
+    elements.forEach((el: HTMLElement) => {
+      staffLinePositionsArray.push(el.offsetTop);
     });
     for (let i = 0; i < staffLinePositionsArray.length; i++) {
       staffLinePositions[this.verticalGridKeys[i]] = staffLinePositionsArray[i];
     }
-    return staffLinePositions;
+    return staffLinePositions as Object;
   }
 
   // Creates the notes and helper-clone notes for the noteChoices div.
@@ -439,160 +443,168 @@ export class MusicNotesInputComponent
     this.repaintLedgerLines();
   }
 
-  // Creates a staff of droppable lines.
-  // TODO(#14340): Remove some usages of jQuery from the codebase.
   buildDroppableStaff(): void {
-    let lineValues = Object.keys(this.NOTE_NAMES_TO_MIDI_VALUES);
+    const lineValues = Object.keys(this.NOTE_NAMES_TO_MIDI_VALUES);
+    const staffContainer = this.elementRef.nativeElement.querySelector(
+      '.oppia-music-input-staff'
+    ) as HTMLElement;
+    if (!staffContainer) {
+      return;
+    }
+
     for (let i = 0; i < lineValues.length; i++) {
-      var staffLineDiv = $('<div class="oppia-music-staff-position"></div>')
-        .css('height', this.VERTICAL_GRID_SPACING)
-        .data('lineValue', lineValues[i])
-        .droppable({
-          accept: '.oppia-music-input-note-choices div',
-          // Over and out are used to remove helper clone if
-          // note is not placed on staff.
-          over: (evt, ui) => {
-            let lineValue = $(evt.target).data('lineValue');
+      const noteName = lineValues[i];
+      const staffLineDiv = this.renderer.createElement('div');
+      this.renderer.addClass(staffLineDiv, 'oppia-music-staff-position');
+      this.renderer.setStyle(
+        staffLineDiv,
+        'height',
+        `${this.VERTICAL_GRID_SPACING}px`
+      );
+      this.renderer.setAttribute(staffLineDiv, 'data-line-value', noteName);
 
-            // Draws a ledger-line when note is hovering over staff-line.
-            if (this.isLedgerLineNote(lineValue)) {
-              // Position of current dropped note.
-              let leftPos = ui.helper.position().left;
-              let topPos = $(evt.target).position().top;
-              let noteId = $(ui.helper).data('noteId');
-              if (noteId === undefined) {
-                noteId = this.generateNoteId();
-                $(ui.helper).data('noteId', noteId);
-              }
-              this.drawLedgerLine(topPos, leftPos);
+      // Drag over.
+      this.renderer.listen(staffLineDiv, 'dragover', (evt: DragEvent) => {
+        evt.preventDefault();
+        this.renderer.addClass(staffLineDiv, 'oppia-music-input-hovered');
+
+        const lineValue = staffLineDiv.getAttribute('data-line-value');
+        if (!lineValue) {
+          return;
+        }
+        if (this.isLedgerLineNote(lineValue)) {
+          const relativeCursorX =
+            evt.clientX - staffContainer.getBoundingClientRect().left;
+          const topPos = staffLineDiv.getBoundingClientRect().top;
+          this.drawLedgerLine(topPos, relativeCursorX);
+        }
+      });
+
+      // Drag Leave.
+      this.renderer.listen(staffLineDiv, 'dragleave', () => {
+        this.renderer.removeClass(staffLineDiv, 'oppia-music-input-hovered');
+        const ledgerLines = document.querySelectorAll(
+          '.oppia-music-input-ledger-line'
+        );
+        if (ledgerLines.length > 0) {
+          const last = ledgerLines[ledgerLines.length - 1];
+          this.renderer.setStyle(last, 'display', 'none');
+        }
+      });
+      // Drop.
+      this.renderer.listen(staffLineDiv, 'drop', (evt: DragEvent) => {
+        evt.preventDefault();
+        this.renderer.removeClass(staffLineDiv, 'oppia-music-input-hovered');
+
+        const ledgerLines = document.querySelectorAll(
+          '.oppia-music-input-ledger-line'
+        );
+        if (ledgerLines.length > 0) {
+          this.renderer.setStyle(
+            ledgerLines[ledgerLines.length - 1],
+            'display',
+            'none'
+          );
+        }
+
+        const noteId =
+          evt.dataTransfer?.getData('note/id') || this.generateNoteId();
+        const noteType = evt.dataTransfer?.getData('note/type') || '0';
+        const oldLeftPos = evt.dataTransfer?.getData('note/oldLeftPos');
+        const startPos = oldLeftPos ? parseFloat(oldLeftPos) : undefined;
+
+        let noteEl = document.getElementById(`note-${noteId}`) as HTMLElement;
+        if (!noteEl) {
+          noteEl = this.renderer.createElement('div');
+          this.renderer.addClass(noteEl, 'oppia-music-input-note');
+          this.renderer.setAttribute(noteEl, 'draggable', 'true');
+          this.renderer.setAttribute(noteEl, 'id', `note-${noteId}`);
+          this.renderer.setAttribute(noteEl, 'data-note-id', noteId);
+          this.renderer.setAttribute(noteEl, 'data-note-type', noteType);
+          this.renderer.appendChild(staffContainer, noteEl);
+        }
+
+        const leftPos =
+          evt.clientX - staffContainer.getBoundingClientRect().left;
+        const topPos = staffLineDiv.offsetTop;
+        const lineValue = staffLineDiv.getAttribute('data-line-value');
+        if (!lineValue) {
+          return;
+        }
+
+        const note = {
+          baseNoteMidiNumber: this.NOTE_NAMES_TO_MIDI_VALUES[lineValue],
+          offset: parseInt(noteType, 10),
+          noteId,
+          noteStart: null,
+        };
+
+        this._removeNotesFromNoteSequenceWithId(note.noteId);
+
+        let finalLeft = leftPos;
+        if (startPos !== finalLeft) {
+          while (this.checkIfNotePositionTaken(finalLeft)) {
+            finalLeft += this.HORIZONTAL_GRID_SPACING;
+          }
+
+          if (
+            Math.floor(finalLeft) >
+            Math.floor(
+              this.getHorizontalPosition(this.MAXIMUM_NOTES_POSSIBLE - 1)
+            )
+          ) {
+            const parent = noteEl.parentNode;
+            if (parent) {
+              this.renderer.removeChild(parent, noteEl);
             }
-          },
-          out: () => {
-            // Removes a ledger line when note is dragged out of
-            // droppable.
-            $('.oppia-music-input-ledger-line').last().hide();
-          },
-          hoverClass: 'oppia-music-input-hovered',
-          // Handles note drops and appends new note to noteSequence.
-          drop: (evt, ui) => {
-            // Makes helper clone not disappear when dropped on staff.
-            $.ui.ddmanager.current.cancelHelperRemoval = true;
-
-            $('.oppia-music-input-ledger-line').last().hide();
-
-            // Previous position of note or undefined.
-            let startPos = $(ui.helper).data('leftPosBeforeDrag');
-
-            // Position of current dropped note.
-            let leftPos = ui.helper.position().left;
-            let topPos = $(evt.target).position().top;
-
-            // The staff line's value.
-            let lineValue = $(evt.target).data('lineValue');
-            let noteType = ui.draggable.data('noteType');
-
-            // A note that is dragged from noteChoices box
-            // has an undefined noteId. This sets the id.
-            // Otherwise, the note has an id.
-            let noteId = $(ui.helper).data('noteId');
-            if (noteId === undefined) {
-              noteId = this.generateNoteId();
-              $(ui.helper).data('noteId', noteId);
-            }
-
-            // Creates a note object.
-            let note = {
-              baseNoteMidiNumber: this.NOTE_NAMES_TO_MIDI_VALUES[lineValue],
-              offset: parseInt(noteType, 10),
-              noteId: noteId,
-              noteStart: null,
-            };
-
-            // When a note is moved, its previous state must be removed
-            // from the noteSequence. Otherwise, the sequence would
-            // erroneously hold notes that have been moved to other
-            // positions. Also this allows an on-staff note's position
-            // to be freed up if it is moved.
-            this._removeNotesFromNoteSequenceWithId(note.noteId);
-
-            // Makes sure that a note can move vertically on it's
-            // position.
-            if (startPos !== leftPos) {
-              // Moves the note to the next available spot on the staff.
-              // If the staff is full, note is moved off staff,
-              // and thus removed.
-              while (this.checkIfNotePositionTaken(leftPos)) {
-                leftPos += this.HORIZONTAL_GRID_SPACING;
-              }
-              if (ui.helper instanceof HTMLElement) {
-                this.renderer.setStyle(ui.helper, 'top', `${topPos}px`);
-                this.renderer.setStyle(ui.helper, 'left', `${leftPos}px`);
-              }
-
-              if (
-                Math.floor(leftPos) >
-                Math.floor(
-                  this.getHorizontalPosition(this.MAXIMUM_NOTES_POSSIBLE - 1)
-                )
-              ) {
-                $(ui.helper).remove();
-                this.repaintLedgerLines();
-                return;
-              }
-            }
-
-            // Adjusts note so it is right on top of the staff line by
-            // calculating half of the VERTICAL_GRID_SPACING and
-            // subtracting that from its current top Position.
-            if (ui.helper instanceof HTMLElement) {
-              this.renderer.setStyle(
-                ui.helper,
-                'top',
-                `${topPos - this.VERTICAL_GRID_SPACING / 2.0}px`
-              );
-            }
-
-            // Add noteStart property to note object.
-            if (this.getNoteStartFromLeftPos(leftPos) !== undefined) {
-              note.noteStart =
-                this.getNoteStartFromLeftPos(leftPos).note.noteStart;
-            } else {
-              this.repaintLedgerLines();
-              return;
-            }
-
-            this._addNoteToNoteSequence(note);
-            this._sortNoteSequence();
-
-            // Sounds the note when it is dropped onto staff.
-            this.playSequence([[this._convertNoteToMidiPitch(note)]]);
-            $(ui.helper).addClass('oppia-music-input-on-staff');
-
             this.repaintLedgerLines();
-          },
-        });
-      $(
-        this.elementRef.nativeElement.querySelectorAll(
-          '.oppia-music-input-staff'
-        )
-      ).append(staffLineDiv);
+            return;
+          }
+        }
+
+        this.renderer.setStyle(noteEl, 'position', 'absolute');
+        this.renderer.setStyle(noteEl, 'left', `${finalLeft}px`);
+        this.renderer.setStyle(
+          noteEl,
+          'top',
+          `${topPos - this.VERTICAL_GRID_SPACING / 2.0}px`
+        );
+        this.renderer.addClass(noteEl, 'oppia-music-input-on-staff');
+
+        const noteStartInfo = this.getNoteStartFromLeftPos(finalLeft);
+        if (!noteStartInfo) {
+          const parent = noteEl.parentNode;
+          if (parent) {
+            this.renderer.removeChild(parent, noteEl);
+          }
+          this.repaintLedgerLines();
+          return;
+        }
+
+        note.noteStart = noteStartInfo.note.noteStart;
+
+        this._addNoteToNoteSequence(note);
+        this._sortNoteSequence();
+        this.playSequence([[this._convertNoteToMidiPitch(note)]]);
+        this.repaintLedgerLines();
+      });
+
+      this.renderer.appendChild(staffContainer, staffLineDiv);
 
       if (i === 0) {
         this.topPositionForCenterOfTopStaffLine =
-          $(staffLineDiv).position().top + this.VERTICAL_GRID_SPACING;
+          staffLineDiv.offsetTop + this.VERTICAL_GRID_SPACING;
       }
 
-      let noteName = lineValues[i];
-
-      // Check if noteName is a valid staff line and if so, paint staff
-      // line.
-      if (this.NOTES_ON_LINES.indexOf(noteName) !== -1) {
-        staffLineDiv.append(
-          $('<div class="oppia-music-staff-line"></div>')
-            // Positions and centers the staff line directly on top of its
-            // associated droppable.
-            .css('margin-top', this.VERTICAL_GRID_SPACING / 2.5)
+      if (this.NOTES_ON_LINES.includes(noteName)) {
+        const staffLine = this.renderer.createElement('div');
+        this.renderer.addClass(staffLine, 'oppia-music-staff-line');
+        this.renderer.setStyle(
+          staffLine,
+          'margin-top',
+          `${this.VERTICAL_GRID_SPACING / 2.5}px`
         );
+        this.renderer.appendChild(staffLineDiv, staffLine);
       }
     }
   }
@@ -661,11 +673,16 @@ export class MusicNotesInputComponent
 
   // Clear noteSequence values and remove all notes
   // and Ledger Lines from the staff.
-  // TODO(#14340): Remove some usages of jQuery from the codebase.
   clearSequence(): void {
     this.noteSequence = [];
-    $('.oppia-music-input-on-staff').remove();
-    $('.oppia-music-input-ledger-line').remove();
+    const notesOnStaff = this.elementRef.nativeElement.querySelectorAll(
+      '.oppia-music-input-on-staff'
+    );
+    notesOnStaff.forEach(note => note.remove());
+    const ledgerLines = this.elementRef.nativeElement.querySelectorAll(
+      '.oppia-music-input-ledger-line'
+    );
+    ledgerLines.forEach(line => line.remove());
   }
 
   // Converts the midiValue of a droppable line that a note is on
@@ -684,12 +701,18 @@ export class MusicNotesInputComponent
    * Horizontal Position value and return the result.
    */
   getHorizontalPosition(noteStartAsFloat: number): number {
-    let lastHorizontalPositionOffset = $(
-      this.elementRef.nativeElement.querySelector(
-        '.oppia-music-input-note-choices div:first-child'
-      )
-    ).position().left;
-    let leftOffset =
+    const firstNoteDiv = this.elementRef.nativeElement.querySelector(
+      '.oppia-music-input-note-choices div:first-child'
+    ) as HTMLElement;
+
+    if (!firstNoteDiv) {
+      console.warn('First note div not found.');
+      return 0;
+    }
+
+    const lastHorizontalPositionOffset =
+      firstNoteDiv.getBoundingClientRect().left;
+    const leftOffset =
       lastHorizontalPositionOffset -
       (this.MAXIMUM_NOTES_POSSIBLE - 1) * this.HORIZONTAL_GRID_SPACING;
     return leftOffset + noteStartAsFloat * this.HORIZONTAL_GRID_SPACING;
@@ -706,33 +729,27 @@ export class MusicNotesInputComponent
     return this.LEDGER_LINE_NOTES.indexOf(lineValue) !== -1;
   }
 
-  // TODO(#14340): Remove some usages of jQuery from the codebase.
   drawLedgerLine(topPos: number, leftPos: number): void {
-    var ledgerLineDiv = $(
-      '<div class"oppia-music-input-ledger-line ' +
-        'oppia-music-input-natural-note"></div>'
-    )
-      .droppable({
-        accept: '.oppia-music-input-note-choices div',
-        // When a ledgerLine note is moved out of its droppable,
-        // remove ledger line.
-        out: () => {
-          $(ledgerLineDiv).hide();
-        },
-        hoverClass: 'oppia-music-input-hovered',
-        containment: '.oppia-music-input-valid-note-area',
-      })
-      // Adjust ledger line to be centered with the note.
-      .css({
-        left: leftPos - 1,
-        // 0.4 is a little less than half to allow for the height of the
-        // ledger line when considering its placement.
-        top: topPos + this.VERTICAL_GRID_SPACING * 0.4,
-      });
+    const ledgerLineDiv = this.renderer.createElement('div');
+    this.renderer.addClass(ledgerLineDiv, 'oppia-music-input-ledger-line');
+    this.renderer.addClass(ledgerLineDiv, 'oppia-music-input-natural-note');
 
-    $(
-      this.elementRef.nativeElement.querySelectorAll('.oppia-music-input-staff')
-    ).append(ledgerLineDiv);
+    this.renderer.setStyle(ledgerLineDiv, 'position', 'absolute');
+    this.renderer.setStyle(ledgerLineDiv, 'left', `${leftPos - 1}px`);
+    this.renderer.setStyle(
+      ledgerLineDiv,
+      'top',
+      `${topPos + this.VERTICAL_GRID_SPACING * 0.4}px`
+    );
+    ledgerLineDiv.addEventListener('dragleave', () => {
+      this.renderer.setStyle(ledgerLineDiv, 'display', 'none');
+    });
+    const staffContainer = this.elementRef.nativeElement.querySelector(
+      '.oppia-music-input-staff'
+    );
+    if (staffContainer) {
+      this.renderer.appendChild(staffContainer, ledgerLineDiv);
+    }
   }
 
   repaintLedgerLines(): void {

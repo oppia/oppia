@@ -2,7 +2,7 @@
   <div class="oppia-practice-tab-container e2e-test-practice-tab-container"
        [ngClass]="{'practice-tab-for-learner-dashboard': displayArea === 'progressTab'}">
     <mat-card class="oppia-page-card oppia-long-text">
-      <h1 class="tab-title"
+      <h1 class="tab-title e2e-test-topic-page-tab-title"
           tabindex="0"
           *ngIf="displayArea === 'topicViewer'">
         <span [innerHTML]="'I18N_TOPIC_VIEWER_PRACTICE_SESSION_BETA_TAG' | translate"
@@ -20,7 +20,7 @@
       </div>
       <mat-card-content>
         <div *ngFor="let subtopic of availableSubtopics; let i = index"
-             class="practice-tab-subtopic-item">
+             class="practice-tab-subtopic-item e2e-test-subtopic-item">
           <mat-checkbox color="primary"
                         tabindex="0"
                         class="practice-tab-mat-checkbox e2e-test-skill-checkbox"

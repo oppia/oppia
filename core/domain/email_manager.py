@@ -2714,7 +2714,8 @@ def verify_mailchimp_secret(secret: str) -> bool:
 def _generate_attachments_for_failed_voiceovers(
     date: str,
     time: str,
-    voiceover_regeneration_error_messages: List[Dict[str, List[str]|str]]
+    voiceover_regeneration_error_messages: List[
+        Dict[str, List[Tuple[str, str]] | str]]
 ) -> List[Dict[str, str]]:
     """Generates a text file containing details of failed voiceover
     regeneration attempts.
@@ -2751,7 +2752,8 @@ def _generate_attachments_for_failed_voiceovers(
 
         for error_message in error_messages:
             lines.append('\n----------------------------------------\n')
-            lines.append('Error Message: %s\n' % error_message)
+            lines.append('Content ID: %s, Error Message: %s\n' % (
+                error_message[0], error_message[1]))
             lines.append('\n----------------------------------------\n')
 
     file = open(filename, 'w', encoding='utf-8')
@@ -2852,7 +2854,8 @@ def send_emails_to_voiceover_tech_leads(
     date: str,
     time: str,
     language_descriptions: List[str],
-    voiceover_regeneration_error_messages: List[Dict[str, List[str]|str]]
+    voiceover_regeneration_error_messages: List[Dict[
+        str, List[Tuple[str, str]] | str]]
 ) -> None:
     """Sends an email to the voiceover tech leads with details of failed
     voiceover regeneration attempts.

@@ -63,7 +63,7 @@
       <ul *ngIf="!windowIsNarrow && !pageIsIframed"
           class="nav oppia-navbar-tabs">
         <li [ngClass]="{'open' : activeMenuName === 'homeMenu'}"
-            *ngIf="userIsLoggedIn"
+            *ngIf="!userIsLoggedIn"
             [hidden]="!navElementsVisibilityStatus.I18N_TOPNAV_HOME"
             aria-hidden="false"
             class="nav-item  oppia-navbar-clickable-dropdown e2e-test-home-oppia-list-item">
@@ -126,7 +126,7 @@
                     </div>
                     <div (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
                          class="nav-item-bottom-link">
-                      <a class="underline nav-item-bottom-link" tabindex="0" href="/community-library">
+                      <a class="underline nav-item-bottom-link e2e-test-topnb-go-to-community-library-link" tabindex="0" href="/community-library">
                         <span class="link">
                           {{ 'I18N_TOPNAV_LIBRARY' | translate }}
                         </span>

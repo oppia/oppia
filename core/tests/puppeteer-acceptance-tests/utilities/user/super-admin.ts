@@ -42,8 +42,8 @@ const rolesSelectDropdown = 'div.mat-select-trigger';
 const userRoleDescriptionSelector = '.oppia-user-role-description';
 
 // Blog Post.
-const blogPostTitleSelector = '.e2e-test-blog-post-tile-title';
 const generateBlogPostButton = '.e2e-test-generate-blog-post';
+const blogPostTitleSelector = '.e2e-test-blog-post-tile-title';
 
 // Community Library.
 const searchFieldCommunityLibrary = 'input.e2e-test-search-input';
@@ -114,6 +114,8 @@ const saveAutogenerationToggleButtonSelector =
   '.e2e-test-save-autogeneration-toggle-button';
 const enableAutogenerationToggleSelector =
   '.e2e-test-cloud-service-autogeneration-toggle';
+const assignedTopicSelector = '.e2e-test-assigned-topic';
+const selectedRoleHeadingSelector = '.e2e-test-active-role';
 
 export class SuperAdmin extends BaseUser {
   /**
@@ -238,6 +240,21 @@ export class SuperAdmin extends BaseUser {
         await this.waitForElementToBeClickable(button);
         await button.click();
 
+        await this.page.waitForFunction(
+          (selector: string, topic: string) => {
+            const assingedTopicElements = document.querySelectorAll(selector);
+            for (const element of Array.from(assingedTopicElements)) {
+              const textContent = element.textContent;
+              if (textContent === topic) {
+                return true;
+              }
+            }
+            return false;
+          },
+          {},
+          assignedTopicSelector,
+          topicName
+        );
         return;
       }
     }
@@ -317,7 +334,7 @@ export class SuperAdmin extends BaseUser {
     await deleteRoleButton.click();
 
     await this.waitForNetworkIdle();
-    await this.isElementVisible(deleteRoleButtonSelector, false);
+    await this.expectElementToBeVisible(deleteRoleButtonSelector, false);
     showMessage(`Role ${role} has been removed from user ${username}`);
     return;
   }
@@ -330,6 +347,8 @@ export class SuperAdmin extends BaseUser {
     await this.navigateToAdminPageRolesTab();
     role = role.replace(/\b\w/g, char => char.toUpperCase());
     await this.clickOn(role);
+
+    await this.expectTextContentToContain(selectedRoleHeadingSelector, role);
   }
 
   /**
@@ -664,7 +683,7 @@ export class SuperAdmin extends BaseUser {
    */
   async generateDummyBlogPost(): Promise<void> {
     await this.navigateToAdminPageActivitiesTab();
-    await this.isElementVisible(generateBlogPostButton);
+    await this.expectElementToBeVisible(generateBlogPostButton);
     await this.clickOn(generateBlogPostButton);
 
     await this.expectActionStatusMessageToBe(
@@ -688,22 +707,23 @@ export class SuperAdmin extends BaseUser {
    */
   async expectBlogPostToBePresent(expectedBlog: string): Promise<void> {
     await this.navigateToBlogPage();
-    const titleRegex = new RegExp(`^${expectedBlog}-[A-Za-z]{12}$`);
 
-    const blogPostTitles = await this.page.$$(blogPostTitleSelector);
-    for (const titleElement of blogPostTitles) {
-      const title = await this.page.evaluate(
-        el => el.textContent,
-        titleElement
-      );
-      if (titleRegex.test(title.trim())) {
+    await this.expectElementToBeVisible(blogPostTitleSelector);
+    const blogTitles = await this.page.$$eval(blogPostTitleSelector, elements =>
+      elements.map(element => element.textContent)
+    );
+    for (const title of blogTitles) {
+      if (!title) {
+        continue;
+      }
+      if (title.includes(expectedBlog)) {
         showMessage('The blog post is present on the blog dashboard.');
         return;
       }
     }
 
     throw new Error(
-      `The blog post "${expectedBlog}" was not found on the blog dashboard.`
+      `Blog post with title ${expectedBlog} not found on the blog dashboard.`
     );
   }
 
@@ -838,6 +858,8 @@ export class SuperAdmin extends BaseUser {
 
       await this.waitForElementToBeClickable(paramValueInput);
       await this.page.type(paramValueInput, ruleValue);
+
+      await this.expectInputValueToBe(paramValueInput, ruleValue);
       showMessage('Rule added successfully.');
     } catch (error) {
       console.error(
@@ -873,10 +895,20 @@ export class SuperAdmin extends BaseUser {
       await platformParameter.waitForSelector(paramValueInput, {visible: true});
       const valueInputs = await platformParameter.$$(paramValueInput);
       await valueInputs[1].type(value);
+      await this.page.waitForFunction(
+        (element: Element, value: string) => {
+          return (element as HTMLInputElement).value.trim() === value.trim();
+        },
+        {},
+        valueInputs[1],
+        value
+      );
       showMessage('Default value changed successfully.');
     } catch (error) {
       console.error(
-        `Failed to change default value of platform parameter "${platformParam}": ${error}`
+        `Failed to change default value of platform parameter "${platformParam}".\n` +
+          'Original Error:\n' +
+          error.stack
       );
       throw error;
     }
@@ -1011,7 +1043,7 @@ export class SuperAdmin extends BaseUser {
   async regenerateContributionOpportunitiesForTopic(
     topicId: string
   ): Promise<void> {
-    await this.isElementVisible(topicIdInputSelector);
+    await this.expectElementToBeVisible(topicIdInputSelector);
     await this.type(topicIdInputSelector, topicId);
 
     await this.page.waitForSelector(regenerateOpportunitiesButton);
@@ -1042,7 +1074,7 @@ export class SuperAdmin extends BaseUser {
   async rollbackExplorationToSafeState(
     explorationId: string | null
   ): Promise<void> {
-    await this.isElementVisible(explorationIdInputSelector);
+    await this.expectElementToBeVisible(explorationIdInputSelector);
     await this.type(explorationIdInputSelector, explorationId as string);
 
     await this.page.waitForSelector(rollbackExplorationButton);
@@ -1063,7 +1095,7 @@ export class SuperAdmin extends BaseUser {
     oldUserName: string,
     newUserName: string
   ): Promise<void> {
-    await this.isElementVisible(oldUserNameInputSelector);
+    await this.expectElementToBeVisible(oldUserNameInputSelector);
     await this.type(oldUserNameInputSelector, oldUserName);
 
     await this.type(newUserNameInputSelector, newUserName);
@@ -1097,7 +1129,7 @@ export class SuperAdmin extends BaseUser {
   async getExplorationInteractions(
     explorationId: string | null
   ): Promise<void> {
-    await this.isElementVisible(explorationIdToGetInteractionsInput);
+    await this.expectElementToBeVisible(explorationIdToGetInteractionsInput);
     await this.type(
       explorationIdToGetInteractionsInput,
       explorationId as string
@@ -1118,7 +1150,7 @@ export class SuperAdmin extends BaseUser {
    * @returns {Promise<void>}
    */
   async grantSuperAdminPrivileges(username: string): Promise<void> {
-    await this.isElementVisible(usernameToGrantPrivilegeInput);
+    await this.expectElementToBeVisible(usernameToGrantPrivilegeInput);
     await this.type(usernameToGrantPrivilegeInput, username);
 
     await this.page.waitForSelector(grantSuperAdminButtonSelector);
@@ -1136,7 +1168,7 @@ export class SuperAdmin extends BaseUser {
    * @returns {Promise<void>}
    */
   async revokeSuperAdminPrivileges(username: string): Promise<void> {
-    await this.isElementVisible(usernameToRevokePrivilegeInput);
+    await this.expectElementToBeVisible(usernameToRevokePrivilegeInput);
     await this.type(usernameToRevokePrivilegeInput, username);
 
     await this.page.waitForSelector(revokeSuperAdminButton);
@@ -1159,7 +1191,7 @@ export class SuperAdmin extends BaseUser {
     author: string,
     publishedOn: string
   ): Promise<void> {
-    await this.isElementVisible(blogIdInputSelector);
+    await this.expectElementToBeVisible(blogIdInputSelector);
     await this.type(blogIdInputSelector, blogId);
 
     await this.type(blogAuthorInputSelector, author);
@@ -1168,6 +1200,10 @@ export class SuperAdmin extends BaseUser {
 
     await this.page.waitForSelector(updateBlogPostButtonSelector);
     await this.clickOn(updateBlogPostButtonSelector);
+
+    await this.expectActionStatusMessageToBe(
+      'Successfully updated blog post data'
+    );
   }
 
   /**

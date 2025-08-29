@@ -29,10 +29,7 @@ import {
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {StateParamChangesService} from 'components/state-editor/state-editor-properties-services/state-param-changes.service';
 import {ParamChange} from 'domain/exploration/param-change.model';
-import {
-  ParamSpecs,
-  ParamSpecsObjectFactory,
-} from 'domain/exploration/ParamSpecsObjectFactory';
+import {ParamSpecs} from 'domain/exploration/param-specs.model';
 import {AlertsService} from 'services/alerts.service';
 import {EditabilityService} from 'services/editability.service';
 import {ExternalSaveService} from 'services/external-save.service';
@@ -56,7 +53,6 @@ describe('Param Changes Editor Component', () => {
   let editabilityService: EditabilityService;
   let explorationParamSpecsService: ExplorationParamSpecsService;
   let explorationStatesService: ExplorationStatesService;
-  let paramSpecsObjectFactory: ParamSpecsObjectFactory;
   let stateParamChangesService: StateParamChangesService;
   let postSaveHookSpy = jasmine.createSpy('postSaveHook', () => {});
   let mockExternalSaveEventEmitter = new EventEmitter();
@@ -95,13 +91,12 @@ describe('Param Changes Editor Component', () => {
     component = fixture.componentInstance;
 
     alertsService = TestBed.inject(AlertsService);
-    paramSpecsObjectFactory = TestBed.inject(ParamSpecsObjectFactory);
     stateParamChangesService = TestBed.inject(StateParamChangesService);
     editabilityService = TestBed.inject(EditabilityService);
     explorationParamSpecsService = TestBed.inject(ExplorationParamSpecsService);
     explorationStatesService = TestBed.inject(ExplorationStatesService);
     explorationParamSpecsService.init(
-      paramSpecsObjectFactory.createFromBackendDict({
+      ParamSpecs.createFromBackendDict({
         y: {
           obj_type: 'UnicodeString',
         },

@@ -206,11 +206,17 @@ jobs:
         if: ${{ steps.check_skip.outputs.SKIP_SUITE != 'true' }}
         run: >
           set -o pipefail;
-          VIDEO_RECORDING_IS_ENABLED=0
+          VIDEO_RECORDING_IS_ENABLED=1
           xvfb-run -a --server-args="-screen 0, 1920x1080x24"
           python -m scripts.run_acceptance_tests
           --skip-build --suite=${{ matrix.suite.name }} --prod_env --server_log_level=info
           | tee desktop_acceptance_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
+      - name: Uploading Desktop test recordings as Artifacts
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-acceptance-test-video-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}-original
+          path: /home/runner/work/oppia/oppia_full_stack_test_video_recordings/acceptance
       - name: Upload desktop acceptance test logs
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4

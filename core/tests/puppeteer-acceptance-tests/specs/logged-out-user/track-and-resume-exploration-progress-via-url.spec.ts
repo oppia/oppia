@@ -145,7 +145,7 @@ describe('Logged-out User', function () {
       await loggedOutUser.verifyCheckpointModalAppears();
 
       await loggedOutUser.reloadPage();
-      await loggedOutUser.expectProgressRemainder(false);
+      await loggedOutUser.expectProgressReminder(false);
 
       await loggedOutUser.continueToNextCard();
       await loggedOutUser.submitAnswer('-35');
@@ -161,7 +161,7 @@ describe('Logged-out User', function () {
       progressUrl = await loggedOutUser.copyProgressUrl();
 
       await loggedOutUser.startExplorationUsingProgressUrl(progressUrl, false);
-      await loggedOutUser.expectProgressRemainder(true);
+      await loggedOutUser.expectProgressReminder(true);
       await loggedOutUser.chooseActionInProgressRemainder('Resume');
 
       await loggedOutUser.goBackToPreviousCard();

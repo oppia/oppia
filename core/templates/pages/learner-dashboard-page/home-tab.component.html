@@ -4,14 +4,14 @@
       {{ getTimeOfDay() | translate }}, {{ username }}!
     </div>
     <div tabindex="0" class="continue-where-you-left-off" *ngIf="isNonemptyObject(untrackedTopics) || continueWhereYouLeftOffList.length !== 0">
-      <p class="continue-where-you-left-off-heading"
+      <p class="continue-where-you-left-off-heading e2e-test-section-heading"
         [innerHTML]="'I18N_LEARNER_DASHBOARD_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate" *ngIf="continueWhereYouLeftOffList.length !== 0">
       </p>
-      <p class="continue-where-you-left-off-heading"
+      <p class="continue-where-you-left-off-heading e2e-test-section-heading"
         [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION_HEADING' | translate"
         *ngIf="continueWhereYouLeftOffList.length === 0">
       </p>
-      <div class="empty-continue-where-you-left-off-section" *ngIf="continueWhereYouLeftOffList.length === 0">
+      <div class="empty-continue-where-you-left-off-section e2e-test-continue-section e2e-test-empty-section" *ngIf="continueWhereYouLeftOffList.length === 0">
         <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate" class="empty-continue-where-you-left-off-section-text">
         </p>
         <a id="setting-a-goal-link" (click)="changeActiveSection()">
@@ -20,7 +20,7 @@
         </a>
       </div>
       <div class="continue-where-you-left-off-scroll">
-        <div class="continue-where-you-left-off-section" *ngIf="continueWhereYouLeftOffList.length !== 0"
+        <div class="continue-where-you-left-off-section e2e-test-continue-section e2e-test-non-empty-section" *ngIf="continueWhereYouLeftOffList.length !== 0"
           [ngStyle]="windowIsNarrow && {'width': width + 'px'}">
           <div *ngFor="let topicSummaryTile of continueWhereYouLeftOffList" class="topic-summary">
             <div *ngFor="let storySummaryTile of topicSummaryTile.canonicalStorySummaryDicts; let i = index"
@@ -34,7 +34,7 @@
       </div>
     </div>
     <div tabindex="0" class="suggested-for-you e2e-test-suggested-for-you" *ngIf="isNonemptyObject(untrackedTopics) && !isGoalLimitReached()">
-      <p class="suggested-for-you-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate">
+      <p class="suggested-for-you-heading e2e-test-section-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate">
       </p>
       <div class="suggested-for-you-section">
         <div *ngFor="let item of untrackedTopics | keyvalue" class="untracked-topics">
@@ -77,7 +77,7 @@
         *ngIf="!isNonemptyObject(untrackedTopics) && continueWhereYouLeftOffList.length === 0">
       <p class="suggested-for-you-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate">
       </p>
-      <div class="empty-suggested-for-you-section">
+      <div class="empty-suggested-for-you-section e2e-test-home-tab-empty-suggestions">
         <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_SUGGESTED_FOR_YOU_SECTION' | translate">
         </p>
       </div>
@@ -91,7 +91,11 @@
         {{ 'I18N_LEARNER_DASHBOARD_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate }}
       </p>
       <div class="d-flex flex-wrap justify-content-between w-100">
-        <oppia-card-display *ngIf="continueWhereYouLeftOffList.length !== 0 || incompleteExplorationsList?.length > 0 || incompleteCollectionsList?.length > 0 || partiallyLearntTopicsList.length !== 0" [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_PROGRESS_SECTION'" [numCards]="getTotalInProgressLessons()" [displayMaxWidth]="'fit-content'">
+        <oppia-card-display *ngIf="continueWhereYouLeftOffList.length !== 0 || incompleteExplorationsList?.length > 0 || incompleteCollectionsList?.length > 0 || partiallyLearntTopicsList.length !== 0"
+                            [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_PROGRESS_SECTION'"
+                            [numCards]="getTotalInProgressLessons()"
+                            [displayMaxWidth]="'fit-content'"
+                            class="e2e-test-continue-where-you-left-off">
           <ng-container *ngFor="let topicSummaryTile of partiallyLearntTopicsList">
             <ng-container *ngFor="let storySummaryTile of topicSummaryTile.canonicalStorySummaryDicts">
               <lesson-card [story]="storySummaryTile" [topic]="topicSummaryTile.name" [isGoal]="currentGoalIds.has(topicSummaryTile.id)"> </lesson-card>
@@ -133,10 +137,10 @@
         </ng-container>
       </oppia-card-display>
     </div>
-    <div class="oppia-learner-dash-section px-3 py-4 w-100"
-        *ngIf="!isNonemptyObject(untrackedTopics) && continueWhereYouLeftOffList.length === 0">
+    <div class="oppia-learner-dash-section px-3 py-4 w-100 e2e-test-learn-something-new-section"
+         *ngIf="!isNonemptyObject(untrackedTopics) && continueWhereYouLeftOffList.length === 0">
       <p class="oppia-learner-dash-section-heading"> {{ 'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate }} </p>
-      <div class="empty-suggested-for-you-section">
+      <div class="empty-suggested-for-you-section e2e-test-home-tab-empty-suggestions">
         <p> {{ 'I18N_LEARNER_DASHBOARD_EMPTY_SUGGESTED_FOR_YOU_SECTION' | translate }} </p>
       </div>
     </div>

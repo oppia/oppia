@@ -67,7 +67,9 @@ export default {
 
     "RTE_COMPONENT_CONFIGS": {
       "ALL_COMPONENTS": ["tabs", "skillreview", "collapsible", "math", "image", "link", "video"],
-      "BLOG_COMPONENTS": ["image", "link", "video"]
+      "BLOG_COMPONENTS": ["image", "link", "video"],
+      "SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS": ["tabs", "skillreview", "collapsible", "math", "image", "link", "video", "workedexample"],
+      "WORKED_EXAMPLE_MODAL_COMPONENTS": ["image", "math", "skillreview"]
     },
 
   "LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST": [
@@ -6915,6 +6917,15 @@ export default {
       "MANUALLY_REGISTERED_WITH_BACKEND": true,
       "META": []
     },
+    "LESSON_PLAYER_EMBED": {
+      "ROUTE": "embed/lesson/:exploration_id",
+      "TITLE": "",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "META": []
+    },
     "NEW_LESSON_PLAYER": {
       "ROUTE": "lesson/:exploration_id",
       "TITLE": "",
@@ -7807,6 +7818,18 @@ export default {
       "^": "لِلْقُوَّةِ",
       "^2": "تَرْبِيعْ",
       "^3": "تَكْعِيبْ"
+    },
+    "es": {
+      "+": "más",
+      "-": "menos",
+      "*": "multiplicado por",
+      "×": "multiplicado por",
+      "÷": "dividido",
+      "=": "igual",
+      "!": "factorial",
+      "^": "elevado a",
+      "^2": "al cuadrado",
+      "^3": "al cubo"
     }
   },
   // Please consult the translation team before adding any entries here.
@@ -7815,6 +7838,7 @@ export default {
   "LANGUAGE_CODE_TO_SENTENCE_ENDING_PUNCTUATION_MARKS": {
     "ar": "؟!",
     "en": ".!?",
+    "es": ".!?",
     "pt": ".!?",
     "hi": "।!?"
   }

@@ -43,6 +43,8 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {TopicViewerDomainConstants} from 'domain/topic_viewer/topic-viewer-domain.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
+import {PracticeSessionPageConstants} from 'pages/practice-session-page/practice-session-page.constants';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
 
 @Component({
   selector: 'oppia-subtopic-viewer-page',
@@ -69,6 +71,8 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
   prevSubtopic!: Subtopic;
   directiveSubscriptions = new Subscription();
   subtopicSummaryIsShown: boolean = false;
+  isPracticeTabDisplayed: boolean = false;
+  currentSubtopicId!: number;
 
   constructor(
     private alertsService: AlertsService,
@@ -83,7 +87,8 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
     private windowRef: WindowRef,
     private windowDimensionsService: WindowDimensionsService,
     private translateService: TranslateService,
-    private platformFeatureService: PlatformFeatureService
+    private platformFeatureService: PlatformFeatureService,
+    private siteAnalyticsService: SiteAnalyticsService
   ) {
     this.sections = null;
     this.pageContents = null;
@@ -153,6 +158,7 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
           this.pageTitleService.updateMetaTag(
             `Review the skill of ${this.subtopicTitle.toLowerCase()}.`
           );
+          this.currentSubtopicId = subtopicDataObject.getCurrentSubtopicId();
 
           let nextSubtopic = subtopicDataObject.getNextSubtopic();
           let prevSubtopic = subtopicDataObject.getPrevSubtopic();
@@ -184,6 +190,8 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
                   topicDataObject.getTopicId(),
                   TranslationKeyType.TITLE
                 );
+              this.isPracticeTabDisplayed =
+                topicDataObject.getPracticeTabIsDisplayed();
             });
 
           this.loaderService.hideLoadingScreen();
@@ -256,19 +264,23 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
   }
 
   openPracticeMenu(): void {
-    if (!this.classroomUrlFragment || !this.topicUrlFragment) {
-      return;
-    }
-    this.windowRef.nativeWindow.open(
-      this.urlInterpolationService.interpolateUrl(
-        ClassroomDomainConstants.TOPIC_VIEWER_PRACTICE_URL_TEMPLATE,
-        {
-          classroom_url_fragment: this.classroomUrlFragment,
-          topic_url_fragment: this.topicUrlFragment,
-        }
-      ),
-      '_self'
+    const selectedSubtopicIds = [];
+    selectedSubtopicIds.push(this.currentSubtopicId);
+    let practiceSessionsUrl = this.urlInterpolationService.interpolateUrl(
+      PracticeSessionPageConstants.PRACTICE_SESSIONS_URL,
+      {
+        topic_url_fragment: this.topicUrlFragment,
+        classroom_url_fragment: this.classroomUrlFragment,
+        stringified_subtopic_ids: JSON.stringify(selectedSubtopicIds),
+      }
     );
+    this.siteAnalyticsService.registerPracticeSessionStartEvent(
+      this.classroomUrlFragment,
+      this.parentTopicTitle,
+      selectedSubtopicIds.toString()
+    );
+    this.windowRef.nativeWindow.location.href = practiceSessionsUrl;
+    this.loaderService.showLoadingScreen('Loading');
   }
 
   backToTopic(): void {
