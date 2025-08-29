@@ -16,7 +16,7 @@
  * @fileoverview Acceptance test from CUJv3 Doc
  * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
  *
- * TM.TE Add, remove, and edit the subtopics of a topic.
+ * TM.TE.?? Topic manager creates, deletes. edits the stories, and chapters.
  */
 
 import testConstants from '../../utilities/common/test-constants';
@@ -28,8 +28,9 @@ import {TopicManager} from '../../utilities/user/topic-manager';
 const ROLES = testConstants.Roles;
 
 describe('Topic Manager', function () {
-  let topicManager: TopicManager & ExplorationEditor;
+  let topicManager: TopicManager & CurriculumAdmin;
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
+  let explorationId: string;
 
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
@@ -38,11 +39,10 @@ describe('Topic Manager', function () {
       [ROLES.CURRICULUM_ADMIN]
     );
 
-    const explorationId =
-      await curriculumAdmin.createAndPublishExplorationWithCards(
-        'Solving problems without a calculator',
-        'Mathematics'
-      );
+    explorationId = await curriculumAdmin.createAndPublishExplorationWithCards(
+      'Solving problems without a calculator',
+      'Mathematics'
+    );
     await curriculumAdmin.createAndPublishTopic(
       'Arithmetic Operations',
       'Addition',
@@ -83,49 +83,18 @@ describe('Topic Manager', function () {
     );
   }, 600000);
 
-  it('should be able to add and delete a subtopic in a topic', async function () {
-    await topicManager.openTopicEditor('Arithmetic Operations');
-    await topicManager.createSubtopicForTopic(
-      'Subtraction',
-      'subtraction',
+  it('should be able to create and remove a story in a topic', async function () {
+    topicManager.openTopicEditor('Arithmetic Operations');
+    await topicManager.addStoryToTopic(
+      'The Broken Calculator',
+      'the-broken-calculator',
       'Arithmetic Operations'
     );
-    await topicManager.openTopicEditor('Arithmetic Operations');
-    // TODO: Expect subtopic to be present.
-
-    // Delete the subtopic.
-    await topicManager.deleteSubtopicFromTopic(
-      'Subtraction',
-      'Arithmetic Operations'
+    await topicManager.addChapter(
+      'Solving problems without a calculator',
+      explorationId
     );
     await topicManager.openTopicEditor('Arithmetic Operations');
-    // TODO: Expect subtopic to be absent.
-  });
-
-  it('should be able to edit and preview subtopic', async function () {
-    await topicManager.openSubtopicEditor('Addition', 'Arithmetic Operations');
-    await topicManager.editSubTopicDetails(
-      'Introduction to Addition and Subtraction',
-      'intro-add-subtract',
-      'This is introduction to Addition and Subtraction.',
-      testConstants.data.profilePicture
-    );
-    await topicManager.expectScreenshotToMatch(
-      'updatedAdditionSubtopic',
-      __dirname
-    );
-
-    await topicManager.saveTopicDraft('Arithmetic Operations');
-    await topicManager.expectToastMessageToBe('Changes Saved.');
-
-    await topicManager.navigateToSubtopicPreviewTab(
-      'Introduction to Addition and Subtraction',
-      'Arithmetic Operations'
-    );
-    await topicManager.expectSubtopicPreviewToHave(
-      'Introduction to Addition and Subtraction',
-      'This is introduction to Addition and Subtraction.'
-    );
   });
 
   afterAll(async function () {
