@@ -435,7 +435,7 @@ import { CheckpointProgressService } from 'pages/exploration-player-page/service
 import { ProgressUrlService } from 'pages/exploration-player-page/services/progress-url.service';
 import { ExplorationInitializationService } from 'pages/exploration-player-page/services/exploration-initialization.service';
 import { CardAnimationService } from 'pages/exploration-player-page/services/card-animation.service';
-
+import { VoiceoverLanguageManagementService } from './voiceover-language-management-service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -871,6 +871,7 @@ export const angularServices: [string, Type<{}>][] = [
     UserEmailPreferencesBackendApiService],
   ['UserExplorationPermissionsService', UserExplorationPermissionsService],
   ['UtilsService', UtilsService],
+  ['VoiceoverLanguageManagementService', VoiceoverLanguageManagementService],
   ['ValidatorsService', ValidatorsService],
   ['VersionedExplorationCachingService', VersionedExplorationCachingService],
   ['VersionHistoryBackendApiService', VersionHistoryBackendApiService],
