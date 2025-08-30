@@ -387,7 +387,6 @@ import { TrainingDataEditorPanelService } from 'pages/exploration-editor-page/ed
 import { QuestionUpdateService } from 'domain/question/question-update.service';
 import { SkillEditorRoutingService } from 'pages/skill-editor-page/services/skill-editor-routing.service';
 import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-redo.service';
-import { ExplorationMetadataObjectFactory } from 'domain/exploration/ExplorationMetadataObjectFactory';
 import { VersionHistoryBackendApiService } from 'pages/exploration-editor-page/services/version-history-backend-api.service';
 import { TranslationStatusService } from 'pages/exploration-editor-page/translation-tab/services/translation-status.service';
 import { YamlService } from './yaml.service';
@@ -566,7 +565,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExplorationDataBackendApiService', ExplorationDataBackendApiService],
   ['ExplorationDataService', ExplorationDataService],
   ['ExplorationDiffService', ExplorationDiffService],
-  ['ExplorationMetadataObjectFactory', ExplorationMetadataObjectFactory],
   ['ExplorationParamSpecsService', ExplorationParamSpecsService],
   ['ExplorationRightsService', ExplorationRightsService],
   ['ExplorationRightsBackendApiService', ExplorationRightsBackendApiService],

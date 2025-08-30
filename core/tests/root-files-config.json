@@ -13,7 +13,6 @@
     "core/tests/test-modules-mappings/README.md",
     "core/tests/README.md",
     "assets/README.md",
-    "core/templates/domain/exploration/ExplorationMetadataObjectFactorySpec.ts",
     "core/templates/domain/exploration/ExplorationObjectFactorySpec.ts",
     "extensions/rich_text_components/richTextComponentsRequires.ts",
     "core/templates/domain/exploration/LostChangeObjectFactorySpec.ts",
