@@ -19,9 +19,9 @@
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {fakeAsync, TestBed, tick} from '@angular/core/testing';
 import {TranslateService} from '@ngx-translate/core';
-import {MockTranslateService} from '../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
-import {AnswerClassificationResult} from '../../../domain/classifier/answer-classification-result.model';
-import {Interaction} from '../../../domain/exploration/interaction.model';
+import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
+import {AnswerClassificationResult} from 'domain/classifier/answer-classification-result.model';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {
   Exploration,
   ExplorationBackendDict,
@@ -30,17 +30,17 @@ import {Outcome} from '../../../domain/exploration/outcome.model';
 import {
   ParamChangeBackendDict,
   ParamChange,
-} from '../../../domain/exploration/param-change.model';
+} from 'domain/exploration/param-change.model';
 import {
   FetchExplorationBackendResponse,
   ReadOnlyExplorationBackendApiService,
-} from '../../../domain/exploration/read-only-exploration-backend-api.service';
-import {StateCard} from '../../../domain/state_card/state-card.model';
-import {ExpressionInterpolationService} from '../../../expressions/expression-interpolation.service';
-import {TextInputRulesService} from '../../../../../extensions/interactions/TextInput/directives/text-input-rules.service';
-import {AlertsService} from '../../../services/alerts.service';
-import {PageContextService} from '../../../services/page-context.service';
-import {UrlService} from '../../../services/contextual/url.service';
+} from 'domain/exploration/read-only-exploration-backend-api.service';
+import {StateCard} from 'domain/state_card/state-card.model';
+import {ExpressionInterpolationService} from 'expressions/expression-interpolation.service';
+import {TextInputRulesService} from 'interactions/TextInput/directives/text-input-rules.service';
+import {AlertsService} from 'services/alerts.service';
+import {PageContextService} from 'services/page-context.service';
+import {UrlService} from 'services/contextual/url.service';
 import {AnswerClassificationService} from './answer-classification.service';
 import {AudioPreloaderService} from './audio-preloader.service';
 import {ContentTranslationLanguageService} from './content-translation-language.service';
@@ -49,18 +49,30 @@ import {ImagePreloaderService} from './image-preloader.service';
 import {LearnerParamsService} from './learner-params.service';
 import {PlayerTranscriptService} from './player-transcript.service';
 import {StatsReportingService} from './stats-reporting.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {ContentTranslationManagerService} from './content-translation-manager.service';
+
+class MockPlatformFeatureService {
+  status = {
+    NewLessonPlayer: {
+      isEnabled: false,
+    },
+  };
+}
 
 describe('Exploration engine service ', () => {
   let alertsService: AlertsService;
   let answerClassificationService: AnswerClassificationService;
   let answerClassificationResult: AnswerClassificationService;
   let audioPreloaderService: AudioPreloaderService;
+  let contentTranslationManagerService: ContentTranslationManagerService;
   let pageContextService: PageContextService;
   let contentTranslationLanguageService: ContentTranslationLanguageService;
   let expressionInterpolationService: ExpressionInterpolationService;
   let explorationEngineService: ExplorationEngineService;
   let imagePreloaderService: ImagePreloaderService;
   let learnerParamsService: LearnerParamsService;
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
   let playerTranscriptService: PlayerTranscriptService;
   let readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService;
   let statsReportingService: StatsReportingService;
@@ -359,10 +371,17 @@ describe('Exploration engine service ', () => {
           provide: TranslateService,
           useClass: MockTranslateService,
         },
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService,
+        },
       ],
     });
 
     alertsService = TestBed.inject(AlertsService);
+    contentTranslationManagerService = TestBed.inject(
+      ContentTranslationManagerService
+    );
     answerClassificationService = TestBed.inject(AnswerClassificationService);
     audioPreloaderService = TestBed.inject(AudioPreloaderService);
     pageContextService = TestBed.inject(PageContextService);
@@ -415,10 +434,21 @@ describe('Exploration engine service ', () => {
     'should load exploration when initialized in ' + 'exploration player page',
     () => {
       let initSuccessCb = jasmine.createSpy('success');
+
+      spyOn(urlService, 'getPathname').and.returnValue('/lesson/123');
+      mockPlatformFeatureService.status.NewLessonPlayer.isEnabled = true;
       // Setting exploration player page.
       spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
         false
       );
+      spyOn(
+        contentTranslationLanguageService,
+        'getCurrentContentLanguageCode'
+      ).and.returnValue('en');
+      spyOn(
+        contentTranslationManagerService,
+        'displayTranslations'
+      ).and.returnValue(null);
 
       explorationEngineService.init(
         explorationDict,
@@ -433,6 +463,11 @@ describe('Exploration engine service ', () => {
       expect(initSuccessCb).toHaveBeenCalled();
     }
   );
+
+  it('should check new lesson player feature flag is enabled', () => {
+    mockPlatformFeatureService.status.NewLessonPlayer.isEnabled = true;
+    expect(explorationEngineService.isNewLessonPlayerEnabled()).toBe(true);
+  });
 
   it(
     'should throw error when initialized in exploration' +

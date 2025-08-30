@@ -636,6 +636,7 @@ import {ProgressBarComponent} from './progress-bar/progress-bar.component';
     ContentLanguageSelectorComponent,
     ProgressBarComponent,
     ConversationSkinComponent,
+    HintSolutionAndConceptCardDisplayComponent,
     ConversationDisplayComponent,
     CardNavigationControlComponent,
     NewConversationSkinComponent,
