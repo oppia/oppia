@@ -17,7 +17,7 @@
  * on conversation skin.
  */
 
-import {Component, Input, Optional} from '@angular/core';
+import {Component, Input, OnDestroy, OnInit, Optional} from '@angular/core';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {CollectionSummary} from 'domain/collection/collection-summary.model';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
@@ -74,7 +74,9 @@ export interface QuestionPlayerConfig {
   templateUrl: './new-ratings-and-recommendations.component.html',
   styleUrls: ['./new-ratings-and-recommendations.component.css'],
 })
-export class NewRatingsAndRecommendationsComponent {
+export class NewRatingsAndRecommendationsComponent
+  implements OnInit, OnDestroy
+{
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -225,6 +227,10 @@ export class NewRatingsAndRecommendationsComponent {
       );
       return modalRef;
     }
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
   }
 
   showThankYouModal(

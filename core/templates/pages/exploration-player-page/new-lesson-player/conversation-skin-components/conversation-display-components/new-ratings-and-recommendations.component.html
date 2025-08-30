@@ -1,12 +1,12 @@
 <div class="conversation-skin-final-summary">
   <div *ngIf="userIsLoggedIn && !explorationIsInPreviewMode" class="conversation-skin-final-ratings">
     <p class="conversation-skin-final-ratings-header">{{'I18N_PLAYER_RATE_LESSON' | translate}}</p>
-      <oppia-rating-display [ratingValue]="userRating"
-                            [isEditable]="true"
-                            (edit)="submitUserRating($event)"
-                            class="conversation-skin-final-ratings-display"
-                            (click)="showFeedbackModal()">
-      </oppia-rating-display>
+    <oppia-rating-display [ratingValue]="userRating"
+                          [isEditable]="true"
+                          (edit)="submitUserRating($event)"
+                          class="conversation-skin-final-ratings-display"
+                          (click)="showFeedbackModal()">
+    </oppia-rating-display>
   </div>
 
   <div *ngIf="!collectionSummary && !inStoryMode && recommendedExplorationSummaries && recommendedExplorationSummaries.length > 0"

@@ -292,6 +292,18 @@ describe('Conversation display component', () => {
     expect(componentInstance.getInputResponsePairId).toHaveBeenCalled();
   }));
 
+  it('should return true if displayedCard is not completed', () => {
+    componentInstance.displayedCard = mockDisplayedCard;
+    spyOn(mockDisplayedCard, 'isCompleted').and.returnValue(false);
+    expect(componentInstance.isCurrentCardAtEndOfTranscript()).toBeTrue();
+  });
+
+  it('should return false if displayedCard is completed', () => {
+    componentInstance.displayedCard = mockDisplayedCard;
+    spyOn(mockDisplayedCard, 'isCompleted').and.returnValue(true);
+    expect(componentInstance.isCurrentCardAtEndOfTranscript()).toBeFalse();
+  });
+
   it('should set default profile pictures when username is null', fakeAsync(() => {
     spyOn(componentInstance, 'updateDisplayedCard');
     let userInfo = {

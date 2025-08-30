@@ -13,7 +13,7 @@ oppia-new-ratings-and-recommendations .conversation-skin-final-summary {
 }
 
 oppia-new-ratings-and-recommendations .conversation-skin-final-ratings-header {
-  color: #333333;
+  color: #333;
   font-family: 'Capriola', Arial, sans-serif;
   font-size: 20px;
   font-weight: 400;
@@ -32,7 +32,7 @@ oppia-new-ratings-and-recommendations .conversation-skin-final-ratings-display {
 }
 
 oppia-new-ratings-and-recommendations .conversation-skin-final-recommendations-header {
-  color: #333333;
+  color: #333;
   font-size: 20px;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-weight: 400;
@@ -105,31 +105,31 @@ oppia-new-ratings-and-recommendations .conversation-skin-login-secondary-options
 }
 
 oppia-new-ratings-and-recommendations .ratings-and-recommendations-exp-summary-tiles-container {
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    margin-left: auto;
-    margin-right: auto;
-    padding-top: 24px;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-top: 24px;
 }
 
 oppia-new-ratings-and-recommendations .community-library-btn {
-  width: 325px;
-  height: 78px;
-  padding: 16px;
-  border-width: 1px;
-  border-radius: 4px;
-  margin-bottom: 15px;
-  display: flex;
-  margin: auto;
   align-items: center;
+  background-color: #e8f1f0;
+  border: 1px solid #00645c;
+  border-radius: 4px;
+  border-width: 1px;
+  color: #00645c;
+  display: flex;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
-  font-weight: 400;
   font-size: 18px;
-  background-color: #E8F1F0;
-  border: 1px solid #00645C;
-  color: #00645C;
+  font-weight: 400;
+  height: 78px;
+  margin: auto;
+  margin-bottom: 15px;
+  padding: 16px;
+  width: 325px;
 }
 
 oppia-new-ratings-and-recommendations a:hover {
@@ -151,12 +151,11 @@ oppia-new-ratings-and-recommendations .community-library-btn i {
 
 @media (max-width: 480px) {
   oppia-new-ratings-and-recommendations .community-library-btn {
-    width: 240px;
     font-size: 13px;
+    width: 240px;
   }
 
   oppia-new-ratings-and-recommendations .community-library-btn i {
     font-size: 18px;
   }
 }
-

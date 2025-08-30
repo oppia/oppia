@@ -71,21 +71,21 @@ oppia-exploration-summary-tile .thumbnail-image {
 }
 
 oppia-exploration-summary-tile .exploration-summary-btn {
-  width: 325px;
-  height: 78px;
-  padding: 16px;
-  border-width: 1px;
-  border-radius: 4px;
-  margin-bottom: 15px;
-  display: flex;
   align-items: center;
+  border: none;
+  background-color: #fff;
+  border-radius: 4px;
+  border-width: 1px;
+  color: #0D48A1;
+  display: flex;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-weight: 400;
   font-size: 18px;
-  border: none;
-  background-color: #fff;
-  color: #0D48A1;
+  height: 78px;
   justify-content: space-between;
+  margin-bottom: 15px;
+  padding: 16px;
+  width: 325px;
 }
 
 oppia-exploration-summary-tile a:hover {
@@ -112,8 +112,8 @@ oppia-exploration-summary-tile .exploration-summary-btn span {
 
 @media (max-width: 480px) {
   oppia-exploration-summary-tile .exploration-summary-btn {
-    width: 240px;
     font-size: 13px;
+    width: 240px;
   }
 
   oppia-exploration-summary-tile .arrow-icon {

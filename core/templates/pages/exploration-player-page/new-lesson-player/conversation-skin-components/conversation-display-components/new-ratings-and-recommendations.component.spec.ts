@@ -17,7 +17,12 @@
  */
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  EventEmitter,
+  NO_ERRORS_SCHEMA,
+  Pipe,
+  PipeTransform,
+} from '@angular/core';
 import {
   ComponentFixture,
   fakeAsync,
@@ -25,11 +30,8 @@ import {
   tick,
   waitForAsync,
 } from '@angular/core/testing';
-import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-import {
-  MatBottomSheet,
-  MatBottomSheetRef,
-} from '@angular/material/bottom-sheet';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import {AlertsService} from 'services/alerts.service';
@@ -54,8 +56,17 @@ import {ConversationFlowService} from '../../../services/conversation-flow.servi
 import {PageContextService} from 'services/page-context.service';
 import {LessonFeedbackModalComponent} from '../../sidebar-components/lesson-feedback-modal.component';
 import {CustomizableThankYouModalComponent} from '../../sidebar-components/customizable-thank-you-modal.component';
+import {MockTranslatePipe} from '../../../../../tests/unit-test-utils';
+import {of} from 'rxjs';
 
-fdescribe('New Ratings and recommendations component', () => {
+@Pipe({name: 'limitTo'})
+export class MockLimitToPipe implements PipeTransform {
+  transform(value: string): string {
+    return value;
+  }
+}
+
+describe('New Ratings and recommendations component', () => {
   let fixture: ComponentFixture<NewRatingsAndRecommendationsComponent>;
   let componentInstance: NewRatingsAndRecommendationsComponent;
   let alertsService: AlertsService;
@@ -108,7 +119,11 @@ fdescribe('New Ratings and recommendations component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [NewRatingsAndRecommendationsComponent],
+      declarations: [
+        NewRatingsAndRecommendationsComponent,
+        MockLimitToPipe,
+        MockTranslatePipe,
+      ],
       providers: [
         AlertsService,
         LearnerViewRatingService,

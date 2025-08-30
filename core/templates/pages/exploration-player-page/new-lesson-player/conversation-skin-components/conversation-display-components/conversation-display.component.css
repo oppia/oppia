@@ -132,8 +132,8 @@ oppia-conversation-display .new-conversation-skin-responses-dropdown-container {
 }
 
 oppia-conversation-display .response-history-container {
-  display: flex;
   align-items: center;
+  display: flex;
 }
 
 oppia-conversation-display .response-history-container hr {

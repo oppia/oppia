@@ -52,17 +52,17 @@
 }
 
 .post-chapter-recommendations-btn {
-  width: 325px;
+  align-items: center;
+  margin-bottom: 15px;
+  border-radius: 4px;
+  border-width: 1px;
+  display: flex;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 400;
   height: 78px;
   padding: 16px;
-  border-width: 1px;
-  border-radius: 4px;
-  margin-bottom: 15px;
-  display: flex;
-  align-items: center;
-  font-family: "Capriola", "Roboto", Arial, sans-serif;
-  font-weight: 400;
-  font-size: 18px;
+  width: 325px;
 }
 
 .new-post-chapter-recommendation-cards-container a {
@@ -105,8 +105,8 @@
 }
 
 .three-buttons-container {
-  width: 100%;
   justify-content: center;
+  width: 100%;
 }
 
 
@@ -142,4 +142,3 @@
     font-size: 13px;
   }
 }
-
