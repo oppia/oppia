@@ -21,7 +21,6 @@ import {
   EventEmitter,
   forwardRef,
   Input,
-  NgZone,
   OnInit,
   Output,
 } from '@angular/core';
@@ -62,7 +61,6 @@ export class SchemaBasedHtmlEditorComponent
   localValue!: string;
   @Output() localValueChange = new EventEmitter<string>();
   onChange: (val: string) => void = () => {};
-  constructor(private ngZone: NgZone) {}
 
   // Implemented as a part of ControlValueAccessor interface.
   writeValue(value: string): void {
