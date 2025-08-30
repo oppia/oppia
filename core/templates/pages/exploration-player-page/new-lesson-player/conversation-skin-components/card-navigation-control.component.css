@@ -10,8 +10,8 @@
 */
 
 oppia-progress-tracker {
-  position: absolute;
   left: 50%;
+  position: absolute;
   transform: translateX(-50%);
   width: 375px;
 }
@@ -73,10 +73,10 @@ oppia-progress-tracker {
 
 .card-navigation-control {
   background-color: white;
+  height: 60px;
   margin-left: 0;
   margin-right: 0;
   max-width: 100%;
-  height: 60px;
 }
 
 .card-navigation-control .oppia-nav-button {

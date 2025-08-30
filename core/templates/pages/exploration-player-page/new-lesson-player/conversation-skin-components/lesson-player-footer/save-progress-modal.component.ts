@@ -48,6 +48,7 @@ export class SaveProgressModalComponent {
   onLoginButtonClicked(): void {
     this.userService.getLoginUrlAsync().then(loginUrl => {
       let urlId = this.loggedOutProgressUniqueUrlId;
+      /* istanbul ignore if */
       if (urlId === null) {
         throw new Error(
           'User should not be able to login if ' +

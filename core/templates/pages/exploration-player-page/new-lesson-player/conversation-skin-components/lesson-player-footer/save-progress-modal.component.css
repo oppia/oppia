@@ -13,15 +13,15 @@ oppia-save-progress-modal .new-save-progress-menu .checkpoint-status {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  margin: 32px 0;
   width: 100%;
-  margin:32px 0;
 }
 
 oppia-save-progress-modal .new-save-progress-menu h3 {
+  color: #00645c;
   font-family: capriola, sans-serif;
   font-size: 20px;
   font-weight: 400;
-  color: #00645c;
   text-align: center;
 }
 

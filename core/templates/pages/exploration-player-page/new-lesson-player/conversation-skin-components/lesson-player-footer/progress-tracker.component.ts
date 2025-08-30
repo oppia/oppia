@@ -31,7 +31,6 @@ import {ExplorationEngineService} from 'pages/exploration-player-page/services/e
 import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
 import {PageContextService} from 'services/page-context.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import {AttributionService} from 'services/attribution.service';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 
 @Component({

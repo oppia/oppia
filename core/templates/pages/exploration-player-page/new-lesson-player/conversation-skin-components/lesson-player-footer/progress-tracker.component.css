@@ -1,20 +1,20 @@
 .progress-tracker-container {
+  align-items: center;
   display: flex;
   justify-content: space-between;
-  align-items: center;
 }
 
 .progress-tracker-container button {
-  margin-left: 22px;
-  width: 90px;
-  height: 44px;
-  padding: 10px 12px;
-  color: #c55f45;
+  align-items: center;
   border: 1px solid #c55f45;
   border-radius: 4px;
+  color: #c55f45;
   display: flex;
-  align-items: center;
+  height: 44px;
   justify-content: space-between;
+  margin-left: 22px;
+  padding: 10px 12px;
+  width: 90px;
 }
 
 oppia-checkpoint-bar {
@@ -31,10 +31,6 @@ oppia-checkpoint-bar {
     display: none;
   }
 }
-
-/* @media (max-width: 480px) {
-
-} */
 
 @media (max-width: 320px) {
   .progress-tracker-container button {
