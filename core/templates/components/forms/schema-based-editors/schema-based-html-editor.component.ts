@@ -90,6 +90,8 @@ export class SchemaBasedHtmlEditorComponent
   updateValue(value: string): void {
     this.localValue = value;
     this.onChange(value);
-    this.localValueChange.emit(value);
+    Promise.resolve().then(() => {
+      this.localValueChange.emit(value);
+    });
   }
 }
