@@ -140,19 +140,15 @@ export class NewRatingsAndRecommendationsComponent
         )
         .then(storyData => {
           this.storyId = storyData.id;
-          for (let i = 0; i < storyData.nodes.length; i++) {
-            if (
-              storyData.nodes[i].id === nodeId &&
-              i + 1 < storyData.nodes.length
-            ) {
+          storyData.nodes.forEach((node: ReadOnlyStoryNode, i: number) => {
+            if (node.id === nodeId && i + 1 < storyData.nodes.length) {
               this.nextStoryNode = storyData.nodes[i + 1];
               this.nextStoryNodeIconUrl = this.getIconUrl(
                 this.storyId,
                 this.nextStoryNode.thumbnailFilename
               );
-              break;
             }
-          }
+          });
         });
       this.storyViewerUrl = this.urlInterpolationService.interpolateUrl(
         TopicViewerDomainConstants.STORY_VIEWER_URL_TEMPLATE,

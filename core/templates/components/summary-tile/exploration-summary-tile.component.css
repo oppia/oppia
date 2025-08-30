@@ -79,8 +79,8 @@ oppia-exploration-summary-tile .exploration-summary-btn {
   color: #0d48a1;
   display: flex;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
-  font-weight: 400;
   font-size: 18px;
+  font-weight: 400;
   height: 78px;
   justify-content: space-between;
   margin-bottom: 15px;
