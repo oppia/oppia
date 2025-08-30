@@ -144,7 +144,7 @@ export class NewRatingsAndRecommendationsComponent
             if (node.id === nodeId && i + 1 < storyData.nodes.length) {
               this.nextStoryNode = storyData.nodes[i + 1];
               this.nextStoryNodeIconUrl = this.getIconUrl(
-                this.storyId,
+                this.storyId as string,
                 this.nextStoryNode.thumbnailFilename
               );
             }
