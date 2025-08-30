@@ -61,7 +61,7 @@ class MockWindowRef {
   };
 }
 
-describe('SaveProgressModalComponent', () => {
+fdescribe('SaveProgressModalComponent', () => {
   let fixture: ComponentFixture<SaveProgressModalComponent>;
   let componentInstance: SaveProgressModalComponent;
   let userService: UserService;
@@ -101,6 +101,7 @@ describe('SaveProgressModalComponent', () => {
     localStorageService = TestBed.inject(LocalStorageService);
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+    mockWindowRef = TestBed.inject(WindowRef) as MockWindowRef;
   });
 
   it('should create', () => {

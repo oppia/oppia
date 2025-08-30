@@ -592,7 +592,7 @@ export class NewConversationSkinComponent {
     );
 
     return (
-      !prevSessionStatesProgress.includes(getPreviousCardName) &&
+      !prevSessionStatesProgress.includes(getPreviousCardName as string) &&
       this.checkpointCelebrationIsShown &&
       displayedCard.getStateName() !== firstStateName.getStateName() &&
       stateData.cardIsCheckpoint

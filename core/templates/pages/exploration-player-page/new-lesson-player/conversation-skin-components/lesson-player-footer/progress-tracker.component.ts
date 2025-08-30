@@ -125,7 +125,7 @@ export class ProgressTrackerComponent implements OnInit, OnDestroy {
     if (displayedCardIndex > 0) {
       let state = this.explorationEngineService.getState();
       let stateCard = this.explorationEngineService.getStateCardByName(
-        state.name
+        state.name as string
       );
       if (stateCard.isTerminal()) {
         this.completedCheckpointsCount += 1;

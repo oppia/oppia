@@ -40,13 +40,13 @@ const CHECKPOINT_STATUS_IN_PROGRESS = 'in-progress';
   styleUrls: ['./checkpoint-bar.component.css'],
 })
 export class CheckpointBarComponent implements OnInit {
-  explorationId: string;
+  explorationId!: string;
   expStates!: StateObjectsBackendDict;
   checkpointCount: number = 0;
   expEnded: boolean = false;
   directiveSubscriptions = new Subscription();
   completedCheckpointsCount!: number;
-  checkpointStatusArray: string[];
+  checkpointStatusArray!: string[];
 
   constructor(
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
@@ -113,7 +113,7 @@ export class CheckpointBarComponent implements OnInit {
       if (displayedCardIndex > 0) {
         let state = this.explorationEngineService.getState();
         let stateCard = this.explorationEngineService.getStateCardByName(
-          state.name
+          state.name as string
         );
         if (stateCard.isTerminal()) {
           this.completedCheckpointsCount += 1;
