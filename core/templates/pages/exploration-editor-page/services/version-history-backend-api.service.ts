@@ -22,8 +22,7 @@ import {Injectable} from '@angular/core';
 import {
   ExplorationMetadata,
   ExplorationMetadataBackendDict,
-  ExplorationMetadataObjectFactory,
-} from 'domain/exploration/ExplorationMetadataObjectFactory';
+} from 'domain/exploration/exploration-metadata.model';
 import {State, StateBackendDict} from 'domain/state/state.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
@@ -64,7 +63,6 @@ export class VersionHistoryBackendApiService {
     '/version_history_handler/metadata/<exploration_id>/<version>';
 
   constructor(
-    private explorationMetadataObjectFactory: ExplorationMetadataObjectFactory,
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService
   ) {}
@@ -123,10 +121,9 @@ export class VersionHistoryBackendApiService {
       .then(response => {
         let metadataInPreviousVersion: ExplorationMetadata | null = null;
         if (response.metadata_dict_in_previous_version) {
-          metadataInPreviousVersion =
-            this.explorationMetadataObjectFactory.createFromBackendDict(
-              response.metadata_dict_in_previous_version
-            );
+          metadataInPreviousVersion = ExplorationMetadata.createFromBackendDict(
+            response.metadata_dict_in_previous_version
+          );
         }
         return {
           lastEditedVersionNumber: response.last_edited_version_number,
