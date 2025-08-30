@@ -61,7 +61,7 @@ class MockWindowRef {
   };
 }
 
-fdescribe('SaveProgressModalComponent', () => {
+describe('SaveProgressModalComponent', () => {
   let fixture: ComponentFixture<SaveProgressModalComponent>;
   let componentInstance: SaveProgressModalComponent;
   let userService: UserService;
