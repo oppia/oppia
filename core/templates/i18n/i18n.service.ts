@@ -30,6 +30,7 @@ import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {UserBackendApiService} from 'services/user-backend-api.service';
 import {CookieService} from 'ngx-cookie';
 import {UserService} from 'services/user.service';
+import {LanguageBannerService} from 'components/language-banner/language-banner.service';
 
 @Injectable({
   providedIn: 'root',
@@ -72,7 +73,8 @@ export class I18nService {
     private translateCacheService: TranslateCacheService,
     private translateService: TranslateService,
     private windowRef: WindowRef,
-    private siteAnalyticsService: SiteAnalyticsService
+    private siteAnalyticsService: SiteAnalyticsService,
+    private languageBannerService: LanguageBannerService
   ) {}
 
   setLocalStorageKeys(langCode: string): void {
@@ -216,6 +218,11 @@ export class I18nService {
         this.removeUrlLangParam();
       }
     });
+  }
+
+  handleLanguageUpdate(languageCode: string): void {
+    this.updateUserPreferredLanguage(languageCode);
+    this.languageBannerService.markLanguageBannerAsDismissed();
   }
 
   private _updateDirection(newDirection: string): void {
