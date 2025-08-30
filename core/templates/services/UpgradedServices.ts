@@ -154,7 +154,6 @@ import {LearnerParamsService} from 'pages/exploration-player-page/services/learn
 import {LocalStorageService} from 'services/local-storage.service';
 import {LoaderService} from 'services/loader.service';
 import {LoggerService} from 'services/contextual/logger.service';
-import {LostChangeObjectFactory} from 'domain/exploration/LostChangeObjectFactory';
 import {
   MathEquationInputRulesService,
   // eslint-disable-next-line max-len
@@ -426,9 +425,6 @@ export class UpgradedServices {
     upgradedServices['LearnerParamsService'] = new LearnerParamsService();
     upgradedServices['LoaderService'] = new LoaderService();
     upgradedServices['LoggerService'] = new LoggerService();
-    upgradedServices['LostChangeObjectFactory'] = new LostChangeObjectFactory(
-      new UtilsService()
-    );
     upgradedServices['MathEquationInputRulesService'] =
       new MathEquationInputRulesService(
         upgradedServices['AlgebraicExpressionInputRulesService']

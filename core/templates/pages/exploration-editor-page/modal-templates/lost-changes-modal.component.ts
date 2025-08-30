@@ -17,15 +17,16 @@
  */
 
 import {Component, ElementRef, Input, OnInit} from '@angular/core';
-
 import {LoggerService} from 'services/contextual/logger.service';
 import {
   LostChange,
-  LostChangeObjectFactory,
-} from 'domain/exploration/LostChangeObjectFactory';
+  LostChangeBackendDict,
+} from 'domain/exploration/lost-change.model';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {UtilsService} from 'services/utils.service';
+import {ExplorationChange} from 'domain/exploration/exploration-draft.model';
 
 @Component({
   selector: 'oppia-lost-changes-modal',
@@ -45,8 +46,8 @@ export class LostChangesModalComponent
     private elRef: ElementRef,
     private windowRef: WindowRef,
     private loggerService: LoggerService,
-    private lostChangeObjectFactory: LostChangeObjectFactory,
-    private ngbActiveModal: NgbActiveModal
+    private ngbActiveModal: NgbActiveModal,
+    private utilsService: UtilsService
   ) {
     super(ngbActiveModal);
   }
@@ -54,7 +55,8 @@ export class LostChangesModalComponent
   ngOnInit(): void {
     this.hasLostChanges = this.lostChanges && this.lostChanges.length > 0;
     this.lostChanges = this.lostChanges.map(
-      this.lostChangeObjectFactory.createNew
+      (lostChangeDict: ExplorationChange | LostChangeBackendDict) =>
+        LostChange.createNew(this.utilsService, lostChangeDict)
     );
   }
 
