@@ -37,7 +37,7 @@ import {
   VersionTreeService,
 } from './services/version-tree.service';
 import {CompareVersionsService} from './services/compare-versions.service';
-import {ExplorationMetadata} from 'domain/exploration/ExplorationMetadataObjectFactory';
+import {ExplorationMetadata} from 'domain/exploration/exploration-metadata.model';
 import {LoggerService} from 'services/contextual/logger.service';
 
 interface VersionMetadata {
