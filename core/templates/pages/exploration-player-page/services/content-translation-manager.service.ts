@@ -27,6 +27,15 @@ import {InteractionCustomizationArgs} from 'interactions/customization-args-defs
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {PageContextService} from 'services/page-context.service';
 import {ImagePreloaderService} from './image-preloader.service';
+import {ContentTranslationLanguageService} from '../services/content-translation-language.service';
+import {AudioPreloaderService} from '../services/audio-preloader.service';
+import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
+import {VoiceoverPlayerService} from '../services/voiceover-player.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
+import {PlayerPositionService} from '../services/player-position.service';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {AutomaticVoiceoverHighlightService} from 'services/automatic-voiceover-highlight-service';
 
 @Injectable({
   providedIn: 'root',
@@ -38,6 +47,7 @@ export class ContentTranslationManagerService {
   private explorationLanguageCode!: string;
   private onStateCardContentUpdateEmitter: EventEmitter<void> =
     new EventEmitter();
+  private onLanguageChangeEmitter: EventEmitter<string> = new EventEmitter();
 
   // The 'originalTranscript' is a copy of the transcript in the exploration
   // language in it's initial state.
@@ -48,7 +58,16 @@ export class ContentTranslationManagerService {
     private extensionTagAssemblerService: ExtensionTagAssemblerService,
     private entityTranslationsService: EntityTranslationsService,
     private pageContextService: PageContextService,
-    private imagePreloaderService: ImagePreloaderService
+    private imagePreloaderService: ImagePreloaderService,
+    private entityVoiceoversService: EntityVoiceoversService,
+    private voiceoverPlayerService: VoiceoverPlayerService,
+    private automaticVoiceoverHighlightService: AutomaticVoiceoverHighlightService,
+    private playerPositionService: PlayerPositionService,
+    private stateEditorService: StateEditorService,
+    private contentTranslationLanguageService: ContentTranslationLanguageService,
+    private audioPreloaderService: AudioPreloaderService,
+    private voiceoverBackendApiService: VoiceoverBackendApiService,
+    private i18nLanguageCodeService: I18nLanguageCodeService
   ) {}
 
   setOriginalTranscript(explorationLanguageCode: string): void {
@@ -60,6 +79,10 @@ export class ContentTranslationManagerService {
 
   get onStateCardContentUpdate(): EventEmitter<void> {
     return this.onStateCardContentUpdateEmitter;
+  }
+
+  get onLanguageChange(): EventEmitter<string> {
+    return this.onLanguageChangeEmitter;
   }
 
   /**
@@ -118,5 +141,72 @@ export class ContentTranslationManagerService {
       );
       card.setInteractionHtml(element.outerHTML);
     }
+  }
+
+  changeCurrentContentLanguage(newLanguageCode: string): void {
+    this.entityVoiceoversService.setLanguageCode(newLanguageCode);
+
+    this.entityVoiceoversService.fetchEntityVoiceovers().then(() => {
+      this.voiceoverPlayerService.setLanguageAccentCodesDescriptions(
+        newLanguageCode,
+        this.entityVoiceoversService.getLanguageAccentCodes()
+      );
+      this.automaticVoiceoverHighlightService.setAutomatedVoiceoversAudioOffsets(
+        this.entityVoiceoversService.getActiveEntityVoiceovers()
+          ?.automatedVoiceoversAudioOffsetsMsecs || {}
+      );
+      this.automaticVoiceoverHighlightService.getSentencesToHighlightForTimeRanges();
+    });
+    this.contentTranslationLanguageService.setCurrentContentLanguageCode(
+      newLanguageCode
+    );
+    this.displayTranslations(newLanguageCode);
+  }
+
+  initLessonTranslations(): void {
+    const newLanguageCode =
+      this.i18nLanguageCodeService.getCurrentI18nLanguageCode();
+    let selectedLanguageCode =
+      this.contentTranslationLanguageService.getCurrentContentLanguageCode();
+
+    const languageOptions =
+      this.contentTranslationLanguageService.getLanguageOptionsForDropdown();
+
+    for (let option of languageOptions) {
+      if (option.value === newLanguageCode) {
+        this.contentTranslationLanguageService.setCurrentContentLanguageCode(
+          option.value
+        );
+        selectedLanguageCode = option.value;
+        break;
+      }
+    }
+
+    if (this.audioPreloaderService.exploration !== undefined) {
+      this.voiceoverBackendApiService
+        .fetchVoiceoverAdminDataAsync()
+        .then(response => {
+          this.voiceoverPlayerService.languageAccentMasterList =
+            response.languageAccentMasterList;
+          this.voiceoverPlayerService.languageCodesMapping =
+            response.languageCodesMapping;
+
+          this.voiceoverPlayerService.setLanguageAccentCodesDescriptions(
+            selectedLanguageCode,
+            this.entityVoiceoversService.getLanguageAccentCodes()
+          );
+
+          this.audioPreloaderService.kickOffAudioPreloader(
+            this.getCurrentStateName()
+          );
+        });
+    }
+  }
+
+  getCurrentStateName(): string {
+    if (this.pageContextService.isInExplorationPlayerPage()) {
+      return this.playerPositionService.getCurrentStateName();
+    }
+    return this.stateEditorService.getActiveStateName() as string;
   }
 }
