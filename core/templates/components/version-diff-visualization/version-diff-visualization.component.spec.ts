@@ -21,7 +21,7 @@ import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {VersionDiffVisualizationComponent} from './version-diff-visualization.component';
-import {State} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 
 class MockNgbModal {
   open() {

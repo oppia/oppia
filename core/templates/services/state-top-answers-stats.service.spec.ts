@@ -22,7 +22,7 @@ import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
 import {AnswerStats} from 'domain/exploration/answer-stats.model';
 import {AnswerStatsBackendDict} from 'domain/exploration/visualization-info.model';
-import {StateBackendDict} from 'domain/state/StateObjectFactory';
+import {StateBackendDict} from 'domain/state/state.model';
 import {Rule} from 'domain/exploration/rule.model';
 import {StateTopAnswersStats} from 'domain/statistics/state-top-answers-stats-object.factory';
 import {StateTopAnswersStatsService} from 'services/state-top-answers-stats.service';

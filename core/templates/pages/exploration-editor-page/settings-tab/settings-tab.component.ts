@@ -59,7 +59,7 @@ import {UserEmailPreferencesService} from '../services/user-email-preferences.se
 import {UserExplorationPermissionsService} from '../services/user-exploration-permissions.service';
 import {ExplorationEditorPageConstants} from '../exploration-editor-page.constants';
 import {AppConstants} from 'app.constants';
-import {ExplorationMetadataObjectFactory} from 'domain/exploration/ExplorationMetadataObjectFactory';
+import {ExplorationMetadata} from 'domain/exploration/exploration-metadata.model';
 import {
   MetadataDiffData,
   VersionHistoryService,
@@ -151,7 +151,6 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     private explorationFeaturesService: ExplorationFeaturesService,
     private explorationInitStateNameService: ExplorationInitStateNameService,
     private explorationLanguageCodeService: ExplorationLanguageCodeService,
-    private explorationMetadataObjectFactory: ExplorationMetadataObjectFactory,
     private explorationObjectiveService: ExplorationObjectiveService,
     private explorationParamChangesService: ExplorationParamChangesService,
     private explorationParamSpecsService: ExplorationParamSpecsService,
@@ -362,10 +361,9 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
       () => {}
     );
 
-    const explorationMetadata =
-      this.explorationMetadataObjectFactory.createFromBackendDict(
-        explorationData.exploration_metadata
-      );
+    const explorationMetadata = ExplorationMetadata.createFromBackendDict(
+      explorationData.exploration_metadata
+    );
 
     this.versionHistoryService.insertMetadataVersionHistoryData(
       this.versionHistoryService.getLatestVersionOfExploration(),

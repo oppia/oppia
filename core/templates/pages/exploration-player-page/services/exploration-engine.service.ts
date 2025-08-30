@@ -29,7 +29,7 @@ import {ParamChange} from 'domain/exploration/param-change.model';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
-import {State} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {ExpressionInterpolationService} from 'expressions/expression-interpolation.service';
 import {TextInputCustomizationArgs} from 'interactions/customization-args-defs';
@@ -57,6 +57,7 @@ import {ExplorationPlayerConstants} from '../current-lesson-player/exploration-p
 import isEqual from 'lodash/isEqual';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {LearnerAnswerInfoService} from './learner-answer-info.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 @Injectable({
   providedIn: 'root',
@@ -98,6 +99,7 @@ export class ExplorationEngineService {
     private statsReportingService: StatsReportingService,
     private stateEditorService: StateEditorService,
     private translateService: TranslateService,
+    private platformFeatureService: PlatformFeatureService,
     private urlService: UrlService
   ) {
     this.setExplorationProperties();
@@ -542,6 +544,14 @@ export class ExplorationEngineService {
       preferredContentLanguageCodes,
       this.exploration.getLanguageCode()
     );
+
+    let pathnameArray = this.urlService.getPathname().split('/');
+    if (this.isNewLessonPlayerEnabled() && pathnameArray.includes('lesson')) {
+      this.contentTranslationManagerService.displayTranslations(
+        this.contentTranslationLanguageService.getCurrentContentLanguageCode()
+      );
+      this.contentTranslationManagerService.initLessonTranslations();
+    }
   }
 
   /**
@@ -1032,5 +1042,9 @@ export class ExplorationEngineService {
     // from parent map, hence we return the reversed path that goes
     // from initStateName to destStateName.
     return shortestPathToStateInReverse.reverse();
+  }
+
+  isNewLessonPlayerEnabled(): boolean {
+    return this.platformFeatureService.status.NewLessonPlayer.isEnabled;
   }
 }

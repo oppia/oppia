@@ -13,11 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of
- * WrittenTranslations domain objects.
+ * @fileoverview Model class for creating new frontend instances of
+ * WrittenTranslations.
  */
-
-import {Injectable} from '@angular/core';
 
 import {
   DataFormatToDefaultValuesKey,
@@ -156,15 +154,8 @@ export class WrittenTranslations {
 
     return {translations_mapping: translationsMappingDict};
   }
-}
 
-@Injectable({
-  providedIn: 'root',
-})
-export class WrittenTranslationsObjectFactory {
-  constructor() {}
-
-  createFromBackendDict(
+  static createFromBackendDict(
     writtenTranslationsDict: WrittenTranslationsBackendDict
   ): WrittenTranslations {
     const translationsMapping: WrittenTranslationsMapping = {};
@@ -184,7 +175,7 @@ export class WrittenTranslationsObjectFactory {
     return new WrittenTranslations(translationsMapping);
   }
 
-  createEmpty(): WrittenTranslations {
+  static createEmpty(): WrittenTranslations {
     return new WrittenTranslations({});
   }
 }

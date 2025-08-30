@@ -13,18 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for StateObjectFactory.
+ * @fileoverview Unit tests for State.
  */
 
 import {CamelCaseToHyphensPipe} from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import {
-  StateBackendDict,
-  StateObjectFactory,
-} from 'domain/state/StateObjectFactory';
+import {StateBackendDict, State} from 'domain/state/state.model';
 import {TestBed} from '@angular/core/testing';
 
-describe('State Object Factory', () => {
-  let sof: StateObjectFactory;
+describe('State', () => {
   let stateObject: StateBackendDict;
   let TextInputInteraction = {
     classifier_model_id: null,
@@ -80,9 +76,8 @@ describe('State Object Factory', () => {
     TestBed.configureTestingModule({
       providers: [CamelCaseToHyphensPipe],
     });
-    sof = TestBed.inject(StateObjectFactory);
 
-    spyOnProperty(sof, 'NEW_STATE_TEMPLATE', 'get').and.returnValue(
+    spyOnProperty(State, 'NEW_STATE_TEMPLATE', 'get').and.returnValue(
       TextInputInteraction
     );
 
@@ -134,7 +129,7 @@ describe('State Object Factory', () => {
   });
 
   it('should create a new state object from backend dict', () => {
-    const stateObjectBackend = sof.createFromBackendDict(
+    const stateObjectBackend = State.createFromBackendDict(
       'State name',
       stateObject
     );
@@ -142,7 +137,7 @@ describe('State Object Factory', () => {
   });
 
   it('should be able to get content ID to HTML', () => {
-    const state = sof.createFromBackendDict('State name', stateObject);
+    const state = State.createFromBackendDict('State name', stateObject);
 
     const contentIdToHtml = state.getContentIdToContents();
     expect(contentIdToHtml).toEqual({
@@ -167,7 +162,7 @@ describe('State Object Factory', () => {
         },
       ];
       stateObject.param_changes = paramChanges;
-      const stateObjectBackend = sof.createFromBackendDict(
+      const stateObjectBackend = State.createFromBackendDict(
         'State name',
         stateObject
       );
@@ -182,7 +177,7 @@ describe('State Object Factory', () => {
 
   it('should create a default state object', () => {
     const stateName = 'Default state';
-    const stateObjectDefault = sof.createDefaultState(
+    const stateObjectDefault = State.createDefaultState(
       stateName,
       'content_0',
       'default_outcome_1'
@@ -196,7 +191,7 @@ describe('State Object Factory', () => {
 
   it('should set a new name for state object', () => {
     const stateName = 'New name';
-    const stateObjectDefault = sof.createFromBackendDict(
+    const stateObjectDefault = State.createFromBackendDict(
       'Default state',
       stateObject
     );
@@ -206,8 +201,8 @@ describe('State Object Factory', () => {
   });
 
   it('should copy a state object', () => {
-    const otherState = sof.createFromBackendDict('Other state', stateObject);
-    const stateObjectDefault = sof.createFromBackendDict('', stateObject);
+    const otherState = State.createFromBackendDict('Other state', stateObject);
+    const stateObjectDefault = State.createFromBackendDict('', stateObject);
 
     stateObjectDefault.copy(otherState);
 
