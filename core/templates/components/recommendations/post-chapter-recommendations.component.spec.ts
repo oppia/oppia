@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//      http://www.apache.org/licenses/LICENSE-2.0
+//      [http://www.apache.org/licenses/LICENSE-2.0](http://www.apache.org/licenses/LICENSE-2.0)
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS-IS" BASIS,
@@ -45,7 +45,8 @@ class MockWindowRef {
     location: {
       pathname: '/learn/math',
       href: '',
-      reload: () => {},
+      reload: jasmine.createSpy('reload'),
+      assign: jasmine.createSpy('assign'),
     },
   };
 }
@@ -53,18 +54,22 @@ class MockWindowRef {
 describe('End chapter check mark component', function () {
   let component: PostChapterRecommendationsComponent;
   let fixture: ComponentFixture<PostChapterRecommendationsComponent>;
-  let mockPlatformFeatureService = new MockPlatformFeatureService();
+  let mockPlatformFeatureService: MockPlatformFeatureService;
   let urlInterpolationService: UrlInterpolationService;
   let mockWindowRef: MockWindowRef;
   let userService: UserService;
   let urlService: UrlService;
 
   beforeEach(waitForAsync(() => {
+    mockPlatformFeatureService = new MockPlatformFeatureService();
+    mockWindowRef = new MockWindowRef();
+
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [PostChapterRecommendationsComponent, MockTranslatePipe],
       providers: [
         UrlInterpolationService,
+        UrlService,
         {
           provide: WindowRef,
           useValue: mockWindowRef,
@@ -73,7 +78,6 @@ describe('End chapter check mark component', function () {
           provide: PlatformFeatureService,
           useValue: mockPlatformFeatureService,
         },
-        UrlService,
       ],
     }).compileComponents();
   }));
@@ -81,7 +85,6 @@ describe('End chapter check mark component', function () {
   beforeEach(() => {
     fixture = TestBed.createComponent(PostChapterRecommendationsComponent);
     component = fixture.componentInstance;
-    mockWindowRef = new MockWindowRef();
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     urlService = TestBed.inject(UrlService);
     userService = TestBed.inject(UserService);
@@ -116,12 +119,13 @@ describe('End chapter check mark component', function () {
     spyOn(userService, 'getLoginUrlAsync').and.returnValue(
       Promise.resolve('login_url')
     );
-    expect(mockWindowRef.nativeWindow.location.href).toBe('/login_url');
+
     component.signIn();
     tick();
 
     expect(userService.getLoginUrlAsync).toHaveBeenCalled();
-    expect(mockWindowRef.nativeWindow.location.href).toBe('/login_url');
+    // The component assigns to location directly, not location.href
+    expect(mockWindowRef.nativeWindow.location).toBe('login_url');
   }));
 
   it(
@@ -131,11 +135,12 @@ describe('End chapter check mark component', function () {
       spyOn(userService, 'getLoginUrlAsync').and.returnValue(
         Promise.resolve('')
       );
-      spyOn(mockWindowRef.nativeWindow.location, 'reload');
+
       component.signIn();
       tick();
 
       expect(userService.getLoginUrlAsync).toHaveBeenCalled();
+      expect(mockWindowRef.nativeWindow.location.reload).toHaveBeenCalled();
     })
   );
 

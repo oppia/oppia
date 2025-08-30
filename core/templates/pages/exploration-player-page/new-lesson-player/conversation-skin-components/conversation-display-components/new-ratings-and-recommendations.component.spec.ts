@@ -346,14 +346,7 @@ describe('New Ratings and recommendations component', () => {
     });
     spyOn(storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
       Promise.resolve(
-        new StoryPlaythrough(
-          'story_id',
-          [readOnlyStoryNode1], // Only one node
-          '',
-          '',
-          '',
-          ''
-        )
+        new StoryPlaythrough('story_id', [readOnlyStoryNode1], '', '', '', '')
       )
     );
     spyOn(topicViewerBackendApiService, 'fetchTopicDataAsync').and.returnValue(

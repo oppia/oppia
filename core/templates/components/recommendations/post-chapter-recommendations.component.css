@@ -53,7 +53,6 @@
 
 .post-chapter-recommendations-btn {
   align-items: center;
-  margin-bottom: 15px;
   border-radius: 4px;
   border-width: 1px;
   display: flex;
@@ -61,6 +60,7 @@
   font-size: 18px;
   font-weight: 400;
   height: 78px;
+  margin-bottom: 15px;
   padding: 16px;
   width: 325px;
 }
@@ -81,25 +81,25 @@
 
 .learner-dashboard-btn,
 .signup-btn {
-  background-color: #E8F1F0;
-  border: 1px solid #00645C;
-  color: #00645C;
+  background-color: #e8f1f0;
+  border: 1px solid #00645c;
+  color: #00645c;
 }
 
 .next-lesson-btn {
-  background-color: #0D48A1;
-  border: 1px solid #0D48A1;
+  background-color: #0d48a1;
+  border: 1px solid #0d48a1;
   color: #fff;
 }
 
 .review-card-btn {
-  background-color: #FFFCFC;
-  border: 1px solid #C55F45;
-  color: #C55F45;
+  background-color: #fffcfc;
+  border: 1px solid #c55f45;
+  color: #c55f45;
 }
 
 .more-practice-btn {
-  background-color: #F4FAFB;
+  background-color: #f4fafb;
   border: 1px solid #008098;
   color: #008098;
 }
@@ -128,14 +128,10 @@
   }
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 480px) {
   .post-chapter-recommendations-btn {
-    width: 260px;
     font-size: 13px;
-  }
-
-  .post-chapter-recommendations-btn {
-    font-size: 18px;
+    width: 260px;
   }
 
   .post-chapter-recommendations-btn span {
