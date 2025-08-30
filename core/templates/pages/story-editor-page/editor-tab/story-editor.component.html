@@ -144,13 +144,13 @@
           </div>
           <div *ngIf="story.getThumbnailFilename() && mainStoryCardIsShown">
             <div *ngIf="!storyPreviewCardIsShown" >
-              <button class="btn btn-default show-story-preview-button" (click)="togglePreview()">
+              <button class="btn btn-secondary show-story-preview-button" (click)="togglePreview()">
                 Expand Preview
                 <i class="fa fa-angle-down"></i>
               </button>
             </div>
             <div *ngIf="storyPreviewCardIsShown">
-              <button class="btn btn-default show-story-preview-button" (click)="togglePreview()">
+              <button class="btn btn-secondary show-story-preview-button" (click)="togglePreview()">
                 Collapse Preview
                 <i class="fa fa-angle-up"></i>
               </button>

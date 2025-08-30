@@ -81,7 +81,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             return (
                 '# Just a comment',
                 '# Third party files:',
-                '- third_party/static/bootstrap-4.3.1/')
+                '- third_party/static/bootstrap-5.3.1/')
 
         readlines_swap = self.swap(
             run_lint_checks.FileCache, 'readlines', mock_readlines)
@@ -99,7 +99,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             unused_self: str, unused_filepath: str
         ) -> Tuple[str, ...]:
             return (
-                '# Third party files:', '- third_party/static/bootstrap-4.3/')
+                '# Third party files:', '- third_party/static/bootstrap-5.3/')
 
         readlines_swap = self.swap(
             run_lint_checks.FileCache, 'readlines', mock_readlines)

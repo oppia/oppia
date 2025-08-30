@@ -164,14 +164,14 @@
       </div>
       <div *ngIf="topic.getThumbnailFilename() && mainTopicCardIsShown">
         <div *ngIf="!topicPreviewCardIsShown" >
-          <button class="btn btn-default show-topic-preview-button"
+          <button class="btn btn-secondary show-topic-preview-button"
                   (click)="togglePreview()">
             Expand Preview
             <i class="fa fa-angle-down"></i>
           </button>
         </div>
         <div *ngIf="topicPreviewCardIsShown">
-          <button class="btn btn-default show-topic-preview-button"
+          <button class="btn btn-secondary show-topic-preview-button"
                   (click)="togglePreview()">
             Collapse Preview
             <i class="fa fa-angle-up"></i>
