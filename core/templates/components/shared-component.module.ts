@@ -190,7 +190,6 @@ import {AuthService} from 'services/auth.service';
 
 // Miscellaneous.
 import {JoyrideModule} from 'ngx-joyride';
-import {SmartRouterModule} from 'hybrid-router-module-provider';
 import {StaleTabInfoModalComponent} from './stale-tab-info/stale-tab-info-modal.component';
 import {UnsavedChangesStatusInfoModalComponent} from './unsaved-changes-status-info/unsaved-changes-status-info-modal.component';
 import {NgbModalModule} from '@ng-bootstrap/ng-bootstrap';
@@ -215,6 +214,7 @@ import {NewInputResponsePairComponent} from 'pages/exploration-player-page/new-l
 import {NewConversationSkinComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/new-conversation-skin.component';
 import {ConversationDisplayComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/conversation-display.component';
 import {CardNavigationControlComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/card-navigation-control.component';
+import {RouterModule} from '@angular/router';
 import {HintSolutionAndConceptCardDisplayComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/hint-solution-and-concept-card-display.component';
 import {DisplayNewHintModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/display-new-hint-modal.component';
 import {DisplayNewSolutionModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/display-new-solution-modal.component';
@@ -235,9 +235,7 @@ import {ProgressBarComponent} from './progress-bar/progress-bar.component';
     CustomFormsComponentsModule,
     CommonElementsModule,
     CodeMirrorModule,
-    // TODO(#13443): Remove smart router module provider once all pages are
-    // migrated to angular router.
-    SmartRouterModule,
+    RouterModule,
     MaterialModule,
     NgBootstrapModule,
     DynamicContentModule,
