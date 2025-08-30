@@ -13,19 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for exploration metadata object factory.
+ * @fileoverview Unit tests for ExplorationMetadata.
  */
 
-import {TestBed} from '@angular/core/testing';
 import {AppConstants} from 'app.constants';
 import {
   ExplorationMetadata,
   ExplorationMetadataBackendDict,
-  ExplorationMetadataObjectFactory,
-} from './ExplorationMetadataObjectFactory';
+} from './exploration-metadata.model';
 
 describe('Exploration metadata object factory', () => {
-  let explorationMetadataObjectFactory: ExplorationMetadataObjectFactory;
   let explorationMetadata: ExplorationMetadata;
   let explorationMetadataBackendDict: ExplorationMetadataBackendDict;
   const cArgs = {
@@ -35,14 +32,6 @@ describe('Exploration metadata object factory', () => {
   const gId = 'Copier';
 
   beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [ExplorationMetadataObjectFactory],
-    });
-
-    explorationMetadataObjectFactory = TestBed.inject(
-      ExplorationMetadataObjectFactory
-    );
-
     explorationMetadataBackendDict = {
       title: 'Exploration',
       category: 'Algebra',
@@ -67,10 +56,9 @@ describe('Exploration metadata object factory', () => {
   });
 
   it('should create exploration metadata object from backend dict', () => {
-    explorationMetadata =
-      explorationMetadataObjectFactory.createFromBackendDict(
-        explorationMetadataBackendDict
-      );
+    explorationMetadata = ExplorationMetadata.createFromBackendDict(
+      explorationMetadataBackendDict
+    );
 
     expect(explorationMetadata.toBackendDict()).toEqual(
       explorationMetadataBackendDict
@@ -83,10 +71,9 @@ describe('Exploration metadata object factory', () => {
     // If you modify anything in constants.METADATA_PROPERTIES, then make
     // sure to include the changes in properties in the attributes of the
     // model class too.
-    explorationMetadata =
-      explorationMetadataObjectFactory.createFromBackendDict(
-        explorationMetadataBackendDict
-      );
+    explorationMetadata = ExplorationMetadata.createFromBackendDict(
+      explorationMetadataBackendDict
+    );
     const backendDict = explorationMetadata.toBackendDict();
 
     for (let property of AppConstants.METADATA_PROPERTIES) {

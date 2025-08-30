@@ -18,10 +18,7 @@
 
 import {Injectable} from '@angular/core';
 import {ExplorationChange} from 'domain/exploration/exploration-draft.model';
-import {
-  ExplorationMetadata,
-  ExplorationMetadataObjectFactory,
-} from 'domain/exploration/ExplorationMetadataObjectFactory';
+import {ExplorationMetadata} from 'domain/exploration/exploration-metadata.model';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {StateObjectsDict, States} from 'domain/exploration/states.model';
 import {ExplorationDataService} from 'pages/exploration-editor-page/services/exploration-data.service';
@@ -51,7 +48,6 @@ export class CompareVersionsService {
   constructor(
     private explorationDataService: ExplorationDataService,
     private explorationDiffService: ExplorationDiffService,
-    private explorationMetadataObjectFactory: ExplorationMetadataObjectFactory,
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private versionTreeService: VersionTreeService
   ) {}
@@ -161,13 +157,9 @@ export class CompareVersionsService {
       );
 
       let v1Metadata =
-        this.explorationMetadataObjectFactory.createFromBackendDict(
-          v1MetadataDict
-        );
+        ExplorationMetadata.createFromBackendDict(v1MetadataDict);
       let v2Metadata =
-        this.explorationMetadataObjectFactory.createFromBackendDict(
-          v2MetadataDict
-        );
+        ExplorationMetadata.createFromBackendDict(v2MetadataDict);
 
       return {
         nodes: diffGraphData.nodes,
