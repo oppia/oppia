@@ -116,10 +116,12 @@ describe('End chapter check mark component', function () {
     spyOn(userService, 'getLoginUrlAsync').and.returnValue(
       Promise.resolve('login_url')
     );
+    expect(mockWindowRef.nativeWindow.location.href).toBe('/login_url');
     component.signIn();
     tick();
 
     expect(userService.getLoginUrlAsync).toHaveBeenCalled();
+    expect(mockWindowRef.nativeWindow.location.href).toBe('/login_url');
   }));
 
   it(
@@ -134,9 +136,6 @@ describe('End chapter check mark component', function () {
       tick();
 
       expect(userService.getLoginUrlAsync).toHaveBeenCalled();
-      // fixture.whenStable().then(() => {
-      //   expect(mockWindowRef.nativeWindow.location.reload).toHaveBeenCalled();
-      // });
     })
   );
 
