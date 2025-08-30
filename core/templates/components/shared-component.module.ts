@@ -652,6 +652,7 @@ import {CheckpointCelebrationFooterComponent} from 'pages/exploration-player-pag
     ContentLanguageSelectorComponent,
     ProgressBarComponent,
     ConversationSkinComponent,
+    HintSolutionAndConceptCardDisplayComponent,
     ConversationDisplayComponent,
     CardNavigationControlComponent,
     NewConversationSkinComponent,

@@ -1,1 +1,49 @@
-<div class="oppia-new-audio-bar"></div>
+<div class="oppia-new-audio-bar" *ngIf="isAudioBarAvailable()">
+  <i class="fas fa-headphones desktop-mode"></i>
+  <p class=" desktop-mode">Listen to this lesson in <span *ngIf="languageAccentDescriptions.length === 1">{{selectedLanguageAccentDescription}}</span></p>
+
+  <div class="oppia-new-audio-header-control-buttons" #audioControls>
+    <div class="oppia-new-audio-header-select desktop-mode" *ngIf="languageAccentDescriptions.length > 1">
+      <select class="audio-language-select e2e-test-audio-lang-select"
+              [(ngModel)]="selectedLanguageAccentDescription"
+              (change)="updateSelectedLanguageAccent()">
+        <option *ngFor="let opt of languageAccentDescriptions" [value]="opt">{{ opt }}</option>
+      </select>
+    </div>
+
+    <div class="audio-new-header-control-icons">
+      <a (click)="onPlayButtonClicked()" (keydown.enter)="onPlayButtonClicked()" [ngbTooltip]="!isAudioAvailableInCurrentLanguageAccent() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:selectedLanguageAccentDescription}) : ''" placement="right">
+        <i class="fas" tabindex="0" aria-label="Press enter to Listen to the Lesson"
+            [ngClass]="{'fa-ellipsis-h': audioLoadingIndicatorIsShown, 'fa-play': !isAudioPlaying(), 'fa-pause': isAudioPlaying()}">
+        </i>
+      </a>
+    </div>
+
+    <div class="new-slider-section">
+      <mat-progress-bar mode="indeterminate" *ngIf="audioLoadingIndicatorIsShown"></mat-progress-bar>
+      <oppia-audio-slider class="audio-progress-bar" [value]="this.currentVoiceoverTime" *ngIf="!audioLoadingIndicatorIsShown"
+                          [dir]="isLanguageRTL() ? 'rtl' : 'ltr'"
+                          [max]="this.totalVoiceoverDurationSecs"
+                          (valueChange)="setProgress($event)"
+                          aria-label="audio-slider">
+      </oppia-audio-slider>
+      <span *ngIf="audioLoadingIndicatorIsShown && !doesCurrentAudioTranslationNeedUpdate()" class="audio-controls-message">
+          {{ 'I18N_PLAYER_AUDIO_LOADING_AUDIO' | translate }}
+      </span>
+      <span *ngIf="isAudioAvailableInCurrentLanguageAccent() && doesCurrentAudioTranslationNeedUpdate()" class="audio-controls-message">
+      {{ 'I18N_PLAYER_AUDIO_MIGHT_NOT_MATCH_TEXT' | translate }}
+      </span>
+      <!--Filler space for message-->
+      <span class="audio-controls-message">&zwnj;</span>
+    </div>
+  </div>
+
+  <div class="oppia-new-audio-header-select mobile-mode" *ngIf="languageAccentDescriptions.length > 1">
+    <select class="audio-language-select e2e-test-audio-lang-select"
+            [(ngModel)]="selectedLanguageAccentDescription"
+            (change)="updateSelectedLanguageAccent()">
+      <option *ngFor="let opt of languageAccentDescriptions" [value]="opt">{{ opt }}</option>
+    </select>
+  </div>
+
+</div>
