@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2025 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,33 +25,39 @@ import {
   tick,
   waitForAsync,
 } from '@angular/core/testing';
-import {NgbPopoverModule} from '@ng-bootstrap/ng-bootstrap';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {
+  MatBottomSheet,
+  MatBottomSheetRef,
+} from '@angular/material/bottom-sheet';
 import {TranslateService} from '@ngx-translate/core';
-import {MockTranslateService} from '../../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
-import {AlertsService} from '../../../../services/alerts.service';
-import {UrlService} from '../../../../services/contextual/url.service';
-import {WindowRef} from '../../../../services/contextual/window-ref.service';
-import {UserService} from '../../../../services/user.service';
-import {LearnerViewRatingService} from '../../services/learner-view-rating.service';
-import {MockLimitToPipe} from '../templates/lesson-information-card-modal.component.spec';
-import {RatingsAndRecommendationsComponent} from './ratings-and-recommendations.component';
-import {ExplorationModeService} from '../../services/exploration-mode.service';
-import {UrlInterpolationService} from '../../../../domain/utilities/url-interpolation.service';
-import {LocalStorageService} from '../../../../services/local-storage.service';
-import {AssetsBackendApiService} from '../../../../services/assets-backend-api.service';
-import {StoryViewerBackendApiService} from '../../../../domain/story_viewer/story-viewer-backend-api.service';
-import {TopicViewerBackendApiService} from '../../../../domain/topic_viewer/topic-viewer-backend-api.service';
-import {StoryPlaythrough} from '../../../../domain/story_viewer/story-playthrough.model';
-import {ReadOnlyStoryNode} from '../../../../domain/story_viewer/read-only-story-node.model';
-import {ReadOnlyTopic} from '../../../../domain/topic_viewer/read-only-topic.model';
-import {LearnerExplorationSummary} from '../../../../domain/summary/learner-exploration-summary.model';
-import {SiteAnalyticsService} from '../../../../services/site-analytics.service';
-import {ConversationFlowService} from '../../services/conversation-flow.service';
-import {PageContextService} from '../../../../services/page-context.service';
+import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
+import {AlertsService} from 'services/alerts.service';
+import {UrlService} from 'services/contextual/url.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {UserService} from 'services/user.service';
+import {LearnerViewRatingService} from '../../../services/learner-view-rating.service';
+import {NewRatingsAndRecommendationsComponent} from './new-ratings-and-recommendations.component';
+import {ExplorationModeService} from '../../../services/exploration-mode.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {LocalStorageService} from 'services/local-storage.service';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {StoryViewerBackendApiService} from 'domain/story_viewer/story-viewer-backend-api.service';
+import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-backend-api.service';
+import {StoryPlaythrough} from 'domain/story_viewer/story-playthrough.model';
+import {ReadOnlyStoryNode} from 'domain/story_viewer/read-only-story-node.model';
+import {ReadOnlyTopic} from 'domain/topic_viewer/read-only-topic.model';
+import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {ConversationFlowService} from '../../../services/conversation-flow.service';
+import {PageContextService} from 'services/page-context.service';
+import {LessonFeedbackModalComponent} from '../../sidebar-components/lesson-feedback-modal.component';
+import {CustomizableThankYouModalComponent} from '../../sidebar-components/customizable-thank-you-modal.component';
 
-describe('Ratings and recommendations component', () => {
-  let fixture: ComponentFixture<RatingsAndRecommendationsComponent>;
-  let componentInstance: RatingsAndRecommendationsComponent;
+fdescribe('New Ratings and recommendations component', () => {
+  let fixture: ComponentFixture<NewRatingsAndRecommendationsComponent>;
+  let componentInstance: NewRatingsAndRecommendationsComponent;
   let alertsService: AlertsService;
   let learnerViewRatingService: LearnerViewRatingService;
   let urlService: UrlService;
@@ -64,19 +70,17 @@ describe('Ratings and recommendations component', () => {
   let storyViewerBackendApiService: StoryViewerBackendApiService;
   let topicViewerBackendApiService: TopicViewerBackendApiService;
   let siteAnalyticsService: SiteAnalyticsService;
-
-  const mockNgbPopover = jasmine.createSpyObj('NgbPopover', [
-    'close',
-    'toggle',
-    'open',
-  ]);
+  let windowDimensionsService: WindowDimensionsService;
+  let ngbModal: NgbModal;
+  let bottomSheet: MatBottomSheet;
+  let windowRef: WindowRef;
 
   class MockWindowRef {
     nativeWindow = {
       location: {
         search: '',
         pathname: '/path/name',
-        reload: () => {},
+        reload: jasmine.createSpy('reload'),
       },
     };
   }
@@ -98,13 +102,13 @@ describe('Ratings and recommendations component', () => {
     getPageContext(): string {
       return this.pageContext;
     }
-    setExplorationVersion(_version: number): void {}
+    setExplorationVersion(version: number): void {}
   }
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, NgbPopoverModule],
-      declarations: [RatingsAndRecommendationsComponent, MockLimitToPipe],
+      imports: [HttpClientTestingModule],
+      declarations: [NewRatingsAndRecommendationsComponent],
       providers: [
         AlertsService,
         LearnerViewRatingService,
@@ -113,11 +117,13 @@ describe('Ratings and recommendations component', () => {
         ExplorationModeService,
         UrlInterpolationService,
         ConversationFlowService,
+        WindowDimensionsService,
         {provide: PageContextService, useClass: MockPageContextService},
         AssetsBackendApiService,
         StoryViewerBackendApiService,
         TopicViewerBackendApiService,
         LocalStorageService,
+        SiteAnalyticsService,
         {
           provide: WindowRef,
           useClass: MockWindowRef,
@@ -126,13 +132,21 @@ describe('Ratings and recommendations component', () => {
           provide: TranslateService,
           useClass: MockTranslateService,
         },
+        {
+          provide: NgbModal,
+          useValue: jasmine.createSpyObj('NgbModal', ['open']),
+        },
+        {
+          provide: MatBottomSheet,
+          useValue: jasmine.createSpyObj('MatBottomSheet', ['open']),
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(RatingsAndRecommendationsComponent);
+    fixture = TestBed.createComponent(NewRatingsAndRecommendationsComponent);
     componentInstance = fixture.componentInstance;
     alertsService = TestBed.inject(AlertsService);
     learnerViewRatingService = TestBed.inject(LearnerViewRatingService);
@@ -146,6 +160,14 @@ describe('Ratings and recommendations component', () => {
     storyViewerBackendApiService = TestBed.inject(StoryViewerBackendApiService);
     topicViewerBackendApiService = TestBed.inject(TopicViewerBackendApiService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
+    windowDimensionsService = TestBed.inject(WindowDimensionsService);
+    ngbModal = TestBed.inject(NgbModal);
+    bottomSheet = TestBed.inject(MatBottomSheet);
+    windowRef = TestBed.inject(WindowRef);
+  });
+
+  it('should create', () => {
+    expect(componentInstance).toBeTruthy();
   });
 
   it(
@@ -256,11 +278,6 @@ describe('Ratings and recommendations component', () => {
         )
       );
 
-      // This throws "Type 'null' is not assignable to parameter of type
-      // 'QuestionPlayerConfig'." We need to suppress this error because
-      // of the need to test validations. This throws an error because
-      // the value is null.
-      // @ts-ignore
       componentInstance.questionPlayerConfig = null;
 
       componentInstance.ngOnInit();
@@ -287,6 +304,67 @@ describe('Ratings and recommendations component', () => {
       expect(componentInstance.collectionId).toEqual(collectionId);
     })
   );
+
+  it('should not find next story node when current node is the last', fakeAsync(() => {
+    const readOnlyStoryNode1 = new ReadOnlyStoryNode(
+      'node_1',
+      '',
+      '',
+      [],
+      [],
+      [],
+      '',
+      false,
+      '',
+      {} as LearnerExplorationSummary,
+      false,
+      'bg_color_1',
+      'filename_1'
+    );
+
+    spyOn(explorationModeService, 'isInStoryChapterMode').and.returnValue(true);
+    spyOn(urlService, 'getUrlParams').and.returnValue({
+      story_url_fragment: 'story_url_fragment',
+      topic_url_fragment: 'topic_url_fragment',
+      classroom_url_fragment: 'classroom_url_fragment',
+      node_id: 'node_1',
+    });
+    spyOn(storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
+      Promise.resolve(
+        new StoryPlaythrough(
+          'story_id',
+          [readOnlyStoryNode1], // Only one node
+          '',
+          '',
+          '',
+          ''
+        )
+      )
+    );
+    spyOn(topicViewerBackendApiService, 'fetchTopicDataAsync').and.returnValue(
+      Promise.resolve(
+        new ReadOnlyTopic(
+          'topic_name',
+          'topic_Id',
+          'description',
+          [],
+          [],
+          [],
+          [],
+          {},
+          {},
+          true,
+          'metatag',
+          'page_title_fragment'
+        )
+      )
+    );
+
+    componentInstance.ngOnInit();
+    tick();
+
+    expect(componentInstance.nextStoryNode).toBe(null);
+  }));
 
   it(
     'should not generate story page url and determine the next story node' +
@@ -325,33 +403,103 @@ describe('Ratings and recommendations component', () => {
     ).toHaveBeenCalledWith('story', 'story_id', 'thumbnail_filename');
   });
 
-  it('should toggle popover when user clicks on rating stars', () => {
-    componentInstance.feedbackPopOver = mockNgbPopover;
+  it('should return true for mobile screen size when width is less than breakpoint', () => {
+    spyOn(windowDimensionsService, 'getWidth').and.returnValue(400);
 
-    componentInstance.togglePopover();
-
-    // Using feedback popover directly here breaks the principle of
-    // independent unit tests. Hence, mock is used here.
-    // The mock doesn't allow us to check its final state.
-    // So, using a spy on function toggle instead.
-    expect(componentInstance.feedbackPopOver.toggle).toHaveBeenCalled();
+    expect(componentInstance.isMobileScreenSize()).toBe(true);
   });
 
-  it('should close popover when user clicks on cancel button', () => {
-    componentInstance.feedbackPopOver = mockNgbPopover;
+  it('should return false for mobile screen size when width is greater than breakpoint', () => {
+    spyOn(windowDimensionsService, 'getWidth').and.returnValue(600);
 
-    componentInstance.closePopover();
+    expect(componentInstance.isMobileScreenSize()).toBe(false);
+  });
 
-    // Using feedback popover directly here breaks the principle of
-    // independent unit tests. Hence, mock is used here.
-    // The mock doesn't allow us to check its final state.
-    // So, using a spy on function toggle instead.
-    expect(componentInstance.feedbackPopOver.close).toHaveBeenCalled();
+  it('should show feedback modal for mobile screen', () => {
+    const mockBottomSheetRef = jasmine.createSpyObj('MatBottomSheetRef', [
+      'afterDismissed',
+    ]);
+    mockBottomSheetRef.afterDismissed.and.returnValue(of('submit'));
+
+    spyOn(componentInstance, 'isMobileScreenSize').and.returnValue(true);
+    spyOn(componentInstance, 'showThankYouModal').and.returnValue(
+      mockBottomSheetRef
+    );
+    (bottomSheet.open as jasmine.Spy).and.returnValue(mockBottomSheetRef);
+
+    const result = componentInstance.showFeedbackModal();
+
+    expect(bottomSheet.open).toHaveBeenCalledWith(
+      LessonFeedbackModalComponent,
+      {
+        disableClose: true,
+      }
+    );
+    expect(result).toBe(mockBottomSheetRef);
+  });
+
+  it('should show feedback modal for desktop screen', () => {
+    const mockModalRef = jasmine.createSpyObj('NgbModalRef', ['result']);
+    mockModalRef.result = Promise.resolve();
+
+    spyOn(componentInstance, 'isMobileScreenSize').and.returnValue(false);
+    spyOn(componentInstance, 'showThankYouModal').and.returnValue(mockModalRef);
+    (ngbModal.open as jasmine.Spy).and.returnValue(mockModalRef);
+
+    const result = componentInstance.showFeedbackModal();
+
+    expect(ngbModal.open).toHaveBeenCalledWith(LessonFeedbackModalComponent, {
+      backdrop: 'static',
+    });
+    expect(result).toBe(mockModalRef);
+  });
+
+  it('should show thank you modal for mobile screen', () => {
+    const mockBottomSheetRef = jasmine.createSpyObj('MatBottomSheetRef', [
+      'afterDismissed',
+    ]);
+    const i18nKey = 'I18N_PLAYER_THANK_FEEDBACK';
+
+    spyOn(componentInstance, 'isMobileScreenSize').and.returnValue(true);
+    (bottomSheet.open as jasmine.Spy).and.returnValue(mockBottomSheetRef);
+
+    const result = componentInstance.showThankYouModal(i18nKey);
+
+    expect(bottomSheet.open).toHaveBeenCalledWith(
+      CustomizableThankYouModalComponent,
+      {
+        data: {
+          modalMessageI18nKey: i18nKey,
+        },
+      }
+    );
+    expect(result).toBe(mockBottomSheetRef);
+  });
+
+  it('should show thank you modal for desktop screen', () => {
+    const mockModalRef = jasmine.createSpyObj('NgbModalRef', [
+      'componentInstance',
+    ]);
+    const i18nKey = 'I18N_PLAYER_THANK_FEEDBACK';
+    mockModalRef.componentInstance = {};
+
+    spyOn(componentInstance, 'isMobileScreenSize').and.returnValue(false);
+    (ngbModal.open as jasmine.Spy).and.returnValue(mockModalRef);
+
+    const result = componentInstance.showThankYouModal(i18nKey);
+
+    expect(ngbModal.open).toHaveBeenCalledWith(
+      CustomizableThankYouModalComponent,
+      {
+        backdrop: true,
+      }
+    );
+    expect(mockModalRef.componentInstance.modalMessageI18nKey).toBe(i18nKey);
+    expect(result).toBe(mockModalRef);
   });
 
   it('should submit user rating when user clicks on rating star', () => {
     spyOn(learnerViewRatingService, 'submitUserRating');
-    componentInstance.feedbackPopOver = mockNgbPopover;
     const userRating = 5;
 
     componentInstance.submitUserRating(userRating);
@@ -371,7 +519,10 @@ describe('Ratings and recommendations component', () => {
     tick();
 
     expect(userService.getLoginUrlAsync).toHaveBeenCalled();
-    expect(siteAnalyticsService.registerNewSignupEvent).toHaveBeenCalled();
+    expect(siteAnalyticsService.registerNewSignupEvent).toHaveBeenCalledWith(
+      '.sign-in-button'
+    );
+    expect(windowRef.nativeWindow.location).toBe('login_url');
   }));
 
   it(
@@ -387,25 +538,37 @@ describe('Ratings and recommendations component', () => {
       tick();
 
       expect(userService.getLoginUrlAsync).toHaveBeenCalled();
-      expect(siteAnalyticsService.registerNewSignupEvent).toHaveBeenCalled();
+      expect(siteAnalyticsService.registerNewSignupEvent).toHaveBeenCalledWith(
+        '.sign-in-button'
+      );
+      expect(windowRef.nativeWindow.location.reload).toHaveBeenCalled();
     })
   );
 
   it('should return the value from getIsRefresherExploration', () => {
-    spyOn(
-      conversationFlowService,
-      'getIsRefresherExploration'
-    ).and.callThrough();
-    componentInstance.getIsRefresherExploration();
+    const expectedValue = true;
+    spyOn(conversationFlowService, 'getIsRefresherExploration').and.returnValue(
+      expectedValue
+    );
+
+    const result = componentInstance.getIsRefresherExploration();
+
     expect(
       conversationFlowService.getIsRefresherExploration
     ).toHaveBeenCalled();
+    expect(result).toBe(expectedValue);
   });
 
   it('should return the value from getParentExplorationIds', () => {
-    spyOn(conversationFlowService, 'getParentExplorationIds').and.callThrough();
-    componentInstance.getParentExplorationIds();
+    const expectedIds = ['exp1', 'exp2'];
+    spyOn(conversationFlowService, 'getParentExplorationIds').and.returnValue(
+      expectedIds
+    );
+
+    const result = componentInstance.getParentExplorationIds();
+
     expect(conversationFlowService.getParentExplorationIds).toHaveBeenCalled();
+    expect(result).toBe(expectedIds);
   });
 
   it("should save user's sign up section preference to localStorage", () => {
@@ -432,5 +595,38 @@ describe('Ratings and recommendations component', () => {
     getPreferenceSpy.and.returnValue(null);
 
     expect(componentInstance.isSignUpSectionHidden()).toBe(false);
+  });
+
+  it('should initialize when questionPlayerConfig is provided', fakeAsync(() => {
+    componentInstance.questionPlayerConfig = {
+      resultActionButtons: [],
+      skillList: ['skill1'],
+      skillDescriptions: ['desc1'],
+      questionCount: 5,
+      questionsSortedByDifficulty: true,
+    };
+
+    spyOn(explorationModeService, 'isInStoryChapterMode').and.returnValue(
+      false
+    );
+    spyOn(urlService, 'getCollectionIdFromExplorationUrl').and.returnValue(
+      'collection_id'
+    );
+    spyOn(learnerViewRatingService, 'init');
+
+    componentInstance.ngOnInit();
+    tick();
+
+    expect(learnerViewRatingService.init).not.toHaveBeenCalled();
+  }));
+
+  it('should unsubscribe from all subscriptions on destroy', () => {
+    spyOn(componentInstance.directiveSubscriptions, 'unsubscribe');
+
+    componentInstance.ngOnDestroy();
+
+    expect(
+      componentInstance.directiveSubscriptions.unsubscribe
+    ).toHaveBeenCalled();
   });
 });
