@@ -33,7 +33,6 @@ import {
   ReadOnlyExplorationBackendApiService,
 } from 'domain/exploration/read-only-exploration-backend-api.service';
 import {ExplorationEngineService} from 'pages/exploration-player-page/services/exploration-engine.service';
-import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
 import {PlayerTranscriptService} from 'pages/exploration-player-page/services/player-transcript.service';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 import {PageContextService} from 'services/page-context.service';
@@ -261,7 +260,7 @@ describe('CheckpointBarComponent', () => {
 
     component.updateLessonProgressBar();
 
-    expect(component.completedCheckpointsCount).toBe(2); // 3 - 1
+    expect(component.completedCheckpointsCount).toBe(2);
     expect(component.checkpointStatusArray.length).toBe(4);
     expect(component.checkpointStatusArray[0]).toBe('completed');
     expect(component.checkpointStatusArray[1]).toBe('completed');
@@ -286,7 +285,7 @@ describe('CheckpointBarComponent', () => {
     component.updateLessonProgressBar();
 
     expect(component.expEnded).toBe(true);
-    expect(component.completedCheckpointsCount).toBe(2); // 1 + 1 (terminal state)
+    expect(component.completedCheckpointsCount).toBe(2);
   });
 
   it('should not update progress when exploration has ended', () => {
@@ -296,14 +295,13 @@ describe('CheckpointBarComponent', () => {
 
     component.updateLessonProgressBar();
 
-    expect(component.completedCheckpointsCount).toBe(2); // Should remain unchanged
+    expect(component.completedCheckpointsCount).toBe(2);
     expect(component.checkpointStatusArray.length).toBe(3);
   });
 
   it('should create checkpoint status array with all completed when all checkpoints are done', () => {
     component.expEnded = false;
     component.checkpointCount = 3;
-    // Mock returns 4, so completedCheckpointsCount will be 4 - 1 = 3
     mockCheckpointProgressService.getMostRecentlyReachedCheckpointIndex.and.returnValue(
       4
     );

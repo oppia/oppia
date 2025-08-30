@@ -418,7 +418,7 @@ describe('ProgressTrackerComponent', () => {
     expect(() => {
       component.openProgressReminderModal();
       tick();
-    }).not.toThrow();
+    }).not.toThrowError();
   }));
 
   it('should open save progress modal with correct properties', () => {

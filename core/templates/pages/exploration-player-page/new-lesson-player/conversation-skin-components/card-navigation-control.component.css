@@ -16,7 +16,6 @@ oppia-progress-tracker {
   width: 375px;
 }
 
-
 .card-navigation-control .oppia-nav-button .mat-button.oppia-autofocus:focus {
   background-color: #0d48a1;
 }
@@ -192,4 +191,3 @@ oppia-progress-tracker {
     width: 100px;
   }
 }
-

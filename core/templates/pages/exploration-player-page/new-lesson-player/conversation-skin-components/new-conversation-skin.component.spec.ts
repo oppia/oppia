@@ -546,7 +546,9 @@ describe('New Conversation skin component', () => {
       ).and.returnValue([]);
       spyOn(playerTranscriptService, 'getCard').and.callFake(
         (index: number) => {
-          if (index === 0) return mockFirstCard;
+          if (index === 0) {
+            return mockFirstCard;
+          }
           return mockPreviousCard;
         }
       );
@@ -573,7 +575,9 @@ describe('New Conversation skin component', () => {
       ).and.returnValue(['PreviousState']);
       spyOn(playerTranscriptService, 'getCard').and.callFake(
         (index: number) => {
-          if (index === 0) return mockFirstCard;
+          if (index === 0) {
+            return mockFirstCard;
+          }
           return mockPreviousCard;
         }
       );
@@ -600,7 +604,9 @@ describe('New Conversation skin component', () => {
       ).and.returnValue([]);
       spyOn(playerTranscriptService, 'getCard').and.callFake(
         (index: number) => {
-          if (index === 0) return mockFirstCard;
+          if (index === 0) {
+            return mockFirstCard;
+          }
           return mockPreviousCard;
         }
       );
@@ -653,7 +659,9 @@ describe('New Conversation skin component', () => {
       ).and.returnValue([]);
       spyOn(playerTranscriptService, 'getCard').and.callFake(
         (index: number) => {
-          if (index === 0) return mockFirstCard;
+          if (index === 0) {
+            return mockFirstCard;
+          }
           return mockPreviousCard;
         }
       );
@@ -677,7 +685,7 @@ describe('New Conversation skin component', () => {
       spyOn(
         playerTranscriptService,
         'getPrevSessionStatesProgress'
-      ).and.returnValue([undefined]); // Include undefined to make the check fail
+      ).and.returnValue([undefined]);
       spyOn(playerTranscriptService, 'getCard').and.returnValue(mockFirstCard);
       spyOn(conversationFlowService, 'getDisplayedCard').and.returnValue(
         mockStateCard
@@ -699,10 +707,12 @@ describe('New Conversation skin component', () => {
       spyOn(
         playerTranscriptService,
         'getPrevSessionStatesProgress'
-      ).and.returnValue([undefined]); // Include undefined to make the check fail
+      ).and.returnValue([undefined]);
       spyOn(playerTranscriptService, 'getCard').and.callFake(
         (index: number) => {
-          if (index === 0) return mockFirstCard;
+          if (index === 0) {
+            return mockFirstCard;
+          }
           return mockPreviousCard;
         }
       );

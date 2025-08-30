@@ -61,7 +61,7 @@ class MockWindowRef {
   };
 }
 
-fdescribe('SaveProgressModalComponent', () => {
+describe('SaveProgressModalComponent', () => {
   let fixture: ComponentFixture<SaveProgressModalComponent>;
   let componentInstance: SaveProgressModalComponent;
   let userService: UserService;
@@ -101,9 +101,6 @@ fdescribe('SaveProgressModalComponent', () => {
     localStorageService = TestBed.inject(LocalStorageService);
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
-
-    // Override the WindowRef with our mock
-    componentInstance['windowRef'] = mockWindowRef;
   });
 
   it('should create', () => {

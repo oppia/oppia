@@ -82,12 +82,6 @@ describe('CheckpointCelebrationFooterComponent', () => {
     expect(mockConfettiComponent.animateConfetti).toHaveBeenCalled();
   }));
 
-  it('should handle ngAfterViewInit lifecycle correctly', () => {
-    component.confettiComponent = mockConfettiComponent;
-
-    expect(() => component.ngAfterViewInit()).not.toThrow();
-  });
-
   it('should ensure confetti animation is triggered asynchronously', fakeAsync(() => {
     component.confettiComponent = mockConfettiComponent;
 
