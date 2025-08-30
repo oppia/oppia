@@ -92,9 +92,6 @@ export class SchemaBasedHtmlEditorComponent
   updateValue(value: string): void {
     this.localValue = value;
     this.onChange(value);
-
-    this.ngZone.onStable.pipe(take(1)).subscribe(() => {
-      this.localValueChange.emit(value);
-    });
+    this.localValueChange.emit(value);
   }
 }
