@@ -1006,7 +1006,10 @@ export class ConversationFlowService {
    */
   private _addNewCard(newCard: StateCard): void {
     this.playerTranscriptService.addNewCard(newCard);
-    this._shouldDisplayTranslation();
+    const numberOfCards = this.playerTranscriptService.getNumCards();
+    if (numberOfCards > 1) {
+      this._shouldDisplayTranslation();
+    }
     this._updateCardLayout();
 
     this.playerPositionService.changeCurrentQuestion(
