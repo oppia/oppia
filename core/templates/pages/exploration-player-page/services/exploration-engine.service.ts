@@ -100,7 +100,7 @@ export class ExplorationEngineService {
     private statsReportingService: StatsReportingService,
     private stateEditorService: StateEditorService,
     private translateService: TranslateService,
-    private urlInterpolationService: UrlInterpolationService
+    private urlInterpolationService: UrlInterpolationService,
     private platformFeatureService: PlatformFeatureService,
     private urlService: UrlService
   ) {
