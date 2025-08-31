@@ -360,17 +360,29 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         def mock_check_changes_in_config() -> None:
             check_function_calls['check_changes_in_config_is_called'] = True
 
+        # Mock for subprocess.check_output (used by git commands).
         # Here we use type Any because the subprocess function accepts
         # multiple argument types and configurations that cannot be
         # precisely typed with specific types.
-        def mock_npx_subprocess(
+        def mock_git_subprocess(
                 cmds: List[str], **kwargs: Any  # pylint: disable=unused-argument
         ) -> bytes:
-            self.assertTrue(cmds[0].endswith('npx'))
-            self.assertEqual(cmds[1], 'lint-staged')
-            check_function_calls['check_npx_subprocess_is_called'] = True
-            # Return empty bytes as check_output would.
+            # Return empty bytes for git diff commands.
             return b''
+
+        # Mock for subprocess.run (used by npx commands).
+        # Here we use type Any because the subprocess function accepts
+        # multiple argument types and configurations that cannot be
+        # precisely typed with specific types.
+        def mock_npx_subprocess_run(
+                cmds: List[str], **kwargs: Any  # pylint: disable=unused-argument
+        ) -> Any:
+            if len(cmds) >= 2:
+                self.assertTrue(cmds[0].endswith('npx'))
+                self.assertEqual(cmds[1], 'lint-staged')
+                check_function_calls['check_npx_subprocess_is_called'] = True
+            # Return a mock result object for subprocess.run.
+            return type('MockResult', (), {'returncode': 0})()
 
         package_lock_swap = self.swap(
             pre_commit_hook, 'does_diff_include_package_lock_file', mock_func)
@@ -381,10 +393,12 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         check_config_swap = self.swap(
             pre_commit_hook, 'check_changes_in_config',
             mock_check_changes_in_config)
+        git_subprocess_swap = self.swap(
+            subprocess, 'check_output', mock_git_subprocess)
         npx_subprocess_swap = self.swap(
-            subprocess, 'check_output', mock_npx_subprocess)
+            subprocess, 'run', mock_npx_subprocess_run)
         with package_lock_swap, package_lock_in_current_folder_swap:
-            with check_config_swap, npx_subprocess_swap:
+            with check_config_swap, git_subprocess_swap, npx_subprocess_swap:
                 pre_commit_hook.main(args=[])
         self.assertTrue(
             check_function_calls['check_changes_in_config_is_called'])
