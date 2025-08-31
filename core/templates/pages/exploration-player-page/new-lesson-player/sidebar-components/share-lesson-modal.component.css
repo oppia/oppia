@@ -79,8 +79,8 @@ oppia-share-lesson-modal .success-message p {
   align-items: center;
   background-color: #323232;
   display: flex;
-  padding: 12px 16px;
   justify-content: space-between;
+  padding: 12px 16px;
 }
 
 oppia-share-lesson-modal .copy-modal-body {
