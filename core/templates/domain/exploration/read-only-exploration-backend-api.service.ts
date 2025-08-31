@@ -25,7 +25,7 @@ import {ParamChangeBackendDict} from 'domain/exploration/param-change.model';
 import {ParamSpecsBackendDict} from 'domain/exploration/param-specs.model';
 import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {ExplorationMetadataBackendDict} from './ExplorationMetadataObjectFactory';
+import {ExplorationMetadataBackendDict} from './exploration-metadata.model';
 import {VersionedExplorationCachingService} from 'pages/exploration-editor-page/services/versioned-exploration-caching.service';
 import {UrlService} from 'services/contextual/url.service';
 
