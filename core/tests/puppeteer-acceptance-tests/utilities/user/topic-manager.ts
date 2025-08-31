@@ -303,11 +303,27 @@ const skillSelectInQuestionTabSelector =
   '.e2e-test-select-skill-dropdown mat-select';
 const addQuestionButtonSelector = '.e2e-test-create-question-button';
 
+// Story Editor.
+const storyTitleInStoryEditorSelector = '.e2e-test-story-title-field';
+const storyDescriptionInStoryEditorSelector =
+  '.e2e-test-story-description-field';
+const storyMetaTagContentInStoryEditorSelector =
+  '.e2e-test-story-meta-tag-content-field';
+const storyUrlFragmentInStoryEditorSelector = '.e2e-test-url-fragment-field';
+
+// Chapter Editor.
+const prerequisiteSkillSelector =
+  '.e2e-test-prerequisite-skill-description-card';
+const aquiredSkillSkillSelector = '.e2e-test-acquired-skill-description-card';
+
 // Other Selectors.
 const activeTabSelector = '.e2e-test-active-tab';
 const addSubtopicButton = 'button.e2e-test-add-subtopic-button';
 const subtopicDescriptionEditorToggle = 'div.e2e-test-show-schema-editor';
 const createSubtopicButton = '.e2e-test-confirm-subtopic-creation-button';
+const storyRowSelector = 'tr.e2e-test-story-list-item';
+const thumbnailDescriptionSelector = '.e2e-test-thumbnail-description';
+const thumbnailTitleSelector = '.e2e-test-thumbnail-title';
 
 export class TopicManager extends BaseUser {
   /**
@@ -708,6 +724,7 @@ export class TopicManager extends BaseUser {
   /**
    * Save a topic draft.
    * @param {string} topicName - name of the topic to be saved.
+   * @param {string} description - description of the topic to be saved.
    */
   async saveTopicDraft(topicName: string, description?: string): Promise<void> {
     await this.page.waitForSelector(modalDiv, {hidden: true});
@@ -2925,6 +2942,27 @@ export class TopicManager extends BaseUser {
     }
   }
 
+  async expectSaveStoryButtonToBeDisabled(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const isMobileSaveButtonVisible = await this.isElementVisible(
+        mobileSaveStoryChangesButton
+      );
+      if (!isMobileSaveButtonVisible) {
+        await this.clickOn(mobileOptionsSelector);
+      }
+    }
+    await this.page.waitForFunction(
+      (selector: string) => {
+        const element = document.querySelector(selector);
+        return (element as HTMLButtonElement)?.disabled === true;
+      },
+      {},
+      this.isViewportAtMobileWidth()
+        ? mobileSaveStoryChangesButton
+        : saveStoryButton
+    );
+  }
+
   /**
    * Save a story as a topic manager.
    */
@@ -3644,44 +3682,210 @@ export class TopicManager extends BaseUser {
   }
 
   /**
-   * Create a subtopic as a curriculum admin.
-   * @param {string} title - The title of the Subtopic.
-   * @param {string} urlFragment - The url fragment of the Subtopic.
-   * @param {string} topicName - The name of the Topic which storing the new Subtopic.
+   * Checks if the stories list is empty.
    */
-  async createSubtopicForTopic(
-    title: string,
-    urlFragment: string,
-    topicName: string
-  ): Promise<void> {
-    await this.openTopicEditor(topicName);
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(subtopicReassignHeader);
-    }
-    await this.clickOn(addSubtopicButton);
-    await this.type(subtopicTitleField, title);
-    await this.page.waitForSelector(subtopicUrlFragmentField, {
-      visible: true,
-    });
-    await this.page.type(subtopicUrlFragmentField, urlFragment);
+  async expectStoriesListToBeEmpty(): Promise<void> {
+    await this.expectElementToBeVisible(storyRowSelector, false);
+  }
 
-    await this.clickOn(subtopicDescriptionEditorToggle);
-    await this.page.waitForSelector(richTextAreaField, {visible: true});
-    await this.type(
-      richTextAreaField,
-      `Subtopic creation description text for ${title}`
+  /**
+   * Checks if the stories list contains the given story.
+   * @param {string} story - The story to check.
+   * @returns {Promise<ElementHandle<Element> | null>} The story row element.
+   */
+  async expectStoriesListToContain(
+    story: string,
+    visible: boolean = true
+  ): Promise<ElementHandle<Element> | null> {
+    const storyListVisible = await this.isElementVisible(storyRowSelector);
+    if (!storyListVisible) {
+      // If we expected the stories list to be visible, but it was not, then
+      // throw an error.
+      if (visible) {
+        throw new Error('Stories list is not visible');
+      }
+      // If we expected the stories list to be not visible, and it wasn't, then
+      // return null.
+      showMessage('Stories list is not visible as expected.');
+      return null;
+    }
+
+    const storyRows = await this.page.$$(storyRowSelector);
+
+    let foundStoryRow: ElementHandle<Element> | null = null;
+    for (const storyRow of storyRows) {
+      const storyRowText = await storyRow.$eval('td', el =>
+        el.textContent?.trim()
+      );
+      if (storyRowText === story) {
+        foundStoryRow = storyRow;
+        break;
+      }
+    }
+
+    if (!foundStoryRow) {
+      if (visible) {
+        throw new Error(`Story ${story} not found`);
+      } else {
+        showMessage(`Story ${story} is not found as expected.`);
+        return null;
+      }
+    }
+
+    if (visible) {
+      showMessage(`Story ${story} is found as expected.`);
+      return foundStoryRow;
+    } else {
+      throw new Error(`Story ${story} is found but it shouldn't be.`);
+    }
+  }
+
+  /**
+   * Deletes a story from the stories list.
+   * @param {string} storyName - The name of the story to delete.
+   */
+  async deleteStory(storyName: string): Promise<void> {
+    const storyRow = await this.expectStoriesListToContain(storyName);
+    if (!storyRow) {
+      throw new Error(`Story ${storyName} not found in stories list.`);
+    }
+
+    const deleteButton = await storyRow.waitForSelector(
+      deleteStoryButtonSelector
+    );
+    if (!deleteButton) {
+      throw new Error('Delete button not found');
+    }
+
+    await deleteButton.click();
+  }
+
+  /**
+   * Edits the details of a story.
+   * @param {string} title - The new title of the story.
+   * @param {string} description - The new description of the story.
+   * @param {string} metaTag - The new meta tag of the story.
+   * @param {string} urlFragment - The new URL fragment of the story.
+   */
+  async editStoryDetails(
+    title: string,
+    description: string,
+    metaTag: string,
+    urlFragment: string
+  ): Promise<void> {
+    // Title.
+    await this.clearAllTextFrom(storyTitleInStoryEditorSelector);
+    await this.type(storyTitleInStoryEditorSelector, title);
+    await this.expectElementValueToBe(storyTitleInStoryEditorSelector, title);
+
+    // Description.
+    await this.clearAllTextFrom(storyDescriptionInStoryEditorSelector);
+    await this.type(storyDescriptionInStoryEditorSelector, description);
+    await this.expectElementValueToBe(
+      storyDescriptionInStoryEditorSelector,
+      description
     );
 
-    await this.clickOn(subtopicPhotoBoxButton);
-    await this.page.waitForSelector(photoUploadModal, {visible: true});
-    await this.uploadFile(curriculumAdminThumbnailImage);
-    await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
-    await this.clickOn(uploadPhotoButton);
+    // Meta Tag.
+    await this.clearAllTextFrom(storyMetaTagContentInStoryEditorSelector);
+    await this.type(storyMetaTagContentInStoryEditorSelector, metaTag);
+    await this.expectElementValueToBe(
+      storyMetaTagContentInStoryEditorSelector,
+      metaTag
+    );
 
-    await this.page.waitForSelector(photoUploadModal, {hidden: true});
-    await this.clickOn(createSubtopicButton);
-    await this.saveTopicDraft(topicName);
-    showMessage(`Subtopic ${title} is created.`);
+    // URL Fragment.
+    await this.clearAllTextFrom(storyUrlFragmentInStoryEditorSelector);
+    await this.type(storyUrlFragmentInStoryEditorSelector, urlFragment);
+    await this.expectElementValueToBe(
+      storyUrlFragmentInStoryEditorSelector,
+      urlFragment
+    );
+  }
+
+  /**
+   * Checks if the preview card is visible.
+   * @param {string} title - The title of the card.
+   * @param {string} description - The description of the card.
+   */
+  async expectPreviewCardToBeVisible(
+    title?: string,
+    description?: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(chapterPreviewContainerSelector);
+
+    if (title) {
+      await this.expectTextContentToBe(thumbnailTitleSelector, title);
+    }
+
+    if (description) {
+      await this.expectTextContentToBe(
+        thumbnailDescriptionSelector,
+        description
+      );
+    }
+  }
+
+  /**
+   * Checks if the prerequisite skill is visible.
+   * @param {string} skillName - The name of the prerequisite skill.
+   * @returns {Promise<ElementHandle<Element>>} The prerequisite skill element.
+   */
+  async expectPrerequisiteSkillToBeVisible(
+    skillName: string
+  ): Promise<ElementHandle<Element>> {
+    await this.expectElementToBeVisible(prerequisiteSkillSelector);
+    const prerequisiteSkillElements = await this.page.$$(
+      prerequisiteSkillSelector
+    );
+
+    let prerequisiteSkillElement: ElementHandle<Element> | null = null;
+    for (const prerequisiteSkill of prerequisiteSkillElements) {
+      const prerequisiteSkillText = await prerequisiteSkill.evaluate(el =>
+        el.textContent?.trim()
+      );
+      if (prerequisiteSkillText === skillName) {
+        prerequisiteSkillElement = prerequisiteSkill;
+        break;
+      }
+    }
+
+    if (!prerequisiteSkillElement) {
+      throw new Error(`Prerequisite skill ${skillName} not found.`);
+    }
+
+    showMessage(`Prerequisite skill ${skillName} is visible.`);
+    return prerequisiteSkillElement;
+  }
+
+  /**
+   * Checks if the aquired skill is visible.
+   * @param {string} skillName - The name of the aquired skill.
+   * @returns {Promise<ElementHandle<Element>>} The aquired skill element.
+   */
+  async expectAquiredSkillToBeVisible(
+    skillName: string
+  ): Promise<ElementHandle<Element>> {
+    await this.expectElementToBeVisible(aquiredSkillSkillSelector);
+    const aquiredSkillElements = await this.page.$$(aquiredSkillSkillSelector);
+
+    let aquiredSkillElement: ElementHandle<Element> | null = null;
+    for (const aquiredSkill of aquiredSkillElements) {
+      const aquiredSkillText = await aquiredSkill.evaluate(el =>
+        el.textContent?.trim()
+      );
+      if (aquiredSkillText === skillName) {
+        aquiredSkillElement = aquiredSkill;
+        break;
+      }
+    }
+
+    if (!aquiredSkillElement) {
+      throw new Error(`Aquired skill ${skillName} not found.`);
+    }
+
+    showMessage(`Aquired skill ${skillName} is visible.`);
+    return aquiredSkillElement;
   }
 }
 

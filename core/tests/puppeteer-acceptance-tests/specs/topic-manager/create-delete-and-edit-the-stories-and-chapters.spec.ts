@@ -28,7 +28,7 @@ import {TopicManager} from '../../utilities/user/topic-manager';
 const ROLES = testConstants.Roles;
 
 describe('Topic Manager', function () {
-  let topicManager: TopicManager & CurriculumAdmin;
+  let topicManager: TopicManager & CurriculumAdmin & ExplorationEditor;
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
   let explorationId: string;
 
@@ -47,15 +47,6 @@ describe('Topic Manager', function () {
       'Arithmetic Operations',
       'Addition',
       'Addition'
-    );
-    await curriculumAdmin.addStoryToTopic(
-      'The Broken Calculator',
-      'the-broken-calculator',
-      'Arithmetic Operations'
-    );
-    await curriculumAdmin.addChapter(
-      'Solving problems without a calculator',
-      explorationId
     );
     await curriculumAdmin.createAndPublishClassroom(
       'Maths',
@@ -88,13 +79,139 @@ describe('Topic Manager', function () {
     await topicManager.addStoryToTopic(
       'The Broken Calculator',
       'the-broken-calculator',
-      'Arithmetic Operations'
+      'Arithmetic Operations',
+      'this is a meta tag',
+      testConstants.data.profilePicture
     );
     await topicManager.addChapter(
       'Solving problems without a calculator',
       explorationId
     );
+    await topicManager.saveStoryDraft();
+    await topicManager.expectScreenshotToMatch('storyEditor', __dirname);
+
+    // Check if the story is present in the stories list.
     await topicManager.openTopicEditor('Arithmetic Operations');
+    await topicManager.expectStoriesListToContain('The Broken Calculator');
+
+    // Delete the story.
+    await topicManager.deleteStory('The Broken Calculator');
+    await topicManager.saveTopicDraft(
+      'Arithmetic Operations',
+      'Added and removed the story.'
+    );
+    await topicManager.expectStoriesListToBeEmpty();
+  });
+
+  it('should be able to edit and preview the story', async function () {
+    await topicManager.addStoryToTopic(
+      'The Broken Calculator',
+      'the-broken-calculator',
+      'Arithmetic Operations'
+    );
+
+    await topicManager.openStoryEditor(
+      'The Broken Calculator',
+      'Arithmetic Operations'
+    );
+    await topicManager.editStoryDetails(
+      'New Story Title',
+      'New Story Description',
+      'New Meta Tag',
+      'new-url-fragment'
+    );
+    await topicManager.saveStoryDraft();
+    await topicManager.clickOn('Expand Preview');
+    await topicManager.expectPreviewCardToBeVisible(
+      'New Story Title',
+      'New Story Description'
+    );
+  });
+
+  it('should be able to save chapters with mobile supported explorations', async function () {
+    // Revert the story name.
+    await topicManager.editStoryDetails(
+      'The Broken Calculator',
+      'Learn how to solve problems without a calculator.',
+      'Learn how to solve problems without a calculator.',
+      'the-broken-calculator'
+    );
+    await topicManager.addChapter(
+      'Solving problems without a calculator',
+      explorationId
+    );
+
+    // Create and publish a new explorations.
+    const simpleExplorationId =
+      await topicManager.createAndPublishAMinimalExplorationWithTitle(
+        'Simple Exploration',
+        'Algebra'
+      );
+
+    const programmingExplorationId =
+      await topicManager.createSimpleProgrammingExploration();
+
+    // Add simple chapter.
+    await topicManager.addChapter('Simple Exploration', simpleExplorationId);
+    await topicManager.saveStoryDraft();
+    await topicManager.previewChapterCard();
+    await topicManager.expectPreviewCardToBeVisible('Simple Exploration');
+
+    // Add unsupported chaper.
+    await topicManager.openStoryEditor(
+      'The Broken Calculator',
+      'Arithmetic Operations'
+    );
+    await topicManager.addChapterWithoutSaving(
+      'Programming Exploration',
+      programmingExplorationId,
+      'The Broken Calculator',
+      'Arithmetic Operations'
+    );
+    await topicManager.expectNewChapterErrorSpan(
+      'The states [Introduction] contain restricted interaction types.'
+    );
+  });
+
+  it('should be able to edit and preivew the chapter', async function () {
+    await topicManager.openChapterEditor(
+      'Solving problems without a calculator',
+      'The Broken Calculator',
+      'Arithmetic Operations'
+    );
+    await topicManager.addAcquiredSkill('Addition');
+    await topicManager.saveStoryDraft();
+
+    await topicManager.openChapterEditor(
+      'Simple Exploration',
+      'The Broken Calculator',
+      'Arithmetic Operations'
+    );
+    await topicManager.editChapterDetails(
+      'New Title',
+      'New Description',
+      'New Meta Tag',
+      'new-url-fragment'
+    );
+    await topicManager.saveStoryDraft();
+    await topicManager.previewChapterCard();
+    await topicManager.expectPreviewCardToBeVisible(
+      'New Title',
+      'New Description'
+    );
+
+    // Add prerequisite skill.
+    await topicManager.addPrerequisiteSkill('Addition');
+    await topicManager.expectPrerequisiteSkillToBeVisible('Addition');
+
+    // Add aquired skill.
+    await topicManager.addAcquiredSkill('Subtraction');
+    await topicManager.expectAquiredSkillToBeVisible('Subtraction');
+
+    // Add prerequisite skill.
+    await topicManager.saveStoryDraft();
+    await topicManager.addPrerequisiteSkill('Word Problems');
+    await topicManager.expectSaveStoryButtonToBeDisabled();
   });
 
   afterAll(async function () {

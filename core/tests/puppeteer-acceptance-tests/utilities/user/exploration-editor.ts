@@ -4586,7 +4586,7 @@ export class ExplorationEditor extends BaseUser {
    * Ends at same page, after adding programming interaction and saving the
    * draft.
    */
-  async createSimpleProgrammingExploration(): Promise<string | null> {
+  async createSimpleProgrammingExploration(): Promise<string> {
     // Check if element to add interaction is visible (pre-check)
     await this.page.waitForSelector(stateEditSelector, {
       visible: true,

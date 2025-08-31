@@ -1304,11 +1304,15 @@ export class CurriculumAdmin extends TopicManager {
    * @param {string} storyTitle - The title of the story.
    * @param {string} storyUrlFragment - The URL fragment of the story.
    * @param {string} topicName - The name of the topic.
+   * @param {string} metaTag - The meta tag of the story.
+   * @param {string} photoURL - The URL of the photo of the story.
    */
   async addStoryToTopic(
     storyTitle: string,
     storyUrlFragment: string,
-    topicName: string
+    topicName: string,
+    metaTag: string = 'meta',
+    photoURL: string = curriculumAdminThumbnailImage
   ): Promise<string> {
     await this.openTopicEditor(topicName);
     if (this.isViewportAtMobileWidth()) {
@@ -1326,7 +1330,7 @@ export class CurriculumAdmin extends TopicManager {
     );
 
     await this.clickOn(storyPhotoBoxButton);
-    await this.uploadFile(curriculumAdminThumbnailImage);
+    await this.uploadFile(photoURL);
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
     await this.clickOn(uploadPhotoButton);
 
@@ -1335,7 +1339,7 @@ export class CurriculumAdmin extends TopicManager {
 
     await this.page.waitForSelector(storyMetaTagInput);
     await this.page.focus(storyMetaTagInput);
-    await this.page.type(storyMetaTagInput, 'meta');
+    await this.page.type(storyMetaTagInput, metaTag);
     await this.page.keyboard.press('Tab');
     await this.saveStoryDraft();
 
@@ -2374,6 +2378,47 @@ export class CurriculumAdmin extends TopicManager {
     await this.expectElementToBeVisible(addNewSkillButton);
     await this.clickOn(addNewSkillButton);
     await this.fillSkillInfoAndSubmit(skillName, reviewMaterial);
+  }
+
+  /**
+   * Create a subtopic as a curriculum admin.
+   * @param {string} title - The title of the Subtopic.
+   * @param {string} urlFragment - The url fragment of the Subtopic.
+   * @param {string} topicName - The name of the Topic which storing the new Subtopic.
+   */
+  async createSubtopicForTopic(
+    title: string,
+    urlFragment: string,
+    topicName: string
+  ): Promise<void> {
+    await this.openTopicEditor(topicName);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(subtopicReassignHeader);
+    }
+    await this.clickOn(addSubtopicButton);
+    await this.type(subtopicTitleField, title);
+    await this.page.waitForSelector(subtopicUrlFragmentField, {
+      visible: true,
+    });
+    await this.page.type(subtopicUrlFragmentField, urlFragment);
+
+    await this.clickOn(subtopicDescriptionEditorToggle);
+    await this.page.waitForSelector(richTextAreaField, {visible: true});
+    await this.type(
+      richTextAreaField,
+      `Subtopic creation description text for ${title}`
+    );
+
+    await this.clickOn(subtopicPhotoBoxButton);
+    await this.page.waitForSelector(photoUploadModal, {visible: true});
+    await this.uploadFile(curriculumAdminThumbnailImage);
+    await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
+    await this.clickOn(uploadPhotoButton);
+
+    await this.page.waitForSelector(photoUploadModal, {hidden: true});
+    await this.clickOn(createSubtopicButton);
+    await this.saveTopicDraft(topicName);
+    showMessage(`Subtopic ${title} is created.`);
   }
 }
 
