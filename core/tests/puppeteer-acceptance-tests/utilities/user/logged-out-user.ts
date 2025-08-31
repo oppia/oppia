@@ -5523,6 +5523,14 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Navigates to new lesson player and plays an exploration by its ID.
+   * @param {string | null} explorationId - The ID of the exploration to play.
+   */
+  async playLesson(explorationId: string | null): Promise<void> {
+    await this.goto(`${baseUrl}/lesson/${explorationId as string}`);
+  }
+
+  /**
    * Opens the feedback popup and checks if the feedback form is present.
    */
   async openFeedbackPopup(): Promise<void> {
