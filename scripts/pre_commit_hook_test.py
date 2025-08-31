@@ -359,12 +359,18 @@ class PreCommitHookTests(test_utils.GenericTestBase):
             return False
         def mock_check_changes_in_config() -> None:
             check_function_calls['check_changes_in_config_is_called'] = True
-        def mock_npx_subprocess(  # pylint: disable=unused-argument
-                cmds: List[str], check: bool = False, **kwargs: Any) -> bytes:
+
+        # Here we use type Any because the subprocess function accepts
+        # multiple argument types and configurations that cannot be
+        # precisely typed with specific types.
+        def mock_npx_subprocess(
+                cmds: List[str], **kwargs: Any  # pylint: disable=unused-argument
+        ) -> bytes:
             self.assertTrue(cmds[0].endswith('npx'))
             self.assertEqual(cmds[1], 'lint-staged')
             check_function_calls['check_npx_subprocess_is_called'] = True
-            return b''  # Return empty bytes as check_output would
+            # Return empty bytes as check_output would.
+            return b''
 
         package_lock_swap = self.swap(
             pre_commit_hook, 'does_diff_include_package_lock_file', mock_func)

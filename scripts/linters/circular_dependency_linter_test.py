@@ -84,8 +84,10 @@ class CircularDependencyLintChecksManagerTest(unittest.TestCase):
 
         with mock.patch('os.path.exists') as mock_exists:
             with mock.patch('subprocess.run') as mock_subprocess:
-                mock_exists.return_value = False  # No local madge
-                mock_subprocess.side_effect = FileNotFoundError()  # No global madge
+                # No local madge.
+                mock_exists.return_value = False
+                # No global madge.
+                mock_subprocess.side_effect = FileNotFoundError()
                 result = linter._check_madge_installation()  # pylint: disable=protected-access
                 self.assertFalse(result)
 
@@ -106,7 +108,8 @@ class CircularDependencyLintChecksManagerTest(unittest.TestCase):
 
         with mock.patch('os.path.exists') as mock_exists:
             with mock.patch('subprocess.run') as mock_subprocess:
-                mock_exists.return_value = False  # No local madge
+                # No local madge.
+                mock_exists.return_value = False
                 # Global madge found but version check fails.
                 mock_subprocess.return_value = mock.Mock(returncode=1)
                 result = linter._check_madge_installation()  # pylint: disable=protected-access
@@ -127,16 +130,22 @@ class CircularDependencyLintChecksManagerTest(unittest.TestCase):
             )
         )
 
-        with mock.patch.object(linter, '_check_madge_installation') as mock_madge:
+        with mock.patch.object(
+            linter, '_check_madge_installation'
+        ) as mock_madge:
             with mock.patch('subprocess.Popen') as mock_popen:
                 mock_madge.return_value = True
                 mock_process = mock.Mock()
-                mock_process.communicate.return_value = (b'', b'')  # No output = no circular deps
+                # No output = no circular deps.
+                mock_process.communicate.return_value = (b'', b'')
                 mock_popen.return_value = mock_process
-                
+
                 result = linter._lint_circular_dependencies()  # pylint: disable=protected-access
-                self.assertFalse(result.failed)  # Should not be failed
-                self.assertEqual(result.messages, ['No circular dependencies found.'])
+                # Should not be failed.
+                self.assertFalse(result.failed)
+                self.assertEqual(
+                    result.messages, ['No circular dependencies found.']
+                )
 
     def test_lint_circular_dependencies_with_violations(self) -> None:
         """Test circular dependency linting with violations found."""
@@ -153,17 +162,27 @@ class CircularDependencyLintChecksManagerTest(unittest.TestCase):
             )
         )
 
-        with mock.patch.object(linter, '_check_madge_installation') as mock_madge:
+        with mock.patch.object(
+            linter, '_check_madge_installation'
+        ) as mock_madge:
             with mock.patch('subprocess.Popen') as mock_popen:
                 mock_madge.return_value = True
                 mock_process = mock.Mock()
-                circular_output = 'Finding files\n✖ Found 44 circular dependencies!\n\nfile1.js -> file2.js'
-                mock_process.communicate.return_value = (circular_output.encode(), b'')
+                circular_output = (
+                    'Finding files\n✖ Found 44 circular dependencies!\n\n'
+                    'file1.js -> file2.js'
+                )
+                mock_process.communicate.return_value = (
+                    circular_output.encode(), b''
+                )
                 mock_popen.return_value = mock_process
-                
+
                 result = linter._lint_circular_dependencies()  # pylint: disable=protected-access
-                self.assertTrue(result.failed)  # Should be failed
-                self.assertIn('Circular dependencies detected', result.messages[0])
+                # Should be failed.
+                self.assertTrue(result.failed)
+                self.assertIn(
+                    'Circular dependencies detected', result.messages[0]
+                )
 
     def test_perform_all_lint_checks(self) -> None:
         """Test perform_all_lint_checks method."""
@@ -180,19 +199,26 @@ class CircularDependencyLintChecksManagerTest(unittest.TestCase):
             )
         )
 
-        with mock.patch.object(linter, '_check_madge_installation') as mock_madge:
+        with mock.patch.object(
+            linter, '_check_madge_installation'
+        ) as mock_madge:
             with mock.patch('subprocess.Popen') as mock_popen:
                 mock_madge.return_value = True
                 mock_process = mock.Mock()
-                mock_process.communicate.return_value = (b'', b'')  # No output = no circular deps
+                # No output = no circular deps.
+                mock_process.communicate.return_value = (b'', b'')
                 mock_popen.return_value = mock_process
-                
+
                 result = linter.perform_all_lint_checks()
-                self.assertEqual(len(result), 1)  # Should return one TaskResult
-                self.assertFalse(result[0].failed)  # Should not be failed
+                # Should return one TaskResult.
+                self.assertEqual(len(result), 1)
+                # Should not be failed.
+                self.assertFalse(result[0].failed)
 
 
-class ThirdPartyCircularDependencyLintChecksManagerTest(unittest.TestCase):
+class ThirdPartyCircularDependencyLintChecksManagerTest(
+        unittest.TestCase
+):
     """Tests for ThirdPartyCircularDependencyLintChecksManager."""
 
     def test_initialization(self) -> None:
@@ -205,8 +231,8 @@ class ThirdPartyCircularDependencyLintChecksManagerTest(unittest.TestCase):
         file_cache = mock.Mock(spec=run_lint_checks.FileCache)
 
         linter = (
-            circular_dependency_linter.
-            ThirdPartyCircularDependencyLintChecksManager(
+            circular_dependency_linter
+            .ThirdPartyCircularDependencyLintChecksManager(
                 js_files, ts_files, file_cache
             )
         )

@@ -42,63 +42,80 @@ class TestCheckDependenciesFunction(unittest.TestCase):
         with mock.patch(
             'scripts.run_circular_dependency_checks.validate_target_paths'
         ) as mock_validate:
-            mock_validate.return_value = ['file1.js']  # Return valid files
+            # Return valid files.
+            mock_validate.return_value = ['file1.js']
             with mock.patch(
-                'scripts.run_circular_dependency_checks.check_madge_installation'
+                'scripts.run_circular_dependency_checks'
+                '.check_madge_installation'
             ) as mock_madge_check:
                 mock_madge_check.return_value = 'madge'
                 with mock.patch(
                     'scripts.run_circular_dependency_checks.run_madge_command'
                 ) as mock_run_madge:
-                    mock_run_madge.return_value = (True, 'No circular dependencies')
+                    mock_run_madge.return_value = (
+                        True, 'No circular dependencies'
+                    )
                     result = (
-                        run_circular_dependency_checks.check_circular_dependencies(
+                        run_circular_dependency_checks
+                        .check_circular_dependencies(
                             files=['file1.js'],
                             verbose=False
                         )
                     )
-                    self.assertTrue(result[0])  # Success should be True
-                    self.assertIsNotNone(result[1])  # Should have a message
+                    # Success should be True.
+                    self.assertTrue(result[0])
+                    # Should have a message.
+                    self.assertIsNotNone(result[1])
 
     def test_madge_installation_check_failure(self) -> None:
         """Test Madge installation check failure."""
         with mock.patch(
             'scripts.run_circular_dependency_checks.validate_target_paths'
         ) as mock_validate:
-            mock_validate.return_value = ['file1.js']  # Return valid files
+            # Return valid files.
+            mock_validate.return_value = ['file1.js']
             with mock.patch(
-                'scripts.run_circular_dependency_checks.check_madge_installation'
+                'scripts.run_circular_dependency_checks.'
+                'check_madge_installation'
             ) as mock_madge_check:
                 mock_madge_check.side_effect = RuntimeError(
                     'Madge is not installed')
                 result = (
-                    run_circular_dependency_checks.check_circular_dependencies(
+                    run_circular_dependency_checks
+                    .check_circular_dependencies(
                         files=['file1.js'],
                         verbose=False
                     )
                 )
-                self.assertFalse(result[0])  # Success should be False
-                self.assertIn('Madge', result[1])  # Message should mention Madge
+                # Success should be False.
+                self.assertFalse(result[0])
+                # Message should mention Madge.
+                self.assertIn('Madge', result[1])
 
     def test_madge_version_check_failure(self) -> None:
         """Test Madge version check failure."""
         with mock.patch(
             'scripts.run_circular_dependency_checks.validate_target_paths'
         ) as mock_validate:
-            mock_validate.return_value = ['file1.js']  # Return valid files
+            # Return valid files.
+            mock_validate.return_value = ['file1.js']
             with mock.patch(
-                'scripts.run_circular_dependency_checks.check_madge_installation'
+                'scripts.run_circular_dependency_checks.'
+                'check_madge_installation'
             ) as mock_madge_check:
                 mock_madge_check.side_effect = RuntimeError(
                     'Invalid Madge version')
                 result = (
-                    run_circular_dependency_checks.check_circular_dependencies(
+                    run_circular_dependency_checks
+                    .check_circular_dependencies(
                         files=['file1.js'],
                         verbose=False
                     )
                 )
-                self.assertFalse(result[0])  # Success should be False
-                self.assertIn('Invalid', result[1])  # Message should mention error
+                # Success should be False.
+                self.assertFalse(result[0])
+                # Message should mention error.
+                self.assertIn('Invalid', result[1])
 
     @mock.patch('tempfile.NamedTemporaryFile')
     def test_check_dependencies_with_config_file_creation(
@@ -114,22 +131,29 @@ class TestCheckDependenciesFunction(unittest.TestCase):
         with mock.patch(
             'scripts.run_circular_dependency_checks.validate_target_paths'
         ) as mock_validate:
-            mock_validate.return_value = ['file1.js', 'file1.ts']  # Return valid files
+            # Return valid files.
+            mock_validate.return_value = ['file1.js', 'file1.ts']
             with mock.patch(
-                'scripts.run_circular_dependency_checks.check_madge_installation'
+                'scripts.run_circular_dependency_checks.'
+                'check_madge_installation'
             ) as mock_madge_check:
                 mock_madge_check.return_value = 'madge'
                 with mock.patch(
-                    'scripts.run_circular_dependency_checks.run_madge_command'
+                    'scripts.run_circular_dependency_checks.'
+                    'run_madge_command'
                 ) as mock_run_madge:
-                    mock_run_madge.return_value = (True, 'No circular dependencies')
+                    mock_run_madge.return_value = (
+                        True, 'No circular dependencies'
+                    )
                     result = (
-                        run_circular_dependency_checks.check_circular_dependencies(
+                        run_circular_dependency_checks
+                        .check_circular_dependencies(
                             files=['file1.js', 'file1.ts'],
                             verbose=False
                         )
                     )
-                    self.assertTrue(result[0])  # Success should be True
+                    # Success should be True.
+                    self.assertTrue(result[0])
 
     @mock.patch('tempfile.NamedTemporaryFile')
     def test_check_dependencies_with_circular_deps_found(
@@ -145,31 +169,38 @@ class TestCheckDependenciesFunction(unittest.TestCase):
         with mock.patch(
             'scripts.run_circular_dependency_checks.validate_target_paths'
         ) as mock_validate:
-            mock_validate.return_value = ['file1.js', 'file1.ts']  # Return valid files
+            # Return valid files.
+            mock_validate.return_value = ['file1.js', 'file1.ts']
             with mock.patch(
-                'scripts.run_circular_dependency_checks.check_madge_installation'
+                'scripts.run_circular_dependency_checks.'
+                'check_madge_installation'
             ) as mock_madge_check:
                 mock_madge_check.return_value = 'madge'
                 with mock.patch(
-                    'scripts.run_circular_dependency_checks.run_madge_command'
+                    'scripts.run_circular_dependency_checks.'
+                    'run_madge_command'
                 ) as mock_run_madge:
                     mock_run_madge.return_value = (
-                        False, 'Circular dependency: file1.js -> file2.js')
+                        False, 'Circular dependency: file1.js -> file2.js'
+                    )
                     result = (
-                        run_circular_dependency_checks.check_circular_dependencies(
+                        run_circular_dependency_checks
+                        .check_circular_dependencies(
                             files=['file1.js', 'file1.ts'],
                             verbose=False
                         )
                     )
-                    self.assertFalse(result[0])  # Success should be False
-                    self.assertIn('Circular', result[1])  # Should mention circular
+                    # Success should be False.
+                    self.assertFalse(result[0])
+                    # Should mention circular.
+                    self.assertIn('Circular', result[1])
 
     def test_main_with_help_argument(self) -> None:
         """Test main function with help argument."""
         test_args = ['--help']
         with self.assertRaises(SystemExit):
             with mock.patch('sys.argv', ['script_name'] + test_args):
-                # Here we use type Any because mock objects don't have
+                # Here we use type Any because mock objects don't have.
                 # specific types and can represent various return types.
                 with mock.patch(
                     'argparse.ArgumentParser.parse_args'
@@ -188,7 +219,7 @@ class TestCheckDependenciesFunction(unittest.TestCase):
                 ('root', ['dir1'], ['file1.js', 'file2.ts'])
             ]
 
-            # Here we use type Any because mock objects don't have
+            # Here we use type Any because mock objects don't have.
             # specific types and can represent various return types.
             mock_args: Any = MockArgs(
                 files=None,
