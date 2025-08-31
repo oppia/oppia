@@ -28,7 +28,7 @@ import sys
 
 from scripts import common
 
-from typing import Dict, Final, List, Optional, Tuple
+from typing import Any, Dict, Final, List, Optional, Tuple
 
 # Parser configuration following run_acceptance_tests.py pattern.
 _PARSER: Final = argparse.ArgumentParser(
@@ -109,10 +109,12 @@ DEFAULT_TARGET_DIRECTORIES: Final[List[str]] = [
 ]
 
 
+# Here we use type Any because Madge configuration can contain various
+# types of values including strings, lists, booleans, and nested objects.
 def get_madge_config(
     exclude_patterns: Optional[List[str]] = None,
     output_format: str = 'text'
-) -> Dict[str, any]:
+) -> Dict[str, Any]:
     """Get the Madge configuration optimized for Oppia codebase.
 
     Args:
@@ -142,7 +144,7 @@ def get_madge_config(
     return config
 
 
-def check_madge_installation(skip_check: bool = False) -> Optional[str]:
+def check_madge_installation(skip_check: bool = False) -> str:
     """Check if Madge is installed and return the command to execute it.
 
     Args:
@@ -150,7 +152,7 @@ def check_madge_installation(skip_check: bool = False) -> Optional[str]:
             default command.
 
     Returns:
-        Optional[str]. String command to run Madge, or None if not available.
+        str. String command to run Madge.
 
     Raises:
         RuntimeError. If Madge is not installed and skip_check is False.
@@ -263,10 +265,12 @@ def validate_target_paths(
     return valid_targets
 
 
+# Here we use type Any because Madge configuration can contain various
+# types of values including strings, lists, booleans, and nested objects.
 def run_madge_command(
     madge_cmd: str,
     targets: List[str],
-    config: Dict[str, any],
+    config: Dict[str, Any],
     timeout: int = 300,
     verbose: bool = False
 ) -> Tuple[bool, str]:

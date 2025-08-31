@@ -20,6 +20,9 @@ import unittest
 from unittest import mock
 
 from scripts.linters import circular_dependency_linter
+from scripts.linters import run_lint_checks
+
+from typing import List
 
 
 class CircularDependencyLintChecksManagerTest(unittest.TestCase):
@@ -30,9 +33,8 @@ class CircularDependencyLintChecksManagerTest(unittest.TestCase):
         js_files = ['file1.js', 'file2.js']
         ts_files = ['file1.ts', 'file2.ts']
 
-        # Here we use object because we need a simple mock that can
-        # represent any file cache type without specific implementation.
-        file_cache = object()
+        # Create a proper mock for FileCache.
+        file_cache = mock.Mock(spec=run_lint_checks.FileCache)
 
         linter = (
             circular_dependency_linter.CircularDependencyLintChecksManager(
@@ -50,7 +52,7 @@ class CircularDependencyLintChecksManagerTest(unittest.TestCase):
 
         # Here we use object because we need a simple mock that can
         # represent any file cache type without specific implementation.
-        file_cache = object()
+        file_cache = mock.Mock(spec=run_lint_checks.FileCache)
 
         linter = (
             circular_dependency_linter.CircularDependencyLintChecksManager(
@@ -72,7 +74,7 @@ class CircularDependencyLintChecksManagerTest(unittest.TestCase):
 
         # Here we use object because we need a simple mock that can
         # represent any file cache type without specific implementation.
-        file_cache = object()
+        file_cache = mock.Mock(spec=run_lint_checks.FileCache)
 
         linter = (
             circular_dependency_linter.CircularDependencyLintChecksManager(
@@ -92,7 +94,7 @@ class CircularDependencyLintChecksManagerTest(unittest.TestCase):
 
         # Here we use object because we need a simple mock that can
         # represent any file cache type without specific implementation.
-        file_cache = object()
+        file_cache = mock.Mock(spec=run_lint_checks.FileCache)
 
         linter = (
             circular_dependency_linter.CircularDependencyLintChecksManager(
@@ -117,7 +119,7 @@ class CircularDependencyLintChecksManagerTest(unittest.TestCase):
 
         # Here we use object because we need a simple mock that can
         # represent any file cache type without specific implementation.
-        file_cache = object()
+        file_cache = mock.Mock(spec=run_lint_checks.FileCache)
 
         linter = (
             circular_dependency_linter.CircularDependencyLintChecksManager(
@@ -135,7 +137,7 @@ class CircularDependencyLintChecksManagerTest(unittest.TestCase):
 
         # Here we use object because we need a simple mock that can
         # represent any file cache type without specific implementation.
-        file_cache = object()
+        file_cache = mock.Mock(spec=run_lint_checks.FileCache)
 
         linter = (
             circular_dependency_linter.CircularDependencyLintChecksManager(
@@ -152,7 +154,7 @@ class CircularDependencyLintChecksManagerTest(unittest.TestCase):
             )
             result = linter._lint_circular_dependencies()  # pylint: disable=protected-access
             self.assertTrue(result.failed)
-            self.assertIn('Circular dependency found', result.error_messages[0])
+            self.assertIn('Circular dependency found', result.messages[0])
 
     def test_perform_all_lint_checks(self) -> None:
         """Test perform_all_lint_checks method."""
@@ -161,7 +163,7 @@ class CircularDependencyLintChecksManagerTest(unittest.TestCase):
 
         # Here we use object because we need a simple mock that can
         # represent any file cache type without specific implementation.
-        file_cache = object()
+        file_cache = mock.Mock(spec=run_lint_checks.FileCache)
 
         linter = (
             circular_dependency_linter.CircularDependencyLintChecksManager(
@@ -178,12 +180,12 @@ class ThirdPartyCircularDependencyLintChecksManagerTest(unittest.TestCase):
 
     def test_initialization(self) -> None:
         """Test ThirdPartyCircularDependencyLintChecksManager init."""
-        js_files = []
-        ts_files = []
+        js_files: List[str] = []
+        ts_files: List[str] = []
 
         # Here we use object because we need a simple mock that can
         # represent any file cache type without specific implementation.
-        file_cache = object()
+        file_cache = mock.Mock(spec=run_lint_checks.FileCache)
 
         linter = (
             circular_dependency_linter.
