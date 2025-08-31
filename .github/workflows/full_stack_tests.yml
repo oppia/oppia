@@ -51,6 +51,7 @@ jobs:
       fail-fast: false
       matrix:
         env: [prod]
+        mobile: [false, true]
         suite:
           - name: topic-manager/access-dashboard-using-profile-dropdown
           - name: topic-manager/edit-the-topic
@@ -61,7 +62,6 @@ jobs:
           - name: topic-manager/create-delete-and-edit-the-stories-and-chapters
         run1: [1]
         run2: [1]
-        mobile: [false, true]
     name: (${{ matrix.env }}) ${{ matrix.mobile && 'Mobile' || 'Desktop' }} (${{ matrix.suite.name }})
     steps:
       - name: Check for broken suites

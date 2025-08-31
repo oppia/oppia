@@ -104,7 +104,7 @@ describe('Topic Manager', function () {
     await topicManager.openTopicEditor('Whole Numbers');
 
     // Verify that the breadcrumb contains read only text.
-    if (topicManager.isViewportAtMobileWidth()) {
+    if (!topicManager.isViewportAtMobileWidth()) {
       topicManager.expectNavbarBreadcrumbToContain(
         "View only mode, you don't have rights to edit this topic"
       );
