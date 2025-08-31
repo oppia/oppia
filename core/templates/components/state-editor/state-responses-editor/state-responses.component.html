@@ -177,7 +177,7 @@
             <div *ngFor="let skillWithMisconceptions of misconceptionsBySkill | keyvalue">
               <div *ngFor="let misconception of skillWithMisconceptions.value">
                 <div *ngIf="!misconception.isMandatory()"
-                     class="misconception-list-item optional-misconception-list-item"
+                     class="misconception-list-item optional-misconception-list-item e2e-test-misconception-item"
                      [ngClass]="{'optional-misconception-list-no-action': isNoActionExpected(skillWithMisconceptions.key + '-' + misconception.getId())}">
                   <div>
                     <div>

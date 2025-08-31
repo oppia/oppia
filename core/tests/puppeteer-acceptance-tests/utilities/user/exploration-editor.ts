@@ -840,7 +840,7 @@ export class ExplorationEditor extends BaseUser {
   async addResponseDetailsInResponseModal(
     feedback: string,
     destination?: string,
-    responseIsCorrect?: boolean,
+    responseIsCorrect: boolean = true,
     isLastResponse: boolean = true
   ): Promise<void> {
     await this.clickOn(feedbackEditorSelector);
@@ -3002,7 +3002,7 @@ export class ExplorationEditor extends BaseUser {
    */
   async addImageInteraction(
     feedback: string = 'Correct!',
-    nextCard: string = 'Last Card'
+    nextCard?: string
   ): Promise<void> {
     await this.page.waitForSelector(addInteractionButton, {
       visible: true,
@@ -3031,12 +3031,7 @@ export class ExplorationEditor extends BaseUser {
 
     // Update correct response.
     await this.expectModalTitleToBe('Add Response');
-    await this.addResponseDetailsInResponseModal(
-      feedback,
-      nextCard,
-      true,
-      true
-    );
+    await this.addResponseDetailsInResponseModal(feedback, nextCard);
   }
 
   /**

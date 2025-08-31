@@ -318,12 +318,10 @@ const aquiredSkillSkillSelector = '.e2e-test-acquired-skill-description-card';
 
 // Other Selectors.
 const activeTabSelector = '.e2e-test-active-tab';
-const addSubtopicButton = 'button.e2e-test-add-subtopic-button';
-const subtopicDescriptionEditorToggle = 'div.e2e-test-show-schema-editor';
-const createSubtopicButton = '.e2e-test-confirm-subtopic-creation-button';
 const storyRowSelector = 'tr.e2e-test-story-list-item';
 const thumbnailDescriptionSelector = '.e2e-test-thumbnail-description';
 const thumbnailTitleSelector = '.e2e-test-thumbnail-title';
+const questionEditorContainer = '.e2e-test-question-editor-container';
 
 export class TopicManager extends BaseUser {
   /**
@@ -637,6 +635,14 @@ export class TopicManager extends BaseUser {
     for (let i = 0; i < questionCount; i++) {
       await this.addBasicAlgebraQuestionToSkill(skillName);
     }
+  }
+
+  /**
+   * Click on the create new question button in the skill editor.
+   */
+  async clickOnCreateNewQuestionButtonInSkillEditor(): Promise<void> {
+    await this.clickOn(createQuestionButton);
+    await this.expectElementToBeVisible(questionEditorContainer);
   }
 
   /**
