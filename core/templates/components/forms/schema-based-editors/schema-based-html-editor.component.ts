@@ -45,6 +45,9 @@ import {
 export class SchemaBasedHtmlEditorComponent
   implements ControlValueAccessor, OnInit, Validator
 {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() disabled!: boolean;
   @Input() labelForFocusTarget!: string;
   @Input() uiConfig!: {add_element_text: string};
@@ -66,6 +69,11 @@ export class SchemaBasedHtmlEditorComponent
 
   // Implemented as a part of Validator interface.
   validate(control: AbstractControl): ValidationErrors {
+    // Currently, the validation for this component is handled by the
+    // apply-validation directive, so this method returns an empty
+    // object. However, when we move to reactive forms, that validation should
+    // be moved here instead (see the Todo below).
+    // TODO(#15458): Move template driven validation into code.
     return {};
   }
 
