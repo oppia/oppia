@@ -571,6 +571,18 @@
     {
       "name": "topic-manager/edit-and-republish-the-skill",
       "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/edit-and-republish-the-skill.spec.ts"
+    },
+    {
+      "name": "topic-manager/add-questions-from-topic-editor",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/add-questions-from-topic-editor.spec.ts"
+    },
+    {
+      "name": "topic-manager/add-remove-and-edit-subtopics",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/add-remove-and-edit-subtopics.spec.ts"
+    },
+    {
+      "name": "topic-manager/create-delete-and-edit-the-stories-and-chapters",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/create-delete-and-edit-the-stories-and-chapters.spec.ts"
     }
   ],
   "docker_suites": []

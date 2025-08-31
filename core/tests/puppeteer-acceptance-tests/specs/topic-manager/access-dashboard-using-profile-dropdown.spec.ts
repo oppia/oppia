@@ -154,7 +154,7 @@ describe('Topic Manager', function () {
       'Subtraction',
       'Word Problems',
     ]);
-    await topicManager.sortSkills('Newest Created');
+    await topicManager.sortSkills('Newly Created');
     await topicManager.expectFilteredSkillsInOrder([
       'Word Problems',
       'Subtraction',

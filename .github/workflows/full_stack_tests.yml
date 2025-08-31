@@ -56,7 +56,10 @@ jobs:
           - name: topic-manager/edit-the-topic
           - name: topic-manager/assign-unassign-and-merge-skills-in-skill-dashboard
           - name: topic-manager/edit-and-republish-the-skill
-        run1: [1, 2]
+          - name: topic-manager/add-questions-from-topic-editor
+          - name: topic-manager/add-remove-and-edit-subtopics
+          - name: topic-manager/create-delete-and-edit-the-stories-and-chapters
+        run1: [1]
         run2: [1]
         mobile: [false, true]
     name: (${{ matrix.env }}) ${{ matrix.mobile && 'Mobile' || 'Desktop' }} (${{ matrix.suite.name }})
