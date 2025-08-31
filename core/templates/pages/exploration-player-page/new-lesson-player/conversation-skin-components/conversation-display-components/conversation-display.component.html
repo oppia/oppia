@@ -77,24 +77,6 @@
                                     [nextLessonLink]="nextLessonLink">
   </oppia-new-ratings-and-recommendations>
 
-  <oppia-new-ratings-and-recommendations *ngIf="!isIframed && isOnTerminalCard() && isCurrentCardAtEndOfTranscript()"
-                                    [userIsLoggedIn]="userIsLoggedIn"
-                                    [explorationIsInPreviewMode]="explorationIsInPreviewMode"
-                                    [questionPlayerConfig]="questionPlayerConfig"
-                                    [collectionSummary]="collectionSummary"
-                                    [recommendedExplorationSummaries]="recommendedExplorationSummaries"
-                                    [nextLessonLink]="nextLessonLink">
-  </oppia-new-ratings-and-recommendations>
-
-  <oppia-new-ratings-and-recommendations *ngIf="!isIframed && isOnTerminalCard() && isCurrentCardAtEndOfTranscript()"
-                                    [userIsLoggedIn]="userIsLoggedIn"
-                                    [explorationIsInPreviewMode]="explorationIsInPreviewMode"
-                                    [questionPlayerConfig]="questionPlayerConfig"
-                                    [collectionSummary]="collectionSummary"
-                                    [recommendedExplorationSummaries]="recommendedExplorationSummaries"
-                                    [nextLessonLink]="nextLessonLink">
-  </oppia-new-ratings-and-recommendations>
-
   <ng-container *ngIf="displayedCardWasCompletedInPrevSession && !conceptCardIsBeingShown && (displayedCard.getInteractionId() != 'Continue')">
     <div class="conversation-skin-oppia-completed-state-card">
       <svg width="30" class="left-side-curve" height="24" viewBox="0 0 30 24" fill="none" xmlns="http://www.w3.org/2000/svg"
