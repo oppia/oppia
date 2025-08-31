@@ -79,11 +79,6 @@ oppia-conversation-display .left-side-curve {
   width: 39px;
 }
 
-oppia-conversation-display .conversation-skin-tutor-card-middle-section .conversation-skin-user-avatar,
-oppia-conversation-display .conversation-skin-tutor-card-middle-section .conversation-skin-oppia-avatar {
-  display: none;
-}
-
 oppia-conversation-display .oppia-learner-view-card-top-content p:not(:last-child) {
   line-height: 1.5;
   margin-bottom: 18px;
@@ -103,11 +98,11 @@ oppia-conversation-display .conversation-skin-future-tutor-card {
 }
 
 oppia-conversation-display .conversation-skin-tutor-card-middle-section .conversation-skin-learner-answer-content {
-  background-color: rgba(236,239,241,0.4);
+  background-color: #fff8e5;
 }
 
 oppia-conversation-display .conversation-skin-tutor-card-middle-section .conversation-skin-oppia-feedback-content {
-  background-color: rgba(224,242,241,0.4);
+  background-color: #fff;
 }
 
 oppia-conversation-display .conversation-skin-tutor-card-middle-section .conversation-skin-oppia-feedback-content::before,
@@ -132,18 +127,27 @@ oppia-conversation-display .card-content-hidden {
   opacity: 0;
 }
 
-.conversation-skin-responses-dropdown-container {
-  border-bottom: 1px solid #ccc;
+oppia-conversation-display .new-conversation-skin-responses-dropdown-container {
   cursor: pointer;
-  line-height: 0.1em;
-  margin: 8px 20px 20px 20px;
-  text-align: center;
+  flex-shrink: 0;
+  margin: 20px 0;
+}
+
+oppia-conversation-display .response-history-container {
+  align-items: center;
+  display: flex;
+}
+
+oppia-conversation-display .response-history-container hr {
+  background-color: #000;
+  border: none;
+  height: 2px;
+  width: 23%;
 }
 
 oppia-conversation-display .conversation-skin-responses-dropdown-text {
-  background-color: #fff;
   color: #000;
-  font-size: 0.8em;
+  font-size: 16px;
   padding: 0 10px;
 }
 
@@ -324,6 +328,10 @@ oppia-conversation-display .oppia-mcq-question-description-text {
     margin-left: 40px;
     margin-top: 30px;
     padding-bottom: 30px;
+  }
+
+  oppia-conversation-display .conversation-skin-responses-dropdown-text {
+    font-size: 14px;
   }
 }
 

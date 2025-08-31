@@ -49,8 +49,6 @@
 
     <img class="conversation-skin-oppia-avatar rounded-circle" [src]="oppiaAvatarImageUrl" alt="">
 
-    <span id="getInputResponsePairId()"></span>
-
     <div dir="auto">
       <oppia-rte-output-display *ngIf="data.oppiaResponse !== null" [rteString]="data.oppiaResponse" [class]="'oppia-rte-viewer conversation-skin-oppia-feedback-content ' + (bottomSection ? 'e2e-test-conversation-feedback-latest' : '')"
         [ngStyle]="{'min-width': (isVideoRteElementPresentInResponse() ? '75%' : 'inherit')}"

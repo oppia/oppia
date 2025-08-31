@@ -23,20 +23,36 @@
   </div>
   <!-- New UI for the question -->
 
+  <div class="response-history-container" *ngIf="shouldResponseHistoryBeShown()">
+    <hr>
+    <h4 class="new-conversation-skin-responses-dropdown-container"
+        (click)="toggleShowPreviousResponses()">
+      <span class="conversation-skin-responses-dropdown-text e2e-test-previous-responses-text">
+        <span>
+          {{ 'I18N_PLAYER_PREVIOUS_RESPONSES' | translate:{previousResponses: displayedCard.getInputResponsePairs().length - (isInteractionInline() ? 1 : 0)} }}
+        </span>
+        <span class="conversation-skin-responses-dropdown-icon">
+          <i class="fas fa-play conversation-skin-responses-dropdown-icon" [ngClass]="{'conversation-skin-responses-dropdown-icon-rotated': arePreviousResponsesShown}"></i>
+        </span>
+      </span>
+    </h4>
+    <hr>
+  </div>
+
   <div class="conversation-skin-tutor-card-middle-section"
        *ngIf="(arePreviousResponsesShown && !conceptCardIsBeingShown)" [@expandInOut]>
-    <div *ngFor="let responsePair of displayedCard.getInputResponsePairs(); index as index">
-      <div *ngIf="index !== (displayedCard.getInputResponsePairs().length - 1) || !isInteractionInline()">
+    <ng-container *ngFor="let responsePair of displayedCard.getInputResponsePairs(); index as index">
+      <ng-container *ngIf="index !== (displayedCard.getInputResponsePairs().length - 1) || !isInteractionInline()">
         <oppia-new-input-response-pair [data]="responsePair"
                                   [profilePicturePngDataUrl]="profilePicturePngDataUrl"
                                   [profilePictureWebpDataUrl]="profilePictureWebpDataUrl"
                                   [oppiaAvatarImageUrl]="OPPIA_AVATAR_IMAGE_URL"
-                                  [inputResponsePairId]="getInputResponsePairId($index)"
+                                  [inputResponsePairId]="getInputResponsePairId(index)"
                                   [isLastPair]="false"
                                   [feedbackIsEnabled]="feedbackIsEnabled">
         </oppia-new-input-response-pair>
-      </div>
-    </div>
+      </ng-container>
+    </ng-container>
   </div>
 
   <!-- If the interaction is inline, always show the most recent response pair, if there is one. -->
@@ -51,6 +67,15 @@
                               [feedbackIsEnabled]="feedbackIsEnabled">
     </oppia-new-input-response-pair>
   </div>
+
+  <oppia-new-ratings-and-recommendations *ngIf="!isIframed && isOnTerminalCard() && isCurrentCardAtEndOfTranscript()"
+                                    [userIsLoggedIn]="userIsLoggedIn"
+                                    [explorationIsInPreviewMode]="explorationIsInPreviewMode"
+                                    [questionPlayerConfig]="questionPlayerConfig"
+                                    [collectionSummary]="collectionSummary"
+                                    [recommendedExplorationSummaries]="recommendedExplorationSummaries"
+                                    [nextLessonLink]="nextLessonLink">
+  </oppia-new-ratings-and-recommendations>
 
   <ng-container *ngIf="displayedCardWasCompletedInPrevSession && !conceptCardIsBeingShown && (displayedCard.getInteractionId() != 'Continue')">
     <div class="conversation-skin-oppia-completed-state-card">

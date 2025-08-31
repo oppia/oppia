@@ -20,9 +20,15 @@ import {Component, Input} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {UrlService} from 'services/contextual/url.service';
 import {PracticeSessionPageConstants} from 'pages/practice-session-page/practice-session-page.constants';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import './post-chapter-recommendations.component.css';
+import {UserService} from 'services/user.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+
 @Component({
   selector: 'oppia-post-chapter-recommendations',
   templateUrl: './post-chapter-recommendations.component.html',
+  styleUrls: ['./post-chapter-recommendations.component.css'],
 })
 export class PostChapterRecommendationsComponent {
   // The below property will be undefined when the current chapter
@@ -40,10 +46,14 @@ export class PostChapterRecommendationsComponent {
   // passed down as input from the parent component is initialized to
   // be false.
   @Input() practiceQuestionsAreEnabled!: boolean;
+  @Input() userIsLoggedIn!: boolean;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
-    private urlService: UrlService
+    private urlService: UrlService,
+    private platformFeatureService: PlatformFeatureService,
+    private userService: UserService,
+    private windowRef: WindowRef
   ) {}
 
   getStaticImageUrl(imagePath: string): string {
@@ -63,6 +73,18 @@ export class PostChapterRecommendationsComponent {
     );
   }
 
+  signIn(): void {
+    this.userService.getLoginUrlAsync().then(loginUrl => {
+      if (loginUrl) {
+        (
+          this.windowRef.nativeWindow as {location: string | Location}
+        ).location = loginUrl;
+      } else {
+        this.windowRef.nativeWindow.location.reload();
+      }
+    });
+  }
+
   getStudyTabUrl(): string {
     return (
       this.urlInterpolationService.interpolateUrl(
@@ -74,5 +96,13 @@ export class PostChapterRecommendationsComponent {
         }
       ) + '/studyguide'
     );
+  }
+
+  showThreeButtons(): boolean {
+    return this.practiceQuestionsAreEnabled && !this.nextStoryNodeTitle;
+  }
+
+  isNewLessonPlayerEnabled(): boolean {
+    return this.platformFeatureService.status.NewLessonPlayer.isEnabled;
   }
 }
