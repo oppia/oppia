@@ -81,13 +81,13 @@ describe('Exploration Editor', function () {
     await explorationEditor.continueToNextJoyrideStep();
     await explorationEditor.expectJoyrideTitleToBe('Preview');
     await explorationEditor.expectJoyrideContentToContain(
-      'At any time, you can click the preview button to play through your exploration.'
+      'Tap on this "Options" dropdown to access the Preview option and play through your exploration.'
     );
 
     await explorationEditor.continueToNextJoyrideStep();
     await explorationEditor.expectJoyrideTitleToBe('Save');
     await explorationEditor.expectJoyrideContentToContain(
-      "When you're done making changes, be sure to save your work."
+      'When you\'re done making changes, tap the "Save Draft" button to save your work.'
     );
 
     await explorationEditor.continueToNextJoyrideStep();
@@ -118,16 +118,27 @@ describe('Exploration Editor', function () {
       'Start your translation by choosing the language that you want to translate to.'
     );
 
+    // Add a small delay before trying to click the Previous button in mobile mode
+    await explorationEditor.page.waitForTimeout(1000);
+    // Wait for Previous button to be both visible and clickable
+    await explorationEditor.page.waitForSelector(
+      '.joyride-step__prev-container .joyride-button',
+      {visible: true}
+    );
     await explorationEditor.continueToPreviousJoyrideStep();
     await explorationEditor.expectJoyrideTitleToBe('Translations In Oppia');
     await explorationEditor.continueToNextJoyrideStep();
+    await explorationEditor.expectJoyrideTitleToBe('Choose Language');
 
     await explorationEditor.continueToNextJoyrideStep();
+    // In mobile mode, the tour skips the "Choose a Card to Translate" step
+    // (translationTabStatusGraph) since the status graph is only visible on desktop,
+    // and goes directly to the card options step
     await explorationEditor.expectJoyrideTitleToBe(
-      'Choose a Card to Translate'
+      'Choose a Part of the Card to Translate'
     );
     await explorationEditor.expectJoyrideContentToContain(
-      'Then, choose a card from the exploration overview by clicking on the card.'
+      'Next, choose a part of the lesson card to translate.'
     );
 
     await explorationEditor.continueToNextJoyrideStep();

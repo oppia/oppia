@@ -5833,6 +5833,11 @@ export class ExplorationEditor extends BaseUser {
     await this.expectJoyridePreviousButtonToBeVisible();
 
     const currentStep = await this.getTextContent(joyrideStepSelector);
+    await this.page.waitForTimeout(1000);
+    await this.page.waitForSelector(
+      '.joyride-step__prev-container .joyride-button',
+      {visible: true}
+    );
     await this.page.click(previousButtonSelector);
 
     await this.page.waitForFunction(

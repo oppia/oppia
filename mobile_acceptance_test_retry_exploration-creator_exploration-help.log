@@ -1,0 +1,397 @@
+Found existing installation: apache-beam 2.43.0
+Uninstalling apache-beam-2.43.0:
+  Successfully uninstalled apache-beam-2.43.0
+Found existing installation: azure-cognitiveservices-speech 1.41.1
+Uninstalling azure-cognitiveservices-speech-1.41.1:
+  Successfully uninstalled azure-cognitiveservices-speech-1.41.1
+Found existing installation: bleach 4.1.0
+Uninstalling bleach-4.1.0:
+  Successfully uninstalled bleach-4.1.0
+Found existing installation: CacheControl 0.14.0
+Uninstalling CacheControl-0.14.0:
+  Successfully uninstalled CacheControl-0.14.0
+Found existing installation: cachetools 4.2.4
+Uninstalling cachetools-4.2.4:
+  Successfully uninstalled cachetools-4.2.4
+Found existing installation: charset-normalizer 3.3.2
+Uninstalling charset-normalizer-3.3.2:
+  Successfully uninstalled charset-normalizer-3.3.2
+Found existing installation: cloudpickle 2.2.1
+Uninstalling cloudpickle-2.2.1:
+  Successfully uninstalled cloudpickle-2.2.1
+Found existing installation: crcmod 1.7
+Uninstalling crcmod-1.7:
+  Successfully uninstalled crcmod-1.7
+Found existing installation: deepdiff 5.8.1
+Uninstalling deepdiff-5.8.1:
+  Successfully uninstalled deepdiff-5.8.1
+Found existing installation: defusedxml 0.7.1
+Uninstalling defusedxml-0.7.1:
+  Successfully uninstalled defusedxml-0.7.1
+Found existing installation: Deprecated 1.2.14
+Uninstalling Deprecated-1.2.14:
+  Successfully uninstalled Deprecated-1.2.14
+Found existing installation: docopt 0.6.2
+Uninstalling docopt-0.6.2:
+  Successfully uninstalled docopt-0.6.2
+Found existing installation: elasticsearch 7.17.0
+Uninstalling elasticsearch-7.17.0:
+  Successfully uninstalled elasticsearch-7.17.0
+Found existing installation: exceptiongroup 1.2.2
+Uninstalling exceptiongroup-1.2.2:
+  Successfully uninstalled exceptiongroup-1.2.2
+Found existing installation: fastavro 1.9.5
+Uninstalling fastavro-1.9.5:
+  Successfully uninstalled fastavro-1.9.5
+Found existing installation: fasteners 0.19
+Uninstalling fasteners-0.19:
+  Successfully uninstalled fasteners-0.19
+Found existing installation: firebase-admin 5.2.0
+Uninstalling firebase-admin-5.2.0:
+  Successfully uninstalled firebase-admin-5.2.0
+Found existing installation: future 0.18.3
+Uninstalling future-0.18.3:
+  Successfully uninstalled future-0.18.3
+Found existing installation: google-api-core 2.23.0
+Uninstalling google-api-core-2.23.0:
+  Successfully uninstalled google-api-core-2.23.0
+Found existing installation: google-api-python-client 2.123.0
+Uninstalling google-api-python-client-2.123.0:
+  Successfully uninstalled google-api-python-client-2.123.0
+Found existing installation: google-apitools 0.5.31
+Uninstalling google-apitools-0.5.31:
+  Successfully uninstalled google-apitools-0.5.31
+Found existing installation: google-auth 2.35.0
+Uninstalling google-auth-2.35.0:
+  Successfully uninstalled google-auth-2.35.0
+Found existing installation: google-auth-httplib2 0.1.1
+Uninstalling google-auth-httplib2-0.1.1:
+  Successfully uninstalled google-auth-httplib2-0.1.1
+Found existing installation: google-cloud-appengine-logging 1.1.6
+Uninstalling google-cloud-appengine-logging-1.1.6:
+  Successfully uninstalled google-cloud-appengine-logging-1.1.6
+Found existing installation: google-cloud-audit-log 0.2.5
+Uninstalling google-cloud-audit-log-0.2.5:
+  Successfully uninstalled google-cloud-audit-log-0.2.5
+Found existing installation: google-cloud-bigquery 3.26.0
+Uninstalling google-cloud-bigquery-3.26.0:
+  Successfully uninstalled google-cloud-bigquery-3.26.0
+Found existing installation: google-cloud-bigquery-storage 2.13.2
+Uninstalling google-cloud-bigquery-storage-2.13.2:
+  Successfully uninstalled google-cloud-bigquery-storage-2.13.2
+Found existing installation: google-cloud-bigtable 1.7.3
+Uninstalling google-cloud-bigtable-1.7.3:
+  Successfully uninstalled google-cloud-bigtable-1.7.3
+Found existing installation: google-cloud-core 2.4.1
+Uninstalling google-cloud-core-2.4.1:
+  Successfully uninstalled google-cloud-core-2.4.1
+Found existing installation: google-cloud-dataflow-client 0.8.13
+Uninstalling google-cloud-dataflow-client-0.8.13:
+  Successfully uninstalled google-cloud-dataflow-client-0.8.13
+Found existing installation: google-cloud-datastore 1.15.5
+Uninstalling google-cloud-datastore-1.15.5:
+  Successfully uninstalled google-cloud-datastore-1.15.5
+Found existing installation: google-cloud-dlp 3.9.2
+Uninstalling google-cloud-dlp-3.9.2:
+  Successfully uninstalled google-cloud-dlp-3.9.2
+Found existing installation: google-cloud-firestore 2.7.2
+Uninstalling google-cloud-firestore-2.7.2:
+  Successfully uninstalled google-cloud-firestore-2.7.2
+Found existing installation: google-cloud-language 1.3.2
+Uninstalling google-cloud-language-1.3.2:
+  Successfully uninstalled google-cloud-language-1.3.2
+Found existing installation: google-cloud-logging 3.11.3
+Uninstalling google-cloud-logging-3.11.3:
+  Successfully uninstalled google-cloud-logging-3.11.3
+Found existing installation: google-cloud-ndb 1.11.1
+Uninstalling google-cloud-ndb-1.11.1:
+  Successfully uninstalled google-cloud-ndb-1.11.1
+Found existing installation: google-cloud-pubsub 2.13.11
+Uninstalling google-cloud-pubsub-2.13.11:
+  Successfully uninstalled google-cloud-pubsub-2.13.11
+Found existing installation: google-cloud-pubsublite 1.11.0
+Uninstalling google-cloud-pubsublite-1.11.0:
+  Successfully uninstalled google-cloud-pubsublite-1.11.0
+Found existing installation: google-cloud-recommendations-ai 0.7.1
+Uninstalling google-cloud-recommendations-ai-0.7.1:
+  Successfully uninstalled google-cloud-recommendations-ai-0.7.1
+Found existing installation: google-cloud-secret-manager 2.21.0
+Uninstalling google-cloud-secret-manager-2.21.0:
+  Successfully uninstalled google-cloud-secret-manager-2.21.0
+Found existing installation: google-cloud-spanner 3.26.0
+Uninstalling google-cloud-spanner-3.26.0:
+  Successfully uninstalled google-cloud-spanner-3.26.0
+Found existing installation: google-cloud-storage 2.18.2
+Uninstalling google-cloud-storage-2.18.2:
+  Successfully uninstalled google-cloud-storage-2.18.2
+Found existing installation: google-cloud-tasks 2.17.0
+Uninstalling google-cloud-tasks-2.17.0:
+  Successfully uninstalled google-cloud-tasks-2.17.0
+Found existing installation: google-cloud-translate 3.17.0
+Uninstalling google-cloud-translate-3.17.0:
+  Successfully uninstalled google-cloud-translate-3.17.0
+Found existing installation: google-cloud-videointelligence 1.16.3
+Uninstalling google-cloud-videointelligence-1.16.3:
+  Successfully uninstalled google-cloud-videointelligence-1.16.3
+Found existing installation: google-cloud-vision 1.0.2
+Uninstalling google-cloud-vision-1.0.2:
+  Successfully uninstalled google-cloud-vision-1.0.2
+Found existing installation: google-crc32c 1.5.0
+Uninstalling google-crc32c-1.5.0:
+  Successfully uninstalled google-crc32c-1.5.0
+Found existing installation: google-resumable-media 2.7.2
+Uninstalling google-resumable-media-2.7.2:
+  Successfully uninstalled google-resumable-media-2.7.2
+Found existing installation: googleapis-common-protos 1.63.2
+Uninstalling googleapis-common-protos-1.63.2:
+  Successfully uninstalled googleapis-common-protos-1.63.2
+Found existing installation: grpc-google-iam-v1 0.12.7
+Uninstalling grpc-google-iam-v1-0.12.7:
+  Successfully uninstalled grpc-google-iam-v1-0.12.7
+Found existing installation: grpcio 1.65.1
+Uninstalling grpcio-1.65.1:
+  Successfully uninstalled grpcio-1.65.1
+Found existing installation: grpcio-status 1.48.2
+Uninstalling grpcio-status-1.48.2:
+  Successfully uninstalled grpcio-status-1.48.2
+Found existing installation: gunicorn 20.1.0
+Uninstalling gunicorn-20.1.0:
+  Successfully uninstalled gunicorn-20.1.0
+Found existing installation: hdfs 2.7.3
+Uninstalling hdfs-2.7.3:
+  Successfully uninstalled hdfs-2.7.3
+Found existing installation: html5lib 1.1
+Uninstalling html5lib-1.1:
+  Successfully uninstalled html5lib-1.1
+Found existing installation: httplib2 0.20.4
+Uninstalling httplib2-0.20.4:
+  Successfully uninstalled httplib2-0.20.4
+Found existing installation: idna 3.7
+Uninstalling idna-3.7:
+  Successfully uninstalled idna-3.7
+Found existing installation: importlib_metadata 8.5.0
+Uninstalling importlib_metadata-8.5.0:
+  Successfully uninstalled importlib_metadata-8.5.0
+Found existing installation: iniconfig 2.0.0
+Uninstalling iniconfig-2.0.0:
+  Successfully uninstalled iniconfig-2.0.0
+Found existing installation: mailchimp3 3.0.15
+Uninstalling mailchimp3-3.0.15:
+  Successfully uninstalled mailchimp3-3.0.15
+Found existing installation: msgpack 1.0.8
+Uninstalling msgpack-1.0.8:
+  Successfully uninstalled msgpack-1.0.8
+Found existing installation: mutagen 1.45.1
+Uninstalling mutagen-1.45.1:
+  Successfully uninstalled mutagen-1.45.1
+Found existing installation: numpy 1.22.4
+Uninstalling numpy-1.22.4:
+  Successfully uninstalled numpy-1.22.4
+Found existing installation: oauth2client 4.1.3
+Uninstalling oauth2client-4.1.3:
+  Successfully uninstalled oauth2client-4.1.3
+Found existing installation: objsize 0.5.2
+Uninstalling objsize-0.5.2:
+  Successfully uninstalled objsize-0.5.2
+Found existing installation: opentelemetry-api 1.28.1
+Uninstalling opentelemetry-api-1.28.1:
+  Successfully uninstalled opentelemetry-api-1.28.1
+Found existing installation: ordered-set 4.1.0
+Uninstalling ordered-set-4.1.0:
+  Successfully uninstalled ordered-set-4.1.0
+Found existing installation: orjson 3.10.6
+Uninstalling orjson-3.10.6:
+  Successfully uninstalled orjson-3.10.6
+Found existing installation: overrides 7.7.0
+Uninstalling overrides-7.7.0:
+  Successfully uninstalled overrides-7.7.0
+Found existing installation: pluggy 1.5.0
+Uninstalling pluggy-1.5.0:
+  Successfully uninstalled pluggy-1.5.0
+Found existing installation: proto-plus 1.24.0
+Uninstalling proto-plus-1.24.0:
+  Successfully uninstalled proto-plus-1.24.0
+Found existing installation: protobuf 3.20.3
+Uninstalling protobuf-3.20.3:
+  Successfully uninstalled protobuf-3.20.3
+Found existing installation: pyarrow 7.0.0
+Uninstalling pyarrow-7.0.0:
+  Successfully uninstalled pyarrow-7.0.0
+Found existing installation: pyasn1 0.6.0
+Uninstalling pyasn1-0.6.0:
+  Successfully uninstalled pyasn1-0.6.0
+Found existing installation: pyasn1_modules 0.4.0
+Uninstalling pyasn1_modules-0.4.0:
+  Successfully uninstalled pyasn1_modules-0.4.0
+Found existing installation: pydot 1.4.2
+Uninstalling pydot-1.4.2:
+  Successfully uninstalled pydot-1.4.2
+Found existing installation: pylatexenc 2.10
+Uninstalling pylatexenc-2.10:
+  Successfully uninstalled pylatexenc-2.10
+Found existing installation: pymemcache 4.0.0
+Uninstalling pymemcache-4.0.0:
+  Successfully uninstalled pymemcache-4.0.0
+Found existing installation: pymongo 3.13.0
+Uninstalling pymongo-3.13.0:
+  Successfully uninstalled pymongo-3.13.0
+Found existing installation: pyparsing 3.1.2
+Uninstalling pyparsing-3.1.2:
+  Successfully uninstalled pyparsing-3.1.2
+Found existing installation: pytest 7.4.4
+Uninstalling pytest-7.4.4:
+  Successfully uninstalled pytest-7.4.4
+Found existing installation: python-dateutil 2.9.0.post0
+Uninstalling python-dateutil-2.9.0.post0:
+  Successfully uninstalled python-dateutil-2.9.0.post0
+Found existing installation: pytz 2024.1
+Uninstalling pytz-2024.1:
+  Successfully uninstalled pytz-2024.1
+Found existing installation: redis 3.5.3
+Uninstalling redis-3.5.3:
+  Successfully uninstalled redis-3.5.3
+Found existing installation: regex 2024.7.24
+Uninstalling regex-2024.7.24:
+  Successfully uninstalled regex-2024.7.24
+Found existing installation: requests 2.31.0
+Uninstalling requests-2.31.0:
+  Successfully uninstalled requests-2.31.0
+Found existing installation: requests-mock 1.9.3
+Uninstalling requests-mock-1.9.3:
+  Successfully uninstalled requests-mock-1.9.3
+Found existing installation: requests-toolbelt 0.9.1
+Uninstalling requests-toolbelt-0.9.1:
+  Successfully uninstalled requests-toolbelt-0.9.1
+Found existing installation: result 0.6.0
+Uninstalling result-0.6.0:
+  Successfully uninstalled result-0.6.0
+Found existing installation: rsa 4.7.2
+Uninstalling rsa-4.7.2:
+  Successfully uninstalled rsa-4.7.2
+Found existing installation: simplejson 3.17.5
+Uninstalling simplejson-3.17.5:
+  Successfully uninstalled simplejson-3.17.5
+Found existing installation: six 1.16.0
+Uninstalling six-1.16.0:
+  Successfully uninstalled six-1.16.0
+Found existing installation: sqlparse 0.5.1
+Uninstalling sqlparse-0.5.1:
+  Successfully uninstalled sqlparse-0.5.1
+Found existing installation: uritemplate 4.1.1
+Uninstalling uritemplate-4.1.1:
+  Successfully uninstalled uritemplate-4.1.1
+Found existing installation: urllib3 1.26.18
+Uninstalling urllib3-1.26.18:
+  Successfully uninstalled urllib3-1.26.18
+Found existing installation: webapp2 3.0.0b1
+Uninstalling webapp2-3.0.0b1:
+  Successfully uninstalled webapp2-3.0.0b1
+Found existing installation: webencodings 0.5.1
+Uninstalling webencodings-0.5.1:
+  Successfully uninstalled webencodings-0.5.1
+Found existing installation: zipp 3.21.0
+Uninstalling zipp-3.21.0:
+  Successfully uninstalled zipp-3.21.0
+Found existing installation: zstandard 0.23.0
+Uninstalling zstandard-0.23.0:
+  Successfully uninstalled zstandard-0.23.0
+Collecting beautifulsoup4==4.12.2 (from -r /tmp/tmpbn76qomm (line 1))
+  Using cached beautifulsoup4-4.12.2-py3-none-any.whl (142 kB)
+Collecting dill==0.3.6 (from -r /tmp/tmpbn76qomm (line 4))
+  Using cached dill-0.3.6-py3-none-any.whl (110 kB)
+Collecting soupsieve==2.4.1 (from -r /tmp/tmpbn76qomm (line 7))
+  Using cached soupsieve-2.4.1-py3-none-any.whl (36 kB)
+Collecting wrapt==1.15.0 (from -r /tmp/tmpbn76qomm (line 10))
+  Using cached wrapt-1.15.0-cp310-cp310-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl (78 kB)
+Installing collected packages: wrapt, soupsieve, dill, beautifulsoup4
+  Attempting uninstall: wrapt
+    Found existing installation: wrapt 1.16.0
+    Uninstalling wrapt-1.16.0:
+      Successfully uninstalled wrapt-1.16.0
+  Attempting uninstall: soupsieve
+    Found existing installation: soupsieve 2.3.1
+    Uninstalling soupsieve-2.3.1:
+      Successfully uninstalled soupsieve-2.3.1
+  Attempting uninstall: dill
+    Found existing installation: dill 0.3.1.1
+    Uninstalling dill-0.3.1.1:
+      Successfully uninstalled dill-0.3.1.1
+  Attempting uninstall: beautifulsoup4
+    Found existing installation: beautifulsoup4 4.10.0
+    Uninstalling beautifulsoup4-4.10.0:
+      Successfully uninstalled beautifulsoup4-4.10.0
+Successfully installed beautifulsoup4-4.12.2 dill-0.3.6 soupsieve-2.4.1 wrapt-1.15.0
+[1m[33m⚠  emulators:[39m[22m You are not currently authenticated so some features may not work correctly. Please run [1mfirebase login[22m to authenticate the CLI.
+[1m[36mi  emulators:[39m[22m Starting emulators: auth
+[1m[36mi  ui:[39m[22m Emulator UI logging to [1mui-debug.log[22m
+
+┌─────────────────────────────────────────────────────────────┐
+│ [32m✔[39m  [1mAll emulators ready! It is now safe to connect your app.[22m │
+│ [36mi[39m  View Emulator UI at [4m[1mhttp://127.0.0.1:4000[22m[24m                │
+└─────────────────────────────────────────────────────────────┘
+
+┌────────────────┬────────────────┬────────────────────────────┐
+│ Emulator       │ Host:Port      │ View in Emulator UI        │
+├────────────────┼────────────────┼────────────────────────────┤
+│ Authentication │ 127.0.0.1:9099 │ [4m[1mhttp://127.0.0.1:4000/auth[22m[24m │
+└────────────────┴────────────────┴────────────────────────────┘
+[90m  Emulator Hub running at [39m127.0.0.1:4400
+[90m  Other reserved ports:[39m 4500
+
+Issues? Report them at [4m[1mhttps://github.com/firebase/firebase-tools/issues[22m[24m and attach the *-debug.log files.
+ 
+Requirement already satisfied: pip in /tmp/tmpwla2fvbn/lib/python3.10/site-packages (23.0.1)                                                                                            Collecting pip              Using cached pip-25.2-py3-none-any.whl (1.8 MB)                                               Installing collected packages: pip                                  Attempting uninstall: pip                         Found existing installation: pip 23.0.1                                       
+Uninstalling pip-23.0.1:                        Successfully uninstalled pip-23.0.1                                   Successfully installed pip-25.2                               Collecting apache-beam==2.43.0 (from -r requirements.txt (line 11))                                                                   Using cached apache_beam-2.43.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (14.0 MB)                                                                                                    Collecting azure-cognitiveservices-speech==1.41.1 (from -r requirements.txt (line 38))                                                                                      Using cached azure_cognitiveservices_speech-1.41.1-py3-none-manylinux1_x86_64.whl (39.7 MB)                                                                                           Collecting beautifulsoup4==4.10.0 (from -r requirements.txt (line 46))                                                                      Using cached beautifulsoup4-4.10.0-py3-none-any.whl (97 kB)                                                           Collecting bleach==4.1.0 (from -r requirements.txt (line 50))                                                             Using cached bleach-4.1.0-py2.py3-none-any.whl (157 kB)                                                       Collecting cachecontrol==0.14.0 (from -r requirements.txt (line 54))                                                                    Using cached cachecontrol-0.14.0-py3-none-any.whl (22 kB)                                                         Collecting cachetools==4.2.4 (from -r requirements.txt (line 58))                                                                 Using cached cachetools-4.2.4-py3-none-any.whl (10 kB)                                                      Collecting certifi==2023.7.22 (from -r requirements.txt (line 64))                                                                  Using cached certifi-2023.7.22-py3-none-any.whl (158 kB)                                                        Collecting charset-normalizer==3.3.2 (from -r requirements.txt (line 71))                                                                         Using cached charset_normalizer-3.3.2-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (142 kB)                                                                                                         Collecting cloudpickle==2.2.1 (from -r requirements.txt (line 163))                                                                   Using cached cloudpickle-2.2.1-py3-none-any.whl (25 kB)                                                       Collecting crcmod==1.7 (from -r requirements.txt (line 167))                                                            Using cached crcmod-1.7-cp310-cp310-linux_x86_64.whl                                                    Collecting deepdiff==5.8.1 (from -r requirements.txt (line 170))                                                                Using cached deepdiff-5.8.1-py3-none-any.whl (69 kB)                                                    Collecting defusedxml==0.7.1 (from -r requirements.txt (line 174))                                                                  Using cached defusedxml-0.7.1-py2.py3-none-any.whl (25 kB)                                                          Collecting deprecated==1.2.14 (from -r requirements.txt (line 178))                                                                   Using cached Deprecated-1.2.14-py2.py3-none-any.whl (9.6 kB)                                                            Collecting dill==0.3.1.1 (from -r requirements.txt (line 182))                                                              Using cached dill-0.3.1.1-py3-none-any.whl                                          Collecting docopt==0.6.2 (from -r requirements.txt (line 185))                                                              Using cached docopt-0.6.2-py2.py3-none-any.whl                                              Collecting elasticsearch==7.17.0 (from -r requirements.txt (line 188))                                                                      Using cached elasticsearch-7.17.0-py2.py3-none-any.whl (385 kB)                                                               Collecting exceptiongroup==1.2.2 (from -r requirements.txt (line 192))                                                                      Using cached exceptiongroup-1.2.2-py3-none-any.whl (16 kB)                                                          Collecting fastavro==1.9.5 (from -r requirements.txt (line 196))                                                                Using cached fastavro-1.9.5-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.1 MB)                                                                                               Collecting fasteners==0.19 (from -r requirements.txt (line 229))                                                                Using cached fasteners-0.19-py3-none-any.whl (18 kB)                                                    Collecting filetype==1.2.0 (from -r requirements.txt (line 235))                                                                Using cached filetype-1.2.0-py2.py3-none-any.whl (19 kB)                                                        Collecting firebase-admin==5.2.0 (from -r requirements.txt (line 239))                                                                      Using cached firebase_admin-5.2.0-py3-none-any.whl (115 kB)                                                           Collecting future==0.18.3 (from -r requirements.txt (line 243))                                                               Using cached future-0.18.3-py3-none-any.whl                                           Collecting google-api-core==2.23.0 (from -r requirements.txt (line 246))                                                                        Using cached google_api_core-2.23.0-py3-none-any.whl (156 kB)                                                             Collecting google-api-python-client==2.123.0 (from -r requirements.txt (line 273))                                                                                  Using cached google_api_python_client-2.123.0-py2.py3-none-any.whl (12.4 MB)                                                                            Collecting google-apitools==0.5.31 (from -r requirements.txt (line 277))                                                                        Using cached google_apitools-0.5.31-py3-none-any.whl                                                    Collecting google-auth==2.35.0 (from -r requirements.txt (line 281))                                                                    Using cached google_auth-2.35.0-py2.py3-none-any.whl (208 kB)                                                             Collecting google-auth-httplib2==0.1.1 (from -r requirements.txt (line 298))                                                                            Using cached google_auth_httplib2-0.1.1-py2.py3-none-any.whl (9.3 kB)                                                                     Collecting google-cloud-appengine-logging==1.1.6 (from -r requirements.txt (line 304))                                                                                      Using cached google_cloud_appengine_logging-1.1.6-py2.py3-none-any.whl (14 kB)                                                                              Collecting google-cloud-audit-log==0.2.5 (from -r requirements.txt (line 308))                                                                              Using cached google_cloud_audit_log-0.2.5-py2.py3-none-any.whl (12 kB)                                                                      Collecting google-cloud-bigquery==3.26.0 (from -r requirements.txt (line 312))                                                                              Using cached google_cloud_bigquery-3.26.0-py2.py3-none-any.whl (239 kB)                                                                       Collecting google-cloud-bigquery-storage==2.13.2 (from -r requirements.txt (line 318))                                                                                      Using cached google_cloud_bigquery_storage-2.13.2-py2.py3-none-any.whl (180 kB)                                                                               Collecting google-cloud-bigtable==1.7.3 (from -r requirements.txt (line 322))                                                                             Using cached google_cloud_bigtable-1.7.3-py2.py3-none-any.whl (268 kB)                                                                      Collecting google-cloud-core==2.4.1 (from -r requirements.txt (line 326))                                                                         Using cached google_cloud_core-2.4.1-py2.py3-none-any.whl (29 kB)                                                                 Collecting google-cloud-dataflow-client==0.8.13 (from -r requirements.txt (line 339))                                                                                     Using cached google_cloud_dataflow_client-0.8.13-py2.py3-none-any.whl (250 kB)                                                                              Collecting google-cloud-datastore==1.15.5 (from -r requirements.txt (line 343))                                                                               Using cached google_cloud_datastore-1.15.5-py2.py3-none-any.whl (134 kB)                                                                        Collecting google-cloud-dlp==3.9.2 (from -r requirements.txt (line 349))                                                                        Using cached google_cloud_dlp-3.9.2-py2.py3-none-any.whl (125 kB)                                                                 Collecting google-cloud-firestore==2.7.2 (from -r requirements.txt (line 353))                                                                              Using cached google_cloud_firestore-2.7.2-py2.py3-none-any.whl (253 kB)                                                                       Collecting google-cloud-language==1.3.2 (from -r requirements.txt (line 357))                                                                             Using cached google_cloud_language-1.3.2-py2.py3-none-any.whl (83 kB)                                                                     Collecting google-cloud-logging==3.11.3 (from -r requirements.txt (line 361))                                                                             Using cached google_cloud_logging-3.11.3-py2.py3-none-any.whl (218 kB)                                                                      Collecting google-cloud-ndb==1.11.1 (from -r requirements.txt (line 365))                                                                         Using cached google_cloud_ndb-1.11.1-py3-none-any.whl (177 kB)                                                              Collecting google-cloud-pubsub==2.13.11 (from -r requirements.txt (line 369))                                                                             Using cached google_cloud_pubsub-2.13.11-py2.py3-none-any.whl (236 kB)                                                                      Collecting google-cloud-pubsublite==1.11.0 (from -r requirements.txt (line 375))                                                                                Using cached google_cloud_pubsublite-1.11.0-py2.py3-none-any.whl (303 kB)                                                                         Collecting google-cloud-recommendations-ai==0.7.1 (from -r requirements.txt (line 379))                                                                                       Using cached google_cloud_recommendations_ai-0.7.1-py2.py3-none-any.whl (148 kB)                                                                                Collecting google-cloud-secret-manager==2.21.0 (from -r requirements.txt (line 383))                                                                                    Using cached google_cloud_secret_manager-2.21.0-py2.py3-none-any.whl (193 kB)                                                                             Collecting google-cloud-spanner==3.26.0 (from -r requirements.txt (line 387))  console.log
+    [test-log]: Checking if element JSHandle@node is clickable...
+
+      at Object.showMessage (utilities/common/show-message.ts:36:11)
+
+  console.log
+    [test-log]: Element (JSHandle@node) is clickable, as expected.
+
+      at Object.showMessage (utilities/common/show-message.ts:36:11)
+
+  console.log
+    [test-log]: Button (text: OK) is clickable, as expected.
+
+      at Object.showMessage (utilities/common/show-message.ts:36:11)
+
+  console.log
+    [test-log]: Button (text: OK) is clicked.
+
+      at Object.showMessage (utilities/common/show-message.ts:36:11)
+
+  console.log
+    [test-log]: Checking if element JSHandle@node is clickable...
+
+      at Object.showMessage (utilities/common/show-message.ts:36:11)
+
+  console.log
+    [test-log]: Element (JSHandle@node) is clickable, as expected.
+
+      at Object.showMessage (utilities/common/show-message.ts:36:11)
+
+  console.log
+    [test-log]: Button (text: Sign in) is clickable, as expected.
+
+      at Object.showMessage (utilities/common/show-message.ts:36:11)
+
+  console.log
+    [test-log]: Button (text: Sign in) is clicked.
+
+      at Object.showMessage (utilities/common/show-message.ts:36:11)
+
+[test-log]: Test failed: Capturing screenshots...
+[test-log]: Test failed: Capturing screenshots...
+[test-log]: Test failed: Capturing screenshots...
+[test-log]: Test failed: Capturing screenshots...
+  console.log
+    [test-log]: Closing browsers for 0 users.
+
+      at Object.showMessage (utilities/common/show-message.ts:36:11)
+
+  console.log
+    [test-log]: All browsers closed.
+
+      at Object.showMessage (utilities/common/show-message.ts:36:11)
+
