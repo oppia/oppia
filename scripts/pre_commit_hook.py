@@ -1,17 +1,17 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 #
 # Copyright 2019 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the 'License');
 # you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at.
+# You may obtain a copy of the License at
 #
 #      http://www.apache.org/licenses/LICENSE-2.0
 #
-# Unless required by applicable law or agreed to in writing, software.
+# Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an 'AS-IS' BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and.
+# See the License for the specific language governing permissions and
 # limitations under the License.
 
 """Pre-commit hook that checks files added/modified in a commit.
@@ -35,15 +35,15 @@ import subprocess
 import sys
 
 # When executing Python scripts using `python -m ...` from oppia/oppia,
-# Python adds the repository root to sys.path. See the documentation at.
+# Python adds the repository root to sys.path. See the documentation at
 #
-#   https://docs.python.org/3.10/library/sys.html#sys.path.
+#   https://docs.python.org/3.10/library/sys.html#sys.path
 #
-# However, when git executes pre_commit_hook.py from its symlink in.
-# /.git/hooks, the shebang #!/usr/bin/env python at the top of this file.
-# causes the python interpreter to execute this hook directly rather than.
+# However, when git executes pre_commit_hook.py from its symlink in
+# /.git/hooks, the shebang #!/usr/bin/env python at the top of this file
+# causes the python interpreter to execute this hook directly rather than
 # as a discovered module. So, Python instead adds /.git/hooks to sys.path,
-# rather than the opipa/oppia root. To correct this problem, we add the.
+# rather than the opipa/oppia root. To correct this problem, we add the
 # current working directory to sys.path.
 sys.path.append(os.getcwd())
 from core import feconf  # isort:skip # pylint: disable=wrong-import-position.
@@ -84,7 +84,7 @@ def install_hook() -> None:
     if file_is_symlink and file_exists:
         print('Symlink already exists')
     else:
-        # This is needed, because otherwise some systems symlink/copy the .pyc.
+        # This is needed, because otherwise some systems symlink/copy the .pyc
         # file instead of the .py file.
         this_file = __file__.replace('pyc', 'py')
         # If its a broken symlink, delete it.
