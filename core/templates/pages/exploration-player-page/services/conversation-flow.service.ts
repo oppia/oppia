@@ -187,6 +187,7 @@ export class ConversationFlowService {
    * @returns {boolean} - True if the card has a supplemental (non-inline) view; otherwise, false.
    */
   isSupplementalCardNonempty(card: StateCard): boolean {
+    console.log(!card.isInteractionInline());
     return !card.isInteractionInline();
   }
 

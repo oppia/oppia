@@ -4084,3 +4084,7 @@ mat-tooltip-component .mat-tooltip.oppia-mat-tooltip-list {
   color: #fc0;
   margin-left: 5px;
 }
+
+.hidden-element {
+  outline: 0;
+}

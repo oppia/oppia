@@ -35,7 +35,7 @@ import {StateCard} from '../../../../domain/state_card/state-card.model';
 import {UrlInterpolationService} from '../../../../domain/utilities/url-interpolation.service';
 import {AudioPlayerService} from '../../../../services/audio-player.service';
 import {WindowRef} from '../../../../services/contextual/window-ref.service';
-import {ExplorationPlayerConstants} from '../exploration-player-page.constants';
+import {ExplorationPlayerConstants} from '../../current-lesson-player/exploration-player-page.constants';
 import {CurrentInteractionService} from '../../services/current-interaction.service';
 import {
   HelpCardEventResponse,
