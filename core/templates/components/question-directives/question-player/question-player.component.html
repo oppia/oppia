@@ -25,7 +25,7 @@
             matTooltipClass="oppia-mat-tooltip-list">
         Beta
       </span>
-      <div [hidden]="!(totalQuestions > 0)">
+      <div *ngIf="!questionsLoading && totalQuestions > 0">
         <h2 class="oppia-question-player-header"
             tabindex="0"
             [attr.aria-label]="'Question ' + currentQuestion + ' out of ' + totalQuestions">
@@ -35,7 +35,7 @@
           <div class="current-progress" [ngStyle]="{'width': currentProgress + '%'}"></div>
         </div>
       </div>
-      <div [hidden]="!(totalQuestions === 0)">
+      <div *ngIf="!questionsLoading && totalQuestions === 0">
         <h4 class="practice-questions-coming-soon-header">Coming Soon!</h4>
         <div class="practice-questions-coming-soon-text">There are no questions created yet for the selected subtopic(s). Please check back later!</div>
       </div>

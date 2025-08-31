@@ -18,8 +18,8 @@
  */
 
 import {Injectable} from '@angular/core';
-import {ExplorationMetadata} from 'domain/exploration/ExplorationMetadataObjectFactory';
-import {State} from 'domain/state/StateObjectFactory';
+import {ExplorationMetadata} from 'domain/exploration/exploration-metadata.model';
+import {State} from 'domain/state/state.model';
 import {
   EntityTranslationsService,
   LanguageCodeToEntityTranslations,

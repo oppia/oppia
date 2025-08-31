@@ -79,31 +79,60 @@ describe('Schema based editor component', function () {
     expect(component.localValue).toEqual(10);
   });
 
-  it('should set form validity', fakeAsync(() => {
-    let mockEmitter = new EventEmitter();
-    let form = jasmine.createSpyObj('form', ['$setValidity']);
-
+  it('should trigger validator change on form status change', fakeAsync(() => {
+    const mockEmitter = new EventEmitter<void>();
     spyOnProperty(component.form, 'statusChanges').and.returnValue(mockEmitter);
-    spyOn(angular, 'element').and.returnValue(
-      // This throws "Type '{ top: number; }' is not assignable to type
-      // 'JQLite | Coordinates'". We need to suppress this error because
-      // angular element have more properties than offset and top.
-      // @ts-expect-error
-      {
-        controller: (formString: string) => {
-          return form;
-        },
-      }
-    );
+
+    const validatorSpy = jasmine.createSpy('validatorSpy');
+    component.registerOnValidatorChange(validatorSpy);
 
     component.ngAfterViewInit();
     tick();
-    mockEmitter.emit('INVALID');
-    tick();
-    mockEmitter.emit();
 
-    component.writeValue(10);
-    expect(component.localValue).toEqual(10);
-    expect(form.$setValidity).toHaveBeenCalledTimes(2);
+    mockEmitter.emit();
+    tick();
+
+    expect(validatorSpy).toHaveBeenCalled();
   }));
+
+  it('should call onTouched when onTouch is called', () => {
+    const onTouchedSpy = jasmine.createSpy('onTouched');
+    component.registerOnTouched(onTouchedSpy);
+
+    component.onTouch();
+
+    expect(onTouchedSpy).toHaveBeenCalled();
+  });
+
+  it('should call onTouch and emit blur event when onInputBlur is called', () => {
+    const touchSpy = spyOn(component, 'onTouch');
+    spyOn(component.inputBlur, 'emit');
+
+    component.onInputBlur();
+
+    expect(touchSpy).toHaveBeenCalled();
+    expect(component.inputBlur.emit).toHaveBeenCalled();
+  });
+
+  it('should emit focus event when onInputFocus is called', () => {
+    spyOn(component.inputFocus, 'emit');
+
+    component.onInputFocus();
+
+    expect(component.inputFocus.emit).toHaveBeenCalled();
+  });
+
+  it('should set disabled state when setDisabledState is called', () => {
+    component.setDisabledState(true);
+    expect(component.disabled).toBeTrue();
+
+    component.setDisabledState(false);
+    expect(component.disabled).toBeFalse();
+  });
+
+  it('should return null when validate is called without form', () => {
+    component.form = null as unknown as typeof component.form;
+    const result = component.validate(new FormControl(1));
+    expect(result).toBeNull();
+  });
 });
