@@ -28,7 +28,7 @@ import {TopicManager} from '../../utilities/user/topic-manager';
 const ROLES = testConstants.Roles;
 
 describe('Topic Manager', function () {
-  let topicManager: TopicManager & ExplorationEditor;
+  let topicManager: TopicManager & ExplorationEditor & CurriculumAdmin;
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
 
   beforeAll(async function () {
