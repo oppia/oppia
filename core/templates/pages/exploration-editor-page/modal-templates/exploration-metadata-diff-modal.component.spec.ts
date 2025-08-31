@@ -31,11 +31,9 @@ import {ExplorationMetadataDiffModalComponent} from './exploration-metadata-diff
 import {
   ExplorationMetadata,
   ExplorationMetadataBackendDict,
-  ExplorationMetadataObjectFactory,
-} from 'domain/exploration/ExplorationMetadataObjectFactory';
+} from 'domain/exploration/exploration-metadata.model';
 
 describe('Exploration Metadata Diff Modal Component', () => {
-  let explorationMetadataObjectFactory: ExplorationMetadataObjectFactory;
   let component: ExplorationMetadataDiffModalComponent;
   let fixture: ComponentFixture<ExplorationMetadataDiffModalComponent>;
   let historyTabYamlConversionService: HistoryTabYamlConversionService;
@@ -61,9 +59,6 @@ describe('Exploration Metadata Diff Modal Component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ExplorationMetadataDiffModalComponent);
     component = fixture.componentInstance;
-    explorationMetadataObjectFactory = TestBed.inject(
-      ExplorationMetadataObjectFactory
-    );
     historyTabYamlConversionService = TestBed.inject(
       HistoryTabYamlConversionService
     );
@@ -101,10 +96,10 @@ describe('Exploration Metadata Diff Modal Component', () => {
       edits_allowed: true,
     };
 
-    newMetadata = explorationMetadataObjectFactory.createFromBackendDict(
+    newMetadata = ExplorationMetadata.createFromBackendDict(
       newExplorationMetadataBackendDict
     );
-    oldMetadata = explorationMetadataObjectFactory.createFromBackendDict(
+    oldMetadata = ExplorationMetadata.createFromBackendDict(
       oldExplorationMetadataBackendDict
     );
 

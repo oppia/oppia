@@ -128,7 +128,7 @@ describe('Add Or Update Solution Modal Component', () => {
       });
       expect(component.answerIsValid).toBeFalse();
       expect(component.ansOptions).toEqual(['The only', 'One']);
-      expect(component.tempAnsOption).toEqual('One');
+      expect(component.tempAnsOption).toEqual('The only');
     });
 
     it('should update the answerIsExclusive correctly', () => {

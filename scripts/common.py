@@ -71,7 +71,7 @@ YARN_VERSION = '1.22.15'
 #    the upgrade to develop.
 # 7. If any tests fail, DO NOT upgrade to this newer version of the redis cli.
 REDIS_CLI_VERSION = '6.2.4'
-ELASTICSEARCH_VERSION = '7.17.0'
+ELASTICSEARCH_VERSION = '7.17.27'
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
 CURR_DIR = os.path.abspath(os.getcwd())

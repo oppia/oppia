@@ -198,8 +198,9 @@ export class PracticeTabComponent implements OnInit, OnDestroy {
       this.topicName,
       selectedSubtopicIds.toString()
     );
-    this.windowRef.nativeWindow.location.href = practiceSessionsUrl;
+
     this.loaderService.showLoadingScreen('Loading');
+    this.windowRef.nativeWindow.location.href = practiceSessionsUrl;
   }
 
   isAtLeastOneSubtopicSelected(): boolean {
