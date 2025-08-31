@@ -45,12 +45,12 @@ import {ChangeListService} from '../../services/change-list.service';
 import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 import {EntityVoiceovers} from '../../../../domain/voiceover/entity-voiceovers.model';
 import {Voiceover} from '../../../../domain/exploration/voiceover.model';
 import {LocalStorageService} from 'services/local-storage.service';
 import {VoiceoverPlayerService} from '../../../exploration-player-page/services/voiceover-player.service';
 import {VoiceoverLanguageManagementService} from 'services/voiceover-language-management-service';
-
 class MockNgbModal {
   open() {
     return {
@@ -66,6 +66,47 @@ class MockPageContextService {
 
   isExplorationLinkedToStory() {
     return true;
+  }
+}
+
+class MockPlatformFeatureService {
+  get status(): object {
+    return {
+      EnableVoiceoverContribution: {
+        isEnabled: true,
+      },
+      AddVoiceoverWithAccent: {
+        isEnabled: false,
+      },
+    };
+  }
+}
+class MockVoiceoverLanguageManagementService {
+  languageAccentMasterList = {};
+  autoGeneratableLanguageAccentCodes = [];
+  languageCodesMapping = {};
+  cloudSupportedLanguageAccentCodes = [];
+  init(
+    languageAccentMasterList: Record<string, Record<string, string>>,
+    autoGeneratableLanguageAccentCodes: string[],
+    languageCodesMapping: Record<string, Record<string, boolean>>
+  ): void {
+    this.languageAccentMasterList = languageAccentMasterList;
+    this.autoGeneratableLanguageAccentCodes =
+      autoGeneratableLanguageAccentCodes;
+    this.languageCodesMapping = languageCodesMapping;
+  }
+  getAutogeneratableLanguageAccents(languageCode: string): string[] {
+    return [];
+  }
+  canVoiceoverForLanguage(languageCode: string): boolean {
+    return true;
+  }
+  setCloudSupportedLanguageAccents(languageCode: string): void {}
+  isAutogenerationSupportedGivenLanguageAccent(
+    languageAccentCode: string
+  ): boolean {
+    return false;
   }
 }
 
@@ -106,6 +147,14 @@ describe('Translator Overview component', () => {
           provide: PageContextService,
           useClass: MockPageContextService,
         },
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService,
+        },
+        {
+          provide: VoiceoverLanguageManagementService,
+          useClass: MockVoiceoverLanguageManagementService,
+        },
         WindowRef,
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -140,6 +189,8 @@ describe('Translator Overview component', () => {
     voiceoverLanguageManagementService = TestBed.inject(
       VoiceoverLanguageManagementService
     );
+
+    spyOn(voiceoverLanguageManagementService, 'init').and.callThrough();
 
     spyOn(
       translationTabActiveModeService,

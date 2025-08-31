@@ -101,7 +101,7 @@ class MockWindowRef {
   };
 }
 
-describe('Conversation skin component', () => {
+describe('New Conversation skin component', () => {
   let fixture: ComponentFixture<NewConversationSkinComponent>;
   let componentInstance: NewConversationSkinComponent;
   let chapterProgressService: ChapterProgressService;
@@ -520,6 +520,219 @@ describe('Conversation skin component', () => {
     );
   }));
 
+  describe('isCheckpointCelebrationFooterEnabled', () => {
+    let mockStateCard: StateCard;
+    let mockPreviousCard: StateCard;
+    let mockFirstCard: StateCard;
+    let mockState: State;
+
+    beforeEach(() => {
+      mockStateCard = jasmine.createSpyObj('StateCard', ['getStateName']);
+      mockPreviousCard = jasmine.createSpyObj('StateCard', ['getStateName']);
+      mockFirstCard = jasmine.createSpyObj('StateCard', ['getStateName']);
+      mockState = jasmine.createSpyObj('State', [], {
+        cardIsCheckpoint: true,
+      });
+
+      mockStateCard.getStateName.and.returnValue('CurrentState');
+      mockPreviousCard.getStateName.and.returnValue('PreviousState');
+      mockFirstCard.getStateName.and.returnValue('FirstState');
+    });
+
+    it('should return true when all conditions are met for checkpoint celebration', () => {
+      spyOn(
+        playerTranscriptService,
+        'getPrevSessionStatesProgress'
+      ).and.returnValue([]);
+      spyOn(playerTranscriptService, 'getCard').and.callFake(
+        (index: number) => {
+          if (index === 0) {
+            return mockFirstCard;
+          }
+          return mockPreviousCard;
+        }
+      );
+      spyOn(conversationFlowService, 'getDisplayedCard').and.returnValue(
+        mockStateCard
+      );
+      spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(2);
+      spyOn(playerTranscriptService, 'getNumCards').and.returnValue(3);
+      spyOn(explorationEngineService, 'getStateFromStateName').and.returnValue(
+        mockState
+      );
+
+      componentInstance.checkpointCelebrationIsShown = true;
+
+      expect(componentInstance.isCheckpointCelebrationFooterEnabled()).toBe(
+        true
+      );
+    });
+
+    it('should return false when previous session states progress includes previous card name', () => {
+      spyOn(
+        playerTranscriptService,
+        'getPrevSessionStatesProgress'
+      ).and.returnValue(['PreviousState']);
+      spyOn(playerTranscriptService, 'getCard').and.callFake(
+        (index: number) => {
+          if (index === 0) {
+            return mockFirstCard;
+          }
+          return mockPreviousCard;
+        }
+      );
+      spyOn(conversationFlowService, 'getDisplayedCard').and.returnValue(
+        mockStateCard
+      );
+      spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(2);
+      spyOn(playerTranscriptService, 'getNumCards').and.returnValue(3);
+      spyOn(explorationEngineService, 'getStateFromStateName').and.returnValue(
+        mockState
+      );
+
+      componentInstance.checkpointCelebrationIsShown = true;
+
+      expect(componentInstance.isCheckpointCelebrationFooterEnabled()).toBe(
+        false
+      );
+    });
+
+    it('should return false when checkpointCelebrationIsShown is false', () => {
+      spyOn(
+        playerTranscriptService,
+        'getPrevSessionStatesProgress'
+      ).and.returnValue([]);
+      spyOn(playerTranscriptService, 'getCard').and.callFake(
+        (index: number) => {
+          if (index === 0) {
+            return mockFirstCard;
+          }
+          return mockPreviousCard;
+        }
+      );
+      spyOn(conversationFlowService, 'getDisplayedCard').and.returnValue(
+        mockStateCard
+      );
+      spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(2);
+      spyOn(playerTranscriptService, 'getNumCards').and.returnValue(3);
+      spyOn(explorationEngineService, 'getStateFromStateName').and.returnValue(
+        mockState
+      );
+
+      componentInstance.checkpointCelebrationIsShown = false;
+
+      expect(componentInstance.isCheckpointCelebrationFooterEnabled()).toBe(
+        false
+      );
+    });
+
+    it('should return false when displayed card is the first state', () => {
+      spyOn(
+        playerTranscriptService,
+        'getPrevSessionStatesProgress'
+      ).and.returnValue([]);
+      spyOn(playerTranscriptService, 'getCard').and.returnValue(mockFirstCard);
+      spyOn(conversationFlowService, 'getDisplayedCard').and.returnValue(
+        mockFirstCard
+      );
+      spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(0);
+      spyOn(playerTranscriptService, 'getNumCards').and.returnValue(3);
+      spyOn(explorationEngineService, 'getStateFromStateName').and.returnValue(
+        mockState
+      );
+
+      componentInstance.checkpointCelebrationIsShown = true;
+
+      expect(componentInstance.isCheckpointCelebrationFooterEnabled()).toBe(
+        false
+      );
+    });
+
+    it('should return false when state is not a checkpoint', () => {
+      const nonCheckpointState = jasmine.createSpyObj('State', [], {
+        cardIsCheckpoint: false,
+      });
+
+      spyOn(
+        playerTranscriptService,
+        'getPrevSessionStatesProgress'
+      ).and.returnValue([]);
+      spyOn(playerTranscriptService, 'getCard').and.callFake(
+        (index: number) => {
+          if (index === 0) {
+            return mockFirstCard;
+          }
+          return mockPreviousCard;
+        }
+      );
+      spyOn(conversationFlowService, 'getDisplayedCard').and.returnValue(
+        mockStateCard
+      );
+      spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(2);
+      spyOn(playerTranscriptService, 'getNumCards').and.returnValue(3);
+      spyOn(explorationEngineService, 'getStateFromStateName').and.returnValue(
+        nonCheckpointState
+      );
+
+      componentInstance.checkpointCelebrationIsShown = true;
+
+      expect(componentInstance.isCheckpointCelebrationFooterEnabled()).toBe(
+        false
+      );
+    });
+
+    it('should return false when display card index is 0', () => {
+      spyOn(
+        playerTranscriptService,
+        'getPrevSessionStatesProgress'
+      ).and.returnValue([undefined]);
+      spyOn(playerTranscriptService, 'getCard').and.returnValue(mockFirstCard);
+      spyOn(conversationFlowService, 'getDisplayedCard').and.returnValue(
+        mockStateCard
+      );
+      spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(0);
+      spyOn(playerTranscriptService, 'getNumCards').and.returnValue(3);
+      spyOn(explorationEngineService, 'getStateFromStateName').and.returnValue(
+        mockState
+      );
+
+      componentInstance.checkpointCelebrationIsShown = true;
+
+      expect(componentInstance.isCheckpointCelebrationFooterEnabled()).toBe(
+        false
+      );
+    });
+
+    it('should handle edge case when display card index exceeds number of cards', () => {
+      spyOn(
+        playerTranscriptService,
+        'getPrevSessionStatesProgress'
+      ).and.returnValue([undefined]);
+      spyOn(playerTranscriptService, 'getCard').and.callFake(
+        (index: number) => {
+          if (index === 0) {
+            return mockFirstCard;
+          }
+          return mockPreviousCard;
+        }
+      );
+      spyOn(conversationFlowService, 'getDisplayedCard').and.returnValue(
+        mockStateCard
+      );
+      spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(5);
+      spyOn(playerTranscriptService, 'getNumCards').and.returnValue(3);
+      spyOn(explorationEngineService, 'getStateFromStateName').and.returnValue(
+        mockState
+      );
+
+      componentInstance.checkpointCelebrationIsShown = true;
+
+      expect(componentInstance.isCheckpointCelebrationFooterEnabled()).toBe(
+        false
+      );
+    });
+  });
+
   it('should initialize component', fakeAsync(() => {
     let collectionId = 'id';
     let expId = 'exp_id';
@@ -680,6 +893,7 @@ describe('Conversation skin component', () => {
 
     windowRef.nativeWindow.onresize(null);
     tick(1000);
+    flush();
   }));
 
   it('should initialize component as logged in user', fakeAsync(() => {
