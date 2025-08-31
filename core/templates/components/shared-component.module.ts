@@ -225,6 +225,10 @@ import {NewEndChapterConfettiComponent} from 'pages/exploration-player-page/new-
 import {NewEndChapterCheckMarkComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/new-end-chapter-check-mark.component';
 import {PlayerHeaderComponent} from 'pages/exploration-player-page/new-lesson-player/header-components/player-header.component';
 import {ProgressBarComponent} from './progress-bar/progress-bar.component';
+import {ProgressTrackerComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/progress-tracker.component';
+import {CheckpointBarComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/checkpoint-bar.component';
+import {SaveProgressModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/save-progress-modal.component';
+import {CheckpointCelebrationFooterComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/checkpoint-celebration-footer.component';
 @NgModule({
   imports: [
     BackgroundBannerModule,
@@ -275,6 +279,7 @@ import {ProgressBarComponent} from './progress-bar/progress-bar.component';
     CompletionGraphComponent,
     CorrectnessFooterComponent,
     NewCorrectnessFooterComponent,
+    CheckpointCelebrationFooterComponent,
     ConfirmLeaveModalComponent,
     ConfirmQuestionExitModalComponent,
     ContinueButtonComponent,
@@ -284,6 +289,8 @@ import {ProgressBarComponent} from './progress-bar/progress-bar.component';
     CardNavigationControlComponent,
     ProgressBarComponent,
     NewConversationSkinComponent,
+    ProgressTrackerComponent,
+    CheckpointBarComponent,
     EndChapterCheckMarkComponent,
     NewEndChapterCheckMarkComponent,
     EndChapterConfettiComponent,
@@ -308,6 +315,7 @@ import {ProgressBarComponent} from './progress-bar/progress-bar.component';
     FilteredChoicesFieldComponent,
     FeedbackPopupComponent,
     PracticeTabComponent,
+    SaveProgressModalComponent,
     CollectionSummaryTileComponent,
     ExplorationEmbedButtonModalComponent,
     CheckpointCelebrationModalComponent,
@@ -440,6 +448,7 @@ import {ProgressBarComponent} from './progress-bar/progress-bar.component';
     CompletionGraphComponent,
     CorrectnessFooterComponent,
     NewCorrectnessFooterComponent,
+    CheckpointCelebrationFooterComponent,
     ConfirmLeaveModalComponent,
     PlayerHeaderComponent,
     ConfirmQuestionExitModalComponent,
@@ -449,6 +458,8 @@ import {ProgressBarComponent} from './progress-bar/progress-bar.component';
     ConversationSkinComponent,
     ConversationDisplayComponent,
     CardNavigationControlComponent,
+    ProgressTrackerComponent,
+    CheckpointBarComponent,
     NewConversationSkinComponent,
     EndChapterCheckMarkComponent,
     NewEndChapterCheckMarkComponent,
@@ -456,6 +467,7 @@ import {ProgressBarComponent} from './progress-bar/progress-bar.component';
     EndChapterConfettiComponent,
     NewEndChapterConfettiComponent,
     CreateNewSkillModalComponent,
+    SaveProgressModalComponent,
     CreateActivityModalComponent,
     CustomizeInteractionModalComponent,
     DeleteHintModalComponent,
@@ -614,6 +626,7 @@ import {ProgressBarComponent} from './progress-bar/progress-bar.component';
     FormsModule,
     MaterialModule,
     NgBootstrapModule,
+    CheckpointCelebrationFooterComponent,
     RichTextComponentsModule,
     ObjectComponentsModule,
     OppiaCkEditor4Module,
@@ -630,6 +643,9 @@ import {ProgressBarComponent} from './progress-bar/progress-bar.component';
     NewCorrectnessFooterComponent,
     ConfirmLeaveModalComponent,
     ConfirmQuestionExitModalComponent,
+    SaveProgressModalComponent,
+    ProgressTrackerComponent,
+    CheckpointBarComponent,
     ContinueButtonComponent,
     ContentLanguageSelectorComponent,
     ProgressBarComponent,

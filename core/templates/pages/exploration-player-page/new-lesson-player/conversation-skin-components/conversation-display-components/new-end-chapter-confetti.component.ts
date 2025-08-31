@@ -16,7 +16,7 @@
  * @fileoverview Component for the end chapter celebration confetti component.
  */
 
-import {Component, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import './new-end-chapter-confetti.component.css';
 
@@ -26,10 +26,14 @@ import './new-end-chapter-confetti.component.css';
   styleUrls: ['./new-end-chapter-confetti.component.css'],
 })
 export class NewEndChapterConfettiComponent implements OnInit {
+  @Input() topOffset: string = '40px';
   confettiIsShown: boolean = false;
   endChapterCelebratoryAudio = new Audio();
 
-  constructor(private urlInterpolationService: UrlInterpolationService) {}
+  constructor(
+    private urlInterpolationService: UrlInterpolationService,
+    private cdRef: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.endChapterCelebratoryAudio.src =
@@ -41,6 +45,7 @@ export class NewEndChapterConfettiComponent implements OnInit {
 
   animateConfetti(): void {
     this.confettiIsShown = true;
+    this.cdRef.detectChanges();
     this.endChapterCelebratoryAudio.play();
   }
 }

@@ -9,6 +9,7 @@ oppia-conversation-display .oppia-learner-view-card-content .oppia-learner-confi
   margin-left: 10px;
 }
 
+oppia-conversation-display .conversation-skin-oppia-completed-state-card,
 oppia-conversation-display .oppia-learner-view-card-top-section {
   background-color: #fff;
   border-radius: 0 16px 16px;
@@ -60,6 +61,7 @@ oppia-conversation-display .conversation-skin-instruction-disabled {
   color: gray;
 }
 
+oppia-conversation-display .conversation-skin-oppia-completed-state-card .conversation-skin-oppia-avatar,
 oppia-conversation-display .oppia-learner-view-card-top-section .conversation-skin-oppia-avatar {
   border: 2px solid #c55f45;
   border-radius: 50%;
@@ -69,7 +71,7 @@ oppia-conversation-display .oppia-learner-view-card-top-section .conversation-sk
   width: 100px;
 }
 
-oppia-conversation-display .oppia-learner-view-card-top-section .left-side-curve {
+oppia-conversation-display .left-side-curve {
   height: 49px;
   left: -37px;
   position: absolute;
@@ -272,12 +274,6 @@ oppia-conversation-display .oppia-no-interaction-text {
   color: #f00;
 }
 
-oppia-conversation-display .conversation-skin-oppia-completed-state-card {
-  margin: 60px 0 40px;
-  padding: 0 20px;
-  position: relative;
-}
-
 oppia-conversation-display .conversation-skin-oppia-completed-state-card .conversation-skin-oppia-feedback-content {
   color: #888;
   font-style: italic;
@@ -306,10 +302,8 @@ oppia-conversation-display .oppia-mcq-question-description-text {
   }
 }
 
-/* ============================This comment has been placed to segregate the old code and the new CSS media queries=================================================== */
-/* It will be removed after the completion of the New lesson Player */
-
 @media (max-width: 480px) {
+  oppia-conversation-display .conversation-skin-oppia-completed-state-card .conversation-skin-oppia-avatar,
   oppia-conversation-display .oppia-learner-view-card-top-section .conversation-skin-oppia-avatar {
     height: 34px;
     left: -38px;
@@ -317,7 +311,7 @@ oppia-conversation-display .oppia-mcq-question-description-text {
     width: 34px;
   }
 
-  oppia-conversation-display .oppia-learner-view-card-top-section .left-side-curve {
+  oppia-conversation-display .left-side-curve {
     height: 29px;
     left: -18px;
     position: absolute;
@@ -334,13 +328,14 @@ oppia-conversation-display .oppia-mcq-question-description-text {
 }
 
 @media (min-width: 481px) and (max-width: 768px) {
+  oppia-conversation-display .conversation-skin-oppia-completed-state-card .conversation-skin-oppia-avatar,
   oppia-conversation-display .oppia-learner-view-card-top-section .conversation-skin-oppia-avatar {
     height: 64px;
     left: -68px;
     width: 64px;
   }
 
-  oppia-conversation-display .oppia-learner-view-card-top-section .left-side-curve {
+  oppia-conversation-display .left-side-curve {
     height: 39px;
     left: -28px;
     position: absolute;
@@ -356,17 +351,23 @@ oppia-conversation-display .oppia-mcq-question-description-text {
 }
 
 @media (min-width: 769px) and (max-width: 1023px) {
+  oppia-conversation-display .conversation-skin-oppia-completed-state-card .conversation-skin-oppia-avatar,
   oppia-conversation-display .oppia-learner-view-card-top-section .conversation-skin-oppia-avatar {
     height: 64px;
     left: -68px;
     width: 64px;
   }
 
-  oppia-conversation-display .oppia-learner-view-card-top-section .left-side-curve {
+  oppia-conversation-display .left-side-curve {
     height: 39px;
     left: -28px;
     position: absolute;
     top: -8px;
     width: 29px;
   }
+}
+
+oppia-conversation-display .conversation-skin-oppia-completed-state-card {
+  margin-top: 35px;
+  padding: 32px;
 }
