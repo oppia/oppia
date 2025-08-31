@@ -26,7 +26,7 @@ import subprocess
 from core.tests import test_utils
 
 import psutil
-from typing import List, Tuple
+from typing import Any, List, Tuple
 
 from . import pre_commit_hook
 
@@ -360,10 +360,11 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         def mock_check_changes_in_config() -> None:
             check_function_calls['check_changes_in_config_is_called'] = True
         def mock_npx_subprocess(  # pylint: disable=unused-argument
-                cmds: List[str], check: bool) -> None:
+                cmds: List[str], check: bool = False, **kwargs: Any) -> bytes:
             self.assertTrue(cmds[0].endswith('npx'))
             self.assertEqual(cmds[1], 'lint-staged')
             check_function_calls['check_npx_subprocess_is_called'] = True
+            return b''  # Return empty bytes as check_output would
 
         package_lock_swap = self.swap(
             pre_commit_hook, 'does_diff_include_package_lock_file', mock_func)
@@ -375,7 +376,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
             pre_commit_hook, 'check_changes_in_config',
             mock_check_changes_in_config)
         npx_subprocess_swap = self.swap(
-            subprocess, 'run', mock_npx_subprocess)
+            subprocess, 'check_output', mock_npx_subprocess)
         with package_lock_swap, package_lock_in_current_folder_swap:
             with check_config_swap, npx_subprocess_swap:
                 pre_commit_hook.main(args=[])

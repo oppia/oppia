@@ -82,10 +82,12 @@ class CircularDependencyLintChecksManagerTest(unittest.TestCase):
             )
         )
 
-        with mock.patch('subprocess.run') as mock_subprocess:
-            mock_subprocess.side_effect = FileNotFoundError()
-            result = linter._check_madge_installation()  # pylint: disable=protected-access
-            self.assertFalse(result)
+        with mock.patch('os.path.exists') as mock_exists:
+            with mock.patch('subprocess.run') as mock_subprocess:
+                mock_exists.return_value = False  # No local madge
+                mock_subprocess.side_effect = FileNotFoundError()  # No global madge
+                result = linter._check_madge_installation()  # pylint: disable=protected-access
+                self.assertFalse(result)
 
     def test_check_madge_installation_version_failure(self) -> None:
         """Test Madge installation check when version check fails."""
@@ -102,15 +104,13 @@ class CircularDependencyLintChecksManagerTest(unittest.TestCase):
             )
         )
 
-        with mock.patch('subprocess.run') as mock_subprocess:
-            # Madge found.
-            # Version check fails.
-            mock_subprocess.side_effect = [
-                mock.Mock(returncode=0),
-                mock.Mock(returncode=1)
-            ]
-            result = linter._check_madge_installation()  # pylint: disable=protected-access
-            self.assertFalse(result)
+        with mock.patch('os.path.exists') as mock_exists:
+            with mock.patch('subprocess.run') as mock_subprocess:
+                mock_exists.return_value = False  # No local madge
+                # Global madge found but version check fails.
+                mock_subprocess.return_value = mock.Mock(returncode=1)
+                result = linter._check_madge_installation()  # pylint: disable=protected-access
+                self.assertFalse(result)
 
     def test_lint_circular_dependencies_success(self) -> None:
         """Test successful circular dependency linting."""
@@ -127,8 +127,16 @@ class CircularDependencyLintChecksManagerTest(unittest.TestCase):
             )
         )
 
-        result = linter._lint_circular_dependencies()  # pylint: disable=protected-access
-        self.assertEqual(result, [])
+        with mock.patch.object(linter, '_check_madge_installation') as mock_madge:
+            with mock.patch('subprocess.Popen') as mock_popen:
+                mock_madge.return_value = True
+                mock_process = mock.Mock()
+                mock_process.communicate.return_value = (b'', b'')  # No output = no circular deps
+                mock_popen.return_value = mock_process
+                
+                result = linter._lint_circular_dependencies()  # pylint: disable=protected-access
+                self.assertFalse(result.failed)  # Should not be failed
+                self.assertEqual(result.messages, ['No circular dependencies found.'])
 
     def test_lint_circular_dependencies_with_violations(self) -> None:
         """Test circular dependency linting with violations found."""
@@ -145,16 +153,17 @@ class CircularDependencyLintChecksManagerTest(unittest.TestCase):
             )
         )
 
-        with mock.patch(
-            'scripts.run_circular_dependency_checks.'
-            'check_circular_dependencies'
-        ) as mock_check:
-            mock_check.return_value = (
-                'Circular dependency found:\n  file1.js -> file2.js'
-            )
-            result = linter._lint_circular_dependencies()  # pylint: disable=protected-access
-            self.assertTrue(result.failed)
-            self.assertIn('Circular dependency found', result.messages[0])
+        with mock.patch.object(linter, '_check_madge_installation') as mock_madge:
+            with mock.patch('subprocess.Popen') as mock_popen:
+                mock_madge.return_value = True
+                mock_process = mock.Mock()
+                circular_output = 'Finding files\n✖ Found 44 circular dependencies!\n\nfile1.js -> file2.js'
+                mock_process.communicate.return_value = (circular_output.encode(), b'')
+                mock_popen.return_value = mock_process
+                
+                result = linter._lint_circular_dependencies()  # pylint: disable=protected-access
+                self.assertTrue(result.failed)  # Should be failed
+                self.assertIn('Circular dependencies detected', result.messages[0])
 
     def test_perform_all_lint_checks(self) -> None:
         """Test perform_all_lint_checks method."""
@@ -171,8 +180,16 @@ class CircularDependencyLintChecksManagerTest(unittest.TestCase):
             )
         )
 
-        result = linter.perform_all_lint_checks()
-        self.assertEqual(result, [])
+        with mock.patch.object(linter, '_check_madge_installation') as mock_madge:
+            with mock.patch('subprocess.Popen') as mock_popen:
+                mock_madge.return_value = True
+                mock_process = mock.Mock()
+                mock_process.communicate.return_value = (b'', b'')  # No output = no circular deps
+                mock_popen.return_value = mock_process
+                
+                result = linter.perform_all_lint_checks()
+                self.assertEqual(len(result), 1)  # Should return one TaskResult
+                self.assertFalse(result[0].failed)  # Should not be failed
 
 
 class ThirdPartyCircularDependencyLintChecksManagerTest(unittest.TestCase):
