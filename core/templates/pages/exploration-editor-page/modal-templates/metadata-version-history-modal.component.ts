@@ -20,7 +20,7 @@ import {Input, OnInit} from '@angular/core';
 import {Component} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import {ExplorationMetadata} from 'domain/exploration/ExplorationMetadataObjectFactory';
+import {ExplorationMetadata} from 'domain/exploration/exploration-metadata.model';
 import {PageContextService} from 'services/page-context.service';
 import {HistoryTabYamlConversionService} from '../services/history-tab-yaml-conversion.service';
 import {VersionHistoryBackendApiService} from '../services/version-history-backend-api.service';

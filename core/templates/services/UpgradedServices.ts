@@ -154,7 +154,6 @@ import {LearnerParamsService} from 'pages/exploration-player-page/services/learn
 import {LocalStorageService} from 'services/local-storage.service';
 import {LoaderService} from 'services/loader.service';
 import {LoggerService} from 'services/contextual/logger.service';
-import {LostChangeObjectFactory} from 'domain/exploration/LostChangeObjectFactory';
 import {
   MathEquationInputRulesService,
   // eslint-disable-next-line max-len
@@ -333,9 +332,9 @@ import {ResponsesService} from 'pages/exploration-editor-page/editor-tab/service
 import {QuestionValidationService} from './question-validation.service';
 import {MathInteractionsService} from './math-interactions.service';
 import {EntityVoiceoversService} from './entity-voiceovers.services';
-import {VoiceoverLanguageManagementService} from './voiceover-language-management-service';
 import {AutomaticVoiceoverHighlightService} from './automatic-voiceover-highlight-service';
 import {VoiceoverPlayerService} from 'pages/exploration-player-page/services/voiceover-player.service';
+import {VoiceoverLanguageManagementService} from './voiceover-language-management-service';
 
 interface UpgradedServicesDict {
   // Type 'unknown' is used here because we don't know the exact type of
@@ -426,9 +425,6 @@ export class UpgradedServices {
     upgradedServices['LearnerParamsService'] = new LearnerParamsService();
     upgradedServices['LoaderService'] = new LoaderService();
     upgradedServices['LoggerService'] = new LoggerService();
-    upgradedServices['LostChangeObjectFactory'] = new LostChangeObjectFactory(
-      new UtilsService()
-    );
     upgradedServices['MathEquationInputRulesService'] =
       new MathEquationInputRulesService(
         upgradedServices['AlgebraicExpressionInputRulesService']
