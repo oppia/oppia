@@ -36,7 +36,7 @@ class MockFocusOnDirective {
   @Input() oppiaFocusOn: string = '';
 }
 
-fdescribe('LessonFeedbackModalComponent', () => {
+describe('LessonFeedbackModalComponent', () => {
   let component: LessonFeedbackModalComponent;
   let fixture: ComponentFixture<LessonFeedbackModalComponent>;
   let ngbActiveModal: NgbActiveModal;
