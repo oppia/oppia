@@ -742,7 +742,7 @@ def main(args: Optional[List[str]] = None) -> None:
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
-# it will only be called when run_lint_checks.py is used as a.
-# script
+# it will only be called when run_lint_checks.py is used as a
+# script.
 if __name__ == '__main__': # pragma: no cover
     main()
