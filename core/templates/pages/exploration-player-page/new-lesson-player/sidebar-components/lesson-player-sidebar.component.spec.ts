@@ -75,6 +75,7 @@ describe('LessonPlayerSidebarComponent', () => {
     visibilitySubject = new BehaviorSubject<boolean>(false);
     mockMobileMenuService = {
       getMenuVisibility: () => visibilitySubject.asObservable(),
+      toggleMenuVisibility: jasmine.createSpy('toggleMenuVisibility'),
     };
 
     const ngbModalSpy = jasmine.createSpyObj('NgbModal', ['open']);
@@ -429,6 +430,7 @@ describe('LessonPlayerSidebarComponent', () => {
 
     const result = component.showFeedbackModal();
 
+    // Manually trigger the subscription since it happens synchronously
     expect(mockBottomSheet.open).toHaveBeenCalledWith(
       LessonFeedbackModalComponent
     );
