@@ -82,5 +82,8 @@ export class SchemaBasedHtmlEditorComponent
   updateValue(value: string): void {
     this.localValue = value;
     this.onChange(value);
+    setTimeout(() => {
+      this.onChange(value);
+    });
   }
 }
