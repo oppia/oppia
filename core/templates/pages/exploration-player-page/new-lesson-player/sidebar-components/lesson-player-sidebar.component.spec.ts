@@ -430,7 +430,6 @@ describe('LessonPlayerSidebarComponent', () => {
 
     const result = component.showFeedbackModal();
 
-    // Manually trigger the subscription since it happens synchronously
     expect(mockBottomSheet.open).toHaveBeenCalledWith(
       LessonFeedbackModalComponent
     );
