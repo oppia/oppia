@@ -356,6 +356,10 @@ oppia-conversation-display .oppia-mcq-question-description-text {
     margin-top: 30px;
     padding-bottom: 30px;
   }
+
+  oppia-conversation-display .oppia-conversation-display .oppia-learner-view-card-top-section {
+    width: 100%;
+  }
 }
 
 @media (min-width: 769px) and (max-width: 1023px) {
