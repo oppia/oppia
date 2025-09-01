@@ -2770,6 +2770,12 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(dismissTranslationWelcomeModalSelector, {
       hidden: true,
     });
+
+    // Scroll to top to ensure translation tab elements are visible for the tour.
+    await this.page.evaluate(() => {
+      window.scrollTo(0, 0);
+    });
+
     showMessage('Translation tutorial pop-up closed successfully.');
   }
 
@@ -5727,6 +5733,11 @@ export class ExplorationEditor extends BaseUser {
     await this.isElementVisible(translationTourButtonSelector);
     await this.clickOn(translationTourButtonSelector);
 
+    // Scroll to top to ensure the translation tab elements are visible for the tour.
+    await this.page.evaluate(() => {
+      window.scrollTo(0, 0);
+    });
+
     await this.expectElementToBeVisible(joyrideBodySelector);
   }
 
@@ -5811,10 +5822,38 @@ export class ExplorationEditor extends BaseUser {
     await this.expectJoyrideNextButtonToBeVisible();
 
     const currentStep = await this.getTextContent(joyrideStepSelector);
+
+    // Scroll the next button into view if needed.
+    await this.page.evaluate(selector => {
+      const element = document.querySelector(selector);
+      if (element) {
+        element.scrollIntoView({block: 'center', inline: 'center'});
+      }
+    }, nextButtonSelector);
+
     await this.page.click(nextButtonSelector);
 
     await this.waitForPageToFullyLoad();
     await this.page.waitForTimeout(1000);
+
+    // Check if we're transitioning to the "Choose a Part of the Card to Translate" step
+    // and ensure the translation content area is visible while keeping joyride controls accessible.
+    await this.page.evaluate(() => {
+      const currentTitle = document
+        .querySelector('.e2e-test-joyride-title')
+        ?.textContent?.trim();
+      if (currentTitle === 'Choose a Part of the Card to Translate') {
+        // Scroll to show the translation content but not too far down.
+        // This ensures both the joyride controls and the translation tabs are visible.
+        window.scrollTo({
+          top: 200,
+          behavior: 'smooth',
+        });
+      }
+    });
+
+    await this.page.waitForTimeout(500); // Allow scroll to complete.
+
     await this.page.waitForFunction(
       (selector: string, currentStep: string) => {
         const element = document.querySelector(selector);
@@ -5834,10 +5873,20 @@ export class ExplorationEditor extends BaseUser {
 
     const currentStep = await this.getTextContent(joyrideStepSelector);
     await this.page.waitForTimeout(1000);
+
     await this.page.waitForSelector(
       '.joyride-step__prev-container .joyride-button',
       {visible: true}
     );
+
+    // Scroll the previous button into view if needed.
+    await this.page.evaluate(selector => {
+      const element = document.querySelector(selector);
+      if (element) {
+        element.scrollIntoView({block: 'center', inline: 'center'});
+      }
+    }, previousButtonSelector);
+
     await this.page.click(previousButtonSelector);
 
     await this.page.waitForFunction(

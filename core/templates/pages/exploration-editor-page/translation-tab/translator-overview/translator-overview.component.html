@@ -89,21 +89,24 @@
 
 <style>
   .language-selector-text {
-    float: left;
-    width: 50%;
+    margin-bottom: 8px;
+    text-align: center;
   }
   .language-selector-form {
-    width: 210px;
+    max-width: 300px;
+    width: 100%;
   }
   .language-selector-container {
     align-items: center;
     display: flex;
-    justify-content: space-around;
-    margin: auto;
+    flex-direction: column;
+    margin: 15px auto;
+    max-width: 400px;
+    padding: 0 10px;
     text-align: center;
-    width: 500px;
   }
   .oppia-translator-overview {
+    align-items: center;
     display: -webkit-flex;
     display: flex;
     flex-direction: column;
@@ -112,10 +115,13 @@
     text-align: center;
   }
   .oppia-translation-progress {
+    align-items: center;
     display: -webkit-flex;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     margin-top: 8px;
+    text-align: center;
   }
   .oppia-translation-progress-bar {
     background-color: #c1e9f3;
