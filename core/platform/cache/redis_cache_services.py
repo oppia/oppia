@@ -36,52 +36,38 @@ datastore_services = models.Registry.import_datastore_services()
 class RedisClient:
     """Redis client for our own implementation of caching."""
 
-    def __init__(self) -> None:
-        self._is_client_initialized = False
-        self._oppia_redis_client: Optional[redis.StrictRedis[str]] = None
-        self._cloud_ndb_redis_client: Optional[redis.StrictRedis[str]] = None
+    def get_oppia_redis_client(self) -> Optional[redis.StrictRedis[str]]:
+        """Fetches redis model and obtains oppia redis client.
 
-    def _initialize_client(self) -> None:
-        """Initializes the client by fetching redis model if the client is not
-        initialized.
+        Returns:
+            redis.StrictRedis[str]. The oppia redis client.
         """
-        if self._is_client_initialized:
-            return
-
         with datastore_services.get_ndb_context():
             redishost = redis_services.get_redis_host()
         if not redishost:
-            return
-        self._oppia_redis_client = redis.StrictRedis(
+            return None
+        return redis.StrictRedis(
             host=redishost,
             port=feconf.REDISPORT,
             db=feconf.OPPIA_REDIS_DB_INDEX,
             decode_responses=True
         )
-        self._cloud_ndb_redis_client = redis.StrictRedis(
-            host=redishost,
-            port=feconf.REDISPORT,
-            db=feconf.CLOUD_NDB_REDIS_DB_INDEX
-        )
-        self._is_client_initialized = True
-
-    def get_oppia_redis_client(self) -> Optional[redis.StrictRedis[str]]:
-        """Initializes redis model and obtains oppia redis client.
-
-        Returns:
-            redis.StrictRedis[str]. The oppia redis client.
-        """
-        self._initialize_client()
-        return self._oppia_redis_client
 
     def get_cloud_ndb_redis_client(self) -> Optional[redis.StrictRedis[str]]:
-        """Initializes redis model and obtains cloud ndb redis client.
+        """Fetches redis model and obtains cloud ndb redis client.
 
         Returns:
             redis.StrictRedis[str]. The cloud ndb redis client.
         """
-        self._initialize_client()
-        return self._cloud_ndb_redis_client
+        with datastore_services.get_ndb_context():
+            redishost = redis_services.get_redis_host()
+        if not redishost:
+            return None
+        return redis.StrictRedis(
+            host=redishost,
+            port=feconf.REDISPORT,
+            db=feconf.CLOUD_NDB_REDIS_DB_INDEX
+        )
 
 
 REDIS_CLIENT = RedisClient()
@@ -132,7 +118,7 @@ def get_multi(keys: List[str]) -> List[Optional[str]]:
     assert isinstance(keys, list)
     oppia_redis_client = REDIS_CLIENT.get_oppia_redis_client()
     if not oppia_redis_client:
-        return []
+        return [None] * len(keys)
     return oppia_redis_client.mget(keys)
 
 
