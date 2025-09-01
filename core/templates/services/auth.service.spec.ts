@@ -270,7 +270,6 @@ describe('Auth service', function () {
     });
 
     it('should return firebase config', () => {
-      // Mock getConfig function to return a sample configuration.
       spyOn(AuthService, 'getConfig').and.returnValue({
         FIREBASE_CONFIG_API_KEY: 'sample-api-key',
         FIREBASE_CONFIG_AUTH_DOMAIN: 'sample-auth-domain',
