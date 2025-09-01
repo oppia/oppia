@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-from core import feconf
 from core.domain import redis_services
 from core.platform import models
 from core.tests import test_utils
@@ -35,7 +34,7 @@ class RedisServicesUnitTests(test_utils.GenericTestBase):
     """Tests for the Redis services module."""
 
     def test_get_redis_host_returns_correct_host(self) -> None:
-        self.assertEqual(redis_services.get_redis_host(), feconf.REDISHOST)
+        self.assertIsNone(redis_services.get_redis_host())
         new_host = 'new.redis.host'
         redis_services.update_redis_host(new_host)
         self.assertEqual(redis_services.get_redis_host(), new_host)

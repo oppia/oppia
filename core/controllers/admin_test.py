@@ -942,7 +942,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        self.assertEqual(redis_services.get_redis_host(), feconf.REDISHOST)
+        self.assertIsNone(redis_services.get_redis_host())
         self.post_json(
             '/adminhandler', {
                 'action': 'update_redis_host',
