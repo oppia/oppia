@@ -29,7 +29,6 @@ from typing import Dict, List, Optional
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import datastore_services
-    from mypy_imports import secrets_services
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -166,7 +165,7 @@ def delete_multi(keys: List[str]) -> int:
     """
     for key in keys:
         assert isinstance(key, str)
+    oppia_redis_client = REDIS_CLIENT.get_oppia_redis_client()
     if not oppia_redis_client:
         return 0
-    oppia_redis_client = REDIS_CLIENT.get_oppia_redis_client()
     return oppia_redis_client.delete(*keys)

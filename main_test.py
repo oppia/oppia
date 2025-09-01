@@ -25,7 +25,7 @@ from core.tests import test_utils
 import main
 
 import google.cloud.logging
-from typing import ContextManager, Dict, cast
+from typing import ContextManager, Dict, Optional, cast
 import webapp2
 import webtest
 
@@ -86,7 +86,7 @@ class NdbWsgiMiddlewareTests(test_utils.GenericTestBase):
             return response
 
         def get_ndb_context_mock(
-                global_cache: datastore_services.RedisCache
+                global_cache: Optional[datastore_services.RedisCache] = None
         ) -> ContextManager[None]:
             """Mock the NDB context.
 
@@ -96,7 +96,10 @@ class NdbWsgiMiddlewareTests(test_utils.GenericTestBase):
             Returns:
                 ContextManager. Context manager that does nothing.
             """
-            self.assertEqual(type(global_cache), datastore_services.RedisCache)
+            if global_cache:
+                self.assertEqual(
+                    type(global_cache), datastore_services.RedisCache
+                )
             return contextlib.nullcontext()
 
         get_ndb_context_swap = self.swap_with_checks(
