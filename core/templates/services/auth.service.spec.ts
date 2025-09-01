@@ -319,7 +319,7 @@ describe('Auth service', function () {
       expect(XMLHttpRequest.prototype.open).toHaveBeenCalled();
     });
 
-    it('should log an error when unable to fetch firebase config from ', () => {
+    it('should log an error when unable to fetch firebase config', () => {
       spyOn(XMLHttpRequest.prototype, 'open').and.callThrough();
       spyOn(XMLHttpRequest.prototype, 'send').and.callFake(() => {
         throw new Error('Test Error');
