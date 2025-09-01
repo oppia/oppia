@@ -121,6 +121,7 @@ describe('Topic Manager', function () {
       1,
       2
     );
+    // Correct Response.
     await topicManager.updateItemSelectionLearnersAnswerInResponseModal(
       'contains at least one of',
       ['Correct Option 1', 'Correct Option 2']
@@ -131,6 +132,7 @@ describe('Topic Manager', function () {
       true,
       false
     );
+    // Incorrect Response.
     await topicManager.updateItemSelectionLearnersAnswerInResponseModal(
       'contains at least one of',
       ['Option 1', 'Option 2']
@@ -162,8 +164,17 @@ describe('Topic Manager', function () {
       'Option 1',
       'Option 2',
       'Correct Response',
-      'Option 4',
+      'Not correct response',
     ]);
+    await topicManager.updateMultipleChoiceLearnersAnswerInResponseModal(
+      'is equal to',
+      'Not correct response'
+    );
+    await topicManager.addResponseDetailsInResponseModal(
+      'Wrong Answer',
+      undefined,
+      false
+    );
     await topicManager.updateMultipleChoiceLearnersAnswerInResponseModal(
       'is equal to',
       'Correct Response'
@@ -176,6 +187,11 @@ describe('Topic Manager', function () {
     await topicManager.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong Answer. Please try again'
     );
+    await topicManager.tagAnswerGroupWithMisconception(
+      1,
+      'Lining up the numbers incorrectly',
+      true
+    );
     await topicManager.addHintToState('Select the correct option.');
     await topicManager.saveQuestion();
     await topicManager.expectQuestionToBeVisible('Select the correct option.');
@@ -184,6 +200,15 @@ describe('Topic Manager', function () {
     await topicManager.clickOnAddQuestionButton();
     await topicManager.updateCardContent('Select the corrent option.');
     await topicManager.addTextInputInteraction();
+    await topicManager.updateAnswersInResponseModal(
+      INTERACTION_TYPES.TEXT_INPUT,
+      'Hello'
+    );
+    await topicManager.addResponseDetailsInResponseModal(
+      'Wrong Answer',
+      undefined,
+      false
+    );
     await topicManager.updateAnswersInResponseModal(
       INTERACTION_TYPES.TEXT_INPUT,
       'Hello, Oppia!'
@@ -195,6 +220,11 @@ describe('Topic Manager', function () {
     );
     await topicManager.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong Answer'
+    );
+    await topicManager.tagAnswerGroupWithMisconception(
+      1,
+      'Lining up the numbers incorrectly',
+      true
     );
     await topicManager.addHintToState('Test Hint 3');
     await topicManager.addSolutionToState(
@@ -219,6 +249,15 @@ describe('Topic Manager', function () {
     ]);
     await topicManager.updateDragAndDropSortLearnersAnswerInResponseModal(
       'is equal to ordering ...',
+      [3, 1, 2]
+    );
+    await topicManager.addResponseDetailsInResponseModal(
+      "Wrong it's in decreasing order",
+      undefined,
+      false
+    );
+    await topicManager.updateDragAndDropSortLearnersAnswerInResponseModal(
+      'is equal to ordering ...',
       [1, 3, 2]
     );
     await topicManager.addResponseDetailsInResponseModal(
@@ -228,6 +267,11 @@ describe('Topic Manager', function () {
     );
     await topicManager.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong Answer'
+    );
+    await topicManager.tagAnswerGroupWithMisconception(
+      1,
+      'Lining up the numbers incorrectly',
+      true
     );
     await topicManager.addHintToState('Test Hint 4');
     // TODO: Verify works properly.
@@ -245,6 +289,15 @@ describe('Topic Manager', function () {
     await topicManager.customizeNumberInputInteraction(true);
     await topicManager.updateAnswersInResponseModal(
       INTERACTION_TYPES.NUMBER_INPUT,
+      '1000'
+    );
+    await topicManager.addResponseDetailsInResponseModal(
+      'Wrong',
+      undefined,
+      false
+    );
+    await topicManager.updateAnswersInResponseModal(
+      INTERACTION_TYPES.NUMBER_INPUT,
       '100'
     );
     await topicManager.addResponseDetailsInResponseModal(
@@ -254,6 +307,11 @@ describe('Topic Manager', function () {
     );
     await topicManager.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong Answer'
+    );
+    await topicManager.tagAnswerGroupWithMisconception(
+      1,
+      'Lining up the numbers incorrectly',
+      true
     );
     await topicManager.addHintToState('Test Hint 5');
     await topicManager.addSolutionToState(
@@ -271,6 +329,15 @@ describe('Topic Manager', function () {
     await topicManager.customizeFractionInputInteraction(true, false, true);
     await topicManager.updateAnswersInResponseModal(
       INTERACTION_TYPES.FRACTION_INPUT,
+      '2'
+    );
+    await topicManager.addResponseDetailsInResponseModal(
+      'Wrong',
+      undefined,
+      false
+    );
+    await topicManager.updateAnswersInResponseModal(
+      INTERACTION_TYPES.FRACTION_INPUT,
       '1/2'
     );
     await topicManager.addResponseDetailsInResponseModal(
@@ -280,6 +347,11 @@ describe('Topic Manager', function () {
     );
     await topicManager.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong Answer'
+    );
+    await topicManager.tagAnswerGroupWithMisconception(
+      1,
+      'Lining up the numbers incorrectly',
+      true
     );
     await topicManager.addHintToState('Test Hint 6');
     await topicManager.addSolutionToState(
@@ -297,7 +369,13 @@ describe('Topic Manager', function () {
       INTERACTION_TYPES.NUMBER_WITH_UNITS,
       false
     );
-    await topicManager.fillValueInInteractionResponseModal('1/2', 'input');
+    await topicManager.fillValueInInteractionResponseModal('100km', 'input');
+    await topicManager.addResponseDetailsInResponseModal(
+      'Wrong',
+      undefined,
+      false
+    );
+    await topicManager.fillValueInInteractionResponseModal('160km', 'input');
     await topicManager.addResponseDetailsInResponseModal(
       'Great!',
       undefined,
@@ -305,6 +383,11 @@ describe('Topic Manager', function () {
     );
     await topicManager.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong Answer'
+    );
+    await topicManager.tagAnswerGroupWithMisconception(
+      1,
+      'Lining up the numbers incorrectly',
+      true
     );
     await topicManager.addHintToState('Test Hint');
     await topicManager.addSolutionToState(
