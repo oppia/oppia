@@ -62,23 +62,23 @@
     },
     {
       "name": "curriculum-admin/create-edit-and-delete-classroom",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/curriculum-admin/create-edit-and-delete-classroom.spec.ts"
+      "module": "core/tests/puppeteer-acceptance-tests/specs-old/curriculum-admin/create-edit-and-delete-classroom.spec.ts"
     },
     {
       "name": "curriculum-admin/create-publish-unpublish-and-delete-topic-and-skill",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/curriculum-admin/create-publish-unpublish-and-delete-topic-and-skill.spec.ts"
+      "module": "core/tests/puppeteer-acceptance-tests/specs-old/curriculum-admin/create-publish-unpublish-and-delete-topic-and-skill.spec.ts"
     },
     {
       "name": "curriculum-admin/create-subtopic-study-guide-with-multiple-sections",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/curriculum-admin/create-subtopic-study-guide-with-multiple-sections.spec.ts"
+      "module": "core/tests/puppeteer-acceptance-tests/specs-old/curriculum-admin/create-subtopic-study-guide-with-multiple-sections.spec.ts"
     },
     {
       "name": "curriculum-admin/create-skill-with-workedexamples",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/curriculum-admin/create-skill-with-workedexamples.spec.ts"
+      "module": "core/tests/puppeteer-acceptance-tests/specs-old/curriculum-admin/create-skill-with-workedexamples.spec.ts"
     },
     {
       "name": "curriculum-admin/try-to-paste-invalid-components-and-get-error",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/curriculum-admin/try-to-paste-invalid-components-and-get-error.spec.ts"
+      "module": "core/tests/puppeteer-acceptance-tests/specs-old/curriculum-admin/try-to-paste-invalid-components-and-get-error.spec.ts"
     },
     {
       "name": "exploration-editor/create-exploration-and-change-basic-settings",
@@ -555,6 +555,10 @@
     {
       "name": "blog-post-writer/create-and-edit-blog-post",
       "module": "core/tests/puppeteer-acceptance-tests/specs/blog-post-writer/create-and-edit-blog-post.spec.ts"
+    },
+    {
+      "name": "curriculum-admin/create-publish-unpublish-and-delete-topic-and-skill",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/curriculum-admin/create-publish-unpublish-and-delete-topic-and-skill.spec.ts"
     }
   ],
   "docker_suites": []

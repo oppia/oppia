@@ -461,6 +461,18 @@ export class TopicManager extends BaseUser {
   }
 
   /**
+   * Checks if we are in topic editor.
+   * @param {string} topicName - Optional topic name to check.
+   */
+  async expectToBeInTopicEditor(topicName?: string): Promise<void> {
+    await this.expectElementToBeVisible(topicEditorMainTabFormSelector);
+
+    if (topicName) {
+      await this.expectElementValueToBe(topicNameField, topicName);
+    }
+  }
+
+  /**
    * Edits the details of a topic.
    * @param {string} topicName - The name of the topic.
    * @param {string} urlFragment - The URL fragment of the topic.
@@ -477,7 +489,7 @@ export class TopicManager extends BaseUser {
     topicName?: string,
     urlFragment?: string
   ): Promise<void> {
-    await this.expectElementToBeVisible(topicEditorMainTabFormSelector);
+    await this.expectToBeInTopicEditor();
     if (topicName) {
       await this.clearAllTextFrom(topicNameField);
       await this.type(topicNameField, topicName);
