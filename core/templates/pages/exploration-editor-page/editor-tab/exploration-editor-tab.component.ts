@@ -1,6 +1,6 @@
 // Copyright 2014 The Oppia Authors. All Rights Reserved.
 //
-// Licensed under the Apache License, Version 2.0 (the    public windowDimensionsService: WindowDimensionsService,"License");
+// Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
@@ -106,8 +106,8 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
     private focusManagerService: FocusManagerService,
     private stateEditorRefreshService: StateEditorRefreshService,
     private loaderService: LoaderService,
-    public graphDataService: GraphDataService,
-    public joyride: JoyrideService,
+    private graphDataService: GraphDataService,
+    private joyride: JoyrideService,
     private versionHistoryService: VersionHistoryService,
     private versionHistoryBackendApiService: VersionHistoryBackendApiService,
     private pageContextService: PageContextService,
@@ -147,14 +147,11 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   startTutorial(): void {
     this.tutorialInProgress = true;
 
-    // Use mobile-specific tour steps if viewport is mobile.
-    const tourSteps = this.windowDimensionsService.isWindowNarrow()
-      ? this.mobileJoyRideSteps
-      : this.joyRideSteps;
-
     this.joyride
       .startTour({
-        steps: tourSteps,
+        steps: this.windowDimensionsService.isWindowNarrow()
+          ? this.mobileJoyRideSteps
+          : this.joyRideSteps,
         stepDefaultPosition: 'top',
         themeColor: '#212f23',
       })
