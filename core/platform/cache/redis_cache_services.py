@@ -21,9 +21,17 @@ from __future__ import annotations
 from core import feconf
 from core.domain import caching_domain
 from core.domain import redis_services
+from core.platform import models
 
 import redis
 from typing import Dict, List, Optional
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import datastore_services
+    from mypy_imports import secrets_services
+
+datastore_services = models.Registry.import_datastore_services()
 
 
 class RedisClient:
@@ -41,7 +49,8 @@ class RedisClient:
         if self._is_client_initialized:
             return
 
-        redishost = redis_services.get_redis_host()
+        with datastore_services.get_ndb_context():
+            redishost = redis_services.get_redis_host()
         if not redishost:
             return
         self._oppia_redis_client = redis.StrictRedis(
@@ -102,11 +111,12 @@ def get_memory_cache_stats() -> caching_domain.MemoryCacheStats:
 
 def flush_caches() -> None:
     """Wipes the Redis caches clean."""
+    oppia_redis_client = REDIS_CLIENT.get_oppia_redis_client()
     if oppia_redis_client:
-        oppia_redis_client = REDIS_CLIENT.get_oppia_redis_client()
         oppia_redis_client.flushdb()
+
+    cloud_ndb_redis_client = REDIS_CLIENT.get_cloud_ndb_redis_client()
     if cloud_ndb_redis_client:
-        cloud_ndb_redis_client = REDIS_CLIENT.get_cloud_ndb_redis_client()
         cloud_ndb_redis_client.flushdb()
 
 
