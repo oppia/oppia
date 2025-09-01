@@ -227,6 +227,10 @@ export default function isElementClickable(
   // Here we check if the element is clickable and if not, we scroll it into view
   // and check again.
   if (!isClickable(element)) {
+    // Added this line because Bootstrap 5 added smooth scroll default behavior.
+    // Reference: https://katalon-inc.my.site.com/support/article/Test-case-failures-due-to-auto-scrolling-in-Bootstrap-5-and-how-to-fix
+    const htmlElement = document.documentElement;
+    htmlElement.style.scrollBehavior = 'auto';
     element.scrollIntoView({block: 'center', inline: 'center'});
   }
 
