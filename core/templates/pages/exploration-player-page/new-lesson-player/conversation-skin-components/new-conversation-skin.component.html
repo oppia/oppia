@@ -62,13 +62,15 @@
                         [submitButtonIsShown]="!getAnswerIsBeingProcessed() && !continueToReviseStateButtonIsVisible"
                         [showContinueToReviseButton]="continueToReviseStateButtonIsVisible"
                         (clickContinueToReviseButton)="triggerRedirectionToStuckState()"
-                        (skipQuestion)="skipCurrentQuestion()">
+                        (skipQuestion)="skipCurrentQuestion()"
+                        [userIsLoggedIn]="isLoggedIn">
     </oppia-card-navigation-control>
   </div>
 
   <!-- Correct Answer Pop-Up -->
-  <div class="new-conversation-skin-correctness-footer-container" *ngIf="isCorrectnessFooterEnabled()">
-    <oppia-new-correctness-footer></oppia-new-correctness-footer>
+  <div class="new-conversation-skin-correctness-footer-container">
+    <oppia-new-correctness-footer *ngIf="isCorrectnessFooterEnabled()"></oppia-new-correctness-footer>
+    <oppia-checkpoint-celebration-footer *ngIf="isCheckpointCelebrationFooterEnabled()"></oppia-checkpoint-celebration-footer>
   </div>
 </div>
 

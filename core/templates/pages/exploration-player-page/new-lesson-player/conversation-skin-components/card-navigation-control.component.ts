@@ -70,6 +70,7 @@ export class CardNavigationControlComponent {
   @Input() displayedCard!: StateCard;
   @Input() submitButtonIsShown!: boolean;
   @Input() showContinueToReviseButton!: boolean;
+  @Input() userIsLoggedIn: boolean = false;
   navigationThroughCardHistoryIsEnabled: boolean = true;
   skipButtonIsShown: boolean = false;
   hasPrevious!: boolean;
