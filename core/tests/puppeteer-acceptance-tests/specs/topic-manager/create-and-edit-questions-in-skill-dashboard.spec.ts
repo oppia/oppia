@@ -196,9 +196,9 @@ describe('Topic Manager', function () {
     await topicManager.saveQuestion();
     await topicManager.expectQuestionToBeVisible('Select the correct option.');
 
-    // Text Inpit Interaction.
+    // Text Input Interaction.
     await topicManager.clickOnAddQuestionButton();
-    await topicManager.updateCardContent('Select the corrent option.');
+    await topicManager.updateCardContent('Enter text input.');
     await topicManager.addTextInputInteraction();
     await topicManager.updateAnswersInResponseModal(
       INTERACTION_TYPES.TEXT_INPUT,
@@ -400,11 +400,40 @@ describe('Topic Manager', function () {
 
     // Navigate to the preview tab.
     await topicManager.navigateToSkillPreviewTab();
+    for (const question of [
+      'Select bottom half of the image',
+      'Select any one correct option.',
+      'Select the correct option.',
+      'Enter text input.',
+      'Drag and Drop Sort',
+      'Number Input',
+      'Fraction Input',
+      'Number with Units',
+    ]) {
+      await topicManager.expectQuestionToPreviewProperly(question);
+    }
   });
 
   it('should be able to edit questions in skills editor', async function () {
     await topicManager.openSkillEditor('Addition');
+    await topicManager.updateRubric('Hard', 'This is for hard questions.');
+    await topicManager.publishSkillChanges();
+
     await topicManager.navigateToSkillQuestionEditorTab();
+    await topicManager.openQuestionEditor('Number with Units.');
+    await topicManager.selectQuestionDifficulty('Hard');
+    await topicManager.updateCardContent('Solve 2 + 3');
+    await topicManager.updateHint('This is the new hint.');
+    await topicManager.updateSolutionExplanation(
+      'This is the new solution explanation.'
+    );
+
+    await topicManager.expectScreenshotToMatch(
+      'updatedQuestionInQuestionEditor',
+      __dirname
+    );
+    await topicManager.updateResponse(0, '25km', 'This is the new feedback.');
+    await topicManager.expectSaveQuestionButtonToBeEnabled();
   });
 
   afterAll(async function () {

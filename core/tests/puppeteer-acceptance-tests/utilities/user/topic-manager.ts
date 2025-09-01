@@ -322,6 +322,10 @@ const storyRowSelector = 'tr.e2e-test-story-list-item';
 const thumbnailDescriptionSelector = '.e2e-test-thumbnail-description';
 const thumbnailTitleSelector = '.e2e-test-thumbnail-title';
 const questionEditorContainer = '.e2e-test-question-editor-container';
+const questionDifficultySelectionModalSelector =
+  '.e2e-test-question-opportunity-difficulty';
+const confirmSkillDificultyButton =
+  'button.e2e-test-confirm-skill-difficulty-button';
 
 export class TopicManager extends BaseUser {
   /**
@@ -717,6 +721,13 @@ export class TopicManager extends BaseUser {
 
     await this.waitForNetworkIdle();
     await this.page.waitForSelector(modalDiv, {hidden: true});
+  }
+
+  /**
+   * Checks if the save question button is enabled.
+   */
+  async expectSaveQuestionButtonToBeEnabled(): Promise<void> {
+    await this.expectElementToBeClickable(saveQuestionButton);
   }
 
   /**
@@ -3663,14 +3674,53 @@ export class TopicManager extends BaseUser {
    * Checks if the question is visible in the questions tab.
    * @param {string} question - The question to check.
    */
-  async expectQuestionToBeVisible(question: string): Promise<void> {
+  async expectQuestionToBeVisible(
+    question: string
+  ): Promise<ElementHandle<Element>> {
     await this.expectElementToBeVisible(questionTextSelector);
 
-    const questions = await this.page.$$eval(questionTextSelector, elements =>
-      elements.map(element => element.textContent?.trim())
-    );
+    const questionElements = await this.page.$$(questionTextSelector);
+    let questionElement: ElementHandle<Element> | null = null;
+    for (const questionEle of questionElements) {
+      const questionText = await questionEle.evaluate(el =>
+        el.textContent?.trim()
+      );
+      if (questionText === question) {
+        questionElement = questionEle;
+        break;
+      }
+    }
 
-    expect(questions).toContain(question);
+    if (!questionElement) {
+      throw new Error(`Question ${question} not found.`);
+    }
+
+    showMessage(`Question ${question} is visible.`);
+    return questionElement;
+  }
+
+  async openQuestionEditor(question: string): Promise<void> {
+    const questionElement = await this.expectQuestionToBeVisible(question);
+
+    await questionElement.click();
+    await this.expectElementToBeVisible(addQuestionButtonSelector, false);
+  }
+
+  /**
+   * Function to select the difficulty level of the question to be suggested.
+   * @param {string} difficulty - The difficulty level of the question.
+   */
+  async selectQuestionDifficulty(
+    difficulty: 'Easy' | 'Medium' | 'Hard' = 'Medium'
+  ): Promise<void> {
+    await this.expectElementToBeVisible(
+      questionDifficultySelectionModalSelector
+    );
+    const selector = `.e2e-test-skill-difficulty-${difficulty.toLowerCase()}`;
+    await this.clickOn(selector);
+    await this.clickOn(confirmSkillDificultyButton);
+
+    await this.expectElementToBeVisible(confirmSkillDificultyButton, false);
   }
 
   /**
@@ -3887,6 +3937,15 @@ export class TopicManager extends BaseUser {
 
     showMessage(`Aquired skill ${skillName} is visible.`);
     return aquiredSkillElement;
+  }
+
+  /**
+   * It's a composite function that checks if the question preview has the expected name.
+   * @param {string} question - The expected question.
+   */
+  async expectQuestionToPreviewProperly(question: string): Promise<void> {
+    await this.previewQuestion(question);
+    await this.expectPreviewQuestionText(question);
   }
 }
 

@@ -421,6 +421,11 @@ const nodeWarningSignSelector = '.e2e-test-node-warning-sign';
 const navigationDropdownInMobileVisibleSelector =
   '.oppia-exploration-editor-tabs-dropdown.show';
 
+const responseInputSelector = '.e2e-test-answer-tab';
+const answerInputSelector = '.e2e-test-answer-description-fragment input';
+const saveAnswerButtonInResponseGroupSelector = '.e2e-test-save-answer';
+const activeRuleTabClass = 'oppia-rule-tab-active';
+
 export enum INTERACTION_TYPES {
   ALGEBRAIC_EXPRESSION = 'Algebric Expression Input',
   CODE_EDITOR = 'Code Editor',
@@ -6653,6 +6658,50 @@ export class ExplorationEditor extends BaseUser {
       element,
       value
     );
+  }
+
+  /**
+   * Updates the response.
+   * @param index The zero-based index of the response.
+   * @param newAnswer The new answer.
+   * @param responseFeedback The new response feedback.
+   */
+  async updateResponse(
+    index: number,
+    newAnswer?: string,
+    responseFeedback?: string
+  ): Promise<void> {
+    await this.page.waitForSelector(responseGroupDiv);
+    const elements = await this.page.$$(responseGroupDiv);
+    if (elements.length < index + 1) {
+      throw new Error(`Element ${index} not found.`);
+    }
+    await elements[index].click();
+    await this.page.waitForFunction(
+      (element: HTMLElement, className: string) => {
+        return element.className.includes(className);
+      },
+      {},
+      elements[index],
+      activeRuleTabClass
+    );
+
+    if (newAnswer) {
+      await this.clickOn(responseInputSelector);
+      await this.clearAllTextFrom(answerInputSelector);
+      await this.type(answerInputSelector, newAnswer);
+      await this.clickOn(saveAnswerButtonInResponseGroupSelector);
+      await this.expectElementToBeVisible(
+        saveAnswerButtonInResponseGroupSelector,
+        false
+      );
+    }
+
+    if (responseFeedback) {
+      await this.updateDefaultResponseFeedbackInExplorationEditorPage(
+        responseFeedback
+      );
+    }
   }
 }
 
