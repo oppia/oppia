@@ -91,7 +91,7 @@ describe('Topic Manager', function () {
       'Arithmetic Operations'
     );
     await topicManager.openTopicEditor('Arithmetic Operations');
-    // TODO: Expect subtopic to be present.
+    await topicManager.verifySubtopicPresenceInTopic('Subtraction');
 
     // Delete the subtopic.
     await topicManager.deleteSubtopicFromTopic(
@@ -99,13 +99,18 @@ describe('Topic Manager', function () {
       'Arithmetic Operations'
     );
     await topicManager.openTopicEditor('Arithmetic Operations');
-    // TODO: Expect subtopic to be absent.
+    await topicManager.verifySubtopicPresenceInTopic('Addition');
+    await topicManager.verifySubtopicPresenceInTopic(
+      'Subtraction', // Subtopic Name.
+      null, // Check in the same topic.
+      false // Should not exist.
+    );
   });
 
   it('should be able to edit and preview subtopic', async function () {
     await topicManager.openSubtopicEditor('Addition', 'Arithmetic Operations');
     await topicManager.editSubTopicDetails(
-      'Introduction to Addition and Subtraction',
+      'Intro to addition and Subtraction',
       'intro-add-subtract',
       'This is introduction to Addition and Subtraction.',
       testConstants.data.profilePicture
@@ -119,11 +124,11 @@ describe('Topic Manager', function () {
     await topicManager.expectToastMessageToBe('Changes Saved.');
 
     await topicManager.navigateToSubtopicPreviewTab(
-      'Introduction to Addition and Subtraction',
+      'Intro to addition and Subtraction',
       'Arithmetic Operations'
     );
     await topicManager.expectSubtopicPreviewToHave(
-      'Introduction to Addition and Subtraction',
+      'Intro to addition and Subtraction',
       'This is introduction to Addition and Subtraction.'
     );
   });

@@ -2801,54 +2801,49 @@ export class TopicManager extends BaseUser {
    */
   async verifySubtopicPresenceInTopic(
     subtopicName: string,
-    topicName: string,
-    shouldExist: boolean
+    topicName: string | null = null,
+    shouldExist: boolean = true
   ): Promise<void> {
-    try {
+    // Navigate to topic editor if topic name is provided.
+    if (topicName) {
       await this.openTopicEditor(topicName);
       await this.waitForStaticAssetsToLoad();
 
       if (this.isViewportAtMobileWidth()) {
         await this.clickOn(subtopicReassignHeader);
       }
-
-      const subtopics = await this.page.$$(subtopicTitleSelector);
-
-      for (const subtopicElement of subtopics) {
-        const subtopic = await this.page.evaluate(
-          el => el.textContent.trim(),
-          subtopicElement
-        );
-
-        if (subtopic === subtopicName) {
-          if (!shouldExist) {
-            throw new Error(
-              `Subtopic ${subtopicName} exists in topic ${topicName}, but it shouldn't.`
-            );
-          }
-          showMessage(
-            `Subtopic ${subtopicName} is ${shouldExist ? 'found' : 'not found'} in topic ${topicName}, as expected.`
-          );
-          return;
-        }
-      }
-
-      if (shouldExist) {
-        throw new Error(
-          `Subtopic ${subtopicName} not found in topic ${topicName}, but it should exist.`
-        );
-      }
-
-      showMessage(
-        `Subtopic ${subtopicName} is ${shouldExist ? 'found' : 'not found'} in topic ${topicName}, as expected.`
-      );
-    } catch (error) {
-      const newError = new Error(
-        `Failed to verify subtopic presence in topic: ${error}`
-      );
-      newError.stack = error.stack;
-      throw newError;
     }
+
+    const subtopics = await this.page.$$(subtopicTitleSelector);
+
+    for (const subtopicElement of subtopics) {
+      const subtopic = await this.page.evaluate(
+        el => el.textContent.trim(),
+        subtopicElement
+      );
+
+      if (subtopic === subtopicName) {
+        if (!shouldExist) {
+          throw new Error(
+            `Subtopic ${subtopicName} exists in topic ${topicName}, but it shouldn't.`
+          );
+        }
+        showMessage(
+          `Subtopic ${subtopicName} is ${shouldExist ? 'found' : 'not found'} in topic ${topicName}, as expected.`
+        );
+        return;
+      }
+    }
+
+    if (shouldExist) {
+      throw new Error(
+        `Subtopic ${subtopicName} not found in topic ${topicName}, but it should exist.`
+      );
+    }
+
+    showMessage(
+      `Subtopic ${subtopicName} is ${shouldExist ? 'found' : 'not found'} in topic ${topicName}, as expected.`
+    );
   }
 
   /**

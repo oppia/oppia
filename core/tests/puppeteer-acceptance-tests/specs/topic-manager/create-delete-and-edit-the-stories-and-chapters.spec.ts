@@ -16,7 +16,7 @@
  * @fileoverview Acceptance test from CUJv3 Doc
  * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
  *
- * TM.TE.?? Topic manager creates, deletes. edits the stories, and chapters.
+ * TM.TE Topic manager creates, deletes. edits the stories, and chapters.
  */
 
 import testConstants from '../../utilities/common/test-constants';
@@ -83,10 +83,7 @@ describe('Topic Manager', function () {
       'this is a meta tag',
       testConstants.data.profilePicture
     );
-    await topicManager.addChapter(
-      'Solving problems without a calculator',
-      explorationId
-    );
+    await topicManager.addChapter('Solving Problems', explorationId);
     await topicManager.saveStoryDraft();
     await topicManager.expectScreenshotToMatch('storyEditor', __dirname);
 

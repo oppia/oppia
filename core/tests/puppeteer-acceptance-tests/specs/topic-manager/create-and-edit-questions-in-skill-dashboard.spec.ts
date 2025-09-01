@@ -319,6 +319,11 @@ describe('Topic Manager', function () {
     await topicManager.navigateToSkillPreviewTab();
   });
 
+  it('should be able to edit questions in skills editor', async function () {
+    await topicManager.openSkillEditor('Addition');
+    await topicManager.navigateToSkillQuestionEditorTab();
+  });
+
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });

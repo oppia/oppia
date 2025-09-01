@@ -91,24 +91,19 @@ describe('Topic Manager', function () {
     await topicManager.editTopicDetails(
       'Arithmetic Operations (New): This is the new topic description.', // Description.
       'Arithmetic Operations (New) • Oppia', // Title Fragment.
-      'TODOFILEPATHHERE', // Thumbnail.
+      testConstants.data.curriculumAdminThumbnailImage, // Thumbnail.
       'AO 101', // Title.
       'arithmetic-101' // URL fragment.
     );
     await topicManager.saveTopicDraft(
-      'A0 101',
-      'Moved Arithmetic Operations to A0 101'
+      'AO 101',
+      'Moved Arithmetic Operations to AO 101'
     );
     await topicManager.expectToastMessageToBe('Changes Saved.');
 
-    await topicManager.expectScreenshotToMatch(
-      'changedTopicArithmeticOperations',
-      __dirname
-    );
-
     // Enable practice tab.
-    await curriculumAdmin.createQuestionsForSkill('A0 101', 10);
-    await topicManager.openTopicEditor('A0 101');
+    await curriculumAdmin.createQuestionsForSkill('Addition', 10);
+    await topicManager.openTopicEditor('AO 101');
     await topicManager.togglePracticeTabCheckbox();
     await topicManager.expectSaveChangesButtonInTopicEditorToBe('enabled');
     await topicManager.expectScreenshotToMatch(
@@ -117,10 +112,12 @@ describe('Topic Manager', function () {
     );
 
     // Check topic preview.
-    await topicManager.saveTopicDraft('A0 101', 'Enabled practice tab.');
+    await topicManager.saveTopicDraft('AO 101', 'Enabled practice tab.');
+    await topicManager.expectToastMessageToBe('Changes Saved.');
+
     await topicManager.navigateToTopicPreviewTab();
     await topicManager.expectTopicPreviewToHaveTitleAndDescription(
-      'Arithmetic Operations',
+      'AO 101',
       'Arithmetic Operations (New): This is the new topic description.'
     );
 

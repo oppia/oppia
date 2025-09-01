@@ -16,7 +16,7 @@
  * @fileoverview Acceptance test from CUJv3 Doc
  * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
  *
- * TM.SE Topic Manager edits and republishes the skill.
+ * TM.SE Edit and republish the skill.
  */
 
 import testConstants from '../../utilities/common/test-constants';
@@ -86,7 +86,10 @@ describe('Topic Manager', function () {
   it('should be able to edit and republish the skill', async function () {
     // Add worked example to the skill.
     await topicManager.openSkillEditor('Subtraction');
-    // TODO: Add worked example and save.
+    // TODO(#23231): Add worked example and save.
+    // Also, uncomment the below line.
+    // await this.expectSaveChangesInSkillEditorToBe('enabled');
+    await topicManager.expectScreenshotToMatch('skillEditor', __dirname);
 
     // Add a misconception to the skill.
     await topicManager.publishUpdatedSkill('Added misconception to the skill');

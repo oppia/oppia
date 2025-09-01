@@ -122,6 +122,7 @@ describe('Topic Manager', function () {
       'Addition'
     );
     await topicManager.expectToastMessageToBe('Merged Skills.');
+    await topicManager.expectFilteredSkills(['Addition']);
     await topicManager.expectFilteredSkills(['Subtration'], false);
   });
 
