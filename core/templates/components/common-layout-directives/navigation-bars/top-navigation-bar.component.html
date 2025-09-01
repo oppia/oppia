@@ -28,7 +28,6 @@
     </ng-container>
     <ng-template #anchorTemplate>
       <a href="/"
-         [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.SPLASH.ROUTE"
          [ngClass]="windowIsNarrow ? 'oppia-logo-small ml-0' : 'oppia-logo-wide'">
         <picture>
           <source type="image/webp"
@@ -72,8 +71,7 @@
              aria-hidden="false"
              aria-label="Home"
              tabindex="0"
-             href="/"
-             [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.SPLASH.ROUTE">
+             href="/">
             <span class="oppia-navbar-tab-content">
               {{ 'I18N_TOPNAV_HOME' | translate }}
             </span>
@@ -257,7 +255,6 @@
               <div class="top-section d-flex">
                 <a class="item item-border d-flex flex-column innvolved-item e2e-test-navbar-get-involved-menu-school-and-organizations-button"
                    href="/partnerships"
-                   [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE"
                    rel="noopener"
                    (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})">
                   <div class="heading">
@@ -288,7 +285,6 @@
               <div class="bottom-section d-flex">
                 <a class="item item-border d-flex flex-column innvolved-item e2e-test-navbar-get-involved-menu-contact-us-button"
                    href="/contact"
-                   [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.CONTACT.ROUTE"
                    (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
                    rel="noopener">
                   <div class="heading">
@@ -303,7 +299,6 @@
                 </a>
                 <a class="item d-flex flex-column innvolved-item e2e-test-navbar-get-involved-menu-donate-button"
                    href="/donate"
-                   [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
                    (blur)="getInvolvedDropdown.close()"
                    rel="noopener">
                   <div class="heading">
@@ -327,7 +322,6 @@
           <a class="nav-link oppia-navbar-tab donate-tab e2e-test-navbar-donate-desktop-button"
              tabindex="0"
              href="/donate"
-             [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
              rel="noopener">
             <span class="oppia-navbar-tab-content"
                  [innerHTML]="'I18N_TOPNAV_DONATE' | translate">
@@ -513,7 +507,6 @@
         </li>
         <li class="nav-item" *ngIf="FEEDBACK_UPDATES_IN_PROFILE_PIC_DROP_DOWN_IS_ENABLED">
           <a (click)="closeSubmenuIfNotMobile($event)"
-             [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.FEEDBACK_UPDATES.ROUTE"
              class="dropdown-item nav-link e2e-test-learner-dashboard-menu-link">
             <span [innerHTML]="'I18N_TOPNAV_FEEDBACK_UPDATES' | translate"></span>
             <span *ngIf="unreadThreadsCount !== 0">({{ unreadThreadsCount }})</span>
@@ -524,7 +517,6 @@
           <a (click)="closeSubmenuIfNotMobile($event);onLogoutButtonClicked()"
              (blur)="profileDropdown.close()"
              [href]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LOGOUT.ROUTE"
-             [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LOGOUT.ROUTE"
              class="dropdown-item nav-link e2e-test-logout-link">
             <span [innerHTML]="'I18N_TOPNAV_LOGOUT' | translate"></span>
           </a>

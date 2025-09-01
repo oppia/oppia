@@ -23,7 +23,6 @@
       "analytics-constants": ["assets/analytics-constants.json"],
       "app.constants": ["core/templates/app.constants"],
       "google-analytics.initializer": ["core/templates/google-analytics.initializer"],
-      "hybrid-router-module-provider": ["core/templates/hybrid-router-module-provider"],
       "app-events/*": ["core/templates/app-events/*"],
       "base-components/*": ["core/templates/base-components/*"],
       "components/*": ["core/templates/components/*"],

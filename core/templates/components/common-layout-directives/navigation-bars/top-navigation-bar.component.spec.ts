@@ -51,6 +51,7 @@ import {AppConstants} from 'app.constants';
 import {NavbarAndFooterGATrackingPages} from 'app.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {UrlService} from 'services/contextual/url.service';
+import {ContentTranslationManagerService} from 'pages/exploration-player-page/services/content-translation-manager.service';
 
 class MockPlatformFeatureService {
   status = {
@@ -105,6 +106,7 @@ describe('TopNavigationBarComponent', () => {
   let deviceInfoService: DeviceInfoService;
   let sidebarStatusService: SidebarStatusService;
   let feedbackUpdatesBackendApiService: FeedbackUpdatesBackendApiService;
+  let contentTranslationManagerService: ContentTranslationManagerService;
   let learnerGroupBackendApiService: LearnerGroupBackendApiService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let i18nService: I18nService;
@@ -198,6 +200,9 @@ describe('TopNavigationBarComponent', () => {
     sidebarStatusService = TestBed.inject(SidebarStatusService);
     i18nService = TestBed.inject(I18nService);
     urlService = TestBed.inject(UrlService);
+    contentTranslationManagerService = TestBed.inject(
+      ContentTranslationManagerService
+    );
     feedbackUpdatesBackendApiService = TestBed.inject(
       FeedbackUpdatesBackendApiService
     );
@@ -575,18 +580,27 @@ describe('TopNavigationBarComponent', () => {
     });
   }));
 
-  it(
-    'should change the language when user clicks on new language' +
-      ' from dropdown',
-    () => {
-      let langCode = 'hi';
-      spyOn(i18nService, 'updateUserPreferredLanguage');
-      component.changeLanguage(langCode);
-      expect(i18nService.updateUserPreferredLanguage).toHaveBeenCalledWith(
-        langCode
-      );
-    }
-  );
+  it('should emit language change event when URL contains lesson', () => {
+    const langCode = 'hi';
+    spyOn(urlService, 'getPathname').and.returnValue('/lesson/1');
+    spyOn(contentTranslationManagerService.onLanguageChange, 'emit');
+
+    component.changeLanguage(langCode);
+
+    expect(
+      contentTranslationManagerService.onLanguageChange.emit
+    ).toHaveBeenCalledWith(langCode);
+  });
+
+  it('should call handleLanguageUpdate when URL does not contain lesson', () => {
+    const langCode = 'hi';
+    spyOn(urlService, 'getPathname').and.returnValue('/explore/1');
+    spyOn(i18nService, 'handleLanguageUpdate');
+
+    component.changeLanguage(langCode);
+
+    expect(i18nService.handleLanguageUpdate).toHaveBeenCalledWith(langCode);
+  });
 
   it('should check if learner groups feature is enabled', fakeAsync(() => {
     spyOn(component, 'truncateNavbar').and.stub();

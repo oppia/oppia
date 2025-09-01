@@ -22,10 +22,12 @@ import {LoggerService} from 'services/contextual/logger.service';
 import {ExplorationDataService} from 'pages/exploration-editor-page/services/exploration-data.service';
 import {
   LostChange,
-  LostChangeObjectFactory,
-} from 'domain/exploration/LostChangeObjectFactory';
+  LostChangeBackendDict,
+} from 'domain/exploration/lost-change.model';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {UtilsService} from 'services/utils.service';
+import {ExplorationChange} from 'domain/exploration/exploration-draft.model';
 
 @Component({
   selector: 'oppia-save-version-mismatch-modal',
@@ -47,8 +49,8 @@ export class SaveVersionMismatchModalComponent
     private elRef: ElementRef,
     private loggerService: LoggerService,
     private explorationDataService: ExplorationDataService,
-    private lostChangeObjectFactory: LostChangeObjectFactory,
-    private ngbActiveModal: NgbActiveModal
+    private ngbActiveModal: NgbActiveModal,
+    private utilsService: UtilsService
   ) {
     super(ngbActiveModal);
   }
@@ -57,7 +59,8 @@ export class SaveVersionMismatchModalComponent
     this.hasLostChanges = this.lostChanges && this.lostChanges.length > 0;
     if (this.hasLostChanges) {
       this.lostChanges = this.lostChanges.map(
-        this.lostChangeObjectFactory.createNew
+        (lostChangeDict: ExplorationChange | LostChangeBackendDict) =>
+          LostChange.createNew(this.utilsService, lostChangeDict)
       );
     }
   }

@@ -13,40 +13,29 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for WrittenTranslationsObjectFactory.ts
+ * @fileoverview Unit tests for WrittenTranslations.
  */
-import {TestBed} from '@angular/core/testing';
-
-import {
-  WrittenTranslations,
-  WrittenTranslationsObjectFactory,
-} from 'domain/exploration/WrittenTranslationsObjectFactory';
+import {WrittenTranslations} from 'domain/exploration/written-translations.model';
 import {WrittenTranslation} from 'domain/exploration/written-translation.model';
 
-describe('Written Translations Object Factory', () => {
-  let writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
+describe('Written Translations', () => {
   let writtenTranslationsBackendDict: WrittenTranslations;
 
   beforeEach(() => {
-    writtenTranslationsObjectFactory = TestBed.inject(
-      WrittenTranslationsObjectFactory
-    );
-
-    writtenTranslationsBackendDict =
-      writtenTranslationsObjectFactory.createFromBackendDict({
-        translations_mapping: {
-          content_1: {
-            'hi-en': {
-              data_format: 'html',
-              translation: '',
-              needs_update: false,
-            },
+    writtenTranslationsBackendDict = WrittenTranslations.createFromBackendDict({
+      translations_mapping: {
+        content_1: {
+          'hi-en': {
+            data_format: 'html',
+            translation: '',
+            needs_update: false,
           },
         },
-      });
+      },
+    });
   });
 
-  it('should create a written translations object from backend dict', () => {
+  it('should create a written translations from backend dict', () => {
     expect(writtenTranslationsBackendDict.toBackendDict()).toEqual({
       translations_mapping: {
         content_1: {
@@ -60,13 +49,12 @@ describe('Written Translations Object Factory', () => {
     });
   });
 
-  it('should create an empty written translations object', () => {
-    const emptyWrittenTranslationsObject =
-      writtenTranslationsObjectFactory.createEmpty();
-    expect(emptyWrittenTranslationsObject.getAllContentIds()).toEqual([]);
+  it('should create an empty written translations', () => {
+    const emptyWrittenTranslations = WrittenTranslations.createEmpty();
+    expect(emptyWrittenTranslations.getAllContentIds()).toEqual([]);
   });
 
-  it('should add and delete contents from a written translations object', () => {
+  it('should add and delete contents from a written translations', () => {
     expect(writtenTranslationsBackendDict.getAllContentIds()).toEqual([
       'content_1',
     ]);
@@ -95,7 +83,7 @@ describe('Written Translations Object Factory', () => {
     ]);
   });
 
-  it('should add translation in a written translations object', () => {
+  it('should add translation in a written translations', () => {
     expect(() => {
       writtenTranslationsBackendDict.addWrittenTranslation(
         'content_1',
@@ -116,9 +104,9 @@ describe('Written Translations Object Factory', () => {
     ).toEqual(['hi-en', 'en']);
   });
 
-  it('should update the html language code of a written translations object', () => {
+  it('should update the html language code of a written translations', () => {
     const writtenTranslationsBackendDict =
-      writtenTranslationsObjectFactory.createFromBackendDict({
+      WrittenTranslations.createFromBackendDict({
         translations_mapping: {
           content_1: {
             'hi-en': {
@@ -202,7 +190,7 @@ describe('Written Translations Object Factory', () => {
 
   it('should set needs_update to true in all translations from a content', () => {
     const writtenTranslationsBackendDict =
-      writtenTranslationsObjectFactory.createFromBackendDict({
+      WrittenTranslations.createFromBackendDict({
         translations_mapping: {
           content_1: {
             'hi-en': {

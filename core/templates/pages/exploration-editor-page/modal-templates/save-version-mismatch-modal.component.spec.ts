@@ -27,10 +27,7 @@ import {
 
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {SaveVersionMismatchModalComponent} from './save-version-mismatch-modal.component';
-import {
-  LostChange,
-  LostChangeObjectFactory,
-} from 'domain/exploration/LostChangeObjectFactory';
+import {LostChange} from 'domain/exploration/lost-change.model';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ExplorationDataService} from '../services/exploration-data.service';
 
@@ -115,7 +112,6 @@ describe('Save Version Mismatch Modal Component', () => {
         ChangesInHumanReadableFormComponentStub,
       ],
       providers: [
-        LostChangeObjectFactory,
         {
           provide: ExplorationDataService,
           useValue: explorationDataService,
