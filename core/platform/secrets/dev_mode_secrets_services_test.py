@@ -30,10 +30,10 @@ class DevModeSecretsServicesTests(test_utils.GenericTestBase):
 
     def test_get_secret_returns_existing_secret(self) -> None:
         secrets = {
-            "name": "secret",
-            "name1": {
-                "FIREBASE_CONFIG_API_KEY": "fake-api-key",
-                "FIREBASE_CONFIG_AUTH_DOMAIN": ""
+            'name': 'secret',
+            'name1': {
+                'FIREBASE_CONFIG_API_KEY': 'fake-api-key',
+                'FIREBASE_CONFIG_AUTH_DOMAIN': ''
             }
         }
         with self.swap(os, 'environ', {'SECRETS': json.dumps(secrets)}):

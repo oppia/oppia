@@ -126,7 +126,7 @@ export class AuthService {
     } catch (e) {
       console.error('Unable to fetch firebase config : ', e);
     }
-    if (config === '') {
+    if (config.trim().length === 0) {
       return {
         apiKey: AppConstants.FIREBASE_CONFIG_API_KEY,
         authDomain: AppConstants.FIREBASE_CONFIG_AUTH_DOMAIN,

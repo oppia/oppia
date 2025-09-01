@@ -35,8 +35,10 @@ class FirebaseServicesTests(test_utils.GenericTestBase):
 
     def _mock_get_secret(self, name: str) -> Optional[Dict[str, str]]:
         """Mock for the get_secret function.
+
         Args:
             name: str. The name of the secret to retrieve the value.
+
         Returns:
             Optional[str]. The value of the secret.
         """

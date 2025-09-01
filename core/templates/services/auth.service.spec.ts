@@ -318,5 +318,18 @@ describe('Auth service', function () {
       });
       expect(XMLHttpRequest.prototype.open).toHaveBeenCalled();
     });
+
+    it('should log an error when unable to fetch firebase config from ', () => {
+      spyOn(XMLHttpRequest.prototype, 'open').and.callThrough();
+      spyOn(XMLHttpRequest.prototype, 'send').and.callFake(() => {
+        throw new Error('Test Error');
+      });
+      const consoleSpy = spyOn(console, 'error');
+      AuthService.getConfig();
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'Unable to fetch firebase config : ',
+        jasmine.any(Error)
+      );
+    });
   });
 });
