@@ -3,8 +3,10 @@
 
     <!-- tutor Card -->
     <div class="new-conversation-skin-tutor-card-container"
-         [ngClass]="{'new-conversation-skin-tutor-card-alone':
-                      !canWindowShowTwoCards() && !isCurrentSupplementalCardNonempty()}">
+     [ngClass]="{
+       'new-conversation-skin-tutor-card-alone': !canWindowShowTwoCards() && !isCurrentSupplementalCardNonempty(),
+       'supplemental-cards': isCurrentSupplementalCardNonempty()
+     }">
       <oppia-conversation-display [displayedCard]="getDisplayedCard()"
                         [displayedCardWasCompletedInPrevSession]="isDisplayedCardCompletedInPrevSession()"
                         [avatarImageIsShown]="true"

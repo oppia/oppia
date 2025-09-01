@@ -11,7 +11,7 @@
     <oppia-new-conversation-skin class="preview-conversation-skin" *ngIf="voiceoversAreLoaded && isNewLessonPlayerEnabled()"></oppia-new-conversation-skin>
   </div>
 
-  <div class="oppia-preview-bottom-right-container" [ngStyle]="isNewLessonPlayerEnabled() ? {bottom: '58px'} : {bottom: '42px'}">
+  <div class="oppia-preview-bottom-right-container" [ngClass]="{'restart-btn': isNewLessonPlayerEnabled()}">
     <div class="oppia-parameter-summary" *ngIf="showParameterSummary()">
       <strong>Parameters:</strong>
       <table>
@@ -50,6 +50,7 @@
 
   .oppia-preview-bottom-right-container {
     /* Fixed at bottom right corner (before footer) and appear on top of other div*/
+    bottom: 42px;
     display: block;
     position: fixed;
     right: 0;
@@ -112,5 +113,15 @@
     position: fixed;
     right: 0;
     z-index: 1010;
+  }
+
+  .restart-btn {
+    top: 116px;
+  }
+
+  @media (max-width: 768px) {
+    .restart-btn {
+      top: 46px;
+    }
   }
 </style>
