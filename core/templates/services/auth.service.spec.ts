@@ -308,7 +308,14 @@ describe('Auth service', function () {
       spyOn(XMLHttpRequest.prototype, 'open').and.callThrough();
       spyOn(XMLHttpRequest.prototype, 'send');
       const firebaseConfig = AuthService.getConfig();
-      expect(firebaseConfig).toBe(null);
+      expect(firebaseConfig).toEqual({
+        apiKey: 'fake-api-key',
+        authDomain: '',
+        projectId: 'dev-project-id',
+        storageBucket: '',
+        messagingSenderId: '',
+        appId: '',
+      });
       expect(XMLHttpRequest.prototype.open).toHaveBeenCalled();
     });
   });
