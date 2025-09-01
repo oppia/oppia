@@ -113,6 +113,17 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
         parsed_text = voiceover_regeneration_services.parse_html(content_html)
         self.assertEqual(parsed_text, expected_parsed_text)
 
+    def test_should_able_to_raise_exception_for_invalid_tag(self) -> None:
+        content_html = (
+            '<p><oppia-noninteractive-workedexample>'
+            '</oppia-noninteractive-workedexample></p>')
+        exception_msg = (
+            'HTML content contains invalid or unsupported tags: '
+            'oppia-noninteractive-workedexample'
+        )
+        with self.assertRaisesRegex(Exception, exception_msg):
+            voiceover_regeneration_services.parse_html(content_html)
+
     def test_should_be_able_to_regenerate_automatic_voiceovers(self) -> None:
         content_html = '<p>Hello world, this is a dummy text.</p>'
         exploration_id = 'exp_id'

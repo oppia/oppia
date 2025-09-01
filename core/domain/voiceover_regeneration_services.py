@@ -53,15 +53,26 @@ speech_synthesis_services = (
     models.Registry.import_speech_synthesis_services())
 
 
-ALLOWED_CUSTOM_OPPIA_RTE_TAGS = [
+ALLOWED_LESSON_CUSTOM_RTE_TAGS = [
     'oppia-noninteractive-collapsible',
     'oppia-noninteractive-image',
     'oppia-noninteractive-link',
     'oppia-noninteractive-math',
     'oppia-noninteractive-video',
     'oppia-noninteractive-skillreview',
-    'oppia-noninteractive-tabs',
-    'oppia-noninteractive-workedexample'
+    'oppia-noninteractive-tabs'
+]
+
+ALLOWED_LESSON_GENERAL_RTE_TAGS = [
+    'p',
+    'strong',
+    'br',
+    'em',
+    'li',
+    'ol',
+    'ul',
+    'pre',
+    'blockquote'
 ]
 
 WAIT_TIME_FOR_VOICEOVER_REGENERATION_IN_SECONDS = 3
@@ -77,9 +88,11 @@ def convert_custom_oppia_tags_to_generic_tags(element: bs4.Tag) -> bs4.Tag:
     Returns:
         Tag. The transformed paragraph tag.
     """
-    # The custom tags for images, videos, tabs, and collapsible
-    # tags are not processed here because we do not plan to
-    # provide voiceovers for the text associated with these tags.
+    # NOTE: Tags such as images, videos, tabs, and collapsibles are excluded
+    # here because automatic voiceovers are not planned for the text they
+    # contain. At present, only link, skill review, and math tags are processed.
+    # In the future, if other custom tags require voiceover support,
+    # their handling should be implemented in the code below.
 
     if element.name in [
         'oppia-noninteractive-link',
@@ -88,14 +101,14 @@ def convert_custom_oppia_tags_to_generic_tags(element: bs4.Tag) -> bs4.Tag:
         escaped_text = element.get('text-with-value')
         text = html.unescape(escaped_text)
         element.string = json.loads(text)
+        element.name = 'p'
     elif element.name == 'oppia-noninteractive-math':
         escaped_math_content = element.get('math_content-with-value')
         math_content = json.loads(html.unescape(escaped_math_content))
         latex_expr = math_content['raw_latex']
         converter = latex2text.LatexNodes2Text()
         element.string = converter.latex_to_text(latex_expr)
-
-    element.name = 'p'
+        element.name = 'p'
     return element
 
 
@@ -108,9 +121,25 @@ def parse_html(html_content: str) -> str:
 
     Returns:
         str. The plain text retrieved from the HTML content.
+
+    Raises:
+        Exception. The HTML content contains invalid or unsupported tags.
     """
     soup = bs4.BeautifulSoup(html_content, 'html.parser')
-    for custom_tag_element in ALLOWED_CUSTOM_OPPIA_RTE_TAGS:
+    all_tags = {tag.name for tag in soup.find_all()}
+
+    unknown_tags = (
+        all_tags -
+        set(ALLOWED_LESSON_GENERAL_RTE_TAGS) -
+        set(ALLOWED_LESSON_CUSTOM_RTE_TAGS)
+    )
+
+    if unknown_tags:
+        raise Exception(
+            'HTML content contains invalid or unsupported tags: %s' % (
+                ', '.join(unknown_tags)))
+
+    for custom_tag_element in ALLOWED_LESSON_CUSTOM_RTE_TAGS:
         for element in soup.find_all(custom_tag_element):
             convert_custom_oppia_tags_to_generic_tags(element)
 
