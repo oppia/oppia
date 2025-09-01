@@ -119,8 +119,9 @@ runs:
         #
         # Note that we need to include install_python_dev_dependencies.py in
         # the cache key because it has the version numbers for pip, pip-tools
-        # and setuptools.
-        key: ${{ runner.os }}-proddeps-${{ hashFiles('/home/runner/work/.pyversion', 'yarn.lock', 'requirements_dev.txt', 'requirements.txt', 'dependencies.json',  'scripts/install_python_dev_dependencies.py') }}
+        # and setuptools. We include scripts/common.py because it has version
+        # numbers for dependencies like Elasticsearch.
+        key: ${{ runner.os }}-proddeps-${{ hashFiles('/home/runner/work/.pyversion', 'yarn.lock', 'requirements_dev.txt', 'requirements.txt', 'dependencies.json',  'scripts/install_python_dev_dependencies.py', 'scripts/common.py') }}
         path: |
           /home/runner/work/oppia/oppia_tools
           /home/runner/work/oppia/yarn_cache

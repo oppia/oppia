@@ -1,0 +1,140 @@
+.post-chapter-recommendations-container {
+  margin-bottom: 30px;
+}
+.post-chapter-recommendations-container .post-chapter-recommendation-text {
+  font-size: 1.2em;
+  text-align: center;
+}
+.post-chapter-recommendations-container .post-chapter-recommendation-cards-container {
+  align-items: flex-start;
+  display: flex;
+  justify-content: space-evenly;
+}
+.post-chapter-recommendation-cards-container .recommendation-card-wrapper {
+  width: 192px;
+}
+.post-chapter-recommendation-cards-container .recommendation-card {
+  border-radius: 15px;
+  box-shadow: 7px 7px 5px rgba(0, 0, 0, 0.08);
+  height: 150px;
+  margin-bottom: 20px;
+  width: 192px;
+}
+.post-chapter-recommendation-cards-container .recommendation-card-svg {
+  border-radius: 15px;
+}
+.post-chapter-recommendation-cards-container .next-story-node-image {
+  transform: scale(0.8);
+}
+.post-chapter-recommendation-cards-container .post-chapter-recommendations-practice-icon {
+  transform: scale(0.7);
+}
+.post-chapter-recommendation-cards-container .post-chapter-recommendations-revision-icon {
+  transform: scale(0.7);
+}
+.post-chapter-recommendation-cards-container p {
+  font-size: 1.2em;
+  text-align: center;
+}
+.post-chapter-recommendation-cards-container .or-text {
+  margin-top: 65px;
+}
+.post-chapter-recommendation-cards-container .to-the-next-lesson-text {
+  font-weight: 800;
+  margin-bottom: 0;
+}
+
+.new-post-chapter-recommendation-cards-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  width: 662px;
+}
+
+.post-chapter-recommendations-btn {
+  align-items: center;
+  border-radius: 4px;
+  border-width: 1px;
+  display: flex;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  height: 78px;
+  margin-bottom: 15px;
+  padding: 16px;
+  width: 325px;
+}
+
+.new-post-chapter-recommendation-cards-container a {
+  text-decoration: none;
+}
+
+.post-chapter-recommendations-btn i {
+  font-size: 24px;
+  margin-right: 10px;
+}
+
+.post-chapter-recommendations-btn span {
+  font-family: "Roboto", Arial, sans-serif;
+  font-size: 16px;
+}
+
+.learner-dashboard-btn,
+.signup-btn {
+  background-color: #e8f1f0;
+  border: 1px solid #00645c;
+  color: #00645c;
+}
+
+.next-lesson-btn {
+  background-color: #0d48a1;
+  border: 1px solid #0d48a1;
+  color: #fff;
+}
+
+.review-card-btn {
+  background-color: #fffcfc;
+  border: 1px solid #c55f45;
+  color: #c55f45;
+}
+
+.more-practice-btn {
+  background-color: #f4fafb;
+  border: 1px solid #008098;
+  color: #008098;
+}
+
+.three-buttons-container {
+  justify-content: center;
+  width: 100%;
+}
+
+
+@media (max-width: 1200px) {
+  .post-chapter-recommendations-container .post-chapter-recommendation-cards-container {
+    align-items: center;
+    flex-direction: column;
+  }
+  .post-chapter-recommendation-cards-container .or-text {
+    margin-bottom: 40px;
+    margin-top: 40px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .new-post-chapter-recommendation-cards-container {
+    justify-content: center;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .post-chapter-recommendations-btn {
+    font-size: 13px;
+    width: 260px;
+  }
+
+  .post-chapter-recommendations-btn span {
+    font-size: 13px;
+  }
+}

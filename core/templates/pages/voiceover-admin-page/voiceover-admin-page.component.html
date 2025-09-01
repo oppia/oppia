@@ -33,7 +33,7 @@
                 <span *ngIf="!isAutogenerationSupportedByCloudService(languageAccentCodeToDescription.key)"
                       matTooltip="This language accent does not support autogeneration functionality."
                       matTooltipPosition="after">
-                  <span>No</span>
+                  <span class="autogeneration-disabled-text">N/A</span>
                   <span>
                     <mat-icon>info</mat-icon>
                   </span>
@@ -149,13 +149,12 @@
 </mat-card>
 
 <mat-card class="oppia-page-card oppia-long-text-card automatic-voiceover-regeneration-record-card">
-  <h3>Automatic voiceovers regeneration status</h3>
+  <h3>Lesson-level voiceover regeneration status</h3>
 
-  <p>
-    <i>
-      <strong>Note: </strong>
-      <span>Use the date picker below to choose the date range for fetching voiceover regeneration records.</span>
-    </i>
+  <p class="info-text">
+      The voiceover regeneration records shown here are those triggered via the
+      deferred queue (performed asynchronously), not the ones initiated as one-off
+      individual voiceover regenerations through the exploration translation tab.
   </p>
 
   <div>
@@ -184,7 +183,7 @@
   </div>
 
   <div *ngIf="!fetchingrenegenratedVoiceoverData && !cloudTaskRunList.length">
-    <p class="no-record-info-text">
+    <p class="info-text">
       <i>No records found for the selected date range.</i>
     </p>
   </div>
@@ -266,7 +265,7 @@
     position: relative;
     vertical-align: top;
   }
-  .no-record-info-text {
+  .info-text {
     margin-left: 1%;
   }
   .date-selector-inner-container .mat-form-field-wrapper {
@@ -294,6 +293,7 @@
     margin-right: 23%;
   }
   .language-accent-autogeneration-status {
+    cursor: pointer;
     width: 20%;
   }
   .language-accent-description {
@@ -404,6 +404,10 @@
     align-items: center;
     display: flex;
     width: auto;
+  }
+
+  .autogeneration-disabled-text {
+    margin-right: 15px;
   }
 
   @media (max-width: 600px) {

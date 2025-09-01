@@ -34,7 +34,6 @@ import 'third-party-imports/midi-js.import';
 import 'third-party-imports/skulpt.import';
 import {ToastrModule} from 'ngx-toastr';
 import {toastrConfig} from 'pages/oppia-root/app.module';
-import {PlayerHeaderComponent} from './lesson-header/player-header.component';
 import {LessonPlayerSidebarComponent} from './sidebar-components/lesson-player-sidebar.component';
 import {NewAudioBarComponent} from './conversation-skin-components/new-audio-bar.component';
 import {ConceptCardManagerService} from '../services/concept-card-manager.service';
@@ -42,6 +41,8 @@ import {NewFlagExplorationModalComponent} from './sidebar-components/flag-lesson
 import {CustomizableThankYouModalComponent} from './sidebar-components/customizable-thank-you-modal.component';
 import {LessonFeedbackModalComponent} from './sidebar-components/lesson-feedback-modal.component';
 import {MatBottomSheetModule} from '@angular/material/bottom-sheet';
+import {NewSwitchContentLanguageRefreshRequiredModalComponent} from './conversation-skin-components/conversation-display-components/new-switch-content-language-refresh-required-modal.component';
+import {NewProgressReminderModalComponent} from './conversation-skin-components/lesson-player-footer/new-progress-reminder-modal.component';
 
 @NgModule({
   imports: [
@@ -61,22 +62,24 @@ import {MatBottomSheetModule} from '@angular/material/bottom-sheet';
   declarations: [
     NewLessonPlayerPageComponent,
     NewLessonPlayerPageRootComponent,
-    PlayerHeaderComponent,
     LessonPlayerSidebarComponent,
+    NewSwitchContentLanguageRefreshRequiredModalComponent,
     NewAudioBarComponent,
     NewFlagExplorationModalComponent,
     CustomizableThankYouModalComponent,
     LessonFeedbackModalComponent,
+    NewProgressReminderModalComponent,
   ],
   entryComponents: [
     NewFlagExplorationModalComponent,
     CustomizableThankYouModalComponent,
     NewLessonPlayerPageComponent,
     NewLessonPlayerPageRootComponent,
-    PlayerHeaderComponent,
     LessonPlayerSidebarComponent,
     NewAudioBarComponent,
     LessonFeedbackModalComponent,
+    NewSwitchContentLanguageRefreshRequiredModalComponent,
+    NewProgressReminderModalComponent,
   ],
   providers: [
     HintAndSolutionModalService,

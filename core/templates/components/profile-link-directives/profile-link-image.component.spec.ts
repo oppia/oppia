@@ -24,7 +24,6 @@ import {RouterModule} from '@angular/router';
 import {APP_BASE_HREF} from '@angular/common';
 
 import {UserService} from 'services/user.service';
-import {SmartRouterModule} from 'hybrid-router-module-provider';
 import {ProfileLinkImageComponent} from './profile-link-image.component';
 
 /**
@@ -38,13 +37,7 @@ describe('ProfileLinkImageComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-        // TODO(#13443): Remove hybrid router module provider once all pages are
-        // migrated to angular router.
-        SmartRouterModule,
-        RouterModule.forRoot([]),
-      ],
+      imports: [HttpClientTestingModule, RouterModule.forRoot([])],
       declarations: [ProfileLinkImageComponent],
       providers: [
         {

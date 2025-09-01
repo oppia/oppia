@@ -8,6 +8,14 @@
 /*
   This affects the progress nav bar.
 */
+
+oppia-progress-tracker {
+  left: 50%;
+  position: absolute;
+  transform: translateX(-50%);
+  width: 375px;
+}
+
 .card-navigation-control .oppia-nav-button .mat-button.oppia-autofocus:focus {
   background-color: #0d48a1;
 }
@@ -64,6 +72,7 @@
 
 .card-navigation-control {
   background-color: white;
+  height: 60px;
   margin-left: 0;
   margin-right: 0;
   max-width: 100%;
@@ -159,4 +168,26 @@
   font-weight: bold;
   margin-right: 10px;
   text-transform: uppercase;
+}
+
+@media (max-width: 768px) {
+  oppia-progress-tracker {
+    width: 175px;
+  }
+}
+
+@media (max-width: 480px) {
+  .card-navigation-control .oppia-learner-confirm-button,
+  .card-navigation-control.continue-button {
+    font-size: 13px;
+  }
+
+  .card-navigation-control .right-side-buttons {
+    margin: 0;
+    margin-bottom: 20px;
+  }
+
+  .hide-save-btn {
+    width: 100px;
+  }
 }

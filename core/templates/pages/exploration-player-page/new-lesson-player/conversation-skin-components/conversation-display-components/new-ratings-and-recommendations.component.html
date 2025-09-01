@@ -1,0 +1,57 @@
+<div class="conversation-skin-final-summary">
+  <div *ngIf="userIsLoggedIn && !explorationIsInPreviewMode" class="conversation-skin-final-ratings">
+    <p class="conversation-skin-final-ratings-header">{{'I18N_PLAYER_RATE_LESSON' | translate}}</p>
+    <oppia-rating-display [ratingValue]="userRating"
+                          [isEditable]="true"
+                          (edit)="submitUserRating($event)"
+                          class="conversation-skin-final-ratings-display"
+                          (click)="showFeedbackModal()">
+    </oppia-rating-display>
+  </div>
+
+  <div *ngIf="!collectionSummary && !inStoryMode && recommendedExplorationSummaries && recommendedExplorationSummaries.length > 0"
+       class="conversation-skin-final-recommendations">
+    <ng-container *ngIf="recommendedExplorationSummaries.length > 0">
+      <div class="conversation-skin-final-recommendations-header-container">
+        <span *ngIf="!collectionSummary && !getIsRefresherExploration()" class="conversation-skin-final-recommendations-header"
+              translate="I18N_END_EXPLORATION_RECOMMENDATION_MESSAGE">
+        </span>
+      </div>
+      <div class="ratings-and-recommendations-exp-summary-tiles-container conversation-skin-recommended-activities-container">
+        <oppia-exploration-summary-tile *ngFor="let exp of (recommendedExplorationSummaries|limitTo:3)"
+                                        [collectionId]="collectionId"
+                                        [explorationId]="exp.id"
+                                        [explorationTitle]="exp.title"
+                                        [parentExplorationIds]="getParentExplorationIds()"
+                                        [lastUpdatedMsec]="exp.lastUpdatedMsec"
+                                        [objective]="exp.objective"
+                                        [category]="exp.category"
+                                        [ratings]="exp.ratings"
+                                        [thumbnailIconUrl]="exp.thumbnailIconUrl"
+                                        [thumbnailBgColor]="exp.thumbnailBgColor"
+                                        [numViews]="exp.numViews"
+                                        [isCommunityOwned]="exp.communityOwned"
+                                        [mobileCutoffPx]="5000"
+                                        class="ratings-component-oppia-exploration-summary-tile">
+        </oppia-exploration-summary-tile>
+      </div>
+    </ng-container>
+  </div>
+
+  <a href="/community-library" *ngIf="!inStoryMode">
+    <button class="community-library-btn" tabindex="0">
+      <i class="fa-solid fa-arrow-right-to-bracket"></i>
+      <p>Go To Library</p>
+    </button>
+  </a>
+
+  <ng-container *ngIf="inStoryMode  && storyId">
+    <oppia-post-chapter-recommendations [nextStoryNodeLink]="nextLessonLink"
+                                        [nextStoryNodeThumbnailUrl]="nextStoryNodeIconUrl ? nextStoryNodeIconUrl : ''"
+                                        [nextStoryNodeThumbnailBgColor]="nextStoryNode ? nextStoryNode.thumbnailBgColor : ''"
+                                        [nextStoryNodeTitle]="nextStoryNode ? nextStoryNode.title : ''"
+                                        [practiceQuestionsAreEnabled]="practiceQuestionsAreEnabled"
+                                        [userIsLoggedIn]="userIsLoggedIn">
+    </oppia-post-chapter-recommendations>
+  </ng-container>
+</div>

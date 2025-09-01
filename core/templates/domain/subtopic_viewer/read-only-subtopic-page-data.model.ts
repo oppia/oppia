@@ -33,6 +33,7 @@ export interface SubtopicDataBackendDict {
   subtopic_title: string;
   sections: StudyGuideSectionBackendDict[] | null;
   page_contents: SubtopicPageContentsBackendDict | null;
+  current_subtopic_id: number;
   next_subtopic_dict: SubtopicBackendDict | null;
   prev_subtopic_dict: SubtopicBackendDict | null;
   topic_id: string;
@@ -45,6 +46,7 @@ export class ReadOnlySubtopicPageData {
   subtopicTitle: string;
   sections: StudyGuideSection[] | null;
   pageContents: SubtopicPageContents | null;
+  currentSubtopicId: number;
   nextSubtopic: Subtopic | null;
   prevSubtopic: Subtopic | null;
 
@@ -52,6 +54,7 @@ export class ReadOnlySubtopicPageData {
     parentTopicId: string,
     parentTopicName: string,
     subtopicTitle: string,
+    currentSubtopicId: number,
     nextSubtopic: Subtopic | null,
     prevSubtopic: Subtopic | null,
     sections: StudyGuideSection[] | null,
@@ -62,6 +65,7 @@ export class ReadOnlySubtopicPageData {
     this.subtopicTitle = subtopicTitle;
     this.sections = sections;
     this.pageContents = pageContents;
+    this.currentSubtopicId = currentSubtopicId;
     this.nextSubtopic = nextSubtopic;
     this.prevSubtopic = prevSubtopic;
   }
@@ -84,6 +88,10 @@ export class ReadOnlySubtopicPageData {
 
   getSections(): StudyGuideSection[] | null {
     return this.sections;
+  }
+
+  getCurrentSubtopicId(): number {
+    return this.currentSubtopicId;
   }
 
   getNextSubtopic(): Subtopic | null {
@@ -122,6 +130,7 @@ export class ReadOnlySubtopicPageData {
       subtopicDataBackendDict.topic_id,
       subtopicDataBackendDict.topic_name,
       subtopicDataBackendDict.subtopic_title,
+      subtopicDataBackendDict.current_subtopic_id,
       nextSubtopic,
       prevSubtopic,
       sections,

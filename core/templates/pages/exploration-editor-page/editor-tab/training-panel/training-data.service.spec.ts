@@ -26,7 +26,7 @@ import {ResponsesService} from '../services/responses.service';
 import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {Rule} from 'domain/exploration/rule.model';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import {State} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 import {Interaction} from 'domain/exploration/interaction.model';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';

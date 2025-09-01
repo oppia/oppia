@@ -40,6 +40,7 @@ export class VoiceoverPlayerService {
   public languageAccentDescriptions: string[] = [];
   public languageAccentDescriptionsToCodes: LanguageAccentDescriptionToCode =
     {};
+  public isAutomaticVoiceoverPlaying: boolean = false;
   private _translationLanguageChangedEventEmitter = new EventEmitter<void>();
   private _activeVoiceoverChangedEventEmitter = new EventEmitter<void>();
   constructor(private entityVoiceoversService: EntityVoiceoversService) {}
@@ -89,13 +90,14 @@ export class VoiceoverPlayerService {
     languageAccentCodes: string[]
   ): void {
     let retrievedLanguageAccentCodes =
-      this.languageAccentMasterList[languageCode];
+      this.languageAccentMasterList[languageCode] || {};
+
     let languageAccentDescriptions = [];
     this.languageAccentDescriptions = [];
     this.languageAccentDescriptionsToCodes = {};
 
     for (let languageAccentCode in retrievedLanguageAccentCodes) {
-      if (languageAccentCodes.indexOf(languageAccentCode) !== -1) {
+      if (languageAccentCodes.includes(languageAccentCode)) {
         let description = retrievedLanguageAccentCodes[languageAccentCode];
 
         languageAccentDescriptions.push(description);

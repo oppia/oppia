@@ -23,7 +23,7 @@ import {MockTranslateService} from '../../../../components/forms/schema-based-ed
 import {BackgroundMaskService} from '../../../../services/stateful/background-mask.service';
 import {LearnerAnswerInfoCard} from './learner-answer-info-card.component';
 import {ExplorationEngineService} from '../../services/exploration-engine.service';
-import {StateObjectFactory} from '../../../../domain/state/StateObjectFactory';
+import {State} from '../../../../domain/state/state.model';
 import {ExplorationHtmlFormatterService} from '../../../../services/exploration-html-formatter.service';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {PlayerTranscriptService} from '../../services/player-transcript.service';
@@ -35,7 +35,6 @@ describe('LearnerAnswerInfoCard', () => {
   let fixture: ComponentFixture<LearnerAnswerInfoCard>;
   let explorationHtmlFormatter: ExplorationHtmlFormatterService;
   let explorationEngineService: ExplorationEngineService;
-  let stateObjectFactory: StateObjectFactory;
   let conversationFlowService: ConversationFlowService;
   let playerTranscriptService: PlayerTranscriptService;
   let learnerAnswerInfoService: LearnerAnswerInfoService;
@@ -56,14 +55,13 @@ describe('LearnerAnswerInfoCard', () => {
   }));
 
   beforeEach(() => {
-    stateObjectFactory = TestBed.get(StateObjectFactory);
     explorationHtmlFormatter = TestBed.get(ExplorationHtmlFormatterService);
     learnerAnswerInfoService = TestBed.get(LearnerAnswerInfoService);
     playerTranscriptService = TestBed.get(PlayerTranscriptService);
     conversationFlowService = TestBed.inject(ConversationFlowService);
     explorationEngineService = TestBed.get(ExplorationEngineService);
     spyOn(explorationEngineService, 'getState').and.returnValue(
-      stateObjectFactory.createFromBackendDict('stateName', {
+      State.createFromBackendDict('stateName', {
         classifier_model_id: null,
         content: {
           html: '',
