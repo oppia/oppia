@@ -99,7 +99,7 @@ const closePublishedPopUpButton = 'button.e2e-test-share-publish-close';
 const discardDraftDropdownSelector = 'button.e2e-test-save-discard-toggle';
 const desktopDiscardDraftButton = 'a.e2e-test-discard-changes';
 const confirmDiscardButton = 'button.e2e-test-confirm-discard-changes';
-const currentCardNameSelector = 'strong.e2e-test-state-name-text';
+const currentCardNameContainerSelector = '.e2e-test-state-name-container';
 
 const previewTabButton = '.e2e-test-preview-tab';
 const previewTabContainer = '.e2e-test-preview-tab-container';
@@ -417,6 +417,9 @@ const customSelectedCharctersSelector = '.e2e-test-custom-letters';
 const showUnitFormatsButtonSelector = '.e2e-test-show-unit-formats';
 const codeOutputSelector = '.e2e-test-code-output';
 const graphContainerSelector = '.e2e-test-graph-input-viz-container';
+const nodeWarningSignSelector = '.e2e-test-node-warning-sign';
+const navigationDropdownInMobileVisibleSelector =
+  '.oppia-exploration-editor-tabs-dropdown.show';
 
 export enum INTERACTION_TYPES {
   ALGEBRAIC_EXPRESSION = 'Algebric Expression Input',
@@ -723,12 +726,6 @@ export class ExplorationEditor extends BaseUser {
    * @param numberOfItems The expected number of history items.
    */
   async expectNumberOfHistoryItemsToBe(numberOfItems: number): Promise<void> {
-    // TODO(#22976): In mobile view the number of items displayed exceeds the
-    // maximum number of items allowed per page. So, skip this check for mobile
-    // view.
-    if (this.isViewportAtMobileWidth()) {
-      return;
-    }
     if (numberOfItems === 0) {
       await this.expectElementToBeVisible(historyListItemSelector, false);
       return;
@@ -2002,6 +1999,7 @@ export class ExplorationEditor extends BaseUser {
       throw new Error('Math equation box not found.');
     }
 
+    await this.waitForElementToStabilize(equationBox);
     await equationBox.click();
     await equationBox.type(solution);
 
@@ -2738,22 +2736,26 @@ export class ExplorationEditor extends BaseUser {
    * on the dropdown toggle.
    */
   async closeEditorNavigationDropdownOnMobile(): Promise<void> {
-    try {
-      await this.page.waitForSelector(dropdownToggleIcon, {
-        visible: true,
-        timeout: 5000,
-      });
-      await this.clickOn(dropdownToggleIcon);
+    const isDropdownClosed = await this.isElementVisible(
+      openExplorationEditorNavigationMobile,
+      false,
+      5000
+    );
 
-      await this.expectElementToBeVisible(
-        openExplorationEditorNavigationMobile,
-        false
+    if (isDropdownClosed) {
+      showMessage(
+        'Skipped closing editor navigation dropdown, already closed.'
       );
-
-      showMessage('Editor navigation closed successfully.');
-    } catch (error) {
-      throw new Error(`Dropdown Toggle Icon not found: ${error.message}`);
+      return;
     }
+
+    // We are using page.click as this button might be overlapped by the
+    // dropdown. Thus, it will fail with onClick.
+    await this.page.click(dropdownToggleIcon);
+    await this.expectElementToBeVisible(
+      openExplorationEditorNavigationMobile,
+      false
+    );
   }
 
   /**
@@ -3329,6 +3331,7 @@ export class ExplorationEditor extends BaseUser {
    * Enables Automatic Text-to-Speech switch present in settings tab.
    */
   async enableAutomaticTextToSpeech(): Promise<void> {
+    await this.expandSettingsTabSection('Advanced Features');
     await this.page.waitForSelector(textToSpeechToggle, {
       visible: true,
     });
@@ -3656,7 +3659,7 @@ export class ExplorationEditor extends BaseUser {
       throw new Error(`Card name ${cardName} not found in the graph.`);
     }
 
-    let cardButton;
+    let cardButton: ElementHandle<Element> | null = null;
     if (this.isViewportAtMobileWidth()) {
       cardButton = elements[cardIndex + elements.length / 2];
     } else {
@@ -3680,7 +3683,7 @@ export class ExplorationEditor extends BaseUser {
           return element?.textContent?.includes(value);
         },
         {},
-        currentCardNameSelector,
+        currentCardNameContainerSelector,
         headingName
       );
     } catch (error) {
@@ -3689,7 +3692,7 @@ export class ExplorationEditor extends BaseUser {
         await this.navigateToCard(cardName, false);
       } else {
         error.message =
-          `Unable to navigate to the card ${cardName}\n.` + error.message;
+          `Unable to navigate to the card ${cardName}.\n` + error.message;
         throw error;
       }
     }
@@ -4321,6 +4324,16 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(mobileNavbarDropdown);
       await this.page.waitForSelector(mobileNavbarPane);
       await this.clickAndWaitForNavigation(mobileTranslationTabButton);
+
+      // Close dropdown if it doesn't automatically close.
+      const isVisible = await this.isElementVisible(
+        navigationDropdownInMobileVisibleSelector
+      );
+      if (isVisible) {
+        // We are using page.click as this button might be overlapped by the
+        // dropdown. Thus, it will fail with onClick.
+        await this.page.click(dropdownToggleIcon);
+      }
     } else {
       await this.page.waitForSelector(translationTabButton, {
         visible: true,
@@ -4349,6 +4362,16 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(mobileNavbarDropdown);
       await this.page.waitForSelector(mobileNavbarPane);
       await this.clickOn(mobileMainTabButton);
+
+      // Close dropdown if it doesn't automatically close.
+      const isVisible = await this.isElementVisible(
+        navigationDropdownInMobileVisibleSelector
+      );
+      if (isVisible) {
+        // We are using page.click as this button might be overlapped by the
+        // dropdown. Thus, it will fail with onClick.
+        await this.page.click(dropdownToggleIcon);
+      }
     } else {
       await this.page.waitForSelector(mainTabButton, {
         visible: true,
@@ -5040,6 +5063,7 @@ export class ExplorationEditor extends BaseUser {
 
     await this.clickOn(addManualVoiceoverButton);
     await this.uploadFile(voiceoverFilePath);
+    await this.waitForElementToStabilize(saveUploadedAudioButton);
     await this.clickOn(saveUploadedAudioButton);
     await this.waitForNetworkIdle();
 
@@ -6550,17 +6574,53 @@ export class ExplorationEditor extends BaseUser {
     // Get Fields.
     const videoUrlInput = await helperModel?.$(textInputField);
 
-    if (videoUrlInput) {
-      await videoUrlInput.type(videoUrl);
-    } else {
+    if (!videoUrlInput) {
       throw new Error('Video URL input not found in the helper modal');
     }
+    await this.waitForElementToStabilize(videoUrlInput);
+    await videoUrlInput.type(videoUrl);
 
     await this.page.waitForSelector(closeButtonForExtraModel);
     await this.page.click(closeButtonForExtraModel);
     await this.page.waitForSelector(closeButtonForExtraModel, {
       hidden: true,
     });
+  }
+
+  /**
+   * Function to navigate to exploration editor.
+   * @param explorationUrl - url of the exploration.
+   */
+  async navigateToExplorationEditor(
+    explorationId: string | null
+  ): Promise<void> {
+    if (!explorationId) {
+      throw new Error('Cannot navigate to editor: explorationId is null');
+    }
+    const editorUrl = `${baseUrl}/create/${explorationId}#/`;
+    await this.goto(editorUrl);
+
+    showMessage('Navigation to exploration editor is successful.');
+  }
+
+  /**
+   * Expects the node warning sign to be visible or not visible.
+   * @param visible - Whether the node warning sign should be visible or not.
+   */
+  async expectNodeWariningSignToBeVisible(
+    visible: boolean = true
+  ): Promise<void> {
+    // TODO(##23129): Remove this skip once the issue is fixed, and the nodes
+    // are added to mobile viewport.
+    if (this.isViewportAtMobileWidth()) {
+      showMessage(
+        'Skipping node warning sign check on mobile viewport,' +
+          'as nodes are not visible on mobile viewport.'
+      );
+      return;
+    }
+
+    await this.expectElementToBeVisible(nodeWarningSignSelector, visible);
   }
 }
 

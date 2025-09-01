@@ -23,6 +23,8 @@ import {LanguageUtilService} from 'domain/utilities/language-util.service';
 import {UrlService} from 'services/contextual/url.service';
 
 import {INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM} from 'pages/exploration-player-page/current-lesson-player/modals/switch-content-language-refresh-required-modal.component';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
 export interface ExplorationLanguageInfo {
   /**
@@ -40,7 +42,9 @@ export interface ExplorationLanguageInfo {
 export class ContentTranslationLanguageService {
   constructor(
     private languageUtilService: LanguageUtilService,
-    private urlService: UrlService
+    private urlService: UrlService,
+    private platformFeatureService: PlatformFeatureService,
+    private i18nLanguageCodeService: I18nLanguageCodeService
   ) {}
 
   // The 'currentContentLanguageCode' is initialized using private methods.
@@ -56,41 +60,69 @@ export class ContentTranslationLanguageService {
   ): void {
     this.currentContentLanguageCode = '';
     this.languageOptions = [];
-    // Set the content language that is chosen initially.
-    // Use the following priority (highest to lowest):
-    // 1. The URL parameter "initialContentLanguageCode".
-    // 2. Preferred content languages.
-    // 3. Otherwise, the exploration language code.
+    allContentLanguageCodesInExploration.push(explorationLanguageCode);
 
-    const urlParams = this.urlService.getUrlParams();
-    if (
-      urlParams.hasOwnProperty(INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM) &&
-      allContentLanguageCodesInExploration.includes(
-        urlParams[INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM]
-      )
-    ) {
-      this.setCurrentContentLanguageCode(
-        urlParams[INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM]
-      );
-    }
+    if (this.isNewLessonPlayerEnabled()) {
+      // Set the content language that is chosen initially.
+      // Use the following priority (highest to lowest):
+      // 1. Preferred site language.
+      // 2. Otherwise, the exploration language code.
 
-    if (
-      !this.currentContentLanguageCode &&
-      preferredContentLanguageCodes !== null
-    ) {
-      for (const languageCode of preferredContentLanguageCodes) {
-        if (allContentLanguageCodesInExploration.includes(languageCode)) {
-          this.setCurrentContentLanguageCode(languageCode);
-          break;
+      const preferredSiteLanguage =
+        this.i18nLanguageCodeService.getCurrentI18nLanguageCode();
+      if (
+        !this.currentContentLanguageCode &&
+        preferredSiteLanguage !== null &&
+        allContentLanguageCodesInExploration.includes(preferredSiteLanguage)
+      ) {
+        this.currentContentLanguageCode = preferredSiteLanguage;
+      }
+
+      if (
+        !this.currentContentLanguageCode &&
+        explorationLanguageCode !== null
+      ) {
+        this.currentContentLanguageCode = explorationLanguageCode;
+      }
+    } else {
+      // Set the content language that is chosen initially.
+      // Use the following priority (highest to lowest):
+      // 1. The URL parameter "initialContentLanguageCode".
+      // 2. Preferred content languages.
+      // 3. Otherwise, the exploration language code.
+
+      const urlParams = this.urlService.getUrlParams();
+      if (
+        urlParams.hasOwnProperty(INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM) &&
+        allContentLanguageCodesInExploration.includes(
+          urlParams[INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM]
+        )
+      ) {
+        this.setCurrentContentLanguageCode(
+          urlParams[INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM]
+        );
+      }
+
+      if (
+        !this.currentContentLanguageCode &&
+        preferredContentLanguageCodes !== null
+      ) {
+        for (const languageCode of preferredContentLanguageCodes) {
+          if (allContentLanguageCodesInExploration.includes(languageCode)) {
+            this.setCurrentContentLanguageCode(languageCode);
+            break;
+          }
         }
+      }
+
+      if (
+        !this.currentContentLanguageCode &&
+        explorationLanguageCode !== null
+      ) {
+        this.currentContentLanguageCode = explorationLanguageCode;
       }
     }
 
-    if (!this.currentContentLanguageCode && explorationLanguageCode !== null) {
-      this.currentContentLanguageCode = explorationLanguageCode;
-    }
-
-    allContentLanguageCodesInExploration.push(explorationLanguageCode);
     allContentLanguageCodesInExploration.forEach((languageCode: string) => {
       // TODO(#12341): Change getContentanguageDescription to instead refer to
       // the list of languages that we support written translations for. (Note
@@ -145,5 +177,9 @@ export class ContentTranslationLanguageService {
     if (this.currentContentLanguageCode !== newLanguageCode) {
       this.currentContentLanguageCode = newLanguageCode;
     }
+  }
+
+  isNewLessonPlayerEnabled(): boolean {
+    return this.platformFeatureService.status.NewLessonPlayer.isEnabled;
   }
 }

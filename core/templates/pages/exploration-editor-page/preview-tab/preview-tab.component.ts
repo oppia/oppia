@@ -23,7 +23,7 @@ import isEqual from 'lodash/isEqual';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
 import {ParamChange} from 'domain/exploration/param-change.model';
-import {ParamChangesObjectFactory} from 'domain/exploration/ParamChangesObjectFactory';
+import {ParamChanges} from 'domain/exploration/param-changes.model';
 import {ExplorationEngineService} from 'pages/exploration-player-page/services/exploration-engine.service';
 import {
   ExplorationParams,
@@ -44,6 +44,10 @@ import {RouterService} from '../services/router.service';
 import {PreviewSetParametersModalComponent} from './templates/preview-set-parameters-modal.component';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {ExplorationChangeEditVoiceovers} from 'domain/exploration/exploration-draft.model';
+import {ChangeListService} from '../services/change-list.service';
+import {EntityVoiceovers} from 'domain/voiceover/entity-voiceovers.model';
+import {Voiceover} from 'domain/exploration/voiceover.model';
 
 @Component({
   selector: 'oppia-preview-tab',
@@ -74,9 +78,9 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
     private parameterMetadataService: ParameterMetadataService,
     private routerService: RouterService,
     private stateEditorService: StateEditorService,
-    private paramChangesObjectFactory: ParamChangesObjectFactory,
     private entityVoiceoversService: EntityVoiceoversService,
-    private conversationFlowService: ConversationFlowService
+    private conversationFlowService: ConversationFlowService,
+    private changeListService: ChangeListService
   ) {}
 
   getManualParamChanges(
@@ -198,9 +202,7 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
         // is fully finished.
         if (!this.explorationParamChangesService.savedMemento) {
           this.explorationParamChangesService.init(
-            this.paramChangesObjectFactory.createFromBackendList(
-              explorationData.param_changes
-            )
+            ParamChanges.createFromBackendList(explorationData.param_changes)
           );
           this.explorationStatesService.init(explorationData.states, false);
           this.explorationInitStateNameService.init(
@@ -256,9 +258,55 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
         );
 
         this.entityVoiceoversService.fetchEntityVoiceovers().then(() => {
+          this.updateManualVoiceoverWithChangeList();
           this.voiceoversAreLoaded = true;
         });
       });
+  }
+
+  updateManualVoiceoverWithChangeList(): void {
+    this.changeListService.getVoiceoverChangeList().forEach(changeDict => {
+      changeDict = changeDict as ExplorationChangeEditVoiceovers;
+      let contentId = changeDict.content_id;
+      let voiceovers = changeDict.voiceovers;
+      let languageAccentCode = changeDict.language_accent_code;
+
+      let entityVoiceovers =
+        this.entityVoiceoversService.getEntityVoiceoversByLanguageAccentCode(
+          languageAccentCode
+        );
+      if (entityVoiceovers === undefined) {
+        entityVoiceovers = new EntityVoiceovers(
+          this.entityVoiceoversService.entityId,
+          this.entityVoiceoversService.entityType,
+          this.entityVoiceoversService.entityVersion,
+          languageAccentCode,
+          {},
+          {}
+        );
+      }
+
+      if (!entityVoiceovers.voiceoversMapping.hasOwnProperty(contentId)) {
+        entityVoiceovers.voiceoversMapping[contentId] = {};
+      }
+
+      if (voiceovers.hasOwnProperty('manual')) {
+        let manualVoiceover = Voiceover.createFromBackendDict(
+          voiceovers.manual
+        );
+        entityVoiceovers.voiceoversMapping[contentId].manual = manualVoiceover;
+      } else {
+        entityVoiceovers.voiceoversMapping[contentId].manual = undefined;
+        if (entityVoiceovers.voiceoversMapping[contentId].auto === undefined) {
+          delete entityVoiceovers.voiceoversMapping[contentId];
+        }
+      }
+
+      this.entityVoiceoversService.addEntityVoiceovers(
+        languageAccentCode,
+        entityVoiceovers
+      );
+    });
   }
 
   ngOnDestroy(): void {

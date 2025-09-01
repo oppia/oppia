@@ -18,7 +18,7 @@
 
 import {SuggestionThread} from 'domain/suggestion/suggestion-thread-object.model';
 import {ThreadMessage} from 'domain/feedback_message/ThreadMessage.model';
-import {FeedbackThreadBackendDict} from 'domain/feedback_thread/FeedbackThreadObjectFactory';
+import {FeedbackThreadBackendDict} from 'domain/feedback_thread/feedback-thread.model';
 import {SuggestionBackendDict} from './suggestion.model';
 
 describe('SuggestionThreadObjectFactory', () => {

@@ -1,6 +1,10 @@
+<oppia-new-end-chapter-confetti #confetti class="end-chapter-confetti">
+</oppia-new-end-chapter-confetti>
 <div class="oppia-learner-view-card" [@fadeInOut]="this.displayedCard">
+  <oppia-new-end-chapter-check-mark #checkMark [ngClass]="{'check-mark-hidden': checkMarkHidden, 'check-mark-skipped': checkMarkSkipped}" class="end-chapter-check-mark">
+  </oppia-new-end-chapter-check-mark>
   <!-- New UI for the question -->
-  <div class="oppia-learner-view-card-top-section">
+  <div class="oppia-learner-view-card-top-section" [ngClass]="{'card-content-hidden': !checkMarkHidden}">
     <svg width="30" class="left-side-curve" height="24" viewBox="0 0 30 24" fill="none" xmlns="http://www.w3.org/2000/svg"
     [ngStyle]="isLanguageRTL() ? {'transform': 'scaleX(-1)'} : {}">
       <path fill-rule="evenodd" clip-rule="evenodd" d="M0.832031 0C12.8267 5.31326 22.692 13.4676 29.1014 23.3701V0H0.832031Z" fill="white"/>
@@ -10,8 +14,7 @@
     <div class="oppia-rte-viewer oppia-learner-view-card-top-content"
           [ngClass]="getContentAudioHighlightClass()">
       <div tabindex="0">
-        <oppia-rte-output-display [rteString]="displayedCard.getContentHtml()"
-                                  class="e2e-test-conversation-content">
+        <oppia-rte-output-display [rteString]="displayedCard.getContentHtml()">
         </oppia-rte-output-display>
       </div>
       <div *ngIf="isContentAudioTranslationAvailable()" class="conversation-skin-audio-controls">
@@ -20,20 +23,36 @@
   </div>
   <!-- New UI for the question -->
 
+  <div class="response-history-container" *ngIf="shouldResponseHistoryBeShown()">
+    <hr>
+    <h4 class="new-conversation-skin-responses-dropdown-container"
+        (click)="toggleShowPreviousResponses()">
+      <span class="conversation-skin-responses-dropdown-text e2e-test-previous-responses-text">
+        <span>
+          {{ 'I18N_PLAYER_PREVIOUS_RESPONSES' | translate:{previousResponses: displayedCard.getInputResponsePairs().length - (isInteractionInline() ? 1 : 0)} }}
+        </span>
+        <span class="conversation-skin-responses-dropdown-icon">
+          <i class="fas fa-play conversation-skin-responses-dropdown-icon" [ngClass]="{'conversation-skin-responses-dropdown-icon-rotated': arePreviousResponsesShown}"></i>
+        </span>
+      </span>
+    </h4>
+    <hr>
+  </div>
+
   <div class="conversation-skin-tutor-card-middle-section"
        *ngIf="(arePreviousResponsesShown && !conceptCardIsBeingShown)" [@expandInOut]>
-    <div *ngFor="let responsePair of displayedCard.getInputResponsePairs(); index as index">
-      <div *ngIf="index !== (displayedCard.getInputResponsePairs().length - 1) || !isInteractionInline()">
+    <ng-container *ngFor="let responsePair of displayedCard.getInputResponsePairs(); index as index">
+      <ng-container *ngIf="index !== (displayedCard.getInputResponsePairs().length - 1) || !isInteractionInline()">
         <oppia-new-input-response-pair [data]="responsePair"
                                   [profilePicturePngDataUrl]="profilePicturePngDataUrl"
                                   [profilePictureWebpDataUrl]="profilePictureWebpDataUrl"
                                   [oppiaAvatarImageUrl]="OPPIA_AVATAR_IMAGE_URL"
-                                  [inputResponsePairId]="getInputResponsePairId($index)"
+                                  [inputResponsePairId]="getInputResponsePairId(index)"
                                   [isLastPair]="false"
                                   [feedbackIsEnabled]="feedbackIsEnabled">
         </oppia-new-input-response-pair>
-      </div>
-    </div>
+      </ng-container>
+    </ng-container>
   </div>
 
   <!-- If the interaction is inline, always show the most recent response pair, if there is one. -->
@@ -49,15 +68,30 @@
     </oppia-new-input-response-pair>
   </div>
 
-  <div *ngIf="displayedCardWasCompletedInPrevSession && !conceptCardIsBeingShown && (displayedCard.getInteractionId() != 'Continue')">
-    <div class="conversation-skin-oppia-feedback-container conversation-skin-oppia-completed-state-card">
+  <oppia-new-ratings-and-recommendations *ngIf="!isIframed && isOnTerminalCard() && isCurrentCardAtEndOfTranscript()"
+                                    [userIsLoggedIn]="userIsLoggedIn"
+                                    [explorationIsInPreviewMode]="explorationIsInPreviewMode"
+                                    [questionPlayerConfig]="questionPlayerConfig"
+                                    [collectionSummary]="collectionSummary"
+                                    [recommendedExplorationSummaries]="recommendedExplorationSummaries"
+                                    [nextLessonLink]="nextLessonLink">
+  </oppia-new-ratings-and-recommendations>
+
+  <ng-container *ngIf="displayedCardWasCompletedInPrevSession && !conceptCardIsBeingShown && (displayedCard.getInteractionId() != 'Continue')">
+    <div class="conversation-skin-oppia-completed-state-card">
+      <svg width="30" class="left-side-curve" height="24" viewBox="0 0 30 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+        [ngStyle]="isLanguageRTL() ? {'transform': 'scaleX(-1)'} : {}">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M0.832031 0C12.8267 5.31326 22.692 13.4676 29.1014 23.3701V0H0.832031Z" fill="white"/>
+      </svg>
       <img class="conversation-skin-oppia-avatar rounded-circle" [src]="OPPIA_AVATAR_IMAGE_URL" alt="">
       <div class="conversation-skin-oppia-feedback-content">
         {{ 'I18N_EXPLORATION_STATE_PREVIOUSLY_COMPLETED' | translate }}
       </div>
     </div>
-  </div>
+  </ng-container>
 </div>
+
+<oppia-hint-solution-and-concept-card-display></oppia-hint-solution-and-concept-card-display>
 
 
 <!--
@@ -67,9 +101,7 @@ Show the interaction (if it is inline) or the interaction instructions
 In addition, if the exploration is iframed, the terminal card will
 have no learner input section, so we do not show it.
 -->
-<div *ngIf="!displayedCardWasCompletedInPrevSession && isInteractionInline() && !shouldHideInteraction && isCurrentCardAtEndOfTranscript() && !waitingForOppiaFeedback &&
-((displayedCard.getInteractionHtml() && !displayedCard.isCompleted()) || displayedCard.isCompleted()) &&
-(!isOnTerminalCard() || !isIframed || displayedCard.isCompleted())">
+<div *ngIf="shouldInteractionBeDisplayed() && !isOnTerminalCard()">
   <div class="conversation-skin-inline-interaction"
       [ngStyle]="(displayedCard.getInteractionId() != 'Continue') ?
                   {'background-color': '#fff', 'box-shadow': '0px 0px 10px 0px rgba(0, 100, 92, 0.5)'} : {}">
@@ -78,8 +110,7 @@ have no learner input section, so we do not show it.
       This can lead to two conflicting copies of the interaction for
       non-inline interactions. -->
     <div *ngIf="isInteractionInline() && displayedCard.getInteractionHtml() && !displayedCard.isCompleted() && !conceptCardIsBeingShown">
-      <oppia-interaction-display classStr="e2e-test-conversation-input"
-                                  [htmlData]="displayedCard.getInteractionHtml()">
+      <oppia-interaction-display [htmlData]="displayedCard.getInteractionHtml()">
       </oppia-interaction-display>
     </div>
   </div>

@@ -40,8 +40,8 @@ from core.platform import models
 from core.tests import test_utils
 
 from typing import (
-    Callable, DefaultDict, Dict, Final, List, Optional, Sequence, Set, Type,
-    Union)
+    Callable, DefaultDict, Dict, Final, List, Optional, Sequence, Set, Tuple,
+    Type, Union)
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -8337,19 +8337,19 @@ class VoiceoverRegenerationNotificationEmailUnitTests(
         language_descriptions = ['English', 'Hindi']
 
         voiceover_regeneration_error_messages: List[
-            Dict[str, str|List[str]]] = [{
+            Dict[str, str|List[Tuple[str, str]]]] = [{
                 'exploration_id': 'exploration_id_1',
                 'language_accent': 'English (India)',
                 'error_messages': [
-                    'Error message 1 for English (India)',
-                    'Error message 2 for English (India)'
+                    ('content0', 'Error message 1 for English (India)'),
+                    ('content1', 'Error message 2 for English (India)')
                 ]
             }, {
                 'exploration_id': 'exploration_id_2',
                 'language_accent': 'Hindi (India)',
                 'error_messages': [
-                    'Error message 1 for Hindi (India)',
-                    'Error message 2 for Hindi (India)'
+                    ('content0', 'Error message 1 for Hindi (India)'),
+                    ('content1', 'Error message 2 for Hindi (India)')
                 ]
             }]
 

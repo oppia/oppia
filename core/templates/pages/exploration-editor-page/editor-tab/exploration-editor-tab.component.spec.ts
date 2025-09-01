@@ -60,11 +60,7 @@ import {
 } from 'ngx-joyride';
 import {Router} from '@angular/router';
 import {ExplorationPermissions} from 'domain/exploration/exploration-permissions.model';
-import {
-  State,
-  StateBackendDict,
-  StateObjectFactory,
-} from 'domain/state/StateObjectFactory';
+import {State, StateBackendDict} from 'domain/state/state.model';
 import {Interaction} from 'domain/exploration/interaction.model';
 import {PageContextService} from 'services/page-context.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
@@ -75,7 +71,7 @@ import {
   FetchSkillResponse,
   SkillBackendApiService,
 } from 'domain/skill/skill-backend-api.service';
-import {SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
+import {Skill} from 'domain/skill/skill.model';
 import {Misconception} from 'domain/skill/misconception.model';
 import {AlertsService} from 'services/alerts.service';
 
@@ -99,11 +95,9 @@ describe('Exploration editor tab component', () => {
   var explorationNextContentIdIndexService: ExplorationNextContentIdIndexService;
   let mockRefreshStateEditorEventEmitter = null;
   let versionHistoryService: VersionHistoryService;
-  let stateObjectFactory: StateObjectFactory;
   let stateObject: StateBackendDict;
   let versionHistoryBackendApiService: VersionHistoryBackendApiService;
   let skillBackendApiService: SkillBackendApiService;
-  let skillObjectFactory: SkillObjectFactory;
   let alertsService: AlertsService;
 
   class MockJoyrideService {
@@ -232,12 +226,10 @@ describe('Exploration editor tab component', () => {
       ExplorationNextContentIdIndexService
     );
     versionHistoryService = TestBed.inject(VersionHistoryService);
-    stateObjectFactory = TestBed.inject(StateObjectFactory);
     versionHistoryBackendApiService = TestBed.inject(
       VersionHistoryBackendApiService
     );
     skillBackendApiService = TestBed.inject(SkillBackendApiService);
-    skillObjectFactory = TestBed.inject(SkillObjectFactory);
     alertsService = TestBed.inject(AlertsService);
 
     mockRefreshStateEditorEventEmitter = new EventEmitter();
@@ -659,7 +651,7 @@ describe('Exploration editor tab component', () => {
   it('should populate misconceptions for state', fakeAsync(() => {
     spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
       Promise.resolve({
-        skill: skillObjectFactory.createFromBackendDict({
+        skill: Skill.createFromBackendDict({
           id: 'skill_id1',
           description: 'test description 1',
           misconceptions: [
@@ -1053,10 +1045,7 @@ describe('Exploration editor tab component', () => {
 
   it('should fetch the version history data on initialization of state editor', fakeAsync(() => {
     stateEditorService.setActiveStateName('First State');
-    let stateData = stateObjectFactory.createFromBackendDict(
-      'State',
-      stateObject
-    );
+    let stateData = State.createFromBackendDict('State', stateObject);
     spyOn(
       versionHistoryBackendApiService,
       'fetchStateVersionHistoryAsync'

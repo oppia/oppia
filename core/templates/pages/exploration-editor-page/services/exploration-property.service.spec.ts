@@ -21,20 +21,14 @@ import {TestBed, waitForAsync} from '@angular/core/testing';
 import {ExplorationPropertyService} from 'pages/exploration-editor-page/services/exploration-property.service';
 import {ChangeListService} from 'pages/exploration-editor-page/services/change-list.service';
 
-import {ParamChangesObjectFactory} from 'domain/exploration/ParamChangesObjectFactory';
-import {
-  ParamSpecs,
-  ParamSpecsObjectFactory,
-} from 'domain/exploration/ParamSpecsObjectFactory';
-import {ParamSpecObjectFactory} from 'domain/exploration/ParamSpecObjectFactory';
+import {ParamChanges} from 'domain/exploration/param-changes.model';
+import {ParamSpecs} from 'domain/exploration/param-specs.model';
+import {ParamSpec} from 'domain/exploration/param-spec.model';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ParamChange} from 'domain/exploration/param-change.model';
 
 describe('Exploration Property Service', () => {
   let explorationPropertyService: ExplorationPropertyService;
-  let paramChangesObjectFactory: ParamChangesObjectFactory;
-  let paramSpecsObjectFactory: ParamSpecsObjectFactory;
-  let paramSpecObjectFactory: ParamSpecObjectFactory;
   let changeListService: ChangeListService;
   let editExplorationPropertySpy: jasmine.Spy;
 
@@ -45,9 +39,6 @@ describe('Exploration Property Service', () => {
 
     explorationPropertyService = TestBed.inject(ExplorationPropertyService);
     changeListService = TestBed.inject(ChangeListService);
-    paramChangesObjectFactory = TestBed.inject(ParamChangesObjectFactory);
-    paramSpecsObjectFactory = TestBed.inject(ParamSpecsObjectFactory);
-    paramSpecObjectFactory = TestBed.inject(ParamSpecObjectFactory);
 
     editExplorationPropertySpy = spyOn(
       changeListService,
@@ -142,7 +133,7 @@ describe('Exploration Property Service', () => {
     let normalizeSpy = spyOn(child, '_normalize').and.callThrough();
 
     child.init(
-      paramChangesObjectFactory.createFromBackendList([
+      ParamChanges.createFromBackendList([
         {
           customization_args: {
             parse_with_jinja: true,
@@ -173,7 +164,7 @@ describe('Exploration Property Service', () => {
     child.propertyName = 'param_specs';
     child._normalize = function (paramSpecs: ParamSpecs) {
       // Changing paramSpecs so hasChanged() turns to be true on line 87.
-      let paramSpec = paramSpecObjectFactory.createDefault();
+      let paramSpec = ParamSpec.createDefault();
       paramSpecs.addParamIfNew('z', paramSpec);
       return paramSpecs;
     };
@@ -181,7 +172,7 @@ describe('Exploration Property Service', () => {
     let normalizeSpy = spyOn(child, '_normalize').and.callThrough();
 
     child.init(
-      paramSpecsObjectFactory.createFromBackendDict({
+      ParamSpecs.createFromBackendDict({
         x: {
           obj_type: 'UnicodeString',
         },

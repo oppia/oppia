@@ -52,6 +52,7 @@ import {FeedbackThreadSummaryBackendDict} from 'domain/feedback_thread/feedback-
 import {LanguageBannerService} from 'components/language-banner/language-banner.service';
 
 import './top-navigation-bar.component.css';
+import {ContentTranslationManagerService} from 'pages/exploration-player-page/services/content-translation-manager.service';
 
 interface LanguageInfo {
   id: string;
@@ -149,7 +150,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   NAV_MODES_WITH_CUSTOM_LOCAL_NAV = [
     'create',
     'explore',
-    'lesson',
     'collection',
     'collection_editor',
     'topics_and_skills_dashboard',
@@ -199,7 +199,8 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     private focusManagerService: FocusManagerService,
     private platformFeatureService: PlatformFeatureService,
     private learnerGroupBackendApiService: LearnerGroupBackendApiService,
-    private languageBannerService: LanguageBannerService
+    private languageBannerService: LanguageBannerService,
+    private contentTranslationManagerService: ContentTranslationManagerService
   ) {}
 
   ngOnInit(): void {
@@ -429,8 +430,12 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   }
 
   changeLanguage(languageCode: string): void {
-    this.i18nService.updateUserPreferredLanguage(languageCode);
-    this.languageBannerService.markLanguageBannerAsDismissed();
+    const pathname = this.urlService.getPathname().split('/');
+    if (pathname.includes('lesson')) {
+      this.contentTranslationManagerService.onLanguageChange.emit(languageCode);
+    } else {
+      this.i18nService.handleLanguageUpdate(languageCode);
+    }
   }
 
   isLanguageRTL(): boolean {

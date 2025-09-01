@@ -20,7 +20,6 @@ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {APP_BASE_HREF} from '@angular/common';
 import {RouterModule} from '@angular/router';
 
-import {SmartRouterModule} from 'hybrid-router-module-provider';
 import {AudioFileUploaderComponent} from './audio-file-uploader.component';
 
 describe('Audio File Uploader Component', () => {
@@ -29,12 +28,7 @@ describe('Audio File Uploader Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        // TODO(#13443): Remove hybrid router module provider once all pages are
-        // migrated to angular router.
-        SmartRouterModule,
-        RouterModule.forRoot([]),
-      ],
+      imports: [RouterModule.forRoot([])],
       declarations: [AudioFileUploaderComponent],
       providers: [
         {

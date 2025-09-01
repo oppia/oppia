@@ -46,12 +46,11 @@ import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFacto
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {PlatformFeatureService} from 'services/platform-feature.service';
-import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
 import {EntityVoiceovers} from '../../../../domain/voiceover/entity-voiceovers.model';
 import {Voiceover} from '../../../../domain/exploration/voiceover.model';
 import {LocalStorageService} from 'services/local-storage.service';
 import {VoiceoverPlayerService} from '../../../exploration-player-page/services/voiceover-player.service';
-
+import {VoiceoverLanguageManagementService} from 'services/voiceover-language-management-service';
 class MockNgbModal {
   open() {
     return {
@@ -82,6 +81,34 @@ class MockPlatformFeatureService {
     };
   }
 }
+class MockVoiceoverLanguageManagementService {
+  languageAccentMasterList = {};
+  autoGeneratableLanguageAccentCodes = [];
+  languageCodesMapping = {};
+  cloudSupportedLanguageAccentCodes = [];
+  init(
+    languageAccentMasterList: Record<string, Record<string, string>>,
+    autoGeneratableLanguageAccentCodes: string[],
+    languageCodesMapping: Record<string, Record<string, boolean>>
+  ): void {
+    this.languageAccentMasterList = languageAccentMasterList;
+    this.autoGeneratableLanguageAccentCodes =
+      autoGeneratableLanguageAccentCodes;
+    this.languageCodesMapping = languageCodesMapping;
+  }
+  getAutogeneratableLanguageAccents(languageCode: string): string[] {
+    return [];
+  }
+  canVoiceoverForLanguage(languageCode: string): boolean {
+    return true;
+  }
+  setCloudSupportedLanguageAccents(languageCode: string): void {}
+  isAutogenerationSupportedGivenLanguageAccent(
+    languageAccentCode: string
+  ): boolean {
+    return false;
+  }
+}
 
 describe('Translator Overview component', () => {
   let component: TranslatorOverviewComponent;
@@ -102,9 +129,9 @@ describe('Translator Overview component', () => {
   let changeListService: ChangeListService;
   let windowRef: WindowRef;
   let entityTranslation: EntityTranslation;
-  let voiceoverBackendApiService: VoiceoverBackendApiService;
   let localStorageService: LocalStorageService;
   let voiceoverPlayerService: VoiceoverPlayerService;
+  let voiceoverLanguageManagementService: VoiceoverLanguageManagementService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -123,6 +150,10 @@ describe('Translator Overview component', () => {
         {
           provide: PlatformFeatureService,
           useClass: MockPlatformFeatureService,
+        },
+        {
+          provide: VoiceoverLanguageManagementService,
+          useClass: MockVoiceoverLanguageManagementService,
         },
         WindowRef,
       ],
@@ -151,11 +182,15 @@ describe('Translator Overview component', () => {
     routerService = TestBed.inject(RouterService);
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
     entityVoiceoversService = TestBed.inject(EntityVoiceoversService);
-    voiceoverBackendApiService = TestBed.inject(VoiceoverBackendApiService);
     changeListService = TestBed.inject(ChangeListService);
     windowRef = TestBed.inject(WindowRef);
     localStorageService = TestBed.inject(LocalStorageService);
     voiceoverPlayerService = TestBed.inject(VoiceoverPlayerService);
+    voiceoverLanguageManagementService = TestBed.inject(
+      VoiceoverLanguageManagementService
+    );
+
+    spyOn(voiceoverLanguageManagementService, 'init').and.callThrough();
 
     spyOn(
       translationTabActiveModeService,
@@ -187,16 +222,12 @@ describe('Translator Overview component', () => {
         'hi-IN': true,
       },
     };
+    voiceoverLanguageManagementService.languageCodesMapping =
+      languageCodesMapping;
+    voiceoverLanguageManagementService.languageAccentMasterList =
+      languageAccentMasterList;
 
-    let voiceoverAdminDataResponse = {
-      languageAccentMasterList: languageAccentMasterList,
-      languageCodesMapping: languageCodesMapping,
-    };
     spyOn(translationLanguageService, 'setActiveLanguageAccentCode');
-    spyOn(
-      voiceoverBackendApiService,
-      'fetchVoiceoverAdminDataAsync'
-    ).and.resolveTo(Promise.resolve(voiceoverAdminDataResponse));
     spyOn(voiceoverPlayerService, 'setLanguageAccentCodesDescriptions');
 
     explorationLanguageCodeService.init(explorationLanguageCode);

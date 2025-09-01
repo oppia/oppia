@@ -284,19 +284,6 @@ def get_exploration_ids_matching_query(
     return (returned_exploration_ids, search_offset)
 
 
-def get_non_private_exploration_summaries(
-) -> Dict[str, exp_domain.ExplorationSummary]:
-    """Returns a dict with all non-private exploration summary domain objects,
-    keyed by their id.
-
-    Returns:
-        dict. The keys are exploration ids and the values are corresponding
-        non-private ExplorationSummary domain objects.
-    """
-    return exp_fetchers.get_exploration_summaries_from_models(
-        exp_models.ExpSummaryModel.get_non_private())
-
-
 def get_top_rated_exploration_summaries(
     limit: int
 ) -> Dict[str, exp_domain.ExplorationSummary]:
@@ -2140,6 +2127,7 @@ def compute_models_to_put_when_saving_new_exp_version(
             exp_summary_model, exp_summary
         )
     )
+
     models_to_put.append(updated_exp_summary_model)
     return models_to_put
 

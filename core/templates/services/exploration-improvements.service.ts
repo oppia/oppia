@@ -22,7 +22,7 @@ import {merge} from 'd3-array';
 import {ExplorationImprovementsConfig} from 'domain/improvements/exploration-improvements-config.model';
 import {HighBounceRateTask} from 'domain/improvements/high-bounce-rate-task.model';
 import {NeedsGuidingResponsesTask} from 'domain/improvements/needs-guiding-response-task.model';
-import {State} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 import {ExplorationRightsService} from 'pages/exploration-editor-page/services/exploration-rights.service';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {UserExplorationPermissionsService} from 'pages/exploration-editor-page/services/user-exploration-permissions.service';

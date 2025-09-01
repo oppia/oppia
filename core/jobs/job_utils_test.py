@@ -319,7 +319,8 @@ class GetBeamQueryFromNdbQueryTests(test_utils.TestBase):
             job_utils.get_beam_query_from_ndb_query(query)
 
     def test_query_with_not_equal_filter_raises_type_error(self) -> None:
-        query = datastore_services.Query(filters=BarModel.prop != 1)
+        query = datastore_services.Query(
+            filters=datastore_services.not_equal(BarModel.prop, 1))
 
         with self.assertRaisesRegex(TypeError, 'forbidden filter'):
             job_utils.get_beam_query_from_ndb_query(query)
