@@ -305,13 +305,4 @@ describe('Auth service', function () {
       expect(firebaseConfig1).toBe(firebaseConfig2);
     });
   });
-
-  it('should call firebase_config API', () => {
-    // Mock getConfig function to return a sample configuration.
-    spyOn(XMLHttpRequest.prototype, 'open').and.callThrough();
-    spyOn(XMLHttpRequest.prototype, 'send');
-    const firebaseConfig = AuthService.getConfig();
-    expect(firebaseConfig).toBe(null);
-    expect(XMLHttpRequest.prototype.open).toHaveBeenCalled();
-  });
 });

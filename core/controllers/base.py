@@ -332,7 +332,8 @@ class BaseHandler(
                 '/logout?redirect_url=%s' % feconf.PENDING_ACCOUNT_DELETION_URL)
             return
 
-        if self.partially_logged_in and request_split.path != '/logout':
+        if self.partially_logged_in and request_split.path not in [
+                '/logout', '/firebase_config']:
             self.redirect('/logout?redirect_url=%s' % request_split.path)
             return
 
