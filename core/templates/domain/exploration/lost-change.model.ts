@@ -13,12 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of LostChange
- * domain objects.
+ * @fileoverview Model class for creating new frontend instances of LostChange.
  */
 
-import {Injectable} from '@angular/core';
-import {} from '@angular/upgrade/static';
 import {UtilsService} from 'services/utils.service';
 import isEqual from 'lodash/isEqual';
 
@@ -242,29 +239,19 @@ export class LostChange {
     }
     return language;
   }
-}
-
-@Injectable({
-  providedIn: 'root',
-})
-export class LostChangeObjectFactory {
-  constructor(private utilsService: UtilsService) {
-    // The createNew function needs to be binded because it's used a lot in
-    // calbacks and then `this` would refer to window instead of the service
-    // itself.
-    this.createNew = this.createNew.bind(this);
-  }
 
   /**
    * @param {String} lostChangeDict - the name of the type to fetch.
    * @returns {LostChange} - The associated type, if any.
    */
-  createNew(
+
+  static createNew(
+    utilsService: UtilsService,
     lostChangeDict: ExplorationChange | LostChangeBackendDict
   ): LostChange {
     lostChangeDict = lostChangeDict as LostChangeBackendDict;
     return new LostChange(
-      this.utilsService,
+      utilsService,
       lostChangeDict.cmd,
       lostChangeDict.new_state_name,
       lostChangeDict.old_state_name,

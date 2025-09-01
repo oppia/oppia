@@ -1,4 +1,4 @@
-<div class="post-chapter-recommendations-container">
+<div class="post-chapter-recommendations-container" *ngIf="!isNewLessonPlayerEnabled()">
   <p class="post-chapter-recommendation-text">
     {{ 'I18N_END_EXPLORATION_RECOMMENDATION_MESSAGE' | translate }}
   </p>
@@ -79,61 +79,38 @@
   </div>
 </div>
 
-<style>
-  .post-chapter-recommendations-container {
-    margin-bottom: 30px;
-  }
-  .post-chapter-recommendations-container .post-chapter-recommendation-text {
-    font-size: 1.2em;
-    text-align: center;
-  }
-  .post-chapter-recommendations-container .post-chapter-recommendation-cards-container {
-    align-items: flex-start;
-    display: flex;
-    justify-content: space-evenly;
-  }
-  .post-chapter-recommendation-cards-container .recommendation-card-wrapper {
-    width: 192px;
-  }
-  .post-chapter-recommendation-cards-container .recommendation-card {
-    border-radius: 15px;
-    box-shadow: 7px 7px 5px rgba(0, 0, 0, 0.08);
-    height: 150px;
-    margin-bottom: 20px;
-    width: 192px;
-  }
-  .post-chapter-recommendation-cards-container .recommendation-card-svg {
-    border-radius: 15px;
-  }
-  .post-chapter-recommendation-cards-container .next-story-node-image {
-    transform: scale(0.8);
-  }
-  .post-chapter-recommendation-cards-container .post-chapter-recommendations-practice-icon {
-    transform: scale(0.7);
-  }
-  .post-chapter-recommendation-cards-container .post-chapter-recommendations-revision-icon {
-    transform: scale(0.7);
-  }
-  .post-chapter-recommendation-cards-container p {
-    font-size: 1.2em;
-    text-align: center;
-  }
-  .post-chapter-recommendation-cards-container .or-text {
-    margin-top: 65px;
-  }
-  .post-chapter-recommendation-cards-container .to-the-next-lesson-text {
-    font-weight: 800;
-    margin-bottom: 0;
-  }
-
-  @media (max-width: 1200px) {
-    .post-chapter-recommendations-container .post-chapter-recommendation-cards-container {
-      align-items: center;
-      flex-direction: column;
-    }
-    .post-chapter-recommendation-cards-container .or-text {
-      margin-bottom: 40px;
-      margin-top: 40px;
-    }
-  }
-</style>
+<div class="post-chapter-recommendations-container" *ngIf="isNewLessonPlayerEnabled()">
+  <p class="post-chapter-recommendation-text">
+    {{ 'I18N_END_EXPLORATION_RECOMMENDATION_MESSAGE' | translate }}
+  </p>
+  <div class="new-post-chapter-recommendation-cards-container" [ngClass]="{'three-buttons-container': showThreeButtons()}">
+    <button *ngIf="!userIsLoggedIn" class="post-chapter-recommendations-btn signup-btn" tabindex="0" (click)="signIn()">
+      <i class="fa-solid fa-arrow-right-to-bracket"></i>
+      <p>Sign up or Login <br><span>And save your lesson progress</span></p>
+    </button>
+    <a href="/learner-dashboard" *ngIf="userIsLoggedIn">
+      <button class="post-chapter-recommendations-btn learner-dashboard-btn">
+        <i class="fa-solid fa-arrow-right-to-bracket"></i>
+        <p>Go To Learner Dashboard</p>
+      </button>
+    </a>
+    <a [href]="nextStoryNodeLink" *ngIf="nextStoryNodeTitle">
+      <button class="post-chapter-recommendations-btn next-lesson-btn" tabindex="0">
+        <i class="fa-solid fa-arrow-right"></i>
+        <p>Next Lesson <br><span>{{ nextStoryNodeTitle }}</span></p>
+      </button>
+    </a>
+    <a [href]="getStudyTabUrl()" *ngIf="practiceQuestionsAreEnabled">
+      <button class="post-chapter-recommendations-btn review-card-btn" tabindex="0">
+        <i class="fa-solid fa-eye"></i>
+        <p>Check Review Card <br><span>And save your lesson progress</span></p>
+      </button>
+    </a>
+    <a [href]="getPracticeTabUrl()" *ngIf="practiceQuestionsAreEnabled">
+      <button class="post-chapter-recommendations-btn more-practice-btn" tabindex="0">
+        <i class="fa-solid fa-pen-to-square"></i>
+        <p>Do More Practice <br><span>Practice learned skills</span></p>
+      </button>
+    </a>
+  </div>
+</div>

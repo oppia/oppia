@@ -25,7 +25,6 @@ import {
   tick,
 } from '@angular/core/testing';
 import {APP_BASE_HREF} from '@angular/common';
-import {SmartRouterModule} from 'hybrid-router-module-provider';
 import {UserInfo} from 'domain/user/user-info.model';
 import {RouterModule} from '@angular/router';
 
@@ -46,13 +45,7 @@ describe('Contributor dashboard admin navbar component', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-        // TODO(#13443): Remove hybrid router module provider once all pages are
-        // migrated to angular router.
-        SmartRouterModule,
-        RouterModule.forRoot([]),
-      ],
+      imports: [HttpClientTestingModule, RouterModule.forRoot([])],
       declarations: [ContributorDashboardAdminNavbarComponent],
       providers: [
         {

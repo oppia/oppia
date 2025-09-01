@@ -20,7 +20,6 @@
               <a *ngIf="username"
                  aria-label="Go to profile page"
                  href="/profile/{{ username }}"
-                 [smartRouterLink]="'/profile/' + username"
                  class="preferences-page-tab-focus e2e-test-go-to-profile-page">
                   {{ username }}
               </a>
@@ -164,7 +163,6 @@
                 <mat-card class="oppia-subscription-card oppia-subscription-list-container">
                   <a class="oppia-subscription-profile-link"
                      href="/profile/{{ subscription.creator_username }}"
-                     [smartRouterLink]="'/profile/' + subscription.creator_username"
                      tabindex="0"
                      rel="noopener"
                      target="_blank">
@@ -337,8 +335,7 @@
         <div class="col-lg-8 col-md-8 col-sm-8">
           <a href="/delete-account"
              [attr.aria-label]="('I18N_DELETE_ACCOUNT_PAGE_HEADING' | translate) + ('I18N_DELETE_ACCOUNT_PAGE_REDIRECT_INFO' | translate)"
-             class="preferences-page-tab-focus"
-            [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DELETE_ACCOUNT.ROUTE">
+             class="preferences-page-tab-focus">
             <button tabindex="-1" type="button" class="btn btn-danger e2e-test-delete-account-button">
               {{ 'I18N_DELETE_ACCOUNT_PAGE_HEADING' | translate }}
             </button>

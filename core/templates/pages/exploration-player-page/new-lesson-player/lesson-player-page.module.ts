@@ -41,6 +41,8 @@ import {NewFlagExplorationModalComponent} from './sidebar-components/flag-lesson
 import {CustomizableThankYouModalComponent} from './sidebar-components/customizable-thank-you-modal.component';
 import {LessonFeedbackModalComponent} from './sidebar-components/lesson-feedback-modal.component';
 import {MatBottomSheetModule} from '@angular/material/bottom-sheet';
+import {NewSwitchContentLanguageRefreshRequiredModalComponent} from './conversation-skin-components/conversation-display-components/new-switch-content-language-refresh-required-modal.component';
+import {NewProgressReminderModalComponent} from './conversation-skin-components/lesson-player-footer/new-progress-reminder-modal.component';
 
 @NgModule({
   imports: [
@@ -61,10 +63,12 @@ import {MatBottomSheetModule} from '@angular/material/bottom-sheet';
     NewLessonPlayerPageComponent,
     NewLessonPlayerPageRootComponent,
     LessonPlayerSidebarComponent,
+    NewSwitchContentLanguageRefreshRequiredModalComponent,
     NewAudioBarComponent,
     NewFlagExplorationModalComponent,
     CustomizableThankYouModalComponent,
     LessonFeedbackModalComponent,
+    NewProgressReminderModalComponent,
   ],
   entryComponents: [
     NewFlagExplorationModalComponent,
@@ -74,6 +78,8 @@ import {MatBottomSheetModule} from '@angular/material/bottom-sheet';
     LessonPlayerSidebarComponent,
     NewAudioBarComponent,
     LessonFeedbackModalComponent,
+    NewSwitchContentLanguageRefreshRequiredModalComponent,
+    NewProgressReminderModalComponent,
   ],
   providers: [
     HintAndSolutionModalService,

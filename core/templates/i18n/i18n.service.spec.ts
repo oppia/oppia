@@ -34,10 +34,12 @@ import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {UserBackendApiService} from 'services/user-backend-api.service';
 import {UserService} from 'services/user.service';
 import {I18nService} from './i18n.service';
+import {LanguageBannerService} from 'components/language-banner/language-banner.service';
 
 describe('I18n service', () => {
   let i18nService: I18nService;
   let windowRef: WindowRef;
+  let languageBannerService: LanguageBannerService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let userService: UserService;
   let userBackendApiService: UserBackendApiService;
@@ -101,6 +103,7 @@ describe('I18n service', () => {
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     userService = TestBed.inject(UserService);
     userBackendApiService = TestBed.inject(UserBackendApiService);
+    languageBannerService = TestBed.inject(LanguageBannerService);
   });
 
   it('should set cache language according to URL lang param', fakeAsync(() => {
@@ -422,6 +425,17 @@ describe('I18n service', () => {
       flushMicrotasks();
     })
   );
+
+  it('should handleLanguageUpdate', () => {
+    spyOn(i18nService, 'updateUserPreferredLanguage');
+    spyOn(languageBannerService, 'markLanguageBannerAsDismissed');
+
+    i18nService.handleLanguageUpdate('fr');
+    expect(i18nService.updateUserPreferredLanguage).toHaveBeenCalledWith('fr');
+    expect(
+      languageBannerService.markLanguageBannerAsDismissed
+    ).toHaveBeenCalled();
+  });
 
   it('should test getters', () => {
     expect(i18nService.directionChangeEventEmitter).toBeDefined();
