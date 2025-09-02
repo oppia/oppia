@@ -141,10 +141,10 @@ describe('Practice Question Reviewer', function () {
 
     await questionReviewer.startQuestionReview('What is 2 + 3?', 'Addition');
     await questionReviewer.clickOn('Next');
-    await questionReviewer.expectQuestionInReviewModalToBe('12 + 14');
+    await questionReviewer.expectQuestionInReviewModalToBe('12 + 4');
   });
 
-  it('should be able to review the submitted quesions', async function () {
+  it('should be able to review the submitted questions', async function () {
     // Reject the question suggestion.
     await questionReviewer.submitReview(
       'reject',

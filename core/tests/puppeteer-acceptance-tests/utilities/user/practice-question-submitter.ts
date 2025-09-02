@@ -496,6 +496,11 @@ export class PracticeQuestionSubmitter extends BaseUser {
     showMessage(`${interactionToAdd} interaction has been added successfully.`);
   }
 
+  /**
+   * Adds response details in the question response modal.
+   * @param feedback - The feedback for the response.
+   * @param correctResponse - Whether the response is correct.
+   */
   async addResponseDetailsInQuestionResponseModal(
     feedback: string,
     correctResponse: boolean = true

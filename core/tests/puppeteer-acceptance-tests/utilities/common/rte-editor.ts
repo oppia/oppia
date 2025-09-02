@@ -154,6 +154,7 @@ export class RTEEditor {
    * @param {string} content - The content to update the editor with.
    */
   async updateAndSaveContent(content: string): Promise<void> {
+    await this.parentPage.waitForSelector(rteTextAreaSelector, {visible: true});
     await this.parentPage.type(rteTextAreaSelector, content);
     await this.parentPage.click(saveRTEButtonSelector);
     await this.parentPage.waitForSelector(rteTextAreaSelector, {

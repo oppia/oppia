@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Utilty class for translation submitter.
+ * @fileoverview Utilty class for translation reviewer.
  */
 
 import {ElementHandle} from 'puppeteer';

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Question Submitters utility file.
+ * @fileoverview Practice Question Reviewer utility file.
  */
 
 import {RTEEditor} from '../common/rte-editor';
@@ -64,11 +64,18 @@ export class PracticeQuestionReviewer extends Contributor {
     await this.expectModalTitleToBe(skill);
   }
 
+  /**
+   * Submits a question review.
+   * @param {string} reviewType - The type of review to submit.
+   * @param {string} reviewMessage - The message to submit.
+   */
   async submitReview(
     reviewType: 'accept' | 'reject',
     reviewMessage?: string
   ): Promise<void> {
     const buttonSelector = `.${reviewButtonPrefix}-${reviewType}-button`;
+    await this.expectElementToBeVisible(buttonSelector);
+
     if (reviewMessage) {
       await this.fillReviewComment(reviewMessage);
     }
@@ -77,6 +84,10 @@ export class PracticeQuestionReviewer extends Contributor {
     await this.expectToastMessage('Submitted suggestion review.');
   }
 
+  /**
+   * Edits the question in the question editor modal.
+   * @param {string} question - The question to edit.
+   */
   async editQuestionInQuestionEditorModal(question: string): Promise<void> {
     await this.expectElementToBeVisible(editQuestionPencilIconSelector);
     await this.clickOn(editQuestionPencilIconSelector);

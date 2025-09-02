@@ -302,7 +302,6 @@ export class Contributor extends BaseUser {
           el.querySelector(sel)?.textContent?.trim(),
         badgeValueSelector
       );
-      console.log(`[debug] badgeValue: ${badgeValue}`);
       if (badgeValue !== expectedBadgeValue) {
         continue;
       }
@@ -449,9 +448,7 @@ export class Contributor extends BaseUser {
   /**
    * Expects the contribution table to contain a row with the given topic name,
    * accepted cards, and accepted words.
-   * @param topicName - The topic name to search for.
-   * @param acceptedCards - The number of accepted cards.
-   * @param acceptedWords - The number of accepted words.
+   * @param {string[]} rowValues - The values of the row to be checked.
    */
   async expectContributionTableToContainRow(
     rowValues: (string | null)[]

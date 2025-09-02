@@ -68,7 +68,7 @@ export class TranslationSubmitter extends BaseUser {
    */
   async clickOnPaginationButtonInTranslationSubmitterPage(
     button: 'previous' | 'next'
-  ) {
+  ): Promise<void> {
     const selector = `${paginationBtnSelectorPrefix}-${button}`;
     await this.expectElementToBeVisible(selector);
 
@@ -81,7 +81,8 @@ export class TranslationSubmitter extends BaseUser {
    * Clicks on the RTE option with the given title.
    * @param title - The title of RTE option.
    */
-  async clickOnRTEOptionContainingTitle(title: string) {
+  async clickOnRTEOptionContainingTitle(title: string): Promise<void> {
+    await this.expectElementToBeVisible(rteEditorBodySelector);
     const rteEditor = new RTEEditor(this.page, this.page);
     await rteEditor.clickOnRTEOptionWithTitle(title);
   }
@@ -185,6 +186,11 @@ export class TranslationSubmitter extends BaseUser {
     await this.expectElementToBeVisible(selector, visible);
   }
 
+  /**
+   * Checks if the copy tool works properly.
+   * @param description - The description of the image.
+   * @param caption - The caption of the image.
+   */
   async expectCopyToolWorksProperly(
     description: string,
     caption: string
@@ -285,25 +291,6 @@ export class TranslationSubmitter extends BaseUser {
       value
     );
     return;
-
-    // TODO: remove.
-    const selector = `${rteHelperModalContainerSelector} ${baseSelector}`;
-    await this.expectElementToBeVisible(selector);
-    await this.clearAllTextFrom(selector);
-    await this.type(selector, value);
-    await this.page.waitForFunction(
-      (sel: string, val: string) => {
-        const element = document.querySelector(sel);
-        return (
-          element &&
-          ((element as HTMLInputElement).value === val ||
-            (element as HTMLElement).textContent?.includes(val))
-        );
-      },
-      {},
-      selector,
-      value
-    );
   }
 
   /**
@@ -370,7 +357,7 @@ export class TranslationSubmitter extends BaseUser {
    * RTE editor if it is not already focused.
    * @param text - The text to type in the RTE editor.
    */
-  async typeTextForRTE(text: string) {
+  async typeTextForRTE(text: string): Promise<void> {
     // Pre-checks.
     await this.expectElementToBeVisible(rteEditorBodySelector);
     const initialHTMLContent = await this.page.$eval(
