@@ -54,6 +54,7 @@ jobs:
         mobile: [false, true]
         suite:
           - name: curriculum-admin/create-publish-unpublish-and-delete-topic-and-skill
+          - name: curriculum-admin/create-edit-and-delete-a-classroom
         run1: [1]
         run2: [1]
     name: (${{ matrix.env }}) ${{ matrix.mobile && 'Mobile' || 'Desktop' }} (${{ matrix.suite.name }})

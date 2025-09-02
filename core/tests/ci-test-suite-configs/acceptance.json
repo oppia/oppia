@@ -559,6 +559,10 @@
     {
       "name": "curriculum-admin/create-publish-unpublish-and-delete-topic-and-skill",
       "module": "core/tests/puppeteer-acceptance-tests/specs/curriculum-admin/create-publish-unpublish-and-delete-topic-and-skill.spec.ts"
+    },
+    {
+      "name": "curriculum-admin/create-edit-and-delete-a-classroom",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/curriculum-admin/create-edit-and-delete-a-classroom.spec.ts"
     }
   ],
   "docker_suites": []
