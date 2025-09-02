@@ -292,6 +292,11 @@ html {
   */
   font-size: 62.5%;
   height: 100%;
+  /* 
+    Added this line because Bootstrap 5 added smooth scroll default behavior.
+    Reference: https://katalon-inc.my.site.com/support/article/Test-case-failures-due-to-auto-scrolling-in-Bootstrap-5-and-how-to-fix 
+  */
+  scroll-behavior: auto !important;
 }
 
 body {
