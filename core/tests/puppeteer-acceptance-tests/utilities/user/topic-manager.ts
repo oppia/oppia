@@ -256,8 +256,29 @@ const removeSkillModalHeaderSelector =
   '.e2e-test-delete-state-skill-modal-header';
 const addMisconceptionHeaderSelector =
   '.e2e-test-oppia-misconception-card-header';
+const mobileSaveTopicDropdown =
+  'div.navbar-mobile-options .e2e-test-mobile-save-topic-dropdown';
+const mobilePublishTopicButton =
+  'div.navbar-mobile-options .e2e-test-mobile-publish-topic-button';
+const publishTopicButton = 'button.e2e-test-publish-topic-button';
+const topicAndSkillDashboardSelector = '.e2e-test-topics-and-skills-dashboard';
+const skillEditorSelector = 'e2e-test-skill-editor';
 
 export class TopicManager extends BaseUser {
+  /**
+   * Checks if we are in topic and skills dashboard.
+   */
+  async expectToBeInTopicAndSkillsDashboardPage(): Promise<void> {
+    await this.expectElementToBeVisible(topicAndSkillDashboardSelector);
+  }
+
+  /**
+   * Checks if we are in skill editor page.
+   */
+  async expectToBeInSkillEditorPage(): Promise<void> {
+    await this.expectElementToBeVisible(skillEditorSelector);
+  }
+
   /**
    * Navigate to the topic and skills dashboard page.
    */
@@ -265,6 +286,7 @@ export class TopicManager extends BaseUser {
     await this.page.bringToFront();
     await this.waitForNetworkIdle();
     await this.goto(topicAndSkillsDashboardUrl);
+    await this.expectToBeInTopicAndSkillsDashboardPage();
   }
 
   /**
@@ -3178,6 +3200,29 @@ export class TopicManager extends BaseUser {
       );
       newError.stack = error.stack;
       throw newError;
+    }
+  }
+
+  /**
+   * Publishes a topic draft.
+   * @param topicName - Optional. If not provided, the topic editor will be opened.
+   */
+  async publishDraftTopic(topicName?: string): Promise<void> {
+    if (topicName) {
+      await this.openTopicEditor(topicName);
+    } else {
+      await this.expectToBeInTopicEditor();
+    }
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileOptionsSelector);
+      await this.clickOn(mobileSaveTopicDropdown);
+      await this.page.waitForSelector(mobilePublishTopicButton);
+      await this.clickOn(mobilePublishTopicButton);
+      await this.page.waitForSelector(mobilePublishTopicButton, {hidden: true});
+    } else {
+      await this.clickOn(publishTopicButton);
+
+      await this.page.waitForSelector(publishTopicButton, {hidden: true});
     }
   }
 }

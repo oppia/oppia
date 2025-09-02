@@ -3,7 +3,7 @@
   <p class="hint">Drag the classroom tiles to change the order in which they appear to learners on the classrooms page, community library, and in the navigation bar.</p>
   <div cdkDropList (cdkDropListDropped)="drop($event)">
     <div *ngFor="let classroom of classroomIdToClassroomNameIndex"
-         class="classroom-tile"
+         class="classroom-tile e2e-test-movable-classroom-tile"
          cdkDrag
     >
       {{ classroom.classroom_name }}

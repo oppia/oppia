@@ -21,6 +21,7 @@ import testConstants from '../../utilities/common/test-constants';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {ConsoleReporter} from '../../utilities/common/console-reporter';
+import {TopicManager} from '../../utilities/user/topic-manager';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
@@ -35,7 +36,7 @@ ConsoleReporter.setConsoleErrorsToIgnore([
 ]);
 
 describe('Curriculum Admin', function () {
-  let curriculumAdmin: CurriculumAdmin;
+  let curriculumAdmin: CurriculumAdmin & TopicManager;
   let loggedInUser: LoggedInUser;
 
   beforeAll(async function () {
@@ -51,59 +52,85 @@ describe('Curriculum Admin', function () {
     );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
-  it(
-    'should manage topics and skills: create, assign, publish, unpublish, and delete.',
-    async function () {
-      await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
-      await curriculumAdmin.createTopic('Test Topic 1', 'test-topic-one');
-      await curriculumAdmin.createSubtopicForTopic(
-        'Test Subtopic 1',
-        'test-subtopic-one',
-        'Test Topic 1'
-      );
+  it('should be able to create a topic.', async function () {
+    await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
+    await curriculumAdmin.createTopic('Test Topic 1', 'test-topic-one');
+    await curriculumAdmin.expectToBeInTopicEditor('Test Topic 1');
+  });
 
-      await curriculumAdmin.createSkillForTopic(
-        'Test Skill 1',
-        'Test Topic 1',
-        false
-      );
-      await curriculumAdmin.createQuestionsForSkill('Test Skill 1', 3);
-      await curriculumAdmin.assignSkillToSubtopicInTopicEditor(
-        'Test Skill 1',
-        'Test Subtopic 1',
-        'Test Topic 1'
-      );
-      await curriculumAdmin.addSkillToDiagnosticTest(
-        'Test Skill 1',
-        'Test Topic 1'
-      );
+  it('should be able to publish a topic', async function () {
+    // Add Subtopic.
+    await curriculumAdmin.createSubtopicForTopic(
+      'Test Subtopic 1',
+      'test-subtopic-one',
+      'Test Topic 1'
+    );
 
-      await curriculumAdmin.publishDraftTopic('Test Topic 1');
-      await curriculumAdmin.expectTopicToBePublishedInTopicsAndSkillsDashboard(
-        'Test Topic 1',
-        0,
-        1,
-        1
-      );
+    // Create skill, and add it to diagnostic test.
+    await curriculumAdmin.createSkillForTopic(
+      'Test Skill 1',
+      'Test Topic 1',
+      false
+    );
+    await curriculumAdmin.createQuestionsForSkill('Test Skill 1', 3);
+    await curriculumAdmin.assignSkillToSubtopicInTopicEditor(
+      'Test Skill 1',
+      'Test Subtopic 1',
+      'Test Topic 1'
+    );
+    await curriculumAdmin.addSkillToDiagnosticTest(
+      'Test Skill 1',
+      'Test Topic 1'
+    );
 
-      await curriculumAdmin.unpublishTopic('Test Topic 1');
-      await loggedInUser.expectTopicLinkReturns404('test-topic-one');
+    // Publish topic.
+    await curriculumAdmin.publishDraftTopic('Test Topic 1');
+    await curriculumAdmin.expectToastMessageToBe('Topic Published.');
+    await curriculumAdmin.expectToBeInTopicAndSkillsDashboardPage();
+    await curriculumAdmin.expectTopicToBePublishedInTopicsAndSkillsDashboard(
+      'Test Topic 1',
+      0, // Story added.
+      1, // Subtopic added.
+      1 // Skill added.
+    );
 
-      await curriculumAdmin.deleteTopic('Test Topic 1');
-      await curriculumAdmin.expectTopicNotInTopicsAndSkillDashboard(
-        'Test Topic 1'
-      );
+    await curriculumAdmin.openTopicEditor('Test Topic 1');
+    await curriculumAdmin.expectUnpublishTopicButtonToBeVisible();
+  });
 
-      // User must remove all questions from the skill before deleting it.
-      await curriculumAdmin.removeAllQuestionsFromTheSkill('Test Skill 1');
-      await curriculumAdmin.deleteSkill('Test Skill 1');
-      await curriculumAdmin.expectSkillNotInTopicsAndSkillsDashboard(
-        'Test Skill 1'
-      );
-    },
+  it('should be able to create a skill', async function () {
+    await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
+    await curriculumAdmin.navigateToSkillsTab();
 
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+    await curriculumAdmin.clickOnCreateNewSkillButtonInSkillDashboard();
+    await curriculumAdmin.fillSkillDetailsInNewSkillModal(
+      'Test Skill 2',
+      'Test Review Material'
+    );
+    await curriculumAdmin.clickOn('Save');
+    await curriculumAdmin.expectToBeInSkillEditorPage();
+  });
+
+  it('should be able to unpublish a topic', async function () {
+    await curriculumAdmin.unpublishTopic('Test Topic 1');
+    await loggedInUser.expectTopicLinkReturns404('test-topic-one');
+  });
+
+  it('should be able to delete a topic', async function () {
+    await curriculumAdmin.deleteTopic('Test Topic 1');
+    await curriculumAdmin.expectTopicNotInTopicsAndSkillDashboard(
+      'Test Topic 1'
+    );
+  });
+
+  it('should be able to delete a skill', async function () {
+    // User must remove all questions from the skill before deleting it.
+    await curriculumAdmin.removeAllQuestionsFromTheSkill('Test Skill 1');
+    await curriculumAdmin.deleteSkill('Test Skill 1');
+    await curriculumAdmin.expectSkillNotInTopicsAndSkillsDashboard(
+      'Test Skill 1'
+    );
+  });
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();

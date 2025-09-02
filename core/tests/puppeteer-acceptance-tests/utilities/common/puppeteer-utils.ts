@@ -446,6 +446,7 @@ export class BaseUser {
     }
     showMessage(`Element (${selector}) is clickable, as expected.`);
   }
+
   /**
    * The function clicks the element using the text on the button.
    * @param selector The text of the button to click on.
@@ -481,6 +482,23 @@ export class BaseUser {
       await element.click();
       showMessage(`Element (selector: ${selector}) is clicked.`);
     }
+  }
+
+  /**
+   * Checks if the mat chip with the given text content is visible.
+   * @param textContent The text content of the mat chip.
+   * @returns The element handle of the mat chip.
+   */
+  async expectMatChipToBeVisible(
+    textContent: string
+  ): Promise<ElementHandle<Element>> {
+    const matChipElement = await this.page.waitForXPath(
+      `//mat-chip[contains(text(), '${textContent}')]`
+    );
+    if (!matChipElement) {
+      throw new Error(`Mat chip with text ${textContent} not found.`);
+    }
+    return matChipElement;
   }
 
   /**
