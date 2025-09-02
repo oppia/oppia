@@ -106,7 +106,7 @@ import {CompletionGraphComponent} from './statistics-directives/completion-graph
 import {TutorCardComponent} from 'pages/exploration-player-page/current-lesson-player/learner-experience/tutor-card.component';
 import {ContentLanguageSelectorComponent} from 'pages/exploration-player-page/current-lesson-player/layout-directives/content-language-selector.component';
 import {RatingDisplayComponent} from './ratings/rating-display/rating-display.component';
-import {SupplementalCardComponent} from 'pages/exploration-player-page/current-lesson-player/learner-experience/supplemental-card.component';
+import {SupplementalCardComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/supplemental-card.component';
 import {AddOrUpdateSolutionModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-or-update-solution-modal.component';
 import {SavePendingChangesModalComponent} from './save-pending-changes/save-pending-changes-modal.component';
 import {AddHintModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-hint-modal.component';
@@ -190,7 +190,6 @@ import {AuthService} from 'services/auth.service';
 
 // Miscellaneous.
 import {JoyrideModule} from 'ngx-joyride';
-import {SmartRouterModule} from 'hybrid-router-module-provider';
 import {StaleTabInfoModalComponent} from './stale-tab-info/stale-tab-info-modal.component';
 import {UnsavedChangesStatusInfoModalComponent} from './unsaved-changes-status-info/unsaved-changes-status-info-modal.component';
 import {NgbModalModule} from '@ng-bootstrap/ng-bootstrap';
@@ -215,6 +214,7 @@ import {NewInputResponsePairComponent} from 'pages/exploration-player-page/new-l
 import {NewConversationSkinComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/new-conversation-skin.component';
 import {ConversationDisplayComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/conversation-display.component';
 import {CardNavigationControlComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/card-navigation-control.component';
+import {RouterModule} from '@angular/router';
 import {HintSolutionAndConceptCardDisplayComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/hint-solution-and-concept-card-display.component';
 import {DisplayNewHintModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/display-new-hint-modal.component';
 import {DisplayNewSolutionModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/display-new-solution-modal.component';
@@ -223,6 +223,13 @@ import {ShareLessonModalComponent} from 'pages/exploration-player-page/new-lesso
 import {NewCorrectnessFooterComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/new-correctness-footer.component';
 import {NewEndChapterConfettiComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/new-end-chapter-confetti.component';
 import {NewEndChapterCheckMarkComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/new-end-chapter-check-mark.component';
+import {PlayerHeaderComponent} from 'pages/exploration-player-page/new-lesson-player/header-components/player-header.component';
+import {ProgressBarComponent} from './progress-bar/progress-bar.component';
+import {ProgressTrackerComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/progress-tracker.component';
+import {CheckpointBarComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/checkpoint-bar.component';
+import {SaveProgressModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/save-progress-modal.component';
+import {CheckpointCelebrationFooterComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/checkpoint-celebration-footer.component';
+import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/new-ratings-and-recommendations.component';
 @NgModule({
   imports: [
     BackgroundBannerModule,
@@ -233,9 +240,7 @@ import {NewEndChapterCheckMarkComponent} from 'pages/exploration-player-page/new
     CustomFormsComponentsModule,
     CommonElementsModule,
     CodeMirrorModule,
-    // TODO(#13443): Remove smart router module provider once all pages are
-    // migrated to angular router.
-    SmartRouterModule,
+    RouterModule,
     MaterialModule,
     NgBootstrapModule,
     DynamicContentModule,
@@ -275,6 +280,7 @@ import {NewEndChapterCheckMarkComponent} from 'pages/exploration-player-page/new
     CompletionGraphComponent,
     CorrectnessFooterComponent,
     NewCorrectnessFooterComponent,
+    CheckpointCelebrationFooterComponent,
     ConfirmLeaveModalComponent,
     ConfirmQuestionExitModalComponent,
     ContinueButtonComponent,
@@ -282,11 +288,15 @@ import {NewEndChapterCheckMarkComponent} from 'pages/exploration-player-page/new
     ConversationSkinComponent,
     ConversationDisplayComponent,
     CardNavigationControlComponent,
+    ProgressBarComponent,
     NewConversationSkinComponent,
+    ProgressTrackerComponent,
+    CheckpointBarComponent,
     EndChapterCheckMarkComponent,
     NewEndChapterCheckMarkComponent,
     EndChapterConfettiComponent,
     NewEndChapterConfettiComponent,
+    PlayerHeaderComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
     CustomizeInteractionModalComponent,
@@ -306,6 +316,7 @@ import {NewEndChapterCheckMarkComponent} from 'pages/exploration-player-page/new
     FilteredChoicesFieldComponent,
     FeedbackPopupComponent,
     PracticeTabComponent,
+    SaveProgressModalComponent,
     CollectionSummaryTileComponent,
     ExplorationEmbedButtonModalComponent,
     CheckpointCelebrationModalComponent,
@@ -332,6 +343,7 @@ import {NewEndChapterCheckMarkComponent} from 'pages/exploration-player-page/new
     QuestionEditorSaveModalComponent,
     RatingDisplayComponent,
     RatingsAndRecommendationsComponent,
+    NewRatingsAndRecommendationsComponent,
     ResponseHeaderComponent,
     RubricsEditorComponent,
     ScoreRingComponent,
@@ -438,7 +450,9 @@ import {NewEndChapterCheckMarkComponent} from 'pages/exploration-player-page/new
     CompletionGraphComponent,
     CorrectnessFooterComponent,
     NewCorrectnessFooterComponent,
+    CheckpointCelebrationFooterComponent,
     ConfirmLeaveModalComponent,
+    PlayerHeaderComponent,
     ConfirmQuestionExitModalComponent,
     ContinueButtonComponent,
     ConceptCardComponent,
@@ -446,12 +460,16 @@ import {NewEndChapterCheckMarkComponent} from 'pages/exploration-player-page/new
     ConversationSkinComponent,
     ConversationDisplayComponent,
     CardNavigationControlComponent,
+    ProgressTrackerComponent,
+    CheckpointBarComponent,
     NewConversationSkinComponent,
     EndChapterCheckMarkComponent,
     NewEndChapterCheckMarkComponent,
+    ProgressBarComponent,
     EndChapterConfettiComponent,
     NewEndChapterConfettiComponent,
     CreateNewSkillModalComponent,
+    SaveProgressModalComponent,
     CreateActivityModalComponent,
     CustomizeInteractionModalComponent,
     DeleteHintModalComponent,
@@ -507,6 +525,7 @@ import {NewEndChapterCheckMarkComponent} from 'pages/exploration-player-page/new
     QuestionDifficultySelectorComponent,
     RatingDisplayComponent,
     RatingsAndRecommendationsComponent,
+    NewRatingsAndRecommendationsComponent,
     ResponseHeaderComponent,
     RubricsEditorComponent,
     StateContentEditorComponent,
@@ -610,6 +629,7 @@ import {NewEndChapterCheckMarkComponent} from 'pages/exploration-player-page/new
     FormsModule,
     MaterialModule,
     NgBootstrapModule,
+    CheckpointCelebrationFooterComponent,
     RichTextComponentsModule,
     ObjectComponentsModule,
     OppiaCkEditor4Module,
@@ -626,9 +646,14 @@ import {NewEndChapterCheckMarkComponent} from 'pages/exploration-player-page/new
     NewCorrectnessFooterComponent,
     ConfirmLeaveModalComponent,
     ConfirmQuestionExitModalComponent,
+    SaveProgressModalComponent,
+    ProgressTrackerComponent,
+    CheckpointBarComponent,
     ContinueButtonComponent,
     ContentLanguageSelectorComponent,
+    ProgressBarComponent,
     ConversationSkinComponent,
+    HintSolutionAndConceptCardDisplayComponent,
     ConversationDisplayComponent,
     CardNavigationControlComponent,
     NewConversationSkinComponent,
@@ -637,6 +662,7 @@ import {NewEndChapterCheckMarkComponent} from 'pages/exploration-player-page/new
     EndChapterConfettiComponent,
     NewEndChapterConfettiComponent,
     CreateNewSkillModalComponent,
+    PlayerHeaderComponent,
     CreateActivityModalComponent,
     CustomizeInteractionModalComponent,
     DeleteAnswerGroupModalComponent,
@@ -671,6 +697,7 @@ import {NewEndChapterCheckMarkComponent} from 'pages/exploration-player-page/new
     PreviewThumbnailComponent,
     RatingDisplayComponent,
     RatingsAndRecommendationsComponent,
+    NewRatingsAndRecommendationsComponent,
     ResponseHeaderComponent,
     RubricsEditorComponent,
     OnScreenKeyboardComponent,

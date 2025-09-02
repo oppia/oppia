@@ -105,9 +105,9 @@ def defer(
 
     task = platform_taskqueue_services.create_http_task(
         queue_name=queue_name, url=feconf.TASK_URL_DEFERRED, payload=payload)
-    assert task.task_name is not None
+    assert task.name is not None
     cloud_task_model = create_new_cloud_task_model(
-        new_cloud_task_model_id, task.task_name, fn_identifier)
+        new_cloud_task_model_id, task.name, fn_identifier)
     cloud_task_model.update_timestamps()
     cloud_task_model.put()
 

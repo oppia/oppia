@@ -26,7 +26,7 @@ import {LoggedOutUserFactory, LoggedOutUser} from '../user/logged-out-user';
 import {BlogAdminFactory, BlogAdmin} from '../user/blog-admin';
 import {QuestionAdminFactory} from '../user/question-admin';
 import {BlogPostEditorFactory} from '../user/blog-post-editor';
-import {VoiceoverAdminFactory} from '../user/voiceover-admin';
+import {VoiceoverAdmin, VoiceoverAdminFactory} from '../user/voiceover-admin';
 import {
   ExplorationEditorFactory,
   ExplorationEditor,
@@ -55,6 +55,10 @@ import {
   PracticeQuestionReviewer,
   PracticeQuestionReviewerFactory,
 } from '../user/practice-question-reviewer';
+import {
+  VoiceoverSubmitter,
+  VoiceoverSubmitterFactory,
+} from '../user/voiceover-submitter';
 
 const ROLES = testConstants.Roles;
 const cookieBannerAcceptButton =
@@ -74,10 +78,12 @@ const USER_ROLE_MAPPING = {
   [ROLES.MODERATOR]: ModeratorFactory,
   [ROLES.RELEASE_COORDINATOR]: ReleaseCoordinatorFactory,
   [ROLES.TRANSLATION_REVIEWER]: TranslationReviewerFactory,
+  [ROLES.VOICEOVER_SUBMITTER]: VoiceoverSubmitterFactory,
 } as const;
 
 const USERS_ROLES_NOT_REFLECTED_IN_ADMIN_PAGE: string[] = [
   ROLES.TRANSLATION_REVIEWER,
+  ROLES.VOICEOVER_SUBMITTER,
 ];
 
 /**
@@ -105,13 +111,15 @@ type BasicRolesUser = LoggedOutUser &
   CurriculumAdmin &
   TranslationSubmitter &
   Contributor &
-  PracticeQuestionReviewer;
+  PracticeQuestionReviewer &
+  VoiceoverSubmitter;
 
 /**
  * Global user instances that are created and can be reused again.
  */
-let superAdminInstance: (SuperAdmin & BlogAdmin & TranslationAdmin) | null =
-  null;
+let superAdminInstance:
+  | (SuperAdmin & BlogAdmin & TranslationAdmin & VoiceoverAdmin)
+  | null = null;
 let activeUsers: BaseUser[] = [];
 
 export class UserFactory {
@@ -157,6 +165,10 @@ export class UserFactory {
         superAdminInstance = await UserFactory.createNewSuperAdmin('superAdm');
       }
 
+      if (!user.username) {
+        throw new Error('Username is null while adding roles');
+      }
+
       switch (role) {
         case ROLES.BLOG_POST_EDITOR:
           await superAdminInstance.navigateToBlogAdminPage();
@@ -177,6 +189,17 @@ export class UserFactory {
           await superAdminInstance.addTranslationLanguageReviewRights(
             user.username,
             topic
+          );
+          break;
+        case ROLES.VOICEOVER_SUBMITTER:
+          if (!topic) {
+            throw new Error(
+              'Exploration ID is required to assign a voiceover submitter.'
+            );
+          }
+          await superAdminInstance.addVoiceoverArtistToExplorationWithID(
+            topic,
+            user.username
           );
           break;
         default:
@@ -220,6 +243,7 @@ export class UserFactory {
       CurriculumAdminFactory(),
       ContributorFactory(),
       PracticeQuestionReviewerFactory(),
+      VoiceoverSubmitterFactory(),
     ]);
 
     user.username = username;
@@ -242,7 +266,7 @@ export class UserFactory {
    */
   static createNewSuperAdmin = async function (
     username: string
-  ): Promise<SuperAdmin & BlogAdmin & TranslationAdmin> {
+  ): Promise<SuperAdmin & BlogAdmin & TranslationAdmin & VoiceoverAdmin> {
     if (superAdminInstance !== null) {
       return superAdminInstance;
     }
@@ -260,6 +284,7 @@ export class UserFactory {
     superAdminInstance = UserFactory.composeUserWithRoles(superAdmin, [
       BlogAdminFactory(),
       TranslationAdminFactory(),
+      VoiceoverAdminFactory(),
     ]);
 
     return superAdminInstance;

@@ -1778,6 +1778,7 @@ export class LoggedInUser extends BaseUser {
 
     await this.clickOn(submitReportButtonSelector);
 
+    await this.waitForElementToStabilize(closeModalButton);
     await this.clickOn(closeModalButton);
 
     await this.page.waitForSelector(explorationSuccessfullyFlaggedMessage, {

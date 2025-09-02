@@ -31,7 +31,7 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {TranslationStatusService} from '../services/translation-status.service';
-import {State} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 
 class MockNgbModal {
   open() {
