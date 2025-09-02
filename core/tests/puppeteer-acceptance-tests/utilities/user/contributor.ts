@@ -189,14 +189,15 @@ export class Contributor extends BaseUser {
    * @param button - The button to check for.
    */
   async expectPaginationButtonToBeDisabled(
-    button: 'previous' | 'next'
+    button: 'previous' | 'next',
+    disabled: boolean = true
   ): Promise<void> {
     const selector =
       button === 'previous'
         ? paginationButtonPreviousSelector
         : paginationButtonNextSelector;
     await this.expectElementToBeVisible(selector);
-    await this.expectElementToBeClickable(selector, false);
+    await this.expectElementToBeClickable(selector, !disabled);
   }
 
   /**

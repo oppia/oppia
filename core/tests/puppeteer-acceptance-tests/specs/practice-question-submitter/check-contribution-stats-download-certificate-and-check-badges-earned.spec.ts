@@ -128,7 +128,7 @@ describe('Practice Question Submitter', function () {
     await questionSubmitter.startAndCompleteQuestionSuggestion(
       'Addition',
       'Arithmetic Operations',
-      '14 + 12'
+      'What is 14 + 12'
     );
     await questionSubmitter.startAndCompleteQuestionSuggestion(
       'Addition',

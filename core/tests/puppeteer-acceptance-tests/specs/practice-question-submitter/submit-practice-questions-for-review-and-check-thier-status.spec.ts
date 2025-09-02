@@ -251,7 +251,7 @@ describe('Practice Question Submitter', function () {
     await questionSubmitter.expectContributionStatusToBe(
       'What is 14 + 12?',
       'Addition',
-      ' Accepted'
+      'Accepted'
     );
     await questionSubmitter.expectContributionStatusToBe(
       'What is 10 + 11?',

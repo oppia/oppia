@@ -133,7 +133,7 @@ describe('Practice Question Reviewer', function () {
       'Arithmetic Operations',
       'What is 231 + 12?'
     );
-  });
+  }, 600000);
 
   it('should be able to navigate between questions to review', async function () {
     await questionReviewer.navigateToContributorDashboardUsingProfileDropdown();

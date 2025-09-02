@@ -146,6 +146,11 @@ describe('Translation Reviewer', function () {
     await translationReviewer.expectPaginationButtonToBeDisabled('previous');
 
     await translationReviewer.clickOnPaginationButton('next');
+    await translationReviewer.expectPaginationButtonToBeDisabled(
+      'previous',
+      false
+    );
+    await translationReviewer.clickOnPaginationButton('previous');
   });
 
   it('should be able to accept the translation', async function () {

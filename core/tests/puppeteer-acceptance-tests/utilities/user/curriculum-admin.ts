@@ -507,12 +507,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
     await this.clickOn(uploadPhotoButton);
     await this.page.waitForSelector(photoUploadModal, {hidden: true});
-    const newPagePromise = this.waitForNewPage();
     await this.clickOn(createTopicButton);
-    // Close new page, so that screenrecorder doesn't capture it and remove
-    // focus from the main page.
-    const newPage = await newPagePromise;
-    await newPage.close();
 
     await this.page.waitForSelector('.e2e-test-topics-table');
     await this.openTopicEditor(name);

@@ -108,7 +108,7 @@ describe('Translation Submitter', function () {
     await curriculumAdm.createAndPublishStoryWithChapter(
       'The Mystery of the Melting Ice',
       'melting-ice',
-      `The Foggy Window`,
+      'The Foggy Window',
       explorationIds[0] as string,
       'States of Matter'
     );

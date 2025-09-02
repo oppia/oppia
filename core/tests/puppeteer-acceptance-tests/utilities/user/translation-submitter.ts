@@ -117,6 +117,7 @@ export class TranslationSubmitter extends BaseUser {
    */
   async clickOnDiscardChangesButton(): Promise<void> {
     await this.expectElementToBeVisible(discardChangeButton);
+    await this.waitForElementToStabilize(discardChangeButton);
     await this.clickOn(discardChangeButton);
     await this.expectElementToBeVisible(discardChangeButton, false);
   }
@@ -129,7 +130,7 @@ export class TranslationSubmitter extends BaseUser {
   async clickOnTranslateButtonInTranslateTextTab(
     chapterName: string,
     storyName: string
-  ) {
+  ): Promise<void> {
     const opportunityItem =
       await this.expectTranslationOpportunityToBePresentInTranslateTextTab(
         chapterName,
