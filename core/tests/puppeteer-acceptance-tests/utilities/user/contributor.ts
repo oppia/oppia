@@ -21,6 +21,7 @@ import {ElementHandle} from 'puppeteer';
 import {BaseUser} from '../common/puppeteer-utils';
 import {showMessage} from '../common/show-message';
 import isElementClickable from '../../functions/is-element-clickable';
+import {ExplorationEditor} from './exploration-editor';
 
 const contributionTabSelector = '.e2e-test-contribution-tab';
 const activeTabSelector = '.e2e-test-active-tab';
@@ -60,7 +61,7 @@ const selectedLanguageSelector = '.e2e-test-language-selector-selected';
 const featuredLanguageOptionSelector = '.e2e-test-featured-language';
 const languageOptionSelector = '.e2e-test-language-selector-option';
 
-export class Contributor extends BaseUser {
+export class Contributor extends ExplorationEditor {
   /**
    * Checks if the active tab name is visible and matches the expected values.
    * @param tabName - The expected name of the active tab.

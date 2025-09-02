@@ -420,6 +420,8 @@ const graphContainerSelector = '.e2e-test-graph-input-viz-container';
 const nodeWarningSignSelector = '.e2e-test-node-warning-sign';
 const navigationDropdownInMobileVisibleSelector =
   '.oppia-exploration-editor-tabs-dropdown.show';
+const confirmDeleteInteractionButtonSelector =
+  '.e2e-test-confirm-delete-interaction';
 
 export enum INTERACTION_TYPES {
   ALGEBRAIC_EXPRESSION = 'Algebric Expression Input',
@@ -839,8 +841,8 @@ export class ExplorationEditor extends BaseUser {
    */
   async addResponseDetailsInResponseModal(
     feedback: string,
-    destination: string,
-    responseIsCorrect: boolean,
+    destination?: string,
+    responseIsCorrect?: boolean,
     isLastResponse: boolean = true
   ): Promise<void> {
     await this.clickOn(feedbackEditorSelector);
@@ -919,8 +921,8 @@ export class ExplorationEditor extends BaseUser {
     interactionType: string,
     answer: string,
     feedback: string,
-    destination: string,
-    responseIsCorrect: boolean,
+    destination?: string,
+    responseIsCorrect?: boolean,
     isLastResponse: boolean = true
   ): Promise<void> {
     await this.updateAnswersInResponseModal(
@@ -6751,6 +6753,20 @@ export class ExplorationEditor extends BaseUser {
     }
 
     await this.expectElementToBeVisible(nodeWarningSignSelector, visible);
+  }
+
+  /**
+   * Removes the current interaction.
+   */
+  async removeInteraction(): Promise<void> {
+    await this.expectElementToBeVisible(removeInteractionButttonSelector);
+    await this.clickOn(removeInteractionButttonSelector);
+    await this.expectElementToBeVisible(confirmDeleteInteractionButtonSelector);
+    await this.clickOn(confirmDeleteInteractionButtonSelector);
+    await this.expectElementToBeVisible(
+      confirmDeleteInteractionButtonSelector,
+      false
+    );
   }
 }
 

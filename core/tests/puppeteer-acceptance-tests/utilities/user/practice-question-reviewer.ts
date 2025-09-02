@@ -18,6 +18,7 @@
 
 import {RTEEditor} from '../common/rte-editor';
 import {Contributor} from './contributor';
+import {INTERACTION_TYPES} from './exploration-editor';
 
 // Contributor Dashboard Selectors.
 const opportunityButtonSelector = '.e2e-test-opportunity-list-item-button';
@@ -123,10 +124,42 @@ export class PracticeQuestionReviewer extends Contributor {
   }
 
   /**
+   * Edits the question interaction in the review.
+   */
+  async editQuestionInteractionInReview(): Promise<void> {
+    // Click on edit button.
+    await this.expectElementToBeVisible(editButtonSelector);
+    await this.clickOn(editButtonSelector);
+
+    await this.removeInteraction();
+
+    await this.addInteraction(INTERACTION_TYPES.NUMERIC_INPUT);
+
+    // Add responses to the number input interaction.
+    await this.addResponsesToTheInteraction(
+      INTERACTION_TYPES.NUMBER_INPUT,
+      '100',
+      'Perfect!',
+      undefined,
+      true
+    );
+
+    // Add hint.
+    await this.addHintToState('Test Hint');
+
+    // Add a solution to the state.
+    await this.addSolutionToState(
+      '100',
+      'As said in the question itself.',
+      true
+    );
+  }
+
+  /**
    * Checks that the question in the review modal is the same as the one passed in.
    * @param question The question to check.
    */
-  async expectQuestionInReviewModalToBe(question: string) {
+  async expectQuestionInReviewModalToBe(question: string): Promise<void> {
     await this.expectTextContentToBe(rteDisplaySelector, question);
   }
 
