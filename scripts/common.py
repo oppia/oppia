@@ -308,34 +308,34 @@ ACCEPTANCE_TEST_SUITE_NAMES = [
     'logged-out-user/track-and-resume-exploration-progress-via-url',
     'logged-out-user/play-lesson-in-different-languages-and-listen-'
     'to-voiceovers',
- fix-color-error
-    'logged-out-user/deny-access-to-dashboards-and-actions-without-login',
-    'logged-out-user/subscribe-to-newsletter-and-click-all-buttons',
- develop
-    'moderator/edit-featured-activities-list',
-    'moderator/view-recent-commits-and-feedback-messages',
-    'practice-question-admin/add-and-remove-contribution-rights',
-    'release-coordinator/run-a-beam-job-and-copy-the-output',
-    'release-coordinator/update-promo-bar-message',
-    'release-coordinator/flush-and-get-profile-of-redis-cache',
-    'release-coordinator/edit-feature-rollout-configuration',
-    'super-admin/edit-user-roles',
-    'super-admin/load-dummy-data-in-dev-mode',
-    'super-admin/edit-platform-parameters',
-    'super-admin/use-misc-tab-features',
-    'topic-manager/edit-and-preview-a-subtopic',
-    'topic-manager/edit-and-preview-a-topic',
-    'translation-admin/add-and-remove-translation-rights',
-    'topic-manager/create-and-delete-subtopic-and-story',
-    'topic-manager/browse-skills-on-topics-and-skills-dashboard',
-    'topic-manager/browse-topics-on-topics-and-skills-dashboard',
-    'topic-manager/create-and-delete-questions-in-skill-editor',
-    'topic-manager/assign-unassign-and-merge-skills',
-    'topic-manager/cannot-do-curriculum-admin-actions',
-    'topic-manager/edit-and-republish-a-skill',
-    'topic-manager/edit-preview-and-save-a-chapter',
-    'voiceover-admin/add-voiceover-artist-to-an-exploration'
-]
+#  fix-color-error
+#     'logged-out-user/deny-access-to-dashboards-and-actions-without-login',
+#     'logged-out-user/subscribe-to-newsletter-and-click-all-buttons',
+#  develop
+#     'moderator/edit-featured-activities-list',
+#     'moderator/view-recent-commits-and-feedback-messages',
+#     'practice-question-admin/add-and-remove-contribution-rights',
+#     'release-coordinator/run-a-beam-job-and-copy-the-output',
+#     'release-coordinator/update-promo-bar-message',
+#     'release-coordinator/flush-and-get-profile-of-redis-cache',
+#     'release-coordinator/edit-feature-rollout-configuration',
+#     'super-admin/edit-user-roles',
+#     'super-admin/load-dummy-data-in-dev-mode',
+#     'super-admin/edit-platform-parameters',
+#     'super-admin/use-misc-tab-features',
+#     'topic-manager/edit-and-preview-a-subtopic',
+#     'topic-manager/edit-and-preview-a-topic',
+#     'translation-admin/add-and-remove-translation-rights',
+#     'topic-manager/create-and-delete-subtopic-and-story',
+#     'topic-manager/browse-skills-on-topics-and-skills-dashboard',
+#     'topic-manager/browse-topics-on-topics-and-skills-dashboard',
+#     'topic-manager/create-and-delete-questions-in-skill-editor',
+#     'topic-manager/assign-unassign-and-merge-skills',
+#     'topic-manager/cannot-do-curriculum-admin-actions',
+#     'topic-manager/edit-and-republish-a-skill',
+#     'topic-manager/edit-preview-and-save-a-chapter',
+#     'voiceover-admin/add-voiceover-artist-to-an-exploration'
+# ]
 
 log_to_terminal(LogType.info("Acceptance Test Suite Names:"))
 for suite_name in ACCEPTANCE_TEST_SUITE_NAMES:
