@@ -1781,10 +1781,7 @@ class TestBase(unittest.TestCase):
                 # type for type safety.
 
                 for args, kwargs in cast(
-                    # Here we use type Any because the expected_args and
-                    # expected_kwargs can contain arguments of arbitrary
-                    # and mixed types from different functions.
-                    Iterator[Tuple[Any, Any]],
+                    Iterator[Tuple[Tuple[object, ...], Dict[str, object]]],
                     itertools.zip_longest(
                         expected_args_iter,
                         expected_kwargs_iter,
