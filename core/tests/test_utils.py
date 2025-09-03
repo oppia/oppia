@@ -1780,11 +1780,10 @@ class TestBase(unittest.TestCase):
                 # an iterator of tuples, and we need to specify the tuple
                 # type for type safety.
 
-                # Here we use type Any because the expected_args and
-                # expected_kwargs can contain arguments of arbitrary
-                # and mixed types from different functions. This makes
-                # it impossible to use a more specific type annotation safely.
                 for args, kwargs in cast(
+                    # Here we use type Any because the expected_args and
+                    # expected_kwargs can contain arguments of arbitrary
+                    # and mixed types from different functions.
                     Iterator[Tuple[Any, Any]],
                     itertools.zip_longest(
                         expected_args_iter,
