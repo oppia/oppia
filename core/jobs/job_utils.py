@@ -111,6 +111,7 @@ def get_model_class(kind: Optional[str]) -> Type[datastore_services.Model]:
         datastore_services.Model._lookup_model(kind) # pylint: disable=protected-access
     )
 
+
 def get_model_kind(
     model: Union[datastore_services.Model, Type[datastore_services.Model]]
 ) -> str:

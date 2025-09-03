@@ -387,7 +387,7 @@ class RunPortserverTests(test_utils.GenericTestBase):
             socket, 'socket', lambda *unused_args: mock_socket)
 
         with swap_socket, swap_hasattr:
-            # Here use cast because MockSocket is a test double and does not
+            # Here we use cast because MockSocket is a test double and does not
             # inherit from socket.SocketType, but we want to use it in place
             # of a socket for testing handle_connection.
             cast_socket = cast(socket.SocketType, mock_socket)
