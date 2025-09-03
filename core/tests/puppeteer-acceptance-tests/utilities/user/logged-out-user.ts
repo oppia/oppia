@@ -5446,6 +5446,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async verifyVoiceoverIsPlaying(shouldBePlaying: boolean): Promise<void> {
     try {
+      await this.page.waitForSelector(audioSliderSelector);
       const currentSliderValue = await this.page.$eval(
         audioSliderSelector,
         el => parseInt(el.textContent?.trim() ?? '', 10)
@@ -5469,9 +5470,9 @@ export class LoggedOutUser extends BaseUser {
       }
     } catch (error) {
       if (shouldBePlaying) {
-        throw new Error(
-          'Voiceover is not playing, expected to be playing.' + error
-        );
+        error.message =
+          'Voiceover is not playing, expected to be playing.\n' + error.message;
+        throw error;
       } else {
         showMessage('Voiceover is not playing, as expected.');
       }
