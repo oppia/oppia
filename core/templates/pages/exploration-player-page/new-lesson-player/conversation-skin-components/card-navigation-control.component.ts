@@ -44,6 +44,7 @@ import './card-navigation-control.component.css';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
 import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
 import {PageContextService} from 'services/page-context.service';
+import {CheckpointProgressService} from 'pages/exploration-player-page/services/checkpoint-progress.service';
 
 @Component({
   selector: 'oppia-card-navigation-control',
@@ -83,6 +84,8 @@ export class CardNavigationControlComponent {
   lastDisplayedCard!: StateCard;
   explorationId!: string;
   newCardStateName!: string;
+  // Initialize checkpointCount to 1 because first card will always be a checkpoint.
+  checkpointCount: number = 1;
   currentCardIndex!: number;
   @Output() submit: EventEmitter<void> = new EventEmitter();
 
@@ -111,6 +114,7 @@ export class CardNavigationControlComponent {
     private conversationFlowService: ConversationFlowService,
     private schemaFormSubmittedService: SchemaFormSubmittedService,
     private windowDimensionsService: WindowDimensionsService,
+    private checkpointProgressService: CheckpointProgressService,
     private contentTranslationManagerService: ContentTranslationManagerService
   ) {}
 
@@ -127,6 +131,13 @@ export class CardNavigationControlComponent {
       !this.pageContextService.isInDiagnosticTestPlayerPage();
     this.skipButtonIsShown =
       this.pageContextService.isInDiagnosticTestPlayerPage();
+    let pathnameArray = this.urlService.getPathname().split('/');
+
+    if (pathnameArray.includes('lesson') && !pathnameArray.includes('embed')) {
+      this.checkpointProgressService.fetchCheckpointCount().then(count => {
+        this.checkpointCount = count;
+      });
+    }
 
     this.directiveSubscriptions.add(
       this.playerPositionService.onHelpCardAvailable.subscribe(helpCard => {
