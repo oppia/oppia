@@ -18,7 +18,9 @@
 
 from __future__ import annotations
 
+import json
 import os
+import re
 from unittest import mock
 
 from core import feconf
@@ -601,3 +603,35 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
             errors_while_voiceover_regeneration,
             [('content_0', 'Mocked exception during voiceover regeneration')]
         )
+
+    def test_custom_rte_tags_sync_with_definitions(self) -> None:
+        with open(
+            feconf.RTE_EXTENSIONS_DEFINITIONS_PATH, 'r', encoding='utf-8'
+        ) as file:
+            file_contents = file.read()
+            match = re.search(
+                r'export default ({.*}) as const;', file_contents, re.DOTALL)
+
+            if match:
+                json_like_data = match.group(1)
+                custom_rte_tags_definition_dict = json.loads(json_like_data)
+
+                custom_rte_tag_to_names = {
+                    'oppia-noninteractive-collapsible': 'Collapsible',
+                    'oppia-noninteractive-image': 'Image',
+                    'oppia-noninteractive-link': 'Link',
+                    'oppia-noninteractive-math': 'Math',
+                    'oppia-noninteractive-video': 'Video',
+                    'oppia-noninteractive-skillreview': 'Skillreview',
+                    'oppia-noninteractive-tabs': 'Tabs',
+                    'oppia-noninteractive-workedexample': 'Workedexample',
+                }
+                rte_tag_names = list(custom_rte_tags_definition_dict.keys())
+
+                self.assertItemsEqual(
+                    voiceover_regeneration_services.ALLOWED_CUSTOM_RTE_TAGS,
+                    list(custom_rte_tag_to_names.keys()))
+                self.assertItemsEqual(
+                    rte_tag_names,
+                    list(custom_rte_tag_to_names.values())
+                )

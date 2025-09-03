@@ -53,17 +53,18 @@ speech_synthesis_services = (
     models.Registry.import_speech_synthesis_services())
 
 
-ALLOWED_LESSON_CUSTOM_RTE_TAGS = [
+ALLOWED_CUSTOM_RTE_TAGS = [
     'oppia-noninteractive-collapsible',
     'oppia-noninteractive-image',
     'oppia-noninteractive-link',
     'oppia-noninteractive-math',
     'oppia-noninteractive-video',
     'oppia-noninteractive-skillreview',
-    'oppia-noninteractive-tabs'
+    'oppia-noninteractive-tabs',
+    'oppia-noninteractive-workedexample'
 ]
 
-ALLOWED_LESSON_GENERAL_RTE_TAGS = [
+ALLOWED_GENERAL_RTE_TAGS = [
     'p',
     'strong',
     'br',
@@ -130,8 +131,8 @@ def parse_html(html_content: str) -> str:
 
     unknown_tags = (
         all_tags -
-        set(ALLOWED_LESSON_GENERAL_RTE_TAGS) -
-        set(ALLOWED_LESSON_CUSTOM_RTE_TAGS)
+        set(ALLOWED_CUSTOM_RTE_TAGS) -
+        set(ALLOWED_GENERAL_RTE_TAGS)
     )
 
     if unknown_tags:
@@ -139,7 +140,7 @@ def parse_html(html_content: str) -> str:
             'HTML content contains invalid or unsupported tags: %s' % (
                 ', '.join(unknown_tags)))
 
-    for custom_tag_element in ALLOWED_LESSON_CUSTOM_RTE_TAGS:
+    for custom_tag_element in ALLOWED_CUSTOM_RTE_TAGS:
         for element in soup.find_all(custom_tag_element):
             convert_custom_oppia_tags_to_generic_tags(element)
 
