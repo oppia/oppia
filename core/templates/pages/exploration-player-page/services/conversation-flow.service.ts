@@ -1800,6 +1800,10 @@ export class ConversationFlowService {
     this.isLoggedIn = userStatus;
   }
 
+  getIsLoggedIn(): boolean {
+    return this.isLoggedIn;
+  }
+
   get onPlayerStateChange(): EventEmitter<string> {
     return this._playerStateChangeEventEmitter;
   }
