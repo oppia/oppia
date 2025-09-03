@@ -113,16 +113,16 @@ ELASTICSEARCH_VERSION = '7.17.0'
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
 CURR_DIR = os.path.abspath(os.getcwd())
-log_to_terminal(LogType.success(f"Current Directory: {CURR_DIR}"))
+log_to_terminal(LogType.SUCCESS(f"Current Directory: {CURR_DIR}"))
 
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
 OPPIA_TOOLS_DIR_ABS_PATH = os.path.abspath(OPPIA_TOOLS_DIR)
-log_to_terminal(LogType.success(f"Oppia Tools Directory: {OPPIA_TOOLS_DIR_ABS_PATH}"))
+log_to_terminal(LogType.SUCCESS(f"Oppia Tools Directory: {OPPIA_TOOLS_DIR_ABS_PATH}"))
 
 THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
 THIRD_PARTY_PYTHON_LIBS_DIR = os.path.join(THIRD_PARTY_DIR, 'python_libs')
-log_to_terminal(LogType.info(f"Third Party Directory: {THIRD_PARTY_DIR}"))
-log_to_terminal(LogType.info(f"Third Party Python Libs Directory: {THIRD_PARTY_PYTHON_LIBS_DIR}"))
+log_to_terminal(LogType.INFO(f"Third Party Directory: {THIRD_PARTY_DIR}"))
+log_to_terminal(LogType.INFO(f"Third Party Python Libs Directory: {THIRD_PARTY_PYTHON_LIBS_DIR}"))
 
 GOOGLE_CLOUD_SDK_HOME = (
     '/app/vm_deps/google-cloud-sdk'
@@ -133,7 +133,7 @@ GOOGLE_CLOUD_SDK_HOME = (
         'google-cloud-sdk'
     )
 )
-log_to_terminal(LogType.info(f"Google Cloud SDK Home: {GOOGLE_CLOUD_SDK_HOME}"))
+log_to_terminal(LogType.INFO(f"Google Cloud SDK Home: {GOOGLE_CLOUD_SDK_HOME}"))
 GOOGLE_APP_ENGINE_SDK_HOME = os.path.join(
     GOOGLE_CLOUD_SDK_HOME, 'platform', 'google_appengine')
 GOOGLE_CLOUD_SDK_BIN = os.path.join(GOOGLE_CLOUD_SDK_HOME, 'bin')
@@ -570,9 +570,9 @@ def is_current_branch_a_hotfix_branch() -> bool:
     current_branch_name = get_current_branch_name()
     is_hotfix = bool(re.match(HOTFIX_BRANCH_REGEX, current_branch_name))
     if is_hotfix:
-        log_to_terminal(LogType.info(f"The current branch '{current_branch_name}' is a hotfix branch."))
+        log_to_terminal(LogType.INFO(f"The current branch '{current_branch_name}' is a hotfix branch."))
     else:
-        log_to_terminal(LogType.warning(f"The current branch '{current_branch_name}' is not a hotfix branch."))
+        log_to_terminal(LogType.WARNING(f"The current branch '{current_branch_name}' is not a hotfix branch."))
     return is_hotfix
 
 
@@ -591,9 +591,9 @@ def is_current_branch_a_release_branch() -> bool:
     is_release_branch = release_match or release_maintenance_match or hotfix_match
 
     if is_release_branch:
-        log_to_terminal(LogType.info(f"The current branch '{current_branch_name}' is a release branch."))
+        log_to_terminal(LogType.INFO(f"The current branch '{current_branch_name}' is a release branch."))
     else:
-        log_to_terminal(LogType.warning(f"The current branch '{current_branch_name}' is not a release branch."))
+        log_to_terminal(LogType.WARNING(f"The current branch '{current_branch_name}' is not a release branch."))
     
     return is_release_branch
 
@@ -608,9 +608,9 @@ def is_current_branch_a_test_branch() -> bool:
     current_branch_name = get_current_branch_name()
     is_test_branch = bool(re.match(TEST_BRANCH_REGEX, current_branch_name))
     if is_test_branch:
-        log_to_terminal(LogType.info(f"The current branch '{current_branch_name}' is a test branch."))
+        log_to_terminal(LogType.INFO(f"The current branch '{current_branch_name}' is a test branch."))
     else:
-        log_to_terminal(LogType.warning(f"The current branch '{current_branch_name}' is not a test branch."))
+        log_to_terminal(LogType.WARNING(f"The current branch '{current_branch_name}' is not a test branch."))
     return is_test_branch
 
 
@@ -638,9 +638,9 @@ def is_port_in_use(port: int) -> bool:
     with contextlib.closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
         port_in_use = bool(not s.connect_ex(('localhost', port)))
     if port_in_use:
-        log_to_terminal(LogType.info(f"Port {port} is in use."))
+        log_to_terminal(LogType.INFO(f"Port {port} is in use."))
     else:
-        log_to_terminal(LogType.warning(f"Port {port} is not in use."))
+        log_to_terminal(LogType.WARNING(f"Port {port} is not in use."))
     return port_in_use
 
 
@@ -659,12 +659,12 @@ def recursive_chown(path: str, uid: int, gid: int) -> None:
         for root, directories, filenames in os.walk(path):
             for directory in directories:
                 os.chown(os.path.join(root, directory), uid, gid)
-                log_to_terminal(LogType.info(f"Ownership updated for directory: {os.path.join(root, directory)}."))
+                log_to_terminal(LogType.INFO(f"Ownership updated for directory: {os.path.join(root, directory)}."))
             for filename in filenames:
                 os.chown(os.path.join(root, filename), uid, gid)
-                log_to_terminal(LogType.info(f"Ownership updated for file: {os.path.join(root, filename)}."))
+                log_to_terminal(LogType.INFO(f"Ownership updated for file: {os.path.join(root, filename)}."))
     except Exception as e:
-        log_to_terminal(LogType.error(f"Error updating ownership for {path}: {str(e)}"))
+        log_to_terminal(LogType.ERROR(f"Error updating ownership for {path}: {str(e)}"))
 
 
 def recursive_chmod(path: str, mode: int) -> None:
@@ -709,7 +709,7 @@ def install_npm_library(library_name: str, version: str, path: str) -> None:
     try:
         log_to_terminal(LogType.info(f"Checking whether {library_name} is installed in {path}"))
         if not os.path.exists(os.path.join(NODE_MODULES_PATH, library_name)):
-            log_to_terminal(LogType.warning(f"{library_name} is not installed. Installing..."))
+            log_to_terminal(LogType.WARNING(f"{library_name} is not installed. Installing..."))
             subprocess.check_call(['yarn', 'add', f"{library_name}@{version}"])
             log_to_terminal(LogType.SUCCESS(f"{library_name} installed successfully."))
         else:
@@ -747,7 +747,7 @@ def get_personal_access_token() -> str:
     try:
         personal_access_token = getpass.getpass(
             prompt=(
-                LogType.info(
+                LogType.INFO(
                     "Please provide personal access token for your GitHub ID. "
                     "You can create one at https://github.com/settings/tokens: "
                 )
@@ -755,14 +755,14 @@ def get_personal_access_token() -> str:
         )
         if personal_access_token is None:
             raise Exception(
-                LogType.error(
+                LogType.ERROR(
                     "No personal access token provided. Set up a personal access token "
                     "at https://github.com/settings/tokens and re-run the script."
                 )
             )
         return personal_access_token
     except Exception as e:
-        log_to_terminal(LogType.error(f"Error retrieving personal access token: {str(e)}"))
+        log_to_terminal(LogType.ERROR(f"Error retrieving personal access token: {str(e)}"))
         raise
 
 
@@ -864,9 +864,9 @@ def wait_for_port_to_be_in_use(port_number: int) -> None:
         waited_seconds += 1
     if (waited_seconds == MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS
             and not is_port_in_use(port_number)):
-        log_to_terminal(LogType.error(
+        log_to_terminal(LogType.ERROR(
             f"Failed to start server on port {port_number}, exiting..."))
-        log_to_terminal(LogType.warning(
+        log_to_terminal(LogType.WARNING(
             "This may be because you do not have enough available memory. "
             "Please refer to: https://github.com/oppia/oppia/wiki/Troubleshooting#low-ram"
         ))
@@ -960,7 +960,7 @@ def write_stdout_safe(string: Union[str, bytes]) -> None:
         except OSError as e:
             if e.errno == errno.EAGAIN:
                 continue
-            log_to_terminal(LogType.error("Failed to write to stdout: %s" % e))
+            log_to_terminal(LogType.ERROR("Failed to write to stdout: %s" % e))
             raise
 
 
@@ -990,7 +990,7 @@ def url_retrieve(
             enforce_https is True.
     """
     if enforce_https and not url.startswith('https://'):
-        log_to_terminal(LogType.error(f"The URL {url} does not use HTTPS."))
+        log_to_terminal(LogType.ERROR(f"The URL {url} does not use HTTPS."))
         raise Exception(f"The URL {url} should use HTTPS.")
 
     # Try downloading using curl initially.
@@ -1007,8 +1007,8 @@ def url_retrieve(
         return
 
     # Download with urlopen if curl fails.
-    log_to_terminal(LogType.error('Downloading using curl failed. Trying with urlopen.'))
-    log_to_terminal(LogType.error('Error log for curl: %s' % err))
+    log_to_terminal(LogType.ERROR('Downloading using curl failed. Trying with urlopen.'))
+    log_to_terminal(LogType.ERROR('Error log for curl: %s' % err))
     failures = 0
     success = False
     while not success and failures < max_attempts:
