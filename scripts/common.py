@@ -416,7 +416,7 @@ def require_cwd_to_be_oppia(allow_deploy_dir: bool = False) -> None:
         os.path.isdir(os.path.join(os.getcwd(), os.pardir, 'oppia')))
 
     if is_oppia_dir or (allow_deploy_dir and is_deploy_dir):
-        log_to_terminal(LogType.success("Current directory is valid."))
+        log_to_terminal(LogType.SUCCESS("Current directory is valid."))
         return
 
     raise Exception(LogType.error('Please run this script from the oppia/ directory.'))
@@ -447,7 +447,7 @@ def open_new_tab_in_browser_if_possible(url: str) -> None:
         browser_cmds[default_index + 1:])
     for cmd in ordered_browser_cmds:
         if subprocess.call(['which', cmd]) == 0:
-            log_to_terminal(LogType.success(f"Opening {url} in {cmd}."))
+            log_to_terminal(LogType.SUCCESS(f"Opening {url} in {cmd}."))
             subprocess.check_call([cmd, url])
             return
     log_to_terminal(LogType.error('******************************************************************'))
@@ -499,7 +499,7 @@ def verify_local_repo_is_clean() -> None:
         raise Exception(
             LogType.error(
                 'ERROR: This script should be run from a clean branch.'))
-    log_to_terminal(LogType.success("The repository is clean and ready."))
+    log_to_terminal(LogType.SUCCESS("The repository is clean and ready."))
 
 def get_current_branch_name() -> str:
     """Get the current branch name.
@@ -523,7 +523,7 @@ def update_branch_with_upstream() -> None:
     log_to_terminal(LogType.info(f"Updating branch '{current_branch_name}' with upstream..."))
     try:
         run_cmd(['git', 'pull', 'upstream', current_branch_name])
-        log_to_terminal(LogType.success(f"Branch '{current_branch_name}' updated successfully."))
+        log_to_terminal(LogType.SUCCESS(f"Branch '{current_branch_name}' updated successfully."))
     except subprocess.CalledProcessError as e:
         raise Exception(
             LogType.error(f"Failed to update branch '{current_branch_name}'. Error: {e}"))
@@ -548,18 +548,18 @@ def get_current_release_version_number(release_branch_name: str) -> str:
         HOTFIX_BRANCH_REGEX, release_branch_name)
     if release_match:
         return release_match.group(1)
-        log_to_terminal(LogType.success(f"Release branch version: {version}"))
+        log_to_terminal(LogType.SUCCESS(f"Release branch version: {version}"))
         return version
     elif release_maintenance_match:
         version = release_maintenance_match.group(1)
-        log_to_terminal(LogType.success(f"Release maintenance branch version: {version}"))
+        log_to_terminal(LogType.SUCCESS(f"Release maintenance branch version: {version}"))
         return version
     elif hotfix_match:
         version = hotfix_match.group(1)
-        log_to_terminal(LogType.success(f"Hotfix branch version: {version}"))
+        log_to_terminal(LogType.SUCCESS(f"Hotfix branch version: {version}"))
         return version
     else:
-        raise Exception(LogType.error(f"Invalid branch name: {release_branch_name}."))
+        raise Exception(LogType.ERROR(f"Invalid branch name: {release_branch_name}."))
 
 def is_current_branch_a_hotfix_branch() -> bool:
     """Checks if the current branch is a hotfix branch.
@@ -623,7 +623,7 @@ def verify_current_branch_name(expected_branch_name: str) -> None:
             f"Current branch: '{current_branch_name}'"
         ))
     else:
-        log_to_terminal(LogType.success(f"Verified: Current branch is '{expected_branch_name}'."))
+        log_to_terminal(LogType.SUCCESS(f"Verified: Current branch is '{expected_branch_name}'."))
 
 
 def is_port_in_use(port: int) -> bool:
@@ -655,7 +655,7 @@ def recursive_chown(path: str, uid: int, gid: int) -> None:
     """
     try:
         os.chown(path, uid, gid)
-        log_to_terminal(LogType.success(f"Ownership updated for {path}."))
+        log_to_terminal(LogType.SUCCESS(f"Ownership updated for {path}."))
         for root, directories, filenames in os.walk(path):
             for directory in directories:
                 os.chown(os.path.join(root, directory), uid, gid)
@@ -676,16 +676,16 @@ def recursive_chmod(path: str, mode: int) -> None:
     """
     try:
         os.chmod(path, mode)
-        log_to_terminal(LogType.success(f"Mode changed for path: {path}"))
+        log_to_terminal(LogType.SUCCESS(f"Mode changed for path: {path}"))
         for root, directories, filenames in os.walk(path):
             for directory in directories:
                 os.chmod(os.path.join(root, directory), mode)
-                log_to_terminal(LogType.info(f"Mode changed for directory: {os.path.join(root, directory)}"))
+                log_to_terminal(LogType.INFO(f"Mode changed for directory: {os.path.join(root, directory)}"))
             for filename in filenames:
                 os.chmod(os.path.join(root, filename), mode)
-                log_to_terminal(LogType.info(f"Mode changed for file: {os.path.join(root, filename)}"))
+                log_to_terminal(LogType.INFO(f"Mode changed for file: {os.path.join(root, filename)}"))
     except Exception as e:
-        log_to_terminal(LogType.error(f"Error changing mode for {path}: {str(e)}"))
+        log_to_terminal(LogType.ERROR(f"Error changing mode for {path}: {str(e)}"))
 
 
 def print_each_string_after_two_new_lines(strings: List[str]) -> None:
@@ -711,9 +711,9 @@ def install_npm_library(library_name: str, version: str, path: str) -> None:
         if not os.path.exists(os.path.join(NODE_MODULES_PATH, library_name)):
             log_to_terminal(LogType.warning(f"{library_name} is not installed. Installing..."))
             subprocess.check_call(['yarn', 'add', f"{library_name}@{version}"])
-            log_to_terminal(LogType.success(f"{library_name} installed successfully."))
+            log_to_terminal(LogType.SUCCESS(f"{library_name} installed successfully."))
         else:
-            log_to_terminal(LogType.success(f"{library_name} is already installed in {path}."))
+            log_to_terminal(LogType.SUCCESS(f"{library_name} is already installed in {path}."))
     except subprocess.CalledProcessError as e:
         log_to_terminal(LogType.error(f"Failed to install {library_name}: {str(e)}"))
 
@@ -726,12 +726,12 @@ def ask_user_to_confirm(message: str) -> None:
             to do.
     """
     while True:
-        log_to_terminal(LogType.info('******************************************************'))
-        log_to_terminal(LogType.info(message))
-        log_to_terminal(LogType.info('Confirm once you are done by entering y/ye/yes.\n'))
+        log_to_terminal(LogType.INFO('******************************************************'))
+        log_to_terminal(LogType.INFO(message))
+        log_to_terminal(LogType.INFO('Confirm once you are done by entering y/ye/yes.\n'))
         answer = input().lower()
         if answer in AFFIRMATIVE_CONFIRMATIONS:
-            log_to_terminal(LogType.success("Task confirmed by user."))
+            log_to_terminal(LogType.SUCCESS("Task confirmed by user."))
             return
 
 
@@ -778,9 +778,9 @@ def create_readme(dir_path: str, readme_content: str) -> None:
     try:
         with utils.open_file(os.path.join(dir_path, 'README.md'), 'w') as f:
             f.write(readme_content)
-        log_to_terminal(LogType.success(f"README created successfully in {dir_path}."))
+        log_to_terminal(LogType.SUCCESS(f"README created successfully in {dir_path}."))
     except Exception as e:
-        log_to_terminal(LogType.error(f"Error creating README in {dir_path}: {str(e)}"))
+        log_to_terminal(LogType.ERROR(f"Error creating README in {dir_path}: {str(e)}"))
 
 
 def inplace_replace_file(
@@ -837,16 +837,16 @@ def inplace_replace_file(
                 )
             )
         os.replace(new_filename, filename)
-        log_to_terminal(LogType.success(f"File successfully updated: {filename}"))
+        log_to_terminal(LogType.SUCCESS(f"File successfully updated: {filename}"))
 
     except ValueError as ve:
         os.remove(new_filename)
-        log_to_terminal(LogType.error(f"Validation error: {ve}"))
+        log_to_terminal(LogType.ERROR(f"Validation error: {ve}"))
         raise
 
     except Exception as e:
         os.remove(new_filename)
-        log_to_terminal(LogType.error(f"An error occurred while processing the file: {e}"))
+        log_to_terminal(LogType.ERROR(f"An error occurred while processing the file: {e}"))
         raise
 
 
@@ -872,7 +872,7 @@ def wait_for_port_to_be_in_use(port_number: int) -> None:
         ))
         sys.exit(1)
         
-    log_to_terminal(LogType.success(f"Port {port_number} is now in use."))
+    log_to_terminal(LogType.SUCCESS(f"Port {port_number} is now in use."))
 
 
 def wait_for_port_to_not_be_in_use(port_number: int) -> bool:
@@ -1003,7 +1003,7 @@ def url_retrieve(
         out, err = curl_task.communicate()
     if curl_task.returncode == 0:
         # The download was successful.
-        log_to_terminal(LogType.success(f"Download successful: {url}"))
+        log_to_terminal(LogType.SUCCESS(f"Download successful: {url}"))
         return
 
     # Download with urlopen if curl fails.
@@ -1027,11 +1027,11 @@ def url_retrieve(
                 f"Attempt {failures} of {max_attempts} failed when downloading {url}."))
             log_to_terminal(LogType.error(f"Error in url_retrieve: {exception}"))
             if failures >= max_attempts:
-                log_to_terminal(LogType.error("Max attempts reached. Raising exception."))
+                log_to_terminal(LogType.ERROR("Max attempts reached. Raising exception."))
                 raise exception
-            log_to_terminal(LogType.info("Retrying download."))
+            log_to_terminal(LogType.INFO("Retrying download."))
         else:
-            log_to_terminal(LogType.success(f"Download successful: {url}"))
+            log_to_terminal(LogType.SUCCESS(f"Download successful: {url}"))
             success = True
 
 
@@ -1045,10 +1045,10 @@ def setup_chrome_bin_env_variable() -> None:
     for path in CHROME_PATHS:
         if os.path.isfile(path):
             os.environ['CHROME_BIN'] = path
-            log_to_terminal(LogType.success(f"CHROME_BIN set to: {path}"))
+            log_to_terminal(LogType.SUCCESS(f"CHROME_BIN set to: {path}"))
             break
     else:
-        log_to_terminal(LogType.error("Chrome is not found, stopping..."))
+        log_to_terminal(LogType.ERROR("Chrome is not found, stopping..."))
         raise Exception("Chrome not found.")
 
 
@@ -1061,15 +1061,15 @@ def run_ng_compilation() -> None:
             with servers.managed_ng_build() as proc:
                 proc.wait()
         except subprocess.CalledProcessError as error:
-            log_to_terminal(LogType.error(f"Angular compilation failed: {error.output}"))
+            log_to_terminal(LogType.ERROR(f"Angular compilation failed: {error.output}"))
             if attempt == max_tries - 1:
-                log_to_terminal(LogType.error("Maximum attempts reached. Exiting..."))
+                log_to_terminal(LogType.ERROR("Maximum attempts reached. Exiting..."))
                 sys.exit(error.returncode)
         if os.path.isdir(ng_bundles_dir_name):
-            log_to_terminal(LogType.success("Angular compilation completed successfully."))
+            log_to_terminal(LogType.SUCCESS("Angular compilation completed successfully."))
             break
     if not os.path.isdir(ng_bundles_dir_name):
-        log_to_terminal(LogType.error("Failed to complete ng build compilation, exiting..."))
+        log_to_terminal(LogType.ERROR("Failed to complete ng build compilation, exiting..."))
         sys.exit(1)
 
 
@@ -1081,7 +1081,7 @@ def set_constants_to_default() -> None:
         maintenance_mode=False,
         version_info_must_be_set=False
         )
-    log_to_terminal(LogType.success("Constants have been reset to default values."))
+    log_to_terminal(LogType.SUCCESS("Constants have been reset to default values."))
 
 
 def modify_constants(
