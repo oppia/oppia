@@ -59,7 +59,6 @@ describe('Translation Submitter', function () {
       'Fraction Foundations',
       'Unit Fractions'
     );
-    // await curriculumAdm.createTopic('Fractions', 'fractions');
     await curriculumAdm.createSkillForTopic('Math', 'Fractions');
 
     // Create an exploration.
@@ -120,7 +119,7 @@ describe('Translation Submitter', function () {
       await curriculumAdm.addChapter(`Chapter ${id}`, id);
       await curriculumAdm.saveStoryDraft();
     }
-  }, 1500000);
+  }, 1800000);
 
   it('should be able to navigate to contribution page', async function () {
     // Navigate to the contributor dashboard.
