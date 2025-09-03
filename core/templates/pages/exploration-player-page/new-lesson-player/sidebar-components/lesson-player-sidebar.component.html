@@ -2,7 +2,7 @@
   <div class="player-desktop-sidebar-menu"
        [class.expanded]="sidebarIsExpanded">
     <div class="lesson-player-sidebar-top">
-      <button class="player-sidebar-toggle"
+      <button class="player-sidebar-toggle e2e-lesson-player-sidebar-toggle-btn"
               (click)="toggleSidebar()"
               [class.expanded]="sidebarIsExpanded">
         <div *ngIf="!sidebarIsExpanded">
@@ -14,7 +14,7 @@
           <i class="fa fa-lg fa-chevron-left lesson-player-sidebar-chevron"></i>
         </div>
       </button>
-      <div *ngIf="sidebarIsExpanded">
+      <div *ngIf="sidebarIsExpanded" class="e2e-lesson-player-sidebar-description">
         <div class="oppia-exploration-description"
             *ngIf="!isHackyExpDescTranslationDisplayed()">
           {{ expDescription | truncateAndCapitalize: 90 }}
@@ -27,21 +27,21 @@
       </div>
     </div>
     <div class="player-sidebar-button-container">
-      <button class="player-sidebar-button" (click)="showShareLessonModal()" aria-label="Share lesson">
+      <button class="player-sidebar-button e2e-sidebar-share-button" (click)="showShareLessonModal()" aria-label="Share lesson">
         <i *ngIf="!sidebarIsExpanded" class="fa fa-lg fa-share-alt"></i>
         <span *ngIf="sidebarIsExpanded">
           <i class="fa fa-lg fa-share-alt"></i>
           {{ 'I18N_SHARE_LESSON' | translate }}
         </span>
       </button>
-      <button class="player-sidebar-button" (click)="showFeedbackModal()" aria-label="Give feedback">
+      <button class="player-sidebar-button e2e-sidebar-feedback-button-desktop" (click)="showFeedbackModal()" aria-label="Give feedback">
         <i *ngIf="!sidebarIsExpanded" class="fa fa-lg fa-comments"></i>
         <span *ngIf="sidebarIsExpanded">
           <i class="fa fa-lg fa-comments"></i>
           {{ 'I18N_LESSON_PLAYER_FEEDBACK_BUTTON' | translate }}
         </span>
       </button>
-      <button class="player-sidebar-button" (click)="showFlagExplorationModal()" aria-label="Report content">
+      <button class="player-sidebar-button e2e-sidebar-report-button-desktop" (click)="showFlagExplorationModal()" aria-label="Report content">
         <i *ngIf="!sidebarIsExpanded" class="fa fa-lg fa-flag"></i>
         <span *ngIf="sidebarIsExpanded">
           <i class="fa fa-lg fa-flag"></i>

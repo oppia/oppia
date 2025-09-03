@@ -336,6 +336,10 @@ const feedbackPopupSelector = '.e2e-test-exploration-feedback-popup-link';
 const feedbackTextarea = '.e2e-test-exploration-feedback-textarea';
 const generateAttributionSelector = '.e2e-test-generate-attribution';
 const attributionHtmlSectionSelector = '.attribution-html-section';
+const lessonPlayerSidebarToggleBtnSelector =
+  '.e2e-lesson-player-sidebar-toggle-btn';
+const lessonPlayerSidebarDescriptionSelector =
+  '.e2e-lesson-player-sidebar-description';
 const attributionHtmlCodeSelector = '.attribution-html-code';
 const attributionPrintTextSelector = '.attribution-print-text';
 const shareExplorationButtonSelector = '.e2e-test-share-exploration-button';
@@ -345,9 +349,19 @@ const checkpointModalSelector = '.lesson-info-tooltip-add-ons';
 const feedbackSelector = '.e2e-test-conversation-feedback-latest';
 const previousCardButton = '.e2e-test-back-button';
 const hintButtonSelector = '.e2e-test-view-hint';
+const copyLinkButtonSelector = '.e2e-copy-link-btn';
+const embedInWebpageButtonSelector = '.e2e-test-embed-in-webpage-button';
+const shareModalSuccessMessageSelector = '.e2e-share-modal-success-message';
+const attributionValueSelector = '.e2e-attribution-value';
+const copyAttributionButtonSelector = '.e2e-copy-attribution-button';
+const attributeThisLessonTextSelector = '.e2e-attribute-this-lesson-text';
 const gotItButtonSelector = '.e2e-test-learner-got-it-button';
 const responsesDropdownSelector = '.conversation-skin-responses-dropdown-text';
 const responseSelector = 'oppia-interaction-display';
+const sidebarShareButtonSelector = '.e2e-sidebar-share-button';
+const sidebarFeedbackButtonDesktopSelector =
+  '.e2e-sidebar-feedback-button-desktop';
+const sidebarReportButtonDesktopSelector = '.e2e-sidebar-report-button-desktop';
 const closeLessonInfoTooltipSelector = '.e2e-test-close-lesson-info-tooltip';
 const viewSolutionButton = '.e2e-test-view-solution';
 const stateConversationContent = '.e2e-test-conversation-content';
@@ -4301,6 +4315,193 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(attributionHtmlSectionSelector, {
       visible: true,
     });
+  }
+
+  async copyLessonSharingLink(): Promise<string> {
+    try {
+      // OverridePermissions is used to allow clipboard access.
+      const context = this.page.browser().defaultBrowserContext();
+      await context.overridePermissions('http://localhost:8181', [
+        'clipboard-read',
+        'clipboard-write',
+      ]);
+
+      // Click on the copy button.
+      await this.page.waitForSelector(copyLinkButtonSelector, {
+        visible: true,
+      });
+      await this.clickOn(copyLinkButtonSelector);
+
+      // Reading the clipboard data.
+      const clipboardData = await this.page.evaluate(async () => {
+        return await navigator.clipboard.readText();
+      });
+
+      if (!clipboardData) {
+        throw new Error('Failed to copy the lesson sharing link.');
+      }
+
+      return clipboardData;
+    } catch (error) {
+      console.error('An error occurred:', error);
+      throw error;
+    }
+  }
+
+  async expectLessonSharingLinkToBeCopied(
+    successMsg: string,
+    linkText: string
+  ): Promise<void> {
+    await this.expectPageURLToContain(linkText);
+
+    await this.expectTextContentInElementWithSelectorToBe(
+      shareModalSuccessMessageSelector,
+      successMsg
+    );
+    showMessage('Lesson sharing link copied to clipboard.');
+  }
+
+  async copyAttribution(): Promise<string> {
+    try {
+      // OverridePermissions is used to allow clipboard access.
+      const context = this.page.browser().defaultBrowserContext();
+      await context.overridePermissions('http://localhost:8181', [
+        'clipboard-read',
+        'clipboard-write',
+      ]);
+
+      // Click on the copy button.
+      await this.page.waitForSelector(attributeThisLessonTextSelector, {
+        visible: true,
+      });
+      await this.clickOn(attributeThisLessonTextSelector);
+
+      await this.page.waitForSelector(copyAttributionButtonSelector, {
+        visible: true,
+      });
+      await this.clickOn(copyAttributionButtonSelector);
+
+      // Reading the clipboard data.
+      const clipboardData = await this.page.evaluate(async () => {
+        return await navigator.clipboard.readText();
+      });
+
+      if (!clipboardData) {
+        throw new Error('Failed to copy the lesson attribution.');
+      }
+
+      return clipboardData;
+    } catch (error) {
+      console.error('An error occurred:', error);
+      throw error;
+    }
+  }
+
+  async expectAttributionToBeCopied(
+    successMsg: string,
+    attributionText: string
+  ): Promise<void> {
+    const attributionValue = await this.page.waitForSelector(
+      attributionValueSelector,
+      {
+        visible: true,
+      }
+    );
+    const attributionValueText = await this.page.evaluate(
+      el => el.value,
+      attributionValue
+    );
+    expect(attributionValueText).toBe(attributionText);
+
+    await this.expectTextContentInElementWithSelectorToBe(
+      shareModalSuccessMessageSelector,
+      successMsg
+    );
+    showMessage('Attribution copied to clipboard.');
+  }
+
+  async openShareModal(): Promise<void> {
+    await this.page.waitForSelector(sidebarShareButtonSelector, {
+      visible: true,
+    });
+    await this.clickOn(sidebarShareButtonSelector);
+  }
+
+  async openFeedbackModal(): Promise<void> {
+    await this.page.waitForSelector(sidebarFeedbackButtonDesktopSelector, {
+      visible: true,
+    });
+    await this.clickOn(sidebarFeedbackButtonDesktopSelector);
+  }
+
+  async openReportModal(): Promise<void> {
+    await this.page.waitForSelector(sidebarReportButtonDesktopSelector, {
+      visible: true,
+    });
+    await this.clickOn(sidebarReportButtonDesktopSelector);
+  }
+
+  async toggleLessonPlayerSidebar(): Promise<void> {
+    await this.page.waitForSelector(lessonPlayerSidebarToggleBtnSelector, {
+      visible: true,
+    });
+    await this.clickOn(lessonPlayerSidebarToggleBtnSelector);
+  }
+
+  /**
+   * Verifies that the sidebar toggle button displays the expected text.
+   * Skips the check if the viewport is at mobile width.
+   *
+   * @param btnText - The expected text content of the sidebar toggle button.
+   */
+  async expectSidebarToggleBtnTextToBe(btnText: string): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      showMessage(
+        'Skipping Sidebar toggle button text check on mobile viewport.'
+      );
+      return;
+    }
+    await this.expectTextContentInElementWithSelectorToBe(
+      lessonPlayerSidebarToggleBtnSelector,
+      btnText
+    );
+  }
+
+  async expectLessonDescriptionInSidebarTextToBe(
+    lessonDescription: string
+  ): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      showMessage('Skipping Lesson description text check on mobile viewport.');
+      return;
+    }
+    await this.expectTextContentInElementWithSelectorToBe(
+      lessonPlayerSidebarDescriptionSelector,
+      lessonDescription
+    );
+  }
+
+  async expectSidebarShareButtonToBePresent(): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
+    await this.page.waitForSelector(sidebarShareButtonSelector, {
+      timeout: 5000,
+    });
+    showMessage('Share button present.');
+  }
+
+  async expectSidebarFeedbackButtonToBePresent(): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
+    await this.page.waitForSelector(sidebarFeedbackButtonDesktopSelector, {
+      timeout: 5000,
+    });
+    showMessage('Feedback button present.');
+  }
+
+  async expectSidebarReportButtonToBePresent(): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
+    await this.page.waitForSelector(sidebarReportButtonDesktopSelector, {
+      timeout: 5000,
+    });
+    showMessage('Report button present.');
   }
 
   /**

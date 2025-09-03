@@ -485,6 +485,10 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/share-the-lesson-from-the-lesson-player.spec.ts"
     },
     {
+      "name": "logged-out-learner/share-the-lesson-from-the-new-lesson-player",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/share-the-lesson-from-the-new-lesson-player.spec.ts"
+    },
+    {
       "name": "logged-in-learner/sets-goal-on-learner-dashboard",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/sets-goal-on-learner-dashboard.spec.ts"
     },

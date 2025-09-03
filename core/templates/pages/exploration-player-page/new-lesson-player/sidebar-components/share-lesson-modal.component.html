@@ -41,11 +41,11 @@
     </div>
 
     <div class="copy-modal-body copy-modal-body-btn">
-      <button mat-button class="share-modal-btn" (click)="copyLessonLink()" aria-label="Copy lesson link">
+      <button mat-button class="share-modal-btn e2e-copy-link-btn" (click)="copyLessonLink()" aria-label="Copy lesson link">
         <span class="button-content">{{'I18N_SHARE_MODAL_COPY_LINK_BUTTON' | translate}} <mat-icon>code</mat-icon></span>
       </button>
 
-      <button mat-button class="share-modal-btn" (click)="showEmbedModal()" aria-label="Show embed code for webpage">
+      <button mat-button class="share-modal-btn e2e-embed-in-webpage-btn" (click)="showEmbedModal()" aria-label="Show embed code for webpage">
         <span class="button-content">{{'I18N_SHARE_MODAL_EMBED_IN_WEBPAGE' | translate}} <mat-icon>link</mat-icon></span>
       </button>
     </div>
@@ -73,8 +73,8 @@
       <p>1. Copy and paste the credit <br> 2. Attach a copy of the "CC BY SA 4.0 license"</p>
 
       <div class="cc-attribution-text">
-        <input type="text" class="cc-attribution-input" [value]="ccAttributionText" readonly aria-label="Creative Commons attribution text">
-        <button mat-button class="copy-cc-btn" (click)="copyAttribution()" aria-label="Copy attribution text">
+        <input type="text" class="cc-attribution-input e2e-attribution-value" [value]="ccAttributionText" readonly aria-label="Creative Commons attribution text">
+        <button mat-button class="copy-cc-btn e2e-copy-attribution-btn" (click)="copyAttribution()" aria-label="Copy attribution text">
           <span class="button-content">
             {{'Copy Attribution' | translate}}
             <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="copy-attribution">
@@ -91,7 +91,7 @@
 </div>
 
 <div class="oppia-share-lesson-modal-footer" [ngStyle]="modalState != modalStates.COPY ? { 'justify-content': 'flex-end' } : {}">
-  <span class="lesson-attribution-text" *ngIf="modalState == modalStates.COPY" (click)="showAttributionModal()" role="link" tabindex="0">
+  <span class="lesson-attribution-text e2e-attribute-this-lesson-text" *ngIf="modalState == modalStates.COPY" (click)="showAttributionModal()" role="link" tabindex="0">
     {{'How to attribute this lesson' | translate}}
   </span>
   <button *ngIf="isWindowNarrow()" mat-button class="cancel-button" (click)="closeModal()" aria-label="Cancel and close the modal">
@@ -99,6 +99,6 @@
   </button>
 </div>
 
-<div class="success-message" role="alert" aria-live="assertive">
+<div class="success-message e2e-share-modal-success-message" role="alert" aria-live="assertive">
   <p *ngIf="successMessageIsVisible">{{ successMessage | translate }} <mat-icon>check_circle</mat-icon></p>
 </div>
