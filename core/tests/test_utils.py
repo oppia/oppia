@@ -1772,23 +1772,27 @@ class TestBase(unittest.TestCase):
             # "call_num"' error. Thus to avoid the error, we used ignore here.
             self.assertEqual(
                 new_function_with_checks.call_num > 0, called, msg=msg)  # type: ignore[attr-defined]
-            pretty_unused_args = [
-                ', '.join(itertools.chain(
-                    (repr(a) for a in args),
-                    ('%s=%r' % kwarg for kwarg in kwargs.items())))
-                # Here we use cast because itertools.zip_longest returns
-                # an iterator of tuples, and we need to specify the tuple
-                # type for type safety.
+            pretty_unused_args: List[str] = []
 
-                for args, kwargs in cast(
-                    Iterator[Tuple[Tuple[object, ...], Dict[str, object]]],
-                    itertools.zip_longest(
-                        expected_args_iter,
-                        expected_kwargs_iter,
-                        fillvalue={}
-                    )
+            # Here we use type Any because the expected_args and
+            # expected_kwargs can contain arguments of arbitrary
+            # and mixed types from different functions.
+            args: Any
+            # Here we use type Any because the expected_args and
+            # expected_kwargs can contain arguments of arbitrary
+            # and mixed types from different functions.
+            kwargs: Any
+            for args, kwargs in itertools.zip_longest(
+                expected_args_iter,
+                expected_kwargs_iter,
+                fillvalue={}
+            ):
+                pretty_unused_args.append(
+                    ', '.join(itertools.chain(
+                        (repr(a) for a in args),
+                        ('%s=%r' % kwarg for kwarg in kwargs.items())
+                    ))
                 )
-            ]
 
             # Here we use MyPy ignore because we are accessing the 'call_num'
             # attribute on a function which is of type 'callable' and functions
