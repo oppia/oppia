@@ -206,7 +206,6 @@ const editClassroomTeaserTextInputField =
   '.e2e-test-update-classroom-teaser-text';
 const editClassroomTopicListIntroInputField =
   '.e2e-test-update-classroom-topic-list-intro';
-const classroomThumbnailContainer = '.e2e-test-classroom-thumbnail-container';
 const classroomBannerContainer = '.e2e-test-classroom-banner-container';
 const imageUploaderModal = '.e2e-test-image-uploader-modal';
 const openTopicDropdownButton = '.e2e-test-add-topic-to-classroom-button';
