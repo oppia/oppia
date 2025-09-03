@@ -32,10 +32,9 @@ import sys
 import time
 from urllib import error as urlerror
 from urllib import request as urlrequest
-
 from core import feconf
 from scripts import servers
-
+import enum
 from typing import Dict, Final, Generator, List, Optional, Tuple, Union
 
 # Add third_party to path. Some scripts access feconf even before
@@ -70,15 +69,61 @@ YARN_VERSION = '1.22.15'
 #    this message, and that all of the `make test` tests pass before you commit
 #    the upgrade to develop.
 # 7. If any tests fail, DO NOT upgrade to this newer version of the redis cli.
+class LogType(enum.Enum):
+    """Enum representing different log types."""
+    INFO = "INFO"
+    ERROR = "ERROR"
+    SUCCESS = "SUCCESS"
+    WARNING = "WARNING"
+
+# ANSI color codes for terminal output
+_LOG_COLORS = {
+    LogType.INFO: "\033[34m",  # Blue
+    LogType.ERROR: "\033[31m",  # Red
+    LogType.SUCCESS: "\033[32m",  # Green
+    LogType.WARNING: "\033[33m",  # Yellow
+}
+RESET_COLOR = "\033[0m"
+def process_logs_and_highlight_errors(log: str) -> str:
+    """Processes logs and highlights errors or warnings if type is not specified."""
+    error_keywords = ["ERROR", "FAIL", "TimeoutError"]
+    warning_keywords = ["WARN"]
+
+    if any(keyword in log for keyword in error_keywords):
+        return f"{_LOG_COLORS[LogType.ERROR]}{log}{RESET_COLOR}"
+    if any(keyword in log for keyword in warning_keywords):
+        return f"{_LOG_COLORS[LogType.WARNING]}{log}{RESET_COLOR}"
+    return log
+def log_to_terminal(message: str, message_type: LogType = None) -> None:
+    """
+    Logs a message to the terminal with optional color formatting.
+    
+    Args:
+        message (str): The message to be printed.
+        message_type (LogType, optional): The type of log message (INFO, ERROR, etc.).
+                                         If not provided, uses process_logs_and_highlight_errors().
+    """
+    if message_type:
+        color = _LOG_COLORS.get(message_type, "")
+        print(f"{color}{message}{RESET_COLOR}")
+    else:
+        print(process_logs_and_highlight_errors(message))
 REDIS_CLI_VERSION = '6.2.4'
-ELASTICSEARCH_VERSION = '7.17.27'
+ELASTICSEARCH_VERSION = '7.17.0'
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
 CURR_DIR = os.path.abspath(os.getcwd())
+log_to_terminal(LogType.success(f"Current Directory: {CURR_DIR}"))
+
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
 OPPIA_TOOLS_DIR_ABS_PATH = os.path.abspath(OPPIA_TOOLS_DIR)
+log_to_terminal(LogType.success(f"Oppia Tools Directory: {OPPIA_TOOLS_DIR_ABS_PATH}"))
+
 THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
 THIRD_PARTY_PYTHON_LIBS_DIR = os.path.join(THIRD_PARTY_DIR, 'python_libs')
+log_to_terminal(LogType.info(f"Third Party Directory: {THIRD_PARTY_DIR}"))
+log_to_terminal(LogType.info(f"Third Party Python Libs Directory: {THIRD_PARTY_PYTHON_LIBS_DIR}"))
+
 GOOGLE_CLOUD_SDK_HOME = (
     '/app/vm_deps/google-cloud-sdk'
     if feconf.OPPIA_IS_DOCKERIZED
@@ -88,6 +133,7 @@ GOOGLE_CLOUD_SDK_HOME = (
         'google-cloud-sdk'
     )
 )
+log_to_terminal(LogType.info(f"Google Cloud SDK Home: {GOOGLE_CLOUD_SDK_HOME}"))
 GOOGLE_APP_ENGINE_SDK_HOME = os.path.join(
     GOOGLE_CLOUD_SDK_HOME, 'platform', 'google_appengine')
 GOOGLE_CLOUD_SDK_BIN = os.path.join(GOOGLE_CLOUD_SDK_HOME, 'bin')
@@ -105,6 +151,7 @@ FRONTEND_DIR = os.path.join(CURR_DIR, 'core', 'templates')
 YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, 'yarn-%s' % YARN_VERSION)
 FIREBASE_PATH = os.path.join(
     NODE_MODULES_PATH, 'firebase-tools', 'lib', 'bin', 'firebase.js')
+    
 OS_NAME = platform.system()
 ARCHITECTURE = platform.machine()
 REDIS_SERVER_PATH = os.path.join(
@@ -204,10 +251,96 @@ CHROME_PATHS = [
     '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 ]
 
-ACCEPTANCE_TEST_CONFIG_FILE_PATH = os.path.join(
-    CURR_DIR, 'core', 'tests', 'ci-test-suite-configs', 'acceptance.json'
-)
+log_to_terminal(LogType.info("Supported Chrome Paths:"))
+for path in CHROME_PATHS:
+    log_to_terminal(LogType.success(f"  - {path}"))
 
+ACCEPTANCE_TEST_SUITE_NAMES = [
+    'blog-admin/assign-roles-to-users-and-change-tag-properties',
+    'blog-editor/create-and-delete-draft-blog-post',
+    'blog-editor/create-and-publish-a-blog-post-with-required-details',
+    'blog-editor/try-to-publish-a-duplicate-blog-post-and-get-blocked',
+    'curriculum-admin/create-publish-unpublish-and-delete-topic-and-skill',
+    'curriculum-admin/create-edit-and-delete-classroom',
+    'exploration-editor/create-exploration-and-change-basic-settings',
+    'exploration-editor/manage-exploration-misconceptions',
+    'exploration-editor/modify-translations-through-modal',
+    'exploration-editor/load-complete-and-restart-exploration-preview',
+    'exploration-editor/publish-the-exploration-with-an-interaction',
+    'exploration-editor/save-draft-publish-and-discard-the-changes',
+    'logged-in-user/subscribe-to-creator-and-view-all-',
+    'explorations-by-that-creator',
+    'logged-in-user/create-and-delete-account',
+    'logged-in-user/save-an-exploration-to-play-later',
+    'logged-in-user/restart-or-continue-exploration-on-revisit',
+    'logged-in-user/edit-profile-preferences-and-export-their-account',
+    'logged-in-user/set-language-to-rtl-and-navigate-through-site',
+    'logged-in-user/give-feedback-rate-and-report-an-exploration',
+    'logged-in-user/manage-goals-progress-and-lessons-from-learner-dashboard',
+    'logged-in-user/deny-access-to-pages-without-additional-roles',
+    'logged-out-user/check-all-user-flow-of-donor',
+    'logged-out-user/check-all-user-flow-of-parent-teacher',
+    'logged-out-user/check-all-user-flow-of-partner',
+    'logged-out-user/check-all-user-flow-of-volunteer',
+    'logged-out-user/click-all-buttons-on-about-page',
+    'logged-out-user/click-all-buttons-on-contact-us-page',
+    'logged-out-user/click-all-buttons-on-donation-thanks-page',
+    'logged-out-user/click-all-buttons-on-navbar',
+    'logged-out-user/click-all-buttons-on-partnerships-page',
+    'logged-out-user/click-all-buttons-on-teach-page',
+    'logged-out-user/click-all-buttons-on-volunteer-page',
+    'logged-out-user/click-all-links-in-oppia-footer',
+    'logged-out-user/click-all-links-on-creator-guidelines-page',
+    'logged-out-user/click-all-links-on-get-started-page',
+    'logged-out-user/click-all-links-on-privacy-policy-page',
+    'logged-out-user/click-all-links-on-terms-page',
+    'logged-out-user/click-all-buttons-on-donate-page',
+    'logged-out-user/visit-classroom-index-page',
+    'logged-out-user/browse-and-search-for-lessons-in-community-library',
+    'logged-out-user/select-and-play-topic-from-classroom-page',
+    'logged-out-user/choose-what-to-do-from-the-last-card-of-an-exploration',
+    'logged-out-user/play-through-lesson-while-getting-feedback-and-hints',
+    'logged-out-user/share-and-give-feedback-for-exploration-'
+    'but-not-report-and-rate-it',
+    'logged-out-user/use-keyboard-shortcuts-to-navigate-and-shift-focus',
+    'logged-out-user/change-site-language-and-engage-with-original-exploration',
+    'logged-out-user/sign-in-and-save-exploration-progress',
+    'logged-out-user/track-and-resume-exploration-progress-via-url',
+    'logged-out-user/play-lesson-in-different-languages-and-listen-'
+    'to-voiceovers',
+ fix-color-error
+    'logged-out-user/deny-access-to-dashboards-and-actions-without-login',
+    'logged-out-user/subscribe-to-newsletter-and-click-all-buttons',
+ develop
+    'moderator/edit-featured-activities-list',
+    'moderator/view-recent-commits-and-feedback-messages',
+    'practice-question-admin/add-and-remove-contribution-rights',
+    'release-coordinator/run-a-beam-job-and-copy-the-output',
+    'release-coordinator/update-promo-bar-message',
+    'release-coordinator/flush-and-get-profile-of-redis-cache',
+    'release-coordinator/edit-feature-rollout-configuration',
+    'super-admin/edit-user-roles',
+    'super-admin/load-dummy-data-in-dev-mode',
+    'super-admin/edit-platform-parameters',
+    'super-admin/use-misc-tab-features',
+    'topic-manager/edit-and-preview-a-subtopic',
+    'topic-manager/edit-and-preview-a-topic',
+    'translation-admin/add-and-remove-translation-rights',
+    'topic-manager/create-and-delete-subtopic-and-story',
+    'topic-manager/browse-skills-on-topics-and-skills-dashboard',
+    'topic-manager/browse-topics-on-topics-and-skills-dashboard',
+    'topic-manager/create-and-delete-questions-in-skill-editor',
+    'topic-manager/assign-unassign-and-merge-skills',
+    'topic-manager/cannot-do-curriculum-admin-actions',
+    'topic-manager/edit-and-republish-a-skill',
+    'topic-manager/edit-preview-and-save-a-chapter',
+    'voiceover-admin/add-voiceover-artist-to-an-exploration'
+]
+
+log_to_terminal(LogType.info("Acceptance Test Suite Names:"))
+for suite_name in ACCEPTANCE_TEST_SUITE_NAMES:
+    log_to_terminal(LogType.success(f"  - {suite_name}"))
+    
 GAE_PORT_FOR_E2E_TESTING: Final = 8181
 ELASTICSEARCH_SERVER_PORT: Final = 9200
 PORTS_USED_BY_OPPIA_PROCESSES_IN_LOCAL_E2E_TESTING: Final = [
@@ -265,6 +398,7 @@ def run_cmd(cmd_tokens: List[str]) -> str:
 def ensure_directory_exists(d: str) -> None:
     """Creates the given directory if it does not already exist."""
     if not os.path.exists(d):
+        log_to_terminal(LogType.info(f"Creating directory: {d}"))
         os.makedirs(d)
 
 
@@ -282,11 +416,10 @@ def require_cwd_to_be_oppia(allow_deploy_dir: bool = False) -> None:
         os.path.isdir(os.path.join(os.getcwd(), os.pardir, 'oppia')))
 
     if is_oppia_dir or (allow_deploy_dir and is_deploy_dir):
+        log_to_terminal(LogType.success("Current directory is valid."))
         return
 
-    raise Exception('Please run this script from the oppia/ directory.')
-
-
+    raise Exception(LogType.error('Please run this script from the oppia/ directory.'))
 def open_new_tab_in_browser_if_possible(url: str) -> None:
     """Opens the given URL in a new browser tab, if possible."""
     if USER_PREFERENCES['open_new_tab_in_browser'] is None:
@@ -314,18 +447,19 @@ def open_new_tab_in_browser_if_possible(url: str) -> None:
         browser_cmds[default_index + 1:])
     for cmd in ordered_browser_cmds:
         if subprocess.call(['which', cmd]) == 0:
+            log_to_terminal(LogType.success(f"Opening {url} in {cmd}."))
             subprocess.check_call([cmd, url])
             return
-    print('******************************************************************')
-    print(
-        'WARNING: Unable to open browser. Please manually open the following')
-    print('URL in a browser window, then press Enter to confirm.')
-    print('')
-    print('    %s' % url)
-    print('')
-    print('NOTE: To get rid of this message, open scripts/common.py and fix')
-    print('the function open_new_tab_in_browser_if_possible() to work on your')
-    print('system.')
+    log_to_terminal(LogType.error('******************************************************************'))
+    log_to_terminal(LogType.error(
+        'WARNING: Unable to open browser. Please manually open the following'))
+    log_to_terminal('URL in a browser window, then press Enter to confirm.')
+    log_to_terminal('')
+    log_to_terminal(LogType.error(f'    {url}'))
+    log_to_terminal('')
+    log_to_terminal(LogType.warning('NOTE: To get rid of this message, open scripts/common.py and fix'))
+    log_to_terminal('the function open_new_tab_in_browser_if_possible() to work on your')
+    log_to_terminal('system.')
     input()
 
 
@@ -344,8 +478,9 @@ def get_remote_alias(remote_urls: List[str]) -> str:
             break
     if remote_alias is None:
         raise Exception(
-            'ERROR: There is no existing remote alias for the %s repo.'
-            % ', '.join(remote_urls))
+            LogType.error(
+                f'ERROR: There is no existing remote alias for the {", ".join(remote_urls)} repo.'))
+
 
     return remote_alias
 
@@ -362,8 +497,9 @@ def verify_local_repo_is_clean() -> None:
             not branch_is_clean_message_1 in git_status_output and
             not branch_is_clean_message_2 in git_status_output):
         raise Exception(
-            'ERROR: This script should be run from a clean branch.')
-
+            LogType.error(
+                'ERROR: This script should be run from a clean branch.'))
+    log_to_terminal(LogType.success("The repository is clean and ready."))
 
 def get_current_branch_name() -> str:
     """Get the current branch name.
@@ -384,7 +520,13 @@ def get_current_branch_name() -> str:
 def update_branch_with_upstream() -> None:
     """Updates the current branch with upstream."""
     current_branch_name = get_current_branch_name()
-    run_cmd(['git', 'pull', 'upstream', current_branch_name])
+    log_to_terminal(LogType.info(f"Updating branch '{current_branch_name}' with upstream..."))
+    try:
+        run_cmd(['git', 'pull', 'upstream', current_branch_name])
+        log_to_terminal(LogType.success(f"Branch '{current_branch_name}' updated successfully."))
+    except subprocess.CalledProcessError as e:
+        raise Exception(
+            LogType.error(f"Failed to update branch '{current_branch_name}'. Error: {e}"))
 
 
 def get_current_release_version_number(release_branch_name: str) -> str:
@@ -406,23 +548,32 @@ def get_current_release_version_number(release_branch_name: str) -> str:
         HOTFIX_BRANCH_REGEX, release_branch_name)
     if release_match:
         return release_match.group(1)
+        log_to_terminal(LogType.success(f"Release branch version: {version}"))
+        return version
     elif release_maintenance_match:
-        return release_maintenance_match.group(1)
+        version = release_maintenance_match.group(1)
+        log_to_terminal(LogType.success(f"Release maintenance branch version: {version}"))
+        return version
     elif hotfix_match:
-        return hotfix_match.group(1)
+        version = hotfix_match.group(1)
+        log_to_terminal(LogType.success(f"Hotfix branch version: {version}"))
+        return version
     else:
-        raise Exception('Invalid branch name: %s.' % release_branch_name)
-
+        raise Exception(LogType.error(f"Invalid branch name: {release_branch_name}."))
 
 def is_current_branch_a_hotfix_branch() -> bool:
     """Checks if the current branch is a hotfix branch.
 
     Returns:
-        bool. Whether the current branch is hotfix branch.
+        bool. Whether the current branch is a hotfix branch.
     """
     current_branch_name = get_current_branch_name()
-    return bool(
-        re.match(HOTFIX_BRANCH_REGEX, current_branch_name))
+    is_hotfix = bool(re.match(HOTFIX_BRANCH_REGEX, current_branch_name))
+    if is_hotfix:
+        log_to_terminal(LogType.info(f"The current branch '{current_branch_name}' is a hotfix branch."))
+    else:
+        log_to_terminal(LogType.warning(f"The current branch '{current_branch_name}' is not a hotfix branch."))
+    return is_hotfix
 
 
 def is_current_branch_a_release_branch() -> bool:
@@ -437,7 +588,15 @@ def is_current_branch_a_release_branch() -> bool:
         re.match(RELEASE_MAINTENANCE_BRANCH_REGEX, current_branch_name))
     hotfix_match = bool(
         re.match(HOTFIX_BRANCH_REGEX, current_branch_name))
-    return release_match or release_maintenance_match or hotfix_match
+    is_release_branch = release_match or release_maintenance_match or hotfix_match
+
+    if is_release_branch:
+        log_to_terminal(LogType.info(f"The current branch '{current_branch_name}' is a release branch."))
+    else:
+        log_to_terminal(LogType.warning(f"The current branch '{current_branch_name}' is not a release branch."))
+    
+    return is_release_branch
+
 
 
 def is_current_branch_a_test_branch() -> bool:
@@ -447,15 +606,24 @@ def is_current_branch_a_test_branch() -> bool:
         bool. Whether the current branch is a test branch for deployment.
     """
     current_branch_name = get_current_branch_name()
-    return bool(re.match(TEST_BRANCH_REGEX, current_branch_name))
+    is_test_branch = bool(re.match(TEST_BRANCH_REGEX, current_branch_name))
+    if is_test_branch:
+        log_to_terminal(LogType.info(f"The current branch '{current_branch_name}' is a test branch."))
+    else:
+        log_to_terminal(LogType.warning(f"The current branch '{current_branch_name}' is not a test branch."))
+    return is_test_branch
 
 
 def verify_current_branch_name(expected_branch_name: str) -> None:
     """Checks that the user is on the expected branch."""
-    if get_current_branch_name() != expected_branch_name:
-        raise Exception(
-            'ERROR: This script can only be run from the "%s" branch.' %
-            expected_branch_name)
+    current_branch_name = get_current_branch_name()
+    if current_branch_name != expected_branch_name:
+        raise Exception(LogType.error(
+            f"ERROR: This script can only be run from the '{expected_branch_name}' branch. "
+            f"Current branch: '{current_branch_name}'"
+        ))
+    else:
+        log_to_terminal(LogType.success(f"Verified: Current branch is '{expected_branch_name}'."))
 
 
 def is_port_in_use(port: int) -> bool:
@@ -467,9 +635,13 @@ def is_port_in_use(port: int) -> bool:
     Returns:
         bool. True if port is open else False.
     """
-    with contextlib.closing(
-        socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
-        return bool(not s.connect_ex(('localhost', port)))
+    with contextlib.closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
+        port_in_use = bool(not s.connect_ex(('localhost', port)))
+    if port_in_use:
+        log_to_terminal(LogType.info(f"Port {port} is in use."))
+    else:
+        log_to_terminal(LogType.warning(f"Port {port} is not in use."))
+    return port_in_use
 
 
 def recursive_chown(path: str, uid: int, gid: int) -> None:
@@ -477,16 +649,22 @@ def recursive_chown(path: str, uid: int, gid: int) -> None:
     uid and gid.
 
     Args:
-        path: str. The path for which owner id and group id need to be setup.
+        path: str. The path for which owner id and group id need to be set up.
         uid: int. Owner ID to be set.
         gid: int. Group ID to be set.
     """
-    os.chown(path, uid, gid)
-    for root, directories, filenames in os.walk(path):
-        for directory in directories:
-            os.chown(os.path.join(root, directory), uid, gid)
-        for filename in filenames:
-            os.chown(os.path.join(root, filename), uid, gid)
+    try:
+        os.chown(path, uid, gid)
+        log_to_terminal(LogType.success(f"Ownership updated for {path}."))
+        for root, directories, filenames in os.walk(path):
+            for directory in directories:
+                os.chown(os.path.join(root, directory), uid, gid)
+                log_to_terminal(LogType.info(f"Ownership updated for directory: {os.path.join(root, directory)}."))
+            for filename in filenames:
+                os.chown(os.path.join(root, filename), uid, gid)
+                log_to_terminal(LogType.info(f"Ownership updated for file: {os.path.join(root, filename)}."))
+    except Exception as e:
+        log_to_terminal(LogType.error(f"Error updating ownership for {path}: {str(e)}"))
 
 
 def recursive_chmod(path: str, mode: int) -> None:
@@ -496,12 +674,18 @@ def recursive_chmod(path: str, mode: int) -> None:
         path: str. The path for which mode would be set.
         mode: int. The mode to be set.
     """
-    os.chmod(path, mode)
-    for root, directories, filenames in os.walk(path):
-        for directory in directories:
-            os.chmod(os.path.join(root, directory), mode)
-        for filename in filenames:
-            os.chmod(os.path.join(root, filename), mode)
+    try:
+        os.chmod(path, mode)
+        log_to_terminal(LogType.success(f"Mode changed for path: {path}"))
+        for root, directories, filenames in os.walk(path):
+            for directory in directories:
+                os.chmod(os.path.join(root, directory), mode)
+                log_to_terminal(LogType.info(f"Mode changed for directory: {os.path.join(root, directory)}"))
+            for filename in filenames:
+                os.chmod(os.path.join(root, filename), mode)
+                log_to_terminal(LogType.info(f"Mode changed for file: {os.path.join(root, filename)}"))
+    except Exception as e:
+        log_to_terminal(LogType.error(f"Error changing mode for {path}: {str(e)}"))
 
 
 def print_each_string_after_two_new_lines(strings: List[str]) -> None:
@@ -511,22 +695,27 @@ def print_each_string_after_two_new_lines(strings: List[str]) -> None:
         strings: list(str). The strings to print.
     """
     for string in strings:
-        print('%s\n' % string)
+        log_to_terminal(f"\n{LogType.info(string)}\n")
 
 
 def install_npm_library(library_name: str, version: str, path: str) -> None:
-    """Installs the npm library after ensuring its not already installed.
+    """Installs the npm library after ensuring it's not already installed.
 
     Args:
         library_name: str. The library name.
         version: str. The library version.
         path: str. The installation path for the library.
     """
-    print('Checking whether %s is installed in %s' % (library_name, path))
-    if not os.path.exists(os.path.join(NODE_MODULES_PATH, library_name)):
-        print('Installing %s' % library_name)
-        subprocess.check_call([
-            'yarn', 'add', '%s@%s' % (library_name, version)])
+    try:
+        log_to_terminal(LogType.info(f"Checking whether {library_name} is installed in {path}"))
+        if not os.path.exists(os.path.join(NODE_MODULES_PATH, library_name)):
+            log_to_terminal(LogType.warning(f"{library_name} is not installed. Installing..."))
+            subprocess.check_call(['yarn', 'add', f"{library_name}@{version}"])
+            log_to_terminal(LogType.success(f"{library_name} installed successfully."))
+        else:
+            log_to_terminal(LogType.success(f"{library_name} is already installed in {path}."))
+    except subprocess.CalledProcessError as e:
+        log_to_terminal(LogType.error(f"Failed to install {library_name}: {str(e)}"))
 
 
 def ask_user_to_confirm(message: str) -> None:
@@ -537,38 +726,48 @@ def ask_user_to_confirm(message: str) -> None:
             to do.
     """
     while True:
-        print('******************************************************')
-        print(message)
-        print('Confirm once you are done by entering y/ye/yes.\n')
+        log_to_terminal(LogType.info('******************************************************'))
+        log_to_terminal(LogType.info(message))
+        log_to_terminal(LogType.info('Confirm once you are done by entering y/ye/yes.\n'))
         answer = input().lower()
         if answer in AFFIRMATIVE_CONFIRMATIONS:
+            log_to_terminal(LogType.success("Task confirmed by user."))
             return
 
 
 def get_personal_access_token() -> str:
-    """Returns the personal access token for the GitHub id of user.
+    """Returns the personal access token for the GitHub ID of the user.
 
     Returns:
-        str. The personal access token for the GitHub id of user.
+        str. The personal access token for the GitHub ID of the user.
 
     Raises:
         Exception. Personal access token is None.
     """
-    personal_access_token = getpass.getpass(
-        prompt=(
-            'Please provide personal access token for your github ID. '
-            'You can create one at https://github.com/settings/tokens: '))
-
-    if personal_access_token is None:
-        raise Exception(
-            'No personal access token provided, please set up a personal '
-            'access token at https://github.com/settings/tokens and re-run '
-            'the script')
-    return personal_access_token
+    try:
+        personal_access_token = getpass.getpass(
+            prompt=(
+                LogType.info(
+                    "Please provide personal access token for your GitHub ID. "
+                    "You can create one at https://github.com/settings/tokens: "
+                )
+            )
+        )
+        if personal_access_token is None:
+            raise Exception(
+                LogType.error(
+                    "No personal access token provided. Set up a personal access token "
+                    "at https://github.com/settings/tokens and re-run the script."
+                )
+            )
+        return personal_access_token
+    except Exception as e:
+        log_to_terminal(LogType.error(f"Error retrieving personal access token: {str(e)}"))
+        raise
 
 
 def create_readme(dir_path: str, readme_content: str) -> None:
-    """Creates a readme in a given dir path with the specified
+    """Creates a README in a given dir path with the specified
     readme content.
 
     Args:
@@ -576,8 +775,12 @@ def create_readme(dir_path: str, readme_content: str) -> None:
             be created.
         readme_content: str. The content to be written in the README.
     """
-    with utils.open_file(os.path.join(dir_path, 'README.md'), 'w') as f:
-        f.write(readme_content)
+    try:
+        with utils.open_file(os.path.join(dir_path, 'README.md'), 'w') as f:
+            f.write(readme_content)
+        log_to_terminal(LogType.success(f"README created successfully in {dir_path}."))
+    except Exception as e:
+        log_to_terminal(LogType.error(f"Error creating README in {dir_path}: {str(e)}"))
 
 
 def inplace_replace_file(
@@ -605,12 +808,13 @@ def inplace_replace_file(
         ValueError. Wrong number of replacements.
         Exception. The content failed to get replaced.
     """
-    new_filename = '%s.new' % filename
+    new_filename = f"{filename}.new"
     shutil.copyfile(filename, new_filename)
     new_contents = []
     total_number_of_replacements = 0
     try:
         regex = re.compile(regex_pattern)
+        log_to_terminal(LogType.info(f"Processing file: {filename}"))
         with utils.open_file(filename, 'r') as old_file:
             for line in old_file:
                 new_line, number_of_replacements = regex.subn(
@@ -627,17 +831,22 @@ def inplace_replace_file(
             total_number_of_replacements != expected_number_of_replacements
         ):
             raise ValueError(
-                'Wrong number of replacements. Expected %s. Performed %s.' % (
-                    expected_number_of_replacements,
-                    total_number_of_replacements
+                LogType.error(
+                    f"Wrong number of replacements. Expected {expected_number_of_replacements}, "
+                    f"performed {total_number_of_replacements}."
                 )
             )
-
         os.replace(new_filename, filename)
+        log_to_terminal(LogType.success(f"File successfully updated: {filename}"))
 
-    except Exception:
-        # Drop the new file if there was an error.
+    except ValueError as ve:
         os.remove(new_filename)
+        log_to_terminal(LogType.error(f"Validation error: {ve}"))
+        raise
+
+    except Exception as e:
+        os.remove(new_filename)
+        log_to_terminal(LogType.error(f"An error occurred while processing the file: {e}"))
         raise
 
 
@@ -655,12 +864,15 @@ def wait_for_port_to_be_in_use(port_number: int) -> None:
         waited_seconds += 1
     if (waited_seconds == MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS
             and not is_port_in_use(port_number)):
-        print('Failed to start server on port %s, exiting ...' % port_number)
-        print(
-            'This may be because you do not have enough available '
-            'memory. Please refer to '
-            'https://github.com/oppia/oppia/wiki/Troubleshooting#low-ram')
+        log_to_terminal(LogType.error(
+            f"Failed to start server on port {port_number}, exiting..."))
+        log_to_terminal(LogType.warning(
+            "This may be because you do not have enough available memory. "
+            "Please refer to: https://github.com/oppia/oppia/wiki/Troubleshooting#low-ram"
+        ))
         sys.exit(1)
+        
+    log_to_terminal(LogType.success(f"Port {port_number} is now in use."))
 
 
 def wait_for_port_to_not_be_in_use(port_number: int) -> bool:
@@ -748,7 +960,7 @@ def write_stdout_safe(string: Union[str, bytes]) -> None:
         except OSError as e:
             if e.errno == errno.EAGAIN:
                 continue
-
+            log_to_terminal(LogType.error("Failed to write to stdout: %s" % e))
             raise
 
 
@@ -778,11 +990,11 @@ def url_retrieve(
             enforce_https is True.
     """
     if enforce_https and not url.startswith('https://'):
-        raise Exception(
-            'The URL %s should use HTTPS.' % url)
+        log_to_terminal(LogType.error(f"The URL {url} does not use HTTPS."))
+        raise Exception(f"The URL {url} should use HTTPS.")
 
     # Try downloading using curl initially.
-    print('Downloading %s to %s using curl...' % (url, output_path))
+    log_to_terminal('Downloading %s to %s using curl...' % (url, output_path))
     curl_task = subprocess.Popen(
     # The -L flag is for following redirects.
         ['curl', '-L', url, '--output', output_path],
@@ -791,13 +1003,12 @@ def url_retrieve(
         out, err = curl_task.communicate()
     if curl_task.returncode == 0:
         # The download was successful.
-        print(out)
-        print(err)
+        log_to_terminal(LogType.success(f"Download successful: {url}"))
         return
 
     # Download with urlopen if curl fails.
-    print('Downloading using curl failed. Trying with urlopen.')
-    print('Error log for curl: %s' % err)
+    log_to_terminal(LogType.error('Downloading using curl failed. Trying with urlopen.'))
+    log_to_terminal(LogType.error('Error log for curl: %s' % err))
     failures = 0
     success = False
     while not success and failures < max_attempts:
@@ -812,14 +1023,15 @@ def url_retrieve(
             client.IncompleteRead, ConnectionResetError
         ) as exception:
             failures += 1
-            print('Attempt %d of %d failed when downloading %s.' % (
-                failures, max_attempts, url))
-            print('Error in common.url_retrieve: %s' % exception)
+            log_to_terminal(LogType.error(
+                f"Attempt {failures} of {max_attempts} failed when downloading {url}."))
+            log_to_terminal(LogType.error(f"Error in url_retrieve: {exception}"))
             if failures >= max_attempts:
+                log_to_terminal(LogType.error("Max attempts reached. Raising exception."))
                 raise exception
-            print('Error: %s' % exception)
-            print('Retrying download.')
+            log_to_terminal(LogType.info("Retrying download."))
         else:
+            log_to_terminal(LogType.success(f"Download successful: {url}"))
             success = True
 
 
@@ -833,10 +1045,11 @@ def setup_chrome_bin_env_variable() -> None:
     for path in CHROME_PATHS:
         if os.path.isfile(path):
             os.environ['CHROME_BIN'] = path
+            log_to_terminal(LogType.success(f"CHROME_BIN set to: {path}"))
             break
     else:
-        print('Chrome is not found, stopping...')
-        raise Exception('Chrome not found.')
+        log_to_terminal(LogType.error("Chrome is not found, stopping..."))
+        raise Exception("Chrome not found.")
 
 
 def run_ng_compilation() -> None:
@@ -848,12 +1061,15 @@ def run_ng_compilation() -> None:
             with servers.managed_ng_build() as proc:
                 proc.wait()
         except subprocess.CalledProcessError as error:
-            print(error.output)
-            sys.exit(error.returncode)
+            log_to_terminal(LogType.error(f"Angular compilation failed: {error.output}"))
+            if attempt == max_tries - 1:
+                log_to_terminal(LogType.error("Maximum attempts reached. Exiting..."))
+                sys.exit(error.returncode)
         if os.path.isdir(ng_bundles_dir_name):
+            log_to_terminal(LogType.success("Angular compilation completed successfully."))
             break
     if not os.path.isdir(ng_bundles_dir_name):
-        print('Failed to complete ng build compilation, exiting...')
+        log_to_terminal(LogType.error("Failed to complete ng build compilation, exiting..."))
         sys.exit(1)
 
 
@@ -865,6 +1081,7 @@ def set_constants_to_default() -> None:
         maintenance_mode=False,
         version_info_must_be_set=False
         )
+    log_to_terminal(LogType.success("Constants have been reset to default values."))
 
 
 def modify_constants(
@@ -956,10 +1173,10 @@ def is_oppia_server_already_running() -> bool:
     """
     for port in PORTS_USED_BY_OPPIA_PROCESSES_IN_LOCAL_E2E_TESTING:
         if is_port_in_use(port):
-            print(
+            log_to_terminal(LogType.error(
                 'There is already a server running on localhost:%s. '
                 'Please terminate it before running the end-to-end tests. '
-                'Exiting.' % port)
+                'Exiting.' % port))
             return True
     return False
 
