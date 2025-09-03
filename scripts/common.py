@@ -307,7 +307,7 @@ ACCEPTANCE_TEST_SUITE_NAMES = [
     'logged-out-user/sign-in-and-save-exploration-progress',
     'logged-out-user/track-and-resume-exploration-progress-via-url',
     'logged-out-user/play-lesson-in-different-languages-and-listen-'
-    'to-voiceovers',
+    'to-voiceovers'
 #  fix-color-error
 #     'logged-out-user/deny-access-to-dashboards-and-actions-without-login',
 #     'logged-out-user/subscribe-to-newsletter-and-click-all-buttons',
@@ -335,7 +335,7 @@ ACCEPTANCE_TEST_SUITE_NAMES = [
 #     'topic-manager/edit-and-republish-a-skill',
 #     'topic-manager/edit-preview-and-save-a-chapter',
 #     'voiceover-admin/add-voiceover-artist-to-an-exploration'
-# ]
+]
 
 log_to_terminal(LogType.info("Acceptance Test Suite Names:"))
 for suite_name in ACCEPTANCE_TEST_SUITE_NAMES:
