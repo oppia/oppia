@@ -32,17 +32,12 @@ import {
   StateInteractionStatsService,
 } from 'services/state-interaction-stats.service';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {
-  State,
-  StateBackendDict,
-  StateObjectFactory,
-} from 'domain/state/StateObjectFactory';
+import {State, StateBackendDict} from 'domain/state/state.model';
 
 const joC = jasmine.objectContaining;
 
 describe('State Interaction Stats Service', () => {
   let httpTestingController: HttpTestingController;
-  let stateObjectFactory: StateObjectFactory;
   let stateInteractionStatsService: StateInteractionStatsService;
 
   beforeEach(() => {
@@ -54,7 +49,6 @@ describe('State Interaction Stats Service', () => {
       ],
     });
 
-    stateObjectFactory = TestBed.get(StateObjectFactory);
     httpTestingController = TestBed.get(HttpTestingController);
     stateInteractionStatsService = TestBed.get(StateInteractionStatsService);
   });
@@ -185,7 +179,7 @@ describe('State Interaction Stats Service', () => {
       linked_skill_id: null,
     };
 
-    mockState = stateObjectFactory.createFromBackendDict('Hola', stateDict);
+    mockState = State.createFromBackendDict('Hola', stateDict);
   });
 
   it('should support improvements overview for states with text-input', () => {

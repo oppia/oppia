@@ -220,4 +220,11 @@ describe('Practice session page', () => {
 
     expect(component.directiveSubscriptions.unsubscribe).toHaveBeenCalled();
   });
+
+  it('should update loadingMessage when loaderService emits', () => {
+    const testMessage = 'Loading';
+    component.ngOnInit();
+    loaderService.onLoadingMessageChange.emit(testMessage);
+    expect(component.loadingMessage).toBe(testMessage);
+  });
 });

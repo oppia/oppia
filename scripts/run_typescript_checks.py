@@ -77,7 +77,6 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/domain/topic/topic-update.service.ts',
     'core/templates/filters/truncate-input-based-on-interaction-answer-type.pipe.spec.ts',
     'core/templates/filters/truncate-input-based-on-interaction-answer-type.pipe.ts',
-    'core/templates/karma.module.ts',
     'core/templates/pages/admin-page/admin-blog-admin-common.module.ts',
     'core/templates/pages/blog-dashboard-page/shared-blog-components.module.ts',
     'core/templates/pages/classroom-page/classroom-page.module.ts',

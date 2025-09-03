@@ -41,8 +41,7 @@
         <ul>
           <li>
             <a (click)="navigateToAboutPage()"
-               class="e2e-test-footer-about-link"
-               [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE">
+               class="e2e-test-footer-about-link">
                {{ 'I18N_FOOTER_ABOUT' | translate }}
             </a>
           </li>
@@ -65,36 +64,31 @@
         <ul>
           <li>
             <a href="/get-started"
-               [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.GET_STARTED.ROUTE"
                class="e2e-test-get-started-link">
                {{ 'I18N_FOOTER_GET_STARTED' | translate }}
             </a>
           </li>
           <li>
             <a href="/creator-guidelines"
-               class="e2e-test-creator-guidelines-link"
-               [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PLAYBOOK.ROUTE">
+               class="e2e-test-creator-guidelines-link">
                {{ 'I18N_PLAYBOOK_HEADING' | translate }}
             </a>
           </li>
           <li>
             <a (click)="navigateToTeachPage()"
-               class="e2e-test-teach-link"
-               [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.TEACH.ROUTE">
+               class="e2e-test-teach-link">
                {{ 'I18N_FOOTER_TEACH_PAGE' | translate }}
             </a>
           </li>
           <li>
             <a href="/community-library"
-               class="e2e-test-community-library-link"
-               [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE">
+               class="e2e-test-community-library-link">
                {{ 'I18N_FOOTER_BROWSE_LIBRARY' | translate }}
             </a>
           </li>
           <li>
             <a href="/contact"
-               class="e2e-test-contact-link"
-               [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.CONTACT.ROUTE">
+               class="e2e-test-contact-link">
                {{ 'I18N_FOOTER_CONTACT_US' | translate }}
             </a>
           </li>
@@ -116,14 +110,12 @@
     </small>
     <small>
       <a href="/terms"
-         [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.TERMS.ROUTE"
          class="e2e-test-terms-link">
          {{ 'I18N_FOOTER_TERMS_OF_SERVICE' | translate }}
       </a>
     </small>
     <small>
       <a href="/privacy-policy"
-         [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PRIVACY.ROUTE"
          class="e2e-test-privacy-policy-link">
           {{ 'I18N_FOOTER_PRIVACY_POLICY' | translate }}
       </a>

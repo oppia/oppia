@@ -27,7 +27,10 @@ jobs:
       - name: Merge develop branch into the current branch
         uses: ./.github/actions/merge
       - name: Github Actions from Oppiabot
-        uses: oppia/oppiabot@1.4.0
+        # Since we control the oppia/oppiabot repository, we can safely
+        # automatically run the latest version of its code. This is generally
+        # not a safe practice for dependencies we do not control.
+        uses: oppia/oppiabot
         with:
           repo-token: ${{secrets.GITHUB_TOKEN}}
         env:

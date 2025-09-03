@@ -13,10 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating instances of exploration metadata objects.
+ * @fileoverview Model class for creating new frontend instances of ExplorationMetadata.
  */
 
-import {Injectable} from '@angular/core';
 import {ParamChange, ParamChangeBackendDict} from './param-change.model';
 import {ParamChanges} from './param-changes.model';
 import {ParamSpecs, ParamSpecsBackendDict} from './param-specs.model';
@@ -107,17 +106,8 @@ export class ExplorationMetadata {
       edits_allowed: this._editsAllowed,
     };
   }
-}
 
-// TODO(#15599): Refactor ExplorationMetadataObjectFactory to a model.ts once
-// ParamSpecsObjectFactory and ParamChangesObjectFactory are refactored
-// into model.ts files.
-
-@Injectable({
-  providedIn: 'root',
-})
-export class ExplorationMetadataObjectFactory {
-  createFromBackendDict(
+  static createFromBackendDict(
     explorationMetadataBackendDict: ExplorationMetadataBackendDict
   ): ExplorationMetadata {
     const paramChanges = ParamChanges.createFromBackendList(
