@@ -4601,13 +4601,14 @@ class State(translation_domain.BaseTranslatableObject):
                     content_type, extra_prefix=extra_prefix)
 
                 if content_type == translation_domain.ContentType.RULE:
-                    old_content_id = content['content_id']
-                    content['content_id'] = new_content_id
+                    old_content_id = content.get('contentId')
+                    if old_content_id is not None:
+                        content['contentId'] = new_content_id
                 else:
-                    old_content_id = content['content_id']
-                    content['content_id'] = new_content_id
+                    old_content_id = content.get('content_id')
+                    if old_content_id is not None:
+                        content['content_id'] = new_content_id
 
-                # Skip if no content_id was found
                 if old_content_id is None:
                     continue
 

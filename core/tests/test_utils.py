@@ -1772,12 +1772,23 @@ class TestBase(unittest.TestCase):
             # "call_num"' error. Thus to avoid the error, we used ignore here.
             self.assertEqual(
                 new_function_with_checks.call_num > 0, called, msg=msg)  # type: ignore[attr-defined]
+            # Here we use type Any because the expected_args and expected_kwargs
+            # can contain arguments of various types from different functions, and
+            # we need to handle arbitrary argument combinations during testing.
+            # Here we use cast because itertools.zip_longest returns an iterator
+            # of tuples, but we need to specify the exact tuple type for type safety.
             pretty_unused_args = [
                 ', '.join(itertools.chain(
                     (repr(a) for a in args),
                     ('%s=%r' % kwarg for kwarg in kwargs.items())))
-                for args, kwargs in cast(Iterator[Tuple[Any, Any]], itertools.zip_longest(
-                    expected_args_iter, expected_kwargs_iter, fillvalue={}))
+                for args, kwargs in cast(
+                    Iterator[Tuple[Any, Any]],
+                    itertools.zip_longest(
+                        expected_args_iter,
+                        expected_kwargs_iter,
+                        fillvalue={}
+                    )
+                )
             ]
 
             # Here we use MyPy ignore because we are accessing the 'call_num'
