@@ -230,7 +230,7 @@ export class VoiceoverBackendApiService {
     });
   }
 
-  async generateAutomaticVoiceoverAsync(
+  async generateAutotmaticVoiceoverAsync(
     explorationID: string,
     explorationVersion: number,
     stateName: string,

@@ -28,7 +28,6 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {By} from '@angular/platform-browser';
-import {EventEmitter} from '@angular/core';
 import {OppiaRteParserService} from 'services/oppia-rte-parser.service';
 import {RichTextComponentsModule} from './rich-text-components.module';
 import {RteOutputDisplayComponent} from './rte-output-display.component';
@@ -95,11 +94,6 @@ describe('RTE display component', () => {
     localStorageService = TestBed.inject(LocalStorageService);
     audioplayerService = TestBed.inject(AudioPlayerService);
     component = fixture.componentInstance;
-
-    spyOn(
-      entityVoiceoversService,
-      'onLanguageAccentCodeChange'
-    ).and.returnValue(new EventEmitter<string>());
   }));
 
   // NOTE: Debugging might be a bit confusing sometimes, especially if this the
@@ -354,9 +348,7 @@ describe('RTE display component', () => {
     });
     regenerateVoiceoverFeatureSpy.and.returnValue(true);
     component.ngOnInit();
-    entityVoiceoversService.onLanguageAccentCodeChange.emit();
-
-    tick(5000);
+    tick(2000);
     flush();
     discardPeriodicTasks();
 
@@ -374,7 +366,7 @@ describe('RTE display component', () => {
       component,
       'isAutomaticVoiceoverRegenerationFromExpFeatureEnabled'
     );
-    spyOn(automaticVoiceoverHighlightService, 'setHighlightIdToSentenceMap');
+    spyOn(automaticVoiceoverHighlightService, 'setHighlightIdToSenetenceMap');
     spyOn(automaticVoiceoverHighlightService, 'setActiveContentId');
 
     let changes: SimpleChanges = {
@@ -398,7 +390,7 @@ describe('RTE display component', () => {
     tick(1000);
 
     expect(
-      automaticVoiceoverHighlightService.setHighlightIdToSentenceMap
+      automaticVoiceoverHighlightService.setHighlightIdToSenetenceMap
     ).not.toHaveBeenCalled();
     expect(
       automaticVoiceoverHighlightService.setActiveContentId
@@ -411,7 +403,7 @@ describe('RTE display component', () => {
     tick(1000);
 
     expect(
-      automaticVoiceoverHighlightService.setHighlightIdToSentenceMap
+      automaticVoiceoverHighlightService.setHighlightIdToSenetenceMap
     ).toHaveBeenCalled();
     expect(
       automaticVoiceoverHighlightService.setActiveContentId
@@ -528,11 +520,10 @@ describe('RTE display component', () => {
       component,
       'isManualVoiceoverAvailableForActiveContent'
     ).and.returnValue(false);
-    spyOn(component, 'isInPlayerOrPreviewPage').and.returnValue(true);
     let audioPlayingSpy = spyOn(audioplayerService, 'isPlaying');
     audioPlayingSpy.and.returnValue(true);
 
-    component.highlightIdToSentenceText = {
+    component.highlighIdToSentenceText = {
       highlightBlock1: 'Hello world',
     };
 
@@ -568,11 +559,10 @@ describe('RTE display component', () => {
         component,
         'isManualVoiceoverAvailableForActiveContent'
       ).and.returnValue(false);
-      spyOn(component, 'isInPlayerOrPreviewPage').and.returnValue(true);
       let audioPlayingSpy = spyOn(audioplayerService, 'isPlaying');
       audioPlayingSpy.and.returnValue(true);
 
-      component.highlightIdToSentenceText = {
+      component.highlighIdToSentenceText = {
         highlightBlock2: 'New element',
       };
 
@@ -625,7 +615,6 @@ describe('RTE display component', () => {
       component,
       'isManualVoiceoverAvailableForActiveContent'
     ).and.returnValue(false);
-    spyOn(component, 'isInPlayerOrPreviewPage').and.returnValue(true);
     let audioPlayingSpy = spyOn(audioplayerService, 'isPlaying');
     audioPlayingSpy.and.returnValue(false);
 
@@ -653,28 +642,15 @@ describe('RTE display component', () => {
     ).toBe('');
   }));
 
-  it('should not highlight sentence when manual voiceover is available in player page', () => {
-    component.previousHighlightedElementId = undefined;
+  it('should not highlight sentence when manual voiceover is available', () => {
+    component.previousHighlightedElementId = '';
     spyOn(
       component,
       'isManualVoiceoverAvailableForActiveContent'
     ).and.returnValue(true);
-    spyOn(component, 'isInPlayerOrPreviewPage').and.returnValue(true);
     component.highlightSentenceDuringVoiceoverPlay();
     // No updates were made to the previously highlighted element ID.
-    expect(component.previousHighlightedElementId).toBe(undefined);
-  });
-
-  it('should not highlight sentence when manual voiceover is playing in editor page', () => {
-    component.previousHighlightedElementId = undefined;
-    spyOn(component, 'isInPlayerOrPreviewPage').and.returnValue(false);
-    let audioPlayingSpy = spyOn(audioplayerService, 'isPlaying');
-    audioPlayingSpy.and.returnValue(true);
-    voiceoverPlayerService.isAutomaticVoiceoverPlaying = false;
-
-    component.highlightSentenceDuringVoiceoverPlay();
-    // No updates were made to the previously highlighted element ID.
-    expect(component.previousHighlightedElementId).toBe(undefined);
+    expect(component.previousHighlightedElementId).toBe('');
   });
 
   it('should be able to return manual voiceover status correctly', () => {

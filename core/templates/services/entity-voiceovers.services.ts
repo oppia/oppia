@@ -39,7 +39,6 @@ export class EntityVoiceoversService {
     {};
   public entityVoiceoversLoaded: boolean = false;
   private _voiceoversLoadedEventEmitter = new EventEmitter<void>();
-  public languageAccentCodeChangeEventEmitter = new EventEmitter<void>();
 
   constructor(private voiceoverBackendApiService: VoiceoverBackendApiService) {}
 
@@ -225,9 +224,5 @@ export class EntityVoiceoversService {
 
   get onVoiceoverLoad(): EventEmitter<void> {
     return this._voiceoversLoadedEventEmitter;
-  }
-
-  get onLanguageAccentCodeChange(): EventEmitter<void> {
-    return this.languageAccentCodeChangeEventEmitter;
   }
 }
