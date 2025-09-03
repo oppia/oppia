@@ -422,6 +422,7 @@ const navigationDropdownInMobileVisibleSelector =
   '.oppia-exploration-editor-tabs-dropdown.show';
 const confirmDeleteInteractionButtonSelector =
   '.e2e-test-confirm-delete-interaction';
+const selectedInteractionNameSelector = '.e2e-test-selected-interaction-name';
 
 export enum INTERACTION_TYPES {
   ALGEBRAIC_EXPRESSION = 'Algebric Expression Input',
@@ -494,6 +495,16 @@ const UNPUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
 const PUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
   'oppia-Publishwithaninteraction-v';
 export class ExplorationEditor extends BaseUser {
+  /**
+   * Checks if the interaction name is as expected.
+   * @param name The name of the interaction.
+   */
+  async expectSelectedInteractionNameToBe(name: string): Promise<void> {
+    await this.expectTextContentToBe(
+      selectedInteractionNameSelector,
+      `Interaction ( ${name} )`
+    );
+  }
   /**
    * Remove feedback response in preview tab.
    */

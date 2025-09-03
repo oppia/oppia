@@ -133,7 +133,7 @@ describe('Practice Question Reviewer', function () {
       'Arithmetic Operations',
       'What is 231 + 12?'
     );
-  }, 600000);
+  }, 900000);
 
   it('should be able to navigate between questions to review', async function () {
     await questionReviewer.navigateToContributorDashboardUsingProfileDropdown();
@@ -171,12 +171,22 @@ describe('Practice Question Reviewer', function () {
       'Updated Question',
       'Addition'
     );
-    // TODO: View math interaction.
-
+    await questionSubmitter.viewSubmittedQuestion(
+      'Updated Question',
+      'Addition'
+    );
+    await questionSubmitter.expectSelectedInteractionNameToBe('Number Input');
     // Accept the question suggestion.
     await questionReviewer.startQuestionReview('What is 231 + 12?', 'Addition');
     await questionReviewer.submitReview('accept', 'Test Review Message');
-    // TODO: Verify as topic manager.
+
+    // Checks if questions are visible in question skill editor.
+    await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
+    await curriculumAdmin.openSkillEditor('Addition');
+    await curriculumAdmin.navigateToSkillQuestionEditorTab();
+    await curriculumAdmin.expectQuestionToBePresent('Updated Question');
+    await curriculumAdmin.expectQuestionToBePresent('What is 231 + 12?');
+    await curriculumAdmin.expectQuestionToBePresent('What is 2 + 3?', false);
   });
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();

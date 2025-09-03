@@ -20,6 +20,7 @@ import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import {ElementHandle} from 'puppeteer';
+import {Contributor} from './contributor';
 
 const contributorDashboardUrl = testConstants.URLs.ContributorDashboard;
 const imageToUpload = testConstants.data.curriculumAdminThumbnailImage;
@@ -109,7 +110,7 @@ const contributionTabClass = 'e2e-test-contribution-tab';
 const activeElementClass = 'e2e-test-active';
 const viewDropdownSelector = '.e2e-test-mobile-contribution-dropdown';
 
-export class PracticeQuestionSubmitter extends BaseUser {
+export class PracticeQuestionSubmitter extends Contributor {
   /**
    * Function for navigating to the contributor dashboard admin page.
    */
@@ -688,6 +689,32 @@ export class PracticeQuestionSubmitter extends BaseUser {
         'If you have 2 apples and someone gives you 3 apples, how many apples do you have?'
     );
     await this.submitQuestionSuggestion();
+  }
+
+  /**
+   * Clicks on the view button in the submitted question.
+   * @param {string} question - The question to view.
+   * @param {string} skill - The skill the question belongs to.
+   */
+  async viewSubmittedQuestion(question: string, skill: string): Promise<void> {
+    const questionElement = await this.expectOpportunityToBePresent(
+      question,
+      skill
+    );
+
+    if (!questionElement) {
+      throw new Error(`Opportunity item for question ${question} not found.`);
+    }
+
+    const viewButton = await questionElement.waitForSelector(
+      suggestQuestionButton
+    );
+    if (!viewButton) {
+      throw new Error('View button not found.');
+    }
+
+    await viewButton.click();
+    await this.expectElementToBeVisible(viewQuestionSudggestionModalHeader);
   }
 }
 

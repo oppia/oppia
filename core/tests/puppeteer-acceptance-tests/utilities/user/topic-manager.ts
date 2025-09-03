@@ -3174,6 +3174,29 @@ export class TopicManager extends BaseUser {
       throw newError;
     }
   }
+
+  /**
+   * Checks if the question is present in the topic.
+   * @param {string} question - The question to check.
+   * @param {boolean} contains - Whether the question should be present.
+   */
+  async expectQuestionToBePresent(
+    question: string,
+    contains: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(questionTextSelector);
+
+    const questionTexts = await this.page.$$eval(
+      questionTextSelector,
+      elements => elements.map(element => element.textContent?.trim())
+    );
+
+    if (contains) {
+      expect(questionTexts).toContain(question);
+    } else {
+      expect(questionTexts).not.toContain(question);
+    }
+  }
 }
 
 export let TopicManagerFactory = (): TopicManager => new TopicManager();
