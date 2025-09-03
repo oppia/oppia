@@ -112,14 +112,11 @@ def defer(
     datetime.datetime.strptime('', '')
     platform_taskqueue_services.create_http_task(
         queue_name=queue_name, url=feconf.TASK_URL_DEFERRED, payload=payload)
-<<<<<<< HEAD
-=======
     assert task.name is not None
     cloud_task_model = create_new_cloud_task_model(
         new_cloud_task_model_id, task.name, fn_identifier)
     cloud_task_model.update_timestamps()
     cloud_task_model.put()
->>>>>>> e12ef4f821 (Fixes task queue bug (#23181))
 
 
 # Here we use type Any because the argument 'params' can accept payload
