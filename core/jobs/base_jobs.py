@@ -60,7 +60,7 @@ from core.jobs.types import job_run_result
 
 import apache_beam as beam
 
-from typing import Dict, List, Tuple, Type, cast # isort: skip
+from typing import Dict, List, Tuple, Type # isort: skip
 
 
 class JobMetaclass(type):
@@ -115,9 +115,6 @@ class JobMetaclass(type):
 
         job_cls = super(JobMetaclass, mcs).__new__(mcs, name, bases, namespace)
 
-        # In mypy <1.0 we needed a cast(JobMetaclass, job_cls) here,
-        # because mypy treated super().__new__ as returning only `type`.
-        # Since mypy ≥1.0 correctly infers `JobMetaclass`, the cast is redundant.
         if name == 'JobBase':
             return job_cls
 
@@ -131,9 +128,6 @@ class JobMetaclass(type):
             else:
                 raise TypeError('%s must inherit from JobBase' % name)
 
-        # In mypy <1.0 we needed a cast(JobMetaclass, job_cls) here,
-        # because mypy treated super().__new__ as returning only `type`.
-        # Since mypy ≥1.0 correctly infers `JobMetaclass`, the cast is redundant.
         return job_cls
 
     @classmethod

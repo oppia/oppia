@@ -38,7 +38,7 @@ from core.domain import object_registry
 from core.domain import rte_component_registry
 from core.tests import test_utils
 
-from typing import Final, List, Tuple, Type, cast
+from typing import Final, List, Tuple, Type
 
 # File names ending in any of these suffixes will be ignored when checking for
 # RTE component validity.
@@ -298,8 +298,7 @@ class RteComponentRegistryUnitTests(test_utils.GenericTestBase):
                 module = importlib.util.module_from_spec(spec)
                 # Ruling out the possibility of None for mypy type checking.
                 assert spec.loader is not None
-                # Since mypy ≥1.0 correctly infers spec.loader as Loader after the
-                # None-check above, no cast is needed anymore.
+
                 spec.loader.exec_module(module)
                 break
 

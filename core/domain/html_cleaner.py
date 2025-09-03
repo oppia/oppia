@@ -114,12 +114,12 @@ def clean(user_submitted_html: str) -> str:
 
     # TODO(sll): Alert the caller if the input was changed due to this call.
     # TODO(sll): Add a log message if bad HTML is detected.
-    
-     # Here we use MyPy ignore because core_tags comes from external registry
-     # functions that return Dict[str, object] but bleach.clean expects
-     # Dict[str, List[str]]. The actual runtime values are compatible but
-     # MyPy cannot verify this due to the complex union types in bleach's
-     # type annotations.
+
+    # Here we use MyPy ignore because core_tags comes from external registry
+    # functions that return Dict[str, object] but bleach.clean expects
+    # Dict[str, List[str]]. The actual runtime values are compatible but
+    # MyPy cannot verify this due to the complex union types in bleach's
+    # type annotations.
     return bleach.clean(
         user_submitted_html, tags=tag_names,
         attributes=core_tags, strip=True # type: ignore[arg-type]

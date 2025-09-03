@@ -386,10 +386,10 @@ class RunPortserverTests(test_utils.GenericTestBase):
         swap_socket = self.swap(
             socket, 'socket', lambda *unused_args: mock_socket)
 
-        # Here use cast because MockSocket is a test double and does not
-        # inherit from socket.SocketType, but we want to use it in place
-        # of a socket for testing handle_connection.
         with swap_socket, swap_hasattr:
+            # Here use cast because MockSocket is a test double and does not
+            # inherit from socket.SocketType, but we want to use it in place
+            # of a socket for testing handle_connection.
             cast_socket = cast(socket.SocketType, mock_socket)
             server = run_portserver.Server(dummy_handler, '\08181')
             run_portserver.Server.handle_connection(cast_socket, dummy_handler)

@@ -58,7 +58,7 @@ import sys
 import threading
 
 from core import utils
-from typing import Callable, Deque, Final, List, Optional, Sequence, Any
+from typing import Any, Callable, Deque, Final, List, Optional, Sequence
 
 _PROTOCOLS: Final = [
     (socket.SOCK_STREAM, socket.IPPROTO_TCP),
@@ -428,6 +428,10 @@ class Server:
             socket_path: str. Path to socket file.
         """
         self.socket_path = socket_path
+        # Here we use type Any because the return value of
+        # _start_server can be different socket-like objects
+        # depending on the runtime environment, and no more
+        # precise common type is available.
         self.socket: Any = self._start_server(self.socket_path)
         self.handler = handler
 

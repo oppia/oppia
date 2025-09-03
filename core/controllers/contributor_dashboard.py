@@ -414,8 +414,9 @@ class ReviewableOpportunitiesHandler(
 
         for item in exp_opp_summaries.values():
             if item is not None:
-                # Here we use MyPy ignore because 'id' is always expected to be a 
-                # str, but mypy cannot verify this due to dynamic attribute access.
+                # Here we use MyPy ignore because 'id' is always expected
+                # to be a str, but mypy cannot verify this due to dynamic
+                # attribute access.
                 ordered_exp_opp_summaries[getattr(item, 'id', None)] = item # type: ignore[index]
         return list(ordered_exp_opp_summaries.values())
 

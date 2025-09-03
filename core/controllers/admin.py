@@ -1315,7 +1315,7 @@ class AdminHandler(
                 question_1 = question_services.get_question_by_id(question_id_1)
                 question_2 = question_services.get_question_by_id(question_id_2)
                 question_3 = question_services.get_question_by_id(question_id_3)
-                # Here we use MyPy ignore because story_fetchers is dynamically 
+                # Here we use MyPy ignore because story_fetchers is dynamically
                 # added to story_services module and not explicitly exported.
                 story = story_services.story_fetchers.get_story_by_id( # type: ignore[attr-defined]
                     story_id

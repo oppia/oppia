@@ -3266,7 +3266,7 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
         user_settings = user_services.get_user_settings(self.viewer_id)
         new_last_logged_in = user_settings.last_logged_in
         assert new_last_logged_in is not None
-        
+
         self.assertLess(
             last_logged_in,
             new_last_logged_in)
@@ -3301,7 +3301,7 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
             last_logged_in = user_settings.last_logged_in
             assert last_logged_in is not None
             assert previous_last_logged_in_datetime is not None
-            
+
             self.assertGreater(
                 last_logged_in,
                 previous_last_logged_in_datetime)
@@ -3376,14 +3376,14 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
                 'property_name': 'objective',
                 'new_value': 'new objective'
             })], 'Test edit 2')
-        
+
         # Make sure last exploration edited time gets updated.
         editor_settings = user_services.get_user_settings(self.editor_id)
-        
+
         last_edited = editor_settings.last_edited_an_exploration
         assert last_edited is not None
         assert previous_last_edited_an_exploration is not None
-        
+
         self.assertGreater(
             last_edited,
             previous_last_edited_an_exploration)
@@ -3440,11 +3440,11 @@ class LastExplorationCreatedIntegrationTests(test_utils.GenericTestBase):
 
         # Make sure that last exploration created time gets updated.
         owner_settings = user_services.get_user_settings(self.owner_id)
-        
+
         last_created = owner_settings.last_created_an_exploration
         assert last_created is not None
         assert previous_last_created_an_exploration is not None
-        
+
         self.assertGreater(
             last_created,
             previous_last_created_an_exploration)

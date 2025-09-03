@@ -28,7 +28,7 @@ from core import constants
 from core import feconf
 from core import utils
 
-from typing import Any, Dict, List, Type, TypedDict, Union, cast
+from typing import Any, Dict, List, Type, TypedDict, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -131,8 +131,7 @@ class Registry:
                 module = importlib.util.module_from_spec(spec)
                 # Ruling out the possibility of None for mypy type checking.
                 assert spec.loader is not None
-                # Since mypy ≥1.0 correctly infers spec.loader as Loader after the
-                # None-check above, no cast is needed anymore.
+
                 spec.loader.exec_module(module)
                 break
         else:

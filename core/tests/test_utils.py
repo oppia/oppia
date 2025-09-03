@@ -1774,13 +1774,11 @@ class TestBase(unittest.TestCase):
                 new_function_with_checks.call_num > 0, called, msg=msg)  # type: ignore[attr-defined]
             pretty_unused_args: List[str] = []
 
-            # Here we use type Any because the expected_args and
-            # expected_kwargs can contain arguments of arbitrary
-            # and mixed types from different functions.
+            # Here we use type Any because the expected_args can contains
+            # arguments of arbitrary and mixed types from different functions.
             args: Any
-            # Here we use type Any because the expected_args and
-            # expected_kwargs can contain arguments of arbitrary
-            # and mixed types from different functions.
+            # Here we use type Any because the expected_kwargs can contains
+            # arguments of arbitrary and mixed types from different functions.
             kwargs: Any
             for args, kwargs in itertools.zip_longest(
                 expected_args_iter,

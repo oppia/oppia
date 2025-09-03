@@ -102,13 +102,14 @@ def get_model_class(kind: Optional[str]) -> Type[datastore_services.Model]:
     # separate workers and some parts of the jobs are probably not available
     # to all the workers.
     models.Registry.get_all_storage_model_classes()
-    # Here use cast because _lookup_model returns Optional[Model] or a less
+
+    # Here we use cast because _lookup_model returns Optional[Model] or a less
     # precise type, but we know it will return a Model subclass type here,
-    # so we cast to clarify the type.
-    return cast(Type[datastore_services.Model],
+    # so we cast to clarify the type and satisfy the type checker.
+    return cast(
+        Type[datastore_services.Model],
         datastore_services.Model._lookup_model(kind) # pylint: disable=protected-access
     )
-
 
 def get_model_kind(
     model: Union[datastore_services.Model, Type[datastore_services.Model]]
