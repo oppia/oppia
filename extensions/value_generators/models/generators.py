@@ -31,12 +31,6 @@ class Copier(value_generators_domain.BaseValueGenerator):
 
     default_value: str = ''
 
-    # The following method previously had a non-matching signature
-    # with its superclass's generate_value method due to the use of
-    # *args and **kwargs in the superclass. However, as of MyPy 1.0.1,
-    # this override is now correctly handled by the type checker, making
-    # the # type: ignore[override] directive unnecessary. It has been
-    # removed to maintain a clean and explicit type definition.
     def generate_value(
         self,
         unused_context_params: Optional[Dict[str, str]],
@@ -64,12 +58,6 @@ class RandomSelector(value_generators_domain.BaseValueGenerator):
 
     default_value: str = ''
 
-    # The following method previously had a non-matching signature
-    # with its superclass's generate_value method due to the use of
-    # *args and **kwargs in the superclass. However, as of MyPy 1.0.1,
-    # this override is now correctly handled by the type checker, making
-    # the # type: ignore[override] directive unnecessary. It has been
-    # removed to maintain a clean and explicit type definition.
     def generate_value(
         self,
         unused_context_params: Dict[str, str],

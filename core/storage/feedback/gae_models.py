@@ -514,9 +514,6 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         cls, thread_id: str, message_id: int, *, strict: bool = ...
     ) -> Optional[GeneralFeedbackMessageModel]: ...
 
-    # Previously this method used `# type: ignore[override]` to silence
-    # a false-positive in older versions of mypy (<1.0). Since mypy ≥1.0
-    # correctly recognizes this override, the ignore is no longer needed.
     @classmethod
     def get(
         cls, thread_id: str, message_id: int, strict: bool = True

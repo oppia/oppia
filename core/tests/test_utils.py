@@ -1886,9 +1886,6 @@ class TestBase(unittest.TestCase):
         Raises:
             AssertionError. When dictionaries doesn't match.
         """
-        # Previously this line needed `# type: ignore[arg-type]` due to a
-        # false-positive in mypy <1.0. Newer versions handle Mapping[str, Any]
-        # correctly, so the ignore is no longer required.
         super().assertDictEqual(dict_one, dict_two, msg=msg)
 
     # Here we use type Any because the method 'assertItemsEqual' can accept any

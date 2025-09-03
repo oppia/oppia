@@ -4607,6 +4607,10 @@ class State(translation_domain.BaseTranslatableObject):
                     old_content_id = content['content_id']
                     content['content_id'] = new_content_id
 
+                # Skip if no content_id was found
+                if old_content_id is None:
+                    continue
+
                 assert isinstance(old_content_id, str)
                 old_to_new_content_id[old_content_id] = new_content_id
 

@@ -1593,9 +1593,6 @@ class VersionedModel(BaseModel):
         version: Optional[int] = None
     ) -> Optional[SELF_VERSIONED_MODEL]: ...
 
-    # Previously this method used `# type: ignore[override]` to silence
-    # a false-positive in older versions of mypy (<1.0). Since mypy ≥1.0
-    # correctly recognizes this override, the ignore is no longer needed.
     @classmethod
     def get(
         cls: Type[SELF_VERSIONED_MODEL],

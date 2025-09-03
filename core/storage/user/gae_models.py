@@ -2064,9 +2064,6 @@ class StoryProgressModel(base_models.BaseModel):
         cls, user_id: str, story_id: str, *, strict: bool = ...
     ) -> Optional[StoryProgressModel]: ...
 
-    # Previously this method used `# type: ignore[override]` to silence
-    # a false-positive in older versions of mypy (<1.0). Since mypy ≥1.0
-    # correctly recognizes this override, the ignore is no longer needed.
     @classmethod
     def get(
         cls, user_id: str, story_id: str, strict: bool = True
