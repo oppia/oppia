@@ -4601,9 +4601,13 @@ class State(translation_domain.BaseTranslatableObject):
                     content_type, extra_prefix=extra_prefix)
 
                 if content_type == translation_domain.ContentType.RULE:
+                    # Here we use MyPy ignore because older state dicts
+                    # used "contentId" instead of "content_id", so we
+                    # need to allow access to the "contentId" key even
+                    # though it is not defined in the TypedDict.
                     old_content_id = content.get('contentId')
                     if old_content_id is not None:
-                        content['contentId'] = new_content_id
+                        content['contentId'] = new_content_id # type: ignore[typeddict-item]
                 else:
                     old_content_id = content.get('content_id')
                     if old_content_id is not None:

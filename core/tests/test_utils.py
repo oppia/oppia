@@ -1776,13 +1776,14 @@ class TestBase(unittest.TestCase):
                 ', '.join(itertools.chain(
                     (repr(a) for a in args),
                     ('%s=%r' % kwarg for kwarg in kwargs.items())))
-                # Here we use type Any because the expected_args and
-                # expected_kwargs can contain arguments of various types
-                # from different functions, we need to handle arbitrary
-                # argument combinations during testing.
                 # Here we use cast because itertools.zip_longest returns
-                # an iterator of tuples, we need to specify the exact
-                # tuple type for type safety.
+                # an iterator of tuples, and we need to specify the tuple
+                # type for type safety.
+
+                # Here we use type Any because the expected_args and
+                # expected_kwargs can contain arguments of arbitrary
+                # and mixed types from different functions. This makes
+                # it impossible to use a more specific type annotation safely.
                 for args, kwargs in cast(
                     Iterator[Tuple[Any, Any]],
                     itertools.zip_longest(
