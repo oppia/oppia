@@ -339,7 +339,7 @@ ACCEPTANCE_TEST_SUITE_NAMES = [
 
 log_to_terminal(LogType.info("Acceptance Test Suite Names:"))
 for suite_name in ACCEPTANCE_TEST_SUITE_NAMES:
-    log_to_terminal(LogType.success(f"  - {suite_name}"))
+    log_to_terminal(LogType.SUCCESS(f"  - {suite_name}"))
     
 GAE_PORT_FOR_E2E_TESTING: Final = 8181
 ELASTICSEARCH_SERVER_PORT: Final = 9200
