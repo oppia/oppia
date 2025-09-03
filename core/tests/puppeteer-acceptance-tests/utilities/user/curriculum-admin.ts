@@ -1950,7 +1950,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.type(editClassroomTeaserTextInputField, teaserText);
     await this.page.type(editClassroomTopicListIntroInputField, topicListIntro);
     await this.page.type(editClassroomCourseDetailsInputField, courseDetails);
-    await this.clickOn(classroomThumbnailContainer);
+    await this.clickOn(photoBoxButton);
 
     await this.uploadFile(curriculumAdminThumbnailImage);
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
