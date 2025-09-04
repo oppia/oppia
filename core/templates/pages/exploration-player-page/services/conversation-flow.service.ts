@@ -1449,7 +1449,8 @@ export class ConversationFlowService {
     } else if (
       this.solutionForState !== null &&
       numberOfIncorrectSubmissions >=
-        ExplorationPlayerConstants.MAX_INCORRECT_ANSWERS_BEFORE_RELEASING_SOLUTION
+        ExplorationPlayerConstants.MAX_INCORRECT_ANSWERS_BEFORE_RELEASING_SOLUTION &&
+      this.hintsAndSolutionManagerService.areAllHintsExhausted()
     ) {
       this.hintsAndSolutionManagerService.releaseSolution();
     }
