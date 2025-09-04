@@ -131,12 +131,12 @@ export class ConceptCardManagerService {
   }
 
   reset(newCard: StateCard): void {
-    if (this.hintsAvailable) {
-      return;
-    }
     this.conceptCardReleased = false;
     this.conceptCardConsumed = false;
     this.wrongAnswersSinceConceptCardConsumed = 0;
+    if (this.hintsAvailable) {
+      return;
+    }
     if (this.timeout) {
       clearTimeout(this.timeout);
       this.timeout = null;

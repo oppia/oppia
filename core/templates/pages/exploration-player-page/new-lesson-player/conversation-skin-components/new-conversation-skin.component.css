@@ -110,6 +110,7 @@ oppia-new-conversation-skin .oppia-button-icon {
 
 .oppia-exploration-checkpoints-message .toast-container .checkpoints-toast-info {
   cursor: default;
+  margin-top: 100px;
 }
 
 
