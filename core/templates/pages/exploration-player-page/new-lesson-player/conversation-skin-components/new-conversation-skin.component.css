@@ -74,7 +74,8 @@ oppia-new-conversation-skin .new-supplemental-card-parent-container {
   margin-left: 12px;
   margin-top: 30px;
   max-width: 650px;
-  position: relative;
+  top: 100px;
+  position: sticky;
   z-index: 2;
 }
 

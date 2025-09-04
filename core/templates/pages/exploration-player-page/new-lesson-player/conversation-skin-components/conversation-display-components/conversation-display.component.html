@@ -39,7 +39,7 @@
     <hr>
   </div>
 
-  <div class="conversation-skin-tutor-card-middle-section"
+  <div class="conversation-skin-tutor-card-middle-section" [ngClass]="{'supplemental-history-response': !isInteractionInline()}"
        *ngIf="(arePreviousResponsesShown && !conceptCardIsBeingShown)" [@expandInOut]>
     <ng-container *ngFor="let responsePair of displayedCard.getInputResponsePairs(); index as index">
       <ng-container *ngIf="index !== (displayedCard.getInputResponsePairs().length - 1) || !isInteractionInline()">
