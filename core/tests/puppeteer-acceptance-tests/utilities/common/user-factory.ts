@@ -59,7 +59,10 @@ import {
   VoiceoverSubmitter,
   VoiceoverSubmitterFactory,
 } from '../user/voiceover-submitter';
-import {ContributorAdminFactory} from '../user/contributor-admin';
+import {
+  ContributorAdmin,
+  ContributorAdminFactory,
+} from '../user/contributor-admin';
 import {TranslationCoordinatorFactory} from '../user/translation-coordinator';
 import {QuestionCoordinatorFactory} from '../user/practice-question-coordinator';
 
@@ -116,6 +119,7 @@ type BasicRolesUser = LoggedOutUser &
   CurriculumAdmin &
   TranslationSubmitter &
   Contributor &
+  ContributorAdmin &
   PracticeQuestionReviewer &
   VoiceoverSubmitter;
 
@@ -282,13 +286,13 @@ export class UserFactory {
       LoggedOutUserFactory(),
       LoggedInUserFactory(),
       ExplorationEditorFactory(),
-      TranslationSubmitterFactory(),
       QuestionSubmitterFactory(),
       TopicManagerFactory(),
       CurriculumAdminFactory(),
+      TranslationSubmitterFactory(),
       ContributorFactory(),
-      PracticeQuestionReviewerFactory(),
       ContributorAdminFactory(),
+      PracticeQuestionReviewerFactory(),
       VoiceoverSubmitterFactory(),
     ]);
 
