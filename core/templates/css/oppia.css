@@ -461,6 +461,7 @@ h3 {
 a {
   color: #0844aa;
   cursor: pointer;
+  text-decoration: none
 }
 
 a:hover {
@@ -1666,6 +1667,9 @@ pre.oppia-pre-wrapped-text {
   background-color: #f89406;
   font-size: 16px;
   max-width: 550px;
+  opacity: 1 !important;
+  display: block !important;
+  transition: none !important;
 }
 
 .toast-success {
