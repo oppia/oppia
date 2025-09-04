@@ -600,6 +600,7 @@
 	"I18N_PLAYER_PLUS_TAGS": "<[additionalTagNumber]>+ weitere Tags",
 	"I18N_PLAYER_PREVIOUS_RESPONSES": "Vorherige Antworten (<[previousResponses]>)",
 	"I18N_PLAYER_RATE_EXPLORATION": "Hast du etwas Neues gelernt? Wie würdest du diese Erforschung bewerten?",
+	"I18N_PLAYER_RATE_LESSON": "Wie würdest du diese Lektion beurteilen?",
 	"I18N_PLAYER_RATINGS_TOOLTIP": "Bewertungen",
 	"I18N_PLAYER_RECOMMEND_EXPLORATIONS": "Vorschläge für das Nächste:",
 	"I18N_PLAYER_REPORT_MODAL_BODY_AD": "Irreführender Inhalt, Spam oder Werbung",
