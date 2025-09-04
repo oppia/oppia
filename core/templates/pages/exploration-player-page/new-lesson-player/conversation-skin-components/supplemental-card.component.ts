@@ -32,7 +32,7 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {Subscription} from 'rxjs';
 import {AudioPlayerService} from 'services/audio-player.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import {ExplorationPlayerConstants} from '../exploration-player-page.constants';
+import {ExplorationPlayerConstants} from '../../current-lesson-player/exploration-player-page.constants';
 import {CurrentInteractionService} from '../../services/current-interaction.service';
 import {PlayerPositionService} from '../../services/player-position.service';
 

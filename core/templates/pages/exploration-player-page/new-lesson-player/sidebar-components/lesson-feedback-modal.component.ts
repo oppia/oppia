@@ -64,20 +64,18 @@ export class LessonFeedbackModalComponent {
 
   saveFeedback(): void {
     if (this.feedbackText) {
-      this.feedbackPopupBackendApiService
-        .submitFeedbackAsync(
-          this.feedbackTitle,
-          this.feedbackText,
-          !this.isSubmitterAnonymized && this.isLoggedIn,
-          this.playerPositionService.getCurrentStateName()
-        )
-        .then(() => {
-          if (this.ngbActiveModal) {
-            this.ngbActiveModal.close();
-          } else {
-            this.bottomSheetRef.dismiss();
-          }
-        });
+      this.feedbackPopupBackendApiService.submitFeedbackAsync(
+        this.feedbackTitle,
+        this.feedbackText,
+        !this.isSubmitterAnonymized && this.isLoggedIn,
+        this.playerPositionService.getCurrentStateName()
+      );
+    }
+
+    if (this.ngbActiveModal) {
+      this.ngbActiveModal.close();
+    } else {
+      this.bottomSheetRef.dismiss();
     }
   }
 
