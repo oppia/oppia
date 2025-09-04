@@ -24,7 +24,6 @@ import {
 } from 'pages/interaction-specs.constants';
 import {Subscription} from 'rxjs';
 import {UrlService} from 'services/contextual/url.service';
-import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {NewLessonPlayerConstants} from '../../new-lesson-player/lesson-player-page.constants';
 import {PlayerPositionService} from '../../services/player-position.service';
@@ -44,7 +43,6 @@ import './card-navigation-control.component.css';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
 import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
 import {PageContextService} from 'services/page-context.service';
-import {CheckpointProgressService} from 'pages/exploration-player-page/services/checkpoint-progress.service';
 
 @Component({
   selector: 'oppia-card-navigation-control',
@@ -82,10 +80,9 @@ export class CardNavigationControlComponent {
   helpCardHasContinueButton!: boolean;
   isIframed!: boolean;
   lastDisplayedCard!: StateCard;
+  progressTrackerIsVisible: boolean = false;
   explorationId!: string;
   newCardStateName!: string;
-  // Initialize checkpointCount to 1 because first card will always be a checkpoint.
-  checkpointCount: number = 1;
   currentCardIndex!: number;
   @Output() submit: EventEmitter<void> = new EventEmitter();
 
@@ -113,8 +110,6 @@ export class CardNavigationControlComponent {
     private pageContextService: PageContextService,
     private conversationFlowService: ConversationFlowService,
     private schemaFormSubmittedService: SchemaFormSubmittedService,
-    private windowDimensionsService: WindowDimensionsService,
-    private checkpointProgressService: CheckpointProgressService,
     private contentTranslationManagerService: ContentTranslationManagerService
   ) {}
 
@@ -134,9 +129,7 @@ export class CardNavigationControlComponent {
     let pathnameArray = this.urlService.getPathname().split('/');
 
     if (pathnameArray.includes('lesson') && !pathnameArray.includes('embed')) {
-      this.checkpointProgressService.fetchCheckpointCount().then(count => {
-        this.checkpointCount = count;
-      });
+      this.progressTrackerIsVisible = true;
     }
 
     this.directiveSubscriptions.add(
