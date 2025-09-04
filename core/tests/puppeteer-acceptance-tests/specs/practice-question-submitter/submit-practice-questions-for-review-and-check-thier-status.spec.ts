@@ -160,9 +160,7 @@ describe('Practice Question Submitter', function () {
     await questionSubmitter.editDefaultResponseFeedbackInQuestionEditorPage(
       'Wrong Answer'
     );
-    await questionSubmitter.addHintToState(
-      'If you have 2 apples and someone gives you 3 apples, how many apples do you have?'
-    );
+    await questionSubmitter.addHintToState('1 + 2 = 3');
     await questionSubmitter.submitQuestionSuggestion();
 
     // Submit a medium question.
@@ -181,9 +179,7 @@ describe('Practice Question Submitter', function () {
     await questionSubmitter.editDefaultResponseFeedbackInQuestionEditorPage(
       'Wrong Answer'
     );
-    await questionSubmitter.addHintToState(
-      'If you have 14 apples and someone gives you 14 apples, how many apples do you have?'
-    );
+    await questionSubmitter.addHintToState('1 + 2 = 3');
     await questionSubmitter.submitQuestionSuggestion();
 
     // Submit a hard question.
@@ -202,9 +198,7 @@ describe('Practice Question Submitter', function () {
     await questionSubmitter.editDefaultResponseFeedbackInQuestionEditorPage(
       'Wrong Answer'
     );
-    await questionSubmitter.addHintToState(
-      'If you have 10 apples and someone gives you 11 apples, how many apples do you have?'
-    );
+    await questionSubmitter.addHintToState('1 + 2 = 3');
     await questionSubmitter.submitQuestionSuggestion();
 
     // Verify that the questions are submitted successfully.

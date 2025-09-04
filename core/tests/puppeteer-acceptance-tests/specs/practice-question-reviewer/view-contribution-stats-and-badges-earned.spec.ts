@@ -133,7 +133,7 @@ describe('Practice Question Reviewer', function () {
       'Arithmetic Operations',
       'What is 231 + 12?'
     );
-  });
+  }, 600000);
 
   it('should be able to check contribution stats', async function () {
     await questionReviewer.navigateToContributorDashboardUsingProfileDropdown();
@@ -184,6 +184,7 @@ describe('Practice Question Reviewer', function () {
   it('should be able to check badges earned', async function () {
     await questionSubmitter.navigateToTabInMyContributions('Badges');
     await questionSubmitter.expectBadgesToContain('1', 'Review');
+    await questionSubmitter.expectBadgesToContain('1', 'Correction');
   });
 
   afterAll(async function () {

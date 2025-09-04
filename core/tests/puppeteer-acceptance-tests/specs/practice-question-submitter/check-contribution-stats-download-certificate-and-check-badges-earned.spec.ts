@@ -140,19 +140,19 @@ describe('Practice Question Submitter', function () {
     );
     // Submit reviews.
     await questionReviewer.navigateToContributorDashboardUsingProfileDropdown();
-    await questionReviewer.startQuestionReview('What is 2 + 3?', 'Addition');
-    await questionReviewer.submitReview('accept', 'Test Review Message');
+    await questionReviewer.startQuestionReview('What is 10 - 11?', 'Addition');
+    await questionReviewer.submitReview(
+      'reject',
+      'It is not an addition problem.'
+    );
     await questionReviewer.startQuestionReview('What is 14 + 12?', 'Addition');
     await questionReviewer.editQuestionInReview('What is 14 + 12?');
     await questionReviewer.submitReview(
       'accept',
       'Please make sure to use full sentences.'
     );
-    await questionReviewer.startQuestionReview('What is 10 - 11?', 'Addition');
-    await questionReviewer.submitReview(
-      'reject',
-      'It is not an addition problem.'
-    );
+    await questionReviewer.startQuestionReview('What is 2 + 3?', 'Addition');
+    await questionReviewer.submitReview('accept', 'Test Review Message');
 
     // Check question status.
     await questionSubmitter.page.reload();
