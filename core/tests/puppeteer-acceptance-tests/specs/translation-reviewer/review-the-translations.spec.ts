@@ -166,13 +166,14 @@ describe('Translation Reviewer', function () {
 
     // Accept the translation with adding review comment.
     await translationReviewer.clickOn('Edit');
-    // TODO(FILE_ISSUE): RTE not usable.
+    // TODO(#23250): RTE not usable. Once the issue is fixed, uncomment the following line.
     // await translationReviewer.typeTextForRTE('Review comment');
     await translationReviewer.clickOn('Update');
     await translationReviewer.submitTranslationReview(
       'accept',
       'I have added some changes.'
     );
+    await translationReviewer.expectCardContentToBe('सामग्री 2');
   });
 
   it('should be able to reject a translation', async function () {
