@@ -50,7 +50,7 @@ import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 import {ExplorationChange} from './exploration-draft.model';
 import {BaseTranslatableObject} from 'domain/objects/BaseTranslatableObject.model';
-import {ExplorationMetadataBackendDict} from './ExplorationMetadataObjectFactory';
+import {ExplorationMetadataBackendDict} from './exploration-metadata.model';
 import {FetchExplorationBackendResponse} from './read-only-exploration-backend-api.service';
 
 export interface ExplorationBackendDict {

@@ -3,14 +3,14 @@
   even when the first button is not present. -->
   <div class="row-item row-item-previous-card">
     <!-- *ngIf on this second wrapping div because *ngIf lags on buttons. -->
-    <div *ngIf="hasPrevious && !helpCardHasContinueButton && navigationThroughCardHistoryIsEnabled">
+    <ng-container *ngIf="hasPrevious && !helpCardHasContinueButton && navigationThroughCardHistoryIsEnabled">
       <button mat-raised-button
               aria-label="Previous Card"
               (click)="moveBackByOneCard()"
               class="oppia-back-button oppia-nav-button oppia-nav-left-button">
         <i class="material-icons oppia-vcenter" aria-hidden="true">&#xE5C4;</i>
       </button>
-    </div>
+    </ng-container>
   </div>
   <div *ngIf="hasNext && navigationThroughCardHistoryIsEnabled" class="row-item row-item-next-card">
     <button mat-raised-button
@@ -20,8 +20,9 @@
       <i class="material-icons oppia-vcenter" aria-hidden="true">&#xE5C8;</i>
     </button>
   </div>
-  <div *ngIf="!hasNext">
-    <div *ngIf="submitButtonIsShown && !shouldContinueButtonBeShown() && !helpCardHasContinueButton" class="oppia-nav-button">
+  <oppia-progress-tracker [userIsLoggedIn]="userIsLoggedIn" [ngClass]="{ 'hide-save-btn': userIsLoggedIn }"></oppia-progress-tracker>
+  <ng-container *ngIf="!hasNext">
+    <div *ngIf="submitButtonIsShown && !shouldContinueButtonBeShown() && !helpCardHasContinueButton" class="oppia-nav-button right-side-buttons">
       <button mat-button
               class="btn btn-secondary  oppia-skip-button"
               *ngIf="skipButtonIsShown"
@@ -53,5 +54,5 @@
                             [isLearnAgainButton]="isLearnAgainButton"
                             (clickContinueButton)="clickContinueToReviseButton.emit()">
     </oppia-continue-button>
-  </div>
+  </ng-container>
 </div>
