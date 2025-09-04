@@ -45,7 +45,6 @@ import {ContentTranslationManagerService} from '../../services/content-translati
 import {ConversationFlowService} from '../../services/conversation-flow.service';
 import {Interaction} from '../../../../domain/exploration/interaction.model';
 import {RecordedVoiceovers} from '../../../../domain/exploration/recorded-voiceovers.model';
-import exp from 'constants';
 
 describe('Progress nav component', () => {
   let fixture: ComponentFixture<CardNavigationControlComponent>;
