@@ -587,6 +587,14 @@
     {
       "name": "practice-question-reviewer/view-contribution-stats-and-badges-earned",
       "module": "core/tests/puppeteer-acceptance-tests/specs/practice-question-reviewer/view-contribution-stats-and-badges-earned.spec.ts"
+    },
+    {
+      "name": "translation-coordinator/add-remove-translation-rights",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-coordinator/add-remove-translation-rights.spec.ts"
+    },
+    {
+      "name": "practice-question-coordinator/add-and-remove-question-rights",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/practice-question-coordinator/add-and-remove-question-rights.spec.ts"
     }
   ],
   "docker_suites": []

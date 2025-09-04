@@ -1233,9 +1233,10 @@ export class BaseUser {
         return element?.textContent?.trim();
       }, selector);
       error.message =
-        'Failed: Text content does not match..\n' +
+        `Text content of "${selector}" does not match the expected text.\n` +
         `Expected: "${text}"\n` +
         `Actual: "${actualTextContent}"\n` +
+        'Original Error:\n' +
         error.message;
       throw error;
     }
@@ -1310,8 +1311,7 @@ export class BaseUser {
     parentElement?: ElementHandle<Element>
   ): Promise<ElementHandle<Element>> {
     const context = parentElement ?? this.page;
-    await context.waitForSelector(selector, {visible: true});
-    const element = await this.page.$(selector);
+    const element = await context.waitForSelector(selector, {visible: true});
     if (!element) {
       throw new Error(`Element with selector ${selector} not found.`);
     }
@@ -1498,13 +1498,27 @@ export class BaseUser {
       // Select the option.
       await this.page.waitForSelector('mat-option');
       const options = await this.page.$$('mat-option');
+      const optionTexts: string[] = [];
+
+      let optionElement: ElementHandle<Element> | null = null;
       for (const option of options) {
         const optionText = await option.evaluate(el => el.textContent?.trim());
+        optionTexts.push(optionText ?? 'Undefined');
         if (optionText === value) {
-          await option.click();
+          optionElement = option;
           break;
         }
       }
+
+      if (!optionElement) {
+        throw new Error(
+          `Option "${value}" not found.\n` +
+            `Found options: "${optionTexts.join('", "')}"`
+        );
+      }
+
+      // Click on the option.
+      await optionElement.click();
 
       // Verify the value of the select is updated.
       await this.expectTextContentToBe(selector, value);

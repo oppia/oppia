@@ -59,6 +59,9 @@ import {
   VoiceoverSubmitter,
   VoiceoverSubmitterFactory,
 } from '../user/voiceover-submitter';
+import {ContributorAdminFactory} from '../user/contributor-admin';
+import {TranslationCoordinatorFactory} from '../user/translation-coordinator';
+import {QuestionCoordinatorFactory} from '../user/practice-question-coordinator';
 
 const ROLES = testConstants.Roles;
 const cookieBannerAcceptButton =
@@ -69,10 +72,12 @@ const cookieBannerAcceptButton =
  */
 const USER_ROLE_MAPPING = {
   [ROLES.TRANSLATION_ADMIN]: TranslationAdminFactory,
+  [ROLES.TRANSLATION_COORDINATOR]: TranslationCoordinatorFactory,
   [ROLES.BLOG_ADMIN]: BlogAdminFactory,
   [ROLES.BLOG_POST_EDITOR]: BlogPostEditorFactory,
   [ROLES.CURRICULUM_ADMIN]: CurriculumAdminFactory,
   [ROLES.QUESTION_ADMIN]: QuestionAdminFactory,
+  [ROLES.QUESTION_COORDINATOR]: QuestionCoordinatorFactory,
   [ROLES.VOICEOVER_ADMIN]: VoiceoverAdminFactory,
   [ROLES.TOPIC_MANAGER]: TopicManagerFactory,
   [ROLES.MODERATOR]: ModeratorFactory,
@@ -151,6 +156,15 @@ export class UserFactory {
   /**
    * This function assigns roles to a user and returns the instance of
    * that user.
+   * @param {TUser} user - The user to assign roles to.
+   * @param {TRoles} roles - The roles to assign to the user.
+   * @param {string | string[]} args - The arguments to pass to the role
+   *     assignment function. For Topic Manager, it should be the topic
+   *     name (as string). For Translation Coordinator, it should be the
+   *     array of language code (as string[]). For Voiceover Submitter,
+   *     it should be the exploration ID (as string).
+   * @returns {TUser & MultipleRoleIntersection<TRoles>} - The user with
+   *     the roles assigned.
    */
   static assignRolesToUser = async function <
     TUser extends BaseUser,
@@ -158,7 +172,7 @@ export class UserFactory {
   >(
     user: TUser,
     roles: TRoles,
-    topic: string = ''
+    args?: string | string[]
   ): Promise<TUser & MultipleRoleIntersection<TRoles>> {
     for (const role of roles) {
       if (superAdminInstance === null) {
@@ -178,27 +192,37 @@ export class UserFactory {
           );
           break;
         case ROLES.TOPIC_MANAGER:
+          if (typeof args !== 'string') {
+            throw new Error('Expected additional argument to be string.');
+          }
           await superAdminInstance.assignRoleToUser(
             user.username,
             ROLES.TOPIC_MANAGER,
-            topic
+            args as string
+          );
+          break;
+        case ROLES.TRANSLATION_COORDINATOR:
+          await superAdminInstance.assignRoleToUser(
+            user.username,
+            ROLES.TRANSLATION_COORDINATOR,
+            args
           );
           break;
         case ROLES.TRANSLATION_REVIEWER:
           await superAdminInstance.navigateToContributorDashboardAdminPage();
           await superAdminInstance.addTranslationLanguageReviewRights(
             user.username,
-            topic
+            args as string
           );
           break;
         case ROLES.VOICEOVER_SUBMITTER:
-          if (!topic) {
+          if (typeof args !== 'string') {
             throw new Error(
               'Exploration ID is required to assign a voiceover submitter.'
             );
           }
           await superAdminInstance.addVoiceoverArtistToExplorationWithID(
-            topic,
+            args as string,
             user.username
           );
           break;
@@ -225,13 +249,34 @@ export class UserFactory {
       showMessage('Enabled text to speech synthesis using cloud service.');
     };
 
+  /**
+   * This function creates a new user with the specified roles and returns
+   * the instance of that user.
+   * @param {string} username - The username of the user.
+   * @param {string} email - The email of the user.
+   * @param {OptionalRoles<TRoles>} roles - The roles to assign to the user.
+   * @param {string | string[]} args - The arguments to pass to the role
+   *     assignment function. For Topic Manager, it should be the topic
+   *     name. For Translation Coordinator, it should be the array of
+   *     language code.
+   * @returns {Promise<
+   *     LoggedOutUser &
+   *       LoggedInUser &
+   *       ExplorationEditor &
+   *       QuestionSubmitter &
+   *       TopicManager &
+   *       CurriculumAdmin &
+   *       ContributorAdmin &
+   *       MultipleRoleIntersection<TRoles>
+   *   >} - The user with the roles assigned.
+   */
   static createNewUser = async function <
     TRoles extends (keyof typeof USER_ROLE_MAPPING)[] = never[],
   >(
     username: string,
     email: string,
     roles: OptionalRoles<TRoles> = [] as OptionalRoles<TRoles>,
-    topic: string = ''
+    args?: string | string[]
   ): Promise<BasicRolesUser & MultipleRoleIntersection<TRoles>> {
     let user = UserFactory.composeUserWithRoles(BaseUserFactory(), [
       LoggedOutUserFactory(),
@@ -243,6 +288,7 @@ export class UserFactory {
       CurriculumAdminFactory(),
       ContributorFactory(),
       PracticeQuestionReviewerFactory(),
+      ContributorAdminFactory(),
       VoiceoverSubmitterFactory(),
     ]);
 
@@ -256,7 +302,7 @@ export class UserFactory {
     return (await UserFactory.assignRolesToUser(
       user,
       roles,
-      topic
+      args
     )) as BasicRolesUser & MultipleRoleIntersection<TRoles>;
   };
 
