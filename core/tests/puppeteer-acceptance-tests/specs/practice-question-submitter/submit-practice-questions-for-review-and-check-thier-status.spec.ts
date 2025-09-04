@@ -217,23 +217,17 @@ describe('Practice Question Submitter', function () {
   });
 
   it('should be able to check question status', async function () {
-    // Accept the question suggestion.
-    await questionReviewer.navigateToContributorDashboardUsingProfileDropdown();
-    await questionReviewer.startQuestionReview('What is 2 + 3?', 'Addition');
-    await questionReviewer.submitReview('accept', 'Test Review Message');
+    // Reject the question suggestion.
+    await questionReviewer.startQuestionReview('What is 10 + 11?', 'Addition');
+    await questionReviewer.submitReview('reject', 'No answer is correct.');
     // Edit the question suggestion.
     await questionReviewer.startQuestionReview('14 + 12', 'Addition');
     await questionReviewer.editQuestionInReview('What is 14 + 12?');
-    await questionReviewer.submitReview(
-      'accept',
-      'Please make sure to use full sentences.'
-    );
-    // Reject the question suggestion.
-    await questionReviewer.startQuestionReview('What is 10 + 11?', 'Addition');
-    await questionReviewer.submitReview(
-      'reject',
-      'It is not of Hard difficulty.'
-    );
+    await questionReviewer.submitReview('accept');
+    // Accept the question suggestion.
+    await questionReviewer.navigateToContributorDashboardUsingProfileDropdown();
+    await questionReviewer.startQuestionReview('What is 2 + 3?', 'Addition');
+    await questionReviewer.submitReview('accept');
 
     // Check question status.
     await questionSubmitter.page.reload();

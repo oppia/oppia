@@ -170,7 +170,7 @@ describe('Practice Question Submitter', function () {
   });
 
   it('should be able to download contribution certificate', async function () {
-    // TODO(ISSUE_NUMBER): Currently, the download certificate functionality is not working
+    // TODO(#22743): Currently, the download certificate functionality is not working
     // when "To" date is of today and only contribution is made today.
   });
 

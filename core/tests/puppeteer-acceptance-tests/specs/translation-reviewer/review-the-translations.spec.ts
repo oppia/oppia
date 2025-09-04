@@ -125,7 +125,6 @@ describe('Translation Reviewer', function () {
   }, 900000);
 
   it('should be able to view all pending reviews', async function () {
-    // TODO: Can't see the one with different language.
     await translationReviewer.navigateToContributorDashboardUsingProfileDropdown();
     await translationReviewer.expectPinIconToBeVisible();
     await translationReviewer.expectScreenshotToMatch(
@@ -156,12 +155,14 @@ describe('Translation Reviewer', function () {
   it('should be able to accept the translation', async function () {
     // Accept the translation without adding review comment.
     await translationReviewer.submitTranslationReview('accept');
+    await translationReviewer.expectCardContentToBe('सामग्री 1');
 
     // Accept the translation with adding review comment.
     await translationReviewer.submitTranslationReview(
       'accept',
       'Review comment'
     );
+    await translationReviewer.expectCardContentToBe('सामग्री 2');
 
     // Accept the translation with adding review comment.
     await translationReviewer.clickOn('Edit');

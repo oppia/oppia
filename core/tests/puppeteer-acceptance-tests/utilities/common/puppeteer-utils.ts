@@ -1228,9 +1228,16 @@ export class BaseUser {
 
       showMessage(`Text content of "${selector}" is "${text}".`);
     } catch (error) {
-      throw new Error(
-        `Failed: Text content of "${selector}" is not "${text}".\nOriginal Error:\n${error.stack}`
-      );
+      const actualTextContent = await this.page.evaluate((selector: string) => {
+        const element = document.querySelector(selector);
+        return element?.textContent?.trim();
+      }, selector);
+      error.message =
+        'Failed: Text content does not match..\n' +
+        `Expected: "${text}"\n` +
+        `Actual: "${actualTextContent}"\n` +
+        error.message;
+      throw error;
     }
   }
 

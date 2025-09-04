@@ -64,6 +64,7 @@ const reviewCommentInputSelector = '.e2e-test-suggestion-review-message';
 const acceptTranslationButtonSelector = '.e2e-test-translation-accept-button';
 const rejectTranslationButtonSelector = '.e2e-test-translation-reject-button';
 const reviewContentContainerSelector = '.e2e-test-review-content-container';
+const translatedContentContainerSelector = '.e2e-test-translated-content';
 
 export class TranslationReviewer extends BaseUser {
   /**
@@ -228,6 +229,17 @@ export class TranslationReviewer extends BaseUser {
       {},
       reviewContentContainerSelector,
       initialReviewContent
+    );
+  }
+
+  /**
+   * Checks if the review content is as expected.
+   * @param expectedContent - The expected content.
+   */
+  async expectCardContentToBe(expectedContent: string): Promise<void> {
+    await this.expectTextContentToBe(
+      `${reviewContentContainerSelector} ${translatedContentContainerSelector}`,
+      expectedContent
     );
   }
 
