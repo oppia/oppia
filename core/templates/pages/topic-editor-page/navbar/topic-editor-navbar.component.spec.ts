@@ -51,8 +51,12 @@ class MockWindowRef {
       hash: '123',
       href: '',
       replace: (val: string) => {},
-      addEventListener: (_event: string, _cb: () => void) => {},
-      removeEventListener: (_event: string, _cb: () => void) => {},
+    },
+    addEventListener(
+      event: string,
+      callback: (arg0: {returnValue: null}) => void
+    ) {
+      callback({returnValue: null});
     },
     open: (url: string) => {},
     gtag: () => {},
