@@ -19,11 +19,7 @@
 import {TestBed} from '@angular/core/testing';
 import {AnswerClassificationResult} from '../../../domain/classifier/answer-classification-result.model';
 import {Outcome} from '../../../domain/exploration/outcome.model';
-import {
-  State,
-  StateBackendDict,
-  StateObjectFactory,
-} from '../../../domain/state/StateObjectFactory';
+import {State, StateBackendDict} from '../../../domain/state/state.model';
 import {LearnerAnswerDetailsBackendApiService} from '../../../domain/statistics/learner-answer-details-backend-api.service';
 import {
   AnswerClassificationService,
@@ -35,7 +31,6 @@ import {TextInputRulesService} from '../../../../../extensions/interactions/Text
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 
 describe('Learner answer info service', () => {
-  let sof: StateObjectFactory;
   let stateDict: StateBackendDict;
   let firstState: State;
   let secondState: State;
@@ -168,15 +163,14 @@ describe('Learner answer info service', () => {
       classifier_model_id: '',
     };
 
-    sof = TestBed.get(StateObjectFactory);
     learnerAnswerInfoService = TestBed.get(LearnerAnswerInfoService);
     answerClassificationService = TestBed.get(AnswerClassificationService);
     ladbas = TestBed.get(LearnerAnswerDetailsBackendApiService);
     DEFAULT_OUTCOME_CLASSIFICATION =
       ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION;
-    firstState = sof.createFromBackendDict('new state', stateDict);
-    secondState = sof.createFromBackendDict('fake state', stateDict);
-    thirdState = sof.createFromBackendDict('demo state', stateDict);
+    firstState = State.createFromBackendDict('new state', stateDict);
+    secondState = State.createFromBackendDict('fake state', stateDict);
+    thirdState = State.createFromBackendDict('demo state', stateDict);
     tirs = TestBed.get(TextInputRulesService);
 
     spyOn(

@@ -48,7 +48,7 @@ import {
   ReadOnlyExplorationBackendApiService,
 } from '../../../../domain/exploration/read-only-exploration-backend-api.service';
 import {ExplorationEngineService} from '../../services/exploration-engine.service';
-import {StateObjectFactory} from '../../../../domain/state/StateObjectFactory';
+import {State} from '../../../../domain/state/state.model';
 import {EditableExplorationBackendApiService} from '../../../../domain/exploration/editable-exploration-backend-api.service';
 import {PlayerPositionService} from '../../services/player-position.service';
 import {PlayerTranscriptService} from '../../services/player-transcript.service';
@@ -122,7 +122,6 @@ describe('ExplorationFooterComponent', () => {
   let windowDimensionsService: WindowDimensionsService;
   let mockResizeEventEmitter = new EventEmitter();
   let explorationSummaryBackendApiService: ExplorationSummaryBackendApiService;
-  let stateObjectFactory: StateObjectFactory;
   let explorationEngineService: ExplorationEngineService;
   let editableExplorationBackendApiService: EditableExplorationBackendApiService;
   let playerPositionService: PlayerPositionService;
@@ -209,7 +208,6 @@ describe('ExplorationFooterComponent', () => {
       EditableExplorationBackendApiService
     );
     explorationEngineService = TestBed.inject(ExplorationEngineService);
-    stateObjectFactory = TestBed.inject(StateObjectFactory);
     playerPositionService = TestBed.inject(PlayerPositionService);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
     userService = TestBed.inject(UserService);
@@ -516,7 +514,7 @@ describe('ExplorationFooterComponent', () => {
       stateCard
     );
     spyOn(explorationEngineService, 'getState').and.returnValue(
-      stateObjectFactory.createFromBackendDict('End', endState)
+      State.createFromBackendDict('End', endState)
     );
 
     component.openProgressReminderModal();
@@ -602,7 +600,7 @@ describe('ExplorationFooterComponent', () => {
       stateCard
     );
     spyOn(explorationEngineService, 'getState').and.returnValue(
-      stateObjectFactory.createFromBackendDict('End', endState)
+      State.createFromBackendDict('End', endState)
     );
 
     component.openProgressReminderModal();
@@ -899,7 +897,7 @@ describe('ExplorationFooterComponent', () => {
       2
     );
     spyOn(explorationEngineService, 'getState').and.returnValue(
-      stateObjectFactory.createFromBackendDict(
+      State.createFromBackendDict(
         'End',
         sampleExpResponse.exploration.states.End
       )
@@ -974,7 +972,7 @@ describe('ExplorationFooterComponent', () => {
       },
     };
     spyOn(explorationEngineService, 'getState').and.returnValue(
-      stateObjectFactory.createFromBackendDict('End', endState)
+      State.createFromBackendDict('End', endState)
     );
 
     component.showConceptCard();
@@ -1035,7 +1033,7 @@ describe('ExplorationFooterComponent', () => {
     );
     spyOn(playerTranscriptService, 'getCard').and.returnValue(card);
     spyOn(explorationEngineService, 'getStateFromStateName').and.returnValue(
-      stateObjectFactory.createFromBackendDict('State A', {
+      State.createFromBackendDict('State A', {
         classifier_model_id: null,
         content: {
           html: '',

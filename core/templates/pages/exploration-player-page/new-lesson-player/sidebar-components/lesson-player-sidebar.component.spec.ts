@@ -75,6 +75,7 @@ describe('LessonPlayerSidebarComponent', () => {
     visibilitySubject = new BehaviorSubject<boolean>(false);
     mockMobileMenuService = {
       getMenuVisibility: () => visibilitySubject.asObservable(),
+      toggleMenuVisibility: jasmine.createSpy('toggleMenuVisibility'),
     };
 
     const ngbModalSpy = jasmine.createSpyObj('NgbModal', ['open']);

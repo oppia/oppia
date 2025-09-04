@@ -192,6 +192,6 @@ export class AddOrUpdateSolutionModalComponent
       }
     );
     this.ansOptions = ['The only', 'One'];
-    this.tempAnsOption = this.ansOptions[1];
+    this.tempAnsOption = this.ansOptions[this.data.answerIsExclusive ? 0 : 1];
   }
 }
