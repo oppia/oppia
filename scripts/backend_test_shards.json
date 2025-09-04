@@ -312,7 +312,9 @@
         "core.platform.storage.cloud_storage_emulator_test",
         "core.platform.storage.dev_mode_storage_services_test",
         "core.platform.storage.cloud_storage_services_test",
-        "core.domain.contribution_stats_services_test"
+        "core.domain.contribution_stats_services_test",
+        "scripts.linters.circular_dependency_linter_test",
+        "scripts.run_circular_dependency_checks_test"
     ],
     "5": [
         "core.controllers.suggestion_test",
