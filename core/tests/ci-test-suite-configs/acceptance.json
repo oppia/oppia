@@ -555,6 +555,14 @@
     {
       "name": "blog-post-writer/create-and-edit-blog-post",
       "module": "core/tests/puppeteer-acceptance-tests/specs/blog-post-writer/create-and-edit-blog-post.spec.ts"
+    },
+    {
+      "name": "translation-coordinator/add-remove-translation-rights",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-coordinator/add-remove-translation-rights.spec.ts"
+    },
+    {
+      "name": "practice-question-coordinator/add-and-remove-question-rights",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/practice-question-coordinator/add-and-remove-question-rights.spec.ts"
     }
   ],
   "docker_suites": []
