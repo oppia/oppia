@@ -1801,6 +1801,10 @@ export class ConversationFlowService {
     this.isLoggedIn = userStatus;
   }
 
+  /**
+   * Returns the user's login status.
+   * @returns {boolean} True if the user is logged in, false otherwise.
+   */
   getIsLoggedIn(): boolean {
     return this.isLoggedIn;
   }

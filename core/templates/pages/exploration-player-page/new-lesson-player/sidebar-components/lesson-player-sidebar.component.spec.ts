@@ -47,6 +47,7 @@ import {ShareLessonModalComponent} from './share-lesson-modal.component';
 import {NewFlagExplorationModalComponent} from './flag-lesson-modal.component';
 import {LessonFeedbackModalComponent} from './lesson-feedback-modal.component';
 import {CustomizableThankYouModalComponent} from './customizable-thank-you-modal.component';
+import {ConversationFlowService} from '../../services/conversation-flow.service';
 import {of} from 'rxjs';
 
 @Pipe({name: 'truncateAndCapitalize'})
@@ -66,6 +67,7 @@ describe('LessonPlayerSidebarComponent', () => {
   let urlService: UrlService;
   let mockNgbModal: jasmine.SpyObj<NgbModal>;
   let mockBottomSheet: jasmine.SpyObj<MatBottomSheet>;
+  let conversationFlowService: ConversationFlowService;
   let mockLearnerLocalNavBackendApiService: jasmine.SpyObj<LearnerLocalNavBackendApiService>;
   let mockAlertsService: jasmine.SpyObj<AlertsService>;
   let mockWindowDimensionsService: jasmine.SpyObj<WindowDimensionsService>;
@@ -103,6 +105,7 @@ describe('LessonPlayerSidebarComponent', () => {
         ReadOnlyExplorationBackendApiService,
         PageContextService,
         I18nLanguageCodeService,
+        ConversationFlowService,
         UrlService,
         {
           provide: MobileMenuService,
@@ -141,6 +144,7 @@ describe('LessonPlayerSidebarComponent', () => {
     fixture = TestBed.createComponent(LessonPlayerSidebarComponent);
     component = fixture.componentInstance;
     pageContextService = TestBed.inject(PageContextService);
+    conversationFlowService = TestBed.inject(ConversationFlowService);
     readOnlyExplorationBackendApiService = TestBed.inject(
       ReadOnlyExplorationBackendApiService
     );
@@ -337,6 +341,11 @@ describe('LessonPlayerSidebarComponent', () => {
 
     expect(mockAlertsService.addWarning).toHaveBeenCalledWith(errorMessage);
   }));
+
+  it('should get is user logged in', () => {
+    spyOn(conversationFlowService, 'getIsLoggedIn').and.returnValue(true);
+    expect(component.isUserLoggedIn()).toBeTrue();
+  });
 
   it('should show flag exploration modal on mobile with no result', () => {
     mockWindowDimensionsService.getWidth.and.returnValue(400);

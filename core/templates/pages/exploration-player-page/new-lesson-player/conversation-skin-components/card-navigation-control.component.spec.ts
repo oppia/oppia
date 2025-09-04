@@ -45,6 +45,7 @@ import {ContentTranslationManagerService} from '../../services/content-translati
 import {ConversationFlowService} from '../../services/conversation-flow.service';
 import {Interaction} from '../../../../domain/exploration/interaction.model';
 import {RecordedVoiceovers} from '../../../../domain/exploration/recorded-voiceovers.model';
+import exp from 'constants';
 
 describe('Progress nav component', () => {
   let fixture: ComponentFixture<CardNavigationControlComponent>;
@@ -131,6 +132,9 @@ describe('Progress nav component', () => {
     let mockSchemaFormSubmittedEventEmitter = new EventEmitter<void>();
 
     spyOn(urlService, 'isIframed').and.returnValue(isIframed);
+    spyOn(urlService, 'getPathname').and.returnValue(
+      'http://localhost:8181/lesson/wZiXFx1iV5bz'
+    );
     spyOn(componentInstance.submit, 'emit');
     spyOnProperty(playerPositionService, 'onHelpCardAvailable').and.returnValue(
       mockOnHelpCardAvailableEventEmitter
@@ -151,6 +155,7 @@ describe('Progress nav component', () => {
     expect(componentInstance.isIframed).toEqual(isIframed);
     expect(componentInstance.helpCardHasContinueButton).toBeTrue();
     expect(componentInstance.submit.emit).toHaveBeenCalled();
+    expect(componentInstance.progressTrackerIsVisible).toBeTrue();
   }));
 
   it('should update displayed card info', fakeAsync(() => {
