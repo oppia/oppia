@@ -30,6 +30,7 @@ import {Skill} from 'domain/skill/skill.model.ts';
 import {SkillUpdateService} from 'domain/skill/skill-update.service';
 import {ConfirmQuestionExitModalComponent} from 'components/question-directives/modal-templates/confirm-question-exit-modal.component';
 import {QuestionUndoRedoService} from 'domain/editor/undo_redo/question-undo-redo.service';
+import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 
 @Component({
   selector: 'oppia-skill-editor-navbar',
@@ -47,6 +48,7 @@ export class SkillEditorNavabarComponent implements OnInit {
   constructor(
     private alertsService: AlertsService,
     private ngbModal: NgbModal,
+    private preventPageUnloadEventService: PreventPageUnloadEventService,
     private skillEditorRoutingService: SkillEditorRoutingService,
     private skillEditorStateService: SkillEditorStateService,
     private skillUpdateService: SkillUpdateService,
@@ -198,5 +200,11 @@ export class SkillEditorNavabarComponent implements OnInit {
     this.directiveSubscriptions.add(
       this.undoRedoService._undoRedoChangeEventEmitter.subscribe(() => {})
     );
+    this.preventPageUnloadEventService.addListener(() => {
+      return (
+        this.undoRedoService.getChangeCount() > 0 ||
+        this.questionUndoRedoService.hasChanges()
+      );
+    });
   }
 }

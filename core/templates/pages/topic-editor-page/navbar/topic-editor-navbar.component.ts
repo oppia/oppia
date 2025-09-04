@@ -34,6 +34,7 @@ import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.consta
 import {Topic} from 'domain/topic/topic-object.model';
 import {TopicRights} from 'domain/topic/topic-rights.model';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 
 @Component({
   selector: 'oppia-topic-editor-navbar',
@@ -64,6 +65,7 @@ export class TopicEditorNavbarComponent
     private ngbModal: NgbModal,
     private topicRightsBackendApiService: TopicRightsBackendApiService,
     private alertsService: AlertsService,
+    private preventPageUnloadEventService: PreventPageUnloadEventService,
     private undoRedoService: UndoRedoService,
     private questionUndoRedoService: QuestionUndoRedoService,
     private urlInterpolationService: UrlInterpolationService,
@@ -364,6 +366,12 @@ export class TopicEditorNavbarComponent
         this._validateTopic();
       })
     );
+    this.preventPageUnloadEventService.addListener(() => {
+      return (
+        this.undoRedoService.getChangeCount() > 0 ||
+        this.questionUndoRedoService.hasChanges()
+      );
+    });
     this.topicId = this.urlService.getTopicIdFromUrl();
     this.navigationChoices = ['Topic', 'Questions', 'Preview'];
     this.activeTab = this.getMobileNavigatorText();

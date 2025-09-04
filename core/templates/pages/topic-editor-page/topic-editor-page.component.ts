@@ -229,9 +229,12 @@ export class TopicEditorPageComponent implements OnInit, OnDestroy {
     );
     this.topicEditorStateService.loadTopic(this.urlService.getTopicIdFromUrl());
     this.pageTitleService.setNavbarTitleForMobileView('Topic Editor');
-    this.preventPageUnloadEventService.addListener(
-      this.undoRedoService.getChangeCount.bind(this.undoRedoService)
-    );
+    this.preventPageUnloadEventService.addListener(() => {
+      return (
+        this.undoRedoService.getChangeCount() > 0 ||
+        this.questionUndoRedoService.hasChanges()
+      );
+    });
     this.validationIssues = [];
     this.prepublishValidationIssues = [];
     this.warningsAreShown = false;
