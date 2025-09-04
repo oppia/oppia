@@ -547,7 +547,7 @@ const takeQuizButtonSelector = '.e2e-test-take-diagnostic-test';
 const startDiagnosticTestButtonSelector = '.e2e-test-start-diagnostic-test';
 
 // Diagnostic Test Player.
-const diagnosticTestPlayerSelector = 'oppia-dignostic-test-player';
+const diagnosticTestPlayerSelector = 'oppia-diagnostic-test-player';
 const skipQuestionButton = '.e2e-test-skip-question-button';
 const currentProgessSelector = '.e2e-test-progress-container';
 

@@ -306,6 +306,7 @@ const mobileGetInvolvedMenuContainerSelector =
   '.e2e-mobile-test-sidebar-get-involved-menu';
 const mobileLearnDropdownSelector = '.e2e-mobile-test-learn';
 const mobileLearnSubMenuSelector = '.e2e-test-mobile-learn-submenu';
+const mobileNavBarOpenSelector = '.oppia-sidebar-menu-open';
 
 const commonPlayLaterIconSelector = '.e2e-test-lesson-playlist-icon';
 const learnerDashboardIconsSelector = 'oppia-learner-dashboard-icons';
@@ -3224,7 +3225,7 @@ export class LoggedInUser extends BaseUser {
 
       // Close Navmenu.
       await this.clickOn(mobileNavbarOpenSidebarButton);
-      await this.expectElementToBeVisible(mobileLearnDropdownSelector, false);
+      await this.expectElementToBeVisible(mobileNavBarOpenSelector, false);
     }
     // Desktop view port.
     else {
