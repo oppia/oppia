@@ -1665,10 +1665,10 @@ pre.oppia-pre-wrapped-text {
 
 .toast {
   background-color: #f89406;
+  display: block !important;
   font-size: 16px;
   max-width: 550px;
   opacity: 1 !important;
-  display: block !important;
   transition: none !important;
 }
 
