@@ -41,7 +41,7 @@
         <div class="card-header">
           <h3 class="card-title">{{ section.heading.unicode }}</h3>
         </div>
-        <div class="card-body">
+        <div class="card-content">
           <oppia-rte-output-display [rteString]="section.content.html">
           </oppia-rte-output-display>
         </div>
@@ -265,10 +265,6 @@
 
     .card-header {
       padding: 15px 15px;
-    }
-
-    .content-title {
-      font-size: 18.2px;
     }
 
     .card-title {
