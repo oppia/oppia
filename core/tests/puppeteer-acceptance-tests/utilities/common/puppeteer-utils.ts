@@ -39,6 +39,8 @@ const commonModalCancelBtnSelector = '.e2e-test-cancel-action-button';
 const uploadErrorMessageDivSelector = '.e2e-test-upload-error-message';
 const currentMatTabHeaderSelector = '.mat-tab-label-active';
 const actionStatusMessageSelector = '.e2e-test-status-message';
+const warningToastMessageSelector = '.e2e-test-toast-warning-message';
+const warningToastCloseButtonSelector = '.e2e-test-close-toast-warning';
 
 const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
 const baseURL = testConstants.URLs.BaseURL;
@@ -1715,6 +1717,28 @@ export class BaseUser {
       uploadErrorMessageDivSelector,
       expectedErrorMessage
     );
+  }
+
+  /**
+   * Checks if the toast warning message matches the expected warning message.
+   * @param {string} expectedWarningMessage - The expected warning message.
+   */
+  async expectToastWarningMessageToBe(
+    expectedWarningMessage: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(warningToastMessageSelector);
+    await this.expectTextContentToContain(
+      warningToastMessageSelector,
+      expectedWarningMessage
+    );
+  }
+
+  /**
+   * Clicks on the close button in the toast warning message.
+   */
+  async closeToastWarningMessage(): Promise<void> {
+    await this.clickOn(warningToastCloseButtonSelector);
+    await this.expectElementToBeVisible(warningToastMessageSelector, false);
   }
 }
 

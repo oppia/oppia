@@ -63,6 +63,12 @@ jobs:
             short_name: edit-users-role
           - name: super-admin/edit-platform-parameter
             short_name: edit-platform-parameter
+          - name: site-moderator/check-recent-commits
+            short_name: check-recent-commits
+          - name: site-moderator/check-recent-feedback-messages
+            short_name: check-recent-feedback-messages
+          - name: site-moderator/featured-activities-section
+            short_name: featured-activities-section
         run1: [1, 2]
         run2: [1]
         mobile: [false, true]

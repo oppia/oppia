@@ -591,6 +591,18 @@
     {
       "name": "super-admin/use-misc-tab-feature",
       "module": "core/tests/puppeteer-acceptance-tests/specs/super-admin/use-misc-tab-feature.spec.ts"
+    },
+    {
+      "name": "site-moderator/check-recent-commits",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/site-moderator/check-recent-commits.spec.ts"
+    },
+    {
+      "name": "site-moderator/check-recent-feedback-messages",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/site-moderator/check-recent-feedback-messages.spec.ts"
+    },
+    {
+      "name": "site-moderator/featured-activities-section",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/site-moderator/featured-activities-section.spec.ts"
     }
   ],
   "docker_suites": []
