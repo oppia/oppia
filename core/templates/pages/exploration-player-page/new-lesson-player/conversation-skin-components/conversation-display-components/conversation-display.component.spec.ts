@@ -292,6 +292,65 @@ describe('Conversation display component', () => {
     expect(componentInstance.getInputResponsePairId).toHaveBeenCalled();
   }));
 
+  it('should return true if displayedCard is not completed', () => {
+    componentInstance.displayedCard = mockDisplayedCard;
+    spyOn(mockDisplayedCard, 'isCompleted').and.returnValue(false);
+    expect(componentInstance.isCurrentCardAtEndOfTranscript()).toBeTrue();
+  });
+
+  it('should return false if displayedCard is completed', () => {
+    componentInstance.displayedCard = mockDisplayedCard;
+    spyOn(mockDisplayedCard, 'isCompleted').and.returnValue(true);
+    expect(componentInstance.isCurrentCardAtEndOfTranscript()).toBeFalse();
+  });
+
+  describe('shouldResponseHistoryBeShown', () => {
+    beforeEach(() => {
+      componentInstance.displayedCard = mockDisplayedCard;
+    });
+
+    it('should return false if inputOutputHistoryIsShown is false', () => {
+      componentInstance.inputOutputHistoryIsShown = false;
+      spyOn(mockDisplayedCard, 'getInputResponsePairs').and.returnValue([
+        {},
+        {},
+      ]);
+      spyOn(componentInstance, 'isInteractionInline').and.returnValue(true);
+      expect(componentInstance.shouldResponseHistoryBeShown()).toBeFalse();
+    });
+
+    it('should return true if interaction is inline and pairCount > 1', () => {
+      componentInstance.inputOutputHistoryIsShown = true;
+      spyOn(mockDisplayedCard, 'getInputResponsePairs').and.returnValue([
+        {},
+        {},
+      ]);
+      spyOn(componentInstance, 'isInteractionInline').and.returnValue(true);
+      expect(componentInstance.shouldResponseHistoryBeShown()).toBeTrue();
+    });
+
+    it('should return false if interaction is inline and pairCount <= 1', () => {
+      componentInstance.inputOutputHistoryIsShown = true;
+      spyOn(mockDisplayedCard, 'getInputResponsePairs').and.returnValue([{}]);
+      spyOn(componentInstance, 'isInteractionInline').and.returnValue(true);
+      expect(componentInstance.shouldResponseHistoryBeShown()).toBeFalse();
+    });
+
+    it('should return true if interaction is not inline and pairCount > 0', () => {
+      componentInstance.inputOutputHistoryIsShown = true;
+      spyOn(mockDisplayedCard, 'getInputResponsePairs').and.returnValue([{}]);
+      spyOn(componentInstance, 'isInteractionInline').and.returnValue(false);
+      expect(componentInstance.shouldResponseHistoryBeShown()).toBeTrue();
+    });
+
+    it('should return false if interaction is not inline and pairCount == 0', () => {
+      componentInstance.inputOutputHistoryIsShown = true;
+      spyOn(mockDisplayedCard, 'getInputResponsePairs').and.returnValue([]);
+      spyOn(componentInstance, 'isInteractionInline').and.returnValue(false);
+      expect(componentInstance.shouldResponseHistoryBeShown()).toBeFalse();
+    });
+  });
+
   it('should set default profile pictures when username is null', fakeAsync(() => {
     spyOn(componentInstance, 'updateDisplayedCard');
     let userInfo = {

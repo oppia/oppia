@@ -143,6 +143,7 @@ export class LessonPlayerSidebarComponent implements OnInit {
         .afterDismissed()
         .subscribe((result: FlagExplorationModalResult) => {
           if (result) {
+            this.mobileMenuService.toggleMenuVisibility();
             this.learnerLocalNavBackendApiService
               .postReportAsync(this.explorationId, result)
               .then(
@@ -191,6 +192,7 @@ export class LessonPlayerSidebarComponent implements OnInit {
       );
       bottomSheetRef.afterDismissed().subscribe(result => {
         if (result !== 'cancel') {
+          this.mobileMenuService.toggleMenuVisibility();
           this.showThankYouModal('I18N_PLAYER_THANK_FEEDBACK');
         }
       });

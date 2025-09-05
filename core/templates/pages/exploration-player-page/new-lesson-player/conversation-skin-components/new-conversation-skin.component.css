@@ -50,7 +50,6 @@ oppia-new-conversation-skin .new-supplemental-card-parent-container {
   display: flex;
   justify-content: center;
   margin: 0 auto;
-  max-width: 1400px;
   padding: 56px 14px 0;
   padding-bottom: 50px;
   width: 100%;
@@ -61,10 +60,10 @@ oppia-new-conversation-skin .new-supplemental-card-parent-container {
 }
 
 .new-conversation-skin-tutor-card-container {
-  flex-shrink: 10000;
-  margin-bottom: 10px;
-  max-width: 650px;
+  margin: auto;
+  max-width: 660px;
   position: relative;
+  width: 90vw;
   z-index: 3;
 }
 
@@ -87,6 +86,12 @@ oppia-new-conversation-skin .new-supplemental-card-parent-container {
   cursor: default;
   margin-left: 10px;
   margin-right: 10px;
+}
+
+.supplemental-cards {
+  margin: 0;
+  margin-bottom: 28px;
+  width: 40vw;
 }
 
 oppia-new-conversation-skin .oppia-new-button-raised.mat-raised-raised {
@@ -120,6 +125,10 @@ oppia-new-conversation-skin .oppia-button-icon {
     position: relative;
     width: 100%;
   }
+
+  .new-conversation-skin-tutor-card-container {
+    width: 70vw;
+  }
 }
 
 @media (min-width: 481px) and (max-width: 768px) {
@@ -128,6 +137,10 @@ oppia-new-conversation-skin .oppia-button-icon {
     padding: 66px 80px 66px 25px;
     position: relative;
     width: 100%;
+  }
+
+  .new-conversation-skin-tutor-card-container {
+    width: 70vw;
   }
 }
 

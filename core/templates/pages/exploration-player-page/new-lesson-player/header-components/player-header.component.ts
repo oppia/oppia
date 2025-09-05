@@ -139,7 +139,6 @@ export class PlayerHeaderComponent {
         });
 
       if (this.isLinkedToTopic) {
-        console.warn('yooooooooooo');
         this.storyUrlFragment =
           this.urlService.getStoryUrlFragmentFromLearnerUrl();
 
