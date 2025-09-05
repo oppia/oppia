@@ -53,7 +53,7 @@ speech_synthesis_services = (
     models.Registry.import_speech_synthesis_services())
 
 
-ALLOWED_CUSTOM_RTE_TAGS = [
+ALLOWED_CUSTOM_OPPIA_RTE_TAGS = [
     'oppia-noninteractive-collapsible',
     'oppia-noninteractive-image',
     'oppia-noninteractive-link',
@@ -64,7 +64,7 @@ ALLOWED_CUSTOM_RTE_TAGS = [
     'oppia-noninteractive-workedexample'
 ]
 
-ALLOWED_GENERAL_RTE_TAGS = [
+ALLOWED_GENERAL_OPPIA_RTE_TAGS = [
     'p',
     'strong',
     'br',
@@ -89,11 +89,12 @@ def convert_custom_oppia_tags_to_generic_tags(element: bs4.Tag) -> bs4.Tag:
     Returns:
         Tag. The transformed paragraph tag.
     """
-    # NOTE: Tags such as images, videos, tabs, and collapsibles are excluded
-    # here because automatic voiceovers are not planned for the text they
-    # contain. At present, only link, skill review, and math tags are processed.
-    # In the future, if other custom tags require voiceover support,
-    # their handling should be implemented in the code below.
+    # NOTE: This method currently processes only the Link, Skillreview, and Math
+    # custom RTE tags. It extracts and returns the user-facing text from these
+    # tags. Other tags are not handled here, so their content is excluded during
+    # voiceover regeneration. To support additional custom tags (e.g., Images,
+    # Worked Examples, etc.), add similar rules below to ensure their texts are
+    # also processed during voiceover regeneration.
 
     if element.name in [
         'oppia-noninteractive-link',
@@ -131,8 +132,8 @@ def parse_html(html_content: str) -> str:
 
     unknown_tags = (
         all_tags -
-        set(ALLOWED_CUSTOM_RTE_TAGS) -
-        set(ALLOWED_GENERAL_RTE_TAGS)
+        set(ALLOWED_CUSTOM_OPPIA_RTE_TAGS) -
+        set(ALLOWED_GENERAL_OPPIA_RTE_TAGS)
     )
 
     if unknown_tags:
@@ -140,7 +141,7 @@ def parse_html(html_content: str) -> str:
             'HTML content contains invalid or unsupported tags: %s' % (
                 ', '.join(unknown_tags)))
 
-    for custom_tag_element in ALLOWED_CUSTOM_RTE_TAGS:
+    for custom_tag_element in ALLOWED_CUSTOM_OPPIA_RTE_TAGS:
         for element in soup.find_all(custom_tag_element):
             convert_custom_oppia_tags_to_generic_tags(element)
 

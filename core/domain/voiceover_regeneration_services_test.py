@@ -117,11 +117,11 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
 
     def test_should_able_to_raise_exception_for_invalid_tag(self) -> None:
         content_html = (
-            '<p><oppia-noninteractive-workedexample>'
-            '</oppia-noninteractive-workedexample></p>')
+            '<p><oppia-noninteractive-invalidtag>'
+            '</oppia-noninteractive-invalidtag></p>')
         exception_msg = (
             'HTML content contains invalid or unsupported tags: '
-            'oppia-noninteractive-workedexample'
+            'oppia-noninteractive-invalidtag'
         )
         with self.assertRaisesRegex(Exception, exception_msg):
             voiceover_regeneration_services.parse_html(content_html)
@@ -629,7 +629,8 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
                 rte_tag_names = list(custom_rte_tags_definition_dict.keys())
 
                 self.assertItemsEqual(
-                    voiceover_regeneration_services.ALLOWED_CUSTOM_RTE_TAGS,
+                    voiceover_regeneration_services
+                    .ALLOWED_CUSTOM_OPPIA_RTE_TAGS,
                     list(custom_rte_tag_to_names.keys()))
                 self.assertItemsEqual(
                     rte_tag_names,
