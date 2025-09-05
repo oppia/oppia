@@ -195,4 +195,27 @@ def run_acceptance_test(test_name: str) -> None:
 def is_current_branch_a_hotfix_branch() -> bool:
     """Stub function to satisfy pre-push hook. Returns False by default."""
     return False
+import subprocess
+
+def is_current_branch_a_hotfix_branch() -> bool:
+    """Stub for pre-push hook. Returns False by default."""
+    return False
+
+def start_subprocess_for_result(cmd_args, ignore_errors=False, print_cmd=False) -> str:
+    """Stub for pre-push hook. Runs a subprocess and returns its output."""
+    try:
+        if print_cmd:
+            print('Running:', ' '.join(cmd_args))
+        result = subprocess.run(
+            cmd_args,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=True,
+            text=True
+        )
+        return result.stdout.strip()
+    except subprocess.CalledProcessError as e:
+        if not ignore_errors:
+            raise
+        return e.stdout.strip()
     
