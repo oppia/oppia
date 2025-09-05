@@ -59,6 +59,7 @@ export class SchemaBasedHtmlEditorComponent
   @Input() disabled!: boolean;
   @Input() labelForFocusTarget!: string;
   @Input() uiConfig!: {add_element_text: string};
+  localValue!: string;
   @Output() localValueChange = new EventEmitter<string>();
   onChange: (val: string) => void = () => {};
 
