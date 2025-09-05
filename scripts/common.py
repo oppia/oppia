@@ -113,7 +113,8 @@ ELASTICSEARCH_VERSION = '7.17.0'
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
 CURR_DIR = os.path.abspath(os.getcwd())
-log_to_terminal(LogType.SUCCESS(f"Current Directory: {CURR_DIR}"))
+log_to_terminal(LogType.SUCCESS, f"Current Directory: {CURR_DIR}")
+
 
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
 OPPIA_TOOLS_DIR_ABS_PATH = os.path.abspath(OPPIA_TOOLS_DIR)
