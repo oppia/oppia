@@ -16,7 +16,15 @@
  * @fileoverview Component for a schema-based editor for HTML.
  */
 
-import {Component, forwardRef, Input, OnInit} from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  forwardRef,
+  Input,
+  OnInit,
+  Output,
+} from '@angular/core';
 import {
   NG_VALUE_ACCESSOR,
   NG_VALIDATORS,
@@ -51,9 +59,10 @@ export class SchemaBasedHtmlEditorComponent
   @Input() disabled!: boolean;
   @Input() labelForFocusTarget!: string;
   @Input() uiConfig!: {add_element_text: string};
-  localValue!: string;
+  @Output() localValueChange = new EventEmitter<string>();
   onChange: (val: string) => void = () => {};
 
+  constructor(private cdRef: ChangeDetectorRef) {}
   // Implemented as a part of ControlValueAccessor interface.
   writeValue(value: string): void {
     this.localValue = value;
@@ -80,10 +89,8 @@ export class SchemaBasedHtmlEditorComponent
   ngOnInit(): void {}
 
   updateValue(value: string): void {
-    this.localValue = value;
     this.onChange(value);
-    setTimeout(() => {
-      this.onChange(value);
-    });
+    this.localValueChange.emit(value);
+    this.cdRef.detectChanges();
   }
 }
