@@ -68,9 +68,9 @@ class IdentifyExplorationsWithDuplicateContentIdsJobTests(
         state1 = exploration.states['Introduction']
         state2 = exploration.states['State2']
 
-        duplicate_content_id = 'content_0'
-        state1.content.content_id = duplicate_content_id
-        state2.content.content_id = duplicate_content_id
+        state1.content.content_id = content_id_generator.generate(
+            translation_domain.ContentType.CONTENT)
+        state2.content.content_id = state1.content.content_id
 
         exploration.next_content_id_index = (
             content_id_generator.next_content_id_index)
@@ -80,7 +80,7 @@ class IdentifyExplorationsWithDuplicateContentIdsJobTests(
         self.assert_job_output_is([
             job_run_result.JobRunResult.as_stdout(
                 'Exploration exp_id (version 1) has duplicate content IDs: '
-                '{\'content_0\': [\'Introduction\', \'State2\']}'
+                '{\'content_2\': [\'Introduction\', \'State2\']}'
             )
         ])
 
@@ -132,7 +132,7 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         self.assert_job_output_is([
             job_run_result.JobRunResult.as_stdout(
                 f'Fixed exploration exp_id (version 1) - regenerated content '
-                f'IDs: [\'{original_content_id} -> content_2 in State2\']'
+                f'IDs: [\'{original_content_id} -> content_3 in State2\']'
             )
         ])
 
@@ -179,7 +179,7 @@ class AuditIdentifyExplorationsWithDuplicateContentIdsJobTests(
         self.assert_job_output_is([
             job_run_result.JobRunResult.as_stdout(
                 'Exploration exp_id (version 1) has duplicate content IDs: '
-                '{\'content_0\': [\'Introduction\', \'State2\']}'
+                '{\'content_2\': [\'Introduction\', \'State2\']}'
             )
         ])
 
@@ -221,7 +221,7 @@ class AuditFixExplorationsWithDuplicateContentIdsJobTests(
         self.assert_job_output_is([
             job_run_result.JobRunResult.as_stdout(
                 f'Fixed exploration exp_id (version 1) - regenerated content '
-                f'IDs: [\'{original_content_id} -> content_2 in State2\']'
+                f'IDs: [\'{original_content_id} -> content_3 in State2\']'
             )
         ])
 
