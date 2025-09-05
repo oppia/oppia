@@ -3,7 +3,7 @@
 #    python -m scripts.install_third_party_libs
 #
 # to update `requirements.txt` and `third_party/python_libs` accordingly.
-apache-beam[gcp]==2.54.0
+apache-beam[gcp]==2.59.0
 azure-cognitiveservices-speech==1.41.1
 beautifulsoup4==4.12.3
 bleach==4.1.0
@@ -32,7 +32,7 @@ Pillow==10.1.0
 pylatexenc==2.10
 pytest==7.4.4
 PyYAML==6.0
-redis==3.5.3
+redis==5.3.0
 requests==2.31.0
 requests-mock==1.9.3
 requests-toolbelt==0.9.1
