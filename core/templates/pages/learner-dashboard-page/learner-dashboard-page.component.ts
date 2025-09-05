@@ -553,7 +553,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
   }
 
   isShowRedesignedLearnerDashboardActive(): boolean {
-    return this.platFeatService.status.ShowRedesignedLearnerDashboard.isEnabled;
+    return true;
   }
 
   getDashboardTabHeading(): string {
