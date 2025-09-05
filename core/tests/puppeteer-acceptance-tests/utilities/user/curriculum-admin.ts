@@ -1034,7 +1034,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(assignSubtopicButton, {
       visible: true,
     });
-    await this.clickOn('Assign to Subtopic');
+    await this.clickOnElementWithText('Assign to Subtopic');
 
     await this.page.waitForSelector(subtopicNameSelector, {visible: true});
     await this.page.evaluate(
@@ -1089,7 +1089,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.waitForElementToBeClickable(selectRubricDifficultySelector);
     await this.select(selectRubricDifficultySelector, difficultyValue);
     await this.waitForStaticAssetsToLoad();
-    await this.clickOn(' + ADD EXPLANATION FOR DIFFICULTY ');
+    await this.clickOnElementWithText('+ ADD EXPLANATION FOR DIFFICULTY');
     await this.type(rteSelector, explanation);
     await this.clickOn(saveRubricExplanationButton);
 

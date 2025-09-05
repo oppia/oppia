@@ -299,12 +299,12 @@ export class Moderator extends BaseUser {
    * @param {string} explorationId - The ID of the exploration to feature.
    */
   async featureActivity(explorationId: string | null): Promise<void> {
-    await this.clickOn(' Add element ');
+    await this.clickOnElementWithText(' Add element ');
 
     await this.page.waitForSelector(explorationIDField);
     await this.page.type(explorationIDField, explorationId as string);
     await this.page.keyboard.press('Enter');
-    await this.clickOn(' Save Featured Activities ');
+    await this.clickOnElementWithText(' Save Featured Activities ');
 
     try {
       await this.page.waitForFunction(
@@ -352,7 +352,7 @@ export class Moderator extends BaseUser {
     await this.waitForElementToBeClickable(deleteButton);
     await deleteButton.click();
 
-    await this.clickOn(' Save Featured Activities ');
+    await this.clickOnElementWithText(' Save Featured Activities ');
 
     try {
       await this.page.waitForFunction(

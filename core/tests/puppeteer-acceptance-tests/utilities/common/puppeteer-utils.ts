@@ -351,10 +351,10 @@ export class BaseUser {
   async signInWithEmail(email: string): Promise<void> {
     await this.goto(testConstants.URLs.Home);
     if (!this.userHasAcceptedCookies) {
-      await this.clickOn('OK');
+      await this.clickOnElementWithText('OK');
       this.userHasAcceptedCookies = true;
     }
-    await this.clickOn('Sign in');
+    await this.clickOnElementWithText('Sign in');
     await this.type(testConstants.SignInDetails.inputField, email);
     await this.clickAndWaitForNavigation('Sign In');
   }
@@ -481,6 +481,23 @@ export class BaseUser {
       await element.click();
       showMessage(`Element (selector: ${selector}) is clicked.`);
     }
+  }
+
+  /**
+   * Clicks on the element with the given text.
+   * @param text The text of the element to click on.
+   */
+  async clickOnElementWithText(text: string): Promise<void> {
+    const element = await this.page.waitForXPath(
+      `//*[contains(normalize-space(text()), "${text}")]`
+    );
+
+    if (!element) {
+      throw new Error(`Element not found for text: ${text}`);
+    }
+    await this.waitForElementToBeClickable(element);
+    await element.click();
+    showMessage(`Element (text: ${text}) is clicked.`);
   }
 
   /**

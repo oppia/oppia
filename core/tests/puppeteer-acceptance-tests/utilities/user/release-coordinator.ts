@@ -298,7 +298,7 @@ export class ReleaseCoordinator extends BaseUser {
    * Saves the promo bar message.
    */
   async savePromoBarMessage(): Promise<void> {
-    await this.clickOn(' Save changes ');
+    await this.clickOnElementWithText(' Save changes ');
     await this.page.waitForSelector(actionStatusMessageSelector, {
       visible: true,
     });
@@ -331,7 +331,7 @@ export class ReleaseCoordinator extends BaseUser {
    * Clicks on the 'Flush Cache' button.
    */
   async flushCache(): Promise<void> {
-    await this.clickOn('Flush Cache');
+    await this.clickOnElementWithText('Flush Cache');
     await this.expectActionStatusMessageToBe('Success! Memory Cache Flushed.');
   }
 
@@ -498,7 +498,7 @@ export class ReleaseCoordinator extends BaseUser {
       const pages = await this.browserObject.pages();
       this.page = pages[pages.length - 1];
 
-      await this.clickOn(' View Output ');
+      await this.clickOnElementWithText(' View Output ');
       await this.page.waitForSelector(beamJobRunOutputSelector, {
         visible: true,
       });

@@ -116,7 +116,7 @@ describe('Blog Post Writer', function () {
     // Close the thumbnail image upload modal. If the viewport is mobile, the
     // cancel button isn't visible as the modal is embedded in page itself.
     if (!blogPostWriter.isViewportAtMobileWidth()) {
-      await blogPostWriter.clickOn('Cancel');
+      await blogPostWriter.clickOnElementWithText('Cancel');
     }
 
     // Update blog title of less than 5 characters.

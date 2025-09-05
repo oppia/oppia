@@ -370,7 +370,7 @@ export class SuperAdmin extends BaseUser {
    * @param {string[]} users - An array of usernames to check.
    */
   async expectRoleToHaveAssignedUsers(users: string[]): Promise<void> {
-    await this.clickOn(' Assigned users ');
+    await this.clickOnElementWithText(' Assigned users ');
 
     for (const user of users) {
       try {
@@ -548,7 +548,7 @@ export class SuperAdmin extends BaseUser {
     await this.page.waitForSelector(generateExplorationButton, {
       visible: true,
     });
-    await this.clickOn(' Generate Explorations ');
+    await this.clickOnElementWithText(' Generate Explorations ');
 
     await this.waitForNetworkIdle();
     await this.expectActionStatusMessageToBe(
@@ -582,7 +582,7 @@ export class SuperAdmin extends BaseUser {
    */
   async loadDummyNewStructuresData(): Promise<void> {
     await this.navigateToAdminPageActivitiesTab();
-    await this.clickOn(' Load Data ');
+    await this.clickOnElementWithText(' Load Data ');
 
     await this.waitForNetworkIdle();
     await this.expectActionStatusMessageToBe(
@@ -638,7 +638,7 @@ export class SuperAdmin extends BaseUser {
    */
   async generateDummySkill(): Promise<void> {
     await this.navigateToAdminPageActivitiesTab();
-    await this.clickOn(' Generate Data ');
+    await this.clickOnElementWithText(' Generate Data ');
 
     await this.waitForNetworkIdle();
     await this.expectActionStatusMessageToBe(

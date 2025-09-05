@@ -373,7 +373,7 @@ export class TopicManager extends BaseUser {
       }
     }
     await this.clickOn(deleteSkillButton);
-    await this.clickOn('Delete skill');
+    await this.clickOnElementWithText('Delete skill');
     await this.expectElementToBeVisible(removeSkillModalHeaderSelector, false);
   }
 
@@ -772,7 +772,7 @@ export class TopicManager extends BaseUser {
    */
   async verifyStatusOfPracticeTab(expectedStatus: string): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.clickOn('Subtopics');
+      await this.clickOnElementWithText('Subtopics');
     }
     try {
       const practiceTab = await this.page.$(practiceTabToggle);
@@ -2177,7 +2177,7 @@ export class TopicManager extends BaseUser {
     await this.waitForElementToBeClickable(selectRubricDifficultySelector);
     await this.select(selectRubricDifficultySelector, difficultyValue);
     await this.waitForStaticAssetsToLoad();
-    await this.clickOn(' + ADD EXPLANATION FOR DIFFICULTY ');
+    await this.clickOnElementWithText(' + ADD EXPLANATION FOR DIFFICULTY ');
     await this.type(rteSelector, explanation);
     await this.clickOn(saveRubricExplanationButton);
 
@@ -2224,7 +2224,7 @@ export class TopicManager extends BaseUser {
    * Previews a concept card.
    */
   async previewConceptCard(): Promise<void> {
-    await this.clickOn(' Preview Concept Card ');
+    await this.clickOnElementWithText(' Preview Concept Card ');
     await this.expectElementToBeVisible(conceptCardPreviewModelSelector);
   }
 
@@ -2269,9 +2269,9 @@ export class TopicManager extends BaseUser {
     if (!this.isViewportAtMobileWidth()) {
       showMessage('Skipping opening dropdowns since we are in desktop view');
     }
-    await this.clickOn('Misconceptions');
-    await this.clickOn(' Prerequisite Skills ');
-    await this.clickOn('Rubrics');
+    await this.clickOnElementWithText('Misconceptions');
+    await this.clickOnElementWithText(' Prerequisite Skills ');
+    await this.clickOnElementWithText('Rubrics');
 
     // Post Check: As aim of function is to open all mobile dropdowns, we are checking number of mobile collapsible cards.
     const mobileCollapsibleCards = await this.page.$$(

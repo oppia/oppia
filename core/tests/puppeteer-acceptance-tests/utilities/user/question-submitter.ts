@@ -491,7 +491,7 @@ export class QuestionSubmitter extends BaseUser {
     await this.isElementVisible(addInteractionButton);
 
     await this.clickOn(addInteractionButton);
-    await this.clickOn('Image Region');
+    await this.clickOnElementWithText('Image Region');
     await this.clickOn(uploadImageButton);
     await this.uploadFile(imageToUpload);
     await this.clickOn(useTheUploadImageButton);

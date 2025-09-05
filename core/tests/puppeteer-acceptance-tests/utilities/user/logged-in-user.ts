@@ -516,7 +516,7 @@ export class LoggedInUser extends BaseUser {
           throw error;
         }
       }
-      await this.clickOn('Stories');
+      await this.clickOnElementWithText('Stories');
 
       await this.page.waitForSelector(progressTabSectionInLearnerDashboard, {
         visible: true,
@@ -786,10 +786,10 @@ export class LoggedInUser extends BaseUser {
   async navigateToSignUpPage(): Promise<void> {
     await this.goto(homePageUrl);
     if (!this.userHasAcceptedCookies) {
-      await this.clickOn('OK');
+      await this.clickOnElementWithText('OK');
       this.userHasAcceptedCookies = true;
     }
-    await this.clickOn('Sign in');
+    await this.clickOnElementWithText('Sign in');
 
     await this.page.waitForSelector(loginPage, {
       visible: true,
@@ -864,7 +864,7 @@ export class LoggedInUser extends BaseUser {
       invalidEmailErrorContainer
     );
     if (!invalidEmailErrorContainerElement) {
-      await this.clickOn('Sign In');
+      await this.clickOnElementWithText('Sign In');
       await this.page.waitForNavigation({waitUntil: 'networkidle0'});
 
       // Post Check: Check if the login page is closed. We can't check if user
@@ -2723,7 +2723,7 @@ export class LoggedInUser extends BaseUser {
 
     await this.waitForElementToBeClickable(addNewGoalButtonSelector);
     await this.page.click(addNewGoalButtonSelector);
-    await this.clickOn('Remove');
+    await this.clickOnElementWithText('Remove');
 
     await this.expectElementToBeVisible(removeModalContainerSelector, false);
   }

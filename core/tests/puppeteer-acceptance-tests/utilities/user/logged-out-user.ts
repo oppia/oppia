@@ -1677,7 +1677,7 @@ export class LoggedOutUser extends BaseUser {
   async clickCreateOneHereLinkOnGetStartedPage(): Promise<void> {
     await this.page.waitForXPath('//a[contains(text(),"create one here")]');
     const pageTarget = this.page.target();
-    await this.clickOn('create one here');
+    await this.clickOnElementWithText('create one here');
     const newTarget = await this.browserObject.waitForTarget(
       target => target.opener() === pageTarget
     );
@@ -1751,7 +1751,10 @@ export class LoggedOutUser extends BaseUser {
    */
   async clickForumLinkOnCreatorGuidelinesPage(): Promise<void> {
     await this.page.waitForXPath('//a[contains(text(),"forum")]');
-    await Promise.all([this.page.waitForNavigation(), this.clickOn('forum')]);
+    await Promise.all([
+      this.page.waitForNavigation(),
+      this.clickOnElementWithText('forum'),
+    ]);
     await this.waitForNetworkIdle();
 
     expect(this.page.url()).toBe(googleGroupsOppiaUrl);
@@ -1765,7 +1768,7 @@ export class LoggedOutUser extends BaseUser {
 
     await Promise.all([
       this.page.waitForNavigation(),
-      await this.clickOn('Design Tips'),
+      await this.clickOnElementWithText('Design Tips'),
     ]);
 
     expect(this.page.url()).toBe(explorationDesignTipsUrl);
@@ -1781,7 +1784,7 @@ export class LoggedOutUser extends BaseUser {
 
     await Promise.all([
       this.page.waitForNavigation(),
-      await this.clickOn('Create an Exploration'),
+      await this.clickOnElementWithText('Create an Exploration'),
     ]);
 
     expect(this.page.url()).toBe(creatorDashboardCreateModeUrl);
@@ -1797,7 +1800,7 @@ export class LoggedOutUser extends BaseUser {
 
     await Promise.all([
       this.page.waitForNavigation(),
-      await this.clickOn('Browse our Explorations'),
+      await this.clickOnElementWithText('Browse our Explorations'),
     ]);
 
     expect(this.page.url()).toBe(communityLibraryUrl);
@@ -1845,7 +1848,7 @@ export class LoggedOutUser extends BaseUser {
     );
     await Promise.all([
       this.page.waitForNavigation({waitUntil: 'networkidle0'}),
-      this.clickOn('https://www.oppia.org'),
+      this.clickOnElementWithText('https://www.oppia.org'),
     ]);
 
     expect(this.page.url()).toBe(homeUrl);
@@ -3954,7 +3957,7 @@ export class LoggedOutUser extends BaseUser {
     const isLoginPromptContainerPresent =
       await this.page.$(loginPromptContainer);
     if (isLoginPromptContainerPresent) {
-      await this.clickOn('SKIP');
+      await this.clickOnElementWithText('SKIP');
     }
 
     await this.page.waitForSelector(loginPromptContainer, {
@@ -4276,7 +4279,7 @@ export class LoggedOutUser extends BaseUser {
       await this.clickOn(stayAnonymousCheckbox);
     }
 
-    await this.clickOn('Submit');
+    await this.clickOnElementWithText('Submit');
 
     try {
       await this.page.waitForFunction(
@@ -5094,7 +5097,7 @@ export class LoggedOutUser extends BaseUser {
       visible: true,
     });
     await this.type(testConstants.SignInDetails.inputField, email);
-    await this.clickOn('Sign In');
+    await this.clickOnElementWithText('Sign In');
     await this.page.waitForNavigation({waitUntil: 'networkidle0'});
     await this.type('input.e2e-test-username-input', username);
     await this.clickOn('input.e2e-test-agree-to-terms-checkbox');
@@ -5120,7 +5123,7 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(loginButtonSelector, {
       visible: true,
     });
-    await this.clickOn('Sign in');
+    await this.clickOnElementWithText('Sign in');
 
     await this.goThoroughSignUpProcess(email, username);
   }
@@ -5553,7 +5556,7 @@ export class LoggedOutUser extends BaseUser {
       await this.clickOn(stayAnonymousCheckbox);
     }
 
-    await this.clickOn('Submit');
+    await this.clickOnElementWithText('Submit');
 
     if (verifyFeedbackPopup) {
       await this.verifyFeedbackSubmissionSuccess();

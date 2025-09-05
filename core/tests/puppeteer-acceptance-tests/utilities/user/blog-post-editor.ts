@@ -613,7 +613,7 @@ export class BlogPostEditor extends BaseUser {
    * This function publishes the blog post.
    */
   async publishTheBlogPost(): Promise<void> {
-    await this.clickOn('PUBLISH');
+    await this.clickOnElementWithText('PUBLISH');
     await this.expectElementToBeVisible(confirmButtonSelector);
     await this.clickOn(confirmButtonSelector);
     await this.expectElementToBeVisible(confirmButtonSelector, false);
@@ -624,7 +624,7 @@ export class BlogPostEditor extends BaseUser {
    * This function creates a new blog post with the given title.
    */
   async createNewBlogPostWithTitle(newBlogPostTitle: string): Promise<void> {
-    await this.clickOn('NEW POST');
+    await this.clickOnElementWithText('NEW POST');
     await this.expectPublishButtonToBeDisabled();
 
     await this.uploadBlogPostThumbnailImage();
@@ -703,7 +703,7 @@ export class BlogPostEditor extends BaseUser {
    * This function deletes a published blog post with the given title.
    */
   async deletePublishedBlogPostWithTitle(blogPostTitle: string): Promise<void> {
-    await this.clickOn('PUBLISHED');
+    await this.clickOnElementWithText('PUBLISHED');
     const allPublishedBlogPosts = await this.page.$$(
       listOfBlogsInBlogDashboard
     );
@@ -778,7 +778,7 @@ export class BlogPostEditor extends BaseUser {
    */
   async navigateToPublishTab(): Promise<void> {
     await this.goto(blogDashboardUrl);
-    await this.clickOn('PUBLISHED');
+    await this.clickOnElementWithText('PUBLISHED');
 
     await this.expectElementToBeVisible(publisedBlogsTabContainerSelector);
     showMessage('Navigated to publish tab.');
@@ -825,7 +825,7 @@ export class BlogPostEditor extends BaseUser {
     blogPostTitle: string
   ): Promise<void> {
     await this.goto(blogDashboardUrl);
-    await this.clickOn('PUBLISHED');
+    await this.clickOnElementWithText('PUBLISHED');
     await this.waitForPageToFullyLoad();
 
     const allPublishedBlogPosts = await this.page.$$(

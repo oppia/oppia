@@ -3012,7 +3012,7 @@ export class ExplorationEditor extends BaseUser {
     await this.expectModalTitleToBe('Choose Interaction');
 
     // Click on image region interaction.
-    await this.clickOn('Image Region');
+    await this.clickOnElementWithText('Image Region');
     await this.expectCustomizeInteractionTitleToBe(
       'Customize Interaction (Image Region)'
     );
@@ -3902,7 +3902,7 @@ export class ExplorationEditor extends BaseUser {
     let responseTabs = await this.page.$$(responseGroupDiv);
 
     await responseTabs[responseIndex].click();
-    await this.clickOn('Tag with misconception');
+    await this.clickOnElementWithText('Tag with misconception');
 
     await this.page.waitForSelector(misconceptionTitle, {
       timeout: 5000,
@@ -3919,7 +3919,7 @@ export class ExplorationEditor extends BaseUser {
       }
     }
 
-    await this.clickOn('Done');
+    await this.clickOnElementWithText('Done');
     await this.page.waitForSelector(leaveTranslationsAsIsButton, {
       visible: true,
     });
@@ -3970,7 +3970,7 @@ export class ExplorationEditor extends BaseUser {
         await misconceptionTitle.click();
       }
     }
-    await this.clickOn('Save Misconception');
+    await this.clickOnElementWithText('Save Misconception');
     await this.page.waitForSelector(leaveTranslationsAsIsButton, {
       visible: true,
     });
@@ -4771,7 +4771,7 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(stayAnonymousCheckbox);
     }
 
-    await this.clickOn('Submit');
+    await this.clickOnElementWithText('Submit');
 
     try {
       await this.page.waitForFunction(
@@ -6359,7 +6359,7 @@ export class ExplorationEditor extends BaseUser {
 
     for (let i = 0; i < tabContents.length; i++) {
       if (i > 1) {
-        await this.clickOn('.e2e-test-add-list-entry');
+        await this.clickOnElementWithText('.e2e-test-add-list-entry');
       }
       await this.clearAllTextFrom(
         `oppia-rte-helper-model input.e2e-test-text-input:nth-child(${i + 1})`
