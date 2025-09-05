@@ -191,3 +191,8 @@ def run_acceptance_test(test_name: str) -> None:
         LogType.INFO
     )
     os.system(f'{sys.executable} {test_path}')
+
+def is_current_branch_a_hotfix_branch() -> bool:
+    """Stub function to satisfy pre-push hook. Returns False by default."""
+    return False
+    
