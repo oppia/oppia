@@ -142,9 +142,20 @@ class Constants(dict):  # type: ignore[type-arg]
     def __getattr__(self, name: str) -> Any:
         return self[name]
 
+    # This is needed for pickling when instances of Constants are passed as
+    # part of predicates in Beam jobs.
+    def __getstate__(self):
+        return self.__dict__
+
+    # This is needed for unpickling when instances of Constants are passed as
+    # part of predicates in Beam jobs.
+    def __setstate__(self, d):
+        self.__dict__ = d
+
 
 constants = Constants(parse_json_from_ts(  # pylint:disable=invalid-name
     get_package_file_contents('assets', 'constants.ts')))
+
 
 release_constants = Constants( # pylint:disable=invalid-name
     json.loads(get_package_file_contents('assets', 'release_constants.json'))
