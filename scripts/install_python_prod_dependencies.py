@@ -43,7 +43,9 @@ GIT_DIRECT_URL_REQUIREMENT_PATTERN: Final = (
 # These are libraries represented in requirements.txt using hyphens after the
 # first word, but in their METADATA files using a period after the first word
 # instead.
-LIBRARY_PREFIXES_WITH_INITIAL_PERIOD: Final = ['backports', 'jaraco', 'keyrings']
+LIBRARY_PREFIXES_WITH_INITIAL_PERIOD: Final = [
+    'backports', 'jaraco', 'keyrings']
+
 
 def normalize_python_library_name(library_name: str) -> str:
     """Returns a normalized version of the python library name.
