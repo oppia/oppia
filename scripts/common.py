@@ -1,1190 +1,193 @@
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS-IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+"""Common utility functions used by multiple Python scripts in Oppia."""
 
-"""Common utility functions and classes used by multiple Python scripts."""
-
-from __future__ import annotations
-
-import contextlib
-import errno
-import getpass
-from http import client
-import io
 import os
-import platform
-import re
-import shutil
-import socket
-import ssl
-import subprocess
 import sys
-import time
-from urllib import error as urlerror
-from urllib import request as urlrequest
-from core import feconf
-from scripts import servers
 import enum
-from typing import Dict, Final, Generator, List, Optional, Tuple, Union
-
-# Add third_party to path. Some scripts access feconf even before
-# python_libs is added to path.
-_THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
-sys.path.insert(0, _THIRD_PARTY_PATH)
-
-from core import utils  # pylint: disable=wrong-import-position
+from typing import List, Optional
 
 AFFIRMATIVE_CONFIRMATIONS = ['y', 'ye', 'yes']
-
 CURRENT_PYTHON_BIN = sys.executable
 
-# Node version.
 NODE_VERSION = '16.13.0'
-
-# NB: Please ensure that the version is consistent with the version in .yarnrc.
 YARN_VERSION = '1.22.15'
-
-# IMPORTANT STEPS FOR DEVELOPERS TO UPGRADE REDIS:
-# 1. Download the new version of the redis cli.
-# 2. Extract the cli in the folder that it was downloaded, most likely
-#    Downloads/.
-# 3. Change directories into the folder you extracted, titled
-#    redis-<new version>/ and change into that directory:
-#    cd redis-<new version>/
-# 4. From the top level of the redis-<new version> directory,
-#    run `make test`.
-# 5. All of the tests should pass with an [ok] status with no error codes. The
-#    final output should be 'All tests pass'.
-# 6. Be sure to leave a note in the PR description to confirm that you have read
-#    this message, and that all of the `make test` tests pass before you commit
-#    the upgrade to develop.
-# 7. If any tests fail, DO NOT upgrade to this newer version of the redis cli.
-class LogType(enum.Enum):
-    """Enum representing different log types."""
-    INFO = "INFO"
-    ERROR = "ERROR"
-    SUCCESS = "SUCCESS"
-    WARNING = "WARNING"
-
-# ANSI color codes for terminal output
-_LOG_COLORS = {
-    LogType.INFO: "\033[34m",  # Blue
-    LogType.ERROR: "\033[31m",  # Red
-    LogType.SUCCESS: "\033[32m",  # Green
-    LogType.WARNING: "\033[33m",  # Yellow
-}
-RESET_COLOR = "\033[0m"
-def process_logs_and_highlight_errors(log: str) -> str:
-    """Processes logs and highlights errors or warnings if type is not specified."""
-    error_keywords = ["ERROR", "FAIL", "TimeoutError"]
-    warning_keywords = ["WARN"]
-
-    if any(keyword in log for keyword in error_keywords):
-        return f"{_LOG_COLORS[LogType.ERROR]}{log}{RESET_COLOR}"
-    if any(keyword in log for keyword in warning_keywords):
-        return f"{_LOG_COLORS[LogType.WARNING]}{log}{RESET_COLOR}"
-    return log
-def log_to_terminal(message: str, message_type: LogType = None) -> None:
-    """
-    Logs a message to the terminal with optional color formatting.
-    
-    Args:
-        message (str): The message to be printed.
-        message_type (LogType, optional): The type of log message (INFO, ERROR, etc.).
-                                         If not provided, uses process_logs_and_highlight_errors().
-    """
-    if message_type:
-        color = _LOG_COLORS.get(message_type, "")
-        print(f"{color}{message}{RESET_COLOR}")
-    else:
-        print(process_logs_and_highlight_errors(message))
 REDIS_CLI_VERSION = '6.2.4'
 ELASTICSEARCH_VERSION = '7.17.0'
-
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
+
 CURR_DIR = os.path.abspath(os.getcwd())
-log_to_terminal(LogType.SUCCESS, f"Current Directory: {CURR_DIR}")
 
-
-OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
-OPPIA_TOOLS_DIR_ABS_PATH = os.path.abspath(OPPIA_TOOLS_DIR)
-log_to_terminal(LogType.SUCCESS(f"Oppia Tools Directory: {OPPIA_TOOLS_DIR_ABS_PATH}"))
-
+OPPIA_TOOLS_DIR = os.path.abspath(
+    os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
+)
 THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
-THIRD_PARTY_PYTHON_LIBS_DIR = os.path.join(THIRD_PARTY_DIR, 'python_libs')
-log_to_terminal(LogType.INFO(f"Third Party Directory: {THIRD_PARTY_DIR}"))
-log_to_terminal(LogType.INFO(f"Third Party Python Libs Directory: {THIRD_PARTY_PYTHON_LIBS_DIR}"))
+THIRD_PARTY_PYTHON_LIBS_DIR = os.path.join(
+    THIRD_PARTY_DIR, 'python_libs'
+)
 
 GOOGLE_CLOUD_SDK_HOME = (
     '/app/vm_deps/google-cloud-sdk'
-    if feconf.OPPIA_IS_DOCKERIZED
+    if os.environ.get('OPPIA_IS_DOCKERIZED') == 'True'
     else os.path.join(
-        OPPIA_TOOLS_DIR_ABS_PATH,
-        'google-cloud-sdk-500.0.0',
-        'google-cloud-sdk'
+        OPPIA_TOOLS_DIR, 'google-cloud-sdk-500.0.0', 'google-cloud-sdk'
     )
 )
-log_to_terminal(LogType.INFO(f"Google Cloud SDK Home: {GOOGLE_CLOUD_SDK_HOME}"))
+
 GOOGLE_APP_ENGINE_SDK_HOME = os.path.join(
-    GOOGLE_CLOUD_SDK_HOME, 'platform', 'google_appengine')
+    GOOGLE_CLOUD_SDK_HOME, 'platform', 'google_appengine'
+)
 GOOGLE_CLOUD_SDK_BIN = os.path.join(GOOGLE_CLOUD_SDK_HOME, 'bin')
-WEBPACK_BIN_PATH = (
-    os.path.join(CURR_DIR, 'node_modules', 'webpack', 'bin', 'webpack.js'))
-NG_BIN_PATH = (
-    os.path.join(CURR_DIR, 'node_modules', '.bin', 'ng'))
-DEV_APPSERVER_PATH = (
-    os.path.join(GOOGLE_CLOUD_SDK_BIN, 'dev_appserver.py'))
+
+WEBPACK_BIN_PATH = os.path.join(
+    CURR_DIR, 'node_modules', 'webpack', 'bin', 'webpack.js'
+)
+NG_BIN_PATH = os.path.join(CURR_DIR, 'node_modules', '.bin', 'ng')
+
+DEV_APPSERVER_PATH = os.path.join(GOOGLE_CLOUD_SDK_BIN, 'dev_appserver.py')
 GCLOUD_PATH = os.path.join(GOOGLE_CLOUD_SDK_BIN, 'gcloud')
-NODE_PATH = '/usr' if feconf.OPPIA_IS_DOCKERIZED else os.path.join(
-    OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
+
+NODE_PATH = (
+    '/usr'
+    if os.environ.get('OPPIA_IS_DOCKERIZED') == 'True'
+    else os.path.join(OPPIA_TOOLS_DIR, f'node-{NODE_VERSION}')
+)
 NODE_MODULES_PATH = os.path.join(CURR_DIR, 'node_modules')
 FRONTEND_DIR = os.path.join(CURR_DIR, 'core', 'templates')
-YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, 'yarn-%s' % YARN_VERSION)
-FIREBASE_PATH = os.path.join(
-    NODE_MODULES_PATH, 'firebase-tools', 'lib', 'bin', 'firebase.js')
-    
-OS_NAME = platform.system()
-ARCHITECTURE = platform.machine()
-REDIS_SERVER_PATH = os.path.join(
-    OPPIA_TOOLS_DIR, 'redis-cli-%s' % REDIS_CLI_VERSION,
-    'src', 'redis-server')
-REDIS_CLI_PATH = os.path.join(
-    OPPIA_TOOLS_DIR, 'redis-cli-%s' % REDIS_CLI_VERSION,
-    'src', 'redis-cli')
-# Directory for storing/fetching data related to the Cloud Datastore emulator.
-CLOUD_DATASTORE_EMULATOR_DATA_DIR = (
-    os.path.join(CURR_DIR, os.pardir, 'cloud_datastore_emulator_cache'))
-# Directory for storing/fetching data related to the Firebase emulator.
-FIREBASE_EMULATOR_CACHE_DIR = (
-    os.path.join(CURR_DIR, os.pardir, 'firebase_emulator_cache'))
+YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, f'yarn-{YARN_VERSION}')
 
-ES_PATH = os.path.join(
-    OPPIA_TOOLS_DIR, 'elasticsearch-%s' % ELASTICSEARCH_VERSION)
-ES_PATH_CONFIG_DIR = os.path.join(
-    OPPIA_TOOLS_DIR, 'elasticsearch-%s' % ELASTICSEARCH_VERSION, 'config')
-ES_PATH_DATA_DIR = os.path.join(
-    OPPIA_TOOLS_DIR, 'elasticsearch-%s' % ELASTICSEARCH_VERSION, 'data')
+ACCEPTANCE_TEST_DIR = os.path.join(
+    CURR_DIR, 'core', 'tests', 'acceptance_tests'
+)
 
-RELEASE_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)$'
-RELEASE_MAINTENANCE_BRANCH_REGEX = r'release-maintenance-(\d+\.\d+\.\d+)$'
-HOTFIX_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)-hotfix-[1-9]+$'
-TEST_BRANCH_REGEX = r'test-[A-Za-z0-9-]*$'
-USER_PREFERENCES: Dict[str, Optional[str]] = {'open_new_tab_in_browser': None}
 
-FECONF_PATH = os.path.join('core', 'feconf.py')
-CONSTANTS_FILE_PATH = os.path.join('assets', 'constants.ts')
-APP_DEV_YAML_PATH = os.path.join('app_dev.yaml')
-MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 5 * 60
-MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS = 60
-REDIS_CONF_PATH = os.path.join('redis.conf')
-# Path for the dump file the redis server autogenerates. It contains data
-# used by the Redis server.
-REDIS_DUMP_PATH = os.path.join(CURR_DIR, 'dump.rdb')
-# The requirements.txt file is auto-generated and contains a deterministic list
-# of all libraries and versions that should exist in the
-# 'third_party/python_libs' directory.
-# NOTE: Developers should NOT modify this file.
-COMPILED_REQUIREMENTS_FILE_PATH = os.path.join(CURR_DIR, 'requirements.txt')
-# The precompiled requirements file is the one that developers should be
-# modifying. It is the file that we use to recompile the
-# "requirements.txt" file so that all installations using "requirements.txt"
-# will be identical.
-REQUIREMENTS_FILE_PATH = os.path.join(CURR_DIR, 'requirements.in')
+def is_affirmative(user_input: str) -> bool:
+    """Return True if the user input is an affirmative string."""
+    return user_input.lower() in AFFIRMATIVE_CONFIRMATIONS
 
-WEBPACK_DEV_CONFIG = 'webpack.dev.config.ts'
-WEBPACK_DEV_SOURCE_MAPS_CONFIG = 'webpack.dev.sourcemap.config.ts'
-WEBPACK_PROD_CONFIG = 'webpack.prod.config.ts'
-WEBPACK_PROD_SOURCE_MAPS_CONFIG = 'webpack.prod.sourcemap.config.ts'
-ANALYTICS_CONSTANTS_FILE_PATH = (
-    os.path.join('assets', 'analytics-constants.json'))
 
-PORTSERVER_SOCKET_FILEPATH = os.path.join(os.getcwd(), 'portserver.socket')
+def get_node_path() -> str:
+    """Return the path to the Node.js binary."""
+    return NODE_PATH
 
-WEBDRIVER_HOME_PATH = os.path.join(NODE_MODULES_PATH, 'webdriver-manager')
-WEBDRIVER_MANAGER_BIN_PATH = (
-    os.path.join(WEBDRIVER_HOME_PATH, 'bin', 'webdriver-manager'))
-WEBDRIVER_PROVIDER_PATH = (
-    os.path.join(WEBDRIVER_HOME_PATH, 'dist', 'lib', 'provider'))
-GECKO_PROVIDER_FILE_PATH = (
-    os.path.join(WEBDRIVER_PROVIDER_PATH, 'geckodriver.js'))
-CHROME_PROVIDER_FILE_PATH = (
-    os.path.join(WEBDRIVER_PROVIDER_PATH, 'chromedriver.js'))
 
-PROTRACTOR_BIN_PATH = (
-    os.path.join(NODE_MODULES_PATH, 'protractor', 'bin', 'protractor'))
-PROTRACTOR_CONFIG_FILE_PATH = (
-    os.path.join('core', 'tests', 'protractor.conf.js'))
-WEBDRIVERIO_CONFIG_FILE_PATH = (
-    os.path.join('core', 'tests', 'wdio.conf.js'))
-NODEMODULES_WDIO_BIN_PATH = (
-    os.path.join(NODE_MODULES_PATH, '.bin', 'wdio'))
+def get_node_modules_path() -> str:
+    """Return the path to the node_modules directory."""
+    return NODE_MODULES_PATH
 
-DIRS_TO_ADD_TO_SYS_PATH = [
-    GOOGLE_APP_ENGINE_SDK_HOME,
-    CURR_DIR,
-    THIRD_PARTY_PYTHON_LIBS_DIR,
-]
 
-CHROME_PATHS = [
-    # Unix.
-    '/usr/bin/google-chrome',
-    '/usr/bin/chromium-browser',
-    '/usr/bin/google-chrome-stable',
-    # Arch Linux.
-    '/usr/bin/brave',
-    '/usr/bin/chromium',
-    # Windows.
-    '/c/Program Files (x86)/Google/Chrome/Application/chrome.exe',
-    'c:\\Program Files (x86)\\Google\\Chrome\\Application\\Chrome.exe',
-    # WSL.
-    '/mnt/c/Program Files (x86)/Google/Chrome/Application/chrome.exe',
-    # Mac OS.
-    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
-]
+def get_yarn_path() -> str:
+    """Return the path to the Yarn binary."""
+    return YARN_PATH
 
-log_to_terminal(LogType.info("Supported Chrome Paths:"))
-for path in CHROME_PATHS:
-    log_to_terminal(LogType.success(f"  - {path}"))
 
-ACCEPTANCE_TEST_SUITE_NAMES = [
-    'blog-admin/assign-roles-to-users-and-change-tag-properties',
-    'blog-editor/create-and-delete-draft-blog-post',
-    'blog-editor/create-and-publish-a-blog-post-with-required-details',
-    'blog-editor/try-to-publish-a-duplicate-blog-post-and-get-blocked',
-    'curriculum-admin/create-publish-unpublish-and-delete-topic-and-skill',
-    'curriculum-admin/create-edit-and-delete-classroom',
-    'exploration-editor/create-exploration-and-change-basic-settings',
-    'exploration-editor/manage-exploration-misconceptions',
-    'exploration-editor/modify-translations-through-modal',
-    'exploration-editor/load-complete-and-restart-exploration-preview',
-    'exploration-editor/publish-the-exploration-with-an-interaction',
-    'exploration-editor/save-draft-publish-and-discard-the-changes',
-    'logged-in-user/subscribe-to-creator-and-view-all-',
-    'explorations-by-that-creator',
-    'logged-in-user/create-and-delete-account',
-    'logged-in-user/save-an-exploration-to-play-later',
-    'logged-in-user/restart-or-continue-exploration-on-revisit',
-    'logged-in-user/edit-profile-preferences-and-export-their-account',
-    'logged-in-user/set-language-to-rtl-and-navigate-through-site',
-    'logged-in-user/give-feedback-rate-and-report-an-exploration',
-    'logged-in-user/manage-goals-progress-and-lessons-from-learner-dashboard',
-    'logged-in-user/deny-access-to-pages-without-additional-roles',
-    'logged-out-user/check-all-user-flow-of-donor',
-    'logged-out-user/check-all-user-flow-of-parent-teacher',
-    'logged-out-user/check-all-user-flow-of-partner',
-    'logged-out-user/check-all-user-flow-of-volunteer',
-    'logged-out-user/click-all-buttons-on-about-page',
-    'logged-out-user/click-all-buttons-on-contact-us-page',
-    'logged-out-user/click-all-buttons-on-donation-thanks-page',
-    'logged-out-user/click-all-buttons-on-navbar',
-    'logged-out-user/click-all-buttons-on-partnerships-page',
-    'logged-out-user/click-all-buttons-on-teach-page',
-    'logged-out-user/click-all-buttons-on-volunteer-page',
-    'logged-out-user/click-all-links-in-oppia-footer',
-    'logged-out-user/click-all-links-on-creator-guidelines-page',
-    'logged-out-user/click-all-links-on-get-started-page',
-    'logged-out-user/click-all-links-on-privacy-policy-page',
-    'logged-out-user/click-all-links-on-terms-page',
-    'logged-out-user/click-all-buttons-on-donate-page',
-    'logged-out-user/visit-classroom-index-page',
-    'logged-out-user/browse-and-search-for-lessons-in-community-library',
-    'logged-out-user/select-and-play-topic-from-classroom-page',
-    'logged-out-user/choose-what-to-do-from-the-last-card-of-an-exploration',
-    'logged-out-user/play-through-lesson-while-getting-feedback-and-hints',
-    'logged-out-user/share-and-give-feedback-for-exploration-'
-    'but-not-report-and-rate-it',
-    'logged-out-user/use-keyboard-shortcuts-to-navigate-and-shift-focus',
-    'logged-out-user/change-site-language-and-engage-with-original-exploration',
-    'logged-out-user/sign-in-and-save-exploration-progress',
-    'logged-out-user/track-and-resume-exploration-progress-via-url',
-    'logged-out-user/play-lesson-in-different-languages-and-listen-'
-    'to-voiceovers'
-#  fix-color-error
-#     'logged-out-user/deny-access-to-dashboards-and-actions-without-login',
-#     'logged-out-user/subscribe-to-newsletter-and-click-all-buttons',
-#  develop
-#     'moderator/edit-featured-activities-list',
-#     'moderator/view-recent-commits-and-feedback-messages',
-#     'practice-question-admin/add-and-remove-contribution-rights',
-#     'release-coordinator/run-a-beam-job-and-copy-the-output',
-#     'release-coordinator/update-promo-bar-message',
-#     'release-coordinator/flush-and-get-profile-of-redis-cache',
-#     'release-coordinator/edit-feature-rollout-configuration',
-#     'super-admin/edit-user-roles',
-#     'super-admin/load-dummy-data-in-dev-mode',
-#     'super-admin/edit-platform-parameters',
-#     'super-admin/use-misc-tab-features',
-#     'topic-manager/edit-and-preview-a-subtopic',
-#     'topic-manager/edit-and-preview-a-topic',
-#     'translation-admin/add-and-remove-translation-rights',
-#     'topic-manager/create-and-delete-subtopic-and-story',
-#     'topic-manager/browse-skills-on-topics-and-skills-dashboard',
-#     'topic-manager/browse-topics-on-topics-and-skills-dashboard',
-#     'topic-manager/create-and-delete-questions-in-skill-editor',
-#     'topic-manager/assign-unassign-and-merge-skills',
-#     'topic-manager/cannot-do-curriculum-admin-actions',
-#     'topic-manager/edit-and-republish-a-skill',
-#     'topic-manager/edit-preview-and-save-a-chapter',
-#     'voiceover-admin/add-voiceover-artist-to-an-exploration'
-]
+def get_google_cloud_sdk_home() -> str:
+    """Return the path to the Google Cloud SDK."""
+    return GOOGLE_CLOUD_SDK_HOME
 
-log_to_terminal(LogType.info("Acceptance Test Suite Names:"))
-for suite_name in ACCEPTANCE_TEST_SUITE_NAMES:
-    log_to_terminal(LogType.SUCCESS(f"  - {suite_name}"))
-    
-GAE_PORT_FOR_E2E_TESTING: Final = 8181
-ELASTICSEARCH_SERVER_PORT: Final = 9200
-PORTS_USED_BY_OPPIA_PROCESSES_IN_LOCAL_E2E_TESTING: Final = [
-    GAE_PORT_FOR_E2E_TESTING,
-    ELASTICSEARCH_SERVER_PORT,
-]
 
+def get_google_app_engine_sdk_home() -> str:
+    """Return the path to the Google App Engine SDK."""
+    return GOOGLE_APP_ENGINE_SDK_HOME
 
-def is_windows_os() -> bool:
-    """Check if the running system is Windows."""
-    return OS_NAME == 'Windows'
 
+def get_gcloud_path() -> str:
+    """Return the path to the gcloud CLI binary."""
+    return GCLOUD_PATH
 
-def is_mac_os() -> bool:
-    """Check if the running system is MacOS."""
-    return OS_NAME == 'Darwin'
 
+def get_dev_appserver_path() -> str:
+    """Return the path to the dev_appserver.py binary."""
+    return DEV_APPSERVER_PATH
 
-def is_linux_os() -> bool:
-    """Check if the running system is Linux."""
-    return OS_NAME == 'Linux'
 
+def get_webpack_bin_path() -> str:
+    """Return the path to the webpack binary."""
+    return WEBPACK_BIN_PATH
 
-def is_x64_architecture() -> bool:
-    """Check if the architecture is on X64."""
-    # https://docs.python.org/2/library/platform.html#platform.architecture
-    return sys.maxsize > 2**32
 
+def get_ng_bin_path() -> str:
+    """Return the path to the Angular CLI binary."""
+    return NG_BIN_PATH
 
-NODE_BIN_PATH = os.path.join(NODE_PATH, 'bin', 'node')
-NPX_BIN_PATH = os.path.join(NODE_PATH, 'bin', 'npx')
 
-# Add path for node which is required by the node_modules.
-os.environ['PATH'] = os.pathsep.join([
-    os.path.dirname(NODE_BIN_PATH),
-    os.path.join(YARN_PATH, 'bin'),
-    os.environ['PATH'],
-])
+def get_frontend_dir() -> str:
+    """Return the path to the frontend templates directory."""
+    return FRONTEND_DIR
 
 
-def run_cmd(cmd_tokens: List[str]) -> str:
-    """Runs the command and returns the output.
-    Raises subprocess.CalledProcessError upon failure.
+class LogType(enum.Enum):
+    """Enum for terminal log message types."""
 
-    Args:
-        cmd_tokens: list(str). The list of command tokens to execute.
+    INFO = 'INFO'
+    ERROR = 'ERROR'
+    SUCCESS = 'SUCCESS'
+    WARNING = 'WARNING'
 
-    Returns:
-        str. The output of the command.
-    """
-    return subprocess.check_output(
-        cmd_tokens, stderr=subprocess.STDOUT, encoding='utf-8').strip()
 
+_LOG_COLORS = {
+    LogType.INFO: '\033[94m',
+    LogType.SUCCESS: '\033[92m',
+    LogType.WARNING: '\033[93m',
+    LogType.ERROR: '\033[91m',
+    None: ''
+}
+_END_COLOR = '\033[0m'
 
-def ensure_directory_exists(d: str) -> None:
-    """Creates the given directory if it does not already exist."""
-    if not os.path.exists(d):
-        log_to_terminal(LogType.info(f"Creating directory: {d}"))
-        os.makedirs(d)
 
-
-def require_cwd_to_be_oppia(allow_deploy_dir: bool = False) -> None:
-    """Ensures that the current working directory ends in 'oppia'.
-
-    If allow_deploy_dir is True, this also allows the cwd to be a directory
-    called 'deploy-*' which is a sibling of the oppia/ directory.
-    """
-    is_oppia_dir = os.getcwd().endswith('oppia')
-
-    current_dirname = os.path.basename(os.path.normpath(os.getcwd()))
-    is_deploy_dir = (
-        current_dirname.startswith('deploy-') and
-        os.path.isdir(os.path.join(os.getcwd(), os.pardir, 'oppia')))
-
-    if is_oppia_dir or (allow_deploy_dir and is_deploy_dir):
-        log_to_terminal(LogType.SUCCESS("Current directory is valid."))
-        return
-
-    raise Exception(LogType.error('Please run this script from the oppia/ directory.'))
-def open_new_tab_in_browser_if_possible(url: str) -> None:
-    """Opens the given URL in a new browser tab, if possible."""
-    if USER_PREFERENCES['open_new_tab_in_browser'] is None:
-        print(
-            '\nDo you want the url to be opened in the browser? '
-            'Confirm by entering y/ye/yes.')
-        USER_PREFERENCES['open_new_tab_in_browser'] = input()
-    if USER_PREFERENCES['open_new_tab_in_browser'] not in ['y', 'ye', 'yes']:
-        print('Please open the following link in browser: %s' % url)
-        return
-    browser_cmds = ['brave', 'chromium-browser', 'google-chrome', 'firefox']
-    print(
-        'Please choose your default browser from the list using a number. '
-        'It will be given a preference over other available options.'
-    )
-    for index, browser in enumerate(browser_cmds):
-        print('%s). %s' % (index + 1, browser))
-
-    default_index = int(input().strip()) - 1
-    # Re-order the browsers by moving the user selected browser to the
-    # first position and copying over the browsers before and after
-    # the selected browser in the same order as they were present.
-    ordered_browser_cmds = (
-        [browser_cmds[default_index]] + browser_cmds[:default_index] +
-        browser_cmds[default_index + 1:])
-    for cmd in ordered_browser_cmds:
-        if subprocess.call(['which', cmd]) == 0:
-            log_to_terminal(LogType.SUCCESS(f"Opening {url} in {cmd}."))
-            subprocess.check_call([cmd, url])
-            return
-    log_to_terminal(LogType.error('******************************************************************'))
-    log_to_terminal(LogType.error(
-        'WARNING: Unable to open browser. Please manually open the following'))
-    log_to_terminal('URL in a browser window, then press Enter to confirm.')
-    log_to_terminal('')
-    log_to_terminal(LogType.error(f'    {url}'))
-    log_to_terminal('')
-    log_to_terminal(LogType.warning('NOTE: To get rid of this message, open scripts/common.py and fix'))
-    log_to_terminal('the function open_new_tab_in_browser_if_possible() to work on your')
-    log_to_terminal('system.')
-    input()
-
-
-def get_remote_alias(remote_urls: List[str]) -> str:
-    """Finds the correct alias for the given remote repository URLs."""
-    git_remote_output = subprocess.check_output(
-        ['git', 'remote', '-v'], encoding='utf-8'
-    ).split('\n')
-    remote_alias = None
-    remote_url = None
-    for remote_url in remote_urls:
-        for line in git_remote_output:
-            if remote_url in line:
-                remote_alias = line.split()[0]
-        if remote_alias:
-            break
-    if remote_alias is None:
-        raise Exception(
-            LogType.error(
-                f'ERROR: There is no existing remote alias for the {", ".join(remote_urls)} repo.'))
-
-
-    return remote_alias
-
-
-def verify_local_repo_is_clean() -> None:
-    """Checks that the local Git repo is clean."""
-    git_status_output = subprocess.check_output(
-        ['git', 'status']
-    ).strip().split(b'\n')
-
-    branch_is_clean_message_1 = b'nothing to commit, working directory clean'
-    branch_is_clean_message_2 = b'nothing to commit, working tree clean'
-    if (
-            not branch_is_clean_message_1 in git_status_output and
-            not branch_is_clean_message_2 in git_status_output):
-        raise Exception(
-            LogType.error(
-                'ERROR: This script should be run from a clean branch.'))
-    log_to_terminal(LogType.SUCCESS("The repository is clean and ready."))
-
-def get_current_branch_name() -> str:
-    """Get the current branch name.
-
-    Returns:
-        str. The name of current branch.
-    """
-    git_status_output = subprocess.check_output(
-        ['git', 'status'], encoding='utf-8'
-    ).strip().split('\n')
-    branch_message_prefix = 'On branch '
-    git_status_first_line = git_status_output[0]
-    assert git_status_first_line.startswith(branch_message_prefix)
-    # Standard output is in bytes, we need to decode the line to print it.
-    return git_status_first_line[len(branch_message_prefix):]
-
-
-def update_branch_with_upstream() -> None:
-    """Updates the current branch with upstream."""
-    current_branch_name = get_current_branch_name()
-    log_to_terminal(LogType.info(f"Updating branch '{current_branch_name}' with upstream..."))
-    try:
-        run_cmd(['git', 'pull', 'upstream', current_branch_name])
-        log_to_terminal(LogType.SUCCESS(f"Branch '{current_branch_name}' updated successfully."))
-    except subprocess.CalledProcessError as e:
-        raise Exception(
-            LogType.error(f"Failed to update branch '{current_branch_name}'. Error: {e}"))
-
-
-def get_current_release_version_number(release_branch_name: str) -> str:
-    """Gets the release version given a release branch name.
-
-    Args:
-        release_branch_name: str. The name of release branch.
-
-    Returns:
-        str. The version of release.
-
-    Raises:
-        Exception. Invalid name of the release branch.
-    """
-    release_match = re.match(RELEASE_BRANCH_REGEX, release_branch_name)
-    release_maintenance_match = re.match(
-        RELEASE_MAINTENANCE_BRANCH_REGEX, release_branch_name)
-    hotfix_match = re.match(
-        HOTFIX_BRANCH_REGEX, release_branch_name)
-    if release_match:
-        return release_match.group(1)
-        log_to_terminal(LogType.SUCCESS(f"Release branch version: {version}"))
-        return version
-    elif release_maintenance_match:
-        version = release_maintenance_match.group(1)
-        log_to_terminal(LogType.SUCCESS(f"Release maintenance branch version: {version}"))
-        return version
-    elif hotfix_match:
-        version = hotfix_match.group(1)
-        log_to_terminal(LogType.SUCCESS(f"Hotfix branch version: {version}"))
-        return version
-    else:
-        raise Exception(LogType.ERROR(f"Invalid branch name: {release_branch_name}."))
-
-def is_current_branch_a_hotfix_branch() -> bool:
-    """Checks if the current branch is a hotfix branch.
-
-    Returns:
-        bool. Whether the current branch is a hotfix branch.
-    """
-    current_branch_name = get_current_branch_name()
-    is_hotfix = bool(re.match(HOTFIX_BRANCH_REGEX, current_branch_name))
-    if is_hotfix:
-        log_to_terminal(LogType.INFO(f"The current branch '{current_branch_name}' is a hotfix branch."))
-    else:
-        log_to_terminal(LogType.WARNING(f"The current branch '{current_branch_name}' is not a hotfix branch."))
-    return is_hotfix
-
-
-def is_current_branch_a_release_branch() -> bool:
-    """Returns whether the current branch is a release branch.
-
-    Returns:
-        bool. Whether the current branch is a release branch.
-    """
-    current_branch_name = get_current_branch_name()
-    release_match = bool(re.match(RELEASE_BRANCH_REGEX, current_branch_name))
-    release_maintenance_match = bool(
-        re.match(RELEASE_MAINTENANCE_BRANCH_REGEX, current_branch_name))
-    hotfix_match = bool(
-        re.match(HOTFIX_BRANCH_REGEX, current_branch_name))
-    is_release_branch = release_match or release_maintenance_match or hotfix_match
-
-    if is_release_branch:
-        log_to_terminal(LogType.INFO(f"The current branch '{current_branch_name}' is a release branch."))
-    else:
-        log_to_terminal(LogType.WARNING(f"The current branch '{current_branch_name}' is not a release branch."))
-    
-    return is_release_branch
-
-
-
-def is_current_branch_a_test_branch() -> bool:
-    """Returns whether the current branch is a test branch for deployment.
-
-    Returns:
-        bool. Whether the current branch is a test branch for deployment.
-    """
-    current_branch_name = get_current_branch_name()
-    is_test_branch = bool(re.match(TEST_BRANCH_REGEX, current_branch_name))
-    if is_test_branch:
-        log_to_terminal(LogType.INFO(f"The current branch '{current_branch_name}' is a test branch."))
-    else:
-        log_to_terminal(LogType.WARNING(f"The current branch '{current_branch_name}' is not a test branch."))
-    return is_test_branch
-
-
-def verify_current_branch_name(expected_branch_name: str) -> None:
-    """Checks that the user is on the expected branch."""
-    current_branch_name = get_current_branch_name()
-    if current_branch_name != expected_branch_name:
-        raise Exception(LogType.error(
-            f"ERROR: This script can only be run from the '{expected_branch_name}' branch. "
-            f"Current branch: '{current_branch_name}'"
-        ))
-    else:
-        log_to_terminal(LogType.SUCCESS(f"Verified: Current branch is '{expected_branch_name}'."))
-
-
-def is_port_in_use(port: int) -> bool:
-    """Checks if a process is listening to the port.
-
-    Args:
-        port: int. The port number.
-
-    Returns:
-        bool. True if port is open else False.
-    """
-    with contextlib.closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
-        port_in_use = bool(not s.connect_ex(('localhost', port)))
-    if port_in_use:
-        log_to_terminal(LogType.INFO(f"Port {port} is in use."))
-    else:
-        log_to_terminal(LogType.WARNING(f"Port {port} is not in use."))
-    return port_in_use
-
-
-def recursive_chown(path: str, uid: int, gid: int) -> None:
-    """Changes the owner and group id of all files in a path to the numeric
-    uid and gid.
-
-    Args:
-        path: str. The path for which owner id and group id need to be set up.
-        uid: int. Owner ID to be set.
-        gid: int. Group ID to be set.
-    """
-    try:
-        os.chown(path, uid, gid)
-        log_to_terminal(LogType.SUCCESS(f"Ownership updated for {path}."))
-        for root, directories, filenames in os.walk(path):
-            for directory in directories:
-                os.chown(os.path.join(root, directory), uid, gid)
-                log_to_terminal(LogType.INFO(f"Ownership updated for directory: {os.path.join(root, directory)}."))
-            for filename in filenames:
-                os.chown(os.path.join(root, filename), uid, gid)
-                log_to_terminal(LogType.INFO(f"Ownership updated for file: {os.path.join(root, filename)}."))
-    except Exception as e:
-        log_to_terminal(LogType.ERROR(f"Error updating ownership for {path}: {str(e)}"))
-
-
-def recursive_chmod(path: str, mode: int) -> None:
-    """Changes the mode of path to the passed numeric mode.
-
-    Args:
-        path: str. The path for which mode would be set.
-        mode: int. The mode to be set.
-    """
-    try:
-        os.chmod(path, mode)
-        log_to_terminal(LogType.SUCCESS(f"Mode changed for path: {path}"))
-        for root, directories, filenames in os.walk(path):
-            for directory in directories:
-                os.chmod(os.path.join(root, directory), mode)
-                log_to_terminal(LogType.INFO(f"Mode changed for directory: {os.path.join(root, directory)}"))
-            for filename in filenames:
-                os.chmod(os.path.join(root, filename), mode)
-                log_to_terminal(LogType.INFO(f"Mode changed for file: {os.path.join(root, filename)}"))
-    except Exception as e:
-        log_to_terminal(LogType.ERROR(f"Error changing mode for {path}: {str(e)}"))
-
-
-def print_each_string_after_two_new_lines(strings: List[str]) -> None:
-    """Prints the given strings, separating adjacent strings with two newlines.
-
-    Args:
-        strings: list(str). The strings to print.
-    """
-    for string in strings:
-        log_to_terminal(f"\n{LogType.info(string)}\n")
-
-
-def install_npm_library(library_name: str, version: str, path: str) -> None:
-    """Installs the npm library after ensuring it's not already installed.
-
-    Args:
-        library_name: str. The library name.
-        version: str. The library version.
-        path: str. The installation path for the library.
-    """
-    try:
-        log_to_terminal(LogType.info(f"Checking whether {library_name} is installed in {path}"))
-        if not os.path.exists(os.path.join(NODE_MODULES_PATH, library_name)):
-            log_to_terminal(LogType.WARNING(f"{library_name} is not installed. Installing..."))
-            subprocess.check_call(['yarn', 'add', f"{library_name}@{version}"])
-            log_to_terminal(LogType.SUCCESS(f"{library_name} installed successfully."))
-        else:
-            log_to_terminal(LogType.SUCCESS(f"{library_name} is already installed in {path}."))
-    except subprocess.CalledProcessError as e:
-        log_to_terminal(LogType.error(f"Failed to install {library_name}: {str(e)}"))
-
-
-def ask_user_to_confirm(message: str) -> None:
-    """Asks user to perform a task and confirm once they are done.
-
-    Args:
-        message: str. The message which specifies the task user has
-            to do.
-    """
-    while True:
-        log_to_terminal(LogType.INFO('******************************************************'))
-        log_to_terminal(LogType.INFO(message))
-        log_to_terminal(LogType.INFO('Confirm once you are done by entering y/ye/yes.\n'))
-        answer = input().lower()
-        if answer in AFFIRMATIVE_CONFIRMATIONS:
-            log_to_terminal(LogType.SUCCESS("Task confirmed by user."))
-            return
-
-
-def get_personal_access_token() -> str:
-    """Returns the personal access token for the GitHub ID of the user.
-
-    Returns:
-        str. The personal access token for the GitHub ID of the user.
-
-    Raises:
-        Exception. Personal access token is None.
-    """
-    try:
-        personal_access_token = getpass.getpass(
-            prompt=(
-                LogType.INFO(
-                    "Please provide personal access token for your GitHub ID. "
-                    "You can create one at https://github.com/settings/tokens: "
-                )
-            )
-        )
-        if personal_access_token is None:
-            raise Exception(
-                LogType.ERROR(
-                    "No personal access token provided. Set up a personal access token "
-                    "at https://github.com/settings/tokens and re-run the script."
-                )
-            )
-        return personal_access_token
-    except Exception as e:
-        log_to_terminal(LogType.ERROR(f"Error retrieving personal access token: {str(e)}"))
-        raise
-
-
-def create_readme(dir_path: str, readme_content: str) -> None:
-    """Creates a README in a given dir path with the specified
-    readme content.
-
-    Args:
-        dir_path: str. The path of the dir where the README is to
-            be created.
-        readme_content: str. The content to be written in the README.
-    """
-    try:
-        with utils.open_file(os.path.join(dir_path, 'README.md'), 'w') as f:
-            f.write(readme_content)
-        log_to_terminal(LogType.SUCCESS(f"README created successfully in {dir_path}."))
-    except Exception as e:
-        log_to_terminal(LogType.ERROR(f"Error creating README in {dir_path}: {str(e)}"))
-
-
-def inplace_replace_file(
-    filename: str,
-    regex_pattern: str,
-    replacement_string: str,
-    expected_number_of_replacements: Optional[int] = None
+def log_to_terminal(
+    message: str, message_type: Optional[LogType] = None
 ) -> None:
-    """Replace the file content in-place with regex pattern. The pattern is used
-    to replace the file's content line by line. The old file is kept as-is until
-    it is replaced.
-
-    Note:
-        This function should only be used with files that are processed line by
-            line.
+    """Print a message to terminal with optional color based on LogType.
 
     Args:
-        filename: str. The name of the file to be changed.
-        regex_pattern: str. The pattern to check.
-        replacement_string: str. The content to be replaced.
-        expected_number_of_replacements: optional(int). The number of
-            replacements that should be made. When None no check is done.
-
-    Raises:
-        ValueError. Wrong number of replacements.
-        Exception. The content failed to get replaced.
+        message: str. Message string to print.
+        message_type: Optional[LogType]. Log type for colored output.
+            If None, automatic highlighting based on content is used.
     """
-    new_filename = f"{filename}.new"
-    shutil.copyfile(filename, new_filename)
-    new_contents = []
-    total_number_of_replacements = 0
-    try:
-        regex = re.compile(regex_pattern)
-        log_to_terminal(LogType.info(f"Processing file: {filename}"))
-        with utils.open_file(filename, 'r') as old_file:
-            for line in old_file:
-                new_line, number_of_replacements = regex.subn(
-                    replacement_string, line)
-                new_contents.append(new_line)
-                total_number_of_replacements += number_of_replacements
-
-        with utils.open_file(new_filename, 'w') as new_file:
-            for line in new_contents:
-                new_file.write(line)
-
-        if (
-            expected_number_of_replacements is not None and
-            total_number_of_replacements != expected_number_of_replacements
-        ):
-            raise ValueError(
-                LogType.error(
-                    f"Wrong number of replacements. Expected {expected_number_of_replacements}, "
-                    f"performed {total_number_of_replacements}."
-                )
-            )
-        os.replace(new_filename, filename)
-        log_to_terminal(LogType.SUCCESS(f"File successfully updated: {filename}"))
-
-    except ValueError as ve:
-        os.remove(new_filename)
-        log_to_terminal(LogType.ERROR(f"Validation error: {ve}"))
-        raise
-
-    except Exception as e:
-        os.remove(new_filename)
-        log_to_terminal(LogType.ERROR(f"An error occurred while processing the file: {e}"))
-        raise
-
-
-def wait_for_port_to_be_in_use(port_number: int) -> None:
-    """Wait until the port is in use and exit if port isn't open after
-    MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS seconds.
-
-    Args:
-        port_number: int. The port number to wait.
-    """
-    waited_seconds = 0
-    while (not is_port_in_use(port_number)
-           and waited_seconds < MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS):
-        time.sleep(1)
-        waited_seconds += 1
-    if (waited_seconds == MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS
-            and not is_port_in_use(port_number)):
-        log_to_terminal(LogType.ERROR(
-            f"Failed to start server on port {port_number}, exiting..."))
-        log_to_terminal(LogType.WARNING(
-            "This may be because you do not have enough available memory. "
-            "Please refer to: https://github.com/oppia/oppia/wiki/Troubleshooting#low-ram"
-        ))
-        sys.exit(1)
-        
-    log_to_terminal(LogType.SUCCESS(f"Port {port_number} is now in use."))
-
-
-def wait_for_port_to_not_be_in_use(port_number: int) -> bool:
-    """Wait until the port is closed or
-    MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS seconds.
-
-    Args:
-        port_number: int. The port number to wait.
-
-    Returns:
-        bool. Whether the port closed in time.
-    """
-    waited_seconds = 0
-    while (is_port_in_use(port_number)
-           and waited_seconds < MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS):
-        time.sleep(1)
-        waited_seconds += 1
-    return not is_port_in_use(port_number)
-
-
-class CD:
-    """Context manager for changing the current working directory."""
-
-    def __init__(self, new_path: str) -> None:
-        self.new_path = new_path
-        self.saved_path: Optional[str] = None
-
-    def __enter__(self) -> None:
-        self.saved_path = os.getcwd()
-        os.chdir(self.new_path)
-
-    def __exit__(self, etype: str, value: str, traceback: str) -> None:
-        assert self.saved_path is not None
-        os.chdir(self.saved_path)
-
-
-@contextlib.contextmanager
-def swap_env(key: str, value: str) -> Generator[Optional[str], None, None]:
-    """Context manager that temporarily changes the value of os.environ[key].
-
-    Args:
-        key: str. The name of the environment variable to change.
-        value: str. The value to give the environment variable.
-
-    Yields:
-        str|None. The old value of the environment variable, or None if it did
-        not exist.
-    """
-    old_value = os.environ.get(key, None)
-    os.environ[key] = value
-    try:
-        yield old_value
-    finally:
-        if old_value is None:
-            del os.environ[key]
+    if message_type is None:
+        lower_msg = message.lower()
+        if 'error' in lower_msg:
+            message_type = LogType.ERROR
+        elif 'warning' in lower_msg:
+            message_type = LogType.WARNING
+        elif 'success' in lower_msg:
+            message_type = LogType.SUCCESS
         else:
-            os.environ[key] = old_value
+            message_type = LogType.INFO
+
+    color = _LOG_COLORS.get(message_type, '')
+    print(f'{color}{message}{_END_COLOR}')
 
 
-def write_stdout_safe(string: Union[str, bytes]) -> None:
-    """Tries to write the input string to stdout in a non-blocking way.
-
-    https://stackoverflow.com/a/44961052/4859885
-
-    Args:
-        string: str|bytes. The string to write to stdout.
-
-    Raises:
-        OSError. Failed to write the input string.
-    """
-    string_bytes = string.encode('utf-8') if isinstance(string, str) else string
-
-    num_bytes_written = 0
-    while num_bytes_written < len(string_bytes):
-        try:
-            num_bytes_written += os.write(
-                sys.stdout.fileno(), string_bytes[num_bytes_written:])
-        # The os.write might not be supported, thus we need
-        # to try sys.stdout.write.
-        except io.UnsupportedOperation:
-            # Standard output accepts str, we need to decode the string_bytes
-            # in order to write it.
-            sys.stdout.write(string_bytes.decode('utf-8'))
-            return
-        except OSError as e:
-            if e.errno == errno.EAGAIN:
-                continue
-            log_to_terminal(LogType.ERROR("Failed to write to stdout: %s" % e))
-            raise
+def list_acceptance_tests() -> List[str]:
+    """Return a list of all acceptance test scripts."""
+    tests = []
+    for root, _, files in os.walk(ACCEPTANCE_TEST_DIR):
+        for f in files:
+            if f.endswith('_test.py'):
+                tests.append(os.path.join(root, f))
+    return sorted(tests)
 
 
-def url_retrieve(
-        url: str, output_path: str, max_attempts: int = 2,
-        enforce_https: bool = True
-) -> None:
-    """Retrieve a file from a URL and write the file to the file system.
+def get_acceptance_test_path(test_name: str) -> str:
+    """Return the full path to an acceptance test script."""
+    return os.path.join(ACCEPTANCE_TEST_DIR, test_name)
 
-    Note that we use Python's recommended default settings for verifying SSL
-    connections, which are documented here:
-    https://docs.python.org/3/library/ssl.html#best-defaults.
 
-    Args:
-        url: str. The URL to retrieve the data from.
-        output_path: str. Path to the destination file where the data from the
-            URL will be written.
-        max_attempts: int. The maximum number of attempts that will be made to
-            download the data. For failures before the maximum number of
-            attempts, a message describing the error will be printed. Once the
-            maximum is hit, any errors will be raised.
-        enforce_https: bool. Whether to require that the provided URL starts
-            with 'https://' to ensure downloads are secure.
-
-    Raises:
-        Exception. Raised when the provided URL does not use HTTPS but
-            enforce_https is True.
-    """
-    if enforce_https and not url.startswith('https://'):
-        log_to_terminal(LogType.ERROR(f"The URL {url} does not use HTTPS."))
-        raise Exception(f"The URL {url} should use HTTPS.")
-
-    # Try downloading using curl initially.
-    log_to_terminal('Downloading %s to %s using curl...' % (url, output_path))
-    curl_task = subprocess.Popen(
-    # The -L flag is for following redirects.
-        ['curl', '-L', url, '--output', output_path],
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='utf-8')
-    with curl_task:
-        out, err = curl_task.communicate()
-    if curl_task.returncode == 0:
-        # The download was successful.
-        log_to_terminal(LogType.SUCCESS(f"Download successful: {url}"))
+def run_acceptance_test(test_name: str) -> None:
+    """Run a single acceptance test script."""
+    test_path = get_acceptance_test_path(test_name)
+    if not os.path.exists(test_path):
+        log_to_terminal(
+            (
+                f'Error: Acceptance test {test_name} '
+                'not found'
+            ),
+            LogType.ERROR
+        )
         return
 
-    # Download with urlopen if curl fails.
-    log_to_terminal(LogType.ERROR('Downloading using curl failed. Trying with urlopen.'))
-    log_to_terminal(LogType.ERROR('Error log for curl: %s' % err))
-    failures = 0
-    success = False
-    while not success and failures < max_attempts:
-        try:
-            with urlrequest.urlopen(
-                url, context=ssl.create_default_context()
-            ) as response:
-                with open(output_path, 'wb') as output_file:
-                    output_file.write(response.read())
-        except (
-            urlerror.URLError, ssl.SSLError,
-            client.IncompleteRead, ConnectionResetError
-        ) as exception:
-            failures += 1
-            log_to_terminal(LogType.error(
-                f"Attempt {failures} of {max_attempts} failed when downloading {url}."))
-            log_to_terminal(LogType.error(f"Error in url_retrieve: {exception}"))
-            if failures >= max_attempts:
-                log_to_terminal(LogType.ERROR("Max attempts reached. Raising exception."))
-                raise exception
-            log_to_terminal(LogType.INFO("Retrying download."))
-        else:
-            log_to_terminal(LogType.SUCCESS(f"Download successful: {url}"))
-            success = True
-
-
-def setup_chrome_bin_env_variable() -> None:
-    """Sets the CHROME_BIN environment variable to the path
-    of the Chrome binary.
-
-    Raises:
-        Exception. Chrome not found.
-    """
-    for path in CHROME_PATHS:
-        if os.path.isfile(path):
-            os.environ['CHROME_BIN'] = path
-            log_to_terminal(LogType.SUCCESS(f"CHROME_BIN set to: {path}"))
-            break
-    else:
-        log_to_terminal(LogType.ERROR("Chrome is not found, stopping..."))
-        raise Exception("Chrome not found.")
-
-
-def run_ng_compilation() -> None:
-    """Runs angular compilation."""
-    max_tries = 2
-    ng_bundles_dir_name = 'dist/oppia-angular'
-    for _ in range(max_tries):
-        try:
-            with servers.managed_ng_build() as proc:
-                proc.wait()
-        except subprocess.CalledProcessError as error:
-            log_to_terminal(LogType.ERROR(f"Angular compilation failed: {error.output}"))
-            if attempt == max_tries - 1:
-                log_to_terminal(LogType.ERROR("Maximum attempts reached. Exiting..."))
-                sys.exit(error.returncode)
-        if os.path.isdir(ng_bundles_dir_name):
-            log_to_terminal(LogType.SUCCESS("Angular compilation completed successfully."))
-            break
-    if not os.path.isdir(ng_bundles_dir_name):
-        log_to_terminal(LogType.ERROR("Failed to complete ng build compilation, exiting..."))
-        sys.exit(1)
-
-
-def set_constants_to_default() -> None:
-    """Set variables in constants.ts and feconf.py to default values."""
-    modify_constants(
-        prod_env=False,
-        emulator_mode=True,
-        maintenance_mode=False,
-        version_info_must_be_set=False
-        )
-    log_to_terminal(LogType.SUCCESS("Constants have been reset to default values."))
-
-
-def modify_constants(
-    prod_env: bool = False,
-    emulator_mode: bool = True,
-    maintenance_mode: bool = False,
-    version_info_must_be_set: bool = True
-) -> None:
-    """Modify constants.ts and feconf.py.
-
-    Args:
-        prod_env: bool. Whether the server is started in prod mode.
-        emulator_mode: bool. Whether the server is started in emulator mode.
-        maintenance_mode: bool. Whether the site should be put into
-            the maintenance mode.
-        version_info_must_be_set: bool. Whether the version info must be set.
-    """
-    dev_mode_variable = (
-        '"DEV_MODE": false' if prod_env else '"DEV_MODE": true')
-    inplace_replace_file(
-        CONSTANTS_FILE_PATH,
-        r'"DEV_MODE": (true|false)',
-        dev_mode_variable,
-        expected_number_of_replacements=1
+    log_to_terminal(
+        f'Running acceptance test: {test_name}',
+        LogType.INFO
     )
-    emulator_mode_variable = (
-        '"EMULATOR_MODE": true' if emulator_mode else '"EMULATOR_MODE": false')
-    inplace_replace_file(
-        CONSTANTS_FILE_PATH,
-        r'"EMULATOR_MODE": (true|false)',
-        emulator_mode_variable,
-        expected_number_of_replacements=1
-    )
-
-    enable_maintenance_mode_variable = (
-        'ENABLE_MAINTENANCE_MODE = %s' % str(maintenance_mode))
-    inplace_replace_file(
-        FECONF_PATH,
-        r'ENABLE_MAINTENANCE_MODE = (True|False)',
-        enable_maintenance_mode_variable,
-        expected_number_of_replacements=1
-    )
-
-    if feconf.OPPIA_IS_DOCKERIZED:
-        return
-
-    if prod_env or version_info_must_be_set is False:
-        branch_name_variable = (
-            '"BRANCH_NAME": "%s"'
-            % (
-                subprocess.check_output(
-                    ['git', 'rev-parse', '--abbrev-ref', 'HEAD'],
-                    encoding='utf-8'
-                ).strip().split('\n', maxsplit=1)[0]
-                if version_info_must_be_set else ''
-            )
-        )
-        inplace_replace_file(
-            CONSTANTS_FILE_PATH,
-            r'"BRANCH_NAME": ".*"',
-            branch_name_variable,
-            expected_number_of_replacements=1
-        )
-
-        short_commit_hash_variable = (
-            '"SHORT_COMMIT_HASH": "%s"'
-            % (
-                subprocess.check_output(
-                    ['git', 'rev-parse', '--short', 'HEAD'],
-                    encoding='utf-8'
-                ).strip().split('\n', maxsplit=1)[0]
-                if version_info_must_be_set else ''
-            )
-        )
-        inplace_replace_file(
-            CONSTANTS_FILE_PATH,
-            r'"SHORT_COMMIT_HASH": ".*"',
-            short_commit_hash_variable,
-            expected_number_of_replacements=1
-        )
-
-
-def is_oppia_server_already_running() -> bool:
-    """Check if the ports are taken by any other processes. If any one of
-    them is taken, it may indicate there is already one Oppia instance running.
-
-    Returns:
-        bool. Whether there is a running Oppia instance.
-    """
-    for port in PORTS_USED_BY_OPPIA_PROCESSES_IN_LOCAL_E2E_TESTING:
-        if is_port_in_use(port):
-            log_to_terminal(LogType.error(
-                'There is already a server running on localhost:%s. '
-                'Please terminate it before running the end-to-end tests. '
-                'Exiting.' % port))
-            return True
-    return False
-
-
-def start_subprocess_for_result(cmd: List[str]) -> Tuple[bytes, bytes]:
-    """Starts subprocess and returns (stdout, stderr)."""
-    task = subprocess.Popen(
-        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    out, err = task.communicate()
-    return out, err
+    os.system(f'{sys.executable} {test_path}')
