@@ -1127,7 +1127,7 @@ describe('Conversation flow service', () => {
       'expId',
       version,
       currentStateName,
-      conversationFlowService.isLoggedIn,
+      conversationFlowService.getIsLoggedIn(),
       'uuid-123'
     );
   }));
