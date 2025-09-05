@@ -26,7 +26,7 @@ google-cloud-translate==3.21.1
 gunicorn==23.0.0
 mailchimp3==3.0.21
 mutagen==1.47.0
-Pillow==11.1.0
+Pillow==10.1.0
 pylatexenc==2.10
 PyYAML==6.0.2
 redis==5.3.1
