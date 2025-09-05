@@ -419,6 +419,7 @@ def _get_possible_normalized_metadata_directory_names(
     """
     # Some metadata folders replace the hyphens in the library name with
     # underscores.
+    print(library_name)
     return {
         normalize_directory_name(
             '%s-%s.dist-info' % (library_name, version_string)),
