@@ -16,10 +16,11 @@
  * @fileoverview Release coordinator users utility file.
  */
 
-import puppeteer from 'puppeteer';
+import puppeteer, {ElementHandle} from 'puppeteer';
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
+import {SuperAdmin} from './super-admin';
 
 // URLs.
 const releaseCoordinatorUrl = testConstants.URLs.ReleaseCoordinator;
@@ -34,6 +35,9 @@ const splashUrl = testConstants.URLs.splash;
 
 const featuresTab = '.e2e-test-features-tab';
 const mobileFeaturesTab = '.e2e-test-features-tab-mobile';
+const beamJobsTab = '.e2e-test-beam-jobs';
+const mobileBeamJobsTab = '.e2e-test-beam-jobs-mobile';
+const beamJobsTabContainerSelector = 'oppia-beam-jobs-tab';
 
 // Selectors for mobile navigation.
 const mobileMiscTab = '.e2e-test-misc-tab-mobile';
@@ -43,7 +47,7 @@ const mobileNavBar = '.e2e-test-navbar-dropdown-toggle';
 const saveButtonSelector = '.e2e-test-save-button';
 const featureFlagNameSelector = '.e2e-test-feature-name';
 const featureFlagDiv = '.e2e-test-feature-flag';
-const rolloutPercentageInput = '.e2e-test-editor-int';
+const rolloutPercentageInputSelector = '.e2e-test-editor-int';
 const featureFlagSelector = '.e2e-test-feature-flag';
 const enableFeatureSelector = '.e2e-test-value-selector';
 
@@ -67,8 +71,21 @@ const miscTabContainerSelector =
 const promoBarSaveButtonSelector =
   '.e2e-test-release-coordinator-promo-bar-button';
 const beamJobCloseOuputButtonSelector = '.e2e-test-close-beam-job-output';
+const addUserGroupContainerSelector = '.e2e-test-add-user-group-container';
+const userGroupItemSelector = '.e2e-test-user-group-item';
+const userGroupCreateErrorSelector = '.e2e-test-user-group-save-error';
+const removeUserGroupButtonSelector = '.e2e-test-remove-user-group-button';
 
 export class ReleaseCoordinator extends BaseUser {
+  constructor() {
+    super();
+    const tmpObject = new SuperAdmin();
+    Object.getOwnPropertyNames(tmpObject).forEach(function (methodName) {
+      if (typeof tmpObject[methodName] === 'function') {
+        this[methodName] = tmpObject[methodName].bind(tmpObject);
+      }
+    }, this);
+  }
   /**
    * Navigate to the release coordinator page.
    */
@@ -99,6 +116,19 @@ export class ReleaseCoordinator extends BaseUser {
       console.error('Failed to navigate to features tab:', error);
       throw error;
     }
+  }
+
+  async navigateToBeamJobsTab(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeVisible(mobileNavBar);
+      await this.clickOn(mobileNavBar);
+      await this.clickOn(mobileBeamJobsTab);
+    } else {
+      await this.expectElementToBeVisible(beamJobsTab);
+      await this.clickOn(beamJobsTab);
+    }
+
+    await this.expectElementToBeVisible(beamJobsTabContainerSelector);
   }
 
   /**
@@ -155,8 +185,10 @@ export class ReleaseCoordinator extends BaseUser {
         );
 
         if (featureFlagName === featureName) {
-          await featureFlags[i].waitForSelector(rolloutPercentageInput);
-          const inputElement = await featureFlags[i].$(rolloutPercentageInput);
+          await featureFlags[i].waitForSelector(rolloutPercentageInputSelector);
+          const inputElement = await featureFlags[i].$(
+            rolloutPercentageInputSelector
+          );
           if (inputElement) {
             // Select all the text in the input field and delete it.
             await inputElement.click({clickCount: 3});
@@ -200,10 +232,37 @@ export class ReleaseCoordinator extends BaseUser {
   }
 
   /**
+   * Checks if the force enabled status of a feature flag is as expected.
+   * @param {string} featureFlag - The name of the feature flag to expect.
+   * @param {boolean} forceEnabled - The expected force enabled status of the feature flag.
+   */
+  async expectFeatureFlagForcedEnabledStatusToBe(
+    featureFlag: string,
+    forceEnabled: boolean
+  ): Promise<void> {
+    const featureFlagDiv = await this.expectFeatureFlagToBePresent(featureFlag);
+    const forceEnabledElement = await featureFlagDiv.$(enableFeatureSelector);
+
+    if (!forceEnabledElement) {
+      throw new Error('Force enabled element not found.');
+    }
+
+    const forceEnabledSelectValue = await forceEnabledElement.evaluate(
+      el => (el as HTMLSelectElement).value
+    );
+
+    expect(forceEnabledSelectValue).toBe(forceEnabled ? '0: true' : '1: false');
+  }
+
+  /**
    * This function enables a specific feature flag.
    * @param {string} featureName - The name of the feature flag to enable.
+   * @param {boolean} enable - Whether to enable or disable the feature flag.
    */
-  async enableFeatureFlag(featureName: string): Promise<void> {
+  async enableFeatureFlag(
+    featureName: string,
+    enable: boolean = true
+  ): Promise<void> {
     try {
       await this.goto(releaseCoordinatorUrl);
 
@@ -234,7 +293,7 @@ export class ReleaseCoordinator extends BaseUser {
           await featureFlags[i].waitForSelector(enableFeatureSelector);
           const selectElement = await featureFlags[i].$(enableFeatureSelector);
           if (selectElement) {
-            await selectElement.select('0: true');
+            await selectElement.select(enable ? '0: true' : '1: false');
           } else {
             throw new Error(
               `Value selector not found for feature flag: "${featureName}"`
@@ -275,12 +334,23 @@ export class ReleaseCoordinator extends BaseUser {
 
   /**
    * Enables the promo bar.
+   * @param {'enabled' | 'disabled'} expectedState - The expected state of the promo bar.
    */
-  async enablePromoBar(): Promise<void> {
+  async togglePromoBar(
+    expectedState: 'enabled' | 'disabled' = 'enabled'
+  ): Promise<void> {
     await this.page.waitForSelector(promoBarToggleSelector);
     await this.clickOn(promoBarToggleSelector);
 
-    await this.expectElementToBeClickable(promoBarSaveButtonSelector);
+    await this.page.waitForFunction(
+      (selector: string, checked: boolean) => {
+        const element = document.querySelector(selector);
+        return (element as HTMLInputElement)?.checked === checked;
+      },
+      {},
+      promoBarToggleSelector,
+      expectedState === 'enabled'
+    );
   }
 
   /**
@@ -416,8 +486,12 @@ export class ReleaseCoordinator extends BaseUser {
   /**
    * Checks if the 'totalKeysStored' property of the memory cache profile is less than a specified value.
    * @param {number} maxValue - The value that 'totalKeysStored' is expected to be less than.
+   * @param {number} minValue - The value that 'totalKeysStored' is expected to be greater than.
    */
-  async expectTotalKeysStoredToBeLessThan(maxValue: number): Promise<void> {
+  async expectTotalKeysStoredToBeInRange(
+    maxValue?: number,
+    minValue?: number
+  ): Promise<void> {
     await this.page.waitForSelector(memoryCacheProfileTableSelector, {
       visible: true,
     });
@@ -432,9 +506,15 @@ export class ReleaseCoordinator extends BaseUser {
 
     if (totalKeysStored === null) {
       throw new Error('totalKeysStored is null');
-    } else if (totalKeysStored >= maxValue) {
+    }
+    if (maxValue && totalKeysStored >= maxValue) {
       throw new Error(
         `Expected totalKeysStored to be less than ${maxValue}, but it was ${totalKeysStored}`
+      );
+    }
+    if (minValue && totalKeysStored <= minValue) {
+      throw new Error(
+        `Expected totalKeysStored to be greater than ${minValue}, but it was ${totalKeysStored}`
       );
     }
   }
@@ -533,28 +613,10 @@ export class ReleaseCoordinator extends BaseUser {
    * @param {string} expectedOutput - The expected output of the job.
    */
   async expectJobOutputToBe(expectedOutput: string): Promise<void> {
-    try {
-      await this.page.waitForSelector(beamJobRunOutputSelector, {
-        visible: true,
-      });
-      const actualOutput = await this.page.$eval(
-        beamJobRunOutputSelector,
-        el => el.textContent
-      );
-      if (!actualOutput) {
-        throw new Error('Output element is empty or not found.');
-      }
-
-      if (actualOutput === expectedOutput) {
-        showMessage('Output is as expected');
-      } else {
-        throw new Error(`Output is not as expected. Expected: ${expectedOutput} 
-        Actual: ${actualOutput}`);
-      }
-    } catch (error) {
-      console.error('An error occurred:', error);
-      throw error;
-    }
+    await this.expectTextContentToContain(
+      beamJobRunOutputSelector,
+      expectedOutput
+    );
   }
 
   /**
@@ -569,12 +631,76 @@ export class ReleaseCoordinator extends BaseUser {
   }
 
   /**
+   * Expects the feature flag to be present in the features tab.
+   * @param {string} featureFlag - The name of the feature flag to expect.
+   */
+  async expectFeatureFlagToBePresent(
+    featureFlag: string
+  ): Promise<ElementHandle<Element>> {
+    await this.expectElementToBeVisible(featureFlagNameSelector);
+    const featureFlagNames = await this.page.$$eval(
+      featureFlagNameSelector,
+      elements => elements.map(element => element.textContent?.trim())
+    );
+    expect(featureFlagNames).toContain(featureFlag);
+
+    await this.expectElementToBeVisible(featureFlagDiv);
+    const featureFlagDivs = await this.page.$$(featureFlagDiv);
+    let featureFlagDivElement: ElementHandle<Element> | null = null;
+    for (const featureFlagDivElementElement of featureFlagDivs) {
+      const featureFlagDivElementText =
+        await featureFlagDivElementElement.$eval(featureFlagNameSelector, el =>
+          el.textContent?.trim()
+        );
+      if (featureFlagDivElementText === featureFlag) {
+        featureFlagDivElement = featureFlagDivElementElement;
+        break;
+      }
+    }
+
+    if (!featureFlagDivElement) {
+      throw new Error(`Feature flag "${featureFlag}" not found.`);
+    }
+
+    return featureFlagDivElement;
+  }
+
+  /**
+   * Checks if the rollout percentage input is enabled or disabled.
+   * @param {string} featureFlag - The name of the feature flag to expect.
+   */
+  async expectRolloutPercentageInputToBe(
+    featureFlag: string,
+    state: 'enabled' | 'disabled',
+    value?: number
+  ): Promise<void> {
+    const featureFlagDiv = await this.expectFeatureFlagToBePresent(featureFlag);
+    const rolloutPercentageInputElement = await featureFlagDiv.$(
+      rolloutPercentageInputSelector
+    );
+    if (!rolloutPercentageInputElement) {
+      throw new Error('Rollout percentage input not found.');
+    }
+    await this.expectElementToBeClickable(
+      rolloutPercentageInputElement,
+      state === 'enabled'
+    );
+
+    if (value) {
+      const rolloutPercentageInputValue =
+        await rolloutPercentageInputElement.evaluate(
+          el => (el as HTMLInputElement).value
+        );
+      expect(rolloutPercentageInputValue).toBe(value.toString());
+    }
+  }
+
+  /**
    * Verifies the status of the Dummy Handler in the Features Tab.
    * If true, the function will verify that the Dummy Handler is enabled.
    * If false, it will verify that the Dummy Handler is disabled.
    * @param {boolean} enabled - Expected status of the Dummy Handler.
    */
-
   async verifyDummyHandlerStatusInFeaturesTab(enabled: boolean): Promise<void> {
     await this.navigateToReleaseCoordinatorPage();
     await this.navigateToFeaturesTab();
@@ -597,6 +723,80 @@ export class ReleaseCoordinator extends BaseUser {
 
     showMessage(
       `Dummy handler is ${enabled ? 'enabled' : 'disabled'}, as expected`
+    );
+  }
+
+  /**
+   * Checks if the user group is present in the user groups list.
+   * @param {string} groupName - The name of the user group to check.
+   */
+  async expectUserGroupToBePresent(
+    groupName: string,
+    present: boolean = true
+  ): Promise<ElementHandle<Element> | null> {
+    await this.expectElementToBeVisible(userGroupItemSelector);
+    const userGroupElements = await this.page.$$(userGroupItemSelector);
+    const userGroupNames = await this.page.$$eval(
+      userGroupItemSelector,
+      elements => elements.map(element => element.textContent?.trim())
+    );
+
+    const index = userGroupNames.indexOf(groupName);
+
+    if (index === -1 && present) {
+      throw new Error(`User group "${groupName}" not found.`);
+    }
+    if (index !== -1 && !present) {
+      throw new Error(`User group "${groupName}" found, but it should not be.`);
+    }
+
+    return present ? userGroupElements[index] : null;
+  }
+
+  /**
+   * Adds a new user group with the given name.
+   * @param {string} groupName - The name of the user group to add.
+   */
+  async addUserGroup(groupName: string): Promise<void> {
+    const userGroupInputSelector = `${addUserGroupContainerSelector} input`;
+    const addNewUserGroupButtonSelector = `${addUserGroupContainerSelector} button`;
+
+    await this.expectElementToBeVisible(addUserGroupContainerSelector);
+    await this.type(userGroupInputSelector, groupName);
+    await this.clickOn(addNewUserGroupButtonSelector);
+
+    await this.expectUserGroupToBePresent(groupName);
+  }
+
+  /**
+   * Deletes the user group with the given name.
+   * @param {string} groupName - The name of the user group to delete.
+   */
+  async removeUserGroup(groupName: string): Promise<void> {
+    const userGroupElement = await this.expectUserGroupToBePresent(groupName);
+    if (!userGroupElement) {
+      throw new Error(`User group "${groupName}" not found.`);
+    }
+    await userGroupElement.click();
+    const removeUserGroupButton = await userGroupElement.$(
+      removeUserGroupButtonSelector
+    );
+    if (!removeUserGroupButton) {
+      throw new Error('Remove user group button not found.');
+    }
+    await removeUserGroupButton.click();
+
+    await this.expectUserGroupToBePresent(groupName, false);
+  }
+
+  /**
+   * Checks if the user group creation error is present.
+   * @param {string} errorMessage - The expected error message.
+   */
+  async expectUserGroupCreationErrorToBe(errorMessage: string): Promise<void> {
+    await this.expectTextContentToBe(
+      userGroupCreateErrorSelector,
+      errorMessage
     );
   }
 }
