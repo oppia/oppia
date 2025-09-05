@@ -20,7 +20,7 @@ import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {TakeBreakModalComponent} from './take-break-modal.component';
-import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
+import {MockTranslatePipe} from '../../../../../tests/unit-test-utils';
 
 class MockActiveModal {
   dismiss(): void {
