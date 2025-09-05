@@ -579,6 +579,18 @@
     {
       "name": "release-coordinator/navigate-to-the-release-coordinator-page-beam-jobs-tab",
       "module": "core/tests/puppeteer-acceptance-tests/specs/release-coordinator/navigate-to-the-release-coordinator-page-beam-jobs-tab.spec.ts"
+    },
+    {
+      "name": "super-admin/edit-platform-parameter",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/super-admin/edit-platform-parameter.spec.ts"
+    },
+    {
+      "name": "super-admin/edit-users-role",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/super-admin/edit-users-role.spec.ts"
+    },
+    {
+      "name": "super-admin/use-misc-tab-feature",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/super-admin/use-misc-tab-feature.spec.ts"
     }
   ],
   "docker_suites": []

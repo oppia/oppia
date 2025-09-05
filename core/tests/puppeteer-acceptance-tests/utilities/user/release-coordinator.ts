@@ -348,7 +348,7 @@ export class ReleaseCoordinator extends BaseUser {
         return (element as HTMLInputElement)?.checked === checked;
       },
       {},
-      promoBarToggleSelector,
+      `${promoBarToggleSelector} input`,
       expectedState === 'enabled'
     );
   }
@@ -681,8 +681,15 @@ export class ReleaseCoordinator extends BaseUser {
     if (!rolloutPercentageInputElement) {
       throw new Error('Rollout percentage input not found.');
     }
-    await this.expectElementToBeClickable(
-      rolloutPercentageInputElement,
+    await this.page.waitForFunction(
+      (selector: string, disabled: boolean) => {
+        const element = document.querySelector(selector);
+        return (element as HTMLInputElement).disabled === disabled;
+      },
+      {
+        timeout: 10000,
+      },
+      rolloutPercentageInputSelector,
       state === 'enabled'
     );
 

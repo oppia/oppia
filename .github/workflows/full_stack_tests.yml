@@ -57,6 +57,12 @@ jobs:
             short_name: flush-the-memory-cache
           - name: release-coordinator/navigate-to-the-release-coordinator-page-beam-jobs-tab
             short_name: navigate-to-the-release-coordinator-page-beam-jobs-tab
+          - name: super-admin/use-misc-tab-feature
+            short_name: use-misc-tab-feature
+          - name: super-admin/edit-users-role
+            short_name: edit-users-role
+          - name: super-admin/edit-platform-parameter
+            short_name: edit-platform-parameter
         run1: [1, 2]
         run2: [1]
         mobile: [false, true]
