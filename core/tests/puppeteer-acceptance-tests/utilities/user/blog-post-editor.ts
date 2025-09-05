@@ -77,6 +77,7 @@ export class BlogPostEditor extends BaseUser {
    */
   async addUserBioInBlogDashboard(): Promise<void> {
     const inputBar = await this.isElementVisible(blogAuthorBioField);
+    expect(inputBar).toBe(true);
     // It is used here to avoid filling the user bio each time. We fill it only once when
     // the user is accessing the blog dashboard for the first time.
     if (inputBar) {

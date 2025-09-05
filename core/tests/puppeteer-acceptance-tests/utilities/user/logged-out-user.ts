@@ -3143,10 +3143,12 @@ export class LoggedOutUser extends BaseUser {
    * Clicks on continue button in continue button interaction.
    */
   async clickOnContinueButtonInInteractionCard(): Promise<void> {
-    await this.isElementVisible(nextCardButton);
+    const isVisible = await this.isElementVisible(nextCardButton);
+    expect(isVisible).toBe(true);
     await this.clickOn(nextCardButton);
 
-    await this.isElementVisible(nextCardButton, false);
+    const isHidden = await this.isElementVisible(nextCardButton, false);
+    expect(isHidden).toBe(true);
   }
 
   /**
@@ -3727,7 +3729,8 @@ export class LoggedOutUser extends BaseUser {
    * Navigates to the revision tab in the topic page.
    */
   async navigateToRevisionTabInTopic(): Promise<void> {
-    await this.isElementVisible(revisionTabButtonSelector);
+    const isVisible = await this.isElementVisible(revisionTabButtonSelector);
+    expect(isVisible).toBe(true);
     await this.clickOn(revisionTabButtonSelector);
 
     await this.waitForPageToFullyLoad();
@@ -3741,10 +3744,12 @@ export class LoggedOutUser extends BaseUser {
     const selector = this.isViewportAtMobileWidth()
       ? backToClassroomBreadcrumbSelectorMobile
       : backToClassroomLinkSelector;
-    await this.isElementVisible(selector);
+    const isVisible = await this.isElementVisible(selector);
+    expect(isVisible).toBe(true);
     await this.clickOn(selector);
 
-    await this.isElementVisible(selector, false);
+    const isHidden = await this.isElementVisible(selector, false);
+    expect(isHidden).toBe(true);
   }
 
   async expectToBeInClassroomPage(classroomURLFragment: string): Promise<void> {
@@ -3761,30 +3766,44 @@ export class LoggedOutUser extends BaseUser {
    * Clicks on the start here button in the classroom page.
    */
   async clickOnStartHereButtonInClassroomPage(): Promise<void> {
-    await this.isElementVisible(startHereButtonSelector);
+    const isVisible = await this.isElementVisible(startHereButtonSelector);
+    expect(isVisible).toBe(true);
 
     await this.clickAndWaitForNavigation(startHereButtonSelector);
-    await this.isElementVisible(startHereButtonSelector, false);
+    const isHidden = await this.isElementVisible(
+      startHereButtonSelector,
+      false
+    );
+    expect(isHidden).toBe(true);
   }
 
   /**
    * Clicks on the take quiz button in the classroom page.
    */
   async clickOnTakeQuizButtonInClassroomPage(): Promise<void> {
-    await this.isElementVisible(takeQuizButtonSelector);
+    const isVisible = await this.isElementVisible(takeQuizButtonSelector);
+    expect(isVisible).toBe(true);
 
     await this.clickOn(takeQuizButtonSelector);
-    await this.isElementVisible(takeQuizButtonSelector, false);
+    const isHidden = await this.isElementVisible(takeQuizButtonSelector, false);
+    expect(isHidden).toBe(true);
   }
 
   /**
    * Starts a diagnostic test.
    */
   async startDiagnosticTest(): Promise<void> {
-    await this.isElementVisible(startDiagnosticTestButtonSelector);
+    const isVisible = await this.isElementVisible(
+      startDiagnosticTestButtonSelector
+    );
+    expect(isVisible).toBe(true);
 
     await this.clickOn(startDiagnosticTestButtonSelector);
-    await this.isElementVisible(startDiagnosticTestButtonSelector, false);
+    const isHidden = await this.isElementVisible(
+      startDiagnosticTestButtonSelector,
+      false
+    );
+    expect(isHidden).toBe(true);
   }
 
   /**
@@ -3795,7 +3814,8 @@ export class LoggedOutUser extends BaseUser {
       (await this.page.$eval(currentProgessSelector, el =>
         el.textContent?.trim()
       )) ?? '';
-    await this.isElementVisible(skipQuestionButton);
+    const isVisible = await this.isElementVisible(skipQuestionButton);
+    expect(isVisible).toBe(true);
 
     await this.clickOn(skipQuestionButton);
 
@@ -5337,6 +5357,7 @@ export class LoggedOutUser extends BaseUser {
     await this.waitForPageToFullyLoad();
 
     const isDropdownVisible = await this.isElementVisible(voiceoverDropdown);
+    expect(isDropdownVisible).toBe(true);
     if (isDropdownVisible) {
       await this.expandVoiceoverBar();
     }
@@ -5873,7 +5894,8 @@ export class LoggedOutUser extends BaseUser {
     value: string,
     exactMatch: boolean = false
   ): Promise<void> {
-    await this.isElementVisible(selector);
+    const isVisible = await this.isElementVisible(selector);
+    expect(isVisible).toBe(true);
 
     const actualTextContent = await this.page.$eval(
       selector,
@@ -5965,7 +5987,10 @@ export class LoggedOutUser extends BaseUser {
    * Checks if the partnerships page contains the expected image.
    */
   async expectPartneringWithUsImageToBePresent(): Promise<void> {
-    await this.isElementVisible(partneringWithUsImageSelector);
+    const isVisible = await this.isElementVisible(
+      partneringWithUsImageSelector
+    );
+    expect(isVisible).toBe(true);
   }
 
   /**
@@ -6017,14 +6042,20 @@ export class LoggedOutUser extends BaseUser {
    * Checks if explore button is visible in about page.
    */
   async expectExploreLessonsButtonInAboutPageToBePresent(): Promise<void> {
-    await this.isElementVisible(exploreLessonsButtonInAboutUsPageSelector);
+    const isVisible = await this.isElementVisible(
+      exploreLessonsButtonInAboutUsPageSelector
+    );
+    expect(isVisible).toBe(true);
   }
 
   /**
    * Checks if android app button is visible in about page.
    */
   async expectAndroidAppButtonInAboutPageToBePresent(): Promise<void> {
-    await this.isElementVisible(androidAppButtonInAboutUsPageSelector);
+    const isVisible = await this.isElementVisible(
+      androidAppButtonInAboutUsPageSelector
+    );
+    expect(isVisible).toBe(true);
   }
 
   /**
@@ -6084,14 +6115,16 @@ export class LoggedOutUser extends BaseUser {
    * Checks if "Our Impact" section is visible in donation page.
    */
   async expectOurImpactSectionInDonationPageToBePresent(): Promise<void> {
-    await this.isElementVisible(ourImpactSectionSelector);
+    const isVisible = await this.isElementVisible(ourImpactSectionSelector);
+    expect(isVisible).toBe(true);
   }
 
   /**
    * Checks if "Our Learners" section is visible in donation page.
    */
   async expectOurLearnersSectionInDonationPageToBePresent(): Promise<void> {
-    await this.isElementVisible(ourLearnersSectionSelector);
+    const isVisible = await this.isElementVisible(ourLearnersSectionSelector);
+    expect(isVisible).toBe(true);
   }
 
   /**
@@ -6119,22 +6152,34 @@ export class LoggedOutUser extends BaseUser {
    * Checks if "Our Network" section is visible in donation page.
    */
   async expectOurNetworkSectionInDonationPageToBePresent(): Promise<void> {
-    await this.isElementVisible(ourNetworkHeadingSelector);
+    const isHeadingVisible = await this.isElementVisible(
+      ourNetworkHeadingSelector
+    );
+    expect(isHeadingVisible).toBe(true);
 
     await this.expectTextContentInElementWithSelectorToBe(
       ourNetworkHeadingSelector,
       'Our Network'
     );
 
-    await this.isElementVisible(ourNetworkSectionSelector);
-    await this.isElementVisible(donationHighlightsSelector);
+    const isSectionVisible = await this.isElementVisible(
+      ourNetworkSectionSelector
+    );
+    expect(isSectionVisible).toBe(true);
+    const isDonationHighlightsVisible = await this.isElementVisible(
+      donationHighlightsSelector
+    );
+    expect(isDonationHighlightsVisible).toBe(true);
   }
 
   /**
    * Checks that the "View Report" button on the About page is visible.
    */
   async expectViewReportButtonInAboutPageToBeVisible(): Promise<void> {
-    await this.isElementVisible(impactReportButtonInAboutPage);
+    const isVisible = await this.isElementVisible(
+      impactReportButtonInAboutPage
+    );
+    expect(isVisible).toBe(true);
   }
 
   /**
@@ -6156,7 +6201,10 @@ export class LoggedOutUser extends BaseUser {
    * to the correct Google Play Store URL for the Oppia Android app.
    */
   async clickOnPlayStoreImageInAndroidPageAndVerifyNavigation(): Promise<void> {
-    await this.isElementVisible(redirectToPlayStoreImageSelector);
+    const isVisible = await this.isElementVisible(
+      redirectToPlayStoreImageSelector
+    );
+    expect(isVisible).toBe(true);
 
     await this.clickLinkButtonToNewTab(
       redirectToPlayStoreImageSelector,
@@ -6249,7 +6297,10 @@ export class LoggedOutUser extends BaseUser {
    */
   async verifyLearnerStoriesCarouselInPartnershipPageWorksProperly(): Promise<void> {
     const activeItemSelector = `${learnerStoriesCarouselContainerSelector} .carousel-item.active`;
-    await this.isElementVisible(learnerStoriesHeadingSelector);
+    const isHeadingVisible = await this.isElementVisible(
+      learnerStoriesHeadingSelector
+    );
+    expect(isHeadingVisible).toBe(true);
 
     // Verify Coursal Heading.
     const subHeading = await this.page.$eval(
@@ -6420,7 +6471,10 @@ export class LoggedOutUser extends BaseUser {
    * @param {string} classroomName - The name of the classroom.
    */
   async clickOnClassroomTileInLearnPage(classroomName: string): Promise<void> {
-    await this.isElementVisible(classroomTileContainerSelector);
+    const isVisible = await this.isElementVisible(
+      classroomTileContainerSelector
+    );
+    expect(isVisible).toBe(true);
 
     const classroomTiles = await this.page.$$(classroomTileContainerSelector);
 
@@ -6619,7 +6673,8 @@ export class LoggedOutUser extends BaseUser {
    * Expects the user to be in the diagnostic test player.
    */
   async expectToBeInDiagnosticTestPlayer(): Promise<void> {
-    await this.isElementVisible(diagnosticTestPlayerSelector);
+    const isVisible = await this.isElementVisible(diagnosticTestPlayerSelector);
+    expect(isVisible).toBe(true);
 
     await this.isTextPresentOnPage('Learner Diagnostic Test');
   }

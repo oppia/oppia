@@ -5702,14 +5702,18 @@ export class ExplorationEditor extends BaseUser {
    * Navigates to the tour tab in the exploration editor.
    */
   async clickOnTakeATourButton(): Promise<void> {
-    await this.isElementVisible(takeATourButtonSelector);
+    const isVisible = await this.isElementVisible(takeATourButtonSelector);
+    expect(isVisible).toBe(true);
     await this.clickOn(takeATourButtonSelector);
 
     await this.expectElementToBeVisible(joyrideBodySelector);
   }
 
   async clickOnTakeATranslationsTourButton(): Promise<void> {
-    await this.isElementVisible(translationTourButtonSelector);
+    const isVisible = await this.isElementVisible(
+      translationTourButtonSelector
+    );
+    expect(isVisible).toBe(true);
     await this.clickOn(translationTourButtonSelector);
 
     await this.expectElementToBeVisible(joyrideBodySelector);

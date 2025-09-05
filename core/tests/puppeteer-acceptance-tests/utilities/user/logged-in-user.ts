@@ -343,7 +343,10 @@ export class LoggedInUser extends BaseUser {
    * Function for clicking on the profile dropdown.
    */
   async clickOnProfileDropdown(): Promise<void> {
-    await this.isElementVisible(profileDropdownToggleSelector);
+    const isVisible = await this.isElementVisible(
+      profileDropdownToggleSelector
+    );
+    expect(isVisible).toBe(true);
     await this.clickOn(profileDropdownToggleSelector);
   }
 
@@ -354,7 +357,10 @@ export class LoggedInUser extends BaseUser {
   async expectProfileDropdownToContainElementWithContent(
     item: string
   ): Promise<void> {
-    await this.isElementVisible(profileDropdownContainerSelector);
+    const isVisible = await this.isElementVisible(
+      profileDropdownContainerSelector
+    );
+    expect(isVisible).toBe(true);
 
     const elementsContents = await this.page.$$eval(
       profileDropdownAnchorSelector,
@@ -3197,27 +3203,54 @@ export class LoggedInUser extends BaseUser {
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileNavbarOpenSidebarButton);
       // Learn Dropdown.
-      await this.isElementVisible(mobileLearnDropdownSelector);
-      await this.isElementVisible(mobileLearnSubMenuSelector);
+      const isLearnDropdownVisible = await this.isElementVisible(
+        mobileLearnDropdownSelector
+      );
+      expect(isLearnDropdownVisible).toBe(true);
+      const isLearnSubMenuVisible = await this.isElementVisible(
+        mobileLearnSubMenuSelector
+      );
+      expect(isLearnSubMenuVisible).toBe(true);
       await this.clickOn(mobileLearnDropdownSelector);
-      await this.isElementVisible(mobileLearnSubMenuSelector, false);
+      const isLearnSubMenuHidden = await this.isElementVisible(
+        mobileLearnSubMenuSelector,
+        false
+      );
+      expect(isLearnSubMenuHidden).toBe(true);
       await this.clickOn(mobileLearnDropdownSelector);
 
       // About Dropdown.
-      await this.isElementVisible(mobileAboutMenuDropdownSelector);
-      await this.isElementVisible(mobileAboutPageButtonSelector, false);
+      const isAboutDropdownVisible = await this.isElementVisible(
+        mobileAboutMenuDropdownSelector
+      );
+      expect(isAboutDropdownVisible).toBe(true);
+      const isAboutPageButtonHidden = await this.isElementVisible(
+        mobileAboutPageButtonSelector,
+        false
+      );
+      expect(isAboutPageButtonHidden).toBe(true);
       await this.clickOn(mobileAboutMenuDropdownSelector);
-      await this.isElementVisible(mobileAboutPageButtonSelector);
+      const isAboutPageButtonVisible = await this.isElementVisible(
+        mobileAboutPageButtonSelector
+      );
+      expect(isAboutPageButtonVisible).toBe(true);
       await this.clickOn(mobileAboutMenuDropdownSelector);
 
       // Get Involved Dropdown.
-      await this.isElementVisible(mobileGetInvolvedDropdownSelector);
-      await this.isElementVisible(
+      const isGetInvolvedDropdownVisible = await this.isElementVisible(
+        mobileGetInvolvedDropdownSelector
+      );
+      expect(isGetInvolvedDropdownVisible).toBe(true);
+      const isGetInvolvedMenuHidden = await this.isElementVisible(
         mobileGetInvolvedMenuContainerSelector,
         false
       );
+      expect(isGetInvolvedMenuHidden).toBe(true);
       await this.clickOn(mobileGetInvolvedDropdownSelector);
-      await this.isElementVisible(mobileGetInvolvedMenuContainerSelector);
+      const isGetInvolvedMenuVisible = await this.isElementVisible(
+        mobileGetInvolvedMenuContainerSelector
+      );
+      expect(isGetInvolvedMenuVisible).toBe(true);
       await this.clickOn(mobileGetInvolvedDropdownSelector);
 
       // Close Navmenu.
@@ -3226,13 +3259,22 @@ export class LoggedInUser extends BaseUser {
     // Desktop view port.
     else {
       await this.clickOn(navbarLearnTab);
-      await this.isElementVisible(navbarLearnDropdownContainerSelector);
+      const isLearnDropdownContainerVisible = await this.isElementVisible(
+        navbarLearnDropdownContainerSelector
+      );
+      expect(isLearnDropdownContainerVisible).toBe(true);
 
       await this.clickOn(navbarAboutTab);
-      await this.isElementVisible(navbarAboutDropdownConatinaerSelector);
+      const isAboutDropdownContainerVisible = await this.isElementVisible(
+        navbarAboutDropdownConatinaerSelector
+      );
+      expect(isAboutDropdownContainerVisible).toBe(true);
 
       await this.clickOn(navbarGetInvolvedTab);
-      await this.isElementVisible(navbarGetInvolvedDropdownContainerSelector);
+      const isGetInvolvedDropdownContainerVisible = await this.isElementVisible(
+        navbarGetInvolvedDropdownContainerSelector
+      );
+      expect(isGetInvolvedDropdownContainerVisible).toBe(true);
     }
   }
 }
