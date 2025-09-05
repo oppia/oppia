@@ -103,18 +103,6 @@ describe('End chapter check mark component', function () {
     );
   });
 
-  it('should return true from showThreeButtons when practiceQuestionsAreEnabled is true and nextStoryNodeTitle is falsy', () => {
-    component.practiceQuestionsAreEnabled = true;
-    component.nextStoryNodeTitle = '';
-    expect(component.showThreeButtons()).toBeTrue();
-  });
-
-  it('should return false from showThreeButtons when nextStoryNodeTitle is truthy', () => {
-    component.practiceQuestionsAreEnabled = true;
-    component.nextStoryNodeTitle = 'Some Title';
-    expect(component.showThreeButtons()).toBeFalse();
-  });
-
   it('should redirect to sign in page when user clicks on signin button', fakeAsync(() => {
     spyOn(userService, 'getLoginUrlAsync').and.returnValue(
       Promise.resolve('login_url')

@@ -383,3 +383,9 @@ oppia-conversation-display .conversation-skin-oppia-completed-state-card {
   margin-top: 35px;
   padding: 32px;
 }
+
+@media (min-width: 1024px) {
+  oppia-conversation-display .supplemental-history-response {
+    width: 75%;
+  }
+}
