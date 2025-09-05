@@ -301,10 +301,10 @@ oppia-learner-dashboard-page .oppia-learner-groups-icon {
 
 .oppia-learner-dash-container {
   background-color: #f2f4f7;
-  padding: 0 16px;
   min-width: 320px;
-  position: relative;
   overflow-x: hidden;
+  padding: 0 16px;
+  position: relative;
 }
 
 .oppia-learner-dash-sidebar {
@@ -384,8 +384,8 @@ oppia-learner-dashboard-page .oppia-learner-groups-icon {
     display: flex;
     height: max-content;
     justify-content: space-around;
-    padding: 8px 0;
     overflow-x: auto;
+    padding: 8px 0;
     width: 100%;
   }
 
