@@ -273,7 +273,7 @@ def _job_bookkeeping_context(
     try:
         yield run_model
 
-    except Exception as exception:
+    except Exception:
         run_model.latest_job_state = beam_job_models.BeamJobState.FAILED.value
         _put_job_stderr(run_model.id, traceback.format_exc())
 
