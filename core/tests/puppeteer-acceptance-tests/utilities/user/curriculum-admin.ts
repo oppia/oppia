@@ -383,7 +383,7 @@ export class CurriculumAdmin extends BaseUser {
       await this.page.reload({waitUntil: 'networkidle0'});
     } else {
       await this.page.waitForSelector(skillQuestionTab, {visible: true});
-      await this.clickAndWaitForNavigation(skillQuestionTab);
+      await this.clickAndWaitForNavigation(skillQuestionTab, true);
     }
   }
 
@@ -1421,7 +1421,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOnElementWithSelector(uploadPhotoButton);
 
     await this.page.waitForSelector(photoUploadModal, {hidden: true});
-    await this.clickAndWaitForNavigation(createStoryButton);
+    await this.clickAndWaitForNavigation(createStoryButton, true);
 
     await this.page.waitForSelector(storyMetaTagInput);
     await this.page.focus(storyMetaTagInput);
@@ -1475,7 +1475,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOnElementWithSelector(uploadPhotoButton);
 
     await this.page.waitForSelector(photoUploadModal, {hidden: true});
-    await this.clickAndWaitForNavigation(createStoryButton);
+    await this.clickAndWaitForNavigation(createStoryButton, true);
 
     await this.page.waitForSelector(storyMetaTagInput);
     await this.page.focus(storyMetaTagInput);
@@ -1836,7 +1836,7 @@ export class CurriculumAdmin extends BaseUser {
         await this.goto(questionsTabUrl);
         await this.page.reload({waitUntil: 'networkidle0'});
       } else {
-        await this.clickAndWaitForNavigation(skillQuestionTab);
+        await this.clickAndWaitForNavigation(skillQuestionTab, true);
       }
 
       while (true) {

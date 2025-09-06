@@ -2412,7 +2412,7 @@ export class ExplorationEditor extends BaseUser {
    */
   async navigateToExplorationEditorFromCreatorDashboard(): Promise<void> {
     await this.page.waitForSelector(createExplorationButtonSelector);
-    await this.clickAndWaitForNavigation(createExplorationButtonSelector);
+    await this.clickAndWaitForNavigation(createExplorationButtonSelector, true);
 
     await this.page.waitForFunction(
       (targetURL: string) => {
@@ -2427,7 +2427,7 @@ export class ExplorationEditor extends BaseUser {
    * Function to navigate to exploration editor.
    */
   async navigateToExplorationEditorPage(): Promise<void> {
-    await this.clickAndWaitForNavigation(createExplorationButton);
+    await this.clickAndWaitForNavigation(createExplorationButton, true);
   }
 
   /**
@@ -4329,7 +4329,7 @@ export class ExplorationEditor extends BaseUser {
       });
       await this.clickOnElementWithSelector(mobileNavbarDropdown);
       await this.page.waitForSelector(mobileNavbarPane);
-      await this.clickAndWaitForNavigation(mobileTranslationTabButton);
+      await this.clickAndWaitForNavigation(mobileTranslationTabButton, true);
 
       // Close dropdown if it doesn't automatically close.
       const isVisible = await this.isElementVisible(
@@ -4344,7 +4344,7 @@ export class ExplorationEditor extends BaseUser {
       await this.page.waitForSelector(translationTabButton, {
         visible: true,
       });
-      await this.clickAndWaitForNavigation(translationTabButton);
+      await this.clickAndWaitForNavigation(translationTabButton, true);
     }
 
     await this.expectElementToBeVisible(translationTabContainer);

@@ -755,7 +755,7 @@ export class LoggedInUser extends BaseUser {
    * Clicks the delete account button and waits for navigation.
    */
   async deleteAccount(): Promise<void> {
-    await this.clickAndWaitForNavigation(deleteAccountButton);
+    await this.clickAndWaitForNavigation(deleteAccountButton, true);
 
     await this.page.waitForSelector(deleteAccountPage, {
       visible: true,
@@ -774,7 +774,7 @@ export class LoggedInUser extends BaseUser {
       accountDeletionButtonInDeleteAccountPage
     );
     await this.type(confirmUsernameField, username);
-    await this.clickAndWaitForNavigation(confirmAccountDeletionButton);
+    await this.clickAndWaitForNavigation(confirmAccountDeletionButton, true);
 
     await this.page.waitForSelector(deleteMyAcccountButton, {
       hidden: true,
@@ -1598,7 +1598,7 @@ export class LoggedInUser extends BaseUser {
         throw new Error('Profile tab not found');
       }
 
-      await this.clickAndWaitForNavigation(goToProfilePageButton);
+      await this.clickAndWaitForNavigation(goToProfilePageButton, true);
       await this.waitForPageToFullyLoad();
       if (!this.page.url().includes('/profile')) {
         throw new Error('Failed to navigate to Profile tab');
@@ -1621,7 +1621,7 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(saveChangesButtonSelector, {
       visible: true,
     });
-    await this.clickAndWaitForNavigation(saveChangesButtonSelector);
+    await this.clickAndWaitForNavigation(saveChangesButtonSelector, true);
     const isDisabled = await this.page.$eval(
       `button${saveChangesButtonSelector}`,
       btn => (btn as HTMLButtonElement).disabled
@@ -2261,7 +2261,7 @@ export class LoggedInUser extends BaseUser {
    * Function to navigate to exploration editor from creator dashboard.
    */
   async navigateToExplorationEditorPageFromCreatorDashboard(): Promise<void> {
-    await this.clickAndWaitForNavigation(createExplorationButton);
+    await this.clickAndWaitForNavigation(createExplorationButton, true);
 
     if (!this.page.url().includes('/create/')) {
       throw new Error(

@@ -836,7 +836,7 @@ export class LoggedOutUser extends BaseUser {
       visible: true,
     });
     await this.type(blogSearchInputSelector, keyword);
-    await this.clickAndWaitForNavigation(blogSubmitButtonSelector);
+    await this.clickAndWaitForNavigation(blogSubmitButtonSelector, true);
 
     const url = new URL(this.page.url());
     const queryParam = url.searchParams.get('q');
@@ -884,7 +884,7 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(blogTagFilterDropdownSelector, {
       hidden: true,
     });
-    await this.clickAndWaitForNavigation(blogSubmitButtonSelector);
+    await this.clickAndWaitForNavigation(blogSubmitButtonSelector, true);
 
     const url = new URL(this.page.url());
     const queryParam = url.searchParams.get('tags');
@@ -995,7 +995,7 @@ export class LoggedOutUser extends BaseUser {
     expectedDestinationPageUrl: string,
     expectedDestinationPageName: string
   ): Promise<void> {
-    await this.clickAndWaitForNavigation(button);
+    await this.clickAndWaitForNavigation(button, true);
 
     await this.expectPageURLToContain(expectedDestinationPageUrl);
   }
@@ -1383,7 +1383,7 @@ export class LoggedOutUser extends BaseUser {
     if (buttonText !== 'Watch a video') {
       throw new Error('The Watch A Video button does not exist!');
     }
-    await Promise.all([this.clickAndWaitForNavigation(watchAVideoButton)]);
+    await this.clickAndWaitForNavigation(watchAVideoButton, true);
     await this.waitForPageToFullyLoad();
 
     const url = this.page.url();
@@ -1409,7 +1409,7 @@ export class LoggedOutUser extends BaseUser {
     if (buttonText !== 'Read our blog') {
       throw new Error('The Read Our Blog button does not exist!');
     }
-    await this.clickAndWaitForNavigation(readOurBlogButton);
+    await this.clickAndWaitForNavigation(readOurBlogButton, true);
 
     if (this.page.url() !== blogUrl) {
       throw new Error(
@@ -1563,7 +1563,7 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(footerForumlink, {
       visible: true,
     });
-    await this.clickAndWaitForNavigation(footerForumlink);
+    await this.clickAndWaitForNavigation(footerForumlink, true);
 
     expect(this.page.url()).toBe(googleGroupsOppiaUrl);
   }
@@ -3266,7 +3266,10 @@ export class LoggedOutUser extends BaseUser {
       throw new Error('The Watch A Video button does not exist!');
     }
     await Promise.all([
-      this.clickAndWaitForNavigation(watchAVideoButtonInThanksForSubscribe),
+      this.clickAndWaitForNavigation(
+        watchAVideoButtonInThanksForSubscribe,
+        true
+      ),
     ]);
     await this.waitForPageToFullyLoad();
 
@@ -3292,7 +3295,10 @@ export class LoggedOutUser extends BaseUser {
     if (buttonText !== 'Read our blog') {
       throw new Error('The Read Our Blog button does not exist!');
     }
-    await this.clickAndWaitForNavigation(readOurBlogButtonInThanksForSubscribe);
+    await this.clickAndWaitForNavigation(
+      readOurBlogButtonInThanksForSubscribe,
+      true
+    );
 
     if (this.page.url() !== readBlogUrl) {
       throw new Error(
@@ -3788,7 +3794,7 @@ export class LoggedOutUser extends BaseUser {
   async clickOnStartHereButtonInClassroomPage(): Promise<void> {
     await this.isElementVisible(startHereButtonSelector);
 
-    await this.clickAndWaitForNavigation(startHereButtonSelector);
+    await this.clickAndWaitForNavigation(startHereButtonSelector, true);
     await this.isElementVisible(startHereButtonSelector, false);
   }
 
@@ -3993,9 +3999,9 @@ export class LoggedOutUser extends BaseUser {
   async returnToTopicPageAfterCompletingExploration(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.clickAndWaitForNavigation('Return to Story');
-      await this.clickAndWaitForNavigation(NavbarBackButton);
+      await this.clickAndWaitForNavigation(NavbarBackButton, true);
     } else {
-      await this.clickAndWaitForNavigation(oppiaTopicTitleSelector);
+      await this.clickAndWaitForNavigation(oppiaTopicTitleSelector, true);
     }
 
     await this.page.waitForSelector(topicDescriptionSelector, {
@@ -4218,7 +4224,7 @@ export class LoggedOutUser extends BaseUser {
       hidden: true,
     });
 
-    await this.clickAndWaitForNavigation(nextLessonButton);
+    await this.clickAndWaitForNavigation(nextLessonButton, true);
 
     await this.page.waitForSelector(nextLessonButton, {
       hidden: true,
@@ -4863,7 +4869,7 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(resumeExplorationButton, {visible: true});
 
     if (action === 'Restart') {
-      await this.clickAndWaitForNavigation(restartExplorationButton);
+      await this.clickAndWaitForNavigation(restartExplorationButton, true);
     } else if (action === 'Resume') {
       await this.clickOnElementWithSelector(resumeExplorationButton);
       // Closing checkpoint modal if appears.

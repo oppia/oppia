@@ -514,13 +514,22 @@ export class BaseUser {
   /**
    * The function clicks the element using the text on the button
    * and wait until the new page is fully loaded.
+   * @param {string} selector - The selector of the element.
+   * @param {boolean} useSelector - Whether to use the selector or the text.
    */
-  async clickAndWaitForNavigation(selector: string): Promise<void> {
+  async clickAndWaitForNavigation(
+    selector: string,
+    useSelector: boolean = false
+  ): Promise<void> {
     const navigationPromise = this.page.waitForNavigation({
       waitUntil: ['networkidle2', 'load'],
     });
 
-    await this.clickOnElementWithSelector(selector);
+    if (useSelector) {
+      await this.clickOnElementWithSelector(selector);
+    } else {
+      await this.clickOnElementWithText(selector);
+    }
     await navigationPromise;
   }
 

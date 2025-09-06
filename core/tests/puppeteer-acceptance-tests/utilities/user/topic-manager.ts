@@ -290,7 +290,7 @@ export class TopicManager extends BaseUser {
       await this.page.reload({waitUntil: 'networkidle0'});
     } else {
       await this.expectElementToBeVisible(skillQuestionTab);
-      await this.clickAndWaitForNavigation(skillQuestionTab);
+      await this.clickAndWaitForNavigation(skillQuestionTab, true);
     }
 
     await this.expectElementToBeVisible(questionContainerSelector);
@@ -322,7 +322,7 @@ export class TopicManager extends BaseUser {
     } else {
       await this.expectElementToBeVisible(questionPreviewTab);
       await this.page.waitForSelector(questionPreviewTab);
-      await this.clickAndWaitForNavigation(questionPreviewTab);
+      await this.clickAndWaitForNavigation(questionPreviewTab, true);
     }
 
     await this.expectElementToBeVisible(skillPreviewContainerSelector);
