@@ -2878,7 +2878,7 @@ export class ExplorationEditor extends BaseUser {
     );
 
     await this.waitForNetworkIdle();
-    await this.clickOnElementWithSelector(interactionToAdd);
+    await this.clickOnElementWithText(interactionToAdd);
     if (skipInteractionCustoization) {
       await this.expectCustomizeInteractionTitleToBe(
         `Customize Interaction (${interactionToAdd})`
