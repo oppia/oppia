@@ -26,7 +26,6 @@ import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
 import {StorySummary} from 'domain/story/story-summary.model';
 import {StoryNode} from 'domain/story/story-node.model';
-import {By} from '@angular/platform-browser';
 
 describe('GoalListComponent', () => {
   let component: GoalListComponent;
