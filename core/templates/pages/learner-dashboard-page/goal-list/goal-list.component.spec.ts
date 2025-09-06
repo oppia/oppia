@@ -22,7 +22,6 @@ import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {GoalListComponent} from './goal-list.component';
-import {ContentToggleButtonComponent} from '../content-toggle-button/content-toggle-button.component';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
 import {StorySummary} from 'domain/story/story-summary.model';
