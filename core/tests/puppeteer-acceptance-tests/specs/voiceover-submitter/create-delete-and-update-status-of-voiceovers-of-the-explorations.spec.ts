@@ -69,7 +69,6 @@ describe('Voiceover Submitter', function () {
       'voiceoverSubmitter',
       'voiceover_submitter@example.com',
       [ROLES.VOICEOVER_SUBMITTER],
-      null,
       explorationId
     );
   }, 600000);
