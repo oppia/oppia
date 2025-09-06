@@ -84,15 +84,15 @@
 }
 
 .teach-page .carousel-indicators {
-  position: absolute;
   bottom: -30px; 
-  left: 50%;
-  transform: translateX(-50%);
   display: flex;
   justify-content: center;
+  left: 50%;
+  list-style: none;
   margin: 0;
   padding: 0;
-  list-style: none;
+  position: absolute;
+  transform: translateX(-50%);
 }
 
 .teach-page .carousel-indicators li {
