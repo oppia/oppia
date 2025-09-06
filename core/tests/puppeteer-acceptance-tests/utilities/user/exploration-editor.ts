@@ -2877,13 +2877,8 @@ export class ExplorationEditor extends BaseUser {
       interactionToAdd as INTERACTION_TYPES
     );
 
-    const selector =
-      INTERACTION_SELECTORS[interactionToAdd] ?? ` ${interactionToAdd} `;
-    if (INTERACTION_SELECTORS[interactionToAdd]) {
-      await this.page.waitForSelector(selector);
-    }
     await this.waitForNetworkIdle();
-    await this.clickOnElementWithSelector(selector);
+    await this.clickOnElementWithSelector(interactionToAdd);
     if (skipInteractionCustoization) {
       await this.expectCustomizeInteractionTitleToBe(
         `Customize Interaction (${interactionToAdd})`

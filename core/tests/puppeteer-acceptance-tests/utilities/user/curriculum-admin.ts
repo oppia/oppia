@@ -434,7 +434,7 @@ export class CurriculumAdmin extends BaseUser {
       visible: true,
     });
     await this.clickOnElementWithSelector(responseRuleDropdown);
-    await this.clickOnElementWithSelector(equalsRuleButtonText);
+    await this.clickOnElementWithText(equalsRuleButtonText);
     await this.type(floatTextField, '3');
     await this.clickOnElementWithSelector(answersInGroupAreCorrectToggle);
     await this.clickOnElementWithSelector(openAnswerGroupFeedBackEditor);
