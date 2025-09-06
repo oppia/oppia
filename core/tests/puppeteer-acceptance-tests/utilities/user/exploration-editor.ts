@@ -3152,7 +3152,7 @@ export class ExplorationEditor extends BaseUser {
       visible: true,
     });
     await this.clickOnElementWithSelector(categoryDropdown);
-    await this.clickOnElementWithSelector(category);
+    await this.clickOnElementWithText(category);
     await this.expectSelectedCategoryToBe(category);
   }
 
@@ -3391,7 +3391,7 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOnElementWithSelector(addUsernameInputBox);
     await this.type(addUsernameInputBox, username);
     await this.clickOnElementWithSelector(addRoleDropdown);
-    await this.clickOnElementWithSelector(collaboratorRoleOption);
+    await this.clickOnElementWithText(collaboratorRoleOption);
     await this.waitForElementToStabilize(saveRoleButton);
     await this.clickOnElementWithSelector(saveRoleButton);
     await this.page.waitForSelector(saveRoleButton, {hidden: true});
@@ -4823,7 +4823,7 @@ export class ExplorationEditor extends BaseUser {
       showMessage(
         `Switching content type from ${activeContentType} to ${contentType}`
       );
-      await this.clickOnElementWithSelector(contentType);
+      await this.clickOnElementWithText(contentType);
     }
     await this.clickOnElementWithSelector(editTranslationSelector);
     switch (contentType) {
@@ -6174,7 +6174,7 @@ export class ExplorationEditor extends BaseUser {
 
     await this.expectElementToBeVisible(explorationCategoryDropdown);
     await this.clickOnElementWithSelector(explorationCategoryDropdown);
-    await this.clickOnElementWithSelector(category);
+    await this.clickOnElementWithText(category);
     await this.expectTextContentToBe(categoryDropdown, category);
 
     await this.expectElementToBeVisible(explorationLanguageSelector);

@@ -346,7 +346,7 @@ export class SuperAdmin extends BaseUser {
   async selectRole(role: string): Promise<void> {
     await this.navigateToAdminPageRolesTab();
     role = role.replace(/\b\w/g, char => char.toUpperCase());
-    await this.clickOnElementWithSelector(role);
+    await this.clickOnElementWithText(role);
 
     await this.expectTextContentToContain(selectedRoleHeadingSelector, role);
   }

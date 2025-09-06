@@ -991,12 +991,10 @@ export class LoggedOutUser extends BaseUser {
    */
   private async clickButtonToNavigateToNewPage(
     button: string,
-    buttonName: string,
     expectedDestinationPageUrl: string,
-    expectedDestinationPageName: string
+    useSelector: boolean = true
   ): Promise<void> {
-    await this.clickAndWaitForNavigation(button, true);
-
+    await this.clickAndWaitForNavigation(button, useSelector);
     await this.expectPageURLToContain(expectedDestinationPageUrl);
   }
 
@@ -1037,9 +1035,7 @@ export class LoggedOutUser extends BaseUser {
       await this.clickOnElementWithSelector(mobileNavbarOpenSidebarButton);
       await this.clickButtonToNavigateToNewPage(
         mobileSidebarBasicMathematicsButton,
-        'Basic Mathematics button in the Learn Menu on navbar',
-        mathClassroomUrl,
-        'Math Classroom'
+        mathClassroomUrl
       );
     } else {
       await this.page.waitForSelector(navbarLearnTab, {
@@ -1048,9 +1044,7 @@ export class LoggedOutUser extends BaseUser {
       await this.clickOnElementWithSelector(navbarLearnTab);
       await this.clickButtonToNavigateToNewPage(
         navbarLearnTabBasicMathematicsButton,
-        'Basic Mathematics button in the Learn Menu on navbar',
-        mathClassroomUrl,
-        'Math Classroom'
+        mathClassroomUrl
       );
     }
   }
@@ -1068,9 +1062,7 @@ export class LoggedOutUser extends BaseUser {
       await this.clickOnElementWithSelector(mobileSidebarExpandAboutMenuButton);
       await this.clickButtonToNavigateToNewPage(
         mobileSidebarAboutButton,
-        'About Oppia button in the About Menu on mobile sidebar',
-        aboutUrl,
-        'About'
+        aboutUrl
       );
     } else {
       await this.page.waitForSelector(navbarAboutTab, {
@@ -1079,9 +1071,7 @@ export class LoggedOutUser extends BaseUser {
       await this.clickOnElementWithSelector(navbarAboutTab);
       await this.clickButtonToNavigateToNewPage(
         navbarAboutTabAboutButton,
-        'About Oppia button in the About Menu on navbar',
-        aboutUrl,
-        'About'
+        aboutUrl
       );
     }
   }
@@ -1099,9 +1089,7 @@ export class LoggedOutUser extends BaseUser {
       await this.clickOnElementWithSelector(mobileSidebarExpandAboutMenuButton);
       await this.clickButtonToNavigateToNewPage(
         mobileSidebarTeachButton,
-        'Teach button in the About Menu on mobile sidebar',
-        teachUrl,
-        'Teach'
+        teachUrl
       );
     } else {
       await this.page.waitForSelector(navbarAboutTab, {
@@ -1110,9 +1098,7 @@ export class LoggedOutUser extends BaseUser {
       await this.clickOnElementWithSelector(navbarAboutTab);
       await this.clickButtonToNavigateToNewPage(
         navbarAboutTabTeachButton,
-        'Teach button in the About Menu on navbar',
-        teachUrl,
-        'Teach'
+        teachUrl
       );
     }
   }
@@ -1228,9 +1214,7 @@ export class LoggedOutUser extends BaseUser {
       );
       await this.clickButtonToNavigateToNewPage(
         mobileSidebarGetInvolvedMenuPartnershipsButton,
-        'School and Organizations in the Get Involved Menu on mobile sidebar',
-        partnershipsUrl,
-        'Partnerships'
+        partnershipsUrl
       );
     } else {
       await this.page.waitForSelector(navbarGetInvolvedTab, {
@@ -1239,9 +1223,7 @@ export class LoggedOutUser extends BaseUser {
       await this.clickOnElementWithSelector(navbarGetInvolvedTab);
       await this.clickButtonToNavigateToNewPage(
         navbarGetInvolvedTabSchoolAndOrganizationsButton,
-        'School and Organizations in the Get Involved Menu on navbar',
-        partnershipsUrl,
-        'Partnerships'
+        partnershipsUrl
       );
     }
   }
@@ -1261,9 +1243,7 @@ export class LoggedOutUser extends BaseUser {
       );
       await this.clickButtonToNavigateToNewPage(
         mobileSidebarGetInvolvedMenuVolunteerButton,
-        'Volunteer in the Get Involved Menu on mobile sidebar',
-        volunteerUrl,
-        'Volunteer'
+        volunteerUrl
       );
     } else {
       await this.page.waitForSelector(navbarGetInvolvedTab, {
@@ -1272,9 +1252,7 @@ export class LoggedOutUser extends BaseUser {
       await this.clickOnElementWithSelector(navbarGetInvolvedTab);
       await this.clickButtonToNavigateToNewPage(
         navbarGetInvolvedTabVolunteerButton,
-        'Volunteer in the Get Involved Menu on navbar',
-        volunteerUrl,
-        'Volunteer'
+        volunteerUrl
       );
     }
   }
@@ -1294,9 +1272,7 @@ export class LoggedOutUser extends BaseUser {
       );
       await this.clickButtonToNavigateToNewPage(
         mobileSidevbarGetInvolvedMenuDonateButton,
-        'Donate in the Get Involved Menu on mobile sidebar',
-        donateUrl,
-        'Donate'
+        donateUrl
       );
     } else {
       await this.page.waitForSelector(navbarGetInvolvedTab, {
@@ -1305,9 +1281,7 @@ export class LoggedOutUser extends BaseUser {
       await this.clickOnElementWithSelector(navbarGetInvolvedTab);
       await this.clickButtonToNavigateToNewPage(
         navbarGetInvolvedTabDonateButton,
-        'Donate in the Get Involved Menu on navbar',
-        donateUrl,
-        'Donate'
+        donateUrl
       );
     }
   }
@@ -1327,9 +1301,7 @@ export class LoggedOutUser extends BaseUser {
       );
       await this.clickButtonToNavigateToNewPage(
         mobileSidebarGetInvolvedMenuContactUsButton,
-        'Contact Us in the Get Involved Menu on mobile sidebar',
-        contactUrl,
-        'Contact'
+        contactUrl
       );
     } else {
       await this.page.waitForSelector(navbarGetInvolvedTab, {
@@ -1338,9 +1310,7 @@ export class LoggedOutUser extends BaseUser {
       await this.clickOnElementWithSelector(navbarGetInvolvedTab);
       await this.clickButtonToNavigateToNewPage(
         navbarGetInvolvedTabContactUsButton,
-        'Contact Us in the Get Involved Menu on navbar',
-        contactUrl,
-        'Contact'
+        contactUrl
       );
     }
   }
@@ -1362,12 +1332,7 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(navbarDonateButton, {
       visible: true,
     });
-    await this.clickButtonToNavigateToNewPage(
-      navbarDonateButton,
-      'Donate button on navbar',
-      donateUrl,
-      'Donate'
-    );
+    await this.clickButtonToNavigateToNewPage(navbarDonateButton, donateUrl);
   }
 
   /**
@@ -1537,23 +1502,13 @@ export class LoggedOutUser extends BaseUser {
    * Navigates to the About page using the oppia website footer.
    */
   async clickOnAboutLinkInFooter(): Promise<void> {
-    await this.clickButtonToNavigateToNewPage(
-      footerAboutLink,
-      'About Oppia link in the About Oppia section in the footer',
-      aboutUrl,
-      'About'
-    );
+    await this.clickButtonToNavigateToNewPage(footerAboutLink, aboutUrl);
   }
   /**
    * Navigates to the Blog page using the oppia website footer.
    */
   async clickOnBlogLinkInFooter(): Promise<void> {
-    await this.clickButtonToNavigateToNewPage(
-      footerBlogLink,
-      'Blog link in the About Oppia section in the footer',
-      blogUrl,
-      'Blog'
-    );
+    await this.clickButtonToNavigateToNewPage(footerBlogLink, blogUrl);
   }
 
   /**
@@ -1575,9 +1530,7 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(footerGetStartedLink);
     await this.clickButtonToNavigateToNewPage(
       footerGetStartedLink,
-      'Get Started link in the footer',
-      getStartedUrl,
-      'Get Started'
+      getStartedUrl
     );
   }
 
@@ -1588,9 +1541,7 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(footerCreatorGuidelinesLink);
     await this.clickButtonToNavigateToNewPage(
       footerCreatorGuidelinesLink,
-      'Creator Guidelines link in the footer',
-      creatorGuidelinesUrl,
-      'Creator Guidelines'
+      creatorGuidelinesUrl
     );
   }
 
@@ -1599,12 +1550,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async clickOnForParentsSlashTeachersLinkInFooter(): Promise<void> {
     await this.page.waitForSelector(footerCreatorGuidelinesLink);
-    await this.clickButtonToNavigateToNewPage(
-      footerTeachLink,
-      'For Parents/Teachers link in footer',
-      teachUrl,
-      'Oppia for Parents, Teachers, and Guardians'
-    );
+    await this.clickButtonToNavigateToNewPage(footerTeachLink, teachUrl);
   }
 
   /**
@@ -1612,12 +1558,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async clickOnTermsOfServiceLinkInFooter(): Promise<void> {
     await this.page.waitForSelector(footerCreatorGuidelinesLink);
-    await this.clickButtonToNavigateToNewPage(
-      footerTermsLink,
-      'Terms of use link in footer',
-      termsUrl,
-      'Terms of Use'
-    );
+    await this.clickButtonToNavigateToNewPage(footerTermsLink, termsUrl);
   }
 
   /**
@@ -1627,9 +1568,7 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(footerCreatorGuidelinesLink);
     await this.clickButtonToNavigateToNewPage(
       footerPrivacyPolicyLink,
-      'Privacy Policy link in the footer',
-      privacyPolicyUrl,
-      'Privacy Policy'
+      privacyPolicyUrl
     );
   }
 
@@ -1640,9 +1579,7 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(footerCreatorGuidelinesLink);
     await this.clickButtonToNavigateToNewPage(
       footerCommunityLibraryLink,
-      'Browse the Library link in the footer',
-      communityLibraryUrl,
-      'Community Library'
+      communityLibraryUrl
     );
   }
 
@@ -1651,12 +1588,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async clickOnContactUsLinkInFooter(): Promise<void> {
     await this.page.waitForSelector(footerCreatorGuidelinesLink);
-    await this.clickButtonToNavigateToNewPage(
-      footerContactUsLink,
-      'Contact Us link in the footer',
-      contactUrl,
-      'Contact'
-    );
+    await this.clickButtonToNavigateToNewPage(footerContactUsLink, contactUrl);
   }
 
   /**
@@ -1870,9 +1802,7 @@ export class LoggedOutUser extends BaseUser {
   async clickLinkAboutCookiesOnPrivacyPolicyPage(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       'https://allaboutcookies.org/how-to-manage-cookies',
-      'link to learn about cookies on the Privacy Policy page',
-      allAboutCookiesUrl,
-      'All About Cookies'
+      allAboutCookiesUrl
     );
   }
 
@@ -1882,9 +1812,7 @@ export class LoggedOutUser extends BaseUser {
   async clickLinkAboutGoogleAnalyticsOnPrivacyPolicyPage(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       'https://www.google.com/policies/privacy/partners/',
-      'link to learn about Google Analytivs on the Privacy Policy page',
-      googleAnalyticsPartnerPoliciesUrl,
-      'Google Privacy & Terms'
+      googleAnalyticsPartnerPoliciesUrl
     );
   }
 
@@ -1894,9 +1822,7 @@ export class LoggedOutUser extends BaseUser {
   async clickLinkAboutGoogleAnalyticsOptOutOnPrivacyPolicyPage(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       googleAnalyticsOptOutUrl,
-      'link to opt out of cookies on the Privacy Policy pager',
-      googleAnalyticsOptOutUrl,
-      'Google Analytics Opt-out Browser Add-on'
+      googleAnalyticsOptOutUrl
     );
   }
 
@@ -2052,9 +1978,7 @@ export class LoggedOutUser extends BaseUser {
     if (this.isViewportAtMobileWidth()) {
       await this.clickButtonToNavigateToNewPage(
         exploreLessonsButtonAtTheTopInTeachPage,
-        'Explore Lessons button',
-        classroomsPageUrl,
-        'Classrooms page'
+        classroomsPageUrl
       );
     }
   }
@@ -2066,9 +1990,7 @@ export class LoggedOutUser extends BaseUser {
   async clickExploreLessonsButtonAtTheBottomInTeachPage(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       exploreLessonsButtonAtTheBottomInTeachPage,
-      'Explore Lessons button',
-      classroomsPageUrl,
-      'Classrooms page'
+      classroomsPageUrl
     );
   }
 
@@ -2079,9 +2001,7 @@ export class LoggedOutUser extends BaseUser {
   async clickGetAndroidAppButtonInTeachPage(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       getAndroidAppButtonInTeachPage,
-      'Get Android App button',
-      androidUrl,
-      'Android page'
+      androidUrl
     );
   }
 
@@ -2092,9 +2012,7 @@ export class LoggedOutUser extends BaseUser {
   async clickGetAndroidAppButtonInSplashPage(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       getAndroidAppButtonSelector,
-      'Access the Android App',
-      androidUrl,
-      'Android Page'
+      androidUrl
     );
   }
 
@@ -2425,9 +2343,7 @@ export class LoggedOutUser extends BaseUser {
   async clickReadMoreStoriesButtonInPartnershipsPageAndVerifyNavigation(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       readMoreStoriesButtonInPartnershipsPage,
-      'Read more stories button',
-      blogUrl,
-      'Blog'
+      blogUrl
     );
   }
 
@@ -2542,9 +2458,7 @@ export class LoggedOutUser extends BaseUser {
     });
     await this.clickButtonToNavigateToNewPage(
       privacyPolicyLinkInTermsPage,
-      'Privacy Policy link in the terms page',
-      privacyPolicyUrl,
-      'Privacy Policy'
+      privacyPolicyUrl
     );
   }
 
@@ -2556,9 +2470,7 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(ccLicenseLinkInTermsPage, {visible: true});
     await this.clickButtonToNavigateToNewPage(
       ccLicenseLinkInTermsPage,
-      'License link in the terms page',
-      ccLicenseUrl,
-      'License'
+      ccLicenseUrl
     );
   }
 
@@ -2572,9 +2484,7 @@ export class LoggedOutUser extends BaseUser {
     });
     await this.clickButtonToNavigateToNewPage(
       googleGroupSignUpLinkInTermsPage,
-      'Google Group Sign Up link in the terms page',
-      OppiaAnnounceGoogleGroupUrl,
-      'Oppia-announce Google Group page'
+      OppiaAnnounceGoogleGroupUrl
     );
   }
 
@@ -2583,12 +2493,7 @@ export class LoggedOutUser extends BaseUser {
    * it navigates to the correct URL.
    */
   async clickDonateTodayButtonInContactUsPage(): Promise<void> {
-    await this.clickButtonToNavigateToNewPage(
-      'DONATE TODAY',
-      'DONATE TODAY button',
-      donateUrl,
-      'Donate'
-    );
+    await this.clickButtonToNavigateToNewPage('DONATE TODAY', donateUrl, false);
   }
 
   /**
@@ -2598,9 +2503,8 @@ export class LoggedOutUser extends BaseUser {
   async clickBecomeAPartnerButtonInContactUsPage(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       'BECOME A PARTNER',
-      'BECOME A PARTNER button',
       partnershipsUrl,
-      'Partnerships'
+      false
     );
   }
 
@@ -2611,9 +2515,8 @@ export class LoggedOutUser extends BaseUser {
   async clickVolunteerButtonInContactUsPage(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       'BECOME A VOLUNTEER',
-      'BECOME A VOLUNTEER button',
       volunteerUrl,
-      'Volunteer'
+      false
     );
   }
 
@@ -2921,9 +2824,7 @@ export class LoggedOutUser extends BaseUser {
       : volunteerLearnMoreDesktopButtonInAboutPage;
     await this.clickButtonToNavigateToNewPage(
       volunteerLearnMoreButtonInAboutPage,
-      'Learn More button of Volunteer tab',
-      volunteerUrl,
-      'Volunteer'
+      volunteerUrl
     );
   }
 
@@ -2945,9 +2846,7 @@ export class LoggedOutUser extends BaseUser {
     await this.clickOnElementWithSelector(partnerTab);
     await this.clickButtonToNavigateToNewPage(
       partnerLearnMoreButtonInAboutPage,
-      'Learn More button of Partner tab',
-      partnershipsUrl,
-      'Partnerships'
+      partnershipsUrl
     );
   }
 

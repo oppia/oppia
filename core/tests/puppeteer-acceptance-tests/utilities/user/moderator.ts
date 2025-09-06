@@ -164,7 +164,7 @@ export class Moderator extends BaseUser {
       {},
       title
     );
-    await this.clickAndWaitForNavigation(title, true);
+    await this.clickAndWaitForNavigation(title);
 
     await this.expectElementToBeVisible(
       explorationFeedbackTabContainerSelector
