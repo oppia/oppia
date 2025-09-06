@@ -206,7 +206,10 @@ const editClassroomTeaserTextInputField =
   '.e2e-test-update-classroom-teaser-text';
 const editClassroomTopicListIntroInputField =
   '.e2e-test-update-classroom-topic-list-intro';
-const classroomBannerContainer = '.e2e-test-classroom-banner-container';
+const classroomThumbnailContainer =
+  '.e2e-test-classroom-thumbnail-container .e2e-test-photo-button';
+const classroomBannerContainer =
+  '.e2e-test-classroom-banner-container .e2e-test-photo-button';
 const imageUploaderModal = '.e2e-test-image-uploader-modal';
 const openTopicDropdownButton = '.e2e-test-add-topic-to-classroom-button';
 const topicDropDownFormField = '.e2e-test-classroom-category-dropdown';
@@ -1949,7 +1952,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.type(editClassroomTeaserTextInputField, teaserText);
     await this.page.type(editClassroomTopicListIntroInputField, topicListIntro);
     await this.page.type(editClassroomCourseDetailsInputField, courseDetails);
-    await this.clickOn(photoBoxButton);
+    await this.clickOn(classroomThumbnailContainer);
 
     await this.uploadFile(curriculumAdminThumbnailImage);
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
