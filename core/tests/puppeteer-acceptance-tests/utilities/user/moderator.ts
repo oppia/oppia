@@ -49,7 +49,7 @@ export class Moderator extends BaseUser {
    */
   async navigateToFeaturedActivitiesTab(): Promise<void> {
     await this.expectElementToBeVisible(featuredActivitiesTab);
-    await this.clickOn(featuredActivitiesTab);
+    await this.clickOnElementWithSelector(featuredActivitiesTab);
     await this.expectElementToBeVisible(featuredActivitiesHeaderSelector);
   }
 
@@ -289,7 +289,7 @@ export class Moderator extends BaseUser {
    */
   async navigateToRecentFeedbackMessagesTab(): Promise<void> {
     await this.expectElementToBeVisible(feedbackMessagesTab);
-    await this.clickOn(feedbackMessagesTab);
+    await this.clickOnElementWithSelector(feedbackMessagesTab);
 
     await this.expectElementToBeVisible(feedbackMessagesHeaderSelector);
   }

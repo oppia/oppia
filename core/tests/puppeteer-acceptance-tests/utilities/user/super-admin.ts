@@ -171,9 +171,9 @@ export class SuperAdmin extends BaseUser {
   ): Promise<void> {
     await this.goto(adminPageRolesTab);
     await this.type(roleEditorInputField, username);
-    await this.clickOn(roleEditorButtonSelector);
-    await this.clickOn(addRoleButton);
-    await this.clickOn(rolesSelectDropdown);
+    await this.clickOnElementWithSelector(roleEditorButtonSelector);
+    await this.clickOnElementWithSelector(addRoleButton);
+    await this.clickOnElementWithSelector(rolesSelectDropdown);
     const allRoleElements = await this.page.$$('.mat-option-text');
     for (let i = 0; i < allRoleElements.length; i++) {
       const roleText = await this.page.evaluate(
@@ -269,7 +269,7 @@ export class SuperAdmin extends BaseUser {
     const currentPageUrl = this.page.url();
     await this.goto(adminPageRolesTab);
     await this.type(roleEditorInputField, username);
-    await this.clickOn(roleEditorButtonSelector);
+    await this.clickOnElementWithSelector(roleEditorButtonSelector);
     await this.page.waitForSelector(justifyContentDiv);
     const userRoleElements = await this.page.$$(userRoleDescriptionSelector);
     for (let i = 0; i < userRoleElements.length; i++) {
@@ -293,7 +293,7 @@ export class SuperAdmin extends BaseUser {
     const currentPageUrl = this.page.url();
     await this.goto(adminPageRolesTab);
     await this.type(roleEditorInputField, username);
-    await this.clickOn(roleEditorButtonSelector);
+    await this.clickOnElementWithSelector(roleEditorButtonSelector);
     await this.page.waitForSelector(justifyContentDiv);
     const userRoleElements = await this.page.$$(userRoleDescriptionSelector);
     for (let i = 0; i < userRoleElements.length; i++) {
@@ -318,7 +318,7 @@ export class SuperAdmin extends BaseUser {
     await this.goto(adminPageRolesTab);
     await this.page.waitForSelector(roleEditorInputField);
     await this.type(roleEditorInputField, username);
-    await this.clickOn(roleEditorButtonSelector);
+    await this.clickOnElementWithSelector(roleEditorButtonSelector);
     await this.page.waitForSelector(justifyContentDiv);
     await this.page.waitForSelector(
       `.e2e-test-${role}-remove-button-container`
@@ -346,7 +346,7 @@ export class SuperAdmin extends BaseUser {
   async selectRole(role: string): Promise<void> {
     await this.navigateToAdminPageRolesTab();
     role = role.replace(/\b\w/g, char => char.toUpperCase());
-    await this.clickOn(role);
+    await this.clickOnElementWithSelector(role);
 
     await this.expectTextContentToContain(selectedRoleHeadingSelector, role);
   }
@@ -596,7 +596,7 @@ export class SuperAdmin extends BaseUser {
    */
   async expectTopicInTopicsAndSkillDashboard(topicName: string): Promise<void> {
     await this.navigateToTopicsAndSkillsDashboard();
-    await this.clickOn(topicsTab);
+    await this.clickOnElementWithSelector(topicsTab);
     const isTopicPresent = await this.isTextPresentOnPage(topicName);
     if (!isTopicPresent) {
       throw new Error(
@@ -618,7 +618,7 @@ export class SuperAdmin extends BaseUser {
     skillName: string
   ): Promise<void> {
     await this.navigateToTopicsAndSkillsDashboard();
-    await this.clickOn(skillsTab);
+    await this.clickOnElementWithSelector(skillsTab);
     const isSkillPresent = await this.isTextPresentOnPage(skillName);
     if (!isSkillPresent) {
       throw new Error(
@@ -652,7 +652,7 @@ export class SuperAdmin extends BaseUser {
   async generateDummyMathClassroom(): Promise<void> {
     await this.navigateToAdminPageActivitiesTab();
     await this.page.waitForSelector(loadDummyMathClassRoomButton);
-    await this.clickOn(loadDummyMathClassRoomButton);
+    await this.clickOnElementWithSelector(loadDummyMathClassRoomButton);
 
     await this.waitForNetworkIdle();
     await this.expectActionStatusMessageToBe(
@@ -684,7 +684,7 @@ export class SuperAdmin extends BaseUser {
   async generateDummyBlogPost(): Promise<void> {
     await this.navigateToAdminPageActivitiesTab();
     await this.expectElementToBeVisible(generateBlogPostButton);
-    await this.clickOn(generateBlogPostButton);
+    await this.clickOnElementWithSelector(generateBlogPostButton);
 
     await this.expectActionStatusMessageToBe(
       'Dummy Blog Post generated successfully.'
@@ -850,7 +850,7 @@ export class SuperAdmin extends BaseUser {
       await addRuleButton.click();
 
       await this.waitForElementToBeClickable(addConditionButton);
-      await this.clickOn(addConditionButton);
+      await this.clickOnElementWithSelector(addConditionButton);
 
       await this.page.waitForSelector(serverModeSelector, {visible: true});
       await this.waitForElementToBeClickable(serverModeSelector);
@@ -1047,7 +1047,7 @@ export class SuperAdmin extends BaseUser {
     await this.type(topicIdInputSelector, topicId);
 
     await this.page.waitForSelector(regenerateOpportunitiesButton);
-    await this.clickOn(regenerateOpportunitiesButton);
+    await this.clickOnElementWithSelector(regenerateOpportunitiesButton);
 
     await this.expectActionStatusMessageToBe(
       'No. of opportunities model created:',
@@ -1060,7 +1060,7 @@ export class SuperAdmin extends BaseUser {
    */
   async regenerateTopicSummaries(): Promise<void> {
     await this.page.waitForSelector(regenerateTopicSummariesButton);
-    await this.clickOn(regenerateTopicSummariesButton);
+    await this.clickOnElementWithSelector(regenerateTopicSummariesButton);
 
     await this.expectActionStatusMessageToBe(
       'Successfully regenerated all topic summaries.',
@@ -1078,7 +1078,7 @@ export class SuperAdmin extends BaseUser {
     await this.type(explorationIdInputSelector, explorationId as string);
 
     await this.page.waitForSelector(rollbackExplorationButton);
-    await this.clickOn(rollbackExplorationButton);
+    await this.clickOnElementWithSelector(rollbackExplorationButton);
 
     await this.expectActionStatusMessageToBe(
       'Exploration rolledback to version:',
@@ -1101,7 +1101,7 @@ export class SuperAdmin extends BaseUser {
     await this.type(newUserNameInputSelector, newUserName);
 
     await this.page.waitForSelector(updateUserNameButtonSelector);
-    await this.clickOn(updateUserNameButtonSelector);
+    await this.clickOnElementWithSelector(updateUserNameButtonSelector);
 
     await this.expectActionStatusMessageToBe(
       `Successfully renamed ${oldUserName} to ${newUserName}!`,
@@ -1114,7 +1114,9 @@ export class SuperAdmin extends BaseUser {
    */
   async getNumberOfPendingDeletionRequests(): Promise<void> {
     await this.page.waitForSelector(getPendingDeletionRequestsCountButton);
-    await this.clickOn(getPendingDeletionRequestsCountButton);
+    await this.clickOnElementWithSelector(
+      getPendingDeletionRequestsCountButton
+    );
 
     await this.expectActionStatusMessageToBe(
       'The number of users that are being deleted is:',
@@ -1136,7 +1138,7 @@ export class SuperAdmin extends BaseUser {
     );
 
     await this.page.waitForSelector(getInteractionsButton);
-    await this.clickOn(getInteractionsButton);
+    await this.clickOnElementWithSelector(getInteractionsButton);
 
     await this.expectActionStatusMessageToBe(
       'Successfully fetched interactionIds in exploration.',
@@ -1154,7 +1156,7 @@ export class SuperAdmin extends BaseUser {
     await this.type(usernameToGrantPrivilegeInput, username);
 
     await this.page.waitForSelector(grantSuperAdminButtonSelector);
-    await this.clickOn(grantSuperAdminButtonSelector);
+    await this.clickOnElementWithSelector(grantSuperAdminButtonSelector);
 
     await this.expectActionStatusMessageToBe(
       'Success!',
@@ -1172,7 +1174,7 @@ export class SuperAdmin extends BaseUser {
     await this.type(usernameToRevokePrivilegeInput, username);
 
     await this.page.waitForSelector(revokeSuperAdminButton);
-    await this.clickOn(revokeSuperAdminButton);
+    await this.clickOnElementWithSelector(revokeSuperAdminButton);
 
     await this.expectActionStatusMessageToBe(
       'Success!',
@@ -1199,7 +1201,7 @@ export class SuperAdmin extends BaseUser {
     await this.type(blogPublishedOnInputSelector, publishedOn);
 
     await this.page.waitForSelector(updateBlogPostButtonSelector);
-    await this.clickOn(updateBlogPostButtonSelector);
+    await this.clickOnElementWithSelector(updateBlogPostButtonSelector);
 
     await this.expectActionStatusMessageToBe(
       'Successfully updated blog post data'
@@ -1220,7 +1222,9 @@ export class SuperAdmin extends BaseUser {
     }
     await toggle.click();
     await this.page.waitForSelector(saveAutogenerationToggleButtonSelector);
-    await this.clickOn(saveAutogenerationToggleButtonSelector);
+    await this.clickOnElementWithSelector(
+      saveAutogenerationToggleButtonSelector
+    );
   }
 }
 

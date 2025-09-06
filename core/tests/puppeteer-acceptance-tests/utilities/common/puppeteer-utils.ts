@@ -365,7 +365,9 @@ export class BaseUser {
   async signUpNewUser(username: string, email: string): Promise<void> {
     await this.signInWithEmail(email);
     await this.type('input.e2e-test-username-input', username);
-    await this.clickOn('input.e2e-test-agree-to-terms-checkbox');
+    await this.clickOnElementWithSelector(
+      'input.e2e-test-agree-to-terms-checkbox'
+    );
     await this.page.waitForSelector(
       'button.e2e-test-register-user:not([disabled])'
     );
@@ -449,38 +451,21 @@ export class BaseUser {
   /**
    * The function clicks the element using the text on the button.
    * @param selector The text of the button to click on.
-   * @param forceSelector If true, the function will try to find the element by its CSS selector.
    * @param parentElement The parent element to search within.
    */
-  async clickOn(
+  async clickOnElementWithSelector(
     selector: string,
-    forceSelector: boolean = false,
     parentElement?: puppeteer.ElementHandle
   ): Promise<void> {
     const context = parentElement ?? this.page;
-    /** Normalize-space is used to remove the extra spaces in the text.
-     * Check the documentation for the normalize-space function here :
-     * https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space */
-    const [button] = await context.$x(
-      `\/\/*[contains(text(), normalize-space('${selector}'))]`
-    );
-    // If we fail to find the element by its XPATH, then the button is undefined and
-    // we try to find it by its CSS selector.
-    if (button !== undefined && !forceSelector) {
-      await this.waitForElementToBeClickable(button);
-      showMessage(`Button (text: ${selector}) is clickable, as expected.`);
-      await button.click();
-      showMessage(`Button (text: ${selector}) is clicked.`);
-    } else {
-      const element = await context.waitForSelector(selector, {visible: true});
-      if (!element) {
-        throw new Error(`Element not found for selector ${selector}`);
-      }
-      await this.waitForElementToBeClickable(element);
-      showMessage(`Element (selector: ${selector}) is clickable, as expected.`);
-      await element.click();
-      showMessage(`Element (selector: ${selector}) is clicked.`);
+    const element = await context.waitForSelector(selector, {timeout: 10000});
+    if (!element) {
+      throw new Error(`Element not found for selector ${selector}`);
     }
+    await this.waitForElementToBeClickable(element);
+    showMessage(`Element (selector: ${selector}) is clickable, as expected.`);
+    await element.click();
+    showMessage(`Element (selector: ${selector}) is clicked.`);
   }
 
   /**
@@ -488,8 +473,12 @@ export class BaseUser {
    * @param text The text of the element to click on.
    */
   async clickOnElementWithText(text: string): Promise<void> {
+    // Normalize-space is used to remove the extra spaces in the text.
+    // Check the documentation for the normalize-space function here :
+    // https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space.
     const element = await this.page.waitForXPath(
-      `//*[contains(normalize-space(text()), "${text}")]`
+      `//*[contains(normalize-space(text()), "${text}")]`,
+      {timeout: 10000}
     );
 
     if (!element) {
@@ -531,7 +520,7 @@ export class BaseUser {
       waitUntil: ['networkidle2', 'load'],
     });
 
-    await this.clickOn(selector, false);
+    await this.clickOnElementWithSelector(selector);
     await navigationPromise;
   }
 
@@ -1695,7 +1684,7 @@ export class BaseUser {
         ? commonModalConfirmBtnSelector
         : commonModalCancelBtnSelector;
     await this.expectElementToBeVisible(currentActionBtnSelector);
-    await this.clickOn(currentActionBtnSelector);
+    await this.clickOnElementWithSelector(currentActionBtnSelector);
 
     await this.expectElementToBeVisible(currentActionBtnSelector, false);
   }

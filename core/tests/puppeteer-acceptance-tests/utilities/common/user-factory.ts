@@ -265,7 +265,7 @@ export class UserFactory {
     await user.openBrowser();
     await user.page.goto(testConstants.URLs.Home);
     await user.waitForPageToFullyLoad();
-    await user.clickOn(cookieBannerAcceptButton);
+    await user.clickOnElementWithSelector(cookieBannerAcceptButton);
     activeUsers.push(user);
     return user;
   };
