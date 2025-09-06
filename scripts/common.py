@@ -990,6 +990,12 @@ _LOG_COLORS = {
 _END_COLOR = '\033[0m'
 
 def log_to_terminal(message: str, message_type: Optional[LogType] = None) -> None:
+    """Logs a message to the terminal with color formatting.
+
+    If no message_type is provided, it is inferred from the message text.
+    Supported types: ERROR, WARNING, SUCCESS, DEBUG, INFO.
+    """
+
     if message_type is None:
         lower_msg = message.lower()
         if 'error' in lower_msg:
@@ -998,9 +1004,13 @@ def log_to_terminal(message: str, message_type: Optional[LogType] = None) -> Non
             message_type = LogType.WARNING
         elif 'success' in lower_msg:
             message_type = LogType.SUCCESS
+        elif 'debug' in lower_msg:
+            message_type = LogType.DEBUG
         else:
             message_type = LogType.INFO
 
-    color = _LOG_COLORS.get(message_type, '')
-    print(f'{color}{message}{_END_COLOR}')
+    if message_type not in _LOG_COLORS:
+        message_type = LogType.INFO
 
+    color = _LOG_COLORS[message_type]
+    print(f'{color}{message}{_END_COLOR}')
