@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import contextlib
+import enum
 import errno
 import getpass
 from http import client
@@ -37,6 +38,7 @@ from core import feconf
 from scripts import servers
 
 from typing import Dict, Final, Generator, List, Optional, Tuple, Union
+
 
 # Add third_party to path. Some scripts access feconf even before
 # python_libs is added to path.
@@ -971,13 +973,15 @@ def start_subprocess_for_result(cmd: List[str]) -> Tuple[bytes, bytes]:
     out, err = task.communicate()
     return out, err
 
-import enum
 
 class LogType(enum.Enum):
+    """Enumeration of supported log message types for CI log colorization."""
+
     INFO = 'INFO'
     ERROR = 'ERROR'
     SUCCESS = 'SUCCESS'
     WARNING = 'WARNING'
+    DEBUG = 'DEBUG'
 
 
 _LOG_COLORS = {
@@ -989,13 +993,17 @@ _LOG_COLORS = {
 }
 _END_COLOR = '\033[0m'
 
-def log_to_terminal(message: str, message_type: Optional[LogType] = None) -> None:
+
+def log_to_terminal(
+    message: str,
+    message_type: Optional[LogType] = None
+) -> None:
     """Logs a message to the terminal with color formatting.
 
-    If no message_type is provided, it is inferred from the message text.
-    Supported types: ERROR, WARNING, SUCCESS, DEBUG, INFO.
+    If no message_type is provided, it is inferred from the
+    message text. Supported types: ERROR, WARNING, SUCCESS,
+    DEBUG, and INFO.
     """
-
     if message_type is None:
         lower_msg = message.lower()
         if 'error' in lower_msg:
@@ -1013,4 +1021,4 @@ def log_to_terminal(message: str, message_type: Optional[LogType] = None) -> Non
         message_type = LogType.INFO
 
     color = _LOG_COLORS[message_type]
-    print(f'{color}{message}{_END_COLOR}')
+    write_stdout_safe(f'{color}{message}{_END_COLOR}\n')
