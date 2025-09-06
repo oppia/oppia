@@ -279,13 +279,15 @@ describe('LessonFeedbackModalComponent', () => {
 
     spyOn(feedbackPopupBackendApiService, 'submitFeedbackAsync');
     spyOn(ngbActiveModal, 'close');
+    spyOn(bottomSheetRef, 'dismiss');
 
     component.saveFeedback();
 
     expect(
       feedbackPopupBackendApiService.submitFeedbackAsync
     ).not.toHaveBeenCalled();
-    expect(ngbActiveModal.close).not.toHaveBeenCalled();
+    expect(ngbActiveModal.close).toHaveBeenCalled();
+    expect(bottomSheetRef.dismiss).not.toHaveBeenCalled();
   });
 
   it('should not save feedback when feedback text is null', () => {
@@ -294,13 +296,15 @@ describe('LessonFeedbackModalComponent', () => {
 
     spyOn(feedbackPopupBackendApiService, 'submitFeedbackAsync');
     spyOn(ngbActiveModal, 'close');
+    spyOn(bottomSheetRef, 'dismiss');
 
     component.saveFeedback();
 
     expect(
       feedbackPopupBackendApiService.submitFeedbackAsync
     ).not.toHaveBeenCalled();
-    expect(ngbActiveModal.close).not.toHaveBeenCalled();
+    expect(ngbActiveModal.close).toHaveBeenCalled();
+    expect(bottomSheetRef.dismiss).not.toHaveBeenCalled();
   });
 
   it('should close modal with MatBottomSheetRef', () => {
