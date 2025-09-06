@@ -341,29 +341,48 @@ describe('GoalListComponent', () => {
     expect(currentNode).toEqual(2);
   });
 
-  it('should set displayAllNodes to true with handleToggleState', () => {
-    expect(component.displayAllNodes).toBeFalse();
-    component.handleToggleState(true);
+  describe('expandedStories', () => {
+    it('should return false if story is not in expandedStories', () => {
+      const storyId = 'story_1';
+      expect(component.isExpanded(storyId)).toBeFalse();
+    });
 
-    fixture.detectChanges();
+    it('should return true after toggling a story once', () => {
+      const storyId = 'story_2';
+      component.handleToggleState(true, storyId);
+      expect(component.isExpanded(storyId)).toBeTrue();
+    });
 
-    expect(component.displayAllNodes).toBeTrue();
-  });
+    it('should return false after toggling a story twice', () => {
+      const storyId = 'story_3';
+      component.handleToggleState(true, storyId);
+      component.handleToggleState(false, storyId);
+      expect(component.isExpanded(storyId)).toBeFalse();
+    });
 
-  it('should set displayAllNodes false when handleToggleState', () => {
-    expect(component.displayAllNodes).toBeFalse();
-    fixture.whenRenderingDone().then(() => {
-      spyOn(component, 'handleToggleState').and.callThrough();
+    it('should keep expanded state independent for different stories', () => {
+      const storyA = 'story_A';
+      const storyB = 'story_B';
 
-      const button = fixture.debugElement.query(
-        By.directive(ContentToggleButtonComponent)
-      ).componentInstance;
-      button.toggle();
+      component.handleToggleState(true, storyA);
+      expect(component.isExpanded(storyA)).toBeTrue();
+      expect(component.isExpanded(storyB)).toBeFalse();
 
-      fixture.detectChanges();
+      component.handleToggleState(true, storyB);
+      expect(component.isExpanded(storyA)).toBeTrue();
+      expect(component.isExpanded(storyB)).toBeTrue();
+    });
 
-      expect(component.handleToggleState).toHaveBeenCalled();
-      expect(component.displayAllNodes).toBeTrue();
+    it('should return false for story explicitly set to false', () => {
+      const storyId = 'story_4';
+      component.expandedStories[storyId] = false;
+      expect(component.isExpanded(storyId)).toBeFalse();
+    });
+
+    it('should return true for story explicitly set to true', () => {
+      const storyId = 'story_5';
+      component.expandedStories[storyId] = true;
+      expect(component.isExpanded(storyId)).toBeTrue();
     });
   });
 });
