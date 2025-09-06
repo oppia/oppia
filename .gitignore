@@ -80,3 +80,15 @@ debug.log
 
 # Puppeteer acceptance tests.
 jest-runtime-config.json
+
+# Virtual environments
+oppia-env/
+.venv/
+venv/
+env/
+
+# Archive files and downloads
+gcloud-sdk.tar.gz
+
+
+
