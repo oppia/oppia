@@ -28,8 +28,8 @@
 
 <div *ngIf="isShowRestructuredStudyGuidesFeatureEnabled()" class="oppia-subtopic-viewer-container new-subtopic-viewer-container">
   <button (click)="backToTopic()" class="btn e2e-test-go-back-to-topic-button btn-back-to-topic">
-    <p class="text-next-study-guide-fixed">
-      <i class="material-icons icon-next-study-guide">arrow_back</i>
+    <p>
+      <i class="material-icons md-18 icon-next-study-guide">arrow_back</i>
       {{ 'I18N_SUBTOPIC_VIEWER_BACK_TO_TOPIC' | translate }} '{{ parentTopicTitle }}'
     </p>
   </button>
@@ -202,10 +202,11 @@
 
   .btn-back-to-topic {
     align-self: flex-start;
-    color: #003c34;
+    color: #015f9c;
     display: block;
-    font-family: Capriola, Arial, sans-serif;
-    font-size: 15px;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 200;
     padding: 0;
     text-align: center;
   }

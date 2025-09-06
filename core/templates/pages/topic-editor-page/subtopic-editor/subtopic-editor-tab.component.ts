@@ -63,9 +63,7 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
   editableUrlFragment: string;
   subtopicPage: SubtopicPage;
   studyGuide: StudyGuide;
-  // Index can be null. It means that no section is active.
-  // This also help in closing the study guide section editor.
-  activeSectionIndex!: number;
+  activeSectionIndex: number = -1;
   allowedBgColors;
   htmlData: string;
   sections: StudyGuideSection[];
