@@ -4463,7 +4463,7 @@ export class LoggedOutUser extends BaseUser {
     expectedCode: string
   ): Promise<void> {
     await this.waitForStaticAssetsToLoad();
-    await this.clickOnElementWithSelector(embedLessonButton, true);
+    await this.clickOnElementWithSelector(embedLessonButton);
     await this.page.waitForSelector(embedCodeSelector);
     const embedCode = await this.page.$eval(
       embedCodeSelector,
@@ -5178,7 +5178,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async expectNavbarButtonsToHaveText(expectedText: string[]): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.clickOnElementWithSelector(openMobileNavbarMenuButton, true);
+      await this.clickOnElementWithSelector(openMobileNavbarMenuButton);
     }
 
     const isMobileViewport = this.isViewportAtMobileWidth();
@@ -5466,7 +5466,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async pauseVoiceover(): Promise<void> {
     await this.page.waitForSelector(pauseVoiceoverButton, {visible: true});
-    await this.clickOnElementWithSelector(pauseVoiceoverButton, true);
+    await this.clickOnElementWithSelector(pauseVoiceoverButton);
     await this.page.waitForSelector(playVoiceoverButton, {visible: true});
     showMessage('Voiceover paused successfully.');
   }
