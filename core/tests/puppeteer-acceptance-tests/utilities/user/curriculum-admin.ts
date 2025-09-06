@@ -54,7 +54,7 @@ const interactionNameDiv = 'div.oppia-interaction-tile-name';
 const saveInteractionButton = 'button.e2e-test-save-interaction';
 const responseRuleDropdown =
   'oppia-rule-type-selector.e2e-test-answer-description';
-const equalsRuleButtonText = 'is equal to ... ';
+const equalsRuleButtonText = 'is equal to ...';
 const answersInGroupAreCorrectToggle =
   'input.e2e-test-editor-correctness-toggle';
 const saveResponseButton = 'button.e2e-test-add-new-response';

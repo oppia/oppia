@@ -477,7 +477,7 @@ export class BaseUser {
     // Check the documentation for the normalize-space function here :
     // https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space.
     const element = await this.page.waitForXPath(
-      `//*[contains(normalize-space(text()), "${text}")]`,
+      `//*[contains(normalize-space(text()), normalize-space("${text}"))]`,
       {timeout: 10000}
     );
 

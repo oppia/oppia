@@ -2621,7 +2621,7 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOnElementWithSelector(explorationGoalInput);
       await this.type(explorationGoalInput, goal);
       await this.clickOnElementWithSelector(explorationCategoryDropdown);
-      await this.clickOnElementWithSelector(category);
+      await this.clickOnElementWithText(category);
       if (tags) {
         await this.type(tagsField, tags);
       }
