@@ -998,8 +998,13 @@ export class BaseUser {
   ): Promise<Page | null> {
     const xpath = `//a[normalize-space(.)="${anchorInnerText}"]`;
     const element = await context.waitForXPath(xpath);
+
+    if (!element) {
+      throw new Error(`No element found for text: ${anchorInnerText}`);
+    }
+
     const pageTarget = context.target();
-    await element?.click();
+    await element.click();
     const newTarget = await this.browserObject.waitForTarget(
       target => target.opener() === pageTarget
     );

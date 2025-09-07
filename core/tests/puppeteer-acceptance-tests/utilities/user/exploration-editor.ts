@@ -425,7 +425,7 @@ export enum INTERACTION_TYPES {
   ALGEBRAIC_EXPRESSION = 'Algebric Expression Input',
   CODE_EDITOR = 'Code Editor',
   CONTINUE_BUTTON = 'Continue Button',
-  DRAG_AND_DROP_SORT = 'Drag and Drop Sort',
+  DRAG_AND_DROP_SORT = 'Drag And Drop Sort',
   END_EXPLORATION = 'End Exploration',
   FRACTION_INPUT = 'Fraction Input',
   GRAPH_THEORY = 'Graph Theory',
@@ -3192,7 +3192,7 @@ export class ExplorationEditor extends BaseUser {
       visible: true,
     });
     await this.clickOnElementWithSelector(languageUpdateDropdown);
-    await this.clickOnElementWithSelector(language);
+    await this.clickOnElementWithText(language);
     await this.page.waitForNetworkIdle();
 
     await this.expectSelectedLanguageToBe(language);
@@ -3412,7 +3412,7 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOnElementWithSelector(addUsernameInputBox);
     await this.type(addUsernameInputBox, username);
     await this.clickOnElementWithSelector(addRoleDropdown);
-    await this.clickOnElementWithSelector(playtesterRoleOption);
+    await this.clickOnElementWithText(playtesterRoleOption);
     await this.clickOnElementWithSelector(saveRoleButton);
     await this.page.waitForSelector(saveRoleButton, {hidden: true});
     showMessage(`${username} has been added as playtester.`);
@@ -5035,7 +5035,7 @@ export class ExplorationEditor extends BaseUser {
       showMessage(
         `Switching content type from ${activeContentType} to ${contentType}`
       );
-      await this.clickOnElementWithSelector(contentType);
+      await this.clickOnElementWithText(contentType);
     }
 
     await this.clickOnElementWithSelector(voiceoverLanguageSelector);
@@ -5102,7 +5102,7 @@ export class ExplorationEditor extends BaseUser {
       showMessage(
         `Switching content type from ${activeContentType} to ${contentType}`
       );
-      await this.clickOnElementWithSelector(contentType);
+      await this.clickOnElementWithText(contentType);
     }
 
     await this.clickOnElementWithSelector(voiceoverLanguageSelector);
