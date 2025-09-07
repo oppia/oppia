@@ -5,19 +5,11 @@
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
 
-/*
-  This affects the progress nav bar.
-*/
-
 oppia-progress-tracker {
   left: 50%;
   position: absolute;
   transform: translateX(-50%);
   width: 375px;
-}
-
-.card-navigation-control .oppia-nav-button .mat-button.oppia-autofocus:focus {
-  background-color: #0d48a1;
 }
 
 .card-navigation-control .oppia-learner-confirm-button {

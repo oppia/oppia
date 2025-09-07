@@ -46,11 +46,11 @@
         {{ 'I18N_INTERACTIONS_SUBMIT' | translate }}
       </button>
     </div>
-    <oppia-continue-button *ngIf="shouldContinueButtonBeShown()" [focusLabel]="CONTINUE_BUTTON_FOCUS_LABEL" class="d-block continue-button"
+    <oppia-continue-button tabindex="0" *ngIf="shouldContinueButtonBeShown()" [focusLabel]="CONTINUE_BUTTON_FOCUS_LABEL" class="d-block continue-button"
                             [isLearnAgainButton]="isLearnAgainButton"
                             (clickContinueButton)="onClickContinueButton()">
     </oppia-continue-button>
-    <oppia-continue-button *ngIf="!shouldContinueButtonBeShown() && showContinueToReviseButton" [focusLabel]="CONTINUE_BUTTON_FOCUS_LABEL" class="d-block continue-button"
+    <oppia-continue-button tabindex="0" *ngIf="!shouldContinueButtonBeShown() && showContinueToReviseButton" [focusLabel]="CONTINUE_BUTTON_FOCUS_LABEL" class="d-block continue-button"
                             [isLearnAgainButton]="isLearnAgainButton"
                             (clickContinueButton)="clickContinueToReviseButton.emit()">
     </oppia-continue-button>
