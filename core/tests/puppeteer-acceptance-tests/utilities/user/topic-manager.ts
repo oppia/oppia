@@ -263,7 +263,7 @@ const topicAndSkillsOptionInProfileMenu =
   '.e2e-test-topics-and-skills-dashboard-link';
 const topicAndSkillsDashboardPageSelector =
   '.e2e-test-topic-and-skills-dashboard';
-const navbarBreadcrumbSelector = 'oppia-navbar-breadcrumb';
+const navbarBreadcrumbSelector = '.e2e-test-navbar-breadcrumb';
 const resetTopicFilterButtonSelector = '.e2e-test-topic-filter-reset';
 
 const floatTextField = '.e2e-test-rule-details .e2e-test-float-form-input';
@@ -295,7 +295,7 @@ const submitAnswerButton = 'button.e2e-test-submit-answer-button';
 const submitSolutionButton = 'button.e2e-test-submit-solution-button';
 const saveQuestionButton = 'button.e2e-test-save-question-button';
 
-// Topic Editor > Preview Tab.
+// Preview tab of the topic editor.
 const previewSubtabClass = 'e2e-test-preview-subtab';
 
 // Topic Editor > Questions Tab.
@@ -326,6 +326,7 @@ const questionDifficultySelectionModalSelector =
   '.e2e-test-question-opportunity-difficulty';
 const confirmSkillDificultyButton =
   'button.e2e-test-confirm-skill-difficulty-button';
+const skillSelectionModalSelector = '.e2e-test-skill-container';
 
 export class TopicManager extends BaseUser {
   /**
@@ -680,9 +681,7 @@ export class TopicManager extends BaseUser {
     }, interactionNameDiv);
 
     await this.clickOn(saveInteractionButton);
-    await this.page.waitForSelector('oppia-add-answer-group-modal-component', {
-      visible: true,
-    });
+    await this.expectModalTitleToBe('Add Response');
     await this.clickOn(responseRuleDropdown);
     await this.clickOn(equalsRuleButtonText);
     await this.type(floatTextField, '3');
@@ -1475,6 +1474,8 @@ export class TopicManager extends BaseUser {
     skillName: string,
     visible: boolean = true
   ): Promise<ElementHandle | null> {
+    await this.waitForPageToFullyLoad();
+    await this.expectElementToBeVisible(skillSelectionModalSelector);
     const skillVisible = await this.isElementVisible(skillItem);
     if (!skillVisible) {
       if (visible) {
@@ -1512,7 +1513,7 @@ export class TopicManager extends BaseUser {
       );
     } else {
       showMessage(
-        `Skill ${skillName} is visible in the skill selection modal.`
+        `Skill ${skillName} is not visible in the skill selection modal.`
       );
       return null;
     }
@@ -1550,9 +1551,7 @@ export class TopicManager extends BaseUser {
       throw new Error('Radio inner circle selector not found');
     }
 
-    await this.page.evaluate(selector => {
-      document.querySelector(selector).click();
-    }, radioInnerCircleSelector);
+    await this.clickOn(radioInnerCircleSelector);
 
     await this.clickOn(confirmSkillSelectionButtonSelector);
     await this.expectElementToBeVisible(
@@ -3582,12 +3581,7 @@ export class TopicManager extends BaseUser {
   async navigateToTabInPreview(
     tabName: 'Learn' | 'Practice' | 'Study'
   ): Promise<void> {
-    const xpath = `//*[contains(text(), '${tabName}')]`;
-    const tabElement = await this.page.waitForXPath(xpath);
-    if (!tabElement) {
-      throw new Error(`Tab ${tabName} not found.`);
-    }
-    await tabElement.click();
+    await this.clickOn(tabName);
 
     await this.expectTextContentToBe(
       `.${previewSubtabClass}${activeTabSelector}`,
@@ -3680,23 +3674,23 @@ export class TopicManager extends BaseUser {
     await this.expectElementToBeVisible(questionTextSelector);
 
     const questionElements = await this.page.$$(questionTextSelector);
-    let questionElement: ElementHandle<Element> | null = null;
-    for (const questionEle of questionElements) {
-      const questionText = await questionEle.evaluate(el =>
+    let requiredQuestionElement: ElementHandle<Element> | null = null;
+    for (const questionElement of questionElements) {
+      const questionText = await questionElement.evaluate(el =>
         el.textContent?.trim()
       );
       if (questionText === question) {
-        questionElement = questionEle;
+        requiredQuestionElement = questionElement;
         break;
       }
     }
 
-    if (!questionElement) {
+    if (!requiredQuestionElement) {
       throw new Error(`Question ${question} not found.`);
     }
 
     showMessage(`Question ${question} is visible.`);
-    return questionElement;
+    return requiredQuestionElement;
   }
 
   async openQuestionEditor(question: string): Promise<void> {

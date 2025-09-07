@@ -585,6 +585,10 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/create-delete-and-edit-the-stories-and-chapters.spec.ts"
     },
     {
+      "name": "topic-manager/create-and-edit-questions-in-skill-dashboard",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/create-and-edit-questions-in-skill-dashboard.spec.ts"
+    },
+    {
       "name": "translation-coordinator/add-remove-translation-rights",
       "module": "core/tests/puppeteer-acceptance-tests/specs/translation-coordinator/add-remove-translation-rights.spec.ts"
     },

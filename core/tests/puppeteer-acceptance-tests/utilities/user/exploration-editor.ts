@@ -6648,8 +6648,7 @@ export class ExplorationEditor extends BaseUser {
     await element.click({clickCount: 3});
     await this.page.keyboard.press('Backspace');
 
-    await element.type(value);
-
+    await this.type(element, value);
     await this.page.waitForFunction(
       (element: HTMLInputElement, value: string) => {
         return (element as HTMLInputElement).value === value;
@@ -6668,8 +6667,8 @@ export class ExplorationEditor extends BaseUser {
    */
   async updateResponse(
     index: number,
-    newAnswer?: string,
-    responseFeedback?: string
+    newAnswer: string,
+    responseFeedback: string
   ): Promise<void> {
     await this.page.waitForSelector(responseGroupDiv);
     const elements = await this.page.$$(responseGroupDiv);

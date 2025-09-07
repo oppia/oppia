@@ -67,7 +67,7 @@ const mobileDeleteTopicButton = '.e2e-test-mobile-delete-topic-button';
 const confirmTopicDeletionButton = '.e2e-test-confirm-topic-deletion-button';
 
 const addSubtopicButton = 'button.e2e-test-add-subtopic-button';
-const subtopicTitleField = 'input.e2e-test-new-subtopic-title-field';
+const subtopicTitleField = 'input.e2e-test-subtopic-title-field';
 const subtopicStudyGuideHeadingField =
   '.e2e-test-new-subtopic-study-guide-section-heading-field';
 const subtopicStudyGuideContentField =

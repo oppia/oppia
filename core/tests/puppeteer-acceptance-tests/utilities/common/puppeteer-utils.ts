@@ -581,11 +581,22 @@ export class BaseUser {
 
   /**
    * This function types the text in the input field using its CSS selector.
+   * @param selector The CSS selector of the input field.
+   * @param text The text to type.
    */
-  async type(selector: string, text: string): Promise<void> {
-    await this.page.waitForSelector(selector, {visible: true});
-    await this.waitForElementToBeClickable(selector);
-    await this.page.type(selector, text);
+  async type(
+    selector: string | ElementHandle<Element>,
+    text: string
+  ): Promise<void> {
+    let element =
+      typeof selector === 'string'
+        ? await this.page.waitForSelector(selector)
+        : selector;
+    if (!element) {
+      throw new Error(`Element not found for selector: ${selector}`);
+    }
+    await this.waitForElementToBeClickable(element);
+    await element.type(text);
   }
 
   /**
