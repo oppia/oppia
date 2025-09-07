@@ -23,7 +23,7 @@ import {ExplorationParamChangesService} from 'pages/exploration-editor-page/serv
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {GraphDataService} from 'pages/exploration-editor-page/services/graph-data.service';
 import {ExplorationEditorPageConstants} from 'pages/exploration-editor-page/exploration-editor-page.constants';
-import {State} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 import {ParamChange} from 'domain/exploration/param-change.model';
 import cloneDeep from 'lodash/cloneDeep';
 

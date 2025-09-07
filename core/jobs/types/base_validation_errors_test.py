@@ -178,8 +178,9 @@ class InconsistentTimestampsErrorTests(AuditErrorsTestBase):
         self.assertEqual(
             error.stderr,
             'InconsistentTimestampsError in BaseModel(id="123"): '
-            'created_on=%r is later than last_updated=%r' % (
-                self.NOW, self.YEAR_AGO))
+            'created_on=%s is later than last_updated=%s' % (
+                self.NOW.strftime('%Y-%m-%d %H:%M:%S'),
+                self.YEAR_AGO.strftime('%Y-%m-%d %H:%M:%S')))
 
 
 class InvalidCommitStatusErrorTests(AuditErrorsTestBase):
@@ -269,8 +270,8 @@ class ModelMutatedDuringJobErrorTests(AuditErrorsTestBase):
         self.assertEqual(
             error.stderr,
             'ModelMutatedDuringJobError in BaseModel(id="123"): '
-            'last_updated=%r is later than the audit job\'s start time' % (
-                model.last_updated))
+            'last_updated=%s is later than the audit job\'s start time' % (
+                model.last_updated.strftime('%Y-%m-%d %H:%M:%S')))
 
 
 class ModelIdRegexErrorTests(AuditErrorsTestBase):

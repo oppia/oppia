@@ -583,6 +583,14 @@
     {
       "name": "topic-manager/create-delete-and-edit-the-stories-and-chapters",
       "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/create-delete-and-edit-the-stories-and-chapters.spec.ts"
+    },
+    {
+      "name": "translation-coordinator/add-remove-translation-rights",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-coordinator/add-remove-translation-rights.spec.ts"
+    },
+    {
+      "name": "practice-question-coordinator/add-and-remove-question-rights",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/practice-question-coordinator/add-and-remove-question-rights.spec.ts"
     }
   ],
   "docker_suites": []

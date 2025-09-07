@@ -24,7 +24,7 @@
 import {EventEmitter, Injectable} from '@angular/core';
 
 import {AppConstants} from 'app.constants';
-import {State} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {ExpressionInterpolationService} from 'expressions/expression-interpolation.service';
 import {InteractionAnswer} from 'interactions/answer-defs';
