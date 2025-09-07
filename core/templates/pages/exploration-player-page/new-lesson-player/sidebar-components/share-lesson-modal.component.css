@@ -39,6 +39,7 @@ oppia-share-lesson-modal .cancel-button {
 
 oppia-share-lesson-modal .lesson-attribution-text {
   color: #00645c;
+  cursor: pointer;
   font-size: 20px;
   font-weight: 700;
   text-decoration: underline;
@@ -96,6 +97,10 @@ oppia-share-lesson-modal .cc-attribution-header {
   font-weight: 400;
   margin-bottom: 32px;
   text-align: center;
+}
+
+oppia-share-lesson-modal .cc-attribution a:hover {
+  text-decoration: none;
 }
 
 oppia-share-lesson-modal .cc-attribution-input {
