@@ -7,7 +7,6 @@ apache-beam[gcp]==2.67.0
 azure-cognitiveservices-speech==1.41.1
 beautifulsoup4==4.12.3
 bleach==4.1.0
-certifi==2025.8.3
 deepdiff==8.6.1
 defusedxml==0.7.1
 elasticsearch==7.17.0
@@ -16,7 +15,6 @@ firebase-admin==6.9.0
 future==1.0.0
 google-cloud-storage==2.19.0
 google-auth==2.40.3
-google-cloud-bigquery==3.36.0
 google-cloud-dataflow-client==0.9.0
 google-cloud-logging==3.12.1
 google-cloud-ndb==2.3.4

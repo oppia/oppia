@@ -83,7 +83,6 @@ certifi==2025.8.3 \
     --hash=sha256:e564105f78ded564e3ae7c923924435e1daa7463faeab5bb932bc53ffae63407 \
     --hash=sha256:f6c12493cfb1b06ba2ff328595af9350c65d6644968e5d3a2ffd78699af217a5
     # via
-    #   -r requirements.in
     #   elasticsearch
     #   httpcore
     #   httpx
@@ -461,7 +460,6 @@ google-cloud-bigquery==3.36.0 \
     --hash=sha256:0cfbad09999907600fd0618794491db10000d98911ec7768ac6041cb9a0257dd \
     --hash=sha256:519d7a16be2119dca1ea8871e6dd45f971a8382c337cbe045319543b9e743bdd
     # via
-    #   -r requirements.in
     #   apache-beam
     #   google-cloud-aiplatform
 google-cloud-bigquery-storage==2.13.2 \
