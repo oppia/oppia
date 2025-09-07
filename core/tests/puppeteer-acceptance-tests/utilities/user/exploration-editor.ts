@@ -422,7 +422,7 @@ const navigationDropdownInMobileVisibleSelector =
   '.oppia-exploration-editor-tabs-dropdown.show';
 
 export enum INTERACTION_TYPES {
-  ALGEBRAIC_EXPRESSION = 'Algebric Expression Input',
+  ALGEBRAIC_EXPRESSION = 'Algebraic Expression Input',
   CODE_EDITOR = 'Code Editor',
   CONTINUE_BUTTON = 'Continue Button',
   DRAG_AND_DROP_SORT = 'Drag And Drop Sort',
@@ -5142,6 +5142,7 @@ export class ExplorationEditor extends BaseUser {
       timeout: 5000,
     });
 
+    await this.waitForElementToStabilize(voiceoverConfirmationModalButton);
     await this.clickOnElementWithSelector(voiceoverConfirmationModalButton);
 
     await this.page.waitForSelector(voiceoverConfirmationModalButton, {
@@ -6179,7 +6180,7 @@ export class ExplorationEditor extends BaseUser {
 
     await this.expectElementToBeVisible(explorationLanguageSelector);
     await this.clickOnElementWithSelector(explorationLanguageSelector);
-    await this.clickOnElementWithSelector(language);
+    await this.clickOnElementWithText(language);
     await this.expectTextContentToBe(explorationLanguageSelector, language);
 
     await this.expectElementToBeVisible(tagsField);
