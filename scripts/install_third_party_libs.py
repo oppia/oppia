@@ -36,20 +36,23 @@ import subprocess
 import sys
 import tarfile
 
-from core import feconf, utils
-from scripts import (
-    install_dependencies_json_packages,
-    install_python_dev_dependencies,
-    install_python_prod_dependencies,
-)
+from core import feconf
 
 from typing import Final
 
-from . import clean, common
+from scripts import install_python_dev_dependencies  # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
 
 if not feconf.OPPIA_IS_DOCKERIZED:
     install_python_dev_dependencies.main(['--assert_compiled'])
-    from . import pre_commit_hook, pre_push_hook
+    from . import pre_commit_hook  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+    from . import pre_push_hook  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+
+from . import clean  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+
+from core import utils  # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from scripts import install_dependencies_json_packages  # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+from scripts import install_python_prod_dependencies  # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
 
 # Place to download zip files for temporary storage.
 TMP_UNZIP_PATH: Final = os.path.join('.', 'tmp_unzip.zip')
