@@ -56,3 +56,7 @@ oppia-new-audio-bar {
 oppia-player-header {
   z-index: 2;
 }
+
+oppia-lesson-player-sidebar {
+  z-index: 3;
+}
