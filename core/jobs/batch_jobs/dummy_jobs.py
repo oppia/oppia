@@ -37,7 +37,9 @@ class DummyPassJob(base_jobs.JobBase):
         return (
             self.pipeline
             | 'Create success result' >> beam.Create([
-                job_run_result.JobRunResult.as_stdout('SUCCESS: Dummy job completed successfully')
+                job_run_result.JobRunResult.as_stdout(
+                    'SUCCESS: Dummy job completed successfully'
+                )
             ])
         )
 
@@ -55,6 +57,8 @@ class DummyFailJob(base_jobs.JobBase):
         return (
             self.pipeline
             | 'Create failure result' >> beam.Create([
-                job_run_result.JobRunResult.as_stderr('ERROR: Dummy job failed as expected')
+                job_run_result.JobRunResult.as_stderr(
+                    'ERROR: Dummy job failed as expected'
+                )
             ])
         )

@@ -21,7 +21,6 @@ from __future__ import annotations
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import dummy_jobs
 from core.jobs.types import job_run_result
-from core.tests import test_utils
 
 from typing import Type
 
