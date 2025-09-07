@@ -98,10 +98,6 @@ export class PostChapterRecommendationsComponent {
     );
   }
 
-  showThreeButtons(): boolean {
-    return this.practiceQuestionsAreEnabled && !this.nextStoryNodeTitle;
-  }
-
   isNewLessonPlayerEnabled(): boolean {
     return this.platformFeatureService.status.NewLessonPlayer.isEnabled;
   }
