@@ -1473,6 +1473,7 @@ class UrlRetrieveTests(CommonTests):
 class LogToTerminalTests(CommonTests):
     """Tests for the log_to_terminal function."""
 
+
     def test_log_to_terminal_infers_error_from_message(self) -> None:
         output: list[str] = []
 
@@ -1480,9 +1481,9 @@ class LogToTerminalTests(CommonTests):
             output.append(msg)
 
         with self.swap(common, 'write_stdout_safe', mock_write_stdout):
-            common.log_to_terminal("This is an error!")
+            common.log_to_terminal('This is an error!')
 
-        self.assertTrue(any("This is an error!" in o for o in output))
+        self.assertTrue(any('This is an error!' in o for o in output))
 
     def test_log_to_terminal_with_success_type(self) -> None:
         output: list[str] = []
@@ -1492,11 +1493,9 @@ class LogToTerminalTests(CommonTests):
 
         with self.swap(common, 'write_stdout_safe', mock_write_stdout):
             common.log_to_terminal(
-                "Operation succeeded",
-                message_type=common.LogType.SUCCESS
-            )
+                'Operation succeeded', message_type=common.LogType.SUCCESS)
 
-        self.assertTrue(any("Operation succeeded" in o for o in output))
+        self.assertTrue(any('Operation succeeded' in o for o in output))
 
     def test_log_to_terminal_defaults_to_info(self) -> None:
         output: list[str] = []
@@ -1505,8 +1504,6 @@ class LogToTerminalTests(CommonTests):
             output.append(msg)
 
         with self.swap(common, 'write_stdout_safe', mock_write_stdout):
-            common.log_to_terminal("Just an info message")
+            common.log_to_terminal('Just an info message')
 
-        self.assertTrue(any("Just an info message" in o for o in output))
-
-            
+        self.assertTrue(any('Just an info message' in o for o in output))
