@@ -34,7 +34,6 @@ describe('Logged-in User', function () {
   let releaseCoordinator: ReleaseCoordinator;
   const explorationTitles = ['Exploration 1', 'Exploration 2', 'Exploration 3'];
   const explorationIds: string[] = [];
-  const playLaterExplorationTitle = 'Exploration 4';
 
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
@@ -59,13 +58,6 @@ describe('Logged-in User', function () {
       explorationIds.push(id ?? '');
     }
 
-    // Create a simple exploration (no need to play) for saved community lessons to shorten setup time.
-    const playLaterId =
-      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
-        playLaterExplorationTitle
-      );
-    explorationIds.push(playLaterId);
-
     loggedInUser = await UserFactory.createNewUser(
       'loggedInUser1',
       'logged_in_user1@example.com'
@@ -76,8 +68,8 @@ describe('Logged-in User', function () {
     'should display saved community lessons after adding to playlist',
     async function () {
       await loggedInUser.navigateToCommunityLibraryPage();
-      await loggedInUser.searchForLessonInSearchBar(playLaterExplorationTitle);
-      await loggedInUser.addLessonToPlayLater(playLaterExplorationTitle);
+      await loggedInUser.searchForLessonInSearchBar(explorationTitles[0]);
+      await loggedInUser.addLessonToPlayLater(explorationTitles[0], true);
       await loggedInUser.expectToolTipMessage(
         "Successfully added to your 'Play Later' list."
       );
@@ -86,7 +78,7 @@ describe('Logged-in User', function () {
 
       await loggedInUser.expectLessonCardsToBePresent({
         subsection: 'Lessons you saved for later',
-        expectedTitles: [playLaterExplorationTitle],
+        expectedTitles: [explorationTitles[0]],
       });
     },
     DEFAULT_SPEC_TIMEOUT_MSECS

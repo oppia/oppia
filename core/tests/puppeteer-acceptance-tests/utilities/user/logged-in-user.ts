@@ -3596,20 +3596,10 @@ export class LoggedInUser extends BaseUser {
     return getCardsInView;
   }
 
-  /**
-   * Helper function - Shifts the card display to display the rest of the hidden cards.
-   * @param {string} shift  - Direction of shift.
-   * @param {puppeteer.ElementHandle | null | undefined} shiftButton - Button that handles shifting cards.
-   * @param {() => Promise<Record<string, boolean>>} cardsInView - Async function that returns the dimensions of first and last of element list.
-   */
-  private async shiftCardDisplay(
-    shift: string,
-    shiftButton: puppeteer.ElementHandle | null | undefined,
-    cardsInView: () => Promise<Record<string, boolean>>
-  ): Promise<void> {
-    await shiftButton?.click();
-    let isCardInView = (await cardsInView()).isFirstCardInView;
-    expect(isCardInView).toBe(shift === 'more' ? false : true);
+  private async isButtonDisabled(
+    button: puppeteer.ElementHandle | null | undefined
+  ): Promise<boolean | undefined> {
+    return await button?.evaluate(e => e.hasAttribute('disabled'));
   }
 
   /**
@@ -3649,17 +3639,28 @@ export class LoggedInUser extends BaseUser {
       if (minusButtonElement === null && plusButtonElement === null) {
         expect(isFirstCardInView && isLastCardInView).toBe(true);
       } else {
-        const getCardsInViewArg = () => getCardsInView(allCardElements);
-        await this.shiftCardDisplay(
-          'more',
-          isRTL ? minusButtonElement : plusButtonElement,
-          getCardsInViewArg
-        );
-        await this.shiftCardDisplay(
-          'less',
-          isRTL ? plusButtonElement : minusButtonElement,
-          getCardsInViewArg
-        );
+        const nextButton = isRTL ? minusButtonElement : plusButtonElement;
+        const prevButton = isRTL ? plusButtonElement : minusButtonElement;
+
+        expect(isFirstCardInView).toBeTruthy();
+
+        let isPrevDisabled = await this.isButtonDisabled(prevButton);
+        expect(isPrevDisabled).toBeTruthy();
+
+        await nextButton?.click();
+        isFirstCardInView = (await getCardsInView(allCardElements))
+          .isFirstCardInView;
+        expect(isFirstCardInView).toBeFalsy();
+
+        isPrevDisabled = await this.isButtonDisabled(prevButton);
+        expect(isPrevDisabled).toBeFalsy();
+
+        await prevButton?.click();
+        isPrevDisabled = await this.isButtonDisabled(prevButton);
+        isFirstCardInView = (await getCardsInView(allCardElements))
+          .isFirstCardInView;
+        expect(isFirstCardInView).toBeTruthy();
+        expect(isPrevDisabled).toBeTruthy();
       }
     } else {
       throw new Error(
