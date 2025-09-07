@@ -1549,8 +1549,9 @@ class LogToTerminalTests(CommonTests):
             output.append(msg)
 
         with self.swap(common, 'write_stdout_safe', mock_write_stdout):
+            # Here we use MyPy ignore because INVALID is not part of LogType,
+            # but we are testing fallback behavior.
             common.log_to_terminal(
                 'Forced invalid type', message_type='INVALID')  # type: ignore[arg-type]
 
         self.assertTrue(any('Forced invalid type' in o for o in output))
-    
