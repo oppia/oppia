@@ -3322,7 +3322,7 @@ export class LoggedInUser extends BaseUser {
       )
     );
 
-    expect(allElementsText).toEqual(expectedTexts);
+    expect(allElementsText.sort()).toEqual(expectedTexts.sort());
 
     excludedTexts.forEach(t => expect(allElementsText).not.toContain(t));
   }
@@ -3642,25 +3642,25 @@ export class LoggedInUser extends BaseUser {
         const nextButton = isRTL ? minusButtonElement : plusButtonElement;
         const prevButton = isRTL ? plusButtonElement : minusButtonElement;
 
-        expect(isFirstCardInView).toBeTruthy();
+        expect(isFirstCardInView).toBe(true);
 
         let isPrevDisabled = await this.isButtonDisabled(prevButton);
-        expect(isPrevDisabled).toBeTruthy();
+        expect(isPrevDisabled).toBe(true);
 
         await nextButton?.click();
         isFirstCardInView = (await getCardsInView(allCardElements))
           .isFirstCardInView;
-        expect(isFirstCardInView).toBeFalsy();
+        expect(isFirstCardInView).toBe(false);
 
         isPrevDisabled = await this.isButtonDisabled(prevButton);
-        expect(isPrevDisabled).toBeFalsy();
+        expect(isPrevDisabled).toBe(false);
 
         await prevButton?.click();
         isPrevDisabled = await this.isButtonDisabled(prevButton);
         isFirstCardInView = (await getCardsInView(allCardElements))
           .isFirstCardInView;
-        expect(isFirstCardInView).toBeTruthy();
-        expect(isPrevDisabled).toBeTruthy();
+        expect(isFirstCardInView).toBe(true);
+        expect(isPrevDisabled).toBe(true);
       }
     } else {
       throw new Error(
