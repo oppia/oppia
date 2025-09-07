@@ -1471,10 +1471,8 @@ class UrlRetrieveTests(CommonTests):
             with open(output_path, 'rb') as buffer:
                 self.assertEqual(buffer.read(), b'content')
 
-                
 class LogToTerminalTests(CommonTests):
     """Tests for the log_to_terminal function."""
-
 
     def test_log_to_terminal_infers_error_from_message(self) -> None:
         output: list[str] = []
