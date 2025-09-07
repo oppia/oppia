@@ -25,8 +25,7 @@ import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 
 describe('Release Coordinator', function () {
-  let releaseCoordinator: ReleaseCoordinator;
-  let loggedOutUser: LoggedOutUser;
+  let releaseCoordinator: ReleaseCoordinator & LoggedOutUser;
 
   beforeAll(async function () {
     releaseCoordinator = await UserFactory.createNewUser(
@@ -34,12 +33,11 @@ describe('Release Coordinator', function () {
       'releaseCoordinator@example.com',
       [testConstants.Roles.RELEASE_COORDINATOR]
     );
-    loggedOutUser = await UserFactory.createLoggedOutUser();
   });
 
   it('should be able to enable the promo bar', async function () {
-    await loggedOutUser.navigateToCommunityLibraryPage();
-    await loggedOutUser.expectPromoBarToBeVisible(false);
+    await releaseCoordinator.navigateToCommunityLibraryPage();
+    await releaseCoordinator.expectPromoBarToBeVisible(false);
 
     // Enable the promo bar.
     await releaseCoordinator.navigateToReleaseCoordinatorPage();
@@ -50,17 +48,19 @@ describe('Release Coordinator', function () {
     await releaseCoordinator.expectActionStatusMessageToBe('Success!');
 
     // Verify that the promo bar is visible.
-    await loggedOutUser.page.reload();
-    await loggedOutUser.expectPromoBarToBeVisible(true, 'testing');
+    await releaseCoordinator.navigateToCommunityLibraryPage();
+    await releaseCoordinator.expectPromoBarToBeVisible(true, 'testing');
 
     // Disable the promo bar.
+    await releaseCoordinator.navigateToReleaseCoordinatorPage();
+    await releaseCoordinator.navigateToMiscTab();
     await releaseCoordinator.togglePromoBar('disabled');
     await releaseCoordinator.savePromoBarMessage();
     await releaseCoordinator.expectActionStatusMessageToBe('Success!');
 
     // Verify that the promo bar is not visible.
-    await loggedOutUser.page.reload();
-    await loggedOutUser.expectPromoBarToBeVisible(false);
+    await releaseCoordinator.navigateToCommunityLibraryPage();
+    await releaseCoordinator.expectPromoBarToBeVisible(false);
   });
 
   afterAll(async function () {
