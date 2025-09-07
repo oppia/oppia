@@ -208,7 +208,9 @@ export class SuperAdmin extends BaseUser {
             await this.selectLanguageForTranslationCoordinatorRole(language);
           }
 
-          await this.clickOn(languageSelectorCloseButtonSelector);
+          await this.clickOnElementWithSelector(
+            languageSelectorCloseButtonSelector
+          );
           await this.expectElementToBeVisible(
             languageSelectorCloseButtonSelector,
             false
@@ -247,7 +249,7 @@ export class SuperAdmin extends BaseUser {
     );
     await this.select(selectElementSelector, language);
 
-    await this.clickOn(addLanguageButtonSelector);
+    await this.clickOnElementWithSelector(addLanguageButtonSelector);
 
     await this.page.waitForFunction(
       (selector: string, numberOfLanguages: number) => {
