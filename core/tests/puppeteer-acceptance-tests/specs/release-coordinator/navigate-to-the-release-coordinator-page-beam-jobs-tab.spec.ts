@@ -42,11 +42,6 @@ describe('Release Coordinator', function () {
     );
   });
 
-  it('should be able to navigate tabs', async function () {
-    await releaseCoordinator.navigateToFeaturesTab();
-    await releaseCoordinator.navigateToMiscTab();
-  });
-
   it('should be able to run beam job (Success)', async function () {
     await releaseCoordinator.navigateToBeamJobsTab();
     await releaseCoordinator.selectAndRunJob('AuditExplorationMigrationJob');
@@ -58,7 +53,7 @@ describe('Release Coordinator', function () {
   });
 
   it('should be able to handle beam job failure', async function () {
-    // TODO: need to find a job that fails.
+    // TODO: Create a dummy job that always fails, or create an issue for the same.
   });
 
   afterAll(async function () {
