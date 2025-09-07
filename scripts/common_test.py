@@ -1471,6 +1471,7 @@ class UrlRetrieveTests(CommonTests):
             with open(output_path, 'rb') as buffer:
                 self.assertEqual(buffer.read(), b'content')
 
+
 class LogToTerminalTests(CommonTests):
     """Tests for the log_to_terminal function."""
 
