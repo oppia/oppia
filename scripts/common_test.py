@@ -1555,3 +1555,14 @@ class LogToTerminalTests(CommonTests):
                 'Forced invalid type', message_type='INVALID')  # type: ignore[arg-type]
 
         self.assertTrue(any('Forced invalid type' in o for o in output))
+
+    def test_log_to_terminal_infers_debug_from_message(self) -> None:
+        output: list[str] = []
+
+        def mock_write_stdout(msg: str) -> None:
+            output.append(msg)
+
+        with self.swap(common, 'write_stdout_safe', mock_write_stdout):
+            common.log_to_terminal('Debugging something important')
+
+        self.assertTrue(any('debugging' in o.lower() for o in output))
