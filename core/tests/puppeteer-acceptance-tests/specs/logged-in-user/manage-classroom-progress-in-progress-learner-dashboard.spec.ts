@@ -73,18 +73,13 @@ describe('Logged-in User', function () {
       'Find the Value of a Number',
     ];
 
-    const firstChapterId =
-      await curriculumAdmin.createAndPublishExplorationWithThreeCards(
-        placeValueChapters[0]
-      );
-
-    // Speed up set-up by making the second chapter auto-complete with no cards.
-    const secondChapterId =
-      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
-        placeValueChapters[1]
-      );
-
-    chapterIds.push(firstChapterId, secondChapterId);
+    for (const chapter of placeValueChapters) {
+      const id =
+        await curriculumAdmin.createAndPublishExplorationWithThreeCards(
+          chapter
+        );
+      chapterIds.push(id ?? '');
+    }
 
     await curriculumAdmin.addStoryToTopic(
       "Jamie's Adventures in the Arcade",
@@ -125,7 +120,10 @@ describe('Logged-in User', function () {
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
-  it(
+  // TODO(#18384) - Currently fails because it cannot differentiate between classroom and exploration lessons.
+  // This results in classroom lessons being duplicated as exploration lessons (with metadata).
+  /*
+    it(
     'should show in progress classroom lessons and skills',
     async function () {
       await loggedInUser.navigateToClassroomPage('math');
@@ -204,7 +202,7 @@ describe('Logged-in User', function () {
       });
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+  );*/
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();

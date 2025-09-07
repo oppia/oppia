@@ -3714,7 +3714,7 @@ export class LoggedInUser extends BaseUser {
     }
     await this.page.waitForSelector(tabSelector);
     const tabButton = await this.page.$(tabSelector);
-    tabButton?.click();
+    await tabButton?.click();
   }
 }
 
