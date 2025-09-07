@@ -34,6 +34,7 @@ omit =
     */core/jobs/batch_jobs/story_migration_jobs.py
     */core/jobs/batch_jobs/story_node_jobs.py
     */core/jobs/batch_jobs/subtopic_migration_jobs.py
+    */core/jobs/batch_jobs/clean_up_voiceover_models_job.py
     */core/jobs/batch_jobs/suggestion_migration_jobs.py
     */core/jobs/batch_jobs/suggestion_stats_computation_jobs.py
     */core/jobs/batch_jobs/topic_migration_jobs.py
