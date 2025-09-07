@@ -25,7 +25,16 @@ from core.platform import models
 
 from google.cloud import ndb
 from typing import (
-    Any, ContextManager, Dict, List, Optional, Sequence, Tuple, TypeVar, Union)
+    Any,
+    ContextManager,
+    Dict,
+    List,
+    Optional,
+    Sequence,
+    Tuple,
+    TypeVar,
+    Union,
+)
 
 MYPY = False
 if MYPY: # pragma: no cover
