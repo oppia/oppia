@@ -830,7 +830,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             lines = f.readlines()
             for line in lines:
                 trimmed_line = line.strip()
-                if not trimmed_line or trimmed_line.startswith(('#', 'git')):
+                if not trimmed_line or trimmed_line.startswith((
+                        '#', 'git', '--hash')):
                     continue
                 library_name_and_version_string = trimmed_line.split(
                     ' ')[0].split('==')

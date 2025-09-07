@@ -108,9 +108,9 @@ def normalize_python_library_name(library_name: str) -> str:
     # library names in the requirements files are distinct when normalized.
     library_name = re.sub(r'\[[^\[^\]]+\]', '', library_name)
     if any(
-            library_name.startswith(prefix)
+            library_name.startswith('%s%s' % (prefix, '-'))
             for prefix in LIBRARY_PREFIXES_WITH_INITIAL_PERIOD):
-        library_name_parts = '-'.split(library_name)
+        library_name_parts = library_name.split('-')
         library_name = '%s.%s' % (
             library_name_parts[0], '-'.join(library_name_parts[1:]))
     return library_name.lower()
