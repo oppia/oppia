@@ -83,7 +83,7 @@
   <p class="post-chapter-recommendation-text">
     {{ 'I18N_END_EXPLORATION_RECOMMENDATION_MESSAGE' | translate }}
   </p>
-  <div class="new-post-chapter-recommendation-cards-container" [ngClass]="{'three-buttons-container': showThreeButtons()}">
+  <div class="new-post-chapter-recommendation-cards-container" [ngClass]="{'three-buttons-container': !nextStoryNodeTitle}">
     <button *ngIf="!userIsLoggedIn" class="post-chapter-recommendations-btn signup-btn" tabindex="0" (click)="signIn()">
       <i class="fa-solid fa-arrow-right-to-bracket"></i>
       <p>Sign up or Login <br><span>And save your lesson progress</span></p>
