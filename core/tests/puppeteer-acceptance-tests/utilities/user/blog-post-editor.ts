@@ -615,6 +615,7 @@ export class BlogPostEditor extends BaseUser {
   async publishTheBlogPost(): Promise<void> {
     await this.clickOnElementWithText('PUBLISH');
     await this.expectElementToBeVisible(confirmButtonSelector);
+    await this.waitForElementToStabilize(confirmButtonSelector);
     await this.clickOnElementWithSelector(confirmButtonSelector);
     await this.expectElementToBeVisible(confirmButtonSelector, false);
     showMessage('Successfully published a blog post!');

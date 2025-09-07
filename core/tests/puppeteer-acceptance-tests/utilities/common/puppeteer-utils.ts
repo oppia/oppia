@@ -463,6 +463,7 @@ export class BaseUser {
       throw new Error(`Element not found for selector ${selector}`);
     }
     await this.waitForElementToBeClickable(element);
+    await this.waitForElementToStabilize(element, 2000);
     showMessage(`Element (selector: ${selector}) is clickable, as expected.`);
     await element.click();
     showMessage(`Element (selector: ${selector}) is clicked.`);
