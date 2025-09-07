@@ -3777,7 +3777,7 @@ export class LoggedInUser extends BaseUser {
           expect(isFirstCardInView && isLastCardInView).toBe(true);
           expect(contentToggleButton).toBeFalsy();
         }
-      } else if (allCardElements.length === 0) {
+      } else if (allCardElements.length === 1) {
         expect(contentToggleButton).toBeFalsy();
         expect(
           this.isBoxWithinRange(
