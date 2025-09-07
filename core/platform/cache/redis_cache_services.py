@@ -25,7 +25,10 @@ import redis
 from typing import Dict, List, Optional
 
 # Redis client for our own implementation of caching.
-OPPIA_REDIS_CLIENT: redis.StrictRedis[str] = redis.StrictRedis[str](
+# Here we use MyPy ignore because the redis library's type stubs
+# do not fully support subscript notation for StrictRedis, and MyPy
+# requires explicit type parameters.
+OPPIA_REDIS_CLIENT = redis.StrictRedis( # type: ignore[type-arg]
     host=feconf.REDISHOST,
     port=feconf.REDISPORT,
     db=feconf.OPPIA_REDIS_DB_INDEX,
@@ -33,7 +36,10 @@ OPPIA_REDIS_CLIENT: redis.StrictRedis[str] = redis.StrictRedis[str](
 )
 
 # Redis client for the Cloud NDB cache.
-CLOUD_NDB_REDIS_CLIENT: redis.StrictRedis[bytes] = redis.StrictRedis[bytes](
+# Here we use MyPy ignore because the redis library's type stubs
+# do not fully support subscript notation for StrictRedis, and MyPy
+# requires explicit type parameters.
+CLOUD_NDB_REDIS_CLIENT = redis.StrictRedis( # type: ignore[type-arg]
     host=feconf.REDISHOST,
     port=feconf.REDISPORT,
     db=feconf.CLOUD_NDB_REDIS_DB_INDEX
