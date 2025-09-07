@@ -1004,6 +1004,8 @@ export class BaseUser {
     }
 
     const pageTarget = context.target();
+    await this.waitForElementToBeClickable(element);
+    await this.waitForElementToStabilize(element);
     await element.click();
     const newTarget = await this.browserObject.waitForTarget(
       target => target.opener() === pageTarget
