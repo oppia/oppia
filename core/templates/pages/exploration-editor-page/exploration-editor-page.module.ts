@@ -115,7 +115,6 @@ import {ExplorationFeaturesService} from 'services/exploration-features.service'
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {ExplorationInitStateNameService} from './services/exploration-init-state-name.service';
 import {ExplorationLanguageCodeService} from './services/exploration-language-code.service';
-import {ExplorationMetadataObjectFactory} from 'domain/exploration/ExplorationMetadataObjectFactory';
 import {ExplorationNextContentIdIndexService} from './services/exploration-next-content-id-index.service';
 import {ExplorationObjectiveService} from './services/exploration-objective.service';
 import {ExplorationParamChangesService} from './services/exploration-param-changes.service';
@@ -339,7 +338,6 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     ExplorationHtmlFormatterService,
     ExplorationInitStateNameService,
     ExplorationLanguageCodeService,
-    ExplorationMetadataObjectFactory,
     ExplorationNextContentIdIndexService,
     ExplorationObjectiveService,
     ExplorationParamChangesService,

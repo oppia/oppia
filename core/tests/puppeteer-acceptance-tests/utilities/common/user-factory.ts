@@ -23,7 +23,7 @@ import {LoggedOutUserFactory, LoggedOutUser} from '../user/logged-out-user';
 import {BlogAdminFactory, BlogAdmin} from '../user/blog-admin';
 import {QuestionAdminFactory} from '../user/question-admin';
 import {BlogPostEditorFactory} from '../user/blog-post-editor';
-import {VoiceoverAdminFactory} from '../user/voiceover-admin';
+import {VoiceoverAdmin, VoiceoverAdminFactory} from '../user/voiceover-admin';
 import {
   ExplorationEditorFactory,
   ExplorationEditor,
@@ -42,6 +42,13 @@ import {ModeratorFactory} from '../user/moderator';
 import {ReleaseCoordinatorFactory} from '../user/release-coordinator';
 import testConstants, {BLOG_RIGHTS} from './test-constants';
 import {showMessage} from './show-message';
+import {
+  ContributorAdmin,
+  ContributorAdminFactory,
+} from '../user/contributor-admin';
+import {TranslationCoordinatorFactory} from '../user/translation-coordinator';
+import {QuestionCoordinatorFactory} from '../user/practice-question-coordinator';
+import {VoiceoverSubmitterFactory} from '../user/voiceover-submitter';
 
 const ROLES = testConstants.Roles;
 const cookieBannerAcceptButton =
@@ -52,14 +59,17 @@ const cookieBannerAcceptButton =
  */
 const USER_ROLE_MAPPING = {
   [ROLES.TRANSLATION_ADMIN]: TranslationAdminFactory,
+  [ROLES.TRANSLATION_COORDINATOR]: TranslationCoordinatorFactory,
   [ROLES.BLOG_ADMIN]: BlogAdminFactory,
   [ROLES.BLOG_POST_EDITOR]: BlogPostEditorFactory,
   [ROLES.CURRICULUM_ADMIN]: CurriculumAdminFactory,
   [ROLES.QUESTION_ADMIN]: QuestionAdminFactory,
+  [ROLES.QUESTION_COORDINATOR]: QuestionCoordinatorFactory,
   [ROLES.VOICEOVER_ADMIN]: VoiceoverAdminFactory,
   [ROLES.TOPIC_MANAGER]: TopicManagerFactory,
   [ROLES.MODERATOR]: ModeratorFactory,
   [ROLES.RELEASE_COORDINATOR]: ReleaseCoordinatorFactory,
+  [ROLES.VOICEOVER_SUBMITTER]: VoiceoverSubmitterFactory,
 } as const;
 
 /**
@@ -82,7 +92,7 @@ type OptionalRoles<TRoles extends (keyof typeof USER_ROLE_MAPPING)[]> =
 /**
  * Global user instances that are created and can be reused again.
  */
-let superAdminInstance: (SuperAdmin & BlogAdmin) | null = null;
+let superAdminInstance: (SuperAdmin & BlogAdmin & VoiceoverAdmin) | null = null;
 let activeUsers: BaseUser[] = [];
 
 export class UserFactory {
@@ -114,6 +124,15 @@ export class UserFactory {
   /**
    * This function assigns roles to a user and returns the instance of
    * that user.
+   * @param {TUser} user - The user to assign roles to.
+   * @param {TRoles} roles - The roles to assign to the user.
+   * @param {string | string[]} args - The arguments to pass to the role
+   *     assignment function. For Topic Manager, it should be the topic
+   *     name (as string). For Translation Coordinator, it should be the
+   *     array of language code (as string[]). For Voiceover Submitter,
+   *     it should be the exploration ID (as string).
+   * @returns {TUser & MultipleRoleIntersection<TRoles>} - The user with
+   *     the roles assigned.
    */
   static assignRolesToUser = async function <
     TUser extends BaseUser,
@@ -121,11 +140,15 @@ export class UserFactory {
   >(
     user: TUser,
     roles: TRoles,
-    topic: string = ''
+    args?: string | string[]
   ): Promise<TUser & MultipleRoleIntersection<TRoles>> {
     for (const role of roles) {
       if (superAdminInstance === null) {
         superAdminInstance = await UserFactory.createNewSuperAdmin('superAdm');
+      }
+
+      if (!user.username) {
+        throw new Error('Username is null while adding roles');
       }
 
       switch (role) {
@@ -137,10 +160,31 @@ export class UserFactory {
           );
           break;
         case ROLES.TOPIC_MANAGER:
+          if (typeof args !== 'string') {
+            throw new Error('Expected additional argument to be string.');
+          }
           await superAdminInstance.assignRoleToUser(
             user.username,
             ROLES.TOPIC_MANAGER,
-            topic
+            args as string
+          );
+          break;
+        case ROLES.TRANSLATION_COORDINATOR:
+          await superAdminInstance.assignRoleToUser(
+            user.username,
+            ROLES.TRANSLATION_COORDINATOR,
+            args
+          );
+          break;
+        case ROLES.VOICEOVER_SUBMITTER:
+          if (typeof args !== 'string') {
+            throw new Error(
+              'Exploration ID is required to assign a voiceover submitter.'
+            );
+          }
+          await superAdminInstance.addVoiceoverArtistToExplorationWithID(
+            args as string,
+            user.username
           );
           break;
         default:
@@ -148,7 +192,9 @@ export class UserFactory {
           break;
       }
 
-      await superAdminInstance.expectUserToHaveRole(user.username, role);
+      if (role !== ROLES.VOICEOVER_SUBMITTER) {
+        await superAdminInstance.expectUserToHaveRole(user.username, role);
+      }
 
       UserFactory.composeUserWithRoles(user, [USER_ROLE_MAPPING[role]()]);
     }
@@ -165,13 +211,34 @@ export class UserFactory {
       showMessage('Enabled text to speech synthesis using cloud service.');
     };
 
+  /**
+   * This function creates a new user with the specified roles and returns
+   * the instance of that user.
+   * @param {string} username - The username of the user.
+   * @param {string} email - The email of the user.
+   * @param {OptionalRoles<TRoles>} roles - The roles to assign to the user.
+   * @param {string | string[]} args - The arguments to pass to the role
+   *     assignment function. For Topic Manager, it should be the topic
+   *     name. For Translation Coordinator, it should be the array of
+   *     language code.
+   * @returns {Promise<
+   *     LoggedOutUser &
+   *       LoggedInUser &
+   *       ExplorationEditor &
+   *       QuestionSubmitter &
+   *       TopicManager &
+   *       CurriculumAdmin &
+   *       ContributorAdmin &
+   *       MultipleRoleIntersection<TRoles>
+   *   >} - The user with the roles assigned.
+   */
   static createNewUser = async function <
     TRoles extends (keyof typeof USER_ROLE_MAPPING)[] = never[],
   >(
     username: string,
     email: string,
     roles: OptionalRoles<TRoles> = [] as OptionalRoles<TRoles>,
-    topic: string = ''
+    args?: string | string[]
   ): Promise<
     LoggedOutUser &
       LoggedInUser &
@@ -179,6 +246,7 @@ export class UserFactory {
       QuestionSubmitter &
       TopicManager &
       CurriculumAdmin &
+      ContributorAdmin &
       MultipleRoleIntersection<TRoles>
   > {
     let user = UserFactory.composeUserWithRoles(BaseUserFactory(), [
@@ -188,13 +256,18 @@ export class UserFactory {
       QuestionSubmitterFactory(),
       TopicManagerFactory(),
       CurriculumAdminFactory(),
+      ContributorAdminFactory(),
+      VoiceoverSubmitterFactory(),
     ]);
+
+    user.username = username;
+    user.email = email;
 
     await user.openBrowser();
     await user.signUpNewUser(username, email);
     activeUsers.push(user);
 
-    return await UserFactory.assignRolesToUser(user, roles, topic);
+    return await UserFactory.assignRolesToUser(user, roles, args);
   };
 
   /**
@@ -203,7 +276,7 @@ export class UserFactory {
    */
   static createNewSuperAdmin = async function (
     username: string
-  ): Promise<SuperAdmin & BlogAdmin> {
+  ): Promise<SuperAdmin & BlogAdmin & VoiceoverAdmin> {
     if (superAdminInstance !== null) {
       return superAdminInstance;
     }
@@ -216,9 +289,11 @@ export class UserFactory {
       SuperAdminFactory(),
     ]);
     await superAdmin.assignRoleToUser(username, ROLES.BLOG_ADMIN);
+    await superAdmin.assignRoleToUser(username, ROLES.VOICEOVER_ADMIN);
     await superAdmin.expectUserToHaveRole(username, ROLES.BLOG_ADMIN);
     superAdminInstance = UserFactory.composeUserWithRoles(superAdmin, [
       BlogAdminFactory(),
+      VoiceoverAdminFactory(),
     ]);
 
     return superAdminInstance;

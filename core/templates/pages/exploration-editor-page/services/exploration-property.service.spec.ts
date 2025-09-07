@@ -22,17 +22,13 @@ import {ExplorationPropertyService} from 'pages/exploration-editor-page/services
 import {ChangeListService} from 'pages/exploration-editor-page/services/change-list.service';
 
 import {ParamChanges} from 'domain/exploration/param-changes.model';
-import {
-  ParamSpecs,
-  ParamSpecsObjectFactory,
-} from 'domain/exploration/ParamSpecsObjectFactory';
+import {ParamSpecs} from 'domain/exploration/param-specs.model';
 import {ParamSpec} from 'domain/exploration/param-spec.model';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ParamChange} from 'domain/exploration/param-change.model';
 
 describe('Exploration Property Service', () => {
   let explorationPropertyService: ExplorationPropertyService;
-  let paramSpecsObjectFactory: ParamSpecsObjectFactory;
   let changeListService: ChangeListService;
   let editExplorationPropertySpy: jasmine.Spy;
 
@@ -43,7 +39,6 @@ describe('Exploration Property Service', () => {
 
     explorationPropertyService = TestBed.inject(ExplorationPropertyService);
     changeListService = TestBed.inject(ChangeListService);
-    paramSpecsObjectFactory = TestBed.inject(ParamSpecsObjectFactory);
 
     editExplorationPropertySpy = spyOn(
       changeListService,
@@ -177,7 +172,7 @@ describe('Exploration Property Service', () => {
     let normalizeSpy = spyOn(child, '_normalize').and.callThrough();
 
     child.init(
-      paramSpecsObjectFactory.createFromBackendDict({
+      ParamSpecs.createFromBackendDict({
         x: {
           obj_type: 'UnicodeString',
         },

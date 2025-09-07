@@ -44,7 +44,7 @@ import {
 } from 'pages/exploration-player-page/services/answer-classification.service';
 import {AlertsService} from 'services/alerts.service';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
-import {State} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 import {ResponsesService} from '../services/responses.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';

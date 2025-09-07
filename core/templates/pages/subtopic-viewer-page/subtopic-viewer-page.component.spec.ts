@@ -44,6 +44,7 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {AppConstants} from 'app.constants';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
 
 class MockTranslateService {
   onLangChange: EventEmitter<string> = new EventEmitter();
@@ -63,7 +64,16 @@ class MockPlatformFeatureService {
 class MockWindowRef {
   nativeWindow = {
     open: jasmine.createSpy('open'),
+    location: {
+      href: '',
+    },
   };
+}
+
+class MockSiteAnalyticsService {
+  registerPracticeSessionStartEvent = jasmine.createSpy(
+    'registerPracticeSessionStartEvent'
+  );
 }
 
 describe('Subtopic viewer page', function () {
@@ -82,6 +92,7 @@ describe('Subtopic viewer page', function () {
   let platformFeatureService: PlatformFeatureService;
   let windowRef: WindowRef;
   let urlInterpolationService: UrlInterpolationService;
+  let siteAnalyticsService: SiteAnalyticsService;
 
   let topicName = 'Topic Name';
   let topicId = '123abcd';
@@ -203,6 +214,10 @@ describe('Subtopic viewer page', function () {
           provide: WindowRef,
           useClass: MockWindowRef,
         },
+        {
+          provide: SiteAnalyticsService,
+          useClass: MockSiteAnalyticsService,
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -226,6 +241,7 @@ describe('Subtopic viewer page', function () {
     platformFeatureService = TestBed.inject(PlatformFeatureService);
     windowRef = TestBed.inject(WindowRef);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
 
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
       true
@@ -291,7 +307,7 @@ describe('Subtopic viewer page', function () {
         subtopicDataObject.getParentTopicId()
       );
       expect(component.parentTopicTitle).toEqual(
-        subtopicDataObject.getParentTopicName()
+        topicDataObject.getTopicName()
       );
       expect(component.nextSubtopic).toEqual(
         subtopicDataObject.getNextSubtopic()
@@ -340,7 +356,6 @@ describe('Subtopic viewer page', function () {
       'subtopic-url'
     );
     spyOn(loaderService, 'showLoadingScreen');
-    spyOn(subtopicDataObject, 'getSections').and.returnValue([]);
 
     spyOn(
       subtopicViewerBackendApiService,
@@ -353,7 +368,7 @@ describe('Subtopic viewer page', function () {
     component.ngOnInit();
     tick();
 
-    expect(component.sections).toEqual([]);
+    expect(component.sections).toEqual(subtopicDataObject.getSections());
     expect(component.pageContents).toBeNull();
   }));
 
@@ -540,26 +555,21 @@ describe('Subtopic viewer page', function () {
   it('should open practice menu when openPracticeMenu is called', () => {
     component.classroomUrlFragment = 'math';
     component.topicUrlFragment = 'algebra';
+    component.currentSubtopicId = 1;
+    component.parentTopicTitle = 'Test Topic';
 
     spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
       '/practice-menu'
     );
+    spyOn(loaderService, 'showLoadingScreen');
 
     component.openPracticeMenu();
 
-    expect(windowRef.nativeWindow.open).toHaveBeenCalledWith(
-      '/practice-menu',
-      '_self'
-    );
-  });
-
-  it('should not open practice menu when required fragments are missing', () => {
-    component.classroomUrlFragment = '';
-    component.topicUrlFragment = 'algebra';
-
-    component.openPracticeMenu();
-
-    expect(windowRef.nativeWindow.open).not.toHaveBeenCalled();
+    expect(
+      siteAnalyticsService.registerPracticeSessionStartEvent
+    ).toHaveBeenCalledWith('math', 'Test Topic', '1');
+    expect(windowRef.nativeWindow.location.href).toBe('/practice-menu');
+    expect(loaderService.showLoadingScreen).toHaveBeenCalledWith('Loading');
   });
 
   it('should navigate back to topic when backToTopic is called', () => {

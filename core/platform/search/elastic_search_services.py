@@ -57,7 +57,7 @@ class ElasticSearchClient:
                         platform_parameter_list.ParamName.ES_USERNAME.value))
                 self._client = elasticsearch.Elasticsearch(
                     ('%s:%s' % (feconf.ES_HOST, feconf.ES_LOCALHOST_PORT))
-                    if es_cloud_id is None else None,
+                    if es_cloud_id == '' else None,
                     cloud_id=es_cloud_id,
                     http_auth=(
                         (es_username, secrets_services.get_secret(

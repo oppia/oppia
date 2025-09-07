@@ -114,10 +114,61 @@ def parse_html(html_content: str) -> str:
         for element in soup.find_all(custom_tag_element):
             convert_custom_oppia_tags_to_generic_tags(element)
 
-    text_content: str = soup.get_text(
-        separator=feconf.OPPIA_CONTENT_TAG_DELIMITER, strip=True)
+    text_content: str = get_text_with_delimiters(
+        soup, delimiter=feconf.OPPIA_CONTENT_TAG_DELIMITER)
 
     return text_content
+
+
+def get_text_with_delimiters(soup: bs4.BeautifulSoup, delimiter: str) -> str:
+    """The method extracts text from the BeautifulSoup object and
+    adds delimiters between text segments based on the block-level HTML tags.
+
+    Args:
+        soup: BeautifulSoup. The BeautifulSoup object containing the HTML
+            content.
+        delimiter: str. The delimiter to be added between text segments.
+
+    Returns:
+        str. The text content with delimiters added between segments.
+    """
+    block_tags_for_delimiter = [
+        'p',
+        'li',
+        'pre',
+        'oppia-noninteractive-math',
+        'oppia-noninteractive-skillreview',
+        'oppia-noninteractive-link'
+    ]
+    list_tags = ['ul', 'ol']
+
+    text_segments = []
+
+    for element in soup.body.children if soup.body else soup.children:
+        if isinstance(element, bs4.Tag):
+            if element.name in list_tags:
+                for li in element.find_all('li', recursive=False):
+                    li_text = li.get_text(separator=' ', strip=True)
+                    if li_text:
+                        text_segments.append(li_text)
+                        text_segments.append(delimiter)
+            else:
+                text = element.get_text(separator=' ', strip=True)
+                if text:
+                    text_segments.append(text)
+                    if element.name in block_tags_for_delimiter:
+                        text_segments.append(delimiter)
+        elif isinstance(element, bs4.NavigableString):
+            text = str(element).strip()
+            if text:
+                text_segments.append(text)
+                text_segments.append(delimiter)
+
+    # Remove trailing delimiters, if any.
+    while text_segments and text_segments[-1] == delimiter:
+        text_segments.pop()
+
+    return ''.join(text_segments)
 
 
 def synthesize_voiceover_for_html_string(

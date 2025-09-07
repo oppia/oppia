@@ -29,6 +29,7 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {Subscription} from 'rxjs';
 import {SkillMasteryBackendApiService} from 'domain/skill/skill-mastery-backend-api.service';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
+import {LoaderService} from 'services/loader.service';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 import {QuestionPlayerConceptCardModalComponent} from './question-player-concept-card-modal.component';
 import {QuestionPlayerConstants} from 'components/question-directives/question-player/question-player.constants';
@@ -110,6 +111,7 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
   userIsLoggedIn!: boolean;
   canCreateCollections!: boolean;
   componentSubscription = new Subscription();
+  questionsLoading!: boolean;
 
   constructor(
     private pageContextService: PageContextService,
@@ -117,6 +119,7 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
     private location: Location,
     private ngbModal: NgbModal,
     private playerPositionService: PlayerPositionService,
+    private loaderService: LoaderService,
     private preventPageUnloadEventService: PreventPageUnloadEventService,
     private skillMasteryBackendApiService: SkillMasteryBackendApiService,
     private userService: UserService,
@@ -542,9 +545,11 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
     this.finalCorrect = 0.0;
     this.scorePerSkillMapping = {};
     this.testIsPassed = true;
+    this.questionsLoading = true;
   }
 
   ngOnInit(): void {
+    this.loaderService.showLoadingScreen('Loading');
     {
       this.componentSubscription.add(
         this.playerPositionService.onCurrentQuestionChange.subscribe(result =>
@@ -554,7 +559,11 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
 
       this.componentSubscription.add(
         this.questionPlayerEngineService.onTotalQuestionsReceived.subscribe(
-          result => this.updateTotalQuestions(result)
+          result => {
+            this.updateTotalQuestions(result);
+            this.questionsLoading = false;
+            this.loaderService.hideLoadingScreen();
+          }
         )
       );
 

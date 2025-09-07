@@ -33,7 +33,7 @@ import {ImprovementsService} from 'services/improvements.service';
 import {StateTopAnswersStatsService} from 'services/state-top-answers-stats.service';
 import {UnresolvedAnswersOverviewComponent} from './unresolved-answers-overview.component';
 import {ExternalSaveService} from 'services/external-save.service';
-import {State} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 
 describe('Unresolved Answers Overview Component', () => {
   let component: UnresolvedAnswersOverviewComponent;

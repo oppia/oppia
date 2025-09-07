@@ -65,18 +65,13 @@ import { CreatorDashboardBackendApiService } from 'domain/creator_dashboard/crea
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { EmailDashboardBackendApiService } from 'domain/email-dashboard/email-dashboard-backend-api.service';
 import { ExplorationObjectFactory } from 'domain/exploration/ExplorationObjectFactory';
-import { LostChangeObjectFactory } from 'domain/exploration/LostChangeObjectFactory';
-import { ParamSpecsObjectFactory } from 'domain/exploration/ParamSpecsObjectFactory';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
-import { WrittenTranslationObjectFactory } from 'domain/exploration/WrittenTranslationObjectFactory';
-import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
 import { CuratedExplorationValidationService } from 'domain/exploration/curated-exploration-validation.service';
 import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
 import { ExplorationPermissionsBackendApiService } from 'domain/exploration/exploration-permissions-backend-api.service';
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { StateInteractionStatsBackendApiService } from 'domain/exploration/state-interaction-stats-backend-api.service';
 import { StatsReportingBackendApiService } from 'domain/exploration/stats-reporting-backend-api.service';
-import { FeedbackThreadObjectFactory } from 'domain/feedback_thread/FeedbackThreadObjectFactory';
 import { FeedbackUpdatesBackendApiService } from 'domain/feedback_updates/feedback-updates-backend-api.service';
 import { LearnerDashboardActivityBackendApiService} from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
 import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
@@ -100,7 +95,6 @@ import { SkillCreationBackendApiService } from 'domain/skill/skill-creation-back
 import { SkillMasteryBackendApiService } from 'domain/skill/skill-mastery-backend-api.service';
 import { SkillRightsBackendApiService } from 'domain/skill/skill-rights-backend-api.service';
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
-import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { LearnerAnswerDetailsBackendApiService } from 'domain/statistics/learner-answer-details-backend-api.service';
 import { PlaythroughBackendApiService } from 'domain/statistics/playthrough-backend-api.service';
 import { StateTopAnswersStatsObjectFactory } from 'domain/statistics/state-top-answers-stats-object.factory';
@@ -392,7 +386,6 @@ import { TrainingDataEditorPanelService } from 'pages/exploration-editor-page/ed
 import { QuestionUpdateService } from 'domain/question/question-update.service';
 import { SkillEditorRoutingService } from 'pages/skill-editor-page/services/skill-editor-routing.service';
 import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-redo.service';
-import { ExplorationMetadataObjectFactory } from 'domain/exploration/ExplorationMetadataObjectFactory';
 import { VersionHistoryBackendApiService } from 'pages/exploration-editor-page/services/version-history-backend-api.service';
 import { TranslationStatusService } from 'pages/exploration-editor-page/translation-tab/services/translation-status.service';
 import { YamlService } from './yaml.service';
@@ -442,7 +435,7 @@ import { CheckpointProgressService } from 'pages/exploration-player-page/service
 import { ProgressUrlService } from 'pages/exploration-player-page/services/progress-url.service';
 import { ExplorationInitializationService } from 'pages/exploration-player-page/services/exploration-initialization.service';
 import { CardAnimationService } from 'pages/exploration-player-page/services/card-animation.service';
-
+import { VoiceoverLanguageManagementService } from './voiceover-language-management-service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -571,7 +564,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExplorationDataBackendApiService', ExplorationDataBackendApiService],
   ['ExplorationDataService', ExplorationDataService],
   ['ExplorationDiffService', ExplorationDiffService],
-  ['ExplorationMetadataObjectFactory', ExplorationMetadataObjectFactory],
   ['ExplorationParamSpecsService', ExplorationParamSpecsService],
   ['ExplorationRightsService', ExplorationRightsService],
   ['ExplorationRightsBackendApiService', ExplorationRightsBackendApiService],
@@ -620,7 +612,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['FatigueDetectionService',
     FatigueDetectionService],
   ['FeedbackPopupBackendApiService', FeedbackPopupBackendApiService],
-  ['FeedbackThreadObjectFactory', FeedbackThreadObjectFactory],
   ['FeedbackUpdatesBackendApiService', FeedbackUpdatesBackendApiService],
   ['FilterForMatchingSubstringPipe', FilterForMatchingSubstringPipe],
   ['FocusManagerService', FocusManagerService],
@@ -689,7 +680,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['LoaderService', LoaderService],
   ['LocalStorageService', LocalStorageService],
   ['LoggerService', LoggerService],
-  ['LostChangeObjectFactory', LostChangeObjectFactory],
   ['MathEquationInputRulesService', MathEquationInputRulesService],
   ['MathEquationInputValidationService', MathEquationInputValidationService],
   ['MathInteractionsService', MathInteractionsService],
@@ -721,7 +711,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['OppiaRteParserService', OppiaRteParserService],
   ['PageHeadService', PageHeadService],
   ['PageTitleService', PageTitleService],
-  ['ParamSpecsObjectFactory', ParamSpecsObjectFactory],
   ['PencilCodeEditorRulesService', PencilCodeEditorRulesService],
   ['PencilCodeEditorValidationService', PencilCodeEditorValidationService],
   ['PlatformParameterAdminBackendApiService',
@@ -810,7 +799,6 @@ export const angularServices: [string, Type<{}>][] = [
     StateInteractionStatsBackendApiService],
   ['StateInteractionStatsService', StateInteractionStatsService],
   ['StateNameService', StateNameService],
-  ['StateObjectFactory', StateObjectFactory],
   ['StateParamChangesService', StateParamChangesService],
   ['StatePropertyService', StatePropertyService],
   ['StateSolicitAnswerDetailsService', StateSolicitAnswerDetailsService],
@@ -883,6 +871,7 @@ export const angularServices: [string, Type<{}>][] = [
     UserEmailPreferencesBackendApiService],
   ['UserExplorationPermissionsService', UserExplorationPermissionsService],
   ['UtilsService', UtilsService],
+  ['VoiceoverLanguageManagementService', VoiceoverLanguageManagementService],
   ['ValidatorsService', ValidatorsService],
   ['VersionedExplorationCachingService', VersionedExplorationCachingService],
   ['VersionHistoryBackendApiService', VersionHistoryBackendApiService],
@@ -891,8 +880,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['VersionTreeService', VersionTreeService],
   ['WindowDimensionsService', WindowDimensionsService],
   ['WindowRef', WindowRef],
-  ['WrittenTranslationObjectFactory', WrittenTranslationObjectFactory],
-  ['WrittenTranslationsObjectFactory', WrittenTranslationsObjectFactory],
   ['YamlService', YamlService],
   ['BaseInteractionValidationService', BaseInteractionValidationService],
   ['UndoRedoService', UndoRedoService],
