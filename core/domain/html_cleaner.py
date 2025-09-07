@@ -29,7 +29,7 @@ from core.domain import rte_component_registry
 
 import bleach
 import bs4
-from typing import Dict, Final, List, TypedDict, Union, cast
+from typing import Callable, Dict, Final, List, TypedDict, Union, cast
 
 
 class ComponentsDict(TypedDict):
@@ -67,7 +67,7 @@ def filter_a(tag: str, name: str, value: str) -> bool:
     return False
 
 
-ATTRS_ALLOWLIST: Final = {
+ATTRS_ALLOWLIST: Final[Dict[str, Union[List[str], Callable[..., bool]]]] = {
     'a': filter_a,
     'b': [],
     'blockquote': [],
@@ -115,14 +115,9 @@ def clean(user_submitted_html: str) -> str:
     # TODO(sll): Alert the caller if the input was changed due to this call.
     # TODO(sll): Add a log message if bad HTML is detected.
 
-    # Here we use MyPy ignore because core_tags comes from external registry
-    # functions that return Dict[str, object] but bleach.clean expects
-    # Dict[str, List[str]]. The actual runtime values are compatible but
-    # MyPy cannot verify this due to the complex union types in bleach's
-    # type annotations.
     return bleach.clean(
         user_submitted_html, tags=tag_names,
-        attributes=core_tags, strip=True # type: ignore[arg-type]
+        attributes=core_tags, strip=True
     )
 
 
@@ -136,11 +131,9 @@ def strip_html_tags(html_string: str) -> str:
         str. The HTML string that results after all the tags and attributes are
         stripped out.
     """
-    # Here we use MyPy ignore because bleach.clean's attributes parameter
-    # has a complex union type that doesn't include Dict[<nothing>, <nothing>]
-    # for empty dicts, but this is safe at runtime.
+    empty_attrs: Dict[str, List[str]] = {}
     return bleach.clean(
-        html_string, tags=[], attributes={}, strip=True # type: ignore[arg-type]
+        html_string, tags=[], attributes=empty_attrs, strip=True
     )
 
 

@@ -52,6 +52,7 @@ from core.domain import rights_manager
 from core.domain import role_services
 from core.domain import search_services
 from core.domain import skill_domain
+from core.domain import skill_fetchers
 from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import stats_services
@@ -1307,19 +1308,11 @@ class AdminHandler(
                     subtopic_page_domain.SubtopicPage
                     .create_default_subtopic_page(1, topic_id))
             else:
-                # Here we use MyPy ignore because skill_fetchers is dynamically
-                # added to skill_services module and not explicitly exported.
-                skill = skill_services.skill_fetchers.get_skill_by_id( # type: ignore[attr-defined]
-                    skill_id
-                )
+                skill = skill_fetchers.get_skill_by_id(skill_id)
                 question_1 = question_services.get_question_by_id(question_id_1)
                 question_2 = question_services.get_question_by_id(question_id_2)
                 question_3 = question_services.get_question_by_id(question_id_3)
-                # Here we use MyPy ignore because story_fetchers is dynamically
-                # added to story_services module and not explicitly exported.
-                story = story_services.story_fetchers.get_story_by_id( # type: ignore[attr-defined]
-                    story_id
-                )
+                story = story_fetchers.get_story_by_id(story_id)
 
             # Generating the explorations to be added to the story.
             exploration_ids_to_publish = []
