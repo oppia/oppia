@@ -93,7 +93,7 @@ describe('Topic Manager', function () {
       'Arithmetic Operations (New) • Oppia', // Title Fragment.
       testConstants.data.curriculumAdminThumbnailImage, // Thumbnail.
       'AO 101', // Title.
-      'arithmetic-101' // URL fragment.
+      'arithmetic-new' // URL fragment.
     );
     await topicManager.saveTopicDraft(
       'AO 101',

@@ -3616,7 +3616,7 @@ export class TopicManager extends BaseUser {
       : desktopSkillDescriptionSelector;
     await this.expectElementToBeVisible(skillNameAndStatusContainer);
 
-    const skillContainers = await this.page.$$(skillsAssignmentSelector);
+    const skillContainers = await this.page.$$(skillNameAndStatusContainer);
     const skillContainer = skillContainers.find(async container => {
       const foundSkillName = await container.$eval(
         skillDescriptionSelector,
