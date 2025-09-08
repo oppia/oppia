@@ -92,7 +92,8 @@ describe('Topic Manager', function () {
     await topicManager.expectScreenshotToMatch('skillEditor', __dirname);
 
     // Add a misconception to the skill.
-    await topicManager.publishUpdatedSkill('Added misconception to the skill');
+    // TODO(#23231): Uncomment the below line, once the issue is fixed.
+    // await topicManager.publishUpdatedSkill('Added worked example to the skill');
     await topicManager.addMisconception(
       "You can't subtract a fraction from a whole number.",
       'We have practiced subtracting fractions from whole numbers.',

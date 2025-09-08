@@ -110,7 +110,7 @@ describe('Topic Manager', function () {
   it('should be able to edit and preview subtopic', async function () {
     await topicManager.openSubtopicEditor('Addition', 'Arithmetic Operations');
     await topicManager.editSubTopicDetails(
-      'Intro to addition and Subtraction',
+      'Intro to Addition and Subtraction',
       'intro-add-subtract',
       'This is introduction to Addition and Subtraction.',
       testConstants.data.profilePicture

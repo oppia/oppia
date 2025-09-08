@@ -920,6 +920,7 @@ export class CurriculumAdmin extends TopicManager {
     await this.page.waitForSelector(
       `${confirmSkillAssignationButton}:not([disabled])`
     );
+    await this.waitForElementToStabilize(confirmSkillAssignationButton);
     await this.clickOn(confirmSkillAssignationButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
     await this.saveTopicDraft(topicName);

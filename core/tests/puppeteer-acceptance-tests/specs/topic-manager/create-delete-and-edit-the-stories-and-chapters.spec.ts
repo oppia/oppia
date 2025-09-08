@@ -106,11 +106,6 @@ describe('Topic Manager', function () {
       'the-broken-calculator',
       'Arithmetic Operations'
     );
-
-    await topicManager.openStoryEditor(
-      'The Broken Calculator',
-      'Arithmetic Operations'
-    );
     await topicManager.editStoryDetails(
       'New Story Title',
       'New Story Description',

@@ -327,6 +327,8 @@ const questionDifficultySelectionModalSelector =
 const confirmSkillDificultyButton =
   'button.e2e-test-confirm-skill-difficulty-button';
 const skillSelectionModalSelector = '.e2e-test-skill-container';
+const saveSubtopicExplanationButtonSelector =
+  '.e2e-test-save-subtopic-content-button';
 
 export class TopicManager extends BaseUser {
   /**
@@ -2009,8 +2011,8 @@ export class TopicManager extends BaseUser {
     const missingSkills = expectedSkills.filter(
       topic => !skillNames.includes(topic)
     );
-    const matchedSkills = skillNames.filter(topic =>
-      expectedSkills.includes(topic)
+    const matchedSkills = expectedSkills.filter(topic =>
+      skillNames.includes(topic)
     );
 
     if (visible && missingSkills.length > 0) {
@@ -2728,6 +2730,7 @@ export class TopicManager extends BaseUser {
     await this.page.waitForSelector(richTextAreaField, {visible: true});
     await this.clearAllTextFrom(richTextAreaField);
     await this.type(richTextAreaField, explanation);
+    await this.clickOn(saveSubtopicExplanationButtonSelector);
 
     // Update the thumbnail if it is provided.
     if (thumbnail) {
@@ -3003,9 +3006,13 @@ export class TopicManager extends BaseUser {
    * @param {string} storyName - The name of the story.
    * @param {string} topicName - The name of the topic.
    */
-  async openStoryEditor(storyName: string, topicName: string): Promise<void> {
-    try {
+  async openStoryEditor(storyName: string, topicName?: string): Promise<void> {
+    // If topic name is given, navigate to topic.
+    if (topicName) {
       await this.openTopicEditor(topicName);
+    }
+
+    try {
       if (this.isViewportAtMobileWidth()) {
         const elements = await this.page.$$(
           mobileCollapsibleCardHeaderSelector
