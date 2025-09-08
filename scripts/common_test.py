@@ -12,11 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Copyright 2019 The Oppia Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS-IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 """Unit tests for scripts/common.py."""
 
 from __future__ import annotations
 
-# Standard library
 import builtins
 import contextlib
 import errno
@@ -37,17 +50,14 @@ import time
 from typing import Generator, List, Literal, NoReturn, Tuple
 from urllib import request as urlrequest
 
-# Third-party
 import yaml
 
-# Local imports
 from core import feconf
 from core import utils
 from core.tests import test_utils
 from scripts import servers
 from . import common
 
-# Aliases
 StringIO = io.StringIO
 
 
@@ -411,7 +421,7 @@ class CommonTests(test_utils.GenericTestBase):
 
     def test_get_remote_alias_with_correct_alias(self) -> None:
         def mock_check_output(
-            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+            unused_cmd_tokens: List[str], unused_encoding: str = 'utf-8'  # pylint: disable=unused-argument
         ) -> str:
             return 'remote1 url1\nremote2 url2'
         with self.swap(
@@ -421,7 +431,7 @@ class CommonTests(test_utils.GenericTestBase):
 
     def test_get_remote_alias_with_incorrect_alias(self) -> None:
         def mock_check_output(
-            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+            unused_cmd_tokens: List[str], unused_encoding: str = 'utf-8'  # pylint: disable=unused-argument
         ) -> str:
             return 'remote1 url1\nremote2 url2'
         check_output_swap = self.swap(
@@ -452,7 +462,7 @@ class CommonTests(test_utils.GenericTestBase):
 
     def test_get_current_branch_name(self) -> None:
         def mock_check_output(
-            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+            unused_cmd_tokens: List[str], _encoding: str = 'utf-8'  # pylint: disable=unused-argument
         ) -> str:
             return 'On branch test'
         with self.swap(
@@ -461,7 +471,7 @@ class CommonTests(test_utils.GenericTestBase):
 
     def test_update_branch_with_upstream(self) -> None:
         def mock_check_output(
-            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+            unused_cmd_tokens: List[str], _encoding: str = 'utf-8'  # pylint: disable=unused-argument
         ) -> str:
             return 'On branch test'
 
@@ -503,7 +513,7 @@ class CommonTests(test_utils.GenericTestBase):
         self
     ) -> None:
         def mock_check_output(
-            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+            unused_cmd_tokens: List[str], _encoding: str = 'utf-8'  # pylint: disable=unused-argument
         ) -> str:
             return 'On branch release-1.2.3'
         with self.swap(
@@ -512,7 +522,7 @@ class CommonTests(test_utils.GenericTestBase):
 
     def test_is_current_branch_a_hotfix_branch_with_hotfix_branch(self) -> None:
         def mock_check_output(
-            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+            unused_cmd_tokens: List[str], _encoding: str = 'utf-8'  # pylint: disable=unused-argument
         ) -> str:
             return 'On branch release-1.2.3-hotfix-1'
         with self.swap(
@@ -523,7 +533,7 @@ class CommonTests(test_utils.GenericTestBase):
         self
     ) -> None:
         def mock_check_output(
-            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+            unused_cmd_tokens: List[str], _encoding: str = 'utf-8'  # pylint: disable=unused-argument
         ) -> str:
             return 'On branch release-1.2.3'
         with self.swap(
@@ -534,7 +544,7 @@ class CommonTests(test_utils.GenericTestBase):
         self
     ) -> None:
         def mock_check_output(
-            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+            unused_cmd_tokens: List[str], _encoding: str = 'utf-8'  # pylint: disable=unused-argument
         ) -> str:
             return 'On branch release-1.2.3-hotfix-1'
         with self.swap(
@@ -545,7 +555,7 @@ class CommonTests(test_utils.GenericTestBase):
         self
     ) -> None:
         def mock_check_output(
-            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+            unused_cmd_tokens: List[str], _encoding: str = 'utf-8'  # pylint: disable=unused-argument
         ) -> str:
             return 'On branch release-maintenance-1.2.3'
         with self.swap(
@@ -556,7 +566,7 @@ class CommonTests(test_utils.GenericTestBase):
         self
     ) -> None:
         def mock_check_output(
-            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+            unused_cmd_tokens: List[str], _encoding: str = 'utf-8'  # pylint: disable=unused-argument
         ) -> str:
             return 'On branch test'
         with self.swap(
@@ -565,7 +575,7 @@ class CommonTests(test_utils.GenericTestBase):
 
     def test_is_current_branch_a_test_branch_with_test_branch(self) -> None:
         def mock_check_output(
-            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+            unused_cmd_tokens: List[str], _encoding: str = 'utf-8'  # pylint: disable=unused-argument
         ) -> str:
             return 'On branch test-common'
         with self.swap(
@@ -574,7 +584,7 @@ class CommonTests(test_utils.GenericTestBase):
 
     def test_is_current_branch_a_test_branch_with_non_test_branch(self) -> None:
         def mock_check_output(
-            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+            unused_cmd_tokens: List[str], _encoding: str = 'utf-8'  # pylint: disable=unused-argument
         ) -> str:
             return 'On branch invalid-test'
         with self.swap(
@@ -583,7 +593,7 @@ class CommonTests(test_utils.GenericTestBase):
 
     def test_verify_current_branch_name_with_correct_branch(self) -> None:
         def mock_check_output(
-            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+            unused_cmd_tokens: List[str], _encoding: str = 'utf-8'  # pylint: disable=unused-argument
         ) -> str:
             return 'On branch test'
         with self.swap(
@@ -592,7 +602,7 @@ class CommonTests(test_utils.GenericTestBase):
 
     def test_verify_current_branch_name_with_incorrect_branch(self) -> None:
         def mock_check_output(
-            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+            unused_cmd_tokens: List[str], _encoding: str = 'utf-8'  # pylint: disable=unused-argument
         ) -> str:
             return 'On branch invalid'
         check_output_swap = self.swap(
@@ -1073,7 +1083,7 @@ class CommonTests(test_utils.GenericTestBase):
 
         with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', True):
             def mock_check_output(
-                unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+                unused_cmd_tokens: List[str], _encoding: str = 'utf-8'  # pylint: disable=unused-argument
             ) -> str:
                 return 'test'
             check_output_swap = self.swap(
@@ -1143,7 +1153,7 @@ class CommonTests(test_utils.GenericTestBase):
 
         with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', False):
             def mock_check_output(
-                unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+                unused_cmd_tokens: List[str], _encoding: str = 'utf-8'  # pylint: disable=unused-argument
             ) -> str:
                 return 'test'
             check_output_swap = self.swap(
@@ -1542,7 +1552,7 @@ class GetRemoteAliasTests(CommonTests):
 
     def test_returns_alias_when_url_matches(self) -> None:
         fake_git_output = 'origin\tgit@github.com:oppia/oppia.git (fetch)\n'
-        def mock_check_output(cmd: list[str], encoding: str = 'utf-8') -> str:
+        def mock_check_output(_cmd: list[str], _encoding: str = 'utf-8') -> str:
             return fake_git_output
 
         with self.swap(subprocess, 'check_output', mock_check_output):
@@ -1550,7 +1560,7 @@ class GetRemoteAliasTests(CommonTests):
         self.assertEqual(alias, 'origin')
 
     def test_raises_when_no_alias_found(self) -> None:
-        def mock_check_output(cmd: list[str], encoding: str = 'utf-8') -> str:
+        def mock_check_output(_cmd: list[str], _encoding: str = 'utf-8') -> str:
             return 'nothing here\n'
 
         with self.swap(subprocess, 'check_output', mock_check_output):
@@ -1630,12 +1640,10 @@ class LogToTerminalIntegrationTests(CommonTests):
     """Integration test to hit the real write_stdout_safe."""
 
     def test_log_to_terminal_writes_to_stdout(self) -> None:
-        # Capture real stdout temporarily
         buffer = StringIO()
         saved_stdout = sys.stdout
         sys.stdout = buffer
         try:
-            # Call without mocking so write_stdout_safe is executed
             common.log_to_terminal(
                 'Hello from real stdout', common.LogType.INFO
             )
