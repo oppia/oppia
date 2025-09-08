@@ -1230,7 +1230,10 @@ export class BaseUser {
           const element = context
             ? context.querySelector(selector)
             : document.querySelector(selector);
-          return element?.textContent?.trim();
+          return (
+            element?.textContent?.trim() +
+            `" (inside ${context ? 'context' : 'document'})`
+          );
         },
         selector,
         context

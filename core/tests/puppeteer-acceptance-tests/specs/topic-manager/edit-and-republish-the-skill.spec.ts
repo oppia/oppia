@@ -100,7 +100,7 @@ describe('Topic Manager', function () {
       'Feedback for subtracting fractions from whole numbers.',
       true
     );
-    await this.expectSaveChangesInSkillEditorToBe('enabled');
+    await topicManager.expectSaveChangesInSkillEditorToBe('enabled');
 
     // Add explaination for a difficulty rubric.
     await topicManager.publishUpdatedSkill('Added misconception to the skill');

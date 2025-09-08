@@ -265,6 +265,8 @@ const mobileSaveSkillButton = '.e2e-test-mobile-save-skill-changes';
 const mobilePreviewTab = '.e2e-test-mobile-preview-tab';
 const navigationDropdown = '.e2e-test-mobile-skill-nav-dropdown-icon';
 const addNewSkillButton = '.e2e-test-create-skill-button-circle';
+const createNewSkillMobileButton =
+  '.e2e-test-mobile-create-skill-button-secondary';
 
 export class CurriculumAdmin extends TopicManager {
   /**
@@ -2373,11 +2375,14 @@ export class CurriculumAdmin extends TopicManager {
     skillName: string,
     reviewMaterial: string
   ): Promise<void> {
+    const skillButtonSelector = this.isViewportAtMobileWidth()
+      ? createNewSkillMobileButton
+      : addNewSkillButton;
     await this.navigateToTopicAndSkillsDashboardPage();
 
     await this.navigateToSkillsTab();
-    await this.expectElementToBeVisible(addNewSkillButton);
-    await this.clickOn(addNewSkillButton);
+    await this.expectElementToBeVisible(skillButtonSelector);
+    await this.clickOn(skillButtonSelector);
     await this.fillSkillInfoAndSubmit(skillName, reviewMaterial);
   }
 

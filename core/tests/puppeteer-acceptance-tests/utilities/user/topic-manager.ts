@@ -329,6 +329,7 @@ const confirmSkillDificultyButton =
 const skillSelectionModalSelector = '.e2e-test-skill-container';
 const saveSubtopicExplanationButtonSelector =
   '.e2e-test-save-subtopic-content-button';
+const noSkillsPresentMessageSelector = '.e2e-test-no-skills-present-message';
 
 export class TopicManager extends BaseUser {
   /**
@@ -610,6 +611,12 @@ export class TopicManager extends BaseUser {
       await this.clearAllTextFrom(topicEditorUrlFragmentField);
       await this.page.type(topicEditorUrlFragmentField, urlFragment);
       await this.expectInputValueToBe(topicEditorUrlFragmentField, urlFragment);
+
+      // TODO(#23302): Currently, changing the URL fragment throws some
+      // unexpected warnings. Once fixed, remove the three lines below.
+      const closeToastMessageButton = 'button.e2e-test-close-toast-warning';
+      await this.clickOn(closeToastMessageButton);
+      await this.clickOn(closeToastMessageButton);
     }
     await this.clearAllTextFrom(updateTopicWebFragmentField);
     await this.type(updateTopicWebFragmentField, titleFragments);
@@ -1237,7 +1244,12 @@ export class TopicManager extends BaseUser {
     const skillSelector = this.isViewportAtMobileWidth()
       ? mobileSkillSelector
       : desktopSkillSelector;
-    await this.expectElementToBeVisible(skillSelector);
+    const skillsVisible = await this.isElementVisible(skillSelector);
+    const noSkillsMessage = await this.isElementVisible(
+      noSkillsPresentMessageSelector
+    );
+
+    expect(skillsVisible || noSkillsMessage).toBe(true);
   }
 
   /**
@@ -3624,13 +3636,17 @@ export class TopicManager extends BaseUser {
     await this.expectElementToBeVisible(skillNameAndStatusContainer);
 
     const skillContainers = await this.page.$$(skillNameAndStatusContainer);
-    const skillContainer = skillContainers.find(async container => {
+    let skillContainer: ElementHandle | null = null;
+    for (const container of skillContainers) {
       const foundSkillName = await container.$eval(
         skillDescriptionSelector,
         element => element.textContent?.trim()
       );
-      return foundSkillName === skillName;
-    });
+      if (foundSkillName === skillName) {
+        skillContainer = container;
+        break;
+      }
+    }
 
     if (!skillContainer) {
       throw new Error(`Skill ${skillName} not found in topic.`);

@@ -43,10 +43,14 @@ describe('Topic Manager', function () {
         'Solving problems without a calculator',
         'Mathematics'
       );
-    await curriculumAdmin.createAndPublishTopic(
+    await curriculumAdmin.createTopic(
       'Arithmetic Operations',
+      'arithmetic-operation'
+    );
+    await curriculumAdmin.createSubtopicForTopic(
       'Addition',
-      'Addition'
+      'addition',
+      'Arithmetic Operations'
     );
     await curriculumAdmin.addStoryToTopic(
       'The Broken Calculator',
