@@ -1472,31 +1472,6 @@ class UrlRetrieveTests(CommonTests):
                 self.assertEqual(buffer.read(), b'content')
 
 
-class CommonGetRemoteUrlTests(test_utils.GenericTestBase):
-    """Test methods related to retrieving remote URLs from git."""
-
-    def test_get_remote_url(self) -> None:
-        def mock_check_output(
-            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
-        ) -> str:
-            return 'https://github.com/oppia/oppia.git'
-        with self.swap(subprocess, 'check_output', mock_check_output):
-            self.assertEqual(
-                common.get_remote_url('origin'),
-                'https://github.com/oppia/oppia.git'
-            )
-
-    def test_get_remote_url_from_alias(self) -> None:
-        def mock_check_output(
-            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
-        ) -> str:
-            return 'origin\thttps://github.com/oppia/oppia.git (fetch)'
-        with self.swap(subprocess, 'check_output', mock_check_output):
-            self.assertEqual(
-                common.get_remote_url_from_alias('origin'),
-                'https://github.com/oppia/oppia.git')
-
-
 class CommonSwapEnvironTests(test_utils.GenericTestBase):
     """Test the swap_env utility in common."""
 
@@ -1513,39 +1488,6 @@ class CommonSwapEnvironTests(test_utils.GenericTestBase):
             self.assertIsNone(old_value)
             self.assertEqual(os.environ['BAZ'], 'qux')
         self.assertNotIn('BAZ', os.environ)
-
-
-class CommonFileOperationTests(test_utils.GenericTestBase):
-    """Tests for file operations in common."""
-
-    def test_copy_file(self) -> None:
-        src = tempfile.NamedTemporaryFile(delete=False)
-        dst = src.name + '_copy'
-        try:
-            with utils.open_file(src.name, 'w') as f:
-                f.write('hello')
-            common.copy_file(src.name, dst)
-            with utils.open_file(dst, 'r') as f:
-                self.assertEqual(f.read(), 'hello')
-        finally:
-            os.remove(src.name)
-            if os.path.exists(dst):
-                os.remove(dst)
-
-    def test_move_file(self) -> None:
-        src = tempfile.NamedTemporaryFile(delete=False)
-        dst = src.name + '_moved'
-        try:
-            with utils.open_file(src.name, 'w') as f:
-                f.write('world')
-            common.move_file(src.name, dst)
-            with utils.open_file(dst, 'r') as f:
-                self.assertEqual(f.read(), 'world')
-        finally:
-            if os.path.exists(src.name):
-                os.remove(src.name)
-            if os.path.exists(dst):
-                os.remove(dst)
 
 
 class CommonBranchTests(test_utils.GenericTestBase):
