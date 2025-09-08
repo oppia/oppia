@@ -1566,3 +1566,172 @@ class LogToTerminalTests(CommonTests):
             common.log_to_terminal('Debugging something important')
 
         self.assertTrue(any('debugging' in o.lower() for o in output))
+
+    def test_log_to_terminal_infers_warning(self) -> None:
+        output: list[str] = []
+
+        def mock_write_stdout(msg: str) -> None:
+            output.append(msg)
+
+        with self.swap(common, 'write_stdout_safe', mock_write_stdout):
+            common.log_to_terminal('This is a WARNING!')
+
+        self.assertTrue(any('WARNING' in o.upper() for o in output))
+
+    def test_log_to_terminal_infers_error(self) -> None:
+        output: list[str] = []
+
+        def mock_write_stdout(msg: str) -> None:
+            output.append(msg)
+
+        with self.swap(common, 'write_stdout_safe', mock_write_stdout):
+            common.log_to_terminal('This is an ERROR!')
+
+        self.assertTrue(any('ERROR' in o.upper() for o in output))
+
+    def test_log_to_terminal_infers_success(self) -> None:
+        output: list[str] = []
+
+        def mock_write_stdout(msg: str) -> None:
+            output.append(msg)
+
+        with self.swap(common, 'write_stdout_safe', mock_write_stdout):
+            common.log_to_terminal('This is a SUCCESS!')
+
+        self.assertTrue(any('SUCCESS' in o.upper() for o in output))
+
+    def test_log_to_terminal_infers_debug(self) -> None:
+        output: list[str] = []
+
+        def mock_write_stdout(msg: str) -> None:
+            output.append(msg)
+
+        with self.swap(common, 'write_stdout_safe', mock_write_stdout):
+            common.log_to_terminal('debug message here')
+
+        self.assertTrue(any('debug' in o.lower() for o in output))
+
+    def test_log_to_terminal_defaults_to_info_else_case(self) -> None:
+        output: list[str] = []
+
+        def mock_write_stdout(msg: str) -> None:
+            output.append(msg)
+
+        with self.swap(common, 'write_stdout_safe', mock_write_stdout):
+            common.log_to_terminal('random unrelated text')
+
+        self.assertTrue(any('random' in o for o in output))
+    
+class RequireCwdToBeOppiaTests(CommonTests):
+    """Tests for require_cwd_to_be_oppia."""
+
+    def test_passes_when_in_oppia_dir(self) -> None:
+        with self.swap(os, 'getcwd', lambda: '/fake/path/oppia'):
+            # Should not raise.
+            common.require_cwd_to_be_oppia()
+
+    def test_passes_when_in_deploy_dir_and_allowed(self) -> None:
+        def mock_getcwd() -> str:
+            return '/fake/path/deploy-123'
+        def mock_isdir(path: str) -> bool:
+            return True  # Pretend oppia exists.
+
+        with self.swap(os, 'getcwd', mock_getcwd), self.swap(os.path, 'isdir', mock_isdir):
+            # Should not raise.
+            common.require_cwd_to_be_oppia(allow_deploy_dir=True)
+
+    def test_raises_when_not_in_oppia_or_deploy_dir(self) -> None:
+        with self.swap(os, 'getcwd', lambda: '/wrong/place'):
+            with self.assertRaisesRegex(Exception, 'Please run this script'):
+                common.require_cwd_to_be_oppia()
+
+
+class GetRemoteAliasTests(CommonTests):
+    """Tests for get_remote_alias."""
+
+    def test_returns_alias_when_url_matches(self) -> None:
+        fake_git_output = "origin\tgit@github.com:oppia/oppia.git (fetch)\n"
+        def mock_check_output(cmd: list[str], encoding: str = 'utf-8') -> str:
+            return fake_git_output
+
+        with self.swap(subprocess, 'check_output', mock_check_output):
+            alias = common.get_remote_alias(['github.com:oppia/oppia'])
+        self.assertEqual(alias, 'origin')
+
+    def test_raises_when_no_alias_found(self) -> None:
+        def mock_check_output(cmd: list[str], encoding: str = 'utf-8') -> str:
+            return "nothing here\n"
+
+        with self.swap(subprocess, 'check_output', mock_check_output):
+            with self.assertRaisesRegex(Exception, 'no existing remote alias'):
+                common.get_remote_alias(['some/unknown/repo'])
+
+
+class GetCurrentReleaseVersionNumberTests(CommonTests):
+    """Tests for get_current_release_version_number."""
+
+    def test_valid_release_branch(self) -> None:
+        version = common.get_current_release_version_number('release-3.2.1')
+        self.assertEqual(version, '3.2.1')
+
+    def test_valid_maintenance_branch(self) -> None:
+        version = common.get_current_release_version_number(
+            'release-maintenance-5.4.0')
+        self.assertEqual(version, '5.4.0')
+
+    def test_valid_hotfix_branch(self) -> None:
+        version = common.get_current_release_version_number(
+            'release-7.8.9-hotfix-1')
+        self.assertEqual(version, '7.8.9')
+        
+    def test_invalid_branch_raises(self) -> None:
+        with self.assertRaisesRegex(Exception, 'Invalid branch name'):
+            common.get_current_release_version_number('feature-x')
+
+
+class PlatformAndArchitectureTests(CommonTests):
+    """Tests for OS and architecture helper functions in common.py."""
+
+    def test_is_windows_os(self) -> None:
+        with self.swap(common, 'OS_NAME', 'Windows'):
+            self.assertTrue(common.is_windows_os())
+            self.assertFalse(common.is_mac_os())
+            self.assertFalse(common.is_linux_os())
+
+    def test_is_mac_os(self) -> None:
+        with self.swap(common, 'OS_NAME', 'Darwin'):
+            self.assertTrue(common.is_mac_os())
+            self.assertFalse(common.is_windows_os())
+            self.assertFalse(common.is_linux_os())
+
+    def test_is_linux_os(self) -> None:
+        with self.swap(common, 'OS_NAME', 'Linux'):
+            self.assertTrue(common.is_linux_os())
+            self.assertFalse(common.is_windows_os())
+            self.assertFalse(common.is_mac_os())
+
+    def test_is_x64_architecture_true(self) -> None:
+        with self.swap(sys, 'maxsize', 2**64):
+            self.assertTrue(common.is_x64_architecture())
+
+    def test_is_x64_architecture_false(self) -> None:
+        with self.swap(sys, 'maxsize', 2**16):
+            self.assertFalse(common.is_x64_architecture())
+            
+
+class EnsureDirectoryExistsTests(CommonTests):
+    """Tests for ensure_directory_exists."""
+
+    def test_creates_directory_if_not_exists(self) -> None:
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmpdir:
+            new_dir = os.path.join(tmpdir, 'new_folder')
+            self.assertFalse(os.path.exists(new_dir))
+            common.ensure_directory_exists(new_dir)
+            self.assertTrue(os.path.exists(new_dir))
+
+    def test_does_nothing_if_directory_already_exists(self) -> None:
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmpdir:
+            common.ensure_directory_exists(tmpdir)
+            self.assertTrue(os.path.exists(tmpdir))            
