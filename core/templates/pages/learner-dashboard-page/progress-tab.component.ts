@@ -122,7 +122,7 @@ export class ProgressTabComponent {
     playlist: false,
     subscriptions: false,
   };
-
+  private curatedExplorationIds: Set<string> = new Set();
   pageNumberInCommunityLessons: number = 1;
   pageSize: number = 3;
   startIndexInCommunityLessons: number = 0;
@@ -167,12 +167,27 @@ export class ProgressTabComponent {
       ...this.explorationPlaylist,
       ...this.collectionPlaylist
     );
-    this.allCommunityLessons.push(
+    this.curatedExplorationIds.clear();
+    [
+      ...this.incompleteExplorationsList,
+      ...this.completedExplorationsList,
+    ].forEach(exp => {
+      this.curatedExplorationIds.add(exp.id);
+    });
+
+    this.allCommunityLessons = [
       ...this.incompleteExplorationsList,
       ...this.incompleteCollectionsList,
       ...this.completedCollectionsList,
-      ...this.completedExplorationsList
+      ...this.completedExplorationsList,
+    ].filter(
+      (lesson: LearnerExplorationSummary | CollectionSummary) =>
+        !(
+          lesson instanceof LearnerExplorationSummary &&
+          this.curatedExplorationIds.has(lesson.id)
+        )
     );
+
     this.displayIncompleteLessonsList = this.totalIncompleteLessonsList.slice(
       0,
       3
@@ -235,11 +250,7 @@ export class ProgressTabComponent {
     } else if (section === this.incomplete) {
       this.displayInCommunityLessons = this.totalIncompleteLessonsList;
     } else if (section === this.all) {
-      this.displayInCommunityLessons = [];
-      this.displayInCommunityLessons.push(
-        ...this.totalIncompleteLessonsList,
-        ...this.totalCompletedLessonsList
-      );
+      this.displayInCommunityLessons = this.allCommunityLessons;
     }
     this.pageNumberInCommunityLessons = 1;
     this.startIndexInCommunityLessons = 0;
