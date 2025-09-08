@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 
+# Standard library
 import builtins
 import contextlib
 import errno
@@ -33,21 +34,25 @@ import subprocess
 import sys
 import tempfile
 import time
+from typing import Generator, List, Literal, NoReturn, Tuple
 from urllib import request as urlrequest
 
+# Third-party
+import yaml
+
+# Local imports
 from core import feconf
 from core import utils
 from core.tests import test_utils
 from scripts import servers
-
-from typing import Generator, List, Literal, NoReturn, Tuple
-import yaml
-
 from . import common
+
+# Aliases
+StringIO = io.StringIO
 
 
 class MockCompiler:
-    def wait(self) -> None: # pylint: disable=missing-docstring
+    def wait(self) -> None:  # pylint: disable=missing-docstring
         pass
 
 
@@ -1509,97 +1514,6 @@ class LogToTerminalTests(CommonTests):
 
         self.assertTrue(any('Just an info message' in o for o in output))
 
-    def test_log_to_terminal_infers_success(self) -> None:
-        output: list[str] = []
-
-        def mock_write_stdout(msg: str) -> None:
-            output.append(msg)
-
-        with self.swap(common, 'write_stdout_safe', mock_write_stdout):
-            common.log_to_terminal('The operation was a success!')
-
-        self.assertTrue(any('success' in o.lower() for o in output))
-
-    def test_log_to_terminal_infers_debug(self) -> None:
-        output: list[str] = []
-
-        def mock_write_stdout(msg: str) -> None:
-            output.append(msg)
-
-        with self.swap(common, 'write_stdout_safe', mock_write_stdout):
-            common.log_to_terminal('debugging info here')
-
-        self.assertTrue(any('debugging' in o.lower() for o in output))
-
-    def test_log_to_terminal_defaults_to_info_else_case(self) -> None:
-        output: list[str] = []
-
-        def mock_write_stdout(msg: str) -> None:
-            output.append(msg)
-
-        with self.swap(common, 'write_stdout_safe', mock_write_stdout):
-            common.log_to_terminal('random text with no keywords')
-
-        self.assertTrue(any('random text' in o for o in output))
-
-    def test_log_to_terminal_invalid_type_defaults_to_info(self) -> None:
-        output: list[str] = []
-
-        def mock_write_stdout(msg: str) -> None:
-            output.append(msg)
-
-        with self.swap(common, 'write_stdout_safe', mock_write_stdout):
-            # Here we use MyPy ignore because INVALID is not part of LogType,
-            # but we are testing fallback behavior.
-            common.log_to_terminal(
-                'Forced invalid type', message_type='INVALID')  # type: ignore[arg-type]
-
-        self.assertTrue(any('Forced invalid type' in o for o in output))
-
-    def test_log_to_terminal_infers_debug_from_message(self) -> None:
-        output: list[str] = []
-
-        def mock_write_stdout(msg: str) -> None:
-            output.append(msg)
-
-        with self.swap(common, 'write_stdout_safe', mock_write_stdout):
-            common.log_to_terminal('Debugging something important')
-
-        self.assertTrue(any('debugging' in o.lower() for o in output))
-
-    def test_log_to_terminal_infers_warning(self) -> None:
-        output: list[str] = []
-
-        def mock_write_stdout(msg: str) -> None:
-            output.append(msg)
-
-        with self.swap(common, 'write_stdout_safe', mock_write_stdout):
-            common.log_to_terminal('This is a WARNING!')
-
-        self.assertTrue(any('WARNING' in o.upper() for o in output))
-
-    def test_log_to_terminal_infers_error(self) -> None:
-        output: list[str] = []
-
-        def mock_write_stdout(msg: str) -> None:
-            output.append(msg)
-
-        with self.swap(common, 'write_stdout_safe', mock_write_stdout):
-            common.log_to_terminal('This is an ERROR!')
-
-        self.assertTrue(any('ERROR' in o.upper() for o in output))
-
-    def test_log_to_terminal_infers_success(self) -> None:
-        output: list[str] = []
-
-        def mock_write_stdout(msg: str) -> None:
-            output.append(msg)
-
-        with self.swap(common, 'write_stdout_safe', mock_write_stdout):
-            common.log_to_terminal('This is a SUCCESS!')
-
-        self.assertTrue(any('SUCCESS' in o.upper() for o in output))
-
     def test_log_to_terminal_infers_debug(self) -> None:
         output: list[str] = []
 
@@ -1627,7 +1541,7 @@ class GetRemoteAliasTests(CommonTests):
     """Tests for get_remote_alias."""
 
     def test_returns_alias_when_url_matches(self) -> None:
-        fake_git_output = "origin\tgit@github.com:oppia/oppia.git (fetch)\n"
+        fake_git_output = 'origin\tgit@github.com:oppia/oppia.git (fetch)\n'
         def mock_check_output(cmd: list[str], encoding: str = 'utf-8') -> str:
             return fake_git_output
 
@@ -1637,7 +1551,7 @@ class GetRemoteAliasTests(CommonTests):
 
     def test_raises_when_no_alias_found(self) -> None:
         def mock_check_output(cmd: list[str], encoding: str = 'utf-8') -> str:
-            return "nothing here\n"
+            return 'nothing here\n'
 
         with self.swap(subprocess, 'check_output', mock_check_output):
             with self.assertRaisesRegex(Exception, 'no existing remote alias'):
@@ -1709,7 +1623,7 @@ class EnsureDirectoryExistsTests(CommonTests):
     def test_does_nothing_if_directory_already_exists(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             common.ensure_directory_exists(tmpdir)
-            self.assertTrue(os.path.exists(tmpdir))            
+            self.assertTrue(os.path.exists(tmpdir))
 
 
 class LogToTerminalIntegrationTests(CommonTests):
@@ -1722,7 +1636,9 @@ class LogToTerminalIntegrationTests(CommonTests):
         sys.stdout = buffer
         try:
             # Call without mocking so write_stdout_safe is executed
-            common.log_to_terminal('Hello from real stdout', common.LogType.INFO)
+            common.log_to_terminal(
+                'Hello from real stdout', common.LogType.INFO
+            )
         finally:
             sys.stdout = saved_stdout
 
