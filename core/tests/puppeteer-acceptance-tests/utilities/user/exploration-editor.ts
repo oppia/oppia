@@ -6298,10 +6298,15 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Moves the node in the graph.
+   * @param {'response modal' | 'answer page'} state - The state of the node.
    */
-  async expectGraphNodeCanBeMoved(): Promise<void> {
+  async expectGraphNodeCanBeMoved(
+    state: 'response modal' | 'answer page' = 'answer page'
+  ): Promise<void> {
     // Check if the graph interaction is present.
-    const graphHelper = new GraphViz(this.page);
+    const context =
+      state === 'response modal' ? await this.getRuleEditorModal() : this.page;
+    const graphHelper = new GraphViz(this.page, context);
     await graphHelper.expectGraphInteractionToBePresent();
 
     // Move the node to the given position.
@@ -6321,9 +6326,14 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Checks if graph node can be removed.
+   * @param {'response modal' | 'answer page'} state - The state of the node.
    */
-  async expectGraphNodeCanBeRemoved(): Promise<void> {
-    const graphHelper = new GraphViz(this.page);
+  async expectGraphNodeCanBeRemoved(
+    state: 'response modal' | 'answer page' = 'answer page'
+  ): Promise<void> {
+    const context =
+      state === 'response modal' ? await this.getRuleEditorModal() : this.page;
+    const graphHelper = new GraphViz(this.page, context);
 
     const nodes = await graphHelper.getVertices();
     await graphHelper.removeNode(nodes[0]);
@@ -6333,9 +6343,14 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Checks if graph node can be added.
+   * @param {'response modal' | 'answer page'} state - The state of the node.
    */
-  async expectGraphNodeCanBeAdded(): Promise<void> {
-    const graphHelper = new GraphViz(this.page);
+  async expectGraphNodeCanBeAdded(
+    state: 'response modal' | 'answer page' = 'answer page'
+  ): Promise<void> {
+    const context =
+      state === 'response modal' ? await this.getRuleEditorModal() : this.page;
+    const graphHelper = new GraphViz(this.page, context);
     const nodes = await graphHelper.getVertices();
     await graphHelper.addNode(60, 60);
     const newNodes = await graphHelper.getVertices();

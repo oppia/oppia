@@ -36,7 +36,7 @@ describe('Community Library Browser', function () {
       'community_library_browser@example.com'
     );
     curriculumAdmin = await UserFactory.createNewUser(
-      'curriculumAdm',
+      'currAdm',
       'curriculum_adm@example.com',
       [testConstants.Roles.CURRICULUM_ADMIN]
     );
@@ -83,9 +83,7 @@ describe('Community Library Browser', function () {
 
     // Check subscribed creators in preferences page.
     await communityLibraryBrowser.navigateToPreferencesPageUsingProfileDropdown();
-    await communityLibraryBrowser.expectSubscribedCreatorsToContain(
-      'curriculumAdm'
-    );
+    await communityLibraryBrowser.expectSubscribedCreatorsToContain('currAdm');
   });
 
   afterAll(async function () {

@@ -45,7 +45,7 @@ export class GraphViz {
    */
   constructor(
     page: puppeteer.Page,
-    context?: puppeteer.ElementHandle<Element>
+    context?: puppeteer.ElementHandle<Element> | puppeteer.Page
   ) {
     this.parentPage = page;
     this.context = context ?? this.parentPage;
