@@ -527,6 +527,7 @@ export class BaseUser {
     });
 
     if (useSelector) {
+      await this.waitForElementToStabilize(selector);
       await this.clickOnElementWithSelector(selector);
     } else {
       await this.clickOnElementWithText(selector);
