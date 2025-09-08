@@ -32,13 +32,10 @@ describe('Logged-in User', function () {
   let loggedInUser: LoggedInUser & LoggedOutUser;
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
   let releaseCoordinator: ReleaseCoordinator;
-  const explorationTitles = [
-    'Exploration 1',
-    'Exploration 2',
-    'Exploration 3',
-    'Exploration 4',
-  ];
+  const explorationTitles = ['Exploration 1', 'Exploration 2', 'Exploration 3'];
+  const shortExplorationTitle: string = 'Exploration 4';
   const explorationIds: string[] = [];
+  let shortExplorationId = '';
 
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
@@ -63,6 +60,11 @@ describe('Logged-in User', function () {
       explorationIds.push(id ?? '');
     }
 
+    shortExplorationId =
+      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
+        shortExplorationTitle
+      );
+
     loggedInUser = await UserFactory.createNewUser(
       'loggedInUser1',
       'logged_in_user1@example.com'
@@ -72,7 +74,7 @@ describe('Logged-in User', function () {
   it(
     'should display in-progress section after starting explorations and show dropdown option if cards do not fit',
     async function () {
-      for (const id of explorationIds.slice(1)) {
+      for (const id of explorationIds) {
         await loggedInUser.playExploration(id);
         await loggedInUser.continueToNextCard();
       }
@@ -81,7 +83,7 @@ describe('Logged-in User', function () {
 
       await loggedInUser.expectLessonCardsToBePresent({
         subsection: 'Community Lessons',
-        expectedTitles: explorationTitles.slice(1),
+        expectedTitles: explorationTitles,
         section: 'In Progress',
       });
 
@@ -96,9 +98,7 @@ describe('Logged-in User', function () {
   it(
     'should display completed section after finishing explorations and hide dropdown option if cards do fit',
     async function () {
-      await loggedInUser.playExploration(explorationIds[0]);
-      await loggedInUser.continueToNextCard();
-      await loggedInUser.continueToNextCard();
+      await loggedInUser.playExploration(shortExplorationId);
       await loggedInUser.expectExplorationCompletionToastMessage(
         'Congratulations for completing this lesson!'
       );
@@ -108,13 +108,13 @@ describe('Logged-in User', function () {
 
       await loggedInUser.expectLessonCardsToBePresent({
         subsection: 'Community Lessons',
-        expectedTitles: explorationTitles.slice(1),
+        expectedTitles: explorationTitles,
         section: 'In Progress',
       });
 
       await loggedInUser.expectLessonCardsToBePresent({
         subsection: 'Community Lessons',
-        expectedTitles: explorationTitles.slice(0, 1),
+        expectedTitles: [shortExplorationId],
         section: 'Completed',
       });
 
