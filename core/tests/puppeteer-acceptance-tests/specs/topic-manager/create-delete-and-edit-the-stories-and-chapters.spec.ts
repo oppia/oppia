@@ -75,7 +75,7 @@ describe('Topic Manager', function () {
   }, 600000);
 
   it('should be able to create and remove a story in a topic', async function () {
-    topicManager.openTopicEditor('Arithmetic Operations');
+    await topicManager.openTopicEditor('Arithmetic Operations');
     await topicManager.addStoryToTopic(
       'The Broken Calculator',
       'the-broken-calculator',
