@@ -3326,6 +3326,7 @@ export class LoggedInUser extends BaseUser {
     const allElements = await parentElement?.$$(
       learnerDashSelectors[selector].heading
     );
+
     const allElementsText = await Promise.all(
       allElements.map(
         async element => await element.evaluate(el => el.textContent?.trim())
@@ -3775,10 +3776,10 @@ export class LoggedInUser extends BaseUser {
           expect(isLastCardInView).toBe(false);
         } else {
           expect(isFirstCardInView && isLastCardInView).toBe(true);
-          expect(contentToggleButton).toBeFalsy();
+          expect(contentToggleButtonElement).toBeFalsy();
         }
       } else if (allCardElements.length === 1) {
-        expect(contentToggleButton).toBeFalsy();
+        expect(contentToggleButtonElement).toBeFalsy();
         expect(
           this.isBoxWithinRange(
             containerElement,

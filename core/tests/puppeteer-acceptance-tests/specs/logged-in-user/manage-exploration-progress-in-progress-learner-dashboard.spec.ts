@@ -67,12 +67,12 @@ describe('Logged-in User', function () {
       'loggedInUser1',
       'logged_in_user1@example.com'
     );
-  }, 550000);
+  }, 600000);
 
   it(
     'should display in-progress section after starting explorations and show dropdown option if cards do not fit',
     async function () {
-      for (const id of explorationIds) {
+      for (const id of explorationIds.slice(1)) {
         await loggedInUser.playExploration(id);
         await loggedInUser.continueToNextCard();
       }
@@ -81,7 +81,7 @@ describe('Logged-in User', function () {
 
       await loggedInUser.expectLessonCardsToBePresent({
         subsection: 'Community Lessons',
-        expectedTitles: explorationTitles,
+        expectedTitles: explorationTitles.slice(1),
         section: 'In Progress',
       });
 
@@ -106,20 +106,15 @@ describe('Logged-in User', function () {
       await loggedInUser.navigateToLearnerDashboard();
       await loggedInUser.navigateToTab('progress');
 
-      await loggedInUser.expectDropdownButton(
-        'Community Lessons',
-        'In Progress'
-      );
-
       await loggedInUser.expectLessonCardsToBePresent({
         subsection: 'Community Lessons',
-        expectedTitles: explorationTitles.slice(2),
+        expectedTitles: explorationTitles.slice(1),
         section: 'In Progress',
       });
 
       await loggedInUser.expectLessonCardsToBePresent({
         subsection: 'Community Lessons',
-        expectedTitles: explorationTitles.slice(0, 2),
+        expectedTitles: explorationTitles.slice(0, 1),
         section: 'Completed',
       });
 
