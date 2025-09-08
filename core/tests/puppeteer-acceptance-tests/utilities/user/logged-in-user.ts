@@ -3542,7 +3542,7 @@ export class LoggedInUser extends BaseUser {
     const content = selectors.content.slice(1);
     const heading = selectors.heading.slice(1);
     const foundElement = await parentElement.$x(
-      `//*[contains(concat(' ', normalize-space(@class), ' '), " ${content} ") and .//*[contains(concat(' ', normalize-space(@class), ' '), " ${heading} ") and normalize-space(.) = "${targetText}"] ]`
+      `.//*[contains(concat(' ', normalize-space(@class), ' '), " ${content} ") and .//*[contains(concat(' ', normalize-space(@class), ' '), " ${heading} ") and normalize-space(.) = "${targetText}"] ]`
     );
 
     return foundElement.length > 0 ? foundElement[0] : null;
