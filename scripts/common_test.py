@@ -1621,6 +1621,7 @@ class LogToTerminalTests(CommonTests):
             common.log_to_terminal('random unrelated text')
 
         self.assertTrue(any('random' in o for o in output))
+
     
 class RequireCwdToBeOppiaTests(CommonTests):
     """Tests for require_cwd_to_be_oppia."""
@@ -1641,9 +1642,9 @@ class RequireCwdToBeOppiaTests(CommonTests):
             common.require_cwd_to_be_oppia(allow_deploy_dir=True)
 
     def test_raises_when_not_in_oppia_or_deploy_dir(self) -> None:
-        with self.swap(os, 'getcwd', lambda: '/wrong/place'):
-            with self.assertRaisesRegex(Exception, 'Please run this script'):
-                common.require_cwd_to_be_oppia()
+    with self.swap(os, 'getcwd', lambda: '/wrong/place'):
+        with self.assertRaisesRegex(Exception, 'Please run this script'):
+            common.require_cwd_to_be_oppia()
 
 
 class GetRemoteAliasTests(CommonTests):
@@ -1717,7 +1718,7 @@ class PlatformAndArchitectureTests(CommonTests):
     def test_is_x64_architecture_false(self) -> None:
         with self.swap(sys, 'maxsize', 2**16):
             self.assertFalse(common.is_x64_architecture())
-            
+
 
 class EnsureDirectoryExistsTests(CommonTests):
     """Tests for ensure_directory_exists."""
@@ -1735,3 +1736,24 @@ class EnsureDirectoryExistsTests(CommonTests):
         with tempfile.TemporaryDirectory() as tmpdir:
             common.ensure_directory_exists(tmpdir)
             self.assertTrue(os.path.exists(tmpdir))            
+
+
+class LogToTerminalIntegrationTests(CommonTests):
+    """Integration test to hit the real write_stdout_safe."""
+
+    def test_log_to_terminal_writes_to_stdout(self) -> None:
+        # Capture real stdout temporarily
+        from io import StringIO
+        import sys
+
+        buffer = StringIO()
+        saved_stdout = sys.stdout
+        sys.stdout = buffer
+        try:
+            # Call without mocking so write_stdout_safe is executed
+            common.log_to_terminal('Hello from real stdout', common.LogType.INFO)
+        finally:
+            sys.stdout = saved_stdout
+
+        output = buffer.getvalue()
+        self.assertIn('Hello from real stdout', output)
