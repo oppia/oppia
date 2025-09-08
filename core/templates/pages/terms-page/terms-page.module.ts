@@ -22,15 +22,13 @@ import {TermsPageComponent} from 'pages/terms-page/terms-page.component';
 import {TermsPageRootComponent} from './terms-page-root.component';
 import {CommonModule} from '@angular/common';
 import {TermsPageRoutingModule} from './terms-page-routing.module';
-import {SmartRouterModule} from 'hybrid-router-module-provider';
+import {RouterModule} from '@angular/router';
 
 @NgModule({
   imports: [
     CommonModule,
     SharedComponentsModule,
-    // TODO(#13443): Remove smart router module provider once all pages are
-    // migrated to angular router.
-    SmartRouterModule,
+    RouterModule,
     TermsPageRoutingModule,
   ],
   declarations: [TermsPageComponent, TermsPageRootComponent],

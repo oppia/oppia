@@ -247,7 +247,7 @@
         <oppia-classroom-navigation-links></oppia-classroom-navigation-links>
       </div>
       <div [hidden]="!learnSubmenuIsShown" class="oppia-community-library-section">
-        <a href="/community-library" [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE" tabindex="-1" class="e2e-mobile-test-library-link">
+        <a href="/community-library" tabindex="-1" class="e2e-mobile-test-library-link">
           <p class="oppia-sidebar-learn-subtext mb-2">{{ 'I18N_SIDEBAR_SUBMENU_COMMUNITY_LIBRARY_DESCRIPTION' | translate }}</p>
           <span class="learn-submenu-links">{{ 'I18N_SIDEBAR_SUBMENU_COMMUNITY_LIBRARY' | translate }}</span>
           <i class="fas fa-arrow-right oppia-sidebar-menu-icon float-none learn-submenu-links"></i>
@@ -263,28 +263,28 @@
       </div>
       <div [hidden]="!getinvolvedSubmenuIsShown" class="e2e-mobile-test-sidebar-get-involved-menu">
         <div class="oppia-sidebar-submenu-upperborder">
-          <a tabindex="-1" href="/partnerships" [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE" class="e2e-mobile-test-sidebar-get-involved-menu-partnerships-button">
+          <a tabindex="-1" href="/partnerships" class="e2e-mobile-test-sidebar-get-involved-menu-partnerships-button">
             <i class="fas fa-globe oppia-sidebar-submenu-icon partnerships-icon"></i>
             <span class="oppia-sidebar-submenu-title">{{ 'I18N_SIDEBAR_PARTNERSHIPS' | translate }}</span>
             <p class="oppia-sidebar-submenu-text">{{ 'I18N_SIDEBAR_PARTNERSHIPS_DESCRIPTION' | translate }}</p>
           </a>
         </div>
         <div class="oppia-sidebar-submenu-upperborder">
-          <a tabindex="-1" (click)="navigateToVolunteerPage()" smartRouterLink="/volunteer" class="e2e-mobile-test-sidebar-get-involved-menu-volunteer-button">
+          <a tabindex="-1" (click)="navigateToVolunteerPage()" class="e2e-mobile-test-sidebar-get-involved-menu-volunteer-button">
             <i class="fas fa-user-friends oppia-sidebar-submenu-icon volunteer-icon"></i>
             <span class="oppia-sidebar-submenu-title">{{ 'I18N_SIDEBAR_VOLUNTEER' | translate }}</span>
             <p class="oppia-sidebar-submenu-text">{{ 'I18N_SIDEBAR_VOLUNTEER_DESCRIPTION' | translate }}</p>
           </a>
         </div>
         <div class="oppia-sidebar-submenu-upperborder">
-          <a tabindex="-1" href="/donate" [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE" class="e2e-mobile-test-sidebar-get-involved-menu-donate-button">
+          <a tabindex="-1" href="/donate" class="e2e-mobile-test-sidebar-get-involved-menu-donate-button">
             <i class="fas fa-heart oppia-sidebar-submenu-icon donate-icon"></i>
             <span class="oppia-sidebar-submenu-title">{{ 'I18N_SIDEBAR_DONATE' | translate }}</span>
             <p class="oppia-sidebar-submenu-text">{{ 'I18N_SIDEBAR_DONATE_DESCRIPTION' | translate }}</p>
           </a>
         </div>
         <div class="oppia-sidebar-submenu-upperborder">
-          <a tabindex="-1" href="/contact" [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.CONTACT.ROUTE" class="e2e-mobile-test-sidebar-get-involved-menu-contact-us-button">
+          <a tabindex="-1" href="/contact" class="e2e-mobile-test-sidebar-get-involved-menu-contact-us-button">
             <i class="fas fa-envelope oppia-sidebar-submenu-icon contact-icon"></i>
             <span class="oppia-sidebar-submenu-title">{{ 'I18N_SIDEBAR_CONTACT_US' | translate }}</span>
             <p class="oppia-sidebar-submenu-text">{{ 'I18N_SIDEBAR_CONTACT_US_DESCRIPTION' | translate }}</p>
@@ -301,12 +301,12 @@
       </div>
       <div [hidden]="!aboutSubmenuIsShown">
         <div class="oppia-sidebar-submenu-upperborder">
-          <a tabindex="-1" (click)="navigateToAboutPage()" [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE" class="oppia-sidebar-menu-link e2e-mobile-test-sidebar-about-button">
+          <a tabindex="-1" (click)="navigateToAboutPage()" class="oppia-sidebar-menu-link e2e-mobile-test-sidebar-about-button">
             <span class="oppia-sidebar-submenu-title">{{ 'I18N_SIDEBAR_ABOUT_LINK' | translate }}</span>
           </a>
         </div>
         <div class="oppia-sidebar-submenu-upperborder">
-          <a tabindex="-1" (click)="navigateToTeachPage()" [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.TEACH.ROUTE" class="oppia-sidebar-menu-link e2e-mobile-test-sidebar-teach-button">
+          <a tabindex="-1" (click)="navigateToTeachPage()" class="oppia-sidebar-menu-link e2e-mobile-test-sidebar-teach-button">
             <span class="oppia-sidebar-submenu-title">{{ 'I18N_SIDEBAR_TEACH' | translate }}</span>
           </a>
         </div>
@@ -336,7 +336,6 @@
 
     <li [ngClass]="{'active': currentUrl === '/donate'}" class="oppia-sidebar-rows">
       <a href="/donate"
-         [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
          tabindex="-1"
          class="e2e-test-navbar-donate-mobile-button text-uppercase oppia-sidebar-menu-link">
         <span>{{ 'I18N_SIDEBAR_DONATE' | translate }}</span>

@@ -27,7 +27,7 @@ import {ExplorationInitStateNameService} from './exploration-init-state-name.ser
 import {ParameterMetadataService} from 'pages/exploration-editor-page/services/parameter-metadata.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {AppConstants} from 'app.constants';
-import {State} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 import {
   ComputeGraphService,
   GraphLink,

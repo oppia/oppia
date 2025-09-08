@@ -25,7 +25,7 @@ import {QuestionUndoRedoService} from 'domain/editor/undo_redo/question-undo-red
 import {QuestionDomainConstants} from 'domain/question/question-domain.constants';
 import cloneDeep from 'lodash/cloneDeep';
 import {Injectable} from '@angular/core';
-import {StateBackendDict} from 'domain/state/StateObjectFactory';
+import {StateBackendDict} from 'domain/state/state.model';
 import {Question} from './QuestionObjectFactory';
 
 interface ApplyParams {

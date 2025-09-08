@@ -18,7 +18,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {LanguageAccentMasterList} from 'domain/voiceover/voiceover-backend-api.service';
 
 export interface LanguageCodesMapping {
@@ -71,10 +70,3 @@ export class VoiceoverLanguageManagementService {
     return this.cloudSupportedLanguageAccentCodes.includes(languageAccentCode);
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'VoiceoverLanguageManagementService',
-    downgradeInjectable(VoiceoverLanguageManagementService)
-  );

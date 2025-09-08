@@ -27,7 +27,7 @@ import {
 } from 'interactions/answer-defs';
 import {MultipleChoiceInputCustomizationArgs} from 'extensions/interactions/customization-args-defs';
 import {InteractionRulesRegistryService} from 'services/interaction-rules-registry.service';
-import {State} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 import {StateInteractionStatsBackendApiService} from 'domain/exploration/state-interaction-stats-backend-api.service';
 
 type Option = string | string[];

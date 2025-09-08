@@ -26,7 +26,7 @@ import {InteractionAnswer, TextInputAnswer} from 'interactions/answer-defs';
 import {Interaction} from 'domain/exploration/interaction.model';
 import {InteractionSpecsService} from 'services/interaction-specs.service';
 import {Outcome} from 'domain/exploration/outcome.model';
-import {State} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 import {
   InteractionRuleInputs,
   TranslatableSetOfNormalizedString,
