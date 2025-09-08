@@ -16,7 +16,7 @@
   </div>
   <div class="oppia-learner-dash-goals-modal-actions w-100" mat-dialog-actions>
     <button (click)="onClose()" class="oppia-learner-dash-button--inverse oppia-learner-dash-button-sm oppia-learner-dash-button--modal outline" mat-button> {{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_MODAL_CANCEL' | translate }} </button>
-    <button (click)="onSubmit()" class="oppia-learner-dash-button--default oppia-learner-dash-button-sm oppia-learner-dash-button--modal e2e-test-add-new-goal-button" mat-button> {{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_MODAL_SAVE' | translate }} </button>
+    <button (click)="onSubmit()" [disabled]="checkedTopics.size === 0" class="oppia-learner-dash-button--default oppia-learner-dash-button-sm oppia-learner-dash-button--modal e2e-test-add-new-goal-button" mat-button> {{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_MODAL_SAVE' | translate }} </button>
   </div>
 </div>
 
