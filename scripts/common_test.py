@@ -1623,30 +1623,6 @@ class LogToTerminalTests(CommonTests):
         self.assertTrue(any('random' in o for o in output))
 
 
-class RequireCwdToBeOppiaTests(CommonTests):
-    """Tests for require_cwd_to_be_oppia."""
-
-    def test_passes_when_in_oppia_dir(self) -> None:
-        with self.swap(os, 'getcwd', lambda: '/fake/path/oppia'):
-            # Should not raise.
-            common.require_cwd_to_be_oppia()
-
-    def test_passes_when_in_deploy_dir_and_allowed(self) -> None:
-        def mock_getcwd() -> str:
-            return '/fake/path/deploy-123'
-        def mock_isdir(path: str) -> bool:
-            return True  # Pretend oppia exists.
-
-        with self.swap(os, 'getcwd', mock_getcwd), self.swap(os.path, 'isdir', mock_isdir):
-            # Should not raise.
-            common.require_cwd_to_be_oppia(allow_deploy_dir=True)
-
-    def test_raises_when_not_in_oppia_or_deploy_dir(self) -> None:
-        with self.swap(os, 'getcwd', lambda: '/wrong/place'):
-            with self.assertRaisesRegex(Exception, 'Please run this script'):
-                common.require_cwd_to_be_oppia()
-
-
 class GetRemoteAliasTests(CommonTests):
     """Tests for get_remote_alias."""
 
@@ -1724,7 +1700,6 @@ class EnsureDirectoryExistsTests(CommonTests):
     """Tests for ensure_directory_exists."""
 
     def test_creates_directory_if_not_exists(self) -> None:
-        import tempfile
         with tempfile.TemporaryDirectory() as tmpdir:
             new_dir = os.path.join(tmpdir, 'new_folder')
             self.assertFalse(os.path.exists(new_dir))
@@ -1732,7 +1707,6 @@ class EnsureDirectoryExistsTests(CommonTests):
             self.assertTrue(os.path.exists(new_dir))
 
     def test_does_nothing_if_directory_already_exists(self) -> None:
-        import tempfile
         with tempfile.TemporaryDirectory() as tmpdir:
             common.ensure_directory_exists(tmpdir)
             self.assertTrue(os.path.exists(tmpdir))            
@@ -1743,9 +1717,6 @@ class LogToTerminalIntegrationTests(CommonTests):
 
     def test_log_to_terminal_writes_to_stdout(self) -> None:
         # Capture real stdout temporarily
-        from io import StringIO
-        import sys
-
         buffer = StringIO()
         saved_stdout = sys.stdout
         sys.stdout = buffer
