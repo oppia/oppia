@@ -91,6 +91,7 @@ describe('Topic Manager', function () {
     await topicManager.editTopicDetails(
       'Arithmetic Operations (New): This is the new topic description.', // Description.
       'Arithmetic Operations (New) • Oppia', // Title Fragment.
+      'New A101 meta tag', // Meta tag.
       testConstants.data.curriculumAdminThumbnailImage, // Thumbnail.
       'AO 101', // Title.
       'arithmetic-new' // URL fragment.

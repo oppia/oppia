@@ -3629,12 +3629,11 @@ export class TopicManager extends BaseUser {
       throw new Error(`Skill ${skillName} not found in topic.`);
     }
 
-    const skillStatus = await skillContainer.$eval(
+    await this.expectTextContentToBe(
       skillsAssignmentSelector,
-      element => element.textContent?.trim()
+      topicNames,
+      skillContainer
     );
-
-    expect(skillStatus).toBe(topicNames);
   }
 
   /**

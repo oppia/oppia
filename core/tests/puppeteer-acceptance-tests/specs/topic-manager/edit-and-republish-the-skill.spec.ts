@@ -81,7 +81,7 @@ describe('Topic Manager', function () {
       [ROLES.TOPIC_MANAGER],
       'Arithmetic Operations'
     );
-  });
+  }, 600000);
 
   it('should be able to edit and republish the skill', async function () {
     // Add worked example to the skill.

@@ -165,7 +165,7 @@ export class BaseUser {
           }
 
           const config = {
-            followNewTab: true,
+            followNewTab: false,
             fps: 25,
             ffmpeg_Path: null,
             // Below dimensions are of recorded video.
@@ -689,10 +689,7 @@ export class BaseUser {
       __dirname,
       '../../jest-runtime-config.json'
     );
-    if (
-      fs.existsSync(CONFIG_FILE) &&
-      !(process.env.VIDEO_RECORDING_IS_ENABLED === '1')
-    ) {
+    if (fs.existsSync(CONFIG_FILE)) {
       try {
         const configData = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf-8'));
         if (configData.testFailureDetected) {
@@ -1203,27 +1200,41 @@ export class BaseUser {
    * Verify text content inside an element
    * @param {string} selector - The selector of the element to get text from.
    * @param {string} text - The expected text content.
+   * @param {ElementHandle<Element>} context - The context in which the element is located.
    */
-  async expectTextContentToBe(selector: string, text: string): Promise<void> {
+  async expectTextContentToBe(
+    selector: string,
+    text: string,
+    context: ElementHandle<Element> | null = null
+  ): Promise<void> {
     await this.expectElementToBeVisible(selector);
 
     try {
       await this.page.waitForFunction(
-        (selector: string, text: string) => {
-          const element = document.querySelector(selector);
-          return element?.textContent?.trim() === text.trim();
+        (selector: string, text: string, context: HTMLElement | null) => {
+          const element = context
+            ? context.querySelector(selector)
+            : document.querySelector(selector);
+          return element && element.textContent?.trim() === text.trim();
         },
         {},
         selector,
-        text
+        text,
+        context
       );
 
       showMessage(`Text content of "${selector}" is "${text}".`);
     } catch (error) {
-      const actualTextContent = await this.page.evaluate((selector: string) => {
-        const element = document.querySelector(selector);
-        return element?.textContent?.trim();
-      }, selector);
+      const actualTextContent = await this.page.evaluate(
+        (selector: string, context: HTMLElement | null) => {
+          const element = context
+            ? context.querySelector(selector)
+            : document.querySelector(selector);
+          return element?.textContent?.trim();
+        },
+        selector,
+        context
+      );
       error.message =
         `Text content of "${selector}" does not match the expected text.\n` +
         `Expected: "${text}", Found: "${actualTextContent}"\n` +

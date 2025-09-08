@@ -294,6 +294,6 @@ describe('Topic Manager', function () {
   });
 
   afterAll(async function () {
-    // await UserFactory.closeAllBrowsers();
+    await UserFactory.closeAllBrowsers();
   });
 });

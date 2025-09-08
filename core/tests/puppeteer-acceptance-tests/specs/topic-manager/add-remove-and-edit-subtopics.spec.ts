@@ -120,7 +120,7 @@ describe('Topic Manager', function () {
       __dirname
     );
 
-    await topicManager.saveTopicDraft('Arithmetic Operations');
+    await topicManager.saveTopicDraft('Arithmetic Operations', 'Updated topic');
     await topicManager.expectToastMessageToBe('Changes Saved.');
 
     await topicManager.navigateToSubtopicPreviewTab(

@@ -105,7 +105,7 @@ describe('Topic Manager', function () {
 
     // Verify that the breadcrumb contains read only text.
     if (!topicManager.isViewportAtMobileWidth()) {
-      topicManager.expectNavbarBreadcrumbToContain(
+      await topicManager.expectNavbarBreadcrumbToContain(
         "View only mode, you don't have rights to edit this topic"
       );
     }
