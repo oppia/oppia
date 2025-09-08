@@ -63,7 +63,6 @@ module.exports = function (config) {
       // are not bundled, they will be treated separately.
       'third_party/static/jquery-3.5.1/jquery.min.js',
       'third_party/static/angularjs-1.8.2/angular.js',
-      'core/templates/karma.module.ts',
       'third_party/static/angularjs-1.8.2/angular-mocks.js',
       generatedJs,
       // Note that unexpected errors occur ("Cannot read property 'num' of

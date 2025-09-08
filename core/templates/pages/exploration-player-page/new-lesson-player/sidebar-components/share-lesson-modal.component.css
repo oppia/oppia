@@ -54,6 +54,7 @@ oppia-share-lesson-modal .share-modal-btn {
   border: 1px solid #205d86;
   border-radius: 4px;
   color: #205d86;
+  font-size: 17px;
   font-weight: 700;
   margin-right: 12px;
   padding: 8px 16px;
@@ -67,18 +68,19 @@ oppia-share-lesson-modal .share-modal-btn .button-content {
 }
 
 oppia-share-lesson-modal .success-message {
-  background-color: #323232;
   border-radius: 4px;
   color: white;
+  height: 40px;
   margin: auto;
-  padding: 12px 16px;
   width: 200px;
 }
 
 oppia-share-lesson-modal .success-message p {
   align-items: center;
+  background-color: #323232;
   display: flex;
   justify-content: space-between;
+  padding: 12px 16px;
 }
 
 oppia-share-lesson-modal .copy-modal-body {
@@ -106,6 +108,7 @@ oppia-share-lesson-modal .cc-attribution-input {
 oppia-share-lesson-modal .copy-cc-btn {
   border: 1px solid #205d86;
   border-radius: 4px;
+  font-size: 17px;
   padding: 10px;
   width: 49%;
 }

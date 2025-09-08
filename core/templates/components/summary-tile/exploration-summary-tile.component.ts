@@ -35,6 +35,7 @@ import {
 } from 'services/i18n-language-code.service';
 
 import './exploration-summary-tile.component.css';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 @Component({
   selector: 'oppia-exploration-summary-tile',
@@ -97,6 +98,7 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
     private ratingComputationService: RatingComputationService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
+    private platformFeatureService: PlatformFeatureService,
     private windowRef: WindowRef,
     private dateTimeFormatService: DateTimeFormatService,
     private userService: UserService,
@@ -260,6 +262,14 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
       this.i18nLanguageCodeService.isHackyTranslationAvailable(
         this.expObjectiveTranslationKey
       ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
+  }
+
+  isInNewLessonPlayer(): boolean {
+    const url = this.urlService.getPathname().split('/');
+    return (
+      url.includes('lesson') &&
+      this.platformFeatureService.status.NewLessonPlayer.isEnabled
     );
   }
 }
