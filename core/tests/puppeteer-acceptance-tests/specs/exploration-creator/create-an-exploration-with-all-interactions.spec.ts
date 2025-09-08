@@ -366,10 +366,9 @@ describe('Exploration Editor', function () {
     // Customize Graph Theory Interaction.
     await explorationEditor.customizeGraphTheoryInteraction();
     await explorationEditor.expectModalTitleToBe('Add Response');
-    // Move node.
-    await explorationEditor.expectGraphNodeCanBeMoved();
-    // Remove and add node.
+    // Node can be added, moved and removed.
     await explorationEditor.expectGraphNodeCanBeAdded();
+    await explorationEditor.expectGraphNodeCanBeMoved();
     await explorationEditor.expectGraphNodeCanBeRemoved();
     // Add feedback for correct answer.
     await explorationEditor.updateGraphTheoryLearnerAnswerInResponseModal();
