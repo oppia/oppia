@@ -113,10 +113,24 @@ oppia-new-conversation-skin .oppia-button-icon {
   margin-top: 100px;
 }
 
+oppia-card-navigation-control {
+  bottom: 0;
+  position: fixed;
+  width: calc(100vw - 80px);
+  z-index: 100;
+}
 
-@media(min-width: 768px) {
-  .new-progress-nav-bar-container {
-    display: block;
+.expanded-sidebar {
+  width: calc(100vw - 240px);
+}
+
+@media(max-width: 767px) {
+  oppia-card-navigation-control {
+    width: 100vw;
+  }
+
+  .expanded-sidebar {
+    width: 100vw;
   }
 }
 

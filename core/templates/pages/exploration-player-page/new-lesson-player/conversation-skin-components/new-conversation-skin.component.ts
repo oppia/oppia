@@ -60,6 +60,7 @@ import {CardAnimationService} from 'pages/exploration-player-page/services/card-
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
 import {DiagnosticTestTopicTrackerModel} from 'pages/diagnostic-test-player-page/diagnostic-test-topic-tracker.model';
 import {ExplorationEngineService} from 'pages/exploration-player-page/services/exploration-engine.service';
+import {MobileMenuService} from 'pages/exploration-player-page/services/mobile-menu.service';
 
 @Component({
   selector: 'oppia-new-conversation-skin',
@@ -131,7 +132,8 @@ export class NewConversationSkinComponent {
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private checkpointProgressService: CheckpointProgressService,
     private conversationFlowService: ConversationFlowService,
-    private chapterProgressService: ChapterProgressService
+    private chapterProgressService: ChapterProgressService,
+    private menuService: MobileMenuService
   ) {}
 
   ngOnInit(): void {
@@ -428,6 +430,10 @@ export class NewConversationSkinComponent {
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
+
+  getSidebarIsExpanded(): boolean {
+    return this.menuService.getSidebarIsExpanded();
   }
 
   getExplorationLink(): string {

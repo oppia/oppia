@@ -38,6 +38,7 @@ import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {ContentTranslationLanguageService} from '../services/content-translation-language.service';
 import {PlayerTranscriptService} from '../services/player-transcript.service';
 import {I18nService} from 'i18n/i18n.service';
+import {MobileMenuService} from 'pages/exploration-player-page/services/mobile-menu.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
 require('interactions/interactionsRequires.ts');
@@ -59,6 +60,7 @@ export class NewLessonPlayerPageComponent implements OnDestroy {
     private pageContextService: PageContextService,
     private explorationPermissionsBackendApiService: ExplorationPermissionsBackendApiService,
     private keyboardShortcutService: KeyboardShortcutService,
+    private menuService: MobileMenuService,
     private metaTagCustomizationService: MetaTagCustomizationService,
     private pageTitleService: PageTitleService,
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
@@ -160,6 +162,10 @@ export class NewLessonPlayerPageComponent implements OnDestroy {
         this.setPageTitle();
       })
     );
+  }
+
+  getSidebarIsExpanded(): boolean {
+    return this.menuService.getSidebarIsExpanded();
   }
 
   setPageTitle(): void {
