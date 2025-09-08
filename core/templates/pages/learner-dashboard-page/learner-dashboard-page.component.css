@@ -196,7 +196,7 @@ oppia-learner-dashboard-page .oppia-learner-groups-icon {
   }
 }
 
-@media screen and (min-width: 768px) and (max-width: 1000px) {
+@media screen and (min-width: 769px) and (max-width: 1000px) {
   .oppia-learner-dashboard-buttons {
     height: 0.1rem;
   }
@@ -211,15 +211,6 @@ oppia-learner-dashboard-page .oppia-learner-groups-icon {
 @media(max-width:450px) {
   .oppia-learner-dashboard-progress-button-menu-options {
     font-size: 16px;
-  }
-}
-
-@media screen and (min-width: 1001px) and (max-width: 1200px) {
-  oppia-learner-dashboard-page .oppia-buttons {
-    margin-left: 205px;
-  }
-  .oppia-learner-dashboard-progress-button-menu-options {
-    margin: 0 110px;
   }
 }
 
@@ -242,7 +233,6 @@ oppia-learner-dashboard-page .oppia-learner-groups-icon {
   .oppia-learner-dashboard-main-content-container .oppia-learner-dashboard-no-activity-card {
     margin: 0 2px 0 4px;
   }
-
 
   oppia-learner-dashboard-page .oppia-svg-image {
     height: 35px;
@@ -309,10 +299,10 @@ oppia-learner-dashboard-page .oppia-learner-groups-icon {
   margin: 0 auto;
 }
 
-
-
 .oppia-learner-dash-container {
   background-color: #f2f4f7;
+  min-width: 320px;
+  overflow-x: hidden;
   padding: 0 16px;
   position: relative;
 }
@@ -330,9 +320,12 @@ oppia-learner-dashboard-page .oppia-learner-groups-icon {
 .oppia-learner-dash-sidebar_btn {
   background-color: transparent;
   border: 1px solid #fff;
+  box-sizing: border-box;
   color: #fff;
   margin-bottom: 16px;
   padding: 12px 8px;
+  text-align: center;
+  width: 100%;
 }
 
 .oppia-learner-dash-sidebar_btn:not(.oppia-learner-dash-sidebar_btn--active):hover {
@@ -364,6 +357,7 @@ oppia-learner-dashboard-page .oppia-learner-groups-icon {
 .oppia-learner-dash-tab {
   flex-grow: 1;
   max-width: 1216px;
+  min-width: 0;
 }
 
 .oppia-learner-dash-content {
@@ -373,7 +367,7 @@ oppia-learner-dashboard-page .oppia-learner-groups-icon {
   position: relative;
 }
 
-@media screen and (max-width: 767px) {
+@media screen and (max-width: 768px) {
   .oppia-learner-dash-container {
     padding: 0;
   }
@@ -381,6 +375,7 @@ oppia-learner-dashboard-page .oppia-learner-groups-icon {
   .oppia-learner-dash-content {
     align-content: flex-start;
     flex-direction: column;
+    gap: 0;
   }
 
   .oppia-learner-dash-sidebar {
@@ -389,7 +384,8 @@ oppia-learner-dashboard-page .oppia-learner-groups-icon {
     display: flex;
     height: max-content;
     justify-content: space-around;
-    padding: 0;
+    overflow-x: auto;
+    padding: 8px 0;
     width: 100%;
   }
 
@@ -400,12 +396,15 @@ oppia-learner-dashboard-page .oppia-learner-groups-icon {
     border-radius: 0 !important;
     border-top: 2px solid transparent;
     color: #00645c;
+    flex: 1;
     flex-direction: column;
     font-size: 14px;
     height: max-content;
     margin-bottom: 0;
+    min-width: 80px;
+    padding: 8px 4px;
     transition: all 300ms ease-out;
-    width: 120px !important;
+    width: auto !important;
   }
 
   .oppia-learner-dash-sidebar_btn:not(.oppia-learner-dash-sidebar_btn--active):hover {
@@ -416,6 +415,7 @@ oppia-learner-dashboard-page .oppia-learner-groups-icon {
 
   .oppia-learner-dash-sidebar_btn span {
     color: #fff;
+    font-size: 16px;
     margin-bottom: .5em;
     margin-right: 0;
   }
@@ -451,7 +451,117 @@ oppia-learner-dashboard-page .oppia-learner-groups-icon {
   }
 
   .oppia-learner-dash-tab {
+    box-sizing: border-box;
     min-height: calc(100vh - 128px);
+    padding: 8px;
+    width: 100%;
+  }
+}
+
+/* Specific fixes for very small screens (320px and below) */
+@media screen and (max-width: 360px) {
+  .oppia-learner-dashboard-title {
+    font-size: 2em;
+    margin-bottom: 20px;
+    padding-top: 40px;
+  }
+
+  .oppia-learner-dashboard-main-content-title {
+    font-size: 20px;
+  }
+
+  .oppia-learner-dash-greeting {
+    font-size: 24px;
+  }
+
+  .oppia-learner-dash-section-heading {
+    font-size: 20px;
+  }
+
+  .oppia-learner-dash-sidebar_btn {
+    font-size: 12px;
+    min-width: 70px;
+    padding: 6px 2px;
+  }
+
+  .oppia-learner-dash-sidebar_btn span {
+    font-size: 14px;
+  }
+
+  .oppia-learner-dashboard-progress-button-menu-options {
+    font-size: 14px;
+    margin: 0 8px;
+    padding: 15px 3px;
+  }
+
+  .oppia-learner-dash-container {
+    padding: 0;
+  }
+
+  .oppia-learner-dash-tab {
+    padding: 4px;
+  }
+
+  .oppia-learner-dash-section {
+    margin-bottom: 12px;
+    padding: 12px;
+  }
+}
+
+/* Ultra-small screens (320px and below) */
+@media screen and (max-width: 320px) {
+  .oppia-learner-dashboard-title {
+    font-size: 1.8em;
+    margin-bottom: 15px;
+    padding-top: 30px;
+  }
+
+  .oppia-learner-dash-greeting {
+    font-size: 20px;
+  }
+
+  .oppia-learner-dash-section-heading {
+    font-size: 18px;
+  }
+
+  .oppia-learner-dash-sidebar_btn {
+    font-size: 11px;
+    min-width: 60px;
+    padding: 4px 1px;
+  }
+
+  .oppia-learner-dash-sidebar_btn span {
+    font-size: 12px;
+    margin-bottom: .3em;
+  }
+
+  .oppia-learner-dashboard-progress-button-menu-options {
+    font-size: 12px;
+    margin: 0 4px;
+    padding: 12px 2px;
+  }
+
+  .oppia-learner-dash-tab {
+    padding: 2px;
+  }
+
+  .oppia-learner-dash-section {
+    margin-bottom: 8px;
+    padding: 8px;
+  }
+
+  .oppia-learner-dashboard-intro-button-link {
+    max-width: 200px;
+    width: 100%;
+  }
+
+  oppia-learner-dashboard-page .oppia-svg-image {
+    height: 28px;
+    width: 36px;
+  }
+
+  oppia-learner-dashboard-page .oppia-learner-groups-icon {
+    font-size: 28px;
   }
 }
 
@@ -472,13 +582,13 @@ oppia-learner-dashboard-page .oppia-learner-groups-icon {
   .oppia-learner-dash-tab {
     width: 1216px;
   }
-
 }
 
 .oppia-learner-dash-button-sm {
   align-items: center;
   border: 1px solid;
   border-radius: 4px;
+  box-sizing: border-box;
   display: inline-flex;
   font-size: 14px;
   font-weight: 500;
@@ -536,11 +646,13 @@ oppia-learner-dashboard-page .oppia-learner-groups-icon {
   color: #00645c;
   font-family: 'Capriola', 'Roboto', Arial, sans-serif;
   font-size: 32px;
+  word-wrap: break-word;
 }
 
 .oppia-learner-dash-section {
   background-color: #fff;
   border-radius: 4px;
+  box-sizing: border-box;
   margin-bottom: 16px;
   padding: 16px;
 }
@@ -549,4 +661,5 @@ oppia-learner-dashboard-page .oppia-learner-groups-icon {
   color: #205d86;
   font-family: 'Capriola', 'Roboto', Arial, sans-serif;
   font-size: 24px;
+  word-wrap: break-word;
 }

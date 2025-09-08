@@ -64,7 +64,7 @@ import {SkillMasteryViewerComponent} from './skill-mastery/skill-mastery.compone
 import {ExplorationSummaryTileComponent} from './summary-tile/exploration-summary-tile.component';
 import {PracticeTabComponent} from 'pages/topic-viewer-page/practice-tab/practice-tab.component';
 import {CollectionSummaryTileComponent} from './summary-tile/collection-summary-tile.component';
-import {TakeBreakModalComponent} from 'pages/exploration-player-page/current-lesson-player/templates/take-break-modal.component';
+import {TakeBreakModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/take-break-modal.component';
 import {TopicsAndSkillsDashboardNavbarBreadcrumbComponent} from 'pages/topics-and-skills-dashboard-page/navbar/topics-and-skills-dashboard-navbar-breadcrumb.component';
 import {ThreadTableComponent} from 'pages/exploration-editor-page/feedback-tab/thread-table/thread-table.component';
 import {SummaryListHeaderComponent} from './state-directives/answer-group-editor/summary-list-header.component';
@@ -106,7 +106,7 @@ import {CompletionGraphComponent} from './statistics-directives/completion-graph
 import {TutorCardComponent} from 'pages/exploration-player-page/current-lesson-player/learner-experience/tutor-card.component';
 import {ContentLanguageSelectorComponent} from 'pages/exploration-player-page/current-lesson-player/layout-directives/content-language-selector.component';
 import {RatingDisplayComponent} from './ratings/rating-display/rating-display.component';
-import {SupplementalCardComponent} from 'pages/exploration-player-page/current-lesson-player/learner-experience/supplemental-card.component';
+import {SupplementalCardComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/supplemental-card.component';
 import {AddOrUpdateSolutionModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-or-update-solution-modal.component';
 import {SavePendingChangesModalComponent} from './save-pending-changes/save-pending-changes-modal.component';
 import {AddHintModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-hint-modal.component';
@@ -225,6 +225,11 @@ import {NewEndChapterConfettiComponent} from 'pages/exploration-player-page/new-
 import {NewEndChapterCheckMarkComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/new-end-chapter-check-mark.component';
 import {PlayerHeaderComponent} from 'pages/exploration-player-page/new-lesson-player/header-components/player-header.component';
 import {ProgressBarComponent} from './progress-bar/progress-bar.component';
+import {ProgressTrackerComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/progress-tracker.component';
+import {CheckpointBarComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/checkpoint-bar.component';
+import {SaveProgressModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/save-progress-modal.component';
+import {CheckpointCelebrationFooterComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/checkpoint-celebration-footer.component';
+import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/new-ratings-and-recommendations.component';
 @NgModule({
   imports: [
     BackgroundBannerModule,
@@ -275,6 +280,7 @@ import {ProgressBarComponent} from './progress-bar/progress-bar.component';
     CompletionGraphComponent,
     CorrectnessFooterComponent,
     NewCorrectnessFooterComponent,
+    CheckpointCelebrationFooterComponent,
     ConfirmLeaveModalComponent,
     ConfirmQuestionExitModalComponent,
     ContinueButtonComponent,
@@ -284,6 +290,8 @@ import {ProgressBarComponent} from './progress-bar/progress-bar.component';
     CardNavigationControlComponent,
     ProgressBarComponent,
     NewConversationSkinComponent,
+    ProgressTrackerComponent,
+    CheckpointBarComponent,
     EndChapterCheckMarkComponent,
     NewEndChapterCheckMarkComponent,
     EndChapterConfettiComponent,
@@ -308,6 +316,7 @@ import {ProgressBarComponent} from './progress-bar/progress-bar.component';
     FilteredChoicesFieldComponent,
     FeedbackPopupComponent,
     PracticeTabComponent,
+    SaveProgressModalComponent,
     CollectionSummaryTileComponent,
     ExplorationEmbedButtonModalComponent,
     CheckpointCelebrationModalComponent,
@@ -334,6 +343,7 @@ import {ProgressBarComponent} from './progress-bar/progress-bar.component';
     QuestionEditorSaveModalComponent,
     RatingDisplayComponent,
     RatingsAndRecommendationsComponent,
+    NewRatingsAndRecommendationsComponent,
     ResponseHeaderComponent,
     RubricsEditorComponent,
     ScoreRingComponent,
@@ -440,6 +450,7 @@ import {ProgressBarComponent} from './progress-bar/progress-bar.component';
     CompletionGraphComponent,
     CorrectnessFooterComponent,
     NewCorrectnessFooterComponent,
+    CheckpointCelebrationFooterComponent,
     ConfirmLeaveModalComponent,
     PlayerHeaderComponent,
     ConfirmQuestionExitModalComponent,
@@ -449,6 +460,8 @@ import {ProgressBarComponent} from './progress-bar/progress-bar.component';
     ConversationSkinComponent,
     ConversationDisplayComponent,
     CardNavigationControlComponent,
+    ProgressTrackerComponent,
+    CheckpointBarComponent,
     NewConversationSkinComponent,
     EndChapterCheckMarkComponent,
     NewEndChapterCheckMarkComponent,
@@ -456,6 +469,7 @@ import {ProgressBarComponent} from './progress-bar/progress-bar.component';
     EndChapterConfettiComponent,
     NewEndChapterConfettiComponent,
     CreateNewSkillModalComponent,
+    SaveProgressModalComponent,
     CreateActivityModalComponent,
     CustomizeInteractionModalComponent,
     DeleteHintModalComponent,
@@ -511,6 +525,7 @@ import {ProgressBarComponent} from './progress-bar/progress-bar.component';
     QuestionDifficultySelectorComponent,
     RatingDisplayComponent,
     RatingsAndRecommendationsComponent,
+    NewRatingsAndRecommendationsComponent,
     ResponseHeaderComponent,
     RubricsEditorComponent,
     StateContentEditorComponent,
@@ -614,6 +629,7 @@ import {ProgressBarComponent} from './progress-bar/progress-bar.component';
     FormsModule,
     MaterialModule,
     NgBootstrapModule,
+    CheckpointCelebrationFooterComponent,
     RichTextComponentsModule,
     ObjectComponentsModule,
     OppiaCkEditor4Module,
@@ -630,6 +646,9 @@ import {ProgressBarComponent} from './progress-bar/progress-bar.component';
     NewCorrectnessFooterComponent,
     ConfirmLeaveModalComponent,
     ConfirmQuestionExitModalComponent,
+    SaveProgressModalComponent,
+    ProgressTrackerComponent,
+    CheckpointBarComponent,
     ContinueButtonComponent,
     ContentLanguageSelectorComponent,
     ProgressBarComponent,
@@ -678,6 +697,7 @@ import {ProgressBarComponent} from './progress-bar/progress-bar.component';
     PreviewThumbnailComponent,
     RatingDisplayComponent,
     RatingsAndRecommendationsComponent,
+    NewRatingsAndRecommendationsComponent,
     ResponseHeaderComponent,
     RubricsEditorComponent,
     OnScreenKeyboardComponent,

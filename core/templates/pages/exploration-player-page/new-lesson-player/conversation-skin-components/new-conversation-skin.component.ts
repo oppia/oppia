@@ -59,6 +59,7 @@ import {CurrentEngineService} from 'pages/exploration-player-page/services/curre
 import {CardAnimationService} from 'pages/exploration-player-page/services/card-animation.service';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
 import {DiagnosticTestTopicTrackerModel} from 'pages/diagnostic-test-player-page/diagnostic-test-topic-tracker.model';
+import {ExplorationEngineService} from 'pages/exploration-player-page/services/exploration-engine.service';
 
 @Component({
   selector: 'oppia-new-conversation-skin',
@@ -90,6 +91,8 @@ export class NewConversationSkinComponent {
   submitButtonIsDisabled = true;
   isLearnerReallyStuck: boolean = false;
   showInteraction: boolean = true;
+  checkpointCelebrationIsShown: boolean = false;
+  viewIsInitialized: boolean = false;
 
   // Finalized state for the component.
   continueToReviseStateButtonIsVisible: boolean = false;
@@ -109,6 +112,7 @@ export class NewConversationSkinComponent {
     private conceptCardManagerService: ConceptCardManagerService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private imagePreloaderService: ImagePreloaderService,
+    private explorationEngineService: ExplorationEngineService,
     private learnerAnswerInfoService: LearnerAnswerInfoService,
     private learnerParamsService: LearnerParamsService,
     private loaderService: LoaderService,
@@ -183,6 +187,12 @@ export class NewConversationSkinComponent {
           this.playerTranscriptService.resetNumberOfIncorrectSubmissions();
           this.conversationFlowService.setNextCardIfStuck(null);
           this.continueToReviseStateButtonIsVisible = false;
+
+          this.checkpointCelebrationIsShown = true;
+          setTimeout(() => {
+            this.checkpointCelebrationIsShown = false;
+          }, 5000);
+
           this.conversationFlowService.triggerIfLearnerStuckAction(true, () => {
             this.continueToReviseStateButtonIsVisible = true;
           });
@@ -559,6 +569,33 @@ export class NewConversationSkinComponent {
     return (
       displayedCard.getInteraction() &&
       prevSessionStatesProgress.indexOf(displayedCard.getStateName()) !== -1
+    );
+  }
+
+  isCheckpointCelebrationFooterEnabled(): boolean {
+    const prevSessionStatesProgress =
+      this.playerTranscriptService.getPrevSessionStatesProgress();
+    const firstStateName = this.playerTranscriptService.getCard(0);
+
+    const displayedCard = this.conversationFlowService.getDisplayedCard();
+    const displayCardIndex = this.playerPositionService.getDisplayedCardIndex();
+    const numOfCards = this.playerTranscriptService.getNumCards();
+    let getPreviousCard, getPreviousCardName;
+    if (numOfCards >= displayCardIndex && displayCardIndex > 0) {
+      getPreviousCard = this.playerTranscriptService.getCard(
+        displayCardIndex - 1
+      );
+      getPreviousCardName = getPreviousCard.getStateName();
+    }
+    const stateData = this.explorationEngineService.getStateFromStateName(
+      displayedCard.getStateName()
+    );
+
+    return (
+      !prevSessionStatesProgress.includes(getPreviousCardName as string) &&
+      this.checkpointCelebrationIsShown &&
+      displayedCard.getStateName() !== firstStateName.getStateName() &&
+      stateData.cardIsCheckpoint
     );
   }
 

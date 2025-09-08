@@ -506,8 +506,23 @@ export class ConversationDisplayComponent {
     return this.displayedCard.isTerminal();
   }
 
+  shouldResponseHistoryBeShown(): boolean {
+    const pairCount = this.displayedCard.getInputResponsePairs().length;
+    if (!this.inputOutputHistoryIsShown) {
+      return false;
+    }
+    if (this.isInteractionInline()) {
+      return pairCount > 1;
+    }
+    return pairCount > 0;
+  }
+
   getInputResponsePairId(index: number): string {
     return 'input-response-pair-' + index;
+  }
+
+  isCurrentCardAtEndOfTranscript(): boolean {
+    return !this.displayedCard.isCompleted();
   }
 
   shouldInteractionBeDisplayed(): boolean {

@@ -42,6 +42,8 @@ import {CustomizableThankYouModalComponent} from './sidebar-components/customiza
 import {LessonFeedbackModalComponent} from './sidebar-components/lesson-feedback-modal.component';
 import {MatBottomSheetModule} from '@angular/material/bottom-sheet';
 import {NewSwitchContentLanguageRefreshRequiredModalComponent} from './conversation-skin-components/conversation-display-components/new-switch-content-language-refresh-required-modal.component';
+import {NewProgressReminderModalComponent} from './conversation-skin-components/lesson-player-footer/new-progress-reminder-modal.component';
+import {ConversationFlowService} from '../services/conversation-flow.service';
 
 @NgModule({
   imports: [
@@ -67,6 +69,7 @@ import {NewSwitchContentLanguageRefreshRequiredModalComponent} from './conversat
     NewFlagExplorationModalComponent,
     CustomizableThankYouModalComponent,
     LessonFeedbackModalComponent,
+    NewProgressReminderModalComponent,
   ],
   entryComponents: [
     NewFlagExplorationModalComponent,
@@ -77,11 +80,13 @@ import {NewSwitchContentLanguageRefreshRequiredModalComponent} from './conversat
     NewAudioBarComponent,
     LessonFeedbackModalComponent,
     NewSwitchContentLanguageRefreshRequiredModalComponent,
+    NewProgressReminderModalComponent,
   ],
   providers: [
     HintAndSolutionModalService,
     FatigueDetectionService,
     ConceptCardManagerService,
+    ConversationFlowService,
   ],
 })
 export class NewLessonPlayerPageModule {}

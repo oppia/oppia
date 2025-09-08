@@ -116,6 +116,11 @@ const enableAutogenerationToggleSelector =
   '.e2e-test-cloud-service-autogeneration-toggle';
 const assignedTopicSelector = '.e2e-test-assigned-topic';
 const selectedRoleHeadingSelector = '.e2e-test-active-role';
+const languageSelectorCloseButtonSelector =
+  '.e2e-test-language-selector-close-button';
+const languageSelectorBodySelector = '.e2e-test-language-selector-modal-body';
+const addLanguageButtonSelector = '.e2e-test-language-selector-add-button';
+const selectedLanguageSelector = '.e2e-test-selected-language';
 
 export class SuperAdmin extends BaseUser {
   /**
@@ -163,11 +168,17 @@ export class SuperAdmin extends BaseUser {
 
   /**
    * The function to assign a role to a user.
+   * @param {string} username - The username of the user to assign the role to.
+   * @param {string} role - The role to assign to the user.
+   * @param {string | string[]} args - The arguments to pass to the role
+   *     assignment function. For Topic Manager, it should be the topic
+   *     name. For Translation Coordinator, it should be the array of
+   *     language code.
    */
   async assignRoleToUser(
     username: string,
     role: string,
-    topicName?: string
+    args?: string | string[]
   ): Promise<void> {
     await this.goto(adminPageRolesTab);
     await this.type(roleEditorInputField, username);
@@ -186,12 +197,67 @@ export class SuperAdmin extends BaseUser {
         );
         await this.waitForStaticAssetsToLoad();
         if (role === topicManagerRole) {
+          if (typeof args !== 'string') {
+            throw new Error('Expected additional argument to be string.');
+          }
+          const topicName = args as string;
           await this.selectTopicForTopicManagerRole(topicName as string);
+        }
+        if (role === testConstants.Roles.TRANSLATION_COORDINATOR) {
+          for (const language of args as string[]) {
+            await this.selectLanguageForTranslationCoordinatorRole(language);
+          }
+
+          await this.clickOn(languageSelectorCloseButtonSelector);
+          await this.expectElementToBeVisible(
+            languageSelectorCloseButtonSelector,
+            false
+          );
         }
         return;
       }
     }
     throw new Error(`Role ${role} does not exists.`);
+  }
+
+  private async selectLanguageForTranslationCoordinatorRole(
+    language: string
+  ): Promise<void> {
+    const visible = await this.isElementVisible(
+      selectedLanguageSelector,
+      true,
+      5000
+    );
+    const initalNumberOfLanguages = !visible
+      ? 0
+      : (await this.page.$$(selectedLanguageSelector)).length;
+    const selectElementSelector = `${languageSelectorBodySelector} select`;
+
+    // Page updates select value to the first option by default.
+    // If we don't wait for the page to update the value, we end up in race
+    // condition where the page updates the value to the first option after
+    // we select the language.
+    await this.page.waitForFunction(
+      (selector: string) => {
+        const element = document.querySelector(selector);
+        return element && (element as HTMLSelectElement).value;
+      },
+      {},
+      selectElementSelector
+    );
+    await this.select(selectElementSelector, language);
+
+    await this.clickOn(addLanguageButtonSelector);
+
+    await this.page.waitForFunction(
+      (selector: string, numberOfLanguages: number) => {
+        const elements = document.querySelectorAll(selector);
+        return elements.length === numberOfLanguages;
+      },
+      {},
+      selectedLanguageSelector,
+      initalNumberOfLanguages + 1
+    );
   }
 
   /**

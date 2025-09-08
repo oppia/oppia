@@ -46,17 +46,17 @@
   color: #c55f45;
 }
 
-.oppia-learner-hint-solution-and-concept-card-display-button .solution-button {
+.solution-button {
   background: #0d48a1;
 }
 
-.oppia-learner-hint-solution-and-concept-card-display-button .solution-button.viewed {
+.solution-button.viewed {
   background-color: #fff;
   border: 1px solid #0d48a1;
   color: #0d48a1;
 }
 
-.oppia-learner-hint-solution-and-concept-card-display-button .solution-button.viewed:focus {
+.solution-button.viewed:focus {
   border: 1px solid #0d48a1;
 }
 
