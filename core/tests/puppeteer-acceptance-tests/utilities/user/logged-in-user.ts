@@ -256,6 +256,7 @@ const explorationLanguagePerferenceChipsSelector =
 const siteLanguageValueSelector = `${siteLanguageInputSelector} span.mat-select-min-line`;
 const audioLanguageValueSelector = `${audioLanguageInputSelector} span.mat-select-min-line`;
 const photoUploadErrorMessage = '.e2e-test-upload-error';
+const subscribedCreatorSelector = '.e2e-test-subscription-name';
 
 // Profile Page selectors.
 const profileContainerSelector = '.e2e-test-profile-container';
@@ -440,17 +441,21 @@ export class LoggedInUser extends BaseUser {
 
   /**
    * Function to subscribe to a creator with the given username.
+   * @param {string} username - The username of the creator to subscribe to.
+   *     If not provided, the function will subscribe to the creator of the
+   *     current page.
    */
-  async subscribeToCreator(username: string): Promise<void> {
-    const profilePageUrl = `${profilePageUrlPrefix}/${username}`;
-
-    if (this.page.url() !== profilePageUrl) {
+  async subscribeToCreator(username?: string): Promise<void> {
+    // Navigate to user's profile if username is given.
+    if (username) {
       await this.navigateToProfilePage(username);
     }
 
     await this.clickOn(subscribeButton);
-    await this.page.waitForSelector(unsubscribeLabel);
-    showMessage(`Subscribed to the creator with username ${username}.`);
+    await this.expectElementToBeVisible(unsubscribeLabel);
+    showMessage(
+      `Subscribed to the creator${username ? ` (${username})` : ''}.`
+    );
   }
 
   /**
@@ -3242,6 +3247,21 @@ export class LoggedInUser extends BaseUser {
         navbarGetInvolvedDropdownContainerSelector
       );
     }
+  }
+
+  /**
+   * Checks if the subscribed creators contain the given creator name.
+   * Requires the user to be on Preferences page.
+   * @param {string} creatorName - The name of the creator to check.
+   */
+  async expectSubscribedCreatorsToContain(creatorName: string): Promise<void> {
+    await this.expectElementToBeVisible(subscribedCreatorSelector);
+    const subscribedCreators = await this.page.$$eval(
+      subscribedCreatorSelector,
+      elements => elements.map(el => el.textContent?.trim())
+    );
+
+    expect(subscribedCreators).toContain(creatorName);
   }
 }
 

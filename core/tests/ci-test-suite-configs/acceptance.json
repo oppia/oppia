@@ -555,6 +555,10 @@
     {
       "name": "blog-post-writer/create-and-edit-blog-post",
       "module": "core/tests/puppeteer-acceptance-tests/specs/blog-post-writer/create-and-edit-blog-post.spec.ts"
+    },
+    {
+      "name": "community-library-browser/subscribe-to-a-favourite-creator",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/community-library-browser/subscribe-to-a-favourite-creator.spec.ts"
     }
   ],
   "docker_suites": []
