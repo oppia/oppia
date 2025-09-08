@@ -152,7 +152,10 @@ class Constants(dict):  # type: ignore[type-arg]
 
     # This is needed for unpickling when instances of Constants are passed as
     # part of predicates in Beam jobs.
-    def __setstate__(self, d) -> None:
+    # Here we use type Any because this method parses and stores the values of
+    # constants defined in constants.ts file and we cannot define a single type
+    # which works for all of them.
+    def __setstate__(self, d: Dict[str, Any]) -> None:
         self.__dict__ = d
 
 
