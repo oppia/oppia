@@ -4402,7 +4402,8 @@ title: Title
             ])
 
     def test_find_content_by_content_id_returns_main_content(self) -> None:
-        exploration = exp_domain.Exploration.create_default_exploration('exp_id')
+        exploration = exp_domain.Exploration.create_default_exploration(
+          'exp_id')
         init_state = exploration.states[exploration.init_state_name]
         # The default content_id for the main card is usually 'content_0'
         content_id = init_state.content.content_id
@@ -4412,18 +4413,65 @@ title: Title
         self.assertEqual(found_content, content_value)
 
     def test_find_content_by_content_id_returns_hint_content(self) -> None:
-        exploration = exp_domain.Exploration.create_default_exploration('exp_id')
+        exploration = exp_domain.Exploration.create_default_exploration(
+          'exp_id')
         init_state = exploration.states[exploration.init_state_name]
-        hint = state_domain.Hint(state_domain.SubtitledHtml('hint_1', '<p>hint one</p>'))
+        hint = state_domain.Hint(
+          state_domain.SubtitledHtml('hint_1', '<p>hint one</p>'))
         init_state.update_interaction_hints([hint])
 
         found_content = exploration.find_content_by_content_id('hint_1')
         self.assertEqual(found_content, '<p>hint one</p>')
 
     def test_find_content_by_content_id_returns_none_for_missing(self) -> None:
-        exploration = exp_domain.Exploration.create_default_exploration('exp_id')
-        found_content = exploration.find_content_by_content_id('nonexistent_id')
+        exploration = exp_domain.Exploration.create_default_exploration(
+          'exp_id')
+        found_content = exploration.find_content_by_content_id(
+          'nonexistent_id')
         self.assertIsNone(found_content)
+
+    def test_find_content_by_content_id_returns_str_and_list(self) -> None:
+      exploration = exp_domain.Exploration.create_default_exploration(
+        'exp_id')
+      init_state = exploration.states[exploration.init_state_name]
+
+      # Case 1: content_id maps to a string (main content)
+      content_id = init_state.content.content_id
+      found_content = exploration.find_content_by_content_id(content_id)
+      self.assertIsInstance(found_content, str)
+
+      # Case 2: content_id maps to a list (e.g., ItemSelectionInput choices)
+      # Simulate a customization arg with a list of strings as content_value
+      # We'll patch the translatable contents collection for this test.
+      class DummyContent:
+          def __init__(self, value):
+              self.content_value = value
+
+      # Add a dummy state with a content_id that maps to a list
+      state = state_domain.State.create_default_state(
+          'ListState',
+          'content_list_id',
+          'default_outcome_id'
+      )
+      exploration.states['ListState'] = state
+
+      # Patch get_translatable_contents_collection to return a list for this
+      # id.
+      orig_method = state.get_translatable_contents_collection
+      def fake_collection():
+          class DummyCollection:
+              content_id_to_translatable_content = {
+                  'content_list_id': DummyContent(['a', 'b', 'c'])
+              }
+          return DummyCollection()
+      state.get_translatable_contents_collection = fake_collection
+
+      found_list_content = exploration.find_content_by_content_id('content_list_id')
+      self.assertIsInstance(found_list_content, list)
+      self.assertEqual(found_list_content, ['a', 'b', 'c'])
+
+      # Restore original method
+      state.get_translatable_contents_collection = orig_method
 
 
 class ExplorationSummaryTests(test_utils.GenericTestBase):

@@ -2514,17 +2514,18 @@ class Exploration(translation_domain.BaseTranslatableObject):
             self.edits_allowed
         )
 
-    def find_content_by_content_id(self, content_id: str) -> Optional[str]:
+    def find_content_by_content_id(
+        self, content_id: str
+    ) -> Optional[Union[str, List[str]]]:
         """Traverse all states and return the content for a given content_id.
 
         Args:
             content_id: str. The content_id to search for.
 
         Returns:
-            str|None. The content (HTML or unicode) if found, else None.
+            str|List[str]|None. The content (HTML or unicode) if found, else None.
         """
         for state in self.states.values():
-            # Get all translatable contents in the state.
             contents_collection = state.get_translatable_contents_collection()
             content_map = contents_collection.content_id_to_translatable_content
             if content_id in content_map:
