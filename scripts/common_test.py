@@ -1622,7 +1622,7 @@ class LogToTerminalTests(CommonTests):
 
         self.assertTrue(any('random' in o for o in output))
 
-    
+
 class RequireCwdToBeOppiaTests(CommonTests):
     """Tests for require_cwd_to_be_oppia."""
 
@@ -1642,9 +1642,9 @@ class RequireCwdToBeOppiaTests(CommonTests):
             common.require_cwd_to_be_oppia(allow_deploy_dir=True)
 
     def test_raises_when_not_in_oppia_or_deploy_dir(self) -> None:
-    with self.swap(os, 'getcwd', lambda: '/wrong/place'):
-        with self.assertRaisesRegex(Exception, 'Please run this script'):
-            common.require_cwd_to_be_oppia()
+        with self.swap(os, 'getcwd', lambda: '/wrong/place'):
+            with self.assertRaisesRegex(Exception, 'Please run this script'):
+                common.require_cwd_to_be_oppia()
 
 
 class GetRemoteAliasTests(CommonTests):
@@ -1684,7 +1684,7 @@ class GetCurrentReleaseVersionNumberTests(CommonTests):
         version = common.get_current_release_version_number(
             'release-7.8.9-hotfix-1')
         self.assertEqual(version, '7.8.9')
-        
+
     def test_invalid_branch_raises(self) -> None:
         with self.assertRaisesRegex(Exception, 'Invalid branch name'):
             common.get_current_release_version_number('feature-x')
