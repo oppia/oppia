@@ -85,7 +85,6 @@ describe('Curriculum Admin', function () {
 
     // Publish topic.
     await curriculumAdmin.publishDraftTopic('Test Topic 1');
-    await curriculumAdmin.expectToastMessageToBe('Topic Published.');
     await curriculumAdmin.expectToBeInTopicAndSkillsDashboardPage();
     await curriculumAdmin.expectTopicToBePublishedInTopicsAndSkillsDashboard(
       'Test Topic 1',

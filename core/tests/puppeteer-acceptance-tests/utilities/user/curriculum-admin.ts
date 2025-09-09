@@ -458,7 +458,9 @@ export class CurriculumAdmin extends TopicManager {
     for (const element of classroomTileElements) {
       if (
         await element.evaluate(
-          element => element.textContent?.trim() === classroomName
+          (el, classroomName: string) =>
+            el.textContent?.trim() === classroomName,
+          classroomName
         )
       ) {
         classroomTileElement = element;
