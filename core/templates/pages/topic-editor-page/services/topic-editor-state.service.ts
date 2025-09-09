@@ -119,7 +119,6 @@ export class TopicEditorStateService {
 
   private _questionEditorOpenedEventEmitter: EventEmitter<boolean> =
     new EventEmitter<boolean>();
-  private _savedTopic: Topic | null = this._topic;
 
   constructor(
     private alertsService: AlertsService,
@@ -318,14 +317,6 @@ export class TopicEditorStateService {
     this._topicWithUrlFragmentExists = topicWithUrlFragmentExists;
   }
 
-  setTopicForTesting(topic: Topic): void {
-    this._topic = topic;
-  }
-
-  setSavedTopicForTesting(savedTopic: Topic | null): void {
-    this._savedTopic = savedTopic;
-  }
-
   /**
    * Loads, or reloads, the topic stored by this service given a
    * specified topic ID. See setTopic() for more information on
@@ -500,13 +491,6 @@ export class TopicEditorStateService {
    */
   getTopic(): Topic {
     return this._topic;
-  }
-
-  getSavedTopic(): Topic {
-    if (!this._savedTopic) {
-      return this._topic;
-    }
-    return this._savedTopic;
   }
 
   /**
@@ -785,7 +769,6 @@ export class TopicEditorStateService {
               );
             }
           }
-          this._savedTopic = cloneDeep(this._topic);
           this.undoRedoService.clearChanges();
           this._topicIsBeingSaved = false;
           if (successCallback) {
