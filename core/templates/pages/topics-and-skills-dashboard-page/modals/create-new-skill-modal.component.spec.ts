@@ -170,6 +170,18 @@ describe('Create new skill modal', () => {
     expect(componentInstance.errorMsg).toBe('');
   });
 
+  it('should return true if there are more than 2 workedexamples', () => {
+    componentInstance.bindableDict.displayedConceptCardExplanation =
+      '<oppia-noninteractive-workedexample>aasdfasdf</oppia-noninteractive-workedexample><oppia-noninteractive-workedexample>aasdfasdf</oppia-noninteractive-workedexample><oppia-noninteractive-workedexample>aasdfasdf</oppia-noninteractive-workedexample>';
+    expect(componentInstance.checkExtraWorkedexample()).toEqual(true);
+  });
+
+  it('should return false if there are 2 or fewer workedexamples', () => {
+    componentInstance.bindableDict.displayedConceptCardExplanation =
+      '<oppia-noninteractive-workedexample>example1</oppia-noninteractive-workedexample><oppia-noninteractive-workedexample>example2</oppia-noninteractive-workedexample>';
+    expect(componentInstance.checkExtraWorkedexample()).toEqual(false);
+  });
+
   it('should save concept card explanation', () => {
     spyOn(SubtitledHtml, 'createDefault').and.returnValue(testObj);
     componentInstance.saveConceptCardExplanation();

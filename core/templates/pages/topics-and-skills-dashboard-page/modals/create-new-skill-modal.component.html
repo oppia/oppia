@@ -41,6 +41,9 @@
                              [localValue]="bindableDict.displayedConceptCardExplanation"
                              (localValueChange)="updateExplanation($event)">
         </schema-based-editor>
+        <div *ngIf="checkExtraWorkedexample()" class="oppia-length-validation-error e2e-test-more-than-2-workedexamples" aria-live="assertive">
+          <p>Skills can have a maximum of 2 workedexamples. Please remove any additional ones.</p>
+        </div>
       </div>
     </div>
   </div>

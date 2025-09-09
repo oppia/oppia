@@ -43,6 +43,7 @@ export class CreateNewSkillModalComponent {
     Rubric.create(AppConstants.SKILL_DIFFICULTIES[2], []),
   ];
 
+  workedExampleLimitExceeded!: boolean;
   newSkillDescription: string = '';
   errorMsg: string = '';
   skillDescriptionExists: boolean = true;
@@ -115,6 +116,18 @@ export class CreateNewSkillModalComponent {
   _skillDescriptionExistsCallback(skillDescriptionExists: boolean): void {
     this.skillDescriptionExists = skillDescriptionExists;
     this.setErrorMessageIfNeeded();
+  }
+
+  checkExtraWorkedexample(): boolean {
+    const workedexampleRegex =
+      /<oppia-noninteractive-workedexample.*?>.*?<\/oppia-noninteractive-workedexample>/g;
+    const matches =
+      this.bindableDict.displayedConceptCardExplanation.match(
+        workedexampleRegex
+      );
+
+    this.workedExampleLimitExceeded = !!(matches && matches.length > 2);
+    return this.workedExampleLimitExceeded;
   }
 
   updateSkillDescriptionAndCheckIfExists(): void {
