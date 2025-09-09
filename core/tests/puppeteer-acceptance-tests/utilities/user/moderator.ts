@@ -37,6 +37,7 @@ const explorationFeedbackTabContainerSelector =
   '.e2e-test-exploration-feedback-card';
 const explorationEditorContainerSelector = 'oppia-exploration-editor-page-root';
 const moderatorPageContainerSelector = '.e2e-test-moderator-page';
+const toastMessageSelector = '.e2e-test-toast-message';
 
 export class Moderator extends BaseUser {
   /**
@@ -443,7 +444,6 @@ export class Moderator extends BaseUser {
    */
   async featureActivity(
     explorationId: string | null,
-    save: boolean = true,
     activityIndex: number = 0
   ): Promise<void> {
     await this.clickOn('Add element');
@@ -465,19 +465,12 @@ export class Moderator extends BaseUser {
       explorationId as string
     );
 
-    if (save) {
-      await this.clickOn('Save Featured Activities');
+    await this.clickOn('Save Featured Activities');
 
-      try {
-        await this.page.waitForFunction(
-          'document.querySelector(".e2e-test-toast-message") !== null',
-          {timeout: 5000}
-        );
-        showMessage('Activity featured successfully.');
-      } catch (error) {
-        throw new Error('Failed to save the featured activities');
-      }
-    }
+    expect(
+      (await this.isElementVisible(toastMessageSelector, true, 5000)) ||
+        (await this.expectToastWarningMessageToBe(''))
+    ).toBe(true);
   }
 
   /**

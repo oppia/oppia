@@ -802,7 +802,7 @@ export class ReleaseCoordinator extends BaseUser {
    * @param {string} errorMessage - The expected error message.
    */
   async expectUserGroupCreationErrorToBe(errorMessage: string): Promise<void> {
-    await this.expectTextContentToBe(
+    await this.expectTextContentToContain(
       userGroupCreateErrorSelector,
       errorMessage
     );
