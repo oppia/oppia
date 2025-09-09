@@ -122,7 +122,7 @@ export class ProgressTabComponent {
     playlist: false,
     subscriptions: false,
   };
-  private curatedExplorationIds: Set<string> = new Set();
+  curatedExplorationIds: Set<string> = new Set();
   pageNumberInCommunityLessons: number = 1;
   pageSize: number = 3;
   startIndexInCommunityLessons: number = 0;
