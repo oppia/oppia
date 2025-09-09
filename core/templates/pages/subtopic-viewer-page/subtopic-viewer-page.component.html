@@ -27,12 +27,12 @@
 </div>
 
 <div *ngIf="isShowRestructuredStudyGuidesFeatureEnabled()" class="oppia-subtopic-viewer-container new-subtopic-viewer-container">
-  <button (click)="backToTopic()" class="btn e2e-test-go-back-to-topic-button btn-back-to-topic">
-    <p>
+  <div class="breadcrumb-container">
+    <button (click)="backToTopic()" class="btn e2e-test-go-back-to-topic-button btn-back-to-topic">
       <i class="material-icons md-18 icon-next-study-guide">arrow_back</i>
       {{ 'I18N_SUBTOPIC_VIEWER_BACK_TO_TOPIC' | translate }} '{{ parentTopicTitle }}'
-    </p>
-  </button>
+    </button>
+  </div>
   <p *ngIf="!isHackySubtopicTitleTranslationDisplayed()" class="content-title">{{ subtopicTitle }}</p>
   <p *ngIf="isHackySubtopicTitleTranslationDisplayed()" class="content-title">{{ subtopicTitleTranslationKey | translate }}</p>
   <div class="content-box">
@@ -202,13 +202,18 @@
 
   .btn-back-to-topic {
     align-self: flex-start;
-    color: #015f9c;
+    color: #003b36;
     display: block;
     font-family: Roboto, Arial, sans-serif;
     font-size: 12px;
     font-weight: 200;
     padding: 0;
     text-align: center;
+  }
+
+  .breadcrumb-container {
+    width: 60%;
+    display: flex;
   }
 
   .btn-practice-section {
@@ -247,6 +252,10 @@
     .content-box {
       width: 100%;
     }
+
+    .breadcrumb-container {
+      width: 65%;
+    }
   }
 
   @media screen and (max-width: 700px) {
@@ -280,6 +289,10 @@
       align-self: center;
       font-size: 16px;
       margin-bottom: 30px;
+    }
+
+    .breadcrumb-container {
+      justify-content: center;
     }
   }
 </style>
