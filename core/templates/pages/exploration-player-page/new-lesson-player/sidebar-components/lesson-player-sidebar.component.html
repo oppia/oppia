@@ -27,27 +27,41 @@
       </div>
     </div>
     <div class="player-sidebar-button-container">
-      <button class="player-sidebar-button" (click)="showShareLessonModal()" aria-label="Share lesson">
-        <i *ngIf="!sidebarIsExpanded" class="fa fa-lg fa-share-alt"></i>
-        <span *ngIf="sidebarIsExpanded">
-          <i class="fa fa-lg fa-share-alt"></i>
-          {{ 'I18N_SHARE_LESSON' | translate }}
-        </span>
+      <button class="player-sidebar-button"
+          (click)="showShareLessonModal()"
+          aria-label="Share lesson"
+          matTooltip="{{ 'I18N_SHARE_LESSON' | translate }}"
+          matTooltipPosition="above">
+      <i *ngIf="!sidebarIsExpanded" class="fa fa-lg fa-share-alt"></i>
+      <span *ngIf="sidebarIsExpanded">
+        <i class="fa fa-lg fa-share-alt"></i>
+        {{ 'I18N_SHARE_LESSON' | translate }}
+      </span>
       </button>
-      <button class="player-sidebar-button" (click)="showFeedbackModal()" aria-label="Give feedback">
-        <i *ngIf="!sidebarIsExpanded" class="fa fa-lg fa-comments"></i>
-        <span *ngIf="sidebarIsExpanded">
-          <i class="fa fa-lg fa-comments"></i>
-          {{ 'I18N_LESSON_PLAYER_FEEDBACK_BUTTON' | translate }}
-        </span>
+      <button class="player-sidebar-button"
+          (click)="showFeedbackModal()"
+          aria-label="Give feedback"
+          matTooltip="{{ 'I18N_LESSON_PLAYER_FEEDBACK_BUTTON' | translate }}"
+          matTooltipPosition="above">
+      <i *ngIf="!sidebarIsExpanded" class="fa fa-lg fa-comments"></i>
+      <span *ngIf="sidebarIsExpanded">
+        <i class="fa fa-lg fa-comments"></i>
+        {{ 'I18N_LESSON_PLAYER_FEEDBACK_BUTTON' | translate }}
+      </span>
       </button>
-      <button class="player-sidebar-button" *ngIf="isUserLoggedIn()" (click)="showFlagExplorationModal()" aria-label="Report content">
-        <i *ngIf="!sidebarIsExpanded" class="fa fa-lg fa-flag"></i>
-        <span *ngIf="sidebarIsExpanded">
-          <i class="fa fa-lg fa-flag"></i>
-          {{ 'I18N_LESSON_PLAYER_REPORT_BUTTON' | translate }}
-        </span>
+      <button class="player-sidebar-button"
+          *ngIf="isUserLoggedIn()"
+          (click)="showFlagExplorationModal()"
+          aria-label="Report content"
+          matTooltip="{{ 'I18N_LESSON_PLAYER_REPORT_BUTTON' | translate }}"
+          matTooltipPosition="above">
+      <i *ngIf="!sidebarIsExpanded" class="fa fa-lg fa-flag"></i>
+      <span *ngIf="sidebarIsExpanded">
+        <i class="fa fa-lg fa-flag"></i>
+        {{ 'I18N_LESSON_PLAYER_REPORT_BUTTON' | translate }}
+      </span>
       </button>
+    </div>
     </div>
   </div>
   <div *ngIf="mobileMenuVisible" class="player-mobile-menu-container">
