@@ -161,7 +161,7 @@ describe('Release Coordinator', function () {
     // Try to create a duplicate user group.
     await releaseCoordinator.addUserGroup('group1');
     await releaseCoordinator.expectUserGroupCreationErrorToBe(
-      "The user group 'group1' already exists. "
+      "The user group 'group1' already exists."
     );
 
     // Create another user group.

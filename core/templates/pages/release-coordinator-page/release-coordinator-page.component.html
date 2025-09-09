@@ -155,7 +155,7 @@
             </div>
             <hr *ngIf="userGroupInEditMode">
             <p *ngIf="userGroupSaveError.length > 0"
-               class="oppia-warning-text e2e-test-user-group-save-error">
+               class="oppia-warning-text">
               {{ userGroupSaveError }}
             </p>
             <div *ngIf="userGroupInEditMode" class="row justify-content-end">
@@ -186,7 +186,7 @@
           + Add new user group
         </button>
         <p *ngIf="userGroupValidationError.length > 0"
-           class="oppia-warning-text">
+           class="oppia-warning-text e2e-test-user-group-save-error">
           {{ userGroupValidationError }}
         </p>
       </div>

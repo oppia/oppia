@@ -38,6 +38,7 @@ const explorationFeedbackTabContainerSelector =
 const explorationEditorContainerSelector = 'oppia-exploration-editor-page-root';
 const moderatorPageContainerSelector = '.e2e-test-moderator-page';
 const toastMessageSelector = '.e2e-test-toast-message';
+const warningToastMessageSelector = '.e2e-test-toast-warning-message';
 
 export class Moderator extends BaseUser {
   /**
@@ -469,7 +470,7 @@ export class Moderator extends BaseUser {
 
     expect(
       (await this.isElementVisible(toastMessageSelector, true, 5000)) ||
-        (await this.expectToastWarningMessageToBe(''))
+        (await this.isElementVisible(warningToastMessageSelector, true, 5000))
     ).toBe(true);
   }
 
@@ -481,7 +482,7 @@ export class Moderator extends BaseUser {
     // Subtracting 1 from index to make it 1-based.
     index -= 1;
 
-    await this.navigateToFeaturedActivitiesTab();
+    await this.expectElementToBeVisible(featuredActivityRowSelector);
     const rows = await this.page.$$(featuredActivityRowSelector);
 
     if (rows.length === 0) {
