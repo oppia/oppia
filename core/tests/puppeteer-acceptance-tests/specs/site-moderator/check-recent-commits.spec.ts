@@ -81,7 +81,7 @@ describe('Site Moderator', function () {
       'Exploration',
       'Category',
       'Username',
-      'Commit Message',
+      'Commit message',
       'Community-owned?',
     ]);
     await siteModerator.expectCommitToHaveProperties(1, [

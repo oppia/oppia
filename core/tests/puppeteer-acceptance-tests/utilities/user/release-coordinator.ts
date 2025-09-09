@@ -578,7 +578,7 @@ export class ReleaseCoordinator extends BaseUser {
       const pages = await this.browserObject.pages();
       this.page = pages[pages.length - 1];
 
-      await this.clickOn(' View Output ');
+      await this.clickOn('View Output');
       await this.page.waitForSelector(beamJobRunOutputSelector, {
         visible: true,
       });
@@ -690,7 +690,7 @@ export class ReleaseCoordinator extends BaseUser {
         timeout: 10000,
       },
       rolloutPercentageInputSelector,
-      state === 'enabled'
+      state === 'disabled'
     );
 
     if (value) {

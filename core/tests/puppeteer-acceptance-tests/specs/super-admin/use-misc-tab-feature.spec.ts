@@ -58,7 +58,7 @@ describe('Super Admin', function () {
 
   it('should be able to update Azure TTS service', async function () {
     await superAdmin.enableTextToSpeechSynthesisUsingCloudService();
-    await superAdmin.expectActionSuccessMessage('Success');
+    await superAdmin.expectActionSuccessMessage('Success!');
   });
 
   afterAll(async function () {

@@ -72,7 +72,7 @@ describe('Site Moderator', function () {
     ]);
 
     // Use invalid exploration ID.
-    await siteModerator.featureActivity('ABC0101');
+    await siteModerator.featureActivity('ABC0101', false);
     await siteModerator.expectToastWarningMessageToBe(
       'These Exploration IDs do not exist: ABC0101'
     );

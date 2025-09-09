@@ -443,23 +443,31 @@ export class Moderator extends BaseUser {
   /**
    * Function to feature an activity.
    * @param {string} explorationId - The ID of the exploration to feature.
+   * @param {boolean} save - Whether to save the featured activities.
    */
-  async featureActivity(explorationId: string | null): Promise<void> {
-    await this.clickOn(' Add element ');
+  async featureActivity(
+    explorationId: string | null,
+    save: boolean = true
+  ): Promise<void> {
+    await this.clickOn('Add element');
 
     await this.page.waitForSelector(explorationIDField);
     await this.page.type(explorationIDField, explorationId as string);
     await this.page.keyboard.press('Enter');
-    await this.clickOn(' Save Featured Activities ');
+    await this.expectElementValueToBe(explorationIDField, explorationId ?? '');
 
-    try {
-      await this.page.waitForFunction(
-        'document.querySelector(".e2e-test-toast-message") !== null',
-        {timeout: 5000}
-      );
-      showMessage('Activity featured successfully.');
-    } catch (error) {
-      throw new Error('Failed to save the featured activities');
+    if (save) {
+      await this.clickOn('Save Featured Activities');
+
+      try {
+        await this.page.waitForFunction(
+          'document.querySelector(".e2e-test-toast-message") !== null',
+          {timeout: 5000}
+        );
+        showMessage('Activity featured successfully.');
+      } catch (error) {
+        throw new Error('Failed to save the featured activities');
+      }
     }
   }
 

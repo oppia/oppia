@@ -80,7 +80,7 @@ describe('Site Moderator', function () {
       'moderatorPageRecentFeedbackMessagesTab',
       __dirname
     );
-    await siteModerator.expectNumberOfFeedbackMessages(1);
+    await siteModerator.expectNumberOfFeedbackMessages(2);
     await siteModerator.expectFeedbackMessageToHaveProperties(1, [
       'timestamp',
       'explorationId',
