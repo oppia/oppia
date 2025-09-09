@@ -165,6 +165,7 @@ export class StudyGuideSectionEditorComponent implements OnInit {
         this.container.sectionContentHtml,
         Number(subtopicId)
       );
+      this.topicEditorStateService.setStudyGuide(studyGuide);
     }
   }
 

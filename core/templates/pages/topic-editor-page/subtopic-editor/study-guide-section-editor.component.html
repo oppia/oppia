@@ -26,7 +26,7 @@
 
   <div *ngIf="isEditable && headingEditorIsOpen">
     <form class="form-inline"
-          (submit)="saveSection()">
+          (submit)="saveSection(true)">
       <div class="oppia-rule-details-header">
         <strong>Section Heading</strong>
         <schema-based-editor class="e2e-test-study-guide-section-heading-plaintext-editor"
@@ -82,7 +82,7 @@
 
   <div *ngIf="isEditable && contentEditorIsOpen" class="section-content-part">
     <form class="form-inline"
-          (submit)="saveSection()">
+          (submit)="saveSection(false)">
       <div class="oppia-rule-details-header">
         <strong>Section Content</strong>
         <schema-based-editor class="e2e-test-study-guide-section-content-rich-text-editor"
