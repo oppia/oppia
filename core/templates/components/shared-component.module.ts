@@ -64,7 +64,7 @@ import {SkillMasteryViewerComponent} from './skill-mastery/skill-mastery.compone
 import {ExplorationSummaryTileComponent} from './summary-tile/exploration-summary-tile.component';
 import {PracticeTabComponent} from 'pages/topic-viewer-page/practice-tab/practice-tab.component';
 import {CollectionSummaryTileComponent} from './summary-tile/collection-summary-tile.component';
-import {TakeBreakModalComponent} from 'pages/exploration-player-page/current-lesson-player/templates/take-break-modal.component';
+import {TakeBreakModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/take-break-modal.component';
 import {TopicsAndSkillsDashboardNavbarBreadcrumbComponent} from 'pages/topics-and-skills-dashboard-page/navbar/topics-and-skills-dashboard-navbar-breadcrumb.component';
 import {ThreadTableComponent} from 'pages/exploration-editor-page/feedback-tab/thread-table/thread-table.component';
 import {SummaryListHeaderComponent} from './state-directives/answer-group-editor/summary-list-header.component';

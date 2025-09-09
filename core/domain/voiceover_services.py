@@ -1268,6 +1268,7 @@ def regenerate_voiceovers_on_exploration_curation(
                 continue
 
             content_value = translatable_content.content_value
+            assert isinstance(content_value, str)
 
             language_code_to_contents_mapping.setdefault('en', {})[
                 content_id] = content_value
@@ -1289,8 +1290,11 @@ def regenerate_voiceovers_on_exploration_curation(
             if translated_content.needs_update:
                 continue
 
+            content_value = translated_content.content_value
+            assert isinstance(content_value, str)
+
             language_code_to_contents_mapping.setdefault(language_code, {})[
-                content_id] = translated_content.content_value
+                content_id] = content_value
 
     _regenerate_voiceovers_for_given_contents(
         exploration_id,
@@ -1360,6 +1364,7 @@ def regenerate_voiceovers_of_exploration_for_given_language_accent(
                     continue
 
                 content_value = translatable_content.content_value
+                assert isinstance(content_value, str)
 
                 language_code_to_contents_mapping.setdefault('en', {})[
                     content_id] = content_value
@@ -1380,8 +1385,11 @@ def regenerate_voiceovers_of_exploration_for_given_language_accent(
             if translated_content.needs_update:
                 continue
 
+            content_value = translated_content.content_value
+            assert isinstance(content_value, str)
+
             language_code_to_contents_mapping.setdefault(language_code, {})[
-                content_id] = translated_content.content_value
+                content_id] = content_value
 
     _regenerate_voiceovers_for_given_contents(
         exploration_id,
