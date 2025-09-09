@@ -44,7 +44,9 @@ describe('Release Coordinator', function () {
 
   it('should be able to run beam job (Success)', async function () {
     await releaseCoordinator.navigateToBeamJobsTab();
-    await releaseCoordinator.selectAndRunJob('AuditExplorationMigrationJob');
+    await releaseCoordinator.selectAndRunJob(
+      'FindMathExplorationsWithRulesJob'
+    );
     // Beam jobs, take a while to run.
     await releaseCoordinator.waitForJobToComplete();
 

@@ -36,7 +36,7 @@ const feedbackMessagesHeaderSelector = '.e2e-test-feedback-messages-header';
 const explorationFeedbackTabContainerSelector =
   '.e2e-test-exploration-feedback-card';
 const explorationEditorContainerSelector = 'oppia-exploration-editor-page-root';
-const moderatorPageContainerSelector = 'oppia-moderator-page-root';
+const moderatorPageContainerSelector = '.e2e-test-moderator-page';
 
 export class Moderator extends BaseUser {
   /**
@@ -222,7 +222,10 @@ export class Moderator extends BaseUser {
       throw new Error('Exploration link not found');
     }
 
-    await explorationElement?.click();
+    await Promise.all([
+      this.page.waitForNavigation({waitUntil: 'load'}),
+      explorationElement.click(),
+    ]);
   }
 
   /**
@@ -253,39 +256,31 @@ export class Moderator extends BaseUser {
   ): Promise<void> {
     const selector = `.e2e-test-${table.replace(' ', '-')}-row`;
     await this.expectElementToBeVisible(selector);
-    const timeValues = await this.page.$$eval(
+    const timeValues: string[] = await this.page.$$eval(
       `${selector} td`,
       (elements: Element[]) =>
-        elements.map(element => element.textContent?.trim())
+        elements.map(element => element.textContent?.trim() ?? '')
     );
 
     if (timeValues.length < 2) {
       throw new Error('Not enough timestamps found.');
     }
 
-    // Parse time strings like "6:07 AM" to comparable format.
     const parseTime = (timeStr: string): number => {
-      const [time, period] = timeStr.split(' ');
-      const [hours, minutes] = time.split(':').map(Number);
-      let hour24 = hours;
-
-      if (period === 'PM' && hours !== 12) {
-        hour24 += 12;
-      } else if (period === 'AM' && hours === 12) {
-        hour24 = 0;
+      if (!timeStr) {
+        return 0;
       }
 
-      // Handle a case where last commit is after 12:00 AM, but
-      // the first commit is before 12:00 AM.
-      if (period === 'AM' && hours === 12) {
-        hour24 += 12;
+      try {
+        const date = new Date(timeStr);
+        return date.getTime();
+      } catch {
+        return 0;
       }
-
-      return hour24 * 60 + minutes; // Convert to minutes for comparison.
     };
 
-    const time1 = parseTime(timeValues[0] ?? '');
-    const time2 = parseTime(timeValues[1] ?? '');
+    const time1 = parseTime(timeValues[0]);
+    const time2 = parseTime(timeValues[1]);
 
     expect(time1).toBeGreaterThan(time2);
   }
@@ -444,17 +439,31 @@ export class Moderator extends BaseUser {
    * Function to feature an activity.
    * @param {string} explorationId - The ID of the exploration to feature.
    * @param {boolean} save - Whether to save the featured activities.
+   * @param {number} activityIndex - The 0-based index of the activity to feature.
    */
   async featureActivity(
     explorationId: string | null,
-    save: boolean = true
+    save: boolean = true,
+    activityIndex: number = 0
   ): Promise<void> {
     await this.clickOn('Add element');
 
     await this.page.waitForSelector(explorationIDField);
-    await this.page.type(explorationIDField, explorationId as string);
+    const explorationIdFieldElement = await this.page.$$(explorationIDField);
+    if (explorationIdFieldElement.length < activityIndex + 1) {
+      throw new Error(
+        `Invalid activity index: ${activityIndex}\n.` +
+          `Found only ${explorationIdFieldElement.length} activities.`
+      );
+    }
+    await explorationIdFieldElement[activityIndex].type(
+      explorationId as string
+    );
     await this.page.keyboard.press('Enter');
-    await this.expectElementValueToBe(explorationIDField, explorationId ?? '');
+    await this.expectElementValueToBe(
+      explorationIdFieldElement[activityIndex],
+      explorationId as string
+    );
 
     if (save) {
       await this.clickOn('Save Featured Activities');

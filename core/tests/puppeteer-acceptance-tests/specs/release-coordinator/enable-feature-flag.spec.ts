@@ -64,6 +64,7 @@ describe('Release Coordinator', function () {
     );
     // Verify that data is persisted on reload.
     await releaseCoordinator.page.reload();
+    await releaseCoordinator.navigateToFeaturesTab();
     await releaseCoordinator.expectFeatureFlagForcedEnabledStatusToBe(
       dummyFeatureFlagName,
       true
@@ -89,6 +90,7 @@ describe('Release Coordinator', function () {
 
     // Verify that data is persisted on reload.
     await releaseCoordinator.page.reload();
+    await releaseCoordinator.navigateToFeaturesTab();
     await releaseCoordinator.expectFeatureFlagForcedEnabledStatusToBe(
       dummyFeatureFlagName,
       false
@@ -121,6 +123,7 @@ describe('Release Coordinator', function () {
 
     // Check that data is persisted on reload.
     await releaseCoordinator.page.reload();
+    await releaseCoordinator.navigateToFeaturesTab();
     await releaseCoordinator.expectFeatureFlagForcedEnabledStatusToBe(
       dummyFeatureFlagName,
       false

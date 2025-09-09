@@ -682,15 +682,16 @@ export class ReleaseCoordinator extends BaseUser {
       throw new Error('Rollout percentage input not found.');
     }
     await this.page.waitForFunction(
-      (selector: string, disabled: boolean) => {
-        const element = document.querySelector(selector);
+      (selector: string, disabled: boolean, context: HTMLElement) => {
+        const element = context.querySelector(selector);
         return (element as HTMLInputElement).disabled === disabled;
       },
       {
         timeout: 10000,
       },
       rolloutPercentageInputSelector,
-      state === 'disabled'
+      state === 'disabled',
+      featureFlagDiv
     );
 
     if (value) {

@@ -943,6 +943,7 @@ export class SuperAdmin extends BaseUser {
       await addRuleButton.click();
 
       await this.waitForElementToBeClickable(addConditionButton);
+      await this.waitForElementToStabilize(addConditionButton);
       await this.clickOn(addConditionButton);
 
       await this.page.waitForSelector(serverModeSelector, {visible: true});
@@ -952,7 +953,7 @@ export class SuperAdmin extends BaseUser {
       await this.waitForElementToBeClickable(paramValueInput);
       await this.page.type(paramValueInput, ruleValue);
 
-      await this.expectInputValueToBe(paramValueInput, ruleValue);
+      await this.expectElementValueToBe(paramValueInput, ruleValue);
       showMessage('Rule added successfully.');
     } catch (error) {
       console.error(
