@@ -19,7 +19,6 @@
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
-import {time} from 'console';
 
 const moderatorPageUrl = testConstants.URLs.ModeratorPage;
 
