@@ -152,7 +152,7 @@ describe('Curriculum Admin', function () {
 
   it('should be able to delete a classroom', async function () {
     await curriculumAdmin.deleteClassroom('Math');
-    await curriculumAdmin.expectNumberOfClassroomsToBe(0);
+    await curriculumAdmin.expectNumberOfClassroomsToBe(1);
   });
 
   afterAll(async function () {

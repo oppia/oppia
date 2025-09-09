@@ -15,7 +15,8 @@
         No classroom exists at this moment.
       </em>
 
-      <div *ngFor="let classroom of classroomIdToClassroomNameIndex">
+      <div *ngFor="let classroom of classroomIdToClassroomNameIndex"
+           class="e2e-test-classroom-tile-container">
         <div class="oppia-classroom-tile e2e-test-classroom-tile"
              (click)="getClassroomData(classroom.classroom_id)">
           <span *ngIf="!(classroomEditorMode && classroom.key === tempClassroomData.getClassroomId())" class="e2e-test-classroom-tile-name">
@@ -36,7 +37,7 @@
           </button>
         </div>
 
-        <div class="classroom-details"
+        <div class="classroom-details e2e-test-classroom-details"
              *ngIf="classroomDetailsIsShown && tempClassroomData.getClassroomId() === classroom.classroom_id">
           <div *ngIf="classroomViewerMode">
             <i class="material-icons oppia-edit-icon e2e-test-edit-classroom-config-button"
@@ -100,7 +101,7 @@
             <span class="col-lg-3 col-md-3 col-sm-3">
               <strong>Topic List Intro</strong>
             </span>
-            <span *ngIf="classroomViewerMode" class="classroom-field e2e-test-classroom-topic-list-view">
+            <span *ngIf="classroomViewerMode" class="classroom-field e2e-test-classroom-topic-list-intro-view">
                 {{tempClassroomData.getTopicListIntro()}}
             </span>
             <textarea *ngIf="classroomEditorMode"

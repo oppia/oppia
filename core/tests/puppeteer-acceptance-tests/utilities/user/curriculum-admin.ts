@@ -16,6 +16,7 @@
  * @fileoverview Curriculum Admin users utility file.
  */
 
+import puppeteer from 'puppeteer';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import {ElementHandle} from 'puppeteer';
@@ -195,6 +196,8 @@ const newClassroomUrlFragmentInputField =
   '.e2e-test-new-classroom-url-fragment';
 const saveNewClassroomButton = '.e2e-test-create-new-classroom';
 const classroomTileSelector = '.e2e-test-classroom-tile';
+const classroomTileContainerSelector = '.e2e-test-classroom-tile-container';
+const classroomDetailsSelector = '.e2e-test-classroom-details';
 
 const editClassroomConfigButton = '.e2e-test-edit-classroom-config-button';
 const closeClassroomConfigButton = '.e2e-cancel-classroom-changes';
@@ -373,13 +376,26 @@ export class CurriculumAdmin extends TopicManager {
    * @param classroomNames The names of the classrooms.
    */
   async expectClassroomsInOrder(classroomNames: string[]): Promise<void> {
-    await this.expectElementToBeVisible(classroomTileNameSpan);
-
-    const classroomTileNameSpans = await this.page.$$eval(
+    await this.page.waitForFunction(
+      (selector: string, orderedClassroom: string[]) => {
+        const classroomTileNameSpans = document.querySelectorAll(selector);
+        if (classroomTileNameSpans.length !== orderedClassroom.length) {
+          return false;
+        }
+        for (let i = 0; i < classroomTileNameSpans.length; i++) {
+          if (
+            classroomTileNameSpans[i].textContent?.trim() !==
+            orderedClassroom[i]
+          ) {
+            return false;
+          }
+        }
+        return true;
+      },
+      {},
       classroomTileNameSpan,
-      elements => elements.map(element => element.textContent?.trim())
+      classroomNames
     );
-    expect(classroomTileNameSpans).toEqual(classroomNames);
   }
 
   /**
@@ -412,6 +428,52 @@ export class CurriculumAdmin extends TopicManager {
 
     return topicBoxElement;
   }
+
+  /**
+   * Opens the classroom details page for the given classroom.
+   * @param classroomName The name of the classroom to open.
+   */
+  async openClassroomDetails(classroomName: string): Promise<void> {
+    const classroomTileContainerElement =
+      await this.expectClassroomToBeVisible(classroomName);
+
+    try {
+      await classroomTileContainerElement.waitForSelector(
+        classroomDetailsSelector,
+        {
+          hidden: true,
+          timeout: 5000,
+        }
+      );
+    } catch (error) {
+      if (error instanceof puppeteer.errors.TimeoutError) {
+        showMessage('Classroom details are already visible.');
+        return;
+      }
+
+      throw error;
+    }
+
+    const classroomTileElement =
+      await classroomTileContainerElement.waitForSelector(
+        classroomTileSelector
+      );
+
+    if (!classroomTileElement) {
+      throw new Error('Classroom tile not found.');
+    }
+
+    await this.expectElementToBeClickable(classroomTileElement);
+    await classroomTileElement.click();
+
+    await classroomTileContainerElement.waitForSelector(
+      classroomDetailsSelector,
+      {
+        visible: true,
+        timeout: 10000,
+      }
+    );
+  }
   /**
    * Checks if the classroom details are as expected.
    * @param {string} classroomName - The name of the classroom.
@@ -427,9 +489,7 @@ export class CurriculumAdmin extends TopicManager {
     classroomTopicListIntro: string,
     classroomCourseDetails: string
   ): Promise<void> {
-    const classroomTileElement =
-      await this.expectClassroomToBeVisible(classroomName);
-    await classroomTileElement.click();
+    await this.openClassroomDetails(classroomName);
 
     await this.expectTextContentToBe(classroomNameSelector, classroomName);
     await this.expectTextContentToBe(classroomURLSelector, classroomURL);
@@ -451,17 +511,20 @@ export class CurriculumAdmin extends TopicManager {
   async expectClassroomToBeVisible(
     classroomName: string
   ): Promise<ElementHandle<Element>> {
-    await this.expectElementToBeVisible(classroomTileSelector);
-    const classroomTileElements = await this.page.$$(classroomTileSelector);
+    await this.expectElementToBeVisible(classroomTileContainerSelector);
+    const classroomTileElements = await this.page.$$(
+      classroomTileContainerSelector
+    );
 
     let classroomTileElement: ElementHandle<Element> | null = null;
     for (const element of classroomTileElements) {
       if (
-        await element.evaluate(
-          (el, classroomName: string) =>
-            el.textContent?.trim() === classroomName,
-          classroomName
-        )
+        await element.evaluate((el, classroomName: string) => {
+          const spanElement = el.querySelector('span');
+          return (
+            spanElement && spanElement.textContent?.trim() === classroomName
+          );
+        }, classroomName)
       ) {
         classroomTileElement = element;
         break;
@@ -469,7 +532,14 @@ export class CurriculumAdmin extends TopicManager {
     }
 
     if (!classroomTileElement) {
-      throw new Error(`Classroom ${classroomName} not found.`);
+      const foundClassrooms = await Promise.all(
+        classroomTileElements.map(el =>
+          el.evaluate(htmlEl => htmlEl?.textContent?.trim())
+        )
+      );
+      throw new Error(
+        `Classroom ${classroomName} not found.\nFound: ${foundClassrooms.join(', ')}`
+      );
     }
 
     return classroomTileElement;
@@ -2122,6 +2192,7 @@ export class CurriculumAdmin extends TopicManager {
     await this.page.waitForSelector(createNewClassroomModal);
     await this.page.type(newClassroomNameInputField, classroomName);
     await this.page.type(newClassroomUrlFragmentInputField, urlFragment);
+    await this.waitForElementToStabilize(saveNewClassroomButton);
     await this.clickOn(saveNewClassroomButton);
     await this.page.waitForSelector(createNewClassroomModal, {visible: false});
     showMessage(`Created ${classroomName} classroom.`);
@@ -2143,11 +2214,17 @@ export class CurriculumAdmin extends TopicManager {
     await this.editClassroom(classroomName);
 
     if (url) {
+      await this.clearAllTextFrom(editClassroomUrlFragmentInputField);
       await this.page.type(editClassroomUrlFragmentInputField, url);
     }
 
+    await this.clearAllTextFrom(editClassroomTeaserTextInputField);
     await this.page.type(editClassroomTeaserTextInputField, teaserText);
+
+    await this.clearAllTextFrom(editClassroomTopicListIntroInputField);
     await this.page.type(editClassroomTopicListIntroInputField, topicListIntro);
+
+    await this.clearAllTextFrom(editClassroomCourseDetailsInputField);
     await this.page.type(editClassroomCourseDetailsInputField, courseDetails);
 
     await this.clickOn(classroomThumbnailContainer);
@@ -2188,7 +2265,7 @@ export class CurriculumAdmin extends TopicManager {
     }
     await prerequisiteInputElement.click();
 
-    await this.clickOn(prerequisiteTopicName);
+    await this.selectMatOption(prerequisiteTopicName);
     await this.expectMatChipToBeVisible(prerequisiteTopicName);
   }
 
