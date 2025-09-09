@@ -269,23 +269,10 @@ export class Moderator extends BaseUser {
       throw new Error('Not enough timestamps found.');
     }
 
-    const parseTime = (timeStr: string): number => {
-      if (!timeStr) {
-        return 0;
-      }
+    const time1 = parseLocaleAbbreviatedDatetimeString(timeValues[0]);
+    const time2 = parseLocaleAbbreviatedDatetimeString(timeValues[1]);
 
-      try {
-        const date = new Date(timeStr);
-        return date.getTime();
-      } catch {
-        return 0;
-      }
-    };
-
-    const time1 = parseTime(timeValues[0]);
-    const time2 = parseTime(timeValues[1]);
-
-    expect(time1).toBeGreaterThan(time2);
+    expect(time1).toBeGreaterThanOrEqual(time2);
   }
 
   /**

@@ -741,24 +741,21 @@ export class ReleaseCoordinator extends BaseUser {
   async expectUserGroupToBePresent(
     groupName: string,
     present: boolean = true
-  ): Promise<ElementHandle<Element> | null> {
-    await this.expectElementToBeVisible(userGroupItemSelector);
-    const userGroupElements = await this.page.$$(userGroupItemSelector);
-    const userGroupNames = await this.page.$$eval(
+  ): Promise<void> {
+    await this.page.waitForFunction(
+      (selector: string, groupName: string, present: boolean) => {
+        const elements = document.querySelectorAll(selector);
+        return (
+          Array.from(elements).some(
+            element => element.textContent?.trim() === groupName
+          ) === present
+        );
+      },
+      {},
       userGroupItemSelector,
-      elements => elements.map(element => element.textContent?.trim())
+      groupName,
+      present
     );
-
-    const index = userGroupNames.indexOf(groupName);
-
-    if (index === -1 && present) {
-      throw new Error(`User group "${groupName}" not found.`);
-    }
-    if (index !== -1 && !present) {
-      throw new Error(`User group "${groupName}" found, but it should not be.`);
-    }
-
-    return present ? userGroupElements[index] : null;
   }
 
   /**
@@ -782,7 +779,20 @@ export class ReleaseCoordinator extends BaseUser {
    * @param {string} groupName - The name of the user group to delete.
    */
   async removeUserGroup(groupName: string): Promise<void> {
-    const userGroupElement = await this.expectUserGroupToBePresent(groupName);
+    await this.expectElementToBeVisible(userGroupItemSelector);
+    const userGroupElements = await this.page.$$(userGroupItemSelector);
+    const userGroupNames = await this.page.$$eval(
+      userGroupItemSelector,
+      elements => elements.map(element => element.textContent?.trim())
+    );
+
+    const index = userGroupNames.indexOf(groupName);
+
+    if (index === -1) {
+      throw new Error(`User group "${groupName}" not found.`);
+    }
+
+    const userGroupElement = userGroupElements[index];
     if (!userGroupElement) {
       throw new Error(`User group "${groupName}" not found.`);
     }
