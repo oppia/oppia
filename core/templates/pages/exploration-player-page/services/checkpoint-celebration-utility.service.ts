@@ -21,8 +21,7 @@ import {Injectable, EventEmitter} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 
 import {ComputeGraphService} from 'services/compute-graph.service';
-import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
-import {StatesObjectFactory} from 'domain/exploration/StatesObjectFactory';
+import {StateObjectsBackendDict, States} from 'domain/exploration/states.model';
 
 enum CheckpointMessageTypes {
   FIRST = 'FIRST',
@@ -41,7 +40,6 @@ export class CheckpointCelebrationUtilityService {
   private _openLessonInformationModalEmitter = new EventEmitter<void>();
   constructor(
     private computeGraphService: ComputeGraphService,
-    private statesObjectFactory: StatesObjectFactory,
     private translateService: TranslateService
   ) {}
 
@@ -49,8 +47,7 @@ export class CheckpointCelebrationUtilityService {
     statesbackendDict: StateObjectsBackendDict,
     initStateName: string
   ): string[] {
-    const states =
-      this.statesObjectFactory.createFromBackendDict(statesbackendDict);
+    const states = States.createFromBackendDict(statesbackendDict);
     const bfsStateList = this.computeGraphService.computeBfsTraversalOfStates(
       initStateName,
       states,
