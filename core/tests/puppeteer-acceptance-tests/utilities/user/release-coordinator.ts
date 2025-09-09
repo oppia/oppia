@@ -770,6 +770,7 @@ export class ReleaseCoordinator extends BaseUser {
     const addNewUserGroupButtonSelector = `${addUserGroupContainerSelector} button`;
 
     await this.expectElementToBeVisible(addUserGroupContainerSelector);
+    await this.clearAllTextFrom(userGroupInputSelector);
     await this.type(userGroupInputSelector, groupName);
     await this.clickOn(addNewUserGroupButtonSelector);
 

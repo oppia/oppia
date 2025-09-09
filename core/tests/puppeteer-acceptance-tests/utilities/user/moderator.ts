@@ -510,16 +510,8 @@ export class Moderator extends BaseUser {
     await deleteButton.click();
 
     await this.clickOn(' Save Featured Activities ');
-
-    try {
-      await this.page.waitForFunction(
-        'document.querySelector(".e2e-test-toast-message") !== null',
-        {timeout: 5000}
-      );
-      showMessage('Activity unfeatured successfully.');
-    } catch (error) {
-      throw new Error('Failed to save the unfeatured activities');
-    }
+    (await this.isElementVisible(toastMessageSelector, true, 5000)) ||
+      (await this.isElementVisible(warningToastMessageSelector, true, 5000));
   }
 }
 

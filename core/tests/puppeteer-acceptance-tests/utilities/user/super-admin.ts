@@ -951,6 +951,7 @@ export class SuperAdmin extends BaseUser {
       await this.page.select(serverModeSelector, condition);
 
       await this.waitForElementToBeClickable(paramValueInput);
+      await this.clearAllTextFrom(paramValueInput);
       await this.page.type(paramValueInput, ruleValue);
 
       await this.expectElementValueToBe(paramValueInput, ruleValue);

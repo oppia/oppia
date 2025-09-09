@@ -77,6 +77,9 @@ describe('Site Moderator', function () {
       'These Exploration IDs do not exist: ABC0101'
     );
     await siteModerator.closeToastWarningMessage();
+    // Once we check that activity can't be added, it's data is still there.
+    // Thus, we are removing it.
+    await siteModerator.unfeatureActivityAtIndex(2);
   });
 
   it('should be able to remove featured activity', async function () {
