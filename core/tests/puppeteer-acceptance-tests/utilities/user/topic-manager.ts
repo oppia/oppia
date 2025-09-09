@@ -262,7 +262,7 @@ const mobilePublishTopicButton =
   'div.navbar-mobile-options .e2e-test-mobile-publish-topic-button';
 const publishTopicButton = 'button.e2e-test-publish-topic-button';
 const topicAndSkillDashboardSelector = '.e2e-test-topics-and-skills-dashboard';
-const skillEditorSelector = 'e2e-test-skill-editor';
+const skillEditorSelector = '.e2e-test-skill-editor';
 
 export class TopicManager extends BaseUser {
   /**
