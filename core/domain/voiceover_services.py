@@ -1246,7 +1246,7 @@ def regenerate_voiceovers_on_exploration_curation(
     # A dictionary where each key is a language code, and each value is a
     # content mapping dictionary. The content mapping dictionary contains
     # content IDs as keys and their corresponding HTML content as values.
-    language_code_to_contents_mapping = {}
+    language_code_to_contents_mapping: Dict[str, Dict[str, str]] = {}
 
     exploration = exp_fetchers.get_exploration_by_id(exploration_id)
     assert exploration is not None
@@ -1262,7 +1262,11 @@ def regenerate_voiceovers_on_exploration_curation(
         for translatable_content in (
                 content_id_to_translatable_content.values()):
             content_id = translatable_content.content_id
-            # Check if what happens when this is list of str.
+
+            # Rule inputs are not considered for voiceover generation.
+            if content_id.startswith('rule_input'):
+                continue
+
             content_value = translatable_content.content_value
 
             language_code_to_contents_mapping.setdefault('en', {})[
@@ -1326,7 +1330,7 @@ def regenerate_voiceovers_of_exploration_for_given_language_accent(
     # A dictionary where each key is a language code, and each value is a
     # content mapping dictionary. The content mapping dictionary contains
     # content IDs as keys and their corresponding HTML content as values.
-    language_code_to_contents_mapping = {}
+    language_code_to_contents_mapping: Dict[str, Dict[str, str]] = {}
 
     language_code = get_language_code_from_language_accent_code(
         language_accent_code)
@@ -1350,7 +1354,11 @@ def regenerate_voiceovers_of_exploration_for_given_language_accent(
             for translatable_content in (
                     content_id_to_translatable_content.values()):
                 content_id = translatable_content.content_id
-                # Check if what happens when this is list of str.
+
+                # Rule inputs are not considered for voiceover generation.
+                if content_id.startswith('rule_input'):
+                    continue
+
                 content_value = translatable_content.content_value
 
                 language_code_to_contents_mapping.setdefault('en', {})[
