@@ -252,7 +252,7 @@ export class Moderator extends BaseUser {
   async expectTimestampToBeInDescendingOrder(
     table: 'commit' | 'feedback messages' = 'commit'
   ): Promise<void> {
-    const selector = `.e2e-test-${table.replaceAll(' ', '-')}-row`;
+    const selector = `.e2e-test-${table.replace(' ', '-')}-row`;
     await this.expectElementToBeVisible(selector);
     const timeValues = await this.page.$$eval(
       `${selector} td`,
