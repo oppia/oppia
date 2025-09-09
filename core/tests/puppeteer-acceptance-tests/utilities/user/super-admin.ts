@@ -127,6 +127,8 @@ const platformParameterTabContainerSelector =
 const userRolesTabContainerSelector = 'oppia-admin-roles-tab';
 const userRolesVisualizationContainerSelector =
   'oppia-roles-and-actions-visualizer';
+const platformParameterDefaultValueContainerSelector =
+  '.e2e-test-platform-param-default-value-container';
 
 export class SuperAdmin extends BaseUser {
   /**
@@ -983,15 +985,26 @@ export class SuperAdmin extends BaseUser {
       }
       await this.waitForElementToBeClickable(editButton);
       await editButton.click();
-      await platformParameter.waitForSelector(paramValueInput, {visible: true});
-      const valueInputs = await platformParameter.$$(paramValueInput);
-      await valueInputs[1].type(value);
+
+      const deafultValueInputSelector = `${platformParameterDefaultValueContainerSelector} ${paramValueInput}`;
+      const inputElement = await platformParameter.waitForSelector(
+        deafultValueInputSelector,
+        {visible: true}
+      );
+
+      if (!inputElement) {
+        throw new Error(
+          `Input field not found for platform parameter "${platformParam}".`
+        );
+      }
+
+      await inputElement.type(value);
       await this.page.waitForFunction(
         (element: Element, value: string) => {
           return (element as HTMLInputElement).value.trim() === value.trim();
         },
         {},
-        valueInputs[1],
+        inputElement,
         value
       );
       showMessage('Default value changed successfully.');
