@@ -98,6 +98,10 @@ describe('Site Moderator', function () {
     await siteModerator.clickOnExplorationLinkInRecentCommitsTable(2);
     await siteModerator.expectToBeInExplorationEditor(explorationId);
 
+    // We are going back twice because when we click on the exploration link,
+    // we are redirected twice, first to the exploration editor, and then to
+    // the feedback tab.
+    await siteModerator.page.goBack();
     await siteModerator.page.goBack();
     await siteModerator.expectToBeInModeratorPage();
   });

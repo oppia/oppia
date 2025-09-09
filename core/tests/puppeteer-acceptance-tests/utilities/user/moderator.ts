@@ -19,6 +19,7 @@
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
+import parseLocaleAbbreviatedDatetimeString from '../../functions/date-functions';
 
 const moderatorPageUrl = testConstants.URLs.ModeratorPage;
 
