@@ -1,4 +1,4 @@
-<div *ngIf="!mobileCardToBeShown" class="e2e-test-lesson-card">
+<div *ngIf="!mobileCardToBeShown && !isInNewLessonPlayer()" class="e2e-test-lesson-card">
   <oppia-learner-dashboard-icons *ngIf="showLearnerDashboardIconsIfPossible && userIsLoggedIn"
                                  [activityType]="activityType"
                                  [activityId]="explorationId"
@@ -109,7 +109,8 @@
     </i>
   </button>
 </div>
-<div *ngIf="mobileCardToBeShown">
+
+<div *ngIf="mobileCardToBeShown && !isInNewLessonPlayer()">
   <oppia-learner-dashboard-icons *ngIf="showLearnerDashboardIconsIfPossible && userIsLoggedIn"
                                  [activityType]="activityType"
                                  [activityId]="explorationId"
@@ -162,3 +163,10 @@
     </i>
   </button>
 </div>
+
+<a [href]="getExplorationLink()" *ngIf="isInNewLessonPlayer()">
+  <button class="exploration-summary-btn" tabindex="0">
+    <i class="fa-solid fa-arrow-right arrow-icon"></i>
+    <p>{{ explorationTitle }}<br><span><i class="fa-solid fa-star star-icon"></i>{{avgRating ? avgRating : 'N/A'}}</span></p>
+  </button>
+</a>

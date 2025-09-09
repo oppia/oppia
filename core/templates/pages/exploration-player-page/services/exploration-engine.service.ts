@@ -57,6 +57,7 @@ import {ExplorationPlayerConstants} from '../current-lesson-player/exploration-p
 import isEqual from 'lodash/isEqual';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {LearnerAnswerInfoService} from './learner-answer-info.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 @Injectable({
   providedIn: 'root',
@@ -98,6 +99,7 @@ export class ExplorationEngineService {
     private statsReportingService: StatsReportingService,
     private stateEditorService: StateEditorService,
     private translateService: TranslateService,
+    private platformFeatureService: PlatformFeatureService,
     private urlService: UrlService
   ) {
     this.setExplorationProperties();
@@ -542,6 +544,14 @@ export class ExplorationEngineService {
       preferredContentLanguageCodes,
       this.exploration.getLanguageCode()
     );
+
+    let pathnameArray = this.urlService.getPathname().split('/');
+    if (this.isNewLessonPlayerEnabled() && pathnameArray.includes('lesson')) {
+      this.contentTranslationManagerService.displayTranslations(
+        this.contentTranslationLanguageService.getCurrentContentLanguageCode()
+      );
+      this.contentTranslationManagerService.initLessonTranslations();
+    }
   }
 
   /**
@@ -1032,5 +1042,9 @@ export class ExplorationEngineService {
     // from parent map, hence we return the reversed path that goes
     // from initStateName to destStateName.
     return shortestPathToStateInReverse.reverse();
+  }
+
+  isNewLessonPlayerEnabled(): boolean {
+    return this.platformFeatureService.status.NewLessonPlayer.isEnabled;
   }
 }

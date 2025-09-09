@@ -1,14 +1,14 @@
 <div class="modal-header e2e-test-language-selector-modal">
   <h4 class="modal-title">Translation reviewer roles for user {{username}}</h4>
 </div>
-<div class="modal-body">
+<div class="modal-body e2e-test-language-selector-modal-body">
   <div class="modal-body">
     <p *ngIf="assignedLanguageIds.length">User has review rights in the following languages:</p>
     <p *ngIf="!assignedLanguageIds.length">User does not have review rights in any languages.</p>
     <ul>
       <li *ngFor="let languageId of assignedLanguageIds">
-        <div class="d-flex justify-content-between">
-          <span>{{ languageIdToName[languageId] }}</span>
+        <div class="d-flex justify-content-between e2e-test-selected-language-container">
+          <span class="e2e-test-selected-language">{{ languageIdToName[languageId] }}</span>
           <div class="mat-icon-button oppia-progress-spinner" *ngIf="languageIdInUpdate === languageId">
             <mat-spinner [diameter]="24"></mat-spinner>
           </div>
@@ -38,7 +38,7 @@
   </div>
 </div>
 <div class="modal-footer">
-  <button type="button" class="cancel-button" (click)="close()">Close</button>
+  <button type="button" class="cancel-button e2e-test-close-button" (click)="close()">Close</button>
 </div>
 
 <style>

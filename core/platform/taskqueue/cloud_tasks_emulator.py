@@ -64,7 +64,7 @@ class Task:
         self.url = url
         self.scheduled_for = scheduled_for
         self.queue_name = queue_name
-        self.task_name = task_name
+        self.name = task_name
 
 
 class Emulator:
@@ -136,7 +136,7 @@ class Emulator:
                 self._task_handler(
                     url=task.url, payload=task.payload,
                     queue_name=task.queue_name,
-                    task_name=task.task_name)
+                    task_name=task.name)
 
             time.sleep(0.01)
 
@@ -165,7 +165,7 @@ class Emulator:
             self._task_handler(
                 url=task.url, payload=task.payload,
                 queue_name=task.queue_name,
-                task_name=task.task_name)
+                task_name=task.name)
 
     def _total_enqueued_tasks(self) -> int:
         """Returns the total number of tasks across all of the queues in the

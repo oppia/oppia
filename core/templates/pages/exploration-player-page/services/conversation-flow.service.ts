@@ -1006,7 +1006,10 @@ export class ConversationFlowService {
    */
   private _addNewCard(newCard: StateCard): void {
     this.playerTranscriptService.addNewCard(newCard);
-    this._shouldDisplayTranslation();
+    const numberOfCards = this.playerTranscriptService.getNumCards();
+    if (numberOfCards > 1) {
+      this._shouldDisplayTranslation();
+    }
     this._updateCardLayout();
 
     this.playerPositionService.changeCurrentQuestion(
@@ -1446,7 +1449,8 @@ export class ConversationFlowService {
     } else if (
       this.solutionForState !== null &&
       numberOfIncorrectSubmissions >=
-        ExplorationPlayerConstants.MAX_INCORRECT_ANSWERS_BEFORE_RELEASING_SOLUTION
+        ExplorationPlayerConstants.MAX_INCORRECT_ANSWERS_BEFORE_RELEASING_SOLUTION &&
+      this.hintsAndSolutionManagerService.areAllHintsExhausted()
     ) {
       this.hintsAndSolutionManagerService.releaseSolution();
     }
@@ -1795,6 +1799,14 @@ export class ConversationFlowService {
    */
   setIsLoggedIn(userStatus: boolean): void {
     this.isLoggedIn = userStatus;
+  }
+
+  /**
+   * Returns the user's login status.
+   * @returns {boolean} True if the user is logged in, false otherwise.
+   */
+  getIsLoggedIn(): boolean {
+    return this.isLoggedIn;
   }
 
   get onPlayerStateChange(): EventEmitter<string> {
