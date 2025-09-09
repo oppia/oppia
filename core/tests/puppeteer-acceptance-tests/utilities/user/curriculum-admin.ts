@@ -298,6 +298,8 @@ const navigationDropdown = '.e2e-test-mobile-skill-nav-dropdown-icon';
 
 const createNewSkillButtonInSkillDashboardSelector =
   '.e2e-test-create-skill-button-circle';
+const createNewSkillMobileButton =
+  '.e2e-test-mobile-create-skill-button-secondary';
 const classroomNameSelector = '.e2e-test-classroom-name-view';
 const classroomURLSelector = '.e2e-test-classroom-url-view';
 const classroomTeaserSelector = '.e2e-test-classroom-teaser-view';
@@ -2869,7 +2871,10 @@ export class CurriculumAdmin extends TopicManager {
    * Click on create new skill button in skill dashboard.
    */
   async clickOnCreateNewSkillButtonInSkillDashboard(): Promise<void> {
-    await this.clickOn(createNewSkillButtonInSkillDashboardSelector);
+    const selector = this.isViewportAtMobileWidth()
+      ? createNewSkillMobileButton
+      : createNewSkillButtonInSkillDashboardSelector;
+    await this.clickOn(selector);
     await this.expectModalTitleToBe('New Skill');
   }
 }

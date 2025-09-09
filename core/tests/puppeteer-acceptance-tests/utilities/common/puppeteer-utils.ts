@@ -485,6 +485,24 @@ export class BaseUser {
   }
 
   /**
+   * Clicks on the element and returns a new page opened by the click.
+   * @param selector The selector of the element.
+   * @returns The new page opened by the click.
+   */
+  async clickOnElementAndGetNewPage(selector: string): Promise<Page> {
+    const newPagePromise: Promise<Page> = new Promise<Page>(resolve =>
+      this.browserObject.once('targetcreated', async target => {
+        const newPage = await target.page();
+        await newPage.bringToFront();
+        resolve(newPage);
+      })
+    );
+    await this.clickOn(selector);
+    const newPage = await newPagePromise;
+    return newPage;
+  }
+
+  /**
    * Checks if the mat chip with the given text content is visible.
    * @param textContent The text content of the mat chip.
    * @returns The element handle of the mat chip.
@@ -1176,13 +1194,15 @@ export class BaseUser {
    * Verify that element is visilbe or not.
    * @param {string} selector - The selector of the element to get text from.
    * @param {boolean} visibility - Whether the element should be visible or not.
+   * @param {Page} context - The page on which the selector should be verified.
    */
   async expectElementToBeVisible(
     selector: string,
-    visibility: boolean = true
+    visibility: boolean = true,
+    context: Page = this.page
   ): Promise<void> {
     const options = visibility ? {visible: true} : {hidden: true};
-    await this.page.waitForSelector(selector, options);
+    await context.waitForSelector(selector, options);
     showMessage(`Element ${selector} is ${visibility ? 'visible' : 'hidden'}.`);
   }
 

@@ -106,8 +106,8 @@ describe('Curriculum Admin', function () {
       'Test Skill 2',
       'Test Review Material'
     );
-    await curriculumAdmin.clickOn('Save');
-    await curriculumAdmin.expectToBeInSkillEditorPage();
+    const newPage = await curriculumAdmin.clickOnElementAndGetNewPage('Save');
+    await curriculumAdmin.expectToBeInSkillEditorPage(newPage);
   });
 
   it('should be able to unpublish a topic', async function () {

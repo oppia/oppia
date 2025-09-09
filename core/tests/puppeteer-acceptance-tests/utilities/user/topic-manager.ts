@@ -18,7 +18,7 @@
 import {BaseUser} from '../common/puppeteer-utils';
 import {showMessage} from '../common/show-message';
 import testConstants from '../common/test-constants';
-import {ElementHandle} from 'puppeteer';
+import {ElementHandle, Page} from 'puppeteer';
 import puppeteer from 'puppeteer';
 
 const topicAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
@@ -274,9 +274,11 @@ export class TopicManager extends BaseUser {
 
   /**
    * Checks if we are in skill editor page.
+   * If the skill editor opened in a new tab, switches to that tab.
+   * @param context The context in which the skill editor is located.
    */
-  async expectToBeInSkillEditorPage(): Promise<void> {
-    await this.expectElementToBeVisible(skillEditorSelector);
+  async expectToBeInSkillEditorPage(context: Page = this.page): Promise<void> {
+    await this.expectElementToBeVisible(skillEditorSelector, true, context);
   }
 
   /**
