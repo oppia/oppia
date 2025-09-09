@@ -259,18 +259,15 @@ export class Moderator extends BaseUser {
   ): Promise<void> {
     const selector = `.e2e-test-${table.replace(' ', '-')}-row`;
     await this.expectElementToBeVisible(selector);
-    const timeValues: string[] = await this.page.$$eval(
-      `${selector} td`,
-      (elements: Element[]) =>
-        elements.map(element => element.textContent?.trim() ?? '')
-    );
-
-    if (timeValues.length < 2) {
-      throw new Error('Not enough timestamps found.');
-    }
-
-    const time1 = parseLocaleAbbreviatedDatetimeString(timeValues[0]);
-    const time2 = parseLocaleAbbreviatedDatetimeString(timeValues[1]);
+    const rowElements = await this.page.$$(selector);
+    const rawTimeValue1 = await rowElements[0].evaluate(el => {
+      return el.querySelector('td')?.textContent?.trim();
+    });
+    const rawTimeValue2 = await rowElements[1].evaluate(el => {
+      return el.querySelector('td')?.textContent?.trim();
+    });
+    const time1 = parseLocaleAbbreviatedDatetimeString(rawTimeValue1 as string);
+    const time2 = parseLocaleAbbreviatedDatetimeString(rawTimeValue2 as string);
 
     expect(time1).toBeGreaterThanOrEqual(time2);
   }
