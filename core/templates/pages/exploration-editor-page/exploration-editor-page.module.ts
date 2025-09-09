@@ -165,7 +165,6 @@ import {StateParamChangesService} from 'components/state-editor/state-editor-pro
 import {StateSolicitAnswerDetailsService} from 'components/state-editor/state-editor-properties-services/state-solicit-answer-details.service';
 import {StateSolutionService} from 'components/state-editor/state-editor-properties-services/state-solution.service';
 import {StateTutorialFirstTimeService} from './services/state-tutorial-first-time.service';
-import {StatesObjectFactory} from 'domain/exploration/StatesObjectFactory';
 import {TranslationLanguageService} from './translation-tab/services/translation-language.service';
 import {TranslationStatusService} from './translation-tab/services/translation-status.service';
 import {TranslationTabActiveModeService} from './translation-tab/services/translation-tab-active-mode.service';
@@ -390,7 +389,6 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     StateSolicitAnswerDetailsService,
     StateSolutionService,
     StateTutorialFirstTimeService,
-    StatesObjectFactory,
     TranslationLanguageService,
     TranslationStatusService,
     TranslationTabActiveModeService,

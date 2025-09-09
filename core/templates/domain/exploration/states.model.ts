@@ -13,10 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of State
+ * @fileoverview Model for creating new frontend instances of State
  * domain objects given a list of backend state dictionaries.
  */
-import {Injectable} from '@angular/core';
 
 import {StateBackendDict, State} from 'domain/state/state.model';
 import {Voiceover} from 'domain/exploration/voiceover.model';
@@ -147,13 +146,10 @@ export class States {
     }
     return finalStateNames;
   }
-}
 
-@Injectable({
-  providedIn: 'root',
-})
-export class StatesObjectFactory {
-  createFromBackendDict(statesBackendDict: StateObjectsBackendDict): States {
+  static createFromBackendDict(
+    statesBackendDict: StateObjectsBackendDict
+  ): States {
     let stateObjectsDict: StateObjectsDict = {};
     for (let stateName in statesBackendDict) {
       stateObjectsDict[stateName] = State.createFromBackendDict(
