@@ -1082,10 +1082,6 @@ export class UpgradedServices {
       );
 
     // Topological level: 8.
-      upgradedServices['LoggerService'],
-      upgradedServices['UrlInterpolationService']
-    );
-
     upgradedServices['PretestQuestionBackendApiService'] =
       new PretestQuestionBackendApiService(
         upgradedServices['UrlInterpolationService'],
