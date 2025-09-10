@@ -99,6 +99,7 @@ const questionContentSelector = '.e2e-test-conversation-content';
 const numericInputInteractionField = '.e2e-test-conversation-input';
 const skillNameInputSelector = '.e2e-test-skill-name-input';
 const radioInnerCircleSelector = '.mat-radio-inner-circle';
+const radioInnerCircleContainerSelector = '.mat-radio-container';
 const confirmSkillSelectionButtonSelector =
   '.e2e-test-confirm-skill-selection-button';
 const questionTextSelector = '.e2e-test-question-text';
@@ -330,6 +331,8 @@ const skillSelectionModalSelector = '.e2e-test-skill-container';
 const saveSubtopicExplanationButtonSelector =
   '.e2e-test-save-subtopic-content-button';
 const noSkillsPresentMessageSelector = '.e2e-test-no-skills-present-message';
+
+const ADD_PREREQUISITE_SKILL_BUTTON_LABEL = '+ ADD PREREQUISITE SKILL';
 
 export class TopicManager extends BaseUser {
   /**
@@ -614,6 +617,7 @@ export class TopicManager extends BaseUser {
 
       // TODO(#23302): Currently, changing the URL fragment throws some
       // unexpected warnings. Once fixed, remove the three lines below.
+      await this.page.keyboard.press('Tab');
       const closeToastMessageButton = 'button.e2e-test-close-toast-warning';
       await this.clickOn(closeToastMessageButton);
       await this.clickOn(closeToastMessageButton);
@@ -1366,6 +1370,10 @@ export class TopicManager extends BaseUser {
     }
     await this.clickOn(confirmUnassignSkillButton);
 
+    await this.expectToastMessageToBe(
+      'The skill has been unassigned from the topic.'
+    );
+
     await this.expectElementToBeVisible(confirmUnassignSkillButton, false);
   }
 
@@ -1447,12 +1455,12 @@ export class TopicManager extends BaseUser {
     await this.waitForElementToBeClickable(skillOptionsElement);
     await skillOptionsElement.click();
 
-    await this.page.waitForSelector(assignSkillButton);
-    const assignSkillButtonElement = await this.page.$(assignSkillButton);
+    const assignSkillButtonElement =
+      await skillItem.waitForSelector(assignSkillButton);
     if (!assignSkillButtonElement) {
       throw new Error('Assign skill button not found');
     }
-    await this.page.evaluate(el => el.click(), assignSkillButtonElement);
+    await assignSkillButtonElement.click();
 
     await this.page.waitForSelector(topicNameSelector);
     const topicNames = await this.page.$$(topicNameSelector);
@@ -1558,14 +1566,14 @@ export class TopicManager extends BaseUser {
       throw new Error(`Skill ${skillName} not found in Skill Selection Modal`);
     }
     const radioInnerCircleSelectorElement = await skillElement.waitForSelector(
-      radioInnerCircleSelector
+      radioInnerCircleContainerSelector
     );
 
     if (!radioInnerCircleSelectorElement) {
       throw new Error('Radio inner circle selector not found');
     }
 
-    await this.clickOn(radioInnerCircleSelector);
+    await radioInnerCircleSelectorElement.click();
 
     await this.clickOn(confirmSkillSelectionButtonSelector);
     await this.expectElementToBeVisible(
@@ -2364,20 +2372,10 @@ export class TopicManager extends BaseUser {
    * @param {string} skillName - The name of the skill to add.
    */
   async addPrerequisiteSkill(skillName: string): Promise<void> {
-    await this.waitForStaticAssetsToLoad();
-    await this.page.waitForSelector(addPrerequisiteSkillButton);
-    const elements = await this.page.$$(addPrerequisiteSkillButton);
-
-    if (this.isViewportAtMobileWidth()) {
-      if (elements.length < 2) {
-        throw new Error('Did not find 2 "add prerequisite" button.');
-      }
-      await this.waitForElementToBeClickable(elements[1]);
-      await elements[1].click();
-    } else {
-      await this.waitForElementToBeClickable(elements[0]);
-      await elements[0].click();
-    }
+    await this.page.waitForXPath(
+      `//button[contains(text(), '${ADD_PREREQUISITE_SKILL_BUTTON_LABEL}')]`
+    );
+    await this.clickOn(ADD_PREREQUISITE_SKILL_BUTTON_LABEL);
     await this.filterAndSelectSkillInSkillSelector(skillName);
   }
 
@@ -2675,9 +2673,11 @@ export class TopicManager extends BaseUser {
    */
   async openSubtopicEditor(
     subtopicName: string,
-    topicName: string
+    topicName?: string
   ): Promise<void> {
-    await this.openTopicEditor(topicName);
+    if (topicName) {
+      await this.openTopicEditor(topicName);
+    }
 
     await this.page.waitForSelector(subtopicReassignHeader);
     let elementToClick = await this.page.$(subtopicReassignHeader);
@@ -3630,29 +3630,18 @@ export class TopicManager extends BaseUser {
     skillName: string,
     topicNames: string
   ): Promise<void> {
-    const skillDescriptionSelector = this.isViewportAtMobileWidth()
-      ? mobileSkillDescriptionSelector
-      : desktopSkillDescriptionSelector;
-    await this.expectElementToBeVisible(skillNameAndStatusContainer);
-
-    const skillContainers = await this.page.$$(skillNameAndStatusContainer);
-    let skillContainer: ElementHandle | null = null;
-    for (const container of skillContainers) {
-      const foundSkillName = await container.$eval(
-        skillDescriptionSelector,
-        element => element.textContent?.trim()
-      );
-      if (foundSkillName === skillName) {
-        skillContainer = container;
-        break;
-      }
-    }
+    const skillContainer = await this.getSkillElementFromSelection(skillName);
 
     if (!skillContainer) {
       throw new Error(`Skill ${skillName} not found in topic.`);
     }
 
-    await this.expectTextContentToBe(
+    await this.page.waitForFunction(
+      (selector: string, topicName: string, context: HTMLElement) => {
+        const element = context.querySelector(selector);
+        return element?.textContent?.trim() === topicName;
+      },
+      {},
       skillsAssignmentSelector,
       topicNames,
       skillContainer

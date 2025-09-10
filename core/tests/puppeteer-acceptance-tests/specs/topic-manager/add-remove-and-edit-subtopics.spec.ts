@@ -112,7 +112,7 @@ describe('Topic Manager', function () {
   });
 
   it('should be able to edit and preview subtopic', async function () {
-    await topicManager.openSubtopicEditor('Addition', 'Arithmetic Operations');
+    await topicManager.openSubtopicEditor('Addition');
     await topicManager.editSubTopicDetails(
       'Intro to Addition and Subtraction',
       'intro-add-subtract',
@@ -128,7 +128,7 @@ describe('Topic Manager', function () {
     await topicManager.expectToastMessageToBe('Changes Saved.');
 
     await topicManager.navigateToSubtopicPreviewTab(
-      'Intro to addition and Subtraction',
+      'Intro to Addition and Subtraction',
       'Arithmetic Operations'
     );
     await topicManager.expectSubtopicPreviewToHave(
