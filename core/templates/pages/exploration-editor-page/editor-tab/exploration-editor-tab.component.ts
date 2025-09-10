@@ -68,26 +68,28 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   stateName: string;
   index: number = 0;
   validationErrorIsShown: boolean = false;
-  joyRideSteps: string[] = [
-    'editorTabTourContainer',
-    'editorTabTourContentEditorTab',
-    'editorTabTourSlideStateInteractionEditorTab',
-    'editorTabTourStateResponsesTab',
-    'editorTabTourPreviewTab',
-    'editorTabTourSaveDraft',
-    'editorTabTourTutorialComplete',
-  ];
+  canEditExploration: boolean = true;
 
-  // Mobile-specific tour steps (uses mobile-specific elements)
-  mobileJoyRideSteps: string[] = [
-    'editorTabTourContainer',
-    'editorTabTourContentEditorTab',
-    'editorTabTourSlideStateInteractionEditorTab',
-    'editorTabTourStateResponsesTab',
-    'editorTabTourMobilePreview', // Mobile-specific preview in dropdown.
-    'editorTabTourMobileSaveDraft', // Mobile-specific save draft selector.
-    'editorTabTourTutorialComplete',
-  ];
+  private getTourSteps(): string[] {
+    const isMobile = this.windowDimensionsService.isWindowNarrow();
+    const steps = [
+      'editorTabTourContainer',
+      'editorTabTourContentEditorTab',
+      'editorTabTourSlideStateInteractionEditorTab',
+      'editorTabTourStateResponsesTab',
+      ...(isMobile
+        ? ['editorTabTourMobilePreview']
+        : ['editorTabTourPreviewTab']),
+    ];
+    // Only add save draft steps if user has edit permissions
+    if (this.canEditExploration) {
+      steps.push(
+        isMobile ? 'editorTabTourMobileSaveDraft' : 'editorTabTourSaveDraft'
+      );
+    }
+    steps.push('editorTabTourTutorialComplete');
+    return steps;
+  }
 
   constructor(
     private editabilityService: EditabilityService,
@@ -149,9 +151,7 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
 
     this.joyride
       .startTour({
-        steps: this.windowDimensionsService.isWindowNarrow()
-          ? this.mobileJoyRideSteps
-          : this.joyRideSteps,
+        steps: this.getTourSteps(),
         stepDefaultPosition: 'top',
         themeColor: '#212f23',
       })
@@ -252,16 +252,7 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
     this.userExplorationPermissionsService
       .getPermissionsAsync()
       .then(permissions => {
-        if (!permissions.canEdit) {
-          this.joyRideSteps = [
-            'editorTabTourContainer',
-            'editorTabTourContentEditorTab',
-            'editorTabTourSlideStateInteractionEditorTab',
-            'editorTabTourStateResponsesTab',
-            'editorTabTourPreviewTab',
-            'editorTabTourTutorialComplete',
-          ];
-        }
+        this.canEditExploration = permissions.canEdit;
       });
   }
 
