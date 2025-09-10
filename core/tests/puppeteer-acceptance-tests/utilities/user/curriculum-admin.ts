@@ -364,8 +364,6 @@ export class CurriculumAdmin extends TopicManager {
       await this.page.mouse.move(targetCenter.x, targetCenter.y, {steps: 10});
       await this.page.mouse.up();
 
-      await this.page.waitForTimeout(100);
-
       requiredIndex += 1;
     }
 

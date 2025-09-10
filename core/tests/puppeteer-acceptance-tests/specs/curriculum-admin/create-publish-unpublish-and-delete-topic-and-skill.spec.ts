@@ -25,6 +25,7 @@ import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {ConsoleReporter} from '../../utilities/common/console-reporter';
 import {TopicManager} from '../../utilities/user/topic-manager';
+import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
@@ -39,7 +40,7 @@ ConsoleReporter.setConsoleErrorsToIgnore([
 ]);
 
 describe('Curriculum Admin', function () {
-  let curriculumAdmin: CurriculumAdmin & TopicManager;
+  let curriculumAdmin: CurriculumAdmin & TopicManager & LoggedOutUser;
   let loggedInUser: LoggedInUser;
 
   beforeAll(async function () {
@@ -126,12 +127,18 @@ describe('Curriculum Admin', function () {
   });
 
   it('should be able to delete a skill', async function () {
+    // Navigate to the skill editor page and copy the URL to check for 404
+    // error afterwards.
+    await curriculumAdmin.openSkillEditor('Test Skill 1');
+    const pageURL = curriculumAdmin.page.url();
     // User must remove all questions from the skill before deleting it.
     await curriculumAdmin.removeAllQuestionsFromTheSkill('Test Skill 1');
     await curriculumAdmin.deleteSkill('Test Skill 1');
     await curriculumAdmin.expectSkillNotInTopicsAndSkillsDashboard(
       'Test Skill 1'
     );
+    await curriculumAdmin.goto(pageURL);
+    await curriculumAdmin.expectToBeOnErrorPage(404);
   });
 
   afterAll(async function () {
