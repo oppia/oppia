@@ -69,7 +69,6 @@ describe('Release Coordinator', function () {
   });
 
   it('should be able to run beam job (Success)', async function () {
-    await releaseCoordinator.navigateToBeamJobsTab();
     await releaseCoordinator.selectAndRunJob(
       'FindMathExplorationsWithRulesJob'
     );
