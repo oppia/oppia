@@ -15,7 +15,6 @@
     "assets/README.md",
     "core/templates/domain/exploration/ExplorationObjectFactorySpec.ts",
     "extensions/rich_text_components/richTextComponentsRequires.ts",
-    "core/templates/domain/exploration/StatesObjectFactorySpec.ts",
     "core/templates/domain/collection/search-explorations-backend-api.service.ts",
     "core/README.md",
     "core/templates/components/skills-mastery-list/skills-mastery-list-concept-card-modal.controller.ts",
