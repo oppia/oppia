@@ -2839,35 +2839,19 @@ export class TopicManager extends BaseUser {
       }
     }
 
-    const subtopics = await this.page.$$(subtopicTitleSelector);
-
-    for (const subtopicElement of subtopics) {
-      const subtopic = await this.page.evaluate(
-        el => el.textContent.trim(),
-        subtopicElement
-      );
-
-      if (subtopic === subtopicName) {
-        if (!shouldExist) {
-          throw new Error(
-            `Subtopic ${subtopicName} exists in topic ${topicName}, but it shouldn't.`
-          );
-        }
-        showMessage(
-          `Subtopic ${subtopicName} is ${shouldExist ? 'found' : 'not found'} in topic ${topicName}, as expected.`
+    // Check if subtopic exists or not.
+    await this.page.waitForFunction(
+      (selector: string, subtopicName: string, present: boolean) => {
+        const subtopicsElements = document.querySelectorAll(selector);
+        const subtopics = Array.from(subtopicsElements).map(
+          (el: Element) => el.textContent?.trim() || ''
         );
-        return;
-      }
-    }
-
-    if (shouldExist) {
-      throw new Error(
-        `Subtopic ${subtopicName} not found in topic ${topicName}, but it should exist.`
-      );
-    }
-
-    showMessage(
-      `Subtopic ${subtopicName} is ${shouldExist ? 'found' : 'not found'} in topic ${topicName}, as expected.`
+        return subtopics.includes(subtopicName) === present;
+      },
+      {timeout: 10000},
+      subtopicTitleSelector,
+      subtopicName,
+      shouldExist
     );
   }
 
