@@ -50,7 +50,9 @@ describe('Release Coordinator', function () {
     // Verify that the promo bar is visible.
     await releaseCoordinator.navigateToCommunityLibraryPage();
     await releaseCoordinator.expectPromoBarToBeVisible(true, 'testing');
+  });
 
+  it('should be able to disable the promo bar', async function () {
     // Disable the promo bar.
     await releaseCoordinator.navigateToReleaseCoordinatorPage();
     await releaseCoordinator.navigateToMiscTab();

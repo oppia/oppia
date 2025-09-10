@@ -118,6 +118,9 @@ export class ReleaseCoordinator extends BaseUser {
     }
   }
 
+  /**
+   * Navigates to the beam jobs tab.
+   */
   async navigateToBeamJobsTab(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.expectElementToBeVisible(mobileNavBar);
@@ -668,6 +671,8 @@ export class ReleaseCoordinator extends BaseUser {
   /**
    * Checks if the rollout percentage input is enabled or disabled.
    * @param {string} featureFlag - The name of the feature flag to expect.
+   * @param {'enabled' | 'disabled'} state - The expected state of the rollout percentage input.
+   * @param {number} value - The expected value of the rollout percentage input.
    */
   async expectRolloutPercentageInputToBe(
     featureFlag: string,
@@ -737,6 +742,7 @@ export class ReleaseCoordinator extends BaseUser {
   /**
    * Checks if the user group is present in the user groups list.
    * @param {string} groupName - The name of the user group to check.
+   * @param {boolean} present - Whether the user group is expected to be present.
    */
   async expectUserGroupToBePresent(
     groupName: string,
@@ -817,6 +823,31 @@ export class ReleaseCoordinator extends BaseUser {
       userGroupCreateErrorSelector,
       errorMessage
     );
+  }
+
+  /**
+   * Checks if the job status is as expected.
+   * @param {number} rowIndex - The 1-based index of the row to check.
+   * @param {boolean} expectedStatus - The expected status of the job.
+   */
+  async expectJobStatusToBeSuccessful(
+    rowIndex: number,
+    expectedStatus: boolean
+  ): Promise<void> {
+    const beamJobsTableSelector = '.e2e-test-beam-jobs-table';
+    const beamJobStatusSelectorPrefix = '..e2e-test-job-status-';
+    const beamJobRowSelector = `${beamJobsTableSelector} tbody tr:nth-child(${rowIndex})`;
+    const rowElement = await this.page.waitForSelector(beamJobRowSelector);
+    if (!rowElement) {
+      throw new Error('Row element not found');
+    }
+
+    const statusSelector =
+      expectedStatus === true
+        ? beamJobStatusSelectorPrefix + 'success'
+        : beamJobStatusSelectorPrefix + 'failure';
+
+    await rowElement.waitForSelector(statusSelector, {visible: true});
   }
 }
 

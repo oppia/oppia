@@ -76,8 +76,13 @@ describe('Release Coordinator', function () {
     await releaseCoordinator.waitForJobToComplete();
 
     await releaseCoordinator.viewAndCopyJobOutput();
+    // Check if the job output is as expected.
     await releaseCoordinator.expectJobOutputToBe(
       `('${explorationId}', 'Introduction', [])`
+    );
+    await this.expectJobStatusToBeSuccessful(
+      1, // First job.
+      true // Successful.
     );
   });
 

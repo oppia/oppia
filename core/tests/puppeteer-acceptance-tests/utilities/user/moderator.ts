@@ -19,7 +19,6 @@
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
-import parseLocaleAbbreviatedDatetimeString from '../../functions/date-functions';
 
 const moderatorPageUrl = testConstants.URLs.ModeratorPage;
 
@@ -221,10 +220,6 @@ export class Moderator extends BaseUser {
     const row = commitRows[commitIndex];
     const explorationElement = await row.$('td:nth-child(2) a');
 
-    await this.page.evaluate(el => {
-      console.log('[debug]: ' + el.href);
-    }, explorationElement);
-
     if (!explorationElement) {
       throw new Error('Exploration link not found');
     }
@@ -270,8 +265,12 @@ export class Moderator extends BaseUser {
     const rawTimeValue2 = await rowElements[1].evaluate(el => {
       return el.querySelector('td')?.textContent?.trim();
     });
-    const time1 = parseLocaleAbbreviatedDatetimeString(rawTimeValue1 as string);
-    const time2 = parseLocaleAbbreviatedDatetimeString(rawTimeValue2 as string);
+    const time1 = this.parseLocaleAbbreviatedDatetimeString(
+      rawTimeValue1 as string
+    );
+    const time2 = this.parseLocaleAbbreviatedDatetimeString(
+      rawTimeValue2 as string
+    );
 
     expect(time1).toBeGreaterThanOrEqual(time2);
   }
@@ -429,7 +428,6 @@ export class Moderator extends BaseUser {
   /**
    * Function to feature an activity.
    * @param {string} explorationId - The ID of the exploration to feature.
-   * @param {boolean} save - Whether to save the featured activities.
    * @param {number} activityIndex - The 0-based index of the activity to feature.
    */
   async featureActivity(
@@ -499,6 +497,8 @@ export class Moderator extends BaseUser {
     await deleteButton.click();
 
     await this.clickOn(' Save Featured Activities ');
+
+    // Check if either success or warning toast message is visible.
     (await this.isElementVisible(toastMessageSelector, true, 5000)) ||
       (await this.isElementVisible(warningToastMessageSelector, true, 5000));
   }
