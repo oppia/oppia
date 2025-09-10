@@ -2268,7 +2268,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOn(richTextAreaField);
     await this.clearAllTextFrom(richTextAreaField);
     await this.page.waitForSelector(moreThanTwoWorkedExamplesError, {
-      visible: false,
+      hidden: true,
     });
   }
 
