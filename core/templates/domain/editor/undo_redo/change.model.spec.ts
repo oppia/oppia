@@ -21,17 +21,13 @@ import {
   BackendChangeObject,
   Change,
 } from 'domain/editor/undo_redo/change.model';
-import {QuestionObjectFactory} from 'domain/question/QuestionObjectFactory';
+import {Question} from 'domain/question/question.model';
 
 describe('Change domain objects model', () => {
-  let questionObjectFactory: QuestionObjectFactory;
-
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [],
-      providers: [QuestionObjectFactory],
     });
-    questionObjectFactory = TestBed.get(QuestionObjectFactory);
   });
 
   it('should invoke no callbacks after creation', () => {
@@ -66,7 +62,7 @@ describe('Change domain objects model', () => {
       reverseFunc
     );
 
-    let fakeDomainObject = questionObjectFactory.createDefaultQuestion([]);
+    let fakeDomainObject = Question.createDefaultQuestion([]);
     changeDomainObject.applyChange(fakeDomainObject);
 
     expect(applyFunc).toHaveBeenCalledWith(
@@ -92,7 +88,7 @@ describe('Change domain objects model', () => {
       reverseFunc
     );
 
-    let fakeDomainObject = questionObjectFactory.createDefaultQuestion([]);
+    let fakeDomainObject = Question.createDefaultQuestion([]);
     changeDomainObject.reverseChange(fakeDomainObject);
 
     expect(reverseFunc).toHaveBeenCalledWith(

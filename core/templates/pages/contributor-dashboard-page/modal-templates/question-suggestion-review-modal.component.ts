@@ -23,11 +23,7 @@ import {
   Misconception,
   MisconceptionSkillMap,
 } from 'domain/skill/misconception.model';
-import {
-  Question,
-  QuestionBackendDict,
-  QuestionObjectFactory,
-} from 'domain/question/QuestionObjectFactory';
+import {Question, QuestionBackendDict} from 'domain/question/question.model';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {State} from 'domain/state/state.model';
 import {ThreadMessage} from 'domain/feedback_message/ThreadMessage.model';
@@ -150,8 +146,7 @@ export class QuestionSuggestionReviewModalComponent
     private siteAnalyticsService: SiteAnalyticsService,
     private skillBackendApiService: SkillBackendApiService,
     private suggestionModalService: SuggestionModalService,
-    private threadDataBackendApiService: ThreadDataBackendApiService,
-    private questionObjectFactory: QuestionObjectFactory
+    private threadDataBackendApiService: ThreadDataBackendApiService
   ) {
     super(ngbActiveModal);
   }
@@ -348,7 +343,7 @@ export class QuestionSuggestionReviewModalComponent
   refreshContributionState(): void {
     this.suggestion =
       this.allContributions[this.currentSuggestionId].suggestion;
-    this.question = this.questionObjectFactory.createFromBackendDict(
+    this.question = Question.createFromBackendDict(
       this.suggestion.change_cmd.question_dict
     );
     this.authorName = this.suggestion.author_name;
