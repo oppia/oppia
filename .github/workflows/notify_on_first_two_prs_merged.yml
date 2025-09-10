@@ -1,0 +1,84 @@
+name: Celebrate initial contributions
+
+on:
+  pull_request_target:
+    types: [closed]
+
+permissions: read-all
+
+jobs:
+  comment-on-merge:
+    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'develop'
+    runs-on: ubuntu-22.04
+    permissions:
+      pull-requests: write 
+    steps:
+      - name: Checkout repository so that local actions can be used
+        uses: actions/checkout@v4
+      - name: Set environment variables
+        env:
+          AUTHOR: ${{ github.event.pull_request.user.login }}
+          REPO: ${{ github.event.repository.name }}
+          OWNER: ${{ github.event.repository.owner.login }}
+        run: |
+          echo "AUTHOR=${AUTHOR}" >> $GITHUB_ENV
+          echo "REPO=${REPO}" >> $GITHUB_ENV
+          echo "OWNER=${OWNER}" >> $GITHUB_ENV
+      - name: Count merged PRs
+        id: count-prs
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          retries: 3
+          script: |
+            const author = process.env.AUTHOR;
+            const repo = process.env.REPO;
+            const owner = process.env.OWNER;
+            const { data } = await github.rest.search.issuesAndPullRequests({
+              q: `repo:${owner}/${repo} type:pr state:closed author:${author}`
+            });
+            const prCount = data.items.filter(pr => pr.pull_request.merged_at).length;
+            core.exportVariable('PR_COUNT', prCount);
+      - name: Comment on the PR
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          retries: 3
+          script: |
+            const prCount = parseInt(process.env.PR_COUNT);
+            const author = process.env.AUTHOR;
+            const mention = 'HardikGoyal2003';  // Update this if the mention needs to change
+            const prNumber = context.payload.pull_request.number;
+
+            let message;
+            if (prCount === 1) {
+              message = `✨ **Fantastic work @${author}!** Your very first PR to Oppia has been merged! 🎉🥳\n\n` +
+                `You've just taken your first step into open-source, and we couldn’t be happier to have you onboard. 🙌\n` +
+                `If you're feeling adventurous, why not dive into another issue and keep contributing? The community would love to see more from you! 🚀\n\n` +
+                `For any support, feel free to reach out to the developer onboarding lead: @${mention}. Happy coding! 👩‍💻👨‍💻`;
+            } else if (prCount === 2) {
+              message = `👏 **Well done @${author}!** Two PRs merged already! 🎉🥳\n\n` +
+                `With your second PR, you're on a roll, and your contributions are already making a difference. 🌟\n` +
+                `This means you may be eligible to join the Oppia dev team as a collaborator! 🎉 If you're interested, please fill out [this form](https://forms.gle/NxPjimCMqsSTNUgu5) and become an even more integral part of the community. 🌱\n\n` +
+                `Looking forward to seeing even more contributions from you. The developer onboarding lead: @${mention} is here if you need any help! Keep up the great work! 🚀`;
+            }
+              
+            if (prCount === 1 || prCount === 2) {
+              // GitHub rate-limits REST API requests to 15 per second (see
+              // (https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api?apiVersion=2022-11-28#about-secondary-rate-limits ).
+              // The timeout here is used to handle the case where multiple PRs
+              // are merged in a group through the merge queue, which causes
+              // this action to run simultaneously for all of them. Having a
+              // random timeout means that, in most cases, the REST API calls
+              // will happen at different times, and thus not trigger the rate
+              // limit. Note that the comment will still be posted within 60
+              // seconds of the merge.
+              setTimeout(async function() {
+                await github.rest.issues.createComment({
+                  owner: process.env.OWNER,
+                  repo: process.env.REPO,
+                  issue_number: prNumber,
+                  body: message
+                });
+              }, Math.random() * 60000)
+            }

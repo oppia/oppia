@@ -1,0 +1,47 @@
+name: Revert Wiki Changes Made Through the Web Interface
+on:
+  gollum:
+  workflow_dispatch:
+permissions: read-all
+jobs:
+  revert:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - name: Retrieve authentication token
+        id: get-token
+        # SHA1 hash of the release-v0.0.1 commit.
+        uses: oppia/get-github-app-token@8c3b19db0cdcd0f7fded7dd71e5e0429bf72df1a
+        with:
+          app_id: ${{ secrets.OPPIA_WIKI_SYNCHRONIZER_APP_ID }}
+          private_key: ${{ secrets.OPPIA_WIKI_SYNCHRONIZER_APP_PRIVATE_KEY }}
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          repository: ${{github.repository_owner}}/oppia.wiki
+          token: ${{ steps.get-token.outputs.token }}
+          fetch-depth: 0
+      - name: Add remote
+        run: git remote add source https://github.com/${{github.repository_owner}}/oppia-web-developer-docs.git
+      - name: Fetch remote
+        run: git fetch source
+      - name: Check for differences
+        id: check-diff
+        run: |
+          delimiter="$(openssl rand -hex 8)"
+          echo "diff<<$delimiter" >> "$GITHUB_OUTPUT"
+          echo $(git log source/develop..origin/master) >> "$GITHUB_OUTPUT"
+          echo "$delimiter" >> "$GITHUB_OUTPUT"
+      - name: Force-push from source
+        if: ${{ steps.check-diff.outputs.diff != '' }}
+        run: |
+          # Update our copy of the source repo in case changes have been merged
+          # to it while this workflow was running.
+          git fetch source
+          # Checkout source.
+          git checkout develop
+          # Force-push source commits to deployment repo, over-writing the
+          # changes made via the web interface and bringing the repos back in
+          # sync.
+          git push -f origin develop:master
