@@ -93,10 +93,6 @@ describe('Topic Manager', function () {
 
     // Delete the story.
     await topicManager.deleteStory('The Broken Calculator');
-    await topicManager.saveTopicDraft(
-      'Arithmetic Operations',
-      'Added and removed the story.'
-    );
     await topicManager.expectStoriesListToBeEmpty();
   });
 

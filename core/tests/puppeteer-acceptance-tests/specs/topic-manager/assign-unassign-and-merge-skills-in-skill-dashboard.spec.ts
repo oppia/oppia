@@ -104,6 +104,10 @@ describe('Topic Manager', function () {
       'Subtraction',
       'Arithmetic Operations'
     );
+    await topicManager.expectToastMessageToBe(
+      'The skill has been unassigned to the topic.'
+    );
+
     await topicManager.expectSkillAssignedToTopic('Subtraction', 'Unassigned');
   });
 

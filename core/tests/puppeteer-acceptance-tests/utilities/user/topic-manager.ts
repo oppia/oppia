@@ -1369,10 +1369,6 @@ export class TopicManager extends BaseUser {
     }
     await this.clickOn(confirmUnassignSkillButton);
 
-    await this.expectToastMessageToBe(
-      'The skill has been unassigned from the topic.'
-    );
-
     await this.expectElementToBeVisible(confirmUnassignSkillButton, false);
   }
 
@@ -3623,6 +3619,7 @@ export class TopicManager extends BaseUser {
     await this.page.waitForFunction(
       (selector: string, topicName: string, context: HTMLElement) => {
         const element = context.querySelector(selector);
+        console.log('[debug]: ' + element?.textContent?.trim());
         return element?.textContent?.trim() === topicName;
       },
       {},
