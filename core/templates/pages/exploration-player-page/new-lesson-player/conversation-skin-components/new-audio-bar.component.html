@@ -1,4 +1,4 @@
-<div class="oppia-new-audio-bar" *ngIf="isAudioBarAvailable()">
+<div class="oppia-new-audio-bar" *ngIf="isAudioBarAvailable() && isAudioAvailableInCurrentLanguageAccent()">
   <i class="fas fa-headphones desktop-mode"></i>
   <p class=" desktop-mode">Listen to this lesson in <span *ngIf="languageAccentDescriptions.length === 1">{{selectedLanguageAccentDescription}}</span></p>
 
