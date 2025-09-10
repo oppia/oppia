@@ -221,6 +221,10 @@ export class Moderator extends BaseUser {
     const row = commitRows[commitIndex];
     const explorationElement = await row.$('td:nth-child(2) a');
 
+    await this.page.evaluate(el => {
+      console.log('[debug]: ' + el.href);
+    }, explorationElement);
+
     if (!explorationElement) {
       throw new Error('Exploration link not found');
     }

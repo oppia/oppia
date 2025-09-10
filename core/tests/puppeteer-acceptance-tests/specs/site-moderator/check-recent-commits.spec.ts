@@ -66,9 +66,6 @@ describe('Site Moderator', function () {
       'Test Exploration Goal 2',
       'Algebra'
     );
-
-    await explorationEditor.playExploration(explorationId);
-    await explorationEditor.giveFeedback('It was good');
   });
 
   it('should be able verify display of recent commits table', async function () {
@@ -98,10 +95,6 @@ describe('Site Moderator', function () {
     await siteModerator.clickOnExplorationLinkInRecentCommitsTable(2);
     await siteModerator.expectToBeInExplorationEditor(explorationId);
 
-    // We are going back twice because when we click on the exploration link,
-    // we are redirected twice, first to the exploration editor, and then to
-    // the feedback tab.
-    await siteModerator.page.goBack();
     await siteModerator.page.goBack();
     await siteModerator.expectToBeInModeratorPage();
   });

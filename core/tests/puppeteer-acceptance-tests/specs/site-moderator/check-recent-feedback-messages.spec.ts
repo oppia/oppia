@@ -19,6 +19,7 @@
  * SM.MP.02 Check recent feedback messages.
  */
 
+import {showMessage} from '../../utilities/common/show-message';
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {Moderator} from '../../utilities/user/moderator';
@@ -26,7 +27,6 @@ import {Moderator} from '../../utilities/user/moderator';
 describe('Site Moderator', function () {
   let siteModerator: Moderator;
   let explorationId: string;
-  let explorationId2: string;
 
   beforeAll(async function () {
     siteModerator = await UserFactory.createNewUser(
@@ -64,7 +64,7 @@ describe('Site Moderator', function () {
       'End Exploration'
     );
     await explorationEditor.saveExplorationDraft();
-    explorationId2 = await explorationEditor.publishExplorationWithMetadata(
+    await explorationEditor.publishExplorationWithMetadata(
       'Test Exploration Title 2',
       'Test Exploration Goal 2',
       'Algebra'
@@ -80,6 +80,15 @@ describe('Site Moderator', function () {
       'moderatorPageRecentFeedbackMessagesTab',
       __dirname
     );
+    // TODO(19443): Once this issue is resolved (which was not allowing to make the feedback
+    // in mobile viewport which is required for testing the feedback messages tab),
+    // remove this part of skipping the test and make the test to run in mobile viewport as well.
+    // see: https://github.com/oppia/oppia/issues/19443
+    if (process.env.MOBILE === 'true') {
+      showMessage('Test skipped in mobile viewport');
+      return;
+    }
+
     await siteModerator.expectNumberOfFeedbackMessages(2);
     await siteModerator.expectFeedbackMessageToHaveProperties(1, [
       'timestamp',
@@ -92,6 +101,15 @@ describe('Site Moderator', function () {
   });
 
   it('should be able to click on feedback links', async function () {
+    // TODO(19443): Once this issue is resolved (which was not allowing to make the feedback
+    // in mobile viewport which is required for testing the feedback messages tab),
+    // remove this part of skipping the test and make the test to run in mobile viewport as well.
+    // see: https://github.com/oppia/oppia/issues/19443
+    if (process.env.MOBILE === 'true') {
+      showMessage('Test skipped in mobile viewport');
+      return;
+    }
+
     // Opens Feedback tab in the exploration editor.
     await siteModerator.openFeedbackTabFromLinkInExplorationId(explorationId);
     await siteModerator.expectToBeOnFeedbackTab();
