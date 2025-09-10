@@ -5,8 +5,87 @@
 */
 
 .oppia-new-audio-bar {
-  background-color: #f00;
-  height: 40px;
+  background-color: #fff8e5;
+  display: flex;
+  height: 44px;
+  padding: 10px 8px;
+  padding-right: 48px;
   position: relative;
   width: 100%;
+}
+
+.oppia-new-audio-bar i {
+  color: #c55f45;
+  font-size: 24px;
+}
+
+.oppia-new-audio-bar p {
+  color: #205d86;
+  flex-shrink: 0;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  margin-left: 8px;
+  margin-right: 8px;
+  margin-top: 4px;
+}
+
+.oppia-new-audio-bar span {
+  color: #c55f45;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.oppia-new-audio-header-select select {
+  background-color: #fff8e5;
+  border: 2px solid #205d86;
+  border-radius: 4px;
+  color: #205d86;
+  font-weight: 500;
+  height: 28px;
+  width: 89px;
+}
+
+.oppia-new-audio-header-control-buttons {
+  display: flex;
+  width: 100%;
+}
+
+.audio-new-header-control-icons i {
+  color: #205d86;
+  font-size: 15px;
+  margin-left: 12px;
+  margin-right: 12px;
+}
+
+.new-slider-section {
+  width: 100%;
+}
+
+oppia-new-audio-bar .mat-slider-horizontal {
+  height: 0;
+  min-width: 120px;
+}
+
+oppia-new-audio-bar .mat-slider {
+  padding: 0;
+}
+
+oppia-new-audio-bar .mat-slider-wrapper {
+  position: static;
+}
+
+oppia-new-audio-bar .mobile-mode {
+  display: none;
+}
+
+@media (max-width: 480px) {
+  oppia-new-audio-bar .desktop-mode {
+    display: none;
+  }
+  oppia-new-audio-bar .mobile-mode {
+    display: block;
+    margin-left: 30px;
+  }
 }

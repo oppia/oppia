@@ -23,11 +23,11 @@ import {
   ContributorCertificateResponse,
 } from './contribution-and-review-backend-api.service';
 import {SuggestionBackendDict} from 'domain/suggestion/suggestion.model';
-import {StateBackendDict} from 'domain/state/StateObjectFactory';
+import {StateBackendDict} from 'domain/state/state.model';
 import {ImagesData} from 'services/image-local-storage.service';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {ComputeGraphService} from 'services/compute-graph.service';
-import {States} from 'domain/exploration/StatesObjectFactory';
+import {States} from 'domain/exploration/states.model';
 import {
   ExplorationObjectFactory,
   Exploration,

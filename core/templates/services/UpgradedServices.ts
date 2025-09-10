@@ -154,7 +154,6 @@ import {LearnerParamsService} from 'pages/exploration-player-page/services/learn
 import {LocalStorageService} from 'services/local-storage.service';
 import {LoaderService} from 'services/loader.service';
 import {LoggerService} from 'services/contextual/logger.service';
-import {LostChangeObjectFactory} from 'domain/exploration/LostChangeObjectFactory';
 import {
   MathEquationInputRulesService,
   // eslint-disable-next-line max-len
@@ -272,7 +271,6 @@ import {
 import {StateInteractionStatsBackendApiService} from 'domain/exploration/state-interaction-stats-backend-api.service';
 import {StateInteractionStatsService} from 'services/state-interaction-stats.service';
 import {StateNameService} from 'components/state-editor/state-editor-properties-services/state-name.service';
-import {StateObjectFactory} from 'domain/state/StateObjectFactory';
 import {
   StateParamChangesService,
   // eslint-disable-next-line max-len
@@ -293,7 +291,6 @@ import {StateTopAnswersStatsBackendApiService} from 'services/state-top-answers-
 import {StateTopAnswersStatsObjectFactory} from 'domain/statistics/state-top-answers-stats-object.factory';
 import {StateTopAnswersStatsService} from 'services/state-top-answers-stats.service';
 import {StatsReportingBackendApiService} from 'domain/exploration/stats-reporting-backend-api.service';
-import {StatesObjectFactory} from 'domain/exploration/StatesObjectFactory';
 import {StoryEditorNavigationService} from 'pages/story-editor-page/services/story-editor-navigation.service';
 import {StoryViewerBackendApiService} from 'domain/story_viewer/story-viewer-backend-api.service';
 import {SubtopicViewerBackendApiService} from 'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
@@ -326,7 +323,6 @@ import {VersionTreeService} from 'pages/exploration-editor-page/history-tab/serv
 import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import {WrittenTranslationsObjectFactory} from 'domain/exploration/WrittenTranslationsObjectFactory';
 import {
   SolutionVerificationService,
   // eslint-disable-next-line max-len
@@ -335,9 +331,9 @@ import {ResponsesService} from 'pages/exploration-editor-page/editor-tab/service
 import {QuestionValidationService} from './question-validation.service';
 import {MathInteractionsService} from './math-interactions.service';
 import {EntityVoiceoversService} from './entity-voiceovers.services';
-import {VoiceoverLanguageManagementService} from './voiceover-language-management-service';
 import {AutomaticVoiceoverHighlightService} from './automatic-voiceover-highlight-service';
 import {VoiceoverPlayerService} from 'pages/exploration-player-page/services/voiceover-player.service';
+import {VoiceoverLanguageManagementService} from './voiceover-language-management-service';
 
 interface UpgradedServicesDict {
   // Type 'unknown' is used here because we don't know the exact type of
@@ -428,9 +424,6 @@ export class UpgradedServices {
     upgradedServices['LearnerParamsService'] = new LearnerParamsService();
     upgradedServices['LoaderService'] = new LoaderService();
     upgradedServices['LoggerService'] = new LoggerService();
-    upgradedServices['LostChangeObjectFactory'] = new LostChangeObjectFactory(
-      new UtilsService()
-    );
     upgradedServices['MathEquationInputRulesService'] =
       new MathEquationInputRulesService(
         upgradedServices['AlgebraicExpressionInputRulesService']
@@ -651,8 +644,6 @@ export class UpgradedServices {
     upgradedServices['WindowDimensionsService'] = new WindowDimensionsService(
       upgradedServices['WindowRef']
     );
-    upgradedServices['WrittenTranslationsObjectFactory'] =
-      new WrittenTranslationsObjectFactory();
 
     // Topological level: 2.
     upgradedServices['CsrfTokenService'] = new CsrfTokenService(
@@ -1092,20 +1083,13 @@ export class UpgradedServices {
       new InteractionAttributesExtractorService(
         upgradedServices['HtmlEscaperService']
       );
-    upgradedServices['StateObjectFactory'] = new StateObjectFactory();
 
     // Topological level: 8.
-    upgradedServices['StatesObjectFactory'] = new StatesObjectFactory(
-      upgradedServices['StateObjectFactory']
-    );
-    upgradedServices['QuestionObjectFactory'] = new QuestionObjectFactory(
-      upgradedServices['StateObjectFactory']
-    );
+    upgradedServices['QuestionObjectFactory'] = new QuestionObjectFactory();
 
     // Topological level: 9.
     upgradedServices['ExplorationObjectFactory'] = new ExplorationObjectFactory(
       upgradedServices['LoggerService'],
-      upgradedServices['StatesObjectFactory'],
       upgradedServices['UrlInterpolationService']
     );
     upgradedServices['PretestQuestionBackendApiService'] =

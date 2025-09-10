@@ -20,10 +20,7 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-import {
-  StateBackendDict,
-  StateObjectFactory,
-} from 'domain/state/StateObjectFactory';
+import {StateBackendDict, State} from 'domain/state/state.model';
 import {VersionHistoryBackendApiService} from 'pages/exploration-editor-page/services/version-history-backend-api.service';
 import {
   StateDiffData,
@@ -34,7 +31,6 @@ import {StateVersionHistoryComponent} from './state-version-history.component';
 describe('State version history component', () => {
   let component: StateVersionHistoryComponent;
   let fixture: ComponentFixture<StateVersionHistoryComponent>;
-  let stateObjectFactory: StateObjectFactory;
   let versionHistoryService: VersionHistoryService;
   let stateObject: StateBackendDict;
   let ngbModal: NgbModal;
@@ -67,7 +63,6 @@ describe('State version history component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(StateVersionHistoryComponent);
     component = fixture.componentInstance;
-    stateObjectFactory = TestBed.inject(StateObjectFactory);
     versionHistoryBackendApiService = TestBed.inject(
       VersionHistoryBackendApiService
     );
@@ -115,10 +110,7 @@ describe('State version history component', () => {
       solicit_answer_details: false,
       card_is_checkpoint: false,
     };
-    let stateData = stateObjectFactory.createFromBackendDict(
-      'State',
-      stateObject
-    );
+    let stateData = State.createFromBackendDict('State', stateObject);
     spyOn(
       versionHistoryBackendApiService,
       'fetchStateVersionHistoryAsync'
@@ -191,10 +183,7 @@ describe('State version history component', () => {
           result: Promise.reject(),
         } as NgbModalRef
       );
-      let stateData = stateObjectFactory.createFromBackendDict(
-        'State',
-        stateObject
-      );
+      let stateData = State.createFromBackendDict('State', stateObject);
       spyOn(versionHistoryService, 'getBackwardStateDiffData').and.returnValue({
         oldState: stateData,
         newState: stateData,
@@ -227,16 +216,13 @@ describe('State version history component', () => {
       }
       spyOn(versionHistoryService, 'getBackwardStateDiffData').and.returnValues(
         {
-          oldState: stateObjectFactory.createFromBackendDict(null, stateObject),
-          newState: stateObjectFactory.createFromBackendDict(null, stateObject),
+          oldState: State.createFromBackendDict(null, stateObject),
+          newState: State.createFromBackendDict(null, stateObject),
           oldVersionNumber: 3,
         } as StateDiffData,
         {
-          oldState: stateObjectFactory.createFromBackendDict(null, stateObject),
-          newState: stateObjectFactory.createFromBackendDict(
-            'State',
-            stateObject
-          ),
+          oldState: State.createFromBackendDict(null, stateObject),
+          newState: State.createFromBackendDict('State', stateObject),
           oldVersionNumber: 3,
         } as StateDiffData
       );

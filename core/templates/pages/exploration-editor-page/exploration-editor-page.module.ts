@@ -115,7 +115,6 @@ import {ExplorationFeaturesService} from 'services/exploration-features.service'
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {ExplorationInitStateNameService} from './services/exploration-init-state-name.service';
 import {ExplorationLanguageCodeService} from './services/exploration-language-code.service';
-import {ExplorationMetadataObjectFactory} from 'domain/exploration/ExplorationMetadataObjectFactory';
 import {ExplorationNextContentIdIndexService} from './services/exploration-next-content-id-index.service';
 import {ExplorationObjectiveService} from './services/exploration-objective.service';
 import {ExplorationParamChangesService} from './services/exploration-param-changes.service';
@@ -166,7 +165,6 @@ import {StateParamChangesService} from 'components/state-editor/state-editor-pro
 import {StateSolicitAnswerDetailsService} from 'components/state-editor/state-editor-properties-services/state-solicit-answer-details.service';
 import {StateSolutionService} from 'components/state-editor/state-editor-properties-services/state-solution.service';
 import {StateTutorialFirstTimeService} from './services/state-tutorial-first-time.service';
-import {StatesObjectFactory} from 'domain/exploration/StatesObjectFactory';
 import {TranslationLanguageService} from './translation-tab/services/translation-language.service';
 import {TranslationStatusService} from './translation-tab/services/translation-status.service';
 import {TranslationTabActiveModeService} from './translation-tab/services/translation-tab-active-mode.service';
@@ -339,7 +337,6 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     ExplorationHtmlFormatterService,
     ExplorationInitStateNameService,
     ExplorationLanguageCodeService,
-    ExplorationMetadataObjectFactory,
     ExplorationNextContentIdIndexService,
     ExplorationObjectiveService,
     ExplorationParamChangesService,
@@ -392,7 +389,6 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     StateSolicitAnswerDetailsService,
     StateSolutionService,
     StateTutorialFirstTimeService,
-    StatesObjectFactory,
     TranslationLanguageService,
     TranslationStatusService,
     TranslationTabActiveModeService,

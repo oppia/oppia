@@ -414,16 +414,15 @@ def get_published_blog_post_summaries_by_user_id(
         blog posts assigned to given user.
     """
     # All the blog posts which are not published and are saved as 'draft' will
-    # have 'published_on' field as 'None'. We use '!= None' to fetch the
-    # published blog posts instead of 'is not None' because it is inside
-    # query() and Google App Engine does not support 'is not None' inside
-    # query().
+    # have 'published_on' field as 'None'. We use "2000 or later" as shorthand
+    # for "not None", since checking directly for "not None" results in a
+    # query error.
     blog_post_summary_models: Sequence[blog_models.BlogPostSummaryModel] = (
         blog_models.BlogPostSummaryModel.query(
             blog_models.BlogPostSummaryModel.author_id == user_id
         ).filter(
-            blog_models.BlogPostSummaryModel.published_on # pylint: disable=singleton-comparison, inequality-with-none
-            != None
+            blog_models.BlogPostSummaryModel.published_on
+            >= datetime.datetime(2000, 1, 1)
         ).order(
             -blog_models.BlogPostSummaryModel.published_on
         ).fetch(
@@ -825,13 +824,12 @@ def get_published_blog_post_summaries(
         max_limit = size
     else:
         max_limit = feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
-    # We use '!= None' instead of 'is not None' because the it is inside
-    # query() and Google App Engine does not support 'is not None' inside
-    # query().
+    # We use "2000 or later" as shorthand for "not None", since checking
+    # directly for "not None" results in a query error.
     blog_post_summary_models: Sequence[blog_models.BlogPostSummaryModel] = (
         blog_models.BlogPostSummaryModel.query(
-            blog_models.BlogPostSummaryModel.published_on # pylint: disable=singleton-comparison, inequality-with-none
-            != None
+            blog_models.BlogPostSummaryModel.published_on
+            >= datetime.datetime(2000, 1, 1)
         ).order(
             -blog_models.BlogPostSummaryModel.published_on
         ).fetch(

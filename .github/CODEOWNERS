@@ -66,7 +66,6 @@
 /core/templates/services/question-validation.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/request-interceptor.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/UpgradedServices.ts @oppia/lace-frontend-reviewers
-/core/templates/hybrid-router-module-provider*.ts @oppia/lace-frontend-reviewers
 /core/templates/utility/hashes.ts @oppia/lace-frontend-reviewers
 /core/templates/utility/string-utility*.ts @oppia/lace-frontend-reviewers
 /proxy.conf.json @oppia/lace-frontend-reviewers
@@ -714,7 +713,6 @@
 /core/tests/ @oppia/dev-workflow-reviewers
 /assets/ @oppia/lace-frontend-reviewers
 /data/ @oppia/lace-backend-reviewers
-/core/templates/karma.module.ts @oppia/dev-workflow-reviewers
 /core/tests/webdriverio_utils/ @oppia/dev-workflow-reviewers
 /core/tests/webdriverio_desktop/ @oppia/dev-workflow-reviewers
 /core/tests/webdriverio/ @oppia/dev-workflow-reviewers
