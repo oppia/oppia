@@ -27,6 +27,7 @@ export class AddGoalsModalComponent {
   completedTopics: Set<string>;
   topics: {[topicId: string]: string} = {};
   publishedClassroomTopics: Set<string> = new Set();
+  originalCheckedTopics: Set<string>;
 
   constructor(
     public dialogRef: MatDialogRef<AddGoalsModalComponent>,
@@ -38,7 +39,9 @@ export class AddGoalsModalComponent {
       publishedClassroomTopics?: Set<string>;
     }
   ) {
-    this.checkedTopics = new Set(data.checkedTopics);
+    this.checkedTopics = new Set(data.checkedTopics || []);
+    this.originalCheckedTopics = new Set(this.checkedTopics);
+
     this.completedTopics = new Set(data.completedTopics);
     this.topics = data.topics;
     this.publishedClassroomTopics =
@@ -73,13 +76,13 @@ export class AddGoalsModalComponent {
   }
 
   onSubmit(): void {
-    if (this.checkedTopics.size > 0) {
+    if (!this.isSaveDisabled) {
       this.dialogRef.close(this.checkedTopics);
     }
   }
 
   get isSaveDisabled(): boolean {
-    return this.checkedTopics.size === 0;
+    return this.setsAreEqual(this.checkedTopics, this.originalCheckedTopics);
   }
 
   isCheckboxDisabled(topicId: string): boolean {
@@ -87,5 +90,13 @@ export class AddGoalsModalComponent {
       this.completedTopics.has(topicId) ||
       (this.checkedTopics.size >= 5 && !this.checkedTopics.has(topicId))
     );
+  }
+
+  private setsAreEqual(a: Set<string>, b: Set<string>): boolean {
+    if (a.size !== b.size) return false;
+    for (const val of a) {
+      if (!b.has(val)) return false;
+    }
+    return true;
   }
 }
