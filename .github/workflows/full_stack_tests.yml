@@ -106,7 +106,7 @@ jobs:
           VIDEO_RECORDING_IS_ENABLED=1
           xvfb-run -a --server-args="-screen 0, 1920x1080x24"
           python -m scripts.run_acceptance_tests
-          --skip-build --suite=${{ matrix.suite.name }} --prod_env ${{ matrix.mobile && '--mobile' || '' }}
+          --suite=${{ matrix.suite.name }} ${{ matrix.mobile && '--mobile' || '' }}
           | tee desktop_acceptance_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
       - name: Upload Desktop test recordings as Artifacts
         if: ${{ failure() }}
