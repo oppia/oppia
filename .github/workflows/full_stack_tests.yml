@@ -141,3 +141,25 @@ jobs:
         with:
           name: png-snapshots-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}-new
           path: core/tests/puppeteer-acceptance-tests/specs/**/*.png
+
+  # New job to collect all PNG snapshots into a single artifact
+  collect_all_screenshots:
+    name: Collect all screenshots into single artifact
+    needs: [acceptance_test_with_python_installation]
+    runs-on: ubuntu-22.04
+    if: ${{ always() }}
+    steps:      
+      - name: Download all PNG snapshot artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: png-snapshots-*-new
+          path: temp-screenshots
+          merge-multiple: true
+        continue-on-error: true
+            
+      - name: Upload all screenshots as single artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: all-png-snapshots-combined
+          path: temp-screenshots
+          if-no-files-found: warn
