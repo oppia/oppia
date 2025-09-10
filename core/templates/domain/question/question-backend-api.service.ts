@@ -21,10 +21,7 @@ import {Injectable} from '@angular/core';
 import cloneDeep from 'lodash/cloneDeep';
 
 import {QuestionDomainConstants} from 'domain/question/question-domain.constants';
-import {
-  QuestionObjectFactory,
-  QuestionBackendDict,
-} from 'domain/question/QuestionObjectFactory';
+import {Question, QuestionBackendDict} from 'domain/question/question.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {QuestionSummaryForOneSkillBackendDict} from 'domain/question/question-summary-for-one-skill-object.model';
 import {DiagnosticTestQuestionsModel} from './diagnostic-test-questions.model';
@@ -66,8 +63,7 @@ export interface SkillIdToQuestionsResponse {
 export class QuestionBackendApiService {
   constructor(
     private http: HttpClient,
-    private urlInterpolationService: UrlInterpolationService,
-    private questionObjectFactory: QuestionObjectFactory
+    private urlInterpolationService: UrlInterpolationService
   ) {}
 
   private _fetchQuestions(
@@ -274,14 +270,12 @@ export class QuestionBackendApiService {
             let skillIdToQuestionsDict: SkillIdToQuestionsResponse = {};
 
             for (let skillId in response.skill_id_to_questions_dict) {
-              const mainQuestion =
-                this.questionObjectFactory.createFromBackendDict(
-                  response.skill_id_to_questions_dict[skillId].main_question
-                );
-              const backupQuestion =
-                this.questionObjectFactory.createFromBackendDict(
-                  response.skill_id_to_questions_dict[skillId].backup_question
-                );
+              const mainQuestion = Question.createFromBackendDict(
+                response.skill_id_to_questions_dict[skillId].main_question
+              );
+              const backupQuestion = Question.createFromBackendDict(
+                response.skill_id_to_questions_dict[skillId].backup_question
+              );
 
               skillIdToQuestionsDict[skillId] =
                 new DiagnosticTestQuestionsModel(mainQuestion, backupQuestion);
