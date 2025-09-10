@@ -58,7 +58,7 @@ const cookieBannerAcceptButton =
   'button.e2e-test-oppia-cookie-banner-accept-button';
 
 /**
- * Mapping of user roles to their respective function class.ser
+ * Mapping of user roles to their respective function class.
  */
 const USER_ROLE_MAPPING = {
   [ROLES.TRANSLATION_ADMIN]: TranslationAdminFactory,

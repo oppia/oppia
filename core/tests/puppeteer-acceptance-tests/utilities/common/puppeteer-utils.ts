@@ -492,9 +492,8 @@ export class BaseUser {
   async clickOnElementAndGetNewPage(selector: string): Promise<Page> {
     const newPagePromise: Promise<Page> = new Promise<Page>(resolve =>
       this.browserObject.once('targetcreated', async target => {
-        const newPage = await target.page();
-        await newPage.bringToFront();
-        resolve(newPage);
+        const page = await target.page();
+        resolve(page);
       })
     );
     await this.clickOn(selector);

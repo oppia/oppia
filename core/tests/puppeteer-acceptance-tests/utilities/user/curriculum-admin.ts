@@ -311,6 +311,9 @@ const classroomCourseDetailsSelector =
 const classroomTopicBoxSelector = '.e2e-test-classroom-topic-box';
 const classroomTopicNameSelector = '.e2e-test-classroom-topic-name';
 const movableClassroomTileSelector = '.e2e-test-movable-classroom-tile';
+const matFormFieldSelector = 'mat-form-field';
+const topicPrerequisitesContainerSelector =
+  '.e2e-test-topic-prerquisites-container';
 
 export class CurriculumAdmin extends TopicManager {
   /**
@@ -1827,6 +1830,7 @@ export class CurriculumAdmin extends TopicManager {
    */
   async expectUnpublishTopicButtonToBeVisible(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeVisible(mobileOptionsSelector);
       await this.clickOn(mobileOptionsSelector);
       await this.clickOn(mobileSaveTopicDropdown);
       await this.page.waitForSelector(mobileNavbarDropdownOptions);
@@ -2202,6 +2206,13 @@ export class CurriculumAdmin extends TopicManager {
 
   /**
    * Function for updating a classroom.
+   * @param {string} classroomName - The name of the classroom.
+   * @param {string} teaserText - The teaser text of the classroom.
+   * @param {string} topicListIntro - The topic list intro of the classroom.
+   * @param {string} courseDetails - The course details of the classroom.
+   * @param {string} url - The URL of the classroom.
+   * @param {string} thumbnailImage - The thumbnail image of the classroom.
+   * @param {string} bannerImage - The banner image of the classroom.
    */
   async updateClassroom(
     classroomName: string,
@@ -2261,7 +2272,7 @@ export class CurriculumAdmin extends TopicManager {
     const topicBox = await this.expectClassroomToContainTopic(topicName);
 
     const prerequisiteInputElement =
-      await topicBox.waitForSelector('mat-form-field');
+      await topicBox.waitForSelector(matFormFieldSelector);
     if (!prerequisiteInputElement) {
       throw new Error('Prerequisite input element not found');
     }
@@ -2280,8 +2291,6 @@ export class CurriculumAdmin extends TopicManager {
     topicName: string,
     prerequisiteTopic: string | null
   ): Promise<void> {
-    const topicPrerequisitesContainerSelector =
-      '.e2e-test-topic-prerquisites-container';
     const topicBox = await this.expectClassroomToContainTopic(topicName);
 
     if (!prerequisiteTopic) {
@@ -2307,7 +2316,10 @@ export class CurriculumAdmin extends TopicManager {
   }
 
   /**
-   * Function for adding a topic to a classroom
+   * Function for adding a topic to a classroom.
+   * @param {string} classroomName - The name of the classroom.
+   * @param {string} topicName - The name of the topic.
+   * @param {string[]} prerequisiteTopics - The prerequisite topics of the topic.
    */
   async addTopicToClassroom(
     classroomName: string,
@@ -2874,6 +2886,7 @@ export class CurriculumAdmin extends TopicManager {
     const selector = this.isViewportAtMobileWidth()
       ? createNewSkillMobileButton
       : createNewSkillButtonInSkillDashboardSelector;
+    await this.expectElementToBeVisible(selector);
     await this.clickOn(selector);
     await this.expectModalTitleToBe('New Skill');
   }

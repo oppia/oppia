@@ -13,7 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for topic management by curriculum admin
+ * @fileoverview Acceptance test from CUJv3 Doc
+ * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
+ *
+ * CA. Create, publish, unpublish, and delete a topic and a skill.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
