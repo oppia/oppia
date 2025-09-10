@@ -153,7 +153,7 @@ describe('Release Coordinator', function () {
   it('should be able to set rollout to a user group', async function () {
     await releaseCoordinator.navigateToMiscTab();
     await releaseCoordinator.addUserGroup('group1');
-    // TODO(FILE_ISSUE): Currently, adding a user to user group is not working.
+    // TODO(#23330): Currently, adding a user to user group is not working.
     // Once fixed, add a part to add user 'anotherUser' to user group 'group1'.
     // Also, try adding the user again to the same user group. It should throw an error.
     // Also, try using an invalid username. It should throw an error.

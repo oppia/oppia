@@ -87,7 +87,8 @@ describe('Release Coordinator', function () {
   });
 
   it('should be able to handle beam job failure', async function () {
-    // TODO: Create a dummy job that always fails, or create an issue for the same.
+    // TODO(#23331): Once we have a dummy job that always fails,
+    // add steps to run the dummy
   });
 
   afterAll(async function () {
