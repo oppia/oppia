@@ -61,7 +61,7 @@ import {TopicViewerDomainConstants} from 'domain/topic_viewer/topic-viewer-domai
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {StoryViewerBackendApiService} from 'domain/story_viewer/story-viewer-backend-api.service';
-import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
+import {StateObjectsBackendDict} from 'domain/exploration/states.model';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {CheckpointProgressService} from './checkpoint-progress.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
