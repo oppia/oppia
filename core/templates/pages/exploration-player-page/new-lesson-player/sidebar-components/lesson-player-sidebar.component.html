@@ -41,7 +41,7 @@
           {{ 'I18N_LESSON_PLAYER_FEEDBACK_BUTTON' | translate }}
         </span>
       </button>
-      <button class="player-sidebar-button" (click)="showFlagExplorationModal()" aria-label="Report content">
+      <button class="player-sidebar-button" *ngIf="isUserLoggedIn()" (click)="showFlagExplorationModal()" aria-label="Report content">
         <i *ngIf="!sidebarIsExpanded" class="fa fa-lg fa-flag"></i>
         <span *ngIf="sidebarIsExpanded">
           <i class="fa fa-lg fa-flag"></i>

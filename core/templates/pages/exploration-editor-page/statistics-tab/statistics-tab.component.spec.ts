@@ -27,10 +27,7 @@ import {
   StateInteractionStats,
   StateInteractionStatsService,
 } from 'services/state-interaction-stats.service';
-import {
-  States,
-  StatesObjectFactory,
-} from 'domain/exploration/StatesObjectFactory';
+import {States} from 'domain/exploration/states.model';
 import {AlertsService} from 'services/alerts.service';
 import {ComputeGraphService} from 'services/compute-graph.service';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
@@ -56,7 +53,6 @@ describe('Statistics Tab Component', () => {
   let explorationStatsService: ExplorationStatsService;
   let readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService;
   let stateInteractionStatsService: StateInteractionStatsService;
-  let statesObjectFactory: StatesObjectFactory;
   let refreshStatisticsTabEventEmitter = new EventEmitter();
 
   class MockRouterService {
@@ -96,7 +92,6 @@ describe('Statistics Tab Component', () => {
     readOnlyExplorationBackendApiService = TestBed.inject(
       ReadOnlyExplorationBackendApiService
     );
-    statesObjectFactory = TestBed.inject(StatesObjectFactory);
     computeGraphService = TestBed.inject(ComputeGraphService);
 
     // This throws "Argument of type 'null' is not assignable to
@@ -105,7 +100,7 @@ describe('Statistics Tab Component', () => {
     // error because the state with name 'Introduction' is not
     // present in the states object.
     // @ts-ignore
-    spyOn(statesObjectFactory, 'createFromBackendDict').and.returnValue(null);
+    spyOn(States, 'createFromBackendDict').and.returnValue(null);
 
     let explorationDict = {
       states: {

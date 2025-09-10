@@ -291,7 +291,6 @@ import {StateTopAnswersStatsBackendApiService} from 'services/state-top-answers-
 import {StateTopAnswersStatsObjectFactory} from 'domain/statistics/state-top-answers-stats-object.factory';
 import {StateTopAnswersStatsService} from 'services/state-top-answers-stats.service';
 import {StatsReportingBackendApiService} from 'domain/exploration/stats-reporting-backend-api.service';
-import {StatesObjectFactory} from 'domain/exploration/StatesObjectFactory';
 import {StoryEditorNavigationService} from 'pages/story-editor-page/services/story-editor-navigation.service';
 import {StoryViewerBackendApiService} from 'domain/story_viewer/story-viewer-backend-api.service';
 import {SubtopicViewerBackendApiService} from 'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
@@ -1086,13 +1085,11 @@ export class UpgradedServices {
       );
 
     // Topological level: 8.
-    upgradedServices['StatesObjectFactory'] = new StatesObjectFactory();
     upgradedServices['QuestionObjectFactory'] = new QuestionObjectFactory();
 
     // Topological level: 9.
     upgradedServices['ExplorationObjectFactory'] = new ExplorationObjectFactory(
       upgradedServices['LoggerService'],
-      upgradedServices['StatesObjectFactory'],
       upgradedServices['UrlInterpolationService']
     );
     upgradedServices['PretestQuestionBackendApiService'] =

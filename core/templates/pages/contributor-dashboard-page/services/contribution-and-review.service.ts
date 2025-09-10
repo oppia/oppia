@@ -27,7 +27,7 @@ import {StateBackendDict} from 'domain/state/state.model';
 import {ImagesData} from 'services/image-local-storage.service';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {ComputeGraphService} from 'services/compute-graph.service';
-import {States} from 'domain/exploration/StatesObjectFactory';
+import {States} from 'domain/exploration/states.model';
 import {
   ExplorationObjectFactory,
   Exploration,
