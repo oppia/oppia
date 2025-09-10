@@ -32,7 +32,6 @@ scripts/
 stubs/
 third_party/python_libs/
 typings/
-webpack_bundles/
 # Some third_party static scripts are directly imported, namely: jquery,
 # jqueryui, angularjs, jqueryui-touch-punch, MathJax, code-mirror,
 # ui-codemirror, d3js, midi-js, ui-map, guppy, skulpt, math-expressions.
