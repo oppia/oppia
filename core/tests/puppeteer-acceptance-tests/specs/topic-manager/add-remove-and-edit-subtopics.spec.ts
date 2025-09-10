@@ -102,6 +102,7 @@ describe('Topic Manager', function () {
       'Subtraction',
       'Arithmetic Operations'
     );
+    await topicManager.saveTopicDraft('Arithmetic Operations', 'Updated topic');
     await topicManager.openTopicEditor('Arithmetic Operations');
     await topicManager.verifySubtopicPresenceInTopic('Addition');
     await topicManager.verifySubtopicPresenceInTopic(

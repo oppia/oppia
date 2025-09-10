@@ -425,6 +425,7 @@ const responseInputSelector = '.e2e-test-answer-tab';
 const answerInputSelector = '.e2e-test-answer-description-fragment input';
 const saveAnswerButtonInResponseGroupSelector = '.e2e-test-save-answer';
 const activeRuleTabClass = 'oppia-rule-tab-active';
+const addElementLabel = 'Add element';
 
 export enum INTERACTION_TYPES {
   ALGEBRAIC_EXPRESSION = 'Algebric Expression Input',
@@ -1778,7 +1779,10 @@ export class ExplorationEditor extends BaseUser {
         );
         break;
       case INTERACTION_TYPES.TEXT_INPUT:
-        await this.clickOn(addResponseOptionButton);
+        await this.page.waitForXPath(
+          `//*[normalize-space(text())="${addElementLabel}"]`
+        );
+        await this.clickOn(addElementLabel);
         await this.page.waitForSelector(textInputInteractionOption);
         await this.page.type(textInputInteractionOption, answer);
         break;
