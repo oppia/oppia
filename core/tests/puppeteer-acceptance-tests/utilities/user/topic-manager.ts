@@ -2845,6 +2845,7 @@ export class TopicManager extends BaseUser {
         const subtopics = Array.from(subtopicsElements).map(
           (el: Element) => el.textContent?.trim() || ''
         );
+        console.log('[debug]: ' + subtopics.join(', '));
         return subtopics.includes(subtopicName) === present;
       },
       {timeout: 10000},
