@@ -19,7 +19,7 @@
 import {Component, OnInit} from '@angular/core';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
-import {QuestionObjectFactory} from 'domain/question/QuestionObjectFactory';
+import {Question} from 'domain/question/question.model';
 import {QuestionUndoRedoService} from 'domain/editor/undo_redo/question-undo-redo.service';
 import {Skill} from 'domain/skill/skill.model.ts';
 import {SkillOpportunity} from 'domain/opportunity/skill-opportunity.model';
@@ -62,7 +62,6 @@ export class QuestionOpportunitiesComponent implements OnInit {
     private pageContextService: PageContextService,
     private contributionOpportunitiesService: ContributionOpportunitiesService,
     private ngbModal: NgbModal,
-    private questionObjectFactory: QuestionObjectFactory,
     private questionUndoRedoService: QuestionUndoRedoService,
     private siteAnalyticsService: SiteAnalyticsService,
     private userService: UserService
@@ -100,9 +99,7 @@ export class QuestionOpportunitiesComponent implements OnInit {
 
   createQuestion(skill: Skill, skillDifficulty: number): void {
     const skillId = skill.getId();
-    const question = this.questionObjectFactory.createDefaultQuestion([
-      skillId,
-    ]);
+    const question = Question.createDefaultQuestion([skillId]);
     const questionId = question.getId();
     const questionStateData = question.getStateData();
     this.questionUndoRedoService.clearChanges();
