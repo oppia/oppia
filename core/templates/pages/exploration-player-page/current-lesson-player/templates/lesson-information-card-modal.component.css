@@ -194,8 +194,8 @@
 }
 
 .oppia-lesson-info-card .row-item {
-  flex-grow: 1;
   flex: 0 0 auto;
+  flex-grow: 1;
   max-width: none;
   padding-left: 0;
   padding-right: 0;

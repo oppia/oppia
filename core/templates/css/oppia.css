@@ -2827,8 +2827,8 @@ mat-card.preview-conversation-skin-supplemental-card {
 
 .oppia-modal-lesson-information-card .modal-dialog .modal-content {
   border-radius: 4px;
-  min-width: 270px;
   height: 600px;
+  min-width: 270px;
   overflow-y: scroll;
 }
 
