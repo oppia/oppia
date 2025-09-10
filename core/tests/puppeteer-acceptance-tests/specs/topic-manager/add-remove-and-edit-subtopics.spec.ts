@@ -132,7 +132,7 @@ describe('Topic Manager', function () {
       'Arithmetic Operations'
     );
     await topicManager.expectSubtopicPreviewToHave(
-      'Intro to addition and Subtraction',
+      'Intro to Addition and Subtraction',
       'This is introduction to Addition and Subtraction.'
     );
   });

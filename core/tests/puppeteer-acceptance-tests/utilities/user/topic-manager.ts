@@ -620,7 +620,6 @@ export class TopicManager extends BaseUser {
       await this.page.keyboard.press('Tab');
       const closeToastMessageButton = 'button.e2e-test-close-toast-warning';
       await this.clickOn(closeToastMessageButton);
-      await this.clickOn(closeToastMessageButton);
     }
     await this.clearAllTextFrom(updateTopicWebFragmentField);
     await this.type(updateTopicWebFragmentField, titleFragments);
