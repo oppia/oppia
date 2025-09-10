@@ -211,7 +211,6 @@ jobs:
           python -m scripts.run_acceptance_tests
           --skip-build --suite=${{ matrix.suite.name }} --prod_env --server_log_level=info
           | tee desktop_acceptance_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
-        timeout-minutes: 30
       - name: Uploading Desktop test recordings as Artifacts
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
@@ -248,7 +247,6 @@ jobs:
           python -m scripts.run_acceptance_tests
           --skip-build --suite=${{ matrix.suite.name }} --prod_env --server_log_level=info
           | tee desktop_acceptance_test_retry_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
-        timeout-minutes: 30
       - name: Upload desktop acceptance retry test logs
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
@@ -276,7 +274,6 @@ jobs:
           python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite.name }}
           --prod_env --mobile --server_log_level=info
           | tee mobile_acceptance_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
-        timeout-minutes: 30
       - name: Upload mobile acceptance test logs
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
@@ -300,7 +297,6 @@ jobs:
           python -m scripts.run_acceptance_tests --skip-build
           --suite=${{ matrix.suite.name }} --prod_env --mobile --server_log_level=info
           | tee mobile_acceptance_test_retry_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
-        timeout-minutes: 30
       - name: Upload mobile acceptance test logs
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
