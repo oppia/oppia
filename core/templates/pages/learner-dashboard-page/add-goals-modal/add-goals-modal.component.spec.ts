@@ -232,4 +232,23 @@ describe('AddGoalsModalComponent', () => {
     expect(component.checkedTopics.has('t4')).toBeTrue();
     expect(component.checkedTopics.has('t5')).toBeTrue();
   });
+  describe('setsAreEqual', () => {
+    it('should return true for equal sets', () => {
+      const a = new Set(['1', '2']);
+      const b = new Set(['1', '2']);
+      expect(component.setsAreEqual(a, b)).toBeTrue();
+    });
+
+    it('should return false when sets have different sizes', () => {
+      const a = new Set(['1', '2']);
+      const b = new Set(['1']);
+      expect(component.setsAreEqual(a, b)).toBeFalse();
+    });
+
+    it('should return false when sets have same size but different elements', () => {
+      const a = new Set(['1', '2']);
+      const b = new Set(['2', '3']);
+      expect(component.setsAreEqual(a, b)).toBeFalse();
+    });
+  });
 });

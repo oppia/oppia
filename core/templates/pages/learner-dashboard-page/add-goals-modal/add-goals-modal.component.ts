@@ -92,7 +92,7 @@ export class AddGoalsModalComponent {
     );
   }
 
-  private setsAreEqual(a: Set<string>, b: Set<string>): boolean {
+  setsAreEqual(a: Set<string>, b: Set<string>): boolean {
     if (a.size !== b.size) {
       return false;
     }
