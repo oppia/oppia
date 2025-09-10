@@ -18,10 +18,7 @@
 
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
-import {
-  QuestionBackendDict,
-  QuestionObjectFactory,
-} from 'domain/question/QuestionObjectFactory';
+import {QuestionBackendDict, Question} from 'domain/question/question.model';
 import {Skill} from 'domain/skill/skill.model.ts';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {ExplorationPlayerConstants} from 'pages/exploration-player-page/current-lesson-player/exploration-player-page.constants';
@@ -47,7 +44,6 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
     private currentInteractionService: CurrentInteractionService,
     private conversationFlowService: ConversationFlowService,
     private questionPlayerEngineService: QuestionPlayerEngineService,
-    private questionObjectFactory: QuestionObjectFactory,
     private windowDimensionsService: WindowDimensionsService
   ) {}
 
@@ -168,11 +164,7 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
     this.questionPlayerEngineService.clearQuestions();
     this.displayCardIsInitialized = false;
     this.questionPlayerEngineService.init(
-      [
-        this.questionObjectFactory.createFromBackendDict(
-          this.displayedQuestions[index]
-        ),
-      ],
+      [Question.createFromBackendDict(this.displayedQuestions[index])],
       this.initializeQuestionCard.bind(this),
       () => {}
     );

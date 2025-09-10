@@ -33,7 +33,7 @@ import {
   SkillLinkageModificationsArray,
 } from 'domain/question/editable-question-backend-api.service';
 import {QuestionSummary} from 'domain/question/question-summary-object.model';
-import {QuestionObjectFactory} from 'domain/question/QuestionObjectFactory';
+import {Question} from 'domain/question/question.model';
 import {Misconception} from 'domain/skill/misconception.model';
 import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
@@ -84,7 +84,6 @@ describe('Questions List Component', () => {
   let skillBackendApiService: SkillBackendApiService;
   let alertsService: AlertsService;
   let loggerService: LoggerService;
-  let questionObjectFactory: QuestionObjectFactory;
   let editableQuestionBackendApiService: EditableQuestionBackendApiService;
   let questionUndoRedoService: QuestionUndoRedoService;
   let pageContextService: PageContextService;
@@ -107,7 +106,6 @@ describe('Questions List Component', () => {
         SkillEditorRoutingService,
         SkillBackendApiService,
         AlertsService,
-        QuestionObjectFactory,
         EditableQuestionBackendApiService,
         QuestionUndoRedoService,
         {
@@ -132,7 +130,6 @@ describe('Questions List Component', () => {
     skillEditorRoutingService = TestBed.inject(SkillEditorRoutingService);
     skillBackendApiService = TestBed.inject(SkillBackendApiService);
     alertsService = TestBed.inject(AlertsService);
-    questionObjectFactory = TestBed.inject(QuestionObjectFactory);
     editableQuestionBackendApiService = TestBed.inject(
       EditableQuestionBackendApiService
     );
@@ -141,7 +138,7 @@ describe('Questions List Component', () => {
     pageContextService = TestBed.inject(PageContextService);
     questionValidationService = TestBed.inject(QuestionValidationService);
 
-    question = questionObjectFactory.createFromBackendDict({
+    question = Question.createFromBackendDict({
       id: '1',
       question_state_data: {
         content: {
