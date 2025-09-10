@@ -91,6 +91,37 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
     return steps;
   }
 
+  // Getters for backward compatibility with tests.
+  get joyRideSteps(): string[] {
+    const steps = [
+      'editorTabTourContainer',
+      'editorTabTourContentEditorTab',
+      'editorTabTourSlideStateInteractionEditorTab',
+      'editorTabTourStateResponsesTab',
+      'editorTabTourPreviewTab',
+    ];
+    if (this.canEditExploration) {
+      steps.push('editorTabTourSaveDraft');
+    }
+    steps.push('editorTabTourTutorialComplete');
+    return steps;
+  }
+
+  get mobileJoyRideSteps(): string[] {
+    const steps = [
+      'editorTabTourContainer',
+      'editorTabTourContentEditorTab',
+      'editorTabTourSlideStateInteractionEditorTab',
+      'editorTabTourStateResponsesTab',
+      'editorTabTourMobilePreview',
+    ];
+    if (this.canEditExploration) {
+      steps.push('editorTabTourMobileSaveDraft');
+    }
+    steps.push('editorTabTourTutorialComplete');
+    return steps;
+  }
+
   constructor(
     private editabilityService: EditabilityService,
     private explorationNextContentIdIndexService: ExplorationNextContentIdIndexService,
