@@ -19,7 +19,7 @@ import {
   EntityTranslation,
   EntityTranslationBackendDict,
 } from './entity-translation.model';
-import {TranslatedContent} from 'domain/exploration/translated-content';
+import {TranslatedContent} from 'domain/exploration/translated-content.model';
 
 describe('EntityTranslation', () => {
   let entityTranslationBackendDict: EntityTranslationBackendDict;
