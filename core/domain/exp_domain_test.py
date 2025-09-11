@@ -4405,7 +4405,6 @@ title: Title
         exploration = exp_domain.Exploration.create_default_exploration(
           'exp_id')
         init_state = exploration.states[exploration.init_state_name]
-        # The default content_id for the main card is usually 'content_0'
         content_id = init_state.content.content_id
         content_value = init_state.content.html
 

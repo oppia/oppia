@@ -2523,7 +2523,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             content_id: str. The content_id to search for.
 
         Returns:
-            str|List[str]|None. The content (HTML or unicode) if found, else None.
+            str|List[str]|None. The content if found, else None.
         """
         for state in self.states.values():
             contents_collection = state.get_translatable_contents_collection()
