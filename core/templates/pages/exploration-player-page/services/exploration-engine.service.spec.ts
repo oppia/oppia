@@ -23,10 +23,10 @@ import {MockTranslateService} from 'components/forms/schema-based-editors/integr
 import {AnswerClassificationResult} from 'domain/classifier/answer-classification-result.model';
 import {Interaction} from 'domain/exploration/interaction.model';
 import {
+  Exploration,
   ExplorationBackendDict,
-  ExplorationObjectFactory,
-} from 'domain/exploration/ExplorationObjectFactory';
-import {Outcome} from 'domain/exploration/outcome.model';
+} from '../../../domain/exploration/exploration.model';
+import {Outcome} from '../../../domain/exploration/outcome.model';
 import {
   ParamChangeBackendDict,
   ParamChange,
@@ -70,7 +70,6 @@ describe('Exploration engine service ', () => {
   let contentTranslationLanguageService: ContentTranslationLanguageService;
   let expressionInterpolationService: ExpressionInterpolationService;
   let explorationEngineService: ExplorationEngineService;
-  let explorationObjectFactory: ExplorationObjectFactory;
   let imagePreloaderService: ImagePreloaderService;
   let learnerParamsService: LearnerParamsService;
   let mockPlatformFeatureService = new MockPlatformFeatureService();
@@ -394,7 +393,6 @@ describe('Exploration engine service ', () => {
     );
     imagePreloaderService = TestBed.inject(ImagePreloaderService);
     learnerParamsService = TestBed.inject(LearnerParamsService);
-    explorationObjectFactory = TestBed.inject(ExplorationObjectFactory);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
     readOnlyExplorationBackendApiService = TestBed.inject(
       ReadOnlyExplorationBackendApiService
@@ -534,7 +532,7 @@ describe('Exploration engine service ', () => {
       getInitialState: () => ({name: null}),
     };
 
-    spyOn(explorationObjectFactory, 'createFromBackendDict').and.returnValue(
+    spyOn(Exploration, 'createFromBackendDict').and.returnValue(
       mockExploration
     );
 

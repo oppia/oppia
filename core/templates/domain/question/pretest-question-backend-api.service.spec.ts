@@ -23,15 +23,11 @@ import {
 import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
 import {PretestQuestionBackendApiService} from 'domain/question/pretest-question-backend-api.service';
-import {
-  QuestionBackendDict,
-  QuestionObjectFactory,
-} from 'domain/question/QuestionObjectFactory';
+import {QuestionBackendDict, Question} from 'domain/question/question.model';
 
 describe('Pretest question backend API service', function () {
   let pretestQuestionBackendApiService: PretestQuestionBackendApiService;
   let httpTestingController: HttpTestingController;
-  let questionObjectFactory: QuestionObjectFactory;
 
   var ERROR_STATUS_CODE = 500;
 
@@ -163,11 +159,10 @@ describe('Pretest question backend API service', function () {
       PretestQuestionBackendApiService
     );
     httpTestingController = TestBed.inject(HttpTestingController);
-    questionObjectFactory = TestBed.inject(QuestionObjectFactory);
 
     sampleDataResultsObjects = {
       pretest_question_objects: [
-        questionObjectFactory.createFromBackendDict(
+        Question.createFromBackendDict(
           responseDictionaries.pretest_question_dicts[0] as QuestionBackendDict
         ),
       ],
