@@ -120,3 +120,9 @@ jobs:
         with:
           name: png-snapshots-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}-new
           path: core/tests/puppeteer-acceptance-tests/specs/**/*.png
+      - name: Upload mobile test failure screenshots as artifacts
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-acceptance-test-failure-screenshot-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
+          path: /home/runner/work/oppia/oppia_full_stack_test_failure_screenshots/acceptance
