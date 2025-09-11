@@ -19,7 +19,7 @@
 
 import {Injectable} from '@angular/core';
 
-import {States} from 'domain/exploration/StatesObjectFactory';
+import {States} from 'domain/exploration/states.model';
 
 export interface GraphLink {
   source: string;
