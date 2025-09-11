@@ -255,6 +255,7 @@ const mobileSubtopicContainerSelector = '.e2e-test-mobile-subtopic-content';
 const addSkillButton = 'button.e2e-test-add-skill-button';
 const skillNameInput = '.e2e-test-skill-name-input';
 const skillItem = '.e2e-test-skills-list-item';
+const skillSelectionItemSelector = '.e2e-test-skill-selection-item';
 const confirmSkillButton = '.e2e-test-confirm-skill-selection-button';
 const deleteSkillButton = 'i.skill-delete-button';
 const mobileToggleSkillCard = '.e2e-test-toggle-skill-card';
@@ -335,6 +336,9 @@ const skillSelectionModalSelector = '.e2e-test-skill-container';
 const saveSubtopicExplanationButtonSelector =
   '.e2e-test-save-subtopic-content-button';
 const noSkillsPresentMessageSelector = '.e2e-test-no-skills-present-message';
+const expandStoryHeaderSelector =
+  '.e2e-test-mobile-stories-collapsible-card-header';
+const addNewStoryButtonSelector = '.e2e-test-create-story-button';
 
 const ADD_PREREQUISITE_SKILL_BUTTON_LABEL = '+ ADD PREREQUISITE SKILL';
 
@@ -1502,7 +1506,9 @@ export class TopicManager extends BaseUser {
   ): Promise<ElementHandle | null> {
     await this.waitForPageToFullyLoad();
     await this.expectElementToBeVisible(skillSelectionModalSelector);
-    const skillVisible = await this.isElementVisible(skillItem);
+    const skillVisible = await this.isElementVisible(
+      skillSelectionItemSelector
+    );
     if (!skillVisible) {
       if (visible) {
         throw new Error(
@@ -1516,7 +1522,7 @@ export class TopicManager extends BaseUser {
       }
     }
 
-    const skillElements = await this.page.$$(skillItem);
+    const skillElements = await this.page.$$(skillSelectionItemSelector);
     for (const skillElement of skillElements) {
       const foundSkillName = await this.page.evaluate(
         (skillElement: Element) => skillElement.textContent?.trim(),
@@ -2683,10 +2689,13 @@ export class TopicManager extends BaseUser {
       await this.openTopicEditor(topicName);
     }
 
-    await this.page.waitForSelector(subtopicReassignHeader);
-    let elementToClick = await this.page.$(subtopicReassignHeader);
-    if (this.isViewportAtMobileWidth() && elementToClick) {
-      await elementToClick.click();
+    // Expand subtopic list if it is not expanded.
+    if (
+      this.isViewportAtMobileWidth() &&
+      !(await this.isElementVisible(mobileSubtopicContainerSelector))
+    ) {
+      await this.expectElementToBeVisible(subtopicExpandHeaderSelector);
+      await this.clickOn(subtopicExpandHeaderSelector);
     }
 
     try {
@@ -3585,12 +3594,36 @@ export class TopicManager extends BaseUser {
   async expectSaveChangesButtonInTopicEditorToBe(
     status: 'enabled' | 'disabled'
   ): Promise<void> {
-    await this.expectElementToBeVisible(saveTopicButton);
-    const buttonIsEnabled = await this.page.$eval(
-      saveTopicButton,
-      el => !(el as HTMLButtonElement).disabled
-    );
-    expect(buttonIsEnabled).toBe(status === 'enabled');
+    if (this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeVisible(mobileOptionsSelector);
+      await this.clickOn(mobileOptionsSelector);
+      await this.page.waitForFunction(
+        (selector: string, enabled: boolean) => {
+          const element = document.querySelector(selector);
+          return (
+            // Check if the element value is 'Save Changes'. If it is, then
+            // there are no changes to be saved and we treat it as disabled.
+            !(element?.textContent?.trim() === 'Save Changes') === enabled
+          );
+        },
+        {},
+        discardChangesInMobileNavSelector,
+        status === 'enabled'
+      );
+      await this.clickOn(mobileOptionsSelector);
+
+      await this.expectElementToBeVisible(
+        discardChangesInMobileNavSelector,
+        false
+      );
+    } else {
+      await this.expectElementToBeVisible(saveTopicButton);
+      const buttonIsEnabled = await this.page.$eval(
+        saveTopicButton,
+        el => !(el as HTMLButtonElement).disabled
+      );
+      expect(buttonIsEnabled).toBe(status === 'enabled');
+    }
   }
 
   /**
@@ -3807,6 +3840,14 @@ export class TopicManager extends BaseUser {
     story: string,
     visible: boolean = true
   ): Promise<ElementHandle<Element> | null> {
+    // Expand stories view in mobile.
+    if (
+      this.isViewportAtMobileWidth() &&
+      !(await this.isElementVisible(addNewStoryButtonSelector))
+    ) {
+      await this.clickOn(expandStoryHeaderSelector);
+    }
+
     const storyListVisible = await this.isElementVisible(storyRowSelector);
     if (!storyListVisible) {
       // If we expected the stories list to be visible, but it was not, then
