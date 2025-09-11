@@ -251,6 +251,7 @@ const chapterPreviewContainerSelector = '.e2e-test-thumbnail-container';
 const multiSelectionInputChipSelector = '.e2e-test-multi-selection-chip';
 
 const subtopicExpandHeaderSelector = '.e2e-test-show-subtopics-list';
+const mobileSubtopicContainerSelector = '.e2e-test-mobile-subtopic-content';
 const addSkillButton = 'button.e2e-test-add-skill-button';
 const skillNameInput = '.e2e-test-skill-name-input';
 const skillItem = '.e2e-test-skills-list-item';
@@ -782,7 +783,6 @@ export class TopicManager extends BaseUser {
       await this.page.waitForSelector(topicEditorSaveModelSelector, {
         hidden: true,
       });
-      await this.openTopicEditor(topicName);
     } else {
       await this.clickOn(saveTopicButton);
       if (description) {
@@ -2843,6 +2843,15 @@ export class TopicManager extends BaseUser {
       }
     }
 
+    // Expand subtopic list if it is not expanded.
+    if (
+      this.isViewportAtMobileWidth() &&
+      !(await this.isElementVisible(mobileSubtopicContainerSelector))
+    ) {
+      await this.expectElementToBeVisible(subtopicExpandHeaderSelector);
+      await this.clickOn(subtopicExpandHeaderSelector);
+    }
+
     // Check if subtopic exists or not.
     await this.page.waitForFunction(
       (selector: string, subtopicName: string, present: boolean) => {
@@ -3651,12 +3660,6 @@ export class TopicManager extends BaseUser {
     const skillDescriptionSelector = this.isViewportAtMobileWidth()
       ? mobileSkillDescriptionSelector
       : desktopSkillDescriptionSelector;
-
-    const skillContainer = await this.getSkillElementFromSelection(skillName);
-
-    if (!skillContainer) {
-      throw new Error(`Skill ${skillName} not found in topic.`);
-    }
 
     await this.page.waitForFunction(
       (

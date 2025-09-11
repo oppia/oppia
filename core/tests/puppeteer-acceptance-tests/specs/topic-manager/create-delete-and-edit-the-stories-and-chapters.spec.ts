@@ -186,7 +186,7 @@ describe('Topic Manager', function () {
       'New Title',
       'New Description',
       'New Meta Tag',
-      'new-url-fragment'
+      testConstants.data.curriculumAdminThumbnailImage
     );
     await topicManager.saveStoryDraft();
     await topicManager.previewChapterCard();
