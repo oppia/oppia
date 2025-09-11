@@ -656,6 +656,13 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.delete_node(self.NODE_ID_1)
         self.assertIsNone(self.story.story_contents.initial_node_id)
 
+    def test_delete_node_with_three_nodes_must_in_order(self) -> None:
+        self.story.add_node('node_3', 'Node title 3')
+        self.story.story_contents.nodes[0].exploration_id = 'exp 3'
+        self.story.update_node_destination_node_ids(self.NODE_ID_2, ['node_3'])
+        self.story.delete_node(self.NODE_ID_2)
+        self.assertEqual(self.story.story_contents.nodes[0].destination_node_ids, ['node_3'])
+
     def test_get_number_from_node_id(self) -> None:
         self.assertEqual(
             story_domain.StoryNode.get_number_from_node_id('node_10'), 10)
