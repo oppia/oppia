@@ -59,6 +59,7 @@ from core.jobs.batch_jobs import (                                   # pylint: d
     missing_translation_images_repair_jobs)
 from core.jobs.batch_jobs import user_bios_change_jobs               # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import skill_inspection_jobs               # pylint: disable=unused-import  # isort: skip
+from core.jobs.batch_jobs import dummy_jobs                          # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import populate_study_guide_models_jobs    # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import exploration_voiceover_sync_jobs    # pylint: disable=unused-import  # isort: skip
 
