@@ -27,11 +27,10 @@ import {StateBackendDict} from 'domain/state/state.model';
 import {ImagesData} from 'services/image-local-storage.service';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {ComputeGraphService} from 'services/compute-graph.service';
+import {LoggerService} from 'services/contextual/logger.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {States} from 'domain/exploration/states.model';
-import {
-  ExplorationObjectFactory,
-  Exploration,
-} from 'domain/exploration/ExplorationObjectFactory';
+import {Exploration} from 'domain/exploration/exploration.model';
 
 export interface OpportunityDict {
   skill_id: string;
@@ -87,7 +86,8 @@ export class ContributionAndReviewService {
     private contributionAndReviewBackendApiService: ContributionAndReviewBackendApiService,
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private computeGraphService: ComputeGraphService,
-    private explorationObjectFactory: ExplorationObjectFactory
+    private loggerService: LoggerService,
+    private urlInterpolationService: UrlInterpolationService
   ) {}
 
   getActiveTabType(): string {
@@ -205,8 +205,10 @@ export class ContributionAndReviewService {
       )
       .then(fetchSuggestionsResponse => {
         const exploration: Exploration =
-          this.explorationObjectFactory.createFromExplorationBackendResponse(
-            explorationBackendResponse
+          Exploration.createFromExplorationBackendResponse(
+            explorationBackendResponse,
+            this.loggerService,
+            this.urlInterpolationService
           );
         const sortedTranslationSuggestions =
           this.sortTranslationSuggestionsByState(
