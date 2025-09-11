@@ -20,7 +20,7 @@ import {AnswerStats} from 'domain/exploration/answer-stats.model';
 import {StateTopAnswersStats} from 'domain/statistics/state-top-answers-stats.model';
 
 describe('State top answers stats', () => {
-it('should create a state top answers stats object from a backend dict', () => {
+  it('should create a state top answers stats object from a backend dict', () => {
     var backendDict = {
       answers: {
         Hola: [
@@ -49,7 +49,8 @@ it('should create a state top answers stats object from a backend dict', () => {
       ),
     };
 
-    var stateTopAnswerStats = StateTopAnswersStats.createFromBackendDict(backendDict);
+    var stateTopAnswerStats =
+      StateTopAnswersStats.createFromBackendDict(backendDict);
 
     expect(stateTopAnswerStats.answers).toEqual(stateAnswers);
     expect(stateTopAnswerStats.interactionIds).toEqual(
