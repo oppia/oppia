@@ -188,8 +188,6 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                 return True
             if path == 'test-module.spec.js':
                 return True
-            if path == 'ExplorationObjectFactorySpec.ts':
-                return True
             return original_os_path_exists(path)
         os_path_exists_swap = self.swap(
             os.path, 'exists', mock_os_path_exists)
@@ -201,15 +199,13 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                         args=['--check_coverage', '--specs_to_run='
                               'home-page.component.spec.ts,'
                               'about-page.component.ts,'
-                              'test-module.js,'
-                              'ExplorationObjectFactory.ts'])
+                              'test-module.js'])
 
         cmd = [
             common.NODE_BIN_PATH, '--max-old-space-size=4096',
             os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
             'start', os.path.join('core', 'tests', 'karma.conf.ts'),
             '--specs_to_run='
-            'ExplorationObjectFactorySpec.ts,'
             'about-page.component.spec.ts,'
             'home-page.component.spec.ts,'
             'test-module.spec.js']
@@ -217,7 +213,6 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         self.assertTrue(self.frontend_coverage_checks_called)
         self.assertEqual(self.frontend_coverage_checks_args, [[
             '--files_to_check='
-            'ExplorationObjectFactorySpec.ts,'
             'about-page.component.spec.ts,'
             'home-page.component.spec.ts,'
             'test-module.spec.js'

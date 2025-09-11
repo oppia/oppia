@@ -20,7 +20,7 @@
 import {
   TranslatedContent,
   TranslatedContentBackendDict,
-} from 'domain/exploration/TranslatedContentObjectFactory';
+} from 'domain/exploration/translated-content.model';
 
 interface TranslationMappingDict {
   [contentId: string]: TranslatedContentBackendDict;

@@ -32,9 +32,9 @@ import {EntityTranslationsService} from 'services/entity-translations.services';
 import {
   DataFormatToDefaultValuesKey,
   TranslatedContent,
-} from 'domain/exploration/TranslatedContentObjectFactory';
+} from 'domain/exploration/translated-content.model';
 import {ChangeListService} from 'pages/exploration-editor-page/services/change-list.service';
-import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
+import {EntityTranslation} from 'domain/translation/entity-translation.model';
 import {PageContextService} from 'services/page-context.service';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 

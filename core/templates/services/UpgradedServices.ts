@@ -286,7 +286,6 @@ import {
   // eslint-disable-next-line max-len
 } from 'components/state-editor/state-editor-properties-services/state-solution.service';
 import {StateTopAnswersStatsBackendApiService} from 'services/state-top-answers-stats-backend-api.service';
-import {StateTopAnswersStatsObjectFactory} from 'domain/statistics/state-top-answers-stats-object.factory';
 import {StateTopAnswersStatsService} from 'services/state-top-answers-stats.service';
 import {StatsReportingBackendApiService} from 'domain/exploration/stats-reporting-backend-api.service';
 import {StoryEditorNavigationService} from 'pages/story-editor-page/services/story-editor-navigation.service';
@@ -617,8 +616,6 @@ export class UpgradedServices {
         upgradedServices['HttpClient'],
         upgradedServices['ImageLocalStorageService']
       );
-    upgradedServices['StateTopAnswersStatsObjectFactory'] =
-      new StateTopAnswersStatsObjectFactory();
     upgradedServices['SpeechSynthesisChunkerService'] =
       new SpeechSynthesisChunkerService(upgradedServices['HtmlEscaperService']);
     upgradedServices['SchemaDefaultValueService'] =
@@ -945,7 +942,6 @@ export class UpgradedServices {
     upgradedServices['StateTopAnswersStatsBackendApiService'] =
       new StateTopAnswersStatsBackendApiService(
         upgradedServices['HttpClient'],
-        upgradedServices['StateTopAnswersStatsObjectFactory'],
         upgradedServices['UrlInterpolationService']
       );
     upgradedServices['StatsReportingBackendApiService'] =
