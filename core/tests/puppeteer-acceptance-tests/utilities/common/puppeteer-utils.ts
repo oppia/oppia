@@ -433,7 +433,13 @@ export class BaseUser {
         ? await this.page.waitForSelector(selector)
         : selector;
     try {
-      await this.page.waitForFunction(isElementClickable, {}, element);
+      await this.page.waitForFunction(
+        isElementClickable,
+        {},
+        element,
+        true,
+        true
+      );
     } catch (error) {
       if (error instanceof Error) {
         await this.page.evaluate(isElementClickable, element, true, true);

@@ -1094,7 +1094,9 @@ export class TopicManager extends BaseUser {
    */
   async navigateToTopicPreviewTab(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileOptionsSelector);
+      if (!(await this.isElementVisible(mobileNavbarDropdown))) {
+        await this.clickOn(mobileOptionsSelector);
+      }
       await this.clickOn(mobileNavbarDropdown);
       await this.clickOn(topicMobilePreviewTab);
     } else {

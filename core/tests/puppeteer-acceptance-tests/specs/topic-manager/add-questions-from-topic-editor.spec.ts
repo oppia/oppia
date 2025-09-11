@@ -157,13 +157,13 @@ describe('Topic Manager', function () {
     await topicManager.saveQuestion();
     await topicManager.expectQuestionToBeVisible('Select the correct option.');
 
-    // Text Inpit Interaction.
+    // Text Input Interaction.
     await topicManager.clickOnAddQuestionButton();
-    await topicManager.updateCardContent('Select the corrent option.');
+    await topicManager.updateCardContent('Enter text input.');
     await topicManager.addTextInputInteraction();
-    await curriculumAdmin.updateAnswersInResponseModal(
+    await topicManager.updateAnswersInResponseModal(
       INTERACTION_TYPES.TEXT_INPUT,
-      'Hello, Oppia!'
+      'Hello'
     );
     await topicManager.addResponseDetailsInResponseModal(
       'Great!',
