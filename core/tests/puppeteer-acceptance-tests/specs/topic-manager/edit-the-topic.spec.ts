@@ -124,7 +124,7 @@ describe('Topic Manager', function () {
 
     await topicManager.navigateToTabInPreview('Practice');
     await topicManager.expectTabTitleInTopicPageToBe(
-      'Master Skills for AO 101 Beta' // We are adding "Beta" is beta tag is present inside the element.
+      'BetaMaster Skills for AO 101' // We are adding "Beta" as beta tag is present inside the element.
     );
 
     await topicManager.navigateToTabInPreview('Study');

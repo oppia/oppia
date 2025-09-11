@@ -1780,9 +1780,7 @@ export class ExplorationEditor extends BaseUser {
         break;
       case INTERACTION_TYPES.TEXT_INPUT:
         try {
-          await this.page.waitForXPath(
-            `//*[normalize-space(text())="${addElementLabel}"]`
-          );
+          await this.expectElementToBeVisible(addListEntryButtonSelector);
         } catch (error) {
           await this.page.evaluate(() => {
             // Log class list of every element on the page.
@@ -1798,7 +1796,7 @@ export class ExplorationEditor extends BaseUser {
             });
           });
         }
-        await this.clickOn(addElementLabel);
+        await this.clickOn(addListEntryButtonSelector);
         await this.page.waitForSelector(textInputInteractionOption);
         await this.page.type(textInputInteractionOption, answer);
         break;
