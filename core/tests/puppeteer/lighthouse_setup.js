@@ -105,7 +105,7 @@ var topicThumbnailResetButton = '.e2e-test-thumbnail-reset-button';
 var topicMetaTagInput = '.e2e-test-topic-meta-tag-content-field';
 var saveTopicButton =
   '.e2e-test-save-topic-button .oppia-save-publish-button-label';
-var topicCommitMessageInput = '.e2e-test-commit-message-input';
+var topicCommitMessageInput = 'textarea.e2e-test-commit-message-input';
 var publishChangesButton = '.e2e-test-close-save-modal-button';
 var cookieBannerAcceptButton = '.e2e-test-oppia-cookie-banner-accept-button';
 
