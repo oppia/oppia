@@ -13,18 +13,17 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the States object factory.
+ * @fileoverview Unit tests for the States.
  */
 
 import {TestBed} from '@angular/core/testing';
 
 import {CamelCaseToHyphensPipe} from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import {State} from 'domain/state/state.model';
-import {StatesObjectFactory} from 'domain/exploration/StatesObjectFactory';
+import {States} from 'domain/exploration/states.model';
 import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 
-describe('States Object Factory', () => {
-  let ssof = null;
+describe('States', () => {
   let statesDict = null;
   let newState = null;
   let newState2 = null;
@@ -36,7 +35,6 @@ describe('States Object Factory', () => {
     TestBed.configureTestingModule({
       providers: [CamelCaseToHyphensPipe],
     });
-    ssof = TestBed.get(StatesObjectFactory);
     spyOnProperty(State, 'NEW_STATE_TEMPLATE', 'get').and.returnValue({
       classifier_model_id: null,
       content: {
@@ -378,7 +376,7 @@ describe('States Object Factory', () => {
     'should create a new state given a state name and set ' +
       'that state to a terminal state',
     () => {
-      let newStates = ssof.createFromBackendDict(statesDict);
+      let newStates = States.createFromBackendDict(statesDict);
       newStates.addState('new state', 'content_5', 'default_outcome_6');
       expect(newStates.hasState('new state')).toBe(true);
       expect(newStates.getStateNames()).toEqual(['first state', 'new state']);
@@ -395,7 +393,7 @@ describe('States Object Factory', () => {
   );
 
   it('should correctly retrieve the terminal states', () => {
-    let newStates = ssof.createFromBackendDict(statesDict);
+    let newStates = States.createFromBackendDict(statesDict);
 
     newStates.setState(
       'first state',
@@ -405,10 +403,10 @@ describe('States Object Factory', () => {
   });
 
   it('should correctly delete a state', () => {
-    let states = ssof.createFromBackendDict(stateDictToDelete);
+    let states = States.createFromBackendDict(stateDictToDelete);
     states.deleteState('first state');
     expect(states).toEqual(
-      ssof.createFromBackendDict({
+      States.createFromBackendDict({
         'second state': secondState,
       })
     );
@@ -418,11 +416,11 @@ describe('States Object Factory', () => {
     "should correctly set any states' interaction.defaultOutcomes that " +
       'point to a deleted or renamed state name',
     () => {
-      let states = ssof.createFromBackendDict(statesWithCyclicOutcomeDict);
+      let states = States.createFromBackendDict(statesWithCyclicOutcomeDict);
       states.renameState('first state', 'third state');
       states.deleteState('second state');
       expect(states).toEqual(
-        ssof.createFromBackendDict({
+        States.createFromBackendDict({
           'third state': {
             content: {
               content_id: 'content',
