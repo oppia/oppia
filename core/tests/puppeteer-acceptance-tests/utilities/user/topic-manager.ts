@@ -3666,7 +3666,7 @@ export class TopicManager extends BaseUser {
       ) => {
         const elements = document.querySelectorAll(skillElementSelector);
         let skillElement: Element | null = null;
-        for (const element of elements) {
+        for (const element of Array.from(elements)) {
           const foundSkillName = element
             .querySelector(skillDescriptionSelector)
             ?.textContent?.trim();
