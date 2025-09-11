@@ -73,8 +73,8 @@ class FeatureNames(enum.Enum):
     )
     SHOW_REGENERATED_VOICEOVERS_TO_LEARNERS = (
         'show_regenerated_voiceovers_to_learners')
-    AUTOMATED_VOICEOVER_SYNTHESIS_FROM_TASK_QUEUE = (
-        'automated_voiceover_synthesis_from_task_queue')
+    ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS = (
+        'enable_background_voiceover_synthesis')
 
 # Names of feature objects defined in FeatureNames should be added
 # to one of the following lists:
@@ -91,6 +91,7 @@ class FeatureNames(enum.Enum):
 # still requires further testing or approvals, which can be enabled for QA
 # testers. 'prod' feature has been fully tested so that it can be enabled in the
 # production environment.
+
 
 # Names of features in dev stage, the corresponding feature flag instances must
 # be in dev stage otherwise it will cause a test error in the backend test.
@@ -114,7 +115,7 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
     FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES,
     FeatureNames.SHOW_REGENERATED_VOICEOVERS_TO_LEARNERS,
-    FeatureNames.AUTOMATED_VOICEOVER_SYNTHESIS_FROM_TASK_QUEUE,
+    FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS,
     FeatureNames.ENABLE_WORKED_EXAMPLES_RTE_COMPONENT
 ]
 
@@ -320,10 +321,10 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             feature_flag_domain.ServerMode.TEST
         )
     ),
-    FeatureNames.AUTOMATED_VOICEOVER_SYNTHESIS_FROM_TASK_QUEUE.value: (
+    FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS.value: (
         (
-            'The flag enables the automated voiceover synthesis from the '
-            'task queue.',
+            'The flag enables the asynchronous voiceover synthesis for the '
+            'curated exploration contents.',
             feature_flag_domain.ServerMode.TEST
         )
     ),

@@ -258,11 +258,11 @@ class DeferredTasksHandler(
                 wipeout_service
                 .remove_user_from_activities_with_associated_rights_models),
         fn_ids_to_names[
-            'FUNCTION_ID_REGENERATE_VOICEOVER_ON_EXP_UPDATE']: (
-                voiceover_services.regenerate_voiceover_for_updated_exploration
+            'FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_UPDATE']: (
+                voiceover_services.regenerate_voiceovers_for_updated_exploration
         ),
         fn_ids_to_names[
-            'FUNCTION_ID_REGENERATE_VOICEOVER_ON_EXP_CURATION']: (
+            'FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_CURATION']: (
                 voiceover_services.regenerate_voiceovers_on_exploration_curation
         )
     }

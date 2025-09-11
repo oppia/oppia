@@ -2113,14 +2113,15 @@ def compute_models_to_put_when_saving_new_exp_version(
             )
         )
 
-        # Regenerates voiceovers when curated exploration contents are updated.
+        # Asynchronously regenerates voiceovers using a deferred job when
+        # curated exploration content changes.
         if feature_flag_services.is_feature_flag_enabled(
             feature_flag_list.FeatureNames
-            .AUTOMATED_VOICEOVER_SYNTHESIS_FROM_TASK_QUEUE.value, None
+            .ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS.value, None
         ):
             taskqueue_services.defer(
                 feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
-                    'FUNCTION_ID_REGENERATE_VOICEOVER_ON_EXP_UPDATE'],
+                    'FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_UPDATE'],
                 taskqueue_services.QUEUE_NAME_VOICEOVER_REGENERATION,
                 updated_exploration.id,
                 updated_exploration.title,

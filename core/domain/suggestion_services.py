@@ -819,7 +819,7 @@ def accept_suggestion(
     # Generates voiceovers for approved translation suggestions.
     if feature_flag_services.is_feature_flag_enabled(
         feature_flag_list.FeatureNames
-        .AUTOMATED_VOICEOVER_SYNTHESIS_FROM_TASK_QUEUE.value, None
+        .ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS.value, None
     ):
         translated_content = suggestion.change_cmd.translation_html
         content_id = suggestion.change_cmd.content_id

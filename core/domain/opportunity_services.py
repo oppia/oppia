@@ -236,15 +236,16 @@ def create_exp_opportunity_summary(
             translation_counts, list(language_codes_needing_voice_artists), [],
             {}))
 
-    # Regenerates voiceovers for exploration contents in English and other
-    # available translations when the exploration is linked to a story.
+    # Asynchronously regenerates voiceovers for exploration contents in English
+    # and other available translations when the exploration is linked to a
+    # story.
     if feature_flag_services.is_feature_flag_enabled(
         feature_flag_list.FeatureNames
-        .AUTOMATED_VOICEOVER_SYNTHESIS_FROM_TASK_QUEUE.value, None
+        .ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS.value, None
     ):
         taskqueue_services.defer(
             feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
-                'FUNCTION_ID_REGENERATE_VOICEOVER_ON_EXP_CURATION'],
+                'FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_CURATION'],
             taskqueue_services.QUEUE_NAME_VOICEOVER_REGENERATION,
             exploration.id,
             datetime.datetime.utcnow().isoformat(),

@@ -1146,7 +1146,7 @@ def _regenerate_voiceovers_for_given_contents(
         )
 
 
-def regenerate_voiceover_for_updated_exploration(
+def regenerate_voiceovers_for_updated_exploration(
     exploration_id: str,
     exploration_title: str,
     exploration_version: int,
