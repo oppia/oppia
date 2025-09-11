@@ -77,9 +77,7 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
       'editorTabTourContentEditorTab',
       'editorTabTourSlideStateInteractionEditorTab',
       'editorTabTourStateResponsesTab',
-      ...(isMobile
-        ? ['editorTabTourMobilePreview']
-        : ['editorTabTourPreviewTab']),
+      isMobile ? 'editorTabTourMobilePreview' : 'editorTabTourPreviewTab',
     ];
     // Only add save draft steps if user has edit permissions.
     if (this.canEditExploration) {
