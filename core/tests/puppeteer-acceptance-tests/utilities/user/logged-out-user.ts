@@ -6580,6 +6580,7 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForFunction(
       (selector: string, expectedTabTitle: string) => {
         const tabTitle = document.querySelector(selector)?.textContent?.trim();
+        console.log('[debug] tabTitle: ', tabTitle);
         return tabTitle === expectedTabTitle;
       },
       {},

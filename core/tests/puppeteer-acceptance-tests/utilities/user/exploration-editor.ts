@@ -1779,9 +1779,25 @@ export class ExplorationEditor extends BaseUser {
         );
         break;
       case INTERACTION_TYPES.TEXT_INPUT:
-        await this.page.waitForXPath(
-          `//*[normalize-space(text())="${addElementLabel}"]`
-        );
+        try {
+          await this.page.waitForXPath(
+            `//*[normalize-space(text())="${addElementLabel}"]`
+          );
+        } catch (error) {
+          await this.page.evaluate(() => {
+            // Log class list of every element on the page.
+            const elements = document.querySelectorAll('*');
+            console.log('[debug] (Elements): ' + elements.length);
+            elements.forEach(element => {
+              console.log(
+                '[debug] (Elements): ' +
+                  element.tagName +
+                  ' :: ' +
+                  element.className
+              );
+            });
+          });
+        }
         await this.clickOn(addElementLabel);
         await this.page.waitForSelector(textInputInteractionOption);
         await this.page.type(textInputInteractionOption, answer);

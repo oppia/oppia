@@ -3604,12 +3604,19 @@ export class TopicManager extends BaseUser {
   /**
    * Checks if the skill is assigned to the given topics.
    * @param {string} skillName - The name of the skill.
-   * @param {string} topicNames - The names of the topics, separated by comma.
+   * @param {string} topicName - The names of the topics, separated by comma.
    */
   async expectSkillAssignedToTopic(
     skillName: string,
-    topicNames: string
+    topicName: string
   ): Promise<void> {
+    const skillItemSelector = isMobileWidth
+      ? mobileSkillItemSelector
+      : desktopSkillItemSelector;
+    const skillDescriptionSelector = isMobileWidth
+      ? mobileSkillDescriptionSelector
+      : desktopSkillDescriptionSelector;
+
     const skillContainer = await this.getSkillElementFromSelection(skillName);
 
     if (!skillContainer) {
@@ -3617,15 +3624,43 @@ export class TopicManager extends BaseUser {
     }
 
     await this.page.waitForFunction(
-      (selector: string, topicName: string, context: HTMLElement) => {
-        const element = context.querySelector(selector);
+      (
+        selector: string,
+        topicName: string,
+        skillElementSelector: string,
+        skillDescriptionSelector: string,
+        skillName: string
+      ) => {
+        const elements = document.querySelectorAll(skillElementSelector);
+        let skillElement: Element | null = null;
+        for (const element of elements) {
+          const foundSkillName = element
+            .querySelector(skillDescriptionSelector)
+            ?.textContent?.trim();
+          if (foundSkillName === skillName) {
+            skillElement = element;
+            break;
+          }
+        }
+
+        if (!skillElement) {
+          return false;
+        }
+
+        console.log(
+          '[debug]: (SkillElement) ' + skillElement?.textContent?.trim()
+        );
+
+        const element = skillElement.querySelector(selector);
         console.log('[debug]: ' + element?.textContent?.trim());
         return element?.textContent?.trim() === topicName;
       },
       {},
       skillsAssignmentSelector,
-      topicNames,
-      skillContainer
+      topicName,
+      skillItemSelector,
+      skillDescriptionCardSelector,
+      skillName
     );
   }
 
@@ -3795,6 +3830,7 @@ export class TopicManager extends BaseUser {
     }
 
     await deleteButton.click();
+    await this.clickOn('Delete Story');
   }
 
   /**
