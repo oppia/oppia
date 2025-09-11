@@ -98,7 +98,6 @@ import {ExplorationFeaturesService} from 'services/exploration-features.service'
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {ExplorationImprovementsBackendApiService} from 'services/exploration-improvements-backend-api.service';
 import {ExplorationImprovementsTaskRegistryService} from 'services/exploration-improvements-task-registry.service';
-import {ExplorationObjectFactory} from 'domain/exploration/ExplorationObjectFactory';
 import {ExplorationPermissionsBackendApiService} from 'domain/exploration/exploration-permissions-backend-api.service';
 import {ExplorationRecommendationsBackendApiService} from 'domain/recommendations/exploration-recommendations-backend-api.service';
 import {ExplorationStatsBackendApiService} from 'services/exploration-stats-backend-api.service';
@@ -1083,10 +1082,6 @@ export class UpgradedServices {
       );
 
     // Topological level: 8.
-    upgradedServices['ExplorationObjectFactory'] = new ExplorationObjectFactory(
-      upgradedServices['LoggerService'],
-      upgradedServices['UrlInterpolationService']
-    );
     upgradedServices['PretestQuestionBackendApiService'] =
       new PretestQuestionBackendApiService(
         upgradedServices['UrlInterpolationService'],
