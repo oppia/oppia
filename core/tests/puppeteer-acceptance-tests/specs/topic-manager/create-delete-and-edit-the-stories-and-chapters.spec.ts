@@ -93,6 +93,7 @@ describe('Topic Manager', function () {
 
     // Delete the story.
     await topicManager.deleteStory('The Broken Calculator');
+    await topicManager.saveTopicDraft('Arithmetic Operations', 'Updated topic');
     await topicManager.expectStoriesListToBeEmpty();
   });
 
@@ -124,10 +125,8 @@ describe('Topic Manager', function () {
       'Learn how to solve problems without a calculator.',
       'the-broken-calculator'
     );
-    await topicManager.addChapter(
-      'Solving problems without a calculator',
-      explorationId
-    );
+    await topicManager.addChapter('Solving problems', explorationId);
+    await topicManager.saveStoryDraft();
 
     // Create and publish a new explorations.
     const simpleExplorationId =
@@ -136,12 +135,19 @@ describe('Topic Manager', function () {
         'Algebra'
       );
 
+    await topicManager.navigateToCreatorDashboardPage();
+    await topicManager.navigateToExplorationEditorFromCreatorDashboard();
     const programmingExplorationId =
       await topicManager.createSimpleProgrammingExploration();
 
     // Add simple chapter.
+    await topicManager.openStoryEditor(
+      'The Broken Calculator',
+      'Arithmetic Operations'
+    );
     await topicManager.addChapter('Simple Exploration', simpleExplorationId);
     await topicManager.saveStoryDraft();
+    await topicManager.openChapterEditor('Simple Exploration');
     await topicManager.previewChapterCard();
     await topicManager.expectPreviewCardToBeVisible('Simple Exploration');
 
@@ -156,6 +162,7 @@ describe('Topic Manager', function () {
       'The Broken Calculator',
       'Arithmetic Operations'
     );
+    await topicManager.clickOn('Create Chapter');
     await topicManager.expectNewChapterErrorSpan(
       'The states [Introduction] contain restricted interaction types.'
     );
@@ -163,7 +170,7 @@ describe('Topic Manager', function () {
 
   it('should be able to edit and preivew the chapter', async function () {
     await topicManager.openChapterEditor(
-      'Solving problems without a calculator',
+      'Solving problems',
       'The Broken Calculator',
       'Arithmetic Operations'
     );

@@ -3253,11 +3253,13 @@ export class TopicManager extends BaseUser {
    */
   async openChapterEditor(
     chapterName: string,
-    storyName: string,
-    topicName: string
+    storyName?: string,
+    topicName?: string
   ): Promise<void> {
     try {
-      await this.openStoryEditor(storyName, topicName);
+      if (storyName) {
+        await this.openStoryEditor(storyName, topicName);
+      }
       const addChapterButtonElement = await this.page.$(addChapterButton);
       if (!addChapterButtonElement) {
         const mobileChapterCollapsibleCardElement = await this.page.$(
