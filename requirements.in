@@ -25,6 +25,8 @@ gunicorn==23.0.0
 mailchimp3==3.0.21
 mutagen==1.47.0
 Pillow==10.1.0
+# Note: proto-plus is added temporarily based on https://github.com/googleapis/python-bigquery/issues/1908#issuecomment-2077899818
+proto-plus==1.24.0.dev1
 pylatexenc==2.10
 PyYAML==6.0.2
 redis==5.3.1
