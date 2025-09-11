@@ -21,10 +21,7 @@ import {EventEmitter} from '@angular/core';
 import {fakeAsync, flush, TestBed, tick} from '@angular/core/testing';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {ExplorationChangeAddState} from 'domain/exploration/exploration-draft.model';
-import {
-  StateObjectsBackendDict,
-  StatesObjectFactory,
-} from 'domain/exploration/StatesObjectFactory';
+import {StateObjectsBackendDict, States} from 'domain/exploration/states.model';
 import {AlertsService} from 'services/alerts.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {EditabilityService} from 'services/editability.service';
@@ -583,7 +580,6 @@ describe('Exploration save service ' + 'while saving changes', () => {
   let changeListService: ChangeListService;
   let explorationRightsService: ExplorationRightsService;
   let ngbModal: NgbModal;
-  let statesObjectFactory: StatesObjectFactory;
   let siteAnalyticsService: SiteAnalyticsService;
   let routerService: RouterService;
   let explorationDiffService: ExplorationDiffService;
@@ -866,7 +862,6 @@ describe('Exploration save service ' + 'while saving changes', () => {
     explorationRightsService = TestBed.inject(ExplorationRightsService);
     ngbModal = TestBed.inject(NgbModal);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
-    statesObjectFactory = TestBed.inject(StatesObjectFactory);
     alertsService = TestBed.inject(AlertsService);
     routerService = TestBed.inject(RouterService);
     explorationDiffService = TestBed.inject(ExplorationDiffService);
@@ -894,8 +889,7 @@ describe('Exploration save service ' + 'while saving changes', () => {
   it('should open exploration save modal', fakeAsync(() => {
     let startLoadingCb = jasmine.createSpy('startLoadingCb');
     let endLoadingCb = jasmine.createSpy('endLoadingCb');
-    let sampleStates =
-      statesObjectFactory.createFromBackendDict(statesBackendDict);
+    let sampleStates = States.createFromBackendDict(statesBackendDict);
     spyOn(routerService, 'savePendingChanges').and.returnValue();
     spyOn(explorationStatesService, 'getStates').and.returnValue(sampleStates);
     spyOn(explorationDiffService, 'getDiffGraphData').and.returnValue({
@@ -962,8 +956,7 @@ describe('Exploration save service ' + 'while saving changes', () => {
     fakeAsync(() => {
       let startLoadingCb = jasmine.createSpy('startLoadingCb');
       let endLoadingCb = jasmine.createSpy('endLoadingCb');
-      let sampleStates =
-        statesObjectFactory.createFromBackendDict(statesBackendDict);
+      let sampleStates = States.createFromBackendDict(statesBackendDict);
       spyOn(routerService, 'savePendingChanges').and.returnValue();
       spyOn(explorationStatesService, 'getStates').and.returnValue(
         sampleStates
@@ -1012,8 +1005,7 @@ describe('Exploration save service ' + 'while saving changes', () => {
     fakeAsync(() => {
       let startLoadingCb = jasmine.createSpy('startLoadingCb');
       let endLoadingCb = jasmine.createSpy('endLoadingCb');
-      let sampleStates =
-        statesObjectFactory.createFromBackendDict(statesBackendDict);
+      let sampleStates = States.createFromBackendDict(statesBackendDict);
       spyOn(routerService, 'savePendingChanges').and.returnValue();
       spyOn(explorationStatesService, 'getStates').and.returnValue(
         sampleStates
@@ -1059,8 +1051,7 @@ describe('Exploration save service ' + 'while saving changes', () => {
     fakeAsync(() => {
       let startLoadingCb = jasmine.createSpy('startLoadingCb');
       let endLoadingCb = jasmine.createSpy('endLoadingCb');
-      let sampleStates =
-        statesObjectFactory.createFromBackendDict(statesBackendDict);
+      let sampleStates = States.createFromBackendDict(statesBackendDict);
       spyOn(routerService, 'savePendingChanges').and.returnValue();
       spyOn(explorationStatesService, 'getStates').and.returnValue(
         sampleStates
