@@ -34,6 +34,8 @@ from core.platform import models
 
 from typing import Dict, List, Literal, Optional, Sequence, Tuple, cast
 
+VoiceoverTypeStr = Literal['manual', 'auto']
+
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import exp_models
@@ -308,10 +310,9 @@ def compute_voiceover_related_change(
                 # conforms to the specific nested dictionary structure required
                 # by the create_new() method.
                 cast(Dict[str, Dict[
-                    Literal['manual', 'auto'],
+                    VoiceoverTypeStr,
                     Optional[state_domain.VoiceoverDict]
-                    ]
-                ], entity_voiceovers_dict['voiceovers_mapping']),
+                    ]], entity_voiceovers_dict['voiceovers_mapping']),
                 entity_voiceovers_dict[
                     'automated_voiceovers_audio_offsets_msecs']
             )
@@ -426,7 +427,7 @@ def create_entity_voiceovers_model(
     # conforms to the specific nested dictionary structure required
     # by the create_new() method.
     voiceovers_mapping = cast(Dict[str, Dict[
-        Literal['manual', 'auto'], Optional[state_domain.VoiceoverDict]
+        VoiceoverTypeStr, Optional[state_domain.VoiceoverDict]
         ]], entity_voiceovers_dict['voiceovers_mapping'])
     automated_voiceovers_audio_offsets_msecs_dict = entity_voiceovers_dict[
         'automated_voiceovers_audio_offsets_msecs']
@@ -923,10 +924,9 @@ def compute_voiceover_related_changes_upon_revert(
                 # conforms to the specific nested dictionary structure required
                 # by the create_new() method.
                 cast(Dict[str, Dict[
-                    Literal['manual', 'auto'],
+                    VoiceoverTypeStr,
                     Optional[state_domain.VoiceoverDict]
-                    ]
-                ], entity_voiceovers_dict['voiceovers_mapping']),
+                    ]], entity_voiceovers_dict['voiceovers_mapping']),
                 entity_voiceovers_dict[
                     'automated_voiceovers_audio_offsets_msecs']
             )

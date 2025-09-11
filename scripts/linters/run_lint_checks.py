@@ -644,8 +644,8 @@ def main(args: Optional[List[str]] = None) -> None:
 
     read_files(all_filepaths, namespace=namespace)
     # Here we use cast because multiprocessing.Manager().dict() returns
-    # a DictProxy,which is functionally equivalent to a standard Dict
-    # but is not seen as type-compatible by MyPy.This tells the type
+    # a DictProxy, which is functionally equivalent to a standard Dict
+    # but is not seen as type-compatible by MyPy. This tells the type
     # checker to treat it as the correct type for static analysis.
     files = cast(Dict[str, List[str]], multiprocessing.Manager().dict())
     categorize_files(all_filepaths, files)

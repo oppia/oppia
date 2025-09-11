@@ -24,7 +24,9 @@ from core import feconf
 from core import utils
 from core.domain import state_domain
 
-from typing import Dict, List, Optional, Tuple, TypedDict, Union
+from typing import Dict, List, Literal, Optional, Tuple, TypedDict, Union
+
+VoiceoverTypeStr = Literal['manual', 'auto']
 
 
 class EntityVoiceoversDict(TypedDict):
