@@ -60,6 +60,8 @@ const mergeSkillsButtonDesktop = '.e2e-test-merge-skills-button';
 const skillsTab = 'a.e2e-test-skills-tab';
 const skillsAssignmentSelector = '.e2e-test-skill-assignments';
 const skillNameAndStatusContainer = '.e2e-test-open-skill-editor';
+const discardChangesInMobileNavSelector =
+  '.e2e-test-mobile-discard-changes-direct';
 
 // Story Creation Modal.
 const saveStoryButton = 'button.e2e-test-save-story-button';
@@ -266,6 +268,7 @@ const topicAndSkillsDashboardPageSelector =
   '.e2e-test-topic-and-skills-dashboard';
 const navbarBreadcrumbSelector = '.e2e-test-navbar-breadcrumb';
 const resetTopicFilterButtonSelector = '.e2e-test-topic-filter-reset';
+const mobileTopicFilterResetSelector = '.e2e-test-mobile-topic-filter-reset';
 
 const floatTextField = '.e2e-test-rule-details .e2e-test-float-form-input';
 const solutionFloatTextField =
@@ -339,8 +342,14 @@ export class TopicManager extends BaseUser {
    * Resets the topic filter in Topic and Skills Dashboard.
    */
   async resetTopicFilter(): Promise<void> {
-    await this.expectElementToBeVisible(resetTopicFilterButtonSelector);
-    await this.clickOn(resetTopicFilterButtonSelector);
+    if (this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeVisible(displayMobileFiltersButton);
+      await this.clickOn(displayMobileFiltersButton);
+      await this.clickOn(mobileTopicFilterResetSelector);
+    } else {
+      await this.expectElementToBeVisible(resetTopicFilterButtonSelector);
+      await this.clickOn(resetTopicFilterButtonSelector);
+    }
   }
   /**
    * Clicks on Topics and Skills Dashboard option in the profile menu.
@@ -3595,10 +3604,34 @@ export class TopicManager extends BaseUser {
   async expectSaveChangesInSkillEditorToBe(
     status: 'enabled' | 'disabled'
   ): Promise<void> {
-    await this.expectElementToBeClickable(
-      saveOrPublishSkillSelector,
-      status === 'enabled'
-    );
+    if (this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeVisible(mobileOptionsSelector);
+      await this.clickOn(mobileOptionsSelector);
+      await this.page.waitForFunction(
+        (selector: string, enabled: boolean) => {
+          const element = document.querySelector(selector);
+          return (
+            // Check if the element value is 'Discard Changes'. If it is, then
+            // there are no changes to be saved and we treat it as disabled.
+            !(element?.textContent?.trim() === 'Discard Changes') === enabled
+          );
+        },
+        {},
+        discardChangesInMobileNavSelector,
+        status === 'enabled'
+      );
+      await this.clickOn(mobileOptionsSelector);
+
+      await this.expectElementToBeVisible(
+        discardChangesInMobileNavSelector,
+        false
+      );
+    } else {
+      await this.expectElementToBeClickable(
+        saveOrPublishSkillSelector,
+        status === 'enabled'
+      );
+    }
   }
 
   /**
@@ -3610,10 +3643,10 @@ export class TopicManager extends BaseUser {
     skillName: string,
     topicName: string
   ): Promise<void> {
-    const skillItemSelector = isMobileWidth
+    const skillItemSelector = this.isViewportAtMobileWidth()
       ? mobileSkillItemSelector
       : desktopSkillItemSelector;
-    const skillDescriptionSelector = isMobileWidth
+    const skillDescriptionSelector = this.isViewportAtMobileWidth()
       ? mobileSkillDescriptionSelector
       : desktopSkillDescriptionSelector;
 
@@ -3659,7 +3692,7 @@ export class TopicManager extends BaseUser {
       skillsAssignmentSelector,
       topicName,
       skillItemSelector,
-      skillDescriptionCardSelector,
+      skillDescriptionSelector,
       skillName
     );
   }
