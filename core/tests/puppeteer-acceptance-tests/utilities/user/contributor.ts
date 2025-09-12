@@ -42,6 +42,8 @@ const activeElementClass = 'e2e-test-active';
 const viewDropdownSelector = '.e2e-test-mobile-contribution-dropdown';
 const viewDropdownOptionSelector =
   '.e2e-test-mobile-contribution-dropdown-option';
+const desktopBadgeContainerSelector = '.e2e-test-desktop-badge-container';
+const mobileBadgeContainerSelector = '.e2e-test-mobile-badge-container';
 const badgeSelector = '.e2e-test-badge';
 const badgeValueSelector = '.e2e-test-badge-value';
 const badgeCaptionSelector = '.e2e-test-badge-caption';
@@ -292,8 +294,8 @@ export class Contributor extends ExplorationEditor {
     // We are not checking if the badge is visible because first badge might
     // be hidden.
     const viewBasedBadgeSelector = this.isViewportAtMobileWidth()
-      ? `.mobile-badge-container ${badgeSelector}`
-      : `.desktop-badge-container ${badgeSelector}`;
+      ? `${mobileBadgeContainerSelector} ${badgeSelector}`
+      : `${desktopBadgeContainerSelector} ${badgeSelector}`;
     await this.expectElementToBeVisible(viewBasedBadgeSelector);
 
     const badges = await this.page.$$(viewBasedBadgeSelector);

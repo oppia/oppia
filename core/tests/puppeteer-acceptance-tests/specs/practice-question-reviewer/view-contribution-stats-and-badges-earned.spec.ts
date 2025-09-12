@@ -140,6 +140,7 @@ describe('Practice Question Reviewer', function () {
     await questionReviewer.navigateToTabInMyContributions('Review Questions');
 
     // Reject the question suggestion.
+    await questionReviewer.startQuestionReview('12 + 4', 'Addition');
     await questionReviewer.submitReview(
       'reject',
       'Well, the question is correct, but I am required as per CUJ'

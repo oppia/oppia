@@ -163,7 +163,7 @@ describe('Practice Question Submitter', function () {
       'Question Contributions'
     );
     await questionSubmitter.expectContributionTableToContainRow([
-      'Addition',
+      'Arithmetic Operations',
       '2',
       '1',
     ]);
