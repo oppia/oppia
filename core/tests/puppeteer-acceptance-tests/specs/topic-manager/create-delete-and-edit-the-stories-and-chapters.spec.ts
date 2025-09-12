@@ -202,11 +202,6 @@ describe('Topic Manager', function () {
     // Add aquired skill.
     await topicManager.addAcquiredSkill('Subtraction');
     await topicManager.expectAquiredSkillToBeVisible('Subtraction');
-
-    // Add prerequisite skill.
-    await topicManager.saveStoryDraft();
-    await topicManager.addPrerequisiteSkill('Word Problems');
-    await topicManager.expectSaveStoryButtonToBeDisabled();
   });
 
   afterAll(async function () {

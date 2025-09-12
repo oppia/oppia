@@ -1782,6 +1782,7 @@ export class ExplorationEditor extends BaseUser {
         try {
           await this.expectElementToBeVisible(addListEntryButtonSelector);
         } catch (error) {
+          await showMessage('[debug] page url: ' + this.page.url());
           await this.page.evaluate(() => {
             // Log class list of every element on the page.
             const elements = document.querySelectorAll('*');
