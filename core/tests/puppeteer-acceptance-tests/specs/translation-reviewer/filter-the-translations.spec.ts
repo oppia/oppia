@@ -45,7 +45,7 @@ describe('Translation Reviewer', function () {
       'translatorReviewer',
       'translatorReviewer@example.com',
       [ROLES.TRANSLATION_REVIEWER],
-      'hi'
+      ['hi', 'ak']
     );
 
     translationSubmitter = await UserFactory.createNewUser(
@@ -147,18 +147,18 @@ describe('Translation Reviewer', function () {
 
     // Translation of "States of Matter" should not be present.
     await translationReviewer.expectOpportunityToBePresent(
-      'सामग्री 0',
+      'Chemical Reactions',
       'States of Matter',
       false
     );
     // Translation of "Fractions" should be present.
     await translationReviewer.expectOpportunityToBePresent(
-      'emu nsɛm 0 (slices a wɔde sesa wɔn ho wɔn ho)',
+      'Cutting the Pies',
       'Fractions',
       true
     );
     await translationReviewer.expectOpportunityToBePresent(
-      'सामग्री 0 (पाई काटना)',
+      'Trading Slices',
       'Fractions',
       true
     );
@@ -169,13 +169,13 @@ describe('Translation Reviewer', function () {
 
     // Translation in Hindi should be present.
     await translationReviewer.expectOpportunityToBePresent(
-      'सामग्री 0',
+      'Cutting the Pies',
       'Fractions',
       true
     );
     // Translation in Akan should not be present.
     await translationReviewer.expectOpportunityToBePresent(
-      'emu nsɛm 0 (slices a wɔde sesa wɔn ho wɔn ho)',
+      'Trading Slices',
       'Fractions',
       false
     );

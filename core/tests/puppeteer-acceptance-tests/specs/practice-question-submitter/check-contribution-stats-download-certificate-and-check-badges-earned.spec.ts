@@ -145,7 +145,7 @@ describe('Practice Question Submitter', function () {
       'reject',
       'It is not an addition problem.'
     );
-    await questionReviewer.startQuestionReview('What is 14 + 12?', 'Addition');
+    await questionReviewer.startQuestionReview('What is 14 + 12', 'Addition');
     await questionReviewer.editQuestionInReview('What is 14 + 12?');
     await questionReviewer.submitReview(
       'accept',

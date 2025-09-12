@@ -214,10 +214,12 @@ export class UserFactory {
           break;
         case ROLES.TRANSLATION_REVIEWER:
           await superAdminInstance.navigateToContributorDashboardAdminPage();
-          await superAdminInstance.addTranslationLanguageReviewRights(
-            user.username,
-            args as string
-          );
+          for (const language of args as string[]) {
+            await superAdminInstance.addTranslationLanguageReviewRights(
+              user.username,
+              language
+            );
+          }
           break;
         case ROLES.VOICEOVER_SUBMITTER:
           if (typeof args !== 'string') {

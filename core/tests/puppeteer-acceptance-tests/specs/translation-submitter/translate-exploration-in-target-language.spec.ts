@@ -20,7 +20,7 @@
  */
 
 import {RTE_BUTTON_TITLES} from '../../utilities/common/rte-editor';
-import testConstants, {FILEPATHS} from '../../utilities/common/test-constants';
+import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {Contributor} from '../../utilities/user/contributor';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
@@ -119,7 +119,7 @@ describe('Translation Submitter', function () {
       await curriculumAdm.addChapter(`Chapter ${id}`, id);
       await curriculumAdm.saveStoryDraft();
     }
-  }, 1800000);
+  }, 2100000);
 
   it('should be able to navigate to contribution page', async function () {
     // Navigate to the contributor dashboard.

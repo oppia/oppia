@@ -51,7 +51,7 @@
     <div class="oppia-contributions-side-navbar-part e2e-test-available-task-label" *ngIf="reviewTabs.length > 0" tabindex="0">
       <div class="oppia-contributions-navbar-items-list" navbar-label="Available Tasks" aria-label="Available tasks">
         <div class="oppia-contributions-navbar-item e2e-test-review-buttons" *ngFor="let tab of reviewTabs">
-          <button class="oppia-contributions-navbar-button"
+          <button class="oppia-contributions-navbar-button e2e-test-contribution-tab"
                   (click)="switchToTab(TAB_TYPE_REVIEWS, tab.tabSubType)"
                   [ngClass]="isActiveTab(TAB_TYPE_REVIEWS, tab.tabSubType) ? 'oppia-contributions-active-navbar' : ''">{{tab.text}}
           </button>

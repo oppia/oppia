@@ -218,6 +218,7 @@ describe('Practice Question Submitter', function () {
 
   it('should be able to check question status', async function () {
     // Reject the question suggestion.
+    await questionReviewer.navigateToContributorDashboardUsingProfileDropdown();
     await questionReviewer.startQuestionReview('What is 10 + 11?', 'Addition');
     await questionReviewer.submitReview('reject', 'No answer is correct.');
     // Edit the question suggestion.

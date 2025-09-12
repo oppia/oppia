@@ -236,7 +236,9 @@ export class TranslationReviewer extends BaseUser {
    * Checks if the review content is as expected.
    * @param expectedContent - The expected content.
    */
-  async expectCardContentToBe(expectedContent: string): Promise<void> {
+  async expectCardContentToBeInTranslationReview(
+    expectedContent: string
+  ): Promise<void> {
     await this.expectTextContentToBe(
       `${reviewContentContainerSelector} ${translatedContentContainerSelector}`,
       expectedContent
