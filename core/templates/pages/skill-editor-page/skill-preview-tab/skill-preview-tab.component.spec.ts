@@ -27,7 +27,7 @@ import {
 import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
-import {QuestionBackendDict} from 'domain/question/QuestionObjectFactory';
+import {QuestionBackendDict} from 'domain/question/question.model';
 import {InteractionRulesService} from '../../../pages/exploration-player-page/services/answer-classification.service';
 import {Interaction} from 'domain/exploration/interaction.model';
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';

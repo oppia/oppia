@@ -131,6 +131,9 @@ describe('Progress nav component', () => {
     let mockSchemaFormSubmittedEventEmitter = new EventEmitter<void>();
 
     spyOn(urlService, 'isIframed').and.returnValue(isIframed);
+    spyOn(urlService, 'getPathname').and.returnValue(
+      'http://localhost:8181/lesson/wZiXFx1iV5bz'
+    );
     spyOn(componentInstance.submit, 'emit');
     spyOnProperty(playerPositionService, 'onHelpCardAvailable').and.returnValue(
       mockOnHelpCardAvailableEventEmitter
@@ -151,6 +154,7 @@ describe('Progress nav component', () => {
     expect(componentInstance.isIframed).toEqual(isIframed);
     expect(componentInstance.helpCardHasContinueButton).toBeTrue();
     expect(componentInstance.submit.emit).toHaveBeenCalled();
+    expect(componentInstance.progressTrackerIsVisible).toBeTrue();
   }));
 
   it('should update displayed card info', fakeAsync(() => {

@@ -41,6 +41,7 @@ import {
   MatBottomSheetRef,
 } from '@angular/material/bottom-sheet';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
 
 const MOBILE_SCREEN_BREAKPOINT = 480;
 
@@ -70,6 +71,7 @@ export class LessonPlayerSidebarComponent implements OnInit {
     @Optional() private bottomSheet: MatBottomSheet,
     private learnerLocalNavBackendApiService: LearnerLocalNavBackendApiService,
     private alertsService: AlertsService,
+    private conversationFlowService: ConversationFlowService,
     private windowDimensionsService: WindowDimensionsService
   ) {}
 
@@ -237,5 +239,9 @@ export class LessonPlayerSidebarComponent implements OnInit {
 
   isMobileScreenSize(): boolean {
     return this.windowDimensionsService.getWidth() < MOBILE_SCREEN_BREAKPOINT;
+  }
+
+  isUserLoggedIn(): boolean {
+    return this.conversationFlowService.getIsLoggedIn();
   }
 }
