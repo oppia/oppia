@@ -43,10 +43,7 @@ import {
   Misconception,
   MisconceptionSkillMap,
 } from 'domain/skill/misconception.model';
-import {
-  Question,
-  QuestionObjectFactory,
-} from 'domain/question/QuestionObjectFactory';
+import {Question} from 'domain/question/question.model';
 import {State} from 'domain/state/state.model';
 import {Rubric} from 'domain/skill/rubric.model';
 import {EditableQuestionBackendApiService} from 'domain/question/editable-question-backend-api.service';
@@ -123,7 +120,6 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     private imageLocalStorageService: ImageLocalStorageService,
     private loggerService: LoggerService,
     private ngbModal: NgbModal,
-    private questionObjectFactory: QuestionObjectFactory,
     private questionsListService: QuestionsListService,
     private questionUndoRedoService: QuestionUndoRedoService,
     private questionValidationService: QuestionValidationService,
@@ -162,9 +158,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
 
     this.imageLocalStorageService.flushStoredImagesData();
     this.pageContextService.setImageSaveDestinationToLocalStorage();
-    this.question = this.questionObjectFactory.createDefaultQuestion(
-      this.newQuestionSkillIds
-    );
+    this.question = Question.createDefaultQuestion(this.newQuestionSkillIds);
     this.questionId = this.question.getId();
     this.questionStateData = this.question.getStateData();
     this.questionIsBeingUpdated = false;

@@ -89,14 +89,14 @@
     padding: 20px;
   }
 </style>
-<div class="question-role-editor-main-container">
+<div class="question-role-editor-main-container e2e-test-question-role-editor-container">
   <div>
     <div class="title-container">Edit roles for user {{username}}</div>
     <div class="sub-heading-container">User Role</div>
     <div class="attribute-container">
       <span (click)="toggleQuestionSubmitter()" (keydown.space)="toggleQuestionSubmitter()" tabindex="0">
-        <i *ngIf="!rights.isQuestionSubmitter" class="material-icons md-18 question-submitter-role-checkbox">&#xE835;</i>
-        <i *ngIf="rights.isQuestionSubmitter" class="material-icons md-18 question-submitter-role-checkbox">&#xE834;</i>
+        <i *ngIf="!rights.isQuestionSubmitter" class="material-icons md-18 question-submitter-role-checkbox e2e-test-question-submitter-checkbox e2e-test-checkbox-unchecked">&#xE835;</i>
+        <i *ngIf="rights.isQuestionSubmitter" class="material-icons md-18 question-submitter-role-checkbox e2e-test-question-submitter-checkbox e2e-test-checkbox-checked">&#xE834;</i>
       </span>
       <div class="label-container">
         <div class="label">Question Submitter</div>
@@ -105,8 +105,8 @@
     </div>
     <div class="attribute-container">
       <span (click)="toggleQuestionReviewer()" (keydown.space)="toggleQuestionReviewer()" tabindex="0">
-        <i *ngIf="!rights.isQuestionReviewer" class="material-icons md-18 question-submitter-role-checkbox">&#xE835;</i>
-        <i *ngIf="rights.isQuestionReviewer" class="material-icons md-18 question-submitter-role-checkbox">&#xE834;</i>
+        <i *ngIf="!rights.isQuestionReviewer" class="material-icons md-18 question-submitter-role-checkbox e2e-test-question-reviewer-checkbox e2e-test-checkbox-unchecked">&#xE835;</i>
+        <i *ngIf="rights.isQuestionReviewer" class="material-icons md-18 question-submitter-role-checkbox e2e-test-question-reviewer-checkbox e2e-test-checkbox-checked">&#xE834;</i>
       </span>
       <div class="label-container">
         <div class="label">Question Reviewer</div>
@@ -116,7 +116,7 @@
     <div class="question-role-editor-footer-ruler"></div>
     <div class="question-role-editor-footer">
       <button class="cancel-button" (click)="close()">Cancel</button>
-      <button class="save-button" (click)="saveAndClose()">Save Changes</button>
+      <button class="save-button e2e-test-save-button" (click)="saveAndClose()">Save Changes</button>
     </div>
   </div>
 </div>

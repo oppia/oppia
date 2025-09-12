@@ -5,7 +5,7 @@
     <loading-dots></loading-dots>
   </div>
 </div>
-<div *ngIf="!loadingMessage">
+<div *ngIf="!loadingMessage" class="e2e-test-new-contributor-admin-dashboard-page">
   <div class="oppia-dashboard-container position-relative">
     <div class="oppia-dashboard-title"
       [ngClass]="{'oppia-dashboard-title-mobile': checkMobileView(), 'oppia-dashboard-title-desktop': !checkMobileView()}">
@@ -16,13 +16,13 @@
       <mat-card layout="row" class="oppia-mat-card">
         <div class="translation-reviewer stats-card" [attr.aria-label]="'Translation Reviewer '" tabindex="0" *ngIf="isTranslationCoordinator">
           <p class="stat-description">Translation Reviewers <br>[{{selectedLanguage.language}}]</p>
-          <h2 class="stat-value-with-rating e2e-test-oppia-average-rating">
+          <h2 class="stat-value-with-rating e2e-test-oppia-average-rating e2e-test-contributor-count">
             {{ translationReviewersCount ? translationReviewersCount : 0 }}
           </h2>
         </div>
         <div class="question-reviewer stats-card" [attr.aria-label]="'Practice Question Reviewer '" tabindex="0" *ngIf="isQuestionCoordinator">
           <p class="stat-description">Practice Question Reviewers</p>
-          <h2 class="stat-value-with-rating e2e-test-oppia-total-plays">
+          <h2 class="stat-value-with-rating e2e-test-oppia-total-plays e2e-test-total-question-reviewers">
             {{questionReviewersCount}}
           </h2>
         </div>
@@ -58,7 +58,7 @@
       <div class="filter-container">
         <div class="filter-rights-sub-container">
           <div class="add-rights-button-container">
-            <button class="add-rights-button" (click)="openUsernameInputModal()" *ngIf="!(activeTab === TAB_NAME_TRANSLATION_SUBMITTER)">
+            <button class="add-rights-button e2e-test-add-contributor-button" (click)="openUsernameInputModal()" *ngIf="!(activeTab === TAB_NAME_TRANSLATION_SUBMITTER)">
               + ADD {{ (activeTab === TAB_NAME_QUESTION_SUBMITTER) ? 'SUBMITTER' : 'REVIEWER' }}
             </button>
           </div>
@@ -112,7 +112,8 @@
         <mat-form-field class="choices-field">
           <mat-select placeholder="Contribution Type"
                       [value]="selectedContributionType"
-                      (valueChange)="updateSelectedContributionType($event)">
+                      (valueChange)="updateSelectedContributionType($event)"
+                      class="e2e-test-tab-selection-dropdown">
             <mat-option *ngFor="let choice of CONTRIBUTION_TYPES" [value]="choice">
               {{ choice }}
             </mat-option>
@@ -121,15 +122,15 @@
       </div>
       <div class="filter-container">
         <div class="add-rights-button-container">
-          <button class="add-rights-button" (click)="openUsernameInputModal()" *ngIf="!(activeTab === TAB_NAME_TRANSLATION_SUBMITTER)">
+          <button class="add-rights-button e2e-test-add-contributor-button" (click)="openUsernameInputModal()" *ngIf="!(activeTab === TAB_NAME_TRANSLATION_SUBMITTER)">
             + ADD {{ (activeTab === TAB_NAME_QUESTION_SUBMITTER) ? 'SUBMITTER' : 'REVIEWER' }}
           </button>
         </div>
         <div class="language-selector-container" *ngIf="(activeTab === TAB_NAME_TRANSLATION_SUBMITTER) || (activeTab === TAB_NAME_TRANSLATION_REVIEWER)">
-          <div class="oppia-filter-selector-container e2e-test-topic-selector" (click)="toggleLanguageDropdown()">
+          <div class="oppia-filter-selector-container e2e-test-topic-selector e2e-test-language-selector" (click)="toggleLanguageDropdown()">
             <div class="oppia-filter-selector-inner-container e2e-test-topic-selector-selected">
               <b class="required">Language: </b>
-              <div class="selector-icon-div">
+              <div class="selector-icon-div e2e-test-language-selector-selected">
                 {{selectedLanguage.language}}
                 <span class="fas fa-caret-down oppia-filter-selector-inner-container-arrow"
                   [@languageDropdownTrigger]="languageDropdownShown ? 'expanded' : 'collapsed'">
@@ -138,7 +139,7 @@
             </div>
             <div *ngIf="languageDropdownShown"
                  class="oppia-filter-selector-dropdown-container e2e-test-topic-selector-dropdown">
-              <div class="oppia-filter-selector-dropdown-option e2e-test-topic-selector-option"
+              <div class="oppia-filter-selector-dropdown-option e2e-test-topic-selector-option e2e-test-language-selector-option"
                    *ngFor="let option of languageChoices"
                    (click)="selectLanguage(option.language)"
                    [ngClass]="{'oppia-filter-selector-dropdown-option-selected' : option === selectedLanguage.language}">
