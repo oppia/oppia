@@ -214,6 +214,9 @@ export class UserFactory {
           break;
         case ROLES.TRANSLATION_REVIEWER:
           await superAdminInstance.navigateToContributorDashboardAdminPage();
+          if (typeof args === 'string') {
+            args = [args];
+          }
           for (const language of args as string[]) {
             await superAdminInstance.addTranslationLanguageReviewRights(
               user.username,
