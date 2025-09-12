@@ -24,7 +24,6 @@ import {
 } from 'pages/interaction-specs.constants';
 import {Subscription} from 'rxjs';
 import {UrlService} from 'services/contextual/url.service';
-import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {NewLessonPlayerConstants} from '../../new-lesson-player/lesson-player-page.constants';
 import {PlayerPositionService} from '../../services/player-position.service';
@@ -81,6 +80,7 @@ export class CardNavigationControlComponent {
   helpCardHasContinueButton!: boolean;
   isIframed!: boolean;
   lastDisplayedCard!: StateCard;
+  progressTrackerIsVisible: boolean = false;
   explorationId!: string;
   newCardStateName!: string;
   currentCardIndex!: number;
@@ -110,7 +110,6 @@ export class CardNavigationControlComponent {
     private pageContextService: PageContextService,
     private conversationFlowService: ConversationFlowService,
     private schemaFormSubmittedService: SchemaFormSubmittedService,
-    private windowDimensionsService: WindowDimensionsService,
     private contentTranslationManagerService: ContentTranslationManagerService
   ) {}
 
@@ -127,6 +126,11 @@ export class CardNavigationControlComponent {
       !this.pageContextService.isInDiagnosticTestPlayerPage();
     this.skipButtonIsShown =
       this.pageContextService.isInDiagnosticTestPlayerPage();
+    let pathnameArray = this.urlService.getPathname().split('/');
+
+    if (pathnameArray.includes('lesson') && !pathnameArray.includes('embed')) {
+      this.progressTrackerIsVisible = true;
+    }
 
     this.directiveSubscriptions.add(
       this.playerPositionService.onHelpCardAvailable.subscribe(helpCard => {

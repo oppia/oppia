@@ -30,15 +30,8 @@ import {
 } from './contribution-and-review-backend-api.service';
 import {SuggestionBackendDict} from 'domain/suggestion/suggestion.model';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
-import {
-  ExplorationObjectFactory,
-  Exploration,
-} from 'domain/exploration/ExplorationObjectFactory';
-import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
-import {
-  StatesObjectFactory,
-  States,
-} from 'domain/exploration/StatesObjectFactory';
+import {Exploration} from 'domain/exploration/exploration.model';
+import {StateObjectsBackendDict, States} from 'domain/exploration/states.model';
 import {FetchExplorationBackendResponse} from '../../../domain/exploration/read-only-exploration-backend-api.service';
 import {LoggerService} from 'services/contextual/logger.service';
 import {ParamSpecs} from '../../../domain/exploration/param-specs.model';
@@ -48,7 +41,6 @@ describe('Contribution and review service', () => {
   let carbas: ContributionAndReviewBackendApiService;
   let fetchSuggestionsAsyncSpy: jasmine.Spy;
   let downloadContributorCertificateAsyncSpy: jasmine.Spy;
-  let statesObjectFactory: StatesObjectFactory;
   let readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService;
   let urlInterpolationService: UrlInterpolationService;
   let loggerService: LoggerService;
@@ -119,8 +111,6 @@ describe('Contribution and review service', () => {
         UrlInterpolationService,
         ContributionAndReviewBackendApiService,
         ReadOnlyExplorationBackendApiService,
-        ExplorationObjectFactory,
-        StatesObjectFactory,
         LoggerService,
       ],
     });
@@ -131,7 +121,6 @@ describe('Contribution and review service', () => {
     );
     loggerService = TestBed.inject(LoggerService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
-    statesObjectFactory = TestBed.inject(StatesObjectFactory);
     fetchSuggestionsAsyncSpy = spyOn(carbas, 'fetchSuggestionsAsync');
     downloadContributorCertificateAsyncSpy = spyOn(
       carbas,
@@ -400,15 +389,13 @@ describe('Contribution and review service', () => {
   });
 
   describe('getReviewableTranslationSuggestionsAsync', () => {
-    let explorationObjectFactory: ExplorationObjectFactory;
-    let explorationObjectFactorySpy: jasmine.Spy;
+    let explorationCreateFromBackendDictSpy: jasmine.Spy;
     let fetchExplorationSpy: jasmine.Spy;
     let mockSortTranslationSpy: jasmine.Spy;
 
     beforeEach(() => {
-      explorationObjectFactory = TestBed.inject(ExplorationObjectFactory);
-      explorationObjectFactorySpy = spyOn(
-        explorationObjectFactory,
+      explorationCreateFromBackendDictSpy = spyOn(
+        Exploration,
         'createFromBackendDict'
       );
       fetchExplorationSpy = spyOn(
@@ -534,7 +521,7 @@ describe('Contribution and review service', () => {
             card_is_checkpoint: false,
           },
         } as StateObjectsBackendDict;
-        const states = statesObjectFactory.createFromBackendDict(mockStates);
+        const states = States.createFromBackendDict(mockStates);
         const mockReadOnlyExplorationData: FetchExplorationBackendResponse = {
           can_edit: true,
           exploration: {
@@ -597,7 +584,7 @@ describe('Contribution and review service', () => {
         fetchSuggestionsAsyncSpy.and.returnValue(
           Promise.resolve(backendFetchResponse)
         );
-        explorationObjectFactorySpy.and.returnValue(exploration);
+        explorationCreateFromBackendDictSpy.and.returnValue(exploration);
         mockSortTranslationSpy.and.returnValue([
           {
             suggestion_type: 'suggestion',
@@ -702,7 +689,7 @@ describe('Contribution and review service', () => {
             },
             more: false,
           });
-          expect(explorationObjectFactorySpy).toHaveBeenCalled();
+          expect(explorationCreateFromBackendDictSpy).toHaveBeenCalled();
           expect(getStatesSpy).toHaveBeenCalled();
           expect(fetchSuggestionsAsyncSpy).toHaveBeenCalled();
           expect(fetchExplorationSpy).toHaveBeenCalled();
@@ -1250,8 +1237,7 @@ describe('Contribution and review service', () => {
       'should sort translation cards within each state based ' +
         'on type and index',
       () => {
-        const states =
-          statesObjectFactory.createFromBackendDict(statesBackendDict);
+        const states = States.createFromBackendDict(statesBackendDict);
         const sortedTranslationSuggestions =
           cars.sortTranslationSuggestionsByState(
             translationSuggestions,
@@ -1385,8 +1371,7 @@ describe('Contribution and review service', () => {
     );
 
     it('should return suggestions as it is when initStateName is not defined', () => {
-      const states =
-        statesObjectFactory.createFromBackendDict(statesBackendDict);
+      const states = States.createFromBackendDict(statesBackendDict);
       const sortedTranslationCards = cars.sortTranslationSuggestionsByState(
         translationSuggestions,
         states,
