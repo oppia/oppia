@@ -1109,9 +1109,9 @@ pluggy==1.5.0 \
     --hash=sha256:2cffa88e94fdc978c4c574f15f9e59b7f4201d439195c3715ca9e2486f1d0cf1 \
     --hash=sha256:44e1ad92c8ca002de6377e165f3e0f1be63266ab4d554740532335b9d75ea669
     # via keyrings-google-artifactregistry-auth
-proto-plus==1.24.0.dev1 \
-    --hash=sha256:bb583d9dc5006d788687c1f0496e003a7949fea174fd3f28cf37cfa005005dd6 \
-    --hash=sha256:e3e46255d640d3f5166ce401e5d6428bc45bd588262efacf000eb4d354eea236
+proto-plus==1.25.0 \
+    --hash=sha256:c91fc4a65074ade8e458e95ef8bac34d4008daa7cce4a12d6707066fca648961 \
+    --hash=sha256:fbb17f57f7bd05a68b7707e745e26528b0b3c34e378db91eef93912c54982d91
     # via
     #   -r requirements.in
     #   apache-beam
