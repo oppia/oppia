@@ -459,11 +459,13 @@ const addThumbnailToTopic = async function (page, topicName) {
 
     await page.waitForSelector(saveTopicButton);
 
-    //This part is added for debugging.
+    // This part is added for debugging.
     // await page.click(saveTopicButton).
     await page.evaluate(() => {
       const option = document.querySelector('.e2e-test-save-topic-button');
-      if (option) option.click();
+      if (option) {
+        option.click();
+      }
     });
     await page.waitForSelector(topicCommitMessageInput);
     await page.focus(topicCommitMessageInput);
