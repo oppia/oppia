@@ -856,6 +856,7 @@ export class ExplorationEditor extends BaseUser {
     responseIsCorrect?: boolean,
     isLastResponse: boolean = true
   ): Promise<void> {
+    await this.waitForElementToStabilize(feedbackEditorSelector);
     await this.clickOn(feedbackEditorSelector);
     await this.type(stateContentInputField, feedback);
     await this.expectTextContentToBe(stateContentInputField, feedback);
@@ -1752,10 +1753,10 @@ export class ExplorationEditor extends BaseUser {
     interactionType: INTERACTION_TYPES,
     answer: string
   ): Promise<void> {
+    const responseModal = await this.getRuleEditorModal();
     switch (interactionType) {
       case INTERACTION_TYPES.NUMBER_INPUT:
-        await this.page.waitForSelector(floatFormInput);
-        await this.page.type(floatFormInput, answer);
+        (await responseModal.waitForSelector(floatFormInput))?.type(answer);
         break;
       case INTERACTION_TYPES.MULTIPLE_CHOICE:
         await this.page.waitForSelector(multipleChoiceResponseDropdown, {
@@ -5264,6 +5265,9 @@ export class ExplorationEditor extends BaseUser {
       if (sourceElement === destinationElement) {
         continue;
       }
+
+      await this.waitForElementToStabilize(sourceElement);
+      await this.waitForElementToStabilize(destinationElement);
 
       const sourceBox = await sourceElement.boundingBox();
       const destBox = await destinationElement.boundingBox();

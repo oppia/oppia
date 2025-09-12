@@ -177,6 +177,7 @@ describe('Practice Question Reviewer', function () {
       'Question Reviews'
     );
     await questionReviewer.expectContributionTableToContainRow([
+      null,
       'Addition', // Skill.
       '3', // Questions reviewed.
       '2', // Questions accepted.
