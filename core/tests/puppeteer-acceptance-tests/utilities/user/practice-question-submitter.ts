@@ -96,7 +96,7 @@ const questionDifficultySelectionModalSelector =
 
 const saveDestinationButtonSelector = '.e2e-test-save-outcome-dest';
 const saveStuckDestinationButtonSelector = '.e2e-test-save-stuck-destination';
-const responseModalBodySelector = '.e2e-test-response-modal-body';
+const responseModalBodyClass = 'e2e-test-response-modal-body';
 const opportunityItemSelector = '.e2e-test-opportunity-list-item';
 const opportunityItemHeadingSelector =
   '.e2e-test-opportunity-list-item-heading';
@@ -634,10 +634,10 @@ export class PracticeQuestionSubmitter extends Contributor {
     inputType: 'input' | 'textarea',
     index: number = 0
   ): Promise<void> {
-    await this.expectElementToBeVisible(responseModalBodySelector);
-
-    const xpath = `//div[contains(@class, '${responseModalBodySelector})]//${inputType === 'textarea' ? 'textarea' : 'input'}[${index + 1}]`;
-    const inputElement = await this.page.waitForXPath(xpath);
+    const xpath = `//div[contains(@class, '${responseModalBodyClass})]//${inputType === 'textarea' ? 'textarea' : 'input'}[${index + 1}]`;
+    const inputElement = await this.page.waitForXPath(xpath, {
+      visible: true,
+    });
 
     if (!inputElement) {
       throw new Error(`Input element not found for selector ${xpath}`);

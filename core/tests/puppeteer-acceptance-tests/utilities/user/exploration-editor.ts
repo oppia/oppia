@@ -6775,6 +6775,7 @@ export class ExplorationEditor extends BaseUser {
    */
   async removeInteraction(): Promise<void> {
     await this.expectElementToBeVisible(removeInteractionButttonSelector);
+    await this.waitForElementToStabilize(removeInteractionButttonSelector);
     await this.clickOn(removeInteractionButttonSelector);
     await this.expectElementToBeVisible(confirmDeleteInteractionButtonSelector);
     await this.clickOn(confirmDeleteInteractionButtonSelector);
