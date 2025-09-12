@@ -55,6 +55,7 @@ from core.jobs.batch_jobs import (                                   # pylint: d
     audit_topic_related_models_relation_jobs)
 from core.jobs.batch_jobs import (                                   # pylint: disable=unused-import  # isort: skip
     reject_invalid_suggestion_and_delete_invalid_translation_jobs)
+from core.jobs.batch_jobs import delete_duplicate_content_ids_jobs   # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import (                                   # pylint: disable=unused-import  # isort: skip
     missing_translation_images_repair_jobs)
 from core.jobs.batch_jobs import user_bios_change_jobs               # pylint: disable=unused-import  # isort: skip
