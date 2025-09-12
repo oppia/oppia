@@ -161,7 +161,10 @@ describe('Practice Question Reviewer', function () {
     );
     await questionSubmitter.page.reload();
     await questionSubmitter.expectOpportunityToBePresent(
-      'Updated Question',
+      // When question is updated, the question displays updated question, as
+      // well as the original question. So, we are concatenating the updated
+      // question with the original question.
+      'Updated Question' + 'What is 2 + 3?',
       'Addition'
     );
     // Accept the question suggestion.
@@ -169,13 +172,11 @@ describe('Practice Question Reviewer', function () {
     await questionReviewer.submitReview('accept', 'Test Review Message');
 
     // Check contribution stats.
-    await questionSubmitter.navigateToTabInMyContributions(
-      'Contribution Stats'
-    );
-    await questionSubmitter.selectContributionTypeInContributionDashboard(
+    await questionReviewer.navigateToTabInMyContributions('Contribution Stats');
+    await questionReviewer.selectContributionTypeInContributionDashboard(
       'Question Reviews'
     );
-    await questionSubmitter.expectContributionTableToContainRow([
+    await questionReviewer.expectContributionTableToContainRow([
       'Addition', // Skill.
       '3', // Questions reviewed.
       '2', // Questions accepted.
@@ -183,9 +184,9 @@ describe('Practice Question Reviewer', function () {
   });
 
   it('should be able to check badges earned', async function () {
-    await questionSubmitter.navigateToTabInMyContributions('Badges');
-    await questionSubmitter.expectBadgesToContain('1', 'Review');
-    await questionSubmitter.expectBadgesToContain('1', 'Correction');
+    await questionReviewer.navigateToTabInMyContributions('Badges');
+    await questionReviewer.expectBadgesToContain('1', 'Review');
+    await questionReviewer.expectBadgesToContain('1', 'Correction');
   });
 
   afterAll(async function () {

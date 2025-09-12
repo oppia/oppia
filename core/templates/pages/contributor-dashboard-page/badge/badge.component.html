@@ -1,10 +1,10 @@
-<div *ngIf="isUnlocked && contributionType === 'question'" class="question-badge-container">
+<div *ngIf="isUnlocked && contributionType === 'question'" class="question-badge-container e2e-test-badge">
   <img class="question-badge"
        src="/assets/images/contributor_dashboard/question-{{contributionSubType}}-badge.component.svg">
-  <div class="question-badge-value">
+  <div class="question-badge-value e2e-test-badge-value">
       {{contributionCount}}
   </div>
-  <div class="question-badge-caption">
+  <div class="question-badge-caption e2e-test-badge-caption">
       {{contributionSubTypeText}}
   </div>
 </div>
