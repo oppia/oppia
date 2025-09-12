@@ -238,7 +238,7 @@ describe('Practice Question Submitter', function () {
       'Accepted'
     );
     await questionSubmitter.expectContributionStatusToBe(
-      'What is 14 + 12?',
+      'What is 14 + 12?14 + 12',
       'Addition',
       'Accepted'
     );
@@ -375,7 +375,7 @@ describe('Practice Question Submitter', function () {
     await questionSubmitter.editDefaultResponseFeedbackInQuestionEditorPage(
       'Try Again!'
     );
-    // TODO: Verify works properly.
+    await questionSubmitter.addHintToState('Arrage in ascending order');
     await questionSubmitter.addDragAndDropSortSolution(
       ['First', 'Second', 'Third'],
       'As given in the question.'

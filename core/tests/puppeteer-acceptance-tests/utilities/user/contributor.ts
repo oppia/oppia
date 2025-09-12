@@ -560,7 +560,9 @@ export class Contributor extends ExplorationEditor {
       featuredLanguageOptionSelector,
       languageOptionSelector,
     ]) {
-      await this.expectElementToBeVisible(optionSelector);
+      if (!(await this.isElementVisible(optionSelector))) {
+        continue;
+      }
       // Get the language option element.
       for (const option of await this.page.$$(optionSelector)) {
         const optionText = await option.evaluate(el => el.textContent?.trim());

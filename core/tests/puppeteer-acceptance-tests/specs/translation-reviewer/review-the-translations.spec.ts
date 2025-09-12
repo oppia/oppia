@@ -63,7 +63,7 @@ describe('Translation Reviewer', function () {
       await curriculumAdm.createAndPublishExplorationWithCards(
         'Exploration 1',
         'Mathematics',
-        3
+        4
       );
     const explorationId2 =
       await curriculumAdm.createAndPublishExplorationWithCards('Exploration 2');
@@ -106,6 +106,10 @@ describe('Translation Reviewer', function () {
     await translationSubmitter.clickOnDiscardChangesButton();
     await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE('सामग्री 2');
+    await translationSubmitter.clickOn('Save and translate another');
+    await translationSubmitter.clickOnDiscardChangesButton();
+    await translationSubmitter.clickOnSkipTranslationButton();
+    await translationSubmitter.typeTextForRTE('सामग्री 3');
     await translationSubmitter.clickOn('Save and close');
     await translationSubmitter.clickOnDiscardChangesButton();
 
@@ -178,7 +182,7 @@ describe('Translation Reviewer', function () {
       'I have added some changes.'
     );
     await translationReviewer.expectCardContentToBeInTranslationReview(
-      'सामग्री 2'
+      'सामग्री 3'
     );
   });
 
