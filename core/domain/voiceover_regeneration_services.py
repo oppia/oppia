@@ -31,6 +31,8 @@ from core import feconf
 from core import utils
 from core.domain import exp_fetchers
 from core.domain import fs_services
+from core.domain import html_cleaner
+from core.domain import rte_component_registry
 from core.domain import state_domain
 from core.domain import translation_fetchers
 from core.domain import voiceover_services
@@ -52,30 +54,6 @@ if MYPY: # pragma: no cover
 speech_synthesis_services = (
     models.Registry.import_speech_synthesis_services())
 
-
-ALLOWED_CUSTOM_OPPIA_RTE_TAGS = [
-    'oppia-noninteractive-collapsible',
-    'oppia-noninteractive-image',
-    'oppia-noninteractive-link',
-    'oppia-noninteractive-math',
-    'oppia-noninteractive-video',
-    'oppia-noninteractive-skillreview',
-    'oppia-noninteractive-tabs',
-    'oppia-noninteractive-workedexample'
-]
-
-ALLOWED_GENERAL_OPPIA_RTE_TAGS = [
-    'p',
-    'strong',
-    'br',
-    'em',
-    'li',
-    'ol',
-    'ul',
-    'pre',
-    'blockquote'
-]
-
 WAIT_TIME_FOR_VOICEOVER_REGENERATION_IN_SECONDS = 3
 
 
@@ -91,7 +69,7 @@ def convert_custom_oppia_tags_to_generic_tags(element: bs4.Tag) -> bs4.Tag:
     """
     # NOTE: This method currently processes only the Link, Skillreview, and Math
     # custom RTE tags. It extracts and returns the user-facing text from these
-    # tags. Other tags are not handled here, so their content is excluded during
+    # tags. Other tags returns empty string, so their content is excluded during
     # voiceover regeneration. To support additional custom tags (e.g., Images,
     # Worked Examples, etc.), add similar rules below to ensure their texts are
     # also processed during voiceover regeneration.
@@ -110,6 +88,17 @@ def convert_custom_oppia_tags_to_generic_tags(element: bs4.Tag) -> bs4.Tag:
         latex_expr = math_content['raw_latex']
         converter = latex2text.LatexNodes2Text()
         element.string = converter.latex_to_text(latex_expr)
+        element.name = 'p'
+    elif element.name in [
+        'oppia-noninteractive-collapsible',
+        'oppia-noninteractive-image',
+        'oppia-noninteractive-video',
+        'oppia-noninteractive-tabs',
+        'oppia-noninteractive-workedexample'
+    ]:
+        # For these tags, we simply replace them with an empty string to
+        # exclude their content from voiceover regeneration.
+        element.string = ''
         element.name = 'p'
     return element
 
@@ -130,10 +119,14 @@ def parse_html(html_content: str) -> str:
     soup = bs4.BeautifulSoup(html_content, 'html.parser')
     all_tags = {tag.name for tag in soup.find_all()}
 
+    allowed_custom_oppia_rte_tags = list(
+        rte_component_registry.Registry.get_tag_list_with_attrs().keys())
+    allowed_general_oppia_rte_tags = list(html_cleaner.ATTRS_ALLOWLIST.keys())
+
     unknown_tags = (
         all_tags -
-        set(ALLOWED_CUSTOM_OPPIA_RTE_TAGS) -
-        set(ALLOWED_GENERAL_OPPIA_RTE_TAGS)
+        set(allowed_custom_oppia_rte_tags) -
+        set(allowed_general_oppia_rte_tags)
     )
 
     if unknown_tags:
@@ -141,7 +134,7 @@ def parse_html(html_content: str) -> str:
             'HTML content contains invalid or unsupported tags: %s' % (
                 ', '.join(unknown_tags)))
 
-    for custom_tag_element in ALLOWED_CUSTOM_OPPIA_RTE_TAGS:
+    for custom_tag_element in allowed_custom_oppia_rte_tags:
         for element in soup.find_all(custom_tag_element):
             convert_custom_oppia_tags_to_generic_tags(element)
 

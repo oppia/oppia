@@ -18,9 +18,7 @@
 
 from __future__ import annotations
 
-import json
 import os
-import re
 from unittest import mock
 
 from core import feconf
@@ -81,13 +79,54 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
         expected_parsed_text = 'x^2 + y^2 = z^2'
         self.assertEqual(parsed_text, expected_parsed_text)
 
-    def test_should_not_convert_oppia_image_tag_to_p_tags(self) -> None:
+    def test_empty_text_from_image_tag(self) -> None:
         content_html = (
             '<oppia-noninteractive-image alt-with-value="&amp;quot;Circle'
             '&amp;quot;" caption-with-value="&amp;quot;Circle&amp;quot;" '
             'filepath-with-value="&amp;quot;img_20250120_160503_kusnpv2um4_'
             'height_350_width_450.svg&amp;quot;" ng-version="11.2.14">'
             '</oppia-noninteractive-image>')
+        parsed_text = voiceover_regeneration_services.parse_html(content_html)
+        expected_parsed_text = ''
+        self.assertEqual(parsed_text, expected_parsed_text)
+
+    def test_empty_text_from_video_tag(self) -> None:
+        content_html = (
+            '<oppia-noninteractive-video autoplay-with-value=\"true\" '
+            'end-with-value=\"11\"'
+            ' video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;'
+            'quot;\"></oppia-noninteractive-video>')
+        parsed_text = voiceover_regeneration_services.parse_html(content_html)
+        expected_parsed_text = ''
+        self.assertEqual(parsed_text, expected_parsed_text)
+
+    def test_empty_text_from_worked_example_tag(self) -> None:
+        content_html = (
+            '<oppia-noninteractive-workedexample question-with-value="&amp;'
+            'quot;&amp;lt;pre&amp;gt;&amp;lt;p&amp;gt;lorem ipsum&amp;'
+            'lt;/p&amp;gt;&amp;lt;/pre&amp;gt;'
+            '&amp;quot;" answer-with-value="&amp;quot;'
+            'lorem ipsum&amp;quot;">'
+            '</oppia-noninteractive-workedexample>')
+        parsed_text = voiceover_regeneration_services.parse_html(content_html)
+        expected_parsed_text = ''
+        self.assertEqual(parsed_text, expected_parsed_text)
+
+    def test_empty_text_from_collapsible_tag(self) -> None:
+        content_html = (
+            '<oppia-noninteractive-collapsible '
+            'content-with-value=\'&amp;quot;&amp;quot;\' heading-with-value='
+            '\'&amp;quot;&amp;quot;\'></oppia-noninteractive-collapsible>')
+        parsed_text = voiceover_regeneration_services.parse_html(content_html)
+        expected_parsed_text = ''
+        self.assertEqual(parsed_text, expected_parsed_text)
+
+    def test_empty_text_from_tabs_tag(self) -> None:
+        content_html = (
+            '<oppia-noninteractive-tabs tab_contents-with-value=\'[{&amp;quot;'
+            '&amp;quot;:&amp;quot;Hint introduction&amp;quot;,&amp;quot;content'
+            '&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;hint&amp;lt;/p&amp;gt;&amp;'
+            'quot;}]\'></oppia-noninteractive-tabs>')
         parsed_text = voiceover_regeneration_services.parse_html(content_html)
         expected_parsed_text = ''
         self.assertEqual(parsed_text, expected_parsed_text)
@@ -603,36 +642,3 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
             errors_while_voiceover_regeneration,
             [('content_0', 'Mocked exception during voiceover regeneration')]
         )
-
-    def test_custom_rte_tags_sync_with_definitions(self) -> None:
-        with open(
-            feconf.RTE_EXTENSIONS_DEFINITIONS_PATH, 'r', encoding='utf-8'
-        ) as file:
-            file_contents = file.read()
-            match = re.search(
-                r'export default ({.*}) as const;', file_contents, re.DOTALL)
-
-            if match:
-                json_like_data = match.group(1)
-                custom_rte_tags_definition_dict = json.loads(json_like_data)
-
-                custom_rte_tag_to_names = {
-                    'oppia-noninteractive-collapsible': 'Collapsible',
-                    'oppia-noninteractive-image': 'Image',
-                    'oppia-noninteractive-link': 'Link',
-                    'oppia-noninteractive-math': 'Math',
-                    'oppia-noninteractive-video': 'Video',
-                    'oppia-noninteractive-skillreview': 'Skillreview',
-                    'oppia-noninteractive-tabs': 'Tabs',
-                    'oppia-noninteractive-workedexample': 'Workedexample',
-                }
-                rte_tag_names = list(custom_rte_tags_definition_dict.keys())
-
-                self.assertItemsEqual(
-                    voiceover_regeneration_services
-                    .ALLOWED_CUSTOM_OPPIA_RTE_TAGS,
-                    list(custom_rte_tag_to_names.keys()))
-                self.assertItemsEqual(
-                    rte_tag_names,
-                    list(custom_rte_tag_to_names.values())
-                )
