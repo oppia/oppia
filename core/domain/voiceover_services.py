@@ -31,10 +31,10 @@ from core.domain import user_services
 from core.domain import voiceover_domain
 from core.domain import voiceover_regeneration_services
 from core.platform import models
+from core.storage.voiceover import gae_models
 
-from typing import Dict, List, Literal, Optional, Sequence, Tuple, cast
+from typing import Dict, List, Optional, Sequence, Tuple, cast
 
-VoiceoverTypeStr = Literal['manual', 'auto']
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -310,9 +310,9 @@ def compute_voiceover_related_change(
                 # conforms to the specific nested dictionary structure required
                 # by the create_new() method.
                 cast(Dict[str, Dict[
-                    VoiceoverTypeStr,
+                    gae_models.VoiceoverTypeStr,
                     Optional[state_domain.VoiceoverDict]
-                    ]], entity_voiceovers_dict['voiceovers_mapping']),
+                ]], entity_voiceovers_dict['voiceovers_mapping']),
                 entity_voiceovers_dict[
                     'automated_voiceovers_audio_offsets_msecs']
             )
@@ -427,8 +427,8 @@ def create_entity_voiceovers_model(
     # conforms to the specific nested dictionary structure required
     # by the create_new() method.
     voiceovers_mapping = cast(Dict[str, Dict[
-        VoiceoverTypeStr, Optional[state_domain.VoiceoverDict]
-        ]], entity_voiceovers_dict['voiceovers_mapping'])
+        gae_models.VoiceoverTypeStr, Optional[state_domain.VoiceoverDict]
+    ]], entity_voiceovers_dict['voiceovers_mapping'])
     automated_voiceovers_audio_offsets_msecs_dict = entity_voiceovers_dict[
         'automated_voiceovers_audio_offsets_msecs']
 
@@ -924,9 +924,9 @@ def compute_voiceover_related_changes_upon_revert(
                 # conforms to the specific nested dictionary structure required
                 # by the create_new() method.
                 cast(Dict[str, Dict[
-                    VoiceoverTypeStr,
+                    gae_models.VoiceoverTypeStr,
                     Optional[state_domain.VoiceoverDict]
-                    ]], entity_voiceovers_dict['voiceovers_mapping']),
+                ]], entity_voiceovers_dict['voiceovers_mapping']),
                 entity_voiceovers_dict[
                     'automated_voiceovers_audio_offsets_msecs']
             )
