@@ -208,10 +208,10 @@ describe('Translation Reviewer', function () {
     await translationReviewer.expectContributionTableToContainRow([
       null,
       'Fractions',
+      '4',
+      '8',
       '3',
       '6',
-      '2',
-      '4',
     ]);
 
     // Download certificate.

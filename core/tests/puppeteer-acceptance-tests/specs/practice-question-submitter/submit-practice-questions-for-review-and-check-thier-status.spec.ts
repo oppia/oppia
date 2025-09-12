@@ -380,6 +380,7 @@ describe('Practice Question Submitter', function () {
       ['First', 'Second', 'Third'],
       'As given in the question.'
     );
+    await questionSubmitter.submitQuestionSuggestion();
 
     // Number Input Interaction.
     await questionSubmitter.suggestQuestionsForSkillandTopic(
