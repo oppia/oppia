@@ -293,6 +293,7 @@ const toggleSkillEditOptionsButton =
 const mobileSaveSkillButton = '.e2e-test-mobile-save-skill-changes';
 const mobilePreviewTab = '.e2e-test-mobile-preview-tab';
 const navigationDropdown = '.e2e-test-mobile-skill-nav-dropdown-icon';
+const toggleRubricsDropdownSelector = '.e2e-test-toggle-rubrics-dropdown';
 
 export class CurriculumAdmin extends BaseUser {
   /**
@@ -1089,6 +1090,15 @@ export class CurriculumAdmin extends BaseUser {
         break;
       default:
         throw new Error(`Unknown difficulty: ${difficulty}`);
+    }
+
+    // Expand the difficulty rubric section in mobile.
+    if (
+      this.isViewportAtMobileWidth() &&
+      !(await this.isElementVisible(selectRubricDifficultySelector))
+    ) {
+      await this.expectElementToBeVisible(toggleRubricsDropdownSelector);
+      await this.clickOn(toggleRubricsDropdownSelector);
     }
     await this.waitForElementToBeClickable(selectRubricDifficultySelector);
     await this.select(selectRubricDifficultySelector, difficultyValue);
