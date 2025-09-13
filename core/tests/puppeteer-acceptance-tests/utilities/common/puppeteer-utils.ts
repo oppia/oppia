@@ -165,7 +165,7 @@ export class BaseUser {
           }
 
           const config = {
-            followNewTab: true,
+            followNewTab: false,
             fps: 25,
             ffmpeg_Path: null,
             // Below dimensions are of recorded video.
