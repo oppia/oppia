@@ -241,26 +241,13 @@ export class Contributor extends ExplorationEditor {
       await this.expectElementToBeVisible(viewDropdownSelector);
       await this.clickOn(viewDropdownSelector);
 
-      await this.expectElementToBeVisible(viewDropdownOptionSelector);
-      const contibutionTypeOptions = await this.page.$$(
-        viewDropdownOptionSelector
-      );
-      let optionElement: ElementHandle<Element> | null = null;
-      for (const option of contibutionTypeOptions) {
-        const optionText = await option.evaluate(el => el.textContent?.trim());
-        if (optionText === tabName) {
-          optionElement = option;
-          break;
-        }
-      }
+      const xpath = `//*[contains(@class, '${viewDropdownOptionClass}') and contains(text(), "${tabName}")]`;
+
+      const optionElement = await this.page.waitForXPath(xpath);
 
       if (!optionElement) {
         throw new Error(`Option ${tabName} not found.`);
       }
-
-      // Click on the option.
-      await this.waitForElementToStabilize(optionElement);
-      await this.expectElementToBeClickable(optionElement);
       await optionElement.click();
 
       await this.expectTextContentToContain(viewDropdownSelector, tabName);
@@ -449,7 +436,7 @@ export class Contributor extends ExplorationEditor {
    */
   async switchToTabInContributionDashboard(
     tabName: 'Translate Text' | 'My Contributions' | 'Submit Question'
-  ) {
+  ): Promise<void> {
     await this.page.waitForSelector(contributionTabSelector);
 
     // Get required tab element.
@@ -466,8 +453,6 @@ export class Contributor extends ExplorationEditor {
     if (!tabElement) {
       throw new Error(`Tab ${tabName} not found.`);
     }
-
-    await this.page.waitForFunction(isElementClickable, {}, tabElement);
 
     // Click on the tab.
     await tabElement.click();
