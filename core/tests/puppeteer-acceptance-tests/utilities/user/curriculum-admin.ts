@@ -20,7 +20,7 @@ import puppeteer from 'puppeteer';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import {ElementHandle} from 'puppeteer';
-import {TopicManager} from './topic-manager';
+import {BaseUser} from '../common/puppeteer-utils';
 
 const curriculumAdminThumbnailImage =
   testConstants.data.curriculumAdminThumbnailImage;
@@ -314,8 +314,12 @@ const movableClassroomTileSelector = '.e2e-test-movable-classroom-tile';
 const matFormFieldSelector = 'mat-form-field';
 const topicPrerequisitesContainerSelector =
   '.e2e-test-topic-prerquisites-container';
+const mobilePublishTopicButton =
+  'div.navbar-mobile-options .e2e-test-mobile-publish-topic-button';
+const publishTopicButton = 'button.e2e-test-publish-topic-button';
+const topicEditorMainTabFormSelector = '.e2e-test-topic-editor-main-tab';
 
-export class CurriculumAdmin extends TopicManager {
+export class CurriculumAdmin extends BaseUser {
   /**
    * Moves the classrooms in the order of the given classroom names.
    * @param classroomNames The names of the classrooms to move.
@@ -2887,6 +2891,49 @@ export class CurriculumAdmin extends TopicManager {
     await this.expectElementToBeVisible(selector);
     await this.clickOn(selector);
     await this.expectModalTitleToBe('New Skill');
+  }
+
+  /**
+   * Checks if we are in topic editor.
+   * @param {string} topicName - Optional topic name to check.
+   *
+   * TODO(#22539): This function has a duplicate in topic-manager.ts.
+   * To avoid unexpected behavior, ensure that any modifications here are also
+   * made in topic-manager.ts.
+   */
+  async expectToBeInTopicEditor(topicName?: string): Promise<void> {
+    await this.expectElementToBeVisible(topicEditorMainTabFormSelector);
+
+    if (topicName) {
+      await this.expectElementValueToBe(topicNameField, topicName);
+    }
+  }
+
+  /**
+   * Publishes a topic draft.
+   * @param topicName - Optional. If not provided, the topic editor will be opened.
+   *
+   * TODO(#22539): This function has a duplicate in topic-manager.ts.
+   * To avoid unexpected behavior, ensure that any modifications here are also
+   * made in topic-manager.ts.
+   */
+  async publishDraftTopic(topicName?: string): Promise<void> {
+    if (topicName) {
+      await this.openTopicEditor(topicName);
+    } else {
+      await this.expectToBeInTopicEditor();
+    }
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileOptionsSelector);
+      await this.clickOn(mobileSaveTopicDropdown);
+      await this.page.waitForSelector(mobilePublishTopicButton);
+      await this.clickOn(mobilePublishTopicButton);
+      await this.page.waitForSelector(mobilePublishTopicButton, {hidden: true});
+    } else {
+      await this.clickOn(publishTopicButton);
+
+      await this.page.waitForSelector(publishTopicButton, {hidden: true});
+    }
   }
 }
 

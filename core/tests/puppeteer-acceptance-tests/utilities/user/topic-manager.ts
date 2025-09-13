@@ -487,6 +487,10 @@ export class TopicManager extends BaseUser {
   /**
    * Checks if we are in topic editor.
    * @param {string} topicName - Optional topic name to check.
+   *
+   * TODO(#22539): This function has a duplicate in curriculum-admin.ts.
+   * To avoid unexpected behavior, ensure that any modifications here are also
+   * made in curriculum-admin.ts.
    */
   async expectToBeInTopicEditor(topicName?: string): Promise<void> {
     await this.expectElementToBeVisible(topicEditorMainTabFormSelector);
@@ -3208,6 +3212,10 @@ export class TopicManager extends BaseUser {
   /**
    * Publishes a topic draft.
    * @param topicName - Optional. If not provided, the topic editor will be opened.
+   *
+   * TODO(#22539): This function has a duplicate in curriculum-admin.ts.
+   * To avoid unexpected behavior, ensure that any modifications here are also
+   * made in curriculum-admin.ts.
    */
   async publishDraftTopic(topicName?: string): Promise<void> {
     if (topicName) {
