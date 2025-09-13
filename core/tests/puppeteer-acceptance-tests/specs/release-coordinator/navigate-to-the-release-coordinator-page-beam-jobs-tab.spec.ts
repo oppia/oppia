@@ -80,7 +80,7 @@ describe('Release Coordinator', function () {
     await releaseCoordinator.expectJobOutputToBe(
       `('${explorationId}', 'Introduction', [])`
     );
-    await this.expectJobStatusToBeSuccessful(
+    await releaseCoordinator.expectJobStatusToBeSuccessful(
       1, // First job.
       true // Successful.
     );
@@ -88,7 +88,7 @@ describe('Release Coordinator', function () {
 
   it('should be able to handle beam job failure', async function () {
     // TODO(#23331): Once we have a dummy job that always fails,
-    // add steps to run the dummy
+    // add steps to run the dummy job and check if the job status is failure.
   });
 
   afterAll(async function () {

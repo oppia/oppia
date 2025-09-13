@@ -88,6 +88,7 @@ export class ReleaseCoordinator extends BaseUser {
       }
     }, this);
   }
+
   /**
    * Navigate to the release coordinator page.
    */
