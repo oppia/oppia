@@ -182,6 +182,7 @@ describe('Practice Question Reviewer', function () {
       'Addition'
     );
     await questionSubmitter.expectSelectedInteractionNameToBe('Number Input');
+    await questionSubmitter.closePracticeQuestionModal();
     // Accept the question suggestion.
     // TODO(#23345): Currently, the wrong question gets rejected instead of the correct one.
     // Once fixed, replace the '12 + 4' with 'What is 231 + 12?'.

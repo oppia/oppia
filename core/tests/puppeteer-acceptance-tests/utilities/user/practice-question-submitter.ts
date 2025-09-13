@@ -113,6 +113,7 @@ const reviewContentContainerSelector = '.e2e-test-review-content-container';
 const contributionTabClass = 'e2e-test-contribution-tab';
 const activeElementClass = 'e2e-test-active';
 const viewDropdownSelector = '.e2e-test-mobile-contribution-dropdown';
+const closeModalButtonSelector = '.e2e-test-close-modal-button';
 
 export class PracticeQuestionSubmitter extends Contributor {
   /**
@@ -447,7 +448,12 @@ export class PracticeQuestionSubmitter extends Contributor {
       hidden: true,
     });
 
-    await this.clickOn(editFeedbackButtonSelector);
+    const editFeedbackSelector = this.isViewportAtMobileWidth()
+      ? editFeedbackButtonSelector
+      : feedbackEditorButton;
+
+    await this.waitForElementToStabilize(editFeedbackSelector);
+    await this.clickOn(editFeedbackSelector);
     await this.page.waitForSelector(stateContentInputField, {visible: true});
     await this.type(stateContentInputField, 'Last Card');
     await this.clickOn(correctAnswerInTheGroupSelector);
@@ -724,6 +730,17 @@ export class PracticeQuestionSubmitter extends Contributor {
 
     await viewButton.click();
     await this.expectElementToBeVisible(viewQuestionSudggestionModalHeader);
+  }
+
+  /**
+   * Closes the translation modal.
+   */
+  async closePracticeQuestionModal(): Promise<void> {
+    await this.expectElementToBeVisible(closeModalButtonSelector);
+    await this.clickOn(closeModalButtonSelector);
+
+    // Verify that the modal is closed.
+    await this.expectElementToBeVisible(closeModalButtonSelector, false);
   }
 }
 
