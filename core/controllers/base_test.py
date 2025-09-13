@@ -194,7 +194,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
             def mock_get_secret(name: str) -> Optional[str]:
                 if name == 'FIREBASE_CONFIG_VALUES':
-                    return {"apiKey": "test-key"}
+                    return "{\"apiKey\": \"test-key\"}"
                 return 'secret'
 
             with self.swap_to_always_return(

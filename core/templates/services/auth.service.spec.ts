@@ -270,7 +270,7 @@ describe('Auth service', function () {
     });
 
     it('should return firebase config', () => {
-      spyOn(AuthService, 'getConfig').and.returnValue({
+      spyOn(AuthService, 'fetchConfigFromBackend').and.returnValue({
         FIREBASE_CONFIG_API_KEY: 'sample-api-key',
         FIREBASE_CONFIG_AUTH_DOMAIN: 'sample-auth-domain',
         FIREBASE_CONFIG_PROJECT_ID: 'sample-project-id',
@@ -290,7 +290,7 @@ describe('Auth service', function () {
     });
 
     it('should return the same config if called multiple times', () => {
-      spyOn(AuthService, 'getConfig').and.returnValue({
+      spyOn(AuthService, 'fetchConfigFromBackend').and.returnValue({
         FIREBASE_CONFIG_API_KEY: 'sample-api-key',
         FIREBASE_CONFIG_AUTH_DOMAIN: 'sample-auth-domain',
         FIREBASE_CONFIG_PROJECT_ID: 'sample-project-id',
@@ -307,7 +307,7 @@ describe('Auth service', function () {
     it('should call firebase_config API', () => {
       spyOn(XMLHttpRequest.prototype, 'open').and.callThrough();
       spyOn(XMLHttpRequest.prototype, 'send');
-      const firebaseConfig = AuthService.getConfig();
+      const firebaseConfig = AuthService.fetchConfigFromBackend();
       expect(firebaseConfig).toEqual({
         apiKey: 'fake-api-key',
         authDomain: '',
@@ -341,7 +341,7 @@ describe('Auth service', function () {
         }
       });
 
-      const firebaseConfig = AuthService.getConfig();
+      const firebaseConfig = AuthService.fetchConfigFromBackend();
 
       expect(XMLHttpRequest.prototype.open).toHaveBeenCalledWith(
         'GET',
@@ -372,7 +372,7 @@ describe('Auth service', function () {
         }
       });
 
-      const firebaseConfig = AuthService.getConfig();
+      const firebaseConfig = AuthService.fetchConfigFromBackend();
 
       expect(XMLHttpRequest.prototype.open).toHaveBeenCalledWith(
         'GET',
@@ -395,7 +395,7 @@ describe('Auth service', function () {
         throw new Error('Test Error');
       });
       const consoleSpy = spyOn(console, 'error');
-      AuthService.getConfig();
+      AuthService.fetchConfigFromBackend();
       expect(consoleSpy).toHaveBeenCalledWith(
         'Unable to fetch firebase config : ',
         jasmine.any(Error)
