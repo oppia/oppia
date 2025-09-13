@@ -163,7 +163,7 @@ describe('Topic Manager', function () {
     await topicManager.addTextInputInteraction();
     await topicManager.updateAnswersInResponseModal(
       INTERACTION_TYPES.TEXT_INPUT,
-      'Hello'
+      'Hello, Oppia!'
     );
     await topicManager.addResponseDetailsInResponseModal(
       'Great!',
