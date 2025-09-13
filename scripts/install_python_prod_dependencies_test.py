@@ -814,7 +814,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         ]
 
         for lib_name, expected_normalized_name in expected_normalized_names:
-            observed_normalized_name =(
+            observed_normalized_name = (
                 install_python_prod_dependencies.normalize_python_library_name(
                     lib_name))
             self.assertEqual(
