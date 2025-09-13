@@ -75,6 +75,8 @@ const addUserGroupContainerSelector = '.e2e-test-add-user-group-container';
 const userGroupItemSelector = '.e2e-test-user-group-item';
 const userGroupCreateErrorSelector = '.e2e-test-user-group-save-error';
 const removeUserGroupButtonSelector = '.e2e-test-remove-user-group-button';
+const beamJobsTableSelector = '.e2e-test-beam-jobs-table';
+const beamJobStatusSelectorPrefix = '..e2e-test-job-status-';
 
 export class ReleaseCoordinator extends BaseUser {
   constructor() {
@@ -834,8 +836,6 @@ export class ReleaseCoordinator extends BaseUser {
     rowIndex: number,
     expectedStatus: boolean
   ): Promise<void> {
-    const beamJobsTableSelector = '.e2e-test-beam-jobs-table';
-    const beamJobStatusSelectorPrefix = '..e2e-test-job-status-';
     const beamJobRowSelector = `${beamJobsTableSelector} tbody tr:nth-child(${rowIndex})`;
     const rowElement = await this.page.waitForSelector(beamJobRowSelector);
     if (!rowElement) {
