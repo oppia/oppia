@@ -432,6 +432,7 @@ export class TranslationModalComponent {
 
   skipActiveTranslation(): void {
     this.checkForUnsavedChanges(() => {
+      this.clearTranslation();
       const translatableItem = this.translateTextService.getTextToTranslate();
       this.updateActiveState(translatableItem);
       ({more: this.moreAvailable} = translatableItem);
@@ -445,6 +446,7 @@ export class TranslationModalComponent {
 
   returnToPreviousTranslation(): void {
     this.checkForUnsavedChanges(() => {
+      this.clearTranslation();
       const translatableItem =
         this.translateTextService.getPreviousTextToTranslate();
       this.updateActiveState(translatableItem);
@@ -543,27 +545,40 @@ export class TranslationModalComponent {
           this.alertsService.addSuccessMessage(
             'Submitted translation for review.'
           );
+          this.clearTranslation();
           this.uploadingTranslation = false;
+
           if (this.moreAvailable) {
             this.skipActiveTranslation();
             this.resetEditor();
           } else {
-            this.activeWrittenTranslation = '';
+            this.closeWithoutUnsavedCheck();
           }
         },
         (errorReason: string) => {
+          this.uploadingTranslation = false;
           this.pageContextService.resetImageSaveDestination();
           this.alertsService.clearWarnings();
           this.alertsService.addWarning(errorReason);
-          this.close();
+          this.closeWithoutUnsavedCheck();
         }
       );
     }
     if (!this.moreAvailable) {
       this.pageContextService.resetImageSaveDestination();
-      this.close();
+      this.closeWithoutUnsavedCheck();
     }
   }
+
+  private clearTranslation(): void {
+    this.activeWrittenTranslation = '';
+  }
+
+  private closeWithoutUnsavedCheck(): void {
+    this.activeModal.close();
+    this.ckEditorCopyContentService.copyModeActive = false;
+  }
+
   updateTranslatedText(): void {
     if (!this.canTranslatedTextBeSubmitted()) {
       return;

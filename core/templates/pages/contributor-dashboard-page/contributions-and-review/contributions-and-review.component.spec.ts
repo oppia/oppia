@@ -46,7 +46,7 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {UserInfo} from 'domain/user/user-info.model';
 import {CsrfTokenService} from 'services/csrf-token.service';
 import {AlertsService} from 'services/alerts.service';
-import {QuestionObjectFactory} from 'domain/question/QuestionObjectFactory';
+import {Question} from 'domain/question/question.model';
 import {FormatRtePreviewPipe} from 'filters/format-rte-preview.pipe';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {OpportunitiesListComponent} from '../opportunities-list/opportunities-list.component';
@@ -90,7 +90,6 @@ describe('Contributions and review component', () => {
   var translationTopicService: TranslationTopicService;
   var userService: UserService;
   let alertsService: AlertsService;
-  let questionObjectFactory: QuestionObjectFactory;
   var getUserCreatedTranslationSuggestionsAsyncSpy = null;
   var getReviewableQuestionSuggestionsAsyncSpy = null;
   var getReviewableTranslationSuggestionsAsyncSpy = null;
@@ -139,7 +138,6 @@ describe('Contributions and review component', () => {
         SkillBackendApiService,
         FormatRtePreviewPipe,
         HtmlEscaperService,
-        QuestionObjectFactory,
         CsrfTokenService,
         TranslationTopicService,
         {
@@ -160,7 +158,6 @@ describe('Contributions and review component', () => {
     component = fixture.componentInstance;
 
     ngbModal = TestBed.inject(NgbModal);
-    questionObjectFactory = TestBed.inject(QuestionObjectFactory);
     alertsService = TestBed.inject(AlertsService);
     contributionAndReviewService = TestBed.inject(ContributionAndReviewService);
     userService = TestBed.inject(UserService);
@@ -615,7 +612,7 @@ describe('Contributions and review component', () => {
         skill_description: 'string',
         skill_rubrics: [],
       };
-      let question = questionObjectFactory.createFromBackendDict({
+      let question = Question.createFromBackendDict({
         question_state_data_schema_version: null,
         id: 'question_1',
         question_state_data: {

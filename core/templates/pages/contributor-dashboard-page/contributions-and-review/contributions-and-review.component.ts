@@ -30,11 +30,7 @@ import {Subscription, Observable} from 'rxjs';
 import {Rubric} from 'domain/skill/rubric.model';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {MisconceptionSkillMap} from 'domain/skill/misconception.model';
-import {
-  Question,
-  QuestionBackendDict,
-  QuestionObjectFactory,
-} from 'domain/question/QuestionObjectFactory';
+import {Question, QuestionBackendDict} from 'domain/question/question.model';
 import {
   ActiveContributionDict,
   TranslationSuggestionReviewModalComponent,
@@ -198,7 +194,6 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     private contributionOpportunitiesService: ContributionOpportunitiesService,
     private formatRtePreviewPipe: FormatRtePreviewPipe,
     private ngbModal: NgbModal,
-    private questionObjectFactory: QuestionObjectFactory,
     private skillBackendApiService: SkillBackendApiService,
     private translationLanguageService: TranslationLanguageService,
     private translationTopicService: TranslationTopicService,
@@ -339,9 +334,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     const suggestionId = suggestion.suggestion_id;
     const updatedQuestion =
       question ||
-      this.questionObjectFactory.createFromBackendDict(
-        suggestion.change_cmd.question_dict
-      );
+      Question.createFromBackendDict(suggestion.change_cmd.question_dict);
 
     const modalRef = this.ngbModal.open(
       QuestionSuggestionReviewModalComponent,
