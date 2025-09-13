@@ -32,7 +32,7 @@ import {
   ExplorationChange,
   ExplorationDraft,
 } from 'domain/exploration/exploration-draft.model';
-import {ExplorationBackendDict} from 'domain/exploration/ExplorationObjectFactory';
+import {ExplorationBackendDict} from 'domain/exploration/exploration.model';
 import {FetchExplorationBackendResponse} from 'domain/exploration/read-only-exploration-backend-api.service';
 
 describe('Exploration data service', function () {

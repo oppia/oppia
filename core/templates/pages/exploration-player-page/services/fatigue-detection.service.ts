@@ -18,7 +18,7 @@
 
 import {Injectable} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {TakeBreakModalComponent} from 'pages/exploration-player-page/current-lesson-player/templates/take-break-modal.component';
+import {TakeBreakModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/take-break-modal.component';
 
 @Injectable({
   providedIn: 'root',

@@ -39,7 +39,7 @@ import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {PlaythroughIssuesBackendApiService} from 'services/playthrough-issues-backend-api.service';
 import {Playthrough} from 'domain/statistics/playthrough.model';
 import {StateBackendDict} from 'domain/state/state.model';
-import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
+import {StateObjectsBackendDict} from 'domain/exploration/states.model';
 import {StateStats} from 'domain/statistics/state-stats-model';
 import {StateTopAnswersStatsService} from 'services/state-top-answers-stats.service';
 import {UserExplorationPermissionsService} from 'pages/exploration-editor-page/services/user-exploration-permissions.service';
