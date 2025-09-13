@@ -171,11 +171,14 @@ describe('Practice Question Reviewer', function () {
     );
     await questionSubmitter.page.reload();
     await questionSubmitter.expectOpportunityToBePresent(
-      'Updated Question',
+      // When question is updated, the question displays updated question, as
+      // well as the original question. So, we are concatenating the updated
+      // question with the original question.
+      'Updated Question' + 'What is 2 + 3?',
       'Addition'
     );
     await questionSubmitter.viewSubmittedQuestion(
-      'Updated Question',
+      'Updated Question' + 'What is 2 + 3?',
       'Addition'
     );
     await questionSubmitter.expectSelectedInteractionNameToBe('Number Input');
