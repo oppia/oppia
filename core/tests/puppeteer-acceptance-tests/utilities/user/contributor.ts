@@ -339,6 +339,38 @@ export class Contributor extends ExplorationEditor {
   }
 
   /**
+   * Selects the badge type in the contribution dashboard.
+   * @param badgeType - The badge type to select.
+   * @param {string} topicName - The name of the topic to select the badge type.
+   */
+  async selectBadgeTypeInMobileView(
+    badgeType: 'Translation' | 'Question'
+  ): Promise<void> {
+    if (!this.isViewportAtMobileWidth()) {
+      showMessage(
+        "Skipping selecting badge type in mobile view as it's not required in desktop view"
+      );
+      return;
+    }
+
+    await this.expectElementToBeVisible(topicSelector);
+    await this.clickOn(topicSelector);
+
+    await this.expectElementToBeVisible(topicOptionSelector);
+
+    const buttonXPath = `//*[normalize-space(.)='${badgeType}']`;
+    const badgeOption = await this.page.waitForXPath(buttonXPath);
+    if (!badgeOption) {
+      throw new Error(`Badge type ${badgeType} not found.`);
+    }
+
+    await badgeOption.click();
+
+    // Verify option is selected.
+    await this.expectTextContentToBe(selectedTopicSelector, badgeType);
+  }
+
+  /**
    * Selects the contribution type in the contribution dashboard.
    * @param contributionType - The contribution type to select.
    */
@@ -474,6 +506,9 @@ export class Contributor extends ExplorationEditor {
     for (const row of tableRows) {
       const rowCells = await row.$$(cellSelector);
       if (rowValues.length !== rowCells.length) {
+        showMessage(
+          `[debug] row values length: ${rowValues.length}, row cells length: ${rowCells.length}`
+        );
         continue;
       }
 

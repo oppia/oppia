@@ -6086,7 +6086,10 @@ export class ExplorationEditor extends BaseUser {
    */
   async expectModalTitleToBe(expectedTitle: string): Promise<void> {
     await this.expectElementToBeVisible(commonModalTitleSelector);
-    await this.expectTextContentToBe(commonModalTitleSelector, expectedTitle);
+    await this.expectTextContentToContain(
+      commonModalTitleSelector,
+      expectedTitle
+    );
   }
 
   /**

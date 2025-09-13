@@ -602,6 +602,7 @@ export class BaseUser {
    */
   async type(selector: string, text: string): Promise<void> {
     await this.page.waitForSelector(selector, {visible: true});
+    await this.waitForElementToStabilize(selector);
     await this.waitForElementToBeClickable(selector);
     await this.page.type(selector, text);
   }

@@ -29,7 +29,10 @@ const imageToUploadInQuestion = testConstants.data.profilePicture;
 const submitQuestionTab = 'a.e2e-test-submitQuestionTab';
 const opportunityHeadingTitlSelector =
   '.e2e-test-opportunity-list-item-heading';
-const opportunitySubheadingTitle = '.e2e-test-opportunity-list-item-subheading';
+const desktopOpportunitySubheadingTitleSelector =
+  '.e2e-test-opportunity-list-item-subheading';
+const mobileOpportunitySubheadingTitleSelector =
+  '.e2e-test-mobile-opportunity-list-item-subheading';
 const opportunityListItem = '.e2e-test-opportunity-list-item';
 const suggestQuestionButton = 'button.e2e-test-opportunity-list-item-button';
 const confirmSkillDificultyButton =
@@ -84,6 +87,7 @@ const solutionInputTextArea =
 const submitQuestionButon = '.e2e-test-save-question-button';
 const feedbackEditorButton =
   'div.oppia-edit-feedback .oppia-click-to-start-editing';
+const editFeedbackButtonSelector = '.e2e-test-open-feedback-editor';
 const addElementToTextInputInteraction = 'button.e2e-test-add-list-entry';
 const skillDifficultyEasy = '.e2e-test-skill-difficulty-easy';
 const skillDifficultyMedium = '.e2e-test-skill-difficulty-medium';
@@ -127,6 +131,9 @@ export class PracticeQuestionSubmitter extends Contributor {
     skillName: string,
     topicName: string
   ): Promise<void> {
+    const opportunitySubHeadingSelector = this.isViewportAtMobileWidth()
+      ? mobileOpportunitySubheadingTitleSelector
+      : desktopOpportunitySubheadingTitleSelector;
     await this.expectElementToBeVisible(submitQuestionTab);
     await this.clickOn(submitQuestionTab);
     await this.page.waitForSelector(opportunityListItem, {visible: true});
@@ -137,8 +144,10 @@ export class PracticeQuestionSubmitter extends Contributor {
       });
       const headingElement = await item.$(opportunityHeadingTitlSelector);
 
-      await item.waitForSelector(opportunitySubheadingTitle, {visible: true});
-      const subheadingElement = await item.$(opportunitySubheadingTitle);
+      await item.waitForSelector(opportunitySubHeadingSelector, {
+        visible: true,
+      });
+      const subheadingElement = await item.$(opportunitySubHeadingSelector);
 
       if (!subheadingElement || !headingElement) {
         continue;
@@ -197,8 +206,8 @@ export class PracticeQuestionSubmitter extends Contributor {
     await this.waitForElementToStabilize(textStateEditSelector);
     await this.clickOn(textStateEditSelector);
     await this.page.waitForSelector(stateContentInputField, {visible: true});
-    await this.clickOn(stateContentInputField);
     await this.type(stateContentInputField, text);
+    await this.waitForElementToStabilize(stateContentInputField);
     await this.clickOn(saveStateEditorContentButton);
 
     await this.expectElementToBeVisible(saveStateEditorContentButton, false);
@@ -303,7 +312,7 @@ export class PracticeQuestionSubmitter extends Contributor {
     await this.expectElementToBeVisible(submitQuestionButon);
     await this.clickOn(submitQuestionButon);
 
-    this.expectElementToBeVisible(submitQuestionButon, false);
+    await this.expectElementToBeVisible(submitQuestionButon, false);
   }
 
   /**
@@ -438,8 +447,7 @@ export class PracticeQuestionSubmitter extends Contributor {
       hidden: true,
     });
 
-    await this.waitForElementToBeClickable(feedbackEditorButton);
-    await this.clickOn(feedbackEditorButton);
+    await this.clickOn(editFeedbackButtonSelector);
     await this.page.waitForSelector(stateContentInputField, {visible: true});
     await this.type(stateContentInputField, 'Last Card');
     await this.clickOn(correctAnswerInTheGroupSelector);
@@ -689,6 +697,7 @@ export class PracticeQuestionSubmitter extends Contributor {
         'If you have 2 apples and someone gives you 3 apples, how many apples do you have?'
     );
     await this.submitQuestionSuggestion();
+    await this.expectToastMessage('Submitted question for review.');
   }
 
   /**

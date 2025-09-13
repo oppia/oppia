@@ -177,6 +177,7 @@ describe('Practice Question Submitter', function () {
 
   it('should be able to check for badges earned', async function () {
     await questionSubmitter.navigateToTabInMyContributions('Badges');
+    await questionSubmitter.selectBadgeTypeInMobileView('Question');
     await questionSubmitter.expectBadgesToContain('1', 'Submission');
   });
 
