@@ -192,12 +192,17 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         for route in main.URLS:
             url = re.sub('<([^/^:]+)>', 'abc123', route.template)
 
+            def mock_get_secret(name: str) -> Optional[str]:
+                if name == 'FIREBASE_CONFIG_VALUES':
+                    return {"apiKey": "test-key"}
+                return 'secret'
+
             with self.swap_to_always_return(
-                secrets_services, 'get_secret', 'secret'
+                secrets_services, 'get_secret', mock_get_secret
             ):
                 # Some of these will 404 or 302. This is expected.
                 self.get_response_without_checking_for_errors(
-                    url, [200, 301, 302, 400, 401, 404, 405, 500])
+                    url, [200, 301, 302, 400, 401, 404, 405])
 
     def test_that_no_post_results_in_500_error(self) -> None:
         """Test that no POST request results in a 500 error."""

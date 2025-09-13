@@ -319,6 +319,76 @@ describe('Auth service', function () {
       expect(XMLHttpRequest.prototype.open).toHaveBeenCalled();
     });
 
+    it('should parse config returned from request', () => {
+      const mockConfig = {
+        FIREBASE_CONFIG_API_KEY: 'test-api-key',
+        FIREBASE_CONFIG_AUTH_DOMAIN: 'test-auth-domain',
+        FIREBASE_CONFIG_PROJECT_ID: 'test-project-id',
+        FIREBASE_CONFIG_STORAGE_BUCKET: 'test-storage-bucket',
+        FIREBASE_CONFIG_MESSAGING_SENDER_ID: 'test-sender-id',
+        FIREBASE_CONFIG_APP_ID: 'test-app-id',
+      };
+      spyOn(XMLHttpRequest.prototype, 'open').and.callThrough();
+      spyOn(XMLHttpRequest.prototype, 'send').and.callFake(function (
+        this: jasmine.SpyObj<XMLHttpRequest>
+      ) {
+        Object.defineProperty(this, 'status', {value: 200});
+        Object.defineProperty(this, 'responseText', {
+          value: ")]}'" + JSON.stringify(mockConfig),
+        });
+        if (this.onload) {
+          this.onload(new ProgressEvent('load'));
+        }
+      });
+
+      const firebaseConfig = AuthService.getConfig();
+
+      expect(XMLHttpRequest.prototype.open).toHaveBeenCalledWith(
+        'GET',
+        '/firebase_config',
+        false
+      );
+      expect(firebaseConfig).toEqual({
+        apiKey: 'test-api-key',
+        authDomain: 'test-auth-domain',
+        projectId: 'test-project-id',
+        storageBucket: 'test-storage-bucket',
+        messagingSenderId: 'test-sender-id',
+        appId: 'test-app-id',
+      });
+    });
+
+    it('should return default config if request returns empty', () => {
+      spyOn(XMLHttpRequest.prototype, 'open').and.callThrough();
+      spyOn(XMLHttpRequest.prototype, 'send').and.callFake(function (
+        this: jasmine.SpyObj<XMLHttpRequest>
+      ) {
+        Object.defineProperty(this, 'status', {value: 200});
+        Object.defineProperty(this, 'responseText', {
+          value: ")]}'" + JSON.stringify(''),
+        });
+        if (this.onload) {
+          this.onload(new ProgressEvent('load'));
+        }
+      });
+
+      const firebaseConfig = AuthService.getConfig();
+
+      expect(XMLHttpRequest.prototype.open).toHaveBeenCalledWith(
+        'GET',
+        '/firebase_config',
+        false
+      );
+      expect(firebaseConfig).toEqual({
+        apiKey: 'fake-api-key',
+        authDomain: '',
+        projectId: 'dev-project-id',
+        storageBucket: '',
+        messagingSenderId: '',
+        appId: '',
+      });
+    });
+
     it('should log an error when unable to fetch firebase config', () => {
       spyOn(XMLHttpRequest.prototype, 'open').and.callThrough();
       spyOn(XMLHttpRequest.prototype, 'send').and.callFake(() => {

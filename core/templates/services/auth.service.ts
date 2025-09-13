@@ -111,7 +111,7 @@ export class AuthService {
     }
   }
 
-  static getConfig: () => FirebaseOptions = function () {
+  static fetchConfigFromBackend: () => FirebaseOptions = function () {
     let config: string = '';
     let request = new XMLHttpRequest();
     try {
@@ -126,17 +126,25 @@ export class AuthService {
     } catch (e) {
       console.error('Unable to fetch firebase config : ', e);
     }
-    if (config.trim().length === 0) {
-      return {
-        apiKey: AppConstants.FIREBASE_CONFIG_API_KEY,
-        authDomain: AppConstants.FIREBASE_CONFIG_AUTH_DOMAIN,
-        projectId: AppConstants.FIREBASE_CONFIG_PROJECT_ID,
-        storageBucket: AppConstants.FIREBASE_CONFIG_STORAGE_BUCKET,
-        messagingSenderId: AppConstants.FIREBASE_CONFIG_MESSAGING_SENDER_ID,
-        appId: AppConstants.FIREBASE_CONFIG_APP_ID,
-      } as const;
+    const defaultFirebaseConfig = {
+      FIREBASE_CONFIG_API_KEY: AppConstants.FIREBASE_CONFIG_API_KEY,
+      FIREBASE_CONFIG_AUTH_DOMAIN: AppConstants.FIREBASE_CONFIG_AUTH_DOMAIN,
+      FIREBASE_CONFIG_PROJECT_ID: AppConstants.FIREBASE_CONFIG_PROJECT_ID,
+      FIREBASE_CONFIG_STORAGE_BUCKET:
+        AppConstants.FIREBASE_CONFIG_STORAGE_BUCKET,
+      FIREBASE_CONFIG_MESSAGING_SENDER_ID:
+        AppConstants.FIREBASE_CONFIG_MESSAGING_SENDER_ID,
+      FIREBASE_CONFIG_APP_ID: AppConstants.FIREBASE_CONFIG_APP_ID,
+    };
+    if (config === '') {
+      return defaultFirebaseConfig;
     } else {
-      return JSON.parse(config);
+      const parsedConfig = JSON.parse(config);
+      if (Object.keys(parsedConfig).length === 0) {
+        return defaultFirebaseConfig;
+      } else {
+        return parsedConfig;
+      }
     }
   };
 
@@ -146,7 +154,7 @@ export class AuthService {
 
   static get firebaseConfig(): FirebaseOptions {
     if (AuthService.firebaseConfigDict === undefined) {
-      var config = AuthService.getConfig();
+      var config = AuthService.fetchConfigFromBackend();
       AuthService.firebaseConfigDict = {
         apiKey: config.FIREBASE_CONFIG_API_KEY,
         authDomain: config.FIREBASE_CONFIG_AUTH_DOMAIN,
