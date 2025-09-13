@@ -71,7 +71,7 @@ var topicDescriptionField = '.e2e-test-new-topic-description-field';
 var topicPageTitleFragmField = '.e2e-test-new-page-title-fragm-field';
 var topicThumbnailButton = '.e2e-test-photo-button';
 var topicUploadButton = '.e2e-test-photo-upload-input';
-var topicPhotoSubmit = '.e2e-test-photo-upload-submit';
+var topicPhotoSubmit = 'button.e2e-test-photo-upload-submit';
 var thumbnailContainer = '.e2e-test-thumbnail-container';
 var confirmTopicCreationButton = '.e2e-test-confirm-topic-creation-button';
 var createdTopicLink = '.e2e-test-topic-name';
@@ -103,8 +103,8 @@ var generateTopicButton = '.load-dummy-new-structures-data-button';
 var generateClassroomButton = '.load-dummy-math-classroom';
 var topicThumbnailResetButton = '.e2e-test-thumbnail-reset-button';
 var topicMetaTagInput = '.e2e-test-topic-meta-tag-content-field';
-var saveTopicButton = 'button.e2e-test-save-topic-button';
-var topicCommitMessageInput = 'textarea.e2e-test-commit-message-input';
+var saveTopicButton = '.e2e-test-save-topic-button';
+var topicCommitMessageInput = '.e2e-test-commit-message-input';
 var publishChangesButton = '.e2e-test-close-save-modal-button';
 var cookieBannerAcceptButton = '.e2e-test-oppia-cookie-banner-accept-button';
 
@@ -455,6 +455,7 @@ const addThumbnailToTopic = async function (page, topicName) {
     await page.waitForSelector(topicMetaTagInput);
     await page.focus(topicMetaTagInput);
     await page.type(topicMetaTagInput, 'meta');
+    await page.keyboard.press('Tab');
 
     await page.waitForSelector(saveTopicButton);
     await page.click(saveTopicButton);
