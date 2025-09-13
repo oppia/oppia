@@ -33,18 +33,15 @@ if MYPY: # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 
 
-
-
 class RedisClient:
     """Redis client for our own implementation of caching."""
 
-    def __init__(self):
-        """Initializes RedisClient with None values for redis host and clients."""
+    def __init__(self) -> None:
         self._redishost = None
         self._oppia_redis_client = None
         self._cloud_ndb_redis_client = None
 
-    def _update_clients_if_needed(self):
+    def _update_clients_if_needed(self) -> None:
         """Recreates and updates clients if the redis host has changed."""
         with datastore_services.get_ndb_context():
             new_redishost = redis_services.get_redis_host()
