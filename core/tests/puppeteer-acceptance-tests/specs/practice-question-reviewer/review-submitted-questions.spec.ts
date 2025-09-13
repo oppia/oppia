@@ -188,7 +188,7 @@ describe('Practice Question Reviewer', function () {
     // Once fixed, replace the '12 + 4' with 'What is 231 + 12?'.
     // Do this by uncommenting the line below and removing the line next to it.
     // await questionReviewer.startQuestionReview('What is 231 + 12?', 'Addition');
-    await questionReviewer.startQuestionReview('12 + 14', 'Addition');
+    await questionReviewer.startQuestionReview('12 + 4', 'Addition');
     await questionReviewer.submitReview('accept', 'Test Review Message');
 
     // Checks if questions are visible in question skill editor.
@@ -200,7 +200,7 @@ describe('Practice Question Reviewer', function () {
     // Once fixed, replace the 'What is 231 + 12?' with '12 + 4'.
     // Do this by uncommenting the line below and removing the line next to it.
     // await curriculumAdmin.expectQuestionToBePresent('What is 231 + 12?');
-    await curriculumAdmin.expectQuestionToBePresent('12 + 14');
+    await curriculumAdmin.expectQuestionToBePresent('12 + 4');
     await curriculumAdmin.expectQuestionToBePresent('What is 2 + 3?', false);
   });
   afterAll(async function () {

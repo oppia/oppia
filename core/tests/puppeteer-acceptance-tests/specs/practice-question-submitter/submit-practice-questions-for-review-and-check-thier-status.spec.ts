@@ -422,11 +422,6 @@ describe('Practice Question Submitter', function () {
     await questionSubmitter.seedTextToQuestion('What is 10/11?');
     await questionSubmitter.addInteraction(
       INTERACTION_TYPES.FRACTION_INPUT,
-      false
-    );
-    await questionSubmitter.customizeFractionInputInteraction(
-      true,
-      false,
       true
     );
     await questionSubmitter.fillValueInInteractionResponseModal('2', 'input');
