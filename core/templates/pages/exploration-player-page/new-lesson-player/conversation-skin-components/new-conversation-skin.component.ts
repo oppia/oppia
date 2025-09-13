@@ -579,6 +579,9 @@ export class NewConversationSkinComponent {
   }
 
   isCheckpointCelebrationFooterEnabled(): boolean {
+    if (!this.pageContextService.isInExplorationPlayerPage()) {
+      return false;
+    }
     const prevSessionStatesProgress =
       this.playerTranscriptService.getPrevSessionStatesProgress();
     const firstStateName = this.playerTranscriptService.getCard(0);

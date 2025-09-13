@@ -50,6 +50,7 @@ oppia-new-conversation-skin .new-supplemental-card-parent-container {
   display: flex;
   justify-content: center;
   margin: 0 auto;
+  margin-bottom: 100px;
   padding: 56px 14px 0;
   padding-bottom: 50px;
   width: 100%;
