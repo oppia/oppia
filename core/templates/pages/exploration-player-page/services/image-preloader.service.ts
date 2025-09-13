@@ -20,7 +20,7 @@ import {Injectable} from '@angular/core';
 import {SafeResourceUrl} from '@angular/platform-browser';
 
 import {AppConstants} from 'app.constants';
-import {Exploration} from 'domain/exploration/ExplorationObjectFactory';
+import {Exploration} from 'domain/exploration/exploration.model';
 import {ExtractImageFilenamesFromModelService} from 'pages/exploration-player-page/services/extract-image-filenames-from-model.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {ComputeGraphService} from 'services/compute-graph.service';
