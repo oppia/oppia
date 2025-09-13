@@ -7,7 +7,8 @@
             [matTooltipDisabled]="isWarningTooltipDisabled()"
             aria-label="List that shows issues preventing to save changes to the topic"
             class="w-100">
-        <button class="btn btn-light oppia-save-changes-button e2e-test-save-topic-button float-start"
+        <button type="button"
+                class="btn btn-light oppia-save-changes-button e2e-test-save-topic-button float-start"
                 [ngClass]="{'btn-success': topicIsSaveable}"
                 (click)="saveChanges()"
                 [disabled]="!topicIsSaveable">
