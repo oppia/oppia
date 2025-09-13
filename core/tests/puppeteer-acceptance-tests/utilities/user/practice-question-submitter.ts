@@ -634,7 +634,7 @@ export class PracticeQuestionSubmitter extends Contributor {
     inputType: 'input' | 'textarea',
     index: number = 0
   ): Promise<void> {
-    const xpath = `//div[contains(@class, '${responseModalBodyClass})]//${inputType === 'textarea' ? 'textarea' : 'input'}[${index + 1}]`;
+    const xpath = `//div[contains(@class, '${responseModalBodyClass}')]//${inputType === 'textarea' ? 'textarea' : 'input'}[${index + 1}]`;
     const inputElement = await this.page.waitForXPath(xpath, {
       visible: true,
     });

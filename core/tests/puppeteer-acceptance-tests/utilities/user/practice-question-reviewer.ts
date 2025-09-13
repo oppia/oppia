@@ -153,6 +153,10 @@ export class PracticeQuestionReviewer extends Contributor {
       'As said in the question itself.',
       true
     );
+
+    // Save the question.
+    await this.clickOn(saveQuestionButtonSelector);
+    await this.expectToastMessage('Updated question.');
   }
 
   /**
