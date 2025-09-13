@@ -89,7 +89,7 @@ export class CreateNewSubtopicModalComponent
     this.SUBTOPIC_PAGE_SCHEMA = {
       type: 'html',
       ui_config: {
-        rte_components: 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS',
+        rte_component_config_id: 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS',
         rows: 100,
       },
     };
@@ -118,7 +118,7 @@ export class CreateNewSubtopicModalComponent
       this.SUBTOPIC_PAGE_SCHEMA = {
         type: 'html',
         ui_config: {
-          rte_components: 'ALL_COMPONENTS',
+          rte_component_config_id: 'ALL_COMPONENTS',
           rows: 100,
         },
       };

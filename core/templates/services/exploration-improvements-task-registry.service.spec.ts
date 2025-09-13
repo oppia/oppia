@@ -47,14 +47,11 @@ import {
   CyclicStateTransitionsCustomizationArgs,
   MultipleIncorrectSubmissionsCustomizationArgs,
 } from 'domain/statistics/playthrough-issue.model';
-import {StatesObjectFactory} from 'domain/exploration/StatesObjectFactory';
+import {States} from 'domain/exploration/states.model';
 import {ExplorationImprovementsTaskRegistryService} from 'services/exploration-improvements-task-registry.service';
 
 describe('Exploration improvements task registrar service', () => {
   let taskRegistryService: ExplorationImprovementsTaskRegistryService;
-
-  let statesObjectFactory: StatesObjectFactory;
-
   let answerStatsBackendDict: AnswerStatsBackendDict;
   let cstPlaythroughIssueBackendDict: PlaythroughIssueBackendDict;
   let eqPlaythroughIssueBackendDict: PlaythroughIssueBackendDict;
@@ -73,8 +70,6 @@ describe('Exploration improvements task registrar service', () => {
     taskRegistryService = TestBed.get(
       ExplorationImprovementsTaskRegistryService
     );
-
-    statesObjectFactory = TestBed.get(StatesObjectFactory);
 
     config = new ExplorationImprovementsConfig(
       expId,
@@ -228,7 +223,7 @@ describe('Exploration improvements task registrar service', () => {
     return ExplorationTaskModel.createFromBackendDict(dict) as T;
   };
   const makeStates = (map = statesBackendDict) => {
-    return statesObjectFactory.createFromBackendDict(map);
+    return States.createFromBackendDict(map);
   };
   const makeExpStats = (dict = expStatsBackendDict) => {
     return ExplorationStats.createFromBackendDict(dict);

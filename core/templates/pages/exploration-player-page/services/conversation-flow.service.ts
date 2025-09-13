@@ -61,7 +61,7 @@ import {TopicViewerDomainConstants} from 'domain/topic_viewer/topic-viewer-domai
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {StoryViewerBackendApiService} from 'domain/story_viewer/story-viewer-backend-api.service';
-import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
+import {StateObjectsBackendDict} from 'domain/exploration/states.model';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {CheckpointProgressService} from './checkpoint-progress.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
@@ -1449,7 +1449,8 @@ export class ConversationFlowService {
     } else if (
       this.solutionForState !== null &&
       numberOfIncorrectSubmissions >=
-        ExplorationPlayerConstants.MAX_INCORRECT_ANSWERS_BEFORE_RELEASING_SOLUTION
+        ExplorationPlayerConstants.MAX_INCORRECT_ANSWERS_BEFORE_RELEASING_SOLUTION &&
+      this.hintsAndSolutionManagerService.areAllHintsExhausted()
     ) {
       this.hintsAndSolutionManagerService.releaseSolution();
     }
@@ -1798,6 +1799,14 @@ export class ConversationFlowService {
    */
   setIsLoggedIn(userStatus: boolean): void {
     this.isLoggedIn = userStatus;
+  }
+
+  /**
+   * Returns the user's login status.
+   * @returns {boolean} True if the user is logged in, false otherwise.
+   */
+  getIsLoggedIn(): boolean {
+    return this.isLoggedIn;
   }
 
   get onPlayerStateChange(): EventEmitter<string> {

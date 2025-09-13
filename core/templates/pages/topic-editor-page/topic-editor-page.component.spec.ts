@@ -22,7 +22,13 @@ import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
 import {StoryReference} from 'domain/topic/story-reference-object.model';
 import {Topic} from 'domain/topic/topic-object.model';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
+import {
+  ComponentFixture,
+  waitForAsync,
+  TestBed,
+  tick,
+  fakeAsync,
+} from '@angular/core/testing';
 import {TopicEditorRoutingService} from './services/topic-editor-routing.service';
 import {TopicEditorStateService} from './services/topic-editor-state.service';
 import {TopicEditorPageComponent} from './topic-editor-page.component';
@@ -31,6 +37,9 @@ import {PageContextService} from 'services/page-context.service';
 import {UrlService} from 'services/contextual/url.service';
 import {PageTitleService} from 'services/page-title.service';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
+import {QuestionUndoRedoService} from 'domain/editor/undo_redo/question-undo-redo.service';
+import {ConfirmQuestionExitModalComponent} from 'components/question-directives/modal-templates/confirm-question-exit-modal.component';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
 class MockPageContextService {
   getExplorationId() {
@@ -51,19 +60,28 @@ describe('Topic editor page', () => {
   let fixture: ComponentFixture<TopicEditorPageComponent>;
   let pageTitleService: PageTitleService;
   let preventPageUnloadEventService: PreventPageUnloadEventService;
+  let questionUndoRedoService: QuestionUndoRedoService;
   let topicEditorRoutingService: TopicEditorRoutingService;
   let undoRedoService: UndoRedoService;
   let topicEditorStateService: TopicEditorStateService;
   let urlService: UrlService;
   let topic;
+  let ngbModal;
+  let runSpy;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [TopicEditorPageComponent],
       providers: [
+        NgbModal,
+        {
+          provide: PageContextService,
+          useClass: MockPageContextService,
+        },
         PageTitleService,
         PreventPageUnloadEventService,
+        QuestionUndoRedoService,
         TopicEditorRoutingService,
         UndoRedoService,
         TopicEditorStateService,
@@ -89,6 +107,9 @@ describe('Topic editor page', () => {
     topicEditorRoutingService = TestBed.inject(TopicEditorRoutingService);
     topicEditorStateService = TestBed.inject(TopicEditorStateService);
     urlService = TestBed.inject(UrlService);
+    questionUndoRedoService = TestBed.inject(QuestionUndoRedoService);
+    ngbModal = TestBed.inject(NgbModal);
+    runSpy = jasmine.createSpy('run');
 
     let subtopic = Subtopic.createFromTitle(1, 'subtopic1');
     subtopic._thumbnailFilename = 'b.svg';
@@ -182,6 +203,67 @@ describe('Topic editor page', () => {
 
     component.hideWarnings();
     expect(component.warningsAreShown).toBe(false);
+  });
+
+  it('should open modal, clear changes, reset flag and run callback when confirmed', fakeAsync(() => {
+    spyOn(component, 'getActiveTabName').and.returnValue('questions');
+    spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
+    spyOn(questionUndoRedoService, 'clearChanges');
+
+    const mockModalRef = {
+      result: Promise.resolve(),
+    };
+    spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
+
+    component.confirmBeforeLeavingQuestions(runSpy);
+    tick();
+
+    expect(ngbModal.open).toHaveBeenCalledWith(
+      ConfirmQuestionExitModalComponent,
+      {backdrop: true}
+    );
+    expect(questionUndoRedoService.clearChanges).toHaveBeenCalled();
+    expect(component.cancelNavigationOnce).toBeFalse();
+    expect(runSpy).toHaveBeenCalled();
+  }));
+
+  it('should open modal and set cancelNavigationOnce when dismissed', fakeAsync(() => {
+    spyOn(component, 'getActiveTabName').and.returnValue('questions');
+    spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
+    spyOn(questionUndoRedoService, 'clearChanges');
+
+    const mockModalRef = {
+      result: Promise.reject(),
+    };
+    spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
+
+    component.confirmBeforeLeavingQuestions(runSpy);
+    tick();
+
+    expect(ngbModal.open).toHaveBeenCalled();
+    expect(questionUndoRedoService.clearChanges).not.toHaveBeenCalled();
+    expect(component.cancelNavigationOnce).toBeTrue();
+    expect(runSpy).not.toHaveBeenCalled();
+  }));
+
+  it('should skip modal if cancelNavigationOnce is true and reset it', () => {
+    spyOn(component, 'getActiveTabName').and.returnValue('questions');
+    spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
+    component.cancelNavigationOnce = true;
+
+    component.confirmBeforeLeavingQuestions(runSpy);
+
+    expect(component.cancelNavigationOnce).toBeFalse();
+    expect(runSpy).not.toHaveBeenCalled();
+  });
+
+  it('should directly run callback when not in questions tab', () => {
+    spyOn(component, 'getActiveTabName').and.returnValue('topic');
+    spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(false);
+
+    component.confirmBeforeLeavingQuestions(runSpy);
+
+    expect(runSpy).toHaveBeenCalled();
   });
 
   it(

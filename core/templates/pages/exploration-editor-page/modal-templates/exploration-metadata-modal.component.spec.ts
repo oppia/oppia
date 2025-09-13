@@ -28,7 +28,7 @@ import {
 } from '@angular/core/testing';
 import {MatChipInputEvent} from '@angular/material/chips';
 import {NgbActiveModal, NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
+import {StateObjectsBackendDict} from 'domain/exploration/states.model';
 import {AlertsService} from 'services/alerts.service';
 import {ExplorationCategoryService} from '../services/exploration-category.service';
 import {ExplorationDataService} from '../services/exploration-data.service';

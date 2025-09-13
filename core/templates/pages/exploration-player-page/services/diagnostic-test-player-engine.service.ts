@@ -20,7 +20,7 @@ import {Injectable} from '@angular/core';
 
 import cloneDeep from 'lodash/cloneDeep';
 import {AppConstants} from 'app.constants';
-import {Question} from 'domain/question/QuestionObjectFactory';
+import {Question} from 'domain/question/question.model';
 import {State} from 'domain/state/state.model';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {ExpressionInterpolationService} from 'expressions/expression-interpolation.service';
