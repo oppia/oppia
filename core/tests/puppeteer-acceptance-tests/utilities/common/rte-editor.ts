@@ -88,6 +88,35 @@ export class RTEEditor {
   }
 
   /**
+   * Clears the content of the editor.
+   * Requires the editor to be visible. Does not save the content.
+   */
+  async clearAll(): Promise<void> {
+    const textAreaElement = await this.context.waitForSelector(
+      rteTextAreaSelector,
+      {visible: true}
+    );
+
+    if (!textAreaElement) {
+      throw new Error('Text area element not found.');
+    }
+
+    await textAreaElement.click({clickCount: 3});
+    await this.parentPage.keyboard.press('Backspace');
+
+    await this.parentPage.waitForFunction(
+      (selector: string, parent: Element | null = null) => {
+        const context = parent ?? document;
+        const element = context.querySelector(selector);
+        return element?.textContent === '';
+      },
+      {},
+      rteTextAreaSelector,
+      this.context instanceof puppeteer.ElementHandle ? this.context : null
+    );
+  }
+
+  /**
    * Changes the format of the current editor to the given format.
    * @param {'heading' | 'normal'} format - The format to change to.
    */

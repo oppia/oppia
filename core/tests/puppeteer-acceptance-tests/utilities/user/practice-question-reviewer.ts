@@ -105,6 +105,7 @@ export class PracticeQuestionReviewer extends Contributor {
     }
 
     const rteEditor = new RTEEditor(this.page, questionEditorModal);
+    await rteEditor.clearAll();
     await rteEditor.updateAndSaveContent(question);
   }
 

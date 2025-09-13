@@ -466,6 +466,7 @@ describe('Practice Question Submitter', function () {
       'As given in the question.',
       true
     );
+    await questionSubmitter.submitQuestionSuggestion();
 
     // Verify question submitted.
     await questionSubmitter.switchToTabInContributionDashboard(
