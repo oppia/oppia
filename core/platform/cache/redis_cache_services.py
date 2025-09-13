@@ -33,8 +33,39 @@ if MYPY: # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 
 
+
+
 class RedisClient:
     """Redis client for our own implementation of caching."""
+
+    def __init__(self):
+        """Initializes RedisClient with None values for redis host and clients."""
+        self._redishost = None
+        self._oppia_redis_client = None
+        self._cloud_ndb_redis_client = None
+
+    def _update_clients_if_needed(self):
+        """Recreates and updates clients if the redis host has changed."""
+        with datastore_services.get_ndb_context():
+            new_redishost = redis_services.get_redis_host()
+
+        if new_redishost != self._redishost:
+            self._redishost = new_redishost
+            if self._redishost:
+                self._oppia_redis_client = redis.StrictRedis(
+                    host=self._redishost,
+                    port=feconf.REDISPORT,
+                    db=feconf.OPPIA_REDIS_DB_INDEX,
+                    decode_responses=True
+                )
+                self._cloud_ndb_redis_client = redis.StrictRedis(
+                    host=self._redishost,
+                    port=feconf.REDISPORT,
+                    db=feconf.CLOUD_NDB_REDIS_DB_INDEX
+                )
+            else:
+                self._oppia_redis_client = None
+                self._cloud_ndb_redis_client = None
 
     def get_oppia_redis_client(self) -> Optional[redis.StrictRedis[str]]:
         """Fetches redis model and obtains oppia redis client.
@@ -42,16 +73,8 @@ class RedisClient:
         Returns:
             redis.StrictRedis[str]. The oppia redis client.
         """
-        with datastore_services.get_ndb_context():
-            redishost = redis_services.get_redis_host()
-        if not redishost:
-            return None
-        return redis.StrictRedis(
-            host=redishost,
-            port=feconf.REDISPORT,
-            db=feconf.OPPIA_REDIS_DB_INDEX,
-            decode_responses=True
-        )
+        self._update_clients_if_needed()
+        return self._oppia_redis_client
 
     def get_cloud_ndb_redis_client(self) -> Optional[redis.StrictRedis[str]]:
         """Fetches redis model and obtains cloud ndb redis client.
@@ -59,15 +82,8 @@ class RedisClient:
         Returns:
             redis.StrictRedis[str]. The cloud ndb redis client.
         """
-        with datastore_services.get_ndb_context():
-            redishost = redis_services.get_redis_host()
-        if not redishost:
-            return None
-        return redis.StrictRedis(
-            host=redishost,
-            port=feconf.REDISPORT,
-            db=feconf.CLOUD_NDB_REDIS_DB_INDEX
-        )
+        self._update_clients_if_needed()
+        return self._cloud_ndb_redis_client
 
 
 REDIS_CLIENT = RedisClient()
