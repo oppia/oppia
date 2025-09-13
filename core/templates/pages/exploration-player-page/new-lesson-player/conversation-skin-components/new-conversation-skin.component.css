@@ -125,6 +125,10 @@ oppia-card-navigation-control {
   width: calc(100vw - 240px);
 }
 
+.question-player-footer {
+  width: 100%;
+}
+
 @media(max-width: 767px) {
   oppia-card-navigation-control {
     width: 100vw;

@@ -636,4 +636,13 @@ export class NewConversationSkinComponent {
   getIsInStoryMode(): boolean {
     return this.explorationModeService.isInStoryChapterMode();
   }
+
+  isInLessonPlayer(): boolean {
+    const pathnameArray = this.urlService.getPathname().split('/');
+    console.log(pathnameArray);
+    if (pathnameArray[1] === 'lesson') {
+      return true;
+    }
+    return false;
+  }
 }

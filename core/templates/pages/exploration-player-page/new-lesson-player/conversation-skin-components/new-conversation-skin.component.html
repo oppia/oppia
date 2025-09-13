@@ -58,7 +58,7 @@
   </div>
 
   <div *ngIf="!getCanAskLearnerForAnswerInfo()" class="new-progress-nav-bar-container">
-    <oppia-card-navigation-control [ngClass]="{'expanded-sidebar': getSidebarIsExpanded()}"
+    <oppia-card-navigation-control [ngClass]="{'expanded-sidebar': getSidebarIsExpanded(),'question-player-footer': !isInLessonPlayer()}"
                         (submit)="submitAnswerFromProgressNav()"
                         [isLearnAgainButton]="isLearnAgainButton()"
                         [displayedCard]="getDisplayedCard()"
