@@ -105,14 +105,11 @@ export class RTEEditor {
     await this.parentPage.keyboard.press('Backspace');
 
     await this.parentPage.waitForFunction(
-      (selector: string, parent: Element | null = null) => {
-        const context = parent ?? document;
-        const element = context.querySelector(selector);
+      (element: Element) => {
         return element?.textContent === '';
       },
       {},
-      rteTextAreaSelector,
-      this.context instanceof puppeteer.ElementHandle ? this.context : null
+      textAreaElement
     );
   }
 
