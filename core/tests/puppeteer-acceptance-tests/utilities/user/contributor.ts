@@ -40,8 +40,7 @@ const reviewContentContainerSelector = '.e2e-test-review-content-container';
 const contributionTabClass = 'e2e-test-contribution-tab';
 const activeElementClass = 'e2e-test-active';
 const viewDropdownSelector = '.e2e-test-mobile-contribution-dropdown';
-const viewDropdownOptionSelector =
-  '.e2e-test-mobile-contribution-dropdown-option';
+const viewDropdownOptionClass = 'e2e-test-mobile-contribution-dropdown-option';
 const desktopBadgeContainerSelector = '.e2e-test-desktop-badge-container';
 const mobileBadgeContainerSelector = '.e2e-test-mobile-badge-container';
 const badgeSelector = '.e2e-test-badge';
