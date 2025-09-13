@@ -934,6 +934,10 @@ textarea {
   padding-top: 13px;
 }
 
+[dir="rtl"] .oppia-navbar-breadcrumb {
+  margin-right: 10px;
+}
+
 .oppia-navbar-breadcrumb li {
   display: inline-block;
   overflow: hidden;
@@ -942,14 +946,14 @@ textarea {
 }
 
 .oppia-navbar-breadcrumb-separator {
-  margin-right: 8px;
+  margin-inline-end: 8px;
 }
 .oppia-navbar-breadcrumb-separator:after {
   content: ">";
 }
 
 .oppia-navbar-breadcrumb-rtl-separator {
-  margin-left: 8px;
+  margin-inline-start: 8px;
 }
 .oppia-navbar-breadcrumb-rtl-separator:after {
   content: "<";
