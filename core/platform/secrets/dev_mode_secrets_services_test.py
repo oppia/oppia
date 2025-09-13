@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-import json
 import os
 
 from core.platform.secrets import dev_mode_secrets_services
