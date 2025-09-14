@@ -17,11 +17,7 @@
  */
 
 import {DiagnosticTestQuestionsModel} from './diagnostic-test-questions.model';
-import {
-  Question,
-  QuestionBackendDict,
-  QuestionObjectFactory,
-} from './QuestionObjectFactory';
+import {Question, QuestionBackendDict} from 'domain/question/question.model';
 import {TestBed} from '@angular/core/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 
@@ -30,14 +26,9 @@ describe('Diagnostic test questions model', () => {
   let question1: Question, question2: Question;
 
   beforeEach(() => {
-    let questionObjectFactory: QuestionObjectFactory;
-
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [QuestionObjectFactory],
     });
-
-    questionObjectFactory = TestBed.inject(QuestionObjectFactory);
 
     let questionBackendDict1: QuestionBackendDict = {
       id: '',
@@ -237,10 +228,8 @@ describe('Diagnostic test questions model', () => {
       next_content_id_index: 5,
     };
 
-    question1 =
-      questionObjectFactory.createFromBackendDict(questionBackendDict1);
-    question2 =
-      questionObjectFactory.createFromBackendDict(questionBackendDict2);
+    question1 = Question.createFromBackendDict(questionBackendDict1);
+    question2 = Question.createFromBackendDict(questionBackendDict2);
   });
 
   it('should be able to create model', () => {

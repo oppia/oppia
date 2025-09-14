@@ -18,7 +18,7 @@
 
 import {TestBed} from '@angular/core/testing';
 import {DiagnosticTestQuestionsModel} from 'domain/question/diagnostic-test-questions.model';
-import {Question} from 'domain/question/QuestionObjectFactory';
+import {Question} from 'domain/question/question.model';
 import {State} from 'domain/state/state.model';
 import {
   DiagnosticTestCurrentTopicStatusModel,

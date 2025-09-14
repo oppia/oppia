@@ -854,7 +854,7 @@ describe('Translation Modal Component', () => {
       ).and.returnValue(Promise.resolve({}));
       component.suggestTranslatedText();
       tick();
-      const req = httpTestingController.expectOne('/suggestionhandler/');
+      let req = httpTestingController.expectOne('/suggestionhandler/');
       expect(req.request.method).toEqual('POST');
       expect(req.request.body.getAll('payload')[0]).toEqual(
         JSON.stringify(expectedPayload)
@@ -870,6 +870,9 @@ describe('Translation Modal Component', () => {
       );
       flushMicrotasks();
       component.suggestTranslatedText();
+      tick();
+      req = httpTestingController.expectOne('/suggestionhandler/');
+      req.flush({});
       expect(pageContextService.getImageSaveDestination()).toBe(
         AppConstants.IMAGE_SAVE_DESTINATION_SERVER
       );
@@ -1057,10 +1060,8 @@ describe('Translation Modal Component', () => {
         const getTextSpy = spyOn(translateTextService, 'getTextToTranslate');
 
         mockModalRef.result = Promise.reject();
-
         component.skipActiveTranslation();
         tick();
-
         expect(ngbModal.open).toHaveBeenCalledWith(
           ConfirmTranslationExitModalComponent,
           {backdrop: 'static'}
