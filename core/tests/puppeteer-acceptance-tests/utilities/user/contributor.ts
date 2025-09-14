@@ -239,6 +239,7 @@ export class Contributor extends ExplorationEditor {
     tabName: 'Contribution Stats' | 'Badges' | 'Review Questions'
   ): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
+      await this.waitForPageToFullyLoad();
       await this.expectElementToBeVisible(viewDropdownSelector);
       await this.page.waitForFunction(
         (selector: string) => {
