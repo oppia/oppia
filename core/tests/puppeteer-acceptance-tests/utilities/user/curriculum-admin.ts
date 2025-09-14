@@ -318,6 +318,7 @@ const mobilePublishTopicButton =
   'div.navbar-mobile-options .e2e-test-mobile-publish-topic-button';
 const publishTopicButton = 'button.e2e-test-publish-topic-button';
 const topicEditorMainTabFormSelector = '.e2e-test-topic-editor-main-tab';
+const oldTopicNameField = '.e2e-test-topic-name-field';
 
 export class CurriculumAdmin extends BaseUser {
   /**
@@ -2905,7 +2906,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.expectElementToBeVisible(topicEditorMainTabFormSelector);
 
     if (topicName) {
-      await this.expectElementValueToBe(topicNameField, topicName);
+      await this.expectElementValueToBe(oldTopicNameField, topicName);
     }
   }
 
