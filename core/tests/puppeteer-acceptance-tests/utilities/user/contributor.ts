@@ -257,6 +257,7 @@ export class Contributor extends ExplorationEditor {
       if (!optionElement) {
         throw new Error(`Option ${tabName} not found.`);
       }
+      await this.waitForElementToStabilize(optionElement);
       await optionElement.click();
 
       await this.expectTextContentToBe(viewDropdownSelector, tabName);
