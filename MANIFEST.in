@@ -9,3 +9,4 @@ include extensions/interactions/legacy_interaction_specs_by_state_version/*.json
 include extensions/interactions/rule_templates.json
 include extensions/objects/object_defaults.json
 include requirements.txt
+include package.json
