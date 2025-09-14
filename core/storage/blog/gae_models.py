@@ -20,7 +20,8 @@ from __future__ import annotations
 
 from core import utils
 from core.platform import models
-
+import logging
+from datetime import datetime
 from typing import Dict, List, Literal, Optional, Sequence, TypedDict
 
 MYPY = False
@@ -385,16 +386,25 @@ class BlogPostRightsModel(base_models.BaseModel):
             in which the given user is an editor. The list will be ordered
             according to the time when the model was last updated.
         """
+        start_time=datetime.now()
         query = cls.query(
             cls.editor_ids == user_id,
             cls.blog_post_is_published # pylint: disable=singleton-comparison
             == True
         ).order(-cls.last_updated)
-        return list(
+        result= list(
             query.fetch(
                 limit, offset=offset
             ) if limit is not None else query.fetch(offset=offset)
         )
+        #Added logging to check in the future if getting the published models by user is taking time or no(helps in debugging).
+        query_duration=(datetime.now()-start_time).total_seconds()
+        if query_duration>0.1:
+                logging.warning(
+                "Getting published model by users is taking %.3fs this might be slow for user_id: %s",
+                query_duration, user_id
+            )
+        return result
 
     @classmethod
     def get_draft_models_by_user(
@@ -416,14 +426,23 @@ class BlogPostRightsModel(base_models.BaseModel):
             in which the given user is an editor. The list will be ordered
             according to the time when the model was last updated.
         """
+        start_time=datetime.now()
         query = cls.query(
             cls.editor_ids == user_id,
             cls.blog_post_is_published # pylint: disable=singleton-comparison
             == False
         ).order(-cls.last_updated)
-        return list(
+        result= list(
             query.fetch(limit) if limit is not None else query.fetch()
         )
+        query_duration=(datetime.now()-start_time).total_seconds()
+        if query_duration>0.1:
+                logging.warning(
+                "Getting draft model by users is taking %.3fs this might be slow for user_id: %s",
+                query_duration, user_id
+            )
+        return result
+
 
     @classmethod
     def get_all_by_user(cls, user_id: str) -> List[BlogPostRightsModel]:

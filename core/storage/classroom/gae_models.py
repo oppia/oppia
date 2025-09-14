@@ -20,9 +20,9 @@ from __future__ import annotations
 
 from core import utils
 from core.platform import models
-
+from datetime import datetime
 from typing import Dict, List, Optional
-
+import logging
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
@@ -236,9 +236,16 @@ class ClassroomModel(base_models.BaseModel):
         Returns:
             ClassroomModel | None. The Classroom model or None if not found.
         """
-        return ClassroomModel.query(
+        start_time=datetime.now()
+       
+        results = ClassroomModel.query(
             datastore_services.all_of(
                 cls.name == classroom_name,
-                cls.deleted == False  # pylint: disable=singleton-comparison
+                cls.deleted == False
             )
         ).get()
+        query_time=(datetime.now()-start_time).total_seconds()
+        #Logging for time it took to search a class by name level is above warning (gives idea about slow queries)
+        if query_time>0.1:
+            logging.warning(f"Slow query search for:{query_time:.3f}s for '{classroom_name}'")
+        return results
