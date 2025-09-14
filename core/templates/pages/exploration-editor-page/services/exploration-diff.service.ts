@@ -16,7 +16,6 @@
  * @fileoverview Service for computing diffs of explorations.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import cloneDeep from 'lodash/cloneDeep';
@@ -33,7 +32,7 @@ import {
   ExplorationChangeRenameState,
   ExplorationChangeEditStateProperty,
 } from 'domain/exploration/exploration-draft.model';
-import {StateObjectsDict} from 'domain/exploration/StatesObjectFactory';
+import {StateObjectsDict} from 'domain/exploration/states.model';
 
 export interface ExplorationGraphChangeList {
   changeList: ExplorationChange[];
@@ -314,7 +313,9 @@ export class ExplorationDiffService {
           change.cmd !== 'mark_translation_needs_update_for_language' &&
           change.cmd !== 'remove_translations' &&
           change.cmd !== 'edit_translation' &&
-          change.cmd !== 'update_voiceovers'
+          change.cmd !== 'update_voiceovers' &&
+          change.cmd !== 'mark_voiceovers_needs_update' &&
+          change.cmd !== 'remove_voiceovers'
         ) {
           throw new Error('Invalid change command: ' + change.cmd);
         }
@@ -420,10 +421,3 @@ export class ExplorationDiffService {
     return this._getDiffGraphData(oldStates, newStates, changeListData);
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ExplorationDiffService',
-    downgradeInjectable(ExplorationDiffService)
-  );

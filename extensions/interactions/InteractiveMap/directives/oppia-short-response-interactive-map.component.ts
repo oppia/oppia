@@ -21,7 +21,6 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 
 @Component({
@@ -48,10 +47,3 @@ export class ShortResponseInteractiveMapComponent implements OnInit {
     this.formattedCoords += _answer[1] >= 0 ? 'E' : 'W';
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaShortResponseInteractiveMap',
-  downgradeComponent({
-    component: ShortResponseInteractiveMapComponent,
-  }) as angular.IDirectiveFactory
-);

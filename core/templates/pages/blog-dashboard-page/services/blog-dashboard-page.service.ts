@@ -17,7 +17,6 @@
  */
 
 import {Injectable, EventEmitter} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {AlertsService} from 'services/alerts.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {UrlService} from 'services/contextual/url.service';
@@ -141,7 +140,7 @@ export class BlogDashboardPageService {
         () => {
           this.alertsService.addSuccessMessage(
             'Blog Post Deleted Successfully.',
-            5000
+            10000
           );
           if (this.activeTab === 'editor_tab') {
             this.navigateToMainTab();
@@ -165,10 +164,3 @@ export class BlogDashboardPageService {
     }
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'BlogDashboardPageService',
-    downgradeInjectable(BlogDashboardPageService)
-  );

@@ -19,7 +19,6 @@
 import {Ratio} from 'domain/objects/ratio.model';
 
 import {Component, Input, OnDestroy, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {Subject, Subscription} from 'rxjs';
 import {debounceTime, distinctUntilChanged} from 'rxjs/operators';
 
@@ -134,6 +133,7 @@ export class InteractiveRatioExpressionInputComponent
         this.errorMessageI18nKey = parsingError.message;
       }
       this.isValid = false;
+      this.currentInteractionService.updateAnswerIsValid(false);
     }
   }
 
@@ -144,16 +144,10 @@ export class InteractiveRatioExpressionInputComponent
   answerValueChanged(): void {
     this.answerChanged.next(this.answer);
     this.currentInteractionService.updateCurrentAnswer(this.answer);
+    this.currentInteractionService.updateAnswerIsValid(this.isAnswerValid());
   }
 
   ngOnDestroy(): void {
     this.componentSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaInteractiveRatioExpressionInput',
-  downgradeComponent({
-    component: InteractiveRatioExpressionInputComponent,
-  }) as angular.IDirectiveFactory
-);

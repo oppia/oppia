@@ -16,7 +16,6 @@
  * @fileoverview Service to add custom attributes to the <html> element.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {WindowRef} from 'services/contextual/window-ref.service';
@@ -34,10 +33,3 @@ export class DocumentAttributeCustomizationService {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'DocumentAttributeCustomizationService',
-    downgradeInjectable(DocumentAttributeCustomizationService)
-  );

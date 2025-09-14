@@ -705,7 +705,8 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
         [
             (platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD, 0.35),  # pylint: disable=line-too-long
             (platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD, 0),  # pylint: disable=line-too-long
-            (platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS, 0) # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS, 0), # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com') # pylint: disable=line-too-long
         ]
     )
     def test_custom_high_bounce_rate_creation_threshold(self) -> None:
@@ -721,7 +722,8 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
         [
             (platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD, 0),  # pylint: disable=line-too-long
             (platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD, 0.05),  # pylint: disable=line-too-long
-            (platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS, 0) # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS, 0), # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com') # pylint: disable=line-too-long
         ]
     )
     def test_custom_high_bounce_rate_obsoletion_threshold(self) -> None:
@@ -737,7 +739,8 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
         [
             (platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD, 0),  # pylint: disable=line-too-long
             (platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD, 0),  # pylint: disable=line-too-long
-            (platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS, 20) # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS, 20), # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com') # pylint: disable=line-too-long
         ]
     )
     def test_custom_high_bounce_rate_task_minimum_exploration_starts(

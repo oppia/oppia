@@ -19,17 +19,11 @@
 
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {
   ExplorationMetadata,
   ExplorationMetadataBackendDict,
-  ExplorationMetadataObjectFactory,
-} from 'domain/exploration/ExplorationMetadataObjectFactory';
-import {
-  State,
-  StateBackendDict,
-  StateObjectFactory,
-} from 'domain/state/StateObjectFactory';
+} from 'domain/exploration/exploration-metadata.model';
+import {State, StateBackendDict} from 'domain/state/state.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 interface StateVersionHistoryBackendResponse {
@@ -69,9 +63,7 @@ export class VersionHistoryBackendApiService {
     '/version_history_handler/metadata/<exploration_id>/<version>';
 
   constructor(
-    private explorationMetadataObjectFactory: ExplorationMetadataObjectFactory,
     private http: HttpClient,
-    private stateObjectFactory: StateObjectFactory,
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
@@ -95,11 +87,10 @@ export class VersionHistoryBackendApiService {
       .then(response => {
         let stateInPreviousVersion: State | null = null;
         if (response.state_dict_in_previous_version) {
-          stateInPreviousVersion =
-            this.stateObjectFactory.createFromBackendDict(
-              response.state_name_in_previous_version,
-              response.state_dict_in_previous_version
-            );
+          stateInPreviousVersion = State.createFromBackendDict(
+            response.state_name_in_previous_version,
+            response.state_dict_in_previous_version
+          );
         }
         return {
           lastEditedVersionNumber: response.last_edited_version_number,
@@ -130,10 +121,9 @@ export class VersionHistoryBackendApiService {
       .then(response => {
         let metadataInPreviousVersion: ExplorationMetadata | null = null;
         if (response.metadata_dict_in_previous_version) {
-          metadataInPreviousVersion =
-            this.explorationMetadataObjectFactory.createFromBackendDict(
-              response.metadata_dict_in_previous_version
-            );
+          metadataInPreviousVersion = ExplorationMetadata.createFromBackendDict(
+            response.metadata_dict_in_previous_version
+          );
         }
         return {
           lastEditedVersionNumber: response.last_edited_version_number,
@@ -146,10 +136,3 @@ export class VersionHistoryBackendApiService {
       });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'VersionHistoryBackendApiService',
-    downgradeInjectable(VersionHistoryBackendApiService)
-  );

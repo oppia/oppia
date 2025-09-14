@@ -18,7 +18,6 @@
  */
 
 import {TrainingDataEditorPanelComponent} from './training-data-editor-panel-modal.component';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {AlertsService} from 'services/alerts.service';
@@ -53,10 +52,3 @@ export class TrainingDataEditorPanelService {
     this.externalSaveService.onExternalSave.emit();
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'TrainingDataEditorPanelService',
-    downgradeInjectable(TrainingDataEditorPanelService)
-  );

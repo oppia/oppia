@@ -30,7 +30,7 @@ import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {TopicsAndSkillsDashboardBackendApiService} from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {TopicUpdateService} from 'domain/topic/topic-update.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {StorySummary} from 'domain/story/story-summary.model';
@@ -92,7 +92,7 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   subtopicEditOptionsAreShown: number;
   skillOptionDialogueBox: boolean = true;
   maxCharsInTopicName!: number;
-  maxCharsInTopicUrlFragment!: number;
+  MAX_CHARS_IN_TOPIC_URL_FRAGMENT!: number;
   maxCharsInTopicDescription!: number;
   maxCharsInPageTitleFragmentForWeb!: number;
   maxCharsInMetaTagContent!: number;
@@ -101,9 +101,10 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   classroomUrlFragment: string | null = null;
   classroomName: string | null = null;
   curriculumAdminUsernames: string[] = [];
+  generatedUrlPrefix: string;
 
   constructor(
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private entityCreationService: EntityCreationService,
     private focusManagerService: FocusManagerService,
     private imageUploadHelperService: ImageUploadHelperService,
@@ -121,6 +122,7 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   ) {}
 
   directiveSubscriptions = new Subscription();
+  validUrlFragmentRegex = new RegExp(AppConstants.VALID_URL_FRAGMENT_REGEX);
 
   drop(event: CdkDragDrop<Subtopic[]>): void {
     moveItemInArray(this.subtopics, event.previousIndex, event.currentIndex);
@@ -182,9 +184,10 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
     this.editableThumbnailDataUrl =
       this.imageUploadHelperService.getTrustedResourceUrlForThumbnailFilename(
         this.topic.getThumbnailFilename(),
-        this.contextService.getEntityType(),
-        this.contextService.getEntityId()
+        this.pageContextService.getEntityType(),
+        this.pageContextService.getEntityId()
       );
+    this.generatedUrlPrefix = `${this.hostname}/learn/${this.classroomUrlFragment}`;
   }
 
   getEligibleSkillSummariesForDiagnosticTest(): ShortSkillSummary[] {
@@ -386,6 +389,11 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
         newTopicUrlFragment
       );
     }
+  }
+
+  onChangeTopicEditorUrlFragment(urlFragment: string): void {
+    this.editableTopicUrlFragment = urlFragment;
+    this.updateTopicUrlFragment(urlFragment);
   }
 
   updateTopicThumbnailFilename(newThumbnailFilename: string): void {
@@ -665,7 +673,7 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
     this.initEditor();
     this._initStorySummaries();
     this.maxCharsInTopicName = AppConstants.MAX_CHARS_IN_TOPIC_NAME;
-    this.maxCharsInTopicUrlFragment =
+    this.MAX_CHARS_IN_TOPIC_URL_FRAGMENT =
       AppConstants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT;
     this.maxCharsInTopicDescription =
       AppConstants.MAX_CHARS_IN_TOPIC_DESCRIPTION;

@@ -36,8 +36,8 @@ ConsoleReporter.setConsoleErrorsToIgnore([/.*404.*Not Found.*/]);
 
 describe('Exploration Creator', function () {
   let explorationEditor: ExplorationEditor;
-  let voiceoverAdmin: VoiceoverAdmin;
-  let curriculumAdmin: CurriculumAdmin;
+  let voiceoverAdmin: VoiceoverAdmin & ExplorationEditor;
+  let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
   let explorationId: string | null;
 
   beforeAll(async function () {
@@ -82,7 +82,7 @@ describe('Exploration Creator', function () {
     async function () {
       await explorationEditor.navigateToCreatorDashboardPage();
 
-      await explorationEditor.navigateToExplorationEditorPage();
+      await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
 
       await explorationEditor.dismissWelcomeModal();
 
@@ -116,7 +116,7 @@ describe('Exploration Creator', function () {
       await explorationEditor.addTags(['TagA', 'TagB', 'TagC']);
       await explorationEditor.expectTagsToMatch(['TagA', 'TagB', 'TagC']);
 
-      await explorationEditor.previewSummary();
+      await explorationEditor.previewAndCloseSummary();
 
       await explorationEditor.enableAutomaticTextToSpeech();
 
@@ -133,7 +133,7 @@ describe('Exploration Creator', function () {
       if (voiceoverAdmin.isViewportAtMobileWidth()) {
         await voiceoverAdmin.closeEditorNavigationDropdownOnMobile();
       }
-      await voiceoverAdmin.openvoiceArtistDropdown();
+      await voiceoverAdmin.expandSettingsTabSection('Voice Artists');
       await voiceoverAdmin.addVoiceoverArtistsToExploration([
         'guestUser1',
         'guestUser2',

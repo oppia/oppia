@@ -42,9 +42,8 @@ import {
   OnInit,
   SimpleChanges,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {AutoplayedVideosService} from 'services/autoplayed-videos.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {ServicesConstants} from 'services/services.constants';
 
@@ -85,7 +84,7 @@ export class NoninteractiveVideo implements OnInit, OnChanges {
 
   constructor(
     private autoplayedVideosService: AutoplayedVideosService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private elementRed: ElementRef,
     private htmlEscaperService: HtmlEscaperService
   ) {}
@@ -140,7 +139,7 @@ export class NoninteractiveVideo implements OnInit, OnChanges {
     // Autoplay if user is in learner view and creator has specified
     // to autoplay given video.
     if (
-      this.contextService.getPageContext() ===
+      this.pageContextService.getPageContext() ===
         ServicesConstants.PAGE_CONTEXT.EXPLORATION_PLAYER &&
       autoplayVal
     ) {
@@ -156,7 +155,7 @@ export class NoninteractiveVideo implements OnInit, OnChanges {
 
     // This following check disables the video in Editor being caught
     // by tabbing while in Exploration Editor mode.
-    if (this.contextService.isInExplorationEditorMode()) {
+    if (this.pageContextService.isInExplorationEditorMode()) {
       this.tabIndexVal = -1;
     }
   }
@@ -176,10 +175,3 @@ export class NoninteractiveVideo implements OnInit, OnChanges {
     }
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaNoninteractiveVideo',
-  downgradeComponent({
-    component: NoninteractiveVideo,
-  }) as angular.IDirectiveFactory
-);

@@ -199,7 +199,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             cls: Type[interaction_registry.Registry],
             interaction_id: str
         ) -> base.BaseInteraction:
-            interaction = copy.deepcopy(cls._interactions[interaction_id]) # pylint: disable=protected-access
+            interaction = copy.deepcopy(
+                cls._interactions[interaction_id] # pylint: disable=protected-access
+            )
             interaction.answer_type = 'ListOfSetsOfHtmlStrings'
             return interaction
 
@@ -466,7 +468,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             cls: Type[interaction_registry.Registry],
             interaction_id: str
         ) -> base.BaseInteraction:
-            interaction = copy.deepcopy(cls._interactions[interaction_id]) # pylint: disable=protected-access
+            interaction = copy.deepcopy(
+                cls._interactions[interaction_id] # pylint: disable=protected-access
+            )
             interaction.answer_type = 'SetOfHtmlString'
             interaction.can_have_solution = True
             return interaction
@@ -791,8 +795,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             classmethod(mock_get_html_field_types_to_rule_specs)):
             with self.assertRaisesRegex(
                 Exception,
-                'The solution does not have a valid '
-                'correct_answer type.'):
+                'The solution does not have a valid correct_answer type.'
+            ):
                 state_domain.State.convert_html_fields_in_state(
                     state.to_dict(), lambda x: x)
 
@@ -851,12 +855,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'linked_skill_id': None,
             'param_changes': [],
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {
-                    'content_2': {},
-                    'default_outcome_3': {}
-                }
-            },
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
             'inapplicable_skill_misconception_ids': []
@@ -1477,9 +1475,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'html': '<p>This is solution for state1</p>'
                     }
                 }
-            },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {}
             }
         }
 
@@ -1560,9 +1555,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'html': '<p>This is solution for state1</p>'
                     }
                 }
-            },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {}
             }
         }
 
@@ -1738,9 +1730,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'confirmed_unclassified_answers': [],
                 'id': 'ItemSelectionInput',
                 'hints': []
-            },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {}
             }
         }
 
@@ -1813,9 +1802,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'confirmed_unclassified_answers': [],
                 'id': 'ItemSelectionInput',
                 'hints': []
-            },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {}
             }
         }
         interaction_registry.Registry.get_all_specs_for_state_schema_version(
@@ -1949,9 +1935,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                             'html': html_with_old_math_schema
                         }
                     }]
-            },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {}
             }
         }
 
@@ -2016,9 +1999,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                             'html': html_with_new_math_schema
                         }
                     }]
-            },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {}
             }
         }
         self.assertEqual(
@@ -2116,9 +2096,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'confirmed_unclassified_answers': [],
                 'id': 'ItemSelectionInput',
                 'hints': []
-            },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {}
             }
         }
 
@@ -2130,8 +2107,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             html_type_dict['format'] = 'invalid format'
 
         def mock_get_html_field_types_to_rule_specs(
-            unused_cls: Type[state_domain.State],  # pylint: disable=unused-argument
-            state_schema_version: Optional[int] = None  # pylint: disable=unused-argument
+            unused_cls: Type[ # pylint: disable=unused-argument
+                state_domain.State
+            ],
+            state_schema_version: Optional[ # pylint: disable=unused-argument
+                int
+            ] = None
         ) -> Dict[str, rules_registry.RuleSpecsExtensionDict]:
             return mock_html_field_types_to_rule_specs_dict
 
@@ -2236,9 +2217,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'confirmed_unclassified_answers': [],
                 'id': 'ItemSelectionInput',
                 'hints': []
-            },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {}
             }
         }
 
@@ -2337,9 +2315,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         }
                     }
                 ]
-            },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {}
             }
         }
 
@@ -2360,8 +2335,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         ):
             with self.assertRaisesRegex(
                 Exception,
-                'The solution does not have a valid '
-                'correct_answer type.'):
+                'The solution does not have a valid correct_answer type.'
+            ):
                 state_domain.State.convert_html_fields_in_state(
                     state_dict_with_old_math_schema,
                     html_validation_service.
@@ -2423,9 +2398,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                             'html': html_with_old_math_schema
                         }
                     }]
-            },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {}
             }
         }
 
@@ -2470,9 +2442,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                             'html': html_with_new_math_schema
                         }
                     }]
-            },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {}
             }
         }
         solution_dict: state_domain.SolutionDict = {
@@ -2520,8 +2489,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_id', '<p>some html</p>')
         subtitled_html.validate()
         with self.assertRaisesRegex(
-            utils.ValidationError, 'Expected content id to be a string, '
-            'received 20'):
+            utils.ValidationError,
+            'Expected content id to be a string, received 20'
+        ):
             with self.swap(subtitled_html, 'content_id', 20):
                 subtitled_html.validate()
 
@@ -2543,8 +2513,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_id', 'some html string')
         subtitled_unicode.validate()
         with self.assertRaisesRegex(
-            utils.ValidationError, 'Expected content id to be a string, '
-            'received 20'):
+            utils.ValidationError,
+            'Expected content id to be a string, received 20'
+        ):
             with self.swap(subtitled_unicode, 'content_id', 20):
                 subtitled_unicode.validate()
 
@@ -2770,8 +2741,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.solicit_answer_details, False)
         with self.assertRaisesRegex(
-            utils.ValidationError, 'Expected solicit_answer_details to be '
-            'a boolean, received'):
+            utils.ValidationError,
+            'Expected solicit_answer_details to be a boolean, received'
+        ):
             with self.swap(init_state, 'solicit_answer_details', 'abc'):
                 exploration.validate()
         self.assertEqual(init_state.solicit_answer_details, False)
@@ -2804,8 +2776,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.linked_skill_id, None)
         with self.assertRaisesRegex(
-            utils.ValidationError, 'Expected linked_skill_id to be '
-            'a str, received 12.'):
+            utils.ValidationError,
+            'Expected linked_skill_id to be a str, received 12.'
+        ):
             with self.swap(init_state, 'linked_skill_id', 12):
                 exploration.validate()
         self.assertEqual(init_state.linked_skill_id, None)
@@ -2830,8 +2803,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.card_is_checkpoint, True)
         with self.assertRaisesRegex(
-            utils.ValidationError, 'Expected card_is_checkpoint to be '
-            'a boolean, received'):
+            utils.ValidationError,
+            'Expected card_is_checkpoint to be a boolean, received'
+        ):
             with self.swap(init_state, 'card_is_checkpoint', 'abc'):
                 exploration.validate()
         self.assertEqual(init_state.card_is_checkpoint, True)
@@ -2914,98 +2888,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(captured_logs), 1)
         self.assertIn('Bad state dict: invalid_state_dict', captured_logs[0])
 
-    def test_cannot_update_hints_with_content_id_not_in_recorded_voiceovers(
-        self
-    ) -> None:
-        exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-        old_hints_list = [
-            state_domain.Hint(
-                state_domain.SubtitledHtml(
-                    'hint_1', '<p>Hello, this is html1 for state2</p>')
-            )
-        ]
-        new_hints_list = [
-            state_domain.Hint(
-                state_domain.SubtitledHtml(
-                    'hint_2', '<p>Hello, this is html2 for state2</p>')
-            )
-        ]
-
-        exploration.init_state.update_interaction_hints(old_hints_list)
-
-        recorded_voiceovers_dict: state_domain.RecordedVoiceoversDict = {
-            'voiceovers_mapping': {
-                'content': {
-                    'en': {
-                        'filename': 'filename3.mp3',
-                        'file_size_bytes': 3000,
-                        'needs_update': False,
-                        'duration_secs': 8.1
-                    }
-                },
-                'default_outcome': {}
-            }
-        }
-        recorded_voiceovers = (
-            state_domain.RecordedVoiceovers.from_dict(recorded_voiceovers_dict))
-
-        exploration.init_state.update_recorded_voiceovers(recorded_voiceovers)
-
-        with self.assertRaisesRegex(
-            Exception,
-            'The content_id hint_1 does not exist in recorded_voiceovers'):
-            exploration.init_state.update_interaction_hints(new_hints_list)
-
-    def test_cannot_update_hints_with_new_content_id_in_recorded_voiceovers(
-        self
-    ) -> None:
-        exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-        old_hints_list = [
-            state_domain.Hint(
-                state_domain.SubtitledHtml(
-                    'hint_1', '<p>Hello, this is html1 for state2</p>')
-            )
-        ]
-        new_hints_list = [
-            state_domain.Hint(
-                state_domain.SubtitledHtml(
-                    'hint_2', '<p>Hello, this is html2 for state2</p>')
-            )
-        ]
-
-        exploration.init_state.update_interaction_hints(old_hints_list)
-
-        recorded_voiceovers_dict: state_domain.RecordedVoiceoversDict = {
-            'voiceovers_mapping': {
-                'hint_1': {
-                    'en': {
-                        'filename': 'filename3.mp3',
-                        'file_size_bytes': 3000,
-                        'needs_update': False,
-                        'duration_secs': 6.1
-                    }
-                },
-                'hint_2': {
-                    'en': {
-                        'filename': 'filename4.mp3',
-                        'file_size_bytes': 3000,
-                        'needs_update': False,
-                        'duration_secs': 7.5
-                    }
-                },
-                'default_outcome': {}
-            }
-        }
-        recorded_voiceovers = (
-            state_domain.RecordedVoiceovers.from_dict(recorded_voiceovers_dict))
-
-        exploration.init_state.update_recorded_voiceovers(recorded_voiceovers)
-
-        with self.assertRaisesRegex(
-            Exception,
-            'The content_id hint_2 already exists in recorded_voiceovers'):
-            exploration.init_state.update_interaction_hints(new_hints_list)
-
     def test_cannot_update_interaction_solution_with_non_dict_solution(
         self
     ) -> None:
@@ -3041,8 +2923,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         # the codebase we plan to get rid of the tests that intentionally test
         # wrong inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
-            Exception, 'Expected solution to be a Solution object,'
-            'received test string'):
+            Exception,
+            'Expected solution to be a Solution object,received test string'
+        ):
             exploration.init_state.update_interaction_solution('test string')  # type: ignore[arg-type]
 
     def test_update_interaction_solution_with_no_solution(self) -> None:
@@ -3158,9 +3041,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             exploration.init_state.update_interaction_answer_groups(
                 [state_answer_group])
 
-    # TODO(#13059): Here we use MyPy ignore because after we fully type
-    # the codebase we plan to get rid of the tests that intentionally test
-    # wrong inputs that we can normally catch by typing.
     def test_cannot_update_answer_groups_with_non_list_rule_specs(self) -> None:
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
         state_answer_group = state_domain.AnswerGroup(
@@ -3169,6 +3049,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'feedback_1', '<p>Feedback</p>'), False, [], None, None
             ), [], [], None
         )
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
         state_answer_group.rule_specs = {}  # type: ignore[assignment]
 
         with self.assertRaisesRegex(
@@ -3429,6 +3312,26 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             recorded_voiceovers.get_content_ids_for_voiceovers(),
             ['content_id'])
+
+    def test_should_be_able_to_strip_voiceovers(self) -> None:
+        recorded_voiceovers_dict: state_domain.RecordedVoiceoversDict = {
+            'voiceovers_mapping': {
+                'content': {
+                    'en': {
+                        'filename': 'xyz.mp3',
+                        'file_size_bytes': 123,
+                        'needs_update': False,
+                        'duration_secs': 1.1
+                    }
+                }
+            }
+        }
+
+        recorded_voiceovers = state_domain.RecordedVoiceovers.from_dict(
+            recorded_voiceovers_dict)
+
+        recorded_voiceovers.strip_all_existing_voiceovers()
+        self.assertEqual(recorded_voiceovers.voiceovers_mapping['content'], {})
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
     # codebase we plan to get rid of the tests that intentionally test wrong

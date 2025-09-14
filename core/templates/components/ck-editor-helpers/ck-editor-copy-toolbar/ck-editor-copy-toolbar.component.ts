@@ -18,7 +18,6 @@
 
 import {Component, Inject} from '@angular/core';
 import {DOCUMENT} from '@angular/common';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 import {CkEditorCopyContentService} from 'components/ck-editor-helpers/ck-editor-copy-content.service';
 
@@ -57,10 +56,3 @@ export class CkEditorCopyToolbarComponent {
     this.document.body.style.cursor = '';
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'ckEditorCopyToolbar',
-    downgradeComponent({component: CkEditorCopyToolbarComponent})
-  );

@@ -25,8 +25,8 @@ import {
   OnInit,
   Output,
   AfterViewChecked,
+  NgZone,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
 import {EventBusGroup, EventBusService} from 'app-events/event-bus.service';
@@ -81,7 +81,8 @@ export class RuleEditorComponent
     private stateInteractionIdService: StateInteractionIdService,
     private responsesService: ResponsesService,
     private populateRuleContentIdsService: PopulateRuleContentIdsService,
-    private readonly changeDetectorRef: ChangeDetectorRef
+    private readonly changeDetectorRef: ChangeDetectorRef,
+    private readonly ngZone: NgZone
   ) {
     this.eventBusGroup = new EventBusGroup(this.eventBusService);
   }
@@ -197,7 +198,7 @@ export class RuleEditorComponent
     // interaction, where the rule inputs can sometimes be integers and
     // sometimes be lists of music notes.
     this.ruleDescriptionFragments = [];
-    setTimeout(() => {
+    this.ngZone.run(() => {
       this.ruleDescriptionFragments = result;
     }, 10);
 
@@ -331,10 +332,3 @@ export class RuleEditorComponent
     this.changeDetectorRef.detectChanges();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaRuleEditor',
-  downgradeComponent({
-    component: RuleEditorComponent,
-  }) as angular.IDirectiveFactory
-);

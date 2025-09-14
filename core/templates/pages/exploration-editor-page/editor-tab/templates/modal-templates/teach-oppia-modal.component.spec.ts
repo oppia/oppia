@@ -26,16 +26,13 @@ import {
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import {
-  StateBackendDict,
-  StateObjectFactory,
-} from 'domain/state/StateObjectFactory';
+import {StateBackendDict, State} from 'domain/state/state.model';
 import {TrainingDataService} from '../../training-panel/training-data.service';
 import {TrainingModalService} from '../../training-panel/training-modal.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {AlertsService} from 'services/alerts.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {ResponsesService} from '../../services/responses.service';
 import {
@@ -45,21 +42,20 @@ import {
 import {TruncateInputBasedOnInteractionAnswerTypePipe} from 'filters/truncate-input-based-on-interaction-answer-type.pipe';
 import {AnswerClassificationResult} from 'domain/classifier/answer-classification-result.model';
 import {AnswerClassificationService} from 'pages/exploration-player-page/services/answer-classification.service';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {TeachOppiaModalBackendApiService} from './teach-oppia-modal-backend-api.service';
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {InteractionAnswer} from 'interactions/answer-defs';
 
 describe('Teach Oppia Modal Component', () => {
   let component: TeachOppiaModalComponent;
   let fixture: ComponentFixture<TeachOppiaModalComponent>;
   let alertsService: AlertsService;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let explorationHtmlFormatterService: ExplorationHtmlFormatterService;
   let stateEditorService: StateEditorService;
   let stateInteractionIdService: StateInteractionIdService;
-  let stateObjectFactory: StateObjectFactory;
   let explorationStatesService: ExplorationStatesService;
   let responsesService: ResponsesService;
   let trainingDataService: TrainingDataService;
@@ -133,9 +129,6 @@ describe('Teach Oppia Modal Component', () => {
     },
     linked_skill_id: null,
     param_changes: [],
-    recorded_voiceovers: {
-      voiceovers_mapping: {},
-    },
     solicit_answer_details: false,
     card_is_checkpoint: false,
   };
@@ -195,7 +188,6 @@ describe('Teach Oppia Modal Component', () => {
     component = fixture.componentInstance;
     injector = TestBed.inject(Injector);
     stateInteractionIdService = TestBed.inject(StateInteractionIdService);
-    stateObjectFactory = TestBed.inject(StateObjectFactory);
     trainingDataService = TestBed.inject(TrainingDataService);
     trainingModalService = TestBed.inject(TrainingModalService);
     teachOppiaModalBackendApiService = TestBed.inject(
@@ -231,7 +223,7 @@ describe('Teach Oppia Modal Component', () => {
         },
       ];
       alertsService = TestBed.inject(AlertsService);
-      contextService = TestBed.inject(ContextService);
+      pageContextService = TestBed.inject(PageContextService);
       explorationHtmlFormatterService = TestBed.inject(
         ExplorationHtmlFormatterService
       );
@@ -242,12 +234,14 @@ describe('Teach Oppia Modal Component', () => {
       trainingModalService = TestBed.inject(TrainingModalService);
 
       spyOn(injector, 'get').and.stub();
-      spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
+      spyOn(pageContextService, 'getExplorationId').and.returnValue(
+        explorationId
+      );
       spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
         stateName
       );
       spyOn(explorationStatesService, 'getState').and.returnValue(
-        stateObjectFactory.createFromBackendDict(stateName, state)
+        State.createFromBackendDict(stateName, state)
       );
       stateInteractionIdService.init(stateName, 'TextInput');
       spyOn(

@@ -17,7 +17,6 @@
  * attrs for interactions.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {HtmlEscaperService} from 'services/html-escaper.service';
@@ -25,7 +24,7 @@ import {
   InteractionCustomizationArgs,
   InteractionCustomizationArgsBackendDict,
 } from 'extensions/interactions/customization-args-defs';
-import {InteractionObjectFactory} from 'domain/exploration/InteractionObjectFactory';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {
   InteractionSpecsConstants,
   InteractionSpecsKey,
@@ -58,10 +57,7 @@ export class InteractionAttributesExtractorService {
     'TextInput',
   ];
 
-  constructor(
-    private htmlEscaperService: HtmlEscaperService,
-    private interactionFactory: InteractionObjectFactory
-  ) {}
+  constructor(private htmlEscaperService: HtmlEscaperService) {}
 
   getValuesFromAttributes(
     interactionId: InteractionSpecsKey,
@@ -83,16 +79,10 @@ export class InteractionAttributesExtractorService {
       });
     });
 
-    const ca = this.interactionFactory.convertFromCustomizationArgsBackendDict(
+    const ca = Interaction.convertFromCustomizationArgsBackendDict(
       interactionId,
       caBackendDict
     );
     return ca;
   }
 }
-angular
-  .module('oppia')
-  .factory(
-    'InteractionAttributesExtractorService',
-    downgradeInjectable(InteractionAttributesExtractorService)
-  );

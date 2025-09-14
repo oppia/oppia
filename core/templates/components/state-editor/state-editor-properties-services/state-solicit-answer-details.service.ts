@@ -15,7 +15,6 @@
 /**
  * @fileoverview A data service that stores the solicit answer details value.
  */
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {AlertsService} from 'services/alerts.service';
@@ -34,10 +33,3 @@ export class StateSolicitAnswerDetailsService extends StatePropertyService<boole
     this.setterMethodKey = 'saveSolicitAnswerDetails';
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'StateSolicitAnswerDetailsService',
-    downgradeInjectable(StateSolicitAnswerDetailsService)
-  );

@@ -21,7 +21,6 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {InteractionAnswer} from 'interactions/answer-defs';
 import {NumericExpressionInputCustomizationArgs} from 'interactions/customization-args-defs';
 import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
@@ -89,6 +88,7 @@ export class InteractiveNumericExpressionInput implements OnInit {
         );
       }
       this.warningText = this.mathInteractionsService.getWarningText();
+      this.currentInteractionService.updateAnswerIsValid(answerIsValid);
       return answerIsValid;
     }
     this.warningText = '';
@@ -177,10 +177,3 @@ export class InteractiveNumericExpressionInput implements OnInit {
     );
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaInteractiveNumericExpressionInput',
-  downgradeComponent({
-    component: InteractiveNumericExpressionInput,
-  }) as angular.IDirectiveFactory
-);

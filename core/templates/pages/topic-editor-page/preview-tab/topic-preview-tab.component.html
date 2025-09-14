@@ -1,4 +1,4 @@
-<div class="topic-preview-parent">
+<div class="topic-preview-parent e2e-test-topic-preview-container">
   <div>
     <background-banner></background-banner>
   </div>
@@ -13,7 +13,7 @@
                  [src]="getStaticImageUrl('/icons/play_icon_24px.svg')">
           </div>
           <div class="topic-preview-text">
-            Lessons
+            Learn
           </div>
         </div>
         <div class="topic-preview-navbar-tab"
@@ -34,18 +34,20 @@
                  [src]="getStaticImageUrl('/icons/review_icon_24px.svg')">
           </div>
           <div class="topic-preview-text">
-            Revision
+            Study
           </div>
         </div>
       </div>
     </div>
     <div *ngIf="activeTab === 'story'">
-      <stories-list [topicName]="topic.getName()"
+      <stories-list
+                    [topicName]="topic.getName()"
+                    [topicId]="topic.getId()"
                     [topicDescription]="topic.getDescription()"
                     [canonicalStorySummaries]="canonicalStorySummaries"
-                    [classroomUrlFragment]="''"
-                    [classroomName]="''"
-                    [topicUrlFragment]="''">
+                    [classroomUrlFragment]="classroomUrlFragment"
+                    [classroomName]="classroomName"
+                    [topicUrlFragment]="topicUrlFragment">
       </stories-list>
     </div>
     <div *ngIf="activeTab === 'subtopic'">
@@ -56,11 +58,18 @@
                       [topicUrlFragment]="''">
       </subtopics-list>
     </div>
-    <div *ngIf="activeTab === 'practice'">
-      <practice-tab [subtopicsList]="subtopics"
+    <div  *ngIf="activeTab === 'practice'">
+      <practice-tab *ngIf="isPracticeTabEnabled()" [subtopicsList]="subtopics"
                     [topicName]="topicName"
-                    [previewMode]="true">
+                    [topicUrlFragment]="topicUrlFragment"
+                    [classroomUrlFragment]="classroomUrlFragment">
       </practice-tab>
+      <mat-card dir="auto" *ngIf="!isPracticeTabEnabled()" class="oppia-page-card practice-tab-not-available-card">
+        <h2 class="coming-soon-title" [innerHTML]="'I18N_TOPIC_VIEWER_COMING_SOON' | translate">
+        </h2>
+        <div class="coming-soon-text" [innerHTML]="'I18N_TOPIC_VIEWER_COMING_SOON_PRACTICE' | translate">
+        </div>
+      </mat-card>
     </div>
   </div>
 </div>
@@ -91,10 +100,10 @@
   .topic-preview-navbar-tab {
     cursor: pointer;
     display: inline-block;
+    flex: 1;
     height: 100%;
     padding: 20px 0;
     text-align: center;
-    width: 25%;
   }
   .topic-preview-icon img {
     height: 40px;
@@ -106,11 +115,11 @@
     margin-top: 4px;
     text-transform: uppercase;
   }
-  .topic-preview-container md-card {
+  .topic-preview-container mat-card {
     box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 0 rgba(0,0,0,0.24);
     margin-top: 0;
   }
-  .topic-preview-parent .topic-preview-container md-card {
+  .topic-preview-parent .topic-preview-container mat-card {
     box-shadow: none;
   }
   @media screen and (max-width: 1000px) {

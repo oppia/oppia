@@ -16,7 +16,6 @@
  * @fileoverview Service to fetch all translations for an entity from the backend.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
@@ -77,10 +76,3 @@ export class EntityBulkTranslationsBackendApiService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'EntityBulkTranslationsBackendApiService',
-    downgradeInjectable(EntityBulkTranslationsBackendApiService)
-  );

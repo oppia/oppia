@@ -17,7 +17,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {StoryContents} from 'domain/story/story-contents-object.model';
 
@@ -106,10 +105,3 @@ export class StoryValidationService {
     return issues;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'StoryValidationService',
-    downgradeInjectable(StoryValidationService)
-  );

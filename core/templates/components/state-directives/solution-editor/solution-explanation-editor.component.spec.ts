@@ -25,14 +25,11 @@ import {
 } from '@angular/core/testing';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {EditabilityService} from 'services/editability.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {SolutionExplanationEditor} from './solution-explanation-editor.component';
 import {ExternalSaveService} from 'services/external-save.service';
 import {StateSolutionService} from 'components/state-editor/state-editor-properties-services/state-solution.service';
-import {
-  Solution,
-  SolutionObjectFactory,
-} from 'domain/exploration/SolutionObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
 
 class MockStateSolutionService {
   displayed = {
@@ -62,7 +59,7 @@ describe('Solution explanation editor', () => {
   let component: SolutionExplanationEditor;
   let fixture: ComponentFixture<SolutionExplanationEditor>;
 
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let editabilityService: EditabilityService;
   let stateSolutionService: StateSolutionService;
   let externalSaveService: ExternalSaveService;
@@ -72,10 +69,9 @@ describe('Solution explanation editor', () => {
     TestBed.configureTestingModule({
       declarations: [SolutionExplanationEditor],
       providers: [
-        ContextService,
+        PageContextService,
         EditabilityService,
         ExternalSaveService,
-        SolutionObjectFactory,
         {
           provide: StateSolutionService,
           useClass: MockStateSolutionService,
@@ -89,7 +85,7 @@ describe('Solution explanation editor', () => {
     fixture = TestBed.createComponent(SolutionExplanationEditor);
     component = fixture.componentInstance;
 
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     editabilityService = TestBed.inject(EditabilityService);
     stateSolutionService = TestBed.inject(StateSolutionService);
     externalSaveService = TestBed.inject(ExternalSaveService);
@@ -97,7 +93,7 @@ describe('Solution explanation editor', () => {
     spyOnProperty(externalSaveService, 'onExternalSave').and.returnValue(
       externalSaveServiceEmitter
     );
-    spyOn(contextService, 'getEntityType').and.returnValue('question');
+    spyOn(pageContextService, 'getEntityType').and.returnValue('question');
     spyOn(editabilityService, 'isEditable').and.returnValue(true);
 
     fixture.detectChanges();
@@ -112,6 +108,7 @@ describe('Solution explanation editor', () => {
     const schema = {
       type: 'html',
       ui_config: {
+        rte_component_config_id: 'ALL_COMPONENTS',
         hide_complex_extensions: true,
       },
     };
@@ -133,6 +130,7 @@ describe('Solution explanation editor', () => {
     const schema = {
       type: 'html',
       ui_config: {
+        rte_component_config_id: 'ALL_COMPONENTS',
         hide_complex_extensions: true,
       },
     };

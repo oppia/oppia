@@ -20,7 +20,6 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {SchemaDefaultValue} from 'services/schema-default-value.service';
 
 interface ListOfTabsEditorSchema {
@@ -46,6 +45,7 @@ interface ListOfTabsEditorSchema {
         schema: {
           type: 'html';
           ui_config: {
+            rte_component_config_id: 'ALL_COMPONENTS';
             hide_complex_extensions: true;
           };
         };
@@ -92,6 +92,7 @@ export class ListOfTabsEditorComponent implements OnInit {
           schema: {
             type: 'html',
             ui_config: {
+              rte_component_config_id: 'ALL_COMPONENTS',
               hide_complex_extensions: true,
             },
           },
@@ -123,10 +124,3 @@ export class ListOfTabsEditorComponent implements OnInit {
     this.valueChanged.emit(this.value);
   }
 }
-
-angular.module('oppia').directive(
-  'listOfTabsEditor',
-  downgradeComponent({
-    component: ListOfTabsEditorComponent,
-  }) as angular.IDirectiveFactory
-);

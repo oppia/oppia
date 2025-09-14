@@ -20,10 +20,9 @@
 import cloneDeep from 'lodash/cloneDeep';
 import {Observable} from 'rxjs';
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {EventEmitter, Injectable} from '@angular/core';
 
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {Hint} from 'domain/exploration/hint-object.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {
@@ -33,11 +32,11 @@ import {
   ItemSelectionInputCustomizationArgs,
   MultipleChoiceInputCustomizationArgs,
 } from 'extensions/interactions/customization-args-defs';
-import {Interaction} from 'domain/exploration/InteractionObjectFactory';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
-import {Solution} from 'domain/exploration/SolutionObjectFactory';
+import {Interaction} from 'domain/exploration/interaction.model';
+import {Outcome} from 'domain/exploration/outcome.model';
+import {Solution} from 'domain/exploration/solution.model';
 import {SolutionValidityService} from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
-import {State} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 
 export interface AnswerChoice {
   val: string | number | SubtitledHtml;
@@ -73,6 +72,8 @@ export class StateEditorService {
   private _updateMisconceptionsEventEmitter = new EventEmitter<void>();
   private _onChangeLinkedSkillIdEventEmitter = new EventEmitter<void>();
   private _objectFormValidityChangeEventEmitter = new EventEmitter<boolean>();
+  private _updateActiveStateIfInEditorEventEmitter: EventEmitter<string> =
+    new EventEmitter();
 
   activeStateName: string | null = null;
   // These properties are initialized using Angular lifecycle hooks
@@ -366,8 +367,8 @@ export class StateEditorService {
   get onChangeLinkedSkillId(): EventEmitter<void> {
     return this._onChangeLinkedSkillIdEventEmitter;
   }
-}
 
-angular
-  .module('oppia')
-  .factory('StateEditorService', downgradeInjectable(StateEditorService));
+  get onUpdateActiveStateIfInEditor(): EventEmitter<string> {
+    return this._updateActiveStateIfInEditorEventEmitter;
+  }
+}

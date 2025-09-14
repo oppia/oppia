@@ -27,7 +27,6 @@ import {
   OnInit,
   SimpleChanges,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {WindowRef} from 'services/contextual/window-ref.service';
 
 @Component({
@@ -108,10 +107,3 @@ export class CodemirrorMergeviewComponent
     }
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaCodemirrorMergeview',
-  downgradeComponent({
-    component: CodemirrorMergeviewComponent,
-  }) as angular.IDirectiveFactory
-);

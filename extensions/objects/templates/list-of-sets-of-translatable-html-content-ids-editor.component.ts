@@ -18,7 +18,6 @@
  */
 
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {ObjectFormValidityChangeEvent} from 'app-events/app-events';
 import {EventBusGroup, EventBusService} from 'app-events/event-bus.service';
 
@@ -185,10 +184,3 @@ export class ListOfSetsOfTranslatableHtmlContentIdsEditorComponent {
     }
   }
 }
-
-angular.module('oppia').directive(
-  'listOfSetsOfTranslatableHtmlContentIdsEditor',
-  downgradeComponent({
-    component: ListOfSetsOfTranslatableHtmlContentIdsEditorComponent,
-  }) as angular.IDirectiveFactory
-);

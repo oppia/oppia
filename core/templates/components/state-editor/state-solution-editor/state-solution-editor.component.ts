@@ -18,7 +18,6 @@
  */
 
 import {Component, EventEmitter, OnInit, Output} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {SolutionValidityService} from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import {SolutionVerificationService} from 'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
@@ -33,7 +32,7 @@ import {StateEditorService} from '../state-editor-properties-services/state-edit
 import {StateHintsService} from '../state-editor-properties-services/state-hints.service';
 import {StateInteractionIdService} from '../state-editor-properties-services/state-interaction-id.service';
 import {StateSolutionService} from '../state-editor-properties-services/state-solution.service';
-import {Solution} from 'domain/exploration/SolutionObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
 import {AppConstants} from 'app.constants';
 import {StateEditorConstants} from '../state-editor.constants';
 import {ConvertToPlainTextPipe} from 'filters/string-utility-filters/convert-to-plain-text.pipe';
@@ -251,10 +250,3 @@ export class StateSolutionEditorComponent implements OnInit {
     this.solutionCardIsShown = !this.solutionCardIsShown;
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaStateSolutionEditor',
-  downgradeComponent({
-    component: StateSolutionEditorComponent,
-  }) as angular.IDirectiveFactory
-);

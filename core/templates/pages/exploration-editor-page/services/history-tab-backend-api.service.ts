@@ -16,7 +16,6 @@
  * @fileoverview Backend api service for history tab component;
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {ExplorationSnapshot} from '../history-tab/services/version-tree.service';
@@ -66,10 +65,3 @@ export class HistoryTabBackendApiService {
       .toPromise();
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'HistoryTabBackendApiService',
-    downgradeInjectable(HistoryTabBackendApiService)
-  );

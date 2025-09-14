@@ -18,7 +18,6 @@
 
 import {Component} from '@angular/core';
 import {Router} from '@angular/router';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
@@ -50,6 +49,10 @@ export class OppiaFooterComponent {
 
   versionInformationIsShown: boolean = this.router.url === '/about';
 
+  subscriptionProcessing: boolean = false;
+  emailDuplicated: boolean = false;
+  emailsSubscribed: Set<string> = new Set();
+
   constructor(
     private alertsService: AlertsService,
     private ngbModal: NgbModal,
@@ -69,35 +72,58 @@ export class OppiaFooterComponent {
     return regex.test(String(this.emailAddress));
   }
 
+  disableNewsletterSubscription(): boolean {
+    if (!this.subscriptionProcessing) {
+      return !this.validateEmailAddress();
+    }
+    return this.subscriptionProcessing;
+  }
+
+  isAlreadySubscribed(email: string): boolean {
+    return this.emailsSubscribed.has(email);
+  }
+
+  clearNewsletterWarning(): void {
+    this.emailDuplicated = false;
+  }
+
   subscribeToMailingList(): void {
     // Convert null or empty string to null for consistency.
     const userName = this.name ? String(this.name) : null;
-    this.mailingListBackendApiService
-      .subscribeUserToMailingList(
-        String(this.emailAddress),
-        userName,
-        AppConstants.MAILING_LIST_WEB_TAG
-      )
-      .then(status => {
-        if (status) {
-          this.alertsService.addInfoMessage('Done!', 1000);
-          this.ngbModal.open(ThanksForSubscribingModalComponent, {
-            backdrop: 'static',
-            size: 'xl',
-          });
-        } else {
+    if (this.isAlreadySubscribed(String(this.emailAddress))) {
+      this.emailDuplicated = true;
+    } else {
+      this.subscriptionProcessing = true;
+      this.emailsSubscribed.add(String(this.emailAddress));
+      this.mailingListBackendApiService
+        .subscribeUserToMailingList(
+          String(this.emailAddress),
+          userName,
+          AppConstants.MAILING_LIST_WEB_TAG
+        )
+        .then(status => {
+          if (status) {
+            this.alertsService.addInfoMessage('Done!', 1000);
+            this.ngbModal.open(ThanksForSubscribingModalComponent, {
+              backdrop: 'static',
+              size: 'xl',
+            });
+          } else {
+            this.alertsService.addInfoMessage(
+              AppConstants.MAILING_LIST_UNEXPECTED_ERROR_MESSAGE,
+              10000
+            );
+          }
+          this.subscriptionProcessing = false;
+        })
+        .catch(errorResponse => {
           this.alertsService.addInfoMessage(
             AppConstants.MAILING_LIST_UNEXPECTED_ERROR_MESSAGE,
             10000
           );
-        }
-      })
-      .catch(errorResponse => {
-        this.alertsService.addInfoMessage(
-          AppConstants.MAILING_LIST_UNEXPECTED_ERROR_MESSAGE,
-          10000
-        );
-      });
+          this.subscriptionProcessing = false;
+        });
+    }
   }
 
   navigateToAboutPage(): void {
@@ -114,10 +140,3 @@ export class OppiaFooterComponent {
     this.windowRef.nativeWindow.location.href = '/teach';
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaFooter',
-  downgradeComponent({
-    component: OppiaFooterComponent,
-  }) as angular.IDirectiveFactory
-);

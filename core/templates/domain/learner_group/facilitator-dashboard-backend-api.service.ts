@@ -17,7 +17,6 @@
  * on the facilitator dashboard.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
@@ -63,10 +62,3 @@ export class FacilitatorDashboardBackendApiService {
     return this._fetchTeacherDashboardLearnerGroupsAsync();
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'FacilitatorDashboardBackendApiService',
-    downgradeInjectable(FacilitatorDashboardBackendApiService)
-  );

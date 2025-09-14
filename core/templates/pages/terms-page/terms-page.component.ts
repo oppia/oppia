@@ -17,7 +17,6 @@
  */
 
 import {Component} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {AppConstants} from 'app.constants';
 
 @Component({
@@ -32,7 +31,3 @@ export class TermsPageComponent {
     el.scrollIntoView({behavior: 'smooth'});
   }
 }
-
-angular
-  .module('oppia')
-  .directive('termsPage', downgradeComponent({component: TermsPageComponent}));

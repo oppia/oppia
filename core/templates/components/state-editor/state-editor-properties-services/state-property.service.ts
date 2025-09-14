@@ -16,7 +16,6 @@
  * @fileoverview Standalone services for the general state editor page.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {EventEmitter, Injectable} from '@angular/core';
 
 import cloneDeep from 'lodash/cloneDeep';
@@ -119,7 +118,3 @@ export class StatePropertyService<StatePropertyType> {
     this.displayed = cloneDeep(this.savedMemento);
   }
 }
-
-angular
-  .module('oppia')
-  .factory('StatePropertyService', downgradeInjectable(StatePropertyService));

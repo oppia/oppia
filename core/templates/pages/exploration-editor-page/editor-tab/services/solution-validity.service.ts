@@ -17,7 +17,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 @Injectable({
   providedIn: 'root',
@@ -56,10 +55,3 @@ export class SolutionValidityService {
     return this.solutionValidities;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'SolutionValidityService',
-    downgradeInjectable(SolutionValidityService)
-  );

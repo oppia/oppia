@@ -17,7 +17,6 @@
  */
 
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 import './learner-group-details.component.css';
 
@@ -49,10 +48,3 @@ export class LearnerGroupDetailsComponent {
     return this.readOnlyMode;
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaLearnerGroupDetails',
-    downgradeComponent({component: LearnerGroupDetailsComponent})
-  );

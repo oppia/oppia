@@ -407,6 +407,81 @@ describe('Change List Service when changes are mergable', () => {
     );
   }));
 
+  it('should return true for only if only voiceover changes', fakeAsync(() => {
+    changeListService.changeListAddedTimeoutId = setTimeout(() => {}, 10);
+    changeListService.explorationChangeList.length = 0;
+    changeListService.loadingMessage = '';
+    spyOn(
+      changeListService.autosaveInProgressEventEmitter,
+      'emit'
+    ).and.callThrough();
+
+    let voiceover: VoiceoverBackendDict = {
+      filename: 'b.mp3',
+      file_size_bytes: 100000,
+      needs_update: false,
+      duration_secs: 12.0,
+    };
+    let voiceoverTypeToVoiceovers = {
+      manual: voiceover,
+    };
+
+    changeListService.editVoiceovers(
+      'content_id_1',
+      'en-US',
+      voiceoverTypeToVoiceovers
+    );
+
+    flush();
+
+    expect(changeListService.isOnlyVoiceoverChangeListPresent()).toBe(true);
+  }));
+
+  it('should return false if non voiceover changes in the change list', fakeAsync(() => {
+    changeListService.changeListAddedTimeoutId = setTimeout(() => {}, 10);
+    changeListService.explorationChangeList.length = 0;
+    let saveSpy = spyOn(
+      changeListService.autosaveInProgressEventEmitter,
+      'emit'
+    ).and.callThrough();
+
+    changeListService.renameState('oldState', 'newState');
+    flush();
+
+    expect(changeListService.isOnlyVoiceoverChangeListPresent()).toBe(false);
+    expect(saveSpy).toHaveBeenCalled();
+  }));
+
+  it('should mark voiceovers as needing update', fakeAsync(() => {
+    changeListService.changeListAddedTimeoutId = setTimeout(() => {}, 10);
+    changeListService.explorationChangeList.length = 0;
+    changeListService.loadingMessage = '';
+    let saveSpy = spyOn(
+      changeListService.autosaveInProgressEventEmitter,
+      'emit'
+    ).and.callThrough();
+
+    changeListService.markVoiceoversAsNeedingUpdate('content_id_1', 'en-US');
+    flush();
+    expect(saveSpy).toHaveBeenCalled();
+    expect(changeListService.explorationChangeList.length).toEqual(1);
+  }));
+
+  it('should successfully remove voiceovers', fakeAsync(() => {
+    changeListService.changeListAddedTimeoutId = setTimeout(() => {}, 10);
+    changeListService.explorationChangeList.length = 0;
+    changeListService.loadingMessage = '';
+    let saveSpy = spyOn(
+      changeListService.autosaveInProgressEventEmitter,
+      'emit'
+    ).and.callThrough();
+
+    changeListService.removeVoiceovers('content_id_1', 'en-US');
+    flush();
+    expect(saveSpy).toHaveBeenCalled();
+    expect(changeListService.explorationChangeList.length).toEqual(1);
+  }));
+
   it(
     'should save changes after renaming a state ' +
       "when calling 'renameState'",

@@ -18,7 +18,7 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
+
 import {Schema} from 'services/schema-default-value.service';
 
 @Injectable({
@@ -35,10 +35,3 @@ export class SchemaUndefinedLastElementService {
     }
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'SchemaUndefinedLastElementService',
-    downgradeInjectable(SchemaUndefinedLastElementService)
-  );

@@ -17,7 +17,6 @@
  * from backend and to backend.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
@@ -326,10 +325,3 @@ export class LearnerGroupBackendApiService {
     return this._isLearnerGroupFeatureEnabledAsync();
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'LearnerGroupBackendApiService',
-    downgradeInjectable(LearnerGroupBackendApiService)
-  );

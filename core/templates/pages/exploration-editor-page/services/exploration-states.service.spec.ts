@@ -19,12 +19,9 @@
 import {ChangeListService} from './change-list.service';
 import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ExplorationStatesService} from './exploration-states.service';
-import {
-  AnswerGroup,
-  AnswerGroupObjectFactory,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
 
@@ -46,9 +43,8 @@ class MockNgbModal {
 describe('ExplorationStatesService', () => {
   let ngbModal: NgbModal;
   let changeListService: ChangeListService;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let explorationStatesService: ExplorationStatesService;
-  let answerGroupObjectFactory: AnswerGroupObjectFactory;
   let answerGroup: AnswerGroup;
   let generateContentIdService: GenerateContentIdService;
 
@@ -68,9 +64,8 @@ describe('ExplorationStatesService', () => {
   beforeEach(() => {
     ngbModal = TestBed.inject(NgbModal);
     changeListService = TestBed.inject(ChangeListService);
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     explorationStatesService = TestBed.inject(ExplorationStatesService);
-    answerGroupObjectFactory = TestBed.inject(AnswerGroupObjectFactory);
     generateContentIdService = TestBed.inject(GenerateContentIdService);
     generateContentIdService.init(
       () => 0,
@@ -80,9 +75,9 @@ describe('ExplorationStatesService', () => {
 
   beforeEach(() => {
     let EXP_ID = '7';
-    spyOn(contextService, 'getExplorationId').and.returnValue(EXP_ID);
+    spyOn(pageContextService, 'getExplorationId').and.returnValue(EXP_ID);
 
-    answerGroup = answerGroupObjectFactory.createFromBackendDict(
+    answerGroup = AnswerGroup.createFromBackendDict(
       {
         rule_specs: [
           {
@@ -117,14 +112,6 @@ describe('ExplorationStatesService', () => {
       {
         Hola: {
           content: {content_id: 'content', html: ''},
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {},
-              feedback_1: {},
-              rule_input: {},
-            },
-          },
           param_changes: [],
           interaction: {
             confirmed_unclassified_answers: [],

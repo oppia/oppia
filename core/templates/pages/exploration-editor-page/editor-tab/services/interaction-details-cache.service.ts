@@ -23,7 +23,6 @@
 import cloneDeep from 'lodash/cloneDeep';
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
 
@@ -65,10 +64,3 @@ export class InteractionDetailsCacheService {
     return cloneDeep(InteractionDetailsCacheService._cache[interactionId]);
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'InteractionDetailsCacheService',
-    downgradeInjectable(InteractionDetailsCacheService)
-  );

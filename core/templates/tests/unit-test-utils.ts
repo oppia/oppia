@@ -55,6 +55,7 @@ export class MockI18nService {
   updateViewToUserPreferredSiteLanguage(): void {}
   removeUrlLangParam(): void {}
   updateUserPreferredLanguage(newLangCode: string): void {}
+  handleLanguageUpdate(newLangCode: string): void {}
 }
 
 @NgModule({

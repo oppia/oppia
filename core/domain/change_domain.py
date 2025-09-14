@@ -33,7 +33,6 @@ if MYPY: # pragma: no cover
     from core.domain import param_domain
     from core.domain import platform_parameter_domain
     from core.domain import question_domain
-    from core.domain import skill_domain
     from core.domain import state_domain
     from core.domain import translation_domain
 
@@ -62,7 +61,6 @@ if MYPY: # pragma: no cover
         List[param_domain.ParamChangeDict],
         List[state_domain.AnswerGroupDict],
         List[state_domain.HintDict],
-        List[skill_domain.WorkedExampleDict],
         translation_domain.WrittenTranslationsDict,
         List[platform_parameter_domain.PlatformParameterRuleDict],
         question_domain.QuestionDict,

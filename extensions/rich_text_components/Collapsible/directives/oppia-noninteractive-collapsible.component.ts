@@ -41,7 +41,6 @@ import {
   OnInit,
   SimpleChanges,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 
 @Component({
@@ -81,10 +80,3 @@ export class NoninteractiveCollapsible implements OnInit, OnChanges {
     }
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaNoninteractiveCollapsible',
-  downgradeComponent({
-    component: NoninteractiveCollapsible,
-  }) as angular.IDirectiveFactory
-);

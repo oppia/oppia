@@ -286,14 +286,15 @@ def _raise_validation_errors_for_unescaped_html_tag(
 
 
 def validate_rte_tags(
-    html_data: str, is_tag_nested_inside_tabs_or_collapsible: bool = False
+    html_data: str,
+    is_tag_nested_inside_tabs_or_collapsible: bool = False
 ) -> None:
     """Validate all the RTE tags.
 
     Args:
         html_data: str. The RTE content of the state.
-        is_tag_nested_inside_tabs_or_collapsible: bool. True when we
-            validate tags inside `Tabs` or `Collapsible` tag.
+        is_tag_nested_inside_tabs_or_collapsible: bool. True when
+            we validate tags inside `Tabs` or `Collapsible` tag.
 
     Raises:
         ValidationError. Image does not have alt-with-value attribute.
@@ -400,8 +401,7 @@ def validate_rte_tags(
 
         if not tag.has_attr('autoplay-with-value'):
             raise utils.ValidationError(
-                'Video tag does not have \'autoplay-with-value\' '
-                'attribute.'
+                'Video tag does not have \'autoplay-with-value\' attribute.'
             )
 
         if tag['autoplay-with-value'].strip() not in (
@@ -422,8 +422,7 @@ def validate_rte_tags(
     for tag in soup.find_all('oppia-noninteractive-link'):
         if not tag.has_attr('text-with-value'):
             raise utils.ValidationError(
-                'Link tag does not have \'text-with-value\' '
-                'attribute.'
+                'Link tag does not have \'text-with-value\' attribute.'
             )
 
         _raise_validation_errors_for_unescaped_html_tag(
@@ -456,8 +455,7 @@ def validate_rte_tags(
         math_content_list = json.loads(math_content_json)
         if 'raw_latex' not in math_content_list:
             raise utils.ValidationError(
-                'Math tag does not have \'raw_latex-with-value\' '
-                'attribute.'
+                'Math tag does not have \'raw_latex-with-value\' attribute.'
             )
 
         if is_html_empty(math_content_list['raw_latex']):
@@ -495,8 +493,8 @@ def validate_rte_tags(
         collapsible_tags = soup.find_all('oppia-noninteractive-collapsible')
         if len(collapsible_tags) > 0:
             raise utils.ValidationError(
-                'Collapsible tag should not be present inside another '
-                'Tabs or Collapsible tag.'
+                'Collapsible tag should not be present inside Tabs '
+                'or another Collapsible tag.'
             )
 
 
@@ -525,7 +523,9 @@ def _raise_validation_errors_for_empty_tabs_content(
         )
 
 
-def validate_tabs_and_collapsible_rte_tags(html_data: str) -> None:
+def validate_tabs_and_collapsible_rte_tags(
+        html_data: str
+    ) -> None:
     """Validates `Tabs` and `Collapsible` RTE tags
 
     Args:

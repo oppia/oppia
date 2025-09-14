@@ -28,6 +28,7 @@ const topicAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
 const baseURL = testConstants.URLs.BaseURL;
 
 const richTextAreaField = 'div.e2e-test-rte';
+const richTextParagraphTag = 'div.e2e-test-rte p';
 const floatTextField = '.e2e-test-rule-details .e2e-test-float-form-input';
 const solutionFloatTextField =
   'oppia-add-or-update-solution-modal .e2e-test-float-form-input';
@@ -70,12 +71,12 @@ const submitSolutionButton = 'button.e2e-test-submit-solution-button';
 const saveQuestionButton = 'button.e2e-test-save-question-button';
 
 const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
-const dropdownToggleIcon = '.e2e-test-mobile-options-dropdown';
 
 const topicsTab = 'a.e2e-test-topics-tab';
 const desktopTopicSelector = 'a.e2e-test-topic-name';
 const topicNameField = 'input.e2e-test-new-topic-name-field';
-const topicUrlFragmentField = 'input.e2e-test-new-topic-url-fragment-field';
+const topicUrlFragmentField =
+  '.e2e-test-new-topic-url-fragment-field .e2e-test-url-fragment-field';
 const topicWebFragmentField = 'input.e2e-test-new-page-title-fragm-field';
 const topicDescriptionField = 'textarea.e2e-test-new-topic-description-field';
 const createTopicButton = 'button.e2e-test-confirm-topic-creation-button';
@@ -96,8 +97,40 @@ const confirmTopicDeletionButton = '.e2e-test-confirm-topic-deletion-button';
 
 const addSubtopicButton = 'button.e2e-test-add-subtopic-button';
 const subtopicTitleField = 'input.e2e-test-new-subtopic-title-field';
+const subtopicStudyGuideHeadingField =
+  '.e2e-test-new-subtopic-study-guide-section-heading-field';
+const subtopicStudyGuideContentField =
+  '.e2e-test-create-subtopic-page-content-rich-text-editor';
+const showSectionsList = '.e2e-test-show-study-guide-sections-list';
+const showSubtopicsList = '.e2e-test-show-subtopics-list';
+const firstSubtopicTile = '.e2e-test-subtopic';
+const firstStudyGuideSectionTile = '.e2e-test-study-guide-section-0';
+const addStudyGuideSectionButton = '.e2e-test-add-study-guide-section';
+const addStudyGuideSectionModalHeading =
+  '.e2e-test-add-study-guide-section-modal-heading-field';
+const addStudyGuideSectionModalContent =
+  '.e2e-test-add-study-guide-section-modal-content-field';
+const addStudyGuideSectionModalSaveButton =
+  '.e2e-test-add-study-guide-section-modal-save-button';
+const addStudyGuideSectionModalCancelButton =
+  '.e2e-test-add-study-guide-section-modal-cancel-button';
+const addStudyGuideSectionContentLength =
+  '.e2e-test-add-study-guide-section-content-length-error';
+const deleteStudyGuideSectionButton = '.e2e-test-delete-example-button';
+const expandedStudyGuideSectionTileHeading =
+  '.e2e-test-study-guide-section-heading-field';
+const expandedStudyGuideSectionTileContent =
+  '.e2e-test-study-guide-section-content-field';
+const editStudyGuideSectionHeadingIcon = '.e2e-test-section-heading-edit-icon';
+const editStudyGuideSectionContentIcon = '.e2e-test-section-content-edit-icon';
+const editStudyGuideSectionHeadingEditor =
+  '.e2e-test-study-guide-section-heading-plaintext-editor';
+const editStudyGuideSectionContentEditor =
+  '.e2e-test-study-guide-section-content-rich-text-editor';
+const studyGuideSectionDeleteConfirmButton =
+  '.e2e-test-confirm-delete-study-guide-section-button';
 const subtopicUrlFragmentField =
-  'input.e2e-test-new-subtopic-url-fragment-field';
+  '.e2e-test-create-new-subtopic .e2e-test-url-fragment-field';
 const subtopicDescriptionEditorToggle = 'div.e2e-test-show-schema-editor';
 const createSubtopicButton = '.e2e-test-confirm-subtopic-creation-button';
 const subtopicNameSelector = '.e2e-test-subtopic-name';
@@ -138,6 +171,9 @@ const confirmDeletionButton =
   'button.e2e-test-really-delete-exploration-button';
 
 const mobileOptionsSelector = '.e2e-test-mobile-options-base';
+const mobileNavbarDropdown =
+  'div.navbar-mobile-options .e2e-test-mobile-navbar-dropdown';
+const topicMobilePreviewTab = '.e2e-test-mobile-preview-tab';
 const mobileTopicSelector = 'div.e2e-test-mobile-topic-name a';
 const mobileSkillSelector = 'span.e2e-test-mobile-skill-name';
 
@@ -178,6 +214,8 @@ const topicDropDownFormField = '.e2e-test-classroom-category-dropdown';
 const topicSelector = '.e2e-test-classroom-topic-selector-choice';
 const publishClassroomButton =
   '.e2e-test-toggle-classroom-publication-status-btn';
+const enableDiagnosticTestButton =
+  '.e2e-test-toggle-diagnostic-test-status-btn';
 const saveClassroomButton = '.e2e-test-save-classroom-config-button';
 const classroomTileNameSpan = '.e2e-test-classroom-tile-name';
 const deleteClassroomButton = '.e2e-test-delete-classroom-button';
@@ -193,8 +231,9 @@ const createNewTopicMobileButton = '.e2e-test-create-topic-mobile-button';
 
 const addStoryButton = 'button.e2e-test-create-story-button';
 const storyTitleField = 'input.e2e-test-new-story-title-field';
+const storyUrlFragmentField =
+  '.e2e-test-create-new-story-url-fragment-field .e2e-test-url-fragment-field';
 const storyDescriptionField = 'textarea.e2e-test-new-story-description-field';
-const storyUrlFragmentField = 'input.e2e-test-new-story-url-fragment-field';
 const createStoryButton = 'button.e2e-test-confirm-story-creation-button';
 const storyPhotoBoxButton =
   'oppia-create-new-story-modal .e2e-test-photo-button';
@@ -219,6 +258,42 @@ const newChapterPhotoBoxButton =
   '.e2e-test-chapter-input-thumbnail .e2e-test-photo-button';
 const mobileChapterCollapsibleCard = '.e2e-test-mobile-add-chapter';
 const createChapterButton = 'button.e2e-test-confirm-chapter-creation-button';
+const selectRubricDifficultySelector = '.e2e-test-select-rubric-difficulty';
+const rteSelector = '.e2e-test-rte';
+const saveRubricExplanationButton = '.e2e-test-save-rubric-explanation-button';
+const saveOrPublishSkillSelector = '.e2e-test-save-or-publish-skill';
+const commitMessageInputSelector = '.e2e-test-commit-message-input';
+const closeSaveModalButtonSelector = '.e2e-test-close-save-modal-button';
+const settingsContainerSelector =
+  '.oppia-editor-card.oppia-settings-card-container';
+const deleteButtonSelector = 'button.oppia-delete-button';
+const navigationDropdownInMobileVisibleSelector =
+  '.oppia-exploration-editor-tabs-dropdown.show';
+
+const insertWorkedExampleButton = '.cke_button__oppiaworkedexample';
+const editWorkedExampleModalQuestionRte =
+  '.e2e-test-arg-editor-inner-0 .e2e-test-rte';
+const editWorkedExampleModalAnswerRte =
+  '.e2e-test-arg-editor-inner-1 .e2e-test-rte';
+const rteComponentSaveButton = '.e2e-test-close-rich-text-component-editor';
+const topicPreviewTab = '.e2e-test-topic-preview-tab';
+const expandWorkedExampleButton = '.e2e-test-expand-workedexample';
+const subtopicExpandHeaderSelector = '.e2e-test-show-subtopics-list';
+const practiceTabToggle = '.e2e-test-toggle-practice-tab';
+
+const createNewSkillButton = '.e2e-test-create-skill-button';
+const createSkillButton = '.e2e-test-confirm-skill-creation-button';
+const editConceptCard = '.e2e-test-edit-concept-card';
+const moreThanTwoWorkedExamplesError = '.e2e-test-more-than-2-workedexamples';
+const saveReviewMaterialButton = '.e2e-test-save-concept-card';
+const publishSkillButton = '.e2e-test-publish-skill-changes-button';
+const skillPreviewTabButton = '.e2e-test-question-preview-tab';
+const toggleSkillEditOptionsButton =
+  'div.e2e-test-mobile-toggle-skill-nav-dropdown-icon';
+const mobileSaveSkillButton = '.e2e-test-mobile-save-skill-changes';
+const mobilePreviewTab = '.e2e-test-mobile-preview-tab';
+const navigationDropdown = '.e2e-test-mobile-skill-nav-dropdown-icon';
+
 export class CurriculumAdmin extends BaseUser {
   /**
    * Navigate to the topic and skills dashboard page.
@@ -231,15 +306,22 @@ export class CurriculumAdmin extends BaseUser {
 
   /**
    * Create a skill for a particular topic.
+   * @param {string} description - The description of the skill to be created.
+   * @param {string} topicName - The name of the topic for which the skill is
+   * to be created.
+   * @param {boolean} addWorkedExample - True if the skill should have a
+   * WorkedExample, false otherwise.
    */
   async createSkillForTopic(
     description: string,
-    topicName: string
+    topicName: string,
+    addWorkedExample: boolean = false
   ): Promise<void> {
     await this.openTopicEditor(topicName);
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(subtopicReassignHeader);
     }
+    await this.page.waitForSelector(addSkillButton);
     await this.clickOn(addSkillButton);
     await this.type(skillDescriptionField, description);
     await this.page.waitForSelector(skillReviewMaterialHeader);
@@ -249,10 +331,29 @@ export class CurriculumAdmin extends BaseUser {
       richTextAreaField,
       `Review material text content for ${description}.`
     );
+    if (addWorkedExample) {
+      await this.clickOn(insertWorkedExampleButton);
+      await this.page.waitForSelector(editWorkedExampleModalQuestionRte, {
+        visible: true,
+      });
+      await this.clearAllTextFrom(editWorkedExampleModalQuestionRte);
+      await this.type(editWorkedExampleModalQuestionRte, 'Type the number one');
+      await this.page.waitForSelector(editWorkedExampleModalAnswerRte, {
+        visible: true,
+      });
+      await this.clearAllTextFrom(editWorkedExampleModalAnswerRte);
+      await this.waitForElementToStabilize(editWorkedExampleModalAnswerRte);
+      await this.type(editWorkedExampleModalAnswerRte, '1');
+      await this.clickOn(rteComponentSaveButton);
+    }
     await this.page.waitForSelector(
       `${confirmSkillCreationButton}:not([disabled])`
     );
     await this.clickOn(confirmSkillCreationButton);
+    await this.waitForNetworkIdle();
+    await this.page.waitForSelector(confirmSkillCreationButton, {
+      hidden: true,
+    });
     await this.page.bringToFront();
   }
 
@@ -266,6 +367,9 @@ export class CurriculumAdmin extends BaseUser {
       : desktopSkillQuestionTab;
 
     if (isMobileWidth) {
+      await this.page.waitForFunction(() =>
+        window.location.href.includes('skill_editor')
+      );
       const currentUrl = new URL(this.page.url());
       const hashParts = currentUrl.hash.split('/');
 
@@ -278,6 +382,7 @@ export class CurriculumAdmin extends BaseUser {
       await this.goto(currentUrl.toString());
       await this.page.reload({waitUntil: 'networkidle0'});
     } else {
+      await this.page.waitForSelector(skillQuestionTab, {visible: true});
       await this.clickAndWaitForNavigation(skillQuestionTab);
     }
   }
@@ -363,6 +468,9 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(modalDiv, {hidden: true});
 
     await this.clickOn(saveQuestionButton);
+
+    await this.waitForNetworkIdle();
+    await this.page.waitForSelector(modalDiv, {hidden: true});
   }
 
   /**
@@ -379,6 +487,9 @@ export class CurriculumAdmin extends BaseUser {
     }
 
     await this.type(topicNameField, name);
+    await this.page.waitForSelector(topicUrlFragmentField, {
+      visible: true,
+    });
     await this.type(topicUrlFragmentField, urlFragment);
     await this.type(topicWebFragmentField, name);
     await this.type(
@@ -440,6 +551,8 @@ export class CurriculumAdmin extends BaseUser {
       ),
       this.page.waitForNavigation(),
     ]);
+
+    expect(this.page.url()).toContain('/topic_editor/');
   }
 
   /**
@@ -474,10 +587,13 @@ export class CurriculumAdmin extends BaseUser {
       ),
       this.page.waitForNavigation(),
     ]);
+
+    expect(this.page.url()).toContain('/skill_editor/');
   }
 
   /**
    * Save a topic as a curriculum admin.
+   * @param {string} topicName - The name of the Topic whose draft is to be saved.
    */
   async saveTopicDraft(topicName: string): Promise<void> {
     await this.page.waitForSelector(modalDiv, {hidden: true});
@@ -503,6 +619,10 @@ export class CurriculumAdmin extends BaseUser {
       await this.clickOn(saveTopicButton);
 
       await this.page.waitForSelector(modalDiv, {visible: true});
+      await this.type(
+        saveChangesMessageInput,
+        'Test saving topic as curriculum admin.'
+      );
       await this.page.waitForSelector(
         `${closeSaveModalButton}:not([disabled])`,
         {visible: true}
@@ -514,6 +634,9 @@ export class CurriculumAdmin extends BaseUser {
 
   /**
    * Create a subtopic as a curriculum admin.
+   * @param {string} title - The title of the Subtopic.
+   * @param {string} urlFragment - The url fragment of the Subtopic.
+   * @param {string} topicName - The name of the Topic which storing the new Subtopic.
    */
   async createSubtopicForTopic(
     title: string,
@@ -526,7 +649,10 @@ export class CurriculumAdmin extends BaseUser {
     }
     await this.clickOn(addSubtopicButton);
     await this.type(subtopicTitleField, title);
-    await this.type(subtopicUrlFragmentField, urlFragment);
+    await this.page.waitForSelector(subtopicUrlFragmentField, {
+      visible: true,
+    });
+    await this.page.type(subtopicUrlFragmentField, urlFragment);
 
     await this.clickOn(subtopicDescriptionEditorToggle);
     await this.page.waitForSelector(richTextAreaField, {visible: true});
@@ -545,6 +671,326 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOn(createSubtopicButton);
     await this.saveTopicDraft(topicName);
     showMessage(`Subtopic ${title} is created.`);
+  }
+
+  /**
+   * Create a subtopic with study guides as a curriculum admin.
+   * @param {string} title - The title of the Subtopic.
+   * @param {string} urlFragment - The url fragment of the Subtopic.
+   * @param {string} heading - The heading of the initial Subtopic Study Guide Section.
+   * @param {string} content - The content of the initial Subtopic Study Guide Section.
+   * @param {string} topicName - The name of the Topic which storing the new Subtopic.
+   * @param {boolean} addWorkedExample - True if the study guide should have a WorkedExample,
+   * false otherwise.
+   */
+  async createSubtopicWithStudyGuideForTopic(
+    title: string,
+    urlFragment: string,
+    heading: string,
+    content: string,
+    topicName: string,
+    addWorkedExample: boolean = false
+  ): Promise<void> {
+    await this.openTopicEditor(topicName);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(subtopicReassignHeader);
+    }
+    await this.clickOn(addSubtopicButton);
+    await this.type(subtopicTitleField, title);
+    await this.page.waitForSelector(subtopicUrlFragmentField, {
+      visible: true,
+    });
+    await this.page.type(subtopicUrlFragmentField, urlFragment);
+
+    await this.page.type(subtopicStudyGuideHeadingField, heading);
+    await this.clickOn(subtopicStudyGuideContentField);
+    await this.page.waitForSelector(richTextAreaField, {visible: true});
+    await this.type(richTextAreaField, content);
+    if (addWorkedExample) {
+      await this.clickOn(insertWorkedExampleButton);
+      await this.page.waitForSelector(editWorkedExampleModalQuestionRte, {
+        visible: true,
+      });
+      await this.clearAllTextFrom(editWorkedExampleModalQuestionRte);
+      await this.type(editWorkedExampleModalQuestionRte, 'Type the number one');
+      await this.page.waitForSelector(editWorkedExampleModalAnswerRte, {
+        visible: true,
+      });
+      await this.clearAllTextFrom(editWorkedExampleModalAnswerRte);
+      await this.type(editWorkedExampleModalAnswerRte, '1');
+      await this.clickOn(rteComponentSaveButton);
+    }
+
+    await this.clickOn(subtopicPhotoBoxButton);
+    await this.page.waitForSelector(photoUploadModal, {visible: true});
+    await this.uploadFile(curriculumAdminThumbnailImage);
+    await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
+    await this.clickOn(uploadPhotoButton);
+
+    await this.page.waitForSelector(photoUploadModal, {hidden: true});
+    await this.clickOn(createSubtopicButton);
+    await this.page.waitForSelector(modalDiv, {hidden: true});
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(showSectionsList);
+      await this.scrollToBottomOfPage();
+    }
+    await this.page.waitForSelector(firstStudyGuideSectionTile, {
+      visible: true,
+    });
+    showMessage(`Subtopic ${title} is created.`);
+  }
+
+  /**
+   * Add a section to the subtopic study guide. Make sure you are
+   * on the subtopic editor tab for this to work.
+   * @param {string} sectionHeading - The heading of the Section to be added.
+   * @param {string} sectionContent - The content of the Section to be added.
+   * @param {number} currentNumberOfSections - The number of the Sections currently in the Study Guide.
+   */
+  async addSubtopicStudyGuideSection(
+    sectionHeading: string,
+    sectionContent: string,
+    currentNumberOfSections: number
+  ): Promise<void> {
+    await this.clickOn(addStudyGuideSectionButton);
+    await this.type(addStudyGuideSectionModalHeading, sectionHeading);
+    await this.clickOn(addStudyGuideSectionModalContent);
+    await this.page.waitForSelector(richTextAreaField, {visible: true});
+    await this.type(richTextAreaField, sectionContent);
+    await this.clickOn(addStudyGuideSectionModalSaveButton);
+    if (this.isViewportAtMobileWidth()) {
+      await this.scrollToBottomOfPage();
+    }
+    await this.page.waitForSelector(
+      `.e2e-test-study-guide-section-${currentNumberOfSections}`,
+      {
+        visible: true,
+      }
+    );
+    await this.page.waitForSelector(deleteStudyGuideSectionButton, {
+      visible: true,
+    });
+  }
+
+  /**
+   * Add a section with a WorkedExample to the subtopic study guide. Make sure you are
+   * on the subtopic editor tab for this to work.
+   * @param {string} sectionHeading - The heading of the Section to be added.
+   * @param {string} sectionContent - The content of the Section to be added.
+   * @param {number} currentNumberOfSections - The number of the Sections currently in the Study Guide.
+   * @param {string} WorkedExampleQuestion - The WorkedExample question.
+   * @param {string} WorkedExampleAnswer - The WorkedExample answer.
+   */
+  async addSubtopicStudyGuideSectionWithWorkedExample(
+    sectionHeading: string,
+    sectionContent: string,
+    currentNumberOfSections: number,
+    WorkedExampleQuestion: string,
+    WorkedExampleAnswer: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(addStudyGuideSectionButton);
+    await this.clickOn(addStudyGuideSectionButton);
+    await this.type(addStudyGuideSectionModalHeading, sectionHeading);
+    await this.clickOn(addStudyGuideSectionModalContent);
+    await this.page.waitForSelector(richTextAreaField, {visible: true});
+    await this.type(richTextAreaField, sectionContent);
+    await this.clickOn(insertWorkedExampleButton);
+    await this.page.waitForSelector(editWorkedExampleModalQuestionRte, {
+      visible: true,
+    });
+    await this.type(editWorkedExampleModalQuestionRte, WorkedExampleQuestion);
+    await this.page.waitForSelector(editWorkedExampleModalAnswerRte, {
+      visible: true,
+    });
+    await this.type(editWorkedExampleModalAnswerRte, WorkedExampleAnswer);
+    await this.clickOn(rteComponentSaveButton);
+    await this.clickOn(addStudyGuideSectionModalSaveButton);
+    if (this.isViewportAtMobileWidth()) {
+      await this.scrollToBottomOfPage();
+    }
+    await this.page.waitForSelector(
+      `.e2e-test-study-guide-section-${currentNumberOfSections}`,
+      {
+        visible: true,
+      }
+    );
+    await this.page.waitForSelector(deleteStudyGuideSectionButton, {
+      visible: true,
+    });
+  }
+
+  /**
+   * Navigates to the study guide Previews tab.
+   */
+  async previewStudyGuide(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeVisible(showSubtopicsList);
+      await this.clickOn(showSubtopicsList);
+      await this.clickOn(firstSubtopicTile);
+      await this.clickOn(mobileOptionsSelector);
+      await this.clickOn(mobileNavbarDropdown);
+      await this.clickOn(topicMobilePreviewTab);
+    } else {
+      await this.expectElementToBeVisible(topicPreviewTab);
+      await this.clickOn(topicPreviewTab);
+    }
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Verifies if the subtopic study guide has the expected title and sections.
+   * @param {string} studyGuideTitle - The expected title of the study guide.
+   * @param {string[][]} studyGuideSections - The expected sections of the study guide.
+   * It is a list of sections. Sections are a list of strings having length of 2 - heading and content.
+   * @param {boolean} expectWorkedExample - If the sections have a WorkedExample or not.
+   */
+  async expectSubtopicStudyGuideToHaveTitleAndSections(
+    studyGuideTitle: string,
+    studyGuideSections: string[][],
+    expectWorkedExample: boolean
+  ): Promise<void> {
+    try {
+      const isTitlePresent = await this.isTextPresentOnPage(studyGuideTitle);
+
+      if (!isTitlePresent) {
+        throw new Error(
+          'Expected study guide title to be present, but it was not found.'
+        );
+      }
+
+      for (var i = 0; i < studyGuideSections.length; i++) {
+        for (var j = 0; j < 2; j++) {
+          const isHeadingPresent = await this.isTextPresentOnPage(
+            studyGuideSections[i][j]
+          );
+          if (!isHeadingPresent) {
+            throw new Error(
+              `Expected study guide section ${i + 1} heading to be present on the page, but it was not found`
+            );
+          }
+          j++;
+          const isContentPresent = await this.isTextPresentOnPage(
+            studyGuideSections[i][j]
+          );
+          if (!isContentPresent) {
+            throw new Error(
+              `Expected study guide section ${i + 1} content to be present on the page, but it was not found`
+            );
+          }
+        }
+      }
+      if (expectWorkedExample) {
+        await this.page.waitForSelector(expandWorkedExampleButton, {
+          visible: true,
+        });
+      }
+    } catch (error) {
+      const newError = new Error(
+        `Failed to verify sections of study guide: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Checks if the length error shows up in the Add
+   * Study Guide Section Modal of the subtopic study
+   * guide. Make sure you are on the subtopic editor
+   * tab for this to work.
+   */
+  async checkAddSectionModalShowsLengthError(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(showSubtopicsList);
+      await this.clickOn(firstSubtopicTile);
+      await this.clickOn(showSectionsList);
+    }
+    await this.page.waitForSelector(addStudyGuideSectionButton, {
+      visible: true,
+    });
+    await this.clickOn(addStudyGuideSectionButton);
+    await this.type(addStudyGuideSectionModalHeading, 'Section Heading');
+    await this.clickOn(addStudyGuideSectionModalContent);
+    await this.page.waitForSelector(richTextAreaField, {visible: true});
+    await this.type(
+      richTextAreaField,
+      'Section Content Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam qu'
+    );
+    await this.page.waitForSelector(addStudyGuideSectionContentLength, {
+      visible: true,
+    });
+  }
+
+  /**
+   * Clears the content of the Add Section Modal and closes it.
+   */
+  async clearContentFieldAndCloseAddSectionModal(): Promise<void> {
+    await this.clearAllTextFrom(richTextAreaField);
+    await this.page.waitForSelector(addStudyGuideSectionContentLength, {
+      hidden: true,
+    });
+    await this.clickOn(addStudyGuideSectionModalCancelButton);
+  }
+
+  /**
+   * Clicks on a Study Guide Section Tile to expand it.
+   * Indexes start from 0.
+   * @param {number} index - The index of the Section to be expanded.
+   */
+  async expandStudyGuideSectionTile(index: number): Promise<void> {
+    await this.clickOn(`.e2e-test-study-guide-section-${index}`);
+    await this.page.waitForSelector(
+      `.e2e-test-study-guide-section-${index}-expanded`,
+      {
+        visible: true,
+      }
+    );
+    await this.page.waitForSelector(expandedStudyGuideSectionTileHeading, {
+      visible: true,
+    });
+    await this.page.waitForSelector(expandedStudyGuideSectionTileContent, {
+      visible: true,
+    });
+  }
+
+  /**
+   * Clicks on the Section heading to open the heading editor.
+   */
+  async openSectionHeadingEditor(): Promise<void> {
+    await this.clickOn(editStudyGuideSectionHeadingIcon);
+    await this.page.waitForSelector(editStudyGuideSectionHeadingEditor, {
+      visible: true,
+    });
+  }
+
+  /**
+   * Clicks on the Section content to open the content editor.
+   */
+  async openSectionContentEditor(): Promise<void> {
+    await this.clickOn(editStudyGuideSectionContentIcon);
+    if (this.isViewportAtMobileWidth()) {
+      await this.scrollToBottomOfPage();
+    }
+    await this.page.waitForSelector(editStudyGuideSectionContentEditor, {
+      visible: true,
+    });
+  }
+
+  /**
+   * Deletes a Section of the subtopic study guide.
+   * Indexes start from 0.
+   * @param {number} index - The index of the Section to be deleted.
+   */
+  async deleteStudyGuideSection(index: number): Promise<void> {
+    await this.clickOn(
+      `.e2e-test-study-guide-section-${index} ${deleteStudyGuideSectionButton}`
+    );
+    await this.clickOn(studyGuideSectionDeleteConfirmButton);
+
+    await this.expectElementToBeVisible(
+      studyGuideSectionDeleteConfirmButton,
+      false
+    );
   }
 
   /**
@@ -620,6 +1066,65 @@ export class CurriculumAdmin extends BaseUser {
   }
 
   /**
+   * Updates a rubric.
+   * @param {string} difficulty - The difficulty level to update.
+   * @param {string} explanation - The explanation to update.
+   */
+  async updateRubric(difficulty: string, explanation: string): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
+    let difficultyValue: string;
+    switch (difficulty) {
+      case 'Easy':
+        difficultyValue = '0';
+        break;
+      case 'Medium':
+        difficultyValue = '1';
+        break;
+      case 'Hard':
+        difficultyValue = '2';
+        break;
+      default:
+        throw new Error(`Unknown difficulty: ${difficulty}`);
+    }
+    await this.waitForElementToBeClickable(selectRubricDifficultySelector);
+    await this.select(selectRubricDifficultySelector, difficultyValue);
+    await this.waitForStaticAssetsToLoad();
+    await this.clickOn(' + ADD EXPLANATION FOR DIFFICULTY ');
+    await this.type(rteSelector, explanation);
+    await this.clickOn(saveRubricExplanationButton);
+
+    await this.page.waitForSelector(saveRubricExplanationButton, {
+      hidden: true,
+    });
+  }
+
+  /**
+   * Publishes an updated skill.
+   * @param {string} updateMessage - The update message.
+   */
+  async publishUpdatedSkill(updateMessage: string): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
+    await this.page.waitForSelector(saveOrPublishSkillSelector, {
+      visible: true,
+    });
+    await this.clickOn(saveOrPublishSkillSelector);
+
+    await this.page.waitForSelector(commitMessageInputSelector, {
+      visible: true,
+    });
+    await this.type(commitMessageInputSelector, updateMessage);
+    await this.page.waitForSelector(closeSaveModalButtonSelector, {
+      visible: true,
+    });
+    await this.clickOn(closeSaveModalButtonSelector);
+
+    await this.page.waitForSelector(closeSaveModalButtonSelector, {
+      hidden: true,
+    });
+    showMessage('Skill updated successful');
+  }
+
+  /**
    * Add a skill for diagnostic test and then publish the topic.
    * Adding a skill to diagnostic test is necessary for publishing the topic.
    */
@@ -673,8 +1178,11 @@ export class CurriculumAdmin extends BaseUser {
       await this.clickOn(mobileSaveTopicDropdown);
       await this.page.waitForSelector(mobilePublishTopicButton);
       await this.clickOn(mobilePublishTopicButton);
+      await this.page.waitForSelector(mobilePublishTopicButton, {hidden: true});
     } else {
       await this.clickOn(publishTopicButton);
+
+      await this.page.waitForSelector(publishTopicButton, {hidden: true});
     }
   }
 
@@ -806,12 +1314,25 @@ export class CurriculumAdmin extends BaseUser {
   async navigateToExplorationSettingsTab(): Promise<void> {
     await this.waitForStaticAssetsToLoad();
     if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileNavToggleButton, {visible: true});
       await this.clickOn(mobileNavToggleButton);
       await this.clickOn(mobileOptionsDropdown);
       await this.clickOn(mobileSettingsButton);
+
+      // Close dropdown if it doesn't automatically close.
+      const isVisible = await this.isElementVisible(
+        navigationDropdownInMobileVisibleSelector
+      );
+      if (isVisible) {
+        // We are using page.click as this button might be overlapped by the
+        // dropdown. Thus, it will fail with onClick.
+        this.page.click(mobileOptionsDropdown);
+      }
     } else {
+      await this.page.waitForSelector(explorationSettingsTab, {visible: true});
       await this.clickOn(explorationSettingsTab);
     }
+    await this.page.waitForSelector(settingsContainerSelector, {visible: true});
     showMessage('Navigation to settings tab is successful.');
   }
 
@@ -823,6 +1344,10 @@ export class CurriculumAdmin extends BaseUser {
     await this.waitForStaticAssetsToLoad();
     await this.clickOn(deleteExplorationButton);
     await this.clickOn(confirmDeletionButton);
+
+    await this.page.waitForSelector(confirmDeleteClassroomButton, {
+      hidden: true,
+    });
   }
 
   /**
@@ -830,9 +1355,10 @@ export class CurriculumAdmin extends BaseUser {
    */
   async dismissWelcomeModal(): Promise<void> {
     try {
+      await this.page.waitForNetworkIdle();
       await this.page.waitForSelector(dismissWelcomeModalSelector, {
         visible: true,
-        timeout: 5000,
+        timeout: 10000,
       });
       await this.clickOn(dismissWelcomeModalSelector);
       await this.page.waitForSelector(dismissWelcomeModalSelector, {
@@ -845,28 +1371,18 @@ export class CurriculumAdmin extends BaseUser {
   }
 
   /**
-   * Function to close editor navigation dropdown. Can be done by clicking
-   * on the dropdown toggle.
-   */
-  async closeEditorNavigationDropdownOnMobile(): Promise<void> {
-    try {
-      await this.page.waitForSelector(dropdownToggleIcon, {
-        visible: true,
-        timeout: 5000,
-      });
-      await this.clickOn(dropdownToggleIcon);
-      showMessage('Editor navigation closed successfully.');
-    } catch (error) {
-      showMessage(`Dropdown Toggle Icon not found: ${error.message}`);
-    }
-  }
-
-  /**
    * Function to open control dropdown so that delete exploration button is visible
    * in mobile view.
    */
   async openExplorationControlDropdown(): Promise<void> {
+    await this.page.waitForSelector(explorationControlsSettingsDropdown, {
+      visible: true,
+    });
     await this.clickOn(explorationControlsSettingsDropdown);
+
+    await this.page.waitForSelector(deleteButtonSelector, {
+      visible: true,
+    });
   }
 
   /**
@@ -886,7 +1402,10 @@ export class CurriculumAdmin extends BaseUser {
     }
     await this.clickOn(addStoryButton);
     await this.type(storyTitleField, storyTitle);
-    await this.type(storyUrlFragmentField, storyUrlFragment);
+    await this.page.waitForSelector(storyUrlFragmentField, {
+      visible: true,
+    });
+    await this.page.type(storyUrlFragmentField, storyUrlFragment);
     await this.type(
       storyDescriptionField,
       `Story creation description for ${storyTitle}.`
@@ -937,7 +1456,10 @@ export class CurriculumAdmin extends BaseUser {
     }
     await this.clickOn(addStoryButton);
     await this.type(storyTitleField, storyTitle);
-    await this.type(storyUrlFragmentField, storyUrlFragment);
+    await this.page.waitForSelector(storyUrlFragmentField, {
+      visible: true,
+    });
+    await this.page.type(storyUrlFragmentField, storyUrlFragment);
     await this.type(
       storyDescriptionField,
       `Story creation description for ${storyTitle}.`
@@ -977,6 +1499,9 @@ export class CurriculumAdmin extends BaseUser {
         await this.clickOn(mobileChapterCollapsibleCard);
       }
     }
+    await this.page.waitForSelector(addChapterButton, {
+      visible: true,
+    });
     await this.clickOn(addChapterButton);
     await this.type(newChapterTitleField, chapterName);
     await this.type(newChapterExplorationIdField, explorationId);
@@ -1003,8 +1528,12 @@ export class CurriculumAdmin extends BaseUser {
       if (!isMobileSaveButtonVisible) {
         await this.clickOn(mobileOptionsSelector);
       }
+      await this.page.waitForSelector(mobileSaveStoryChangesButton, {
+        visible: true,
+      });
       await this.clickOn(mobileSaveStoryChangesButton);
     } else {
+      await this.page.waitForSelector(saveStoryButton, {visible: true});
       await this.clickOn(saveStoryButton);
     }
     await this.type(
@@ -1021,9 +1550,21 @@ export class CurriculumAdmin extends BaseUser {
    */
   async publishStoryDraft(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileSaveStoryChangesDropdown, {
+        visible: true,
+      });
       await this.clickOn(mobileSaveStoryChangesDropdown);
       await this.page.waitForSelector(mobilePublishStoryButton);
       await this.clickOn(mobilePublishStoryButton);
+
+      await this.page.waitForFunction(
+        (selector: string) => {
+          const element = document.querySelector(selector);
+          return element?.textContent?.trim() === 'Unpublish Story';
+        },
+        {},
+        mobilePublishStoryButton
+      );
     } else {
       await this.page.waitForSelector(`${publishStoryButton}:not([disabled])`);
       await this.clickOn(publishStoryButton);
@@ -1118,6 +1659,10 @@ export class CurriculumAdmin extends BaseUser {
           } else {
             throw new Error('Confirm button not found');
           }
+
+          await this.page.waitForSelector(confirmTopicDeletionButton, {
+            hidden: true,
+          });
           break;
         }
       }
@@ -1220,6 +1765,10 @@ export class CurriculumAdmin extends BaseUser {
           } else {
             throw new Error('Confirm button not found');
           }
+
+          await this.page.waitForSelector(confirmSkillDeletionButton, {
+            hidden: true,
+          });
           break;
         }
       }
@@ -1317,9 +1866,9 @@ export class CurriculumAdmin extends BaseUser {
         `All questions have been successfully removed from the skill "${skillName}".`
       );
     } catch (error) {
-      console.error(
-        `Failed to remove all questions from the skill "${skillName}"`,
-        error.stack
+      throw new Error(
+        `Failed to remove all questions from the skill "${skillName}"` +
+          error.stack
       );
     }
   }
@@ -1417,6 +1966,8 @@ export class CurriculumAdmin extends BaseUser {
 
     await this.clickOn(saveClassroomButton);
 
+    await this.page.waitForSelector(saveClassroomButton, {hidden: true});
+
     showMessage(`Updated ${classroomName} classroom.`);
   }
 
@@ -1437,6 +1988,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOn(topicSelector);
     await this.page.waitForSelector(openTopicDropdownButton);
     await this.clickOn(saveClassroomButton);
+    await this.page.waitForSelector(saveClassroomButton, {hidden: true});
 
     showMessage(`Added ${topicName} topic to the ${classroomName} classroom.`);
   }
@@ -1459,13 +2011,30 @@ export class CurriculumAdmin extends BaseUser {
 
   /**
    * Function for publishing a classroom.
+   * @param {string} classroomName - The name of the classroom.
    */
   async publishClassroom(classroomName: string): Promise<void> {
     await this.navigateToClassroomAdminPage();
     await this.editClassroom(classroomName);
     await this.clickOn(publishClassroomButton);
     await this.clickOn(saveClassroomButton);
+    await this.page.waitForSelector(saveClassroomButton, {hidden: true});
+
     showMessage(`Published ${classroomName} classroom.`);
+  }
+
+  /**
+   * Enables diagnostic test for a classroom.
+   * @param {string} classroomName - The name of the classroom.
+   */
+  async enableDiagnosticTestForClassroom(classroomName: string): Promise<void> {
+    await this.navigateToClassroomAdminPage();
+    await this.editClassroom(classroomName);
+    await this.clickOn(enableDiagnosticTestButton);
+    await this.clickOn(saveClassroomButton);
+    await this.page.waitForSelector(saveClassroomButton, {hidden: true});
+
+    showMessage(`Enabled diagnostic test for ${classroomName} classroom.`);
   }
 
   /**
@@ -1502,7 +2071,7 @@ export class CurriculumAdmin extends BaseUser {
 
         await this.page.waitForSelector(deleteClassroomModal, {visible: true});
         await this.clickOn(confirmDeleteClassroomButton);
-        await this.page.waitForSelector(deleteClassroomModal, {visible: false});
+        await this.page.waitForSelector(deleteClassroomModal, {hidden: true});
 
         showMessage(`Deleted ${classroomName} classroom.`);
         foundClassroom = true;
@@ -1566,7 +2135,7 @@ export class CurriculumAdmin extends BaseUser {
       topicName
     );
 
-    await this.createSkillForTopic(skillName, topicName);
+    await this.createSkillForTopic(skillName, topicName, false);
     await this.createQuestionsForSkill(skillName, 3);
     await this.assignSkillToSubtopicInTopicEditor(
       skillName,
@@ -1576,6 +2145,336 @@ export class CurriculumAdmin extends BaseUser {
     await this.addSkillToDiagnosticTest(skillName, topicName);
 
     await this.publishDraftTopic(topicName);
+  }
+
+  /**
+   * Creates a topic with a skill.
+   * @param {string} topicName - The name of the topic.
+   * @param {string} skillName - The name of the skill.
+   */
+  async createTopicWithSkill(
+    topicName: string,
+    skillName: string
+  ): Promise<void> {
+    await this.createTopic(
+      topicName,
+      topicName.toLowerCase().replace(/ /g, '-')
+    );
+    await this.createSkillForTopic(skillName, topicName, true);
+  }
+
+  /**
+   * Creates a skill from the topics and skills dashboard.
+   * @param description - The description of the skill.
+   * @param reviewMaterial - the content of the skill.
+   */
+  async createSkillFromTopicsAndSkillsDashboard(
+    description: string,
+    reviewMaterial: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(createNewSkillButton);
+    await this.clickOn(createNewSkillButton);
+    await this.type(skillDescriptionField, description);
+    await this.clickOn(skillReviewMaterialHeader);
+    await this.clickOn(richTextAreaField);
+    await this.type(richTextAreaField, reviewMaterial);
+    await this.addWorkedExampleRteComponent('Type the number one', '1');
+    await this.clickOn(createSkillButton);
+    await this.openSkillEditor(description);
+  }
+
+  /**
+   * Click on the edit button of the review material section of
+   * a skill that opens up the rich text editor.
+   */
+  async clickOnReviewMaterialEditButton(): Promise<void> {
+    await this.expectElementToBeVisible(editConceptCard);
+    await this.clickOn(editConceptCard);
+    await this.expectElementToBeVisible(rteSelector);
+  }
+
+  /**
+   * Copies all the content from the review material rich text
+   * editor.
+   */
+  async copyContentFromReviewMaterialRte(): Promise<void> {
+    // OverridePermissions is used to allow clipboard access.
+    const context = this.page.browser().defaultBrowserContext();
+    await context.overridePermissions('http://localhost:8181', [
+      'clipboard-read',
+      'clipboard-write',
+    ]);
+    await this.copyAllTextFrom(richTextParagraphTag);
+  }
+
+  /**
+   * Copies the WorkedExample from the review material rich text
+   * editor.
+   */
+  async copyWorkedExampleFromReviewMaterialRte(): Promise<void> {
+    // OverridePermissions is used to allow clipboard access.
+    const context = this.page.browser().defaultBrowserContext();
+    await context.overridePermissions('http://localhost:8181', [
+      'clipboard-read',
+      'clipboard-write',
+    ]);
+    await this.copyTextFrom(richTextAreaField);
+  }
+
+  /**
+   * Adds a WorkedExample rich text editor component to a
+   * supporting rich text editor.
+   * @param question - The question of the WorkedExample
+   * @param answer - The solution of the WorkedExample.
+   */
+  async addWorkedExampleRteComponent(
+    question: string,
+    answer: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(insertWorkedExampleButton);
+    await this.clickOn(insertWorkedExampleButton);
+    await this.page.waitForSelector(editWorkedExampleModalQuestionRte, {
+      visible: true,
+    });
+    await this.clearAllTextFrom(editWorkedExampleModalQuestionRte);
+    await this.type(editWorkedExampleModalQuestionRte, question);
+    await this.page.waitForSelector(editWorkedExampleModalAnswerRte, {
+      visible: true,
+    });
+    await this.clearAllTextFrom(editWorkedExampleModalAnswerRte);
+    await this.waitForElementToStabilize(editWorkedExampleModalAnswerRte);
+    await this.type(editWorkedExampleModalAnswerRte, answer);
+    await this.clickOn(rteComponentSaveButton);
+    await this.page.waitForSelector(editWorkedExampleModalAnswerRte, {
+      hidden: true,
+    });
+  }
+
+  /**
+   * Clears all the content from a rich text editor.
+   */
+  async clearRte(): Promise<void> {
+    await this.expectElementToBeVisible(richTextAreaField);
+    await this.clickOn(richTextAreaField);
+    await this.clearAllTextFrom(richTextAreaField);
+  }
+
+  /**
+   * Clears all the content from a rich text editor and checks if the
+   * limit of WorkedExamples error disappears.
+   */
+  async clearRteAndCheckIfErrorDisappears(): Promise<void> {
+    await this.expectElementToBeVisible(richTextAreaField);
+    await this.clickOn(richTextAreaField);
+    await this.clearAllTextFrom(richTextAreaField);
+    await this.page.waitForSelector(moreThanTwoWorkedExamplesError, {
+      visible: false,
+    });
+  }
+
+  /**
+   * Saves the changes made to the review material.
+   */
+  async saveReviewMaterial(): Promise<void> {
+    await this.expectElementToBeVisible(saveReviewMaterialButton);
+    await this.clickOn(saveReviewMaterialButton);
+  }
+
+  /**
+   * Clicks on the rich text editor and presses enter
+   * to go to the next line.
+   */
+  async clickOnRteAndPressEnter(): Promise<void> {
+    await this.clickOnReviewMaterialEditButton();
+    await this.clickOn(richTextAreaField);
+    await this.page.keyboard.press('Enter');
+  }
+
+  /**
+   * Types the given text in the review material rich text editor.
+   * @param text - The text to be typed in the rich text editor.
+   */
+  async typeTextInReviewMaterialEditor(text: string): Promise<void> {
+    await this.expectElementToBeVisible(richTextAreaField);
+    await this.clickOn(richTextAreaField);
+    await this.type(richTextAreaField, text);
+  }
+
+  /**
+   * Publish the changes made to the skill.
+   */
+  async publishSkillChanges(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeVisible(mobileOptionsSelector);
+      await this.clickOn(mobileOptionsSelector);
+      // The mobile view has 2 instances of the element, from which
+      // the first one is inapplicable here.
+      const elems = await this.page.$$(toggleSkillEditOptionsButton);
+      await elems[1].click();
+      await this.clickOn(mobileSaveSkillButton);
+    } else {
+      await this.expectElementToBeVisible(publishSkillButton);
+      await this.clickOn(publishSkillButton);
+    }
+    await this.type(
+      saveChangesMessageInput,
+      'Test saving skill as curriculum admin.'
+    );
+    await this.page.waitForSelector(`${closeSaveModalButton}:not([disabled])`);
+    await this.clickOn(closeSaveModalButton);
+    await this.page.waitForSelector('oppia-skill-editor-save-modal', {
+      hidden: true,
+    });
+  }
+
+  /**
+   * Navigate to the skill preview tab.
+   */
+  async navigateToSkillPreviewTab(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(navigationDropdown);
+      const navDropdownElements = await this.page.$$(navigationDropdown);
+      await this.waitForElementToBeClickable(navDropdownElements[1]);
+      await navDropdownElements[1].click();
+
+      await this.page.waitForSelector(mobilePreviewTab);
+      await this.clickOn(mobilePreviewTab);
+    } else {
+      await this.clickOn(skillPreviewTabButton);
+    }
+    await this.waitForPageToFullyLoad();
+    await this.scrollToBottomOfPage();
+  }
+
+  /**
+   * Checks of the WorkedExamples have been correctly added to the
+   * skill.
+   * @param {string[][]} workedExamples - A list of WorkedExamples.
+   * Each entry is a list with 2 strings - Question and Answer.
+   */
+  async checkWorkedExamplesExistForSkill(
+    workedExamples: string[][]
+  ): Promise<void> {
+    if (!this.isViewportAtMobileWidth()) {
+      try {
+        for (var i = 0; i < workedExamples.length; i++) {
+          const isQuestionPresent = this.isTextPresentOnPage(
+            workedExamples[i][0]
+          );
+          if (!isQuestionPresent) {
+            throw new Error(
+              `Expected WorkedExample Question ${workedExamples[i][0]} to be present on the page, but it was not found.`
+            );
+          }
+          const isAnswerPresent = this.isTextPresentOnPage(
+            workedExamples[i][1]
+          );
+          if (!isAnswerPresent) {
+            throw new Error(
+              `Expected WorkedExample Answer ${workedExamples[i][1]} to be present on the page, but it was not found.`
+            );
+          }
+        }
+      } catch (error) {
+        const newError = new Error(
+          `Failed to verify WorkedExamples of skill: ${error}`
+        );
+        newError.stack = error.stack;
+        throw newError;
+      }
+    }
+  }
+
+  /**
+   * Creates and publishes a topic with a subtopic (having study guides) and skill.
+   * @param {string} topicName - The name of the topic.
+   * @param {string} subtopicName - The name of the subtopic.
+   * @param {string} skillName - The name of the skill.
+   */
+  async createAndPublishTopicWithSubtopicsAndStudyGuides(
+    topicName: string,
+    subtopicName: string,
+    skillName: string
+  ): Promise<void> {
+    await this.createTopic(
+      topicName,
+      topicName.toLowerCase().replace(/ /g, '-')
+    );
+    await this.createSubtopicWithStudyGuideForTopic(
+      subtopicName,
+      subtopicName.toLowerCase().replace(/ /g, '-'),
+      'Adding With Your Fingers',
+      'One way to add is using your...',
+      topicName,
+      true
+    );
+    await this.addSubtopicStudyGuideSection(
+      'Using an Addition Table',
+      'To add two single-digit...',
+      1
+    );
+    await this.saveTopicDraft(topicName);
+
+    await this.createSkillForTopic(skillName, topicName);
+    await this.createQuestionsForSkill(skillName, 10);
+    await this.assignSkillToSubtopicInTopicEditor(
+      skillName,
+      subtopicName,
+      topicName
+    );
+    await this.addSkillToDiagnosticTest(skillName, topicName);
+    await this.togglePracticeTabCheckbox();
+    await this.saveTopicDraft(topicName);
+
+    await this.createSubtopicWithStudyGuideForTopic(
+      'Subtracting Numbers',
+      'subtract-nos',
+      'Common Mistakes',
+      'Some common mistakes students make are...',
+      topicName,
+      true
+    );
+    await this.saveTopicDraft(topicName);
+
+    await this.createSkillForTopic('Skill 2', topicName, false);
+    await this.assignSkillToSubtopicInTopicEditor(
+      'Skill 2',
+      'Subtracting Numbers',
+      topicName
+    );
+
+    await this.publishDraftTopic(topicName);
+  }
+
+  /**
+   * Toggles the "Show practice tab to learners" in Topic Editor.
+   */
+  async togglePracticeTabCheckbox(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeVisible(subtopicExpandHeaderSelector);
+      await this.clickOn(subtopicExpandHeaderSelector);
+    }
+    try {
+      await this.page.waitForSelector(practiceTabToggle);
+      const practiceTabToggleElement = await this.page.$(practiceTabToggle);
+      if (!practiceTabToggleElement) {
+        throw new Error('Practice tab toggle not found.');
+      }
+      await this.waitForElementToBeClickable(practiceTabToggleElement);
+      await practiceTabToggleElement.click();
+
+      await this.page.waitForFunction(
+        (selector: string) => {
+          const element = document.querySelector(selector);
+          return (element as HTMLInputElement).checked === true;
+        },
+        {},
+        practiceTabToggle
+      );
+    } catch (error) {
+      console.error(error.stack);
+      throw error;
+    }
   }
 
   /**

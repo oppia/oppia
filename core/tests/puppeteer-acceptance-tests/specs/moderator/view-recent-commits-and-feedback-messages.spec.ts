@@ -57,7 +57,7 @@ describe('Moderator', function () {
     );
 
     await explorationEditor.navigateToCreatorDashboardPage();
-    await explorationEditor.navigateToExplorationEditorPage();
+    await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
     await explorationEditor.dismissWelcomeModal();
     await explorationEditor.createMinimalExploration(
       'Test Exploration',

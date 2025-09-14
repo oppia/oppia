@@ -21,7 +21,6 @@
 // in via initArgs.
 
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {Subject} from 'rxjs';
 import {debounceTime, distinctUntilChanged} from 'rxjs/operators';
 
@@ -68,10 +67,3 @@ export class CodeStringEditorComponent implements OnInit {
     this.debounceInputSubject.next(e.target.value);
   }
 }
-
-angular.module('oppia').directive(
-  'codeStringEditor',
-  downgradeComponent({
-    component: CodeStringEditorComponent,
-  }) as angular.IDirectiveFactory
-);

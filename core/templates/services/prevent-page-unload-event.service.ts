@@ -17,7 +17,7 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
+
 import {WindowRef} from 'services/contextual/window-ref.service';
 
 @Injectable({
@@ -90,10 +90,3 @@ export class PreventPageUnloadEventService {
     this.removeListener();
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'PreventPageUnloadEventService',
-    downgradeInjectable(PreventPageUnloadEventService)
-  );

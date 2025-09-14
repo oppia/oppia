@@ -297,8 +297,7 @@ def _migrate_rubrics_to_latest_schema(
             at present.
     """
     rubric_schema_version = versioned_rubrics['schema_version']
-    if not (1 <= rubric_schema_version
-            <= feconf.CURRENT_RUBRIC_SCHEMA_VERSION):
+    if not 1 <= rubric_schema_version <= feconf.CURRENT_RUBRIC_SCHEMA_VERSION:
         raise Exception(
             'Sorry, we can only process v1-v%d rubric schemas at '
             'present.' % feconf.CURRENT_RUBRIC_SCHEMA_VERSION)

@@ -16,7 +16,6 @@
  * @fileoverview Utility service for language operations.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {AudioLanguage} from 'domain/utilities/audio-language.model';
@@ -239,7 +238,3 @@ export class LanguageUtilService {
     ];
   }
 }
-
-angular
-  .module('oppia')
-  .factory('LanguageUtilService', downgradeInjectable(LanguageUtilService));

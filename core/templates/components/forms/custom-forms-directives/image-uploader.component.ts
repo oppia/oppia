@@ -18,10 +18,9 @@
 
 import {EventEmitter, OnInit, Output} from '@angular/core';
 import {Component, Input} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 import {ImageUploaderModalComponent} from './image-uploader-modal.component';
@@ -65,7 +64,7 @@ export class ImageUploaderComponent implements OnInit {
 
   constructor(
     private imageUploadHelperService: ImageUploadHelperService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private ngbModal: NgbModal,
     private urlInterpolationService: UrlInterpolationService,
     private assetsBackendApiService: AssetsBackendApiService
@@ -79,7 +78,7 @@ export class ImageUploaderComponent implements OnInit {
     );
 
     if (this.imageUploaderParameters.filename) {
-      const entityType = this.contextService.getEntityType();
+      const entityType = this.pageContextService.getEntityType();
       if (entityType === undefined) {
         throw new Error('No image present for preview');
       }
@@ -88,13 +87,13 @@ export class ImageUploaderComponent implements OnInit {
           this.imageUploadHelperService.getTrustedResourceUrlForThumbnailFilename(
             this.imageUploaderParameters.filename,
             entityType,
-            this.contextService.getEntityId()
+            this.pageContextService.getEntityId()
           );
       } else {
         this.editableImageDataUrl =
           this.assetsBackendApiService.getImageUrlForPreview(
             entityType,
-            this.contextService.getEntityId(),
+            this.pageContextService.getEntityId(),
             this.imageUploaderParameters.filename
           );
       }
@@ -156,10 +155,3 @@ export class ImageUploaderComponent implements OnInit {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaThumbnailUploader',
-    downgradeComponent({component: ImageUploaderComponent})
-  );

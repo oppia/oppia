@@ -26,6 +26,12 @@
   </div>
 </div>
 
+
+<div *ngIf="updateIsDisabled" tabindex="0" class="alert alert-danger oppia-input-error">
+  <strong>Warning:</strong> Please ensure all components (images, math formulas, concept cards) in your translation match
+  the original content to proceed.
+</div>
+
 <div class="modal-body">
   <div *ngIf="status == 'rejected'" class="translation-suggestion-review-message alert alert-danger">
     <p>See your submitted translation below. Please submit a new translation to address the requested revisions.</p>
@@ -105,7 +111,8 @@
         </button>
         <button class="btn btn-success ml-2"
                 *ngIf="startedEditing"
-                (click)="updateSuggestion()">
+                (click)="updateSuggestion()"
+                [disabled]="updateIsDisabled">
           Update
         </button>
       </div>

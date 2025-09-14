@@ -16,18 +16,13 @@
  * @fileoverview Service to receive questions as pretests for an exploration.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
 import cloneDeep from 'lodash/cloneDeep';
 
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {
-  Question,
-  QuestionBackendDict,
-  QuestionObjectFactory,
-} from 'domain/question/QuestionObjectFactory';
+import {Question, QuestionBackendDict} from 'domain/question/question.model';
 import {QuestionDomainConstants} from 'domain/question/question-domain.constants';
 
 import {AppConstants} from 'app.constants';
@@ -42,8 +37,7 @@ interface PretestQuestionsBackendResponse {
 export class PretestQuestionBackendApiService {
   constructor(
     private urlInterpolationService: UrlInterpolationService,
-    private http: HttpClient,
-    private questionObjectFactory: QuestionObjectFactory
+    private http: HttpClient
   ) {}
 
   _fetchPretestQuestions(
@@ -76,9 +70,7 @@ export class PretestQuestionBackendApiService {
           var pretestQuestionDicts = cloneDeep(data.pretest_question_dicts);
           var pretestQuestionObjects = pretestQuestionDicts.map(
             pretestQuestionDict => {
-              return this.questionObjectFactory.createFromBackendDict(
-                pretestQuestionDict
-              );
+              return Question.createFromBackendDict(pretestQuestionDict);
             }
           );
           if (successCallback) {
@@ -107,10 +99,3 @@ export class PretestQuestionBackendApiService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'PretestQuestionBackendApiService',
-    downgradeInjectable(PretestQuestionBackendApiService)
-  );

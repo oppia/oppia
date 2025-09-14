@@ -15,7 +15,7 @@
 /**
  * @fileoverview Rules service for the interaction.
  */
-import {downgradeInjectable} from '@angular/upgrade/static';
+
 import {Injectable} from '@angular/core';
 
 import {NormalizeWhitespacePipe} from 'filters/string-utility-filters/normalize-whitespace.pipe';
@@ -92,7 +92,3 @@ export class TextInputRulesService {
     return normalizedInput.some(input => normalizedAnswer.includes(input));
   }
 }
-
-angular
-  .module('oppia')
-  .factory('TextInputRulesService', downgradeInjectable(TextInputRulesService));

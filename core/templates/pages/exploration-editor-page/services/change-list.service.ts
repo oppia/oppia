@@ -17,7 +17,6 @@
  * committed to the server.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {EventEmitter, Output} from '@angular/core';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
@@ -40,7 +39,7 @@ import {
 import {
   ParamChange,
   ParamChangeBackendDict,
-} from 'domain/exploration/ParamChangeObjectFactory';
+} from 'domain/exploration/param-change.model';
 import {
   InteractionCustomizationArgs,
   InteractionCustomizationArgsBackendDict,
@@ -48,20 +47,14 @@ import {
 import {
   AnswerGroup,
   AnswerGroupBackendDict,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+} from 'domain/exploration/answer-group.model';
 import {Hint, HintBackendDict} from 'domain/exploration/hint-object.model';
-import {
-  Outcome,
-  OutcomeBackendDict,
-} from 'domain/exploration/OutcomeObjectFactory';
-import {
-  RecordedVoiceOverBackendDict,
-  RecordedVoiceovers,
-} from 'domain/exploration/recorded-voiceovers.model';
-import {LostChange} from 'domain/exploration/LostChangeObjectFactory';
+import {Outcome, OutcomeBackendDict} from 'domain/exploration/outcome.model';
+import {LostChange} from 'domain/exploration/lost-change.model';
 import {BaseTranslatableObject} from 'domain/objects/BaseTranslatableObject.model';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 import {VoiceoverTypeToVoiceoversBackendDict} from 'domain/exploration/voiceover.model';
+import cloneDeep from 'lodash/cloneDeep';
 
 export type StatePropertyValues =
   | AnswerGroup[]
@@ -70,7 +63,6 @@ export type StatePropertyValues =
   | InteractionCustomizationArgs
   | Outcome
   | ParamChange[]
-  | RecordedVoiceovers
   | string
   | SubtitledHtml
   | BaseTranslatableObject;
@@ -81,7 +73,6 @@ export type StatePropertyDictValues =
   | InteractionCustomizationArgsBackendDict
   | OutcomeBackendDict
   | ParamChangeBackendDict[]
-  | RecordedVoiceOverBackendDict
   | string
   | SubtitledHtmlBackendDict;
 export type StatePropertyNames =
@@ -95,7 +86,6 @@ export type StatePropertyNames =
   | 'linked_skill_id'
   | 'param_changes'
   | 'param_specs'
-  | 'recorded_voiceovers'
   | 'solicit_answer_details'
   | 'solution'
   | 'state_name'
@@ -136,7 +126,6 @@ export class ChangeListService {
     answer_groups: true,
     confirmed_unclassified_answers: true,
     content: true,
-    recorded_voiceovers: true,
     default_outcome: true,
     hints: true,
     inapplicable_skill_misconception_ids: true,
@@ -306,8 +295,8 @@ export class ChangeListService {
     }
     this.addChange({
       cmd: 'edit_exploration_property',
-      new_value: angular.copy(newValue),
-      old_value: angular.copy(oldValue),
+      new_value: cloneDeep(newValue),
+      old_value: cloneDeep(oldValue),
       property_name: backendName,
     } as ExplorationChangeEditExplorationProperty);
   }
@@ -334,19 +323,25 @@ export class ChangeListService {
     }
     this.addChange({
       cmd: 'edit_state_property',
-      new_value: angular.copy(newValue),
-      old_value: angular.copy(oldValue),
+      new_value: cloneDeep(newValue),
+      old_value: cloneDeep(oldValue),
       property_name: backendName,
       state_name: stateName,
     });
   }
 
   getChangeList(): ExplorationChange[] {
-    return angular.copy(this.explorationChangeList);
+    return cloneDeep(this.explorationChangeList);
+  }
+
+  isOnlyVoiceoverChangeListPresent(): boolean {
+    return this.explorationChangeList.every(
+      change => change.cmd === 'update_voiceovers'
+    );
   }
 
   getTranslationChangeList(): ExplorationChange[] {
-    return angular.copy(
+    return cloneDeep(
       this.explorationChangeList.filter(change => {
         return [
           'edit_translation',
@@ -359,7 +354,7 @@ export class ChangeListService {
   }
 
   getVoiceoverChangeList(): ExplorationChange[] {
-    return angular.copy(
+    return cloneDeep(
       this.explorationChangeList.filter(change => {
         return change.cmd === 'update_voiceovers';
       })
@@ -479,6 +474,22 @@ export class ChangeListService {
     });
   }
 
+  markVoiceoversAsNeedingUpdate(contentId: string, languageCode: string): void {
+    this.addChange({
+      cmd: 'mark_voiceovers_needs_update',
+      content_id: contentId,
+      language_code: languageCode,
+    });
+  }
+
+  removeVoiceovers(contentId: string, languageCode: string): void {
+    this.addChange({
+      cmd: 'remove_voiceovers',
+      content_id: contentId,
+      language_code: languageCode,
+    });
+  }
+
   /**
    * Saves a change dict that represents removing translations in all languages
    * for the given content id.
@@ -506,7 +517,3 @@ export class ChangeListService {
     return this.autosaveInProgressEventEmitter.asObservable();
   }
 }
-
-angular
-  .module('oppia')
-  .factory('ChangeListService', downgradeInjectable(ChangeListService));

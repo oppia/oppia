@@ -18,7 +18,6 @@
  * with base class as ExplorationPropertyService.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {EventEmitter} from '@angular/core';
 import {Injectable} from '@angular/core';
 import cloneDeep from 'lodash/cloneDeep';
@@ -29,8 +28,9 @@ import {LoggerService} from 'services/contextual/logger.service';
 import {
   ParamChange,
   ParamChangeBackendDict,
-} from 'domain/exploration/ParamChangeObjectFactory';
-import {ParamSpecs} from 'domain/exploration/ParamSpecsObjectFactory';
+} from 'domain/exploration/param-change.model';
+import {ParamSpecs} from 'domain/exploration/param-specs.model';
+import isEqual from 'lodash/isEqual';
 
 export type ExplorationPropertyValues =
   | null
@@ -100,7 +100,7 @@ export class ExplorationPropertyService {
 
   // Returns whether the current value has changed from the memento.
   hasChanged(): boolean {
-    return !angular.equals(this.savedMemento, this.displayed);
+    return !isEqual(this.savedMemento, this.displayed);
   }
 
   // Transforms the given value into a normalized form. THIS CAN BE
@@ -164,10 +164,3 @@ export class ExplorationPropertyService {
     return this._explorationPropertyChangedEventEmitter;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ExplorationPropertyService',
-    downgradeInjectable(ExplorationPropertyService)
-  );

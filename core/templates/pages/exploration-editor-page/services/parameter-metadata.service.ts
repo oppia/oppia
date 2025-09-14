@@ -17,15 +17,14 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {ParamMetadata} from 'domain/exploration/param-metadata.model';
 import {ExpressionInterpolationService} from 'expressions/expression-interpolation.service';
 import {ExplorationParamChangesService} from 'pages/exploration-editor-page/services/exploration-param-changes.service';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {GraphDataService} from 'pages/exploration-editor-page/services/graph-data.service';
 import {ExplorationEditorPageConstants} from 'pages/exploration-editor-page/exploration-editor-page.constants';
-import {State} from 'domain/state/StateObjectFactory';
-import {ParamChange} from 'domain/exploration/ParamChangeObjectFactory';
+import {State} from 'domain/state/state.model';
+import {ParamChange} from 'domain/exploration/param-change.model';
 import cloneDeep from 'lodash/cloneDeep';
 
 interface GetUnsetParametersInfoResult {
@@ -290,10 +289,3 @@ export class ParameterMetadataService {
     return unsetParametersInfo;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ParameterMetadataService',
-    downgradeInjectable(ParameterMetadataService)
-  );

@@ -17,17 +17,16 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {
   Warning,
-  baseInteractionValidationService,
+  BaseInteractionValidationService,
 } from 'interactions/base-interaction-validation.service';
 import {RatioExpressionInputCustomizationArgs} from 'extensions/interactions/customization-args-defs';
 import {Ratio} from 'domain/objects/ratio.model';
 import {RatioExpressionInputRulesService} from './ratio-expression-input-rules.service';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {AppConstants} from 'app.constants';
 import {RatioInputAnswer} from 'interactions/answer-defs';
 
@@ -36,7 +35,7 @@ import {RatioInputAnswer} from 'interactions/answer-defs';
 })
 export class RatioExpressionInputValidationService {
   constructor(
-    private baseInteractionValidationServiceInstance: baseInteractionValidationService
+    private baseInteractionValidationServiceInstance: BaseInteractionValidationService
   ) {}
 
   getCustomizationArgsWarnings(
@@ -55,14 +54,14 @@ export class RatioExpressionInputValidationService {
         {
           type: AppConstants.WARNING_TYPES.ERROR,
           message:
-            'The number of terms should be a non-negative integer other than 1.',
+            'The number of terms should be a non-negative integer other than 1',
         },
       ];
     } else if (expectedNumberOfTerms === 1) {
       return [
         {
           type: AppConstants.WARNING_TYPES.ERROR,
-          message: 'The number of terms in a ratio should be greater than 1.',
+          message: 'The number of terms in a ratio should be greater than 1',
         },
       ];
     } else if (expectedNumberOfTerms > 10) {
@@ -70,7 +69,7 @@ export class RatioExpressionInputValidationService {
         {
           type: AppConstants.WARNING_TYPES.ERROR,
           message:
-            'The number of terms in a ratio should not be greater than 10.',
+            'The number of terms in a ratio should not be greater than 10',
         },
       ];
     } else {
@@ -147,7 +146,7 @@ export class RatioExpressionInputValidationService {
                 message:
                   `Learner answer ${j + 1} from Oppia response ${i + 1} ` +
                   'will never be matched because it has differing number ' +
-                  'of terms than required.',
+                  'of terms than required',
               });
             }
           } else if (currentRuleType === 'HasSpecificTermEqualTo') {
@@ -163,7 +162,7 @@ export class RatioExpressionInputValidationService {
                 message:
                   `Learner answer ${j + 1} from Oppia response ${i + 1} ` +
                   'will never be matched because it expects more terms ' +
-                  'than the answer allows.',
+                  'than the answer allows',
               });
             }
           } else {
@@ -174,7 +173,7 @@ export class RatioExpressionInputValidationService {
                 message:
                   `Learner answer ${j + 1} from Oppia response ${i + 1} ` +
                   'will never be matched because it has differing ' +
-                  'number of terms than required.',
+                  'number of terms than required',
               });
             }
           }
@@ -210,7 +209,7 @@ export class RatioExpressionInputValidationService {
               message:
                 `Learner answer ${j + 1} from Oppia response ${i + 1} will ` +
                 "never be matched because it is preceded by a 'Equals' " +
-                'answer with a matching input.',
+                'answer with a matching input',
             });
           } else if (
             seenRuleType === 'HasSpecificTermEqualTo' &&
@@ -227,7 +226,7 @@ export class RatioExpressionInputValidationService {
               message:
                 `Learner answer ${j + 1} from Oppia response ${i + 1} will ` +
                 'never be matched because it is preceded by a ' +
-                "'HasSpecificTermEqualTo' answer with a matching input.",
+                "'HasSpecificTermEqualTo' answer with a matching input",
             });
           } else if (
             seenRuleType === 'IsEquivalent' &&
@@ -244,7 +243,7 @@ export class RatioExpressionInputValidationService {
               message:
                 `Learner answer ${j + 1} from Oppia response ${i + 1} will ` +
                 'never be matched because it is preceded by a ' +
-                "'IsEquivalent' answer with a matching input.",
+                "'IsEquivalent' answer with a matching input",
             });
           } else if (
             seenRuleType === 'HasNumberOfTermsEqualTo' &&
@@ -262,7 +261,7 @@ export class RatioExpressionInputValidationService {
               message:
                 `Learner answer ${j + 1} from Oppia response ${i + 1} will ` +
                 'never be matched because it is preceded by a ' +
-                "'HasNumberOfTermsEqualTo' answer with a matching input.",
+                "'HasNumberOfTermsEqualTo' answer with a matching input",
             });
           } else if (
             currentRuleType === 'HasNumberOfTermsEqualTo' &&
@@ -274,7 +273,7 @@ export class RatioExpressionInputValidationService {
               message:
                 `Learner answer ${j + 1} from Oppia response ${i + 1} will ` +
                 'never be matched because it is preceded by a ' +
-                "'HasNumberOfTermsEqualTo' answer with a matching input.",
+                "'HasNumberOfTermsEqualTo' answer with a matching input",
             });
           }
         }
@@ -285,10 +284,3 @@ export class RatioExpressionInputValidationService {
     return warningsList;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'RatioExpressionInputValidationService',
-    downgradeInjectable(RatioExpressionInputValidationService)
-  );

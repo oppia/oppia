@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+import logging
+
 from core import feconf
 from core import utils
 from core.constants import constants
@@ -415,6 +417,32 @@ def get_static_asset_url(filepath: str) -> str:
     Returns:
         str. The URL of the file.
     """
+    # TODO(1149): Refactor to remove usage of inline imports.
+    # This inline import is required because of the following cicrular
+    # import happening without it:
+    # exp_domain -> html_validation_service -> fs_services ->
+    # platform_parameter_services -> platform_parameter_registry ->
+    # caching_services -> exp_domain.
+    # Caching services should be refactored to eliminate dependency on
+    # multiple domain objects.
+    from core.domain import platform_parameter_list
+    from core.domain import platform_parameter_services
+    # TODO(release-scripts#137): Remove once site URL is verified on all
+    # servers.
+    oppia_site_url = platform_parameter_services.get_platform_parameter_value(
+        platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value
+    )
+    oppia_project_id = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.OPPIA_PROJECT_ID.value))
+    logging.info(
+        'Logging OPPIA_SITE_URL_FOR_EMAILS for debugging: %s' % oppia_site_url
+    )
+    logging.info(
+        'Logging OPPIA_PROJECT_ID platform param for debugging: %s' % (
+            oppia_project_id
+        )
+    )
     if constants.EMULATOR_MODE:
         # By using assetsstatic the app returns the requested
         # files in assets folder by that it bypasses
@@ -423,5 +451,6 @@ def get_static_asset_url(filepath: str) -> str:
         return 'http://localhost:8181/assetsstatic/%s' % (
             filepath
         )
+    assert isinstance(oppia_project_id, str)
     return 'https://storage.googleapis.com/%s-static/%s' % (
-        feconf.OPPIA_PROJECT_ID, filepath)
+        oppia_project_id, filepath)

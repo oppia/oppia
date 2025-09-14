@@ -53,14 +53,14 @@ class EnableFeatureFlagTests(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags([
         feature_flag_list.FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS,
-        feature_flag_list.FeatureNames.DIAGNOSTIC_TEST
+        feature_flag_list.FeatureNames.BLOG_PAGES
     ])
     def test_enable_multiple_feature_flags_decorator(self) -> None:
         """Tests if multiple feature flags are enabled."""
         self.assertTrue(feature_flag_services.is_feature_flag_enabled(
             'dummy_feature_flag_for_e2e_tests', None))
         self.assertTrue(feature_flag_services.is_feature_flag_enabled(
-            'diagnostic_test', None))
+            'blog_pages', None))
 
 
 class SetPlatformParametersTests(test_utils.GenericTestBase):
@@ -650,7 +650,9 @@ class TestUtilsTests(test_utils.GenericTestBase):
                 SwapWithCheckTestClass.functions_with_args()
 
     def test_swap_with_check_on_expected_kwargs(self) -> None:
-        def mock_getenv(key: str, default: str) -> None: # pylint: disable=unused-argument
+        def mock_getenv(
+            key: str, default: str # pylint: disable=unused-argument
+        ) -> None:
             return
         getenv_swap = self.swap_with_checks(
             os, 'getenv', mock_getenv,
@@ -663,7 +665,9 @@ class TestUtilsTests(test_utils.GenericTestBase):
     def test_swap_with_check_on_expected_kwargs_failed_on_wrong_numbers(
         self
     ) -> None:
-        def mock_getenv(key: str, default: str) -> None: # pylint: disable=unused-argument
+        def mock_getenv(
+            key: str, default: str # pylint: disable=unused-argument
+        ) -> None:
             return
         getenv_swap = self.swap_with_checks(
             os, 'getenv', mock_getenv, expected_kwargs=[

@@ -201,7 +201,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     'stdout': subprocess.PIPE,
                 },
             ]))
-        args = run_e2e_tests._PARSER.parse_args(args=[])  # pylint: disable=protected-access
+        args = run_e2e_tests._PARSER.parse_args( # pylint: disable=protected-access
+            args=[])
 
         with self.swap_mock_set_constants_to_default:
             lines, _ = run_e2e_tests.run_tests(args)

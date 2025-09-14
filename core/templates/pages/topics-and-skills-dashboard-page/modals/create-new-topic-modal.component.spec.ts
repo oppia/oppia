@@ -22,15 +22,17 @@ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {FormsModule} from '@angular/forms';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {TopicEditorStateService} from 'pages/topic-editor-page/services/topic-editor-state.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {CreateNewTopicModalComponent} from './create-new-topic-modal.component';
+import {UrlFragmentEditorComponent} from '../../../components/url-fragment-editor/url-fragment-editor.component';
+import {By} from '@angular/platform-browser';
 
 describe('Create new topic modal', () => {
   let fixture: ComponentFixture<CreateNewTopicModalComponent>;
   let componentInstance: CreateNewTopicModalComponent;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let ngbActiveModal: NgbActiveModal;
   let imageLocalStorageService: ImageLocalStorageService;
   let topicEditorStateService: TopicEditorStateService;
@@ -46,7 +48,7 @@ describe('Create new topic modal', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule, FormsModule],
-      declarations: [CreateNewTopicModalComponent],
+      declarations: [CreateNewTopicModalComponent, UrlFragmentEditorComponent],
       providers: [
         NgbActiveModal,
         ImageLocalStorageService,
@@ -63,7 +65,7 @@ describe('Create new topic modal', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(CreateNewTopicModalComponent);
     componentInstance = fixture.componentInstance;
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
     topicEditorStateService = TestBed.inject(TopicEditorStateService);
@@ -74,10 +76,10 @@ describe('Create new topic modal', () => {
   });
 
   it('should intialize', () => {
-    spyOn(contextService, 'setImageSaveDestinationToLocalStorage');
+    spyOn(pageContextService, 'setImageSaveDestinationToLocalStorage');
     componentInstance.ngOnInit();
     expect(
-      contextService.setImageSaveDestinationToLocalStorage
+      pageContextService.setImageSaveDestinationToLocalStorage
     ).toHaveBeenCalled();
   });
 
@@ -182,5 +184,27 @@ describe('Create new topic modal', () => {
     expect(
       topicEditorStateService.updateExistenceOfTopicUrlFragment
     ).not.toHaveBeenCalled();
+  });
+
+  it('should call onUrlFragmentChange when urlFragmentChange event is emitted', () => {
+    spyOn(componentInstance, 'onUrlFragmentChange');
+    const childComponent = fixture.debugElement.query(
+      By.directive(UrlFragmentEditorComponent)
+    );
+    const testFragment = 'test-topic-url-fragment';
+    childComponent.triggerEventHandler('urlFragmentChange', testFragment);
+    expect(componentInstance.onUrlFragmentChange).toHaveBeenCalledWith(
+      testFragment
+    );
+  });
+
+  it('should update newlyCreatedTopic.urlFragment and call onTopicUrlFragmentChange', () => {
+    spyOn(componentInstance, 'onTopicUrlFragmentChange');
+    const newUrlFragment = 'new-topic-url-fragment';
+    componentInstance.onUrlFragmentChange(newUrlFragment);
+    expect(componentInstance.newlyCreatedTopic.urlFragment).toBe(
+      newUrlFragment
+    );
+    expect(componentInstance.onTopicUrlFragmentChange).toHaveBeenCalled();
   });
 });

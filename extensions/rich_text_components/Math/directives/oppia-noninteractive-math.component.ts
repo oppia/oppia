@@ -42,11 +42,10 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import {SafeResourceUrl} from '@angular/platform-browser';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {AppConstants} from 'app.constants';
 import {ImagePreloaderService} from 'pages/exploration-player-page/services/image-preloader.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
@@ -77,7 +76,7 @@ export class NoninteractiveMath implements OnInit, OnChanges {
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private htmlEscaperService: HtmlEscaperService,
     private imageLocalStorageService: ImageLocalStorageService,
     private imagePreloaderService: ImagePreloaderService,
@@ -113,7 +112,10 @@ export class NoninteractiveMath implements OnInit, OnChanges {
     // preloader service beforehand.
     if (
       this.imagePreloaderService.inExplorationPlayer() &&
-      !(this.contextService.getEntityType() === AppConstants.ENTITY_TYPE.SKILL)
+      !(
+        this.pageContextService.getEntityType() ===
+        AppConstants.ENTITY_TYPE.SKILL
+      )
     ) {
       this.imagePreloaderService
         .getImageUrlAsync(mathExpressionContent.svg_filename)
@@ -130,7 +132,7 @@ export class NoninteractiveMath implements OnInit, OnChanges {
         // target entity's images in the translatable content which needs
         // to be fetched from the server.
         if (
-          this.contextService.getImageSaveDestination() ===
+          this.pageContextService.getImageSaveDestination() ===
             AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE &&
           this.imageLocalStorageService.isInStorage(
             mathExpressionContent.svg_filename
@@ -144,11 +146,11 @@ export class NoninteractiveMath implements OnInit, OnChanges {
               this.svgSanitizerService.getTrustedSvgResourceUrl(imageData);
           }
         } else {
-          const entityType = this.contextService.getEntityType();
+          const entityType = this.pageContextService.getEntityType();
           if (entityType) {
             this.imageUrl = this.assetsBackendApiService.getImageUrlForPreview(
               entityType,
-              this.contextService.getEntityId(),
+              this.pageContextService.getEntityId(),
               mathExpressionContent.svg_filename
             );
           }
@@ -156,9 +158,9 @@ export class NoninteractiveMath implements OnInit, OnChanges {
       } catch (e) {
         const additionalInfo =
           '\nEntity type: ' +
-          this.contextService.getEntityType() +
+          this.pageContextService.getEntityType() +
           '\nEntity ID: ' +
-          this.contextService.getEntityId() +
+          this.pageContextService.getEntityId() +
           '\nFilepath: ' +
           mathExpressionContent.svg_filename;
         if (e instanceof Error) {
@@ -179,10 +181,3 @@ export class NoninteractiveMath implements OnInit, OnChanges {
     }
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaNoninteractiveMath',
-  downgradeComponent({
-    component: NoninteractiveMath,
-  }) as angular.IDirectiveFactory
-);

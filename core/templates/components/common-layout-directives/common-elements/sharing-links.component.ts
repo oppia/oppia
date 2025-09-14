@@ -19,7 +19,6 @@
 import {AppConstants} from 'app.constants';
 
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
@@ -67,7 +66,7 @@ export class SharingLinksComponent implements OnInit {
       this.activityUrlFragment = 'collection';
     } else if (this.shareType !== 'blog') {
       // TODO(#13122): Remove this code to throw error. Remove @Input to
-      // this component and use ContextService directly to determine if the
+      // this component and use PageContextService directly to determine if the
       // collection or exploration page is active and render accordingly.
       throw new Error(
         'SharingLinks component can only be used in the ' +
@@ -168,10 +167,3 @@ export class SharingLinksComponent implements OnInit {
 
 type ShareType = 'exploration' | 'collection' | 'blog';
 type SharingPlatform = 'facebook' | 'twitter' | 'classroom' | 'linkedin';
-
-angular
-  .module('oppia')
-  .directive(
-    'sharingLinks',
-    downgradeComponent({component: SharingLinksComponent})
-  );

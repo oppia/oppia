@@ -19,7 +19,6 @@
 import {Component, OnInit} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {Input} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {AppConstants} from 'app.constants';
 import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
@@ -156,10 +155,3 @@ export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
     return 'height: 144px; width: 192px;';
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaLearnerTopicSummaryTile',
-    downgradeComponent({component: LearnerTopicGoalsSummaryTileComponent})
-  );

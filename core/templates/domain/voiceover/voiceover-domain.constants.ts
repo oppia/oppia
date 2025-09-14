@@ -25,4 +25,8 @@ export const VoiceoverDomainConstants = {
   GET_ENTITY_VOICEOVERS_BULK:
     '/entity_voiceovers_bulk_handler/<entity_type>/<entity_id>/' +
     '<entity_version>/<language_code>',
+  AUTOMATIC_VOICEOVER_REGENERATION_RECORD_URL:
+    '/automatic_voiceover_regeneration_record',
+  REGENERATE_AUTOMATIC_VOICEOVER_HANDLER_URL:
+    '/regenerate_automatic_voiceover/<exploration_id>',
 } as const;

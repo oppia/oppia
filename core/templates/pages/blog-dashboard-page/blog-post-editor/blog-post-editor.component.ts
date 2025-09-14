@@ -29,7 +29,6 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {AlertsService} from 'services/alerts.service';
 import {
   BlogPostEditorData,
@@ -86,6 +85,7 @@ export class BlogPostEditorComponent implements OnInit {
   HTML_SCHEMA: EditorSchema = {
     type: 'html',
     ui_config: {
+      rte_component_config_id: 'BLOG_COMPONENTS',
       hide_complex_extensions: false,
       startupFocusEnabled: false,
     },
@@ -465,10 +465,3 @@ export class BlogPostEditorComponent implements OnInit {
     }
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaBlogPostEditor',
-  downgradeComponent({
-    component: BlogPostEditorComponent,
-  }) as angular.IDirectiveFactory
-);

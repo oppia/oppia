@@ -24,7 +24,6 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {
   AnswerChoice,
   StateEditorService,
@@ -40,7 +39,7 @@ import {AlertsService} from 'services/alerts.service';
 import cloneDeep from 'lodash/cloneDeep';
 import {AppConstants} from 'app.constants';
 import {ExternalSaveService} from 'services/external-save.service';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {BaseTranslatableObject} from 'interactions/rule-input-defs';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 
@@ -425,10 +424,3 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaAnswerGroupEditor',
-  downgradeComponent({
-    component: AnswerGroupEditor,
-  }) as angular.IDirectiveFactory
-);

@@ -17,13 +17,12 @@
  */
 
 import {Component, EventEmitter, OnInit, Output} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {StateCustomizationArgsService} from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import {EditabilityService} from 'services/editability.service';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import {StateSolutionService} from 'components/state-editor/state-editor-properties-services/state-solution.service';
-import {Solution} from 'domain/exploration/SolutionObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
 
 interface ExplanationFormSchema {
   type: string;
@@ -77,14 +76,9 @@ export class SolutionEditor implements OnInit {
 
     this.EXPLANATION_FORM_SCHEMA = {
       type: 'html',
-      ui_config: {},
+      ui_config: {
+        rte_component_config_id: 'ALL_COMPONENTS',
+      },
     };
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaSolutionEditor',
-  downgradeComponent({
-    component: SolutionEditor,
-  }) as angular.IDirectiveFactory
-);

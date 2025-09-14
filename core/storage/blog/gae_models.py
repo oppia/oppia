@@ -202,7 +202,9 @@ class BlogPostModel(base_models.BaseModel):
         """
         return BlogPostModel.query(
             datastore_services.all_of(
-                cls.url_fragment == url_fragment, cls.deleted == False) # pylint: disable=singleton-comparison
+                cls.url_fragment == url_fragment,
+                cls.deleted == False # pylint: disable=singleton-comparison
+            )
         ).get()
 
     @classmethod
@@ -384,7 +386,9 @@ class BlogPostRightsModel(base_models.BaseModel):
             according to the time when the model was last updated.
         """
         query = cls.query(
-            cls.editor_ids == user_id, cls.blog_post_is_published == True # pylint: disable=singleton-comparison
+            cls.editor_ids == user_id,
+            cls.blog_post_is_published # pylint: disable=singleton-comparison
+            == True
         ).order(-cls.last_updated)
         return list(
             query.fetch(
@@ -413,7 +417,9 @@ class BlogPostRightsModel(base_models.BaseModel):
             according to the time when the model was last updated.
         """
         query = cls.query(
-            cls.editor_ids == user_id, cls.blog_post_is_published == False # pylint: disable=singleton-comparison
+            cls.editor_ids == user_id,
+            cls.blog_post_is_published # pylint: disable=singleton-comparison
+            == False
         ).order(-cls.last_updated)
         return list(
             query.fetch(limit) if limit is not None else query.fetch()

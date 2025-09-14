@@ -254,8 +254,9 @@ class ValidateChangeDictForBlogPost(test_utils.GenericTestBase):
             'content': 'hi'
         }
         with self.assertRaisesRegex(
-            Exception, 'Invalid tags provided. Tags not in default'
-            ' tags list.'):
+            Exception,
+            'Invalid tags provided. Tags not in default tags list.'
+        ):
             domain_objects_validator.validate_change_dict_for_blog_post(
                 blog_post_change)
 
@@ -383,13 +384,6 @@ class ValidateStateDictInStateYamlHandler(test_utils.GenericTestBase):
                 'hints': []
             },
             'linked_skill_id': None,
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {
-                    'content_0': {},
-                    'default_outcome_1': {},
-                    'ca_placeholder_2': {}
-                }
-            },
             'classifier_model_id': None,
             'card_is_checkpoint': False,
             'solicit_answer_details': False,
@@ -486,16 +480,6 @@ class ValidateQuestionStateDict(test_utils.GenericTestBase):
                 'solution': None
             },
             'param_changes': [],
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {
-                    'content_0': {},
-                    'default_outcome_1': {},
-                    'ca_choices_2': {},
-                    'ca_choices_3': {},
-                    'feedback_4': {},
-                    'feedback_5': {}
-                }
-            },
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
             'inapplicable_skill_misconception_ids': []

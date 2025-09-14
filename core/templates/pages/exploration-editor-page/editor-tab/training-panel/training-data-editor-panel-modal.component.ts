@@ -17,14 +17,13 @@
  */
 import {Subscription} from 'rxjs';
 import {Component, Injector, OnDestroy, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import {StateCustomizationArgsService} from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
-import {ExplorationPlayerConstants} from 'pages/exploration-player-page/exploration-player-page.constants';
+import {ExplorationPlayerConstants} from 'pages/exploration-player-page/current-lesson-player/exploration-player-page.constants';
 import {AngularNameService} from 'pages/exploration-editor-page/services/angular-name.service';
 import {AlgebraicExpressionInputRulesService} from 'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service';
 import {CodeReplRulesService} from 'interactions/CodeRepl/directives/code-repl-rules.service';
@@ -45,7 +44,7 @@ import {
 } from 'pages/exploration-player-page/services/answer-classification.service';
 import {AlertsService} from 'services/alerts.service';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
-import {State} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 import {ResponsesService} from '../services/responses.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
@@ -305,10 +304,3 @@ export class TrainingDataEditorPanelComponent
     }
   }
 }
-
-angular.module('oppia').directive(
-  'trainingDataEditorPanel',
-  downgradeComponent({
-    component: TrainingDataEditorPanelComponent,
-  }) as angular.IDirectiveFactory
-);

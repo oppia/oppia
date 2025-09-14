@@ -17,7 +17,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {CodeNormalizerService} from 'services/code-normalizer.service';
 import {NormalizeWhitespacePipe} from 'filters/string-utility-filters/normalize-whitespace.pipe';
@@ -78,7 +77,3 @@ export class CodeReplRulesService {
     return normalizedError.indexOf(normalizedSnippet) !== -1;
   }
 }
-
-angular
-  .module('oppia')
-  .factory('CodeReplRulesService', downgradeInjectable(CodeReplRulesService));

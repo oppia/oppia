@@ -435,7 +435,10 @@ class GenerateExplorationOpportunitySummariesJob(base_jobs.JobBase):
                 lambda result: result.is_ok())
             | 'Fetch the models to be put' >> beam.FlatMap(
                 lambda result: result.unwrap())
-            | 'Add ID as a key' >> beam.WithKeys(lambda model: model.id)  # pylint: disable=no-value-for-parameter
+            | 'Add ID as a key'
+            >> beam.WithKeys( # pylint: disable=no-value-for-parameter
+                lambda model: model.id
+            )
             | 'Allow only one item per key' >> (
                 beam.combiners.Sample.FixedSizePerKey(1))
             | 'Remove the IDs' >> beam.Values()  # pylint: disable=no-value-for-parameter

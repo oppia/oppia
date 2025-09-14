@@ -17,7 +17,6 @@
  * the training modal used for unresolved answers.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {EventEmitter, Injectable} from '@angular/core';
 import {AlertsService} from 'services/alerts.service';
 import {ExternalSaveService} from 'services/external-save.service';
@@ -86,7 +85,3 @@ export class TrainingModalService {
     this.externalSaveService.onExternalSave.emit();
   }
 }
-
-angular
-  .module('oppia')
-  .factory('TrainingModalService', downgradeInjectable(TrainingModalService));

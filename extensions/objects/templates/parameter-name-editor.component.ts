@@ -20,7 +20,6 @@
 // available in the context in which it is used.
 
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 import {ExplorationParamSpecsService} from 'pages/exploration-editor-page/services/exploration-param-specs.service';
 
@@ -73,10 +72,3 @@ export class ParameterNameEditorComponent implements OnInit {
     this.valueChanged.emit(this.value);
   }
 }
-
-angular.module('oppia').directive(
-  'parameterNameEditor',
-  downgradeComponent({
-    component: ParameterNameEditorComponent,
-  })
-);

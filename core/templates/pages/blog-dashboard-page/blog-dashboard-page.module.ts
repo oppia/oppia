@@ -30,7 +30,7 @@ import {toastrConfig} from 'pages/oppia-root/app.module';
 import {BlogDashboardPageRootComponent} from './blog-dashboard-page-root.component';
 import {BlogAuthorDetailsEditorComponent} from './modal-templates/author-detail-editor-modal.component';
 import {BlogDashboardPageAuthGuard} from './blog-dashboard-page-auth.guard';
-
+import {RteHelperService} from 'services/rte-helper.service';
 @NgModule({
   imports: [
     SharedComponentsModule,
@@ -57,5 +57,6 @@ import {BlogDashboardPageAuthGuard} from './blog-dashboard-page-auth.guard';
     BlogDashboardPageComponent,
     BlogAuthorDetailsEditorComponent,
   ],
+  providers: [RteHelperService],
 })
 export class BlogDashboardPageModule {}

@@ -14,7 +14,7 @@
         </button>
       </div>
 
-      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 text-center" ng-if="canCreateCollections">
+      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 text-center" *ngIf="canCreateCollections">
         <img [src]="getStaticImageUrl('/activity/collection.svg')" (click)="chooseCollection()">
         <button type="button" (click)="chooseCollection()"
                 class="btn oppia-transition-200 e2e-test-create-collection">

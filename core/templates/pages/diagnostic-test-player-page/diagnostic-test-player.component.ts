@@ -31,6 +31,8 @@ import {AppConstants} from 'app.constants';
 import {Router} from '@angular/router';
 import {LoaderService} from 'services/loader.service';
 import {AlertsService} from 'services/alerts.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 @Component({
   selector: 'oppia-diagnostic-test-player',
@@ -57,8 +59,10 @@ export class DiagnosticTestPlayerComponent implements OnInit {
     private diagnosticTestPlayerStatusService: DiagnosticTestPlayerStatusService,
     private windowRef: WindowRef,
     private router: Router,
+    private platformFeatureService: PlatformFeatureService,
     private loaderService: LoaderService,
-    private alertsService: AlertsService
+    private alertsService: AlertsService,
+    private siteAnalyticsService: SiteAnalyticsService
   ) {}
 
   ngOnInit(): void {
@@ -139,6 +143,9 @@ export class DiagnosticTestPlayerComponent implements OnInit {
             response.classroomDict.topicIdToPrerequisiteTopicIds
           );
         this.diagnosticTestIsStarted = true;
+        this.siteAnalyticsService.registerDiagnosticTestStartedEvent(
+          this.classroomData.getName()
+        );
       })
       .catch(() => {
         this.isStartTestButtonDisabled = true;
@@ -157,6 +164,10 @@ export class DiagnosticTestPlayerComponent implements OnInit {
         return recommendedTopicIds.indexOf(topicSummary.getId()) !== -1;
       });
     this.diagnosticTestIsFinished = true;
+
+    this.siteAnalyticsService.registerDiagnosticTestCompletionEvent(
+      this.classroomData.getName()
+    );
   }
 
   getTopicButtonText(topicName: string): string {
@@ -175,5 +186,23 @@ export class DiagnosticTestPlayerComponent implements OnInit {
         topicUrlFragment: urlFragment,
       }
     );
+  }
+  getRecommendationAcceptanceEvent(topicName: string): void {
+    if (this.classroomData) {
+      const topicSummary = this.recommendedTopicSummaries.find(
+        summary => summary.getName() === topicName
+      );
+      if (topicSummary) {
+        const topicId = topicSummary.getId();
+        this.siteAnalyticsService.registerDiagnosticTestRecommendationAcceptedEvent(
+          this.classroomData.getName(),
+          topicId
+        );
+      }
+    }
+  }
+
+  isNewLessonPlayerEnabled(): boolean {
+    return this.platformFeatureService.status.NewLessonPlayer.isEnabled;
   }
 }

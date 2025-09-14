@@ -21,7 +21,7 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {Subscription} from 'rxjs';
 import {HelpModalComponent} from 'pages/exploration-editor-page/modal-templates/help-modal.component';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {EditabilityService} from 'services/editability.service';
 import {ExplorationImprovementsService} from 'services/exploration-improvements.service';
@@ -57,7 +57,7 @@ export class EditorNavigationComponent implements OnInit, OnDestroy {
 
   constructor(
     private changeListService: ChangeListService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private editabilityService: EditabilityService,
     private explorationImprovementsService: ExplorationImprovementsService,
     private explorationRightsService: ExplorationRightsService,
@@ -199,7 +199,7 @@ export class EditorNavigationComponent implements OnInit, OnDestroy {
   }
 
   showUserHelpModal(): void {
-    const explorationId = this.contextService.getExplorationId();
+    const explorationId = this.pageContextService.getExplorationId();
     this.siteAnalyticsService.registerClickHelpButtonEvent(explorationId);
 
     const EDITOR_TUTORIAL_MODE = 'editor';

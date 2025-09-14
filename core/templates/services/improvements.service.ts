@@ -18,9 +18,8 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
-import {State} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 
 @Injectable({
   providedIn: 'root',
@@ -39,7 +38,3 @@ export class ImprovementsService {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory('ImprovementsService', downgradeInjectable(ImprovementsService));

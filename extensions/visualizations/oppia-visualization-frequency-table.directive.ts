@@ -17,7 +17,6 @@
  */
 
 import {Component, Input} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 import './oppia-visualization-frequency-table.directive.css';
 
@@ -41,10 +40,3 @@ export class OppiaVisualizationFrequencyTableComponent {
 
   constructor() {}
 }
-
-angular.module('oppia').directive(
-  'oppiaVisualizationFrequencyTable',
-  downgradeComponent({
-    component: OppiaVisualizationFrequencyTableComponent,
-  }) as angular.IDirectiveFactory
-);

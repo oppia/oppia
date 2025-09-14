@@ -17,7 +17,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 @Injectable({
   providedIn: 'root',
@@ -35,7 +34,3 @@ export class BlogPostPageService {
     this._blogPostId = id;
   }
 }
-
-angular
-  .module('oppia')
-  .factory('BlogPostPageService', downgradeInjectable(BlogPostPageService));

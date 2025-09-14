@@ -16,8 +16,6 @@
  * @fileoverview Service to get data for to a blog dashboard from backend.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
-
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {
@@ -143,10 +141,3 @@ export class BlogDashboardBackendApiService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'BlogDashboardBackendApiService',
-    downgradeInjectable(BlogDashboardBackendApiService)
-  );

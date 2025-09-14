@@ -65,7 +65,7 @@ describe('Logged-out User', function () {
     loggedOutUser = await UserFactory.createLoggedOutUser();
 
     await explorationEditor.navigateToCreatorDashboardPage();
-    await explorationEditor.navigateToExplorationEditorPage();
+    await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
     await explorationEditor.dismissWelcomeModal();
     await explorationEditor.updateCardContent('Introduction to Algebra');
     await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
@@ -88,7 +88,9 @@ describe('Logged-out User', function () {
       CARD_NAME.FINAL_CARD,
       true
     );
-    await explorationEditor.editDefaultResponseFeedback('Wrong, try again!');
+    await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
+      'Wrong, try again!'
+    );
 
     await explorationEditor.saveExplorationDraft();
 
@@ -147,9 +149,18 @@ describe('Logged-out User', function () {
         EXPLORATION_ATTRIBUTION_PRINT
       );
       await loggedOutUser.closeAttributionModal();
-      await loggedOutUser.shareExploration('Facebook', explorationId);
-      await loggedOutUser.shareExploration('Twitter', explorationId);
-      await loggedOutUser.shareExploration('Classroom', explorationId);
+      await loggedOutUser.shareExplorationAndVerifyRedirect(
+        'Facebook',
+        explorationId
+      );
+      await loggedOutUser.shareExplorationAndVerifyRedirect(
+        'Twitter',
+        explorationId
+      );
+      await loggedOutUser.shareExplorationAndVerifyRedirect(
+        'Classroom',
+        explorationId
+      );
 
       await loggedOutUser.embedThisLesson(EXPECTED_EMBED_URL(explorationId));
 

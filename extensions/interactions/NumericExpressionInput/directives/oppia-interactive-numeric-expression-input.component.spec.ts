@@ -73,6 +73,7 @@ describe('NumericExpressionInputInteractive', () => {
     ) {}
 
     updateCurrentAnswer(answer: InteractionAnswer): void {}
+    updateAnswerIsValid(isValid: boolean) {}
 
     registerCurrentInteraction(
       submitAnswerFn: Function,
@@ -139,10 +140,15 @@ describe('NumericExpressionInputInteractive', () => {
     component.value = '1/';
     fixture.detectChanges();
     spyOn(mockCurrentInteractionService, 'onSubmit');
+    spyOn(mockCurrentInteractionService, 'updateAnswerIsValid');
 
     component.submitAnswer();
 
     expect(mockCurrentInteractionService.onSubmit).not.toHaveBeenCalled();
+    expect(component.isCurrentAnswerValid()).toBe(false);
+    expect(
+      mockCurrentInteractionService.updateAnswerIsValid
+    ).toHaveBeenCalledWith(false);
     expect(component.warningText).toBe(
       'Your answer seems to be missing a variable/number after the "/".'
     );
@@ -153,10 +159,15 @@ describe('NumericExpressionInputInteractive', () => {
     component.hasBeenTouched = false;
     component.value = '1+1';
     spyOn(mockCurrentInteractionService, 'onSubmit');
+    spyOn(mockCurrentInteractionService, 'updateAnswerIsValid');
 
     component.submitAnswer();
 
     expect(mockCurrentInteractionService.onSubmit).toHaveBeenCalled();
+    expect(component.isCurrentAnswerValid()).toBe(true);
+    expect(
+      mockCurrentInteractionService.updateAnswerIsValid
+    ).toHaveBeenCalledWith(true);
     expect(component.warningText).toBe('');
     expect(component.hasBeenTouched).toBeTrue();
   });

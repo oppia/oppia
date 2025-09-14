@@ -26,7 +26,6 @@
 // be different depending on the user's logged in/logged out state.
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {Collection} from 'domain/collection/collection.model';
 import {GuestCollectionProgress} from 'domain/collection/guest-collection-progress.model';
@@ -146,10 +145,3 @@ export class GuestCollectionProgressService {
     return this._getNextExplorationId(collection, completedExplorationIds);
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'GuestCollectionProgressService',
-    downgradeInjectable(GuestCollectionProgressService)
-  );

@@ -46,7 +46,7 @@ import {TopicPlayerViewerCommonModule} from 'pages/topic-viewer-page/topic-viewe
 import {StoryCreationBackendApiService} from 'components/entity-creation-services/story-creation-backend-api.service';
 import {EntityCreationService} from './services/entity-creation.service';
 import {CreateNewSkillModalService} from './services/create-new-skill-modal.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
@@ -76,6 +76,9 @@ import {BottomNavbarStatusService} from 'services/bottom-navbar-status.service';
 import {LoaderService} from 'services/loader.service';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 import {RteHelperService} from 'services/rte-helper.service';
+import {AddStudyGuideSectionModalComponent} from 'pages/topic-editor-page/subtopic-editor/add-study-guide-section.component';
+import {DeleteStudyGuideSectionComponent} from 'pages/topic-editor-page/subtopic-editor/delete-study-guide-section-modal.component';
+import {StudyGuideSectionEditorComponent} from './subtopic-editor/study-guide-section-editor.component';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -112,6 +115,9 @@ import {RteHelperService} from 'services/rte-helper.service';
     TopicEditorPageComponent,
     TopicEditorPageRootComponent,
     SubtopicEditorTabComponent,
+    AddStudyGuideSectionModalComponent,
+    DeleteStudyGuideSectionComponent,
+    StudyGuideSectionEditorComponent,
   ],
   entryComponents: [
     TopicEditorPageRootComponent,
@@ -131,6 +137,9 @@ import {RteHelperService} from 'services/rte-helper.service';
     TopicEditorTabComponent,
     TopicEditorPageComponent,
     SubtopicEditorTabComponent,
+    AddStudyGuideSectionModalComponent,
+    DeleteStudyGuideSectionComponent,
+    StudyGuideSectionEditorComponent,
   ],
   providers: [
     RteHelperService,
@@ -138,7 +147,7 @@ import {RteHelperService} from 'services/rte-helper.service';
     EntityCreationService,
     CreateNewSkillModalService,
     SubtopicValidationService,
-    ContextService,
+    PageContextService,
     FocusManagerService,
     ImageUploadHelperService,
     PageTitleService,

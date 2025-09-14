@@ -17,7 +17,6 @@
  */
 
 import {Component, Input} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {AppConstants} from 'app.constants';
 
 @Component({
@@ -55,10 +54,3 @@ export class ProfileLinkTextComponent {
     return ['admin', 'OppiaMigrationBot'].indexOf(username) === -1;
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'profileLinkText',
-    downgradeComponent({component: ProfileLinkTextComponent})
-  );

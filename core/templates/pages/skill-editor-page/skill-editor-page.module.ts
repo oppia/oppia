@@ -25,10 +25,7 @@ import {SkillEditorNavbarBreadcrumbComponent} from 'pages/skill-editor-page/navb
 import {DeleteMisconceptionModalComponent} from './modal-templates/delete-misconception-modal.component';
 import {SkillDescriptionEditorComponent} from './editor-tab/skill-description-editor/skill-description-editor.component';
 import {SkillPrerequisiteSkillsEditorComponent} from './editor-tab/skill-prerequisite-skills-editor/skill-prerequisite-skills-editor.component';
-import {WorkedExampleEditorComponent} from './editor-tab/skill-concept-card-editor/worked-example-editor.component';
 import {MisconceptionEditorComponent} from './editor-tab/skill-misconceptions-editor/misconception-editor.component';
-import {DeleteWorkedExampleComponent} from './modal-templates/delete-worked-example-modal.component';
-import {AddWorkedExampleModalComponent} from './modal-templates/add-worked-example.component';
 import {SkillRubricsEditorComponent} from './editor-tab/skill-rubrics-editor/skill-rubrics-editor.component';
 import {AddMisconceptionModalComponent} from './modal-templates/add-misconception-modal.component';
 import {SkillEditorSaveModalComponent} from './modal-templates/skill-editor-save-modal.component';
@@ -41,10 +38,11 @@ import {SkillPreviewTabComponent} from './skill-preview-tab/skill-preview-tab.co
 import {SkillEditorMainTabComponent} from './editor-tab/skill-editor-main-tab.component';
 import {SkillEditorPageComponent} from './skill-editor-page.component';
 import {CUSTOM_ELEMENTS_SCHEMA, NgModule} from '@angular/core';
-import {toastrConfig} from 'pages/lightweight-oppia-root/app.module';
 import {SkillEditorAccessGuard} from './skill-editor-access.guard';
 import {SkillEditorPageRootComponent} from './skill-editor-page-root.component';
 import {SkillEditorStalenessDetectionService} from './services/skill-editor-staleness-detection.service';
+import {RteHelperService} from 'services/rte-helper.service';
+import {toastrConfig} from 'pages/oppia-root/app.module';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -71,10 +69,7 @@ import {SkillEditorStalenessDetectionService} from './services/skill-editor-stal
     SkillPrerequisiteSkillsEditorComponent,
     SkillPreviewModalComponent,
     SkillEditorSaveModalComponent,
-    WorkedExampleEditorComponent,
     MisconceptionEditorComponent,
-    AddWorkedExampleModalComponent,
-    DeleteWorkedExampleComponent,
     SkillRubricsEditorComponent,
     AddMisconceptionModalComponent,
     SkillMisconceptionsEditorComponent,
@@ -92,10 +87,7 @@ import {SkillEditorStalenessDetectionService} from './services/skill-editor-stal
     SkillPrerequisiteSkillsEditorComponent,
     SkillPreviewModalComponent,
     SkillEditorSaveModalComponent,
-    WorkedExampleEditorComponent,
     MisconceptionEditorComponent,
-    AddWorkedExampleModalComponent,
-    DeleteWorkedExampleComponent,
     SkillRubricsEditorComponent,
     AddMisconceptionModalComponent,
     SkillMisconceptionsEditorComponent,
@@ -104,6 +96,6 @@ import {SkillEditorStalenessDetectionService} from './services/skill-editor-stal
     SkillEditorMainTabComponent,
     SkillEditorPageComponent,
   ],
-  providers: [SkillEditorStalenessDetectionService],
+  providers: [SkillEditorStalenessDetectionService, RteHelperService],
 })
 export class SkillEditorPageModule {}

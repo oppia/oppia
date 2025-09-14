@@ -24,17 +24,17 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {AppConstants} from 'app.constants';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 interface HtmlSchema {
   type: 'html';
+  ui_config: object;
 }
 
 interface BindableDict {
   displayedConceptCardExplanation: string;
-  displayedWorkedExamples: string;
 }
 
 @Component({
@@ -50,13 +50,20 @@ export class ReviewMaterialEditorComponent implements OnInit {
   @Input() bindableDict!: BindableDict;
   explanationMemento!: string;
   editableExplanation!: string;
+  workedExampleLimitExceeded!: boolean;
   COMPONENT_NAME_EXPLANATION!: string;
   conceptCardExplanationEditorIsShown: boolean = false;
   HTML_SCHEMA: HtmlSchema = {
     type: 'html',
+    ui_config: {
+      rte_component_config_id: 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS',
+    },
   };
 
-  constructor(private changeDetectorRef: ChangeDetectorRef) {}
+  constructor(
+    private changeDetectorRef: ChangeDetectorRef,
+    private platformFeatureService: PlatformFeatureService
+  ) {}
 
   ngOnInit(): void {
     this.COMPONENT_NAME_EXPLANATION = AppConstants.COMPONENT_NAME_EXPLANATION;
@@ -68,14 +75,39 @@ export class ReviewMaterialEditorComponent implements OnInit {
   // Remove this function when the schema-based editor
   // is migrated to Angular 2+.
   getSchema(): HtmlSchema {
+    if (!this.isEnableWorkedexamplesRteComponentFeatureEnabled()) {
+      this.HTML_SCHEMA = {
+        type: 'html',
+        ui_config: {
+          rte_component_config_id: 'ALL_COMPONENTS',
+        },
+      };
+    }
     return this.HTML_SCHEMA;
   }
 
   updateLocalExp($event: string): void {
-    if (this.editableExplanation !== $event) {
+    if (
+      this.editableExplanation !== $event &&
+      !this.checkExtraWorkedexample($event)
+    ) {
       this.editableExplanation = $event;
       this.changeDetectorRef.detectChanges();
     }
+  }
+
+  checkExtraWorkedexample(html: string): boolean {
+    const workedexampleRegex =
+      /<oppia-noninteractive-workedexample.*?>.*?<\/oppia-noninteractive-workedexample>/g;
+    const matches = html.match(workedexampleRegex);
+
+    this.workedExampleLimitExceeded = !!(matches && matches.length > 2);
+    return this.workedExampleLimitExceeded;
+  }
+
+  isEnableWorkedexamplesRteComponentFeatureEnabled(): boolean {
+    return this.platformFeatureService.status.EnableWorkedExamplesRteComponent
+      .isEnabled;
   }
 
   openConceptCardExplanationEditor(): void {
@@ -97,10 +129,3 @@ export class ReviewMaterialEditorComponent implements OnInit {
     this.onSaveExplanation.emit(explanationObject);
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaReviewMaterialEditor',
-    downgradeComponent({component: ReviewMaterialEditorComponent})
-  );

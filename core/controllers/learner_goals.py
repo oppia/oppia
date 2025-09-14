@@ -64,7 +64,9 @@ class LearnerGoalsHandler(
     # exception below and use an 'if-else' clause inside the function
     # body to handle the different activity cases properly.
     @acl_decorators.can_access_learner_dashboard
-    def post(self, activity_type: str, topic_id: str) -> None:  # pylint: disable=unused-argument
+    def post(
+        self, activity_type: str, topic_id: str # pylint: disable=unused-argument
+    ) -> None:
         """Adds a topic to the learner's learning goals.
 
         Args:
@@ -93,7 +95,9 @@ class LearnerGoalsHandler(
     # exception below and use an 'if-else' clause inside the function
     # body to handle the different activity cases properly.
     @acl_decorators.can_access_learner_dashboard
-    def delete(self, activity_type: str, topic_id: str) -> None:  # pylint: disable=unused-argument
+    def delete(
+        self, activity_type: str, topic_id: str # pylint: disable=unused-argument
+    ) -> None:
         """Removes a topic from the learner's learning goals.
 
         Args:

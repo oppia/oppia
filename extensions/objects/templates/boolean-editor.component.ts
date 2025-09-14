@@ -18,7 +18,6 @@
 
 // The value for this editor is always editable.
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 @Component({
   selector: 'boolean-editor',
@@ -34,10 +33,3 @@ export class BooleanEditorComponent {
     this.valueChanged.emit(e);
   }
 }
-
-angular.module('oppia').directive(
-  'booleanEditor',
-  downgradeComponent({
-    component: BooleanEditorComponent,
-  }) as angular.IDirectiveFactory
-);

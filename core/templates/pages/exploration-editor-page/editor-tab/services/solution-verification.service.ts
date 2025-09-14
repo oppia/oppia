@@ -17,13 +17,12 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {
   StateEditorService,
   // eslint-disable-next-line max-len
 } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import {Interaction} from 'domain/exploration/InteractionObjectFactory';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {InteractionAnswer} from 'interactions/answer-defs';
 import {AnswerClassificationService} from 'pages/exploration-player-page/services/answer-classification.service';
 import {InteractionRulesRegistryService} from 'services/interaction-rules-registry.service';
@@ -63,9 +62,3 @@ export class SolutionVerificationService {
     return stateName !== result.outcome.dest;
   }
 }
-angular
-  .module('oppia')
-  .factory(
-    'SolutionVerificationService',
-    downgradeInjectable(SolutionVerificationService)
-  );

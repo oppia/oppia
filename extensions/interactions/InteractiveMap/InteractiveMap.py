@@ -34,7 +34,6 @@ class InteractiveMap(base.BaseInteraction):
     description: str = 'Allows learners to specify a position on a world map.'
     display_mode: str = base.DISPLAY_MODE_SUPPLEMENTAL
     is_trainable: bool = False
-    _dependency_ids: List[str] = ['ui_leaflet']
     answer_type: str = 'CoordTwoDim'
     instructions: str = 'I18N_INTERACTIONS_MAP_INSTRUCTION'
     narrow_instructions: str = 'I18N_INTERACTIONS_MAP_NARROW_INSTRUCTION'

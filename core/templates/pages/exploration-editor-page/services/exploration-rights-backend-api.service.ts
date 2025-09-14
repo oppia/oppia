@@ -16,7 +16,6 @@
  * @fileoverview Backend api service for Exploration Rights Service;
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
@@ -159,10 +158,3 @@ export class ExplorationRightsBackendApiService {
       .toPromise();
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ExplorationRightsBackendApiService',
-    downgradeInjectable(ExplorationRightsBackendApiService)
-  );

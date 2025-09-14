@@ -26,7 +26,6 @@ import {
   Output,
   QueryList,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
@@ -408,10 +407,3 @@ export class FeaturesTabComponent implements OnInit {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'adminFeaturesTab',
-    downgradeComponent({component: FeaturesTabComponent})
-  );

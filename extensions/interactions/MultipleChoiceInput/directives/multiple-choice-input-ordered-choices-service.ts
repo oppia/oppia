@@ -17,7 +17,7 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
+
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 
 export interface ChoiceWithIndex {
@@ -38,10 +38,3 @@ export class MultipleChoiceInputOrderedChoicesService {
     return this.choices;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'MultipleChoiceInputOrderedChoicesService',
-    downgradeInjectable(MultipleChoiceInputOrderedChoicesService)
-  );

@@ -17,15 +17,16 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {AppConstants} from 'app.constants';
-import {State} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 import {LearnerAnswerDetailsBackendApiService} from 'domain/statistics/learner-answer-details-backend-api.service';
 import {
   AnswerClassificationService,
   InteractionRulesService,
 } from 'pages/exploration-player-page/services/answer-classification.service';
+import {ExplorationFeaturesBackendApiService} from 'services/exploration-features-backend-api.service';
+import {PageContextService} from 'services/page-context.service';
 
 @Injectable({
   providedIn: 'root',
@@ -33,6 +34,8 @@ import {
 export class LearnerAnswerInfoService {
   constructor(
     private answerClassificationService: AnswerClassificationService,
+    private explorationFeaturesBackendApiService: ExplorationFeaturesBackendApiService,
+    private pageContextService: PageContextService,
     private learnerAnswerDetailsBackendApiService: LearnerAnswerDetailsBackendApiService
   ) {}
 
@@ -48,6 +51,7 @@ export class LearnerAnswerInfoService {
   private currentInteractionRulesService!: InteractionRulesService;
   private submittedAnswerInfoCount: number = 0;
   private canAskLearnerForAnswerInfo: boolean = false;
+  alwaysAskLearnersForAnswerDetails: boolean = false;
   private visitedStates: string[] = [];
   private probabilityIndexes = {
     // The probability that a request for explanation of the answer that is
@@ -73,12 +77,25 @@ export class LearnerAnswerInfoService {
     return (Math.floor(Math.random() * (max - min + 1)) + min) / 100;
   }
 
+  checkAlwaysAskLearnersForAnswerDetails(): void {
+    let explorationId = this.pageContextService.getExplorationId();
+    this.explorationFeaturesBackendApiService
+      .fetchExplorationFeaturesAsync(explorationId)
+      .then(featuresData => {
+        this.alwaysAskLearnersForAnswerDetails =
+          featuresData.alwaysAskLearnersForAnswerDetails;
+      });
+  }
+
+  getAlwaysAskLearnerForAnswerDetails(): boolean {
+    return this.alwaysAskLearnersForAnswerDetails;
+  }
+
   initLearnerAnswerInfoService(
     entityId: string,
     state: State,
     answer: string,
-    interactionRulesService: InteractionRulesService,
-    alwaysAskLearnerForAnswerInfo: boolean
+    interactionRulesService: InteractionRulesService
   ): void {
     this.currentEntityId = entityId;
     this.currentAnswer = answer;
@@ -115,7 +132,7 @@ export class LearnerAnswerInfoService {
       return;
     }
 
-    if (alwaysAskLearnerForAnswerInfo === true) {
+    if (this.getAlwaysAskLearnerForAnswerDetails() === true) {
       this.canAskLearnerForAnswerInfo = true;
       return;
     }
@@ -179,22 +196,16 @@ export class LearnerAnswerInfoService {
     return this.currentInteractionRulesService;
   }
 
-  getSolicitAnswerDetailsQuestion(): string {
-    var el = $('<p>');
-    el.attr('translate', 'I18N_SOLICIT_ANSWER_DETAILS_QUESTION');
-    return $('<span>').append(el).html();
+  getSolicitAnswerDetailsFeedback(): string {
+    var el = document.createElement('p');
+    el.setAttribute('translate', 'I18N_SOLICIT_ANSWER_DETAILS_FEEDBACK');
+    return el.outerHTML;
   }
 
-  getSolicitAnswerDetailsFeedback(): string {
-    var el = $('<p>');
-    el.attr('translate', 'I18N_SOLICIT_ANSWER_DETAILS_FEEDBACK');
-    return $('<span>').append(el).html();
+  getSolicitAnswerDetailsQuestion(): string {
+    var el = document.createElement('p');
+    el.setAttribute('translate', 'I18N_SOLICIT_ANSWER_DETAILS_QUESTION');
+
+    return el.outerHTML;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'LearnerAnswerInfoService',
-    downgradeInjectable(LearnerAnswerInfoService)
-  );

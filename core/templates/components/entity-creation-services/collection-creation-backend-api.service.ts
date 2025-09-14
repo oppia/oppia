@@ -16,7 +16,6 @@
  * collection_id.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
@@ -66,10 +65,3 @@ export class CollectionCreationBackendService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'CollectionCreationBackendService',
-    downgradeInjectable(CollectionCreationBackendService)
-  );

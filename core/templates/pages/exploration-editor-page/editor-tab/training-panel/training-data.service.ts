@@ -19,16 +19,15 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {GraphDataService} from 'pages/exploration-editor-page/services/graph-data.service';
 import {ResponsesService} from 'pages/exploration-editor-page/editor-tab/services/responses.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import cloneDeep from 'lodash/cloneDeep';
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {InteractionAnswer} from 'interactions/answer-defs';
-import {State} from 'domain/state/StateObjectFactory';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {State} from 'domain/state/state.model';
+import {Outcome} from 'domain/exploration/outcome.model';
 
 interface AnswerGroupData {
   answerGroupIndex: number;
@@ -270,7 +269,3 @@ export class TrainingDataService {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory('TrainingDataService', downgradeInjectable(TrainingDataService));

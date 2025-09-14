@@ -17,7 +17,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 @Injectable({
   providedIn: 'root',
@@ -36,10 +35,3 @@ export class ReviewTestEngineService {
     }
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ReviewTestEngineService',
-    downgradeInjectable(ReviewTestEngineService)
-  );

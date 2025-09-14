@@ -72,7 +72,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {ExpressionParserService} from 'expressions/expression-parser.service';
 import {
@@ -138,10 +137,3 @@ export class ExpressionEvaluatorService {
     return parsed;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ExpressionEvaluatorService',
-    downgradeInjectable(ExpressionEvaluatorService)
-  );

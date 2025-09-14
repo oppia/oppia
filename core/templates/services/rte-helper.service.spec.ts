@@ -49,6 +49,7 @@ describe('Rte Helper Service', () => {
             schema: {
               type: 'html',
               ui_config: {
+                rte_component_config_id: 'ALL_COMPONENTS',
                 hide_complex_extensions: true,
               },
             },
@@ -226,6 +227,10 @@ describe('Rte Helper Service', () => {
             name: 'tab_contents',
             description: 'The tab titles and contents.',
             schema: {
+              ui_config: {
+                rte_component_config_id: 'ALL_COMPONENTS',
+                hide_complex_extensions: true,
+              },
               type: 'custom',
               obj_type: 'ListOfTabs',
             },
@@ -318,6 +323,45 @@ describe('Rte Helper Service', () => {
         requiresFs: false,
         tooltip: 'Insert video',
         requiresInternet: true,
+      },
+      {
+        backendId: 'Workedexample',
+        customizationArgSpecs: [
+          {
+            name: 'question',
+            description: 'The question for the worked example',
+            schema: {
+              type: 'html',
+              ui_config: {
+                rte_component_config_id: 'WORKED_EXAMPLE_MODAL_COMPONENTS',
+                hide_complex_extensions: true,
+              },
+            },
+            default_value_obtainable_from_highlight: false,
+            default_value: 'Sample Question',
+          },
+          {
+            name: 'answer',
+            description: 'The answer for the worked example',
+            schema: {
+              type: 'html',
+              ui_config: {
+                rte_component_config_id: 'WORKED_EXAMPLE_MODAL_COMPONENTS',
+                hide_complex_extensions: true,
+              },
+            },
+            default_value_obtainable_from_highlight: false,
+            default_value:
+              'You have revealed the answer for the worked example.',
+          },
+        ],
+        id: 'workedexample',
+        iconDataUrl: '/rich_text_components/Workedexample/Workedexample.png',
+        isComplex: true,
+        isBlockElement: true,
+        requiresFs: false,
+        tooltip: 'Insert worked example',
+        requiresInternet: false,
       },
     ]);
   });

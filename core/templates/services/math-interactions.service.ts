@@ -17,7 +17,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import nerdamer from 'nerdamer';
 
@@ -726,10 +725,3 @@ export class MathInteractionsService {
     return unsupportedFunctions;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'MathInteractionsService',
-    downgradeInjectable(MathInteractionsService)
-  );

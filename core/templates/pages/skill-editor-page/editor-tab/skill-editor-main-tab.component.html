@@ -54,15 +54,6 @@
             </div>
             <div class="count-text">Misconceptions</div>
           </div>
-          <div class="example-count">
-            <span class="count-value" *ngIf="!hasLoadedSkill()">
-              <loading-dots></loading-dots>
-            </span>
-            <div class="count-value" *ngIf="hasLoadedSkill()">
-              {{ skill?.getConceptCard().getWorkedExamples().length }}
-            </div>
-            <div class="count-text">Worked Examples</div>
-          </div>
           <div class="create-question oppia-autofocus"
                (click)="createQuestion()"
                [oppiaFocusOn]="newQuestionBtn">
@@ -130,7 +121,6 @@
   }
 
   .skill-editor .misconception-count,
-  .skill-editor .example-count,
   .skill-editor .create-question {
     border-right: 2px solid #707070;
     display: inline-block;
@@ -196,7 +186,6 @@
     }
 
     .skill-editor .misconception-count,
-    .skill-editor .example-count,
     .skill-editor .create-question {
       height: 80px;
     }
@@ -214,7 +203,6 @@
     }
 
     .skill-editor .misconception-count,
-    .skill-editor .example-count,
     .skill-editor .create-question {
       height: auto;
     }
@@ -234,7 +222,6 @@
     }
 
     .skill-editor .misconception-count,
-    .skill-editor .example-count,
     .skill-editor .create-question {
       height: 80px;
       width: 33%;

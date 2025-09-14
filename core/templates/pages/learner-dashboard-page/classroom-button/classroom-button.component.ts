@@ -16,7 +16,6 @@
  * @fileoverview Component for classroom buttons
  */
 import {Component, Input} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 @Component({
   selector: 'oppia-classroom-button',
@@ -39,10 +38,3 @@ export class ClassroomButtonComponent {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'classroomButtonComponent',
-    downgradeComponent({component: ClassroomButtonComponent})
-  );

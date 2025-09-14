@@ -71,9 +71,11 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             self.check_function_calls['remove_is_called'] = True
         def mock_rename(_path1: str, _path2: str) -> None:
             self.check_function_calls['rename_is_called'] = True
-        def mock_url_retrieve(_url: str, filename: str) -> None:  # pylint: disable=unused-argument
+        def mock_url_retrieve( # pylint: disable=unused-argument
+            _url: str, filename: str) -> None:
             pass
-        def mock_extractall(_self: zipfile.ZipFile, path: str) -> None:  # pylint: disable=unused-argument
+        def mock_extractall( # pylint: disable=unused-argument
+            _self: zipfile.ZipFile, path: str) -> None:
             self.check_function_calls['extractall_is_called'] = True
 
         self.unzip_swap = self.swap(
@@ -159,7 +161,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
 
         def mock_url_open(_url: str) -> BinaryIO:
             self.check_function_calls['url_open_is_called'] = True
-            # The function is used as follows: utils.url_open(req).read()
+            # The function is used as follows: url_open(req).read()
             # So, the mock returns a file object as a mock so that the read
             # function can work correctly.
             file_obj = install_dependencies_json_packages.open_file(

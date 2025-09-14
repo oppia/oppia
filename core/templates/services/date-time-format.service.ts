@@ -17,7 +17,6 @@
  * since the Epoch to human-readable dates.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -114,7 +113,3 @@ export class DateTimeFormatService {
     return dayjs(date).fromNow();
   }
 }
-
-angular
-  .module('oppia')
-  .factory('DateTimeFormatService', downgradeInjectable(DateTimeFormatService));

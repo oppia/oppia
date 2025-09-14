@@ -18,7 +18,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 @Injectable({
   providedIn: 'root',
@@ -47,10 +46,3 @@ export class AdminTaskManagerService {
     AdminTaskManagerService.taskIsRunning = false;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'AdminTaskManagerService',
-    downgradeInjectable(AdminTaskManagerService)
-  );

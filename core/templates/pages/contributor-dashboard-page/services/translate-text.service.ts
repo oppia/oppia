@@ -17,7 +17,6 @@
  * fields.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 import {ImagesData} from 'services/image-local-storage.service';
 
@@ -26,7 +25,7 @@ import {TranslatableTexts} from 'domain/opportunity/translatable-texts.model';
 import {
   TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
   TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING,
-} from 'domain/exploration/WrittenTranslationObjectFactory';
+} from 'domain/exploration/written-translation.model';
 
 export interface TranslatableItem {
   translation: string | string[];
@@ -262,7 +261,3 @@ export class TranslateTextService {
       );
   }
 }
-
-angular
-  .module('oppia')
-  .factory('TranslateTextService', downgradeInjectable(TranslateTextService));

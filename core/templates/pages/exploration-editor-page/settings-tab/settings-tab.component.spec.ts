@@ -35,7 +35,7 @@ import {ExplorationDataService} from '../services/exploration-data.service';
 import {ExplorationEditsAllowedBackendApiService} from '../services/exploration-edits-allowed-backend-api.service';
 import {EditabilityService} from 'services/editability.service';
 import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {UserService} from 'services/user.service';
 import {ExplorationCategoryService} from '../services/exploration-category.service';
 import {ExplorationInitStateNameService} from '../services/exploration-init-state-name.service';
@@ -54,19 +54,18 @@ import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {SettingsTabComponent} from './settings-tab.component';
 import {UserInfo} from 'domain/user/user-info.model';
 import {ExplorationPermissions} from 'domain/exploration/exploration-permissions.model';
-import {State} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 import {MatChipInputEvent} from '@angular/material/chips';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {
   MetadataDiffData,
   VersionHistoryService,
 } from '../services/version-history.service';
-import {ExplorationMetadata} from 'domain/exploration/ExplorationMetadataObjectFactory';
-import {ParamSpecs} from 'domain/exploration/ParamSpecsObjectFactory';
-import {ParamSpecObjectFactory} from 'domain/exploration/ParamSpecObjectFactory';
+import {ExplorationMetadata} from 'domain/exploration/exploration-metadata.model';
+import {ParamSpecs} from 'domain/exploration/param-specs.model';
 import {VersionHistoryBackendApiService} from '../services/version-history-backend-api.service';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {Interaction} from 'domain/exploration/InteractionObjectFactory';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 
 describe('Settings Tab Component', () => {
@@ -75,7 +74,7 @@ describe('Settings Tab Component', () => {
   let alertsService: AlertsService;
   let changeListService: ChangeListService;
   let explorationDataService: ExplorationDataService;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let editableExplorationBackendApiService: EditableExplorationBackendApiService;
   let explorationCategoryService: ExplorationCategoryService;
   let explorationInitStateNameService: ExplorationInitStateNameService;
@@ -107,7 +106,6 @@ describe('Settings Tab Component', () => {
   let mockEventEmitterRouterService = new EventEmitter();
   let mockEventEmitteruserExplorationPermissionsService = new EventEmitter();
   let versionHistoryService: VersionHistoryService;
-  let paramSpecObjectFactory: ParamSpecObjectFactory;
   let versionHistoryBackendApiService: VersionHistoryBackendApiService;
 
   class MockChangeDetectorRef {
@@ -207,7 +205,7 @@ describe('Settings Tab Component', () => {
     ngbModal = TestBed.inject(NgbModal);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     explorationDataService = TestBed.inject(ExplorationDataService);
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     settingTabBackendApiService = TestBed.inject(SettingTabBackendApiService);
     editableExplorationBackendApiService = TestBed.inject(
       EditableExplorationBackendApiService
@@ -228,7 +226,6 @@ describe('Settings Tab Component', () => {
     userEmailPreferencesService = TestBed.inject(UserEmailPreferencesService);
     userService = TestBed.inject(UserService);
     versionHistoryService = TestBed.inject(VersionHistoryService);
-    paramSpecObjectFactory = TestBed.inject(ParamSpecObjectFactory);
     versionHistoryBackendApiService = TestBed.inject(
       VersionHistoryBackendApiService
     );
@@ -237,7 +234,9 @@ describe('Settings Tab Component', () => {
       explorationTagsService,
       'onExplorationPropertyChanged'
     ).and.returnValue(mockExplorationTagsServiceonPropertyChanged);
-    spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
+    spyOn(pageContextService, 'getExplorationId').and.returnValue(
+      explorationId
+    );
     spyOn(
       userExplorationPermissionsService,
       'getPermissionsAsync'
@@ -1359,7 +1358,7 @@ describe('Settings Tab Component', () => {
       '',
       55,
       'Introduction',
-      new ParamSpecs({}, paramSpecObjectFactory),
+      new ParamSpecs({}),
       [],
       false,
       true
@@ -1431,7 +1430,7 @@ describe('Settings Tab Component', () => {
         '',
         55,
         'Introduction',
-        new ParamSpecs({}, paramSpecObjectFactory),
+        new ParamSpecs({}),
         [],
         false,
         true

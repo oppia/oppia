@@ -16,13 +16,12 @@
  * @fileoverview Service to extract image filenames in a State.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {ContentTranslationLanguageService} from 'pages/exploration-player-page/services/content-translation-language.service';
 import {HtmlEscaperService} from 'services/html-escaper.service';
-import {State} from 'domain/state/StateObjectFactory';
-import {Skill} from 'domain/skill/SkillObjectFactory';
+import {State} from 'domain/state/state.model';
+import {Skill} from 'domain/skill/skill.model.ts';
 import {ImageClickInputCustomizationArgs} from 'interactions/customization-args-defs';
 import {EntityTranslationsService} from 'services/entity-translations.services';
 
@@ -208,12 +207,6 @@ export class ExtractImageFilenamesFromModelService {
     for (let misconception of skill.getMisconceptions()) {
       htmlList.push(misconception.getFeedback(), misconception.getNotes());
     }
-    for (let workedExample of skill.getConceptCard().getWorkedExamples()) {
-      htmlList.push(
-        workedExample.getExplanation().html,
-        workedExample.getQuestion().html
-      );
-    }
     htmlList.push(skill.getConceptCard().getExplanation().html);
     skill.getRubrics().forEach(rubric => {
       htmlList.push(...rubric.getExplanations());
@@ -235,10 +228,3 @@ export class ExtractImageFilenamesFromModelService {
   getImageFilenamesInSkill = this._getImageFilenamesInSkill;
   getImageFilenamesInState = this._getImageFilenamesInState;
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ExtractImageFilenamesFromModelService',
-    downgradeInjectable(ExtractImageFilenamesFromModelService)
-  );

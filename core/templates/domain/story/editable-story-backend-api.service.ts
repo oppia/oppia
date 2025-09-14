@@ -16,7 +16,6 @@
  * @fileoverview Service to send changes to a story to the backend.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 
@@ -309,10 +308,3 @@ export class EditableStoryBackendApiService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'EditableStoryBackendApiService',
-    downgradeInjectable(EditableStoryBackendApiService)
-  );

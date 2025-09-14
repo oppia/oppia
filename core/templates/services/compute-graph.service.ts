@@ -17,10 +17,9 @@
  * exploration.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
-import {States} from 'domain/exploration/StatesObjectFactory';
+import {States} from 'domain/exploration/states.model';
 
 export interface GraphLink {
   source: string;
@@ -148,7 +147,3 @@ export class ComputeGraphService {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory('ComputeGraphService', downgradeInjectable(ComputeGraphService));

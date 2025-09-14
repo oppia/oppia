@@ -40,7 +40,8 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         super().setUp()
 
         self.print_arr: list[str] = []
-        def mock_print(msg: str, end: str = '\n') -> None:  # pylint: disable=unused-argument
+        def mock_print( # pylint: disable=unused-argument
+            msg: str, end: str = '\n') -> None:
             self.print_arr.append(msg)
         self.print_swap = self.swap(builtins, 'print', mock_print)
 
@@ -187,7 +188,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                 return True
             if path == 'test-module.spec.js':
                 return True
-            if path == 'AppSpec.ts':
+            if path == 'ExplorationObjectFactorySpec.ts':
                 return True
             return original_os_path_exists(path)
         os_path_exists_swap = self.swap(
@@ -201,20 +202,22 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                               'home-page.component.spec.ts,'
                               'about-page.component.ts,'
                               'test-module.js,'
-                              'App.ts'])
+                              'ExplorationObjectFactory.ts'])
 
         cmd = [
             common.NODE_BIN_PATH, '--max-old-space-size=4096',
             os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
             'start', os.path.join('core', 'tests', 'karma.conf.ts'),
-            '--specs_to_run=AppSpec.ts,'
+            '--specs_to_run='
+            'ExplorationObjectFactorySpec.ts,'
             'about-page.component.spec.ts,'
             'home-page.component.spec.ts,'
             'test-module.spec.js']
         self.assertIn(cmd, self.cmd_token_list)
         self.assertTrue(self.frontend_coverage_checks_called)
         self.assertEqual(self.frontend_coverage_checks_args, [[
-            '--files_to_check=AppSpec.ts,'
+            '--files_to_check='
+            'ExplorationObjectFactorySpec.ts,'
             'about-page.component.spec.ts,'
             'home-page.component.spec.ts,'
             'test-module.spec.js'

@@ -20,13 +20,13 @@ import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {Subscription} from 'rxjs';
 import {AppConstants} from 'app.constants';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model';
 import {
   TRANSLATION_DATA_FORMAT_HTML,
   TRANSLATION_DATA_FORMAT_UNICODE,
   TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
   TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING,
-} from 'domain/exploration/WrittenTranslationObjectFactory';
+} from 'domain/exploration/written-translation.model';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
 import {Rule} from 'domain/exploration/rule.model';
 import {CkEditorCopyContentService} from 'components/ck-editor-helpers/ck-editor-copy-content.service';
@@ -42,15 +42,15 @@ import {TranslationTabActiveContentIdService} from '../services/translation-tab-
 import {TranslationTabActiveModeService} from '../services/translation-tab-active-mode.service';
 import {FormatRtePreviewPipe} from 'filters/format-rte-preview.pipe';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {ConvertToPlainTextPipe} from 'filters/string-utility-filters/convert-to-plain-text.pipe';
 import {TruncatePipe} from 'filters/string-utility-filters/truncate.pipe';
 import {WrapTextWithEllipsisPipe} from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 import {ParameterizeRuleDescriptionPipe} from 'filters/parameterize-rule-description.pipe';
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {BaseTranslatableObject} from 'interactions/rule-input-defs';
 import {Hint} from 'domain/exploration/hint-object.model';
-import {Solution} from 'domain/exploration/SolutionObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 import {TranslationLanguageService} from '../services/translation-language.service';
@@ -131,10 +131,6 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
   isVoiceoverContributionEnabled(): boolean {
     return this.platformFeatureService.status.EnableVoiceoverContribution
       .isEnabled;
-  }
-
-  isVoiceoverContributionWithAccentEnabled(): boolean {
-    return this.platformFeatureService.status.AddVoiceoverWithAccent.isEnabled;
   }
 
   getRequiredHtml(subtitledHtml: SubtitledHtml): string {

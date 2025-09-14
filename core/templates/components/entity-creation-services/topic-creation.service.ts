@@ -17,14 +17,13 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {TopicCreationBackendApiService} from 'domain/topic/topic-creation-backend-api.service';
 import {TopicsAndSkillsDashboardBackendApiService} from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {CreateNewTopicModalComponent} from 'pages/topics-and-skills-dashboard-page/modals/create-new-topic-modal.component';
 import {AlertsService} from 'services/alerts.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 
@@ -39,7 +38,7 @@ export class TopicCreationService {
     private ngbModal: NgbModal,
     private windowRef: WindowRef,
     private alertsService: AlertsService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private imageLocalStorageService: ImageLocalStorageService,
     private topicCreationBackendApiService: TopicCreationBackendApiService,
     private topicsAndSkillsDashboardBackendApiService: TopicsAndSkillsDashboardBackendApiService,
@@ -50,7 +49,7 @@ export class TopicCreationService {
     if (this.topicCreationInProgress) {
       return;
     }
-    this.contextService.setImageSaveDestinationToLocalStorage();
+    this.pageContextService.setImageSaveDestinationToLocalStorage();
     let modalRef = this.ngbModal.open(CreateNewTopicModalComponent, {
       backdrop: 'static',
       windowClass: 'create-new-topic',
@@ -82,7 +81,7 @@ export class TopicCreationService {
               this.topicsAndSkillsDashboardBackendApiService.onTopicsAndSkillsDashboardReinitialized.emit();
               this.topicCreationInProgress = false;
               this.imageLocalStorageService.flushStoredImagesData();
-              this.contextService.resetImageSaveDestination();
+              this.pageContextService.resetImageSaveDestination();
               newTab.location.href =
                 this.urlInterpolationService.interpolateUrl(
                   this.TOPIC_EDITOR_URL_TEMPLATE,
@@ -106,7 +105,3 @@ export class TopicCreationService {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory('TopicCreationService', downgradeInjectable(TopicCreationService));

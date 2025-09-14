@@ -20,7 +20,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import cloneDeep from 'lodash/cloneDeep';
 import {CollectionDomainConstants} from 'domain/collection/collection-domain.constants';
 import {Collection} from 'domain/collection/collection.model';
@@ -347,9 +346,3 @@ export class CollectionUpdateService {
     );
   }
 }
-angular
-  .module('oppia')
-  .factory(
-    'CollectionUpdateService',
-    downgradeInjectable(CollectionUpdateService)
-  );

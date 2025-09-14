@@ -77,10 +77,6 @@ var suites = {
     './core/tests/webdriverio_desktop/embedding.js'
   ],
 
-  explorationFeedbackTab: [
-    './core/tests/webdriverio_desktop/explorationFeedbackTab.js'
-  ],
-
   explorationImprovementsTab: [
     './core/tests/webdriverio_desktop/explorationImprovementsTab.js'
   ],
@@ -95,14 +91,6 @@ var suites = {
 
   explorationTranslationTab: [
     './core/tests/webdriverio_desktop/explorationTranslationTab.js'
-  ],
-
-  extensions: [
-    './core/tests/webdriverio_desktop/extensions.js'
-  ],
-
-  fileUploadExtensions: [
-    './core/tests/webdriverio_desktop/fileUploadExtensions.js'
   ],
 
   fileUploadFeatures: [
@@ -329,6 +317,9 @@ exports.config = {
         '-i', process.env.DISPLAY,
         '-g', '300',
         '-loglevel', '16',
+        // Use ultrafast preset to reduce overhead,
+        // which is crucial when testing in CI.
+        '-preset', 'ultrafast',
       ];
       const uniqueString = Math.random().toString(36).substring(2, 8);
       var name = uniqueString + '.mp4';

@@ -16,7 +16,6 @@
  * @fileoverview Service for fetching and resolving suggestions.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {
@@ -24,15 +23,14 @@ import {
   ContributorCertificateResponse,
 } from './contribution-and-review-backend-api.service';
 import {SuggestionBackendDict} from 'domain/suggestion/suggestion.model';
-import {StateBackendDict} from 'domain/state/StateObjectFactory';
+import {StateBackendDict} from 'domain/state/state.model';
 import {ImagesData} from 'services/image-local-storage.service';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {ComputeGraphService} from 'services/compute-graph.service';
-import {States} from 'domain/exploration/StatesObjectFactory';
-import {
-  ExplorationObjectFactory,
-  Exploration,
-} from 'domain/exploration/ExplorationObjectFactory';
+import {LoggerService} from 'services/contextual/logger.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {States} from 'domain/exploration/states.model';
+import {Exploration} from 'domain/exploration/exploration.model';
 
 export interface OpportunityDict {
   skill_id: string;
@@ -88,7 +86,8 @@ export class ContributionAndReviewService {
     private contributionAndReviewBackendApiService: ContributionAndReviewBackendApiService,
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private computeGraphService: ComputeGraphService,
-    private explorationObjectFactory: ExplorationObjectFactory
+    private loggerService: LoggerService,
+    private urlInterpolationService: UrlInterpolationService
   ) {}
 
   getActiveTabType(): string {
@@ -206,8 +205,10 @@ export class ContributionAndReviewService {
       )
       .then(fetchSuggestionsResponse => {
         const exploration: Exploration =
-          this.explorationObjectFactory.createFromExplorationBackendResponse(
-            explorationBackendResponse
+          Exploration.createFromExplorationBackendResponse(
+            explorationBackendResponse,
+            this.loggerService,
+            this.urlInterpolationService
           );
         const sortedTranslationSuggestions =
           this.sortTranslationSuggestionsByState(
@@ -511,10 +512,3 @@ export class ContributionAndReviewService {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ContributionAndReviewService',
-    downgradeInjectable(ContributionAndReviewService)
-  );

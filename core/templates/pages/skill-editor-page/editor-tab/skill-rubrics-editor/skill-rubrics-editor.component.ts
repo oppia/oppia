@@ -17,11 +17,10 @@
  */
 
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {Subscription} from 'rxjs';
 import {Rubric} from 'domain/skill/rubric.model';
 import {SkillUpdateService} from 'domain/skill/skill-update.service';
-import {Skill} from 'domain/skill/SkillObjectFactory';
+import {Skill} from 'domain/skill/skill.model.ts';
 import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 
@@ -92,10 +91,3 @@ export class SkillRubricsEditorComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaSkillRubricsEditor',
-  downgradeComponent({
-    component: SkillRubricsEditorComponent,
-  }) as angular.IDirectiveFactory
-);

@@ -15,7 +15,7 @@
                 (setStatusMessage)="statusMessage=$event">
   </features-tab>
 
-  <div class="oppia-tlease-coordiator-misc-tab-container" *ngIf="activeTab === TAB_ID_MISC">
+  <div class="oppia-release-coordiator-misc-tab-container e2e-test-release-coordiator-misc-tab-container" *ngIf="activeTab === TAB_ID_MISC">
     <div *ngIf="!isPageFullyLoaded">
       <oppia-loading-message [message]="loadingMessage"></oppia-loading-message>
     </div>
@@ -68,6 +68,7 @@
         <mat-divider></mat-divider>
         <div class="oppia-action-buttons-container">
           <button mat-raised-button
+                  class="e2e-test-release-coordinator-promo-bar-button"
                   color="primary"
                   type="submit"
                   [disabled]="!promoBarConfigForm.dirty">

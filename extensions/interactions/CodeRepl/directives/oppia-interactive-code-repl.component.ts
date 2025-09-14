@@ -29,7 +29,6 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 import {CodemirrorComponent} from '@ctrl/ngx-codemirror';
 import {Subscription} from 'rxjs';
@@ -257,9 +256,10 @@ export class InteractiveCodeReplComponent
           line: preCodeNumLines,
           ch: 0,
         },
-        angular.extend({}, markOptions, {
+        {
+          ...markOptions,
           inclusiveRight: false,
-        })
+        }
       );
 
       for (var i = 0; i < preCodeNumLines; i++) {
@@ -308,10 +308,3 @@ export class InteractiveCodeReplComponent
     this.componentSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaInteractiveCodeRepl',
-  downgradeComponent({
-    component: InteractiveCodeReplComponent,
-  }) as angular.IDirectiveFactory
-);

@@ -1130,6 +1130,114 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         self.assertNotIn(
             self.android_report_id, original_ticket_model.report_ids)
 
+    def test_reassign_ticket_ignores_removed_old_report(
+            self) -> None:
+        app_feedback_report_services.store_incoming_report_stats(
+            self.android_report_obj)
+        app_feedback_report_services.reassign_ticket(
+            self.android_report_obj, self.android_ticket_obj)
+        for i in range(1, 4):
+            temp_timestamp = (
+                self.REPORT_SUBMITTED_TIMESTAMP + datetime.timedelta(days=i))
+            report_id = self._add_current_report(
+                submitted_on=temp_timestamp, assign_ticket=False)
+            report_model = (
+                app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                    report_id))
+            report_obj = app_feedback_report_services.get_report_from_model(
+                report_model)
+            app_feedback_report_services.store_incoming_report_stats(report_obj)
+            app_feedback_report_services.reassign_ticket(
+                report_obj, self.android_ticket_obj)
+
+        new_ticket_id = (
+            app_feedback_report_models.AppFeedbackReportTicketModel.generate_id(
+                'new_ticket_name'))
+        app_feedback_report_models.AppFeedbackReportTicketModel.create(
+            new_ticket_id, 'new_ticket_name', self.PLATFORM_ANDROID,
+            None, None, self.REPORT_SUBMITTED_TIMESTAMP, [])
+        new_ticket_model = (
+            app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
+                new_ticket_id))
+        new_ticket_obj = app_feedback_report_services.get_ticket_from_model(
+            new_ticket_model)
+
+        app_feedback_report_services.reassign_ticket(
+            self.android_report_obj, new_ticket_obj)
+
+        original_ticket_model = (
+            app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
+                self.android_ticket_id))
+
+        self.assertGreater(
+            original_ticket_model.newest_report_timestamp,
+            self.android_report_obj.submitted_on_timestamp,
+            msg=(
+                'Expected the newest_report_timestamp to remain unchanged when '
+                'an older report is removed.'))
+
+    def test_reassign_ticket_retains_oldest_timestamp(
+            self) -> None:
+        app_feedback_report_services.store_incoming_report_stats(
+            self.android_report_obj)
+        app_feedback_report_services.reassign_ticket(
+            self.android_report_obj, self.android_ticket_obj)
+
+        for i in [0, -1]:
+            temp_timestamp = (
+                self.REPORT_SUBMITTED_TIMESTAMP + datetime.timedelta(days=i))
+            report_id = self._add_current_report(
+                submitted_on=temp_timestamp, assign_ticket=False)
+            report_model = (
+                app_feedback_report_models.AppFeedbackReportModel.get_by_id(
+                    report_id))
+            report_obj = app_feedback_report_services.get_report_from_model(
+                report_model)
+            app_feedback_report_services.store_incoming_report_stats(report_obj)
+            app_feedback_report_services.reassign_ticket(
+                report_obj, self.android_ticket_obj)
+
+        original_ticket_model = (
+            app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
+                self.android_ticket_id))
+        self.assertEqual(
+            original_ticket_model.newest_report_timestamp,
+            self.REPORT_SUBMITTED_TIMESTAMP)
+
+        new_ticket_id = (
+            app_feedback_report_models.AppFeedbackReportTicketModel.generate_id(
+                'new_ticket'))
+        app_feedback_report_models.AppFeedbackReportTicketModel.create(
+            new_ticket_id, 'new_ticket', self.PLATFORM_ANDROID,
+            None, None, self.REPORT_SUBMITTED_TIMESTAMP, [])
+        new_ticket_model = (
+            app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
+                new_ticket_id))
+        new_ticket_obj = app_feedback_report_services.get_ticket_from_model(
+            new_ticket_model)
+
+        app_feedback_report_services.reassign_ticket(
+            self.android_report_obj, new_ticket_obj)
+
+        updated_ticket_model = (
+            app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
+                self.android_ticket_id))
+
+        self.assertLessEqual(
+            updated_ticket_model.newest_report_timestamp,
+            self.REPORT_SUBMITTED_TIMESTAMP)
+
+        app_feedback_report_services.reassign_ticket(
+            self.android_report_obj, None)
+
+        updated_ticket_model = (
+            app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
+                self.android_ticket_id))
+
+        self.assertLessEqual(
+            updated_ticket_model.newest_report_timestamp,
+            self.REPORT_SUBMITTED_TIMESTAMP)
+
     def test_reassign_updates_new_ticket_newest_report_creation_timestamp(
             self) -> None:
         ticket_name = 'ticket_name'
@@ -1215,6 +1323,16 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             'The report is being removed from an invalid ticket id'):
             app_feedback_report_services.reassign_ticket(
                 self.android_report_obj, None)
+
+    def test_scrub_web_report_raises_exception(self) -> None:
+        mock_web_report_obj = self.android_report_obj
+        mock_web_report_obj.platform = self.PLATFORM_WEB
+
+        with self.assertRaisesRegex(
+            utils.InvalidInputException,
+            'Web report domain objects have not been defined.'):
+            app_feedback_report_services.scrub_single_app_feedback_report(
+                mock_web_report_obj, self.user_id)
 
     def test_scrub_android_report_removes_info(self) -> None:
         app_feedback_report_services.scrub_single_app_feedback_report(

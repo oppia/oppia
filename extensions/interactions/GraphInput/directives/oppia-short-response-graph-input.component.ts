@@ -21,7 +21,6 @@
  */
 
 import {Component, Input} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {GraphAnswer} from 'interactions/answer-defs';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 
@@ -48,10 +47,3 @@ export class ShortResponseGraphInput {
     ) as GraphAnswer;
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaShortResponseGraphInput',
-  downgradeComponent({
-    component: ShortResponseGraphInput,
-  }) as angular.IDirectiveFactory
-);

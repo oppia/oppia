@@ -20,11 +20,11 @@ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {SolutionEditor} from './solution-editor.component';
 import {EditabilityService} from 'services/editability.service';
-import {SolutionObjectFactory} from 'domain/exploration/SolutionObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
 import {StateCustomizationArgsService} from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
-import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import {StateSolutionService} from 'components/state-editor/state-editor-properties-services/state-solution.service';
+import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 
 class MockStateCustomizationArgsService {
   savedMemento = 'data3';
@@ -56,14 +56,12 @@ describe('Solution editor component', () => {
   let component: SolutionEditor;
   let fixture: ComponentFixture<SolutionEditor>;
   let editabilityService: EditabilityService;
-  let solutionObjectFactory: SolutionObjectFactory;
   let stateSolutionService: StateSolutionService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [SolutionEditor],
       providers: [
-        SolutionObjectFactory,
         {
           provide: EditabilityService,
           useClass: MockEditabilityService,
@@ -93,11 +91,10 @@ describe('Solution editor component', () => {
     fixture = TestBed.createComponent(SolutionEditor);
     component = fixture.componentInstance;
 
-    solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
     editabilityService = TestBed.inject(EditabilityService);
     stateSolutionService = TestBed.inject(StateSolutionService);
 
-    stateSolutionService.savedMemento = solutionObjectFactory.createNew(
+    stateSolutionService.savedMemento = Solution.createNew(
       true,
       'correct_answer',
       '<p> Hint Index 0 </p>',
@@ -114,7 +111,9 @@ describe('Solution editor component', () => {
     expect(editabilityService.isEditable).toHaveBeenCalled();
     expect(component.EXPLANATION_FORM_SCHEMA).toEqual({
       type: 'html',
-      ui_config: {},
+      ui_config: {
+        rte_component_config_id: 'ALL_COMPONENTS',
+      },
     });
   });
 
@@ -127,12 +126,7 @@ describe('Solution editor component', () => {
   });
 
   it('should save new solution', () => {
-    let solution = solutionObjectFactory.createNew(
-      true,
-      'answer',
-      'Html',
-      'XyzID'
-    );
+    let solution = Solution.createNew(true, 'answer', 'Html', 'XyzID');
     spyOn(component.saveSolution, 'emit').and.stub();
 
     component.updateNewSolution(solution);

@@ -28,7 +28,6 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {SchemaDefaultValue} from 'services/schema-default-value.service';
 
 interface StringValidatorSchema {
@@ -85,10 +84,3 @@ export class SetOfUnicodeStringEditorComponent implements OnInit {
     this.changeDetectorRef.detectChanges();
   }
 }
-
-angular.module('oppia').directive(
-  'setOfUnicodeStringEditor',
-  downgradeComponent({
-    component: SetOfUnicodeStringEditorComponent,
-  }) as angular.IDirectiveFactory
-);

@@ -122,6 +122,10 @@ class _Gae(Platform):
                 from core.storage.classroom import (
                     gae_models as classroom_models)
                 returned_models.append(classroom_models)
+            elif name == Names.CLOUD_TASK:
+                from core.storage.cloud_task import (
+                    gae_models as cloud_task_models)
+                returned_models.append(cloud_task_models)
             elif name == Names.COLLECTION:
                 from core.storage.collection import (
                     gae_models as collection_models)
@@ -273,6 +277,23 @@ class _Gae(Platform):
         """
         from core.platform.app_identity import gae_app_identity_services
         return gae_app_identity_services
+
+    @classmethod
+    def import_speech_synthesis_services(cls) -> ModuleType:
+        """Imports and returns the speech synthesis services module.
+
+        Returns:
+            module. The speech synthesis services module based on the current
+            environment.
+        """
+        if constants.EMULATOR_MODE:
+            from core.platform.speech_synthesis import (
+                dev_mode_speech_synthesis_services)
+            return dev_mode_speech_synthesis_services
+
+        from core.platform.speech_synthesis import (
+            azure_speech_synthesis_services)
+        return azure_speech_synthesis_services
 
     @classmethod
     def import_email_services(cls) -> ModuleType:
@@ -502,6 +523,15 @@ class Registry:
             module. The app_identity_services module.
         """
         return cls._get().import_app_identity_services()
+
+    @classmethod
+    def import_speech_synthesis_services(cls) -> ModuleType:
+        """Imports and returns speech synthesis services module.
+
+        Returns:
+            module. The speech synthesis services module.
+        """
+        return cls._get().import_speech_synthesis_services()
 
     @classmethod
     def import_email_services(cls) -> ModuleType:

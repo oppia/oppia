@@ -215,6 +215,25 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
                 beam_job_services.get_beam_job_runs(refresh=True),
                 beam_job_run_models)
 
+    def test_get_beam_job_runs_with_only_terminal_states_does_not_update_models(
+        self) -> None:
+        beam_job_run_models = [
+            self.create_beam_job_run_model(
+                job_state=beam_job_models.BeamJobState.DONE.value),
+            self.create_beam_job_run_model(
+                job_state=beam_job_models.BeamJobState.CANCELLED.value),
+            self.create_beam_job_run_model(
+                job_state=beam_job_models.BeamJobState.FAILED.value),
+        ]
+
+        beam_job_models.BeamJobRunModel.update_timestamps_multi(
+            beam_job_run_models)
+        beam_job_models.BeamJobRunModel.put_multi(beam_job_run_models)
+
+        result = beam_job_services.get_beam_job_runs(refresh=True)
+
+        self.assert_domains_equal_models(result, beam_job_run_models)
+
     def test_create_beam_job_run_model(self) -> None:
         model = beam_job_services.create_beam_job_run_model(
             'FooJob', dataflow_job_id='123')

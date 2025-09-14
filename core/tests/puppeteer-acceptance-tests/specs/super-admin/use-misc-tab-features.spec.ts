@@ -48,7 +48,7 @@ describe('Super Admin', function () {
     );
 
     await curriculumAdmin.navigateToCreatorDashboardPage();
-    await curriculumAdmin.navigateToExplorationEditorPage();
+    await curriculumAdmin.navigateToExplorationEditorFromCreatorDashboard();
     await curriculumAdmin.dismissWelcomeModal();
     await curriculumAdmin.createMinimalExploration(
       'Test Exploration',

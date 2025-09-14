@@ -21,11 +21,10 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {ContinueCustomizationArgs} from 'interactions/customization-args-defs';
 import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ContinueRulesService} from './continue-rules.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
@@ -46,14 +45,14 @@ export class OppiaInteractiveContinue implements OnInit {
 
   constructor(
     private continueRulesService: ContinueRulesService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private currentInteractionService: CurrentInteractionService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private interactionAttributesExtractorService: InteractionAttributesExtractorService
   ) {}
 
   ngOnInit(): void {
-    this.isInEditorMode = this.contextService.isInExplorationEditorMode();
+    this.isInEditorMode = this.pageContextService.isInExplorationEditorMode();
     const {buttonText} =
       this.interactionAttributesExtractorService.getValuesFromAttributes(
         'Continue',
@@ -87,9 +86,3 @@ export class OppiaInteractiveContinue implements OnInit {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 }
-angular.module('oppia').directive(
-  'oppiaInteractiveContinue',
-  downgradeComponent({
-    component: OppiaInteractiveContinue,
-  }) as angular.IDirectiveFactory
-);

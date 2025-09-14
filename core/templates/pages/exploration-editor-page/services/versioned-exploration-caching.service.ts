@@ -20,7 +20,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {FetchExplorationBackendResponse} from 'domain/exploration/read-only-exploration-backend-api.service';
 
 export interface VersionedExplorationData {
@@ -96,10 +95,3 @@ export class VersionedExplorationCachingService {
     this._versionedExplorationDataCache = {};
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'VersionedExplorationCachingService',
-    downgradeInjectable(VersionedExplorationCachingService)
-  );

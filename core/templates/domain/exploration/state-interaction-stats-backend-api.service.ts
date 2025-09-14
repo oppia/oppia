@@ -16,7 +16,6 @@
  * @fileoverview Backend api service for state interaction stats.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
@@ -74,10 +73,3 @@ export class StateInteractionStatsBackendApiService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'StateInteractionStatsBackendApiService',
-    downgradeInjectable(StateInteractionStatsBackendApiService)
-  );

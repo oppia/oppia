@@ -18,9 +18,8 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
-import {ExplorationMetadata} from 'domain/exploration/ExplorationMetadataObjectFactory';
-import {State} from 'domain/state/StateObjectFactory';
+import {ExplorationMetadata} from 'domain/exploration/exploration-metadata.model';
+import {State} from 'domain/state/state.model';
 import {
   EntityTranslationsService,
   LanguageCodeToEntityTranslations,
@@ -80,10 +79,3 @@ export class HistoryTabYamlConversionService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'HistoryTabYamlConversionService',
-    downgradeInjectable(HistoryTabYamlConversionService)
-  );

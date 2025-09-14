@@ -29,7 +29,6 @@ import {
   Output,
   SimpleChanges,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {Subscription} from 'rxjs';
 import {ExternalSaveService} from 'services/external-save.service';
 
@@ -106,10 +105,3 @@ export class UnicodeStringEditorComponent
     this.componentSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'unicodeStringEditor',
-  downgradeComponent({
-    component: UnicodeStringEditorComponent,
-  }) as angular.IDirectiveFactory
-);

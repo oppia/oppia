@@ -20,7 +20,6 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {ObjectFormValidityChangeEvent} from 'app-events/app-events';
 import {EventBusGroup, EventBusService} from 'app-events/event-bus.service';
 import {AppConstants} from 'app.constants';
@@ -137,10 +136,3 @@ export class NumericExpressionEditorComponent implements OnInit {
     GuppyInitializationService.interactionType = 'NumericExpressionInput';
   }
 }
-
-angular.module('oppia').directive(
-  'numericExpressionEditor',
-  downgradeComponent({
-    component: NumericExpressionEditorComponent,
-  }) as angular.IDirectiveFactory
-);

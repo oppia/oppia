@@ -17,7 +17,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {SetInputAnswer} from 'interactions/answer-defs';
 import {SetInputRuleInputs} from 'interactions/rule-input-defs';
@@ -80,7 +79,3 @@ export class SetInputRulesService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory('SetInputRulesService', downgradeInjectable(SetInputRulesService));

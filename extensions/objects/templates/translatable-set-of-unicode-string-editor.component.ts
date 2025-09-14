@@ -24,7 +24,6 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 import {TranslatableSetOfStringSchema} from './translatable-set-of-normalized-string-editor.component';
 
@@ -73,10 +72,3 @@ export class TranslatableSetOfUnicodeStringEditorComponent implements OnInit {
     return this.schema;
   }
 }
-
-angular.module('oppia').directive(
-  'translatableSetOfUnicodeStringEditor',
-  downgradeComponent({
-    component: TranslatableSetOfUnicodeStringEditorComponent,
-  }) as angular.IDirectiveFactory
-);

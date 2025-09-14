@@ -25,36 +25,17 @@
           <oppia-rte-output-display [rteString]="skill.skill_contents.explanation.html">
           </oppia-rte-output-display>
         </div>
-        <strong> Worked Examples </strong>
-        <ul>
-          <li *ngFor="let example of skill.skill_contents.worked_examples" class="worked-example-container">
-            <b> Question: </b>
-            <oppia-rte-output-display [rteString]="example.question.html">
-            </oppia-rte-output-display>
-            <div class="worked-example-explanation-section">
-              <b> Explanation: </b>
-              <oppia-rte-output-display [rteString]="example.explanation.html">
-              </oppia-rte-output-display>
-            </div>
-          </li>
-        </ul>
       </div>
     </div>
   </div>
 </div>
 <style>
-  .skill-selector-editor .worked-example-explanation-section {
-    margin-top: 1.5vh;
-  }
   .skill-selector-editor .skill-selector-item-container {
     max-height: 50vh;
     overflow-y: auto;
   }
   .skill-selector-editor .skill-explanation-container {
     padding-bottom: 10px;
-    padding-top: 5px;
-  }
-  .skill-selector-editor .worked-example-container {
     padding-top: 5px;
   }
   .skill-selector-editor .oppia-list-group-item-text {

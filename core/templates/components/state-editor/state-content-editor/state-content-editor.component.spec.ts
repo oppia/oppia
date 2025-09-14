@@ -28,6 +28,7 @@ import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {ChangeListService} from 'pages/exploration-editor-page/services/change-list.service';
 import {ExternalSaveService} from 'services/external-save.service';
 import {StateContentService} from 'components/state-editor/state-editor-properties-services/state-content.service';
+import cloneDeep from 'lodash/cloneDeep';
 
 describe('StateHintsEditorComponent', () => {
   let component: StateContentEditorComponent;
@@ -142,7 +143,7 @@ describe('StateHintsEditorComponent', () => {
 
   it('should not save changes to content when edit is cancelled', function () {
     component.ngOnInit();
-    var contentBeforeEdit = angular.copy(stateContentService.savedMemento);
+    const contentBeforeEdit = cloneDeep(stateContentService.savedMemento);
 
     stateContentService.displayed = _getContent('content', 'Test Content');
 
@@ -171,5 +172,13 @@ describe('StateHintsEditorComponent', () => {
 
     expect(component.cardHeightLimitReached).toBeTrue();
     expect(component.isCardHeightLimitReached).toHaveBeenCalled();
+  });
+
+  it('should return false if shadow preview card is not present', () => {
+    spyOn(document, 'querySelector').and.returnValue(null);
+
+    const result = component.isCardHeightLimitReached();
+
+    expect(result).toBeFalse();
   });
 });

@@ -31,6 +31,11 @@ const featuredActivityRowSelector =
   '#e2e-test-schema-based-list-editor-table-row';
 const deleteFeaturedActivityButton = '.e2e-test-delete-list-entry';
 
+const featuredActivitiesHeaderSelector = '.e2e-test-featured-activities-header';
+const feedbackMessagesHeaderSelector = '.e2e-test-feedback-messages-header';
+const explorationFeedbackTabContainerSelector =
+  '.e2e-test-exploration-feedback-card';
+
 export class Moderator extends BaseUser {
   /**
    * Function to navigate to the moderator page.
@@ -43,7 +48,9 @@ export class Moderator extends BaseUser {
    * Function to navigate to the Featured Activities tab.
    */
   async navigateToFeaturedActivitiesTab(): Promise<void> {
+    await this.expectElementToBeVisible(featuredActivitiesTab);
     await this.clickOn(featuredActivitiesTab);
+    await this.expectElementToBeVisible(featuredActivitiesHeaderSelector);
   }
 
   /**
@@ -68,6 +75,7 @@ export class Moderator extends BaseUser {
    * @param {number} commitIndex - The index of the commit to view.
    */
   private async getPropertiesOfCommit(commitIndex: number): Promise<object> {
+    await this.page.waitForSelector(commitRowSelector);
     const commitRows = await this.page.$$(commitRowSelector);
     if (commitRows.length === 0) {
       throw new Error('No recent commits found');
@@ -116,6 +124,7 @@ export class Moderator extends BaseUser {
       isCommunityOwned,
     };
   }
+
   /**
    * Function to check if a specific commit has all the expected properties.
    * @param {number} commitIndex - The index of the commit to check.
@@ -142,7 +151,24 @@ export class Moderator extends BaseUser {
   async openFeedbackTabFromLinkInExplorationTitle(
     title: string
   ): Promise<void> {
+    await this.page.waitForFunction(
+      (title: string) => {
+        const anchorElements = document.querySelectorAll('a');
+        for (const element of Array.from(anchorElements)) {
+          if (element.textContent?.trim() === title) {
+            return true;
+          }
+        }
+        return false;
+      },
+      {},
+      title
+    );
     await this.clickAndWaitForNavigation(title);
+
+    await this.expectElementToBeVisible(
+      explorationFeedbackTabContainerSelector
+    );
   }
 
   /**
@@ -238,14 +264,34 @@ export class Moderator extends BaseUser {
   async openFeedbackTabFromLinkInExplorationId(
     explorationID: string | null
   ): Promise<void> {
+    await this.page.waitForFunction(
+      (explorationID: string) => {
+        const anchorElements = document.querySelectorAll('a');
+        for (const element of Array.from(anchorElements)) {
+          if (element.textContent?.trim() === explorationID) {
+            return true;
+          }
+        }
+        return false;
+      },
+      {},
+      explorationID
+    );
     await this.clickAndWaitForNavigation(` ${explorationID} ` as string);
+
+    await this.expectElementToBeVisible(
+      explorationFeedbackTabContainerSelector
+    );
   }
 
   /**
    * Function to navigate to recent feedback messages.
    */
   async navigateToRecentFeedbackMessagesTab(): Promise<void> {
+    await this.expectElementToBeVisible(feedbackMessagesTab);
     await this.clickOn(feedbackMessagesTab);
+
+    await this.expectElementToBeVisible(feedbackMessagesHeaderSelector);
   }
 
   /**
@@ -280,10 +326,6 @@ export class Moderator extends BaseUser {
     index -= 1;
 
     await this.navigateToFeaturedActivitiesTab();
-    await this.page.waitForSelector(featuredActivityRowSelector, {
-      visible: true,
-    });
-
     const rows = await this.page.$$(featuredActivityRowSelector);
 
     if (rows.length === 0) {

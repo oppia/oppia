@@ -20,15 +20,13 @@
  * followed by the name of the arg.
  */
 
-import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
+import {Component, HostListener, Input, OnInit} from '@angular/core';
 import {ItemSelectionInputCustomizationArgs} from 'interactions/customization-args-defs';
 import {BrowserCheckerService} from 'domain/utilities/browser-checker.service';
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
 import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
 import {ItemSelectionInputRulesService} from 'interactions/ItemSelectionInput/directives/item-selection-input-rules.service';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {AudioTranslationManagerService} from 'pages/exploration-player-page/services/audio-translation-manager.service';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 import {PlayerTranscriptService} from 'pages/exploration-player-page/services/player-transcript.service';
 import {StateCard} from 'domain/state_card/state-card.model';
@@ -68,7 +66,6 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
     private currentInteractionService: CurrentInteractionService,
     private interactionAttributesExtractorService: InteractionAttributesExtractorService,
     private itemSelectionInputRulesService: ItemSelectionInputRulesService,
-    private audioTranslationManagerService: AudioTranslationManagerService,
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService
   ) {}
@@ -98,30 +95,6 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
 
     for (let i = 0; i < this.choices.length; i++) {
       this.userSelections[this.choices[i]] = false;
-    }
-
-    // Setup voiceover.
-    this.displayedCard = this.playerTranscriptService.getCard(
-      this.playerPositionService.getDisplayedCardIndex()
-    );
-    if (this.displayedCard) {
-      this.recordedVoiceovers = this.displayedCard.getRecordedVoiceovers();
-
-      // Combine labels for voiceover.
-      let combinedChoiceLabels = '';
-      for (const choiceLabel of this.choices) {
-        combinedChoiceLabels +=
-          this.audioTranslationManagerService.cleanUpHTMLforVoiceover(
-            choiceLabel
-          );
-      }
-
-      // Say the choices aloud if autoplay is enabled.
-      this.audioTranslationManagerService.setSequentialAudioTranslations(
-        this.recordedVoiceovers.getBindableVoiceovers(this.getContentId()),
-        combinedChoiceLabels,
-        this.COMPONENT_NAME_RULE_INPUT
-      );
     }
 
     this.displayCheckboxes = this.maxAllowableSelectionCount > 1;
@@ -206,6 +179,12 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
     this.currentInteractionService.updateCurrentAnswer(this.getAnswers());
   }
 
+  @HostListener('document:keydown.enter', ['$event'])
+  handleEnterKey(event: KeyboardEvent): void {
+    event.preventDefault();
+    this.submitAnswer();
+  }
+
   submitAnswer(): void {
     const answers = this.getAnswers();
     this.currentInteractionService.onSubmit(
@@ -218,10 +197,3 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
     return !this.notEnoughSelections;
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaInteractiveItemSelectionInput',
-  downgradeComponent({
-    component: InteractiveItemSelectionInputComponent,
-  }) as angular.IDirectiveFactory
-);

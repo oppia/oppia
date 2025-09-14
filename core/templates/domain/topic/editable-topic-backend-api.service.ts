@@ -18,7 +18,6 @@
 
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {AppConstants} from 'app.constants';
 import {BackendChangeObject} from 'domain/editor/undo_redo/change.model';
@@ -30,6 +29,7 @@ import {SubtopicPageBackendDict} from 'domain/topic/subtopic-page.model';
 import {TopicBackendDict} from 'domain/topic/topic-object.model';
 import {TopicDomainConstants} from 'domain/topic/topic-domain.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {StudyGuideBackendDict} from './study-guide.model';
 
 interface FetchTopicBackendResponse {
   topic_dict: TopicBackendDict;
@@ -73,6 +73,10 @@ interface FetchStoriesBackendResponse {
 
 interface FetchSubtopicPageBackendResponse {
   subtopic_page: SubtopicPageBackendDict;
+}
+
+interface FetchStudyGuideBackendResponse {
+  study_guide: StudyGuideBackendDict;
 }
 
 interface DeleteTopicBackendResponse {
@@ -140,11 +144,6 @@ export class EditableTopicBackendApiService {
       .then(
         response => {
           if (successCallback) {
-            // The response is passed as a dict with 2 fields and not as 2
-            // parameters, because the successCallback is called as the resolve
-            // callback function in $q in fetchTopic(), and according to its
-            // documentation (https://docs.angularjs.org/api/ng/service/$q),
-            // resolve or reject can have only a single parameter.
             successCallback({
               topicDict: response.topic_dict,
               groupedSkillSummaries: response.grouped_skill_summary_dicts,
@@ -224,6 +223,36 @@ export class EditableTopicBackendApiService {
       );
   }
 
+  private _fetchStudyGuide(
+    topicId: string,
+    subtopicId: number,
+    successCallback: (value: StudyGuideBackendDict) => void,
+    errorCallback: (reason: string) => void
+  ): void {
+    let studyGuideDataUrl = this.urlInterpolationService.interpolateUrl(
+      AppConstants.STUDY_GUIDE_EDITOR_DATA_URL_TEMPLATE,
+      {
+        topic_id: topicId,
+        subtopic_id: subtopicId.toString(),
+      }
+    );
+
+    this.http
+      .get<FetchStudyGuideBackendResponse>(studyGuideDataUrl)
+      .toPromise()
+      .then(
+        response => {
+          let topic = response.study_guide;
+          if (successCallback) {
+            successCallback(topic);
+          }
+        },
+        errorResponse => {
+          errorCallback(errorResponse.error);
+        }
+      );
+  }
+
   private _deleteTopic(
     topicId: string,
     successCallback: (value: number) => void,
@@ -265,6 +294,8 @@ export class EditableTopicBackendApiService {
       }
     );
 
+    // Rename topic_and_subtopic_page_change_dicts to
+    // topic_and_subtopic_change_dicts.
     let putData = {
       version: topicVersion,
       commit_message: commitMessage,
@@ -364,6 +395,15 @@ export class EditableTopicBackendApiService {
     });
   }
 
+  async fetchStudyGuideAsync(
+    topicId: string,
+    subtopicId: number
+  ): Promise<StudyGuideBackendDict> {
+    return new Promise((resolve, reject) => {
+      this._fetchStudyGuide(topicId, subtopicId, resolve, reject);
+    });
+  }
+
   /**
    * Updates a topic in the backend with the provided topic ID.
    * The changes only apply to the topic of the given version and the
@@ -448,10 +488,3 @@ export class EditableTopicBackendApiService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'EditableTopicBackendApiService',
-    downgradeInjectable(EditableTopicBackendApiService)
-  );

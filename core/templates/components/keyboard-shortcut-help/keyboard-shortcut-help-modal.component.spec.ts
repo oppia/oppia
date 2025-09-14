@@ -25,7 +25,7 @@ import {
 import {By} from '@angular/platform-browser';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {UrlService} from 'services/contextual/url.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 
 import {KeyboardShortcutHelpModalComponent} from './keyboard-shortcut-help-modal.component';
 
@@ -40,7 +40,7 @@ describe('KeyboardShortcutHelpModalComponent', () => {
   let fixture: ComponentFixture<KeyboardShortcutHelpModalComponent>;
   let ngbActiveModal: NgbActiveModal;
   let urlService: UrlService;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [KeyboardShortcutHelpModalComponent],
@@ -58,7 +58,7 @@ describe('KeyboardShortcutHelpModalComponent', () => {
     component = fixture.componentInstance;
     ngbActiveModal = TestBed.get(NgbActiveModal);
     urlService = TestBed.get(UrlService);
-    contextService = TestBed.get(ContextService);
+    pageContextService = TestBed.get(PageContextService);
   });
 
   it('should load the library page shortcut descriptions', () => {
@@ -71,7 +71,7 @@ describe('KeyboardShortcutHelpModalComponent', () => {
 
   it('should load the exploration player shortcut descriptions', () => {
     const mockExplorationPlayerPage = spyOn(
-      contextService,
+      pageContextService,
       'isInExplorationPlayerPage'
     ).and.returnValue(true);
     component.ngOnInit();

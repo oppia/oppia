@@ -34,7 +34,6 @@ import {
   ValidationErrors,
   Validator,
 } from '@angular/forms';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NumericInputValidationService} from 'interactions/NumericInput/directives/numeric-input-validation.service';
 import {NumberConversionService} from 'services/number-conversion.service';
 import {SchemaDefaultValue} from 'services/schema-default-value.service';
@@ -273,10 +272,3 @@ export class SchemaBasedFloatEditorComponent
     }
   }
 }
-
-angular.module('oppia').directive(
-  'schemaBasedFloatEditor',
-  downgradeComponent({
-    component: SchemaBasedFloatEditorComponent,
-  })
-);

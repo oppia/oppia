@@ -28,7 +28,6 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {hexbin, HexbinBin} from 'd3-hexbin';
 import {max, sum} from 'd3-array';
 import {RGBColor, rgb} from 'd3-color';
@@ -38,7 +37,7 @@ import {
   ImagePreloaderService,
 } from 'pages/exploration-player-page/services/image-preloader.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 
 import './oppia-visualization-click-hexbins.directive.css';
 
@@ -82,7 +81,7 @@ export class OppiaVisualizationClickHexbinsComponent implements OnInit {
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private imagePreloaderService: ImagePreloaderService
   ) {}
 
@@ -127,12 +126,15 @@ export class OppiaVisualizationClickHexbinsComponent implements OnInit {
       this.imagePath
     );
     const imageUrl = this.assetsBackendApiService.getImageUrlForPreview(
-      this.contextService.getEntityType(),
-      this.contextService.getEntityId(),
+      this.pageContextService.getEntityType(),
+      this.pageContextService.getEntityId(),
       this.imagePath
     );
 
-    const wrapperWidth = $('.click-hexbin-wrapper').width() || 300;
+    const wrapperEl = document.querySelector(
+      '.click-hexbin-wrapper'
+    ) as HTMLElement;
+    const wrapperWidth = wrapperEl?.offsetWidth || 300;
     const wrapperHeight =
       this.imageSize.width === 0
         ? this.imageSize.height
@@ -157,10 +159,3 @@ export class OppiaVisualizationClickHexbinsComponent implements OnInit {
     this.hexagonMesh = hexbinGenerator.mesh();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaVisualizationClickHexbins',
-  downgradeComponent({
-    component: OppiaVisualizationClickHexbinsComponent,
-  }) as angular.IDirectiveFactory
-);

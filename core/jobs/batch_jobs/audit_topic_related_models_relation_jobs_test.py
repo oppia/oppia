@@ -144,7 +144,7 @@ class ValidateTopicModelsJobTests(
                 model_property.ModelProperty(
                     topic_models.TopicModel,
                     topic_models.TopicModel.name),
-                    model_id='topic_1',
+                    topic_model,
                     target_kind='TopicRightsModel',
                     target_id='topic_1'),
         ])
@@ -180,7 +180,7 @@ class ValidateTopicModelsJobTests(
                 id_property=model_property.ModelProperty(
                     topic_models.TopicModel,
                     topic_models.TopicModel.name),
-                model_id='topic_1',
+                model=topic_model,
                 target_kind='TopicSummaryModel',
                 target_id='topic_1'),
         ])
@@ -399,14 +399,14 @@ class ValidateTopicModelsJobTests(
                 model_property.ModelProperty(
                     topic_models.TopicModel,
                     topic_models.TopicModel.name),
-                    model_id='topic_2',
+                    model=topic_model2,
                     target_kind='TopicRightsModel',
                     target_id='topic_2'),
             base_validation_errors.ModelRelationshipError(
                 model_property.ModelProperty(
                     topic_models.TopicModel,
                     topic_models.TopicModel.name),
-                    model_id='topic_3',
+                    model=topic_model3,
                     target_kind='TopicSummaryModel',
                     target_id='topic_3'),
         ])

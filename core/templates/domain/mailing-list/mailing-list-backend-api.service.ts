@@ -18,7 +18,6 @@
 
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 export interface MailingListReturnStatusData {
   status: boolean;
@@ -67,10 +66,3 @@ export class MailingListBackendApiService {
     return this._putRequestAsync('/mailinglistsubscriptionhandler', payload);
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'MailingListBackendApiService',
-    downgradeInjectable(MailingListBackendApiService)
-  );

@@ -15,7 +15,6 @@
  * @fileoverview Backend api service for fetching the learner data;
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {AppConstants} from 'app.constants';
@@ -48,10 +47,3 @@ export class LearnerViewInfoBackendApiService {
       .toPromise();
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'LearnerViewInfoBackendApiService',
-    downgradeInjectable(LearnerViewInfoBackendApiService)
-  );

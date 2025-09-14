@@ -25,7 +25,6 @@ import {
   ValidationErrors,
   Validator,
 } from '@angular/forms';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 @Component({
   selector: 'schema-based-html-editor',
@@ -87,10 +86,3 @@ export class SchemaBasedHtmlEditorComponent
     });
   }
 }
-
-angular.module('oppia').directive(
-  'schemaBasedHtmlEditor',
-  downgradeComponent({
-    component: SchemaBasedHtmlEditorComponent,
-  })
-);

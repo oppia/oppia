@@ -22,7 +22,6 @@
 
 import {ChangeDetectorRef} from '@angular/core';
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {AppConstants} from 'app.constants';
 import {GuppyInitializationService} from 'services/guppy-initialization.service';
 
@@ -100,10 +99,3 @@ export class SetOfAlgebraicIdentifierEditorComponent implements OnInit {
     }
   }
 }
-
-angular.module('oppia').directive(
-  'setOfAlgebraicIdentifierEditor',
-  downgradeComponent({
-    component: SetOfAlgebraicIdentifierEditorComponent,
-  }) as angular.IDirectiveFactory
-);

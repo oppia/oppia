@@ -19,8 +19,6 @@
 import {ItemSelectionInputRulesService} from 'interactions/ItemSelectionInput/directives/item-selection-input-rules.service';
 
 describe('Item Selection rules service', () => {
-  beforeEach(angular.mock.module('oppia'));
-
   let isirs: ItemSelectionInputRulesService;
   beforeEach(() => {
     isirs = new ItemSelectionInputRulesService();

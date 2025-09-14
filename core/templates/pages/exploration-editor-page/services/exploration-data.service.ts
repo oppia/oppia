@@ -18,10 +18,9 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
 import {ExplorationChange} from 'domain/exploration/exploration-draft.model';
-import {ExplorationBackendDict} from 'domain/exploration/ExplorationObjectFactory';
+import {ExplorationBackendDict} from 'domain/exploration/exploration.model';
 import {
   ReadOnlyExplorationBackendApiService,
   ReadOnlyExplorationBackendDict,
@@ -252,10 +251,3 @@ export class ExplorationDataService {
       );
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ExplorationDataService',
-    downgradeInjectable(ExplorationDataService)
-  );

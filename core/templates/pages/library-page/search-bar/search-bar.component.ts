@@ -21,7 +21,6 @@ import {Subject} from 'rxjs';
 import {AppConstants} from 'app.constants';
 import {EventToCodes, NavigationService} from 'services/navigation.service';
 import {Component, Input, OnDestroy, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {SearchService, SelectionDetails} from 'services/search.service';
@@ -374,10 +373,3 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaSearchBar',
-  downgradeComponent({
-    component: SearchBarComponent,
-  }) as angular.IDirectiveFactory
-);

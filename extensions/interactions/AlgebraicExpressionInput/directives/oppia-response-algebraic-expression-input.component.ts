@@ -21,7 +21,6 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 
 @Component({
@@ -42,10 +41,3 @@ export class ResponseAlgebraicExpressionInputComponent implements OnInit {
   }
 }
 require('services/html-escaper.service.ts');
-
-angular.module('oppia').directive(
-  'oppiaResponseAlgebraicExpressionInput',
-  downgradeComponent({
-    component: ResponseAlgebraicExpressionInputComponent,
-  }) as angular.IDirectiveFactory
-);

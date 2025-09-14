@@ -32,10 +32,9 @@ import {
   ElementRef,
   ViewChild,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -44,10 +43,7 @@ import {PopulateRuleContentIdsService} from 'pages/exploration-editor-page/servi
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {Rule} from 'domain/exploration/rule.model';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
-import {
-  Outcome,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {AppConstants} from 'app.constants';
 import {EditabilityService} from 'services/editability.service';
 import cloneDeep from 'lodash/cloneDeep';
@@ -100,14 +96,13 @@ export class AddAnswerGroupModalComponent
   constructor(
     private ngbActiveModal: NgbActiveModal,
     private urlInterpolationService: UrlInterpolationService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private windowRef: WindowRef,
     private eventBusService: EventBusService,
     private populateRuleContentIdsService: PopulateRuleContentIdsService,
     private stateEditorService: StateEditorService,
     private editorFirstTimeEventsService: EditorFirstTimeEventsService,
     private generateContentIdService: GenerateContentIdService,
-    private outcomeObjectFactory: OutcomeObjectFactory,
     private platformFeatureService: PlatformFeatureService,
     private editabilityService: EditabilityService
   ) {
@@ -202,7 +197,7 @@ export class AddAnswerGroupModalComponent
     var feedbackContentId = this.generateContentIdService.getNextStateId(
       AppConstants.COMPONENT_NAME_FEEDBACK
     );
-    this.tmpOutcome = this.outcomeObjectFactory.createNew(
+    this.tmpOutcome = Outcome.createNew(
       this.questionModeEnabled ? null : this.stateName,
       feedbackContentId,
       '',
@@ -225,10 +220,3 @@ export class AddAnswerGroupModalComponent
     this.eventBusGroup.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaAddAnswerGroupModalComponent',
-  downgradeComponent({
-    component: AddAnswerGroupModalComponent,
-  }) as angular.IDirectiveFactory
-);

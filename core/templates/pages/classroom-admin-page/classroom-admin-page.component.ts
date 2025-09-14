@@ -21,7 +21,7 @@ import {Component, OnInit} from '@angular/core';
 import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
 import {AlertsService} from 'services/alerts.service';
 import {AppConstants} from 'app.constants';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {
   ClassroomBackendApiService,
   ClassroomBackendDict,
@@ -66,7 +66,7 @@ export class ClassroomAdminPageComponent implements OnInit {
     private classroomAdminDataService: ClassroomAdminDataService,
     private ngbModal: NgbModal,
     private alertsService: AlertsService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private editableTopicBackendApiService: EditableTopicBackendApiService
   ) {}
 
@@ -183,7 +183,7 @@ export class ClassroomAdminPageComponent implements OnInit {
           cloneDeep(response.classroomDict)
         );
 
-        this.contextService.setCustomEntityContext(
+        this.pageContextService.setCustomEntityContext(
           AppConstants.ENTITY_TYPE.CLASSROOM,
           classroomId
         );
@@ -337,6 +337,9 @@ export class ClassroomAdminPageComponent implements OnInit {
     const classroomPublicationStatusIsChanged =
       this.tempClassroomData.getIsPublished() !==
       this.classroomData.getIsPublished();
+    const classroomDiagnosticTestStatusIsChanged =
+      this.tempClassroomData.getDiagnosticTestIsEnabled() !==
+      this.classroomData.getDiagnosticTestIsEnabled();
 
     this.classroomAdminDataService.validateClassroom(
       this.tempClassroomData,
@@ -361,7 +364,8 @@ export class ClassroomAdminPageComponent implements OnInit {
       classroomTeaserTextIsChanged ||
       classroomBannerIsChanged ||
       classroomThumbnailIsChanged ||
-      classroomPublicationStatusIsChanged
+      classroomPublicationStatusIsChanged ||
+      classroomDiagnosticTestStatusIsChanged
     ) {
       this.classroomDataIsChanged = true;
     } else {
@@ -382,6 +386,7 @@ export class ClassroomAdminPageComponent implements OnInit {
       topic_id_to_prerequisite_topic_ids:
         classroomDict.topicIdToPrerequisiteTopicIds,
       is_published: classroomDict.isPublished,
+      diagnostic_test_is_enabled: classroomDict.diagnosticTestIsEnabled,
       thumbnail_data: classroomDict.thumbnailData,
       banner_data: classroomDict.bannerData,
     };
@@ -830,6 +835,13 @@ export class ClassroomAdminPageComponent implements OnInit {
     );
   }
 
+  toggleDiagnosticTestStatus(): void {
+    this.tempClassroomData.setdiagnosticTestIsEnabled(
+      !this.tempClassroomData.getDiagnosticTestIsEnabled()
+    );
+    this.updateClassroomField();
+  }
+
   togglePublicationStatus(): void {
     this.tempClassroomData.setIsPublished(
       !this.tempClassroomData.getIsPublished()
@@ -853,6 +865,6 @@ export class ClassroomAdminPageComponent implements OnInit {
   }
 
   ngOnDestory(): void {
-    this.contextService.removeCustomEntityContext();
+    this.pageContextService.removeCustomEntityContext();
   }
 }

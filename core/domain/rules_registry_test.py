@@ -112,7 +112,9 @@ class RulesRegistryUnitTests(test_utils.GenericTestBase):
             expected_state_schema_version_to_html_field_types_to_rule_specs
         )
 
-        rules_registry.Registry._state_schema_version_to_html_field_types_to_rule_specs[41] = {}  # pylint: disable=protected-access
+        rules_registry.Registry._state_schema_version_to_html_field_types_to_rule_specs[ # pylint: disable=protected-access
+            41
+        ] = {}
         rules_registry.Registry.get_html_field_types_to_rule_specs(
             state_schema_version=41)
 
@@ -121,6 +123,6 @@ class RulesRegistryUnitTests(test_utils.GenericTestBase):
             expected_state_schema_version_to_html_field_types_to_rule_specs
         )
 
-        rules_registry.Registry._state_schema_version_to_html_field_types_to_rule_specs[41] = (  # pylint: disable=protected-access
-            specs_from_json_v41
-        )
+        rules_registry.Registry._state_schema_version_to_html_field_types_to_rule_specs[ # pylint: disable=protected-access
+            41
+        ] = specs_from_json_v41

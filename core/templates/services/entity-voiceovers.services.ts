@@ -18,7 +18,6 @@
  */
 
 import {EventEmitter, Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Voiceover} from 'domain/exploration/voiceover.model';
 import {EntityVoiceovers} from 'domain/voiceover/entity-voiceovers.model';
 import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
@@ -38,7 +37,9 @@ export class EntityVoiceoversService {
   public activeLanguageAccentCode!: string;
   public languageAccentCodeToEntityVoiceovers: LanguageAccentCodeToEntityVoiceovers =
     {};
+  public entityVoiceoversLoaded: boolean = false;
   private _voiceoversLoadedEventEmitter = new EventEmitter<void>();
+  public languageAccentCodeChangeEventEmitter = new EventEmitter<void>();
 
   constructor(private voiceoverBackendApiService: VoiceoverBackendApiService) {}
 
@@ -82,6 +83,7 @@ export class EntityVoiceoversService {
 
   async fetchEntityVoiceovers(): Promise<void> {
     return new Promise((resolve, reject) => {
+      this.entityVoiceoversLoaded = false;
       this.voiceoverBackendApiService
         .fetchEntityVoiceoversByLanguageCodeAsync(
           this.entityType,
@@ -90,11 +92,18 @@ export class EntityVoiceoversService {
           this.languageCode
         )
         .then(entityVoiceoversList => {
+          this.languageAccentCodeToEntityVoiceovers = {};
           this.createLanguageAccentCodeToEntityVoiceovers(entityVoiceoversList);
+          this.entityVoiceoversLoaded = true;
+          this.activeLanguageAccentCode = this.getLanguageAccentCodes()[0];
           this._voiceoversLoadedEventEmitter.emit();
           resolve();
         });
     });
+  }
+
+  isEntityVoiceoversLoaded(): boolean {
+    return this.entityVoiceoversLoaded;
   }
 
   getEntityVoiceoversByLanguageAccentCode(
@@ -141,14 +150,27 @@ export class EntityVoiceoversService {
     );
     for (let entityVoiceovers of allEntityVoiceovers) {
       for (let contentId in entityVoiceovers.voiceoversMapping) {
+        let voiceovers = [];
+        let manualVoiceover = entityVoiceovers.getManualVoiceover(
+          contentId
+        ) as Voiceover;
+        let automaticVoiceover = entityVoiceovers.getAutomaticVoiceover(
+          contentId
+        ) as Voiceover;
+
+        if (manualVoiceover) {
+          voiceovers.push(manualVoiceover);
+        }
+
+        if (automaticVoiceover) {
+          voiceovers.push(automaticVoiceover);
+        }
+
         if (Object.keys(contentIdToVoiceovers).indexOf(contentId) !== -1) {
-          contentIdToVoiceovers[contentId].push(
-            entityVoiceovers.getManualVoiceover(contentId) as Voiceover
-          );
+          contentIdToVoiceovers[contentId] =
+            contentIdToVoiceovers[contentId].concat(voiceovers);
         } else {
-          contentIdToVoiceovers[contentId] = [
-            entityVoiceovers.getManualVoiceover(contentId) as Voiceover,
-          ];
+          contentIdToVoiceovers[contentId] = voiceovers;
         }
       }
     }
@@ -156,14 +178,56 @@ export class EntityVoiceoversService {
     return contentIdToVoiceovers;
   }
 
+  getAllVoiceovers(): Voiceover[] {
+    let allVoiceovers: Voiceover[] = [];
+    let allContentIdsToVoiceovers = this.getAllContentIdsToVoiceovers();
+    for (let contentId in allContentIdsToVoiceovers) {
+      allVoiceovers = allVoiceovers.concat(
+        allContentIdsToVoiceovers[contentId]
+      );
+    }
+    return allVoiceovers;
+  }
+
+  markManualVoiceoverAsNeedingUpdate(contentId: string): void {
+    let allEntityVoiceovers = Object.values(
+      this.languageAccentCodeToEntityVoiceovers
+    );
+    for (let entityVoiceovers of allEntityVoiceovers) {
+      if (entityVoiceovers.getManualVoiceover(contentId)) {
+        entityVoiceovers.getManualVoiceover(contentId)?.markAsNeedingUpdate();
+      }
+    }
+  }
+
+  removeAllVoiceoversForContent(contentId: string): void {
+    let allEntityVoiceovers = Object.values(
+      this.languageAccentCodeToEntityVoiceovers
+    );
+    for (let entityVoiceovers of allEntityVoiceovers) {
+      if (entityVoiceovers.getManualVoiceover(contentId)) {
+        entityVoiceovers.removeVoiceover(contentId);
+      }
+    }
+  }
+
+  toggleManualVoiceoverByLanguageAccent(
+    languageAccentCode: string,
+    contentId: string
+  ): void {
+    let entityVoiceovers =
+      this.languageAccentCodeToEntityVoiceovers[languageAccentCode];
+    entityVoiceovers.toggleManualVoiceoverNeedsUpdate(contentId);
+
+    this.languageAccentCodeToEntityVoiceovers[languageAccentCode] =
+      entityVoiceovers;
+  }
+
   get onVoiceoverLoad(): EventEmitter<void> {
     return this._voiceoversLoadedEventEmitter;
   }
-}
 
-angular
-  .module('oppia')
-  .factory(
-    'EntityVoiceoversService',
-    downgradeInjectable(EntityVoiceoversService)
-  );
+  get onLanguageAccentCodeChange(): EventEmitter<void> {
+    return this.languageAccentCodeChangeEventEmitter;
+  }
+}

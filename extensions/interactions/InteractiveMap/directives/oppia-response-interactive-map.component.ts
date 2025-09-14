@@ -29,7 +29,6 @@ import {Component, Input, OnInit} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {icon, latLng, MapOptions, Marker, marker, tileLayer} from 'leaflet';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 @Component({
   selector: 'oppia-response-interactive-map',
@@ -101,10 +100,3 @@ export class ResponseInteractiveMapComponent implements OnInit {
     this.changeMarkerPosition(answer[0], answer[1]);
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaResponseInteractiveMap',
-  downgradeComponent({
-    component: ResponseInteractiveMapComponent,
-  })
-);

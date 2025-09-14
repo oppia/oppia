@@ -25,7 +25,7 @@ import {
   CustomizationArgsSpecsType,
   RteHelperModalComponent,
   RteComponentId,
-} from './rte-helper-modal.controller';
+} from './rte-helper-modal.component';
 import cloneDeep from 'lodash/cloneDeep';
 
 const RTE_COMPONENT_SPECS = ServicesConstants.RTE_COMPONENT_SPECS;

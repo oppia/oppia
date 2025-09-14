@@ -16,7 +16,6 @@
  * @fileoverview Backend api service for email dashboard pages.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
@@ -115,10 +114,3 @@ export class EmailDashboardBackendApiService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'EmailDashboardBackendApiService',
-    downgradeInjectable(EmailDashboardBackendApiService)
-  );

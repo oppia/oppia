@@ -21,10 +21,13 @@ from __future__ import annotations
 import contextlib
 import logging
 import pprint
+import traceback
 
 from core import feconf
 from core.domain import beam_job_services
 from core.domain import caching_services
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 from core.jobs import base_jobs
 from core.jobs import job_options
 from core.jobs.io import cache_io
@@ -134,7 +137,8 @@ def run_job(
     # does not affect the job.
     caching_services.flush_memory_caches()
 
-    # NOTE: Exceptions raised within this context are logged and suppressed.
+    # NOTE: Exceptions raised within this context are logged to the job's
+    # stderr and suppressed.
     with _job_bookkeeping_context(job_name) as run_model:
         _ = (
             job.run()
@@ -182,8 +186,12 @@ def refresh_state_of_beam_job_run_model(
         return
 
     try:
+        oppia_project_id = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.OPPIA_PROJECT_ID.value))
+        assert isinstance(oppia_project_id, str)
         job = dataflow.JobsV1Beta3Client().get_job(dataflow.GetJobRequest(
-            job_id=job_id, project_id=feconf.OPPIA_PROJECT_ID,
+            job_id=job_id, project_id=oppia_project_id,
             location=feconf.GOOGLE_APP_ENGINE_REGION))
 
     except Exception as e:
@@ -230,8 +238,12 @@ def cancel_job(beam_job_run_model: beam_job_models.BeamJobRunModel) -> None:
         raise ValueError('dataflow_job_id must not be None')
 
     try:
+        oppia_project_id = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.OPPIA_PROJECT_ID.value))
+        assert isinstance(oppia_project_id, str)
         dataflow.JobsV1Beta3Client().update_job(dataflow.UpdateJobRequest(
-            job_id=job_id, project_id=feconf.OPPIA_PROJECT_ID,
+            job_id=job_id, project_id=oppia_project_id,
             location=feconf.GOOGLE_APP_ENGINE_REGION,
             job=dataflow.Job(
                 requested_state=dataflow.JobState.JOB_STATE_CANCELLED)))
@@ -261,9 +273,9 @@ def _job_bookkeeping_context(
     try:
         yield run_model
 
-    except Exception as exception:
+    except Exception:
         run_model.latest_job_state = beam_job_models.BeamJobState.FAILED.value
-        _put_job_stderr(run_model.id, str(exception))
+        _put_job_stderr(run_model.id, traceback.format_exc())
 
     finally:
         run_model.put()

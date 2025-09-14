@@ -17,19 +17,18 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import nerdamer from 'nerdamer';
 
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {
   Warning,
-  baseInteractionValidationService,
+  BaseInteractionValidationService,
 } from 'interactions/base-interaction-validation.service';
 import {MathEquationInputCustomizationArgs} from 'extensions/interactions/customization-args-defs';
 import {MathEquationInputRulesService} from './math-equation-input-rules.service';
 import {MathInteractionsService} from 'services/math-interactions.service';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {AppConstants} from 'app.constants';
 import {AlgebraicExpressionInputRulesService} from 'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service';
 import {NumericExpressionInputRulesService} from 'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
@@ -41,7 +40,7 @@ export class MathEquationInputValidationService {
   private supportedFunctionNames = AppConstants.SUPPORTED_FUNCTION_NAMES;
 
   constructor(
-    private baseInteractionValidationServiceInstance: baseInteractionValidationService
+    private baseInteractionValidationServiceInstance: BaseInteractionValidationService
   ) {}
 
   getCustomizationArgsWarnings(
@@ -55,8 +54,7 @@ export class MathEquationInputValidationService {
         type: AppConstants.WARNING_TYPES.ERROR,
         message:
           'The number of custom letters cannot be more than ' +
-          allowedLettersLimit +
-          '.',
+          allowedLettersLimit,
       });
     }
 
@@ -170,7 +168,7 @@ export class MathEquationInputValidationService {
                 ' from Oppia response ' +
                 (i + 1) +
                 ' will never be matched because it is preceded by ' +
-                "an 'IsEquivalentTo' learner answer with a matching input.",
+                "an 'IsEquivalentTo' learner answer with a matching input",
             });
           } else if (
             currentRuleType === 'MatchesExactlyWith' &&
@@ -190,7 +188,7 @@ export class MathEquationInputValidationService {
                 (i + 1) +
                 ' will never be matched because it is preceded by ' +
                 "a 'MatchesExactlyWith' learner answer with " +
-                'a matching input.',
+                'a matching input',
             });
           }
         }
@@ -228,10 +226,3 @@ export class MathEquationInputValidationService {
     return warningsList;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'MathEquationInputValidationService',
-    downgradeInjectable(MathEquationInputValidationService)
-  );

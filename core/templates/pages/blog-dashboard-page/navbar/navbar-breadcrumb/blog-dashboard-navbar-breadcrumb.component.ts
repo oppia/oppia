@@ -17,7 +17,6 @@
  */
 
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {Subscription} from 'rxjs';
 import {BlogDashboardPageService} from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
 
@@ -57,10 +56,3 @@ export class BlogDashboardNavbarBreadcrumbComponent
     return this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaBlogDashboardNavbarBreadcrumb',
-  downgradeComponent({
-    component: BlogDashboardNavbarBreadcrumbComponent,
-  })
-);

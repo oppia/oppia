@@ -17,7 +17,6 @@
  * warning messages if the validation fails.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {AlertsService} from 'services/alerts.service';
@@ -53,7 +52,6 @@ export class ValidatorsService {
       }
       return false;
     }
-
     for (var i = 0; i < AppConstants.INVALID_NAME_CHARS.length; i++) {
       if (input.indexOf(AppConstants.INVALID_NAME_CHARS[i]) !== -1) {
         if (showWarnings) {
@@ -128,6 +126,15 @@ export class ValidatorsService {
     return true;
   }
 
+  hasValidDescription(description: string): boolean {
+    var allowDescriptionToBeBlank = false;
+    return this.isValidEntityName(
+      description,
+      false,
+      allowDescriptionToBeBlank
+    );
+  }
+
   isValidReviewMessage(input: string, showWarnings: boolean): boolean {
     if (!input) {
       return true;
@@ -143,7 +150,3 @@ export class ValidatorsService {
     return true;
   }
 }
-
-angular
-  .module('oppia')
-  .factory('ValidatorsService', downgradeInjectable(ValidatorsService));

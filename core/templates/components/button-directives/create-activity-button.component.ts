@@ -17,7 +17,6 @@
  */
 
 import {Component, OnInit, ViewEncapsulation} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {ExplorationCreationService} from 'components/entity-creation-services/exploration-creation.service';
 import {UrlService} from 'services/contextual/url.service';
@@ -115,9 +114,3 @@ export class CreateActivityButtonComponent implements OnInit {
     });
   }
 }
-angular
-  .module('oppia')
-  .directive(
-    'oppiaCreateActivityButton',
-    downgradeComponent({component: CreateActivityButtonComponent})
-  );

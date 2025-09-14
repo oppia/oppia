@@ -24,23 +24,23 @@ import {
   SecurityContext,
 } from '@angular/core';
 import {Location} from '@angular/common';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {DomSanitizer} from '@angular/platform-browser';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {Subscription} from 'rxjs';
 import {SkillMasteryBackendApiService} from 'domain/skill/skill-mastery-backend-api.service';
-import {ExplorationPlayerStateService} from 'pages/exploration-player-page/services/exploration-player-state.service';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
+import {LoaderService} from 'services/loader.service';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 import {QuestionPlayerConceptCardModalComponent} from './question-player-concept-card-modal.component';
 import {QuestionPlayerConstants} from 'components/question-directives/question-player/question-player.constants';
 import {SkillMasteryModalComponent} from './skill-mastery-modal.component';
 import {UserService} from 'services/user.service';
-import {QuestionPlayerStateService} from './services/question-player-state.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
+import {QuestionPlayerEngineService} from 'pages/exploration-player-page/services/question-player-engine.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {UrlService} from 'services/contextual/url.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 export interface QuestionData {
   linkedSkillIds: string[];
@@ -111,18 +111,20 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
   userIsLoggedIn!: boolean;
   canCreateCollections!: boolean;
   componentSubscription = new Subscription();
+  questionsLoading!: boolean;
 
   constructor(
-    private contextService: ContextService,
-    private explorationPlayerStateService: ExplorationPlayerStateService,
+    private pageContextService: PageContextService,
+    private questionPlayerEngineService: QuestionPlayerEngineService,
     private location: Location,
     private ngbModal: NgbModal,
     private playerPositionService: PlayerPositionService,
+    private loaderService: LoaderService,
     private preventPageUnloadEventService: PreventPageUnloadEventService,
-    private questionPlayerStateService: QuestionPlayerStateService,
     private skillMasteryBackendApiService: SkillMasteryBackendApiService,
     private userService: UserService,
     private windowRef: WindowRef,
+    private platformFeatureService: PlatformFeatureService,
     private _sanitizer: DomSanitizer,
     private siteAnalyticsService: SiteAnalyticsService,
     private urlService: UrlService
@@ -179,7 +181,7 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
     this.finalCorrect = this.totalScore;
     this.totalScore = Math.round((this.totalScore * 100) / totalQuestions);
     this.resultsLoaded = true;
-    this.questionPlayerStateService.resultsPageIsLoadedEventEmitter.emit(
+    this.questionPlayerEngineService.resultsPageIsLoadedEventEmitter.emit(
       this.resultsLoaded
     );
   }
@@ -543,9 +545,11 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
     this.finalCorrect = 0.0;
     this.scorePerSkillMapping = {};
     this.testIsPassed = true;
+    this.questionsLoading = true;
   }
 
   ngOnInit(): void {
+    this.loaderService.showLoadingScreen('Loading');
     {
       this.componentSubscription.add(
         this.playerPositionService.onCurrentQuestionChange.subscribe(result =>
@@ -554,18 +558,22 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
       );
 
       this.componentSubscription.add(
-        this.explorationPlayerStateService.onTotalQuestionsReceived.subscribe(
-          result => this.updateTotalQuestions(result)
+        this.questionPlayerEngineService.onTotalQuestionsReceived.subscribe(
+          result => {
+            this.updateTotalQuestions(result);
+            this.questionsLoading = false;
+            this.loaderService.hideLoadingScreen();
+          }
         )
       );
 
       this.componentSubscription.add(
-        this.questionPlayerStateService.onQuestionSessionCompleted.subscribe(
+        this.questionPlayerEngineService.onQuestionSessionCompleted.subscribe(
           result => {
             this.windowRef.nativeWindow.location.hash =
               QuestionPlayerConstants.HASH_PARAM +
               encodeURIComponent(JSON.stringify(result));
-            this.contextService.removeCustomEntityContext();
+            this.pageContextService.removeCustomEntityContext();
           }
         )
       );
@@ -612,9 +620,9 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
         this.userIsLoggedIn = userInfo.isLoggedIn();
       });
       // The initResults function is written separately since it is also
-      // called in this.$on when some external events are triggered.
+      // called in ngOnInit when some external events are triggered.
       this.initResults();
-      this.questionPlayerStateService.resultsPageIsLoadedEventEmitter.emit(
+      this.questionPlayerEngineService.resultsPageIsLoadedEventEmitter.emit(
         this.resultsLoaded
       );
       this.preventPageUnloadEventService.addListener(() => {
@@ -626,11 +634,8 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.componentSubscription.unsubscribe();
   }
-}
 
-angular.module('oppia').directive(
-  'oppiaQuestionPlayer',
-  downgradeComponent({
-    component: QuestionPlayerComponent,
-  }) as angular.IDirectiveFactory
-);
+  isNewLessonPlayerEnabled(): boolean {
+    return this.platformFeatureService.status.NewLessonPlayer.isEnabled;
+  }
+}

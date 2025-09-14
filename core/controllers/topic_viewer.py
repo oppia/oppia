@@ -30,6 +30,7 @@ from core.domain import platform_parameter_services
 from core.domain import skill_services
 from core.domain import story_fetchers
 from core.domain import topic_fetchers
+from core.domain import topic_services
 
 from typing import Dict
 
@@ -177,5 +178,39 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                     str(constants.CLASSROOM_NAME_FOR_UNATTACHED_TOPICS)
                 ) else classroom_name
             )
+        })
+        self.render_json(self.values)
+
+
+class TopicNameHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """A data handler for checking if a topic with given name exists."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'topic_name': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': constants.MAX_CHARS_IN_TOPIC_NAME
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.open_access
+    def get(self, topic_name: str) -> None:
+        """Handler that receives a topic name and checks whether
+        a topic with the same name exists.
+
+        Args:
+            topic_name: str. The topic name.
+        """
+        self.values.update({
+            'topic_name_exists': (
+                topic_services.does_topic_with_name_exist(topic_name))
         })
         self.render_json(self.values)

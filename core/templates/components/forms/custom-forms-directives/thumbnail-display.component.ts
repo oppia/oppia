@@ -18,7 +18,6 @@
 
 import {Component, Input, OnChanges, OnInit} from '@angular/core';
 import {SafeResourceUrl} from '@angular/platform-browser';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 
@@ -69,10 +68,3 @@ export class ThumbnailDisplayComponent implements OnInit, OnChanges {
     }
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaThumbnailDisplay',
-    downgradeComponent({component: ThumbnailDisplayComponent})
-  );

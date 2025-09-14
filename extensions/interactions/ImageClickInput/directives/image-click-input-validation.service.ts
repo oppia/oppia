@@ -16,16 +16,15 @@
  * @fileoverview Validator service for the interaction.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {
   Warning,
-  baseInteractionValidationService,
+  BaseInteractionValidationService,
 } from 'interactions/base-interaction-validation.service';
 import {ImageClickInputCustomizationArgs} from 'interactions/customization-args-defs';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 
 import {AppConstants} from 'app.constants';
 
@@ -34,7 +33,7 @@ import {AppConstants} from 'app.constants';
 })
 export class ImageClickInputValidationService {
   constructor(
-    private baseInteractionValidationServiceInstance: baseInteractionValidationService
+    private baseInteractionValidationServiceInstance: BaseInteractionValidationService
   ) {}
 
   getCustomizationArgsWarnings(
@@ -65,7 +64,7 @@ export class ImageClickInputValidationService {
     if (imgAndRegionArgValue.labeledRegions.length === 0) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
-        message: 'Please specify at least one region in the image.',
+        message: 'Please specify at least one region in the image',
       });
     }
 
@@ -159,17 +158,10 @@ export class ImageClickInputValidationService {
         type: AppConstants.WARNING_TYPES.ERROR,
         message:
           'Please add a learner answer to cover what should ' +
-          'happen if none of the given regions are clicked.',
+          'happen if none of the given regions are clicked',
       });
     }
 
     return warningsList;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ImageClickInputValidationService',
-    downgradeInjectable(ImageClickInputValidationService)
-  );

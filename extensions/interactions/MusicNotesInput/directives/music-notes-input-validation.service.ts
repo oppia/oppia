@@ -16,16 +16,15 @@
  * @fileoverview Validator service for the interaction.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {
   Warning,
-  baseInteractionValidationService,
+  BaseInteractionValidationService,
 } from 'interactions/base-interaction-validation.service';
 import {MusicNotesInputCustomizationArgs} from 'extensions/interactions/customization-args-defs';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {AppConstants} from 'app.constants';
 
 @Injectable({
@@ -33,7 +32,7 @@ import {AppConstants} from 'app.constants';
 })
 export class MusicNotesInputValidationService {
   constructor(
-    private baseInteractionValidationServiceInstance: baseInteractionValidationService
+    private baseInteractionValidationServiceInstance: BaseInteractionValidationService
   ) {}
 
   getCustomizationArgsWarnings(
@@ -66,7 +65,7 @@ export class MusicNotesInputValidationService {
             partialWarningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message:
-                `The rule in response group ${groupId} is invalid. ` +
+                `The rule in response group ${groupId} is invalid -- ` +
                 `${rule.inputs.a} is more than ${rule.inputs.b}`,
             });
           }
@@ -85,10 +84,3 @@ export class MusicNotesInputValidationService {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'MusicNotesInputValidationService',
-    downgradeInjectable(MusicNotesInputValidationService)
-  );

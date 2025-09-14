@@ -18,7 +18,6 @@
 
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import analyticsConstants from 'analytics-constants';
@@ -46,10 +45,3 @@ export class DeleteAccountBackendApiService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'DeleteAccountBackendApiService',
-    downgradeInjectable(DeleteAccountBackendApiService)
-  );

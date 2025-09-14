@@ -42,6 +42,7 @@ export class SelectSkillModalComponent extends ConfirmOrCancelModal {
   selectedSkillId!: string;
   allowSkillsFromOtherTopics: boolean = false;
   associatedSkillSummaries!: ShortSkillSummary[];
+  skillIdsToExclude: Set<string> = new Set<string>();
   errorMessage: string =
     'This skill is already linked to the current question.';
 
@@ -74,7 +75,11 @@ export class SelectSkillModalComponent extends ConfirmOrCancelModal {
     this.selectedSkillId = skillId;
   }
 
-  isSaveButtonEnabled(): boolean {
+  isDoneButtonDisabled(): boolean {
+    return !this.selectedSkillId || !this.isSkillAlreadyLinked();
+  }
+
+  isSkillAlreadyLinked(): boolean {
     for (let idx in this.associatedSkillSummaries) {
       if (this.associatedSkillSummaries[idx].getId() === this.selectedSkillId) {
         return false;

@@ -17,7 +17,6 @@
  */
 
 import {Component, Input, OnInit, SimpleChanges} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {animate, state, style, transition, trigger} from '@angular/animations';
@@ -434,10 +433,3 @@ export class ContributorAdminStatsTable implements OnInit {
     }
   }
 }
-
-angular.module('oppia').directive(
-  'contributorAdminDashboardPage',
-  downgradeComponent({
-    component: ContributorAdminStatsTable,
-  }) as angular.IDirectiveFactory
-);

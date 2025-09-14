@@ -38,8 +38,8 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
         super().setUp()
         process = subprocess.Popen(
             ['test'], stdout=subprocess.PIPE, encoding='utf-8')
-        def mock_popen(
-            unused_cmd: str, stdout: str, encoding: str  # pylint: disable=unused-argument
+        def mock_popen( # pylint: disable=unused-argument
+            unused_cmd: str, stdout: str, encoding: str
         ) -> subprocess.Popen[str]:  # pylint: disable=unsubscriptable-object
             return process
 
@@ -127,8 +127,8 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
         """Test that error is produced if stdout is not empty."""
         process = subprocess.Popen(
             ['echo', 'test'], stdout=subprocess.PIPE, encoding='utf-8')
-        def mock_popen_for_errors(
-            unused_cmd: str, stdout: str, encoding: str  # pylint: disable=unused-argument
+        def mock_popen_for_errors( # pylint: disable=unused-argument
+            unused_cmd: str, stdout: str, encoding: str
         ) -> subprocess.Popen[str]:  # pylint: disable=unsubscriptable-object
             return process
 
@@ -144,8 +144,8 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
             ['echo', ''], stdout=subprocess.PIPE, encoding='utf-8')
         non_empty_process = subprocess.Popen(
             ['echo', 'test'], stdout=subprocess.PIPE, encoding='utf-8')
-        def mock_popen_for_errors(
-            cmd_tokens: List[str], stdout: str, encoding: str  # pylint: disable=unused-argument
+        def mock_popen_for_errors( # pylint: disable=unused-argument
+            cmd_tokens: List[str], stdout: str, encoding: str
         ) -> subprocess.Popen[str]:
             if (
                 cmd_tokens == [
@@ -179,16 +179,15 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
                 """
                 self.call_counter = self.call_counter + 1
                 return_values = {
-                    1: 'core/templates/App.ts',
-                    2: 'core/new_directory/new_file.ts',
-                    3: ''
+                    1: 'core/new_directory/new_file.ts',
+                    2: ''
                 }
                 return return_values[self.call_counter]
 
         class MockProcess:
             stdout = MockOutput()
-        def mock_popen_for_errors(
-            unused_cmd: str, stdout: str, encoding: str  # pylint: disable=unused-argument
+        def mock_popen_for_errors( # pylint: disable=unused-argument
+            unused_cmd: str, stdout: str, encoding: str
         ) -> MockProcess:  # pylint: disable=unsubscriptable-object
             return MockProcess()
 
@@ -197,7 +196,7 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
             with self.assertRaisesRegex(SystemExit, '1'), swap_path_exists:
                 run_typescript_checks.compile_temp_strict_tsconfig(
                     run_typescript_checks.STRICT_TSCONFIG_FILEPATH,
-                    ['core/templates/App.ts', 'core/new_directory/new_file.ts']
+                    ['core/new_directory/new_file.ts']
                 )
 
     def test_config_path_when_no_arg_is_used(self) -> None:

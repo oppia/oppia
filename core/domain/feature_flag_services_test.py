@@ -317,8 +317,8 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         with swap_all_feature_flags, swap_all_feature_names_set:
             with swap_name_to_description_feature_stage_registry_dict:
                 with self.assertRaisesRegex(
-                    Exception, 'Feature flag not found: '
-                    'feature_that_does_not_exist.'
+                    Exception,
+                    'Feature flag not found: feature_that_does_not_exist.'
                 ):
                     feature_services.is_feature_flag_enabled(
                         'feature_that_does_not_exist', self.owner_id)

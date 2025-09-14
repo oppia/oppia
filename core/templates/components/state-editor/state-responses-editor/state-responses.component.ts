@@ -25,7 +25,6 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {AddAnswerGroupModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-answer-group-modal.component';
@@ -34,7 +33,7 @@ import {
   Misconception,
   MisconceptionSkillMap,
   TaggedMisconception,
-} from 'domain/skill/MisconceptionObjectFactory';
+} from 'domain/skill/misconception.model';
 import {Subscription} from 'rxjs';
 import {
   AnswerChoice,
@@ -46,13 +45,10 @@ import {ExternalSaveService} from 'services/external-save.service';
 import {StateInteractionIdService} from '../state-editor-properties-services/state-interaction-id.service';
 import {AppConstants} from 'app.constants';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {AlertsService} from 'services/alerts.service';
-import {
-  AnswerGroup,
-  AnswerGroupObjectFactory,
-} from 'domain/exploration/AnswerGroupObjectFactory';
-import {Interaction} from 'domain/exploration/InteractionObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {Rule} from 'domain/exploration/rule.model';
 import {ParameterizeRuleDescriptionPipe} from 'filters/parameterize-rule-description.pipe';
 import {ConvertToPlainTextPipe} from 'filters/string-utility-filters/convert-to-plain-text.pipe';
@@ -116,7 +112,6 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     private alertsService: AlertsService,
     private ngbModal: NgbModal,
     private generateContentIdService: GenerateContentIdService,
-    private answerGroupObjectFactory: AnswerGroupObjectFactory,
     private urlInterpolationService: UrlInterpolationService,
     private convertToPlainText: ConvertToPlainTextPipe,
     private parameterizeRuleDescription: ParameterizeRuleDescriptionPipe,
@@ -276,7 +271,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
 
         // Create a new answer group.
         this.answerGroups.push(
-          this.answerGroupObjectFactory.createNew(
+          AnswerGroup.createNew(
             [result.tmpRule],
             result.tmpOutcome,
             [],
@@ -851,10 +846,3 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaStateResponses',
-  downgradeComponent({
-    component: StateResponsesComponent,
-  }) as angular.IDirectiveFactory
-);

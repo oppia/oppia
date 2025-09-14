@@ -18,28 +18,27 @@
 
 import {TestBed} from '@angular/core/testing';
 
-import {CamelCaseToHyphensPipe} from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import {ContextService} from 'services/context.service';
+import {CamelCaseToHyphensPipe} from '../../../filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import {LoggerService} from '../../../services/contextual/logger.service';
+import {UrlInterpolationService} from '../../../domain/utilities/url-interpolation.service';
+import {PageContextService} from '../../../services/page-context.service';
 import {
   ExplorationBackendDict,
-  ExplorationObjectFactory,
-} from 'domain/exploration/ExplorationObjectFactory';
+  Exploration,
+} from '../../../domain/exploration/exploration.model';
 import {
   ExtractImageFilenamesFromModelService,
   // eslint-disable-next-line max-len
-} from 'pages/exploration-player-page/services/extract-image-filenames-from-model.service';
+} from './extract-image-filenames-from-model.service';
 
-import {
-  SkillBackendDict,
-  SkillObjectFactory,
-} from 'domain/skill/SkillObjectFactory';
+import {SkillBackendDict, Skill} from 'domain/skill/skill.model';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 
 describe('Extracting Image file names in the state service', () => {
   let eifms: ExtractImageFilenamesFromModelService;
-  let eof: ExplorationObjectFactory;
-  let sof: SkillObjectFactory;
-  let ecs: ContextService;
+  let ecs: PageContextService;
+  let loggerService: LoggerService;
+  let urlInterpolationService: UrlInterpolationService;
   let explorationDict: ExplorationBackendDict;
   let ImageFilenamesInExploration: {[x: string]: string[]};
   let skillDict: SkillBackendDict;
@@ -49,10 +48,10 @@ describe('Extracting Image file names in the state service', () => {
       imports: [HttpClientTestingModule],
       providers: [CamelCaseToHyphensPipe],
     });
-    eof = TestBed.inject(ExplorationObjectFactory);
-    ecs = TestBed.inject(ContextService);
+    ecs = TestBed.inject(PageContextService);
     eifms = TestBed.inject(ExtractImageFilenamesFromModelService);
-    sof = TestBed.inject(SkillObjectFactory);
+    loggerService = TestBed.inject(LoggerService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
     spyOn(ecs, 'getExplorationId').and.returnValue('1');
 
     explorationDict = {
@@ -70,12 +69,6 @@ describe('Extracting Image file names in the state service', () => {
           content: {
             content_id: 'content',
             html: '',
-          },
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {},
-            },
           },
           interaction: {
             id: 'Continue',
@@ -115,12 +108,6 @@ describe('Extracting Image file names in the state service', () => {
             content_id: 'content',
             html: 'Congratulations, you have finished!',
           },
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {},
-            },
-          },
           interaction: {
             id: 'EndExploration',
             default_outcome: null,
@@ -145,14 +132,6 @@ describe('Extracting Image file names in the state service', () => {
           content: {
             content_id: 'content',
             html: 'Multiple Choice',
-          },
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {},
-              feedback_1: {},
-              feedback_2: {},
-            },
           },
           interaction: {
             id: 'MultipleChoiceInput',
@@ -255,14 +234,6 @@ describe('Extracting Image file names in the state service', () => {
               '<p><oppia-noninteractive-image filepath-with-value="&amp;' +
               'quot;s4Content.png&amp;quot;">' +
               '</oppia-noninteractive-image></p>',
-          },
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {},
-              feedback_1: {},
-              feedback_2: {},
-            },
           },
           interaction: {
             id: 'ItemSelectionInput',
@@ -381,17 +352,6 @@ describe('Extracting Image file names in the state service', () => {
           content: {
             content_id: 'content',
             html: '',
-          },
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {},
-              feedback_1: {},
-              feedback_2: {},
-              feedback_3: {},
-              feedback_4: {},
-              feedback_5: {},
-            },
           },
           interaction: {
             id: 'ImageClickInput',
@@ -601,16 +561,6 @@ describe('Extracting Image file names in the state service', () => {
             content_id: 'content',
             html: '<p>Text Input Content</p>',
           },
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {},
-              feedback_1: {},
-              feedback_2: {},
-              hint_1: {},
-              solution: {},
-            },
-          },
           interaction: {
             id: 'TextInput',
             default_outcome: {
@@ -757,14 +707,6 @@ describe('Extracting Image file names in the state service', () => {
               'amp;quot;\\&amp;quot;&amp;gt;&amp;lt;/' +
               'oppia-noninteractive-image&amp;gt;&amp;quot;}]">' +
               '</oppia-noninteractive-tabs></p>',
-          },
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {},
-              feedback_1: {},
-              feedback_2: {},
-            },
           },
           interaction: {
             id: 'ItemSelectionInput',
@@ -951,48 +893,6 @@ describe('Extracting Image file names in the state service', () => {
       ],
     };
 
-    const example1 = {
-      question: {
-        html:
-          '<p><oppia-noninteractive-image alt-with-value="&amp;' +
-          'quot;f&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"' +
-          'filepath-with-value="&amp;quot;worked-example-1-question' +
-          '.png&amp;quot;"></oppia-noninteractive-image>This is a text ' +
-          'input.</p>',
-        content_id: 'worked_example_q_1',
-      },
-      explanation: {
-        html:
-          '<p><oppia-noninteractive-image alt-with-value="&amp;' +
-          'quot;f&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"' +
-          'filepath-with-value="&amp;quot;worked-example-1-explanation' +
-          '.png&amp;quot;"></oppia-noninteractive-image>This is a text ' +
-          'input.</p>',
-        content_id: 'worked_example_e_1',
-      },
-    };
-
-    const example2 = {
-      question: {
-        html:
-          '<p><oppia-noninteractive-image alt-with-value="&amp;' +
-          'quot;f&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"' +
-          'filepath-with-value="&amp;quot;worked-example-2-question' +
-          '.png&amp;quot;"></oppia-noninteractive-image>This is a text ' +
-          'input.</p>',
-        content_id: 'worked_example_q_2',
-      },
-      explanation: {
-        html:
-          '<p><oppia-noninteractive-image alt-with-value="&amp;' +
-          'quot;f&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"' +
-          'filepath-with-value="&amp;quot;worked-example-2-explanation' +
-          '.png&amp;quot;"></oppia-noninteractive-image>This is a text ' +
-          'input.</p>',
-        content_id: 'worked_example_e_2',
-      },
-    };
-
     const skillContentsDict = {
       explanation: {
         html:
@@ -1003,14 +903,9 @@ describe('Extracting Image file names in the state service', () => {
           'input.</p>',
         content_id: 'explanation',
       },
-      worked_examples: [example1, example2],
       recorded_voiceovers: {
         voiceovers_mapping: {
           explanation: {},
-          worked_example_q_1: {},
-          worked_example_e_1: {},
-          worked_example_q_2: {},
-          worked_example_e_2: {},
         },
       },
     };
@@ -1034,16 +929,16 @@ describe('Extracting Image file names in the state service', () => {
       'misconception-dict-2-notes.png',
       'misconception-dict-2-feedback.png',
       'rubric-dict-easy-explanation.png',
-      'worked-example-1-question.png',
-      'worked-example-1-explanation.png',
-      'worked-example-2-question.png',
-      'worked-example-2-explanation.png',
       'skill-concept-card-explanation.png',
     ];
   });
 
   it('should get all the filenames of the images in a state', () => {
-    let exploration = eof.createFromBackendDict(explorationDict);
+    let exploration = Exploration.createFromBackendDict(
+      explorationDict,
+      loggerService,
+      urlInterpolationService
+    );
     let states = exploration.getStates();
     let stateNames = states.getStateNames();
     stateNames.forEach(statename => {
@@ -1057,7 +952,7 @@ describe('Extracting Image file names in the state service', () => {
   });
 
   it('should get all the filenames of the images in a skill', () => {
-    let skill = sof.createFromBackendDict(skillDict);
+    let skill = Skill.createFromBackendDict(skillDict);
     let imageFilenamesInSkill = eifms.getImageFilenamesInSkill(skill).sort();
     expect(imageFilenamesInSkill).toEqual(expectedImageFilenamesInSkill.sort());
   });

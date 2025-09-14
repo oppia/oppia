@@ -26,7 +26,6 @@ import {
   ViewChild,
   ElementRef,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {InteractionDetailsCacheService} from 'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service';
@@ -42,18 +41,18 @@ import {StateEditorService} from '../state-editor-properties-services/state-edit
 import {StateInteractionIdService} from '../state-editor-properties-services/state-interaction-id.service';
 import {StateSolutionService} from '../state-editor-properties-services/state-solution.service';
 import {StateContentService} from '../state-editor-properties-services/state-content.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {
   InteractionCustomizationArgs,
   InteractionData,
 } from 'interactions/customization-args-defs';
-import {Solution} from 'domain/exploration/SolutionObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
-import {State} from 'domain/state/StateObjectFactory';
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {State} from 'domain/state/state.model';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {InteractionAnswer} from 'interactions/answer-defs';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
 
@@ -97,7 +96,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
 
   constructor(
     private alertsService: AlertsService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private editabilityService: EditabilityService,
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
     private interactionDetailsCacheService: InteractionDetailsCacheService,
@@ -145,7 +144,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
     );
     this.interactionIsDisabled =
       this.interactionId === 'EndExploration' &&
-      this.contextService.isExplorationLinkedToStory();
+      this.pageContextService.isExplorationLinkedToStory();
   }
 
   _updateAnswerChoices(): void {
@@ -358,10 +357,3 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaStateInteractionEditor',
-  downgradeComponent({
-    component: StateInteractionEditorComponent,
-  }) as angular.IDirectiveFactory
-);

@@ -17,11 +17,10 @@
  */
 
 import {Component, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 import {BrowserCheckerService} from 'domain/utilities/browser-checker.service';
 import {AttributionService} from 'services/attribution.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {UrlService} from 'services/contextual/url.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
@@ -42,7 +41,7 @@ export class AttributionGuideComponent implements OnInit {
   constructor(
     private attributionService: AttributionService,
     private browserCheckerService: BrowserCheckerService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private urlService: UrlService,
     private windowDimensionsService: WindowDimensionsService
@@ -95,14 +94,19 @@ export class AttributionGuideComponent implements OnInit {
   }
 
   getExplorationId(): string {
-    return this.contextService.getExplorationId();
+    return this.pageContextService.getExplorationId();
   }
 
   copyAttribution(className: string): void {
-    const codeDiv = document.getElementsByClassName(className)[0];
+    const codeDiv = document.getElementsByClassName(
+      className
+    )[0] as HTMLElement;
+    if (!codeDiv) {
+      return;
+    }
     const range = document.createRange();
-    range.setStartBefore((codeDiv as HTMLDivElement).firstChild as Node);
-    range.setEndAfter((codeDiv as HTMLDivElement).lastChild as Node);
+    range.setStartBefore(codeDiv.firstChild as Node);
+    range.setEndAfter(codeDiv.lastChild as Node);
     // 'getSelection()' will not return 'null' since it is not called on an
     // undisplayed <iframe>. That is why we can use '?'.
     const selection = window.getSelection();
@@ -110,14 +114,8 @@ export class AttributionGuideComponent implements OnInit {
     selection?.addRange(range);
     document.execCommand('copy');
     selection?.removeAllRanges();
-    $(codeDiv).tooltip('show');
-    setTimeout(() => $(codeDiv).tooltip('hide'), 1000);
+    codeDiv.setAttribute('title', 'Copied!');
+    codeDiv.dispatchEvent(new Event('mouseenter'));
+    setTimeout(() => codeDiv.removeAttribute('title'), 1000);
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'attributionGuide',
-    downgradeComponent({component: AttributionGuideComponent})
-  );

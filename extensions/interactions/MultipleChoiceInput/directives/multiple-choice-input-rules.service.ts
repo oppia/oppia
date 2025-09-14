@@ -17,7 +17,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {MultipleChoiceAnswer} from 'interactions/answer-defs';
 import {MultipleChoiceRuleInputs} from 'interactions/rule-input-defs';
@@ -33,10 +32,3 @@ export class MultipleChoiceInputRulesService {
     return answer === inputs.x;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'MultipleChoiceInputRulesService',
-    downgradeInjectable(MultipleChoiceInputRulesService)
-  );

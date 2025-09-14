@@ -16,16 +16,15 @@
  * @fileoverview Validator service for the interaction.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {
   Warning,
-  baseInteractionValidationService,
+  BaseInteractionValidationService,
 } from 'interactions/base-interaction-validation.service';
 import {NumericInputCustomizationArgs} from 'interactions/customization-args-defs';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 
 import {AppConstants} from 'app.constants';
 
@@ -43,7 +42,7 @@ interface Range {
 })
 export class NumericInputValidationService {
   constructor(
-    private baseInteractionValidationServiceInstance: baseInteractionValidationService
+    private baseInteractionValidationServiceInstance: BaseInteractionValidationService
   ) {}
 
   getCustomizationArgsWarnings(
@@ -108,7 +107,7 @@ export class NumericInputValidationService {
           ' from Oppia response ' +
           (answerGroupIndex + 1) +
           ', Please ensure that the second number ' +
-          'is greater than the first number.',
+          'is greater than the first number',
       });
     };
     var raiseWarningForRequireNonnegativeInput = function (
@@ -122,7 +121,7 @@ export class NumericInputValidationService {
             'Learner answer ' +
             (ruleIndex + 1) +
             ' input ' +
-            'should be greater than or equal to zero.',
+            'should be greater than or equal to zero',
         });
       }
     };
@@ -158,7 +157,7 @@ export class NumericInputValidationService {
                   'Learner answer ' +
                   (j + 1) +
                   ' upper bound of the range ' +
-                  'should be greater than or equal to zero.',
+                  'should be greater than or equal to zero',
               });
             }
             break;
@@ -190,7 +189,7 @@ export class NumericInputValidationService {
                 message:
                   'Learner answer ' +
                   (j + 1) +
-                  ' tolerance must be a positive value.',
+                  ' tolerance must be a positive value',
               });
             }
             if (
@@ -203,7 +202,7 @@ export class NumericInputValidationService {
                   'Learner answer ' +
                   (j + 1) +
                   ' Upper bound of the ' +
-                  'tolerance range should be greater than or equal to zero.',
+                  'tolerance range should be greater than or equal to zero',
               });
             }
             break;
@@ -223,8 +222,7 @@ export class NumericInputValidationService {
                 (ranges[k].ruleIndex + 1) +
                 ' from ' +
                 'response ' +
-                (ranges[k].answerGroupIndex + 1) +
-                '.',
+                (ranges[k].answerGroupIndex + 1),
             });
           }
         }
@@ -330,10 +328,3 @@ export class NumericInputValidationService {
     }
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'NumericInputValidationService',
-    downgradeInjectable(NumericInputValidationService)
-  );

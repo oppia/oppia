@@ -17,16 +17,13 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {AppConstants} from 'app.constants';
-import {Exploration} from 'domain/exploration/ExplorationObjectFactory';
-import {AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
+import {Exploration} from 'domain/exploration/exploration.model';
+import {Voiceover} from 'domain/exploration/voiceover.model';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {ComputeGraphService} from 'services/compute-graph.service';
-import {ContextService} from 'services/context.service';
-import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
-import {PlatformFeatureService} from 'services/platform-feature.service';
+import {PageContextService} from 'services/page-context.service';
 
 @Injectable({
   providedIn: 'root',
@@ -34,6 +31,7 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 export class AudioPreloaderService {
   private filenamesOfAudioCurrentlyDownloading: string[] = [];
   private filenamesOfAudioToBeDownloaded: string[] = [];
+  public contentIdsToVoiceovers: {[contentId: string]: Voiceover[]} = {};
 
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
@@ -46,11 +44,8 @@ export class AudioPreloaderService {
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
-    private audioTranslationLanguageService: AudioTranslationLanguageService,
     private computeGraphService: ComputeGraphService,
-    private contextService: ContextService,
-    private platformFeatureService: PlatformFeatureService,
-    private entityVoiceoversService: EntityVoiceoversService
+    private pageContextService: PageContextService
   ) {}
 
   init(exploration: Exploration): void {
@@ -106,13 +101,6 @@ export class AudioPreloaderService {
   }
 
   private getAudioFilenamesInBfsOrder(sourceStateName: string): string[] {
-    const languageCode =
-      this.audioTranslationLanguageService.getCurrentAudioLanguageCode();
-    // If the language code is not selected then there are no audio
-    // files available, so we directly return empty array.
-    if (languageCode === null) {
-      return [];
-    }
     const initialStateName = this.exploration.getInitialState().name;
     let bfsTraversalOfStates: string[] = [];
     if (initialStateName !== null) {
@@ -125,38 +113,22 @@ export class AudioPreloaderService {
     }
     const audioFilenamesInBfsOrder = [];
     for (const stateName of bfsTraversalOfStates) {
-      if (this.isVoiceoverContributionWithAccentEnabled()) {
-        let contentIds = this.getAllContentIdsFromState(stateName) as string[];
-
-        let contentIdsToVoiceovers =
-          this.entityVoiceoversService.getAllContentIdsToVoiceovers();
-
-        for (let contentId of contentIds) {
-          let voiceovers = contentIdsToVoiceovers[contentId];
-
-          if (voiceovers === undefined) {
-            continue;
-          }
-
-          for (let voiceover of voiceovers) {
-            let filename = voiceover.filename;
-            if (audioFilenamesInBfsOrder.indexOf(filename) === -1) {
-              audioFilenamesInBfsOrder.push(voiceover.filename);
-            }
-          }
+      let contentIds = this.getAllContentIdsFromState(stateName) as string[];
+      for (let contentId of contentIds) {
+        let voiceovers = this.contentIdsToVoiceovers[contentId];
+        if (voiceovers === undefined) {
+          continue;
         }
-      } else {
-        let allVoiceovers = this.exploration.getAllVoiceovers(languageCode);
-        for (const voiceover of allVoiceovers[stateName]) {
-          audioFilenamesInBfsOrder.push(voiceover.filename);
+
+        for (let voiceover of voiceovers) {
+          let filename = voiceover.filename;
+          if (audioFilenamesInBfsOrder.indexOf(filename) === -1) {
+            audioFilenamesInBfsOrder.push(voiceover.filename);
+          }
         }
       }
     }
     return audioFilenamesInBfsOrder;
-  }
-
-  isVoiceoverContributionWithAccentEnabled(): boolean {
-    return this.platformFeatureService.status.AddVoiceoverWithAccent.isEnabled;
   }
 
   getAllContentIdsFromState(stateName: string): string[] | undefined {
@@ -168,7 +140,7 @@ export class AudioPreloaderService {
 
   private loadAudio(audioFilename: string): void {
     this.assetsBackendApiService
-      .loadAudio(this.contextService.getExplorationId(), audioFilename)
+      .loadAudio(this.pageContextService.getExplorationId(), audioFilename)
       .then(loadedAudio => {
         const index = this.filenamesOfAudioCurrentlyDownloading.findIndex(
           filename => filename === loadedAudio.filename
@@ -196,7 +168,3 @@ export class AudioPreloaderService {
     this.filenamesOfAudioCurrentlyDownloading.length = 0;
   }
 }
-
-angular
-  .module('oppia')
-  .factory('AudioPreloaderService', downgradeInjectable(AudioPreloaderService));

@@ -18,7 +18,6 @@
  */
 
 import {EventEmitter, Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
 import {LoggerService} from 'services/contextual/logger.service';
@@ -100,10 +99,3 @@ export class TranslationLanguageService {
     return this._activeLanguageAccentChangedEventEmitter;
   }
 }
-
-angular
-  .module('oppia')
-  .service(
-    'TranslationLanguageService',
-    downgradeInjectable(TranslationLanguageService)
-  );

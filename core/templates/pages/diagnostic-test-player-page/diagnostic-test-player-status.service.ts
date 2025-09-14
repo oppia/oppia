@@ -18,7 +18,6 @@
  */
 
 import {EventEmitter, Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 @Injectable({
   providedIn: 'root',
@@ -45,10 +44,3 @@ export class DiagnosticTestPlayerStatusService {
     return this._diagnosticTestSkipQuestionEventEmitter;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'DiagnosticTestPlayerStatusService',
-    downgradeInjectable(DiagnosticTestPlayerStatusService)
-  );

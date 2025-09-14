@@ -17,7 +17,6 @@
  */
 
 import {Component} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {LibraryPageConstants} from '../library-page.constants';
 
@@ -42,10 +41,3 @@ export class LibraryFooterComponent {
       pageMode !== LibraryPageConstants.LIBRARY_PAGE_MODES.SEARCH;
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaLibraryFooter',
-  downgradeComponent({
-    component: LibraryFooterComponent,
-  }) as angular.IDirectiveFactory
-);

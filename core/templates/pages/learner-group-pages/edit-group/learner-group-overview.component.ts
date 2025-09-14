@@ -17,7 +17,6 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {LearnerGroupSyllabusBackendApiService} from 'domain/learner_group/learner-group-syllabus-backend-api.service';
 import {LearnerGroupUserInfo} from 'domain/learner_group/learner-group-user-info.model';
 import {LearnerGroupUserProgress} from 'domain/learner_group/learner-group-user-progress.model';
@@ -114,10 +113,3 @@ export class LearnerGroupOverviewComponent implements OnInit {
     return webpImageUrl;
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaLearnerGroupOverview',
-    downgradeComponent({component: LearnerGroupOverviewComponent})
-  );

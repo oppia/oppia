@@ -18,7 +18,6 @@
 
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {FeatureFlagDomainConstants} from 'domain/feature-flag/feature-flag-domain.constants';
 
@@ -52,10 +51,3 @@ export class FeatureFlagDummyBackendApiService {
     return response.is_enabled === true;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'FeatureFlagDummyBackendApiService',
-    downgradeInjectable(FeatureFlagDummyBackendApiService)
-  );

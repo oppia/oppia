@@ -17,7 +17,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {WindowRef} from './contextual/window-ref.service';
 
 @Injectable({
@@ -39,7 +38,3 @@ export class FaviconService {
       .appendChild(link);
   }
 }
-
-angular
-  .module('oppia')
-  .factory('FaviconService', downgradeInjectable(FaviconService));

@@ -17,7 +17,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {TopicsAndSkillsDashboardPageConstants} from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
 
 @Injectable({
@@ -49,7 +48,3 @@ export class SkillCreationService {
       TopicsAndSkillsDashboardPageConstants.SKILL_DESCRIPTION_STATUS_VALUES.STATUS_UNCHANGED;
   }
 }
-
-angular
-  .module('oppia')
-  .service('SkillCreationService', downgradeInjectable(SkillCreationService));

@@ -24,7 +24,7 @@ import {
   tick,
 } from '@angular/core/testing';
 import {GraphVizComponent} from './graph-viz.component';
-import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ElementRef, NO_ERRORS_SCHEMA} from '@angular/core';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {GraphDetailService} from './graph-detail.service';
 import {DeviceInfoService} from 'services/contextual/device-info.service';
@@ -148,18 +148,18 @@ describe('GraphVizComponent', () => {
     expect(component.EDGE_WIDTH_PX).toBe(graphDetailService.EDGE_WIDTH_PX);
     expect(component.selectedEdgeWeightValue).toBe(0);
     expect(component.shouldShowWrongWeightWarning).toBe(false);
-    expect(component.isMobile).toBe(false);
+    expect(component.usingMobileDevice).toBe(false);
   });
 
   it(
-    'should set isMobile to true on initailisation if device' +
+    'should set usingMobileDevice to true on initailisation if device' +
       ' used by the user is a mobile',
     () => {
       spyOn(deviceInfoService, 'isMobileDevice').and.returnValue(true);
 
       component.ngOnInit();
 
-      expect(component.isMobile).toBe(true);
+      expect(component.usingMobileDevice).toBe(true);
     }
   );
 
@@ -361,7 +361,7 @@ describe('GraphVizComponent', () => {
     component.canAddVertex = false;
     component.canDeleteVertex = false;
     component.canDeleteEdge = false;
-    component.isMobile = true;
+    component.usingMobileDevice = true;
     component.helpText = null;
 
     expect(component.state.currentMode).toBe(component._MODES.MOVE);
@@ -376,7 +376,7 @@ describe('GraphVizComponent', () => {
       mode: component._MODES.ADD_EDGE,
     });
     expect(component.state.currentMode).toBe(component._MODES.ADD_EDGE);
-    expect(component.isMobile).toBe(true);
+    expect(component.usingMobileDevice).toBe(true);
     expect(component.helpText).toBe(
       'I18N_INTERACTIONS_GRAPH_EDGE_INITIAL_HELPTEXT'
     );
@@ -392,7 +392,7 @@ describe('GraphVizComponent', () => {
       component.canAddVertex = false;
       component.canDeleteVertex = false;
       component.canDeleteEdge = false;
-      component.isMobile = true;
+      component.usingMobileDevice = true;
       component.helpText = null;
       component.state.currentMode = component._MODES.ADD_EDGE;
 
@@ -408,8 +408,8 @@ describe('GraphVizComponent', () => {
       });
       expect(component.state.currentMode).toBe(component._MODES.MOVE);
       // The help text must be displayed only if the user is using a mobile.
-      // Therefore we check that the value of isMobile is true.
-      expect(component.isMobile).toBe(true);
+      // Therefore we check that the value of usingMobileDevice is true.
+      expect(component.usingMobileDevice).toBe(true);
       expect(component.helpText).toBe(
         'I18N_INTERACTIONS_GRAPH_MOVE_INITIAL_HELPTEXT'
       );
@@ -423,7 +423,7 @@ describe('GraphVizComponent', () => {
       spyOn(component, 'initButtons').and.callThrough();
       component.canAddEdge = false;
       component.canMoveVertex = false;
-      component.isMobile = true;
+      component.usingMobileDevice = true;
       component.helpText = null;
 
       expect(component.buttons).toEqual([]);
@@ -439,24 +439,24 @@ describe('GraphVizComponent', () => {
       expect(component.state.currentMode).toBe(component._MODES.ADD_VERTEX);
       expect(component.initButtons).toHaveBeenCalled();
       // The help text must be displayed only if the user is using a mobile.
-      // Therefore we check that the value of isMobile is true.
-      expect(component.isMobile).toBe(true);
+      // Therefore we check that the value of usingMobileDevice is true.
+      expect(component.usingMobileDevice).toBe(true);
       expect(component.helpText).toBe('');
     }
   );
 
   it('should not set help text when user is not in mobile', () => {
     spyOn(component, 'initButtons').and.callThrough();
-    component.isMobile = false;
+    component.usingMobileDevice = false;
     component.helpText = null;
 
     component.init();
 
     expect(component.initButtons).toHaveBeenCalled();
     // The help text must be displayed only if the user is using a mobile.
-    // Therefore we check that the value of isMobile is false to make sure that
-    // the help text was not set.
-    expect(component.isMobile).toBe(false);
+    // Therefore we check that the value of usingMobileDevice is false
+    // to make sure that the help text was not set.
+    expect(component.usingMobileDevice).toBe(false);
     expect(component.helpText).toBe('');
   });
 
@@ -801,12 +801,158 @@ describe('GraphVizComponent', () => {
     }
   );
 
+  it('should set the hoveredVertex when focus gets on vertex', () => {
+    const index = 3;
+
+    component.onFocusVertex(index);
+
+    expect(component.state.hoveredVertex).toBe(index);
+  });
+
+  it(
+    'should call onMouseleaveVertex when focus leaves the vertex is' +
+      ' called',
+    () => {
+      const index = 3;
+      spyOn(component, 'onMouseleaveVertex');
+
+      component.onBlurVertex(index);
+
+      expect(component.onMouseleaveVertex).toHaveBeenCalledWith(index);
+    }
+  );
+
+  it('should update dot position when currentMode is 2', () => {
+    const event = new MouseEvent('mousemove', {
+      clientX: 100,
+      clientY: 100,
+    });
+
+    const dotCursorElement = document.createElement('div');
+    dotCursorElement.classList.add('oppia-cursor-for-add-node');
+    dotCursorElement.style.top = '0px';
+    dotCursorElement.style.left = '0px';
+
+    spyOn(document, 'querySelector').and.returnValue(dotCursorElement);
+
+    component.ngAfterViewInit();
+
+    component.state.currentMode = 2;
+    component.interactionIsActive = true;
+    component.dotCursorCoordinateX = 0;
+    component.dotCursorCoordinateY = 0;
+
+    const graphAreaElement = document.createElement('div');
+    graphAreaElement.classList.add('oppia-graph-viz-svg');
+    graphAreaElement.style.position = 'absolute';
+    graphAreaElement.style.left = '0px';
+    graphAreaElement.style.top = '0px';
+
+    component.graphArea = new ElementRef(graphAreaElement);
+
+    component.mousemoveGraphSVG(event);
+
+    expect(component.dotCursorCoordinateX).toBe(100);
+    expect(component.dotCursorCoordinateY).toBe(100);
+    expect(dotCursorElement.style.top).toBe(
+      component.dotCursorCoordinateY + 'px'
+    );
+    expect(dotCursorElement.style.left).toBe(
+      component.dotCursorCoordinateX + 'px'
+    );
+  });
+
+  it('should dispatch click event when button is on top of dot', () => {
+    const dotElement = document.createElement('div');
+    dotElement.classList.add('oppia-cursor-for-add-node');
+
+    const buttonElements = [
+      document.createElement('button'),
+      document.createElement('button'),
+    ];
+
+    buttonElements[0].classList.add('graph-button');
+    buttonElements[1].classList.add('graph-button');
+
+    spyOn(document, 'querySelector').and.returnValue(dotElement);
+    spyOn(document, 'querySelectorAll').and.returnValue(buttonElements);
+
+    spyOn(dotElement, 'getBoundingClientRect').and.returnValue({
+      top: 100,
+      bottom: 110,
+      left: 200,
+      right: 210,
+    });
+
+    spyOn(buttonElements[0], 'getBoundingClientRect').and.returnValue({
+      top: 90,
+      bottom: 135,
+      left: 190,
+      right: 275,
+    });
+    spyOn(buttonElements[1], 'getBoundingClientRect').and.returnValue({
+      top: 50,
+      bottom: 80,
+      left: 150,
+      right: 220,
+    });
+
+    spyOn(buttonElements[0], 'dispatchEvent');
+
+    const result = component.isButtonOnTopOfDot();
+
+    expect(result).toBe(true);
+    expect(buttonElements[0].dispatchEvent).toHaveBeenCalledWith(
+      new MouseEvent('click')
+    );
+  });
+
+  it('should return false when no button is on top of dot', () => {
+    const dotElement = document.createElement('div');
+    dotElement.classList.add('oppia-cursor-for-add-node');
+
+    const buttonElements = [
+      document.createElement('button'),
+      document.createElement('button'),
+    ];
+
+    buttonElements[0].classList.add('graph-button');
+    buttonElements[1].classList.add('graph-button');
+
+    spyOn(document, 'querySelector').and.returnValue(dotElement);
+    spyOn(document, 'querySelectorAll').and.returnValue(buttonElements);
+
+    spyOn(dotElement, 'getBoundingClientRect').and.returnValue({
+      top: 100,
+      bottom: 110,
+      left: 200,
+      right: 210,
+    });
+
+    spyOn(buttonElements[0], 'getBoundingClientRect').and.returnValue({
+      top: 50,
+      bottom: 80,
+      left: 150,
+      right: 220,
+    });
+    spyOn(buttonElements[1], 'getBoundingClientRect').and.returnValue({
+      top: 120,
+      bottom: 150,
+      left: 220,
+      right: 290,
+    });
+
+    const result = component.isButtonOnTopOfDot();
+
+    expect(result).toBe(false);
+  });
+
   it(
     'should add vertex when graph is clicked and interaction is' + ' active',
     () => {
       component.state.currentMode = component._MODES.ADD_VERTEX;
-      component.state.mouseX = 20;
-      component.state.mouseY = 20;
+      component.dotCursorCoordinateX = 20;
+      component.dotCursorCoordinateY = 20;
 
       expect(component.graph.vertices).toEqual([
         {
@@ -867,6 +1013,137 @@ describe('GraphVizComponent', () => {
       ]);
     }
   );
+
+  it(
+    'should update dotCursorCoordinateX, set style.top and style.left' +
+      ' when ArrowLeft key is pressed',
+    () => {
+      const dotCursorElement = document.createElement('div');
+      dotCursorElement.classList.add('oppia-cursor-for-add-node');
+      dotCursorElement.style.top = '0px';
+      dotCursorElement.style.left = '0px';
+      component.dotCursor = new ElementRef(dotCursorElement);
+      const dot = component.dotCursor.nativeElement;
+      component.state.currentMode = 2;
+      spyOn(component, 'isButtonOnTopOfDot').and.returnValue(false);
+
+      const event = new KeyboardEvent('keydown', {key: 'ArrowLeft'});
+      component.handleKeyDown(event);
+
+      expect(component.dotCursorCoordinateX).toBe(-10);
+      expect(dot.style.top).toBe(component.dotCursorCoordinateY + 'px');
+      expect(dot.style.left).toBe(component.dotCursorCoordinateX + 'px');
+    }
+  );
+
+  it(
+    'should update dotCursorCoordinateY, set style.top and style.left' +
+      ' when ArrowUp key is pressed',
+    () => {
+      const dotCursorElement = document.createElement('div');
+      dotCursorElement.classList.add('oppia-cursor-for-add-node');
+      dotCursorElement.style.top = '0px';
+      dotCursorElement.style.left = '0px';
+      component.dotCursor = new ElementRef(dotCursorElement);
+      const dot = component.dotCursor.nativeElement;
+      component.state.currentMode = 2;
+      spyOn(component, 'isButtonOnTopOfDot').and.returnValue(false);
+
+      const event = new KeyboardEvent('keydown', {key: 'ArrowUp'});
+      component.handleKeyDown(event);
+
+      expect(component.dotCursorCoordinateY).toBe(-10);
+      expect(dot.style.top).toBe(component.dotCursorCoordinateY + 'px');
+      expect(dot.style.left).toBe(component.dotCursorCoordinateX + 'px');
+    }
+  );
+
+  it(
+    'should update dotCursorCoordinateX, set style.top and style.left' +
+      'when ArrowRight key is pressed',
+    () => {
+      const dotCursorElement = document.createElement('div');
+      dotCursorElement.classList.add('oppia-cursor-for-add-node');
+      dotCursorElement.style.top = '0px';
+      dotCursorElement.style.left = '0px';
+      component.dotCursor = new ElementRef(dotCursorElement);
+      const dot = component.dotCursor.nativeElement;
+      component.state.currentMode = 2;
+      spyOn(component, 'isButtonOnTopOfDot').and.returnValue(false);
+
+      const event = new KeyboardEvent('keydown', {key: 'ArrowRight'});
+      component.handleKeyDown(event);
+
+      expect(component.dotCursorCoordinateX).toBe(10);
+      expect(dot.style.top).toBe(component.dotCursorCoordinateY + 'px');
+      expect(dot.style.left).toBe(component.dotCursorCoordinateX + 'px');
+    }
+  );
+
+  it(
+    'should update dotCursorCoordinateY, set style.top and style.left' +
+      ' when ArrowDown key is pressed',
+    () => {
+      const dotCursorElement = document.createElement('div');
+      dotCursorElement.classList.add('oppia-cursor-for-add-node');
+      dotCursorElement.style.top = '0px';
+      dotCursorElement.style.left = '0px';
+      component.dotCursor = new ElementRef(dotCursorElement);
+      const dot = component.dotCursor.nativeElement;
+      component.state.currentMode = 2;
+      spyOn(component, 'isButtonOnTopOfDot').and.returnValue(false);
+
+      const event = new KeyboardEvent('keydown', {key: 'ArrowDown'});
+      component.handleKeyDown(event);
+
+      expect(component.dotCursorCoordinateY).toBe(10);
+      expect(dot.style.top).toBe(component.dotCursorCoordinateY + 'px');
+      expect(dot.style.left).toBe(component.dotCursorCoordinateX + 'px');
+    }
+  );
+
+  it(
+    'should not update dotCursorCoordinateX and dotCursorCoordinateY' +
+      ' when currentMode is not 2',
+    () => {
+      const dotCursorElement = document.createElement('div');
+      dotCursorElement.classList.add('oppia-cursor-for-add-node');
+      dotCursorElement.style.top = '0px';
+      dotCursorElement.style.left = '0px';
+      component.dotCursor = new ElementRef(dotCursorElement);
+      const dot = component.dotCursor.nativeElement;
+      component.state.currentMode = 1;
+
+      const event = new KeyboardEvent('keydown', {key: 'ArrowLeft'});
+      component.handleKeyDown(event);
+
+      expect(component.dotCursorCoordinateX).toBe(0);
+      expect(component.dotCursorCoordinateY).toBe(0);
+      expect(dot.style.top).toBe(component.dotCursorCoordinateY + 'px');
+      expect(dot.style.left).toBe(component.dotCursorCoordinateX + 'px');
+    }
+  );
+
+  it('should call onClickGraphSVG when Enter key is pressed', () => {
+    const dotCursorElement = document.createElement('div');
+    dotCursorElement.classList.add('oppia-cursor-for-add-node');
+    dotCursorElement.style.top = '0px';
+    dotCursorElement.style.left = '0px';
+    component.dotCursor = new ElementRef(dotCursorElement);
+    const dot = component.dotCursor.nativeElement;
+    component.state.currentMode = 2;
+
+    const event = new KeyboardEvent('keydown', {key: 'Enter'});
+    spyOn(component, 'onClickGraphSVG');
+
+    component.handleKeyDown(event);
+
+    expect(component.dotCursorCoordinateX).toBe(0);
+    expect(component.dotCursorCoordinateY).toBe(0);
+    expect(dot.style.top).toBe(component.dotCursorCoordinateY + 'px');
+    expect(dot.style.left).toBe(component.dotCursorCoordinateX + 'px');
+    expect(component.onClickGraphSVG).toHaveBeenCalled();
+  });
 
   it(
     'should not add vertex when the user is not allowed to add a' + ' vertex',
@@ -1146,7 +1423,7 @@ describe('GraphVizComponent', () => {
 
   it('should set helkp text for move button if user is using a mobile', () => {
     spyOn(Event.prototype, 'preventDefault');
-    component.isMobile = true;
+    component.usingMobileDevice = true;
 
     expect(component.helpText).toBe('');
 
@@ -1194,7 +1471,7 @@ describe('GraphVizComponent', () => {
 
   it('should set help text for add edge button if user is using mobile', () => {
     spyOn(Event.prototype, 'preventDefault');
-    component.isMobile = true;
+    component.usingMobileDevice = true;
 
     expect(component.helpText).toBe('');
 
@@ -1245,7 +1522,7 @@ describe('GraphVizComponent', () => {
       ' using mobile',
     () => {
       spyOn(Event.prototype, 'preventDefault');
-      component.isMobile = true;
+      component.usingMobileDevice = true;
 
       expect(component.helpText).toBe('');
 
@@ -1295,7 +1572,7 @@ describe('GraphVizComponent', () => {
       ' using mobile',
     () => {
       spyOn(Event.prototype, 'preventDefault');
-      component.isMobile = true;
+      component.usingMobileDevice = true;
 
       expect(component.helpText).toBe('');
 
@@ -1391,7 +1668,7 @@ describe('GraphVizComponent', () => {
 
   it('should start adding edge when user clicks a vertex in a mobile', () => {
     component.state.currentMode = component._MODES.ADD_EDGE;
-    component.isMobile = true;
+    component.usingMobileDevice = true;
     spyOn(component, 'onTouchInitialVertex').and.callThrough();
     spyOn(component, 'beginAddEdge').and.callThrough();
 
@@ -1412,7 +1689,7 @@ describe('GraphVizComponent', () => {
 
   it('should move vertex when user clicks a vertex in a mobile', () => {
     component.state.currentMode = component._MODES.MOVE;
-    component.isMobile = true;
+    component.usingMobileDevice = true;
     component.state.mouseX = 20;
     component.state.mouseY = 20;
     spyOn(component, 'onTouchInitialVertex').and.callThrough();
@@ -1447,7 +1724,7 @@ describe('GraphVizComponent', () => {
     () => {
       component.state.addEdgeVertex = 0;
       component.state.hoveredVertex = 1;
-      component.isMobile = true;
+      component.usingMobileDevice = true;
 
       expect(component.helpText).toBe('');
 
@@ -1469,7 +1746,7 @@ describe('GraphVizComponent', () => {
       component.state.addEdgeVertex = 1;
       component.state.hoveredVertex = 1;
       component.state.currentlyDraggedVertex = 1;
-      component.isMobile = true;
+      component.usingMobileDevice = true;
       spyOn(component, 'onTouchFinalVertex').and.callThrough();
       spyOn(component, 'endDragVertex').and.callThrough();
 
@@ -1494,7 +1771,7 @@ describe('GraphVizComponent', () => {
       component.state.addEdgeVertex = 1;
       component.state.hoveredVertex = 1;
       component.state.currentlyDraggedVertex = 1;
-      component.isMobile = true;
+      component.usingMobileDevice = true;
       spyOn(component, 'onTouchFinalVertex').and.callThrough();
       spyOn(component, 'tryAddEdge').and.callThrough();
       spyOn(component, 'endAddEdge').and.callThrough();
@@ -1521,7 +1798,7 @@ describe('GraphVizComponent', () => {
 
     component.onMousedownVertex(0);
 
-    expect(component.isMobile).toBe(false);
+    expect(component.usingMobileDevice).toBe(false);
     expect(component.canAddEdge).toBe(true);
     expect(component.beginAddEdge).toHaveBeenCalledWith(0);
     expect(component.state.addEdgeVertex).toBe(0);
@@ -1542,7 +1819,7 @@ describe('GraphVizComponent', () => {
 
     component.onMousedownVertex(0);
 
-    expect(component.isMobile).toBe(false);
+    expect(component.usingMobileDevice).toBe(false);
     expect(component.canMoveVertex).toBe(true);
     expect(component.beginDragVertex).toHaveBeenCalledWith(0);
     expect(component.state.currentlyDraggedVertex).toBe(0);
@@ -1553,7 +1830,7 @@ describe('GraphVizComponent', () => {
   });
 
   it('should not run onMousedownVertex when user uses a mobile phone', () => {
-    component.isMobile = true;
+    component.usingMobileDevice = true;
     spyOn(component, 'beginAddEdge');
     spyOn(component, 'beginDragVertex');
 
@@ -1561,13 +1838,13 @@ describe('GraphVizComponent', () => {
 
     component.onMousedownVertex(0);
 
-    expect(component.isMobile).toBe(true);
+    expect(component.usingMobileDevice).toBe(true);
     expect(component.beginAddEdge).not.toHaveBeenCalled();
     expect(component.beginDragVertex).not.toHaveBeenCalled();
   });
 
   it('should not run onMouseleaveVertex when user uses a mobile phone', () => {
-    component.isMobile = true;
+    component.usingMobileDevice = true;
 
     expect(component.state.hoveredVertex).toBeNull();
 
@@ -1662,7 +1939,7 @@ describe('GraphVizComponent', () => {
 
   // This function only executes on mouse actions.
   it('should not add edge when user is using a mobile', () => {
-    component.isMobile = true;
+    component.usingMobileDevice = true;
     spyOn(component, 'tryAddEdge');
     spyOn(component, 'endAddEdge');
     spyOn(component, 'endDragVertex');
@@ -1680,7 +1957,7 @@ describe('GraphVizComponent', () => {
     component.state.addEdgeVertex = 0;
     spyOn(component, 'tryAddEdge').and.callThrough();
 
-    expect(component.isMobile).toBe(false);
+    expect(component.usingMobileDevice).toBe(false);
     expect(component.graph.edges).toEqual([
       {
         src: 0,
@@ -1723,7 +2000,7 @@ describe('GraphVizComponent', () => {
     component.state.addEdgeVertex = 0;
     spyOn(component, 'tryAddEdge').and.callThrough();
 
-    expect(component.isMobile).toBe(false);
+    expect(component.usingMobileDevice).toBe(false);
     expect(component.graph.edges).toEqual([
       {
         src: 0,
@@ -1761,7 +2038,7 @@ describe('GraphVizComponent', () => {
     component.state.addEdgeVertex = 0;
     spyOn(component, 'tryAddEdge').and.callThrough();
 
-    expect(component.isMobile).toBe(false);
+    expect(component.usingMobileDevice).toBe(false);
     expect(component.graph.edges).toEqual([
       {
         src: 0,
@@ -1803,7 +2080,7 @@ describe('GraphVizComponent', () => {
       spyOn(component, 'tryAddEdge').and.callThrough();
       spyOn(component, 'endAddEdge').and.callThrough();
 
-      expect(component.isMobile).toBe(false);
+      expect(component.usingMobileDevice).toBe(false);
       expect(component.graph.edges).toEqual([
         {
           src: 0,

@@ -208,7 +208,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             suggestion_models.STATUS_ACCEPTED, 'test_author',
             'reviewer_1', self.change_cmd, self.score_category,
             'exploration.exp1.thread_6', 'hi')
-        to_date = datetime.datetime.now()
+        to_date = datetime.datetime.now(
+            datetime.timezone.utc).replace(tzinfo=None)
         from_date = to_date - datetime.timedelta(days=1)
 
         suggestions = (
@@ -228,7 +229,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             suggestion_models.STATUS_ACCEPTED, 'test_author',
             'reviewer_1', self.change_cmd, self.score_category,
             'exploration.exp1.thread_6', 'hi')
-        to_date = datetime.datetime.now()
+        to_date = datetime.datetime.now(
+            datetime.timezone.utc).replace(tzinfo=None)
         from_date = to_date - datetime.timedelta(days=1)
 
         suggestions = (

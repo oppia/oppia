@@ -17,7 +17,6 @@
  */
 
 import {Component} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {DeleteAccountBackendApiService} from './services/delete-account-backend-api.service';
 import {DeleteAccountModalComponent} from './templates/delete-account-modal.component';
@@ -48,10 +47,3 @@ export class DeleteAccountPageComponent {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaDeleteAccountPage',
-    downgradeComponent({component: DeleteAccountPageComponent})
-  );

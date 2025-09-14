@@ -40,6 +40,7 @@ class ContentType(enum.Enum):
     FEEDBACK = 'feedback'
     HINT = 'hint'
     SOLUTION = 'solution'
+    SECTION = 'section'
 
 
 class TranslatableContentFormat(enum.Enum):

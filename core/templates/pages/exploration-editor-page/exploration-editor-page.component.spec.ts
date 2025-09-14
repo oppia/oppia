@@ -29,14 +29,12 @@ import {
 import {BrowserDynamicTestingModule} from '@angular/platform-browser-dynamic/testing';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import {ParamChangesObjectFactory} from 'domain/exploration/ParamChangesObjectFactory';
-import {ParamSpecsObjectFactory} from 'domain/exploration/ParamSpecsObjectFactory';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {StateEditorRefreshService} from 'pages/exploration-editor-page/services/state-editor-refresh.service';
 import {UserExplorationPermissionsService} from 'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import {AlertsService} from 'services/alerts.service';
 import {InternetConnectivityService} from 'services/internet-connectivity.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {EditabilityService} from 'services/editability.service';
 import {
   ExplorationFeatures,
@@ -95,6 +93,9 @@ class MockPlatformFeatureService {
     ExplorationEditorCanModifyTranslations: {
       isEnabled: false,
     },
+    ShowVoiceoverTabForNonCuratedExplorations: {
+      isEnabled: false,
+    },
   };
 }
 
@@ -123,6 +124,7 @@ describe('Exploration editor page component', () => {
   let userService: UserService;
   let ueps: UserExplorationPermissionsService;
   let ics: InternetConnectivityService;
+  let pageContextService: PageContextService;
   let mockEnterEditorForTheFirstTime: EventEmitter<void>;
   let registerAcceptTutorialModalEventSpy;
   let registerDeclineTutorialModalEventSpy;
@@ -167,9 +169,6 @@ describe('Exploration editor page component', () => {
           id: null,
           hints: [],
         },
-        recorded_voiceovers: {
-          voiceovers_mapping: {},
-        },
       },
       Final: {
         param_changes: [],
@@ -193,9 +192,6 @@ describe('Exploration editor page component', () => {
           confirmed_unclassified_answers: [],
           id: null,
           hints: [],
-        },
-        recorded_voiceovers: {
-          voiceovers_mapping: {},
         },
       },
     },
@@ -276,13 +272,14 @@ describe('Exploration editor page component', () => {
         AutosaveInfoModalsService,
         ChangeListService,
         {
-          provide: ContextService,
+          provide: PageContextService,
           useValue: {
             getExplorationId: () => {
               return explorationId;
             },
             setExplorationIsLinkedToStory: () => {},
             setExplorationVersion: expVersion => {},
+            isExplorationLinkedToStory: () => {},
           },
         },
         EditabilityService,
@@ -292,8 +289,6 @@ describe('Exploration editor page component', () => {
         InternetConnectivityService,
         PageTitleService,
         LoaderService,
-        ParamChangesObjectFactory,
-        ParamSpecsObjectFactory,
         RouterService,
         SiteAnalyticsService,
         StateEditorRefreshService,
@@ -374,6 +369,7 @@ describe('Exploration editor page component', () => {
     entityBulkTranslationsBackendApiService = TestBed.inject(
       EntityBulkTranslationsBackendApiService
     );
+    pageContextService = TestBed.inject(PageContextService);
 
     isLocationSetToNonStateEditorTabSpy = spyOn(
       rs,
@@ -1227,5 +1223,31 @@ describe('Exploration editor page component', () => {
       flush();
       discardPeriodicTasks();
     }));
+  });
+
+  describe('voiceover tab', () => {
+    it('should be shwon correctly', () => {
+      let isExplorationLinkedToStorySpy = spyOn(
+        pageContextService,
+        'isExplorationLinkedToStory'
+      );
+
+      // Curated exploration must show voiceover tab.
+      isExplorationLinkedToStorySpy.and.returnValue(true);
+      let voiceoverTabIsEnabled = component.isVoiceoverTabEnabled();
+      expect(voiceoverTabIsEnabled).toBeTrue();
+
+      // Non curated exploration, when feature flag is disabled, must not show voiceover tab.
+      isExplorationLinkedToStorySpy.and.returnValue(false);
+      mockPlatformFeatureService.status.ShowVoiceoverTabForNonCuratedExplorations.isEnabled =
+        false;
+      expect(component.isVoiceoverTabEnabled()).toBeFalse();
+
+      // Non curated exploration, when feature flag is enabled, must show voiceover tab.
+      isExplorationLinkedToStorySpy.and.returnValue(false);
+      mockPlatformFeatureService.status.ShowVoiceoverTabForNonCuratedExplorations.isEnabled =
+        true;
+      expect(component.isVoiceoverTabEnabled()).toBeTrue();
+    });
   });
 });

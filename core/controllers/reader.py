@@ -804,8 +804,9 @@ class StateHitEventHandler(
         exploration_version = self.normalized_payload['exploration_version']
         session_id = self.normalized_payload['session_id']
         # TODO(sll): Why do we not record the value of this anywhere?
-        client_time_spent_in_secs = self.normalized_payload[  # pylint: disable=unused-variable
-            'client_time_spent_in_secs']
+        client_time_spent_in_secs = ( # pylint: disable=unused-variable
+            self.normalized_payload['client_time_spent_in_secs']
+        )
         old_params = self.normalized_payload['old_params']
 
         event_services.StateHitEventHandler.record(
@@ -2093,7 +2094,7 @@ class SaveTransientCheckpointProgressHandler(
 
     @acl_decorators.can_play_exploration
     def put(self, exploration_id: str) -> None:
-        """"Handles the PUT requests. Saves the logged-out user's progress."""
+        """Handles the PUT requests. Saves the logged-out user's progress."""
         assert self.normalized_payload is not None
         unique_progress_url_id = (
             self.normalized_payload['unique_progress_url_id'])
@@ -2182,7 +2183,7 @@ class LearnerAnswerDetailsSubmissionHandler(
 
     @acl_decorators.can_play_entity
     def put(self, entity_type: str, entity_id: str) -> None:
-        """"Handles the PUT requests. Stores the answer details submitted
+        """Handles the PUT requests. Stores the answer details submitted
         by the learner.
         """
         assert self.normalized_payload is not None

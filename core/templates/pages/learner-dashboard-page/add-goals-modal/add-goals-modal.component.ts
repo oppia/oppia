@@ -16,7 +16,6 @@
  * @fileoverview Component for add goals modal
  */
 import {Component, Inject} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 @Component({
   selector: 'oppia-add-goals-modal',
@@ -57,10 +56,3 @@ export class AddGoalsModalComponent {
     this.dialogRef.close(this.checkedTopics);
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'addGoalsModalComponent',
-    downgradeComponent({component: AddGoalsModalComponent})
-  );

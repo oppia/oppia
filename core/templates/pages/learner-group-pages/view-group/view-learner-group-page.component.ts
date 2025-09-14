@@ -17,13 +17,12 @@
  */
 
 import {Component, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 import {LoaderService} from 'services/loader.service';
 import {LearnerGroupPagesConstants} from '../learner-group-pages.constants';
 import {LearnerGroupData} from 'domain/learner_group/learner-group.model';
 import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-backend-api.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {LearnerGroupSyllabusBackendApiService} from 'domain/learner_group/learner-group-syllabus-backend-api.service';
 import {UserService} from 'services/user.service';
 import {LearnerGroupUserProgress} from 'domain/learner_group/learner-group-user-progress.model';
@@ -52,7 +51,7 @@ export class ViewLearnerGroupPageComponent implements OnInit {
   constructor(
     private loaderService: LoaderService,
     private learnerGroupBackendApiService: LearnerGroupBackendApiService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private userService: UserService,
     private ngbModal: NgbModal,
     private windowRef: WindowRef,
@@ -60,7 +59,7 @@ export class ViewLearnerGroupPageComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.learnerGroupId = this.contextService.getLearnerGroupId();
+    this.learnerGroupId = this.pageContextService.getLearnerGroupId();
     this.activeTab = this.VIEW_LEARNER_GROUP_TABS_I18N_IDS.OVERVIEW;
     if (this.learnerGroupId) {
       this.loaderService.showLoadingScreen('Loading');
@@ -179,10 +178,3 @@ export class ViewLearnerGroupPageComponent implements OnInit {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaViewLearnerGroupPage',
-    downgradeComponent({component: ViewLearnerGroupPageComponent})
-  );

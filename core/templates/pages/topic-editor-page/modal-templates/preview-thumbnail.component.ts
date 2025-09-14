@@ -17,8 +17,7 @@
  */
 
 import {Component, Input} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 
 @Component({
@@ -40,12 +39,12 @@ export class PreviewThumbnailComponent {
   editableThumbnailDataUrl!: string;
 
   constructor(
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private imageUploadHelperService: ImageUploadHelperService
   ) {}
 
   ngOnInit(): void {
-    let entityType = this.contextService.getEntityType();
+    let entityType = this.pageContextService.getEntityType();
     if (entityType === undefined) {
       throw new Error('No image present for preview');
     }
@@ -53,14 +52,7 @@ export class PreviewThumbnailComponent {
       this.imageUploadHelperService.getTrustedResourceUrlForThumbnailFilename(
         this.filename,
         entityType,
-        this.contextService.getEntityId()
+        this.pageContextService.getEntityId()
       );
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaPreviewThumbnail',
-  downgradeComponent({
-    component: PreviewThumbnailComponent,
-  }) as angular.IDirectiveFactory
-);

@@ -28,7 +28,6 @@ import {HtmlEscaperService} from 'services/html-escaper.service';
 import {MathInteractionsService} from 'services/math-interactions.service';
 import {AlgebraicExpressionInputRulesService} from './algebraic-expression-input-rules.service';
 import {AppConstants} from 'app.constants';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {InteractionAnswer} from 'interactions/answer-defs';
 import {TranslateService} from '@ngx-translate/core';
 
@@ -83,6 +82,7 @@ export class AlgebraicExpressionInputInteractionComponent
           this.guppyInitializationService.getAllowedVariables()
         );
       this.warningText = this.mathInteractionsService.getWarningText();
+      this.currentInteractionService.updateAnswerIsValid(answerIsValid);
       return answerIsValid;
     }
     this.warningText = '';
@@ -98,6 +98,11 @@ export class AlgebraicExpressionInputInteractionComponent
       this.value,
       this.algebraicExpressionInputRulesService
     );
+    let answerIsValid = this.mathInteractionsService.validateEquation(
+      this.value,
+      this.guppyInitializationService.getAllowedVariables()
+    );
+    this.currentInteractionService.updateAnswerIsValid(answerIsValid);
   }
 
   onAnswerChange(focusObj: FocusObj): void {
@@ -159,10 +164,3 @@ export class AlgebraicExpressionInputInteractionComponent
     GuppyInitializationService.interactionType = 'AlgebraicExpressionInput';
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaInteractiveAlgebraicExpressionInput',
-  downgradeComponent({
-    component: AlgebraicExpressionInputInteractionComponent,
-  }) as angular.IDirectiveFactory
-);

@@ -16,7 +16,6 @@
  * @fileoverview Expression syntax tree service.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {ExpressionParserService} from 'expressions/expression-parser.service';
@@ -52,7 +51,7 @@ export class ExprUndefinedVarError extends ExpressionError {
     public varname: string,
     public envs: EnvDict[]
   ) {
-    super(varname + ' not found in ' + angular.toJson(envs));
+    super(varname + ' not found in ' + JSON.stringify(envs));
   }
 }
 
@@ -332,10 +331,3 @@ export class ExpressionSyntaxTreeService {
     },
   };
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ExpressionSyntaxTreeService',
-    downgradeInjectable(ExpressionSyntaxTreeService)
-  );

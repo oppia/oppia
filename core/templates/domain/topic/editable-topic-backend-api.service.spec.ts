@@ -87,6 +87,24 @@ describe('Editable topic backend API service', () => {
       },
       language_code: 'en',
     },
+    study_guide: {
+      id: 'topicId-1',
+      topicId: 'topicId',
+      sections: [
+        {
+          heading: {
+            content_id: 'section_heading_0',
+            unicode_str: 'heading 1',
+          },
+          content: {
+            content_id: 'section_content_0',
+            html: '<p>content 1</p>',
+          },
+        },
+      ],
+      nextContentIdIndex: 2,
+      language_code: 'en',
+    },
     skill_creation_is_allowed: true,
   };
   let csrfService: CsrfTokenService;
@@ -190,6 +208,51 @@ describe('Editable topic backend API service', () => {
         .then(successHandler, failHandler);
       let req = httpTestingController.expectOne(
         '/subtopic_page_editor_handler/data/topicId/1'
+      );
+      expect(req.request.method).toEqual('GET');
+      req.flush('Error loading subtopic 1.', {
+        status: 500,
+        statusText: 'Error loading subtopic 1.',
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Error loading subtopic 1.');
+    })
+  );
+
+  it('should successfully fetch an existing study guide from the backend', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    editableTopicBackendApiService
+      .fetchStudyGuideAsync('topicId', 1)
+      .then(successHandler, failHandler);
+    let req = httpTestingController.expectOne(
+      '/study_guide_editor_handler/data/topicId/1'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleDataResults);
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(sampleDataResults.study_guide);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it(
+    'should use the rejection handler when fetching an existing subtopic' +
+      ' page fails',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+
+      editableTopicBackendApiService
+        .fetchStudyGuideAsync('topicId', 1)
+        .then(successHandler, failHandler);
+      let req = httpTestingController.expectOne(
+        '/study_guide_editor_handler/data/topicId/1'
       );
       expect(req.request.method).toEqual('GET');
       req.flush('Error loading subtopic 1.', {

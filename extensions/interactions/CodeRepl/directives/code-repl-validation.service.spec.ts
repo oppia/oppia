@@ -18,15 +18,9 @@
 
 import {TestBed} from '@angular/core/testing';
 
-import {
-  AnswerGroup,
-  AnswerGroupObjectFactory,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {CodeReplValidationService} from 'interactions/CodeRepl/directives/code-repl-validation.service';
-import {
-  Outcome,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 
 import {AppConstants} from 'app.constants';
 import {CodeReplCustomizationArgs} from 'interactions/customization-args-defs';
@@ -36,7 +30,6 @@ describe('CodeReplValidationService', () => {
   let validatorService: CodeReplValidationService;
   let currentState: string, customizationArguments: CodeReplCustomizationArgs;
   let goodAnswerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
-  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -45,11 +38,9 @@ describe('CodeReplValidationService', () => {
 
     validatorService = TestBed.get(CodeReplValidationService);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
-    oof = TestBed.get(OutcomeObjectFactory);
-    agof = TestBed.get(AnswerGroupObjectFactory);
 
     currentState = 'First State';
-    goodDefaultOutcome = oof.createFromBackendDict({
+    goodDefaultOutcome = Outcome.createFromBackendDict({
       dest: 'Second State',
       dest_if_really_stuck: null,
       feedback: {
@@ -77,7 +68,9 @@ describe('CodeReplValidationService', () => {
       },
     };
 
-    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, [], null)];
+    goodAnswerGroups = [
+      AnswerGroup.createNew([], goodDefaultOutcome, [], null),
+    ];
   });
 
   it('should be able to perform basic validation', () => {
@@ -105,7 +98,7 @@ describe('CodeReplValidationService', () => {
     expect(warnings).toEqual([
       {
         type: WARNING_TYPES.ERROR,
-        message: 'Programming language name must be a string.',
+        message: 'Programming language name must be a string',
       },
     ]);
   });
@@ -125,7 +118,7 @@ describe('CodeReplValidationService', () => {
     expect(warnings).toEqual([
       {
         type: WARNING_TYPES.ERROR,
-        message: 'Placeholder text must be a string.',
+        message: 'Placeholder text must be a string',
       },
     ]);
   });
@@ -145,7 +138,7 @@ describe('CodeReplValidationService', () => {
     expect(warnings).toEqual([
       {
         type: WARNING_TYPES.ERROR,
-        message: 'The pre-code text must be a string.',
+        message: 'The pre-code text must be a string',
       },
     ]);
   });
@@ -165,7 +158,7 @@ describe('CodeReplValidationService', () => {
     expect(warnings).toEqual([
       {
         type: WARNING_TYPES.ERROR,
-        message: 'The post-code text must be a string.',
+        message: 'The post-code text must be a string',
       },
     ]);
   });

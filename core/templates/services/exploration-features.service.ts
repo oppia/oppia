@@ -17,12 +17,11 @@
  *               the exploration editor.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {ExplorationFeatures} from 'services/exploration-features-backend-api.service';
-import {ParamChangeBackendDict} from 'domain/exploration/ParamChangeObjectFactory';
-import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
+import {ParamChangeBackendDict} from 'domain/exploration/param-change.model';
+import {StateObjectsBackendDict} from 'domain/exploration/states.model';
 
 export interface ExplorationDataDict {
   param_changes: ParamChangeBackendDict[] | [];
@@ -101,10 +100,3 @@ export class ExplorationFeaturesService {
     ExplorationFeaturesService.settings.areParametersEnabled = true;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ExplorationFeaturesService',
-    downgradeInjectable(ExplorationFeaturesService)
-  );

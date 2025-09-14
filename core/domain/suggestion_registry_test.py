@@ -2881,14 +2881,6 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                 'id': 'ImageClickInput', 'solution': None
             },
             'param_changes': [],
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {
-                    'content_0': {},
-                    'default_outcome_1': {},
-                    'feedback_2': {},
-                    'hint_3': {}
-                }
-            },
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
             'inapplicable_skill_misconception_ids': []

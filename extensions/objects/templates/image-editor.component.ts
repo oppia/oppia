@@ -52,7 +52,6 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import {SafeResourceUrl} from '@angular/platform-browser';
-import {downgradeComponent} from '@angular/upgrade/static';
 // eslint-disable-next-line oppia/disallow-httpclient
 import {HttpClient} from '@angular/common/http';
 
@@ -61,7 +60,7 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {ImagePreloaderService} from 'pages/exploration-player-page/services/image-preloader.service';
 import {AlertsService} from 'services/alerts.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {CsrfTokenService} from 'services/csrf-token.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
@@ -70,11 +69,9 @@ import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 // Relative path used as an work around to get the angular compiler and webpack
 // build to not complain.
 // TODO(#16309): Fix relative imports.
-import '../../../core/templates/third-party-imports/gif-frames.import';
+import {GifFramesService} from '../../../core/templates/third-party-imports/gif-frames.import';
 import {WindowRef} from 'services/contextual/window-ref.service';
-
 const gifshot = require('gifshot');
-import * as gifFrames from 'gif-frames';
 
 // We attach GifFrames to the window and use it in our codebase and the
 // default Window interface doesn't contain "GifFrames" property. Hence we want
@@ -83,11 +80,6 @@ import * as gifFrames from 'gif-frames';
 // global scope Window as Window is a global object. Typescript interfaces only
 // union the interfaces with the same name when presented in the same scope.
 // TODO(#16735): Remove the usage of declare globals in "non-global" files.
-declare global {
-  interface Window {
-    GifFrames: gifFrames;
-  }
-}
 
 interface FilepathData {
   mode: number;
@@ -204,14 +196,15 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     private http: HttpClient,
     private alertsService: AlertsService,
     private assetsBackendApiService: AssetsBackendApiService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private csrfTokenService: CsrfTokenService,
     private imageLocalStorageService: ImageLocalStorageService,
     private imagePreloaderService: ImagePreloaderService,
     private imageUploadHelperService: ImageUploadHelperService,
     private svgSanitizerService: SvgSanitizerService,
     private urlInterpolationService: UrlInterpolationService,
-    private windowRef: WindowRef
+    private windowRef: WindowRef,
+    private gifFramesService: GifFramesService
   ) {}
 
   ngOnInit(): void {
@@ -276,8 +269,8 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     };
     this.processedImageIsTooLarge = false;
 
-    this.entityId = this.contextService.getEntityId();
-    this.entityType = this.contextService.getEntityType();
+    this.entityId = this.pageContextService.getEntityId();
+    this.entityType = this.pageContextService.getEntityType();
 
     window.addEventListener(
       'mouseup',
@@ -584,7 +577,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
 
   private getTrustedResourceUrlForImageFileName(imageFileName) {
     if (
-      this.contextService.getImageSaveDestination() ===
+      this.pageContextService.getImageSaveDestination() ===
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE &&
       this.imageLocalStorageService.isInStorage(imageFileName)
     ) {
@@ -597,8 +590,8 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     }
     const encodedFilepath = window.encodeURIComponent(imageFileName);
     return this.assetsBackendApiService.getImageUrlForPreview(
-      this.contextService.getEntityType(),
-      this.contextService.getEntityId(),
+      this.pageContextService.getEntityType(),
+      this.pageContextService.getEntityId(),
       encodedFilepath
     );
   }
@@ -606,7 +599,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
   resetFilePathEditor(): void {
     if (
       this.data.metadata.savedImageFilename &&
-      this.contextService.getImageSaveDestination() ===
+      this.pageContextService.getImageSaveDestination() ===
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE &&
       this.imageLocalStorageService.isInStorage(
         this.data.metadata.savedImageFilename
@@ -1126,8 +1119,8 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     // especially if there are a lot. Changing the cursor will let the
     // user know that something is happening.
     document.body.style.cursor = 'wait';
-    (this.windowRef.nativeWindow as Window)
-      .GifFrames({
+    this.gifFramesService
+      .getFrames({
         url: imageDataURI,
         frames: 'all',
         outputType: 'canvas',
@@ -1203,7 +1196,7 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     imageType: string
   ): void {
     if (
-      this.contextService.getImageSaveDestination() ===
+      this.pageContextService.getImageSaveDestination() ===
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
     ) {
       this.saveImageToLocalStorage(dimensions, resampledFile, imageType);
@@ -1277,10 +1270,3 @@ export class ImageEditorComponent implements OnInit, OnChanges {
     }
   }
 }
-
-angular.module('oppia').directive(
-  'imageEditor',
-  downgradeComponent({
-    component: ImageEditorComponent,
-  }) as angular.IDirectiveFactory
-);

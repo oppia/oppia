@@ -18,7 +18,6 @@
 
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 interface PlatformParameterSchema {
   type: string;
 }
@@ -133,10 +132,3 @@ export class BlogAdminBackendApiService {
       .toPromise();
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'BlogAdminBackendApiService',
-    downgradeInjectable(BlogAdminBackendApiService)
-  );

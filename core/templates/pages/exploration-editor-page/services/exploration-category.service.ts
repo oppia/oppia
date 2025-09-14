@@ -18,7 +18,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {ExplorationPropertyService} from './exploration-property.service';
 import {ExplorationRightsService} from './exploration-rights.service';
 import {ValidatorsService} from 'services/validators.service';
@@ -56,10 +55,3 @@ export class ExplorationCategoryService extends ExplorationPropertyService {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ExplorationCategoryService',
-    downgradeInjectable(ExplorationCategoryService)
-  );

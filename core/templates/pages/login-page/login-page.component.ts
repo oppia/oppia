@@ -18,7 +18,6 @@
 
 import {Component, OnInit} from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
-import {downgradeComponent} from '@angular/upgrade/static';
 import firebase from 'firebase/app';
 
 import {AppConstants} from 'app.constants';
@@ -139,7 +138,3 @@ export class LoginPageComponent implements OnInit {
     this.windowRef.nativeWindow.location.assign(destination);
   }
 }
-
-angular
-  .module('oppia')
-  .directive('loginPage', downgradeComponent({component: LoginPageComponent}));

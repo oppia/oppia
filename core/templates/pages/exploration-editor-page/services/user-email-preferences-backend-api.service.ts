@@ -19,7 +19,6 @@
 
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {ExplorationDataService} from './exploration-data.service';
 import {
@@ -51,10 +50,3 @@ export class UserEmailPreferencesBackendApiService {
       .toPromise();
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'UserEmailPreferencesBackendApiService',
-    downgradeInjectable(UserEmailPreferencesBackendApiService)
-  );

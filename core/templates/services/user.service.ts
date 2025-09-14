@@ -17,7 +17,7 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
+
 import {AppConstants} from 'app.constants';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {UserInfo} from 'domain/user/user-info.model';
@@ -157,7 +157,3 @@ export class UserService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory('UserService', downgradeInjectable(UserService));

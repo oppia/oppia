@@ -23,7 +23,6 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 export interface TranslatableSetOfStringSchema {
   type: string;
@@ -78,10 +77,3 @@ export class TranslatableSetOfNormalizedStringEditorComponent
     return this.schema;
   }
 }
-
-angular.module('oppia').directive(
-  'translatableSetOfNormalizedStringEditor',
-  downgradeComponent({
-    component: TranslatableSetOfNormalizedStringEditorComponent,
-  }) as angular.IDirectiveFactory
-);

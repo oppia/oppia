@@ -16,7 +16,6 @@
  * @fileoverview Service to change the rights of collections in the backend.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
@@ -218,10 +217,3 @@ export class CollectionRightsBackendApiService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'CollectionRightsBackendApiService',
-    downgradeInjectable(CollectionRightsBackendApiService)
-  );

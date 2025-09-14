@@ -17,7 +17,6 @@
  */
 
 import {Component, Input, OnInit, ViewChildren} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {AnswerContentModalComponent} from 'components/common-layout-directives/common-elements/answer-content-modal.component';
 import {sum} from 'd3-array';
@@ -98,10 +97,3 @@ export class VisualizationSortedTilesComponent implements OnInit {
     }
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaVisualizationSortedTiles',
-  downgradeComponent({
-    component: VisualizationSortedTilesComponent,
-  }) as angular.IDirectiveFactory
-);

@@ -34,7 +34,6 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
 import {StateLinkedSkillIdService} from '../state-editor-properties-services/state-skill.service';
 import {SkillsCategorizedByTopics} from 'pages/topics-and-skills-dashboard-page/skills-list/skills-list.component';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {UserService} from 'services/user.service';
 import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
@@ -165,10 +164,3 @@ export class StateSkillEditorComponent implements OnInit {
     this.skillEditorIsShown = !this.skillEditorIsShown;
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'stateSkillEditor',
-    downgradeComponent({component: StateSkillEditorComponent})
-  );

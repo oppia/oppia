@@ -16,7 +16,6 @@
  * @fileoverview Service to send changes to a collection to the backend.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
@@ -172,10 +171,3 @@ export class EditableCollectionBackendApiService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'EditableCollectionBackendApiService',
-    downgradeInjectable(EditableCollectionBackendApiService)
-  );

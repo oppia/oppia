@@ -18,7 +18,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {AppConstants} from 'app.constants';
 import {ExplorationDataService} from 'pages/exploration-editor-page/services/exploration-data.service';
 import {AlertsService} from 'services/alerts.service';
@@ -325,9 +324,3 @@ export class ExplorationRightsService {
     }
   }
 }
-angular
-  .module('oppia')
-  .factory(
-    'ExplorationRightsService',
-    downgradeInjectable(ExplorationRightsService)
-  );

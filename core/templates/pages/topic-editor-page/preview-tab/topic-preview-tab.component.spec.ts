@@ -18,18 +18,22 @@
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {TranslateModule, TranslateService} from '@ngx-translate/core';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MaterialModule} from 'modules/material.module';
 import {StorySummary} from 'domain/story/story-summary.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {TopicEditorStateService} from '../services/topic-editor-state.service';
 import {TopicPreviewTabComponent} from './topic-preview-tab.component';
+import {EventEmitter} from '@angular/core';
 
 describe('Topic Preview Tab Component', () => {
   let fixture: ComponentFixture<TopicPreviewTabComponent>;
   let componentInstance: TopicPreviewTabComponent;
+  let mockTranslateService: jasmine.SpyObj<TranslateService>;
   let testName = 'test_name';
   let mockUrl = 'mock_url';
+  let topicUrl = 'topic_1';
   let storySummaries = [
     new StorySummary(
       'id',
@@ -55,6 +59,13 @@ describe('Topic Preview Tab Component', () => {
   ];
 
   class MockTopicEditorStateService {
+    private practiceTabDisplayed = false;
+    setPracticeTabDisplayed(value: boolean) {
+      this.practiceTabDisplayed = value;
+    }
+    getSavedTopic() {
+      return this.getTopic();
+    }
     getTopic() {
       return {
         getName(): string {
@@ -63,7 +74,19 @@ describe('Topic Preview Tab Component', () => {
         getSubtopics() {
           return [];
         },
+        getUrlFragment() {
+          return topicUrl;
+        },
+        getPracticeTabIsDisplayed: () => this.practiceTabDisplayed,
       };
+    }
+
+    getClassroomName() {
+      return 'classroom_name';
+    }
+
+    getClassroomUrlFragment() {
+      return 'classroom_1';
     }
 
     getCanonicalStorySummaries() {
@@ -78,8 +101,17 @@ describe('Topic Preview Tab Component', () => {
   }
 
   beforeEach(waitForAsync(() => {
+    mockTranslateService = jasmine.createSpyObj('TranslateService', [
+      'instant',
+    ]);
+    mockTranslateService.onLangChange = new EventEmitter();
+
     TestBed.configureTestingModule({
-      imports: [BrowserAnimationsModule, MaterialModule],
+      imports: [
+        BrowserAnimationsModule,
+        MaterialModule,
+        TranslateModule.forRoot(),
+      ],
       declarations: [TopicPreviewTabComponent],
       providers: [
         {
@@ -90,6 +122,10 @@ describe('Topic Preview Tab Component', () => {
           provide: UrlInterpolationService,
           useClass: MockUrlInterpolationService,
         },
+        {
+          provide: TranslateService,
+          useValue: mockTranslateService,
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -98,6 +134,7 @@ describe('Topic Preview Tab Component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(TopicPreviewTabComponent);
     componentInstance = fixture.componentInstance;
+    componentInstance.ngOnInit();
   });
 
   it('should create', () => {
@@ -106,9 +143,11 @@ describe('Topic Preview Tab Component', () => {
 
   it('should initialize', () => {
     componentInstance.ngOnInit();
+    expect(componentInstance.classroomUrlFragment).toEqual('classroom_1');
+    expect(componentInstance.topicUrlFragment).toEqual('topic_1');
     expect(componentInstance.topicName).toEqual(testName);
     expect(componentInstance.subtopics).toEqual([]);
-    expect(componentInstance.cannonicalStorySummaries).toEqual(storySummaries);
+    expect(componentInstance.canonicalStorySummaries).toEqual(storySummaries);
     expect(componentInstance.chapterCount).toEqual(0);
   });
 
@@ -123,5 +162,28 @@ describe('Topic Preview Tab Component', () => {
     expect(componentInstance.activeTab).toEqual('subtopic');
     componentInstance.changePreviewTab('practice');
     expect(componentInstance.activeTab).toEqual('practice');
+  });
+
+  it('should return true when practiceTabIsDisplayed is true', () => {
+    (
+      componentInstance.topicEditorStateService as MockTopicEditorStateService
+    ).setPracticeTabDisplayed(true);
+    componentInstance.ngOnInit();
+    expect(componentInstance.isPracticeTabEnabled()).toBeTrue();
+  });
+
+  it('should return false when practiceTabIsDisplayed is false', () => {
+    (
+      componentInstance.topicEditorStateService as MockTopicEditorStateService
+    ).setPracticeTabDisplayed(false);
+    componentInstance.ngOnInit();
+    expect(componentInstance.isPracticeTabEnabled()).toBeFalse();
+  });
+
+  it('should update page title on language change', () => {
+    spyOn(componentInstance, 'setPageTitle');
+    componentInstance.subscribeToOnLangChange();
+    mockTranslateService.onLangChange.emit();
+    expect(componentInstance.setPageTitle).toHaveBeenCalled();
   });
 });

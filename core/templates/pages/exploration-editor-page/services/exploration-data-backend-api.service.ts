@@ -18,7 +18,6 @@
  */
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {ExplorationChange} from 'domain/exploration/exploration-draft.model';
 import {Observable} from 'rxjs';
 import {DraftAutoSaveResponse} from './exploration-data.service';
@@ -44,10 +43,3 @@ export class ExplorationDataBackendApiService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ExplorationDataBackendApiService',
-    downgradeInjectable(ExplorationDataBackendApiService)
-  );

@@ -18,7 +18,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {ExplorationPropertyService} from 'pages/exploration-editor-page/services/exploration-property.service';
 import {AlertsService} from 'services/alerts.service';
 import {LoggerService} from 'services/contextual/logger.service';
@@ -52,10 +51,3 @@ export class ExplorationAutomaticTextToSpeechService extends ExplorationProperty
     this.saveDisplayedValue();
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ExplorationAutomaticTextToSpeechService',
-    downgradeInjectable(ExplorationAutomaticTextToSpeechService)
-  );

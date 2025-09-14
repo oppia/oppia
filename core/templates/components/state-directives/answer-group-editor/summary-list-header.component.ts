@@ -17,7 +17,6 @@
  */
 
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 interface DeleteSummaryEventData {
   index: number;
@@ -44,6 +43,8 @@ export class SummaryListHeaderComponent {
   @Input() numItems!: number;
 
   deleteItem(evt: Event): void {
+    evt.stopPropagation();
+    evt.preventDefault();
     let eventData = {
       index: this.index,
       event: evt,
@@ -51,10 +52,3 @@ export class SummaryListHeaderComponent {
     this.summaryDelete.emit(eventData);
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaSummaryListHeader',
-    downgradeComponent({component: SummaryListHeaderComponent})
-  );

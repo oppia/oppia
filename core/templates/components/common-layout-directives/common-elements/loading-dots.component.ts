@@ -17,7 +17,6 @@
  */
 
 import {Component} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 @Component({
   selector: 'loading-dots',
@@ -27,9 +26,3 @@ import {downgradeComponent} from '@angular/upgrade/static';
 export class LoadingDotsComponent {
   constructor() {}
 }
-angular
-  .module('oppia')
-  .directive(
-    'loadingDots',
-    downgradeComponent({component: LoadingDotsComponent})
-  );

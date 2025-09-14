@@ -18,14 +18,10 @@
 
 import {EventEmitter, Injectable, NgZone} from '@angular/core';
 import {AudioFile} from 'domain/utilities/audio-file.model';
-import {
-  AudioTranslationManagerService,
-  AudioTranslations,
-} from 'pages/exploration-player-page/services/audio-translation-manager.service';
+import {AudioTranslations} from 'pages/exploration-player-page/services/audio-translation-manager.service';
 import {AssetsBackendApiService} from './assets-backend-api.service';
-import {ContextService} from './context.service';
+import {PageContextService} from './page-context.service';
 import {Howl} from 'howler';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {interval, Subject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
 
@@ -51,8 +47,7 @@ export class AudioPlayerService {
   private _stopIntervalSubject = new Subject<void>();
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
-    private audioTranslationManagerService: AudioTranslationManagerService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private ngZone: NgZone
   ) {}
 
@@ -65,7 +60,7 @@ export class AudioPlayerService {
       return;
     }
     this.assetsBackendApiService
-      .loadAudio(this.contextService.getExplorationId(), filename)
+      .loadAudio(this.pageContextService.getExplorationId(), filename)
       .then(
         (loadedAudioFile: AudioFile) => {
           this._currentTrack = new Howl({
@@ -83,7 +78,6 @@ export class AudioPlayerService {
             this._currentTrack = null;
             this._currentTrackFilename = null;
             this._lastPauseOrSeekPos = null;
-            this.audioTranslationManagerService.clearSecondaryAudioTranslations();
           });
         },
         e => errorCallback(e)
@@ -124,7 +118,7 @@ export class AudioPlayerService {
     if (!this.isPlaying()) {
       return;
     }
-    this._lastPauseOrSeekPos = this.getCurrentTime();
+    this._lastPauseOrSeekPos = Math.floor(this.getCurrentTimeInSecs());
     // 'currentTrack' is not null since the track is playing
     // and that is why we use '?'.
     this._currentTrack?.pause();
@@ -140,7 +134,6 @@ export class AudioPlayerService {
     this._currentTrack = null;
     this._currentTrackFilename = null;
     this._lastPauseOrSeekPos = null;
-    this.audioTranslationManagerService.clearSecondaryAudioTranslations();
   }
 
   rewind(seconds: number): void {
@@ -168,7 +161,7 @@ export class AudioPlayerService {
     }
   }
 
-  getCurrentTime(): number {
+  getCurrentTimeInSecs(): number {
     if (!this._currentTrack) {
       return 0;
     }
@@ -176,7 +169,7 @@ export class AudioPlayerService {
     if (typeof currentTime !== 'number') {
       return 0;
     }
-    return Math.floor(currentTime);
+    return Math.floor(currentTime * 10) / 10;
   }
 
   setCurrentTime(val: number): void {
@@ -231,7 +224,3 @@ export class AudioPlayerService {
     return this._stopIntervalSubject;
   }
 }
-
-angular
-  .module('oppia')
-  .factory('AudioPlayerService', downgradeInjectable(AudioPlayerService));

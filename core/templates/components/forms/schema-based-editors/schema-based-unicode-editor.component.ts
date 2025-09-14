@@ -19,7 +19,7 @@
 // Relative path used as an work around to get the angular compiler and webpack
 // build to not complain.
 // TODO(#16309): Fix relative imports.
-import '../../../third-party-imports/ui-codemirror.import';
+import '../../../third-party-imports/codemirror.import';
 import {
   Component,
   EventEmitter,
@@ -36,7 +36,6 @@ import {
   ValidationErrors,
   Validator,
 } from '@angular/forms';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {TranslateService} from '@ngx-translate/core';
 import CodeMirror from 'codemirror';
 import 'components/code-mirror/codemirror.component';
@@ -223,10 +222,3 @@ export class SchemaBasedUnicodeEditor
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'schemaBasedUnicodeEditor',
-  downgradeComponent({
-    component: SchemaBasedUnicodeEditor,
-  })
-);

@@ -1453,7 +1453,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.assertIn(
             'An image in the submitted translation\'s original content '
             'named "img.png" cannot be found. Please save it to the '
-            'backend file system at /exploration/%s/assets/image/ '  
+            'backend file system at /exploration/%s/assets/image/ '
             'before submitting this translation again.' % exp_id,
             response_dict['error']
         )
@@ -2373,14 +2373,6 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                 'id': 'ImageClickInput', 'solution': None
             },
             'param_changes': [],
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {
-                    'content_0': {},
-                    'default_outcome_1': {},
-                    'feedback_2': {},
-                    'hint_3': {}
-                }
-            },
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
             'inapplicable_skill_misconception_ids': []

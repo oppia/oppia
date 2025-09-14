@@ -16,7 +16,6 @@
  * @fileoverview Service to fetch statistics about an exploration's states.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
@@ -53,10 +52,3 @@ export class StateTopAnswersStatsBackendApiService {
       );
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'StateTopAnswersStatsBackendApiService',
-    downgradeInjectable(StateTopAnswersStatsBackendApiService)
-  );

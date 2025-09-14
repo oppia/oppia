@@ -17,7 +17,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {MathInteractionsService} from 'services/math-interactions.service';
 
@@ -89,10 +88,14 @@ export class GuppyInitializationService {
   }
 
   findActiveGuppyObject(): GuppyObject | undefined {
-    let activeId = $('.guppy_active').attr('id');
-    for (let guppyObject of this.guppyInstances) {
-      if (guppyObject.divId === activeId) {
-        return guppyObject;
+    const activeElement = document.querySelector('.guppy_active');
+    const activeId = activeElement ? activeElement.id : null;
+
+    if (activeId) {
+      for (let guppyObject of this.guppyInstances) {
+        if (guppyObject.divId === activeId) {
+          return guppyObject;
+        }
       }
     }
   }
@@ -113,10 +116,3 @@ export class GuppyInitializationService {
     GuppyInitializationService.allowedVariables = allowedVariables;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'GuppyInitializationService',
-    downgradeInjectable(GuppyInitializationService)
-  );

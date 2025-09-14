@@ -22,14 +22,14 @@ import {
 } from '@angular/common/http/testing';
 import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ExplorationPermissionsBackendApiService} from 'domain/exploration/exploration-permissions-backend-api.service';
 import {ExplorationPermissions} from 'domain/exploration/exploration-permissions.model';
 
 describe('Exploration permissions backend api service', () => {
   let epbas: ExplorationPermissionsBackendApiService;
   let httpTestingController: HttpTestingController;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -38,9 +38,9 @@ describe('Exploration permissions backend api service', () => {
 
     epbas = TestBed.get(ExplorationPermissionsBackendApiService);
     httpTestingController = TestBed.get(HttpTestingController);
-    contextService = TestBed.get(ContextService);
+    pageContextService = TestBed.get(PageContextService);
 
-    spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp1');
   });
 
   afterEach(() => {

@@ -17,7 +17,6 @@
  */
 
 import {EventEmitter, Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 @Injectable({
   providedIn: 'root',
@@ -25,7 +24,3 @@ import {downgradeInjectable} from '@angular/upgrade/static';
 export class CheckRevertService {
   detailsEventEmitter: EventEmitter<string> = new EventEmitter<string>();
 }
-
-angular
-  .module('oppia')
-  .factory('CheckRevertService', downgradeInjectable(CheckRevertService));

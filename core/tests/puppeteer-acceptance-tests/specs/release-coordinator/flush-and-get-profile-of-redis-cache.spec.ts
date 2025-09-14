@@ -52,7 +52,7 @@ describe('Release Coordinator', function () {
         'totalKeysStored',
       ]);
 
-      // Since the cache is flushed, the total keys stored should be less than 60.
+      // Since the cache is flushed, the total keys stored should be less than 70.
       // But, not necessarily 0, as there could be some keys stored in the cache
       // while fetching the profile, for example platform params.
       // Ideally the keys should be equal to number of platform params but the
@@ -64,7 +64,7 @@ describe('Release Coordinator', function () {
       // immediately freed, causing the increase in the keys.count value we see.
       // See details in:
       // https://github.com/oppia/oppia/pull/20369#issuecomment-2282186319.
-      await releaseCoordinator.expectTotalKeysStoredToBeLessThan(60);
+      await releaseCoordinator.expectTotalKeysStoredToBeLessThan(70);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

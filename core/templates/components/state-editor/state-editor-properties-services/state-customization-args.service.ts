@@ -19,7 +19,6 @@
  */
 
 import {EventEmitter, Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {AlertsService} from 'services/alerts.service';
 import {
@@ -44,10 +43,3 @@ export class StateCustomizationArgsService extends StatePropertyService<Interact
     return this._schemaBasedFormsShownEventEmitter;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'StateCustomizationArgsService',
-    downgradeInjectable(StateCustomizationArgsService)
-  );

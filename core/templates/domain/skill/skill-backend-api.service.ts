@@ -16,17 +16,12 @@
  * @fileoverview Service to send changes to a skill to the backend.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {HttpClient} from '@angular/common/http';
 import {BackendChangeObject} from 'domain/editor/undo_redo/change.model';
 import {SkillDomainConstants} from 'domain/skill/skill-domain.constants';
-import {
-  Skill,
-  SkillBackendDict,
-  SkillObjectFactory,
-} from 'domain/skill/SkillObjectFactory';
+import {Skill, SkillBackendDict} from 'domain/skill/skill.model';
 import {SkillSummaryBackendDict} from 'domain/skill/skill-summary.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {Observable} from 'rxjs';
@@ -73,7 +68,6 @@ interface SkillAssignmentForDiagnosticTestBackendResponse {
 export class SkillBackendApiService {
   constructor(
     private http: HttpClient,
-    private skillObjectFactory: SkillObjectFactory,
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
@@ -92,9 +86,7 @@ export class SkillBackendApiService {
         .then(
           response => {
             resolve({
-              skill: this.skillObjectFactory.createFromBackendDict(
-                response.skill
-              ),
+              skill: Skill.createFromBackendDict(response.skill),
               assignedSkillTopicData: response.assigned_skill_topic_data_dict,
               // TODO(nishantwrp): Refactor this property to return SkillSummary
               // domain objects instead of backend dicts.
@@ -130,9 +122,7 @@ export class SkillBackendApiService {
           response => {
             resolve(
               response.skills.map(backendDict => {
-                return this.skillObjectFactory.createFromBackendDict(
-                  backendDict
-                );
+                return Skill.createFromBackendDict(backendDict);
               })
             );
           },
@@ -191,9 +181,7 @@ export class SkillBackendApiService {
         .toPromise()
         .then(
           response => {
-            resolve(
-              this.skillObjectFactory.createFromBackendDict(response.skill)
-            );
+            resolve(Skill.createFromBackendDict(response.skill));
           },
           errorResponse => {
             reject(errorResponse.error.error);
@@ -264,10 +252,3 @@ export class SkillBackendApiService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'SkillBackendApiService',
-    downgradeInjectable(SkillBackendApiService)
-  );

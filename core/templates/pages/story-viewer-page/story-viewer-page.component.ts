@@ -23,7 +23,6 @@ import {
   ViewChild,
   OnDestroy,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
 
@@ -322,10 +321,3 @@ export class StoryViewerPageComponent implements OnInit, OnDestroy {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaStoryViewerPage',
-    downgradeComponent({component: StoryViewerPageComponent})
-  );

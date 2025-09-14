@@ -27,7 +27,7 @@ import {InteractiveImageClickInput} from './oppia-interactive-image-click-input.
 import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
 import {ImageClickAnswer} from 'interactions/answer-defs';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ImagePreloaderService} from 'pages/exploration-player-page/services/image-preloader.service';
 import {EventEmitter} from '@angular/core';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
@@ -38,7 +38,7 @@ import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 
 describe('InteractiveImageClickInput', () => {
   let fixture: ComponentFixture<InteractiveImageClickInput>;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let component: InteractiveImageClickInput;
   let imagePreloaderService: ImagePreloaderService;
   let currentInteractionService: CurrentInteractionService;
@@ -89,7 +89,7 @@ describe('InteractiveImageClickInput', () => {
 
   beforeEach(() => {
     imagePreloaderService = TestBed.inject(ImagePreloaderService);
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     currentInteractionService = TestBed.inject(CurrentInteractionService);
     playerPositionService = TestBed.inject(PlayerPositionService);
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
@@ -141,8 +141,8 @@ describe('InteractiveImageClickInput', () => {
       clickPosition: [1, 2],
       clickedRegions: ['region1'],
     } as ImageClickAnswer;
-    spyOn(contextService, 'getEntityType').and.returnValue('exploration');
-    spyOn(contextService, 'getEntityId').and.returnValue('expId');
+    spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
+    spyOn(pageContextService, 'getEntityId').and.returnValue('expId');
   });
 
   afterEach(() => {
@@ -218,7 +218,7 @@ describe('InteractiveImageClickInput', () => {
       spyOn(component, 'loadImage');
       spyOn(component, 'updateCurrentlyHoveredRegions');
       spyOn(currentInteractionService, 'registerCurrentInteraction');
-      spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+      spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
       );
       spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(true);
@@ -240,7 +240,7 @@ describe('InteractiveImageClickInput', () => {
       spyOn(component, 'loadImage');
       spyOn(component, 'updateCurrentlyHoveredRegions');
       spyOn(currentInteractionService, 'registerCurrentInteraction');
-      spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+      spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
       );
       spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(true);
@@ -460,6 +460,19 @@ describe('InteractiveImageClickInput', () => {
         },
       ])
     );
+
+    const styleMock = jasmine.createSpyObj<CSSStyleDeclaration>(
+      'CSSStyleDeclaration',
+      ['marginLeft', 'marginTop', 'width', 'height']
+    );
+    const dotMock = document.createElement('div');
+    spyOn(document, 'querySelector').and.returnValue(dotMock);
+    styleMock.marginLeft = '0px';
+    styleMock.marginTop = '0px';
+    styleMock.width = '0px';
+    styleMock.height = '0px';
+    spyOn(window, 'getComputedStyle').and.returnValue(styleMock);
+
     spyOn(component, 'updateCurrentlyHoveredRegions').and.callThrough();
     spyOnProperty(MouseEvent.prototype, 'clientX', 'get').and.returnValue(290);
     spyOnProperty(MouseEvent.prototype, 'clientY', 'get').and.returnValue(260);
@@ -467,6 +480,7 @@ describe('InteractiveImageClickInput', () => {
     component.lastAnswer = null;
     component.ngOnInit();
 
+    component.usingMobileDevice = true;
     expect(component.interactionIsActive).toBe(true);
     expect(component.mouseX).toBe(0);
     expect(component.mouseY).toBe(0);
@@ -476,10 +490,184 @@ describe('InteractiveImageClickInput', () => {
 
     // The mouseX and mouseY variables must be updated only
     // when the interaction is active.
+    expect(component.usingMobileDevice).toBe(true);
     expect(component.interactionIsActive).toBe(true);
     expect(component.mouseX).toBe(0.45);
     expect(component.mouseY).toBe(0.3);
     expect(component.currentlyHoveredRegions).toEqual(['Region1']);
+  });
+
+  it(
+    'should update dotCursorCoordinateX, set style.top and style.left' +
+      ' when ArrowLeft key is pressed',
+    () => {
+      spyOn(component, 'updateDotPosition');
+      spyOn(component, 'updateCurrentlyHoveredRegions');
+
+      component.dotCursorCoordinateX = 0;
+      component.dotCursorCoordinateY = 0;
+      component.currentlyHoveredRegions = ['region1', 'region2'];
+      const event = new KeyboardEvent('keydown', {key: 'ArrowLeft'});
+
+      component.handleKeyDown(event);
+
+      expect(component.dotCursorCoordinateX).toBe(-10);
+      expect(component.dotCursorCoordinateY).toBe(0);
+      expect(component.updateDotPosition).toHaveBeenCalledWith(event);
+      expect(component.updateCurrentlyHoveredRegions).toHaveBeenCalled();
+      expect(component.currentlyHoveredRegions).toEqual([]);
+    }
+  );
+
+  it(
+    'should update dotCursorCoordinateY, set style.top and style.left' +
+      ' when ArrowUp key is pressed',
+    () => {
+      spyOn(component, 'updateDotPosition');
+      spyOn(component, 'updateCurrentlyHoveredRegions');
+
+      component.dotCursorCoordinateX = 0;
+      component.dotCursorCoordinateY = 0;
+      component.currentlyHoveredRegions = ['region1', 'region2'];
+      const event = new KeyboardEvent('keydown', {key: 'ArrowUp'});
+
+      component.handleKeyDown(event);
+
+      expect(component.dotCursorCoordinateX).toBe(0);
+      expect(component.dotCursorCoordinateY).toBe(-10);
+      expect(component.updateDotPosition).toHaveBeenCalledWith(event);
+      expect(component.updateCurrentlyHoveredRegions).toHaveBeenCalled();
+      expect(component.currentlyHoveredRegions).toEqual([]);
+    }
+  );
+
+  it(
+    'should update dotCursorCoordinateX, set style.top and style.left' +
+      'when ArrowRight key is pressed',
+    () => {
+      spyOn(component, 'updateDotPosition');
+      spyOn(component, 'updateCurrentlyHoveredRegions');
+
+      component.dotCursorCoordinateX = 0;
+      component.dotCursorCoordinateY = 0;
+      component.currentlyHoveredRegions = ['region1', 'region2'];
+      const event = new KeyboardEvent('keydown', {key: 'ArrowRight'});
+
+      component.handleKeyDown(event);
+
+      expect(component.dotCursorCoordinateX).toBe(10);
+      expect(component.dotCursorCoordinateY).toBe(0);
+      expect(component.updateDotPosition).toHaveBeenCalledWith(event);
+      expect(component.updateCurrentlyHoveredRegions).toHaveBeenCalled();
+      expect(component.currentlyHoveredRegions).toEqual([]);
+    }
+  );
+
+  it(
+    'should update dotCursorCoordinateY, set style.top and style.left' +
+      ' when ArrowDown key is pressed',
+    () => {
+      spyOn(component, 'updateDotPosition');
+      spyOn(component, 'updateCurrentlyHoveredRegions');
+
+      component.dotCursorCoordinateX = 0;
+      component.dotCursorCoordinateY = 0;
+      component.currentlyHoveredRegions = ['region1', 'region2'];
+      const event = new KeyboardEvent('keydown', {key: 'ArrowDown'});
+
+      component.handleKeyDown(event);
+
+      expect(component.dotCursorCoordinateX).toBe(0);
+      expect(component.dotCursorCoordinateY).toBe(10);
+      expect(component.updateDotPosition).toHaveBeenCalledWith(event);
+      expect(component.updateCurrentlyHoveredRegions).toHaveBeenCalled();
+      expect(component.currentlyHoveredRegions).toEqual([]);
+    }
+  );
+
+  it('should click on graph when Enter key is pressed', () => {
+    spyOn(component, 'updateDotPosition');
+    spyOn(component, 'updateCurrentlyHoveredRegions');
+    spyOn(component, 'onClickImage');
+
+    component.dotCursorCoordinateX = 0;
+    component.dotCursorCoordinateY = 0;
+    component.currentlyHoveredRegions = ['region1', 'region2'];
+    const event = new KeyboardEvent('keydown', {key: 'Enter'});
+
+    component.handleKeyDown(event);
+
+    expect(component.dotCursorCoordinateX).toBe(0);
+    expect(component.dotCursorCoordinateY).toBe(0);
+    expect(component.onClickImage).toHaveBeenCalled();
+    expect(component.updateDotPosition).toHaveBeenCalledWith(event);
+    expect(component.updateCurrentlyHoveredRegions).toHaveBeenCalled();
+    expect(component.currentlyHoveredRegions).toEqual([]);
+  });
+
+  it('should update dot position and styles', () => {
+    const imageElement = document.createElement('img');
+    imageElement.classList.add('oppia-image-click-img');
+    spyOn(imageElement, 'getBoundingClientRect').and.returnValue({
+      left: 100,
+      top: 200,
+    });
+    spyOn(window, 'getComputedStyle').and.returnValue({
+      marginLeft: '10px',
+      marginTop: '20px',
+    });
+
+    const dotElement = document.createElement('div');
+    dotElement.classList.add('oppia-select-image-region-cursor');
+    spyOn(dotElement, 'getBoundingClientRect').and.returnValue({
+      top: 100,
+      bottom: 110,
+      left: 200,
+      right: 210,
+    });
+
+    const event = new MouseEvent('mousemove', {
+      clientX: 100,
+      clientY: 100,
+    });
+
+    component.el = {
+      nativeElement: {
+        querySelectorAll: () => [imageElement],
+      },
+    };
+
+    spyOn(document, 'querySelector').and.returnValue(dotElement);
+
+    component.ngOnInit();
+    component.usingMobileDevice = false;
+    component.updateDotPosition(event);
+
+    expect(component.dotCursorCoordinateX).toBe(
+      event.clientX -
+        imageElement.getBoundingClientRect().left +
+        parseFloat(window.getComputedStyle(imageElement).marginLeft) +
+        8
+    );
+    expect(component.dotCursorCoordinateY).toBe(
+      event.clientY -
+        imageElement.getBoundingClientRect().top +
+        parseFloat(window.getComputedStyle(imageElement).marginTop) +
+        8
+    );
+
+    expect(dotElement.style.top).toBe(component.dotCursorCoordinateY + 'px');
+    expect(dotElement.style.left).toBe(component.dotCursorCoordinateX + 'px');
+
+    const dotRect = dotElement.getBoundingClientRect();
+    expect(component.mouseX).toBe(
+      (dotRect.left - imageElement.getBoundingClientRect().left) /
+        imageElement.width
+    );
+    expect(component.mouseY).toBe(
+      (dotRect.top - imageElement.getBoundingClientRect().top) /
+        imageElement.height
+    );
   });
 
   it(
@@ -524,6 +712,10 @@ describe('InteractiveImageClickInput', () => {
               getBoundingClientRect: () => {
                 return new DOMRect(300, 300, 300, 300);
               },
+            },
+            style: {
+              marginLeft: '10px',
+              marginTop: '20px',
             },
             getBoundingClientRect: () => {
               return new DOMRect(200, 200, 200, 200);
@@ -576,13 +768,13 @@ describe('InteractiveImageClickInput', () => {
   });
 
   it('should show region if in exploration editor', () => {
-    spyOn(contextService, 'getEditorTabContext').and.returnValue('editor');
+    spyOn(pageContextService, 'getEditorTabContext').and.returnValue('editor');
 
     expect(component.getDotDisplay()).toBe('none');
   });
 
   it('should not show region if not in exploration editor', () => {
-    spyOn(contextService, 'getEditorTabContext').and.returnValue('preview');
+    spyOn(pageContextService, 'getEditorTabContext').and.returnValue('preview');
 
     expect(component.getDotDisplay()).toBe('inline');
   });

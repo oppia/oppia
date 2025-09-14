@@ -19,7 +19,6 @@
 
 import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {CdkDragSortEvent, moveItemInArray} from '@angular/cdk/drag-drop';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {Hint} from 'domain/exploration/hint-object.model';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
@@ -35,7 +34,7 @@ import {ExternalSaveService} from 'services/external-save.service';
 import {AddHintModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-hint-modal.component';
 import {DeleteHintModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-hint-modal.component';
 import {DeleteLastHintModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-last-hint-modal.component';
-import {Solution} from 'domain/exploration/SolutionObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 interface DeleteValueResponse {
@@ -240,10 +239,3 @@ export class StateHintsEditorComponent implements OnInit {
     this.stateEditorService.updateStateHintsEditorInitialised();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaStateHintsEditor',
-  downgradeComponent({
-    component: StateHintsEditorComponent,
-  }) as angular.IDirectiveFactory
-);

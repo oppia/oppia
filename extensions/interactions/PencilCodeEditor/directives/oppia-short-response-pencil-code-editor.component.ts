@@ -21,7 +21,6 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 
 interface Answer {
@@ -47,10 +46,3 @@ export class ShortResponePencilCodeEditor implements OnInit {
     ).code;
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaShortResponsePencilCodeEditor',
-  downgradeComponent({
-    component: ShortResponePencilCodeEditor,
-  }) as angular.IDirectiveFactory
-);

@@ -19,7 +19,6 @@
 
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 interface ExplorationCreationBackendDict {
   exploration_id: string;
@@ -90,10 +89,3 @@ export class ExplorationCreationBackendApiService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ExplorationCreationBackendApiService',
-    downgradeInjectable(ExplorationCreationBackendApiService)
-  );

@@ -17,7 +17,6 @@
  */
 
 import {Injectable, EventEmitter} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 @Injectable({
   providedIn: 'root',
@@ -29,10 +28,3 @@ export class ExternalRteSaveService {
     return this._externalRteSaveEventEmitter;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ExternalRteSaveService',
-    downgradeInjectable(ExternalRteSaveService)
-  );

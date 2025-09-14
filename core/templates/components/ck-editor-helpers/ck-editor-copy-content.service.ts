@@ -17,7 +17,6 @@
  *               ck editor
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable, EventEmitter} from '@angular/core';
 
 import {HtmlEscaperService} from 'services/html-escaper.service';
@@ -43,6 +42,7 @@ export class CkEditorCopyContentService {
     'oppia-noninteractive-tabs',
     'oppia-noninteractive-video',
     'oppia-noninteractive-skillreview',
+    'oppia-noninteractive-workedexample',
   ]);
 
   private copyEventEmitter = new EventEmitter<CkEditorCopyEvent>();
@@ -209,10 +209,3 @@ export class CkEditorCopyContentService {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'CkEditorCopyContentService',
-    downgradeInjectable(CkEditorCopyContentService)
-  );

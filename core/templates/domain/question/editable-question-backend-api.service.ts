@@ -18,18 +18,14 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {HttpClient} from '@angular/common/http';
-import {
-  QuestionObjectFactory,
-  QuestionBackendDict,
-  Question,
-} from 'domain/question/QuestionObjectFactory';
+import {QuestionBackendDict, Question} from 'domain/question/question.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {QuestionDomainConstants} from 'domain/question/question-domain.constants';
-import {SkillBackendDict} from 'domain/skill/SkillObjectFactory';
+import {SkillBackendDict} from 'domain/skill/skill.model.ts';
 import {BackendChangeObject} from 'domain/editor/undo_redo/change.model';
+import cloneDeep from 'lodash/cloneDeep';
 
 export interface CreateQuestionResponse {
   questionId: string;
@@ -69,7 +65,6 @@ export interface ImageData {
 export class EditableQuestionBackendApiService {
   constructor(
     private http: HttpClient,
-    private questionObjectFactory: QuestionObjectFactory,
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
@@ -132,11 +127,10 @@ export class EditableQuestionBackendApiService {
         .toPromise()
         .then(
           response => {
-            let questionObject =
-              this.questionObjectFactory.createFromBackendDict(
-                response.question_dict
-              );
-            let skillDicts = angular.copy(response.associated_skill_dicts);
+            let questionObject = Question.createFromBackendDict(
+              response.question_dict
+            );
+            let skillDicts = cloneDeep(response.associated_skill_dicts);
             successCallback({
               questionObject: questionObject,
               associated_skill_dicts: skillDicts,
@@ -178,7 +172,7 @@ export class EditableQuestionBackendApiService {
         .toPromise()
         .then(
           response => {
-            let questionDict = angular.copy(response.questionDict);
+            let questionDict = cloneDeep(response.questionDict);
             successCallback(
               // The returned data is an updated question dict.
               questionDict
@@ -287,10 +281,3 @@ export class EditableQuestionBackendApiService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'EditableQuestionBackendApiService',
-    downgradeInjectable(EditableQuestionBackendApiService)
-  );

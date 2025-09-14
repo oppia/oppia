@@ -177,8 +177,7 @@ def migrate_state_schema(
     if state_schema_version is None or state_schema_version < 1:
         state_schema_version = 0
 
-    if not (25 <= state_schema_version
-            <= feconf.CURRENT_STATE_SCHEMA_VERSION):
+    if not 25 <= state_schema_version <= feconf.CURRENT_STATE_SCHEMA_VERSION:
         raise Exception(
             'Sorry, we can only process v25-v%d state schemas at present.' %
             feconf.CURRENT_STATE_SCHEMA_VERSION)

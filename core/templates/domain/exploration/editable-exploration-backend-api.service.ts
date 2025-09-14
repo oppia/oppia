@@ -20,10 +20,9 @@ import {HttpClient} from '@angular/common/http';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {AppConstants} from 'app.constants';
-import {ExplorationBackendDict} from './ExplorationObjectFactory';
+import {ExplorationBackendDict} from './exploration.model';
 import {ExplorationChange} from './exploration-draft.model';
 import {tap} from 'rxjs/operators';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 @Injectable({
@@ -247,10 +246,3 @@ export class EditableExplorationBackendApiService {
     return this._deleteExplorationAsync(explorationId);
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'EditableExplorationBackendApiService',
-    downgradeInjectable(EditableExplorationBackendApiService)
-  );

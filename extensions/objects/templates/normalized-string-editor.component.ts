@@ -28,7 +28,6 @@ import {
   Output,
   SimpleChanges,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {Subscription} from 'rxjs';
 import {ExternalSaveService} from 'services/external-save.service';
 
@@ -105,10 +104,3 @@ export class NormalizedStringEditorComponent
     this.componentSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'normalizedStringEditor',
-  downgradeComponent({
-    component: NormalizedStringEditorComponent,
-  }) as angular.IDirectiveFactory
-);
