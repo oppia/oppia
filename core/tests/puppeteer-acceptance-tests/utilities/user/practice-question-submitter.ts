@@ -504,8 +504,12 @@ export class PracticeQuestionSubmitter extends Contributor {
     feedback: string,
     correctResponse: boolean = true
   ): Promise<void> {
-    await this.waitForElementToBeClickable(editFeedbackButtonSelector);
-    await this.clickOn(editFeedbackButtonSelector);
+    const editFeedbackSelector = this.isViewportAtMobileWidth()
+      ? editFeedbackButtonMobileSelector
+      : editFeedbackButtonSelector;
+
+    await this.waitForElementToBeClickable(editFeedbackSelector);
+    await this.clickOn(editFeedbackSelector);
 
     await this.type(stateContentInputField, feedback);
     if (correctResponse) {
