@@ -180,7 +180,7 @@ describe('Topic Manager', function () {
       false
     );
     await topicManager.saveQuestion();
-    await topicManager.expectQuestionToBeVisible('Drag and Drop Sort.');
+    await topicManager.expectQuestionToBeVisible('Enter text input.');
 
     // Drag and Drop Sort Interaction.
     await topicManager.clickOnAddQuestionButton();
