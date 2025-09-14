@@ -39,8 +39,7 @@
     "core/tests/ci-test-suite-configs/README.md",
     "core/tests/puppeteer-acceptance-tests/jest.config.js",
     "core/tests/puppeteer-acceptance-tests/custom-jest-environment.js",
-    "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/manage-exploration-misconceptions.spec.ts",
-    "core/templates/domain/statistics/learner-answer-details.model.ts"
+    "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/manage-exploration-misconceptions.spec.ts"
   ],
   "RUN_ALL_TESTS_ROOT_FILES": [
     "extensions/ckeditor_plugins/pre/plugin.js",
