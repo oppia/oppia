@@ -74,7 +74,6 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         for story_summary in canonical_story_summaries:
             all_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
                 self.user_id, story_summary.id)['all_nodes']
-            # Show all nodes including drafts to fix chapter visibility issue
             filtered_nodes = all_nodes
             pending_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
                 self.user_id, story_summary.id)['pending_nodes']
