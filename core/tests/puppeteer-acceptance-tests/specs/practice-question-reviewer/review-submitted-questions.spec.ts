@@ -137,7 +137,6 @@ describe('Practice Question Reviewer', function () {
 
   it('should be able to navigate between questions to review', async function () {
     await questionReviewer.navigateToContributorDashboardUsingProfileDropdown();
-    await questionReviewer.navigateToTabInMyContributions('Review Questions');
 
     await questionReviewer.startQuestionReview('What is 231 + 12?', 'Addition');
     await questionReviewer.clickOn('Next');

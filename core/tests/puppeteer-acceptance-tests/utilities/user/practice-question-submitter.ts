@@ -373,10 +373,11 @@ export class PracticeQuestionSubmitter extends Contributor {
       );
 
       if (heading === opportunityHeadingTitle) {
-        const button = await item.$(suggestQuestionButton);
-        await this.page.evaluate(button => {
-          button.click();
-        }, button);
+        const button = await item.waitForSelector(suggestQuestionButton);
+        if (!button) {
+          throw new Error('Suggest Question button not found.');
+        }
+        await button.click();
 
         await item.waitForSelector(suggestQuestionButton, {hidden: true});
         return;
@@ -658,10 +659,11 @@ export class PracticeQuestionSubmitter extends Contributor {
     }
 
     await inputElement.click({clickCount: 3});
-    await this.page.keyboard.type(value);
+    await inputElement.type(value);
 
     await this.page.waitForFunction(
       (element: HTMLInputElement | HTMLTextAreaElement, value: string) => {
+        console.log('[debug] element.value: ' + element.value);
         return element.value.trim() === value;
       },
       {},
@@ -721,14 +723,18 @@ export class PracticeQuestionSubmitter extends Contributor {
       throw new Error(`Opportunity item for question ${question} not found.`);
     }
 
-    const viewButton = await questionElement.waitForSelector(
-      suggestQuestionButton
-    );
-    if (!viewButton) {
-      throw new Error('View button not found.');
-    }
+    if (this.isViewportAtMobileWidth()) {
+      await questionElement.click();
+    } else {
+      const viewButton = await questionElement.waitForSelector(
+        suggestQuestionButton
+      );
+      if (!viewButton) {
+        throw new Error('View button not found.');
+      }
 
-    await viewButton.click();
+      await viewButton.click();
+    }
     await this.expectElementToBeVisible(viewQuestionSudggestionModalHeader);
   }
 

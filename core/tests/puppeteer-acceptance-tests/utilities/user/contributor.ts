@@ -239,6 +239,14 @@ export class Contributor extends ExplorationEditor {
   ): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.expectElementToBeVisible(viewDropdownSelector);
+      await this.page.waitForFunction(
+        (selector: string) => {
+          const element = document.querySelector(selector);
+          return element && element.textContent !== '';
+        },
+        {},
+        viewDropdownSelector
+      );
       await this.clickOn(viewDropdownSelector);
 
       const xpath = `//*[contains(@class, '${viewDropdownOptionClass}') and contains(text(), "${tabName}")]`;
@@ -250,7 +258,7 @@ export class Contributor extends ExplorationEditor {
       }
       await optionElement.click();
 
-      await this.expectTextContentToContain(viewDropdownSelector, tabName);
+      await this.expectTextContentToBe(viewDropdownSelector, tabName);
     } else {
       const xpath = `//button[contains(@class, "${contributionTabClass}") and contains(text(), "${tabName}")]`;
 
