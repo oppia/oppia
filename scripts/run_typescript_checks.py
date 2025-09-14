@@ -68,6 +68,10 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/components/state-editor/state-interaction-editor/state-interaction-editor.component.spec.ts',
     'core/templates/components/state-editor/state-interaction-editor/state-interaction-editor.component.ts',
     'core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts',
+<<<<<<< Updated upstream
+=======
+    'core/templates/domain/exploration/states.model.spec.ts',
+>>>>>>> Stashed changes
     'core/templates/domain/exploration/editable-exploration-backend-api.service.spec.ts',
     'core/templates/domain/question/editable-question-backend-api.service.spec.ts',
     'core/templates/domain/question/question-update.service.ts',

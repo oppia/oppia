@@ -133,7 +133,7 @@ def get_file_spec(file_path: str) -> str | None:
         If the file is not a TypeScript or JavaScript file, None is returned.
     """
     if (
-        file_path.endswith(('.spec.ts', '.spec.js', 'Spec.ts', 'Spec.js')) and
+        file_path.endswith(('.spec.ts', '.spec.js', 'Spec.js')) and
         os.path.exists(file_path)
     ):
         return file_path
@@ -143,7 +143,7 @@ def get_file_spec(file_path: str) -> str | None:
         if os.path.exists(spec_file_path):
             return spec_file_path
 
-        spec_file_path = file_path.replace('.ts', 'Spec.ts').replace(
+        spec_file_path = file_path.replace('.ts').replace(
             '.js', 'Spec.js')
         if os.path.exists(spec_file_path):
             return spec_file_path
