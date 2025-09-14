@@ -61,6 +61,7 @@ const languageSelector = '.e2e-test-language-selector';
 const selectedLanguageSelector = '.e2e-test-language-selector-selected';
 const featuredLanguageOptionSelector = '.e2e-test-featured-language';
 const languageOptionSelector = '.e2e-test-language-selector-option';
+const rteDisplaySelector = '.e2e-test-state-content-display';
 
 export class Contributor extends ExplorationEditor {
   /**
@@ -616,6 +617,14 @@ export class Contributor extends ExplorationEditor {
 
     // Verify language is selected.
     await this.expectTextContentToContain(selectedLanguageSelector, language);
+  }
+
+  /**
+   * Checks that the question in the review modal is the same as the one passed in.
+   * @param question The question to check.
+   */
+  async expectQuestionInReviewModalToBe(question: string): Promise<void> {
+    await this.expectTextContentToBe(rteDisplaySelector, question);
   }
 }
 

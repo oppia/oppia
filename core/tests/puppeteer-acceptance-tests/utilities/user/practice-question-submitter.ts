@@ -379,7 +379,7 @@ export class PracticeQuestionSubmitter extends Contributor {
         }
         await button.click();
 
-        await item.waitForSelector(suggestQuestionButton, {hidden: true});
+        await this.expectQuestionInReviewModalToBe(opportunityHeadingTitle);
         return;
       }
     }

@@ -36,7 +36,6 @@ const editQuestionPencilIconSelector = '.e2e-test-edit-content-pencil-button';
 const saveQuestionButtonSelector = '.e2e-test-save-question-button';
 
 // Other Selectors.
-const rteDisplaySelector = '.e2e-test-state-content-display';
 
 export class PracticeQuestionReviewer extends Contributor {
   /**
@@ -165,18 +164,12 @@ export class PracticeQuestionReviewer extends Contributor {
   }
 
   /**
-   * Checks that the question in the review modal is the same as the one passed in.
-   * @param question The question to check.
-   */
-  async expectQuestionInReviewModalToBe(question: string): Promise<void> {
-    await this.expectTextContentToBe(rteDisplaySelector, question);
-  }
-
-  /**
    * Checks if the question review modal is present or not.
    * @param visible - Whether the modal should be visible or not.
    */
-  async expectQuestionReviewModalToBePresent(visible: boolean = true) {
+  async expectQuestionReviewModalToBePresent(
+    visible: boolean = true
+  ): Promise<void> {
     await this.expectElementToBeVisible(reviewModalHeaderSelector, visible);
   }
 }
