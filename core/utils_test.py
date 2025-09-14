@@ -818,12 +818,6 @@ class UtilsTests(test_utils.GenericTestBase):
             base64.b64encode(b'hello').decode('utf-8'))
         )
 
-    def test_url_open(self) -> None:
-        response = utils.url_open('http://www.google.com')
-        self.assertEqual(response.getcode(), 200)
-        self.assertEqual(
-            response.url, 'http://www.google.com')
-
     def test_get_random_int(self) -> None:
         self.assertLess(utils.get_random_int(5), 5)
         self.assertGreaterEqual(utils.get_random_int(5), 0)

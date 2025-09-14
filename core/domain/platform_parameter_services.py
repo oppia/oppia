@@ -38,7 +38,16 @@ DATA_TYPE_TO_SCHEMA_TYPE: Dict[str, str] = {
     'bool': 'bool'
 }
 
-PACKAGE_JSON_FILE_PATH: Final = os.path.join(os.getcwd(), 'package.json')
+# We use a relative path here because functions in this file are used within
+# the oppia-beam-job library in Apache Beam, and the root of the execution
+# cannot be assumed to be at oppia/ (since, in that environment, all the Oppia
+# code is a library in Python's site-packages).
+#
+# Note that os.path.abspath(__file__) provides the path of the current
+# platform_parameter_services.py module.
+PACKAGE_JSON_FILE_PATH: Final = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)),
+    os.pardir, os.pardir, 'package.json')
 
 
 class PlatformParameterNotFoundException(Exception):

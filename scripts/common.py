@@ -36,6 +36,7 @@ from urllib import request as urlrequest
 from core import feconf
 from scripts import servers
 
+import certifi
 from typing import Dict, Final, Generator, List, Optional, Tuple, Union
 
 # Add third_party to path. Some scripts access feconf even before
@@ -750,6 +751,21 @@ def write_stdout_safe(string: Union[str, bytes]) -> None:
                 continue
 
             raise
+
+
+def url_open(
+    source_url: Union[str, urlrequest.Request]
+) -> urlrequest._UrlopenRet:
+    """Opens a URL and returns the response.
+
+    Args:
+        source_url: Union[str, Request]. The URL.
+
+    Returns:
+        urlopen. The 'urlopen' object.
+    """
+    context = ssl.create_default_context(cafile=certifi.where())
+    return urlrequest.urlopen(source_url, context=context)
 
 
 def url_retrieve(
