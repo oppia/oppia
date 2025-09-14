@@ -37,9 +37,9 @@ class RedisClient:
     """Redis client for our own implementation of caching."""
 
     def __init__(self) -> None:
-        self._redishost = None
-        self._oppia_redis_client = None
-        self._cloud_ndb_redis_client = None
+        self._redishost: Optional[str] = None
+        self._oppia_redis_client: Optional[redis.StrictRedis[str]] = None
+        self._cloud_ndb_redis_client: Optional[redis.StrictRedis[str]] = None
 
     def _update_clients_if_needed(self) -> None:
         """Recreates and updates clients if the redis host has changed."""
