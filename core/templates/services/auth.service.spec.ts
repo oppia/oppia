@@ -309,12 +309,12 @@ describe('Auth service', function () {
       spyOn(XMLHttpRequest.prototype, 'send');
       const firebaseConfig = AuthService.fetchConfigFromBackend();
       expect(firebaseConfig).toEqual({
-        apiKey: 'fake-api-key',
-        authDomain: '',
-        projectId: 'dev-project-id',
-        storageBucket: '',
-        messagingSenderId: '',
-        appId: '',
+        FIREBASE_CONFIG_API_KEY: 'fake-api-key',
+        FIREBASE_CONFIG_AUTH_DOMAIN: '',
+        FIREBASE_CONFIG_PROJECT_ID: 'dev-project-id',
+        FIREBASE_CONFIG_STORAGE_BUCKET: '',
+        FIREBASE_CONFIG_MESSAGING_SENDER_ID: '',
+        FIREBASE_CONFIG_APP_ID: '',
       });
       expect(XMLHttpRequest.prototype.open).toHaveBeenCalled();
     });
@@ -349,12 +349,12 @@ describe('Auth service', function () {
         false
       );
       expect(firebaseConfig).toEqual({
-        apiKey: 'test-api-key',
-        authDomain: 'test-auth-domain',
-        projectId: 'test-project-id',
-        storageBucket: 'test-storage-bucket',
-        messagingSenderId: 'test-sender-id',
-        appId: 'test-app-id',
+        FIREBASE_CONFIG_API_KEY: 'test-api-key',
+        FIREBASE_CONFIG_AUTH_DOMAIN: 'test-auth-domain',
+        FIREBASE_CONFIG_PROJECT_ID: 'test-project-id',
+        FIREBASE_CONFIG_STORAGE_BUCKET: 'test-storage-bucket',
+        FIREBASE_CONFIG_MESSAGING_SENDER_ID: 'test-sender-id',
+        FIREBASE_CONFIG_APP_ID: 'test-app-id',
       });
     });
 
@@ -380,12 +380,12 @@ describe('Auth service', function () {
         false
       );
       expect(firebaseConfig).toEqual({
-        apiKey: 'fake-api-key',
-        authDomain: '',
-        projectId: 'dev-project-id',
-        storageBucket: '',
-        messagingSenderId: '',
-        appId: '',
+        FIREBASE_CONFIG_API_KEY: 'fake-api-key',
+        FIREBASE_CONFIG_AUTH_DOMAIN: '',
+        FIREBASE_CONFIG_PROJECT_ID: 'dev-project-id',
+        FIREBASE_CONFIG_STORAGE_BUCKET: '',
+        FIREBASE_CONFIG_MESSAGING_SENDER_ID: '',
+        FIREBASE_CONFIG_APP_ID: '',
       });
     });
 
