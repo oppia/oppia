@@ -94,6 +94,6 @@ class IndexExplorationSummaries(beam.DoFn): # type: ignore[misc]
         try:
             search_services.index_exploration_summaries(exp_summary)
             for _ in exp_summary:
-                yield result.Ok()
+                yield result.Ok(True)
         except platform_search_services.SearchException as e:
             yield result.Err(e)
