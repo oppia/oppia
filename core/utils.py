@@ -27,7 +27,6 @@ import json
 import os
 import random
 import re
-import ssl
 import string
 import time
 import unicodedata
@@ -38,7 +37,6 @@ from core import feconf
 from core.constants import constants
 
 from PIL import Image
-import certifi
 import filetype
 import yaml
 
@@ -1394,21 +1392,6 @@ def quoted(s: str) -> str:
         str. The quoted string.
     """
     return json.dumps(s)
-
-
-def url_open(
-    source_url: Union[str, urllib.request.Request]
-) -> urllib.request._UrlopenRet:
-    """Opens a URL and returns the response.
-
-    Args:
-        source_url: Union[str, Request]. The URL.
-
-    Returns:
-        urlopen. The 'urlopen' object.
-    """
-    context = ssl.create_default_context(cafile=certifi.where())
-    return urllib.request.urlopen(source_url, context=context)
 
 
 def escape_html(unescaped_html_data: str) -> str:

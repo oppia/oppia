@@ -98,6 +98,6 @@ class IndexBlogPostSummaries(beam.DoFn): # type: ignore[misc]
             search_services.index_blog_post_summaries(
                 blog_post_summaries)
             for _ in blog_post_summaries:
-                yield result.Ok()
+                yield result.Ok(True)
         except platform_search_services.SearchException as e:
             yield result.Err(e)

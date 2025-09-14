@@ -801,6 +801,29 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28'
             'Windows%29' in self.print_arr)
 
+    def test_normalize_python_library_name(
+        self
+    ) -> None:
+        expected_normalized_names = [
+            ('backports-tarfile', 'backports.tarfile'),
+            ('backports-tarfile-2', 'backports.tarfile-2'),
+            ('apache-beam[gcp]', 'apache-beam'),
+            ('Pillow', 'pillow'),
+            ('pylatexenc', 'pylatexenc'),
+            ('PyYAML', 'pyyaml')
+        ]
+
+        for lib_name, expected_normalized_name in expected_normalized_names:
+            observed_normalized_name = (
+                install_python_prod_dependencies.normalize_python_library_name(
+                    lib_name))
+            self.assertEqual(
+                observed_normalized_name,
+                expected_normalized_name,
+                msg='%s should normalize to %s, but observed %s' % (
+                    lib_name, expected_normalized_name,
+                    observed_normalized_name))
+
     def test_uniqueness_of_normalized_lib_names_in_requirements_file(
         self
     ) -> None:
@@ -830,7 +853,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             lines = f.readlines()
             for line in lines:
                 trimmed_line = line.strip()
-                if not trimmed_line or trimmed_line.startswith(('#', 'git')):
+                if not trimmed_line or trimmed_line.startswith((
+                        '#', 'git', '--hash')):
                     continue
                 library_name_and_version_string = trimmed_line.split(
                     ' ')[0].split('==')
