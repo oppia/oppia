@@ -245,9 +245,9 @@ describe('Translation Submitter', function () {
     await translationSubmitter.clickOnRTEOptionContainingTitle(
       RTE_BUTTON_TITLES.IMAGE.HI
     );
-    await translationSubmitter.clickOn('UPLOAD');
+    await translationSubmitter.clickOnElementWithText('UPLOAD');
     await translationSubmitter.uploadFile(testConstants.data.profilePicture);
-    await translationSubmitter.clickOn('Use This Image');
+    await translationSubmitter.clickOnElementWithText('Use This Image');
     await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
       'textarea',
       'छवि विवरण'
