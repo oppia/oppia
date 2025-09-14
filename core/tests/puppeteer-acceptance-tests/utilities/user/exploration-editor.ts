@@ -32,8 +32,6 @@ const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 const baseUrl = testConstants.URLs.BaseURL;
 const imageToUpload = testConstants.data.curriculumAdminThumbnailImage;
 
-const createExplorationButton = 'button.e2e-test-create-new-exploration-button';
-
 const createExplorationButtonSelector =
   'button.e2e-test-create-new-exploration-button';
 const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
@@ -2441,7 +2439,7 @@ export class ExplorationEditor extends BaseUser {
    * Function to navigate to exploration editor.
    */
   async navigateToExplorationEditorPage(): Promise<void> {
-    await this.clickAndWaitForNavigation(createExplorationButton);
+    await this.clickAndWaitForNavigation(createExplorationButtonSelector);
   }
 
   /**

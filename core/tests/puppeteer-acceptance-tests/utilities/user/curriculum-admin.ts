@@ -354,6 +354,7 @@ export class CurriculumAdmin extends BaseUser {
       `${confirmSkillCreationButton}:not([disabled])`
     );
     const newPagePromise = this.waitForNewPage();
+    await this.waitForElementToStabilize(confirmSkillCreationButton);
     await this.clickOn(confirmSkillCreationButton);
     // Close new page, so that screenrecorder doesn't capture it and remove
     // focus from the main page.
