@@ -20,7 +20,7 @@
 import {Injectable} from '@angular/core';
 import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
 import {ExplorationChange} from 'domain/exploration/exploration-draft.model';
-import {ExplorationBackendDict} from 'domain/exploration/ExplorationObjectFactory';
+import {ExplorationBackendDict} from 'domain/exploration/exploration.model';
 import {
   ReadOnlyExplorationBackendApiService,
   ReadOnlyExplorationBackendDict,

@@ -1298,6 +1298,7 @@
     "I18N_PLAYER_PLUS_TAGS": "<[additionalTagNumber]>+ more tags",
     "I18N_PLAYER_PREVIOUS_RESPONSES": "Previous responses (<[previousResponses]>)",
     "I18N_PLAYER_RATE_EXPLORATION": "Learned something new? How would you rate this exploration?",
+    "I18N_PLAYER_RATE_LESSON": "How would you rate this lesson?",
     "I18N_PLAYER_RATINGS_TOOLTIP": "Ratings",
     "I18N_PLAYER_RECOMMEND_EXPLORATIONS": "Suggested Next",
     "I18N_PLAYER_REPORT_MODAL_BODY_AD": "Misleading content, spam or ads",
