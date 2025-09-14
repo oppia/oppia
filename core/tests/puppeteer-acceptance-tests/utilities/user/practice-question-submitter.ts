@@ -83,9 +83,9 @@ const solutionInputNumeric = 'oppia-add-or-update-solution-modal input';
 const solutionInputTextArea =
   '.e2e-test-interaction-html textarea.e2e-test-description-box';
 const submitQuestionButon = '.e2e-test-save-question-button';
-const feedbackEditorButton =
+const editFeedbackButtonSelector =
   'div.oppia-edit-feedback .oppia-click-to-start-editing';
-const editFeedbackButtonSelector = '.e2e-test-open-feedback-editor';
+const editFeedbackButtonMobileSelector = '.e2e-test-open-feedback-editor';
 const addElementToTextInputInteraction = 'button.e2e-test-add-list-entry';
 const viewQuestionSudggestionModalHeader =
   '.e2e-test-question-suggestion-review-modal-header';
@@ -433,8 +433,8 @@ export class PracticeQuestionSubmitter extends Contributor {
     });
 
     const editFeedbackSelector = this.isViewportAtMobileWidth()
-      ? editFeedbackButtonSelector
-      : feedbackEditorButton;
+      ? editFeedbackButtonMobileSelector
+      : editFeedbackButtonSelector;
 
     await this.waitForElementToStabilize(editFeedbackSelector);
     await this.clickOn(editFeedbackSelector);
@@ -468,8 +468,8 @@ export class PracticeQuestionSubmitter extends Contributor {
     await this.page.waitForSelector(textInputField, {visible: true});
     await this.type(textInputField, answer);
 
-    await this.waitForElementToBeClickable(feedbackEditorButton);
-    await this.clickOn(feedbackEditorButton);
+    await this.waitForElementToBeClickable(editFeedbackButtonSelector);
+    await this.clickOn(editFeedbackButtonSelector);
     await this.page.waitForSelector(stateContentInputField, {visible: true});
     await this.type(stateContentInputField, 'Last Card');
     await this.clickOn(correctAnswerInTheGroupSelector);
@@ -504,8 +504,8 @@ export class PracticeQuestionSubmitter extends Contributor {
     feedback: string,
     correctResponse: boolean = true
   ): Promise<void> {
-    await this.waitForElementToBeClickable(feedbackEditorButton);
-    await this.clickOn(feedbackEditorButton);
+    await this.waitForElementToBeClickable(editFeedbackButtonSelector);
+    await this.clickOn(editFeedbackButtonSelector);
 
     await this.type(stateContentInputField, feedback);
     if (correctResponse) {
@@ -563,8 +563,11 @@ export class PracticeQuestionSubmitter extends Contributor {
       hidden: true,
     });
 
-    await this.waitForElementToBeClickable(editFeedbackButtonSelector);
-    await this.clickOn(editFeedbackButtonSelector);
+    const editButtonSelector = this.isViewportAtMobileWidth()
+      ? editFeedbackButtonMobileSelector
+      : editFeedbackButtonSelector;
+    await this.waitForElementToBeClickable(editButtonSelector);
+    await this.clickOn(editButtonSelector);
     await this.page.waitForSelector(addAnswerGroupComponentSelector, {
       visible: true,
     });
