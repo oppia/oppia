@@ -357,25 +357,25 @@ describe('Auth service', function () {
       expect(fetchSpy).toHaveBeenCalledWith('/firebase_config');
     });
 
-    it('should parse config returned from request', async () => {
-      const mockConfig = {
-        FIREBASE_CONFIG_API_KEY: 'test-api-key',
-        FIREBASE_CONFIG_AUTH_DOMAIN: 'test-auth-domain',
-        FIREBASE_CONFIG_PROJECT_ID: 'test-project-id',
-        FIREBASE_CONFIG_STORAGE_BUCKET: 'test-storage-bucket',
-        FIREBASE_CONFIG_MESSAGING_SENDER_ID: 'test-sender-id',
-        FIREBASE_CONFIG_APP_ID: 'test-app-id',
+    it('should return default config if response is not ok', async () => {
+      const defaultFirebaseConfig = {
+        FIREBASE_CONFIG_API_KEY: 'fake-api-key',
+        FIREBASE_CONFIG_AUTH_DOMAIN: '',
+        FIREBASE_CONFIG_PROJECT_ID: 'dev-project-id',
+        FIREBASE_CONFIG_STORAGE_BUCKET: '',
+        FIREBASE_CONFIG_MESSAGING_SENDER_ID: '',
+        FIREBASE_CONFIG_APP_ID: '',
       };
       fetchSpy.and.resolveTo({
-        ok: true,
-        text: () => Promise.resolve(")]}'" + JSON.stringify(mockConfig)),
+        ok: false,
       } as Response);
 
       const firebaseConfig = await AuthService.fetchConfigFromBackend();
-      expect(firebaseConfig).toEqual(mockConfig);
+
+      expect(firebaseConfig).toEqual(defaultFirebaseConfig);
     });
 
-    it('should return default config if request returns empty', async () => {
+    it('should return default config if request returns empty string', async () => {
       const defaultFirebaseConfig = {
         FIREBASE_CONFIG_API_KEY: 'fake-api-key',
         FIREBASE_CONFIG_AUTH_DOMAIN: '',
@@ -390,6 +390,48 @@ describe('Auth service', function () {
       } as Response);
 
       const firebaseConfig = await AuthService.fetchConfigFromBackend();
+      expect(firebaseConfig).toEqual(defaultFirebaseConfig);
+    });
+
+    it('should return default config if parsed JSON is empty', async () => {
+      const defaultFirebaseConfig = {
+        FIREBASE_CONFIG_API_KEY: 'fake-api-key',
+        FIREBASE_CONFIG_AUTH_DOMAIN: '',
+        FIREBASE_CONFIG_PROJECT_ID: 'dev-project-id',
+        FIREBASE_CONFIG_STORAGE_BUCKET: '',
+        FIREBASE_CONFIG_MESSAGING_SENDER_ID: '',
+        FIREBASE_CONFIG_APP_ID: '',
+      };
+      fetchSpy.and.resolveTo({
+        ok: true,
+        text: () => Promise.resolve(")]}'" + JSON.stringify({})),
+      } as Response);
+
+      const firebaseConfig = await AuthService.fetchConfigFromBackend();
+      expect(firebaseConfig).toEqual(defaultFirebaseConfig);
+    });
+
+    it('should return default config on parsing error', async () => {
+      const defaultFirebaseConfig = {
+        FIREBASE_CONFIG_API_KEY: 'fake-api-key',
+        FIREBASE_CONFIG_AUTH_DOMAIN: '',
+        FIREBASE_CONFIG_PROJECT_ID: 'dev-project-id',
+        FIREBASE_CONFIG_STORAGE_BUCKET: '',
+        FIREBASE_CONFIG_MESSAGING_SENDER_ID: '',
+        FIREBASE_CONFIG_APP_ID: '',
+      };
+      fetchSpy.and.resolveTo({
+        ok: true,
+        text: () => Promise.resolve(")]}'" + 'invalid json'),
+      } as Response);
+      const consoleSpy = spyOn(console, 'error');
+
+      const firebaseConfig = await AuthService.fetchConfigFromBackend();
+
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'Unable to parse firebase config : ',
+        jasmine.any(SyntaxError)
+      );
       expect(firebaseConfig).toEqual(defaultFirebaseConfig);
     });
 
