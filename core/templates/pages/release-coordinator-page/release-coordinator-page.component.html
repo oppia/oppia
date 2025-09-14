@@ -138,7 +138,7 @@
                         <mat-icon class="oppia-cancel-button-text">cancel</mat-icon>
                       </button>
                     </mat-chip>
-                    <input placeholder="Add Username"
+                    <input placeholder="Add Username and press Enter"
                            #userInputToAddUserToGroup
                            [matChipInputFor]="chipList"
                            [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
@@ -208,6 +208,8 @@
     font-size: 16px;
     position: absolute;
     right: 10%;
+    padding: 8px;
+    z-index: 10;
     -webkit-transition: all 200ms;
     transition: all 200ms;
   }
