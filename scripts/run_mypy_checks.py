@@ -33,6 +33,7 @@ EXCLUDED_DIRECTORIES: Final = [
     'scripts/linters/test_files/',
     'third_party/',
     'venv/',
+    '.direnv/',
     # The files in 'build_sources' and 'data' directories can be
     # ignored while type checking, because these files are only
     # used as resources for the tests.

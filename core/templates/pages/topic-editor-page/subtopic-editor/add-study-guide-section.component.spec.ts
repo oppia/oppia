@@ -127,7 +127,7 @@ describe('Add Study Guide Section Modal Component', () => {
     expect(schema).toEqual({
       type: 'html',
       ui_config: {
-        rte_components: 'ALL_COMPONENTS',
+        rte_component_config_id: 'ALL_COMPONENTS',
         rows: 100,
       },
     });
