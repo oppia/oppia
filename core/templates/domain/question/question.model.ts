@@ -13,11 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating and mutating instances of frontend
+ * @fileoverview Model for creating and mutating instances of frontend
  * question domain objects.
  */
 
-import {Injectable} from '@angular/core';
 import {State, StateBackendDict} from 'domain/state/state.model';
 import {AppConstants} from 'app.constants';
 import {MisconceptionSkillMap} from 'domain/skill/misconception.model';
@@ -182,16 +181,11 @@ export class Question {
     }
     return questionBackendDict;
   }
-}
 
-@Injectable({
-  providedIn: 'root',
-})
-export class QuestionObjectFactory {
   // TODO(#14312): Remove the createDefaultQuestion so that full question can be
   // created from start.
   // Create a default question until the actual question is saved.
-  createDefaultQuestion(skillIds: string[]): Question {
+  static createDefaultQuestion(skillIds: string[]): Question {
     return new Question(
       null,
       State.createDefaultState(null, 'content_0', 'default_outcome_1'),
@@ -203,7 +197,9 @@ export class QuestionObjectFactory {
     );
   }
 
-  createFromBackendDict(questionBackendDict: QuestionBackendDict): Question {
+  static createFromBackendDict(
+    questionBackendDict: QuestionBackendDict
+  ): Question {
     return new Question(
       questionBackendDict.id,
       State.createFromBackendDict(

@@ -85,7 +85,7 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
   SUBTOPIC_PAGE_SCHEMA: {
     type: string;
     ui_config: {
-      rte_components: string;
+      rte_component_config_id: string;
       rows: number;
     };
   };
@@ -442,7 +442,7 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
         : 'ALL_COMPONENTS';
     this.SUBTOPIC_PAGE_SCHEMA = {
       type: 'html',
-      ui_config: {rte_components: rteComponents, rows: 100},
+      ui_config: {rte_component_config_id: rteComponents, rows: 100},
     };
     this.htmlData = '';
     this.sections = [];
