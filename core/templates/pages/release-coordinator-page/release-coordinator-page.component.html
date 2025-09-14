@@ -2,8 +2,16 @@
 
 <div align="center"
      *ngIf="statusMessage"
-     class="oppia-status-message-container e2e-test-status-message">
-  {{ statusMessage }}
+     class="oppia-status-message-container e2e-test-status-me  .oppia-edit-icon {
+    cursor: pointer;
+    font-size: 16px;
+    padding: 8px;
+    position: absolute;
+    right: 10%;
+    -webkit-transition: all 200ms;
+    transition: all 200ms;
+    z-index: 10;
+  }{{ statusMessage }}
 </div>
 <br>
 <div class="oppia-release-coordinator-page-tabs-container">
@@ -206,11 +214,11 @@
   .oppia-edit-icon {
     cursor: pointer;
     font-size: 16px;
+    padding: 8px;
     position: absolute;
     right: 10%;
-    padding: 8px;
-    z-index: 10;
     -webkit-transition: all 200ms;
+    z-index: 10;
     transition: all 200ms;
   }
   .oppia-warning-text {
