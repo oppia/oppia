@@ -159,7 +159,6 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/topic-editor-page/subtopic-editor/subtopic-editor-tab.component.ts',
     'core/templates/pages/topic-editor-page/topic-editor-page.component.spec.ts',
     'core/templates/pages/topic-editor-page/topic-editor-page.component.ts',
-    'core/templates/services/UpgradedServices.ts',
     'core/templates/services/angular-services.index.ts',
     'core/templates/services/exploration-improvements-task-registry.service.ts',
     'core/templates/services/nested-directives-recursion-timeout-prevention.service.spec.ts',
