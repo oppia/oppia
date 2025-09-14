@@ -8,5 +8,8 @@ include extensions/interactions/html_field_types_to_rule_specs.json
 include extensions/interactions/legacy_interaction_specs_by_state_version/*.json
 include extensions/interactions/rule_templates.json
 include extensions/objects/object_defaults.json
-include requirements.txt
+# This file is needed if a job needs to determine the value of platform
+# parameters, since part of the workflow for that is to read the server version
+# from package.json.
 include package.json
+include requirements.txt
