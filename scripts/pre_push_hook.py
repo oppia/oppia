@@ -274,8 +274,10 @@ def check_for_backend_python_library_inconsistencies() -> None:
         print('\n')
         common.print_each_string_after_two_new_lines([
             'Please fix these discrepancies by editing the `requirements.in`\n'
-            'file or running `scripts.install_third_party_libs` to regenerate\n'
-            'the `third_party/python_libs` directory.\n'])
+            'file, running `scripts.install_third_party_libs` to regenerate\n'
+            'the `third_party/python_libs` directory, or updating\n'
+            '_get_possible_normalized_metadata_directory_names() in\n'
+            'install_python_prod_dependencies().\n'])
         sys.exit(1)
     else:
         print('Python dependencies consistency check succeeded.')
