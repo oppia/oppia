@@ -376,29 +376,35 @@ export class Contributor extends ExplorationEditor {
       | 'Question Contributions'
       | 'Question Reviews'
   ): Promise<void> {
-    const dropdownSelector = this.isViewportAtMobileWidth()
-      ? `${topicSelector}${mobileElementSelector}`
-      : `${topicSelector}${desktopElementSelector}`;
     const selectedOptionSelector = this.isViewportAtMobileWidth()
       ? `${selectedTopicSelector}${mobileElementSelector}`
       : `${selectedTopicSelector}${desktopElementSelector}`;
 
-    await this.expectElementToBeVisible(dropdownSelector);
-    await this.clickOn(dropdownSelector);
+    if (this.isViewportAtMobileWidth()) {
+      await this.waitForPageToFullyLoad();
+    }
+
+    await this.expectElementToBeVisible(selectedOptionSelector);
+    await this.clickOn(selectedOptionSelector);
 
     await this.expectElementToBeVisible(topicOptionSelector);
     const contibutionTypeOptions = await this.page.$$(topicOptionSelector);
     let optionElement: ElementHandle<Element> | null = null;
+    let foundOptions: string[] = [];
     for (const option of contibutionTypeOptions) {
       const optionText = await option.evaluate(el => el.textContent?.trim());
       if (optionText === contributionType) {
         optionElement = option;
         break;
       }
+      foundOptions.push(optionText ?? '');
     }
 
     if (!optionElement) {
-      throw new Error(`Option ${contributionType} not found.`);
+      throw new Error(
+        `Option "${contributionType}" not found.\n` +
+          `Found Options: "${foundOptions.join('", "')}"`
+      );
     }
 
     // Click on the option.

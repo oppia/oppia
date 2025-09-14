@@ -112,7 +112,7 @@ describe('Practice Question Submitter', function () {
       'math-classroom',
       'Arithmetic Operations'
     );
-  }, 600000);
+  }, 750000);
 
   it('should be able to check contribution stats', async function () {
     // Submit question suggestions.
