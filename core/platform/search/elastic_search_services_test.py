@@ -272,9 +272,10 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                     'hits': []
                 }
             }
-
+        
+        es_client = elastic_search_services.ES.get_client()
         swap_search = self.swap(
-            elastic_search_services.ES, 'search', mock_search)
+            es_client, 'search', mock_search)
         with swap_search:
             result, new_offset = elastic_search_services.search(
                 'query', correct_index_name, ['my_category'], ['en', 'es']

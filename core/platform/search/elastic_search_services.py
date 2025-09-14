@@ -300,7 +300,7 @@ def search(
             'rank': {
                 'order': 'desc',
                 'missing': '_last',
-                'unmapped_type': 'float'
+                'unmapped_type': 'float',
             }
         }]
     }
