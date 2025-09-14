@@ -1797,6 +1797,7 @@ export class ExplorationEditor extends BaseUser {
             });
           });
         }
+        await this.waitForElementToStabilize(addListEntryButtonSelector);
         await this.clickOn(addListEntryButtonSelector);
         await this.page.waitForSelector(textInputInteractionOption);
         await this.page.type(textInputInteractionOption, answer);
