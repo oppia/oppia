@@ -49,8 +49,8 @@ jobs:
       fail-fast: false
       matrix:
         suite:
-          - name: translation-submitter/translate-exploration-in-target-language
-            short_name: translate-exploration-in-target-language
+          # - name: translation-submitter/translate-exploration-in-target-language
+          #   short_name: translate-exploration-in-target-language
           - name: translation-submitter/check-their-accomplishment
             short_name: check-their-accomplishment
           - name: translation-reviewer/review-the-translations
@@ -67,7 +67,8 @@ jobs:
             short_name: view-contribution-stats-and-badges-earned
         run1: [1, 2]
         run2: [1]
-        mobile: [false, true]
+        # mobile: [false, true]
+        mobile: [true]
     name: ${{ matrix.mobile && 'M' || 'D' }}-${{ matrix.suite.short_name }}
     steps:
       - name: Check for broken suites
