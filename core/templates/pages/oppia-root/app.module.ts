@@ -44,7 +44,11 @@ import {
   AngularFireAuthModule,
   USE_EMULATOR,
 } from '@angular/fire/auth';
-import {AngularFireModule, FIREBASE_OPTIONS} from '@angular/fire';
+import {
+  AngularFireModule,
+  FirebaseOptions,
+  FIREBASE_OPTIONS,
+} from '@angular/fire';
 import {AuthService} from 'services/auth.service';
 // This throws "TS2307". We need to
 // suppress this error because hammer come from hammerjs
@@ -84,9 +88,10 @@ export class MyHammerConfig extends HammerGestureConfig {
   };
 }
 
-export function firebaseConfigInitializerFactory() {
-  return () => AuthService.getFirebaseConfigAsync();
-}
+const firebaseConfigInitializerFactory =
+  function (): () => Promise<FirebaseOptions> {
+    return () => AuthService.getFirebaseConfigAsync();
+  };
 
 @NgModule({
   imports: [

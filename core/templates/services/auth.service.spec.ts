@@ -255,6 +255,11 @@ describe('Auth service', function () {
       authService = new AuthService(angularFireAuth, authBackendApiService);
     });
 
+    beforeEach(() => {
+      AuthService.firebaseConfigPromise = undefined;
+      AuthService.firebaseConfigDict = undefined;
+    });
+
     it('should not delegate to signInWithRedirectAsync', async () => {
       await expectAsync(authService.signInWithRedirectAsync()).toBeResolvedTo();
 

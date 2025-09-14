@@ -21,7 +21,11 @@ import 'zone.js';
 // Modules.
 import {CommonModule} from '@angular/common';
 import {APP_INITIALIZER, NgModule} from '@angular/core';
-import {AngularFireModule, FIREBASE_OPTIONS} from '@angular/fire';
+import {
+  AngularFireModule,
+  FirebaseOptions,
+  FIREBASE_OPTIONS,
+} from '@angular/fire';
 import {
   AngularFireAuth,
   AngularFireAuthModule,
@@ -231,9 +235,10 @@ import {SaveProgressModalComponent} from 'pages/exploration-player-page/new-less
 import {CheckpointCelebrationFooterComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/checkpoint-celebration-footer.component';
 import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/new-ratings-and-recommendations.component';
 
-export function firebaseConfigInitializerFactory() {
-  return () => AuthService.getFirebaseConfigAsync();
-}
+const firebaseConfigInitializerFactory =
+  function (): () => Promise<FirebaseOptions> {
+    return () => AuthService.getFirebaseConfigAsync();
+  };
 
 @NgModule({
   imports: [
