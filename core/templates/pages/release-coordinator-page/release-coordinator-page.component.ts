@@ -336,11 +336,16 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
 
   updateUserGroup(userGroup: UserGroup): void {
     // Check if there's pending text in the input field and add it.
-    const pendingInput =
-      this.userInputToAddUserToGroup.nativeElement.value.trim();
-    if (pendingInput) {
-      // Call the existing addUserToUserGroup function.
-      this.addUserToUserGroup({value: pendingInput}, userGroup);
+    if (
+      this.userInputToAddUserToGroup &&
+      this.userInputToAddUserToGroup.nativeElement
+    ) {
+      const pendingInput =
+        this.userInputToAddUserToGroup.nativeElement.value.trim();
+      if (pendingInput) {
+        // Call the existing addUserToUserGroup function.
+        this.addUserToUserGroup({value: pendingInput}, userGroup);
+      }
     }
 
     const ALPHANUMERIC_REGEX = /^[a-zA-Z0-9 ]+$/;
