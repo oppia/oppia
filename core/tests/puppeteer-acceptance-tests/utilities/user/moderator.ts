@@ -163,7 +163,14 @@ export class Moderator extends BaseUser {
    */
   async expectCommitPropertyToBe(
     commitIndex: number,
-    property: string,
+    property: keyof {
+      timestamp: string;
+      exploration: string;
+      category: string;
+      username: string;
+      commitMessage: string;
+      isCommunityOwned: string;
+    },
     value: string
   ): Promise<void> {
     const commit = await this.getPropertiesOfCommit(commitIndex);

@@ -20,7 +20,6 @@ import puppeteer, {ElementHandle} from 'puppeteer';
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
-import {SuperAdmin} from './super-admin';
 
 // URLs.
 const releaseCoordinatorUrl = testConstants.URLs.ReleaseCoordinator;
@@ -79,16 +78,6 @@ const beamJobsTableSelector = '.e2e-test-beam-jobs-table';
 const beamJobStatusSelectorPrefix = '.e2e-test-job-status-';
 
 export class ReleaseCoordinator extends BaseUser {
-  constructor() {
-    super();
-    const tmpObject = new SuperAdmin();
-    Object.getOwnPropertyNames(tmpObject).forEach(function (methodName) {
-      if (typeof tmpObject[methodName] === 'function') {
-        this[methodName] = tmpObject[methodName].bind(tmpObject);
-      }
-    }, this);
-  }
-
   /**
    * Navigate to the release coordinator page.
    */
