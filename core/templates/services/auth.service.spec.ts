@@ -455,4 +455,12 @@ describe('Auth service', function () {
       });
     });
   });
+
+  describe('firebaseConfig getter', () => {
+    it('should throw an error if config is not initialized', () => {
+      expect(() => AuthService.firebaseConfig).toThrowError(
+        'Firebase config has not been initialized.'
+      );
+    });
+  });
 });
