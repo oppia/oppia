@@ -16,10 +16,8 @@
  * @fileoverview Question Submitters utility file.
  */
 
-import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
-import {ElementHandle} from 'puppeteer';
 import {Contributor} from './contributor';
 
 const contributorDashboardUrl = testConstants.URLs.ContributorDashboard;
@@ -89,9 +87,6 @@ const feedbackEditorButton =
   'div.oppia-edit-feedback .oppia-click-to-start-editing';
 const editFeedbackButtonSelector = '.e2e-test-open-feedback-editor';
 const addElementToTextInputInteraction = 'button.e2e-test-add-list-entry';
-const skillDifficultyEasy = '.e2e-test-skill-difficulty-easy';
-const skillDifficultyMedium = '.e2e-test-skill-difficulty-medium';
-const skillDifficultyHard = '.e2e-test-skill-difficulty-hard';
 const viewQuestionSudggestionModalHeader =
   '.e2e-test-question-suggestion-review-modal-header';
 const questionSuggestionModalDifficultySelector = '.oppia-difficulty-title';
@@ -101,18 +96,6 @@ const questionDifficultySelectionModalSelector =
 const saveDestinationButtonSelector = '.e2e-test-save-outcome-dest';
 const saveStuckDestinationButtonSelector = '.e2e-test-save-stuck-destination';
 const responseModalBodyClass = 'e2e-test-response-modal-body';
-const opportunityItemSelector = '.e2e-test-opportunity-list-item';
-const opportunityItemHeadingSelector =
-  '.e2e-test-opportunity-list-item-heading';
-const opportunitySubHeadingSelector =
-  '.e2e-test-opportunity-list-item-subheading';
-const paginationButtonPreviousSelector = '.e2e-test-pagination-button-previous';
-const paginationButtonNextSelector = '.e2e-test-pagination-button-next';
-const reviewContentContainerSelector = '.e2e-test-review-content-container';
-
-const contributionTabClass = 'e2e-test-contribution-tab';
-const activeElementClass = 'e2e-test-active';
-const viewDropdownSelector = '.e2e-test-mobile-contribution-dropdown';
 const closeModalButtonSelector = '.e2e-test-close-modal-button';
 
 export class PracticeQuestionSubmitter extends Contributor {
@@ -580,8 +563,8 @@ export class PracticeQuestionSubmitter extends Contributor {
       hidden: true,
     });
 
-    await this.waitForElementToBeClickable(feedbackEditorButton);
-    await this.clickOn(feedbackEditorButton);
+    await this.waitForElementToBeClickable(editFeedbackButtonSelector);
+    await this.clickOn(editFeedbackButtonSelector);
     await this.page.waitForSelector(addAnswerGroupComponentSelector, {
       visible: true,
     });
