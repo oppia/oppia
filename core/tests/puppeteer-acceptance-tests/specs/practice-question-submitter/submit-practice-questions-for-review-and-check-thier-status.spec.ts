@@ -238,7 +238,7 @@ describe('Practice Question Submitter', function () {
       'Accepted'
     );
     await questionSubmitter.expectContributionStatusToBe(
-      'What is 14 + 12?14 + 12',
+      'What is 14 + 12?',
       'Addition',
       'Accepted'
     );
@@ -474,7 +474,7 @@ describe('Practice Question Submitter', function () {
     );
     await questionSubmitter.expectContributionStatusToBe(
       'What is 10km + 11km?',
-      'Arithmetic Operations',
+      'Addition',
       'Awaiting review'
     );
     await questionSubmitter.viewQuestionSuggestion('What is 10km + 11km?');
