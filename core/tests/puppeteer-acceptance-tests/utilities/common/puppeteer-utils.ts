@@ -1150,6 +1150,16 @@ export class BaseUser {
   }
 
   /**
+   * Scrolls to the top of the page.
+   */
+  async scrollToTopOfPage(): Promise<void> {
+    await this.page.evaluate(() => {
+      window.scrollTo(0, 0);
+    });
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
    * Returns text in nested element
    * @param {string} selector - The selector of the element to get text from.
    */
