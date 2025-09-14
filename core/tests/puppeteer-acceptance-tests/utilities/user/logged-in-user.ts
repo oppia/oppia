@@ -1208,6 +1208,7 @@ export class LoggedInUser extends BaseUser {
       await removeFromPlayLaterButton?.click();
 
       // Confirm removal.
+      await this.waitForElementToStabilize(confirmRemovalFromPlayLaterButton);
       await this.clickOn(confirmRemovalFromPlayLaterButton);
 
       await this.page.waitForSelector(confirmRemovalFromPlayLaterButton, {
