@@ -612,9 +612,11 @@ class PrePushHookTests(test_utils.GenericTestBase):
                 '|version                  ',
                 '\n',
                 'Please fix these discrepancies by editing the '
-                '`requirements.in`\nfile or running '
+                '`requirements.in`\nfile, running '
                 '`scripts.install_third_party_libs` to regenerate\nthe '
-                '`third_party/python_libs` directory.\n\n'
+                '`third_party/python_libs` directory, or updating\n'
+                '_get_possible_normalized_metadata_directory_names() in\n'
+                'install_python_prod_dependencies().\n\n'
             ])
 
     def test_main_exits_when_missing_backend_python_lib(self) -> None:
@@ -649,9 +651,11 @@ class PrePushHookTests(test_utils.GenericTestBase):
                 '|None                     ',
                 '\n',
                 'Please fix these discrepancies by editing the '
-                '`requirements.in`\nfile or running '
+                '`requirements.in`\nfile, running '
                 '`scripts.install_third_party_libs` to regenerate\nthe '
-                '`third_party/python_libs` directory.\n\n'
+                '`third_party/python_libs` directory, or updating\n'
+                '_get_possible_normalized_metadata_directory_names() in\n'
+                'install_python_prod_dependencies().\n\n'
             ])
 
     def test_main_with_no_inconsistencies_in_backend_python_libs(self) -> None:

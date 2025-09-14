@@ -41,7 +41,7 @@ import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 interface HTMLSchema {
   type: string;
   ui_config: {
-    rte_components: string;
+    rte_component_config_id: string;
     language: string;
     languageDirection: string;
   };
@@ -141,7 +141,7 @@ export class StateTranslationEditorComponent implements OnInit, OnDestroy {
     this.HTML_SCHEMA = {
       type: 'html',
       ui_config: {
-        rte_components: 'ALL_COMPONENTS',
+        rte_component_config_id: 'ALL_COMPONENTS',
         language: this.languageCode,
         languageDirection:
           this.translationLanguageService.getActiveLanguageDirection(),

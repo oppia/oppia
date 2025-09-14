@@ -229,7 +229,7 @@ class AuditPopulateQuestionSummaryVersionOneOffJob(base_jobs.JobBase):
 # assume that PTransform class is of type Any. Thus to avoid MyPy's error
 # (Class cannot subclass 'PTransform' (has type 'Any')), we added an
 # ignore here.
-class MigrateQuestionModels(beam.PTransform):# type: ignore[misc]
+class MigrateQuestionModels(beam.PTransform):  # type: ignore[misc]
     """Transform that gets all Question models, performs migration
       and filters any error results.
     """
