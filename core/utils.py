@@ -21,14 +21,12 @@ import binascii
 import collections
 import datetime
 import hashlib
-import imghdr
 import io
 import itertools
 import json
 import os
 import random
 import re
-import ssl
 import string
 import time
 import unicodedata
@@ -39,7 +37,7 @@ from core import feconf
 from core.constants import constants
 
 from PIL import Image
-import certifi
+import filetype
 import yaml
 
 from typing import ( # isort:skip
@@ -426,14 +424,16 @@ def convert_image_binary_to_data_url(
         Exception. The given binary string does not represent a PNG image.
         Exception. The given binary string does not represent a WEBP image.
     """
-    if imghdr.what(None, h=content) == file_type:
-        return '%s%s' % (
-            DATA_URL_FORMAT_PREFIX % file_type,
-            urllib.parse.quote(base64.b64encode(content))
-        )
-    else:
+    file_details = filetype.guess(content)
+    if file_details is None or file_details.extension != file_type:
         raise Exception(
-            'The given string does not represent a %s image.' % file_type)
+            'The given binary string does not represent a %s image.' 
+            % file_type)
+
+    return '%s%s' % (
+        DATA_URL_FORMAT_PREFIX % file_type,
+        urllib.parse.quote(base64.b64encode(content))
+    )
 
 
 def is_base64_encoded(content: str) -> bool:
@@ -593,6 +593,24 @@ def get_time_in_millisecs(datetime_obj: datetime.datetime) -> float:
         float. The time in milliseconds since the Epoch.
     """
     return datetime_obj.timestamp() * 1000.0
+
+
+def convert_millisecs_time_to_datetime_object(
+        date_time_msecs: float) -> datetime.datetime:
+    """Returns the datetime object from the given date time in milliseconds.
+
+    Args:
+        date_time_msecs: float. Date time represented in milliseconds.
+
+    Returns:
+        datetime. An object of type datetime.datetime corresponding to
+        the given milliseconds.
+    """
+    return (
+        datetime.datetime.fromtimestamp(
+            date_time_msecs / 1000.0, tz=datetime.timezone.utc
+        )
+    )
 
 
 def convert_naive_datetime_to_string(datetime_obj: datetime.datetime) -> str:
@@ -1374,21 +1392,6 @@ def quoted(s: str) -> str:
         str. The quoted string.
     """
     return json.dumps(s)
-
-
-def url_open(
-    source_url: Union[str, urllib.request.Request]
-) -> urllib.request._UrlopenRet:
-    """Opens a URL and returns the response.
-
-    Args:
-        source_url: Union[str, Request]. The URL.
-
-    Returns:
-        urlopen. The 'urlopen' object.
-    """
-    context = ssl.create_default_context(cafile=certifi.where())
-    return urllib.request.urlopen(source_url, context=context)
 
 
 def escape_html(unescaped_html_data: str) -> str:

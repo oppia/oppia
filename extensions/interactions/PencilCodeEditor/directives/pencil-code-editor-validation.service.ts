@@ -18,13 +18,13 @@
 
 import {Injectable} from '@angular/core';
 
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {
-  baseInteractionValidationService,
+  BaseInteractionValidationService,
   Warning,
 } from 'interactions/base-interaction-validation.service';
 import {PencilCodeEditorCustomizationArgs} from 'extensions/interactions/customization-args-defs';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 
 import {AppConstants} from 'app.constants';
 
@@ -33,7 +33,7 @@ import {AppConstants} from 'app.constants';
 })
 export class PencilCodeEditorValidationService {
   constructor(
-    private baseInteractionValidationServiceInstance: baseInteractionValidationService
+    private baseInteractionValidationServiceInstance: BaseInteractionValidationService
   ) {}
 
   getCustomizationArgsWarnings(
@@ -49,7 +49,7 @@ export class PencilCodeEditorValidationService {
     if (!(typeof initialCode === 'string')) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
-        message: 'The initialCode must be a string.',
+        message: 'The initialCode must be a string',
       });
     }
     return warningsList;

@@ -17,7 +17,7 @@
  *     Classification Result domain objects.
  */
 
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 
 export class AnswerClassificationResult {
   outcome: Outcome;

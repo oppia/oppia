@@ -29,6 +29,7 @@ LOG_LOCK: Final = threading.Lock()
 ALL_ERRORS: Final = []
 SUCCESS_MESSAGE_PREFIX: Final = 'SUCCESS '
 FAILED_MESSAGE_PREFIX: Final = 'FAILED '
+MAX_ATTEMPTS: Final = 3
 
 
 def log(message: str, show_time: bool = False) -> None:
@@ -96,6 +97,7 @@ class TaskThread(threading.Thread):
         func: Callable[..., Any],
         verbose: bool,
         semaphore: threading.Semaphore,
+        errors_to_retry_on: List[str],
         name: Optional[str],
         report_enabled: bool
     ) -> None:
@@ -109,39 +111,66 @@ class TaskThread(threading.Thread):
         self.semaphore = semaphore
         self.finished = False
         self.report_enabled = report_enabled
+        self.errors_to_retry_on = errors_to_retry_on or []
+        self.num_attempts = 0
 
     def run(self) -> None:
         try:
-            self.task_results = self.func()
-            if self.verbose:
-                for task_result in self.task_results:
-                    # The following section will print the output of the lint
-                    # checks.
-                    if self.report_enabled:
-                        log(
-                            'Report from %s check\n'
-                            '----------------------------------------\n'
-                            '%s' % (task_result.name, '\n'.join(
-                                task_result.get_report())), show_time=True)
-                    # The following section will print the output of backend
-                    # tests.
-                    else:
-                        log(
-                            'LOG %s:\n%s'
-                            '----------------------------------------' %
-                            (self.name, task_result.messages[0]),
-                            show_time=True)
-            log(
-                'FINISHED %s: %.1f secs' % (
-                    self.name, time.time() - self.start_time), show_time=True)
-        except Exception as e:
-            self.exception = e
-            self.stacktrace = traceback.format_exc()
-            if 'KeyboardInterrupt' not in self.exception.args[0]:
-                log(str(e))
-                log(
-                    'ERROR %s: %.1f secs' %
-                    (self.name, time.time() - self.start_time), show_time=True)
+            while self.num_attempts < MAX_ATTEMPTS:
+                self.num_attempts += 1
+                try:
+                    self.task_results = self.func()
+
+                    if self.verbose:
+                        for task_result in self.task_results:
+                            # The following section will print the output of the
+                            # lint checks.
+                            if self.report_enabled:
+                                log(
+                                    'Report from %s check\n'
+                                    '----------------------------------------\n'
+                                    '%s' % (
+                                        task_result.name, '\n'.join(
+                                            task_result.get_report())),
+                                    show_time=True)
+                            # The following section will print the output of
+                            # backend tests.
+                            else:
+                                log(
+                                    'LOG %s:\n%s'
+                                    '----------------------------------------' %
+                                    (self.name, task_result.messages[0]),
+                                    show_time=True)
+
+                    log(
+                        'FINISHED %s: %.1f secs' % (
+                            self.name, time.time() - self.start_time),
+                        show_time=True)
+                    return
+                except Exception as e:
+                    log(
+                        'Attempt {} of {} failed for {}'.format(
+                            self.num_attempts, MAX_ATTEMPTS, self.name))
+
+                    is_last_attempt = self.num_attempts >= MAX_ATTEMPTS
+                    should_retry = any(
+                        err in str(e)
+                        for err in self.errors_to_retry_on)
+
+                    if is_last_attempt or not should_retry:
+                        # This is either the last attempt
+                        # or not a retryable error.
+                        self.exception = e
+                        self.stacktrace = traceback.format_exc()
+                        if 'KeyboardInterrupt' not in str(e):
+                            log(str(e))
+                            log(
+                                'ERROR {} - {:.1f} secs'.format(
+                                    self.name,
+                                    time.time() - self.start_time),
+                                show_time=True)
+                        break
+                    log('Retrying {} - error: {}'.format(self.name, e))
         finally:
             self.semaphore.release()
             self.finished = True
@@ -213,6 +242,7 @@ def create_task(
     func: Callable[..., Any],
     verbose: bool,
     semaphore: threading.Semaphore,
+    errors_to_retry_on: List[str],
     name: Optional[str] = None,
     report_enabled: bool = True
 ) -> TaskThread:
@@ -225,9 +255,14 @@ def create_task(
             can run at any time.
         name: str|None. Name of the task that is going to be created.
         report_enabled: bool. Decide whether task result will print or not.
+        errors_to_retry_on: List[str]. List of error message substrings that
+            will trigger retry attempts when they appear in exceptions. If an
+            error contains any of these substrings, the task will be retried
+            up to MAX_ATTEMPTS times.
 
     Returns:
         task: TaskThread object. Created task.
     """
-    task = TaskThread(func, verbose, semaphore, name, report_enabled)
+    task = TaskThread(
+        func, verbose, semaphore, errors_to_retry_on, name, report_enabled)
     return task

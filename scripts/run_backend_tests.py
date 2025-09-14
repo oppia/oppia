@@ -65,9 +65,6 @@ from . import install_third_party_libs
 
 from core import feconf, utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
-# This installs third party libraries before importing other files or importing
-# libraries that use the builtins python module (e.g. build, utils).
-install_third_party_libs.main()
 
 from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import concurrent_task_utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
@@ -94,6 +91,12 @@ TIME_REPORT_PATH: Final = os.path.join(
     os.getcwd(), 'backend_test_time_report.json'
 )
 AVERAGE_TEST_CASE_TIME: Final = 2
+
+# Error code indicating a segmentation fault, which can occur transiently due to
+# instability in gRPC (a dependency of apache-beam[gcp]). This error was first
+# observed after upgrading apache-beam[gcp] in PR #20752. Tests encountering
+# this error are retried to handle potential flakiness.
+ERROR_RETRY_CODE: Final = 'Error -11'
 
 _PARSER: Final = argparse.ArgumentParser(
     description="""
@@ -143,6 +146,11 @@ _PARSER.add_argument(
     '-v',
     '--verbose',
     help='optional; if specified, display the output of the tests being run',
+    action='store_true')
+_PARSER.add_argument(
+    '--skip-install',
+    help='optional; if specified, skips the installation of '
+        'third party libraries',
     action='store_true')
 
 
@@ -432,7 +440,8 @@ def main(args: Optional[List[str]] = None) -> None:
 
     if parsed_args.test_path and '.' in parsed_args.test_path:
         raise Exception('The delimiter in test_path should be a slash (/)')
-
+    if not parsed_args.skip_install:
+        install_third_party_libs.main()
     with contextlib.ExitStack() as stack:
         # TODO(#18260): Remove this when we permanently move to the
         # Dockerized Setup.
@@ -518,7 +527,7 @@ def main(args: Optional[List[str]] = None) -> None:
                 parsed_args.generate_coverage_report)
             task = concurrent_task_utils.create_task(
                 test.run, parsed_args.verbose, semaphore, name=test_target,
-                report_enabled=False)
+                report_enabled=False, errors_to_retry_on=[ERROR_RETRY_CODE])
             task_to_taskspec[task] = test
             tasks.append(task)
 

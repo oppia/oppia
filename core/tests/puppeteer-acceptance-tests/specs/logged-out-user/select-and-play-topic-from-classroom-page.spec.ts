@@ -98,7 +98,7 @@ describe('Logged-out User', function () {
 
       // Returning to the topic page from the exploration player itself.
       await loggedOutUser.returnToTopicPageAfterCompletingExploration();
-      await loggedOutUser.navigateToRevisionTab();
+      await loggedOutUser.navigateToStudyTab();
 
       // Review cards are the subtopic that are created in the topic.
       await loggedOutUser.selectReviewCardToLearn('Negative Numbers');

@@ -23,7 +23,7 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
 import {Rubric} from 'domain/skill/rubric.model';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {SkillDifficulty} from 'domain/skill/skill-difficulty.model';
-import {Skill} from 'domain/skill/SkillObjectFactory';
+import {Skill} from 'domain/skill/skill.model.ts';
 import {ImageFile} from 'domain/utilities/image-file.model';
 import {ExtractImageFilenamesFromModelService} from 'pages/exploration-player-page/services/extract-image-filenames-from-model.service';
 import {AlertsService} from 'services/alerts.service';
@@ -108,13 +108,6 @@ export class QuestionsOpportunitiesSelectDifficultyModalComponent
         this.alertsService.addWarning(`Error populating skill: ${error}.`);
       }
     );
-  }
-
-  changeSkillWithDifficulty(
-    newSkillWithDifficulty: SkillDifficulty,
-    idx: number
-  ): void {
-    this.linkedSkillsWithDifficulty[idx] = newSkillWithDifficulty;
   }
 
   startQuestionCreation(): void {

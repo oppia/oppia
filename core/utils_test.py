@@ -577,7 +577,9 @@ class UtilsTests(test_utils.GenericTestBase):
             self.get_static_asset_filepath(), 'assets', 'favicon.ico')
 
         with self.assertRaisesRegex(
-            Exception, 'The given string does not represent a png image.'):
+            Exception,
+            'The given binary string does not represent a png image.'
+        ):
             utils.convert_png_to_data_url(favicon_filepath)
 
     def test_get_exploration_components_from_dir_with_invalid_path_raises_error(
@@ -748,6 +750,12 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(
             dt, datetime.datetime.fromtimestamp(msecs / 1000.0))
 
+    def test_convert_millisecs_time_to_datetime_object(self) -> None:
+        msecs = 1690761600000
+        dt = utils.convert_millisecs_time_to_datetime_object(msecs)
+        dt2 = datetime.datetime(2023, 7, 31, 0, 0, tzinfo=datetime.timezone.utc)
+        self.assertEqual(dt, dt2)
+
     def test_grouper(self) -> None:
         self.assertEqual(
             [list(g) for g in utils.grouper(range(7), 3)],
@@ -809,12 +817,6 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertTrue(utils.is_base64_encoded(
             base64.b64encode(b'hello').decode('utf-8'))
         )
-
-    def test_url_open(self) -> None:
-        response = utils.url_open('http://www.google.com')
-        self.assertEqual(response.getcode(), 200)
-        self.assertEqual(
-            response.url, 'http://www.google.com')
 
     def test_get_random_int(self) -> None:
         self.assertLess(utils.get_random_int(5), 5)
@@ -941,7 +943,8 @@ class UtilsTests(test_utils.GenericTestBase):
     ) -> None:
         file_contents_png, _ = self._get_png_and_webp_image()
         with self.assertRaisesRegex(
-            Exception, 'The given string does not represent a webp image.'
+            Exception,
+            'The given binary string does not represent a webp image.'
         ):
             utils.convert_image_binary_to_data_url(
                 file_contents_png, 'webp')

@@ -79,7 +79,7 @@ describe('Exploration Editor', function () {
 
     // Navigate to the creator dashboard and create a new exploration.
     await explorationEditor.navigateToCreatorDashboardPage();
-    await explorationEditor.navigateToExplorationEditorPage();
+    await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
     await explorationEditor.dismissWelcomeModal();
     await explorationEditor.updateCardContent(INTRODUCTION_CARD_CONTENT);
     await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
@@ -109,7 +109,9 @@ describe('Exploration Editor', function () {
       CARD_NAME.TEXT_QUESTION,
       true
     );
-    await explorationEditor.editDefaultResponseFeedback('Wrong.');
+    await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
+      'Wrong.'
+    );
     await explorationEditor.addHintToState(
       'It is closer to zero but not a positive number.'
     );
@@ -128,7 +130,9 @@ describe('Exploration Editor', function () {
       CARD_NAME.FINAL_CARD,
       true
     );
-    await explorationEditor.editDefaultResponseFeedback('Wrong.');
+    await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
+      'Wrong.'
+    );
     await explorationEditor.addSolutionToState(
       'minus',
       'Minus is the opposite of plus.',
@@ -171,7 +175,11 @@ describe('Exploration Editor', function () {
       'Test Topic 1'
     );
 
-    await curriculumAdmin.createSkillForTopic('Test Skill 1', 'Test Topic 1');
+    await curriculumAdmin.createSkillForTopic(
+      'Test Skill 1',
+      'Test Topic 1',
+      false
+    );
     await curriculumAdmin.createQuestionsForSkill('Test Skill 1', 3);
     await curriculumAdmin.assignSkillToSubtopicInTopicEditor(
       'Test Skill 1',
@@ -203,7 +211,7 @@ describe('Exploration Editor', function () {
       await explorationEditor.navigateToTranslationsTab();
       await explorationEditor.dismissTranslationTabWelcomeModal();
       await explorationEditor.editTranslationOfContent(
-        'de',
+        'Deutsch (German)',
         'Content',
         'Content translation text'
       );
@@ -236,7 +244,7 @@ describe('Exploration Editor', function () {
       await explorationEditor.navigateToCard(CARD_NAME.TEXT_QUESTION);
       await explorationEditor.navigateToTranslationsTab();
       await explorationEditor.editTranslationOfContent(
-        'de',
+        'Deutsch (German)',
         'Interaction',
         'Interaction translation text'
       );
@@ -278,7 +286,7 @@ describe('Exploration Editor', function () {
         await explorationEditor.closeEditorNavigationDropdownOnMobile();
       }
       await explorationEditor.editTranslationOfContent(
-        'de',
+        'Deutsch (German)',
         'Hint',
         'Hint translation text'
       );
@@ -314,7 +322,7 @@ describe('Exploration Editor', function () {
       await explorationEditor.navigateToCard(CARD_NAME.TEXT_QUESTION);
       await explorationEditor.navigateToTranslationsTab();
       await explorationEditor.editTranslationOfContent(
-        'de',
+        'Deutsch (German)',
         'Solution',
         'Solution explanation translation text'
       );
@@ -353,13 +361,15 @@ describe('Exploration Editor', function () {
       );
       await explorationEditor.navigateToTranslationsTab();
       await explorationEditor.editTranslationOfContent(
-        'de',
+        'Deutsch (German)',
         'Feedback',
         'Response feedback translation text',
         1
       );
       await explorationEditor.navigateToEditorTab();
-      await explorationEditor.editDefaultResponseFeedback('Feedback content.');
+      await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
+        'Feedback content.'
+      );
       await explorationEditor.openModifyExistingTranslationsModal();
       await explorationEditor.verifyTranslationInModifyTranslationsModal(
         'de',

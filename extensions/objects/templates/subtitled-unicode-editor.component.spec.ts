@@ -19,7 +19,7 @@
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ChangeDetectorRef} from '@angular/core';
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
-import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 import {SubtitledUnicodeEditorComponent} from './subtitled-unicode-editor.component';
 
 describe('SubtitledUnicodeEditorComponent', () => {

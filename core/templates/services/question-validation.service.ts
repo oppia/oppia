@@ -20,8 +20,8 @@
 import {Injectable, Injector} from '@angular/core';
 
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import {Question} from 'domain/question/QuestionObjectFactory';
-import {MisconceptionSkillMap} from 'domain/skill/MisconceptionObjectFactory';
+import {Question} from 'domain/question/question.model';
+import {MisconceptionSkillMap} from 'domain/skill/misconception.model';
 import {ResponsesService} from 'pages/exploration-editor-page/editor-tab/services/responses.service';
 import {
   InteractionSpecsConstants,

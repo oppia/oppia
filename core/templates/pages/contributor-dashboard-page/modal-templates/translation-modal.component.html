@@ -16,7 +16,7 @@
     </div>
     <button type="button"
             class="close oppia-close-button-position"
-            (click)="activeModal.close()"
+            (click)="close()"
             aria-label="Close">
       <span aria-hidden="true">&times;</span>
     </button>
@@ -288,7 +288,7 @@
   .oppia-rte-editor-focused:focus > oppia-noninteractive-tabs > div {
     outline: solid 2px #009688;
   }
-  .oppia-rte-editor-focused:focus > oppia-noninteractive-collapsible > uib-accordion > div {
+  .oppia-rte-editor-focused:focus > oppia-noninteractive-collapsible > ngb-accordion > div {
     outline: solid 2px #009688;
   }
   .oppia-rte-editor-focused:focus > oppia-noninteractive-image > figure {

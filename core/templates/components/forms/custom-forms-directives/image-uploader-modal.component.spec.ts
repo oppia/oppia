@@ -26,6 +26,7 @@ import {ImageUploaderModalComponent} from './image-uploader-modal.component';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {of} from 'rxjs';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {fakeAsync, tick} from '@angular/core/testing';
 
 describe('Image Uploader Modal', () => {
   let fixture: ComponentFixture<ImageUploaderModalComponent>;
@@ -102,6 +103,10 @@ describe('Image Uploader Modal', () => {
       document.createElement('img')
     );
 
+    // Trigger change detection to propagate the updated input property to the component.
+    // Without this, Angular's change detection might not run before ngOnInit(), leading to
+    // stale property values if the component relies on the updated input during initialization.
+    fixture.detectChanges();
     componentInstance.initializeCropper();
 
     expect(componentInstance.cropper).toBeDefined();
@@ -114,6 +119,7 @@ describe('Image Uploader Modal', () => {
       document.createElement('img')
     );
 
+    fixture.detectChanges();
     componentInstance.initializeCropper();
 
     expect(componentInstance.cropper).toBeDefined();
@@ -128,7 +134,7 @@ describe('Image Uploader Modal', () => {
     });
   });
 
-  it('should handle image upload and confirm image', () => {
+  it('should handle image upload and confirm image', fakeAsync(() => {
     const dataBase64Mock = 'VEhJUyBJUyBUSEUgQU5TV0VSCg==';
     const arrayBuffer = Uint8Array.from(window.atob(dataBase64Mock), c =>
       c.charCodeAt(0)
@@ -158,6 +164,11 @@ describe('Image Uploader Modal', () => {
     );
 
     componentInstance.onFileChanged(file);
+    // Advance the virtual clock to process pending asynchronous operations like file reading.
+    // This ensures any Promise resolutions or setTimeout calls in onFileChanged complete before
+    // proceeding. Without this, image loading might not finish before we check upload status.
+    tick();
+
     expect(componentInstance.invalidImageWarningIsShown).toBeFalse();
 
     const imageDataUrl = 'base64ImageData';
@@ -171,41 +182,46 @@ describe('Image Uploader Modal', () => {
 
     componentInstance.confirm();
     expect(componentInstance.croppedImageDataUrl).toEqual(imageDataUrl);
-  });
+  }));
 
   it(
     'should confirm and set croppedImageDataUrl same as uploadedImage ' +
       'in case of Thumbnail',
-    () => {
+    fakeAsync(() => {
       componentInstance.imageUploaderParameters.imageName = 'Thumbnail';
+      fixture.detectChanges();
+
       componentInstance.ngOnInit();
       let file = new File([svgString], 'test.svg', {type: 'image/svg+xml'});
       componentInstance.invalidImageWarningIsShown = false;
 
       componentInstance.onFileChanged(file);
+      tick();
 
       expect(componentInstance.invalidImageWarningIsShown).toBeFalse();
 
       const confirmSpy = spyOn(componentInstance, 'confirm').and.callThrough();
-
       componentInstance.confirm();
 
       expect(confirmSpy).toHaveBeenCalled();
       expect(componentInstance.croppedImageDataUrl).toEqual(
         componentInstance.uploadedImage as string
       );
-    }
+    })
   );
 
-  it('should remove invalid tags and attributes', () => {
+  it('should remove invalid tags and attributes', fakeAsync(() => {
     componentInstance.ngOnInit();
     let file = new File([svgString], 'test.svg', {type: 'image/svg+xml'});
     componentInstance.invalidImageWarningIsShown = false;
+    fixture.detectChanges();
 
     componentInstance.onFileChanged(file);
+    tick();
+
     expect(componentInstance.areInvalidTagsOrAttrsPresent()).toBeFalse();
     expect(componentInstance.invalidImageWarningIsShown).toBeFalse();
-  });
+  }));
 
   it(
     'should update background color if the new color is different' +
@@ -213,6 +229,8 @@ describe('Image Uploader Modal', () => {
     () => {
       componentInstance.imageUploaderParameters.bgColor = 'red';
       componentInstance.updateBackgroundColor('blue');
+      fixture.detectChanges();
+
       expect(componentInstance.imageUploaderParameters.bgColor).toBe('blue');
     }
   );
@@ -223,6 +241,8 @@ describe('Image Uploader Modal', () => {
     () => {
       componentInstance.imageUploaderParameters.bgColor = 'red';
       componentInstance.updateBackgroundColor('red');
+      fixture.detectChanges();
+
       expect(componentInstance.imageUploaderParameters.bgColor).toBe('red');
     }
   );
@@ -242,7 +262,15 @@ describe('Image Uploader Modal', () => {
     expect(componentInstance.invalidImageWarningIsShown).toBeTrue();
   });
 
-  it('should not initialize cropper if croppableImageRef is null', () => {
+  it('should check if image is uploaded', () => {
+    componentInstance.uploadedImage = null;
+    expect(componentInstance.isImageUploaded()).toBeFalse();
+
+    componentInstance.uploadedImage = 'some-image-url';
+    expect(componentInstance.isImageUploaded()).toBeTrue();
+  });
+
+  it('should not initialize cropper if croppableImageRef is null', fakeAsync(() => {
     spyOn(componentInstance, 'initializeCropper');
     const mockCroppableImageRef = {nativeElement: {}} as ElementRef;
     componentInstance.croppableImageRef = mockCroppableImageRef;
@@ -250,11 +278,13 @@ describe('Image Uploader Modal', () => {
     componentInstance.ngOnInit();
     let file = new File([svgString], 'test.svg', {type: 'image/svg+xml'});
     componentInstance.invalidImageWarningIsShown = false;
+    fixture.detectChanges();
 
     componentInstance.onFileChanged(file);
+    tick();
 
     expect(componentInstance.initializeCropper).not.toHaveBeenCalled();
-  });
+  }));
 
   it('should throw error if cropper is not initialized', () => {
     expect(() => {
@@ -262,7 +292,7 @@ describe('Image Uploader Modal', () => {
     }).toThrowError('Cropper has not been initialized');
   });
 
-  it('should handle file read errors', () => {
+  it('should handle file read errors', fakeAsync(() => {
     spyOn(componentInstance, 'onInvalidImageLoaded');
     const file = new File([], 'invalid.png');
     const reader = new FileReader();
@@ -275,6 +305,8 @@ describe('Image Uploader Modal', () => {
     spyOn(window, 'FileReader').and.returnValue(reader);
 
     componentInstance.onFileChanged(file);
+    tick();
+
     expect(componentInstance.onInvalidImageLoaded).toHaveBeenCalled();
-  });
+  }));
 });

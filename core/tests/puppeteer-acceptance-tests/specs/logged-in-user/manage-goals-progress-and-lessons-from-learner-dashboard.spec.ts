@@ -47,7 +47,9 @@ describe('Logged-in User', function () {
 
     explorationId2 =
       await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
-        'Positive Numbers'
+        'Positive Numbers',
+        'Algebra',
+        false
       );
 
     await curriculumAdmin.createAndPublishTopic(
@@ -112,20 +114,6 @@ describe('Logged-in User', function () {
       // The exploration has a single state.
       await loggedInUser.expectExplorationCompletionToastMessage(
         'Congratulations for completing this lesson!'
-      );
-
-      await loggedInUser.navigateToLearnerDashboardUsingProfileDropdown();
-      await loggedInUser.navigateToGoalsSection();
-      await loggedInUser.expectCompletedGoalsToInclude(['Algebra I']);
-
-      await loggedInUser.navigateToProgressSection();
-      await loggedInUser.expectStoriesCompletedToInclude(['Test Story 1']);
-
-      await loggedInUser.navigateToCommunityLessonsSection();
-      await loggedInUser.expectCompletedLessonsToInclude(['Negative Numbers']);
-      await loggedInUser.verifyLessonPresenceInPlayLater(
-        'Positive Numbers',
-        false
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS

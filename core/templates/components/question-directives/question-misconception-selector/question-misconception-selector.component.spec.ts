@@ -22,8 +22,8 @@ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {
   MisconceptionSkillMap,
-  MisconceptionObjectFactory,
-} from 'domain/skill/MisconceptionObjectFactory';
+  Misconception,
+} from 'domain/skill/misconception.model';
 import {QuestionMisconceptionSelectorComponent} from './question-misconception-selector.component';
 
 describe('Question Misconception Selector Component', () => {
@@ -31,7 +31,6 @@ describe('Question Misconception Selector Component', () => {
   let fixture: ComponentFixture<QuestionMisconceptionSelectorComponent>;
   let stateEditorService: StateEditorService;
 
-  let misconceptionObjectFactory: MisconceptionObjectFactory;
   let mockMisconceptionObject: MisconceptionSkillMap;
 
   beforeEach(waitForAsync(() => {
@@ -47,30 +46,11 @@ describe('Question Misconception Selector Component', () => {
     fixture = TestBed.createComponent(QuestionMisconceptionSelectorComponent);
     component = fixture.componentInstance;
     stateEditorService = TestBed.inject(StateEditorService);
-    misconceptionObjectFactory = TestBed.inject(MisconceptionObjectFactory);
-
-    misconceptionObjectFactory = TestBed.inject(MisconceptionObjectFactory);
     stateEditorService = TestBed.inject(StateEditorService);
 
     mockMisconceptionObject = {
-      abc: [
-        misconceptionObjectFactory.create(
-          1,
-          'misc1',
-          'notes1',
-          'feedback1',
-          true
-        ),
-      ],
-      def: [
-        misconceptionObjectFactory.create(
-          2,
-          'misc2',
-          'notes2',
-          'feedback1',
-          true
-        ),
-      ],
+      abc: [Misconception.create(1, 'misc1', 'notes1', 'feedback1', true)],
+      def: [Misconception.create(2, 'misc2', 'notes2', 'feedback1', true)],
     };
     spyOn(stateEditorService, 'getMisconceptionsBySkill').and.callFake(() => {
       return mockMisconceptionObject;

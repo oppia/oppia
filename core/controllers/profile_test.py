@@ -662,6 +662,14 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
             (platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT, 'sub'), # pylint: disable=line-too-long
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.OPPIA_PROJECT_ID,
+                'dev-project-id'
+            )
         ]
     )
     def test_send_post_signup_email(self) -> None:
@@ -1092,6 +1100,22 @@ class SignupTests(test_utils.GenericTestBase):
             (platform_parameter_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT, 'body'), # pylint: disable=line-too-long
             (platform_parameter_list.ParamName.EMAIL_FOOTER, 'footer'), # pylint: disable=line-too-long
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'), # pylint: disable=line-too-long
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                'noreply@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.OPPIA_PROJECT_ID,
+                'dev-project-id'
+            )
         ]
     )
     def test_user_settings_of_existing_user(self) -> None:
@@ -1215,8 +1239,6 @@ class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.swap_secret = self.swap_to_always_return(
             secrets_services, 'get_secret', 'secret')
-        self.swap_audience_id = (
-            self.swap(feconf, 'MAILCHIMP_AUDIENCE_ID', 'audience_id'))
         user_services.update_email_preferences(
             self.editor_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE,
             feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
@@ -1249,8 +1271,14 @@ class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
             'Missing key in handler args: data[email].'
         )
 
+    @test_utils.set_platform_parameters(
+        [(
+            platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID,
+            'audience_id'
+        )]
+    )
     def test_post_with_different_audience_id(self) -> None:
-        with self.swap_secret, self.swap_audience_id:
+        with self.swap_secret:
             json_response = self.post_json(
                 '%s/secret' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT, {
                     'data[list_id]': 'invalid_audience_id',
@@ -1259,8 +1287,14 @@ class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
                 }, use_payload=False)
             self.assertEqual(json_response, {})
 
+    @test_utils.set_platform_parameters(
+        [(
+            platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID,
+            'audience_id'
+        )]
+    )
     def test_post_with_invalid_email_id(self) -> None:
-        with self.swap_secret, self.swap_audience_id:
+        with self.swap_secret:
             json_response = self.post_json(
                 '%s/secret' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT, {
                     'data[list_id]': 'audience_id',
@@ -1281,8 +1315,20 @@ class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
                 self.assertIn(
                     'Received invalid Mailchimp webhook secret', captured_logs)
 
+    @test_utils.set_platform_parameters(
+        [(
+            platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID,
+            'audience_id'
+        ), (
+            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+            'system@example.com'
+        ), (
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS,
+            False
+        )]
+    )
     def test_post(self) -> None:
-        with self.swap_secret, self.swap_audience_id:
+        with self.swap_secret:
             user_services.update_email_preferences(
                 self.editor_id,
                 False,

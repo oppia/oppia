@@ -77,9 +77,11 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
   NOTES_SCHEMA = {
     type: 'html',
     ui_config: {
+      rte_component_config_id: 'ALL_COMPONENTS',
       startupFocusEnabled: false,
     },
   };
+  generatedUrlPrefix: string;
 
   constructor(
     private alertsService: AlertsService,
@@ -108,6 +110,7 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
 
   hostname = this.windowRef.nativeWindow.location.hostname;
   TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topic_id>';
+  validUrlFragmentRegex = new RegExp(AppConstants.VALID_URL_FRAGMENT_REGEX);
 
   _init(): void {
     this.story = this.storyEditorStateService.getStory();
@@ -184,6 +187,7 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
   }
 
   _initEditor(): void {
+    this.generatedUrlPrefix = `${this.hostname}/learn/${this.getClassroomUrlFragment()}/${this.getTopicUrlFragment()}/story`;
     this.story = this.storyEditorStateService.getStory();
     if (this.story) {
       this.storyContents = this.story.getStoryContents();
@@ -267,6 +271,11 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
           // No further action is needed.
         }
       );
+  }
+
+  onStoryEditorUrlFragmentChange(urlFragment: string): void {
+    this.editableUrlFragment = urlFragment;
+    this.updateStoryUrlFragment(urlFragment);
   }
 
   createNode(): void {

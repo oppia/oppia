@@ -30,6 +30,7 @@ import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api
 import {ClassroomNavigationLinksComponent} from './classroom-navigation-links.component';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 describe('ClassroomNavigationLinksComponent', () => {
   let component: ClassroomNavigationLinksComponent;
@@ -91,6 +92,15 @@ describe('ClassroomNavigationLinksComponent', () => {
           provide: AssetsBackendApiService,
           useValue: assetsBackendApiServiceSpy,
         },
+        {
+          provide: WindowRef,
+          useValue: {
+            nativeWindow: {
+              location: {pathname: '/learn'},
+              gtag: jasmine.createSpy('gtag'),
+            },
+          },
+        },
       ],
     }).compileComponents();
 
@@ -116,8 +126,8 @@ describe('ClassroomNavigationLinksComponent', () => {
     component.ngOnInit();
     tick();
 
-    // It should store top 2 public classrooms.
-    expect(component.classroomSummaries.length).toEqual(2);
+    // It should store all public classrooms.
+    expect(component.classroomSummaries.length).toEqual(3);
     expect(component.isLoading).toBeFalse();
   }));
 
@@ -180,5 +190,26 @@ describe('ClassroomNavigationLinksComponent', () => {
     expect(
       siteAnalyticsService.registerClickClassroomCardEvent
     ).toHaveBeenCalled();
+  });
+
+  it('should not load classroom summaries if currentUrl is signup', fakeAsync(() => {
+    const windowRef = TestBed.inject(WindowRef) as WindowRef;
+    windowRef.nativeWindow.location.pathname = '/signup';
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.currentUrl).toEqual('signup');
+    expect(
+      classroomBackendApiService.getAllClassroomsSummaryAsync
+    ).not.toHaveBeenCalled();
+    expect(component.classroomSummaries).toEqual([]);
+    expect(component.isLoading).toBeTrue();
+  }));
+
+  it('should return the correct number of classrooms from getClassroomCount', () => {
+    component.classroomSummaries = dummyClassroomSummaries;
+    const countLength = component.getClassroomCount();
+    expect(countLength).toBe(dummyClassroomSummaries.length);
   });
 });

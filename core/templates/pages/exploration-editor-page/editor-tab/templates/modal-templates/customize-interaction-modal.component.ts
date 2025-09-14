@@ -31,14 +31,14 @@ import {SchemaConstants} from 'components/forms/schema-based-editors/schema.cons
 import {StateCustomizationArgsService} from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model';
 import {EditorFirstTimeEventsService} from 'pages/exploration-editor-page/services/editor-first-time-events.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {Schema} from 'services/schema-default-value.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {ConfirmLeaveModalComponent} from 'pages/exploration-editor-page/modal-templates/confirm-leave-modal.component';
 import {InteractionDetailsCacheService} from '../../services/interaction-details-cache.service';
-import {InteractionObjectFactory} from 'domain/exploration/InteractionObjectFactory';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {AppConstants} from 'app.constants';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -166,12 +166,11 @@ export class CustomizeInteractionModalComponent
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private editorFirstTimeEventsService: EditorFirstTimeEventsService,
     private focusManagerService: FocusManagerService,
     private injector: Injector,
     private interactionDetailsCacheService: InteractionDetailsCacheService,
-    private interactionObjectFactory: InteractionObjectFactory,
     private ngbActiveModal: NgbActiveModal,
     private ngbModal: NgbModal,
     private stateCustomizationArgsService: StateCustomizationArgsService,
@@ -245,7 +244,7 @@ export class CustomizeInteractionModalComponent
       );
 
       this.stateCustomizationArgsService.displayed =
-        this.interactionObjectFactory.convertFromCustomizationArgsBackendDict(
+        Interaction.convertFromCustomizationArgsBackendDict(
           newInteractionId,
           customizationArgsBackendDict
         );
@@ -451,7 +450,7 @@ export class CustomizeInteractionModalComponent
       // Above called with this.stateCustomizationArgsService.displayed.
     }
     this.explorationIsLinkedToStory =
-      this.contextService.isExplorationLinkedToStory();
+      this.pageContextService.isExplorationLinkedToStory();
     this.editorFirstTimeEventsService.registerFirstClickAddInteractionEvent();
 
     if (this.stateEditorService.isInQuestionMode()) {
@@ -459,7 +458,7 @@ export class CustomizeInteractionModalComponent
         [],
         AppConstants.ALLOWED_QUESTION_INTERACTION_CATEGORIES
       );
-    } else if (this.contextService.isExplorationLinkedToStory()) {
+    } else if (this.pageContextService.isExplorationLinkedToStory()) {
       this.allowedInteractionCategories = Array.prototype.concat.apply(
         [],
         AppConstants.ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES
@@ -476,7 +475,7 @@ export class CustomizeInteractionModalComponent
         [],
         AppConstants.ALLOWED_QUESTION_INTERACTION_CATEGORIES
       );
-    } else if (this.contextService.isExplorationLinkedToStory()) {
+    } else if (this.pageContextService.isExplorationLinkedToStory()) {
       this.allowedInteractionCategories = Array.prototype.concat.apply(
         [],
         AppConstants.ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES

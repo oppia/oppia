@@ -21,10 +21,7 @@ import {EventEmitter} from '@angular/core';
 import {fakeAsync, flush, TestBed, tick} from '@angular/core/testing';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {ExplorationChangeAddState} from 'domain/exploration/exploration-draft.model';
-import {
-  StateObjectsBackendDict,
-  StatesObjectFactory,
-} from 'domain/exploration/StatesObjectFactory';
+import {StateObjectsBackendDict, States} from 'domain/exploration/states.model';
 import {AlertsService} from 'services/alerts.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {EditabilityService} from 'services/editability.service';
@@ -583,7 +580,6 @@ describe('Exploration save service ' + 'while saving changes', () => {
   let changeListService: ChangeListService;
   let explorationRightsService: ExplorationRightsService;
   let ngbModal: NgbModal;
-  let statesObjectFactory: StatesObjectFactory;
   let siteAnalyticsService: SiteAnalyticsService;
   let routerService: RouterService;
   let explorationDiffService: ExplorationDiffService;
@@ -609,12 +605,6 @@ describe('Exploration save service ' + 'while saving changes', () => {
       content: {
         content_id: 'content',
         html: '{{HtmlValue}}',
-      },
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-          default_outcome: {},
-        },
       },
       param_changes: [],
       interaction: {
@@ -665,12 +655,6 @@ describe('Exploration save service ' + 'while saving changes', () => {
         content_id: 'content',
         html: 'content',
       },
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-          default_outcome: {},
-        },
-      },
       param_changes: [],
       interaction: {
         confirmed_unclassified_answers: [],
@@ -720,12 +704,6 @@ describe('Exploration save service ' + 'while saving changes', () => {
         content_id: 'content',
         html: 'content',
       },
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-          default_outcome: {},
-        },
-      },
       param_changes: [],
       interaction: {
         confirmed_unclassified_answers: [],
@@ -774,12 +752,6 @@ describe('Exploration save service ' + 'while saving changes', () => {
       content: {
         content_id: 'content',
         html: 'content',
-      },
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-          default_outcome: {},
-        },
       },
       param_changes: [],
       interaction: {
@@ -890,7 +862,6 @@ describe('Exploration save service ' + 'while saving changes', () => {
     explorationRightsService = TestBed.inject(ExplorationRightsService);
     ngbModal = TestBed.inject(NgbModal);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
-    statesObjectFactory = TestBed.inject(StatesObjectFactory);
     alertsService = TestBed.inject(AlertsService);
     routerService = TestBed.inject(RouterService);
     explorationDiffService = TestBed.inject(ExplorationDiffService);
@@ -918,8 +889,7 @@ describe('Exploration save service ' + 'while saving changes', () => {
   it('should open exploration save modal', fakeAsync(() => {
     let startLoadingCb = jasmine.createSpy('startLoadingCb');
     let endLoadingCb = jasmine.createSpy('endLoadingCb');
-    let sampleStates =
-      statesObjectFactory.createFromBackendDict(statesBackendDict);
+    let sampleStates = States.createFromBackendDict(statesBackendDict);
     spyOn(routerService, 'savePendingChanges').and.returnValue();
     spyOn(explorationStatesService, 'getStates').and.returnValue(sampleStates);
     spyOn(explorationDiffService, 'getDiffGraphData').and.returnValue({
@@ -986,8 +956,7 @@ describe('Exploration save service ' + 'while saving changes', () => {
     fakeAsync(() => {
       let startLoadingCb = jasmine.createSpy('startLoadingCb');
       let endLoadingCb = jasmine.createSpy('endLoadingCb');
-      let sampleStates =
-        statesObjectFactory.createFromBackendDict(statesBackendDict);
+      let sampleStates = States.createFromBackendDict(statesBackendDict);
       spyOn(routerService, 'savePendingChanges').and.returnValue();
       spyOn(explorationStatesService, 'getStates').and.returnValue(
         sampleStates
@@ -1024,11 +993,9 @@ describe('Exploration save service ' + 'while saving changes', () => {
       explorationSaveService.saveChangesAsync(startLoadingCb, endLoadingCb);
       // Opening modal second time.
       explorationSaveService.saveChangesAsync(startLoadingCb, endLoadingCb);
-      // We need multiple '$rootScope.$apply()' here since, the source code
-      // consists of nested promises.
       flush();
+      tick();
       flush();
-
       expect(modalSpy).toHaveBeenCalledTimes(1);
     })
   );
@@ -1038,8 +1005,7 @@ describe('Exploration save service ' + 'while saving changes', () => {
     fakeAsync(() => {
       let startLoadingCb = jasmine.createSpy('startLoadingCb');
       let endLoadingCb = jasmine.createSpy('endLoadingCb');
-      let sampleStates =
-        statesObjectFactory.createFromBackendDict(statesBackendDict);
+      let sampleStates = States.createFromBackendDict(statesBackendDict);
       spyOn(routerService, 'savePendingChanges').and.returnValue();
       spyOn(explorationStatesService, 'getStates').and.returnValue(
         sampleStates
@@ -1073,12 +1039,9 @@ describe('Exploration save service ' + 'while saving changes', () => {
       } as NgbModalRef);
 
       explorationSaveService.saveChangesAsync(startLoadingCb, endLoadingCb);
-      // We need multiple '$rootScope.$apply()' here since, the source code
-      // consists of nested promises.
       flush();
       tick();
       flush();
-
       expect(modalSpy).toHaveBeenCalled();
     })
   );
@@ -1088,8 +1051,7 @@ describe('Exploration save service ' + 'while saving changes', () => {
     fakeAsync(() => {
       let startLoadingCb = jasmine.createSpy('startLoadingCb');
       let endLoadingCb = jasmine.createSpy('endLoadingCb');
-      let sampleStates =
-        statesObjectFactory.createFromBackendDict(statesBackendDict);
+      let sampleStates = States.createFromBackendDict(statesBackendDict);
       spyOn(routerService, 'savePendingChanges').and.returnValue();
       spyOn(explorationStatesService, 'getStates').and.returnValue(
         sampleStates

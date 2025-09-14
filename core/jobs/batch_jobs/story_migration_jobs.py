@@ -57,7 +57,7 @@ datastore_services = models.Registry.import_datastore_services()
 # assume that PTransform class is of type Any. Thus to avoid MyPy's error
 # (Class cannot subclass 'PTransform' (has type 'Any')), we added an
 # ignore here.
-class MigrateStoryModels(beam.PTransform):# type: ignore[misc]
+class MigrateStoryModels(beam.PTransform):  # type: ignore[misc]
     """Transform that gets all Story models, performs migration and filters any
     error results.
     """

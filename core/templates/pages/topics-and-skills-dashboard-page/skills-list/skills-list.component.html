@@ -3,7 +3,6 @@
     <colgroup>
       <col class="dashboard-table-index-column">
       <col class="dashboard-table-description-column">
-      <col class="dashboard-table-examples-column">
       <col class="dashboard-table-misconception-column">
       <col class="dashboard-table-status-column">
       <col class="dashboard-table-options-column">
@@ -13,7 +12,6 @@
           class="dashboard-table-headings">
         <p *ngIf="key === 'index'" class="text-center"></p>
         <p *ngIf="key === 'description'" class="text-left">Skill Description</p>
-        <p *ngIf="key === 'worked_examples_count'" class="text-center">Worked Examples</p>
         <p *ngIf="key === 'misconception_count'" class="text-center">Misconceptions</p>
         <p *ngIf="key === 'status'" class="text-right skill-status-heading">Status</p>
       </th>
@@ -36,11 +34,6 @@
             </span>
           </div>
         </a>
-      </td>
-      <td>
-        <span class="list-summary text-center">
-          <span> {{skill.workedExamplesCount}} </span>
-        </span>
       </td>
       <td>
         <span class="list-summary text-center">
@@ -142,10 +135,6 @@
       </div>
       <div class="skill-item-entities">
         <div class="skill-item-entity">
-          <div class="skill-item-key"><span>Worked Examples</span></div>
-          <div class="skill-item-value"><span> {{ skill.workedExamplesCount }}</span></div>
-        </div>
-        <div class="skill-item-entity">
           <div class="skill-item-key"><span>Misconceptions</span></div>
           <div class="skill-item-value"><span> {{ skill.misconceptionCount }}</span></div>
         </div>
@@ -180,19 +169,19 @@
   }
 
   .dashboard-table-index-column {
-    width: 5%;
+    width: 6%;
   }
 
   .dashboard-table-description-column {
-    width: 25%;
+    width: 30%;
   }
 
   .dashboard-table-examples-column {
-    width: 12%;
+    width: 15%;
   }
 
   .dashboard-table-misconception-column {
-    width: 12%;
+    width: 15%;
   }
 
   .dashboard-table-status-column {

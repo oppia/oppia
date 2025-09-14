@@ -236,7 +236,6 @@ def _get_augmented_skill_summaries_in_batches(
             skill_summary.language_code,
             skill_summary.version,
             skill_summary.misconception_count,
-            skill_summary.worked_examples_count,
             topic_names,
             classroom_names,
             skill_summary.skill_model_created_on,
@@ -441,7 +440,6 @@ def get_skill_summary_from_model(
         skill_summary_model.language_code,
         skill_summary_model.version,
         skill_summary_model.misconception_count,
-        skill_summary_model.worked_examples_count,
         skill_summary_model.skill_model_created_on,
         skill_summary_model.skill_model_last_updated
     )
@@ -816,21 +814,6 @@ def apply_change_list(
                     )
                     explanation.validate()
                     skill.update_explanation(explanation)
-                elif (change.property_name ==
-                      skill_domain.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES):
-                    # Here we use cast because this 'elif'
-                    # condition forces change to have type
-                    # UpdateSkillContentsPropertyWorkedExamplesCmd.
-                    update_worked_examples_cmd = cast(
-                        skill_domain.UpdateSkillContentsPropertyWorkedExamplesCmd,  # pylint: disable=line-too-long
-                        change
-                    )
-                    worked_examples_list: List[skill_domain.WorkedExample] = []
-                    for worked_example in update_worked_examples_cmd.new_value:
-                        worked_examples_list.append(
-                            skill_domain.WorkedExample.from_dict(worked_example)
-                        )
-                    skill.update_worked_examples(worked_examples_list)
             elif change.cmd == skill_domain.CMD_ADD_SKILL_MISCONCEPTION:
                 # Here we use cast because we are narrowing down the type from
                 # SkillChange to a specific change command.
@@ -1095,7 +1078,8 @@ def update_skill(
                     )
                 )
         taskqueue_services.defer(
-            taskqueue_services.FUNCTION_ID_UNTAG_DELETED_MISCONCEPTIONS,
+            feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+                'FUNCTION_ID_UNTAG_DELETED_MISCONCEPTIONS'],
             taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
             committer_id, skill_id, skill.description,
             deleted_skill_misconception_ids)
@@ -1164,8 +1148,6 @@ def compute_summary_of_skill(
         Exception. No data available for when the skill was created.
     """
     skill_model_misconception_count = len(skill.misconceptions)
-    skill_model_worked_examples_count = len(
-        skill.skill_contents.worked_examples)
 
     if skill.created_on is None:
         raise Exception(
@@ -1179,7 +1161,6 @@ def compute_summary_of_skill(
     skill_summary = skill_domain.SkillSummary(
         skill.id, skill.description, skill.language_code,
         skill.version, skill_model_misconception_count,
-        skill_model_worked_examples_count,
         skill.created_on, skill.last_updated
     )
 
@@ -1216,7 +1197,6 @@ def populate_skill_summary_model_fields(
         'language_code': skill_summary.language_code,
         'version': skill_summary.version,
         'misconception_count': skill_summary.misconception_count,
-        'worked_examples_count': skill_summary.worked_examples_count,
         'skill_model_last_updated': skill_summary.skill_model_last_updated,
         'skill_model_created_on': skill_summary.skill_model_created_on
     }

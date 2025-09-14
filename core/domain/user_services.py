@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import datetime
 import hashlib
-import imghdr
 import itertools
 import logging
 import urllib
@@ -39,6 +38,7 @@ from core.domain import state_domain
 from core.domain import user_domain
 from core.platform import models
 
+import filetype
 import requests
 
 from typing import (
@@ -329,11 +329,15 @@ def get_users_settings(
             if user_settings_model is None:
                 raise Exception('User with ID \'%s\' not found.' % user_id)
     result: List[Optional[user_domain.UserSettings]] = []
+    system_email_address = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value))
+    assert isinstance(system_email_address, str)
     for i, model in enumerate(user_settings_models):
         if user_ids[i] == feconf.SYSTEM_COMMITTER_ID:
             result.append(user_domain.UserSettings(
                 user_id=feconf.SYSTEM_COMMITTER_ID,
-                email=feconf.SYSTEM_EMAIL_ADDRESS,
+                email=system_email_address,
                 roles=[
                     feconf.ROLE_ID_FULL_USER,
                     feconf.ROLE_ID_CURRICULUM_ADMIN,
@@ -391,7 +395,10 @@ def fetch_gravatar(user_email: str) -> str:
         logging.exception('Failed to fetch Gravatar from %s' % gravatar_url)
     else:
         if response.ok:
-            if imghdr.what(None, h=response.content) == 'png':
+            # File_details might be None if the file does not
+            # match any of the types that filetype supports.
+            file_details = filetype.guess(response.content)
+            if file_details is not None and file_details.extension == 'png':
                 return utils.convert_image_binary_to_data_url(
                     response.content, 'png')
         else:

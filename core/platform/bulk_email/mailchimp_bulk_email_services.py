@@ -23,6 +23,8 @@ import hashlib
 import logging
 
 from core import feconf
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 from core.platform import models
 
 import mailchimp3
@@ -74,7 +76,11 @@ def _get_mailchimp_class() -> Optional[mailchimp3.MailChimp]:
         logging.error('Mailchimp API key is not available.')
         return None
 
-    if not feconf.MAILCHIMP_USERNAME:
+    mailchimp_username = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.MAILCHIMP_USERNAME.value))
+    assert isinstance(mailchimp_username, str)
+    if not mailchimp_username:
         logging.error('Mailchimp username is not set.')
         return None
 
@@ -82,7 +88,7 @@ def _get_mailchimp_class() -> Optional[mailchimp3.MailChimp]:
     # username and hence cannot be tested directly. The mailchimp functions are
     # tested with a mock class.
     return mailchimp3.MailChimp(    # pragma: no cover
-        mc_api=mailchimp_api_key, mc_user=feconf.MAILCHIMP_USERNAME)
+        mc_api=mailchimp_api_key, mc_user=mailchimp_username)
 
 
 def _create_user_in_mailchimp_db(
@@ -111,8 +117,12 @@ def _create_user_in_mailchimp_db(
             mailchimp API.
     """
     try:
+        mailchimp_audience_id = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID.value))
+        assert isinstance(mailchimp_audience_id, str)
         client.lists.members.create(
-            feconf.MAILCHIMP_AUDIENCE_ID, subscribed_mailchimp_data)
+            mailchimp_audience_id, subscribed_mailchimp_data)
     except mailchimpclient.MailChimpError as error:
         error_message = ast.literal_eval(str(error))
         # This is the specific error message returned for the case where the
@@ -150,10 +160,14 @@ def permanently_delete_user_from_list(user_email: str) -> None:
 
     subscriber_hash = _get_subscriber_hash(user_email)
     try:
+        mailchimp_audience_id = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID.value))
+        assert isinstance(mailchimp_audience_id, str)
         client.lists.members.get(
-            feconf.MAILCHIMP_AUDIENCE_ID, subscriber_hash)
+            mailchimp_audience_id, subscriber_hash)
         client.lists.members.delete_permanent(
-            feconf.MAILCHIMP_AUDIENCE_ID, subscriber_hash)
+            mailchimp_audience_id, subscriber_hash)
     except mailchimpclient.MailChimpError as error:
         # This has to be done since the message can only be accessed from
         # MailChimpError by error.message in Python2, but this is deprecated in
@@ -270,8 +284,12 @@ def add_or_update_user_status(
 
     try:
         try:
+            mailchimp_audience_id = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID.value))
+            assert isinstance(mailchimp_audience_id, str)
             client.lists.members.get(
-                feconf.MAILCHIMP_AUDIENCE_ID, subscriber_hash)
+                mailchimp_audience_id, subscriber_hash)
 
             # If member is already added to mailchimp list, we cannot
             # permanently delete a list member, since they cannot be
@@ -279,13 +297,13 @@ def add_or_update_user_status(
             # preference.
             if can_receive_email_updates:
                 client.lists.members.tags.update(
-                    feconf.MAILCHIMP_AUDIENCE_ID, subscriber_hash, tag_data)
+                    mailchimp_audience_id, subscriber_hash, tag_data)
                 client.lists.members.update(
-                    feconf.MAILCHIMP_AUDIENCE_ID, subscriber_hash,
+                    mailchimp_audience_id, subscriber_hash,
                     subscribed_mailchimp_data)
             else:
                 client.lists.members.update(
-                    feconf.MAILCHIMP_AUDIENCE_ID, subscriber_hash,
+                    mailchimp_audience_id, subscriber_hash,
                     unsubscribed_mailchimp_data)
         except mailchimpclient.MailChimpError as mailchimp_err:
             # This has to be done since the message can only be accessed from

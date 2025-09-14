@@ -24,6 +24,7 @@ import logging
 import re
 
 from core import feconf
+from core import utils
 from core.constants import constants
 from core.domain import contribution_stats_services
 from core.domain import email_manager
@@ -33,6 +34,7 @@ from core.domain import html_cleaner
 from core.domain import html_validation_service
 from core.domain import opportunity_services
 from core.domain import question_domain
+from core.domain import rte_component_registry
 from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import suggestion_registry
@@ -42,9 +44,11 @@ from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
 
+import bs4
 from typing import (
     Callable, Dict, Final, List, Literal, Mapping, Match,
-    Optional, Sequence, Set, Tuple, Union, cast, overload)
+    Optional, Sequence, Set, Tuple, Union, cast, overload
+)
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -98,6 +102,7 @@ SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS: Dict[str, Callable[..., str]] = {
 }
 
 RECENT_REVIEW_OUTCOMES_LIMIT: Final = 100
+MAX_CONTENT_LENGTH_WITHOUT_TRUNCATION: Final = 100
 
 
 @overload
@@ -2142,8 +2147,91 @@ def _update_suggestion_counts_in_community_contribution_stats(
         suggestions, amount)
 
 
+def _strip_prefix(component_name: str) -> str:
+    """Removes the 'oppia-noninteractive-' prefix from component names.
+
+    Args:
+        component_name: str. The full component name.
+
+    Returns:
+        str. The component name without the prefix.
+    """
+    return component_name.removeprefix('oppia-noninteractive-')
+
+
+def highlight_differences(
+        original: str,
+        updated: str,
+        truncation_limit: int = MAX_CONTENT_LENGTH_WITHOUT_TRUNCATION
+) -> Tuple[str, str]:
+    """Finds the first difference between two strings and truncates accordingly.
+
+    Args:
+        original: str. The original string.
+        updated: str. The updated string.
+        truncation_limit: int. Maximum length of the returned snippets.
+
+    Returns:
+        tuple. A pair of truncated strings highlighting where they differ.
+    """
+    # If the strings are identical, simply return truncated versions.
+    if original == updated:
+        return original[:truncation_limit], updated[:truncation_limit]
+
+    min_length = min(len(original), len(updated))
+
+    # Find the first index where the strings differ.
+    diff_index = min_length
+    for i in range(min_length):
+        if original[i] != updated[i]:
+            diff_index = i
+            break
+    # Calculate start_index with 10 characters before the first difference.
+    start_index = max(0, diff_index - 10)
+
+    # Truncate both original and updated strings.
+    truncated_original = original[start_index:start_index + truncation_limit]
+    truncated_updated = updated[start_index:start_index + truncation_limit]
+
+    # Apply '...' at the start if truncation happens and it's not
+    # already at the start of the string.
+    if len(truncated_original) < truncation_limit and start_index > 0:
+        truncated_original = '...' + truncated_original
+    if len(truncated_updated) < truncation_limit and start_index > 0:
+        truncated_updated = '...' + truncated_updated
+
+    truncated_original = truncated_original[:truncation_limit]
+    truncated_updated = truncated_updated[:truncation_limit]
+
+    return truncated_original, truncated_updated
+
+
+def count_rte_components(html_content: str) -> Dict[str, int]:
+    """Counts the number of each RTE component in the provided HTML content.
+
+    Args:
+        html_content: str. The HTML content to analyze.
+
+    Returns:
+        Dict[str, int]. A dictionary where keys are RTE component names
+        (e.g., 'oppia-noninteractive-image') and values are their counts.
+    """
+    soup = bs4.BeautifulSoup(html_content, 'html.parser')
+    component_counts = {}
+    rte_tags_with_attrs = (
+        rte_component_registry.Registry.get_tag_list_with_attrs()
+    )
+    rte_tags = list(rte_tags_with_attrs.keys())
+
+    for tag in rte_tags:
+        component_counts[tag] = len(soup.find_all(tag))
+
+    return component_counts
+
+
 def update_translation_suggestion(
-    suggestion_id: str, translation_html: str
+    suggestion_id: str,
+    translation_html: str
 ) -> None:
     """Updates the translation_html of a suggestion with the given
     suggestion_id.
@@ -2153,10 +2241,13 @@ def update_translation_suggestion(
         translation_html: str. The new translation_html string.
 
     Raises:
-        Exception. Expected SuggestionTranslateContent suggestion but found
-            different suggestion.
+        InvalidInputException. The RTE component counts in
+            the updated translation do not match the original content.
+        Exception. The suggestion is not of type
+            SuggestionTranslateContent.
     """
     suggestion = get_suggestion_by_id(suggestion_id)
+
     if not isinstance(
         suggestion, suggestion_registry.SuggestionTranslateContent
     ):
@@ -2164,6 +2255,64 @@ def update_translation_suggestion(
             'Expected SuggestionTranslateContent suggestion but found: %s.'
             % type(suggestion).__name__
         )
+
+    original_text_html = suggestion.change_cmd.content_html
+    original_rte_counts = count_rte_components(original_text_html)
+    updated_rte_counts = count_rte_components(translation_html)
+
+    # We use a sorted approach to compare component counts because it ensures
+    # consistency in comparison regardless of the order components appear.
+    all_component_names = sorted(
+        {_strip_prefix(name)
+        for name in original_rte_counts.keys() | updated_rte_counts.keys()}
+    )
+
+    discrepancy_components = []
+
+    for component_name in all_component_names:
+        full_name = f'oppia-noninteractive-{component_name}'
+        original_count = original_rte_counts.get(full_name, 0)
+        updated_count = updated_rte_counts.get(full_name, 0)
+
+        if original_count != updated_count:
+            discrepancy_components.append((
+                component_name, original_count, updated_count
+            ))
+
+    if discrepancy_components:
+        # Create the component differences summary.
+        original_summary = [
+            f'{count} {name}' for name, count, _ in discrepancy_components
+        ]
+        updated_summary = [
+            f'{count} {name}' for name, _, count in discrepancy_components
+        ]
+
+        original_summary_text = (
+            f'Components in original text: {", ".join(original_summary)}.'
+        )
+        updated_summary_text = (
+            f'Components in translated text: {", ".join(updated_summary)}.'
+        )
+
+        # Get truncated versions of both original and translated
+        # text for the error message.
+        original_text_preview, translation_text_preview = (
+            highlight_differences(
+                original_text_html,
+                translation_html,
+                truncation_limit=MAX_CONTENT_LENGTH_WITHOUT_TRUNCATION
+            )
+        )
+
+        # Raise the error with detailed information.
+        raise utils.InvalidInputException(
+            f'{original_summary_text} {updated_summary_text}\n'
+            f'Original text preview: {original_text_preview}\n'
+            f'Translated text preview: {translation_text_preview}'
+        )
+
+    # Store the full translation HTML without truncation.
     suggestion.change_cmd.translation_html = (
         html_cleaner.clean(translation_html)
         if isinstance(translation_html, str)

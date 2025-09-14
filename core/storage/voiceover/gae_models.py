@@ -75,7 +75,7 @@ class EntityVoiceoversModel(base_models.BaseModel):
     # that are synthesized from Azure. These audio offsets are not provided or
     # stored for manual voiceovers.
     automated_voiceovers_audio_offsets_msecs = datastore_services.JsonProperty(
-        required=True)
+        required=True, default={})
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:

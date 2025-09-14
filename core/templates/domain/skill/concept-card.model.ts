@@ -25,69 +25,29 @@ import {
   SubtitledHtml,
   SubtitledHtmlBackendDict,
 } from 'domain/exploration/subtitled-html.model';
-import {
-  WorkedExample,
-  WorkedExampleBackendDict,
-} from 'domain/skill/worked-example.model';
 
 export interface ConceptCardBackendDict {
   explanation: SubtitledHtmlBackendDict;
-  worked_examples: WorkedExampleBackendDict[];
   recorded_voiceovers: RecordedVoiceOverBackendDict;
 }
 
 export class ConceptCard {
   _explanation: SubtitledHtml;
-  _workedExamples: WorkedExample[];
   _recordedVoiceovers: RecordedVoiceovers;
 
   constructor(
     explanation: SubtitledHtml,
-    workedExamples: WorkedExample[],
     recordedVoiceovers: RecordedVoiceovers
   ) {
     this._explanation = explanation;
-    this._workedExamples = workedExamples;
     this._recordedVoiceovers = recordedVoiceovers;
   }
 
   toBackendDict(): ConceptCardBackendDict {
     return {
       explanation: this._explanation.toBackendDict(),
-      worked_examples: this._workedExamples.map(
-        (workedExample: WorkedExample) => {
-          return workedExample.toBackendDict();
-        }
-      ),
       recorded_voiceovers: this._recordedVoiceovers.toBackendDict(),
     };
-  }
-
-  _getElementsInFirstSetButNotInSecond(
-    setA: Set<string>,
-    setB: Set<string>
-  ): string[] {
-    let diffList = Array.from(setA).filter(element => {
-      return !setB.has(element);
-    });
-    return diffList;
-  }
-
-  _extractAvailableContentIdsFromWorkedExamples(
-    workedExamples: WorkedExample[]
-  ): Set<string> {
-    let contentIds: Set<string> = new Set();
-    workedExamples.forEach((workedExample: WorkedExample) => {
-      let question = workedExample.getQuestion();
-      if (question.contentId !== null) {
-        contentIds.add(question.contentId);
-      }
-      let explanation = workedExample.getExplanation();
-      if (explanation.contentId !== null) {
-        contentIds.add(explanation.contentId);
-      }
-    });
-    return contentIds;
   }
 
   getExplanation(): SubtitledHtml {
@@ -98,48 +58,8 @@ export class ConceptCard {
     this._explanation = explanation;
   }
 
-  getWorkedExamples(): WorkedExample[] {
-    return this._workedExamples.slice();
-  }
-
-  setWorkedExamples(workedExamples: WorkedExample[]): void {
-    let oldContentIds = this._extractAvailableContentIdsFromWorkedExamples(
-      this._workedExamples
-    );
-
-    this._workedExamples = workedExamples.slice();
-
-    let newContentIds = this._extractAvailableContentIdsFromWorkedExamples(
-      this._workedExamples
-    );
-
-    let contentIdsToDelete = this._getElementsInFirstSetButNotInSecond(
-      oldContentIds,
-      newContentIds
-    );
-    let contentIdsToAdd = this._getElementsInFirstSetButNotInSecond(
-      newContentIds,
-      oldContentIds
-    );
-
-    for (let i = 0; i < contentIdsToDelete.length; i++) {
-      this._recordedVoiceovers.deleteContentId(contentIdsToDelete[i]);
-    }
-    for (let i = 0; i < contentIdsToAdd.length; i++) {
-      this._recordedVoiceovers.addContentId(contentIdsToAdd[i]);
-    }
-  }
-
   getRecordedVoiceovers(): RecordedVoiceovers {
     return this._recordedVoiceovers;
-  }
-
-  static _generateWorkedExamplesFromBackendDict(
-    workedExampleDicts: WorkedExampleBackendDict[]
-  ): WorkedExample[] {
-    return workedExampleDicts.map(workedExampleDict => {
-      return WorkedExample.createFromBackendDict(workedExampleDict);
-    });
   }
 
   static createFromBackendDict(
@@ -147,9 +67,6 @@ export class ConceptCard {
   ): ConceptCard {
     return new ConceptCard(
       SubtitledHtml.createFromBackendDict(conceptCardBackendDict.explanation),
-      this._generateWorkedExamplesFromBackendDict(
-        conceptCardBackendDict.worked_examples
-      ),
       RecordedVoiceovers.createFromBackendDict(
         conceptCardBackendDict.recorded_voiceovers
       )

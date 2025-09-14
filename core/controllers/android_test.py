@@ -346,6 +346,44 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                 }]
             )
 
+    def test_get_subtopic_with_study_guide_migration_returns_correct_json(
+        self) -> None:
+        study_guide = self.save_new_study_guide(1, 'user_id', 'topic_id')
+        with self.secrets_swap:
+            self.assertEqual(
+                self.get_json(
+                    '/android_data?activity_type='
+                    'subtopic_with_study_guide_migration&'
+                    'activities_data=[{"id": "topic_id-1", "version": 1}]',
+                    headers={'X-ApiKey': 'secret'},
+                    expected_status_int=200
+                ),
+                [{
+                    'id': 'topic_id-1',
+                    'version': 1,
+                    'payload': study_guide.to_subtopic_page_dict_for_android()
+                }]
+            )
+
+    def test_get_subtopic_with_study_guide_returns_correct_json(
+        self) -> None:
+        study_guide = self.save_new_study_guide(1, 'user_id', 'topic_id')
+        with self.secrets_swap:
+            self.assertEqual(
+                self.get_json(
+                    '/android_data?activity_type='
+                    'subtopic_with_study_guide&'
+                    'activities_data=[{"id": "topic_id-1", "version": 1}]',
+                    headers={'X-ApiKey': 'secret'},
+                    expected_status_int=200
+                ),
+                [{
+                    'id': 'topic_id-1',
+                    'version': 1,
+                    'payload': study_guide.to_dict()
+                }]
+            )
+
     def test_get_classroom_returns_correct_json(self) -> None:
         classroom_id = classroom_config_services.get_new_classroom_id()
 

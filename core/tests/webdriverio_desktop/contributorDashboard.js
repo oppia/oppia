@@ -242,6 +242,11 @@ describe('Contributor dashboard page', function () {
     await action.click('Image', images[0]);
     await action.click('Cancel', cancelButton);
     expect(images.length).toEqual(2);
+
+    // Handle any unhandled dialogs that might appear during navigation.
+    await browser.execute(function () {
+      window.onbeforeunload = null;
+    });
     await users.logout();
   });
 

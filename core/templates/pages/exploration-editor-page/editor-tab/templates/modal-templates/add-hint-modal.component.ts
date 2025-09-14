@@ -23,7 +23,7 @@ import {AppConstants} from 'app.constants';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {StateHintsService} from 'components/state-editor/state-editor-properties-services/state-hints.service';
 import {Hint} from 'domain/exploration/hint-object.model';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
 import {ExplorationEditorPageConstants} from 'pages/exploration-editor-page/exploration-editor-page.constants';
 import {
@@ -54,14 +54,15 @@ export class AddHintModalComponent
   HINT_FORM_SCHEMA: HintFormSchema = {
     type: 'html',
     ui_config: {
+      rte_component_config_id: 'ALL_COMPONENTS',
       hide_complex_extensions:
-        this.contextService.getEntityType() === 'question',
+        this.pageContextService.getEntityType() === 'question',
     },
   };
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private generateContentIdService: GenerateContentIdService,
     private ngbActiveModal: NgbActiveModal,
     private stateHintsService: StateHintsService,

@@ -1,5 +1,5 @@
 <form autocomplete="off" [attr.disabled]="!isValid" role="form" class="form-horizontal">
-  <!-- This ng-form is needed for submitting answer on hitting enter. -->
+  <!-- This form is needed for submitting the answer on hitting enter. -->
   <input type="text"
          name="answer"
          [(ngModel)]="answer"
@@ -9,7 +9,7 @@
          [oppiaFocusOn]="labelForFocusTarget"
          [placeholder]="placeholder">
 
-  <div class="oppia-form-error oppia-ratio-expression-input-error">
+  <div class="oppia-form-error oppia-ratio-expression-input-error e2e-test-form-error-container">
     {{ errorMessageI18nKey | translate: { termsCount: expectedNumberOfTerms } }}
   </div>
 </form>

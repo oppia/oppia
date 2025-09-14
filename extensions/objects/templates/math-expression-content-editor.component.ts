@@ -82,7 +82,9 @@ export class MathExpressionContentEditorComponent implements OnInit {
 
   ngOnInit(): void {
     this.insertScriptService.loadScript(KNOWN_SCRIPTS.MATHJAX, () => {
-      this.init();
+      MathJax.Hub.Queue(() => {
+        this.init();
+      });
     });
   }
 
@@ -149,8 +151,12 @@ export class MathExpressionContentEditorComponent implements OnInit {
     outputElement.innerHTML = s.outerHTML;
     // Naturally MathJax works asynchronously, but we can add processes
     // which we want to happen synchronously into the MathJax Hub Queue.
+    this.numberOfElementsInQueue = Math.max(
+      0,
+      this.numberOfElementsInQueue + 1
+    );
     MathJax.Hub.Queue(['Typeset', MathJax.Hub, outputElement]);
-    this.numberOfElementsInQueue++;
+
     MathJax.Hub.Queue(() => {
       if (outputElement.getElementsByTagName('svg')[0] !== undefined) {
         let svgElement = outputElement.getElementsByTagName('svg')[0];
@@ -163,7 +169,11 @@ export class MathExpressionContentEditorComponent implements OnInit {
         svgElement.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
         this.svgString = svgElement.outerHTML;
       }
-      this.numberOfElementsInQueue--;
+      this.numberOfElementsInQueue = Math.max(
+        0,
+        this.numberOfElementsInQueue - 1
+      );
+
       // We need to ensure that all the typepsetting requests in the
       // MathJax queue is finished before we save the final SVG.
       if (this.numberOfElementsInQueue === 0) {

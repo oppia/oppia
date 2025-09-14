@@ -142,7 +142,6 @@ class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
                     'html': 'test explanation',
                     'content_id': 'explanation',
                 },
-                'worked_examples': [],
                 'recorded_voiceovers': {
                     'voiceovers_mapping': {}
                 },
@@ -177,7 +176,6 @@ class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
                     'html': 'test explanation',
                     'content_id': 'explanation',
                 },
-                'worked_examples': [],
                 'recorded_voiceovers': {
                     'voiceovers_mapping': {}
                 },

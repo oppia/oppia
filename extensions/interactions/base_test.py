@@ -792,7 +792,8 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             # returns correctly, we are accessing private attribute for this
             # test.
             self.assertEqual(
-                interaction.dependency_ids, interaction._dependency_ids) # pylint: disable=protected-access
+                interaction.dependency_ids, interaction._dependency_ids # pylint: disable=protected-access
+            )
 
     def test_linear_interactions(self) -> None:
         """Sanity-check for the number of linear interactions."""

@@ -1,4 +1,4 @@
-<div class="history-tab-container">
+<div class="history-tab-container e2e-test-exploration-history-tab">
   <mat-card class="oppia-editor-card history-table-card">
     <div class="oppia-mobile-collapsible-card-header">
       <h3 class="history-card-header-text" tabindex="0">History</h3>
@@ -7,7 +7,7 @@
       <div class="history-tab-header">
         <mat-paginator [length]="versionCheckboxArray.length"
                        [pageSize]="VERSIONS_PER_PAGE"
-                       class="pagination"
+                       class="pagination e2e-test-desktop-history-pagination"
                        [pageSizeOptions]="versionChoices"
                        (page)="paginator($event)">
         </mat-paginator>
@@ -35,7 +35,7 @@
         <span>Displaying {{ startingIndex }}-{{ endIndex }} of {{ totalExplorationVersionMetadata.length }}</span>
       </div>
       <div *ngFor="let metadata of explorationVersionMetadata; index as index" class="history-list-item e2e-test-history-list-item">
-        <div class="history-table-index" [attr.aria-label]="'Version number: '+ metadata.versionNumber" tabindex="0">
+        <div class="history-table-index e2e-test-history-table-index" [attr.aria-label]="'Version number: '+ metadata.versionNumber" tabindex="0">
           {{ metadata.versionNumber }}.
         </div>
         <div class="history-table-message e2e-test-history-table-message" [attr.aria-label]="'Notes: '+ metadata.commitMessage" tabindex="0">
@@ -49,7 +49,7 @@
         </div>
         <div class="history-table-options e2e-test-history-list-options">
           <div ngbDropdown class="dropdown">
-            <button ngbDropdownToggle class="history-table-option" type="button" id="{{ 'dropdownMenuButton-' + index }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" tabindex="0" role="button" aria-label="options">
+            <button ngbDropdownToggle class="history-table-option e2e-test-history-table-option" type="button" id="{{ 'dropdownMenuButton-' + index }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" tabindex="0" role="button" aria-label="options">
               <i class="fa fa-ellipsis-v"></i>
             </button>
             <div ngbDropdownMenu class="dropdown-menu dropdown-menu-left" [attr.aria-label]="'dropdownMenuButton-' + index">
@@ -59,7 +59,7 @@
                  (click)="showCheckRevertExplorationModal(metadata.versionNumber)">
                 Revert
               </a>
-              <a ngbDropdownItem class="dropdown-item" href="#" (click)="downloadExplorationWithVersion(metadata.versionNumber)"
+              <a ngbDropdownItem class="dropdown-item e2e-test-download-exploration" href="#" (click)="downloadExplorationWithVersion(metadata.versionNumber)"
                  title="Download exploration as a zip file.">
                 Download
               </a>
@@ -70,7 +70,7 @@
       <br>
       <div class="pagination-mobile">
         <mat-paginator [length]="versionCheckboxArray.length"
-                       class="pagination"
+                       class="pagination e2e-test-mobile-history-pagination"
                        [pageSize]="VERSIONS_PER_PAGE"
                        [pageSizeOptions]="versionChoices"
                        (page)="paginator($event)">
@@ -90,7 +90,8 @@
         <div class="revision-select-container">
           <mat-form-field appearance="fill" class="e2e-test-history-version-dropdown-first">
             <mat-label>Revision #1 :</mat-label>
-            <mat-select [(value)]="firstVersion" disableRipple>
+            <mat-select [(value)]="firstVersion"
+                        class="e2e-test-version-comparasion-select" disableRipple>
               <mat-option *ngFor="let choice of totalExplorationVersionMetadata ; index as index"
                           [value]="choice"
                           (click)="changeSelectedVersions(firstVersion, 1)">{{ choice.versionNumber }}
@@ -101,7 +102,8 @@
         <div class="revision-select-container">
           <mat-form-field appearance="fill" class="e2e-test-history-version-dropdown-second">
             <mat-label>Revision #2 :</mat-label>
-            <mat-select [(value)]="secondVersion" disableRipple>
+            <mat-select [(value)]="secondVersion"
+                        class="e2e-test-version-comparasion-select" disableRipple>
               <mat-option *ngFor="let choice of totalExplorationVersionMetadata ; index as index"
                           [value]="choice"
                           (click)="changeSelectedVersions(secondVersion, 2)">{{ choice.versionNumber }}
@@ -111,7 +113,7 @@
         </div>
         <button (click)="resetGraph()" class="btn btn-outline-secondary oppia-reset-button e2e-test-reset-graph">Reset</button>
       </div>
-      <div *ngIf="diffData && !hideHistoryGraph && explorationVersionMetadata" class="graph-diff-container">
+      <div *ngIf="diffData && !hideHistoryGraph && explorationVersionMetadata" class="graph-diff-container e2e-test-graph-diff-container">
         <h3>
           Changes from version {{ compareVersionMetadata.earlierVersion.versionNumber }}
           to version {{ compareVersionMetadata.laterVersion.versionNumber }}

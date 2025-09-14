@@ -111,8 +111,8 @@ class BuildTests(test_utils.GenericTestBase):
 
     def test_minify_and_create_sourcemap_under_docker_environment(self) -> None:
         """Tests _minify_and_create_sourcemap with an invalid filepath."""
-
-        def mock_subprocess_check_call(command: str, **kwargs: bool) -> None:   # pylint: disable=unused-argument
+        def mock_subprocess_check_call( # pylint: disable=unused-argument
+            command: str, **kwargs: bool) -> None:
             """Mock method for replacing subprocess.check_call()."""
             excepted_cmd = (
                 'node /app/oppia/node_modules/uglify-js/bin/uglifyjs '
@@ -136,7 +136,8 @@ class BuildTests(test_utils.GenericTestBase):
         # Get all filepaths from dependencies.json.
         dependency_filepaths = build.get_dependencies_filepaths()
         # Join and write all JS files in /third_party/static to file_stream.
-        build._join_files(dependency_filepaths['js'], third_party_js_stream)  # pylint: disable=protected-access
+        build._join_files( # pylint: disable=protected-access
+            dependency_filepaths['js'], third_party_js_stream)
         counter = 0
         # Only checking first 10 files.
         js_file_count = 10
@@ -168,9 +169,11 @@ class BuildTests(test_utils.GenericTestBase):
     def test_insert_hash(self) -> None:
         """Test _insert_hash returns correct filenames with provided hashes."""
         self.assertEqual(
-            build._insert_hash('file.js', '123456'), 'file.123456.js')  # pylint: disable=protected-access
+            build._insert_hash( # pylint: disable=protected-access
+                'file.js', '123456'), 'file.123456.js'
+            )
         self.assertEqual(
-            build._insert_hash(  # pylint: disable=protected-access
+            build._insert_hash( # pylint: disable=protected-access
                 'path/to/file.js', '654321'), 'path/to/file.654321.js')
         self.assertEqual(
             build._insert_hash('file.min.js', 'abcdef'), 'file.min.abcdef.js')  # pylint: disable=protected-access
@@ -213,7 +216,8 @@ class BuildTests(test_utils.GenericTestBase):
             ValueError, (
                 '%s files in first dir list != %s files in second dir list') %
             (source_dir_file_count, target_dir_file_count)):
-            build._compare_file_count([EMPTY_DIR], [MOCK_ASSETS_DEV_DIR])  # pylint: disable=protected-access
+            build._compare_file_count( # pylint: disable=protected-access
+                [EMPTY_DIR], [MOCK_ASSETS_DEV_DIR])
 
         # Test when one of the lists contain multiple directories.
         mock_extensions_dir_list = [MOCK_EXTENSIONS_DEV_DIR]
@@ -225,7 +229,8 @@ class BuildTests(test_utils.GenericTestBase):
             ValueError, (
                 '%s files in first dir list != %s files in second dir list') %
             (source_dir_file_count, target_dir_file_count)):
-            build._compare_file_count([EMPTY_DIR], mock_extensions_dir_list)  # pylint: disable=protected-access
+            build._compare_file_count( # pylint: disable=protected-access
+                [EMPTY_DIR], mock_extensions_dir_list)
 
         # Reset EMPTY_DIRECTORY to clean state.
         build.safe_delete_directory_tree(EMPTY_DIR)
@@ -241,14 +246,16 @@ class BuildTests(test_utils.GenericTestBase):
         file_hashes: Dict[str, str] = {}
         base_filename = 'base.html'
         with self.assertRaisesRegex(ValueError, 'Hash dict is empty'):
-            build._verify_filepath_hash(base_filename, file_hashes)  # pylint: disable=protected-access
+            build._verify_filepath_hash( # pylint: disable=protected-access
+                base_filename, file_hashes)
 
         # Generate a random hash dict for base.html.
         file_hashes = {base_filename: (
             test_utils.generate_random_hexa_str())}
         with self.assertRaisesRegex(
             ValueError, '%s is expected to contain MD5 hash' % base_filename):
-            build._verify_filepath_hash(base_filename, file_hashes)  # pylint: disable=protected-access
+            build._verify_filepath_hash( # pylint: disable=protected-access
+                base_filename, file_hashes)
 
         base_without_hash_filename = 'base_without_hash.html'
         build._verify_filepath_hash(  # pylint: disable=protected-access
@@ -257,7 +264,8 @@ class BuildTests(test_utils.GenericTestBase):
         bad_filepath = 'README'
         with self.assertRaisesRegex(
             ValueError, 'Filepath has less than 2 partitions after splitting'):
-            build._verify_filepath_hash(bad_filepath, file_hashes)  # pylint: disable=protected-access
+            build._verify_filepath_hash( # pylint: disable=protected-access
+                bad_filepath, file_hashes)
 
         hashed_base_filename = build._insert_hash(  # pylint: disable=protected-access
             base_filename, test_utils.generate_random_hexa_str())
@@ -265,14 +273,16 @@ class BuildTests(test_utils.GenericTestBase):
             KeyError,
             'Hash from file named %s does not match hash dict values' %
             hashed_base_filename):
-            build._verify_filepath_hash(hashed_base_filename, file_hashes)  # pylint: disable=protected-access
+            build._verify_filepath_hash( # pylint: disable=protected-access
+                hashed_base_filename, file_hashes)
 
     def test_process_html(self) -> None:
         """Test process_html removes whitespaces."""
         base_html_source_path = (
             os.path.join(MOCK_TEMPLATES_DEV_DIR, 'base.html'))
 
-        build._ensure_files_exist([base_html_source_path])  # pylint: disable=protected-access
+        build._ensure_files_exist( # pylint: disable=protected-access
+            [base_html_source_path])
         minified_html_file_stream = io.StringIO()
 
         # Assert that base.html has white spaces and has original filepaths.
@@ -515,7 +525,8 @@ class BuildTests(test_utils.GenericTestBase):
         build._execute_tasks(build_tasks)  # pylint: disable=protected-access
         with self.assertRaisesRegex(
             OSError, 'threads can only be started once'):
-            build._execute_tasks(build_tasks)  # pylint: disable=protected-access
+            build._execute_tasks( # pylint: disable=protected-access
+                build_tasks)
         # Assert that all threads are joined.
         extra_build_threads = [
             thread.name for thread in threading.enumerate()
@@ -603,7 +614,8 @@ class BuildTests(test_utils.GenericTestBase):
         # Build all files and save to final directory.
         common.ensure_directory_exists(
             extensions_dirnames_to_dirpaths['staging_dir'])
-        build._execute_tasks(build_dir_tasks)  # pylint: disable=protected-access
+        build._execute_tasks( # pylint: disable=protected-access
+            build_dir_tasks)
         self.assertEqual(threading.active_count(), 1)
         build._execute_tasks(  # pylint: disable=protected-access
             build.generate_copy_tasks_to_copy_from_source_to_target(
@@ -1129,8 +1141,8 @@ class BuildTests(test_utils.GenericTestBase):
     def test_build_using_ng_command(self) -> None:
 
         @contextlib.contextmanager
-        def mock_managed_ng_build(
-            use_prod_env: bool, watch_mode: bool # pylint: disable=unused-argument
+        def mock_managed_ng_build( # pylint: disable=unused-argument
+            use_prod_env: bool, watch_mode: bool
         ) -> Iterator[scripts_test_utils.PopenStub]:
             yield scripts_test_utils.PopenStub()
 
@@ -1152,8 +1164,8 @@ class BuildTests(test_utils.GenericTestBase):
     ) -> None:
 
         @contextlib.contextmanager
-        def mock_managed_ng_build(
-            use_prod_env: bool, watch_mode: bool # pylint: disable=unused-argument
+        def mock_managed_ng_build( # pylint: disable=unused-argument
+            use_prod_env: bool, watch_mode: bool
         ) -> Iterator[scripts_test_utils.PopenStub]:
             yield scripts_test_utils.PopenStub()
 

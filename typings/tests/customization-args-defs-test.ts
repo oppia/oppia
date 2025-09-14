@@ -59,7 +59,7 @@ import {
   TextInputCustomizationArgs,
   TextInputCustomizationArgsBackendDict,
 } from 'interactions/customization-args-defs';
-import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 
 /**

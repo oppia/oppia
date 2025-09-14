@@ -31,7 +31,6 @@ import threading
 import time
 from urllib import request as urlrequest
 
-from core import utils
 from core.tests import test_utils
 from scripts import common
 from scripts import scripts_test_utils
@@ -490,7 +489,8 @@ class ManagedProcessTests(test_utils.TestBase):
 
         old_os_path_exists = os.path.exists
 
-        def mock_os_remove_files(file_path: str) -> None: # pylint: disable=unused-argument
+        def mock_os_remove_files( # pylint: disable=unused-argument
+            file_path: str) -> None:
             check_function_calls['shutil_rmtree_is_called'] = True
 
         def mock_os_path_exists(file_path: str) -> bool: # pylint: disable=unused-argument
@@ -1139,7 +1139,7 @@ class GetChromedriverVersionTests(test_utils.TestBase):
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
         url_open_swap = self.swap_with_checks(
-            utils, 'url_open', mock_url_open, expected_args=[(expected_url,)])
+            common, 'url_open', mock_url_open, expected_args=[(expected_url,)])
 
         with check_output_swap, url_open_swap:
             self.assertEqual(
@@ -1155,7 +1155,7 @@ class GetChromedriverVersionTests(test_utils.TestBase):
 
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
-        url_open_swap = self.swap(utils, 'url_open', mock_url_open)
+        url_open_swap = self.swap(common, 'url_open', mock_url_open)
 
         with check_output_swap, url_open_swap:
             self.assertEqual(

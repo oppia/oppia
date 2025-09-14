@@ -55,23 +55,29 @@ describe('Topic Manager', function () {
 
     explorationId2 =
       await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
-        'Understanding Polynomial Functions'
+        'Understanding Polynomial Functions',
+        'Algebra',
+        false
       );
 
     explorationId3 =
       await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
-        'Exploring Advance Equations'
+        'Exploring Advance Equations',
+        'Algebra',
+        false
       );
 
     await curriculumAdmin.createTopic('Algebra II', 'algebra-ii');
 
     await curriculumAdmin.createSkillForTopic(
       'Quadratic Equations',
-      'Algebra II'
+      'Algebra II',
+      false
     );
     await curriculumAdmin.createSkillForTopic(
       'Polynomial Functions',
-      'Algebra II'
+      'Algebra II',
+      false
     );
 
     await curriculumAdmin.addStoryToTopic(

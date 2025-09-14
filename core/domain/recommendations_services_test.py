@@ -125,9 +125,8 @@ class TopicSimilarityUnitTests(test_utils.GenericTestBase):
                 'length of topic list: 3.')
             ):
             recommendations_services.update_topic_similarities(
-                'Art,Biology,Chemistry\n'
-                '1.0,0.2,0.1\n'
-                '0.2,1.0,0.8')
+                'Art,Biology,Chemistry\n1.0,0.2,0.1\n0.2,1.0,0.8'
+            )
 
         with self.assertRaisesRegex(
             Exception, (

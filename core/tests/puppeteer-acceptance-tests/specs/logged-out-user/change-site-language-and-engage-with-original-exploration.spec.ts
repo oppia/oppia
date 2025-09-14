@@ -46,7 +46,7 @@ describe('Logged-out User', function () {
     );
 
     await explorationEditor.navigateToCreatorDashboardPage();
-    await explorationEditor.navigateToExplorationEditorPage();
+    await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
     await explorationEditor.dismissWelcomeModal();
     await explorationEditor.updateCardContent(
       'We will be learning numbers today.'
@@ -73,9 +73,6 @@ describe('Logged-out User', function () {
       'We have learnt positive numbers.'
     );
     await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
-
-    // Navigate back to the introduction card and save the draft.
-    await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
     await explorationEditor.saveExplorationDraft();
 
     await explorationEditor.publishExplorationWithMetadata(
@@ -95,7 +92,7 @@ describe('Logged-out User', function () {
 
       // Check the navbar to confirm that it is translated correctly.
       await loggedOutUser.expectNavbarButtonsToHaveText([
-        'के बारे में',
+        'परिचय',
         'बुनियादी गणित',
         'जानिए',
       ]);
@@ -115,7 +112,8 @@ describe('Logged-out User', function () {
 
       await loggedOutUser.continueToNextCard();
       await loggedOutUser.expectExplorationCompletionToastMessage(
-        'Congratulations for completing this lesson!'
+        'इस पाठ को पूरा करने के लिए बधाई! अब आप अगली बार जब वापस आएंगे तो पाठ को शुरू से ' +
+          'शुरू करेंगे।'
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS

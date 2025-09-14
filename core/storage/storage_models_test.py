@@ -124,7 +124,11 @@ class StorageModelsTest(test_utils.GenericTestBase):
         for model in all_models:
             export_policy = model.get_export_policy()
             self.assertEqual(
-                sorted([str(prop) for prop in model._properties]), # pylint: disable=protected-access
+                sorted(
+                    [
+                        str(prop) for prop in model._properties # pylint: disable=protected-access
+                    ]
+                ),
                 sorted(export_policy.keys())
             )
             self.assertTrue(

@@ -18,5 +18,4 @@
 
 import 'leaflet/dist/leaflet.js';
 import 'leaflet/dist/leaflet.css';
-require('static/angular-ui-leaflet-1.0.3/ui-leaflet.min.no-header.js');
 require('static/angular-simple-logger-0.1.7/angular-simple-logger.min.js');

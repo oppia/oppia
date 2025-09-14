@@ -61,8 +61,8 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
         )
-        def mock_popen(
-            cmd_tokens: List[str], stdout: int, stderr: int  # pylint: disable=unused-argument
+        def mock_popen( # pylint: disable=unused-argument
+            cmd_tokens: List[str], stdout: int, stderr: int
         ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
             if 'remote.origin.url' in cmd_tokens:
                 return process_for_origin_url
@@ -94,8 +94,8 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         communicate_swap = self.swap(
             process, 'communicate', mock_communicate)
 
-        def mock_popen(
-            cmd_tokens: List[str], stdout: int, stderr: int  # pylint: disable=unused-argument
+        def mock_popen( # pylint: disable=unused-argument
+            cmd_tokens: List[str], stdout: int, stderr: int
         ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
             return process
 
@@ -150,8 +150,8 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         process_for_remote = subprocess.Popen(
             [b'echo', b''], stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
-        def mock_popen(
-            cmd_tokens: List[bytes], stdout: int, stderr: int  # pylint: disable=unused-argument
+        def mock_popen( # pylint: disable=unused-argument
+            cmd_tokens: List[bytes], stdout: int, stderr: int
         ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
             return process_for_remote
         popen_swap = self.swap_with_checks(
@@ -189,8 +189,8 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
         )
-        def mock_popen(
-            cmd_tokens: List[str], stdout: int, stderr: int  # pylint: disable=unused-argument
+        def mock_popen( # pylint: disable=unused-argument
+            cmd_tokens: List[str], stdout: int, stderr: int
         ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
             if 'remote.origin.url' in cmd_tokens:
                 return process_for_origin_url
@@ -236,8 +236,8 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
         )
-        def mock_popen(
-            cmd_tokens: List[str], stdout: int, stderr: int  # pylint: disable=unused-argument
+        def mock_popen( # pylint: disable=unused-argument
+            cmd_tokens: List[str], stdout: int, stderr: int
         ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
             if 'remote.origin.url' in cmd_tokens:
                 return process_for_origin_url
@@ -293,8 +293,8 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             stderr=subprocess.PIPE
         )
 
-        def mock_popen(
-            cmd_tokens: List[str], stdout: int, stderr: int  # pylint: disable=unused-argument
+        def mock_popen( # pylint: disable=unused-argument
+            cmd_tokens: List[str], stdout: int, stderr: int
         ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
             if 'config' in cmd_tokens:
                 return process_for_remote_url
@@ -321,8 +321,8 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         process_for_remote = subprocess.Popen(
             [b'echo', b''], stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
-        def mock_popen(
-            cmd_tokens: List[bytes], stdout: int, stderr: int  # pylint: disable=unused-argument
+        def mock_popen( # pylint: disable=unused-argument
+            cmd_tokens: List[bytes], stdout: int, stderr: int
         ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
             return process_for_remote
         popen_swap = self.swap_with_checks(
@@ -359,8 +359,8 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
         )
-        def mock_popen(
-            cmd_tokens: List[str], stdout: int, stderr: int  # pylint: disable=unused-argument
+        def mock_popen( # pylint: disable=unused-argument
+            cmd_tokens: List[str], stdout: int, stderr: int
         ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
             if 'remote.origin.url' in cmd_tokens:
                 return process_for_origin_url

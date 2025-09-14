@@ -17,8 +17,7 @@
 """Provides app identity services."""
 
 from __future__ import annotations
-
-from core import feconf
+import os
 
 _GCS_RESOURCE_BUCKET_NAME_SUFFIX = '-resources'
 
@@ -36,10 +35,11 @@ def get_application_id() -> str:
     Raises:
         ValueError. Value can't be None for application id.
     """
-    app_id = feconf.OPPIA_PROJECT_ID
-    if app_id is None:
-        raise ValueError('Value None for application id is invalid.')
-    return app_id
+    oppia_project_id = os.environ.get('GOOGLE_CLOUD_PROJECT', 'dev-project-id')
+    assert isinstance(oppia_project_id, str)
+    if not oppia_project_id:
+        raise ValueError('Value "" for application id is invalid.')
+    return oppia_project_id
 
 
 def get_gcs_resource_bucket_name() -> str:

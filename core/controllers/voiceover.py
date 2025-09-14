@@ -16,9 +16,13 @@
 
 from __future__ import annotations
 
+import datetime
+
 from core import feconf
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import taskqueue_services
+from core.domain import voiceover_regeneration_services
 from core.domain import voiceover_services
 
 from typing import Dict, TypedDict
@@ -42,10 +46,16 @@ class VoiceoverAdminDataHandler(
 
         language_codes_mapping: Dict[str, Dict[str, bool]] = (
             voiceover_services.get_all_language_accent_codes_for_voiceovers())
+
+        autogeneratable_language_accent_codes = (
+            voiceover_services.get_autogeneratable_language_accent_codes())
+
         self.values.update({
             'language_accent_master_list':
                 language_accent_master_list,
-            'language_codes_mapping': language_codes_mapping
+            'language_codes_mapping': language_codes_mapping,
+            'autogeneratable_language_accent_codes':
+                autogeneratable_language_accent_codes
         })
         self.render_json(self.values)
 
@@ -272,4 +282,129 @@ class EntityVoiceoversBulkHandler(
         self.values.update({
             'entity_voiceovers_list': entity_voiceovers_dicts
         })
+        self.render_json(self.values)
+
+
+class AutomaticVoiceoverRegenerationRecordHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handler class to retrieve automatic voiceover regeneration records
+    within a specified date range."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'start_date': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'end_date': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+        }
+    }
+
+    @acl_decorators.can_access_voiceover_admin_page
+    def get(self) -> None:
+        """Retrieves automatic voiceover regeneration records within the
+        specified start and end dates.
+        """
+        assert self.normalized_request is not None
+        start_date: str = self.normalized_request.get('start_date', '')
+        end_date: str = self.normalized_request.get('end_date', '')
+
+        # Convert start_date and end_date to datetime objects.
+        start_date_obj: datetime.datetime = datetime.datetime.fromisoformat(
+            start_date.replace('Z', '+00:00'))
+        end_date_obj: datetime.datetime = datetime.datetime.fromisoformat(
+            end_date.replace('Z', '+00:00'))
+
+        # Fetch only those records that are related to voiceover regeneration
+        # and are within the specified date range.
+        cloud_task_run_objects = (
+            taskqueue_services.get_cloud_task_run_by_given_params(
+                taskqueue_services.QUEUE_NAME_VOICEOVER_REGENERATION,
+                start_date_obj, end_date_obj))
+
+        self.values.update({
+            'automatic_voiceover_regeneration_records': [
+                cloud_task_run.to_dict()
+                for cloud_task_run in cloud_task_run_objects
+            ]
+        })
+        self.render_json(self.values)
+
+
+class RegenerateAutomaticVoiceoverHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Regenerates the automatic voiceover for the given exploration data."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'exploration_version': {
+                'schema': {
+                    'type': 'int'
+                }
+            },
+            'state_name': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'content_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'language_accent_code': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
+
+    @acl_decorators.can_voiceover_exploration
+    def put(self, exploration_id: str) -> None:
+        """Regenerates the voiceover for the given exploration data."""
+        assert self.normalized_payload is not None
+        state_name: str = self.normalized_payload['state_name']
+        content_id: str = self.normalized_payload['content_id']
+        language_accent_code: str = self.normalized_payload[
+            'language_accent_code']
+        exploration_version: int = int(self.normalized_payload[
+            'exploration_version'])
+
+        generated_voiceover, sentence_tokens_with_durations = (
+            voiceover_regeneration_services.
+            regenerate_voiceover_for_exploration_content(
+                exploration_id,
+                exploration_version,
+                state_name,
+                content_id,
+                language_accent_code
+            )
+        )
+
+        self.values.update({
+            'filename': generated_voiceover.filename,
+            'duration_secs': generated_voiceover.duration_secs,
+            'file_size_bytes': generated_voiceover.file_size_bytes,
+            'needs_update': generated_voiceover.needs_update,
+            'sentence_tokens_with_durations': sentence_tokens_with_durations
+        })
+
         self.render_json(self.values)

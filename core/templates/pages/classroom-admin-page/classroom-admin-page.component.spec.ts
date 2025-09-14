@@ -26,7 +26,7 @@ import {
 } from '@angular/core/testing';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {EditableTopicBackendApiService} from 'domain/topic/editable-topic-backend-api.service';
 import {ClassroomAdminPageComponent} from 'pages/classroom-admin-page/classroom-admin-page.component';
@@ -71,6 +71,7 @@ let dummyClassroomDict = {
   topicListIntro: 'Start from the basics with our first topic.',
   topicIdToPrerequisiteTopicIds: {},
   isPublished: true,
+  diagnosticTestIsEnabled: false,
   thumbnailData: dummyThumbnailData,
   bannerData: dummyBannerData,
 };
@@ -99,7 +100,7 @@ let dummyTopicToClassroomRelations = [
 describe('Classroom Admin Page component ', () => {
   let component: ClassroomAdminPageComponent;
   let fixture: ComponentFixture<ClassroomAdminPageComponent>;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let classroomBackendApiService: ClassroomBackendApiService;
   let editableTopicBackendApiService: EditableTopicBackendApiService;
   let ngbModal: NgbModal;
@@ -118,7 +119,7 @@ describe('Classroom Admin Page component ', () => {
       declarations: [ClassroomAdminPageComponent, MockTranslatePipe],
       providers: [
         AlertsService,
-        ContextService,
+        PageContextService,
         ClassroomBackendApiService,
         EditableTopicBackendApiService,
         {
@@ -129,7 +130,7 @@ describe('Classroom Admin Page component ', () => {
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
     fixture = TestBed.createComponent(ClassroomAdminPageComponent);
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     component = fixture.componentInstance;
   });
 
@@ -491,6 +492,7 @@ describe('Classroom Admin Page component ', () => {
       topic_list_intro: 'Start from the basics with our first topic.',
       topic_id_to_prerequisite_topic_ids: {},
       is_published: true,
+      diagnostic_test_is_enabled: false,
       thumbnail_data: dummyThumbnailData,
       banner_data: dummyBannerData,
     };
@@ -503,6 +505,7 @@ describe('Classroom Admin Page component ', () => {
       topicListIntro: 'Start from the basics with our first topic.',
       topicIdToPrerequisiteTopicIds: {},
       isPublished: true,
+      diagnosticTestIsEnabled: false,
       thumbnailData: dummyThumbnailData,
       bannerData: dummyBannerData,
     };
@@ -579,6 +582,7 @@ describe('Classroom Admin Page component ', () => {
         topicListIntro: 'Start from the basics with our first topic.',
         topicIdToPrerequisiteTopicIds: {},
         isPublished: true,
+        diagnosticTestIsEnabled: false,
         thumbnailData: dummyThumbnailData,
         bannerData: dummyBannerData,
       });
@@ -874,6 +878,7 @@ describe('Classroom Admin Page component ', () => {
       topicListIntro: 'Start from the basics with our first topic.',
       topicIdToPrerequisiteTopicIds: {},
       isPublished: true,
+      diagnosticTestIsEnabled: false,
       thumbnailData: dummyThumbnailData,
       bannerData: dummyBannerData,
     };
@@ -1412,6 +1417,29 @@ describe('Classroom Admin Page component ', () => {
     expect(component.updateClassroomData).toHaveBeenCalled();
   }));
 
+  it('should toggle diagnostic test status', () => {
+    const response = {
+      classroomDict: {
+        ...dummyClassroomDict,
+      },
+    };
+    component.tempClassroomData = ExistingClassroomData.createClassroomFromDict(
+      response.classroomDict
+    );
+    component.classroomData = ExistingClassroomData.createClassroomFromDict(
+      response.classroomDict
+    );
+
+    expect(
+      component.tempClassroomData.getDiagnosticTestIsEnabled()
+    ).toBeFalse();
+
+    component.toggleDiagnosticTestStatus();
+
+    expect(component.tempClassroomData.getDiagnosticTestIsEnabled()).toBeTrue();
+    expect(component.classroomDataIsChanged).toBeTrue();
+  });
+
   it('should not be able to publish classroom due to validation errors', () => {
     const response = {
       classroomDict: {
@@ -1502,9 +1530,9 @@ describe('Classroom Admin Page component ', () => {
     'should clear custom context when ngOnDestroy is called or when' +
       ' thumbnail/banner filename is not provided',
     fakeAsync(() => {
-      spyOn(contextService, 'removeCustomEntityContext');
+      spyOn(pageContextService, 'removeCustomEntityContext');
       component.ngOnDestory();
-      expect(contextService.removeCustomEntityContext).toHaveBeenCalled();
+      expect(pageContextService.removeCustomEntityContext).toHaveBeenCalled();
 
       let response = {
         classroomDict: {
@@ -1523,7 +1551,7 @@ describe('Classroom Admin Page component ', () => {
       component.getClassroomData('classroomId');
       tick();
 
-      expect(contextService.removeCustomEntityContext).toHaveBeenCalled();
+      expect(pageContextService.removeCustomEntityContext).toHaveBeenCalled();
     })
   );
 

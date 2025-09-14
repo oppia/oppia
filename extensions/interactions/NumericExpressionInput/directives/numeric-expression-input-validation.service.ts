@@ -18,15 +18,15 @@
 
 import {Injectable} from '@angular/core';
 
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {
   Warning,
-  baseInteractionValidationService,
+  BaseInteractionValidationService,
 } from 'interactions/base-interaction-validation.service';
 import {MathInteractionsService} from 'services/math-interactions.service';
 import {NumericExpressionInputCustomizationArgs} from 'extensions/interactions/customization-args-defs';
 import {NumericExpressionInputRulesService} from './numeric-expression-input-rules.service';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {AppConstants} from 'app.constants';
 
 @Injectable({
@@ -36,7 +36,7 @@ export class NumericExpressionInputValidationService {
   private supportedFunctionNames = AppConstants.SUPPORTED_FUNCTION_NAMES;
 
   constructor(
-    private baseInteractionValidationServiceInstance: baseInteractionValidationService
+    private baseInteractionValidationServiceInstance: BaseInteractionValidationService
   ) {}
 
   getCustomizationArgsWarnings(
@@ -122,7 +122,7 @@ export class NumericExpressionInputValidationService {
                 (i + 1) +
                 ' will never be matched ' +
                 "because it is preceded by an 'IsEquivalentTo' " +
-                'answer with a matching input.',
+                'answer with a matching input',
             });
           } else if (
             currentRuleType === 'MatchesExactlyWith' &&
@@ -142,7 +142,7 @@ export class NumericExpressionInputValidationService {
                 (i + 1) +
                 ' will never be matched ' +
                 "because it is preceded by a 'MatchesExactlyWith' " +
-                'answer with a matching input.',
+                'answer with a matching input',
             });
           }
         }

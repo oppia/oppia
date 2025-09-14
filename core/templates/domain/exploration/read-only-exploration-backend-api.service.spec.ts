@@ -50,18 +50,6 @@ describe('Read only exploration backend API service', () => {
         Introduction: {
           param_changes: [],
           classifier_model_id: null,
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {
-                en: {
-                  filename: 'test.mp3',
-                  file_size_bytes: 100,
-                  needs_update: false,
-                  duration_secs: 0.1,
-                },
-              },
-            },
-          },
           solicit_answer_details: true,
           card_is_checkpoint: true,
           linked_skill_id: null,

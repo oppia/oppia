@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import contextlib
+import json
 import logging
 import os
 import re
@@ -26,7 +27,6 @@ import subprocess
 import threading
 
 from core import feconf
-from core import utils
 from scripts import common
 
 import psutil
@@ -582,7 +582,7 @@ def get_chromedriver_version() -> str:
     if int(installed_version_parts[0]) >= 115:
         chromedriver_version: str = '.'.join(installed_version_parts)
     else:
-        response = utils.url_open(
+        response = common.url_open(
             'https://chromedriver.storage.googleapis.com/LATEST_RELEASE_%s' % (
                 '.'.join(installed_version_parts[:-1])
             )
@@ -756,7 +756,15 @@ def managed_acceptance_tests_server(
         Exception. The suite_name is not in the list of the acceptance tests
             suite names.
     """
-    if suite_name not in common.ACCEPTANCE_TESTS_SUITE_NAMES:
+    available_suites = {}
+    with open(
+        common.ACCEPTANCE_TEST_CONFIG_FILE_PATH, 'r', encoding='utf-8'
+    ) as f:
+        filedata = json.load(f)
+        for suites in filedata.values():
+            for suite in suites:
+                available_suites[suite['name']] = suite['module']
+    if suite_name not in available_suites:
         raise Exception('Invalid suite name: %s' % suite_name)
 
     os.environ['HEADLESS'] = 'true' if headless else 'false'
@@ -766,12 +774,10 @@ def managed_acceptance_tests_server(
 
     nodemodules_jest_bin_path = os.path.join(
         common.NODE_MODULES_PATH, '.bin', 'jest')
-    puppeteer_acceptance_tests_dir_path = os.path.join(
-        common.CURR_DIR, 'core', 'tests', 'puppeteer-acceptance-tests', 'specs')
 
     acceptance_tests_args = [
         nodemodules_jest_bin_path,
-        '%s' % os.path.join(puppeteer_acceptance_tests_dir_path, suite_name),
+        '%s' % os.path.join(available_suites[suite_name]),
         '--config=./core/tests/puppeteer-acceptance-tests/jest.config.js'
     ]
 

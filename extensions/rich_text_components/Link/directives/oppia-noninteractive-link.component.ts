@@ -41,7 +41,7 @@ import {
   OnInit,
   SimpleChanges,
 } from '@angular/core';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 
 @Component({
@@ -60,7 +60,7 @@ export class NoninteractiveLink implements OnInit, OnChanges {
   showUrlInTooltip: boolean = false;
   tabIndexVal: number = 0;
   constructor(
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private htmlEscaperService: HtmlEscaperService
   ) {}
 
@@ -97,7 +97,7 @@ export class NoninteractiveLink implements OnInit, OnChanges {
 
     // This following check disables the link in Editor being caught
     // by tabbing while in Exploration Editor mode.
-    if (this.contextService.isInExplorationEditorMode()) {
+    if (this.pageContextService.isInExplorationEditorMode()) {
       this.tabIndexVal = -1;
     }
   }

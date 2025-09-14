@@ -42,8 +42,8 @@ const rolesSelectDropdown = 'div.mat-select-trigger';
 const userRoleDescriptionSelector = '.oppia-user-role-description';
 
 // Blog Post.
-const blogPostTitleSelector = '.e2e-test-blog-post-tile-title';
 const generateBlogPostButton = '.e2e-test-generate-blog-post';
+const blogPostTitleSelector = '.e2e-test-blog-post-tile-title';
 
 // Community Library.
 const searchFieldCommunityLibrary = 'input.e2e-test-search-input';
@@ -110,6 +110,17 @@ const grantSuperAdminButtonSelector = '.e2e-test-grant-super-admin-button';
 const usernameToGrantPrivilegeInput = '.e2e-test-username-to-grant-input';
 const revokeSuperAdminButton = '.e2e-test-revoke-super-admin-button';
 const usernameToRevokePrivilegeInput = '.e2e-test-username-to-revoke-input';
+const saveAutogenerationToggleButtonSelector =
+  '.e2e-test-save-autogeneration-toggle-button';
+const enableAutogenerationToggleSelector =
+  '.e2e-test-cloud-service-autogeneration-toggle';
+const assignedTopicSelector = '.e2e-test-assigned-topic';
+const selectedRoleHeadingSelector = '.e2e-test-active-role';
+const languageSelectorCloseButtonSelector =
+  '.e2e-test-language-selector-close-button';
+const languageSelectorBodySelector = '.e2e-test-language-selector-modal-body';
+const addLanguageButtonSelector = '.e2e-test-language-selector-add-button';
+const selectedLanguageSelector = '.e2e-test-selected-language';
 
 export class SuperAdmin extends BaseUser {
   /**
@@ -157,11 +168,17 @@ export class SuperAdmin extends BaseUser {
 
   /**
    * The function to assign a role to a user.
+   * @param {string} username - The username of the user to assign the role to.
+   * @param {string} role - The role to assign to the user.
+   * @param {string | string[]} args - The arguments to pass to the role
+   *     assignment function. For Topic Manager, it should be the topic
+   *     name. For Translation Coordinator, it should be the array of
+   *     language code.
    */
   async assignRoleToUser(
     username: string,
     role: string,
-    topicName?: string
+    args?: string | string[]
   ): Promise<void> {
     await this.goto(adminPageRolesTab);
     await this.type(roleEditorInputField, username);
@@ -180,12 +197,67 @@ export class SuperAdmin extends BaseUser {
         );
         await this.waitForStaticAssetsToLoad();
         if (role === topicManagerRole) {
+          if (typeof args !== 'string') {
+            throw new Error('Expected additional argument to be string.');
+          }
+          const topicName = args as string;
           await this.selectTopicForTopicManagerRole(topicName as string);
+        }
+        if (role === testConstants.Roles.TRANSLATION_COORDINATOR) {
+          for (const language of args as string[]) {
+            await this.selectLanguageForTranslationCoordinatorRole(language);
+          }
+
+          await this.clickOn(languageSelectorCloseButtonSelector);
+          await this.expectElementToBeVisible(
+            languageSelectorCloseButtonSelector,
+            false
+          );
         }
         return;
       }
     }
     throw new Error(`Role ${role} does not exists.`);
+  }
+
+  private async selectLanguageForTranslationCoordinatorRole(
+    language: string
+  ): Promise<void> {
+    const visible = await this.isElementVisible(
+      selectedLanguageSelector,
+      true,
+      5000
+    );
+    const initalNumberOfLanguages = !visible
+      ? 0
+      : (await this.page.$$(selectedLanguageSelector)).length;
+    const selectElementSelector = `${languageSelectorBodySelector} select`;
+
+    // Page updates select value to the first option by default.
+    // If we don't wait for the page to update the value, we end up in race
+    // condition where the page updates the value to the first option after
+    // we select the language.
+    await this.page.waitForFunction(
+      (selector: string) => {
+        const element = document.querySelector(selector);
+        return element && (element as HTMLSelectElement).value;
+      },
+      {},
+      selectElementSelector
+    );
+    await this.select(selectElementSelector, language);
+
+    await this.clickOn(addLanguageButtonSelector);
+
+    await this.page.waitForFunction(
+      (selector: string, numberOfLanguages: number) => {
+        const elements = document.querySelectorAll(selector);
+        return elements.length === numberOfLanguages;
+      },
+      {},
+      selectedLanguageSelector,
+      initalNumberOfLanguages + 1
+    );
   }
 
   /**
@@ -234,6 +306,21 @@ export class SuperAdmin extends BaseUser {
         await this.waitForElementToBeClickable(button);
         await button.click();
 
+        await this.page.waitForFunction(
+          (selector: string, topic: string) => {
+            const assingedTopicElements = document.querySelectorAll(selector);
+            for (const element of Array.from(assingedTopicElements)) {
+              const textContent = element.textContent;
+              if (textContent === topic) {
+                return true;
+              }
+            }
+            return false;
+          },
+          {},
+          assignedTopicSelector,
+          topicName
+        );
         return;
       }
     }
@@ -303,15 +390,17 @@ export class SuperAdmin extends BaseUser {
       `.e2e-test-${role}-remove-button-container`
     );
 
-    const deleteRoleButton = await this.page.$(
-      `.e2e-test-${role}-remove-button-container`
-    );
+    const deleteRoleButtonSelector = `.e2e-test-${role}-remove-button-container`;
+    const deleteRoleButton = await this.page.$(deleteRoleButtonSelector);
     if (!deleteRoleButton) {
       throw new Error(`User does not have the "${role}" role!`);
     }
 
     await this.waitForElementToBeClickable(deleteRoleButton);
     await deleteRoleButton.click();
+
+    await this.waitForNetworkIdle();
+    await this.expectElementToBeVisible(deleteRoleButtonSelector, false);
     showMessage(`Role ${role} has been removed from user ${username}`);
     return;
   }
@@ -324,6 +413,8 @@ export class SuperAdmin extends BaseUser {
     await this.navigateToAdminPageRolesTab();
     role = role.replace(/\b\w/g, char => char.toUpperCase());
     await this.clickOn(role);
+
+    await this.expectTextContentToContain(selectedRoleHeadingSelector, role);
   }
 
   /**
@@ -406,6 +497,8 @@ export class SuperAdmin extends BaseUser {
         await this.waitForElementToBeClickable(reloadButton);
         await reloadButton.click();
         await this.waitForNetworkIdle();
+
+        await this.expectActionStatusMessageToBe('Data reloaded successfully.');
         showMessage(`Reloaded exploration ${explorationName}`);
         return;
       }
@@ -479,6 +572,11 @@ export class SuperAdmin extends BaseUser {
           }
           await this.waitForElementToBeClickable(reloadButton);
           await reloadButton.click();
+
+          await this.waitForNetworkIdle();
+          await this.expectActionStatusMessageToBe(
+            'Data reloaded successfully.'
+          );
           return;
         }
       }
@@ -517,6 +615,12 @@ export class SuperAdmin extends BaseUser {
       visible: true,
     });
     await this.clickOn(' Generate Explorations ');
+
+    await this.waitForNetworkIdle();
+    await this.expectActionStatusMessageToBe(
+      'Dummy explorations generated successfully.'
+    );
+    showMessage('Successfully generated and published the dummy explorations.');
   }
 
   /**
@@ -545,7 +649,13 @@ export class SuperAdmin extends BaseUser {
   async loadDummyNewStructuresData(): Promise<void> {
     await this.navigateToAdminPageActivitiesTab();
     await this.clickOn(' Load Data ');
+
+    await this.waitForNetworkIdle();
+    await this.expectActionStatusMessageToBe(
+      'Dummy new structures data generated successfully.'
+    );
   }
+
   /**
    * Function to check if a topic is present in the Topics and Skills Dashboard.
    * @param {string} topicName - The name of the topic to check.
@@ -595,6 +705,11 @@ export class SuperAdmin extends BaseUser {
   async generateDummySkill(): Promise<void> {
     await this.navigateToAdminPageActivitiesTab();
     await this.clickOn(' Generate Data ');
+
+    await this.waitForNetworkIdle();
+    await this.expectActionStatusMessageToBe(
+      'Dummy new skill and questions generated successfully.'
+    );
   }
 
   /**
@@ -604,6 +719,11 @@ export class SuperAdmin extends BaseUser {
     await this.navigateToAdminPageActivitiesTab();
     await this.page.waitForSelector(loadDummyMathClassRoomButton);
     await this.clickOn(loadDummyMathClassRoomButton);
+
+    await this.waitForNetworkIdle();
+    await this.expectActionStatusMessageToBe(
+      'Dummy new classroom generated successfully.'
+    );
   }
 
   /**
@@ -629,7 +749,22 @@ export class SuperAdmin extends BaseUser {
    */
   async generateDummyBlogPost(): Promise<void> {
     await this.navigateToAdminPageActivitiesTab();
+    await this.expectElementToBeVisible(generateBlogPostButton);
     await this.clickOn(generateBlogPostButton);
+
+    await this.expectActionStatusMessageToBe(
+      'Dummy Blog Post generated successfully.'
+    );
+  }
+
+  /**
+   * Generates N dummy blog posts.
+   */
+  async generateDummyBlogPosts(numBlogs: number): Promise<void> {
+    await this.navigateToAdminPageActivitiesTab();
+    for (let i = 0; i < numBlogs; i++) {
+      await this.generateDummyBlogPost();
+    }
   }
 
   /**
@@ -638,22 +773,23 @@ export class SuperAdmin extends BaseUser {
    */
   async expectBlogPostToBePresent(expectedBlog: string): Promise<void> {
     await this.navigateToBlogPage();
-    const titleRegex = new RegExp(`^${expectedBlog}-[A-Za-z]{12}$`);
 
-    const blogPostTitles = await this.page.$$(blogPostTitleSelector);
-    for (const titleElement of blogPostTitles) {
-      const title = await this.page.evaluate(
-        el => el.textContent,
-        titleElement
-      );
-      if (titleRegex.test(title.trim())) {
+    await this.expectElementToBeVisible(blogPostTitleSelector);
+    const blogTitles = await this.page.$$eval(blogPostTitleSelector, elements =>
+      elements.map(element => element.textContent)
+    );
+    for (const title of blogTitles) {
+      if (!title) {
+        continue;
+      }
+      if (title.includes(expectedBlog)) {
         showMessage('The blog post is present on the blog dashboard.');
         return;
       }
     }
 
     throw new Error(
-      `The blog post "${expectedBlog}" was not found on the blog dashboard.`
+      `Blog post with title ${expectedBlog} not found on the blog dashboard.`
     );
   }
 
@@ -788,6 +924,8 @@ export class SuperAdmin extends BaseUser {
 
       await this.waitForElementToBeClickable(paramValueInput);
       await this.page.type(paramValueInput, ruleValue);
+
+      await this.expectInputValueToBe(paramValueInput, ruleValue);
       showMessage('Rule added successfully.');
     } catch (error) {
       console.error(
@@ -823,10 +961,20 @@ export class SuperAdmin extends BaseUser {
       await platformParameter.waitForSelector(paramValueInput, {visible: true});
       const valueInputs = await platformParameter.$$(paramValueInput);
       await valueInputs[1].type(value);
+      await this.page.waitForFunction(
+        (element: Element, value: string) => {
+          return (element as HTMLInputElement).value.trim() === value.trim();
+        },
+        {},
+        valueInputs[1],
+        value
+      );
       showMessage('Default value changed successfully.');
     } catch (error) {
       console.error(
-        `Failed to change default value of platform parameter "${platformParam}": ${error}`
+        `Failed to change default value of platform parameter "${platformParam}".\n` +
+          'Original Error:\n' +
+          error.stack
       );
       throw error;
     }
@@ -851,6 +999,11 @@ export class SuperAdmin extends BaseUser {
       }
       await this.waitForElementToBeClickable(saveButton);
       await saveButton.click();
+
+      await platformParameter.waitForSelector(
+        `${paramSaveChangesButton} .btn[disabled]`,
+        {visible: true}
+      );
     } catch (error) {
       console.error(
         `Failed to save changes to platform parameter "${parameterName}": ${error}`
@@ -956,10 +1109,16 @@ export class SuperAdmin extends BaseUser {
   async regenerateContributionOpportunitiesForTopic(
     topicId: string
   ): Promise<void> {
+    await this.expectElementToBeVisible(topicIdInputSelector);
     await this.type(topicIdInputSelector, topicId);
 
     await this.page.waitForSelector(regenerateOpportunitiesButton);
     await this.clickOn(regenerateOpportunitiesButton);
+
+    await this.expectActionStatusMessageToBe(
+      'No. of opportunities model created:',
+      'Regenerating opportunities...'
+    );
   }
 
   /**
@@ -968,6 +1127,11 @@ export class SuperAdmin extends BaseUser {
   async regenerateTopicSummaries(): Promise<void> {
     await this.page.waitForSelector(regenerateTopicSummariesButton);
     await this.clickOn(regenerateTopicSummariesButton);
+
+    await this.expectActionStatusMessageToBe(
+      'Successfully regenerated all topic summaries.',
+      'Regenerating all topic summaries'
+    );
   }
 
   /**
@@ -976,10 +1140,16 @@ export class SuperAdmin extends BaseUser {
   async rollbackExplorationToSafeState(
     explorationId: string | null
   ): Promise<void> {
+    await this.expectElementToBeVisible(explorationIdInputSelector);
     await this.type(explorationIdInputSelector, explorationId as string);
 
     await this.page.waitForSelector(rollbackExplorationButton);
     await this.clickOn(rollbackExplorationButton);
+
+    await this.expectActionStatusMessageToBe(
+      'Exploration rolledback to version:',
+      'Rollingback exploration'
+    );
   }
 
   /**
@@ -991,12 +1161,18 @@ export class SuperAdmin extends BaseUser {
     oldUserName: string,
     newUserName: string
   ): Promise<void> {
+    await this.expectElementToBeVisible(oldUserNameInputSelector);
     await this.type(oldUserNameInputSelector, oldUserName);
 
     await this.type(newUserNameInputSelector, newUserName);
 
     await this.page.waitForSelector(updateUserNameButtonSelector);
     await this.clickOn(updateUserNameButtonSelector);
+
+    await this.expectActionStatusMessageToBe(
+      `Successfully renamed ${oldUserName} to ${newUserName}!`,
+      'Updating username'
+    );
   }
 
   /**
@@ -1005,6 +1181,11 @@ export class SuperAdmin extends BaseUser {
   async getNumberOfPendingDeletionRequests(): Promise<void> {
     await this.page.waitForSelector(getPendingDeletionRequestsCountButton);
     await this.clickOn(getPendingDeletionRequestsCountButton);
+
+    await this.expectActionStatusMessageToBe(
+      'The number of users that are being deleted is:',
+      'Getting the number of users that are being deleted'
+    );
   }
 
   /**
@@ -1014,6 +1195,7 @@ export class SuperAdmin extends BaseUser {
   async getExplorationInteractions(
     explorationId: string | null
   ): Promise<void> {
+    await this.expectElementToBeVisible(explorationIdToGetInteractionsInput);
     await this.type(
       explorationIdToGetInteractionsInput,
       explorationId as string
@@ -1021,6 +1203,11 @@ export class SuperAdmin extends BaseUser {
 
     await this.page.waitForSelector(getInteractionsButton);
     await this.clickOn(getInteractionsButton);
+
+    await this.expectActionStatusMessageToBe(
+      'Successfully fetched interactionIds in exploration.',
+      'Retrieving interactions in exploration'
+    );
   }
 
   /**
@@ -1029,10 +1216,16 @@ export class SuperAdmin extends BaseUser {
    * @returns {Promise<void>}
    */
   async grantSuperAdminPrivileges(username: string): Promise<void> {
+    await this.expectElementToBeVisible(usernameToGrantPrivilegeInput);
     await this.type(usernameToGrantPrivilegeInput, username);
 
     await this.page.waitForSelector(grantSuperAdminButtonSelector);
     await this.clickOn(grantSuperAdminButtonSelector);
+
+    await this.expectActionStatusMessageToBe(
+      'Success!',
+      'Communicating with Firebase server'
+    );
   }
 
   /**
@@ -1041,10 +1234,16 @@ export class SuperAdmin extends BaseUser {
    * @returns {Promise<void>}
    */
   async revokeSuperAdminPrivileges(username: string): Promise<void> {
+    await this.expectElementToBeVisible(usernameToRevokePrivilegeInput);
     await this.type(usernameToRevokePrivilegeInput, username);
 
     await this.page.waitForSelector(revokeSuperAdminButton);
     await this.clickOn(revokeSuperAdminButton);
+
+    await this.expectActionStatusMessageToBe(
+      'Success!',
+      'Communicating with Firebase server'
+    );
   }
 
   /**
@@ -1058,6 +1257,7 @@ export class SuperAdmin extends BaseUser {
     author: string,
     publishedOn: string
   ): Promise<void> {
+    await this.expectElementToBeVisible(blogIdInputSelector);
     await this.type(blogIdInputSelector, blogId);
 
     await this.type(blogAuthorInputSelector, author);
@@ -1066,6 +1266,27 @@ export class SuperAdmin extends BaseUser {
 
     await this.page.waitForSelector(updateBlogPostButtonSelector);
     await this.clickOn(updateBlogPostButtonSelector);
+
+    await this.expectActionStatusMessageToBe(
+      'Successfully updated blog post data'
+    );
+  }
+
+  /**
+   * Enables text-to-speech synthesis for Oppia voiceovers using a cloud
+   * service.
+   */
+  async enableTextToSpeechSynthesisUsingCloudService(): Promise<void> {
+    await this.navigateToAdminPageMiscTab();
+    await this.scrollToBottomOfPage();
+    await this.page.waitForSelector(enableAutogenerationToggleSelector);
+    const toggle = await this.page.$(enableAutogenerationToggleSelector);
+    if (!toggle) {
+      throw new Error('Enable autogeneration toggle not found on the page.');
+    }
+    await toggle.click();
+    await this.page.waitForSelector(saveAutogenerationToggleButtonSelector);
+    await this.clickOn(saveAutogenerationToggleButtonSelector);
   }
 }
 

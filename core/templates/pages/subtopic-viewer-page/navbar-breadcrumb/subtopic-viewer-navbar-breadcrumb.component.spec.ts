@@ -103,7 +103,9 @@ describe('Subtopic viewer navbar breadcrumb component', function () {
 
   it('should get topic url after component is initialized', () => {
     component.ngOnInit();
-    expect(component.getTopicUrl()).toBe('/learn/classroom_1/topic_1/revision');
+    expect(component.getTopicUrl()).toBe(
+      '/learn/classroom_1/topic_1/studyguide'
+    );
   });
 
   it(

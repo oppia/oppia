@@ -27,7 +27,7 @@ import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {LoaderService} from 'services/loader.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {UserExplorationPermissionsService} from 'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -37,6 +37,7 @@ import {RouterService} from '../services/router.service';
 import {StateTutorialFirstTimeService} from '../services/state-tutorial-first-time.service';
 import {TranslationTabComponent} from './translation-tab.component';
 import {ExplorationPermissions} from 'domain/exploration/exploration-permissions.model';
+import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
 import {
   JoyrideDirective,
   JoyrideOptionsService,
@@ -58,7 +59,7 @@ class MockNgbModal {
   }
 }
 
-class MockContextservice {
+class MockPageContextService {
   getExplorationId() {
     return 'exp1';
   }
@@ -68,7 +69,7 @@ describe('Translation tab component', () => {
   let component: TranslationTabComponent;
   let fixture: ComponentFixture<TranslationTabComponent>;
   let ngbModal: NgbModal;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let editabilityService: EditabilityService;
   let explorationStatesService: ExplorationStatesService;
   let loaderService: LoaderService;
@@ -77,6 +78,7 @@ describe('Translation tab component', () => {
   let stateEditorService: StateEditorService;
   let stateTutorialFirstTimeService: StateTutorialFirstTimeService;
   let userExplorationPermissionsService: UserExplorationPermissionsService;
+  let voiceoverBackendApiService: VoiceoverBackendApiService;
   let refreshTranslationTabEmitter = new EventEmitter<void>();
   let enterTranslationForTheFirstTimeEmitter = new EventEmitter<string>();
 
@@ -126,7 +128,7 @@ describe('Translation tab component', () => {
         // The UserExplorationPermissionsService has been
         // mocked here because spying the function of
         // UserExplorationPermissionsService is not able to
-        // stop afterAll error i.e. ContextService should not
+        // stop afterAll error i.e. PageContextService should not
         // be used outside the context of an exploration or a question.
         {
           provide: UserExplorationPermissionsService,
@@ -141,8 +143,8 @@ describe('Translation tab component', () => {
           useClass: MockNgbModal,
         },
         {
-          provide: ContextService,
-          useClass: MockContextservice,
+          provide: PageContextService,
+          useClass: MockPageContextService,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -153,7 +155,7 @@ describe('Translation tab component', () => {
     fixture = TestBed.createComponent(TranslationTabComponent);
     component = fixture.componentInstance;
 
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     loaderService = TestBed.inject(LoaderService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     userExplorationPermissionsService = TestBed.inject(
@@ -167,8 +169,9 @@ describe('Translation tab component', () => {
     stateTutorialFirstTimeService = TestBed.inject(
       StateTutorialFirstTimeService
     );
+    voiceoverBackendApiService = TestBed.inject(VoiceoverBackendApiService);
 
-    spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp1');
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
       'Introduction'
     );
@@ -181,6 +184,34 @@ describe('Translation tab component', () => {
     );
     let element = document.createElement('div');
     spyOn(document, 'querySelector').and.returnValue(element as HTMLElement);
+
+    let languageAccentMasterList = {
+      en: {
+        'en-IN': 'English (India)',
+        'en-US': 'English (United State)',
+      },
+      hi: {
+        'hi-IN': 'Hindi (India)',
+      },
+    };
+    let languageCodesMapping = {
+      en: {
+        'en-US': true,
+      },
+      hi: {
+        'hi-IN': true,
+      },
+    };
+
+    let voiceoverAdminDataResponse = {
+      languageAccentMasterList: languageAccentMasterList,
+      languageCodesMapping: languageCodesMapping,
+    };
+
+    spyOn(
+      voiceoverBackendApiService,
+      'fetchVoiceoverAdminDataAsync'
+    ).and.resolveTo(Promise.resolve(voiceoverAdminDataResponse));
 
     explorationStatesService.init(
       {
@@ -250,20 +281,6 @@ describe('Translation tab component', () => {
           linked_skill_id: null,
           param_changes: [],
           solicit_answer_details: false,
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {},
-              feedback_1: {
-                en: {
-                  filename: 'myfile2.mp3',
-                  file_size_bytes: 120000,
-                  needs_update: false,
-                  duration_secs: 1.2,
-                },
-              },
-            },
-          },
         },
       },
       false

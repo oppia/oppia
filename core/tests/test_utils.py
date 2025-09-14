@@ -69,6 +69,8 @@ from core.domain import state_domain
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
+from core.domain import study_guide_domain
+from core.domain import study_guide_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import topic_domain
@@ -343,7 +345,9 @@ def swap_is_feature_flag_enabled_function(
     """
     def mock_is_feature_flag_enabled(
         feature_flag_name: str,
-        feature_flag: Optional[feature_flag_domain.FeatureFlag] = None, # pylint: disable=unused-argument
+        feature_flag: Optional[ # pylint: disable=unused-argument
+            feature_flag_domain.FeatureFlag
+        ] = None,
         user_id: Optional[str] = None # pylint: disable=unused-argument
     ) -> bool:
         """Mocks is_feature_flag_enabled function to return True if the
@@ -1229,7 +1233,7 @@ class TaskqueueServicesStub:
         payload: Optional[Dict[str, str]] = None,
         scheduled_for: Optional[datetime.datetime] = None,
         task_name: Optional[str] = None
-    ) -> None:
+    ) -> cloud_tasks_emulator.Task:
         """Creates a Task in the corresponding queue that will be executed when
         the 'scheduled_for' countdown expires using the cloud tasks emulator.
 
@@ -1241,12 +1245,15 @@ class TaskqueueServicesStub:
             scheduled_for: datetime|None. The naive datetime object for the time
                 to execute the task. Ignored by this stub.
             task_name: str|None. Optional. The name of the task.
+
+        Returns:
+            Task. The task that was created in the queue.
         """
         # Causes the task to execute immediately by setting the scheduled_for
         # time to 0. If we allow scheduled_for to be non-zero, then tests that
         # rely on the actions made by the task will become unreliable.
         scheduled_for = None
-        self._client.create_task(
+        return self._client.create_task(
             queue_name, url, payload, scheduled_for=scheduled_for,
             task_name=task_name)
 
@@ -2452,10 +2459,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_0: {}
-        default_outcome_1: {}
     solicit_answer_details: false
   New state:
     card_is_checkpoint: false
@@ -2483,10 +2486,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_2: {}
-        default_outcome_3: {}
     solicit_answer_details: false
 states_schema_version: %d
 tags: []
@@ -2519,23 +2518,24 @@ version: 1
 
         with contextlib.ExitStack() as stack:
             stack.callback(AuthServicesStub.install_stub(self))
+            es_client = elastic_search_services.ES.get_client()
             stack.enter_context(self.swap(
-                elastic_search_services.ES.indices, 'create',
+                es_client.indices, 'create',
                 es_stub.mock_create_index))
             stack.enter_context(self.swap(
-                elastic_search_services.ES, 'index',
+                es_client, 'index',
                 es_stub.mock_index))
             stack.enter_context(self.swap(
-                elastic_search_services.ES, 'exists',
+                es_client, 'exists',
                 es_stub.mock_exists))
             stack.enter_context(self.swap(
-                elastic_search_services.ES, 'delete',
+                es_client, 'delete',
                 es_stub.mock_delete))
             stack.enter_context(self.swap(
-                elastic_search_services.ES, 'delete_by_query',
+                es_client, 'delete_by_query',
                 es_stub.mock_delete_by_query))
             stack.enter_context(self.swap(
-                elastic_search_services.ES, 'search',
+                es_client, 'search',
                 es_stub.mock_search))
             stack.enter_context(self.swap(
                 memory_cache_services, 'flush_caches',
@@ -3237,10 +3237,14 @@ version: 1
             expect_errors=expect_errors
         )
 
+    # Here we use type Any because the 'payload' argument can accept
+    # different types of dictionaries that need to be sent over to the handler,
+    # those dictionaries can contain any type of values. So, to allow different
+    # dictionaries, we used Any type here.
     def post_task(
         self,
         url: str,
-        payload: Dict[str, str],
+        payload: Dict[str, Any],
         headers: Dict[str, bytes] | Dict[str, str],
         csrf_token: Optional[str] = None,
         expect_errors: bool = False,
@@ -3845,6 +3849,39 @@ version: 1
             owner_id, subtopic_page, 'Create new subtopic', subtopic_changes)
         return subtopic_page
 
+    def save_new_study_guide(
+        self, subtopic_id: int, owner_id: str, topic_id: str
+    ) -> study_guide_domain.StudyGuide:
+        """Creates an Oppia study guide and saves it.
+
+        Args:
+            subtopic_id: int. ID of the subtopic for which the study guide is
+                to be created.
+            owner_id: str. The user_id of the creator of the topic.
+            topic_id: str. ID for the topic that the subtopic belongs to.
+
+        Returns:
+            StudyGuide. A newly-created study guide.
+        """
+        study_guide = (
+            study_guide_domain.StudyGuide.create_study_guide(
+                subtopic_id, topic_id, 'Android Study Guide',
+                '<p>Android Study Guide Content</p>'
+            )
+        )
+        study_guide_changes = [
+            study_guide_domain.StudyGuideChange({
+                'cmd': study_guide_domain.CMD_CREATE_NEW,
+                'topic_id': topic_id,
+                'subtopic_id': subtopic_id,
+            })
+        ]
+        study_guide_services.save_study_guide(
+            owner_id, study_guide, 'Created new study guide',
+            study_guide_changes
+        )
+        return study_guide
+
     def save_new_topic(
         self,
         topic_id: str,
@@ -4199,6 +4236,7 @@ version: 1
         topic_id_to_prerequisite_topic_ids: Optional[
             Dict[str, List[str]]] = None,
         is_published: bool = True,
+        diagnostic_test_is_enabled: bool = False,
         thumbnail_data: Optional[
             classroom_config_domain.ImageData
         ] = None,
@@ -4220,6 +4258,8 @@ version: 1
             topic_id_to_prerequisite_topic_ids: Dict[str, List[str]]. A dict
                 with topic ID as key and list of topic IDs as value.
             is_published: bool. Whether this classroom is published or not.
+            diagnostic_test_is_enabled: bool. Whether this classroom
+                is published or not.
             thumbnail_data: Optional[ImageData]. Image data object for
                 thumbnail.
             banner_data: Optional[ImageData]. Image data object for banner.
@@ -4246,6 +4286,8 @@ version: 1
                 else {}
             ),
             is_published=is_published,
+            diagnostic_test_is_enabled=(
+                diagnostic_test_is_enabled),
             thumbnail_data=(
                 thumbnail_data
                 if thumbnail_data is not None
@@ -4324,6 +4366,7 @@ class EmailMessageMock:
         subject: str,
         plaintext_body: str,
         html_body: str,
+        cc: Optional[Sequence[str]] = None,
         bcc: Optional[Sequence[str]] = None,
         reply_to: Optional[str] = None,
         recipient_variables: Optional[
@@ -4343,6 +4386,8 @@ class EmailMessageMock:
             plaintext_body: str. The plaintext body of the email. Must be utf-8.
             html_body: str. The HTML body of the email. Must fit in a datastore
                 entity. Must be utf-8.
+            cc: list(str)|None. Optional argument. List of cc emails. Emails
+                must be utf-8.
             bcc: list(str)|None. Optional argument. List of bcc emails. Emails
                 must be utf-8.
             reply_to: str|None. Optional argument. Reply address formatted like
@@ -4369,6 +4414,7 @@ class EmailMessageMock:
         self.subject = subject
         self.body = plaintext_body
         self.html = html_body
+        self.cc = cc
         self.bcc = bcc
         self.reply_to = reply_to
         self.recipient_variables = recipient_variables
@@ -4408,6 +4454,7 @@ class GenericEmailTestBase(GenericTestBase):
         subject: str,
         plaintext_body: str,
         html_body: str,
+        cc: Optional[List[str]] = None,
         bcc: Optional[List[str]] = None,
         reply_to: Optional[str] = None,
         recipient_variables: Optional[
@@ -4427,6 +4474,8 @@ class GenericEmailTestBase(GenericTestBase):
             plaintext_body: str. The plaintext body of the email. Must be utf-8.
             html_body: str. The HTML body of the email. Must fit in a datastore
                 entity. Must be utf-8.
+            cc: list(str)|None. Optional argument. List of cc emails. Must be
+                utf-8.
             bcc: list(str)|None. Optional argument. List of bcc emails. Must be
                 utf-8.
             reply_to: str|None. Optional Argument. Reply address formatted like
@@ -4451,13 +4500,17 @@ class GenericEmailTestBase(GenericTestBase):
         Returns:
             bool. Whether the emails are sent successfully.
         """
+        cc_emails = None
+        if cc:
+            cc_emails = cc[0] if len(cc) == 1 else cc
         bcc_emails = None
         if bcc:
             bcc_emails = bcc[0] if len(bcc) == 1 else bcc
 
         new_email = EmailMessageMock(
             sender_email, recipient_emails, subject, plaintext_body, html_body,
-            bcc=bcc_emails, reply_to=(reply_to if reply_to else None),
+            cc=cc_emails, bcc=bcc_emails,
+            reply_to=(reply_to if reply_to else None),
             recipient_variables=(
                 recipient_variables if recipient_variables else None),
             attachments=attachments if attachments else None)

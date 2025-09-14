@@ -66,7 +66,7 @@ export class SharingLinksComponent implements OnInit {
       this.activityUrlFragment = 'collection';
     } else if (this.shareType !== 'blog') {
       // TODO(#13122): Remove this code to throw error. Remove @Input to
-      // this component and use ContextService directly to determine if the
+      // this component and use PageContextService directly to determine if the
       // collection or exploration page is active and render accordingly.
       throw new Error(
         'SharingLinks component can only be used in the ' +

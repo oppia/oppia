@@ -33,9 +33,9 @@ import {
 import {ExternalSaveService} from 'services/external-save.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {
+  Misconception,
   MisconceptionSkillMap,
-  MisconceptionObjectFactory,
-} from 'domain/skill/MisconceptionObjectFactory';
+} from 'domain/skill/misconception.model';
 
 class MockNgbModalRef {
   componentInstance = {
@@ -49,7 +49,6 @@ describe('Question Misconception Editor Component', () => {
   let ngbModal: NgbModal;
   let stateEditorService: StateEditorService;
 
-  let misconceptionObjectFactory: MisconceptionObjectFactory;
   let mockMisconceptionObject: MisconceptionSkillMap;
   let outcome = {
     feedback: {
@@ -72,26 +71,13 @@ describe('Question Misconception Editor Component', () => {
     component = fixture.componentInstance;
     ngbModal = TestBed.inject(NgbModal);
     stateEditorService = TestBed.inject(StateEditorService);
-    misconceptionObjectFactory = TestBed.inject(MisconceptionObjectFactory);
 
     component.isEditable = true;
     component.outcome = outcome;
     mockMisconceptionObject = {
       abc: [
-        misconceptionObjectFactory.create(
-          1,
-          'misc1',
-          'notes1',
-          'feedback1',
-          true
-        ),
-        misconceptionObjectFactory.create(
-          2,
-          'misc2',
-          'notes2',
-          'feedback1',
-          true
-        ),
+        Misconception.create(1, 'misc1', 'notes1', 'feedback1', true),
+        Misconception.create(2, 'misc2', 'notes2', 'feedback1', true),
       ],
     };
     spyOn(stateEditorService, 'getMisconceptionsBySkill').and.callFake(() => {
@@ -120,9 +106,57 @@ describe('Question Misconception Editor Component', () => {
     );
   });
 
-  it('should use feedback by default', () => {
+  it('should initialize feedbackIsUsed to true if no previous state exists', () => {
+    component.previousFeedbackIsUsed = null;
+    component.ngOnInit();
+
     expect(component.feedbackIsUsed).toBeTrue();
-    expect(component.misconceptionsBySkill).toEqual(mockMisconceptionObject);
+  });
+
+  it('should initialize feedbackIsUsed to true if previous state was true', () => {
+    component.previousFeedbackIsUsed = true;
+    component.ngOnInit();
+
+    expect(component.feedbackIsUsed).toBeTrue();
+  });
+
+  it('should initialize feedbackIsUsed to false if previous state was false', () => {
+    component.previousFeedbackIsUsed = false;
+    component.ngOnInit();
+
+    expect(component.feedbackIsUsed).toBeFalse();
+  });
+
+  it('should update feedbackIsUsed and store the previous state', () => {
+    component.feedbackIsUsed = true;
+
+    const updatedValues = {
+      misconception: mockMisconceptionObject.abc[1],
+      skillId: 'id',
+      feedbackIsUsed: false,
+    };
+    component.updateValues(updatedValues);
+
+    expect(component.feedbackIsUsed).toBeFalse();
+    expect(component.previousFeedbackIsUsed).toBeTrue();
+  });
+
+  it('should clear outcome feedback if feedbackIsUsed is false and feedback matches misconception feedback', () => {
+    component.selectedMisconception = mockMisconceptionObject.abc[0];
+    component.selectedMisconceptionSkillId = 'abc';
+    component.feedbackIsUsed = false;
+    component.outcome.feedback.html =
+      mockMisconceptionObject.abc[0].getFeedback();
+
+    const saveAnswerGroupFeedbackSpy = spyOn(
+      component.saveAnswerGroupFeedback,
+      'emit'
+    );
+
+    component.updateMisconception();
+
+    const emittedOutcome = saveAnswerGroupFeedbackSpy.calls.first().args[0];
+    expect(emittedOutcome.feedback.html).toEqual('');
   });
 
   it('should enable edit mode correctly', () => {

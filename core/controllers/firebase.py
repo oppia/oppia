@@ -88,13 +88,17 @@ class FirebaseProxyPage(
     # Here we use type Any because we accept any number/type of args
     # to accomodate all firebase requests.
     @acl_decorators.open_access
-    def get(self, *args: Any, **kwargs: Any) -> None:  # pylint: disable=unused-argument
+    def get(
+        self, *args: Any, **kwargs: Any # pylint: disable=unused-argument
+    ) -> None:
         """Proxies GET requests to the firebase app."""
         self._firebase_proxy()
 
     # Here we use type Any because we accept any number/type of args
     # to accomodate all firebase requests.
     @acl_decorators.open_access
-    def post(self, *args: Any, **kwargs: Any) -> None:  # pylint: disable=unused-argument
+    def post(
+        self, *args: Any, **kwargs: Any # pylint: disable=unused-argument
+    ) -> None:
         """Proxies POST requests to the firebase app."""
         self._firebase_proxy()

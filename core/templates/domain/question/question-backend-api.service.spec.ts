@@ -21,16 +21,12 @@ import {
 } from '@angular/common/http/testing';
 import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
-import {
-  QuestionBackendDict,
-  QuestionObjectFactory,
-} from 'domain/question/QuestionObjectFactory';
+import {QuestionBackendDict, Question} from 'domain/question/question.model';
 import {DiagnosticTestQuestionsModel} from './diagnostic-test-questions.model';
 
 describe('Question backend Api service', () => {
   let questionBackendApiService: QuestionBackendApiService;
   let httpTestingController: HttpTestingController;
-  let questionObjectFactory: QuestionObjectFactory;
   let sampleResponse = {
     question_summary_dicts: [
       {
@@ -54,9 +50,6 @@ describe('Question backend Api service', () => {
         question_state_data: {
           content: {
             html: 'Question 1',
-          },
-          recorded_voiceovers: {
-            voiceovers_mapping: {},
           },
           interaction: {
             answer_groups: [],
@@ -99,11 +92,9 @@ describe('Question backend Api service', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [QuestionObjectFactory],
     });
 
     questionBackendApiService = TestBed.get(QuestionBackendApiService);
-    questionObjectFactory = TestBed.inject(QuestionObjectFactory);
     httpTestingController = TestBed.get(HttpTestingController);
   });
 
@@ -553,15 +544,6 @@ describe('Question backend Api service', () => {
           },
           linked_skill_id: null,
           card_is_checkpoint: true,
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              1: {},
-              ca_placeholder_0: {},
-              feedback_id: {},
-              solution: {},
-              hint_1: {},
-            },
-          },
         },
         question_state_data_schema_version: 2,
         language_code: '',
@@ -650,15 +632,6 @@ describe('Question backend Api service', () => {
           },
           linked_skill_id: null,
           card_is_checkpoint: true,
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              1: {},
-              ca_placeholder_0: {},
-              feedback_id: {},
-              solution: {},
-              hint_1: {},
-            },
-          },
         },
         question_state_data_schema_version: 2,
         language_code: '',
@@ -668,10 +641,8 @@ describe('Question backend Api service', () => {
         inapplicable_skill_misconception_ids: [],
       };
 
-      const question1 =
-        questionObjectFactory.createFromBackendDict(questionBackendDict1);
-      const question2 =
-        questionObjectFactory.createFromBackendDict(questionBackendDict2);
+      const question1 = Question.createFromBackendDict(questionBackendDict1);
+      const question2 = Question.createFromBackendDict(questionBackendDict2);
 
       questionBackendApiService
         .fetchDiagnosticTestQuestionsAsync(topicId, ['questionId'])

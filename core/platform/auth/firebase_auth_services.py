@@ -58,6 +58,8 @@ import logging
 from core import feconf
 from core.constants import constants
 from core.domain import auth_domain
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 from core.platform import models
 
 import firebase_admin
@@ -69,11 +71,13 @@ import webapp2
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import auth_models
+    from mypy_imports import datastore_services
 
 auth_models, user_models = (
     models.Registry.import_models([models.Names.AUTH, models.Names.USER]))
 
 transaction_services = models.Registry.import_transaction_services()
+datastore_services = models.Registry.import_datastore_services()
 
 
 def establish_firebase_connection() -> None:
@@ -87,14 +91,21 @@ def establish_firebase_connection() -> None:
     Raises:
         ValueError. The Firebase app has a genuine problem.
     """
-    try:
-        firebase_admin.get_app()
-    except ValueError as error:
-        if 'initialize_app' in str(error):
-            firebase_admin.initialize_app(
-                options={'projectId': feconf.OPPIA_PROJECT_ID})
-        else:
-            raise
+    with datastore_services.get_ndb_context():
+        try:
+            firebase_admin.get_app()
+        except ValueError as error:
+            if 'initialize_app' in str(error):
+                oppia_project_id = (
+                    platform_parameter_services.get_platform_parameter_value(
+                        platform_parameter_list.ParamName.OPPIA_PROJECT_ID.value
+                    )
+                )
+                assert isinstance(oppia_project_id, str)
+                firebase_admin.initialize_app(
+                    options={'projectId': oppia_project_id})
+            else:
+                raise
 
 
 def establish_auth_session(
@@ -588,7 +599,8 @@ def _create_auth_claims(
     auth_id = firebase_claims['sub']
     email = firebase_claims.get('email')
     role_is_super_admin = (
-        email == feconf.ADMIN_EMAIL_ADDRESS or
+        email == platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value) or
         firebase_claims.get('role') == feconf.FIREBASE_ROLE_SUPER_ADMIN)
     return auth_domain.AuthClaims(
         auth_id, email, role_is_super_admin=role_is_super_admin)

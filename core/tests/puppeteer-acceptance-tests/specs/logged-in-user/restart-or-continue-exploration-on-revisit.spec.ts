@@ -33,7 +33,7 @@ enum INTERACTION_TYPES {
 enum CARD_NAME {
   INTRODUCTION = 'Introduction',
   TEST_QUESTION = 'Test Question',
-  REVISION_CARD = 'Revision Card',
+  STUDY_GUIDE = 'Study Guide',
   FINAL_CARD = 'Final Card',
 }
 
@@ -48,7 +48,7 @@ describe('Logged-in User', function () {
     );
 
     await explorationEditor.navigateToCreatorDashboardPage();
-    await explorationEditor.navigateToExplorationEditorPage();
+    await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
     await explorationEditor.dismissWelcomeModal();
     await explorationEditor.updateCardContent(
       'We will be learning positive numbers.'
@@ -70,14 +70,16 @@ describe('Logged-in User', function () {
       INTERACTION_TYPES.NUMERIC_INPUT,
       '-99',
       'Prefect!',
-      CARD_NAME.REVISION_CARD,
+      CARD_NAME.STUDY_GUIDE,
       true
     );
-    await explorationEditor.editDefaultResponseFeedback('Wrong, try again!');
+    await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
+      'Wrong, try again!'
+    );
     await explorationEditor.saveExplorationDraft();
 
-    // Navigate to the new card and Revision content.
-    await explorationEditor.navigateToCard(CARD_NAME.REVISION_CARD);
+    // Navigate to the new card and Study Guide content.
+    await explorationEditor.navigateToCard(CARD_NAME.STUDY_GUIDE);
     await explorationEditor.updateCardContent(
       'Positive numbers are greater than zero.'
     );
@@ -130,7 +132,7 @@ describe('Logged-in User', function () {
       // Reloading from the current progress.
       await loggedInUser.reloadPage();
 
-      await loggedInUser.expectProgressRemainder(true);
+      await loggedInUser.expectProgressReminder(true);
       // Continue the exploration from where they left off.
       await loggedInUser.chooseActionInProgressRemainder('Restart');
 
@@ -140,7 +142,7 @@ describe('Logged-in User', function () {
 
       // Again reload the page to check the 'Resume' exploration in the progress remainder as well.
       await loggedInUser.reloadPage();
-      await loggedInUser.expectProgressRemainder(true);
+      await loggedInUser.expectProgressReminder(true);
       await loggedInUser.chooseActionInProgressRemainder('Resume');
 
       await loggedInUser.continueToNextCard();

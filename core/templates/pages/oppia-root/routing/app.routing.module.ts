@@ -21,7 +21,8 @@ import {NgModule} from '@angular/core';
 import {Route, RouterModule} from '@angular/router';
 import {AppConstants} from 'app.constants';
 import {IsLoggedInGuard} from 'pages/lightweight-oppia-root/routing/guards/is-logged-in.guard';
-import {IsNewLessonPlayerGuard} from 'pages/exploration-player-page/new-lesson-player/lesson-player-flag.guard';
+import {LessonPlayerPageAuthGuard} from 'pages/exploration-player-page/new-lesson-player/lesson-player-auth.guard';
+import {NormalizeUrlCaseGuard} from 'pages/oppia-root/routing/normalize-url-case.guard';
 
 // All paths must be defined in constants.ts file.
 // Otherwise pages will have false 404 status code.
@@ -147,6 +148,7 @@ const routes: Route[] = [
       import('pages/classroom-page/classroom-page.module').then(
         m => m.ClassroomPageModule
       ),
+    canActivate: [NormalizeUrlCaseGuard],
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TOPIC_EDITOR.ROUTE,
@@ -226,7 +228,7 @@ const routes: Route[] = [
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EXPLORATION_PLAYER.ROUTE,
     loadChildren: () =>
       import(
-        'pages/exploration-player-page/exploration-player-page.module'
+        'pages/exploration-player-page/current-lesson-player/exploration-player-page.module'
       ).then(m => m.ExplorationPlayerPageModule),
   },
   {
@@ -234,8 +236,16 @@ const routes: Route[] = [
       .ROUTE,
     loadChildren: () =>
       import(
-        'pages/exploration-player-page/exploration-player-page.module'
+        'pages/exploration-player-page/current-lesson-player/exploration-player-page.module'
       ).then(m => m.ExplorationPlayerPageModule),
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LESSON_PLAYER_EMBED.ROUTE,
+    loadChildren: () =>
+      import(
+        'pages/exploration-player-page/new-lesson-player/lesson-player-page.module'
+      ).then(m => m.NewLessonPlayerPageModule),
+    canActivate: [LessonPlayerPageAuthGuard],
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.NEW_LESSON_PLAYER.ROUTE,
@@ -244,7 +254,7 @@ const routes: Route[] = [
         'pages/exploration-player-page/new-lesson-player' +
           '/lesson-player-page.module'
       ).then(m => m.NewLessonPlayerPageModule),
-    canActivate: [IsNewLessonPlayerGuard],
+    canActivate: [LessonPlayerPageAuthGuard],
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ANDROID.ROUTE,

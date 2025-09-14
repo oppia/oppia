@@ -22,10 +22,12 @@
 }
 
 .multiple-choice-outer-radio-button {
+  align-items: center;
   border: 2px solid #0d48a1;
   border-radius: 50%;
-  display: inline-block;
+  display: flex;
   height: 16px;
+  justify-content: center;
   margin-bottom: -1px;
   width: 16px;
 }

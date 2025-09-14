@@ -133,6 +133,7 @@ export class InteractiveRatioExpressionInputComponent
         this.errorMessageI18nKey = parsingError.message;
       }
       this.isValid = false;
+      this.currentInteractionService.updateAnswerIsValid(false);
     }
   }
 
@@ -143,6 +144,7 @@ export class InteractiveRatioExpressionInputComponent
   answerValueChanged(): void {
     this.answerChanged.next(this.answer);
     this.currentInteractionService.updateCurrentAnswer(this.answer);
+    this.currentInteractionService.updateAnswerIsValid(this.isAnswerValid());
   }
 
   ngOnDestroy(): void {

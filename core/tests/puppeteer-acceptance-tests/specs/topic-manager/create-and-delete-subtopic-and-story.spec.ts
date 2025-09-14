@@ -52,7 +52,9 @@ describe('Topic Manager', function () {
       );
     explorationId2 =
       await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
-        'test exploration 2'
+        'test exploration 2',
+        'Algebra',
+        false
       );
 
     await curriculumAdmin.createTopic('Addition', 'add');

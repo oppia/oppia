@@ -23,7 +23,7 @@ import {
   Input,
   Output,
 } from '@angular/core';
-import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model';
 
 @Component({
   selector: 'subtitled-unicode-editor',

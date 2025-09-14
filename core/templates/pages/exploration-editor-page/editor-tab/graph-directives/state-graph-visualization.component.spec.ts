@@ -305,7 +305,7 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
     flush();
   }));
 
-  it('should initialize $scope properties after controller is initialized', fakeAsync(() => {
+  it('should initialize component properties after component is initialized', fakeAsync(() => {
     component.versionGraphData = graphData;
     component.ngOnInit();
     tick();

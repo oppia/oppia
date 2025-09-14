@@ -20,9 +20,8 @@ import {Injectable} from '@angular/core';
 
 import cloneDeep from 'lodash/cloneDeep';
 import {AppConstants} from 'app.constants';
-import {BindableVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
-import {Question} from 'domain/question/QuestionObjectFactory';
-import {State} from 'domain/state/StateObjectFactory';
+import {Question} from 'domain/question/question.model';
+import {State} from 'domain/state/state.model';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {ExpressionInterpolationService} from 'expressions/expression-interpolation.service';
 import {InteractionAnswer} from 'interactions/answer-defs';
@@ -31,10 +30,9 @@ import {
   InteractionRulesService,
 } from 'pages/exploration-player-page/services/answer-classification.service';
 import {AlertsService} from 'services/alerts.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
-import {AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
 import {DiagnosticTestCurrentTopicStatusModel} from 'pages/diagnostic-test-player-page/diagnostic-test-current-topic-status.model';
 import {DiagnosticTestTopicTrackerModel} from 'pages/diagnostic-test-player-page/diagnostic-test-topic-tracker.model';
 import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
@@ -60,8 +58,7 @@ export class DiagnosticTestPlayerEngineService {
   constructor(
     private alertsService: AlertsService,
     private answerClassificationService: AnswerClassificationService,
-    private audioTranslationLanguageService: AudioTranslationLanguageService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
     private expressionInterpolationService: ExpressionInterpolationService,
     private focusManagerService: FocusManagerService,
@@ -198,7 +195,6 @@ export class DiagnosticTestPlayerEngineService {
       nextCard: StateCard,
       refreshInteraction: boolean,
       feedbackHtml: string,
-      feedbackAudioTranslations: BindableVoiceovers,
       refresherExplorationId: string,
       missingPrerequisiteSkillId: string,
       remainOnCurrentCard: boolean,
@@ -223,7 +219,6 @@ export class DiagnosticTestPlayerEngineService {
     let stateCard: StateCard;
     let refreshInteraction: boolean = false;
     let feedbackHtml: string = '';
-    let feedbackAudioTranslations: BindableVoiceovers = {};
     let refresherExplorationId: string = '';
     let missingPrerequisiteSkillId: string = '';
     let remainOnCurrentCard: boolean = false;
@@ -254,7 +249,6 @@ export class DiagnosticTestPlayerEngineService {
           stateCard,
           refreshInteraction,
           feedbackHtml,
-          feedbackAudioTranslations,
           refresherExplorationId,
           missingPrerequisiteSkillId,
           remainOnCurrentCard,
@@ -419,7 +413,7 @@ export class DiagnosticTestPlayerEngineService {
   }
 
   recordNewCardAdded(): void {
-    this.contextService.setCustomEntityContext(
+    this.pageContextService.setCustomEntityContext(
       AppConstants.ENTITY_TYPE.QUESTION,
       this._currentQuestion.getId() as string
     );
@@ -459,9 +453,7 @@ export class DiagnosticTestPlayerEngineService {
       questionHtml,
       interactionHtml as string,
       interaction,
-      stateData.recordedVoiceovers,
-      stateData.content.contentId as string,
-      this.audioTranslationLanguageService
+      stateData.content.contentId as string
     );
   }
 

@@ -42,7 +42,7 @@ import {
   MatSnackBarModule,
   MatSnackBarRef,
 } from '@angular/material/snack-bar';
-import {of, Subject} from 'rxjs';
+import {of} from 'rxjs';
 // This throws "TS2307". We need to
 // suppress this error because rte-output-display is not strictly typed yet.
 // @ts-ignore
@@ -80,7 +80,6 @@ describe('Translation Suggestion Review Modal Component', function () {
   let userService: UserService;
   let activeModal: NgbActiveModal;
   let changeDetectorRef: MockChangeDetectorRef = new MockChangeDetectorRef();
-  let snackBarSpy: jasmine.Spy;
   let snackBar: MatSnackBar;
   let mockPlatformFeatureService = new MockPlatformFeatureService();
 
@@ -126,6 +125,7 @@ describe('Translation Suggestion Review Modal Component', function () {
     userService = TestBed.inject(UserService);
     contributionAndReviewService = TestBed.inject(ContributionAndReviewService);
     languageUtilService = TestBed.inject(LanguageUtilService);
+
     spyOn(
       siteAnalyticsService,
       'registerContributorDashboardViewSuggestionForReview'
@@ -134,7 +134,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       'audio_language_description'
     );
 
-    snackBarSpy = spyOn(snackBar, 'openFromComponent').and.returnValue(
+    spyOn(snackBar, 'openFromComponent').and.returnValue(
       new MockMatSnackBarRef() as unknown as MatSnackBarRef<unknown>
     );
 
@@ -152,6 +152,36 @@ describe('Translation Suggestion Review Modal Component', function () {
       new ElementRef({offsetHeight: 200}),
       null
     );
+    component.initialSuggestionId = 'suggestion_1';
+    component.suggestionIdToContribution = {
+      suggestion_1: {
+        suggestion: {
+          author_name: 'author_name',
+          language_code: 'language_code',
+          last_updated_msecs: 1559074000000,
+          status: 'status',
+          suggestion_id: 'suggestion_1',
+          target_id: '1',
+          target_type: 'target_type',
+          suggestion_type: 'translate_content',
+          change_cmd: {
+            content_id: 'hint_1',
+            content_html: '<p>content</p>',
+            translation_html: 'Translation content',
+            state_name: 'StateName',
+            cmd: 'edit_state_property',
+            data_format: 'html',
+            language_code: 'language_code',
+          },
+          exploration_content_html: '<p>content</p>',
+        },
+        details: {
+          topic_name: 'topic_1',
+          story_title: 'story_1',
+          chapter_title: 'chapter_1',
+        },
+      },
+    };
   });
 
   describe('when initializing the modal ', () => {
@@ -482,391 +512,6 @@ describe('Translation Suggestion Review Modal Component', function () {
       expect(component.errorMessage).toBe('Invalid Suggestion: Error');
     });
 
-    it(
-      'should accept suggestion in suggestion modal service when clicking' +
-        ' on accept and review next suggestion button',
-      function () {
-        component.ngOnInit();
-        expect(component.activeSuggestionId).toBe('suggestion_1');
-        expect(component.activeSuggestion).toEqual(suggestion1);
-        expect(component.reviewable).toBe(reviewable);
-        expect(component.reviewMessage).toBe('');
-        // Suggestion 1's exploration_content_html matches its content_html.
-        expect(component.hasExplorationContentChanged()).toBe(false);
-
-        spyOn(
-          siteAnalyticsService,
-          'registerContributorDashboardAcceptSuggestion'
-        );
-        spyOn(
-          contributionAndReviewService,
-          'reviewExplorationSuggestion'
-        ).and.callFake(
-          (
-            targetId,
-            suggestionId,
-            action,
-            reviewMessage,
-            commitMessage,
-            successCallback,
-            errorCallback
-          ) => {
-            return Promise.resolve(successCallback(suggestionId));
-          }
-        );
-        spyOn(activeModal, 'close');
-        spyOn(alertsService, 'addSuccessMessage');
-        spyOn(component, 'showSnackbar');
-        spyOn(component, 'startCommitTimeout');
-
-        component.reviewMessage = 'Review message example';
-        component.translationUpdated = true;
-        component.acceptAndReviewNext();
-
-        expect(component.activeSuggestionId).toBe('suggestion_2');
-        expect(component.activeSuggestion).toEqual(suggestion2);
-        expect(component.reviewable).toBe(reviewable);
-        expect(component.reviewMessage).toBe('');
-
-        component.commitQueuedSuggestion();
-
-        // Suggestion 2's exploration_content_html does not match its
-        // content_html.
-        expect(component.hasExplorationContentChanged()).toBe(true);
-        expect(
-          siteAnalyticsService.registerContributorDashboardAcceptSuggestion
-        ).toHaveBeenCalledWith('Translation');
-        expect(
-          contributionAndReviewService.reviewExplorationSuggestion
-        ).toHaveBeenCalledWith(
-          '1',
-          'suggestion_1',
-          'accept',
-          'Review message example: ' +
-            '(Note: This suggestion was submitted with reviewer edits.)',
-          'hint section of "StateName" card',
-          jasmine.any(Function),
-          jasmine.any(Function)
-        );
-        expect(alertsService.addSuccessMessage).toHaveBeenCalled();
-
-        component.reviewMessage = 'Review message example 2';
-        component.translationUpdated = false;
-        component.acceptAndReviewNext();
-
-        component.commitQueuedSuggestion();
-
-        expect(
-          siteAnalyticsService.registerContributorDashboardAcceptSuggestion
-        ).toHaveBeenCalledWith('Translation');
-        expect(
-          contributionAndReviewService.reviewExplorationSuggestion
-        ).toHaveBeenCalledWith(
-          '2',
-          'suggestion_2',
-          'accept',
-          'Review message example 2',
-          'hint section of "StateName" card',
-          jasmine.any(Function),
-          jasmine.any(Function)
-        );
-        expect(alertsService.addSuccessMessage).toHaveBeenCalled();
-        expect(activeModal.close).toHaveBeenCalledWith([
-          'suggestion_1',
-          'suggestion_2',
-        ]);
-      }
-    );
-
-    it(
-      'should set suggestion review message to auto-generated note when ' +
-        'suggestion is accepted with edits and no user-supplied review message',
-      fakeAsync(() => {
-        component.ngOnInit();
-        expect(component.activeSuggestionId).toBe('suggestion_1');
-        expect(component.activeSuggestion).toEqual(suggestion1);
-        expect(component.reviewable).toBe(reviewable);
-        expect(component.reviewMessage).toBe('');
-
-        spyOn(
-          siteAnalyticsService,
-          'registerContributorDashboardAcceptSuggestion'
-        );
-        spyOn(component, 'resolveSuggestionAndUpdateModal');
-        spyOn(component, 'startCommitTimeout');
-        spyOn(component, 'showSnackbar');
-        spyOn(
-          contributionAndReviewService,
-          'reviewExplorationSuggestion'
-        ).and.callFake(
-          (
-            targetId,
-            suggestionId,
-            action,
-            reviewMessage,
-            commitMessage,
-            successCallback,
-            errorCallback
-          ) => {
-            return Promise.resolve(successCallback(suggestionId));
-          }
-        );
-        spyOn(alertsService, 'addSuccessMessage');
-
-        component.translationUpdated = true;
-        component.acceptAndReviewNext();
-
-        tick();
-
-        expect(component.hasQueuedSuggestion).toBeTrue();
-        expect(component.queuedSuggestion).toEqual({
-          target_id: '1',
-          suggestion_id: 'suggestion_1',
-          action_status: 'accept',
-          commit_message: 'hint section of "StateName" card',
-          reviewer_message:
-            '(Note: This suggestion was submitted with ' + 'reviewer edits.)',
-        });
-      })
-    );
-
-    it(
-      'should accept the queued suggestion when the timer has expired' +
-        'review button',
-      () => {
-        component.ngOnInit();
-
-        expect(component.activeSuggestionId).toBe('suggestion_1');
-        expect(component.activeSuggestion).toEqual(suggestion1);
-        expect(component.reviewable).toBe(reviewable);
-        expect(component.reviewMessage).toBe('');
-
-        spyOn(
-          siteAnalyticsService,
-          'registerContributorDashboardAcceptSuggestion'
-        );
-        spyOn(
-          contributionAndReviewService,
-          'reviewExplorationSuggestion'
-        ).and.callFake(
-          (
-            targetId,
-            suggestionId,
-            action,
-            reviewMessage,
-            commitMessage,
-            successCallback,
-            errorCallback
-          ) => {
-            return Promise.resolve(successCallback(suggestionId));
-          }
-        );
-        spyOn(activeModal, 'close');
-        spyOn(alertsService, 'addSuccessMessage');
-        spyOn(component, 'resolveSuggestionAndUpdateModal').and.stub();
-        spyOn(component, 'startCommitTimeout').and.stub();
-        spyOn(component, 'showSnackbar').and.stub();
-
-        component.acceptAndReviewNext();
-
-        expect(component.hasQueuedSuggestion).toBeTrue();
-        expect(component.queuedSuggestion).toEqual({
-          target_id: '1',
-          suggestion_id: 'suggestion_1',
-          action_status: AppConstants.ACTION_ACCEPT_SUGGESTION,
-          reviewer_message: '',
-          commit_message: 'hint section of "StateName" card',
-        });
-
-        component.commitQueuedSuggestion();
-      }
-    );
-
-    it('should reject the queued suggestion when the timer has expired', () => {
-      component.ngOnInit();
-
-      expect(component.activeSuggestionId).toBe('suggestion_1');
-      expect(component.activeSuggestion).toEqual(suggestion1);
-      expect(component.reviewable).toBe(reviewable);
-      expect(component.reviewMessage).toBe('');
-      expect(component.isUndoFeatureEnabled).toBeTrue();
-
-      spyOn(
-        siteAnalyticsService,
-        'registerContributorDashboardAcceptSuggestion'
-      );
-      spyOn(
-        contributionAndReviewService,
-        'reviewExplorationSuggestion'
-      ).and.callFake(
-        (
-          targetId,
-          suggestionId,
-          action,
-          reviewMessage,
-          commitMessage,
-          successCallback,
-          errorCallback
-        ) => {
-          return Promise.resolve(successCallback(suggestionId));
-        }
-      );
-      spyOn(activeModal, 'close');
-      spyOn(alertsService, 'addSuccessMessage');
-      spyOn(component, 'resolveSuggestionAndUpdateModal').and.stub();
-      spyOn(component, 'startCommitTimeout').and.stub();
-      spyOn(component, 'showSnackbar').and.stub();
-
-      component.rejectAndReviewNext('rejected');
-
-      expect(component.hasQueuedSuggestion).toBeTrue();
-      expect(component.queuedSuggestion).toEqual({
-        target_id: '1',
-        suggestion_id: 'suggestion_1',
-        action_status: AppConstants.ACTION_REJECT_SUGGESTION,
-        reviewer_message: 'rejected',
-      });
-
-      component.commitQueuedSuggestion();
-    });
-
-    it('should undo the queued suggestion when clicked on undo button', () => {
-      component.ngOnInit();
-      expect(component.activeSuggestionId).toBe('suggestion_1');
-      expect(component.activeSuggestion).toEqual(suggestion1);
-      expect(component.reviewable).toBe(reviewable);
-      expect(component.reviewMessage).toBe('');
-      component.resolvedSuggestionIds = ['suggestion_1'];
-
-      component.hasQueuedSuggestion = true;
-      component.queuedSuggestion = {
-        target_id: '1',
-        suggestion_id: 'suggestion_1',
-        action_status: 'accept',
-        commit_message: 'hint section of "StateName" card',
-        reviewer_message:
-          '(Note: This suggestion was submitted with' + 'reviewer edits.)',
-      };
-      component.removedSuggestion = contribution1;
-      component.undoReviewAction();
-
-      expect(component.hasQueuedSuggestion).toBeFalse();
-      expect(component.queuedSuggestion).toBe(undefined);
-    });
-
-    it(
-      'should allow the reviewer to fix the suggestion if the backend pre' +
-        ' accept/reject validation failed',
-      function () {
-        const responseMessage = 'Pre accept validation failed.';
-
-        component.ngOnInit();
-        expect(component.activeSuggestionId).toBe('suggestion_1');
-        expect(component.activeSuggestion).toEqual(suggestion1);
-        expect(component.reviewable).toBe(reviewable);
-        expect(component.reviewMessage).toBe('');
-        spyOn(component, 'revertSuggestionResolution');
-        spyOn(
-          siteAnalyticsService,
-          'registerContributorDashboardAcceptSuggestion'
-        );
-        spyOn(
-          siteAnalyticsService,
-          'registerContributorDashboardRejectSuggestion'
-        );
-        spyOn(
-          contributionAndReviewService,
-          'reviewExplorationSuggestion'
-        ).and.callFake(
-          (
-            targetId,
-            suggestionId,
-            action,
-            reviewMessage,
-            commitMessage,
-            successCallback,
-            errorCallback
-          ) => {
-            return Promise.reject(errorCallback(responseMessage));
-          }
-        );
-        spyOn(alertsService, 'addWarning');
-
-        component.reviewMessage = 'Review message example';
-        component.queuedSuggestion = {
-          target_id: '1',
-          suggestion_id: 'suggestion_1',
-          action_status: 'accept',
-          commit_message: 'hint section of "StateName" card',
-          reviewer_message:
-            '(Note: This suggestion was submitted with' + 'reviewer edits.)',
-        };
-        component.hasQueuedSuggestion = true;
-        component.commitQueuedSuggestion();
-
-        expect(component.revertSuggestionResolution).toHaveBeenCalled();
-      }
-    );
-
-    it('should show the pop up bar when suggestion is queued', () => {
-      spyOn(component, 'commitQueuedSuggestion').and.callThrough();
-      component.hasQueuedSuggestion = true;
-      component.showSnackbar();
-
-      expect(snackBarSpy.calls.mostRecent().returnValue.instance.message).toBe(
-        'Suggestion queued'
-      );
-    });
-
-    it(
-      'should commit the queued suggestion when' + ' the snackbar is dismissed',
-      () => {
-        const commitQueuedSuggestionSpy = spyOn(
-          component,
-          'commitQueuedSuggestion'
-        ).and.callThrough();
-
-        let afterDismissedObservable = new Subject<void>();
-        let snackBarRefMock = {
-          instance: {message: ''},
-          afterDismissed: () => afterDismissedObservable.asObservable(),
-          onAction: () => of(null),
-        };
-
-        snackBarSpy.and.returnValue(snackBarRefMock);
-
-        component.showSnackbar();
-        component.hasQueuedSuggestion = true;
-
-        afterDismissedObservable.next();
-        afterDismissedObservable.complete();
-
-        expect(commitQueuedSuggestionSpy).toHaveBeenCalled();
-      }
-    );
-
-    it(
-      'should start commit timeout when clicking on accept and review' +
-        'next suggestion button',
-      () => {
-        spyOn(window, 'setTimeout');
-        spyOn(component, 'commitQueuedSuggestion');
-        component.commitTimeout = undefined;
-
-        component.startCommitTimeout();
-
-        expect(window.setTimeout).toHaveBeenCalled();
-        const timeoutCallback = (
-          window.setTimeout as unknown as jasmine.Spy
-        ).calls.mostRecent().args[0];
-        expect(typeof timeoutCallback).toBe('function');
-
-        timeoutCallback();
-
-        expect(component.commitQueuedSuggestion).toHaveBeenCalled();
-      }
-    );
-
     it('should remove suggestion_id from resolvedSuggestionIds if it exists', () => {
       component.ngOnInit();
       component.resolvedSuggestionIds = ['suggestion_1', 'suggestion_2'];
@@ -966,6 +611,49 @@ describe('Translation Suggestion Review Modal Component', function () {
         jasmine.any(Function),
         jasmine.any(Function)
       );
+    });
+
+    it('should emit queuedSuggestion Emit when suggestions are accepted', () => {
+      component.ngOnInit();
+      spyOn(component, 'generateCommitMessage').and.returnValue(
+        'Generated Commit Message'
+      );
+      const queuedSuggestionSpy = spyOn(
+        component.queuedSuggestionSummaryEmit,
+        'emit'
+      );
+
+      component.queuedSuggestion = {
+        suggestion_id: 'suggestion_2',
+        target_id: '2',
+        action_status: 'ACCEPTED',
+        reviewer_message: '',
+      };
+
+      component.acceptAndReviewNext();
+      expect(queuedSuggestionSpy).toHaveBeenCalled();
+    });
+
+    it('should emit queuedSuggestion Emit when suggestions are rejected', () => {
+      component.ngOnInit();
+      spyOn(component, 'generateCommitMessage').and.returnValue(
+        'Generated Commit Message'
+      );
+      const queuedSuggestionSpy = spyOn(
+        component.queuedSuggestionSummaryEmit,
+        'emit'
+      );
+
+      component.queuedSuggestion = {
+        suggestion_id: 'suggestion_2',
+        target_id: '2',
+        action_status: 'REJECTED',
+        reviewer_message: '',
+      };
+      component.lastSuggestionToReview = true;
+
+      component.rejectAndReviewNext('');
+      expect(queuedSuggestionSpy).toHaveBeenCalled();
     });
 
     describe('isHtmlContentEqual', function () {
@@ -1100,66 +788,6 @@ describe('Translation Suggestion Review Modal Component', function () {
         true;
       component.ngOnInit();
     });
-
-    it(
-      'should reject suggestion in suggestion modal service when clicking ' +
-        'on reject and review next suggestion button',
-      function () {
-        expect(component.activeSuggestionId).toBe('suggestion_1');
-        expect(component.activeSuggestion).toEqual(suggestion1);
-        expect(component.reviewable).toBe(reviewable);
-        expect(component.reviewMessage).toBe('');
-
-        spyOn(
-          contributionAndReviewService,
-          'reviewExplorationSuggestion'
-        ).and.callFake(
-          (
-            targetId,
-            suggestionId,
-            action,
-            reviewMessage,
-            commitMessage,
-            successCallback,
-            errorCallback
-          ) => {
-            return Promise.resolve(successCallback(suggestionId));
-          }
-        );
-        spyOn(
-          siteAnalyticsService,
-          'registerContributorDashboardRejectSuggestion'
-        );
-        spyOn(activeModal, 'close');
-        spyOn(alertsService, 'addSuccessMessage');
-
-        spyOn(component, 'startCommitTimeout');
-        spyOn(component, 'showSnackbar');
-        spyOn(component, 'resolveSuggestionAndUpdateModal');
-
-        component.reviewMessage = 'Review message example';
-        component.rejectAndReviewNext(component.reviewMessage);
-        component.commitQueuedSuggestion();
-
-        expect(
-          siteAnalyticsService.registerContributorDashboardRejectSuggestion
-        ).toHaveBeenCalledWith('Translation');
-        expect(
-          contributionAndReviewService.reviewExplorationSuggestion
-        ).toHaveBeenCalledWith(
-          '1',
-          'suggestion_1',
-          'reject',
-          'Review message example',
-          null,
-          jasmine.any(Function),
-          jasmine.any(Function)
-        );
-        expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
-          'Suggestion rejected.'
-        );
-      }
-    );
   });
 
   describe('when reviewing suggestion when flag CdAllowUndoingTranslationReview is disabled', function () {
@@ -2678,5 +2306,474 @@ describe('Translation Suggestion Review Modal Component', function () {
     const result = component.getImageInfoForSuggestion(content);
 
     expect(result).toEqual(expectedHtmlString);
+  });
+
+  describe('Translation Suggestion Review Modal - Component Validation', () => {
+    const htmlWithComponents = `
+    <p>Content with components</p>
+    <oppia-noninteractive-image
+      alt-with-value="&amp;quot;Image description&amp;quot;"
+      caption-with-value="&amp;quot;Image caption&amp;quot;"
+      filepath-with-value="&amp;quot;img_20241109_030945_oc195e5356_height_350_width_450.svg&amp;quot;">
+    </oppia-noninteractive-image>
+    <oppia-noninteractive-math 
+      math_content-with-value="{\u0026amp;quot;raw_latex\u0026amp;quot;:\u0026amp;quot;\\\\frac{x}{y}\u0026amp;quot;,\u0026amp;quot;svg_filename\u0026amp;quot;:\u0026amp;quot;mathImg_20250126_225215_x5vy0sjj6v_height_3d205_width_1d784_vertical_1d306.svg\u0026amp;quot;}">
+    </oppia-noninteractive-math>
+    <oppia-noninteractive-skillreview 
+      skill_id-with-value="&amp;quot;wfLsQD3CTfrI&amp;quot;" 
+      text-with-value="&amp;quot;concept card&amp;quot;">
+    </oppia-noninteractive-skillreview>
+  `;
+    const htmlWithoutComponents = '<p>Content without components</p>';
+    const htmlWithMultipleComponents = `
+  <p>Content with multiple components</p>
+  <oppia-noninteractive-image
+    alt-with-value="&amp;quot;Image 1&amp;quot;"
+    caption-with-value="&amp;quot;Image 1 caption&amp;quot;"
+    filepath-with-value="&amp;quot;img1.svg&amp;quot;">
+  </oppia-noninteractive-image>
+  <oppia-noninteractive-image
+    alt-with-value="&amp;quot;Image 2&amp;quot;"
+    caption-with-value="&amp;quot;Image 2 caption&amp;quot;"
+    filepath-with-value="&amp;quot;img2.svg&amp;quot;">
+  </oppia-noninteractive-image>
+  <oppia-noninteractive-math 
+    math_content-with-value="{\u0026amp;quot;raw_latex\u0026amp;quot;:\u0026amp;quot;\\\\frac{x}{y}\u0026amp;quot;}">
+  </oppia-noninteractive-math>
+  <oppia-noninteractive-math 
+    math_content-with-value="{\u0026amp;quot;raw_latex\u0026amp;quot;:\u0026amp;quot;\\\\frac{a}{b}\u0026amp;quot;}">
+  </oppia-noninteractive-math>
+  <oppia-noninteractive-skillreview 
+    skill_id-with-value="&amp;quot;skill1&amp;quot;"
+    text-with-value="&amp;quot;concept card 1&amp;quot;">
+  </oppia-noninteractive-skillreview>
+  <oppia-noninteractive-skillreview 
+    skill_id-with-value="&amp;quot;skill2&amp;quot;"
+    text-with-value="&amp;quot;concept card 2&amp;quot;">
+  </oppia-noninteractive-skillreview>
+`;
+
+    beforeEach(() => {
+      component.initialSuggestionId = 'suggestion_1';
+      component.suggestionIdToContribution = {
+        suggestion_1: {
+          suggestion: {
+            author_name: 'author_name',
+            language_code: 'language_code',
+            last_updated_msecs: 1559074000000,
+            status: 'status',
+            suggestion_id: 'suggestion_1',
+            target_id: '1',
+            target_type: 'target_type',
+            suggestion_type: 'translate_content',
+            change_cmd: {
+              content_id: 'hint_1',
+              content_html: htmlWithComponents,
+              translation_html: htmlWithComponents,
+              state_name: 'StateName',
+              cmd: 'edit_state_property',
+              data_format: 'html',
+              language_code: 'language_code',
+            },
+            exploration_content_html: '<p>content</p>',
+          },
+          details: {
+            topic_name: 'topic_1',
+            story_title: 'story_1',
+            chapter_title: 'chapter_1',
+          },
+        },
+        suggestion_2: {
+          suggestion: {
+            author_name: 'author_name',
+            language_code: 'language_code',
+            last_updated_msecs: 1559074000000,
+            status: 'status',
+            suggestion_id: 'suggestion_2',
+            target_id: '2',
+            target_type: 'target_type',
+            suggestion_type: 'translate_content',
+            change_cmd: {
+              content_id: 'hint_2',
+              content_html: htmlWithoutComponents,
+              translation_html: htmlWithoutComponents,
+              state_name: 'StateName',
+              cmd: 'edit_state_property',
+              data_format: 'html',
+              language_code: 'language_code',
+            },
+            exploration_content_html: '<p>content</p>',
+          },
+          details: {
+            topic_name: 'topic_2',
+            story_title: 'story_2',
+            chapter_title: 'chapter_2',
+          },
+        },
+        suggestion_3: {
+          suggestion: {
+            author_name: 'author_name',
+            language_code: 'language_code',
+            last_updated_msecs: 1559074000000,
+            status: 'status',
+            suggestion_id: 'suggestion_3',
+            target_id: '3',
+            target_type: 'target_type',
+            suggestion_type: 'translate_content',
+            change_cmd: {
+              content_id: 'hint_3',
+              content_html: htmlWithMultipleComponents,
+              translation_html: htmlWithMultipleComponents,
+              state_name: 'StateName',
+              cmd: 'edit_state_property',
+              data_format: 'html',
+              language_code: 'language_code',
+            },
+            exploration_content_html: '<p>content</p>',
+          },
+          details: {
+            topic_name: 'topic_3',
+            story_title: 'story_3',
+            chapter_title: 'chapter_3',
+          },
+        },
+      };
+    });
+
+    it('should initialize validation state correctly from original content', () => {
+      expect(component.initialSuggestionId).toBeDefined();
+      expect(component.suggestionIdToContribution).toBeDefined();
+      expect(component.suggestionIdToContribution.suggestion_1).toBeDefined();
+      expect(
+        component.suggestionIdToContribution.suggestion_1.suggestion
+      ).toBeDefined();
+      expect(
+        component.suggestionIdToContribution.suggestion_1.suggestion.change_cmd
+      ).toBeDefined();
+      expect(
+        component.suggestionIdToContribution.suggestion_1.suggestion.change_cmd
+          .content_html
+      ).toBe(htmlWithComponents);
+
+      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
+
+      component.ngOnInit();
+
+      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
+
+      expect(component.translationHtml).toBe(htmlWithComponents);
+    });
+
+    it('should detect component mismatch when removing components', () => {
+      expect(component.initialSuggestionId).toBeDefined();
+      expect(component.suggestionIdToContribution).toBeDefined();
+      expect(
+        component.suggestionIdToContribution.suggestion_1.suggestion.change_cmd
+          .content_html
+      ).toBe(htmlWithComponents);
+      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
+
+      component.ngOnInit();
+
+      component.editedContent = {html: htmlWithoutComponents};
+      expect(component.editedContent).toBeDefined();
+      expect(component.editedContent.html).toBe(htmlWithoutComponents);
+
+      expect(component.areComponentsMismatched()).toBeTrue();
+      expect(component.incompleteTranslationErrorIsShown).toBeTrue();
+    });
+
+    it('should detect component mismatch when adding components', () => {
+      expect(component.initialSuggestionId).toBeDefined();
+      expect(component.suggestionIdToContribution).toBeDefined();
+
+      component.initialSuggestionId = 'suggestion_2';
+      expect(
+        component.suggestionIdToContribution.suggestion_2.suggestion.change_cmd
+          .content_html
+      ).toBe(htmlWithoutComponents);
+      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
+
+      component.ngOnInit();
+      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
+
+      component.editedContent = {html: htmlWithComponents};
+      expect(component.editedContent).toBeDefined();
+      expect(component.editedContent.html).toBe(htmlWithComponents);
+
+      expect(component.areComponentsMismatched()).toBeTrue();
+      expect(component.incompleteTranslationErrorIsShown).toBeTrue();
+    });
+
+    it('should detect no mismatch when components match', () => {
+      expect(component.initialSuggestionId).toBeDefined();
+      expect(component.suggestionIdToContribution).toBeDefined();
+      expect(
+        component.suggestionIdToContribution.suggestion_1.suggestion.change_cmd
+          .content_html
+      ).toBe(htmlWithComponents);
+      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
+
+      component.ngOnInit();
+      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
+
+      component.editedContent = {html: htmlWithComponents};
+      expect(component.editedContent).toBeDefined();
+      expect(component.editedContent.html).toBe(htmlWithComponents);
+
+      expect(component.areComponentsMismatched()).toBeFalse();
+      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
+    });
+
+    it('should handle multiple components correctly', () => {
+      expect(component.initialSuggestionId).toBeDefined();
+      expect(component.suggestionIdToContribution).toBeDefined();
+
+      component.initialSuggestionId = 'suggestion_3';
+      expect(
+        component.suggestionIdToContribution.suggestion_3.suggestion.change_cmd
+          .content_html
+      ).toBe(htmlWithMultipleComponents);
+      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
+
+      component.ngOnInit();
+      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
+
+      component.editedContent = {html: htmlWithMultipleComponents};
+      expect(component.editedContent).toBeDefined();
+      expect(component.editedContent.html).toBe(htmlWithMultipleComponents);
+
+      expect(component.areComponentsMismatched()).toBeFalse();
+      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
+    });
+
+    it('should disable update button when components mismatch', () => {
+      expect(component.initialSuggestionId).toBeDefined();
+      expect(component.suggestionIdToContribution).toBeDefined();
+      expect(
+        component.suggestionIdToContribution.suggestion_1.suggestion.change_cmd
+          .content_html
+      ).toBe(htmlWithComponents);
+      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
+      expect(component.startedEditing).toBeFalse();
+
+      component.ngOnInit();
+      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
+
+      component.startedEditing = true;
+      expect(component.startedEditing).toBeTrue();
+
+      component.editedContent = {html: htmlWithoutComponents};
+      expect(component.editedContent).toBeDefined();
+      expect(component.editedContent.html).toBe(htmlWithoutComponents);
+
+      expect(component.updateIsDisabled).toBeTrue();
+      expect(component.incompleteTranslationErrorIsShown).toBeTrue();
+    });
+
+    it('should handle successful update when components match', () => {
+      expect(component.initialSuggestionId).toBeDefined();
+      expect(component.suggestionIdToContribution).toBeDefined();
+      expect(
+        component.suggestionIdToContribution.suggestion_1.suggestion.change_cmd
+          .content_html
+      ).toBe(htmlWithComponents);
+      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
+      expect(component.errorFound).toBeFalse();
+
+      const updateSpy = spyOn(
+        contributionAndReviewService,
+        'updateTranslationSuggestionAsync'
+      );
+      expect(updateSpy).not.toHaveBeenCalled();
+
+      component.ngOnInit();
+      expect(component.incompleteTranslationErrorIsShown).toBeFalse();
+
+      component.editedContent = {html: htmlWithComponents};
+      expect(component.editedContent).toBeDefined();
+      expect(component.editedContent.html).toBe(htmlWithComponents);
+
+      component.updateSuggestion();
+      expect(component.errorFound).toBeFalse();
+      expect(updateSpy).toHaveBeenCalledWith(
+        component.initialSuggestionId,
+        htmlWithComponents,
+        jasmine.any(Function),
+        jasmine.any(Function)
+      );
+    });
+
+    it('should show error message when attempting update with mismatched components', () => {
+      expect(component.initialSuggestionId).toBeDefined();
+      expect(component.suggestionIdToContribution).toBeDefined();
+      expect(
+        component.suggestionIdToContribution.suggestion_1.suggestion.change_cmd
+          .content_html
+      ).toBe(htmlWithComponents);
+
+      component.translationHtml = htmlWithComponents;
+      component.ngOnInit();
+
+      component.editedContent = {html: htmlWithoutComponents};
+      component.updateSuggestion();
+
+      expect(component.errorMessage).toBe(
+        'Please ensure all components (images, math formulas, concept cards, videos) in your translation match the original content.'
+      );
+      expect(component.errorFound).toBeTrue();
+    });
+
+    it('should clear error when no component mismatch', () => {
+      component.errorMessage = 'Some error';
+      component.errorFound = true;
+      component.incompleteTranslationErrorIsShown = false;
+
+      component.activeSuggestion = {
+        author_name: 'author_name',
+        change_cmd: {
+          cmd: 'edit_state_property',
+          content_html: htmlWithComponents,
+          content_id: 'content_1',
+          data_format: 'html',
+          language_code: 'en',
+          state_name: 'Introduction',
+          translation_html: htmlWithComponents,
+        },
+        exploration_content_html: '<p>content</p>',
+        language_code: 'en',
+        last_updated_msecs: 1559074000000,
+        status: 'review',
+        suggestion_id: 'suggestion_1',
+        suggestion_type: 'translate_content',
+        target_id: '1',
+        target_type: 'exploration',
+      };
+
+      component.editedContent = {html: htmlWithComponents};
+
+      component.ngOnChanges({
+        editedContent: {
+          currentValue: {html: htmlWithComponents},
+          previousValue: undefined,
+          firstChange: true,
+          isFirstChange: () => true,
+        },
+      });
+
+      expect(component.errorMessage).toBe('');
+      expect(component.errorFound).toBeFalse();
+    });
+
+    it('should keep error when component mismatch exists', () => {
+      component.errorMessage = 'Some error';
+      component.errorFound = true;
+      component.incompleteTranslationErrorIsShown = true;
+
+      component.activeSuggestion = {
+        author_name: 'author_name',
+        change_cmd: {
+          cmd: 'edit_state_property',
+          content_html: htmlWithComponents,
+          content_id: 'content_1',
+          data_format: 'html',
+          language_code: 'en',
+          state_name: 'Introduction',
+          translation_html: htmlWithComponents,
+        },
+        exploration_content_html: '<p>content</p>',
+        language_code: 'en',
+        last_updated_msecs: 1559074000000,
+        status: 'review',
+        suggestion_id: 'suggestion_1',
+        suggestion_type: 'translate_content',
+        target_id: '1',
+        target_type: 'exploration',
+      };
+
+      component.editedContent = {html: htmlWithoutComponents};
+
+      component.ngOnChanges({
+        editedContent: {
+          currentValue: {html: htmlWithoutComponents},
+          previousValue: undefined,
+          firstChange: true,
+          isFirstChange: () => true,
+        },
+      });
+
+      expect(component.errorMessage).toBe('Some error');
+      expect(component.errorFound).toBeTrue();
+    });
+
+    it('should not process when editedContent is null', () => {
+      component.errorMessage = 'Some error';
+      component.errorFound = true;
+      component.editedContent = {html: ''};
+
+      component.activeSuggestion = {
+        author_name: 'author_name',
+        change_cmd: {
+          cmd: 'edit_state_property',
+          content_html: htmlWithComponents,
+          content_id: 'content_1',
+          data_format: 'html',
+          language_code: 'en',
+          state_name: 'Introduction',
+          translation_html: htmlWithComponents,
+        },
+        exploration_content_html: '<p>content</p>',
+        language_code: 'en',
+        last_updated_msecs: 1559074000000,
+        status: 'review',
+        suggestion_id: 'suggestion_1',
+        suggestion_type: 'translate_content',
+        target_id: '1',
+        target_type: 'exploration',
+      };
+
+      component.ngOnChanges({
+        editedContent: {
+          currentValue: null,
+          previousValue: {html: htmlWithComponents},
+          firstChange: false,
+          isFirstChange: () => false,
+        },
+      });
+
+      expect(component.errorMessage).toBe('Some error');
+      expect(component.errorFound).toBeTrue();
+    });
+
+    it('should not update when an image is replaced with a math formula', () => {
+      expect(component.initialSuggestionId).toBeDefined();
+      expect(component.suggestionIdToContribution).toBeDefined();
+
+      component.translationHtml = `
+        <p>Content with components</p>
+        <oppia-noninteractive-image
+          alt-with-value="&amp;quot;Image description&amp;quot;"
+          caption-with-value="&amp;quot;Image caption&amp;quot;"
+          filepath-with-value="&amp;quot;img_20241109_030945_oc195e5356_height_350_width_450.svg&amp;quot;">
+        </oppia-noninteractive-image>
+      `;
+      component.ngOnInit();
+      const updatedHtml = `
+        <p>Content with components</p>
+        <oppia-noninteractive-math
+          math_content-with-value="{\u0026amp;quot;raw_latex\u0026amp;quot;:\u0026amp;quot;\\\\frac{x}{y}\u0026amp;quot;,\u0026amp;quot;svg_filename\u0026amp;quot;:\u0026amp;quot;mathImg_20250126_225215_x5vy0sjj6v_height_3d205_width_1d784_vertical_1d306.svg\u0026amp;quot;}">
+        </oppia-noninteractive-math>
+      `;
+      component.editedContent = {
+        html: updatedHtml,
+      };
+
+      component.updateSuggestion();
+
+      expect(component.errorMessage).toBe(
+        'Please ensure all components (images, math formulas, concept cards, videos) in your translation match the original content.'
+      );
+      expect(component.errorFound).toBeTrue();
+    });
   });
 });

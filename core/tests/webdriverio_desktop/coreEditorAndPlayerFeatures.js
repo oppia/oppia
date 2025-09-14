@@ -593,7 +593,10 @@ describe('Core exploration functionality', function () {
       var closeAddResponseButton = $('.e2e-test-close-add-response-modal');
       await action.click('Close Add Response Button', closeAddResponseButton);
       await action.click('Test interaction button', testInteractionButton);
-      await expect(svgElem).toBeDisplayed();
+      await waitFor.visibilityOf(
+        svgElem,
+        'SVG element takes too long to appear'
+      );
       await action.click('Save Interaction Button', saveInteractionBtn);
     }
   );

@@ -18,7 +18,6 @@
 
 import {Component, Input} from '@angular/core';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import {StateRecordedVoiceoversService} from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {GraphDataService} from 'pages/exploration-editor-page/services/graph-data.service';
 import {RouterService} from 'pages/exploration-editor-page/services/router.service';
@@ -39,7 +38,6 @@ export class StateTranslationStatusGraphComponent {
     private graphDataService: GraphDataService,
     private stateEditorService: StateEditorService,
     private routerService: RouterService,
-    private stateRecordedVoiceoversService: StateRecordedVoiceoversService,
     private translationStatusService: TranslationStatusService
   ) {}
 
@@ -64,10 +62,6 @@ export class StateTranslationStatusGraphComponent {
     let stateData = this.explorationStatesService.getState(stateName);
 
     if (stateName && stateData) {
-      this.stateRecordedVoiceoversService.init(
-        stateName,
-        stateData.recordedVoiceovers
-      );
       this.stateEditorService.onRefreshStateTranslation.emit();
     }
     this.routerService.onCenterGraph.emit();

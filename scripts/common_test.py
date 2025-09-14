@@ -795,7 +795,8 @@ class CommonTests(test_utils.GenericTestBase):
             self.assertEqual(common.get_personal_access_token(), 'token')
 
     def test_get_personal_access_token_with_token_as_none(self) -> None:
-        def mock_getpass(prompt: str) -> None:  # pylint: disable=unused-argument
+        def mock_getpass( # pylint: disable=unused-argument
+            prompt: str) -> None:
             return None
         getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
         with getpass_swap, self.assertRaisesRegex(
@@ -1350,6 +1351,11 @@ class UrlRetrieveTests(CommonTests):
             subprocess, 'Popen', mock_successful_curl_popen)
         self.swap_curl_failure = self.swap(
             subprocess, 'Popen', mock_failing_curl_popen)
+
+    def test_url_open(self) -> None:
+        response = common.url_open('http://www.google.com')
+        self.assertEqual(response.getcode(), 200)
+        self.assertEqual(response.url, 'http://www.google.com')
 
     def test_url_retrieve_tries_curl_at_outset(self) -> None:
         with tempfile.TemporaryDirectory() as tempdir:

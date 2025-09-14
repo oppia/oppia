@@ -19,7 +19,6 @@
 import {ChangeDetectorRef, Component} from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {ThreadMessage} from 'domain/feedback_message/ThreadMessage.model';
-import isEqual from 'lodash/isEqual';
 import {AlertsService} from 'services/alerts.service';
 import {DateTimeFormatService} from 'services/date-time-format.service';
 import {LoaderService} from 'services/loader.service';
@@ -146,10 +145,22 @@ export class ModeratorPageComponent {
   }
 
   isSaveFeaturedActivitiesButtonDisabled(): boolean {
-    return isEqual(
-      this.displayedFeaturedActivityReferences,
-      this.lastSavedFeaturedActivityReferences
-    );
+    // Declare new variable as false so that the button is not disabled
+    // when there are no elements on the Moderator page.
+    var isDisabled: boolean = false;
+    for (let reference of this.displayedFeaturedActivityReferences) {
+      // If the [id] input field is blank, isDiasabled is set as true which will
+      // be returned and disable the Save Featured Activities button.
+      if (reference.id.trim() === '') {
+        isDisabled = true;
+        // When something is typed into the [id] input, isDisabled is set as
+        // false, which is then returned making the Save Featured Activities
+        // button no longer disabled.
+      } else {
+        isDisabled = false;
+      }
+    }
+    return isDisabled;
   }
 
   saveFeaturedActivityReferences(): void {
@@ -164,6 +175,17 @@ export class ModeratorPageComponent {
       .then(() => {
         this.lastSavedFeaturedActivityReferences = activityReferencesToSave;
         this.alertsService.addSuccessMessage('Featured activities saved.');
+      })
+      // Catches 400 error returned from backend and displays the custom
+      // and corresponding error message created in moderator.py.
+      .catch(error => {
+        if (error.status === 400 && error.error) {
+          this.alertsService.addWarning(error.error.error);
+        } else {
+          this.alertsService.addWarning(
+            'An unexpected error occurred. Please try again later.'
+          );
+        }
       });
   }
 

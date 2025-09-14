@@ -29,7 +29,7 @@ import {TransferExplorationOwnershipModalComponent} from './templates/transfer-e
 import {PreviewSummaryTileModalComponent} from './templates/preview-summary-tile-modal.component';
 import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {EditabilityService} from 'services/editability.service';
@@ -59,7 +59,7 @@ import {UserEmailPreferencesService} from '../services/user-email-preferences.se
 import {UserExplorationPermissionsService} from '../services/user-exploration-permissions.service';
 import {ExplorationEditorPageConstants} from '../exploration-editor-page.constants';
 import {AppConstants} from 'app.constants';
-import {ExplorationMetadataObjectFactory} from 'domain/exploration/ExplorationMetadataObjectFactory';
+import {ExplorationMetadata} from 'domain/exploration/exploration-metadata.model';
 import {
   MetadataDiffData,
   VersionHistoryService,
@@ -141,7 +141,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
   constructor(
     private alertsService: AlertsService,
     private changeListService: ChangeListService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     public editabilityService: EditabilityService,
     private editableExplorationBackendApiService: EditableExplorationBackendApiService,
     private explorationAutomaticTextToSpeechService: ExplorationAutomaticTextToSpeechService,
@@ -151,7 +151,6 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     private explorationFeaturesService: ExplorationFeaturesService,
     private explorationInitStateNameService: ExplorationInitStateNameService,
     private explorationLanguageCodeService: ExplorationLanguageCodeService,
-    private explorationMetadataObjectFactory: ExplorationMetadataObjectFactory,
     private explorationObjectiveService: ExplorationObjectiveService,
     private explorationParamChangesService: ExplorationParamChangesService,
     private explorationParamSpecsService: ExplorationParamSpecsService,
@@ -292,7 +291,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
 
           this.stateNames = this.explorationStatesService.getStateNames();
           this.explorationIsLinkedToStory =
-            this.contextService.isExplorationLinkedToStory();
+            this.pageContextService.isExplorationLinkedToStory();
         }
         this.hasPageLoaded = true;
       });
@@ -362,10 +361,9 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
       () => {}
     );
 
-    const explorationMetadata =
-      this.explorationMetadataObjectFactory.createFromBackendDict(
-        explorationData.exploration_metadata
-      );
+    const explorationMetadata = ExplorationMetadata.createFromBackendDict(
+      explorationData.exploration_metadata
+    );
 
     this.versionHistoryService.insertMetadataVersionHistoryData(
       this.versionHistoryService.getLatestVersionOfExploration(),
@@ -376,7 +374,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     if (this.versionHistoryService.getLatestVersionOfExploration() !== null) {
       const metadataVersionHistory =
         await this.versionHistoryBackendApiService.fetchMetadataVersionHistoryAsync(
-          this.contextService.getExplorationId(),
+          this.pageContextService.getExplorationId(),
           this.versionHistoryService.getLatestVersionOfExploration() as number
         );
       if (metadataVersionHistory !== null) {

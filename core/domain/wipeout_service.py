@@ -202,7 +202,8 @@ def pre_delete_user(user_id: str) -> None:
         )
     if feconf.ROLE_ID_MOBILE_LEARNER not in user_settings.roles:
         taskqueue_services.defer(
-            taskqueue_services.FUNCTION_ID_REMOVE_USER_FROM_RIGHTS_MODELS,
+            feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+                'FUNCTION_ID_REMOVE_USER_FROM_RIGHTS_MODELS'],
             taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
             user_id,
         )

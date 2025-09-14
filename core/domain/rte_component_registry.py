@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+import importlib.abc
+import importlib.util
 import inspect
 import os
 import pkgutil
@@ -26,7 +28,7 @@ from core import constants
 from core import feconf
 from core import utils
 
-from typing import Any, Dict, List, Type, TypedDict, Union
+from typing import Any, Dict, List, Type, TypedDict, Union, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -123,11 +125,20 @@ class Registry:
 
         for loader, name, _ in pkgutil.iter_modules(path=rte_path):
             if name == 'components':
-                fetched_module = loader.find_module(name)
+                spec = loader.find_spec(name)
                 # Ruling out the possibility of None for mypy type checking.
-                assert fetched_module is not None
-                module = fetched_module.load_module(name)
+                assert spec is not None
+                module = importlib.util.module_from_spec(spec)
+                # Ruling out the possibility of None for mypy type checking.
+                assert spec.loader is not None
+                # Here we use cast because we are narrowing down the type of
+                # 'spec.loader' from Optional[_Loader] to the more specific
+                # importlib.abc.Loader type.
+                loader_with_exec = cast(importlib.abc.Loader, spec.loader)
+                loader_with_exec.exec_module(module)
                 break
+        else:
+            return {}
 
         component_types_to_component_classes = {}
         component_names = list(cls.get_all_rte_components().keys())

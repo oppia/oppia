@@ -75,6 +75,10 @@ export class QuestionAdmin extends BaseUser {
     await this.clickOn(addContributionRightsSubmitButton);
 
     await this.waitForNetworkIdle();
+    await this.expectElementToBeClickable(
+      addContributionRightsSubmitButton,
+      false
+    );
   }
 
   /**
@@ -89,6 +93,10 @@ export class QuestionAdmin extends BaseUser {
     await this.clickOn(addContributionRightsSubmitButton);
 
     await this.waitForNetworkIdle();
+    await this.expectElementToBeClickable(
+      addContributionRightsSubmitButton,
+      false
+    );
   }
 
   /**
@@ -103,6 +111,10 @@ export class QuestionAdmin extends BaseUser {
     await this.clickOn(removeContributionRightsSubmitButton);
 
     await this.waitForNetworkIdle();
+    await this.expectElementToBeClickable(
+      removeContributionRightsSubmitButton,
+      false
+    );
   }
 
   /**
@@ -117,6 +129,10 @@ export class QuestionAdmin extends BaseUser {
     await this.clickOn(removeContributionRightsSubmitButton);
 
     await this.waitForNetworkIdle();
+    await this.expectElementToBeClickable(
+      removeContributionRightsSubmitButton,
+      false
+    );
   }
 
   /**

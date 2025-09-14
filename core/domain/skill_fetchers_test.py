@@ -44,12 +44,8 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        example_1 = skill_domain.WorkedExample(
-            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
-            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
-        )
         skill_contents = skill_domain.SkillContents(
-            state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [example_1],
+            state_domain.SubtitledHtml('1', '<p>Explanation</p>'),
             state_domain.RecordedVoiceovers.from_dict({
                 'voiceovers_mapping': {
                     '1': {}, '2': {}, '3': {}
@@ -78,16 +74,11 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
             prerequisite_skill_ids=['skill_id_1', 'skill_id_2'])
 
     def test_get_multi_skills(self) -> None:
-        example_1 = skill_domain.WorkedExample(
-            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
-            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
-        )
         self.save_new_skill(
             'skill_a', self.user_id_admin, description='Description A',
             misconceptions=[],
             skill_contents=skill_domain.SkillContents(
                 state_domain.SubtitledHtml('1', '<p>Explanation</p>'),
-                [example_1],
                 state_domain.RecordedVoiceovers.from_dict({
                     'voiceovers_mapping': {
                         '1': {}, '2': {}, '3': {}
@@ -105,7 +96,6 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
             misconceptions=[],
             skill_contents=skill_domain.SkillContents(
                 state_domain.SubtitledHtml('1', '<p>Explanation</p>'),
-                [example_1],
                 state_domain.RecordedVoiceovers.from_dict({
                     'voiceovers_mapping': {
                         '1': {}, '2': {}, '3': {}
@@ -177,10 +167,6 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
         commit_cmd = skill_domain.SkillChange({
             'cmd': skill_domain.CMD_CREATE_NEW
         })
-        example_1 = skill_domain.WorkedExample(
-            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
-            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
-        )
         model = skill_models.SkillModel(
             id='skill_id',
             description='description',
@@ -194,7 +180,6 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
             all_questions_merged=False,
             skill_contents=skill_domain.SkillContents(
                 state_domain.SubtitledHtml('1', '<p>Explanation</p>'),
-                [example_1],
                 state_domain.RecordedVoiceovers.from_dict({
                     'voiceovers_mapping': {
                         '1': {}, '2': {}, '3': {}
@@ -223,10 +208,6 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
         commit_cmd = skill_domain.SkillChange({
             'cmd': skill_domain.CMD_CREATE_NEW
         })
-        example_1 = skill_domain.WorkedExample(
-            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
-            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
-        )
         model = skill_models.SkillModel(
             id='skill_id',
             description='description',
@@ -240,7 +221,6 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
             all_questions_merged=False,
             skill_contents=skill_domain.SkillContents(
                 state_domain.SubtitledHtml('1', '<p>Explanation</p>'),
-                [example_1],
                 state_domain.RecordedVoiceovers.from_dict({
                     'voiceovers_mapping': {
                         '1': {}, '2': {}, '3': {}
@@ -300,10 +280,6 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
         commit_cmd = skill_domain.SkillChange({
             'cmd': skill_domain.CMD_CREATE_NEW
         })
-        example_1 = skill_domain.WorkedExample(
-            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
-            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
-        )
         model = skill_models.SkillModel(
             id='skill_id',
             description='description',
@@ -317,7 +293,6 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
             all_questions_merged=False,
             skill_contents=skill_domain.SkillContents(
                 state_domain.SubtitledHtml('1', '<p>Explanation</p>'),
-                [example_1],
                 state_domain.RecordedVoiceovers.from_dict({
                     'voiceovers_mapping': {
                         '1': {}, '2': {}, '3': {}

@@ -22,7 +22,7 @@ import {AppConstants} from 'app.constants';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {NewlyCreatedTopic} from 'domain/topics_and_skills_dashboard/newly-created-topic.model';
 import {TopicEditorStateService} from 'pages/topic-editor-page/services/topic-editor-state.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 
@@ -46,9 +46,10 @@ export class CreateNewTopicModalComponent extends ConfirmOrCancelModal {
   topicNameExists: boolean = false;
   maxWebTitleFrag = AppConstants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB;
   minWebTitleFrag = AppConstants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB;
+  generatedUrlPrefix = `${this.hostname}/learn/staging`;
 
   constructor(
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private ngbActiveModal: NgbActiveModal,
     private imageLocalStorageService: ImageLocalStorageService,
     private windowRef: WindowRef,
@@ -58,7 +59,7 @@ export class CreateNewTopicModalComponent extends ConfirmOrCancelModal {
   }
 
   ngOnInit(): void {
-    this.contextService.setImageSaveDestinationToLocalStorage();
+    this.pageContextService.setImageSaveDestinationToLocalStorage();
   }
 
   save(): void {
@@ -76,11 +77,15 @@ export class CreateNewTopicModalComponent extends ConfirmOrCancelModal {
     );
   }
 
+  onUrlFragmentChange(urlFragment: string): void {
+    this.newlyCreatedTopic.urlFragment = urlFragment;
+    this.onTopicUrlFragmentChange();
+  }
+
   onTopicUrlFragmentChange(): void {
     if (!this.newlyCreatedTopic.urlFragment) {
       return;
     }
-
     this.topicEditorStateService.updateExistenceOfTopicUrlFragment(
       this.newlyCreatedTopic.urlFragment,
       () => {

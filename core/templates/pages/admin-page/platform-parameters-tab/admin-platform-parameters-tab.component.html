@@ -216,8 +216,8 @@
               [disabled]="!isPlatformParamChanged(platformParameter) || getWarnings(platformParameter).length > 0">
         Save
       </button>
-      <li class="uib-dropdown nav-item icon nav-list-item">
-        <ul class="uib-dropdown-menu oppia-editor-warnings-box dropdown-menu warning-box" *ngIf="warningsAreShown && getWarnings(platformParameter).length > 0">
+      <li ngbDropdown class="dropdown icon nav-list-item">
+        <ul ngbDropdownMenu class="oppia-editor-warnings-box dropdown-menu warning-box" *ngIf="warningsAreShown && getWarnings(platformParameter).length > 0">
           <span class="oppia-editor-warnings-header">Please fix the errors below before saving</span>
           <li class="oppia-editor-warnings-text" *ngFor="let warning of getWarnings(platformParameter); index as index">
             <hr class="oppia-editor-warnings-separator">
@@ -242,7 +242,7 @@
     position: relative;
   }
 
-  .save-button-container .uib-dropdown {
+  .save-button-container .dropdown {
     left: 0;
     opacity: 0;
     position: absolute;
@@ -252,7 +252,7 @@
     z-index: 1;
   }
 
-  .save-button-container:hover .uib-dropdown {
+  .save-button-container:hover .dropdown {
     opacity: 1;
     visibility: visible;
   }

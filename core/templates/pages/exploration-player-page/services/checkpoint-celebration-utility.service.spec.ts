@@ -20,10 +20,10 @@ import {TestBed} from '@angular/core/testing';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 
-import {CheckpointCelebrationUtilityService} from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
-import {ComputeGraphService} from 'services/compute-graph.service';
-import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
-import {StatesObjectFactory} from 'domain/exploration/StatesObjectFactory';
+import {CheckpointCelebrationUtilityService} from './checkpoint-celebration-utility.service';
+import {ComputeGraphService} from '../../../services/compute-graph.service';
+import {StateObjectsBackendDict} from '../../../domain/exploration/states.model';
+import {States} from '../../../domain/exploration/states.model';
 
 class MockTranslateService {
   onLangChange: EventEmitter<string> = new EventEmitter();
@@ -36,13 +36,11 @@ describe('Checkpoint celebration utility service', () => {
   let checkpointCelebrationUtilityService: CheckpointCelebrationUtilityService;
   let translateService: TranslateService;
   let computeGraphService: ComputeGraphService;
-  let statesObjectFactory: StatesObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
         CheckpointCelebrationUtilityService,
-        StatesObjectFactory,
         ComputeGraphService,
         {
           provide: TranslateService,
@@ -59,7 +57,6 @@ describe('Checkpoint celebration utility service', () => {
     );
     translateService = TestBed.inject(TranslateService);
     computeGraphService = TestBed.inject(ComputeGraphService);
-    statesObjectFactory = TestBed.inject(StatesObjectFactory);
   });
 
   it('should get the state list for checkpoint messages', () => {
@@ -69,12 +66,6 @@ describe('Checkpoint celebration utility service', () => {
         content: {
           content_id: 'content',
           html: '',
-        },
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {},
-            default_outcome: {},
-          },
         },
         interaction: {
           answer_groups: [],
@@ -111,12 +102,6 @@ describe('Checkpoint celebration utility service', () => {
           content_id: 'content',
           html: '',
         },
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {},
-            default_outcome: {},
-          },
-        },
         interaction: {
           answer_groups: [],
           confirmed_unclassified_answers: [],
@@ -136,7 +121,7 @@ describe('Checkpoint celebration utility service', () => {
         card_is_checkpoint: false,
       },
     };
-    const states = statesObjectFactory.createFromBackendDict(statesBackendDict);
+    const states = States.createFromBackendDict(statesBackendDict);
     spyOn(computeGraphService, 'computeBfsTraversalOfStates').and.returnValue([
       'First State',
       'End State',

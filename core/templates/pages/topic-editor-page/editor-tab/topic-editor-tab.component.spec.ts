@@ -42,7 +42,7 @@ import {EntityCreationService} from 'pages/topic-editor-page/services/entity-cre
 import {TopicEditorRoutingService} from '../services/topic-editor-routing.service';
 import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
 import {TopicEditorTabComponent} from './topic-editor-tab.component';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {RearrangeSkillsInSubtopicsModalComponent} from '../modal-templates/rearrange-skills-in-subtopics-modal.component';
 import {ChangeSubtopicAssignmentModalComponent} from '../modal-templates/change-subtopic-assignment-modal.component';
 import {SavePendingChangesModalComponent} from 'components/save-pending-changes/save-pending-changes-modal.component';
@@ -50,6 +50,8 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {TopicsAndSkillsDashboardBackendApiService} from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import {CdkDragDrop} from '@angular/cdk/drag-drop';
+import {UrlFragmentEditorComponent} from '../../../components/url-fragment-editor/url-fragment-editor.component';
+import {By} from '@angular/platform-browser';
 
 class MockNgbModal {
   open() {
@@ -59,7 +61,7 @@ class MockNgbModal {
   }
 }
 
-class MockContextService {
+class MockPageContextService {
   getExplorationId() {
     return 'explorationId';
   }
@@ -116,6 +118,7 @@ describe('Topic editor tab directive', () => {
         RearrangeSkillsInSubtopicsModalComponent,
         ChangeSubtopicAssignmentModalComponent,
         SavePendingChangesModalComponent,
+        UrlFragmentEditorComponent,
       ],
       providers: [
         UrlInterpolationService,
@@ -140,8 +143,8 @@ describe('Topic editor tab directive', () => {
           useClass: MockNgbModal,
         },
         {
-          provide: ContextService,
-          useClass: MockContextService,
+          provide: PageContextService,
+          useClass: MockPageContextService,
         },
         {
           provide: ImageUploadHelperService,
@@ -254,7 +257,7 @@ describe('Topic editor tab directive', () => {
     expect(component.maxCharsInTopicName).toEqual(
       AppConstants.MAX_CHARS_IN_TOPIC_NAME
     );
-    expect(component.maxCharsInTopicUrlFragment).toEqual(
+    expect(component.MAX_CHARS_IN_TOPIC_URL_FRAGMENT).toEqual(
       AppConstants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT
     );
     expect(component.maxCharsInTopicDescription).toEqual(
@@ -849,5 +852,36 @@ describe('Topic editor tab directive', () => {
 
     component.removeDiagnosticTestSkillDropdown();
     expect(component.diagnosticTestSkillsDropdownIsShown).toBeFalse();
+  });
+
+  it('should call onChangeTopicEditorUrlFragment when urlFragmentChange event is emitted', () => {
+    spyOn(component, 'onChangeTopicEditorUrlFragment');
+    const childComponent = fixture.debugElement.query(
+      By.directive(UrlFragmentEditorComponent)
+    );
+    const testFragment = 'test-topic-url-fragment';
+    childComponent.triggerEventHandler('urlFragmentChange', testFragment);
+    expect(component.onChangeTopicEditorUrlFragment).toHaveBeenCalledWith(
+      testFragment
+    );
+  });
+
+  it('should call updateTopicUrlFragment when blur event is triggered', () => {
+    spyOn(component, 'updateTopicUrlFragment');
+    const childComponent = fixture.debugElement.query(
+      By.directive(UrlFragmentEditorComponent)
+    );
+    childComponent.triggerEventHandler('blur', {});
+    expect(component.updateTopicUrlFragment).toHaveBeenCalled();
+  });
+
+  it('should update editableTopicUrlFragment and call updateTopicUrlFragment', () => {
+    spyOn(component, 'updateTopicUrlFragment');
+    const newUrlFragment = 'new-topic-url';
+    component.onChangeTopicEditorUrlFragment(newUrlFragment);
+    expect(component.editableTopicUrlFragment).toBe(newUrlFragment);
+    expect(component.updateTopicUrlFragment).toHaveBeenCalledWith(
+      newUrlFragment
+    );
   });
 });

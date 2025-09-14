@@ -20,7 +20,7 @@
              class="e2e-test-tag-filter-selection-input">
     </mat-chip-list>
     <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectTag($event)" class="e2e-test-tag-filter-selection-dropdown">
-      <mat-option *ngFor="let tag of filteredTags | async" [value]="tag" (click)="$event.stopPropagation(); trigger.openPanel()">
+      <mat-option [ngClass]="'e2e-test-select-' + tag" *ngFor="let tag of filteredTags | async" [value]="tag" (click)="$event.stopPropagation(); trigger.openPanel()">
         {{ tag }}
       </mat-option>
     </mat-autocomplete>

@@ -20,8 +20,9 @@ from __future__ import annotations
 
 import functools
 
-from core import feconf
 from core.constants import constants
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 
 from google import auth
 from google.cloud import secretmanager
@@ -45,8 +46,12 @@ def get_secret(name: str) -> Optional[str]:
     Returns:
         str. The value of the secret.
     """
+    oppia_project_id = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.OPPIA_PROJECT_ID.value))
+    assert isinstance(oppia_project_id, str)
     secret_name = (
-        f'projects/{feconf.OPPIA_PROJECT_ID}/secrets/{name}/versions/latest')
+        f'projects/{oppia_project_id}/secrets/{name}/versions/latest')
     try:
         response = CLIENT.access_secret_version(request={'name': secret_name})
     except Exception:

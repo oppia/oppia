@@ -18,7 +18,7 @@
 
 import {Component, OnInit} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 
 @Component({
@@ -36,11 +36,11 @@ export class HelpModalComponent implements OnInit {
   constructor(
     private ngbActiveModal: NgbActiveModal,
     private siteAnalyticsService: SiteAnalyticsService,
-    private contextService: ContextService
+    private pageContextService: PageContextService
   ) {}
 
   ngOnInit(): void {
-    this.explorationId = this.contextService.getExplorationId();
+    this.explorationId = this.pageContextService.getExplorationId();
   }
 
   beginEditorTutorial(): void {

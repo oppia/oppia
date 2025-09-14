@@ -103,6 +103,17 @@ export class PlayerPositionService {
   }
 
   /**
+   * Checks whether the currently displayed card is the last card in the transcript.
+   *
+   * @returns {boolean} `true` if the current card is the last card; otherwise, `false`.
+   */
+  isCurrentCardAtEndOfTranscript(): boolean {
+    return this.playerTranscriptService.isLastCard(
+      this.getDisplayedCardIndex()
+    );
+  }
+
+  /**
    * This function is used to get whether the learner has just
    * submitted an answer.
    * @return {boolean} Whether the learner has just submitted an answer.

@@ -16,8 +16,14 @@
 
 from __future__ import annotations
 
+import datetime
+import uuid
+
 from core import feconf
+from core.domain import rights_domain
+from core.domain import rights_manager
 from core.domain import state_domain
+from core.domain import taskqueue_services
 from core.domain import user_services
 from core.domain import voiceover_domain
 from core.domain import voiceover_services
@@ -395,3 +401,112 @@ class EntityVoiceoversBulkHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             len(json_response['entity_voiceovers_list']), 2)
+
+
+class RegenerateAutomaticVoiceoverHandlerTests(test_utils.GenericTestBase):
+    """Test to regenerate voiceover for the given exploration data."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.VOICEOVER_ADMIN_EMAIL, self.VOICEOVER_ADMIN_USERNAME)
+        self.set_voiceover_admin([self.VOICEOVER_ADMIN_USERNAME])
+        self.voiceover_admin_id = self.get_user_id_from_email(
+            self.VOICEOVER_ADMIN_EMAIL)
+        self.voiceover_admin = user_services.get_user_actions_info(
+            self.voiceover_admin_id)
+
+        self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
+        self.voice_artist_id = self.get_user_id_from_email(
+            self.VOICE_ARTIST_EMAIL)
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
+
+        self.exploration = self.save_new_valid_exploration(
+            'exp_id', self.owner_id, title='Exploration 1')
+        rights_manager.publish_exploration(self.owner, self.exploration.id)
+        rights_manager.assign_role_for_exploration(
+            self.voiceover_admin, self.exploration.id, self.voice_artist_id,
+            rights_domain.ROLE_VOICE_ARTIST)
+
+    def test_should_be_able_to_regenerate_voiceovers(self) -> None:
+        self.login(self.VOICE_ARTIST_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        payload = {
+            'language_accent_code': 'en-US',
+            'state_name': 'Introduction',
+            'content_id': 'content_0',
+            'exploration_version': 1
+        }
+
+        handler_url = '/regenerate_automatic_voiceover/%s' % self.exploration.id
+
+        response_dict = self.put_json(
+            handler_url, payload, csrf_token=csrf_token)
+
+        expected_sentence_tokens_with_durations = [
+            {'token': 'This', 'audio_offset_msecs': 0.0},
+            {'token': 'is', 'audio_offset_msecs': 100.0},
+            {'token': 'a', 'audio_offset_msecs': 200.0},
+            {'token': 'test', 'audio_offset_msecs': 300.0},
+            {'token': 'text', 'audio_offset_msecs': 400.0}
+        ]
+
+        self.assertEqual(
+            response_dict['sentence_tokens_with_durations'],
+            expected_sentence_tokens_with_durations)
+        self.assertTrue(response_dict['filename'].startswith('content_0-en-US'))
+
+        self.logout()
+
+
+class AutomaticVoiceoverRegenerationRecordHandlerTests(
+    test_utils.GenericTestBase
+):
+    """Test to validate automatic voiceover regeneration record handler."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.VOICEOVER_ADMIN_EMAIL, self.VOICEOVER_ADMIN_USERNAME)
+        self.set_voiceover_admin([self.VOICEOVER_ADMIN_USERNAME])
+        self.voiceover_admin_id = self.get_user_id_from_email(
+            self.VOICEOVER_ADMIN_EMAIL)
+
+    def test_get_automatic_voiceover_regeneration_records(self) -> None:
+        self.login(self.VOICEOVER_ADMIN_EMAIL, is_super_admin=True)
+
+        new_model_id = 'random_model_id'
+        project_id = 'dev-project-id'
+        location_id = 'us-central'
+        task_id = uuid.uuid4().hex
+        queue_name = 'voiceover-regeneration'
+
+        task_name = (
+            'projects/%s/locations/%s/queues/%s/tasks/%s' % (
+                project_id, location_id, queue_name, task_id
+            )
+        )
+        function_id = 'delete_exps_from_user_models'
+
+        taskqueue_services.create_new_cloud_task_model(
+            new_model_id, task_name, function_id)
+
+        cloud_task_run = taskqueue_services.get_cloud_task_run_by_model_id(
+            new_model_id)
+        assert cloud_task_run is not None
+        start_date = cloud_task_run.created_on.replace(
+            tzinfo=datetime.timezone.utc).isoformat()
+        end_date = (
+            cloud_task_run.created_on + datetime.timedelta(days=1)
+        ).replace(tzinfo=datetime.timezone.utc).isoformat()
+
+        json_response = self.get_json(
+            '/automatic_voiceover_regeneration_record',
+            params={'start_date': start_date, 'end_date': end_date}
+        )
+        self.assertEqual(
+            json_response['automatic_voiceover_regeneration_records'],
+            [cloud_task_run.to_dict()])
+        self.logout()

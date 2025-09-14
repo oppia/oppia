@@ -9,7 +9,10 @@ body:
 - type: checkboxes
   id: sharing
   attributes:
-    label: I confirm that I set the sharing options of the document to “anyone with the link can comment”.
+    label: I confirm that I have given edit access to the GSoC mentors mailing list.
+    description: >
+        Note: If you're concerned about unwanted changes, you can turn on
+        [edit notifications](https://support.google.com/docs/answer/91588?hl=en&co=GENIE.Platform%3DDesktop).
     options:
         - label: "Yes"
           required: true

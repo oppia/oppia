@@ -25,7 +25,7 @@ import {
 import {
   SubtitledUnicodeBackendDict,
   SubtitledUnicode,
-} from 'domain/exploration/SubtitledUnicodeObjectFactory';
+} from 'domain/exploration/subtitled-unicode.model';
 
 export interface LabeledRegion {
   region: {

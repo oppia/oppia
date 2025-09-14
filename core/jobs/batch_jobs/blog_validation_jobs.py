@@ -162,7 +162,10 @@ class GetModelsWithDuplicatePropertyValues(beam.PTransform):  # type: ignore[mis
             | 'Discard models with empty property value' >> (
                 beam.Filter(lambda model: self.get_property_value(model) != ''))
             | 'Generate (%s, model) key value pairs' % self.property_name >> (
-                beam.WithKeys(self.get_property_value)) # pylint: disable=no-value-for-parameter
+                beam.WithKeys( # pylint: disable=no-value-for-parameter
+                    self.get_property_value
+                )
+            )
             | 'Group pairs by their %s' % self.property_name >> (
                 beam.GroupByKey())
             | 'Discard %s key' % self.property_name >> (

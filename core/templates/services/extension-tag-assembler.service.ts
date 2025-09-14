@@ -25,7 +25,7 @@ import {
   InteractionCustomizationArgs,
   InteractionCustomizationArgsBackendDict,
 } from 'interactions/customization-args-defs';
-import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 
 // Service for assembling extension tags (for interactions).
