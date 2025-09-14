@@ -97,6 +97,7 @@ export class AuthService {
   private authServiceImpl: AuthServiceImpl;
   creds!: firebase.auth.UserCredential;
   private static firebaseConfigDict: FirebaseOptions;
+  private static firebaseConfigPromise: Promise<FirebaseOptions>;
 
   constructor(
     @Optional() private angularFireAuth: AngularFireAuth | null,
@@ -111,21 +112,8 @@ export class AuthService {
     }
   }
 
-  static fetchConfigFromBackend: () => FirebaseOptions = function () {
-    let config: string = '';
-    let request = new XMLHttpRequest();
-    try {
-      request.open('GET', '/firebase_config', false);
-      request.send(null);
-      if (request.status === 200) {
-        let jsonResponse = request.responseText.substr(
-          request.responseText.indexOf(")]}'") + 4
-        );
-        config = jsonResponse;
-      }
-    } catch (e) {
-      console.error('Unable to fetch firebase config : ', e);
-    }
+  static async fetchConfigFromBackend(): Promise<FirebaseOptions> {
+    let config = '';
     const defaultFirebaseConfig = {
       FIREBASE_CONFIG_API_KEY: AppConstants.FIREBASE_CONFIG_API_KEY,
       FIREBASE_CONFIG_AUTH_DOMAIN: AppConstants.FIREBASE_CONFIG_AUTH_DOMAIN,
@@ -136,33 +124,62 @@ export class AuthService {
         AppConstants.FIREBASE_CONFIG_MESSAGING_SENDER_ID,
       FIREBASE_CONFIG_APP_ID: AppConstants.FIREBASE_CONFIG_APP_ID,
     };
+    try {
+      const response = await fetch('/firebase_config');
+      if (response.ok) {
+        let jsonResponse = await response.text();
+        if (jsonResponse.startsWith(")]}'")) {
+          jsonResponse = jsonResponse.substring(4);
+        }
+        config = jsonResponse;
+      }
+    } catch (e) {
+      console.error('Unable to fetch firebase config : ', e);
+      return defaultFirebaseConfig;
+    }
+
     if (config === '') {
       return defaultFirebaseConfig;
     } else {
-      const parsedConfig = JSON.parse(config);
-      if (Object.keys(parsedConfig).length === 0) {
+      try {
+        const parsedConfig = JSON.parse(config);
+        if (Object.keys(parsedConfig).length === 0) {
+          return defaultFirebaseConfig;
+        } else {
+          return parsedConfig;
+        }
+      } catch (e) {
+        console.error('Unable to parse firebase config : ', e);
         return defaultFirebaseConfig;
-      } else {
-        return parsedConfig;
       }
     }
-  };
+  }
 
   static get firebaseEmulatorIsEnabled(): boolean {
     return AppConstants.EMULATOR_MODE;
   }
 
+  static async getFirebaseConfigAsync(): Promise<FirebaseOptions> {
+    if (AuthService.firebaseConfigPromise === undefined) {
+      AuthService.firebaseConfigPromise =
+        AuthService.fetchConfigFromBackend().then(config => {
+          AuthService.firebaseConfigDict = {
+            apiKey: config.FIREBASE_CONFIG_API_KEY,
+            authDomain: config.FIREBASE_CONFIG_AUTH_DOMAIN,
+            projectId: config.FIREBASE_CONFIG_PROJECT_ID,
+            storageBucket: config.FIREBASE_CONFIG_STORAGE_BUCKET,
+            messagingSenderId: config.FIREBASE_CONFIG_MESSAGING_SENDER_ID,
+            appId: config.FIREBASE_CONFIG_APP_ID,
+          };
+          return AuthService.firebaseConfigDict;
+        });
+    }
+    return AuthService.firebaseConfigPromise;
+  }
+
   static get firebaseConfig(): FirebaseOptions {
     if (AuthService.firebaseConfigDict === undefined) {
-      var config = AuthService.fetchConfigFromBackend();
-      AuthService.firebaseConfigDict = {
-        apiKey: config.FIREBASE_CONFIG_API_KEY,
-        authDomain: config.FIREBASE_CONFIG_AUTH_DOMAIN,
-        projectId: config.FIREBASE_CONFIG_PROJECT_ID,
-        storageBucket: config.FIREBASE_CONFIG_STORAGE_BUCKET,
-        messagingSenderId: config.FIREBASE_CONFIG_MESSAGING_SENDER_ID,
-        appId: config.FIREBASE_CONFIG_APP_ID,
-      };
+      throw new Error('Firebase config has not been initialized.');
     }
     return AuthService.firebaseConfigDict;
   }

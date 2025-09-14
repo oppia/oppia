@@ -32,6 +32,7 @@ describe('Auth service', function () {
   let creds: firebase.auth.UserCredential;
   let authBackendApiService: jasmine.SpyObj<AuthBackendApiService>;
   let angularFireAuth: jasmine.SpyObj<AngularFireAuth>;
+  let fetchSpy: jasmine.Spy;
 
   beforeEach(async () => {
     angularFireAuth = jasmine.createSpyObj<AngularFireAuth>([
@@ -63,6 +64,12 @@ describe('Auth service', function () {
       credential: null,
       additionalUserInfo: null,
     };
+
+    fetchSpy = spyOn(window, 'fetch');
+  });
+
+  afterEach(() => {
+    fetchSpy.calls.reset();
   });
 
   it(
@@ -269,17 +276,31 @@ describe('Auth service', function () {
       expect(authBackendApiService.beginSessionAsync).not.toHaveBeenCalled();
     });
 
-    it('should return firebase config', () => {
-      spyOn(AuthService, 'fetchConfigFromBackend').and.returnValue({
+    it('should return firebase config', async () => {
+      const mockConfig = {
         FIREBASE_CONFIG_API_KEY: 'sample-api-key',
         FIREBASE_CONFIG_AUTH_DOMAIN: 'sample-auth-domain',
         FIREBASE_CONFIG_PROJECT_ID: 'sample-project-id',
         FIREBASE_CONFIG_STORAGE_BUCKET: 'sample-storage-bucket',
         FIREBASE_CONFIG_MESSAGING_SENDER_ID: 'sample-sender-id',
         FIREBASE_CONFIG_APP_ID: 'sample-app-id',
-      });
-      const firebaseConfig = AuthService.firebaseConfig;
+      };
+      fetchSpy.and.resolveTo({
+        ok: true,
+        text: () => Promise.resolve(")]}'" + JSON.stringify(mockConfig)),
+      } as Response);
+
+      const firebaseConfig = await AuthService.getFirebaseConfigAsync();
+
       expect(firebaseConfig).toEqual({
+        apiKey: 'sample-api-key',
+        authDomain: 'sample-auth-domain',
+        projectId: 'sample-project-id',
+        storageBucket: 'sample-storage-bucket',
+        messagingSenderId: 'sample-sender-id',
+        appId: 'sample-app-id',
+      });
+      expect(AuthService.firebaseConfig).toEqual({
         apiKey: 'sample-api-key',
         authDomain: 'sample-auth-domain',
         projectId: 'sample-project-id',
@@ -289,37 +310,49 @@ describe('Auth service', function () {
       });
     });
 
-    it('should return the same config if called multiple times', () => {
-      spyOn(AuthService, 'fetchConfigFromBackend').and.returnValue({
+    it('should return the same config if called multiple times', async () => {
+      const mockConfig = {
         FIREBASE_CONFIG_API_KEY: 'sample-api-key',
         FIREBASE_CONFIG_AUTH_DOMAIN: 'sample-auth-domain',
         FIREBASE_CONFIG_PROJECT_ID: 'sample-project-id',
         FIREBASE_CONFIG_STORAGE_BUCKET: 'sample-storage-bucket',
         FIREBASE_CONFIG_MESSAGING_SENDER_ID: 'sample-sender-id',
         FIREBASE_CONFIG_APP_ID: 'sample-app-id',
-      });
-      const firebaseConfig1 = AuthService.firebaseConfig;
-      const firebaseConfig2 = AuthService.firebaseConfig;
+      };
+      fetchSpy.and.resolveTo({
+        ok: true,
+        text: () => Promise.resolve(")]}'" + JSON.stringify(mockConfig)),
+      } as Response);
+
+      const firebaseConfig1 = await AuthService.getFirebaseConfigAsync();
+      const firebaseConfig2 = await AuthService.getFirebaseConfigAsync();
 
       expect(firebaseConfig1).toBe(firebaseConfig2);
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
     });
 
-    it('should call firebase_config API', () => {
-      spyOn(XMLHttpRequest.prototype, 'open').and.callThrough();
-      spyOn(XMLHttpRequest.prototype, 'send');
-      const firebaseConfig = AuthService.fetchConfigFromBackend();
-      expect(firebaseConfig).toEqual({
+    it('should call firebase_config API', async () => {
+      const defaultFirebaseConfig = {
         FIREBASE_CONFIG_API_KEY: 'fake-api-key',
         FIREBASE_CONFIG_AUTH_DOMAIN: '',
         FIREBASE_CONFIG_PROJECT_ID: 'dev-project-id',
         FIREBASE_CONFIG_STORAGE_BUCKET: '',
         FIREBASE_CONFIG_MESSAGING_SENDER_ID: '',
         FIREBASE_CONFIG_APP_ID: '',
-      });
-      expect(XMLHttpRequest.prototype.open).toHaveBeenCalled();
+      };
+      fetchSpy.and.resolveTo({
+        ok: true,
+        text: () =>
+          Promise.resolve(")]}'" + JSON.stringify(defaultFirebaseConfig)),
+      } as Response);
+
+      const firebaseConfig = await AuthService.fetchConfigFromBackend();
+
+      expect(firebaseConfig).toEqual(defaultFirebaseConfig);
+      expect(fetchSpy).toHaveBeenCalledWith('/firebase_config');
     });
 
-    it('should parse config returned from request', () => {
+    it('should parse config returned from request', async () => {
       const mockConfig = {
         FIREBASE_CONFIG_API_KEY: 'test-api-key',
         FIREBASE_CONFIG_AUTH_DOMAIN: 'test-auth-domain',
@@ -328,56 +361,42 @@ describe('Auth service', function () {
         FIREBASE_CONFIG_MESSAGING_SENDER_ID: 'test-sender-id',
         FIREBASE_CONFIG_APP_ID: 'test-app-id',
       };
-      spyOn(XMLHttpRequest.prototype, 'open').and.callThrough();
-      spyOn(XMLHttpRequest.prototype, 'send').and.callFake(function (
-        this: jasmine.SpyObj<XMLHttpRequest>
-      ) {
-        Object.defineProperty(this, 'status', {value: 200});
-        Object.defineProperty(this, 'responseText', {
-          value: ")]}'" + JSON.stringify(mockConfig),
-        });
-        if (this.onload) {
-          this.onload(new ProgressEvent('load'));
-        }
-      });
+      fetchSpy.and.resolveTo({
+        ok: true,
+        text: () => Promise.resolve(")]}'" + JSON.stringify(mockConfig)),
+      } as Response);
 
-      const firebaseConfig = AuthService.fetchConfigFromBackend();
-
-      expect(XMLHttpRequest.prototype.open).toHaveBeenCalledWith(
-        'GET',
-        '/firebase_config',
-        false
-      );
-      expect(firebaseConfig).toEqual({
-        FIREBASE_CONFIG_API_KEY: 'test-api-key',
-        FIREBASE_CONFIG_AUTH_DOMAIN: 'test-auth-domain',
-        FIREBASE_CONFIG_PROJECT_ID: 'test-project-id',
-        FIREBASE_CONFIG_STORAGE_BUCKET: 'test-storage-bucket',
-        FIREBASE_CONFIG_MESSAGING_SENDER_ID: 'test-sender-id',
-        FIREBASE_CONFIG_APP_ID: 'test-app-id',
-      });
+      const firebaseConfig = await AuthService.fetchConfigFromBackend();
+      expect(firebaseConfig).toEqual(mockConfig);
     });
 
-    it('should return default config if request returns empty', () => {
-      spyOn(XMLHttpRequest.prototype, 'open').and.callThrough();
-      spyOn(XMLHttpRequest.prototype, 'send').and.callFake(function (
-        this: jasmine.SpyObj<XMLHttpRequest>
-      ) {
-        Object.defineProperty(this, 'status', {value: 200});
-        Object.defineProperty(this, 'responseText', {
-          value: ")]}'" + JSON.stringify(''),
-        });
-        if (this.onload) {
-          this.onload(new ProgressEvent('load'));
-        }
-      });
+    it('should return default config if request returns empty', async () => {
+      const defaultFirebaseConfig = {
+        FIREBASE_CONFIG_API_KEY: 'fake-api-key',
+        FIREBASE_CONFIG_AUTH_DOMAIN: '',
+        FIREBASE_CONFIG_PROJECT_ID: 'dev-project-id',
+        FIREBASE_CONFIG_STORAGE_BUCKET: '',
+        FIREBASE_CONFIG_MESSAGING_SENDER_ID: '',
+        FIREBASE_CONFIG_APP_ID: '',
+      };
+      fetchSpy.and.resolveTo({
+        ok: true,
+        text: () => Promise.resolve(")]}'" + JSON.stringify('')),
+      } as Response);
 
-      const firebaseConfig = AuthService.fetchConfigFromBackend();
+      const firebaseConfig = await AuthService.fetchConfigFromBackend();
+      expect(firebaseConfig).toEqual(defaultFirebaseConfig);
+    });
 
-      expect(XMLHttpRequest.prototype.open).toHaveBeenCalledWith(
-        'GET',
-        '/firebase_config',
-        false
+    it('should log an error when unable to fetch firebase config', async () => {
+      fetchSpy.and.rejectWith(new Error('Test Error'));
+      const consoleSpy = spyOn(console, 'error');
+
+      const firebaseConfig = await AuthService.fetchConfigFromBackend();
+
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'Unable to fetch firebase config : ',
+        jasmine.any(Error)
       );
       expect(firebaseConfig).toEqual({
         FIREBASE_CONFIG_API_KEY: 'fake-api-key',
@@ -387,19 +406,6 @@ describe('Auth service', function () {
         FIREBASE_CONFIG_MESSAGING_SENDER_ID: '',
         FIREBASE_CONFIG_APP_ID: '',
       });
-    });
-
-    it('should log an error when unable to fetch firebase config', () => {
-      spyOn(XMLHttpRequest.prototype, 'open').and.callThrough();
-      spyOn(XMLHttpRequest.prototype, 'send').and.callFake(() => {
-        throw new Error('Test Error');
-      });
-      const consoleSpy = spyOn(console, 'error');
-      AuthService.fetchConfigFromBackend();
-      expect(consoleSpy).toHaveBeenCalledWith(
-        'Unable to fetch firebase config : ',
-        jasmine.any(Error)
-      );
     });
   });
 });

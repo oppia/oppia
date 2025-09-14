@@ -20,8 +20,8 @@ import 'zone.js';
 
 // Modules.
 import {CommonModule} from '@angular/common';
-import {NgModule} from '@angular/core';
-import {AngularFireModule} from '@angular/fire';
+import {APP_INITIALIZER, NgModule} from '@angular/core';
+import {AngularFireModule, FIREBASE_OPTIONS} from '@angular/fire';
 import {
   AngularFireAuth,
   AngularFireAuthModule,
@@ -230,6 +230,11 @@ import {CheckpointBarComponent} from 'pages/exploration-player-page/new-lesson-p
 import {SaveProgressModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/save-progress-modal.component';
 import {CheckpointCelebrationFooterComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/checkpoint-celebration-footer.component';
 import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/new-ratings-and-recommendations.component';
+
+export function firebaseConfigInitializerFactory() {
+  return () => AuthService.getFirebaseConfigAsync();
+}
+
 @NgModule({
   imports: [
     BackgroundBannerModule,
@@ -255,7 +260,7 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     JoyrideModule.forRoot(),
     RecommendationsModule,
     StringUtilityPipesModule,
-    AngularFireModule.initializeApp(AuthService.firebaseConfig),
+    AngularFireModule,
     AngularFireAuthModule,
     MatProgressSpinnerModule,
     NgbModalModule,
@@ -267,6 +272,16 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
 
   providers: [
     AngularFireAuth,
+    AuthService,
+    {
+      provide: APP_INITIALIZER,
+      useFactory: firebaseConfigInitializerFactory,
+      multi: true,
+    },
+    {
+      provide: FIREBASE_OPTIONS,
+      useFactory: () => AuthService.firebaseConfig,
+    },
     {
       provide: USE_EMULATOR,
       useValue: AuthService.firebaseEmulatorConfig,
