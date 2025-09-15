@@ -339,7 +339,6 @@ const noSkillsPresentMessageSelector = '.e2e-test-no-skills-present-message';
 const expandStoryHeaderSelector =
   '.e2e-test-mobile-stories-collapsible-card-header';
 const addNewStoryButtonSelector = '.e2e-test-create-story-button';
-const questionTabContainerSelector = `.e2e-test-topic-${lowerCaseTabName}-container`;
 
 const ADD_PREREQUISITE_SKILL_BUTTON_LABEL = '+ ADD PREREQUISITE SKILL';
 
@@ -3758,6 +3757,7 @@ export class TopicManager extends BaseUser {
       await this.clickOn(tabSelector);
     }
 
+    const questionTabContainerSelector = `.e2e-test-topic-${lowerCaseTabName}-container`;
     await this.expectElementToBeVisible(questionTabContainerSelector);
   }
 
