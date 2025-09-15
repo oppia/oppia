@@ -2210,8 +2210,28 @@ class Story:
             raise Exception('Expected to_index value to be with-in bounds.')
 
         story_node_to_move = copy.deepcopy(story_content_nodes[from_index])
-        del story_content_nodes[from_index]
+
+        # The initial node is shifted
+        if from_index == 0:
+            right_neighbour = story_content_nodes[1]
+            self.update_initial_node(right_neighbour.id)
+
+        self.delete_node(story_node_to_move.id)
         story_content_nodes.insert(to_index, story_node_to_move)
+
+        if to_index == 0:
+            # Node is moved to the start of the storyline
+            self.update_initial_node(story_node_to_move.id)
+        else:
+            left_neighbour = story_content_nodes[to_index - 1]
+            self.update_node_destination_node_ids(left_neighbour.id, [story_node_to_move.id])
+
+        if to_index == len(story_content_nodes) - 1:
+            # Node is moved to the end of the storyline
+            self.update_node_destination_node_ids(story_node_to_move.id, [])
+        else:
+            right_neighbour = story_content_nodes[to_index + 1]
+            self.update_node_destination_node_ids(story_node_to_move.id, [right_neighbour.id])
 
     def update_node_exploration_id(
         self, node_id: str, new_exploration_id: str
