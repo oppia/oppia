@@ -2387,7 +2387,7 @@ export class TopicManager extends BaseUser {
     await this.page.waitForXPath(
       `//button[contains(text(), '${ADD_PREREQUISITE_SKILL_BUTTON_LABEL}')]`
     );
-    await this.clickOn(ADD_PREREQUISITE_SKILL_BUTTON_LABEL);
+    await this.clickOnElementWithText(ADD_PREREQUISITE_SKILL_BUTTON_LABEL);
     await this.filterAndSelectSkillInSkillSelector(skillName);
   }
 
