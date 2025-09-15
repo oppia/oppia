@@ -1209,3 +1209,66 @@ class OpportunityUpdateOnAcceeptingSuggestionUnitTest(
 
         self.assertFalse(
             'hi' in opportunity.incomplete_translation_language_codes)
+    
+    def test_accepted_suggestion_handles_missing_language_gracefully(
+        self
+    ) -> None:
+        """Test that accepting a suggestion doesn't crash when language is not in list."""
+        # Create a model without 'hi' in the incomplete languages list
+        self.opportunity_model.incomplete_translation_language_codes = ['es', 'fr']
+        self.opportunity_model.put()
+        
+        # This should NOT raise ValueError even though 'hi' is not in the list
+        (
+            opportunity_services
+            .update_translation_opportunity_with_accepted_suggestion(
+                'exp_1', 'hi'
+            )
+        )
+        
+        # Verify the model was still saved
+        updated_model = (
+            opportunity_models.ExplorationOpportunitySummaryModel.get('exp_1')
+        )
+        self.assertIsNotNone(updated_model)
+        # 'hi' should still not be in the list since it wasn't there to remove
+        self.assertNotIn('hi', updated_model.incomplete_translation_language_codes)
+    
+    def test_accepted_suggestion_with_already_removed_language(
+        self
+    ) -> None:
+        """Test accepting suggestion twice for same language doesn't crash."""
+        # First acceptance - should work normally
+        (
+            opportunity_services
+            .update_translation_opportunity_with_accepted_suggestion(
+                'exp_1', 'hi'
+            )
+        )
+        
+        # Verify 'hi' was counted
+        opportunity = (
+            opportunity_services.get_exploration_opportunity_summaries_by_ids(
+                ['exp_1']
+            )
+        )
+        assert opportunity['exp_1'] is not None
+        self.assertEqual(opportunity['exp_1'].translation_counts, {'hi': 1})
+        
+        # Second acceptance - 'hi' might already be removed from incomplete list
+        # This should NOT crash with ValueError
+        (
+            opportunity_services
+            .update_translation_opportunity_with_accepted_suggestion(
+                'exp_1', 'hi'
+            )
+        )
+        
+        # Verify it still worked and count increased
+        opportunity = (
+            opportunity_services.get_exploration_opportunity_summaries_by_ids(
+                ['exp_1']
+            )
+        )
+        assert opportunity['exp_1'] is not None
+        self.assertEqual(opportunity['exp_1'].translation_counts, {'hi': 2})

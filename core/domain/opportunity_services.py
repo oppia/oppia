@@ -20,6 +20,9 @@ from __future__ import annotations
 
 import collections
 import logging
+import logging
+
+from typing import List, Optional
 
 from core import feconf
 
@@ -37,6 +40,8 @@ from core.domain import translation_services
 from core.platform import models
 
 from typing import Dict, List, Optional, Sequence, Tuple
+
+logger = logging.getLogger(__name__)
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -368,25 +373,43 @@ def compute_opportunity_models_with_updated_exploration(
 
 
 def update_translation_opportunity_with_accepted_suggestion(
-    exploration_id: str, language_code: str
-) -> None:
-    """Updates the translation opportunity for the accepted suggestion in the
-    ExplorationOpportunitySummaryModel.
-
+    exp_id: str, language_code: str) -> None:
+    """Updates translation opportunity when a suggestion is accepted.
+    
+    This function removes the language from the translation opportunity's
+    list of incomplete translation languages when a translation is accepted.
+    
     Args:
-        exploration_id: str. The ID of the exploration.
-        language_code: str. The langauge code of the accepted translation
-            suggestion.
+        exp_id: str. The exploration ID.
+        language_code: str. The language code of the accepted translation.
+    
+    Raises:
+        Exception: If the exploration opportunity model doesn't exist.
     """
-    model = opportunity_models.ExplorationOpportunitySummaryModel.get(
-        exploration_id)
-    exp_opportunity_summary = (
-        get_exploration_opportunity_summary_from_model(model))
+    # Get the opportunity model
+    opportunity_model = (
+        opportunity_models.ExplorationOpportunitySummaryModel.get(
+            exp_id, strict=False))
+    
+    if opportunity_model is None:
+        raise Exception(
+            'Exploration opportunity model for exploration %s does not exist.'
+            % exp_id)
 
-    if language_code in exp_opportunity_summary.translation_counts:
-        exp_opportunity_summary.translation_counts[language_code] += 1
+    if language_code in opportunity_model.incomplete_translation_language_codes:
+        opportunity_model.incomplete_translation_language_codes.remove(
+            language_code)
+        logger.info(
+            'Removed language %s from incomplete translations for exp %s',
+            language_code, exp_id)
     else:
-        exp_opportunity_summary.translation_counts[language_code] = 1
+        # Log warning when language is not in the list
+        logger.warning(
+            'Language %s not found in incomplete translations for exp %s. '
+            'Possible causes: language was already removed, or suggestion '
+            'was accepted for a language that was not marked as incomplete.',
+            language_code, exp_id)
+
 
     if (
         exp_opportunity_summary.content_count ==
@@ -400,7 +423,130 @@ def update_translation_opportunity_with_accepted_suggestion(
 
     exp_opportunity_summary.validate()
     _save_multi_exploration_opportunity_summary([exp_opportunity_summary])
+    # Update the model
+    opportunity_model.update_timestamps()
+    opportunity_model.put()
 
+def update_translation_opportunity_with_rejected_suggestion(
+    exp_id: str, language_code: str) -> None:
+    """Updates translation opportunity when a suggestion is rejected.
+    
+    This function adds the language back to the translation opportunity's
+    list of incomplete translation languages when a translation is rejected.
+    
+    Args:
+        exp_id: str. The exploration ID.
+        language_code: str. The language code of the rejected translation.
+    
+    Raises:
+        Exception: If the exploration opportunity model doesn't exist.
+    """
+    # Get the opportunity model
+    opportunity_model = (
+        opportunity_models.ExplorationOpportunitySummaryModel.get(
+            exp_id, strict=False))
+    
+    if opportunity_model is None:
+        raise Exception(
+            'Exploration opportunity model for exploration %s does not exist.'
+            % exp_id)
+    
+    # FIXED: Check if language is already in the list before adding
+    if language_code not in opportunity_model.incomplete_translation_language_codes:
+        opportunity_model.incomplete_translation_language_codes.append(
+            language_code)
+        logger.info(
+            'Added language %s to incomplete translations for exp %s',
+            language_code, exp_id)
+    else:
+        # Log info when language is already in the list
+        logger.info(
+            'Language %s already in incomplete translations for exp %s',
+            language_code, exp_id)
+    
+    # Update the model
+    opportunity_model.update_timestamps()
+    opportunity_model.put()
+def remove_language_from_list_safely(
+    language_list: List[str], language_code: str, context: str = "") -> bool:
+    """Safely removes a language from a list with logging.
+    
+    Args:
+        language_list: List[str]. The list of language codes.
+        language_code: str. The language code to remove.
+        context: str. Optional context for logging.
+    
+    Returns:
+        bool. True if the language was removed, False if it wasn't in the list.
+    """
+    if language_code in language_list:
+        language_list.remove(language_code)
+        if context:
+            logger.info(
+                'Removed language %s from list in context: %s',
+                language_code, context)
+        return True
+    else:
+        if context:
+            logger.warning(
+                'Language %s not found in list in context: %s',
+                language_code, context)
+        return False
+
+def add_language_to_list_safely(
+    language_list: List[str], language_code: str, context: str = "") -> bool:
+    """Safely adds a language to a list with logging.
+    
+    Args:
+        language_list: List[str]. The list of language codes.
+        language_code: str. The language code to add.
+        context: str. Optional context for logging.
+    
+    Returns:
+        bool. True if the language was added, False if it was already in the list.
+    """
+    if language_code not in language_list:
+        language_list.append(language_code)
+        if context:
+            logger.info(
+                'Added language %s to list in context: %s',
+                language_code, context)
+        return True
+    else:
+        if context:
+            logger.info(
+                'Language %s already in list in context: %s',
+                language_code, context)
+        return False
+
+def update_translation_opportunities_bulk(
+    updates: List[tuple], operation: str = 'remove') -> None:
+    """Updates multiple translation opportunities in bulk.
+    
+    Args:
+        updates: List[tuple]. List of (exp_id, language_code) tuples.
+        operation: str. Either 'remove' or 'add'.
+    
+    Raises:
+        ValueError: If operation is not 'remove' or 'add'.
+    """
+    if operation not in ['remove', 'add']:
+        raise ValueError('Operation must be either "remove" or "add"')
+    
+    for exp_id, language_code in updates:
+        try:
+            if operation == 'remove':
+                update_translation_opportunity_with_accepted_suggestion(
+                    exp_id, language_code)
+            else:
+                update_translation_opportunity_with_rejected_suggestion(
+                    exp_id, language_code)
+        except Exception as e:
+            logger.error(
+                'Failed to update opportunity for exp %s, lang %s: %s',
+                exp_id, language_code, str(e))
+            # Continue processing other updates
+            continue
 
 def update_exploration_opportunities_with_story_changes(
     story: story_domain.Story, exp_ids: List[str]
