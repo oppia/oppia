@@ -57,7 +57,7 @@ const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
 class UiConfig {
   'hide_complex_extensions': boolean;
-  'rte_components': string;
+  'rte_component_config_id': string;
   'startupFocusEnabled'?: boolean;
   'language'?: string;
   'languageDirection'?: string;
@@ -258,7 +258,7 @@ export class TranslationModalComponent {
         // properly since contributors will not be able to view and translate
         // complex extensions.
         hide_complex_extensions: false,
-        rte_components: 'ALL_COMPONENTS',
+        rte_component_config_id: 'ALL_COMPONENTS',
         language: this.translationLanguageService.getActiveLanguageCode(),
         languageDirection:
           this.translationLanguageService.getActiveLanguageDirection(),

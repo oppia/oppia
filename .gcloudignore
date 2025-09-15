@@ -24,17 +24,14 @@ docker-compose.yml
 Makefile
 
 # Other folders to ignore.
-/backend_prod_files/webpack_bundles/
-/core/tests/
-/docker/
-/local_compiled_js_for_test/
-/node_modules/
-/scripts/
-/stubs/
-/third_party/python3_libs/
-/third_party/python_libs/
-/typings/
-/webpack_bundles/
+core/tests/
+docker/
+local_compiled_js_for_test/
+node_modules/
+scripts/
+stubs/
+third_party/python_libs/
+typings/
 # Some third_party static scripts are directly imported, namely: jquery,
 # jqueryui, angularjs, jqueryui-touch-punch, MathJax, code-mirror,
 # ui-codemirror, d3js, midi-js, ui-map, guppy, skulpt, math-expressions.

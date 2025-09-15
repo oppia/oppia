@@ -2514,6 +2514,24 @@ class Exploration(translation_domain.BaseTranslatableObject):
             self.edits_allowed
         )
 
+    def find_content_by_content_id(
+        self, content_id: str
+    ) -> Optional[Union[str, List[str]]]:
+        """Traverse all states and return the content for a given content_id.
+
+        Args:
+            content_id: str. The content_id to search for.
+
+        Returns:
+            str|List[str]|None. The content if found, else None.
+        """
+        for state in self.states.values():
+            contents_collection = state.get_translatable_contents_collection()
+            content_map = contents_collection.content_id_to_translatable_content
+            if content_id in content_map:
+                return content_map[content_id].content_value
+        return None
+
     @classmethod
     def _convert_states_v41_dict_to_v42_dict(
         cls, states_dict: Dict[str, state_domain.StateDict]
