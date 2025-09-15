@@ -339,6 +339,7 @@ const noSkillsPresentMessageSelector = '.e2e-test-no-skills-present-message';
 const expandStoryHeaderSelector =
   '.e2e-test-mobile-stories-collapsible-card-header';
 const addNewStoryButtonSelector = '.e2e-test-create-story-button';
+const questionTabContainerSelector = `.e2e-test-topic-${lowerCaseTabName}-container`;
 
 const ADD_PREREQUISITE_SKILL_BUTTON_LABEL = '+ ADD PREREQUISITE SKILL';
 
@@ -3744,9 +3745,20 @@ export class TopicManager extends BaseUser {
   async navigateToTabInTopicEditorPage(
     tabName: 'Preview Tab' | 'Questions Tab'
   ): Promise<void> {
-    const tabSelector = `.e2e-test-topic-${tabName.toLocaleLowerCase().replace(' ', '-')}`;
-    await this.expectElementToBeVisible(tabSelector);
-    await this.clickOn(tabSelector);
+    const lowerCaseTabName = tabName.toLocaleLowerCase().replace(' ', '-');
+    if (this.isViewportAtMobileWidth()) {
+      if (!(await this.isElementVisible(mobileNavbarDropdown))) {
+        await this.clickOn(mobileOptionsSelector);
+      }
+      await this.clickOn(mobileNavbarDropdown);
+      await this.clickOn(`.e2e-test-mobile-${lowerCaseTabName}`);
+    } else {
+      const tabSelector = `.e2e-test-${lowerCaseTabName}-button`;
+      await this.expectElementToBeVisible(tabSelector);
+      await this.clickOn(tabSelector);
+    }
+
+    await this.expectElementToBeVisible(questionTabContainerSelector);
   }
 
   /**

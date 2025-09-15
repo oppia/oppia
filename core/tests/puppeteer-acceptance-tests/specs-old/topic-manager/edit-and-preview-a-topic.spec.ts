@@ -62,7 +62,7 @@ describe('Topic Manager User Journey', function () {
       await topicManager.saveTopicDraft('Mathematics');
 
       if (process.env.MOBILE === 'true') {
-        // TODO(20665): Resolve the issue of inconsistent topic preview navigation between desktop and mobile modes.
+        // TODO(#20665): Resolve the issue of inconsistent topic preview navigation between desktop and mobile modes.
         // Once the issue is resolved, remove the following line to allow the flow to check the preview tab in mobile viewport.
         // Refer to the issue: [https://github.com/oppia/oppia/issues/20665]
         return;
