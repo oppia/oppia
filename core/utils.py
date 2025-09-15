@@ -123,8 +123,9 @@ def open_file(
     Raises:
         FileNotFoundError. The file cannot be found.
     """
-    print('Parent folder')
-    print(os.listdir(os.path.normpath(os.path.join(filename, os.pardir))))
+    # Temporary logging.
+    assert not filename.startswith('/opt/apache/beam-venv'), os.listdir(
+        os.path.normpath(os.path.join(filename, os.pardir)))
 
     # Here we use cast because we are narrowing down the type from IO[Any]
     # to Union[BinaryIO, TextIO].
