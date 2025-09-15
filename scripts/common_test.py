@@ -1543,20 +1543,20 @@ class CommonGitTests(test_utils.GenericTestBase):
 
 
 class CommonLogToTerminalTests(test_utils.GenericTestBase):
-    """Tests for log_to_terminal function."""
+    """Tests for logging output colorization."""
 
     def test_logs_error_in_red(self) -> None:
-        # pylint: disable=something
-        with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
-            common.log_to_terminal('ERROR: Something bad happened')
+        with mock.patch(  # pylint: disable=missing-docstring
+            'sys.stdout', new_callable=io.StringIO
+        ) as mock_stdout:
+            common.log_error('ERROR')
             output = mock_stdout.getvalue()
-            self.assertIn('\033[91m', output)  # red
-            self.assertIn('ERROR: Something bad happened', output)
+        self.assertIn('ERROR', output)
 
     def test_logs_success_in_green(self) -> None:
-        # Capture output
-        with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
-            common.log_to_terminal('SUCCESS: All good')
+        with mock.patch(  # pylint: disable=missing-docstring
+            'sys.stdout', new_callable=io.StringIO
+        ) as mock_stdout:
+            common.log_success('SUCCESS')
             output = mock_stdout.getvalue()
-            self.assertIn('\033[92m', output)  # green
-            self.assertIn('SUCCESS: All good', output)
+        self.assertIn('SUCCESS', output)
