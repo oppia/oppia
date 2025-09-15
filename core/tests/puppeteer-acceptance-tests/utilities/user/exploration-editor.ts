@@ -431,7 +431,7 @@ export enum INTERACTION_TYPES {
   ALGEBRAIC_EXPRESSION = 'Algebric Expression Input',
   CODE_EDITOR = 'Code Editor',
   CONTINUE_BUTTON = 'Continue Button',
-  DRAG_AND_DROP_SORT = 'Drag and Drop Sort',
+  DRAG_AND_DROP_SORT = 'Drag And Drop Sort',
   END_EXPLORATION = 'End Exploration',
   FRACTION_INPUT = 'Fraction Input',
   GRAPH_THEORY = 'Graph Theory',
