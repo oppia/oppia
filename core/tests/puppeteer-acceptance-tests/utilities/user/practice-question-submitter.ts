@@ -468,8 +468,11 @@ export class PracticeQuestionSubmitter extends Contributor {
     await this.page.waitForSelector(textInputField, {visible: true});
     await this.type(textInputField, answer);
 
-    await this.waitForElementToBeClickable(editFeedbackButtonSelector);
-    await this.clickOn(editFeedbackButtonSelector);
+    const editFeedbackSelector = this.isViewportAtMobileWidth()
+      ? editFeedbackButtonMobileSelector
+      : editFeedbackButtonSelector;
+    await this.waitForElementToBeClickable(editFeedbackSelector);
+    await this.clickOn(editFeedbackSelector);
     await this.page.waitForSelector(stateContentInputField, {visible: true});
     await this.type(stateContentInputField, 'Last Card');
     await this.clickOn(correctAnswerInTheGroupSelector);
