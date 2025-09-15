@@ -36,7 +36,6 @@ import urllib.request
 from core import feconf
 from core.constants import constants
 
-from PIL import Image
 import filetype
 import yaml
 from PIL import Image
