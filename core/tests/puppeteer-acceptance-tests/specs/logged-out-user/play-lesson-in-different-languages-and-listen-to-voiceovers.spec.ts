@@ -49,162 +49,162 @@ ConsoleReporter.setConsoleErrorsToIgnore([
 ]);
 
 describe('Exploration Editor', function () {
-  // let explorationEditor: ExplorationEditor;
-  // let curriculumAdmin: CurriculumAdmin;
-  // let releaseCoordinator: ReleaseCoordinator;
+  let explorationEditor: ExplorationEditor;
+  let curriculumAdmin: CurriculumAdmin;
+  let releaseCoordinator: ReleaseCoordinator;
   let loggedOutUser: LoggedOutUser;
-  // let voiceoverAdmin: VoiceoverAdmin;
-  // let explorationId: string | null;
+  let voiceoverAdmin: VoiceoverAdmin;
+  let explorationId: string | null;
 
   beforeAll(async function () {
-    //   curriculumAdmin = await UserFactory.createNewUser(
-    //     'curriculumAdm',
-    //     'curriculumAdmin@example.com',
-    //     [ROLES.CURRICULUM_ADMIN]
-    //   );
+    curriculumAdmin = await UserFactory.createNewUser(
+      'curriculumAdm',
+      'curriculumAdmin@example.com',
+      [ROLES.CURRICULUM_ADMIN]
+    );
 
-    //   explorationEditor = await UserFactory.createNewUser(
-    //     'explorationEditor',
-    //     'exploration_editor@example.com'
-    //   );
+    explorationEditor = await UserFactory.createNewUser(
+      'explorationEditor',
+      'exploration_editor@example.com'
+    );
 
-    //   releaseCoordinator = await UserFactory.createNewUser(
-    //     'releaseCoordinator',
-    //     'release_coordinator@example.com',
-    //     [ROLES.RELEASE_COORDINATOR]
-    //   );
+    releaseCoordinator = await UserFactory.createNewUser(
+      'releaseCoordinator',
+      'release_coordinator@example.com',
+      [ROLES.RELEASE_COORDINATOR]
+    );
 
-    //   voiceoverAdmin = await UserFactory.createNewUser(
-    //     'voiceoverAdm',
-    //     'voiceover_admin@example.com',
-    //     [ROLES.VOICEOVER_ADMIN]
-    //   );
+    voiceoverAdmin = await UserFactory.createNewUser(
+      'voiceoverAdm',
+      'voiceover_admin@example.com',
+      [ROLES.VOICEOVER_ADMIN]
+    );
 
-    //   await voiceoverAdmin.addSupportedLanguageAccentPair('Hindi (India)');
+    await voiceoverAdmin.addSupportedLanguageAccentPair('Hindi (India)');
 
-    //   // Enable the feature flag.
-    //   await releaseCoordinator.enableFeatureFlag(
-    //     'exploration_editor_can_modify_translations'
-    //   );
+    // Enable the feature flag.
+    await releaseCoordinator.enableFeatureFlag(
+      'exploration_editor_can_modify_translations'
+    );
 
-    //   // Navigate to the creator dashboard and create a new exploration.
-    //   await explorationEditor.navigateToCreatorDashboardPage();
-    //   await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
-    //   await explorationEditor.dismissWelcomeModal();
-    //   await explorationEditor.updateCardContent(INTRODUCTION_CARD_CONTENT);
-    //   await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+    // Navigate to the creator dashboard and create a new exploration.
+    await explorationEditor.navigateToCreatorDashboardPage();
+    await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
+    await explorationEditor.dismissWelcomeModal();
+    await explorationEditor.updateCardContent(INTRODUCTION_CARD_CONTENT);
+    await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
 
-    //   // Add the final card.
-    //   await explorationEditor.viewOppiaResponses();
-    //   await explorationEditor.directLearnersToNewCard(CARD_NAME.FINAL_CARD);
-    //   await explorationEditor.saveExplorationDraft();
+    // Add the final card.
+    await explorationEditor.viewOppiaResponses();
+    await explorationEditor.directLearnersToNewCard(CARD_NAME.FINAL_CARD);
+    await explorationEditor.saveExplorationDraft();
 
-    //   await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
-    //   await explorationEditor.updateCardContent(
-    //     'We have practiced negative numbers.'
-    //   );
-    //   await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
+    await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
+    await explorationEditor.updateCardContent(
+      'We have practiced negative numbers.'
+    );
+    await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
 
-    //   // Navigate back to the introduction card and save the draft.
-    //   await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
-    //   await explorationEditor.saveExplorationDraft();
+    // Navigate back to the introduction card and save the draft.
+    await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
+    await explorationEditor.saveExplorationDraft();
 
-    //   explorationId = await explorationEditor.publishExplorationWithMetadata(
-    //     'Test Exploration',
-    //     'This is a test exploration.',
-    //     'Algebra'
-    //   );
-    //   if (!explorationId) {
-    //     throw new Error('Error in publishing exploration successfully.');
-    //   }
+    explorationId = await explorationEditor.publishExplorationWithMetadata(
+      'Test Exploration',
+      'This is a test exploration.',
+      'Algebra'
+    );
+    if (!explorationId) {
+      throw new Error('Error in publishing exploration successfully.');
+    }
 
-    //   await curriculumAdmin.createAndPublishTopic(
-    //     'Algebra I',
-    //     'Negative Numbers',
-    //     'Negative Numbers'
-    //   );
+    await curriculumAdmin.createAndPublishTopic(
+      'Algebra I',
+      'Negative Numbers',
+      'Negative Numbers'
+    );
 
-    //   await curriculumAdmin.createAndPublishClassroom(
-    //     'Math',
-    //     'math',
-    //     'Algebra I'
-    //   );
+    await curriculumAdmin.createAndPublishClassroom(
+      'Math',
+      'math',
+      'Algebra I'
+    );
 
-    //   await curriculumAdmin.createAndPublishStoryWithChapter(
-    //     'Algebra Story',
-    //     'algebra-story',
-    //     'Understanding Negative Numbers',
-    //     explorationId as string,
-    //     'Algebra I'
-    //   );
+    await curriculumAdmin.createAndPublishStoryWithChapter(
+      'Algebra Story',
+      'algebra-story',
+      'Understanding Negative Numbers',
+      explorationId as string,
+      'Algebra I'
+    );
 
-    //   // Setting up translations for the exploration.
-    //   await explorationEditor.page.bringToFront();
-    //   await explorationEditor.reloadPage();
-    //   await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
-    //   await explorationEditor.navigateToTranslationsTab();
-    //   await explorationEditor.dismissTranslationTabWelcomeModal();
-    //   await explorationEditor.editTranslationOfContent(
-    //     'हिन्दी (Hindi)',
-    //     'Content',
-    //     'यह अन्वेषण ऋणात्मक संख्याओं के बारे में आपकी समझ का परीक्षण करेगा।'
-    //   );
+    // Setting up translations for the exploration.
+    await explorationEditor.page.bringToFront();
+    await explorationEditor.reloadPage();
+    await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
+    await explorationEditor.navigateToTranslationsTab();
+    await explorationEditor.dismissTranslationTabWelcomeModal();
+    await explorationEditor.editTranslationOfContent(
+      'हिन्दी (Hindi)',
+      'Content',
+      'यह अन्वेषण ऋणात्मक संख्याओं के बारे में आपकी समझ का परीक्षण करेगा।'
+    );
 
-    //   await explorationEditor.navigateToEditorTab();
-    //   await explorationEditor.reloadPage();
-    //   await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
-    //   await explorationEditor.navigateToTranslationsTab();
-    //   await explorationEditor.editTranslationOfContent(
-    //     'हिन्दी (Hindi)',
-    //     'Interaction',
-    //     'जारी रखना'
-    //   );
+    await explorationEditor.navigateToEditorTab();
+    await explorationEditor.reloadPage();
+    await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
+    await explorationEditor.navigateToTranslationsTab();
+    await explorationEditor.editTranslationOfContent(
+      'हिन्दी (Hindi)',
+      'Interaction',
+      'जारी रखना'
+    );
 
-    //   await explorationEditor.navigateToEditorTab();
-    //   await explorationEditor.reloadPage();
-    //   await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
-    //   await explorationEditor.navigateToTranslationsTab();
-    //   await explorationEditor.editTranslationOfContent(
-    //     'हिन्दी (Hindi)',
-    //     'Content',
-    //     'हमने ऋणात्मक संख्याओं का अभ्यास किया है।'
-    //   );
+    await explorationEditor.navigateToEditorTab();
+    await explorationEditor.reloadPage();
+    await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
+    await explorationEditor.navigateToTranslationsTab();
+    await explorationEditor.editTranslationOfContent(
+      'हिन्दी (Hindi)',
+      'Content',
+      'हमने ऋणात्मक संख्याओं का अभ्यास किया है।'
+    );
 
-    //   // Adding voiceovers to the exploration.
-    //   await explorationEditor.navigateToEditorTab();
-    //   await explorationEditor.reloadPage();
-    //   await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
-    //   await explorationEditor.navigateToTranslationsTab();
-    //   await explorationEditor.addVoiceoverToContent(
-    //     'हिन्दी (Hindi)',
-    //     'Hindi (India)',
-    //     'Content',
-    //     INTRO_CONTENT_VOICEOVER_IN_HI
-    //   );
+    // Adding voiceovers to the exploration.
+    await explorationEditor.navigateToEditorTab();
+    await explorationEditor.reloadPage();
+    await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
+    await explorationEditor.navigateToTranslationsTab();
+    await explorationEditor.addVoiceoverToContent(
+      'हिन्दी (Hindi)',
+      'Hindi (India)',
+      'Content',
+      INTRO_CONTENT_VOICEOVER_IN_HI
+    );
 
-    //   await explorationEditor.navigateToEditorTab();
-    //   await explorationEditor.reloadPage();
-    //   await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
-    //   await explorationEditor.navigateToTranslationsTab();
-    //   await explorationEditor.addVoiceoverToContent(
-    //     'हिन्दी (Hindi)',
-    //     'Hindi (India)',
-    //     'Interaction',
-    //     CONTINUE_INTERACTION_VOICEOVER_IN_HI
-    //   );
+    await explorationEditor.navigateToEditorTab();
+    await explorationEditor.reloadPage();
+    await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
+    await explorationEditor.navigateToTranslationsTab();
+    await explorationEditor.addVoiceoverToContent(
+      'हिन्दी (Hindi)',
+      'Hindi (India)',
+      'Interaction',
+      CONTINUE_INTERACTION_VOICEOVER_IN_HI
+    );
 
-    //   await explorationEditor.navigateToEditorTab();
-    //   await explorationEditor.reloadPage();
-    //   await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
-    //   await explorationEditor.navigateToTranslationsTab();
-    //   await explorationEditor.addVoiceoverToContent(
-    //     'हिन्दी (Hindi)',
-    //     'Hindi (India)',
-    //     'Content',
-    //     LAST_CARD_VOICEOVER_IN_HI
-    //   );
+    await explorationEditor.navigateToEditorTab();
+    await explorationEditor.reloadPage();
+    await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
+    await explorationEditor.navigateToTranslationsTab();
+    await explorationEditor.addVoiceoverToContent(
+      'हिन्दी (Hindi)',
+      'Hindi (India)',
+      'Content',
+      LAST_CARD_VOICEOVER_IN_HI
+    );
 
-    //   await explorationEditor.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraft();
 
     loggedOutUser = await UserFactory.createLoggedOutUser();
 
@@ -243,6 +243,6 @@ describe('Exploration Editor', function () {
   );
 
   afterAll(async function () {
-    // await UserFactory.closeAllBrowsers();
+    await UserFactory.closeAllBrowsers();
   }, 450000);
 });

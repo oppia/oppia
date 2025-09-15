@@ -118,7 +118,10 @@ describe('Translation Submitter', function () {
   it('should be able to navigate to contribution page', async function () {
     // Navigate to the contributor dashboard.
     await translationSubmitter.navigateToContributorDashboardUsingProfileDropdown();
-    await translationSubmitter.expectUsernameToBe('translator');
+    // Username is only visible in desktop view.
+    if (!translationSubmitter.isViewportAtMobileWidth()) {
+      await translationSubmitter.expectUsernameToBe('translator');
+    }
     await translationSubmitter.expectScreenshotToMatch(
       'contributorDashboard',
       __dirname

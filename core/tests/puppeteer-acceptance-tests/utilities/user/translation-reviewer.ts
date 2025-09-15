@@ -65,6 +65,7 @@ const acceptTranslationButtonSelector = '.e2e-test-translation-accept-button';
 const rejectTranslationButtonSelector = '.e2e-test-translation-reject-button';
 const reviewContentContainerSelector = '.e2e-test-review-content-container';
 const translatedContentContainerSelector = '.e2e-test-translated-content';
+const reviewModalContainerSelector = '.e2e-test-translation-review-modal';
 
 export class TranslationReviewer extends BaseUser {
   /**
@@ -75,7 +76,7 @@ export class TranslationReviewer extends BaseUser {
   async clickOnTranslateButtonInTranslateTextTabInTranslationReview(
     chapterName: string,
     storyName: string
-  ) {
+  ): Promise<void> {
     const initbackToLessonButtonVisible = await this.isElementVisible(
       backToLessonButtonSelector
     );
@@ -254,6 +255,14 @@ export class TranslationReviewer extends BaseUser {
       rejectTranslationButtonSelector,
       false
     );
+  }
+
+  /**
+   * Checks if the review modal is present or not.
+   * @param {boolean} present - Whether the modal should be present.
+   */
+  async expectReviewModalToBePresent(present: boolean = true): Promise<void> {
+    await this.expectElementToBeVisible(reviewModalContainerSelector, present);
   }
 }
 

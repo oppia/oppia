@@ -195,6 +195,7 @@ describe('Translation Reviewer', function () {
       'reject',
       'Some lines are not translated properly'
     );
+    await translationReviewer.expectReviewModalToBePresent(false);
   });
 
   it('should be able to check contribution stats', async function () {

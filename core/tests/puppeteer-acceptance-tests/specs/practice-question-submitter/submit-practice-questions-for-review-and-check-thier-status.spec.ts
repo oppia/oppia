@@ -123,7 +123,6 @@ describe('Practice Question Submitter', function () {
     // Go to the contribution dashboard.
     await questionSubmitter.navigateToContributorDashboardUsingProfileDropdown();
 
-    // TODO: Contribution opportunities are not visible on the first page.
     await questionSubmitter.expectScreenshotToMatch(
       'emptyPracticeQuestionOpportunities',
       __dirname
