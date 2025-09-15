@@ -175,6 +175,7 @@ export class PracticeQuestionSubmitter extends Contributor {
     );
     // TODO(#23370): Currently, the difficulty selector is not visible.
     // Uncomment the following line when the issue is fixed.
+    // const skillDifficultySelector = `.e2e-test-skill-difficulty-${difficulty.toLocaleLowerCase()}`;
     // await this.clickOn(skillDifficultySelector);
     await this.clickOn(confirmSkillDificultyButton);
 
