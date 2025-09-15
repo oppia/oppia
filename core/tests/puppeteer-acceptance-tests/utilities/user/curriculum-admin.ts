@@ -1043,7 +1043,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(assignSubtopicButton, {
       visible: true,
     });
-    await this.clickOn('Assign to Subtopic');
+    await this.clickOnElementWithText('Assign to Subtopic');
 
     await this.page.waitForSelector(subtopicNameSelector, {visible: true});
     await this.page.evaluate(
