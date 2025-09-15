@@ -96,11 +96,6 @@ describe('Translation Submitter', function () {
     const explorationIds =
       await curriculumAdm.createAndPublishExplorationsWithCards(10);
 
-    await curriculumAdm.createAndPublishTopic(
-      'States of Matter',
-      'Properties of Solids',
-      'Classifying States of Matter'
-    );
     await curriculumAdm.createTopic('States of Matter', 'states-of-matter');
 
     await curriculumAdm.createAndPublishStoryWithChapter(
@@ -277,6 +272,7 @@ describe('Translation Submitter', function () {
       'input',
       'संक्षिप्त होने वाला ब्लॉक खोल लिया है।'
     );
+    await translationSubmitter.selectSkillInConceptCard('Math');
     await translationSubmitter.clickOnSaveButtonInCustomizeRTEModal();
     await translationSubmitter.page.keyboard.press('Enter');
   });

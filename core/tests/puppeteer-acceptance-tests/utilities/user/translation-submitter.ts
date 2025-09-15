@@ -24,6 +24,7 @@ import {showMessage} from '../common/show-message';
 
 // Common Selectors.
 const activeTabSelector = '.e2e-test-active-tab';
+const selectedSkillSelector = '.e2e-test-rte-skill-selected';
 
 // Contributor Dashboard Selectors.
 const contributionTabSelector = '.e2e-test-contribution-tab';
@@ -496,6 +497,19 @@ export class TranslationSubmitter extends BaseUser {
     await this.expectTextContentToBe(
       currentProgressSelector,
       `(${expectedProgress}%)`
+    );
+  }
+
+  /**
+   * Fills the concept card modal and saves.
+   * @param {string} skill - The skill to fill the concept card modal with.
+   */
+  async selectSkillInConceptCard(skill: string): Promise<void> {
+    await this.type(skillNameInput, skill);
+    await this.clickOn(skillItemInRTESelector);
+    await this.expectTextContentToContain(
+      `${selectedSkillSelector} label`,
+      skill
     );
   }
 }
