@@ -1547,14 +1547,15 @@ class CommonLogToTerminalTests(test_utils.GenericTestBase):
 
     def test_logs_error_in_red(self) -> None:
         with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
-            common.log_to_terminal("ERROR: Something bad happened")
+            common.log_to_terminal('ERROR: Something bad happened')
             output = mock_stdout.getvalue()
             self.assertIn('\033[91m', output)  # red
-            self.assertIn("ERROR: Something bad happened", output)
+            self.assertIn('ERROR: Something bad happened', output)
 
     def test_logs_success_in_green(self) -> None:
+        # Capture output
         with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
-            common.log_to_terminal("SUCCESS: All good")
+            common.log_to_terminal('SUCCESS: All good')
             output = mock_stdout.getvalue()
             self.assertIn('\033[92m', output)  # green
-            self.assertIn("SUCCESS: All good", output)
+            self.assertIn('SUCCESS: All good', output)
