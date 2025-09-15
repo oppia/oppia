@@ -143,11 +143,6 @@ def get_file_spec(file_path: str) -> str | None:
         if os.path.exists(spec_file_path):
             return spec_file_path
 
-        spec_file_path = file_path.replace('.ts').replace(
-            '.js', 'Spec.js')
-        if os.path.exists(spec_file_path):
-            return spec_file_path
-
     return None
 
 
