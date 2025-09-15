@@ -81,7 +81,7 @@ const textInputInteractionOption =
 const textInputField = '.e2e-test-text-input';
 
 const saveDraftButton = 'button.e2e-test-save-draft-button';
-const commitMessage = 'textarea.e2e-test-commit-message-input';
+const commitMessageSelector = 'textarea.e2e-test-commit-message-input';
 const publishExplorationButtonSelector = 'button.e2e-test-publish-exploration';
 const explorationTitleInput = 'input.e2e-test-exploration-title-input-modal';
 const explorationGoalInput = 'input.e2e-test-exploration-objective-input-modal';
@@ -2788,7 +2788,6 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} content - The content to be added to the card.
    */
   async updateCardContent(content: string): Promise<void> {
-    await this.waitForPageToFullyLoad();
     await this.page.waitForSelector(stateEditSelector, {
       visible: true,
     });
@@ -2854,14 +2853,11 @@ export class ExplorationEditor extends BaseUser {
     interactionToAdd: string,
     skipInteractionCustoization: boolean = true
   ): Promise<void> {
-    await this.waitForPageToFullyLoad();
     await this.page.waitForSelector(addInteractionButton, {
       visible: true,
     });
 
     await this.clickOn(addInteractionButton);
-
-    await this.waitForPageToFullyLoad();
 
     // Check if modal title is correct.
     await this.expectModalTitleToBe('Choose Interaction');
@@ -2882,13 +2878,7 @@ export class ExplorationEditor extends BaseUser {
       interactionToAdd as INTERACTION_TYPES
     );
 
-    const selector =
-      INTERACTION_SELECTORS[interactionToAdd] ?? ` ${interactionToAdd} `;
-    if (INTERACTION_SELECTORS[interactionToAdd]) {
-      await this.page.waitForSelector(selector);
-    }
-    await this.waitForNetworkIdle();
-    await this.clickOn(selector);
+    await this.clickOnElementWithText(interactionToAdd);
     if (skipInteractionCustoization) {
       await this.expectCustomizeInteractionTitleToBe(
         `Customize Interaction (${interactionToAdd})`
@@ -3483,8 +3473,11 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Function to save an exploration draft.
+   * @param commitMessage - The commit message text to be saved.
    */
-  async saveExplorationDraft(): Promise<void> {
+  async saveExplorationDraft(
+    commitMessage: string = 'Testing Testing'
+  ): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       const element = await this.page.$(mobileNavbarOptions);
       // If the element is not present, it means the mobile navigation bar is not expanded.
@@ -3508,8 +3501,10 @@ export class ExplorationEditor extends BaseUser {
       });
       await this.clickOn(saveChangesButton);
     }
-    await this.clickOn(commitMessage);
-    await this.type(commitMessage, 'Testing Testing');
+    if (commitMessage) {
+      await this.clickOn(commitMessageSelector);
+      await this.type(commitMessageSelector, commitMessage);
+    }
     await this.clickOn(saveDraftButton);
     await this.page.waitForSelector(saveDraftButton, {hidden: true});
 
@@ -4705,7 +4700,7 @@ export class ExplorationEditor extends BaseUser {
         await this.createAndPublishAMinimalExplorationWithTitle(
           explorationTitle,
           'Algebra',
-          i === 0 // Wait for welcome modal only on first exploration.
+          false
         );
       explorationIds.push(explorationId);
     }
@@ -6177,8 +6172,8 @@ export class ExplorationEditor extends BaseUser {
   }
 
   async fillDescriptionInSaveDraftModal(description: string): Promise<void> {
-    await this.expectElementToBeVisible(commitMessage);
-    await this.type(commitMessage, description);
+    await this.expectElementToBeVisible(commitMessageSelector);
+    await this.type(commitMessageSelector, description);
 
     await this.page.waitForFunction(
       (selector: string, value: string) => {
@@ -6186,7 +6181,7 @@ export class ExplorationEditor extends BaseUser {
         return (element as HTMLTextAreaElement)?.value?.trim() === value.trim();
       },
       {},
-      commitMessage,
+      commitMessageSelector,
       description
     );
   }
