@@ -183,7 +183,7 @@ describe('Practice Question Reviewer', function () {
 
   it('should be able to check badges earned', async function () {
     await questionReviewer.navigateToTabInMyContributions('Badges');
-    await questionSubmitter.selectBadgeTypeInMobileView('Question');
+    await questionReviewer.selectBadgeTypeInMobileView('Question');
     await questionReviewer.expectBadgesToContain('1', 'Review');
     await questionReviewer.expectBadgesToContain('1', 'Correction');
   });

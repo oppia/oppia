@@ -477,7 +477,10 @@ describe('Practice Question Submitter', function () {
       'Addition',
       'Awaiting review'
     );
-    await questionSubmitter.viewQuestionSuggestion('What is 10km + 11km?');
+    await questionSubmitter.viewSubmittedQuestion(
+      'What is 10km + 11km?',
+      'Addition'
+    );
     await questionSubmitter.expectScreenshotToMatch(
       'questionContributionPreviewModal',
       __dirname
