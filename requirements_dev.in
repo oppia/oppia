@@ -8,7 +8,7 @@ coverage==7.10.6
 esprima==4.0.1
 filetype==1.2.0
 isort==5.13.2
-mypy==0.812
+mypy==1.0.1
 Pillow==10.1.0
 psutil==7.0.0
 pycodestyle==2.14.0
