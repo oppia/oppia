@@ -1777,6 +1777,30 @@ class Story:
         return story_contents_dict
 
     @classmethod
+    def _convert_story_contents_v5_dict_to_v6_dict(
+        cls,
+        story_contents_dict: StoryContentsDict
+    ) -> StoryContentsDict:
+        """Converts v5 Story Contents schema to the modern v6 schema.
+        v6 schema fixes story node's destination_node and relinks disconnected nodes.
+
+        Args:
+            story_id: str. The unique ID of the story.
+            story_contents_dict: dict. A dict used to initialize a Story
+                Contents domain object.
+
+        Returns:
+            dict. The converted story_contents_dict.
+        """
+        previous_node_id = None
+        for node in story_contents_dict['nodes']:
+            if previous_node_id:
+                node['destination_node_ids'] = [previous_node_id]
+            previous_node_id = node['id']
+
+        return story_contents_dict
+
+    @classmethod
     def update_story_contents_from_model(
         cls,
         versioned_story_contents: VersionedStoryContentsDict,
