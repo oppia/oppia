@@ -20,22 +20,18 @@ from __future__ import annotations
 
 import logging
 
-from core.domain import opportunity_services
-from core.domain import state_domain
+from core.domain import opportunity_services, state_domain
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-
 from typing import Iterable, Optional
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import datastore_services
-    from mypy_imports import exp_models
-    from mypy_imports import voiceover_models
+    from mypy_imports import datastore_services, exp_models, voiceover_models
 
 datastore_services = models.Registry.import_datastore_services()
 

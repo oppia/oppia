@@ -29,6 +29,8 @@ FILES_WITHOUT_ASSOCIATED_TEST_FILES = [
     # These are data files for testing and have no logic to be tested.
     'scripts/linters/test_files/invalid_annotations.py',
     'scripts/linters/test_files/invalid_author.py',
+    'scripts/linters/test_files/invalid_black_pragma_fmt_off.py',
+    'scripts/linters/test_files/invalid_black_pragma_fmt_skip.py',
     'scripts/linters/test_files/invalid_copyright.py',
     'scripts/linters/test_files/invalid_docstring.py',
     'scripts/linters/test_files/invalid_import_order.py',

@@ -20,19 +20,18 @@ from __future__ import annotations
 
 import datetime
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
 from core.platform import models
 from core.tests import test_utils
+
 from typing import Dict, Final, List, Mapping
 
 MYPY = False
 if MYPY: # pragma: no cover
     # Here, change domain is imported only for type checking.
-    from core.domain import change_domain  # pylint: disable=invalid-import # isort:skip
-    from mypy_imports import base_models
-    from mypy_imports import suggestion_models
+    from core.domain import change_domain  # pylint: disable=invalid-import
+    from mypy_imports import base_models, suggestion_models
 
 (base_models, suggestion_models, user_models) = models.Registry.import_models([
     models.Names.BASE_MODEL, models.Names.SUGGESTION, models.Names.USER

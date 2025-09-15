@@ -57,21 +57,22 @@ import logging
 
 from core import feconf
 from core.constants import constants
-from core.domain import auth_domain
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_services
+from core.domain import (
+    auth_domain,
+    platform_parameter_list,
+    platform_parameter_services,
+)
 from core.platform import models
 
 import firebase_admin
+import webapp2
 from firebase_admin import auth as firebase_auth
 from firebase_admin import exceptions as firebase_exceptions
 from typing import List, Optional
-import webapp2
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import auth_models
-    from mypy_imports import datastore_services
+    from mypy_imports import auth_models, datastore_services
 
 auth_models, user_models = (
     models.Registry.import_models([models.Names.AUTH, models.Names.USER]))

@@ -18,16 +18,16 @@
 
 from __future__ import annotations
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import change_domain
-from core.domain import state_domain
-from core.domain import translation_domain
+from core.domain import (  # pylint: disable=invalid-import-from
+    change_domain,
+    html_validation_service,
+    state_domain,
+    translation_domain,
+)
 
 from typing import Callable, Final, List, Literal, Optional, TypedDict, Union
-
-from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.

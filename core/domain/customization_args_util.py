@@ -18,8 +18,7 @@
 
 from __future__ import annotations
 
-from core import schema_utils
-from core import utils
+from core import schema_utils, utils
 from core.domain import state_domain
 from extensions import domain
 
