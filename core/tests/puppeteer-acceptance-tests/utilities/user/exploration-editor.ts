@@ -5244,6 +5244,10 @@ export class ExplorationEditor extends BaseUser {
         continue;
       }
 
+      // Ensure that elements have stopped animating before we start dragging.
+      await this.waitForElementToStabilize(sourceElement);
+      await this.waitForElementToStabilize(destinationElement);
+
       const sourceBox = await sourceElement.boundingBox();
       const destBox = await destinationElement.boundingBox();
 
