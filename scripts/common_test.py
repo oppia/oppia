@@ -34,6 +34,7 @@ import sys
 import tempfile
 import time
 from urllib import request as urlrequest
+from unittest import mock
 
 from core import feconf
 from core import utils
@@ -1539,3 +1540,21 @@ class CommonGitTests(test_utils.GenericTestBase):
                 'ERROR: There is no existing remote alias for the invalid repo.'
             ):
                 common.get_remote_alias(['invalid'])
+
+
+class CommonLogToTerminalTests(test_utils.GenericTestBase):
+    """Tests for log_to_terminal function."""
+
+    def test_logs_error_in_red(self) -> None:
+        with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+            common.log_to_terminal("ERROR: Something bad happened")
+            output = mock_stdout.getvalue()
+            self.assertIn('\033[91m', output)  # red
+            self.assertIn("ERROR: Something bad happened", output)
+
+    def test_logs_success_in_green(self) -> None:
+        with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+            common.log_to_terminal("SUCCESS: All good")
+            output = mock_stdout.getvalue()
+            self.assertIn('\033[92m', output)  # green
+            self.assertIn("SUCCESS: All good", output)
