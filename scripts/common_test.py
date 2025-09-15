@@ -37,13 +37,13 @@ import unittest
 from unittest import mock
 from urllib import request as urlrequest
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.tests import test_utils
 from scripts import servers
 
-from typing import Generator, List, Literal, NoReturn, Tuple, cast
+
 import yaml
+from typing import Generator, List, Literal, NoReturn, Tuple, cast
 
 from . import common
 

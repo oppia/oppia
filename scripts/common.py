@@ -20,7 +20,6 @@ import contextlib
 import enum
 import errno
 import getpass
-from http import client
 import io
 import os
 import platform
@@ -31,6 +30,7 @@ import ssl
 import subprocess
 import sys
 import time
+from http import client
 from urllib import error as urlerror
 from urllib import request as urlrequest
 
