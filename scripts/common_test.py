@@ -33,8 +33,8 @@ import subprocess
 import sys
 import tempfile
 import time
-from urllib import request as urlrequest
 from unittest import mock
+from urllib import request as urlrequest
 
 from core import feconf
 from core import utils
@@ -1546,6 +1546,7 @@ class CommonLogToTerminalTests(test_utils.GenericTestBase):
     """Tests for log_to_terminal function."""
 
     def test_logs_error_in_red(self) -> None:
+        # pylint: disable=something
         with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
             common.log_to_terminal('ERROR: Something bad happened')
             output = mock_stdout.getvalue()
