@@ -139,6 +139,6 @@ describe('Topic Manager', function () {
   }, 600000);
 
   afterAll(async function () {
-    // await UserFactory.closeAllBrowsers();
+    await UserFactory.closeAllBrowsers();
   });
 });
