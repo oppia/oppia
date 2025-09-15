@@ -700,6 +700,7 @@ export class CurriculumAdmin extends BaseUser {
       }
     }, interactionNameDiv);
 
+    await this.waitForElementToStabilize(saveInteractionButton);
     await this.clickOn(saveInteractionButton);
     await this.page.waitForSelector('oppia-add-answer-group-modal-component', {
       visible: true,
