@@ -45,9 +45,9 @@ DATA_TYPE_TO_SCHEMA_TYPE: Dict[str, str] = {
 #
 # Note that os.path.abspath(__file__) provides the path of the current
 # platform_parameter_services.py module.
-PACKAGE_JSON_FILE_PATH: Final = os.path.join(
+PACKAGE_JSON_FILE_PATH: Final = os.path.normpath(os.path.join(
     os.path.dirname(os.path.abspath(__file__)),
-    os.pardir, os.pardir, 'package.json')
+    os.pardir, os.pardir, 'package.json'))
 
 
 class PlatformParameterNotFoundException(Exception):
