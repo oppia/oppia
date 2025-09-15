@@ -4401,6 +4401,34 @@ title: Title
                 '<p>state content html</p>'
             ])
 
+    def test_find_content_by_content_id_returns_main_content(self) -> None:
+        exploration = exp_domain.Exploration.create_default_exploration(
+          'exp_id')
+        init_state = exploration.states[exploration.init_state_name]
+        content_id = init_state.content.content_id
+        content_value = init_state.content.html
+
+        found_content = exploration.find_content_by_content_id(content_id)
+        self.assertEqual(found_content, content_value)
+
+    def test_find_content_by_content_id_returns_hint_content(self) -> None:
+        exploration = exp_domain.Exploration.create_default_exploration(
+          'exp_id')
+        init_state = exploration.states[exploration.init_state_name]
+        hint = state_domain.Hint(
+          state_domain.SubtitledHtml('hint_1', '<p>hint one</p>'))
+        init_state.update_interaction_hints([hint])
+
+        found_content = exploration.find_content_by_content_id('hint_1')
+        self.assertEqual(found_content, '<p>hint one</p>')
+
+    def test_find_content_by_content_id_returns_none_for_missing(self) -> None:
+        exploration = exp_domain.Exploration.create_default_exploration(
+          'exp_id')
+        found_content = exploration.find_content_by_content_id(
+          'nonexistent_id')
+        self.assertIsNone(found_content)
+
 
 class ExplorationSummaryTests(test_utils.GenericTestBase):
 

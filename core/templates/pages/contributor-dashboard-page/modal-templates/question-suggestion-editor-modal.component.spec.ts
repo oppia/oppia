@@ -29,10 +29,7 @@ import {ContributionAndReviewService} from '../services/contribution-and-review.
 import {QuestionSuggestionBackendApiService} from '../services/question-suggestion-backend-api.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {QuestionUndoRedoService} from 'domain/editor/undo_redo/question-undo-redo.service';
-import {
-  Question,
-  QuestionObjectFactory,
-} from 'domain/question/QuestionObjectFactory';
+import {Question} from 'domain/question/question.model';
 import {Skill} from 'domain/skill/skill.model';
 import {AlertsService} from 'services/alerts.service';
 import {CsrfTokenService} from 'services/csrf-token.service';
@@ -109,7 +106,6 @@ describe('Question Suggestion Editor Modal Component', () => {
   let contributionAndReviewService: ContributionAndReviewService;
   let csrfTokenService: CsrfTokenService;
   let ngbModal: NgbModal;
-  let questionObjectFactory: QuestionObjectFactory;
   let questionUndoRedoService: QuestionUndoRedoService;
   let siteAnalyticsService: SiteAnalyticsService;
   let stateEditorService: StateEditorService;
@@ -147,7 +143,6 @@ describe('Question Suggestion Editor Modal Component', () => {
           useClass: MockAlertsService,
         },
         CsrfTokenService,
-        QuestionObjectFactory,
         QuestionUndoRedoService,
         SiteAnalyticsService,
         StateEditorService,
@@ -162,7 +157,6 @@ describe('Question Suggestion Editor Modal Component', () => {
 
     alertsService = TestBed.inject(AlertsService);
     csrfTokenService = TestBed.inject(CsrfTokenService);
-    questionObjectFactory = TestBed.inject(QuestionObjectFactory);
     contributionAndReviewService = TestBed.inject(ContributionAndReviewService);
     questionUndoRedoService = TestBed.inject(QuestionUndoRedoService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
@@ -207,7 +201,7 @@ describe('Question Suggestion Editor Modal Component', () => {
     };
     skill = Skill.createFromBackendDict(skillDict);
     component.skill = skill;
-    question = questionObjectFactory.createFromBackendDict({
+    question = Question.createFromBackendDict({
       id: skill.getId(),
       question_state_data: {
         classifier_model_id: null,

@@ -43,7 +43,7 @@ import json
 import re
 import subprocess
 
-from core import constants, utils
+from core import constants
 from scripts import common
 
 from typing import Final, List, Optional, Pattern, Tuple
@@ -142,7 +142,7 @@ def verify_target_version_compatible_with_latest_release(
             minor version plus one.
         AssertionError. The current patch version is different than 0.
     """
-    response = utils.url_open(
+    response = common.url_open(
         'https://api.github.com/repos/oppia/oppia/releases/latest')
     if response.getcode() != 200:
         raise Exception(

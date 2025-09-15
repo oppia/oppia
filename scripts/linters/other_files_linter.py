@@ -292,7 +292,7 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
         errors = []
         for workflow_path in workflow_paths:
             workflow_str = self.file_cache.read(workflow_path)
-            workflow_dict = yaml.load(workflow_str, Loader=yaml.Loader)
+            workflow_dict = yaml.safe_load(workflow_str)
             errors += self._check_that_workflow_steps_have_name(
                 workflow_dict, workflow_path)
         return concurrent_task_utils.TaskResult(

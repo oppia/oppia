@@ -65,6 +65,8 @@ export class HomeTabComponent {
   directiveSubscriptions = new Subscription();
   currentGoalIds: Set<string> = new Set();
   storySummariesWithAvailableNodes: Set<string> = new Set();
+  communityLibraryUrl =
+    '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE;
 
   constructor(
     private i18nLanguageCodeService: I18nLanguageCodeService,

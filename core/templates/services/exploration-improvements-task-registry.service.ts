@@ -21,7 +21,7 @@ import {Injectable} from '@angular/core';
 import {group} from 'd3-array';
 
 import {AnswerStats} from 'domain/exploration/answer-stats.model';
-import {States} from 'domain/exploration/StatesObjectFactory';
+import {States} from 'domain/exploration/states.model';
 import {ExplorationImprovementsConfig} from 'domain/improvements/exploration-improvements-config.model';
 import {
   ExplorationTask,

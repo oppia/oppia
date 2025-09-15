@@ -161,7 +161,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
 
         def mock_url_open(_url: str) -> BinaryIO:
             self.check_function_calls['url_open_is_called'] = True
-            # The function is used as follows: utils.url_open(req).read()
+            # The function is used as follows: url_open(req).read()
             # So, the mock returns a file object as a mock so that the read
             # function can work correctly.
             file_obj = install_dependencies_json_packages.open_file(
