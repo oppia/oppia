@@ -685,26 +685,27 @@ export class PracticeQuestionSubmitter extends Contributor {
     defaultResponseFeedback?: string,
     hint?: string
   ): Promise<void> {
-    const opportunityItem = await this.expectOpportunityToBePresent(
-      skill,
-      topic
-    );
-    if (!opportunityItem) {
-      throw new Error(`Opportunity item for skill "${skill}" not found.`);
-    }
+    await this.suggestQuestionsForSkillandTopic(skill, topic);
+    // const opportunityItem = await this.expectOpportunityToBePresent(
+    //   skill,
+    //   topic
+    // );
+    // if (!opportunityItem) {
+    //   throw new Error(`Opportunity item for skill "${skill}" not found.`);
+    // }
 
-    if (this.isViewportAtMobileWidth()) {
-      await opportunityItem.click();
-    } else {
-      const viewButton = await opportunityItem.waitForSelector(
-        opportunityItemButtonSelector
-      );
-      if (!viewButton) {
-        throw new Error('View button not found.');
-      }
+    // if (this.isViewportAtMobileWidth()) {
+    //   await opportunityItem.click();
+    // } else {
+    //   const viewButton = await opportunityItem.waitForSelector(
+    //     opportunityItemButtonSelector
+    //   );
+    //   if (!viewButton) {
+    //     throw new Error('View button not found.');
+    //   }
 
-      await viewButton.click();
-    }
+    //   await viewButton.click();
+    // }
 
     await this.selectQuestionDifficulty(difficulty ?? 'Medium');
     await this.seedTextToQuestion(question);
