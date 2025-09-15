@@ -173,8 +173,7 @@ export class PracticeQuestionSubmitter extends Contributor {
     await this.expectElementToBeVisible(
       questionDifficultySelectionModalSelector
     );
-    const skillDifficultySelector = `.e2e-test-skill-difficulty-${difficulty.toLocaleLowerCase()}`;
-    // TODO(FILE_ISSUE): Currently, the difficulty selector is not visible.
+    // TODO(#23370): Currently, the difficulty selector is not visible.
     // Uncomment the following line when the issue is fixed.
     // await this.clickOn(skillDifficultySelector);
     await this.clickOn(confirmSkillDificultyButton);
