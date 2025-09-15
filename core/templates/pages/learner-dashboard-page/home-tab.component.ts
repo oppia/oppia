@@ -212,8 +212,8 @@ export class HomeTabComponent {
 
     return (
       totalStories +
-      this.incompleteExplorationsList.length +
-      this.incompleteCollectionsList.length
+      (this.incompleteExplorationsList?.length || 0) +
+      (this.incompleteCollectionsList?.length || 0)
     );
   }
 }
