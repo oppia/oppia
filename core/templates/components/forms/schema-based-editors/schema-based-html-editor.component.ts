@@ -90,10 +90,10 @@ export class SchemaBasedHtmlEditorComponent
   ngOnInit(): void {}
 
   updateValue(value: string): void {
-    const cleanValue = String(value || '');
-    this.localValue = cleanValue;
-    this.onChange(cleanValue);
-    this.localValueChange.emit(cleanValue);
-    this.cdRef.detectChanges();
+    if (this.localValue !== value) {
+      this.localValue = value;
+      this.onChange(value);
+      this.localValueChange.emit(value);
+    }
   }
 }
