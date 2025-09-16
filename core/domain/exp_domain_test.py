@@ -23,25 +23,25 @@ import json
 import os
 from unittest import mock
 
-from core import feature_flag_list
-from core import feconf
-from core import utils
+from core import feature_flag_list, feconf, utils
 from core.constants import constants
-from core.domain import caching_services
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import exp_services_test
-from core.domain import param_domain
-from core.domain import platform_parameter_list
-from core.domain import rights_manager
-from core.domain import state_domain
-from core.domain import translation_domain
+from core.domain import (
+    caching_services,
+    exp_domain,
+    exp_fetchers,
+    exp_services,
+    exp_services_test,
+    param_domain,
+    platform_parameter_list,
+    rights_manager,
+    state_domain,
+    translation_domain,
+)
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Any, Dict, Final, List, Tuple, Union, cast
 import yaml
+from typing import Any, Dict, Final, List, Tuple, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover

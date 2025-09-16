@@ -35,8 +35,8 @@ import re
 import shutil
 import subprocess
 import sys
-
 from types import TracebackType
+
 from typing import Final, List, Optional, Type
 
 # When executing Python scripts using `python -m ...` from oppia/oppia,
@@ -51,10 +51,16 @@ from typing import Final, List, Optional, Type
 # rather than the opipa/oppia root. To correct this problem, we add the
 # current working directory to sys.path.
 sys.path.append(os.getcwd())
-from scripts import common  # isort:skip  # pylint: disable=wrong-import-position
-from scripts import install_python_prod_dependencies # isort:skip  # pylint: disable=wrong-import-position
+
+# These imports must come after sys.path modification,
+# so the pylint import-position rules are disabled.
+from scripts import common  # pylint: disable=wrong-import-position
+from scripts import git_changes_utils  # pylint: disable=wrong-import-position
+from scripts import (  # pylint: disable=wrong-import-position
+    install_python_prod_dependencies,
+)
+
 from core import feconf #isort:skip # pylint: disable=wrong-import-position
-from scripts import git_changes_utils # isort:skip # pylint: disable=wrong-import-position
 
 # Git hash of /dev/null, refers to an 'empty' commit.
 GIT_NULL_COMMIT: Final = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'

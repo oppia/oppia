@@ -21,17 +21,14 @@ from __future__ import annotations
 import json
 import logging
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import fs_services
-from core.domain import rte_component_registry
+from core.domain import fs_services, rte_component_registry
 from extensions.objects.models import objects
 from extensions.rich_text_components import components
 
 import bs4
 import defusedxml.ElementTree
-
 from typing import Callable, Dict, Iterator, List, Tuple, Union
 
 
