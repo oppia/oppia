@@ -23,13 +23,11 @@ from core.jobs.io import ndb_io
 from core.platform import models
 
 import apache_beam as beam
-
 from typing import List
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import datastore_services
+    from mypy_imports import base_models, datastore_services
 
 (base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 

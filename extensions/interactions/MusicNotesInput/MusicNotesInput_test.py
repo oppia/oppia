@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 from core.tests import test_utils
+
 from extensions.interactions.MusicNotesInput import MusicNotesInput # pylint: disable=unused-import # isort: skip
 
 

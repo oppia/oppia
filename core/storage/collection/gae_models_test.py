@@ -23,9 +23,7 @@ import datetime
 
 from core import feconf
 from core.constants import constants
-from core.domain import collection_domain
-from core.domain import collection_services
-from core.domain import rights_domain
+from core.domain import collection_domain, collection_services, rights_domain
 from core.platform import models
 from core.tests import test_utils
 
@@ -33,9 +31,7 @@ from typing import Dict, Final, List
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import collection_models
-    from mypy_imports import user_models
+    from mypy_imports import base_models, collection_models, user_models
 
 (base_models, collection_models, user_models) = models.Registry.import_models([
     models.Names.BASE_MODEL, models.Names.COLLECTION, models.Names.USER

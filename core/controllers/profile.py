@@ -22,20 +22,20 @@ import logging
 import re
 import zipfile
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.controllers import acl_decorators
-from core.controllers import base
-from core.domain import email_manager
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_services
-from core.domain import role_services
-from core.domain import subscription_services
-from core.domain import summary_services
-from core.domain import takeout_service
-from core.domain import user_services
-from core.domain import wipeout_service
+from core.controllers import acl_decorators, base
+from core.domain import (
+    email_manager,
+    platform_parameter_list,
+    platform_parameter_services,
+    role_services,
+    subscription_services,
+    summary_services,
+    takeout_service,
+    user_services,
+    wipeout_service,
+)
 
 from typing import Any, Callable, Dict, Optional, TypedDict
 

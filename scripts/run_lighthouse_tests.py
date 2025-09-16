@@ -27,9 +27,8 @@ import sys
 
 from core import feconf
 from core.constants import constants
-from scripts import build
-from scripts import common
-from scripts import servers
+from scripts import build, common, servers
+
 from typing import Final, List, Optional
 
 LIGHTHOUSE_MODE_PERFORMANCE: Final = 'performance'
