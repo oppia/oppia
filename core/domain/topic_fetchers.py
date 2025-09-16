@@ -20,17 +20,26 @@ from __future__ import annotations
 
 import copy
 
-from core import feconf
-from core import utils
-from core.domain import caching_services
-from core.domain import classroom_config_services
-from core.domain import story_domain
-from core.domain import story_fetchers
-from core.domain import topic_domain
+from core import feconf, utils
+from core.domain import (
+    caching_services,
+    classroom_config_services,
+    story_domain,
+    story_fetchers,
+    topic_domain,
+)
 from core.platform import models
 
 from typing import (
-    Dict, List, Literal, Optional, Sequence, Set, TypedDict, overload)
+    Dict,
+    List,
+    Literal,
+    Optional,
+    Sequence,
+    Set,
+    TypedDict,
+    overload,
+)
 
 MYPY = False
 if MYPY:  # pragma: no cover

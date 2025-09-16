@@ -28,27 +28,25 @@ import os
 import re
 import types
 
-from core import feconf
-from core import handler_schema_constants
-from core import utils
+import main
+from core import feconf, handler_schema_constants, utils
 from core.constants import constants
-from core.controllers import acl_decorators
-from core.controllers import base
-from core.controllers import payload_validator
-from core.domain import auth_domain
-from core.domain import exp_services
-from core.domain import rights_manager
-from core.domain import taskqueue_services
-from core.domain import user_services
-from core.domain import wipeout_service
+from core.controllers import acl_decorators, base, payload_validator
+from core.domain import (
+    auth_domain,
+    exp_services,
+    rights_manager,
+    taskqueue_services,
+    user_services,
+    wipeout_service,
+)
 from core.platform import models
 from core.tests import test_utils
-import main
 
-from typing import Dict, Final, FrozenSet, List, Optional, TypedDict, cast
 import webapp2
-from webapp2_extras import routes
 import webtest
+from typing import Dict, Final, FrozenSet, List, Optional, TypedDict, cast
+from webapp2_extras import routes
 
 MYPY = False
 if MYPY:  # pragma: no cover

@@ -22,7 +22,6 @@ from core.platform.storage import cloud_storage_services
 from core.tests import test_utils
 
 from google.cloud import storage
-
 from typing import Dict, List, Optional
 
 

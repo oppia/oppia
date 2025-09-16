@@ -17,13 +17,13 @@
 from __future__ import annotations
 
 from core import feconf
-from core.controllers import acl_decorators
-from core.controllers import base
-from core.controllers import domain_objects_validator
-from core.domain import email_manager
-from core.domain import user_query_domain
-from core.domain import user_query_services
-from core.domain import user_services
+from core.controllers import acl_decorators, base, domain_objects_validator
+from core.domain import (
+    email_manager,
+    user_query_domain,
+    user_query_services,
+    user_services,
+)
 
 from typing import Dict, List, Optional, TypedDict
 

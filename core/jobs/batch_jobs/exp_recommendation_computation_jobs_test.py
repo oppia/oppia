@@ -31,8 +31,7 @@ from typing import Dict, Final, List, Tuple, Type, Union
 
 MYPY = False
 if MYPY:
-    from mypy_imports import exp_models
-    from mypy_imports import recommendations_models
+    from mypy_imports import exp_models, recommendations_models
 
 (exp_models, recommendations_models) = models.Registry.import_models([
     models.Names.EXPLORATION, models.Names.RECOMMENDATIONS

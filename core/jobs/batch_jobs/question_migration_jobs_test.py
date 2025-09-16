@@ -19,8 +19,7 @@
 from __future__ import annotations
 
 from core import feconf
-from core.domain import question_domain
-from core.domain import question_services
+from core.domain import question_domain, question_services
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import question_migration_jobs
 from core.jobs.types import job_run_result
