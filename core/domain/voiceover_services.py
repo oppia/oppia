@@ -33,8 +33,8 @@ from core.domain import (
 )
 from core.platform import models
 from core.storage.voiceover import gae_models
-from typing import Dict, List, Optional, Sequence, Tuple, cast
 
+from typing import Dict, List, Optional, Sequence, Tuple, cast
 
 MYPY = False
 if MYPY: # pragma: no cover

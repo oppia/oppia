@@ -53,8 +53,8 @@ class MockSocket:
         return ['Address', self.port]
 
     def recv( # pylint: disable=missing-docstring
-        self, *unused_args: str) -> None:
-        pass
+        self, *unused_args: str) -> bytes:
+        return b"test-request"
 
     def sendall( # pylint: disable=missing-docstring
         self, *unused_args: str) -> None:
