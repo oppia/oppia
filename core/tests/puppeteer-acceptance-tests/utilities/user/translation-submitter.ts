@@ -58,6 +58,8 @@ const skillNameInput = '.e2e-test-skill-name-input';
 const skillItemInRTESelector = '.e2e-test-rte-skill-selector-item';
 const contributionTableSelector = '.e2e-test-topics-table';
 const discardChangeButton = '.e2e-test-discard-translation-chages';
+const loadingOpportunityPlaceholderSelector =
+  '.e2e-test-opportunity-loading-placeholder';
 
 const currentProgressSelector =
   '.e2e-test-opportunity-list-item-progress-percentage';
@@ -73,9 +75,17 @@ export class TranslationSubmitter extends BaseUser {
     const selector = `${paginationBtnSelectorPrefix}-${button}`;
     await this.expectElementToBeVisible(selector);
 
+    const opportunityUnloadedPromise = this.expectElementToBeVisible(
+      loadingOpportunityPlaceholderSelector
+    );
     await this.clickOn(selector);
 
-    // TODO: Post-check: Verify if the page is loaded.
+    // Post-check: Ensure that the opportunities are refreshed.
+    await opportunityUnloadedPromise;
+    await this.expectElementToBeVisible(
+      loadingOpportunityPlaceholderSelector,
+      false
+    );
   }
 
   /**
@@ -183,7 +193,7 @@ export class TranslationSubmitter extends BaseUser {
   async expectPaginationButtonToBeVisible(
     button: 'previous' | 'next',
     visible: boolean = true
-  ) {
+  ): Promise<void> {
     const selector = `${paginationBtnSelectorPrefix}-${button}`;
     await this.expectElementToBeVisible(selector, visible);
   }
