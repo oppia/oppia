@@ -652,6 +652,7 @@ export class PracticeQuestionSubmitter extends Contributor {
       throw new Error(`Input element not found for selector ${xpath}`);
     }
 
+    await this.waitForElementToStabilize(inputElement);
     await inputElement.click({clickCount: 3});
     await inputElement.type(value);
 
