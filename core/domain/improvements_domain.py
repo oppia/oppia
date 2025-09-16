@@ -20,8 +20,7 @@ from __future__ import annotations
 
 import datetime
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
 
 from typing import Optional, TypedDict

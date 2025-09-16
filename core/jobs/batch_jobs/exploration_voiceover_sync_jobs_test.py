@@ -19,17 +19,18 @@
 from __future__ import annotations
 
 from core import feconf
-
 from core.constants import constants
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import state_domain
-from core.domain import story_domain
-from core.domain import story_services
-from core.domain import topic_domain
-from core.domain import topic_services
-from core.domain import voiceover_services
+from core.domain import (
+    exp_domain,
+    exp_fetchers,
+    exp_services,
+    state_domain,
+    story_domain,
+    story_services,
+    topic_domain,
+    topic_services,
+    voiceover_services,
+)
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import exploration_voiceover_sync_jobs
 from core.jobs.types import job_run_result

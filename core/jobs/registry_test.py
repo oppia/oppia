@@ -18,8 +18,7 @@
 
 from __future__ import annotations
 
-from core.jobs import base_jobs
-from core.jobs import registry
+from core.jobs import base_jobs, registry
 from core.tests import test_utils
 
 

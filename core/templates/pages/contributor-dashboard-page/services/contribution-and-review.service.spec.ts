@@ -30,10 +30,7 @@ import {
 } from './contribution-and-review-backend-api.service';
 import {SuggestionBackendDict} from 'domain/suggestion/suggestion.model';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
-import {
-  ExplorationObjectFactory,
-  Exploration,
-} from 'domain/exploration/ExplorationObjectFactory';
+import {Exploration} from 'domain/exploration/exploration.model';
 import {StateObjectsBackendDict, States} from 'domain/exploration/states.model';
 import {FetchExplorationBackendResponse} from '../../../domain/exploration/read-only-exploration-backend-api.service';
 import {LoggerService} from 'services/contextual/logger.service';
@@ -114,7 +111,6 @@ describe('Contribution and review service', () => {
         UrlInterpolationService,
         ContributionAndReviewBackendApiService,
         ReadOnlyExplorationBackendApiService,
-        ExplorationObjectFactory,
         LoggerService,
       ],
     });
@@ -393,15 +389,13 @@ describe('Contribution and review service', () => {
   });
 
   describe('getReviewableTranslationSuggestionsAsync', () => {
-    let explorationObjectFactory: ExplorationObjectFactory;
-    let explorationObjectFactorySpy: jasmine.Spy;
+    let explorationCreateFromBackendDictSpy: jasmine.Spy;
     let fetchExplorationSpy: jasmine.Spy;
     let mockSortTranslationSpy: jasmine.Spy;
 
     beforeEach(() => {
-      explorationObjectFactory = TestBed.inject(ExplorationObjectFactory);
-      explorationObjectFactorySpy = spyOn(
-        explorationObjectFactory,
+      explorationCreateFromBackendDictSpy = spyOn(
+        Exploration,
         'createFromBackendDict'
       );
       fetchExplorationSpy = spyOn(
@@ -590,7 +584,7 @@ describe('Contribution and review service', () => {
         fetchSuggestionsAsyncSpy.and.returnValue(
           Promise.resolve(backendFetchResponse)
         );
-        explorationObjectFactorySpy.and.returnValue(exploration);
+        explorationCreateFromBackendDictSpy.and.returnValue(exploration);
         mockSortTranslationSpy.and.returnValue([
           {
             suggestion_type: 'suggestion',
@@ -695,7 +689,7 @@ describe('Contribution and review service', () => {
             },
             more: false,
           });
-          expect(explorationObjectFactorySpy).toHaveBeenCalled();
+          expect(explorationCreateFromBackendDictSpy).toHaveBeenCalled();
           expect(getStatesSpy).toHaveBeenCalled();
           expect(fetchSuggestionsAsyncSpy).toHaveBeenCalled();
           expect(fetchExplorationSpy).toHaveBeenCalled();

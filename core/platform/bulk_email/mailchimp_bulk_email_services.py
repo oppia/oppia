@@ -23,13 +23,11 @@ import hashlib
 import logging
 
 from core import feconf
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_services
+from core.domain import platform_parameter_list, platform_parameter_services
 from core.platform import models
 
 import mailchimp3
 from mailchimp3 import mailchimpclient
-
 from typing import Any, Dict, Optional
 
 MYPY = False
