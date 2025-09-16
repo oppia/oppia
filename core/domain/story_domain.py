@@ -1784,7 +1784,6 @@ class Story:
         v6 schema fixes story node's destination_node_ids and relinks disconnected nodes.
 
         Args:
-            story_id: str. The unique ID of the story.
             story_contents_dict: dict. A dict used to initialize a Story
                 Contents domain object.
 
@@ -2234,7 +2233,7 @@ class Story:
 
         story_node_to_move = copy.deepcopy(story_content_nodes[from_index])
 
-        # The initial node is moved
+        # The initial node is moved.
         if from_index == 0:
             right_neighbour = story_content_nodes[1]
             self.update_initial_node(right_neighbour.id)
@@ -2243,14 +2242,14 @@ class Story:
         story_content_nodes.insert(to_index, story_node_to_move)
 
         if to_index == 0:
-            # Node is moved to the start of the storyline
+            # Node is moved to the start of the storyline.
             self.update_initial_node(story_node_to_move.id)
         else:
             left_neighbour = story_content_nodes[to_index - 1]
             self.update_node_destination_node_ids(left_neighbour.id, [story_node_to_move.id])
 
         if to_index == len(story_content_nodes) - 1:
-            # Node is moved to the end of the storyline
+            # Node is moved to the end of the storyline.
             self.update_node_destination_node_ids(story_node_to_move.id, [])
         else:
             right_neighbour = story_content_nodes[to_index + 1]
