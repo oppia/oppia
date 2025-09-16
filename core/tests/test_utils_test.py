@@ -863,21 +863,31 @@ class ElasticSearchStubTests(test_utils.GenericTestBase):
         stub = test_utils.ElasticSearchStub()
         stub.mock_create_index('test_index')
 
-        doc = {
+        doc1 = {
             'id': 'doc1',
             'title': 'Test Document',
             'content': 'Test content'
         }
 
-        stub.mock_index('test_index', doc, 'doc1')
-        stub.mock_index('test_index', doc, 'doc1')
-
         doc2 = {
+            'id': 'doc2',
+            'title': 'Another Document',
+            'content': 'Another content'
+        }
+
+        stub.mock_index('test_index', doc1, 'doc1')
+        stub.mock_index('test_index', doc2, 'doc2')
+
+        duplicate_doc1 = {
             'id': 'doc1',
             'title': 'Updated Document',
             'content': 'Updated content'
         }
-        stub._DB['test_index'].append(doc2)
+
+        stub.mock_index('test_index', duplicate_doc1, 'doc1')
+
+        db = getattr(stub, '_DB')
+        db['test_index'].append(doc1)
 
         result = stub.mock_search(
             body={'query': {'match_all': {}}},
@@ -885,8 +895,10 @@ class ElasticSearchStubTests(test_utils.GenericTestBase):
             params={'from': 0, 'size': 10}
         )
 
-        self.assertEqual(len(result['hits']['hits']), 1)
-        self.assertEqual(result['total']['value'], 1)
+        self.assertEqual(len(result['hits']['hits']), 2)
+        self.assertEqual(result['total']['value'], 2)
+        returned_ids = {hit['_source']['id'] for hit in result['hits']['hits']}
+        self.assertEqual(returned_ids, {'doc1', 'doc2'})
 
     def test_search_with_multi_match_filter_non_blog_posts(self) -> None:
         stub = test_utils.ElasticSearchStub()
@@ -931,7 +943,7 @@ class ElasticSearchStubTests(test_utils.GenericTestBase):
         self.assertEqual(returned_ids, {'exp1', 'exp2'})
 
     def test_search_with_multi_match_terms_query(self) -> None:
-        """Test line 845->835: Covers multi_match in terms (must clause) logic."""
+
         stub = test_utils.ElasticSearchStub()
         stub.mock_create_index('test_index')
 
@@ -971,6 +983,7 @@ class ElasticSearchStubTests(test_utils.GenericTestBase):
         self.assertEqual(len(result['hits']['hits']), 2)
         returned_ids = {hit['_source']['id'] for hit in result['hits']['hits']}
         self.assertEqual(returned_ids, {'doc1', 'doc3'})
+
 
 class EmailMockTests(test_utils.EmailTestBase):
     """Class for testing EmailTestBase."""
