@@ -207,7 +207,6 @@ describe('Topic Manager', function () {
       'Wrong Answer'
     );
     await topicManager.addHintToState('Test Hint 4');
-    // TODO: Verify works properly.
     await topicManager.addDragAndDropSortSolution(
       ['First', 'Second', 'Third'],
       'As given in the question.'

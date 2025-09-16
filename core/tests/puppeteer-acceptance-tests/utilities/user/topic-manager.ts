@@ -222,6 +222,8 @@ const storyEditorNodeSelector = '.story-editor-node';
 const resetChapterThumbnailButton = '.e2e-test-thumbnail-reset-button';
 const saveExplorationIDButton = '.e2e-test-exploration-id-save-button';
 const addPrerequisiteSkillButton = '.e2e-test-add-prerequisite-skill';
+const addPrerequisiteSkillMobileButtonSelector =
+  '.e2e-test-mobile-add-prerequisite-skill';
 const addPrerequisiteSkillInSkillEditorButton =
   '.e2e-test-add-prerequisite-skill-in-skill-editor-button';
 const togglePrerequisiteSkillsDropdown =
@@ -2389,10 +2391,10 @@ export class TopicManager extends BaseUser {
       await this.expandHeaderInMobile('Prerequisite Skills');
     }
 
-    await this.page.waitForXPath(
-      `//button[contains(text(), '${ADD_PREREQUISITE_SKILL_BUTTON_LABEL}')]`
-    );
-    await this.clickOnElementWithText(ADD_PREREQUISITE_SKILL_BUTTON_LABEL);
+    const selector = this.isViewportAtMobileWidth()
+      ? addPrerequisiteSkillMobileButtonSelector
+      : addPrerequisiteSkillButton;
+    await this.clickOn(selector);
     await this.filterAndSelectSkillInSkillSelector(skillName);
   }
 
