@@ -1782,7 +1782,7 @@ class Story:
         story_contents_dict: StoryContentsDict
     ) -> StoryContentsDict:
         """Converts v5 Story Contents schema to the modern v6 schema.
-        v6 schema fixes story node's destination_node and relinks disconnected nodes.
+        v6 schema fixes story node's destination_node_ids and relinks disconnected nodes.
 
         Args:
             story_id: str. The unique ID of the story.
@@ -2235,7 +2235,7 @@ class Story:
 
         story_node_to_move = copy.deepcopy(story_content_nodes[from_index])
 
-        # The initial node is shifted
+        # The initial node is moved
         if from_index == 0:
             right_neighbour = story_content_nodes[1]
             self.update_initial_node(right_neighbour.id)
