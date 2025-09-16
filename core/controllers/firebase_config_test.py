@@ -17,6 +17,7 @@
 """Tests for the Firebase configuration controllers."""
 
 from __future__ import annotations
+
 import json
 
 from core.platform import models
