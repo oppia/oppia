@@ -29,9 +29,11 @@ from typing import Iterable, List, Set, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import app_identity_services
-    from mypy_imports import storage_services
-    from mypy_imports import suggestion_models
+    from mypy_imports import (
+        app_identity_services,
+        storage_services,
+        suggestion_models,
+    )
 
 (suggestion_models, ) = models.Registry.import_models([
     models.Names.SUGGESTION])

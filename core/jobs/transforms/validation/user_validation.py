@@ -24,25 +24,25 @@ from core import feconf
 from core.jobs import job_utils
 from core.jobs.decorators import validation_decorators
 from core.jobs.transforms.validation import base_validation
-from core.jobs.types import model_property
-from core.jobs.types import user_validation_errors
+from core.jobs.types import model_property, user_validation_errors
 from core.platform import models
 
 import apache_beam as beam
-
 from typing import Iterator, List, Tuple, Type, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import auth_models
-    from mypy_imports import collection_models
-    from mypy_imports import datastore_services
-    from mypy_imports import email_models
-    from mypy_imports import exp_models
-    from mypy_imports import feedback_models
-    from mypy_imports import skill_models
-    from mypy_imports import story_models
-    from mypy_imports import user_models
+    from mypy_imports import (
+        auth_models,
+        collection_models,
+        datastore_services,
+        email_models,
+        exp_models,
+        feedback_models,
+        skill_models,
+        story_models,
+        user_models,
+    )
 
 (
     auth_models, collection_models, email_models,

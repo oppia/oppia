@@ -20,15 +20,15 @@ from __future__ import annotations
 
 import datetime
 
-from core import feature_flag_list
-from core import feconf
-from core import utils
+from core import feature_flag_list, feconf, utils
 from core.constants import constants
 from core.controllers import improvements
-from core.domain import exp_services
-from core.domain import improvements_domain
-from core.domain import improvements_services
-from core.domain import platform_parameter_list
+from core.domain import (
+    exp_services,
+    improvements_domain,
+    improvements_services,
+    platform_parameter_list,
+)
 from core.platform import models
 from core.tests import test_utils
 

@@ -18,15 +18,13 @@
 
 from __future__ import annotations
 
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_services
+from core.domain import platform_parameter_list, platform_parameter_services
 from core.jobs import job_utils
 from core.platform import models
 
 import apache_beam as beam
 from apache_beam import pvalue
 from apache_beam.io.gcp.datastore.v1new import datastoreio
-
 from typing import Optional
 
 MYPY = False

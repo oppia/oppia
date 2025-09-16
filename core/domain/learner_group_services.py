@@ -20,24 +20,28 @@ from __future__ import annotations
 
 from core import feature_flag_list
 from core.constants import constants
-from core.domain import classroom_config_services
-from core.domain import feature_flag_services
-from core.domain import learner_group_domain
-from core.domain import learner_group_fetchers
-from core.domain import story_domain
-from core.domain import story_fetchers
-from core.domain import subtopic_page_domain
-from core.domain import topic_domain
-from core.domain import topic_fetchers
+from core.domain import (
+    classroom_config_services,
+    feature_flag_services,
+    learner_group_domain,
+    learner_group_fetchers,
+    story_domain,
+    story_fetchers,
+    subtopic_page_domain,
+    topic_domain,
+    topic_fetchers,
+)
 from core.platform import models
 
 from typing import List, Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import datastore_services
-    from mypy_imports import learner_group_models
-    from mypy_imports import user_models
+    from mypy_imports import (
+        datastore_services,
+        learner_group_models,
+        user_models,
+    )
 
 (learner_group_models, user_models) = models.Registry.import_models(
     [models.Names.LEARNER_GROUP, models.Names.USER])
