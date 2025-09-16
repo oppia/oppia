@@ -40,13 +40,19 @@ GIT_DIRECT_URL_REQUIREMENT_PATTERN: Final = (
     # definition. This helps stabilize the implementation we depend upon.
     re.compile(r'^(git\+git://github\.com/.*?@[0-9a-f]{40})#egg=([^\s]*)'))
 
+# These are libraries represented in requirements.txt using hyphens after the
+# first word, but in their METADATA files using a period after the first word
+# instead.
+LIBRARY_PREFIXES_WITH_INITIAL_PERIOD: Final = [
+    'backports', 'jaraco', 'keyrings']
+
 
 def normalize_python_library_name(library_name: str) -> str:
     """Returns a normalized version of the python library name.
 
     Normalization of a library name means converting the library name to
     lowercase, and removing any "[...]" suffixes that occur. The reason we do
-    this is because of 2 potential confusions when comparing library names that
+    this is because of 3 potential confusions when comparing library names that
     will cause this script to find incorrect mismatches.
 
     1. Python library name strings are case-insensitive, which means that
@@ -58,6 +64,8 @@ def normalize_python_library_name(library_name: str) -> str:
        the sub-library. These variants can be considered equivalent to an
        individual developer and project because at any point in time, only one
        of these variants is allowed to be installed/used in a project.
+    3. Some python libraries use dots when the entry in requirements.txt uses
+       hyphens.
 
     Here are some examples of ambiguities that this function resolves:
     - 'googleappenginemapreduce' is listed in the 'requirements.txt' file as
@@ -73,6 +81,10 @@ def normalize_python_library_name(library_name: str) -> str:
       incorrect mismatches to be found because the script treats the installed
       package's library name, 'library', differently from the 'requirements.txt'
       listed library name, 'library[sub-library]'
+    - For 'backports-tarfile' in the 'requirements.txt' file, the installed
+      directories have names starting with the string 'backports.tarfile'. This
+      causes confusion when searching for mismatches because python treats the
+      two library names as different even though they are equivalent.
 
     Args:
         library_name: str. The library name to be normalized.
@@ -95,6 +107,12 @@ def normalize_python_library_name(library_name: str) -> str:
     # scripts/install_python_prod_dependencies_test.py to ensure that all
     # library names in the requirements files are distinct when normalized.
     library_name = re.sub(r'\[[^\[^\]]+\]', '', library_name)
+    if any(
+            library_name.startswith('%s%s' % (prefix, '-'))
+            for prefix in LIBRARY_PREFIXES_WITH_INITIAL_PERIOD):
+        library_name_parts = library_name.split('-')
+        library_name = '%s.%s' % (
+            library_name_parts[0], '-'.join(library_name_parts[1:]))
     return library_name.lower()
 
 

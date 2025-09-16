@@ -22,17 +22,16 @@ import functools
 import json
 import re
 
-from core import android_validation_constants
-from core import feconf
-from core import utils
+from core import android_validation_constants, feconf, utils
 from core.constants import constants
-from core.domain import change_domain
+from core.domain import fs_services  # pylint: disable=invalid-import-from
+from core.domain import html_cleaner  # pylint: disable=invalid-import-from
+from core.domain import (  # pylint: disable=invalid-import-from
+    change_domain,
+    html_validation_service,
+)
 
 from typing import Final, List, Literal, Optional, TypedDict, overload
-
-from core.domain import fs_services  # pylint: disable=invalid-import-from # isort:skip
-from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
-from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.

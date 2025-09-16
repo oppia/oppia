@@ -17,6 +17,7 @@
 """Tests for core.platform.app_identity.gae_app_identity_services."""
 
 from __future__ import annotations
+
 import os
 
 from core.platform.app_identity import gae_app_identity_services

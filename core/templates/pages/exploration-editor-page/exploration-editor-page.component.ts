@@ -70,7 +70,7 @@ import {UserExplorationPermissionsService} from './services/user-exploration-per
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {ExplorationNextContentIdIndexService} from './services/exploration-next-content-id-index.service';
 import {VersionHistoryService} from './services/version-history.service';
-import {ExplorationBackendDict} from 'domain/exploration/ExplorationObjectFactory';
+import {ExplorationBackendDict} from 'domain/exploration/exploration.model';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';

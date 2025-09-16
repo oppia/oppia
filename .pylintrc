@@ -60,7 +60,6 @@ bad-functions=apply
 
 [FORMAT]
 
-max-line-length=80
 ignore-long-lines=^.*#\stype:\signore.*$|^\s*(# )?<?https?://\S+>?$
 
 indent-string='    '
@@ -121,6 +120,7 @@ disable=abstract-method,
         duplicate-code,
         import-outside-toplevel,
         logging-not-lazy,
+        line-too-long,
         no-else-return,
         no-member,
         too-many-arguments,

@@ -24,7 +24,6 @@ from core.jobs.types import improvements_validation_errors
 from core.platform import models
 
 import apache_beam as beam
-
 from typing import Iterator
 
 MYPY = False
