@@ -862,13 +862,21 @@ class ElasticSearchStubTests(test_utils.GenericTestBase):
     def test_search_with_duplicate_documents_removes_duplicates(self) -> None:
         stub = test_utils.ElasticSearchStub()
         stub.mock_create_index('test_index')
-        
-        doc = {'id': 'doc1', 'title': 'Test Document', 'content': 'Test content'}
+
+        doc = {
+            'id': 'doc1',
+            'title': 'Test Document',
+            'content': 'Test content'
+        }
 
         stub.mock_index('test_index', doc, 'doc1')
-        stub.mock_index('test_index', doc, 'doc1')  
+        stub.mock_index('test_index', doc, 'doc1')
 
-        doc2 = {'id': 'doc1', 'title': 'Updated Document', 'content': 'Updated content'}
+        doc2 = {
+            'id': 'doc1',
+            'title': 'Updated Document',
+            'content': 'Updated content'
+        }
         stub._DB['test_index'].append(doc2)
 
         result = stub.mock_search(
@@ -876,22 +884,33 @@ class ElasticSearchStubTests(test_utils.GenericTestBase):
             index='test_index',
             params={'from': 0, 'size': 10}
         )
-        
+
         self.assertEqual(len(result['hits']['hits']), 1)
         self.assertEqual(result['total']['value'], 1)
 
     def test_search_with_multi_match_filter_non_blog_posts(self) -> None:
         stub = test_utils.ElasticSearchStub()
         stub.mock_create_index('explorations_index')
-        
 
-        doc1 = {'id': 'exp1', 'language': 'en', 'title': 'English Exploration'}
-        doc2 = {'id': 'exp2', 'language': 'hi', 'title': 'Hindi Exploration'}
-        doc3 = {'id': 'exp3', 'language': 'fr', 'title': 'French Exploration'}
+        doc1 = {
+            'id': 'exp1',
+            'language': 'en',
+            'title': 'English Exploration'
+        }
+        doc2 = {
+            'id': 'exp2',
+            'language': 'hi',
+            'title': 'Hindi Exploration'
+        }
+        doc3 = {
+            'id': 'exp3',
+            'language': 'fr',
+            'title': 'French Exploration'
+        }
+
         stub.mock_index('explorations_index', doc1, 'exp1')
         stub.mock_index('explorations_index', doc2, 'exp2')
         stub.mock_index('explorations_index', doc3, 'exp3')
-        
 
         result = stub.mock_search(
             body={
@@ -916,9 +935,21 @@ class ElasticSearchStubTests(test_utils.GenericTestBase):
         stub = test_utils.ElasticSearchStub()
         stub.mock_create_index('test_index')
 
-        doc1 = {'id': 'doc1', 'title': 'Python programming guide', 'content': 'Learn Python basics'}
-        doc2 = {'id': 'doc2', 'title': 'Java tutorial', 'content': 'Java programming concepts'}
-        doc3 = {'id': 'doc3', 'title': 'Python advanced topics', 'content': 'Advanced Python programming'}
+        doc1 = {
+            'id': 'doc1',
+            'title': 'Python programming guide',
+            'content': 'Learn Python basics'
+        }
+        doc2 = {
+            'id': 'doc2',
+            'title': 'Java tutorial',
+            'content': 'Java programming concepts'
+        }
+        doc3 = {
+            'id': 'doc3',
+            'title': 'Python advanced topics',
+            'content': 'Advanced Python programming'
+        }
         stub.mock_index('test_index', doc1, 'doc1')
         stub.mock_index('test_index', doc2, 'doc2')
         stub.mock_index('test_index', doc3, 'doc3')
