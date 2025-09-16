@@ -17,6 +17,7 @@
 """Provides app identity services."""
 
 from __future__ import annotations
+
 import os
 
 _GCS_RESOURCE_BUCKET_NAME_SUFFIX = '-resources'

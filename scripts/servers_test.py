@@ -32,9 +32,7 @@ import time
 from urllib import request as urlrequest
 
 from core.tests import test_utils
-from scripts import common
-from scripts import scripts_test_utils
-from scripts import servers
+from scripts import common, scripts_test_utils, servers
 
 import psutil
 from typing import Callable, Iterator, List, Optional, Sequence, Tuple

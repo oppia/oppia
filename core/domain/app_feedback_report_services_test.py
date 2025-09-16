@@ -20,11 +20,12 @@ from __future__ import annotations
 
 import datetime
 
-from core import feconf
-from core import utils
-from core.domain import app_feedback_report_constants
-from core.domain import app_feedback_report_domain
-from core.domain import app_feedback_report_services
+from core import feconf, utils
+from core.domain import (
+    app_feedback_report_constants,
+    app_feedback_report_domain,
+    app_feedback_report_services,
+)
 from core.platform import models
 from core.tests import test_utils
 

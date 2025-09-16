@@ -20,24 +20,42 @@ from __future__ import annotations
 
 import multiprocessing
 import os
+import tempfile
 
 from core.tests import test_utils
+
 from typing import Dict, List
 
-from . import python_linter
-from . import run_lint_checks
+from . import python_linter, run_lint_checks
 
 LINTER_TESTS_DIR = os.path.join(os.getcwd(), 'scripts', 'linters', 'test_files')
 VALID_PY_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid.py')
 VALID_PY_JOBS_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid_job_imports.py')
 INVALID_IMPORT_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_import_order.py')
-INVALID_PYCODESTYLE_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_pycodestyle_error.py')
 INVALID_PYTHON3_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_python_three.py')
 INVALID_DOCSTRING_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_docstring.py')
+
+INVALID_PYCODESTYLE_CONTENT = """from __future__ import annotations
+
+class FakeClass:
+    \"\"\"Fake docstring for valid syntax purposes.\"\"\"
+
+    def __init__(self, fake_arg):
+        self.fake_arg = fake_arg
+
+    def fake_method(self, name):
+        \"\"\"This doesn't do anything.
+
+        Args:
+            name: str. Means nothing.
+
+        Yields:
+            tuple(str, str).
+        \"\"\"
+        yield (name, name)"""
 
 NAME_SPACE = multiprocessing.Manager().Namespace()
 PROCESSES: Dict[str, List[str]] = multiprocessing.Manager().dict()
@@ -50,9 +68,11 @@ class PythonLintChecksManagerTests(test_utils.LinterTestBase):
 
     def test_unsorted_import_order(self) -> None:
         lint_task_report = python_linter.ThirdPartyPythonLintChecksManager(
-            [INVALID_IMPORT_FILEPATH]).check_import_order()
-        self.assert_same_list_elements([
-            'FAILED  Import order check failed'], lint_task_report.get_report())
+            [INVALID_IMPORT_FILEPATH]
+        ).check_import_order()
+        self.assert_same_list_elements(
+            ['FAILED  Import order check failed'], lint_task_report.get_report()
+        )
         self.assertEqual('Import order', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
@@ -133,25 +153,61 @@ class PythonLintChecksManagerTests(test_utils.LinterTestBase):
 
     def test_third_party_linter_with_no_files(self) -> None:
         lint_task_report = python_linter.ThirdPartyPythonLintChecksManager(
-            []).perform_all_lint_checks()
+            []
+        ).perform_all_lint_checks()
         self.assert_same_list_elements(
             ['There are no Python files to lint.'],
-            lint_task_report[0].get_report())
+            lint_task_report[0].get_report(),
+        )
         self.assertEqual('Python lint', lint_task_report[0].name)
         self.assertFalse(lint_task_report[0].failed)
 
+    def get_third_party_python_lint_checks_manager_obj(
+        self, file: str
+    ) -> python_linter.ThirdPartyPythonLintChecksManager:
+        """Returns a ThirdPartyPythonLintChecksManager for a temporary Python file.
+        This helper method writes the provided string `file` into a temporary
+        `.py` file and uses it to initialize a ThirdPartyPythonLintChecksManager.
+        A temporary file is used because Black automatically modifies newline
+        formatting at the end of real files, which can interfere with testing.
+
+        Args:
+            file: str. The Python source code to be written to a temporary file.
+
+        Returns:
+            ThirdPartyPythonLintChecksManager. A linter object initialized with
+            the temporary file.
+        """
+        temp_file = tempfile.NamedTemporaryFile(
+            mode='w+', suffix='.py', delete=False
+        )
+        temp_file.write(file)
+        temp_file.close()
+
+        linter = python_linter.ThirdPartyPythonLintChecksManager(
+            [temp_file.name]
+        )
+        self.addCleanup(temp_file.close)
+
+        return linter
+
     def test_third_party_perform_all_lint_checks(self) -> None:
-        lint_task_report = python_linter.ThirdPartyPythonLintChecksManager(
-            [INVALID_PYCODESTYLE_FILEPATH]).perform_all_lint_checks()
+        lint_task_report = self.get_third_party_python_lint_checks_manager_obj(
+            INVALID_PYCODESTYLE_CONTENT
+        ).perform_all_lint_checks()
         self.assertTrue(isinstance(lint_task_report, list))
 
     def test_pycodestyle_with_error_message(self) -> None:
-        lint_task_report = python_linter.ThirdPartyPythonLintChecksManager(
-            [INVALID_PYCODESTYLE_FILEPATH]).lint_py_files()
+        # We use a temporary file here instead of a real one because
+        # the Black formatter auto-fixes newlines at the end of files.
+        lint_task_report = self.get_third_party_python_lint_checks_manager_obj(
+            INVALID_PYCODESTYLE_CONTENT
+        ).lint_py_files()
         print(lint_task_report.trimmed_messages)
         self.assert_same_list_elements(
-            ['24:1: E302 expected 2 blank lines, found 1'],
-            lint_task_report.trimmed_messages)
+            ['3:1: E302 expected 2 blank lines, found 1'],
+            lint_task_report.trimmed_messages,
+        )
         self.assertEqual('Pylint', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 

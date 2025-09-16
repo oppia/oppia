@@ -21,8 +21,7 @@ from __future__ import annotations
 import copy
 
 from core import feconf
-from core.domain import caching_services
-from core.domain import skill_domain
+from core.domain import caching_services, skill_domain
 from core.platform import models
 
 from typing import List, Literal, Optional, overload

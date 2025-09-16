@@ -25,14 +25,11 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-
 from typing import Iterable, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import collection_models
-    from mypy_imports import feedback_models
-    from mypy_imports import user_models
+    from mypy_imports import collection_models, feedback_models, user_models
 
 (collection_models, feedback_models, user_models) = (
     models.Registry.import_models([

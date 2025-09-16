@@ -24,16 +24,14 @@ import operator
 
 from core import feconf
 from core.constants import constants
-from core.domain import exp_domain
-from core.domain import improvements_domain
+from core.domain import exp_domain, improvements_domain
 from core.platform import models
 
 from typing import Dict, Iterator, List, Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import datastore_services
-    from mypy_imports import improvements_models
+    from mypy_imports import datastore_services, improvements_models
 
 (improvements_models,) = (
     models.Registry.import_models([models.Names.IMPROVEMENTS])
