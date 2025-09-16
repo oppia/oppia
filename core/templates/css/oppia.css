@@ -934,10 +934,6 @@ textarea {
   padding-top: 13px;
 }
 
-[dir="rtl"] .oppia-navbar-breadcrumb {
-  margin-right: 10px;
-}
-
 .oppia-navbar-breadcrumb li {
   display: inline-block;
   overflow: hidden;
@@ -2438,7 +2434,7 @@ div#ng-curtain {
   float: right;
   height: 56px;
   line-height: 20px;
-  margin-left: -10px;
+  margin-inline-start: -10px;
   padding: 0;
 }
 
@@ -2451,7 +2447,7 @@ div#ng-curtain {
   margin-top: 8px;
 }
 .oppia-logo-small {
-  margin-left: 6px;
+  margin-inline-start: 6px;
 }
 
 .oppia-navbar-back-button {
