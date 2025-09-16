@@ -19,11 +19,13 @@
 from __future__ import annotations
 
 from core import feconf
-from core.domain import question_domain
-from core.domain import question_fetchers
-from core.domain import skill_services
-from core.domain import suggestion_services
-from core.domain import translation_domain
+from core.domain import (
+    question_domain,
+    question_fetchers,
+    skill_services,
+    suggestion_services,
+    translation_domain,
+)
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import suggestion_migration_jobs
 from core.jobs.types import job_run_result
@@ -34,8 +36,7 @@ from typing import Dict, Final, Union
 
 MYPY = False
 if MYPY:
-    from mypy_imports import exp_models
-    from mypy_imports import suggestion_models
+    from mypy_imports import exp_models, suggestion_models
 
 (exp_models, suggestion_models) = models.Registry.import_models([
     models.Names.EXPLORATION, models.Names.SUGGESTION

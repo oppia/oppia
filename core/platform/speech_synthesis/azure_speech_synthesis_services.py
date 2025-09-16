@@ -25,11 +25,11 @@ import json
 import os
 import re
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
 from core.domain import voiceover_services
 from core.platform import models
+
 import azure.cognitiveservices.speech as speechsdk
 from typing import Dict, List, Optional, Tuple, Union
 

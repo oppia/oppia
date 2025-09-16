@@ -18,73 +18,74 @@ from __future__ import annotations
 
 import logging
 
-from core import android_validation_constants
-from core import feconf
+from core import android_validation_constants, feconf
 from core.constants import constants
-from core.controllers import access_validators
-from core.controllers import acl_decorators
-from core.controllers import admin
-from core.controllers import android
-from core.controllers import base
-from core.controllers import beam_jobs
-from core.controllers import blog_admin
-from core.controllers import blog_dashboard
-from core.controllers import blog_homepage
-from core.controllers import classroom
-from core.controllers import collection_editor
-from core.controllers import collection_viewer
-from core.controllers import concept_card_viewer
-from core.controllers import contributor_dashboard
-from core.controllers import contributor_dashboard_admin
-from core.controllers import creator_dashboard
-from core.controllers import cron
-from core.controllers import custom_landing_pages
-from core.controllers import diagnostic_test_player
-from core.controllers import editor
-from core.controllers import email_dashboard
-from core.controllers import feature_flag
-from core.controllers import features
-from core.controllers import feedback
-from core.controllers import feedback_updates
-from core.controllers import firebase
-from core.controllers import improvements
-from core.controllers import incoming_app_feedback_report
-from core.controllers import learner_dashboard
-from core.controllers import learner_goals
-from core.controllers import learner_group
-from core.controllers import learner_playlist
-from core.controllers import library
-from core.controllers import moderator
-from core.controllers import oppia_root
-from core.controllers import pages
-from core.controllers import practice_sessions
-from core.controllers import profile
-from core.controllers import question_editor
-from core.controllers import questions_list
-from core.controllers import reader
-from core.controllers import recent_commits
-from core.controllers import release_coordinator
-from core.controllers import resources
-from core.controllers import review_tests
-from core.controllers import skill_editor
-from core.controllers import skill_mastery
-from core.controllers import story_editor
-from core.controllers import story_viewer
-from core.controllers import subscriptions
-from core.controllers import subtopic_viewer
-from core.controllers import suggestion
-from core.controllers import tasks
-from core.controllers import topic_editor
-from core.controllers import topic_viewer
-from core.controllers import topics_and_skills_dashboard
-from core.controllers import voice_artist
-from core.controllers import voiceover
+from core.controllers import (
+    access_validators,
+    acl_decorators,
+    admin,
+    android,
+    base,
+    beam_jobs,
+    blog_admin,
+    blog_dashboard,
+    blog_homepage,
+    classroom,
+    collection_editor,
+    collection_viewer,
+    concept_card_viewer,
+    contributor_dashboard,
+    contributor_dashboard_admin,
+    creator_dashboard,
+    cron,
+    custom_landing_pages,
+    diagnostic_test_player,
+    editor,
+    email_dashboard,
+    feature_flag,
+    features,
+    feedback,
+    feedback_updates,
+    firebase,
+    improvements,
+    incoming_app_feedback_report,
+    learner_dashboard,
+    learner_goals,
+    learner_group,
+    learner_playlist,
+    library,
+    moderator,
+    oppia_root,
+    pages,
+    practice_sessions,
+    profile,
+    question_editor,
+    questions_list,
+    reader,
+    recent_commits,
+    release_coordinator,
+    resources,
+    review_tests,
+    skill_editor,
+    skill_mastery,
+    story_editor,
+    story_viewer,
+    subscriptions,
+    subtopic_viewer,
+    suggestion,
+    tasks,
+    topic_editor,
+    topic_viewer,
+    topics_and_skills_dashboard,
+    voice_artist,
+    voiceover,
+)
 from core.platform import models
 from core.platform.auth import firebase_auth_services
 
 import google.cloud.logging
-from typing import Dict, Optional, Type, TypeVar
 import webapp2
+from typing import Dict, Optional, Type, TypeVar
 from webapp2_extras import routes
 
 MYPY = False

@@ -20,20 +20,21 @@ import json
 import logging
 import os
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import activity_domain
-from core.domain import activity_services
-from core.domain import collection_services
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import rating_services
-from core.domain import rights_domain
-from core.domain import rights_manager
-from core.domain import summary_services
-from core.domain import user_services
+from core.domain import (
+    activity_domain,
+    activity_services,
+    collection_services,
+    exp_domain,
+    exp_fetchers,
+    exp_services,
+    rating_services,
+    rights_domain,
+    rights_manager,
+    summary_services,
+    user_services,
+)
 from core.platform import models
 from core.tests import test_utils
 

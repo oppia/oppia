@@ -25,9 +25,7 @@ from typing import Dict, Final, Optional
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import datastore_services
-    from mypy_imports import user_models
+    from mypy_imports import base_models, datastore_services, user_models
 
 base_models, user_models = models.Registry.import_models([
     models.Names.BASE_MODEL, models.Names.USER
