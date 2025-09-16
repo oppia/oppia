@@ -16,8 +16,7 @@
 
 from __future__ import annotations
 
-from core.domain import interaction_registry
-from core.domain import object_registry
+from core.domain import interaction_registry, object_registry
 from core.tests import test_utils
 from extensions.objects.models import objects
 

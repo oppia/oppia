@@ -27,8 +27,7 @@ from typing import Dict, List, Literal, Optional, overload
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import classroom_models
-    from mypy_imports import transaction_services
+    from mypy_imports import classroom_models, transaction_services
 
 (classroom_models,) = models.Registry.import_models([models.Names.CLASSROOM])
 transaction_services = models.Registry.import_transaction_services()

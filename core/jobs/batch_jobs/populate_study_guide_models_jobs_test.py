@@ -31,8 +31,7 @@ from typing import Final, Type
 
 MYPY = True
 if MYPY:
-    from mypy_imports import subtopic_models
-    from mypy_imports import topic_models
+    from mypy_imports import subtopic_models, topic_models
 
 (topic_models, subtopic_models) = models.Registry.import_models([
     models.Names.TOPIC, models.Names.SUBTOPIC])

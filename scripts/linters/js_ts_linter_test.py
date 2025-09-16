@@ -28,11 +28,9 @@ from core.tests import test_utils
 from scripts import concurrent_task_utils
 
 import esprima
-
 from typing import Final, List, Tuple
 
-from . import js_ts_linter
-from . import run_lint_checks
+from . import js_ts_linter, run_lint_checks
 
 NAME_SPACE: Final = multiprocessing.Manager().Namespace()
 NAME_SPACE.files = run_lint_checks.FileCache()

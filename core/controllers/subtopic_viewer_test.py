@@ -16,17 +16,18 @@
 
 from __future__ import annotations
 
-from core import feature_flag_list
-from core import feconf
-from core.domain import state_domain
-from core.domain import study_guide_domain
-from core.domain import study_guide_services
-from core.domain import subtopic_page_domain
-from core.domain import subtopic_page_services
-from core.domain import topic_domain
-from core.domain import topic_services
-from core.domain import translation_domain
-from core.domain import user_services
+from core import feature_flag_list, feconf
+from core.domain import (
+    state_domain,
+    study_guide_domain,
+    study_guide_services,
+    subtopic_page_domain,
+    subtopic_page_services,
+    topic_domain,
+    topic_services,
+    translation_domain,
+    user_services,
+)
 from core.tests import test_utils
 
 
