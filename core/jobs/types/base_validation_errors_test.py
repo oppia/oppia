@@ -23,15 +23,13 @@ import pickle
 
 from core import feconf
 from core.jobs import job_utils
-from core.jobs.types import base_validation_errors
-from core.jobs.types import model_property
+from core.jobs.types import base_validation_errors, model_property
 from core.platform import models
 from core.tests import test_utils as core_test_utils
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import datastore_services
+    from mypy_imports import base_models, datastore_services
 
 (base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 

@@ -16,17 +16,18 @@
 
 from __future__ import annotations
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import caching_services
-from core.domain import role_services
-from core.domain import skill_domain
-from core.domain import skill_services
-from core.domain import topic_domain
-from core.domain import topic_fetchers
-from core.domain import topic_services
-from core.domain import user_services
+from core.domain import (
+    caching_services,
+    role_services,
+    skill_domain,
+    skill_services,
+    topic_domain,
+    topic_fetchers,
+    topic_services,
+    user_services,
+)
 from core.platform import models
 from core.tests import test_utils
 

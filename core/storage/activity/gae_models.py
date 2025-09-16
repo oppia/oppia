@@ -18,9 +18,9 @@
 
 from __future__ import annotations
 
+import core.storage.base_model.gae_models as base_models
 from core import feconf
 from core.platform import models
-import core.storage.base_model.gae_models as base_models
 
 from typing import Dict
 

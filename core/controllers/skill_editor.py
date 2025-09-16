@@ -16,20 +16,18 @@
 
 from __future__ import annotations
 
-from core import android_validation_constants
-from core import feconf
-from core import utils
+from core import android_validation_constants, feconf, utils
 from core.constants import constants
-from core.controllers import acl_decorators
-from core.controllers import base
-from core.controllers import domain_objects_validator
-from core.domain import role_services
-from core.domain import skill_domain
-from core.domain import skill_fetchers
-from core.domain import skill_services
-from core.domain import topic_fetchers
-from core.domain import user_domain
-from core.domain import user_services
+from core.controllers import acl_decorators, base, domain_objects_validator
+from core.domain import (
+    role_services,
+    skill_domain,
+    skill_fetchers,
+    skill_services,
+    topic_fetchers,
+    user_domain,
+    user_services,
+)
 
 from typing import Dict, List, Optional, TypedDict
 

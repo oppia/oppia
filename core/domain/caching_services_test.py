@@ -22,14 +22,14 @@ import json
 
 from core import feconf
 from core.constants import constants
-from core.domain import caching_domain
-from core.domain import caching_services
-from core.domain import collection_domain
-from core.domain import exp_domain
+from core.domain import (
+    caching_domain,
+    caching_services,
+    collection_domain,
+    exp_domain,
+)
 from core.domain import platform_parameter_domain as parameter_domain
-from core.domain import skill_domain
-from core.domain import story_domain
-from core.domain import topic_domain
+from core.domain import skill_domain, story_domain, topic_domain
 from core.platform import models
 from core.tests import test_utils
 

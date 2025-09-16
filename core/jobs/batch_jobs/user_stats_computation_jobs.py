@@ -20,21 +20,18 @@ from __future__ import annotations
 
 from core import feconf
 from core.domain import user_services
-from core.jobs import base_jobs
-from core.jobs import job_utils
+from core.jobs import base_jobs, job_utils
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-
 from typing import Iterable
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import datastore_services
-    from mypy_imports import user_models
+    from mypy_imports import datastore_services, user_models
 
 (user_models,) = models.Registry.import_models([models.Names.USER])
 

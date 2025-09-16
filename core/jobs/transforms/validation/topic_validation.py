@@ -22,12 +22,10 @@ from core.domain import topic_domain
 from core.jobs import job_utils
 from core.jobs.decorators import validation_decorators
 from core.jobs.transforms.validation import base_validation
-from core.jobs.types import model_property
-from core.jobs.types import topic_validation_errors
+from core.jobs.types import model_property, topic_validation_errors
 from core.platform import models
 
 import apache_beam as beam
-
 from typing import Iterator, List, Optional, Tuple, Type, Union
 
 MYPY = False
