@@ -198,7 +198,8 @@
 
       <div class="story-skill-mobile">
         <mat-card class="oppia-page-card oppia-long-text story-node-card skill-requirements-card oppia-mobile-collapsible-card">
-          <div class="story-node-header skill-requirements-header oppia-mobile-collapsible-card-header" (click)="togglePrerequisiteSkillsList()">
+          <div class="story-node-header skill-requirements-header oppia-mobile-collapsible-card-header e2e-test-section-header-prerequisite-skills"
+               (click)="togglePrerequisiteSkillsList()">
             <span>Prerequisite Skills</span>
             <i class="fa fa-caret-down"
                *ngIf="!prerequisiteSkillIsShown"
@@ -209,7 +210,7 @@
                aria-hidden="true">
             </i>
           </div>
-          <div class="story-skill-requirements oppia-mobile-collapsible-card-content" *ngIf="prerequisiteSkillIsShown">
+          <div class="story-skill-requirements oppia-mobile-collapsible-card-content e2e-test-section-body-prerequisite-skills" *ngIf="prerequisiteSkillIsShown">
             <div>
               <span class="oppia-input-box-subtitle">
                 <i>

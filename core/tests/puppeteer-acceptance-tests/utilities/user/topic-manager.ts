@@ -706,6 +706,7 @@ export class TopicManager extends BaseUser {
       }
     }, interactionNameDiv);
 
+    await this.waitForElementToStabilize(saveInteractionButton);
     await this.clickOn(saveInteractionButton);
     await this.expectModalTitleToBe('Add Response');
     await this.clickOn(responseRuleDropdown);
@@ -2384,6 +2385,10 @@ export class TopicManager extends BaseUser {
    * @param {string} skillName - The name of the skill to add.
    */
   async addPrerequisiteSkill(skillName: string): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.expandHeaderInMobile('Prerequisite Skills');
+    }
+
     await this.page.waitForXPath(
       `//button[contains(text(), '${ADD_PREREQUISITE_SKILL_BUTTON_LABEL}')]`
     );
@@ -4061,6 +4066,31 @@ export class TopicManager extends BaseUser {
   async expectQuestionToPreviewProperly(question: string): Promise<void> {
     await this.previewQuestion(question);
     await this.expectPreviewQuestionText(question);
+  }
+
+  /**
+   * Expands the given header in the mobile viewport.
+   * @param {string} header - The header to expand.
+   */
+  async expandHeaderInMobile(header: 'Prerequisite Skills'): Promise<void> {
+    if (!this.isViewportAtMobileWidth()) {
+      showMessage('Skipping test as the viewport is not mobile');
+      return;
+    }
+
+    const simplifiedHeader = header.replace(' ', '-').toLowerCase();
+    const headerSelector = `.e2e-test-section-header-${simplifiedHeader}`;
+    const bodySelector = `.e2e-test-section-body-${simplifiedHeader}`;
+
+    if (await this.isElementVisible(bodySelector, true, 10000)) {
+      showMessage(`Skipping test as the ${header} section is already expanded`);
+      return;
+    }
+
+    await this.expectElementToBeVisible(headerSelector);
+    await this.clickOn(headerSelector);
+
+    await this.expectElementToBeVisible(bodySelector);
   }
 }
 
