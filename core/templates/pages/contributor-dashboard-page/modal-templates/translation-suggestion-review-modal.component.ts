@@ -191,7 +191,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   HTML_SCHEMA: HTMLSchema = {
     type: 'html',
     ui_config: {
-      rte_component_config_id: 'ALL_COMPONENTS',
+      rte_component_config_id: 'CURATED_LESSON_COMPONENTS',
     },
   };
   MAX_REVIEW_MESSAGE_LENGTH = AppConstants.MAX_REVIEW_MESSAGE_LENGTH;
