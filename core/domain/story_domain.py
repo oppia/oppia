@@ -1793,8 +1793,7 @@ class Story:
             dict. The converted story_contents_dict.
         """
         next_node_id = None
-        for i in range(len(story_contents_dict) - 1, -1, -1):
-            node = story_contents_dict[i]
+        for node in reversed(story_contents_dict):
             if next_node_id:
                 node['destination_node_ids'] = [next_node_id]
             next_node_id = node['id']
