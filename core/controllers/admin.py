@@ -48,7 +48,7 @@ from core.domain import (
     question_domain,
     question_services,
     recommendations_services,
-    redis_services
+    redis_services,
     rights_manager,
     role_services,
     search_services,
