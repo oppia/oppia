@@ -272,7 +272,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                     'hits': []
                 }
             }
-        
+
         es_client = elastic_search_services.ES.get_client()
         swap_search = self.swap(
             es_client, 'search', mock_search)
