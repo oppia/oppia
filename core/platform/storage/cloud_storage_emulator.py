@@ -22,8 +22,9 @@ import mimetypes
 
 from core import feconf
 
-import redis
 from typing import Dict, List, Mapping, Optional, Union
+import redis
+
 # Here we use MyPy ignore because the redis library's type stubs
 # do not fully support subscript notation for StrictRedis, and MyPy
 # requires explicit type parameters.
