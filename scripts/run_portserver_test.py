@@ -390,17 +390,16 @@ class RunPortserverTests(test_utils.GenericTestBase):
             server = run_portserver.Server(dummy_handler, '\08181')
 
             connection_socket = MockSocket()
-            # Here we use cast because MockSocket is a test double and does not
-            # inherit from socket.socket, but we want to use it in place
-            # of a real socket for testing handle_connection.
-            cast_socket = cast(MockSocket, server.socket)
             # Here we use cast because the 'handle_connection' method expects a
             # 'socket.socket' object, but for this test we are providing a
             # MockSocket test double to simulate a real connection.
             run_portserver.Server.handle_connection(
                 cast(socket.socket, connection_socket), dummy_handler
             )
-
+            # Here we use cast because MockSocket is a test double and does not
+            # inherit from socket.socket, but we want to use it in place
+            # of a real socket for testing handle_connection.
+            cast_socket = cast(MockSocket, server.socket)
             self.assertFalse(cast_socket.server_closed)
             server.close()
 
