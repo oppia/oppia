@@ -471,7 +471,7 @@ class Server:
     @staticmethod
     def handle_connection(
         connection: socket.socket,
-        handler: Callable[[bytes], bytes]
+        handler: Callable[[bytes], Optional[bytes]]
     ) -> None:
         """Handle a socket connection.
 
@@ -490,6 +490,8 @@ class Server:
         """
         request = connection.recv(Server.message_size)
         response = handler(request)
+        if response is None:
+            raise ValueError('Handler returned None, expected bytes.')
         connection.sendall(response)
         connection.close()
 
