@@ -21,8 +21,7 @@ from __future__ import annotations
 import json
 
 from core import feconf
-from core.controllers import acl_decorators
-from core.controllers import base
+from core.controllers import acl_decorators, base
 from core.domain import firebase_services
 
 from typing import Dict
