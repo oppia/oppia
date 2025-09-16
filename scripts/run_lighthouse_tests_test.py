@@ -25,10 +25,7 @@ import sys
 from core import feconf
 from core.constants import constants
 from core.tests import test_utils
-from scripts import build
-from scripts import common
-from scripts import run_lighthouse_tests
-from scripts import servers
+from scripts import build, common, run_lighthouse_tests, servers
 
 GOOGLE_APP_ENGINE_PORT = 8181
 LIGHTHOUSE_MODE_PERFORMANCE = 'performance'

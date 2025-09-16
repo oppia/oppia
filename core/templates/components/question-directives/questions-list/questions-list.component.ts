@@ -158,7 +158,9 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
 
     this.imageLocalStorageService.flushStoredImagesData();
     this.pageContextService.setImageSaveDestinationToLocalStorage();
+
     this.question = Question.createDefaultQuestion(this.newQuestionSkillIds);
+    this.questionUndoRedoService.clearChanges();
     this.questionId = this.question.getId();
     this.questionStateData = this.question.getStateData();
     this.questionIsBeingUpdated = false;
@@ -543,6 +545,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
               true,
               true
             );
+            this.questionUndoRedoService.clearChanges();
             this.editorIsOpen = false;
             this.questionIsBeingSaved = false;
             this.alertsService.addSuccessMessage(

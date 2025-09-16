@@ -20,13 +20,15 @@ import datetime
 import uuid
 
 from core import feconf
-from core.domain import rights_domain
-from core.domain import rights_manager
-from core.domain import state_domain
-from core.domain import taskqueue_services
-from core.domain import user_services
-from core.domain import voiceover_domain
-from core.domain import voiceover_services
+from core.domain import (
+    rights_domain,
+    rights_manager,
+    state_domain,
+    taskqueue_services,
+    user_services,
+    voiceover_domain,
+    voiceover_services,
+)
 from core.tests import test_utils
 
 from typing import Dict

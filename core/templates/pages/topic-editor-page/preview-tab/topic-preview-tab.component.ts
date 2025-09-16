@@ -17,7 +17,10 @@
  */
 
 import {Component} from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
 import {StorySummary} from 'domain/story/story-summary.model';
+import {Subscription} from 'rxjs';
+import {PageTitleService} from 'services/page-title.service';
 import {Subtopic} from 'domain/topic/subtopic.model';
 import {Topic} from 'domain/topic/topic-object.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
@@ -36,6 +39,8 @@ export class TopicPreviewTabComponent {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   topic!: Topic;
   topicName!: string;
+  directiveSubscriptions = new Subscription();
+  pageTitleFragment: string = '';
   classroomUrlFragment: string = '';
   classroomName: string = '';
   topicUrlFragment!: string;
@@ -43,10 +48,13 @@ export class TopicPreviewTabComponent {
   canonicalStorySummaries!: StorySummary[];
   activeTab: string = this._TAB_STORY;
   chapterCount: number = 0;
+  practiceTabIsDisplayed: boolean = false;
 
   constructor(
     private topicEditorStateService: TopicEditorStateService,
-    private urlInterpolationService: UrlInterpolationService
+    private urlInterpolationService: UrlInterpolationService,
+    private pageTitleService: PageTitleService,
+    private translateService: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -66,6 +74,12 @@ export class TopicPreviewTabComponent {
       this.chapterCount +=
         this.canonicalStorySummaries[idx].getNodeTitles().length;
     }
+    this.setPageTitle();
+    this.subscribeToOnLangChange();
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
   }
 
   getStaticImageUrl(imagePath: string): string {
@@ -84,5 +98,28 @@ export class TopicPreviewTabComponent {
         this.activeTab = this._TAB_PRACTICE;
         break;
     }
+  }
+
+  isPracticeTabEnabled(): boolean {
+    return this.topic.getPracticeTabIsDisplayed();
+  }
+
+  subscribeToOnLangChange(): void {
+    this.directiveSubscriptions.add(
+      this.translateService.onLangChange.subscribe(() => {
+        this.setPageTitle();
+      })
+    );
+  }
+
+  setPageTitle(): void {
+    let translatedTitle = this.translateService.instant(
+      'I18N_TOPIC_VIEWER_PAGE_TITLE',
+      {
+        topicName: this.topicName,
+        pageTitleFragment: this.pageTitleFragment,
+      }
+    );
+    this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 }
