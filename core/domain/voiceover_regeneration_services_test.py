@@ -27,6 +27,7 @@ from core.domain import (
     exp_fetchers,
     exp_services,
     fs_services,
+    rte_component_registry,
     translation_domain,
     translation_services,
     voiceover_regeneration_services,
@@ -643,4 +644,18 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
         self.assertEqual(
             errors_while_voiceover_regeneration,
             [('content_0', 'Mocked exception during voiceover regeneration')]
+        )
+
+    def test_all_custom_tags_have_associated_voiceover_extraction_rules(
+        self
+    ) -> None:
+        existing_custom_rte_tags = list(
+            rte_component_registry.Registry.get_tag_list_with_attrs().keys())
+        custom_tags_with_voiceover_extraction_rules = list(
+            voiceover_regeneration_services.
+            CUSTOM_RTE_TAGS_TO_VOICEOVER_TEXT_EXTRACTION_RULES.keys())
+
+        self.assertItemsEqual(
+            existing_custom_rte_tags,
+            custom_tags_with_voiceover_extraction_rules
         )

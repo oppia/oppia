@@ -57,6 +57,84 @@ speech_synthesis_services = (
 WAIT_TIME_FOR_VOICEOVER_REGENERATION_IN_SECONDS = 3
 
 
+def _extract_text_from_link_tag(element: bs4.Tag) -> str:
+    """Extracts and returns the text from an oppia-noninteractive-link tag.
+
+    Args:
+        element: Tag. The oppia-noninteractive-link tag from which to extract
+            text.
+
+    Returns:
+        str. The extracted text.
+    """
+    escaped_text = element.get('text-with-value')
+    text = html.unescape(escaped_text)
+    return json.loads(text) if escaped_text else ''
+
+
+def _extract_text_from_skillreview_tag(element: bs4.Tag) -> str:
+    """Extracts and returns the text from an oppia-noninteractive-skillreview
+    tag.
+
+    Args:
+        element: Tag. The oppia-noninteractive-skillreview tag from which to
+            extract text.
+
+    Returns:
+        str. The extracted text.
+    """
+    escaped_text = element.get('text-with-value')
+    text = html.unescape(escaped_text)
+    return json.loads(text) if escaped_text else ''
+
+
+def _extract_text_from_math_tag(element: bs4.Tag) -> str:
+    """Extracts and returns the text from an oppia-noninteractive-math tag.
+
+    Args:
+        element: Tag. The oppia-noninteractive-math tag from which to extract
+            text.
+
+    Returns:
+        str. The extracted text.
+    """
+    escaped_math_content = element.get('math_content-with-value')
+    math_content = json.loads(html.unescape(escaped_math_content))
+    latex_expr = math_content['raw_latex']
+    converter = latex2text.LatexNodes2Text()
+    return converter.latex_to_text(latex_expr)
+
+
+def _return_empty_string(_: bs4.Tag) -> str:
+    """Returns an empty string for the given element.
+
+    Args:
+        _: Tag. The HTML tag for which to return an empty string.
+
+    Returns:
+        str. An empty string.
+    """
+    return ''
+
+
+# A dictionary mapping custom Oppia RTE tags to their respective text extraction
+# methods used during voiceover regeneration. Tags like images, videos, etc
+# currently return an empty string, indicating that they are not yet included in
+# voiceover generation (but may be in the future). When introducing new tags,
+# add a corresponding extraction rule here to ensure their learner-facing text
+# can be included in voiceovers.
+CUSTOM_RTE_TAGS_TO_VOICEOVER_TEXT_EXTRACTION_RULES = {
+    'oppia-noninteractive-link': _extract_text_from_link_tag,
+    'oppia-noninteractive-math': _extract_text_from_math_tag,
+    'oppia-noninteractive-skillreview': _extract_text_from_skillreview_tag,
+    'oppia-noninteractive-collapsible': _return_empty_string,
+    'oppia-noninteractive-image': _return_empty_string,
+    'oppia-noninteractive-video': _return_empty_string,
+    'oppia-noninteractive-tabs': _return_empty_string,
+    'oppia-noninteractive-workedexample': _return_empty_string
+}
+
+
 def convert_custom_oppia_tags_to_generic_tags(element: bs4.Tag) -> bs4.Tag:
     """The method transforms custom Oppia tags into standard paragraph tags.
 
@@ -67,39 +145,13 @@ def convert_custom_oppia_tags_to_generic_tags(element: bs4.Tag) -> bs4.Tag:
     Returns:
         Tag. The transformed paragraph tag.
     """
-    # NOTE: This method currently processes only the Link, Skillreview, and Math
-    # custom RTE tags. It extracts and returns the user-facing text from these
-    # tags. Other tags returns empty string, so their content is excluded during
-    # voiceover regeneration. To support additional custom tags (e.g., Images,
-    # Worked Examples, etc.), add similar rules below to ensure their texts are
-    # also processed during voiceover regeneration.
+    tag_name = element.name
+    voiceover_text_extractor_fn = (
+        CUSTOM_RTE_TAGS_TO_VOICEOVER_TEXT_EXTRACTION_RULES.get(
+            tag_name, None))
 
-    if element.name in [
-        'oppia-noninteractive-link',
-        'oppia-noninteractive-skillreview'
-    ]:
-        escaped_text = element.get('text-with-value')
-        text = html.unescape(escaped_text)
-        element.string = json.loads(text)
-        element.name = 'p'
-    elif element.name == 'oppia-noninteractive-math':
-        escaped_math_content = element.get('math_content-with-value')
-        math_content = json.loads(html.unescape(escaped_math_content))
-        latex_expr = math_content['raw_latex']
-        converter = latex2text.LatexNodes2Text()
-        element.string = converter.latex_to_text(latex_expr)
-        element.name = 'p'
-    elif element.name in [
-        'oppia-noninteractive-collapsible',
-        'oppia-noninteractive-image',
-        'oppia-noninteractive-video',
-        'oppia-noninteractive-tabs',
-        'oppia-noninteractive-workedexample'
-    ]:
-        # For these tags, we simply replace them with an empty string to
-        # exclude their content from voiceover regeneration.
-        element.string = ''
-        element.name = 'p'
+    element.string = voiceover_text_extractor_fn(element)
+    element.name = 'p'
     return element
 
 
