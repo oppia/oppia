@@ -93,7 +93,7 @@ jobs:
         id: generate_suite_name_for_artifacts
         # Replace slashes in the filename with underscores.
         run: |
-          SUITE_NAME=${{ matrix.suite.name }}-${{ matrix.run1 }}-${{ matrix.run2 }}-${{ matrix.mobile }}
+          SUITE_NAME=${{ matrix.suite.name }}-${{ matrix.run1 }}-${{ matrix.run2 }}-${{ matrix.mobile }}-${{ matrix.prod }}
           echo "MODIFIED_SUITE_NAME=${SUITE_NAME//\//_}" >> $GITHUB_OUTPUT
       - name: Run Desktop Acceptance Test ${{ matrix.suite.name }}
         # TODO(#22448): Remove once all suites are fixed.
