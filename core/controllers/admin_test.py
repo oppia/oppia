@@ -36,7 +36,7 @@ from core.domain import (
     platform_parameter_registry,
     question_fetchers,
     recommendations_services,
-    redis_services
+    redis_services,
     rights_manager,
     search_services,
     skill_services,
