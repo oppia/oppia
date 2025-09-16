@@ -47,7 +47,7 @@ from core.controllers import (
     feedback,
     feedback_updates,
     firebase,
-    firebase_config
+    firebase_config,
     improvements,
     incoming_app_feedback_report,
     learner_dashboard,
