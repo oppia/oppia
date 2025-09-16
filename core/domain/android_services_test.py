@@ -22,21 +22,22 @@ import logging
 import os
 
 from core import feconf
-from core.domain import android_services
-from core.domain import classroom_config_services
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import skill_fetchers
-from core.domain import story_fetchers
-from core.domain import topic_fetchers
-from core.domain import topic_services
+from core.domain import (
+    android_services,
+    classroom_config_services,
+    exp_fetchers,
+    exp_services,
+    skill_fetchers,
+    story_fetchers,
+    topic_fetchers,
+    topic_services,
+)
 from core.platform import models
 from core.tests import test_utils
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import secrets_services
-    from mypy_imports import translation_models
+    from mypy_imports import secrets_services, translation_models
 
 secrets_services = models.Registry.import_secrets_services()
 

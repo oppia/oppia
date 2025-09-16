@@ -24,36 +24,45 @@ import itertools
 import logging
 import urllib
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import auth_domain
-from core.domain import auth_services
-from core.domain import exp_fetchers
-from core.domain import fs_services
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_services
-from core.domain import role_services
-from core.domain import state_domain
-from core.domain import user_domain
+from core.domain import (
+    auth_domain,
+    auth_services,
+    exp_fetchers,
+    fs_services,
+    platform_parameter_list,
+    platform_parameter_services,
+    role_services,
+    state_domain,
+    user_domain,
+)
 from core.platform import models
 
 import filetype
 import requests
-
 from typing import (
-    Dict, Final, List, Literal, Optional, Sequence, TypedDict,
-    overload)
+    Dict,
+    Final,
+    List,
+    Literal,
+    Optional,
+    Sequence,
+    TypedDict,
+    overload,
+)
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import audit_models
-    from mypy_imports import auth_models
-    from mypy_imports import bulk_email_services
-    from mypy_imports import datastore_services
-    from mypy_imports import suggestion_models
-    from mypy_imports import transaction_services
-    from mypy_imports import user_models
+    from mypy_imports import (
+        audit_models,
+        auth_models,
+        bulk_email_services,
+        datastore_services,
+        suggestion_models,
+        transaction_services,
+        user_models,
+    )
 
 (auth_models, user_models, audit_models, suggestion_models) = (
     models.Registry.import_models([

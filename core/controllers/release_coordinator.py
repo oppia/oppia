@@ -18,12 +18,9 @@ from __future__ import annotations
 
 import logging
 
-from core import feconf
-from core import utils
-from core.controllers import acl_decorators
-from core.controllers import base
-from core.domain import caching_services
-from core.domain import feature_flag_domain
+from core import feconf, utils
+from core.controllers import acl_decorators, base
+from core.domain import caching_services, feature_flag_domain
 from core.domain import feature_flag_services as feature_services
 from core.domain import user_services
 

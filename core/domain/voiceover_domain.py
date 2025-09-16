@@ -20,8 +20,7 @@ from __future__ import annotations
 
 import re
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.domain import state_domain
 
 from typing import Dict, List, Optional, Tuple, TypedDict, Union

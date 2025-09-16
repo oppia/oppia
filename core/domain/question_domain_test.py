@@ -20,12 +20,13 @@ import copy
 import datetime
 import re
 
-from core import feconf
-from core import utils
-from core.domain import customization_args_util
-from core.domain import question_domain
-from core.domain import state_domain
-from core.domain import translation_domain
+from core import feconf, utils
+from core.domain import (
+    customization_args_util,
+    question_domain,
+    state_domain,
+    translation_domain,
+)
 from core.tests import test_utils
 
 from typing import Dict, List, Union

@@ -18,11 +18,12 @@ from __future__ import annotations
 
 from core import feconf
 from core.constants import constants
-from core.controllers import acl_decorators
-from core.controllers import base
-from core.domain import opportunity_services
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_services
+from core.controllers import acl_decorators, base
+from core.domain import (
+    opportunity_services,
+    platform_parameter_list,
+    platform_parameter_services,
+)
 
 from typing import Dict
 

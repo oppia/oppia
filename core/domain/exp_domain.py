@@ -30,25 +30,38 @@ import json
 import re
 import string
 
-from core import feconf
-from core import schema_utils
-from core import utils
+from core import feconf, schema_utils, utils
 from core.constants import constants
-from core.domain import change_domain
-from core.domain import param_domain
-from core.domain import state_domain
-from core.domain import translation_domain
+from core.domain import html_cleaner  # pylint: disable=invalid-import-from
+from core.domain import (  # pylint: disable=invalid-import-from
+    change_domain,
+    html_validation_service,
+    interaction_registry,
+    param_domain,
+    state_domain,
+    translation_domain,
+)
+from core.platform import models  # pylint: disable=invalid-import-from
 from extensions.objects.models import objects
 
 import bs4
 from typing import (
-    Any, Callable, Dict, Final, List, Literal, Mapping, Optional, Sequence,
-    Set, Tuple, TypedDict, Union, cast, overload)
-
-from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
-from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
-from core.domain import interaction_registry  # pylint: disable=invalid-import-from # isort:skip
-from core.platform import models  # pylint: disable=invalid-import-from # isort:skip
+    Any,
+    Callable,
+    Dict,
+    Final,
+    List,
+    Literal,
+    Mapping,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+    TypedDict,
+    Union,
+    cast,
+    overload,
+)
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.

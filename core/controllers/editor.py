@@ -21,29 +21,28 @@ from __future__ import annotations
 import datetime
 import logging
 
-from core import feature_flag_list
-from core import feconf
-from core import utils
+from core import feature_flag_list, feconf, utils
 from core.constants import constants
-from core.controllers import acl_decorators
-from core.controllers import base
+from core.controllers import acl_decorators, base
 from core.controllers import domain_objects_validator as objects_validator
-from core.domain import email_manager
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import feature_flag_services
-from core.domain import fs_services
-from core.domain import image_validation_services
-from core.domain import question_services
-from core.domain import rights_domain
-from core.domain import rights_manager
-from core.domain import search_services
-from core.domain import state_domain
-from core.domain import stats_domain
-from core.domain import stats_services
-from core.domain import translation_fetchers
-from core.domain import user_services
+from core.domain import (
+    email_manager,
+    exp_domain,
+    exp_fetchers,
+    exp_services,
+    feature_flag_services,
+    fs_services,
+    image_validation_services,
+    question_services,
+    rights_domain,
+    rights_manager,
+    search_services,
+    state_domain,
+    stats_domain,
+    stats_services,
+    translation_fetchers,
+    user_services,
+)
 
 from typing import Dict, List, Optional, TypedDict
 

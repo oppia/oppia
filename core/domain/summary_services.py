@@ -20,22 +20,33 @@ from __future__ import annotations
 
 from core import utils
 from core.constants import constants
-from core.domain import activity_domain
-from core.domain import activity_services
-from core.domain import collection_domain
-from core.domain import collection_services
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import rights_domain
-from core.domain import rights_manager
-from core.domain import search_services
-from core.domain import stats_services
-from core.domain import user_domain
-from core.domain import user_services
+from core.domain import (
+    activity_domain,
+    activity_services,
+    collection_domain,
+    collection_services,
+    exp_domain,
+    exp_fetchers,
+    exp_services,
+    rights_domain,
+    rights_manager,
+    search_services,
+    stats_services,
+    user_domain,
+    user_services,
+)
 
 from typing import (
-    Callable, Dict, List, Optional, Sequence, Tuple, TypedDict, Union, cast)
+    Callable,
+    Dict,
+    List,
+    Optional,
+    Sequence,
+    Tuple,
+    TypedDict,
+    Union,
+    cast,
+)
 
 
 class DisplayableCollectionSummaryDict(TypedDict):
