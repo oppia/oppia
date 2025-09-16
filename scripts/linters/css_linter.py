@@ -23,9 +23,8 @@ import subprocess
 
 from typing import Final, List, Tuple
 
+from .. import common, concurrent_task_utils
 from . import linter_utils
-from .. import common
-from .. import concurrent_task_utils
 
 STYLELINT_CONFIG: Final = os.path.join('.stylelintrc')
 

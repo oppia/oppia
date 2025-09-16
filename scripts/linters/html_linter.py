@@ -25,9 +25,8 @@ import subprocess
 
 from typing import Dict, List, Optional, Tuple
 
+from .. import common, concurrent_task_utils
 from . import linter_utils
-from .. import common
-from .. import concurrent_task_utils
 
 MYPY = False
 if MYPY:  # pragma: no cover

@@ -21,19 +21,20 @@ from __future__ import annotations
 import re
 
 from core.constants import constants
-from core.domain import skill_services
-from core.domain import study_guide_domain
-from core.domain import study_guide_services
-from core.domain import topic_domain
-from core.domain import topic_fetchers
-from core.domain import topic_services
+from core.domain import (
+    skill_services,
+    study_guide_domain,
+    study_guide_services,
+    topic_domain,
+    topic_fetchers,
+    topic_services,
+)
 from core.platform import models
 from core.tests import test_utils
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import subtopic_models
+    from mypy_imports import base_models, subtopic_models
 
 (base_models, subtopic_models) = models.Registry.import_models([
     models.Names.BASE_MODEL, models.Names.SUBTOPIC])

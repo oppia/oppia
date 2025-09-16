@@ -21,19 +21,19 @@ API.
 from __future__ import annotations
 
 from core import feconf
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_services
-from core.domain import search_services
+from core.domain import (
+    platform_parameter_list,
+    platform_parameter_services,
+    search_services,
+)
 from core.platform import models
 
 import elasticsearch
-
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import datastore_services
-    from mypy_imports import secrets_services
+    from mypy_imports import datastore_services, secrets_services
 
 secrets_services = models.Registry.import_secrets_services()
 datastore_services = models.Registry.import_datastore_services()

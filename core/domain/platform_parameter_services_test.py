@@ -22,9 +22,11 @@ import enum
 
 from core import feconf
 from core.constants import constants
-from core.domain import caching_services
-from core.domain import platform_parameter_domain
-from core.domain import platform_parameter_list
+from core.domain import (
+    caching_services,
+    platform_parameter_domain,
+    platform_parameter_list,
+)
 from core.domain import platform_parameter_registry as registry
 from core.domain import platform_parameter_services as parameter_services
 from core.tests import test_utils

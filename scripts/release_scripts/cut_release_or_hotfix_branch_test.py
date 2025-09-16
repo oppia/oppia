@@ -24,7 +24,6 @@ import json
 import subprocess
 import sys
 
-from core import utils
 from core.tests import test_utils
 from scripts import common
 from scripts.release_scripts import cut_release_or_hotfix_branch
@@ -114,7 +113,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
         def mock_input() -> str:
             return 'y'
 
-        self.url_open_swap = self.swap(utils, 'url_open', mock_url_open)
+        self.url_open_swap = self.swap(common, 'url_open', mock_url_open)
         self.verify_local_repo_swap = self.swap(
             common, 'verify_local_repo_is_clean',
             mock_verify_local_repo_is_clean)
