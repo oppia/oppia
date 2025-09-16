@@ -20,18 +20,29 @@ from __future__ import annotations
 
 import json
 
-from core.domain import caching_domain
-from core.domain import collection_domain
-from core.domain import exp_domain
-from core.domain import platform_parameter_domain
-from core.domain import skill_domain
-from core.domain import story_domain
-from core.domain import topic_domain
+from core.domain import (
+    caching_domain,
+    collection_domain,
+    exp_domain,
+    platform_parameter_domain,
+    skill_domain,
+    story_domain,
+    topic_domain,
+)
 from core.platform import models
 
 from typing import (
-    Callable, Dict, Final, List, Literal, Mapping, Optional, TypedDict,
-    Union, overload)
+    Callable,
+    Dict,
+    Final,
+    List,
+    Literal,
+    Mapping,
+    Optional,
+    TypedDict,
+    Union,
+    overload,
+)
 
 MYPY = False
 if MYPY: # pragma: no cover

@@ -77,7 +77,7 @@ export class SolutionEditor implements OnInit {
     this.EXPLANATION_FORM_SCHEMA = {
       type: 'html',
       ui_config: {
-        rte_components: 'ALL_COMPONENTS',
+        rte_component_config_id: 'ALL_COMPONENTS',
       },
     };
   }

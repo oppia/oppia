@@ -203,4 +203,8 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
       );
     }
   }
+
+  isPracticeTabEnabled(): boolean {
+    return this.practiceTabIsDisplayed;
+  }
 }

@@ -19,9 +19,7 @@
 from __future__ import annotations
 
 from core import feconf
-from core.domain import exp_domain
-from core.domain import rights_manager
-from core.domain import state_domain
+from core.domain import exp_domain, rights_manager, state_domain
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import translation_migration_jobs
 from core.jobs.types import job_run_result
@@ -32,8 +30,7 @@ from typing import Final, Sequence
 
 MYPY = False
 if MYPY:
-    from mypy_imports import exp_models
-    from mypy_imports import translation_models
+    from mypy_imports import exp_models, translation_models
 
 (exp_models, translation_models) = models.Registry.import_models([
     models.Names.EXPLORATION, models.Names.TRANSLATION

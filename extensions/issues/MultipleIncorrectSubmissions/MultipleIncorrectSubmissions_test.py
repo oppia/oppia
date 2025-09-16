@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 from core.tests import test_utils
+
 from extensions.issues.MultipleIncorrectSubmissions import MultipleIncorrectSubmissions # pylint: disable=unused-import, line-too-long # isort: skip
 
 

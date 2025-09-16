@@ -29,32 +29,42 @@ import copy
 import logging
 import os
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import activity_services
-from core.domain import caching_services
-from core.domain import change_domain
-from core.domain import collection_domain
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import rights_domain
-from core.domain import rights_manager
-from core.domain import search_services
-from core.domain import subscription_services
-from core.domain import user_domain
-from core.domain import user_services
+from core.domain import (
+    activity_services,
+    caching_services,
+    change_domain,
+    collection_domain,
+    exp_fetchers,
+    exp_services,
+    rights_domain,
+    rights_manager,
+    search_services,
+    subscription_services,
+    user_domain,
+    user_services,
+)
 from core.platform import models
 
 from typing import (
-    Dict, Final, Iterable, List, Literal, Mapping, Optional, Sequence, Tuple,
-    TypedDict, cast, overload)
+    Dict,
+    Final,
+    Iterable,
+    List,
+    Literal,
+    Mapping,
+    Optional,
+    Sequence,
+    Tuple,
+    TypedDict,
+    cast,
+    overload,
+)
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import collection_models
-    from mypy_imports import datastore_services
-    from mypy_imports import user_models
+    from mypy_imports import collection_models, datastore_services, user_models
 
 (collection_models, user_models) = models.Registry.import_models([
     models.Names.COLLECTION, models.Names.USER

@@ -43,6 +43,7 @@ import {TopicEditorSendMailComponent} from '../modal-templates/topic-editor-send
 import {TopicEditorRoutingService} from '../services/topic-editor-routing.service';
 import {TopicEditorStateService} from '../services/topic-editor-state.service';
 import {TopicEditorNavbarComponent} from './topic-editor-navbar.component';
+import {QuestionUndoRedoService} from 'domain/editor/undo_redo/question-undo-redo.service';
 
 class MockWindowRef {
   _window = {
@@ -50,6 +51,12 @@ class MockWindowRef {
       hash: '123',
       href: '',
       replace: (val: string) => {},
+    },
+    addEventListener(
+      event: string,
+      callback: (arg0: {returnValue: null}) => void
+    ) {
+      callback({returnValue: null});
     },
     open: (url: string) => {},
     gtag: () => {},
@@ -64,6 +71,7 @@ describe('Topic Editor Navbar', () => {
   let fixture: ComponentFixture<TopicEditorNavbarComponent>;
   let componentInstance: TopicEditorNavbarComponent;
   let topicEditorStateService: TopicEditorStateService;
+  let questionUndoRedoService: QuestionUndoRedoService;
   let urlService: UrlService;
   let topic: Topic;
   let undoRedoService: UndoRedoService;
@@ -89,6 +97,7 @@ describe('Topic Editor Navbar', () => {
         TopicEditorStateService,
         UrlService,
         UndoRedoService,
+        QuestionUndoRedoService,
         TopicRightsBackendApiService,
         {
           provide: WindowRef,
@@ -109,6 +118,7 @@ describe('Topic Editor Navbar', () => {
     undoRedoService = TestBed.inject(UndoRedoService);
     alertsService = TestBed.inject(AlertsService);
     topicRightsBackendApiService = TestBed.inject(TopicRightsBackendApiService);
+    questionUndoRedoService = TestBed.inject(QuestionUndoRedoService);
 
     let subtopic = Subtopic.createFromTitle(1, 'subtopic1');
     subtopic.setUrlFragment('dummy-url');
@@ -817,6 +827,98 @@ describe('Topic Editor Navbar', () => {
       );
     })
   );
+
+  it('should open modal and clear changes when navigating to preview from questions tab', fakeAsync(() => {
+    spyOn(topicEditorRoutingService, 'getActiveTabName').and.returnValue(
+      'questions'
+    );
+    spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
+    spyOn(questionUndoRedoService, 'clearChanges');
+    const navigateSpy = spyOn(componentInstance, '_navigateToPreview');
+
+    const mockModalRef = {
+      componentInstance: {},
+      result: Promise.resolve(),
+    };
+
+    spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
+
+    componentInstance.openTopicViewer();
+    tick();
+
+    expect(ngbModal.open).toHaveBeenCalled();
+    expect(questionUndoRedoService.clearChanges).toHaveBeenCalled();
+    expect(navigateSpy).toHaveBeenCalledWith('questions');
+  }));
+
+  it('should not clear changes if modal dismissed when navigating to preview', fakeAsync(() => {
+    spyOn(topicEditorRoutingService, 'getActiveTabName').and.returnValue(
+      'questions'
+    );
+    spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
+    spyOn(questionUndoRedoService, 'clearChanges');
+    const navigateSpy = spyOn(componentInstance, '_navigateToPreview');
+
+    const mockModalRef = {
+      componentInstance: {},
+      result: Promise.reject(),
+    };
+
+    spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
+
+    componentInstance.openTopicViewer();
+    tick();
+
+    expect(ngbModal.open).toHaveBeenCalled();
+    expect(questionUndoRedoService.clearChanges).not.toHaveBeenCalled();
+    expect(navigateSpy).not.toHaveBeenCalled();
+  }));
+
+  it('should open modal and clear changes when navigating to main tab from questions tab', fakeAsync(() => {
+    spyOn(topicEditorRoutingService, 'getActiveTabName').and.returnValue(
+      'questions'
+    );
+    spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
+    spyOn(questionUndoRedoService, 'clearChanges');
+    const navigateSpy = spyOn(componentInstance, '_navigateToMainTab');
+
+    const mockModalRef = {
+      componentInstance: {},
+      result: Promise.resolve(),
+    };
+
+    spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
+
+    componentInstance.selectMainTab();
+    tick();
+
+    expect(ngbModal.open).toHaveBeenCalled();
+    expect(questionUndoRedoService.clearChanges).toHaveBeenCalled();
+    expect(navigateSpy).toHaveBeenCalledWith('questions');
+  }));
+
+  it('should not clear changes if modal dismissed when navigating to main tab', fakeAsync(() => {
+    spyOn(topicEditorRoutingService, 'getActiveTabName').and.returnValue(
+      'questions'
+    );
+    spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
+    spyOn(questionUndoRedoService, 'clearChanges');
+    const navigateSpy = spyOn(componentInstance, '_navigateToMainTab');
+
+    const mockModalRef = {
+      componentInstance: {},
+      result: Promise.reject(),
+    };
+
+    spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
+
+    componentInstance.selectMainTab();
+    tick();
+
+    expect(ngbModal.open).toHaveBeenCalled();
+    expect(questionUndoRedoService.clearChanges).not.toHaveBeenCalled();
+    expect(navigateSpy).not.toHaveBeenCalled();
+  }));
 
   it('should return all the warnings when called', () => {
     componentInstance.topic = topic;

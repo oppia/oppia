@@ -348,7 +348,7 @@ describe('Subtopic editor tab', () => {
     expect(component.SUBTOPIC_PAGE_SCHEMA).toEqual({
       type: 'html',
       ui_config: {
-        rte_components: 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS',
+        rte_component_config_id: 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS',
         rows: 100,
       },
     });
