@@ -50,8 +50,9 @@ class CollectWeeklyDashboardStatsJobTests(job_test_utils.JobTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.formated_datetime = datetime.datetime.utcnow().strftime(
-            feconf.DASHBOARD_STATS_DATETIME_STRING_FORMAT)
+        self.formated_datetime = datetime.datetime.now(
+            tz=datetime.UTC
+        ).strftime(feconf.DASHBOARD_STATS_DATETIME_STRING_FORMAT)
 
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()

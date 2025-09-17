@@ -220,7 +220,7 @@ class BeamEntityToAndFromModelTests(test_utils.TestBase):
         self.assertEqual(job_utils.get_beam_key_from_ndb_key(ndb_key), beam_key)
 
     def test_get_model_from_beam_entity_with_time(self) -> None:
-        utcnow = datetime.datetime.utcnow()
+        utcnow = datetime.datetime.now(tz=datetime.UTC)
 
         beam_entity = beam_datastore_types.Entity(
             beam_datastore_types.Key(
@@ -253,8 +253,8 @@ class BeamEntityToAndFromModelTests(test_utils.TestBase):
                 ('CoreModel', 'abc'), project=self.oppia_project_id))
         beam_entity.set_properties({
             'prop': 123,
-            'created_on': datetime.datetime.utcnow(),
-            'last_updated': datetime.datetime.utcnow(),
+            'created_on': datetime.datetime.now(tz=datetime.UTC),
+            'last_updated': datetime.datetime.now(tz=datetime.UTC),
             'deleted': False,
         })
 

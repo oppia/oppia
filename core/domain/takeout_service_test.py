@@ -1024,7 +1024,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             author_id=self.USER_ID_1,
             content='content sample',
             title='sample title',
-            published_on=datetime.datetime.utcnow(),
+            published_on=datetime.datetime.now(tz=datetime.UTC),
             url_fragment='sample-url-fragment',
             tags=['tag', 'one'],
             thumbnail_filename='thumbnail'
@@ -1598,7 +1598,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             author_id=self.USER_ID_1,
             content='content sample',
             title='sample title',
-            published_on=datetime.datetime.utcnow(),
+            published_on=datetime.datetime.now(tz=datetime.UTC),
             url_fragment='sample-url-fragment',
             tags=['tag', 'one'],
             thumbnail_filename='thumbnail'

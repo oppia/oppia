@@ -144,7 +144,7 @@ class ExplorationImprovementsHandler(
                     issue_description,
                     status,
                     self.user_id,
-                    datetime.datetime.utcnow()))
+                    datetime.datetime.now(tz=datetime.UTC)))
         improvements_services.put_tasks(task_entries_to_put)
         self.render_json({})
 

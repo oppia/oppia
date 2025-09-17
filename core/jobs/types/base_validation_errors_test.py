@@ -65,7 +65,7 @@ class BarError(base_validation_errors.BaseValidationError):
 class AuditErrorsTestBase(core_test_utils.TestBase):
     """Base class for validator error tests."""
 
-    NOW: datetime.datetime = datetime.datetime.utcnow()
+    NOW: datetime.datetime = datetime.datetime.now(tz=datetime.UTC)
     YEAR_AGO: datetime.datetime = NOW - datetime.timedelta(weeks=52)
     YEAR_LATER: datetime.datetime = NOW + datetime.timedelta(weeks=52)
 

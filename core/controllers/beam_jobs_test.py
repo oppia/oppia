@@ -99,7 +99,8 @@ class BeamJobRunHandlerTests(BeamHandlerTestBase):
         model.put()
         run = beam_job_domain.BeamJobRun(
             model.id, 'FooJob', 'CANCELLING',
-            datetime.datetime.utcnow(), datetime.datetime.utcnow(), False)
+            datetime.datetime.now(tz=datetime.UTC),
+            datetime.datetime.now(tz=datetime.UTC), False)
 
         swap_cancel_beam_job = self.swap_to_always_return(
             beam_job_services, 'cancel_beam_job', value=run)

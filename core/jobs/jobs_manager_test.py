@@ -125,7 +125,7 @@ class RefreshStateOfBeamJobRunModelTests(test_utils.GenericTestBase):
             project_id='dev-project-id',
             location=feconf.GOOGLE_APP_ENGINE_REGION,
             current_state=dataflow.JobState.JOB_STATE_PENDING,
-            current_state_time=datetime.datetime.utcnow())
+            current_state_time=datetime.datetime.now(tz=datetime.UTC))
 
         self.dataflow_client_mock = mock.Mock()
         self.dataflow_client_mock.get_job.return_value = self.dataflow_job
@@ -207,7 +207,7 @@ class CancelJobTests(test_utils.GenericTestBase):
             project_id='dev-project-id',
             location=feconf.GOOGLE_APP_ENGINE_REGION,
             current_state=dataflow.JobState.JOB_STATE_CANCELLING,
-            current_state_time=datetime.datetime.utcnow())
+            current_state_time=datetime.datetime.now(tz=datetime.UTC))
 
         self.dataflow_client_mock = mock.Mock()
         self.dataflow_client_mock.update_job.return_value = self.dataflow_job

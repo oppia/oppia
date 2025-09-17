@@ -66,7 +66,7 @@ class UserQueryTests(test_utils.GenericTestBase):
             query_status=feconf.USER_QUERY_STATUS_PROCESSING,
             user_ids=[],
             sent_email_model_id=None,
-            created_on=datetime.datetime.utcnow(),
+            created_on=datetime.datetime.now(tz=datetime.UTC),
         )
         self.user_query.validate()
 

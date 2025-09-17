@@ -1535,11 +1535,12 @@ class EditorAutosaveHandler(ExplorationHandler):
             if can_edit:
                 exp_services.create_or_update_draft(
                     exploration_id, self.user_id, change_list, version,
-                    datetime.datetime.utcnow())
+                    datetime.datetime.now(tz=datetime.UTC))
             elif can_voiceover:
                 exp_services.create_or_update_draft(
                     exploration_id, self.user_id, change_list, version,
-                    datetime.datetime.utcnow(), is_by_voice_artist=True)
+                    datetime.datetime.now(tz=datetime.UTC),
+                    is_by_voice_artist=True)
         except utils.ValidationError as e:
             # We leave any pre-existing draft changes in the datastore.
             raise self.InvalidInputException(e)

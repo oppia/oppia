@@ -2111,14 +2111,18 @@ class AppEngineTestBase(TestBase):
         self, mocked_now: datetime.datetime
     ) -> Iterator[None]:
         """Mocks parts of the datastore to accept a fake datetime type that
-        always returns the same value for utcnow.
+        always returns the same value of datetime.datetime.now(tz=datetime.UTC).
 
         Example:
             import datetime
-            mocked_now = datetime.datetime.utcnow() - datetime.timedelta(days=1)
+            mocked_now = (
+                datetime.datetime.now(tz=datetime.UTC) -
+                datetime.timedelta(days=1))
             with mock_datetime_utcnow(mocked_now):
-                self.assertEqual(datetime.datetime.utcnow(), mocked_now)
-            actual_now = datetime.datetime.utcnow() # Returns actual time.
+                self.assertEqual(
+                    datetime.datetime.now(tz=datetime.UTC), mocked_now)
+             # Returns actual time.
+            actual_now = datetime.datetime.now(tz=datetime.UTC)
 
         Args:
             mocked_now: datetime.datetime. The datetime which will be used
@@ -2145,10 +2149,8 @@ class AppEngineTestBase(TestBase):
         class MockDatetime(datetime.datetime, metaclass=MockDatetimeType):
             """Always returns mocked_now as the current UTC time."""
 
-            # Here we use MyPy ignore because the signature of this
-            # method doesn't match with datetime.datetime's utcnow().
             @classmethod
-            def utcnow(cls) -> datetime.datetime:  # type: ignore[override]
+            def now(cls, tz=None) -> datetime.datetime:
                 """Returns the mocked datetime."""
                 return mocked_now
 

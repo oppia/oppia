@@ -191,7 +191,7 @@ class BaseHandler(
         # Set self.request, self.response and self.app.
         self.initialize(request, response)
 
-        self.start_time = datetime.datetime.utcnow()
+        self.start_time = datetime.datetime.now(tz=datetime.UTC)
 
         # Here we use type Any because dict 'self.values' is a return dict
         # for the handlers, and different handlers can return different
@@ -286,7 +286,7 @@ class BaseHandler(
                 # to the last log-in time.
                 if (user_settings.last_logged_in is None or
                         not utils.are_datetimes_close(
-                            datetime.datetime.utcnow(),
+                            datetime.datetime.now(tz=datetime.UTC),
                             user_settings.last_logged_in)):
                     user_services.record_user_logged_in(self.user_id)
 

@@ -697,7 +697,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         version = 1
 
         exp_details: IncompleteExplorationDetailsDict = {
-            'timestamp': datetime.datetime.utcnow(),
+            'timestamp': datetime.datetime.now(tz=datetime.UTC),
             'state_name': state_name,
             'version': version
         }
@@ -715,7 +715,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         version = 2
 
         modified_exp_details: IncompleteExplorationDetailsDict = {
-            'timestamp': datetime.datetime.utcnow(),
+            'timestamp': datetime.datetime.now(tz=datetime.UTC),
             'state_name': state_name,
             'version': version
         }

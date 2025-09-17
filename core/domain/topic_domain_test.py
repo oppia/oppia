@@ -1781,7 +1781,7 @@ class TopicSummaryTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        current_time = datetime.datetime.utcnow()
+        current_time = datetime.datetime.now(tz=datetime.UTC)
         time_in_millisecs = utils.get_time_in_millisecs(current_time)
         self.topic_summary_dict = {
             'url_fragment': 'url-frag',

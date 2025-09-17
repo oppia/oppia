@@ -253,7 +253,7 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
 
     def test_is_state_terminal(self) -> None:
 
-        now = datetime.datetime.utcnow()
+        now = datetime.datetime.now(tz=datetime.UTC)
 
         cancelled_beam_job_run = beam_job_domain.BeamJobRun(
             '123',

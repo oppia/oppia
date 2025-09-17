@@ -108,10 +108,11 @@ class RatingServicesTests(test_utils.GenericTestBase):
         # Ruling out the possibility of None for mypy type checking.
         assert first_rating_time is not None
         self.assertLess(
-            datetime.datetime.utcnow(),
+            datetime.datetime.now(tz=datetime.UTC),
             first_rating_time + time_allowed_for_computation)
         self.assertLess(first_rating_time, second_rating_time)
-        self.assertLess(second_rating_time, datetime.datetime.utcnow())
+        self.assertLess(
+            second_rating_time, datetime.datetime.now(tz=datetime.UTC))
 
     def test_rating_assignations_do_not_conflict(self) -> None:
         """Check that ratings of different explorations are independent."""

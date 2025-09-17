@@ -3622,7 +3622,8 @@ class ReviewableSuggestionEmailInfoUnitTests(test_utils.GenericTestBase):
     suggestion_type: str = feconf.SUGGESTION_TYPE_ADD_QUESTION
     language_code: str = 'en'
     suggestion_content: str = 'sample question'
-    submission_datetime: datetime.datetime = datetime.datetime.utcnow()
+    submission_datetime: datetime.datetime = datetime.datetime.now(
+        tz=datetime.UTC)
 
     def test_initial_object_with_valid_arguments_has_correct_properties(
         self

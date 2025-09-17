@@ -133,8 +133,9 @@ def enqueue_task(url: str, params: Dict[str, Any], countdown: int) -> None:
         raise ValueError(
             'The params added to the email task call cannot be json serialized'
         ) from e
-    scheduled_datetime = datetime.datetime.utcnow() + datetime.timedelta(
-        seconds=countdown)
+    scheduled_datetime = (
+        datetime.datetime.now(tz=datetime.UTC) +
+        datetime.timedelta(seconds=countdown))
     platform_taskqueue_services.create_http_task(
         queue_name=QUEUE_NAME_EMAILS, url=url, payload=params,
         scheduled_for=scheduled_datetime)

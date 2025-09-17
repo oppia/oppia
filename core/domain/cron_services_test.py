@@ -51,7 +51,8 @@ class CronServicesTests(test_utils.GenericTestBase):
             collection_ids=[],
             story_ids=[],
             learnt_topic_ids=[],
-            last_updated=datetime.datetime.utcnow() - self.NINE_WEEKS,
+            last_updated=datetime.datetime.now(
+                tz=datetime.UTC) - self.NINE_WEEKS,
             deleted=True
         )
         completed_activities_model.update_timestamps(
@@ -75,7 +76,8 @@ class CronServicesTests(test_utils.GenericTestBase):
             user_ids=[],
             submitter_id=admin_user_id,
             query_status=feconf.USER_QUERY_STATUS_PROCESSING,
-            last_updated=datetime.datetime.utcnow() - self.NINE_WEEKS
+            last_updated=datetime.datetime.now(
+                tz=datetime.UTC) - self.NINE_WEEKS
         )
         user_query_model.update_timestamps(update_last_updated_time=False)
         user_query_model.put()

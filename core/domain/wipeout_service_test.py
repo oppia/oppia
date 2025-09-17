@@ -393,7 +393,8 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         self
     ) -> None:
         date_10_days_ago = (
-            datetime.datetime.utcnow() - datetime.timedelta(days=10))
+            datetime.datetime.now(tz=datetime.UTC) -
+            datetime.timedelta(days=10))
         with self.mock_datetime_utcnow(date_10_days_ago):
             self.signup(self.USER_3_EMAIL, self.USER_3_USERNAME)
         user_3_id = self.get_user_id_from_email(self.USER_3_EMAIL)
@@ -638,7 +639,8 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
         date_10_days_ago = (
-            datetime.datetime.utcnow() - datetime.timedelta(days=10))
+            datetime.datetime.now(tz=datetime.UTC) -
+            datetime.timedelta(days=10))
         with self.mock_datetime_utcnow(date_10_days_ago):
             self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
@@ -5229,7 +5231,7 @@ class WipeoutServiceDeleteBlogPostModelsTests(test_utils.GenericTestBase):
             author_id=self.user_1_id,
             content=self.CONTENT,
             title=self.TITLE,
-            published_on=datetime.datetime.utcnow(),
+            published_on=datetime.datetime.now(tz=datetime.UTC),
             url_fragment='sample-url-fragment',
             tags=self.TAGS,
             thumbnail_filename=self.THUMBNAIL
@@ -5241,7 +5243,7 @@ class WipeoutServiceDeleteBlogPostModelsTests(test_utils.GenericTestBase):
             author_id=self.user_1_id,
             summary=self.SUMMARY,
             title=self.TITLE,
-            published_on=datetime.datetime.utcnow(),
+            published_on=datetime.datetime.now(tz=datetime.UTC),
             url_fragment='sample-url-fragment',
             tags=self.TAGS,
             thumbnail_filename=self.THUMBNAIL
@@ -5386,7 +5388,7 @@ class WipeoutServiceDeleteBlogPostModelsTests(test_utils.GenericTestBase):
                     author_id=self.user_1_id,
                     content=self.CONTENT,
                     title=self.TITLE,
-                    published_on=datetime.datetime.utcnow(),
+                    published_on=datetime.datetime.now(tz=datetime.UTC),
                     url_fragment='sample-url-fragment',
                     tags=self.TAGS,
                     thumbnail_filename=self.THUMBNAIL
@@ -5402,7 +5404,7 @@ class WipeoutServiceDeleteBlogPostModelsTests(test_utils.GenericTestBase):
                     author_id=self.user_1_id,
                     summary=self.SUMMARY,
                     title=self.TITLE,
-                    published_on=datetime.datetime.utcnow(),
+                    published_on=datetime.datetime.now(tz=datetime.UTC),
                     url_fragment='sample-url-fragment',
                     tags=self.TAGS,
                     thumbnail_filename=self.THUMBNAIL

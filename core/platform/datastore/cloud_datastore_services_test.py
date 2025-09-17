@@ -49,7 +49,7 @@ class CloudDatastoreServicesTests(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         self.admin_user_id = self.get_user_id_from_email(
             self.CURRICULUM_ADMIN_EMAIL)
-        self.curr_time = datetime.datetime.utcnow()
+        self.curr_time = datetime.datetime.now(tz=datetime.UTC)
         self.completed_activities_model = user_models.CompletedActivitiesModel(
             id=self.admin_user_id,
             exploration_ids=[],

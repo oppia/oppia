@@ -88,7 +88,7 @@ class ContributorAdminDashboardServicesUnitTest(test_utils.GenericTestBase):
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=datetime.datetime.now(tz=datetime.UTC),
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(35))
         ).put()
@@ -113,7 +113,7 @@ class ContributorAdminDashboardServicesUnitTest(test_utils.GenericTestBase):
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=datetime.datetime.now(tz=datetime.UTC),
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(65))
         ).put()
@@ -138,7 +138,7 @@ class ContributorAdminDashboardServicesUnitTest(test_utils.GenericTestBase):
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=datetime.datetime.now(tz=datetime.UTC),
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(9))
         ).put()
@@ -162,7 +162,7 @@ class ContributorAdminDashboardServicesUnitTest(test_utils.GenericTestBase):
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=datetime.datetime.now(tz=datetime.UTC),
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(25))
         ).put()
@@ -181,7 +181,7 @@ class ContributorAdminDashboardServicesUnitTest(test_utils.GenericTestBase):
                 self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(
                 self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=datetime.datetime.now(tz=datetime.UTC),
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(65))
         ).put()
@@ -199,7 +199,7 @@ class ContributorAdminDashboardServicesUnitTest(test_utils.GenericTestBase):
                 self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(
                 self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=datetime.datetime.now(tz=datetime.UTC),
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(95))
         ).put()
@@ -217,7 +217,7 @@ class ContributorAdminDashboardServicesUnitTest(test_utils.GenericTestBase):
                 self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(
                 self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=datetime.datetime.now(tz=datetime.UTC),
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(125))
         ).put()
@@ -235,7 +235,7 @@ class ContributorAdminDashboardServicesUnitTest(test_utils.GenericTestBase):
                 self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(
                 self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=datetime.datetime.now(tz=datetime.UTC),
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(155))
         ).put()

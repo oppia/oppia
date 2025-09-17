@@ -562,8 +562,10 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         self.blog_post_summary.thumbnail_filename = 'sample-thumbnail.svg'
         self.blog_post_summary.tags = ['tag1', 'tag2']
         self.blog_post_summary.url_fragment = 'sample-url'
-        self.blog_post_summary.published_on = datetime.datetime.utcnow()
-        self.blog_post_summary.last_updated = datetime.datetime.utcnow()
+        self.blog_post_summary.published_on = datetime.datetime.now(
+            tz=datetime.UTC)
+        self.blog_post_summary.last_updated = datetime.datetime.now(
+            tz=datetime.UTC)
 
         expected_dict = {
             'id': self.blog_post_summary.id,

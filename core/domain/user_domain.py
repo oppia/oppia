@@ -329,7 +329,7 @@ class UserSettings:
         """Updates last_edited_an_exploration to the current datetime for the
         user.
         """
-        self.last_edited_an_exploration = datetime.datetime.utcnow()
+        self.last_edited_an_exploration = datetime.datetime.now(tz=datetime.UTC)
 
     def update_first_contribution_msec(
         self, first_contribution_msec: float

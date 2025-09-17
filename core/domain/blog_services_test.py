@@ -538,7 +538,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         model.thumbnail_filename = 'image.png'
         model.content = 'hello bloggers'
         model.url_fragment = 'sample'
-        model.published_on = datetime.datetime.utcnow()
+        model.published_on = datetime.datetime.now(tz=datetime.UTC)
         model.update_timestamps()
         model.put()
 
@@ -575,7 +575,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         model.thumbnail_filename = 'image.png'
         model.content = 'hello bloggers'
         model.url_fragment = 'sample'
-        model.published_on = datetime.datetime.utcnow()
+        model.published_on = datetime.datetime.now(tz=datetime.UTC)
         model.update_timestamps()
         model.put()
 

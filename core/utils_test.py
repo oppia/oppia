@@ -274,7 +274,7 @@ class UtilsTests(test_utils.GenericTestBase):
         """Tests to make sure converting a naive datetime object to a string and
         back doesn't alter the naive datetime object data.
         """
-        now = datetime.datetime.utcnow()
+        now = datetime.datetime.now(tz=datetime.UTC)
         self.assertEqual(
             utils.convert_string_to_naive_datetime_object(
                 utils.convert_naive_datetime_to_string(now)),

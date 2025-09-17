@@ -2077,7 +2077,8 @@ class AuditGenerateContributionStatsJobTests(job_test_utils.JobTestBase):
             target_id=self.EXP_1_ID,
             target_version_at_submission=0,
             language_code=self.LANG_1,
-            last_updated=datetime.datetime.utcnow() - datetime.timedelta(days=1)
+            last_updated=datetime.datetime.now(
+                tz=datetime.UTC) - datetime.timedelta(days=1)
         )
         suggestion_2_model.update_timestamps(update_last_updated_time=False)
         suggestion_models.GeneralSuggestionModel.put_multi([

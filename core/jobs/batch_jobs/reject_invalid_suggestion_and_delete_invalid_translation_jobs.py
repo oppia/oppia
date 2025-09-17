@@ -407,7 +407,8 @@ class ComputeSuggestionsInReviewForTranslatedContents(beam.DoFn):  # type: ignor
                         suggestion.status = suggestion_models.STATUS_REJECTED
                         suggestion.final_reviewer_id = (
                             feconf.SUGGESTION_BOT_USER_ID)
-                        suggestion.last_updated = datetime.datetime.utcnow()
+                        suggestion.last_updated = datetime.datetime.now(
+                            tz=datetime.UTC)
                         updated_suggestion_dicts.append({
                             'updated_suggestion': suggestion,
                             'suggestion_dict': {

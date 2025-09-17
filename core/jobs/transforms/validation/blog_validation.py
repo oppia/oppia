@@ -135,7 +135,7 @@ class ValidateBlogModelTimestamps(beam.DoFn):  # type: ignore[misc]
             yield blog_validation_errors.InconsistentLastUpdatedTimestampsError(
                 model)
 
-        current_datetime = datetime.datetime.utcnow()
+        current_datetime = datetime.datetime.now(tz=datetime.UTC)
         if model.published_on:
             if (model.published_on - max_clock_skew_duration) > (
                     current_datetime):

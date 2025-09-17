@@ -101,7 +101,8 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
         }
         # Create Timestamp protobuf.
         datetime_to_execute_task = (
-            datetime.datetime.utcnow() + datetime.timedelta(seconds=20))
+            datetime.datetime.now(tz=datetime.UTC) +
+            datetime.timedelta(seconds=20))
         timestamp = timestamp_pb2.Timestamp()
         timestamp.FromDatetime(datetime_to_execute_task)
         task_name = 'task1'

@@ -1023,7 +1023,7 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        current_time = datetime.datetime.utcnow()
+        current_time = datetime.datetime.now(tz=datetime.UTC)
         self.collection_summary_dict = {
             'category': 'category',
             'status': constants.ACTIVITY_STATUS_PRIVATE,
@@ -1111,7 +1111,8 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
             'col_id', 'title', 'category', 'objective', 'en', [],
             constants.ACTIVITY_STATUS_PUBLIC, True, ['owner_id'],
             ['editor_id'], ['viewer_id'], ['contributor_id'], {}, 1, 1,
-            datetime.datetime.utcnow(), datetime.datetime.utcnow())
+            datetime.datetime.now(tz=datetime.UTC),
+            datetime.datetime.now(tz=datetime.UTC))
         self.assertFalse(self.collection_summary.is_private())
 
     def test_is_editable_by(self) -> None:
@@ -1121,7 +1122,8 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
             'col_id', 'title', 'category', 'objective', 'en', [],
             constants.ACTIVITY_STATUS_PUBLIC, False, ['owner_id'],
             ['editor_id'], ['viewer_id'], ['contributor_id'], {}, 1, 1,
-            datetime.datetime.utcnow(), datetime.datetime.utcnow())
+            datetime.datetime.now(tz=datetime.UTC),
+            datetime.datetime.now(tz=datetime.UTC))
         self.assertFalse(self.collection_summary.is_editable_by('other_id'))
 
     def test_is_solely_owned_by_user_one_owner(self) -> None:
@@ -1133,7 +1135,8 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
             'col_id', 'title', 'category', 'objective', 'en', [],
             constants.ACTIVITY_STATUS_PUBLIC, True, ['other_id'],
             ['editor_id'], ['viewer_id'], ['contributor_id'], {}, 1, 1,
-            datetime.datetime.utcnow(), datetime.datetime.utcnow())
+            datetime.datetime.now(tz=datetime.UTC),
+            datetime.datetime.now(tz=datetime.UTC))
         self.assertFalse(
             self.collection_summary.is_solely_owned_by_user('owner_id'))
         self.assertTrue(
@@ -1148,7 +1151,8 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
             'col_id', 'title', 'category', 'objective', 'en', [],
             constants.ACTIVITY_STATUS_PUBLIC, True, ['owner_id', 'other_id'],
             ['editor_id'], ['viewer_id'], ['contributor_id'], {}, 1, 1,
-            datetime.datetime.utcnow(), datetime.datetime.utcnow())
+            datetime.datetime.now(tz=datetime.UTC),
+            datetime.datetime.now(tz=datetime.UTC))
         self.assertFalse(
             self.collection_summary.is_solely_owned_by_user('owner_id'))
         self.assertFalse(
