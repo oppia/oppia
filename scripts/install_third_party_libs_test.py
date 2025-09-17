@@ -428,12 +428,12 @@ class SetupTests(test_utils.GenericTestBase):
         self.cd_swap = self.swap(common, 'CD', MockCD)
         version_info = collections.namedtuple(
             'version_info', ['major', 'minor', 'micro'])
-        self.version_info_py310_swap = self.swap(
-            sys, 'version_info', version_info(major=3, minor=10, micro=16)
+        self.version_info_py313_swap = self.swap(
+            sys, 'version_info', version_info(major=3, minor=13, micro=7)
         )
 
     def test_python_version_testing_with_correct_version(self) -> None:
-        with self.version_info_py310_swap:
+        with self.version_info_py313_swap:
             install_third_party_libs.test_python_version()
 
     def test_python_version_testing_with_incorrect_version_and_linux_os(
