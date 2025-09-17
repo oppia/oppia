@@ -52,6 +52,7 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 
 interface HTMLSchema {
   type: string;
+  ui_config: object;
 }
 
 interface EditedContentDict {
@@ -187,7 +188,12 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   @ViewChild('contentPanelWithAltText')
   contentPanelWithAltText!: RteOutputDisplayComponent;
 
-  HTML_SCHEMA: HTMLSchema = {type: 'html'};
+  HTML_SCHEMA: HTMLSchema = {
+    type: 'html',
+    ui_config: {
+      rte_component_config_id: 'CURATED_LESSON_COMPONENTS',
+    },
+  };
   MAX_REVIEW_MESSAGE_LENGTH = AppConstants.MAX_REVIEW_MESSAGE_LENGTH;
   SET_OF_STRINGS_SCHEMA: ListSchema = {
     type: 'list',
