@@ -146,8 +146,8 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
 
         result, new_offset = (
             elastic_search_services.search(
-            '', correct_index_name, [], [], offset=0,
-            size=50
+                '', correct_index_name, [], [], offset=0,
+                size=50
             )
         )
         self.assertEqual(result, [1, 12])
