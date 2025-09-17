@@ -429,7 +429,7 @@ class SetupTests(test_utils.GenericTestBase):
         version_info = collections.namedtuple(
             'version_info', ['major', 'minor', 'micro'])
         self.version_info_py313_swap = self.swap(
-            sys, 'version_info', version_info(major=3, minor=13, micro=7)
+            sys, 'version_info', version_info(major=3, minor=13, micro=6)
         )
 
     def test_python_version_testing_with_correct_version(self) -> None:
