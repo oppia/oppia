@@ -19,18 +19,19 @@ from __future__ import annotations
 import base64
 import os
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import question_services
-from core.domain import skill_domain
-from core.domain import skill_fetchers
-from core.domain import skill_services
-from core.domain import state_domain
-from core.domain import topic_domain
-from core.domain import topic_fetchers
-from core.domain import topic_services
-from core.domain import translation_domain
+from core.domain import (
+    question_services,
+    skill_domain,
+    skill_fetchers,
+    skill_services,
+    state_domain,
+    topic_domain,
+    topic_fetchers,
+    topic_services,
+    translation_domain,
+)
 from core.tests import test_utils
 
 from typing import Callable, Dict, List

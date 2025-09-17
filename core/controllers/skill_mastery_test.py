@@ -19,10 +19,12 @@ from __future__ import annotations
 import json
 
 from core import feconf
-from core.domain import skill_services
-from core.domain import topic_domain
-from core.domain import topic_fetchers
-from core.domain import topic_services
+from core.domain import (
+    skill_services,
+    topic_domain,
+    topic_fetchers,
+    topic_services,
+)
 from core.tests import test_utils
 
 from typing import Dict

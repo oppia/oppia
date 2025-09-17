@@ -13,12 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of Exploration
+ * @fileoverview Model class for creating new frontend instances of Exploration
  * domain objects.
  */
-
-import {} from '@angular/upgrade/static';
-import {Injectable} from '@angular/core';
 
 import cloneDeep from 'lodash/cloneDeep';
 
@@ -39,11 +36,7 @@ import {
 } from 'interactions/customization-args-defs';
 import {Interaction} from 'domain/exploration/interaction.model';
 import {State} from 'domain/state/state.model';
-import {
-  StateObjectsBackendDict,
-  States,
-  StatesObjectFactory,
-} from 'domain/exploration/StatesObjectFactory';
+import {StateObjectsBackendDict, States} from 'domain/exploration/states.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
@@ -201,38 +194,29 @@ export class Exploration extends BaseTranslatableObject {
   getLanguageCode(): string {
     return this.languageCode;
   }
-}
 
-@Injectable({
-  providedIn: 'root',
-})
-export class ExplorationObjectFactory {
-  constructor(
-    private logger: LoggerService,
-    private statesObjectFactory: StatesObjectFactory,
-    private urlInterpolationService: UrlInterpolationService
-  ) {}
-
-  createFromBackendDict(
-    explorationBackendDict: ExplorationBackendDict
+  static createFromBackendDict(
+    explorationBackendDict: ExplorationBackendDict,
+    logger: LoggerService,
+    urlInterpolationService: UrlInterpolationService
   ): Exploration {
     return new Exploration(
       explorationBackendDict.init_state_name,
       ParamChanges.createFromBackendList(explorationBackendDict.param_changes),
       ParamSpecs.createFromBackendDict(explorationBackendDict.param_specs),
-      this.statesObjectFactory.createFromBackendDict(
-        explorationBackendDict.states
-      ),
+      States.createFromBackendDict(explorationBackendDict.states),
       explorationBackendDict.title,
       explorationBackendDict.next_content_id_index,
       explorationBackendDict.language_code,
-      this.logger,
-      this.urlInterpolationService
+      logger,
+      urlInterpolationService
     );
   }
 
-  createFromExplorationBackendResponse(
-    explorationBackendResponse: FetchExplorationBackendResponse
+  static createFromExplorationBackendResponse(
+    explorationBackendResponse: FetchExplorationBackendResponse,
+    logger: LoggerService,
+    urlInterpolationService: UrlInterpolationService
   ): Exploration {
     const explorationBackendDict: ExplorationBackendDict = {
       auto_tts_enabled: explorationBackendResponse.auto_tts_enabled,
@@ -249,6 +233,10 @@ export class ExplorationObjectFactory {
       is_version_of_draft_valid: false,
       draft_change_list_id: explorationBackendResponse.draft_change_list_id,
     };
-    return this.createFromBackendDict(explorationBackendDict);
+    return Exploration.createFromBackendDict(
+      explorationBackendDict,
+      logger,
+      urlInterpolationService
+    );
   }
 }

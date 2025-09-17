@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import copy
+
 from core import utils
 from core.constants import constants
 

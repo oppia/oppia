@@ -23,7 +23,8 @@ from core.tests import test_utils
 from extensions.issues.CyclicStateTransitions import CyclicStateTransitions
 from extensions.issues.EarlyQuit import EarlyQuit
 from extensions.issues.MultipleIncorrectSubmissions import (
-    MultipleIncorrectSubmissions)
+    MultipleIncorrectSubmissions,
+)
 
 
 class IssueRegistryUnitTests(test_utils.GenericTestBase):

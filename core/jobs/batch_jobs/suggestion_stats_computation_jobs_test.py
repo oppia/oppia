@@ -22,15 +22,17 @@ import datetime
 
 from core import feconf
 from core.constants import constants
-from core.domain import exp_domain
-from core.domain import question_domain
-from core.domain import skill_domain
-from core.domain import skill_services
-from core.domain import state_domain
-from core.domain import topic_domain
-from core.domain import topic_fetchers
-from core.domain import topic_services
-from core.domain import translation_domain
+from core.domain import (
+    exp_domain,
+    question_domain,
+    skill_domain,
+    skill_services,
+    state_domain,
+    topic_domain,
+    topic_fetchers,
+    topic_services,
+    translation_domain,
+)
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import suggestion_stats_computation_jobs
 from core.jobs.types import job_run_result
@@ -40,8 +42,7 @@ from typing import Dict, Final, List, Tuple, Type, Union
 
 MYPY = False
 if MYPY:
-    from mypy_imports import opportunity_models
-    from mypy_imports import suggestion_models
+    from mypy_imports import opportunity_models, suggestion_models
 
 (opportunity_models, suggestion_models) = models.Registry.import_models([
     models.Names.OPPORTUNITY, models.Names.SUGGESTION
