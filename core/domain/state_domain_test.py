@@ -1255,8 +1255,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.interaction.answer_groups.append(rg)
 
         states_dict = {'state_name': state.to_dict()}
-
-        states_dict['state_name']['recorded_voiceovers'] = {
+        # Here we use MyPy ignore because, as seen in the
+        # update_old_content_id_to_new_content_id_in_v54_states method,
+        # the latest StateDict schema does not define `recorded_voiceovers`,
+        # but we still need to handle it for older state dicts.
+        states_dict['state_name']['recorded_voiceovers'] = {  # type: ignore[typeddict-item]
             'voiceovers_mapping': {}
         }
 
