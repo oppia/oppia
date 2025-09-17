@@ -18,9 +18,7 @@
 
 from __future__ import annotations
 
-from core.domain import blog_domain
-from core.domain import blog_services
-from core.domain import search_services
+from core.domain import blog_domain, blog_services, search_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
@@ -98,6 +96,6 @@ class IndexBlogPostSummaries(beam.DoFn): # type: ignore[misc]
             search_services.index_blog_post_summaries(
                 blog_post_summaries)
             for _ in blog_post_summaries:
-                yield result.Ok()
+                yield result.Ok(True)
         except platform_search_services.SearchException as e:
             yield result.Err(e)

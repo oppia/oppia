@@ -21,15 +21,17 @@ from __future__ import annotations
 import itertools
 import logging
 
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import opportunity_domain
-from core.domain import opportunity_services
-from core.domain import skill_fetchers
-from core.domain import story_domain
-from core.domain import story_fetchers
-from core.domain import topic_domain
-from core.domain import topic_fetchers
+from core.domain import (
+    exp_domain,
+    exp_fetchers,
+    opportunity_domain,
+    opportunity_services,
+    skill_fetchers,
+    story_domain,
+    story_fetchers,
+    topic_domain,
+    topic_fetchers,
+)
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
@@ -37,20 +39,20 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-
 import result
-
 from typing import Dict, List
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import datastore_services
-    from mypy_imports import exp_models
-    from mypy_imports import opportunity_models
-    from mypy_imports import question_models
-    from mypy_imports import skill_models
-    from mypy_imports import story_models
-    from mypy_imports import topic_models
+    from mypy_imports import (
+        datastore_services,
+        exp_models,
+        opportunity_models,
+        question_models,
+        skill_models,
+        story_models,
+        topic_models,
+    )
 
 (
     exp_models,

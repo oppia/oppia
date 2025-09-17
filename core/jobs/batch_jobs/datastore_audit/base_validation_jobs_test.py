@@ -22,8 +22,7 @@ import datetime
 
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs.datastore_audit import base_validation_jobs
-from core.jobs.types import base_validation_errors
-from core.jobs.types import job_run_result
+from core.jobs.types import base_validation_errors, job_run_result
 from core.platform import models
 
 from typing import Callable, Iterator, List, Type

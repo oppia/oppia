@@ -32,9 +32,7 @@ from typing import Final, Type
 
 MYPY = False
 if MYPY:
-    from mypy_imports import datastore_services
-    from mypy_imports import story_models
-    from mypy_imports import topic_models
+    from mypy_imports import datastore_services, story_models, topic_models
 
 (story_models, topic_models) = models.Registry.import_models([
     models.Names.STORY, models.Names.TOPIC

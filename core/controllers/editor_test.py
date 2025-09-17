@@ -24,26 +24,26 @@ import logging
 import os
 import zipfile
 
-from core import feature_flag_list
-from core import feconf
-from core import utils
+from core import feature_flag_list, feconf, utils
 from core.constants import constants
 from core.controllers import creator_dashboard
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import fs_services
-from core.domain import platform_parameter_domain
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_registry
-from core.domain import question_services
-from core.domain import rights_domain
-from core.domain import rights_manager
-from core.domain import state_domain
-from core.domain import stats_services
-from core.domain import translation_domain
-from core.domain import user_services
-from core.domain import wipeout_service
+from core.domain import (
+    exp_domain,
+    exp_fetchers,
+    exp_services,
+    fs_services,
+    platform_parameter_domain,
+    platform_parameter_list,
+    platform_parameter_registry,
+    question_services,
+    rights_domain,
+    rights_manager,
+    state_domain,
+    stats_services,
+    translation_domain,
+    user_services,
+    wipeout_service,
+)
 from core.platform import models
 from core.tests import test_utils
 
@@ -51,10 +51,12 @@ from typing import Dict, Final, List, Optional, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import exp_models
-    from mypy_imports import stats_models
-    from mypy_imports import translation_models
-    from mypy_imports import user_models
+    from mypy_imports import (
+        exp_models,
+        stats_models,
+        translation_models,
+        user_models,
+    )
 
 (exp_models, stats_models, translation_models, user_models) = (
     models.Registry.import_models([

@@ -35,13 +35,12 @@ import tempfile
 import time
 from urllib import request as urlrequest
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.tests import test_utils
 from scripts import servers
 
-from typing import Generator, List, Literal, NoReturn, Tuple
 import yaml
+from typing import Generator, List, Literal, NoReturn, Tuple
 
 from . import common
 
@@ -1351,6 +1350,11 @@ class UrlRetrieveTests(CommonTests):
             subprocess, 'Popen', mock_successful_curl_popen)
         self.swap_curl_failure = self.swap(
             subprocess, 'Popen', mock_failing_curl_popen)
+
+    def test_url_open(self) -> None:
+        response = common.url_open('http://www.google.com')
+        self.assertEqual(response.getcode(), 200)
+        self.assertEqual(response.url, 'http://www.google.com')
 
     def test_url_retrieve_tries_curl_at_outset(self) -> None:
         with tempfile.TemporaryDirectory() as tempdir:

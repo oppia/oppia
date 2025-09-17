@@ -21,8 +21,7 @@ from __future__ import annotations
 import datetime
 import types
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.platform import models
 from core.tests import test_utils
 
@@ -30,8 +29,7 @@ from typing import Dict, Final, List
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import blog_models
+    from mypy_imports import base_models, blog_models
 
 (base_models, blog_models, user_models) = models.Registry.import_models([
     models.Names.BASE_MODEL, models.Names.BLOG, models.Names.USER
