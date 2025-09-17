@@ -158,7 +158,7 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         story_services.update_story(
             self.USER_ID, self.story_id, changelist,
             'Added node.')
-        
+
         story_id = self.story_id
         story_model = story_models.StoryModel.get(story_id)
         versioned_story_contents: story_domain.VersionedStoryContentsDict = {
