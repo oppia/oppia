@@ -1256,6 +1256,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         states_dict = {'state_name': state.to_dict()}
 
+        states_dict['state_name']['recorded_voiceovers'] = {
+            'voiceovers_mapping': {}
+        }
+
         updated_states, _ = (
             state_domain.State.update_old_content_id_to_new_content_id_in_v54_states(
                 states_dict
