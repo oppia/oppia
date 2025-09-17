@@ -24,14 +24,14 @@ import os
 import re
 import ssl
 import tempfile
-from urllib import request as urlrequest
 import zipfile
+from urllib import request as urlrequest
 
 from core.tests import test_utils
+
 from typing import BinaryIO, Final, NoReturn, Tuple
 
-from . import common
-from . import install_dependencies_json_packages
+from . import common, install_dependencies_json_packages
 
 RELEASE_TEST_DIR: Final = os.path.join('core', 'tests', 'release_sources', '')
 MOCK_TMP_UNZIP_PATH: Final = os.path.join(RELEASE_TEST_DIR, 'tmp_unzip.zip')
@@ -161,7 +161,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
 
         def mock_url_open(_url: str) -> BinaryIO:
             self.check_function_calls['url_open_is_called'] = True
-            # The function is used as follows: utils.url_open(req).read()
+            # The function is used as follows: url_open(req).read()
             # So, the mock returns a file object as a mock so that the read
             # function can work correctly.
             file_obj = install_dependencies_json_packages.open_file(

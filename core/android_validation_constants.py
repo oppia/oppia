@@ -23,7 +23,6 @@ import re
 
 from core.constants import constants
 
-
 # These are the valid interactions that are allowed in an exploration
 # that is to be viewed on the Android app. If, in the future, this is
 # changed, just this array has to be modified to include the new

@@ -43,7 +43,7 @@ import {ExplorationTagsService} from './exploration-tags.service';
 import {ExplorationTitleService} from './exploration-title.service';
 import {ExplorationWarningsService} from './exploration-warnings.service';
 import {RouterService} from './router.service';
-import {StatesObjectFactory} from 'domain/exploration/StatesObjectFactory';
+import {States} from 'domain/exploration/states.model';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {LoggerService} from 'services/contextual/logger.service';
 import {HttpErrorResponse} from '@angular/common/http';
@@ -89,7 +89,6 @@ export class ExplorationSaveService {
     private ngbModal: NgbModal,
     private routerService: RouterService,
     private siteAnalyticsService: SiteAnalyticsService,
-    private statesObjectFactory: StatesObjectFactory,
     private windowRef: WindowRef
   ) {}
 
@@ -240,9 +239,9 @@ export class ExplorationSaveService {
       }
 
       this.explorationDataService.getLastSavedDataAsync().then(data => {
-        const oldStates = this.statesObjectFactory
-          .createFromBackendDict(data.states)
-          .getStateObjects();
+        const oldStates = States.createFromBackendDict(
+          data.states
+        ).getStateObjects();
         const newStates = this.explorationStatesService
           .getStates()
           .getStateObjects();

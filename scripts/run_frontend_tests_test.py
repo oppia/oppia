@@ -25,12 +25,14 @@ from core.tests import test_utils
 
 from typing import Dict, List, Optional, Tuple
 
-from . import build
-from . import check_frontend_test_coverage
-from . import common
-from . import git_changes_utils
-from . import install_third_party_libs
-from . import run_frontend_tests
+from . import (
+    build,
+    check_frontend_test_coverage,
+    common,
+    git_changes_utils,
+    install_third_party_libs,
+    run_frontend_tests,
+)
 
 
 class RunFrontendTestsTests(test_utils.GenericTestBase):
@@ -188,7 +190,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                 return True
             if path == 'test-module.spec.js':
                 return True
-            if path == 'StatesObjectFactorySpec.ts':
+            if path == 'ExplorationObjectFactorySpec.ts':
                 return True
             return original_os_path_exists(path)
         os_path_exists_swap = self.swap(
@@ -202,14 +204,14 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                               'home-page.component.spec.ts,'
                               'about-page.component.ts,'
                               'test-module.js,'
-                              'StatesObjectFactory.ts'])
+                              'ExplorationObjectFactory.ts'])
 
         cmd = [
             common.NODE_BIN_PATH, '--max-old-space-size=4096',
             os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
             'start', os.path.join('core', 'tests', 'karma.conf.ts'),
             '--specs_to_run='
-            'StatesObjectFactorySpec.ts,'
+            'ExplorationObjectFactorySpec.ts,'
             'about-page.component.spec.ts,'
             'home-page.component.spec.ts,'
             'test-module.spec.js']
@@ -217,7 +219,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         self.assertTrue(self.frontend_coverage_checks_called)
         self.assertEqual(self.frontend_coverage_checks_args, [[
             '--files_to_check='
-            'StatesObjectFactorySpec.ts,'
+            'ExplorationObjectFactorySpec.ts,'
             'about-page.component.spec.ts,'
             'home-page.component.spec.ts,'
             'test-module.spec.js'

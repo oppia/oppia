@@ -21,12 +21,10 @@ from __future__ import annotations
 
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
-from core.jobs.types import base_validation_errors
-from core.jobs.types import model_property
+from core.jobs.types import base_validation_errors, model_property
 from core.platform import models
 
 import apache_beam as beam
-
 from typing import List
 
 MYPY = False

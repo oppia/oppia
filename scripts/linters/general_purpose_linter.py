@@ -23,13 +23,8 @@ import re
 
 from typing import Dict, Final, List, Pattern, Tuple, TypedDict
 
-from . import js_ts_linter
-from . import linter_utils
-from . import warranted_angular_security_bypasses
-
-from .. import build
-from .. import common
-from .. import concurrent_task_utils
+from .. import build, common, concurrent_task_utils
+from . import js_ts_linter, linter_utils, warranted_angular_security_bypasses
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -125,6 +120,14 @@ BAD_PATTERNS: Dict[str, BadPatternsDict] = {
             'assets/i18n/', 'core/tests/build_sources/assets/')},
     '\r': {
         'message': 'Please make sure all files only have LF endings (no CRLF).',
+        'excluded_files': (),
+        'excluded_dirs': ()},
+    'fmt: off': {
+        'message': 'Use of "fmt: off" is prohibited. All code must be formatted by Black.',
+        'excluded_files': (),
+        'excluded_dirs': ()},
+    'fmt: skip': {
+        'message': 'Use of "fmt: skip" is prohibited. All code must be formatted by Black.',
         'excluded_files': (),
         'excluded_dirs': ()},
     '<<<<<<<': {

@@ -43,7 +43,7 @@ import {
   ThreadMessages,
 } from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
 import {PageContextService} from 'services/page-context.service';
-import {Question} from 'domain/question/QuestionObjectFactory';
+import {Question} from 'domain/question/question.model';
 import {MisconceptionSkillMap} from 'domain/skill/misconception.model';
 import cloneDeep from 'lodash/cloneDeep';
 
