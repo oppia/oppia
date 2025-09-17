@@ -850,6 +850,7 @@ export class ExplorationEditor extends BaseUser {
     responseIsCorrect: boolean = true,
     isLastResponse: boolean = true
   ): Promise<void> {
+    await this.waitForElementToStabilize(feedbackEditorSelector);
     await this.clickOn(feedbackEditorSelector);
     await this.type(stateContentInputField, feedback);
     await this.expectTextContentToBe(stateContentInputField, feedback);
