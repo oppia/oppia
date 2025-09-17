@@ -1227,25 +1227,45 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.delete_state('END')
         self.assertNotIn('END', exploration.states)
 
-    def test_update_answer_groups_invalid_content_id(self) -> None:
-        """Test that update_interaction_answer_groups raises an exception
-        when a rule input contains a dictionary without a 'contentId' key.
-        """
+    def test_migration_skips_when_old_content_id_is_none(self) -> None:
+        """Ensure migration continues when contentId/content_id is None."""
+        states_dict = {
+            'state_name': state_domain.State.create_default_state(
+                'state_name',
+                content_id_for_state_content='c1',
+                content_id_for_default_outcome='d1'
+            ).to_dict()
+        }
+
+        states_dict['state_name']['interaction']['answer_groups'][0][
+            'rule_specs'
+        ][0]['inputs'] = {'x': {}}
+
+        updated_states, _ = (
+            state_domain.State.update_old_content_id_to_new_content_id_in_v54_states(
+                states_dict
+            )
+        )
+
+        self.assertIn('state_name', updated_states)
+
+    def test_update_answer_groups_invalid_translatable_input(self) -> None:
+        """Ensure update_interaction_answer_groups raises when rule input
+        for a translatable object is not a dict with 'contentId'."""
         state = state_domain.State.create_default_state(
-            'Introduction',
+            'Intro',
             content_id_for_state_content='c',
             content_id_for_default_outcome='d'
         )
-
         state.interaction.id = 'TextInput'
 
         rg = state_domain.AnswerGroup(
             rule_specs=[state_domain.RuleSpec(
                 rule_type='Equals',
-                inputs={'x': {}}
+                inputs={'x': 'not_a_dict'}
             )],
             outcome=state_domain.Outcome(
-                dest='Introduction',
+                dest='Intro',
                 feedback=state_domain.SubtitledHtml('f', 'fc'),
                 labelled_as_correct=False,
                 param_changes=[],
@@ -1259,45 +1279,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             Exception,
-            'Expected value to be a dictionary with a "contentId" key, received {}'
+            r'Expected value to be a dictionary with a "contentId" key'
         ):
             state.update_interaction_answer_groups([rg])
-
-    def test_migration_continues_when_old_content_id_is_none(self) -> None:
-        """Test that migration continues successfully even when the old
-        content_id in a state's content is None or invalid.
-        """
-        states_dict = {
-            'state_name': state_domain.State.create_default_state(
-                'state_name',
-                content_id_for_state_content='content_1',
-                content_id_for_default_outcome='default_outcome_1'
-            ).to_dict()
-        }
-
-        states_dict['state_name']['interaction']['id'] = 'TextInput'
-        states_dict['state_name']['interaction']['answer_groups'] = [{
-            'rule_specs': [
-                {'rule_type': 'Equals', 'inputs': {'x': 'test'}}
-            ],
-            'outcome': {
-                'dest': 'state_name',
-                'feedback': {'html': '<p>test feedback</p>', 'content_id': 'feedback_1'},
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None,
-                'dest_if_really_stuck': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
-
-        updated_states_dict, _ = state_domain.State.update_old_content_id_to_new_content_id_in_v54_states(
-            states_dict
-        )
-
-        self.assertIn('state_name', updated_states_dict)
 
     def test_update_solicit_answer_details(self) -> None:
         """Test updating solicit_answer_details."""
