@@ -243,8 +243,7 @@ describe('Topic Manager', function () {
     // Fraction Input Interaction.
     await topicManager.clickOnAddQuestionButton();
     await topicManager.updateCardContent('Enter 1/2.');
-    await topicManager.addInteraction(INTERACTION_TYPES.FRACTION_INPUT, false);
-    await topicManager.customizeFractionInputInteraction(true, false, true);
+    await topicManager.addInteraction(INTERACTION_TYPES.FRACTION_INPUT);
     await topicManager.updateAnswersInResponseModal(
       INTERACTION_TYPES.FRACTION_INPUT,
       '2'
@@ -264,11 +263,11 @@ describe('Topic Manager', function () {
       true
     );
     await topicManager.saveQuestion();
-    await topicManager.expectQuestionToBeVisible('Number with Units.');
+    await topicManager.expectQuestionToBeVisible('Enter 1/2.');
 
     // Number with Units Interaction.
     await topicManager.clickOnAddQuestionButton();
-    await topicManager.updateCardContent('Number with Units.');
+    await topicManager.updateCardContent('Enter 100km.');
     await topicManager.addInteraction(
       INTERACTION_TYPES.NUMBER_WITH_UNITS,
       false
@@ -289,7 +288,7 @@ describe('Topic Manager', function () {
       true
     );
     await topicManager.saveQuestion();
-    await topicManager.expectQuestionToBeVisible('Number with Units.');
+    await topicManager.expectQuestionToBeVisible('Enter 100km.');
   });
 
   afterAll(async function () {

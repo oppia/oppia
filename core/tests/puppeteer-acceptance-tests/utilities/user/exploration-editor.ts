@@ -2866,7 +2866,6 @@ export class ExplorationEditor extends BaseUser {
    * Function to add an interaction to the exploration.
    * @param {string} interactionToAdd - The interaction type to add to the Exploration.
    * @param {boolean} skipInteractionCustoization - Whether to skip interaction customization.
-   * Note: A space is added before and after the interaction name to match the format in the UI.
    */
   async addInteraction(
     interactionToAdd: string,
