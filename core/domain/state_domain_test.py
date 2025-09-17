@@ -1229,17 +1229,32 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_migration_skips_when_old_content_id_is_none(self) -> None:
         """Ensure migration continues when contentId/content_id is None."""
-        states_dict = {
-            'state_name': state_domain.State.create_default_state(
-                'state_name',
-                content_id_for_state_content='c1',
-                content_id_for_default_outcome='d1'
-            ).to_dict()
-        }
+        state = state_domain.State.create_default_state(
+            'state_name',
+            content_id_for_state_content='c1',
+            content_id_for_default_outcome='d1'
+        )
 
-        states_dict['state_name']['interaction']['answer_groups'][0][
-            'rule_specs'
-        ][0]['inputs'] = {'x': {}}
+        rg = state_domain.AnswerGroup(
+            rule_specs=[state_domain.RuleSpec(
+                rule_type='Equals',
+                inputs={'x': {}}
+            )],
+            outcome=state_domain.Outcome(
+                dest='state_name',
+                feedback=state_domain.SubtitledHtml('f', 'fc'),
+                labelled_as_correct=False,
+                param_changes=[],
+                refresher_exploration_id=None,
+                missing_prerequisite_skill_id=None,
+                dest_if_really_stuck=None
+            ),
+            training_data=[],
+            tagged_skill_misconception_id=None
+        )
+        state.interaction.answer_groups.append(rg)
+
+        states_dict = {'state_name': state.to_dict()}
 
         updated_states, _ = (
             state_domain.State.update_old_content_id_to_new_content_id_in_v54_states(
