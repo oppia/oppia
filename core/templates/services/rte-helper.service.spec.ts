@@ -333,7 +333,7 @@ describe('Rte Helper Service', () => {
             schema: {
               type: 'html',
               ui_config: {
-                rte_component_config_id: 'WORKED_EXAMPLE_MODAL_COMPONENTS',
+                rte_component_config_id: 'CURATED_LESSON_COMPONENTS',
                 hide_complex_extensions: true,
               },
             },
@@ -346,7 +346,7 @@ describe('Rte Helper Service', () => {
             schema: {
               type: 'html',
               ui_config: {
-                rte_component_config_id: 'WORKED_EXAMPLE_MODAL_COMPONENTS',
+                rte_component_config_id: 'CURATED_LESSON_COMPONENTS',
                 hide_complex_extensions: true,
               },
             },
