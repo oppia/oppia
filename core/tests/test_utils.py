@@ -1911,6 +1911,33 @@ class TestBase(unittest.TestCase):
         # type` error. Thus to avoid the error, we used ignore here.
         super().assertDictEqual(dict_one, dict_two, msg=msg)  # type: ignore[arg-type]
 
+    # Here we use type Any because, in Oppia codebase TypedDict is used to
+    # define strict dictionaries and those strict dictionaries are not
+    # compatible with Dict[str, Any] type because of the invariant property of
+    # Dict type. Also, here value of Mapping is annotated as Any because this
+    # method can accept any kind of dictionaries for testing purposes. So, to
+    # make this method generalized for all test cases, we used Any here.
+    def assertDictContainsSubset(
+        self,
+        containing_dict: Mapping[str, Any],
+        subset_dict: Mapping[str, Any],
+        msg: Optional[str] = None
+    ) -> None:
+        """Checks whether containing_subset includes all key-value pairs in
+        subset_dict. If any difference occurred then the Assertion error is
+        raised.
+
+        Args:
+            containing_dict: Mapping[str, Any]. The containing dictionary.
+            subset_duct: Mapping[str, Any]. The smaller dictionary.
+            msg: Optional[str]. Message displayed when test fails.
+
+        Raises:
+            AssertionError. When dictionaries doesn't match.
+        """
+        # Reference: https://stackoverflow.com/a/59777678
+        self.assertEqual(subset_dict, subset_dict | containing_dict)
+
     # Here we use type Any because the method 'assertItemsEqual' can accept any
     # kind of iterables to compare them against each other, and these iterables
     # can be of type List, Dict, Tuple, etc.
