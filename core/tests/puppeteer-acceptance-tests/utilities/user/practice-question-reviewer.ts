@@ -94,6 +94,7 @@ export class PracticeQuestionReviewer extends Contributor {
    */
   async editQuestionInQuestionEditorModal(question: string): Promise<void> {
     await this.expectElementToBeVisible(editQuestionPencilIconSelector);
+    await this.waitForElementToStabilize(editQuestionPencilIconSelector);
     await this.clickOn(editQuestionPencilIconSelector);
 
     const questionEditorModal = await this.page.$(
