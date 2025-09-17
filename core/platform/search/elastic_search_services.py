@@ -71,7 +71,7 @@ class ElasticSearchClient:
                 else:
                     self._client = elasticsearch.Elasticsearch(
                         hosts=[f'http://{feconf.ES_HOST}:{feconf.ES_CLOUD_PORT}'],
-                        basic_auth=(es_username , es_password),
+                        basic_auth=(es_username, es_password),
                         request_timeout=30,
                         verify_certs=False,
                     )
@@ -128,7 +128,7 @@ def _fetch_response_from_elastic_search(
     num_docs_to_fetch = size + 1
     try:
         response = ES.get_client().search(
-            body=query_definition, 
+            body=query_definition,
             index=index_name,
             size=num_docs_to_fetch,
             from_=offset
@@ -193,7 +193,7 @@ def add_documents_to_index(
     for document in documents:
         try:
             response = ES.get_client().index(
-                index=index_name, 
+                index=index_name,
                 document=document,
                 id=document['id']
             )
@@ -226,7 +226,7 @@ def delete_documents_from_index(doc_ids: List[str], index_name: str) -> None:
     for doc_id in doc_ids:
         try:
             document_exists_in_index = ES.get_client().exists(
-                index_name, doc_id)
+                index, id)
         except elasticsearch.NotFoundError:
             # The index does not exist yet. Create it and set
             # document_exists_in_index to False.

@@ -576,15 +576,15 @@ class ElasticSearchStub:
                 indicating that the index was not found.
         """
         error_data = {
-            'reasoon':'no such  index[%s]' % index,
-            'root_cause':[{
+            'reasoon': 'no such  index[%s]' % index,
+            'root_cause': [{
                 'reason': 'no such index [%s]' % index,
                 'index': index,
                 'index_uuid': '_na_',
                 'type': 'index_not_found_exception',
                 'resource.type': 'index_or_alias',
                 'resource.id': index
-            }]
+            }],
             'index': index,
             'index_uuid': '_na_',
             'type': 'index_not_found_exception',
@@ -596,7 +596,7 @@ class ElasticSearchStub:
             meta=meta,
             body={
                 'status': 404,
-                'error':error_data
+                'error': error_data
             }
         )
 
@@ -620,7 +620,7 @@ class ElasticSearchStub:
                 'index': index,
                 'index_uuid': 'RaNdOmStRiNgOfAlPhAs'
             }
-            meta = type('Meta', (),{'status':400})()
+            meta = type('Meta', (), {'status': 400})()
             raise elasticsearch.RequestError(
                 message=f"resource_already_exists_exception: index [{index}/RaNdOmStRiNgOfAlPhAs] already exists",
                 meta=meta,
