@@ -341,10 +341,38 @@ const noSkillsPresentMessageSelector = '.e2e-test-no-skills-present-message';
 const expandStoryHeaderSelector =
   '.e2e-test-mobile-stories-collapsible-card-header';
 const addNewStoryButtonSelector = '.e2e-test-create-story-button';
+const skillEditOptionsContainerSelector =
+  '.e2e-test-skill-edit-options-container';
+const navigationContainerSelector = '.e2e-test-mobile-navigation-bar-container';
 
 const ADD_PREREQUISITE_SKILL_BUTTON_LABEL = '+ ADD PREREQUISITE SKILL';
 
 export class TopicManager extends BaseUser {
+  /**
+   * Closes navigation in mobile view.
+   */
+  async closeNavigationInMobileView(): Promise<void> {
+    if (!this.isViewportAtMobileWidth()) {
+      showMessage('Skipped: Close Navigation in Mobile View');
+      return;
+    }
+
+    // Close skill edit options dropdown.
+    if (await this.isElementVisible(skillEditOptionsContainerSelector)) {
+      await this.clickOn(mobileSkillNavToggle);
+      await this.expectElementToBeVisible(
+        skillEditOptionsContainerSelector,
+        false
+      );
+    }
+
+    // Close navigation bar.
+    if (await this.isElementVisible(navigationContainerSelector)) {
+      await this.clickOn(mobileOptionsSelector);
+      await this.expectElementToBeVisible(navigationContainerSelector, false);
+    }
+  }
+
   /**
    * Resets the topic filter in Topic and Skills Dashboard.
    */
@@ -3673,12 +3701,7 @@ export class TopicManager extends BaseUser {
         discardChangesInMobileNavSelector,
         status === 'enabled'
       );
-      await this.clickOn(mobileOptionsSelector);
-
-      await this.expectElementToBeVisible(
-        discardChangesInMobileNavSelector,
-        false
-      );
+      await this.closeNavigationInMobileView();
     } else {
       await this.expectElementToBeClickable(
         saveOrPublishSkillSelector,
