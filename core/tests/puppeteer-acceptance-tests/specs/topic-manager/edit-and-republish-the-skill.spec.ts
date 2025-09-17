@@ -109,7 +109,7 @@ describe('Topic Manager', function () {
 
     // Add prerequisite skill.
     await topicManager.publishUpdatedSkill('Added difficulty rubric.');
-    await topicManager.addPrerequisiteSkill('Addition');
+    await topicManager.addPrerequisiteSkillInSkillEditor('Addition');
     await topicManager.expectSaveChangesInSkillEditorToBe('enabled');
   });
 

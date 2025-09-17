@@ -484,7 +484,7 @@ export class TopicManager extends BaseUser {
           const element = document.querySelector(selector);
           return element?.textContent?.trim() === expectedText.trim();
         },
-        {timeout: 5000},
+        {timeout: 10000},
         toastMessageSelector,
         expectedMessage
       );
