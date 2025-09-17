@@ -1293,7 +1293,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             )
         )
 
-        interaction.answer_groups[0].rule_specs[0].inputs = {'x': 'test'}
+        interaction.answer_groups[0].rule_specs[0].inputs = {'x': {}}
 
         state_instance.content.content_id = 'old_content_id'
 
