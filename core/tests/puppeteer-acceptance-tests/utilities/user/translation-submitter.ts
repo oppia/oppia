@@ -73,9 +73,22 @@ export class TranslationSubmitter extends BaseUser {
     const selector = `${paginationBtnSelectorPrefix}-${button}`;
     await this.expectElementToBeVisible(selector);
 
+    await this.expectElementToBeVisible(opportunityItemHeadingSelector);
+    const preClickFirstHeading = await this.page.$eval(
+      opportunityItemHeadingSelector,
+      el => el.textContent
+    );
     await this.clickOn(selector);
 
-    // TODO: Post-check: Verify if the page is loaded.
+    await this.page.waitForFunction(
+      (selector: string, preClickFirstHeading: string) => {
+        const element = document.querySelector(selector);
+        return element && element.textContent !== preClickFirstHeading;
+      },
+      {},
+      opportunityItemHeadingSelector,
+      preClickFirstHeading
+    );
   }
 
   /**
