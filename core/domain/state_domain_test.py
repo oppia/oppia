@@ -1227,6 +1227,63 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.delete_state('END')
         self.assertNotIn('END', exploration.states)
 
+    def test_update_answer_groups_invalid_content_id(self) -> None:
+        """Test that update_interaction_answer_groups raises an exception
+        when a rule input contains a dictionary without a 'contentId' key.
+        """
+        state = state_domain.State.create_default_state(
+            'Introduction',
+            content_id_for_state_content='c',
+            content_id_for_default_outcome='d'
+        )
+
+        rg = state_domain.AnswerGroup(
+            rule_specs=[state_domain.RuleSpec(
+                rule_type='Equals',
+                inputs={'x': {}}
+            )],
+            outcome=state_domain.Outcome(
+                dest='Introduction',
+                feedback=state_domain.SubtitledHtml('f', 'fc'),
+                labelled_as_correct=False,
+                param_changes=[],
+                refresher_exploration_id=None,
+                missing_prerequisite_skill_id=None,
+                dest_if_really_stuck=None
+            ),
+            training_data=[],
+            tagged_skill_misconception_id=None
+        )
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Expected value to be a dictionary with a "contentId" key'
+        ):
+            state.update_interaction_answer_groups([rg])
+
+    def test_migration_continues_when_old_content_id_is_none(
+        self
+    ) -> None:
+        """Test that migration continues successfully even when the old
+        content_id in a state's content is not None or invalid.
+        """
+        state_instance = state_domain.State.create_default_state(
+            'state_name',
+            content_id_for_state_content='content_1',
+            content_id_for_default_outcome='default_outcome_1'
+        )
+
+        interaction = state_instance.interaction
+        interaction.id = 'TextInput'
+
+        interaction.answer_groups[0].rule_specs[0].inputs = {'x': 'test'}
+
+        state_instance.content.content_id = 'old_content_id'
+
+        state_instance.update_interaction_answer_groups(interaction.answer_groups)
+
+        self.assertIn('state_name', {'state_name': state_instance})
+
     def test_update_solicit_answer_details(self) -> None:
         """Test updating solicit_answer_details."""
         state = state_domain.State.create_default_state(
