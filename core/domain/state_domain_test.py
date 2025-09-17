@@ -1251,7 +1251,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_update_answer_groups_invalid_translatable_input(self) -> None:
         """Ensure update_interaction_answer_groups raises when rule input
-        for a translatable object is not a dict with 'contentId'."""
+        for a translatable object is not a dict with 'contentId'.
+        """
         state = state_domain.State.create_default_state(
             'Intro',
             content_id_for_state_content='c',
