@@ -70,7 +70,7 @@ class ElasticSearchClient:
                     )
                 else:
                     self._client = elasticsearch.Elasticsearch(
-                        hosts=[f'http://{feconf.ES_HOST}:{feconf.ES_CLOUD_PORT}'],
+                        hosts=[f'http://{feconf.ES_HOST}:{feconf.ES_LOCALHOST_PORT}'],
                         basic_auth=(es_username, es_password),
                         request_timeout=30,
                         verify_certs=False,
