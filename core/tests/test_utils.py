@@ -564,44 +564,47 @@ class ElasticSearchStub:
         """Helper method that clears the mock database."""
         self._DB.clear()
 
-    def _generate_index_not_found_error(self, index_name: str) -> None:
+    def _generate_index_not_found_error(self, index: str) -> None:
         """Helper method that generates an elasticsearch 'index not found' 404
         error.
 
         Args:
-            index_name: str. The index that was not found.
+            index: str. The index that was not found.
 
         Raises:
             elasticsearch.NotFoundError. A manually-constructed error
                 indicating that the index was not found.
         """
+        error_data = {
+            'reasoon':'no such  index[%s]' % index,
+            'root_cause':[{
+                'reason': 'no such index [%s]' % index,
+                'index': index,
+                'index_uuid': '_na_',
+                'type': 'index_not_found_exception',
+                'resource.type': 'index_or_alias',
+                'resource.id': index
+            }]
+            'index': index,
+            'index_uuid': '_na_',
+            'type': 'index_not_found_exception',
+            'resource.type': 'index_or_alias',
+            'resource.id': index
+        }
         raise elasticsearch.NotFoundError(
-            404, 'index_not_found_exception', {
+            message='index_not_found_exception: no such index [%s]' % index,
+            meta=meta,
+            body={
                 'status': 404,
-                'error': {
-                    'reason': 'no such index [%s]' % index_name,
-                    'root_cause': [{
-                        'reason': 'no such index [%s]' % index_name,
-                        'index': index_name,
-                        'index_uuid': '_na_',
-                        'type': 'index_not_found_exception',
-                        'resource.type': 'index_or_alias',
-                        'resource.id': index_name
-                    }],
-                    'index': index_name,
-                    'index_uuid': '_na_',
-                    'type': 'index_not_found_exception',
-                    'resource.type': 'index_or_alias',
-                    'resource.id': index_name
-                }
+                'error':error_data
             }
         )
 
-    def mock_create_index(self, index_name: str) -> NewIndexDict:
+    def mock_create_index(self, index: str) -> NewIndexDict:
         """Creates an index with the given name.
 
         Args:
-            index_name: str. The name of the index to create.
+            index: str. The name of the index to create.
 
         Returns:
             dict. A dict representing the ElasticSearch API response.
@@ -610,20 +613,29 @@ class ElasticSearchStub:
             elasticsearch.RequestError. An index with the given name already
                 exists.
         """
-        if index_name in self._DB:
+        if index in self._DB:
+            error_data = {
+                'type': 'resource_already_exists_exception',
+                'reason': f'index [{index}/RaNdOmStRiNgOfAlPhAs] already exists',
+                'index': index,
+                'index_uuid': 'RaNdOmStRiNgOfAlPhAs'
+            }
+            meta = type('Meta', (),{'status':400})()
             raise elasticsearch.RequestError(
-                400, 'resource_already_exists_exception',
-                'index [%s/RaNdOmStRiNgOfAlPhAs] already exists' % index_name)
-        self._DB[index_name] = []
+                message=f"resource_already_exists_exception: index [{index}/RaNdOmStRiNgOfAlPhAs] already exists",
+                meta=meta,
+                body={'error': error_data, 'status': 400}
+            )
+        self._DB[index] = []
         return {
-            'index': index_name,
+            'index': index,
             'acknowledged': True,
             'shards_acknowledged': True
         }
 
     def mock_index(
         self,
-        index_name: str,
+        index: str,
         document: Dict[str, str],
         id: Optional[str] = None  # pylint: disable=redefined-builtin
     ) -> ExistingIndexDict:
@@ -635,7 +647,7 @@ class ElasticSearchStub:
         https://elasticsearch-py.readthedocs.io/en/v7.10.1/api.html
 
         Args:
-            index_name: str. The name of the index to create.
+            index: str. The name of the index to create.
             document: dict. The document to store.
             id: str. The unique identifier of the document.
 
@@ -646,13 +658,13 @@ class ElasticSearchStub:
             elasticsearch.RequestError. An index with the given name already
                 exists.
         """
-        if index_name not in self._DB:
-            self._generate_index_not_found_error(index_name)
-        self._DB[index_name] = [
-            d for d in self._DB[index_name] if d['id'] != id]
-        self._DB[index_name].append(document)
+        if index not in self._DB:
+            self._generate_index_not_found_error(index)
+        self._DB[index] = [
+            d for d in self._DB[index] if d['id'] != id]
+        self._DB[index].append(document)
         return {
-            '_index': index_name,
+            '_index': index,
             '_shards': {
                 'total': 2,
                 'successful': 1,
@@ -666,13 +678,13 @@ class ElasticSearchStub:
             '_type': '_doc',
         }
 
-    def mock_exists(self, index_name: str, doc_id: str) -> bool:
+    def mock_exists(self, index: str, id: str) -> bool:
         """Checks whether a document with the given ID exists in the mock
         database.
 
         Args:
-            index_name: str. The name of the index to check.
-            doc_id: str. The document id to check.
+            index: str. The name of the index to check.
+            id: str. The document id to check.
 
         Returns:
             bool. Whether the document exists in the index.
@@ -680,17 +692,17 @@ class ElasticSearchStub:
         Raises:
             elasticsearch.NotFoundError: The given index name was not found.
         """
-        if index_name not in self._DB:
-            self._generate_index_not_found_error(index_name)
-        return any(d['id'] == doc_id for d in self._DB[index_name])
+        if index not in self._DB:
+            self._generate_index_not_found_error(index)
+        return any(d['id'] == id for d in self._DB[index])
 
-    def mock_delete(self, index_name: str, doc_id: str) -> ExistingIndexDict:
+    def mock_delete(self, index: str, id: str) -> ExistingIndexDict:
         """Deletes a document from an index in the mock database. Does nothing
         if the document is not in the index.
 
         Args:
-            index_name: str. The name of the index to delete the document from.
-            doc_id: str. The document id to be deleted from the index.
+            index: str. The name of the index to delete the document from.
+            id: str. The document id to be deleted from the index.
 
         Returns:
             dict. A dict representing the ElasticSearch API response.
@@ -698,13 +710,13 @@ class ElasticSearchStub:
         Raises:
             Exception. The document does not exist in the index.
             elasticsearch.NotFoundError. The given index name was not found, or
-                the given doc_id was not found in the given index.
+                the given id was not found in the given index.
         """
-        if index_name not in self._DB:
-            self._generate_index_not_found_error(index_name)
-        docs = [d for d in self._DB[index_name] if d['id'] != doc_id]
-        if len(self._DB[index_name]) != len(docs):
-            self._DB[index_name] = docs
+        if index not in self._DB:
+            self._generate_index_not_found_error(index)
+        docs = [d for d in self._DB[index] if d['id'] != id]
+        if len(self._DB[index]) != len(docs):
+            self._DB[index] = docs
             return {
                 '_type': '_doc',
                 '_seq_no': 99,
@@ -715,29 +727,35 @@ class ElasticSearchStub:
                 },
                 'result': 'deleted',
                 '_primary_term': 1,
-                '_index': index_name,
+                '_index': index,
                 '_version': 4,
                 '_id': '0'
             }
 
+        error_body = {
+            '_index': index,
+            '_type': '_doc',
+            '_id': id,
+            '_version': 1,
+            'result': 'not_found',
+            '_shards': {
+                'total': 2,
+                'successful': 1,
+                'failed': 0
+            },
+            '_seq_no': 103,
+            '_primary_term': 1
+        }
+        meta = type('Meta', (), {'status': 400})()
+
         raise elasticsearch.NotFoundError(
-            404, {
-                '_index': index_name,
-                '_type': '_doc',
-                '_id': doc_id,
-                '_version': 1,
-                'result': 'not_found',
-                '_shards': {
-                    'total': 2,
-                    'successful': 1,
-                    'failed': 0
-                },
-                '_seq_no': 103,
-                '_primary_term': 1
-            })
+            message=f'document not found: [{index}][{id}]',
+            meta=meta,
+            body=error_body
+        )
 
     def mock_delete_by_query(
-        self, index_name: str, query: Dict[str, Dict[str, Dict[str, str]]]
+        self, index: str, query: Dict[str, Dict[str, Dict[str, str]]]
     ) -> DeletedDocumentDict:
         """Deletes documents from an index based on the given query.
 
@@ -746,7 +764,7 @@ class ElasticSearchStub:
         function use that query format.
 
         Args:
-            index_name: str. The name of the index to delete the documents from.
+            index: str. The name of the index to delete the documents from.
             query: dict. The query that defines which documents to delete.
 
         Returns:
@@ -760,10 +778,10 @@ class ElasticSearchStub:
         assert query['query'] == {
             'match_all': {}
         }
-        if index_name not in self._DB:
-            self._generate_index_not_found_error(index_name)
-        index_size = len(self._DB[index_name])
-        del self._DB[index_name][:]
+        if index not in self._DB:
+            self._generate_index_not_found_error(index)
+        index_size = len(self._DB[index])
+        del self._DB[index][:]
         return {
             'took': 72,
             'version_conflicts': 0,
@@ -786,17 +804,16 @@ class ElasticSearchStub:
         self,
         body: Optional[Dict[str, Dict[str, Dict[str, Any]]]] = None,
         index: Optional[str] = None,
-        params: Optional[Dict[str, int]] = None
+        size: Optional[int] = None,
+        from_: Optional[int] = None
     ) -> SearchDocumentDict:
         """Searches and returns documents that match the given query.
 
         Args:
             body: dict|None. A dictionary search definition that uses Query DSL.
             index: str|None. The name of the index to search.
-            params: dict|None. A dict with two keys: `size` and `from`. The
-                corresponding values are ints which represent the number of
-                results to fetch, and the offset from which to fetch them,
-                respectively.
+            size: int|None. The number of results to fetch.
+            from_:int|None. The offset from which the results are to be fetched.
 
         Returns:
             dict. A dict representing the ElasticSearch response.
@@ -810,8 +827,8 @@ class ElasticSearchStub:
         # all indexes. We do not allow their use.
         assert index not in ['_all', '']
         assert index is not None
-        assert params is not None
-        assert sorted(params.keys()) == ['from', 'size']
+        assert size is not None
+        assert from_ is not None
 
         if index not in self._DB:
             self._generate_index_not_found_error(index)
@@ -869,9 +886,7 @@ class ElasticSearchStub:
             '_type': '_doc',
             '_index': index,
             '_source': doc
-        } for doc in result_docs[
-            params['from']: params['from'] + params['size']
-        ]]
+        } for doc in result_docs[from_: from_ + size]]
 
         return {
             'timed_out': False,

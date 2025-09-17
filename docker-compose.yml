@@ -140,7 +140,7 @@ services:
     command: redis-server /app/oppia/redis_docker.conf
 
   elasticsearch:
-    image: elasticsearch:7.17.27
+    image: elasticsearch:8.17.0
     container_name: oppia-elasticsearch
     ports:
       - "9200:9200"

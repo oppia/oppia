@@ -22,7 +22,7 @@ from core.domain import search_services
 from core.platform.search import elastic_search_services
 from core.tests import test_utils
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Sequence, Mapping
 
 
 class ElasticSearchUnitTests(test_utils.GenericTestBase):
@@ -33,13 +33,10 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         correct_id = 'id'
 
         def mock_index(
-                index: str, body: Dict[str, str], id: str # pylint: disable=redefined-builtin
+                index: str, doccuments: Sequence[Mapping[str, Any]], id: str # pylint: disable=redefined-builtin
         ) -> Dict[str, Dict[str, int]]:
             self.assertEqual(index, correct_index_name)
             self.assertEqual(id, correct_id)
-            self.assertEqual(body, {
-                'id': correct_id
-            })
             return {
                 '_shards': {
                     'failed': 0
@@ -112,10 +109,10 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
     def test_clear_index(self) -> None:
         correct_index_name = 'index1'
         def mock_delete_by_query(
-                index: str, body: Dict[str, Dict[str, Dict[str, str]]]
+                index: str, query: Dict[str, Dict[str, Dict[str, str]]]
         ) -> None:
             self.assertEqual(index, correct_index_name)
-            self.assertEqual(body, {
+            self.assertEqual(query, {
                 'query':
                 {
                     'match_all': {}
@@ -171,7 +168,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         # 'Dict[str, Any]' type, and also in the type stubs the type of body is
         # mentioned as Any.
         def mock_search(
-            body: Dict[str, Any], index: str, params: Dict[str, int]
+            body: Dict[str, Any], index: str, from_: int, size: int
         ) -> Dict[str, Dict[str, List[str]]]:
             self.assertEqual(body, {
                 'query': {
@@ -197,10 +194,8 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                 }]
             })
             self.assertEqual(index, correct_index_name)
-            self.assertEqual(params, {
-                'from': 0,
-                'size': 21
-            })
+            self.assertEqual(from_,0)
+            self.assertEqual(size,21)
             return {
                 'hits': {
                     'hits': []
@@ -227,7 +222,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         # 'Dict[str, Any]' type, and also in the type stubs the type of body is
         # mentioned as Any.
         def mock_search(
-            body: Dict[str, Any], index: str, params: Dict[str, int]
+            body: Dict[str, Any], index: str, from_: int,size: int
         ) -> Dict[str, Dict[str, List[str]]]:
             self.assertEqual(body, {
                 'query': {
@@ -257,10 +252,8 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                 }]
             })
             self.assertEqual(index, correct_index_name)
-            self.assertEqual(params, {
-                'from': 0,
-                'size': 21
-            })
+            self.assertEqual(from_,0)
+            self.assertEqual(size,21)
             return {
                 'hits': {
                     'hits': []
@@ -350,7 +343,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         # 'Dict[str, Any]' type, and also in the type stubs the type of body is
         # mentioned as Any.
         def mock_search(
-                body: Dict[str, Any], index: str, params: Dict[str, int]
+                body: Dict[str, Any], index: str, from_: int, size: int
         ) -> Dict[str, Dict[str, List[str]]]:
             self.assertEqual(body, {
                 'query': {
@@ -376,10 +369,8 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                 }]
             })
             self.assertEqual(index, correct_index_name)
-            self.assertEqual(params, {
-                'from': 0,
-                'size': 21
-            })
+            self.assertEqual(from_, 0)
+            self.assertEqual(size, 21)
             return {
                 'hits': {
                     'hits': []
@@ -409,7 +400,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         # 'Dict[str, Any]' type, and also in the type stubs the type of body is
         # mentioned as Any.
         def mock_search(
-            body: Dict[str, Any], index: str, params: Dict[str, int]
+            body: Dict[str, Any], index: str, from_:int , size: int
         ) -> Dict[str, Dict[str, List[str]]]:
             self.assertEqual(body, {
                 'query': {
@@ -439,10 +430,8 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                 }]
             })
             self.assertEqual(index, correct_index_name)
-            self.assertEqual(params, {
-                'from': 0,
-                'size': 21
-            })
+            self.assertEqual(from_, 0)
+            self.assertEqual(size, 21)
             return {
                 'hits': {
                     'hits': []
