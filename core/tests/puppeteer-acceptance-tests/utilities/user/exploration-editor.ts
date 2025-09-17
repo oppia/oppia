@@ -1748,8 +1748,13 @@ export class ExplorationEditor extends BaseUser {
   ): Promise<void> {
     switch (interactionType) {
       case INTERACTION_TYPES.NUMBER_INPUT:
-        await this.page.waitForSelector(floatFormInput);
-        await this.page.type(floatFormInput, answer);
+        await this.page.waitForSelector(
+          `${responseModalBodySelector} ${floatFormInput}`
+        );
+        await this.page.type(
+          `${responseModalBodySelector} ${floatFormInput}`,
+          answer
+        );
         break;
       case INTERACTION_TYPES.MULTIPLE_CHOICE:
         await this.page.waitForSelector(multipleChoiceResponseDropdown, {
