@@ -677,7 +677,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
             'Audio not recognized as a mp3 file\n'
             'Schema validation for \'filename\' failed: Validation failed: '
             'is_regex_matched ({\'regex_pattern\': '
-            '\'[^\\\\s]+(\\\\.(?i)(mp3))$\'}) for object cafe.flac')
+            '\'[^\\\\s]+(\\\\.(?i:mp3))$\'}) for object cafe.flac')
         self.assertEqual(response_dict['error'], error_msg)
 
         self.logout()
@@ -741,7 +741,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
             'Audio not recognized as a mp3 file\n'
             'Schema validation for \'filename\' failed: Validation failed: '
             'is_regex_matched ({\'regex_pattern\': '
-            '\'[^\\\\s]+(\\\\.(?i)(mp3))$\'}) for object cafe.flac')
+            '\'[^\\\\s]+(\\\\.(?i:mp3))$\'}) for object cafe.flac')
         self.assertEqual(response_dict['error'], error_msg)
 
     def test_audio_upload_mpeg_container(self) -> None:
@@ -793,7 +793,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
             'these errors are happening:\n'
             'Schema validation for \'filename\' failed: Validation failed: '
             'is_regex_matched ({\'regex_pattern\': '
-            '\'[^\\\\s]+(\\\\.(?i)(mp3))$\'}) for object test.wav')
+            '\'[^\\\\s]+(\\\\.(?i:mp3))$\'}) for object test.wav')
         self.assertEqual(response_dict['error'], error_msg)
 
     def test_upload_empty_audio(self) -> None:
@@ -866,7 +866,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
             'errors are happening:\n'
             'Schema validation for \'filename\' failed: Validation failed: '
             'is_regex_matched ({\'regex_pattern\': '
-            '\'[^\\\\s]+(\\\\.(?i)(mp3))$\'}) for object test')
+            '\'[^\\\\s]+(\\\\.(?i:mp3))$\'}) for object test')
         self.assertEqual(response_dict['error'], error_msg)
 
     def test_exceed_max_length_detected(self) -> None:

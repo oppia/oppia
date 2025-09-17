@@ -78,7 +78,7 @@ class AudioUploadHandler(
                     'type': 'basestring',
                     'validators': [{
                         'id': 'is_regex_matched',
-                        'regex_pattern': r'[^\s]+(\.(?i)(mp3))$'
+                        'regex_pattern': r'[^\s]+(\.(?i:mp3))$'
                     }]
                 }
             }
