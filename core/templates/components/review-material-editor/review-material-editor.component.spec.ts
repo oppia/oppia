@@ -76,7 +76,7 @@ describe('Review Material Editor Component', () => {
     expect(component.HTML_SCHEMA).toEqual({
       type: 'html',
       ui_config: {
-        rte_components: 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS',
+        rte_component_config_id: 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS',
       },
     });
     expect(component.editableExplanation).toBe('Explanation');
@@ -140,7 +140,7 @@ describe('Review Material Editor Component', () => {
     expect(schema).toEqual({
       type: 'html',
       ui_config: {
-        rte_components: 'ALL_COMPONENTS',
+        rte_component_config_id: 'ALL_COMPONENTS',
       },
     });
   });
@@ -171,7 +171,7 @@ describe('Review Material Editor Component', () => {
     expect(schema).toEqual({
       type: 'html',
       ui_config: {
-        rte_components: 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS',
+        rte_component_config_id: 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS',
       },
     });
   });

@@ -68,8 +68,8 @@ export default {
     "RTE_COMPONENT_CONFIGS": {
       "ALL_COMPONENTS": ["tabs", "skillreview", "collapsible", "math", "image", "link", "video"],
       "BLOG_COMPONENTS": ["image", "link", "video"],
-      "SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS": ["tabs", "skillreview", "collapsible", "math", "image", "link", "video", "workedexample"],
-      "WORKED_EXAMPLE_MODAL_COMPONENTS": ["image", "math", "skillreview"]
+      "SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS": ["skillreview", "math", "image", "workedexample"],
+      "CURATED_LESSON_COMPONENTS": ["image", "math", "skillreview"]
     },
 
   "LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST": [

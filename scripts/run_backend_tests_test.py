@@ -28,15 +28,16 @@ import tempfile
 import threading
 import unittest.mock
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.tests import test_utils
-from scripts import common
-from scripts import concurrent_task_utils
-from scripts import git_changes_utils
-from scripts import install_third_party_libs
-from scripts import run_backend_tests
-from scripts import servers
+from scripts import (
+    common,
+    concurrent_task_utils,
+    git_changes_utils,
+    install_third_party_libs,
+    run_backend_tests,
+    servers,
+)
 
 from typing import Callable, Final, List, Set, Tuple
 
@@ -643,7 +644,9 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             run_backend_tests, 'check_coverage',
             lambda *unused_args, **unused_kwargs: ('Coverage report', 100.00))
 
-        args = ['--test_targets', test_target, '--generate_coverage_report']
+        args = [
+            '--skip-install', '--test_targets', test_target,
+            '--generate_coverage_report']
         with self.print_swap:
             with swap_check_coverage, self.swap_redis_server, swap_execute_task:
                 with self.swap_cloud_datastore_emulator, swap_check_results:
@@ -675,7 +678,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             run_backend_tests, 'check_test_results',
             lambda *unused_args, **unused_kwargs: (100, 0, 0, {}))
 
-        args = ['--test_targets', test_targets]
+        args = ['--skip-install', '--test_targets', test_targets]
         with self.print_swap, self.swap_redis_server, swap_execute_task:
             with self.swap_cloud_datastore_emulator, swap_check_results:
                 run_backend_tests.main(args=args)

@@ -56,7 +56,7 @@ export class ReviewMaterialEditorComponent implements OnInit {
   HTML_SCHEMA: HtmlSchema = {
     type: 'html',
     ui_config: {
-      rte_components: 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS',
+      rte_component_config_id: 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS',
     },
   };
 
@@ -79,7 +79,7 @@ export class ReviewMaterialEditorComponent implements OnInit {
       this.HTML_SCHEMA = {
         type: 'html',
         ui_config: {
-          rte_components: 'ALL_COMPONENTS',
+          rte_component_config_id: 'ALL_COMPONENTS',
         },
       };
     }

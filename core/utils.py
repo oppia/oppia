@@ -27,7 +27,6 @@ import json
 import os
 import random
 import re
-import ssl
 import string
 import time
 import unicodedata
@@ -37,14 +36,27 @@ import urllib.request
 from core import feconf
 from core.constants import constants
 
-from PIL import Image
-import certifi
 import filetype
 import yaml
-
-from typing import ( # isort:skip
-    Any, BinaryIO, Callable, Dict, Iterable, Iterator, List, Mapping,
-    Literal, Optional, TextIO, Tuple, TypeVar, Union, cast, overload)
+from PIL import Image
+from typing import (
+    Any,
+    BinaryIO,
+    Callable,
+    Dict,
+    Iterable,
+    Iterator,
+    List,
+    Literal,
+    Mapping,
+    Optional,
+    TextIO,
+    Tuple,
+    TypeVar,
+    Union,
+    cast,
+    overload,
+)
 
 DATETIME_FORMAT = '%m/%d/%Y, %H:%M:%S:%f'
 ISO_8601_DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fz'
@@ -1394,21 +1406,6 @@ def quoted(s: str) -> str:
         str. The quoted string.
     """
     return json.dumps(s)
-
-
-def url_open(
-    source_url: Union[str, urllib.request.Request]
-) -> urllib.request._UrlopenRet:
-    """Opens a URL and returns the response.
-
-    Args:
-        source_url: Union[str, Request]. The URL.
-
-    Returns:
-        urlopen. The 'urlopen' object.
-    """
-    context = ssl.create_default_context(cafile=certifi.where())
-    return urllib.request.urlopen(source_url, context=context)
 
 
 def escape_html(unescaped_html_data: str) -> str:

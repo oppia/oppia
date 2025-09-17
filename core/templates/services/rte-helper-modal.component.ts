@@ -416,14 +416,6 @@ export class RteHelperModalComponent {
         );
         return;
       }
-    } else if (this.componentId === this.COMPONENT_ID_SKILLREVIEW) {
-      if (value[1] === '') {
-        this.updateRteErrorMessage(
-          'Please select a skill from the ' +
-            "'The skill that this link refers to' section."
-        );
-        return;
-      }
     }
   }
 

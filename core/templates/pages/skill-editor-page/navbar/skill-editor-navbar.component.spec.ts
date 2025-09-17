@@ -36,6 +36,8 @@ import {NgbModal, NgbModalRef, NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {SkillUpdateService} from 'domain/skill/skill-update.service';
 import {SkillEditorNavabarComponent} from './skill-editor-navbar.component';
 import {SkillEditorRoutingService} from '../services/skill-editor-routing.service';
+import {QuestionUndoRedoService} from 'domain/editor/undo_redo/question-undo-redo.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 class MockNgbModalRef {
   componentInstance!: {
@@ -43,16 +45,31 @@ class MockNgbModalRef {
   };
 }
 
+class MockWindowRef {
+  nativeWindow = {
+    location: {
+      hash: '123',
+      href: '',
+      replace: jasmine.createSpy('replace'),
+    },
+    addEventListener: jasmine.createSpy('addEventListener'),
+    open: jasmine.createSpy('open'),
+    gtag: jasmine.createSpy('gtag'),
+  };
+}
+
 describe('Skill Editor Navbar Component', () => {
   let component: SkillEditorNavabarComponent;
   let fixture: ComponentFixture<SkillEditorNavabarComponent>;
   let ngbModal: NgbModal;
+  let questionUndoRedoService: QuestionUndoRedoService;
   let skillEditorRoutingService: SkillEditorRoutingService;
   let skillEditorStateService: SkillEditorStateService;
   let undoRedoService: UndoRedoService;
   let urlService: UrlService;
   let skillUpdateService: SkillUpdateService;
   let sampleSkill: Skill;
+  let windowRef: MockWindowRef;
   let mockEventEmitter = new EventEmitter();
   let mockPrerequisiteSkillChangeEventEmitter = new EventEmitter();
 
@@ -66,6 +83,8 @@ describe('Skill Editor Navbar Component', () => {
         UrlService,
         SkillEditorStateService,
         SkillUpdateService,
+        QuestionUndoRedoService,
+        {provide: WindowRef, useClass: MockWindowRef},
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -80,6 +99,8 @@ describe('Skill Editor Navbar Component', () => {
     undoRedoService = TestBed.inject(UndoRedoService);
     urlService = TestBed.inject(UrlService);
     skillUpdateService = TestBed.inject(SkillUpdateService);
+    questionUndoRedoService = TestBed.inject(QuestionUndoRedoService);
+    windowRef = TestBed.inject(WindowRef) as unknown as MockWindowRef;
 
     const conceptCard = new ConceptCard(
       SubtitledHtml.createDefault(
@@ -140,6 +161,130 @@ describe('Skill Editor Navbar Component', () => {
       expect(result).toBe('activeTab');
     }
   );
+
+  it('should prevent unload if undoRedoService has unsaved changes', () => {
+    spyOn(undoRedoService, 'getChangeCount').and.returnValue(2);
+    spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(false);
+
+    component.ngOnInit();
+
+    const cb = windowRef.nativeWindow.addEventListener.calls.argsFor(0)[1];
+
+    const fakeEvent = {
+      preventDefault: jasmine.createSpy('preventDefault'),
+      returnValue: undefined,
+    };
+
+    cb(fakeEvent);
+
+    expect(fakeEvent.preventDefault).toHaveBeenCalled();
+    expect(fakeEvent.returnValue).not.toBeUndefined();
+  });
+
+  it('should prevent unload if questionUndoRedoService has unsaved changes', () => {
+    spyOn(undoRedoService, 'getChangeCount').and.returnValue(0);
+    spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
+
+    component.ngOnInit();
+
+    const cb = windowRef.nativeWindow.addEventListener.calls.argsFor(0)[1];
+
+    const fakeEvent = {
+      preventDefault: jasmine.createSpy('preventDefault'),
+      returnValue: undefined,
+    };
+
+    cb(fakeEvent);
+
+    expect(fakeEvent.preventDefault).toHaveBeenCalled();
+    expect(fakeEvent.returnValue).not.toBeUndefined();
+  });
+
+  it('should not prevent unload if there are no unsaved changes', () => {
+    spyOn(undoRedoService, 'getChangeCount').and.returnValue(0);
+    spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(false);
+
+    component.ngOnInit();
+
+    const cb = windowRef.nativeWindow.addEventListener.calls.argsFor(0)[1];
+
+    const fakeEvent = {
+      preventDefault: jasmine.createSpy('preventDefault'),
+      returnValue: undefined,
+    };
+
+    cb(fakeEvent);
+
+    expect(fakeEvent.preventDefault).not.toHaveBeenCalled();
+    expect(fakeEvent.returnValue).toBeUndefined();
+  });
+
+  it('should directly run callback if active tab is not questions', () => {
+    spyOn(skillEditorRoutingService, 'getActiveTabName').and.returnValue(
+      'editor'
+    );
+    spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(false);
+    const runSpy = jasmine.createSpy('runSpy');
+
+    component.confirmBeforeLeavingQuestions(runSpy);
+
+    expect(runSpy).toHaveBeenCalled();
+  });
+
+  it('should directly run callback if active tab is questions but no unsaved changes', () => {
+    spyOn(skillEditorRoutingService, 'getActiveTabName').and.returnValue(
+      'questions'
+    );
+    spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(false);
+    const runSpy = jasmine.createSpy('runSpy');
+
+    component.confirmBeforeLeavingQuestions(runSpy);
+
+    expect(runSpy).toHaveBeenCalled();
+  });
+
+  it('should open modal and clear question changes + reset flag on confirm', fakeAsync(() => {
+    spyOn(skillEditorRoutingService, 'getActiveTabName').and.returnValue(
+      'questions'
+    );
+    spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
+    const clearSpy = spyOn(questionUndoRedoService, 'clearChanges');
+    const runSpy = jasmine.createSpy('runSpy');
+    const modalRef = {
+      result: Promise.resolve(),
+    };
+    spyOn(ngbModal, 'open').and.returnValue(modalRef);
+
+    component.confirmBeforeLeavingQuestions(runSpy);
+    tick();
+
+    expect(clearSpy).toHaveBeenCalled();
+    expect(skillEditorRoutingService.questionIsBeingCreated).toBeFalse();
+    expect(runSpy).toHaveBeenCalled();
+  }));
+
+  it('should do nothing when user cancels leaving questions', fakeAsync(() => {
+    spyOn(component, 'getActiveTabName').and.returnValue(
+      component.ROUTE_TAB_QUESTIONS
+    );
+    spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
+
+    var runFn = jasmine.createSpy('runFn');
+
+    spyOn(ngbModal, 'open').and.returnValue({
+      result: {
+        then: function (confirmCb, cancelCb) {
+          cancelCb();
+        },
+      },
+    });
+
+    component.confirmBeforeLeavingQuestions(runFn);
+    tick();
+
+    expect(runFn).not.toHaveBeenCalled();
+    expect(questionUndoRedoService.hasChanges).toHaveBeenCalled();
+  }));
 
   it(
     'should check whether the skill is still loading when ' +

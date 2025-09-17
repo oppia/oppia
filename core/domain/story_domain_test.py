@@ -19,13 +19,14 @@ from __future__ import annotations
 import datetime
 import os
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import fs_services
-from core.domain import story_domain
-from core.domain import story_fetchers
-from core.domain import story_services
+from core.domain import (
+    fs_services,
+    story_domain,
+    story_fetchers,
+    story_services,
+)
 from core.tests import test_utils
 
 from typing import Final

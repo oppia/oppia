@@ -1036,40 +1036,4 @@ describe('RteHelperModalComponent', () => {
       flush();
     }));
   });
-
-  describe('when there are validation errors in skillreview form control', function () {
-    var customizationArgSpecs = [
-      {
-        name: 'text',
-        default_value: 'concept _card',
-      },
-      {
-        name: 'skill_id',
-        default_value: '',
-      },
-    ];
-
-    beforeEach(() => {
-      fixture = TestBed.createComponent(RteHelperModalComponent);
-      component = fixture.componentInstance;
-      (component.componentId = 'skillreview'),
-        (component.attrsCustomizationArgsDict = {
-          text: 'concept_card',
-          content: '',
-        });
-      component.customizationArgSpecs = customizationArgSpecs;
-    });
-
-    it('should display error message when skill is not selected', fakeAsync(() => {
-      component.ngOnInit();
-      flush();
-      component.customizationArgsForm.value[0] = 'concept card';
-      component.customizationArgsForm.value[1] = '';
-      component.onCustomizationArgsFormChange(
-        component.customizationArgsForm.value
-      );
-      expect(component.isErrorMessageNonempty()).toBe(true);
-      flush();
-    }));
-  });
 });
