@@ -11,9 +11,6 @@ class ModuleInfo(NamedTuple):
      ispkg: bool
 
 
-def find_loader(fullname: str) -> Optional[Loader]: ...
-
-
 def iter_modules(
     path: Optional[Iterable[str]] = ...,
     prefix: str = ...
