@@ -22,27 +22,27 @@ import datetime
 import json
 import os
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import email_manager
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_services
-from core.domain import state_domain
-from core.domain import translation_fetchers
-from core.domain import user_services
-from core.domain import voiceover_domain
-from core.domain import voiceover_regeneration_services
+from core.domain import (
+    email_manager,
+    exp_domain,
+    exp_fetchers,
+    platform_parameter_list,
+    platform_parameter_services,
+    state_domain,
+    translation_fetchers,
+    user_services,
+    voiceover_domain,
+    voiceover_regeneration_services,
+)
 from core.platform import models
 
 from typing import Dict, List, Optional, Sequence, Tuple, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import exp_models
-    from mypy_imports import voiceover_models
+    from mypy_imports import exp_models, voiceover_models
 
 (exp_models, voiceover_models,) = models.Registry.import_models([
     models.Names.EXPLORATION,

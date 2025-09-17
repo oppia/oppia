@@ -18,10 +18,12 @@
 
 from __future__ import annotations
 
-from core.domain import collection_domain
-from core.domain import exp_domain
-from core.domain import story_domain
-from core.domain import topic_domain
+from core.domain import (
+    collection_domain,
+    exp_domain,
+    story_domain,
+    topic_domain,
+)
 
 from typing import Dict, List
 

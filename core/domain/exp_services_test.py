@@ -24,35 +24,35 @@ import os
 import re
 import zipfile
 
-from core import feature_flag_list
-from core import feconf
-from core import utils
+from core import feature_flag_list, feconf, utils
 from core.constants import constants
-from core.domain import change_domain
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import feedback_services
-from core.domain import fs_services
-from core.domain import opportunity_domain
-from core.domain import opportunity_services
-from core.domain import param_domain
-from core.domain import rating_services
-from core.domain import rights_domain
-from core.domain import rights_manager
-from core.domain import search_services
-from core.domain import state_domain
-from core.domain import stats_services
-from core.domain import story_domain
-from core.domain import story_services
-from core.domain import subscription_services
-from core.domain import suggestion_services
-from core.domain import topic_fetchers
-from core.domain import topic_services
-from core.domain import translation_domain
-from core.domain import translation_fetchers
-from core.domain import translation_services
-from core.domain import user_services
+from core.domain import (
+    change_domain,
+    exp_domain,
+    exp_fetchers,
+    exp_services,
+    feedback_services,
+    fs_services,
+    opportunity_domain,
+    opportunity_services,
+    param_domain,
+    rating_services,
+    rights_domain,
+    rights_manager,
+    search_services,
+    state_domain,
+    stats_services,
+    story_domain,
+    story_services,
+    subscription_services,
+    suggestion_services,
+    topic_fetchers,
+    topic_services,
+    translation_domain,
+    translation_fetchers,
+    translation_services,
+    user_services,
+)
 from core.platform import models
 from core.tests import test_utils
 from extensions import domain
@@ -61,16 +61,18 @@ from typing import Dict, Final, List, Optional, Sequence, Type, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import datastore_services
-    from mypy_imports import exp_models
-    from mypy_imports import feedback_models
-    from mypy_imports import opportunity_models
-    from mypy_imports import recommendations_models
-    from mypy_imports import stats_models
-    from mypy_imports import suggestion_models
-    from mypy_imports import translation_models
-    from mypy_imports import user_models
-    from mypy_imports import voiceover_models
+    from mypy_imports import (
+        datastore_services,
+        exp_models,
+        feedback_models,
+        opportunity_models,
+        recommendations_models,
+        stats_models,
+        suggestion_models,
+        translation_models,
+        user_models,
+        voiceover_models,
+    )
 
 (
     feedback_models,

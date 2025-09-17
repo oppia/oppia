@@ -43,6 +43,7 @@ import {SkillEditorStalenessDetectionService} from './services/skill-editor-stal
 import {SkillEditorStateService} from './services/skill-editor-state.service';
 import {SkillEditorPageComponent} from './skill-editor-page.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {QuestionUndoRedoService} from 'domain/editor/undo_redo/question-undo-redo.service';
 
 class MockNgbModalRef {
   componentInstance!: {
@@ -74,6 +75,7 @@ describe('Skill editor page', () => {
   let fixture: ComponentFixture<SkillEditorPageComponent>;
   let localStorageService: LocalStorageService;
   let preventPageUnloadEventService: PreventPageUnloadEventService;
+  let questionUndoRedoService: QuestionUndoRedoService;
   let skillEditorRoutingService: SkillEditorRoutingService;
   let skillEditorStalenessDetectionService: SkillEditorStalenessDetectionService;
   let skillEditorStateService: SkillEditorStateService;
@@ -89,6 +91,7 @@ describe('Skill editor page', () => {
       declarations: [SkillEditorPageComponent],
       providers: [
         PreventPageUnloadEventService,
+        QuestionUndoRedoService,
         UndoRedoService,
         UrlService,
         SkillEditorStateService,
@@ -119,6 +122,7 @@ describe('Skill editor page', () => {
     undoRedoService = TestBed.inject(UndoRedoService);
     urlService = TestBed.inject(UrlService);
     windowRef = TestBed.inject(WindowRef);
+    questionUndoRedoService = TestBed.inject(QuestionUndoRedoService);
   });
 
   beforeEach(() => {
@@ -194,6 +198,100 @@ describe('Skill editor page', () => {
     component.ngOnInit();
     expect(skillEditorStateService.loadSkill).toHaveBeenCalledWith('skill_1');
   }));
+
+  it('should clear changes and navigate immediately if there are no unsaved changes', () => {
+    spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(false);
+    const clearSpy = spyOn(questionUndoRedoService, 'clearChanges');
+    const navigateFn = jasmine.createSpy('navigateFn');
+
+    component.navigationWithConfirmation(navigateFn);
+
+    expect(clearSpy).toHaveBeenCalled();
+    expect(navigateFn).toHaveBeenCalled();
+  });
+
+  it('should not navigate if user cancels the modal confirmation', fakeAsync(() => {
+    spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
+    const navigateFn = jasmine.createSpy('navigateFn');
+
+    spyOn(ngbModal, 'open').and.callFake(() => {
+      return {
+        componentInstance: {},
+        result: Promise.reject(),
+      } as NgbModalRef;
+    });
+
+    component.navigationWithConfirmation(navigateFn);
+    tick();
+
+    expect(navigateFn).not.toHaveBeenCalled();
+  }));
+
+  it('should clear changes, reset creation flag, and navigate if user confirms', fakeAsync(() => {
+    spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
+    const clearSpy = spyOn(questionUndoRedoService, 'clearChanges');
+    const navigateFn = jasmine.createSpy('navigateFn');
+
+    spyOn(ngbModal, 'open').and.callFake(() => {
+      return {
+        componentInstance: {},
+        result: Promise.resolve(),
+      } as NgbModalRef;
+    });
+
+    component.navigationWithConfirmation(navigateFn);
+    tick();
+
+    expect(clearSpy).toHaveBeenCalled();
+    expect(skillEditorRoutingService.questionIsBeingCreated).toBeFalse();
+    expect(navigateFn).toHaveBeenCalled();
+  }));
+
+  it('should navigate to Main tab with confirmation when current tab is questions', () => {
+    spyOn(skillEditorRoutingService, 'getActiveTabName').and.returnValue(
+      'questions'
+    );
+    spyOn(component, 'navigationWithConfirmation').and.callFake(fn => fn());
+    const navSpy = spyOn(skillEditorRoutingService, 'navigateToMainTab');
+
+    component.selectMainTab();
+
+    expect(navSpy).toHaveBeenCalled();
+  });
+
+  it('should navigate to Main tab directly when current tab is not questions', () => {
+    spyOn(skillEditorRoutingService, 'getActiveTabName').and.returnValue(
+      'preview'
+    );
+    const navSpy = spyOn(skillEditorRoutingService, 'navigateToMainTab');
+
+    component.selectMainTab();
+
+    expect(navSpy).toHaveBeenCalled();
+  });
+
+  it('should navigate to Preview tab with confirmation when current tab is questions', () => {
+    spyOn(skillEditorRoutingService, 'getActiveTabName').and.returnValue(
+      'questions'
+    );
+    spyOn(component, 'navigationWithConfirmation').and.callFake(fn => fn());
+    const navSpy = spyOn(skillEditorRoutingService, 'navigateToPreviewTab');
+
+    component.selectPreviewTab();
+
+    expect(navSpy).toHaveBeenCalled();
+  });
+
+  it('should navigate to Preview tab directly when current tab is not questions', () => {
+    spyOn(skillEditorRoutingService, 'getActiveTabName').and.returnValue(
+      'main'
+    );
+    const navSpy = spyOn(skillEditorRoutingService, 'navigateToPreviewTab');
+
+    component.selectPreviewTab();
+
+    expect(navSpy).toHaveBeenCalled();
+  });
 
   it(
     'should addListener by passing getChangeCount to ' +

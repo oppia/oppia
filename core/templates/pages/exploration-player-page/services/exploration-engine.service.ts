@@ -23,8 +23,7 @@ import {AnswerClassificationResult} from 'domain/classifier/answer-classificatio
 import {
   Exploration,
   ExplorationBackendDict,
-  ExplorationObjectFactory,
-} from 'domain/exploration/ExplorationObjectFactory';
+} from 'domain/exploration/exploration.model';
 import {ParamChange} from 'domain/exploration/param-change.model';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {Outcome} from 'domain/exploration/outcome.model';
@@ -34,8 +33,10 @@ import {StateCard} from 'domain/state_card/state-card.model';
 import {ExpressionInterpolationService} from 'expressions/expression-interpolation.service';
 import {TextInputCustomizationArgs} from 'interactions/customization-args-defs';
 import {AlertsService} from 'services/alerts.service';
+import {LoggerService} from 'services/contextual/logger.service';
 import {PageContextService} from 'services/page-context.service';
 import {UrlService} from 'services/contextual/url.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
@@ -88,17 +89,18 @@ export class ExplorationEngineService {
     private contentTranslationManagerService: ContentTranslationManagerService,
     private entityTranslationsService: EntityTranslationsService,
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
-    private explorationObjectFactory: ExplorationObjectFactory,
     private expressionInterpolationService: ExpressionInterpolationService,
     private focusManagerService: FocusManagerService,
     private imagePreloaderService: ImagePreloaderService,
     private learnerParamsService: LearnerParamsService,
     private learnerAnswerInfoService: LearnerAnswerInfoService,
+    private loggerService: LoggerService,
     private playerTranscriptService: PlayerTranscriptService,
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private statsReportingService: StatsReportingService,
     private stateEditorService: StateEditorService,
     private translateService: TranslateService,
+    private urlInterpolationService: UrlInterpolationService,
     private platformFeatureService: PlatformFeatureService,
     private urlService: UrlService
   ) {
@@ -499,8 +501,11 @@ export class ExplorationEngineService {
     displayableLanguageCodes: string[],
     successCallback: (stateCard: StateCard, label: string) => void
   ): void {
-    this.exploration =
-      this.explorationObjectFactory.createFromBackendDict(explorationDict);
+    this.exploration = Exploration.createFromBackendDict(
+      explorationDict,
+      this.loggerService,
+      this.urlInterpolationService
+    );
     this.answerIsBeingProcessed = false;
     let initStateName = this.exploration.getInitialState().name;
     if (initStateName === null) {

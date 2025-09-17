@@ -22,7 +22,6 @@ from core.platform import models
 from core.platform.speech_synthesis import dev_mode_speech_synthesis_services
 from core.tests import test_utils
 
-
 secrets_services = models.Registry.import_secrets_services()
 
 

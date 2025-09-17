@@ -49,7 +49,7 @@ describe('Rte Helper Service', () => {
             schema: {
               type: 'html',
               ui_config: {
-                rte_components: 'ALL_COMPONENTS',
+                rte_component_config_id: 'ALL_COMPONENTS',
                 hide_complex_extensions: true,
               },
             },
@@ -228,7 +228,7 @@ describe('Rte Helper Service', () => {
             description: 'The tab titles and contents.',
             schema: {
               ui_config: {
-                rte_components: 'ALL_COMPONENTS',
+                rte_component_config_id: 'ALL_COMPONENTS',
                 hide_complex_extensions: true,
               },
               type: 'custom',
@@ -333,7 +333,7 @@ describe('Rte Helper Service', () => {
             schema: {
               type: 'html',
               ui_config: {
-                rte_components: 'WORKED_EXAMPLE_MODAL_COMPONENTS',
+                rte_component_config_id: 'WORKED_EXAMPLE_MODAL_COMPONENTS',
                 hide_complex_extensions: true,
               },
             },
@@ -346,7 +346,7 @@ describe('Rte Helper Service', () => {
             schema: {
               type: 'html',
               ui_config: {
-                rte_components: 'WORKED_EXAMPLE_MODAL_COMPONENTS',
+                rte_component_config_id: 'WORKED_EXAMPLE_MODAL_COMPONENTS',
                 hide_complex_extensions: true,
               },
             },
