@@ -1237,6 +1237,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             content_id_for_default_outcome='d'
         )
 
+        state.interaction.id = 'TextInput'
+
         rg = state_domain.AnswerGroup(
             rule_specs=[state_domain.RuleSpec(
                 rule_type='Equals',
@@ -1261,11 +1263,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         ):
             state.update_interaction_answer_groups([rg])
 
-    def test_migration_continues_when_old_content_id_is_none(
-        self
-    ) -> None:
+    def test_migration_continues_when_old_content_id_is_none(self) -> None:
         """Test that migration continues successfully even when the old
-        content_id in a state's content is not None or invalid.
+        content_id in a state's content is None or invalid.
         """
         state_instance = state_domain.State.create_default_state(
             'state_name',
@@ -1276,6 +1276,23 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         interaction = state_instance.interaction
         interaction.id = 'TextInput'
 
+        interaction.answer_groups.append(
+            state_domain.AnswerGroup(
+                rule_specs=[state_domain.RuleSpec(rule_type='Equals', inputs={})],
+                outcome=state_domain.Outcome(
+                    dest='state_name',
+                    feedback=state_domain.SubtitledHtml('feedback', 'c_id'),
+                    labelled_as_correct=False,
+                    param_changes=[],
+                    refresher_exploration_id=None,
+                    missing_prerequisite_skill_id=None,
+                    dest_if_really_stuck=None
+                ),
+                training_data=[],
+                tagged_skill_misconception_id=None
+            )
+        )
+
         interaction.answer_groups[0].rule_specs[0].inputs = {'x': 'test'}
 
         state_instance.content.content_id = 'old_content_id'
@@ -1283,6 +1300,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_instance.update_interaction_answer_groups(interaction.answer_groups)
 
         self.assertIn('state_name', {'state_name': state_instance})
+
 
     def test_update_solicit_answer_details(self) -> None:
         """Test updating solicit_answer_details."""
