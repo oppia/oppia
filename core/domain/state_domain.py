@@ -4021,8 +4021,7 @@ class State(translation_domain.BaseTranslatableObject):
                         ).get_rule_param_type(rule_spec.rule_type, param_name))
 
                     if issubclass(param_type, objects.BaseTranslatableObject):
-                        if isinstance(value, dict) and 'contentId' in value:
-                            old_content_id_list.append(value['contentId'])
+                        old_content_id_list.append(value['contentId'])
 
         # TODO(yanamal): Do additional calculations here to get the
         # parameter changes, if necessary.
