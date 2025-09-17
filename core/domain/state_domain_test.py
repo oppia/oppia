@@ -1301,7 +1301,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         self.assertIn('state_name', {'state_name': state_instance})
 
-
     def test_update_solicit_answer_details(self) -> None:
         """Test updating solicit_answer_details."""
         state = state_domain.State.create_default_state(
