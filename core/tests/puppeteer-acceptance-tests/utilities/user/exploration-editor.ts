@@ -467,6 +467,7 @@ const INTERACTION_SELECTORS: Record<string, string> = {
   [INTERACTION_TYPES.WORLD_MAP]: '.e2e-test-interaction-tile-InteractiveMap',
   [INTERACTION_TYPES.MUSIC_NOTES_INPUT]:
     '.e2e-test-interaction-tile-MusicNotesInput',
+  [INTERACTION_TYPES.NUMBER_INPUT]: '.e2e-test-interaction-tile-NumericInput',
 } as const;
 
 enum INTERACTION_TABS {
