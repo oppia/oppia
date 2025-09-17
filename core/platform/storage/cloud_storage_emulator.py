@@ -61,7 +61,7 @@ class EmulatorBlob:
         self._raw_bytes = (
             data.encode('utf-8') if isinstance(data, str) else data)
         if content_type is None:
-            guessed_content_type, _ = mimetypes.guess_type(name)
+            guessed_content_type, _ = mimetypes.guess_file_type(name)
             self._content_type = (
                 guessed_content_type
                 if guessed_content_type
