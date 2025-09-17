@@ -69,7 +69,8 @@ def _extract_text_from_link_tag(element: bs4.Tag) -> str:
     """
     escaped_text = element.get('text-with-value')
     text = html.unescape(escaped_text)
-    return json.loads(text) if escaped_text else ''
+    output_str: str = json.loads(text) if escaped_text else ''
+    return output_str
 
 
 def _extract_text_from_skillreview_tag(element: bs4.Tag) -> str:
@@ -85,7 +86,8 @@ def _extract_text_from_skillreview_tag(element: bs4.Tag) -> str:
     """
     escaped_text = element.get('text-with-value')
     text = html.unescape(escaped_text)
-    return json.loads(text) if escaped_text else ''
+    output_str: str = json.loads(text) if escaped_text else ''
+    return output_str
 
 
 def _extract_text_from_math_tag(element: bs4.Tag) -> str:
@@ -102,7 +104,8 @@ def _extract_text_from_math_tag(element: bs4.Tag) -> str:
     math_content = json.loads(html.unescape(escaped_math_content))
     latex_expr = math_content['raw_latex']
     converter = latex2text.LatexNodes2Text()
-    return converter.latex_to_text(latex_expr)
+    output_str: str = converter.latex_to_text(latex_expr)
+    return output_str
 
 
 def _return_empty_string(_: bs4.Tag) -> str:
@@ -148,7 +151,7 @@ def convert_custom_oppia_tags_to_generic_tags(element: bs4.Tag) -> bs4.Tag:
     tag_name = element.name
     voiceover_text_extractor_fn = (
         CUSTOM_RTE_TAGS_TO_VOICEOVER_TEXT_EXTRACTION_RULES.get(
-            tag_name, None))
+            tag_name, _return_empty_string))
 
     element.string = voiceover_text_extractor_fn(element)
     element.name = 'p'
