@@ -2620,8 +2620,12 @@ export class TopicManager extends BaseUser {
    */
   async publishUpdatedSkill(updateMessage: string): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.expectElementToBeVisible(mobileOptionsSelector);
-      await this.clickOn(mobileOptionsSelector);
+      if (
+        !(await this.isElementVisible(navigationContainerSelector, true, 5000))
+      ) {
+        await this.expectElementToBeVisible(mobileOptionsSelector);
+        await this.clickOn(mobileOptionsSelector);
+      }
       // The mobile view has 2 instances of the element, from which
       // the first one is inapplicable here.
       const elems = await this.page.$$(mobileSkillNavToggle);
@@ -3686,8 +3690,10 @@ export class TopicManager extends BaseUser {
     status: 'enabled' | 'disabled'
   ): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.expectElementToBeVisible(mobileOptionsSelector);
-      await this.clickOn(mobileOptionsSelector);
+      if (!this.isElementVisible(navigationContainerSelector, true, 5000)) {
+        await this.expectElementToBeVisible(mobileOptionsSelector);
+        await this.clickOn(mobileOptionsSelector);
+      }
       await this.page.waitForFunction(
         (selector: string, enabled: boolean) => {
           const element = document.querySelector(selector);
@@ -3701,7 +3707,6 @@ export class TopicManager extends BaseUser {
         discardChangesInMobileNavSelector,
         status === 'enabled'
       );
-      await this.closeNavigationInMobileView();
     } else {
       await this.expectElementToBeClickable(
         saveOrPublishSkillSelector,

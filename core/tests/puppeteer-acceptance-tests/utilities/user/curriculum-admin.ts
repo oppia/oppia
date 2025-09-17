@@ -267,6 +267,11 @@ const navigationDropdown = '.e2e-test-mobile-skill-nav-dropdown-icon';
 const addNewSkillButton = '.e2e-test-create-skill-button-circle';
 const createNewSkillMobileButton =
   '.e2e-test-mobile-create-skill-button-secondary';
+const mobileSaveOrPublishSkillSelector = '.e2e-test-mobile-save-skill-changes';
+const mobileSkillNavToggle =
+  'div.e2e-test-mobile-toggle-skill-nav-dropdown-icon';
+const toggleSkillRubricsDropdown = '.e2e-test-toggle-rubrics-dropdown';
+const navigationContainerSelector = '.e2e-test-mobile-navigation-bar-container';
 
 export class CurriculumAdmin extends TopicManager {
   /**
@@ -934,6 +939,10 @@ export class CurriculumAdmin extends TopicManager {
    * @param {string} explanation - The explanation to update.
    */
   async updateRubric(difficulty: string, explanation: string): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(toggleSkillRubricsDropdown);
+    }
+
     await this.waitForStaticAssetsToLoad();
     let difficultyValue: string;
     switch (difficulty) {
@@ -966,11 +975,28 @@ export class CurriculumAdmin extends TopicManager {
    * @param {string} updateMessage - The update message.
    */
   async publishUpdatedSkill(updateMessage: string): Promise<void> {
-    await this.waitForStaticAssetsToLoad();
-    await this.page.waitForSelector(saveOrPublishSkillSelector, {
-      visible: true,
-    });
-    await this.clickOn(saveOrPublishSkillSelector);
+    if (this.isViewportAtMobileWidth()) {
+      if (
+        !(await this.isElementVisible(navigationContainerSelector, true, 5000))
+      ) {
+        await this.expectElementToBeVisible(mobileOptionsSelector);
+        await this.clickOn(mobileOptionsSelector);
+      }
+      // The mobile view has 2 instances of the element, from which
+      // the first one is inapplicable here.
+      const elems = await this.page.$$(mobileSkillNavToggle);
+      await elems[1].click();
+      await this.page.waitForSelector(mobileSaveOrPublishSkillSelector, {
+        visible: true,
+      });
+      await this.clickOn(mobileSaveOrPublishSkillSelector);
+    } else {
+      await this.waitForStaticAssetsToLoad();
+      await this.page.waitForSelector(saveOrPublishSkillSelector, {
+        visible: true,
+      });
+      await this.clickOn(saveOrPublishSkillSelector);
+    }
 
     await this.page.waitForSelector(commitMessageInputSelector, {
       visible: true,
@@ -980,10 +1006,7 @@ export class CurriculumAdmin extends TopicManager {
       visible: true,
     });
     await this.clickOn(closeSaveModalButtonSelector);
-
-    await this.page.waitForSelector(closeSaveModalButtonSelector, {
-      hidden: true,
-    });
+    await this.expectToastMessageToBe('Changes Saved.');
     showMessage('Skill updated successful');
   }
 

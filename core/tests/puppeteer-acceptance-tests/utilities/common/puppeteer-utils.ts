@@ -778,7 +778,7 @@ export class BaseUser {
   async isElementVisible(
     selector: string,
     visible: boolean = true,
-    timeout: number = 30000
+    timeout: number = 10000
   ): Promise<boolean> {
     try {
       if (visible) {
