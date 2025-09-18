@@ -591,13 +591,13 @@ class ElasticSearchStub:
             'resource.type': 'index_or_alias',
             'resource.id': index
         }
+        meta = elasticsearch.transport.ApiResponseMeta(
+                404, "Index Not Found", {"content-type": "application/json"})
+        body = {'status': 404, 'error': error_data}
         raise elasticsearch.NotFoundError(
-            message='index_not_found_exception: no such index [%s]' % index,
-            meta=meta,
-            body={
-                'status': 404,
-                'error': error_data
-            }
+            'index_not_found_exception: no such index [%s]' % index,
+            meta,
+            body
         )
 
     def mock_create_index(self, index: str) -> NewIndexDict:
@@ -620,11 +620,13 @@ class ElasticSearchStub:
                 'index': index,
                 'index_uuid': 'RaNdOmStRiNgOfAlPhAs'
             }
-            meta = type('Meta', (), {'status': 400})()
+            meta = elasticsearch.transport.ApiResponseMeta(
+                400, "Already Exists", {"content-type": "application/json"})
+            body = {'error': error_data, 'status': 400}
             raise elasticsearch.RequestError(
-                message=f"resource_already_exists_exception: index [{index}/RaNdOmStRiNgOfAlPhAs] already exists",
-                meta=meta,
-                body={'error': error_data, 'status': 400}
+                "resource_already_exists_exception: index [{index}/RaNdOmStRiNgOfAlPhAs] already exists",
+                meta,
+                body
             )
         self._DB[index] = []
         return {
@@ -732,7 +734,7 @@ class ElasticSearchStub:
                 '_id': '0'
             }
 
-        error_body = {
+        body = {
             '_index': index,
             '_type': '_doc',
             '_id': id,
@@ -746,12 +748,12 @@ class ElasticSearchStub:
             '_seq_no': 103,
             '_primary_term': 1
         }
-        meta = type('Meta', (), {'status': 400})()
-
+        meta = elasticsearch.transport.ApiResponseMeta(
+                404, "Document Not Found", {"content-type": "application/json"})
         raise elasticsearch.NotFoundError(
-            message=f'document not found: [{index}][{id}]',
-            meta=meta,
-            body=error_body
+            'document not found: [{index}][{id}]',
+            meta,
+            body
         )
 
     def mock_delete_by_query(
