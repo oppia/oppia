@@ -215,6 +215,7 @@ export class TranslationSubmitter extends BaseUser {
 
     // Add a caption to the image.
     await this.expectElementToBeVisible(textInputSelector);
+    await this.waitForElementToStabilize(textInputSelector);
     await this.clearAllTextFrom(textInputSelector);
     await this.type(textInputSelector, caption);
 

@@ -115,50 +115,28 @@ export class PracticeQuestionSubmitter extends Contributor {
     skillName: string,
     topicName: string
   ): Promise<void> {
-    const opportunitySubHeadingSelector = this.isViewportAtMobileWidth()
-      ? mobileOpportunitySubheadingTitleSelector
-      : desktopOpportunitySubheadingTitleSelector;
     await this.expectElementToBeVisible(submitQuestionTab);
     await this.clickOn(submitQuestionTab);
-    await this.page.waitForSelector(opportunityListItem, {visible: true});
-    const opportunityListItems = await this.page.$$(opportunityListItem);
-    for (const item of opportunityListItems) {
-      await item.waitForSelector(opportunityHeadingTitlSelector, {
-        visible: true,
-      });
-      const headingElement = await item.$(opportunityHeadingTitlSelector);
 
-      await item.waitForSelector(opportunitySubHeadingSelector, {
-        visible: true,
-      });
-      const subheadingElement = await item.$(opportunitySubHeadingSelector);
+    const questionElement = await this.expectOpportunityToBePresent(
+      skillName,
+      topicName
+    );
 
-      if (!subheadingElement || !headingElement) {
-        continue;
-      }
-
-      const subheading = await subheadingElement.evaluate(el =>
-        el.textContent?.trim()
+    if (!questionElement) {
+      throw new Error(
+        `No opportunity found for topic "${topicName}" and skill "${skillName}"`
       );
-      const heading = await headingElement.evaluate(el =>
-        el.textContent?.trim()
-      );
-
-      if (subheading === topicName && heading === skillName) {
-        const button = await item.$(suggestQuestionButton);
-        await this.page.evaluate(button => {
-          button.click();
-        }, button);
-
-        await this.expectElementToBeVisible(
-          questionDifficultySelectionModalSelector
-        );
-        return;
-      }
     }
 
-    throw new Error(
-      `No opportunity found for topic "${topicName}" and skill "${skillName}"`
+    const button = await questionElement.$(suggestQuestionButton);
+    if (!button) {
+      throw new Error('Suggest Question button not found.');
+    }
+    await button.click();
+
+    await this.expectElementToBeVisible(
+      questionDifficultySelectionModalSelector
     );
   }
 
