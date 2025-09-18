@@ -624,7 +624,7 @@ class ElasticSearchStub:
                 400, 'Already Exists', {'content-type': 'application/json'})
             body = {'error': error_data, 'status': 400}
             raise elasticsearch.RequestError(
-                f"resource_already_exists_exception: index [{index}/RaNdOmStRiNgOfAlPhAs] already exists",
+                f'resource_already_exists_exception: index [{index}/RaNdOmStRiNgOfAlPhAs] already exists',
                 meta,
                 body
             )
@@ -680,13 +680,13 @@ class ElasticSearchStub:
             '_type': '_doc',
         }
 
-    def mock_exists(self, index: str, id: str) -> bool:
+    def mock_exists(self, index: str, id_: str) -> bool:
         """Checks whether a document with the given ID exists in the mock
         database.
 
         Args:
             index: str. The name of the index to check.
-            id: str. The document id to check.
+            id_: str. The document id to check.
 
         Returns:
             bool. Whether the document exists in the index.
@@ -696,15 +696,15 @@ class ElasticSearchStub:
         """
         if index not in self._DB:
             self._generate_index_not_found_error(index)
-        return any(d['id'] == id for d in self._DB[index])
+        return any(d['id'] == id_ for d in self._DB[index])
 
-    def mock_delete(self, index: str, id: str) -> ExistingIndexDict:
+    def mock_delete(self, index: str, id_: str) -> ExistingIndexDict:
         """Deletes a document from an index in the mock database. Does nothing
         if the document is not in the index.
 
         Args:
             index: str. The name of the index to delete the document from.
-            id: str. The document id to be deleted from the index.
+            id_: str. The document id to be deleted from the index.
 
         Returns:
             dict. A dict representing the ElasticSearch API response.
@@ -716,7 +716,7 @@ class ElasticSearchStub:
         """
         if index not in self._DB:
             self._generate_index_not_found_error(index)
-        docs = [d for d in self._DB[index] if d['id'] != id]
+        docs = [d for d in self._DB[index] if d['id'] != id_]
         if len(self._DB[index]) != len(docs):
             self._DB[index] = docs
             return {
@@ -737,7 +737,7 @@ class ElasticSearchStub:
         body = {
             '_index': index,
             '_type': '_doc',
-            '_id': id,
+            '_id': id_,
             '_version': 1,
             'result': 'not_found',
             '_shards': {
@@ -751,7 +751,7 @@ class ElasticSearchStub:
         meta = elasticsearch.transport.ApiResponseMeta(
                 404, 'Document Not Found', {'content-type': 'application/json'})
         raise elasticsearch.NotFoundError(
-            f"document not found: [{index}][{id}]",
+            f'document not found: [{index}][{id_}]',
             meta,
             body
         )
