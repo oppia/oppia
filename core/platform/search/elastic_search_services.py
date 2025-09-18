@@ -321,22 +321,25 @@ def search(
         query_definition['query']['bool']['must'].append({
             'multi_match': {
                 'query': query_string,
-                # 'fields' is used to prioritize matches in certain fields. 
-                # It will first try to match with the title, then the category, and finally the description. 
+                # 'fields' is used to prioritize matches in certain fields.
+                # It will first try to match with the title, then the category, and finally the description.
                 # https://www.elastic.co/docs/reference/query-languages/query-dsl/query-dsl-multi-match-query.
                 'fields': ['title^3', 'description', 'category^2'],
-                # 'fuzziness' is used to allow for minor misspellings or typos in the search query. 
-                # The 'AUTO' setting lets Elasticsearch determine the appropriate level of fuzziness 
-                # based on the length of the search term.
+                # 'fuzziness' is used to allow for minor misspellings or typos in the search query.
+                # The 'AUTO' setting lets Elasticsearch determine the appropriate level of 
+                # fuzziness based on the length of the search term.
                 # 'prefix_length' is used to specify the number of initial characters
-                # that must match exactly before fuzziness is applied. This helps to avoid irrelevant matches.
-                # 'max_expansions' is used to limit the number of variations generated for a fuzzy search term.
+                # that must match exactly before fuzziness is applied. This helps to avoid
+                # irrelevant matches.
+                # 'max_expansions' is used to limit the number of variations generated for a fuzzy
+                # search term.
                 # This helps to control the performance of the search query.
                 # https://www.elastic.co/docs/reference/query-languages/query-dsl/query-dsl-fuzzy-query
                 'fuzziness': 'AUTO',
                 'prefix_length': 1,
                 'max_expansions': 50,
-                # 'minimum_should_match' Specifies the minimum number or percentage of optional clauses (like the terms in a More Like This query)
+                # 'minimum_should_match' Specifies the minimum number or percentage of optional
+                # clauses (like the terms in a More Like This query)
                 # that a document must contain to be considered a match.
                 #https://www.elastic.co/docs/reference/query-languages/query-dsl/query-dsl-minimum-should-match
                 'minimum_should_match': '75%'
