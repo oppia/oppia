@@ -22,14 +22,10 @@
  */
 
 import {Injectable} from '@angular/core';
-import {
-  FetchExplorationBackendResponse,
-  ReadOnlyExplorationBackendApiService,
-} from 'domain/exploration/read-only-exploration-backend-api.service';
+import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {PageContextService} from 'services/page-context.service';
 import {ExplorationEngineService} from './exploration-engine.service';
 import {PlayerTranscriptService} from './player-transcript.service';
-import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
 import {ComputeGraphService} from 'services/compute-graph.service';
 import {StateGraphLayoutService} from 'components/graph-services/graph-layout.service';
 import {forEach} from 'angular';
