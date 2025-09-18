@@ -23,11 +23,9 @@ import isElementClickable from '../../functions/is-element-clickable';
 import {showMessage} from '../common/show-message';
 
 // Common Selectors.
-const activeTabSelector = '.e2e-test-active-tab';
 const selectedSkillSelector = '.e2e-test-rte-skill-selected';
 
 // Contributor Dashboard Selectors.
-const contributionTabSelector = '.e2e-test-contribution-tab';
 const paginationBtnSelectorPrefix = '.e2e-test-pagination-button';
 
 // Contribution Dashboard > Translate Text Tab Selectors.
@@ -56,7 +54,6 @@ const rteEditorBodySelector = '.e2e-test-rte';
 const rteHelperModalContainerSelector = '.e2e-test-rte-helper-modal-container';
 const skillNameInput = '.e2e-test-skill-name-input';
 const skillItemInRTESelector = '.e2e-test-rte-skill-selector-item';
-const contributionTableSelector = '.e2e-test-topics-table';
 const discardChangeButton = '.e2e-test-discard-translation-chages';
 
 const currentProgressSelector =
@@ -105,10 +102,10 @@ export class TranslationSubmitter extends BaseUser {
    * Clicks on the skip translation button in the translation modal.
    * This will skip the current translation and load the next one.
    */
-  async clickOnSkipTranslationButton() {
+  async clickOnSkipTranslationButton(): Promise<void> {
     await this.expectElementToBeVisible(textToTranslateContainerSelector);
     const preClickContent = await this.page.evaluate((sel: string) => {
-      return document.querySelector(sel)?.innerHTML;
+      return document.querySelector(sel)?.textContent;
     }, textToTranslateContainerSelector);
 
     await this.expectElementToBeVisible(skipTranslationButtonSelector);
@@ -117,7 +114,7 @@ export class TranslationSubmitter extends BaseUser {
     // Verify that the text to translate container is updated.
     await this.page.waitForFunction(
       (sel: string, htmlContent: string) => {
-        const content = document.querySelector(sel)?.innerHTML;
+        const content = document.querySelector(sel)?.textContent;
         return content !== htmlContent;
       },
       {},
@@ -196,7 +193,7 @@ export class TranslationSubmitter extends BaseUser {
   async expectPaginationButtonToBeVisible(
     button: 'previous' | 'next',
     visible: boolean = true
-  ) {
+  ): Promise<void> {
     const selector = `${paginationBtnSelectorPrefix}-${button}`;
     await this.expectElementToBeVisible(selector, visible);
   }
@@ -290,12 +287,6 @@ export class TranslationSubmitter extends BaseUser {
 
     await this.page.waitForFunction(
       (element: HTMLElement, value: string) => {
-        console.log(`[debug] element: ${element}`);
-        console.log(`[debug] value: ${value}`);
-        console.log(
-          `[debug] element.value: ${(element as HTMLInputElement).value}`
-        );
-        console.log(`[debug] element.textContent: ${element.textContent}`);
         return (
           (element as HTMLInputElement).value === value ||
           element.textContent?.includes(value)
@@ -377,7 +368,7 @@ export class TranslationSubmitter extends BaseUser {
     await this.expectElementToBeVisible(rteEditorBodySelector);
     const initialHTMLContent = await this.page.$eval(
       rteEditorBodySelector,
-      el => (el as HTMLElement).innerHTML
+      el => (el as HTMLElement).textContent
     );
     const isRTEFocused = await this.isElementVisible(
       `${rteEditorBodySelector}.cke_focus`,
@@ -395,7 +386,7 @@ export class TranslationSubmitter extends BaseUser {
     await this.page.waitForFunction(
       (selector: string, initialHTMLContent: string) => {
         const element = document.querySelector(selector);
-        return element?.innerHTML !== initialHTMLContent;
+        return element?.textContent !== initialHTMLContent;
       },
       {},
       rteEditorBodySelector,

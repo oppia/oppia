@@ -18,23 +18,7 @@
 
 import {ElementHandle} from 'puppeteer';
 import {BaseUser} from '../common/puppeteer-utils';
-import {RTEEditor} from '../common/rte-editor';
 
-// Common Selectors.
-const activeTabSelector = '.e2e-test-active-tab';
-
-// Contributor Dashboard Selectors.
-const contributionTabSelector = '.e2e-test-contribution-tab';
-const paginationBtnSelectorPrefix = '.e2e-test-pagination-button';
-
-// Contribution Dashboard > Translate Text Tab Selectors.
-const languageSelector = '.e2e-test-language-selector';
-const selectedLanguageSelector = '.e2e-test-language-selector-selected';
-const featuredLanguageOptionSelector = '.e2e-test-featured-language';
-const languageOptionSelector = '.e2e-test-language-selector-option';
-const topicSelector = '.e2e-test-topic-selector';
-const selectedTopicSelector = '.e2e-test-topic-selector-selected';
-const topicOptionSelector = '.e2e-test-topic-selector-option';
 const opportunityItemSelector = '.e2e-test-opportunity-list-item';
 const opportunityItemHeadingSelector =
   '.e2e-test-opportunity-list-item-heading';
@@ -44,19 +28,6 @@ const opportunityTranslateButtonSelector =
   '.e2e-test-opportunity-list-item-button';
 const translateTextModalHeaderContainerSelector =
   '.e2e-test-translate-text-header-container';
-const textToTranslateContainerSelector = '.oppia-text-to-translate-container';
-const skipTranslationButtonSelector = '.e2e-test-skip-translation-button';
-const copyButtonSelector = '.e2e-test-copy-button';
-const closeModalButtonSelector = '.e2e-test-close-modal-button';
-const imageSelector = '.e2e-test-image';
-const saveImageButtonSelector = '.e2e-test-close-rich-text-component-editor';
-const textInputSelector = '.e2e-test-text-input';
-const descriptionSelector = '.e2e-test-description-box';
-const rteEditorBodySelector = '.e2e-test-rte';
-const rteHelperModalContainerSelector = '.e2e-test-rte-helper-modal-container';
-const skillNameInput = '.e2e-test-skill-name-input';
-const skillItemInRTESelector = '.e2e-test-rte-skill-selector-item';
-const contributionTableSelector = '.e2e-test-topics-table';
 const pinIconSelector = '.e2e-test-pin-icon';
 const backToLessonButtonSelector = '.e2e-test-back-to-lesson-button';
 const modalHeaderSelector = '.e2e-test-modal-header';
