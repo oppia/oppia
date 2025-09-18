@@ -272,7 +272,7 @@ describe('Topic Manager', function () {
       INTERACTION_TYPES.NUMBER_WITH_UNITS,
       false
     );
-    await topicManager.fillValueInInteractionResponseModal('1/2', 'input');
+    await topicManager.fillValueInInteractionResponseModal('100km', 'input');
     await topicManager.addResponseDetailsInResponseModal(
       'Great!',
       undefined,
@@ -283,7 +283,7 @@ describe('Topic Manager', function () {
     );
     await topicManager.addHintToState('Test Hint');
     await topicManager.addSolutionToState(
-      '21km',
+      '100km',
       'As given in the question.',
       true
     );
