@@ -5,6 +5,8 @@
     </div>
   </div>
   <div *ngFor="let checkpointNode of checkpointStatusArray; index as idx" (click)="returnToCheckpointIfCompleted(idx)"
-    [ngClass]="{'completed-checkpoint-node': checkpointStatusArray[idx] === 'completed', 'in-progress-checkpoint-node': checkpointStatusArray[idx] === 'in-progress', 'incomplete-checkpoint-node': checkpointStatusArray[idx] === 'incomplete'}">
+    [ngClass]="{'completed-checkpoint-node': checkpointStatusArray[idx] === 'completed', 'in-progress-checkpoint-node': checkpointStatusArray[idx] === 'in-progress', 'incomplete-checkpoint-node': checkpointStatusArray[idx] === 'incomplete'}"
+    [attr.aria-label]="'Checkpoint ' + (idx + 1) + ' is ' + checkpointStatusArray[idx]"
+    matTooltip="{{'Checkpoint ' + (idx + 1) + ' is ' + checkpointStatusArray[idx]}}" matTooltipPosition="above">
   </div>
 </div>
