@@ -226,7 +226,7 @@ def delete_documents_from_index(doc_ids: List[str], index_name: str) -> None:
     for doc_id in doc_ids:
         try:
             document_exists_in_index = ES.get_client().exists(
-                index = index, id = id)
+                index=index, id=id)
         except elasticsearch.NotFoundError:
             # The index does not exist yet. Create it and set
             # document_exists_in_index to False.
