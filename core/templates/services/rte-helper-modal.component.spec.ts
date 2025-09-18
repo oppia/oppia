@@ -1035,5 +1035,17 @@ describe('RteHelperModalComponent', () => {
       expect(component.isErrorMessageNonempty()).toBe(true);
       flush();
     }));
+
+    it('should display error message when answer is blank', fakeAsync(() => {
+      component.ngOnInit();
+      flush();
+      component.customizationArgsForm.value[0] = 'question 1';
+      component.customizationArgsForm.value[1] = '';
+      component.onCustomizationArgsFormChange(
+        component.customizationArgsForm.value
+      );
+      expect(component.isErrorMessageNonempty()).toBe(true);
+      flush();
+    }));
   });
 });

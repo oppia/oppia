@@ -415,6 +415,10 @@ export class RteHelperModalComponent {
           `The answer is too long. Please use at most ${this.getCharacterLimit(this.COMPONENT_ID_WORKEDEXAMPLE)} characters.`
         );
         return;
+      } else if (value[1] === '') {
+        this.updateRteErrorMessage(
+          'Please ensure the worked example has an answer.'
+        );
       }
     }
   }

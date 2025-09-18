@@ -622,7 +622,7 @@ describe('Subtopic viewer page', function () {
     };
     const result1 = component.checkNextSubtopicTitleLengthAndModify();
     expect(result1).toBe('This is a very lo...');
-    expect(result1.length).toBe(20);
+    expect(result1.length).toBe(18);
 
     const shortTitle = 'Short title';
     component.nextSubtopic = {

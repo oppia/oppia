@@ -213,6 +213,7 @@
 
   .breadcrumb-container {
     display: flex;
+    margin-bottom: 15px;
     width: 45%;
   }
 
@@ -256,6 +257,10 @@
     .breadcrumb-container {
       width: 65%;
     }
+
+    .next-actions-buttons-container {
+      width: 65%;
+    }
   }
 
   @media screen and (max-width: 700px) {
@@ -293,6 +298,18 @@
 
     .breadcrumb-container {
       justify-content: center;
+    }
+    
+    .btn-study-guide-menu {
+      padding-left: 0;
+    }
+  }
+
+  @media screen and (max-width: 400px) {
+    .btn-study-guide-menu {
+      align-items: center;
+      display: flex;
+      padding: 2px;
     }
   }
 </style>

@@ -129,81 +129,81 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
       this.urlService.getSubtopicUrlFragmentFromLearnerUrl();
 
     this.loaderService.showLoadingScreen('Loading');
-    this.subtopicViewerBackendApiService
-      .fetchSubtopicDataAsync(
+
+    const subtopicPromise =
+      this.subtopicViewerBackendApiService.fetchSubtopicDataAsync(
         this.topicUrlFragment,
         this.classroomUrlFragment,
         this.subtopicUrlFragment
-      )
-      .then(
-        subtopicDataObject => {
-          if (this.isShowRestructuredStudyGuidesFeatureEnabled()) {
-            this.sections = subtopicDataObject.getSections();
-          } else {
-            this.pageContents = subtopicDataObject.getPageContents();
-          }
-          this.subtopicTitle = subtopicDataObject.getSubtopicTitle();
-          this.parentTopicId = subtopicDataObject.getParentTopicId();
-          this.pageContextService.setCustomEntityContext(
-            AppConstants.ENTITY_TYPE.TOPIC,
-            this.parentTopicId
-          );
-
-          // The onLangChange event is initially fired before the subtopic is
-          // loaded. Hence the first setpageTitle() call needs to made
-          // manually, and the onLangChange subscription is added after
-          // the subtopic is loaded.
-          this.setPageTitle();
-          this.subscribeToOnLangChange();
-          this.pageTitleService.updateMetaTag(
-            `Review the skill of ${this.subtopicTitle.toLowerCase()}.`
-          );
-          this.currentSubtopicId = subtopicDataObject.getCurrentSubtopicId();
-
-          let nextSubtopic = subtopicDataObject.getNextSubtopic();
-          let prevSubtopic = subtopicDataObject.getPrevSubtopic();
-          if (nextSubtopic) {
-            this.nextSubtopic = nextSubtopic;
-            this.subtopicSummaryIsShown = true;
-          }
-          if (prevSubtopic) {
-            this.prevSubtopic = prevSubtopic;
-            this.subtopicSummaryIsShown = true;
-          }
-
-          this.subtopicTitleTranslationKey =
-            this.i18nLanguageCodeService.getSubtopicTranslationKey(
-              this.parentTopicId,
-              this.subtopicUrlFragment,
-              TranslationKeyType.TITLE
-            );
-
-          this.topicViewerBackendApiService
-            .fetchTopicDataAsync(
-              this.topicUrlFragment,
-              this.classroomUrlFragment
-            )
-            .then(topicDataObject => {
-              this.parentTopicTitle = topicDataObject.getTopicName();
-              this.parentTopicTitleTranslationKey =
-                this.i18nLanguageCodeService.getTopicTranslationKey(
-                  topicDataObject.getTopicId(),
-                  TranslationKeyType.TITLE
-                );
-              this.isPracticeTabDisplayed =
-                topicDataObject.getPracticeTabIsDisplayed();
-            });
-
-          this.loaderService.hideLoadingScreen();
-        },
-        errorResponse => {
-          if (
-            AppConstants.FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1
-          ) {
-            this.alertsService.addWarning('Failed to get subtopic data');
-          }
-        }
       );
+
+    const topicPromise = this.topicViewerBackendApiService.fetchTopicDataAsync(
+      this.topicUrlFragment,
+      this.classroomUrlFragment
+    );
+
+    Promise.all([subtopicPromise, topicPromise]).then(
+      ([subtopicDataObject, topicDataObject]) => {
+        if (this.isShowRestructuredStudyGuidesFeatureEnabled()) {
+          this.sections = subtopicDataObject.getSections();
+        } else {
+          this.pageContents = subtopicDataObject.getPageContents();
+        }
+        this.subtopicTitle = subtopicDataObject.getSubtopicTitle();
+        this.parentTopicId = subtopicDataObject.getParentTopicId();
+        this.pageContextService.setCustomEntityContext(
+          AppConstants.ENTITY_TYPE.TOPIC,
+          this.parentTopicId
+        );
+
+        // The onLangChange event is initially fired before the subtopic is
+        // loaded. Hence the first setpageTitle() call needs to made
+        // manually, and the onLangChange subscription is added after
+        // the subtopic is loaded.
+        this.setPageTitle();
+        this.subscribeToOnLangChange();
+        this.pageTitleService.updateMetaTag(
+          `Review the skill of ${this.subtopicTitle.toLowerCase()}.`
+        );
+        this.currentSubtopicId = subtopicDataObject.getCurrentSubtopicId();
+
+        let nextSubtopic = subtopicDataObject.getNextSubtopic();
+        let prevSubtopic = subtopicDataObject.getPrevSubtopic();
+        if (nextSubtopic) {
+          this.nextSubtopic = nextSubtopic;
+          this.subtopicSummaryIsShown = true;
+        }
+        if (prevSubtopic) {
+          this.prevSubtopic = prevSubtopic;
+          this.subtopicSummaryIsShown = true;
+        }
+
+        this.subtopicTitleTranslationKey =
+          this.i18nLanguageCodeService.getSubtopicTranslationKey(
+            this.parentTopicId,
+            this.subtopicUrlFragment,
+            TranslationKeyType.TITLE
+          );
+
+        this.parentTopicTitle = topicDataObject.getTopicName();
+        this.parentTopicTitleTranslationKey =
+          this.i18nLanguageCodeService.getTopicTranslationKey(
+            topicDataObject.getTopicId(),
+            TranslationKeyType.TITLE
+          );
+        this.isPracticeTabDisplayed =
+          topicDataObject.getPracticeTabIsDisplayed();
+
+        this.loaderService.hideLoadingScreen();
+      },
+      errorResponse => {
+        if (
+          AppConstants.FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1
+        ) {
+          this.alertsService.addWarning('Failed to get subtopic data');
+        }
+      }
+    );
   }
 
   ngOnDestroy(): void {
@@ -305,8 +305,8 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
 
   checkNextSubtopicTitleLengthAndModify(): string {
     let title: string = this.nextSubtopic.getTitle();
-    if (title.length >= 20) {
-      title = title.substring(0, 17) + '...';
+    if (title.length >= 18) {
+      title = title.substring(0, 15) + '...';
     }
     return title;
   }
