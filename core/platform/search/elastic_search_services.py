@@ -331,8 +331,8 @@ def search(
                 # determine the appropriate level of
                 # fuzziness based on the length of the search term.
                 # 'prefix_length' is used to specify the number of initial
-                # characters that must match exactly before fuzziness is applied.
-                # This helps to avoid irrelevant matches.
+                # characters that must match exactly before fuzziness is 
+                # applied. This helps to avoid irrelevant matches.
                 # 'max_expansions' is used to limit the number of variations
                 # generated for a fuzzy search term.
                 # This helps to control the performance of the search query.
@@ -340,10 +340,11 @@ def search(
                 'fuzziness': 'AUTO',
                 'prefix_length': 1,
                 'max_expansions': 50,
-                # 'minimum_should_match' Specifies the minimum number or percentage
-                # of optional clauses (like the terms in a More Like This query)
+                # 'minimum_should_match' Specifies the minimum number or
+                # percentage of optional clauses
+                # (like the terms in a More Like This query)
                 # that a document must contain to be considered a match.
-                #https://www.elastic.co/docs/reference/query-languages/query-dsl/query-dsl-minimum-should-match
+                # https://www.elastic.co/docs/reference/query-languages/query-dsl/query-dsl-minimum-should-match
                 'minimum_should_match': '75%'
             }
         })
