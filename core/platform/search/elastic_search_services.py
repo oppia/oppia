@@ -56,7 +56,7 @@ class ElasticSearchClient:
                     platform_parameter_services.get_platform_parameter_value(
                         platform_parameter_list.ParamName.ES_USERNAME.value))
 
-                es_password = secrets_services.get_secret('ES_PASSWORD')
+                es_password = secrets_services.get_secret('ES_PASSWORD') or ''
 
                 # Use cloud setup if cloud_id is present, otherwise fall back to local.
                 # Only one of cloud_id or hosts can be used with the Elasticsearch v8 client.
