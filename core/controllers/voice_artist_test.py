@@ -18,14 +18,16 @@ from __future__ import annotations
 
 import datetime
 
-from core import feature_flag_list
-from core import feconf
-from core.domain import rights_domain
-from core.domain import rights_manager
-from core.domain import state_domain
-from core.domain import user_services
+from core import feature_flag_list, feconf
+from core.domain import (
+    rights_domain,
+    rights_manager,
+    state_domain,
+    user_services,
+)
 from core.platform import models
 from core.tests import test_utils
+
 from typing import Final
 
 MYPY = False

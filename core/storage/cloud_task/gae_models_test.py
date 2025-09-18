@@ -26,8 +26,7 @@ from typing import List
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import cloud_task_models
+    from mypy_imports import base_models, cloud_task_models
 
 (base_models, cloud_task_models) = models.Registry.import_models([
     models.Names.BASE_MODEL, models.Names.CLOUD_TASK

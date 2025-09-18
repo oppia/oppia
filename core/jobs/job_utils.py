@@ -18,8 +18,7 @@
 
 from __future__ import annotations
 
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_services
+from core.domain import platform_parameter_list, platform_parameter_services
 from core.platform import models
 
 from apache_beam.io.gcp.datastore.v1new import types as beam_datastore_types
@@ -29,8 +28,7 @@ from typing import Any, List, Optional, Tuple, Type, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import datastore_services
+    from mypy_imports import base_models, datastore_services
 
 datastore_services = models.Registry.import_datastore_services()
 

@@ -24,14 +24,14 @@ import pprint
 import traceback
 
 from core import feconf
-from core.domain import beam_job_services
-from core.domain import caching_services
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_services
-from core.jobs import base_jobs
-from core.jobs import job_options
-from core.jobs.io import cache_io
-from core.jobs.io import job_io
+from core.domain import (
+    beam_job_services,
+    caching_services,
+    platform_parameter_list,
+    platform_parameter_services,
+)
+from core.jobs import base_jobs, job_options
+from core.jobs.io import cache_io, job_io
 from core.platform import models
 from core.storage.beam_job import gae_models as beam_job_models
 

@@ -258,7 +258,7 @@ export class TranslationModalComponent {
         // properly since contributors will not be able to view and translate
         // complex extensions.
         hide_complex_extensions: false,
-        rte_component_config_id: 'ALL_COMPONENTS',
+        rte_component_config_id: 'CURATED_LESSON_COMPONENTS',
         language: this.translationLanguageService.getActiveLanguageCode(),
         languageDirection:
           this.translationLanguageService.getActiveLanguageDirection(),

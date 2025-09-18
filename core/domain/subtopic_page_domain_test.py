@@ -18,12 +18,9 @@
 
 from __future__ import annotations
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import state_domain
-from core.domain import subtopic_page_domain
-from core.domain import translation_domain
+from core.domain import state_domain, subtopic_page_domain, translation_domain
 from core.tests import test_utils
 
 

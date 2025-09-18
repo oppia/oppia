@@ -19,20 +19,20 @@ from __future__ import annotations
 import datetime
 import os
 
-from core import feature_flag_list
-from core import feconf
-from core import utils
+from core import feature_flag_list, feconf, utils
 from core.constants import constants
-from core.domain import platform_parameter_list
-from core.domain import skill_services
-from core.domain import story_domain
-from core.domain import story_fetchers
-from core.domain import story_services
-from core.domain import study_guide_domain
-from core.domain import topic_domain
-from core.domain import topic_fetchers
-from core.domain import topic_services
-from core.domain import user_services
+from core.domain import (
+    platform_parameter_list,
+    skill_services,
+    story_domain,
+    story_fetchers,
+    story_services,
+    study_guide_domain,
+    topic_domain,
+    topic_fetchers,
+    topic_services,
+    user_services,
+)
 from core.tests import test_utils
 
 from typing import List

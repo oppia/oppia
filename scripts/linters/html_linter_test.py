@@ -25,8 +25,7 @@ from core.tests import test_utils
 
 from typing import Final
 
-from . import html_linter
-from . import run_lint_checks
+from . import html_linter, run_lint_checks
 
 NAME_SPACE: Final = multiprocessing.Manager().Namespace()
 NAME_SPACE.files = run_lint_checks.FileCache()
