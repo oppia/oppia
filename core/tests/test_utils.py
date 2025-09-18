@@ -83,10 +83,11 @@ from core.platform.taskqueue import cloud_tasks_emulator
 from scripts import common
 
 import elasticsearch
-from elastic_transport import ApiResponseMeta
 import requests_mock
 import webapp2
 import webtest
+from core import feconf
+from elastic_transport import ApiResponseMeta, NodeConfig
 from typing import (
     Any,
     Callable,
@@ -592,8 +593,13 @@ class ElasticSearchStub:
             'resource.type': 'index_or_alias',
             'resource.id': index
         }
+        dummy_node = NodeConfig(scheme="http", host=feconf.ES_HOST, port=feconf.ES_LOCALHOST_PORT)
         meta = ApiResponseMeta(
-                404, 'Index Not Found', {'content-type': 'application/json'})
+            status=404,
+            headers={'content-type': 'application/json'},
+            duration=0.1,
+            node=dummy_node
+        )
         body = {'status': 404, 'error': error_data}
         raise elasticsearch.NotFoundError(
             'index_not_found_exception: no such index [%s]' % index,
@@ -621,8 +627,13 @@ class ElasticSearchStub:
                 'index': index,
                 'index_uuid': 'RaNdOmStRiNgOfAlPhAs'
             }
-            meta = ApiResponseMeta(
-                400, 'Already Exists', {'content-type': 'application/json'})
+        dummy_node = NodeConfig(scheme="http", host=feconf.ES_HOST, port=feconf.ES_LOCALHOST_PORT)
+        meta = ApiResponseMeta(
+            status=400,
+            headers={'content-type': 'application/json'},
+            duration=0.1,
+            node=dummy_node
+        )
             body = {'error': error_data, 'status': 400}
             raise elasticsearch.RequestError(
                 f'resource_already_exists_exception: index [{index}/RaNdOmStRiNgOfAlPhAs] already exists',
@@ -749,8 +760,13 @@ class ElasticSearchStub:
             '_seq_no': 103,
             '_primary_term': 1
         }
+        dummy_node = NodeConfig(scheme="http", host=feconf.ES_HOST, port=feconf.ES_LOCALHOST_PORT)
         meta = ApiResponseMeta(
-                404, 'Document Not Found', {'content-type': 'application/json'})
+            status=404,
+            headers={'content-type': 'application/json'},
+            duration=0.1,
+            node=dummy_node
+        )
         raise elasticsearch.NotFoundError(
             f'document not found: [{index}][{id_}]',
             meta,
