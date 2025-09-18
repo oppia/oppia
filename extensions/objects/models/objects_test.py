@@ -441,7 +441,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
                 'Expected unicode string, received 1'
             ),
             (
-                {'raw_latex': ['x^2'], 'svg_filename':{}},
+                {'raw_latex': ['x^2'], 'svg_filename': {}},
                 re.escape('Expected unicode string, received [\'x^2\']')
             ),
             (

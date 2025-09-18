@@ -18,8 +18,7 @@
 
 from __future__ import annotations
 
-from core.controllers import acl_decorators
-from core.controllers import base
+from core.controllers import acl_decorators, base
 
 from typing import Dict
 

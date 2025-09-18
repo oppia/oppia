@@ -22,32 +22,44 @@ import types
 
 from core import feconf
 from core.constants import constants
-from core.domain import email_manager
-from core.domain import exp_domain
-from core.domain import html_cleaner
-from core.domain import platform_parameter_domain
+from core.domain import (
+    email_manager,
+    exp_domain,
+    html_cleaner,
+    platform_parameter_domain,
+)
 from core.domain import platform_parameter_list as param_list
-from core.domain import platform_parameter_registry
-from core.domain import question_domain
-from core.domain import rights_domain
-from core.domain import story_domain
-from core.domain import subscription_services
-from core.domain import suggestion_registry
-from core.domain import suggestion_services
-from core.domain import translation_domain
-from core.domain import user_services
+from core.domain import (
+    platform_parameter_registry,
+    question_domain,
+    rights_domain,
+    story_domain,
+    subscription_services,
+    suggestion_registry,
+    suggestion_services,
+    translation_domain,
+    user_services,
+)
 from core.platform import models
 from core.tests import test_utils
 
 from typing import (
-    Callable, DefaultDict, Dict, Final, List, Optional, Sequence, Set, Tuple,
-    Type, Union)
+    Callable,
+    DefaultDict,
+    Dict,
+    Final,
+    List,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+    Type,
+    Union,
+)
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import email_models
-    from mypy_imports import secrets_services
-    from mypy_imports import suggestion_models
+    from mypy_imports import email_models, secrets_services, suggestion_models
 
 (email_models, suggestion_models) = models.Registry.import_models(
     [models.Names.EMAIL, models.Names.SUGGESTION])

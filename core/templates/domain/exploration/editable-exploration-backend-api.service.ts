@@ -20,7 +20,7 @@ import {HttpClient} from '@angular/common/http';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {AppConstants} from 'app.constants';
-import {ExplorationBackendDict} from './ExplorationObjectFactory';
+import {ExplorationBackendDict} from './exploration.model';
 import {ExplorationChange} from './exploration-draft.model';
 import {tap} from 'rxjs/operators';
 import {Injectable} from '@angular/core';

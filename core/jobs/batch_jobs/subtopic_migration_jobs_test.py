@@ -19,8 +19,7 @@
 from __future__ import annotations
 
 from core import feconf
-from core.domain import study_guide_domain
-from core.domain import topic_domain
+from core.domain import study_guide_domain, topic_domain
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import subtopic_migration_jobs
 from core.jobs.types import job_run_result

@@ -25,8 +25,7 @@
 from __future__ import annotations
 
 from core.constants import constants
-from core.domain import classroom_config_domain
-from core.domain import classroom_config_services
+from core.domain import classroom_config_domain, classroom_config_services
 from core.platform import models
 from core.tests import test_utils
 

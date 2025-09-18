@@ -24,11 +24,13 @@ import sys
 
 from core.constants import constants
 from core.tests import test_utils
-from scripts import build
-from scripts import common
-from scripts import run_acceptance_tests
-from scripts import scripts_test_utils
-from scripts import servers
+from scripts import (
+    build,
+    common,
+    run_acceptance_tests,
+    scripts_test_utils,
+    servers,
+)
 
 from typing import ContextManager, List, Optional, Tuple
 

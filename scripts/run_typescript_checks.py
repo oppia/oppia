@@ -25,8 +25,9 @@ import sys
 
 from core import utils
 from scripts import common
-from typing import List, Optional, Sequence
+
 import yaml
+from typing import List, Optional, Sequence
 
 from . import build
 
@@ -68,7 +69,7 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/components/state-editor/state-interaction-editor/state-interaction-editor.component.spec.ts',
     'core/templates/components/state-editor/state-interaction-editor/state-interaction-editor.component.ts',
     'core/templates/domain/editor/undo_redo/undo-redo.service.spec.ts',
-    'core/templates/domain/exploration/StatesObjectFactorySpec.ts',
+    'core/templates/domain/exploration/ExplorationObjectFactorySpec.ts',
     'core/templates/domain/exploration/editable-exploration-backend-api.service.spec.ts',
     'core/templates/domain/question/editable-question-backend-api.service.spec.ts',
     'core/templates/domain/question/question-update.service.ts',
@@ -159,7 +160,6 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/topic-editor-page/subtopic-editor/subtopic-editor-tab.component.ts',
     'core/templates/pages/topic-editor-page/topic-editor-page.component.spec.ts',
     'core/templates/pages/topic-editor-page/topic-editor-page.component.ts',
-    'core/templates/services/UpgradedServices.ts',
     'core/templates/services/angular-services.index.ts',
     'core/templates/services/exploration-improvements-task-registry.service.ts',
     'core/templates/services/nested-directives-recursion-timeout-prevention.service.spec.ts',

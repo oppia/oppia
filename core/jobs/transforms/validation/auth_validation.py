@@ -27,8 +27,7 @@ from typing import Iterator, List, Tuple, Type, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import auth_models
-    from mypy_imports import datastore_services
+    from mypy_imports import auth_models, datastore_services
 
 (auth_models,) = models.Registry.import_models([models.Names.AUTH])
 

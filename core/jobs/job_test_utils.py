@@ -23,8 +23,7 @@ import contextlib
 import datetime
 import re
 
-from core.jobs import base_jobs
-from core.jobs import job_options
+from core.jobs import base_jobs, job_options
 from core.jobs.types import job_run_result
 from core.platform import models
 from core.tests import test_utils
@@ -33,13 +32,11 @@ import apache_beam as beam
 from apache_beam import runners
 from apache_beam.testing import test_pipeline
 from apache_beam.testing import util as beam_testing_util
-
 from typing import Any, Iterator, Optional, Sequence, Type
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import datastore_services
+    from mypy_imports import base_models, datastore_services
 
 (base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
