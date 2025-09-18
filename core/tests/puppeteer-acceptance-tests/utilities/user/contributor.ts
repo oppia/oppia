@@ -116,6 +116,10 @@ export class Contributor extends ExplorationEditor {
     let previousElementIds: string[] = [];
     let opportunityItemListChanged = true;
 
+    // TODO(#23395): Currently, the opportunity list is refreshed after the
+    // page is loaded. This causes the test to fail. We are using a workaround
+    // for now, by waiting for the opportunity list to be loaded.
+    // Once the issue is fixed, remove the following do-while loop.
     do {
       await this.page.waitForTimeout(200);
 
@@ -338,7 +342,6 @@ export class Contributor extends ExplorationEditor {
   /**
    * Selects the badge type in the contribution dashboard.
    * @param badgeType - The badge type to select.
-   * @param {string} topicName - The name of the topic to select the badge type.
    */
   async selectBadgeTypeInMobileView(
     badgeType: 'Translation' | 'Question'
@@ -503,13 +506,9 @@ export class Contributor extends ExplorationEditor {
       throw new Error('No rows found in the contribution table.');
     }
 
-    console.log('[debug] found rows:' + tableRows.length);
     for (const row of tableRows) {
       const rowCells = await row.$$(cellSelector);
       if (rowValues.length !== rowCells.length) {
-        showMessage(
-          `[debug] row values length: ${rowValues.length}, row cells length: ${rowCells.length}`
-        );
         continue;
       }
 

@@ -659,7 +659,6 @@ export class PracticeQuestionSubmitter extends Contributor {
 
     await this.page.waitForFunction(
       (element: HTMLInputElement | HTMLTextAreaElement, value: string) => {
-        console.log('[debug] element.value: ' + element.value);
         return element.value.trim() === value;
       },
       {},

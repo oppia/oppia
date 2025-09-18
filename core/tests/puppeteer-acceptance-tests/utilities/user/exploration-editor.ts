@@ -3507,6 +3507,7 @@ export class ExplorationEditor extends BaseUser {
       });
       await this.clickOn(saveChangesButton);
     }
+    // We skip the commit message if it's an empty string.
     if (commitMessage) {
       await this.clickOn(commitMessageSelector);
       await this.type(commitMessageSelector, commitMessage);
@@ -6174,6 +6175,10 @@ export class ExplorationEditor extends BaseUser {
     await this.isTextPresentOnPage('Creator Dashboard');
   }
 
+  /**
+   * Fills the description in the save draft modal.
+   * @param description The description to fill in the save draft modal.
+   */
   async fillDescriptionInSaveDraftModal(description: string): Promise<void> {
     await this.expectElementToBeVisible(commitMessageSelector);
     await this.type(commitMessageSelector, description);
