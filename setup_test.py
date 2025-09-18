@@ -56,8 +56,7 @@ class SetupTests(test_utils.GenericTestBase):
                 'description': 'Oppia Apache Beam package',
                 'install_requires': required_packages,
                 'setup_requires': ['setuptools_scm'],
-                'packages': setuptools.find_packages(),
-                'include_package_data': True,
+                'packages': setuptools.find_packages(exclude=['*tests*']),
                 'package_data': {
                     'oppia_beam_job': ['requirements.txt', 'package.json'],
                     '': ['requirements.txt', 'package.json'],
