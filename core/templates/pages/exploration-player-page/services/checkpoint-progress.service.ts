@@ -29,6 +29,10 @@ import {
 import {PageContextService} from 'services/page-context.service';
 import {ExplorationEngineService} from './exploration-engine.service';
 import {PlayerTranscriptService} from './player-transcript.service';
+import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
+import {ComputeGraphService} from 'services/compute-graph.service';
+import {StateGraphLayoutService} from 'components/graph-services/graph-layout.service';
+import {forEach} from 'angular';
 
 @Injectable({
   providedIn: 'root',
@@ -41,23 +45,68 @@ export class CheckpointProgressService {
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private pageContextService: PageContextService,
     private playerTranscriptService: PlayerTranscriptService,
-    private explorationEngineService: ExplorationEngineService
+    private explorationEngineService: ExplorationEngineService,
+    private computeGraphService: ComputeGraphService,
+    private stateGraphLayoutService: StateGraphLayoutService
   ) {}
 
-  async fetchCheckpointCount(): Promise<number> {
-    const explorationId = this.pageContextService.getExplorationId();
-    return this.readOnlyExplorationBackendApiService
-      .fetchExplorationAsync(explorationId, null)
-      .then((response: FetchExplorationBackendResponse) => {
-        const expStates = response.exploration.states;
-        let count = 0;
-        for (let [, value] of Object.entries(expStates)) {
-          if (value.card_is_checkpoint) {
-            count++;
-          }
-        }
-        return count;
-      });
+  try() {
+    const graphData = this.computeGraphService.compute(
+      this.explorationEngineService.getInitialStateName(),
+      this.explorationEngineService.getExploration().states
+    );
+    const computedNodes = this.stateGraphLayoutService.computeLayout(
+      graphData.nodes,
+      graphData.links,
+      graphData.initStateId,
+      graphData.finalStateIds
+    );
+
+    let depthGraph = {};
+    forEach(computedNodes, node => {
+      depthGraph[node.id] = node.depth;
+    });
+
+    return depthGraph;
+  }
+
+  getMaxStateDepth(): number {
+    const depthGraph = this.try();
+    let maxDepth = 0;
+    for (let stateName in depthGraph) {
+      if (depthGraph[stateName] > maxDepth) {
+        maxDepth = depthGraph[stateName];
+      }
+    }
+    return maxDepth;
+  }
+
+  getCheckpointStates(): number[] {
+    const depthGraph = this.try();
+    const expStates = this.explorationEngineService
+      .getExploration()
+      .states.getStates();
+    let checkpointIndexes: number[] = [];
+    for (let value of expStates) {
+      if (value.cardIsCheckpoint) {
+        checkpointIndexes.push(depthGraph[value.name]);
+      }
+    }
+    checkpointIndexes.sort();
+    return checkpointIndexes;
+  }
+
+  fetchCheckpointCount(): number {
+    const expStates = this.explorationEngineService
+      .getExploration()
+      .states.getStates();
+    let count = 0;
+    for (let value of expStates) {
+      if (value.cardIsCheckpoint) {
+        count++;
+      }
+    }
+    return count;
   }
 
   getMostRecentlyReachedCheckpointIndex(): number {

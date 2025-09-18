@@ -639,7 +639,6 @@ export class NewConversationSkinComponent {
 
   isInLessonPlayer(): boolean {
     const pathnameArray = this.urlService.getPathname().split('/');
-    console.log(pathnameArray);
     if (pathnameArray[1] === 'lesson') {
       return true;
     }

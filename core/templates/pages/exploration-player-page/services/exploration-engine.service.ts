@@ -386,6 +386,10 @@ export class ExplorationEngineService {
     successCallback(initialCard, nextFocusLabel);
   }
 
+  getInitialStateName(): string {
+    return this.exploration.getInitialState().name;
+  }
+
   /**
    * Initializes exploration parameters.
    *
@@ -583,6 +587,10 @@ export class ExplorationEngineService {
    */
   getStateFromStateName(stateName: string): State {
     return this.exploration.getState(stateName);
+  }
+
+  getExploration(): Exploration {
+    return this.exploration;
   }
 
   /**

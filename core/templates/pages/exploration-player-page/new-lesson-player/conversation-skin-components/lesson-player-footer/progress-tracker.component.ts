@@ -78,10 +78,9 @@ export class ProgressTrackerComponent implements OnInit, OnDestroy {
         if (this.checkpointCount) {
           this.showProgressReminderModal();
         } else {
-          this.checkpointProgressService.fetchCheckpointCount().then(count => {
-            this.checkpointCount = count;
-            this.showProgressReminderModal();
-          });
+          this.checkpointCount =
+            this.checkpointProgressService.fetchCheckpointCount();
+          this.showProgressReminderModal();
         }
       })
     );
