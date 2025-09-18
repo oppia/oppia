@@ -331,7 +331,7 @@ def search(
                 # determine the appropriate level of
                 # fuzziness based on the length of the search term.
                 # 'prefix_length' is used to specify the number of initial
-                # characters that must match exactly before fuzziness is 
+                # characters that must match exactly before fuzziness is
                 # applied. This helps to avoid irrelevant matches.
                 # 'max_expansions' is used to limit the number of variations
                 # generated for a fuzzy search term.
