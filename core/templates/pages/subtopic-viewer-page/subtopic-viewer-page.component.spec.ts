@@ -621,7 +621,7 @@ describe('Subtopic viewer page', function () {
       getUrlFragment: () => 'test-fragment',
     };
     const result1 = component.checkNextSubtopicTitleLengthAndModify();
-    expect(result1).toBe('This is a very lo...');
+    expect(result1).toBe('This is a very ...');
     expect(result1.length).toBe(18);
 
     const shortTitle = 'Short title';
