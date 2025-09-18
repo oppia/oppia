@@ -18,13 +18,10 @@
  */
 
 import {ElementHandle} from 'puppeteer';
-import {BaseUser} from '../common/puppeteer-utils';
 import {showMessage} from '../common/show-message';
-import isElementClickable from '../../functions/is-element-clickable';
 import {ExplorationEditor} from './exploration-editor';
 
 const contributionTabSelector = '.e2e-test-contribution-tab';
-const activeTabSelector = '.e2e-test-active-tab';
 const activeTabNameSelector = '.e2e-test-active-tab-name';
 
 const activeTabDescriptionSelector = '.e2e-test-active-tab-description';
@@ -315,7 +312,6 @@ export class Contributor extends ExplorationEditor {
           el.querySelector(sel)?.textContent?.trim(),
         badgeCaptionSelector
       );
-      console.log(`[debug] badgeCaption: ${badgeCaption}`);
       if (badgeCaption !== expectedBadgeCaption) {
         continue;
       }
@@ -326,7 +322,6 @@ export class Contributor extends ExplorationEditor {
             el.querySelector(sel)?.textContent?.trim(),
           badgeLanguageSelector
         );
-        console.log(`[debug] badgeLanguage: ${badgeLanguage}`);
         if (badgeLanguage !== expectedBadgeLanguage) {
           continue;
         }
@@ -517,22 +512,16 @@ export class Contributor extends ExplorationEditor {
       for (let i = 0; i < rowValues.length; i++) {
         if (!rowValues[i]) {
           // If row cell from input is null, we skip comparing it.
-          console.log('[debug] row cell from input is null');
           continue;
         }
         const cellValue = await rowCells[i].evaluate((el: Element) =>
           el.textContent?.trim()
         );
-        console.log('[debug] cell value: ' + cellValue);
-        console.log('[debug] row value: ' + rowValues[i]);
         if (cellValue !== rowValues[i]) {
-          console.log('[debug] cell value does not match');
           match = false;
           break;
         }
       }
-
-      console.log('[debug] match: ' + match);
 
       if (match) {
         return;

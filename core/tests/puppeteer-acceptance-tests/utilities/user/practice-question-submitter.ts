@@ -97,7 +97,6 @@ const saveDestinationButtonSelector = '.e2e-test-save-outcome-dest';
 const saveStuckDestinationButtonSelector = '.e2e-test-save-stuck-destination';
 const responseModalBodyClass = 'e2e-test-response-modal-body';
 const closeModalButtonSelector = '.e2e-test-close-modal-button';
-const opportunityItemButtonSelector = '.e2e-test-opportunity-list-item-button';
 
 export class PracticeQuestionSubmitter extends Contributor {
   /**
