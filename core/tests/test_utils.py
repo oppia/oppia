@@ -83,11 +83,10 @@ from core.platform.taskqueue import cloud_tasks_emulator
 from scripts import common
 
 import elasticsearch
+from elastic_transport import ApiResponseMeta, NodeConfig
 import requests_mock
 import webapp2
 import webtest
-from core import feconf
-from elastic_transport import ApiResponseMeta, NodeConfig
 from typing import (
     Any,
     Callable,
@@ -593,9 +592,10 @@ class ElasticSearchStub:
             'resource.type': 'index_or_alias',
             'resource.id': index
         }
-        dummy_node = NodeConfig(scheme="http", host=feconf.ES_HOST, port=feconf.ES_LOCALHOST_PORT)
+        dummy_node = NodeConfig(scheme='http', host=feconf.ES_HOST, port=feconf.ES_LOCALHOST_PORT)
         meta = ApiResponseMeta(
             status=404,
+            http_version='1.1',
             headers={'content-type': 'application/json'},
             duration=0.1,
             node=dummy_node
@@ -627,19 +627,20 @@ class ElasticSearchStub:
                 'index': index,
                 'index_uuid': 'RaNdOmStRiNgOfAlPhAs'
             }
-        dummy_node = NodeConfig(scheme="http", host=feconf.ES_HOST, port=feconf.ES_LOCALHOST_PORT)
-        meta = ApiResponseMeta(
-            status=400,
-            headers={'content-type': 'application/json'},
-            duration=0.1,
-            node=dummy_node
-        )
-        body = {'error': error_data, 'status': 400}
-        raise elasticsearch.RequestError(
-            f'resource_already_exists_exception: index [{index}/RaNdOmStRiNgOfAlPhAs] already exists',
-            meta,
-            body
-        )
+            dummy_node = NodeConfig(scheme='http', host=feconf.ES_HOST, port=feconf.ES_LOCALHOST_PORT)
+            meta = ApiResponseMeta(
+                status=400,
+                http_version='1.1',
+                headers={'content-type': 'application/json'},
+                duration=0.1,
+                node=dummy_node
+            )
+            body = {'error': error_data, 'status': 400}
+            raise elasticsearch.RequestError(
+                f'resource_already_exists_exception: index [{index}/RaNdOmStRiNgOfAlPhAs] already exists',
+                meta,
+                body
+            )
         self._DB[index] = []
         return {
             'index': index,
@@ -760,9 +761,10 @@ class ElasticSearchStub:
             '_seq_no': 103,
             '_primary_term': 1
         }
-        dummy_node = NodeConfig(scheme="http", host=feconf.ES_HOST, port=feconf.ES_LOCALHOST_PORT)
+        dummy_node = NodeConfig(scheme='http', host=feconf.ES_HOST, port=feconf.ES_LOCALHOST_PORT)
         meta = ApiResponseMeta(
             status=404,
+            http_version='1.1',
             headers={'content-type': 'application/json'},
             duration=0.1,
             node=dummy_node
