@@ -470,6 +470,7 @@ export class Contributor extends ExplorationEditor {
     }
 
     // Click on the tab.
+    await this.waitForElementToBeClickable(tabElement);
     await tabElement.click();
 
     // Verify tab is active.
