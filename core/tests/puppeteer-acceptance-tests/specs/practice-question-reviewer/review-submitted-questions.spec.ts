@@ -139,7 +139,7 @@ describe('Practice Question Reviewer', function () {
     await questionReviewer.navigateToContributorDashboardUsingProfileDropdown();
 
     await questionReviewer.startQuestionReview('What is 231 + 12?', 'Addition');
-    await questionReviewer.clickOn('Next');
+    await questionReviewer.clickOnElementWithText('Next');
     await questionReviewer.expectQuestionInReviewModalToBe('12 + 4');
   });
 
