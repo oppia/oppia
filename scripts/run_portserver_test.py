@@ -413,6 +413,8 @@ class RunPortserverTests(test_utils.GenericTestBase):
         def none_handler(_data: bytes) -> Optional[bytes]:
             return None
 
+        swap_socket = self.swap(socket, 'socket', lambda *unused_args: mock_socket)
+        with swap_socket:
             connection_socket = MockSocket()
             with self.assertRaisesRegex(ValueError, 'Handler returned None, expected bytes.'):
                 # Here we use cast because the 'handle_connection' method
