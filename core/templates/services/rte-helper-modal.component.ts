@@ -405,6 +405,10 @@ export class RteHelperModalComponent {
           `The question is too long. Please use at most ${this.getCharacterLimit(this.COMPONENT_ID_WORKEDEXAMPLE)} characters.`
         );
         return;
+      } else if (value[0] === '') {
+        this.updateRteErrorMessage(
+          'Please ensure the worked example has a question.'
+        );
       }
 
       if (

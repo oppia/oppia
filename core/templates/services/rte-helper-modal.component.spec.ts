@@ -1036,6 +1036,18 @@ describe('RteHelperModalComponent', () => {
       flush();
     }));
 
+    it('should display error message when question is blank', fakeAsync(() => {
+      component.ngOnInit();
+      flush();
+      component.customizationArgsForm.value[0] = '';
+      component.customizationArgsForm.value[1] = 'an answer';
+      component.onCustomizationArgsFormChange(
+        component.customizationArgsForm.value
+      );
+      expect(component.isErrorMessageNonempty()).toBe(true);
+      flush();
+    }));
+
     it('should display error message when answer is blank', fakeAsync(() => {
       component.ngOnInit();
       flush();
