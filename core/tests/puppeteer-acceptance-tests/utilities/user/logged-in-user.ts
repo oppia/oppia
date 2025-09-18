@@ -147,7 +147,7 @@ const settingsTab = 'a.e2e-test-exploration-settings-tab';
 const addTitleBar = 'input#explorationTitle';
 const addInteractionModalSelector = 'customize-interaction-body-container';
 const saveDraftButton = 'button.e2e-test-save-draft-button';
-const commitMessage = 'textarea.e2e-test-commit-message-input';
+const commitMessageSelector = 'textarea.e2e-test-commit-message-input';
 const publishExplorationButton = 'button.e2e-test-publish-exploration';
 const explorationTitleInput = 'input.e2e-test-exploration-title-input-modal';
 const explorationGoalInput = 'input.e2e-test-exploration-objective-input-modal';
@@ -2420,8 +2420,11 @@ export class LoggedInUser extends BaseUser {
 
   /**
    * Function to save an exploration draft.
+   * @param {string} commitMessage - The commit message to be used for the commit.
    */
-  async saveExplorationDraft(): Promise<void> {
+  async saveExplorationDraft(
+    commitMessage: string = 'Testing Testing'
+  ): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       const element = await this.page.$(mobileNavbarOptions);
       // If the element is not present, it means the mobile navigation bar is not expanded.
@@ -2438,8 +2441,8 @@ export class LoggedInUser extends BaseUser {
     } else {
       await this.clickOn(saveChangesButton);
     }
-    await this.clickOn(commitMessage);
-    await this.type(commitMessage, 'Testing Testing');
+    await this.clickOn(commitMessageSelector);
+    await this.type(commitMessageSelector, commitMessage);
     await this.clickOn(saveDraftButton);
     await this.page.waitForSelector(saveDraftButton, {hidden: true});
 
@@ -2467,7 +2470,7 @@ export class LoggedInUser extends BaseUser {
     goal: string,
     category: string,
     tags?: string
-  ): Promise<string | null> {
+  ): Promise<string> {
     const fillExplorationMetadataDetails = async () => {
       await this.clickOn(explorationTitleInput);
       await this.type(explorationTitleInput, `${title}`);
