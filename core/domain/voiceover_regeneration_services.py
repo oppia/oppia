@@ -171,23 +171,11 @@ def parse_html(html_content: str) -> str:
     Raises:
         Exception. The HTML content contains invalid or unsupported tags.
     """
+    html_cleaner.validate_rte_tags(html_content)
     soup = bs4.BeautifulSoup(html_content, 'html.parser')
-    all_tags = {tag.name for tag in soup.find_all()}
 
     allowed_custom_oppia_rte_tags = list(
         rte_component_registry.Registry.get_tag_list_with_attrs().keys())
-    allowed_general_oppia_rte_tags = list(html_cleaner.ATTRS_ALLOWLIST.keys())
-
-    unknown_tags = (
-        all_tags -
-        set(allowed_custom_oppia_rte_tags) -
-        set(allowed_general_oppia_rte_tags)
-    )
-
-    if unknown_tags:
-        raise Exception(
-            'HTML content contains invalid or unsupported tags: %s' % (
-                ', '.join(unknown_tags)))
 
     for custom_tag_element in allowed_custom_oppia_rte_tags:
         for element in soup.find_all(custom_tag_element):

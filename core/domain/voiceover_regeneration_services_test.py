@@ -82,7 +82,7 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
         expected_parsed_text = 'x^2 + y^2 = z^2'
         self.assertEqual(parsed_text, expected_parsed_text)
 
-    def test_empty_text_from_image_tag(self) -> None:
+    def test_image_tag_has_empty_voiceover_string(self) -> None:
         content_html = (
             '<oppia-noninteractive-image alt-with-value="&amp;quot;Circle'
             '&amp;quot;" caption-with-value="&amp;quot;Circle&amp;quot;" '
@@ -93,17 +93,17 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
         expected_parsed_text = ''
         self.assertEqual(parsed_text, expected_parsed_text)
 
-    def test_empty_text_from_video_tag(self) -> None:
+    def test_video_tag_has_empty_voiceover_string(self) -> None:
         content_html = (
             '<oppia-noninteractive-video autoplay-with-value=\"true\" '
-            'end-with-value=\"11\"'
+            'end-with-value=\"20\" start-with-value=\"13\"'
             ' video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;'
             'quot;\"></oppia-noninteractive-video>')
         parsed_text = voiceover_regeneration_services.parse_html(content_html)
         expected_parsed_text = ''
         self.assertEqual(parsed_text, expected_parsed_text)
 
-    def test_empty_text_from_worked_example_tag(self) -> None:
+    def test_worked_example_tag_has_empty_voiceover_string(self) -> None:
         content_html = (
             '<oppia-noninteractive-workedexample question-with-value="&amp;'
             'quot;&amp;lt;pre&amp;gt;&amp;lt;p&amp;gt;lorem ipsum&amp;'
@@ -115,7 +115,7 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
         expected_parsed_text = ''
         self.assertEqual(parsed_text, expected_parsed_text)
 
-    def test_empty_text_from_collapsible_tag(self) -> None:
+    def test_collapsible_tag_has_empty_voiceover_string(self) -> None:
         content_html = (
             '<oppia-noninteractive-collapsible '
             'content-with-value=\'&amp;quot;&amp;quot;\' heading-with-value='
@@ -124,7 +124,7 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
         expected_parsed_text = ''
         self.assertEqual(parsed_text, expected_parsed_text)
 
-    def test_empty_text_from_tabs_tag(self) -> None:
+    def test_tab_tag_has_empty_voiceover_string(self) -> None:
         content_html = (
             '<oppia-noninteractive-tabs tab_contents-with-value=\'[{&amp;quot;'
             '&amp;quot;:&amp;quot;Hint introduction&amp;quot;,&amp;quot;content'
@@ -156,17 +156,6 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
         expected_parsed_text = 'Evaluate the expression  4 × (3-2) + 6 ÷ 2.'
         parsed_text = voiceover_regeneration_services.parse_html(content_html)
         self.assertEqual(parsed_text, expected_parsed_text)
-
-    def test_should_able_to_raise_exception_for_invalid_tag(self) -> None:
-        content_html = (
-            '<p><oppia-noninteractive-invalidtag>'
-            '</oppia-noninteractive-invalidtag></p>')
-        exception_msg = (
-            'HTML content contains invalid or unsupported tags: '
-            'oppia-noninteractive-invalidtag'
-        )
-        with self.assertRaisesRegex(Exception, exception_msg):
-            voiceover_regeneration_services.parse_html(content_html)
 
     def test_should_be_able_to_regenerate_automatic_voiceovers(self) -> None:
         content_html = '<p>Hello world, this is a dummy text.</p>'
@@ -651,11 +640,14 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
     ) -> None:
         existing_custom_rte_tags = list(
             rte_component_registry.Registry.get_tag_list_with_attrs().keys())
+
+        self.assertGreater(len(existing_custom_rte_tags), 0)
+
         custom_tags_with_voiceover_extraction_rules = list(
             voiceover_regeneration_services.
             CUSTOM_RTE_TAGS_TO_VOICEOVER_TEXT_EXTRACTION_RULES.keys())
 
-        self.assertItemsEqual(
-            existing_custom_rte_tags,
-            custom_tags_with_voiceover_extraction_rules
+        self.assertEqual(
+            sorted(existing_custom_rte_tags),
+            sorted(custom_tags_with_voiceover_extraction_rules)
         )
