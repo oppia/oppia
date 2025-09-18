@@ -712,7 +712,7 @@ describe('RTE display component', () => {
 
   it('should return true when page context is subtopic_preview', () => {
     spyOn(pageContextService, 'getSubtopicPreviewIsOpen').and.returnValue(
-      'true'
+      true
     );
     const result = component.isSolutionCollapsedForWorkedexample();
     expect(result).toBe(true);
