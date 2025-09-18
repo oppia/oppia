@@ -1,4 +1,4 @@
-name: Full-stack tests
+name: Test new acceptance tests
 permissions: read-all
 on:
   merge_group:
@@ -65,8 +65,8 @@ jobs:
             short_name: review-submitted-questions
           - name: practice-question-reviewer/view-contribution-stats-and-badges-earned
             short_name: view-contribution-stats-and-badges-earned
-        run1: [1, 2, 3]
-        run2: [1]
+        run1: [1, 2]
+        run2: [1, 2, 3, 4, 5]
         mobile: [false, true]
         prod: [true]
     name: ${{ matrix.mobile && 'M' || 'D' }}-${{ matrix.suite.short_name }}
