@@ -87,7 +87,7 @@ describe('Topic Manager', function () {
     );
   }, 600000);
 
-  it('should be able to access topic and skills dashboard using via profile menu', async function () {
+  it('should be able to access topic and skills dashboard using the profile menu', async function () {
     await topicManager.page.reload();
     await topicManager.clickOnProfileDropdown();
     await topicManager.expectProfileDropdownToContainElementWithContent(

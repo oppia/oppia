@@ -1639,29 +1639,7 @@ export class TopicManager extends BaseUser {
     await this.fillSkillNameInSkillSelectionModal(skillName);
 
     // TODO: replace this with new function, once checked that new function works.
-    await this.page.waitForSelector(radioInnerCircleSelector);
-    const radioInnerCircleSelectorElement = await this.page.$(
-      radioInnerCircleSelector
-    );
-    if (!radioInnerCircleSelectorElement) {
-      throw new Error('Radio inner circle selector not found');
-    }
-    await this.page.evaluate(selector => {
-      document.querySelector(selector).click();
-    }, radioInnerCircleSelector);
-
-    await this.page.waitForSelector(confirmSkillSelectionButtonSelector);
-    const confirmSkillSelectionButtonSelectorElement = await this.page.$(
-      confirmSkillSelectionButtonSelector
-    );
-    if (!confirmSkillSelectionButtonSelectorElement) {
-      throw new Error('Confirm skill selection button selector not found');
-    }
-    await this.clickOn(confirmSkillSelectionButtonSelector);
-    await this.expectElementToBeVisible(
-      confirmSkillSelectionButtonSelector,
-      false
-    );
+    await this.selectSkillAndClickOnDoneInSkillSelectionModal(skillName);
   }
 
   /**
