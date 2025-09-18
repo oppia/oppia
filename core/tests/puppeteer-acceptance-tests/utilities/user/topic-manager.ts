@@ -322,7 +322,11 @@ const storyUrlFragmentInStoryEditorSelector = '.e2e-test-url-fragment-field';
 // Chapter Editor.
 const prerequisiteSkillSelector =
   '.e2e-test-prerequisite-skill-description-card';
+const prerequisiteSkillMobileSelector =
+  '.e2e-test-mobile-prerequisite-skill-description-card';
 const aquiredSkillSkillSelector = '.e2e-test-acquired-skill-description-card';
+const aquiredSkillSkillMobileSelector =
+  '.e2e-test-mobile-acquired-skill-description-card';
 
 // Other Selectors.
 const activeTabSelector = '.e2e-test-active-tab';
@@ -4035,10 +4039,11 @@ export class TopicManager extends BaseUser {
   async expectPrerequisiteSkillToBeVisible(
     skillName: string
   ): Promise<ElementHandle<Element>> {
-    await this.expectElementToBeVisible(prerequisiteSkillSelector);
-    const prerequisiteSkillElements = await this.page.$$(
-      prerequisiteSkillSelector
-    );
+    const selector = this.isViewportAtMobileWidth()
+      ? prerequisiteSkillMobileSelector
+      : prerequisiteSkillSelector;
+    await this.expectElementToBeVisible(selector);
+    const prerequisiteSkillElements = await this.page.$$(selector);
 
     let prerequisiteSkillElement: ElementHandle<Element> | null = null;
     for (const prerequisiteSkill of prerequisiteSkillElements) {
@@ -4067,8 +4072,11 @@ export class TopicManager extends BaseUser {
   async expectAquiredSkillToBeVisible(
     skillName: string
   ): Promise<ElementHandle<Element>> {
-    await this.expectElementToBeVisible(aquiredSkillSkillSelector);
-    const aquiredSkillElements = await this.page.$$(aquiredSkillSkillSelector);
+    const selector = this.isViewportAtMobileWidth()
+      ? aquiredSkillSkillMobileSelector
+      : aquiredSkillSkillSelector;
+    await this.expectElementToBeVisible(selector);
+    const aquiredSkillElements = await this.page.$$(selector);
 
     let aquiredSkillElement: ElementHandle<Element> | null = null;
     for (const aquiredSkill of aquiredSkillElements) {
