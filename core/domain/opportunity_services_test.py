@@ -21,7 +21,7 @@ from __future__ import annotations
 import logging
 import unittest.mock
 
-from core import feconf
+from core import feature_flag_list, feconf
 from core.constants import constants
 from core.domain import (
     exp_domain,
@@ -1039,6 +1039,8 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
             )
         )
 
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS])
     def test_regenerate_opportunities_related_to_topic_when_story_deleted(
         self
     ) -> None:

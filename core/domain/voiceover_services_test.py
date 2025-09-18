@@ -1665,6 +1665,33 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
             exploration_id, title='A Title',
             category='A Category', objective='An Objective')
         exploration.states['Introduction'].content.html = 'First Card!'
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index)
+        self.set_interaction_for_state(
+            exploration.states['Introduction'], 'TextInput',
+            content_id_generator)
+        exploration.states[
+            feconf.DEFAULT_INIT_STATE_NAME
+        ].interaction.answer_groups = [state_domain.AnswerGroup(
+            state_domain.Outcome(
+                'Second', None, state_domain.SubtitledHtml(
+                    'feedback_1', '<p>state outcome html</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Equals', {
+                        'x': {
+                            'contentId': 'rule_input_Equals',
+                            'normalizedStrSet': ['Test']
+                        }
+                    }
+                )
+            ], [], None
+        )]
+        exploration.add_state(
+                'Second',
+                'content_2',
+                'content-3')
 
         exp_services.save_new_exploration(exploration_id, exploration)
 
@@ -1838,6 +1865,13 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
             entity_voiceovers.automated_voiceovers_audio_offsets_msecs,
             {
                 'content_0': [
+                    {'token': 'This', 'audio_offset_msecs': 0.0},
+                    {'token': 'is', 'audio_offset_msecs': 100.0},
+                    {'token': 'a', 'audio_offset_msecs': 200.0},
+                    {'token': 'test', 'audio_offset_msecs': 300.0},
+                    {'token': 'text', 'audio_offset_msecs': 400.0}
+                ],
+                'feedback_1': [
                     {'token': 'This', 'audio_offset_msecs': 0.0},
                     {'token': 'is', 'audio_offset_msecs': 100.0},
                     {'token': 'a', 'audio_offset_msecs': 200.0},
