@@ -194,6 +194,27 @@ export class CheckpointBarComponent implements OnInit {
     }
   }
 
+  /**
+   * If the checkpoint is completed, this function returns the user to the checkpoint.
+   *
+   * @param {number} checkpointNumber - The number of the checkpoint to return to.
+   * @returns {void} This function does not return a value. It changes the displayed card if the checkpoint is completed.
+   */
+  returnToCheckpointIfCompleted(checkpointNumber: number): void {
+    const checkpointCardIndexes = this.checkpointIndexes;
+    const cardIndex = checkpointCardIndexes[checkpointNumber];
+
+    if (
+      this.checkpointStatusArray[checkpointNumber] !==
+      CHECKPOINT_STATUS_COMPLETED
+    ) {
+      return;
+    } else {
+      this.playerPositionService.setDisplayedCardIndex(cardIndex);
+      this.playerPositionService.onActiveCardChanged.emit();
+    }
+  }
+
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
   }
