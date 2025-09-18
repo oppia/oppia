@@ -32,9 +32,39 @@ jobs:
         with:
           message: "The e2e/acceptance coverage test failed on the upstream develop branch."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
+  check_test_suites_to_run:
+    name: Compute which tests to run
+    runs-on: ubuntu-22.04
+    outputs:
+      TEST_SUITES_TO_RUN: ${{ steps.compute_test_suites.outputs.TEST_SUITES_TO_RUN }}
+    steps:
+      - name: Checkout repository so that local actions can be used
+        uses: actions/checkout@v4
+        with:
+          # This fetches all git refs, which is needed in the
+          # check_ci_test_suites_to_run script below.
+          fetch-depth: 0
+      - name: Merge develop and set up dependencies
+        uses: ./.github/actions/merge-develop-and-set-up-dependencies
+      - id: compute_test_suites
+        name: Check test suites to run
+        env:
+          SHOULD_OUTPUT_ALL_TESTS: false
+        # Note that the script also writes the output to $GITHUB_OUTPUT.
+        run: |
+          TEST_SUITES_TO_RUN=$(python -m scripts.check_ci_test_suites_to_run --github_head_ref="HEAD" --github_base_ref="origin/${{ github.event.pull_request.base.ref }}" ${{ env.SHOULD_OUTPUT_ALL_TESTS == 'true' && '--output_all_test_suites' || '' }})
+      - name: Upload root files mapping as a GitHub artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: root-files-mapping
+          path: root-files-mapping.json
   build:
     name: Build the app, and store build files as an artifact
+    needs: [check_test_suites_to_run]
     runs-on: ubuntu-22.04
+    if: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).e2e.count > 0 ||
+            fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).lighthouse_performance.count > 0 ||
+            fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.python.count > 0 }}
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
@@ -43,13 +73,13 @@ jobs:
       - name: Generate build files
         uses: ./.github/actions/generate-build-files
   acceptance_test_with_python_installation:
-    needs: [build]
+    needs: [check_test_suites_to_run, build]
     runs-on: ubuntu-22.04
+    if: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.python.count > 0 }}
     strategy:
       fail-fast: false
       matrix:
-        suite:
-          - name: translation-submitter/translate-exploration-in-target-language
+        suite: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.python.suites }}
         run1: [1, 2, 3, 4]
         run2: [1, 2, 3, 4]
         mobile: [false, true]
