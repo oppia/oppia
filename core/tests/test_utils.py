@@ -634,12 +634,12 @@ class ElasticSearchStub:
             duration=0.1,
             node=dummy_node
         )
-            body = {'error': error_data, 'status': 400}
-            raise elasticsearch.RequestError(
-                f'resource_already_exists_exception: index [{index}/RaNdOmStRiNgOfAlPhAs] already exists',
-                meta,
-                body
-            )
+        body = {'error': error_data, 'status': 400}
+        raise elasticsearch.RequestError(
+            f'resource_already_exists_exception: index [{index}/RaNdOmStRiNgOfAlPhAs] already exists',
+            meta,
+            body
+        )
         self._DB[index] = []
         return {
             'index': index,
