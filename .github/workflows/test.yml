@@ -1,4 +1,4 @@
-name: Full-stack tests
+name: Test new acceptance tests
 permissions: read-all
 on:
   merge_group:
@@ -45,24 +45,29 @@ jobs:
   acceptance_test_with_python_installation:
     needs: [build]
     runs-on: ubuntu-22.04
-    env:
-      SKIP_BUILD: false
     strategy:
       fail-fast: false
       matrix:
-        env: [prod]
-        mobile: [false, true]
         suite:
-          # - name: topic-manager/access-dashboard-using-profile-dropdown
-          # - name: topic-manager/edit-the-topic
-          # - name: topic-manager/assign-unassign-and-merge-skills-in-skill-dashboard
-          # - name: topic-manager/edit-and-republish-the-skill
+          - name: topic-manager/access-dashboard-using-profile-dropdown
+            short_name: access-dashboard-using-profile-dropdown
+          - name: topic-manager/edit-the-topic
+            short_name: edit-the-topic
+          - name: topic-manager/assign-unassign-and-merge-skills-in-skill-dashboard
+            short_name: assign-unassign-and-merge-skills-in-skill-dashboard
+          - name: topic-manager/edit-and-republish-the-skill
+            short_name: edit-and-republish-the-skill
           - name: topic-manager/add-questions-from-topic-editor
-          # - name: topic-manager/add-remove-and-edit-subtopics
+            short_name: add-questions-from-topic-editor
+          - name: topic-manager/add-remove-and-edit-subtopics
+            short_name: add-remove-and-edit-subtopics
           - name: topic-manager/create-delete-and-edit-the-stories-and-chapters
+            short_name: create-delete-and-edit-the-stories-and-chapters
         run1: [1, 2]
         run2: [1]
-    name: (${{ matrix.env }}) ${{ matrix.mobile && 'Mobile' || 'Desktop' }} (${{ matrix.suite.name }})
+        mobile: [false, true]
+        prod: [true, false]
+    name: ${{ matrix.mobile && 'M' || 'D' }}-${{ matrix.suite.short_name }}
     steps:
       - name: Check for broken suites
         id: check_skip
@@ -86,7 +91,7 @@ jobs:
         id: generate_suite_name_for_artifacts
         # Replace slashes in the filename with underscores.
         run: |
-          SUITE_NAME=${{ matrix.suite.name }}-${{ matrix.run1 }}-${{ matrix.run2 }}-${{ matrix.mobile }}-${{ matrix.env }}
+          SUITE_NAME=${{ matrix.suite.name }}-${{ matrix.run1 }}-${{ matrix.run2 }}-${{ matrix.mobile }}-${{ matrix.prod }}
           echo "MODIFIED_SUITE_NAME=${SUITE_NAME//\//_}" >> $GITHUB_OUTPUT
       - name: Run Desktop Acceptance Test ${{ matrix.suite.name }}
         # TODO(#22448): Remove once all suites are fixed.
@@ -96,16 +101,27 @@ jobs:
           VIDEO_RECORDING_IS_ENABLED=1
           xvfb-run -a --server-args="-screen 0, 1920x1080x24"
           python -m scripts.run_acceptance_tests
-          --suite=${{ matrix.suite.name }} 
-          ${{ matrix.env == 'prod' && '--prod_env' || '' }}
-          ${{ matrix.mobile && '--mobile' || '' }}
+          --suite=${{ matrix.suite.name }} ${{ matrix.prod && '--prod_env' || '' }} ${{ matrix.mobile && '--mobile' || '' }}
           | tee desktop_acceptance_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
       - name: Upload Desktop test recordings as Artifacts
-        if: ${{ always() }}
+        if: ${{ failure() }}
         uses: actions/upload-artifact@v4
         with:
           name: desktop-acceptance-test-video-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}-original
           path: /home/runner/work/oppia/oppia_full_stack_test_video_recordings/acceptance
+      - name: Upload desktop acceptance test logs
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-acceptance-test-logs-${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}
+          path: desktop_acceptance_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
+      - name: Upload desktop test failure screenshots as artifacts
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-acceptance-test-failure-screenshot-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
+          path: /home/runner/work/oppia/oppia_full_stack_test_failure_screenshots/acceptance
+        # TODO(#22667): We are running this step twice, as snapshot gets deleted if 2nd attempt passes.
       - name: Uploading diff screenshots as an artifact
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
@@ -120,9 +136,25 @@ jobs:
         with:
           name: png-snapshots-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}-new
           path: core/tests/puppeteer-acceptance-tests/specs/**/*.png
-      - name: Upload mobile test failure screenshots as artifacts
-        if: ${{ failure() }}
+
+  # New job to collect all PNG snapshots into a single artifact
+  collect_all_screenshots:
+    name: Collect all screenshots into single artifact
+    needs: [acceptance_test_with_python_installation]
+    runs-on: ubuntu-22.04
+    if: ${{ always() }}
+    steps:      
+      - name: Download all PNG snapshot artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: png-snapshots-*-new
+          path: temp-screenshots
+          merge-multiple: true
+        continue-on-error: true
+            
+      - name: Upload all screenshots as single artifact
         uses: actions/upload-artifact@v4
         with:
-          name: desktop-acceptance-test-failure-screenshot-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
-          path: /home/runner/work/oppia/oppia_full_stack_test_failure_screenshots/acceptance
+          name: all-png-snapshots-combined
+          path: temp-screenshots
+          if-no-files-found: warn
