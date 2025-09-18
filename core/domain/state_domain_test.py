@@ -1227,17 +1227,20 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.delete_state('END')
         self.assertNotIn('END', exploration.states)
 
-    def test_migration_skips_when_old_content_id_is_none(self) -> None:
-        """Ensure migration continues when contentId/content_id is None."""
+    def test_migration_continues_when_old_content_id_is_none(self) -> None:
+        """Ensure migration continues when old_content_id is None."""
         state = state_domain.State.create_default_state(
             'state_name',
             content_id_for_state_content='c1',
             content_id_for_default_outcome='d1'
         )
 
+        # Add an answer group with a rule that produces a content dict
+        # without 'content_id', so old_content_id = None.
         rg = state_domain.AnswerGroup(
             rule_specs=[state_domain.RuleSpec(
                 rule_type='Equals',
+                # Using an empty dict ensures 'content_id' key is missing.
                 inputs={'x': {}}
             )],
             outcome=state_domain.Outcome(
