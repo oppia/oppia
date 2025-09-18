@@ -99,19 +99,15 @@ describe('Translation Reviewer', function () {
     );
     await translationSubmitter.typeTextForRTE('सामग्री 0');
     await translationSubmitter.clickOn('Save and translate another');
-    await translationSubmitter.clickOnDiscardChangesButton();
     await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE('सामग्री 1');
     await translationSubmitter.clickOn('Save and translate another');
-    await translationSubmitter.clickOnDiscardChangesButton();
     await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE('सामग्री 2');
     await translationSubmitter.clickOn('Save and translate another');
-    await translationSubmitter.clickOnDiscardChangesButton();
     await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE('सामग्री 3');
     await translationSubmitter.clickOn('Save and close');
-    await translationSubmitter.clickOnDiscardChangesButton();
 
     // Add translations to "Trading Slices" in Akan.
     await translationSubmitter.selectLanguageFilter('Ákán (Akan)');
@@ -121,11 +117,9 @@ describe('Translation Reviewer', function () {
     );
     await translationSubmitter.typeTextForRTE('सामग्री 0');
     await translationSubmitter.clickOn('Save and translate another');
-    await translationSubmitter.clickOnDiscardChangesButton();
     await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE('सामग्री 1');
     await translationSubmitter.clickOn('Save and close');
-    await translationSubmitter.clickOnDiscardChangesButton();
   }, 900000);
 
   it('should be able to view all pending reviews', async function () {

@@ -283,7 +283,6 @@ describe('Translation Submitter', function () {
   it('should be able to use copy tool', async function () {
     // Check if anchor text for copy tool works properly.
     await translationSubmitter.clickOn('Save and translate another');
-    await translationSubmitter.clickOnDiscardChangesButton();
     await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.clickAndVerifyAnchorWithInnerText(
       'here',
@@ -300,9 +299,6 @@ describe('Translation Submitter', function () {
     await translationSubmitter.expectToastMessage(
       'Submitted translation for review.'
     );
-    // TODO(#23140): Remove click on discard changes button step below once the
-    // bug is fixed where we are required to click on the dismiss button.
-    await translationSubmitter.clickOnDiscardChangesButton();
   });
 
   it('should be able to check status of the translations', async function () {

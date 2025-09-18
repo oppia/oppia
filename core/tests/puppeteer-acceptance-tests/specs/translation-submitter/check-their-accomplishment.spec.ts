@@ -87,11 +87,9 @@ describe('Translation Submitter', function () {
     );
     await translationSubmitter.typeTextForRTE('सामग्री 0');
     await translationSubmitter.clickOn('Save and translate another');
-    await translationSubmitter.clickOnDiscardChangesButton();
     await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE('सामग्री 1');
     await translationSubmitter.clickOn('Save and close');
-    await translationSubmitter.clickOnDiscardChangesButton();
     await translationSubmitter.switchToTabInContributionDashboard(
       'My Contributions'
     );
