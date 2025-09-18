@@ -592,7 +592,7 @@ class ElasticSearchStub:
             'resource.id': index
         }
         meta = elasticsearch.transport.ApiResponseMeta(
-                404, "Index Not Found", {"content-type": "application/json"})
+                404, 'Index Not Found', {'content-type': 'application/json'})
         body = {'status': 404, 'error': error_data}
         raise elasticsearch.NotFoundError(
             'index_not_found_exception: no such index [%s]' % index,
@@ -621,10 +621,10 @@ class ElasticSearchStub:
                 'index_uuid': 'RaNdOmStRiNgOfAlPhAs'
             }
             meta = elasticsearch.transport.ApiResponseMeta(
-                400, "Already Exists", {"content-type": "application/json"})
+                400, 'Already Exists', {'content-type': 'application/json'})
             body = {'error': error_data, 'status': 400}
             raise elasticsearch.RequestError(
-                "resource_already_exists_exception: index [{index}/RaNdOmStRiNgOfAlPhAs] already exists",
+                f"resource_already_exists_exception: index [{index}/RaNdOmStRiNgOfAlPhAs] already exists",
                 meta,
                 body
             )
@@ -749,9 +749,9 @@ class ElasticSearchStub:
             '_primary_term': 1
         }
         meta = elasticsearch.transport.ApiResponseMeta(
-                404, "Document Not Found", {"content-type": "application/json"})
+                404, 'Document Not Found', {'content-type': 'application/json'})
         raise elasticsearch.NotFoundError(
-            'document not found: [{index}][{id}]',
+            f"document not found: [{index}][{id}]",
             meta,
             body
         )
