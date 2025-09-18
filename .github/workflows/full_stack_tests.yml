@@ -211,6 +211,7 @@ jobs:
           python -m scripts.run_acceptance_tests
           --skip-build --suite=${{ matrix.suite.name }} --prod_env --server_log_level=info
           | tee desktop_acceptance_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
+        timeout-minutes: 30
       - name: Uploading Desktop test recordings as Artifacts
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
@@ -247,6 +248,7 @@ jobs:
           python -m scripts.run_acceptance_tests
           --skip-build --suite=${{ matrix.suite.name }} --prod_env --server_log_level=info
           | tee desktop_acceptance_test_retry_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
+        timeout-minutes: 30
       - name: Upload desktop acceptance retry test logs
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
@@ -274,6 +276,7 @@ jobs:
           python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite.name }}
           --prod_env --mobile --server_log_level=info
           | tee mobile_acceptance_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
+        timeout-minutes: 30
       - name: Upload mobile acceptance test logs
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
@@ -297,6 +300,7 @@ jobs:
           python -m scripts.run_acceptance_tests --skip-build
           --suite=${{ matrix.suite.name }} --prod_env --mobile --server_log_level=info
           | tee mobile_acceptance_test_retry_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
+        timeout-minutes: 30
       - name: Upload mobile acceptance test logs
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
@@ -355,6 +359,7 @@ jobs:
         run: |
           python -m scripts.run_lighthouse_tests --mode accessibility --pages ${{ join(matrix.suite.pages_to_run, ',') }}
         shell: bash
+        timeout-minutes: 45
       - name: Report failure if failed on oppia/oppia develop branch
         if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
         uses: ./.github/actions/send-webhook-notification
@@ -388,6 +393,7 @@ jobs:
       - name: Run Lighthouse performance checks (shard ${{ matrix.suite.name }})
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.run_lighthouse_tests --mode performance --skip_build --record_screen --pages ${{ join(matrix.suite.pages_to_run, ',') }}
+        timeout-minutes: 45
       - name: Uploading puppeteer video as artifact
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4

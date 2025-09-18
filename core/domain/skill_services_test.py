@@ -20,25 +20,27 @@ import logging
 
 from core import feconf
 from core.constants import constants
-from core.domain import question_domain
-from core.domain import skill_domain
-from core.domain import skill_fetchers
-from core.domain import skill_services
-from core.domain import state_domain
-from core.domain import suggestion_services
-from core.domain import topic_domain
-from core.domain import topic_fetchers
-from core.domain import topic_services
-from core.domain import translation_domain
-from core.domain import user_services
+from core.domain import (
+    question_domain,
+    skill_domain,
+    skill_fetchers,
+    skill_services,
+    state_domain,
+    suggestion_services,
+    topic_domain,
+    topic_fetchers,
+    topic_services,
+    translation_domain,
+    user_services,
+)
 from core.platform import models
 from core.tests import test_utils
+
 from typing import Dict, Final, List, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import question_models
-    from mypy_imports import skill_models
+    from mypy_imports import question_models, skill_models
 
 (skill_models, question_models) = models.Registry.import_models([
     models.Names.SKILL, models.Names.QUESTION

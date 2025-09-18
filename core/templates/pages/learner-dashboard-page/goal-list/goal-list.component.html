@@ -5,7 +5,7 @@
       <div class="goal-list-stretch flex-grow-1">
         <div class="goal-list-details flex-grow-1">
           <p class="goal-list-title e2e-test-goal-title">
-            {{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_LIST_STORY_TITLE' | translate: {title: goalTopic.getName()} }}
+            {{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_LIST_STORY_TITLE_NEW' | translate: { topic: goalTopic.getName(), story: story.getTitle() } }}
           </p>
           <div class="goal-list-center">
             <p class="goal-list-progress-text">
@@ -19,10 +19,10 @@
         <div class="goal-list-options">
           <div class="goal-list-center">
             <ng-content></ng-content>
-            <oppia-content-toggle-button (contentToggleEmitter)="handleToggleState($event)"> </oppia-content-toggle-button>
+            <oppia-content-toggle-button (contentToggleEmitter)="handleToggleState($event, story.getId())"> </oppia-content-toggle-button>
           </div>
             <!--TODO(#18384): Resume state, can only check if node is completed or not.-->
-          <a *ngIf="story.getAllNodes().length !== story.getCompletedNodeTitles().length && !displayAllNodes"
+          <a *ngIf="story.getAllNodes().length !== story.getCompletedNodeTitles().length && !isExpanded(story.getId())"
              class="oppia-learner-dash-button-sm oppia-learner-dash-button--default oppia-learner-dash-button--goals-list align-self-end e2e-test-start-lesson-button"
              [href]="getNodeLessonUrl(story, story.getAllNodes()[allCurrentNodes[i]])"
           >
@@ -31,7 +31,7 @@
         </div>
       </div>
     </div>
-    <div *ngIf="displayAllNodes" class="goal-list-story-nodes">
+    <div *ngIf="isExpanded(story.getId())" class="goal-list-story-nodes">
       <ng-container *ngFor="let storyNode of story.getAllNodes(); let j = index">
         <div class="d-flex flex-column">
           <div class="goal-list-story-node-line-container">
@@ -120,6 +120,7 @@
     display: flex;
     flex-direction: column;
     max-height: 276px;
+    overflow-y: auto;
     padding-bottom: 12px;
     padding-top: 12px;
     scrollbar-color: #205d86;

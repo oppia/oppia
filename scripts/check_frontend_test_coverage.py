@@ -60,7 +60,7 @@ NOT_FULLY_COVERED_FILENAMES = [
     'core/templates/components/state-directives/rule-editor/'
         'rule-type-selector.directive.ts',
     'core/templates/domain/question/question-update.service.ts',
-    'core/templates/domain/question/QuestionObjectFactory.ts',
+    'core/templates/domain/question/question.model.ts',
     'core/templates/expressions/expression-interpolation.service.ts',
     'core/templates/google-analytics.initializer.ts',
     'core/templates/pages/exploration-editor-page/services/'

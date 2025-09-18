@@ -16,11 +16,8 @@
  * @fileoverview Tests for Topic update service.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// topic-update.service.ts is upgraded to Angular 8.
 import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-// ^^^ This block is to be removed.
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
 import {Topic, TopicBackendDict} from 'domain/topic/topic-object.model';
 import {TopicUpdateService} from 'domain/topic/topic-update.service';

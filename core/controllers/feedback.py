@@ -18,12 +18,13 @@ from __future__ import annotations
 
 from core import feconf
 from core.constants import constants
-from core.controllers import acl_decorators
-from core.controllers import base
-from core.domain import feedback_domain
-from core.domain import feedback_services
-from core.domain import suggestion_services
-from core.domain import user_services
+from core.controllers import acl_decorators, base
+from core.domain import (
+    feedback_domain,
+    feedback_services,
+    suggestion_services,
+    user_services,
+)
 
 from typing import Dict, List, Optional, TypedDict
 

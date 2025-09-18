@@ -20,8 +20,7 @@ from __future__ import annotations
 
 import enum
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
 from core.domain import feature_flag_domain
 from core.domain import feature_flag_registry as registry

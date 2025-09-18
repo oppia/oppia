@@ -21,6 +21,8 @@ import {TopicEditorSendMailComponent} from '../modal-templates/topic-editor-send
 import {TopicEditorSaveModalComponent} from '../modal-templates/topic-editor-save-modal.component';
 import {AfterContentChecked, Component, OnDestroy, OnInit} from '@angular/core';
 import {TopicEditorStateService} from '../services/topic-editor-state.service';
+import {ConfirmQuestionExitModalComponent} from 'components/question-directives/modal-templates/confirm-question-exit-modal.component';
+import {QuestionUndoRedoService} from 'domain/editor/undo_redo/question-undo-redo.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {TopicRightsBackendApiService} from 'domain/topic/topic-rights-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
@@ -32,6 +34,7 @@ import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.consta
 import {Topic} from 'domain/topic/topic-object.model';
 import {TopicRights} from 'domain/topic/topic-rights.model';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 
 @Component({
   selector: 'oppia-topic-editor-navbar',
@@ -62,7 +65,9 @@ export class TopicEditorNavbarComponent
     private ngbModal: NgbModal,
     private topicRightsBackendApiService: TopicRightsBackendApiService,
     private alertsService: AlertsService,
+    private preventPageUnloadEventService: PreventPageUnloadEventService,
     private undoRedoService: UndoRedoService,
+    private questionUndoRedoService: QuestionUndoRedoService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private topicEditorRoutingService: TopicEditorRoutingService,
@@ -252,18 +257,43 @@ export class TopicEditorNavbarComponent
 
   openTopicViewer(): void {
     this.showNavigationOptions = false;
-    let activeTab = this.topicEditorRoutingService.getActiveTabName();
-    if (activeTab !== 'subtopic_editor' && activeTab !== 'subtopic_preview') {
+    const activeTab = this.topicEditorRoutingService.getActiveTabName();
+
+    if (
+      activeTab === 'questions' &&
+      this.questionUndoRedoService.hasChanges()
+    ) {
+      const modalRef = this.ngbModal.open(ConfirmQuestionExitModalComponent, {
+        backdrop: true,
+      });
+
+      modalRef.result.then(
+        () => {
+          this.questionUndoRedoService.clearChanges();
+          this._navigateToPreview(activeTab);
+        },
+        () => {}
+      );
+    } else {
+      this._navigateToPreview(activeTab);
+    }
+  }
+
+  private _navigateToPreview(activeTab: string): void {
+    if (activeTab === 'subtopic_editor' || activeTab === 'subtopic_preview') {
+      const subtopicId = this.topicEditorRoutingService.getSubtopicIdFromUrl();
+      this.topicEditorRoutingService.navigateToSubtopicPreviewTab(subtopicId);
+      this.activeTab = 'Preview';
+    } else {
       if (this.getChangeListLength() > 0) {
         this.alertsService.addInfoMessage(
-          'Please save all pending changes to preview the topic ' +
-            'with the changes',
+          'Please save all pending changes to preview the topic with the changes',
           2000
         );
         return;
       }
-      let topicUrlFragment = this.topic.getUrlFragment();
-      let classroomUrlFragment =
+      const topicUrlFragment = this.topic.getUrlFragment();
+      const classroomUrlFragment =
         this.topicEditorStateService.getClassroomUrlFragment();
       this.windowRef.nativeWindow.open(
         this.urlInterpolationService.interpolateUrl(
@@ -275,22 +305,40 @@ export class TopicEditorNavbarComponent
         ),
         'blank'
       );
-    } else {
-      let subtopicId = this.topicEditorRoutingService.getSubtopicIdFromUrl();
-      this.topicEditorRoutingService.navigateToSubtopicPreviewTab(subtopicId);
-      this.activeTab = 'Preview';
     }
   }
 
   selectMainTab(): void {
     this.showNavigationOptions = false;
-    let activeTab = this.topicEditorRoutingService.getActiveTabName();
-    if (activeTab !== 'subtopic_editor' && activeTab !== 'subtopic_preview') {
-      this.topicEditorRoutingService.navigateToMainTab();
+    const activeTab = this.topicEditorRoutingService.getActiveTabName();
+
+    if (
+      activeTab === 'questions' &&
+      this.questionUndoRedoService.hasChanges()
+    ) {
+      const modalRef = this.ngbModal.open(ConfirmQuestionExitModalComponent, {
+        backdrop: true,
+      });
+
+      modalRef.result.then(
+        () => {
+          this.questionUndoRedoService.clearChanges();
+          this._navigateToMainTab(activeTab);
+        },
+        () => {}
+      );
+    } else {
+      this._navigateToMainTab(activeTab);
+    }
+  }
+
+  private _navigateToMainTab(activeTab: string): void {
+    if (activeTab === 'subtopic_editor' || activeTab === 'subtopic_preview') {
+      const subtopicId = this.topicEditorRoutingService.getSubtopicIdFromUrl();
+      this.topicEditorRoutingService.navigateToSubtopicEditorWithId(subtopicId);
       this.activeTab = 'Editor';
     } else {
-      let subtopicId = this.topicEditorRoutingService.getSubtopicIdFromUrl();
-      this.topicEditorRoutingService.navigateToSubtopicEditorWithId(subtopicId);
+      this.topicEditorRoutingService.navigateToMainTab();
       this.activeTab = 'Editor';
     }
   }
@@ -318,6 +366,12 @@ export class TopicEditorNavbarComponent
         this._validateTopic();
       })
     );
+    this.preventPageUnloadEventService.addListener(() => {
+      return (
+        this.undoRedoService.getChangeCount() > 0 ||
+        this.questionUndoRedoService.hasChanges()
+      );
+    });
     this.topicId = this.urlService.getTopicIdFromUrl();
     this.navigationChoices = ['Topic', 'Questions', 'Preview'];
     this.activeTab = this.getMobileNavigatorText();

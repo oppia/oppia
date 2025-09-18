@@ -41,7 +41,7 @@ import {PlaythroughService} from 'services/playthrough.service';
 import {NumberAttemptsService} from './number-attempts.service';
 import {PlayerTranscriptService} from './player-transcript.service';
 import {ExplorationModeService} from './exploration-mode.service';
-import {Question} from 'domain/question/QuestionObjectFactory';
+import {Question} from 'domain/question/question.model';
 
 @Injectable({
   providedIn: 'root',

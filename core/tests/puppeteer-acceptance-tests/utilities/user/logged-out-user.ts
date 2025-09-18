@@ -581,6 +581,8 @@ const toastMessageSelector = '.e2e-test-toast-message';
 const voiceoverSelectSelector = '.e2e-test-audio-lang-select';
 
 const conceptCardCloseButtonSelector = '.e2e-test-close-concept-card';
+const promoBarTextSelector = '.e2e-test-promo-bar-text';
+
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
  * According to this specification, the keys for the numbers 0 through 9 are named 'Digit0' through 'Digit9'.
@@ -6789,6 +6791,22 @@ export class LoggedOutUser extends BaseUser {
       `The blog post "${expectedBlog}" was not found on the blog dashboard.\n` +
         `Found blog posts: "${blogTitles.join('", "')}"`
     );
+  }
+
+  /**
+   * Checks if the promo bar is visible and if the promotion content is correct.
+   * @param {boolean} visible - Whether the promo bar should be visible or not.
+   * @param {string} promotionContent - The expected promotion content.
+   */
+  async expectPromoBarToBeVisible(
+    visible: boolean = true,
+    promotionContent?: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(promoBarTextSelector, visible);
+
+    if (visible && promotionContent) {
+      await this.expectTextContentToBe(promoBarTextSelector, promotionContent);
+    }
   }
 }
 
