@@ -19,8 +19,7 @@
 from __future__ import annotations
 
 from core import utils
-from core.jobs.types import base_validation_errors_test
-from core.jobs.types import blog_validation_errors
+from core.jobs.types import base_validation_errors_test, blog_validation_errors
 from core.platform import models
 
 MYPY = False

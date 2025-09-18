@@ -19,15 +19,17 @@
 from __future__ import annotations
 
 from core import feconf
-from core.domain import collection_domain
-from core.domain import collection_services
-from core.domain import exp_domain
-from core.domain import exp_services
-from core.domain import feedback_services
-from core.domain import rights_domain
-from core.domain import rights_manager
-from core.domain import subscription_services
-from core.domain import user_services
+from core.domain import (
+    collection_domain,
+    collection_services,
+    exp_domain,
+    exp_services,
+    feedback_services,
+    rights_domain,
+    rights_manager,
+    subscription_services,
+    user_services,
+)
 from core.platform import models
 from core.tests import test_utils
 

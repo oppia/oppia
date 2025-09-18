@@ -2236,6 +2236,9 @@ describe('Translation Suggestion Review Modal Component', function () {
     it('should get html schema', () => {
       expect(component.getHtmlSchema()).toEqual({
         type: 'html',
+        ui_config: {
+          rte_component_config_id: 'CURATED_LESSON_COMPONENTS',
+        },
       });
     });
 

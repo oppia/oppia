@@ -35,8 +35,8 @@ import re
 import shutil
 import subprocess
 import sys
-
 from types import TracebackType
+
 from typing import Final, List, Optional, Type
 
 # When executing Python scripts using `python -m ...` from oppia/oppia,
@@ -51,10 +51,16 @@ from typing import Final, List, Optional, Type
 # rather than the opipa/oppia root. To correct this problem, we add the
 # current working directory to sys.path.
 sys.path.append(os.getcwd())
-from scripts import common  # isort:skip  # pylint: disable=wrong-import-position
-from scripts import install_python_prod_dependencies # isort:skip  # pylint: disable=wrong-import-position
+
+# These imports must come after sys.path modification,
+# so the pylint import-position rules are disabled.
+from scripts import common  # pylint: disable=wrong-import-position
+from scripts import git_changes_utils  # pylint: disable=wrong-import-position
+from scripts import (  # pylint: disable=wrong-import-position
+    install_python_prod_dependencies,
+)
+
 from core import feconf #isort:skip # pylint: disable=wrong-import-position
-from scripts import git_changes_utils # isort:skip # pylint: disable=wrong-import-position
 
 # Git hash of /dev/null, refers to an 'empty' commit.
 GIT_NULL_COMMIT: Final = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
@@ -274,8 +280,10 @@ def check_for_backend_python_library_inconsistencies() -> None:
         print('\n')
         common.print_each_string_after_two_new_lines([
             'Please fix these discrepancies by editing the `requirements.in`\n'
-            'file or running `scripts.install_third_party_libs` to regenerate\n'
-            'the `third_party/python_libs` directory.\n'])
+            'file, running `scripts.install_third_party_libs` to regenerate\n'
+            'the `third_party/python_libs` directory, or updating\n'
+            '_get_possible_normalized_metadata_directory_names() in\n'
+            'install_python_prod_dependencies().\n'])
         sys.exit(1)
     else:
         print('Python dependencies consistency check succeeded.')

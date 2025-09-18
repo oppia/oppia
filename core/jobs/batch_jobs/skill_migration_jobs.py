@@ -21,26 +21,20 @@ from __future__ import annotations
 import logging
 
 from core import feconf
-from core.domain import skill_domain
-from core.domain import skill_fetchers
-from core.domain import skill_services
+from core.domain import skill_domain, skill_fetchers, skill_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
-from core.jobs.transforms import job_result_transforms
-from core.jobs.transforms import results_transforms
+from core.jobs.transforms import job_result_transforms, results_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
 import result
-
 from typing import Iterable, Sequence, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import datastore_services
-    from mypy_imports import skill_models
+    from mypy_imports import base_models, datastore_services, skill_models
 
 (base_models, skill_models,) = models.Registry.import_models([
     models.Names.BASE_MODEL, models.Names.SKILL
@@ -54,7 +48,7 @@ datastore_services = models.Registry.import_datastore_services()
 # assume that PTransform class is of type Any. Thus to avoid MyPy's error
 # (Class cannot subclass 'PTransform' (has type 'Any')), we added an
 # ignore here.
-class MigrateSkillModels(beam.PTransform):# type: ignore[misc]
+class MigrateSkillModels(beam.PTransform):  # type: ignore[misc]
     """Transform that gets all Skill models, performs migration and filters
     any error results.
     """

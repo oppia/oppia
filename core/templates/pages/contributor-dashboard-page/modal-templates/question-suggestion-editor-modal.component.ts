@@ -25,7 +25,7 @@ import {
 import {AlertsService} from 'services/alerts.service';
 import {AppConstants} from 'app.constants';
 import {MisconceptionSkillMap} from 'domain/skill/misconception.model';
-import {Question} from 'domain/question/QuestionObjectFactory';
+import {Question} from 'domain/question/question.model';
 import {QuestionUndoRedoService} from 'domain/editor/undo_redo/question-undo-redo.service';
 import {Skill} from 'domain/skill/skill.model.ts';
 import {State} from 'domain/state/state.model';

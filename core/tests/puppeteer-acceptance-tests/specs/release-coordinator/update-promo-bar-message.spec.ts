@@ -42,7 +42,7 @@ describe('Release Coordinator', function () {
     async function () {
       await releaseCoordinator.navigateToReleaseCoordinatorPage();
       await releaseCoordinator.navigateToMiscTab();
-      await releaseCoordinator.enablePromoBar();
+      await releaseCoordinator.togglePromoBar();
       await releaseCoordinator.enterPromoBarMessage(promoMessage);
       await releaseCoordinator.savePromoBarMessage();
       // Any learner facing page would work. We are just checking if the message is saved.

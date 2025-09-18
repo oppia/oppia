@@ -31,16 +31,12 @@ import numbers
 import re
 import urllib
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import expression_parser
-from core.domain import html_cleaner
-from core.domain import user_domain
+from core.domain import expression_parser, html_cleaner, user_domain
 from extensions.objects.models import objects
 
 import mutagen
-
 from typing import Any, Callable, Dict, List, Optional, cast
 
 SCHEMA_KEY_ITEMS = 'items'

@@ -21,11 +21,13 @@ from __future__ import annotations
 import math
 
 from core import utils
-from core.domain import blog_domain
-from core.domain import collection_domain
-from core.domain import exp_domain
-from core.domain import rights_domain
-from core.domain import rights_manager
+from core.domain import (
+    blog_domain,
+    collection_domain,
+    exp_domain,
+    rights_domain,
+    rights_manager,
+)
 from core.platform import models
 
 from typing import Final, List, Optional, Tuple, TypedDict

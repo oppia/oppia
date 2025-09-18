@@ -22,19 +22,19 @@ import {CamelCaseToHyphensPipe} from 'filters/string-utility-filters/camel-case-
 import {
   Exploration,
   ExplorationBackendDict,
-  ExplorationObjectFactory,
-} from 'domain/exploration/ExplorationObjectFactory';
+} from 'domain/exploration/exploration.model';
 import {StateBackendDict, State} from 'domain/state/state.model';
 import {Interaction} from 'domain/exploration/interaction.model';
 import {LoggerService} from 'services/contextual/logger.service';
+import {UrlInterpolationService} from '../utilities/url-interpolation.service';
 import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 import {SubtitledHtmlBackendDict} from 'domain/exploration/subtitled-html.model';
 import {FetchExplorationBackendResponse} from './read-only-exploration-backend-api.service';
 
-describe('Exploration object factory', () => {
-  let eof: ExplorationObjectFactory;
+describe('Exploration', () => {
   let exploration: Exploration;
   let ls: LoggerService;
+  let urlInterpolationService: UrlInterpolationService;
   let loggerErrorSpy: jasmine.Spy<(msg: string) => void>;
   let firstState: StateBackendDict;
   let secondState: StateBackendDict;
@@ -44,8 +44,8 @@ describe('Exploration object factory', () => {
     TestBed.configureTestingModule({
       providers: [CamelCaseToHyphensPipe],
     });
-    eof = TestBed.get(ExplorationObjectFactory);
     ls = TestBed.get(LoggerService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
 
     firstState = {
       content: {
@@ -199,7 +199,11 @@ describe('Exploration object factory', () => {
       },
     };
 
-    exploration = eof.createFromBackendDict(explorationDict);
+    exploration = Exploration.createFromBackendDict(
+      explorationDict,
+      ls,
+      urlInterpolationService
+    );
     exploration.setInitialStateName('first state');
     loggerErrorSpy = spyOn(ls, 'error').and.callThrough();
   });
@@ -319,9 +323,12 @@ describe('Exploration object factory', () => {
   it(
     'should create a exploration for given exploration' + 'backend response',
     () => {
-      const responseExploration = eof.createFromExplorationBackendResponse(
-        mockReadOnlyExplorationData
-      );
+      const responseExploration =
+        Exploration.createFromExplorationBackendResponse(
+          mockReadOnlyExplorationData,
+          ls,
+          urlInterpolationService
+        );
 
       expect(responseExploration.getLanguageCode()).toBe('en');
       expect(responseExploration.getInteraction('first state')).toEqual(
