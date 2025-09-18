@@ -83,10 +83,10 @@ from core.platform.taskqueue import cloud_tasks_emulator
 from scripts import common
 
 import elasticsearch
-from elastic_transport import ApiResponseMeta, NodeConfig
 import requests_mock
 import webapp2
 import webtest
+from elastic_transport import ApiResponseMeta, NodeConfig
 from typing import (
     Any,
     Callable,
