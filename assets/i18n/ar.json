@@ -387,7 +387,7 @@
 	"I18N_COOKIE_BANNER_ACKNOWLEDGE": "موافق",
 	"I18N_COOKIE_BANNER_EXPLANATION": "يستخدم هذا الموقع ملفات تعريف الارتباط والتقنيات المماثلة لدعم الوظائف الأساسية والحفاظ على أمان الموقع وتحليل حركة المرور على موقعنا. تعرف على مزيد من المعلومات في <a href=\"/privacy-policy\"></a>.",
 	"I18N_CORRECT_FEEDBACK": "صحيح!",
-	"I18N_COUNT_OF_LESSONS": "{lessonCountValue، جمع، =1{درس} دروس أخرى}}",
+	"I18N_COUNT_OF_LESSONS": "{lessonCountValue, plural, =1 {درس} other {دروس أخرى}}",
 	"I18N_CREATED_LEARNER_GROUP_LINK_MESSAGE": "رابط مجموعتك",
 	"I18N_CREATE_ACCOUNT": "أنشئ حسابًا",
 	"I18N_CREATE_ACTIVITY_QUESTION": "ماذا تريد أن تنشئ؟",

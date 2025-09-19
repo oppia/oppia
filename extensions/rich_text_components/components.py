@@ -21,13 +21,10 @@ from __future__ import annotations
 import os
 import re
 
-from core import constants
-from core import feconf
-from core import utils
+from core import constants, feconf, utils
 from extensions.objects.models import objects
 
 import bs4
-
 from typing import Any, Dict, List, Union
 
 

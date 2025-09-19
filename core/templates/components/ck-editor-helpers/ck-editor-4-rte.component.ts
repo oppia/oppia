@@ -59,7 +59,7 @@ import {Subscription} from 'rxjs';
 
 interface UiConfig {
   (): UiConfig;
-  rte_components: string;
+  rte_component_config_id: string;
   hide_complex_extensions: boolean;
   startupFocusEnabled?: boolean;
   language?: string;
@@ -67,12 +67,12 @@ interface UiConfig {
 }
 
 interface ExtendedCKEditorConfig extends CKEDITOR.config {
-  rte_components?: string;
+  rte_component_config_id?: string;
 }
 export interface RteConfig extends CKEDITOR.config {
   format_heading?: CKEDITOR.config.styleObject;
   format_normal?: CKEDITOR.config.styleObject;
-  rte_components?: string;
+  rte_component_config_id?: string;
 }
 
 @Component({
@@ -134,14 +134,14 @@ export class CkEditor4RteComponent
   }
 
   private validateConfiguration(): void {
-    if (!this.uiConfig || !this.uiConfig.rte_components) {
+    if (!this.uiConfig || !this.uiConfig.rte_component_config_id) {
       this.configError =
-        'No component set specified. Please provide a "rte_components" config in uiConfig.';
+        'No component set specified. Please provide a "rte_component_config_id" config in uiConfig.';
       console.error('Error: ' + this.configError);
       return;
     }
 
-    const rteComponents = this.uiConfig.rte_components;
+    const rteComponents = this.uiConfig.rte_component_config_id;
     const componentList = AppConstants.RTE_COMPONENT_CONFIGS[rteComponents];
 
     if (!componentList) {
@@ -513,7 +513,7 @@ export class CkEditor4RteComponent
     }
 
     // Get component list from AppConstants.
-    const rteComponents = this.uiConfig.rte_components;
+    const rteComponents = this.uiConfig.rte_component_config_id;
     const componentList = AppConstants.RTE_COMPONENT_CONFIGS[rteComponents];
 
     // Filter components based on the defined list and other criteria.
@@ -627,8 +627,8 @@ export class CkEditor4RteComponent
       sharedSpaces
     ) as ExtendedCKEditorConfig;
 
-    if (this.uiConfig && this.uiConfig.rte_components) {
-      ckConfig.rte_components = this.uiConfig.rte_components;
+    if (this.uiConfig && this.uiConfig.rte_component_config_id) {
+      ckConfig.rte_component_config_id = this.uiConfig.rte_component_config_id;
     }
 
     // Initialize CKEditor.

@@ -28,8 +28,7 @@ from typing import Final, Type
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import datastore_services
-    from mypy_imports import exp_models
+    from mypy_imports import datastore_services, exp_models
 
 (exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
 

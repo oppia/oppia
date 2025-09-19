@@ -21,10 +21,7 @@ import os
 import subprocess
 
 from core.tests import test_utils
-
-from scripts import run_backend_tests
-from scripts import run_frontend_tests
-from scripts import run_presubmit_checks
+from scripts import run_backend_tests, run_frontend_tests, run_presubmit_checks
 from scripts.linters import run_lint_checks
 
 

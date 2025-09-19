@@ -21,7 +21,6 @@ from __future__ import annotations
 import functools
 
 from google.cloud import datastore
-
 from typing import Any, Callable
 
 CLIENT = datastore.Client()
