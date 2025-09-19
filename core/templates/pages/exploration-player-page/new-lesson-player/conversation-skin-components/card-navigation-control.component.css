@@ -6,9 +6,6 @@
 */
 
 oppia-progress-tracker {
-  left: 50%;
-  position: absolute;
-  transform: translateX(-50%);
   width: 375px;
 }
 
@@ -72,7 +69,7 @@ oppia-progress-tracker {
 
 .card-navigation-control .oppia-nav-button {
   height: 36px;
-  margin: 0 12px 20px 12px;
+  margin: 0 10px 20px 10px;
   min-width: 36px;
   padding: 6px;
 }
@@ -84,7 +81,7 @@ oppia-progress-tracker {
   box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.25), inset -2px -2px 4px rgba(0, 0, 0, 0.3);
   color: #0d48a1;
   height: 44px;
-  margin: 0 auto;
+  margin: 0 15px;
   padding: 10px 0;
   width: 44px;
 }
@@ -96,7 +93,7 @@ oppia-progress-tracker {
   box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.25), inset -2px -2px 4px rgba(0, 0, 0, 0.3);
   color: #0d48a1;
   height: 44px;
-  margin: 5px;
+  margin: 5px 15px;
   padding: 10px 0;
   width: 44px;
 }
@@ -116,24 +113,19 @@ oppia-progress-tracker {
   -webkit-transform: scaleX(1) /*rtl:scaleX(-1)*/;
   transform: scaleX(1) /*rtl:scaleX(-1)*/;
 }
-.card-navigation-control .oppia-nav-button.oppia-nav-left-button {
-  margin-left: 12px;
-}
 
 .card-navigation-control.row {
   display: flex;
   flex-direction: row;
 }
 .card-navigation-control.space-between {
-  justify-content: space-between;
+  justify-content: center;
 }
 .card-navigation-control.center {
   align-content: center;
   align-items: center;
 }
-.card-navigation-control .row-item {
-  flex-grow: 1;
-}
+
 .card-navigation-control .row-item-next-card {
   text-align: right;
 }
