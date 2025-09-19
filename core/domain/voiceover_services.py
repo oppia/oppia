@@ -1285,6 +1285,10 @@ def regenerate_voiceovers_on_exploration_curation(
         language_code = entity_translation.language_code
         translations = entity_translation.translations
         for content_id, translated_content in translations.items():
+            # Rule inputs are not considered for voiceover generation.
+            if content_id.startswith('rule_input'):
+                continue
+
             # Voiceovers should only be regenerated if the translation is
             # updated.
             if translated_content.needs_update:
@@ -1380,6 +1384,10 @@ def regenerate_voiceovers_of_exploration_for_given_language_accent(
         language_code = entity_translations.language_code
         translations = entity_translations.translations
         for content_id, translated_content in translations.items():
+            # Rule inputs are not considered for voiceover generation.
+            if content_id.startswith('rule_input'):
+                continue
+
             # Voiceovers should only be regenerated if the translation is
             # updated.
             if translated_content.needs_update:
