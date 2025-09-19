@@ -64,7 +64,7 @@ describe('Release Coordinator', function () {
       // immediately freed, causing the increase in the keys.count value we see.
       // See details in:
       // https://github.com/oppia/oppia/pull/20369#issuecomment-2282186319.
-      await releaseCoordinator.expectTotalKeysStoredToBeLessThan(70);
+      await releaseCoordinator.expectTotalKeysStoredToBeInRange(70);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
