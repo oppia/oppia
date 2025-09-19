@@ -6297,7 +6297,7 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Moves the node in the graph.
+   * Checks if the graph node can be moved.
    * @param {'response modal' | 'answer page'} state - The state of the node.
    */
   async expectGraphNodeCanBeMoved(
