@@ -171,7 +171,7 @@ oppia-progress-tracker {
   .card-navigation-control .control-container {
     max-width: 790px;
     transform: translateX(0);
-  } 
+  }
 }
 
 @media (max-width: 768px) {
@@ -181,7 +181,7 @@ oppia-progress-tracker {
 
   .card-navigation-control .control-container {
     max-width: 650px;
-  } 
+  }
 }
 
 @media (max-width: 480px) {

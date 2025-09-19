@@ -18,18 +18,12 @@
 
 import {Component, OnInit} from '@angular/core';
 import './checkpoint-bar.component.css';
-import {
-  FetchExplorationBackendResponse,
-  ReadOnlyExplorationBackendApiService,
-} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {ExplorationEngineService} from '../../../services/exploration-engine.service';
 import {StateObjectsBackendDict} from 'domain/exploration/states.model';
-import {PlayerTranscriptService} from '../../../services/player-transcript.service';
 import {PlayerPositionService} from '../../../services/player-position.service';
 import {Subscription} from 'rxjs';
 import {PageContextService} from 'services/page-context.service';
 import {CheckpointProgressService} from 'pages/exploration-player-page/services/checkpoint-progress.service';
-import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
 
 const CHECKPOINT_STATUS_INCOMPLETE = 'incomplete';
 const CHECKPOINT_STATUS_COMPLETED = 'completed';
@@ -53,12 +47,9 @@ export class CheckpointBarComponent implements OnInit {
   maxStateDepth: number = 0;
 
   constructor(
-    private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private explorationEngineService: ExplorationEngineService,
-    private playerTranscriptService: PlayerTranscriptService,
     private playerPositionService: PlayerPositionService,
     private pageContextService: PageContextService,
-    private conversationFlowService: ConversationFlowService,
     private checkpointProgressService: CheckpointProgressService
   ) {}
 
@@ -92,7 +83,7 @@ export class CheckpointBarComponent implements OnInit {
     const segmentWidth = 100 / this.checkpointCount;
 
     if (displayedCardIndex === checkpointIndexes[0]) {
-      return 0; // No progress needed; it's the first checkpoint
+      return 0; // No progress needed; it's the first checkpoint.
     }
 
     let state = this.explorationEngineService.getState();
@@ -103,11 +94,11 @@ export class CheckpointBarComponent implements OnInit {
       return 100;
     }
 
-    // Find the current segment between checkpoints
+    // Find the current segment between checkpoints.
     let currentSegmentIndex = 0;
 
     if (displayedCardIndex >= checkpointIndexes[checkpointIndexes.length - 1]) {
-      currentSegmentIndex = checkpointIndexes.length - 1; // If at or beyond the last checkpoint, full progress
+      currentSegmentIndex = checkpointIndexes.length - 1; // If at or beyond the last checkpoint, full progress.
     } else {
       for (let i = 0; i < checkpointIndexes.length - 1; i++) {
         if (
@@ -161,22 +152,22 @@ export class CheckpointBarComponent implements OnInit {
       }
     }
 
-    // Mark the first checkpoint as completed
+    // Mark the first checkpoint as completed.
     this.checkpointStatusArray = new Array(this.checkpointCount + 1);
     this.checkpointStatusArray[0] = CHECKPOINT_STATUS_COMPLETED;
 
-    // Mark remaining checkpoints based on current progress
+    // Mark remaining checkpoints based on current progress.
     for (let i = 1; i < this.completedCheckpointsCount; i++) {
       this.checkpointStatusArray[i] = CHECKPOINT_STATUS_COMPLETED;
     }
 
-    // If there are still incomplete checkpoints, mark the next checkpoint as "in-progress"
+    // If there are still incomplete checkpoints, mark the next checkpoint as "in-progress".
     if (this.checkpointCount > this.completedCheckpointsCount) {
       this.checkpointStatusArray[this.completedCheckpointsCount] =
         CHECKPOINT_STATUS_IN_PROGRESS;
     }
 
-    // All remaining checkpoints are incomplete
+    // All remaining checkpoints are incomplete.
     for (
       let i = this.completedCheckpointsCount + 1;
       i < this.checkpointCount;

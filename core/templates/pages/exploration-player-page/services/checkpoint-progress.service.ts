@@ -42,7 +42,7 @@ export class CheckpointProgressService {
     private stateGraphLayoutService: StateGraphLayoutService
   ) {}
 
-  extractDepthGraph() {
+  extractDepthGraph(): {[stateName: string]: number} {
     const graphData = this.computeGraphService.compute(
       this.explorationEngineService.getInitialStateName(),
       this.explorationEngineService.getExploration().states
