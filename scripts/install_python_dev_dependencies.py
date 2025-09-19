@@ -142,6 +142,17 @@ def compile_pip_requirements(
     with open(compiled_path, 'r', encoding='utf-8') as f:
         new_compiled = f.read()
 
+    if old_compiled != new_compiled:
+        raise RuntimeError(
+            f'Requirements file {requirements_path} has changed. Please run '
+            '`python -m scripts.install_python_dev_dependencies` to update '
+            f'{compiled_path}.\n'
+            f'Old file: \n'
+            f'{old_compiled}\n'
+            f'New file: \n'
+            f'{new_compiled}\n'
+            )
+
     return old_compiled != new_compiled
 
 
