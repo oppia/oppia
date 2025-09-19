@@ -188,7 +188,7 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
 
         def mock_open(*_args: str, **_kwargs: str) -> io.StringIO:
             return io.StringIO(
-                f'#    pip-compile --generate-hashes\nmock file contents')
+                '#    pip-compile --generate-hashes\nmock file contents')
 
         run_swap = self.swap_with_checks(
             subprocess, 'run', mock_run, expected_args=[
@@ -230,8 +230,7 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
         def mock_open(*_args: str, **_kwargs: str) -> io.StringIO:
             counter.append(1)
             return io.StringIO(
-                f'#    pip-compile --generate-hashes\n'
-                'mock file contents {len(counter)}')
+                f'#    pip-compile --generate-hashes\nmock file {len(counter)}')
 
         run_swap = self.swap_with_checks(
             subprocess, 'run', mock_run, expected_args=[

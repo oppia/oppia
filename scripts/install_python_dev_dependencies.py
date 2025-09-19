@@ -119,7 +119,7 @@ def uninstall_dev_dependencies() -> None:
 
 def compile_pip_requirements(
     requirements_path: str, compiled_path: str
-) -> bool:
+) -> str:
     """Compile a requirements.txt file.
 
     Args:
@@ -127,7 +127,8 @@ def compile_pip_requirements(
         compiled_path: str. Path to the requirements.txt file.
 
     Returns:
-        bool. Whether the compiled dev requirements file was changed.
+        str. The diff between the original and compiled requirements files, as
+        a string containing newlines.
     """
     with open(compiled_path, 'r', encoding='utf-8') as f:
         old_compiled = list(f.readlines())
@@ -152,10 +153,9 @@ def compile_pip_requirements(
     new_pip_compile_line_index = [
         i for i, value in enumerate(new_compiled)
         if value.startswith('#    pip-compile')][0]
-
     diff = list(difflib.unified_diff(
-        old_compiled[old_pip_compile_line_index + 1:],
-        new_compiled[new_pip_compile_line_index + 1:],
+        old_compiled[old_pip_compile_line_index:],
+        new_compiled[new_pip_compile_line_index:],
         lineterm=''))
     print('Printing diff in %s:' % requirements_path)
     print('--------------------------')
@@ -163,7 +163,7 @@ def compile_pip_requirements(
         print(line)
     print('--------------------------')
 
-    return bool(diff)
+    return '\n'.join(list(diff))
 
 
 def main(cli_args: Optional[List[str]] = None) -> None:
@@ -171,19 +171,20 @@ def main(cli_args: Optional[List[str]] = None) -> None:
     args = _PARSER.parse_args(cli_args)
     check_python_env_is_suitable()
     install_installation_tools()
-    not_compiled = compile_pip_requirements(
+    diff = compile_pip_requirements(
         REQUIREMENTS_DEV_FILE_PATH, COMPILED_REQUIREMENTS_DEV_FILE_PATH)
     if args.uninstall:
         uninstall_dev_dependencies()
     else:
         install_dev_dependencies()
-        if args.assert_compiled and not_compiled:
+        if args.assert_compiled and diff:
             raise RuntimeError(
                 'The Python development requirements file '
                 f'{COMPILED_REQUIREMENTS_DEV_FILE_PATH} was changed by the '
-                'installation script. Please commit the changes. '
-                'You can get the changes again by running this command: '
-                'python -m scripts.install_python_dev_dependencies')
+                'installation script. See diff:\n%s\n\n. Please commit the '
+                'changes. You can get the changes again by running this '
+                'command: python -m scripts.install_python_dev_dependencies' %
+                diff)
 
 
 # This code cannot be covered by tests since it only runs when this file
