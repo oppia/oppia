@@ -35,6 +35,10 @@ const featuredActivitiesHeaderSelector = '.e2e-test-featured-activities-header';
 const feedbackMessagesHeaderSelector = '.e2e-test-feedback-messages-header';
 const explorationFeedbackTabContainerSelector =
   '.e2e-test-exploration-feedback-card';
+const explorationEditorContainerSelector = 'oppia-exploration-editor-page-root';
+const moderatorPageContainerSelector = '.e2e-test-moderator-page';
+const toastMessageSelector = '.e2e-test-toast-message';
+const warningToastMessageSelector = '.e2e-test-toast-warning-message';
 
 export class Moderator extends BaseUser {
   /**
@@ -74,7 +78,14 @@ export class Moderator extends BaseUser {
    * Function to view a specific recent commit.
    * @param {number} commitIndex - The index of the commit to view.
    */
-  private async getPropertiesOfCommit(commitIndex: number): Promise<object> {
+  private async getPropertiesOfCommit(commitIndex: number): Promise<{
+    timestamp: string;
+    exploration: string;
+    category: string;
+    username: string;
+    commitMessage: string;
+    isCommunityOwned: string;
+  }> {
     await this.page.waitForSelector(commitRowSelector);
     const commitRows = await this.page.$$(commitRowSelector);
     if (commitRows.length === 0) {
@@ -127,7 +138,7 @@ export class Moderator extends BaseUser {
 
   /**
    * Function to check if a specific commit has all the expected properties.
-   * @param {number} commitIndex - The index of the commit to check.
+   * @param {number} commitIndex - The 1-based index of the commit to check.
    * @param {string[]} expectedProperties - The properties that the commit is expected to have.
    */
   async expectCommitToHaveProperties(
@@ -142,6 +153,133 @@ export class Moderator extends BaseUser {
       }
     }
     showMessage(`Commit ${commitIndex} has all expected properties.`);
+  }
+
+  /**
+   * Checks if a specific commit has a specific property with a specific value.
+   * @param {number} commitIndex - The 1-based index of the commit to check.
+   * @param {string} property - The property to check.
+   * @param {string} value - The value of the property to check.
+   */
+  async expectCommitPropertyToBe(
+    commitIndex: number,
+    property: keyof {
+      timestamp: string;
+      exploration: string;
+      category: string;
+      username: string;
+      commitMessage: string;
+      isCommunityOwned: string;
+    },
+    value: string
+  ): Promise<void> {
+    const commit = await this.getPropertiesOfCommit(commitIndex);
+
+    if (!(property in commit)) {
+      throw new Error(`Commit does not have property: ${property}`);
+    }
+
+    expect(commit[property]).toBe(value);
+    showMessage(
+      `Commit ${commitIndex} has property ${property} with value ${value}.`
+    );
+  }
+
+  /**
+   * Function to check if the recent commits table has the expected columns.
+   * @param {string[]} columnNames - The names of the columns to check.
+   */
+  async expectRecentCommitsTableToHaveColumns(
+    columnNames: string[]
+  ): Promise<void> {
+    const commitTableHeaderRowSelector = '.e2e-test-commit-table-header-row';
+    await this.expectElementToBeVisible(commitTableHeaderRowSelector);
+
+    const commitTableColumnFields = await this.page.$$eval(
+      `${commitTableHeaderRowSelector} th`,
+      elements => elements.map(element => element.textContent)
+    );
+
+    for (const columnName of columnNames) {
+      expect(commitTableColumnFields).toContain(columnName);
+    }
+  }
+
+  /**
+   * Function to click on the exploration link in the recent commits table.
+   * @param {number} commitIndex - The 1-based index of the commit to click on.
+   */
+  async clickOnExplorationLinkInRecentCommitsTable(
+    commitIndex: number
+  ): Promise<void> {
+    await this.page.waitForSelector(commitRowSelector);
+    const commitRows = await this.page.$$(commitRowSelector);
+    if (commitRows.length === 0) {
+      throw new Error('No recent commits found');
+    }
+
+    commitIndex -= 1; // Adjusting to 0-based index.
+
+    if (commitIndex < 0 || commitIndex >= commitRows.length) {
+      throw new Error('Invalid commit number');
+    }
+
+    const row = commitRows[commitIndex];
+    const explorationElement = await row.$('td:nth-child(2) a');
+
+    if (!explorationElement) {
+      throw new Error('Exploration link not found');
+    }
+
+    await Promise.all([
+      this.page.waitForNavigation({waitUntil: 'load'}),
+      explorationElement.click(),
+    ]);
+  }
+
+  /**
+   * Check if the user is in the exploration editor.
+   * @param {string} explorationId - The ID of the exploration to check.
+   */
+  async expectToBeInExplorationEditor(explorationId?: string): Promise<void> {
+    await this.expectElementToBeVisible(explorationEditorContainerSelector);
+
+    if (explorationId) {
+      await this.expectPageURLToContain(explorationId);
+    }
+  }
+
+  /**
+   * Check if the user is in the moderator page.
+   */
+  async expectToBeInModeratorPage(): Promise<void> {
+    await this.expectElementToBeVisible(moderatorPageContainerSelector);
+  }
+
+  /**
+   * Checks if the timestamps in the commits or feedback messages are in descending order.
+   * @param {'commit' | 'feedback messages'} table - The table to check the timestamps in.
+   */
+  async expectTimestampToBeInDescendingOrder(
+    table: 'commit' | 'feedback messages' = 'commit'
+  ): Promise<void> {
+    const selector = `.e2e-test-${table.replace(' ', '-')}-row`;
+    await this.expectElementToBeVisible(selector);
+    const rowElements = await this.page.$$(selector);
+    const rawTimeValue1 = await rowElements[0].evaluate(el => {
+      return el.querySelector('td')?.textContent?.trim();
+    });
+    const rawTimeValue2 = await rowElements[1].evaluate(el => {
+      return el.querySelector('td')?.textContent?.trim();
+    });
+    const time1 = this.parseLocaleAbbreviatedDatetimeString(
+      rawTimeValue1 as string
+    );
+    const time2 = this.parseLocaleAbbreviatedDatetimeString(
+      rawTimeValue2 as string
+    );
+
+    expect(time1).toBeGreaterThanOrEqual(time2);
   }
 
   /**
@@ -297,35 +435,48 @@ export class Moderator extends BaseUser {
   /**
    * Function to feature an activity.
    * @param {string} explorationId - The ID of the exploration to feature.
+   * @param {number} activityIndex - The 0-based index of the activity to feature.
    */
-  async featureActivity(explorationId: string | null): Promise<void> {
-    await this.clickOn(' Add element ');
+  async featureActivity(
+    explorationId: string | null,
+    activityIndex: number = 0
+  ): Promise<void> {
+    await this.clickOn('Add element');
 
     await this.page.waitForSelector(explorationIDField);
-    await this.page.type(explorationIDField, explorationId as string);
-    await this.page.keyboard.press('Enter');
-    await this.clickOn(' Save Featured Activities ');
-
-    try {
-      await this.page.waitForFunction(
-        'document.querySelector(".e2e-test-toast-message") !== null',
-        {timeout: 5000}
+    const explorationIdFieldElement = await this.page.$$(explorationIDField);
+    if (explorationIdFieldElement.length < activityIndex + 1) {
+      throw new Error(
+        `Invalid activity index: ${activityIndex}\n.` +
+          `Found only ${explorationIdFieldElement.length} activities.`
       );
-      showMessage('Activity featured successfully.');
-    } catch (error) {
-      throw new Error('Failed to save the featured activities');
     }
+    await explorationIdFieldElement[activityIndex].type(
+      explorationId as string
+    );
+    await this.page.keyboard.press('Enter');
+    await this.expectElementValueToBe(
+      explorationIdFieldElement[activityIndex],
+      explorationId as string
+    );
+
+    await this.clickOn('Save Featured Activities');
+
+    expect(
+      (await this.isElementVisible(toastMessageSelector, true, 5000)) ||
+        (await this.isElementVisible(warningToastMessageSelector, true, 5000))
+    ).toBe(true);
   }
 
   /**
    * Function to unfeature an activity.
-   * @param {number} index - The index of the activity to unfeature.
+   * @param {number} index - The 1-based index of the activity to unfeature.
    */
   async unfeatureActivityAtIndex(index: number): Promise<void> {
     // Subtracting 1 from index to make it 1-based.
     index -= 1;
 
-    await this.navigateToFeaturedActivitiesTab();
+    await this.expectElementToBeVisible(featuredActivityRowSelector);
     const rows = await this.page.$$(featuredActivityRowSelector);
 
     if (rows.length === 0) {
@@ -354,14 +505,14 @@ export class Moderator extends BaseUser {
 
     await this.clickOn(' Save Featured Activities ');
 
-    try {
-      await this.page.waitForFunction(
-        'document.querySelector(".e2e-test-toast-message") !== null',
-        {timeout: 5000}
-      );
-      showMessage('Activity unfeatured successfully.');
-    } catch (error) {
-      throw new Error('Failed to save the unfeatured activities');
+    // Check if either success or warning toast message is visible.
+    if (
+      !(
+        (await this.isElementVisible(toastMessageSelector, true, 5000)) ||
+        (await this.isElementVisible(warningToastMessageSelector, true, 5000))
+      )
+    ) {
+      throw new Error('Activity not unfeatured successfully.');
     }
   }
 }

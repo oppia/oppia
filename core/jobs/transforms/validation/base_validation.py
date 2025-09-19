@@ -39,7 +39,6 @@ from core.jobs.types import base_validation_errors
 from core.platform import models
 
 import apache_beam as beam
-
 from typing import Any, Final, Generic, Iterator, Type, TypeVar, Union
 
 MYPY = False

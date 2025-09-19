@@ -18,8 +18,8 @@
 
 from __future__ import annotations
 
-from core import feconf
-from core import utils
+from core import feconf, utils
+
 # TODO(#13594): After the domain layer is refactored to be independent of
 # the storage layer, the disable=invalid-import will
 # be removed.
@@ -33,12 +33,20 @@ from core.domain import feedback_domain  # pylint: disable=invalid-import
 from core.platform import models
 
 from typing import (
-    Dict, Final, List, Literal, Optional, Sequence, Tuple, Union, overload)
+    Dict,
+    Final,
+    List,
+    Literal,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+    overload,
+)
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import datastore_services
+    from mypy_imports import base_models, datastore_services
 
 (base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 

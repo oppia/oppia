@@ -44,7 +44,7 @@ export class AddStudyGuideSectionModalComponent extends ConfirmOrCancelModal {
   SECTION_FORM_CONTENT_SCHEMA: HtmlFormSchema = {
     type: 'html',
     ui_config: {
-      rte_components: 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS',
+      rte_component_config_id: 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS',
     },
   };
   SECTION_FORM_HEADING_SCHEMA: HtmlFormSchema = {
@@ -65,7 +65,7 @@ export class AddStudyGuideSectionModalComponent extends ConfirmOrCancelModal {
       this.SECTION_FORM_CONTENT_SCHEMA = {
         type: 'html',
         ui_config: {
-          rte_components: 'ALL_COMPONENTS',
+          rte_component_config_id: 'ALL_COMPONENTS',
           rows: 100,
         },
       };

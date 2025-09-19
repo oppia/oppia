@@ -23,7 +23,7 @@ import {
   ReadOnlyExplorationBackendApiService,
 } from 'domain/exploration/read-only-exploration-backend-api.service';
 import {ExplorationEngineService} from '../../../services/exploration-engine.service';
-import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
+import {StateObjectsBackendDict} from 'domain/exploration/states.model';
 import {PlayerTranscriptService} from '../../../services/player-transcript.service';
 import {PlayerPositionService} from '../../../services/player-position.service';
 import {Subscription} from 'rxjs';

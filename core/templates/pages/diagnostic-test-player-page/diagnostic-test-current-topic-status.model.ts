@@ -20,7 +20,7 @@
  */
 
 import {DiagnosticTestQuestionsModel} from 'domain/question/diagnostic-test-questions.model';
-import {Question} from 'domain/question/QuestionObjectFactory';
+import {Question} from 'domain/question/question.model';
 
 export interface SkillIdToQuestionsDict {
   [skillId: string]: DiagnosticTestQuestionsModel;

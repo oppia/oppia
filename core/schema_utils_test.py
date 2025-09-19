@@ -98,7 +98,7 @@ UI_CONFIG_SPECS: Dict[str, Dict[str, Any]] = {
         'hide_complex_extensions': {
             'type': SCHEMA_TYPE_BOOL,
         },
-        'rte_components': {
+        'rte_component_config_id': {
             'type': SCHEMA_TYPE_UNICODE_OR_NONE,
         },
     },
@@ -108,7 +108,7 @@ UI_CONFIG_SPECS: Dict[str, Dict[str, Any]] = {
         'hide_complex_extensions': {
             'type': SCHEMA_TYPE_BOOL,
         },
-        'rte_components': {
+        'rte_component_config_id': {
             'type': SCHEMA_TYPE_UNICODE_OR_NONE,
         },
         'placeholder': {

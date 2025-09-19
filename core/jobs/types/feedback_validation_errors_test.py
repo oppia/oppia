@@ -18,8 +18,10 @@
 
 from __future__ import annotations
 
-from core.jobs.types import base_validation_errors_test
-from core.jobs.types import feedback_validation_errors
+from core.jobs.types import (
+    base_validation_errors_test,
+    feedback_validation_errors,
+)
 from core.platform import models
 
 MYPY = False

@@ -22,8 +22,7 @@ import subprocess
 import sys
 
 from core.tests import test_utils
-from scripts import common
-from scripts import run_custom_eslint_tests
+from scripts import common, run_custom_eslint_tests
 
 
 class RunCustomEslintTestsTests(test_utils.GenericTestBase):

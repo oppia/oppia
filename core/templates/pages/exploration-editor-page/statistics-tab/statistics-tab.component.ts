@@ -20,10 +20,7 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
-import {
-  States,
-  StatesObjectFactory,
-} from 'domain/exploration/StatesObjectFactory';
+import {States} from 'domain/exploration/states.model';
 import {ExplorationStats} from 'domain/statistics/exploration-stats.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {Subscription} from 'rxjs';
@@ -76,7 +73,6 @@ export class StatisticsTabComponent implements OnInit, OnDestroy {
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private routerService: RouterService,
     private stateInteractionStatsService: StateInteractionStatsService,
-    private statesObjectFactory: StatesObjectFactory,
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
@@ -92,7 +88,7 @@ export class StatisticsTabComponent implements OnInit, OnDestroy {
       const numNonCompletions =
         expStats.numActualStarts - expStats.numCompletions;
 
-      this.states = this.statesObjectFactory.createFromBackendDict(
+      this.states = States.createFromBackendDict(
         expResponse.exploration.states
       );
       this.expStats = expStats;

@@ -16,7 +16,7 @@
  * @fileoverview Super Admin users utility file.
  */
 
-import puppeteer from 'puppeteer';
+import puppeteer, {ElementHandle} from 'puppeteer';
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
@@ -116,6 +116,19 @@ const enableAutogenerationToggleSelector =
   '.e2e-test-cloud-service-autogeneration-toggle';
 const assignedTopicSelector = '.e2e-test-assigned-topic';
 const selectedRoleHeadingSelector = '.e2e-test-active-role';
+const languageSelectorCloseButtonSelector =
+  '.e2e-test-language-selector-close-button';
+const languageSelectorBodySelector = '.e2e-test-language-selector-modal-body';
+const addLanguageButtonSelector = '.e2e-test-language-selector-add-button';
+const selectedLanguageSelector = '.e2e-test-selected-language';
+
+const platformParameterTabContainerSelector =
+  'oppia-admin-platform-parameters-tab';
+const userRolesTabContainerSelector = 'oppia-admin-roles-tab';
+const userRolesVisualizationContainerSelector =
+  'oppia-roles-and-actions-visualizer';
+const platformParameterDefaultValueContainerSelector =
+  '.e2e-test-platform-param-default-value-container';
 
 export class SuperAdmin extends BaseUser {
   /**
@@ -134,6 +147,7 @@ export class SuperAdmin extends BaseUser {
    */
   async navigateToAdminPageRolesTab(): Promise<void> {
     await this.goto(adminPageRolesTab);
+    await this.expectElementToBeVisible(userRolesTabContainerSelector);
   }
 
   /**
@@ -157,17 +171,36 @@ export class SuperAdmin extends BaseUser {
     await this.goto(communityLibraryUrl);
   }
 
+  /**
+   * Navigates to the Admin Page Platform Parameters Tab.
+   */
   async navigateToAdminPagePlatformParametersTab(): Promise<void> {
     await this.goto(adminPagePlatformParametersTab);
+    await this.expectElementToBeVisible(platformParameterTabContainerSelector);
+  }
+
+  /**
+   * Navigates to the Admin Page Roles Tab.
+   */
+  async expectUserRolesVisualizerToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(
+      userRolesVisualizationContainerSelector
+    );
   }
 
   /**
    * The function to assign a role to a user.
+   * @param {string} username - The username of the user to assign the role to.
+   * @param {string} role - The role to assign to the user.
+   * @param {string | string[]} args - The arguments to pass to the role
+   *     assignment function. For Topic Manager, it should be the topic
+   *     name. For Translation Coordinator, it should be the array of
+   *     language code.
    */
   async assignRoleToUser(
     username: string,
     role: string,
-    topicName?: string
+    args?: string | string[]
   ): Promise<void> {
     await this.goto(adminPageRolesTab);
     await this.type(roleEditorInputField, username);
@@ -186,12 +219,67 @@ export class SuperAdmin extends BaseUser {
         );
         await this.waitForStaticAssetsToLoad();
         if (role === topicManagerRole) {
+          if (typeof args !== 'string') {
+            throw new Error('Expected additional argument to be string.');
+          }
+          const topicName = args as string;
           await this.selectTopicForTopicManagerRole(topicName as string);
+        }
+        if (role === testConstants.Roles.TRANSLATION_COORDINATOR) {
+          for (const language of args as string[]) {
+            await this.selectLanguageForTranslationCoordinatorRole(language);
+          }
+
+          await this.clickOn(languageSelectorCloseButtonSelector);
+          await this.expectElementToBeVisible(
+            languageSelectorCloseButtonSelector,
+            false
+          );
         }
         return;
       }
     }
     throw new Error(`Role ${role} does not exists.`);
+  }
+
+  private async selectLanguageForTranslationCoordinatorRole(
+    language: string
+  ): Promise<void> {
+    const visible = await this.isElementVisible(
+      selectedLanguageSelector,
+      true,
+      5000
+    );
+    const initalNumberOfLanguages = !visible
+      ? 0
+      : (await this.page.$$(selectedLanguageSelector)).length;
+    const selectElementSelector = `${languageSelectorBodySelector} select`;
+
+    // Page updates select value to the first option by default.
+    // If we don't wait for the page to update the value, we end up in race
+    // condition where the page updates the value to the first option after
+    // we select the language.
+    await this.page.waitForFunction(
+      (selector: string) => {
+        const element = document.querySelector(selector);
+        return element && (element as HTMLSelectElement).value;
+      },
+      {},
+      selectElementSelector
+    );
+    await this.select(selectElementSelector, language);
+
+    await this.clickOn(addLanguageButtonSelector);
+
+    await this.page.waitForFunction(
+      (selector: string, numberOfLanguages: number) => {
+        const elements = document.querySelectorAll(selector);
+        return elements.length === numberOfLanguages;
+      },
+      {},
+      selectedLanguageSelector,
+      initalNumberOfLanguages + 1
+    );
   }
 
   /**
@@ -368,24 +456,29 @@ export class SuperAdmin extends BaseUser {
   /**
    * Checks if the specified users are assigned to the current role.
    * @param {string[]} users - An array of usernames to check.
+   * @param {boolean} present - Whether the users should be present or not.
    */
-  async expectRoleToHaveAssignedUsers(users: string[]): Promise<void> {
+  async expectRoleToHaveAssignedUsers(
+    users: string[],
+    present: boolean = true
+  ): Promise<void> {
     await this.clickOn(' Assigned users ');
 
     for (const user of users) {
       try {
         await this.page.waitForFunction(
-          (user: string) => {
+          (user: string, present: boolean) => {
             const regex = new RegExp(`\\b${user}\\b`);
-            return regex.test(document.documentElement.outerHTML);
+            return regex.test(document.documentElement.outerHTML) === present;
           },
-          {},
-          user
+          {timeout: 10000},
+          user,
+          present
         );
       } catch (error) {
         if (error instanceof puppeteer.errors.TimeoutError) {
           const newError = new Error(
-            `User "${user}" is not assigned to the role`
+            `User "${user}" is ${present ? 'not ' : ''}assigned to the role`
           );
           newError.stack = error.stack;
           throw newError;
@@ -850,6 +943,7 @@ export class SuperAdmin extends BaseUser {
       await addRuleButton.click();
 
       await this.waitForElementToBeClickable(addConditionButton);
+      await this.waitForElementToStabilize(addConditionButton);
       await this.clickOn(addConditionButton);
 
       await this.page.waitForSelector(serverModeSelector, {visible: true});
@@ -857,9 +951,10 @@ export class SuperAdmin extends BaseUser {
       await this.page.select(serverModeSelector, condition);
 
       await this.waitForElementToBeClickable(paramValueInput);
+      await this.clearAllTextFrom(paramValueInput);
       await this.page.type(paramValueInput, ruleValue);
 
-      await this.expectInputValueToBe(paramValueInput, ruleValue);
+      await this.expectElementValueToBe(paramValueInput, ruleValue);
       showMessage('Rule added successfully.');
     } catch (error) {
       console.error(
@@ -892,15 +987,26 @@ export class SuperAdmin extends BaseUser {
       }
       await this.waitForElementToBeClickable(editButton);
       await editButton.click();
-      await platformParameter.waitForSelector(paramValueInput, {visible: true});
-      const valueInputs = await platformParameter.$$(paramValueInput);
-      await valueInputs[1].type(value);
+
+      const deafultValueInputSelector = `${platformParameterDefaultValueContainerSelector} ${paramValueInput}`;
+      const inputElement = await platformParameter.waitForSelector(
+        deafultValueInputSelector,
+        {visible: true}
+      );
+
+      if (!inputElement) {
+        throw new Error(
+          `Input field not found for platform parameter "${platformParam}".`
+        );
+      }
+
+      await inputElement.type(value);
       await this.page.waitForFunction(
         (element: Element, value: string) => {
           return (element as HTMLInputElement).value.trim() === value.trim();
         },
         {},
-        valueInputs[1],
+        inputElement,
         value
       );
       showMessage('Default value changed successfully.');
@@ -1221,6 +1327,35 @@ export class SuperAdmin extends BaseUser {
     await toggle.click();
     await this.page.waitForSelector(saveAutogenerationToggleButtonSelector);
     await this.clickOn(saveAutogenerationToggleButtonSelector);
+  }
+
+  /**
+   * Checks if a platform parameter is visible.
+   * @param {string} parameterName - The name of the platform parameter.
+   */
+  async expectPlatformParameterToBeVisible(
+    parameterName: string
+  ): Promise<ElementHandle<Element>> {
+    await this.expectElementToBeVisible(platformParameterSelector);
+
+    // Get all platform parameter containers.
+    const platformParameterContainerElements = await this.page.$$(
+      platformParameterSelector
+    );
+    const platformParameterContainerNames = await this.page.$$eval(
+      `${platformParameterSelector} ${platformParameterNameSelector}`,
+      elements => elements.map(element => element.textContent?.trim())
+    );
+
+    // Check if the platform parameter is present in the container.
+    const index = platformParameterContainerNames.indexOf(parameterName);
+    if (index === -1) {
+      throw new Error(
+        `Platform parameter "${parameterName}" not found in platform parameters.`
+      );
+    }
+
+    return platformParameterContainerElements[index];
   }
 }
 

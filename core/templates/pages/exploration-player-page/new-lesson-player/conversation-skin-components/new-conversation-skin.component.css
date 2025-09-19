@@ -74,7 +74,8 @@ oppia-new-conversation-skin .new-supplemental-card-parent-container {
   margin-left: 12px;
   margin-top: 30px;
   max-width: 650px;
-  position: relative;
+  position: sticky;
+  top: 100px;
   z-index: 2;
 }
 
@@ -109,6 +110,7 @@ oppia-new-conversation-skin .oppia-button-icon {
 
 .oppia-exploration-checkpoints-message .toast-container .checkpoints-toast-info {
   cursor: default;
+  margin-top: 100px;
 }
 
 

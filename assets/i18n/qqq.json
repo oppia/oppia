@@ -934,6 +934,7 @@
 	"I18N_LEARNER_DASHBOARD_GOALS_SECTION_LIST_NODE_TITLE": "Node title for story dropdown in goals tab of learner dashboard",
 	"I18N_LEARNER_DASHBOARD_GOALS_SECTION_LIST_STORY_PROGRESS": "Status of chapters completed for story in goals tab of learner dashboard",
 	"I18N_LEARNER_DASHBOARD_GOALS_SECTION_LIST_STORY_TITLE": "Story title for story dropdown in goals tab of learner dashboard",
+	"I18N_LEARNER_DASHBOARD_GOALS_SECTION_LIST_STORY_TITLE_NEW": "Topic title and Story title for story dropdown in goals tab of learner dashboard",
 	"I18N_LEARNER_DASHBOARD_GOALS_SECTION_MODAL_CANCEL": "Text for cancel button in modal to add goals for the goals section in the learner dashboard",
 	"I18N_LEARNER_DASHBOARD_GOALS_SECTION_MODAL_HEADING": "Heading text in modal to add goals for the goals section in the learner dashboard",
 	"I18N_LEARNER_DASHBOARD_GOALS_SECTION_MODAL_INSTRUCTIONS": "Instructions in modal to add goals for the goals section in the learner dashboard",
