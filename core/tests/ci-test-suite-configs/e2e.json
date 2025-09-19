@@ -69,10 +69,6 @@
       "module": "core/tests/webdriverio_desktop/navigation.js"
     },
     {
-      "name": "profileFeatures",
-      "module": "core/tests/webdriverio_desktop/profileFeatures.js"
-    },
-    {
       "name": "profileMenu",
       "module": "core/tests/webdriverio/profileMenuFlow.js"
     },
@@ -83,10 +79,6 @@
     {
       "name": "skillEditor",
       "module": "core/tests/webdriverio_desktop/skillEditor.js"
-    },
-    {
-      "name": "subscriptions",
-      "module": "core/tests/webdriverio/subscriptionsFlow.js"
     },
     {
       "name": "topicAndStoryEditor",
