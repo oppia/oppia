@@ -557,8 +557,8 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/blog-post-writer/create-and-edit-blog-post.spec.ts"
     },
     {
-      "name": "curriculum-admin/create-publish-unpublish-and-delete-topic-and-skill",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/curriculum-admin/create-publish-unpublish-and-delete-topic-and-skill.spec.ts"
+      "name": "curriculum-admin/create-publish-unpublish-and-delete-the-topic-and-skill",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/curriculum-admin/create-publish-unpublish-and-delete-the-topic-and-skill.spec.ts"
     },
     {
       "name": "curriculum-admin/create-edit-and-delete-a-classroom",

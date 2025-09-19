@@ -2454,6 +2454,7 @@ export class CurriculumAdmin extends BaseUser {
         }
 
         await this.page.waitForSelector(deleteClassroomModal, {visible: true});
+        await this.waitForElementToStabilize(confirmDeleteClassroomButton);
         await this.clickOn(confirmDeleteClassroomButton);
         await this.page.waitForSelector(deleteClassroomModal, {hidden: true});
 
