@@ -293,7 +293,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                     '--output-file', 'requirements.txt',
                 ],
                 [
-                    'python', '-m', 'pip', 'install', '--require-hashes',
+                    sys.executable, '-m', 'pip', 'install', '--require-hashes',
                     '--no-deps', '--target',
                     common.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--no-dependencies',
@@ -344,27 +344,27 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                     '--output-file', 'requirements.txt',
                 ],
                 [
-                    'python', '-m', 'pip', 'install',
+                    sys.executable, '-m', 'pip', 'install',
                     '%s#egg=git-dep1' % (
                         self.get_git_version_string('git-dep1', 'a')),
                     '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--upgrade', '--no-dependencies',
                 ],
                 [
-                    'python', '-m', 'pip', 'install',
+                    sys.executable, '-m', 'pip', 'install',
                     '%s#egg=git-dep2' % (
                         self.get_git_version_string('git-dep2', 'a')),
                     '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--upgrade', '--no-dependencies',
                 ],
                 [
-                    'python', '-m', 'pip', 'install',
+                    sys.executable, '-m', 'pip', 'install',
                     '%s==%s' % ('flask', '1.1.0.1'),
                     '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--upgrade', '--no-dependencies',
                 ],
                 [
-                    'python', '-m', 'pip', 'install',
+                    sys.executable, '-m', 'pip', 'install',
                     '%s==%s' % ('six', '1.16.0'),
                     '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--upgrade', '--no-dependencies',
@@ -425,7 +425,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                     '--output-file', 'requirements.txt',
                 ],
                 [
-                    'python', '-m', 'pip', 'install', '--require-hashes',
+                    sys.executable, '-m', 'pip', 'install', '--require-hashes',
                     '--no-deps', '--target',
                     common.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--no-dependencies', '-r',
@@ -510,6 +510,9 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         self.assertEqual(print_statements, [
             'Checking if pip is installed on the local machine',
             'Regenerating "requirements.txt" file...',
+            'Printing diff in requirements.in:',
+            '--------------------------',
+            '--------------------------',
             'All third-party Python libraries are already installed '
             'correctly.'
         ])
@@ -577,25 +580,25 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                     '--output-file', 'requirements.txt',
                 ],
                 [
-                    'python', '-m', 'pip', 'install',
+                    sys.executable, '-m', 'pip', 'install',
                     '%s==%s' % ('flask', '1.1.1'),
                     '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--upgrade', '--no-dependencies',
                 ],
                 [
-                    'python', '-m', 'pip', 'install',
+                    sys.executable, '-m', 'pip', 'install',
                     '%s==%s' % ('webencodings', '1.1.1'),
                     '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--upgrade', '--no-dependencies',
                 ],
                 [
-                    'python', '-m', 'pip', 'install',
+                    sys.executable, '-m', 'pip', 'install',
                     '%s==%s' % ('six', '1.16.0'),
                     '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--upgrade', '--no-dependencies',
                 ],
                 [
-                    'python', '-m', 'pip', 'install',
+                    sys.executable, '-m', 'pip', 'install',
                     '%s==%s' % ('google-cloud-datastore', '1.15.0'),
                     '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--upgrade', '--no-dependencies',
