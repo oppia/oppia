@@ -563,6 +563,46 @@
     {
       "name": "practice-question-coordinator/add-and-remove-question-rights",
       "module": "core/tests/puppeteer-acceptance-tests/specs/practice-question-coordinator/add-and-remove-question-rights.spec.ts"
+    },
+    {
+      "name": "release-coordinator/enable-feature-flag",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/release-coordinator/enable-feature-flag.spec.ts"
+    },
+    {
+      "name": "release-coordinator/enable-the-promo-bar",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/release-coordinator/enable-the-promo-bar.spec.ts"
+    },
+    {
+      "name": "release-coordinator/flush-the-memory-cache",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/release-coordinator/flush-the-memory-cache.spec.ts"
+    },
+    {
+      "name": "release-coordinator/navigate-to-the-release-coordinator-page-beam-jobs-tab",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/release-coordinator/navigate-to-the-release-coordinator-page-beam-jobs-tab.spec.ts"
+    },
+    {
+      "name": "super-admin/edit-platform-parameter",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/super-admin/edit-platform-parameter.spec.ts"
+    },
+    {
+      "name": "super-admin/edit-users-role",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/super-admin/edit-users-role.spec.ts"
+    },
+    {
+      "name": "super-admin/use-misc-tab-feature",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/super-admin/use-misc-tab-feature.spec.ts"
+    },
+    {
+      "name": "site-moderator/check-recent-commits",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/site-moderator/check-recent-commits.spec.ts"
+    },
+    {
+      "name": "site-moderator/check-recent-feedback-messages",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/site-moderator/check-recent-feedback-messages.spec.ts"
+    },
+    {
+      "name": "site-moderator/featured-activities-section",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/site-moderator/featured-activities-section.spec.ts"
     }
   ],
   "docker_suites": []
