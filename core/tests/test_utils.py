@@ -591,10 +591,11 @@ class ElasticSearchStub:
             'resource.type': 'index_or_alias',
             'resource.id': index
         }
+        meta = type('Meta', (), {'status': 404})()
         body = {'status': 404, 'error': error_data}
         raise elasticsearch.NotFoundError(
             'index_not_found_exception: no such index [%s]' % index,
-            None,
+            meta,
             body
         )
 
@@ -618,10 +619,11 @@ class ElasticSearchStub:
                 'index': index,
                 'index_uuid': 'RaNdOmStRiNgOfAlPhAs'
             }
+            meta = type('Meta', (), {'status': 404})()
             body = {'error': error_data, 'status': 400}
             raise elasticsearch.RequestError(
                 f'resource_already_exists_exception: index [{index}/RaNdOmStRiNgOfAlPhAs] already exists',
-                None,
+                meta,
                 body
             )
         self._DB[index] = []
@@ -744,9 +746,10 @@ class ElasticSearchStub:
             '_seq_no': 103,
             '_primary_term': 1
         }
+        meta = type('Meta', (), {'status': 404})()
         raise elasticsearch.NotFoundError(
             f'document not found: [{index}][{id_}]',
-            None,
+            meta,
             body
         )
 
