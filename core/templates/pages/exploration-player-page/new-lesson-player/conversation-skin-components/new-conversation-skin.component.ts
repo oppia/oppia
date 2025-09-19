@@ -189,17 +189,24 @@ export class NewConversationSkinComponent {
           this.playerTranscriptService.resetNumberOfIncorrectSubmissions();
           this.conversationFlowService.setNextCardIfStuck(null);
           this.continueToReviseStateButtonIsVisible = false;
-          const stateData = this.explorationEngineService.getStateFromStateName(
-            newCard.getStateName()
-          );
+          let pathnameArray = this.urlService.getPathname().split('/');
 
-          if (stateData.cardIsCheckpoint) {
-            this.checkpointCelebrationIsShown = true;
+          if (
+            pathnameArray.includes('lesson') &&
+            !pathnameArray.includes('embed')
+          ) {
+            const stateData =
+              this.explorationEngineService.getStateFromStateName(
+                newCard.getStateName()
+              );
+
+            if (stateData.cardIsCheckpoint) {
+              this.checkpointCelebrationIsShown = true;
+              setTimeout(() => {
+                this.checkpointCelebrationIsShown = false;
+              }, 5000);
+            }
           }
-
-          setTimeout(() => {
-            this.checkpointCelebrationIsShown = false;
-          }, 5000);
 
           this.conversationFlowService.triggerIfLearnerStuckAction(true, () => {
             this.continueToReviseStateButtonIsVisible = true;

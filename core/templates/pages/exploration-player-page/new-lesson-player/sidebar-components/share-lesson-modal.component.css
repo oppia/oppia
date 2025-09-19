@@ -18,6 +18,10 @@ oppia-share-lesson-modal .oppia-share-lesson-modal-title {
   text-align: center;
 }
 
+textarea::-webkit-scrollbar {
+  display: none;
+}
+
 oppia-share-lesson-modal .modal-body {
   display: flex;
   flex-direction: column;
@@ -104,6 +108,7 @@ oppia-share-lesson-modal .cc-attribution a:hover {
 }
 
 oppia-share-lesson-modal .cc-attribution-input {
+  background-color: #ddd;
   border: 1px solid #0d48a1;
   border-radius: 4px;
   padding: 10px;
