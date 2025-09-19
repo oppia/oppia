@@ -27,7 +27,7 @@ from typing import List, Optional
 
 INSTALLATION_TOOL_VERSIONS = {
     'pip': '25.2',
-    'pip-tools': '7.5.0',
+    'pip-tools': '7.4.1',
     'setuptools': '80.9.0',
 }
 REQUIREMENTS_DEV_FILE_PATH = 'requirements_dev.in'
