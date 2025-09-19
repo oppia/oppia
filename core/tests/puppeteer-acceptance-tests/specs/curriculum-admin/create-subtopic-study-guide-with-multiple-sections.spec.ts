@@ -115,6 +115,9 @@ describe('Curriculum Admin', function () {
     );
     await curriculumAdmin.deleteStudyGuideSection(1);
     await curriculumAdmin.saveTopicDraft('Addition and Subtraction');
+  });
+
+  it('should preview a study guide.', async function () {
     await curriculumAdmin.previewStudyGuide();
     await curriculumAdmin.expectSubtopicStudyGuideToHaveTitleAndSections(
       'subtopic1',
