@@ -22,8 +22,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
-import {PageContextService} from 'services/page-context.service';
 import {ExplorationEngineService} from './exploration-engine.service';
 import {PlayerTranscriptService} from './player-transcript.service';
 import {ComputeGraphService} from 'services/compute-graph.service';
@@ -38,15 +36,13 @@ export class CheckpointProgressService {
   visitedCheckpointStateNames: string[] = [];
 
   constructor(
-    private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
-    private pageContextService: PageContextService,
     private playerTranscriptService: PlayerTranscriptService,
     private explorationEngineService: ExplorationEngineService,
     private computeGraphService: ComputeGraphService,
     private stateGraphLayoutService: StateGraphLayoutService
   ) {}
 
-  try() {
+  extractDepthGraph() {
     const graphData = this.computeGraphService.compute(
       this.explorationEngineService.getInitialStateName(),
       this.explorationEngineService.getExploration().states
@@ -58,7 +54,7 @@ export class CheckpointProgressService {
       graphData.finalStateIds
     );
 
-    let depthGraph = {};
+    let depthGraph: {[stateName: string]: number} = {};
     forEach(computedNodes, node => {
       depthGraph[node.id] = node.depth;
     });
@@ -67,7 +63,7 @@ export class CheckpointProgressService {
   }
 
   getMaxStateDepth(): number {
-    const depthGraph = this.try();
+    const depthGraph = this.extractDepthGraph();
     let maxDepth = 0;
     for (let stateName in depthGraph) {
       if (depthGraph[stateName] > maxDepth) {
@@ -78,13 +74,13 @@ export class CheckpointProgressService {
   }
 
   getCheckpointStates(): number[] {
-    const depthGraph = this.try();
+    const depthGraph = this.extractDepthGraph();
     const expStates = this.explorationEngineService
       .getExploration()
       .states.getStates();
     let checkpointIndexes: number[] = [];
     for (let value of expStates) {
-      if (value.cardIsCheckpoint) {
+      if (value.cardIsCheckpoint && value.name !== null) {
         checkpointIndexes.push(depthGraph[value.name]);
       }
     }
