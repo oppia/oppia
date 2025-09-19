@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import argparse
+import difflib
 import os
 import subprocess
 import sys
@@ -129,7 +130,7 @@ def compile_pip_requirements(
         bool. Whether the compiled dev requirements file was changed.
     """
     with open(compiled_path, 'r', encoding='utf-8') as f:
-        old_compiled = f.read()
+        old_compiled = f.readlines()
     subprocess.run(
         [
             'pip-compile', '--no-emit-index-url', '--quiet',
@@ -140,7 +141,14 @@ def compile_pip_requirements(
         encoding='utf-8',
     )
     with open(compiled_path, 'r', encoding='utf-8') as f:
-        new_compiled = f.read()
+        new_compiled = f.readlines()
+
+    diff = difflib.unified_diff(old_compiled, new_compiled, lineterm='')
+    print('Printing diff in %s:' % requirements_path)
+    print('--------------------------')
+    for line in diff:
+        print(line)
+    print('--------------------------')
 
     return old_compiled != new_compiled
 
