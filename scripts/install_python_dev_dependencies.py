@@ -130,7 +130,7 @@ def compile_pip_requirements(
         bool. Whether the compiled dev requirements file was changed.
     """
     with open(compiled_path, 'r', encoding='utf-8') as f:
-        old_compiled = f.readlines()
+        old_compiled = list(f.readlines())
     subprocess.run(
         [
             'pip-compile', '--no-emit-index-url', '--quiet',
@@ -141,16 +141,29 @@ def compile_pip_requirements(
         encoding='utf-8',
     )
     with open(compiled_path, 'r', encoding='utf-8') as f:
-        new_compiled = f.readlines()
+        new_compiled = list(f.readlines())
 
-    diff = difflib.unified_diff(old_compiled, new_compiled, lineterm='')
+    # The options to pip-compile sometimes differ on regeneration (e.g.
+    # cert=None might be passed), so we skip the pip-compile line and those
+    # above it when computing the diff.
+    old_pip_compile_line_index = [
+        i for i, value in enumerate(old_compiled)
+        if value.startswith('#    pip-compile')][0]
+    new_pip_compile_line_index = [
+        i for i, value in enumerate(new_compiled)
+        if value.startswith('#    pip-compile')][0]
+
+    diff = list(difflib.unified_diff(
+        old_compiled[old_pip_compile_line_index + 1:],
+        new_compiled[new_pip_compile_line_index + 1:],
+        lineterm=''))
     print('Printing diff in %s:' % requirements_path)
     print('--------------------------')
     for line in diff:
         print(line)
     print('--------------------------')
 
-    return old_compiled != new_compiled
+    return bool(diff)
 
 
 def main(cli_args: Optional[List[str]] = None) -> None:
