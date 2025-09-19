@@ -86,7 +86,6 @@ import elasticsearch
 import requests_mock
 import webapp2
 import webtest
-from elastic_transport import ApiResponseMeta, NodeConfig
 from typing import (
     Any,
     Callable,
@@ -592,18 +591,10 @@ class ElasticSearchStub:
             'resource.type': 'index_or_alias',
             'resource.id': index
         }
-        dummy_node = NodeConfig(scheme='http', host=feconf.ES_HOST, port=feconf.ES_LOCALHOST_PORT)
-        meta = ApiResponseMeta(
-            status=404,
-            http_version='1.1',
-            headers={'content-type': 'application/json'},
-            duration=0.1,
-            node=dummy_node
-        )
         body = {'status': 404, 'error': error_data}
         raise elasticsearch.NotFoundError(
             'index_not_found_exception: no such index [%s]' % index,
-            meta,
+            None,
             body
         )
 
@@ -627,18 +618,10 @@ class ElasticSearchStub:
                 'index': index,
                 'index_uuid': 'RaNdOmStRiNgOfAlPhAs'
             }
-            dummy_node = NodeConfig(scheme='http', host=feconf.ES_HOST, port=feconf.ES_LOCALHOST_PORT)
-            meta = ApiResponseMeta(
-                status=400,
-                http_version='1.1',
-                headers={'content-type': 'application/json'},
-                duration=0.1,
-                node=dummy_node
-            )
             body = {'error': error_data, 'status': 400}
             raise elasticsearch.RequestError(
                 f'resource_already_exists_exception: index [{index}/RaNdOmStRiNgOfAlPhAs] already exists',
-                meta,
+                None,
                 body
             )
         self._DB[index] = []
@@ -761,17 +744,9 @@ class ElasticSearchStub:
             '_seq_no': 103,
             '_primary_term': 1
         }
-        dummy_node = NodeConfig(scheme='http', host=feconf.ES_HOST, port=feconf.ES_LOCALHOST_PORT)
-        meta = ApiResponseMeta(
-            status=404,
-            http_version='1.1',
-            headers={'content-type': 'application/json'},
-            duration=0.1,
-            node=dummy_node
-        )
         raise elasticsearch.NotFoundError(
             f'document not found: [{index}][{id_}]',
-            meta,
+            None,
             body
         )
 
