@@ -50,7 +50,7 @@ oppia-new-conversation-skin .new-supplemental-card-parent-container {
   display: flex;
   justify-content: center;
   margin: 0 auto;
-  margin-bottom: 100px;
+  margin-bottom: 50px;
   padding: 56px 14px 0;
   padding-bottom: 50px;
   width: 100%;
@@ -142,7 +142,7 @@ oppia-card-navigation-control {
 @media (max-width: 480px) {
   .new-conversation-skin-cards-container {
     display: block;
-    padding: 0 50px 20px 8px;
+    padding: 0 50px 50px 8px;
     position: relative;
     width: 100%;
   }

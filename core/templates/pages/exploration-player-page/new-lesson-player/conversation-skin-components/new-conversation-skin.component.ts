@@ -189,8 +189,14 @@ export class NewConversationSkinComponent {
           this.playerTranscriptService.resetNumberOfIncorrectSubmissions();
           this.conversationFlowService.setNextCardIfStuck(null);
           this.continueToReviseStateButtonIsVisible = false;
+          const stateData = this.explorationEngineService.getStateFromStateName(
+            newCard.getStateName()
+          );
 
-          this.checkpointCelebrationIsShown = true;
+          if (stateData.cardIsCheckpoint) {
+            this.checkpointCelebrationIsShown = true;
+          }
+
           setTimeout(() => {
             this.checkpointCelebrationIsShown = false;
           }, 5000);

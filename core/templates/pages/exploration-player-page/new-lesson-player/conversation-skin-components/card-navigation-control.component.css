@@ -6,6 +6,9 @@
 */
 
 oppia-progress-tracker {
+  left: 50%;
+  position: fixed;
+  transform: translateX(-50%);
   width: 375px;
 }
 
@@ -98,6 +101,15 @@ oppia-progress-tracker {
   width: 44px;
 }
 
+.card-navigation-control .control-container {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  max-width: 850px;
+  transform: translateX(3%);
+  width: 100%;
+}
+
 /*
   The comment in the section below is an rtlcss value directive mentioned here:
   https://rtlcss.com/learn/usage-guide/value-directives/, which tells rtlcss
@@ -133,6 +145,7 @@ oppia-progress-tracker {
   text-align: left;
 }
 
+
 /*
   The comment in the section below is an rtlcss value directive mentioned here:
   https://rtlcss.com/learn/usage-guide/value-directives/, which tells rtlcss
@@ -154,10 +167,21 @@ oppia-progress-tracker {
   text-transform: uppercase;
 }
 
+@media (max-width: 1024px) {
+  .card-navigation-control .control-container {
+    max-width: 790px;
+    transform: translateX(0);
+  } 
+}
+
 @media (max-width: 768px) {
   oppia-progress-tracker {
     width: 175px;
   }
+
+  .card-navigation-control .control-container {
+    max-width: 650px;
+  } 
 }
 
 @media (max-width: 480px) {
