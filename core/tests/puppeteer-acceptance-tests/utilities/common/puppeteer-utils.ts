@@ -1862,6 +1862,38 @@ export class BaseUser {
     // If no pattern matches, throw an error.
     throw new Error(`Unable to parse date string: "${dateString}"`);
   }
+
+  /**
+   * Waits for the transition end of the given element.
+   * @param element The element to wait for.
+   */
+  async waitForTransitionEnd(element: ElementHandle<Element>): Promise<void> {
+    await this.page.evaluate(element => {
+      return new Promise<void>(resolve => {
+        const transition = document.querySelector(element);
+        const onEnd = function () {
+          transition.removeEventListener('transitionend', onEnd);
+          resolve();
+        };
+        transition.addEventListener('transitionend', onEnd);
+      });
+    }, element);
+  }
+
+  /**
+   * Clicks on the given element after waiting for it to be clickable.
+   * Note: This function does not have post-check.
+   * @param element The element to click on.
+   * @param options The options to pass to the click function.
+   */
+  async clickOnElement(
+    element: ElementHandle<Element>,
+    options: puppeteer.ClickOptions = {}
+  ): Promise<void> {
+    await this.waitForElementToBeClickable(element);
+    await this.waitForTransitionEnd(element);
+    await element.click(options);
+  }
 }
 
 export const BaseUserFactory = (): BaseUser => new BaseUser();

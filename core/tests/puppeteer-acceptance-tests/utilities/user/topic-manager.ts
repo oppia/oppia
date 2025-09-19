@@ -1637,8 +1637,6 @@ export class TopicManager extends BaseUser {
   async filterAndSelectSkillInSkillSelector(skillName: string): Promise<void> {
     // Searching by skill name.
     await this.fillSkillNameInSkillSelectionModal(skillName);
-
-    // TODO: replace this with new function, once checked that new function works.
     await this.selectSkillAndClickOnDoneInSkillSelectionModal(skillName);
   }
 
@@ -3825,7 +3823,7 @@ export class TopicManager extends BaseUser {
   async openQuestionEditor(question: string): Promise<void> {
     const questionElement = await this.expectQuestionToBeVisible(question);
 
-    await questionElement.click();
+    await this.clickOnElement(questionElement);
     await this.expectElementToBeVisible(addQuestionButtonSelector, false);
   }
 
@@ -3939,7 +3937,7 @@ export class TopicManager extends BaseUser {
       throw new Error('Delete button not found');
     }
 
-    await deleteButton.click();
+    await this.clickOnElement(deleteButton);
     await this.clickOn('Delete Story');
   }
 

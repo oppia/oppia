@@ -6669,7 +6669,9 @@ export class ExplorationEditor extends BaseUser {
     const element = elements[index];
 
     // Clear all text from the element.
-    await element.click({clickCount: 3});
+    await this.clickOnElement(element, {
+      clickCount: 3,
+    });
     await this.page.keyboard.press('Backspace');
 
     await this.type(element, value);
@@ -6699,7 +6701,7 @@ export class ExplorationEditor extends BaseUser {
     if (elements.length < index + 1) {
       throw new Error(`Element ${index} not found.`);
     }
-    await elements[index].click();
+    await this.clickOnElement(elements[index]);
     await this.page.waitForFunction(
       (element: HTMLElement, className: string) => {
         return element.className.includes(className);
