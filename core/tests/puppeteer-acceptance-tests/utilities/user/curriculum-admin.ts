@@ -1130,9 +1130,11 @@ export class CurriculumAdmin extends BaseUser {
    */
   async addSkillToDiagnosticTest(
     skillName: string,
-    topicName: string
+    topicName?: string
   ): Promise<void> {
-    await this.openTopicEditor(topicName);
+    if (topicName) {
+      await this.openTopicEditor(topicName);
+    }
     await this.clickOn(addDiagnosticTestSkillButton);
     await this.page.waitForSelector(diagnosticTestSkillSelector, {
       visible: true,
@@ -1394,9 +1396,11 @@ export class CurriculumAdmin extends BaseUser {
     storyUrlFragment: string,
     chapterTitle: string,
     explorationId: string,
-    topicName: string
+    topicName?: string
   ): Promise<void> {
-    await this.openTopicEditor(topicName);
+    if (topicName) {
+      await this.openTopicEditor(topicName);
+    }
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileStoryDropdown);
     }

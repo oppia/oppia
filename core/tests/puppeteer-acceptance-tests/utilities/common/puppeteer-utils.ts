@@ -516,7 +516,6 @@ export class BaseUser {
       waitUntil: ['networkidle2', 'load'],
     });
 
-    await this.waitForElementToStabilize(selector);
     await this.clickOn(selector, false);
     await navigationPromise;
   }
