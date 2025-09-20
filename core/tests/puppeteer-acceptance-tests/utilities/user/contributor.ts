@@ -59,6 +59,10 @@ const selectedLanguageSelector = '.e2e-test-language-selector-selected';
 const featuredLanguageOptionSelector = '.e2e-test-featured-language';
 const languageOptionSelector = '.e2e-test-language-selector-option';
 const rteDisplaySelector = '.e2e-test-state-content-display';
+const featuredLanguageContainerSelector =
+  '.e2e-test-featured-language-container';
+const featuredLanguageExplainationSelector =
+  '.e2e-test-language-selector-featured-explanation';
 
 export class Contributor extends ExplorationEditor {
   /**
@@ -572,15 +576,23 @@ export class Contributor extends ExplorationEditor {
   }
 
   /**
-   * Clicks on language selection dropdown and selects the given language.
-   * @param language - The language to select.
+   * Clicks on the language filter dropdown.
    */
-  async selectLanguageFilter(language: string): Promise<void> {
+  async clickOnLanguageFilterDropdown(): Promise<void> {
     // Open the language selector dropdown.
     await this.expectElementToBeVisible(languageSelector);
     await this.clickOn(languageSelector);
     await this.waitForPageToFullyLoad();
 
+    await this.expectElementToBeVisible(languageOptionSelector);
+  }
+
+  /**
+   * Clicks on language selection dropdown and selects the given language.
+   * @param language - The language to select.
+   */
+  async selectLanguageFilter(language: string): Promise<void> {
+    await this.clickOnLanguageFilterDropdown();
     // Find the language option in the dropdown.
     let languageOption: ElementHandle<Element> | null = null;
     for (const optionSelector of [
@@ -614,6 +626,64 @@ export class Contributor extends ExplorationEditor {
 
     // Verify language is selected.
     await this.expectTextContentToContain(selectedLanguageSelector, language);
+  }
+
+  /**
+   * Checks if the selected filter language is present or not.
+   * @param language - The language to check.
+   */
+  async expectSelectedFilterLanguageToBe(language: string): Promise<void> {
+    await this.expectTextContentToContain(selectedLanguageSelector, language);
+  }
+
+  /**
+   * Checks if the featured languages are present or not.
+   * @param expectedLanguages - The expected languages.
+   */
+  async expectFeaturedLangaugesToContain(
+    expectedLanguages: string[]
+  ): Promise<void> {
+    await this.expectElementToBeVisible(featuredLanguageContainerSelector);
+    const featuredLanguages = await this.page.$$eval(
+      featuredLanguageOptionSelector,
+      elements =>
+        elements.map(el => el.textContent?.replace('info', '').trim() || '')
+    );
+
+    for (const expectedLanguage of expectedLanguages) {
+      if (!featuredLanguages.includes(expectedLanguage)) {
+        throw new Error(
+          'Featured language not found.\n' +
+            `Expected: ${expectedLanguage}\n` +
+            `Found: ${featuredLanguages.join(', ')}`
+        );
+      }
+    }
+  }
+
+  /**
+   * Mouse over the featured language tooltip.
+   * @param index - The index of the featured language.
+   * @param tooltipMessage - The expected tooltip message.
+   */
+  async mouseOverFeaturedLanguageTooltip(
+    index: number,
+    tooltipMessage: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(featuredLanguageContainerSelector);
+    const featuredLanguagesElements = await this.page.$$(
+      featuredLanguageOptionSelector
+    );
+    await featuredLanguagesElements[index].hover();
+
+    await this.expectTextContentToBe(
+      featuredLanguageExplainationSelector,
+      tooltipMessage
+    );
+
+    await this.clickOn(languageSelector);
+
+    await this.expectElementToBeVisible(languageOptionSelector, false);
   }
 
   /**

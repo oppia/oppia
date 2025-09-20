@@ -33,9 +33,20 @@ import {TopicManager} from '../../utilities/user/topic-manager';
 import {TranslationSubmitter} from '../../utilities/user/translation-submitter';
 
 const ROLES = testConstants.Roles;
-const youtubeVideoURL = 'https://www.youtube.com/watch?v=mDfiDLn2Rko';
 
 Error.stackTraceLimit = 20;
+
+const FEATURED_LANGUAGES = [
+  'português (Portuguese)',
+  'العربية (Arabic)',
+  'Naijá (Nigerian Pidgin)',
+  'español (Spanish)',
+  'kiswahili (Swahili)',
+  'हिन्दी (Hindi)',
+  'Harshen Hausa (Hausa)',
+  'Ásụ̀sụ́ Ìgbò (Igbo)',
+  'Èdè Yoùbá (Yoruba)',
+];
 
 describe('Translation Submitter', function () {
   let translationSubmitter: TranslationSubmitter & Contributor & LoggedInUser;
@@ -139,6 +150,18 @@ describe('Translation Submitter', function () {
     await translationSubmitter.expectScreenshotToMatch(
       'translationTabInContributionDashboard',
       __dirname
+    );
+
+    // Should be able to show correct featured languages.
+    await translationSubmitter.clickOnLanguageFilterDropdown();
+    await translationSubmitter.expectFeaturedLangaugesToContain(
+      FEATURED_LANGUAGES
+    );
+
+    // Verify featured language tooltip.
+    await translationSubmitter.mouseOverFeaturedLanguageTooltip(
+      0,
+      'For learners in Brazil, Angola and Mozambique.'
     );
 
     // Change the translation language to hindi.
@@ -298,6 +321,16 @@ describe('Translation Submitter', function () {
     await translationSubmitter.clickOn('Save and close');
     await translationSubmitter.expectToastMessage(
       'Submitted translation for review.'
+    );
+  });
+
+  it('should be able to presist selected translation language', async function () {
+    await translationSubmitter.page.reload();
+    await translationSubmitter.switchToTabInContributionDashboard(
+      'Translate Text'
+    );
+    await translationSubmitter.expectSelectedFilterLanguageToBe(
+      'हिन्दी (Hindi)'
     );
   });
 
