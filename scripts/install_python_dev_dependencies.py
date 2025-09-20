@@ -132,6 +132,11 @@ def compile_pip_requirements(
     """
     with open(compiled_path, 'r', encoding='utf-8') as f:
         old_compiled = list(f.readlines())
+    # Warning: In some CI environments, running this command seems to add
+    # --cert=None --client-cert=None --pip-args=None flags to the pip-compile
+    # command referenced at the start of the compiled requirements file. It is
+    # not clear why this happens, since these args are not explicitly being
+    # passed here. We account for that later below when computing the diff.
     subprocess.run(
         [
             'pip-compile', '--no-emit-index-url', '--quiet',
@@ -154,8 +159,8 @@ def compile_pip_requirements(
         i for i, value in enumerate(new_compiled)
         if value.startswith('#    pip-compile')][0]
     diff = list(difflib.unified_diff(
-        old_compiled[old_pip_compile_line_index:],
-        new_compiled[new_pip_compile_line_index:],
+        old_compiled[old_pip_compile_line_index + 1:],
+        new_compiled[new_pip_compile_line_index + 1:],
         lineterm=''))
     print('Printing diff in %s:' % requirements_path)
     print('--------------------------')
