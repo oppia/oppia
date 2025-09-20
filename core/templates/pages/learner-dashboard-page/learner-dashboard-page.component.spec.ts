@@ -585,20 +585,20 @@ describe('Learner dashboard page', () => {
     }));
 
     interface MockNodeSummary {
-      getExplorationId(): string | null;
+      getExplorationId: () => string | null;
     }
 
     interface MockStorySummary {
-      getAllNodes(): MockNodeSummary[];
+      getAllNodes: () => MockNodeSummary[];
     }
 
     interface MockTopic {
-      getCanonicalStorySummaryDicts(): MockStorySummary[];
+      getCanonicalStorySummaryDicts: () => MockStorySummary[];
     }
 
     it('should not throw error if allTopics is empty', fakeAsync(() => {
       component.allTopics = [];
-      expect(() => component.ngOnInit()).not.toThrow();
+      expect(() => component.ngOnInit()).not.toThrowError();
     }));
 
     it('should safely handle empty story summaries', fakeAsync(() => {
@@ -608,7 +608,7 @@ describe('Learner dashboard page', () => {
 
       component.allTopics = [mockTopic];
 
-      expect(() => component.ngOnInit()).not.toThrow();
+      expect(() => component.ngOnInit()).not.toThrowError();
     }));
 
     it('should skip null explorationIds and collect valid ones', fakeAsync(() => {
@@ -627,7 +627,6 @@ describe('Learner dashboard page', () => {
       flush();
       fixture.detectChanges();
 
-      // curatedExplorationIds removes 'exp123' from incomplete list
       const ids = component.incompleteExplorationsList.map(e => e.id);
       expect(ids).not.toContain('exp123');
     }));
