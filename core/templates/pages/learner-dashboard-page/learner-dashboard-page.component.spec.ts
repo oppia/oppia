@@ -302,7 +302,7 @@ describe('Learner dashboard page', () => {
     isLoggedIn: () => true,
   };
 
-  describe('when succesfully fetching learner dashboard data', () => {
+  describe('when successfully fetching learner dashboard data', () => {
     beforeEach(async(() => {
       mockResizeEmitter = new EventEmitter();
       TestBed.configureTestingModule({
@@ -584,51 +584,122 @@ describe('Learner dashboard page', () => {
       flush();
     }));
 
-    interface MockNodeSummary {
-      getExplorationId: () => string | null;
-    }
-
-    interface MockStorySummary {
-      getAllNodes: () => MockNodeSummary[];
-    }
-
-    interface MockTopic {
-      getCanonicalStorySummaryDicts: () => MockStorySummary[];
-    }
-
-    it('should not throw error if allTopics is empty', fakeAsync(() => {
-      component.allTopics = [];
-      expect(() => component.ngOnInit()).not.toThrowError();
-    }));
-
-    it('should safely handle empty story summaries', fakeAsync(() => {
-      const mockTopic = {
-        getCanonicalStorySummaryDicts: () => [],
-      };
-
-      component.allTopics = [mockTopic];
-
-      expect(() => component.ngOnInit()).not.toThrowError();
-    }));
-
-    it('should skip null explorationIds and collect valid ones', fakeAsync(() => {
-      const mockNode1: MockNodeSummary = {getExplorationId: () => null};
-      const mockNode2: MockNodeSummary = {getExplorationId: () => 'exp123'};
-      const mockStory: MockStorySummary = {
-        getAllNodes: () => [mockNode1, mockNode2],
-      };
-      const mockTopic: MockTopic = {
-        getCanonicalStorySummaryDicts: () => [mockStory],
-      };
-
-      component.allTopics = [mockTopic];
+    it('should populate curated exploration IDs from topics with canonical story summaries', fakeAsync(() => {
+      (
+        learnerDashboardBackendApiService.fetchLearnerDashboardTopicsAndStoriesDataAsync as jasmine.Spy
+      ).and.returnValue(
+        Promise.resolve({
+          completedStoriesList: [],
+          learntTopicsList: [],
+          partiallyLearntTopicsList: [],
+          topicsToLearnList: [],
+          allTopicsList: [
+            {
+              id: 'topic1',
+              getCanonicalStorySummaryDicts: () => [
+                {
+                  getAllNodes: () => [
+                    {getExplorationId: () => '1'},
+                    {getExplorationId: () => '2'},
+                  ],
+                },
+              ],
+            },
+          ],
+          untrackedTopics: {},
+          completedToIncompleteStories: [],
+          learntToPartiallyLearntTopics: [],
+          numberOfNonexistentTopicsAndStories:
+            NonExistentTopicsAndStories.createFromBackendDict({
+              number_of_nonexistent_topics: 0,
+              number_of_nonexistent_stories: 0,
+            }),
+        })
+      );
 
       component.ngOnInit();
       flush();
       fixture.detectChanges();
 
-      const ids = component.incompleteExplorationsList.map(e => e.id);
-      expect(ids).not.toContain('exp123');
+      expect(component.curatedExplorationIds).toBeDefined();
+      expect(component.curatedExplorationIds.size).toBe(2);
+      expect(component.curatedExplorationIds.has('1')).toBeTrue();
+      expect(component.curatedExplorationIds.has('2')).toBeTrue();
+    }));
+
+    it('should handle topics without canonical story summary dicts gracefully', fakeAsync(() => {
+      (
+        learnerDashboardBackendApiService.fetchLearnerDashboardTopicsAndStoriesDataAsync as jasmine.Spy
+      ).and.returnValue(
+        Promise.resolve({
+          completedStoriesList: [],
+          learntTopicsList: [],
+          partiallyLearntTopicsList: [],
+          topicsToLearnList: [],
+          allTopicsList: [
+            {
+              id: 'topic2',
+              getCanonicalStorySummaryDicts: () => [],
+            },
+          ],
+          untrackedTopics: {},
+          completedToIncompleteStories: [],
+          learntToPartiallyLearntTopics: [],
+          numberOfNonexistentTopicsAndStories:
+            NonExistentTopicsAndStories.createFromBackendDict({
+              number_of_nonexistent_topics: 0,
+              number_of_nonexistent_stories: 0,
+            }),
+        })
+      );
+
+      component.ngOnInit();
+      flush();
+      fixture.detectChanges();
+
+      expect(component.curatedExplorationIds).toBeDefined();
+      expect(component.curatedExplorationIds.size).toBe(0);
+    }));
+
+    it('should skip null explorationIds when building curatedExplorationIds', fakeAsync(() => {
+      (
+        learnerDashboardBackendApiService.fetchLearnerDashboardTopicsAndStoriesDataAsync as jasmine.Spy
+      ).and.returnValue(
+        Promise.resolve({
+          completedStoriesList: [],
+          learntTopicsList: [],
+          partiallyLearntTopicsList: [],
+          topicsToLearnList: [],
+          allTopicsList: [
+            {
+              id: 'topic3',
+              getCanonicalStorySummaryDicts: () => [
+                {
+                  getAllNodes: () => [
+                    {getExplorationId: () => 'exp1'},
+                    {getExplorationId: () => null},
+                  ],
+                },
+              ],
+            },
+          ],
+          untrackedTopics: {},
+          completedToIncompleteStories: [],
+          learntToPartiallyLearntTopics: [],
+          numberOfNonexistentTopicsAndStories:
+            NonExistentTopicsAndStories.createFromBackendDict({
+              number_of_nonexistent_topics: 0,
+              number_of_nonexistent_stories: 0,
+            }),
+        })
+      );
+
+      component.ngOnInit();
+      flush();
+      fixture.detectChanges();
+
+      expect(component.curatedExplorationIds.size).toBe(1);
+      expect(component.curatedExplorationIds.has('exp1')).toBeTrue();
     }));
 
     it(

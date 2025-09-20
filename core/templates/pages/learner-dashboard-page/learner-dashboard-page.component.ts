@@ -178,6 +178,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
   totalLessonsInPlaylists: (LearnerExplorationSummary | CollectionSummary)[] =
     [];
   subtopicMasteries: Record<string, SubtopicMasterySummaryBackendDict> = {};
+  curatedExplorationIds = new Set<string>();
 
   constructor(
     private alertsService: AlertsService,
@@ -293,14 +294,13 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     dashboardExplorationsDataPromise.then(
       responseData => {
         this.completedExplorationsList = responseData.completedExplorationsList;
-        const curatedExplorationIds = new Set<string>();
         (this.allTopics || []).forEach(topic => {
           (topic.getCanonicalStorySummaryDicts() || []).forEach(
             storySummary => {
               (storySummary.getAllNodes() || []).forEach(nodeSummary => {
                 const expId = nodeSummary.getExplorationId();
                 if (expId !== null) {
-                  curatedExplorationIds.add(expId);
+                  this.curatedExplorationIds.add(expId);
                 }
               });
             }
@@ -309,7 +309,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
 
         this.incompleteExplorationsList = (
           responseData.incompleteExplorationsList || []
-        ).filter(exp => !curatedExplorationIds.has(exp.id));
+        ).filter(exp => !this.curatedExplorationIds.has(exp.id));
         this.subscriptionsList = responseData.subscriptionList;
         this.explorationPlaylist = responseData.explorationPlaylist;
       },
