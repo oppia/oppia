@@ -297,7 +297,9 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
         this.allTopics.forEach(topic => {
           topic.getCanonicalStorySummaryDicts().forEach(storySummary => {
             storySummary.getAllNodes().forEach(nodeSummary => {
-              curatedExplorationIds.add(nodeSummary.getExplorationId());
+              if (nodeSummary.getExplorationId()) {
+                curatedExplorationIds.add(nodeSummary.getExplorationId());
+              }
             });
           });
         });
