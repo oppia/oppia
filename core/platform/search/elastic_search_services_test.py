@@ -22,7 +22,7 @@ from core.domain import search_services
 from core.platform.search import elastic_search_services
 from core.tests import test_utils
 
-from typing import Any, Dict, List, Sequence, Mapping
+from typing import Any, Dict, List, Mapping, Sequence
 
 
 class ElasticSearchUnitTests(test_utils.GenericTestBase):
@@ -400,7 +400,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         # 'Dict[str, Any]' type, and also in the type stubs the type of body is
         # mentioned as Any.
         def mock_search(
-            body: Dict[str, Any], index: str, from_: int , size: int
+            body: Dict[str, Any], index: str, from_: int, size: int
         ) -> Dict[str, Dict[str, List[str]]]:
             self.assertEqual(body, {
                 'query': {
