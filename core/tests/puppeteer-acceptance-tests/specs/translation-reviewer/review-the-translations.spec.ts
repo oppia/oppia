@@ -98,16 +98,22 @@ describe('Translation Reviewer', function () {
       'The Picnic Problem'
     );
     await translationSubmitter.typeTextForRTE('सामग्री 0');
-    await translationSubmitter.clickOn('Save and translate another');
+    await translationSubmitter.clickOnElementWithText(
+      'Save and translate another'
+    );
     await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE('सामग्री 1');
-    await translationSubmitter.clickOn('Save and translate another');
+    await translationSubmitter.clickOnElementWithText(
+      'Save and translate another'
+    );
     await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE('सामग्री 2');
-    await translationSubmitter.clickOn('Save and translate another');
+    await translationSubmitter.clickOnElementWithText(
+      'Save and translate another'
+    );
     await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE('सामग्री 3');
-    await translationSubmitter.clickOn('Save and close');
+    await translationSubmitter.clickOnElementWithText('Save and close');
 
     // Add translations to "Trading Slices" in Akan.
     await translationSubmitter.selectLanguageFilter('Ákán (Akan)');
@@ -116,10 +122,12 @@ describe('Translation Reviewer', function () {
       'The Picnic Problem'
     );
     await translationSubmitter.typeTextForRTE('सामग्री 0');
-    await translationSubmitter.clickOn('Save and translate another');
+    await translationSubmitter.clickOnElementWithText(
+      'Save and translate another'
+    );
     await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE('सामग्री 1');
-    await translationSubmitter.clickOn('Save and close');
+    await translationSubmitter.clickOnElementWithText('Save and close');
   }, 900000);
 
   it('should be able to view all pending reviews', async function () {
@@ -167,10 +175,10 @@ describe('Translation Reviewer', function () {
     );
 
     // Accept the translation with adding review comment.
-    await translationReviewer.clickOn('Edit');
+    await translationReviewer.clickOnElementWithText('Edit');
     // TODO(#23250): RTE not usable. Once the issue is fixed, uncomment the following line.
     // await translationReviewer.typeTextForRTE('Review comment');
-    await translationReviewer.clickOn('Update');
+    await translationReviewer.clickOnElementWithText('Update');
     await translationReviewer.submitTranslationReview(
       'accept',
       'I have added some changes.'

@@ -84,6 +84,7 @@ export class PracticeQuestionReviewer extends Contributor {
       await this.fillReviewComment(reviewMessage);
     }
 
+    await this.waitForElementToStabilize(buttonSelector);
     await this.clickOn(buttonSelector);
     await this.expectToastMessage('Submitted suggestion review.');
   }

@@ -243,6 +243,7 @@ export class TranslationSubmitter extends BaseUser {
    */
   async clickOnSaveButtonInCustomizeRTEModal(): Promise<void> {
     await this.expectElementToBeVisible(saveRTECustomizationButtonSelector);
+    await this.waitForElementToStabilize(saveRTECustomizationButtonSelector);
     await this.clickOn(saveRTECustomizationButtonSelector);
     await this.expectElementToBeVisible(
       saveRTECustomizationButtonSelector,
