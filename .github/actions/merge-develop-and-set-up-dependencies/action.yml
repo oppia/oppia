@@ -152,6 +152,7 @@ runs:
         cat /home/runner/work/oppia/oppia/requirements_dev.txt
         echo "Contents of requirements.txt (after):"
         cat /home/runner/work/oppia/oppia/requirements.txt
+      shell: bash
 
     - name: Check Yarn Cache
       # Check the yarn cache again to see what packages were just
