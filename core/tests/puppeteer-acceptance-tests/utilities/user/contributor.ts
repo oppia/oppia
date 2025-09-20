@@ -64,6 +64,8 @@ const featuredLanguageContainerSelector =
 const featuredLanguageTooltipSelector = '.e2e-test-featured-language-tooltip';
 const featuredLanguageExplainationSelector =
   '.e2e-test-language-selector-featured-explanation';
+const languageDropdownToggleArrowSelector =
+  '.e2e-test-language-dropdown-toggle-arrow';
 
 export class Contributor extends ExplorationEditor {
   /**
@@ -682,7 +684,7 @@ export class Contributor extends ExplorationEditor {
       tooltipMessage
     );
 
-    await this.clickOn(languageSelector);
+    await this.clickOn(languageDropdownToggleArrowSelector);
 
     await this.expectElementToBeVisible(languageOptionSelector, false);
   }
