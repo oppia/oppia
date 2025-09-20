@@ -293,8 +293,18 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     dashboardExplorationsDataPromise.then(
       responseData => {
         this.completedExplorationsList = responseData.completedExplorationsList;
-        this.incompleteExplorationsList =
-          responseData.incompleteExplorationsList || [];
+        const curatedExplorationIds = new Set<string>();
+        this.allTopics.forEach(topic => {
+          topic.getCanonicalStorySummaryDicts().forEach(storySummary => {
+            storySummary.getAllNodes().forEach(nodeSummary => {
+              curatedExplorationIds.add(nodeSummary.getExplorationId());
+            });
+          });
+        });
+
+        this.incompleteExplorationsList = (
+          responseData.incompleteExplorationsList || []
+        ).filter(exp => !curatedExplorationIds.has(exp.id));
         this.subscriptionsList = responseData.subscriptionList;
         this.explorationPlaylist = responseData.explorationPlaylist;
       },
