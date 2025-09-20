@@ -299,7 +299,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
             storySummary => {
               (storySummary.getAllNodes() || []).forEach(nodeSummary => {
                 const expId = nodeSummary.getExplorationId();
-                if (expId != null) {
+                if (expId !== null) {
                   curatedExplorationIds.add(expId);
                 }
               });
