@@ -61,6 +61,7 @@ const languageOptionSelector = '.e2e-test-language-selector-option';
 const rteDisplaySelector = '.e2e-test-state-content-display';
 const featuredLanguageContainerSelector =
   '.e2e-test-featured-language-container';
+const featuredLanguageTooltipSelector = '.e2e-test-featured-language-tooltip';
 const featuredLanguageExplainationSelector =
   '.e2e-test-language-selector-featured-explanation';
 
@@ -671,10 +672,10 @@ export class Contributor extends ExplorationEditor {
     tooltipMessage: string
   ): Promise<void> {
     await this.expectElementToBeVisible(featuredLanguageContainerSelector);
-    const featuredLanguagesElements = await this.page.$$(
-      featuredLanguageOptionSelector
+    const featuredLanguagesInfoElements = await this.page.$$(
+      featuredLanguageTooltipSelector
     );
-    await featuredLanguagesElements[index].hover();
+    await featuredLanguagesInfoElements[index].hover();
 
     await this.expectTextContentToBe(
       featuredLanguageExplainationSelector,
