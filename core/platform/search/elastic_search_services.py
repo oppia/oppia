@@ -128,7 +128,7 @@ def _fetch_response_from_elastic_search(
     num_docs_to_fetch = size + 1
     try:
         response = ES.get_client().search(
-            **query_definition,
+            body=query_definition,
             index=index_name,
             size=num_docs_to_fetch,
             from_=offset
