@@ -3566,10 +3566,7 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(confirmDiscardButton, {
       visible: true,
     });
-    await Promise.all([
-      this.clickOn(confirmDiscardButton),
-      this.page.waitForNavigation({waitUntil: 'networkidle0'}),
-    ]);
+    await this.clickAndWaitForNavigation(confirmDiscardButton);
     await this.waitForStaticAssetsToLoad();
     await this.expectElementToBeVisible(confirmDiscardButton, false);
   }
