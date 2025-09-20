@@ -2438,6 +2438,7 @@ export class TopicManager extends BaseUser {
       if (!confirmSkillSelectionButtonSelectorElement) {
         throw new Error('Confirm skill selection button selector not found');
       }
+      await this.waitForElementToStabilize(confirmSkillSelectionButtonSelector);
       await this.clickOn(confirmSkillSelectionButtonSelector);
 
       await this.expectElementToBeVisible(

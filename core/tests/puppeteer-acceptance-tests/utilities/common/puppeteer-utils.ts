@@ -1866,18 +1866,24 @@ export class BaseUser {
   /**
    * Waits for the transition end of the given element.
    * @param element The element to wait for.
+   * @param timeout The timeout in milliseconds.
    */
-  async waitForTransitionEnd(element: ElementHandle<Element>): Promise<void> {
-    await this.page.evaluate(element => {
-      return new Promise<void>(resolve => {
-        const transition = document.querySelector(element);
-        const onEnd = function () {
-          transition.removeEventListener('transitionend', onEnd);
-          resolve();
-        };
-        transition.addEventListener('transitionend', onEnd);
-      });
-    }, element);
+  async waitForTransitionEnd(
+    element: ElementHandle<Element>,
+    timeout = 5000
+  ): Promise<void> {
+    await Promise.race([
+      this.page.evaluate(element => {
+        return new Promise<void>(resolve => {
+          const onEnd = () => {
+            element.removeEventListener('transitionend', onEnd);
+            resolve();
+          };
+          element.addEventListener('transitionend', onEnd);
+        });
+      }, element),
+      new Promise<void>(resolve => setTimeout(resolve, timeout)),
+    ]);
   }
 
   /**
