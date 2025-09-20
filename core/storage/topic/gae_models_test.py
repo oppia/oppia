@@ -20,8 +20,7 @@ from __future__ import annotations
 
 from core import feconf
 from core.constants import constants
-from core.domain import topic_domain
-from core.domain import topic_services
+from core.domain import topic_domain, topic_services
 from core.platform import models
 from core.tests import test_utils
 
@@ -29,8 +28,7 @@ from typing import Dict, Final, List
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import topic_models
+    from mypy_imports import base_models, topic_models
 
 (base_models, topic_models, user_models) = models.Registry.import_models([
     models.Names.BASE_MODEL, models.Names.TOPIC, models.Names.USER

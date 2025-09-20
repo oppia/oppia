@@ -80,6 +80,3 @@ debug.log
 
 # Puppeteer acceptance tests.
 jest-runtime-config.json
-
-# Cloud Datastore emulator data
-datastore-emulator-data/

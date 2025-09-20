@@ -29,9 +29,7 @@ import sys
 
 from core import utils
 from core.tests import test_utils
-from scripts import common
-from scripts import install_python_prod_dependencies
-from scripts import scripts_test_utils
+from scripts import common, install_python_prod_dependencies, scripts_test_utils
 
 import pkg_resources
 from typing import Dict, List, Optional, Set, Tuple

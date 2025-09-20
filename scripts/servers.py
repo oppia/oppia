@@ -30,10 +30,16 @@ from core import feconf
 from scripts import common
 
 import psutil
-
 from typing import (
-    Any, Callable, ContextManager, Dict, Iterator, List, Optional, Sequence,
-    Union
+    Any,
+    Callable,
+    ContextManager,
+    Dict,
+    Iterator,
+    List,
+    Optional,
+    Sequence,
+    Union,
 )
 
 

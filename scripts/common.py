@@ -40,7 +40,6 @@ from scripts import servers
 import certifi
 from typing import Dict, Final, Generator, List, Optional, Tuple, Union
 
-
 # Add third_party to path. Some scripts access feconf even before
 # python_libs is added to path.
 _THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')

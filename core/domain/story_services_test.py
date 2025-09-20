@@ -20,20 +20,21 @@ import datetime
 import logging
 import os
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import exp_domain
-from core.domain import exp_services
-from core.domain import fs_services
-from core.domain import param_domain
-from core.domain import story_domain
-from core.domain import story_fetchers
-from core.domain import story_services
-from core.domain import topic_domain
-from core.domain import topic_fetchers
-from core.domain import topic_services
-from core.domain import user_services
+from core.domain import (
+    exp_domain,
+    exp_services,
+    fs_services,
+    param_domain,
+    story_domain,
+    story_fetchers,
+    story_services,
+    topic_domain,
+    topic_fetchers,
+    topic_services,
+    user_services,
+)
 from core.platform import models
 from core.tests import test_utils
 
@@ -41,8 +42,7 @@ from typing import Final, List, Optional
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import story_models
-    from mypy_imports import user_models
+    from mypy_imports import story_models, user_models
 
 (story_models, user_models) = models.Registry.import_models(
     [models.Names.STORY, models.Names.USER])

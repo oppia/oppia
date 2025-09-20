@@ -25,28 +25,27 @@ from __future__ import annotations
 import copy
 import logging
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import caching_services
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import learner_group_services
-from core.domain import opportunity_services
-from core.domain import rights_manager
-from core.domain import story_domain
-from core.domain import story_fetchers
-from core.domain import suggestion_services
-from core.domain import topic_fetchers
+from core.domain import (
+    caching_services,
+    exp_fetchers,
+    exp_services,
+    learner_group_services,
+    opportunity_services,
+    rights_manager,
+    story_domain,
+    story_fetchers,
+    suggestion_services,
+    topic_fetchers,
+)
 from core.platform import models
 
 from typing import List, Sequence, Tuple, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import exp_models
-    from mypy_imports import story_models
-    from mypy_imports import user_models
+    from mypy_imports import exp_models, story_models, user_models
 
 (exp_models, story_models, user_models,) = models.Registry.import_models(
     [models.Names.EXPLORATION, models.Names.STORY, models.Names.USER])

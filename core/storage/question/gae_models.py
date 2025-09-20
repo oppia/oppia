@@ -19,8 +19,7 @@ from __future__ import annotations
 import math
 import random
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
 from core.platform import models
 
@@ -29,9 +28,8 @@ from typing import Dict, List, Mapping, Sequence
 MYPY = False
 if MYPY: # pragma: no cover
     # Here, we are importing 'state_domain' only for type-checking purpose.
-    from core.domain import state_domain  # pylint: disable=invalid-import # isort:skip
-    from mypy_imports import base_models
-    from mypy_imports import datastore_services
+    from core.domain import state_domain  # pylint: disable=invalid-import
+    from mypy_imports import base_models, datastore_services
 
 (base_models, skill_models) = models.Registry.import_models([
     models.Names.BASE_MODEL, models.Names.SKILL

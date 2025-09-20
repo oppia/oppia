@@ -20,8 +20,7 @@ from __future__ import annotations
 
 import re
 
-from core.jobs import base_jobs
-from core.jobs import job_test_utils
+from core.jobs import base_jobs, job_test_utils
 from core.tests import test_utils
 
 from typing import Dict, Type

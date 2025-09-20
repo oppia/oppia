@@ -18,19 +18,19 @@ from __future__ import annotations
 
 import logging
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.controllers import acl_decorators
-from core.controllers import base
-from core.domain import learner_progress_services
-from core.domain import question_services
-from core.domain import skill_fetchers
-from core.domain import story_domain
-from core.domain import story_fetchers
-from core.domain import story_services
-from core.domain import summary_services
-from core.domain import topic_fetchers
+from core.controllers import acl_decorators, base
+from core.domain import (
+    learner_progress_services,
+    question_services,
+    skill_fetchers,
+    story_domain,
+    story_fetchers,
+    story_services,
+    summary_services,
+    topic_fetchers,
+)
 
 from typing import Dict, List, Optional, Tuple
 

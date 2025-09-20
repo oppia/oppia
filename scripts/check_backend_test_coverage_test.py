@@ -22,8 +22,7 @@ import subprocess
 import sys
 
 from core.tests import test_utils
-from scripts import check_backend_test_coverage
-from scripts import common
+from scripts import check_backend_test_coverage, common
 
 
 class CheckOverallBackendTestCoverageTests(test_utils.GenericTestBase):
