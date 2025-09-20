@@ -133,7 +133,7 @@ export class NewConversationSkinComponent {
     private checkpointProgressService: CheckpointProgressService,
     private conversationFlowService: ConversationFlowService,
     private chapterProgressService: ChapterProgressService,
-    private menuService: MobileMenuService
+    private mobileMenuService: MobileMenuService
   ) {}
 
   ngOnInit(): void {
@@ -446,7 +446,7 @@ export class NewConversationSkinComponent {
   }
 
   getSidebarIsExpanded(): boolean {
-    return this.menuService.getSidebarIsExpanded();
+    return this.mobileMenuService.getSidebarIsExpanded();
   }
 
   getExplorationLink(): string {

@@ -266,6 +266,135 @@ describe('CheckpointProgressService', () => {
     expect(checkpointIndex).toBe(2);
   });
 
+  it('should return correct checkpoint count when checkpoints exist', () => {
+    const mockStates = [
+      {name: 'Introduction', cardIsCheckpoint: false},
+      {name: 'Checkpoint1', cardIsCheckpoint: true},
+      {name: 'MiddleState', cardIsCheckpoint: false},
+      {name: 'Checkpoint2', cardIsCheckpoint: true},
+    ];
+
+    spyOn(explorationEngineService, 'getExploration').and.returnValue({
+      states: {
+        getStates: () => mockStates,
+      },
+    });
+
+    const count = checkpointProgressService.fetchCheckpointCount();
+    expect(count).toBe(2);
+  });
+
+  it('should return zero when no checkpoints exist', () => {
+    const mockStates = [
+      {name: 'Introduction', cardIsCheckpoint: false},
+      {name: 'MiddleState', cardIsCheckpoint: false},
+    ];
+
+    spyOn(explorationEngineService, 'getExploration').and.returnValue({
+      states: {
+        getStates: () => mockStates,
+      },
+    });
+
+    const count = checkpointProgressService.fetchCheckpointCount();
+    expect(count).toBe(0);
+  });
+
+  it('should count all states with cardIsCheckpoint true', () => {
+    const mockStates = [
+      {name: 'Checkpoint1', cardIsCheckpoint: true},
+      {name: 'Checkpoint2', cardIsCheckpoint: true},
+      {name: 'Checkpoint3', cardIsCheckpoint: true},
+    ];
+
+    spyOn(explorationEngineService, 'getExploration').and.returnValue({
+      states: {
+        getStates: () => mockStates,
+      },
+    });
+
+    const count = checkpointProgressService.fetchCheckpointCount();
+    expect(count).toBe(3);
+  });
+
+  it('should return sorted checkpoint indexes from getCheckpointStates', () => {
+    const mockDepthGraph = {
+      Introduction: 0,
+      Checkpoint1: 1,
+      MiddleState: 2,
+      Checkpoint2: 3,
+    };
+    const mockStates = [
+      {name: 'Introduction', cardIsCheckpoint: false},
+      {name: 'Checkpoint1', cardIsCheckpoint: true},
+      {name: 'MiddleState', cardIsCheckpoint: false},
+      {name: 'Checkpoint2', cardIsCheckpoint: true},
+    ];
+
+    spyOn(explorationEngineService, 'extractDepthGraph').and.returnValue(
+      mockDepthGraph
+    );
+    spyOn(explorationEngineService, 'getExploration').and.returnValue({
+      states: {
+        getStates: () => mockStates,
+      },
+    });
+
+    const checkpointIndexes = checkpointProgressService.getCheckpointStates();
+
+    expect(checkpointIndexes).toEqual([1, 3]);
+    expect(checkpointIndexes).toEqual(checkpointIndexes.slice().sort());
+  });
+
+  it('should return empty array if no checkpoints exist in getCheckpointStates', () => {
+    const mockDepthGraph = {
+      Introduction: 0,
+      MiddleState: 1,
+    };
+    const mockStates = [
+      {name: 'Introduction', cardIsCheckpoint: false},
+      {name: 'MiddleState', cardIsCheckpoint: false},
+    ];
+
+    spyOn(explorationEngineService, 'extractDepthGraph').and.returnValue(
+      mockDepthGraph
+    );
+    spyOn(explorationEngineService, 'getExploration').and.returnValue({
+      states: {
+        getStates: () => mockStates,
+      },
+    });
+
+    const checkpointIndexes = checkpointProgressService.getCheckpointStates();
+
+    expect(checkpointIndexes).toEqual([]);
+  });
+
+  it('should ignore states with null name in getCheckpointStates', () => {
+    const mockDepthGraph = {
+      Checkpoint1: 1,
+      Checkpoint2: 3,
+    };
+    const mockStates = [
+      {name: null, cardIsCheckpoint: true},
+      {name: 'Checkpoint1', cardIsCheckpoint: true},
+      {name: 'Checkpoint2', cardIsCheckpoint: true},
+    ];
+
+    spyOn(explorationEngineService, 'extractDepthGraph').and.returnValue(
+      mockDepthGraph
+    );
+    spyOn(explorationEngineService, 'getExploration').and.returnValue({
+      states: {
+        getStates: () => mockStates,
+      },
+    });
+
+    const checkpointIndexes = checkpointProgressService.getCheckpointStates();
+
+    expect(checkpointIndexes).toEqual([1, 3]);
+  });
+
   it('should get most recently reached checkpoint index with no checkpoints', () => {
     const mockCards = [
       {getStateName: () => 'Introduction'},

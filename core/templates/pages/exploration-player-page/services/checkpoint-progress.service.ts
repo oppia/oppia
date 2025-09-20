@@ -37,44 +37,11 @@ export class CheckpointProgressService {
 
   constructor(
     private playerTranscriptService: PlayerTranscriptService,
-    private explorationEngineService: ExplorationEngineService,
-    private computeGraphService: ComputeGraphService,
-    private stateGraphLayoutService: StateGraphLayoutService
+    private explorationEngineService: ExplorationEngineService
   ) {}
 
-  extractDepthGraph(): {[stateName: string]: number} {
-    const graphData = this.computeGraphService.compute(
-      this.explorationEngineService.getInitialStateName(),
-      this.explorationEngineService.getExploration().states
-    );
-    const computedNodes = this.stateGraphLayoutService.computeLayout(
-      graphData.nodes,
-      graphData.links,
-      graphData.initStateId,
-      graphData.finalStateIds
-    );
-
-    let depthGraph: {[stateName: string]: number} = {};
-    forEach(computedNodes, node => {
-      depthGraph[node.id] = node.depth;
-    });
-
-    return depthGraph;
-  }
-
-  getMaxStateDepth(): number {
-    const depthGraph = this.extractDepthGraph();
-    let maxDepth = 0;
-    for (let stateName in depthGraph) {
-      if (depthGraph[stateName] > maxDepth) {
-        maxDepth = depthGraph[stateName];
-      }
-    }
-    return maxDepth;
-  }
-
   getCheckpointStates(): number[] {
-    const depthGraph = this.extractDepthGraph();
+    const depthGraph = this.explorationEngineService.extractDepthGraph();
     const expStates = this.explorationEngineService
       .getExploration()
       .states.getStates();

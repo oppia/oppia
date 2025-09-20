@@ -79,6 +79,9 @@ describe('LessonPlayerSidebarComponent', () => {
       getMenuVisibility: () => visibilitySubject.asObservable(),
       toggleMenuVisibility: jasmine.createSpy('toggleMenuVisibility'),
       toggleSidebar: jasmine.createSpy('toggleSidebar'),
+      getSidebarIsExpanded: jasmine
+        .createSpy('getSidebarIsExpanded')
+        .and.returnValue(true),
     };
 
     const ngbModalSpy = jasmine.createSpyObj('NgbModal', ['open']);
@@ -204,6 +207,21 @@ describe('LessonPlayerSidebarComponent', () => {
     expect(component.expDescription).toBe(explorationObjective);
     expect(component.explorationTitle).toBe(explorationTitle);
   }));
+
+  it('should toggle sidebar and update sidebarIsExpanded', () => {
+    // Initially sidebarIsExpanded should be false
+    expect(component.sidebarIsExpanded).toBe(false);
+
+    // Call toggleSidebar
+    component.toggleSidebar();
+
+    // Should call toggleSidebar and getSidebarIsExpanded on the service
+    expect(mockMobileMenuService.toggleSidebar).toHaveBeenCalled();
+    expect(mockMobileMenuService.getSidebarIsExpanded).toHaveBeenCalled();
+
+    // Should update sidebarIsExpanded to true (as mocked)
+    expect(component.sidebarIsExpanded).toBe(true);
+  });
 
   it('should handle mobile menu visibility changes', () => {
     component.ngOnInit();

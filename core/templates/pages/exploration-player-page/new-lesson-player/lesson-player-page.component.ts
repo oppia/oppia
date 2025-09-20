@@ -60,7 +60,7 @@ export class NewLessonPlayerPageComponent implements OnDestroy {
     private pageContextService: PageContextService,
     private explorationPermissionsBackendApiService: ExplorationPermissionsBackendApiService,
     private keyboardShortcutService: KeyboardShortcutService,
-    private menuService: MobileMenuService,
+    private mobileMenuService: MobileMenuService,
     private metaTagCustomizationService: MetaTagCustomizationService,
     private pageTitleService: PageTitleService,
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
@@ -142,12 +142,9 @@ export class NewLessonPlayerPageComponent implements OnDestroy {
             this.onLanguageChange(languageCode);
 
           if (switchLanguageModalPromise) {
-            switchLanguageModalPromise.result.then(
-              () => {
-                this.i18nService.handleLanguageUpdate(languageCode);
-              },
-              () => {}
-            );
+            switchLanguageModalPromise.result.then(() => {
+              this.i18nService.handleLanguageUpdate(languageCode);
+            });
           } else {
             this.i18nService.handleLanguageUpdate(languageCode);
           }
@@ -165,7 +162,7 @@ export class NewLessonPlayerPageComponent implements OnDestroy {
   }
 
   getSidebarIsExpanded(): boolean {
-    return this.menuService.getSidebarIsExpanded();
+    return this.mobileMenuService.getSidebarIsExpanded();
   }
 
   setPageTitle(): void {

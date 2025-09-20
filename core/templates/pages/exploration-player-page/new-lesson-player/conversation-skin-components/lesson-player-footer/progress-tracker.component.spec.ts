@@ -93,7 +93,7 @@ class MockPlayerPositionService {
 class MockCheckpointProgressService {
   fetchCheckpointCount = jasmine
     .createSpy('fetchCheckpointCount')
-    .and.returnValue(Promise.resolve(5));
+    .and.returnValue(5);
   getMostRecentlyReachedCheckpointIndex = jasmine
     .createSpy('getMostRecentlyReachedCheckpointIndex')
     .and.returnValue(3);
@@ -248,6 +248,21 @@ describe('ProgressTrackerComponent', () => {
     expect(component.loggedOutProgressUniqueUrl).toBe(
       'http://localhost/progress/test-pid'
     );
+  });
+
+  it('should fetch checkpoint count and show progress reminder modal when checkpoint count is zero', () => {
+    component.checkpointCount = 0; // Ensure checkpoint count is 0
+    mockCheckpointProgressService.fetchCheckpointCount.and.returnValue(5); // Return a number directly, not a Promise
+    spyOn(component, 'showProgressReminderModal');
+
+    component.ngOnInit();
+    mockPlayerPositionService.emitLoadedMostRecentCheckpoint();
+
+    expect(
+      mockCheckpointProgressService.fetchCheckpointCount
+    ).toHaveBeenCalled();
+    expect(component.checkpointCount).toBe(5);
+    expect(component.showProgressReminderModal).toHaveBeenCalled();
   });
 
   it('should set loggedOutProgressUniqueUrlId from progressUrlService when pid does not exist', () => {

@@ -45,6 +45,7 @@ class MockExplorationEngineService {
   getStateCardByName = jasmine.createSpy('getStateCardByName').and.returnValue({
     isTerminal: jasmine.createSpy('isTerminal').and.returnValue(false),
   });
+  getMaxStateDepth = jasmine.createSpy('getMaxStateDepth').and.returnValue(20);
 }
 
 class MockPlayerPositionService {
@@ -87,7 +88,6 @@ class MockCheckpointProgressService {
   getCheckpointStates = jasmine
     .createSpy('getCheckpointStates')
     .and.returnValue([0, 5, 10, 15]);
-  getMaxStateDepth = jasmine.createSpy('getMaxStateDepth').and.returnValue(20);
 }
 
 describe('CheckpointBarComponent', () => {
@@ -162,9 +162,11 @@ describe('CheckpointBarComponent', () => {
     spyOn(component, 'updateLessonProgressBar');
 
     component.ngOnInit();
-    mockPlayerPositionService.emitActiveCardChanged();
 
-    expect(component.updateLessonProgressBar).toHaveBeenCalled();
+    // Trigger the actual subscription event
+    mockPlayerPositionService.onActiveCardChanged.emit();
+
+    expect(component.updateLessonProgressBar).toHaveBeenCalledTimes(2); // Once during ngOnInit, once from subscription
   });
 
   it('should subscribe to new card opened events', () => {
@@ -262,6 +264,75 @@ describe('CheckpointBarComponent', () => {
     expect(component.progressBarWidth).toBe(50);
     expect(component.completedCheckpointsCount).toBe(2);
     expect(component.checkpointStatusArray).toBeDefined();
+  });
+
+  it('should mark exploration as ended when at terminal state with displayedCardIndex > 0', () => {
+    component.checkpointCount = 3;
+    component.expEnded = false;
+    component.completedCheckpointsCount = 0;
+    component.checkpointStatusArray = new Array(
+      component.checkpointCount + 1
+    ).fill('incomplete');
+
+    mockCheckpointProgressService.getMostRecentlyReachedCheckpointIndex.and.returnValue(
+      2
+    );
+    mockPlayerPositionService.getDisplayedCardIndex.and.returnValue(5);
+    mockExplorationEngineService.getState.and.returnValue({
+      name: 'terminalState',
+    });
+    mockExplorationEngineService.getStateCardByName.and.returnValue({
+      isTerminal: jasmine.createSpy('isTerminal').and.returnValue(true),
+    });
+    spyOn(component, 'getCompletedProgressBarWidth').and.returnValue(100);
+
+    component.updateLessonProgressBar();
+
+    expect(component.expEnded).toBe(true);
+    expect(component.completedCheckpointsCount).toBe(2);
+    expect(component.checkpointStatusArray[component.checkpointCount]).toBe(
+      'completed'
+    );
+  });
+
+  it('should not mark exploration as ended when displayedCardIndex is 0 even if terminal', () => {
+    component.checkpointCount = 3;
+    component.expEnded = false;
+
+    mockCheckpointProgressService.getMostRecentlyReachedCheckpointIndex.and.returnValue(
+      2
+    );
+    mockPlayerPositionService.getDisplayedCardIndex.and.returnValue(0); // = 0
+    mockExplorationEngineService.getState.and.returnValue({
+      name: 'terminalState',
+    });
+    mockExplorationEngineService.getStateCardByName.and.returnValue({
+      isTerminal: jasmine.createSpy('isTerminal').and.returnValue(true),
+    });
+    spyOn(component, 'getCompletedProgressBarWidth').and.returnValue(100);
+
+    component.updateLessonProgressBar();
+
+    expect(component.expEnded).toBe(false);
+  });
+
+  it('should not mark exploration as ended when not at terminal state', () => {
+    component.checkpointCount = 3;
+    component.expEnded = false;
+
+    mockCheckpointProgressService.getMostRecentlyReachedCheckpointIndex.and.returnValue(
+      2
+    );
+    mockPlayerPositionService.getDisplayedCardIndex.and.returnValue(5); // > 0
+    mockExplorationEngineService.getState.and.returnValue({name: 'testState'});
+    mockExplorationEngineService.getStateCardByName.and.returnValue({
+      isTerminal: jasmine.createSpy('isTerminal').and.returnValue(false), // Not terminal
+    });
+    spyOn(component, 'getCompletedProgressBarWidth').and.returnValue(50);
+
+    component.updateLessonProgressBar();
+
+    expect(component.expEnded).toBe(false);
   });
 
   it('should handle edge case with empty checkpoint indexes', () => {

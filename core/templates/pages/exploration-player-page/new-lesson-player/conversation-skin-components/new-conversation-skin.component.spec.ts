@@ -87,6 +87,7 @@ import {CurrentEngineService} from '../../services/current-engine.service';
 import {LearnerExplorationSummary} from '../../../../domain/summary/learner-exploration-summary.model';
 import {ChapterProgressService} from '../../services/chapter-progress.service';
 import {CardAnimationService} from '../../services/card-animation.service';
+import {MobileMenuService} from '../../services/mobile-menu.service';
 class MockWindowRef {
   nativeWindow = {
     location: {
@@ -123,6 +124,7 @@ describe('New Conversation skin component', () => {
   let guestCollectionProgressService: GuestCollectionProgressService;
   let hintsAndSolutionManagerService: HintsAndSolutionManagerService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
+  let mobileMenuService: MobileMenuService;
   let imagePreloaderService: ImagePreloaderService;
   let learnerAnswerInfoService: LearnerAnswerInfoService;
   let diagnosticTestPlayerEngineService: DiagnosticTestPlayerEngineService;
@@ -464,6 +466,7 @@ describe('New Conversation skin component', () => {
     contentTranslationManagerService = TestBed.inject(
       ContentTranslationManagerService
     );
+    mobileMenuService = TestBed.inject(MobileMenuService);
     pageContextService = TestBed.inject(PageContextService);
     conversationFlowService = TestBed.inject(ConversationFlowService);
     currentInteractionService = TestBed.inject(CurrentInteractionService);
@@ -539,7 +542,19 @@ describe('New Conversation skin component', () => {
       mockFirstCard.getStateName.and.returnValue('FirstState');
     });
 
+    it('should return false when not in exploration player page', () => {
+      spyOn(pageContextService, 'isInExplorationPlayerPage').and.returnValue(
+        false
+      );
+      expect(
+        componentInstance.isCheckpointCelebrationFooterEnabled()
+      ).toBeFalse();
+    });
+
     it('should return false when previous session states progress includes previous card name', () => {
+      spyOn(pageContextService, 'isInExplorationPlayerPage').and.returnValue(
+        true
+      );
       spyOn(
         playerTranscriptService,
         'getPrevSessionStatesProgress'
@@ -563,12 +578,15 @@ describe('New Conversation skin component', () => {
 
       componentInstance.checkpointCelebrationIsShown = true;
 
-      expect(componentInstance.isCheckpointCelebrationFooterEnabled()).toBe(
-        false
-      );
+      expect(
+        componentInstance.isCheckpointCelebrationFooterEnabled()
+      ).toBeFalse();
     });
 
     it('should return false when checkpointCelebrationIsShown is false', () => {
+      spyOn(pageContextService, 'isInExplorationPlayerPage').and.returnValue(
+        true
+      );
       spyOn(
         playerTranscriptService,
         'getPrevSessionStatesProgress'
@@ -592,12 +610,15 @@ describe('New Conversation skin component', () => {
 
       componentInstance.checkpointCelebrationIsShown = false;
 
-      expect(componentInstance.isCheckpointCelebrationFooterEnabled()).toBe(
-        false
-      );
+      expect(
+        componentInstance.isCheckpointCelebrationFooterEnabled()
+      ).toBeFalse();
     });
 
     it('should return false when displayed card is the first state', () => {
+      spyOn(pageContextService, 'isInExplorationPlayerPage').and.returnValue(
+        true
+      );
       spyOn(
         playerTranscriptService,
         'getPrevSessionStatesProgress'
@@ -614,9 +635,9 @@ describe('New Conversation skin component', () => {
 
       componentInstance.checkpointCelebrationIsShown = true;
 
-      expect(componentInstance.isCheckpointCelebrationFooterEnabled()).toBe(
-        false
-      );
+      expect(
+        componentInstance.isCheckpointCelebrationFooterEnabled()
+      ).toBeFalse();
     });
 
     it('should return false when state is not a checkpoint', () => {
@@ -624,6 +645,9 @@ describe('New Conversation skin component', () => {
         cardIsCheckpoint: false,
       });
 
+      spyOn(pageContextService, 'isInExplorationPlayerPage').and.returnValue(
+        true
+      );
       spyOn(
         playerTranscriptService,
         'getPrevSessionStatesProgress'
@@ -647,12 +671,15 @@ describe('New Conversation skin component', () => {
 
       componentInstance.checkpointCelebrationIsShown = true;
 
-      expect(componentInstance.isCheckpointCelebrationFooterEnabled()).toBe(
-        false
-      );
+      expect(
+        componentInstance.isCheckpointCelebrationFooterEnabled()
+      ).toBeFalse();
     });
 
     it('should return false when display card index is 0', () => {
+      spyOn(pageContextService, 'isInExplorationPlayerPage').and.returnValue(
+        true
+      );
       spyOn(
         playerTranscriptService,
         'getPrevSessionStatesProgress'
@@ -669,12 +696,15 @@ describe('New Conversation skin component', () => {
 
       componentInstance.checkpointCelebrationIsShown = true;
 
-      expect(componentInstance.isCheckpointCelebrationFooterEnabled()).toBe(
-        false
-      );
+      expect(
+        componentInstance.isCheckpointCelebrationFooterEnabled()
+      ).toBeFalse();
     });
 
-    it('should handle edge case when display card index exceeds number of cards', () => {
+    it('should return false when display card index exceeds number of cards', () => {
+      spyOn(pageContextService, 'isInExplorationPlayerPage').and.returnValue(
+        true
+      );
       spyOn(
         playerTranscriptService,
         'getPrevSessionStatesProgress'
@@ -698,9 +728,63 @@ describe('New Conversation skin component', () => {
 
       componentInstance.checkpointCelebrationIsShown = true;
 
-      expect(componentInstance.isCheckpointCelebrationFooterEnabled()).toBe(
-        false
+      expect(
+        componentInstance.isCheckpointCelebrationFooterEnabled()
+      ).toBeFalse();
+    });
+
+    it('should return true when all conditions are met', () => {
+      spyOn(pageContextService, 'isInExplorationPlayerPage').and.returnValue(
+        true
       );
+      spyOn(
+        playerTranscriptService,
+        'getPrevSessionStatesProgress'
+      ).and.returnValue([]);
+      spyOn(playerTranscriptService, 'getCard').and.callFake(
+        (index: number) => {
+          if (index === 0) {
+            return mockFirstCard;
+          }
+          return mockPreviousCard;
+        }
+      );
+      spyOn(conversationFlowService, 'getDisplayedCard').and.returnValue(
+        mockStateCard
+      );
+      spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(2);
+      spyOn(playerTranscriptService, 'getNumCards').and.returnValue(3);
+      spyOn(explorationEngineService, 'getStateFromStateName').and.returnValue(
+        mockState
+      );
+
+      componentInstance.checkpointCelebrationIsShown = true;
+
+      expect(
+        componentInstance.isCheckpointCelebrationFooterEnabled()
+      ).toBeTrue();
+    });
+  });
+
+  describe('isInLessonPlayer', () => {
+    it('should return true when pathnameArray[1] is "lesson"', () => {
+      spyOn(urlService, 'getPathname').and.returnValue('/lesson/123');
+      expect(componentInstance.isInLessonPlayer()).toBeTrue();
+    });
+
+    it('should return false when pathnameArray[1] is not "lesson"', () => {
+      spyOn(urlService, 'getPathname').and.returnValue('/explore/play/123');
+      expect(componentInstance.isInLessonPlayer()).toBeFalse();
+    });
+
+    it('should handle edge case when pathnameArray is too short', () => {
+      spyOn(urlService, 'getPathname').and.returnValue('/explore');
+      expect(componentInstance.isInLessonPlayer()).toBeFalse();
+    });
+
+    it('should handle edge case when pathnameArray[1] is undefined', () => {
+      spyOn(urlService, 'getPathname').and.returnValue('/');
+      expect(componentInstance.isInLessonPlayer()).toBeFalse();
     });
   });
 
@@ -865,6 +949,58 @@ describe('New Conversation skin component', () => {
     windowRef.nativeWindow.onresize(null);
     tick(1000);
     flush();
+  }));
+
+  it('should return sidebar expanded state from mobileMenuService', () => {
+    spyOn(mobileMenuService, 'getSidebarIsExpanded').and.returnValue(true);
+    expect(componentInstance.getSidebarIsExpanded()).toBe(true);
+
+    (mobileMenuService.getSidebarIsExpanded as jasmine.Spy).and.returnValue(
+      false
+    );
+    expect(componentInstance.getSidebarIsExpanded()).toBe(false);
+  });
+
+  it('should handle onNewCardOpened subscription and update state correctly', fakeAsync(() => {
+    const mockSolution = {answer: 'solution'};
+    const mockStateCard = jasmine.createSpyObj('StateCard', [
+      'getSolution',
+      'getStateName',
+      'getHints',
+    ]);
+    mockStateCard.getSolution.and.returnValue(mockSolution);
+    mockStateCard.getStateName.and.returnValue('LessonState');
+    mockStateCard.getHints.and.returnValue([]);
+    spyOn(conversationFlowService, 'setSolutionForState');
+    spyOn(playerTranscriptService, 'resetNumberOfIncorrectSubmissions');
+    spyOn(conversationFlowService, 'setNextCardIfStuck');
+    spyOn(urlService, 'getPathname').and.returnValue('/lesson/123');
+    spyOn(urlService, 'getUrlParams').and.returnValue({});
+    spyOn(explorationEngineService, 'getStateFromStateName').and.returnValue({
+      cardIsCheckpoint: true,
+    });
+    spyOn(conversationFlowService, 'triggerIfLearnerStuckAction').and.callFake(
+      (isStuck, cb) => cb()
+    );
+
+    componentInstance.ngOnInit();
+
+    playerPositionService.onNewCardOpened.emit(mockStateCard);
+
+    expect(conversationFlowService.setSolutionForState).toHaveBeenCalledWith(
+      mockSolution
+    );
+    expect(
+      playerTranscriptService.resetNumberOfIncorrectSubmissions
+    ).toHaveBeenCalled();
+    expect(conversationFlowService.setNextCardIfStuck).toHaveBeenCalledWith(
+      null
+    );
+    expect(componentInstance.continueToReviseStateButtonIsVisible).toBeTrue();
+    expect(componentInstance.checkpointCelebrationIsShown).toBeTrue();
+
+    tick(5000);
+    expect(componentInstance.checkpointCelebrationIsShown).toBeFalse();
   }));
 
   it('should initialize component as logged in user', fakeAsync(() => {

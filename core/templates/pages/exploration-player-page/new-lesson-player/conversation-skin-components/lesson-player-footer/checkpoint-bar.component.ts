@@ -57,7 +57,7 @@ export class CheckpointBarComponent implements OnInit {
     this.explorationId = this.pageContextService.getExplorationId();
     this.checkpointIndexes =
       this.checkpointProgressService.getCheckpointStates();
-    this.maxStateDepth = this.checkpointProgressService.getMaxStateDepth();
+    this.maxStateDepth = this.explorationEngineService.getMaxStateDepth();
 
     this.checkpointCount =
       this.checkpointProgressService.fetchCheckpointCount();
