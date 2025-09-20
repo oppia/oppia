@@ -73,7 +73,7 @@
       <p>1. Copy and paste the credit <br> 2. Attach a copy of the <a href="/license">"CC BY SA 4.0 license"</a></p>
 
       <div class="cc-attribution-text">
-        <textarea type="text" class="cc-attribution-input" [value]="ccAttributionText" readonly aria-label="Creative Commons attribution text"></textarea>
+        <textarea class="cc-attribution-input" [value]="ccAttributionText" readonly aria-label="Creative Commons attribution text"></textarea>
         <button mat-button class="copy-cc-btn" (click)="copyAttribution()" aria-label="Copy attribution text">
           <span class="button-content">
             {{'Copy Attribution' | translate}}
