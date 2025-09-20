@@ -265,6 +265,9 @@ const removeSkillModalHeaderSelector =
   '.e2e-test-delete-state-skill-modal-header';
 const addMisconceptionHeaderSelector =
   '.e2e-test-oppia-misconception-card-header';
+const unsavedChangesWarningModalSelector =
+  '.e2e-test-unsaved-changes-info-modal';
+const staleTabWarningModalSelector = '.e2e-test-stale-tab-info-modal';
 
 const topicAndSkillsOptionInProfileMenu =
   '.e2e-test-topics-and-skills-dashboard-link';
@@ -4106,6 +4109,19 @@ export class TopicManager extends BaseUser {
     await this.clickOn(headerSelector);
 
     await this.expectElementToBeVisible(bodySelector);
+  }
+  /**
+   * Expects the stale tab info modal to be visible.
+   */
+  async expectUnsavedChangesStatusInfoModalToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(unsavedChangesWarningModalSelector);
+  }
+
+  /**
+   * Expects the stale tab info modal to be visible.
+   */
+  async expectStaleTabInfoModalToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(staleTabWarningModalSelector);
   }
 }
 
