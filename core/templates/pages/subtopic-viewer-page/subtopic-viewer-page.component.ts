@@ -45,6 +45,7 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
 import {PracticeSessionPageConstants} from 'pages/practice-session-page/practice-session-page.constants';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {AppConstants} from 'app.constants';
 
 @Component({
   selector: 'oppia-subtopic-viewer-page',
@@ -305,8 +306,15 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
 
   checkNextSubtopicTitleLengthAndModify(): string {
     let title: string = this.nextSubtopic.getTitle();
-    if (title.length >= 18) {
-      title = title.substring(0, 15) + '...';
+    if (
+      title.length >=
+      AppConstants.STUDY_GUIDE_VIEWER_NEXT_SUBTOPIC_TITLE_LENGTH_LIMIT
+    ) {
+      title =
+        title.substring(
+          0,
+          AppConstants.STUDY_GUIDE_VIEWER_NEXT_SUBTOPIC_TITLE_TRUNCATED_LENGTH
+        ) + '...';
     }
     return title;
   }
