@@ -21,7 +21,7 @@ import {
   HttpClientTestingModule,
   HttpTestingController,
 } from '@angular/common/http/testing';
-import {QuestionObjectFactory} from 'domain/question/QuestionObjectFactory';
+import {Question} from 'domain/question/question.model';
 import {
   EditableQuestionBackendApiService,
   SkillLinkageModificationsArray,
@@ -30,7 +30,6 @@ import {CsrfTokenService} from 'services/csrf-token.service';
 
 describe('EditableQuestionBackendApiService', () => {
   let editableQuestionBackendApiService: EditableQuestionBackendApiService;
-  let questionObjectFactory: QuestionObjectFactory;
   let httpTestingController: HttpTestingController;
   let csrfService: CsrfTokenService;
 
@@ -98,17 +97,12 @@ describe('EditableQuestionBackendApiService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [
-        EditableQuestionBackendApiService,
-        QuestionObjectFactory,
-        CsrfTokenService,
-      ],
+      providers: [EditableQuestionBackendApiService, CsrfTokenService],
     });
 
     editableQuestionBackendApiService = TestBed.inject(
       EditableQuestionBackendApiService
     );
-    questionObjectFactory = TestBed.inject(QuestionObjectFactory);
     httpTestingController = TestBed.inject(HttpTestingController);
     csrfService = TestBed.inject(CsrfTokenService);
 
@@ -116,10 +110,9 @@ describe('EditableQuestionBackendApiService', () => {
       Promise.resolve('sample-csrf-token')
     );
 
-    sampleDataResultsObjects.questionObject =
-      questionObjectFactory.createFromBackendDict(
-        sampleDataResults.questionDict
-      );
+    sampleDataResultsObjects.questionObject = Question.createFromBackendDict(
+      sampleDataResults.questionDict
+    );
   });
 
   afterEach(() => {

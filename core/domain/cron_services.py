@@ -25,11 +25,13 @@ from typing import List, Sequence
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import beam_job_models
-    from mypy_imports import datastore_services
-    from mypy_imports import job_models
-    from mypy_imports import user_models
+    from mypy_imports import (
+        base_models,
+        beam_job_models,
+        datastore_services,
+        job_models,
+        user_models,
+    )
 
 (
     base_models, beam_job_models,

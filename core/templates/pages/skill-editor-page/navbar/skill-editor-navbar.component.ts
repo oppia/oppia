@@ -28,6 +28,9 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {AlertsService} from 'services/alerts.service';
 import {Skill} from 'domain/skill/skill.model.ts';
 import {SkillUpdateService} from 'domain/skill/skill-update.service';
+import {ConfirmQuestionExitModalComponent} from 'components/question-directives/modal-templates/confirm-question-exit-modal.component';
+import {QuestionUndoRedoService} from 'domain/editor/undo_redo/question-undo-redo.service';
+import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 
 @Component({
   selector: 'oppia-skill-editor-navbar',
@@ -45,20 +48,65 @@ export class SkillEditorNavabarComponent implements OnInit {
   constructor(
     private alertsService: AlertsService,
     private ngbModal: NgbModal,
+    private preventPageUnloadEventService: PreventPageUnloadEventService,
     private skillEditorRoutingService: SkillEditorRoutingService,
     private skillEditorStateService: SkillEditorStateService,
     private skillUpdateService: SkillUpdateService,
     private undoRedoService: UndoRedoService,
-    private urlService: UrlService
+    private urlService: UrlService,
+    private questionUndoRedoService: QuestionUndoRedoService
   ) {}
 
   directiveSubscriptions = new Subscription();
   ACTIVE_TAB_EDITOR = 'Editor';
   ACTIVE_TAB_QUESTIONS = 'Questions';
   ACTIVE_TAB_PREVIEW = 'Preview';
+  ROUTE_TAB_EDITOR = 'main';
+  ROUTE_TAB_QUESTIONS = 'questions';
+  ROUTE_TAB_PREVIEW = 'preview';
 
   getActiveTabName(): string {
     return this.skillEditorRoutingService.getActiveTabName();
+  }
+
+  confirmBeforeLeavingQuestions(run: () => void): void {
+    const routeTab = this.getActiveTabName();
+    const hasQuestionDraft = this.questionUndoRedoService.hasChanges();
+
+    if (routeTab === this.ROUTE_TAB_QUESTIONS && hasQuestionDraft) {
+      const modalRef = this.ngbModal.open(ConfirmQuestionExitModalComponent, {
+        backdrop: true,
+      });
+
+      modalRef.result.then(
+        () => {
+          this.questionUndoRedoService.clearChanges();
+          this.skillEditorRoutingService.questionIsBeingCreated = false;
+          run();
+        },
+        () => {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
+        }
+      );
+    } else {
+      run();
+    }
+  }
+
+  selectMainTab(): void {
+    this.confirmBeforeLeavingQuestions(() => {
+      this.activeTab = this.ACTIVE_TAB_EDITOR;
+      this.skillEditorRoutingService.navigateToMainTab();
+    });
+  }
+
+  selectPreviewTab(): void {
+    this.confirmBeforeLeavingQuestions(() => {
+      this.activeTab = this.ACTIVE_TAB_PREVIEW;
+      this.skillEditorRoutingService.navigateToPreviewTab();
+    });
   }
 
   isLoadingSkill(): boolean {
@@ -109,16 +157,6 @@ export class SkillEditorNavabarComponent implements OnInit {
     this.showNavigationOptions = !this.showNavigationOptions;
   }
 
-  selectMainTab(): void {
-    this.activeTab = this.ACTIVE_TAB_EDITOR;
-    this.skillEditorRoutingService.navigateToMainTab();
-  }
-
-  selectPreviewTab(): void {
-    this.activeTab = this.ACTIVE_TAB_PREVIEW;
-    this.skillEditorRoutingService.navigateToPreviewTab();
-  }
-
   toggleSkillEditOptions(): void {
     this.showSkillEditOptions = !this.showSkillEditOptions;
   }
@@ -144,7 +182,7 @@ export class SkillEditorNavabarComponent implements OnInit {
         // No further action is needed.
       });
     } else {
-      this.activeTab = this.ACTIVE_TAB_QUESTIONS;
+      this.activeTab = this.ROUTE_TAB_QUESTIONS;
       this.skillEditorRoutingService.navigateToQuestionsTab();
     }
   }
@@ -162,5 +200,11 @@ export class SkillEditorNavabarComponent implements OnInit {
     this.directiveSubscriptions.add(
       this.undoRedoService._undoRedoChangeEventEmitter.subscribe(() => {})
     );
+    this.preventPageUnloadEventService.addListener(() => {
+      return (
+        this.undoRedoService.getChangeCount() > 0 ||
+        this.questionUndoRedoService.hasChanges()
+      );
+    });
   }
 }

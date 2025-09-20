@@ -29,12 +29,14 @@ import {
 
 import {
   ExplorationBackendDict,
-  ExplorationObjectFactory,
-} from '../../../domain/exploration/ExplorationObjectFactory';
+  Exploration,
+} from '../../../domain/exploration/exploration.model';
 import {InteractionAnswer} from '../../../../../extensions/interactions/answer-defs';
 import {AudioPreloaderService} from './audio-preloader.service';
 import {PageContextService} from '../../../services/page-context.service';
 import {PlatformFeatureService} from '../../../services/platform-feature.service';
+import {LoggerService} from '../../../services/contextual/logger.service';
+import {UrlInterpolationService} from '../../../domain/utilities/url-interpolation.service';
 import {
   Voiceover,
   VoiceoverBackendDict,
@@ -75,8 +77,9 @@ describe('Audio preloader service', () => {
   });
 
   let audioPreloaderService: AudioPreloaderService;
-  let explorationObjectFactory: ExplorationObjectFactory;
   let pageContextService: PageContextService;
+  let loggerService: LoggerService;
+  let urlInterpolationService: UrlInterpolationService;
 
   const audioBlob = new Blob(['audio data'], {type: 'audiotype'});
 
@@ -304,14 +307,18 @@ describe('Audio preloader service', () => {
   beforeEach(() => {
     audioPreloaderService = TestBed.inject(AudioPreloaderService);
     audioPreloaderService.setAudioLoadedCallback((_: string): void => {});
-    explorationObjectFactory = TestBed.inject(ExplorationObjectFactory);
     pageContextService = TestBed.inject(PageContextService);
+    loggerService = TestBed.inject(LoggerService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
     spyOn(pageContextService, 'getExplorationId').and.returnValue('1');
   });
 
   it('should maintain the correct number of download requests in queue', fakeAsync(() => {
-    const exploration =
-      explorationObjectFactory.createFromBackendDict(explorationDict);
+    const exploration = Exploration.createFromBackendDict(
+      explorationDict,
+      loggerService,
+      urlInterpolationService
+    );
     audioPreloaderService.init(exploration);
 
     let manualVoiceoverBackendDict1: VoiceoverBackendDict = {
@@ -395,8 +402,11 @@ describe('Audio preloader service', () => {
   }));
 
   it('should return empty audioFiles list if language code is null', () => {
-    const exploration =
-      explorationObjectFactory.createFromBackendDict(explorationDict);
+    const exploration = Exploration.createFromBackendDict(
+      explorationDict,
+      loggerService,
+      urlInterpolationService
+    );
     audioPreloaderService.init(exploration);
     audioPreloaderService.kickOffAudioPreloader(
       exploration.getInitialState().name as string

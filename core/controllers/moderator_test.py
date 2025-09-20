@@ -16,9 +16,7 @@
 
 from __future__ import annotations
 
-from core.domain import platform_parameter_list
-from core.domain import rights_manager
-from core.domain import user_services
+from core.domain import platform_parameter_list, rights_manager, user_services
 from core.tests import test_utils
 
 from typing import Final

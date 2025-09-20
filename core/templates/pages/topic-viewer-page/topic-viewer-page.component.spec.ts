@@ -374,4 +374,14 @@ describe('Topic viewer page', () => {
       expect(topicViewerPageComponent.activeTab).toBe('subtopics');
     }
   );
+
+  it('should return true when practice tab is enabled', () => {
+    topicViewerPageComponent.practiceTabIsDisplayed = true;
+    expect(topicViewerPageComponent.isPracticeTabEnabled()).toBeTrue();
+  });
+
+  it('should return false when practice tab is disabled', () => {
+    topicViewerPageComponent.practiceTabIsDisplayed = false;
+    expect(topicViewerPageComponent.isPracticeTabEnabled()).toBeFalse();
+  });
 });

@@ -21,8 +21,10 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {SavePendingChangesModalComponent} from 'components/save-pending-changes/save-pending-changes-modal.component';
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
 import {EntityEditorBrowserTabsInfoDomainConstants} from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info-domain.constants';
+import {PageContextService} from 'services/page-context.service';
 import {EntityEditorBrowserTabsInfo} from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
 import {Skill} from 'domain/skill/skill.model.ts';
+import {QuestionsListService} from 'services/questions-list.service';
 import {Subscription} from 'rxjs';
 import {BottomNavbarStatusService} from 'services/bottom-navbar-status.service';
 import {UrlService} from 'services/contextual/url.service';
@@ -32,6 +34,8 @@ import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.
 import {SkillEditorRoutingService} from './services/skill-editor-routing.service';
 import {SkillEditorStalenessDetectionService} from './services/skill-editor-staleness-detection.service';
 import {SkillEditorStateService} from './services/skill-editor-state.service';
+import {ConfirmQuestionExitModalComponent} from 'components/question-directives/modal-templates/confirm-question-exit-modal.component';
+import {QuestionUndoRedoService} from 'domain/editor/undo_redo/question-undo-redo.service';
 
 @Component({
   selector: 'oppia-skill-editor-page',
@@ -43,6 +47,9 @@ export class SkillEditorPageComponent implements OnInit {
     private localStorageService: LocalStorageService,
     private ngbModal: NgbModal,
     private preventPageUnloadEventService: PreventPageUnloadEventService,
+    private pageContextService: PageContextService,
+    private questionsListService: QuestionsListService,
+    private questionUndoRedoService: QuestionUndoRedoService,
     private skillEditorRoutingService: SkillEditorRoutingService,
     private skillEditorStateService: SkillEditorStateService,
     private skillEditorStalenessDetectionService: SkillEditorStalenessDetectionService,
@@ -60,12 +67,53 @@ export class SkillEditorPageComponent implements OnInit {
     return this.skillEditorRoutingService.getActiveTabName();
   }
 
+  navigationWithConfirmation(navigateFunction: () => void): void {
+    // Check for any unsaved changes (skill changes or in-progress question)
+    const hasUnsavedQuestionChanges = this.questionUndoRedoService.hasChanges();
+
+    const hasUnsavedChanges = hasUnsavedQuestionChanges;
+    if (hasUnsavedChanges) {
+      const modalRef = this.ngbModal.open(ConfirmQuestionExitModalComponent, {
+        backdrop: true,
+      });
+
+      modalRef.result.then(
+        () => {
+          navigateFunction();
+          this.pageContextService.resetImageSaveDestination?.();
+          this.skillEditorRoutingService.questionIsBeingCreated = false;
+          this.questionUndoRedoService.clearChanges();
+        },
+        () => {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
+        }
+      );
+    } else {
+      navigateFunction();
+      this.questionUndoRedoService.clearChanges();
+    }
+  }
+
   selectMainTab(): void {
-    this.skillEditorRoutingService.navigateToMainTab();
+    if (this.skillEditorRoutingService.getActiveTabName() === 'questions') {
+      this.navigationWithConfirmation(() => {
+        this.skillEditorRoutingService.navigateToMainTab();
+      });
+    } else {
+      this.skillEditorRoutingService.navigateToMainTab();
+    }
   }
 
   selectPreviewTab(): void {
-    this.skillEditorRoutingService.navigateToPreviewTab();
+    if (this.skillEditorRoutingService.getActiveTabName() === 'questions') {
+      this.navigationWithConfirmation(() => {
+        this.skillEditorRoutingService.navigateToPreviewTab();
+      });
+    } else {
+      this.skillEditorRoutingService.navigateToPreviewTab();
+    }
   }
 
   selectQuestionsTab(): void {
@@ -169,9 +217,12 @@ export class SkillEditorPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.bottomNavbarStatusService.markBottomNavbarStatus(true);
-    this.preventPageUnloadEventService.addListener(
-      this.undoRedoService.getChangeCount.bind(this.undoRedoService)
-    );
+    this.preventPageUnloadEventService.addListener(() => {
+      return (
+        this.undoRedoService.getChangeCount() > 0 ||
+        this.questionUndoRedoService.hasChanges()
+      );
+    });
     this.skillEditorStateService.loadSkill(this.urlService.getSkillIdFromUrl());
     this.skill = this.skillEditorStateService.getSkill();
     this.directiveSubscriptions.add(

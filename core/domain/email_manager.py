@@ -22,33 +22,47 @@ import datetime
 import logging
 import pathlib
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import change_domain
-from core.domain import email_services
-from core.domain import html_cleaner
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_registry
-from core.domain import platform_parameter_services
-from core.domain import rights_domain
-from core.domain import story_domain
-from core.domain import subscription_services
-from core.domain import suggestion_registry
-from core.domain import user_services
+from core.domain import (
+    change_domain,
+    email_services,
+    html_cleaner,
+    platform_parameter_list,
+    platform_parameter_registry,
+    platform_parameter_services,
+    rights_domain,
+    story_domain,
+    subscription_services,
+    suggestion_registry,
+    user_services,
+)
 from core.platform import models
 
 from typing import (
-    Callable, DefaultDict, Dict, Final, List, Mapping, Optional, Sequence,
-    Set, Tuple, TypedDict, Union)
+    Callable,
+    DefaultDict,
+    Dict,
+    Final,
+    List,
+    Mapping,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+    TypedDict,
+    Union,
+)
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import app_identity_services
-    from mypy_imports import email_models
-    from mypy_imports import secrets_services
-    from mypy_imports import suggestion_models
-    from mypy_imports import transaction_services
+    from mypy_imports import (
+        app_identity_services,
+        email_models,
+        secrets_services,
+        suggestion_models,
+        transaction_services,
+    )
 
 (email_models, suggestion_models) = models.Registry.import_models([
     models.Names.EMAIL,
