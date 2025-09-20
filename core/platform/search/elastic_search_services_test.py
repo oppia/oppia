@@ -33,7 +33,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         correct_id = 'id'
 
         def mock_index(
-                index: str, doccuments: Sequence[Mapping[str, Any]], id: str # pylint: disable=redefined-builtin
+                index: str, documents: Sequence[Mapping[str, Any]], id: str # pylint: disable=redefined-builtin
         ) -> Dict[str, Dict[str, int]]:
             self.assertEqual(index, correct_index_name)
             self.assertEqual(id, correct_id)
