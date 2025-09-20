@@ -135,6 +135,7 @@ runs:
         cat /home/runner/work/oppia/oppia/requirements_dev.txt
         echo "Contents of requirements.txt (before):"
         cat /home/runner/work/oppia/oppia/requirements.txt
+      shell: bash
 
     - name: Install third-party libs on cache miss (retries on error)
       if: steps.restore_third_party_and_node_modules_cache.outputs.cache-hit == false
