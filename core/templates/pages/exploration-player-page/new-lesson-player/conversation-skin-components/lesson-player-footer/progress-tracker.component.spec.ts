@@ -251,8 +251,8 @@ describe('ProgressTrackerComponent', () => {
   });
 
   it('should fetch checkpoint count and show progress reminder modal when checkpoint count is zero', () => {
-    component.checkpointCount = 0; // Ensure checkpoint count is 0
-    mockCheckpointProgressService.fetchCheckpointCount.and.returnValue(5); // Return a number directly, not a Promise
+    component.checkpointCount = 0;
+    mockCheckpointProgressService.fetchCheckpointCount.and.returnValue(5);
     spyOn(component, 'showProgressReminderModal');
 
     component.ngOnInit();

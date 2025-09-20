@@ -209,17 +209,12 @@ describe('LessonPlayerSidebarComponent', () => {
   }));
 
   it('should toggle sidebar and update sidebarIsExpanded', () => {
-    // Initially sidebarIsExpanded should be false
     expect(component.sidebarIsExpanded).toBe(false);
-
-    // Call toggleSidebar
     component.toggleSidebar();
 
-    // Should call toggleSidebar and getSidebarIsExpanded on the service
     expect(mockMobileMenuService.toggleSidebar).toHaveBeenCalled();
     expect(mockMobileMenuService.getSidebarIsExpanded).toHaveBeenCalled();
 
-    // Should update sidebarIsExpanded to true (as mocked)
     expect(component.sidebarIsExpanded).toBe(true);
   });
 

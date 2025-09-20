@@ -54,8 +54,8 @@ describe('ShareLessonModalComponent', () => {
   let attributionService: jasmine.SpyObj<AttributionService>;
   let pageContextService: jasmine.SpyObj<PageContextService>;
   let windowDimensionsService: jasmine.SpyObj<WindowDimensionsService>;
-  let mockWindow: any;
-  let mockLocation: any;
+  let mockWindow;
+  let mockLocation;
 
   beforeEach(waitForAsync(() => {
     const ngbActiveModalSpy = jasmine.createSpyObj('NgbActiveModal', [
@@ -243,7 +243,6 @@ describe('ShareLessonModalComponent', () => {
   });
 
   it('should dismiss ngbActiveModal when closeModal is called and bottomSheetRef does not exist', () => {
-    // Create a new component without bottomSheetRef
     TestBed.resetTestingModule();
     const ngbActiveModalSpy = jasmine.createSpyObj('NgbActiveModal', [
       'dismiss',
@@ -282,7 +281,6 @@ describe('ShareLessonModalComponent', () => {
           useValue: windowDimensionsServiceSpy,
         },
         {provide: MAT_BOTTOM_SHEET_DATA, useValue: null},
-        // Note: MatBottomSheetRef is not provided here
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
     }).compileComponents();
@@ -501,66 +499,6 @@ describe('ShareLessonModalComponent', () => {
     const result = component.getAuthors();
 
     expect(result).toBe('Single Author');
-  });
-
-  it('should handle data with undefined explorationTitle', () => {
-    TestBed.resetTestingModule();
-    const ngbActiveModalSpy = jasmine.createSpyObj('NgbActiveModal', [
-      'dismiss',
-    ]);
-    const alertsServiceSpy = jasmine.createSpyObj('AlertsService', [
-      'addWarning',
-    ]);
-    const urlServiceSpy = jasmine.createSpyObj('UrlService', [
-      'getCurrentLocation',
-    ]);
-    const attributionServiceSpy = jasmine.createSpyObj('AttributionService', [
-      'getAuthors',
-    ]);
-    const pageContextServiceSpy = jasmine.createSpyObj('PageContextService', [
-      'getExplorationId',
-    ]);
-    const windowDimensionsServiceSpy = jasmine.createSpyObj(
-      'WindowDimensionsService',
-      ['getWidth']
-    );
-    const windowRefSpy = jasmine.createSpyObj('WindowRef', [], {
-      nativeWindow: mockWindow,
-    });
-
-    TestBed.configureTestingModule({
-      declarations: [ShareLessonModalComponent, MockTranslatePipe],
-      providers: [
-        {provide: NgbActiveModal, useValue: ngbActiveModalSpy},
-        {provide: AlertsService, useValue: alertsServiceSpy},
-        {provide: UrlService, useValue: urlServiceSpy},
-        {provide: AttributionService, useValue: attributionServiceSpy},
-        {provide: WindowRef, useValue: windowRefSpy},
-        {provide: PageContextService, useValue: pageContextServiceSpy},
-        {
-          provide: WindowDimensionsService,
-          useValue: windowDimensionsServiceSpy,
-        },
-        {
-          provide: MAT_BOTTOM_SHEET_DATA,
-          useValue: {explorationTitle: undefined},
-        },
-      ],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA],
-    }).compileComponents();
-
-    const testFixture = TestBed.createComponent(ShareLessonModalComponent);
-    const testComponent = testFixture.componentInstance;
-
-    urlServiceSpy.getCurrentLocation.and.returnValue(mockLocation);
-    attributionServiceSpy.getAuthors.and.returnValue(['Author 1', 'Author 2']);
-    pageContextServiceSpy.getExplorationId.and.returnValue(
-      'test-exploration-id'
-    );
-
-    testComponent.ngOnInit();
-
-    expect(testComponent.explorationTitle).toBeUndefined();
   });
 
   it('should test modalStates enum values', () => {

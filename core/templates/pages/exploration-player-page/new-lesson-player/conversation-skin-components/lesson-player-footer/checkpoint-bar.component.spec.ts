@@ -16,12 +16,7 @@
  * @fileoverview Unit tests for CheckpointBar component.
  */
 
-import {
-  ComponentFixture,
-  TestBed,
-  fakeAsync,
-  tick,
-} from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {Subscription, Subject} from 'rxjs';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
@@ -163,10 +158,9 @@ describe('CheckpointBarComponent', () => {
 
     component.ngOnInit();
 
-    // Trigger the actual subscription event
     mockPlayerPositionService.onActiveCardChanged.emit();
 
-    expect(component.updateLessonProgressBar).toHaveBeenCalledTimes(2); // Once during ngOnInit, once from subscription
+    expect(component.updateLessonProgressBar).toHaveBeenCalledTimes(2);
   });
 
   it('should subscribe to new card opened events', () => {
@@ -212,7 +206,7 @@ describe('CheckpointBarComponent', () => {
 
     const width = component.getCompletedProgressBarWidth();
 
-    // Should be 0% (base) + (5/10 * 25%) = 12.5%
+    // Should be 0% (base) + (5/10 * 25%) = 12.5%.
     expect(width).toBe(12.5);
   });
 
@@ -223,7 +217,7 @@ describe('CheckpointBarComponent', () => {
 
     const width = component.getCompletedProgressBarWidth();
 
-    // Should be at second checkpoint = 25%
+    // Should be at second checkpoint = 25%.
     expect(width).toBe(25);
   });
 
@@ -235,7 +229,7 @@ describe('CheckpointBarComponent', () => {
 
     const width = component.getCompletedProgressBarWidth();
 
-    // Should be 75% (base) + (5/10 * 25%) = 87.5%
+    // Should be 75% (base) + (5/10 * 25%) = 87.5%.
     expect(width).toBe(87.5);
   });
 
@@ -302,7 +296,7 @@ describe('CheckpointBarComponent', () => {
     mockCheckpointProgressService.getMostRecentlyReachedCheckpointIndex.and.returnValue(
       2
     );
-    mockPlayerPositionService.getDisplayedCardIndex.and.returnValue(0); // = 0
+    mockPlayerPositionService.getDisplayedCardIndex.and.returnValue(0);
     mockExplorationEngineService.getState.and.returnValue({
       name: 'terminalState',
     });
@@ -323,10 +317,10 @@ describe('CheckpointBarComponent', () => {
     mockCheckpointProgressService.getMostRecentlyReachedCheckpointIndex.and.returnValue(
       2
     );
-    mockPlayerPositionService.getDisplayedCardIndex.and.returnValue(5); // > 0
+    mockPlayerPositionService.getDisplayedCardIndex.and.returnValue(5);
     mockExplorationEngineService.getState.and.returnValue({name: 'testState'});
     mockExplorationEngineService.getStateCardByName.and.returnValue({
-      isTerminal: jasmine.createSpy('isTerminal').and.returnValue(false), // Not terminal
+      isTerminal: jasmine.createSpy('isTerminal').and.returnValue(false),
     });
     spyOn(component, 'getCompletedProgressBarWidth').and.returnValue(50);
 
@@ -342,8 +336,6 @@ describe('CheckpointBarComponent', () => {
 
     const width = component.getCompletedProgressBarWidth();
 
-    // With checkpointCount = 0, the calculation will produce NaN
-    // This is expected behavior for this edge case
     expect(isNaN(width)).toBe(true);
   });
 
@@ -362,11 +354,11 @@ describe('CheckpointBarComponent', () => {
 
     component.updateLessonProgressBar();
 
-    expect(component.checkpointStatusArray.length).toBe(4); // checkpointCount + 1
-    expect(component.checkpointStatusArray[0]).toBe('completed'); // First checkpoint always completed
-    expect(component.checkpointStatusArray[1]).toBe('in-progress'); // Next checkpoint in progress
-    expect(component.checkpointStatusArray[2]).toBe('incomplete'); // Remaining incomplete
-    expect(component.checkpointStatusArray[3]).toBe('incomplete'); // Terminal status
+    expect(component.checkpointStatusArray.length).toBe(4);
+    expect(component.checkpointStatusArray[0]).toBe('completed');
+    expect(component.checkpointStatusArray[1]).toBe('in-progress');
+    expect(component.checkpointStatusArray[2]).toBe('incomplete');
+    expect(component.checkpointStatusArray[3]).toBe('incomplete');
   });
 
   it('should mark all checkpoints as completed when completedCheckpointsCount exceeds checkpointCount', () => {
@@ -374,7 +366,7 @@ describe('CheckpointBarComponent', () => {
     component.expEnded = false;
     mockCheckpointProgressService.getMostRecentlyReachedCheckpointIndex.and.returnValue(
       5
-    ); // This will make completedCheckpointsCount = 4
+    );
     mockPlayerPositionService.getDisplayedCardIndex.and.returnValue(0);
     mockExplorationEngineService.getState.and.returnValue({name: 'testState'});
     mockExplorationEngineService.getStateCardByName.and.returnValue({
@@ -384,12 +376,11 @@ describe('CheckpointBarComponent', () => {
 
     component.updateLessonProgressBar();
 
-    // When completedCheckpointsCount (4) > checkpointCount (3), no checkpoint is marked as in-progress
     expect(component.completedCheckpointsCount).toBe(4);
     expect(component.checkpointStatusArray[0]).toBe('completed');
     expect(component.checkpointStatusArray[1]).toBe('completed');
     expect(component.checkpointStatusArray[2]).toBe('completed');
-    expect(component.checkpointStatusArray[3]).toBe('incomplete'); // Terminal not reached
+    expect(component.checkpointStatusArray[3]).toBe('incomplete');
   });
 
   it('should set displayed card index when returning to completed checkpoint', () => {
@@ -438,8 +429,8 @@ describe('CheckpointBarComponent', () => {
     // The method will find currentSegmentIndex = 0, then calculate based on that
     // startIdx = 0, endIdx = 10, stepsCompleted = -1 - 0 = -1
     // fractionInSegment = -1/10 = -0.1, baseWidth = 0, additionalWidth = -0.1 * 25 = -2.5
-    // So result is 0 + (-2.5) = -2.5, but we should handle this edge case
-    expect(width).toBeLessThan(0); // Accept that negative values can occur with invalid input
+    // So result is 0 + (-2.5) = -2.5, but we should handle this edge case.
+    expect(width).toBeLessThan(0);
   });
 
   it('should unsubscribe from all subscriptions on destroy', () => {
@@ -462,20 +453,21 @@ describe('CheckpointBarComponent', () => {
 
     const width = component.getCompletedProgressBarWidth();
 
-    // Should be 66.67% (base) + (5/10 * 33.33%) = 83.33%
+    // Should be 66.67% (base) + (5/10 * 33.33%) = 83.33%.
     expect(width).toBeCloseTo(83.33, 1);
   });
 
   it('should handle division by zero in progress calculation', () => {
-    component.checkpointIndexes = [5, 5, 5]; // Same indexes (totalSteps will be 0)
+    component.checkpointIndexes = [5, 5, 5];
     component.checkpointCount = 3;
     mockPlayerPositionService.getDisplayedCardIndex.and.returnValue(5);
 
     expect(() => component.getCompletedProgressBarWidth()).not.toThrow();
 
     const width = component.getCompletedProgressBarWidth();
-    // When totalSteps is 0, fractionInSegment should be 0, so result should be baseWidth
-    expect(width).toBe(0); // currentSegmentIndex = 0, baseWidth = 0 * (100/3) = 0
+    // When totalSteps is 0, fractionInSegment should be 0, so result should be baseWidth.
+    // currentSegmentIndex = 0, baseWidth = 0 * (100/3) = 0.
+    expect(width).toBe(0);
   });
 
   it('should handle case when exploration has already ended', () => {
@@ -495,7 +487,6 @@ describe('CheckpointBarComponent', () => {
 
     component.updateLessonProgressBar();
 
-    // When expEnded is true, completedCheckpointsCount should not be updated based on checkpoint service
     expect(component.checkpointStatusArray).toBeDefined();
   });
 });

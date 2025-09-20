@@ -412,7 +412,7 @@ describe('States', () => {
     );
   });
 
-  fit('should return all State objects using getStates()', () => {
+  it('should return all State objects using getStates()', () => {
     const states = States.createFromBackendDict(statesDict);
     const stateObjects = states.getStates();
     expect(Array.isArray(stateObjects)).toBe(true);
