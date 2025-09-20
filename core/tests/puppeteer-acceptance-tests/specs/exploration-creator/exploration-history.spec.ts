@@ -81,6 +81,10 @@ describe('Exploration Editor', function () {
     await explorationEditor.resetGraphDifferenceInHistoryTab();
   });
 
+  it('should be able to revert to a previous version of an exploration', async function () {
+    await explorationEditor;
+  });
+
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });

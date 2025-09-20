@@ -87,6 +87,7 @@ describe('Exploration Editor', function () {
     );
 
     await explorationEditor.saveExplorationDraft();
+    await explorationEditor.expectSelfLoopWarningToBeVisible(false);
   });
 
   it('should be able to use "Multiple Choice" interaction', async function () {

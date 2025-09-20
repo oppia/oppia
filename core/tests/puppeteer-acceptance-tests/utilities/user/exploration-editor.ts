@@ -420,6 +420,8 @@ const graphContainerSelector = '.e2e-test-graph-input-viz-container';
 const nodeWarningSignSelector = '.e2e-test-node-warning-sign';
 const navigationDropdownInMobileVisibleSelector =
   '.oppia-exploration-editor-tabs-dropdown.show';
+const selfLoopWarningSelector = '.e2e-test-response-self-loop-warning';
+const goalWarningSelector = '.e2e-test-exploration-objective-warning';
 
 export enum INTERACTION_TYPES {
   ALGEBRAIC_EXPRESSION = 'Algebric Expression Input',
@@ -6618,6 +6620,47 @@ export class ExplorationEditor extends BaseUser {
     }
 
     await this.expectElementToBeVisible(nodeWarningSignSelector, visible);
+  }
+
+  /**
+   * Checks if the self loop warning is visible.
+   * @param {boolean} visible - Whether the self loop warning should be visible or not.
+   */
+  async expectSelfLoopWarningToBeVisible(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(selfLoopWarningSelector, visible);
+  }
+
+  /**
+   * Checks if the goal warning is visible.
+   * @param {boolean} visible - Whether the goal warning should be visible or not.
+   */
+  async expectGoalWarningToBeVisible(visible: boolean = true): Promise<void> {
+    await this.expectElementToBeVisible(goalWarningSelector, visible);
+  }
+
+  async revertExplorationToVersion(version: string): Promise<void> {
+    const historyItemIndexSelector = '.e2e-test-history-table-index';
+    const historyItemOptionSelector = '.e2e-test-history-table-option';
+    await this.expectElementToBeVisible(historyListItemSelector);
+
+    const historyItems = await this.page.$$(historyListItemSelector);
+    let historyItem: ElementHandle<Element> | null = null;
+    for (const historyItemElement of historyItems) {
+      const historyItemText = await historyItemElement.$eval(
+        historyItemIndexSelector,
+        el => el.textContent?.trim().replace('.', '')
+      );
+      if (historyItemText === version) {
+        historyItem = historyItemElement;
+        break;
+      }
+    }
+
+    if (!historyItem) {
+      throw new Error(`Version ${version} not found in history tab.`);
+    }
   }
 }
 

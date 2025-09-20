@@ -67,6 +67,10 @@ describe('Logged-In Learner', function () {
     await loggedInLearner.expectProfileDropdownToContainElementWithContent(
       'Logout'
     );
+    await loggedInLearner.expectProfileDropdownToContainElementWithContent(
+      'Topics and Skills Dashboard',
+      false
+    );
 
     await loggedInLearner.clickOnProfileDropdown();
     await loggedInLearner.navigateToPreferencesPageUsingProfileDropdown();
