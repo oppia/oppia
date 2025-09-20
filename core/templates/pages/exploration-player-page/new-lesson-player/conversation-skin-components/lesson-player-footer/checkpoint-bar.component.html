@@ -4,9 +4,8 @@
     <div tabindex="0" class="completed-progress-bar" [style.width.%]="progressBarWidth" [attr.aria-label]="getProgressPercentage() + ' percent completed'">
     </div>
   </div>
-  <div *ngFor="let checkpointNode of checkpointStatusArray; index as idx" (click)="returnToCheckpointIfCompleted(idx)"
+  <div *ngFor="let checkpointNode of checkpointStatusArray; index as idx" (click)="returnToCheckpointIfCompleted(idx)" [attr.aria-label]="'Checkpoint ' + (idx + 1) + ' is ' + checkpointStatusArray[idx]"
     [ngClass]="{'completed-checkpoint-node': checkpointStatusArray[idx] === 'completed', 'in-progress-checkpoint-node': checkpointStatusArray[idx] === 'in-progress', 'incomplete-checkpoint-node': checkpointStatusArray[idx] === 'incomplete'}"
-    [attr.aria-label]="'Checkpoint ' + (idx + 1) + ' is ' + checkpointStatusArray[idx]"
     matTooltip="{{'Checkpoint ' + (idx + 1) + ' is ' + checkpointStatusArray[idx]}}" matTooltipPosition="above">
   </div>
 </div>

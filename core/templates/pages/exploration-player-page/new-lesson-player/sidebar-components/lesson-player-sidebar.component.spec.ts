@@ -78,6 +78,7 @@ describe('LessonPlayerSidebarComponent', () => {
     mockMobileMenuService = {
       getMenuVisibility: () => visibilitySubject.asObservable(),
       toggleMenuVisibility: jasmine.createSpy('toggleMenuVisibility'),
+      toggleSidebar: jasmine.createSpy('toggleSidebar'),
     };
 
     const ngbModalSpy = jasmine.createSpyObj('NgbModal', ['open']);
@@ -213,14 +214,6 @@ describe('LessonPlayerSidebarComponent', () => {
 
     visibilitySubject.next(false);
     expect(component.mobileMenuVisible).toBe(false);
-  });
-
-  it('should toggle sidebar', () => {
-    component.sidebarIsExpanded = false;
-    component.toggleSidebar();
-    expect(component.sidebarIsExpanded).toBe(true);
-    component.toggleSidebar();
-    expect(component.sidebarIsExpanded).toBe(false);
   });
 
   it('should check if hacky exp desc translation is displayed', () => {

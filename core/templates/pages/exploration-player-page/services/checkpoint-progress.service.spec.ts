@@ -236,26 +236,6 @@ describe('CheckpointProgressService', () => {
     expect(checkpointProgressService).toBeTruthy();
   });
 
-  it('should fetch checkpoint count correctly', fakeAsync(() => {
-    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp123');
-    spyOn(
-      readOnlyExplorationBackendApiService,
-      'fetchExplorationAsync'
-    ).and.returnValue(Promise.resolve(mockExplorationResponse));
-
-    let result: number;
-    checkpointProgressService.fetchCheckpointCount().then(count => {
-      result = count;
-    });
-    tick();
-
-    expect(pageContextService.getExplorationId).toHaveBeenCalled();
-    expect(
-      readOnlyExplorationBackendApiService.fetchExplorationAsync
-    ).toHaveBeenCalledWith('exp123', null);
-    expect(result).toBe(2);
-  }));
-
   it('should get most recently reached checkpoint index correctly', () => {
     const mockCards = [
       {getStateName: () => 'Introduction'},

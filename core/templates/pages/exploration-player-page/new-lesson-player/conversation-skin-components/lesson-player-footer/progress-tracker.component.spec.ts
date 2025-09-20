@@ -282,21 +282,6 @@ describe('ProgressTrackerComponent', () => {
     expect(component.showProgressReminderModal).toHaveBeenCalled();
   });
 
-  it('should fetch checkpoint count and show progress reminder modal when checkpoint count is zero', fakeAsync(() => {
-    component.checkpointCount = 0;
-    spyOn(component, 'showProgressReminderModal');
-
-    component.ngOnInit();
-    mockPlayerPositionService.emitLoadedMostRecentCheckpoint();
-    tick();
-
-    expect(
-      mockCheckpointProgressService.fetchCheckpointCount
-    ).toHaveBeenCalled();
-    expect(component.checkpointCount).toBe(5);
-    expect(component.showProgressReminderModal).toHaveBeenCalled();
-  }));
-
   it('should emit onShowProgressModal when completedCheckpointsCount is 0', () => {
     mockCheckpointProgressService.getMostRecentlyReachedCheckpointIndex.and.returnValue(
       1

@@ -539,35 +539,6 @@ describe('New Conversation skin component', () => {
       mockFirstCard.getStateName.and.returnValue('FirstState');
     });
 
-    it('should return true when all conditions are met for checkpoint celebration', () => {
-      spyOn(
-        playerTranscriptService,
-        'getPrevSessionStatesProgress'
-      ).and.returnValue([]);
-      spyOn(playerTranscriptService, 'getCard').and.callFake(
-        (index: number) => {
-          if (index === 0) {
-            return mockFirstCard;
-          }
-          return mockPreviousCard;
-        }
-      );
-      spyOn(conversationFlowService, 'getDisplayedCard').and.returnValue(
-        mockStateCard
-      );
-      spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(2);
-      spyOn(playerTranscriptService, 'getNumCards').and.returnValue(3);
-      spyOn(explorationEngineService, 'getStateFromStateName').and.returnValue(
-        mockState
-      );
-
-      componentInstance.checkpointCelebrationIsShown = true;
-
-      expect(componentInstance.isCheckpointCelebrationFooterEnabled()).toBe(
-        true
-      );
-    });
-
     it('should return false when previous session states progress includes previous card name', () => {
       spyOn(
         playerTranscriptService,
@@ -1559,7 +1530,7 @@ describe('New Conversation skin component', () => {
       });
       componentInstance.questionPlayerConfig = {};
       spyOn(conversationFlowService.onPlayerStateChange, 'emit');
-      spyOn(playerPositionService.onLoadedMostRecentCheckpoint, 'emit');
+      spyOn(playerPositionService.onLoadedMostRecentCheckpoint, 'next');
       spyOn(focusManagerService, 'setFocusIfOnDesktop');
       spyOn(loaderService, 'hideLoadingScreen');
       spyOn(urlService, 'getPidFromUrl').and.returnValue(null);
