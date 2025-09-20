@@ -102,7 +102,16 @@ export class VoiceoverSubmitter extends BaseUser {
    * Clicks on the add manual voiceover button.
    */
   async clickOnAddManualVoiceoverButton(): Promise<void> {
-    await this.expectElementToBeVisible(addManualVoiceoverBtnSelector);
+    const isButtonVisible = await this.isElementVisible(
+      addManualVoiceoverBtnSelector,
+      true,
+      10000
+    );
+    if (!isButtonVisible) {
+      throw new Error(
+        'Manual voiceover upload button is not available. This may be due to insufficient permissions or missing voiceover configuration.'
+      );
+    }
     await this.clickOn(addManualVoiceoverBtnSelector);
     await this.expectModalTitleToBe('Add Voiceover');
   }

@@ -77,9 +77,8 @@ export class BlogPostEditor extends BaseUser {
    */
   async addUserBioInBlogDashboard(): Promise<void> {
     const inputBar = await this.isElementVisible(blogAuthorBioField);
-    expect(inputBar).toBe(true);
-    // It is used here to avoid filling the user bio each time. We fill it only once when
-    // the user is accessing the blog dashboard for the first time.
+    // Only fill bio field if it's visible (first-time users vs returning users)
+    // Bio field may not be visible for returning users who already have bio set.
     if (inputBar) {
       await this.type(blogAuthorBioField, 'Dummy-User-Bio');
       await this.page.waitForSelector(`${authorBioSaveButton}:not([disabled])`);

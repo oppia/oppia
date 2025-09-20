@@ -1,0 +1,200 @@
+FAIL core/tests/puppeteer-acceptance-tests/specs/logged-out-user/generate-and-play-automated-voiceovers.spec.ts (647.995 s)
+  ● Exploration Editor › should allow the learner to view and play a lesson entirely in a particular language and start listening to the voiceover from any state
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      5358 |
+      5359 |     const isDropdownVisible = await this.isElementVisible(voiceoverDropdown);
+    > 5360 |     expect(isDropdownVisible).toBe(true);
+           |                               ^
+      5361 |     if (isDropdownVisible) {
+      5362 |       await this.expandVoiceoverBar();
+      5363 |     }
+
+      at LoggedOutUser.startVoiceover (utilities/user/logged-out-user.ts:5360:31)
+      at Object.<anonymous> (specs/logged-out-user/generate-and-play-automated-voiceovers.spec.ts:197:7)
+
+
+2.
+
+FAIL core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/listen-to-voiceovers-of-the-lessons-in-the-lesson-player.spec.ts (742.236 s)
+  ● Logged-Out Learner › should be able to play/pause the audio
+
+    Voiceover expected to be playable, but is not playableError: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      5511 |       await this.clickOn(playVoiceoverButton);
+      5512 |       if (playable) {
+    > 5513 |         throw new Error(
+           |               ^
+      5514 |           'Voiceover expected to be playable, but is not playable' + error
+      5515 |         );
+      5516 |       }
+
+      at LoggedOutUser.expectVoiceoverIsPlayable (utilities/user/logged-out-user.ts:5513:15)
+          at runMicrotasks (<anonymous>)
+      at Object.<anonymous> (specs/logged-out-learner/listen-to-voiceovers-of-the-lessons-in-the-lesson-player.spec.ts:223:5)
+
+  ● Logged-Out Learner › should be able to play audio till the end
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      5358 |
+      5359 |     const isDropdownVisible = await this.isElementVisible(voiceoverDropdown);
+    > 5360 |     expect(isDropdownVisible).toBe(true);
+           |                               ^
+      5361 |     if (isDropdownVisible) {
+      5362 |       await this.expandVoiceoverBar();
+      5363 |     }
+
+      at LoggedOutUser.startVoiceover (utilities/user/logged-out-user.ts:5360:31)
+      at Object.<anonymous> (specs/logged-out-learner/listen-to-voiceovers-of-the-lessons-in-the-lesson-player.spec.ts:249:5)
+
+
+3.
+
+FAIL core/tests/puppeteer-acceptance-tests/specs/logged-out-user/play-lesson-in-different-languages-and-listen-to-voiceovers.spec.ts (582.735 s)
+  ● Exploration Editor › should allow the learner to view and play a lesson entirely in a particular language and start listening to the voiceover from any state
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      5358 |
+      5359 |     const isDropdownVisible = await this.isElementVisible(voiceoverDropdown);
+    > 5360 |     expect(isDropdownVisible).toBe(true);
+           |                               ^
+      5361 |     if (isDropdownVisible) {
+      5362 |       await this.expandVoiceoverBar();
+      5363 |     }
+
+      at LoggedOutUser.startVoiceover (utilities/user/logged-out-user.ts:5360:31)
+      at Object.<anonymous> (specs/logged-out-user/play-lesson-in-different-languages-and-listen-to-voiceovers.spec.ts:238:7)
+
+
+4.
+
+FAIL core/tests/puppeteer-acceptance-tests/specs/voiceover-submitter/create-delete-and-update-status-of-voiceovers-of-the-explorations.spec.ts (525.372 s)
+  Voiceover Submitter
+    ✕ should be able to add and remove voiceovers to explorations (128148 ms)
+    ✕ should not be able to upload a non-audio file (30559 ms)
+    ✕ should not be able to upload audio file larger than 5 minutes (30002 ms)
+    ✕ should be able to mark/unmark voiceover as stale (30001 ms)
+
+  ● Voiceover Submitter › should be able to add and remove voiceovers to explorations
+
+    Voiceover expected to be playable, but is not playableError: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      5511 |       await this.clickOn(playVoiceoverButton);
+      5512 |       if (playable) {
+    > 5513 |         throw new Error(
+           |               ^
+      5514 |           'Voiceover expected to be playable, but is not playable' + error
+      5515 |         );
+      5516 |       }
+
+      at BaseUser.expectVoiceoverIsPlayable (utilities/user/logged-out-user.ts:5513:15)
+          at runMicrotasks (<anonymous>)
+      at Object.<anonymous> (specs/voiceover-submitter/create-delete-and-update-status-of-voiceovers-of-the-explorations.spec.ts:122:5)
+
+  ● Voiceover Submitter › should not be able to upload a non-audio file
+
+    TimeoutError: waiting for selector `.e2e-test-voiceover-upload-audio` failed: timeout 30000ms exceeded
+
+      1165 |   ): Promise<void> {
+      1166 |     const options = visibility ? {visible: true} : {hidden: true};
+    > 1167 |     await this.page.waitForSelector(selector, options);
+           |                     ^
+      1168 |     showMessage(`Element ${selector} is ${visibility ? 'visible' : 'hidden'}.`);
+      1169 |   }
+      1170 |
+
+      at new WaitTask (../../../node_modules/puppeteer/src/common/DOMWorld.ts:813:28)
+      at DOMWorld.waitForSelectorInPage (../../../node_modules/puppeteer/src/common/DOMWorld.ts:656:22)
+      at Object.internalHandler.waitFor (../../../node_modules/puppeteer/src/common/QueryHandler.ts:78:19)
+      at DOMWorld.waitForSelector (../../../node_modules/puppeteer/src/common/DOMWorld.ts:511:25)
+      at Frame.waitForSelector (../../../node_modules/puppeteer/src/common/FrameManager.ts:1290:47)
+      at Page.waitForSelector (../../../node_modules/puppeteer/src/common/Page.ts:3222:29)
+      at BaseUser.expectElementToBeVisible (utilities/common/puppeteer-utils.ts:1167:21)
+      at BaseUser.clickOnAddManualVoiceoverButton (utilities/user/voiceover-submitter.ts:105:16)
+      at Object.<anonymous> (specs/voiceover-submitter/create-delete-and-update-status-of-voiceovers-of-the-explorations.spec.ts:135:30)
+          at runMicrotasks (<anonymous>)
+
+  ● Voiceover Submitter › should not be able to upload audio file larger than 5 minutes
+
+    TimeoutError: waiting for selector `input[type=file]` failed: timeout 30000ms exceeded
+
+      620 |   async uploadFile(filePath: string): Promise<void> {
+      621 |     const inputUploadHandle =
+    > 622 |       await this.page.waitForSelector('input[type=file]');
+          |                       ^
+      623 |     if (inputUploadHandle === null) {
+      624 |       throw new Error('No file input found while attempting to upload a file.');
+      625 |     }
+
+      at new WaitTask (../../../node_modules/puppeteer/src/common/DOMWorld.ts:813:28)
+      at DOMWorld.waitForSelectorInPage (../../../node_modules/puppeteer/src/common/DOMWorld.ts:656:22)
+      at Object.internalHandler.waitFor (../../../node_modules/puppeteer/src/common/QueryHandler.ts:78:19)
+      at DOMWorld.waitForSelector (../../../node_modules/puppeteer/src/common/DOMWorld.ts:511:25)
+      at Frame.waitForSelector (../../../node_modules/puppeteer/src/common/FrameManager.ts:1290:47)
+      at Page.waitForSelector (../../../node_modules/puppeteer/src/common/Page.ts:3222:29)
+      at BaseUser.uploadFile (utilities/common/puppeteer-utils.ts:622:23)
+      at Object.<anonymous> (specs/voiceover-submitter/create-delete-and-update-status-of-voiceovers-of-the-explorations.spec.ts:143:30)
+
+  ● Voiceover Submitter › should be able to mark/unmark voiceover as stale
+
+    TimeoutError: waiting for selector `input[type=file]` failed: timeout 30000ms exceeded
+
+      620 |   async uploadFile(filePath: string): Promise<void> {
+      621 |     const inputUploadHandle =
+    > 622 |       await this.page.waitForSelector('input[type=file]');
+          |                       ^
+      623 |     if (inputUploadHandle === null) {
+      624 |       throw new Error('No file input found while attempting to upload a file.');
+      625 |     }
+
+      at new WaitTask (../../../node_modules/puppeteer/src/common/DOMWorld.ts:813:28)
+      at DOMWorld.waitForSelectorInPage (../../../node_modules/puppeteer/src/common/DOMWorld.ts:656:22)
+      at Object.internalHandler.waitFor (../../../node_modules/puppeteer/src/common/QueryHandler.ts:78:19)
+      at DOMWorld.waitForSelector (../../../node_modules/puppeteer/src/common/DOMWorld.ts:511:25)
+      at Frame.waitForSelector (../../../node_modules/puppeteer/src/common/FrameManager.ts:1290:47)
+      at Page.waitForSelector (../../../node_modules/puppeteer/src/common/Page.ts:3222:29)
+      at BaseUser.uploadFile (utilities/common/puppeteer-utils.ts:622:23)
+
+5.
+
+FAIL core/tests/puppeteer-acceptance-tests/specs/blog-editor/create-and-publish-a-blog-post-with-required-details.spec.ts (160.689 s)
+  Blog Editor
+    ✓ should create and publish a blog post with thumbnail, title, body and tags. (34592 ms)
+    ✕ should not create an empty blog post. (33196 ms)
+
+  ● Blog Editor › should not create an empty blog post.
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      78 |   async addUserBioInBlogDashboard(): Promise<void> {
+      79 |     const inputBar = await this.isElementVisible(blogAuthorBioField);
+    > 80 |     expect(inputBar).toBe(true);
+         |                      ^
+      81 |     // It is used here to avoid filling the user bio each time. We fill it only once when
+      82 |     // the user is accessing the blog dashboard for the first time.
+      83 |     if (inputBar) {
+
+      at BaseUser.addUserBioInBlogDashboard (utilities/user/blog-post-editor.ts:80:22)
+      at BaseUser.openBlogEditorPage (utilities/user/blog-post-editor.ts:504:5)
+      at Object.<anonymous> (specs/blog-editor/create-and-publish-a-blog-post-with-required-details.spec.ts:70:7)
