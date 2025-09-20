@@ -25,10 +25,11 @@ import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 import {
   Exploration,
   ExplorationBackendDict,
-  ExplorationObjectFactory,
-} from '../../../domain/exploration/ExplorationObjectFactory';
+} from '../../../domain/exploration/exploration.model';
 import {ImagePreloaderService} from './image-preloader.service';
 import {AssetsBackendApiService} from '../../../services/assets-backend-api.service';
+import {LoggerService} from '../../../services/contextual/logger.service';
+import {UrlInterpolationService} from '../../../domain/utilities/url-interpolation.service';
 import {EntityTranslationsService} from '../../../services/entity-translations.services';
 import {PageContextService} from '../../../services/page-context.service';
 import {SvgSanitizerService} from '../../../services/svg-sanitizer.service';
@@ -47,7 +48,8 @@ describe('Image preloader service', () => {
 
   let assetsBackendApiService: AssetsBackendApiService;
   let imagePreloaderService: ImagePreloaderService;
-  let explorationObjectFactory: ExplorationObjectFactory;
+  let loggerService: LoggerService;
+  let urlInterpolationService: UrlInterpolationService;
   let pageContextService: PageContextService;
   let entityTranslationsService: EntityTranslationsService;
   let svgSanitizerService: SvgSanitizerService;
@@ -384,10 +386,11 @@ describe('Image preloader service', () => {
 
   beforeEach(() => {
     imagePreloaderService = TestBed.get(ImagePreloaderService);
-    explorationObjectFactory = TestBed.get(ExplorationObjectFactory);
     pageContextService = TestBed.get(PageContextService);
     assetsBackendApiService = TestBed.get(AssetsBackendApiService);
     entityTranslationsService = TestBed.get(EntityTranslationsService);
+    loggerService = TestBed.inject(LoggerService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
     svgSanitizerService = TestBed.inject(SvgSanitizerService);
 
     spyOn(pageContextService, 'getExplorationId').and.returnValue('1');
@@ -399,8 +402,11 @@ describe('Image preloader service', () => {
       }
     );
 
-    exploration =
-      explorationObjectFactory.createFromBackendDict(explorationDict);
+    exploration = Exploration.createFromBackendDict(
+      explorationDict,
+      loggerService,
+      urlInterpolationService
+    );
   });
 
   it('should be in exploration player after init is called', () => {

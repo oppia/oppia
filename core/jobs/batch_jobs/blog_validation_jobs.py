@@ -20,14 +20,12 @@ from __future__ import annotations
 
 import datetime
 
-from core.jobs import base_jobs
-from core.jobs import job_utils
+from core.jobs import base_jobs, job_utils
 from core.jobs.io import ndb_io
 from core.jobs.types import blog_validation_errors
 from core.platform import models
 
 import apache_beam as beam
-
 from typing import Union
 
 MYPY = False

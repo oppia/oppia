@@ -15,6 +15,7 @@
 """Tests for the blog homepage page."""
 
 from __future__ import annotations
+
 import logging
 
 from core import feconf

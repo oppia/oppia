@@ -22,12 +22,13 @@ import io
 
 from core import feconf
 from core.constants import constants
-from core.controllers import acl_decorators
-from core.controllers import base
-from core.domain import fs_services
-from core.domain import rights_domain
-from core.domain import rights_manager
-from core.domain import user_services
+from core.controllers import acl_decorators, base
+from core.domain import (
+    fs_services,
+    rights_domain,
+    rights_manager,
+    user_services,
+)
 
 from mutagen import mp3
 from typing import Dict, TypedDict

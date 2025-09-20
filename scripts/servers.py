@@ -27,14 +27,19 @@ import subprocess
 import threading
 
 from core import feconf
-from core import utils
 from scripts import common
 
 import psutil
-
 from typing import (
-    Any, Callable, ContextManager, Dict, Iterator, List, Optional, Sequence,
-    Union
+    Any,
+    Callable,
+    ContextManager,
+    Dict,
+    Iterator,
+    List,
+    Optional,
+    Sequence,
+    Union,
 )
 
 
@@ -583,7 +588,7 @@ def get_chromedriver_version() -> str:
     if int(installed_version_parts[0]) >= 115:
         chromedriver_version: str = '.'.join(installed_version_parts)
     else:
-        response = utils.url_open(
+        response = common.url_open(
             'https://chromedriver.storage.googleapis.com/LATEST_RELEASE_%s' % (
                 '.'.join(installed_version_parts[:-1])
             )

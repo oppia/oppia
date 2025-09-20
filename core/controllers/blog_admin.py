@@ -19,16 +19,17 @@ from __future__ import annotations
 import logging
 
 from core import feconf
-from core.controllers import acl_decorators
-from core.controllers import base
+from core.controllers import acl_decorators, base
 from core.controllers import domain_objects_validator as validation_method
-from core.domain import blog_services
-from core.domain import platform_parameter_domain
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_registry
-from core.domain import platform_parameter_services
-from core.domain import role_services
-from core.domain import user_services
+from core.domain import (
+    blog_services,
+    platform_parameter_domain,
+    platform_parameter_list,
+    platform_parameter_registry,
+    platform_parameter_services,
+    role_services,
+    user_services,
+)
 
 from typing import Dict, Final, Optional, TypedDict
 

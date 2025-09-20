@@ -19,9 +19,11 @@
 from __future__ import annotations
 
 from core import feconf
-from core.domain import learner_playlist_services
-from core.domain import learner_progress_services
-from core.domain import subscription_services
+from core.domain import (
+    learner_playlist_services,
+    learner_progress_services,
+    subscription_services,
+)
 from core.platform import models
 from core.tests import test_utils
 
