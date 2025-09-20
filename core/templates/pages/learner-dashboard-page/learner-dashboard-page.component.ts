@@ -294,14 +294,17 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
       responseData => {
         this.completedExplorationsList = responseData.completedExplorationsList;
         const curatedExplorationIds = new Set<string>();
-        this.allTopics.forEach(topic => {
-          topic.getCanonicalStorySummaryDicts().forEach(storySummary => {
-            storySummary.getAllNodes().forEach(nodeSummary => {
-              if (nodeSummary.getExplorationId()) {
-                curatedExplorationIds.add(nodeSummary.getExplorationId());
-              }
-            });
-          });
+        (this.allTopics || []).forEach(topic => {
+          (topic.getCanonicalStorySummaryDicts() || []).forEach(
+            storySummary => {
+              (storySummary.getAllNodes() || []).forEach(nodeSummary => {
+                const expId = nodeSummary.getExplorationId();
+                if (expId != null) {
+                  curatedExplorationIds.add(expId);
+                }
+              });
+            }
+          );
         });
 
         this.incompleteExplorationsList = (
