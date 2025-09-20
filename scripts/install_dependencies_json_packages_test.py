@@ -341,14 +341,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                         'url': 'https://bootstrap/bootstrap-4.3.1-dist.zip',
                         'rootDir': 'bootstrap-4.3.1-dist',
                         'targetDir': 'bootstrap'
-                    },
-                    'angularTest': {
-                        'version': '1.8.2',
-                        'downloadFormat': 'files',
-                        'url': 'https://code.angularjs.org/1.8.2',
-                        'targetDirPrefix': 'angularjs-',
-                        'files': ['angular-mocks.js']
-                    },
+                    }
                 }
             }
 

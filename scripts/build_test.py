@@ -117,9 +117,6 @@ class BuildTests(test_utils.GenericTestBase):
             """Mock method for replacing subprocess.check_call()."""
             excepted_cmd = (
                 'node /app/oppia/node_modules/uglify-js/bin/uglifyjs '
-                '/app/oppia/third_party/generated/js/third_party.js -c -m'
-                ' --source-map includeSources,url=\'third_party.min.js.map\' '
-                '-o /app/oppia/third_party/generated/js/third_party.min.js'
             )
             self.assertEqual(command, excepted_cmd)
 
@@ -888,17 +885,9 @@ class BuildTests(test_utils.GenericTestBase):
             os.path.getsize(
                 'core/tests/data/third_party/css/third_party.min.css'),
             os.path.getsize('core/tests/data/third_party/css/third_party.css'))
-        self.assertLess(
-            os.path.getsize(
-                'core/tests/data/third_party/js/third_party.min.js'),
-            os.path.getsize('core/tests/data/third_party/js/third_party.js'))
 
         build.safe_delete_file(
             'core/tests/data/third_party/css/third_party.min.css')
-        build.safe_delete_file(
-            'core/tests/data/third_party/js/third_party.min.js')
-        build.safe_delete_file(
-            'core/tests/data/third_party/js/third_party.min.js.map')
 
     def test_clean(self) -> None:
         check_function_calls = {

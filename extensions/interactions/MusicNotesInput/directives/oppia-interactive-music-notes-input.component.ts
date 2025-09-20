@@ -718,7 +718,7 @@ export class MusicNotesInputComponent
     return leftOffset + noteStartAsFloat * this.HORIZONTAL_GRID_SPACING;
   }
 
-  isCloneOffStaff(helperClone: JQLite | JQuery<this>): boolean {
+  isCloneOffStaff(helperClone: JQuery<HTMLElement>): boolean {
     return !(
       helperClone.position().top > this.staffTop &&
       helperClone.position().top < this.staffBottom

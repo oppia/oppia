@@ -4,10 +4,6 @@ var argv = require('yargs').positional('terminalEnabled', {
 }).argv;
 var path = require('path');
 var webpack = require('webpack');
-var generatedJs = 'third_party/generated/js/third_party.js';
-if (argv.prodEnv) {
-  generatedJs = 'third_party/generated/js/third_party.min.js';
-}
 
 // Here we are checking if the specs_to_run flag is provided or not. If it is
 // provided, we are splitting the comma separated string into an array of
@@ -62,9 +58,6 @@ module.exports = function (config) {
       // Since jquery, angular-mocks and math-expressions
       // are not bundled, they will be treated separately.
       'third_party/static/jquery-3.5.1/jquery.min.js',
-      'third_party/static/angularjs-1.8.2/angular.js',
-      'third_party/static/angularjs-1.8.2/angular-mocks.js',
-      generatedJs,
       // Note that unexpected errors occur ("Cannot read property 'num' of
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
       // and extensions/... are switched. The test framework may be flaky.
