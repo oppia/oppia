@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import argparse
+import difflib
 import os
 import subprocess
 import sys
@@ -118,7 +119,7 @@ def uninstall_dev_dependencies() -> None:
 
 def compile_pip_requirements(
     requirements_path: str, compiled_path: str
-) -> bool:
+) -> str:
     """Compile a requirements.txt file.
 
     Args:
@@ -126,10 +127,16 @@ def compile_pip_requirements(
         compiled_path: str. Path to the requirements.txt file.
 
     Returns:
-        bool. Whether the compiled dev requirements file was changed.
+        str. The diff between the original and compiled requirements files, as
+        a string containing newlines.
     """
     with open(compiled_path, 'r', encoding='utf-8') as f:
-        old_compiled = f.read()
+        old_compiled = list(f.readlines())
+    # Warning: In some CI environments, running this command seems to add
+    # --cert=None --client-cert=None --pip-args=None flags to the pip-compile
+    # command referenced at the start of the compiled requirements file. It is
+    # not clear why this happens, since these args are not explicitly being
+    # passed here. We account for that later below when computing the diff.
     subprocess.run(
         [
             'pip-compile', '--no-emit-index-url', '--quiet',
@@ -140,9 +147,28 @@ def compile_pip_requirements(
         encoding='utf-8',
     )
     with open(compiled_path, 'r', encoding='utf-8') as f:
-        new_compiled = f.read()
+        new_compiled = list(f.readlines())
 
-    return old_compiled != new_compiled
+    # The options to pip-compile sometimes differ on regeneration (e.g.
+    # cert=None might be passed), so we skip the pip-compile line and those
+    # above it when computing the diff.
+    old_pip_compile_line_index = [
+        i for i, value in enumerate(old_compiled)
+        if value.startswith('#    pip-compile')][0]
+    new_pip_compile_line_index = [
+        i for i, value in enumerate(new_compiled)
+        if value.startswith('#    pip-compile')][0]
+    diff = list(difflib.unified_diff(
+        old_compiled[old_pip_compile_line_index + 1:],
+        new_compiled[new_pip_compile_line_index + 1:],
+        lineterm=''))
+    print('Printing diff in %s:' % requirements_path)
+    print('--------------------------')
+    for line in diff:
+        print(line)
+    print('--------------------------')
+
+    return '\n'.join(list(diff))
 
 
 def main(cli_args: Optional[List[str]] = None) -> None:
@@ -150,19 +176,20 @@ def main(cli_args: Optional[List[str]] = None) -> None:
     args = _PARSER.parse_args(cli_args)
     check_python_env_is_suitable()
     install_installation_tools()
-    not_compiled = compile_pip_requirements(
+    diff = compile_pip_requirements(
         REQUIREMENTS_DEV_FILE_PATH, COMPILED_REQUIREMENTS_DEV_FILE_PATH)
     if args.uninstall:
         uninstall_dev_dependencies()
     else:
         install_dev_dependencies()
-        if args.assert_compiled and not_compiled:
+        if args.assert_compiled and diff:
             raise RuntimeError(
                 'The Python development requirements file '
                 f'{COMPILED_REQUIREMENTS_DEV_FILE_PATH} was changed by the '
-                'installation script. Please commit the changes. '
-                'You can get the changes again by running this command: '
-                'python -m scripts.install_python_dev_dependencies')
+                'installation script. See diff:\n%s\n\n. Please commit the '
+                'changes. You can get the changes again by running this '
+                'command: python -m scripts.install_python_dev_dependencies' %
+                diff)
 
 
 # This code cannot be covered by tests since it only runs when this file
