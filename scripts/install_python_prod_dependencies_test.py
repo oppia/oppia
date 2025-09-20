@@ -510,6 +510,9 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         self.assertEqual(print_statements, [
             'Checking if pip is installed on the local machine',
             'Regenerating "requirements.txt" file...',
+            'Printing diff in requirements.in:',
+            '--------------------------',
+            '--------------------------',
             'All third-party Python libraries are already installed '
             'correctly.'
         ])
