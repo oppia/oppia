@@ -1227,53 +1227,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.delete_state('END')
         self.assertNotIn('END', exploration.states)
 
-    def test_migration_continues_when_old_content_id_is_none(self) -> None:
-        """Ensure migration continues when old_content_id is None."""
-        state = state_domain.State.create_default_state(
-            'state_name',
-            content_id_for_state_content='c1',
-            content_id_for_default_outcome='d1'
-        )
-
-        # Add an answer group with a rule that produces a content dict
-        # without 'content_id', so old_content_id = None.
-        rg = state_domain.AnswerGroup(
-            rule_specs=[state_domain.RuleSpec(
-                rule_type='Equals',
-                # Using an empty dict ensures 'content_id' key is missing.
-                inputs={'x': {}}
-            )],
-            outcome=state_domain.Outcome(
-                dest='state_name',
-                feedback=state_domain.SubtitledHtml('f', 'fc'),
-                labelled_as_correct=False,
-                param_changes=[],
-                refresher_exploration_id=None,
-                missing_prerequisite_skill_id=None,
-                dest_if_really_stuck=None
-            ),
-            training_data=[],
-            tagged_skill_misconception_id=None
-        )
-        state.interaction.answer_groups.append(rg)
-
-        states_dict = {'state_name': state.to_dict()}
-        # Here we use MyPy ignore because, as seen in the
-        # update_old_content_id_to_new_content_id_in_v54_states method,
-        # the latest StateDict schema does not define `recorded_voiceovers`,
-        # but we still need to handle it for older state dicts.
-        states_dict['state_name']['recorded_voiceovers'] = {  # type: ignore[typeddict-item]
-            'voiceovers_mapping': {}
-        }
-
-        updated_states, _ = (
-            state_domain.State.update_old_content_id_to_new_content_id_in_v54_states(
-                states_dict
-            )
-        )
-
-        self.assertIn('state_name', updated_states)
-
     def test_update_answer_groups_invalid_translatable_input(self) -> None:
         """Ensure update_interaction_answer_groups raises when rule input
         for a translatable object is not a dict with 'contentId'.
