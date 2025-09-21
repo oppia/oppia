@@ -1596,7 +1596,7 @@ class LogToTerminalTests(unittest.TestCase):
 
     def test_invalid_message_type_defaults_to_info(self) -> None:
         with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
-            common.log_to_terminal(  # type: ignore[arg-type]
+            common.log_to_terminal(
             'forced invalid', message_type='NOT_A_TYPE'
             )
             output = mock_stdout.getvalue()
@@ -1604,7 +1604,7 @@ class LogToTerminalTests(unittest.TestCase):
 
     def test_log_to_terminal_with_invalid_message_type(self) -> None:
         """Checks that an invalid message_type falls back to INFO (blue)."""
-        
+
         with common.capture_stdout() as captured_output:
             # Here we use cast because we deliberately pass an invalid type
             # to test that log_to_terminal falls back to INFO.
