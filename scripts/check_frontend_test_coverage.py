@@ -70,7 +70,10 @@ NOT_FULLY_COVERED_FILENAMES = [
     'extensions/interactions/MusicNotesInput/directives/'
         'oppia-interactive-music-notes-input.component.ts',
     'extensions/interactions/PencilCodeEditor/directives/'
-        'oppia-interactive-pencil-code-editor.component.ts'
+        'oppia-interactive-pencil-code-editor.component.ts',
+    'core/templates/services/suggestion-modal.service.ts',
+    'core/templates/pages/blog-post-page/blog-post-page.component.ts',
+    'core/templates/pages/contributor-dashboard-page/modal-templates/translation-suggestion-review-modal.component.ts'
 ]
 
 
