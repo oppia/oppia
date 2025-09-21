@@ -19,12 +19,15 @@
 from __future__ import annotations
 
 import logging
+import time
 
 from core.domain import (
     exp_fetchers,
+    voiceover_regeneration_services,
     voiceover_services,
     opportunity_services
 )
+from core import feconf
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms, results_transforms
@@ -55,6 +58,7 @@ if MYPY: # pragma: no cover
 )
 datastore_services = models.Registry.import_datastore_services()
 
+WAIT_TIME_FOR_VOICEOVER_REGENERATION_IN_SECONDS = 3
 
 
 class VoiceoverSynthesisJob(base_jobs.JobBase):
@@ -126,6 +130,9 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
         entity_translations_list = []
         entity_voiceovers_list = []
 
+        logging.info('Generating voiceovers for exploration %s' % (
+            exploration_model.id))
+
         with datastore_services.get_ndb_context():
             exploration = exp_fetchers.get_exploration_from_model(
                 exploration_model, False)
@@ -184,6 +191,65 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
                 continue
             language_code_to_autogeneratable_accent_codes[
                 language_code] = language_accent_codes
+
+        error_logs = []
+
+
+        for language_code in language_codes:
+            language_accent_codes = (
+                language_code_to_autogeneratable_accent_codes.get(
+                    language_code))
+            content_ids_to_content_values = (
+                language_code_to_contents_mapping.get(language_code, {}))
+
+            for language_accent_code in language_accent_codes:
+
+                for content_id, content_html in content_ids_to_content_values.items():
+                    exploration_id = exploration.id
+
+                    try:
+
+                        time.sleep(WAIT_TIME_FOR_VOICEOVER_REGENERATION_IN_SECONDS)
+
+                        voiceover_filename = voiceover_regeneration_services.generate_new_voiceover_filename(
+                        content_id, language_accent_code)
+
+                        sentence_tokens_with_durations = voiceover_regeneration_services.synthesize_voiceover_for_html_string(
+                            exploration_id, content_html, language_accent_code, voiceover_filename)
+
+                        voiceover = voiceover_regeneration_services.fetch_voiceover_by_filename(
+                            exploration_id, voiceover_filename)
+
+                        entity_voiceovers = None #Get entity voiceovers.
+                        entity_voiceovers.add_voiceover(
+                            content_id, feconf.VoiceoverType.AUTO, voiceover)
+                        entity_voiceovers.add_automated_voiceovers_audio_offsets(
+                            content_id, sentence_tokens_with_durations)
+                        entity_voiceovers.validate()
+                        logging.info('Generated voiceover for content_id: %s, '
+                                     'language_accent_code: %s.' % (
+                                         content_id, language_accent_code,))
+
+                    except Exception as e:
+                        error_logs.append(
+                            self.generate_error_log(
+                                exploration_id, content_id,
+                                language_accent_code, e)
+                        )
+                        logging.exception(
+                            'Error generating voiceover for exploration_id: %s, '
+                            'content_id: %s, language_accent_code: %s' % (
+                                exploration_id, content_id,
+                                language_accent_code))
+
+    @staticmethod
+    def generate_error_log(exploration_id, content_id, language_accent_code, error):
+        return (
+            'Error for exploration_id: %s, content_id: %s, '
+            'language_accent_code: %s: %s' % (
+                exploration_id, content_id,
+                language_accent_code, error)
+        )
 
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
