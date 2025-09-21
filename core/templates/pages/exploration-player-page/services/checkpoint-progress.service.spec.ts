@@ -20,7 +20,6 @@ import {TestBed, waitForAsync} from '@angular/core/testing';
 import {CheckpointProgressService} from './checkpoint-progress.service';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {TranslateModule} from '@ngx-translate/core';
-import {FetchExplorationBackendResponse} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {PlayerTranscriptService} from './player-transcript.service';
 import {ExplorationEngineService} from './exploration-engine.service';
 
