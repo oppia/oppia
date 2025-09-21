@@ -13,3 +13,7 @@ include extensions/objects/object_defaults.json
 # from package.json.
 include package.json
 include requirements.txt
+prune assets/images
+prune core/templates
+prune core/tests
+recursive-exclude build *.pyc

@@ -59,7 +59,7 @@ def main() -> None:
         description='Oppia Apache Beam package',
         install_requires=required_packages,
         setup_requires=['setuptools_scm'],
-        packages=setuptools.find_packages(exclude=['*tests*']),
+        packages=setuptools.find_packages(),
         package_data={
             'oppia_beam_job': ['requirements.txt', 'package.json'],
             '': ['requirements.txt', 'package.json'],
