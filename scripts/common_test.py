@@ -1604,6 +1604,7 @@ class LogToTerminalTests(unittest.TestCase):
 
     def test_log_to_terminal_with_invalid_message_type(self) -> None:
         """Checks that an invalid message_type falls back to INFO (blue)."""
+        
         with common.capture_stdout() as captured_output:
             # Here we use cast because we deliberately pass an invalid type
             # to test that log_to_terminal falls back to INFO.
@@ -1613,4 +1614,5 @@ class LogToTerminalTests(unittest.TestCase):
             )
             output = captured_output.getvalue()
         self.assertIn('unexpected message', output)
-        self.assertIn('\033[94m', output)  # Default color is INFO (blue).
+        # Default color is INFO (blue).
+        self.assertIn('\033[94m', output)
