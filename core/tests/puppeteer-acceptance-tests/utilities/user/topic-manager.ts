@@ -350,6 +350,10 @@ const addNewStoryButtonSelector = '.e2e-test-create-story-button';
 const skillEditOptionsContainerSelector =
   '.e2e-test-skill-edit-options-container';
 const navigationContainerSelector = '.e2e-test-mobile-navigation-bar-container';
+const responseGroupDiv = '.e2e-test-response-tab';
+const toggleResponseTab = '.e2e-test-response-tab-toggle';
+const misconceptionTitle = '.e2e-test-misconception-title';
+const activeTabClass = 'e2e-test-active-tab';
 
 export class TopicManager extends BaseUser {
   /**
@@ -4147,6 +4151,66 @@ export class TopicManager extends BaseUser {
    */
   async expectStaleTabInfoModalToBeVisible(): Promise<void> {
     await this.expectElementToBeVisible(staleTabWarningModalSelector);
+  }
+
+  /**
+   * Tag an answer response group with a misconception for a state card.
+   * @param responseIndex - The index of the response group to be tagged.
+   * @param misconceptionName - The name of the misconception to tag response with.
+   * @param isOptional - Whether the misconception is optional or compulsory.
+   */
+  async tagAnswerGroupWithMisconceptionInQuestionEditor(
+    responseIndex: number,
+    misconceptionName: string,
+    isOptional: boolean
+  ): Promise<void> {
+    let expectedTitle = !isOptional
+      ? misconceptionName
+      : `(Optional) ${misconceptionName}`;
+    if (this.isViewportAtMobileWidth()) {
+      const element = await this.page.$(responseGroupDiv);
+      // If the responses were collapsed in mobile view.
+      if (!element) {
+        await this.clickOn(toggleResponseTab);
+      }
+    }
+    await this.page.waitForSelector(responseGroupDiv, {
+      visible: true,
+    });
+    let responseTabs = await this.page.$$(responseGroupDiv);
+
+    const responseTab = responseTabs[responseIndex];
+
+    // Check if tab is active.
+    const isActive = await responseTab.evaluate(
+      (el: Element, className: string) => {
+        return el.classList.contains(className);
+      },
+      activeTabClass
+    );
+
+    if (!isActive) {
+      await responseTabs[responseIndex].click();
+    }
+    await this.clickOnElementWithText('Tag with misconception');
+
+    await this.page.waitForSelector(misconceptionTitle, {
+      timeout: 5000,
+      visible: true,
+    });
+    const misconceptionTitles = await this.page.$$(misconceptionTitle);
+    for (const misconceptionTitle of misconceptionTitles) {
+      const title = await this.page.evaluate(
+        el => el.textContent,
+        misconceptionTitle
+      );
+      if (title.trim() === expectedTitle) {
+        await misconceptionTitle.click();
+      }
+    }
+
+    await this.clickOn('Done');
+    await this.expectElementToBeVisible(misconceptionTitle, false);
   }
 }
 

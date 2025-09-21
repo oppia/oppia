@@ -425,7 +425,7 @@ const responseInputSelector = '.e2e-test-answer-tab';
 const answerInputSelector = '.e2e-test-answer-description-fragment input';
 const saveAnswerButtonInResponseGroupSelector = '.e2e-test-save-answer';
 const activeRuleTabClass = 'oppia-rule-tab-active';
-const addElementLabel = 'Add element';
+const activeTabClass = 'e2e-test-active-tab';
 
 export enum INTERACTION_TYPES {
   ALGEBRAIC_EXPRESSION = 'Algebric Expression Input',
@@ -468,6 +468,8 @@ const INTERACTION_SELECTORS: Record<string, string> = {
   [INTERACTION_TYPES.MUSIC_NOTES_INPUT]:
     '.e2e-test-interaction-tile-MusicNotesInput',
   [INTERACTION_TYPES.NUMBER_INPUT]: '.e2e-test-interaction-tile-NumericInput',
+  [INTERACTION_TYPES.FRACTION_INPUT]:
+    '.e2e-test-interaction-tile-FractionInput',
 } as const;
 
 enum INTERACTION_TABS {
@@ -3933,7 +3935,19 @@ export class ExplorationEditor extends BaseUser {
     });
     let responseTabs = await this.page.$$(responseGroupDiv);
 
-    await responseTabs[responseIndex].click();
+    const responseTab = responseTabs[responseIndex];
+
+    // Check if tab is active.
+    const isActive = await responseTab.evaluate(
+      (el: Element, className: string) => {
+        return el.classList.contains(className);
+      },
+      activeTabClass
+    );
+
+    if (!isActive) {
+      await responseTabs[responseIndex].click();
+    }
     await this.clickOn('Tag with misconception');
 
     await this.page.waitForSelector(misconceptionTitle, {
