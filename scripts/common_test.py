@@ -1610,7 +1610,6 @@ class LogToTerminalTests(unittest.TestCase):
         # Default color is INFO (blue).
         self.assertIn('\033[94m', output)
 
-
     def test_log_to_terminal_with_invalid_message_type(self) -> None:
         """Checks that an invalid message_type falls back to INFO (blue)."""
 
