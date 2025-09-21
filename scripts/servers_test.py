@@ -471,7 +471,7 @@ class ManagedProcessTests(test_utils.TestBase):
 
         self.assertEqual(
             popen_calls[0].program_args,
-            '%s/bin/elasticsearch -q' % common.ES_PATH)
+            '%s/bin/elasticsearch -q -E xpack.security.enabled=false' % common.ES_PATH)
         self.assertEqual(popen_calls[0].kwargs, {
             'shell': True,
             'env': {
