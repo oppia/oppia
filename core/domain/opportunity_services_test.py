@@ -671,6 +671,8 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             opportunity_services.get_skill_opportunities(None))
         self.assertEqual(len(skill_opportunities), 0)
 
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS])
     def test_publish_story_creates_exploration_opportunity(self) -> None:
         self.add_exploration_0_to_story()
         # Story is already published, so unpublish first.
@@ -1039,8 +1041,6 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
             )
         )
 
-    @test_utils.enable_feature_flags([
-        feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS])
     def test_regenerate_opportunities_related_to_topic_when_story_deleted(
         self
     ) -> None:

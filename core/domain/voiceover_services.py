@@ -1066,7 +1066,7 @@ def extract_english_voiceover_texts_from_exploration(
 
 def extract_translated_voiceover_texts_from_exploration(
     entity_translations: List[translation_domain.EntityTranslation]
-):
+) -> Dict[str, Dict[str, str]]:
     """Retrieves translated voiceover texts from an exploration’s entity
     translations object.
 

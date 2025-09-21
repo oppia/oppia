@@ -831,9 +831,11 @@ def accept_suggestion(
         _update_user_proficiency(user_proficiency)
 
     # Generates voiceovers for approved translation suggestions.
-    if feature_flag_services.is_feature_flag_enabled(
-        feature_flag_list.FeatureNames
-        .ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS.value, None
+    if (
+        feature_flag_services.is_feature_flag_enabled(
+            feature_flag_list.FeatureNames
+            .ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS.value, None) and
+        suggestion.change_cmd.cmd == 'add_written_translation'
     ):
         translated_content = suggestion.change_cmd.translation_html
         content_id = suggestion.change_cmd.content_id

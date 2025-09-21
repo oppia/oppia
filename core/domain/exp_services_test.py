@@ -6378,6 +6378,9 @@ title: Old Title
             exp_services.update_exploration(
                 user_id, exp_id, change_list, 'By voice artist', True)
 
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames.
+        ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS])
     def test_update_exploration_linked_to_story(self) -> None:
         story_id = story_services.get_new_story_id()
         topic_id = topic_fetchers.get_new_topic_id()
@@ -10111,8 +10114,7 @@ class ComputeVoiceoversModelFromExplorationChangeTest(
 
     @test_utils.enable_feature_flags([
         feature_flag_list.FeatureNames.
-        SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS,
-        feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS])
+        SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS])
     def test_should_be_able_to_create_entity_voiceovers_models(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration(
             'test_exp_id', title='some title', category='Algebra',
