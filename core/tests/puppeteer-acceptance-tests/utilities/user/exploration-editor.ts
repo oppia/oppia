@@ -423,6 +423,10 @@ const navigationDropdownInMobileVisibleSelector =
 const selfLoopWarningSelector = '.e2e-test-response-self-loop-warning';
 const goalWarningSelector = '.e2e-test-exploration-objective-warning';
 
+const revertVersionButtonSelector = '.e2e-test-revert-version';
+const confirmRevertButtonSelector = '.e2e-test-confirm-revert';
+const dropdownMenuShown = '.dropdown-menu.show';
+
 export enum INTERACTION_TYPES {
   ALGEBRAIC_EXPRESSION = 'Algebric Expression Input',
   CODE_EDITOR = 'Code Editor',
@@ -6640,6 +6644,10 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeVisible(goalWarningSelector, visible);
   }
 
+  /**
+   * Reverts the version of exploration.
+   * @param version - The version number to revert to.
+   */
   async revertExplorationToVersion(version: string): Promise<void> {
     const historyItemIndexSelector = '.e2e-test-history-table-index';
     const historyItemOptionSelector = '.e2e-test-history-table-option';
@@ -6671,6 +6679,29 @@ export class ExplorationEditor extends BaseUser {
 
     await this.waitForElementToBeClickable(historyOption);
     await historyOption.click();
+
+    await this.clickOn(`${dropdownMenuShown} ${revertVersionButtonSelector}`);
+    await this.waitForElementToStabilize(confirmRevertButtonSelector);
+    await this.clickAndWaitForNavigation(confirmRevertButtonSelector);
+
+    await this.expectElementToBeVisible(confirmRevertButtonSelector, false);
+  }
+
+  /**
+   * Checks if the date of the last exploration version is in correct format or not.
+   */
+  async expectExplorationHistoryDateHasProperFormat(): Promise<void> {
+    const explorationHistoryDateSelector = '.e2e-test-history-tab-commit-date';
+    await this.expectElementToBeVisible(explorationHistoryDateSelector);
+    const dateString = await this.page.$eval(
+      explorationHistoryDateSelector,
+      el => el.textContent?.trim() || ''
+    );
+    const pattern =
+      /^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{1,2}, \d{1,2}:\d{2} (AM|PM)$/;
+    if (!pattern.test(dateString)) {
+      throw new Error("The date ins't formatted properly.");
+    }
   }
 }
 

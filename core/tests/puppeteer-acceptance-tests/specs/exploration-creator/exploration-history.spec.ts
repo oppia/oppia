@@ -82,7 +82,14 @@ describe('Exploration Editor', function () {
   });
 
   it('should be able to revert to a previous version of an exploration', async function () {
-    await explorationEditor;
+    // Check if exploration version date is properly formatted.
+    await explorationEditor.expectExplorationHistoryDateHasProperFormat();
+
+    // Revert exploration to an older version.
+    await explorationEditor.revertExplorationToVersion('10');
+    await explorationEditor.navigateToEditorTab();
+    await explorationEditor.navigateToCard('Second Card');
+    await explorationEditor.expectCardContentToBe('Thanks for playing! 6');
   });
 
   afterAll(async function () {
