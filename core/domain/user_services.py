@@ -1706,6 +1706,10 @@ def get_human_readable_user_ids(
     usernames = []
     for ind, user_settings in enumerate(users_settings):
         if user_settings is None:
+            # TODO(#23412): This can be removed after ExpSummaryModels are
+            # cleaned such that they no longer reference contributor_ids
+            # that do not have a corresponding UserSettingsModel in the
+            # datastore.
             if include_deleted:
                 usernames.append(LABEL_FOR_DELETED_USER)
             if strict:
