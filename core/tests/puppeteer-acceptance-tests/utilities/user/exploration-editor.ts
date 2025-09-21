@@ -426,6 +426,12 @@ const goalWarningSelector = '.e2e-test-exploration-objective-warning';
 const revertVersionButtonSelector = '.e2e-test-revert-version';
 const confirmRevertButtonSelector = '.e2e-test-confirm-revert';
 const dropdownMenuShown = '.dropdown-menu.show';
+const responseInputSelector = '.e2e-test-answer-tab';
+const answerInputSelector = '.e2e-test-answer-description-fragment input';
+const saveAnswerButtonInResponseGroupSelector = '.e2e-test-save-answer';
+const activeRuleTabClass = 'oppia-rule-tab-active';
+const activeTabClass = 'e2e-test-active-tab';
+const interactionPreviewSelector = '.e2e-test-interaction';
 
 export enum INTERACTION_TYPES {
   ALGEBRAIC_EXPRESSION = 'Algebric Expression Input',
@@ -6702,6 +6708,28 @@ export class ExplorationEditor extends BaseUser {
     if (!pattern.test(dateString)) {
       throw new Error("The date ins't formatted properly.");
     }
+  }
+
+  /**
+   * Clicks on interaction in exploration editor.
+   */
+  async clickOnTestExploration(): Promise<void> {
+    await this.expectElementToBeVisible(interactionPreviewSelector);
+    await this.clickOn(interactionPreviewSelector);
+    await this.page.waitForFunction(
+      (selector: string, h1: string, h2: string) => {
+        const element = document.querySelector(selector);
+        return (
+          element &&
+          (element.textContent?.includes(h1) ||
+            element.textContent?.includes(h2))
+        );
+      },
+      {},
+      commonModalTitleSelector,
+      'Customize Interaction',
+      'Add Response'
+    );
   }
 }
 
