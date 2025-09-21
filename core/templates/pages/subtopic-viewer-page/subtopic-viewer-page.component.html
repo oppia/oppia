@@ -46,20 +46,20 @@
           </oppia-rte-output-display>
         </div>
       </div>
-      <button *ngIf="isPracticeTabDisplayed" (click)="openPracticeMenu()" class="btn btn-next-actions e2e-test-go-to-practice-section-button btn-practice-section">
+      <button *ngIf="isPracticeTabDisplayed" (click)="openPracticeMenu($event)" class="btn btn-next-actions e2e-test-go-to-practice-section-button btn-practice-section">
+        <img [src]="getStaticImageUrl('/icons/practice-button-edit.png')" alt="Practice button icon" width="15px" height="15px" class="practice-section-icon">
         <p class="text-practice-section-fixed">
-          <img [src]="getStaticImageUrl('/icons/practice-button-edit.png')" alt="Practice button icon" width="15px" height="15px">
           {{ 'I18N_SUBTOPIC_VIEWER_GO_TO_PRACTICE' | translate }} {{ subtopicTitle }}
         </p>
       </button>
     </div>
   </div>
   <div class="next-actions-buttons-container">
-    <button (click)="openStudyGuideMenu()" class="btn btn-next-actions e2e-test-go-to-study-guide-menu-button btn-study-guide-menu">
+    <button (click)="openStudyGuideMenu($event)" class="btn btn-next-actions e2e-test-go-to-study-guide-menu-button btn-study-guide-menu">
       <i class="material-icons icon-study-guide-menu">exit_to_app</i>
       <p class="text-go-to-study-guides-fixed"> {{ 'I18N_SUBTOPIC_VIEWER_GO_TO_STUDY_GUIDE_MENU_BUTTON' | translate }}</p>
     </button>
-    <button (click)="openStudyGuide()" *ngIf="nextSubtopic" [title]="nextSubtopic.getTitle()" class="btn btn-next-actions e2e-test-go-to-next-study-guide-button btn-next-study-guide">
+    <button (click)="openStudyGuide($event)" *ngIf="nextSubtopic" [title]="nextSubtopic.getTitle()" class="btn btn-next-actions e2e-test-go-to-next-study-guide-button btn-next-study-guide">
       <i class="material-icons icon-next-study-guide next-study-guide-forward-arrow">arrow_forward</i>
       <div>
         <div>
@@ -172,7 +172,7 @@
     gap: 5px;
     height: 60px;
     padding: 8px;
-    width: 250px;
+    width: 200px;
   }
 
   .btn-next-study-guide {
@@ -227,7 +227,7 @@
     box-shadow: 0 0 10px 0 #00000026;
     color: #008098;
     display: flex;
-    gap: 16px;
+    gap: 5px;
     justify-content: center;
     margin-top: 30px;
     padding-left: 16px;
@@ -238,6 +238,10 @@
     font-size: 15px;
     font-weight: 500;
     margin: 0 !important;
+  }
+  .practice-section-icon {
+    align-self: flex-start;
+    margin-top: 5px;
   }
 
   .next-study-guide-forward-arrow {

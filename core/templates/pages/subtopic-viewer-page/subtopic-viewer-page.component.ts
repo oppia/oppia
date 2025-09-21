@@ -227,12 +227,17 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
     );
   }
 
-  openStudyGuide(): void {
+  openStudyGuide(event?: MouseEvent): void {
     // This component is being used in the topic editor as well and
     // we want to disable the linking in this case.
     const urlFragment = this.nextSubtopic.getUrlFragment();
     if (!this.classroomUrlFragment || !this.topicUrlFragment || !urlFragment) {
       return;
+    }
+    let window = '_self';
+    if (event && (event.ctrlKey || event.metaKey)) {
+      // Open in new tab.
+      window = '_blank';
     }
     this.windowRef.nativeWindow.open(
       this.urlInterpolationService.interpolateUrl(
@@ -243,13 +248,18 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
           subtopic_url_fragment: urlFragment,
         }
       ),
-      '_self'
+      window
     );
   }
 
-  openStudyGuideMenu(): void {
+  openStudyGuideMenu(event?: MouseEvent): void {
     if (!this.classroomUrlFragment || !this.topicUrlFragment) {
       return;
+    }
+    let window = '_self';
+    if (event && (event.ctrlKey || event.metaKey)) {
+      // Open in new tab.
+      window = '_blank';
     }
     this.windowRef.nativeWindow.open(
       this.urlInterpolationService.interpolateUrl(
@@ -259,11 +269,11 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
           topic_url_fragment: this.topicUrlFragment,
         }
       ),
-      '_self'
+      window
     );
   }
 
-  openPracticeMenu(): void {
+  openPracticeMenu(event?: MouseEvent): void {
     const selectedSubtopicIds = [];
     selectedSubtopicIds.push(this.currentSubtopicId);
     let practiceSessionsUrl = this.urlInterpolationService.interpolateUrl(
@@ -279,8 +289,14 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
       this.parentTopicTitle,
       selectedSubtopicIds.toString()
     );
-    this.windowRef.nativeWindow.location.href = practiceSessionsUrl;
-    this.loaderService.showLoadingScreen('Loading');
+    if (event && (event.ctrlKey || event.metaKey)) {
+      // Open in new tab.
+      this.windowRef.nativeWindow.open(practiceSessionsUrl, '_blank');
+    } else {
+      // Normal navigation.
+      this.windowRef.nativeWindow.location.href = practiceSessionsUrl;
+      this.loaderService.showLoadingScreen('Loading');
+    }
   }
 
   backToTopic(): void {
@@ -306,13 +322,24 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
   checkNextSubtopicTitleLengthAndModify(): string {
     let title: string = this.nextSubtopic.getTitle();
     if (
+      this.checkMobileView() &&
       title.length >=
-      AppConstants.STUDY_GUIDE_VIEWER_NEXT_SUBTOPIC_TITLE_LENGTH_LIMIT
+        AppConstants.STUDY_GUIDE_VIEWER_NEXT_SUBTOPIC_TITLE_LENGTH_LIMIT_MOBILE
     ) {
       title =
         title.substring(
           0,
-          AppConstants.STUDY_GUIDE_VIEWER_NEXT_SUBTOPIC_TITLE_TRUNCATED_LENGTH
+          AppConstants.STUDY_GUIDE_VIEWER_NEXT_SUBTOPIC_TITLE_TRUNCATED_LENGTH_MOBILE
+        ) + '...';
+    } else if (
+      !this.checkMobileView() &&
+      title.length >=
+        AppConstants.STUDY_GUIDE_VIEWER_NEXT_SUBTOPIC_TITLE_LENGTH_LIMIT_DESKTOP
+    ) {
+      title =
+        title.substring(
+          0,
+          AppConstants.STUDY_GUIDE_VIEWER_NEXT_SUBTOPIC_TITLE_TRUNCATED_LENGTH_DESKTOP
         ) + '...';
     }
     return title;
