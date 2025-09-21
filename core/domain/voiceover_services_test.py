@@ -1707,6 +1707,17 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
                 'content_format': 'html',
                 'needs_update': True
             },
+            'rule_input_Equals': {
+                'content_value': arabic_translation,
+                'content_format': 'html',
+                'needs_update': False
+            },
+            'feedback_1': {
+                'content_value': arabic_translation,
+                'content_format': 'html',
+                'needs_update': False
+            },
+
         }
 
         translation_models.EntityTranslationsModel.create_new(
@@ -1777,10 +1788,17 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
         self.assertNotEqual(
             entity_voiceovers.voiceovers_mapping, {}
         )
-        self.assertEqual(
+        self.assertDictEqual(
             entity_voiceovers.automated_voiceovers_audio_offsets_msecs,
             {
                 'content_0': [
+                    {'token': 'This', 'audio_offset_msecs': 0.0},
+                    {'token': 'is', 'audio_offset_msecs': 100.0},
+                    {'token': 'a', 'audio_offset_msecs': 200.0},
+                    {'token': 'test', 'audio_offset_msecs': 300.0},
+                    {'token': 'text', 'audio_offset_msecs': 400.0}
+                ],
+                'feedback_1': [
                     {'token': 'This', 'audio_offset_msecs': 0.0},
                     {'token': 'is', 'audio_offset_msecs': 100.0},
                     {'token': 'a', 'audio_offset_msecs': 200.0},

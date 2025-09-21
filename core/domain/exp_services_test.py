@@ -10111,7 +10111,8 @@ class ComputeVoiceoversModelFromExplorationChangeTest(
 
     @test_utils.enable_feature_flags([
         feature_flag_list.FeatureNames.
-        ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS])
+        SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS,
+        feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS])
     def test_should_be_able_to_create_entity_voiceovers_models(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration(
             'test_exp_id', title='some title', category='Algebra',

@@ -31,6 +31,7 @@ from core.domain import (
     platform_parameter_list,
     platform_parameter_services,
     state_domain,
+    translation_domain,
     translation_fetchers,
     user_services,
     voiceover_domain,
@@ -1026,6 +1027,83 @@ def _remove_empty_contents_for_voiceover_regeneration(
             del content_ids_to_content_values[content_id]
 
 
+def extract_english_voiceover_texts_from_exploration(
+    exploration: exp_domain.Exploration
+) -> Dict[str, Dict[str, str]]:
+    """Extracts English voiceover texts from the given exploration.
+
+    Args:
+        exploration: Exploration. The exploration from which to
+            extract English voiceover texts.
+
+    Returns:
+        dict. A dictionary that maps the language code (English) to its
+        corresponding content IDs and their associated values.
+    """
+    language_code_to_contents_mapping: Dict[str, Dict[str, str]] = {}
+
+    for state in exploration.states.values():
+        content_id_to_translatable_content = (
+            state.get_translatable_contents_collection()
+        ).content_id_to_translatable_content
+
+        for translatable_content in (
+                content_id_to_translatable_content.values()):
+            content_id = translatable_content.content_id
+
+            # Rule inputs are not considered for voiceover generation.
+            if content_id.startswith('rule_input'):
+                continue
+
+            content_value = translatable_content.content_value
+            assert isinstance(content_value, str)
+
+            language_code_to_contents_mapping.setdefault('en', {})[
+                content_id] = content_value
+
+    return language_code_to_contents_mapping
+
+
+def extract_translated_voiceover_texts_from_exploration(
+    entity_translations: List[translation_domain.EntityTranslation]
+):
+    """Retrieves translated voiceover texts from an exploration’s entity
+    translations object.
+
+    Args:
+        entity_translations: List[translation_domain.EntityTranslation]. A list
+            of entity translations to extract voiceover texts from.
+
+    Returns:
+        dict. A dictionary mapping language codes to their corresponding content
+        IDs and translated values.
+    """
+    language_code_to_contents_mapping: Dict[str, Dict[str, str]] = {}
+
+    for entity_translation in entity_translations:
+        language_code = entity_translation.language_code
+        translations = entity_translation.translations
+
+        for content_id, translated_content in translations.items():
+
+            # Rule inputs are not considered for voiceover generation.
+            if content_id.startswith('rule_input'):
+                continue
+
+            # Voiceovers should only be regenerated if the translation is
+            # updated.
+            if translated_content.needs_update:
+                continue
+
+            content_value = translated_content.content_value
+            assert isinstance(content_value, str)
+
+            language_code_to_contents_mapping.setdefault(language_code, {})[
+                content_id] = content_value
+
+    return language_code_to_contents_mapping
+
+
 def _regenerate_voiceovers_for_given_contents(
     exploration_id: str,
     exploration_title: str,
@@ -1255,23 +1333,9 @@ def regenerate_voiceovers_on_exploration_curation(
     exploration_title = exploration.title
 
     # Retrieve all English-language contents from the exploration.
-    for state in exploration.states.values():
-        content_id_to_translatable_content = (
-            state.get_translatable_contents_collection()
-        ).content_id_to_translatable_content
-        for translatable_content in (
-                content_id_to_translatable_content.values()):
-            content_id = translatable_content.content_id
-
-            # Rule inputs are not considered for voiceover generation.
-            if content_id.startswith('rule_input'):
-                continue
-
-            content_value = translatable_content.content_value
-            assert isinstance(content_value, str)
-
-            language_code_to_contents_mapping.setdefault('en', {})[
-                content_id] = content_value
+    language_code_to_contents_mapping.update(
+        extract_english_voiceover_texts_from_exploration(exploration)
+    )
 
     # Retrieve all translated contents of the exploration.
     entity_translations = (
@@ -1281,24 +1345,9 @@ def regenerate_voiceovers_on_exploration_curation(
             exploration_version
         )
     )
-    for entity_translation in entity_translations:
-        language_code = entity_translation.language_code
-        translations = entity_translation.translations
-        for content_id, translated_content in translations.items():
-            # Rule inputs are not considered for voiceover generation.
-            if content_id.startswith('rule_input'):
-                continue
-
-            # Voiceovers should only be regenerated if the translation is
-            # updated.
-            if translated_content.needs_update:
-                continue
-
-            content_value = translated_content.content_value
-            assert isinstance(content_value, str)
-
-            language_code_to_contents_mapping.setdefault(language_code, {})[
-                content_id] = content_value
+    language_code_to_contents_mapping.update(
+        extract_translated_voiceover_texts_from_exploration(
+            entity_translations))
 
     _regenerate_voiceovers_for_given_contents(
         exploration_id,
@@ -1355,49 +1404,20 @@ def regenerate_voiceovers_of_exploration_for_given_language_accent(
 
     if language_code == constants.DEFAULT_LANGUAGE_CODE:
         # Retrieve all English-language contents from the exploration.
-        for state in exploration.states.values():
-            content_id_to_translatable_content = (
-                state.get_translatable_contents_collection()
-            ).content_id_to_translatable_content
-            for translatable_content in (
-                    content_id_to_translatable_content.values()):
-                content_id = translatable_content.content_id
-
-                # Rule inputs are not considered for voiceover generation.
-                if content_id.startswith('rule_input'):
-                    continue
-
-                content_value = translatable_content.content_value
-                assert isinstance(content_value, str)
-
-                language_code_to_contents_mapping.setdefault('en', {})[
-                    content_id] = content_value
+        language_code_to_contents_mapping.update(
+            extract_english_voiceover_texts_from_exploration(exploration))
     else:
         # Retrieve all translated contents of the exploration in the given
         # language code.
-        entity_translations = translation_fetchers.get_entity_translation(
+        entity_translation = translation_fetchers.get_entity_translation(
             feconf.TranslatableEntityType.EXPLORATION,
             exploration_id,
             exploration_version,
             language_code
         )
-        language_code = entity_translations.language_code
-        translations = entity_translations.translations
-        for content_id, translated_content in translations.items():
-            # Rule inputs are not considered for voiceover generation.
-            if content_id.startswith('rule_input'):
-                continue
-
-            # Voiceovers should only be regenerated if the translation is
-            # updated.
-            if translated_content.needs_update:
-                continue
-
-            content_value = translated_content.content_value
-            assert isinstance(content_value, str)
-
-            language_code_to_contents_mapping.setdefault(language_code, {})[
-                content_id] = content_value
+        language_code_to_contents_mapping.update(
+            extract_translated_voiceover_texts_from_exploration(
+                [entity_translation]))
 
     _regenerate_voiceovers_for_given_contents(
         exploration_id,
