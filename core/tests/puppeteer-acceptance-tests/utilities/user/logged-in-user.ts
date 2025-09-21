@@ -713,7 +713,7 @@ export class LoggedInUser extends BaseUser {
       await this.waitForElementToBeClickable(ratingStars[rating - 1]);
       await ratingStars[rating - 1].click();
 
-      await this.type(feedbackTextareaSelector, feedback);
+      await this.typeInInputField(feedbackTextareaSelector, feedback);
       if (stayAnonymous) {
         await this.clickOn(anonymousCheckboxSelector);
       }
@@ -777,7 +777,7 @@ export class LoggedInUser extends BaseUser {
       visible: true,
     });
     await this.clickOn(accountDeletionButtonInDeleteAccountPage);
-    await this.type(confirmUsernameField, username);
+    await this.typeInInputField(confirmUsernameField, username);
     await this.clickAndWaitForNavigation(confirmAccountDeletionButton);
 
     await this.page.waitForSelector(deleteMyAcccountButton, {
@@ -826,7 +826,7 @@ export class LoggedInUser extends BaseUser {
       visible: true,
     });
     await this.clearAllTextFrom(signUpUsernameField);
-    await this.type(signUpUsernameField, username);
+    await this.typeInInputField(signUpUsernameField, username);
     // Using blur() to remove focus from signUpUsernameField.
     await this.page.evaluate(selector => {
       document.querySelector(selector).blur();
@@ -863,7 +863,7 @@ export class LoggedInUser extends BaseUser {
       visible: true,
     });
     await this.clearAllTextFrom(signUpEmailField);
-    await this.type(signUpEmailField, email);
+    await this.typeInInputField(signUpEmailField, email);
 
     await this.waitForPageToFullyLoad();
     const invalidEmailErrorContainerElement = await this.page.$(
@@ -1342,7 +1342,7 @@ export class LoggedInUser extends BaseUser {
       visible: true,
     });
     await this.clickOn(bioTextareaSelector);
-    await this.type(bioTextareaSelector, bio);
+    await this.typeInInputField(bioTextareaSelector, bio);
 
     const updatedValue = await this.page.$eval(
       bioTextareaSelector,
@@ -1391,7 +1391,7 @@ export class LoggedInUser extends BaseUser {
    */
   async updateSubjectInterestsWithEnterKey(interests: string[]): Promise<void> {
     for (const interest of interests) {
-      await this.type(subjectInterestsInputSelector, interest);
+      await this.typeInInputField(subjectInterestsInputSelector, interest);
       await this.page.keyboard.press('Enter');
     }
 
@@ -1425,7 +1425,7 @@ export class LoggedInUser extends BaseUser {
       visible: true,
     });
     for (const interest of interests) {
-      await this.type(subjectInterestsInputSelector, interest);
+      await this.typeInInputField(subjectInterestsInputSelector, interest);
       await this.page.click(matFormTextSelector);
     }
 
@@ -1488,7 +1488,7 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(siteLanguageInputSelector, {
       visible: true,
     });
-    await this.type(siteLanguageInputSelector, language);
+    await this.typeInInputField(siteLanguageInputSelector, language);
     await this.page.keyboard.press('Enter');
 
     // Post-check: Ensure the site language is properly selected.
@@ -1517,7 +1517,7 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(audioLanguageInputSelector, {
       visible: true,
     });
-    await this.type(audioLanguageInputSelector, language);
+    await this.typeInInputField(audioLanguageInputSelector, language);
     await this.page.keyboard.press('Enter');
 
     // Post-check: Ensure the audio language is properly selected.
@@ -1803,7 +1803,10 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(issueTypeSelector);
     await this.waitForElementToStabilize(issueTypeSelector);
     await this.page.click(issueTypeSelector);
-    await this.type(reportExplorationTextAreaSelector, issueDescription);
+    await this.typeInInputField(
+      reportExplorationTextAreaSelector,
+      issueDescription
+    );
 
     await this.clickOn(submitReportButtonSelector);
 
@@ -2189,7 +2192,7 @@ export class LoggedInUser extends BaseUser {
       visible: true,
     });
     await this.clearAllTextFrom(addTitleBar);
-    await this.type(addTitleBar, title);
+    await this.typeInInputField(addTitleBar, title);
     await this.page.keyboard.press('Tab');
 
     const currentTitle = await this.page.$eval(
@@ -2304,7 +2307,7 @@ export class LoggedInUser extends BaseUser {
       visible: true,
     });
     await this.clickOn(stateEditSelector);
-    await this.type(stateContentInputField, `${content}`);
+    await this.typeInInputField(stateContentInputField, `${content}`);
     await this.clickOn(saveContentButton);
     await this.page.waitForSelector(stateContentInputField, {hidden: true});
     showMessage('Card content is updated successfully.');
@@ -2320,7 +2323,7 @@ export class LoggedInUser extends BaseUser {
       visible: true,
     });
     await this.clickOn(stateEditSelector);
-    await this.type(stateContentInputField, `${content}`);
+    await this.typeInInputField(stateContentInputField, `${content}`);
     await this.clickOn(addSkillReviewComponentButton);
     await this.clickOn(skillInSkillreviewModal);
     await this.clickOn(saveRteComponentAndCloseCustomizationModalButton);
@@ -2448,7 +2451,7 @@ export class LoggedInUser extends BaseUser {
       await this.clickOn(saveChangesButton);
     }
     await this.clickOn(commitMessageSelector);
-    await this.type(commitMessageSelector, commitMessage);
+    await this.typeInInputField(commitMessageSelector, commitMessage);
     await this.clickOn(saveDraftButton);
     await this.page.waitForSelector(saveDraftButton, {hidden: true});
 
@@ -2479,13 +2482,13 @@ export class LoggedInUser extends BaseUser {
   ): Promise<string> {
     const fillExplorationMetadataDetails = async () => {
       await this.clickOn(explorationTitleInput);
-      await this.type(explorationTitleInput, `${title}`);
+      await this.typeInInputField(explorationTitleInput, `${title}`);
       await this.clickOn(explorationGoalInput);
-      await this.type(explorationGoalInput, `${goal}`);
+      await this.typeInInputField(explorationGoalInput, `${goal}`);
       await this.clickOn(explorationCategoryDropdown);
       await this.clickOn(`${category}`);
       if (tags) {
-        await this.type(tagsField, tags);
+        await this.typeInInputField(tagsField, tags);
       }
     };
     const publishExploration = async () => {
@@ -2744,7 +2747,7 @@ export class LoggedInUser extends BaseUser {
    */
   async giveFeedback(feedback: string, stayAnonymous: boolean): Promise<void> {
     await this.page.waitForSelector(feedbackTextareaSelector);
-    await this.type(feedbackTextareaSelector, feedback);
+    await this.typeInInputField(feedbackTextareaSelector, feedback);
     if (stayAnonymous) {
       await this.clickOn(anonymousCheckboxSelector);
     }

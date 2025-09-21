@@ -59,7 +59,6 @@ const mergeSkillsButtonMobile = '.e2e-test-mobile-merge-skills-button';
 const mergeSkillsButtonDesktop = '.e2e-test-merge-skills-button';
 const skillsTab = 'a.e2e-test-skills-tab';
 const skillsAssignmentSelector = '.e2e-test-skill-assignments';
-const skillNameAndStatusContainer = '.e2e-test-open-skill-editor';
 const discardChangesInMobileNavSelector =
   '.e2e-test-mobile-discard-changes-direct';
 
@@ -352,8 +351,6 @@ const skillEditOptionsContainerSelector =
   '.e2e-test-skill-edit-options-container';
 const navigationContainerSelector = '.e2e-test-mobile-navigation-bar-container';
 
-const ADD_PREREQUISITE_SKILL_BUTTON_LABEL = '+ ADD PREREQUISITE SKILL';
-
 export class TopicManager extends BaseUser {
   /**
    * Closes navigation in mobile view.
@@ -392,7 +389,32 @@ export class TopicManager extends BaseUser {
       await this.expectElementToBeVisible(resetTopicFilterButtonSelector);
       await this.clickOn(resetTopicFilterButtonSelector);
     }
+
+    // Post-check: Ensure all fields are resetted.
+    await this.expectTextContentToBe(
+      `${sortDropdownSelector} .mat-select-value-text`,
+      'Most Recently Updated'
+    );
+    if (await this.isElementVisible(topicStatusDropdownSelector, true, 5000)) {
+      await this.expectTextContentToBe(
+        `${topicStatusDropdownSelector} .mat-select-value-text`,
+        'All'
+      );
+    }
+    if (await this.isElementVisible(classroomDropdownSelector)) {
+      await this.expectTextContentToBe(
+        `${classroomDropdownSelector} .mat-select-min-line`,
+        'Classrooms'
+      );
+    }
+    if (await this.isElementVisible(skillStatusDropdownSelector)) {
+      await this.expectTextContentToBe(
+        `${skillStatusDropdownSelector} .mat-select-value-text`,
+        'All'
+      );
+    }
   }
+
   /**
    * Clicks on Topics and Skills Dashboard option in the profile menu.
    * It does not open the menu.
@@ -565,7 +587,7 @@ export class TopicManager extends BaseUser {
       }
     }
     await this.clickOn(addSkillButton);
-    await this.type(skillNameInput, skillName);
+    await this.typeInInputField(skillNameInput, skillName);
     await this.clickOn(skillItem);
     await this.clickOn(confirmSkillButton);
     await this.expectPageURLToContain(testConstants.URLs.SkillEditor);
@@ -655,7 +677,7 @@ export class TopicManager extends BaseUser {
     await this.expectElementToBeVisible(topicEditorMainTabFormSelector);
     if (topicName) {
       await this.clearAllTextFrom(topicNameField);
-      await this.type(topicNameField, topicName);
+      await this.typeInInputField(topicNameField, topicName);
       await this.expectInputValueToBe(topicNameField, topicName);
     }
     if (urlFragment) {
@@ -673,9 +695,9 @@ export class TopicManager extends BaseUser {
       await this.clickOn(closeToastMessageButton);
     }
     await this.clearAllTextFrom(updateTopicWebFragmentField);
-    await this.type(updateTopicWebFragmentField, titleFragments);
+    await this.typeInInputField(updateTopicWebFragmentField, titleFragments);
     await this.clearAllTextFrom(updateTopicDescriptionField);
-    await this.type(updateTopicDescriptionField, description);
+    await this.typeInInputField(updateTopicDescriptionField, description);
     await this.expectInputValueToBe(updateTopicDescriptionField, description);
 
     await this.clickOn(photoBoxButton);
@@ -721,7 +743,7 @@ export class TopicManager extends BaseUser {
     await this.clickOn(createQuestionButton);
     await this.clickOn(textStateEditSelector);
     await this.page.waitForSelector(richTextAreaField, {visible: true});
-    await this.type(richTextAreaField, 'Add 1+2');
+    await this.typeInInputField(richTextAreaField, 'Add 1+2');
     await this.page.waitForSelector(`${saveContentButton}:not([disabled])`);
     await this.clickOn(saveContentButton);
 
@@ -748,22 +770,22 @@ export class TopicManager extends BaseUser {
     await this.expectModalTitleToBe('Add Response');
     await this.clickOn(responseRuleDropdown);
     await this.clickOn(equalsRuleButtonText);
-    await this.type(floatTextField, '3');
+    await this.typeInInputField(floatTextField, '3');
     await this.clickOn(answersInGroupAreCorrectToggle);
     await this.clickOn(openAnswerGroupFeedBackEditor);
-    await this.type(richTextAreaField, 'Good job!');
+    await this.typeInInputField(richTextAreaField, 'Good job!');
     await this.clickOn(saveResponseButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
 
     await this.clickOn(defaultFeedbackTab);
     await this.clickOn(openOutcomeFeedBackEditor);
     await this.clickOn(richTextAreaField);
-    await this.type(richTextAreaField, 'The answer is 3');
+    await this.typeInInputField(richTextAreaField, 'The answer is 3');
     await this.clickOn(saveOutcomeFeedbackButton);
 
     await this.clickOn(addHintButton);
     await this.page.waitForSelector(modalDiv, {visible: true});
-    await this.type(richTextAreaField, '3');
+    await this.typeInInputField(richTextAreaField, '3');
     await this.clickOn(saveHintButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
 
@@ -772,10 +794,10 @@ export class TopicManager extends BaseUser {
     await this.page.waitForSelector(answerTypeDropdown);
     await this.page.select(answerTypeDropdown, 'The only');
     await this.page.waitForSelector(solutionFloatTextField);
-    await this.type(solutionFloatTextField, '3');
+    await this.typeInInputField(solutionFloatTextField, '3');
     await this.page.waitForSelector(`${submitAnswerButton}:not([disabled])`);
     await this.clickOn(submitAnswerButton);
-    await this.type(richTextAreaField, '1+2 is 3');
+    await this.typeInInputField(richTextAreaField, '1+2 is 3');
     await this.page.waitForSelector(`${submitSolutionButton}:not([disabled])`);
     await this.clickOn(submitSolutionButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
@@ -814,7 +836,7 @@ export class TopicManager extends BaseUser {
       await this.page.waitForSelector(topicEditorSaveModelSelector, {
         visible: true,
       });
-      await this.type(
+      await this.typeInInputField(
         saveChangesMessageInput,
         'Test saving topic as curriculum admin.'
       );
@@ -828,7 +850,7 @@ export class TopicManager extends BaseUser {
     } else {
       await this.clickOn(saveTopicButton);
       if (description) {
-        await this.type(saveChangesMessageInput, description);
+        await this.typeInInputField(saveChangesMessageInput, description);
         await this.expectElementValueToBe(saveChangesMessageInput, description);
       }
       await this.page.waitForSelector(
@@ -909,7 +931,7 @@ export class TopicManager extends BaseUser {
       await this.page.waitForSelector(keywordDropdownSelector);
       await this.clickOn(keywordDropdownSelector);
       await this.page.waitForSelector(multiSelectionInputSelector);
-      await this.type(multiSelectionInputSelector, keyword);
+      await this.typeInInputField(multiSelectionInputSelector, keyword);
       await this.page.keyboard.press('Enter');
       await this.expectTextContentToBe(
         `${multiSelectionInputChipSelector}`,
@@ -1597,7 +1619,7 @@ export class TopicManager extends BaseUser {
    */
   async fillSkillNameInSkillSelectionModal(skillName: string): Promise<void> {
     await this.expectElementToBeVisible(skillNameInputSelector);
-    await this.type(skillNameInputSelector, skillName);
+    await this.typeInInputField(skillNameInputSelector, skillName);
     await this.expectElementValueToBe(skillNameInputSelector, skillName);
   }
 
@@ -1768,7 +1790,7 @@ export class TopicManager extends BaseUser {
    */
   async previewQuestion(questionText: string): Promise<void> {
     await this.expectElementToBeVisible(questionTextInput);
-    await this.type(questionTextInput, questionText);
+    await this.typeInInputField(questionTextInput, questionText);
     await this.page.keyboard.press('Enter');
 
     await this.expectInputValueToBe(questionTextInput, questionText);
@@ -1876,7 +1898,7 @@ export class TopicManager extends BaseUser {
       await this.page.waitForSelector(keywordDropdownSelector);
       await this.clickOn(keywordDropdownSelector);
       await this.page.waitForSelector(multiSelectionInputSelector);
-      await this.type(multiSelectionInputSelector, keyword);
+      await this.typeInInputField(multiSelectionInputSelector, keyword);
       await this.page.keyboard.press('Enter');
       await this.expectTextContentToBe(
         `${multiSelectionInputChipSelector}`,
@@ -2262,8 +2284,8 @@ export class TopicManager extends BaseUser {
       }
     }
     await this.clickOn(addButtonSelector);
-    await this.type(nameFieldSelector, misconceptionName);
-    await this.type(rteSelector, notes);
+    await this.typeInInputField(nameFieldSelector, misconceptionName);
+    await this.typeInInputField(rteSelector, notes);
     const rteElements = await this.page.$$(rteSelector);
     await rteElements[1].type(feedback);
     if (optional) {
@@ -2383,7 +2405,7 @@ export class TopicManager extends BaseUser {
       await this.expectElementToBeVisible(editConceptCardSelector);
       await this.clickOn(editConceptCardSelector);
       await this.clearAllTextFrom(rteSelector);
-      await this.type(rteSelector, updatedMaterial);
+      await this.typeInInputField(rteSelector, updatedMaterial);
       await this.clickOn(saveConceptCardSelector);
       await this.expectElementToBeVisible(saveConceptCardSelector, false);
       showMessage('Updated review material');
@@ -2420,7 +2442,7 @@ export class TopicManager extends BaseUser {
         await this.clickOn(togglePrerequisiteSkillsDropdown);
       }
       await this.clickOn(addPrerequisiteSkillInSkillEditorButton);
-      await this.type(skillNameInputSelector, skillName);
+      await this.typeInInputField(skillNameInputSelector, skillName);
 
       await this.page.waitForSelector(radioInnerCircleSelector);
       const radioInnerCircleSelectorElement = await this.page.$(
@@ -2592,7 +2614,7 @@ export class TopicManager extends BaseUser {
     await this.select(selectRubricDifficultySelector, difficultyValue);
     await this.waitForStaticAssetsToLoad();
     await this.clickOn(' + ADD EXPLANATION FOR DIFFICULTY ');
-    await this.type(rteSelector, explanation);
+    await this.typeInInputField(rteSelector, explanation);
     await this.clickOn(saveRubricExplanationButton);
 
     await this.expectElementToBeVisible(saveRubricExplanationButton, false);
@@ -2629,7 +2651,7 @@ export class TopicManager extends BaseUser {
     await this.page.waitForSelector(commitMessageInputSelector, {
       visible: true,
     });
-    await this.type(commitMessageInputSelector, updateMessage);
+    await this.typeInInputField(commitMessageInputSelector, updateMessage);
     await this.page.waitForSelector(closeSaveModalButtonSelector, {
       visible: true,
     });
@@ -2767,7 +2789,7 @@ export class TopicManager extends BaseUser {
   ): Promise<void> {
     await this.expectElementToBeVisible(subtopicTitleField);
     await this.clearAllTextFrom(subtopicTitleField);
-    await this.type(subtopicTitleField, title);
+    await this.typeInInputField(subtopicTitleField, title);
     if (urlFragment) {
       await this.page.waitForSelector(subtopicUrlFragmentField, {
         visible: true,
@@ -2779,7 +2801,7 @@ export class TopicManager extends BaseUser {
     await this.clickOn(editSubtopicExplanationSelector);
     await this.page.waitForSelector(richTextAreaField, {visible: true});
     await this.clearAllTextFrom(richTextAreaField);
-    await this.type(richTextAreaField, explanation);
+    await this.typeInInputField(richTextAreaField, explanation);
     await this.clickOn(saveSubtopicExplanationButtonSelector);
 
     // Update the thumbnail if it is provided.
@@ -2893,7 +2915,6 @@ export class TopicManager extends BaseUser {
         const subtopics = Array.from(subtopicsElements).map(
           (el: Element) => el.textContent?.trim() || ''
         );
-        console.log('[debug]: ' + subtopics.join(', '));
         return subtopics.includes(subtopicName) === present;
       },
       {timeout: 10000},
@@ -2979,7 +3000,7 @@ export class TopicManager extends BaseUser {
       }, editIcon);
 
       await this.page.waitForSelector(renameSubtopicField);
-      await this.type(renameSubtopicField, newSubtopicName);
+      await this.typeInInputField(renameSubtopicField, newSubtopicName);
 
       await this.page.waitForSelector(saveReassignments);
       await this.clickOn(saveReassignments);
@@ -3036,7 +3057,7 @@ export class TopicManager extends BaseUser {
     } else {
       await this.clickOn(saveStoryButton);
     }
-    await this.type(
+    await this.typeInInputField(
       saveChangesMessageInput,
       'Test saving story as topic manager.'
     );
@@ -3231,8 +3252,8 @@ export class TopicManager extends BaseUser {
       }
     }
     await this.clickOn(addChapterButton);
-    await this.type(newChapterTitleField, chapterName);
-    await this.type(newChapterExplorationIdField, explorationId);
+    await this.typeInInputField(newChapterTitleField, chapterName);
+    await this.typeInInputField(newChapterExplorationIdField, explorationId);
 
     await this.clickOn(newChapterPhotoBoxButton);
     await this.uploadFile(curriculumAdminThumbnailImage);
@@ -3372,11 +3393,11 @@ export class TopicManager extends BaseUser {
     thumbnailImage: string
   ): Promise<void> {
     await this.clearAllTextFrom(chapterTitleField);
-    await this.type(chapterTitleField, chapterName);
-    await this.type(chapterDescriptionField, description);
+    await this.typeInInputField(chapterTitleField, chapterName);
+    await this.typeInInputField(chapterDescriptionField, description);
 
     await this.clearAllTextFrom(chapterExplorationIdField);
-    await this.type(chapterExplorationIdField, explorationId);
+    await this.typeInInputField(chapterExplorationIdField, explorationId);
     await this.clickOn(saveExplorationIDButton);
 
     await this.clickOn(chapterPhotoBoxButton);
@@ -3739,12 +3760,7 @@ export class TopicManager extends BaseUser {
           return false;
         }
 
-        console.log(
-          '[debug]: (SkillElement) ' + skillElement?.textContent?.trim()
-        );
-
         const element = skillElement.querySelector(selector);
-        console.log('[debug]: ' + element?.textContent?.trim());
         return element?.textContent?.trim() === topicName;
       },
       {},
@@ -3960,12 +3976,15 @@ export class TopicManager extends BaseUser {
   ): Promise<void> {
     // Title.
     await this.clearAllTextFrom(storyTitleInStoryEditorSelector);
-    await this.type(storyTitleInStoryEditorSelector, title);
+    await this.typeInInputField(storyTitleInStoryEditorSelector, title);
     await this.expectElementValueToBe(storyTitleInStoryEditorSelector, title);
 
     // Description.
     await this.clearAllTextFrom(storyDescriptionInStoryEditorSelector);
-    await this.type(storyDescriptionInStoryEditorSelector, description);
+    await this.typeInInputField(
+      storyDescriptionInStoryEditorSelector,
+      description
+    );
     await this.expectElementValueToBe(
       storyDescriptionInStoryEditorSelector,
       description
@@ -3973,7 +3992,10 @@ export class TopicManager extends BaseUser {
 
     // Meta Tag.
     await this.clearAllTextFrom(storyMetaTagContentInStoryEditorSelector);
-    await this.type(storyMetaTagContentInStoryEditorSelector, metaTag);
+    await this.typeInInputField(
+      storyMetaTagContentInStoryEditorSelector,
+      metaTag
+    );
     await this.expectElementValueToBe(
       storyMetaTagContentInStoryEditorSelector,
       metaTag
@@ -3981,7 +4003,10 @@ export class TopicManager extends BaseUser {
 
     // URL Fragment.
     await this.clearAllTextFrom(storyUrlFragmentInStoryEditorSelector);
-    await this.type(storyUrlFragmentInStoryEditorSelector, urlFragment);
+    await this.typeInInputField(
+      storyUrlFragmentInStoryEditorSelector,
+      urlFragment
+    );
     await this.expectElementValueToBe(
       storyUrlFragmentInStoryEditorSelector,
       urlFragment

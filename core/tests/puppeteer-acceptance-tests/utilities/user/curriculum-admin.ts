@@ -294,24 +294,27 @@ export class CurriculumAdmin extends TopicManager {
     reviewMaterial: string,
     addWorkedExample: boolean = false
   ): Promise<void> {
-    await this.type(skillDescriptionField, skillName);
+    await this.typeInInputField(skillDescriptionField, skillName);
     await this.page.waitForSelector(skillReviewMaterialHeader);
     await this.clickOn(skillReviewMaterialHeader);
     await this.clickOn(richTextAreaField);
-    await this.type(richTextAreaField, reviewMaterial);
+    await this.typeInInputField(richTextAreaField, reviewMaterial);
     if (addWorkedExample) {
       await this.clickOn(insertWorkedExampleButton);
       await this.page.waitForSelector(editWorkedExampleModalQuestionRte, {
         visible: true,
       });
       await this.clearAllTextFrom(editWorkedExampleModalQuestionRte);
-      await this.type(editWorkedExampleModalQuestionRte, 'Type the number one');
+      await this.typeInInputField(
+        editWorkedExampleModalQuestionRte,
+        'Type the number one'
+      );
       await this.page.waitForSelector(editWorkedExampleModalAnswerRte, {
         visible: true,
       });
       await this.clearAllTextFrom(editWorkedExampleModalAnswerRte);
       await this.waitForElementToStabilize(editWorkedExampleModalAnswerRte);
-      await this.type(editWorkedExampleModalAnswerRte, '1');
+      await this.typeInInputField(editWorkedExampleModalAnswerRte, '1');
       await this.clickOn(rteComponentSaveButton);
     }
     await this.page.waitForSelector(
@@ -394,13 +397,13 @@ export class CurriculumAdmin extends TopicManager {
       await this.clickOn(createNewTopicMobileButton);
     }
 
-    await this.type(topicNameField, name);
+    await this.typeInInputField(topicNameField, name);
     await this.page.waitForSelector(topicUrlFragmentField, {
       visible: true,
     });
-    await this.type(topicUrlFragmentField, urlFragment);
-    await this.type(topicWebFragmentField, name);
-    await this.type(
+    await this.typeInInputField(topicUrlFragmentField, urlFragment);
+    await this.typeInInputField(topicWebFragmentField, name);
+    await this.typeInInputField(
       topicDescriptionField,
       `Topic creation description test for ${name}.`
     );
@@ -511,7 +514,7 @@ export class CurriculumAdmin extends TopicManager {
       await this.page.waitForSelector('oppia-topic-editor-save-modal', {
         visible: true,
       });
-      await this.type(
+      await this.typeInInputField(
         saveChangesMessageInput,
         'Test saving topic as curriculum admin.'
       );
@@ -527,7 +530,7 @@ export class CurriculumAdmin extends TopicManager {
       await this.clickOn(saveTopicButton);
 
       await this.page.waitForSelector(modalDiv, {visible: true});
-      await this.type(
+      await this.typeInInputField(
         saveChangesMessageInput,
         'Test saving topic as curriculum admin.'
       );
@@ -563,7 +566,7 @@ export class CurriculumAdmin extends TopicManager {
       await this.clickOn(subtopicReassignHeader);
     }
     await this.clickOn(addSubtopicButton);
-    await this.type(subtopicTitleField, title);
+    await this.typeInInputField(subtopicTitleField, title);
     await this.page.waitForSelector(subtopicUrlFragmentField, {
       visible: true,
     });
@@ -572,19 +575,22 @@ export class CurriculumAdmin extends TopicManager {
     await this.page.type(subtopicStudyGuideHeadingField, heading);
     await this.clickOn(subtopicStudyGuideContentField);
     await this.page.waitForSelector(richTextAreaField, {visible: true});
-    await this.type(richTextAreaField, content);
+    await this.typeInInputField(richTextAreaField, content);
     if (addWorkedExample) {
       await this.clickOn(insertWorkedExampleButton);
       await this.page.waitForSelector(editWorkedExampleModalQuestionRte, {
         visible: true,
       });
       await this.clearAllTextFrom(editWorkedExampleModalQuestionRte);
-      await this.type(editWorkedExampleModalQuestionRte, 'Type the number one');
+      await this.typeInInputField(
+        editWorkedExampleModalQuestionRte,
+        'Type the number one'
+      );
       await this.page.waitForSelector(editWorkedExampleModalAnswerRte, {
         visible: true,
       });
       await this.clearAllTextFrom(editWorkedExampleModalAnswerRte);
-      await this.type(editWorkedExampleModalAnswerRte, '1');
+      await this.typeInInputField(editWorkedExampleModalAnswerRte, '1');
       await this.clickOn(rteComponentSaveButton);
     }
 
@@ -620,10 +626,13 @@ export class CurriculumAdmin extends TopicManager {
     currentNumberOfSections: number
   ): Promise<void> {
     await this.clickOn(addStudyGuideSectionButton);
-    await this.type(addStudyGuideSectionModalHeading, sectionHeading);
+    await this.typeInInputField(
+      addStudyGuideSectionModalHeading,
+      sectionHeading
+    );
     await this.clickOn(addStudyGuideSectionModalContent);
     await this.page.waitForSelector(richTextAreaField, {visible: true});
-    await this.type(richTextAreaField, sectionContent);
+    await this.typeInInputField(richTextAreaField, sectionContent);
     await this.clickOn(addStudyGuideSectionModalSaveButton);
     if (this.isViewportAtMobileWidth()) {
       await this.scrollToBottomOfPage();
@@ -657,19 +666,28 @@ export class CurriculumAdmin extends TopicManager {
   ): Promise<void> {
     await this.expectElementToBeVisible(addStudyGuideSectionButton);
     await this.clickOn(addStudyGuideSectionButton);
-    await this.type(addStudyGuideSectionModalHeading, sectionHeading);
+    await this.typeInInputField(
+      addStudyGuideSectionModalHeading,
+      sectionHeading
+    );
     await this.clickOn(addStudyGuideSectionModalContent);
     await this.page.waitForSelector(richTextAreaField, {visible: true});
-    await this.type(richTextAreaField, sectionContent);
+    await this.typeInInputField(richTextAreaField, sectionContent);
     await this.clickOn(insertWorkedExampleButton);
     await this.page.waitForSelector(editWorkedExampleModalQuestionRte, {
       visible: true,
     });
-    await this.type(editWorkedExampleModalQuestionRte, WorkedExampleQuestion);
+    await this.typeInInputField(
+      editWorkedExampleModalQuestionRte,
+      WorkedExampleQuestion
+    );
     await this.page.waitForSelector(editWorkedExampleModalAnswerRte, {
       visible: true,
     });
-    await this.type(editWorkedExampleModalAnswerRte, WorkedExampleAnswer);
+    await this.typeInInputField(
+      editWorkedExampleModalAnswerRte,
+      WorkedExampleAnswer
+    );
     await this.clickOn(rteComponentSaveButton);
     await this.clickOn(addStudyGuideSectionModalSaveButton);
     if (this.isViewportAtMobileWidth()) {
@@ -776,10 +794,13 @@ export class CurriculumAdmin extends TopicManager {
       visible: true,
     });
     await this.clickOn(addStudyGuideSectionButton);
-    await this.type(addStudyGuideSectionModalHeading, 'Section Heading');
+    await this.typeInInputField(
+      addStudyGuideSectionModalHeading,
+      'Section Heading'
+    );
     await this.clickOn(addStudyGuideSectionModalContent);
     await this.page.waitForSelector(richTextAreaField, {visible: true});
-    await this.type(
+    await this.typeInInputField(
       richTextAreaField,
       'Section Content Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam qu'
     );
@@ -962,7 +983,7 @@ export class CurriculumAdmin extends TopicManager {
     await this.select(selectRubricDifficultySelector, difficultyValue);
     await this.waitForStaticAssetsToLoad();
     await this.clickOn(' + ADD EXPLANATION FOR DIFFICULTY ');
-    await this.type(rteSelector, explanation);
+    await this.typeInInputField(rteSelector, explanation);
     await this.clickOn(saveRubricExplanationButton);
 
     await this.page.waitForSelector(saveRubricExplanationButton, {
@@ -1001,7 +1022,7 @@ export class CurriculumAdmin extends TopicManager {
     await this.page.waitForSelector(commitMessageInputSelector, {
       visible: true,
     });
-    await this.type(commitMessageInputSelector, updateMessage);
+    await this.typeInInputField(commitMessageInputSelector, updateMessage);
     await this.page.waitForSelector(closeSaveModalButtonSelector, {
       visible: true,
     });
@@ -1287,12 +1308,12 @@ export class CurriculumAdmin extends TopicManager {
       await this.clickOn(mobileStoryDropdown);
     }
     await this.clickOn(addStoryButton);
-    await this.type(storyTitleField, storyTitle);
+    await this.typeInInputField(storyTitleField, storyTitle);
     await this.page.waitForSelector(storyUrlFragmentField, {
       visible: true,
     });
     await this.page.type(storyUrlFragmentField, storyUrlFragment);
-    await this.type(
+    await this.typeInInputField(
       storyDescriptionField,
       `Story creation description for ${storyTitle}.`
     );
@@ -1345,12 +1366,12 @@ export class CurriculumAdmin extends TopicManager {
       await this.clickOn(mobileStoryDropdown);
     }
     await this.clickOn(addStoryButton);
-    await this.type(storyTitleField, storyTitle);
+    await this.typeInInputField(storyTitleField, storyTitle);
     await this.page.waitForSelector(storyUrlFragmentField, {
       visible: true,
     });
     await this.page.type(storyUrlFragmentField, storyUrlFragment);
-    await this.type(
+    await this.typeInInputField(
       storyDescriptionField,
       `Story creation description for ${storyTitle}.`
     );
@@ -1393,8 +1414,8 @@ export class CurriculumAdmin extends TopicManager {
       visible: true,
     });
     await this.clickOn(addChapterButton);
-    await this.type(newChapterTitleField, chapterName);
-    await this.type(newChapterExplorationIdField, explorationId);
+    await this.typeInInputField(newChapterTitleField, chapterName);
+    await this.typeInInputField(newChapterExplorationIdField, explorationId);
 
     await this.clickOn(newChapterPhotoBoxButton);
     await this.uploadFile(curriculumAdminThumbnailImage);
@@ -1426,7 +1447,7 @@ export class CurriculumAdmin extends TopicManager {
       await this.page.waitForSelector(saveStoryButton, {visible: true});
       await this.clickOn(saveStoryButton);
     }
-    await this.type(
+    await this.typeInInputField(
       saveChangesMessageInput,
       'Test saving story as curriculum admin.'
     );
@@ -2064,10 +2085,10 @@ export class CurriculumAdmin extends TopicManager {
   ): Promise<void> {
     await this.expectElementToBeVisible(createNewSkillButton);
     await this.clickOn(createNewSkillButton);
-    await this.type(skillDescriptionField, description);
+    await this.typeInInputField(skillDescriptionField, description);
     await this.clickOn(skillReviewMaterialHeader);
     await this.clickOn(richTextAreaField);
-    await this.type(richTextAreaField, reviewMaterial);
+    await this.typeInInputField(richTextAreaField, reviewMaterial);
     await this.addWorkedExampleRteComponent('Type the number one', '1');
     await this.clickOn(createSkillButton);
     await this.openSkillEditor(description);
@@ -2127,13 +2148,13 @@ export class CurriculumAdmin extends TopicManager {
       visible: true,
     });
     await this.clearAllTextFrom(editWorkedExampleModalQuestionRte);
-    await this.type(editWorkedExampleModalQuestionRte, question);
+    await this.typeInInputField(editWorkedExampleModalQuestionRte, question);
     await this.page.waitForSelector(editWorkedExampleModalAnswerRte, {
       visible: true,
     });
     await this.clearAllTextFrom(editWorkedExampleModalAnswerRte);
     await this.waitForElementToStabilize(editWorkedExampleModalAnswerRte);
-    await this.type(editWorkedExampleModalAnswerRte, answer);
+    await this.typeInInputField(editWorkedExampleModalAnswerRte, answer);
     await this.clickOn(rteComponentSaveButton);
     await this.page.waitForSelector(editWorkedExampleModalAnswerRte, {
       hidden: true,
@@ -2187,7 +2208,7 @@ export class CurriculumAdmin extends TopicManager {
   async typeTextInReviewMaterialEditor(text: string): Promise<void> {
     await this.expectElementToBeVisible(richTextAreaField);
     await this.clickOn(richTextAreaField);
-    await this.type(richTextAreaField, text);
+    await this.typeInInputField(richTextAreaField, text);
   }
 
   /**
@@ -2206,7 +2227,7 @@ export class CurriculumAdmin extends TopicManager {
       await this.expectElementToBeVisible(publishSkillButton);
       await this.clickOn(publishSkillButton);
     }
-    await this.type(
+    await this.typeInInputField(
       saveChangesMessageInput,
       'Test saving skill as curriculum admin.'
     );
@@ -2425,7 +2446,7 @@ export class CurriculumAdmin extends TopicManager {
       await this.clickOn(subtopicReassignHeader);
     }
     await this.clickOn(addSubtopicButton);
-    await this.type(subtopicTitleField, title);
+    await this.typeInInputField(subtopicTitleField, title);
     await this.page.waitForSelector(subtopicUrlFragmentField, {
       visible: true,
     });
@@ -2433,7 +2454,7 @@ export class CurriculumAdmin extends TopicManager {
 
     await this.clickOn(subtopicDescriptionEditorToggle);
     await this.page.waitForSelector(richTextAreaField, {visible: true});
-    await this.type(
+    await this.typeInInputField(
       richTextAreaField,
       `Subtopic creation description text for ${title}`
     );

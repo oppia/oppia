@@ -185,7 +185,7 @@ export class QuestionSubmitter extends BaseUser {
     await this.clickOn(textStateEditSelector);
     await this.page.waitForSelector(stateContentInputField, {visible: true});
     await this.clickOn(stateContentInputField);
-    await this.type(stateContentInputField, text);
+    await this.typeInInputField(stateContentInputField, text);
     await this.clickOn(saveStateEditorContentButton);
 
     await this.expectElementToBeVisible(saveStateEditorContentButton, false);
@@ -208,7 +208,10 @@ export class QuestionSubmitter extends BaseUser {
     await this.page.waitForSelector('textarea[placeholder*="LaTeX"]', {
       visible: true,
     });
-    await this.type('textarea[placeholder*="LaTeX"]', '\\frac{1}{2}');
+    await this.typeInInputField(
+      'textarea[placeholder*="LaTeX"]',
+      '\\frac{1}{2}'
+    );
 
     await this.waitForElementToBeClickable(closeRichTextEditorButton);
     await this.clickOn(closeRichTextEditorButton);
@@ -233,7 +236,10 @@ export class QuestionSubmitter extends BaseUser {
     await this.uploadFile(imageToUploadInQuestion);
     await this.clickOn(useTheUploadImageButton);
     await this.waitForPageToFullyLoad();
-    await this.type(imageDescriptionTextInputSelector, 'Test Description');
+    await this.typeInInputField(
+      imageDescriptionTextInputSelector,
+      'Test Description'
+    );
 
     await this.waitForElementToBeClickable(closeRichTextEditorButton);
     await this.clickOn(closeRichTextEditorButton);
@@ -249,7 +255,7 @@ export class QuestionSubmitter extends BaseUser {
   async addHintToState(hint: string): Promise<void> {
     await this.expectElementToBeVisible(addHintButton);
     await this.clickOn(addHintButton);
-    await this.type(stateContentInputField, hint);
+    await this.typeInInputField(stateContentInputField, hint);
     await this.clickOn(saveHintButton);
 
     await this.expectElementToBeVisible(saveHintButton, false);
@@ -273,10 +279,10 @@ export class QuestionSubmitter extends BaseUser {
       ? solutionInputNumeric
       : solutionInputTextArea;
     await this.page.waitForSelector(solutionSelector, {visible: true});
-    await this.type(solutionSelector, answer);
+    await this.typeInInputField(solutionSelector, answer);
     await this.page.waitForSelector(`${submitAnswerButton}:not([disabled])`);
     await this.clickOn(submitAnswerButton);
-    await this.type(stateContentInputField, answerExplanation);
+    await this.typeInInputField(stateContentInputField, answerExplanation);
     await this.page.waitForSelector(`${submitSolutionButton}:not([disabled])`);
     await this.clickOn(submitSolutionButton);
 
@@ -428,7 +434,7 @@ export class QuestionSubmitter extends BaseUser {
     await this.waitForElementToBeClickable(feedbackEditorButton);
     await this.clickOn(feedbackEditorButton);
     await this.page.waitForSelector(stateContentInputField, {visible: true});
-    await this.type(stateContentInputField, 'Last Card');
+    await this.typeInInputField(stateContentInputField, 'Last Card');
     await this.clickOn(correctAnswerInTheGroupSelector);
     await this.clickOn(addNewResponseButton);
 
@@ -455,12 +461,12 @@ export class QuestionSubmitter extends BaseUser {
 
     await this.clickOn(addElementToTextInputInteraction);
     await this.page.waitForSelector(textInputField, {visible: true});
-    await this.type(textInputField, answer);
+    await this.typeInInputField(textInputField, answer);
 
     await this.waitForElementToBeClickable(feedbackEditorButton);
     await this.clickOn(feedbackEditorButton);
     await this.page.waitForSelector(stateContentInputField, {visible: true});
-    await this.type(stateContentInputField, 'Last Card');
+    await this.typeInInputField(stateContentInputField, 'Last Card');
     await this.clickOn(correctAnswerInTheGroupSelector);
     await this.clickOn(addNewResponseButton);
 
@@ -537,7 +543,7 @@ export class QuestionSubmitter extends BaseUser {
       visible: true,
     });
     await this.page.waitForSelector(stateContentInputField, {visible: true});
-    await this.type(stateContentInputField, 'Last Card');
+    await this.typeInInputField(stateContentInputField, 'Last Card');
     await this.clickOn(correctAnswerInTheGroupSelector);
     await this.clickOn(addNewResponseButton);
 
@@ -564,7 +570,10 @@ export class QuestionSubmitter extends BaseUser {
     if (defaultResponseFeedback) {
       await this.clickOn(openOutcomeFeedBackEditor);
       await this.clickOn(stateContentInputField);
-      await this.type(stateContentInputField, `${defaultResponseFeedback}`);
+      await this.typeInInputField(
+        stateContentInputField,
+        `${defaultResponseFeedback}`
+      );
       await this.clickOn(saveOutcomeFeedbackButton);
       await this.expectElementToBeVisible(saveOutcomeFeedbackButton, false);
     }
@@ -580,7 +589,10 @@ export class QuestionSubmitter extends BaseUser {
       await this.clickOn(outcomeDestWhenStuckSelector);
       // The '4: /' value is used to select the 'a new card called' option in the dropdown.
       await this.select(destinationWhenStuckSelectorDropdown, '4: /');
-      await this.type(addDestinationStateWhenStuckInput, directToCardWhenStuck);
+      await this.typeInInputField(
+        addDestinationStateWhenStuckInput,
+        directToCardWhenStuck
+      );
       await this.clickOn(saveStuckDestinationButtonSelector);
       await this.expectElementToBeVisible(
         saveStuckDestinationButtonSelector,

@@ -359,7 +359,7 @@ export class BaseUser {
       this.userHasAcceptedCookies = true;
     }
     await this.clickOn('Sign in');
-    await this.type(testConstants.SignInDetails.inputField, email);
+    await this.typeInInputField(testConstants.SignInDetails.inputField, email);
     await this.clickAndWaitForNavigation('Sign In');
   }
 
@@ -368,7 +368,7 @@ export class BaseUser {
    */
   async signUpNewUser(username: string, email: string): Promise<void> {
     await this.signInWithEmail(email);
-    await this.type('input.e2e-test-username-input', username);
+    await this.typeInInputField('input.e2e-test-username-input', username);
     await this.clickOn('input.e2e-test-agree-to-terms-checkbox');
     await this.page.waitForSelector(
       'button.e2e-test-register-user:not([disabled])'
@@ -588,7 +588,7 @@ export class BaseUser {
    * @param selector The CSS selector of the input field.
    * @param text The text to type.
    */
-  async type(
+  async typeInInputField(
     selector: string | ElementHandle<Element>,
     text: string
   ): Promise<void> {

@@ -837,7 +837,7 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(blogSearchInputSelector, {
       visible: true,
     });
-    await this.type(blogSearchInputSelector, keyword);
+    await this.typeInInputField(blogSearchInputSelector, keyword);
     await this.clickAndWaitForNavigation(blogSubmitButtonSelector);
 
     const url = new URL(this.page.url());
@@ -3160,13 +3160,13 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForTimeout(1000);
     await this.waitForElementToBeClickable(submitResponseToInteractionInput);
     await this.clearAllTextFrom(submitResponseToInteractionInput);
-    await this.type(submitResponseToInteractionInput, answer);
+    await this.typeInInputField(submitResponseToInteractionInput, answer);
     await this.clickOn(submitAnswerButton);
   }
 
   async submitAnswerInTextArea(answer: string): Promise<void> {
     await this.waitForElementToBeClickable(submitResponseToInteractionTextArea);
-    await this.type(submitResponseToInteractionTextArea, answer);
+    await this.typeInInputField(submitResponseToInteractionTextArea, answer);
     await this.clickOn(submitAnswerButton);
   }
 
@@ -3208,7 +3208,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async submitEmailForNewsletter(email: string): Promise<void> {
     await this.waitForElementToBeClickable(newsletterEmailInputField);
-    await this.type(newsletterEmailInputField, email);
+    await this.typeInInputField(newsletterEmailInputField, email);
     await this.clickOn(newsletterSubscribeButton);
     await this.expectElementToBeVisible(newsletterSubscriptionThanksMessage);
   }
@@ -3373,7 +3373,7 @@ export class LoggedOutUser extends BaseUser {
       visible: true,
     });
     await this.clickOn(searchInputSelector);
-    await this.type(searchInputSelector, lessonName);
+    await this.typeInInputField(searchInputSelector, lessonName);
 
     await this.page.keyboard.press('Enter');
     await this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']});
@@ -4271,7 +4271,7 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector('nav-options', {visible: true});
     await this.clickOn(feedbackPopupSelector);
     await this.page.waitForSelector(feedbackTextarea, {visible: true});
-    await this.type(feedbackTextarea, feedback);
+    await this.typeInInputField(feedbackTextarea, feedback);
 
     // If stayAnonymous is true, clicking on the "stay anonymous" checkbox.
     if (stayAnonymous) {
@@ -5095,10 +5095,10 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(testConstants.SignInDetails.inputField, {
       visible: true,
     });
-    await this.type(testConstants.SignInDetails.inputField, email);
+    await this.typeInInputField(testConstants.SignInDetails.inputField, email);
     await this.clickOn('Sign In');
     await this.page.waitForNavigation({waitUntil: 'networkidle0'});
-    await this.type('input.e2e-test-username-input', username);
+    await this.typeInInputField('input.e2e-test-username-input', username);
     await this.clickOn('input.e2e-test-agree-to-terms-checkbox');
     await this.page.waitForSelector(
       'button.e2e-test-register-user:not([disabled])'
@@ -5548,7 +5548,7 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(feedbackTextarea, {
       visible: true,
     });
-    await this.type(feedbackTextarea, feedback);
+    await this.typeInInputField(feedbackTextarea, feedback);
 
     // If stayAnonymous is true, clicking on the "stay anonymous" checkbox.
     if (stayAnonymous) {
@@ -6582,7 +6582,6 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForFunction(
       (selector: string, expectedTabTitle: string) => {
         const tabTitle = document.querySelector(selector)?.textContent?.trim();
-        console.log('[debug] tabTitle: ', tabTitle);
         return tabTitle === expectedTabTitle;
       },
       {},
