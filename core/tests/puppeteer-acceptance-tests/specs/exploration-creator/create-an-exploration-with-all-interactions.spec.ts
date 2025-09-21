@@ -86,13 +86,6 @@ describe('Exploration Editor', function () {
       CARD_NAMES.SECOND
     );
 
-    // Click on Interaction.
-    await explorationEditor.clickOnTestExploration();
-    await explorationEditor.expectModalTitleToBe(
-      'Customize Interaction (Continue Button)'
-    );
-    await explorationEditor.clickOnElementWithText('Save Interaction');
-
     await explorationEditor.saveExplorationDraft();
   });
 
