@@ -149,9 +149,9 @@ class Elasticsearch(object):
     def search(
         self,
         *,
+        index: Optional[Any] = ...,
         query: Optional[Any] = ...,
         aggregations: Optional[Any] = ...,
-        index: Optional[Any] = ...,
         doc_type: Optional[Any] = ...,
         _source: Optional[Any] = ...,
         _source_excludes: Optional[Any] = ...,

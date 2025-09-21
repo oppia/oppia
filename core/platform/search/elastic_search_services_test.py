@@ -168,9 +168,9 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         # 'Dict[str, Any]' type, and also in the type stubs the type of body is
         # mentioned as Any.
         def mock_search(
-            body: Dict[str, Any], index: str, from_: int, size: int
+            query: Dict[str, Any], index: str, from_: int, size: int
         ) -> Dict[str, Dict[str, List[str]]]:
-            self.assertEqual(body, {
+            self.assertEqual(query, {
                 'query': {
                     'bool': {
                         'filter': [{
@@ -222,9 +222,9 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         # 'Dict[str, Any]' type, and also in the type stubs the type of body is
         # mentioned as Any.
         def mock_search(
-            body: Dict[str, Any], index: str, from_: int, size: int
+            query: Dict[str, Any], index: str, from_: int, size: int
         ) -> Dict[str, Dict[str, List[str]]]:
-            self.assertEqual(body, {
+            self.assertEqual(query, {
                 'query': {
                     'bool': {
                         'must': [{
@@ -343,9 +343,9 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         # 'Dict[str, Any]' type, and also in the type stubs the type of body is
         # mentioned as Any.
         def mock_search(
-                body: Dict[str, Any], index: str, from_: int, size: int
+                query: Dict[str, Any], index: str, from_: int, size: int
         ) -> Dict[str, Dict[str, List[str]]]:
-            self.assertEqual(body, {
+            self.assertEqual(query, {
                 'query': {
                     'bool': {
                         'filter': [{
@@ -400,9 +400,9 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         # 'Dict[str, Any]' type, and also in the type stubs the type of body is
         # mentioned as Any.
         def mock_search(
-            body: Dict[str, Any], index: str, from_: int, size: int
+            query: Dict[str, Any], index: str, from_: int, size: int
         ) -> Dict[str, Dict[str, List[str]]]:
-            self.assertEqual(body, {
+            self.assertEqual(query, {
                 'query': {
                     'bool': {
                         'must': [{
