@@ -462,7 +462,7 @@ describe('CheckpointBarComponent', () => {
     component.checkpointCount = 3;
     mockPlayerPositionService.getDisplayedCardIndex.and.returnValue(5);
 
-    expect(() => component.getCompletedProgressBarWidth()).not.toThrow();
+    expect(() => component.getCompletedProgressBarWidth()).not.toThrowError();
 
     const width = component.getCompletedProgressBarWidth();
     // When totalSteps is 0, fractionInSegment should be 0, so result should be baseWidth.
@@ -482,8 +482,6 @@ describe('CheckpointBarComponent', () => {
       isTerminal: jasmine.createSpy('isTerminal').and.returnValue(true),
     });
     spyOn(component, 'getCompletedProgressBarWidth').and.returnValue(100);
-
-    const initialCompletedCount = component.completedCheckpointsCount;
 
     component.updateLessonProgressBar();
 

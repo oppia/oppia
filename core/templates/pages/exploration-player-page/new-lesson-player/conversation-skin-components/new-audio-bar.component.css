@@ -11,8 +11,8 @@
   margin-top: 40px;
   padding: 10px 8px;
   padding-right: 48px;
-  position: relative;
-  width: 100%;
+  position: fixed;
+  width: calc(100vw - 98px);
 }
 
 .oppia-new-audio-bar i {
@@ -79,6 +79,17 @@ oppia-new-audio-bar .mat-slider-wrapper {
 
 oppia-new-audio-bar .mobile-mode {
   display: none;
+}
+
+.expanded-sidebar {
+  width: calc(100vw - 258px);
+}
+
+@media(max-width: 767px) {
+  .oppia-new-audio-bar,
+  .expanded-sidebar {
+    width: 100vw;
+  }
 }
 
 @media (max-width: 480px) {

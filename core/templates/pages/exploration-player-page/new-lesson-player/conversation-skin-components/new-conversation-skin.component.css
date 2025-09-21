@@ -51,6 +51,7 @@ oppia-new-conversation-skin .new-supplemental-card-parent-container {
   justify-content: center;
   margin: 0 auto;
   margin-bottom: 50px;
+  margin-top: 100px;
   padding: 56px 14px 0;
   padding-bottom: 50px;
   width: 100%;
@@ -117,12 +118,12 @@ oppia-new-conversation-skin .oppia-button-icon {
 oppia-card-navigation-control {
   bottom: 0;
   position: fixed;
-  width: calc(100vw - 80px);
+  width: calc(100vw - 98px);
   z-index: 100;
 }
 
 .expanded-sidebar {
-  width: calc(100vw - 240px);
+  width: calc(100vw - 258px);
 }
 
 .question-player-footer {

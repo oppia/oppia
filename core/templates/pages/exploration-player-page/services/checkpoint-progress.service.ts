@@ -24,9 +24,6 @@
 import {Injectable} from '@angular/core';
 import {ExplorationEngineService} from './exploration-engine.service';
 import {PlayerTranscriptService} from './player-transcript.service';
-import {ComputeGraphService} from 'services/compute-graph.service';
-import {StateGraphLayoutService} from 'components/graph-services/graph-layout.service';
-import {forEach} from 'angular';
 
 @Injectable({
   providedIn: 'root',
