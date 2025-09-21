@@ -4205,11 +4205,12 @@ export class TopicManager extends BaseUser {
         misconceptionTitle
       );
       if (title.trim() === expectedTitle) {
+        await this.waitForElementToStabilize(misconceptionTitle);
         await misconceptionTitle.click();
       }
     }
 
-    await this.clickOn('Done');
+    await this.clickOnElementWithText('Done');
     await this.expectElementToBeVisible(misconceptionTitle, false);
   }
 }

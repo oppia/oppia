@@ -327,11 +327,11 @@ describe('Topic Manager', function () {
 
     // Fraction Input Interaction.
     await topicManager.clickOnAddQuestionButton();
-    await topicManager.updateCardContent('Fraction Input.');
+    await topicManager.updateCardContent('Enter 1/2.');
     await topicManager.addInteraction(INTERACTION_TYPES.FRACTION_INPUT);
     await topicManager.updateAnswersInResponseModal(
       INTERACTION_TYPES.FRACTION_INPUT,
-      '1/2'
+      '2'
     );
     await topicManager.addResponseDetailsInResponseModal(
       'Great!',
@@ -341,7 +341,7 @@ describe('Topic Manager', function () {
     );
     await topicManager.updateAnswersInResponseModal(
       INTERACTION_TYPES.FRACTION_INPUT,
-      '2'
+      '1'
     );
     await topicManager.addResponseDetailsInResponseModal(
       'Wrong',
@@ -363,11 +363,11 @@ describe('Topic Manager', function () {
       true
     );
     await topicManager.saveQuestion();
-    await topicManager.expectQuestionToBeVisible('Number with Units.');
+    await topicManager.expectQuestionToBeVisible('Enter 1/2.');
 
     // Number with Units Interaction.
     await topicManager.clickOnAddQuestionButton();
-    await topicManager.updateCardContent('Number with Units.');
+    await topicManager.updateCardContent('Enter 160km.');
     await topicManager.addInteraction(
       INTERACTION_TYPES.NUMBER_WITH_UNITS,
       false
@@ -395,12 +395,12 @@ describe('Topic Manager', function () {
     );
     await topicManager.addHintToState('Test Hint');
     await topicManager.addSolutionToState(
-      '21km',
+      '160km',
       'As given in the question.',
       true
     );
     await topicManager.saveQuestion();
-    await topicManager.expectQuestionToBeVisible('Number with Units.');
+    await topicManager.expectQuestionToBeVisible('Enter 160km.');
 
     // Navigate to the preview tab.
     await topicManager.navigateToSkillPreviewTab();
@@ -411,8 +411,8 @@ describe('Topic Manager', function () {
       'Enter text input.',
       'Drag and Drop Sort',
       'Number Input',
-      'Fraction Input',
-      'Number with Units',
+      'Enter 1/2',
+      'Enter 160km',
     ]) {
       await topicManager.expectQuestionToPreviewProperly(question);
     }
