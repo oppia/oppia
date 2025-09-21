@@ -328,8 +328,7 @@ describe('Topic Manager', function () {
     // Fraction Input Interaction.
     await topicManager.clickOnAddQuestionButton();
     await topicManager.updateCardContent('Fraction Input.');
-    await topicManager.addInteraction(INTERACTION_TYPES.FRACTION_INPUT, false);
-    await topicManager.customizeFractionInputInteraction(true, false, true);
+    await topicManager.addInteraction(INTERACTION_TYPES.FRACTION_INPUT);
     await topicManager.updateAnswersInResponseModal(
       INTERACTION_TYPES.FRACTION_INPUT,
       '1/2'
