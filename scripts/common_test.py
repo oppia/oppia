@@ -1595,9 +1595,9 @@ class LogToTerminalTests(unittest.TestCase):
             self.assertIn('\033[94m', output)
 
     def test_invalid_message_type_defaults_to_info(self) -> None:
-    with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
-        common.log_to_terminal(  # type: ignore[arg-type]
+        with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+            common.log_to_terminal(  # type: ignore[arg-type]
             'forced invalid', message_type='NOT_A_TYPE'
-        )
-        output = mock_stdout.getvalue()
-        self.assertIn('\033[94m', output)
+            )
+            output = mock_stdout.getvalue()
+            self.assertIn('\033[94m', output)
