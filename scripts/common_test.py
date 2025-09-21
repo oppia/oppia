@@ -41,6 +41,7 @@ from core import feconf, utils
 from core.tests import test_utils
 from scripts import servers
 
+from typing import Generator, List, Literal, NoReturn, Tuple, cast
 import yaml
 from typing import Generator, List, Literal, NoReturn, Tuple, cast
 
