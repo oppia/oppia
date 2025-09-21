@@ -27,10 +27,6 @@ const imageToUploadInQuestion = testConstants.data.profilePicture;
 const submitQuestionTab = 'a.e2e-test-submitQuestionTab';
 const opportunityHeadingTitlSelector =
   '.e2e-test-opportunity-list-item-heading';
-const desktopOpportunitySubheadingTitleSelector =
-  '.e2e-test-opportunity-list-item-subheading';
-const mobileOpportunitySubheadingTitleSelector =
-  '.e2e-test-mobile-opportunity-list-item-subheading';
 const opportunityListItem = '.e2e-test-opportunity-list-item';
 const suggestQuestionButton = 'button.e2e-test-opportunity-list-item-button';
 const confirmSkillDificultyButton =

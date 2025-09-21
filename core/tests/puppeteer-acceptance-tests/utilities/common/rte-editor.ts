@@ -19,7 +19,7 @@
 import puppeteer from 'puppeteer';
 
 const rteTextAreaSelector = '.e2e-test-rte';
-const paragraphFormatOptionSelector = `a[title*="Format"]`;
+const paragraphFormatOptionSelector = 'a[title*="Format"]';
 const bodyFocusedSelector = '.cke_focus';
 const customizeInteractionModalHeaderSelector =
   '.e2e-test-rte-helper-modal-header';
@@ -57,6 +57,8 @@ export class RTEEditor {
     // Check if element is active or not to use in post check.
     const initialInnerHTML = await this.parentPage.evaluate(
       (selector: string) => {
+        0;
+        // eslint-disable-next-line oppia/no-inner-html
         return document.querySelector(selector)?.innerHTML;
       },
       rteTextAreaSelector
@@ -68,6 +70,7 @@ export class RTEEditor {
       await this.parentPage.waitForFunction(
         (selector: string, innerHTML: string, ele2Selector: string) => {
           const element = document.querySelector(selector);
+          // eslint-disable-next-line oppia/no-inner-html
           const classChanged = element?.innerHTML !== innerHTML;
           const headerElement = document.querySelector(ele2Selector);
 
@@ -81,6 +84,7 @@ export class RTEEditor {
     } catch (error) {
       await this.parentPage.evaluate((selector: string) => {
         const element = document.querySelector(selector);
+        // eslint-disable-next-line no-console
         console.log(`[debug] Class List: ${element?.classList}`);
       }, optionSelector);
       throw error;
@@ -121,7 +125,7 @@ export class RTEEditor {
     await this.context.waitForSelector(paragraphFormatOptionSelector);
     const optionElement = await this.context.$(paragraphFormatOptionSelector);
     if (!optionElement) {
-      throw new Error(`Format option not found.`);
+      throw new Error('Format option not found.');
     }
     await optionElement.click();
 
