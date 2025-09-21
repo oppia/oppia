@@ -33,6 +33,8 @@ import subprocess
 import sys
 import tempfile
 import time
+import unittest
+from unittest import mock
 from urllib import request as urlrequest
 
 from core import feconf, utils
@@ -1474,3 +1476,156 @@ class UrlRetrieveTests(CommonTests):
                     'https://example.com', output_path, enforce_https=False)
             with open(output_path, 'rb') as buffer:
                 self.assertEqual(buffer.read(), b'content')
+
+
+class CommonSwapEnvironTests(test_utils.GenericTestBase):
+    """Test the swap_env utility in common."""
+
+    def test_swap_env_sets_and_restores(self) -> None:
+        os.environ['FOO'] = 'bar'
+        with common.swap_env('FOO', 'baz') as old_value:
+            self.assertEqual(old_value, 'bar')
+            self.assertEqual(os.environ['FOO'], 'baz')
+        self.assertEqual(os.environ['FOO'], 'bar')
+
+    def test_swap_env_handles_missing_key(self) -> None:
+        self.assertNotIn('BAZ', os.environ)
+        with common.swap_env('BAZ', 'qux') as old_value:
+            self.assertIsNone(old_value)
+            self.assertEqual(os.environ['BAZ'], 'qux')
+        self.assertNotIn('BAZ', os.environ)
+
+
+class CommonBranchTests(test_utils.GenericTestBase):
+    """Tests for branch-related helpers in common."""
+
+    def test_get_current_release_version_number_with_hotfix(self) -> None:
+        branch_name = 'release-1.2.3-hotfix-5'
+        self.assertEqual(
+            common.get_current_release_version_number(branch_name), '1.2.3')
+
+    def test_is_current_branch_a_release_branch_true(self) -> None:
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'On branch release-1.2.3'
+        with self.swap(subprocess, 'check_output', mock_check_output):
+            self.assertTrue(common.is_current_branch_a_release_branch())
+
+    def test_is_current_branch_a_release_branch_false(self) -> None:
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'On branch develop'
+        with self.swap(subprocess, 'check_output', mock_check_output):
+            self.assertFalse(common.is_current_branch_a_release_branch())
+
+
+class CommonGitTests(test_utils.GenericTestBase):
+    """Tests for low-level git helpers in common."""
+
+    def test_get_remote_alias_success(self) -> None:
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'origin\thttps://github.com/oppia/oppia.git (fetch)\n'
+        with self.swap(subprocess, 'check_output', mock_check_output):
+            self.assertEqual(
+                common.get_remote_alias(['https://github.com/oppia/oppia.git']),
+                'origin')
+
+    def test_get_remote_alias_failure(self) -> None:
+        def mock_check_output(
+            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        ) -> str:
+            return 'origin\thttps://github.com/oppia/oppia.git (fetch)\n'
+        with self.swap(subprocess, 'check_output', mock_check_output):
+            with self.assertRaisesRegex(
+                Exception,
+                'ERROR: There is no existing remote alias for the invalid repo.'
+            ):
+                common.get_remote_alias(['invalid'])
+
+
+class CommonLogToTerminalTests(test_utils.GenericTestBase):
+    """Tests for the log_to_terminal function in common.py."""
+
+    def test_logs_error_in_red(self) -> None:
+        with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+            common.log_to_terminal('This is an error', common.LogType.ERROR)
+            output = mock_stdout.getvalue()
+            self.assertIn('\033[91mThis is an error\033[0m', output)
+
+    def test_logs_success_in_green(self) -> None:
+        with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+            common.log_to_terminal('This is a success', common.LogType.SUCCESS)
+            output = mock_stdout.getvalue()
+            self.assertIn('\033[92mThis is a success\033[0m', output)
+
+
+class LogToTerminalTests(unittest.TestCase):
+    """Tests for log_to_terminal function."""
+
+    def test_logs_error_in_red(self) -> None:
+        with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+            common.log_to_terminal('This is an error')
+            output = mock_stdout.getvalue()
+            self.assertIn('\033[91m', output)
+            self.assertIn('This is an error', output)
+
+    def test_logs_success_in_green(self) -> None:
+        with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+            common.log_to_terminal('Operation success')
+            output = mock_stdout.getvalue()
+            self.assertIn('\033[92m', output)
+            self.assertIn('Operation success', output)
+
+    def test_logs_warning_in_yellow(self) -> None:
+        with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+            common.log_to_terminal('A warning appeared')
+            output = mock_stdout.getvalue()
+            self.assertIn('\033[93m', output)
+
+    def test_logs_debug_in_blue(self) -> None:
+        with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+            common.log_to_terminal('debug info here')
+            output = mock_stdout.getvalue()
+            self.assertIn('\033[94m', output)
+
+    def test_logs_info_as_default(self) -> None:
+        with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+            common.log_to_terminal('just a message')
+            output = mock_stdout.getvalue()
+            self.assertIn('\033[94m', output)
+
+    def test_invalid_message_type_defaults_to_info(self) -> None:
+        """Checks that an invalid message_type defaults to INFO (blue)."""
+
+        with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+            # Here we use cast because we deliberately pass an invalid type
+            # to test that log_to_terminal falls back to INFO.
+            common.log_to_terminal(
+                'forced invalid',
+                message_type=cast(common.LogType, 'NOT_A_TYPE')
+            )
+            output = mock_stdout.getvalue()
+
+        self.assertIn('forced invalid', output)
+        # Default color is INFO (blue).
+        self.assertIn('\033[94m', output)
+
+    def test_log_to_terminal_with_invalid_message_type(self) -> None:
+        """Checks that an invalid message_type falls back to INFO (blue)."""
+
+        with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+            # Here we use cast because we deliberately pass an invalid type
+            # to test that log_to_terminal falls back to INFO.
+            common.log_to_terminal(
+                'unexpected message',
+                message_type=cast(common.LogType, 'NOT_A_TYPE')
+            )
+            output = mock_stdout.getvalue()
+
+        self.assertIn('unexpected message', output)
+        # Default color is INFO (blue).
+        self.assertIn('\033[94m', output)
