@@ -97,7 +97,6 @@
     "karma-coverage-istanbul-reporter": "^3.0.0",
     "karma-jasmine": "^4.0.0",
     "karma-json-fixtures-preprocessor": "^0.0.6",
-    "karma-ng-html2js-preprocessor": "^1.0.0",
     "karma-webpack": "^4.0.0-rc.3",
     "lint-staged": "~13.0.3",
     "loader-utils": "^2.0.0",
