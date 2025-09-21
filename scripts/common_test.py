@@ -1595,24 +1595,34 @@ class LogToTerminalTests(unittest.TestCase):
             self.assertIn('\033[94m', output)
 
     def test_invalid_message_type_defaults_to_info(self) -> None:
+        """Checks that an invalid message_type defaults to INFO (blue)."""
+
         with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
+            # Here we use cast because we deliberately pass an invalid type
+            # to test that log_to_terminal falls back to INFO.
             common.log_to_terminal(
-            'forced invalid', message_type='NOT_A_TYPE'
+                'forced invalid',
+                message_type=cast(common.LogType, 'NOT_A_TYPE')
             )
             output = mock_stdout.getvalue()
-            self.assertIn('\033[94m', output)
+
+        self.assertIn('forced invalid', output)
+        # Default color is INFO (blue).
+        self.assertIn('\033[94m', output)
+
 
     def test_log_to_terminal_with_invalid_message_type(self) -> None:
         """Checks that an invalid message_type falls back to INFO (blue)."""
 
-        with common.capture_stdout() as captured_output:
+        with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
             # Here we use cast because we deliberately pass an invalid type
             # to test that log_to_terminal falls back to INFO.
             common.log_to_terminal(
                 'unexpected message',
                 message_type=cast(common.LogType, 'NOT_A_TYPE')
             )
-            output = captured_output.getvalue()
+            output = mock_stdout.getvalue()
+
         self.assertIn('unexpected message', output)
         # Default color is INFO (blue).
         self.assertIn('\033[94m', output)
