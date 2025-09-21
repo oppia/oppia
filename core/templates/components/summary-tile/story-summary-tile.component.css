@@ -153,7 +153,16 @@ oppia-story-summary-tile .chapters-list {
 
 oppia-story-summary-tile .coming-soon-chapters {
   opacity: 0.4;
+  pointer-events: auto;
+}
+
+oppia-story-summary-tile .coming-soon-chapters a {
   pointer-events: none;
+  text-decoration: none;
+}
+
+oppia-story-summary-tile .coming-soon-chapters a:hover {
+  text-decoration: none;
 }
 
 oppia-story-summary-tile .chapters-heading {
