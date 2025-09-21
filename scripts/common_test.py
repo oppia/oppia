@@ -35,7 +35,6 @@ import tempfile
 import time
 import unittest
 from unittest import mock
-from unittest.mock import patch
 from urllib import request as urlrequest
 
 from core import feconf
