@@ -6661,6 +6661,16 @@ export class ExplorationEditor extends BaseUser {
     if (!historyItem) {
       throw new Error(`Version ${version} not found in history tab.`);
     }
+
+    const historyOption = await historyItem.waitForSelector(
+      historyItemOptionSelector
+    );
+    if (!historyOption) {
+      throw new Error('Options element not found.');
+    }
+
+    await this.waitForElementToBeClickable(historyOption);
+    await historyOption.click();
   }
 }
 
