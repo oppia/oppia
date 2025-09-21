@@ -1565,38 +1565,38 @@ class LogToTerminalTests(unittest.TestCase):
 
     def test_logs_error_in_red(self) -> None:
         with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
-            common.log_to_terminal("This is an error")
+            common.log_to_terminal('This is an error')
             output = mock_stdout.getvalue()
-            self.assertIn("\033[91m", output)
-            self.assertIn("This is an error", output)
+            self.assertIn('\033[91m', output)
+            self.assertIn('This is an error', output)
 
     def test_logs_success_in_green(self) -> None:
         with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
-            common.log_to_terminal("Operation success")
+            common.log_to_terminal('Operation success')
             output = mock_stdout.getvalue()
-            self.assertIn("\033[92m", output)
-            self.assertIn("Operation success", output)
+            self.assertIn('\033[92m', output)
+            self.assertIn('Operation success', output)
 
     def test_logs_warning_in_yellow(self) -> None:
         with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
-            common.log_to_terminal("A warning appeared")
+            common.log_to_terminal('A warning appeared')
             output = mock_stdout.getvalue()
-            self.assertIn("\033[93m", output)
+            self.assertIn('\033[93m', output)
 
     def test_logs_debug_in_blue(self) -> None:
         with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
-            common.log_to_terminal("debug info here")
+            common.log_to_terminal('debug info here')
             output = mock_stdout.getvalue()
-            self.assertIn("\033[94m", output)
+            self.assertIn('\033[94m', output)
 
     def test_logs_info_as_default(self) -> None:
         with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
-            common.log_to_terminal("just a message")
+            common.log_to_terminal('just a message')
             output = mock_stdout.getvalue()
-            self.assertIn("\033[94m", output)
+            self.assertIn('\033[94m', output)
 
     def test_invalid_message_type_defaults_to_info(self) -> None:
         with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
-            common.log_to_terminal("forced invalid", message_type="NOT_A_TYPE")
+            common.log_to_terminal('forced invalid', message_type='NOT_A_TYPE')
             output = mock_stdout.getvalue()
-            self.assertIn("\033[94m", output)
+            self.assertIn('\033[94m', output)
