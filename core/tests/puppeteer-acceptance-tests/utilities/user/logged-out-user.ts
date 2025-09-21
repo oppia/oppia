@@ -6808,6 +6808,14 @@ export class LoggedOutUser extends BaseUser {
       await this.expectTextContentToBe(promoBarTextSelector, promotionContent);
     }
   }
+
+  /**
+   * Compares the text content of next button in lesson player.
+   * @param buttonText - Expected button text.
+   */
+  async expectNextCardButtonTextToBe(buttonText: string): Promise<void> {
+    await this.expectTextContentToBe(nextCardButton, buttonText);
+  }
 }
 
 export let LoggedOutUserFactory = (): LoggedOutUser => new LoggedOutUser();
