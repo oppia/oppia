@@ -3842,10 +3842,8 @@ export class TopicManager extends BaseUser {
   async selectQuestionDifficulty(
     difficulty: 'Easy' | 'Medium' | 'Hard' = 'Medium'
   ): Promise<void> {
-    await this.expectElementToBeVisible(
-      questionDifficultySelectionModalSelector
-    );
     const selector = `.e2e-test-skill-difficulty-${difficulty.toLowerCase()}`;
+    await this.expectElementToBeVisible(selector);
     await this.clickOn(selector);
     await this.clickOn(confirmSkillDificultyButton);
 
@@ -4096,6 +4094,7 @@ export class TopicManager extends BaseUser {
    */
   async expectQuestionToPreviewProperly(question: string): Promise<void> {
     await this.previewQuestion(question);
+    await this.expectTextContentToContain(previewQuestionSelector, question);
     await this.clickOn(previewQuestionSelector);
     await this.expectPreviewQuestionText(question);
   }
