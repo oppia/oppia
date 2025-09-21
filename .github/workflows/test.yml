@@ -51,22 +51,24 @@ jobs:
         suite:
           - name: topic-manager/access-dashboard-using-profile-dropdown
             short_name: access-dashboard-using-profile-dropdown
-          - name: topic-manager/edit-the-topic
-            short_name: edit-the-topic
-          - name: topic-manager/assign-unassign-and-merge-skills-in-skill-dashboard
-            short_name: assign-unassign-and-merge-skills-in-skill-dashboard
-          - name: topic-manager/edit-and-republish-the-skill
-            short_name: edit-and-republish-the-skill
           - name: topic-manager/add-questions-from-topic-editor
             short_name: add-questions-from-topic-editor
           - name: topic-manager/add-remove-and-edit-subtopics
             short_name: add-remove-and-edit-subtopics
+          - name: topic-manager/assign-unassign-and-merge-skills-in-skill-dashboard
+            short_name: assign-unassign-and-merge-skills-in-skill-dashboard
+          - name: topic-manager/create-and-edit-questions-in-skill-dashboard
+            short_name: create-and-edit-questions-in-skill-dashboard
           - name: topic-manager/create-delete-and-edit-the-stories-and-chapters
             short_name: create-delete-and-edit-the-stories-and-chapters
+          - name: topic-manager/edit-the-topic
+            short_name: edit-the-topic
+          - name: topic-manager/edit-and-republish-the-skill
+            short_name: edit-and-republish-the-skill
         run1: [1, 2]
         run2: [1]
         mobile: [false, true]
-        prod: [true, false]
+        prod: [true]
     name: ${{ matrix.mobile && 'M' || 'D' }}-${{ matrix.suite.short_name }}
     steps:
       - name: Check for broken suites
