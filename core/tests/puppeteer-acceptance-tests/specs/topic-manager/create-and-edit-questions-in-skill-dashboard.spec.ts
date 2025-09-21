@@ -424,9 +424,9 @@ describe('Topic Manager', function () {
     await topicManager.publishSkillChanges();
 
     await topicManager.navigateToSkillQuestionEditorTab();
-    await topicManager.openQuestionEditor('Number with Units.');
+    await topicManager.openQuestionEditor('Enter 160km.');
     await topicManager.selectQuestionDifficulty('Hard');
-    await topicManager.updateCardContent('Solve 2 + 3');
+    await topicManager.updateCardContent('Enter 25km');
     await topicManager.updateHint('This is the new hint.');
     await topicManager.updateSolutionExplanation(
       'This is the new solution explanation.'

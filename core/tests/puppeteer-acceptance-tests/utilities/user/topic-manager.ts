@@ -354,6 +354,7 @@ const responseGroupDiv = '.e2e-test-response-tab';
 const toggleResponseTab = '.e2e-test-response-tab-toggle';
 const misconceptionTitle = '.e2e-test-misconception-title';
 const activeTabClass = 'e2e-test-active-tab';
+const previewQuestionSelector = '.e2e-test-preview-question';
 
 export class TopicManager extends BaseUser {
   /**
@@ -1794,6 +1795,7 @@ export class TopicManager extends BaseUser {
    */
   async previewQuestion(questionText: string): Promise<void> {
     await this.expectElementToBeVisible(questionTextInput);
+    await this.clearAllTextFrom(questionTextInput);
     await this.typeInInputField(questionTextInput, questionText);
     await this.page.keyboard.press('Enter');
 
@@ -1805,28 +1807,10 @@ export class TopicManager extends BaseUser {
    * @param {string} expectedText - The expected question text.
    */
   async expectPreviewQuestionText(expectedText: string): Promise<void> {
-    try {
-      await this.page.waitForSelector(questionContentSelector);
-      const questionContentElement = await this.page.$(questionContentSelector);
-
-      if (!questionContentElement) {
-        throw new Error('Question content element not found');
-      }
-
-      const questionText = await this.page.evaluate(
-        element => element.textContent,
-        questionContentElement
-      );
-
-      if (questionText !== expectedText) {
-        throw new Error(
-          `Expected question text to be "${expectedText}", but it was "${questionText}"`
-        );
-      }
-    } catch (error) {
-      console.error(`Error in expectPreviewQuestionText: ${error.message}`);
-      throw error;
-    }
+    await this.expectTextContentToContain(
+      questionContentSelector,
+      expectedText
+    );
   }
 
   /**
@@ -4112,6 +4096,7 @@ export class TopicManager extends BaseUser {
    */
   async expectQuestionToPreviewProperly(question: string): Promise<void> {
     await this.previewQuestion(question);
+    await this.clickOn(previewQuestionSelector);
     await this.expectPreviewQuestionText(question);
   }
 
