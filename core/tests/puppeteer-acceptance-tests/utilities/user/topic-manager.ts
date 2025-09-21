@@ -336,8 +336,6 @@ const storyRowSelector = 'tr.e2e-test-story-list-item';
 const thumbnailDescriptionSelector = '.e2e-test-thumbnail-description';
 const thumbnailTitleSelector = '.e2e-test-thumbnail-title';
 const questionEditorContainer = '.e2e-test-question-editor-container';
-const questionDifficultySelectionModalSelector =
-  '.e2e-test-question-opportunity-difficulty';
 const confirmSkillDificultyButton =
   'button.e2e-test-confirm-skill-difficulty-button';
 const skillSelectionModalSelector = '.e2e-test-skill-container';

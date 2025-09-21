@@ -1795,24 +1795,7 @@ export class ExplorationEditor extends BaseUser {
         );
         break;
       case INTERACTION_TYPES.TEXT_INPUT:
-        try {
-          await this.expectElementToBeVisible(addListEntryButtonSelector);
-        } catch (error) {
-          await showMessage('[debug] page url: ' + this.page.url());
-          await this.page.evaluate(() => {
-            // Log class list of every element on the page.
-            const elements = document.querySelectorAll('*');
-            console.log('[debug] (Elements): ' + elements.length);
-            elements.forEach(element => {
-              console.log(
-                '[debug] (Elements): ' +
-                  element.tagName +
-                  ' :: ' +
-                  element.className
-              );
-            });
-          });
-        }
+        await this.expectElementToBeVisible(addListEntryButtonSelector);
         await this.waitForElementToStabilize(addListEntryButtonSelector);
         await this.clickOn(addListEntryButtonSelector);
         await this.page.waitForSelector(textInputInteractionOption);

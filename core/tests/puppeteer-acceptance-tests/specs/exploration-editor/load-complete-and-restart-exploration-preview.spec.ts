@@ -61,7 +61,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.addInteraction(INTERACTION_TYPES.NUMBER_INPUT);
     await explorationEditor.addResponsesToTheInteraction(
       INTERACTION_TYPES.NUMBER_INPUT,
-      '-99',
+      '-1',
       'Prefect!',
       CARD_NAME.FINAL_CARD,
       true
