@@ -8,12 +8,12 @@
         <p class="classroom-name">{{ storySummary.getClassroomName() }}</p>
       </div>
       <a class="oppia-story-link"
-         [href]="storySummaryToDisplay.isPublished ?  getStoryLink() : null"
-         [title]="!storySummaryToDisplay.isPublished ? 'This chapter will be available soon.' : ''"
-         (click)="!storySummaryToDisplay.isPublished && $event.preventDefault()"
-         (contextmenu)="!storySummaryToDisplay.isPublished && $event.preventDefault()"
-         [attr.tabindex]="storySummaryToDisplay.isPublished ? 0 : -1"
-         target="{{ storySummaryToDisplay.isPublished && openInNewWindow ? '_blank' : '_self' }}">
+         [href]="storySummaryToDisplay?.isPublished ?  getStoryLink() : null"
+         [title]="!storySummaryToDisplay?.isPublished ? 'This chapter will be available soon.' : ''"
+         (click)="!storySummaryToDisplay?.isPublished && $event.preventDefault()"
+         (contextmenu)="!storySummaryToDisplay?.isPublished && $event.preventDefault()"
+         [attr.tabindex]="storySummaryToDisplay?.isPublished ? 0 : -1"
+         target="{{ storySummaryToDisplay?.isPublished && openInNewWindow ? '_blank' : '_self' }}">
         <div class="story-card">
           <div class="oppia-title-section" [ngStyle]="{'background-color': thumbnailBgColor}">
               <!-- We add an empty alt text so that the screen reader does not read the thumbnail image filename and ignores it as the thumbnail does not convey any significant information. -->
