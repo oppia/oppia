@@ -21,10 +21,16 @@
     <div class="align-items-center d-flex justify-content-between mt-2">
       <circle-progress [percent]="progress"> </circle-progress>
       <a [href]="lessonUrl"
+         *ngIf="story?.isPublished"
          class="align-items-center d-inline-flex justify-content-center lesson-card-button text-decoration-none e2e-test-resume-lesson-btn"
          target="_self">
         {{ getButtonTranslationKey() | translate }}
       </a>
+      <span *ngIf="!story?.isPublished"
+             class="align-items-center d-inline-flex justify-content-center lesson-card-button upcoming"
+             title="This chapter will be available soon.">
+             Coming soon.
+      </span>
     </div>
   </div>
 </div>
@@ -51,6 +57,13 @@
     background-color: #429488;
     border-color: #429488;
     color: #fff;
+  }
+
+  .lesson-card-button.upcoming {
+    background-color: #f5f5f5;
+    border: 1px dashed #aaa;
+    color: #888;
+    pointer-events: auto; 
   }
 
   .lesson-card-container {
