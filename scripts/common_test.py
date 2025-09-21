@@ -1604,13 +1604,13 @@ class LogToTerminalTests(unittest.TestCase):
 
     def test_log_to_terminal_with_invalid_message_type(self) -> None:
         """Checks that an invalid message_type falls back to INFO (blue)."""
-        with mock.patch('sys.stdout', new_callable=io.StringIO) as mock_stdout:
-            # Force a wrong type, but cast it so MyPy is satisfied.
+        with common.capture_stdout() as captured_output:
+            # Here we use cast because we deliberately pass an invalid type
+            # to test that log_to_terminal falls back to INFO.
             common.log_to_terminal(
-                "unexpected message",
-                message_type=cast(common.LogType, "NOT_A_TYPE")
+                'unexpected message',
+                message_type=cast(common.LogType, 'NOT_A_TYPE')
             )
-            output = mock_stdout.getvalue()
-            self.assertIn("unexpected message", output)
-            # Default fallback color is INFO (blue).
-            self.assertIn(common._LOG_COLORS[common.LogType.INFO], output)
+            output = captured_output.getvalue()
+        self.assertIn('unexpected message', output)
+        self.assertIn('\033[94m', output)  # Default color is INFO (blue).
