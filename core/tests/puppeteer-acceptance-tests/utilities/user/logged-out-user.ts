@@ -5382,7 +5382,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async verifyVoiceoverIsPlaying(shouldBePlaying: boolean): Promise<void> {
     try {
-      // First check if audio slider exists (voiceover system is available)
+      // First check if audio slider exists (voiceover system is available).
       const isAudioSliderVisible = await this.isElementVisible(
         audioSliderSelector,
         true,
@@ -5485,7 +5485,7 @@ export class LoggedOutUser extends BaseUser {
    * Pauses the voiceover by clicking on the pause button.
    */
   async pauseVoiceover(): Promise<void> {
-    // Check if pause button is available (voiceover is playing)
+    // Check if pause button is available (voiceover is playing).
     const isPauseButtonVisible = await this.isElementVisible(
       pauseVoiceoverButton,
       true,
