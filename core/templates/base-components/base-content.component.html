@@ -41,9 +41,27 @@
       <div class="oppia-content-container e2e-test-content-container">
         <div id="wrapper">
           <div class="oppia-main-body">
-            <nav class="navbar navbar-expand-lg navbar-light oppia-navbar oppia-prevent-selection"
+            <nav *ngIf="!isNewLessonPlayerEnabled()" class="navbar navbar-expand-lg navbar-light oppia-navbar oppia-prevent-selection"
                  role="navigation"
                  headroom>
+              <div class="navbar-container" dir="auto">
+                <div class="oppia-base-content-pre-logo-container">
+                  <ng-content select="navbar-pre-logo-action"></ng-content>
+                </div>
+                <oppia-top-navigation-bar [headerText]="getHeaderText()"
+                                          [subheaderText]="getSubheaderText()">
+                </oppia-top-navigation-bar>
+                <div class="collapse d-lg-inline-flex navbar-collapse oppia-navbar-collapse ng-cloak navbar-options-display">
+                  <div [ngClass]="{'mr-auto': !isLanguageRTL(), 'ml-auto': isLanguageRTL()}">
+                    <ng-content select="navbar-breadcrumb"></ng-content>
+                  </div>
+                  <ng-content select="nav-options"></ng-content>
+                </div>
+              </div>
+            </nav>
+
+            <nav *ngIf="isNewLessonPlayerEnabled()" class="navbar navbar-expand-lg navbar-light oppia-navbar oppia-prevent-selection"
+                 role="navigation">
               <div class="navbar-container" dir="auto">
                 <div class="oppia-base-content-pre-logo-container">
                   <ng-content select="navbar-pre-logo-action"></ng-content>

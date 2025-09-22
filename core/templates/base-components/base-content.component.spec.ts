@@ -34,6 +34,15 @@ import {SidebarStatusService} from 'services/sidebar-status.service';
 import {BackgroundMaskService} from 'services/stateful/background-mask.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {BaseContentComponent} from './base-content.component';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+
+class MockPlatformFeatureService {
+  status = {
+    NewLessonPlayer: {
+      isEnabled: false,
+    },
+  };
+}
 
 describe('Base Content Component', () => {
   // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
@@ -49,6 +58,7 @@ describe('Base Content Component', () => {
   let hash: string = 'test_hash';
   let backgroundMaskService: BackgroundMaskService;
   let bottomNavbarStatusService: BottomNavbarStatusService;
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
   let windowRef: WindowRef;
   let loaderService: LoaderService;
   let keyboardShortcutService: KeyboardShortcutService;
@@ -109,6 +119,10 @@ describe('Base Content Component', () => {
         {
           provide: Router,
           useClass: MockRouteService,
+        },
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService,
         },
         {
           provide: WindowRef,
@@ -178,6 +192,11 @@ describe('Base Content Component', () => {
     expect(windowRef.nativeWindow.location.href).toEqual(
       'https://oppiatestserver.appspot.com' + pathname + search + hash
     );
+  });
+
+  it('should check new lesson player feature flag is enabled', () => {
+    mockPlatformFeatureService.status.NewLessonPlayer.isEnabled = true;
+    expect(componentInstance.isNewLessonPlayerEnabled()).toBe(true);
   });
 
   it('should get sidebar status', () => {
