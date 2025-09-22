@@ -8,7 +8,6 @@
     "prettier"
   ],
   "plugins": [
-    "angular",
     "html",
     "unused-imports",
     "@typescript-eslint",
@@ -22,7 +21,6 @@
       // frontend tests there is no loss of precision.
       "files": ["*Spec.js", "*Spec.ts", "*.spec.ts"],
       "rules": {
-        "angular/di": "off",
         "no-loss-of-precision": "off"
       }
     },
