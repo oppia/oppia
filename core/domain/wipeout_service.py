@@ -489,7 +489,6 @@ def delete_user(
             request object for which to delete or pseudonymize all the models.
     """
     user_id = pending_deletion_request.user_id
-    user_roles = user_models.UserSettingsModel.get_by_id(user_id).roles
 
     auth_services.delete_external_auth_associations(user_id)
 
@@ -499,83 +498,84 @@ def delete_user(
     _delete_models(user_id, models.Names.FEEDBACK)
     _delete_models(user_id, models.Names.SUGGESTION)
     remove_user_from_user_groups(user_id)
-    if feconf.ROLE_ID_MOBILE_LEARNER not in user_roles:
-        remove_user_from_activities_with_associated_rights_models(
-            pending_deletion_request.user_id)
-        _pseudonymize_one_model_class(
-            pending_deletion_request,
-            improvements_models.ExplorationStatsTaskEntryModel,
-            'resolver_id',
-            models.Names.IMPROVEMENTS
-        )
-        _pseudonymize_one_model_class(
-            pending_deletion_request,
-            app_feedback_report_models.AppFeedbackReportModel,
-            'scrubbed_by',
-            models.Names.APP_FEEDBACK_REPORT
-        )
-        _pseudonymize_feedback_models(pending_deletion_request)
-        _pseudonymize_activity_models_without_associated_rights_models(
-            pending_deletion_request,
-            models.Names.QUESTION,
-            question_models.QuestionSnapshotMetadataModel,
-            question_models.QuestionCommitLogEntryModel,
-            'question_id')
-        _pseudonymize_activity_models_without_associated_rights_models(
-            pending_deletion_request,
-            models.Names.SKILL,
-            skill_models.SkillSnapshotMetadataModel,
-            skill_models.SkillCommitLogEntryModel,
-            'skill_id')
-        _pseudonymize_activity_models_without_associated_rights_models(
-            pending_deletion_request,
-            models.Names.STORY,
-            story_models.StorySnapshotMetadataModel,
-            story_models.StoryCommitLogEntryModel,
-            'story_id')
-        _pseudonymize_activity_models_without_associated_rights_models(
-            pending_deletion_request,
-            models.Names.SUBTOPIC,
-            subtopic_models.SubtopicPageSnapshotMetadataModel,
-            subtopic_models.SubtopicPageCommitLogEntryModel,
-            'subtopic_page_id')
-        _pseudonymize_activity_models_with_associated_rights_models(
-            pending_deletion_request,
-            models.Names.EXPLORATION,
-            exp_models.ExplorationSnapshotMetadataModel,
-            exp_models.ExplorationRightsSnapshotMetadataModel,
-            exp_models.ExplorationRightsSnapshotContentModel,
-            exp_models.ExplorationCommitLogEntryModel,
-            'exploration_id',
-            feconf.EXPLORATION_RIGHTS_CHANGE_ALLOWED_COMMANDS,
-            ['owner_ids', 'editor_ids', 'voice_artist_ids', 'viewer_ids'])
-        _remove_user_id_from_contributors_in_summary_models(
-            user_id, exp_models.ExpSummaryModel)
-        _pseudonymize_activity_models_with_associated_rights_models(
-            pending_deletion_request,
-            models.Names.COLLECTION,
-            collection_models.CollectionSnapshotMetadataModel,
-            collection_models.CollectionRightsSnapshotMetadataModel,
-            collection_models.CollectionRightsSnapshotContentModel,
-            collection_models.CollectionCommitLogEntryModel,
-            'collection_id',
-            feconf.COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS,
-            ['owner_ids', 'editor_ids', 'voice_artist_ids', 'viewer_ids'])
-        _remove_user_id_from_contributors_in_summary_models(
-            user_id, collection_models.CollectionSummaryModel)
-        _pseudonymize_activity_models_with_associated_rights_models(
-            pending_deletion_request,
-            models.Names.TOPIC,
-            topic_models.TopicSnapshotMetadataModel,
-            topic_models.TopicRightsSnapshotMetadataModel,
-            topic_models.TopicRightsSnapshotContentModel,
-            topic_models.TopicCommitLogEntryModel,
-            'topic_id',
-            feconf.TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS,
-            ['manager_ids'])
-        _pseudonymize_blog_post_models(pending_deletion_request)
-        _pseudonymize_version_history_models(pending_deletion_request)
-        _delete_profile_picture(pending_deletion_request)
+    remove_user_from_activities_with_associated_rights_models(
+        pending_deletion_request.user_id)
+
+    _pseudonymize_one_model_class(
+        pending_deletion_request,
+        improvements_models.ExplorationStatsTaskEntryModel,
+        'resolver_id',
+        models.Names.IMPROVEMENTS
+    )
+    _pseudonymize_one_model_class(
+        pending_deletion_request,
+        app_feedback_report_models.AppFeedbackReportModel,
+        'scrubbed_by',
+        models.Names.APP_FEEDBACK_REPORT
+    )
+    _pseudonymize_feedback_models(pending_deletion_request)
+    _pseudonymize_activity_models_without_associated_rights_models(
+        pending_deletion_request,
+        models.Names.QUESTION,
+        question_models.QuestionSnapshotMetadataModel,
+        question_models.QuestionCommitLogEntryModel,
+        'question_id')
+    _pseudonymize_activity_models_without_associated_rights_models(
+        pending_deletion_request,
+        models.Names.SKILL,
+        skill_models.SkillSnapshotMetadataModel,
+        skill_models.SkillCommitLogEntryModel,
+        'skill_id')
+    _pseudonymize_activity_models_without_associated_rights_models(
+        pending_deletion_request,
+        models.Names.STORY,
+        story_models.StorySnapshotMetadataModel,
+        story_models.StoryCommitLogEntryModel,
+        'story_id')
+    _pseudonymize_activity_models_without_associated_rights_models(
+        pending_deletion_request,
+        models.Names.SUBTOPIC,
+        subtopic_models.SubtopicPageSnapshotMetadataModel,
+        subtopic_models.SubtopicPageCommitLogEntryModel,
+        'subtopic_page_id')
+    _pseudonymize_activity_models_with_associated_rights_models(
+        pending_deletion_request,
+        models.Names.EXPLORATION,
+        exp_models.ExplorationSnapshotMetadataModel,
+        exp_models.ExplorationRightsSnapshotMetadataModel,
+        exp_models.ExplorationRightsSnapshotContentModel,
+        exp_models.ExplorationCommitLogEntryModel,
+        'exploration_id',
+        feconf.EXPLORATION_RIGHTS_CHANGE_ALLOWED_COMMANDS,
+        ['owner_ids', 'editor_ids', 'voice_artist_ids', 'viewer_ids'])
+    _remove_user_id_from_contributors_in_summary_models(
+        user_id, exp_models.ExpSummaryModel)
+    _pseudonymize_activity_models_with_associated_rights_models(
+        pending_deletion_request,
+        models.Names.COLLECTION,
+        collection_models.CollectionSnapshotMetadataModel,
+        collection_models.CollectionRightsSnapshotMetadataModel,
+        collection_models.CollectionRightsSnapshotContentModel,
+        collection_models.CollectionCommitLogEntryModel,
+        'collection_id',
+        feconf.COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS,
+        ['owner_ids', 'editor_ids', 'voice_artist_ids', 'viewer_ids'])
+    _remove_user_id_from_contributors_in_summary_models(
+        user_id, collection_models.CollectionSummaryModel)
+    _pseudonymize_activity_models_with_associated_rights_models(
+        pending_deletion_request,
+        models.Names.TOPIC,
+        topic_models.TopicSnapshotMetadataModel,
+        topic_models.TopicRightsSnapshotMetadataModel,
+        topic_models.TopicRightsSnapshotContentModel,
+        topic_models.TopicCommitLogEntryModel,
+        'topic_id',
+        feconf.TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS,
+        ['manager_ids'])
+    _pseudonymize_blog_post_models(pending_deletion_request)
+    _pseudonymize_version_history_models(pending_deletion_request)
+    _delete_profile_picture(pending_deletion_request)
+
     _delete_models(user_id, models.Names.EMAIL)
     _delete_models(user_id, models.Names.LEARNER_GROUP)
 
@@ -624,6 +624,9 @@ def verify_user_deleted(
         bool. True if all the models were correctly deleted, False otherwise.
     """
     if not auth_services.verify_external_auth_associations_are_deleted(user_id):
+        logging.error(
+            'External auth association is not deleted for user with ID %s' % (
+                user_id))
         return False
 
     policies_not_to_verify = [
@@ -640,6 +643,9 @@ def verify_user_deleted(
         user_roles = user_settings_model.roles
         if feconf.ROLE_ID_MOBILE_LEARNER not in user_roles:
             if not _verify_profile_picture_is_deleted(username):
+                logging.error(
+                    'Profile picture is not deleted for username %s' % (
+                        username))
                 return False
 
     user_is_verified = True
