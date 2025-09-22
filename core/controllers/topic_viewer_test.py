@@ -16,19 +16,20 @@
 
 from __future__ import annotations
 
-
 from core import feconf
 from core.constants import constants
-from core.domain import classroom_config_services
-from core.domain import platform_parameter_list
-from core.domain import question_services
-from core.domain import skill_services
-from core.domain import story_domain
-from core.domain import story_services
-from core.domain import topic_domain
-from core.domain import topic_services
-from core.domain import translation_domain
-from core.domain import user_services
+from core.domain import (
+    classroom_config_services,
+    platform_parameter_list,
+    question_services,
+    skill_services,
+    story_domain,
+    story_services,
+    topic_domain,
+    topic_services,
+    translation_domain,
+    user_services,
+)
 from core.tests import test_utils
 
 

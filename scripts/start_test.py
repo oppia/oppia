@@ -15,15 +15,18 @@
 """Unit tests for scripts/start.py."""
 
 from __future__ import annotations
+
 import os
 
 from core.constants import constants
 from core.tests import test_utils
-from scripts import build
-from scripts import common
-from scripts import extend_index_yaml
-from scripts import install_third_party_libs
-from scripts import servers
+from scripts import (
+    build,
+    common,
+    extend_index_yaml,
+    install_third_party_libs,
+    servers,
+)
 
 PORT_NUMBER_FOR_GAE_SERVER = 8181
 MANAGED_WEB_BROWSER_ERROR = 'Mock Exception while launching web browser.'

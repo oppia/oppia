@@ -27,10 +27,19 @@ import re
 import tokenize
 
 from core import handler_schema_constants
+
 from pylint import lint
 from pylint import utils as pylint_utils
 from typing import (
-    Dict, Final, Generator, List, Optional, Pattern, Set, Tuple, TypedDict
+    Dict,
+    Final,
+    Generator,
+    List,
+    Optional,
+    Pattern,
+    Set,
+    Tuple,
+    TypedDict,
 )
 
 from . import docstrings_checker
@@ -52,11 +61,10 @@ ALLOWED_PRAGMAS_FOR_INLINE_COMMENTS: Final = [
 
 ALLOWED_LINES_OF_GAP_IN_COMMENT: Final = 15
 
-import astroid  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
-from pylint import checkers  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
-from pylint import interfaces  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
-from pylint.checkers import utils as checker_utils  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
-from pylint.extensions import _check_docs_utils # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
+import astroid
+from pylint import checkers, interfaces
+from pylint.checkers import utils as checker_utils
+from pylint.extensions import _check_docs_utils
 
 
 def read_from_node(node: astroid.scoped_nodes.Module) -> List[str]:

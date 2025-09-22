@@ -19,9 +19,7 @@ from __future__ import annotations
 import os
 import pkgutil
 
-from core import constants
-from core import feconf
-from core import utils
+from core import constants, feconf, utils
 from core.tests import test_utils
 
 

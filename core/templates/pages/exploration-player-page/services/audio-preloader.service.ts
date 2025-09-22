@@ -19,7 +19,7 @@
 import {Injectable} from '@angular/core';
 
 import {AppConstants} from 'app.constants';
-import {Exploration} from 'domain/exploration/ExplorationObjectFactory';
+import {Exploration} from 'domain/exploration/exploration.model';
 import {Voiceover} from 'domain/exploration/voiceover.model';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {ComputeGraphService} from 'services/compute-graph.service';

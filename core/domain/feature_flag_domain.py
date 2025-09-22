@@ -22,8 +22,7 @@ import datetime
 import enum
 import re
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
 
 from typing import Final, List, Optional, TypedDict

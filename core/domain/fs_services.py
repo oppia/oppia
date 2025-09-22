@@ -20,19 +20,16 @@ from __future__ import annotations
 
 import logging
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import image_services
-from core.domain import image_validation_services
+from core.domain import image_services, image_validation_services
 from core.platform import models
 
 from typing import Dict, List, Optional
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import app_identity_services
-    from mypy_imports import storage_services
+    from mypy_imports import app_identity_services, storage_services
 
 storage_services = models.Registry.import_storage_services()
 app_identity_services = models.Registry.import_app_identity_services()
@@ -425,8 +422,8 @@ def get_static_asset_url(filepath: str) -> str:
     # caching_services -> exp_domain.
     # Caching services should be refactored to eliminate dependency on
     # multiple domain objects.
-    from core.domain import platform_parameter_list
-    from core.domain import platform_parameter_services
+    from core.domain import platform_parameter_list, platform_parameter_services
+
     # TODO(release-scripts#137): Remove once site URL is verified on all
     # servers.
     oppia_site_url = platform_parameter_services.get_platform_parameter_value(

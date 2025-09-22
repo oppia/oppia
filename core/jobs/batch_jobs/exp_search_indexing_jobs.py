@@ -18,9 +18,7 @@
 
 from __future__ import annotations
 
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import search_services
+from core.domain import exp_domain, exp_fetchers, search_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
@@ -29,7 +27,6 @@ from core.platform import models
 
 import apache_beam as beam
 import result
-
 from typing import Final, Iterable, List
 
 MYPY = False
@@ -94,6 +91,6 @@ class IndexExplorationSummaries(beam.DoFn): # type: ignore[misc]
         try:
             search_services.index_exploration_summaries(exp_summary)
             for _ in exp_summary:
-                yield result.Ok()
+                yield result.Ok(True)
         except platform_search_services.SearchException as e:
             yield result.Err(e)
