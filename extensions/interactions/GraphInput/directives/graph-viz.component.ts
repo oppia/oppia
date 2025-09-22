@@ -32,7 +32,7 @@ import {
   Output,
   ViewChild,
 } from '@angular/core';
-import {isNumber} from 'lodash';
+import isNumber from 'lodash/isNumber';
 import {GraphAnswer} from 'interactions/answer-defs';
 import {InteractionsExtensionsConstants} from 'interactions/interactions-extension.constants';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';

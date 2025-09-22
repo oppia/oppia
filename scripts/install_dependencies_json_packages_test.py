@@ -341,6 +341,14 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                         'url': 'https://bootstrap/bootstrap-4.3.1-dist.zip',
                         'rootDir': 'bootstrap-4.3.1-dist',
                         'targetDir': 'bootstrap'
+                    },
+                    'jqueryUI': {
+                        'version': '1.12.1',
+                        'downloadFormat': 'files',
+                        'url': 'https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1',
+                        'rootDirPrefix': 'jqueryui-',
+                        'targetDirPrefix': 'jqueryui-',
+                        'files': ['jquery-ui.min.js']
                     }
                 }
             }
