@@ -734,6 +734,16 @@ export class TopicManager extends BaseUser {
    * Click on the create new question button in the skill editor.
    */
   async clickOnCreateNewQuestionButtonInSkillEditor(): Promise<void> {
+    // Close navigation bar, as it can block the "Create Question" button.
+    if (
+      this.isViewportAtMobileWidth() &&
+      (await this.isElementVisible(navigationContainerSelector))
+    ) {
+      await this.clickOn(mobileOptionsSelector);
+      await this.expectElementToBeVisible(navigationContainerSelector, false);
+    }
+
+    // Click on "Create Question" button.
     await this.clickOn(createQuestionButton);
     await this.expectElementToBeVisible(questionEditorContainer);
   }
