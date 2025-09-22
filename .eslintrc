@@ -168,23 +168,6 @@
     "oppia/no-test-blockers": "error",
     "oppia/no-inject": "error",
     "oppia/no-bypass-security-phrase": "error",
-    "angular/di": [
-      "error",
-      "array"
-    ],
-    "angular/di-unused": "error",
-    "angular/directive-restrict": [
-      "error",
-      {
-        "restrict": "E"
-      }
-    ],
-    "angular/no-inline-template": [
-      "error",
-      {
-        "allowSimple": true
-      }
-    ],
     "array-bracket-spacing": [
       "error",
       "never"
