@@ -334,8 +334,11 @@ export class UserFactory {
       SuperAdminFactory(),
     ]);
     await superAdmin.assignRoleToUser(username, ROLES.BLOG_ADMIN);
-    await superAdmin.assignRoleToUser(username, ROLES.TRANSLATION_ADMIN);
     await superAdmin.expectUserToHaveRole(username, ROLES.BLOG_ADMIN);
+    await superAdmin.assignRoleToUser(username, ROLES.TRANSLATION_ADMIN);
+    await superAdmin.expectUserToHaveRole(username, ROLES.TRANSLATION_ADMIN);
+    await superAdmin.assignRoleToUser(username, ROLES.VOICEOVER_ADMIN);
+    await superAdmin.expectUserToHaveRole(username, ROLES.VOICEOVER_ADMIN);
     superAdminInstance = UserFactory.composeUserWithRoles(superAdmin, [
       BlogAdminFactory(),
       TranslationAdminFactory(),
