@@ -30,20 +30,23 @@ import time
 import traceback
 import urllib
 
-from core import feconf
-from core import handler_schema_constants
-from core import utils
+from core import feconf, handler_schema_constants, utils
 from core.controllers import payload_validator
-from core.domain import auth_domain
-from core.domain import auth_services
-from core.domain import user_services
-
-from typing import (
-    Any, Dict, Final, Generic, Mapping, Optional, Sequence, TypedDict, TypeVar,
-    Union
-)
+from core.domain import auth_domain, auth_services, user_services
 
 import webapp2
+from typing import (
+    Any,
+    Dict,
+    Final,
+    Generic,
+    Mapping,
+    Optional,
+    Sequence,
+    TypedDict,
+    TypeVar,
+    Union,
+)
 
 # Note: These private type variables are only defined to implement the Generic
 # typing structure of BaseHandler. So, do not make them public in the future.

@@ -22,8 +22,7 @@ from core.domain import topic_domain
 from core.jobs import job_test_utils
 from core.jobs.decorators import validation_decorators
 from core.jobs.transforms.validation import topic_validation
-from core.jobs.types import base_validation_errors
-from core.jobs.types import topic_validation_errors
+from core.jobs.types import base_validation_errors, topic_validation_errors
 from core.platform import models
 from core.tests import test_utils
 
@@ -31,8 +30,7 @@ import apache_beam as beam
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import topic_models
+    from mypy_imports import base_models, topic_models
 
 (base_models, topic_models) = models.Registry.import_models(
     [models.Names.BASE_MODEL, models.Names.TOPIC])

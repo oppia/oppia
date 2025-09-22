@@ -35,13 +35,12 @@ import tempfile
 import time
 from urllib import request as urlrequest
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.tests import test_utils
 from scripts import servers
 
-from typing import Generator, List, Literal, NoReturn, Tuple
 import yaml
+from typing import Generator, List, Literal, NoReturn, Tuple
 
 from . import common
 

@@ -25,12 +25,14 @@ from core.tests import test_utils
 
 from typing import Dict, List, Optional, Tuple
 
-from . import build
-from . import check_frontend_test_coverage
-from . import common
-from . import git_changes_utils
-from . import install_third_party_libs
-from . import run_frontend_tests
+from . import (
+    build,
+    check_frontend_test_coverage,
+    common,
+    git_changes_utils,
+    install_third_party_libs,
+    run_frontend_tests,
+)
 
 
 class RunFrontendTestsTests(test_utils.GenericTestBase):

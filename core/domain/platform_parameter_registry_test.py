@@ -20,8 +20,7 @@ from __future__ import annotations
 
 import enum
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.domain import caching_services
 from core.domain import platform_parameter_domain as parameter_domain
 from core.domain import platform_parameter_registry as registry

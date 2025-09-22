@@ -21,13 +21,11 @@ import os
 import subprocess
 import sys
 
-from scripts import common
-from scripts import git_changes_utils
+from scripts import common, git_changes_utils
+
 from typing import Optional, Sequence, Set
 
-from . import build
-from . import check_frontend_test_coverage
-from . import install_third_party_libs
+from . import build, check_frontend_test_coverage, install_third_party_libs
 
 # These is a relative path from the oppia/ folder. They are relative because the
 # dtslint command prepends the current working directory to the path, even if

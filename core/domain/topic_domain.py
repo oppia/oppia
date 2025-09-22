@@ -24,21 +24,17 @@ import functools
 import json
 import re
 
-from core import android_validation_constants
-from core import feconf
-from core import utils
+from core import android_validation_constants, feconf, utils
 from core.constants import constants
-from core.domain import change_domain
-from core.domain import study_guide_domain
-from core.domain import subtopic_page_domain
-
-from typing import Dict, List, Literal, Optional, TypedDict
 
 # The fs_services module is required in one of the migration
 # functions in Topic class. This import should be removed
 # once the schema migration functions are moved outside the
 # domain file.
-from core.domain import fs_services # pylint: disable=invalid-import-from # isort:skip
+from core.domain import fs_services  # pylint: disable=invalid-import-from
+from core.domain import change_domain, study_guide_domain, subtopic_page_domain
+
+from typing import Dict, List, Literal, Optional, TypedDict
 
 CMD_CREATE_NEW = feconf.CMD_CREATE_NEW
 CMD_CHANGE_ROLE = feconf.CMD_CHANGE_ROLE
