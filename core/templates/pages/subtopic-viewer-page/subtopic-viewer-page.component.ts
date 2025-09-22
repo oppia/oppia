@@ -299,9 +299,14 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
     }
   }
 
-  backToTopic(): void {
+  backToTopic(event?: MouseEvent): void {
     if (!this.classroomUrlFragment || !this.topicUrlFragment) {
       return;
+    }
+    let window = '_self';
+    if (event && (event.ctrlKey || event.metaKey)) {
+      // Open in new tab.
+      window = '_blank';
     }
     this.windowRef.nativeWindow.open(
       this.urlInterpolationService.interpolateUrl(
@@ -311,7 +316,7 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
           topic_url_fragment: this.topicUrlFragment,
         }
       ),
-      '_self'
+      window
     );
   }
 

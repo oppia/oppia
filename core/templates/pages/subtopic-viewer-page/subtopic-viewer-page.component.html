@@ -28,7 +28,7 @@
 
 <div *ngIf="isShowRestructuredStudyGuidesFeatureEnabled()" class="oppia-subtopic-viewer-container new-subtopic-viewer-container">
   <div class="breadcrumb-container">
-    <button (click)="backToTopic()" class="btn e2e-test-go-back-to-topic-button btn-back-to-topic">
+    <button (click)="backToTopic($event)" class="btn e2e-test-go-back-to-topic-button btn-back-to-topic">
       <i class="material-icons md-18 icon-next-study-guide">arrow_back</i>
       {{ 'I18N_SUBTOPIC_VIEWER_BACK_TO_TOPIC' | translate }} '{{ parentTopicTitle }}'
     </button>
@@ -238,10 +238,6 @@
     font-size: 15px;
     font-weight: 500;
     margin: 0 !important;
-  }
-  .practice-section-icon {
-    align-self: flex-start;
-    margin-top: 5px;
   }
 
   .next-study-guide-forward-arrow {

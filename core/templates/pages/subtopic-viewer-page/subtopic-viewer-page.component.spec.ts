@@ -648,6 +648,23 @@ describe('Subtopic viewer page', function () {
     );
   });
 
+  it('should navigate back to topic when backToTopic is called with Ctrl+click event', () => {
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'algebra';
+    const mockEvent = new MouseEvent('click', {ctrlKey: true});
+
+    spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
+      '/topic-viewer'
+    );
+
+    component.backToTopic(mockEvent);
+
+    expect(windowRef.nativeWindow.open).toHaveBeenCalledWith(
+      '/topic-viewer',
+      '_blank'
+    );
+  });
+
   it('should not navigate back to topic when required fragments are missing', () => {
     component.classroomUrlFragment = '';
     component.topicUrlFragment = 'algebra';
