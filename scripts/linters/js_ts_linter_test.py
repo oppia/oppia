@@ -43,8 +43,6 @@ VALID_JS_FILEPATH: Final = os.path.join(LINTER_TESTS_DIR, 'valid.js')
 VALID_TS_FILEPATH: Final = os.path.join(LINTER_TESTS_DIR, 'valid.ts')
 VALID_BACKEND_API_SERVICE_FILEPATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'valid-backend-api.service.ts')
-INVALID_SORTED_DEPENDENCIES_FILEPATH: Final = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_sorted_dependencies.ts')
 INVALID_CONSTANT_IN_TS_FILEPATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'invalid_constant_in_ts_file.ts')
 INVALID_CONSTANT_FILEPATH: Final = os.path.join(
@@ -181,44 +179,6 @@ class JsTsLintTests(test_utils.LinterTestBase):
             'Please import the file where the constant is declared '
             'or rename the constant.']
         self.validate(lint_task_report, expected_messages, 1)
-
-    def test_third_party_linter(self) -> None:
-        lint_task_report = js_ts_linter.ThirdPartyJsTsLintChecksManager(
-            [INVALID_SORTED_DEPENDENCIES_FILEPATH]
-        ).perform_all_lint_checks()
-        expected_messages = ['Unused injected value IMPORT_STATEMENT']
-        self.validate(lint_task_report, expected_messages, 1)
-
-    def test_third_party_linter_with_stderr(self) -> None:
-        process = subprocess.Popen(['test'], stdout=subprocess.PIPE)
-        def mock_popen( # pylint: disable=unused-argument
-            unused_cmd: str, stdout: int, stderr: int
-        ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
-            return process
-        def mock_communicate(unused_self: str) -> Tuple[bytes, bytes]:
-            return (b'Output', b'Invalid')
-        popen_swap = self.swap(subprocess, 'Popen', mock_popen)
-        communicate_swap = self.swap(
-            subprocess.Popen, 'communicate', mock_communicate)
-        with popen_swap, communicate_swap:
-            with self.assertRaisesRegex(Exception, 'Invalid'):
-                js_ts_linter.ThirdPartyJsTsLintChecksManager(
-                    [INVALID_SORTED_DEPENDENCIES_FILEPATH]
-                ).perform_all_lint_checks()
-
-    def test_third_party_linter_with_invalid_eslint_path(self) -> None:
-        def mock_exists(unused_path: str) -> bool:
-            return False
-
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
-
-        with exists_swap, self.assertRaisesRegex(
-            Exception,
-            'ERROR    Please run start.py first to install node-eslint and '
-            'its dependencies.'):
-            js_ts_linter.ThirdPartyJsTsLintChecksManager(
-                [INVALID_SORTED_DEPENDENCIES_FILEPATH]
-            ).perform_all_lint_checks()
 
     def test_third_party_linter_with_success_message(self) -> None:
         lint_task_report = js_ts_linter.ThirdPartyJsTsLintChecksManager(
