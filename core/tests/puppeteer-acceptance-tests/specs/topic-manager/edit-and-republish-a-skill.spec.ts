@@ -96,6 +96,7 @@ describe('Topic Manager User Journey', function () {
   );
 
   it('should be able to see stale message when skill is edited', async function () {
+    await topicManager.closeConceptCardPreview();
     await topicManager.createAndSwitchToNewTab();
     await topicManager.navigateToTopicAndSkillsDashboardPage();
     await topicManager.openSkillEditor('Double Digit Addition');

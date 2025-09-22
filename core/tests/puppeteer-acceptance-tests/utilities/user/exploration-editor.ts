@@ -6689,6 +6689,9 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(`${dropdownMenuShown} ${revertVersionButtonSelector}`);
     await this.waitForElementToStabilize(confirmRevertButtonSelector);
     await this.clickAndWaitForNavigation(confirmRevertButtonSelector);
+    await this.waitForNetworkIdle({
+      idleTime: 2000,
+    });
 
     await this.expectElementToBeVisible(confirmRevertButtonSelector, false);
   }

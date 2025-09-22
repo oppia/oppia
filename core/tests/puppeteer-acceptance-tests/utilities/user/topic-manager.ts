@@ -3185,6 +3185,25 @@ export class TopicManager extends BaseUser {
   async expectStaleTabInfoModalToBeVisible(): Promise<void> {
     await this.expectElementToBeVisible(staleTabWarningModalSelector);
   }
+
+  /**
+   * Closes concept card preview by clicking at 10 pixels below preivew modal.
+   */
+  async closeConceptCardPreview(): Promise<void> {
+    await this.expectElementToBeVisible(conceptCardPreviewModelSelector);
+    const previewModal = await this.getElementInParent(
+      conceptCardPreviewModelSelector
+    );
+    const boundingBox = await previewModal.boundingBox();
+    if (!boundingBox) {
+      throw new Error('Bounding box not found.');
+    }
+    await this.page.mouse.click(
+      boundingBox.x,
+      boundingBox.y + boundingBox.height + 10
+    );
+    await this.expectElementToBeVisible(conceptCardPreviewModelSelector, false);
+  }
 }
 
 export let TopicManagerFactory = (): TopicManager => new TopicManager();
