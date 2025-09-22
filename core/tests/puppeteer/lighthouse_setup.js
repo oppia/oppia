@@ -459,7 +459,6 @@ const addThumbnailToTopic = async function (page, topicName) {
 
     await page.waitForSelector(saveTopicButton);
     await page.click(saveTopicButton);
-    await page.waitForTimeout(5000);
     await page.waitForSelector(topicCommitMessageInput);
     await page.focus(topicCommitMessageInput);
     await page.type(topicCommitMessageInput, 'Updated thumbnail');
