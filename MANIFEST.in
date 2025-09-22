@@ -4,6 +4,7 @@
 # by running 'python setup.py sdist' in build.py.
 
 graft assets
+include assets/constants.ts
 include extensions/interactions/html_field_types_to_rule_specs.json
 include extensions/interactions/legacy_interaction_specs_by_state_version/*.json
 include extensions/interactions/rule_templates.json
