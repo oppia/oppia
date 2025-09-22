@@ -450,6 +450,18 @@ export class BaseUser {
     }
     showMessage(`Element (${selector}) is clickable, as expected.`);
   }
+
+  /**
+   * Clicks on the given element after checking if it's clickable and not in
+   * tansition animation.
+   * Note: This function doesn't have post-check.
+   */
+  async clickOnElmeent(element: ElementHandle<Element>): Promise<void> {
+    await this.waitForElementToBeClickable(element);
+    await this.waitForTransitionEnd(element);
+    await element.click();
+  }
+
   /**
    * The function clicks the element using the text on the button.
    * @param selector The text of the button to click on.
@@ -460,15 +472,12 @@ export class BaseUser {
     parentElement?: puppeteer.ElementHandle
   ): Promise<void> {
     const context = parentElement ?? this.page;
-    const element = await context.waitForSelector(selector, {timeout: 10000});
+    const element = await context.waitForSelector(selector, {timeout: 15000});
     if (!element) {
       throw new Error(`Element not found for selector ${selector}`);
     }
-    await this.waitForElementToBeClickable(element);
-    await this.waitForElementToStabilize(element, 2000);
-    showMessage(`Element (selector: ${selector}) is clickable, as expected.`);
-    await element.click();
-    showMessage(`Element (selector: ${selector}) is clicked.`);
+    await this.clickOnElmeent(element);
+    showMessage(`Element (selector: ${selector}) clicked.`);
   }
 
   /**
@@ -487,9 +496,8 @@ export class BaseUser {
     if (!element) {
       throw new Error(`Element not found for text: ${text}`);
     }
-    await this.waitForElementToBeClickable(element);
-    await element.click();
-    showMessage(`Element (text: ${text}) is clicked.`);
+    await this.clickOnElmeent(element);
+    showMessage(`Element (text: ${text}) clicked.`);
   }
 
   /**
@@ -1759,7 +1767,7 @@ export class BaseUser {
    */
   async closeToastWarningMessage(): Promise<void> {
     await this.expectElementToBeVisible(warningToastCloseButtonSelector);
-    await this.clickOn(warningToastCloseButtonSelector);
+    await this.clickOnElementWithSelector(warningToastCloseButtonSelector);
     await this.expectElementToBeVisible(warningToastMessageSelector, false);
   }
 
@@ -1837,6 +1845,29 @@ export class BaseUser {
 
     // If no pattern matches, throw an error.
     throw new Error(`Unable to parse date string: "${dateString}"`);
+  }
+
+  /**
+   * Waits for the transition end of the given element.
+   * @param element The element to wait for.
+   * @param timeout The timeout in milliseconds.
+   */
+  async waitForTransitionEnd(
+    element: ElementHandle<Element>,
+    timeout = 5000
+  ): Promise<void> {
+    await Promise.race([
+      this.page.evaluate(element => {
+        return new Promise<void>(resolve => {
+          const onEnd = () => {
+            element.removeEventListener('transitionend', onEnd);
+            resolve();
+          };
+          element.addEventListener('transitionend', onEnd);
+        });
+      }, element),
+      new Promise<void>(resolve => setTimeout(resolve, timeout)),
+    ]);
   }
 }
 
