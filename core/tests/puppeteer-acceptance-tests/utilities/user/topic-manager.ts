@@ -3849,6 +3849,27 @@ export class TopicManager extends BaseUser {
 
     await this.expectElementToBeVisible(confirmSkillDificultyButton, false);
   }
+  /**
+   * Function to select the difficulty level of the question to be suggested.
+   * @param {string} difficulty - The difficulty level of the question.
+   */
+  async selectQuestionDifficultyInQuestionEditor(
+    difficulty: 'Easy' | 'Medium' | 'Hard' = 'Medium'
+  ): Promise<void> {
+    const selector = `.e2e-test-skill-difficulty-${difficulty.toLowerCase()}`;
+    await this.expectElementToBeVisible(selector);
+    await this.clickOn(selector);
+
+    await this.page.waitForFunction(
+      (selector: string, className: string) => {
+        const element = document.querySelector(selector);
+        return element && element.classList.contains(className);
+      },
+      {},
+      selector,
+      'mat-radio-checked'
+    );
+  }
 
   /**
    * Clicks on the add question button in the questions tab.
@@ -4093,9 +4114,30 @@ export class TopicManager extends BaseUser {
    * @param {string} question - The expected question.
    */
   async expectQuestionToPreviewProperly(question: string): Promise<void> {
-    await this.previewQuestion(question);
-    await this.expectTextContentToContain(previewQuestionSelector, question);
-    await this.clickOn(previewQuestionSelector);
+    await this.expectElementToBeVisible(previewQuestionSelector);
+    const questionElements = await this.page.$$(previewQuestionSelector);
+    let questionElement: ElementHandle | null = null;
+    let questions: string[] = [];
+    for (const element of questionElements) {
+      const elementContent = await this.page.evaluate(
+        (el: Element) => el.textContent?.trim(),
+        element
+      );
+
+      questions.push(elementContent ?? '');
+
+      if (elementContent?.includes(question)) {
+        questionElement = element;
+        break;
+      }
+    }
+    if (!questionElement) {
+      throw new Error(
+        `Can't find question ${question}\n` +
+          `Found: "${questions.join('", "')}"`
+      );
+    }
+    await questionElement.click();
     await this.expectPreviewQuestionText(question);
   }
 

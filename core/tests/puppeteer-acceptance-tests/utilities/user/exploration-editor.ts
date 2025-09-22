@@ -165,6 +165,7 @@ const saveTranslationButton = 'button.e2e-test-save-translation';
 const stateSolutionTab = '.e2e-test-oppia-solution-tab';
 const editStateSolutionExplanationSelector =
   '.e2e-test-edit-solution-explanation';
+const editSolutionDivSelector = '.e2e-test-edit-solution';
 const saveSolutionEditButton = 'button.e2e-test-save-solution-explanation-edit';
 
 const stateHintTab = '.e2e-test-hint-tab';
@@ -3846,6 +3847,33 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(saveSolutionEditButton, {
       hidden: true,
     });
+  }
+
+  /**
+   * Clicks on the first solution and updates it.
+   * @param solution - The new solution.
+   * @param explaination - The new explaination.
+   * @param isSolutionNumericInput - Weather the solution is numeric or not.
+   */
+  async updateSolution(
+    solution: string,
+    explaination: string,
+    isSolutionNumericInput: boolean = true
+  ): Promise<void> {
+    await this.page.waitForSelector(stateSolutionTab, {visible: true});
+    await this.clickOn(stateSolutionTab);
+    await this.clickOn(editSolutionDivSelector);
+
+    // Add solution.
+    const solutionSelector = isSolutionNumericInput
+      ? solutionInputNumeric
+      : solutionInputTextArea;
+    await this.page.waitForSelector(solutionSelector, {visible: true});
+    await this.clearAllTextFrom(solutionSelector);
+    await this.typeInInputField(solutionSelector, solution);
+    await this.page.waitForSelector(`${submitAnswerButton}:not([disabled])`);
+    await this.clickOn(submitAnswerButton);
+    await this.addSolutionExplanationAndSave(explaination);
   }
 
   /**
