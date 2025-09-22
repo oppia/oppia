@@ -27,6 +27,7 @@ from core.domain import (
     exp_fetchers,
     exp_services,
     fs_services,
+    rte_component_registry,
     translation_domain,
     translation_services,
     voiceover_regeneration_services,
@@ -81,13 +82,54 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
         expected_parsed_text = 'x^2 + y^2 = z^2'
         self.assertEqual(parsed_text, expected_parsed_text)
 
-    def test_should_not_convert_oppia_image_tag_to_p_tags(self) -> None:
+    def test_image_tag_has_empty_voiceover_string(self) -> None:
         content_html = (
             '<oppia-noninteractive-image alt-with-value="&amp;quot;Circle'
             '&amp;quot;" caption-with-value="&amp;quot;Circle&amp;quot;" '
             'filepath-with-value="&amp;quot;img_20250120_160503_kusnpv2um4_'
             'height_350_width_450.svg&amp;quot;" ng-version="11.2.14">'
             '</oppia-noninteractive-image>')
+        parsed_text = voiceover_regeneration_services.parse_html(content_html)
+        expected_parsed_text = ''
+        self.assertEqual(parsed_text, expected_parsed_text)
+
+    def test_video_tag_has_empty_voiceover_string(self) -> None:
+        content_html = (
+            '<oppia-noninteractive-video autoplay-with-value=\"true\" '
+            'end-with-value=\"20\" start-with-value=\"13\"'
+            ' video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;'
+            'quot;\"></oppia-noninteractive-video>')
+        parsed_text = voiceover_regeneration_services.parse_html(content_html)
+        expected_parsed_text = ''
+        self.assertEqual(parsed_text, expected_parsed_text)
+
+    def test_worked_example_tag_has_empty_voiceover_string(self) -> None:
+        content_html = (
+            '<oppia-noninteractive-workedexample question-with-value="&amp;'
+            'quot;&amp;lt;pre&amp;gt;&amp;lt;p&amp;gt;lorem ipsum&amp;'
+            'lt;/p&amp;gt;&amp;lt;/pre&amp;gt;'
+            '&amp;quot;" answer-with-value="&amp;quot;'
+            'lorem ipsum&amp;quot;">'
+            '</oppia-noninteractive-workedexample>')
+        parsed_text = voiceover_regeneration_services.parse_html(content_html)
+        expected_parsed_text = ''
+        self.assertEqual(parsed_text, expected_parsed_text)
+
+    def test_collapsible_tag_has_empty_voiceover_string(self) -> None:
+        content_html = (
+            '<oppia-noninteractive-collapsible '
+            'content-with-value=\'&amp;quot;&amp;quot;\' heading-with-value='
+            '\'&amp;quot;&amp;quot;\'></oppia-noninteractive-collapsible>')
+        parsed_text = voiceover_regeneration_services.parse_html(content_html)
+        expected_parsed_text = ''
+        self.assertEqual(parsed_text, expected_parsed_text)
+
+    def test_tab_tag_has_empty_voiceover_string(self) -> None:
+        content_html = (
+            '<oppia-noninteractive-tabs tab_contents-with-value=\'[{&amp;quot;'
+            '&amp;quot;:&amp;quot;Hint introduction&amp;quot;,&amp;quot;content'
+            '&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;hint&amp;lt;/p&amp;gt;&amp;'
+            'quot;}]\'></oppia-noninteractive-tabs>')
         parsed_text = voiceover_regeneration_services.parse_html(content_html)
         expected_parsed_text = ''
         self.assertEqual(parsed_text, expected_parsed_text)
@@ -591,4 +633,21 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
         self.assertEqual(
             errors_while_voiceover_regeneration,
             [('content_0', 'Mocked exception during voiceover regeneration')]
+        )
+
+    def test_all_custom_tags_have_associated_voiceover_extraction_rules(
+        self
+    ) -> None:
+        existing_custom_rte_tags = list(
+            rte_component_registry.Registry.get_tag_list_with_attrs().keys())
+
+        self.assertGreater(len(existing_custom_rte_tags), 0)
+
+        custom_tags_with_voiceover_extraction_rules = list(
+            voiceover_regeneration_services.
+            CUSTOM_RTE_TAGS_TO_VOICEOVER_TEXT_EXTRACTION_RULES.keys())
+
+        self.assertEqual(
+            sorted(existing_custom_rte_tags),
+            sorted(custom_tags_with_voiceover_extraction_rules)
         )
