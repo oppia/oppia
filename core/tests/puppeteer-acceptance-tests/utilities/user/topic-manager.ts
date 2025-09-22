@@ -2052,35 +2052,27 @@ export class TopicManager extends BaseUser {
       ? mobileSkillSelector
       : desktopSkillSelector;
     await this.waitForStaticAssetsToLoad();
-    const topicElements = await this.page.$$(skillNameSelector);
 
-    if (expectedSkills.length === 0) {
-      throw new Error('Expected skills should not be empty');
-    }
+    await this.page.waitForFunction(
+      (selector: string, skills: string[], visible: boolean) => {
+        const skillElements = document.querySelectorAll(selector);
+        const foundSkills = Array.from(skillElements).map(el =>
+          el.textContent?.trim()
+        );
 
-    const skillNames = await Promise.all(
-      topicElements.map(element =>
-        this.page.evaluate(el => el.textContent.trim(), element)
-      )
+        for (const skill of skills) {
+          if (foundSkills.includes(skill) !== visible) {
+            return false;
+          }
+        }
+
+        return true;
+      },
+      {},
+      skillNameSelector,
+      expectedSkills,
+      visible
     );
-
-    const missingSkills = expectedSkills.filter(
-      topic => !skillNames.includes(topic)
-    );
-    const matchedSkills = expectedSkills.filter(topic =>
-      skillNames.includes(topic)
-    );
-
-    if (visible && missingSkills.length > 0) {
-      throw new Error(
-        `Expected skill ${missingSkills.join(', ')} to be present, but they were not found.`
-      );
-    }
-    if (!visible && matchedSkills.length > 0) {
-      throw new Error(
-        `Expected skill ${matchedSkills.join(', ')} to not be present, but they were found.`
-      );
-    }
 
     showMessage('Filtered skills match the expected skills.');
   }
