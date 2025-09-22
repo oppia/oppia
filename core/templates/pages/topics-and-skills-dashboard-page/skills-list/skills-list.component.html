@@ -269,21 +269,23 @@
   }
 
   .skill-list-options-container {
-    display: inline;
-    position: relative;
-  }
+  display: flex;
+  justify-content: flex-end;
+  position: relative;
+}
 
   .skill-edit-options {
-    background-color: #fff;
-    border: 1px solid #000;
-    display: flex;
-    flex-wrap: wrap;
-    position: absolute;
-    right: 0;
-    text-align: left;
-    top: 0;
-    width: 140px;
-  }
+  background-color: #fff;
+  border: 1px solid #000;
+  display: flex;
+  flex-wrap: wrap;
+  position: absolute;
+  right: 0;
+  left: auto; /* add this */
+  text-align: left;
+  top: 0;
+  width: 140px;
+}
 
   .assign-skill-box,
   .merge-skill-box,
@@ -354,11 +356,18 @@
     }
 
     .skill-edit-options {
-      right: 15px;
-      text-align: left;
-      top: -5px;
-      width: 140px;
-    }
+        right: 15px;
+        left: auto; /* add this */
+        text-align: left;
+        top: -5px;
+        width: 140px;
+      }
+
+     .skill-list-options-container {
+        display: flex;
+        justify-content: flex-end;
+        position: relative;
+    } 
 
     .skill-edit-box-icon {
       margin: 0;
