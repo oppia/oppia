@@ -319,6 +319,7 @@ def _join_files(
         with utils.open_file(source_path, 'r') as source_file:
             write_to_file_stream(target_file_stream, source_file.read())
 
+
 def _generate_copy_tasks_for_fonts(
     source_paths: List[str], target_path: str
 ) -> Deque[threading.Thread]:
