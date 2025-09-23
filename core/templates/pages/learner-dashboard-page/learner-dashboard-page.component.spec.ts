@@ -40,13 +40,14 @@ import {Component, EventEmitter, NO_ERRORS_SCHEMA, Pipe} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 
 import {AlertsService} from 'services/alerts.service';
+import {LoggerService} from 'services/contextual/logger.service';
 import {CsrfTokenService} from 'services/csrf-token.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {DateTimeFormatService} from 'services/date-time-format.service';
 import {
   ExplorationBackendDict,
-  ExplorationObjectFactory,
-} from 'domain/exploration/ExplorationObjectFactory';
+  Exploration,
+} from 'domain/exploration/exploration.model';
 import {LearnerDashboardBackendApiService} from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import {LearnerDashboardActivityBackendApiService} from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
 import {SuggestionModalForLearnerDashboardService} from './suggestion-modal/suggestion-modal-for-learner-dashboard.service';
@@ -124,8 +125,9 @@ describe('Learner dashboard page', () => {
   let alertsService: AlertsService = null;
   let csrfTokenService: CsrfTokenService = null;
   let dateTimeFormatService: DateTimeFormatService = null;
-  let explorationObjectFactory: ExplorationObjectFactory = null;
   let focusManagerService: FocusManagerService;
+  let loggerService: LoggerService;
+  let urlInterpolationService: UrlInterpolationService;
   let learnerDashboardBackendApiService: LearnerDashboardBackendApiService =
     null;
   let suggestionModalForLearnerDashboardService: SuggestionModalForLearnerDashboardService =
@@ -324,7 +326,6 @@ describe('Learner dashboard page', () => {
         providers: [
           AlertsService,
           DateTimeFormatService,
-          ExplorationObjectFactory,
           FocusManagerService,
           LearnerDashboardBackendApiService,
           {
@@ -366,9 +367,10 @@ describe('Learner dashboard page', () => {
       alertsService = TestBed.inject(AlertsService);
       csrfTokenService = TestBed.inject(CsrfTokenService);
       dateTimeFormatService = TestBed.inject(DateTimeFormatService);
-      explorationObjectFactory = TestBed.inject(ExplorationObjectFactory);
       focusManagerService = TestBed.inject(FocusManagerService);
       windowDimensionsService = TestBed.inject(WindowDimensionsService);
+      loggerService = TestBed.inject(LoggerService);
+      urlInterpolationService = TestBed.inject(UrlInterpolationService);
       learnerDashboardBackendApiService = TestBed.inject(
         LearnerDashboardBackendApiService
       );
@@ -394,12 +396,14 @@ describe('Learner dashboard page', () => {
       // Generate completed explorations and exploration playlist.
       for (let i = 0; i < 10; i++) {
         learnerDashboardExplorationsData.completed_explorations_list[i] =
-          explorationObjectFactory.createFromBackendDict(
+          Exploration.createFromBackendDict(
             Object.assign(explorationDict, {
               id: i + 1,
               title: titleList[i],
               category: categoryList[i],
-            })
+            }),
+            loggerService,
+            urlInterpolationService
           );
         learnerDashboardExplorationsData.exploration_playlist[i] = {
           id: Number(i + 1).toString(),
@@ -409,14 +413,16 @@ describe('Learner dashboard page', () => {
       // Generate incomplete explorations and incomplete exploration playlist.
       for (let i = 0; i < 12; i++) {
         learnerDashboardExplorationsData.incomplete_explorations_list[i] =
-          explorationObjectFactory.createFromBackendDict(
+          Exploration.createFromBackendDict(
             Object.assign(explorationDict, {
               // Create ids from 11 to 22.
               // (1 to 10 is the complete explorations).
               id: Number(i + 11).toString(),
               title: titleList[i],
               category: categoryList[i],
-            })
+            }),
+            loggerService,
+            urlInterpolationService
           );
       }
 

@@ -98,7 +98,6 @@ import {ExplorationFeaturesService} from 'services/exploration-features.service'
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {ExplorationImprovementsBackendApiService} from 'services/exploration-improvements-backend-api.service';
 import {ExplorationImprovementsTaskRegistryService} from 'services/exploration-improvements-task-registry.service';
-import {ExplorationObjectFactory} from 'domain/exploration/ExplorationObjectFactory';
 import {ExplorationPermissionsBackendApiService} from 'domain/exploration/exploration-permissions-backend-api.service';
 import {ExplorationRecommendationsBackendApiService} from 'domain/recommendations/exploration-recommendations-backend-api.service';
 import {ExplorationStatsBackendApiService} from 'services/exploration-stats-backend-api.service';
@@ -220,7 +219,6 @@ import {PopulateRuleContentIdsService} from 'pages/exploration-editor-page/servi
 import {PretestQuestionBackendApiService} from 'domain/question/pretest-question-backend-api.service';
 import {ProfilePageBackendApiService} from 'pages/profile-page/profile-page-backend-api.service';
 import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
-import {QuestionObjectFactory} from 'domain/question/QuestionObjectFactory';
 import {RatingComputationService} from 'components/ratings/rating-computation/rating-computation.service';
 import {
   RatioExpressionInputRulesService,
@@ -291,7 +289,6 @@ import {StateTopAnswersStatsBackendApiService} from 'services/state-top-answers-
 import {StateTopAnswersStatsObjectFactory} from 'domain/statistics/state-top-answers-stats-object.factory';
 import {StateTopAnswersStatsService} from 'services/state-top-answers-stats.service';
 import {StatsReportingBackendApiService} from 'domain/exploration/stats-reporting-backend-api.service';
-import {StatesObjectFactory} from 'domain/exploration/StatesObjectFactory';
 import {StoryEditorNavigationService} from 'pages/story-editor-page/services/story-editor-navigation.service';
 import {StoryViewerBackendApiService} from 'domain/story_viewer/story-viewer-backend-api.service';
 import {SubtopicViewerBackendApiService} from 'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
@@ -900,8 +897,7 @@ export class UpgradedServices {
     upgradedServices['QuestionBackendApiService'] =
       new QuestionBackendApiService(
         upgradedServices['HttpClient'],
-        upgradedServices['UrlInterpolationService'],
-        upgradedServices['QuestionObjectFactory']
+        upgradedServices['UrlInterpolationService']
       );
     upgradedServices['ReadOnlyCollectionBackendApiService'] =
       new ReadOnlyCollectionBackendApiService(
@@ -1086,20 +1082,10 @@ export class UpgradedServices {
       );
 
     // Topological level: 8.
-    upgradedServices['StatesObjectFactory'] = new StatesObjectFactory();
-    upgradedServices['QuestionObjectFactory'] = new QuestionObjectFactory();
-
-    // Topological level: 9.
-    upgradedServices['ExplorationObjectFactory'] = new ExplorationObjectFactory(
-      upgradedServices['LoggerService'],
-      upgradedServices['StatesObjectFactory'],
-      upgradedServices['UrlInterpolationService']
-    );
     upgradedServices['PretestQuestionBackendApiService'] =
       new PretestQuestionBackendApiService(
         upgradedServices['UrlInterpolationService'],
-        upgradedServices['HttpClient'],
-        upgradedServices['QuestionObjectFactory']
+        upgradedServices['HttpClient']
       );
 
     /* eslint-enable dot-notation */

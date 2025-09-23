@@ -64,8 +64,6 @@ import { SearchExplorationsBackendApiService } from 'domain/collection/search-ex
 import { CreatorDashboardBackendApiService } from 'domain/creator_dashboard/creator-dashboard-backend-api.service';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { EmailDashboardBackendApiService } from 'domain/email-dashboard/email-dashboard-backend-api.service';
-import { ExplorationObjectFactory } from 'domain/exploration/ExplorationObjectFactory';
-import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { CuratedExplorationValidationService } from 'domain/exploration/curated-exploration-validation.service';
 import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
 import { ExplorationPermissionsBackendApiService } from 'domain/exploration/exploration-permissions-backend-api.service';
@@ -83,7 +81,6 @@ import { FacilitatorDashboardBackendApiService } from 'domain/learner_group/faci
 import { PlatformParameterAdminBackendApiService } from 'domain/platform-parameter/platform-parameter-admin-backend-api.service';
 import { FeatureFlagBackendApiService } from 'domain/feature-flag/feature-flag-backend-api.service';
 import { FeatureFlagDummyBackendApiService } from 'domain/feature-flag/feature-flag-dummy-backend-api.service';
-import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { EditableQuestionBackendApiService } from 'domain/question/editable-question-backend-api.service';
 import { PretestQuestionBackendApiService } from 'domain/question/pretest-question-backend-api.service';
 import { QuestionBackendApiService } from 'domain/question/question-backend-api.service';
@@ -583,7 +580,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExplorationInitStateNameService', ExplorationInitStateNameService],
   ['ExplorationLanguageCodeService', ExplorationLanguageCodeService],
   ['ExplorationObjectiveService', ExplorationObjectiveService],
-  ['ExplorationObjectFactory', ExplorationObjectFactory],
   ['ExplorationObjectiveService', ExplorationObjectiveService],
   ['ExplorationPermissionsBackendApiService',
     ExplorationPermissionsBackendApiService],
@@ -734,7 +730,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['ProfilePageBackendApiService', ProfilePageBackendApiService],
   ['PromoBarBackendApiService', PromoBarBackendApiService],
   ['EditableQuestionBackendApiService', EditableQuestionBackendApiService],
-  ['QuestionObjectFactory', QuestionObjectFactory],
   ['QuestionBackendApiService', QuestionBackendApiService],
   ['QuestionSuggestionBackendApiService', QuestionSuggestionBackendApiService],
   ['QuestionsListService', QuestionsListService],
@@ -810,7 +805,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['StateTutorialFirstTimeService', StateTutorialFirstTimeService],
   ['TutorialEventsBackendApiService',
     TutorialEventsBackendApiService],
-  ['StatesObjectFactory', StatesObjectFactory],
   ['StatsReportingBackendApiService', StatsReportingBackendApiService],
   ['StatsReportingService', StatsReportingService],
   ['StoryCreationBackendApiService', StoryCreationBackendApiService],
