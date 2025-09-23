@@ -116,11 +116,11 @@ export class ReleaseCoordinator extends BaseUser {
   async navigateToBeamJobsTab(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.expectElementToBeVisible(mobileNavBar);
-      await this.clickOn(mobileNavBar);
-      await this.clickOn(mobileBeamJobsTab);
+      await this.clickOnElementWithSelector(mobileNavBar);
+      await this.clickOnElementWithSelector(mobileBeamJobsTab);
     } else {
       await this.expectElementToBeVisible(beamJobsTab);
-      await this.clickOn(beamJobsTab);
+      await this.clickOnElementWithSelector(beamJobsTab);
     }
 
     await this.expectElementToBeVisible(beamJobsTabContainerSelector);
@@ -767,7 +767,7 @@ export class ReleaseCoordinator extends BaseUser {
     await this.expectElementToBeVisible(addUserGroupContainerSelector);
     await this.clearAllTextFrom(userGroupInputSelector);
     await this.type(userGroupInputSelector, groupName);
-    await this.clickOn(addNewUserGroupButtonSelector);
+    await this.clickOnElementWithSelector(addNewUserGroupButtonSelector);
 
     await this.expectUserGroupToBePresent(groupName);
   }
