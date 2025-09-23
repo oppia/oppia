@@ -19,36 +19,39 @@ from __future__ import annotations
 import logging
 import random
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.controllers import acl_decorators
-from core.controllers import base
-from core.controllers import domain_objects_validator
-from core.controllers import editor
-from core.domain import collection_services
-from core.domain import event_services
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import feedback_services
-from core.domain import interaction_registry
-from core.domain import learner_progress_services
-from core.domain import moderator_services
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_services
-from core.domain import question_services
-from core.domain import rating_services
-from core.domain import recommendations_services
-from core.domain import rights_manager
-from core.domain import skill_services
-from core.domain import stats_domain
-from core.domain import stats_services
-from core.domain import story_fetchers
-from core.domain import summary_services
-from core.domain import translation_fetchers
-from core.domain import translation_services
-from core.domain import user_services
+from core.controllers import (
+    acl_decorators,
+    base,
+    domain_objects_validator,
+    editor,
+)
+from core.domain import (
+    collection_services,
+    event_services,
+    exp_domain,
+    exp_fetchers,
+    exp_services,
+    feedback_services,
+    interaction_registry,
+    learner_progress_services,
+    moderator_services,
+    platform_parameter_list,
+    platform_parameter_services,
+    question_services,
+    rating_services,
+    recommendations_services,
+    rights_manager,
+    skill_services,
+    stats_domain,
+    stats_services,
+    story_fetchers,
+    summary_services,
+    translation_fetchers,
+    translation_services,
+    user_services,
+)
 
 from typing import Dict, List, Optional, TypedDict, Union
 

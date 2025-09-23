@@ -17,10 +17,8 @@
 from __future__ import annotations
 
 from core import feconf
-from core.controllers import acl_decorators
-from core.controllers import base
-from core.domain import subscription_services
-from core.domain import user_services
+from core.controllers import acl_decorators, base
+from core.domain import subscription_services, user_services
 
 from typing import Dict, TypedDict
 

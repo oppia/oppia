@@ -23,34 +23,36 @@ import logging
 import os
 import re
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import auth_services
-from core.domain import collection_services
-from core.domain import event_services
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import platform_parameter_list
-from core.domain import rights_manager
-from core.domain import state_domain
-from core.domain import suggestion_services
-from core.domain import user_domain
-from core.domain import user_services
+from core.domain import (
+    auth_services,
+    collection_services,
+    event_services,
+    exp_domain,
+    exp_fetchers,
+    exp_services,
+    platform_parameter_list,
+    rights_manager,
+    state_domain,
+    suggestion_services,
+    user_domain,
+    user_services,
+)
 from core.platform import models
 from core.tests import test_utils
 
 import requests_mock
-
 from typing import Dict, Final, List
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import audit_models
-    from mypy_imports import auth_models
-    from mypy_imports import suggestion_models
-    from mypy_imports import user_models
+    from mypy_imports import (
+        audit_models,
+        auth_models,
+        suggestion_models,
+        user_models,
+    )
 
 datastore_services = models.Registry.import_datastore_services()
 (auth_models, user_models, audit_models, suggestion_models) = (
@@ -2087,6 +2089,16 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     ) -> None:
         with self.assertRaisesRegex(Exception, 'User not found.'):
             user_services.get_human_readable_user_ids(['unregistered_id'])
+
+    def test_get_human_readable_user_ids_for_nonexistent_user(self) -> None:
+        user_id = 'nonexistent_user_id'
+        self.assertEqual(
+            user_services.get_human_readable_user_ids(
+                [user_id],
+                strict=False,
+                include_deleted=True
+            ),
+            [user_services.LABEL_FOR_DELETED_USER])
 
     def test_record_user_started_state_editor_tutorial(self) -> None:
         user_id = user_services.create_new_user(

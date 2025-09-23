@@ -22,54 +22,55 @@ import operator
 import random
 import string
 
-from core import feature_flag_list
-from core import feconf
-from core import utils
+from core import feature_flag_list, feconf, utils
 from core.constants import constants
-from core.controllers import acl_decorators
-from core.controllers import base
+from core.controllers import acl_decorators, base
 from core.controllers import domain_objects_validator as validation_method
-from core.domain import auth_services
-from core.domain import blog_services
-from core.domain import classroom_config_domain
-from core.domain import classroom_config_services
-from core.domain import collection_services
-from core.domain import email_manager
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import feature_flag_services
-from core.domain import fs_services
-from core.domain import opportunity_services
+from core.domain import (
+    auth_services,
+    blog_services,
+    classroom_config_domain,
+    classroom_config_services,
+    collection_services,
+    email_manager,
+    exp_domain,
+    exp_fetchers,
+    exp_services,
+    feature_flag_services,
+    fs_services,
+    opportunity_services,
+)
 from core.domain import platform_parameter_domain as parameter_domain
 from core.domain import platform_parameter_list
 from core.domain import platform_parameter_registry as registry
 from core.domain import platform_parameter_services as parameter_services
-from core.domain import question_domain
-from core.domain import question_services
-from core.domain import recommendations_services
-from core.domain import rights_manager
-from core.domain import role_services
-from core.domain import search_services
-from core.domain import skill_domain
-from core.domain import skill_services
-from core.domain import state_domain
-from core.domain import stats_services
-from core.domain import story_domain
-from core.domain import story_fetchers
-from core.domain import story_services
-from core.domain import study_guide_domain
-from core.domain import study_guide_services
-from core.domain import subtopic_page_domain
-from core.domain import subtopic_page_services
-from core.domain import suggestion_services
-from core.domain import topic_domain
-from core.domain import topic_fetchers
-from core.domain import topic_services
-from core.domain import translation_domain
-from core.domain import user_services
-from core.domain import voiceover_services
-from core.domain import wipeout_service
+from core.domain import (
+    question_domain,
+    question_services,
+    recommendations_services,
+    rights_manager,
+    role_services,
+    search_services,
+    skill_domain,
+    skill_services,
+    state_domain,
+    stats_services,
+    story_domain,
+    story_fetchers,
+    story_services,
+    study_guide_domain,
+    study_guide_services,
+    subtopic_page_domain,
+    subtopic_page_services,
+    suggestion_services,
+    topic_domain,
+    topic_fetchers,
+    topic_services,
+    translation_domain,
+    user_services,
+    voiceover_services,
+    wipeout_service,
+)
 
 from typing import Dict, List, Optional, TypedDict, Union, cast
 

@@ -20,26 +20,26 @@ import datetime
 import enum
 import re
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
 from core.platform import models
 
-from typing import Final, Literal, TypedDict
-
-from typing import ( # isort:skip
+from typing import (
     Any,
     Dict,
+    Final,
     List,
+    Literal,
     Mapping,
     Optional,
     Sequence,
     Tuple,
     Type,
-    Union,
+    TypedDict,
     TypeVar,
+    Union,
     cast,
-    overload
+    overload,
 )
 
 SELF_BASE_MODEL = TypeVar(  # pylint: disable=invalid-name
@@ -58,9 +58,8 @@ SELF_BASE_SNAPSHOT_CONTENT_MODEL = TypeVar(  # pylint: disable=invalid-name
 MYPY = False
 if MYPY: # pragma: no cover
     # Here, 'change_domain' is imported only for type checking.
-    from core.domain import change_domain  # pylint: disable=invalid-import # isort:skip
-    from mypy_imports import datastore_services
-    from mypy_imports import transaction_services
+    from core.domain import change_domain  # pylint: disable=invalid-import
+    from mypy_imports import datastore_services, transaction_services
 
     AllowedCommitCmdsListType = Sequence[
         Mapping[str, change_domain.AcceptableChangeDictTypes]

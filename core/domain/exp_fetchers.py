@@ -28,19 +28,19 @@ import copy
 import logging
 
 from core import feconf
-from core.domain import caching_services
-from core.domain import exp_domain
-from core.domain import subscription_services
-from core.domain import user_domain
+from core.domain import (
+    caching_services,
+    exp_domain,
+    subscription_services,
+    user_domain,
+)
 from core.platform import models
 
 from typing import Dict, List, Literal, Optional, Sequence, overload
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import datastore_services
-    from mypy_imports import exp_models
-    from mypy_imports import user_models
+    from mypy_imports import datastore_services, exp_models, user_models
 
 (exp_models, user_models) = models.Registry.import_models([
     models.Names.EXPLORATION, models.Names.USER

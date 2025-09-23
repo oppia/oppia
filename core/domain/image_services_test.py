@@ -22,13 +22,11 @@ import io
 import os
 import re
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.domain import image_services
 from core.tests import test_utils
 
-from PIL import Image
-from PIL import ImageChops
+from PIL import Image, ImageChops
 
 
 class ImageServicesUnitTests(test_utils.GenericTestBase):
