@@ -439,8 +439,11 @@ describe('Topic Manager', function () {
       'updatedQuestionInQuestionEditor',
       __dirname
     );
-    await topicManager.updateResponse(0, '25km', 'This is the new feedback.');
-    await topicManager.expectSaveQuestionButtonToBeEnabled();
+
+    // TODO(#23439): Currently, the input field is covered by submit and cancel button.
+    // Once fixed, uncomment step and expectation below.
+    // await topicManager.updateResponse(0, '25km', 'This is the new feedback.');
+    // await topicManager.expectSaveQuestionButtonToBeEnabled();
   });
 
   afterAll(async function () {
