@@ -31,7 +31,6 @@ export let showMessage = function (
     log: '[test-log]',
     browser: '[browser-log]',
   };
-  return;
   // We use console statements to log the progress or feedback of the tests.
   // eslint-disable-next-line no-console
   console.log(`${messagePrefixes[messageType]}: ` + message);
