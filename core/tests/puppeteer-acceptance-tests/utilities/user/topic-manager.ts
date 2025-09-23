@@ -353,6 +353,8 @@ const toggleResponseTab = '.e2e-test-response-tab-toggle';
 const misconceptionTitle = '.e2e-test-misconception-title';
 const activeTabClass = 'e2e-test-active-tab';
 const previewQuestionSelector = '.e2e-test-preview-question';
+const toggleSkillEditOptionsButton =
+  'div.e2e-test-mobile-toggle-skill-nav-dropdown-icon';
 
 export class TopicManager extends BaseUser {
   /**
@@ -366,7 +368,8 @@ export class TopicManager extends BaseUser {
 
     // Close skill edit options dropdown.
     if (await this.isElementVisible(skillEditOptionsContainerSelector)) {
-      await this.clickOn(mobileSkillNavToggle);
+      const elements = await this.page.$$(toggleSkillEditOptionsButton);
+      await this.clickOnElement(elements[1]);
       await this.expectElementToBeVisible(
         skillEditOptionsContainerSelector,
         false
@@ -739,8 +742,7 @@ export class TopicManager extends BaseUser {
       this.isViewportAtMobileWidth() &&
       (await this.isElementVisible(navigationContainerSelector))
     ) {
-      await this.clickOn(mobileOptionsSelector);
-      await this.expectElementToBeVisible(navigationContainerSelector, false);
+      await this.closeNavigationInMobileView();
     }
 
     // Click on "Create Question" button.
