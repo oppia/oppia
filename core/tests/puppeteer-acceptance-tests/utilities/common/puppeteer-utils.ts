@@ -1864,29 +1864,6 @@ export class BaseUser {
   }
 
   /**
-   * Waits for the transition end of the given element.
-   * @param element The element to wait for.
-   * @param timeout The timeout in milliseconds.
-   */
-  async waitForTransitionEnd(
-    element: ElementHandle<Element>,
-    timeout = 5000
-  ): Promise<void> {
-    await Promise.race([
-      this.page.evaluate(element => {
-        return new Promise<void>(resolve => {
-          const onEnd = () => {
-            element.removeEventListener('transitionend', onEnd);
-            resolve();
-          };
-          element.addEventListener('transitionend', onEnd);
-        });
-      }, element),
-      new Promise<void>(resolve => setTimeout(resolve, timeout)),
-    ]);
-  }
-
-  /**
    * Clicks on the given element after waiting for it to be clickable.
    * Note: This function does not have post-check.
    * @param element The element to click on.
@@ -1897,7 +1874,6 @@ export class BaseUser {
     options: puppeteer.ClickOptions = {}
   ): Promise<void> {
     await this.waitForElementToBeClickable(element);
-    await this.waitForTransitionEnd(element);
     await element.click(options);
   }
 }
