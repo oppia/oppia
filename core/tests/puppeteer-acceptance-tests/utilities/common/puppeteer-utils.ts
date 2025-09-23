@@ -456,9 +456,8 @@ export class BaseUser {
    * tansition animation.
    * Note: This function doesn't have post-check.
    */
-  async clickOnElmeent(element: ElementHandle<Element>): Promise<void> {
+  async clickOnElement(element: ElementHandle<Element>): Promise<void> {
     await this.waitForElementToBeClickable(element);
-    await this.waitForTransitionEnd(element);
     await element.click();
   }
 
@@ -476,7 +475,7 @@ export class BaseUser {
     if (!element) {
       throw new Error(`Element not found for selector ${selector}`);
     }
-    await this.clickOnElmeent(element);
+    await this.clickOnElement(element);
     showMessage(`Element (selector: ${selector}) clicked.`);
   }
 
@@ -496,7 +495,7 @@ export class BaseUser {
     if (!element) {
       throw new Error(`Element not found for text: ${text}`);
     }
-    await this.clickOnElmeent(element);
+    await this.clickOnElement(element);
     showMessage(`Element (text: ${text}) clicked.`);
   }
 
@@ -1845,29 +1844,6 @@ export class BaseUser {
 
     // If no pattern matches, throw an error.
     throw new Error(`Unable to parse date string: "${dateString}"`);
-  }
-
-  /**
-   * Waits for the transition end of the given element.
-   * @param element The element to wait for.
-   * @param timeout The timeout in milliseconds.
-   */
-  async waitForTransitionEnd(
-    element: ElementHandle<Element>,
-    timeout = 5000
-  ): Promise<void> {
-    await Promise.race([
-      this.page.evaluate(element => {
-        return new Promise<void>(resolve => {
-          const onEnd = () => {
-            element.removeEventListener('transitionend', onEnd);
-            resolve();
-          };
-          element.addEventListener('transitionend', onEnd);
-        });
-      }, element),
-      new Promise<void>(resolve => setTimeout(resolve, timeout)),
-    ]);
   }
 }
 
