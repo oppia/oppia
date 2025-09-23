@@ -6740,6 +6740,13 @@ export class ExplorationEditor extends BaseUser {
     newAnswer: string,
     responseFeedback: string
   ): Promise<void> {
+    // Expand response group if not expanded already.
+    if (
+      this.isViewportAtMobileWidth() &&
+      !(await this.isElementVisible(responseGroupDiv, true, 5000))
+    ) {
+      await this.clickOn(toggleResponseTab);
+    }
     await this.page.waitForSelector(responseGroupDiv);
     const elements = await this.page.$$(responseGroupDiv);
     if (elements.length < index + 1) {
