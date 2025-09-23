@@ -29,8 +29,7 @@ from typing import Any, Dict, Final, List, Optional
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import cloud_task_models
-    from mypy_imports import platform_taskqueue_services
+    from mypy_imports import cloud_task_models, platform_taskqueue_services
 
 platform_taskqueue_services = models.Registry.import_taskqueue_services()
 
@@ -105,9 +104,9 @@ def defer(
 
     task = platform_taskqueue_services.create_http_task(
         queue_name=queue_name, url=feconf.TASK_URL_DEFERRED, payload=payload)
-    assert task.task_name is not None
+    assert task.name is not None
     cloud_task_model = create_new_cloud_task_model(
-        new_cloud_task_model_id, task.task_name, fn_identifier)
+        new_cloud_task_model_id, task.name, fn_identifier)
     cloud_task_model.update_timestamps()
     cloud_task_model.put()
 

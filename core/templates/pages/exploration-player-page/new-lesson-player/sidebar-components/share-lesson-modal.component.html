@@ -1,3 +1,5 @@
+<!-- This is the hidden element used for avoiding the autofocus on the elements as soon as the modal is opened -->
+<div tabindex="-1" ngbAutofocus class="hidden-element"></div>
 <div class="oppia-share-lesson-modal-header" [ngStyle]="!backBtnIsVisible ? { 'justify-content': 'flex-end' } : {}">
   <button *ngIf="backBtnIsVisible" mat-icon-button (click)="goBackToCopyModal()" aria-label="Back to the previous step">
     <mat-icon>arrow_back</mat-icon>
@@ -58,7 +60,7 @@
       <div class="cc-attribution-text">
         <input type="text" class="cc-attribution-input" [value]="embedCode" readonly aria-label="Embed code to copy">
         <button mat-button class="copy-cc-btn" (click)="copyEmbedCode()" aria-label="Copy embed code">
-          <span class="button-content">{{'Embed in Webpage' | translate}} <mat-icon>link</mat-icon></span>
+          <span class="button-content">Copy HTML code<mat-icon>link</mat-icon></span>
         </button>
       </div>
     </div>
@@ -97,6 +99,6 @@
   </button>
 </div>
 
-<div class="success-message" *ngIf="successMessageIsVisible" role="alert" aria-live="assertive">
-  <p>{{ successMessage | translate }} <mat-icon>check_circle</mat-icon></p>
+<div class="success-message" role="alert" aria-live="assertive">
+  <p *ngIf="successMessageIsVisible">{{ successMessage | translate }} <mat-icon>check_circle</mat-icon></p>
 </div>

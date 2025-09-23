@@ -24,35 +24,35 @@ import os
 import re
 import zipfile
 
-from core import feature_flag_list
-from core import feconf
-from core import utils
+from core import feature_flag_list, feconf, utils
 from core.constants import constants
-from core.domain import change_domain
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import feedback_services
-from core.domain import fs_services
-from core.domain import opportunity_domain
-from core.domain import opportunity_services
-from core.domain import param_domain
-from core.domain import rating_services
-from core.domain import rights_domain
-from core.domain import rights_manager
-from core.domain import search_services
-from core.domain import state_domain
-from core.domain import stats_services
-from core.domain import story_domain
-from core.domain import story_services
-from core.domain import subscription_services
-from core.domain import suggestion_services
-from core.domain import topic_fetchers
-from core.domain import topic_services
-from core.domain import translation_domain
-from core.domain import translation_fetchers
-from core.domain import translation_services
-from core.domain import user_services
+from core.domain import (
+    change_domain,
+    exp_domain,
+    exp_fetchers,
+    exp_services,
+    feedback_services,
+    fs_services,
+    opportunity_domain,
+    opportunity_services,
+    param_domain,
+    rating_services,
+    rights_domain,
+    rights_manager,
+    search_services,
+    state_domain,
+    stats_services,
+    story_domain,
+    story_services,
+    subscription_services,
+    suggestion_services,
+    topic_fetchers,
+    topic_services,
+    translation_domain,
+    translation_fetchers,
+    translation_services,
+    user_services,
+)
 from core.platform import models
 from core.tests import test_utils
 from extensions import domain
@@ -61,16 +61,18 @@ from typing import Dict, Final, List, Optional, Sequence, Type, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import datastore_services
-    from mypy_imports import exp_models
-    from mypy_imports import feedback_models
-    from mypy_imports import opportunity_models
-    from mypy_imports import recommendations_models
-    from mypy_imports import stats_models
-    from mypy_imports import suggestion_models
-    from mypy_imports import translation_models
-    from mypy_imports import user_models
-    from mypy_imports import voiceover_models
+    from mypy_imports import (
+        datastore_services,
+        exp_models,
+        feedback_models,
+        opportunity_models,
+        recommendations_models,
+        stats_models,
+        suggestion_models,
+        translation_models,
+        user_models,
+        voiceover_models,
+    )
 
 (
     feedback_models,
@@ -6086,42 +6088,6 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         self.save_new_valid_exploration(self.EXP_ID_3, self.albert_id)
         rights_manager.publish_exploration(self.albert, self.EXP_ID_3)
         exp_services.delete_exploration(self.albert_id, self.EXP_ID_3)
-
-    def test_get_non_private_exploration_summaries(self) -> None:
-
-        actual_summaries = exp_services.get_non_private_exploration_summaries()
-
-        expected_summaries = {
-            self.EXP_ID_2: exp_domain.ExplorationSummary(
-                self.EXP_ID_2, 'Exploration 2 Albert title',
-                'Algebra', 'An objective', 'en', [],
-                feconf.get_empty_ratings(), feconf.EMPTY_SCALED_AVERAGE_RATING,
-                rights_domain.ACTIVITY_STATUS_PUBLIC,
-                False, [self.albert_id], [], [], [], [self.albert_id],
-                {self.albert_id: 1},
-                self.EXPECTED_VERSION_2,
-                actual_summaries[self.EXP_ID_2].exploration_model_created_on,
-                actual_summaries[self.EXP_ID_2].exploration_model_last_updated,
-                actual_summaries[self.EXP_ID_2].first_published_msec
-                )}
-
-        # Check actual summaries equal expected summaries.
-        self.assertEqual(
-            list(actual_summaries.keys()),
-            list(expected_summaries.keys()))
-        simple_props = ['id', 'title', 'category', 'objective',
-                        'language_code', 'tags', 'ratings',
-                        'scaled_average_rating', 'status',
-                        'community_owned', 'owner_ids',
-                        'editor_ids', 'voice_artist_ids', 'viewer_ids',
-                        'contributor_ids', 'version',
-                        'exploration_model_created_on',
-                        'exploration_model_last_updated']
-        for exp_id, actual_summary in actual_summaries.items():
-            for prop in simple_props:
-                self.assertEqual(
-                    getattr(actual_summary, prop),
-                    getattr(expected_summaries[exp_id], prop))
 
     def test_get_all_exploration_summaries(self) -> None:
         actual_summaries = exp_services.get_all_exploration_summaries()

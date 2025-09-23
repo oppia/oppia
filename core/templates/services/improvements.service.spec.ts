@@ -20,11 +20,10 @@ import {TestBed} from '@angular/core/testing';
 
 import {CamelCaseToHyphensPipe} from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import {ImprovementsService} from 'services/improvements.service';
-import {StateObjectFactory} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 
 describe('ImprovementsService', () => {
   let improvementsService: ImprovementsService;
-  let stateObjectFactory: StateObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -32,7 +31,6 @@ describe('ImprovementsService', () => {
     });
 
     improvementsService = new ImprovementsService();
-    stateObjectFactory = TestBed.get(StateObjectFactory);
   });
 
   describe('.isStateForcedToResolveOutstandingUnaddressedAnswers', () => {
@@ -82,7 +80,7 @@ describe('ImprovementsService', () => {
         card_is_checkpoint: false,
       };
 
-      let mockState = stateObjectFactory.createFromBackendDict(
+      let mockState = State.createFromBackendDict(
         'stateName',
         mockStateBackendDict
       );
@@ -137,7 +135,7 @@ describe('ImprovementsService', () => {
         card_is_checkpoint: false,
       };
 
-      let mockState = stateObjectFactory.createFromBackendDict(
+      let mockState = State.createFromBackendDict(
         'stateName',
         mockStateBackendDict
       );
@@ -192,7 +190,7 @@ describe('ImprovementsService', () => {
         card_is_checkpoint: false,
       };
 
-      let mockState = stateObjectFactory.createFromBackendDict(
+      let mockState = State.createFromBackendDict(
         'stateName',
         mockStateBackendDict
       );

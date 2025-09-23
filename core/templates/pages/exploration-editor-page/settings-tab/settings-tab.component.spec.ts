@@ -54,15 +54,15 @@ import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {SettingsTabComponent} from './settings-tab.component';
 import {UserInfo} from 'domain/user/user-info.model';
 import {ExplorationPermissions} from 'domain/exploration/exploration-permissions.model';
-import {State} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 import {MatChipInputEvent} from '@angular/material/chips';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {
   MetadataDiffData,
   VersionHistoryService,
 } from '../services/version-history.service';
-import {ExplorationMetadata} from 'domain/exploration/ExplorationMetadataObjectFactory';
-import {ParamSpecs} from 'domain/exploration/ParamSpecsObjectFactory';
+import {ExplorationMetadata} from 'domain/exploration/exploration-metadata.model';
+import {ParamSpecs} from 'domain/exploration/param-specs.model';
 import {VersionHistoryBackendApiService} from '../services/version-history-backend-api.service';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {Interaction} from 'domain/exploration/interaction.model';

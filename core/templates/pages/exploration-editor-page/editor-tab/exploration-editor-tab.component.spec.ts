@@ -60,11 +60,7 @@ import {
 } from 'ngx-joyride';
 import {Router} from '@angular/router';
 import {ExplorationPermissions} from 'domain/exploration/exploration-permissions.model';
-import {
-  State,
-  StateBackendDict,
-  StateObjectFactory,
-} from 'domain/state/StateObjectFactory';
+import {State, StateBackendDict} from 'domain/state/state.model';
 import {Interaction} from 'domain/exploration/interaction.model';
 import {PageContextService} from 'services/page-context.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
@@ -99,7 +95,6 @@ describe('Exploration editor tab component', () => {
   var explorationNextContentIdIndexService: ExplorationNextContentIdIndexService;
   let mockRefreshStateEditorEventEmitter = null;
   let versionHistoryService: VersionHistoryService;
-  let stateObjectFactory: StateObjectFactory;
   let stateObject: StateBackendDict;
   let versionHistoryBackendApiService: VersionHistoryBackendApiService;
   let skillBackendApiService: SkillBackendApiService;
@@ -231,7 +226,6 @@ describe('Exploration editor tab component', () => {
       ExplorationNextContentIdIndexService
     );
     versionHistoryService = TestBed.inject(VersionHistoryService);
-    stateObjectFactory = TestBed.inject(StateObjectFactory);
     versionHistoryBackendApiService = TestBed.inject(
       VersionHistoryBackendApiService
     );
@@ -1051,10 +1045,7 @@ describe('Exploration editor tab component', () => {
 
   it('should fetch the version history data on initialization of state editor', fakeAsync(() => {
     stateEditorService.setActiveStateName('First State');
-    let stateData = stateObjectFactory.createFromBackendDict(
-      'State',
-      stateObject
-    );
+    let stateData = State.createFromBackendDict('State', stateObject);
     spyOn(
       versionHistoryBackendApiService,
       'fetchStateVersionHistoryAsync'

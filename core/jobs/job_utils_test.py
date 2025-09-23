@@ -28,8 +28,7 @@ from apache_beam.io.gcp.datastore.v1new import types as beam_datastore_types
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import datastore_services
+    from mypy_imports import base_models, datastore_services
 
 (base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
@@ -319,7 +318,8 @@ class GetBeamQueryFromNdbQueryTests(test_utils.TestBase):
             job_utils.get_beam_query_from_ndb_query(query)
 
     def test_query_with_not_equal_filter_raises_type_error(self) -> None:
-        query = datastore_services.Query(filters=BarModel.prop != 1)
+        query = datastore_services.Query(
+            filters=datastore_services.not_equal(BarModel.prop, 1))
 
         with self.assertRaisesRegex(TypeError, 'forbidden filter'):
             job_utils.get_beam_query_from_ndb_query(query)

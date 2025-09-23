@@ -16,17 +16,18 @@
 
 from __future__ import annotations
 
-from core import feature_flag_list
-from core import feconf
-from core.domain import state_domain
-from core.domain import study_guide_domain
-from core.domain import study_guide_services
-from core.domain import subtopic_page_domain
-from core.domain import subtopic_page_services
-from core.domain import topic_domain
-from core.domain import topic_services
-from core.domain import translation_domain
-from core.domain import user_services
+from core import feature_flag_list, feconf
+from core.domain import (
+    state_domain,
+    study_guide_domain,
+    study_guide_services,
+    subtopic_page_domain,
+    subtopic_page_services,
+    topic_domain,
+    topic_services,
+    translation_domain,
+    user_services,
+)
 from core.tests import test_utils
 
 
@@ -337,6 +338,7 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
             'topic_id': 'topic_id',
             'page_contents': expected_page_contents_dict,
             'subtopic_title': 'Subtopic Title',
+            'current_subtopic_id': 1,
             'next_subtopic_dict': expected_next_subtopic_dict,
             'prev_subtopic_dict': None
         }
@@ -376,6 +378,7 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
             'topic_id': 'topic_id_2',
             'sections': expected_sections_dicts_list,
             'subtopic_title': 'Subtopic Title',
+            'current_subtopic_id': 1,
             'next_subtopic_dict': expected_next_subtopic_dict,
             'prev_subtopic_dict': None
         }
@@ -415,6 +418,7 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
                 }
             ],
             'subtopic_title': 'Subtopic Title 2',
+            'current_subtopic_id': 2,
             'next_subtopic_dict': None,
             'prev_subtopic_dict': expected_prev_subtopic_dict
         }
@@ -446,6 +450,7 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
             'topic_id': 'topic_id',
             'page_contents': expected_page_contents_dict,
             'subtopic_title': 'Subtopic Title 2',
+            'current_subtopic_id': 2,
             'next_subtopic_dict': None,
             'prev_subtopic_dict': expected_prev_subtopic_dict
         }

@@ -211,6 +211,7 @@ jobs:
         id: desktop-test-attempt-1
         # TODO(#22448): Remove once all suites are fixed.
         if: ${{ steps.check_skip.outputs.SKIP_SUITE != 'true' }}
+        timeout-minutes: 30
         run: >
           set -o pipefail;
           VIDEO_RECORDING_IS_ENABLED=1
@@ -245,6 +246,7 @@ jobs:
       # Desktop Test (Attempt 2): Run it only to check for flakiness.
       - name: Run Desktop Acceptance Test ${{ matrix.suite.name }} (Attempt 2 with screen recording)
         if: ${{ steps.desktop-test-attempt-1.outcome == 'failure' }}
+        timeout-minutes: 30
         run: >
           set -o pipefail;
           xvfb-run -a --server-args="-screen 0, 1920x1080x24"
@@ -259,6 +261,7 @@ jobs:
         # TODO(#22448): Remove steps.check_skip.outputs.SKIP_SUITE != 'true' check,
         # once all suites are fixed. Please don't remove the always() check.
         if: ${{ steps.check_skip.outputs.SKIP_SUITE != 'true' && always() }}
+        timeout-minutes: 30
         # TODO(#23106): Currently, video recording failure interfares with
         # acceptance tests, making acceptance test suite fail even if sub-tests
         # passes. Once fixed, enable video recording by updating
@@ -289,7 +292,7 @@ jobs:
         if: ${{ steps.mobile-test-attempt-1.outcome == 'failure' }}
         uses: actions/upload-artifact@v4
         with:
-          name: desktop-acceptance-test-failure-screenshot-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
+          name: mobile-acceptance-test-failure-screenshot-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
           path: /home/runner/work/oppia/oppia_full_stack_test_failure_screenshots/acceptance
 
       - name: Upload mobile test diff screenshots
@@ -304,6 +307,7 @@ jobs:
       # Mobile Test (Attempt 2): Run it only to check for flakiness.
       - name: Run Mobile Acceptance Test ${{ matrix.suite.name }} (Attempt 2 with screen recording)
         if: ${{ steps.mobile-test-attempt-1.outcome == 'failure' }}
+        timeout-minutes: 30
         # We use xvfb-run to create a virtual screen to run tests without headless mode.
         # Numbers in 1920x1080x24 represents screen width, height and color depth respectively.
         run: >
@@ -368,6 +372,7 @@ jobs:
         run: |
           python -m scripts.run_lighthouse_tests --mode accessibility --pages ${{ join(matrix.suite.pages_to_run, ',') }}
         shell: bash
+        timeout-minutes: 45
       - name: Report failure if failed on oppia/oppia develop branch
         if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
         uses: ./.github/actions/send-webhook-notification
@@ -401,6 +406,7 @@ jobs:
       - name: Run Lighthouse performance checks (shard ${{ matrix.suite.name }})
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.run_lighthouse_tests --mode performance --skip_build --record_screen --pages ${{ join(matrix.suite.pages_to_run, ',') }}
+        timeout-minutes: 45
       - name: Uploading puppeteer video as artifact
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4

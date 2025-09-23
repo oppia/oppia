@@ -23,12 +23,14 @@ import sys
 import time
 
 from core.tests import test_utils
-from scripts import build
-from scripts import common
-from scripts import install_third_party_libs
-from scripts import run_e2e_tests
-from scripts import scripts_test_utils
-from scripts import servers
+from scripts import (
+    build,
+    common,
+    install_third_party_libs,
+    run_e2e_tests,
+    scripts_test_utils,
+    servers,
+)
 
 from typing import ContextManager, Final, Tuple
 

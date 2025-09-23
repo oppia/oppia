@@ -83,7 +83,7 @@ export class AddOrUpdateSolutionModalComponent
   EXPLANATION_FORM_SCHEMA: HtmlFormSchema = {
     type: 'html',
     ui_config: {
-      rte_components: 'ALL_COMPONENTS',
+      rte_component_config_id: 'ALL_COMPONENTS',
       hide_complex_extensions:
         this.pageContextService.getEntityType() === 'question',
     },
@@ -192,6 +192,6 @@ export class AddOrUpdateSolutionModalComponent
       }
     );
     this.ansOptions = ['The only', 'One'];
-    this.tempAnsOption = this.ansOptions[1];
+    this.tempAnsOption = this.ansOptions[this.data.answerIsExclusive ? 0 : 1];
   }
 }

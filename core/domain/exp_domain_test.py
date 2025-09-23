@@ -23,25 +23,25 @@ import json
 import os
 from unittest import mock
 
-from core import feature_flag_list
-from core import feconf
-from core import utils
+from core import feature_flag_list, feconf, utils
 from core.constants import constants
-from core.domain import caching_services
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import exp_services_test
-from core.domain import param_domain
-from core.domain import platform_parameter_list
-from core.domain import rights_manager
-from core.domain import state_domain
-from core.domain import translation_domain
+from core.domain import (
+    caching_services,
+    exp_domain,
+    exp_fetchers,
+    exp_services,
+    exp_services_test,
+    param_domain,
+    platform_parameter_list,
+    rights_manager,
+    state_domain,
+    translation_domain,
+)
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Any, Dict, Final, List, Tuple, Union, cast
 import yaml
+from typing import Any, Dict, Final, List, Tuple, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -4400,6 +4400,34 @@ title: Title
                 '<p>This is solution for state1</p>',
                 '<p>state content html</p>'
             ])
+
+    def test_find_content_by_content_id_returns_main_content(self) -> None:
+        exploration = exp_domain.Exploration.create_default_exploration(
+          'exp_id')
+        init_state = exploration.states[exploration.init_state_name]
+        content_id = init_state.content.content_id
+        content_value = init_state.content.html
+
+        found_content = exploration.find_content_by_content_id(content_id)
+        self.assertEqual(found_content, content_value)
+
+    def test_find_content_by_content_id_returns_hint_content(self) -> None:
+        exploration = exp_domain.Exploration.create_default_exploration(
+          'exp_id')
+        init_state = exploration.states[exploration.init_state_name]
+        hint = state_domain.Hint(
+          state_domain.SubtitledHtml('hint_1', '<p>hint one</p>'))
+        init_state.update_interaction_hints([hint])
+
+        found_content = exploration.find_content_by_content_id('hint_1')
+        self.assertEqual(found_content, '<p>hint one</p>')
+
+    def test_find_content_by_content_id_returns_none_for_missing(self) -> None:
+        exploration = exp_domain.Exploration.create_default_exploration(
+          'exp_id')
+        found_content = exploration.find_content_by_content_id(
+          'nonexistent_id')
+        self.assertIsNone(found_content)
 
 
 class ExplorationSummaryTests(test_utils.GenericTestBase):

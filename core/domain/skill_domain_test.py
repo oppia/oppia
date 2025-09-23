@@ -18,12 +18,9 @@ from __future__ import annotations
 
 import datetime
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import skill_domain
-from core.domain import state_domain
-from core.domain import translation_domain
+from core.domain import skill_domain, state_domain, translation_domain
 from core.tests import test_utils
 
 from typing import Final

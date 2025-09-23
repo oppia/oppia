@@ -21,18 +21,16 @@ from __future__ import annotations
 import base64
 import os
 
-from core.domain import auth_domain
-from core.domain import caching_services
+from core.domain import auth_domain, caching_services
 from core.platform import models
 from core.platform.auth import firebase_auth_services
 
-from typing import Final, List, Optional
 import webapp2
+from typing import Final, List, Optional
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import auth_models
-    from mypy_imports import platform_auth_services
+    from mypy_imports import auth_models, platform_auth_services
 
 auth_models, = models.Registry.import_models([models.Names.AUTH])
 

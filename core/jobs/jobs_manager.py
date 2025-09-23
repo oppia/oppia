@@ -21,16 +21,17 @@ from __future__ import annotations
 import contextlib
 import logging
 import pprint
+import traceback
 
 from core import feconf
-from core.domain import beam_job_services
-from core.domain import caching_services
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_services
-from core.jobs import base_jobs
-from core.jobs import job_options
-from core.jobs.io import cache_io
-from core.jobs.io import job_io
+from core.domain import (
+    beam_job_services,
+    caching_services,
+    platform_parameter_list,
+    platform_parameter_services,
+)
+from core.jobs import base_jobs, job_options
+from core.jobs.io import cache_io, job_io
 from core.platform import models
 from core.storage.beam_job import gae_models as beam_job_models
 
@@ -136,7 +137,8 @@ def run_job(
     # does not affect the job.
     caching_services.flush_memory_caches()
 
-    # NOTE: Exceptions raised within this context are logged and suppressed.
+    # NOTE: Exceptions raised within this context are logged to the job's
+    # stderr and suppressed.
     with _job_bookkeeping_context(job_name) as run_model:
         _ = (
             job.run()
@@ -271,9 +273,9 @@ def _job_bookkeeping_context(
     try:
         yield run_model
 
-    except Exception as exception:
+    except Exception:
         run_model.latest_job_state = beam_job_models.BeamJobState.FAILED.value
-        _put_job_stderr(run_model.id, str(exception))
+        _put_job_stderr(run_model.id, traceback.format_exc())
 
     finally:
         run_model.put()
