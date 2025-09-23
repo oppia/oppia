@@ -1,4 +1,4 @@
-name: Test new acceptance tests
+name: Test new acceptance tests (2)
 permissions: read-all
 on:
   merge_group:
@@ -51,8 +51,8 @@ jobs:
         suite:
           # - name: topic-manager/access-dashboard-using-profile-dropdown
           #   short_name: access-dashboard-using-profile-dropdown
-          - name: topic-manager/add-questions-from-topic-editor
-            short_name: add-questions-from-topic-editor
+          # - name: topic-manager/add-questions-from-topic-editor
+          #   short_name: add-questions-from-topic-editor
           # - name: topic-manager/add-remove-and-edit-subtopics
           #   short_name: add-remove-and-edit-subtopics
           # - name: topic-manager/assign-unassign-and-merge-skills-in-skill-dashboard
@@ -72,10 +72,10 @@ jobs:
           #   short_name: edit-and-preview-a-subtopic
           # - name: topic-manager/edit-and-republish-a-skill
           #   short-name: edit-and-republish-a-skill
-        run1: [1, 2, 3, 4, 5]
-        run2: [1, 2, 3]
-        mobile: [true]
-        prod: [true]
+        run1: [1, 5]
+        run2: [1]
+        mobile: [true, false]
+        prod: [true, false]
     name: ${{ matrix.mobile && 'M' || 'D' }}-${{ matrix.suite.short_name }}
     steps:
       - name: Check for broken suites
