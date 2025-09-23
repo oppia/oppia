@@ -80,7 +80,7 @@ describe('Topic Manager User Journey', function () {
       await topicManager.navigateToSubtopicPreviewTab('Add', 'Mathematics');
       await topicManager.expectSubtopicPreviewToHave(
         'Addition',
-        'Subtopic creation description text for Addition'
+        'Subtopic to learn addition'
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
