@@ -19,3 +19,4 @@ PyYAML==6.0.2
 rcssmin==1.2.1
 webtest==3.0.6
 xmltodict==0.15.0
+black==25.9.0
