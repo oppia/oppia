@@ -4164,19 +4164,6 @@ export class TopicManager extends BaseUser {
 
     await this.expectElementToBeVisible(bodySelector);
   }
-  /**
-   * Expects the stale tab info modal to be visible.
-   */
-  async expectUnsavedChangesStatusInfoModalToBeVisible(): Promise<void> {
-    await this.expectElementToBeVisible(unsavedChangesWarningModalSelector);
-  }
-
-  /**
-   * Expects the stale tab info modal to be visible.
-   */
-  async expectStaleTabInfoModalToBeVisible(): Promise<void> {
-    await this.expectElementToBeVisible(staleTabWarningModalSelector);
-  }
 
   /**
    * Tag an answer response group with a misconception for a state card.
