@@ -1,0 +1,68 @@
+name: Comment on CI Workflows
+
+permissions: read-all
+
+on:
+  pull_request_target:
+    types: [opened, synchronized, reopened]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  comment_on_ci_results:
+    name: "CI Workflow Commenter"
+    runs-on: ubuntu-22.04
+    permissions:
+      pull-requests: write
+    strategy:
+      matrix:
+        test_name:
+          - "Full-Stack Tests"
+          - "Backend Coverage Tests"
+          - "Frontend Tests"
+        include:
+          - test_name: "Full-Stack Tests"
+            workflow_file: "full_stack_tests.yml"
+            message: >
+              🛠️ Hi @${{ github.event.pull_request.user.login }}, it looks like the full-stack tests are failing on your PR.
+              Please check the logs and follow [these instructions](https://github.com/oppia/oppia/wiki/If-CI-checks-fail-on-your-PR#introduction)
+              to fix the issues, or report the error as a flake. Thanks!
+          - test_name: "Backend Coverage Tests"
+            workflow_file: "backend_unit_tests.yml"
+            message: >
+              🛠️ Hi @${{ github.event.pull_request.user.login }}, it looks like the backend coverage tests are failing on your PR. Please follow
+              [these instructions](https://github.com/oppia/oppia/wiki/Backend-tests#coverage-reports)
+              to fix the missing coverage.
+          - test_name: "Frontend Tests"
+            workflow_file: "frontend_unit_tests.yml"
+            message: >
+              🛠️ Hi @${{ github.event.pull_request.user.login }}, it looks like the frontend tests are failing on your PR. Please look at the logs
+              and follow [these instructions](https://github.com/oppia/oppia/wiki/If-CI-checks-fail-on-your-PR#introduction)
+              to fix them, or report the error as a flake.
+              
+              You might also find the [instructions for debugging frontend tests](https://github.com/oppia/oppia/wiki/Debug-frontend-tests)
+              helpful.
+    steps:
+      - name: Await Test Workflow Completion
+        id: wait_for_completion_of_workflow
+        uses: ArcticLampyrid/action-wait-for-workflow@7226d2d248ed9b7e231de31209d4f5f5d4c30295
+        with:
+          workflow: ${{ matrix.workflow_file }}
+          sha: ${{ github.event.pull_request.head.sha }}
+          allowed-conclusions: |
+            success
+            failure
+            action_required
+      - name: Verify Manual Approval Requirement
+        if: ${{ steps.wait_for_completion_of_workflow.outputs.run-conclusion == 'action_required' }}
+        run: |
+          echo "::error::First-time contributor workflows require manual approval. After approval, please re-run the comment workflows to post the report."
+          exit 1
+      - name: Notify on Test Failure
+        if: ${{ steps.wait_for_completion_of_workflow.outputs.run-conclusion == 'failure' && !cancelled() }}
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: ${{ matrix.message }}
