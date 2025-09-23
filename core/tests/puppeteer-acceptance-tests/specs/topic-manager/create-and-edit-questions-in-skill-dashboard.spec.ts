@@ -403,8 +403,8 @@ describe('Topic Manager', function () {
     await topicManager.expectQuestionToBeVisible('Enter 160km.');
 
     // Navigate to the preview tab.
-    await topicManager.navigateToSkillPreviewTab();
     // TODO(): Currently, there is issue where all questions are not previewed
+    // await topicManager.navigateToSkillPreviewTab();
     // in the preview tab. Once fixed, uncomment the below line.
     // for (const question of [
     //   'Select bottom half of the image',

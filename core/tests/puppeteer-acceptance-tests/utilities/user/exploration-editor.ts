@@ -962,6 +962,7 @@ export class ExplorationEditor extends BaseUser {
 
     const responseInputs = await this.page.$$(stateContentInputField);
     for (let i = 0; i < options.length; i++) {
+      await responseInputs[i].click({clickCount: 3});
       await responseInputs[i].type(`${options[i]}`);
     }
 

@@ -3855,6 +3855,15 @@ export class TopicManager extends BaseUser {
   async selectQuestionDifficultyInQuestionEditor(
     difficulty: 'Easy' | 'Medium' | 'Hard' = 'Medium'
   ): Promise<void> {
+    const difficultyContainer = '.e2e-test-question-difficulty-container';
+    const difficultyHeader = '.e2e-test-question-difficulty-header';
+    if (
+      this.isViewportAtMobileWidth() &&
+      !(await this.isElementVisible(difficultyContainer, true, 5000))
+    ) {
+      await this.clickOn(difficultyHeader);
+      await this.expectElementToBeVisible(difficultyContainer);
+    }
     const selector = `.e2e-test-skill-difficulty-${difficulty.toLowerCase()}`;
     await this.expectElementToBeVisible(selector);
     await this.clickOn(selector);
@@ -4202,7 +4211,7 @@ export class TopicManager extends BaseUser {
     );
 
     if (!isActive) {
-      await responseTabs[responseIndex].click();
+      await this.clickOnElement(responseTabs[responseIndex]);
     }
     await this.clickOnElementWithText('Tag with misconception');
 
