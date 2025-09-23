@@ -359,6 +359,7 @@ jobs:
         run: |
           python -m scripts.run_lighthouse_tests --mode accessibility --pages ${{ join(matrix.suite.pages_to_run, ',') }}
         shell: bash
+        timeout-minutes: 45
       - name: Report failure if failed on oppia/oppia develop branch
         if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
         uses: ./.github/actions/send-webhook-notification
@@ -392,6 +393,7 @@ jobs:
       - name: Run Lighthouse performance checks (shard ${{ matrix.suite.name }})
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: python -m scripts.run_lighthouse_tests --mode performance --skip_build --record_screen --pages ${{ join(matrix.suite.pages_to_run, ',') }}
+        timeout-minutes: 45
       - name: Uploading puppeteer video as artifact
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
