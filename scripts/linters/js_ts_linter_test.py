@@ -180,6 +180,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
             'or rename the constant.']
         self.validate(lint_task_report, expected_messages, 1)
 
+
     def test_third_party_linter_with_success_message(self) -> None:
         lint_task_report = js_ts_linter.ThirdPartyJsTsLintChecksManager(
             [VALID_TS_FILEPATH]).perform_all_lint_checks()
