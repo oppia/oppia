@@ -1762,6 +1762,9 @@ export class ExplorationEditor extends BaseUser {
         await this.page.waitForSelector(
           `${responseModalBodySelector} ${floatFormInput}`
         );
+        await this.clearAllTextFrom(
+          `${responseModalBodySelector} ${floatFormInput}`
+        );
         await this.page.type(
           `${responseModalBodySelector} ${floatFormInput}`,
           answer

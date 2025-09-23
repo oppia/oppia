@@ -68,13 +68,13 @@ jobs:
           #
           #
           # From older tests.
-          - name: topic-manager/edit-and-preview-a-subtopic
-            short_name: edit-and-preview-a-subtopic
-          - name: topic-manager/edit-and-republish-a-skill
-            short-name: edit-and-republish-a-skill
-        run1: [1, 2]
+          # - name: topic-manager/edit-and-preview-a-subtopic
+          #   short_name: edit-and-preview-a-subtopic
+          # - name: topic-manager/edit-and-republish-a-skill
+          #   short-name: edit-and-republish-a-skill
+        run1: [1, 2, 3, 4, 5]
         run2: [1]
-        mobile: [false, true]
+        mobile: [true]
         prod: [true]
     name: ${{ matrix.mobile && 'M' || 'D' }}-${{ matrix.suite.short_name }}
     steps:
