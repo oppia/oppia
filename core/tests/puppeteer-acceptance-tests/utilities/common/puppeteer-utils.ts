@@ -458,6 +458,7 @@ export class BaseUser {
    */
   async clickOnElement(element: ElementHandle<Element>): Promise<void> {
     await this.waitForElementToBeClickable(element);
+    await this.waitForElementToStabilize(element);
     await element.click();
   }
 
