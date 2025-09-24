@@ -403,7 +403,7 @@ describe('Topic Manager', function () {
     await topicManager.expectQuestionToBeVisible('Enter 160km.');
 
     // Navigate to the preview tab.
-    // TODO(): Currently, there is issue where all questions are not previewed
+    // TODO(#23453): Currently, there is issue where all questions are not previewed
     // await topicManager.navigateToSkillPreviewTab();
     // in the preview tab. Once fixed, uncomment the below line.
     // for (const question of [
