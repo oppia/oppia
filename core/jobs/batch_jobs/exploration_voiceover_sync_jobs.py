@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import logging
 
+from core import feconf
 from core.domain import opportunity_services, state_domain
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
@@ -76,7 +77,9 @@ def get_content_id_to_manual_voiceovers_mapping(
 
     for content_id, manual_voiceover_mapping in (
             entity_voiceovers_model.voiceovers_mapping.items()):
-        manual_voiceover = manual_voiceover_mapping['manual']
+        manual_voiceover = manual_voiceover_mapping[
+            feconf.VoiceoverType.MANUAL
+        ]
         content_id_to_manual_voiceovers[content_id] = manual_voiceover
 
     return content_id_to_manual_voiceovers
@@ -101,12 +104,12 @@ def update_entity_voiceovers_model(
             content_id_to_manual_voiceovers.items()):
         if content_id not in entity_voiceovers_model.voiceovers_mapping:
             entity_voiceovers_model.voiceovers_mapping[content_id] = {
-                'manual': manual_voiceover,
-                'auto': None
+                feconf.VoiceoverType.MANUAL: manual_voiceover,
+                feconf.VoiceoverType.AUTO: None
             }
         else:
             entity_voiceovers_model.voiceovers_mapping[content_id][
-                'manual'] = manual_voiceover
+                feconf.VoiceoverType.MANUAL] = manual_voiceover
 
     return entity_voiceovers_model
 

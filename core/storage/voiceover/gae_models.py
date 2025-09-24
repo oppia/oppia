@@ -23,7 +23,7 @@ import hashlib
 from core import feconf
 from core.platform import models
 
-from typing import Dict, Final, List, Literal, Optional, Sequence, Union
+from typing import Dict, Final, List, Optional, Sequence, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -43,7 +43,7 @@ datastore_services = models.Registry.import_datastore_services()
 
 VOICEOVER_AUTOGENERATION_POLICY_ID: Final = 'voiceover_policy'
 
-VoiceoverTypeStr = Literal['manual', 'auto']
+VoiceoverType = feconf.VoiceoverType
 
 
 class EntityVoiceoversModel(base_models.BaseModel):
@@ -163,7 +163,7 @@ class EntityVoiceoversModel(base_models.BaseModel):
         entity_version: int,
         language_accent_code: str,
         voiceovers_mapping: Dict[str, Dict[
-            VoiceoverTypeStr, Optional[state_domain.VoiceoverDict]]],
+            VoiceoverType, Optional[state_domain.VoiceoverDict]]],
         automated_voiceovers_audio_offsets_msecs: Dict[
         str, List[Dict[str, Union[str, float]]]]
     ) -> EntityVoiceoversModel:

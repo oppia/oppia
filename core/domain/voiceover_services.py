@@ -309,7 +309,7 @@ def compute_voiceover_related_change(
                 # conforms to the specific nested dictionary structure required
                 # by the create_new() method.
                 cast(Dict[str, Dict[
-                    gae_models.VoiceoverTypeStr,
+                    gae_models.VoiceoverType,
                     Optional[state_domain.VoiceoverDict]
                 ]], entity_voiceovers_dict['voiceovers_mapping']),
                 entity_voiceovers_dict[
@@ -426,7 +426,7 @@ def create_entity_voiceovers_model(
     # conforms to the specific nested dictionary structure required
     # by the create_new() method.
     voiceovers_mapping = cast(Dict[str, Dict[
-        gae_models.VoiceoverTypeStr, Optional[state_domain.VoiceoverDict]
+        gae_models.VoiceoverType, Optional[state_domain.VoiceoverDict]
     ]], entity_voiceovers_dict['voiceovers_mapping'])
     automated_voiceovers_audio_offsets_msecs_dict = entity_voiceovers_dict[
         'automated_voiceovers_audio_offsets_msecs']
@@ -923,7 +923,7 @@ def compute_voiceover_related_changes_upon_revert(
                 # conforms to the specific nested dictionary structure required
                 # by the create_new() method.
                 cast(Dict[str, Dict[
-                    gae_models.VoiceoverTypeStr,
+                    gae_models.VoiceoverType,
                     Optional[state_domain.VoiceoverDict]
                 ]], entity_voiceovers_dict['voiceovers_mapping']),
                 entity_voiceovers_dict[
