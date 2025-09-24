@@ -2833,7 +2833,7 @@ export class ExplorationEditor extends BaseUser {
 
     for (const interaction in interactionTabs) {
       if (interactionTabs[interaction].includes(interactionType)) {
-        await this.page.waitForSelector(
+        await this.waitForElementToStabilize(
           INTERACTION_TABS_SELECTORS[interaction]
         );
         await this.clickOn(INTERACTION_TABS_SELECTORS[interaction]);
@@ -2861,18 +2861,6 @@ export class ExplorationEditor extends BaseUser {
 
     // Check if modal title is correct.
     await this.expectModalTitleToBe('Choose Interaction');
-
-    // Change tab based on interaction.
-    // Add more conditional tab changes here.
-    if (
-      INTERACTION_TABS_OF_INTERACTION_TYPE[interactionToAdd] === 'PROGRAMMING'
-    ) {
-      await this.clickOn(programmingInteractionsButtonSelector);
-    } else if (
-      INTERACTION_TABS_OF_INTERACTION_TYPE[interactionToAdd] === 'MATH'
-    ) {
-      await this.clickOn(mathInteractionButtonSelector);
-    }
 
     await this.changeTabInInteractionSelectionModal(
       interactionToAdd as INTERACTION_TYPES
