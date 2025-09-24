@@ -18,25 +18,26 @@ from __future__ import annotations
 
 from core import feconf
 from core.constants import constants
-from core.controllers import acl_decorators
-from core.controllers import base
-from core.domain import android_services
-from core.domain import classroom_config_domain
-from core.domain import classroom_config_services
-from core.domain import classroom_domain
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import skill_domain
-from core.domain import skill_fetchers
-from core.domain import story_domain
-from core.domain import story_fetchers
-from core.domain import study_guide_domain
-from core.domain import study_guide_services
-from core.domain import subtopic_page_domain
-from core.domain import subtopic_page_services
-from core.domain import topic_domain
-from core.domain import topic_fetchers
-from core.domain import translation_fetchers
+from core.controllers import acl_decorators, base
+from core.domain import (
+    android_services,
+    classroom_config_domain,
+    classroom_config_services,
+    classroom_domain,
+    exp_domain,
+    exp_fetchers,
+    skill_domain,
+    skill_fetchers,
+    story_domain,
+    story_fetchers,
+    study_guide_domain,
+    study_guide_services,
+    subtopic_page_domain,
+    subtopic_page_services,
+    topic_domain,
+    topic_fetchers,
+    translation_fetchers,
+)
 
 from typing import Dict, List, Optional, TypedDict, Union
 

@@ -22,13 +22,14 @@ import base64
 
 from core import feconf
 from core.constants import constants
-from core.controllers import acl_decorators
-from core.controllers import base
-from core.domain import collection_domain
-from core.domain import collection_services
-from core.domain import rights_manager
-from core.domain import search_services
-from core.domain import summary_services
+from core.controllers import acl_decorators, base
+from core.domain import (
+    collection_domain,
+    collection_services,
+    rights_manager,
+    search_services,
+    summary_services,
+)
 
 from typing import Dict, List, Optional, TypedDict
 

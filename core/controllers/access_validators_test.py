@@ -18,27 +18,28 @@ from __future__ import annotations
 
 import datetime
 
-from core import feature_flag_list
-from core import feconf
+from core import feature_flag_list, feconf
 from core.constants import constants
-from core.domain import caching_services
-from core.domain import classroom_config_domain
-from core.domain import classroom_config_services
-from core.domain import exp_domain
-from core.domain import exp_services
-from core.domain import fs_services
-from core.domain import learner_group_fetchers
-from core.domain import learner_group_services
-from core.domain import rights_manager
-from core.domain import skill_services
-from core.domain import story_domain
-from core.domain import story_services
-from core.domain import subtopic_page_domain
-from core.domain import subtopic_page_services
-from core.domain import topic_domain
-from core.domain import topic_fetchers
-from core.domain import topic_services
-from core.domain import user_services
+from core.domain import (
+    caching_services,
+    classroom_config_domain,
+    classroom_config_services,
+    exp_domain,
+    exp_services,
+    fs_services,
+    learner_group_fetchers,
+    learner_group_services,
+    rights_manager,
+    skill_services,
+    story_domain,
+    story_services,
+    subtopic_page_domain,
+    subtopic_page_services,
+    topic_domain,
+    topic_fetchers,
+    topic_services,
+    user_services,
+)
 from core.platform import models
 from core.storage.blog import gae_models as blog_models
 from core.tests import test_utils
@@ -47,8 +48,7 @@ from typing import Dict, Final
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import blog_models
-    from mypy_imports import skill_models
+    from mypy_imports import blog_models, skill_models
 
 (blog_models,) = models.Registry.import_models([models.Names.BLOG])
 (skill_models,) = models.Registry.import_models([models.Names.SKILL])
