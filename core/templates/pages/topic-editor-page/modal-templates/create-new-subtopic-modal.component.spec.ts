@@ -325,7 +325,7 @@ describe('create new subtopic modal', function () {
     let isExceeded = component.isSectionContentLengthExceeded();
     expect(isExceeded).toBe(false);
 
-    computeHtmlLengthSpy.and.returnValue(1500);
+    computeHtmlLengthSpy.and.returnValue(6500);
     isExceeded = component.isSectionContentLengthExceeded();
     expect(isExceeded).toBe(true);
   });
