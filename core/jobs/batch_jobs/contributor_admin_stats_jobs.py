@@ -33,9 +33,7 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-
 import result
-
 from typing import Callable, Dict, Iterable, List, Optional, Tuple, Union, cast
 
 MYPY = False
