@@ -489,7 +489,7 @@ def delete_user(
             request object for which to delete or pseudonymize all the models.
     """
     user_id = pending_deletion_request.user_id
-    user_roles = user_models.UserSettingsModel.get_by_id(user_id).roles
+    user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
 
     auth_services.delete_external_auth_associations(user_id)
 
@@ -499,7 +499,10 @@ def delete_user(
     _delete_models(user_id, models.Names.FEEDBACK)
     _delete_models(user_id, models.Names.SUGGESTION)
     remove_user_from_user_groups(user_id)
-    if feconf.ROLE_ID_MOBILE_LEARNER not in user_roles:
+
+    # Explicitly handle the case where the user settings model is deleted.
+    if (user_settings_model is None or
+        feconf.ROLE_ID_MOBILE_LEARNER not in user_settings_model.roles):
         remove_user_from_activities_with_associated_rights_models(
             pending_deletion_request.user_id)
         _pseudonymize_one_model_class(
@@ -624,6 +627,9 @@ def verify_user_deleted(
         bool. True if all the models were correctly deleted, False otherwise.
     """
     if not auth_services.verify_external_auth_associations_are_deleted(user_id):
+        logging.error(
+            'External auth association is not deleted for user with ID %s' % (
+                user_id))
         return False
 
     policies_not_to_verify = [

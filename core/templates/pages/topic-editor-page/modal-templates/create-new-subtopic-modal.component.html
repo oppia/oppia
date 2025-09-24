@@ -82,7 +82,7 @@
             </schema-based-editor>
           </div>
           <div *ngIf="isSectionContentLengthExceeded()" class="oppia-length-validation-error">
-            The content length is too long. Please use at most 1000 characters.
+            The content length is too long. Please use at most {{ studyGuideSectionCharacterLimit }} characters.
           </div>
         </div>
       </div>

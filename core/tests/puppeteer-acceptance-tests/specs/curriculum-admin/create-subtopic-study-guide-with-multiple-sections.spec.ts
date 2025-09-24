@@ -57,7 +57,7 @@ describe('Curriculum Admin', function () {
     // Setup taking longer than 300000 ms.
   }, 480000);
 
-  it('should create a study guide with multiple sections containing workedexamples.', async function () {
+  it('should create a study guide with multiple sections.', async function () {
     await curriculumAdmin.createSubtopicWithStudyGuideForTopic(
       'subtopic1',
       'abcd',
@@ -86,6 +86,9 @@ describe('Curriculum Admin', function () {
       'subtopicWithTwoSections',
       __dirname
     );
+  });
+
+  it('should add sections with workedexamples.', async function () {
     await curriculumAdmin.addSubtopicStudyGuideSectionWithWorkedExample(
       'Section heading 2',
       'Section content 2',
@@ -115,6 +118,9 @@ describe('Curriculum Admin', function () {
     );
     await curriculumAdmin.deleteStudyGuideSection(1);
     await curriculumAdmin.saveTopicDraft('Addition and Subtraction');
+  });
+
+  it('should preview a study guide.', async function () {
     await curriculumAdmin.previewStudyGuide();
     await curriculumAdmin.expectSubtopicStudyGuideToHaveTitleAndSections(
       'subtopic1',

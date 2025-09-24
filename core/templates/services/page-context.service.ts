@@ -53,6 +53,7 @@ export class PageContextService {
   // Null ExplorationVersion implies that no exploration has been created.
   explorationVersion: number | null = null;
   explorationIsLinkedToStory: boolean = false;
+  subtopicPreviewIsOpen: boolean = false;
   questionPlayerIsManuallySet: boolean = false;
   // Context of the editor is null until initialized by init fuctions
   // at respective editors.
@@ -172,6 +173,18 @@ export class PageContextService {
 
   getQuestionPlayerIsManuallySet(): boolean {
     return this.questionPlayerIsManuallySet;
+  }
+
+  setSubtopicPreviewIsOpen(): void {
+    this.subtopicPreviewIsOpen = true;
+  }
+
+  setSubtopicPreviewIsClosed(): void {
+    this.subtopicPreviewIsOpen = false;
+  }
+
+  getSubtopicPreviewIsOpen(): boolean {
+    return this.subtopicPreviewIsOpen;
   }
 
   setExplorationIsLinkedToStory(): void {
