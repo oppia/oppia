@@ -43,6 +43,7 @@ export class CreateNewSkillModalComponent {
     Rubric.create(AppConstants.SKILL_DIFFICULTIES[2], []),
   ];
 
+  workedExampleLimitExceeded!: boolean;
   newSkillDescription: string = '';
   errorMsg: string = '';
   skillDescriptionExists: boolean = true;
@@ -60,6 +61,8 @@ export class CreateNewSkillModalComponent {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   newExplanationObject!: SubtitledHtmlBackendDict;
+  skillEditorWorkedExampleLimit: number =
+    AppConstants.SKILL_EDITOR_WORKED_EXAMPLE_LIMIT;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -115,6 +118,20 @@ export class CreateNewSkillModalComponent {
   _skillDescriptionExistsCallback(skillDescriptionExists: boolean): void {
     this.skillDescriptionExists = skillDescriptionExists;
     this.setErrorMessageIfNeeded();
+  }
+
+  checkExtraWorkedexample(): boolean {
+    const workedexampleRegex =
+      /<oppia-noninteractive-workedexample.*?>.*?<\/oppia-noninteractive-workedexample>/g;
+    const matches =
+      this.bindableDict.displayedConceptCardExplanation.match(
+        workedexampleRegex
+      );
+
+    this.workedExampleLimitExceeded = !!(
+      matches && matches.length > this.skillEditorWorkedExampleLimit
+    );
+    return this.workedExampleLimitExceeded;
   }
 
   updateSkillDescriptionAndCheckIfExists(): void {
