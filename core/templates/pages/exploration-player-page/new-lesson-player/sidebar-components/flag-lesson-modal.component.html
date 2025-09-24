@@ -11,25 +11,19 @@
     <form>
       <div class="oppia-flag-modal-long-text radio">
         <label>
-          <input type="radio" value="ad" [(ngModel)]="flag"
-                [ngModelOptions]="{standalone: true}"
-                (change)="showFlagMessageTextarea(flag)">
+          <input type="radio" value="ad" [(ngModel)]="flag" [ngModelOptions]="{standalone: true}" (change)="showFlagMessageTextarea(flag)">
           {{ 'I18N_PLAYER_REPORT_MODAL_BODY_AD' | translate }}
         </label>
       </div>
       <div class="oppia-flag-modal-long-text radio">
         <label>
-          <input type="radio" value="poor_experience" [(ngModel)]="flag"
-                [ngModelOptions]="{standalone: true}"
-                (change)="showFlagMessageTextarea(flag)">
+          <input type="radio" value="poor_experience" [(ngModel)]="flag" [ngModelOptions]="{standalone: true}" (change)="showFlagMessageTextarea(flag)">
           {{ 'I18N_PLAYER_REPORT_MODAL_BODY_POOR_EXPERIENCE' | translate }}
         </label>
       </div>
       <div class="oppia-flag-modal-long-text radio">
         <label>
-          <input type="radio" value="other" [(ngModel)]="flag"
-                [ngModelOptions]="{standalone: true}"
-                (change)="showFlagMessageTextarea(flag)">
+          <input type="radio" value="other" [(ngModel)]="flag" [ngModelOptions]="{standalone: true}" (change)="showFlagMessageTextarea(flag)">
           {{ 'I18N_PLAYER_REPORT_MODAL_BODY_OTHER' | translate }}
         </label>
         <ng-container *ngIf="flagMessageTextareaIsShown">
@@ -49,7 +43,6 @@
     </button>
   </div>
 </ng-container>
-
 
 <oppia-customizable-thank-you-modal
   *ngIf="thankYouModalIsShown"

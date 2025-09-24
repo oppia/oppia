@@ -126,7 +126,7 @@ describe('Customizable Thank You modal', () => {
     it('should not throw error when closeModal is called without modal services', () => {
       expect(() => {
         component.closeModal();
-      }).not.toThrow();
+      }).not.toThrowError();
     });
   });
 });

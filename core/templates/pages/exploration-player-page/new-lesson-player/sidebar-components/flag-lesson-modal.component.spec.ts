@@ -45,7 +45,6 @@ describe('Flag lesson modal', () => {
   let focusManagerService: FocusManagerService;
   let ngbActiveModal: NgbActiveModal;
   let bottomSheetRef: MatBottomSheetRef;
-  let pageContextService: PageContextService;
   let learnerLocalNavBackendApiService: LearnerLocalNavBackendApiService;
   let alertsService: AlertsService;
 
@@ -103,7 +102,7 @@ describe('Flag lesson modal', () => {
           useClass: MockMatBottomSheetRef,
         },
       ],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA], // This allows unknown elements like oppia-customizable-thank-you-modal
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -113,7 +112,6 @@ describe('Flag lesson modal', () => {
     focusManagerService = TestBed.inject(FocusManagerService);
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     bottomSheetRef = TestBed.inject(MatBottomSheetRef);
-    pageContextService = TestBed.inject(PageContextService);
     learnerLocalNavBackendApiService = TestBed.inject(
       LearnerLocalNavBackendApiService
     );

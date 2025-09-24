@@ -253,9 +253,7 @@ describe('LessonFeedbackModalComponent', () => {
 
   describe('with NgbActiveModal', () => {
     let ngbActiveModal: jasmine.SpyObj<NgbActiveModal>;
-    let focusManagerService: jasmine.SpyObj<FocusManagerService>;
     let userService: jasmine.SpyObj<UserService>;
-    let feedbackPopupBackendApiService: jasmine.SpyObj<FeedbackPopupBackendApiService>;
     let playerPositionService: jasmine.SpyObj<PlayerPositionService>;
 
     const mockUserInfo = {
@@ -303,13 +301,7 @@ describe('LessonFeedbackModalComponent', () => {
       ngbActiveModal = TestBed.inject(
         NgbActiveModal
       ) as jasmine.SpyObj<NgbActiveModal>;
-      focusManagerService = TestBed.inject(
-        FocusManagerService
-      ) as jasmine.SpyObj<FocusManagerService>;
       userService = TestBed.inject(UserService) as jasmine.SpyObj<UserService>;
-      feedbackPopupBackendApiService = TestBed.inject(
-        FeedbackPopupBackendApiService
-      ) as jasmine.SpyObj<FeedbackPopupBackendApiService>;
       playerPositionService = TestBed.inject(
         PlayerPositionService
       ) as jasmine.SpyObj<PlayerPositionService>;
@@ -337,9 +329,7 @@ describe('LessonFeedbackModalComponent', () => {
   });
 
   describe('without any modal services', () => {
-    let focusManagerService: jasmine.SpyObj<FocusManagerService>;
     let userService: jasmine.SpyObj<UserService>;
-    let feedbackPopupBackendApiService: jasmine.SpyObj<FeedbackPopupBackendApiService>;
     let playerPositionService: jasmine.SpyObj<PlayerPositionService>;
 
     const mockUserInfo = {
@@ -380,13 +370,7 @@ describe('LessonFeedbackModalComponent', () => {
         schemas: [CUSTOM_ELEMENTS_SCHEMA],
       }).compileComponents();
 
-      focusManagerService = TestBed.inject(
-        FocusManagerService
-      ) as jasmine.SpyObj<FocusManagerService>;
       userService = TestBed.inject(UserService) as jasmine.SpyObj<UserService>;
-      feedbackPopupBackendApiService = TestBed.inject(
-        FeedbackPopupBackendApiService
-      ) as jasmine.SpyObj<FeedbackPopupBackendApiService>;
       playerPositionService = TestBed.inject(
         PlayerPositionService
       ) as jasmine.SpyObj<PlayerPositionService>;
@@ -409,7 +393,7 @@ describe('LessonFeedbackModalComponent', () => {
     it('should not throw error when closeModal is called without modal services', () => {
       expect(() => {
         component.closeModal();
-      }).not.toThrow();
+      }).not.toThrowError();
     });
   });
 });
