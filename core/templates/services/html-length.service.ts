@@ -218,7 +218,15 @@ export class HtmlLengthService {
     switch (domId) {
       case 'oppia-noninteractive-math':
         return 1;
-      case 'oppia-noninteractive-workedexample':
+      case 'oppia-noninteractive-workedexample': {
+        const questionValueAttr =
+          domTag.getAttribute('question-with-value') || '';
+        const questionValue = this.htmlEscaperService.escapedJsonToObj(
+          questionValueAttr
+        ) as string;
+        const length = this.calculateTextLength(questionValue, calculationType);
+        return length;
+      }
       case 'oppia-noninteractive-collapsible':
       case 'oppia-noninteractive-tabs':
         return 0;

@@ -41,6 +41,9 @@
                              [localValue]="bindableDict.displayedConceptCardExplanation"
                              (localValueChange)="updateExplanation($event)">
         </schema-based-editor>
+        <div *ngIf="checkExtraWorkedexample()" class="oppia-length-validation-error e2e-test-more-than-2-workedexamples" aria-live="assertive">
+          <p>Skills can have a maximum of {{ skillEditorWorkedExampleLimit }} worked examples. Please remove any additional ones.</p>
+        </div>
       </div>
     </div>
   </div>
@@ -49,7 +52,7 @@
     <button class="btn btn-secondary" (click)="cancel()" type="button">Cancel</button>
     <button class="btn btn-success e2e-test-confirm-skill-creation-button"
             type="submit"
-            [disabled]="bindableDict.displayedConceptCardExplanation.length === 0 || newSkillDescription.length === 0 || errorMsg !== ''">
+            [disabled]="bindableDict.displayedConceptCardExplanation.length === 0 || newSkillDescription.length === 0 || errorMsg !== '' || workedExampleLimitExceeded">
             Save
     </button>
   </div>

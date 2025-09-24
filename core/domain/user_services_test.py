@@ -2090,6 +2090,16 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(Exception, 'User not found.'):
             user_services.get_human_readable_user_ids(['unregistered_id'])
 
+    def test_get_human_readable_user_ids_for_nonexistent_user(self) -> None:
+        user_id = 'nonexistent_user_id'
+        self.assertEqual(
+            user_services.get_human_readable_user_ids(
+                [user_id],
+                strict=False,
+                include_deleted=True
+            ),
+            [user_services.LABEL_FOR_DELETED_USER])
+
     def test_record_user_started_state_editor_tutorial(self) -> None:
         user_id = user_services.create_new_user(
             'someUser',

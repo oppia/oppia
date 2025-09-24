@@ -232,6 +232,14 @@ describe('PageContext service', () => {
         expect(ecs.isInExplorationContext()).toBe(false);
       }
     );
+
+    it('should correctly return if subtopic preview is open', () => {
+      expect(ecs.getSubtopicPreviewIsOpen()).toEqual(false);
+      ecs.setSubtopicPreviewIsOpen();
+      expect(ecs.getSubtopicPreviewIsOpen()).toEqual(true);
+      ecs.setSubtopicPreviewIsClosed();
+      expect(ecs.getSubtopicPreviewIsOpen()).toEqual(false);
+    });
   });
 
   describe('behavior in question editor modal', () => {
