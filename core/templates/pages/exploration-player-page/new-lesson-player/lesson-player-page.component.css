@@ -20,7 +20,7 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  width: calc(100vw - 98px);
+  width: calc(100vw - 83px);
 }
 
 .conversation-wrapper {
@@ -43,7 +43,7 @@
 }
 
 .expanded-sidebar {
-  width: calc(100vw - 258px);
+  width: calc(100vw - 243px);
 }
 
 oppia-new-conversation-skin {

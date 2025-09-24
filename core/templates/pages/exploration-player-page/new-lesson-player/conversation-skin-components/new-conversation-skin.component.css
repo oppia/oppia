@@ -118,12 +118,12 @@ oppia-new-conversation-skin .oppia-button-icon {
 oppia-card-navigation-control {
   bottom: 0;
   position: fixed;
-  width: calc(100vw - 98px);
+  width: calc(100vw - 83px);
   z-index: 100;
 }
 
 .expanded-sidebar {
-  width: calc(100vw - 258px);
+  width: calc(100vw - 243px);
 }
 
 .question-player-footer {

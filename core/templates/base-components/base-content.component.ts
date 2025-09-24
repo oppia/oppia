@@ -123,7 +123,11 @@ export class BaseContentComponent {
   }
 
   isNewLessonPlayerEnabled(): boolean {
-    return this.platformFeatureService.status.NewLessonPlayer.isEnabled;
+    const pathnameArray = this.urlService.getPathname().split('/');
+    return (
+      this.platformFeatureService.status.NewLessonPlayer.isEnabled &&
+      pathnameArray.includes('lesson')
+    );
   }
 
   isSidebarShown(): boolean {

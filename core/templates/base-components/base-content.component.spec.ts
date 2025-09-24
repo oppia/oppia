@@ -61,6 +61,7 @@ describe('Base Content Component', () => {
   let mockPlatformFeatureService = new MockPlatformFeatureService();
   let windowRef: WindowRef;
   let loaderService: LoaderService;
+  let urlService: UrlService;
   let keyboardShortcutService: KeyboardShortcutService;
   let sidebarStatusService: SidebarStatusService;
   let cookieService: CookieService;
@@ -69,6 +70,10 @@ describe('Base Content Component', () => {
   class MockUrlService {
     isIframed(): boolean {
       return isIframed;
+    }
+
+    getPathname(): string {
+      return '/lesson/123';
     }
   }
 
@@ -154,6 +159,7 @@ describe('Base Content Component', () => {
     componentInstance = fixture.componentInstance;
     loaderService = TestBed.inject(LoaderService);
     loaderService = loaderService as jasmine.SpyObj<LoaderService>;
+    urlService = TestBed.inject(UrlService);
     keyboardShortcutService = TestBed.inject(KeyboardShortcutService);
     keyboardShortcutService =
       keyboardShortcutService as jasmine.SpyObj<KeyboardShortcutService>;
@@ -194,9 +200,11 @@ describe('Base Content Component', () => {
     );
   });
 
-  it('should check new lesson player feature flag is enabled', () => {
+  it('should return true for isNewLessonPlayerEnabled when feature is enabled and pathname includes lesson', () => {
     mockPlatformFeatureService.status.NewLessonPlayer.isEnabled = true;
-    expect(componentInstance.isNewLessonPlayerEnabled()).toBe(true);
+    spyOn(urlService, 'getPathname').and.returnValue('/lesson/123');
+    const result = componentInstance.isNewLessonPlayerEnabled();
+    expect(result).toBeTrue();
   });
 
   it('should get sidebar status', () => {
