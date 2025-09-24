@@ -65,9 +65,6 @@ const collaboratorRoleOption = 'Collaborator (can make changes)';
 const playtesterRoleOption = 'Playtester (can give feedback)';
 const saveRoleButton = 'button.e2e-test-save-role';
 
-const programmingInteractionsButtonSelector =
-  '.e2e-test-interaction-tab-programming';
-
 const interactionDiv = '.e2e-test-interaction';
 const addInteractionModalSelector = 'customize-interaction-body-container';
 const multipleChoiceInteractionButton =
@@ -296,7 +293,6 @@ const skillNameInput = '.e2e-test-skill-name-input';
 
 const openNavbarIconSelector = '.mobile-navbar-toggled';
 const stateChangesDropdownSelector = '.e2e-test-state-changes-dropdown';
-const mathInteractionButtonSelector = '.e2e-test-interaction-tab-math';
 
 const oppiaYouTubeVideoUrl = 'https://www.youtube.com/watch?v=0tRc75S9MFU';
 const oppiaWebURL = 'https://www.oppia.org';
