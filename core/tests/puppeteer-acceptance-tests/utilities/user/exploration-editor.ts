@@ -6656,6 +6656,13 @@ export class ExplorationEditor extends BaseUser {
 
     const historyItems = await this.page.$$(historyListItemSelector);
     let historyItem: ElementHandle<Element> | null = null;
+
+    const currentVersion = await this.page.$eval(
+      historyItemIndexSelector,
+      (el: Element) => {
+        return parseInt(el.textContent?.replace('.', '').trim() || '');
+      }
+    );
     for (const historyItemElement of historyItems) {
       const historyItemText = await historyItemElement.$eval(
         historyItemIndexSelector,
@@ -6683,11 +6690,21 @@ export class ExplorationEditor extends BaseUser {
 
     await this.clickOn(`${dropdownMenuShown} ${revertVersionButtonSelector}`);
     await this.waitForElementToStabilize(confirmRevertButtonSelector);
-    await this.clickAndWaitForNavigation(confirmRevertButtonSelector);
-    await this.waitForNetworkIdle({
-      idleTime: 2000,
+    await this.clickAndWaitForNavigation(confirmRevertButtonSelector, {
+      waitUntil: ['networkidle0', 'load'],
     });
-
+    await this.page.waitForFunction(
+      (selector: string, version: number) => {
+        const element = document.querySelector(selector);
+        return (
+          parseInt(element?.textContent?.trim().replace('.', '') || '') ===
+          version
+        );
+      },
+      {},
+      historyItemIndexSelector,
+      currentVersion + 1
+    );
     await this.expectElementToBeVisible(confirmRevertButtonSelector, false);
   }
 
