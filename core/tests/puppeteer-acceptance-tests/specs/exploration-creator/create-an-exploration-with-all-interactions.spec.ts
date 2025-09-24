@@ -86,7 +86,7 @@ describe('Exploration Editor', function () {
       CARD_NAMES.SECOND
     );
 
-    // Click on Interaction.
+    // Open appropriate modal on re-clicking an interaction to customize it.
     await explorationEditor.clickOnTestExploration();
     await explorationEditor.expectModalTitleToBe(
       'Customize Interaction (Continue Button)'

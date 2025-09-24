@@ -426,12 +426,9 @@ const goalWarningSelector = '.e2e-test-exploration-objective-warning';
 const revertVersionButtonSelector = '.e2e-test-revert-version';
 const confirmRevertButtonSelector = '.e2e-test-confirm-revert';
 const dropdownMenuShown = '.dropdown-menu.show';
-const responseInputSelector = '.e2e-test-answer-tab';
-const answerInputSelector = '.e2e-test-answer-description-fragment input';
-const saveAnswerButtonInResponseGroupSelector = '.e2e-test-save-answer';
-const activeRuleTabClass = 'oppia-rule-tab-active';
-const activeTabClass = 'e2e-test-active-tab';
 const interactionPreviewSelector = '.e2e-test-interaction';
+const historyItemIndexSelector = '.e2e-test-history-table-index';
+const historyItemOptionSelector = '.e2e-test-history-table-option';
 
 export enum INTERACTION_TYPES {
   ALGEBRAIC_EXPRESSION = 'Algebric Expression Input',
@@ -6655,8 +6652,6 @@ export class ExplorationEditor extends BaseUser {
    * @param version - The version number to revert to.
    */
   async revertExplorationToVersion(version: string): Promise<void> {
-    const historyItemIndexSelector = '.e2e-test-history-table-index';
-    const historyItemOptionSelector = '.e2e-test-history-table-option';
     await this.expectElementToBeVisible(historyListItemSelector);
 
     const historyItems = await this.page.$$(historyListItemSelector);
