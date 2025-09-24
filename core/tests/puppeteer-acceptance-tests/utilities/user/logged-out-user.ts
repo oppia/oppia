@@ -642,6 +642,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async navigateToDonationThanksModalOnAboutPage(): Promise<void> {
     await this.goto(aboutPageThanksModalURL);
+    await this.page.waitForSelector(thanksForDonatingClass, {visible: true});
   }
 
   /**
