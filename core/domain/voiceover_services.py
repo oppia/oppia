@@ -32,7 +32,6 @@ from core.domain import (
     voiceover_regeneration_services,
 )
 from core.platform import models
-from core.storage.voiceover import gae_models
 
 from typing import Dict, List, Optional, Sequence, Tuple, cast
 
