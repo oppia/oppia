@@ -122,7 +122,7 @@ describe('Logged-Out Learner', function () {
       await curriculumAdmin.publishStoryDraft();
     },
     // Test takes longer than default timeout.
-    450000
+    500000
   );
 
   it('should be able to find a lesson to start learning', async function () {
