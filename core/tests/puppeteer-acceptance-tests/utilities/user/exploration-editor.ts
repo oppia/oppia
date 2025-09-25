@@ -444,25 +444,6 @@ export enum INTERACTION_TYPES {
   NUMERIC_INPUT = 'Number Input',
 }
 
-const INTERACTION_SELECTORS: Record<string, string> = {
-  [INTERACTION_TYPES.DRAG_AND_DROP_SORT]:
-    '.e2e-test-interaction-tile-DragAndDropSortInput',
-  [INTERACTION_TYPES.SET_INPUT]: '.e2e-test-interaction-tile-SetInput',
-  [INTERACTION_TYPES.NUMERIC_EXPRESSION]:
-    '.e2e-test-interaction-tile-NumericExpressionInput',
-  [INTERACTION_TYPES.ALGEBRAIC_EXPRESSION]:
-    '.e2e-test-interaction-tile-AlgebraicExpressionInput',
-  [INTERACTION_TYPES.MATH_EQUATION]:
-    '.e2e-test-interaction-tile-MathEquationInput',
-  [INTERACTION_TYPES.NUMBER_WITH_UNITS]:
-    '.e2e-test-interaction-tile-NumberWithUnits',
-  [INTERACTION_TYPES.RATIO_EXPRESSION_INPUT]:
-    '.e2e-test-interaction-tile-RatioExpressionInput',
-  [INTERACTION_TYPES.WORLD_MAP]: '.e2e-test-interaction-tile-InteractiveMap',
-  [INTERACTION_TYPES.MUSIC_NOTES_INPUT]:
-    '.e2e-test-interaction-tile-MusicNotesInput',
-} as const;
-
 enum INTERACTION_TABS {
   PROGRAMMING = 'PROGRAMMING',
   MATHS = 'MATHS',
