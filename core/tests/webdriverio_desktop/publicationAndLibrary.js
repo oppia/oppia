@@ -17,10 +17,8 @@
  * the resultant display of explorations in the library.
  */
 
-var forms = require('../webdriverio_utils/forms.js');
 var general = require('../webdriverio_utils/general.js');
 var users = require('../webdriverio_utils/users.js');
-var waitFor = require('../webdriverio_utils/waitFor.js');
 var workflow = require('../webdriverio_utils/workflow.js');
 
 var AdminPage = require('../webdriverio_utils/AdminPage.js');
@@ -33,9 +31,6 @@ describe('Library index page', function () {
   var adminPage = null;
   var libraryPage = null;
   var explorationEditorPage = null;
-  var explorationEditorMainTab = null;
-  var explorationEditorSettingsTab = null;
-  var explorationPlayerPage = null;
   let releaseCoordinatorPage = null;
 
   beforeAll(async function () {
