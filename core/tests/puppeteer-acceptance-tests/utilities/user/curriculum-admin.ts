@@ -297,6 +297,35 @@ const publishTopicButton = 'button.e2e-test-publish-topic-button';
 const topicEditorMainTabFormSelector = '.e2e-test-topic-editor-main-tab';
 const oldTopicNameField = '.e2e-test-topic-name-field';
 
+const floatTextField = '.e2e-test-rule-details .e2e-test-float-form-input';
+const solutionFloatTextField =
+  'oppia-add-or-update-solution-modal .e2e-test-float-form-input';
+const textStateEditSelector = 'div.e2e-test-state-edit-content';
+const saveContentButton = 'button.e2e-test-save-state-content';
+const createQuestionButton = 'div.e2e-test-create-question';
+const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
+const interactionNumberInputButton =
+  'div.e2e-test-interaction-tile-NumericInput';
+const interactionNameDiv = 'div.oppia-interaction-tile-name';
+const saveInteractionButton = 'button.e2e-test-save-interaction';
+const responseRuleDropdown =
+  'oppia-rule-type-selector.e2e-test-answer-description';
+const equalsRuleButtonText = 'is equal to ... ';
+const answersInGroupAreCorrectToggle =
+  'input.e2e-test-editor-correctness-toggle';
+const saveResponseButton = 'button.e2e-test-add-new-response';
+const defaultFeedbackTab = 'a.e2e-test-default-response-tab';
+const openOutcomeFeedBackEditor = 'div.e2e-test-open-outcome-feedback-editor';
+const saveOutcomeFeedbackButton = 'button.e2e-test-save-outcome-feedback';
+const openAnswerGroupFeedBackEditor = 'i.e2e-test-open-feedback-editor';
+const addHintButton = 'button.e2e-test-oppia-add-hint-button';
+const saveHintButton = 'button.e2e-test-save-hint';
+const addSolutionButton = 'button.e2e-test-oppia-add-solution-button';
+const answerTypeDropdown = 'select.e2e-test-answer-is-exclusive-select';
+const submitAnswerButton = 'button.e2e-test-submit-answer-button';
+const submitSolutionButton = 'button.e2e-test-submit-solution-button';
+const saveQuestionButton = 'button.e2e-test-save-question-button';
+
 export class CurriculumAdmin extends TopicManager {
   /**
    * Moves the classrooms in the order of the given classroom names.
@@ -677,7 +706,7 @@ export class CurriculumAdmin extends TopicManager {
     await this.clickOn(createQuestionButton);
     await this.clickOn(textStateEditSelector);
     await this.page.waitForSelector(richTextAreaField, {visible: true});
-    await this.type(richTextAreaField, 'Add 1+2');
+    await this.typeInInputField(richTextAreaField, 'Add 1+2');
     await this.page.waitForSelector(`${saveContentButton}:not([disabled])`);
     await this.clickOn(saveContentButton);
 
@@ -706,22 +735,22 @@ export class CurriculumAdmin extends TopicManager {
     });
     await this.clickOn(responseRuleDropdown);
     await this.clickOn(equalsRuleButtonText);
-    await this.type(floatTextField, '3');
+    await this.typeInInputField(floatTextField, '3');
     await this.clickOn(answersInGroupAreCorrectToggle);
     await this.clickOn(openAnswerGroupFeedBackEditor);
-    await this.type(richTextAreaField, 'Good job!');
+    await this.typeInInputField(richTextAreaField, 'Good job!');
     await this.clickOn(saveResponseButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
 
     await this.clickOn(defaultFeedbackTab);
     await this.clickOn(openOutcomeFeedBackEditor);
     await this.clickOn(richTextAreaField);
-    await this.type(richTextAreaField, 'The answer is 3');
+    await this.typeInInputField(richTextAreaField, 'The answer is 3');
     await this.clickOn(saveOutcomeFeedbackButton);
 
     await this.clickOn(addHintButton);
     await this.page.waitForSelector(modalDiv, {visible: true});
-    await this.type(richTextAreaField, '3');
+    await this.typeInInputField(richTextAreaField, '3');
     await this.clickOn(saveHintButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
 
@@ -730,10 +759,10 @@ export class CurriculumAdmin extends TopicManager {
     await this.page.waitForSelector(answerTypeDropdown);
     await this.page.select(answerTypeDropdown, 'The only');
     await this.page.waitForSelector(solutionFloatTextField);
-    await this.type(solutionFloatTextField, '3');
+    await this.typeInInputField(solutionFloatTextField, '3');
     await this.page.waitForSelector(`${submitAnswerButton}:not([disabled])`);
     await this.clickOn(submitAnswerButton);
-    await this.type(richTextAreaField, '1+2 is 3');
+    await this.typeInInputField(richTextAreaField, '1+2 is 3');
     await this.page.waitForSelector(`${submitSolutionButton}:not([disabled])`);
     await this.clickOn(submitSolutionButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
