@@ -78,7 +78,7 @@ def get_content_id_to_manual_voiceovers_mapping(
     for content_id, manual_voiceover_mapping in (
             entity_voiceovers_model.voiceovers_mapping.items()):
         manual_voiceover = manual_voiceover_mapping[
-            feconf.VoiceoverType.MANUAL
+            feconf.VoiceoverType.MANUAL.value
         ]
         content_id_to_manual_voiceovers[content_id] = manual_voiceover
 
@@ -104,12 +104,12 @@ def update_entity_voiceovers_model(
             content_id_to_manual_voiceovers.items()):
         if content_id not in entity_voiceovers_model.voiceovers_mapping:
             entity_voiceovers_model.voiceovers_mapping[content_id] = {
-                feconf.VoiceoverType.MANUAL: manual_voiceover,
-                feconf.VoiceoverType.AUTO: None
+                feconf.VoiceoverType.MANUAL.value: manual_voiceover,
+                feconf.VoiceoverType.AUTO.value: None
             }
         else:
             entity_voiceovers_model.voiceovers_mapping[content_id][
-                feconf.VoiceoverType.MANUAL] = manual_voiceover
+                feconf.VoiceoverType.MANUAL.value] = manual_voiceover
 
     return entity_voiceovers_model
 
