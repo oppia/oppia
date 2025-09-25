@@ -28,6 +28,7 @@ import {TopicEditorStateService} from '../services/topic-editor-state.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {StudyGuide} from 'domain/topic/study-guide.model';
 import {StudyGuideSection} from 'domain/topic/study-guide-sections.model';
+import {PageContextService} from 'services/page-context.service';
 
 @Component({
   selector: 'oppia-subtopic-preview-tab',
@@ -60,7 +61,8 @@ export class SubtopicPreviewTab {
     private topicEditorRoutingService: TopicEditorRoutingService,
     private topicEditorStateService: TopicEditorStateService,
     private windowDimensionsService: WindowDimensionsService,
-    private platformFeatureService: PlatformFeatureService
+    private platformFeatureService: PlatformFeatureService,
+    private pageContextService: PageContextService
   ) {}
 
   private _initEditor(): void {
@@ -103,6 +105,7 @@ export class SubtopicPreviewTab {
   }
 
   ngOnInit(): void {
+    this.pageContextService.setSubtopicPreviewIsOpen();
     if (this.isShowRestructuredStudyGuidesFeatureEnabled()) {
       this.directiveSubscriptions.add(
         this.topicEditorStateService.onStudyGuideLoaded.subscribe(() => {
@@ -137,6 +140,7 @@ export class SubtopicPreviewTab {
   }
 
   ngOnDestroy(): void {
+    this.pageContextService.setSubtopicPreviewIsClosed();
     this.directiveSubscriptions.unsubscribe();
   }
 }

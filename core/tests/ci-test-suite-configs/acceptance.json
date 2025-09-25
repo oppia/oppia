@@ -557,6 +557,14 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/blog-post-writer/create-and-edit-blog-post.spec.ts"
     },
     {
+      "name": "curriculum-admin/create-publish-unpublish-and-delete-the-topic-and-skill",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/curriculum-admin/create-publish-unpublish-and-delete-the-topic-and-skill.spec.ts"
+    },
+    {
+      "name": "curriculum-admin/create-edit-and-delete-a-classroom",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/curriculum-admin/create-edit-and-delete-a-classroom.spec.ts"
+    },
+    {
       "name": "translation-coordinator/add-remove-translation-rights",
       "module": "core/tests/puppeteer-acceptance-tests/specs/translation-coordinator/add-remove-translation-rights.spec.ts"
     },

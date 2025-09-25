@@ -65,9 +65,6 @@ const collaboratorRoleOption = 'Collaborator (can make changes)';
 const playtesterRoleOption = 'Playtester (can give feedback)';
 const saveRoleButton = 'button.e2e-test-save-role';
 
-const programmingInteractionsButtonSelector =
-  '.e2e-test-interaction-tab-programming';
-
 const interactionDiv = '.e2e-test-interaction';
 const addInteractionModalSelector = 'customize-interaction-body-container';
 const multipleChoiceInteractionButton =
@@ -296,7 +293,6 @@ const skillNameInput = '.e2e-test-skill-name-input';
 
 const openNavbarIconSelector = '.mobile-navbar-toggled';
 const stateChangesDropdownSelector = '.e2e-test-state-changes-dropdown';
-const mathInteractionButtonSelector = '.e2e-test-interaction-tab-math';
 
 const oppiaYouTubeVideoUrl = 'https://www.youtube.com/watch?v=0tRc75S9MFU';
 const oppiaWebURL = 'https://www.oppia.org';
@@ -2806,7 +2802,7 @@ export class ExplorationEditor extends BaseUser {
 
     for (const interaction in interactionTabs) {
       if (interactionTabs[interaction].includes(interactionType)) {
-        await this.page.waitForSelector(
+        await this.waitForElementToStabilize(
           INTERACTION_TABS_SELECTORS[interaction]
         );
         await this.clickOnElementWithSelector(
@@ -2839,20 +2835,6 @@ export class ExplorationEditor extends BaseUser {
 
     // Check if modal title is correct.
     await this.expectModalTitleToBe('Choose Interaction');
-
-    // Change tab based on interaction.
-    // Add more conditional tab changes here.
-    if (
-      INTERACTION_TABS_OF_INTERACTION_TYPE[interactionToAdd] === 'PROGRAMMING'
-    ) {
-      await this.clickOnElementWithSelector(
-        programmingInteractionsButtonSelector
-      );
-    } else if (
-      INTERACTION_TABS_OF_INTERACTION_TYPE[interactionToAdd] === 'MATH'
-    ) {
-      await this.clickOnElementWithSelector(mathInteractionButtonSelector);
-    }
 
     await this.changeTabInInteractionSelectionModal(
       interactionToAdd as INTERACTION_TYPES

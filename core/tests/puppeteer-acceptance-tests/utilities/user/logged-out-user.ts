@@ -642,6 +642,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async navigateToDonationThanksModalOnAboutPage(): Promise<void> {
     await this.goto(aboutPageThanksModalURL);
+    await this.page.waitForSelector(thanksForDonatingClass, {visible: true});
   }
 
   /**
@@ -3025,6 +3026,7 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * This function verifies that the user is on the correct classroom page.
+   * @param statusCode The status code of the error page.
    */
   async expectToBeOnErrorPage(statusCode: number): Promise<void> {
     await this.page.waitForSelector(errorPageHeading);
