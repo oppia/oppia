@@ -72,7 +72,7 @@ describe('Logged-in User', function () {
     );
 
     // Setup taking longer than 300000ms.
-  }, 420000);
+  }, 500000);
 
   it(
     'should be able to view the updated study guides',
