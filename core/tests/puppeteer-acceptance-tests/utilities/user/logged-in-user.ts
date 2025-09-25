@@ -216,6 +216,8 @@ const completedGoalsContainerSelector = '.e2e-test-completed-goals-section';
 const goalContainerSelector = 'oppia-goal-list';
 const goalTitleSelector = '.e2e-test-goal-title';
 const startGoalButtonSelector = '.e2e-test-start-lesson-button';
+const emptyProgressSectionContainerSelector =
+  '.e2e-test-empty-progress-section';
 
 // Learner Dashboard > Home Tab Seclectors.
 const hometabSectionHeadingSelector =
@@ -3265,6 +3267,13 @@ export class LoggedInUser extends BaseUser {
     );
 
     expect(subscribedCreators).toContain(creatorName);
+  }
+
+  /**
+   * Checks if the progress section in new learner dashboard is empty.
+   */
+  async expectProgressSectionToBeEmptyInNewLD(): Promise<void> {
+    await this.expectElementToBeVisible(emptyProgressSectionContainerSelector);
   }
 }
 
