@@ -199,6 +199,50 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     private platFeatService: PlatformFeatureService
   ) {}
 
+  /**
+   * Populates the curatedExplorationIds set with exploration IDs from all topics.
+   * This is used to filter out curated content from community lessons.
+   */
+  private populateCuratedExplorationIds(): void {
+    this.curatedExplorationIds.clear();
+    (this.allTopics || []).forEach(topic => {
+      (topic.getCanonicalStorySummaryDicts() || []).forEach(storySummary => {
+        (storySummary.getAllNodes() || []).forEach(nodeSummary => {
+          const expId = nodeSummary.getExplorationId();
+          if (expId !== null) {
+            this.curatedExplorationIds.add(expId);
+          }
+        });
+      });
+    });
+  }
+
+  /**
+   * Filters exploration lists to exclude curated explorations.
+   * @param responseData - The response data containing exploration lists
+   */
+  private filterExplorationsData(responseData: any): void {
+    this.populateCuratedExplorationIds();
+
+    // Filter both completed and incomplete explorations
+    this.completedExplorationsList = (
+      responseData.completedExplorationsList || []
+    ).filter(
+      (exp: LearnerExplorationSummary) =>
+        !this.curatedExplorationIds.has(exp.id)
+    );
+
+    this.incompleteExplorationsList = (
+      responseData.incompleteExplorationsList || []
+    ).filter(
+      (exp: LearnerExplorationSummary) =>
+        !this.curatedExplorationIds.has(exp.id)
+    );
+
+    this.subscriptionsList = responseData.subscriptionList;
+    this.explorationPlaylist = responseData.explorationPlaylist;
+  }
+
   ngOnInit(): void {
     this.loaderService.showLoadingScreen('Loading');
 
@@ -293,25 +337,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
       this.learnerDashboardBackendApiService.fetchLearnerDashboardExplorationsDataAsync();
     dashboardExplorationsDataPromise.then(
       responseData => {
-        this.completedExplorationsList = responseData.completedExplorationsList;
-        (this.allTopics || []).forEach(topic => {
-          (topic.getCanonicalStorySummaryDicts() || []).forEach(
-            storySummary => {
-              (storySummary.getAllNodes() || []).forEach(nodeSummary => {
-                const expId = nodeSummary.getExplorationId();
-                if (expId !== null) {
-                  this.curatedExplorationIds.add(expId);
-                }
-              });
-            }
-          );
-        });
-
-        this.incompleteExplorationsList = (
-          responseData.incompleteExplorationsList || []
-        ).filter(exp => !this.curatedExplorationIds.has(exp.id));
-        this.subscriptionsList = responseData.subscriptionList;
-        this.explorationPlaylist = responseData.explorationPlaylist;
+        this.filterExplorationsData(responseData);
       },
       errorResponseStatus => {
         if (
@@ -419,12 +445,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
         this.learnerDashboardBackendApiService.fetchLearnerDashboardExplorationsDataAsync();
       dashboardExplorationsDataPromise.then(
         responseData => {
-          this.completedExplorationsList =
-            responseData.completedExplorationsList;
-          this.incompleteExplorationsList =
-            responseData.incompleteExplorationsList;
-          this.subscriptionsList = responseData.subscriptionList;
-          this.explorationPlaylist = responseData.explorationPlaylist;
+          this.filterExplorationsData(responseData);
         },
         errorResponseStatus => {
           if (
@@ -488,12 +509,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
         this.learnerDashboardBackendApiService.fetchLearnerDashboardExplorationsDataAsync();
       dashboardExplorationsDataPromise.then(
         responseData => {
-          this.completedExplorationsList =
-            responseData.completedExplorationsList;
-          this.incompleteExplorationsList =
-            responseData.incompleteExplorationsList;
-          this.subscriptionsList = responseData.subscriptionList;
-          this.explorationPlaylist = responseData.explorationPlaylist;
+          this.filterExplorationsData(responseData);
         },
         errorResponseStatus => {
           if (
