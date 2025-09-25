@@ -189,7 +189,10 @@ class EntityVoiceovers:
                     'content_id must be a string, received %s' % content_id)
             for voiceover_type, voiceover in (
                     voiceover_type_to_voiceover.items()):
-                if not isinstance(voiceover_type, feconf.VoiceoverType):
+                if voiceover_type not in [
+                    feconf.VoiceoverType.MANUAL.value,
+                    feconf.VoiceoverType.AUTO.value
+                ]:
                     raise utils.ValidationError(
                         'voiceover type must be VoiceoverType, received %s' %
                         voiceover_type)
