@@ -501,11 +501,13 @@ class ExplorationVoiceoverSyncJobTestsBase(
                 feconf.ENTITY_TYPE_EXPLORATION,
                 self.CURATED_EXPLORATION_ID_1, 1, 'en-US', {
                     'content_0': {
-                        feconf.VoiceoverType.MANUAL: self.voiceover_dict_1,
+                        feconf.VoiceoverType.MANUAL.value: (
+                            self.voiceover_dict_1),
                         feconf.VoiceoverType.AUTO.value: None
                     },
                     'content_1': {
-                        feconf.VoiceoverType.MANUAL: self.voiceover_dict_2,
+                        feconf.VoiceoverType.MANUAL.value: (
+                            self.voiceover_dict_2),
                         feconf.VoiceoverType.AUTO.value: None
                     }
                 }, {}))
@@ -514,11 +516,13 @@ class ExplorationVoiceoverSyncJobTestsBase(
                 feconf.ENTITY_TYPE_EXPLORATION,
                 self.CURATED_EXPLORATION_ID_1, 2, 'en-US', {
                     'content_0': {
-                        feconf.VoiceoverType.MANUAL: self.voiceover_dict_3,
+                        feconf.VoiceoverType.MANUAL.value: (
+                            self.voiceover_dict_3),
                         feconf.VoiceoverType.AUTO.value: None
                     },
                     'content_1': {
-                        feconf.VoiceoverType.MANUAL: self.voiceover_dict_4,
+                        feconf.VoiceoverType.MANUAL.value: (
+                            self.voiceover_dict_4),
                         feconf.VoiceoverType.AUTO.value: None
                     }
                 }, {}))
@@ -611,11 +615,13 @@ class ExplorationVoiceoverSyncJobTestsBase(
                 feconf.ENTITY_TYPE_EXPLORATION,
                 self.CURATED_EXPLORATION_ID_2, 1, 'en-US', {
                     'content_0': {
-                        feconf.VoiceoverType.MANUAL: self.voiceover_dict_5,
+                        feconf.VoiceoverType.MANUAL.value: (
+                            self.voiceover_dict_5),
                         feconf.VoiceoverType.AUTO.value: None
                     },
                     'content_1': {
-                        feconf.VoiceoverType.MANUAL: self.voiceover_dict_6,
+                        feconf.VoiceoverType.MANUAL.value: (
+                            self.voiceover_dict_6),
                         feconf.VoiceoverType.AUTO.value: None
                     }
                 }, {}))
