@@ -193,10 +193,6 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-donation-thanks-page.spec.ts"
     },
     {
-      "name": "logged-out-user/check-all-user-flow-of-donor",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/check-all-user-flow-of-donor.spec.ts"
-    },
-    {
       "name": "logged-out-user/check-all-user-flow-of-parent-teacher",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/check-all-user-flow-of-parent-teacher.spec.ts"
     },
