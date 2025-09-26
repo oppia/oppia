@@ -494,7 +494,7 @@ export class PracticeQuestionSubmitter extends Contributor {
     await this.waitForElementToBeClickable(editFeedbackSelector);
     await this.clickOn(editFeedbackSelector);
 
-    await this.typeInInputField(stateContentInputField, feedback);
+    await this.type(stateContentInputField, feedback);
     if (correctResponse) {
       await this.clickOn(correctAnswerInTheGroupSelector);
     }
