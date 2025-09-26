@@ -114,7 +114,7 @@ export class BlogPostEditor extends BaseUser {
     await this.expectElementToBeVisible(blogAuthorBioField);
     await this.clearAllTextFrom(blogAuthorBioField);
     await this.type(blogAuthorBioField, bio);
-    await this.expectInputValueToBe(blogAuthorBioField, bio);
+    await this.expectElementValueToBe(blogAuthorBioField, bio);
   }
 
   /**
@@ -126,7 +126,7 @@ export class BlogPostEditor extends BaseUser {
     await this.expectElementToBeVisible(usernameInputSelector);
     await this.clearAllTextFrom(usernameInputSelector);
     await this.type(usernameInputSelector, username);
-    await this.expectInputValueToBe(usernameInputSelector, username);
+    await this.expectElementValueToBe(usernameInputSelector, username);
   }
 
   /**
