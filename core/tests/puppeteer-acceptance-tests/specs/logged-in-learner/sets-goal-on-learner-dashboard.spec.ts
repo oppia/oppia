@@ -122,7 +122,7 @@ describe('Logged-In Learner', function () {
     await loggedInLearner.expectRedesignedGoalsSectionToContainHeading(
       'In Progress'
     );
-    await loggedInLearner.expectToastMessage(
+    await loggedInLearner.expectToolTipMessage(
       "Successfully added to your 'Current Goals' list."
     );
   });

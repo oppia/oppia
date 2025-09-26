@@ -39,7 +39,6 @@ const commonModalCancelBtnSelector = '.e2e-test-cancel-action-button';
 const uploadErrorMessageDivSelector = '.e2e-test-upload-error-message';
 const currentMatTabHeaderSelector = '.mat-tab-label-active';
 const actionStatusMessageSelector = '.e2e-test-status-message';
-const toastMessageSelector = '.e2e-test-toast-message';
 const warningToastMessageSelector = '.e2e-test-toast-warning-message';
 const warningToastCloseButtonSelector = '.e2e-test-close-toast-warning';
 
@@ -401,24 +400,6 @@ export class BaseUser {
   }
 
   /**
-   * Checks for a new page opened in the context of the current page.
-   * @param cotext - The context in which the new page is opened.
-   * @returns A promise that resolves to the new page.
-   */
-  async waitForNewPage(cotext: Page = this.page): Promise<Page> {
-    const pageTarget = cotext.target();
-    const newTarget = await this.browserObject.waitForTarget(
-      target => target.opener() === pageTarget
-    );
-    const newTabPage = await newTarget.page();
-    expect(newTabPage).toBeDefined();
-    if (!newTabPage) {
-      throw new Error('Failed to get new page opened.');
-    }
-    return newTabPage;
-  }
-
-  /**
    * The function coordinates user interactions with the selected modal.
    */
   async doWithinModal({
@@ -465,6 +446,7 @@ export class BaseUser {
       }
       throw error;
     }
+    showMessage(`Element (${selector}) is clickable, as expected.`);
   }
 
   /**
@@ -651,8 +633,6 @@ export class BaseUser {
       throw new Error(`Element not found for selector: ${selector}`);
     }
     await this.waitForElementToBeClickable(element);
-    await this.waitForElementToStabilize(selector);
-
     await element.type(text);
   }
 
@@ -1266,8 +1246,7 @@ export class BaseUser {
   }
 
   /**
-   * Waits for the given element to be visible, and then checks if the text
-   * content matches the expected text.
+   * Verify text content inside an element
    * @param {string} selector - The selector of the element to get text from.
    * @param {string} text - The expected text content.
    * @param {ElementHandle<Element>} context - The context in which the element is located.
@@ -1310,8 +1289,7 @@ export class BaseUser {
       );
       error.message =
         `Text content of "${selector}" does not match the expected text.\n` +
-        `Expected: "${text}"\n` +
-        `Actual: "${actualTextContent}"\n` +
+        `Expected: "${text}", Found: "${actualTextContent}"\n` +
         'Original Error:\n' +
         error.message;
       throw error;
@@ -1412,8 +1390,8 @@ export class BaseUser {
     // Wait until the element value matches the expected value.
     try {
       await this.page.waitForFunction(
-        (element: HTMLInputElement | HTMLTextAreaElement, value: string) => {
-          return element.value.trim() === value;
+        (element: HTMLElement, value: string) => {
+          return (element as HTMLInputElement)?.value?.trim() === value.trim();
         },
         {},
         selector,
@@ -1508,6 +1486,24 @@ export class BaseUser {
       },
       {},
       url
+    );
+  }
+
+  /**
+   * Function to verify the value of the input field.
+   * @param {string} selector - The selector of the input field.
+   * @param {string} value - The expected value of the input field.
+   */
+  async expectInputValueToBe(selector: string, value: string): Promise<void> {
+    await this.page.waitForFunction(
+      (selector: string, value: string) => {
+        const element: HTMLInputElement | null =
+          document.querySelector(selector);
+        return element?.value === value;
+      },
+      {},
+      selector,
+      value
     );
   }
 
@@ -1760,29 +1756,6 @@ export class BaseUser {
   }
 
   /**
-   * Expects the text content of the toast message to match the given expected message.
-   * @param {string} expectedMessage - The expected message to match the toast message against.
-   */
-  async expectToastMessage(expectedMessage: string): Promise<void> {
-    await this.page.waitForSelector(toastMessageSelector, {visible: true});
-    const toastMessageElement = await this.page.$(toastMessageSelector);
-    const toastMessage = await this.page.evaluate(
-      el => el.textContent.trim(),
-      toastMessageElement
-    );
-
-    if (toastMessage !== expectedMessage) {
-      throw new Error(
-        `Expected toast message to be "${expectedMessage}", but it was "${toastMessage}".`
-      );
-    }
-    if (this.isViewportAtMobileWidth()) {
-      await this.page.click(toastMessageSelector);
-    }
-    await this.expectElementToBeVisible(toastMessageSelector, false);
-  }
-
-  /**
    * Clicks on the button in the modal with the given title and action.
    * @param title - The title of the modal.
    * @param action - The action to click on the button in the modal.
@@ -1834,7 +1807,6 @@ export class BaseUser {
     if (!element) {
       throw new Error(`Element not found for text: ${text}`);
     }
-    await this.waitForElementToStabilize(element);
     await this.waitForElementToBeClickable(element);
     await element.click();
     showMessage(`Element (text: ${text}) is clicked.`);

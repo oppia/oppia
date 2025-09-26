@@ -16,9 +16,9 @@
  * @fileoverview Question Submitters utility file.
  */
 
+import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
-import {Contributor} from './contributor';
 
 const contributorDashboardUrl = testConstants.URLs.ContributorDashboard;
 const imageToUpload = testConstants.data.curriculumAdminThumbnailImage;
@@ -27,6 +27,7 @@ const imageToUploadInQuestion = testConstants.data.profilePicture;
 const submitQuestionTab = 'a.e2e-test-submitQuestionTab';
 const opportunityHeadingTitlSelector =
   '.e2e-test-opportunity-list-item-heading';
+const opportunitySubheadingTitle = '.e2e-test-opportunity-list-item-subheading';
 const opportunityListItem = '.e2e-test-opportunity-list-item';
 const suggestQuestionButton = 'button.e2e-test-opportunity-list-item-button';
 const confirmSkillDificultyButton =
@@ -79,10 +80,12 @@ const solutionInputNumeric = 'oppia-add-or-update-solution-modal input';
 const solutionInputTextArea =
   '.e2e-test-interaction-html textarea.e2e-test-description-box';
 const submitQuestionButon = '.e2e-test-save-question-button';
-const editFeedbackButtonSelector =
+const feedbackEditorButton =
   'div.oppia-edit-feedback .oppia-click-to-start-editing';
-const editFeedbackButtonMobileSelector = '.e2e-test-open-feedback-editor';
 const addElementToTextInputInteraction = 'button.e2e-test-add-list-entry';
+const skillDifficultyEasy = '.e2e-test-skill-difficulty-easy';
+const skillDifficultyMedium = '.e2e-test-skill-difficulty-medium';
+const skillDifficultyHard = '.e2e-test-skill-difficulty-hard';
 const viewQuestionSudggestionModalHeader =
   '.e2e-test-question-suggestion-review-modal-header';
 const questionSuggestionModalDifficultySelector = '.oppia-difficulty-title';
@@ -91,10 +94,8 @@ const questionDifficultySelectionModalSelector =
 
 const saveDestinationButtonSelector = '.e2e-test-save-outcome-dest';
 const saveStuckDestinationButtonSelector = '.e2e-test-save-stuck-destination';
-const responseModalBodyClass = 'e2e-test-response-modal-body';
-const closeModalButtonSelector = '.e2e-test-close-modal-button';
 
-export class PracticeQuestionSubmitter extends Contributor {
+export class QuestionSubmitter extends BaseUser {
   /**
    * Function for navigating to the contributor dashboard admin page.
    */
@@ -113,43 +114,63 @@ export class PracticeQuestionSubmitter extends Contributor {
   ): Promise<void> {
     await this.expectElementToBeVisible(submitQuestionTab);
     await this.clickOn(submitQuestionTab);
+    await this.page.waitForSelector(opportunityListItem, {visible: true});
+    const opportunityListItems = await this.page.$$(opportunityListItem);
+    for (const item of opportunityListItems) {
+      await item.waitForSelector(opportunityHeadingTitlSelector, {
+        visible: true,
+      });
+      const headingElement = await item.$(opportunityHeadingTitlSelector);
 
-    const questionElement = await this.expectOpportunityToBePresent(
-      skillName,
-      topicName
-    );
+      await item.waitForSelector(opportunitySubheadingTitle, {visible: true});
+      const subheadingElement = await item.$(opportunitySubheadingTitle);
 
-    if (!questionElement) {
-      throw new Error(
-        `No opportunity found for topic "${topicName}" and skill "${skillName}"`
+      if (!subheadingElement || !headingElement) {
+        continue;
+      }
+
+      const subheading = await subheadingElement.evaluate(el =>
+        el.textContent?.trim()
       );
+      const heading = await headingElement.evaluate(el =>
+        el.textContent?.trim()
+      );
+
+      if (subheading === topicName && heading === skillName) {
+        const button = await item.$(suggestQuestionButton);
+        await this.page.evaluate(button => {
+          button.click();
+        }, button);
+
+        await this.expectElementToBeVisible(
+          questionDifficultySelectionModalSelector
+        );
+        return;
+      }
     }
 
-    const button = await questionElement.$(suggestQuestionButton);
-    if (!button) {
-      throw new Error('Suggest Question button not found.');
-    }
-    await button.click();
-
-    await this.expectElementToBeVisible(
-      questionDifficultySelectionModalSelector
+    throw new Error(
+      `No opportunity found for topic "${topicName}" and skill "${skillName}"`
     );
   }
 
   /**
    * Function to select the difficulty level of the question to be suggested.
-   * @param difficulty - The difficulty level of the question.
+   * @param {string} difficulty - The difficulty level of the question.
    */
-  async selectQuestionDifficulty(
-    difficulty: 'Easy' | 'Medium' | 'Hard' = 'Medium'
-  ): Promise<void> {
+  async selectQuestionDifficulty(difficulty: string = 'Medium'): Promise<void> {
     await this.expectElementToBeVisible(
       questionDifficultySelectionModalSelector
     );
-    // TODO(#23370): Currently, the difficulty selector is not visible.
-    // Uncomment the following line when the issue is fixed.
-    // const skillDifficultySelector = `.e2e-test-skill-difficulty-${difficulty.toLocaleLowerCase()}`;
-    // await this.clickOn(skillDifficultySelector);
+    if (difficulty === 'Easy') {
+      await this.clickOn(skillDifficultyEasy);
+    } else if (difficulty === 'Medium') {
+      await this.clickOn(skillDifficultyMedium);
+    } else if (difficulty === 'Hard') {
+      await this.clickOn(skillDifficultyHard);
+    } else {
+      throw new Error(`Invalid difficulty level: ${difficulty}`);
+    }
     await this.clickOn(confirmSkillDificultyButton);
 
     await this.expectElementToBeVisible(confirmSkillDificultyButton, false);
@@ -161,10 +182,9 @@ export class PracticeQuestionSubmitter extends Contributor {
    */
   async seedTextToQuestion(text: string): Promise<void> {
     await this.expectElementToBeVisible(textStateEditSelector);
-    await this.waitForElementToStabilize(textStateEditSelector);
     await this.clickOn(textStateEditSelector);
     await this.page.waitForSelector(stateContentInputField, {visible: true});
-    await this.waitForElementToStabilize(stateContentInputField);
+    await this.clickOn(stateContentInputField);
     await this.typeInInputField(stateContentInputField, text);
     await this.clickOn(saveStateEditorContentButton);
 
@@ -276,7 +296,7 @@ export class PracticeQuestionSubmitter extends Contributor {
     await this.expectElementToBeVisible(submitQuestionButon);
     await this.clickOn(submitQuestionButon);
 
-    await this.expectElementToBeVisible(submitQuestionButon, false);
+    this.expectElementToBeVisible(submitQuestionButon, false);
   }
 
   /**
@@ -336,13 +356,12 @@ export class PracticeQuestionSubmitter extends Contributor {
       );
 
       if (heading === opportunityHeadingTitle) {
-        const button = await item.waitForSelector(suggestQuestionButton);
-        if (!button) {
-          throw new Error('Suggest Question button not found.');
-        }
-        await button.click();
+        const button = await item.$(suggestQuestionButton);
+        await this.page.evaluate(button => {
+          button.click();
+        }, button);
 
-        await this.expectQuestionInReviewModalToBe(opportunityHeadingTitle);
+        await item.waitForSelector(suggestQuestionButton, {hidden: true});
         return;
       }
     }
@@ -412,12 +431,8 @@ export class PracticeQuestionSubmitter extends Contributor {
       hidden: true,
     });
 
-    const editFeedbackSelector = this.isViewportAtMobileWidth()
-      ? editFeedbackButtonMobileSelector
-      : editFeedbackButtonSelector;
-
-    await this.waitForElementToStabilize(editFeedbackSelector);
-    await this.clickOn(editFeedbackSelector);
+    await this.waitForElementToBeClickable(feedbackEditorButton);
+    await this.clickOn(feedbackEditorButton);
     await this.page.waitForSelector(stateContentInputField, {visible: true});
     await this.typeInInputField(stateContentInputField, 'Last Card');
     await this.clickOn(correctAnswerInTheGroupSelector);
@@ -448,11 +463,8 @@ export class PracticeQuestionSubmitter extends Contributor {
     await this.page.waitForSelector(textInputField, {visible: true});
     await this.typeInInputField(textInputField, answer);
 
-    const editFeedbackSelector = this.isViewportAtMobileWidth()
-      ? editFeedbackButtonMobileSelector
-      : editFeedbackButtonSelector;
-    await this.waitForElementToBeClickable(editFeedbackSelector);
-    await this.clickOn(editFeedbackSelector);
+    await this.waitForElementToBeClickable(feedbackEditorButton);
+    await this.clickOn(feedbackEditorButton);
     await this.page.waitForSelector(stateContentInputField, {visible: true});
     await this.typeInInputField(stateContentInputField, 'Last Card');
     await this.clickOn(correctAnswerInTheGroupSelector);
@@ -476,31 +488,6 @@ export class PracticeQuestionSubmitter extends Contributor {
       hidden: true,
     });
     showMessage(`${interactionToAdd} interaction has been added successfully.`);
-  }
-
-  /**
-   * Adds response details in the question response modal.
-   * @param feedback - The feedback for the response.
-   * @param correctResponse - Whether the response is correct.
-   */
-  async addResponseDetailsInQuestionResponseModal(
-    feedback: string,
-    correctResponse: boolean = true
-  ): Promise<void> {
-    const editFeedbackSelector = this.isViewportAtMobileWidth()
-      ? editFeedbackButtonMobileSelector
-      : editFeedbackButtonSelector;
-
-    await this.waitForElementToBeClickable(editFeedbackSelector);
-    await this.clickOn(editFeedbackSelector);
-
-    await this.type(stateContentInputField, feedback);
-    if (correctResponse) {
-      await this.clickOn(correctAnswerInTheGroupSelector);
-    }
-    await this.clickOn(addNewResponseButton);
-
-    await this.expectElementToBeVisible(addNewResponseButton, false);
   }
 
   /**
@@ -550,12 +537,8 @@ export class PracticeQuestionSubmitter extends Contributor {
       hidden: true,
     });
 
-    const editButtonSelector = this.isViewportAtMobileWidth()
-      ? editFeedbackButtonMobileSelector
-      : editFeedbackButtonSelector;
-    await this.waitForElementToStabilize(editButtonSelector);
-    await this.waitForElementToBeClickable(editButtonSelector);
-    await this.clickOn(editButtonSelector);
+    await this.waitForElementToBeClickable(feedbackEditorButton);
+    await this.clickOn(feedbackEditorButton);
     await this.page.waitForSelector(addAnswerGroupComponentSelector, {
       visible: true,
     });
@@ -617,118 +600,7 @@ export class PracticeQuestionSubmitter extends Contributor {
       );
     }
   }
-
-  /**
-   * Fills the value in the input field in the response modal.
-   * @param {string} value - The value to fill.
-   * @param {'input' | 'textarea'} inputType - The type of the input field.
-   * @param {number} index - The index of the input field.
-   */
-  async fillValueInInteractionResponseModal(
-    value: string,
-    inputType: 'input' | 'textarea',
-    index: number = 0
-  ): Promise<void> {
-    const xpath = `//div[contains(@class, '${responseModalBodyClass}')]//${inputType === 'textarea' ? 'textarea' : 'input'}[${index + 1}]`;
-    const inputElement = await this.page.waitForXPath(xpath, {
-      visible: true,
-    });
-
-    if (!inputElement) {
-      throw new Error(`Input element not found for selector ${xpath}`);
-    }
-
-    await this.waitForElementToStabilize(inputElement);
-    await inputElement.click({clickCount: 3});
-    await inputElement.type(value);
-
-    await this.page.waitForFunction(
-      (element: HTMLInputElement | HTMLTextAreaElement, value: string) => {
-        return element.value.trim() === value;
-      },
-      {},
-      inputElement,
-      value
-    );
-  }
-
-  /**
-   * This is a composite function that starts a question suggestion and completes it.
-   * @param {string} [skill] - The skill to suggest questions for.
-   * @param {string} [topic] - The topic to suggest questions for.
-   * @param {'Easy' | 'Medium' | 'Hard'} [difficulty] - The difficulty level of the question.
-   * @param {string} [question] - The question to be added to the question.
-   * @param {string[]} [multipleChoiceOptions] - The options to be added to the multiple choice interaction.
-   * @param {string} [defaultResponseFeedback] - The feedback for the default responses.
-   * @param {string} [hint] - The hint to be added to the current state card.
-   */
-  async startAndCompleteQuestionSuggestion(
-    skill: string,
-    topic: string,
-    question: string,
-    multipleChoiceOptions?: string[],
-    difficulty?: 'Easy' | 'Medium' | 'Hard',
-    defaultResponseFeedback?: string,
-    hint?: string
-  ): Promise<void> {
-    await this.suggestQuestionsForSkillandTopic(skill, topic);
-    await this.selectQuestionDifficulty(difficulty ?? 'Medium');
-    await this.seedTextToQuestion(question);
-    await this.addMultipleChoiceInteractionByQuestionSubmitter(
-      multipleChoiceOptions ?? ['5', '-1', '6', '1.5']
-    );
-    await this.editDefaultResponseFeedbackInQuestionEditorPage(
-      defaultResponseFeedback ?? 'Wrong Answer'
-    );
-    await this.addHintToState(
-      hint ??
-        'If you have 2 apples and someone gives you 3 apples, how many apples do you have?'
-    );
-    await this.submitQuestionSuggestion();
-    await this.expectToastMessage('Submitted question for review.');
-  }
-
-  /**
-   * Clicks on the view button in the submitted question.
-   * @param {string} question - The question to view.
-   * @param {string} skill - The skill the question belongs to.
-   */
-  async viewSubmittedQuestion(question: string, skill: string): Promise<void> {
-    const questionElement = await this.expectOpportunityToBePresent(
-      question,
-      skill
-    );
-
-    if (!questionElement) {
-      throw new Error(`Opportunity item for question ${question} not found.`);
-    }
-
-    if (this.isViewportAtMobileWidth()) {
-      await questionElement.click();
-    } else {
-      const viewButton = await questionElement.waitForSelector(
-        suggestQuestionButton
-      );
-      if (!viewButton) {
-        throw new Error('View button not found.');
-      }
-
-      await viewButton.click();
-    }
-    await this.expectElementToBeVisible(viewQuestionSudggestionModalHeader);
-  }
-
-  /**
-   * Closes the translation modal.
-   */
-  async closePracticeQuestionModal(): Promise<void> {
-    await this.expectElementToBeVisible(closeModalButtonSelector);
-    await this.clickOn(closeModalButtonSelector);
-
-    // Verify that the modal is closed.
-    await this.expectElementToBeVisible(closeModalButtonSelector, false);
-  }
 }
 
-export let QuestionSubmitterFactory = (): PracticeQuestionSubmitter =>
-  new PracticeQuestionSubmitter();
+export let QuestionSubmitterFactory = (): QuestionSubmitter =>
+  new QuestionSubmitter();

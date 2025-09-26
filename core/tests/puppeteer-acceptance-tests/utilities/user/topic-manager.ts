@@ -719,7 +719,7 @@ export class TopicManager extends BaseUser {
     if (topicName) {
       await this.clearAllTextFrom(topicNameField);
       await this.typeInInputField(topicNameField, topicName);
-      await this.expectElementValueToBe(topicNameField, topicName);
+      await this.expectInputValueToBe(topicNameField, topicName);
     }
     if (urlFragment) {
       await this.page.waitForSelector(topicEditorUrlFragmentField, {
@@ -727,10 +727,7 @@ export class TopicManager extends BaseUser {
       });
       await this.clearAllTextFrom(topicEditorUrlFragmentField);
       await this.page.type(topicEditorUrlFragmentField, urlFragment);
-      await this.expectElementValueToBe(
-        topicEditorUrlFragmentField,
-        urlFragment
-      );
+      await this.expectInputValueToBe(topicEditorUrlFragmentField, urlFragment);
 
       // TODO(#23302): Currently, changing the URL fragment throws some
       // unexpected warnings. Once fixed, remove the three lines below.
@@ -742,7 +739,7 @@ export class TopicManager extends BaseUser {
     await this.typeInInputField(updateTopicWebFragmentField, titleFragments);
     await this.clearAllTextFrom(updateTopicDescriptionField);
     await this.typeInInputField(updateTopicDescriptionField, description);
-    await this.expectElementValueToBe(updateTopicDescriptionField, description);
+    await this.expectInputValueToBe(updateTopicDescriptionField, description);
 
     await this.clickOn(photoBoxButton);
     await this.page.waitForSelector(photoUploadModal, {visible: true});
@@ -756,7 +753,7 @@ export class TopicManager extends BaseUser {
     await this.clearAllTextFrom(topicMetaTagInput);
     await this.page.type(topicMetaTagInput, metaTags);
     await this.page.keyboard.press('Tab');
-    await this.expectElementValueToBe(topicMetaTagInput, metaTags);
+    await this.expectInputValueToBe(topicMetaTagInput, metaTags);
   }
 
   /**
@@ -1847,7 +1844,7 @@ export class TopicManager extends BaseUser {
     await this.typeInInputField(questionTextInput, questionText);
     await this.page.keyboard.press('Enter');
 
-    await this.expectElementValueToBe(questionTextInput, questionText);
+    await this.expectInputValueToBe(questionTextInput, questionText);
   }
 
   /**
@@ -3107,9 +3104,6 @@ export class TopicManager extends BaseUser {
 
     try {
       if (this.isViewportAtMobileWidth()) {
-        await this.expectElementToBeVisible(
-          mobileCollapsibleCardHeaderSelector
-        );
         const elements = await this.page.$$(
           mobileCollapsibleCardHeaderSelector
         );
@@ -3996,29 +3990,6 @@ export class TopicManager extends BaseUser {
       return foundStoryRow;
     } else {
       throw new Error(`Story ${story} is found but it shouldn't be.`);
-    }
-  }
-
-  /**
-   * Checks if the question is present in the topic.
-   * @param {string} question - The question to check.
-   * @param {boolean} contains - Whether the question should be present.
-   */
-  async expectQuestionToBePresent(
-    question: string,
-    contains: boolean = true
-  ): Promise<void> {
-    await this.expectElementToBeVisible(questionTextSelector);
-
-    const questionTexts = await this.page.$$eval(
-      questionTextSelector,
-      elements => elements.map(element => element.textContent?.trim())
-    );
-
-    if (contains) {
-      expect(questionTexts).toContain(question);
-    } else {
-      expect(questionTexts).not.toContain(question);
     }
   }
 

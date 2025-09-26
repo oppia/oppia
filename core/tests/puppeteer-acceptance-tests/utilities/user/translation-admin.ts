@@ -67,9 +67,8 @@ export class TranslationAdmin extends BaseUser {
 
   /**
    * Function for adding a translation right to a user.
-   * @param username - The username of the user.
-   * @param languageCode - The language code of the language.
    */
+
   async addTranslationLanguageReviewRights(
     username: string,
     languageCode: string

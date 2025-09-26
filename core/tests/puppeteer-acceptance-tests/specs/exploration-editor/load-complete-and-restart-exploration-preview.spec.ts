@@ -55,7 +55,9 @@ describe('Exploration Editor', function () {
 
     // Navigate to the new card and update its content.
     await explorationEditor.navigateToCard(CARD_NAME.TEST_QUESTION);
-    await explorationEditor.updateCardContent('Enter a negative number.');
+    await explorationEditor.updateCardContent(
+      'Enter a negative number greater than -100.'
+    );
     await explorationEditor.addInteraction(INTERACTION_TYPES.NUMBER_INPUT);
     await explorationEditor.addResponsesToTheInteraction(
       INTERACTION_TYPES.NUMBER_INPUT,

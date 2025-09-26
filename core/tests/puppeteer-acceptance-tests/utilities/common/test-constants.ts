@@ -154,7 +154,6 @@ export default {
     MODERATOR: 'moderator',
     RELEASE_COORDINATOR: 'release coordinator',
     COLLECTION_EDITOR: 'collection editor',
-    TRANSLATION_REVIEWER: 'translation reviewer',
     VOICEOVER_SUBMITTER: 'voiceover submitter',
   } as const,
 
