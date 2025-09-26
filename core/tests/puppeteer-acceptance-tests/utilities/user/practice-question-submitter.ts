@@ -149,7 +149,7 @@ export class PracticeQuestionSubmitter extends Contributor {
     // TODO(#23370): Currently, the difficulty selector is not visible.
     // Uncomment the following line when the issue is fixed.
     // const skillDifficultySelector = `.e2e-test-skill-difficulty-${difficulty.toLocaleLowerCase()}`;
-    // await this.clickOn(skillDifficultySelector);
+    // await this.clickOnElementWithSelector(skillDifficultySelector);
     await this.clickOnElementWithSelector(confirmSkillDificultyButton);
 
     await this.expectElementToBeVisible(confirmSkillDificultyButton, false);
@@ -486,13 +486,13 @@ export class PracticeQuestionSubmitter extends Contributor {
       : editFeedbackButtonSelector;
 
     await this.waitForElementToBeClickable(editFeedbackSelector);
-    await this.clickOn(editFeedbackSelector);
+    await this.clickOnElementWithSelector(editFeedbackSelector);
 
     await this.type(stateContentInputField, feedback);
     if (correctResponse) {
-      await this.clickOn(correctAnswerInTheGroupSelector);
+      await this.clickOnElementWithSelector(correctAnswerInTheGroupSelector);
     }
-    await this.clickOn(addNewResponseButton);
+    await this.clickOnElementWithSelector(addNewResponseButton);
 
     await this.expectElementToBeVisible(addNewResponseButton, false);
   }
@@ -709,7 +709,7 @@ export class PracticeQuestionSubmitter extends Contributor {
    */
   async closePracticeQuestionModal(): Promise<void> {
     await this.expectElementToBeVisible(closeModalButtonSelector);
-    await this.clickOn(closeModalButtonSelector);
+    await this.clickOnElementWithSelector(closeModalButtonSelector);
 
     // Verify that the modal is closed.
     await this.expectElementToBeVisible(closeModalButtonSelector, false);

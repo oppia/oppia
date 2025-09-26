@@ -1371,7 +1371,7 @@ export class CurriculumAdmin extends BaseUser {
       !(await this.isElementVisible(selectRubricDifficultySelector))
     ) {
       await this.expectElementToBeVisible(toggleRubricsDropdownSelector);
-      await this.clickOn(toggleRubricsDropdownSelector);
+      await this.clickOnElementWithSelector(toggleRubricsDropdownSelector);
     }
     await this.waitForElementToBeClickable(selectRubricDifficultySelector);
     await this.select(selectRubricDifficultySelector, difficultyValue);

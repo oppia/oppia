@@ -6405,9 +6405,9 @@ export class ExplorationEditor extends BaseUser {
     imageCaption: string | null
   ): Promise<void> {
     await this.expectElementToBeVisible(stateEditSelector);
-    await this.clickOn(stateEditSelector);
+    await this.clickOnElementWithSelector(stateEditSelector);
     await this.addImageRTE(imageFilePath, imageDescription, imageCaption);
-    await this.clickOn(saveContentButton);
+    await this.clickOnElementWithSelector(saveContentButton);
     await this.expectElementToBeVisible(stateContentInputField, false);
   }
 
@@ -6419,7 +6419,7 @@ export class ExplorationEditor extends BaseUser {
   async addExplorationDescriptionContainingBasicRTEComponents(): Promise<void> {
     // Click on RTE.
     await this.page.waitForSelector(stateEditSelector, {visible: true});
-    await this.clickOn(stateEditSelector);
+    await this.clickOnElementWithSelector(stateEditSelector);
 
     // Add Bold text.
     await this.clickOnRTEOptionWithTitle('Bold');
@@ -6478,7 +6478,7 @@ export class ExplorationEditor extends BaseUser {
       'textarea[placeholder*="Enter a math expression using LaTeX"]'
     );
     await textareaElement?.type('x^2 + y^2 = z^2');
-    await this.clickOn(closeButtonForExtraModel);
+    await this.clickOnElementWithSelector(closeButtonForExtraModel);
     await this.waitForNetworkIdle();
     await this.page.keyboard.press('Enter');
 
@@ -6487,14 +6487,14 @@ export class ExplorationEditor extends BaseUser {
     await this.waitForNetworkIdle();
     const skillSearchElement = await this.page.$(skillNameInput);
     await skillSearchElement?.type('Math');
-    await this.clickOn(skillItemInRTESelector);
+    await this.clickOnElementWithSelector(skillItemInRTESelector);
     await this.page.keyboard.press('Enter');
-    await this.clickOn(closeButtonForExtraModel);
+    await this.clickOnElementWithSelector(closeButtonForExtraModel);
     await this.waitForNetworkIdle();
     await this.page.keyboard.press('Enter');
 
     // Save content.
-    await this.clickOn(saveContentButton);
+    await this.clickOnElementWithSelector(saveContentButton);
     await this.expectElementToBeVisible(saveContentButton, false);
   }
 
@@ -6751,11 +6751,10 @@ export class ExplorationEditor extends BaseUser {
    * Removes the current interaction.
    */
   async removeInteraction(): Promise<void> {
-    await this.expectElementToBeVisible(removeInteractionButttonSelector);
-    await this.waitForElementToStabilize(removeInteractionButttonSelector);
-    await this.clickOn(removeInteractionButttonSelector);
-    await this.expectElementToBeVisible(confirmDeleteInteractionButtonSelector);
-    await this.clickOn(confirmDeleteInteractionButtonSelector);
+    await this.clickOnElementWithSelector(removeInteractionButttonSelector);
+    await this.clickOnElementWithSelector(
+      confirmDeleteInteractionButtonSelector
+    );
     await this.expectElementToBeVisible(
       confirmDeleteInteractionButtonSelector,
       false

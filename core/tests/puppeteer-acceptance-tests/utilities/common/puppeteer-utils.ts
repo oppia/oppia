@@ -1821,27 +1821,6 @@ export class BaseUser {
   }
 
   /**
-   * Clicks on the element with the given text.
-   * @param text The text of the element to click on.
-   */
-  async clickOnElementWithText(text: string): Promise<void> {
-    // Normalize-space is used to remove the extra spaces in the text.
-    // Check the documentation for the normalize-space function here :
-    // https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space.
-    const element = await this.page.waitForXPath(
-      `//*[contains(normalize-space(text()), normalize-space("${text}"))]`,
-      {timeout: 10000}
-    );
-
-    if (!element) {
-      throw new Error(`Element not found for text: ${text}`);
-    }
-    await this.waitForElementToStabilize(element);
-    await this.waitForElementToBeClickable(element);
-    await element.click();
-    showMessage(`Element (text: ${text}) is clicked.`);
-  }
-  /**
    * Checks if the toast warning message matches the expected warning message.
    * @param {string} expectedWarningMessage - The expected warning message.
    */

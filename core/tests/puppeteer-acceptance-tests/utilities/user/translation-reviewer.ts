@@ -191,7 +191,7 @@ export class TranslationReviewer extends BaseUser {
       el => el.textContent
     );
 
-    await this.clickOn(buttonSelector);
+    await this.clickOnElementWithSelector(buttonSelector);
 
     await this.page.waitForFunction(
       (selector: string, initialContent: string) => {
