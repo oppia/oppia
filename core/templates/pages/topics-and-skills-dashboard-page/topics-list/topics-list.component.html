@@ -188,7 +188,7 @@
           Not Published
         </span>
       </td>
-      <td>
+      <td class="topic-action-cell">
         <button class="fas fa-ellipsis-v  topic-edit-box-icon e2e-test-topic-edit-box" role="button" (click)="changeEditOptions(topic.id)" aria-label="Topic edit"></button>
         <div *ngIf="showEditOptions(topic.id)" class="topic-edit-options">
           <a class="topic-edit-options-edit e2e-test-edit-topic-button" [href]="getTopicEditorUrl(topic.id)">
@@ -443,6 +443,13 @@
   .topic-primary-information-container {
     height: 100%;
     overflow: auto;
+  }
+  .topic-action-cell {
+    position: relative;
+  }
+  .topic-action-cell .topic-edit-options {
+    left: auto;
+    right: 0;
   }
   .topic-edit-options-edit {
     border-bottom: 1px solid #000;
