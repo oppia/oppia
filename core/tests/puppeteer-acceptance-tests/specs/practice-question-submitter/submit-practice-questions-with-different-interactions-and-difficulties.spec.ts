@@ -19,7 +19,7 @@
 import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {QuestionAdmin} from '../../utilities/user/question-admin';
-import {QuestionSubmitter} from '../../utilities/user/question-submitter';
+import {PracticeQuestionSubmitter} from '../../utilities/user/practice-question-submitter';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
@@ -28,7 +28,7 @@ const ROLES = testConstants.Roles;
 describe('Question Submitter', function () {
   let curriculumAdmin: CurriculumAdmin;
   let questionAdmin: QuestionAdmin;
-  let questionSubmitter: QuestionSubmitter;
+  let questionSubmitter: PracticeQuestionSubmitter;
 
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
