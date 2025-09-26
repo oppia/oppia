@@ -27,12 +27,12 @@
 </div>
 
 <div *ngIf="isShowRestructuredStudyGuidesFeatureEnabled()" class="oppia-subtopic-viewer-container new-subtopic-viewer-container">
-  <button (click)="backToTopic()" class="btn e2e-test-go-back-to-topic-button btn-back-to-topic">
-    <p class="text-next-study-guide-fixed">
-      <i class="material-icons icon-next-study-guide">arrow_back</i>
+  <div class="breadcrumb-container">
+    <button (click)="backToTopic($event)" class="btn e2e-test-go-back-to-topic-button btn-back-to-topic">
+      <i class="material-icons md-18 icon-next-study-guide">arrow_back</i>
       {{ 'I18N_SUBTOPIC_VIEWER_BACK_TO_TOPIC' | translate }} '{{ parentTopicTitle }}'
-    </p>
-  </button>
+    </button>
+  </div>
   <p *ngIf="!isHackySubtopicTitleTranslationDisplayed()" class="content-title">{{ subtopicTitle }}</p>
   <p *ngIf="isHackySubtopicTitleTranslationDisplayed()" class="content-title">{{ subtopicTitleTranslationKey | translate }}</p>
   <div class="content-box">
@@ -46,20 +46,20 @@
           </oppia-rte-output-display>
         </div>
       </div>
-      <button *ngIf="isPracticeTabDisplayed" (click)="openPracticeMenu()" class="btn btn-next-actions e2e-test-go-to-practice-section-button btn-practice-section">
+      <button *ngIf="isPracticeTabDisplayed" (click)="openPracticeMenu($event)" class="btn btn-next-actions e2e-test-go-to-practice-section-button btn-practice-section">
+        <img [src]="getStaticImageUrl('/icons/practice-button-edit.png')" alt="Practice button icon" width="15px" height="15px" class="practice-section-icon">
         <p class="text-practice-section-fixed">
-          <img [src]="getStaticImageUrl('/icons/practice-button-edit.png')" alt="Practice button icon" width="15px" height="15px">
           {{ 'I18N_SUBTOPIC_VIEWER_GO_TO_PRACTICE' | translate }} {{ subtopicTitle }}
         </p>
       </button>
     </div>
   </div>
   <div class="next-actions-buttons-container">
-    <button (click)="openStudyGuideMenu()" class="btn btn-next-actions e2e-test-go-to-study-guide-menu-button btn-study-guide-menu">
+    <button (click)="openStudyGuideMenu($event)" class="btn btn-next-actions e2e-test-go-to-study-guide-menu-button btn-study-guide-menu">
       <i class="material-icons icon-study-guide-menu">exit_to_app</i>
       <p class="text-go-to-study-guides-fixed"> {{ 'I18N_SUBTOPIC_VIEWER_GO_TO_STUDY_GUIDE_MENU_BUTTON' | translate }}</p>
     </button>
-    <button (click)="openStudyGuide()" *ngIf="nextSubtopic" [title]="nextSubtopic.getTitle()" class="btn btn-next-actions e2e-test-go-to-next-study-guide-button btn-next-study-guide">
+    <button (click)="openStudyGuide($event)" *ngIf="nextSubtopic" [title]="nextSubtopic.getTitle()" class="btn btn-next-actions e2e-test-go-to-next-study-guide-button btn-next-study-guide">
       <i class="material-icons icon-next-study-guide next-study-guide-forward-arrow">arrow_forward</i>
       <div>
         <div>
@@ -172,7 +172,7 @@
     gap: 5px;
     height: 60px;
     padding: 8px;
-    width: 250px;
+    width: 200px;
   }
 
   .btn-next-study-guide {
@@ -202,12 +202,19 @@
 
   .btn-back-to-topic {
     align-self: flex-start;
-    color: #003c34;
+    color: #003b36;
     display: block;
-    font-family: Capriola, Arial, sans-serif;
-    font-size: 15px;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 200;
     padding: 0;
     text-align: center;
+  }
+
+  .breadcrumb-container {
+    display: flex;
+    margin-bottom: 15px;
+    width: 45%;
   }
 
   .btn-practice-section {
@@ -220,7 +227,7 @@
     box-shadow: 0 0 10px 0 #00000026;
     color: #008098;
     display: flex;
-    gap: 16px;
+    gap: 8px;
     justify-content: center;
     margin-top: 30px;
     padding-left: 16px;
@@ -245,6 +252,14 @@
   @media screen and (max-width: 1100px) {
     .content-box {
       width: 100%;
+    }
+
+    .breadcrumb-container {
+      width: 65%;
+    }
+
+    .next-actions-buttons-container {
+      width: 65%;
     }
   }
 
@@ -279,6 +294,22 @@
       align-self: center;
       font-size: 16px;
       margin-bottom: 30px;
+    }
+
+    .breadcrumb-container {
+      justify-content: center;
+    }
+
+    .btn-study-guide-menu {
+      padding-left: 0;
+    }
+  }
+
+  @media screen and (max-width: 400px) {
+    .btn-study-guide-menu {
+      align-items: center;
+      display: flex;
+      padding: 2px;
     }
   }
 </style>

@@ -167,7 +167,7 @@ export class BaseUser {
           }
 
           const config = {
-            followNewTab: true,
+            followNewTab: false,
             fps: 25,
             ffmpeg_Path: null,
             // Below dimensions are of recorded video.
@@ -448,6 +448,7 @@ export class BaseUser {
     }
     showMessage(`Element (${selector}) is clickable, as expected.`);
   }
+
   /**
    * The function clicks the element using the text on the button.
    * @param selector The text of the button to click on.
@@ -483,6 +484,40 @@ export class BaseUser {
       await element.click();
       showMessage(`Element (selector: ${selector}) is clicked.`);
     }
+  }
+
+  /**
+   * Clicks on the element and returns a new page opened by the click.
+   * @param selector The selector of the element.
+   * @returns The new page opened by the click.
+   */
+  async clickOnElementAndGetNewPage(selector: string): Promise<Page> {
+    const newPagePromise: Promise<Page> = new Promise<Page>(resolve =>
+      this.browserObject.once('targetcreated', async target => {
+        const page = await target.page();
+        resolve(page);
+      })
+    );
+    await this.clickOn(selector);
+    const newPage = await newPagePromise;
+    return newPage;
+  }
+
+  /**
+   * Checks if the mat chip with the given text content is visible.
+   * @param textContent The text content of the mat chip.
+   * @returns The element handle of the mat chip.
+   */
+  async expectMatChipToBeVisible(
+    textContent: string
+  ): Promise<ElementHandle<Element>> {
+    const matChipElement = await this.page.waitForXPath(
+      `//mat-chip[contains(text(), '${textContent}')]`
+    );
+    if (!matChipElement) {
+      throw new Error(`Mat chip with text ${textContent} not found.`);
+    }
+    return matChipElement;
   }
 
   /**
@@ -1114,6 +1149,16 @@ export class BaseUser {
   }
 
   /**
+   * Scrolls to the top of the page.
+   */
+  async scrollToTopOfPage(): Promise<void> {
+    await this.page.evaluate(() => {
+      window.scrollTo(0, 0);
+    });
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
    * Returns text in nested element
    * @param {string} selector - The selector of the element to get text from.
    */
@@ -1157,13 +1202,15 @@ export class BaseUser {
    * Verify that element is visilbe or not.
    * @param {string} selector - The selector of the element to get text from.
    * @param {boolean} visibility - Whether the element should be visible or not.
+   * @param {Page} context - The page on which the selector should be verified.
    */
   async expectElementToBeVisible(
     selector: string,
-    visibility: boolean = true
+    visibility: boolean = true,
+    context: Page = this.page
   ): Promise<void> {
     const options = visibility ? {visible: true} : {hidden: true};
-    await this.page.waitForSelector(selector, options);
+    await context.waitForSelector(selector, options);
     showMessage(`Element ${selector} is ${visibility ? 'visible' : 'hidden'}.`);
   }
 

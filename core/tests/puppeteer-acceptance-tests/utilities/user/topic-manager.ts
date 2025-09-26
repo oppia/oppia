@@ -18,7 +18,7 @@
 import {BaseUser} from '../common/puppeteer-utils';
 import {showMessage} from '../common/show-message';
 import testConstants from '../common/test-constants';
-import {ElementHandle} from 'puppeteer';
+import {ElementHandle, Page} from 'puppeteer';
 import puppeteer from 'puppeteer';
 
 const topicAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
@@ -256,8 +256,31 @@ const removeSkillModalHeaderSelector =
   '.e2e-test-delete-state-skill-modal-header';
 const addMisconceptionHeaderSelector =
   '.e2e-test-oppia-misconception-card-header';
+const mobileSaveTopicDropdown =
+  'div.navbar-mobile-options .e2e-test-mobile-save-topic-dropdown';
+const mobilePublishTopicButton =
+  'div.navbar-mobile-options .e2e-test-mobile-publish-topic-button';
+const publishTopicButton = 'button.e2e-test-publish-topic-button';
+const topicAndSkillDashboardSelector = '.e2e-test-topics-and-skills-dashboard';
+const skillEditorSelector = '.e2e-test-skill-editor';
 
 export class TopicManager extends BaseUser {
+  /**
+   * Checks if we are in topic and skills dashboard.
+   */
+  async expectToBeInTopicAndSkillsDashboardPage(): Promise<void> {
+    await this.expectElementToBeVisible(topicAndSkillDashboardSelector);
+  }
+
+  /**
+   * Checks if we are in skill editor page.
+   * If the skill editor opened in a new tab, switches to that tab.
+   * @param context The context in which the skill editor is located.
+   */
+  async expectToBeInSkillEditorPage(context: Page = this.page): Promise<void> {
+    await this.expectElementToBeVisible(skillEditorSelector, true, context);
+  }
+
   /**
    * Navigate to the topic and skills dashboard page.
    */
@@ -265,6 +288,7 @@ export class TopicManager extends BaseUser {
     await this.page.bringToFront();
     await this.waitForNetworkIdle();
     await this.goto(topicAndSkillsDashboardUrl);
+    await this.expectToBeInTopicAndSkillsDashboardPage();
   }
 
   /**
@@ -461,6 +485,22 @@ export class TopicManager extends BaseUser {
   }
 
   /**
+   * Checks if we are in topic editor.
+   * @param {string} topicName - Optional topic name to check.
+   *
+   * TODO(#22539): This function has a duplicate in curriculum-admin.ts.
+   * To avoid unexpected behavior, ensure that any modifications here are also
+   * made in curriculum-admin.ts.
+   */
+  async expectToBeInTopicEditor(topicName?: string): Promise<void> {
+    await this.expectElementToBeVisible(topicEditorMainTabFormSelector);
+
+    if (topicName) {
+      await this.expectElementValueToBe(topicNameField, topicName);
+    }
+  }
+
+  /**
    * Edits the details of a topic.
    * @param {string} topicName - The name of the topic.
    * @param {string} urlFragment - The URL fragment of the topic.
@@ -477,7 +517,7 @@ export class TopicManager extends BaseUser {
     topicName?: string,
     urlFragment?: string
   ): Promise<void> {
-    await this.expectElementToBeVisible(topicEditorMainTabFormSelector);
+    await this.expectToBeInTopicEditor();
     if (topicName) {
       await this.clearAllTextFrom(topicNameField);
       await this.type(topicNameField, topicName);
@@ -3166,6 +3206,33 @@ export class TopicManager extends BaseUser {
       );
       newError.stack = error.stack;
       throw newError;
+    }
+  }
+
+  /**
+   * Publishes a topic draft.
+   * @param topicName - Optional. If not provided, the topic editor will be opened.
+   *
+   * TODO(#22539): This function has a duplicate in curriculum-admin.ts.
+   * To avoid unexpected behavior, ensure that any modifications here are also
+   * made in curriculum-admin.ts.
+   */
+  async publishDraftTopic(topicName?: string): Promise<void> {
+    if (topicName) {
+      await this.openTopicEditor(topicName);
+    } else {
+      await this.expectToBeInTopicEditor();
+    }
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileOptionsSelector);
+      await this.clickOn(mobileSaveTopicDropdown);
+      await this.page.waitForSelector(mobilePublishTopicButton);
+      await this.clickOn(mobilePublishTopicButton);
+      await this.page.waitForSelector(mobilePublishTopicButton, {hidden: true});
+    } else {
+      await this.clickOn(publishTopicButton);
+
+      await this.page.waitForSelector(publishTopicButton, {hidden: true});
     }
   }
 }
