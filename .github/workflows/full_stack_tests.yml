@@ -250,7 +250,7 @@ jobs:
           name: acceptance-test-video-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
           path: /home/runner/work/oppia/oppia_full_stack_test_video_recordings/acceptance
 
-      - name: Re-run Desktop Acceptance Test to check flakiness ${{ matrix.suite.name }}
+      - name: Re-run Desktop Acceptance Test to check flakiness for ${{ matrix.suite.name }}
         if: ${{ steps.desktop-test-attempt-1.outcome == 'failure' }}
         timeout-minutes: 30
         run: >
@@ -317,7 +317,7 @@ jobs:
           name: acceptance-test-video-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
           path: /home/runner/work/oppia/oppia_full_stack_test_video_recordings/acceptance
 
-      - name: Re-run Mobile Acceptance Test to check flakiness ${{ matrix.suite.name }}
+      - name: Re-run Mobile Acceptance Test to check flakiness for ${{ matrix.suite.name }}
         if: ${{ steps.mobile-test-attempt-1.outcome == 'failure' }}
         timeout-minutes: 30
         # We use xvfb-run to create a virtual screen to run tests without headless mode.
@@ -331,14 +331,14 @@ jobs:
 
       # Upload other essential files.
       - name: Upload generated test to angular module mapping
-        if: ${{ steps.desktop-test-attempt-1.outcome == 'failure' }}
+        if: ${{ steps.desktop-test-attempt-1.outcome == 'failure' || steps.mobile-test-attempt-1.outcome == 'failure' }}
         uses: actions/upload-artifact@v4
         with:
           name: generated-test-to-angular-module-mapping-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
           path: /home/runner/work/oppia/oppia/core/tests/test-modules-mappings/acceptance/${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.txt
 
       - name: Upload webpack bundles
-        if: ${{ failure() }}
+        if: ${{ steps.desktop-test-attempt-1.outcome == 'failure' || steps.mobile-test-attempt-1.outcome == 'failure' }}
         uses: actions/upload-artifact@v4
         with:
           name: webpack-bundles-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
