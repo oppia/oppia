@@ -43,12 +43,15 @@ import {ReleaseCoordinatorFactory} from '../user/release-coordinator';
 import testConstants, {BLOG_RIGHTS} from './test-constants';
 import {showMessage} from './show-message';
 import {
+  VoiceoverSubmitter,
+  VoiceoverSubmitterFactory,
+} from '../user/voiceover-submitter';
+import {
   ContributorAdmin,
   ContributorAdminFactory,
 } from '../user/contributor-admin';
 import {TranslationCoordinatorFactory} from '../user/translation-coordinator';
 import {QuestionCoordinatorFactory} from '../user/practice-question-coordinator';
-import {VoiceoverSubmitterFactory} from '../user/voiceover-submitter';
 
 const ROLES = testConstants.Roles;
 const cookieBannerAcceptButton =
@@ -246,6 +249,7 @@ export class UserFactory {
       QuestionSubmitter &
       TopicManager &
       CurriculumAdmin &
+      VoiceoverSubmitter &
       ContributorAdmin &
       MultipleRoleIntersection<TRoles>
   > {
@@ -267,7 +271,19 @@ export class UserFactory {
     await user.signUpNewUser(username, email);
     activeUsers.push(user);
 
-    return await UserFactory.assignRolesToUser(user, roles, args);
+    return (await UserFactory.assignRolesToUser(
+      user,
+      roles,
+      args
+    )) as LoggedOutUser &
+      LoggedInUser &
+      ExplorationEditor &
+      QuestionSubmitter &
+      TopicManager &
+      CurriculumAdmin &
+      ContributorAdmin &
+      VoiceoverSubmitter &
+      MultipleRoleIntersection<TRoles>;
   };
 
   /**

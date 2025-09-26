@@ -1214,6 +1214,7 @@ export class LoggedInUser extends BaseUser {
       await removeFromPlayLaterButton?.click();
 
       // Confirm removal.
+      await this.waitForElementToStabilize(confirmRemovalFromPlayLaterButton);
       await this.clickOn(confirmRemovalFromPlayLaterButton);
 
       await this.page.waitForSelector(confirmRemovalFromPlayLaterButton, {
@@ -1282,6 +1283,7 @@ export class LoggedInUser extends BaseUser {
     });
     await this.clickOn(editProfilePictureButton);
     await this.uploadFile(picturePath);
+    await this.waitForElementToStabilize(addProfilePictureButton);
     await this.clickOn(addProfilePictureButton);
 
     await this.page.waitForSelector(addProfilePictureButton, {
