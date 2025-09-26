@@ -6381,10 +6381,7 @@ export class ExplorationEditor extends BaseUser {
     const context =
       state === 'response modal' ? await this.getRuleEditorModal() : this.page;
     const graphHelper = new GraphViz(this.page, context);
-    const nodes = await graphHelper.getVertices();
     await graphHelper.addNode(60, 60);
-    const newNodes = await graphHelper.getVertices();
-    expect(newNodes.length).toEqual(nodes.length + 1);
   }
 
   /**

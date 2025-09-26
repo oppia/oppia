@@ -3195,6 +3195,24 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Continue to next practice question
+   */
+  async continueToNextPracticeQuestion(): Promise<void> {
+    const currentCardContentSelector = `${stateConversationContent} p`;
+    await this.page.waitForSelector(currentCardContentSelector);
+    try {
+      await this.page.waitForSelector(nextCardButton, {timeout: 7000});
+      await this.clickOn(nextCardButton);
+    } catch (error) {
+      if (error instanceof puppeteer.errors.TimeoutError) {
+        await this.clickOn(nextCardArrowButton);
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  /**
    * Function to navigate to the next card in the preview tab.
    */
   async continueToNextCard(): Promise<void> {

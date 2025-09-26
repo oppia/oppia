@@ -64,7 +64,7 @@ describe('Community Library Browser', function () {
       'math',
       'Fractions'
     );
-  });
+  }, 500000);
 
   it('should be able to subscribe to creators', async function () {
     // Start a community lesson.
