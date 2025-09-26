@@ -66,7 +66,6 @@ const desktopLessonCardTitleSelector = '.e2e-test-exploration-tile-title';
 const lessonCardTitleSelector = '.e2e-test-exploration-tile-title';
 const desktopAddToPlayLaterButton = '.e2e-test-add-to-playlist-btn';
 const mobileAddToPlayLaterButton = '.e2e-test-mobile-add-to-playlist-btn';
-const toastMessageSelector = '.e2e-test-toast-message';
 const mobileLessonCardTitleSelector = '.e2e-test-exp-summary-tile-title';
 const mobileCommunityLessonSectionButton = '.e2e-test-mobile-lessons-section';
 const communityLessonsSectionButton = '.e2e-test-community-lessons-section';
@@ -317,6 +316,7 @@ const profileDropdownContainerSelector = '.e2e-test-profile-dropdown-container';
 const profileDropdownAnchorSelector = `${profileDropdownContainerSelector} .nav-link`;
 const closeModalButton = '.e2e-test-close-modal-btn';
 const goalsSectionContainerSelector = '.e2e-test-goals-section-container';
+const usernameSelector = '.e2e-test-username';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -1007,7 +1007,7 @@ export class LoggedInUser extends BaseUser {
 
       // Post-check: Verify if the tooltip appears.
       if (!skipVerification) {
-        await this.expectToolTipMessage(
+        await this.expectToastMessage(
           "Successfully added to your 'Play Later' list."
         );
       }
@@ -1112,29 +1112,6 @@ export class LoggedInUser extends BaseUser {
     // Check the tooltip content.
     const tooltipText = await this.page.$eval('.tooltip', el => el.textContent);
     expect(tooltipText).toBe(expectedTooltip);
-  }
-
-  /**
-   * Expects the text content of the toast message to match the given expected message.
-   * @param {string} expectedMessage - The expected message to match the toast message against.
-   */
-  async expectToolTipMessage(expectedMessage: string): Promise<void> {
-    await this.page.waitForSelector(toastMessageSelector, {visible: true});
-    const toastMessageElement = await this.page.$(toastMessageSelector);
-    const toastMessage = await this.page.evaluate(
-      el => el.textContent.trim(),
-      toastMessageElement
-    );
-
-    if (toastMessage !== expectedMessage) {
-      throw new Error(
-        `Expected toast message to be "${expectedMessage}", but it was "${toastMessage}".`
-      );
-    }
-    if (this.isViewportAtMobileWidth()) {
-      await this.page.click(toastMessageSelector);
-    }
-    await this.expectElementToBeVisible(toastMessageSelector, false);
   }
 
   /**
@@ -2124,19 +2101,13 @@ export class LoggedInUser extends BaseUser {
    * Navigates to the Contributor Dashboard Using Profile Dropdown Menu.
    */
   async navigateToContributorDashboardUsingProfileDropdown(): Promise<void> {
-    await this.page.waitForSelector(profileDropdown, {
-      visible: true,
-    });
+    await this.expectElementToBeVisible(profileDropdown);
     await this.clickOn(profileDropdown);
 
-    await this.page.waitForSelector(contributorDashboardMenuLink, {
-      visible: true,
-    });
+    await this.expectElementToBeVisible(contributorDashboardMenuLink);
     await this.clickOn(contributorDashboardMenuLink);
 
-    await this.page.waitForSelector(contributorDashboardContainerSelector, {
-      visible: true,
-    });
+    await this.expectElementToBeVisible(contributorDashboardContainerSelector);
   }
 
   /**
@@ -3239,6 +3210,14 @@ export class LoggedInUser extends BaseUser {
       await this.clickOn(navbarGetInvolvedTab);
       await this.isElementVisible(navbarGetInvolvedDropdownContainerSelector);
     }
+  }
+
+  /**
+   * Checks if the username matches the expected username.
+   * @param expectedUsername - The expected username.
+   */
+  async expectUsernameToBe(expectedUsername: string): Promise<void> {
+    await this.expectTextContentToBe(usernameSelector, expectedUsername);
   }
 }
 

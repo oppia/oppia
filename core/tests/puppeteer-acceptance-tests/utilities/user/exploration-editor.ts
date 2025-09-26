@@ -32,8 +32,6 @@ const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 const baseUrl = testConstants.URLs.BaseURL;
 const imageToUpload = testConstants.data.curriculumAdminThumbnailImage;
 
-const createExplorationButton = 'button.e2e-test-create-new-exploration-button';
-
 const createExplorationButtonSelector =
   'button.e2e-test-create-new-exploration-button';
 const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
@@ -80,7 +78,7 @@ const textInputInteractionOption =
 const textInputField = '.e2e-test-text-input';
 
 const saveDraftButton = 'button.e2e-test-save-draft-button';
-const commitMessage = 'textarea.e2e-test-commit-message-input';
+const commitMessageSelector = 'textarea.e2e-test-commit-message-input';
 const publishExplorationButtonSelector = 'button.e2e-test-publish-exploration';
 const explorationTitleInput = 'input.e2e-test-exploration-title-input-modal';
 const explorationGoalInput = 'input.e2e-test-exploration-objective-input-modal';
@@ -416,12 +414,15 @@ const graphContainerSelector = '.e2e-test-graph-input-viz-container';
 const nodeWarningSignSelector = '.e2e-test-node-warning-sign';
 const navigationDropdownInMobileVisibleSelector =
   '.oppia-exploration-editor-tabs-dropdown.show';
+const confirmDeleteInteractionButtonSelector =
+  '.e2e-test-confirm-delete-interaction';
+const selectedInteractionNameSelector = '.e2e-test-selected-interaction-name';
 
 export enum INTERACTION_TYPES {
   ALGEBRAIC_EXPRESSION = 'Algebric Expression Input',
   CODE_EDITOR = 'Code Editor',
   CONTINUE_BUTTON = 'Continue Button',
-  DRAG_AND_DROP_SORT = 'Drag and Drop Sort',
+  DRAG_AND_DROP_SORT = 'Drag And Drop Sort',
   END_EXPLORATION = 'End Exploration',
   FRACTION_INPUT = 'Fraction Input',
   GRAPH_THEORY = 'Graph Theory',
@@ -488,6 +489,16 @@ const UNPUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
 const PUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
   'oppia-Publishwithaninteraction-v';
 export class ExplorationEditor extends BaseUser {
+  /**
+   * Checks if the interaction name is as expected.
+   * @param name The name of the interaction.
+   */
+  async expectSelectedInteractionNameToBe(name: string): Promise<void> {
+    await this.expectTextContentToBe(
+      selectedInteractionNameSelector,
+      `Interaction ( ${name} )`
+    );
+  }
   /**
    * Remove feedback response in preview tab.
    */
@@ -835,10 +846,11 @@ export class ExplorationEditor extends BaseUser {
    */
   async addResponseDetailsInResponseModal(
     feedback: string,
-    destination: string,
-    responseIsCorrect: boolean,
+    destination?: string,
+    responseIsCorrect?: boolean,
     isLastResponse: boolean = true
   ): Promise<void> {
+    await this.waitForElementToStabilize(feedbackEditorSelector);
     await this.clickOn(feedbackEditorSelector);
     await this.type(stateContentInputField, feedback);
     await this.expectTextContentToBe(stateContentInputField, feedback);
@@ -915,8 +927,8 @@ export class ExplorationEditor extends BaseUser {
     interactionType: string,
     answer: string,
     feedback: string,
-    destination: string,
-    responseIsCorrect: boolean,
+    destination?: string,
+    responseIsCorrect?: boolean,
     isLastResponse: boolean = true
   ): Promise<void> {
     await this.updateAnswersInResponseModal(
@@ -1735,10 +1747,10 @@ export class ExplorationEditor extends BaseUser {
     interactionType: INTERACTION_TYPES,
     answer: string
   ): Promise<void> {
+    const responseModal = await this.getRuleEditorModal();
     switch (interactionType) {
       case INTERACTION_TYPES.NUMBER_INPUT:
-        await this.page.waitForSelector(floatFormInput);
-        await this.page.type(floatFormInput, answer);
+        (await responseModal.waitForSelector(floatFormInput))?.type(answer);
         break;
       case INTERACTION_TYPES.MULTIPLE_CHOICE:
         await this.page.waitForSelector(multipleChoiceResponseDropdown, {
@@ -2423,7 +2435,7 @@ export class ExplorationEditor extends BaseUser {
    * Function to navigate to exploration editor.
    */
   async navigateToExplorationEditorPage(): Promise<void> {
-    await this.clickAndWaitForNavigation(createExplorationButton);
+    await this.clickAndWaitForNavigation(createExplorationButtonSelector);
   }
 
   /**
@@ -2625,10 +2637,10 @@ export class ExplorationEditor extends BaseUser {
 
     const confirmPublish = async (): Promise<string> => {
       await this.clickOn(saveExplorationChangesButton);
-      await this.waitForPageToFullyLoad();
       await this.page.waitForSelector(explorationConfirmPublishButton, {
         visible: true,
       });
+      await this.waitForElementToStabilize(explorationConfirmPublishButton);
       await this.clickOn(explorationConfirmPublishButton);
       await this.page.waitForSelector(explorationIdElement);
       const explorationIdUrl = await this.page.$eval(
@@ -2653,7 +2665,6 @@ export class ExplorationEditor extends BaseUser {
       return await confirmPublish();
     } catch (error) {
       showMessage('Failed to publish the exploration.\n' + error.stack);
-      await this.waitForPageToFullyLoad();
 
       const errorSavingExplorationElement = await this.page.$(
         errorSavingExplorationModal
@@ -2773,7 +2784,6 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} content - The content to be added to the card.
    */
   async updateCardContent(content: string): Promise<void> {
-    await this.waitForPageToFullyLoad();
     await this.page.waitForSelector(stateEditSelector, {
       visible: true,
     });
@@ -2839,14 +2849,11 @@ export class ExplorationEditor extends BaseUser {
     interactionToAdd: string,
     skipInteractionCustoization: boolean = true
   ): Promise<void> {
-    await this.waitForPageToFullyLoad();
     await this.page.waitForSelector(addInteractionButton, {
       visible: true,
     });
 
     await this.clickOn(addInteractionButton);
-
-    await this.waitForPageToFullyLoad();
 
     // Check if modal title is correct.
     await this.expectModalTitleToBe('Choose Interaction');
@@ -3456,8 +3463,11 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Function to save an exploration draft.
+   * @param commitMessage - The commit message text to be saved.
    */
-  async saveExplorationDraft(): Promise<void> {
+  async saveExplorationDraft(
+    commitMessage: string = 'Testing Testing'
+  ): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       const element = await this.page.$(mobileNavbarOptions);
       // If the element is not present, it means the mobile navigation bar is not expanded.
@@ -3481,8 +3491,11 @@ export class ExplorationEditor extends BaseUser {
       });
       await this.clickOn(saveChangesButton);
     }
-    await this.clickOn(commitMessage);
-    await this.type(commitMessage, 'Testing Testing');
+    // We skip the commit message if it's an empty string.
+    if (commitMessage) {
+      await this.clickOn(commitMessageSelector);
+      await this.type(commitMessageSelector, commitMessage);
+    }
     await this.clickOn(saveDraftButton);
     await this.page.waitForSelector(saveDraftButton, {hidden: true});
 
@@ -4622,23 +4635,29 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Function for creating an exploration with two cards.
+   * @param {string} explorationTitle - The title of the exploration.
+   * @param {string} category - The category of the exploration.,
+   * @param {number} numberOfCards - The number of cards to create.
    */
   async createAndPublishExplorationWithCards(
     explorationTitle: string,
-    category: string = 'Mathematics'
+    category: string = 'Mathematics',
+    numberOfCards: number = 2
   ): Promise<string> {
     await this.navigateToCreatorDashboardPage();
     await this.navigateToExplorationEditorFromCreatorDashboard();
     await this.dismissWelcomeModal();
 
-    await this.updateCardContent('Content 0');
-    await this.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
-    await this.viewOppiaResponses();
-    await this.directLearnersToNewCard('Card 1');
-    await this.saveExplorationDraft();
+    for (let i = 0; i < numberOfCards - 1; i++) {
+      await this.updateCardContent(`Content ${i}`);
+      await this.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+      await this.viewOppiaResponses();
+      await this.directLearnersToNewCard(`Card ${i + 1}`);
+      await this.saveExplorationDraft();
+      await this.navigateToCard(`Card ${i + 1}`);
+    }
 
-    await this.navigateToCard('Card 1');
-    await this.updateCardContent('Content 1');
+    await this.updateCardContent(`Content ${numberOfCards - 1}`);
     await this.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
     await this.saveExplorationDraft();
 
@@ -4654,6 +4673,26 @@ export class ExplorationEditor extends BaseUser {
     } else {
       throw new Error('Exploration not published');
     }
+  }
+
+  /**
+   * Creates and publishes n explorations with cards.
+   * @param n - The number of explorations to create and publish.
+   * @return A promise that resolves to an array of exploration IDs.
+   */
+  async createAndPublishExplorationsWithCards(n: number): Promise<string[]> {
+    const explorationIds: string[] = [];
+    for (let i = 0; i < n; i++) {
+      const explorationTitle = `Quick Exploration ${i + 1}`;
+      const explorationId =
+        await this.createAndPublishAMinimalExplorationWithTitle(
+          explorationTitle,
+          'Algebra',
+          false
+        );
+      explorationIds.push(explorationId);
+    }
+    return explorationIds;
   }
 
   /**
@@ -5207,6 +5246,9 @@ export class ExplorationEditor extends BaseUser {
       if (sourceElement === destinationElement) {
         continue;
       }
+
+      await this.waitForElementToStabilize(sourceElement);
+      await this.waitForElementToStabilize(destinationElement);
 
       const sourceBox = await sourceElement.boundingBox();
       const destBox = await destinationElement.boundingBox();
@@ -6025,7 +6067,10 @@ export class ExplorationEditor extends BaseUser {
    */
   async expectModalTitleToBe(expectedTitle: string): Promise<void> {
     await this.expectElementToBeVisible(commonModalTitleSelector);
-    await this.expectTextContentToBe(commonModalTitleSelector, expectedTitle);
+    await this.expectTextContentToContain(
+      commonModalTitleSelector,
+      expectedTitle
+    );
   }
 
   /**
@@ -6114,9 +6159,13 @@ export class ExplorationEditor extends BaseUser {
     await this.isTextPresentOnPage('Creator Dashboard');
   }
 
+  /**
+   * Fills the description in the save draft modal.
+   * @param description The description to fill in the save draft modal.
+   */
   async fillDescriptionInSaveDraftModal(description: string): Promise<void> {
-    await this.expectElementToBeVisible(commitMessage);
-    await this.type(commitMessage, description);
+    await this.expectElementToBeVisible(commitMessageSelector);
+    await this.type(commitMessageSelector, description);
 
     await this.page.waitForFunction(
       (selector: string, value: string) => {
@@ -6124,7 +6173,7 @@ export class ExplorationEditor extends BaseUser {
         return (element as HTMLTextAreaElement)?.value?.trim() === value.trim();
       },
       {},
-      commitMessage,
+      commitMessageSelector,
       description
     );
   }
@@ -6356,6 +6405,111 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Adds an Image RTE element to the current card.
+   * @param {string} imageFilePath - Path of Image file to add.
+   * @param {string} imageDescription - Image Description to add.
+   * @param {string} imageCaption - Caption to add with image.
+   */
+  async addImageRTEToCardContent(
+    imageFilePath: string,
+    imageDescription: string,
+    imageCaption: string | null
+  ): Promise<void> {
+    await this.expectElementToBeVisible(stateEditSelector);
+    await this.clickOn(stateEditSelector);
+    await this.addImageRTE(imageFilePath, imageDescription, imageCaption);
+    await this.clickOn(saveContentButton);
+    await this.expectElementToBeVisible(stateContentInputField, false);
+  }
+
+  /**
+   * Adds basic RTE components to the exploration.
+   * It includes Bold, Italic, Numbered List, Bulleted List, Pre formatted Text,
+   * Block Quote, Image, Math Formula, and Concept Card.
+   */
+  async addExplorationDescriptionContainingBasicRTEComponents(): Promise<void> {
+    // Click on RTE.
+    await this.page.waitForSelector(stateEditSelector, {visible: true});
+    await this.clickOn(stateEditSelector);
+
+    // Add Bold text.
+    await this.clickOnRTEOptionWithTitle('Bold');
+    await this.type(stateContentInputField, 'Bold text');
+    await this.page.keyboard.press('Enter');
+    await this.clickOnRTEOptionWithTitle('Bold');
+
+    // Add Italic text.
+    await this.clickOnRTEOptionWithTitle('Italic');
+    await this.type(stateContentInputField, 'Italic text');
+    await this.page.keyboard.press('Enter');
+    await this.clickOnRTEOptionWithTitle('Italic');
+
+    // Add Numbered List.
+    await this.clickOnRTEOptionWithTitle('Numbered List');
+    await this.type(stateContentInputField, 'Numbered List Item 1');
+    await this.page.keyboard.press('Enter');
+    await this.type(stateContentInputField, 'Numbered List Item 2');
+    await this.page.keyboard.press('Enter');
+    await this.page.keyboard.press('Enter');
+
+    // Add Bulleted List.
+    await this.clickOnRTEOptionWithTitle('Bulleted List');
+    await this.type(stateContentInputField, 'Bulleted List Item 1');
+    await this.page.keyboard.press('Enter');
+    await this.type(stateContentInputField, 'Bulleted List Item 2');
+    await this.page.keyboard.press('Enter');
+    await this.page.keyboard.press('Enter');
+
+    // Add Pre formatted Text.
+    await this.clickOnRTEOptionWithTitle('Pre');
+    await this.type(stateContentInputField, 'Pre formatted text');
+    await this.clickOnRTEOptionWithTitle('Pre');
+    await this.page.keyboard.press('Enter');
+
+    // Add Block Quote.
+    await this.clickOnRTEOptionWithTitle('Block Quote');
+    await this.type(stateContentInputField, 'Block Quote text');
+    await this.page.keyboard.press('Enter');
+    await this.clickOnRTEOptionWithTitle('Block Quote');
+
+    // Add Image.
+    await this.addImageRTE(
+      testConstants.data.profilePicture,
+      'Test Image',
+      'Test Image Caption'
+    );
+    await this.waitForNetworkIdle();
+
+    await this.page.keyboard.press('ArrowRight');
+
+    // Math Formula.
+    await this.clickOnRTEOptionWithTitle('Insert mathematical formula');
+    await this.waitForNetworkIdle();
+    const textareaElement = await this.page.$(
+      'textarea[placeholder*="Enter a math expression using LaTeX"]'
+    );
+    await textareaElement?.type('x^2 + y^2 = z^2');
+    await this.clickOn(closeButtonForExtraModel);
+    await this.waitForNetworkIdle();
+    await this.page.keyboard.press('Enter');
+
+    // Concept Card.
+    await this.clickOnRTEOptionWithTitle('Insert Concept Card Link');
+    await this.waitForNetworkIdle();
+    const skillSearchElement = await this.page.$(skillNameInput);
+    await skillSearchElement?.type('Math');
+    await this.clickOn(skillItemInRTESelector);
+    await this.page.keyboard.press('Enter');
+    await this.clickOn(closeButtonForExtraModel);
+    await this.waitForNetworkIdle();
+    await this.page.keyboard.press('Enter');
+
+    // Save content.
+    await this.clickOn(saveContentButton);
+    await this.expectElementToBeVisible(saveContentButton, false);
+  }
+
+  /**
    * Updates an exploration description containing all RTE elements.
    */
   async addExplorationDescriptionContainingAllRTEComponents(): Promise<void> {
@@ -6423,7 +6577,7 @@ export class ExplorationEditor extends BaseUser {
     await this.waitForNetworkIdle();
     await this.page.keyboard.press('ArrowRight');
 
-    // Add LinkEnter.
+    // Add Link.
     await this.addTextWithLinkRTE('Oppia', oppiaWebURL);
     await this.waitForNetworkIdle();
     await this.page.keyboard.press('Enter');
@@ -6602,6 +6756,21 @@ export class ExplorationEditor extends BaseUser {
     }
 
     await this.expectElementToBeVisible(nodeWarningSignSelector, visible);
+  }
+
+  /**
+   * Removes the current interaction.
+   */
+  async removeInteraction(): Promise<void> {
+    await this.expectElementToBeVisible(removeInteractionButttonSelector);
+    await this.waitForElementToStabilize(removeInteractionButttonSelector);
+    await this.clickOn(removeInteractionButttonSelector);
+    await this.expectElementToBeVisible(confirmDeleteInteractionButtonSelector);
+    await this.clickOn(confirmDeleteInteractionButtonSelector);
+    await this.expectElementToBeVisible(
+      confirmDeleteInteractionButtonSelector,
+      false
+    );
   }
 }
 

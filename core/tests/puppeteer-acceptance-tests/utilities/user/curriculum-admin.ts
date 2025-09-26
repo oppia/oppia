@@ -295,6 +295,10 @@ const toggleSkillEditOptionsButton =
 const mobileSaveSkillButton = '.e2e-test-mobile-save-skill-changes';
 const mobilePreviewTab = '.e2e-test-mobile-preview-tab';
 const navigationDropdown = '.e2e-test-mobile-skill-nav-dropdown-icon';
+const toggleRubricsDropdownSelector = '.e2e-test-toggle-rubrics-dropdown';
+const mobileSaveOrPublishSkillSelector = '.e2e-test-mobile-save-skill-changes';
+const mobileSkillNavToggle =
+  'div.e2e-test-mobile-toggle-skill-nav-dropdown-icon';
 
 const createNewSkillButtonInSkillDashboardSelector =
   '.e2e-test-create-skill-button-circle';
@@ -620,12 +624,17 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(
       `${confirmSkillCreationButton}:not([disabled])`
     );
+    const newPagePromise = this.waitForNewPage();
+    await this.waitForElementToStabilize(confirmSkillCreationButton);
     await this.clickOn(confirmSkillCreationButton);
+    // Close new page, so that screenrecorder doesn't capture it and remove
+    // focus from the main page.
+    const newPage = await newPagePromise;
+    await newPage.close();
     await this.waitForNetworkIdle();
     await this.page.waitForSelector(confirmSkillCreationButton, {
       hidden: true,
     });
-    await this.page.bringToFront();
   }
 
   /**
@@ -1306,7 +1315,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(assignSubtopicButton, {
       visible: true,
     });
-    await this.clickOn('Assign to Subtopic');
+    await this.clickOnElementWithText('Assign to Subtopic');
 
     await this.page.waitForSelector(subtopicNameSelector, {visible: true});
     await this.page.evaluate(
@@ -1358,6 +1367,15 @@ export class CurriculumAdmin extends BaseUser {
       default:
         throw new Error(`Unknown difficulty: ${difficulty}`);
     }
+
+    // Expand the difficulty rubric section in mobile.
+    if (
+      this.isViewportAtMobileWidth() &&
+      !(await this.isElementVisible(selectRubricDifficultySelector))
+    ) {
+      await this.expectElementToBeVisible(toggleRubricsDropdownSelector);
+      await this.clickOn(toggleRubricsDropdownSelector);
+    }
     await this.waitForElementToBeClickable(selectRubricDifficultySelector);
     await this.select(selectRubricDifficultySelector, difficultyValue);
     await this.waitForStaticAssetsToLoad();
@@ -1375,11 +1393,24 @@ export class CurriculumAdmin extends BaseUser {
    * @param {string} updateMessage - The update message.
    */
   async publishUpdatedSkill(updateMessage: string): Promise<void> {
-    await this.waitForStaticAssetsToLoad();
-    await this.page.waitForSelector(saveOrPublishSkillSelector, {
-      visible: true,
-    });
-    await this.clickOn(saveOrPublishSkillSelector);
+    if (this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeVisible(mobileOptionsSelector);
+      await this.clickOn(mobileOptionsSelector);
+      // The mobile view has 2 instances of the element, from which
+      // the first one is inapplicable here.
+      const elems = await this.page.$$(mobileSkillNavToggle);
+      await elems[1].click();
+      await this.page.waitForSelector(mobileSaveOrPublishSkillSelector, {
+        visible: true,
+      });
+      await this.clickOn(mobileSaveOrPublishSkillSelector);
+    } else {
+      await this.waitForStaticAssetsToLoad();
+      await this.page.waitForSelector(saveOrPublishSkillSelector, {
+        visible: true,
+      });
+      await this.clickOn(saveOrPublishSkillSelector);
+    }
 
     await this.page.waitForSelector(commitMessageInputSelector, {
       visible: true,
@@ -1389,10 +1420,7 @@ export class CurriculumAdmin extends BaseUser {
       visible: true,
     });
     await this.clickOn(closeSaveModalButtonSelector);
-
-    await this.page.waitForSelector(closeSaveModalButtonSelector, {
-      hidden: true,
-    });
+    await this.expectToastMessage('Changes Saved.');
     showMessage('Skill updated successful');
   }
 

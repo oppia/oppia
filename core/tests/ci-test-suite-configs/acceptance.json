@@ -541,6 +541,22 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/export-and-delete-account.spec.ts"
     },
     {
+      "name": "translation-submitter/translate-exploration-in-target-language",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-submitter/translate-exploration-in-target-language.spec.ts"
+    },
+    {
+      "name": "translation-submitter/check-their-accomplishment",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-submitter/check-their-accomplishment.spec.ts"
+    },
+    {
+      "name": "translation-reviewer/review-the-translations",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-reviewer/review-the-translations.spec.ts"
+    },
+    {
+      "name": "translation-reviewer/filter-the-translations",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-reviewer/filter-the-translations.spec.ts"
+    },
+    {
       "name": "voiceover-submitter/create-delete-and-update-status-of-voiceovers-of-the-explorations",
       "module": "core/tests/puppeteer-acceptance-tests/specs/voiceover-submitter/create-delete-and-update-status-of-voiceovers-of-the-explorations.spec.ts"
     },
@@ -555,6 +571,22 @@
     {
       "name": "blog-post-writer/create-and-edit-blog-post",
       "module": "core/tests/puppeteer-acceptance-tests/specs/blog-post-writer/create-and-edit-blog-post.spec.ts"
+    },
+    {
+      "name": "practice-question-submitter/submit-practice-questions-for-review-and-check-thier-status",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/practice-question-submitter/submit-practice-questions-for-review-and-check-thier-status.spec.ts"
+    },
+    {
+      "name": "practice-question-submitter/check-contribution-stats-download-certificate-and-check-badges-earned",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/practice-question-submitter/check-contribution-stats-download-certificate-and-check-badges-earned.spec.ts"
+    },
+    {
+      "name": "practice-question-reviewer/review-submitted-questions",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/practice-question-reviewer/review-submitted-questions.spec.ts"
+    },
+    {
+      "name": "practice-question-reviewer/view-contribution-stats-and-badges-earned",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/practice-question-reviewer/view-contribution-stats-and-badges-earned.spec.ts"
     },
     {
       "name": "curriculum-admin/create-publish-unpublish-and-delete-the-topic-and-skill",
