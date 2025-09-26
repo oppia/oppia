@@ -1815,7 +1815,7 @@ class ValidateTotalContributionStatsJob(base_jobs.JobBase):
         dates = [c.contribution_dates for c in valid_contributions]
         if dates:
             first_date = min(d[0] for d in dates if d[0])
-            last_date = max(d[1] for d in dates if d[1])
+            last_date = max(d[-1] for d in dates if d[-1])
             if first_date != total.first_contribution_date:
                 error_logs += (
                     f'-> first contribution {first_date} != '
