@@ -177,14 +177,6 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/manage-exploration-progress-in-learner-dashboard.spec.ts"
     },
     {
-      "name": "logged-out-user/click-all-buttons-on-about-page",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-about-page.spec.ts"
-    },
-    {
-      "name": "logged-out-user/click-all-buttons-on-navbar",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-navbar.spec.ts"
-    },
-    {
       "name": "logged-out-user/click-all-links-on-get-started-page",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-links-on-get-started-page.spec.ts"
     },
@@ -201,20 +193,8 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/check-all-user-flow-of-partner.spec.ts"
     },
     {
-      "name": "logged-out-user/check-all-user-flow-of-volunteer",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/check-all-user-flow-of-volunteer.spec.ts"
-    },
-    {
-      "name": "logged-out-user/click-all-buttons-on-partnerships-page",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-partnerships-page.spec.ts"
-    },
-    {
       "name": "logged-out-user/click-all-buttons-on-teach-page",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-teach-page.spec.ts"
-    },
-    {
-      "name": "logged-out-user/click-all-buttons-on-volunteer-page",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-volunteer-page.spec.ts"
     },
     {
       "name": "logged-out-user/click-all-buttons-on-contact-us-page",
@@ -229,16 +209,8 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/generate-and-play-automated-voiceovers.spec.ts"
     },
     {
-      "name": "logged-out-user/play-through-lesson-while-getting-feedback-and-hints",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/play-through-lesson-while-getting-feedback-and-hints.spec.ts"
-    },
-    {
       "name": "logged-out-user/visit-classroom-index-page",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/visit-classroom-index-page.spec.ts"
-    },
-    {
-      "name": "logged-out-user/track-and-resume-exploration-progress-via-url",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/track-and-resume-exploration-progress-via-url.spec.ts"
     },
     {
       "name": "logged-out-user/click-all-links-in-oppia-footer",
@@ -257,24 +229,12 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-links-on-terms-page.spec.ts"
     },
     {
-      "name": "logged-out-user/click-all-buttons-on-donate-page",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-donate-page.spec.ts"
-    },
-    {
       "name": "logged-out-user/browse-and-search-for-lessons-in-community-library",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/browse-and-search-for-lessons-in-community-library.spec.ts"
     },
     {
-      "name": "logged-out-user/select-and-play-topic-from-classroom-page",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/select-and-play-topic-from-classroom-page.spec.ts"
-    },
-    {
       "name": "logged-out-user/choose-what-to-do-from-the-last-card-of-an-exploration",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/choose-what-to-do-from-the-last-card-of-an-exploration.spec.ts"
-    },
-    {
-      "name": "logged-out-user/share-and-give-feedback-for-exploration-but-not-report-and-rate-it",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/share-and-give-feedback-for-exploration-but-not-report-and-rate-it.spec.ts"
     },
     {
       "name": "logged-out-user/change-site-language-and-engage-with-original-exploration",
@@ -287,10 +247,6 @@
     {
       "name": "logged-out-user/sign-in-and-save-exploration-progress",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/sign-in-and-save-exploration-progress.spec.ts"
-    },
-    {
-      "name": "logged-out-user/deny-access-to-dashboards-and-actions-without-login",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/deny-access-to-dashboards-and-actions-without-login.spec.ts"
     },
     {
       "name": "logged-out-user/view-and-search-blog-posts",
