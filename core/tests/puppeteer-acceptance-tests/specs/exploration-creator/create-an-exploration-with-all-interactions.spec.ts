@@ -759,7 +759,7 @@ describe('Exploration Editor', function () {
       ['C4'],
       'as given in the question.'
     );
-    await explorationEditor.expectToolTipMessage(
+    await explorationEditor.expectToastMessage(
       'The current solution does not lead to another card.'
     );
 
