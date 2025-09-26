@@ -321,6 +321,8 @@ const profileDropdownAnchorSelector = `${profileDropdownContainerSelector} .nav-
 const closeModalButton = '.e2e-test-close-modal-btn';
 const goalsSectionContainerSelector = '.e2e-test-goals-section-container';
 const usernameSelector = '.e2e-test-username';
+const continueWhereYouLeftOffSection = '.e2e-test-continue-section';
+const nonEmptySectionSelector = '.e2e-test-non-empty-section';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -2827,7 +2829,8 @@ export class LoggedInUser extends BaseUser {
     visible: boolean = true
   ): Promise<void> {
     await this.expectElementToBeVisible(
-      continueFromWhereLeftOffSectionSelector
+      `${continueWhereYouLeftOffSection}${nonEmptySectionSelector}`,
+      visible
     );
   }
 

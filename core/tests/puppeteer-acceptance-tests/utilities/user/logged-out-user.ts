@@ -584,6 +584,7 @@ const voiceoverSelectSelector = '.e2e-test-audio-lang-select';
 
 const conceptCardCloseButtonSelector = '.e2e-test-close-concept-card';
 const promoBarTextSelector = '.e2e-test-promo-bar-text';
+const practiceQuestionHeaderSelector = '.e2e-test-practice-question-header';
 
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
@@ -3200,6 +3201,11 @@ export class LoggedOutUser extends BaseUser {
   async continueToNextPracticeQuestion(): Promise<void> {
     const currentCardContentSelector = `${stateConversationContent} p`;
     await this.page.waitForSelector(currentCardContentSelector);
+
+    const initialHeading = await this.page.$eval(
+      practiceQuestionHeaderSelector,
+      el => el?.textContent?.trim() || ''
+    );
     try {
       await this.page.waitForSelector(nextCardButton, {timeout: 7000});
       await this.clickOn(nextCardButton);
@@ -3210,6 +3216,16 @@ export class LoggedOutUser extends BaseUser {
         throw error;
       }
     }
+
+    await this.page.waitForFunction(
+      (selector: string, heading: string) => {
+        const element = document.querySelector(selector);
+        return element && element.textContent?.trim() !== heading;
+      },
+      {},
+      practiceQuestionHeaderSelector,
+      initialHeading
+    );
   }
 
   /**
