@@ -120,7 +120,7 @@ export default {
       GoogleSignUp: 'https://accounts.google.com/lifecycle/steps/signup/name',
     },
     TeacherStoryTaggedBlogsLink:
-      'https://www.oppia.org/blog/search/find?q=&tags=(%22Teacher%20story%22)',
+      '/blog/search/find?q=&tags=(%22Teacher%20story%22)',
     ParentsTeachersGuideUrl:
       'https://drive.google.com/file/d/1gMixZ2c0j5XAGPx4qDBDvRgiFvF6PMkk/view',
     LessonCreatorLinkedInUrl:
@@ -154,6 +154,7 @@ export default {
     MODERATOR: 'moderator',
     RELEASE_COORDINATOR: 'release coordinator',
     COLLECTION_EDITOR: 'collection editor',
+    TRANSLATION_REVIEWER: 'translation reviewer',
     VOICEOVER_SUBMITTER: 'voiceover submitter',
   } as const,
 

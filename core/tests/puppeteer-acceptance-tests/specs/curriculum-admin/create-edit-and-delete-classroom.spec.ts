@@ -21,6 +21,7 @@ import testConstants from '../../utilities/common/test-constants';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {ConsoleReporter} from '../../utilities/common/console-reporter';
+import {TopicManager} from '../../utilities/user/topic-manager';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
@@ -28,7 +29,7 @@ const ROLES = testConstants.Roles;
 ConsoleReporter.setConsoleErrorsToIgnore([/[\s\S]*/]);
 
 describe('Curriculum Admin', function () {
-  let curriculumAdmin: CurriculumAdmin;
+  let curriculumAdmin: CurriculumAdmin & TopicManager;
   let loggedOutUser: LoggedOutUser;
 
   beforeAll(async function () {
