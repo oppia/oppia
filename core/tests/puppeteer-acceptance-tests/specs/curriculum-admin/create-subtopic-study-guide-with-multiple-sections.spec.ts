@@ -86,7 +86,7 @@ describe('Curriculum Admin', function () {
       'subtopicWithTwoSections',
       __dirname
     );
-  });
+  }, 500000); // Test takes longer than 5mins.
 
   it('should add sections with workedexamples.', async function () {
     await curriculumAdmin.addSubtopicStudyGuideSectionWithWorkedExample(
