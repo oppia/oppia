@@ -173,7 +173,7 @@ jobs:
     if: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.python.count > 0 }}
     strategy:
       # Fast fail only if it's a merge queue.
-      fail-fast: ${{ github.event_name != 'merge_group' }}
+      fail-fast: ${{ github.event_name == 'merge_group' }}
       matrix:
         suite: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.python.suites }}
     name: Acceptance (${{ matrix.suite.name }})
@@ -206,7 +206,7 @@ jobs:
           SUITE_NAME=${{ matrix.suite.name }}
           echo "MODIFIED_SUITE_NAME=${SUITE_NAME//\//_}" >> $GITHUB_OUTPUT
 
-      # Desktop Test (Attempt 1)
+      # Desktop Test
       - name: Run Desktop Acceptance Test ${{ matrix.suite.name }}
         id: desktop-test-attempt-1
         # TODO(#22448): Remove once all suites are fixed.
@@ -243,8 +243,7 @@ jobs:
           # core/tests/puppeteer-acceptance-tests/utilities/common/puppeteer-utils.ts
           path: /home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/diff-snapshots
 
-      # Desktop Test (Attempt 2): Run it only to check for flakiness.
-      - name: Run Desktop Acceptance Test ${{ matrix.suite.name }} (Attempt 2 with screen recording)
+      - name: Re-run Desktop Acceptance Test to check flakiness ${{ matrix.suite.name }}
         if: ${{ steps.desktop-test-attempt-1.outcome == 'failure' }}
         timeout-minutes: 30
         run: >
@@ -254,7 +253,7 @@ jobs:
           --skip-build --suite=${{ matrix.suite.name }} --prod_env --server_log_level=info
           | tee desktop_acceptance_test_retry_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
 
-      # Mobile Test (Attempt 1)
+      # Mobile Test
       - name: Run Mobile Acceptance Test ${{ matrix.suite.name }}
         id: mobile-test-attempt-1
         # We are using always() to prevent the job step from being skipped if desktop test fails.
@@ -304,8 +303,7 @@ jobs:
           # core/tests/puppeteer-acceptance-tests/utilities/common/puppeteer-utils.ts
           path: /home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/diff-snapshots
 
-      # Mobile Test (Attempt 2): Run it only to check for flakiness.
-      - name: Run Mobile Acceptance Test ${{ matrix.suite.name }} (Attempt 2 with screen recording)
+      - name: Re-run Mobile Acceptance Test to check flakiness ${{ matrix.suite.name }}
         if: ${{ steps.mobile-test-attempt-1.outcome == 'failure' }}
         timeout-minutes: 30
         # We use xvfb-run to create a virtual screen to run tests without headless mode.
@@ -319,7 +317,7 @@ jobs:
 
       # Upload other essential files.
       - name: Upload all test recordings as Artifacts
-        if: ${{ steps.mobile-test-attempt-2.outcome == 'failure' }}
+        if: ${{ failure() }}
         uses: actions/upload-artifact@v4
         with:
           name: acceptance-test-video-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
