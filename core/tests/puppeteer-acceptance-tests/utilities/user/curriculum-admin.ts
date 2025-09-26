@@ -655,38 +655,6 @@ export class CurriculumAdmin extends TopicManager {
       `Review material text content for ${description}.`,
       addWorkedExample
     );
-    if (addWorkedExample) {
-      await this.clickOn(insertWorkedExampleButton);
-      await this.page.waitForSelector(editWorkedExampleModalQuestionRte, {
-        visible: true,
-      });
-      await this.clearAllTextFrom(editWorkedExampleModalQuestionRte);
-      await this.typeInInputField(
-        editWorkedExampleModalQuestionRte,
-        'Type the number one'
-      );
-      await this.page.waitForSelector(editWorkedExampleModalAnswerRte, {
-        visible: true,
-      });
-      await this.clearAllTextFrom(editWorkedExampleModalAnswerRte);
-      await this.waitForElementToStabilize(editWorkedExampleModalAnswerRte);
-      await this.typeInInputField(editWorkedExampleModalAnswerRte, '1');
-      await this.clickOn(rteComponentSaveButton);
-    }
-    await this.page.waitForSelector(
-      `${confirmSkillCreationButton}:not([disabled])`
-    );
-    const newPagePromise = this.waitForNewPage();
-    await this.waitForElementToStabilize(confirmSkillCreationButton);
-    await this.clickOn(confirmSkillCreationButton);
-    // Close new page, so that screenrecorder doesn't capture it and remove
-    // focus from the main page.
-    const newPage = await newPagePromise;
-    await newPage.close();
-    await this.waitForNetworkIdle();
-    await this.page.waitForSelector(confirmSkillCreationButton, {
-      hidden: true,
-    });
   }
 
   /**
