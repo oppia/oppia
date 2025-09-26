@@ -39,12 +39,15 @@ LINTER_TESTS_DIR: Final = os.path.join(
 )
 VALID_JS_FILEPATH: Final = os.path.join(LINTER_TESTS_DIR, 'valid.js')
 VALID_TS_FILEPATH: Final = os.path.join(LINTER_TESTS_DIR, 'valid.ts')
+INVALID_TS_FILEPATH: Final = os.path.join(
+    LINTER_TESTS_DIR, 'invalid.ts')
 VALID_BACKEND_API_SERVICE_FILEPATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'valid-backend-api.service.ts')
 VALID_IGNORED_SERVICE_PATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'valid_ignored.service.ts')
 VALID_UNLISTED_SERVICE_PATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'valid_unlisted.service.ts')
+
 
 class Ret:
     """Return object with required attributes."""
@@ -55,6 +58,18 @@ class Ret:
     def communicate(self) -> Tuple[str, bytes]:
         """Return some error."""
         return '', 'Some error'.encode('utf-8')
+
+
+class MockProcess:
+    """Mock process that properly simulates subprocess.Popen behavior."""
+
+    def __init__(self, returncode: int = 1) -> None:
+        self.returncode = returncode
+
+    def communicate(self) -> Tuple[bytes, bytes]:
+        """Return mock communication result with proper types."""
+        return b'', b'Some error'
+
 
 class JsTsLintTests(test_utils.LinterTestBase):
     """Tests for js_ts_linter file."""
@@ -69,12 +84,12 @@ class JsTsLintTests(test_utils.LinterTestBase):
         for stdout in lint_task_report:
             if stdout.failed:
                 for message in expected_messages:
-                    self.assertIn(message, stdout.trimmed_messages)
+                    self.assert_same_list_elements(
+                        [message], stdout.trimmed_messages)
                 self.assert_failed_messages_count(
                     stdout.get_report(), failed_count)
             else:
-                if failed_count == 0:
-                    self.assertFalse(stdout.failed)
+                continue
 
     def test_compile_all_ts_files_with_error(self) -> None:
         def mock_popen_error_call( # pylint: disable=unused-argument
@@ -122,11 +137,9 @@ class JsTsLintTests(test_utils.LinterTestBase):
     def test_third_party_linter_with_success_message(self) -> None:
         lint_task_report = js_ts_linter.ThirdPartyJsTsLintChecksManager(
             [VALID_TS_FILEPATH]).perform_all_lint_checks()
-        
-        # Verify no failures occurred
-        for result in lint_task_report:
-            # This test should pass with valid files
-            self.assertEqual(result.name, 'ESLint')
+        expected_messages = (
+            ['SUCCESS  ESLint check passed'])
+        self.validate(lint_task_report, expected_messages, 0)
 
     def test_custom_linter_with_no_files(self) -> None:
         lint_task_report = js_ts_linter.JsTsLintChecksManager(
@@ -213,10 +226,10 @@ class JsTsLintTests(test_utils.LinterTestBase):
         shutil.rmtree(
             js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
 
-        # Verify the test passed without errors
-        for result in lint_task_report:
-            if result.name == 'Angular Services Index file':
-                self.assertFalse(result.failed)
+        expected_messages = [
+            'SUCCESS  Angular Services Index file check passed'
+        ]
+        self.validate(lint_task_report, expected_messages, 0)
 
     def test_get_linters_with_success(self) -> None:
         custom_linter, third_party = js_ts_linter.get_linters(
@@ -228,33 +241,129 @@ class JsTsLintTests(test_utils.LinterTestBase):
                 third_party,
                 js_ts_linter.ThirdPartyJsTsLintChecksManager))
 
-    def test_eslint_output_trimming(self) -> None:
-        """Test the ESLint output trimming functionality."""
-        # Test with typical ESLint output format
-        eslint_output = """
-/path/to/file.ts
-  10:5  error  Missing semicolon  semi
-  15:12 error  Unused variable 'x'  @typescript-eslint/no-unused-vars
+    def test_eslint_integration_with_invalid_ts_file(self) -> None:
+        """Test ESLint integration using invalid.ts file (tests trimming through public interface)."""
+        mock_eslint_output = f"""
+    {INVALID_TS_FILEPATH}
+    25:3  error  Duplicate identifier 'duplicateVariable'  @typescript-eslint/no-redeclare
+    26:3  error  Duplicate identifier 'duplicateVariable'  @typescript-eslint/no-redeclare
+    24:3  error  'unusedVariable' is assigned a value but never used  @typescript-eslint/no-unused-vars
 
-✖ 2 problems (2 errors, 0 warnings)
-  1 error and 0 warnings potentially fixable with the `--fix` option.
+    ✖ 3 problems (3 errors, 0 warnings)
+    1 error and 0 warnings potentially fixable with the `--fix` option.
 
-"""
-        
-        trimmed = js_ts_linter.ThirdPartyJsTsLintChecksManager._get_trimmed_error_output(eslint_output)
-        
-        # Should remove summary lines and clean up error messages
-        self.assertNotIn('✖ 2 problems', trimmed)
-        self.assertNotIn('fixable with', trimmed)
-        self.assertIn('Missing semicolon', trimmed)
-        self.assertIn('Unused variable', trimmed)
+    """
 
-    def test_empty_eslint_output(self) -> None:
-        """Test handling of empty ESLint output."""
-        empty_output = ""
-        trimmed = js_ts_linter.ThirdPartyJsTsLintChecksManager._get_trimmed_error_output(empty_output)
-        self.assertEqual(trimmed, empty_output)
+        def mock_exists(unused_path: str) -> bool:
+            return True
 
-        whitespace_output = "   \n\n   "
-        trimmed = js_ts_linter.ThirdPartyJsTsLintChecksManager._get_trimmed_error_output(whitespace_output)
-        self.assertEqual(trimmed, whitespace_output)
+        def mock_popen(*args, **kwargs):  # pylint: disable=unused-argument
+            process = MockProcess(returncode=1)
+            process.communicate = lambda: (mock_eslint_output.encode('utf-8'), b'')
+            return process
+
+        exists_swap = self.swap(os.path, 'exists', mock_exists)
+        popen_swap = self.swap(subprocess, 'Popen', mock_popen)
+
+        with exists_swap, popen_swap:
+            lint_task_report = js_ts_linter.ThirdPartyJsTsLintChecksManager(
+                [INVALID_TS_FILEPATH]).perform_all_lint_checks()
+
+        self.assertTrue(lint_task_report[0].failed)
+        self.assertEqual(lint_task_report[0].name, 'ESLint')
+
+        trimmed_output = ''.join(lint_task_report[0].trimmed_messages)
+        # The 'error' keywords should be removed from lines with line numbers.
+        self.assertIn('25:3    Duplicate identifier', trimmed_output)
+        self.assertIn('26:3    Duplicate identifier', trimmed_output)
+        self.assertIn('24:3    \'unusedVariable\'', trimmed_output)
+        # Footer might not be removed if conditions aren't met exactly.
+        self.assertIn('Duplicate identifier', trimmed_output)
+
+    def test_eslint_integration_footer_removal_with_exact_conditions(self) -> None:
+        """Test ESLint footer removal with exact conditions through public interface."""
+        # Create output that meets ALL footer removal conditions exactly:
+        # 1. At least 4 lines
+        # 2. Last line is empty
+        # 3. Second to last line is empty
+        # 4. Third to last ends with '`--fix` option.'
+        # 5. Fourth to last starts with '\u2716'.
+        mock_eslint_output_lines = [
+            f'{INVALID_TS_FILEPATH}',
+            '  25:3  error  Duplicate identifier  @typescript-eslint/no-redeclare',
+            '  24:3  error  Variable never used  @typescript-eslint/no-unused-vars',
+            '\u2716 2 problems (2 errors, 0 warnings)',
+            '  1 error and 0 warnings potentially fixable with the `--fix` option.',
+            '',
+            '' 
+        ]
+        mock_eslint_output = '\n'.join(mock_eslint_output_lines)
+
+        def mock_exists(unused_path: str) -> bool:
+            return True
+
+        def mock_popen(*args, **kwargs):  # pylint: disable=unused-argument
+            process = MockProcess(returncode=1)
+            process.communicate = lambda: (mock_eslint_output.encode('utf-8'), b'')
+            return process
+
+        exists_swap = self.swap(os.path, 'exists', mock_exists)
+        popen_swap = self.swap(subprocess, 'Popen', mock_popen)
+
+        with exists_swap, popen_swap:
+            lint_task_report = js_ts_linter.ThirdPartyJsTsLintChecksManager(
+                [INVALID_TS_FILEPATH]).perform_all_lint_checks()
+
+        trimmed_output = ''.join(lint_task_report[0].trimmed_messages)
+        self.assertNotIn('\u2716 2 problems', trimmed_output)
+        self.assertNotIn('potentially fixable with the `--fix` option.', trimmed_output)
+        self.assertIn('25:3    Duplicate identifier', trimmed_output)
+        self.assertIn('24:3    Variable never used', trimmed_output)
+
+    def test_eslint_integration_no_footer_removal(self) -> None:
+        """Test ESLint when footer removal conditions are not met."""
+        mock_eslint_output = f"""
+    {INVALID_TS_FILEPATH}
+    25:3  error  Duplicate identifier  @typescript-eslint/no-redeclare
+    X 1 problem (1 error, 0 warnings)
+    """
+
+        def mock_exists(unused_path: str) -> bool:
+            return True
+
+        def mock_popen(*args, **kwargs):  # pylint: disable=unused-argument
+            process = MockProcess(returncode=1)
+            process.communicate = lambda: (mock_eslint_output.encode('utf-8'), b'')
+            return process
+
+        exists_swap = self.swap(os.path, 'exists', mock_exists)
+        popen_swap = self.swap(subprocess, 'Popen', mock_popen)
+
+        with exists_swap, popen_swap:
+            lint_task_report = js_ts_linter.ThirdPartyJsTsLintChecksManager(
+                [INVALID_TS_FILEPATH]).perform_all_lint_checks()
+
+        trimmed_output = ''.join(lint_task_report[0].trimmed_messages)
+        self.assertIn('X 1 problem', trimmed_output)
+        self.assertIn('25:3    Duplicate identifier', trimmed_output)
+
+    def test_eslint_integration_empty_output_simulation(self) -> None:
+        """Test ESLint with empty output through public interface."""
+        def mock_exists(unused_path: str) -> bool:
+            return True
+
+        def mock_popen(*args, **kwargs):  # pylint: disable=unused-argument
+            process = MockProcess(returncode=0)
+            process.communicate = lambda: (b'', b'')
+            return process
+
+        exists_swap = self.swap(os.path, 'exists', mock_exists)
+        popen_swap = self.swap(subprocess, 'Popen', mock_popen)
+
+        with exists_swap, popen_swap:
+            lint_task_report = js_ts_linter.ThirdPartyJsTsLintChecksManager(
+                [INVALID_TS_FILEPATH]).perform_all_lint_checks()
+
+        self.assertFalse(lint_task_report[0].failed)
+        self.assertEqual(lint_task_report[0].name, 'ESLint')
+        self.assertEqual(lint_task_report[0].trimmed_messages, [])

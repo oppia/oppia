@@ -47,6 +47,7 @@ INJECTABLES_TO_IGNORE: Final = [
     'CanAccessSplashPageGuard',
 ]
 
+
 def compile_all_ts_files() -> None:
     """Compiles all project typescript files into
     COMPILED_TYPESCRIPT_TMP_PATH. Previously, we only compiled
@@ -64,6 +65,7 @@ def compile_all_ts_files() -> None:
 
     if stderr:
         raise Exception(stderr)
+
 
 class JsTsLintChecksManager(linter_utils.BaseLinter):
     """Manages all the Js and Ts linting functions."""
@@ -183,6 +185,7 @@ class JsTsLintChecksManager(linter_utils.BaseLinter):
 
         return linter_stdout
 
+
 class ThirdPartyJsTsLintChecksManager(linter_utils.BaseLinter):
     """Manages all the third party JavaScript/TypeScript linting functions."""
 
@@ -210,9 +213,7 @@ class ThirdPartyJsTsLintChecksManager(linter_utils.BaseLinter):
         Returns:
             str. A string with the trimmed messages.
         """
-        if not eslint_output.strip():
-            return eslint_output
-            
+
         trimmed_error_messages = []
         # Extract the message from list and split the message by newline
         # so that we can use them and remove last four lines from the end.
@@ -221,7 +222,7 @@ class ThirdPartyJsTsLintChecksManager(linter_utils.BaseLinter):
         # Example: \u2716 2 problems (2 errors, 0 warnings)
         # 1 error and 0 warnings potentially fixable with the `--fix` option.
         eslint_output_lines = eslint_output.split('\n')
-        
+
         # Check if we have enough lines before accessing indices.
         if len(eslint_output_lines) >= 4:
             newlines_present = eslint_output_lines[-1] == '' and (
@@ -313,6 +314,7 @@ class ThirdPartyJsTsLintChecksManager(linter_utils.BaseLinter):
                     ['There are no JavaScript or Typescript files to lint.'])]
 
         return [self._lint_js_and_ts_files()]
+
 
 def get_linters(
     js_filepaths: List[str],
