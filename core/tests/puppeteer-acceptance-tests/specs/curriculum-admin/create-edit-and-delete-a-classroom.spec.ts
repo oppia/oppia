@@ -144,9 +144,9 @@ describe('Curriculum Admin', function () {
       'science',
       'Test Topic 1'
     );
-    await curriculumAdmin.clickOn('Change Order');
+    await curriculumAdmin.clickOnElementWithText('Change Order');
     await curriculumAdmin.moveClassroomInOrder(['Science', 'Math']);
-    await curriculumAdmin.clickOn('Save');
+    await curriculumAdmin.clickOnElementWithText('Save');
     await curriculumAdmin.expectClassroomsInOrder(['Science', 'Math']);
   });
 
