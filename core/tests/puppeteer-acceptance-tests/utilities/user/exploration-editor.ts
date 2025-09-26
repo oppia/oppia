@@ -6496,41 +6496,41 @@ export class ExplorationEditor extends BaseUser {
 
     // Add Bold text.
     await this.clickOnRTEOptionWithTitle('Bold');
-    await this.type(stateContentInputField, 'Bold text');
+    await this.typeInInputField(stateContentInputField, 'Bold text');
     await this.page.keyboard.press('Enter');
     await this.clickOnRTEOptionWithTitle('Bold');
 
     // Add Italic text.
     await this.clickOnRTEOptionWithTitle('Italic');
-    await this.type(stateContentInputField, 'Italic text');
+    await this.typeInInputField(stateContentInputField, 'Italic text');
     await this.page.keyboard.press('Enter');
     await this.clickOnRTEOptionWithTitle('Italic');
 
     // Add Numbered List.
     await this.clickOnRTEOptionWithTitle('Numbered List');
-    await this.type(stateContentInputField, 'Numbered List Item 1');
+    await this.typeInInputField(stateContentInputField, 'Numbered List Item 1');
     await this.page.keyboard.press('Enter');
-    await this.type(stateContentInputField, 'Numbered List Item 2');
+    await this.typeInInputField(stateContentInputField, 'Numbered List Item 2');
     await this.page.keyboard.press('Enter');
     await this.page.keyboard.press('Enter');
 
     // Add Bulleted List.
     await this.clickOnRTEOptionWithTitle('Bulleted List');
-    await this.type(stateContentInputField, 'Bulleted List Item 1');
+    await this.typeInInputField(stateContentInputField, 'Bulleted List Item 1');
     await this.page.keyboard.press('Enter');
-    await this.type(stateContentInputField, 'Bulleted List Item 2');
+    await this.typeInInputField(stateContentInputField, 'Bulleted List Item 2');
     await this.page.keyboard.press('Enter');
     await this.page.keyboard.press('Enter');
 
     // Add Pre formatted Text.
     await this.clickOnRTEOptionWithTitle('Pre');
-    await this.type(stateContentInputField, 'Pre formatted text');
+    await this.typeInInputField(stateContentInputField, 'Pre formatted text');
     await this.clickOnRTEOptionWithTitle('Pre');
     await this.page.keyboard.press('Enter');
 
     // Add Block Quote.
     await this.clickOnRTEOptionWithTitle('Block Quote');
-    await this.type(stateContentInputField, 'Block Quote text');
+    await this.typeInInputField(stateContentInputField, 'Block Quote text');
     await this.page.keyboard.press('Enter');
     await this.clickOnRTEOptionWithTitle('Block Quote');
 
