@@ -243,7 +243,7 @@ jobs:
           # core/tests/puppeteer-acceptance-tests/utilities/common/puppeteer-utils.ts
           path: /home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/diff-snapshots
 
-      - name: Upload desktop test recordings as Artifacts
+      - name: Upload desktop test recordings
         if: ${{ steps.desktop-test-attempt-1.outcome == 'failure' }}
         uses: actions/upload-artifact@v4
         with:
@@ -310,7 +310,7 @@ jobs:
           # core/tests/puppeteer-acceptance-tests/utilities/common/puppeteer-utils.ts
           path: /home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/diff-snapshots
 
-      - name: Upload mobile test recordings as Artifacts
+      - name: Upload mobile test recordings
         if: ${{ steps.mobile-test-attempt-1.outcome == 'failure' }}
         uses: actions/upload-artifact@v4
         with:
