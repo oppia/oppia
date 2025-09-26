@@ -1952,6 +1952,7 @@ export class CurriculumAdmin extends BaseUser {
             throw new Error('Delete button not found');
           }
 
+          await this.waitForElementToStabilize(confirmTopicDeletionButton);
           const confirmButton = await this.page.$(confirmTopicDeletionButton);
           if (confirmButton) {
             await this.waitForElementToBeClickable(confirmButton);
