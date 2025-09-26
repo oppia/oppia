@@ -12,9 +12,11 @@
           [attr.tabindex]="allowSolutionToBeCollapsed ? '0' : null"
           [attr.role]="allowSolutionToBeCollapsed ? 'button' : null"
           [attr.aria-expanded]="allowSolutionToBeCollapsed ? !isSolutionCollapsed : null"
+          [ngClass]="{'collapsed-title': allowSolutionToBeCollapsed && isSolutionCollapsed}"
           (keydown.enter)="allowSolutionToBeCollapsed ? changeSolutionState() : null"
           (keydown.space)="allowSolutionToBeCollapsed ? changeSolutionState() : null">
-    Solution
+    <span *ngIf="allowSolutionToBeCollapsed && isSolutionCollapsed">Solution (click to reveal)</span>
+    <span *ngIf="!allowSolutionToBeCollapsed || !isSolutionCollapsed">Solution</span>
     <i *ngIf="allowSolutionToBeCollapsed && isSolutionCollapsed" class="material-icons e2e-test-expand-workedexample icon-expand-workedexample">expand_more</i>
     <i *ngIf="allowSolutionToBeCollapsed && !isSolutionCollapsed" class="material-icons e2e-test-collapse-workedexample icon-collapse-workedexample">expand_less</i>
   </strong>
@@ -54,6 +56,10 @@
     display: flex;
     justify-content: space-between;
     margin-bottom: 10px;
+  }
+
+  .solution-title.collapsed-title {
+    margin-bottom: 0;
   }
 
   .icon-expand-workedexample, .icon-collapse-workedexample {

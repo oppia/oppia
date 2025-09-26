@@ -1,8 +1,8 @@
 <div class="stats-container" [hidden]="dataLoading">
   <div class="stats-contribution-type-mobile-container">
     <div class="dropdown-label">Type</div>
-    <div #mobileDropdown class="oppia-contribution-stats-type-selector-mobile-container e2e-test-topic-selector">
-      <div class="oppia-stats-type-selector-inner-container e2e-test-topic-selector-selected"
+    <div #mobileDropdown class="oppia-contribution-stats-type-selector-mobile-container e2e-test-topic-selector e2e-test-mobile-element">
+      <div class="oppia-stats-type-selector-inner-container e2e-test-topic-selector-selected e2e-test-mobile-element"
            (click)="toggleMobileDropdown()">
         {{selectedContributionType}}
         <span class="fas fa-sort-down oppia-contributions-dropdown-arrow"
@@ -28,8 +28,8 @@
     Explore the impact of your contributions!
   </div>
   <div class="stats-contribution-type-container">
-    <div #dropdown class="oppia-stats-type-selector-container e2e-test-topic-selector">
-      <div class="oppia-stats-type-selector-inner-container e2e-test-topic-selector-selected"
+    <div #dropdown class="oppia-stats-type-selector-container e2e-test-topic-selector e2e-test-desktop-element">
+      <div class="oppia-stats-type-selector-inner-container e2e-test-topic-selector-selected e2e-test-desktop-element"
            (click)="toggleDropdown()">
         {{selectedContributionType}}
         <span class="fas fa-caret-down oppia-stats-type-selector-inner-container-arrow"
@@ -89,12 +89,12 @@
       </table>
       <div *ngIf="type == 'translationContribution'"
            class="mobile-stats-page">
-        <div class="mobile-stats-data-container" *ngFor="let translationStat of translationStatByLanguageAndTopic.value.data.slice(translationStatByLanguageAndTopic.value.currentPageStartIndex, translationStatByLanguageAndTopic.value.currentPageStartIndex + ITEMS_PER_PAGE)">
+        <div class="mobile-stats-data-container e2e-test-mobile-stats-row" *ngFor="let translationStat of translationStatByLanguageAndTopic.value.data.slice(translationStatByLanguageAndTopic.value.currentPageStartIndex, translationStatByLanguageAndTopic.value.currentPageStartIndex + ITEMS_PER_PAGE)">
           <div class="mobile-stats-row">
             <div class="mobile-stats-name">
               <b>{{COLUMNS[type].months}}</b>
             </div>
-            <div>
+            <div class="e2e-test-mobile-stats-cell">
               {{translationStat.firstContributionDate}} - {{translationStat.lastContributionDate}}
             </div>
           </div>
@@ -102,7 +102,7 @@
             <div class="mobile-stats-name">
               <b>{{COLUMNS[type].topicNames}}</b>
             </div>
-            <div>
+            <div class="e2e-test-mobile-stats-cell">
               {{translationStat.topicName}}
             </div>
           </div>
@@ -110,7 +110,7 @@
             <div class="mobile-stats-name">
               <b>{{COLUMNS[type].acceptedCards}}</b>
             </div>
-            <div>
+            <div class="e2e-test-mobile-stats-cell">
               {{translationStat.acceptedCards}}
             </div>
           </div>
@@ -118,7 +118,7 @@
             <div class="mobile-stats-name">
               <b>{{COLUMNS[type].acceptedWordCount}}</b>
             </div>
-            <div>
+            <div class="e2e-test-mobile-stats-cell">
               {{translationStat.acceptedWordCount}}
             </div>
           </div>
@@ -126,13 +126,13 @@
       </div>
       <div *ngIf="type == 'translationReview'"
            class="mobile-stats-page">
-        <div class="mobile-stats-data-container"
+        <div class="mobile-stats-data-container e2e-test-mobile-stats-row"
              *ngFor="let translationStat of translationStatByLanguageAndTopic.value.data.slice(translationStatByLanguageAndTopic.value.currentPageStartIndex, translationStatByLanguageAndTopic.value.currentPageStartIndex + ITEMS_PER_PAGE)">
           <div class="mobile-stats-row">
             <div class="mobile-stats-name">
               <b>{{COLUMNS[type].months}}</b>
             </div>
-            <div>
+            <div class="e2e-test-mobile-stats-cell">
               {{translationStat.firstContributionDate}} - {{translationStat.lastContributionDate}}
             </div>
           </div>
@@ -140,7 +140,7 @@
             <div class="mobile-stats-name">
               <b>{{COLUMNS[type].topicNames}}</b>
             </div>
-            <div>
+            <div class="e2e-test-mobile-stats-cell">
               {{translationStat.topicName}}
             </div>
           </div>
@@ -148,7 +148,7 @@
             <div class="mobile-stats-name">
               <b>{{COLUMNS[type].reviewedCards}}</b>
             </div>
-            <div>
+            <div class="e2e-test-mobile-stats-cell">
               {{translationStat.reviewedCards}}
             </div>
           </div>
@@ -156,7 +156,7 @@
             <div class="mobile-stats-name">
               <b>{{COLUMNS[type].reviewedWordCount}}</b>
             </div>
-            <div>
+            <div class="e2e-test-mobile-stats-cell">
               {{translationStat.reviewedWordCount}}
             </div>
           </div>
@@ -164,7 +164,7 @@
             <div class="mobile-stats-name">
               <b>{{COLUMNS[type].acceptedCards}}</b>
             </div>
-            <div>
+            <div class="e2e-test-mobile-stats-cell">
               {{translationStat.acceptedCards}}
             </div>
           </div>
@@ -172,7 +172,7 @@
             <div class="mobile-stats-name">
               <b>{{COLUMNS[type].acceptedWordCount}}</b>
             </div>
-            <div>
+            <div class="e2e-test-mobile-stats-cell">
               {{translationStat.acceptedWordCount}}
             </div>
           </div>
@@ -252,13 +252,13 @@
       </table>
       <div *ngIf="type == 'questionContribution'"
            class="mobile-stats-page">
-        <div class="mobile-stats-data-container"
+        <div class="mobile-stats-data-container e2e-test-mobile-stats-row"
              *ngFor="let questionStat of statsData[type].data.slice(statsData[type].currentPageStartIndex, statsData[type].currentPageStartIndex + ITEMS_PER_PAGE)">
           <div class="mobile-stats-row">
             <div class="mobile-stats-name">
               <b>{{COLUMNS[type].months}}</b>
             </div>
-            <div>
+            <div class="e2e-test-mobile-stats-cell">
               {{questionStat.firstContributionDate}} - {{questionStat.lastContributionDate}}
             </div>
           </div>
@@ -266,7 +266,7 @@
             <div class="mobile-stats-name">
               <b>{{COLUMNS[type].topicNames}}</b>
             </div>
-            <div>
+            <div class="e2e-test-mobile-stats-cell">
               {{questionStat.topicName}}
             </div>
           </div>
@@ -274,7 +274,7 @@
             <div class="mobile-stats-name">
               <b>{{COLUMNS[type].acceptedQuestions}}</b>
             </div>
-            <div>
+            <div class="e2e-test-mobile-stats-cell">
               {{questionStat.acceptedQuestions}}
             </div>
           </div>
@@ -282,7 +282,7 @@
             <div class="mobile-stats-name">
               <b>{{COLUMNS[type].acceptedQuestionsWithoutEdits}}</b>
             </div>
-            <div>
+            <div class="e2e-test-mobile-stats-cell">
               {{questionStat.acceptedQuestionsWithoutEdits}}
             </div>
           </div>
@@ -290,13 +290,13 @@
       </div>
       <div *ngIf="type == 'questionReview'"
            class="mobile-stats-page">
-        <div class="mobile-stats-data-container"
+        <div class="mobile-stats-data-container e2e-test-mobile-stats-row"
              *ngFor="let questionStat of statsData[type].data.slice(statsData[type].currentPageStartIndex, statsData[type].currentPageStartIndex + ITEMS_PER_PAGE)">
           <div class="mobile-stats-row">
             <div class="mobile-stats-name">
               <b>{{COLUMNS[type].months}}</b>
             </div>
-            <div>
+            <div class="e2e-test-mobile-stats-cell">
               {{questionStat.firstContributionDate}} - {{questionStat.lastContributionDate}}
             </div>
           </div>
@@ -304,7 +304,7 @@
             <div class="mobile-stats-name">
               <b>{{COLUMNS[type].topicNames}}</b>
             </div>
-            <div>
+            <div class="e2e-test-mobile-stats-cell">
               {{questionStat.topicName}}
             </div>
           </div>
@@ -312,7 +312,7 @@
             <div class="mobile-stats-name">
               <b>{{COLUMNS[type].reviewedQuestions}}</b>
             </div>
-            <div>
+            <div class="e2e-test-mobile-stats-cell">
               {{questionStat.reviewedQuestions}}
             </div>
           </div>
@@ -320,7 +320,7 @@
             <div class="mobile-stats-name">
               <b>{{COLUMNS[type].acceptedQuestions}}</b>
             </div>
-            <div>
+            <div class="e2e-test-mobile-stats-cell">
               {{questionStat.acceptedQuestions}}
             </div>
           </div>
