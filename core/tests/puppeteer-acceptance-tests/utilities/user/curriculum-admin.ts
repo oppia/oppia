@@ -2755,7 +2755,9 @@ export class CurriculumAdmin extends TopicManager {
    */
   async navigateToSkillPreviewTab(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      if (!(await this.isElementVisible(navigationDropdown, true, 5000))) {
+      if (
+        !(await this.isElementVisible(navigationContainerSelector, true, 5000))
+      ) {
         await this.clickOn(mobileOptionsSelector);
       }
       const navDropdownElements = await this.page.$$(navigationDropdown);
