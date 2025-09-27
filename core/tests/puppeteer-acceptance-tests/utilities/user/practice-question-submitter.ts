@@ -140,7 +140,7 @@ export class PracticeQuestionSubmitter extends Contributor {
    * Function to select the difficulty level of the question to be suggested.
    * @param difficulty - The difficulty level of the question.
    */
-  async selectQuestionDifficulty(
+  async selectQuestionDifficultyInPracticeQuestionSubmittion(
     difficulty: 'Easy' | 'Medium' | 'Hard' = 'Medium'
   ): Promise<void> {
     await this.expectElementToBeVisible(
@@ -672,7 +672,9 @@ export class PracticeQuestionSubmitter extends Contributor {
     hint?: string
   ): Promise<void> {
     await this.suggestQuestionsForSkillandTopic(skill, topic);
-    await this.selectQuestionDifficulty(difficulty ?? 'Medium');
+    await this.selectQuestionDifficultyInPracticeQuestionSubmittion(
+      difficulty ?? 'Medium'
+    );
     await this.seedTextToQuestion(question);
     await this.addMultipleChoiceInteractionByQuestionSubmitter(
       multipleChoiceOptions ?? ['5', '-1', '6', '1.5']

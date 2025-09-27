@@ -3874,7 +3874,8 @@ export class TopicManager extends BaseUser {
   async openQuestionEditor(question: string): Promise<void> {
     const questionElement = await this.expectQuestionToBeVisible(question);
 
-    await this.clickOnElement(questionElement);
+    await this.waitForElementToStabilize(questionElement);
+    await questionElement.click();
     await this.expectElementToBeVisible(addQuestionButtonSelector, false);
   }
 
