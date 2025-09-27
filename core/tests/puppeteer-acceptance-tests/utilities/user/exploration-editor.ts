@@ -3037,7 +3037,7 @@ export class ExplorationEditor extends BaseUser {
 
     // Update correct response.
     await this.expectModalTitleToBe('Add Response');
-    await this.addResponseDetailsInResponseModal(feedback, nextCard);
+    await this.addResponseDetailsInResponseModal(feedback, nextCard, true);
   }
 
   /**
