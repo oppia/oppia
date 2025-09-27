@@ -3204,7 +3204,7 @@ export class LoggedOutUser extends BaseUser {
 
     const initialHeading = await this.page.$eval(
       practiceQuestionHeaderSelector,
-      el => el?.textContent?.trim() || ''
+      el => el?.textContent?.trim() ?? ''
     );
     try {
       await this.page.waitForSelector(nextCardButton, {timeout: 7000});
