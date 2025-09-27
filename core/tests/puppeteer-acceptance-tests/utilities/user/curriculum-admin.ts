@@ -895,7 +895,9 @@ export class CurriculumAdmin extends BaseUser {
       await this.page.waitForSelector('oppia-topic-editor-save-modal', {
         hidden: true,
       });
-      await this.openTopicEditor(topicName);
+      if (topicName) {
+        await this.openTopicEditor(topicName);
+      }
     } else {
       await this.clickOn(saveTopicButton);
 
