@@ -2295,14 +2295,6 @@ describe('New Conversation skin component', () => {
     expect(componentInstance.canWindowShowTwoCards()).toBeFalse();
   });
 
-  it('should show progress clearance message if service returns true', () => {
-    spyOn(
-      conversationFlowService,
-      'getShowProgressClearanceMessage'
-    ).and.returnValue(true);
-    expect(componentInstance.isProgressClearanceMessageShown()).toBeTrue();
-  });
-
   it('should check if displayed card was completed in previous session', () => {
     const prevStates = ['State1', 'State2'];
     const displayedCardMock = {

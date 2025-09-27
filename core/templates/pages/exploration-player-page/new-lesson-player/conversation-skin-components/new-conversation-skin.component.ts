@@ -621,10 +621,6 @@ export class NewConversationSkinComponent {
     );
   }
 
-  isProgressClearanceMessageShown(): boolean {
-    return this.conversationFlowService.getShowProgressClearanceMessage();
-  }
-
   // Returns whether the screen is wide enough to fit two
   // cards (e.g., the tutor and supplemental cards) side-by-side.
   canWindowShowTwoCards(): boolean {
