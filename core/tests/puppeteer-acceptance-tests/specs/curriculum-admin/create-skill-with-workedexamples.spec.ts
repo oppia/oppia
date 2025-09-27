@@ -68,6 +68,7 @@ describe('Curriculum Admin', function () {
       'Type the number three',
       '3'
     );
+    await curriculumAdmin.scrollToTopOfPage();
     await curriculumAdmin.expectScreenshotToMatch(
       'workedExampleLimitError',
       __dirname
