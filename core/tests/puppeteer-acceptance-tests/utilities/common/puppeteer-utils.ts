@@ -92,7 +92,6 @@ export class BaseUser {
    * This is a function that opens a new browser instance for the user.
    */
   async openBrowser(): Promise<Page> {
-    throw Error('Testing.');
     const args: string[] = [
       '--window-size=1920,1080',
       '--use-fake-ui-for-media-stream',
