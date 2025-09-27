@@ -88,6 +88,7 @@
 }
 
 .oppia-learner-group-learners-progress .learner-info img {
+  max-width: 20%;
   border-radius: 50%;
 }
 
@@ -125,6 +126,8 @@
 
 .learner-specific-progress-view-selectors .learner-info img {
   border-radius: 50%;
+  float: inline-start;
+  max-width: 20%;
 }
 
 .learner-specific-progress-view-selectors .back-to-all-learners-progress-button {
