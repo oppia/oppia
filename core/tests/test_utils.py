@@ -801,7 +801,7 @@ class ElasticSearchStub:
     # dictionaries and other types too.
     def mock_search(
         self,
-        query: Optional[Dict[str, Dict[str, Dict[str, Any]]]] = None,
+        body: Optional[Dict[str, Dict[str, Dict[str, Any]]]] = None,
         index: Optional[str] = None,
         size: Optional[int] = None,
         from_: Optional[int] = None
@@ -821,7 +821,7 @@ class ElasticSearchStub:
             AssertionError. The given arguments are not supported by this mock.
             elasticsearch.NotFoundError. The given index name was not found.
         """
-        assert query is not None
+        assert body is not None
         # "_all" and "" are special index names that are used to search across
         # all indexes. We do not allow their use.
         assert index not in ['_all', '']
@@ -839,8 +839,8 @@ class ElasticSearchStub:
                 result_docs.append(doc)
                 result_doc_ids.add(doc['id'])
 
-        filters = query['query']['bool']['filter']
-        terms = query['query']['bool']['must']
+        filters = body['query']['bool']['filter']
+        terms = body['query']['bool']['must']
 
         for f in filters:
             # For processing 'doc[k] in v', doc[k] can only be of type string if
