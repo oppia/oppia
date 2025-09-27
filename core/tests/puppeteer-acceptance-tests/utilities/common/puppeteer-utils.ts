@@ -39,6 +39,7 @@ const commonModalCancelBtnSelector = '.e2e-test-cancel-action-button';
 const uploadErrorMessageDivSelector = '.e2e-test-upload-error-message';
 const currentMatTabHeaderSelector = '.mat-tab-label-active';
 const actionStatusMessageSelector = '.e2e-test-status-message';
+const toastMessageSelector = '.e2e-test-toast-message';
 const warningToastMessageSelector = '.e2e-test-toast-warning-message';
 const warningToastCloseButtonSelector = '.e2e-test-close-toast-warning';
 
@@ -167,7 +168,7 @@ export class BaseUser {
           }
 
           const config = {
-            followNewTab: true,
+            followNewTab: false,
             fps: 25,
             ffmpeg_Path: null,
             // Below dimensions are of recorded video.
@@ -400,6 +401,24 @@ export class BaseUser {
   }
 
   /**
+   * Checks for a new page opened in the context of the current page.
+   * @param cotext - The context in which the new page is opened.
+   * @returns A promise that resolves to the new page.
+   */
+  async waitForNewPage(cotext: Page = this.page): Promise<Page> {
+    const pageTarget = cotext.target();
+    const newTarget = await this.browserObject.waitForTarget(
+      target => target.opener() === pageTarget
+    );
+    const newTabPage = await newTarget.page();
+    expect(newTabPage).toBeDefined();
+    if (!newTabPage) {
+      throw new Error('Failed to get new page opened.');
+    }
+    return newTabPage;
+  }
+
+  /**
    * The function coordinates user interactions with the selected modal.
    */
   async doWithinModal({
@@ -446,8 +465,8 @@ export class BaseUser {
       }
       throw error;
     }
-    showMessage(`Element (${selector}) is clickable, as expected.`);
   }
+
   /**
    * The function clicks the element using the text on the button.
    * @param selector The text of the button to click on.
@@ -483,6 +502,40 @@ export class BaseUser {
       await element.click();
       showMessage(`Element (selector: ${selector}) is clicked.`);
     }
+  }
+
+  /**
+   * Clicks on the element and returns a new page opened by the click.
+   * @param selector The selector of the element.
+   * @returns The new page opened by the click.
+   */
+  async clickOnElementAndGetNewPage(selector: string): Promise<Page> {
+    const newPagePromise: Promise<Page> = new Promise<Page>(resolve =>
+      this.browserObject.once('targetcreated', async target => {
+        const page = await target.page();
+        resolve(page);
+      })
+    );
+    await this.clickOn(selector);
+    const newPage = await newPagePromise;
+    return newPage;
+  }
+
+  /**
+   * Checks if the mat chip with the given text content is visible.
+   * @param textContent The text content of the mat chip.
+   * @returns The element handle of the mat chip.
+   */
+  async expectMatChipToBeVisible(
+    textContent: string
+  ): Promise<ElementHandle<Element>> {
+    const matChipElement = await this.page.waitForXPath(
+      `//mat-chip[contains(text(), '${textContent}')]`
+    );
+    if (!matChipElement) {
+      throw new Error(`Mat chip with text ${textContent} not found.`);
+    }
+    return matChipElement;
   }
 
   /**
@@ -586,6 +639,7 @@ export class BaseUser {
    */
   async type(selector: string, text: string): Promise<void> {
     await this.page.waitForSelector(selector, {visible: true});
+    await this.waitForElementToStabilize(selector);
     await this.waitForElementToBeClickable(selector);
     await this.page.type(selector, text);
   }
@@ -1114,6 +1168,16 @@ export class BaseUser {
   }
 
   /**
+   * Scrolls to the top of the page.
+   */
+  async scrollToTopOfPage(): Promise<void> {
+    await this.page.evaluate(() => {
+      window.scrollTo(0, 0);
+    });
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
    * Returns text in nested element
    * @param {string} selector - The selector of the element to get text from.
    */
@@ -1157,13 +1221,15 @@ export class BaseUser {
    * Verify that element is visilbe or not.
    * @param {string} selector - The selector of the element to get text from.
    * @param {boolean} visibility - Whether the element should be visible or not.
+   * @param {Page} context - The page on which the selector should be verified.
    */
   async expectElementToBeVisible(
     selector: string,
-    visibility: boolean = true
+    visibility: boolean = true,
+    context: Page = this.page
   ): Promise<void> {
     const options = visibility ? {visible: true} : {hidden: true};
-    await this.page.waitForSelector(selector, options);
+    await context.waitForSelector(selector, options);
     showMessage(`Element ${selector} is ${visibility ? 'visible' : 'hidden'}.`);
   }
 
@@ -1188,7 +1254,8 @@ export class BaseUser {
   }
 
   /**
-   * Verify text content inside an element
+   * Waits for the given element to be visible, and then checks if the text
+   * content matches the expected text.
    * @param {string} selector - The selector of the element to get text from.
    * @param {string} text - The expected text content.
    */
@@ -1214,7 +1281,8 @@ export class BaseUser {
       }, selector);
       error.message =
         `Text content of "${selector}" does not match the expected text.\n` +
-        `Expected: "${text}", Found: "${actualTextContent}"\n` +
+        `Expected: "${text}"\n` +
+        `Actual: "${actualTextContent}"\n` +
         'Original Error:\n' +
         error.message;
       throw error;
@@ -1315,8 +1383,8 @@ export class BaseUser {
     // Wait until the element value matches the expected value.
     try {
       await this.page.waitForFunction(
-        (element: HTMLElement, value: string) => {
-          return (element as HTMLInputElement)?.value?.trim() === value.trim();
+        (element: HTMLInputElement | HTMLTextAreaElement, value: string) => {
+          return element.value.trim() === value;
         },
         {},
         selector,
@@ -1411,24 +1479,6 @@ export class BaseUser {
       },
       {},
       url
-    );
-  }
-
-  /**
-   * Function to verify the value of the input field.
-   * @param {string} selector - The selector of the input field.
-   * @param {string} value - The expected value of the input field.
-   */
-  async expectInputValueToBe(selector: string, value: string): Promise<void> {
-    await this.page.waitForFunction(
-      (selector: string, value: string) => {
-        const element: HTMLInputElement | null =
-          document.querySelector(selector);
-        return element?.value === value;
-      },
-      {},
-      selector,
-      value
     );
   }
 
@@ -1681,6 +1731,29 @@ export class BaseUser {
   }
 
   /**
+   * Expects the text content of the toast message to match the given expected message.
+   * @param {string} expectedMessage - The expected message to match the toast message against.
+   */
+  async expectToastMessage(expectedMessage: string): Promise<void> {
+    await this.page.waitForSelector(toastMessageSelector, {visible: true});
+    const toastMessageElement = await this.page.$(toastMessageSelector);
+    const toastMessage = await this.page.evaluate(
+      el => el.textContent.trim(),
+      toastMessageElement
+    );
+
+    if (toastMessage !== expectedMessage) {
+      throw new Error(
+        `Expected toast message to be "${expectedMessage}", but it was "${toastMessage}".`
+      );
+    }
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.click(toastMessageSelector);
+    }
+    await this.expectElementToBeVisible(toastMessageSelector, false);
+  }
+
+  /**
    * Clicks on the button in the modal with the given title and action.
    * @param title - The title of the modal.
    * @param action - The action to click on the button in the modal.
@@ -1716,6 +1789,27 @@ export class BaseUser {
     );
   }
 
+  /**
+   * Clicks on the element with the given text.
+   * @param text The text of the element to click on.
+   */
+  async clickOnElementWithText(text: string): Promise<void> {
+    // Normalize-space is used to remove the extra spaces in the text.
+    // Check the documentation for the normalize-space function here :
+    // https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space.
+    const element = await this.page.waitForXPath(
+      `//*[contains(normalize-space(text()), normalize-space("${text}"))]`,
+      {timeout: 10000}
+    );
+
+    if (!element) {
+      throw new Error(`Element not found for text: ${text}`);
+    }
+    await this.waitForElementToStabilize(element);
+    await this.waitForElementToBeClickable(element);
+    await element.click();
+    showMessage(`Element (text: ${text}) is clicked.`);
+  }
   /**
    * Checks if the toast warning message matches the expected warning message.
    * @param {string} expectedWarningMessage - The expected warning message.

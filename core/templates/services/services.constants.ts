@@ -34,6 +34,8 @@ export const ServicesConstants = {
     BLOG_DASHBOARD: 'blog_dashboard',
     DIAGNOSTIC_TEST_PLAYER: 'diagnostic_test_player',
     STUDY_GUIDE_VIEWER: 'studyguide',
+    SUBTOPIC_PREVIEW: 'subtopic_preview',
+    SUBTOPIC_EDITOR: 'subtopic_editor',
     OTHER: 'other',
   },
 
