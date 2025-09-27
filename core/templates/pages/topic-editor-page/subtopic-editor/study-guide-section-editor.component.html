@@ -82,7 +82,7 @@
 
   <div *ngIf="isEditable && contentEditorIsOpen" class="section-content-part">
     <form class="d-flex align-items-center"
-           (submit)="saveSection(false)">
+          (submit)="saveSection(false)">
       <div class="oppia-rule-details-header">
         <strong>Section Content</strong>
         <schema-based-editor class="e2e-test-study-guide-section-content-rich-text-editor"
