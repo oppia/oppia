@@ -19,7 +19,7 @@
   <div class="oppia-opportunity-pagination-container" *ngIf="visibleOpportunities.length > 0">
     <div class="oppia-pagination-button-wrapper">
       <button *ngIf="activePageNumber > 1" type="button"
-              class="oppia-pagination-button"
+              class="oppia-pagination-button e2e-test-pagination-button-previous"
               (click)="gotoPage(activePageNumber - 1)"
               [disabled]="activePageNumber == 1">
         <span class="material-icons">navigate_before</span>Previous
@@ -27,7 +27,7 @@
     </div>
     <div class="oppia-pagination-button-wrapper">
       <button *ngIf="!userIsOnLastPage" type="button"
-              class="oppia-pagination-button"
+              class="oppia-pagination-button e2e-test-pagination-button-next"
               (click)="gotoPage(activePageNumber + 1)"
               [disabled]="loadingOpportunityData || userIsOnLastPage">
         Next<span class="material-icons">navigate_next</span>

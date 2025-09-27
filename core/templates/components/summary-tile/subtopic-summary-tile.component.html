@@ -1,5 +1,5 @@
 <div class="subtopic-card e2e-test-subtopic-tile"
-     (click)="openSubtopicPage()"
+     (click)="openSubtopicPage($event)"
      (keydown.enter)="openSubtopicPage()"
      [ngClass]="{'disabled-link': !classroomUrlFragment}"
      tabindex="0">
