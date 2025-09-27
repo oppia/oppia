@@ -1941,6 +1941,7 @@ export class BaseUser {
     if (!element) {
       throw new Error(`Element not found for text: ${text}`);
     }
+    await this.waitForElementToStabilize(element);
     await this.waitForElementToBeClickable(element);
     await element.click();
     showMessage(`Element (text: ${text}) is clicked.`);
