@@ -235,7 +235,7 @@ jobs:
           path: /home/runner/work/oppia/oppia_full_stack_test_failure_screenshots/acceptance
 
       - name: Upload desktop test diff screenshots
-        if: ${{ steps.desktop-test-attempt-1.outcome == 'failure' }}
+        if: ${{ failure() && steps.desktop-test-attempt-1.outcome == 'failure' }}
         uses: actions/upload-artifact@v4
         with:
           name: diff-snapshots-desktop-attempt-1-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
@@ -318,7 +318,7 @@ jobs:
           path: /home/runner/work/oppia/oppia_full_stack_test_video_recordings/acceptance
 
       - name: Re-run Mobile Acceptance Test to check flakiness for ${{ matrix.suite.name }}
-        if: ${{ steps.mobile-test-attempt-1.outcome == 'failure' }}
+        if: ${{ failure() && steps.mobile-test-attempt-1.outcome == 'failure' }}
         timeout-minutes: 30
         # We use xvfb-run to create a virtual screen to run tests without headless mode.
         # Numbers in 1920x1080x24 represents screen width, height and color depth respectively.
