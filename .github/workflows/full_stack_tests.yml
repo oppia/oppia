@@ -221,14 +221,14 @@ jobs:
           | tee desktop_acceptance_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
 
       - name: Upload desktop test logs
-        if: ${{ steps.desktop-test-attempt-1.outcome == 'failure' }}
+        if: ${{ failure() && steps.desktop-test-attempt-1.outcome == 'failure' }}
         uses: actions/upload-artifact@v4
         with:
           name: desktop-acceptance-test-logs-${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}
           path: desktop_acceptance_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
 
       - name: Upload desktop test failure screenshots
-        if: ${{ steps.desktop-test-attempt-1.outcome == 'failure' }}
+        if: ${{ failure() && steps.desktop-test-attempt-1.outcome == 'failure' }}
         uses: actions/upload-artifact@v4
         with:
           name: desktop-acceptance-test-failure-screenshot-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
@@ -244,14 +244,14 @@ jobs:
           path: /home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/diff-snapshots
 
       - name: Upload desktop test recordings
-        if: ${{ steps.desktop-test-attempt-1.outcome == 'failure' }}
+        if: ${{ failure() && steps.desktop-test-attempt-1.outcome == 'failure' }}
         uses: actions/upload-artifact@v4
         with:
           name: acceptance-test-video-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
           path: /home/runner/work/oppia/oppia_full_stack_test_video_recordings/acceptance
 
       - name: Re-run Desktop Acceptance Test to check flakiness for ${{ matrix.suite.name }}
-        if: ${{ steps.desktop-test-attempt-1.outcome == 'failure' }}
+        if: ${{ failure() && steps.desktop-test-attempt-1.outcome == 'failure' }}
         timeout-minutes: 30
         run: >
           set -o pipefail;
@@ -281,28 +281,28 @@ jobs:
           | tee mobile_acceptance_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
 
       - name: Upload mobile test logs
-        if: ${{ steps.mobile-test-attempt-1.outcome == 'failure' }}
+        if: ${{ failure() && steps.mobile-test-attempt-1.outcome == 'failure' }}
         uses: actions/upload-artifact@v4
         with:
           name: mobile-acceptance-test-logs-${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}
           path: mobile_acceptance_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
 
       - name: Upload mobile test recordings
-        if: ${{ steps.mobile-test-attempt-1.outcome == 'failure' }}
+        if: ${{ failure() && steps.mobile-test-attempt-1.outcome == 'failure' }}
         uses: actions/upload-artifact@v4
         with:
           name: mobile-acceptance-test-video-attempt-1-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
           path: /home/runner/work/oppia/oppia_full_stack_test_video_recordings/acceptance
 
       - name: Upload mobile test failure screenshots
-        if: ${{ steps.mobile-test-attempt-1.outcome == 'failure' }}
+        if: ${{ failure() && steps.mobile-test-attempt-1.outcome == 'failure' }}
         uses: actions/upload-artifact@v4
         with:
           name: mobile-acceptance-test-failure-screenshot-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
           path: /home/runner/work/oppia/oppia_full_stack_test_failure_screenshots/acceptance
 
       - name: Upload mobile test diff screenshots
-        if: ${{ steps.mobile-test-attempt-1.outcome == 'failure' }}
+        if: ${{ failure() && steps.mobile-test-attempt-1.outcome == 'failure' }}
         uses: actions/upload-artifact@v4
         with:
           name: diff-snapshots-mobile-attempt-1-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
@@ -311,7 +311,7 @@ jobs:
           path: /home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/diff-snapshots
 
       - name: Upload mobile test recordings
-        if: ${{ steps.mobile-test-attempt-1.outcome == 'failure' }}
+        if: ${{ failure() && steps.mobile-test-attempt-1.outcome == 'failure' }}
         uses: actions/upload-artifact@v4
         with:
           name: acceptance-test-video-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
@@ -331,14 +331,14 @@ jobs:
 
       # Upload other essential files.
       - name: Upload generated test to angular module mapping
-        if: ${{ steps.desktop-test-attempt-1.outcome == 'failure' || steps.mobile-test-attempt-1.outcome == 'failure' }}
+        if: ${{ failure() && (steps.desktop-test-attempt-1.outcome == 'failure' || steps.mobile-test-attempt-1.outcome == 'failure') }}
         uses: actions/upload-artifact@v4
         with:
           name: generated-test-to-angular-module-mapping-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
           path: /home/runner/work/oppia/oppia/core/tests/test-modules-mappings/acceptance/${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.txt
 
       - name: Upload webpack bundles
-        if: ${{ steps.desktop-test-attempt-1.outcome == 'failure' || steps.mobile-test-attempt-1.outcome == 'failure' }}
+        if: ${{ failure() && (steps.desktop-test-attempt-1.outcome == 'failure' || steps.mobile-test-attempt-1.outcome == 'failure') }}
         uses: actions/upload-artifact@v4
         with:
           name: webpack-bundles-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
