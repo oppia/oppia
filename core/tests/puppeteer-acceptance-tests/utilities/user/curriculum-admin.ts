@@ -876,7 +876,7 @@ export class CurriculumAdmin extends BaseUser {
    * Save a topic as a curriculum admin.
    * @param {string} topicName - The name of the Topic whose draft is to be saved.
    */
-  async saveTopicDraft(topicName: string): Promise<void> {
+  async saveTopicDraft(topicName?: string): Promise<void> {
     await this.page.waitForSelector(modalDiv, {hidden: true});
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileOptionsSelector);
