@@ -150,7 +150,7 @@ class Elasticsearch(object):
         self,
         *,
         index: Optional[Any] = ...,
-        query: Optional[Any] = ...,
+        body: Optional[Any] = ...,
         aggregations: Optional[Any] = ...,
         doc_type: Optional[Any] = ...,
         _source: Optional[Any] = ...,
