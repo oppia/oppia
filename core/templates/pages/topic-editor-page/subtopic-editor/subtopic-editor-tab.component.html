@@ -206,7 +206,11 @@
               </div>
               <button type="button"
                       class="btn btn-add-study-guide-section skill-editor-add-btn e2e-test-add-study-guide-section"
-                      (click)="openAddSectionModal()">
+                      [disabled]="activeSectionIndex!==-1"
+                      (click)="openAddSectionModal()"
+                      [matTooltip]="activeSectionIndex !== -1 ? 'Please close any open sections before adding a new one.' : ''"
+                      [matTooltipDisabled]="activeSectionIndex === -1"
+                      matTooltipPosition="below">
                 + ADD SECTION
               </button>
             </div>

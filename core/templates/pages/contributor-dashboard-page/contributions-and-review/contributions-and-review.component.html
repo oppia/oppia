@@ -2,7 +2,7 @@
   <div class="oppia-contributions-dropdown-section">
     <div class="dropdown-label">View</div>
     <div class="oppia-contributions-dropdown-container">
-      <div class="oppia-contributions-selection-container" (click)="toggleDropdown()">
+      <div class="oppia-contributions-selection-container e2e-test-mobile-contribution-dropdown" (click)="toggleDropdown()">
         {{ activeDropdownTabChoice }}
         <span class="fas fa-sort-down oppia-contributions-dropdown-arrow" [ngStyle]="{ 'transform': dropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
         </span>
@@ -13,7 +13,7 @@
              *ngIf="reviewTabs.length > 0">
           Available Tasks
         </div>
-        <div class="oppia-contributions-dropdown-list-option"
+        <div class="oppia-contributions-dropdown-list-option e2e-test-mobile-contribution-dropdown-option"
              *ngFor="let tab of reviewTabs"
              (click)="switchToTab(TAB_TYPE_REVIEWS, tab.tabSubType)"
              [ngClass]="isActiveTab(TAB_TYPE_REVIEWS, tab.tabSubType) ? 'oppia-contributions-dropdown-list-option-selected' : ''">
@@ -25,6 +25,7 @@
         </div>
         <div class="oppia-contributions-dropdown-list-option" *ngFor="let tab of contributionTabs">
           <div *ngIf="tab && tab.enabled"
+               class="e2e-test-mobile-contribution-dropdown-option"
                (click)="switchToTab(TAB_TYPE_CONTRIBUTIONS, tab.tabSubType)"
                [ngClass]="isActiveTab(TAB_TYPE_CONTRIBUTIONS, tab.tabSubType) ? 'oppia-contributions-dropdown-list-option-selected' : ''">
             {{ tab.text }}
@@ -36,6 +37,7 @@
         </div>
         <div class="oppia-contributions-dropdown-list-option" *ngFor="let tab of accomplishmentsTabs">
           <div *ngIf="tab && tab.enabled"
+               class="e2e-test-mobile-contribution-dropdown-option"
                (click)="switchToTab(TAB_TYPE_ACCOMPLISHMENTS, tab.tabSubType)"
                [ngClass]="isActiveTab(TAB_TYPE_ACCOMPLISHMENTS, tab.tabSubType) ? 'oppia-contributions-dropdown-list-option-selected' : ''">
             {{ tab.text }}
@@ -49,7 +51,7 @@
     <div class="oppia-contributions-side-navbar-part e2e-test-available-task-label" *ngIf="reviewTabs.length > 0" tabindex="0">
       <div class="oppia-contributions-navbar-items-list" navbar-label="Available Tasks" aria-label="Available tasks">
         <div class="oppia-contributions-navbar-item e2e-test-review-buttons" *ngFor="let tab of reviewTabs">
-          <button class="oppia-contributions-navbar-button"
+          <button class="oppia-contributions-navbar-button e2e-test-contribution-tab"
                   (click)="switchToTab(TAB_TYPE_REVIEWS, tab.tabSubType)"
                   [ngClass]="isActiveTab(TAB_TYPE_REVIEWS, tab.tabSubType) ? 'oppia-contributions-active-navbar' : ''">{{tab.text}}
           </button>
@@ -60,9 +62,9 @@
       <div class="oppia-contributions-navbar-items-list" navbar-label="Contributions" aria-label="Contributions">
         <div class="oppia-contributions-navbar-item" *ngFor="let tab of contributionTabs">
           <button *ngIf="tab && tab.enabled"
-                  class="oppia-contributions-navbar-button"
+                  class="oppia-contributions-navbar-button e2e-test-contribution-tab"
                   (click)="switchToTab(TAB_TYPE_CONTRIBUTIONS, tab.tabSubType)"
-                  [ngClass]="isActiveTab(TAB_TYPE_CONTRIBUTIONS, tab.tabSubType) ? 'oppia-contributions-active-navbar' : ''">{{tab.text}}
+                  [ngClass]="isActiveTab(TAB_TYPE_CONTRIBUTIONS, tab.tabSubType) ? 'oppia-contributions-active-navbar e2e-test-active' : ''">{{tab.text}}
           </button>
         </div>
       </div>
@@ -70,9 +72,9 @@
         <div class="oppia-contributions-navbar-items-list" navbar-label="Accomplishments" aria-label="Accomplishments">
           <div class="oppia-contributions-navbar-item" *ngFor="let tab of accomplishmentsTabs">
             <button *ngIf="tab && tab.enabled"
-                    class="oppia-contributions-navbar-button"
+                    class="oppia-contributions-navbar-button e2e-test-contribution-tab"
                     (click)="switchToTab(TAB_TYPE_ACCOMPLISHMENTS, tab.tabSubType)"
-                    [ngClass]="isActiveTab(TAB_TYPE_ACCOMPLISHMENTS, tab.tabSubType) ? 'oppia-contributions-active-navbar' : ''">{{tab.text}}
+                    [ngClass]="isActiveTab(TAB_TYPE_ACCOMPLISHMENTS, tab.tabSubType) ? 'oppia-contributions-active-navbar e2e-test-active' : ''">{{tab.text}}
             </button>
           </div>
         </div>
@@ -119,7 +121,7 @@
         <div *ngIf="isReviewTranslationsTab()" class="oppia-contributions-back-to-lessons-container">
           <button aria-label="Back to reviewable lessons"
                   (click)="onClickBackToReviewableLessons()"
-                  class="oppia-contributions-back-button mat-raised-button">
+                  class="oppia-contributions-back-button mat-raised-button e2e-test-back-to-lesson-button">
             <i class="fa fa-arrow-left oppia-vcenter arrow-left" aria-hidden="true"></i>
           </button>
           <div class="oppia-contributions-back-button-label">Back to lessons</div>

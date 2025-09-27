@@ -328,6 +328,10 @@ legend {
   padding: 6px 12px 6px 12px;
 }
 
+.study-guide-heading-field .form-control {
+  width: 100% !important;
+}
+
 .mb-3 select {
   margin-right: 5px;
 }

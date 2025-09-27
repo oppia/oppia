@@ -15,7 +15,8 @@
         No classroom exists at this moment.
       </em>
 
-      <div *ngFor="let classroom of classroomIdToClassroomNameIndex">
+      <div *ngFor="let classroom of classroomIdToClassroomNameIndex"
+           class="e2e-test-classroom-tile-container">
         <div class="oppia-classroom-tile e2e-test-classroom-tile"
              (click)="getClassroomData(classroom.classroom_id)">
           <span *ngIf="!(classroomEditorMode && classroom.key === tempClassroomData.getClassroomId())" class="e2e-test-classroom-tile-name">
@@ -36,7 +37,7 @@
           </button>
         </div>
 
-        <div class="classroom-details"
+        <div class="classroom-details e2e-test-classroom-details"
              *ngIf="classroomDetailsIsShown && tempClassroomData.getClassroomId() === classroom.classroom_id">
           <div *ngIf="classroomViewerMode">
             <i class="material-icons oppia-edit-icon e2e-test-edit-classroom-config-button"
@@ -51,7 +52,7 @@
               <strong>Name</strong>
             </span>
             <div class="classroom-field">
-              <span *ngIf="classroomViewerMode">
+              <span *ngIf="classroomViewerMode" class="e2e-test-classroom-name-view">
                 {{tempClassroomData.getClassroomName()}}
               </span>
               <input *ngIf="classroomEditorMode"
@@ -68,7 +69,7 @@
               <strong>URL Fragment</strong>
             </span>
             <div class="classroom-field">
-              <span *ngIf="classroomViewerMode">
+              <span *ngIf="classroomViewerMode" class="e2e-test-classroom-url-view">
                 {{tempClassroomData.getClassroomUrlFragment()}}
               </span>
               <input *ngIf="classroomEditorMode"
@@ -84,7 +85,7 @@
             <span class="col-lg-3 col-md-3 col-sm-3">
               <strong>Teaser Text</strong>
             </span>
-            <span *ngIf="classroomViewerMode" class="classroom-field">
+            <span *ngIf="classroomViewerMode" class="classroom-field e2e-test-classroom-teaser-view">
               {{ tempClassroomData.getTeaserText() }}
             </span>
             <textarea *ngIf="classroomEditorMode"
@@ -100,7 +101,7 @@
             <span class="col-lg-3 col-md-3 col-sm-3">
               <strong>Topic List Intro</strong>
             </span>
-            <span *ngIf="classroomViewerMode" class="classroom-field">
+            <span *ngIf="classroomViewerMode" class="classroom-field e2e-test-classroom-topic-list-intro-view">
                 {{tempClassroomData.getTopicListIntro()}}
             </span>
             <textarea *ngIf="classroomEditorMode"
@@ -116,7 +117,7 @@
             <span class="col-lg-3 col-md-3 col-sm-3">
               <strong>Course Details</strong>
             </span>
-            <span *ngIf="classroomViewerMode" class="classroom-field">
+            <span *ngIf="classroomViewerMode" class="classroom-field e2e-test-classroom-course-details-view">
               {{ tempClassroomData.getCourseDetails() }}
             </span>
             <textarea *ngIf="classroomEditorMode"
@@ -214,7 +215,7 @@
                  class="nav oppia-option-list nav-stacked nav-pills drag-and-drop-list">
 
               <div *ngFor="let topicName of topicNames"
-                   class="topic-dependency-container oppia-rule-block oppia-prevent-selection drag-and-drop-box"
+                   class="topic-dependency-container oppia-rule-block oppia-prevent-selection drag-and-drop-box e2e-test-classroom-topic-box"
                    cdkDrag
                    [cdkDragDisabled]="!classroomEditorMode">
 
@@ -223,10 +224,10 @@
                     <span *ngIf="classroomEditorMode"
                           class="fas fa-grip-vertical draggable-icon-indicator topic-drag-indicator">
                     </span>
-                    <span class="topics-name">
+                    <span class="topics-name e2e-test-classroom-topic-name">
                       <strong>{{ topicName }}</strong>
                     </span>
-                    <div class="prerequisite-topics-container">
+                    <div class="prerequisite-topics-container e2e-test-topic-prerquisites-container">
                       <div *ngIf="!classroomEditorMode">
                         <span *ngIf="getPrerequisiteLength(topicName) === 0">
                           <em>No Prerequisites</em>

@@ -308,7 +308,7 @@ export default {
         }
       },
       "default_value_obtainable_from_highlight": false,
-      "default_value": "You have revealed the answer for the worked example."
+      "default_value": ""
     }]
   }
 } as const;
