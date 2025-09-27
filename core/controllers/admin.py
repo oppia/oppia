@@ -1006,7 +1006,7 @@ class AdminHandler(
             if feature_flag_services.is_feature_flag_enabled(
                 feature_flag_list.FeatureNames
                 .SHOW_RESTRUCTURED_STUDY_GUIDES.value,
-                None
+                self.user_id
             ):
                 study_guide = (
                     study_guide_domain.StudyGuide.create_study_guide(
@@ -1093,7 +1093,7 @@ class AdminHandler(
             if feature_flag_services.is_feature_flag_enabled(
                 feature_flag_list.FeatureNames
                 .SHOW_RESTRUCTURED_STUDY_GUIDES.value,
-                None
+                self.user_id
             ):
                 study_guide_services.save_study_guide(
                     self.user_id, study_guide, 'Added study guide',
