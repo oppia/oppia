@@ -937,7 +937,8 @@ export class BaseUser {
   async expectScreenshotToMatch(
     imageName: string,
     testPath: string,
-    newPage?: Page
+    newPage: Page | undefined = undefined,
+    screenshotOptions: puppeteer.ScreenshotOptions = {}
   ): Promise<void> {
     const currentPage = typeof newPage !== 'undefined' ? newPage : this.page;
     await currentPage.mouse.move(0, 0);
@@ -978,7 +979,8 @@ export class BaseUser {
     }
 
     try {
-      expect(await currentPage.screenshot()).toMatchImageSnapshot({
+      const screenshot = await currentPage.screenshot(screenshotOptions);
+      expect(screenshot).toMatchImageSnapshot({
         failureThreshold: failureTrigger,
         failureThresholdType: 'percent',
         customSnapshotIdentifier: imageName,
