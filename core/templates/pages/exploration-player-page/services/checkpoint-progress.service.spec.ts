@@ -152,7 +152,9 @@ describe('CheckpointProgressService', () => {
     const checkpointIndexes = checkpointProgressService.getCheckpointStates();
 
     expect(checkpointIndexes).toEqual([1, 3]);
-    expect(checkpointIndexes).toEqual(checkpointIndexes.slice().sort());
+    expect(checkpointIndexes).toEqual(
+      checkpointIndexes.slice().sort((a, b) => a - b)
+    );
   });
 
   it('should return empty array if no checkpoints exist in getCheckpointStates', () => {

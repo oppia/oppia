@@ -55,7 +55,7 @@
   }
 
   .multiple-choice-option:hover .multiple-choice-inner-radio-button {
-    background-color: #ffffff;
+    background-color: #fff;
     border-radius: 50%;
     display: block;
     height: 8px;
@@ -65,9 +65,9 @@
 
   .multiple-choice-option:hover .multiple-choice-outer-radio-button {
     border-color: #115fd4;
-    box-shadow: 0px 0px 0px 8px rgba(80, 80, 200, 0.2);
+    box-shadow: 0 0 0 8px rgba(80, 80, 200, 0.2);
   }
-
+  
   .multiple-choice-option.selected:hover .multiple-choice-outer-radio-button {
     box-shadow: none;
   }
