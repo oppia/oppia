@@ -33,6 +33,27 @@ body:
         repository" or "Run backend associated test file check")
     validations:
       required: true
+  - type: dropdown
+    id: second-failure
+    attributes:
+      label: Did the test fail after an automatic rerun?
+      options:
+        - Test failed once but was not automatically re-run
+        - Test failed once and then passed after an automatic rerun
+        - Test failed once, was automatically re-run, and then failed again
+      multiple: false
+    validations:
+      required: true
+  - type: dropdown
+    id: desktop-or-mobile
+    attributes:
+      label: Did the test fail when running on desktop, mobile, or both?
+      options:
+        - Desktop
+        - Mobile
+      multiple: true
+    validations:
+      required: true
   - type: textarea
     id: logs
     attributes:
