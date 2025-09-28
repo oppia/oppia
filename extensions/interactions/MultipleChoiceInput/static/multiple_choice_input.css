@@ -46,6 +46,14 @@
   border-color: #115fd4;
 }
 
+button:focus {
+  outline: none;
+}
+
+button:focus-visible {
+  outline: 5px auto -webkit-focus-ring-color;
+}
+
 /* Hover pseudo-class should only be used in desktops because it
  * breaks functionality on mobile.
  */
