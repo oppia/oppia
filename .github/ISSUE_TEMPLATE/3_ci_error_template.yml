@@ -20,7 +20,7 @@ body:
       label: CI Test Type
       description: >
         In which CI test did this failure occur? For E2E or Acceptance test failures,
-        please use our dedicated template.
+        please use our dedicated template instead.
       options:
         - Frontend
         - Backend
