@@ -3220,7 +3220,9 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForFunction(
       (selector: string, heading: string) => {
         const element = document.querySelector(selector);
-        return element && element.textContent?.trim() !== heading;
+        // In case of last question, the element should be hidden,
+        // else it should have different heading.
+        return !element || element.textContent?.trim() !== heading;
       },
       {},
       practiceQuestionHeaderSelector,
