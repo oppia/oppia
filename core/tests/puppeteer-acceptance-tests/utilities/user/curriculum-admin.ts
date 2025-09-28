@@ -1232,7 +1232,6 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(expandedStudyGuideSectionTileContent, {
       visible: true,
     });
-    await this.scrollToBottomOfPage();
   }
 
   /**
