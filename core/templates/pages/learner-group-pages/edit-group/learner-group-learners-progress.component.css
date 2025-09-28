@@ -88,8 +88,8 @@
 }
 
 .oppia-learner-group-learners-progress .learner-info img {
-  max-width: 20%;
   border-radius: 50%;
+  max-width: 20%;
 }
 
 .learner-specific-progress-view-selectors {
