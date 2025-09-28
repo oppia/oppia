@@ -18,7 +18,10 @@
 
 import {SuperAdminFactory, SuperAdmin} from '../user/super-admin';
 import {BaseUserFactory, BaseUser} from './puppeteer-utils';
-import {TranslationAdminFactory} from '../user/translation-admin';
+import {
+  TranslationAdmin,
+  TranslationAdminFactory,
+} from '../user/translation-admin';
 import {LoggedOutUserFactory, LoggedOutUser} from '../user/logged-out-user';
 import {BlogAdminFactory, BlogAdmin} from '../user/blog-admin';
 import {QuestionAdminFactory} from '../user/question-admin';
@@ -33,9 +36,9 @@ import {
   CurriculumAdminFactory,
 } from '../user/curriculum-admin';
 import {
-  QuestionSubmitter,
+  PracticeQuestionSubmitter,
   QuestionSubmitterFactory,
-} from '../user/question-submitter';
+} from '../user/practice-question-submitter';
 import {TopicManager, TopicManagerFactory} from '../user/topic-manager';
 import {LoggedInUserFactory, LoggedInUser} from '../user/logged-in-user';
 import {ModeratorFactory} from '../user/moderator';
@@ -43,12 +46,25 @@ import {ReleaseCoordinatorFactory} from '../user/release-coordinator';
 import testConstants, {BLOG_RIGHTS} from './test-constants';
 import {showMessage} from './show-message';
 import {
+  TranslationSubmitter,
+  TranslationSubmitterFactory,
+} from '../user/translation-submitter';
+import {TranslationReviewerFactory} from '../user/translation-reviewer';
+import {Contributor, ContributorFactory} from '../user/contributor';
+import {
+  PracticeQuestionReviewer,
+  PracticeQuestionReviewerFactory,
+} from '../user/practice-question-reviewer';
+import {
+  VoiceoverSubmitter,
+  VoiceoverSubmitterFactory,
+} from '../user/voiceover-submitter';
+import {
   ContributorAdmin,
   ContributorAdminFactory,
 } from '../user/contributor-admin';
 import {TranslationCoordinatorFactory} from '../user/translation-coordinator';
 import {QuestionCoordinatorFactory} from '../user/practice-question-coordinator';
-import {VoiceoverSubmitterFactory} from '../user/voiceover-submitter';
 
 const ROLES = testConstants.Roles;
 const cookieBannerAcceptButton =
@@ -69,8 +85,14 @@ const USER_ROLE_MAPPING = {
   [ROLES.TOPIC_MANAGER]: TopicManagerFactory,
   [ROLES.MODERATOR]: ModeratorFactory,
   [ROLES.RELEASE_COORDINATOR]: ReleaseCoordinatorFactory,
+  [ROLES.TRANSLATION_REVIEWER]: TranslationReviewerFactory,
   [ROLES.VOICEOVER_SUBMITTER]: VoiceoverSubmitterFactory,
 } as const;
+
+const USERS_ROLES_NOT_REFLECTED_IN_ADMIN_PAGE: string[] = [
+  ROLES.TRANSLATION_REVIEWER,
+  ROLES.VOICEOVER_SUBMITTER,
+];
 
 /**
  * These types are used to create a union of all the roles and then
@@ -89,10 +111,24 @@ type MultipleRoleIntersection<T extends (keyof typeof USER_ROLE_MAPPING)[]> =
 type OptionalRoles<TRoles extends (keyof typeof USER_ROLE_MAPPING)[]> =
   TRoles extends never[] ? [] : TRoles | [];
 
+type BasicRolesUser = LoggedOutUser &
+  LoggedInUser &
+  ExplorationEditor &
+  PracticeQuestionSubmitter &
+  TopicManager &
+  CurriculumAdmin &
+  TranslationSubmitter &
+  Contributor &
+  ContributorAdmin &
+  PracticeQuestionReviewer &
+  VoiceoverSubmitter;
+
 /**
  * Global user instances that are created and can be reused again.
  */
-let superAdminInstance: (SuperAdmin & BlogAdmin & VoiceoverAdmin) | null = null;
+let superAdminInstance:
+  | (SuperAdmin & BlogAdmin & TranslationAdmin & VoiceoverAdmin)
+  | null = null;
 let activeUsers: BaseUser[] = [];
 
 export class UserFactory {
@@ -176,6 +212,18 @@ export class UserFactory {
             args
           );
           break;
+        case ROLES.TRANSLATION_REVIEWER:
+          await superAdminInstance.navigateToContributorDashboardAdminPage();
+          if (typeof args === 'string') {
+            args = [args];
+          }
+          for (const language of args as string[]) {
+            await superAdminInstance.addTranslationLanguageReviewRights(
+              user.username,
+              language
+            );
+          }
+          break;
         case ROLES.VOICEOVER_SUBMITTER:
           if (typeof args !== 'string') {
             throw new Error(
@@ -192,10 +240,9 @@ export class UserFactory {
           break;
       }
 
-      if (role !== ROLES.VOICEOVER_SUBMITTER) {
+      if (!USERS_ROLES_NOT_REFLECTED_IN_ADMIN_PAGE.includes(role)) {
         await superAdminInstance.expectUserToHaveRole(user.username, role);
       }
-
       UserFactory.composeUserWithRoles(user, [USER_ROLE_MAPPING[role]()]);
     }
 
@@ -239,16 +286,7 @@ export class UserFactory {
     email: string,
     roles: OptionalRoles<TRoles> = [] as OptionalRoles<TRoles>,
     args?: string | string[]
-  ): Promise<
-    LoggedOutUser &
-      LoggedInUser &
-      ExplorationEditor &
-      QuestionSubmitter &
-      TopicManager &
-      CurriculumAdmin &
-      ContributorAdmin &
-      MultipleRoleIntersection<TRoles>
-  > {
+  ): Promise<BasicRolesUser & MultipleRoleIntersection<TRoles>> {
     let user = UserFactory.composeUserWithRoles(BaseUserFactory(), [
       LoggedOutUserFactory(),
       LoggedInUserFactory(),
@@ -256,7 +294,10 @@ export class UserFactory {
       QuestionSubmitterFactory(),
       TopicManagerFactory(),
       CurriculumAdminFactory(),
+      TranslationSubmitterFactory(),
+      ContributorFactory(),
       ContributorAdminFactory(),
+      PracticeQuestionReviewerFactory(),
       VoiceoverSubmitterFactory(),
     ]);
 
@@ -267,7 +308,11 @@ export class UserFactory {
     await user.signUpNewUser(username, email);
     activeUsers.push(user);
 
-    return await UserFactory.assignRolesToUser(user, roles, args);
+    return (await UserFactory.assignRolesToUser(
+      user,
+      roles,
+      args
+    )) as BasicRolesUser & MultipleRoleIntersection<TRoles>;
   };
 
   /**
@@ -276,7 +321,7 @@ export class UserFactory {
    */
   static createNewSuperAdmin = async function (
     username: string
-  ): Promise<SuperAdmin & BlogAdmin & VoiceoverAdmin> {
+  ): Promise<SuperAdmin & BlogAdmin & TranslationAdmin & VoiceoverAdmin> {
     if (superAdminInstance !== null) {
       return superAdminInstance;
     }
@@ -289,10 +334,14 @@ export class UserFactory {
       SuperAdminFactory(),
     ]);
     await superAdmin.assignRoleToUser(username, ROLES.BLOG_ADMIN);
-    await superAdmin.assignRoleToUser(username, ROLES.VOICEOVER_ADMIN);
     await superAdmin.expectUserToHaveRole(username, ROLES.BLOG_ADMIN);
+    await superAdmin.assignRoleToUser(username, ROLES.TRANSLATION_ADMIN);
+    await superAdmin.expectUserToHaveRole(username, ROLES.TRANSLATION_ADMIN);
+    await superAdmin.assignRoleToUser(username, ROLES.VOICEOVER_ADMIN);
+    await superAdmin.expectUserToHaveRole(username, ROLES.VOICEOVER_ADMIN);
     superAdminInstance = UserFactory.composeUserWithRoles(superAdmin, [
       BlogAdminFactory(),
+      TranslationAdminFactory(),
       VoiceoverAdminFactory(),
     ]);
 
