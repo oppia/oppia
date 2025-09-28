@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import logging
 
-from core import feconf
 from core.domain import opportunity_services, state_domain
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
