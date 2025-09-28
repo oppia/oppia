@@ -1764,10 +1764,15 @@ export class ExplorationEditor extends BaseUser {
     interactionType: INTERACTION_TYPES,
     answer: string
   ): Promise<void> {
-    const responseModal = await this.getRuleEditorModal();
     switch (interactionType) {
       case INTERACTION_TYPES.NUMBER_INPUT:
-        (await responseModal.waitForSelector(floatFormInput))?.type(answer);
+        await this.waitForElementToStabilize(
+          `${responseModalBodySelector} ${floatFormInput}`
+        );
+        await this.typeInInputField(
+          `${responseModalBodySelector} ${floatFormInput}`,
+          answer
+        );
         break;
       case INTERACTION_TYPES.MULTIPLE_CHOICE:
         await this.page.waitForSelector(multipleChoiceResponseDropdown, {
