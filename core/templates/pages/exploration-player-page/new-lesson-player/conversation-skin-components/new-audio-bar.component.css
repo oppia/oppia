@@ -45,7 +45,7 @@
   color: #205d86;
   font-weight: 500;
   height: 28px;
-  width: 89px;
+  width: 145px;
 }
 
 .oppia-new-audio-header-control-buttons {
@@ -93,6 +93,10 @@ oppia-new-audio-bar .mobile-mode {
 }
 
 @media (max-width: 480px) {
+  .oppia-new-audio-header-select select {
+    width: 120px;
+  }
+
   oppia-new-audio-bar .desktop-mode {
     display: none;
   }
