@@ -32,6 +32,7 @@ from core.domain import (
     voiceover_regeneration_services,
 )
 from core.platform import models
+from core.storage.voiceover import gae_models
 
 from typing import Dict, List, Optional, Sequence, Tuple, cast
 
@@ -264,7 +265,7 @@ def compute_voiceover_related_change(
                         manual_voiceover_dict)
 
                     entity_voiceovers.voiceovers_mapping[content_id][
-                        feconf.VoiceoverType.MANUAL.value] = manual_voiceover
+                        'manual'] = manual_voiceover
 
             entity_voiceovers.validate()
             entity_voiceover_id_to_entity_voiceovers[entity_voiceover_id] = (
@@ -307,7 +308,10 @@ def compute_voiceover_related_change(
                 # static type checker that the 'voiceovers_mapping' value
                 # conforms to the specific nested dictionary structure required
                 # by the create_new() method.
-                entity_voiceovers_dict['voiceovers_mapping'],
+                cast(Dict[str, Dict[
+                    gae_models.VoiceoverTypeStr,
+                    Optional[state_domain.VoiceoverDict]
+                ]], entity_voiceovers_dict['voiceovers_mapping']),
                 entity_voiceovers_dict[
                     'automated_voiceovers_audio_offsets_msecs']
             )
@@ -416,7 +420,14 @@ def create_entity_voiceovers_model(
     language_accent_code = entity_voiceovers.language_accent_code
 
     entity_voiceovers_dict = entity_voiceovers.to_dict()
-    voiceovers_mapping = entity_voiceovers_dict['voiceovers_mapping']
+    # Here we use cast because the .to_dict() method returns a
+    # dictionary with a general value type. This cast assures the
+    # static type checker that the 'voiceovers_mapping' value
+    # conforms to the specific nested dictionary structure required
+    # by the create_new() method.
+    voiceovers_mapping = cast(Dict[str, Dict[
+        gae_models.VoiceoverTypeStr, Optional[state_domain.VoiceoverDict]
+    ]], entity_voiceovers_dict['voiceovers_mapping'])
     automated_voiceovers_audio_offsets_msecs_dict = entity_voiceovers_dict[
         'automated_voiceovers_audio_offsets_msecs']
 
@@ -911,7 +922,10 @@ def compute_voiceover_related_changes_upon_revert(
                 # static type checker that the 'voiceovers_mapping' value
                 # conforms to the specific nested dictionary structure required
                 # by the create_new() method.
-                entity_voiceovers_dict['voiceovers_mapping'],
+                cast(Dict[str, Dict[
+                    gae_models.VoiceoverTypeStr,
+                    Optional[state_domain.VoiceoverDict]
+                ]], entity_voiceovers_dict['voiceovers_mapping']),
                 entity_voiceovers_dict[
                     'automated_voiceovers_audio_offsets_msecs']
             )

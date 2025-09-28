@@ -24,8 +24,6 @@ import tempfile
 
 from core.tests import test_utils
 
-from typing import Dict, List, cast
-
 from . import python_linter, run_lint_checks
 
 LINTER_TESTS_DIR = os.path.join(os.getcwd(), 'scripts', 'linters', 'test_files')
@@ -58,11 +56,6 @@ class FakeClass:
         yield (name, name)"""
 
 NAME_SPACE = multiprocessing.Manager().Namespace()
-# Here we use cast because multiprocessing.Manager().dict() returns
-# a DictProxy, which is functionally equivalent to a standard Dict
-# but is not seen as type-compatible by MyPy. This tells the type
-# checker to treat it as the correct type for static analysis.
-PROCESSES = cast(Dict[str, List[str]], multiprocessing.Manager().dict())
 NAME_SPACE.files = run_lint_checks.FileCache()
 FILE_CACHE = NAME_SPACE.files
 
