@@ -48,7 +48,7 @@ export class CheckpointProgressService {
         checkpointIndexes.push(depthGraph[value.name]);
       }
     }
-    checkpointIndexes.sort();
+    checkpointIndexes.sort((a, b) => a - b);
     return checkpointIndexes;
   }
 
