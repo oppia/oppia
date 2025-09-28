@@ -1190,12 +1190,6 @@ export class CurriculumAdmin extends TopicManager {
     );
     await this.clickOn(addStudyGuideSectionModalContent);
     await this.page.waitForSelector(richTextAreaField, {visible: true});
-    // await this.typeInInputField(
-    //   richTextAreaField,
-    //   'This sentence is 84 characters long. Multiply it by 72 to get more than 6000 chars. '.repeat(
-    //     72
-    //   )
-    // );
     await this.page.evaluate(async textContent => {
       await navigator.clipboard.writeText(textContent);
     }, 'This sentence is 84 characters long. Multiply it by 72 to get more than 6000 chars. '.repeat(72));
