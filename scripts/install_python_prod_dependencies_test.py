@@ -27,7 +27,6 @@ import shutil
 import subprocess
 import sys
 
-from core import utils
 from core.tests import test_utils
 from scripts import common, install_python_prod_dependencies, scripts_test_utils
 
@@ -708,7 +707,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         library_name_pattern = re.compile(
             r'^[a-zA-Z0-9_.-]+(\[[^\[^\]]+\])*$|^\s*--hash=sha256:.*$|\\$'
         )
-        with utils.open_file(
+        with common.open_file(
             common.COMPILED_REQUIREMENTS_FILE_PATH, 'r') as f:
             lines = f.readlines()
             for line in lines:
@@ -829,7 +828,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         self
     ) -> None:
         normalized_library_names: Set[str] = set()
-        with utils.open_file(common.REQUIREMENTS_FILE_PATH, 'r') as f:
+        with common.open_file(common.REQUIREMENTS_FILE_PATH, 'r') as f:
             lines = f.readlines()
             for line in lines:
                 trimmed_line = line.strip()
@@ -849,7 +848,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         self
     ) -> None:
         normalized_library_names: Set[str] = set()
-        with utils.open_file(
+        with common.open_file(
             common.COMPILED_REQUIREMENTS_FILE_PATH, 'r') as f:
             lines = f.readlines()
             for line in lines:

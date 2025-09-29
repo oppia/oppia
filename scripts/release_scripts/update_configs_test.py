@@ -21,8 +21,8 @@ from __future__ import annotations
 import os
 import tempfile
 
-from core import utils
 from core.tests import test_utils
+from scripts import common
 from scripts.release_scripts import update_configs
 
 from typing import Final
@@ -63,7 +63,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             '# the existing storage models for UserStatsModel.\n'
             'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n' % (
                 mailgun_api_key, mailchimp_api_key))
-        with utils.open_file(temp_feconf_path, 'w') as f:
+        with common.open_file(temp_feconf_path, 'w') as f:
             f.write(feconf_text)
         update_configs.verify_config_files(
             temp_feconf_path, temp_app_yaml.name)
@@ -84,7 +84,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             'since it is used in\n'
             '# the existing storage models for UserStatsModel.\n'
             'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n')
-        with utils.open_file(temp_feconf_path, 'w') as f:
+        with common.open_file(temp_feconf_path, 'w') as f:
             f.write(feconf_text)
         update_configs.verify_config_files(
             temp_feconf_path, temp_app_yaml.name)
@@ -107,7 +107,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             '# the existing storage models for UserStatsModel.\n'
             'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n' % (
                 mailgun_api_key, mailchimp_api_key))
-        with utils.open_file(temp_feconf_path, 'w') as f:
+        with common.open_file(temp_feconf_path, 'w') as f:
             f.write(feconf_text)
         with self.assertRaisesRegex(
             Exception, 'REDISHOST must be updated before deployment.'
@@ -133,7 +133,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             '# the existing storage models for UserStatsModel.\n'
             'DASHBOARD_STATS_DATETIME_STRING_FORMAT = \'YY-mm-dd\'\n' % (
                 mailgun_api_key, mailchimp_api_key))
-        with utils.open_file(temp_feconf_path, 'w') as f:
+        with common.open_file(temp_feconf_path, 'w') as f:
             f.write(feconf_text)
         app_yaml_text = (
             '- url: /assets\n'
@@ -143,7 +143,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             '    Access-Control-Allow-Origin: "*"\n'
             '  expiration: "0"'
         )
-        with utils.open_file(temp_app_yaml_path, 'w') as f:
+        with common.open_file(temp_app_yaml_path, 'w') as f:
             f.write(app_yaml_text)
         with self.assertRaisesRegex(
             Exception,
@@ -157,7 +157,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         temp_feconf_config_path = tempfile.NamedTemporaryFile().name
         temp_app_yaml_path = tempfile.NamedTemporaryFile().name
         feconf_config_text = 'OPPIA_SITE_URL = \'https://oppia.org\'\n'
-        with utils.open_file(temp_feconf_config_path, 'w') as f:
+        with common.open_file(temp_feconf_config_path, 'w') as f:
             f.write(feconf_config_text)
 
         app_yaml_text = (
@@ -168,13 +168,13 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             '    Access-Control-Allow-Origin: "*"\n'
             '  expiration: "0"'
         )
-        with utils.open_file(temp_app_yaml_path, 'w') as f:
+        with common.open_file(temp_app_yaml_path, 'w') as f:
             f.write(app_yaml_text)
 
         update_configs.update_app_yaml(
             temp_app_yaml_path, temp_feconf_config_path)
 
-        with utils.open_file(temp_app_yaml_path, 'r') as f:
+        with common.open_file(temp_app_yaml_path, 'r') as f:
             app_yaml_text = f.read()
             self.assertIn(
                 'Access-Control-Allow-Origin: https://oppia.org', app_yaml_text)
@@ -185,7 +185,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         temp_feconf_config_path = tempfile.NamedTemporaryFile().name
         temp_app_yaml_path = tempfile.NamedTemporaryFile().name
         feconf_config_text = 'OPPIA_SiTe_URL = \'https://oppia.org\'\n'
-        with utils.open_file(temp_feconf_config_path, 'w') as f:
+        with common.open_file(temp_feconf_config_path, 'w') as f:
             f.write(feconf_config_text)
 
         app_yaml_text = (
@@ -196,7 +196,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             '    Access-Control-Allow-Origin: "*"\n'
             '  expiration: "0"'
         )
-        with utils.open_file(temp_app_yaml_path, 'w') as f:
+        with common.open_file(temp_app_yaml_path, 'w') as f:
             f.write(app_yaml_text)
 
         with self.assertRaisesRegex(
@@ -226,7 +226,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
                 FECONF_CONFIG_PATH_WITH_EXTRA_LINE, update_configs.FECONF_REGEX)
 
     def test_changes_are_applied_to_config(self) -> None:
-        with utils.open_file(MOCK_LOCAL_FECONF_PATH, 'r') as f:
+        with common.open_file(MOCK_LOCAL_FECONF_PATH, 'r') as f:
             original_text = f.read()
         expected_text = original_text.replace(
             'ADMIN_EMAIL_ADDRESS = \'\'',
@@ -236,10 +236,10 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
                 MOCK_LOCAL_FECONF_PATH,
                 VALID_FECONF_CONFIG_PATH,
                 update_configs.FECONF_REGEX)
-            with utils.open_file(MOCK_LOCAL_FECONF_PATH, 'r') as f:
+            with common.open_file(MOCK_LOCAL_FECONF_PATH, 'r') as f:
                 self.assertEqual(f.read(), expected_text)
         finally:
-            with utils.open_file(MOCK_LOCAL_FECONF_PATH, 'w') as f:
+            with common.open_file(MOCK_LOCAL_FECONF_PATH, 'w') as f:
                 f.write(original_text)
 
     def test_function_calls_without_prompt_for_feconf_and_terms_update(
@@ -331,16 +331,16 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             '  "SITE_NAME_FOR_ANALYTICS": "site-name"\n'
             '  "CAN_SEND_ANALYTICS_EVENTS": true\n'
         )
-        with utils.open_file(temp_constants_path, 'w') as f:
+        with common.open_file(temp_constants_path, 'w') as f:
             f.write(constants_text)
-        with utils.open_file(temp_analytics_constants_config_path, 'w') as f:
+        with common.open_file(temp_analytics_constants_config_path, 'w') as f:
             f.write(analytics_constants_config_text)
 
         update_configs.update_analytics_constants_based_on_config(
             temp_analytics_constants_config_path,
             temp_constants_path
         )
-        with utils.open_file(temp_analytics_constants_config_path, 'r') as f:
+        with common.open_file(temp_analytics_constants_config_path, 'r') as f:
             self.assertEqual(f.read(), expected_analytics_constants_config_text)
 
     def test_raises_error_with_invalid_update_analytics_ids(self) -> None:
@@ -354,7 +354,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             '  "SITE_NAME_FOR_ANALYTICS": ""\n'
             '  "CAN_SEND_ANALYTICS_EVENTS": false\n'
         )
-        with utils.open_file(temp_analytics_constants_config_path, 'w') as f:
+        with common.open_file(temp_analytics_constants_config_path, 'w') as f:
             f.write(analytics_constants_config_text)
 
         # Testing invalid GA_ANALYTICS_ID key.
@@ -364,7 +364,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             '  "SITE_NAME_FOR_ANALYTICS": "site-name"\n'
             '  "CAN_SEND_ANALYTICS_EVENTS": true\n'
         )
-        with utils.open_file(temp_constants_path, 'w') as f:
+        with common.open_file(temp_constants_path, 'w') as f:
             f.write(constants_text)
         with self.assertRaisesRegex(
             Exception, 'Error: No GA_ANALYTICS_ID key found.'
@@ -381,7 +381,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             '  "SITE_NAME_FOR_ANALYTICS": "site-name"\n'
             '  "CAN_SEND_ANALYTICS_EVENTS": true\n'
         )
-        with utils.open_file(temp_constants_path, 'w') as f:
+        with common.open_file(temp_constants_path, 'w') as f:
             f.write(constants_text)
         with self.assertRaisesRegex(
             Exception, 'Error: No GTM_ANALYTICS_ID key found.'
@@ -398,7 +398,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             '  "SITE_name_for_ANALYTICS": "site-name"\n'
             '  "CAN_SEND_ANALYTICS_EVENTS": true\n'
         )
-        with utils.open_file(temp_constants_path, 'w') as f:
+        with common.open_file(temp_constants_path, 'w') as f:
             f.write(constants_text)
         with self.assertRaisesRegex(
             Exception, 'Error: No SITE_NAME_FOR_ANALYTICS key found.'
@@ -415,7 +415,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             '  "SITE_NAME_FOR_ANALYTICS": "site-name"\n'
             '  "can_SEND_analytics_EVENTS": true\n'
         )
-        with utils.open_file(temp_constants_path, 'w') as f:
+        with common.open_file(temp_constants_path, 'w') as f:
             f.write(constants_text)
         with self.assertRaisesRegex(
             Exception, 'Error: No CAN_SEND_ANALYTICS_EVENTS key found.'

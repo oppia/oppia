@@ -1474,3 +1474,37 @@ class UrlRetrieveTests(CommonTests):
                     'https://example.com', output_path, enforce_https=False)
             with open(output_path, 'rb') as buffer:
                 self.assertEqual(buffer.read(), b'content')
+
+    def test_open_file(self) -> None:
+        with common.open_file(
+            os.path.join('scripts', 'common.py'), 'r'
+        ) as f:
+            file_content = f.readlines()
+            self.assertIsNotNone(file_content)
+
+    def test_cannot_open_file(self) -> None:
+        with self.assertRaisesRegex(
+            FileNotFoundError,
+            'No such file or directory: \'invalid_file.py\''
+        ):
+            with common.open_file('invalid_file.py', 'r') as f:
+                f.readlines()
+
+    def test_partition(self) -> None:
+        is_even = lambda n: (n % 2) == 0
+
+        evens, odds = (
+            common.partition([10, 8, 1, 5, 6, 4, 3, 7], predicate=is_even))
+
+        self.assertEqual(list(evens), [10, 8, 6, 4])
+        self.assertEqual(list(odds), [1, 5, 3, 7])
+
+    def test_enumerated_partition(self) -> None:
+        logs = ['ERROR: foo', 'INFO: bar', 'INFO: fee', 'ERROR: fie']
+        is_error = lambda msg: msg.startswith('ERROR: ')
+
+        errors, others = (
+            common.partition(logs, predicate=is_error, enumerated=True))
+
+        self.assertEqual(list(errors), [(0, 'ERROR: foo'), (3, 'ERROR: fie')])
+        self.assertEqual(list(others), [(1, 'INFO: bar'), (2, 'INFO: fee')])

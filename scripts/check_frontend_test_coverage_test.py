@@ -21,8 +21,8 @@ import os
 import subprocess
 import sys
 
-from core import utils
 from core.tests import test_utils
+from scripts import common
 
 from typing import Dict, List, Literal, Optional
 
@@ -68,7 +68,7 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
             self.check_function_calls['check_call_is_called'] = True
 
         self.open_file_swap = self.swap(
-            utils, 'open_file', mock_open_file
+            common, 'open_file', mock_open_file
         )
         self.exists_swap = self.swap(os.path, 'exists', mock_exists)
         self.print_swap = self.swap(builtins, 'print', mock_print)

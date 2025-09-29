@@ -50,7 +50,6 @@ if not feconf.OPPIA_IS_DOCKERIZED:
 from . import clean  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
-from core import utils  # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
 from scripts import install_dependencies_json_packages  # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
 from scripts import install_python_prod_dependencies  # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
 
@@ -77,7 +76,7 @@ def make_google_module_importable_by_python(google_module_path: str) -> None:
     for path_list in os.walk(google_module_path):
         root_path = path_list[0]
         if not root_path.endswith('__pycache__'):
-            with utils.open_file(
+            with common.open_file(
                 os.path.join(root_path, '__init__.py'), 'a'):
                 # If the file doesn't exist, it is created. If it does exist,
                 # this open does nothing.

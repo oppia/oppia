@@ -63,7 +63,6 @@ import subprocess
 import sys
 import threading
 
-from core import utils
 from scripts import common
 
 from typing import Dict, List, Optional, Set, Tuple, cast
@@ -129,9 +128,9 @@ class FileCache:
 
     def __init__(self) -> None:
         self._CACHE_DATA_DICT: Dict[
-            Tuple[str, utils.TextModeTypes], Tuple[str, Tuple[str, ...]]] = {}
+            Tuple[str, common.TextModeTypes], Tuple[str, Tuple[str, ...]]] = {}
 
-    def read(self, filepath: str, mode: utils.TextModeTypes = 'r') -> str:
+    def read(self, filepath: str, mode: common.TextModeTypes = 'r') -> str:
         """Returns the data read from the file in unicode form.
 
         Args:
@@ -146,7 +145,7 @@ class FileCache:
     def readlines(
         self,
         filepath: str,
-        mode: utils.TextModeTypes = 'r'
+        mode: common.TextModeTypes = 'r'
     ) -> Tuple[str, ...]:
         """Returns the tuple containing data line by line as read from the
         file in unicode form.
@@ -165,7 +164,7 @@ class FileCache:
     def _get_data(
         self,
         filepath: str,
-        mode: utils.TextModeTypes
+        mode: common.TextModeTypes
     ) -> Tuple[str, Tuple[str, ...]]:
         """Returns the collected data from the file corresponding to the given
         filepath.
@@ -181,7 +180,7 @@ class FileCache:
         """
         key = (filepath, mode)
         if key not in self._CACHE_DATA_DICT:
-            with utils.open_file(filepath, mode, newline='') as f:
+            with common.open_file(filepath, mode, newline='') as f:
                 lines = f.readlines()
                 self._CACHE_DATA_DICT[key] = (''.join(lines), tuple(lines))
         return self._CACHE_DATA_DICT[key]

@@ -44,8 +44,6 @@ from typing import Dict, Final, Generator, List, Optional, Tuple, Union
 _THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
 sys.path.insert(0, _THIRD_PARTY_PATH)
 
-from core import utils  # pylint: disable=wrong-import-position
-
 AFFIRMATIVE_CONFIRMATIONS = ['y', 'ye', 'yes']
 
 CURRENT_PYTHON_BIN = sys.executable
@@ -215,6 +213,9 @@ PORTS_USED_BY_OPPIA_PROCESSES_IN_LOCAL_E2E_TESTING: Final = [
     GAE_PORT_FOR_E2E_TESTING,
     ELASTICSEARCH_SERVER_PORT,
 ]
+
+TextModeTypes = Literal['r', 'w', 'a', 'x', 'r+', 'w+', 'a+']
+BinaryModeTypes = Literal['rb', 'wb', 'ab', 'xb', 'r+b', 'w+b', 'a+b', 'x+b']
 
 
 def is_windows_os() -> bool:
@@ -577,7 +578,7 @@ def create_readme(dir_path: str, readme_content: str) -> None:
             be created.
         readme_content: str. The content to be written in the README.
     """
-    with utils.open_file(os.path.join(dir_path, 'README.md'), 'w') as f:
+    with open_file(os.path.join(dir_path, 'README.md'), 'w') as f:
         f.write(readme_content)
 
 
@@ -612,14 +613,14 @@ def inplace_replace_file(
     total_number_of_replacements = 0
     try:
         regex = re.compile(regex_pattern)
-        with utils.open_file(filename, 'r') as old_file:
+        with open_file(filename, 'r') as old_file:
             for line in old_file:
                 new_line, number_of_replacements = regex.subn(
                     replacement_string, line)
                 new_contents.append(new_line)
                 total_number_of_replacements += number_of_replacements
 
-        with utils.open_file(new_filename, 'w') as new_file:
+        with open_file(new_filename, 'w') as new_file:
             for line in new_contents:
                 new_file.write(line)
 
@@ -986,3 +987,89 @@ def start_subprocess_for_result(cmd: List[str]) -> Tuple[bytes, bytes]:
         cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = task.communicate()
     return out, err
+
+
+def open_file(
+    filename: str,
+    mode: Union[TextModeTypes, BinaryModeTypes],
+    encoding: Union[str, None] = 'utf-8',
+    newline: Union[str, None] = None
+) -> Union[BinaryIO, TextIO]:
+    """Open file and return a corresponding file object.
+
+    Args:
+        filename: str. The file to be opened.
+        mode: Literal. Mode in which the file is opened.
+        encoding: str. Encoding in which the file is opened.
+        newline: None|str. Controls how universal newlines work.
+
+    Returns:
+        IO[Any]. The file object.
+
+    Raises:
+        FileNotFoundError. The file cannot be found.
+    """
+    # Here we use cast because we are narrowing down the type from IO[Any]
+    # to Union[BinaryIO, TextIO].
+    file = cast(
+        Union[BinaryIO, TextIO],
+        open(filename, mode, encoding=encoding, newline=newline)
+    )
+    return file
+
+
+def partition(
+    iterable: Iterable[T],
+    predicate: Callable[..., bool] = bool,
+    enumerated: bool = False
+) -> Tuple[
+        Iterable[Union[T, Tuple[int, T]]],
+        Iterable[Union[T, Tuple[int, T]]]]:
+    """Returns two generators which split the iterable based on the predicate.
+
+    NOTE: The predicate is called AT MOST ONCE per item.
+
+    Example:
+        is_even = lambda n: (n % 2) == 0
+        evens, odds = partition([10, 8, 1, 5, 6, 4, 3, 7], is_even)
+        assert list(evens) == [10, 8, 6, 4]
+        assert list(odds) == [1, 5, 3, 7]
+
+
+        logs = ['ERROR: foo', 'INFO: bar', 'INFO: fee', 'ERROR: fie']
+        is_error = lambda msg: msg.startswith('ERROR: ')
+        errors, others = partition(logs, is_error, enumerated=True)
+
+        for i, error in errors:
+            raise Exception('Log index=%d failed for reason: %s' % (i, error))
+        for i, message in others:
+            logging.info('Log index=%d: %s' % (i, message))
+
+    Args:
+        iterable: iterable. Any kind of iterable object.
+        predicate: callable. A function which accepts an item and returns True
+            or False.
+        enumerated: bool. Whether the partitions should include their original
+            indices.
+
+    Returns:
+        tuple(iterable, iterable). Two distinct generators. The first generator
+        will hold values which passed the predicate. The second will hold the
+        values which did not. If enumerated is True, then the generators will
+        yield (index, item) pairs. Otherwise, the generators will yield items by
+        themselves.
+    """
+    if enumerated:
+        new_iterable: Iterable[Union[T, Tuple[int, T]]] = enumerate(
+            iterable)
+        old_predicate = predicate
+        predicate = lambda pair: old_predicate(pair[1])
+    else:
+        new_iterable = iterable
+
+    # Creates two distinct generators over the same iterable. Memory-efficient.
+    true_part, false_part = itertools.tee(
+        (i, predicate(i)) for i in new_iterable)
+    return (
+        (i for i, predicate_is_true in true_part if predicate_is_true),
+        (i for i, predicate_is_true in false_part if not predicate_is_true))
