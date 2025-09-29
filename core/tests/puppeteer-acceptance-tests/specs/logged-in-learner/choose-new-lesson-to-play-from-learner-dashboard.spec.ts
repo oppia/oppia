@@ -111,6 +111,12 @@ describe('Logged-In Learner', function () {
 
   it('should be able add a goal', async function () {
     await loggedInLearner.navigateToLearnerDashboardUsingProfileDropdown();
+    await loggedInLearner.expectLearnSomethingNewSectionInRedesignedDashboardToBePresent();
+    await loggedInLearner.expectContinueWhereYouLeftOffSectionInLDToBePresent(
+      false
+    );
+    await loggedInLearner.navigateToProgressSection();
+    await loggedInLearner.expectProgressSectionToBeEmptyInNewLD();
     await loggedInLearner.navigateToGoalsSection();
     await loggedInLearner.addGoalInRedesignedLearnerDashboard('Algebra I');
     await loggedInLearner.expectCurrentGoalsInRedesignedDashboardToContain(

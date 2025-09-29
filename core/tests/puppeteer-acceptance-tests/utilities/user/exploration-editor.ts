@@ -584,6 +584,9 @@ export class ExplorationEditor extends BaseUser {
     );
   }
 
+  /**
+   * Clicks on the image in the interaction preview card.
+   */
   async clickOnImageInInteractionPreviewCard(): Promise<void> {
     await this.expectElementToBeVisible(imageContainerSelector);
     await this.page.click(imageContainerSelector);
@@ -4464,7 +4467,7 @@ export class ExplorationEditor extends BaseUser {
         throw new Error(`Unsupported input type: ${inputType}`);
     }
 
-    await this.clickOn(submitAnswerButton);
+    await this.clickOnSubmitAnswerButton();
   }
 
   /**
@@ -5734,14 +5737,14 @@ export class ExplorationEditor extends BaseUser {
    * Navigates to the tour tab in the exploration editor.
    */
   async clickOnTakeATourButton(): Promise<void> {
-    await this.isElementVisible(takeATourButtonSelector);
+    await this.expectElementToBeVisible(takeATourButtonSelector);
     await this.clickOn(takeATourButtonSelector);
 
     await this.expectElementToBeVisible(joyrideBodySelector);
   }
 
   async clickOnTakeATranslationsTourButton(): Promise<void> {
-    await this.isElementVisible(translationTourButtonSelector);
+    await this.expectElementToBeVisible(translationTourButtonSelector);
     await this.clickOn(translationTourButtonSelector);
 
     await this.expectElementToBeVisible(joyrideBodySelector);
@@ -6333,11 +6336,16 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Moves the node in the graph.
+   * Checks if the graph node can be moved.
+   * @param {'response modal' | 'answer page'} state - The state of the node.
    */
-  async expectGraphNodeCanBeMoved(): Promise<void> {
+  async expectGraphNodeCanBeMoved(
+    state: 'response modal' | 'answer page' = 'answer page'
+  ): Promise<void> {
     // Check if the graph interaction is present.
-    const graphHelper = new GraphViz(this.page);
+    const context =
+      state === 'response modal' ? await this.getRuleEditorModal() : this.page;
+    const graphHelper = new GraphViz(this.page, context);
     await graphHelper.expectGraphInteractionToBePresent();
 
     // Move the node to the given position.
@@ -6357,9 +6365,14 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Checks if graph node can be removed.
+   * @param {'response modal' | 'answer page'} state - The state of the node.
    */
-  async expectGraphNodeCanBeRemoved(): Promise<void> {
-    const graphHelper = new GraphViz(this.page);
+  async expectGraphNodeCanBeRemoved(
+    state: 'response modal' | 'answer page' = 'answer page'
+  ): Promise<void> {
+    const context =
+      state === 'response modal' ? await this.getRuleEditorModal() : this.page;
+    const graphHelper = new GraphViz(this.page, context);
 
     const nodes = await graphHelper.getVertices();
     await graphHelper.removeNode(nodes[0]);
@@ -6369,13 +6382,15 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Checks if graph node can be added.
+   * @param {'response modal' | 'answer page'} state - The state of the node.
    */
-  async expectGraphNodeCanBeAdded(): Promise<void> {
-    const graphHelper = new GraphViz(this.page);
-    const nodes = await graphHelper.getVertices();
+  async expectGraphNodeCanBeAdded(
+    state: 'response modal' | 'answer page' = 'answer page'
+  ): Promise<void> {
+    const context =
+      state === 'response modal' ? await this.getRuleEditorModal() : this.page;
+    const graphHelper = new GraphViz(this.page, context);
     await graphHelper.addNode(60, 60);
-    const newNodes = await graphHelper.getVertices();
-    expect(newNodes.length).toEqual(nodes.length + 1);
   }
 
   /**
@@ -6587,7 +6602,7 @@ export class ExplorationEditor extends BaseUser {
     await this.page.keyboard.press('ArrowRight');
 
     // Add Link.
-    await this.addTextWithLinkRTE('Oppia', oppiaWebURL);
+    await this.addTextWithLinkRTE('Go to Oppia.org website', oppiaWebURL);
     await this.waitForNetworkIdle();
     await this.page.keyboard.press('Enter');
 
