@@ -2263,7 +2263,6 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.type(editClassroomTeaserTextInputField, teaserText);
     await this.page.type(editClassroomTopicListIntroInputField, topicListIntro);
     await this.page.type(editClassroomCourseDetailsInputField, courseDetails);
-    await this.clickOnElementWithSelector(classroomThumbnailContainer);
 
     if (url) {
       await this.clearAllTextFrom(editClassroomUrlFragmentInputField);
