@@ -94,10 +94,11 @@ class SearchException(Exception):
 # The type of 'body' is 'Any'.
 # https://github.com/elastic/elasticsearch-py/blob/acf1e0d94e083c85bb079564d17ff7ee29cf28f6/elasticsearch/client/__init__.pyi#L768
 def _fetch_response_from_elastic_search(
+    query: Dict[str, Any],
+    sort: List[Dict[str, Any]],
     index_name: str,
     offset: int,
     size: int,
-    query_definition: Dict[str, Any],
 ) -> Tuple[List[str], Optional[int]]:
     """Searches for documents matching the given query in the given index.
     NOTE: We cannot search through more than 10,000 results from a search by
@@ -128,10 +129,11 @@ def _fetch_response_from_elastic_search(
     num_docs_to_fetch = size + 1
     try:
         response = ES.get_client().search(
+            query=query,
+            sort=sort,
             index=index_name,
             size=num_docs_to_fetch,
             from_=offset,
-            **query_definition
             )
     except elasticsearch.NotFoundError:
         # The index does not exist yet. Create it and return an empty result.
@@ -307,40 +309,42 @@ def search(
     # This can be seen from the type stubs of elastic search.
     # The type of 'body' is 'Any'.
     # https://github.com/elastic/elasticsearch-py/blob/acf1e0d94e083c85bb079564d17ff7ee29cf28f6/elasticsearch/client/__init__.pyi#L768
-    query_definition: Dict[str, Any] = {
-        'query': {
-            'bool': {
-                'must': [],
-                'filter': [],
-            }
-        },
-        'sort': [{
-            'rank': {
-                'order': 'desc',
-                'missing': '_last',
-                'unmapped_type': 'float',
-            }
-        }],
-    }
+
+
+    query: Dict[str, Any] = { 
+        "bool": { 
+            "must": [], 
+            "filter": [],
+            } 
+        }
+    sort = [ 
+        { "rank": { 
+            "order": "desc",
+            "missing": "_last",
+            "unmapped_type": "float",
+            } 
+        } 
+    ]
+
     if query_string:
-        query_definition['query']['bool']['must'] = [{
+        query['bool']['must'] = [{
             'multi_match': {
                 'query': query_string,
             }
         }]
     if categories:
         category_string = ' '.join(['"%s"' % cat for cat in categories])
-        query_definition['query']['bool']['filter'].append(
+        query['bool']['filter'].append(
             {'match': {'category': category_string}}
         )
     if language_codes:
         language_code_string = ' '.join(['"%s"' % lc for lc in language_codes])
-        query_definition['query']['bool']['filter'].append(
+        query['bool']['filter'].append(
             {'match': {'language_code': language_code_string}}
         )
 
     result_ids, resulting_offset = _fetch_response_from_elastic_search(
-        index_name, offset, size, query_definition,
+        query, sort, index_name, offset, size
     )
 
     return result_ids, resulting_offset
@@ -388,36 +392,37 @@ def blog_post_summaries_search(
     # This can be seen from the type stubs of elastic search.
     # The type of 'body' is 'Any'.
     # https://github.com/elastic/elasticsearch-py/blob/acf1e0d94e083c85bb079564d17ff7ee29cf28f6/elasticsearch/client/__init__.pyi#L768
-    query_definition: Dict[str, Any] = {
-        'query': {
-            'bool': {
-                'must': [],
-                'filter': [],
-            }
-        },
-        'sort': [{
-            'rank': {
-                'order': 'desc',
-                'missing': '_last',
-                'unmapped_type': 'float',
-            }
-        }],
-    }
+
+    query: Dict[str, Any] = { 
+        "bool": { 
+            "must": [], 
+            "filter": [],
+            } 
+        }
+    sort = [ 
+        { "rank": { 
+            "order": "desc",
+            "missing": "_last",
+            "unmapped_type": "float",
+            } 
+        } 
+    ]
+
     if query_string:
-        query_definition['query']['bool']['must'] = [{
+        query['bool']['must'] = [{
             'multi_match': {
                 'query': query_string,
             }
         }]
     if tags:
         for tag in tags:
-            query_definition['query']['bool']['filter'].append(
+            query['bool']['filter'].append(
                 {'match': {'tags': tag}}
             )
 
     index_name = search_services.SEARCH_INDEX_BLOG_POSTS
     result_ids, resulting_offset = _fetch_response_from_elastic_search(
-        index_name, offset, size, query_definition
+        query, sort, index_name, offset, size
     )
 
     return result_ids, resulting_offset

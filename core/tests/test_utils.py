@@ -801,7 +801,8 @@ class ElasticSearchStub:
     # dictionaries and other types too.
     def mock_search(
         self,
-        query: Optional[Dict[str, Dict[str, Dict[str, Any]]]] = None,
+        query: Optional[Dict[str,Any]]= None,
+        sort: Optional[List[Dict[str,Any]]]= None,
         index: Optional[str] = None,
         size: Optional[int] = None,
         from_: Optional[int] = None
@@ -839,8 +840,8 @@ class ElasticSearchStub:
                 result_docs.append(doc)
                 result_doc_ids.add(doc['id'])
 
-        filters = query['query']['bool']['filter']
-        terms = query['query']['bool']['must']
+        filters = query['bool']['filter']
+        terms = query['bool']['must']
 
         for f in filters:
             # For processing 'doc[k] in v', doc[k] can only be of type string if
