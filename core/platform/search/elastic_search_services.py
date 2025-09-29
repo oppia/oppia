@@ -108,7 +108,8 @@ def _fetch_response_from_elastic_search(
     This function also creates the index if it does not exist yet.
 
     Args:
-        query_definition: dict(str, any). The Query DSL object.
+        query: dict(str, any). The Query DSL object.
+        sort: dict(str, any). The Query DSL object.
         index_name: str. The name of the index. Use '_all' or empty string to
             perform the operation on all indices.
         offset: int|None. The offset into the index. Pass this in to start at
@@ -309,21 +310,19 @@ def search(
     # This can be seen from the type stubs of elastic search.
     # The type of 'body' is 'Any'.
     # https://github.com/elastic/elasticsearch-py/blob/acf1e0d94e083c85bb079564d17ff7ee29cf28f6/elasticsearch/client/__init__.pyi#L768
-
-
-    query: Dict[str, Any] = { 
-        "bool": { 
-            "must": [], 
-            "filter": [],
-            } 
+    query: Dict[str, Any] = {
+        'bool': { 
+            'must': [], 
+            'filter': [],
+            }
         }
-    sort = [ 
-        { "rank": { 
-            "order": "desc",
-            "missing": "_last",
-            "unmapped_type": "float",
-            } 
-        } 
+    sort = [
+        {'rank': {
+            'order': 'desc',
+            'missing': 'last',
+            'unmapped_type': 'float',
+            }
+        }
     ]
 
     if query_string:
@@ -393,19 +392,19 @@ def blog_post_summaries_search(
     # The type of 'body' is 'Any'.
     # https://github.com/elastic/elasticsearch-py/blob/acf1e0d94e083c85bb079564d17ff7ee29cf28f6/elasticsearch/client/__init__.pyi#L768
 
-    query: Dict[str, Any] = { 
-        "bool": { 
-            "must": [], 
-            "filter": [],
-            } 
+    query: Dict[str, Any] = {
+        'bool': { 
+            'must': [], 
+            'filter': [],
+            }
         }
-    sort = [ 
-        { "rank": { 
-            "order": "desc",
-            "missing": "_last",
-            "unmapped_type": "float",
-            } 
-        } 
+    sort = [
+        {'rank': {
+            'order': 'desc',
+            'missing': 'last',
+            'unmapped_type': 'float',
+            }
+        }
     ]
 
     if query_string:

@@ -702,7 +702,7 @@ class ElasticSearchStub:
 
         Args:
             index: str. The name of the index to delete the document from.
-            id_: str. The document id to be deleted from the index.
+            id: str. The document id to be deleted from the index.
 
         Returns:
             dict. A dict representing the ElasticSearch API response.
@@ -801,8 +801,8 @@ class ElasticSearchStub:
     # dictionaries and other types too.
     def mock_search(
         self,
-        query: Optional[Dict[str,Any]]= None,
-        sort: Optional[List[Dict[str,Any]]]= None,
+        query: Optional[Dict[str, Any]]= None,
+        sort: Optional[List[Dict[str, Any]]]= None,
         index: Optional[str] = None,
         size: Optional[int] = None,
         from_: Optional[int] = None
@@ -810,7 +810,8 @@ class ElasticSearchStub:
         """Searches and returns documents that match the given query.
 
         Args:
-            body: dict|None. A dictionary search definition that uses Query DSL.
+            query: dict(str, any). The Query DSL object.
+            sort: dict(str, any). The Query DSL object.
             index: str|None. The name of the index to search.
             size: int|None. The number of results to fetch.
             from_:int|None. The offset from which the results are to be fetched.
