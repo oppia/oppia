@@ -2372,7 +2372,7 @@ export class LoggedInUser extends BaseUser {
       visible: true,
     });
     await this.clickOnElementWithSelector(addInteractionButton);
-    await this.clickOnElementWithSelector(` ${interactionToAdd} `);
+    await this.clickOnElementWithText(` ${interactionToAdd} `);
     await this.clickOnElementWithSelector(saveInteractionButton);
     await this.page.waitForSelector(addInteractionModalSelector, {
       hidden: true,
@@ -2419,7 +2419,7 @@ export class LoggedInUser extends BaseUser {
     } else {
       await this.clickOnElementWithSelector(saveChangesButton);
     }
-    await this.clickOnElementWithSelector(commitMessage);
+    await this.clickOnElementWithSelector(commitMessageSelector);
     await this.type(commitMessageSelector, commitMessage);
     await this.clickOnElementWithSelector(saveDraftButton);
     await this.page.waitForSelector(saveDraftButton, {hidden: true});
@@ -2455,7 +2455,7 @@ export class LoggedInUser extends BaseUser {
       await this.clickOnElementWithSelector(explorationGoalInput);
       await this.type(explorationGoalInput, `${goal}`);
       await this.clickOnElementWithSelector(explorationCategoryDropdown);
-      await this.clickOnElementWithSelector(`${category}`);
+      await this.clickOnElementWithText(`${category}`);
       if (tags) {
         await this.type(tagsField, tags);
       }

@@ -1805,7 +1805,8 @@ export class LoggedOutUser extends BaseUser {
   async clickLinkAboutCookiesOnPrivacyPolicyPage(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       'https://allaboutcookies.org/how-to-manage-cookies',
-      allAboutCookiesUrl
+      allAboutCookiesUrl,
+      false
     );
   }
 
@@ -1815,7 +1816,8 @@ export class LoggedOutUser extends BaseUser {
   async clickLinkAboutGoogleAnalyticsOnPrivacyPolicyPage(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       'https://www.google.com/policies/privacy/partners/',
-      googleAnalyticsPartnerPoliciesUrl
+      googleAnalyticsPartnerPoliciesUrl,
+      false
     );
   }
 
@@ -3168,13 +3170,8 @@ export class LoggedOutUser extends BaseUser {
     if (buttonText !== 'Watch a video') {
       throw new Error('The Watch A Video button does not exist!');
     }
-    await Promise.all([
-      this.clickAndWaitForNavigation(
-        watchAVideoButtonInThanksForSubscribe,
-        true
-      ),
-    ]);
-    await this.waitForPageToFullyLoad();
+    this.clickAndWaitForNavigation(watchAVideoButtonInThanksForSubscribe, true),
+      await this.waitForPageToFullyLoad();
 
     const url = this.page.url();
     if (!url.includes(testConstants.OppiaSocials.YouTube.Domain)) {

@@ -2957,7 +2957,7 @@ export class ExplorationEditor extends BaseUser {
     });
     await this.clickOnElementWithSelector(addInteractionButton);
     await this.clickOnElementWithSelector(mathInteractionsTab);
-    await this.clickOnElementWithSelector(` ${interactionToAdd} `);
+    await this.clickOnElementWithText(` ${interactionToAdd} `);
     await this.clickOnElementWithSelector(saveInteractionButton);
     await this.page.waitForSelector(addInteractionModalSelector, {
       hidden: true,
@@ -6387,7 +6387,7 @@ export class ExplorationEditor extends BaseUser {
 
     for (let i = 0; i < tabContents.length; i++) {
       if (i > 1) {
-        await this.clickOnElementWithText('.e2e-test-add-list-entry');
+        await this.clickOnElementWithSelector('.e2e-test-add-list-entry');
       }
       await this.clearAllTextFrom(
         `oppia-rte-helper-model input.e2e-test-text-input:nth-child(${i + 1})`
