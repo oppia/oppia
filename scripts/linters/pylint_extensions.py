@@ -454,7 +454,7 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
 
             line_number += 1
 
-        doc_length = len(node.doc_node.split('\n'))
+        doc_length = len(node.doc_node.value.split('\n'))
         line_number += doc_length
         first_line_after_doc = linecache.getline(
             node.root().file, line_number).strip()
@@ -472,7 +472,7 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
             node: astroid.scoped_nodes.FunctionDef. Node for a function or
                 method definition in the AST.
         """
-        node_doc = docstrings_checker.docstringify(node.doc_node)
+        node_doc = docstrings_checker.docstringify(node.doc_node.value)
         self.check_functiondef_params(node, node_doc)
         self.check_functiondef_returns(node, node_doc)
         self.check_functiondef_yields(node, node_doc)
@@ -600,7 +600,8 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
         if node.name in self.constructor_names:
             class_node = checker_utils.node_frame_class(node)
             if class_node is not None:
-                class_doc = docstrings_checker.docstringify(class_node.doc_node)
+                class_doc = docstrings_checker.docstringify(
+                    class_node.doc_node.value)
                 self.check_single_constructor_params(
                     class_doc, node_doc, class_node)
 
@@ -689,7 +690,7 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
                 method definition in the AST.
         """
         if node.doc_node:
-            docstring = node.doc_node.splitlines()
+            docstring = node.doc_node.value.splitlines()
             # Check for space after """ in docstring.
             if len(docstring[0]) > 0 and docstring[0][0] == ' ':
                 self.add_message('space-after-triple-quote', node=node)
@@ -741,7 +742,7 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
             current_docstring_section = None
             in_description = False
             args_indentation_in_spaces = 0
-            docstring = node.doc_node.splitlines()
+            docstring = node.doc_node.value.splitlines()
             self.check_newline_above_args(node, docstring)
             for line in docstring:
                 stripped_line = line.lstrip()
@@ -992,7 +993,7 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
             if setters_property:
                 func_node = setters_property
 
-        doc = docstrings_checker.docstringify(func_node.doc_node)
+        doc = docstrings_checker.docstringify(func_node.doc_node.value)
         if doc.matching_sections() == 0:
             if doc.doc:
                 self._handle_no_raise_doc(expected_excs, func_node)
@@ -1017,7 +1018,7 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
 
         func_node = node.frame()
 
-        doc = docstrings_checker.docstringify(func_node.doc_node)
+        doc = docstrings_checker.docstringify(func_node.doc_node.value)
         if (doc.matching_sections() == 0 and
                 self.linter.config.accept_no_return_doc):
             return
@@ -1050,7 +1051,7 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
         """
         func_node = node.frame()
 
-        doc = docstrings_checker.docstringify(func_node.doc_node)
+        doc = docstrings_checker.docstringify(func_node.doc_node.value)
         if (doc.matching_sections() == 0 and
                 self.linter.config.accept_no_yields_doc):
             return
@@ -1833,7 +1834,7 @@ class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):  # type: ignore[m
 
             line_number += 1
 
-        doc_length = len(node.doc_node.split('\n'))
+        doc_length = len(node.doc_node.value.split('\n'))
         line_number += doc_length
         first_line_after_doc = linecache.getline(
             node.root().file, line_number).strip()
