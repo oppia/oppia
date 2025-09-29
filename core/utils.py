@@ -1275,12 +1275,14 @@ def compute_list_difference(list_a: List[str], list_b: List[str]) -> List[str]:
     return list(sorted(set(list_a) - set(list_b)))
 
 
-# Here we use MyPy ignore because the flag 'disallow-any-generics' is disabled
-# in MyPy settings and this flag does not allow generic types to be defined
-# without type parameters, but here to count the order elements, we are
-# inheriting from OrderedDict type without providing type parameters which
-# cause MyPy to throw an error. Thus, to avoid the error, we used ignore here.
-class OrderedCounter(collections.Counter, collections.OrderedDict): # type: ignore[type-arg]
+# Here we use MyPy ignore because of the errors from this multiple inheritance
+# [type-arg]: Both `Counter` and `OrderedDict` are generic types that expect
+# type parameters (e.g., Counter[str]). Since we are not providing them here,
+# Mypy raises a `type-arg` error.
+# [misc]: `Counter` and `OrderedDict` both define a `fromkeys` class method,
+# but their type signatures are incompatible. Mypy flags this conflict
+# between parent classes with the general `misc` error code.
+class OrderedCounter(collections.Counter, collections.OrderedDict): # type: ignore[misc, type-arg]
     """Counter that remembers the order elements are first encountered."""
 
     pass
