@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import datetime
 
+from core import utils
 from core.domain import blog_domain
 from core.jobs import job_utils
 from core.jobs.decorators import validation_decorators
@@ -135,7 +136,7 @@ class ValidateBlogModelTimestamps(beam.DoFn):  # type: ignore[misc]
             yield blog_validation_errors.InconsistentLastUpdatedTimestampsError(
                 model)
 
-        current_datetime = datetime.datetime.now(tz=datetime.UTC)
+        current_datetime = utils.get_naive_datetime_now()
         if model.published_on:
             if (model.published_on - max_clock_skew_duration) > (
                     current_datetime):

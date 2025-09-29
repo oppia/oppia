@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import datetime
 
-from core import feconf
+from core import feconf, utils
 from core.domain import (
     exp_services,
     recommendations_services,
@@ -328,7 +328,7 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
         exp_summaries = exp_services.get_all_exploration_summaries()
         # Test case where time_delta_days > 7.
         time_in_past = (
-            datetime.datetime.now(tz=datetime.UTC) -
+            utils.get_naive_datetime_now() -
             datetime.timedelta(days=10))
         exp_summaries['exp_id_2'].exploration_model_last_updated = time_in_past
         self.assertEqual(

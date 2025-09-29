@@ -23,7 +23,7 @@ import datetime
 import io
 import json
 
-from core import feconf
+from core import feconf, utils
 from core.domain import exp_domain, rights_domain
 from core.platform import models
 
@@ -345,7 +345,7 @@ def get_item_similarity(
     ):
         similarity_score += 2.0
 
-    time_now = datetime.datetime.now(tz=datetime.UTC)
+    time_now = utils.get_naive_datetime_now()
     time_delta_days = int(
         (time_now - compared_exp_summary.exploration_model_last_updated).days)
     if time_delta_days <= 7:

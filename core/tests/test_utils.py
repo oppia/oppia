@@ -2146,18 +2146,21 @@ class AppEngineTestBase(TestBase):
         self, mocked_now: datetime.datetime
     ) -> Iterator[None]:
         """Mocks parts of the datastore to accept a fake datetime type that
-        always returns the same value of datetime.datetime.now(tz=datetime.UTC).
+        always returns the same value of
+        datetime.datetime.now(tz=datetime.UTC).replace(tzinfo=None)
 
         Example:
             import datetime
             mocked_now = (
-                datetime.datetime.now(tz=datetime.UTC) -
+                datetime.datetime.now(tz=datetime.UTC).replace(tzinfo=None) -
                 datetime.timedelta(days=1))
             with mock_datetime_utcnow(mocked_now):
                 self.assertEqual(
-                    datetime.datetime.now(tz=datetime.UTC), mocked_now)
+                    datetime.datetime.now(tz=datetime.UTC).replace(tzinfo=None),
+                    mocked_now)
              # Returns actual time.
-            actual_now = datetime.datetime.now(tz=datetime.UTC)
+            actual_now = datetime.datetime.now(tz=datetime.UTC).replace(
+                tzinfo=None)
 
         Args:
             mocked_now: datetime.datetime. The datetime which will be used

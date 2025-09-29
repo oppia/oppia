@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import datetime
 
-from core import feature_flag_list, feconf
+from core import feature_flag_list, feconf, utils
 from core.domain import (
     rights_domain,
     rights_manager,
@@ -148,8 +148,8 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
 
     EXP_ID: Final = 'expId'
     # 30 days into the future.
-    NEWER_DATETIME: Final = datetime.datetime.now(
-        tz=datetime.UTC) + datetime.timedelta(30)
+    NEWER_DATETIME: Final = (
+        utils.get_naive_datetime_now() + datetime.timedelta(30))
     # A date in the past.
     OLDER_DATETIME: Final = datetime.datetime.strptime('2015-03-16', '%Y-%m-%d')
     manual_voiceover_1: state_domain.VoiceoverDict = {

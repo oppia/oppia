@@ -21,7 +21,7 @@ from __future__ import annotations
 
 import datetime
 
-from core import feconf
+from core import feconf, utils
 from core.domain import exp_fetchers
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
@@ -407,8 +407,7 @@ class ComputeSuggestionsInReviewForTranslatedContents(beam.DoFn):  # type: ignor
                         suggestion.status = suggestion_models.STATUS_REJECTED
                         suggestion.final_reviewer_id = (
                             feconf.SUGGESTION_BOT_USER_ID)
-                        suggestion.last_updated = datetime.datetime.now(
-                            tz=datetime.UTC)
+                        suggestion.last_updated = utils.get_naive_datetime_now()
                         updated_suggestion_dicts.append({
                             'updated_suggestion': suggestion,
                             'suggestion_dict': {

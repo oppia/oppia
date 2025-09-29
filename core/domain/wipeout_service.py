@@ -219,7 +219,7 @@ def pre_delete_user(user_id: str) -> None:
 
     user_services.mark_user_for_deletion(user_id)
 
-    date_now = datetime.datetime.now(tz=datetime.UTC)
+    date_now = utils.get_naive_datetime_now()
     date_before_which_username_should_be_saved = (
         date_now - PERIOD_AFTER_WHICH_USERNAME_CANNOT_BE_REUSED)
     if user_settings.created_on is None:

@@ -19,7 +19,7 @@ from __future__ import annotations
 import datetime
 import logging
 
-from core import feconf
+from core import feconf, utils
 from core.platform import models
 from core.platform.datastore import cloud_datastore_services
 from core.tests import test_utils
@@ -49,7 +49,7 @@ class CloudDatastoreServicesTests(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         self.admin_user_id = self.get_user_id_from_email(
             self.CURRICULUM_ADMIN_EMAIL)
-        self.curr_time = datetime.datetime.now(tz=datetime.UTC)
+        self.curr_time = utils.get_naive_datetime_now()
         self.completed_activities_model = user_models.CompletedActivitiesModel(
             id=self.admin_user_id,
             exploration_ids=[],

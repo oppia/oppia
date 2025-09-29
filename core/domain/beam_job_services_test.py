@@ -26,6 +26,7 @@ from core.jobs import base_jobs, jobs_manager
 from core.jobs import registry as jobs_registry
 from core.platform import models
 from core.tests import test_utils
+from core import utils
 
 import apache_beam as beam
 from typing import List, Optional
@@ -253,7 +254,7 @@ class BeamJobRunServicesTests(test_utils.GenericTestBase):
 
     def test_is_state_terminal(self) -> None:
 
-        now = datetime.datetime.now(tz=datetime.UTC)
+        now = utils.get_naive_datetime_now()
 
         cancelled_beam_job_run = beam_job_domain.BeamJobRun(
             '123',

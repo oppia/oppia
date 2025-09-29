@@ -641,7 +641,7 @@ def _send_email(
         email_models.SentEmailModel.create(
             recipient_id, recipient_email_address, sender_id, sender_name_email,
             intent, email_subject, cleaned_html_body,
-            datetime.datetime.now(tz=datetime.UTC)
+            utils.get_naive_datetime_now()
         )
 
     _send_email_transactional()
@@ -709,7 +709,7 @@ def _send_bulk_mail(
         email_models.BulkEmailModel.create(
             instance_id, sender_id, sender_name_email, intent,
             email_subject, cleaned_html_body,
-            datetime.datetime.now(tz=datetime.UTC))
+            utils.get_naive_datetime_now())
 
     _send_bulk_mail_transactional(instance_id)
 
@@ -1703,7 +1703,7 @@ def _create_html_for_reviewable_suggestion_email_info(
         reviewable_suggestion_email_info.language_code)
     # Calculate how long the suggestion has been waiting for review.
     suggestion_review_wait_time = (
-        datetime.datetime.now(tz=datetime.UTC) - (
+        utils.get_naive_datetime_now() - (
             reviewable_suggestion_email_info.submission_datetime))
     # Get a string composed of the largest time unit that has a
     # value, followed by that time unit. For example, if the

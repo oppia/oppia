@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import datetime
 
-from core import feconf
+from core import feconf, utils
 from core.domain import event_services, exp_fetchers, exp_services
 from core.platform import models
 
@@ -86,7 +86,7 @@ def assign_rating_to_exploration(
             exp_user_data_model = user_models.ExplorationUserDataModel.create(
                 user_id, exploration_id)
         exp_user_data_model.rating = new_rating
-        exp_user_data_model.rated_on = datetime.datetime.now(tz=datetime.UTC)
+        exp_user_data_model.rated_on = utils.get_naive_datetime_now()
         exp_user_data_model.update_timestamps()
         exp_user_data_model.put()
         return old_rating

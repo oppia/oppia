@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import datetime
 
+from core import utils
 from core.constants import constants
 from core.domain import recommendations_services
 from core.jobs import job_test_utils
@@ -66,8 +67,7 @@ class ComputeExplorationRecommendationsJobTests(job_test_utils.JobTestBase):
             language_code='lang',
             community_owned=False,
             status=constants.ACTIVITY_STATUS_PUBLIC,
-            exploration_model_last_updated=datetime.datetime.now(
-                tz=datetime.UTC)
+            exploration_model_last_updated=utils.get_naive_datetime_now()
         )
         exp_summary.update_timestamps()
         exp_summary.put()
@@ -91,8 +91,7 @@ class ComputeExplorationRecommendationsJobTests(job_test_utils.JobTestBase):
             language_code='lang',
             community_owned=False,
             status=constants.ACTIVITY_STATUS_PUBLIC,
-            exploration_model_last_updated=datetime.datetime.now(
-                tz=datetime.UTC)
+            exploration_model_last_updated=utils.get_naive_datetime_now()
         )
         exp_summary_1.update_timestamps()
         exp_summary_2 = self.create_model(
@@ -105,8 +104,7 @@ class ComputeExplorationRecommendationsJobTests(job_test_utils.JobTestBase):
             language_code='lang',
             community_owned=False,
             status=constants.ACTIVITY_STATUS_PUBLIC,
-            exploration_model_last_updated=datetime.datetime.now(
-                tz=datetime.UTC)
+            exploration_model_last_updated=utils.get_naive_datetime_now()
         )
         exp_summary_2.update_timestamps()
         self.put_multi([exp_summary_1, exp_summary_2])
@@ -146,8 +144,7 @@ class ComputeExplorationRecommendationsJobTests(job_test_utils.JobTestBase):
             language_code='lang',
             community_owned=False,
             status=constants.ACTIVITY_STATUS_PRIVATE,
-            exploration_model_last_updated=datetime.datetime.now(
-                tz=datetime.UTC)
+            exploration_model_last_updated=utils.get_naive_datetime_now()
         )
         exp_summary_1.update_timestamps()
         exp_summary_2 = self.create_model(
@@ -160,8 +157,7 @@ class ComputeExplorationRecommendationsJobTests(job_test_utils.JobTestBase):
             language_code='lang',
             community_owned=False,
             status=constants.ACTIVITY_STATUS_PRIVATE,
-            exploration_model_last_updated=datetime.datetime.now(
-                tz=datetime.UTC)
+            exploration_model_last_updated=utils.get_naive_datetime_now()
         )
         exp_summary_2.update_timestamps()
         self.put_multi([exp_summary_1, exp_summary_2])
@@ -191,8 +187,7 @@ class ComputeExplorationRecommendationsJobTests(job_test_utils.JobTestBase):
             language_code='lang1',
             community_owned=False,
             status=constants.ACTIVITY_STATUS_PUBLIC,
-            exploration_model_last_updated=datetime.datetime.now(
-                tz=datetime.UTC)
+            exploration_model_last_updated=utils.get_naive_datetime_now()
         )
         exp_summary_1.update_timestamps()
         exp_summary_2 = self.create_model(
@@ -205,8 +200,7 @@ class ComputeExplorationRecommendationsJobTests(job_test_utils.JobTestBase):
             language_code='lang2',
             community_owned=False,
             status=constants.ACTIVITY_STATUS_PUBLIC,
-            exploration_model_last_updated=datetime.datetime.now(
-                tz=datetime.UTC)
+            exploration_model_last_updated=utils.get_naive_datetime_now()
         )
         exp_summary_2.update_timestamps()
         self.put_multi([exp_summary_1, exp_summary_2])
@@ -234,8 +228,7 @@ class ComputeExplorationRecommendationsJobTests(job_test_utils.JobTestBase):
             language_code='lang1',
             community_owned=False,
             status=constants.ACTIVITY_STATUS_PUBLIC,
-            exploration_model_last_updated=datetime.datetime.now(
-                tz=datetime.UTC)
+            exploration_model_last_updated=utils.get_naive_datetime_now()
         )
         exp_summary_1.update_timestamps()
         exp_summary_2 = self.create_model(
@@ -248,8 +241,7 @@ class ComputeExplorationRecommendationsJobTests(job_test_utils.JobTestBase):
             language_code='lang1',
             community_owned=False,
             status=constants.ACTIVITY_STATUS_PUBLIC,
-            exploration_model_last_updated=datetime.datetime.now(
-                tz=datetime.UTC)
+            exploration_model_last_updated=utils.get_naive_datetime_now()
         )
         exp_summary_2.update_timestamps()
         exp_summary_3 = self.create_model(
@@ -262,8 +254,7 @@ class ComputeExplorationRecommendationsJobTests(job_test_utils.JobTestBase):
             language_code='lang1',
             community_owned=False,
             status=constants.ACTIVITY_STATUS_PUBLIC,
-            exploration_model_last_updated=datetime.datetime.now(
-                tz=datetime.UTC)
+            exploration_model_last_updated=utils.get_naive_datetime_now()
         )
         exp_summary_3.update_timestamps()
         self.put_multi([exp_summary_1, exp_summary_2, exp_summary_3])

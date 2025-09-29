@@ -65,7 +65,7 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
             url_fragment='sample-url-fragment',
             tags=['tag1', 'tag2'],
             thumbnail_filename='xyzabc',
-            published_on=datetime.datetime.now(tz=datetime.UTC),
+            published_on=utils.get_naive_datetime_now(),
         )
         blog_summary.update_timestamps()
         blog_summary.put()
@@ -95,7 +95,7 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
             ])
 
     def test_indexes_non_deleted_models(self) -> None:
-        date_time_now = datetime.datetime.now(tz=datetime.UTC)
+        date_time_now = utils.get_naive_datetime_now()
         for i in range(5):
             blog_summary = self.create_model(
                 blog_models.BlogPostSummaryModel,
@@ -152,7 +152,7 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
             url_fragment='sample-url-fragment',
             tags=['tag1', 'tag2'],
             thumbnail_filename='xyzabc',
-            published_on=datetime.datetime.now(tz=datetime.UTC),
+            published_on=utils.get_naive_datetime_now(),
         )
         blog_summary.update_timestamps()
         blog_summary.put()
@@ -201,7 +201,7 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
             url_fragment='sample-url-fragment',
             tags=['tag1', 'tag2'],
             thumbnail_filename='xyzabc',
-            published_on=datetime.datetime.now(tz=datetime.UTC),
+            published_on=utils.get_naive_datetime_now(),
         )
         blog_summary.update_timestamps()
         blog_summary.put()

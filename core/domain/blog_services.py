@@ -506,7 +506,7 @@ def publish_blog_post(blog_post_id: str) -> None:
 
     if not blog_post_rights.blog_post_is_published:
         blog_post_rights.blog_post_is_published = True
-        published_on = datetime.datetime.now(tz=datetime.UTC)
+        published_on = utils.get_naive_datetime_now()
         blog_post.published_on = published_on
         blog_post_summary.published_on = published_on
 

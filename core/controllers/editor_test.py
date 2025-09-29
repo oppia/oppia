@@ -3148,8 +3148,8 @@ class EditorAutosaveTest(BaseEditorControllerTests):
     EXP_ID2: Final = '2'
     EXP_ID3: Final = '3'
     # 30 days into the future.
-    NEWER_DATETIME: Final = datetime.datetime.now(
-        tz=datetime.UTC) + datetime.timedelta(30)
+    NEWER_DATETIME: Final = (
+        utils.get_naive_datetime_now() + datetime.timedelta(30))
     # A date in the past.
     OLDER_DATETIME: Final = datetime.datetime.strptime('2015-03-16', '%Y-%m-%d')
     DRAFT_CHANGELIST: Final = [{

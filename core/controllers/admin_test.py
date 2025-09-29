@@ -3647,7 +3647,7 @@ class UpdateBlogPostHandlerTest(test_utils.GenericTestBase):
         model.thumbnail_filename = 'image.png'
         model.content = 'hello bloggers'
         model.url_fragment = 'sample'
-        model.published_on = datetime.datetime.now(tz=datetime.UTC)
+        model.published_on = utils.get_naive_datetime_now()
         model.update_timestamps()
         model.put()
 

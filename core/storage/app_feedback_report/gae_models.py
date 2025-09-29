@@ -339,7 +339,7 @@ class AppFeedbackReportModel(base_models.BaseModel):
             list(AppFeedbackReportModel). A list of AppFeedbackReportModel
             entities that need to be scrubbed.
         """
-        datetime_now = datetime.datetime.now(tz=datetime.UTC)
+        datetime_now = utils.get_naive_datetime_now()
         datetime_before_which_to_scrub = datetime_now - (
             feconf.APP_FEEDBACK_REPORT_MAXIMUM_LIFESPAN +
             datetime.timedelta(days=1))
@@ -595,7 +595,7 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
             Exception. If the id generator is producing too many collisions.
         """
         current_datetime_in_msec = utils.get_time_in_millisecs(
-            datetime.datetime.now(tz=datetime.UTC))
+            utils.get_naive_datetime_now())
         for _ in range(base_models.MAX_RETRIES):
             name_hash = utils.convert_to_hash(
                 ticket_name, base_models.ID_LENGTH)

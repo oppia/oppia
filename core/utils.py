@@ -627,6 +627,17 @@ def convert_millisecs_time_to_datetime_object(
     )
 
 
+def get_naive_datetime_now() -> datetime.datetime:
+    """Returns the current datetime as a naive datetime.
+
+    This is needed for the App Engine datastore datetime fields.
+
+    Returns:
+        datetime. A naive datetime representing the current time.
+    """
+    return datetime.datetime.now(tz=datetime.UTC).replace(tzinfo=None)
+
+
 def convert_naive_datetime_to_string(datetime_obj: datetime.datetime) -> str:
     """Returns a human-readable string representing the naive datetime object.
 

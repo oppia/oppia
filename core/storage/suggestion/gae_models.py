@@ -426,7 +426,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             list(str). A list of the ids of the suggestions that are stale.
         """
         threshold_time = (
-            datetime.datetime.now(tz=datetime.UTC) - datetime.timedelta(
+            utils.get_naive_datetime_now() - datetime.timedelta(
                 0, 0, 0, THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS))
         suggestion_models: Sequence[GeneralSuggestionModel] = (
             cls.get_all().filter(
@@ -458,7 +458,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 'Expected the suggestion types offered on the Contributor '
                 'Dashboard to be nonempty.')
         threshold_time = (
-            datetime.datetime.now(tz=datetime.UTC) - datetime.timedelta(
+            utils.get_naive_datetime_now() - datetime.timedelta(
                 days=SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS))
         return cls.get_all().filter(datastore_services.all_of(
             cls.status == STATUS_IN_REVIEW,
@@ -486,7 +486,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         threshold_datetime = datetime.datetime.fromtimestamp(
             current_time_millisecs / 1000.0,
             tz=datetime.UTC
-        ) - datetime.timedelta(
+        ).replace(tzinfo=None) - datetime.timedelta(
             days=SUGGESTION_REVIEW_WAIT_TIME_NOTIFICATION
         )
         return (

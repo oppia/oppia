@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import datetime
 
-from core import feconf
+from core import feconf, utils
 from core.domain import beam_job_domain, beam_job_services
 from core.jobs import base_jobs, jobs_manager
 from core.tests import test_utils
@@ -99,8 +99,8 @@ class BeamJobRunHandlerTests(BeamHandlerTestBase):
         model.put()
         run = beam_job_domain.BeamJobRun(
             model.id, 'FooJob', 'CANCELLING',
-            datetime.datetime.now(tz=datetime.UTC),
-            datetime.datetime.now(tz=datetime.UTC), False)
+            utils.get_naive_datetime_now(),
+            utils.get_naive_datetime_now(), False)
 
         swap_cancel_beam_job = self.swap_to_always_return(
             beam_job_services, 'cancel_beam_job', value=run)

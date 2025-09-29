@@ -1328,14 +1328,14 @@ class LoadingAndDeletionOfCollectionDemosTests(CollectionServicesUnitTests):
             len(feconf.DEMO_COLLECTIONS), 1,
             msg='There must be at least one demo collection.')
         for collection_id in feconf.DEMO_COLLECTIONS:
-            start_time = datetime.datetime.now(tz=datetime.UTC)
+            start_time = utils.get_naive_datetime_now()
 
             collection_services.load_demo(collection_id)
             collection = collection_services.get_collection_by_id(
                 collection_id)
             collection.validate()
 
-            duration = datetime.datetime.now(tz=datetime.UTC) - start_time
+            duration = utils.get_naive_datetime_now() - start_time
             processing_time = duration.seconds + (duration.microseconds / 1E6)
             self.log_line(
                 'Loaded and validated collection %s (%.2f seconds)' %

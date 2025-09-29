@@ -2295,7 +2295,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error('Title field should not be empty')
 
     def test_story_summary_creation(self) -> None:
-        curr_time = datetime.datetime.now(tz=datetime.UTC)
+        curr_time = utils.get_naive_datetime_now()
         story_summary = story_domain.StorySummary(
             'story_id', 'title', 'description', 'en', 1, ['Title 1'], '#F8BF74',
             'image.svg', 'story-frag-two', curr_time, curr_time)
@@ -2333,7 +2333,7 @@ class StorySummaryTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        current_time = datetime.datetime.now(tz=datetime.UTC)
+        current_time = utils.get_naive_datetime_now()
         time_in_millisecs = utils.get_time_in_millisecs(current_time)
         self.story_summary_dict = {
             'story_model_created_on': time_in_millisecs,

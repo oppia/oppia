@@ -55,7 +55,7 @@ class BlogPostModelTest(test_utils.GenericTestBase):
             author_id=self.USER_ID,
             content=self.CONTENT,
             title=self.TITLE,
-            published_on=datetime.datetime.now(tz=datetime.UTC),
+            published_on=utils.get_naive_datetime_now(),
             url_fragment='sample-url-fragment',
             tags=self.TAGS,
             thumbnail_filename=self.THUMBNAIL
@@ -191,7 +191,7 @@ class BlogPostSummaryModelTest(test_utils.GenericTestBase):
                 author_id=self.USER_ID,
                 summary=self.SUMMARY,
                 title=self.TITLE,
-                published_on=datetime.datetime.now(tz=datetime.UTC),
+                published_on=utils.get_naive_datetime_now(),
                 url_fragment='sample-url-fragment',
                 tags=self.TAGS,
                 thumbnail_filename=self.THUMBNAIL
@@ -205,7 +205,7 @@ class BlogPostSummaryModelTest(test_utils.GenericTestBase):
                 author_id=self.USER_ID,
                 summary='sample summary',
                 title='Sample Tile',
-                published_on=datetime.datetime.now(tz=datetime.UTC),
+                published_on=utils.get_naive_datetime_now(),
                 url_fragment='sample-url-fragment-two',
                 tags=self.TAGS,
                 thumbnail_filename=self.THUMBNAIL

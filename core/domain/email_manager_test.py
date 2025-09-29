@@ -20,7 +20,7 @@ import datetime
 import logging
 import types
 
-from core import feconf
+from core import feconf, utils
 from core.constants import constants
 from core.domain import (
     email_manager,
@@ -1445,7 +1445,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
                     feconf.SYSTEM_COMMITTER_ID, self.system_email_address,
                     feconf.EMAIL_INTENT_SIGNUP, self.new_email_subject,
                     cleaned_plaintext_body,
-                    datetime.datetime.now(tz=datetime.UTC))
+                    utils.get_naive_datetime_now())
 
                 # Check that the content of this email was recorded in
                 # SentEmailModel.
@@ -1570,7 +1570,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
                 feconf.SYSTEM_COMMITTER_ID, self.system_email_address,
                 feconf.EMAIL_INTENT_SIGNUP, self.new_email_subject,
                 self.new_email_html_body,
-                datetime.datetime.now(tz=datetime.UTC))
+                utils.get_naive_datetime_now())
 
             # Check that the content of this email was recorded in
             # SentEmailModel.
@@ -1636,7 +1636,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
                 feconf.SYSTEM_COMMITTER_ID, self.system_email_address,
                 feconf.EMAIL_INTENT_SIGNUP, '%s%s' % (
                     self.new_email_subject, 1), self.new_email_html_body,
-                datetime.datetime.now(tz=datetime.UTC))
+                utils.get_naive_datetime_now())
 
             # Check that the content of this email was recorded in
             # SentEmailModel.
@@ -1702,7 +1702,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
                 feconf.SYSTEM_COMMITTER_ID, self.system_email_address,
                 feconf.EMAIL_INTENT_SIGNUP, self.new_email_subject,
                 '%s%s' % (self.new_email_html_body, 1),
-                datetime.datetime.now(tz=datetime.UTC))
+                utils.get_naive_datetime_now())
 
             # Check that the content of this email was recorded in
             # SentEmailModel.
@@ -1765,7 +1765,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
             self.assertEqual(len(all_models), 0)
 
             email_sent_time = (
-                datetime.datetime.now(tz=datetime.UTC) -
+                utils.get_naive_datetime_now() -
                 datetime.timedelta(minutes=4))
 
             email_models.SentEmailModel.create(
@@ -1780,7 +1780,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
             self.assertEqual(len(all_models), 1)
 
             email_sent_time = (
-                datetime.datetime.now(tz=datetime.UTC) -
+                utils.get_naive_datetime_now() -
                 datetime.timedelta(minutes=2))
 
             email_models.SentEmailModel.create(

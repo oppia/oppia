@@ -71,7 +71,7 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
                 'recipient_id', 'recipient@email.com', self.SENDER_ID,
                 'sender@email.com', feconf.EMAIL_INTENT_SIGNUP,
                 'Email Subject', 'Email Body',
-                datetime.datetime.now(tz=datetime.UTC))
+                utils.get_naive_datetime_now())
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
@@ -139,7 +139,7 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
                 'recipient_id', 'recipient@email.com', self.SENDER_ID,
                 'sender@email.com', feconf.EMAIL_INTENT_SIGNUP,
                 'Email Subject', 'Email Body',
-                datetime.datetime.now(tz=datetime.UTC))
+                utils.get_naive_datetime_now())
 
             results = email_models.SentEmailModel.get_by_hash('Email Hash')
 
@@ -147,25 +147,25 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_by_hash_behavior_with_sent_datetime_lower_bound(self) -> None:
         with self.generate_constant_hash_ctx:
-            time_now = datetime.datetime.now(tz=datetime.UTC)
+            time_now = utils.get_naive_datetime_now()
             email_models.SentEmailModel.create(
                 'recipient_id', 'recipient@email.com', self.SENDER_ID,
                 'sender@email.com', feconf.EMAIL_INTENT_SIGNUP,
                 'Email Subject', 'Email Body',
-                datetime.datetime.now(tz=datetime.UTC))
+                utils.get_naive_datetime_now())
 
         results = email_models.SentEmailModel.get_by_hash(
             'Email Hash', sent_datetime_lower_bound=time_now)
         self.assertEqual(len(results), 1)
 
-        time_now1 = datetime.datetime.now(tz=datetime.UTC)
+        time_now1 = utils.get_naive_datetime_now()
 
         results = email_models.SentEmailModel.get_by_hash(
             'Email Hash', sent_datetime_lower_bound=time_now1)
         self.assertEqual(len(results), 0)
 
         time_before = (
-            datetime.datetime.now(tz=datetime.UTC) -
+            utils.get_naive_datetime_now() -
             datetime.timedelta(minutes=10))
 
         results = email_models.SentEmailModel.get_by_hash(
@@ -215,7 +215,7 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
             'recipient_id', 'recipient@email.com', self.SENDER_ID,
             'sender@email.com', feconf.EMAIL_INTENT_SIGNUP,
             'Email Subject', 'Email Body',
-            datetime.datetime.now(tz=datetime.UTC))
+            utils.get_naive_datetime_now())
 
         self.assertTrue(
             email_models.SentEmailModel.check_duplicate_message(
@@ -225,7 +225,7 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
             'recipient_id2', 'recipient@email.com', self.SENDER_ID,
             'sender@email.com', feconf.EMAIL_INTENT_SIGNUP,
             'Email Subject', 'Email Body',
-            datetime.datetime.now(tz=datetime.UTC) - datetime.timedelta(
+            utils.get_naive_datetime_now() - datetime.timedelta(
                 minutes=feconf.DUPLICATE_EMAIL_INTERVAL_MINS))
 
         self.assertFalse(
@@ -245,7 +245,7 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
             'recipient_id', 'recipient@email.com', self.SENDER_ID,
             'sender@email.com', feconf.EMAIL_INTENT_SIGNUP,
             'Email Subject', 'Email Body',
-            datetime.datetime.now(tz=datetime.UTC))
+            utils.get_naive_datetime_now())
 
             self.assertFalse(
             email_models.SentEmailModel.check_duplicate_message(
@@ -267,7 +267,7 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
                     'recipient_id', 'recipient@email.com', 'sender_id',
                     'sender@email.com', feconf.EMAIL_INTENT_SIGNUP,
                     'Email Subject', 'Email Body',
-                    datetime.datetime.now(tz=datetime.UTC))
+                    utils.get_naive_datetime_now())
 
 
 class BulkEmailModelUnitTests(test_utils.GenericTestBase):
@@ -281,7 +281,7 @@ class BulkEmailModelUnitTests(test_utils.GenericTestBase):
         email_models.BulkEmailModel.create(
             'instance_id', self.SENDER_ID, 'sender@email.com',
             feconf.BULK_EMAIL_INTENT_MARKETING, 'Email Subject', 'Email Body',
-            datetime.datetime.now(tz=datetime.UTC))
+            utils.get_naive_datetime_now())
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
@@ -345,7 +345,7 @@ class GenerateHashTests(test_utils.GenericTestBase):
             intent=feconf.EMAIL_INTENT_SIGNUP,
             subject='email_subject',
             html_body='email_html_body',
-            sent_datetime=datetime.datetime.now(tz=datetime.UTC))
+            sent_datetime=utils.get_naive_datetime_now())
         email_model_instance.update_timestamps()
         email_model_instance.put()
 
@@ -363,7 +363,7 @@ class GenerateHashTests(test_utils.GenericTestBase):
             intent=feconf.EMAIL_INTENT_SIGNUP,
             subject='email_subject',
             html_body='email_html_body',
-            sent_datetime=datetime.datetime.now(tz=datetime.UTC))
+            sent_datetime=utils.get_naive_datetime_now())
         email_model_instance.update_timestamps()
         email_model_instance.put()
 
@@ -376,7 +376,7 @@ class GenerateHashTests(test_utils.GenericTestBase):
             intent=feconf.EMAIL_INTENT_SIGNUP,
             subject='email_subject',
             html_body='email_html_body2',
-            sent_datetime=datetime.datetime.now(tz=datetime.UTC))
+            sent_datetime=utils.get_naive_datetime_now())
         email_model_instance2.update_timestamps()
         email_model_instance2.put()
 
@@ -393,7 +393,7 @@ class GenerateHashTests(test_utils.GenericTestBase):
             intent=feconf.EMAIL_INTENT_SIGNUP,
             subject='email_subject',
             html_body='email_html_body',
-            sent_datetime=datetime.datetime.now(tz=datetime.UTC))
+            sent_datetime=utils.get_naive_datetime_now())
         email_model_instance2.update_timestamps()
         email_model_instance2.put()
 
@@ -409,7 +409,7 @@ class GenerateHashTests(test_utils.GenericTestBase):
             intent=feconf.EMAIL_INTENT_SIGNUP,
             subject='email_subject2',
             html_body='email_html_body',
-            sent_datetime=datetime.datetime.now(tz=datetime.UTC))
+            sent_datetime=utils.get_naive_datetime_now())
         email_model_instance2.update_timestamps()
         email_model_instance2.put()
 
@@ -425,7 +425,7 @@ class GenerateHashTests(test_utils.GenericTestBase):
             intent=feconf.EMAIL_INTENT_SIGNUP,
             subject='email_subject2',
             html_body='email_html_body2',
-            sent_datetime=datetime.datetime.now(tz=datetime.UTC))
+            sent_datetime=utils.get_naive_datetime_now())
         email_model_instance2.update_timestamps()
         email_model_instance2.put()
 

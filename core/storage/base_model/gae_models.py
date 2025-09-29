@@ -184,10 +184,10 @@ class BaseModel(datastore_services.Model):
         super()._pre_put_hook()
 
         if self.created_on is None:
-            self.created_on = datetime.datetime.now(tz=datetime.UTC)
+            self.created_on = utils.get_naive_datetime_now()
 
         if self.last_updated is None:
-            self.last_updated = datetime.datetime.now(tz=datetime.UTC)
+            self.last_updated = utils.get_naive_datetime_now()
             self._last_updated_timestamp_is_fresh = True
 
         if not self._last_updated_timestamp_is_fresh:
@@ -410,10 +410,10 @@ class BaseModel(datastore_services.Model):
         self._last_updated_timestamp_is_fresh = True
 
         if self.created_on is None:
-            self.created_on = datetime.datetime.now(tz=datetime.UTC)
+            self.created_on = utils.get_naive_datetime_now()
 
         if update_last_updated_time or self.last_updated is None:
-            self.last_updated = datetime.datetime.now(tz=datetime.UTC)
+            self.last_updated = utils.get_naive_datetime_now()
 
     @classmethod
     def update_timestamps_multi(
@@ -605,7 +605,7 @@ class BaseHumanMaintainedModel(BaseModel):
 
     def put_for_human(self) -> None:
         """Stores the model instance on behalf of a human."""
-        self.last_updated_by_human = datetime.datetime.now(tz=datetime.UTC)
+        self.last_updated_by_human = utils.get_naive_datetime_now()
         return super().put()
 
     def put_for_bot(self) -> None:
@@ -630,7 +630,7 @@ class BaseHumanMaintainedModel(BaseModel):
         Returns:
             list(future). A list of futures.
         """
-        now = datetime.datetime.now(tz=datetime.UTC)
+        now = utils.get_naive_datetime_now()
         for instance in instances:
             instance.last_updated_by_human = now
         return super(BaseHumanMaintainedModel, cls).put_multi(instances)

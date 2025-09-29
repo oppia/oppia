@@ -281,7 +281,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
         self.assertEqual(exported_data, expected_data)
 
     def test_get_all_unscrubbed_expiring_report_models(self) -> None:
-        expired_timestamp = datetime.datetime.now(tz=datetime.UTC) - (
+        expired_timestamp = utils.get_naive_datetime_now() - (
             feconf.APP_FEEDBACK_REPORT_MAXIMUM_LIFESPAN +
             datetime.timedelta(days=10))
         expired_model = app_feedback_report_models.AppFeedbackReportModel(

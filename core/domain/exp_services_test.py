@@ -1817,13 +1817,13 @@ class LoadingAndDeletionOfExplorationDemosTests(ExplorationServicesUnitTests):
             msg='There must be at least one demo exploration.')
 
         for exp_id in demo_exploration_ids:
-            start_time = datetime.datetime.now(tz=datetime.UTC)
+            start_time = utils.get_naive_datetime_now()
 
             exp_services.load_demo(exp_id)
             exploration = exp_fetchers.get_exploration_by_id(exp_id)
             exploration.validate(strict=True)
 
-            duration = datetime.datetime.now(tz=datetime.UTC) - start_time
+            duration = utils.get_naive_datetime_now() - start_time
             processing_time = duration.seconds + (duration.microseconds / 1E6)
             self.log_line(
                 'Loaded and validated exploration %s (%.2f seconds)' %

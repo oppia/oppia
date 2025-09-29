@@ -119,8 +119,7 @@ class CronJobTests(test_utils.GenericTestBase):
             collection_ids=[],
             story_ids=[],
             learnt_topic_ids=[],
-            last_updated=datetime.datetime.now(
-                tz=datetime.UTC) - self.NINE_WEEKS,
+            last_updated=utils.get_naive_datetime_now() - self.NINE_WEEKS,
             deleted=True
         )
         completed_activities_model.update_timestamps(
@@ -140,7 +139,7 @@ class CronJobTests(test_utils.GenericTestBase):
         admin_user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
 
         with self.mock_datetime_utcnow(
-            datetime.datetime.now(tz=datetime.UTC) - self.NINE_WEEKS):
+                utils.get_naive_datetime_now() - self.NINE_WEEKS):
             self.save_new_default_exploration('exp_id', admin_user_id)
             exp_services.delete_exploration(admin_user_id, 'exp_id')
 
@@ -160,8 +159,7 @@ class CronJobTests(test_utils.GenericTestBase):
             user_ids=[],
             submitter_id=admin_user_id,
             query_status=feconf.USER_QUERY_STATUS_PROCESSING,
-            last_updated=datetime.datetime.now(
-                tz=datetime.UTC) - self.FIVE_WEEKS
+            last_updated=utils.get_naive_datetime_now() - self.FIVE_WEEKS
         )
         user_query_model.update_timestamps(update_last_updated_time=False)
         user_query_model.put()
@@ -176,8 +174,7 @@ class CronJobTests(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
-        report_timestamp = (
-            datetime.datetime.now(tz=datetime.UTC) - self.FOURTEEN_WEEKS)
+        report_timestamp = utils.get_naive_datetime_now() - self.FOURTEEN_WEEKS
         report_submitted_timestamp = report_timestamp
         ticket_creation_timestamp = datetime.datetime.fromtimestamp(1616173836)
         android_report_info = {

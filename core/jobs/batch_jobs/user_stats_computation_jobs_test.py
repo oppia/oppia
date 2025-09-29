@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import datetime
 
-from core import feconf
+from core import feconf, utils
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import user_stats_computation_jobs
 from core.jobs.types import job_run_result
@@ -50,9 +50,8 @@ class CollectWeeklyDashboardStatsJobTests(job_test_utils.JobTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.formated_datetime = datetime.datetime.now(
-            tz=datetime.UTC
-        ).strftime(feconf.DASHBOARD_STATS_DATETIME_STRING_FORMAT)
+        self.formated_datetime = utils.get_naive_datetime_now().strftime(
+            feconf.DASHBOARD_STATS_DATETIME_STRING_FORMAT)
 
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()

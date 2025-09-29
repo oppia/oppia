@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import datetime
 
+from core import utils
 from core.domain import exp_domain, exp_fetchers, exp_services, rating_services
 from core.platform import models
 from core.tests import test_utils
@@ -109,11 +110,11 @@ class RatingServicesTests(test_utils.GenericTestBase):
         assert first_rating_time is not None
         assert second_rating_time is not None
         self.assertLess(
-            datetime.datetime.now(tz=datetime.UTC),
+            utils.get_naive_datetime_now(),
             first_rating_time + time_allowed_for_computation)
         self.assertLess(first_rating_time, second_rating_time)
         self.assertLess(
-            second_rating_time, datetime.datetime.now(tz=datetime.UTC))
+            second_rating_time, utils.get_naive_datetime_now())
 
     def test_rating_assignations_do_not_conflict(self) -> None:
         """Check that ratings of different explorations are independent."""

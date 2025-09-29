@@ -178,7 +178,7 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
         """Generates a unique id for the event model of the form
         '[timestamp]:[exp_id]:[session_id]'.
         """
-        timestamp = datetime.datetime.now(tz=datetime.UTC)
+        timestamp = utils.get_naive_datetime_now()
         return cls.get_new_id('%s:%s:%s' % (
             utils.get_time_in_millisecs(timestamp),
             exp_id,
@@ -258,7 +258,7 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
         """Generates a unique id for the event model of the form
         '[timestamp]:[exp_id]:[session_id]'.
         """
-        timestamp = datetime.datetime.now(tz=datetime.UTC)
+        timestamp = utils.get_naive_datetime_now()
         return cls.get_new_id('%s:%s:%s' % (
             utils.get_time_in_millisecs(timestamp),
             exp_id,
@@ -330,7 +330,7 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
         """Generates a unique id for the event model of the form
         '[timestamp]:[exp_id]:[session_id]'.
         """
-        timestamp = datetime.datetime.now(tz=datetime.UTC)
+        timestamp = utils.get_naive_datetime_now()
         return cls.get_new_id('%s:%s:%s' % (
             utils.get_time_in_millisecs(timestamp),
             exp_id,
@@ -438,7 +438,7 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
         Returns:
             str. New unique ID for this entity class.
         """
-        timestamp = datetime.datetime.now(tz=datetime.UTC)
+        timestamp = utils.get_naive_datetime_now()
         return cls.get_new_id('%s:%s:%s' % (
             utils.get_time_in_millisecs(timestamp),
             exp_id,
@@ -593,7 +593,7 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
         Returns:
             str. New unique ID for this entity class.
         """
-        timestamp = datetime.datetime.now(tz=datetime.UTC)
+        timestamp = utils.get_naive_datetime_now()
         return cls.get_new_id('%s:%s:%s' % (
             utils.get_time_in_millisecs(timestamp),
             exp_id,
@@ -743,7 +743,7 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
         Returns:
             str. New unique ID for this entity class.
         """
-        timestamp = datetime.datetime.now(tz=datetime.UTC)
+        timestamp = utils.get_naive_datetime_now()
         return cls.get_new_id('%s:%s:%s' % (
             utils.get_time_in_millisecs(timestamp),
             exp_id,
@@ -861,7 +861,7 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
         Returns:
             str. New unique ID for this entity instance.
         """
-        timestamp = datetime.datetime.now(tz=datetime.UTC)
+        timestamp = utils.get_naive_datetime_now()
         return cls.get_new_id('%s:%s:%s' % (
             utils.get_time_in_millisecs(timestamp),
             exp_id,
@@ -975,7 +975,7 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
         Returns:
             str. New unique ID for this entity class.
         """
-        timestamp = datetime.datetime.now(tz=datetime.UTC)
+        timestamp = utils.get_naive_datetime_now()
         return cls.get_new_id('%s:%s:%s' % (
             utils.get_time_in_millisecs(timestamp),
             exp_id,
@@ -1076,7 +1076,7 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
         """Generates a unique id for the event model of the form
         '[timestamp]:[exp_id]:[session_id]'.
         """
-        timestamp = datetime.datetime.now(tz=datetime.UTC)
+        timestamp = utils.get_naive_datetime_now()
         return cls.get_new_id('%s:%s:%s' % (
             utils.get_time_in_millisecs(timestamp),
             exp_id,
@@ -1154,7 +1154,7 @@ class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
         """Generates a unique id for the event model of the form
         '[timestamp]:[exp_id]:[session_id]'.
         """
-        timestamp = datetime.datetime.now(tz=datetime.UTC)
+        timestamp = utils.get_naive_datetime_now()
         return cls.get_new_id('%s:%s:%s' % (
             utils.get_time_in_millisecs(timestamp),
             exp_id,

@@ -1260,7 +1260,7 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
         self.signup('tester@org.com', 'tester')
         author_id = self.get_user_id_from_email('tester@org.com')
 
-        date_time = datetime.datetime.now(tz=datetime.UTC).isoformat()
+        date_time = utils.get_naive_datetime_now().isoformat()
 
         commit1 = exp_models.ExplorationCommitLogEntryModel.create(
             exploration_id, 2, self.committer_1_id, 'msg', 'create', [{
@@ -1327,7 +1327,7 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
         exploration_version = 2
         self.signup('tester@org.com', 'tester')
         author_id = self.get_user_id_from_email('tester@org.com')
-        date_time = datetime.datetime.now(tz=datetime.UTC).isoformat()
+        date_time = utils.get_naive_datetime_now().isoformat()
 
         commit1 = exp_models.ExplorationCommitLogEntryModel.create(
             exploration_id, 2, self.committer_1_id, 'msg', 'create', [{
@@ -1388,7 +1388,7 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
         exploration_title = 'Test Exploration'
         exploration_version = 2
         author_id = 'nik'
-        date_time = datetime.datetime.now(tz=datetime.UTC).isoformat()
+        date_time = utils.get_naive_datetime_now().isoformat()
 
         error = (
             'Could not fetch change diff for exploration %s, version %s during '
@@ -1412,7 +1412,7 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
         exploration_version = 2
         self.signup('tester@org.com', 'tester')
         author_id = self.get_user_id_from_email('tester@org.com')
-        date_time = datetime.datetime.now(tz=datetime.UTC).isoformat()
+        date_time = utils.get_naive_datetime_now().isoformat()
 
         commit1 = exp_models.ExplorationCommitLogEntryModel.create(
             exploration_id, 2, self.committer_1_id, 'msg', 'create', [{

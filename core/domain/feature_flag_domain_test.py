@@ -90,7 +90,7 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
     """Tests for FeatureFlagConfig."""
 
     def test_create_from_dict_returns_correct_instance(self) -> None:
-        current_time = datetime.datetime.now(tz=datetime.UTC)
+        current_time = utils.get_naive_datetime_now()
         feature_flag_config = feature_flag_domain.FeatureFlagConfig.from_dict({
             'force_enable_for_all_users': False,
             'rollout_percentage': 0,
@@ -111,7 +111,7 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
             feature_flag_config.last_updated, current_time)
 
     def test_to_dict_returns_correct_dict(self) -> None:
-        current_time = datetime.datetime.now(tz=datetime.UTC)
+        current_time = utils.get_naive_datetime_now()
         feature_flag_config_dict: feature_flag_domain.FeatureFlagConfigDict = {
             'force_enable_for_all_users': False,
             'rollout_percentage': 0,
@@ -132,9 +132,9 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
             False,
             0,
             [],
-            datetime.datetime.now(tz=datetime.UTC)
+            utils.get_naive_datetime_now()
         )
-        current_time = datetime.datetime.now(tz=datetime.UTC)
+        current_time = utils.get_naive_datetime_now()
         feature_flag_config.set_force_enable_for_all_users(True)
         feature_flag_config.set_rollout_percentage(50)
         feature_flag_config.set_user_group_ids(['user_group_1', 'user_group_2'])
@@ -154,7 +154,7 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
             False,
             0,
             [],
-            datetime.datetime.now(tz=datetime.UTC)
+            utils.get_naive_datetime_now()
         )
         feature_flag_config.validate(feature_flag_domain.ServerMode.DEV)
 
@@ -164,7 +164,7 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
             False,
             -1,
             [],
-            datetime.datetime.now(tz=datetime.UTC)
+            utils.get_naive_datetime_now()
         )
         with self.assertRaisesRegex(
             utils.ValidationError,
@@ -179,7 +179,7 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
             False,
             101,
             [],
-            datetime.datetime.now(tz=datetime.UTC)
+            utils.get_naive_datetime_now()
         )
         with self.assertRaisesRegex(
             utils.ValidationError,
@@ -193,7 +193,7 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
             False,
             0,
             [],
-            datetime.datetime.now(tz=datetime.UTC)
+            utils.get_naive_datetime_now()
         )
         with self.swap(constants, 'DEV_MODE', False):
             with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False):
@@ -210,7 +210,7 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
             False,
             0,
             [],
-            datetime.datetime.now(tz=datetime.UTC)
+            utils.get_naive_datetime_now()
         )
         with self.swap(constants, 'DEV_MODE', False):
             with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
@@ -227,7 +227,7 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
             False,
             0,
             [],
-            datetime.datetime.now(tz=datetime.UTC)
+            utils.get_naive_datetime_now()
         )
         with self.swap(constants, 'DEV_MODE', False):
             with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
@@ -244,7 +244,7 @@ class FeatureFlagTests(test_utils.GenericTestBase):
     """Tests for FeatureFlag."""
 
     def test_create_from_dict_returns_correct_instance(self) -> None:
-        current_time = datetime.datetime.now(tz=datetime.UTC)
+        current_time = utils.get_naive_datetime_now()
         feature_flag = feature_flag_domain.FeatureFlag.from_dict({
             'name': 'feature_a',
             'description': 'for test',
@@ -272,7 +272,7 @@ class FeatureFlagTests(test_utils.GenericTestBase):
             feature_flag.feature_flag_config.last_updated, current_time)
 
     def test_to_dict_returns_correct_dict(self) -> None:
-        current_time = datetime.datetime.now(tz=datetime.UTC)
+        current_time = utils.get_naive_datetime_now()
         feature_flag_config = feature_flag_domain.FeatureFlagConfig(
             False,
             0,
@@ -306,7 +306,7 @@ class FeatureFlagTests(test_utils.GenericTestBase):
             False,
             0,
             [],
-            datetime.datetime.now(tz=datetime.UTC)
+            utils.get_naive_datetime_now()
         )
         feature_flag_spec = feature_flag_domain.FeatureFlagSpec(
             'for test',
@@ -329,7 +329,7 @@ class FeatureFlagTests(test_utils.GenericTestBase):
             False,
             101,
             [],
-            datetime.datetime.now(tz=datetime.UTC)
+            utils.get_naive_datetime_now()
         )
         feature_flag_spec = feature_flag_domain.FeatureFlagSpec(
             'Feature Description',

@@ -21,7 +21,7 @@ from __future__ import annotations
 import datetime
 import itertools
 
-from core import feconf
+from core import feconf, utils
 from core.domain import (
     email_manager,
     feedback_domain,
@@ -1083,7 +1083,7 @@ def update_feedback_email_retries_transactional(user_id: str) -> None:
     """
     model = feedback_models.UnsentFeedbackEmailModel.get(user_id)
     time_since_buffered = (
-        (datetime.datetime.now(tz=datetime.UTC) - model.created_on).seconds)
+        (utils.get_naive_datetime_now() - model.created_on).seconds)
 
     if (time_since_buffered >
             feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS):

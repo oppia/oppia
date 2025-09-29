@@ -21,6 +21,7 @@ from __future__ import annotations
 import datetime
 import uuid
 
+from core import utils
 from core.domain import cloud_task_domain
 from core.tests import test_utils
 
@@ -35,8 +36,8 @@ class CloudTaskDomainTests(test_utils.GenericTestBase):
         task_id = uuid.uuid4().hex
         queue_name = 'test_queue_name'
         current_run_state = 'running'
-        last_updated = datetime.datetime.now(tz=datetime.UTC)
-        created_on = datetime.datetime.now(tz=datetime.UTC)
+        last_updated = utils.get_naive_datetime_now()
+        created_on = utils.get_naive_datetime_now()
         task_name = (
             'projects/%s/locations/%s/queues/%s/tasks/%s' % (
                 project_id, location_id, queue_name, task_id
@@ -67,8 +68,8 @@ class CloudTaskDomainTests(test_utils.GenericTestBase):
         task_id = uuid.uuid4().hex
         queue_name = 'test_queue_name'
         current_run_state = 'running'
-        last_updated = datetime.datetime.now(tz=datetime.UTC)
-        created_on = datetime.datetime.now(tz=datetime.UTC)
+        last_updated = utils.get_naive_datetime_now()
+        created_on = utils.get_naive_datetime_now()
         task_name = (
             'projects/%s/locations/%s/queues/%s/tasks/%s' % (
                 project_id, location_id, queue_name, task_id

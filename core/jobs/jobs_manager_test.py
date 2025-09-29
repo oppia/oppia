@@ -22,7 +22,7 @@ import contextlib
 import datetime
 from unittest import mock
 
-from core import feconf
+from core import feconf, utils
 from core.domain import beam_job_services
 from core.jobs import base_jobs, job_options, jobs_manager
 from core.jobs.types import job_run_result
@@ -125,7 +125,7 @@ class RefreshStateOfBeamJobRunModelTests(test_utils.GenericTestBase):
             project_id='dev-project-id',
             location=feconf.GOOGLE_APP_ENGINE_REGION,
             current_state=dataflow.JobState.JOB_STATE_PENDING,
-            current_state_time=datetime.datetime.now(tz=datetime.UTC))
+            current_state_time=utils.get_naive_datetime_now())
 
         self.dataflow_client_mock = mock.Mock()
         self.dataflow_client_mock.get_job.return_value = self.dataflow_job
@@ -207,7 +207,7 @@ class CancelJobTests(test_utils.GenericTestBase):
             project_id='dev-project-id',
             location=feconf.GOOGLE_APP_ENGINE_REGION,
             current_state=dataflow.JobState.JOB_STATE_CANCELLING,
-            current_state_time=datetime.datetime.now(tz=datetime.UTC))
+            current_state_time=utils.get_naive_datetime_now())
 
         self.dataflow_client_mock = mock.Mock()
         self.dataflow_client_mock.update_job.return_value = self.dataflow_job

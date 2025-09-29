@@ -28,7 +28,7 @@ from core.tests import test_utils
 
 class BeamJobTests(test_utils.TestBase):
 
-    NOW = datetime.datetime.now(tz=datetime.UTC)
+    NOW = utils.get_naive_datetime_now()
 
     def test_usage(self) -> None:
         job = beam_job_domain.BeamJob(
@@ -43,7 +43,7 @@ class BeamJobTests(test_utils.TestBase):
 
 class BeamJobRunTests(test_utils.TestBase):
 
-    NOW = datetime.datetime.now(tz=datetime.UTC)
+    NOW = utils.get_naive_datetime_now()
 
     def test_usage(self) -> None:
         run = beam_job_domain.BeamJobRun(

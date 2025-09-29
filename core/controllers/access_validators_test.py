@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import datetime
 
-from core import feature_flag_list, feconf
+from core import feature_flag_list, feconf, utils
 from core.constants import constants
 from core.domain import (
     caching_services,
@@ -994,7 +994,7 @@ class BlogPostPageAccessValidationHandlerTests(test_utils.GenericTestBase):
             author_id='user_1',
             content='content',
             title='title',
-            published_on=datetime.datetime.now(tz=datetime.UTC),
+            published_on=utils.get_naive_datetime_now(),
             url_fragment='sample-url',
             tags=['news'],
             thumbnail_filename='thumbnail.svg',

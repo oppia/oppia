@@ -314,7 +314,7 @@ class SentEmailModel(base_models.BaseModel):
         email_hash = cls._generate_hash(
             recipient_id, email_subject, email_body)
 
-        datetime_now = datetime.datetime.now(tz=datetime.UTC)
+        datetime_now = utils.get_naive_datetime_now()
         time_interval = datetime.timedelta(
             minutes=feconf.DUPLICATE_EMAIL_INTERVAL_MINS)
 

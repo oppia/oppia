@@ -22,7 +22,7 @@ import datetime
 import re
 import types
 
-from core import feconf
+from core import feconf, utils
 from core.constants import constants
 from core.platform import models
 from core.tests import test_utils
@@ -325,15 +325,15 @@ class BaseHumanMaintainedModelTests(test_utils.GenericTestBase):
             to the datastore.
             """
             self._last_updated_timestamp_is_fresh = True
-            self.last_updated_by_human = datetime.datetime.now(tz=datetime.UTC)
+            self.last_updated_by_human = utils.get_naive_datetime_now()
 
             # These if conditions can be removed once the auto_now property
             # is set True to these attributes.
             if self.created_on is None:
-                self.created_on = datetime.datetime.now(tz=datetime.UTC)
+                self.created_on = utils.get_naive_datetime_now()
 
             if self.last_updated is None:
-                self.last_updated = datetime.datetime.now(tz=datetime.UTC)
+                self.last_updated = utils.get_naive_datetime_now()
 
             # We are using BaseModel.put() to save the changes to the datastore
             # since the put() method which TestBaseHumanMaintainedModel class

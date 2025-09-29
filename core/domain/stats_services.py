@@ -1391,7 +1391,7 @@ def record_learner_answer_info(
         stats_domain.LearnerAnswerInfo.get_new_learner_answer_info_id())
     learner_answer_info = stats_domain.LearnerAnswerInfo(
         learner_answer_info_id, answer, answer_details,
-        datetime.datetime.now(tz=datetime.UTC))
+        utils.get_naive_datetime_now())
     learner_answer_details.add_learner_answer_info(learner_answer_info)
     save_learner_answer_details(
         entity_type, state_reference, learner_answer_details)

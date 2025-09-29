@@ -564,13 +564,13 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             feconf.ROLE_ID_VOICEOVER_ADMIN
         ]
 
-        less_than_time = datetime.datetime.now(tz=datetime.UTC)
+        less_than_time = utils.get_naive_datetime_now()
 
         users_settings = user_services.get_users_settings(user_ids)
         self.assertEqual(len(users_settings), 1)
         admin_settings = users_settings[0]
 
-        greater_than_time = datetime.datetime.now(tz=datetime.UTC)
+        greater_than_time = utils.get_naive_datetime_now()
 
         # Ruling out the possibility of None for mypy type checking.
         assert admin_settings is not None
@@ -3261,7 +3261,7 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
             user_services.get_user_settings(self.viewer_id).last_logged_in)
         self.assertIsNotNone(previous_last_logged_in_datetime)
 
-        current_datetime = datetime.datetime.now(tz=datetime.UTC)
+        current_datetime = utils.get_naive_datetime_now()
         mocked_datetime_utcnow = current_datetime - datetime.timedelta(days=1)
         with self.mock_datetime_utcnow(mocked_datetime_utcnow):
             user_services.record_user_logged_in(self.viewer_id)
@@ -3293,7 +3293,7 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
             user_services.get_user_settings(self.viewer_id).last_logged_in)
         self.assertIsNotNone(previous_last_logged_in_datetime)
 
-        current_datetime = datetime.datetime.now(tz=datetime.UTC)
+        current_datetime = utils.get_naive_datetime_now()
 
         mocked_datetime_utcnow = current_datetime + datetime.timedelta(hours=11)
         with self.mock_datetime_utcnow(mocked_datetime_utcnow):
