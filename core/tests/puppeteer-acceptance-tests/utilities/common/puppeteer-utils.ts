@@ -588,15 +588,15 @@ export class BaseUser {
    * The function clicks the element using the text on the button
    * and wait until the new page is fully loaded.
    * @param selector - The selector of button to click.
-   * @param options - The navigation options.
    * @param useSelector - Whether to use the selector or the text.
+   * @param options - The navigation options.
    */
   async clickAndWaitForNavigation(
     selector: string,
+    useSelector: boolean = false,
     options: puppeteer.WaitForOptions = {
       waitUntil: ['networkidle2', 'load'],
-    },
-    useSelector: boolean = false
+    }
   ): Promise<void> {
     const navigationPromise = this.page.waitForNavigation(options);
 

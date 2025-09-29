@@ -6815,9 +6815,11 @@ export class ExplorationEditor extends BaseUser {
     await this.waitForElementToBeClickable(historyOption);
     await historyOption.click();
 
-    await this.clickOn(`${dropdownMenuShown} ${revertVersionButtonSelector}`);
+    await this.clickOnElementWithSelector(
+      `${dropdownMenuShown} ${revertVersionButtonSelector}`
+    );
     await this.waitForElementToStabilize(confirmRevertButtonSelector);
-    await this.clickAndWaitForNavigation(confirmRevertButtonSelector, {
+    await this.clickAndWaitForNavigation(confirmRevertButtonSelector, true, {
       waitUntil: ['networkidle0', 'load'],
     });
     await this.page.waitForFunction(
