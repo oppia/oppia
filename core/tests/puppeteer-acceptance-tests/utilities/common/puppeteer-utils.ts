@@ -484,15 +484,32 @@ export class BaseUser {
 
   /**
    * The function clicks the element using the text on the button.
-   * @param selector The text of the button to click on.
-   * @param parentElement The parent element to search within.
+   * @param selector - The text of the button to click on.
+   * @param parentElement - The parent element to search within.
+   * @param elementPlace - 1-based index to select nth element with the given selector.
    */
   async clickOnElementWithSelector(
     selector: string,
-    parentElement?: puppeteer.ElementHandle
+    parentElement?: puppeteer.ElementHandle | null,
+    elementPlace?: number
   ): Promise<void> {
     const context = parentElement ?? this.page;
-    const element = await context.waitForSelector(selector, {timeout: 15000});
+    let element = await context.waitForSelector(selector, {timeout: 15000});
+
+    // Get nth element if elementPlace is given.
+    if (elementPlace) {
+      const elements = await context.$$(selector);
+      if (elements.length < elementPlace) {
+        throw Error(
+          `Only ${elements.length} elements found for selecter "${selector}".\n` +
+            `Required atleast ${elementPlace}`
+        );
+      }
+
+      element = elements[elementPlace - 1];
+    }
+
+    // Click on the element.
     if (!element) {
       throw new Error(`Element not found for selector ${selector}`);
     }
