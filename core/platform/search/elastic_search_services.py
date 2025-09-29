@@ -319,7 +319,7 @@ def search(
     sort = [
         {'rank': {
             'order': 'desc',
-            'missing': 'last',
+            'missing': '_last',
             'unmapped_type': 'float',
             }
         }
@@ -401,7 +401,7 @@ def blog_post_summaries_search(
     sort = [
         {'rank': {
             'order': 'desc',
-            'missing': 'last',
+            'missing': '_last',
             'unmapped_type': 'float',
             }
         }
