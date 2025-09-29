@@ -199,11 +199,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     private platFeatService: PlatformFeatureService
   ) {}
 
-  /**
-   * Populates the curatedExplorationIds set with exploration IDs from all topics.
-   * This is used to filter out curated content from community lessons.
-   */
-  private populateCuratedExplorationIds(): void {
+  populateCuratedExplorationIds(): void {
     this.curatedExplorationIds.clear();
     (this.allTopics || []).forEach(topic => {
       (topic.getCanonicalStorySummaryDicts() || []).forEach(storySummary => {
@@ -217,14 +213,9 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     });
   }
 
-  /**
-   * Filters exploration lists to exclude curated explorations.
-   * @param responseData - The response data containing exploration lists
-   */
-  private filterExplorationsData(responseData: any): void {
+  filterExplorationsData(responseData: any): void {
     this.populateCuratedExplorationIds();
 
-    // Filter both completed and incomplete explorations
     this.completedExplorationsList = (
       responseData.completedExplorationsList || []
     ).filter(
@@ -335,20 +326,22 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
 
     let dashboardExplorationsDataPromise =
       this.learnerDashboardBackendApiService.fetchLearnerDashboardExplorationsDataAsync();
-    dashboardExplorationsDataPromise.then(
-      responseData => {
-        this.filterExplorationsData(responseData);
-      },
-      errorResponseStatus => {
-        if (
-          AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus) !== -1
-        ) {
-          this.alertsService.addWarning(
-            'Failed to get learner dashboard explorations data'
-          );
+    dashboardTopicAndStoriesDataPromise.then(() => {
+      dashboardExplorationsDataPromise.then(
+        responseData => {
+          this.filterExplorationsData(responseData);
+        },
+        errorResponseStatus => {
+          if (
+            AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus) !== -1
+          ) {
+            this.alertsService.addWarning(
+              'Failed to get learner dashboard explorations data'
+            );
+          }
         }
-      }
-    );
+      );
+    });
 
     Promise.all([
       userInfoPromise,
