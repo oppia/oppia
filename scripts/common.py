@@ -20,6 +20,7 @@ import contextlib
 import errno
 import getpass
 import io
+import itertools
 import os
 import platform
 import re
@@ -37,7 +38,9 @@ from core import feconf
 from scripts import servers
 
 import certifi
-from typing import Dict, Final, Generator, List, Optional, Tuple, Union
+from typing import (
+    BinaryIO, Dict, Final, Generator, List, Literal, Optional, TextIO, Tuple,
+    Union, cast)
 
 # Add third_party to path. Some scripts access feconf even before
 # python_libs is added to path.
@@ -83,7 +86,7 @@ GOOGLE_CLOUD_SDK_HOME = (
     if feconf.OPPIA_IS_DOCKERIZED
     else os.path.join(
         OPPIA_TOOLS_DIR_ABS_PATH,
-        'google-cloud-sdk-500.0.0',
+        'google-cloud-sdk-540.0.0',
         'google-cloud-sdk'
     )
 )

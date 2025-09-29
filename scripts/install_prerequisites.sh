@@ -29,7 +29,7 @@ sudo apt-get update
 sudo apt-get install curl
 sudo apt-get install git
 sudo apt-get install unzip
-sudo apt-get install openjdk-11-jre
+sudo apt-get install openjdk-21-jre
 
 # Prerequirements for pyenv.
 sudo apt-get install make

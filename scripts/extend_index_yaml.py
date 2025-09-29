@@ -38,13 +38,12 @@ YamlIndexesDict = Dict[
 ]
 
 INDEX_YAML_PATH = os.path.join(os.getcwd(), 'index.yaml')
-WEB_INF_INDEX_XML_PATH = os.path.join(
+WEB_INF_INDEX_YAML_PATH = os.path.join(
     os.getcwd(),
     os.pardir,
     'cloud_datastore_emulator_cache',
     'WEB-INF',
-    'appengine-generated',
-    'datastore-indexes-auto.xml'
+    'index.yaml'
 )
 
 
@@ -90,12 +89,7 @@ def main() -> None:
         index_yaml_dict = yaml.safe_load(f)
 
     with open(WEB_INF_INDEX_XML_PATH, 'r', encoding='utf-8') as f:
-        web_inf_index_xml_dict = xmltodict.parse(
-            f.read(), force_list={'datastore-index', 'property'}
-        )
-
-    web_inf_index_yaml_dict = reformat_xml_dict_into_yaml_dict(
-        web_inf_index_xml_dict)
+        web_inf_index_yaml_dict = yaml.safe_load(f)
 
     if web_inf_index_yaml_dict is None:
         return

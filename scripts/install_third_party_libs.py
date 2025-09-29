@@ -99,8 +99,8 @@ def test_python_version() -> None:
         Exception. The Python version does not match the expected prefix.
     """
     running_python_version = '{0[0]}.{0[1]}.{0[2]}'.format(sys.version_info)
-    if running_python_version != '3.13.6':
-        print('Please use Python 3.13.6. Exiting...')
+    if running_python_version != '3.12.10':
+        print('Please use Python 3.12.10. Exiting...')
         raise Exception('No suitable python version found.')
 
 
@@ -195,7 +195,7 @@ def install_gcloud_sdk() -> None:
             # should also be updated.
             common.url_retrieve(
                 'https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/'
-                'google-cloud-sdk-500.0.0-linux-x86_64.tar.gz',
+                'google-cloud-sdk-540.0.0-linux-x86_64.tar.gz',
                 'gcloud-sdk.tar.gz')
         except Exception as e:
             print('Error downloading Google Cloud SDK. Exiting.')
@@ -205,7 +205,7 @@ def install_gcloud_sdk() -> None:
         tar = tarfile.open(name='gcloud-sdk.tar.gz')
         tar.extractall(
             path=os.path.join(
-                common.OPPIA_TOOLS_DIR, 'google-cloud-sdk-500.0.0/'),
+                common.OPPIA_TOOLS_DIR, 'google-cloud-sdk-540.0.0/'),
             filter='data')
         tar.close()
 

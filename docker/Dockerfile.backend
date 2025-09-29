@@ -1,5 +1,5 @@
 # The platform flag is added because of https://stackoverflow.com/a/71611002
-FROM --platform=linux/amd64 python:3.13.6-slim-bullseye AS backend
+FROM --platform=linux/amd64 python:3.12.10-slim-bullseye AS backend
 
 ENV OPPIA_IS_DOCKERIZED="true"
 
@@ -10,7 +10,7 @@ RUN apt-get update -y && apt-get upgrade -y \
     curl \
     git \
     npm \
-    openjdk-11-jre \
+    openjdk-21-jre \
     unzip \
     wget \
     jq
@@ -27,7 +27,7 @@ RUN pip install pip-tools==7.5.0 setuptools==80.9.0 cmake
 WORKDIR /app/vm_deps
 
 # Installing Google Cloud SDK
-RUN wget -O /app/vm_deps/gcloud-sdk.tar.gz https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-500.0.0-linux-x86_64.tar.gz && \
+RUN wget -O /app/vm_deps/gcloud-sdk.tar.gz https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-540.0.0-linux-x86_64.tar.gz && \
     tar -xzf gcloud-sdk.tar.gz && \
     ./google-cloud-sdk/install.sh --quiet && \
     ./google-cloud-sdk/bin/gcloud components install beta cloud-datastore-emulator app-engine-python app-engine-python-extras && \
