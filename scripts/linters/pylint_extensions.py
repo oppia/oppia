@@ -62,7 +62,7 @@ ALLOWED_PRAGMAS_FOR_INLINE_COMMENTS: Final = [
 ALLOWED_LINES_OF_GAP_IN_COMMENT: Final = 15
 
 import astroid
-from pylint import checkers, interfaces
+from pylint import checkers
 from pylint.checkers import utils as checker_utils
 from pylint.extensions import _check_docs_utils
 
@@ -90,8 +90,6 @@ class HangingIndentChecker(checkers.BaseChecker):  # type: ignore[misc]
     """Custom pylint checker which checks for break after parenthesis in case
     of hanging indentation.
     """
-
-    __implements__ = interfaces.ITokenChecker
 
     name = 'hanging-indent'
     priority = -1
@@ -215,8 +213,6 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
     Args:
         linter: Pylinter. The linter object.
     """
-
-    __implements__ = interfaces.IAstroidChecker
 
     name = 'parameter_documentation'
     msgs = {
@@ -447,7 +443,7 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
                 in the AST.
         """
         # Check if the given node has docstring.
-        if node.doc is None:
+        if node.doc_node is None:
             return
         line_number = node.fromlineno
         # Iterate till the start of docstring.
@@ -458,7 +454,7 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
 
             line_number += 1
 
-        doc_length = len(node.doc.split('\n'))
+        doc_length = len(node.doc_node.split('\n'))
         line_number += doc_length
         first_line_after_doc = linecache.getline(
             node.root().file, line_number).strip()
@@ -692,8 +688,8 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
             node: astroid.NodeNG. Node for a function or
                 method definition in the AST.
         """
-        if node.doc:
-            docstring = node.doc.splitlines()
+        if node.doc_node:
+            docstring = node.doc_node.splitlines()
             # Check for space after """ in docstring.
             if len(docstring[0]) > 0 and docstring[0][0] == ' ':
                 self.add_message('space-after-triple-quote', node=node)
@@ -741,11 +737,11 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
         # description, hence a freeform section.
         currently_in_freeform_section = False
         args_indentation = 0
-        if node.doc:
+        if node.doc_node:
             current_docstring_section = None
             in_description = False
             args_indentation_in_spaces = 0
-            docstring = node.doc.splitlines()
+            docstring = node.doc_node.splitlines()
             self.check_newline_above_args(node, docstring)
             for line in docstring:
                 stripped_line = line.lstrip()
@@ -988,7 +984,7 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
         if not expected_excs:
             return
 
-        if not func_node.doc:
+        if not func_node.doc_node:
             # If this is a property setter,
             # the property should have the docstring instead.
             setters_property = docstrings_checker.get_setters_property(
@@ -1022,7 +1018,8 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
         func_node = node.frame()
 
         doc = docstrings_checker.docstringify(func_node.doc_node)
-        if doc.matching_sections() == 0 and self.config.accept_no_return_doc:
+        if (doc.matching_sections() == 0 and
+                self.linter.config.accept_no_return_doc):
             return
 
         is_property = checker_utils.decorated_with_property(func_node)
@@ -1279,9 +1276,6 @@ class ImportOnlyModulesChecker(checkers.BaseChecker):  # type: ignore[misc]
     """Checker for import-from statements. It checks that
     modules are only imported.
     """
-
-    __implements__ = interfaces.IAstroidChecker
-
     name = 'import-only-modules'
     priority = -1
     msgs = {
@@ -1346,9 +1340,6 @@ class BackslashContinuationChecker(checkers.BaseChecker):  # type: ignore[misc]
     """Custom pylint checker which checks that backslash is not used
     for continuation.
     """
-
-    __implements__ = interfaces.IRawChecker
-
     name = 'backslash-continuation'
     priority = -1
     msgs = {
@@ -1384,8 +1375,6 @@ class FunctionArgsOrderChecker(checkers.BaseChecker): # type: ignore[misc]
     """Custom pylint checker which checks the order of arguments in function
     definition.
     """
-
-    __implements__ = interfaces.IAstroidChecker
     name = 'function-args-order'
     priority = -1
     msgs = {
@@ -1427,8 +1416,6 @@ class RestrictedImportChecker(checkers.BaseChecker):  # type: ignore[misc]
     """Custom pylint checker which checks layers importing modules
     from their respective restricted layers.
     """
-
-    __implements__ = interfaces.IAstroidChecker
     name = 'invalid-import'
     priority = -1
     msgs = {
@@ -1601,7 +1588,6 @@ class RestrictedImportChecker(checkers.BaseChecker):  # type: ignore[misc]
 class SingleCharAndNewlineAtEOFChecker(checkers.BaseChecker):  # type: ignore[misc]
     """Checker for single character files and newline at EOF."""
 
-    __implements__ = interfaces.IRawChecker
     name = 'newline-at-eof'
     priority = -1
     msgs = {
@@ -1640,7 +1626,6 @@ class SingleCharAndNewlineAtEOFChecker(checkers.BaseChecker):  # type: ignore[mi
 class SingleLineCommentChecker(checkers.BaseChecker):  # type: ignore[misc]
     """Checks if comments follow correct style."""
 
-    __implements__ = interfaces.ITokenChecker
     name = 'incorrectly_styled_comment'
     priority = -1
     msgs = {
@@ -1813,7 +1798,6 @@ class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):  # type: ignore[m
     (missing-docstring) for missing file overviews.
     """
 
-    __implements__ = interfaces.IAstroidChecker
     name = 'space_between_imports_and_file-overview'
     priority = -1
     msgs = {
@@ -1837,7 +1821,7 @@ class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):  # type: ignore[m
             node: astroid.scoped_nodes.Function. Node to access module content.
         """
         # Check if the given node has docstring.
-        if node.doc is None:
+        if node.doc_node is None:
             return
         line_number = node.fromlineno
         # Iterate till the start of docstring.
@@ -1848,7 +1832,7 @@ class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):  # type: ignore[m
 
             line_number += 1
 
-        doc_length = len(node.doc.split('\n'))
+        doc_length = len(node.doc_node.split('\n'))
         line_number += doc_length
         first_line_after_doc = linecache.getline(
             node.root().file, line_number).strip()
@@ -1872,8 +1856,6 @@ class SingleLinePragmaChecker(checkers.BaseChecker):  # type: ignore[misc]
     """Custom pylint checker which checks if pylint pragma is used to disable
     a rule for a single line only.
     """
-
-    __implements__ = interfaces.ITokenChecker
 
     name = 'single-line-pragma'
     priority = -1
@@ -1922,8 +1904,6 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):  # type: ignore[misc]
     """Custom pylint checker which checks if MyPy's type ignores are properly
     documented or not.
     """
-
-    __implements__ = interfaces.IAstroidChecker
 
     name = 'type-ignore-comment'
     priority = -1
@@ -2083,8 +2063,6 @@ class SingleSpaceAfterKeyWordChecker(checkers.BaseChecker):  # type: ignore[misc
     after keywords like `if`, `elif`, `while`, and `yield`.
     """
 
-    __implements__ = interfaces.ITokenChecker
-
     name = 'single-space-after-keyword'
     priority = -1
     msgs = {
@@ -2162,8 +2140,6 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):  # type: ignore[misc
         'args_section_end_line_num': 0,
         'func_def_start_line': 0,
     }
-
-    __implements__ = interfaces.IAstroidChecker
 
     name = 'comment-for-exceptional-types'
     priority = -1
@@ -2556,8 +2532,6 @@ class InequalityWithNoneChecker(checkers.BaseChecker):  # type: ignore[misc]
     enforcing use of "if x is not None" instead.
     """
 
-    __implements__ = interfaces.IAstroidChecker
-
     name = 'inequality-with-none'
     priority = -1
     msgs = {
@@ -2596,8 +2570,6 @@ class NonTestFilesFunctionNameChecker(checkers.BaseChecker):  # type: ignore[mis
     """Custom pylint checker prohibiting use of "test_only" prefix in function
     names of non-test files.
     """
-
-    __implements__ = interfaces.IAstroidChecker
 
     name = 'non-test-files-function-name-checker'
     priority = -1
@@ -2639,7 +2611,6 @@ class DisallowedFunctionsChecker(checkers.BaseChecker):  # type: ignore[misc]
     regex checks of functions calls to be removed or replaced.
     """
 
-    __implements__ = interfaces.IAstroidChecker
     name = 'disallowed-function-calls'
     priority = -1
     msgs = {
@@ -2778,8 +2749,6 @@ class DisallowHandlerWithoutSchema(checkers.BaseChecker):  # type: ignore[misc]
     defined within the class.
     """
 
-    __implements__ = interfaces.IAstroidChecker
-
     name = 'disallow-handlers-without-schema'
     priority = -1
     msgs = {
@@ -2894,8 +2863,6 @@ class DisallowHandlerWithoutSchema(checkers.BaseChecker):  # type: ignore[misc]
 class DisallowedImportsChecker(checkers.BaseChecker):  # type: ignore[misc]
     """Check that disallowed imports are not made."""
 
-    __implements__ = interfaces.IAstroidChecker
-
     name = 'disallowed-imports'
     priority = -1
     msgs = {
@@ -2928,9 +2895,7 @@ class DisallowedImportsChecker(checkers.BaseChecker):  # type: ignore[misc]
 # (Class cannot subclass 'BaseChecker' (has type 'Any')),
 # we added an ignore here.
 class PreventStringConcatenationChecker(checkers.BaseChecker): # type: ignore[misc]
-    """Checks for string concactenation and encourages string interpolation."""
-
-    __implements__ = interfaces.IAstroidChecker
+    """Checks for string concatenation and encourages string interpolation."""
 
     name = 'use-string-interpolation'
     priority = -1
