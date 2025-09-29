@@ -24,7 +24,6 @@ from __future__ import annotations
 
 import os
 
-import xmltodict
 import yaml
 from typing import Dict, List, Optional, Union
 
@@ -47,48 +46,12 @@ WEB_INF_INDEX_YAML_PATH = os.path.join(
 )
 
 
-def reformat_xml_dict_into_yaml_dict(
-    xml_dict: XmlIndexesDict
-) -> Optional[YamlIndexesDict]:
-    """Reformats the xml index dict into yaml index dict.
-
-    Args:
-        xml_dict: dict. The dict parsed from xml index file.
-
-    Returns:
-        dict. The dict in yaml format.
-    """
-    yaml_index_entries = []
-    if (
-        'datastore-indexes' not in xml_dict or
-        'datastore-index' not in xml_dict['datastore-indexes']
-    ):
-        return None
-
-    for xml_index in xml_dict['datastore-indexes']['datastore-index']:
-        yaml_index_properties: List[Dict[str, str]] = []
-        for xml_index_property in xml_index['property']:
-            assert isinstance(xml_index_property, dict)
-            yaml_index_property = {
-                'name': xml_index_property['@name'],
-            }
-            if xml_index_property['@direction'] == 'desc':
-                yaml_index_property['direction'] = 'desc'
-            yaml_index_properties.append(yaml_index_property)
-
-        yaml_index_entries.append({
-            'kind': xml_index['@kind'], 'properties': yaml_index_properties
-        })
-
-    return {'indexes': yaml_index_entries}
-
-
 def main() -> None:
     """Extends index.yaml file."""
     with open(INDEX_YAML_PATH, 'r', encoding='utf-8') as f:
         index_yaml_dict = yaml.safe_load(f)
 
-    with open(WEB_INF_INDEX_XML_PATH, 'r', encoding='utf-8') as f:
+    with open(WEB_INF_INDEX_YAML_PATH, 'r', encoding='utf-8') as f:
         web_inf_index_yaml_dict = yaml.safe_load(f)
 
     if web_inf_index_yaml_dict is None:
