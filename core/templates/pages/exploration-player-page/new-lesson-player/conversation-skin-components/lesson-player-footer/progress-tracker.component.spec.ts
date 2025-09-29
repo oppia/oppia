@@ -250,12 +250,14 @@ describe('ProgressTrackerComponent', () => {
     );
   });
 
-  it('should fetch checkpoint count and show progress reminder modal when checkpoint count is zero', () => {
+  it('should fetch checkpoint count and show progress reminder modal when checkpoint count is zero', fakeAsync(() => {
     component.checkpointCount = 0;
     mockCheckpointProgressService.fetchCheckpointCount.and.returnValue(5);
     spyOn(component, 'showProgressReminderModal');
 
     component.ngOnInit();
+    tick();
+
     mockPlayerPositionService.emitLoadedMostRecentCheckpoint();
 
     expect(
@@ -263,7 +265,7 @@ describe('ProgressTrackerComponent', () => {
     ).toHaveBeenCalled();
     expect(component.checkpointCount).toBe(5);
     expect(component.showProgressReminderModal).toHaveBeenCalled();
-  });
+  }));
 
   it('should set loggedOutProgressUniqueUrlId from progressUrlService when pid does not exist', () => {
     mockUrlService.getUrlParams.and.returnValue({});
@@ -287,15 +289,17 @@ describe('ProgressTrackerComponent', () => {
     expect(component.loggedOutProgressUniqueUrl).toBeUndefined();
   });
 
-  it('should show progress reminder modal when checkpoint count exists and onLoadedMostRecentCheckpoint emits', () => {
+  it('should show progress reminder modal when checkpoint count exists and onLoadedMostRecentCheckpoint emits', fakeAsync(() => {
     component.checkpointCount = 5;
     spyOn(component, 'showProgressReminderModal');
 
     component.ngOnInit();
+    tick();
+
     mockPlayerPositionService.emitLoadedMostRecentCheckpoint();
 
     expect(component.showProgressReminderModal).toHaveBeenCalled();
-  });
+  }));
 
   it('should emit onShowProgressModal when completedCheckpointsCount is 0', () => {
     mockCheckpointProgressService.getMostRecentlyReachedCheckpointIndex.and.returnValue(
