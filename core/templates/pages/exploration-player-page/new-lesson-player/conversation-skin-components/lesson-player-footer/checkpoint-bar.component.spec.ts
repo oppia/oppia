@@ -198,6 +198,55 @@ describe('CheckpointBarComponent', () => {
     expect(width).toBe(100);
   });
 
+  it('should return correct tooltip for completed checkpoint', () => {
+    component.checkpointStatusArray = [
+      'completed',
+      'in-progress',
+      'incomplete',
+    ];
+    expect(component.getCheckpointTooltip(0)).toBe('Checkpoint 0: Completed');
+  });
+
+  it('should return correct tooltip for in-progress checkpoint', () => {
+    component.checkpointStatusArray = [
+      'completed',
+      'in-progress',
+      'incomplete',
+    ];
+    expect(component.getCheckpointTooltip(1)).toBe(
+      'Checkpoint 1: Next checkpoint'
+    );
+  });
+
+  it('should return correct tooltip for incomplete checkpoint', () => {
+    component.checkpointStatusArray = [
+      'completed',
+      'in-progress',
+      'incomplete',
+    ];
+    expect(component.getCheckpointTooltip(2)).toBe('Checkpoint 2: Locked');
+  });
+
+  it('should return empty string for unknown checkpoint status', () => {
+    component.checkpointStatusArray = ['completed', 'unknown'];
+    expect(component.getCheckpointTooltip(1)).toBe('');
+  });
+
+  it('should return correct aria label using getCheckpointAriaLabel', () => {
+    component.checkpointStatusArray = [
+      'completed',
+      'in-progress',
+      'incomplete',
+    ];
+    spyOn(component, 'getCheckpointTooltip').and.returnValue(
+      'Checkpoint 1: Next checkpoint'
+    );
+    expect(component.getCheckpointAriaLabel(1)).toBe(
+      'Checkpoint 1: Next checkpoint'
+    );
+    expect(component.getCheckpointTooltip).toHaveBeenCalledWith(1);
+  });
+
   it('should calculate progress width correctly within a segment', () => {
     component.checkpointIndexes = [0, 10, 20, 30];
     component.checkpointCount = 4;

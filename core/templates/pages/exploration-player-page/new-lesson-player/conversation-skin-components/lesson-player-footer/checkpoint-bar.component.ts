@@ -209,4 +209,24 @@ export class CheckpointBarComponent implements OnInit {
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
   }
+
+  getCheckpointTooltip(index: number): string {
+    const status = this.checkpointStatusArray[index];
+    const checkpointNumber = index;
+
+    switch (status) {
+      case 'completed':
+        return `Checkpoint ${checkpointNumber}: Completed`;
+      case 'in-progress':
+        return `Checkpoint ${checkpointNumber}: Next checkpoint`;
+      case 'incomplete':
+        return `Checkpoint ${checkpointNumber}: Locked`;
+      default:
+        return '';
+    }
+  }
+
+  getCheckpointAriaLabel(index: number): string {
+    return this.getCheckpointTooltip(index);
+  }
 }
