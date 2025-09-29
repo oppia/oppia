@@ -76,6 +76,7 @@ export type ModalUserInteractions = (
 
 export class BaseUser {
   page!: Page;
+  pages: Page[] = [];
   browserObject!: Browser;
   userHasAcceptedCookies: boolean = false;
   email: string | null = null;
@@ -128,6 +129,7 @@ export class BaseUser {
           TestToModulesMatcher.registerPuppeteerBrowser(browser);
         }
         this.page = await browser.newPage();
+        this.pages.push(this.page);
 
         if (mobile) {
           // This is the default viewport and user agent settings for iPhone 6.
@@ -585,16 +587,18 @@ export class BaseUser {
   /**
    * The function clicks the element using the text on the button
    * and wait until the new page is fully loaded.
-   * @param {string} selector - The selector of the element.
-   * @param {boolean} useSelector - Whether to use the selector or the text.
+   * @param selector - The selector of button to click.
+   * @param options - The navigation options.
+   * @param useSelector - Whether to use the selector or the text.
    */
   async clickAndWaitForNavigation(
     selector: string,
+    options: puppeteer.WaitForOptions = {
+      waitUntil: ['networkidle2', 'load'],
+    },
     useSelector: boolean = false
   ): Promise<void> {
-    const navigationPromise = this.page.waitForNavigation({
-      waitUntil: ['networkidle2', 'load'],
-    });
+    const navigationPromise = this.page.waitForNavigation(options);
 
     if (useSelector) {
       await this.waitForElementToStabilize(selector);
@@ -1170,6 +1174,7 @@ export class BaseUser {
    */
   async createAndSwitchToNewTab(): Promise<puppeteer.Page> {
     const newPage = await this.browserObject.newPage();
+    this.pages.push(newPage);
 
     if (this.isViewportAtMobileWidth()) {
       // Set viewport for mobile.
@@ -1194,6 +1199,35 @@ export class BaseUser {
     await newPage.bringToFront();
     this.page = newPage;
     return newPage;
+  }
+
+  /**
+   * Switches to the previous page.
+   */
+  async switchToNextPage(): Promise<void> {
+    const currentPageIndex = this.pages.indexOf(this.page);
+    if (currentPageIndex === -1) {
+      throw new Error('Current page not found in pages array.');
+    }
+    const nextPageIndex = (currentPageIndex + 1) % this.pages.length;
+    this.page = this.pages[nextPageIndex];
+
+    this.page.bringToFront();
+  }
+
+  /**
+   * Switches to the previous page.
+   */
+  async switchToPreviousPage(): Promise<void> {
+    const currentPageIndex = this.pages.indexOf(this.page);
+    if (currentPageIndex === -1) {
+      throw new Error('Current page not found in pages array.');
+    }
+    const previousPageIndex =
+      (currentPageIndex - 1 + this.pages.length) % this.pages.length;
+    this.page = this.pages[previousPageIndex];
+
+    this.page.bringToFront();
   }
 
   /**
@@ -1925,6 +1959,28 @@ export class BaseUser {
 
     // If no pattern matches, throw an error.
     throw new Error(`Unable to parse date string: "${dateString}"`);
+  }
+
+  /**
+   * Clicks on the element with the given text.
+   * @param text The text of the element to click on.
+   */
+  async clickOnElementWithText(text: string): Promise<void> {
+    // Normalize-space is used to remove the extra spaces in the text.
+    // Check the documentation for the normalize-space function here :
+    // https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space.
+    const element = await this.page.waitForXPath(
+      `//*[contains(normalize-space(text()), normalize-space("${text}"))]`,
+      {timeout: 10000}
+    );
+
+    if (!element) {
+      throw new Error(`Element not found for text: ${text}`);
+    }
+    await this.waitForElementToStabilize(element);
+    await this.waitForElementToBeClickable(element);
+    await element.click();
+    showMessage(`Element (text: ${text}) is clicked.`);
   }
 }
 

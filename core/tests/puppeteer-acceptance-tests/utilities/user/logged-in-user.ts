@@ -350,9 +350,11 @@ export class LoggedInUser extends BaseUser {
   /**
    * Checks if the profile dropdown contains the given element.
    * @param item The element to check for.
+   * @param visible - Whether the element should be visible or not.
    */
   async expectProfileDropdownToContainElementWithContent(
-    item: string
+    item: string,
+    visible: boolean = true
   ): Promise<void> {
     await this.isElementVisible(profileDropdownContainerSelector);
 
@@ -362,7 +364,11 @@ export class LoggedInUser extends BaseUser {
         elements.map(el => (el as HTMLAnchorElement).textContent?.trim())
     );
 
-    expect(elementsContents).toContain(item);
+    if (visible) {
+      expect(elementsContents).toContain(item);
+    } else {
+      expect(elementsContents).not.toContain(item);
+    }
   }
 
   /**
