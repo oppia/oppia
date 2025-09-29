@@ -414,6 +414,15 @@ const graphContainerSelector = '.e2e-test-graph-input-viz-container';
 const nodeWarningSignSelector = '.e2e-test-node-warning-sign';
 const navigationDropdownInMobileVisibleSelector =
   '.oppia-exploration-editor-tabs-dropdown.show';
+const selfLoopWarningSelector = '.e2e-test-response-self-loop-warning';
+const goalWarningSelector = '.e2e-test-exploration-objective-warning';
+
+const revertVersionButtonSelector = '.e2e-test-revert-version';
+const confirmRevertButtonSelector = '.e2e-test-confirm-revert';
+const dropdownMenuShown = '.dropdown-menu.show';
+const interactionPreviewSelector = '.e2e-test-interaction';
+const historyItemIndexSelector = '.e2e-test-history-table-index';
+const historyItemOptionSelector = '.e2e-test-history-table-option';
 const confirmDeleteInteractionButtonSelector =
   '.e2e-test-confirm-delete-interaction';
 const selectedInteractionNameSelector = '.e2e-test-selected-interaction-name';
@@ -6756,6 +6765,124 @@ export class ExplorationEditor extends BaseUser {
     }
 
     await this.expectElementToBeVisible(nodeWarningSignSelector, visible);
+  }
+
+  /**
+   * Checks if the self loop warning is visible.
+   * @param {boolean} visible - Whether the self loop warning should be visible or not.
+   */
+  async expectSelfLoopWarningToBeVisible(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(selfLoopWarningSelector, visible);
+  }
+
+  /**
+   * Checks if the goal warning is visible.
+   * @param {boolean} visible - Whether the goal warning should be visible or not.
+   */
+  async expectGoalWarningToBeVisible(visible: boolean = true): Promise<void> {
+    await this.expectElementToBeVisible(goalWarningSelector, visible);
+  }
+
+  /**
+   * Reverts the version of exploration.
+   * @param version - The version number to revert to.
+   */
+  async revertExplorationToVersion(version: string): Promise<void> {
+    await this.expectElementToBeVisible(historyListItemSelector);
+
+    const historyItems = await this.page.$$(historyListItemSelector);
+    let historyItem: ElementHandle<Element> | null = null;
+
+    const currentVersion = await this.page.$eval(
+      historyItemIndexSelector,
+      (el: Element) => {
+        return parseInt(el.textContent?.replace('.', '').trim() || '');
+      }
+    );
+    for (const historyItemElement of historyItems) {
+      const historyItemText = await historyItemElement.$eval(
+        historyItemIndexSelector,
+        el => el.textContent?.trim().replace('.', '')
+      );
+      if (historyItemText === version) {
+        historyItem = historyItemElement;
+        break;
+      }
+    }
+
+    if (!historyItem) {
+      throw new Error(`Version ${version} not found in history tab.`);
+    }
+
+    const historyOption = await historyItem.waitForSelector(
+      historyItemOptionSelector
+    );
+    if (!historyOption) {
+      throw new Error('Options element not found.');
+    }
+
+    await this.waitForElementToBeClickable(historyOption);
+    await historyOption.click();
+
+    await this.clickOn(`${dropdownMenuShown} ${revertVersionButtonSelector}`);
+    await this.waitForElementToStabilize(confirmRevertButtonSelector);
+    await this.clickAndWaitForNavigation(confirmRevertButtonSelector, {
+      waitUntil: ['networkidle0', 'load'],
+    });
+    await this.page.waitForFunction(
+      (selector: string, version: number) => {
+        const element = document.querySelector(selector);
+        return (
+          parseInt(element?.textContent?.trim().replace('.', '') || '') ===
+          version
+        );
+      },
+      {},
+      historyItemIndexSelector,
+      currentVersion + 1
+    );
+    await this.expectElementToBeVisible(confirmRevertButtonSelector, false);
+  }
+
+  /**
+   * Checks if the date of the last exploration version is in correct format or not.
+   */
+  async expectExplorationHistoryDateHasProperFormat(): Promise<void> {
+    const explorationHistoryDateSelector = '.e2e-test-history-tab-commit-date';
+    await this.expectElementToBeVisible(explorationHistoryDateSelector);
+    const dateString = await this.page.$eval(
+      explorationHistoryDateSelector,
+      el => el.textContent?.trim() || ''
+    );
+    const pattern =
+      /^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{1,2}, \d{1,2}:\d{2} (AM|PM)$/;
+    if (!pattern.test(dateString)) {
+      throw new Error("The date ins't formatted properly.");
+    }
+  }
+
+  /**
+   * Clicks on interaction in exploration editor.
+   */
+  async clickOnTestExploration(): Promise<void> {
+    await this.expectElementToBeVisible(interactionPreviewSelector);
+    await this.clickOn(interactionPreviewSelector);
+    await this.page.waitForFunction(
+      (selector: string, h1: string, h2: string) => {
+        const element = document.querySelector(selector);
+        return (
+          element &&
+          (element.textContent?.includes(h1) ||
+            element.textContent?.includes(h2))
+        );
+      },
+      {},
+      commonModalTitleSelector,
+      'Customize Interaction',
+      'Add Response'
+    );
   }
 
   /**
