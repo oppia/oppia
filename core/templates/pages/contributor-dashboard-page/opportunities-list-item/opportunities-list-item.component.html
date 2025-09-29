@@ -69,7 +69,7 @@
         {{ opportunity?.subheading | wrapTextWithEllipsis : 55 }}
       </span>
       <span title="{{ opportunity?.subheading }}"
-            class="e2e-test-opportunity-list-item-subheading oppia-subheading-small"
+            class="e2e-test-mobile-opportunity-list-item-subheading oppia-subheading-small"
             [hidden]="opportunityDataIsLoading">
         {{ opportunity?.subheading | wrapTextWithEllipsis : 25 }}
       </span>
@@ -136,7 +136,7 @@
 <div *ngIf="!onMobile && !opportunityDataIsLoading"
      class="oppia-opportunities-list-item oppia-desktop-list-item e2e-test-opportunity-list-item" tabindex="0">
   <mat-icon *ngIf="showPinUnpinButton && !opportunity.isPinned"
-            class="pin-icon"
+            class="pin-icon e2e-test-pin-icon"
             (click)="pinOpportunity()">
             push_pin
   </mat-icon>
@@ -154,7 +154,7 @@
 
 <!-- Mobile -->
 <div *ngIf="showOpportunityButton && onMobile && !opportunityDataIsLoading"
-     class="oppia-opportunities-list-item e2e-test-opportunity-list-item">
+     class="oppia-opportunities-list-item e2e-test-opportunity-list-item e2e-test-pin-icon">
   <mat-icon *ngIf="showPinUnpinButton && !opportunity.isPinned"
             class="pin-icon"
             (click)="pinOpportunity()">
