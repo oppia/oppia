@@ -129,6 +129,14 @@ runs:
           /home/runner/work/oppia/oppia/third_party/python_libs
           /home/runner/work/oppia/oppia/third_party/static
 
+    - name: Print requirements files (before)
+      run: |
+        echo "Contents of requirements_dev.txt (before):"
+        cat /home/runner/work/oppia/oppia/requirements_dev.txt
+        echo "Contents of requirements.txt (before):"
+        cat /home/runner/work/oppia/oppia/requirements.txt
+      shell: bash
+
     - name: Install third-party libs on cache miss (retries on error)
       if: steps.restore_third_party_and_node_modules_cache.outputs.cache-hit == false
       uses: nick-fields/retry@v3
@@ -138,6 +146,14 @@ runs:
         shell: bash
         timeout_minutes: 30
         command: python -m scripts.install_third_party_libs
+
+    - name: Print requirements files (after)
+      run: |
+        echo "Contents of requirements_dev.txt (after):"
+        cat /home/runner/work/oppia/oppia/requirements_dev.txt
+        echo "Contents of requirements.txt (after):"
+        cat /home/runner/work/oppia/oppia/requirements.txt
+      shell: bash
 
     - name: Check Yarn Cache
       # Check the yarn cache again to see what packages were just
