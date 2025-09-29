@@ -63,12 +63,14 @@ class Ret:
 class MockProcess:
     """Mock process that properly simulates subprocess.Popen behavior."""
 
-    def __init__(self, returncode: int = 1) -> None:
+    def __init__(self, returncode: int = 1, stdout: bytes = b'', stderr: bytes = b'') -> None:
         self.returncode = returncode
+        self._stdout = stdout
+        self._stderr = stderr
 
     def communicate(self) -> Tuple[bytes, bytes]:
         """Return mock communication result with proper types."""
-        return b'', b'Some error'
+        return self._stdout, self._stderr
 
 
 class JsTsLintTests(test_utils.LinterTestBase):
@@ -257,10 +259,12 @@ class JsTsLintTests(test_utils.LinterTestBase):
         def mock_exists(unused_path: str) -> bool:
             return True
 
-        def mock_popen(*args, **kwargs):  # pylint: disable=unused-argument
-            process = MockProcess(returncode=1)
-            process.communicate = lambda: (mock_eslint_output.encode('utf-8'), b'')
-            return process
+        def mock_popen(*args: str, **kwargs: str) -> MockProcess:  # pylint: disable=unused-argument
+            return MockProcess(
+                returncode=1,
+                stdout=mock_eslint_output.encode('utf-8'),
+                stderr=b''
+            )
 
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
@@ -302,10 +306,12 @@ class JsTsLintTests(test_utils.LinterTestBase):
         def mock_exists(unused_path: str) -> bool:
             return True
 
-        def mock_popen(*args, **kwargs):  # pylint: disable=unused-argument
-            process = MockProcess(returncode=1)
-            process.communicate = lambda: (mock_eslint_output.encode('utf-8'), b'')
-            return process
+        def mock_popen(*args: str, **kwargs: str) -> MockProcess:  # pylint: disable=unused-argument
+            return MockProcess(
+                returncode=1,
+                stdout=mock_eslint_output.encode('utf-8'),
+                stderr=b''
+            )
 
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
@@ -331,10 +337,12 @@ class JsTsLintTests(test_utils.LinterTestBase):
         def mock_exists(unused_path: str) -> bool:
             return True
 
-        def mock_popen(*args, **kwargs):  # pylint: disable=unused-argument
-            process = MockProcess(returncode=1)
-            process.communicate = lambda: (mock_eslint_output.encode('utf-8'), b'')
-            return process
+        def mock_popen(*args: str, **kwargs: str) -> MockProcess:  # pylint: disable=unused-argument
+            return MockProcess(
+                returncode=1,
+                stdout=mock_eslint_output.encode('utf-8'),
+                stderr=b''
+            )
 
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
@@ -352,10 +360,8 @@ class JsTsLintTests(test_utils.LinterTestBase):
         def mock_exists(unused_path: str) -> bool:
             return True
 
-        def mock_popen(*args, **kwargs):  # pylint: disable=unused-argument
-            process = MockProcess(returncode=0)
-            process.communicate = lambda: (b'', b'')
-            return process
+        def mock_popen(*args: str, **kwargs: str) -> MockProcess:  # pylint: disable=unused-argument
+            return MockProcess(returncode=0, stdout=b'', stderr=b'')
 
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
