@@ -6859,7 +6859,7 @@ export class ExplorationEditor extends BaseUser {
    */
   async clickOnTestExploration(): Promise<void> {
     await this.expectElementToBeVisible(interactionPreviewSelector);
-    await this.clickOn(interactionPreviewSelector);
+    await this.clickOnElementWithSelector(interactionPreviewSelector);
     await this.page.waitForFunction(
       (selector: string, h1: string, h2: string) => {
         const element = document.querySelector(selector);
