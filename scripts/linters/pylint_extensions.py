@@ -1300,7 +1300,7 @@ class ImportOnlyModulesChecker(checkers.BaseChecker):  # type: ignore[misc]
     # is untyped. Thus to avoid MyPy's error
     # (Untyped decorator makes function "visit_importfrom" untyped),
     # we added an ignore here.
-    @checker_utils.check_messages('import-only-modules')  # type: ignore[misc]
+    @checker_utils.only_required_for_messages('import-only-modules')  # type: ignore[misc]
     def visit_importfrom(self, node: astroid.nodes.ImportFrom) -> None:
         """Visits all import-from statements in a python file and checks that
         modules are imported. It then adds a message accordingly.
