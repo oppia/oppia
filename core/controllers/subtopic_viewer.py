@@ -99,7 +99,7 @@ class SubtopicPageDataHandler(
         }
         if feature_flag_services.is_feature_flag_enabled(
             feature_flag_list.FeatureNames
-            .SHOW_RESTRUCTURED_STUDY_GUIDES.value, None
+            .SHOW_RESTRUCTURED_STUDY_GUIDES.value, self.user_id
         ):
             study_guide_sections = (
                 study_guide_services.get_study_guide_sections_by_id(

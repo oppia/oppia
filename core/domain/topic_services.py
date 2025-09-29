@@ -170,7 +170,9 @@ def save_new_topic(committer_id: str, topic: topic_domain.Topic) -> None:
 
 
 def apply_change_list(
-    topic_id: str, change_list: Sequence[change_domain.BaseChange]
+    topic_id: str,
+    change_list: Sequence[change_domain.BaseChange],
+    committer_id: str
 ) -> Tuple[
     topic_domain.Topic,
     Dict[str, subtopic_page_domain.SubtopicPage],
@@ -188,6 +190,7 @@ def apply_change_list(
         topic_id: str. ID of the given topic.
         change_list: list(TopicChange). A change list to be applied to the given
             topic.
+        committer_id: str. ID of the given committer.
 
     Raises:
         Exception. The incoming changelist had simultaneous creation and
@@ -377,7 +380,7 @@ def apply_change_list(
     if feature_flag_services.is_feature_flag_enabled(
         feature_flag_list.FeatureNames
         .SHOW_RESTRUCTURED_STUDY_GUIDES.value,
-        None
+        committer_id
     ):
         modified_study_guides_list = (
             study_guide_services.get_study_guides_with_ids(
@@ -808,7 +811,7 @@ def apply_change_list(
                     if not feature_flag_services.is_feature_flag_enabled(
                         feature_flag_list.FeatureNames
                         .SHOW_RESTRUCTURED_STUDY_GUIDES.value,
-                        None
+                        committer_id
                     ):
                         # Here we use cast because we are narrowing down the
                         # type from TopicChange to a specific change command.
@@ -983,7 +986,7 @@ def update_topic_and_subtopic_pages(
         newly_created_subtopic_ids,
         updated_subtopic_pages_change_cmds_dict,
         updated_study_guides_change_cmds_dict
-    ) = apply_change_list(topic_id, change_list)
+    ) = apply_change_list(topic_id, change_list, committer_id)
 
     if (
             old_topic.url_fragment != updated_topic.url_fragment and
@@ -1006,7 +1009,7 @@ def update_topic_and_subtopic_pages(
         if subtopic_id not in newly_created_subtopic_ids:
             if not feature_flag_services.is_feature_flag_enabled(
                 feature_flag_list.FeatureNames
-                .SHOW_RESTRUCTURED_STUDY_GUIDES.value, None
+                .SHOW_RESTRUCTURED_STUDY_GUIDES.value, committer_id
             ):
                 subtopic_page_services.delete_subtopic_page(
                     committer_id, topic_id, subtopic_id)
@@ -1015,7 +1018,7 @@ def update_topic_and_subtopic_pages(
 
     if not feature_flag_services.is_feature_flag_enabled(
         feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES
-        .value, None
+        .value, committer_id
     ):
         for subtopic_page_id, subtopic_page in updated_subtopic_pages_dict.items(): # pylint: disable=line-too-long
             subtopic_page_change_list = (
@@ -1145,7 +1148,7 @@ def publish_story(
         feature_flag_services.is_feature_flag_enabled(
             feature_flag_list.FeatureNames
             .SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value,
-            None)
+            committer_id)
     )
     if not serial_chapter_curriculum_admin_view_feature_is_enabled:
         chapters_change_list = []
@@ -1210,7 +1213,7 @@ def unpublish_story(
         feature_flag_services.is_feature_flag_enabled(
             feature_flag_list.FeatureNames
             .SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value,
-            None)
+            committer_id)
     )
     if not serial_chapter_curriculum_admin_view_feature_is_enabled:
         chapters_change_list = []
