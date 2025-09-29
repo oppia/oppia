@@ -1341,6 +1341,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(
       `${confirmSkillAssignationButton}:not([disabled])`
     );
+    await this.waitForElementToStabilize(confirmSkillAssignationButton);
     await this.clickOn(confirmSkillAssignationButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
     await this.saveTopicDraft(topicName);
@@ -1951,6 +1952,7 @@ export class CurriculumAdmin extends BaseUser {
             throw new Error('Delete button not found');
           }
 
+          await this.waitForElementToStabilize(confirmTopicDeletionButton);
           const confirmButton = await this.page.$(confirmTopicDeletionButton);
           if (confirmButton) {
             await this.waitForElementToBeClickable(confirmButton);
@@ -2152,6 +2154,9 @@ export class CurriculumAdmin extends BaseUser {
 
         try {
           await this.page.waitForSelector(modalDiv, {visible: true});
+          await this.waitForElementToStabilize(
+            removeQuestionConfirmationButton
+          );
           await this.clickOn(removeQuestionConfirmationButton);
           await this.page.waitForSelector(modalDiv, {hidden: true});
         } catch (error) {

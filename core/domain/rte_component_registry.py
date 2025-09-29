@@ -26,7 +26,7 @@ import pkgutil
 
 from core import constants, feconf, utils
 
-from typing import Any, Dict, List, Type, TypedDict, Union, cast
+from typing import Any, Dict, List, Type, TypedDict, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -129,11 +129,8 @@ class Registry:
                 module = importlib.util.module_from_spec(spec)
                 # Ruling out the possibility of None for mypy type checking.
                 assert spec.loader is not None
-                # Here we use cast because we are narrowing down the type of
-                # 'spec.loader' from Optional[_Loader] to the more specific
-                # importlib.abc.Loader type.
-                loader_with_exec = cast(importlib.abc.Loader, spec.loader)
-                loader_with_exec.exec_module(module)
+
+                spec.loader.exec_module(module)
                 break
         else:
             return {}

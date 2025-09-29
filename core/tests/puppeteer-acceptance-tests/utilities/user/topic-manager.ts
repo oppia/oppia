@@ -256,6 +256,9 @@ const removeSkillModalHeaderSelector =
   '.e2e-test-delete-state-skill-modal-header';
 const addMisconceptionHeaderSelector =
   '.e2e-test-oppia-misconception-card-header';
+const unsavedChangesWarningModalSelector =
+  '.e2e-test-unsaved-changes-info-modal';
+const staleTabWarningModalSelector = '.e2e-test-stale-tab-info-modal';
 const mobileSaveTopicDropdown =
   'div.navbar-mobile-options .e2e-test-mobile-save-topic-dropdown';
 const mobilePublishTopicButton =
@@ -3213,6 +3216,39 @@ export class TopicManager extends BaseUser {
       newError.stack = error.stack;
       throw newError;
     }
+  }
+
+  /**
+   * Expects the stale tab info modal to be visible.
+   */
+  async expectUnsavedChangesStatusInfoModalToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(unsavedChangesWarningModalSelector);
+  }
+
+  /**
+   * Expects the stale tab info modal to be visible.
+   */
+  async expectStaleTabInfoModalToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(staleTabWarningModalSelector);
+  }
+
+  /**
+   * Closes concept card preview by clicking at 10 pixels below preivew modal.
+   */
+  async closeConceptCardPreview(): Promise<void> {
+    await this.expectElementToBeVisible(conceptCardPreviewModelSelector);
+    const previewModal = await this.getElementInParent(
+      conceptCardPreviewModelSelector
+    );
+    const boundingBox = await previewModal.boundingBox();
+    if (!boundingBox) {
+      throw new Error('Bounding box not found.');
+    }
+    await this.page.mouse.click(
+      boundingBox.x,
+      boundingBox.y + boundingBox.height + 10
+    );
+    await this.expectElementToBeVisible(conceptCardPreviewModelSelector, false);
   }
 
   /**
