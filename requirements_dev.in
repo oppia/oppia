@@ -13,7 +13,6 @@ Pillow==11.3.0
 psutil==7.0.0
 pycodestyle==2.14.0
 pylint==3.3.8
-pylint-quotes==0.2.3
 pytest==8.4.2
 PyYAML==6.0.2
 rcssmin==1.2.1

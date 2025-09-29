@@ -6,7 +6,7 @@
 init-hook='import sys; sys.path.append(".")'
 
 # Checks for correct docstring style
-load-plugins=pylint.extensions.docstyle, pylint_quotes, scripts.linters.pylint_extensions, pylint.extensions.bad_builtin
+load-plugins=pylint.extensions.docstyle, scripts.linters.pylint_extensions, pylint.extensions.bad_builtin
 
 string-quote=single
 triple-quote=double
