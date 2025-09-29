@@ -521,16 +521,24 @@ export class BaseUser {
   /**
    * Clicks on the element and returns a new page opened by the click.
    * @param selector The selector of the element.
+   * @param useSelector - Whether to use selector or textcontent.
    * @returns The new page opened by the click.
    */
-  async clickOnElementAndGetNewPage(selector: string): Promise<Page> {
+  async clickOnElementAndGetNewPage(
+    selector: string,
+    useSelector: boolean = false
+  ): Promise<Page> {
     const newPagePromise: Promise<Page> = new Promise<Page>(resolve =>
       this.browserObject.once('targetcreated', async target => {
         const page = await target.page();
         resolve(page);
       })
     );
-    await this.clickOnElementWithSelector(selector);
+    if (useSelector) {
+      await this.clickOnElementWithSelector(selector);
+    } else {
+      await this.clickOnElementWithText(selector);
+    }
     const newPage = await newPagePromise;
     return newPage;
   }
