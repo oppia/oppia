@@ -522,10 +522,8 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         cls, thread_id: str, message_id: int, *, strict: bool = ...
     ) -> Optional[GeneralFeedbackMessageModel]: ...
 
-    # Here we use MyPy ignore because the signature of this method
-    # doesn't match with BaseModel.get().
     @classmethod
-    def get( # type: ignore[override]
+    def get(
         cls, thread_id: str, message_id: int, strict: bool = True
     ) -> Optional[GeneralFeedbackMessageModel]:
         """Gets the GeneralFeedbackMessageModel entry for the given ID. Raises

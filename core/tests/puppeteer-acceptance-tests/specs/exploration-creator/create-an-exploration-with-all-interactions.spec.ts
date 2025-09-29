@@ -86,7 +86,15 @@ describe('Exploration Editor', function () {
       CARD_NAMES.SECOND
     );
 
+    // Open appropriate modal on re-clicking an interaction to customize it.
+    await explorationEditor.clickOnTestExploration();
+    await explorationEditor.expectModalTitleToBe(
+      'Customize Interaction (Continue Button)'
+    );
+    await explorationEditor.clickOnElementWithText('Save Interaction');
+
     await explorationEditor.saveExplorationDraft();
+    await explorationEditor.expectSelfLoopWarningToBeVisible(false);
   });
 
   it('should be able to use "Multiple Choice" interaction', async function () {
