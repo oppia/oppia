@@ -3720,7 +3720,7 @@ export class TopicManager extends BaseUser {
   async navigateToTabInPreview(
     tabName: 'Learn' | 'Practice' | 'Study'
   ): Promise<void> {
-    await this.clickOnElementWithSelector(tabName);
+    await this.clickOnElementWithText(tabName);
 
     await this.expectTextContentToBe(
       `.${previewSubtabClass}${activeTabSelector}`,
