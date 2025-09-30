@@ -203,7 +203,7 @@ export class SuperAdmin extends BaseUser {
     args?: string | string[]
   ): Promise<void> {
     await this.goto(adminPageRolesTab);
-    await this.type(roleEditorInputField, username);
+    await this.typeInInputField(roleEditorInputField, username);
     await this.clickOnElementWithSelector(roleEditorButtonSelector);
     await this.clickOnElementWithSelector(addRoleButton);
     await this.clickOnElementWithSelector(rolesSelectDropdown);
@@ -358,7 +358,7 @@ export class SuperAdmin extends BaseUser {
   async expectUserToHaveRole(username: string, role: string): Promise<void> {
     const currentPageUrl = this.page.url();
     await this.goto(adminPageRolesTab);
-    await this.type(roleEditorInputField, username);
+    await this.typeInInputField(roleEditorInputField, username);
     await this.clickOnElementWithSelector(roleEditorButtonSelector);
     await this.page.waitForSelector(justifyContentDiv);
     const userRoleElements = await this.page.$$(userRoleDescriptionSelector);
@@ -382,7 +382,7 @@ export class SuperAdmin extends BaseUser {
   async expectUserNotToHaveRole(username: string, role: string): Promise<void> {
     const currentPageUrl = this.page.url();
     await this.goto(adminPageRolesTab);
-    await this.type(roleEditorInputField, username);
+    await this.typeInInputField(roleEditorInputField, username);
     await this.clickOnElementWithSelector(roleEditorButtonSelector);
     await this.page.waitForSelector(justifyContentDiv);
     const userRoleElements = await this.page.$$(userRoleDescriptionSelector);
@@ -407,7 +407,7 @@ export class SuperAdmin extends BaseUser {
     role = role.replace(/ /g, '-');
     await this.goto(adminPageRolesTab);
     await this.page.waitForSelector(roleEditorInputField);
-    await this.type(roleEditorInputField, username);
+    await this.typeInInputField(roleEditorInputField, username);
     await this.clickOnElementWithSelector(roleEditorButtonSelector);
     await this.page.waitForSelector(justifyContentDiv);
     await this.page.waitForSelector(
@@ -545,7 +545,7 @@ export class SuperAdmin extends BaseUser {
       await this.page.waitForSelector(searchFieldCommunityLibrary, {
         visible: true,
       });
-      await this.type(searchFieldCommunityLibrary, activityName);
+      await this.typeInInputField(searchFieldCommunityLibrary, activityName);
 
       const isActivityPresent = await this.isTextPresentOnPage(activityName);
       if (!isActivityPresent) {
@@ -633,12 +633,18 @@ export class SuperAdmin extends BaseUser {
     await this.page.waitForSelector(noOfExplorationToGeneratorField, {
       visible: true,
     });
-    await this.type(noOfExplorationToGeneratorField, noToGenerate.toString());
+    await this.typeInInputField(
+      noOfExplorationToGeneratorField,
+      noToGenerate.toString()
+    );
 
     await this.page.waitForSelector(noOfExplorationToPublishField, {
       visible: true,
     });
-    await this.type(noOfExplorationToPublishField, noToPublish.toString());
+    await this.typeInInputField(
+      noOfExplorationToPublishField,
+      noToPublish.toString()
+    );
 
     await this.page.waitForSelector(generateExplorationButton, {
       visible: true,
@@ -1152,7 +1158,7 @@ export class SuperAdmin extends BaseUser {
     topicId: string
   ): Promise<void> {
     await this.expectElementToBeVisible(topicIdInputSelector);
-    await this.type(topicIdInputSelector, topicId);
+    await this.typeInInputField(topicIdInputSelector, topicId);
 
     await this.page.waitForSelector(regenerateOpportunitiesButton);
     await this.clickOnElementWithSelector(regenerateOpportunitiesButton);
@@ -1183,7 +1189,10 @@ export class SuperAdmin extends BaseUser {
     explorationId: string | null
   ): Promise<void> {
     await this.expectElementToBeVisible(explorationIdInputSelector);
-    await this.type(explorationIdInputSelector, explorationId as string);
+    await this.typeInInputField(
+      explorationIdInputSelector,
+      explorationId as string
+    );
 
     await this.page.waitForSelector(rollbackExplorationButton);
     await this.clickOnElementWithSelector(rollbackExplorationButton);
@@ -1204,9 +1213,9 @@ export class SuperAdmin extends BaseUser {
     newUserName: string
   ): Promise<void> {
     await this.expectElementToBeVisible(oldUserNameInputSelector);
-    await this.type(oldUserNameInputSelector, oldUserName);
+    await this.typeInInputField(oldUserNameInputSelector, oldUserName);
 
-    await this.type(newUserNameInputSelector, newUserName);
+    await this.typeInInputField(newUserNameInputSelector, newUserName);
 
     await this.page.waitForSelector(updateUserNameButtonSelector);
     await this.clickOnElementWithSelector(updateUserNameButtonSelector);
@@ -1240,7 +1249,7 @@ export class SuperAdmin extends BaseUser {
     explorationId: string | null
   ): Promise<void> {
     await this.expectElementToBeVisible(explorationIdToGetInteractionsInput);
-    await this.type(
+    await this.typeInInputField(
       explorationIdToGetInteractionsInput,
       explorationId as string
     );
@@ -1261,7 +1270,7 @@ export class SuperAdmin extends BaseUser {
    */
   async grantSuperAdminPrivileges(username: string): Promise<void> {
     await this.expectElementToBeVisible(usernameToGrantPrivilegeInput);
-    await this.type(usernameToGrantPrivilegeInput, username);
+    await this.typeInInputField(usernameToGrantPrivilegeInput, username);
 
     await this.page.waitForSelector(grantSuperAdminButtonSelector);
     await this.clickOnElementWithSelector(grantSuperAdminButtonSelector);
@@ -1279,7 +1288,7 @@ export class SuperAdmin extends BaseUser {
    */
   async revokeSuperAdminPrivileges(username: string): Promise<void> {
     await this.expectElementToBeVisible(usernameToRevokePrivilegeInput);
-    await this.type(usernameToRevokePrivilegeInput, username);
+    await this.typeInInputField(usernameToRevokePrivilegeInput, username);
 
     await this.page.waitForSelector(revokeSuperAdminButton);
     await this.clickOnElementWithSelector(revokeSuperAdminButton);
@@ -1302,11 +1311,11 @@ export class SuperAdmin extends BaseUser {
     publishedOn: string
   ): Promise<void> {
     await this.expectElementToBeVisible(blogIdInputSelector);
-    await this.type(blogIdInputSelector, blogId);
+    await this.typeInInputField(blogIdInputSelector, blogId);
 
-    await this.type(blogAuthorInputSelector, author);
+    await this.typeInInputField(blogAuthorInputSelector, author);
 
-    await this.type(blogPublishedOnInputSelector, publishedOn);
+    await this.typeInInputField(blogPublishedOnInputSelector, publishedOn);
 
     await this.page.waitForSelector(updateBlogPostButtonSelector);
     await this.clickOnElementWithSelector(updateBlogPostButtonSelector);

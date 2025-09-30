@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for the journey of a topic manager to edit topic details, manage practice tab visibility, and preview lesson.
+ * @fileoverview Acceptance Test for the journey of a topic manager. The journey includes adding a sub-topic to a topic, assigning skills to a sub-topic, changing the assignments and re-publishing the topic, opening an existing sub-topic, modifying its data and publishing it again, and previewing the sub-topic in the preview tab.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -25,52 +25,62 @@ const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
 describe('Topic Manager User Journey', function () {
-  let topicManager: TopicManager;
+  let topicManager: TopicManager & CurriculumAdmin;
   let curriculumAdmin: CurriculumAdmin;
 
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
-      'curriculumAdmin@example.com',
+      'curriculum_Admin@example.com',
       [ROLES.CURRICULUM_ADMIN]
     );
 
     await curriculumAdmin.createTopic('Mathematics', 'math');
+    await curriculumAdmin.createSkillForTopic(
+      'One digit Addition',
+      'Mathematics',
+      false
+    );
 
     topicManager = await UserFactory.createNewUser(
       'topicManager',
-      'topicManager@example.com',
+      'topic_manager@example.com',
       [ROLES.TOPIC_MANAGER],
       'Mathematics'
     );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should be able to edit topic name, thumbnail, description, page title fragment for web, and meta tags, and preview lesson in the topic preview.',
+    'should add a sub-topic to a topic, assign skills to the sub-topic, and change the assignments, open an existing sub-topic, modify its data and save the topic again, and preview the sub-topic in the preview tab.',
     async function () {
       await topicManager.openTopicEditor('Mathematics');
 
-      // Topic Manager cannot edit the name and url Fragment of a topic (Curriculum Admin can do that).
-      await topicManager.editTopicDetails(
-        'A comprehensive course on advanced mathematics',
-        'mathematics, advanced, course',
-        'Advanced Mathematics Course',
+      await topicManager.createSubtopicForTopic(
+        'Addition',
+        'add',
+        'Mathematics'
+      );
+      await topicManager.assignSkillToSubtopicInTopicEditor(
+        'One digit Addition',
+        'Addition',
+        'Mathematics'
+      );
+      // This statement updates then name of the subtopic.
+      await topicManager.changeSubtopicAssignments('Add', 'Mathematics');
+
+      await topicManager.openSubtopicEditor('Add', 'Mathematics');
+      await topicManager.editSubTopicDetails(
+        'Addition',
+        'add-numbers',
+        'Subtopic to learn addition',
         testConstants.data.curriculumAdminThumbnailImage
       );
-
-      await topicManager.verifyStatusOfPracticeTab('disabled');
       await topicManager.saveTopicDraft('Mathematics');
 
-      if (process.env.MOBILE === 'true') {
-        // TODO(20665): Resolve the issue of inconsistent topic preview navigation between desktop and mobile modes.
-        // Once the issue is resolved, remove the following line to allow the flow to check the preview tab in mobile viewport.
-        // Refer to the issue: [https://github.com/oppia/oppia/issues/20665]
-        return;
-      }
-      await topicManager.navigateToTopicPreviewTab('Mathematics');
-      await topicManager.expectTopicPreviewToHaveTitleAndDescription(
-        'Mathematics',
-        'A comprehensive course on advanced mathematics'
+      await topicManager.navigateToSubtopicPreviewTab('Add', 'Mathematics');
+      await topicManager.expectSubtopicPreviewToHave(
+        'Addition',
+        'Subtopic to learn addition'
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS

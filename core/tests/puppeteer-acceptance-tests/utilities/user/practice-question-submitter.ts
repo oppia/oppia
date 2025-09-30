@@ -140,7 +140,7 @@ export class PracticeQuestionSubmitter extends Contributor {
    * Function to select the difficulty level of the question to be suggested.
    * @param difficulty - The difficulty level of the question.
    */
-  async selectQuestionDifficulty(
+  async selectQuestionDifficultyInPracticeQuestionSubmittion(
     difficulty: 'Easy' | 'Medium' | 'Hard' = 'Medium'
   ): Promise<void> {
     await this.expectElementToBeVisible(
@@ -164,8 +164,8 @@ export class PracticeQuestionSubmitter extends Contributor {
     await this.waitForElementToStabilize(textStateEditSelector);
     await this.clickOnElementWithSelector(textStateEditSelector);
     await this.page.waitForSelector(stateContentInputField, {visible: true});
-    await this.type(stateContentInputField, text);
     await this.waitForElementToStabilize(stateContentInputField);
+    await this.typeInInputField(stateContentInputField, text);
     await this.clickOnElementWithSelector(saveStateEditorContentButton);
 
     await this.expectElementToBeVisible(saveStateEditorContentButton, false);
@@ -188,7 +188,10 @@ export class PracticeQuestionSubmitter extends Contributor {
     await this.page.waitForSelector('textarea[placeholder*="LaTeX"]', {
       visible: true,
     });
-    await this.type('textarea[placeholder*="LaTeX"]', '\\frac{1}{2}');
+    await this.typeInInputField(
+      'textarea[placeholder*="LaTeX"]',
+      '\\frac{1}{2}'
+    );
 
     await this.waitForElementToBeClickable(closeRichTextEditorButton);
     await this.clickOnElementWithSelector(closeRichTextEditorButton);
@@ -213,7 +216,10 @@ export class PracticeQuestionSubmitter extends Contributor {
     await this.uploadFile(imageToUploadInQuestion);
     await this.clickOnElementWithSelector(useTheUploadImageButton);
     await this.waitForPageToFullyLoad();
-    await this.type(imageDescriptionTextInputSelector, 'Test Description');
+    await this.typeInInputField(
+      imageDescriptionTextInputSelector,
+      'Test Description'
+    );
 
     await this.waitForElementToBeClickable(closeRichTextEditorButton);
     await this.clickOnElementWithSelector(closeRichTextEditorButton);
@@ -229,7 +235,7 @@ export class PracticeQuestionSubmitter extends Contributor {
   async addHintToState(hint: string): Promise<void> {
     await this.expectElementToBeVisible(addHintButton);
     await this.clickOnElementWithSelector(addHintButton);
-    await this.type(stateContentInputField, hint);
+    await this.typeInInputField(stateContentInputField, hint);
     await this.clickOnElementWithSelector(saveHintButton);
 
     await this.expectElementToBeVisible(saveHintButton, false);
@@ -253,10 +259,10 @@ export class PracticeQuestionSubmitter extends Contributor {
       ? solutionInputNumeric
       : solutionInputTextArea;
     await this.page.waitForSelector(solutionSelector, {visible: true});
-    await this.type(solutionSelector, answer);
+    await this.typeInInputField(solutionSelector, answer);
     await this.page.waitForSelector(`${submitAnswerButton}:not([disabled])`);
     await this.clickOnElementWithSelector(submitAnswerButton);
-    await this.type(stateContentInputField, answerExplanation);
+    await this.typeInInputField(stateContentInputField, answerExplanation);
     await this.page.waitForSelector(`${submitSolutionButton}:not([disabled])`);
     await this.clickOnElementWithSelector(submitSolutionButton);
 
@@ -413,7 +419,7 @@ export class PracticeQuestionSubmitter extends Contributor {
     await this.waitForElementToStabilize(editFeedbackSelector);
     await this.clickOnElementWithSelector(editFeedbackSelector);
     await this.page.waitForSelector(stateContentInputField, {visible: true});
-    await this.type(stateContentInputField, 'Last Card');
+    await this.typeInInputField(stateContentInputField, 'Last Card');
     await this.clickOnElementWithSelector(correctAnswerInTheGroupSelector);
     await this.clickOnElementWithSelector(addNewResponseButton);
 
@@ -440,7 +446,7 @@ export class PracticeQuestionSubmitter extends Contributor {
 
     await this.clickOnElementWithSelector(addElementToTextInputInteraction);
     await this.page.waitForSelector(textInputField, {visible: true});
-    await this.type(textInputField, answer);
+    await this.typeInInputField(textInputField, answer);
 
     const editFeedbackSelector = this.isViewportAtMobileWidth()
       ? editFeedbackButtonMobileSelector
@@ -448,7 +454,7 @@ export class PracticeQuestionSubmitter extends Contributor {
     await this.waitForElementToBeClickable(editFeedbackSelector);
     await this.clickOnElementWithSelector(editFeedbackSelector);
     await this.page.waitForSelector(stateContentInputField, {visible: true});
-    await this.type(stateContentInputField, 'Last Card');
+    await this.typeInInputField(stateContentInputField, 'Last Card');
     await this.clickOnElementWithSelector(correctAnswerInTheGroupSelector);
     await this.clickOnElementWithSelector(addNewResponseButton);
 
@@ -488,7 +494,7 @@ export class PracticeQuestionSubmitter extends Contributor {
     await this.waitForElementToBeClickable(editFeedbackSelector);
     await this.clickOnElementWithSelector(editFeedbackSelector);
 
-    await this.type(stateContentInputField, feedback);
+    await this.typeInInputField(stateContentInputField, feedback);
     if (correctResponse) {
       await this.clickOnElementWithSelector(correctAnswerInTheGroupSelector);
     }
@@ -552,7 +558,7 @@ export class PracticeQuestionSubmitter extends Contributor {
       visible: true,
     });
     await this.page.waitForSelector(stateContentInputField, {visible: true});
-    await this.type(stateContentInputField, 'Last Card');
+    await this.typeInInputField(stateContentInputField, 'Last Card');
     await this.clickOnElementWithSelector(correctAnswerInTheGroupSelector);
     await this.clickOnElementWithSelector(addNewResponseButton);
 
@@ -579,7 +585,10 @@ export class PracticeQuestionSubmitter extends Contributor {
     if (defaultResponseFeedback) {
       await this.clickOnElementWithSelector(openOutcomeFeedBackEditor);
       await this.clickOnElementWithSelector(stateContentInputField);
-      await this.type(stateContentInputField, `${defaultResponseFeedback}`);
+      await this.typeInInputField(
+        stateContentInputField,
+        `${defaultResponseFeedback}`
+      );
       await this.clickOnElementWithSelector(saveOutcomeFeedbackButton);
       await this.expectElementToBeVisible(saveOutcomeFeedbackButton, false);
     }
@@ -595,7 +604,10 @@ export class PracticeQuestionSubmitter extends Contributor {
       await this.clickOnElementWithSelector(outcomeDestWhenStuckSelector);
       // The '4: /' value is used to select the 'a new card called' option in the dropdown.
       await this.select(destinationWhenStuckSelectorDropdown, '4: /');
-      await this.type(addDestinationStateWhenStuckInput, directToCardWhenStuck);
+      await this.typeInInputField(
+        addDestinationStateWhenStuckInput,
+        directToCardWhenStuck
+      );
       await this.clickOnElementWithSelector(saveStuckDestinationButtonSelector);
       await this.expectElementToBeVisible(
         saveStuckDestinationButtonSelector,
@@ -658,7 +670,9 @@ export class PracticeQuestionSubmitter extends Contributor {
     hint?: string
   ): Promise<void> {
     await this.suggestQuestionsForSkillandTopic(skill, topic);
-    await this.selectQuestionDifficulty(difficulty ?? 'Medium');
+    await this.selectQuestionDifficultyInPracticeQuestionSubmittion(
+      difficulty ?? 'Medium'
+    );
     await this.seedTextToQuestion(question);
     await this.addMultipleChoiceInteractionByQuestionSubmitter(
       multipleChoiceOptions ?? ['5', '-1', '6', '1.5']
