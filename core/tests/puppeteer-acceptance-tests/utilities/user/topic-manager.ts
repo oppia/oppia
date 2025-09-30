@@ -825,7 +825,7 @@ export class TopicManager extends BaseUser {
     await this.clickOnElementWithSelector(saveInteractionButton);
     await this.expectModalTitleToBe('Add Response');
     await this.clickOnElementWithSelector(responseRuleDropdown);
-    await this.clickOnElementWithSelector(equalsRuleButtonText);
+    await this.clickOnElementWithText(equalsRuleButtonText);
     await this.typeInInputField(floatTextField, '3');
     await this.clickOnElementWithSelector(answersInGroupAreCorrectToggle);
     await this.clickOnElementWithSelector(openAnswerGroupFeedBackEditor);
