@@ -219,7 +219,7 @@ export class VoiceoverAdmin extends BaseUser {
         visible: true,
       });
       await this.clearAllTextFrom(voiceArtistUsernameInputBox);
-      await this.type(voiceArtistUsernameInputBox, voiceArtists[i]);
+      await this.typeInInputField(voiceArtistUsernameInputBox, voiceArtists[i]);
       await this.clickOn(saveVoiceoverArtistEditButton);
       // Adding try catch here to avoid unnecessary waiting for selector if
       // the added voice artist is not an user.
