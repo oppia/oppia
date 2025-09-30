@@ -3903,7 +3903,10 @@ def rollback_exploration_to_safe_state(exp_id: str) -> int:
     return last_known_safe_version
 
 
-def does_exploration_support_voiceovers(exploration_id: str, committer_id: str) -> bool:
+def does_exploration_support_voiceovers(
+    exploration_id: str,
+    committer_id: str
+) -> bool:
     """Checks if voiceover is allowed for the given exploration.
 
     Args:
