@@ -24,7 +24,7 @@
       <td class="e2e-test-skills-list-item">
         <a [href]="getSkillEditorUrl(skill.id)" class="list-summary e2e-test-open-skill-editor">
           <div class="skill-description e2e-test-skill-description">{{ skill.description }}</div>
-          <div class="skill-topic">
+          <div class="skill-topic e2e-test-skill-assignments">
             <span *ngIf="!skill.topicNames.length">
               Unassigned
               <i class="fa fa-exclamation-triangle"></i>
@@ -121,7 +121,7 @@
                 </div>
               </div>
             </div>
-            <div class="skill-topic">
+            <div class="skill-topic e2e-test-skill-assignments">
               <span *ngIf="!skill.topicNames.length">
                 Unassigned
                 <i class="fa fa-exclamation-triangle"></i>

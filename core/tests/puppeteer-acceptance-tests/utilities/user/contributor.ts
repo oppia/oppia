@@ -573,7 +573,7 @@ export class Contributor extends ExplorationEditor {
    */
   async fillReviewComment(comment: string): Promise<void> {
     await this.expectElementToBeVisible(reviewCommentTextareaSelector);
-    await this.type(reviewCommentTextareaSelector, comment);
+    await this.typeInInputField(reviewCommentTextareaSelector, comment);
 
     await this.expectElementValueToBe(reviewCommentTextareaSelector, comment);
   }
