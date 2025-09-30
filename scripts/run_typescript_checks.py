@@ -386,7 +386,6 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/topic-editor-page/modal-templates/create-new-subtopic-modal.component.spec.ts',
     'core/tests/puppeteer-acceptance-tests/utilities/common/puppeteer-utils.ts',
     'core/tests/puppeteer-acceptance-tests/utilities/user/logged-in-user.ts',
-
 ]
 # pylint: enable=line-too-long, single-line-pragma
 
