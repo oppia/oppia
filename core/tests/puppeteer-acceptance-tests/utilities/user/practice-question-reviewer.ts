@@ -32,7 +32,8 @@ const reviewModalHeaderSelector =
 // Question Suggestion Editor Modal Selectors.
 const questionSuggestionEditorModalSelector =
   '.e2e-test-question-suggestion-editor-modal';
-const editQuestionPencilIconSelector = '.e2e-test-edit-content-pencil-button';
+const editQuestionPencilIconSelector =
+  'button.e2e-test-edit-content-pencil-button';
 const saveQuestionButtonSelector = '.e2e-test-save-question-button';
 
 // Other Selectors.
@@ -93,11 +94,7 @@ export class PracticeQuestionReviewer extends Contributor {
    * @param {string} question - The question to edit.
    */
   async editQuestionInQuestionEditorModal(question: string): Promise<void> {
-    await this.clickOnElementWithSelector(
-      editQuestionPencilIconSelector,
-      null,
-      2
-    );
+    await this.clickOnElementWithSelector(editQuestionPencilIconSelector);
 
     const questionEditorModal = await this.page.$(
       questionSuggestionEditorModalSelector
