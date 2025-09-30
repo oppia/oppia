@@ -399,7 +399,7 @@ def fetch_gravatar(user_email: str) -> str:
     gravatar_url = get_gravatar_url(user_email)
     try:
         response = requests.get(
-            gravatar_url, headers={b'Content-Type': b'image/png'},
+            gravatar_url, headers={'Content-Type': 'image/png'},
             allow_redirects=False, timeout=TIMEOUT_SECS)
     except Exception:
         logging.exception('Failed to fetch Gravatar from %s' % gravatar_url)

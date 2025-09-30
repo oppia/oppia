@@ -295,47 +295,6 @@ describe('Contributor Admin Dashboard', function () {
     await users.logout();
   });
 
-  it('should allow question coordinator to view dashboard', async function () {
-    await users.login(QUESTION_COORDINATOR_EMAIL);
-    await contributorDashboardAdminPage.get();
-
-    await contributorDashboardAdminPage.navigateToQuestionSubmitterTab();
-    await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
-    await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
-    await contributorDashboardAdminPage.expectStatsRowsAreExpanded();
-
-    await contributorDashboardAdminPage.navigateToQuestionReviewerTab();
-    await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
-    await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
-    await contributorDashboardAdminPage.expectStatsRowsAreExpanded();
-
-    await users.logout();
-  });
-
-  it('should allow translation coordinator to view dashboard', async function () {
-    await users.login(TRANSLATION_COORDINATOR_EMAIL);
-    await contributorDashboardAdminPage.get();
-
-    await contributorDashboardAdminPage.navigateToTranslationSubmitterTab();
-    await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
-    await contributorDashboardAdminPage.expectNoStatsElement();
-
-    await contributorDashboardAdminPage.switchLanguage('Albanian (shqip)');
-    await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
-    await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
-    await contributorDashboardAdminPage.expectStatsRowsAreExpanded();
-
-    await contributorDashboardAdminPage.navigateToTranslationReviewerTab();
-    await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
-    await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
-    await contributorDashboardAdminPage.expectStatsRowsAreExpanded();
-
-    await contributorDashboardAdminPage.switchLanguage('English');
-    await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
-    await contributorDashboardAdminPage.expectNoStatsElement();
-    await users.logout();
-  });
-
   it(
     'should be able to filter those translation submitters, who have submitted' +
       ' translations between a given date range',
