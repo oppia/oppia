@@ -105,7 +105,7 @@ export class ContributorAdmin extends BaseUser {
     }
 
     const usernameInputSelector = `${commonModalContainerSelector} input`;
-    await this.type(usernameInputSelector, username);
+    await this.typeInInputField(usernameInputSelector, username);
 
     await this.clickOn(addRightsButtonSelector);
     await this.expectElementToBeVisible(addRightsButtonSelector, false);

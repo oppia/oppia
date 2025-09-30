@@ -360,7 +360,7 @@ export class BaseUser {
       this.userHasAcceptedCookies = true;
     }
     await this.clickOn('Sign in');
-    await this.type(testConstants.SignInDetails.inputField, email);
+    await this.typeInInputField(testConstants.SignInDetails.inputField, email);
     await this.clickAndWaitForNavigation('Sign In');
   }
 
@@ -369,7 +369,7 @@ export class BaseUser {
    */
   async signUpNewUser(username: string, email: string): Promise<void> {
     await this.signInWithEmail(email);
-    await this.type('input.e2e-test-username-input', username);
+    await this.typeInInputField('input.e2e-test-username-input', username);
     await this.clickOn('input.e2e-test-agree-to-terms-checkbox');
     await this.page.waitForSelector(
       'button.e2e-test-register-user:not([disabled])'
@@ -593,9 +593,9 @@ export class BaseUser {
    * The function selects all text content and delete it.
    */
   async clearAllTextFrom(selector: string): Promise<void> {
-    await this.waitForElementToBeClickable(selector);
     // Clicking three times on a line of text selects all the text.
     const element = await this.getElementInParent(selector);
+    await this.waitForElementToBeClickable(element);
     await element.click({clickCount: 3});
     await this.page.keyboard.press('Backspace');
   }
@@ -643,12 +643,25 @@ export class BaseUser {
 
   /**
    * This function types the text in the input field using its CSS selector.
+   * @param selector The CSS selector of the input field.
+   * @param text The text to type.
    */
-  async type(selector: string, text: string): Promise<void> {
-    await this.page.waitForSelector(selector, {visible: true});
+  async typeInInputField(
+    selector: string | ElementHandle<Element>,
+    text: string
+  ): Promise<void> {
+    let element =
+      typeof selector === 'string'
+        ? await this.page.waitForSelector(selector)
+        : selector;
+    if (!element) {
+      throw new Error(`Element not found for selector: ${selector}`);
+    }
+    await this.waitForElementToStabilize(element);
+    await this.waitForElementToBeClickable(element);
     await this.waitForElementToStabilize(selector);
-    await this.waitForElementToBeClickable(selector);
-    await this.page.type(selector, text);
+
+    await element.type(text);
   }
 
   /**
@@ -830,7 +843,7 @@ export class BaseUser {
   async isElementVisible(
     selector: string,
     visible: boolean = true,
-    timeout: number = 30000
+    timeout: number = 10000
   ): Promise<boolean> {
     try {
       if (visible) {
@@ -931,7 +944,8 @@ export class BaseUser {
   async expectScreenshotToMatch(
     imageName: string,
     testPath: string,
-    newPage?: Page
+    newPage: Page | undefined = undefined,
+    screenshotOptions: puppeteer.ScreenshotOptions = {}
   ): Promise<void> {
     const currentPage = typeof newPage !== 'undefined' ? newPage : this.page;
     await currentPage.mouse.move(0, 0);
@@ -972,7 +986,8 @@ export class BaseUser {
     }
 
     try {
-      expect(await currentPage.screenshot()).toMatchImageSnapshot({
+      const screenshot = await currentPage.screenshot(screenshotOptions);
+      expect(screenshot).toMatchImageSnapshot({
         failureThreshold: failureTrigger,
         failureThresholdType: 'percent',
         customSnapshotIdentifier: imageName,
@@ -1295,27 +1310,44 @@ export class BaseUser {
    * content matches the expected text.
    * @param {string} selector - The selector of the element to get text from.
    * @param {string} text - The expected text content.
+   * @param {ElementHandle<Element>} context - The context in which the element is located.
    */
-  async expectTextContentToBe(selector: string, text: string): Promise<void> {
+  async expectTextContentToBe(
+    selector: string,
+    text: string,
+    context: ElementHandle<Element> | null = null
+  ): Promise<void> {
     await this.expectElementToBeVisible(selector);
 
     try {
       await this.page.waitForFunction(
-        (selector: string, text: string) => {
-          const element = document.querySelector(selector);
-          return element?.textContent?.trim() === text.trim();
+        (selector: string, text: string, context: HTMLElement | null) => {
+          const element = context
+            ? context.querySelector(selector)
+            : document.querySelector(selector);
+          return element && element.textContent?.trim() === text.trim();
         },
         {},
         selector,
-        text
+        text,
+        context
       );
 
       showMessage(`Text content of "${selector}" is "${text}".`);
     } catch (error) {
-      const actualTextContent = await this.page.evaluate((selector: string) => {
-        const element = document.querySelector(selector);
-        return element?.textContent?.trim();
-      }, selector);
+      const actualTextContent = await this.page.evaluate(
+        (selector: string, context: HTMLElement | null) => {
+          const element = context
+            ? context.querySelector(selector)
+            : document.querySelector(selector);
+          return (
+            element?.textContent?.trim() +
+            `" (inside ${context ? 'context' : 'document'})`
+          );
+        },
+        selector,
+        context
+      );
       error.message =
         `Text content of "${selector}" does not match the expected text.\n` +
         `Expected: "${text}"\n` +
@@ -1923,6 +1955,20 @@ export class BaseUser {
 
     // If no pattern matches, throw an error.
     throw new Error(`Unable to parse date string: "${dateString}"`);
+  }
+
+  /**
+   * Clicks on the given element after waiting for it to be clickable.
+   * Note: This function does not have post-check.
+   * @param element The element to click on.
+   * @param options The options to pass to the click function.
+   */
+  async clickOnElement(
+    element: ElementHandle<Element>,
+    options: puppeteer.ClickOptions = {}
+  ): Promise<void> {
+    await this.waitForElementToBeClickable(element);
+    await element.click(options);
   }
 
   /**

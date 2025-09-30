@@ -16,11 +16,11 @@
  * @fileoverview Curriculum Admin users utility file.
  */
 
-import puppeteer from 'puppeteer';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
+import {TopicManager} from './topic-manager';
+import puppeteer from 'puppeteer';
 import {ElementHandle} from 'puppeteer';
-import {BaseUser} from '../common/puppeteer-utils';
 
 const curriculumAdminThumbnailImage =
   testConstants.data.curriculumAdminThumbnailImage;
@@ -31,11 +31,6 @@ const baseURL = testConstants.URLs.BaseURL;
 
 const richTextAreaField = 'div.e2e-test-rte';
 const richTextParagraphTag = 'div.e2e-test-rte p';
-const floatTextField = '.e2e-test-rule-details .e2e-test-float-form-input';
-const solutionFloatTextField =
-  'oppia-add-or-update-solution-modal .e2e-test-float-form-input';
-const textStateEditSelector = 'div.e2e-test-state-edit-content';
-const saveContentButton = 'button.e2e-test-save-state-content';
 
 const modalDiv = 'div.modal-content';
 const closeSaveModalButton = '.e2e-test-close-save-modal-button';
@@ -45,32 +40,8 @@ const subtopicPhotoBoxButton =
   '.e2e-test-subtopic-thumbnail .e2e-test-photo-button';
 const uploadPhotoButton = 'button.e2e-test-photo-upload-submit';
 const photoUploadModal = 'edit-thumbnail-modal';
-
-const createQuestionButton = 'div.e2e-test-create-question';
 const removeQuestionConfirmationButton =
   '.e2e-test-remove-question-confirmation-button';
-const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
-const interactionNumberInputButton =
-  'div.e2e-test-interaction-tile-NumericInput';
-const interactionNameDiv = 'div.oppia-interaction-tile-name';
-const saveInteractionButton = 'button.e2e-test-save-interaction';
-const responseRuleDropdown =
-  'oppia-rule-type-selector.e2e-test-answer-description';
-const equalsRuleButtonText = 'is equal to ... ';
-const answersInGroupAreCorrectToggle =
-  'input.e2e-test-editor-correctness-toggle';
-const saveResponseButton = 'button.e2e-test-add-new-response';
-const defaultFeedbackTab = 'a.e2e-test-default-response-tab';
-const openOutcomeFeedBackEditor = 'div.e2e-test-open-outcome-feedback-editor';
-const saveOutcomeFeedbackButton = 'button.e2e-test-save-outcome-feedback';
-const openAnswerGroupFeedBackEditor = 'i.e2e-test-open-feedback-editor';
-const addHintButton = 'button.e2e-test-oppia-add-hint-button';
-const saveHintButton = 'button.e2e-test-save-hint';
-const addSolutionButton = 'button.e2e-test-oppia-add-solution-button';
-const answerTypeDropdown = 'select.e2e-test-answer-is-exclusive-select';
-const submitAnswerButton = 'button.e2e-test-submit-answer-button';
-const submitSolutionButton = 'button.e2e-test-submit-solution-button';
-const saveQuestionButton = 'button.e2e-test-save-question-button';
 
 const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
 
@@ -97,7 +68,7 @@ const mobileDeleteTopicButton = '.e2e-test-mobile-delete-topic-button';
 const confirmTopicDeletionButton = '.e2e-test-confirm-topic-deletion-button';
 
 const addSubtopicButton = 'button.e2e-test-add-subtopic-button';
-const subtopicTitleField = 'input.e2e-test-new-subtopic-title-field';
+const subtopicTitleField = 'input.e2e-test-subtopic-title-field';
 const subtopicStudyGuideHeadingField =
   '.e2e-test-new-subtopic-study-guide-section-heading-field';
 const subtopicStudyGuideContentField =
@@ -295,6 +266,11 @@ const toggleSkillEditOptionsButton =
 const mobileSaveSkillButton = '.e2e-test-mobile-save-skill-changes';
 const mobilePreviewTab = '.e2e-test-mobile-preview-tab';
 const navigationDropdown = '.e2e-test-mobile-skill-nav-dropdown-icon';
+const addNewSkillButton = '.e2e-test-create-skill-button-circle';
+const createNewSkillMobileButton =
+  '.e2e-test-mobile-create-skill-button-secondary';
+const toggleSkillRubricsDropdown = '.e2e-test-toggle-rubrics-dropdown';
+const navigationContainerSelector = '.e2e-test-mobile-navigation-bar-container';
 const toggleRubricsDropdownSelector = '.e2e-test-toggle-rubrics-dropdown';
 const mobileSaveOrPublishSkillSelector = '.e2e-test-mobile-save-skill-changes';
 const mobileSkillNavToggle =
@@ -302,8 +278,6 @@ const mobileSkillNavToggle =
 
 const createNewSkillButtonInSkillDashboardSelector =
   '.e2e-test-create-skill-button-circle';
-const createNewSkillMobileButton =
-  '.e2e-test-mobile-create-skill-button-secondary';
 const classroomNameSelector = '.e2e-test-classroom-name-view';
 const classroomURLSelector = '.e2e-test-classroom-url-view';
 const classroomTeaserSelector = '.e2e-test-classroom-teaser-view';
@@ -324,7 +298,36 @@ const publishTopicButton = 'button.e2e-test-publish-topic-button';
 const topicEditorMainTabFormSelector = '.e2e-test-topic-editor-main-tab';
 const oldTopicNameField = '.e2e-test-topic-name-field';
 
-export class CurriculumAdmin extends BaseUser {
+const floatTextField = '.e2e-test-rule-details .e2e-test-float-form-input';
+const solutionFloatTextField =
+  'oppia-add-or-update-solution-modal .e2e-test-float-form-input';
+const textStateEditSelector = 'div.e2e-test-state-edit-content';
+const saveContentButton = 'button.e2e-test-save-state-content';
+const createQuestionButton = 'div.e2e-test-create-question';
+const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
+const interactionNumberInputButton =
+  'div.e2e-test-interaction-tile-NumericInput';
+const interactionNameDiv = 'div.oppia-interaction-tile-name';
+const saveInteractionButton = 'button.e2e-test-save-interaction';
+const responseRuleDropdown =
+  'oppia-rule-type-selector.e2e-test-answer-description';
+const equalsRuleButtonText = 'is equal to ... ';
+const answersInGroupAreCorrectToggle =
+  'input.e2e-test-editor-correctness-toggle';
+const saveResponseButton = 'button.e2e-test-add-new-response';
+const defaultFeedbackTab = 'a.e2e-test-default-response-tab';
+const openOutcomeFeedBackEditor = 'div.e2e-test-open-outcome-feedback-editor';
+const saveOutcomeFeedbackButton = 'button.e2e-test-save-outcome-feedback';
+const openAnswerGroupFeedBackEditor = 'i.e2e-test-open-feedback-editor';
+const addHintButton = 'button.e2e-test-oppia-add-hint-button';
+const saveHintButton = 'button.e2e-test-save-hint';
+const addSolutionButton = 'button.e2e-test-oppia-add-solution-button';
+const answerTypeDropdown = 'select.e2e-test-answer-is-exclusive-select';
+const submitAnswerButton = 'button.e2e-test-submit-answer-button';
+const submitSolutionButton = 'button.e2e-test-submit-solution-button';
+const saveQuestionButton = 'button.e2e-test-save-question-button';
+
+export class CurriculumAdmin extends TopicManager {
   /**
    * Moves the classrooms in the order of the given classroom names.
    * @param classroomNames The names of the classrooms to move.
@@ -567,6 +570,51 @@ export class CurriculumAdmin extends BaseUser {
   }
 
   /**
+   * Fills the skill info and submits the form.
+   * @param skillName The name of the skill.
+   * @param reviewMaterial The review material text content.
+   * @param addWorkedExample Whether to add a worked example.
+   */
+  async fillSkillInfoAndSubmit(
+    skillName: string,
+    reviewMaterial: string,
+    addWorkedExample: boolean = false
+  ): Promise<void> {
+    await this.typeInInputField(skillDescriptionField, skillName);
+    await this.page.waitForSelector(skillReviewMaterialHeader);
+    await this.clickOn(skillReviewMaterialHeader);
+    await this.clickOn(richTextAreaField);
+    await this.typeInInputField(richTextAreaField, reviewMaterial);
+    if (addWorkedExample) {
+      await this.clickOn(insertWorkedExampleButton);
+      await this.page.waitForSelector(editWorkedExampleModalQuestionRte, {
+        visible: true,
+      });
+      await this.clearAllTextFrom(editWorkedExampleModalQuestionRte);
+      await this.typeInInputField(
+        editWorkedExampleModalQuestionRte,
+        'Type the number one'
+      );
+      await this.page.waitForSelector(editWorkedExampleModalAnswerRte, {
+        visible: true,
+      });
+      await this.clearAllTextFrom(editWorkedExampleModalAnswerRte);
+      await this.waitForElementToStabilize(editWorkedExampleModalAnswerRte);
+      await this.typeInInputField(editWorkedExampleModalAnswerRte, '1');
+      await this.clickOn(rteComponentSaveButton);
+    }
+    await this.page.waitForSelector(
+      `${confirmSkillCreationButton}:not([disabled])`
+    );
+    await this.clickOn(confirmSkillCreationButton);
+    await this.waitForNetworkIdle();
+    await this.page.waitForSelector(confirmSkillCreationButton, {
+      hidden: true,
+    });
+    await this.page.bringToFront();
+  }
+
+  /**
    * Fill the skill details in the new skill modal and save.
    * @param {string} description - The description of the skill.
    * @param {string} reviewMaterial - The review material for the skill.
@@ -576,11 +624,11 @@ export class CurriculumAdmin extends BaseUser {
     reviewMaterial: string
   ): Promise<void> {
     await this.expectElementToBeVisible(skillDescriptionField);
-    await this.type(skillDescriptionField, description);
+    await this.typeInInputField(skillDescriptionField, description);
     await this.page.waitForSelector(skillReviewMaterialHeader);
     await this.clickOn(skillReviewMaterialHeader);
     await this.clickOn(richTextAreaField);
-    await this.type(richTextAreaField, reviewMaterial);
+    await this.typeInInputField(richTextAreaField, reviewMaterial);
   }
 
   /**
@@ -602,39 +650,11 @@ export class CurriculumAdmin extends BaseUser {
     }
     await this.page.waitForSelector(addSkillButton);
     await this.clickOn(addSkillButton);
-    await this.fillSkillDetailsInNewSkillModal(
+    await this.fillSkillInfoAndSubmit(
       description,
-      `Review material text content for ${description}.`
+      `Review material text content for ${description}.`,
+      addWorkedExample
     );
-    if (addWorkedExample) {
-      await this.clickOn(insertWorkedExampleButton);
-      await this.page.waitForSelector(editWorkedExampleModalQuestionRte, {
-        visible: true,
-      });
-      await this.clearAllTextFrom(editWorkedExampleModalQuestionRte);
-      await this.type(editWorkedExampleModalQuestionRte, 'Type the number one');
-      await this.page.waitForSelector(editWorkedExampleModalAnswerRte, {
-        visible: true,
-      });
-      await this.clearAllTextFrom(editWorkedExampleModalAnswerRte);
-      await this.waitForElementToStabilize(editWorkedExampleModalAnswerRte);
-      await this.type(editWorkedExampleModalAnswerRte, '1');
-      await this.clickOn(rteComponentSaveButton);
-    }
-    await this.page.waitForSelector(
-      `${confirmSkillCreationButton}:not([disabled])`
-    );
-    const newPagePromise = this.waitForNewPage();
-    await this.waitForElementToStabilize(confirmSkillCreationButton);
-    await this.clickOn(confirmSkillCreationButton);
-    // Close new page, so that screenrecorder doesn't capture it and remove
-    // focus from the main page.
-    const newPage = await newPagePromise;
-    await newPage.close();
-    await this.waitForNetworkIdle();
-    await this.page.waitForSelector(confirmSkillCreationButton, {
-      hidden: true,
-    });
   }
 
   /**
@@ -687,7 +707,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOn(createQuestionButton);
     await this.clickOn(textStateEditSelector);
     await this.page.waitForSelector(richTextAreaField, {visible: true});
-    await this.type(richTextAreaField, 'Add 1+2');
+    await this.typeInInputField(richTextAreaField, 'Add 1+2');
     await this.page.waitForSelector(`${saveContentButton}:not([disabled])`);
     await this.clickOn(saveContentButton);
 
@@ -716,22 +736,22 @@ export class CurriculumAdmin extends BaseUser {
     });
     await this.clickOn(responseRuleDropdown);
     await this.clickOn(equalsRuleButtonText);
-    await this.type(floatTextField, '3');
+    await this.typeInInputField(floatTextField, '3');
     await this.clickOn(answersInGroupAreCorrectToggle);
     await this.clickOn(openAnswerGroupFeedBackEditor);
-    await this.type(richTextAreaField, 'Good job!');
+    await this.typeInInputField(richTextAreaField, 'Good job!');
     await this.clickOn(saveResponseButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
 
     await this.clickOn(defaultFeedbackTab);
     await this.clickOn(openOutcomeFeedBackEditor);
     await this.clickOn(richTextAreaField);
-    await this.type(richTextAreaField, 'The answer is 3');
+    await this.typeInInputField(richTextAreaField, 'The answer is 3');
     await this.clickOn(saveOutcomeFeedbackButton);
 
     await this.clickOn(addHintButton);
     await this.page.waitForSelector(modalDiv, {visible: true});
-    await this.type(richTextAreaField, '3');
+    await this.typeInInputField(richTextAreaField, '3');
     await this.clickOn(saveHintButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
 
@@ -740,10 +760,10 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(answerTypeDropdown);
     await this.page.select(answerTypeDropdown, 'The only');
     await this.page.waitForSelector(solutionFloatTextField);
-    await this.type(solutionFloatTextField, '3');
+    await this.typeInInputField(solutionFloatTextField, '3');
     await this.page.waitForSelector(`${submitAnswerButton}:not([disabled])`);
     await this.clickOn(submitAnswerButton);
-    await this.type(richTextAreaField, '1+2 is 3');
+    await this.typeInInputField(richTextAreaField, '1+2 is 3');
     await this.page.waitForSelector(`${submitSolutionButton}:not([disabled])`);
     await this.clickOn(submitSolutionButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
@@ -767,13 +787,13 @@ export class CurriculumAdmin extends BaseUser {
       await this.clickOn(createNewTopicMobileButton);
     }
 
-    await this.type(topicNameField, name);
+    await this.typeInInputField(topicNameField, name);
     await this.page.waitForSelector(topicUrlFragmentField, {
       visible: true,
     });
-    await this.type(topicUrlFragmentField, urlFragment);
-    await this.type(topicWebFragmentField, name);
-    await this.type(
+    await this.typeInInputField(topicUrlFragmentField, urlFragment);
+    await this.typeInInputField(topicWebFragmentField, name);
+    await this.typeInInputField(
       topicDescriptionField,
       `Topic creation description test for ${name}.`
     );
@@ -884,7 +904,7 @@ export class CurriculumAdmin extends BaseUser {
       await this.page.waitForSelector('oppia-topic-editor-save-modal', {
         visible: true,
       });
-      await this.type(
+      await this.typeInInputField(
         saveChangesMessageInput,
         'Test saving topic as curriculum admin.'
       );
@@ -900,7 +920,7 @@ export class CurriculumAdmin extends BaseUser {
       await this.clickOn(saveTopicButton);
 
       await this.page.waitForSelector(modalDiv, {visible: true});
-      await this.type(
+      await this.typeInInputField(
         saveChangesMessageInput,
         'Test saving topic as curriculum admin.'
       );
@@ -911,47 +931,6 @@ export class CurriculumAdmin extends BaseUser {
       await this.clickOn(closeSaveModalButton);
       await this.page.waitForSelector(modalDiv, {hidden: true});
     }
-  }
-
-  /**
-   * Create a subtopic as a curriculum admin.
-   * @param {string} title - The title of the Subtopic.
-   * @param {string} urlFragment - The url fragment of the Subtopic.
-   * @param {string} topicName - The name of the Topic which storing the new Subtopic.
-   */
-  async createSubtopicForTopic(
-    title: string,
-    urlFragment: string,
-    topicName: string
-  ): Promise<void> {
-    await this.openTopicEditor(topicName);
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(subtopicReassignHeader);
-    }
-    await this.clickOn(addSubtopicButton);
-    await this.type(subtopicTitleField, title);
-    await this.page.waitForSelector(subtopicUrlFragmentField, {
-      visible: true,
-    });
-    await this.page.type(subtopicUrlFragmentField, urlFragment);
-
-    await this.clickOn(subtopicDescriptionEditorToggle);
-    await this.page.waitForSelector(richTextAreaField, {visible: true});
-    await this.type(
-      richTextAreaField,
-      `Subtopic creation description text for ${title}`
-    );
-
-    await this.clickOn(subtopicPhotoBoxButton);
-    await this.page.waitForSelector(photoUploadModal, {visible: true});
-    await this.uploadFile(curriculumAdminThumbnailImage);
-    await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
-    await this.clickOn(uploadPhotoButton);
-
-    await this.page.waitForSelector(photoUploadModal, {hidden: true});
-    await this.clickOn(createSubtopicButton);
-    await this.saveTopicDraft(topicName);
-    showMessage(`Subtopic ${title} is created.`);
   }
 
   /**
@@ -977,7 +956,7 @@ export class CurriculumAdmin extends BaseUser {
       await this.clickOn(subtopicReassignHeader);
     }
     await this.clickOn(addSubtopicButton);
-    await this.type(subtopicTitleField, title);
+    await this.typeInInputField(subtopicTitleField, title);
     await this.page.waitForSelector(subtopicUrlFragmentField, {
       visible: true,
     });
@@ -986,19 +965,22 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.type(subtopicStudyGuideHeadingField, heading);
     await this.clickOn(subtopicStudyGuideContentField);
     await this.page.waitForSelector(richTextAreaField, {visible: true});
-    await this.type(richTextAreaField, content);
+    await this.typeInInputField(richTextAreaField, content);
     if (addWorkedExample) {
       await this.clickOn(insertWorkedExampleButton);
       await this.page.waitForSelector(editWorkedExampleModalQuestionRte, {
         visible: true,
       });
       await this.clearAllTextFrom(editWorkedExampleModalQuestionRte);
-      await this.type(editWorkedExampleModalQuestionRte, 'Type the number one');
+      await this.typeInInputField(
+        editWorkedExampleModalQuestionRte,
+        'Type the number one'
+      );
       await this.page.waitForSelector(editWorkedExampleModalAnswerRte, {
         visible: true,
       });
       await this.clearAllTextFrom(editWorkedExampleModalAnswerRte);
-      await this.type(editWorkedExampleModalAnswerRte, '1');
+      await this.typeInInputField(editWorkedExampleModalAnswerRte, '1');
       await this.clickOn(rteComponentSaveButton);
     }
 
@@ -1034,10 +1016,13 @@ export class CurriculumAdmin extends BaseUser {
     currentNumberOfSections: number
   ): Promise<void> {
     await this.clickOn(addStudyGuideSectionButton);
-    await this.type(addStudyGuideSectionModalHeading, sectionHeading);
+    await this.typeInInputField(
+      addStudyGuideSectionModalHeading,
+      sectionHeading
+    );
     await this.clickOn(addStudyGuideSectionModalContent);
     await this.page.waitForSelector(richTextAreaField, {visible: true});
-    await this.type(richTextAreaField, sectionContent);
+    await this.typeInInputField(richTextAreaField, sectionContent);
     await this.clickOn(addStudyGuideSectionModalSaveButton);
     if (this.isViewportAtMobileWidth()) {
       await this.scrollToBottomOfPage();
@@ -1071,19 +1056,28 @@ export class CurriculumAdmin extends BaseUser {
   ): Promise<void> {
     await this.expectElementToBeVisible(addStudyGuideSectionButton);
     await this.clickOn(addStudyGuideSectionButton);
-    await this.type(addStudyGuideSectionModalHeading, sectionHeading);
+    await this.typeInInputField(
+      addStudyGuideSectionModalHeading,
+      sectionHeading
+    );
     await this.clickOn(addStudyGuideSectionModalContent);
     await this.page.waitForSelector(richTextAreaField, {visible: true});
-    await this.type(richTextAreaField, sectionContent);
+    await this.typeInInputField(richTextAreaField, sectionContent);
     await this.clickOn(insertWorkedExampleButton);
     await this.page.waitForSelector(editWorkedExampleModalQuestionRte, {
       visible: true,
     });
-    await this.type(editWorkedExampleModalQuestionRte, WorkedExampleQuestion);
+    await this.typeInInputField(
+      editWorkedExampleModalQuestionRte,
+      WorkedExampleQuestion
+    );
     await this.page.waitForSelector(editWorkedExampleModalAnswerRte, {
       visible: true,
     });
-    await this.type(editWorkedExampleModalAnswerRte, WorkedExampleAnswer);
+    await this.typeInInputField(
+      editWorkedExampleModalAnswerRte,
+      WorkedExampleAnswer
+    );
     await this.clickOn(rteComponentSaveButton);
     await this.clickOn(addStudyGuideSectionModalSaveButton);
     if (this.isViewportAtMobileWidth()) {
@@ -1190,13 +1184,22 @@ export class CurriculumAdmin extends BaseUser {
       visible: true,
     });
     await this.clickOn(addStudyGuideSectionButton);
-    await this.type(addStudyGuideSectionModalHeading, 'Section Heading');
+    await this.typeInInputField(
+      addStudyGuideSectionModalHeading,
+      'Section Heading'
+    );
     await this.clickOn(addStudyGuideSectionModalContent);
     await this.page.waitForSelector(richTextAreaField, {visible: true});
-    await this.type(
-      richTextAreaField,
-      'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc, quis gravida magna mi a libero. Fusce vulputate eleifend sapien. Vestibulum purus quam, scelerisque ut, mollis sed, nonummy id, metus. Nullam accumsan lorem in dui. Cras ultricies mi eu turpis hendrerit fringilla. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; In ac dui quis mi consectetuer lacinia. Nam pretium turpis et arcu. Duis arcu tortor, suscipit eget, imperdiet nec, imperdiet iaculis, ipsum. Sed aliquam ultrices mauris. Integer ante arcu, accumsan a, consectetuer eget, posuere ut, mauris. Praesent adipiscing. Phasellus ullamcorper ipsum rutrum nunc. Nunc nonummy metus. Vestibulum volutpat pretium libero. Cras id dui. Aenean ut eros et nisl sagittis vestibulum. Nullam nulla eros, ultricies sit amet, nonummy id, imperdiet feugiat, pede. Sed lectus. Donec mollis hendrerit risus. Phasellus nec sem in justo pellentesque facilisis. Etiam imperdiet imperdiet orci. Nunc nec neque. Phasellus leo dolor, tempus non, auctor et, hendrerit quis, nisi. Curabitur ligula sapien, tincidunt non, euismod vitae, posuere imperdiet, leo. Maecenas malesuada. Praesent congue erat at massa. Sed cursus turpis vitae tortor. Donec posuere vulputate arcu. Phasellus accumsan cursus velit. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Sed aliquam, nisi quis porttitor congue, elit erat euismod orci, ac placerat dolor lectus quis orci. Phasellus consectetuer vestibulum elit. Aenean tellus metus, bibendum sed, posuere ac, mattis non, nunc. Vestibulum fringilla pede sit amet augue. In turpis. Pellentesque posuere. Praesent turpis. Aenean posuere, tortor sed cursus feugiat, nunc augue blandit nunc, eu sollicitudin urna dolor sagittis lacus. Donec elit libero, sodales nec, volutpat a, suscipit non, turpis. Nullam sagittis. Suspendisse pulvinar, augue ac venenatis condimentum, sem libero volutpat nibh, nec pellentesque velit pede quis nunc. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Fusce id purus. Ut varius tincidunt libero. Phasellus dolor. Maecenas vestibulum mollis diam. Pellentesque ut neque. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. In dui magna, posuere eget, vestibulum et, tempor auctor, justo. In ac felis quis tortor malesuada pretium. Pellentesque auctor neque nec urna. Proin sapien ipsum, porta a, auctor quis, euismod ut, mi. Aenean viverra rhoncus pede. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Ut non enim eleifend felis pretium feugiat. Vivamus quis mi. Phasellus a est. Phasellus magna. In hac habitasse platea dictumst. Curabitur at lacus ac velit ornare lobortis. Curabitur a felis in nunc fringilla tristique. Morbi mattis ullamcorper velit. Phasellus gravida semper nisi. Nullam vel sem. Pellentesque libero tortor, tincidunt et, tincidunt eget, semper nec, quam. Sed hendrerit. Morbi ac felis. Nunc egestas, augue at pellentesque laoreet, felis eros vehicula leo, at malesuada velit leo quis pede. Donec interdum, metus et hendrerit aliquet, dolor diam sagittis ligula, eget egestas libero turpis vel mi. Nunc nulla. Fusce risus nisl, viverra et, tempor et, pretium in, sapien. Donec venenatis vulputate lorem. Morbi nec metus. Phasellus blandit leo ut odio. Maecenas ullamcorper, dui et placerat feugiat, eros pede varius nisi, condimentum viverra felis nunc et lorem. Sed magna purus, fermentum eu, tincidunt eu, varius ut, felis. In auctor lobortis lacus. Quisque libero metus, condimentum nec, tempor a, sghasgsdfgxcvbxcvbsdfgsdfgxcvbsgdfsxcvb sdfgcvx asdfgxvba sdfgasdfg. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc, quis gravida magna mi a libero. Fusce vulputate eleifend sapien. Vestibulum purus quam, scelerisque ut, mollis sed, nonummy id, metus. Nullam accumsan lorem in dui. Cras ultricies mi eu turpis hendrerit fringilla. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; In ac dui quis mi consectetuer lacinia. Nam pretium turpis et arcu. Duis arcu tortor, suscipit eget, imperdiet nec, imperdiet iaculis, ipsum. Sed aliquam ultrices mauris. Integer ante arcu, accumsan a, consectetuer eget, posuere ut, mauris. Praesent adipiscing. Phasellus ullamcorper ipsum rutrum nunc. Nunc nonummy metus. Vestibulum volutpat pretium libero. Cras id dui. Aenean ut eros et nisl sagittis vestibulum. Nullam nulla eros, ultricies sit amet, nonummy id, imperdiet feugiat, pede. Sed lectus. Donec mollis hendrerit risus. Phasellus nec sem in justo pellentesque facilisis. Etiam imperdiet imperdiet orci. Nunc nec neque. Phasellus leo dolor, tempus non, auctor et, hendrerit quis, nisi. Curabitur ligula sapien, tincidunt non, euismod vitae, posuere imperdiet, leo. Maecenas malesuada. Praesent congue erat at massa. Sed cursus turpis vitae tortor. Donec posuere vulputate arcu. Phasellus accumsan cursus velit. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Sed aliquam, nisi quis porttitor congue, elit erat euismod orci, ac placerat dolor lectus quis orci. Phasellus consectetuer vestibulum elit. Aenean tellus metus, bibendum sed, posuere ac, mattis non, nunc. Vestibulum fringilla pede sit amet augue. In turpis. Pellentesque posuere. Praesent turpis. Aenean posuere, tortor sed cursus feugiat, nunc augue blandit nunc, eu sollicitudin urna dolor sagittis lacus. Donec elit libero, sodales nec, volutpat a, suscipit non, turpis. Nullam sagittis. Suspendisse pulvinar, augue ac venenatis condimentum, sem libero volutpat nibh, nec pellentesque velit pede quis nunc. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Fusce id purus. Ut varius tincidunt libero. Phasellus dolor. Maecenas vestibulum mollis diam. Pellentesque ut neque. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. In dui magna, posuere eget, vestibulum et, tempor auctor, justo. In ac felis quis tortor malesuada pretium. Pellentesque auctor neque nec urna. Proin sapien ipsum, porta a, auctor quis, euismod ut, mi. Aenean viverra rhoncus pede. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Ut non enim eleifend felis pretium feugiat. Vivamus quis mi. Phasellus a est. Phasellus magna. In hac habitasse platea dictumst. Curabitur at lacus ac velit ornare lobortis. Curabitur a felis in nunc fringilla tristique. Morbi mattis ullamcorper velit. Phasellus gravida semper nisi. Nullam vel sem. Pellentesque libero tortor, tincidunt et, tincidunt eget, semper nec, quam. Sed hendrerit. Morbi ac felis. Nunc egestas, augue at pellentesque laoreet, felis eros vehicula leo, at malesuada velit leo quis pede. Donec interdum, metus et hendrerit aliquet, dolor diam sagittis ligula, eget egestas libero turpis vel mi. Nunc nulla. Fusce risus nisl, viverra et, tempor et, pretium in, sapien. Donec venenatis vulputate lorem. Morbi nec metus. Phasellus blandit leo ut odio. Maecenas ullamcorper, dui et placerat feugiat, eros pede varius nisi, condimentum viverra felis nunc et lorem. Sed magna purus, fermentum eu, tincidunt eu, varius ut, felis. In auctor lobortis lacus. Quisque libero metus, condimentum nec, tempor a, commodo mollis, magna. Vestibulum ullamcorper mauris at ligula. Fusce fermentum. Nullam cursus lacinia erat. Praesent blandit laoreet nibh. Fusce convallis metus id felis luctus adipiscing. Pellentesque egestas, neque sit amet convallis pulvinar, justo nulla eleifend augue, ac auctor orci leo non est. Quisque id mi. Ut tincidunt tincidunt erat. Etiam feugiat lorem non metus. Vestibulum dapibus nunc ac augue. Curabitur vestibulum aliquam leo. Praesent egestas neque eu enim. In hac habitasse platea dictumst. Fusce a quam. Etiam ut purus mattis mauris sodales aliquam. Curabitur nisi. Quisque malesuada placerat nisl. Nam ipsum risus, rutrum vitae, vestibulum eu, molestie vel, lacus. Sed augue ipsum, egestas nec, vestibulum et, malesuada adipiscing, dui. Vestibulum facilisis, purus nec pulvinar iaculis, ligula mi congue nunc, vitae euismod ligula urna in dolor. Mauris sollicitudin fermentum libero. Praesent nonummy mi in odio. Nunc interdum lacus sit amet orci. Vestibulum rutrum, mi nec elementum vehicula, eros quam gravida nisl, id fringilla neque ante vel mi. Morbi mollis tellus ac sapien. Phasellus volutpat, metus eget egestas mollis, lacus lacus blandit dui, id egestas quam mauris ut lacus. Fusce vel dui. Sed in libero ut nibh placerat accumsan. Proin faucibus arcu quis ante. In consectetuer turpis ut velit. Nulla sit amet est. Praesent metus tellus, elementum eu, semper a, adipiscing nec, purus. Cras risus ipsum, faucibus ut, ullamcorper id, varius ac, leo. Suspendisse feugiat. Suspendisse enim turpis, dictum sed, iaculis a, condimentum nec, nisi. Praesent nec nisl a purus blandit viverra. Praesent ac massa at ligula laoreet iaculis. Nulla neque dolor, sagittis eget, iaculis quis, molestie non, velit. Mauris turpis nunc, blandit et, volutpat molestie, porta ut, ligula. Fusce pharetra convallis urna. Quisque ut nisi. Donec mi odio, faucibus at, scelerisque quis,'
-    );
+    await this.page.evaluate(async textContent => {
+      await navigator.clipboard.writeText(textContent);
+    }, 'This sentence is 84 characters long. Multiply it by 72 to get more than 6000 chars. '.repeat(72));
+
+    const richTextAreaFieldElement =
+      await this.getElementInParent(richTextAreaField);
+    await richTextAreaFieldElement.focus();
+    await this.page.keyboard.down('Control');
+    await this.page.keyboard.press('KeyV');
+    await this.page.keyboard.up('Control');
     await this.page.waitForSelector(addStudyGuideSectionContentLength, {
       visible: true,
     });
@@ -1353,6 +1356,10 @@ export class CurriculumAdmin extends BaseUser {
    * @param {string} explanation - The explanation to update.
    */
   async updateRubric(difficulty: string, explanation: string): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(toggleSkillRubricsDropdown);
+    }
+
     await this.waitForStaticAssetsToLoad();
     let difficultyValue: string;
     switch (difficulty) {
@@ -1381,7 +1388,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.select(selectRubricDifficultySelector, difficultyValue);
     await this.waitForStaticAssetsToLoad();
     await this.clickOn(' + ADD EXPLANATION FOR DIFFICULTY ');
-    await this.type(rteSelector, explanation);
+    await this.typeInInputField(rteSelector, explanation);
     await this.clickOn(saveRubricExplanationButton);
 
     await this.page.waitForSelector(saveRubricExplanationButton, {
@@ -1395,8 +1402,12 @@ export class CurriculumAdmin extends BaseUser {
    */
   async publishUpdatedSkill(updateMessage: string): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.expectElementToBeVisible(mobileOptionsSelector);
-      await this.clickOn(mobileOptionsSelector);
+      if (
+        !(await this.isElementVisible(navigationContainerSelector, true, 5000))
+      ) {
+        await this.expectElementToBeVisible(mobileOptionsSelector);
+        await this.clickOn(mobileOptionsSelector);
+      }
       // The mobile view has 2 instances of the element, from which
       // the first one is inapplicable here.
       const elems = await this.page.$$(mobileSkillNavToggle);
@@ -1416,7 +1427,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(commitMessageInputSelector, {
       visible: true,
     });
-    await this.type(commitMessageInputSelector, updateMessage);
+    await this.typeInInputField(commitMessageInputSelector, updateMessage);
     await this.page.waitForSelector(closeSaveModalButtonSelector, {
       visible: true,
     });
@@ -1687,12 +1698,12 @@ export class CurriculumAdmin extends BaseUser {
       await this.clickOn(mobileStoryDropdown);
     }
     await this.clickOn(addStoryButton);
-    await this.type(storyTitleField, storyTitle);
+    await this.typeInInputField(storyTitleField, storyTitle);
     await this.page.waitForSelector(storyUrlFragmentField, {
       visible: true,
     });
     await this.page.type(storyUrlFragmentField, storyUrlFragment);
-    await this.type(
+    await this.typeInInputField(
       storyDescriptionField,
       `Story creation description for ${storyTitle}.`
     );
@@ -1730,29 +1741,33 @@ export class CurriculumAdmin extends BaseUser {
    * @param {string} storyTitle - The title of the story.
    * @param {string} storyUrlFragment - The URL fragment of the story.
    * @param {string} topicName - The name of the topic.
+   * @param {string} metaTag - The meta tag of the story.
+   * @param {string} photoURL - The URL of the photo of the story.
    */
   async addStoryToTopic(
     storyTitle: string,
     storyUrlFragment: string,
-    topicName: string
+    topicName: string,
+    metaTag: string = 'meta',
+    photoURL: string = curriculumAdminThumbnailImage
   ): Promise<string> {
     await this.openTopicEditor(topicName);
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileStoryDropdown);
     }
     await this.clickOn(addStoryButton);
-    await this.type(storyTitleField, storyTitle);
+    await this.typeInInputField(storyTitleField, storyTitle);
     await this.page.waitForSelector(storyUrlFragmentField, {
       visible: true,
     });
     await this.page.type(storyUrlFragmentField, storyUrlFragment);
-    await this.type(
+    await this.typeInInputField(
       storyDescriptionField,
       `Story creation description for ${storyTitle}.`
     );
 
     await this.clickOn(storyPhotoBoxButton);
-    await this.uploadFile(curriculumAdminThumbnailImage);
+    await this.uploadFile(photoURL);
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
     await this.clickOn(uploadPhotoButton);
 
@@ -1761,7 +1776,7 @@ export class CurriculumAdmin extends BaseUser {
 
     await this.page.waitForSelector(storyMetaTagInput);
     await this.page.focus(storyMetaTagInput);
-    await this.page.type(storyMetaTagInput, 'meta');
+    await this.page.type(storyMetaTagInput, metaTag);
     await this.page.keyboard.press('Tab');
     await this.saveStoryDraft();
 
@@ -1789,8 +1804,8 @@ export class CurriculumAdmin extends BaseUser {
       visible: true,
     });
     await this.clickOn(addChapterButton);
-    await this.type(newChapterTitleField, chapterName);
-    await this.type(newChapterExplorationIdField, explorationId);
+    await this.typeInInputField(newChapterTitleField, chapterName);
+    await this.typeInInputField(newChapterExplorationIdField, explorationId);
 
     await this.clickOn(newChapterPhotoBoxButton);
     await this.uploadFile(curriculumAdminThumbnailImage);
@@ -1822,7 +1837,7 @@ export class CurriculumAdmin extends BaseUser {
       await this.page.waitForSelector(saveStoryButton, {visible: true});
       await this.clickOn(saveStoryButton);
     }
-    await this.type(
+    await this.typeInInputField(
       saveChangesMessageInput,
       'Test saving story as curriculum admin.'
     );
@@ -2592,10 +2607,10 @@ export class CurriculumAdmin extends BaseUser {
   ): Promise<void> {
     await this.expectElementToBeVisible(createNewSkillButton);
     await this.clickOn(createNewSkillButton);
-    await this.type(skillDescriptionField, description);
+    await this.typeInInputField(skillDescriptionField, description);
     await this.clickOn(skillReviewMaterialHeader);
     await this.clickOn(richTextAreaField);
-    await this.type(richTextAreaField, reviewMaterial);
+    await this.typeInInputField(richTextAreaField, reviewMaterial);
     await this.addWorkedExampleRteComponent('Type the number one', '1');
     await this.clickOn(createSkillButton);
     await this.openSkillEditor(description);
@@ -2655,13 +2670,13 @@ export class CurriculumAdmin extends BaseUser {
       visible: true,
     });
     await this.clearAllTextFrom(editWorkedExampleModalQuestionRte);
-    await this.type(editWorkedExampleModalQuestionRte, question);
+    await this.typeInInputField(editWorkedExampleModalQuestionRte, question);
     await this.page.waitForSelector(editWorkedExampleModalAnswerRte, {
       visible: true,
     });
     await this.clearAllTextFrom(editWorkedExampleModalAnswerRte);
     await this.waitForElementToStabilize(editWorkedExampleModalAnswerRte);
-    await this.type(editWorkedExampleModalAnswerRte, answer);
+    await this.typeInInputField(editWorkedExampleModalAnswerRte, answer);
     await this.clickOn(rteComponentSaveButton);
     await this.page.waitForSelector(editWorkedExampleModalAnswerRte, {
       hidden: true,
@@ -2715,7 +2730,7 @@ export class CurriculumAdmin extends BaseUser {
   async typeTextInReviewMaterialEditor(text: string): Promise<void> {
     await this.expectElementToBeVisible(richTextAreaField);
     await this.clickOn(richTextAreaField);
-    await this.type(richTextAreaField, text);
+    await this.typeInInputField(richTextAreaField, text);
   }
 
   /**
@@ -2734,7 +2749,7 @@ export class CurriculumAdmin extends BaseUser {
       await this.expectElementToBeVisible(publishSkillButton);
       await this.clickOn(publishSkillButton);
     }
-    await this.type(
+    await this.typeInInputField(
       saveChangesMessageInput,
       'Test saving skill as curriculum admin.'
     );
@@ -2750,7 +2765,11 @@ export class CurriculumAdmin extends BaseUser {
    */
   async navigateToSkillPreviewTab(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.page.waitForSelector(navigationDropdown);
+      if (
+        !(await this.isElementVisible(navigationContainerSelector, true, 5000))
+      ) {
+        await this.clickOn(mobileOptionsSelector);
+      }
       const navDropdownElements = await this.page.$$(navigationDropdown);
       await this.waitForElementToBeClickable(navDropdownElements[1]);
       await navDropdownElements[1].click();
@@ -2915,6 +2934,67 @@ export class CurriculumAdmin extends BaseUser {
     );
     await this.addTopicToClassroom(classroomName, topicToBeAssigned);
     await this.publishClassroom(classroomName);
+  }
+
+  /**
+   * Create a skill.
+   * @param {string} skillName - The name of the skill.
+   * @param {string} reviewMaterial - The review material of the skill.
+   */
+  async createSkillFromSkillsDashboard(
+    skillName: string,
+    reviewMaterial: string
+  ): Promise<void> {
+    const skillButtonSelector = this.isViewportAtMobileWidth()
+      ? createNewSkillMobileButton
+      : addNewSkillButton;
+    await this.navigateToTopicAndSkillsDashboardPage();
+
+    await this.navigateToSkillsTab();
+    await this.expectElementToBeVisible(skillButtonSelector);
+    await this.clickOn(skillButtonSelector);
+    await this.fillSkillInfoAndSubmit(skillName, reviewMaterial);
+  }
+
+  /**
+   * Create a subtopic as a curriculum admin.
+   * @param {string} title - The title of the Subtopic.
+   * @param {string} urlFragment - The url fragment of the Subtopic.
+   * @param {string} topicName - The name of the Topic which storing the new Subtopic.
+   */
+  async createSubtopicForTopic(
+    title: string,
+    urlFragment: string,
+    topicName: string
+  ): Promise<void> {
+    await this.openTopicEditor(topicName);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(subtopicReassignHeader);
+    }
+    await this.clickOn(addSubtopicButton);
+    await this.typeInInputField(subtopicTitleField, title);
+    await this.page.waitForSelector(subtopicUrlFragmentField, {
+      visible: true,
+    });
+    await this.page.type(subtopicUrlFragmentField, urlFragment);
+
+    await this.clickOn(subtopicDescriptionEditorToggle);
+    await this.page.waitForSelector(richTextAreaField, {visible: true});
+    await this.typeInInputField(
+      richTextAreaField,
+      `Subtopic creation description text for ${title}`
+    );
+
+    await this.clickOn(subtopicPhotoBoxButton);
+    await this.page.waitForSelector(photoUploadModal, {visible: true});
+    await this.uploadFile(curriculumAdminThumbnailImage);
+    await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
+    await this.clickOn(uploadPhotoButton);
+
+    await this.page.waitForSelector(photoUploadModal, {hidden: true});
+    await this.clickOn(createSubtopicButton);
+    await this.saveTopicDraft(topicName);
+    showMessage(`Subtopic ${title} is created.`);
   }
 
   /**
