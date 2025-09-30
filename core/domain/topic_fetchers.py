@@ -712,7 +712,7 @@ def get_canonical_story_dicts(
         list(dict). A list of canonical story dicts in the given topic.
     """
     canonical_story_ids: List[str] = topic.get_canonical_story_ids(
-        include_only_published=False)
+        include_only_published=True)
     canonical_story_summaries: List[story_domain.StorySummary] = [
         story_fetchers.get_story_summary_by_id(
             canonical_story_id) for canonical_story_id

@@ -2001,6 +2001,12 @@ class AdminHandler(
                     self.user_id, story_id, story_change_list,
                     'add node', story.corresponding_topic_id
                 )
+
+            # Ensure the story is published at the end of chapter generation.
+            story = story_fetchers.get_story_by_id(story_id)
+            topic_services.publish_story(
+                story.corresponding_topic_id, story_id, str(self.user_id)
+            )
         else:
             raise Exception(
                 'Cannot generate dummy chapters in production.')

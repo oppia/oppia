@@ -57,9 +57,9 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
         topic = topic_fetchers.get_topic_by_name(topic_name)
         canonical_story_ids = topic.get_canonical_story_ids(
-            include_only_published=False)
+            include_only_published=True)
         additional_story_ids = topic.get_additional_story_ids(
-            include_only_published=False)
+            include_only_published=True)
         canonical_story_summaries = [
             story_fetchers.get_story_summary_by_id(
                 canonical_story_id) for canonical_story_id
@@ -74,7 +74,8 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         for story_summary in canonical_story_summaries:
             all_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
                 self.user_id, story_summary.id)['all_nodes']
-            filtered_nodes = all_nodes
+            filtered_nodes = [node for node in all_nodes if
+                node.status != constants.STORY_NODE_STATUS_DRAFT]
             pending_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
                 self.user_id, story_summary.id)['pending_nodes']
             pending_node_titles = [node.title for node in pending_nodes]
