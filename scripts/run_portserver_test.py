@@ -29,7 +29,7 @@ from core import utils
 from core.tests import test_utils
 from scripts import run_portserver
 
-from typing import List, Union
+from typing import List, Optional, Union, cast
 
 
 class MockSocket:
@@ -53,8 +53,8 @@ class MockSocket:
         return ['Address', self.port]
 
     def recv( # pylint: disable=missing-docstring
-        self, *unused_args: str) -> None:
-        pass
+        self, *unused_args: str) -> bytes:
+        return b'test-request'
 
     def sendall( # pylint: disable=missing-docstring
         self, *unused_args: str) -> None:
@@ -388,12 +388,42 @@ class RunPortserverTests(test_utils.GenericTestBase):
 
         with swap_socket, swap_hasattr:
             server = run_portserver.Server(dummy_handler, '\08181')
-            run_portserver.Server.handle_connection(MockSocket(), dummy_handler)
 
-            self.assertFalse(server.socket.server_closed)
+            connection_socket = MockSocket()
+            # Here we use cast because MockSocket is a test double and does not
+            # inherit from socket.socket, but we want to use it in place
+            # of a real socket for testing handle_connection.
+            cast_socket = cast(MockSocket, server.socket)
+            # Here we use cast because the 'handle_connection' method expects a
+            # 'socket.socket' object, but for this test we are providing a
+            # MockSocket test double to simulate a real connection.
+            run_portserver.Server.handle_connection(
+                cast(socket.socket, connection_socket), dummy_handler
+            )
+
+            self.assertFalse(cast_socket.server_closed)
             server.close()
 
-        self.assertTrue(server.socket.server_closed)
+        self.assertTrue(cast_socket.server_closed)
+
+    def test_handle_connection_raises_value_error_when_handler_returns_none(self) -> None:
+        mock_socket = MockSocket()
+        mock_socket.port = 8181
+
+        def none_handler(_data: bytes) -> Optional[bytes]:
+            return None
+
+        swap_socket = self.swap(socket, 'socket', lambda *unused_args: mock_socket)
+        with swap_socket:
+            connection_socket = MockSocket()
+            with self.assertRaisesRegex(ValueError, 'Handler returned None, expected bytes.'):
+                # Here we use cast because the 'handle_connection' method
+                # expects a 'socket.socket' object, but for this test we are
+                # providing a MockSocket test double to simulate a real
+                # connection.
+                run_portserver.Server.handle_connection(
+                    cast(socket.socket, connection_socket), none_handler
+                )
 
     def test_server_on_close_removes_the_socket_file(self) -> None:
         path = '8181'
@@ -409,10 +439,14 @@ class RunPortserverTests(test_utils.GenericTestBase):
 
         with swap_socket, swap_hasattr, swap_remove:
             server = run_portserver.Server(dummy_handler, path)
-            self.assertFalse(server.socket.server_closed)
+            # Here we use cast because server.socket is a MockSocket
+            # test double,which has server_closed, but mypy sees it
+            # as socket.socket.
+            cast_socket = cast(MockSocket, server.socket)
+            self.assertFalse(cast_socket.server_closed)
             server.close()
 
-        self.assertTrue(server.socket.server_closed)
+        self.assertTrue(cast_socket.server_closed)
 
     def test_null_port_ranges_while_calling_script_throws_error(self) -> None:
         swap_server = self.swap(

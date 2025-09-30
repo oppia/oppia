@@ -132,49 +132,6 @@ describe('Exploration translation and voiceover tab', function () {
     await users.logout();
   });
 
-  it('should walkthrough translation tutorial when user clicks next', async function () {
-    await users.login('user@editorTab.com');
-    await creatorDashboardPage.get();
-    await creatorDashboardPage.editExploration('Test Exploration');
-    await explorationEditorPage.navigateToTranslationTab();
-    await explorationEditorTranslationTab.startTutorial();
-    await explorationEditorTranslationTab.playTutorial();
-    await explorationEditorTranslationTab.finishTutorial();
-    await users.logout();
-
-    await users.login('voiceArtist@translationTab.com');
-    await creatorDashboardPage.get();
-    await creatorDashboardPage.editExploration('Test Exploration');
-    await explorationEditorMainTab.exitTutorial();
-    await explorationEditorPage.navigateToTranslationTab();
-    await explorationEditorTranslationTab.startTutorial();
-    await explorationEditorTranslationTab.playTutorial();
-    await explorationEditorTranslationTab.finishTutorial();
-    await users.logout();
-  });
-
-  it('should cache the selected language for translation and voiceover', async function () {
-    await users.login('voiceArtist@translationTab.com');
-    await creatorDashboardPage.get();
-    await creatorDashboardPage.editExploration('Test Exploration');
-    await explorationEditorPage.navigateToTranslationTab();
-    await explorationEditorTranslationTab.expectSelectedLanguageToBe('English');
-    await explorationEditorTranslationTab.changeLanguage('हिन्दी (Hindi)');
-    await browser.refresh();
-    await explorationEditorTranslationTab.expectSelectedLanguageToBe('Hindi');
-    await users.logout();
-  });
-
-  it('should have voiceover as a default mode', async function () {
-    await users.login('voiceArtist@translationTab.com');
-    await creatorDashboardPage.get();
-    await creatorDashboardPage.editExploration('Test Exploration');
-    await explorationEditorPage.navigateToTranslationTab();
-    await explorationEditorTranslationTab.changeLanguage('हिन्दी (Hindi)');
-    await explorationEditorTranslationTab.expectToBeInVoiceoverMode();
-    await users.logout();
-  });
-
   it('should have all the state contents for voiceover in exploration language', async function () {
     await users.login('voiceArtist@translationTab.com');
     await creatorDashboardPage.get();

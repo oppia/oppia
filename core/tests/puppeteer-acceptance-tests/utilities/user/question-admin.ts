@@ -67,7 +67,7 @@ export class QuestionAdmin extends BaseUser {
    * Function for adding a right of reviewing questions to a user.
    */
   async addReviewQuestionRights(username: string): Promise<void> {
-    await this.type(addContributorUsernameInput, username);
+    await this.typeInInputField(addContributorUsernameInput, username);
     await this.select(
       addContributonRightsCategorySelector,
       reviewQuestionRightValue
@@ -85,7 +85,7 @@ export class QuestionAdmin extends BaseUser {
    * Function for adding a right of submitting questions to a user.
    */
   async addSubmitQuestionRights(username: string): Promise<void> {
-    await this.type(addContributorUsernameInput, username);
+    await this.typeInInputField(addContributorUsernameInput, username);
     await this.select(
       addContributonRightsCategorySelector,
       submitQuestionRightValue
@@ -103,7 +103,7 @@ export class QuestionAdmin extends BaseUser {
    * Function for removng a right of reviewing questions to a user.
    */
   async removeReviewQuestionRights(username: string): Promise<void> {
-    await this.type(removeContributorUsernameInput, username);
+    await this.typeInInputField(removeContributorUsernameInput, username);
     await this.select(
       removeContributonRightsCategorySelector,
       reviewQuestionRightValue
@@ -121,7 +121,7 @@ export class QuestionAdmin extends BaseUser {
    * Function for removing a right of reviewing questions to a user.
    */
   async removeSubmitQuestionRights(username: string): Promise<void> {
-    await this.type(removeContributorUsernameInput, username);
+    await this.typeInInputField(removeContributorUsernameInput, username);
     await this.select(
       removeContributonRightsCategorySelector,
       submitQuestionRightValue
@@ -197,7 +197,7 @@ export class QuestionAdmin extends BaseUser {
     contribution: string
   ): Promise<string> {
     await this.select(viewContributorFilterMethodSelector, usernameMethodValue);
-    await this.type(viewContributerUsernameInput, username);
+    await this.typeInInputField(viewContributerUsernameInput, username);
     await this.clickOn(viewContributorSubmitButton);
 
     await this.waitForNetworkIdle();

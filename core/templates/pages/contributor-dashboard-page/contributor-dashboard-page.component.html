@@ -2,8 +2,8 @@
   <div class="oppia-contributor-home e2e-test-oppia-contributor-home">
     <div class="oppia-opportunities-tabs">
       <ul class="oppia-opportunities-tabs-list" *ngIf="tabsDetails">
-        <li [ngClass]="{'oppia-active-opportunities-tab': item.key === activeTabName}"
-            class="oppia-opportunities-tab-item"
+        <li [ngClass]="{'oppia-active-opportunities-tab e2e-test-active-tab': item.key === activeTabName}"
+            class="oppia-opportunities-tab-item e2e-test-contribution-tab"
             *ngFor="let item of tabsDetails | keyvalue"
             [attr.aria-label]="item.value.ariaLabel">
           <div *ngIf="item.value.enabled"
@@ -121,9 +121,9 @@
               <div class="oppia-explanation-container">
                 <div class="oppia-opportunities-tabs-explanation">
                   <div class="oppia-opportunities-tabs-explanation-before">
-                    <h1>{{tabsDetails[activeTabName].tabName}}</h1>
+                    <h1 class="e2e-test-active-tab-name">{{tabsDetails[activeTabName].tabName}}</h1>
                   </div>
-                  <h2>{{tabsDetails[activeTabName].description}}</h2>
+                  <h2 class="e2e-test-active-tab-description">{{tabsDetails[activeTabName].description}}</h2>
                 </div>
               </div>
             </div>
