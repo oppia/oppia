@@ -385,7 +385,7 @@ export class TopicManager extends BaseUser {
 
     // Close navigation bar.
     if (await this.isElementVisible(navigationContainerSelector)) {
-      await this.clickOn(mobileOptionsSelector);
+      await this.clickOnElementWithSelector(mobileOptionsSelector);
       await this.expectElementToBeVisible(navigationContainerSelector, false);
     }
   }
@@ -396,11 +396,11 @@ export class TopicManager extends BaseUser {
   async resetTopicFilter(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.expectElementToBeVisible(displayMobileFiltersButton);
-      await this.clickOn(displayMobileFiltersButton);
-      await this.clickOn(mobileTopicFilterResetSelector);
+      await this.clickOnElementWithSelector(displayMobileFiltersButton);
+      await this.clickOnElementWithSelector(mobileTopicFilterResetSelector);
     } else {
       await this.expectElementToBeVisible(resetTopicFilterButtonSelector);
-      await this.clickOn(resetTopicFilterButtonSelector);
+      await this.clickOnElementWithSelector(resetTopicFilterButtonSelector);
     }
 
     // Post-check: Ensure all fields are resetted.
@@ -434,7 +434,7 @@ export class TopicManager extends BaseUser {
    */
   async clickOnTopicAndSkillsOptionInProfileMenu(): Promise<void> {
     await this.expectElementToBeVisible(topicAndSkillsOptionInProfileMenu);
-    await this.clickOn(topicAndSkillsOptionInProfileMenu);
+    await this.clickOnElementWithSelector(topicAndSkillsOptionInProfileMenu);
     await this.expectElementToBeVisible(topicAndSkillsDashboardPageSelector);
   }
 
@@ -739,7 +739,7 @@ export class TopicManager extends BaseUser {
       // unexpected warnings. Once fixed, remove the three lines below.
       await this.page.keyboard.press('Tab');
       const closeToastMessageButton = 'button.e2e-test-close-toast-warning';
-      await this.clickOn(closeToastMessageButton);
+      await this.clickOnElementWithSelector(closeToastMessageButton);
     }
     await this.clearAllTextFrom(updateTopicWebFragmentField);
     await this.typeInInputField(updateTopicWebFragmentField, titleFragments);
@@ -787,7 +787,7 @@ export class TopicManager extends BaseUser {
     }
 
     // Click on "Create Question" button.
-    await this.clickOn(createQuestionButton);
+    await this.clickOnElementWithSelector(createQuestionButton);
     await this.expectElementToBeVisible(questionEditorContainer);
   }
 
@@ -796,14 +796,14 @@ export class TopicManager extends BaseUser {
    */
   async addBasicAlgebraQuestionToSkill(skillName: string): Promise<void> {
     await this.openSkillEditor(skillName);
-    await this.clickOn(createQuestionButton);
-    await this.clickOn(textStateEditSelector);
+    await this.clickOnElementWithSelector(createQuestionButton);
+    await this.clickOnElementWithSelector(textStateEditSelector);
     await this.page.waitForSelector(richTextAreaField, {visible: true});
     await this.typeInInputField(richTextAreaField, 'Add 1+2');
     await this.page.waitForSelector(`${saveContentButton}:not([disabled])`);
-    await this.clickOn(saveContentButton);
+    await this.clickOnElementWithSelector(saveContentButton);
 
-    await this.clickOn(addInteractionButton);
+    await this.clickOnElementWithSelector(addInteractionButton);
     await this.page.waitForSelector(interactionNumberInputButton, {
       visible: true,
     });
@@ -822,43 +822,43 @@ export class TopicManager extends BaseUser {
     }, interactionNameDiv);
 
     await this.waitForElementToStabilize(saveInteractionButton);
-    await this.clickOn(saveInteractionButton);
+    await this.clickOnElementWithSelector(saveInteractionButton);
     await this.expectModalTitleToBe('Add Response');
-    await this.clickOn(responseRuleDropdown);
-    await this.clickOn(equalsRuleButtonText);
+    await this.clickOnElementWithSelector(responseRuleDropdown);
+    await this.clickOnElementWithSelector(equalsRuleButtonText);
     await this.typeInInputField(floatTextField, '3');
-    await this.clickOn(answersInGroupAreCorrectToggle);
-    await this.clickOn(openAnswerGroupFeedBackEditor);
+    await this.clickOnElementWithSelector(answersInGroupAreCorrectToggle);
+    await this.clickOnElementWithSelector(openAnswerGroupFeedBackEditor);
     await this.typeInInputField(richTextAreaField, 'Good job!');
-    await this.clickOn(saveResponseButton);
+    await this.clickOnElementWithSelector(saveResponseButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
 
-    await this.clickOn(defaultFeedbackTab);
-    await this.clickOn(openOutcomeFeedBackEditor);
-    await this.clickOn(richTextAreaField);
+    await this.clickOnElementWithSelector(defaultFeedbackTab);
+    await this.clickOnElementWithSelector(openOutcomeFeedBackEditor);
+    await this.clickOnElementWithSelector(richTextAreaField);
     await this.typeInInputField(richTextAreaField, 'The answer is 3');
-    await this.clickOn(saveOutcomeFeedbackButton);
+    await this.clickOnElementWithSelector(saveOutcomeFeedbackButton);
 
-    await this.clickOn(addHintButton);
+    await this.clickOnElementWithSelector(addHintButton);
     await this.page.waitForSelector(modalDiv, {visible: true});
     await this.typeInInputField(richTextAreaField, '3');
-    await this.clickOn(saveHintButton);
+    await this.clickOnElementWithSelector(saveHintButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
 
-    await this.clickOn(addSolutionButton);
+    await this.clickOnElementWithSelector(addSolutionButton);
     await this.page.waitForSelector(modalDiv, {visible: true});
     await this.page.waitForSelector(answerTypeDropdown);
     await this.page.select(answerTypeDropdown, 'The only');
     await this.page.waitForSelector(solutionFloatTextField);
     await this.typeInInputField(solutionFloatTextField, '3');
     await this.page.waitForSelector(`${submitAnswerButton}:not([disabled])`);
-    await this.clickOn(submitAnswerButton);
+    await this.clickOnElementWithSelector(submitAnswerButton);
     await this.typeInInputField(richTextAreaField, '1+2 is 3');
     await this.page.waitForSelector(`${submitSolutionButton}:not([disabled])`);
-    await this.clickOn(submitSolutionButton);
+    await this.clickOnElementWithSelector(submitSolutionButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
 
-    await this.clickOn(saveQuestionButton);
+    await this.clickOnElementWithSelector(saveQuestionButton);
 
     await this.waitForNetworkIdle();
     await this.page.waitForSelector(modalDiv, {hidden: true});
@@ -875,7 +875,7 @@ export class TopicManager extends BaseUser {
    * Clicks on "Save" button in the question editor.
    */
   async saveQuestion(): Promise<void> {
-    await this.clickOn(saveQuestionButton);
+    await this.clickOnElementWithSelector(saveQuestionButton);
     await this.expectElementToBeVisible(saveQuestionButton, false);
   }
 
@@ -2460,7 +2460,7 @@ export class TopicManager extends BaseUser {
     const selector = this.isViewportAtMobileWidth()
       ? addPrerequisiteSkillMobileButtonSelector
       : addPrerequisiteSkillButton;
-    await this.clickOn(selector);
+    await this.clickOnElementWithSelector(selector);
     await this.filterAndSelectSkillInSkillSelector(skillName);
   }
 
@@ -2778,7 +2778,7 @@ export class TopicManager extends BaseUser {
       !(await this.isElementVisible(mobileSubtopicContainerSelector))
     ) {
       await this.expectElementToBeVisible(subtopicExpandHeaderSelector);
-      await this.clickOn(subtopicExpandHeaderSelector);
+      await this.clickOnElementWithSelector(subtopicExpandHeaderSelector);
     }
 
     try {
@@ -2943,7 +2943,7 @@ export class TopicManager extends BaseUser {
       !(await this.isElementVisible(mobileSubtopicContainerSelector))
     ) {
       await this.expectElementToBeVisible(subtopicExpandHeaderSelector);
-      await this.clickOn(subtopicExpandHeaderSelector);
+      await this.clickOnElementWithSelector(subtopicExpandHeaderSelector);
     }
 
     // Check if subtopic exists or not.
@@ -3065,7 +3065,7 @@ export class TopicManager extends BaseUser {
         mobileSaveStoryChangesButton
       );
       if (!isMobileSaveButtonVisible) {
-        await this.clickOn(mobileOptionsSelector);
+        await this.clickOnElementWithSelector(mobileOptionsSelector);
       }
     }
     await this.page.waitForFunction(
@@ -3683,7 +3683,7 @@ export class TopicManager extends BaseUser {
   ): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.expectElementToBeVisible(mobileOptionsSelector);
-      await this.clickOn(mobileOptionsSelector);
+      await this.clickOnElementWithSelector(mobileOptionsSelector);
       await this.page.waitForFunction(
         (selector: string, enabled: boolean) => {
           const element = document.querySelector(selector);
@@ -3697,7 +3697,7 @@ export class TopicManager extends BaseUser {
         discardChangesInMobileNavSelector,
         status === 'enabled'
       );
-      await this.clickOn(mobileOptionsSelector);
+      await this.clickOnElementWithSelector(mobileOptionsSelector);
 
       await this.expectElementToBeVisible(
         discardChangesInMobileNavSelector,
@@ -3720,7 +3720,7 @@ export class TopicManager extends BaseUser {
   async navigateToTabInPreview(
     tabName: 'Learn' | 'Practice' | 'Study'
   ): Promise<void> {
-    await this.clickOn(tabName);
+    await this.clickOnElementWithSelector(tabName);
 
     await this.expectTextContentToBe(
       `.${previewSubtabClass}${activeTabSelector}`,
@@ -3738,7 +3738,7 @@ export class TopicManager extends BaseUser {
     if (this.isViewportAtMobileWidth()) {
       if (!this.isElementVisible(navigationContainerSelector, true, 5000)) {
         await this.expectElementToBeVisible(mobileOptionsSelector);
-        await this.clickOn(mobileOptionsSelector);
+        await this.clickOnElementWithSelector(mobileOptionsSelector);
       }
       await this.page.waitForFunction(
         (selector: string, enabled: boolean) => {
@@ -3823,14 +3823,16 @@ export class TopicManager extends BaseUser {
     const lowerCaseTabName = tabName.toLocaleLowerCase().replace(' ', '-');
     if (this.isViewportAtMobileWidth()) {
       if (!(await this.isElementVisible(mobileNavbarDropdown))) {
-        await this.clickOn(mobileOptionsSelector);
+        await this.clickOnElementWithSelector(mobileOptionsSelector);
       }
-      await this.clickOn(mobileNavbarDropdown);
-      await this.clickOn(`.e2e-test-mobile-${lowerCaseTabName}`);
+      await this.clickOnElementWithSelector(mobileNavbarDropdown);
+      await this.clickOnElementWithSelector(
+        `.e2e-test-mobile-${lowerCaseTabName}`
+      );
     } else {
       const tabSelector = `.e2e-test-${lowerCaseTabName}-button`;
       await this.expectElementToBeVisible(tabSelector);
-      await this.clickOn(tabSelector);
+      await this.clickOnElementWithSelector(tabSelector);
     }
 
     const questionTabContainerSelector = `.e2e-test-topic-${lowerCaseTabName}-container`;
@@ -3843,7 +3845,7 @@ export class TopicManager extends BaseUser {
    */
   async selectSkillInQuestionsTab(skillName: string): Promise<void> {
     await this.expectElementToBeVisible(skillSelectInQuestionTabSelector);
-    await this.clickOn(skillSelectInQuestionTabSelector);
+    await this.clickOnElementWithSelector(skillSelectInQuestionTabSelector);
 
     await this.selectMatOption(skillName);
     await this.expectTextContentToBe(
@@ -3898,8 +3900,8 @@ export class TopicManager extends BaseUser {
   ): Promise<void> {
     const selector = `.e2e-test-skill-difficulty-${difficulty.toLowerCase()}`;
     await this.expectElementToBeVisible(selector);
-    await this.clickOn(selector);
-    await this.clickOn(confirmSkillDificultyButton);
+    await this.clickOnElementWithSelector(selector);
+    await this.clickOnElementWithSelector(confirmSkillDificultyButton);
 
     await this.expectElementToBeVisible(confirmSkillDificultyButton, false);
   }
@@ -3916,12 +3918,12 @@ export class TopicManager extends BaseUser {
       this.isViewportAtMobileWidth() &&
       !(await this.isElementVisible(difficultyContainer, true, 5000))
     ) {
-      await this.clickOn(difficultyHeader);
+      await this.clickOnElementWithSelector(difficultyHeader);
       await this.expectElementToBeVisible(difficultyContainer);
     }
     const selector = `.e2e-test-skill-difficulty-${difficulty.toLowerCase()}`;
     await this.expectElementToBeVisible(selector);
-    await this.clickOn(selector);
+    await this.clickOnElementWithSelector(selector);
 
     await this.page.waitForFunction(
       (selector: string, className: string) => {
@@ -3939,7 +3941,7 @@ export class TopicManager extends BaseUser {
    */
   async clickOnAddQuestionButton(): Promise<void> {
     await this.expectElementToBeVisible(addQuestionButtonSelector);
-    await this.clickOn(addQuestionButtonSelector);
+    await this.clickOnElementWithSelector(addQuestionButtonSelector);
     await this.expectElementToBeVisible(addQuestionButtonSelector, false);
   }
 
@@ -3964,7 +3966,7 @@ export class TopicManager extends BaseUser {
       this.isViewportAtMobileWidth() &&
       !(await this.isElementVisible(addNewStoryButtonSelector))
     ) {
-      await this.clickOn(expandStoryHeaderSelector);
+      await this.clickOnElementWithSelector(expandStoryHeaderSelector);
     }
 
     const storyListVisible = await this.isElementVisible(storyRowSelector);
@@ -4084,7 +4086,7 @@ export class TopicManager extends BaseUser {
     }
 
     await this.clickOnElement(deleteButton);
-    await this.clickOn('Delete Story');
+    await this.clickOnElementWithSelector('Delete Story');
   }
 
   /**
@@ -4280,7 +4282,7 @@ export class TopicManager extends BaseUser {
     }
 
     await this.expectElementToBeVisible(headerSelector);
-    await this.clickOn(headerSelector);
+    await this.clickOnElementWithSelector(headerSelector);
 
     await this.expectElementToBeVisible(bodySelector);
   }
@@ -4303,7 +4305,7 @@ export class TopicManager extends BaseUser {
       const element = await this.page.$(responseGroupDiv);
       // If the responses were collapsed in mobile view.
       if (!element) {
-        await this.clickOn(toggleResponseTab);
+        await this.clickOnElementWithSelector(toggleResponseTab);
       }
     }
     await this.page.waitForSelector(responseGroupDiv, {

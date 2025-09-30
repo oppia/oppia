@@ -3827,8 +3827,8 @@ export class ExplorationEditor extends BaseUser {
     isSolutionNumericInput: boolean = true
   ): Promise<void> {
     await this.page.waitForSelector(stateSolutionTab, {visible: true});
-    await this.clickOn(stateSolutionTab);
-    await this.clickOn(editSolutionDivSelector);
+    await this.clickOnElementWithSelector(stateSolutionTab);
+    await this.clickOnElementWithSelector(editSolutionDivSelector);
 
     // Add solution.
     const solutionSelector = isSolutionNumericInput
@@ -3838,7 +3838,7 @@ export class ExplorationEditor extends BaseUser {
     await this.clearAllTextFrom(solutionSelector);
     await this.typeInInputField(solutionSelector, solution);
     await this.page.waitForSelector(`${submitAnswerButton}:not([disabled])`);
-    await this.clickOn(submitAnswerButton);
+    await this.clickOnElementWithSelector(submitAnswerButton);
     await this.addSolutionExplanationAndSave(explaination);
   }
 
@@ -6872,7 +6872,7 @@ export class ExplorationEditor extends BaseUser {
       this.isViewportAtMobileWidth() &&
       !(await this.isElementVisible(responseGroupDiv, true, 5000))
     ) {
-      await this.clickOn(toggleResponseTab);
+      await this.clickOnElementWithSelector(toggleResponseTab);
     }
     await this.page.waitForSelector(responseGroupDiv);
     const elements = await this.page.$$(responseGroupDiv);
@@ -6890,10 +6890,12 @@ export class ExplorationEditor extends BaseUser {
     );
 
     if (newAnswer) {
-      await this.clickOn(responseInputSelector);
+      await this.clickOnElementWithSelector(responseInputSelector);
       await this.clearAllTextFrom(answerInputSelector);
       await this.typeInInputField(answerInputSelector, newAnswer);
-      await this.clickOn(saveAnswerButtonInResponseGroupSelector);
+      await this.clickOnElementWithSelector(
+        saveAnswerButtonInResponseGroupSelector
+      );
       await this.expectElementToBeVisible(
         saveAnswerButtonInResponseGroupSelector,
         false

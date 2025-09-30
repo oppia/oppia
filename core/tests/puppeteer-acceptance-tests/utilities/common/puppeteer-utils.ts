@@ -475,11 +475,16 @@ export class BaseUser {
    * Clicks on the given element after checking if it's clickable and not in
    * tansition animation.
    * Note: This function doesn't have post-check.
+   * @param element - The Puppeteer element to click on.
+   * @param options - Click options.
    */
-  async clickOnElement(element: ElementHandle<Element>): Promise<void> {
+  async clickOnElement(
+    element: ElementHandle<Element>,
+    options: puppeteer.ClickOptions = {}
+  ): Promise<void> {
     await this.waitForElementToBeClickable(element);
     await this.waitForElementToStabilize(element);
-    await element.click();
+    await element.click(options);
   }
 
   /**

@@ -42,28 +42,6 @@ const uploadPhotoButton = 'button.e2e-test-photo-upload-submit';
 const photoUploadModal = 'edit-thumbnail-modal';
 const removeQuestionConfirmationButton =
   '.e2e-test-remove-question-confirmation-button';
-const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
-const interactionNumberInputButton =
-  'div.e2e-test-interaction-tile-NumericInput';
-const interactionNameDiv = 'div.oppia-interaction-tile-name';
-const saveInteractionButton = 'button.e2e-test-save-interaction';
-const responseRuleDropdown =
-  'oppia-rule-type-selector.e2e-test-answer-description';
-const equalsRuleButtonText = 'is equal to ...';
-const answersInGroupAreCorrectToggle =
-  'input.e2e-test-editor-correctness-toggle';
-const saveResponseButton = 'button.e2e-test-add-new-response';
-const defaultFeedbackTab = 'a.e2e-test-default-response-tab';
-const openOutcomeFeedBackEditor = 'div.e2e-test-open-outcome-feedback-editor';
-const saveOutcomeFeedbackButton = 'button.e2e-test-save-outcome-feedback';
-const openAnswerGroupFeedBackEditor = 'i.e2e-test-open-feedback-editor';
-const addHintButton = 'button.e2e-test-oppia-add-hint-button';
-const saveHintButton = 'button.e2e-test-save-hint';
-const addSolutionButton = 'button.e2e-test-oppia-add-solution-button';
-const answerTypeDropdown = 'select.e2e-test-answer-is-exclusive-select';
-const submitAnswerButton = 'button.e2e-test-submit-answer-button';
-const submitSolutionButton = 'button.e2e-test-submit-solution-button';
-const saveQuestionButton = 'button.e2e-test-save-question-button';
 
 const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
 
@@ -329,11 +307,10 @@ const createQuestionButton = 'div.e2e-test-create-question';
 const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
 const interactionNumberInputButton =
   'div.e2e-test-interaction-tile-NumericInput';
-const interactionNameDiv = 'div.oppia-interaction-tile-name';
 const saveInteractionButton = 'button.e2e-test-save-interaction';
 const responseRuleDropdown =
   'oppia-rule-type-selector.e2e-test-answer-description';
-const equalsRuleButtonText = 'is equal to ... ';
+const equalsRuleButtonText = 'is equal to ...';
 const answersInGroupAreCorrectToggle =
   'input.e2e-test-editor-correctness-toggle';
 const saveResponseButton = 'button.e2e-test-add-new-response';
@@ -347,6 +324,7 @@ const addSolutionButton = 'button.e2e-test-oppia-add-solution-button';
 const answerTypeDropdown = 'select.e2e-test-answer-is-exclusive-select';
 const submitAnswerButton = 'button.e2e-test-submit-answer-button';
 const submitSolutionButton = 'button.e2e-test-submit-solution-button';
+const interactionNameDiv = 'div.oppia-interaction-tile-name';
 const saveQuestionButton = 'button.e2e-test-save-question-button';
 
 export class CurriculumAdmin extends TopicManager {
@@ -604,11 +582,11 @@ export class CurriculumAdmin extends TopicManager {
   ): Promise<void> {
     await this.typeInInputField(skillDescriptionField, skillName);
     await this.page.waitForSelector(skillReviewMaterialHeader);
-    await this.clickOn(skillReviewMaterialHeader);
-    await this.clickOn(richTextAreaField);
+    await this.clickOnElementWithSelector(skillReviewMaterialHeader);
+    await this.clickOnElementWithSelector(richTextAreaField);
     await this.typeInInputField(richTextAreaField, reviewMaterial);
     if (addWorkedExample) {
-      await this.clickOn(insertWorkedExampleButton);
+      await this.clickOnElementWithSelector(insertWorkedExampleButton);
       await this.page.waitForSelector(editWorkedExampleModalQuestionRte, {
         visible: true,
       });
@@ -623,12 +601,12 @@ export class CurriculumAdmin extends TopicManager {
       await this.clearAllTextFrom(editWorkedExampleModalAnswerRte);
       await this.waitForElementToStabilize(editWorkedExampleModalAnswerRte);
       await this.typeInInputField(editWorkedExampleModalAnswerRte, '1');
-      await this.clickOn(rteComponentSaveButton);
+      await this.clickOnElementWithSelector(rteComponentSaveButton);
     }
     await this.page.waitForSelector(
       `${confirmSkillCreationButton}:not([disabled])`
     );
-    await this.clickOn(confirmSkillCreationButton);
+    await this.clickOnElementWithSelector(confirmSkillCreationButton);
     await this.waitForNetworkIdle();
     await this.page.waitForSelector(confirmSkillCreationButton, {
       hidden: true,
@@ -1422,7 +1400,7 @@ export class CurriculumAdmin extends TopicManager {
    */
   async updateRubric(difficulty: string, explanation: string): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(toggleSkillRubricsDropdown);
+      await this.clickOnElementWithSelector(toggleSkillRubricsDropdown);
     }
 
     await this.waitForStaticAssetsToLoad();
@@ -2837,7 +2815,7 @@ export class CurriculumAdmin extends TopicManager {
       if (
         !(await this.isElementVisible(navigationContainerSelector, true, 5000))
       ) {
-        await this.clickOn(mobileOptionsSelector);
+        await this.clickOnElementWithSelector(mobileOptionsSelector);
       }
       const navDropdownElements = await this.page.$$(navigationDropdown);
       await this.waitForElementToBeClickable(navDropdownElements[1]);
@@ -3021,7 +2999,7 @@ export class CurriculumAdmin extends TopicManager {
 
     await this.navigateToSkillsTab();
     await this.expectElementToBeVisible(skillButtonSelector);
-    await this.clickOn(skillButtonSelector);
+    await this.clickOnElementWithSelector(skillButtonSelector);
     await this.fillSkillInfoAndSubmit(skillName, reviewMaterial);
   }
 
