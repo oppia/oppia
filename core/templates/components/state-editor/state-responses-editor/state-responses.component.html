@@ -48,7 +48,7 @@
                   ⚠
                 </div>
               </div>
-              <a (click)="changeActiveAnswerGroupIndex(index)" (keydown.enter)="changeActiveAnswerGroupIndex(index)" tabindex="0" class="oppia-rule-tab e2e-test-response-tab" [ngClass]="{'oppia-rule-tab-active': activeAnswerGroupIndex === index}">
+              <a (click)="changeActiveAnswerGroupIndex(index)" (keydown.enter)="changeActiveAnswerGroupIndex(index)" tabindex="0" class="oppia-rule-tab e2e-test-response-tab" [ngClass]="{'oppia-rule-tab-active e2e-test-active-tab': activeAnswerGroupIndex === index}">
                 <oppia-response-header [index]="index"
                                        [summary]="summarizeAnswerGroup(answerGroup, getCurrentInteractionId(), getAnswerChoices(), false)"
                                        [shortSummary]="summarizeAnswerGroup(answerGroup, getCurrentInteractionId(), getAnswerChoices(), true)"
@@ -177,7 +177,7 @@
             <div *ngFor="let skillWithMisconceptions of misconceptionsBySkill | keyvalue">
               <div *ngFor="let misconception of skillWithMisconceptions.value">
                 <div *ngIf="!misconception.isMandatory()"
-                     class="misconception-list-item optional-misconception-list-item"
+                     class="misconception-list-item optional-misconception-list-item e2e-test-misconception-item"
                      [ngClass]="{'optional-misconception-list-no-action': isNoActionExpected(skillWithMisconceptions.key + '-' + misconception.getId())}">
                   <div>
                     <div>

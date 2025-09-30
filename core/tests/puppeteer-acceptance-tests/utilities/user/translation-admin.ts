@@ -75,7 +75,7 @@ export class TranslationAdmin extends BaseUser {
     languageCode: string
   ): Promise<void> {
     await this.expectElementToBeVisible(addContributorUsernameInput);
-    await this.type(addContributorUsernameInput, username);
+    await this.typeInInputField(addContributorUsernameInput, username);
     await this.select(
       addContributonRightsCategorySelect,
       translationRightValue
@@ -97,7 +97,7 @@ export class TranslationAdmin extends BaseUser {
     languageCode: string
   ): Promise<void> {
     await this.expectElementToBeVisible(removeContributorUsernameInput);
-    await this.type(removeContributorUsernameInput, username);
+    await this.typeInInputField(removeContributorUsernameInput, username);
     await this.select(
       removeContributonRightsCategorySelect,
       translationRightValue
@@ -114,7 +114,7 @@ export class TranslationAdmin extends BaseUser {
   async viewContributionRightsForUser(username: string): Promise<void> {
     await this.expectElementToBeVisible(viewContributorFilterMethodSelect);
     await this.select(viewContributorFilterMethodSelect, usernameMethodValue);
-    await this.type(viewContributerUsernameInput, username);
+    await this.typeInInputField(viewContributerUsernameInput, username);
     await this.clickOn(viewContributorSubmitButton);
 
     await this.waitForNetworkIdle();

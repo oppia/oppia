@@ -17,10 +17,6 @@
       "module": "core/tests/webdriverio_desktop/additionalPlayerFeatures.js"
     },
     {
-      "name": "blogDashboard",
-      "module": "core/tests/webdriverio_desktop/blogDashboard.js"
-    },
-    {
       "name": "blog",
       "module": "core/tests/webdriverio_desktop/blog.js"
     },
@@ -65,20 +61,12 @@
       "module": "core/tests/webdriverio_desktop/explorationTranslationTab.js"
     },
     {
-      "name": "fileUploadFeatures",
-      "module": "core/tests/webdriverio_desktop/voiceoverUploadFeatures.js"
-    },
-    {
       "name": "learner",
       "module": "core/tests/webdriverio/learnerFlow.js"
     },
     {
       "name": "navigation",
       "module": "core/tests/webdriverio_desktop/navigation.js"
-    },
-    {
-      "name": "profileFeatures",
-      "module": "core/tests/webdriverio_desktop/profileFeatures.js"
     },
     {
       "name": "profileMenu",
@@ -93,20 +81,8 @@
       "module": "core/tests/webdriverio_desktop/skillEditor.js"
     },
     {
-      "name": "subscriptions",
-      "module": "core/tests/webdriverio/subscriptionsFlow.js"
-    },
-    {
-      "name": "topicsAndSkillsDashboard",
-      "module": "core/tests/webdriverio_desktop/topicsAndSkillsDashboard.js"
-    },
-    {
       "name": "topicAndStoryEditor",
       "module": "core/tests/webdriverio_desktop/topicAndStoryEditor.js"
-    },
-    {
-      "name": "topicAndStoryEditorFileUploadFeatures",
-      "module": "core/tests/webdriverio_desktop/topicAndStoryEditorFileUploadFeatures.js"
     },
     {
       "name": "users",
