@@ -29,9 +29,7 @@ from typing import Iterator, List, Optional, Tuple, Type, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import datastore_services
-    from mypy_imports import question_models
-    from mypy_imports import skill_models
+    from mypy_imports import datastore_services, question_models, skill_models
 
 (question_models, skill_models) = models.Registry.import_models(
     [models.Names.QUESTION, models.Names.SKILL])

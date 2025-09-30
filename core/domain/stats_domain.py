@@ -23,19 +23,20 @@ import json
 import numbers
 import sys
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import customization_args_util
-from core.domain import exp_domain
-
-from typing import Any, Dict, Final, List, Literal, Optional, TypedDict, Union
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
-from core.domain import action_registry  # pylint: disable=invalid-import-from # isort:skip
-from core.domain import interaction_registry  # pylint: disable=invalid-import-from # isort:skip
-from core.domain import playthrough_issue_registry  # pylint: disable=invalid-import-from # isort:skip
+from core.domain import action_registry  # pylint: disable=invalid-import-from
+from core.domain import (  # pylint: disable=invalid-import-from
+    customization_args_util,
+    exp_domain,
+    interaction_registry,
+    playthrough_issue_registry,
+)
+
+from typing import Any, Dict, Final, List, Literal, Optional, TypedDict, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -816,17 +817,11 @@ class SessionStateStats:
             if exp_stats_property not in aggregated_stats:
                 raise utils.ValidationError(
                     '%s not in aggregated stats dict.' % (exp_stats_property))
-            # Here we use MyPy ignore because MyPy does not recognize
-            # that keys represented by the variable exp_stats_property
-            # are string literals.
-            if not isinstance(aggregated_stats[exp_stats_property], int): # type: ignore[misc]
+            if not isinstance(aggregated_stats.get(exp_stats_property, 0), int):
                 raise utils.ValidationError(
                     'Expected %s to be an int, received %s' % (
                         exp_stats_property,
-                        # Here we use MyPy ignore because MyPy does not
-                        # recognize that keys represented by the variable
-                        # exp_stats_property are string literals.
-                        aggregated_stats[exp_stats_property] # type: ignore[misc]
+                        aggregated_stats.get(exp_stats_property, 0)
                     )
                 )
         state_stats_mapping = aggregated_stats['state_stats_mapping']

@@ -22,13 +22,16 @@ import multiprocessing
 import os
 import re
 import tempfile
+
 from core.tests import test_utils
 
 from typing import Final, Pattern, Tuple
 
-from . import general_purpose_linter
-from . import run_lint_checks
-from . import warranted_angular_security_bypasses
+from . import (
+    general_purpose_linter,
+    run_lint_checks,
+    warranted_angular_security_bypasses,
+)
 
 NAME_SPACE: Final = multiprocessing.Manager().Namespace()
 NAME_SPACE.files = run_lint_checks.FileCache()
@@ -74,9 +77,11 @@ INVALID_AUTHOR_FILEPATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'invalid_author.py'
 )
 INVALID_DATASTORE_FILEPATH: Final = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_datastore.py')
+    LINTER_TESTS_DIR, 'invalid_datastore.py'
+)
 INVALID_PYLINT_ID_FILEPATH: Final = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_pylint_id.py')
+    LINTER_TESTS_DIR, 'invalid_pylint_id.py'
+)
 INVALID_TABS_FILEPATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'invalid_tabs.py'
 )
@@ -86,9 +91,17 @@ INVALID_TODO_FILEPATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'invalid_todo.py'
 )
 INVALID_COPYRIGHT_FILEPATH: Final = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_copyright.py')
+    LINTER_TESTS_DIR, 'invalid_copyright.py'
+)
 INVALID_ANNOTATIONS_FILEPATH: Final = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_annotations.py')
+    LINTER_TESTS_DIR, 'invalid_annotations.py'
+)
+INVALID_BLACK_FMT_OFF_PRAGMA_FILEPATH: Final = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_black_pragma_fmt_off.py'
+)
+INVALID_BLACK_FMT_SKIP_PRAGMA_FILEPATH: Final = os.path.join(
+    LINTER_TESTS_DIR, 'invalid_black_pragma_fmt_skip.py'
+)
 CONSTANTS_FILEPATH: Final = os.path.join(
     os.getcwd(), 'assets', 'constants.ts'
 )
@@ -212,6 +225,28 @@ class GeneralLintTests(test_utils.LinterTestBase):
         self.assert_same_list_elements(
             ['Please use spaces instead of tabs.'],
             lint_task_report.trimmed_messages)
+        self.assertEqual('Bad pattern', lint_task_report.name)
+        self.assertTrue(lint_task_report.failed)
+
+    def test_invalid_use_of_fmt_off(self) -> None:
+        linter = general_purpose_linter.GeneralPurposeLinter(
+            [INVALID_BLACK_FMT_OFF_PRAGMA_FILEPATH], FILE_CACHE)
+        lint_task_report = linter.check_bad_patterns()
+        self.assert_same_list_elements(
+            ['Use of "fmt: off" is prohibited. All code must be formatted by Black.'],
+            lint_task_report.trimmed_messages
+        )
+        self.assertEqual('Bad pattern', lint_task_report.name)
+        self.assertTrue(lint_task_report.failed)
+
+    def test_invalid_use_of_fmt_skip(self) -> None:
+        linter = general_purpose_linter.GeneralPurposeLinter(
+            [INVALID_BLACK_FMT_SKIP_PRAGMA_FILEPATH], FILE_CACHE)
+        lint_task_report = linter.check_bad_patterns()
+        self.assert_same_list_elements(
+            ['Use of "fmt: skip" is prohibited. All code must be formatted by Black.'],
+            lint_task_report.trimmed_messages
+        )
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 

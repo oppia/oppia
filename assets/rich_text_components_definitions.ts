@@ -291,7 +291,7 @@ export default {
       "schema": {
         "type": "html",
         "ui_config": {
-          "rte_component_config_id": "WORKED_EXAMPLE_MODAL_COMPONENTS",
+          "rte_component_config_id": "CURATED_LESSON_COMPONENTS",
           "hide_complex_extensions": true
         }
       },
@@ -303,12 +303,12 @@ export default {
       "schema": {
         "type": "html",
         "ui_config": {
-          "rte_component_config_id": "WORKED_EXAMPLE_MODAL_COMPONENTS",
+          "rte_component_config_id": "CURATED_LESSON_COMPONENTS",
           "hide_complex_extensions": true
         }
       },
       "default_value_obtainable_from_highlight": false,
-      "default_value": "You have revealed the answer for the worked example."
+      "default_value": ""
     }]
   }
 } as const;

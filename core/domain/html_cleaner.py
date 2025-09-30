@@ -29,7 +29,7 @@ from core.domain import rte_component_registry
 
 import bleach
 import bs4
-from typing import Dict, Final, List, TypedDict, Union, cast
+from typing import Callable, Dict, Final, List, TypedDict, Union, cast
 
 
 class ComponentsDict(TypedDict):
@@ -67,7 +67,7 @@ def filter_a(tag: str, name: str, value: str) -> bool:
     return False
 
 
-ATTRS_ALLOWLIST: Final = {
+ATTRS_ALLOWLIST: Final[Dict[str, Union[List[str], Callable[..., bool]]]] = {
     'a': filter_a,
     'b': [],
     'blockquote': [],
@@ -114,8 +114,11 @@ def clean(user_submitted_html: str) -> str:
 
     # TODO(sll): Alert the caller if the input was changed due to this call.
     # TODO(sll): Add a log message if bad HTML is detected.
+
     return bleach.clean(
-        user_submitted_html, tags=tag_names, attributes=core_tags, strip=True)
+        user_submitted_html, tags=tag_names,
+        attributes=core_tags, strip=True
+    )
 
 
 def strip_html_tags(html_string: str) -> str:
@@ -128,7 +131,10 @@ def strip_html_tags(html_string: str) -> str:
         str. The HTML string that results after all the tags and attributes are
         stripped out.
     """
-    return bleach.clean(html_string, tags=[], attributes={}, strip=True)
+    empty_attrs: Dict[str, List[str]] = {}
+    return bleach.clean(
+        html_string, tags=[], attributes=empty_attrs, strip=True
+    )
 
 
 def get_image_filenames_from_html_strings(html_strings: List[str]) -> List[str]:

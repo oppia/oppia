@@ -16,7 +16,7 @@
  * @fileoverview Super Admin users utility file.
  */
 
-import puppeteer from 'puppeteer';
+import puppeteer, {ElementHandle} from 'puppeteer';
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
@@ -122,6 +122,14 @@ const languageSelectorBodySelector = '.e2e-test-language-selector-modal-body';
 const addLanguageButtonSelector = '.e2e-test-language-selector-add-button';
 const selectedLanguageSelector = '.e2e-test-selected-language';
 
+const platformParameterTabContainerSelector =
+  'oppia-admin-platform-parameters-tab';
+const userRolesTabContainerSelector = 'oppia-admin-roles-tab';
+const userRolesVisualizationContainerSelector =
+  'oppia-roles-and-actions-visualizer';
+const platformParameterDefaultValueContainerSelector =
+  '.e2e-test-platform-param-default-value-container';
+
 export class SuperAdmin extends BaseUser {
   /**
    * Navigates to the Admin Page Activities Tab.
@@ -139,6 +147,7 @@ export class SuperAdmin extends BaseUser {
    */
   async navigateToAdminPageRolesTab(): Promise<void> {
     await this.goto(adminPageRolesTab);
+    await this.expectElementToBeVisible(userRolesTabContainerSelector);
   }
 
   /**
@@ -162,8 +171,21 @@ export class SuperAdmin extends BaseUser {
     await this.goto(communityLibraryUrl);
   }
 
+  /**
+   * Navigates to the Admin Page Platform Parameters Tab.
+   */
   async navigateToAdminPagePlatformParametersTab(): Promise<void> {
     await this.goto(adminPagePlatformParametersTab);
+    await this.expectElementToBeVisible(platformParameterTabContainerSelector);
+  }
+
+  /**
+   * Navigates to the Admin Page Roles Tab.
+   */
+  async expectUserRolesVisualizerToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(
+      userRolesVisualizationContainerSelector
+    );
   }
 
   /**
@@ -181,7 +203,7 @@ export class SuperAdmin extends BaseUser {
     args?: string | string[]
   ): Promise<void> {
     await this.goto(adminPageRolesTab);
-    await this.type(roleEditorInputField, username);
+    await this.typeInInputField(roleEditorInputField, username);
     await this.clickOn(roleEditorButtonSelector);
     await this.clickOn(addRoleButton);
     await this.clickOn(rolesSelectDropdown);
@@ -334,7 +356,7 @@ export class SuperAdmin extends BaseUser {
   async expectUserToHaveRole(username: string, role: string): Promise<void> {
     const currentPageUrl = this.page.url();
     await this.goto(adminPageRolesTab);
-    await this.type(roleEditorInputField, username);
+    await this.typeInInputField(roleEditorInputField, username);
     await this.clickOn(roleEditorButtonSelector);
     await this.page.waitForSelector(justifyContentDiv);
     const userRoleElements = await this.page.$$(userRoleDescriptionSelector);
@@ -358,7 +380,7 @@ export class SuperAdmin extends BaseUser {
   async expectUserNotToHaveRole(username: string, role: string): Promise<void> {
     const currentPageUrl = this.page.url();
     await this.goto(adminPageRolesTab);
-    await this.type(roleEditorInputField, username);
+    await this.typeInInputField(roleEditorInputField, username);
     await this.clickOn(roleEditorButtonSelector);
     await this.page.waitForSelector(justifyContentDiv);
     const userRoleElements = await this.page.$$(userRoleDescriptionSelector);
@@ -383,7 +405,7 @@ export class SuperAdmin extends BaseUser {
     role = role.replace(/ /g, '-');
     await this.goto(adminPageRolesTab);
     await this.page.waitForSelector(roleEditorInputField);
-    await this.type(roleEditorInputField, username);
+    await this.typeInInputField(roleEditorInputField, username);
     await this.clickOn(roleEditorButtonSelector);
     await this.page.waitForSelector(justifyContentDiv);
     await this.page.waitForSelector(
@@ -434,24 +456,29 @@ export class SuperAdmin extends BaseUser {
   /**
    * Checks if the specified users are assigned to the current role.
    * @param {string[]} users - An array of usernames to check.
+   * @param {boolean} present - Whether the users should be present or not.
    */
-  async expectRoleToHaveAssignedUsers(users: string[]): Promise<void> {
+  async expectRoleToHaveAssignedUsers(
+    users: string[],
+    present: boolean = true
+  ): Promise<void> {
     await this.clickOn(' Assigned users ');
 
     for (const user of users) {
       try {
         await this.page.waitForFunction(
-          (user: string) => {
+          (user: string, present: boolean) => {
             const regex = new RegExp(`\\b${user}\\b`);
-            return regex.test(document.documentElement.outerHTML);
+            return regex.test(document.documentElement.outerHTML) === present;
           },
-          {},
-          user
+          {timeout: 10000},
+          user,
+          present
         );
       } catch (error) {
         if (error instanceof puppeteer.errors.TimeoutError) {
           const newError = new Error(
-            `User "${user}" is not assigned to the role`
+            `User "${user}" is ${present ? 'not ' : ''}assigned to the role`
           );
           newError.stack = error.stack;
           throw newError;
@@ -516,7 +543,7 @@ export class SuperAdmin extends BaseUser {
       await this.page.waitForSelector(searchFieldCommunityLibrary, {
         visible: true,
       });
-      await this.type(searchFieldCommunityLibrary, activityName);
+      await this.typeInInputField(searchFieldCommunityLibrary, activityName);
 
       const isActivityPresent = await this.isTextPresentOnPage(activityName);
       if (!isActivityPresent) {
@@ -604,12 +631,18 @@ export class SuperAdmin extends BaseUser {
     await this.page.waitForSelector(noOfExplorationToGeneratorField, {
       visible: true,
     });
-    await this.type(noOfExplorationToGeneratorField, noToGenerate.toString());
+    await this.typeInInputField(
+      noOfExplorationToGeneratorField,
+      noToGenerate.toString()
+    );
 
     await this.page.waitForSelector(noOfExplorationToPublishField, {
       visible: true,
     });
-    await this.type(noOfExplorationToPublishField, noToPublish.toString());
+    await this.typeInInputField(
+      noOfExplorationToPublishField,
+      noToPublish.toString()
+    );
 
     await this.page.waitForSelector(generateExplorationButton, {
       visible: true,
@@ -916,6 +949,7 @@ export class SuperAdmin extends BaseUser {
       await addRuleButton.click();
 
       await this.waitForElementToBeClickable(addConditionButton);
+      await this.waitForElementToStabilize(addConditionButton);
       await this.clickOn(addConditionButton);
 
       await this.page.waitForSelector(serverModeSelector, {visible: true});
@@ -923,9 +957,10 @@ export class SuperAdmin extends BaseUser {
       await this.page.select(serverModeSelector, condition);
 
       await this.waitForElementToBeClickable(paramValueInput);
+      await this.clearAllTextFrom(paramValueInput);
       await this.page.type(paramValueInput, ruleValue);
 
-      await this.expectInputValueToBe(paramValueInput, ruleValue);
+      await this.expectElementValueToBe(paramValueInput, ruleValue);
       showMessage('Rule added successfully.');
     } catch (error) {
       console.error(
@@ -958,15 +993,26 @@ export class SuperAdmin extends BaseUser {
       }
       await this.waitForElementToBeClickable(editButton);
       await editButton.click();
-      await platformParameter.waitForSelector(paramValueInput, {visible: true});
-      const valueInputs = await platformParameter.$$(paramValueInput);
-      await valueInputs[1].type(value);
+
+      const deafultValueInputSelector = `${platformParameterDefaultValueContainerSelector} ${paramValueInput}`;
+      const inputElement = await platformParameter.waitForSelector(
+        deafultValueInputSelector,
+        {visible: true}
+      );
+
+      if (!inputElement) {
+        throw new Error(
+          `Input field not found for platform parameter "${platformParam}".`
+        );
+      }
+
+      await inputElement.type(value);
       await this.page.waitForFunction(
         (element: Element, value: string) => {
           return (element as HTMLInputElement).value.trim() === value.trim();
         },
         {},
-        valueInputs[1],
+        inputElement,
         value
       );
       showMessage('Default value changed successfully.');
@@ -1110,7 +1156,7 @@ export class SuperAdmin extends BaseUser {
     topicId: string
   ): Promise<void> {
     await this.expectElementToBeVisible(topicIdInputSelector);
-    await this.type(topicIdInputSelector, topicId);
+    await this.typeInInputField(topicIdInputSelector, topicId);
 
     await this.page.waitForSelector(regenerateOpportunitiesButton);
     await this.clickOn(regenerateOpportunitiesButton);
@@ -1141,7 +1187,10 @@ export class SuperAdmin extends BaseUser {
     explorationId: string | null
   ): Promise<void> {
     await this.expectElementToBeVisible(explorationIdInputSelector);
-    await this.type(explorationIdInputSelector, explorationId as string);
+    await this.typeInInputField(
+      explorationIdInputSelector,
+      explorationId as string
+    );
 
     await this.page.waitForSelector(rollbackExplorationButton);
     await this.clickOn(rollbackExplorationButton);
@@ -1162,9 +1211,9 @@ export class SuperAdmin extends BaseUser {
     newUserName: string
   ): Promise<void> {
     await this.expectElementToBeVisible(oldUserNameInputSelector);
-    await this.type(oldUserNameInputSelector, oldUserName);
+    await this.typeInInputField(oldUserNameInputSelector, oldUserName);
 
-    await this.type(newUserNameInputSelector, newUserName);
+    await this.typeInInputField(newUserNameInputSelector, newUserName);
 
     await this.page.waitForSelector(updateUserNameButtonSelector);
     await this.clickOn(updateUserNameButtonSelector);
@@ -1196,7 +1245,7 @@ export class SuperAdmin extends BaseUser {
     explorationId: string | null
   ): Promise<void> {
     await this.expectElementToBeVisible(explorationIdToGetInteractionsInput);
-    await this.type(
+    await this.typeInInputField(
       explorationIdToGetInteractionsInput,
       explorationId as string
     );
@@ -1217,7 +1266,7 @@ export class SuperAdmin extends BaseUser {
    */
   async grantSuperAdminPrivileges(username: string): Promise<void> {
     await this.expectElementToBeVisible(usernameToGrantPrivilegeInput);
-    await this.type(usernameToGrantPrivilegeInput, username);
+    await this.typeInInputField(usernameToGrantPrivilegeInput, username);
 
     await this.page.waitForSelector(grantSuperAdminButtonSelector);
     await this.clickOn(grantSuperAdminButtonSelector);
@@ -1235,7 +1284,7 @@ export class SuperAdmin extends BaseUser {
    */
   async revokeSuperAdminPrivileges(username: string): Promise<void> {
     await this.expectElementToBeVisible(usernameToRevokePrivilegeInput);
-    await this.type(usernameToRevokePrivilegeInput, username);
+    await this.typeInInputField(usernameToRevokePrivilegeInput, username);
 
     await this.page.waitForSelector(revokeSuperAdminButton);
     await this.clickOn(revokeSuperAdminButton);
@@ -1258,11 +1307,11 @@ export class SuperAdmin extends BaseUser {
     publishedOn: string
   ): Promise<void> {
     await this.expectElementToBeVisible(blogIdInputSelector);
-    await this.type(blogIdInputSelector, blogId);
+    await this.typeInInputField(blogIdInputSelector, blogId);
 
-    await this.type(blogAuthorInputSelector, author);
+    await this.typeInInputField(blogAuthorInputSelector, author);
 
-    await this.type(blogPublishedOnInputSelector, publishedOn);
+    await this.typeInInputField(blogPublishedOnInputSelector, publishedOn);
 
     await this.page.waitForSelector(updateBlogPostButtonSelector);
     await this.clickOn(updateBlogPostButtonSelector);
@@ -1287,6 +1336,35 @@ export class SuperAdmin extends BaseUser {
     await toggle.click();
     await this.page.waitForSelector(saveAutogenerationToggleButtonSelector);
     await this.clickOn(saveAutogenerationToggleButtonSelector);
+  }
+
+  /**
+   * Checks if a platform parameter is visible.
+   * @param {string} parameterName - The name of the platform parameter.
+   */
+  async expectPlatformParameterToBeVisible(
+    parameterName: string
+  ): Promise<ElementHandle<Element>> {
+    await this.expectElementToBeVisible(platformParameterSelector);
+
+    // Get all platform parameter containers.
+    const platformParameterContainerElements = await this.page.$$(
+      platformParameterSelector
+    );
+    const platformParameterContainerNames = await this.page.$$eval(
+      `${platformParameterSelector} ${platformParameterNameSelector}`,
+      elements => elements.map(element => element.textContent?.trim())
+    );
+
+    // Check if the platform parameter is present in the container.
+    const index = platformParameterContainerNames.indexOf(parameterName);
+    if (index === -1) {
+      throw new Error(
+        `Platform parameter "${parameterName}" not found in platform parameters.`
+      );
+    }
+
+    return platformParameterContainerElements[index];
   }
 }
 

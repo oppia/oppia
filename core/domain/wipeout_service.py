@@ -21,46 +21,49 @@ import itertools
 import logging
 import re
 
-from core import feconf
-from core import utils
-from core.domain import auth_services
-from core.domain import collection_services
-from core.domain import email_manager
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import fs_services
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_services
-from core.domain import rights_domain
-from core.domain import rights_manager
-from core.domain import taskqueue_services
-from core.domain import topic_services
-from core.domain import user_services
-from core.domain import wipeout_domain
+from core import feconf, utils
+from core.domain import (
+    auth_services,
+    collection_services,
+    email_manager,
+    exp_fetchers,
+    exp_services,
+    fs_services,
+    platform_parameter_list,
+    platform_parameter_services,
+    rights_domain,
+    rights_manager,
+    taskqueue_services,
+    topic_services,
+    user_services,
+    wipeout_domain,
+)
 from core.platform import models
 
 from typing import Dict, Final, List, Optional, Sequence, Tuple, Type, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import app_feedback_report_models
-    from mypy_imports import base_models
-    from mypy_imports import blog_models
-    from mypy_imports import bulk_email_services
-    from mypy_imports import collection_models
-    from mypy_imports import config_models
-    from mypy_imports import datastore_services
-    from mypy_imports import exp_models
-    from mypy_imports import feedback_models
-    from mypy_imports import improvements_models
-    from mypy_imports import question_models
-    from mypy_imports import skill_models
-    from mypy_imports import story_models
-    from mypy_imports import subtopic_models
-    from mypy_imports import suggestion_models
-    from mypy_imports import topic_models
-    from mypy_imports import transaction_services
-    from mypy_imports import user_models
+    from mypy_imports import (
+        app_feedback_report_models,
+        base_models,
+        blog_models,
+        bulk_email_services,
+        collection_models,
+        config_models,
+        datastore_services,
+        exp_models,
+        feedback_models,
+        improvements_models,
+        question_models,
+        skill_models,
+        story_models,
+        subtopic_models,
+        suggestion_models,
+        topic_models,
+        transaction_services,
+        user_models,
+    )
 
 (
     app_feedback_report_models, base_models,
@@ -486,7 +489,7 @@ def delete_user(
             request object for which to delete or pseudonymize all the models.
     """
     user_id = pending_deletion_request.user_id
-    user_roles = user_models.UserSettingsModel.get_by_id(user_id).roles
+    user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
 
     auth_services.delete_external_auth_associations(user_id)
 
@@ -496,7 +499,10 @@ def delete_user(
     _delete_models(user_id, models.Names.FEEDBACK)
     _delete_models(user_id, models.Names.SUGGESTION)
     remove_user_from_user_groups(user_id)
-    if feconf.ROLE_ID_MOBILE_LEARNER not in user_roles:
+
+    # Explicitly handle the case where the user settings model is deleted.
+    if (user_settings_model is None or
+        feconf.ROLE_ID_MOBILE_LEARNER not in user_settings_model.roles):
         remove_user_from_activities_with_associated_rights_models(
             pending_deletion_request.user_id)
         _pseudonymize_one_model_class(
@@ -621,6 +627,9 @@ def verify_user_deleted(
         bool. True if all the models were correctly deleted, False otherwise.
     """
     if not auth_services.verify_external_auth_associations_are_deleted(user_id):
+        logging.error(
+            'External auth association is not deleted for user with ID %s' % (
+                user_id))
         return False
 
     policies_not_to_verify = [

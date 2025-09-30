@@ -23,19 +23,21 @@ from __future__ import annotations
 from core import utils
 from core.constants import constants
 from core.controllers import base
-from core.domain import blog_domain
-from core.domain import blog_services
-from core.domain import change_domain
-from core.domain import exp_domain
-from core.domain import image_validation_services
-from core.domain import improvements_domain
-from core.domain import platform_parameter_domain
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_registry
-from core.domain import question_domain
-from core.domain import skill_domain
-from core.domain import state_domain
-from core.domain import stats_domain
+from core.domain import (
+    blog_domain,
+    blog_services,
+    change_domain,
+    exp_domain,
+    image_validation_services,
+    improvements_domain,
+    platform_parameter_domain,
+    platform_parameter_list,
+    platform_parameter_registry,
+    question_domain,
+    skill_domain,
+    state_domain,
+    stats_domain,
+)
 
 from typing import Dict, Mapping, Optional, Union
 

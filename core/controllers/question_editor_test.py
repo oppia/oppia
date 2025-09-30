@@ -15,19 +15,21 @@
 """Tests for the Question Editor controller."""
 
 from __future__ import annotations
+
 import json
 import os
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import question_fetchers
-from core.domain import question_services
-from core.domain import skill_services
-from core.domain import topic_domain
-from core.domain import topic_fetchers
-from core.domain import translation_domain
-from core.domain import user_services
+from core.domain import (
+    question_fetchers,
+    question_services,
+    skill_services,
+    topic_domain,
+    topic_fetchers,
+    translation_domain,
+    user_services,
+)
 from core.platform import models
 from core.tests import test_utils
 
@@ -115,7 +117,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         # be of string type but here we are assigning it with None because
         # we want to test the scenario where the question is just created
         # and the id is still needed to be assigned.
-        question_dict['id'] = None  # type: ignore[arg-type]
+        question_dict['id'] = None  # type: ignore[typeddict-item]
         self.post_json(
             feconf.NEW_QUESTION_URL, {
                 'question_dict': question_dict,
@@ -199,7 +201,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         # be of string type but here we are assigning it with None because
         # we want to test the scenario where the question is just created
         # and the id is still needed to be assigned.
-        question_dict['id'] = None  # type: ignore[arg-type]
+        question_dict['id'] = None  # type: ignore[typeddict-item]
         question_dict['version'] = 0
         self.post_json(
             feconf.NEW_QUESTION_URL, {
@@ -228,7 +230,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         # be of string type but here we are assigning it with None because
         # we want to test the scenario where the question is just created
         # and the id is still needed to be assigned.
-        question_dict['id'] = None  # type: ignore[arg-type]
+        question_dict['id'] = None  # type: ignore[typeddict-item]
         question_dict['version'] = 0
         self.post_json(
             feconf.NEW_QUESTION_URL, {
@@ -248,7 +250,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         # be of string type but here we are assigning it with None because
         # we want to test the scenario where the question is just created
         # and the id is still needed to be assigned.
-        question_dict['id'] = None  # type: ignore[arg-type]
+        question_dict['id'] = None  # type: ignore[typeddict-item]
         question_dict['version'] = 0
         self.post_json(
             feconf.NEW_QUESTION_URL, {
@@ -268,7 +270,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         # be of string type but here we are assigning it with None because
         # we want to test the scenario where the question is just created
         # and the id is still needed to be assigned.
-        question_dict['id'] = None  # type: ignore[arg-type]
+        question_dict['id'] = None  # type: ignore[typeddict-item]
         question_dict['version'] = 0
         self.post_json(
             feconf.NEW_QUESTION_URL, {
@@ -286,7 +288,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         # be of string type but here we are assigning it with None because
         # we want to test the scenario where the question is just created
         # and the id is still needed to be assigned.
-        question_dict['id'] = None  # type: ignore[arg-type]
+        question_dict['id'] = None  # type: ignore[typeddict-item]
         question_dict['version'] = 0
         self.post_json(
             feconf.NEW_QUESTION_URL, {
@@ -312,7 +314,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         # be of string type but here we are assigning it with None because
         # we want to test the scenario where the question is just created
         # and the id is still needed to be assigned.
-        question_dict['id'] = None  # type: ignore[arg-type]
+        question_dict['id'] = None  # type: ignore[typeddict-item]
         question_dict['version'] = 0
         self.post_json(
             feconf.NEW_QUESTION_URL, {
@@ -336,11 +338,11 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         # be of string type but here we are assigning it with None because
         # we want to test the scenario where the question is just created
         # and the id is still needed to be assigned.
-        question_dict['id'] = None  # type: ignore[arg-type]
+        question_dict['id'] = None  # type: ignore[typeddict-item]
         # TODO(#13059): Here we use MyPy ignore because after we fully type
         # the codebase we plan to get rid of the tests that intentionally
         # test wrong inputs that we can normally catch by typing.
-        question_dict['question_state_data'] = 'invalid_question_state_data'  # type: ignore[arg-type]
+        question_dict['question_state_data'] = 'invalid_question_state_data'  # type: ignore[typeddict-item]
         question_dict['version'] = 0
         self.post_json(
             feconf.NEW_QUESTION_URL, {
@@ -369,7 +371,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         # be of string type but here we are assigning it with None because
         # we want to test the scenario where the question is just created
         # and the id is still needed to be assigned.
-        question_dict['id'] = None  # type: ignore[arg-type]
+        question_dict['id'] = None  # type: ignore[typeddict-item]
         question_dict['version'] = 0
         content_html = (
             '<oppia-noninteractive-image filepath-with-value='
@@ -411,7 +413,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         # be of string type but here we are assigning it with None because
         # we want to test the scenario where the question is just created
         # and the id is still needed to be assigned.
-        question_dict['id'] = None  # type: ignore[arg-type]
+        question_dict['id'] = None  # type: ignore[typeddict-item]
         question_dict['version'] = 0
         content_html = (
             '<oppia-noninteractive-image filepath-with-value='

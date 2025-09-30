@@ -68,8 +68,8 @@ export default {
     "RTE_COMPONENT_CONFIGS": {
       "ALL_COMPONENTS": ["tabs", "skillreview", "collapsible", "math", "image", "link", "video"],
       "BLOG_COMPONENTS": ["image", "link", "video"],
-      "SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS": ["tabs", "skillreview", "collapsible", "math", "image", "link", "video", "workedexample"],
-      "WORKED_EXAMPLE_MODAL_COMPONENTS": ["image", "math", "skillreview"]
+      "SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS": ["skillreview", "math", "image", "workedexample"],
+      "CURATED_LESSON_COMPONENTS": ["image", "math", "skillreview"]
     },
 
   "LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST": [
@@ -6246,7 +6246,12 @@ export default {
   "MAX_CHARS_IN_TOPIC_DESCRIPTION": 240,
   "MAX_CHARS_IN_SUBTOPIC_TITLE": 64,
   "MAX_CHARS_IN_STUDY_GUIDE_SECTION_HEADING": 200,
-  "STUDY_GUIDE_SECTION_CHARACTER_LIMIT": 1000,
+  "STUDY_GUIDE_SECTION_CHARACTER_LIMIT": 6000,
+  "STUDY_GUIDE_VIEWER_NEXT_SUBTOPIC_TITLE_LENGTH_LIMIT_MOBILE": 18,
+  "STUDY_GUIDE_VIEWER_NEXT_SUBTOPIC_TITLE_TRUNCATED_LENGTH_MOBILE": 15,
+  "STUDY_GUIDE_VIEWER_NEXT_SUBTOPIC_TITLE_LENGTH_LIMIT_DESKTOP": 23,
+  "STUDY_GUIDE_VIEWER_NEXT_SUBTOPIC_TITLE_TRUNCATED_LENGTH_DESKTOP": 20,
+  "SKILL_EDITOR_WORKED_EXAMPLE_LIMIT": 2,
   "DEFAULT_SECTION_HEADING_CONTENT_ID": "section_heading_0",
   "DEFAULT_SECTION_CONTENT_CONTENT_ID": "section_content_1",
   "MAX_CHARS_IN_SKILL_DESCRIPTION": 100,

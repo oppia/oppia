@@ -20,10 +20,8 @@ from __future__ import annotations
 
 import types
 
-from core import feconf
-from core import utils
-from core.domain import feedback_domain
-from core.domain import feedback_services
+from core import feconf, utils
+from core.domain import feedback_domain, feedback_services
 from core.platform import models
 from core.tests import test_utils
 
@@ -31,9 +29,7 @@ from typing import Dict
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import feedback_models
-    from mypy_imports import user_models
+    from mypy_imports import base_models, feedback_models, user_models
 
 (base_models, feedback_models, user_models) = models.Registry.import_models(
     [models.Names.BASE_MODEL, models.Names.FEEDBACK, models.Names.USER])

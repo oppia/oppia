@@ -26,19 +26,14 @@ import pkgutil
 import re
 import string
 import struct
-
 from unittest import mock
 
-from core import feconf
-from core import schema_utils
-from core import schema_utils_test
-from core import utils
+from core import feconf, schema_utils, schema_utils_test, utils
 from core.constants import constants
-from core.domain import object_registry
-from core.domain import rte_component_registry
+from core.domain import object_registry, rte_component_registry
 from core.tests import test_utils
 
-from typing import Final, List, Tuple, Type, cast
+from typing import Final, List, Tuple, Type
 
 # File names ending in any of these suffixes will be ignored when checking for
 # RTE component validity.
@@ -298,11 +293,8 @@ class RteComponentRegistryUnitTests(test_utils.GenericTestBase):
                 module = importlib.util.module_from_spec(spec)
                 # Ruling out the possibility of None for mypy type checking.
                 assert spec.loader is not None
-                # Here we use cast because we are narrowing down the type of
-                # 'spec.loader' from Optional[_Loader] to the more specific
-                # importlib.abc.Loader type.
-                loader_with_exec = cast(importlib.abc.Loader, spec.loader)
-                loader_with_exec.exec_module(module)
+
+                spec.loader.exec_module(module)
                 break
 
         for name, obj in inspect.getmembers(module):

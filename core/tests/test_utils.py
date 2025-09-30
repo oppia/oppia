@@ -36,77 +36,96 @@ import re
 import string
 import unittest
 
-from core import feature_flag_list
-from core import feconf
-from core import schema_utils
-from core import utils
+import main
+from core import feature_flag_list, feconf, schema_utils, utils
 from core.constants import constants
 from core.controllers import base
-from core.domain import auth_domain
-from core.domain import blog_services
-from core.domain import caching_domain
-from core.domain import classroom_config_domain
-from core.domain import classroom_config_services
-from core.domain import collection_domain
-from core.domain import collection_services
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import feature_flag_domain
-from core.domain import feature_flag_services
-from core.domain import interaction_registry
-from core.domain import object_registry
-from core.domain import param_domain
-from core.domain import platform_parameter_domain
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_services
-from core.domain import question_domain
-from core.domain import question_services
-from core.domain import rights_manager
-from core.domain import skill_domain
-from core.domain import skill_services
-from core.domain import state_domain
-from core.domain import story_domain
-from core.domain import story_fetchers
-from core.domain import story_services
-from core.domain import study_guide_domain
-from core.domain import study_guide_services
-from core.domain import subtopic_page_domain
-from core.domain import subtopic_page_services
-from core.domain import topic_domain
-from core.domain import topic_services
-from core.domain import translation_domain
-from core.domain import user_services
+from core.domain import (
+    auth_domain,
+    blog_services,
+    caching_domain,
+    classroom_config_domain,
+    classroom_config_services,
+    collection_domain,
+    collection_services,
+    exp_domain,
+    exp_fetchers,
+    exp_services,
+    feature_flag_domain,
+    feature_flag_services,
+    interaction_registry,
+    object_registry,
+    param_domain,
+    platform_parameter_domain,
+    platform_parameter_list,
+    platform_parameter_services,
+    question_domain,
+    question_services,
+    rights_manager,
+    skill_domain,
+    skill_services,
+    state_domain,
+    story_domain,
+    story_fetchers,
+    story_services,
+    study_guide_domain,
+    study_guide_services,
+    subtopic_page_domain,
+    subtopic_page_services,
+    topic_domain,
+    topic_services,
+    translation_domain,
+    user_services,
+)
 from core.platform import models
 from core.platform.search import elastic_search_services
 from core.platform.taskqueue import cloud_tasks_emulator
-import main
 from scripts import common
 
 import elasticsearch
 import requests_mock
-from typing import (
-    Any, Callable, Collection, Dict, Final, Iterable, Iterator, List,
-    Literal, Mapping, Optional, OrderedDict, Pattern, Sequence, Set,
-    Tuple, Type, TypedDict, TypeVar, Union, cast, overload
-)
 import webapp2
 import webtest
-
+from typing import (
+    Any,
+    Callable,
+    Collection,
+    Dict,
+    Final,
+    Iterable,
+    Iterator,
+    List,
+    Literal,
+    Mapping,
+    Optional,
+    OrderedDict,
+    Pattern,
+    Sequence,
+    Set,
+    Tuple,
+    Type,
+    TypedDict,
+    TypeVar,
+    Union,
+    cast,
+    overload,
+)
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import auth_models
-    from mypy_imports import base_models
-    from mypy_imports import datastore_services
-    from mypy_imports import email_services
-    from mypy_imports import feedback_models
-    from mypy_imports import memory_cache_services
-    from mypy_imports import platform_auth_services
-    from mypy_imports import platform_taskqueue_services
-    from mypy_imports import question_models
-    from mypy_imports import storage_services
-    from mypy_imports import suggestion_models
+    from mypy_imports import (
+        auth_models,
+        base_models,
+        datastore_services,
+        email_services,
+        feedback_models,
+        memory_cache_services,
+        platform_auth_services,
+        platform_taskqueue_services,
+        question_models,
+        storage_services,
+        suggestion_models,
+    )
 
 (
     auth_models, base_models, exp_models, feedback_models, question_models,
@@ -1772,13 +1791,25 @@ class TestBase(unittest.TestCase):
             # "call_num"' error. Thus to avoid the error, we used ignore here.
             self.assertEqual(
                 new_function_with_checks.call_num > 0, called, msg=msg)  # type: ignore[attr-defined]
-            pretty_unused_args = [
-                ', '.join(itertools.chain(
-                    (repr(a) for a in args),
-                    ('%s=%r' % kwarg for kwarg in kwargs.items())))
-                for args, kwargs in itertools.zip_longest(
-                    expected_args_iter, expected_kwargs_iter, fillvalue={})
-            ]
+            pretty_unused_args: List[str] = []
+
+            # Here we use type Any because the expected_args can contains
+            # arguments of arbitrary and mixed types from different functions.
+            args: Any
+            # Here we use type Any because the expected_kwargs can contains
+            # arguments of arbitrary and mixed types from different functions.
+            kwargs: Any
+            for args, kwargs in itertools.zip_longest(
+                expected_args_iter,
+                expected_kwargs_iter,
+                fillvalue={}
+            ):
+                pretty_unused_args.append(
+                    ', '.join(itertools.chain(
+                        (repr(a) for a in args),
+                        ('%s=%r' % kwarg for kwarg in kwargs.items())
+                    ))
+                )
 
             # Here we use MyPy ignore because we are accessing the 'call_num'
             # attribute on a function which is of type 'callable' and functions
@@ -1886,11 +1917,7 @@ class TestBase(unittest.TestCase):
         Raises:
             AssertionError. When dictionaries doesn't match.
         """
-        # Here we use MyPy ignore because, assertDictEqual's argument can only
-        # accept Dict[Any, Any] type but to allow both Dict and TypedDict type
-        # we used Mapping here which causes MyPy to throw `incompatible argument
-        # type` error. Thus to avoid the error, we used ignore here.
-        super().assertDictEqual(dict_one, dict_two, msg=msg)  # type: ignore[arg-type]
+        super().assertDictEqual(dict_one, dict_two, msg=msg)
 
     # Here we use type Any because the method 'assertItemsEqual' can accept any
     # kind of iterables to compare them against each other, and these iterables

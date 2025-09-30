@@ -20,18 +20,17 @@ import copy
 import datetime
 import json
 
-from core import android_validation_constants
-from core import feconf
-from core import utils
+from core import android_validation_constants, feconf, utils
 from core.constants import constants
-from core.domain import change_domain
-from core.domain import state_domain
-from core.domain import translation_domain
+from core.domain import html_cleaner  # pylint: disable=invalid-import-from
+from core.domain import (  # pylint: disable=invalid-import-from
+    change_domain,
+    html_validation_service,
+    state_domain,
+    translation_domain,
+)
 
 from typing import Callable, Dict, Final, List, Literal, Optional, TypedDict
-
-from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
-from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
@@ -1442,10 +1441,10 @@ class Skill:
         # are some fields that are discontinued in the latest domain object
         # (eg. explanation). So, while accessing these discontinued fields MyPy
         # throws an error. Thus, to avoid the error, we used ignore here.
-        explanation = rubric_dict['explanation']  # type: ignore[misc]
+        explanation = rubric_dict['explanation']  # type: ignore[typeddict-item]
         # Here we use MyPy ignore because MyPy doesn't allow key deletion from
         # TypedDict.
-        del rubric_dict['explanation']  # type: ignore[misc]
+        del rubric_dict['explanation']  # type: ignore[typeddict-item]
         rubric_dict['explanations'] = [explanation]
         return rubric_dict
 

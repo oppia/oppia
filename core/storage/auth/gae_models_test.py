@@ -26,9 +26,7 @@ from typing import Final
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import auth_models
-    from mypy_imports import base_models
-    from mypy_imports import user_models
+    from mypy_imports import auth_models, base_models, user_models
 
 (auth_models, base_models, user_models) = (
     models.Registry.import_models([
