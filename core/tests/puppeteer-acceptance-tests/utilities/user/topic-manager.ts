@@ -4086,7 +4086,7 @@ export class TopicManager extends BaseUser {
     }
 
     await this.clickOnElement(deleteButton);
-    await this.clickOnElementWithSelector('Delete Story');
+    await this.clickOnElementWithText('Delete Story');
   }
 
   /**
