@@ -68,6 +68,8 @@ export class CreateNewSubtopicModalComponent
   MAX_CHARS_IN_SUBTOPIC_TITLE!: number;
   MAX_CHARS_IN_STUDY_GUIDE_SECTION_HEADING!: number;
   generatedUrlPrefix!: string;
+  studyGuideSectionCharacterLimit: number =
+    AppConstants.STUDY_GUIDE_SECTION_CHARACTER_LIMIT;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -167,7 +169,7 @@ export class CreateNewSubtopicModalComponent
       this.htmlLengthService.computeHtmlLength(
         this.sectionContentHtml,
         CALCULATION_TYPE_CHARACTER
-      ) > AppConstants.STUDY_GUIDE_SECTION_CHARACTER_LIMIT
+      ) > this.studyGuideSectionCharacterLimit
     );
   }
 

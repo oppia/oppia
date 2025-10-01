@@ -51,6 +51,8 @@ export class AddStudyGuideSectionModalComponent extends ConfirmOrCancelModal {
     type: 'unicode',
     ui_config: {},
   };
+  studyGuideSectionCharacterLimit: number =
+    AppConstants.STUDY_GUIDE_SECTION_CHARACTER_LIMIT;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -99,7 +101,7 @@ export class AddStudyGuideSectionModalComponent extends ConfirmOrCancelModal {
       this.htmlLengthService.computeHtmlLength(
         this.tempSectionContentHtml,
         CALCULATION_TYPE_CHARACTER
-      ) > AppConstants.STUDY_GUIDE_SECTION_CHARACTER_LIMIT
+      ) > this.studyGuideSectionCharacterLimit
     );
   }
 

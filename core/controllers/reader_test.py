@@ -2078,7 +2078,7 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
         # TODO(#13059): Here we use MyPy ignore because after we fully type the
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
-        self.aggregated_stats['num_starts'] = 'invalid'  # type: ignore[arg-type]
+        self.aggregated_stats['num_starts'] = 'invalid'  # type: ignore[typeddict-item]
 
         response = self.post_json('/explorehandler/stats_events/%s' % (
             self.exp_id), {

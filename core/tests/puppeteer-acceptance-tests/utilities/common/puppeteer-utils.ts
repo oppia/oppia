@@ -39,6 +39,7 @@ const commonModalCancelBtnSelector = '.e2e-test-cancel-action-button';
 const uploadErrorMessageDivSelector = '.e2e-test-upload-error-message';
 const currentMatTabHeaderSelector = '.mat-tab-label-active';
 const actionStatusMessageSelector = '.e2e-test-status-message';
+const toastMessageSelector = '.e2e-test-toast-message';
 const warningToastMessageSelector = '.e2e-test-toast-warning-message';
 const warningToastCloseButtonSelector = '.e2e-test-close-toast-warning';
 
@@ -75,6 +76,7 @@ export type ModalUserInteractions = (
 
 export class BaseUser {
   page!: Page;
+  pages: Page[] = [];
   browserObject!: Browser;
   userHasAcceptedCookies: boolean = false;
   email: string | null = null;
@@ -127,6 +129,7 @@ export class BaseUser {
           TestToModulesMatcher.registerPuppeteerBrowser(browser);
         }
         this.page = await browser.newPage();
+        this.pages.push(this.page);
 
         if (mobile) {
           // This is the default viewport and user agent settings for iPhone 6.
@@ -167,7 +170,7 @@ export class BaseUser {
           }
 
           const config = {
-            followNewTab: true,
+            followNewTab: false,
             fps: 25,
             ffmpeg_Path: null,
             // Below dimensions are of recorded video.
@@ -357,7 +360,7 @@ export class BaseUser {
       this.userHasAcceptedCookies = true;
     }
     await this.clickOn('Sign in');
-    await this.type(testConstants.SignInDetails.inputField, email);
+    await this.typeInInputField(testConstants.SignInDetails.inputField, email);
     await this.clickAndWaitForNavigation('Sign In');
   }
 
@@ -366,7 +369,7 @@ export class BaseUser {
    */
   async signUpNewUser(username: string, email: string): Promise<void> {
     await this.signInWithEmail(email);
-    await this.type('input.e2e-test-username-input', username);
+    await this.typeInInputField('input.e2e-test-username-input', username);
     await this.clickOn('input.e2e-test-agree-to-terms-checkbox');
     await this.page.waitForSelector(
       'button.e2e-test-register-user:not([disabled])'
@@ -397,6 +400,24 @@ export class BaseUser {
       ).page()) ?? (await this.browserObject.newPage());
     this.page = newPage;
     this.setupDebugTools();
+  }
+
+  /**
+   * Checks for a new page opened in the context of the current page.
+   * @param cotext - The context in which the new page is opened.
+   * @returns A promise that resolves to the new page.
+   */
+  async waitForNewPage(cotext: Page = this.page): Promise<Page> {
+    const pageTarget = cotext.target();
+    const newTarget = await this.browserObject.waitForTarget(
+      target => target.opener() === pageTarget
+    );
+    const newTabPage = await newTarget.page();
+    expect(newTabPage).toBeDefined();
+    if (!newTabPage) {
+      throw new Error('Failed to get new page opened.');
+    }
+    return newTabPage;
   }
 
   /**
@@ -446,8 +467,8 @@ export class BaseUser {
       }
       throw error;
     }
-    showMessage(`Element (${selector}) is clickable, as expected.`);
   }
+
   /**
    * The function clicks the element using the text on the button.
    * @param selector The text of the button to click on.
@@ -486,6 +507,40 @@ export class BaseUser {
   }
 
   /**
+   * Clicks on the element and returns a new page opened by the click.
+   * @param selector The selector of the element.
+   * @returns The new page opened by the click.
+   */
+  async clickOnElementAndGetNewPage(selector: string): Promise<Page> {
+    const newPagePromise: Promise<Page> = new Promise<Page>(resolve =>
+      this.browserObject.once('targetcreated', async target => {
+        const page = await target.page();
+        resolve(page);
+      })
+    );
+    await this.clickOn(selector);
+    const newPage = await newPagePromise;
+    return newPage;
+  }
+
+  /**
+   * Checks if the mat chip with the given text content is visible.
+   * @param textContent The text content of the mat chip.
+   * @returns The element handle of the mat chip.
+   */
+  async expectMatChipToBeVisible(
+    textContent: string
+  ): Promise<ElementHandle<Element>> {
+    const matChipElement = await this.page.waitForXPath(
+      `//mat-chip[contains(text(), '${textContent}')]`
+    );
+    if (!matChipElement) {
+      throw new Error(`Mat chip with text ${textContent} not found.`);
+    }
+    return matChipElement;
+  }
+
+  /**
    * Selects the mat-option with the given value.
    * @param value The value of the mat-option to select.
    */
@@ -510,11 +565,16 @@ export class BaseUser {
   /**
    * The function clicks the element using the text on the button
    * and wait until the new page is fully loaded.
+   * @param selector - The selector of button to click.
+   * @param options - The navigation options.
    */
-  async clickAndWaitForNavigation(selector: string): Promise<void> {
-    const navigationPromise = this.page.waitForNavigation({
+  async clickAndWaitForNavigation(
+    selector: string,
+    options: puppeteer.WaitForOptions = {
       waitUntil: ['networkidle2', 'load'],
-    });
+    }
+  ): Promise<void> {
+    const navigationPromise = this.page.waitForNavigation(options);
 
     await this.clickOn(selector, false);
     await navigationPromise;
@@ -533,9 +593,9 @@ export class BaseUser {
    * The function selects all text content and delete it.
    */
   async clearAllTextFrom(selector: string): Promise<void> {
-    await this.waitForElementToBeClickable(selector);
     // Clicking three times on a line of text selects all the text.
     const element = await this.getElementInParent(selector);
+    await this.waitForElementToBeClickable(element);
     await element.click({clickCount: 3});
     await this.page.keyboard.press('Backspace');
   }
@@ -583,11 +643,25 @@ export class BaseUser {
 
   /**
    * This function types the text in the input field using its CSS selector.
+   * @param selector The CSS selector of the input field.
+   * @param text The text to type.
    */
-  async type(selector: string, text: string): Promise<void> {
-    await this.page.waitForSelector(selector, {visible: true});
-    await this.waitForElementToBeClickable(selector);
-    await this.page.type(selector, text);
+  async typeInInputField(
+    selector: string | ElementHandle<Element>,
+    text: string
+  ): Promise<void> {
+    let element =
+      typeof selector === 'string'
+        ? await this.page.waitForSelector(selector)
+        : selector;
+    if (!element) {
+      throw new Error(`Element not found for selector: ${selector}`);
+    }
+    await this.waitForElementToStabilize(element);
+    await this.waitForElementToBeClickable(element);
+    await this.waitForElementToStabilize(selector);
+
+    await element.type(text);
   }
 
   /**
@@ -769,7 +843,7 @@ export class BaseUser {
   async isElementVisible(
     selector: string,
     visible: boolean = true,
-    timeout: number = 30000
+    timeout: number = 10000
   ): Promise<boolean> {
     try {
       if (visible) {
@@ -870,7 +944,8 @@ export class BaseUser {
   async expectScreenshotToMatch(
     imageName: string,
     testPath: string,
-    newPage?: Page
+    newPage: Page | undefined = undefined,
+    screenshotOptions: puppeteer.ScreenshotOptions = {}
   ): Promise<void> {
     const currentPage = typeof newPage !== 'undefined' ? newPage : this.page;
     await currentPage.mouse.move(0, 0);
@@ -911,7 +986,8 @@ export class BaseUser {
     }
 
     try {
-      expect(await currentPage.screenshot()).toMatchImageSnapshot({
+      const screenshot = await currentPage.screenshot(screenshotOptions);
+      expect(screenshot).toMatchImageSnapshot({
         failureThreshold: failureTrigger,
         failureThresholdType: 'percent',
         customSnapshotIdentifier: imageName,
@@ -1077,6 +1153,7 @@ export class BaseUser {
    */
   async createAndSwitchToNewTab(): Promise<puppeteer.Page> {
     const newPage = await this.browserObject.newPage();
+    this.pages.push(newPage);
 
     if (this.isViewportAtMobileWidth()) {
       // Set viewport for mobile.
@@ -1104,11 +1181,50 @@ export class BaseUser {
   }
 
   /**
+   * Switches to the previous page.
+   */
+  async switchToNextPage(): Promise<void> {
+    const currentPageIndex = this.pages.indexOf(this.page);
+    if (currentPageIndex === -1) {
+      throw new Error('Current page not found in pages array.');
+    }
+    const nextPageIndex = (currentPageIndex + 1) % this.pages.length;
+    this.page = this.pages[nextPageIndex];
+
+    this.page.bringToFront();
+  }
+
+  /**
+   * Switches to the previous page.
+   */
+  async switchToPreviousPage(): Promise<void> {
+    const currentPageIndex = this.pages.indexOf(this.page);
+    if (currentPageIndex === -1) {
+      throw new Error('Current page not found in pages array.');
+    }
+    const previousPageIndex =
+      (currentPageIndex - 1 + this.pages.length) % this.pages.length;
+    this.page = this.pages[previousPageIndex];
+
+    this.page.bringToFront();
+  }
+
+  /**
    * Scrolls to the bottom of the page.
    */
   async scrollToBottomOfPage(): Promise<void> {
     await this.page.evaluate(() => {
       window.scrollTo(0, document.body.scrollHeight);
+    });
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Scrolls to the top of the page.
+   */
+  async scrollToTopOfPage(): Promise<void> {
+    await this.page.evaluate(() => {
+      window.scrollTo(0, 0);
     });
     await this.waitForPageToFullyLoad();
   }
@@ -1157,13 +1273,15 @@ export class BaseUser {
    * Verify that element is visilbe or not.
    * @param {string} selector - The selector of the element to get text from.
    * @param {boolean} visibility - Whether the element should be visible or not.
+   * @param {Page} context - The page on which the selector should be verified.
    */
   async expectElementToBeVisible(
     selector: string,
-    visibility: boolean = true
+    visibility: boolean = true,
+    context: Page = this.page
   ): Promise<void> {
     const options = visibility ? {visible: true} : {hidden: true};
-    await this.page.waitForSelector(selector, options);
+    await context.waitForSelector(selector, options);
     showMessage(`Element ${selector} is ${visibility ? 'visible' : 'hidden'}.`);
   }
 
@@ -1188,33 +1306,52 @@ export class BaseUser {
   }
 
   /**
-   * Verify text content inside an element
+   * Waits for the given element to be visible, and then checks if the text
+   * content matches the expected text.
    * @param {string} selector - The selector of the element to get text from.
    * @param {string} text - The expected text content.
+   * @param {ElementHandle<Element>} context - The context in which the element is located.
    */
-  async expectTextContentToBe(selector: string, text: string): Promise<void> {
+  async expectTextContentToBe(
+    selector: string,
+    text: string,
+    context: ElementHandle<Element> | null = null
+  ): Promise<void> {
     await this.expectElementToBeVisible(selector);
 
     try {
       await this.page.waitForFunction(
-        (selector: string, text: string) => {
-          const element = document.querySelector(selector);
-          return element?.textContent?.trim() === text.trim();
+        (selector: string, text: string, context: HTMLElement | null) => {
+          const element = context
+            ? context.querySelector(selector)
+            : document.querySelector(selector);
+          return element && element.textContent?.trim() === text.trim();
         },
         {},
         selector,
-        text
+        text,
+        context
       );
 
       showMessage(`Text content of "${selector}" is "${text}".`);
     } catch (error) {
-      const actualTextContent = await this.page.evaluate((selector: string) => {
-        const element = document.querySelector(selector);
-        return element?.textContent?.trim();
-      }, selector);
+      const actualTextContent = await this.page.evaluate(
+        (selector: string, context: HTMLElement | null) => {
+          const element = context
+            ? context.querySelector(selector)
+            : document.querySelector(selector);
+          return (
+            element?.textContent?.trim() +
+            `" (inside ${context ? 'context' : 'document'})`
+          );
+        },
+        selector,
+        context
+      );
       error.message =
         `Text content of "${selector}" does not match the expected text.\n` +
-        `Expected: "${text}", Found: "${actualTextContent}"\n` +
+        `Expected: "${text}"\n` +
+        `Actual: "${actualTextContent}"\n` +
         'Original Error:\n' +
         error.message;
       throw error;
@@ -1315,8 +1452,8 @@ export class BaseUser {
     // Wait until the element value matches the expected value.
     try {
       await this.page.waitForFunction(
-        (element: HTMLElement, value: string) => {
-          return (element as HTMLInputElement)?.value?.trim() === value.trim();
+        (element: HTMLInputElement | HTMLTextAreaElement, value: string) => {
+          return element.value.trim() === value;
         },
         {},
         selector,
@@ -1411,24 +1548,6 @@ export class BaseUser {
       },
       {},
       url
-    );
-  }
-
-  /**
-   * Function to verify the value of the input field.
-   * @param {string} selector - The selector of the input field.
-   * @param {string} value - The expected value of the input field.
-   */
-  async expectInputValueToBe(selector: string, value: string): Promise<void> {
-    await this.page.waitForFunction(
-      (selector: string, value: string) => {
-        const element: HTMLInputElement | null =
-          document.querySelector(selector);
-        return element?.value === value;
-      },
-      {},
-      selector,
-      value
     );
   }
 
@@ -1681,6 +1800,29 @@ export class BaseUser {
   }
 
   /**
+   * Expects the text content of the toast message to match the given expected message.
+   * @param {string} expectedMessage - The expected message to match the toast message against.
+   */
+  async expectToastMessage(expectedMessage: string): Promise<void> {
+    await this.page.waitForSelector(toastMessageSelector, {visible: true});
+    const toastMessageElement = await this.page.$(toastMessageSelector);
+    const toastMessage = await this.page.evaluate(
+      el => el.textContent.trim(),
+      toastMessageElement
+    );
+
+    if (toastMessage !== expectedMessage) {
+      throw new Error(
+        `Expected toast message to be "${expectedMessage}", but it was "${toastMessage}".`
+      );
+    }
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.click(toastMessageSelector);
+    }
+    await this.expectElementToBeVisible(toastMessageSelector, false);
+  }
+
+  /**
    * Clicks on the button in the modal with the given title and action.
    * @param title - The title of the modal.
    * @param action - The action to click on the button in the modal.
@@ -1813,6 +1955,42 @@ export class BaseUser {
 
     // If no pattern matches, throw an error.
     throw new Error(`Unable to parse date string: "${dateString}"`);
+  }
+
+  /**
+   * Clicks on the given element after waiting for it to be clickable.
+   * Note: This function does not have post-check.
+   * @param element The element to click on.
+   * @param options The options to pass to the click function.
+   */
+  async clickOnElement(
+    element: ElementHandle<Element>,
+    options: puppeteer.ClickOptions = {}
+  ): Promise<void> {
+    await this.waitForElementToBeClickable(element);
+    await element.click(options);
+  }
+
+  /**
+   * Clicks on the element with the given text.
+   * @param text The text of the element to click on.
+   */
+  async clickOnElementWithText(text: string): Promise<void> {
+    // Normalize-space is used to remove the extra spaces in the text.
+    // Check the documentation for the normalize-space function here :
+    // https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space.
+    const element = await this.page.waitForXPath(
+      `//*[contains(normalize-space(text()), normalize-space("${text}"))]`,
+      {timeout: 10000}
+    );
+
+    if (!element) {
+      throw new Error(`Element not found for text: ${text}`);
+    }
+    await this.waitForElementToStabilize(element);
+    await this.waitForElementToBeClickable(element);
+    await element.click();
+    showMessage(`Element (text: ${text}) is clicked.`);
   }
 }
 

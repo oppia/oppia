@@ -105,7 +105,7 @@ describe('Logged-in User', function () {
       await loggedInUser.navigateToLearnerDashboardUsingProfileDropdown();
       await loggedInUser.navigateToGoalsSection();
       await loggedInUser.addGoals(['Algebra I']);
-      await loggedInUser.expectToolTipMessage(
+      await loggedInUser.expectToastMessage(
         "Successfully added to your 'Current Goals' list."
       );
 

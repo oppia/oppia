@@ -172,7 +172,8 @@ jobs:
     runs-on: ubuntu-22.04
     if: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.python.count > 0 }}
     strategy:
-      fail-fast: false
+      # Fast fail only if it's a merge queue.
+      fail-fast: ${{ github.event_name == 'merge_group' }}
       matrix:
         suite: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.python.suites }}
     name: Acceptance (${{ matrix.suite.name }})
@@ -189,21 +190,28 @@ jobs:
               break
             fi
           done
+
+      # Checkout repository, merge develop, and generate build files.
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
       - name: Merge develop and set up dependencies
         uses: ./.github/actions/merge-develop-and-set-up-dependencies
       - name: Generate build files
         uses: ./.github/actions/generate-build-files
+
       - name: Generate modified suite name for artifacts
         id: generate_suite_name_for_artifacts
         # Replace slashes in the filename with underscores.
         run: |
           SUITE_NAME=${{ matrix.suite.name }}
           echo "MODIFIED_SUITE_NAME=${SUITE_NAME//\//_}" >> $GITHUB_OUTPUT
+
+      # Desktop Test
       - name: Run Desktop Acceptance Test ${{ matrix.suite.name }}
+        id: desktop-test-attempt-1
         # TODO(#22448): Remove once all suites are fixed.
         if: ${{ steps.check_skip.outputs.SKIP_SUITE != 'true' }}
+        timeout-minutes: 30
         run: >
           set -o pipefail;
           VIDEO_RECORDING_IS_ENABLED=1
@@ -211,122 +219,175 @@ jobs:
           python -m scripts.run_acceptance_tests
           --skip-build --suite=${{ matrix.suite.name }} --prod_env --server_log_level=info
           | tee desktop_acceptance_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
-        timeout-minutes: 30
-      - name: Uploading Desktop test recordings as Artifacts
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: desktop-acceptance-test-video-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}-original
-          path: /home/runner/work/oppia/oppia_full_stack_test_video_recordings/acceptance
-      - name: Upload desktop acceptance test logs
-        if: ${{ failure() }}
+
+      - name: Upload desktop test logs
+        # We need to pass always() because if not, GitHub will implicitly use success(),
+        # which requires all previous jobs/steps to have succeeded. This is not what we want.
+        # Reference: https://docs.github.com/en/actions/reference/workflows-and-actions/expressions#status-check-functions
+        # Quote: “A default status check of success() is applied unless you *include* one of these functions.”
+        if: ${{ always() && steps.desktop-test-attempt-1.outcome == 'failure' }}
         uses: actions/upload-artifact@v4
         with:
           name: desktop-acceptance-test-logs-${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}
           path: desktop_acceptance_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
-      - name: Upload desktop test failure screenshots as artifacts
-        if: ${{ failure() }}
+
+      - name: Upload desktop test failure screenshots
+        # We need to pass always() because if not, GitHub will implicitly use success(),
+        # which requires all previous jobs/steps to have succeeded. This is not what we want.
+        # Reference: https://docs.github.com/en/actions/reference/workflows-and-actions/expressions#status-check-functions
+        # Quote: “A default status check of success() is applied unless you *include* one of these functions.”
+        if: ${{ always() && steps.desktop-test-attempt-1.outcome == 'failure' }}
         uses: actions/upload-artifact@v4
         with:
           name: desktop-acceptance-test-failure-screenshot-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
           path: /home/runner/work/oppia/oppia_full_stack_test_failure_screenshots/acceptance
-        # TODO(#22667): We are running this step twice, as snapshot gets deleted if 2nd attempt passes.
-      - name: Uploading diff screenshots as an artifact
-        if: ${{ failure() }}
+
+      - name: Upload desktop test diff screenshots
+        # We need to pass always() because if not, GitHub will implicitly use success(),
+        # which requires all previous jobs/steps to have succeeded. This is not what we want.
+        # Reference: https://docs.github.com/en/actions/reference/workflows-and-actions/expressions#status-check-functions
+        # Quote: “A default status check of success() is applied unless you *include* one of these functions.”
+        if: ${{ always() && steps.desktop-test-attempt-1.outcome == 'failure' }}
         uses: actions/upload-artifact@v4
         with:
-          name: diff-snapshots-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
+          name: diff-snapshots-desktop-attempt-1-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
           # Note: The path must be kept in sync with the one specified in
           # core/tests/puppeteer-acceptance-tests/utilities/common/puppeteer-utils.ts
           path: /home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/diff-snapshots
-      - name: Run Desktop Acceptance Test ${{ matrix.suite.name }} (Attempt 2 with screen recording)
-        if: ${{ failure() }}
+
+      - name: Upload desktop test recordings
+        # We need to pass always() because if not, GitHub will implicitly use success(),
+        # which requires all previous jobs/steps to have succeeded. This is not what we want.
+        # Reference: https://docs.github.com/en/actions/reference/workflows-and-actions/expressions#status-check-functions
+        # Quote: “A default status check of success() is applied unless you *include* one of these functions.”
+        if: ${{ always() && steps.desktop-test-attempt-1.outcome == 'failure' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: acceptance-test-video-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
+          path: /home/runner/work/oppia/oppia_full_stack_test_video_recordings/acceptance
+
+      - name: Re-run Desktop Acceptance Test to check flakiness for ${{ matrix.suite.name }}
+        # We need to pass always() because if not, GitHub will implicitly use success(),
+        # which requires all previous jobs/steps to have succeeded. This is not what we want.
+        # Reference: https://docs.github.com/en/actions/reference/workflows-and-actions/expressions#status-check-functions
+        # Quote: “A default status check of success() is applied unless you *include* one of these functions.”
+        if: ${{ always() && steps.desktop-test-attempt-1.outcome == 'failure' }}
+        timeout-minutes: 30
         run: >
           set -o pipefail;
-          VIDEO_RECORDING_IS_ENABLED=1
           xvfb-run -a --server-args="-screen 0, 1920x1080x24"
           python -m scripts.run_acceptance_tests
           --skip-build --suite=${{ matrix.suite.name }} --prod_env --server_log_level=info
           | tee desktop_acceptance_test_retry_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
-        timeout-minutes: 30
-      - name: Upload desktop acceptance retry test logs
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: desktop-acceptance-test-retry-logs-${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}
-          path: desktop_acceptance_test_retry_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
-      - name: Uploading Desktop test recordings as Artifacts
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: desktop-acceptance-test-video-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
-          path: /home/runner/work/oppia/oppia_full_stack_test_video_recordings/acceptance
-      - name: Uploading generated test to angular module mapping as an artifact
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: generated-test-to-angular-module-mapping-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
-          path: /home/runner/work/oppia/oppia/core/tests/test-modules-mappings/acceptance/${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.txt
+
+      # Mobile Test
       - name: Run Mobile Acceptance Test ${{ matrix.suite.name }}
-        # TODO(#22448): Remove once all suites are fixed.
-        if: ${{ steps.check_skip.outputs.SKIP_SUITE != 'true' }}
+        id: mobile-test-attempt-1
+        # We are using always() to prevent the job step from being skipped if desktop test fails.
+        # TODO(#22448): Remove steps.check_skip.outputs.SKIP_SUITE != 'true' check,
+        # once all suites are fixed. Please don't remove the always() check.
+        if: ${{ steps.check_skip.outputs.SKIP_SUITE != 'true' && always() }}
+        timeout-minutes: 30
+        # TODO(#23106): Currently, video recording failure interfares with
+        # acceptance tests, making acceptance test suite fail even if sub-tests
+        # passes. Once fixed, enable video recording by updating
+        # VIDEO_RECORDING_IS_ENABLED=0 to VIDEO_RECORDING_IS_ENABLED=1 in run block.
         run: >
           set -o pipefail;
+          VIDEO_RECORDING_IS_ENABLED=0
           xvfb-run -a --server-args="-screen 0, 1920x1080x24"
           python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite.name }}
           --prod_env --mobile --server_log_level=info
           | tee mobile_acceptance_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
-        timeout-minutes: 30
-      - name: Upload mobile acceptance test logs
-        if: ${{ failure() }}
+
+      - name: Upload mobile test logs
+        # We need to pass always() because if not, GitHub will implicitly use success(),
+        # which requires all previous jobs/steps to have succeeded. This is not what we want.
+        # Reference: https://docs.github.com/en/actions/reference/workflows-and-actions/expressions#status-check-functions
+        # Quote: “A default status check of success() is applied unless you *include* one of these functions.”
+        if: ${{ always() && steps.mobile-test-attempt-1.outcome == 'failure' }}
         uses: actions/upload-artifact@v4
         with:
           name: mobile-acceptance-test-logs-${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}
           path: mobile_acceptance_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
-      - name: Upload mobile test failure screenshots as artifacts
-        if: ${{ failure() }}
+
+      - name: Upload mobile test recordings
+        # We need to pass always() because if not, GitHub will implicitly use success(),
+        # which requires all previous jobs/steps to have succeeded. This is not what we want.
+        # Reference: https://docs.github.com/en/actions/reference/workflows-and-actions/expressions#status-check-functions
+        # Quote: “A default status check of success() is applied unless you *include* one of these functions.”
+        if: ${{ always() && steps.mobile-test-attempt-1.outcome == 'failure' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: mobile-acceptance-test-video-attempt-1-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
+          path: /home/runner/work/oppia/oppia_full_stack_test_video_recordings/acceptance
+
+      - name: Upload mobile test failure screenshots
+        # We need to pass always() because if not, GitHub will implicitly use success(),
+        # which requires all previous jobs/steps to have succeeded. This is not what we want.
+        # Reference: https://docs.github.com/en/actions/reference/workflows-and-actions/expressions#status-check-functions
+        # Quote: “A default status check of success() is applied unless you *include* one of these functions.”
+        if: ${{ always() && steps.mobile-test-attempt-1.outcome == 'failure' }}
         uses: actions/upload-artifact@v4
         with:
           name: mobile-acceptance-test-failure-screenshot-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
           path: /home/runner/work/oppia/oppia_full_stack_test_failure_screenshots/acceptance
-      - name: Run Mobile Acceptance Test ${{ matrix.suite.name }} (Attempt 2 with screen recording)
-        if: ${{ failure() }}
+
+      - name: Upload mobile test diff screenshots
+        # We need to pass always() because if not, GitHub will implicitly use success(),
+        # which requires all previous jobs/steps to have succeeded. This is not what we want.
+        # Reference: https://docs.github.com/en/actions/reference/workflows-and-actions/expressions#status-check-functions
+        # Quote: “A default status check of success() is applied unless you *include* one of these functions.”
+        if: ${{ always() && steps.mobile-test-attempt-1.outcome == 'failure' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: diff-snapshots-mobile-attempt-1-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
+          # Note: The path must be kept in sync with the one specified in
+          # core/tests/puppeteer-acceptance-tests/utilities/common/puppeteer-utils.ts
+          path: /home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/diff-snapshots
+
+      - name: Upload mobile test recordings
+        # We need to pass always() because if not, GitHub will implicitly use success(),
+        # which requires all previous jobs/steps to have succeeded. This is not what we want.
+        # Reference: https://docs.github.com/en/actions/reference/workflows-and-actions/expressions#status-check-functions
+        # Quote: “A default status check of success() is applied unless you *include* one of these functions.”
+        if: ${{ always() && steps.mobile-test-attempt-1.outcome == 'failure' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: acceptance-test-video-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
+          path: /home/runner/work/oppia/oppia_full_stack_test_video_recordings/acceptance
+
+      - name: Re-run Mobile Acceptance Test to check flakiness for ${{ matrix.suite.name }}
+        # We need to pass always() because if not, GitHub will implicitly use success(),
+        # which requires all previous jobs/steps to have succeeded. This is not what we want.
+        # Reference: https://docs.github.com/en/actions/reference/workflows-and-actions/expressions#status-check-functions
+        # Quote: “A default status check of success() is applied unless you *include* one of these functions.”
+        if: ${{ always() && steps.mobile-test-attempt-1.outcome == 'failure' }}
+        timeout-minutes: 30
         # We use xvfb-run to create a virtual screen to run tests without headless mode.
         # Numbers in 1920x1080x24 represents screen width, height and color depth respectively.
         run: >
           set -o pipefail;
-          VIDEO_RECORDING_IS_ENABLED=1
           xvfb-run -a --server-args="-screen 0, 1920x1080x24"
           python -m scripts.run_acceptance_tests --skip-build
           --suite=${{ matrix.suite.name }} --prod_env --mobile --server_log_level=info
           | tee mobile_acceptance_test_retry_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
-        timeout-minutes: 30
-      - name: Upload mobile acceptance test logs
-        if: ${{ failure() }}
+
+      # Upload other essential files.
+      - name: Upload generated test to angular module mapping
+        if: ${{ failure() && (steps.desktop-test-attempt-1.outcome == 'failure' || steps.mobile-test-attempt-1.outcome == 'failure') }}
         uses: actions/upload-artifact@v4
         with:
-          name: mobile-acceptance-test-retry-logs-${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}
-          path: mobile_acceptance_test_retry_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
-      - name: Uploading Mobile test recordings as Artifacts
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: mobile-acceptance-test-video-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
-          path: /home/runner/work/oppia/oppia_full_stack_test_video_recordings/acceptance
-      - name: Uploading webpack bundles as an artifact
-        if: ${{ failure() }}
+          name: generated-test-to-angular-module-mapping-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
+          path: /home/runner/work/oppia/oppia/core/tests/test-modules-mappings/acceptance/${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.txt
+
+      - name: Upload webpack bundles
+        if: ${{ failure() && (steps.desktop-test-attempt-1.outcome == 'failure' || steps.mobile-test-attempt-1.outcome == 'failure') }}
         uses: actions/upload-artifact@v4
         with:
           name: webpack-bundles-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
           path: /home/runner/work/oppia/oppia/build
-      - name: Uploading diff screenshots as an artifact
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: diff-snapshots-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
-          # Note: The path must be kept in sync with the one specified in
-          # core/tests/puppeteer-acceptance-tests/utilities/common/puppeteer-utils.ts
-          path: /home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/diff-snapshots
+
       - name: Report failure if failed on oppia/oppia develop branch
         if: ${{
           failure() &&
@@ -338,6 +399,7 @@ jobs:
         with:
           message: "An acceptance test failed on the upstream develop branch."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
+
   lighthouse_accessibility_test:
     needs: [check_test_suites_to_run]
     if: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).lighthouse_accessibility.count > 0 }}
