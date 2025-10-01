@@ -857,7 +857,8 @@ class VersionedModelTests(test_utils.GenericTestBase):
             # type.
             TestVersionedModel.get_multi_versions('model_id1', [1, 1.5, 2]) # type: ignore[list-item]
 
-    def test_all_versioned_models_have_correct_names_for_related_classes(self):
+    def test_versioned_models_have_correct_names_for_related_classes(
+            self) -> None:
         all_model_classes = models.Registry.get_all_storage_model_classes()
         all_versioned_classes = [
             clazz for clazz in all_model_classes
@@ -875,6 +876,12 @@ class VersionedModelTests(test_utils.GenericTestBase):
                 '%sSnapshotContentModel' % class_name_root)
             expected_commit_log_entry_class_name = (
                 '%sCommitLogEntryModel' % class_name_root)
+
+            # The following two assertions enforce that both classes are not
+            # None, otherwise MyPy will complain that those optional fields
+            # does not have a `__name__` attribute.
+            assert clazz.SNAPSHOT_METADATA_CLASS is not None
+            assert clazz.SNAPSHOT_CONTENT_CLASS is not None
 
             self.assertEqual(
                 expected_snapshot_metadata_class_name,
