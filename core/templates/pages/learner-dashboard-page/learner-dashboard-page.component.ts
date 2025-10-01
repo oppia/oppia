@@ -56,6 +56,13 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 
 import './learner-dashboard-page.component.css';
 
+interface LearnerDashboardExplorationsData {
+  completedExplorationsList: LearnerExplorationSummary[];
+  incompleteExplorationsList: LearnerExplorationSummary[];
+  subscriptionList: ProfileSummary[];
+  explorationPlaylist: LearnerExplorationSummary[];
+}
+
 @Component({
   selector: 'oppia-learner-dashboard-page',
   templateUrl: './learner-dashboard-page.component.html',
@@ -213,7 +220,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     });
   }
 
-  filterExplorationsData(responseData: any): void {
+  filterExplorationsData(responseData: LearnerDashboardExplorationsData): void {
     this.populateCuratedExplorationIds();
 
     this.completedExplorationsList = (
@@ -326,7 +333,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
 
     let dashboardExplorationsDataPromise =
       this.learnerDashboardBackendApiService.fetchLearnerDashboardExplorationsDataAsync();
-    dashboardTopicAndStoriesDataPromise.then(() => {
+    dashboardTopicAndStoriesDataPromise.finally(() => {
       dashboardExplorationsDataPromise.then(
         responseData => {
           this.filterExplorationsData(responseData);
