@@ -482,8 +482,8 @@ export class BaseUser {
     element: ElementHandle<Element>,
     options: puppeteer.ClickOptions = {}
   ): Promise<void> {
-    await this.waitForElementToBeClickable(element);
     await this.waitForElementToStabilize(element);
+    await this.waitForElementToBeClickable(element);
     await element.click(options);
   }
 

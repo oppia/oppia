@@ -1827,7 +1827,8 @@ export class LoggedOutUser extends BaseUser {
   async clickLinkAboutGoogleAnalyticsOptOutOnPrivacyPolicyPage(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       googleAnalyticsOptOutUrl,
-      googleAnalyticsOptOutUrl
+      googleAnalyticsOptOutUrl,
+      false
     );
   }
 
