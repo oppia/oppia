@@ -124,6 +124,7 @@ export class PracticeQuestionReviewer extends Contributor {
     // Save the question.
     await this.clickOnElementWithSelector(saveQuestionButtonSelector);
     await this.expectToastMessage('Updated question.');
+    await this.expectElementToBeVisible(saveQuestionButtonSelector, false);
   }
 
   /**
