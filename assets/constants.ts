@@ -65,6 +65,13 @@ export default {
       "explanation": "For learners in Nigeria."
     }],
 
+    "RTE_COMPONENT_CONFIGS": {
+      "ALL_COMPONENTS": ["tabs", "skillreview", "collapsible", "math", "image", "link", "video"],
+      "BLOG_COMPONENTS": ["image", "link", "video"],
+      "SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS": ["skillreview", "math", "image", "workedexample"],
+      "CURATED_LESSON_COMPONENTS": ["image", "math", "skillreview"]
+    },
+
   "LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST": [
     "News", "International", "Educators", "Learners", "Community",
     "Partnerships", "Volunteer", "Stories", "Languages", "New features",
@@ -84,6 +91,8 @@ export default {
   "ACTIVITY_TYPE_STORY": "story",
   "ACTIVITY_TYPE_SKILL": "skill",
   "ACTIVITY_TYPE_SUBTOPIC": "subtopic",
+  "ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE_MIGRATION": "subtopic_with_study_guide_migration",
+  "ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE": "subtopic_with_study_guide",
   "ACTIVITY_TYPE_LEARN_TOPIC": "learntopic",
   "ACTIVITY_TYPE_CLASSROOM": "classroom",
   "DISABLED_EXPLORATION_IDS": ["5"],
@@ -5112,10 +5121,6 @@ export default {
     "Welcome": "#992a2b"
   },
 
-  "INVALID_RTE_COMPONENTS_FOR_BLOG_POST_EDITOR": [
-    "tabs", "math", "collapsible", "skillreview"
-  ],
-
   // This is linked to VALID_RTE_COMPONENTS in android_validation_constants.
   "VALID_RTE_COMPONENTS_FOR_ANDROID": ["image", "math", "skillreview"],
 
@@ -6144,8 +6149,6 @@ export default {
   // Interaction IDs for which answer details cannot be solicited.
   "INTERACTION_IDS_WITHOUT_ANSWER_DETAILS": ["EndExploration", "Continue"],
 
-  "ALLOWED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS": [],
-
   "FEEDBACK_SUBJECT_MAX_CHAR_LIMIT": 50,
 
   "MAX_CURRENT_GOALS_COUNT": 5,
@@ -6242,6 +6245,15 @@ export default {
   "MAX_CHARS_IN_TOPIC_URL_FRAGMENT": 20,
   "MAX_CHARS_IN_TOPIC_DESCRIPTION": 240,
   "MAX_CHARS_IN_SUBTOPIC_TITLE": 64,
+  "MAX_CHARS_IN_STUDY_GUIDE_SECTION_HEADING": 200,
+  "STUDY_GUIDE_SECTION_CHARACTER_LIMIT": 6000,
+  "STUDY_GUIDE_VIEWER_NEXT_SUBTOPIC_TITLE_LENGTH_LIMIT_MOBILE": 18,
+  "STUDY_GUIDE_VIEWER_NEXT_SUBTOPIC_TITLE_TRUNCATED_LENGTH_MOBILE": 15,
+  "STUDY_GUIDE_VIEWER_NEXT_SUBTOPIC_TITLE_LENGTH_LIMIT_DESKTOP": 23,
+  "STUDY_GUIDE_VIEWER_NEXT_SUBTOPIC_TITLE_TRUNCATED_LENGTH_DESKTOP": 20,
+  "SKILL_EDITOR_WORKED_EXAMPLE_LIMIT": 2,
+  "DEFAULT_SECTION_HEADING_CONTENT_ID": "section_heading_0",
+  "DEFAULT_SECTION_CONTENT_CONTENT_ID": "section_content_1",
   "MAX_CHARS_IN_SKILL_DESCRIPTION": 100,
   "MAX_CHARS_IN_STORY_TITLE": 39,
   "MAX_CHARS_IN_STORY_DESCRIPTION": 1000,
@@ -6259,8 +6271,8 @@ export default {
   // 'story URL fragment'.
   "MAX_CHARS_IN_STORY_URL_FRAGMENT": 30,
   // This represents the maximum number of characters in the URL fragment for
-  // subtopic in the revision page URL. E.g.
-  // in /learn/math/fractions/revision/place-values, 'place-values' is the
+  // subtopic in the study guide page URL. E.g.
+  // in /learn/math/fractions/studyguide/place-values, 'place-values' is the
   // 'subtopic URL fragment'.
   "MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT": 25,
   // This is same as base_models.ID_Length.
@@ -6663,7 +6675,7 @@ export default {
       ]
     },
     "SUBTOPIC_VIEWER": {
-      "ROUTE": "learn/:classroom_url_fragment/:topic_url_fragment/revision/:subtopic_url_fragment",
+      "ROUTE": "learn/:classroom_url_fragment/:topic_url_fragment/studyguide/:subtopic_url_fragment",
       "TITLE": "Oppia",
       "MANUALLY_REGISTERED_WITH_BACKEND": true,
       "META": [
@@ -6903,6 +6915,15 @@ export default {
     },
     "EXPLORATION_PLAYER_EMBED": {
       "ROUTE": "embed/exploration/:exploration_id",
+      "TITLE": "",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "META": []
+    },
+    "LESSON_PLAYER_EMBED": {
+      "ROUTE": "embed/lesson/:exploration_id",
       "TITLE": "",
       // Some routes contain url fragments, as syntax for url fragments are
       // different for angular router and backend. They have to be registered
@@ -7752,7 +7773,6 @@ export default {
   "CONTRIBUTOR_CERTIFICATE_HEIGHT": 1313,
   "BRANCH_NAME": "",
   "SHORT_COMMIT_HASH": "",
-
   // Please consult the translation team before adding any entries here.
   // These words improve the quality of automatic voiceovers.
   "LANGUAGE_CODE_TO_MATH_SYMBOL_PRONUNCIATIONS": {
@@ -7797,12 +7817,34 @@ export default {
       "-": "نَاقِصْ",
       "*": "ضَرْبْ",
       "×": "ضَرْبْ",
-      "÷": "تَقْسِيمْ",
+      "÷": "قِسْمَةْ عَلَى",
       "=": "يُسَاوِي",
-      "!": "عاملي",
-      "^": "للقوة",
-      "^2": "تربيع",
-      "^3": "تكعيب"
+      "!": "عَامِلِي",
+      "^": "لِلْقُوَّةِ",
+      "^2": "تَرْبِيعْ",
+      "^3": "تَكْعِيبْ"
+    },
+    "es": {
+      "+": "más",
+      "-": "menos",
+      "*": "multiplicado por",
+      "×": "multiplicado por",
+      "÷": "dividido",
+      "=": "igual",
+      "!": "factorial",
+      "^": "elevado a",
+      "^2": "al cuadrado",
+      "^3": "al cubo"
     }
+  },
+  // Please consult the translation team before adding any entries here.
+  // These punctuation marks are used to identify sentence boundaries during
+  // voiceover playback.
+  "LANGUAGE_CODE_TO_SENTENCE_ENDING_PUNCTUATION_MARKS": {
+    "ar": "؟!",
+    "en": ".!?",
+    "es": ".!?",
+    "pt": ".!?",
+    "hi": "।!?"
   }
 } as const;

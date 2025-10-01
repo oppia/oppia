@@ -38,7 +38,7 @@ import {
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 import {Subscription} from 'rxjs';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {ServicesConstants} from 'services/services.constants';
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
@@ -85,7 +85,7 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
   usingMobileDevice: boolean = false;
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private currentInteractionService: CurrentInteractionService,
     private deviceInfoService: DeviceInfoService,
     private el: ElementRef,
@@ -163,7 +163,7 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
       // showing images in the exploration editor or in preview mode. So
       // we directly assign the url to the imageUrl.
       if (
-        this.contextService.getImageSaveDestination() ===
+        this.pageContextService.getImageSaveDestination() ===
           AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE &&
         this.imageLocalStorageService.isInStorage(this.filepath)
       ) {
@@ -180,8 +180,8 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
         }
       } else {
         this.imageUrl = this.assetsBackendApiService.getImageUrlForPreview(
-          this.contextService.getEntityType(),
-          this.contextService.getEntityId(),
+          this.pageContextService.getEntityType(),
+          this.pageContextService.getEntityId(),
           encodeURIComponent(this.filepath)
         );
       }
@@ -264,7 +264,7 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
 
   getDotDisplay(): 'none' | 'inline' {
     if (
-      this.contextService.getEditorTabContext() ===
+      this.pageContextService.getEditorTabContext() ===
       ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.EDITOR
     ) {
       return 'none';

@@ -27,7 +27,7 @@ import {AppConstants} from 'app.constants';
 import {RteHelperModalComponent} from './rte-helper-modal.component';
 import {ExternalRteSaveService} from './external-rte-save.service';
 import {AlertsService} from './alerts.service';
-import {ContextService} from './context.service';
+import {PageContextService} from './page-context.service';
 import {ImageLocalStorageService} from './image-local-storage.service';
 import {AssetsBackendApiService} from './assets-backend-api.service';
 import {ImageUploadHelperService} from './image-upload-helper.service';
@@ -47,7 +47,7 @@ import {
 describe('RteHelperModalComponent', () => {
   let component: RteHelperModalComponent;
   let fixture: ComponentFixture<RteHelperModalComponent>;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let assetsBackendApiService: AssetsBackendApiService;
   let imageUploadHelperService: ImageUploadHelperService;
   let alertsService: AlertsService;
@@ -73,7 +73,7 @@ describe('RteHelperModalComponent', () => {
       declarations: [RteHelperModalComponent],
       providers: [
         AlertsService,
-        ContextService,
+        PageContextService,
         ImageLocalStorageService,
         AssetsBackendApiService,
         ImageUploadHelperService,
@@ -93,7 +93,7 @@ describe('RteHelperModalComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(RteHelperModalComponent);
     component = fixture.componentInstance;
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
     imageUploadHelperService = TestBed.inject(ImageUploadHelperService);
     alertsService = TestBed.inject(AlertsService);
@@ -139,7 +139,7 @@ describe('RteHelperModalComponent', () => {
 
     it('should save modal customization args when closing it', fakeAsync(() => {
       spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
-      spyOn(contextService, 'getEntityType').and.returnValue('exploration');
+      spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
       component.ngOnInit();
       flush();
       component.onCustomizationArgsFormChange(
@@ -238,10 +238,10 @@ describe('RteHelperModalComponent', () => {
 
     it('should save modal customization args when closing it', fakeAsync(() => {
       spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
-      spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+      spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
         AppConstants.IMAGE_SAVE_DESTINATION_SERVER
       );
-      spyOn(contextService, 'getEntityType').and.returnValue('exploration');
+      spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
       component.ngOnInit();
       flush();
 
@@ -287,10 +287,10 @@ describe('RteHelperModalComponent', () => {
     it('should handle being unable to communicate to server and show error while saving', fakeAsync(() => {
       spyOn(alertsService, 'addWarning');
       spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
-      spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+      spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
         AppConstants.IMAGE_SAVE_DESTINATION_SERVER
       );
-      spyOn(contextService, 'getEntityType').and.returnValue('exploration');
+      spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
       component.ngOnInit();
       flush();
 
@@ -324,7 +324,7 @@ describe('RteHelperModalComponent', () => {
 
     it('should cancel the modal when math SVG exceeds 100 KB', fakeAsync(() => {
       spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
-      spyOn(contextService, 'getEntityType').and.returnValue('exploration');
+      spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
       component.ngOnInit();
       flush();
       component.customizationArgsForm.value[0] = {
@@ -351,7 +351,7 @@ describe('RteHelperModalComponent', () => {
 
     it('should cancel the modal when SVG exceeds 1 MB for blog post', fakeAsync(() => {
       spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
-      spyOn(contextService, 'getEntityType').and.returnValue(
+      spyOn(pageContextService, 'getEntityType').and.returnValue(
         AppConstants.ENTITY_TYPE.BLOG_POST
       );
       component.ngOnInit();
@@ -384,7 +384,9 @@ describe('RteHelperModalComponent', () => {
         'empty for a math expression',
       fakeAsync(() => {
         spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
-        spyOn(contextService, 'getEntityType').and.returnValue('exploration');
+        spyOn(pageContextService, 'getEntityType').and.returnValue(
+          'exploration'
+        );
         component.ngOnInit();
         flush();
         component.customizationArgsForm.value[0] = {
@@ -405,7 +407,7 @@ describe('RteHelperModalComponent', () => {
 
     it('should save modal customization args while in local storage', fakeAsync(() => {
       spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
-      spyOn(contextService, 'getEntityType').and.returnValue('exploration');
+      spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
       component.ngOnInit();
       flush();
       component.customizationArgsForm.value[0] = {
@@ -419,7 +421,7 @@ describe('RteHelperModalComponent', () => {
       );
 
       var imageFile = new Blob();
-      spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+      spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
       );
       spyOn(
@@ -514,7 +516,7 @@ describe('RteHelperModalComponent', () => {
 
     it('should save modal customization args when closing it', fakeAsync(() => {
       spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
-      spyOn(contextService, 'getEntityType').and.returnValue('exploration');
+      spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
       component.ngOnInit();
       flush();
       expect(component.isErrorMessageNonempty()).toBe(false);
@@ -526,6 +528,30 @@ describe('RteHelperModalComponent', () => {
         url: 'google.com',
         text: 'google.com',
       });
+    }));
+
+    it('should display error message when link exceeds length limit', fakeAsync(() => {
+      component.ngOnInit();
+      flush();
+      component.customizationArgsForm.value[0] =
+        'asdfasdfasdfasdfasdfasdfasfdasfasdfasdfasdfasdfasdfasdfasafdssdfgsdfgsdfgasdfasdfzxcvzxcvzxcvasdfasdfasdfzxcvzxcvzxcvzxcvasdfgsadfasdfzxcvzxcvzxcvasdfasdfasdfzxcvzxcvasdfdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf.com';
+      component.customizationArgsForm.value[1] = 'click';
+      component.onCustomizationArgsFormChange(
+        component.customizationArgsForm.value
+      );
+      expect(component.isErrorMessageNonempty()).toBe(true);
+    }));
+
+    it('should display error message when text exceeds length limit', fakeAsync(() => {
+      component.ngOnInit();
+      flush();
+      component.customizationArgsForm.value[0] = 'google.com';
+      component.customizationArgsForm.value[1] =
+        'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate';
+      component.onCustomizationArgsFormChange(
+        component.customizationArgsForm.value
+      );
+      expect(component.isErrorMessageNonempty()).toBe(true);
     }));
   });
 
@@ -880,6 +906,157 @@ describe('RteHelperModalComponent', () => {
       expect(component.errorMessage).toBe(
         'Please ensure that the content of tab 2 is filled.'
       );
+      flush();
+    }));
+
+    it('should display error message when heading length exceeds limit', fakeAsync(() => {
+      component.ngOnInit();
+      flush();
+      component.customizationArgsForm.value[0][0].title =
+        'asdfasdfasdfasdfasdfasdfasfdasfasdfasdfasdfasdfaszxcvzxcvzxcvzxdfgdsfgsdfgsdfgvbxcvbcvzxcvsdfsdafzxcvzxcvzxcvzxcvzxcvsdzfasdafzxcvzxcvzxcvdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfcom';
+      (component.customizationArgsForm.value[0][1].content =
+        'Lorem ipsum dolor sit amet'),
+        component.onCustomizationArgsFormChange(
+          component.customizationArgsForm.value
+        );
+      expect(component.isErrorMessageNonempty()).toBe(true);
+      flush();
+    }));
+
+    it('should display error message when content length exceeds limit', fakeAsync(() => {
+      component.ngOnInit();
+      flush();
+      component.customizationArgsForm.value[0][0].title = 'Tab 1';
+      component.customizationArgsForm.value[0][1].content =
+        'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate';
+      component.onCustomizationArgsFormChange(
+        component.customizationArgsForm.value
+      );
+      expect(component.isErrorMessageNonempty()).toBe(true);
+      flush();
+    }));
+  });
+
+  describe('when there are validation errors in collapsible form control', function () {
+    var customizationArgSpecs = [
+      {
+        name: 'heading',
+        default_value: 'Collapsible 1',
+      },
+      {
+        name: 'content',
+        default_value: 'Hello',
+      },
+    ];
+
+    beforeEach(() => {
+      fixture = TestBed.createComponent(RteHelperModalComponent);
+      component = fixture.componentInstance;
+      (component.componentId = 'collapsible'),
+        (component.attrsCustomizationArgsDict = {
+          heading: 'Collapsible 1',
+          content: 'Hello',
+        });
+      component.customizationArgSpecs = customizationArgSpecs;
+    });
+
+    it('should display error message when heading length exceeds limit', fakeAsync(() => {
+      component.ngOnInit();
+      flush();
+      component.customizationArgsForm.value[0] =
+        'sdfgsdfgsdfgasdfasdfasdfasdfasdfasdfasfdasfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfgasdfasdfxzcvzxcvasdfsdafzxcvzxcvzxcvzxccvasdfasdfzxcvasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfcom';
+      component.customizationArgsForm.value[1] = 'Hello!';
+      component.onCustomizationArgsFormChange(
+        component.customizationArgsForm.value
+      );
+      expect(component.isErrorMessageNonempty()).toBe(true);
+      flush();
+    }));
+
+    it('should display error message when content length exceeds limit', fakeAsync(() => {
+      component.ngOnInit();
+      flush();
+      component.customizationArgsForm.value[0] = 'Collapsible 1';
+      component.customizationArgsForm.value[1] =
+        'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate';
+      component.onCustomizationArgsFormChange(
+        component.customizationArgsForm.value
+      );
+      expect(component.isErrorMessageNonempty()).toBe(true);
+      flush();
+    }));
+  });
+
+  describe('when there are validation errors in workedexample form control', function () {
+    var customizationArgSpecs = [
+      {
+        name: 'question',
+        default_value: 'sample question',
+      },
+      {
+        name: 'answer',
+        default_value: 'sample answer',
+      },
+    ];
+
+    beforeEach(() => {
+      fixture = TestBed.createComponent(RteHelperModalComponent);
+      component = fixture.componentInstance;
+      (component.componentId = 'workedexample'),
+        (component.attrsCustomizationArgsDict = {
+          heading: 'sample question',
+          content: 'sample answer',
+        });
+      component.customizationArgSpecs = customizationArgSpecs;
+    });
+
+    it('should display error message when question length exceeds limit', fakeAsync(() => {
+      component.ngOnInit();
+      flush();
+      component.customizationArgsForm.value[0] =
+        'sdfgsdfgsdfgasdfasdfasdfasdfasdfasdfasfdasfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfgasdfasdfxzcvzxcvasdfsdafzxcvzxcvzxcvzxccvasdfasdfzxcvasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfcomsdfgsdfgsdfgasdfasdfasdfasdfasdfasdfasfdasfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfgasdfasdfxzcvzxcvasdfsdafzxcvzxcvzxcvzxccvasdfasdfzxcvasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfcomsdfgsdfgsdfgasdfasdfasdfasdfasdfasdfasfdasfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfgasdfasdfxzcvzxcvasdfsdafzxcvzxcvzxcvzxccvasdfasdfzxcvasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfcomsdfgsdfgsdfgasdfasdfasdfasdfasdfasdfasfdasfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfgasdfasdfxzcvzxcvasdfsdafzxcvzxcvzxcvzxccvasdfasdfzxcvasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfcomLorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputatesdfgsdfgsdfgasdfasdfasdfasdfasdfasdfasfdasfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfgasdfasdfxzcvzxcvasdfsdafzxcvzxcvzxcvzxccvasdfasdfzxcvasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfcomsdfgsdfgsdfgasdfasdfasdfasdfasdfasdfasfdasfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfgasdfasdfxzcvzxcvasdfsdafzxcvzxcvzxcvzxccvasdfasdfzxcvasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfcomLorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputatesdfgsdfgsdfgasdfasdfasdfasdfasdfasdfasfdasfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfgasdfasdfxzcvzxcvasdfsdafzxcvzxcvzxcvzxccvasdfasdfzxcvasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfcomsdfgsdfgsdfgasdfasdfasdfasdfasdfasdfasfdasfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfgasdfasdfxzcvzxcvasdfsdafzxcvzxcvzxcvzxccvasdfasdfzxcvasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfcomLorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputatesdfgsdfgsdfgasdfasdfasdfasdfasdfasdfasfdasfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfgasdfasdfxzcvzxcvasdfsdafzxcvzxcvzxcvzxccvasdfasdfzxcvasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfcomsdfgsdfgsdfgasdfasdfasdfasdfasdfasdfasfdasfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfgasdfasdfxzcvzxcvasdfsdafzxcvzxcvzxcvzxccvasdfasdfzxcvasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfcom';
+      component.customizationArgsForm.value[1] = 'Hello!';
+      component.onCustomizationArgsFormChange(
+        component.customizationArgsForm.value
+      );
+      expect(component.isErrorMessageNonempty()).toBe(true);
+      flush();
+    }));
+
+    it('should display error message when answer length exceeds limit', fakeAsync(() => {
+      component.ngOnInit();
+      flush();
+      component.customizationArgsForm.value[0] = 'question 1';
+      component.customizationArgsForm.value[1] =
+        'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputatesdfgsdfgsdfgasdfasdfasdfasdfasdfasdfasfdasfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfgasdfasdfxzcvzxcvasdfsdafzxcvzxcvzxcvzxccvasdfasdfzxcvasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfcomsdfgsdfgsdfgasdfasdfasdfasdfasdfasdfasfdasfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfgasdfasdfxzcvzxcvasdfsdafzxcvzxcvzxcvzxccvasdfasdfzxcvasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfcomLorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputatesdfgsdfgsdfgasdfasdfasdfasdfasdfasdfasfdasfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfgasdfasdfxzcvzxcvasdfsdafzxcvzxcvzxcvzxccvasdfasdfzxcvasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfcomsdfgsdfgsdfgasdfasdfasdfasdfasdfasdfasfdasfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfgasdfasdfxzcvzxcvasdfsdafzxcvzxcvzxcvzxccvasdfasdfzxcvasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfcomLorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputatesdfgsdfgsdfgasdfasdfasdfasdfasdfasdfasfdasfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfgasdfasdfxzcvzxcvasdfsdafzxcvzxcvzxcvzxccvasdfasdfzxcvasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfcomsdfgsdfgsdfgasdfasdfasdfasdfasdfasdfasfdasfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfgasdfasdfxzcvzxcvasdfsdafzxcvzxcvzxcvzxccvasdfasdfzxcvasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfcomLorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputatesdfgsdfgsdfgasdfasdfasdfasdfasdfasdfasfdasfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfgasdfasdfxzcvzxcvasdfsdafzxcvzxcvzxcvzxccvasdfasdfzxcvasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfcomsdfgsdfgsdfgasdfasdfasdfasdfasdfasdfasfdasfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfgasdfasdfxzcvzxcvasdfsdafzxcvzxcvzxcvzxccvasdfasdfzxcvasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfcom';
+      component.onCustomizationArgsFormChange(
+        component.customizationArgsForm.value
+      );
+      expect(component.isErrorMessageNonempty()).toBe(true);
+      flush();
+    }));
+
+    it('should display error message when question is blank', fakeAsync(() => {
+      component.ngOnInit();
+      flush();
+      component.customizationArgsForm.value[0] = '';
+      component.customizationArgsForm.value[1] = 'an answer';
+      component.onCustomizationArgsFormChange(
+        component.customizationArgsForm.value
+      );
+      expect(component.isErrorMessageNonempty()).toBe(true);
+      flush();
+    }));
+
+    it('should display error message when answer is blank', fakeAsync(() => {
+      component.ngOnInit();
+      flush();
+      component.customizationArgsForm.value[0] = 'question 1';
+      component.customizationArgsForm.value[1] = '';
+      component.onCustomizationArgsFormChange(
+        component.customizationArgsForm.value
+      );
+      expect(component.isErrorMessageNonempty()).toBe(true);
       flush();
     }));
   });

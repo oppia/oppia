@@ -51,7 +51,7 @@ describe('Logged-in User', function () {
     async function () {
       await loggedInUser.navigateToPreferencesPageUsingProfileDropdown();
       await loggedInUser.updateProfilePicture(PROFILE_PICTURE);
-      await loggedInUser.saveChanges();
+      await loggedInUser.saveChangesInPreferencesPage();
       await loggedInUser.navigateToProfilePageUsingProfileDropdown();
       await loggedInUser.verifyProfilePicUpdate();
     },

@@ -48,7 +48,7 @@ import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {AlertsService} from 'services/alerts.service';
 import {AnswerGroup} from 'domain/exploration/answer-group.model';
-import {Interaction} from 'domain/exploration/InteractionObjectFactory';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {Rule} from 'domain/exploration/rule.model';
 import {ParameterizeRuleDescriptionPipe} from 'filters/parameterize-rule-description.pipe';
 import {ConvertToPlainTextPipe} from 'filters/string-utility-filters/convert-to-plain-text.pipe';

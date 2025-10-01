@@ -22,16 +22,21 @@ import os
 from unittest import mock
 
 from core import feconf
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import fs_services
-from core.domain import translation_domain
-from core.domain import translation_services
-from core.domain import voiceover_regeneration_services
+from core.domain import (
+    exp_domain,
+    exp_fetchers,
+    exp_services,
+    fs_services,
+    rte_component_registry,
+    translation_domain,
+    translation_services,
+    voiceover_regeneration_services,
+    voiceover_services,
+)
 from core.platform import models
 from core.tests import test_utils
 
+import bs4
 from typing import Dict, List, Union
 
 MYPY = False
@@ -77,13 +82,54 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
         expected_parsed_text = 'x^2 + y^2 = z^2'
         self.assertEqual(parsed_text, expected_parsed_text)
 
-    def test_should_not_convert_oppia_image_tag_to_p_tags(self) -> None:
+    def test_image_tag_has_empty_voiceover_string(self) -> None:
         content_html = (
             '<oppia-noninteractive-image alt-with-value="&amp;quot;Circle'
             '&amp;quot;" caption-with-value="&amp;quot;Circle&amp;quot;" '
             'filepath-with-value="&amp;quot;img_20250120_160503_kusnpv2um4_'
             'height_350_width_450.svg&amp;quot;" ng-version="11.2.14">'
             '</oppia-noninteractive-image>')
+        parsed_text = voiceover_regeneration_services.parse_html(content_html)
+        expected_parsed_text = ''
+        self.assertEqual(parsed_text, expected_parsed_text)
+
+    def test_video_tag_has_empty_voiceover_string(self) -> None:
+        content_html = (
+            '<oppia-noninteractive-video autoplay-with-value=\"true\" '
+            'end-with-value=\"20\" start-with-value=\"13\"'
+            ' video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;'
+            'quot;\"></oppia-noninteractive-video>')
+        parsed_text = voiceover_regeneration_services.parse_html(content_html)
+        expected_parsed_text = ''
+        self.assertEqual(parsed_text, expected_parsed_text)
+
+    def test_worked_example_tag_has_empty_voiceover_string(self) -> None:
+        content_html = (
+            '<oppia-noninteractive-workedexample question-with-value="&amp;'
+            'quot;&amp;lt;pre&amp;gt;&amp;lt;p&amp;gt;lorem ipsum&amp;'
+            'lt;/p&amp;gt;&amp;lt;/pre&amp;gt;'
+            '&amp;quot;" answer-with-value="&amp;quot;'
+            'lorem ipsum&amp;quot;">'
+            '</oppia-noninteractive-workedexample>')
+        parsed_text = voiceover_regeneration_services.parse_html(content_html)
+        expected_parsed_text = ''
+        self.assertEqual(parsed_text, expected_parsed_text)
+
+    def test_collapsible_tag_has_empty_voiceover_string(self) -> None:
+        content_html = (
+            '<oppia-noninteractive-collapsible '
+            'content-with-value=\'&amp;quot;&amp;quot;\' heading-with-value='
+            '\'&amp;quot;&amp;quot;\'></oppia-noninteractive-collapsible>')
+        parsed_text = voiceover_regeneration_services.parse_html(content_html)
+        expected_parsed_text = ''
+        self.assertEqual(parsed_text, expected_parsed_text)
+
+    def test_tab_tag_has_empty_voiceover_string(self) -> None:
+        content_html = (
+            '<oppia-noninteractive-tabs tab_contents-with-value=\'[{&amp;quot;'
+            '&amp;quot;:&amp;quot;Hint introduction&amp;quot;,&amp;quot;content'
+            '&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;hint&amp;lt;/p&amp;gt;&amp;'
+            'quot;}]\'></oppia-noninteractive-tabs>')
         parsed_text = voiceover_regeneration_services.parse_html(content_html)
         expected_parsed_text = ''
         self.assertEqual(parsed_text, expected_parsed_text)
@@ -491,3 +537,117 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
         self.assertEqual(
             sentence_tokens_with_durations,
             expected_sentence_tokens_with_durations)
+
+    def test_get_text_with_delimiters_from_html_paragraphs(self) -> None:
+        html = """
+            <html>
+                <body>
+                    Text directly in the body.
+                    <p> Hello world, <strong>this is a test</strong> text. </p>
+                    <p> This is the third paragraph.</p>
+                </body>
+            </html>
+        """
+        soup = bs4.BeautifulSoup(html, 'html.parser')
+        result = voiceover_regeneration_services.get_text_with_delimiters(
+            soup, delimiter=feconf.OPPIA_CONTENT_TAG_DELIMITER)
+        self.assertEqual(
+            result,
+            'Text directly in the body.; Hello world, this is a test text.; '
+            'This is the third paragraph.')
+
+    def test_should_regenerate_voiceovers_of_exploration(self) -> None:
+        editor_email = 'editor1@example.com'
+        editor_username = 'editor1'
+        self.signup(editor_email, editor_username)
+
+        exploration_id = 'exp_id'
+        exploration_version = 2
+        content_id = 'content_0'
+        language_accent_code = 'en-US'
+        exploration_id = 'exp_id'
+        content_html = '<p> This is a test text </p>'
+
+        entity_voiceovers_models = (
+            voiceover_services.get_entity_voiceovers_for_given_exploration(
+                exploration_id, 'exploration', exploration_version
+            )
+        )
+        self.assertEqual(
+            len(entity_voiceovers_models), 0
+        )
+        errors_while_voiceover_regeneration = (
+            voiceover_regeneration_services.
+            regenerate_voiceovers_of_exploration(
+                exploration_id,
+                exploration_version,
+                {content_id: content_html},
+                language_accent_code
+            )
+        )
+        self.assertEqual(
+            errors_while_voiceover_regeneration, []
+        )
+        entity_voiceovers_models = (
+            voiceover_services.get_entity_voiceovers_for_given_exploration(
+                exploration_id, 'exploration', exploration_version
+            )
+        )
+        self.assertEqual(
+            len(entity_voiceovers_models), 1
+        )
+
+    def test_should_return_errors_if_voiceover_regeneration_fails(
+        self
+    ) -> None:
+        exploration_id = 'exp_id'
+        exploration_version = 2
+        content_id = 'content_0'
+        language_accent_code = 'en-US'
+        exploration_id = 'exp_id'
+        content_html = '<p> This is a test text </p>'
+
+        # Mock the voiceover synthesis function to raise an exception.
+        def mock_synthesize_voiceover_for_html_string(
+            exploration_id: str,
+            content_html: str,
+            language_accent_code: str,
+            voiceover_filename: str
+        ) -> List[Dict[str, Union[str, float]]]:
+            raise Exception('Mocked exception during voiceover regeneration')
+
+        with self.swap(
+            voiceover_regeneration_services,
+            'synthesize_voiceover_for_html_string',
+            mock_synthesize_voiceover_for_html_string
+        ):
+            errors_while_voiceover_regeneration = (
+                voiceover_regeneration_services.
+                regenerate_voiceovers_of_exploration(
+                    exploration_id,
+                    exploration_version,
+                    {content_id: content_html},
+                    language_accent_code
+                )
+            )
+        self.assertEqual(
+            errors_while_voiceover_regeneration,
+            [('content_0', 'Mocked exception during voiceover regeneration')]
+        )
+
+    def test_all_custom_tags_have_associated_voiceover_extraction_rules(
+        self
+    ) -> None:
+        existing_custom_rte_tags = list(
+            rte_component_registry.Registry.get_tag_list_with_attrs().keys())
+
+        self.assertGreater(len(existing_custom_rte_tags), 0)
+
+        custom_tags_with_voiceover_extraction_rules = list(
+            voiceover_regeneration_services.
+            CUSTOM_RTE_TAGS_TO_VOICEOVER_TEXT_EXTRACTION_RULES.keys())
+
+        self.assertEqual(
+            sorted(existing_custom_rte_tags),
+            sorted(custom_tags_with_voiceover_extraction_rules)
+        )

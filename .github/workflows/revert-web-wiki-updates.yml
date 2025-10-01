@@ -33,30 +33,15 @@ jobs:
           echo "diff<<$delimiter" >> "$GITHUB_OUTPUT"
           echo $(git log source/develop..origin/master) >> "$GITHUB_OUTPUT"
           echo "$delimiter" >> "$GITHUB_OUTPUT"
-      - name: Revert commits
+      - name: Force-push from source
         if: ${{ steps.check-diff.outputs.diff != '' }}
         run: |
-          git config user.name oppia-wiki-synchronizer[bot]
-          # Email has the form id+name@users.noreply.github.com. The ID
-          # can be retrieved from
-          # https://api.github.com/users/oppia-wiki-synchronizer[bot].
-          git config user.email 102317631+oppia-wiki-synchronizer[bot]@users.noreply.github.com
-          git revert --no-commit source/develop..origin/master
-          msg_file=$(mktemp)
-          echo "Reverting the following changes made through the web interface:\n" > $msg_file
-          git log source/develop..origin/master | while read line; do echo "    ${line}"; done >> $msg_file
-          git commit -F $msg_file
-      - name: Merge in development commits
-        if: ${{ steps.check-diff.outputs.diff != '' }}
-        # If a PR in the source repository was merged around the same time as a
-        # change was made to the wiki through the web interface, its deployment
-        # might fail before this job can revert the change. In that case, we
-        # need to merge in those un-deployed changes to both the source and
-        # deployment repositories.
-        run: git merge source/develop
-      - name: Push to deployment repository
-        if: ${{ steps.check-diff.outputs.diff != '' }}
-        run: git push source master:develop
-      - name: Push to source repository
-        if: ${{ steps.check-diff.outputs.diff != '' }}
-        run: git push
+          # Update our copy of the source repo in case changes have been merged
+          # to it while this workflow was running.
+          git fetch source
+          # Checkout source.
+          git checkout develop
+          # Force-push source commits to deployment repo, over-writing the
+          # changes made via the web interface and bringing the repos back in
+          # sync.
+          git push -f origin develop:master

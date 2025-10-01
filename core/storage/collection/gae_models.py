@@ -21,11 +21,10 @@ from __future__ import annotations
 import copy
 import datetime
 
-from core import feconf
-from core import utils
+import core.storage.base_model.gae_models as base_models
+from core import feconf, utils
 from core.constants import constants
 from core.platform import models
-import core.storage.base_model.gae_models as base_models
 
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
 
@@ -144,7 +143,9 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
                 'max_age must be a datetime.timedelta instance or None.')
 
         query = cls.query(
-            cls.post_commit_is_private == False)  # pylint: disable=singleton-comparison
+            cls.post_commit_is_private # pylint: disable=singleton-comparison
+            == False
+        )
         if max_age:
             query = query.filter(
                 cls.last_updated >= datetime.datetime.utcnow() - max_age)
@@ -906,17 +907,6 @@ class CollectionSummaryModel(base_models.BaseModel):
             cls.editor_ids == user_id,
             cls.viewer_ids == user_id,
             cls.contributor_ids == user_id)).get(keys_only=True) is not None
-
-    @classmethod
-    def get_non_private(cls) -> Sequence[CollectionSummaryModel]:
-        """Returns an iterable with non-private collection summary models.
-
-        Returns:
-            iterable. An iterable with non-private collection summary models.
-        """
-        return cls.get_all().filter(
-            cls.status != constants.ACTIVITY_STATUS_PRIVATE
-        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
     def get_private_at_least_viewable(

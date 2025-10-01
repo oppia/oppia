@@ -45,7 +45,8 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                     'failed': 0
                 }
             }
-        with self.swap(elastic_search_services.ES, 'index', mock_index):
+        es_client = elastic_search_services.ES.get_client()
+        with self.swap(es_client, 'index', mock_index):
             elastic_search_services.add_documents_to_index([{
                 'id': correct_id
             }], correct_index_name)
@@ -74,8 +75,9 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         assert_raises_ctx = self.assertRaisesRegex(
             Exception,
             'Failed to add document to index.')
+        es_client = elastic_search_services.ES.get_client()
         with assert_raises_ctx, self.swap(
-            elastic_search_services.ES, 'index', mock_index):
+            es_client, 'index', mock_index):
             elastic_search_services.add_documents_to_index(
                 documents, correct_index_name)
 
@@ -119,8 +121,9 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                     'match_all': {}
                 }
             })
+        es_client = elastic_search_services.ES.get_client()
         swap_delete_by_query = self.swap(
-            elastic_search_services.ES, 'delete_by_query', mock_delete_by_query)
+            es_client, 'delete_by_query', mock_delete_by_query)
 
         with swap_delete_by_query:
             elastic_search_services.clear_index(correct_index_name)
@@ -163,9 +166,10 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         correct_index_name = 'index1'
 
         # Here we use type Any because this method mocks the behavior of
-        # elastic_search_services.ES.search, so to match the type annotations
-        # with 'search' method we defined the body as 'Dict[str, Any]' type,
-        # and also in the type stubs the type of body is mentioned as Any.
+        # elastic_search_services.ES.get_client().search, so to match the type
+        # annotations with 'search' method we defined the body as
+        # 'Dict[str, Any]' type, and also in the type stubs the type of body is
+        # mentioned as Any.
         def mock_search(
             body: Dict[str, Any], index: str, params: Dict[str, int]
         ) -> Dict[str, Dict[str, List[str]]]:
@@ -203,8 +207,8 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                 }
             }
 
-        swap_search = self.swap(
-            elastic_search_services.ES, 'search', mock_search)
+        es_client = elastic_search_services.ES.get_client()
+        swap_search = self.swap(es_client, 'search', mock_search)
         with swap_search:
             result, new_offset = (
                 elastic_search_services.search(
@@ -218,9 +222,10 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         correct_index_name = 'index1'
 
         # Here we use type Any because this method mocks the behavior of
-        # elastic_search_services.ES.search, so to match the type annotations
-        # with 'search' method we defined the body as 'Dict[str, Any]' type,
-        # and also in the type stubs the type of body is mentioned as Any.
+        # elastic_search_services.ES.get_client().search, so to match the type
+        # annotations with 'search' method we defined the body as
+        # 'Dict[str, Any]' type, and also in the type stubs the type of body is
+        # mentioned as Any.
         def mock_search(
             body: Dict[str, Any], index: str, params: Dict[str, int]
         ) -> Dict[str, Dict[str, List[str]]]:
@@ -262,8 +267,8 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                 }
             }
 
-        swap_search = self.swap(
-            elastic_search_services.ES, 'search', mock_search)
+        es_client = elastic_search_services.ES.get_client()
+        swap_search = self.swap(es_client, 'search', mock_search)
         with swap_search:
             result, new_offset = (
                 elastic_search_services.search(
@@ -340,9 +345,10 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         correct_index_name = search_services.SEARCH_INDEX_BLOG_POSTS
 
         # Here we use type Any because this method mocks the behavior of
-        # elastic_search_services.ES.search, so to match the type annotations
-        # with 'search' method we defined the body as 'Dict[str, Any]' type,
-        # and also in the type stubs the type of body is mentioned as Any.
+        # elastic_search_services.ES.get_client().search, so to match the type
+        # annotations with 'search' method we defined the body as
+        # 'Dict[str, Any]' type, and also in the type stubs the type of body is
+        # mentioned as Any.
         def mock_search(
                 body: Dict[str, Any], index: str, params: Dict[str, int]
         ) -> Dict[str, Dict[str, List[str]]]:
@@ -380,8 +386,8 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                 }
             }
 
-        swap_search = self.swap(
-            elastic_search_services.ES, 'search', mock_search)
+        es_client = elastic_search_services.ES.get_client()
+        swap_search = self.swap(es_client, 'search', mock_search)
         with swap_search:
             result, new_offset = (
                 elastic_search_services.blog_post_summaries_search(
@@ -398,9 +404,10 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         correct_index_name = search_services.SEARCH_INDEX_BLOG_POSTS
 
         # Here we use type Any because this method mocks the behavior of
-        # elastic_search_services.ES.search, so to match the type annotations
-        # with 'search' method we defined the body as 'Dict[str, Any]' type,
-        # and also in the type stubs the type of body is mentioned as Any.
+        # elastic_search_services.ES.get_client().search, so to match the type
+        # annotations with 'search' method we defined the body as
+        # 'Dict[str, Any]' type, and also in the type stubs the type of body is
+        # mentioned as Any.
         def mock_search(
             body: Dict[str, Any], index: str, params: Dict[str, int]
         ) -> Dict[str, Dict[str, List[str]]]:
@@ -442,8 +449,8 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                 }
             }
 
-        swap_search = self.swap(
-            elastic_search_services.ES, 'search', mock_search)
+        es_client = elastic_search_services.ES.get_client()
+        swap_search = self.swap(es_client, 'search', mock_search)
         with swap_search:
             result, new_offset = (
                 elastic_search_services.blog_post_summaries_search(

@@ -29,7 +29,7 @@ from core.domain import rte_component_registry
 
 import bleach
 import bs4
-from typing import Dict, Final, List, TypedDict, Union, cast
+from typing import Callable, Dict, Final, List, TypedDict, Union, cast
 
 
 class ComponentsDict(TypedDict):
@@ -67,7 +67,7 @@ def filter_a(tag: str, name: str, value: str) -> bool:
     return False
 
 
-ATTRS_ALLOWLIST: Final = {
+ATTRS_ALLOWLIST: Final[Dict[str, Union[List[str], Callable[..., bool]]]] = {
     'a': filter_a,
     'b': [],
     'blockquote': [],
@@ -114,8 +114,11 @@ def clean(user_submitted_html: str) -> str:
 
     # TODO(sll): Alert the caller if the input was changed due to this call.
     # TODO(sll): Add a log message if bad HTML is detected.
+
     return bleach.clean(
-        user_submitted_html, tags=tag_names, attributes=core_tags, strip=True)
+        user_submitted_html, tags=tag_names,
+        attributes=core_tags, strip=True
+    )
 
 
 def strip_html_tags(html_string: str) -> str:
@@ -128,7 +131,10 @@ def strip_html_tags(html_string: str) -> str:
         str. The HTML string that results after all the tags and attributes are
         stripped out.
     """
-    return bleach.clean(html_string, tags=[], attributes={}, strip=True)
+    empty_attrs: Dict[str, List[str]] = {}
+    return bleach.clean(
+        html_string, tags=[], attributes=empty_attrs, strip=True
+    )
 
 
 def get_image_filenames_from_html_strings(html_strings: List[str]) -> List[str]:
@@ -286,14 +292,15 @@ def _raise_validation_errors_for_unescaped_html_tag(
 
 
 def validate_rte_tags(
-    html_data: str, is_tag_nested_inside_tabs_or_collapsible: bool = False
+    html_data: str,
+    is_tag_nested_inside_tabs_or_collapsible: bool = False
 ) -> None:
     """Validate all the RTE tags.
 
     Args:
         html_data: str. The RTE content of the state.
-        is_tag_nested_inside_tabs_or_collapsible: bool. True when we
-            validate tags inside `Tabs` or `Collapsible` tag.
+        is_tag_nested_inside_tabs_or_collapsible: bool. True when
+            we validate tags inside `Tabs` or `Collapsible` tag.
 
     Raises:
         ValidationError. Image does not have alt-with-value attribute.
@@ -400,8 +407,7 @@ def validate_rte_tags(
 
         if not tag.has_attr('autoplay-with-value'):
             raise utils.ValidationError(
-                'Video tag does not have \'autoplay-with-value\' '
-                'attribute.'
+                'Video tag does not have \'autoplay-with-value\' attribute.'
             )
 
         if tag['autoplay-with-value'].strip() not in (
@@ -422,8 +428,7 @@ def validate_rte_tags(
     for tag in soup.find_all('oppia-noninteractive-link'):
         if not tag.has_attr('text-with-value'):
             raise utils.ValidationError(
-                'Link tag does not have \'text-with-value\' '
-                'attribute.'
+                'Link tag does not have \'text-with-value\' attribute.'
             )
 
         _raise_validation_errors_for_unescaped_html_tag(
@@ -456,8 +461,7 @@ def validate_rte_tags(
         math_content_list = json.loads(math_content_json)
         if 'raw_latex' not in math_content_list:
             raise utils.ValidationError(
-                'Math tag does not have \'raw_latex-with-value\' '
-                'attribute.'
+                'Math tag does not have \'raw_latex-with-value\' attribute.'
             )
 
         if is_html_empty(math_content_list['raw_latex']):
@@ -495,8 +499,8 @@ def validate_rte_tags(
         collapsible_tags = soup.find_all('oppia-noninteractive-collapsible')
         if len(collapsible_tags) > 0:
             raise utils.ValidationError(
-                'Collapsible tag should not be present inside another '
-                'Tabs or Collapsible tag.'
+                'Collapsible tag should not be present inside Tabs '
+                'or another Collapsible tag.'
             )
 
 
@@ -525,7 +529,9 @@ def _raise_validation_errors_for_empty_tabs_content(
         )
 
 
-def validate_tabs_and_collapsible_rte_tags(html_data: str) -> None:
+def validate_tabs_and_collapsible_rte_tags(
+        html_data: str
+    ) -> None:
     """Validates `Tabs` and `Collapsible` RTE tags
 
     Args:

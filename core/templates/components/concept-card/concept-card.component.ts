@@ -34,7 +34,6 @@ export class ConceptCardComponent implements OnInit {
   loadingMessage!: string;
   skillDeletedMessage!: string;
   conceptsCards: ConceptCard[] = [];
-  numberOfWorkedExamplesShown: number = 0;
   explanationIsShown: boolean = false;
 
   constructor(
@@ -50,10 +49,6 @@ export class ConceptCardComponent implements OnInit {
         });
         this.loadingMessage = '';
         this.currentConceptCard = this.conceptsCards[this.index];
-        this.numberOfWorkedExamplesShown = 0;
-        if (this.currentConceptCard.getWorkedExamples().length > 0) {
-          this.numberOfWorkedExamplesShown = 1;
-        }
       },
       errorResponse => {
         this.loadingMessage = '';
@@ -61,17 +56,5 @@ export class ConceptCardComponent implements OnInit {
           'Oops, it looks like this skill has' + ' been deleted.';
       }
     );
-  }
-
-  isLastWorkedExample(): boolean {
-    return (
-      this.numberOfWorkedExamplesShown ===
-      this.currentConceptCard.getWorkedExamples().length
-    );
-  }
-
-  showMoreWorkedExamples(): void {
-    this.explanationIsShown = false;
-    this.numberOfWorkedExamplesShown++;
   }
 }

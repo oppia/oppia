@@ -25,15 +25,13 @@ import {FeedbackUpdatesPageRootComponent} from './feedback-updates-page-root.com
 import {CommonModule} from '@angular/common';
 import {FeedbackUpdatesPageRoutingModule} from './feedback-updates-page-routing.module';
 import {Error404PageModule} from 'pages/error-pages/error-404/error-404-page.module';
-import {SmartRouterModule} from 'hybrid-router-module-provider';
+import {RouterModule} from '@angular/router';
 
 @NgModule({
   imports: [
     CommonModule,
     NgbPopoverModule,
-    // TODO(#13443): Remove smart router module provider once all pages are
-    // migrated to angular router.
-    SmartRouterModule,
+    RouterModule,
     ReactiveFormsModule,
     SharedComponentsModule,
     FeedbackUpdatesPageRoutingModule,

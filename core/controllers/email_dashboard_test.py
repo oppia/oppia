@@ -17,9 +17,11 @@
 from __future__ import annotations
 
 from core import feconf
-from core.domain import platform_parameter_list
-from core.domain import user_query_services
-from core.domain import user_services
+from core.domain import (
+    platform_parameter_list,
+    user_query_services,
+    user_services,
+)
 from core.platform import models
 from core.tests import test_utils
 
@@ -27,8 +29,7 @@ from typing import Final, Sequence
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import email_models
-    from mypy_imports import user_models
+    from mypy_imports import email_models, user_models
 
 (user_models, email_models) = models.Registry.import_models(
     [models.Names.USER, models.Names.EMAIL])
@@ -143,7 +144,8 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         super().setUp()
         # User A has one created exploration.
         self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
-        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, 'systemUser')
+        system_email_address = 'system@example.com'
+        self.signup(system_email_address, 'systemUser')
         self.user_a_id = self.get_user_id_from_email(
             self.USER_A_EMAIL)
         user_services.update_email_preferences(
@@ -170,10 +172,22 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
             [self.SUBMITTER_USERNAME, self.NEW_SUBMITTER_USERNAME])
 
     @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            )
+        ]
     )
     @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            )
+        ]
     )
     def test_that_no_emails_are_sent_if_query_is_canceled(self) -> None:
         self.login(self.SUBMITTER_EMAIL, is_super_admin=True)
@@ -249,7 +263,17 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         self.logout()
 
     @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            )
+        ]
     )
     def test_that_test_email_for_bulk_emails_is_sent(self) -> None:
         self.login(self.SUBMITTER_EMAIL, is_super_admin=True)

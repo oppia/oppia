@@ -19,33 +19,34 @@ from __future__ import annotations
 import datetime
 import logging
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import auth_services
-from core.domain import collection_services
-from core.domain import email_manager
-from core.domain import exp_services
-from core.domain import fs_services
-from core.domain import platform_parameter_list
-from core.domain import question_domain
-from core.domain import question_services
-from core.domain import rights_domain
-from core.domain import rights_manager
-from core.domain import skill_domain
-from core.domain import skill_services
-from core.domain import story_domain
-from core.domain import story_services
-from core.domain import subtopic_page_domain
-from core.domain import subtopic_page_services
-from core.domain import topic_domain
-from core.domain import topic_fetchers
-from core.domain import topic_services
-from core.domain import translation_domain
-from core.domain import user_domain
-from core.domain import user_services
-from core.domain import wipeout_domain
-from core.domain import wipeout_service
+from core.domain import (
+    auth_services,
+    collection_services,
+    email_manager,
+    exp_services,
+    fs_services,
+    platform_parameter_list,
+    question_domain,
+    question_services,
+    rights_domain,
+    rights_manager,
+    skill_domain,
+    skill_services,
+    story_domain,
+    story_services,
+    subtopic_page_domain,
+    subtopic_page_services,
+    topic_domain,
+    topic_fetchers,
+    topic_services,
+    translation_domain,
+    user_domain,
+    user_services,
+    wipeout_domain,
+    wipeout_service,
+)
 from core.platform import models
 from core.tests import test_utils
 
@@ -53,23 +54,25 @@ from typing import Final, List, Sequence
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import app_feedback_report_models
-    from mypy_imports import auth_models
-    from mypy_imports import blog_models
-    from mypy_imports import collection_models
-    from mypy_imports import config_models
-    from mypy_imports import datastore_services
-    from mypy_imports import exp_models
-    from mypy_imports import feedback_models
-    from mypy_imports import improvements_models
-    from mypy_imports import learner_group_models
-    from mypy_imports import question_models
-    from mypy_imports import skill_models
-    from mypy_imports import story_models
-    from mypy_imports import subtopic_models
-    from mypy_imports import suggestion_models
-    from mypy_imports import topic_models
-    from mypy_imports import user_models
+    from mypy_imports import (
+        app_feedback_report_models,
+        auth_models,
+        blog_models,
+        collection_models,
+        config_models,
+        datastore_services,
+        exp_models,
+        feedback_models,
+        improvements_models,
+        learner_group_models,
+        question_models,
+        skill_models,
+        story_models,
+        subtopic_models,
+        suggestion_models,
+        topic_models,
+        user_models,
+    )
 
 (
     app_feedback_report_models, auth_models, blog_models,
@@ -299,8 +302,10 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
             observed_log_messages,
             ['Email ID %s permanently deleted from bulk email provider\'s db. '
              'Cannot access API, since this is a dev environment'
-             % self.USER_1_EMAIL,
-             'Logging project ID for debugging: dev-project-id'])
+             % self.USER_1_EMAIL] + ([
+                 'Logging project ID for debugging: dev-project-id'
+                 ] * 6)
+             )
         self.assertFalse(email_preferences.can_receive_email_updates)
         self.assertFalse(email_preferences.can_receive_editor_role_email)
         self.assertFalse(email_preferences.can_receive_feedback_message_email)
@@ -685,7 +690,17 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
             user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id))
 
     @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.OPPIA_PROJECT_ID,
+                'dev-project-id'
+            )
+        ]
     )
     def test_run_user_deletion_completion_with_user_properly_deleted(
         self
@@ -725,7 +740,17 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
                 self.user_1_id))
 
     @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.OPPIA_PROJECT_ID,
+                'dev-project-id'
+            )
+        ]
     )
     def test_run_user_deletion_completion_user_wrongly_deleted_emails_enabled(
         self
@@ -5675,7 +5700,17 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
             email_manager, 'send_mail_to_admin', _mock_send_mail_to_admin)
 
     @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.OPPIA_PROJECT_ID,
+                'dev-project-id'
+            )
+        ]
     )
     def test_repeated_deletion_is_successful_when_emails_enabled(
         self
@@ -5722,7 +5757,17 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
             self.assertEqual(len(self.email_bodies), 0)
 
     @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.OPPIA_PROJECT_ID,
+                'dev-project-id'
+            )
+        ]
     )
     def test_regular_deletion_is_successful(self) -> None:
         with self.send_mail_to_admin_swap:
@@ -5818,7 +5863,23 @@ class CheckCompletionOfUserDeletionTaskServiceTests(
     @test_utils.set_platform_parameters(
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'senderName')
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'senderName'),
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                'noreply@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.OPPIA_PROJECT_ID,
+                'dev-project-id'
+            )
         ]
     )
     def test_verification_when_user_is_deleted_is_successful(self) -> None:
@@ -5838,7 +5899,17 @@ class CheckCompletionOfUserDeletionTaskServiceTests(
             user_models.UserSettingsModel.get_by_id(self.user_1_id))
 
     @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.OPPIA_PROJECT_ID,
+                'dev-project-id'
+            )
+        ]
     )
     def test_verification_when_user_is_wrongly_deleted_fails(self) -> None:
         pending_deletion_request = (

@@ -20,8 +20,7 @@ import datetime
 import enum
 import types
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.platform import models
 from core.tests import test_utils
 
@@ -29,8 +28,7 @@ from typing import Final, List
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import app_feedback_report_models
-    from mypy_imports import base_models
+    from mypy_imports import app_feedback_report_models, base_models
 
 (base_models, app_feedback_report_models) = models.Registry.import_models([
     models.Names.BASE_MODEL, models.Names.APP_FEEDBACK_REPORT
@@ -454,7 +452,9 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
             base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER)
 
     def _mock_query_filters_returns_empty_list(
-        self, projection: bool, distinct: bool  # pylint: disable=unused-argument
+        self,
+        projection: bool, # pylint: disable=unused-argument
+        distinct: bool  # pylint: disable=unused-argument
     ) -> List[str]:
         """Mock the model query to test for an invalid filter field. Named
         parameters 'projection' and 'distinct' are required to mock the

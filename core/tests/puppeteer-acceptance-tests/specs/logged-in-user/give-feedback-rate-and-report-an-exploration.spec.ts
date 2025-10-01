@@ -66,7 +66,7 @@ describe('Logged-out User', function () {
     );
 
     await explorationEditor.navigateToCreatorDashboardPage();
-    await explorationEditor.navigateToExplorationEditorPage();
+    await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
     await explorationEditor.dismissWelcomeModal();
     await explorationEditor.updateCardContent('Introduction to Algebra');
     await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
@@ -78,13 +78,11 @@ describe('Logged-out User', function () {
 
     // Navigate to the new card and update its content.
     await explorationEditor.navigateToCard(CARD_NAME.ALGEBRA_BASICS);
-    await explorationEditor.updateCardContent(
-      'Enter a negative number greater than -100.'
-    );
+    await explorationEditor.updateCardContent('Enter a negative number.');
     await explorationEditor.addInteraction(INTERACTION_TYPES.NUMERIC_INPUT);
     await explorationEditor.addResponsesToTheInteraction(
       INTERACTION_TYPES.NUMERIC_INPUT,
-      '-99',
+      '-1',
       'Perfect!',
       CARD_NAME.FINAL_CARD,
       true

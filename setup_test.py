@@ -20,14 +20,11 @@ import builtins
 import os
 import sys
 
+from core import feconf
 from core.tests import test_utils
+from scripts import common
 
 import setuptools
-
-from scripts import common # isort:skip pylint: disable=unused-import
-# Since feconf imports typing_extensions, it should be
-# imported after common is imported.
-from core import feconf # isort:skip
 
 
 class SetupTests(test_utils.GenericTestBase):
@@ -73,7 +70,7 @@ class SetupTests(test_utils.GenericTestBase):
             # Dirs defined in common.GOOGLE_CLOUD_SDK_HOME get added to
             # sys.path when we run backend tests. We use a swap as we
             # need to remove these dirs to import setup.
-            import setup # pylint: disable=syntax-error
+            import setup
             setup.main()
 
         dummy_file_object.close()

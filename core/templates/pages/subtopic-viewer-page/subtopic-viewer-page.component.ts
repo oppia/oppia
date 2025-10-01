@@ -26,7 +26,7 @@ import {SubtopicPageContents} from 'domain/topic/subtopic-page-contents.model';
 import {Subtopic} from 'domain/topic/subtopic.model';
 import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {UrlService} from 'services/contextual/url.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {
@@ -37,6 +37,14 @@ import {LoaderService} from 'services/loader.service';
 import {PageTitleService} from 'services/page-title.service';
 
 import './subtopic-viewer-page.component.css';
+import {StudyGuideSection} from 'domain/topic/study-guide-sections.model';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {TopicViewerDomainConstants} from 'domain/topic_viewer/topic-viewer-domain.constants';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
+import {PracticeSessionPageConstants} from 'pages/practice-session-page/practice-session-page.constants';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
 
 @Component({
   selector: 'oppia-subtopic-viewer-page',
@@ -50,7 +58,10 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
   topicUrlFragment!: string;
   classroomUrlFragment!: string;
   subtopicUrlFragment!: string;
-  pageContents!: SubtopicPageContents;
+  // Remove pageContents once study guides become standard.
+  pageContents!: SubtopicPageContents | null;
+  // Remove '| null' once study guides become standard.
+  sections: StudyGuideSection[] | null;
   subtopicTitle!: string;
   subtopicTitleTranslationKey!: string;
   parentTopicTitle!: string;
@@ -60,19 +71,28 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
   prevSubtopic!: Subtopic;
   directiveSubscriptions = new Subscription();
   subtopicSummaryIsShown: boolean = false;
+  isPracticeTabDisplayed: boolean = false;
+  currentSubtopicId!: number;
 
   constructor(
     private alertsService: AlertsService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private loaderService: LoaderService,
     private pageTitleService: PageTitleService,
     private subtopicViewerBackendApiService: SubtopicViewerBackendApiService,
     private topicViewerBackendApiService: TopicViewerBackendApiService,
     private urlService: UrlService,
+    private urlInterpolationService: UrlInterpolationService,
+    private windowRef: WindowRef,
     private windowDimensionsService: WindowDimensionsService,
-    private translateService: TranslateService
-  ) {}
+    private translateService: TranslateService,
+    private platformFeatureService: PlatformFeatureService,
+    private siteAnalyticsService: SiteAnalyticsService
+  ) {
+    this.sections = null;
+    this.pageContents = null;
+  }
 
   checkMobileView(): boolean {
     return this.windowDimensionsService.getWidth() < 500;
@@ -96,6 +116,11 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
     this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 
+  isShowRestructuredStudyGuidesFeatureEnabled(): boolean {
+    return this.platformFeatureService.status.ShowRestructuredStudyGuides
+      .isEnabled;
+  }
+
   ngOnInit(): void {
     this.topicUrlFragment = this.urlService.getTopicUrlFragmentFromLearnerUrl();
     this.classroomUrlFragment =
@@ -104,79 +129,86 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
       this.urlService.getSubtopicUrlFragmentFromLearnerUrl();
 
     this.loaderService.showLoadingScreen('Loading');
-    this.subtopicViewerBackendApiService
-      .fetchSubtopicDataAsync(
+
+    const subtopicPromise =
+      this.subtopicViewerBackendApiService.fetchSubtopicDataAsync(
         this.topicUrlFragment,
         this.classroomUrlFragment,
         this.subtopicUrlFragment
-      )
-      .then(
-        subtopicDataObject => {
-          this.pageContents = subtopicDataObject.getPageContents();
-          this.subtopicTitle = subtopicDataObject.getSubtopicTitle();
-          this.parentTopicId = subtopicDataObject.getParentTopicId();
-          this.contextService.setCustomEntityContext(
-            AppConstants.ENTITY_TYPE.TOPIC,
-            this.parentTopicId
-          );
-
-          // The onLangChange event is initially fired before the subtopic is
-          // loaded. Hence the first setpageTitle() call needs to made
-          // manually, and the onLangChange subscription is added after
-          // the subtopic is loaded.
-          this.setPageTitle();
-          this.subscribeToOnLangChange();
-          this.pageTitleService.updateMetaTag(
-            `Review the skill of ${this.subtopicTitle.toLowerCase()}.`
-          );
-
-          let nextSubtopic = subtopicDataObject.getNextSubtopic();
-          let prevSubtopic = subtopicDataObject.getPrevSubtopic();
-          if (nextSubtopic) {
-            this.nextSubtopic = nextSubtopic;
-            this.subtopicSummaryIsShown = true;
-          }
-          if (prevSubtopic) {
-            this.prevSubtopic = prevSubtopic;
-            this.subtopicSummaryIsShown = true;
-          }
-
-          this.subtopicTitleTranslationKey =
-            this.i18nLanguageCodeService.getSubtopicTranslationKey(
-              this.parentTopicId,
-              this.subtopicUrlFragment,
-              TranslationKeyType.TITLE
-            );
-
-          this.topicViewerBackendApiService
-            .fetchTopicDataAsync(
-              this.topicUrlFragment,
-              this.classroomUrlFragment
-            )
-            .then(topicDataObject => {
-              this.parentTopicTitle = topicDataObject.getTopicName();
-              this.parentTopicTitleTranslationKey =
-                this.i18nLanguageCodeService.getTopicTranslationKey(
-                  topicDataObject.getTopicId(),
-                  TranslationKeyType.TITLE
-                );
-            });
-
-          this.loaderService.hideLoadingScreen();
-        },
-        errorResponse => {
-          if (
-            AppConstants.FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1
-          ) {
-            this.alertsService.addWarning('Failed to get subtopic data');
-          }
-        }
       );
+
+    const topicPromise = this.topicViewerBackendApiService.fetchTopicDataAsync(
+      this.topicUrlFragment,
+      this.classroomUrlFragment
+    );
+
+    Promise.all([subtopicPromise, topicPromise]).then(
+      ([subtopicDataObject, topicDataObject]) => {
+        if (this.isShowRestructuredStudyGuidesFeatureEnabled()) {
+          this.sections = subtopicDataObject.getSections();
+        } else {
+          this.pageContents = subtopicDataObject.getPageContents();
+        }
+        this.subtopicTitle = subtopicDataObject.getSubtopicTitle();
+        this.parentTopicId = subtopicDataObject.getParentTopicId();
+        this.pageContextService.setCustomEntityContext(
+          AppConstants.ENTITY_TYPE.TOPIC,
+          this.parentTopicId
+        );
+
+        // The onLangChange event is initially fired before the subtopic is
+        // loaded. Hence the first setpageTitle() call needs to made
+        // manually, and the onLangChange subscription is added after
+        // the subtopic is loaded.
+        this.setPageTitle();
+        this.subscribeToOnLangChange();
+        this.pageTitleService.updateMetaTag(
+          `Review the skill of ${this.subtopicTitle.toLowerCase()}.`
+        );
+        this.currentSubtopicId = subtopicDataObject.getCurrentSubtopicId();
+
+        let nextSubtopic = subtopicDataObject.getNextSubtopic();
+        let prevSubtopic = subtopicDataObject.getPrevSubtopic();
+        if (nextSubtopic) {
+          this.nextSubtopic = nextSubtopic;
+          this.subtopicSummaryIsShown = true;
+        }
+        if (prevSubtopic) {
+          this.prevSubtopic = prevSubtopic;
+          this.subtopicSummaryIsShown = true;
+        }
+
+        this.subtopicTitleTranslationKey =
+          this.i18nLanguageCodeService.getSubtopicTranslationKey(
+            this.parentTopicId,
+            this.subtopicUrlFragment,
+            TranslationKeyType.TITLE
+          );
+
+        this.parentTopicTitle = topicDataObject.getTopicName();
+        this.parentTopicTitleTranslationKey =
+          this.i18nLanguageCodeService.getTopicTranslationKey(
+            topicDataObject.getTopicId(),
+            TranslationKeyType.TITLE
+          );
+        this.isPracticeTabDisplayed =
+          topicDataObject.getPracticeTabIsDisplayed();
+
+        this.loaderService.hideLoadingScreen();
+      },
+      errorResponse => {
+        if (
+          AppConstants.FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1
+        ) {
+          this.alertsService.addWarning('Failed to get subtopic data');
+        }
+      }
+    );
   }
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
-    this.contextService.removeCustomEntityContext();
+    this.pageContextService.removeCustomEntityContext();
   }
 
   isHackySubtopicTitleTranslationDisplayed(): boolean {
@@ -193,5 +225,128 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
         this.parentTopicTitleTranslationKey
       ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
     );
+  }
+
+  openStudyGuide(event?: MouseEvent): void {
+    // This component is being used in the topic editor as well and
+    // we want to disable the linking in this case.
+    const urlFragment = this.nextSubtopic.getUrlFragment();
+    if (!this.classroomUrlFragment || !this.topicUrlFragment || !urlFragment) {
+      return;
+    }
+    let window = '_self';
+    if (event && (event.ctrlKey || event.metaKey)) {
+      // Open in new tab.
+      window = '_blank';
+    }
+    this.windowRef.nativeWindow.open(
+      this.urlInterpolationService.interpolateUrl(
+        TopicViewerDomainConstants.SUBTOPIC_VIEWER_URL_TEMPLATE,
+        {
+          classroom_url_fragment: this.classroomUrlFragment,
+          topic_url_fragment: this.topicUrlFragment,
+          subtopic_url_fragment: urlFragment,
+        }
+      ),
+      window
+    );
+  }
+
+  openStudyGuideMenu(event?: MouseEvent): void {
+    if (!this.classroomUrlFragment || !this.topicUrlFragment) {
+      return;
+    }
+    let window = '_self';
+    if (event && (event.ctrlKey || event.metaKey)) {
+      // Open in new tab.
+      window = '_blank';
+    }
+    this.windowRef.nativeWindow.open(
+      this.urlInterpolationService.interpolateUrl(
+        ClassroomDomainConstants.TOPIC_VIEWER_STUDYGUIDE_URL_TEMPLATE,
+        {
+          classroom_url_fragment: this.classroomUrlFragment,
+          topic_url_fragment: this.topicUrlFragment,
+        }
+      ),
+      window
+    );
+  }
+
+  openPracticeMenu(event?: MouseEvent): void {
+    const selectedSubtopicIds = [];
+    selectedSubtopicIds.push(this.currentSubtopicId);
+    let practiceSessionsUrl = this.urlInterpolationService.interpolateUrl(
+      PracticeSessionPageConstants.PRACTICE_SESSIONS_URL,
+      {
+        topic_url_fragment: this.topicUrlFragment,
+        classroom_url_fragment: this.classroomUrlFragment,
+        stringified_subtopic_ids: JSON.stringify(selectedSubtopicIds),
+      }
+    );
+    this.siteAnalyticsService.registerPracticeSessionStartEvent(
+      this.classroomUrlFragment,
+      this.parentTopicTitle,
+      selectedSubtopicIds.toString()
+    );
+    if (event && (event.ctrlKey || event.metaKey)) {
+      // Open in new tab.
+      this.windowRef.nativeWindow.open(practiceSessionsUrl, '_blank');
+    } else {
+      // Normal navigation.
+      this.windowRef.nativeWindow.location.href = practiceSessionsUrl;
+      this.loaderService.showLoadingScreen('Loading');
+    }
+  }
+
+  backToTopic(event?: MouseEvent): void {
+    if (!this.classroomUrlFragment || !this.topicUrlFragment) {
+      return;
+    }
+    let window = '_self';
+    if (event && (event.ctrlKey || event.metaKey)) {
+      // Open in new tab.
+      window = '_blank';
+    }
+    this.windowRef.nativeWindow.open(
+      this.urlInterpolationService.interpolateUrl(
+        ClassroomDomainConstants.TOPIC_VIEWER_URL_TEMPLATE,
+        {
+          classroom_url_fragment: this.classroomUrlFragment,
+          topic_url_fragment: this.topicUrlFragment,
+        }
+      ),
+      window
+    );
+  }
+
+  getStaticImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
+
+  checkNextSubtopicTitleLengthAndModify(): string {
+    let title: string = this.nextSubtopic.getTitle();
+    if (
+      this.checkMobileView() &&
+      title.length >=
+        AppConstants.STUDY_GUIDE_VIEWER_NEXT_SUBTOPIC_TITLE_LENGTH_LIMIT_MOBILE
+    ) {
+      title =
+        title.substring(
+          0,
+          AppConstants.STUDY_GUIDE_VIEWER_NEXT_SUBTOPIC_TITLE_TRUNCATED_LENGTH_MOBILE
+        ) + '...';
+    } else if (
+      !this.checkMobileView() &&
+      title.length >=
+        AppConstants.STUDY_GUIDE_VIEWER_NEXT_SUBTOPIC_TITLE_LENGTH_LIMIT_DESKTOP
+    ) {
+      title =
+        title.substring(
+          0,
+          AppConstants.STUDY_GUIDE_VIEWER_NEXT_SUBTOPIC_TITLE_TRUNCATED_LENGTH_DESKTOP
+        ) + '...';
+    }
+    return title;
   }
 }

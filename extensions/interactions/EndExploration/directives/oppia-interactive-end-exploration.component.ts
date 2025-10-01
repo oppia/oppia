@@ -23,7 +23,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {EndExplorationCustomizationArgs} from 'interactions/customization-args-defs';
 
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {EndExplorationBackendApiService} from './end-exploration-backend-api.service';
 import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
 
@@ -45,7 +45,7 @@ export class InteractiveEndExplorationComponent implements OnInit {
   isInEditorMainTab: boolean = false;
 
   constructor(
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private endExplorationBackendApiService: EndExplorationBackendApiService,
     private interactionAttributesExtractorService: InteractionAttributesExtractorService
   ) {}
@@ -63,15 +63,15 @@ export class InteractiveEndExplorationComponent implements OnInit {
     const authorRecommendedExplorationIds = recommendedExplorationIds.value;
 
     this.isInEditorPage =
-      this.contextService.getPageContext() ===
+      this.pageContextService.getPageContext() ===
       ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR;
     this.isInEditorPreviewMode =
       this.isInEditorPage &&
-      this.contextService.getEditorTabContext() ===
+      this.pageContextService.getEditorTabContext() ===
         ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.PREVIEW;
     this.isInEditorMainTab =
       this.isInEditorPage &&
-      this.contextService.getEditorTabContext() ===
+      this.pageContextService.getEditorTabContext() ===
         ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.EDITOR;
 
     if (this.isInEditorPage) {

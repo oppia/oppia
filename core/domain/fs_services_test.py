@@ -19,12 +19,14 @@ from __future__ import annotations
 import os
 from unittest import mock
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import fs_services
-from core.domain import image_services
-from core.domain import user_services
+from core.domain import (
+    fs_services,
+    image_services,
+    platform_parameter_list,
+    user_services,
+)
 from core.tests import test_utils
 
 
@@ -61,8 +63,7 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'Invalid entity_name received: '
-            'invalid_name.'
+            'Invalid entity_name received: invalid_name.'
         ):
             fs_services.GcsFileSystem('invalid_name', 'exp_id')
 
@@ -104,8 +105,7 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             IOError,
             (
-                'The dir_name should not start with /'
-                ' or end with / : abc/'
+                'The dir_name should not start with / or end with / : abc/'
             )
         ):
             self.fs.listdir('abc/')
@@ -358,6 +358,15 @@ class GetStaticAssetUrlTests(test_utils.GenericTestBase):
                 'http://localhost:8181/assetsstatic/robots.txt'
             )
 
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.OPPIA_PROJECT_ID, 'project-id'),
+            (
+                platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS,
+                'test-url'
+            )
+        ]
+    )
     def test_function_returns_correct_url_for_non_emulator_mode(self) -> None:
         with self.swap(constants, 'EMULATOR_MODE', False):
             with self.swap(feconf, 'OPPIA_PROJECT_ID', 'project-id'):

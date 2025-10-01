@@ -24,9 +24,9 @@ from core.constants import constants
 from core.platform import models
 from core.platform.speech_synthesis import azure_speech_synthesis_services
 from core.tests import test_utils
+
 import azure.cognitiveservices.speech as speechsdk
 from typing import Dict, List, Union
-
 
 secrets_services = models.Registry.import_secrets_services()
 
@@ -291,15 +291,6 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
             word_boundary_collection.audio_offset_list,
             expected_word_boundary_collection)
 
-    def test_is_mathematical_text(self) -> None:
-        math_text = 'Convert 5 + 3 to words.'
-        self.assertTrue(
-            azure_speech_synthesis_services.is_mathematical_text(math_text))
-
-        non_math_text = 'This is a test text.'
-        self.assertFalse(
-            azure_speech_synthesis_services.is_mathematical_text(non_math_text))
-
     def _get_ssml_content(
         self, main_content: str, language_accent_code: str
     ) -> str:
@@ -432,7 +423,7 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
             expected_transformed_content)
 
     def test_should_pronounce_correctly_for_superscripts(self) -> None:
-        math_symbol_pronounciations = (
+        math_symbol_pronunciations = (
             constants.LANGUAGE_CODE_TO_MATH_SYMBOL_PRONUNCIATIONS.get(
             'en', {}))
 
@@ -441,7 +432,7 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             azure_speech_synthesis_services.process_superscript_in_text(
-                content, math_symbol_pronounciations),
+                content, math_symbol_pronunciations),
             expected_content_to_be_pronounced
         )
 
@@ -451,7 +442,7 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             azure_speech_synthesis_services.process_superscript_in_text(
-                content, math_symbol_pronounciations),
+                content, math_symbol_pronunciations),
             expected_content_to_be_pronounced
         )
 
@@ -461,6 +452,6 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             azure_speech_synthesis_services.process_superscript_in_text(
-                content, math_symbol_pronounciations),
+                content, math_symbol_pronunciations),
             expected_content_to_be_pronounced
         )

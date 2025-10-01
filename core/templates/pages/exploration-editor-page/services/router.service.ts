@@ -270,7 +270,62 @@ export class RouterService {
     }
 
     if (this._activeTabName === this.TABS.MAIN.name) {
-      $('.oppia-editor-cards-container').fadeOut(() => {
+      const container = document.querySelector(
+        '.oppia-editor-cards-container'
+      ) as HTMLElement;
+      if (!container) {
+        this._actuallyNavigate(this.SLUG_GUI, stateName);
+        return;
+      }
+
+      // Fade out animation.
+      const fadeOut = (
+        element: HTMLElement,
+        duration: number
+      ): Promise<void> => {
+        return new Promise(resolve => {
+          const startTime = performance.now();
+          const initialOpacity = parseFloat(getComputedStyle(element).opacity);
+
+          const animate = (currentTime: number) => {
+            const elapsedTime = currentTime - startTime;
+            if (elapsedTime < duration) {
+              const opacity = initialOpacity * (1 - elapsedTime / duration);
+              element.style.opacity = opacity.toString();
+              requestAnimationFrame(animate);
+            } else {
+              element.style.opacity = '0';
+              element.style.display = 'none';
+              resolve();
+            }
+          };
+
+          requestAnimationFrame(animate);
+        });
+      };
+
+      // Fade in animation.
+      const fadeIn = (element: HTMLElement, duration: number): void => {
+        element.style.opacity = '0';
+        element.style.display = '';
+
+        const startTime = performance.now();
+        const animate = (currentTime: number) => {
+          const elapsedTime = currentTime - startTime;
+          if (elapsedTime < duration) {
+            const opacity = elapsedTime / duration;
+            element.style.opacity = opacity.toString();
+            requestAnimationFrame(animate);
+          } else {
+            element.style.opacity = '1';
+          }
+        };
+
+        requestAnimationFrame(animate);
+      };
+
+      // Execute fade out, navigate, then fade in.
+      fadeOut(container, 200).then(() => {
         this._actuallyNavigate(this.SLUG_GUI, stateName);
         // In Angular 2+, we use NgZone to manage change detection. Here, we
         // use runOutsideAngular to avoid triggering Angular's change detection
@@ -278,7 +333,7 @@ export class RouterService {
         // run to re-enter Angular's zone and trigger change detection.
 
         setTimeout(() => {
-          $('.oppia-editor-cards-container').fadeIn();
+          fadeIn(container, 200);
         }, 150);
       });
     } else {

@@ -78,7 +78,7 @@ import {ToastrModule} from 'ngx-toastr';
 import {toastrConfig} from 'pages/oppia-root/app.module';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {OppiaCkEditorCopyToolBarModule} from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.module';
-import {ExplorationPlayerViewerCommonModule} from 'pages/exploration-player-page/exploration-player-viewer-common.module';
+import {ExplorationPlayerViewerCommonModule} from 'pages/exploration-player-page/current-lesson-player/exploration-player-viewer-common.module';
 import {StateVersionHistoryModalComponent} from './modal-templates/state-version-history-modal.component';
 import {MetadataVersionHistoryModalComponent} from './modal-templates/metadata-version-history-modal.component';
 import {StateVersionHistoryComponent} from './editor-tab/state-version-history/state-version-history.component';
@@ -98,7 +98,7 @@ import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {AutosaveInfoModalsService} from './services/autosave-info-modals.service';
 import {ChangeListService} from './services/change-list.service';
 import {ComputeGraphService} from 'services/compute-graph.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
 import {EditorFirstTimeEventsService} from './services/editor-first-time-events.service';
 import {EditabilityService} from 'services/editability.service';
@@ -115,7 +115,6 @@ import {ExplorationFeaturesService} from 'services/exploration-features.service'
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {ExplorationInitStateNameService} from './services/exploration-init-state-name.service';
 import {ExplorationLanguageCodeService} from './services/exploration-language-code.service';
-import {ExplorationMetadataObjectFactory} from 'domain/exploration/ExplorationMetadataObjectFactory';
 import {ExplorationNextContentIdIndexService} from './services/exploration-next-content-id-index.service';
 import {ExplorationObjectiveService} from './services/exploration-objective.service';
 import {ExplorationParamChangesService} from './services/exploration-param-changes.service';
@@ -144,7 +143,6 @@ import {LoaderService} from 'services/loader.service';
 import {LocalStorageService} from 'services/local-storage.service';
 import {ParameterMetadataService} from './services/parameter-metadata.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
-import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 import {PopulateRuleContentIdsService} from './services/populate-rule-content-ids.service';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {ResponsesService} from './editor-tab/services/responses.service';
@@ -167,7 +165,6 @@ import {StateParamChangesService} from 'components/state-editor/state-editor-pro
 import {StateSolicitAnswerDetailsService} from 'components/state-editor/state-editor-properties-services/state-solicit-answer-details.service';
 import {StateSolutionService} from 'components/state-editor/state-editor-properties-services/state-solution.service';
 import {StateTutorialFirstTimeService} from './services/state-tutorial-first-time.service';
-import {StatesObjectFactory} from 'domain/exploration/StatesObjectFactory';
 import {TranslationLanguageService} from './translation-tab/services/translation-language.service';
 import {TranslationStatusService} from './translation-tab/services/translation-status.service';
 import {TranslationTabActiveModeService} from './translation-tab/services/translation-tab-active-mode.service';
@@ -323,7 +320,7 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     AutosaveInfoModalsService,
     ChangeListService,
     ComputeGraphService,
-    ContextService,
+    PageContextService,
     CurrentInteractionService,
     EditorFirstTimeEventsService,
     EditabilityService,
@@ -340,7 +337,6 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     ExplorationHtmlFormatterService,
     ExplorationInitStateNameService,
     ExplorationLanguageCodeService,
-    ExplorationMetadataObjectFactory,
     ExplorationNextContentIdIndexService,
     ExplorationObjectiveService,
     ExplorationParamChangesService,
@@ -371,7 +367,6 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     LoggerService,
     ParameterMetadataService,
     PlatformFeatureService,
-    PlayerPositionService,
     PopulateRuleContentIdsService,
     ReadOnlyExplorationBackendApiService,
     ResponsesService,
@@ -394,7 +389,6 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     StateSolicitAnswerDetailsService,
     StateSolutionService,
     StateTutorialFirstTimeService,
-    StatesObjectFactory,
     TranslationLanguageService,
     TranslationStatusService,
     TranslationTabActiveModeService,

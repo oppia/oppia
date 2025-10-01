@@ -17,18 +17,19 @@
 from __future__ import annotations
 
 from core.constants import constants
-from core.domain import classroom_config_services
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import topic_fetchers
+from core.domain import (
+    classroom_config_services,
+    exp_domain,
+    exp_fetchers,
+    exp_services,
+    topic_fetchers,
+)
 from core.platform import models
 from core.tests import test_utils
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import secrets_services
-    from mypy_imports import translation_models
+    from mypy_imports import secrets_services, translation_models
 
 secrets_services = models.Registry.import_secrets_services()
 
@@ -343,6 +344,44 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                     'id': 'topic_id-1',
                     'version': 1,
                     'payload': subtopic.to_dict()
+                }]
+            )
+
+    def test_get_subtopic_with_study_guide_migration_returns_correct_json(
+        self) -> None:
+        study_guide = self.save_new_study_guide(1, 'user_id', 'topic_id')
+        with self.secrets_swap:
+            self.assertEqual(
+                self.get_json(
+                    '/android_data?activity_type='
+                    'subtopic_with_study_guide_migration&'
+                    'activities_data=[{"id": "topic_id-1", "version": 1}]',
+                    headers={'X-ApiKey': 'secret'},
+                    expected_status_int=200
+                ),
+                [{
+                    'id': 'topic_id-1',
+                    'version': 1,
+                    'payload': study_guide.to_subtopic_page_dict_for_android()
+                }]
+            )
+
+    def test_get_subtopic_with_study_guide_returns_correct_json(
+        self) -> None:
+        study_guide = self.save_new_study_guide(1, 'user_id', 'topic_id')
+        with self.secrets_swap:
+            self.assertEqual(
+                self.get_json(
+                    '/android_data?activity_type='
+                    'subtopic_with_study_guide&'
+                    'activities_data=[{"id": "topic_id-1", "version": 1}]',
+                    headers={'X-ApiKey': 'secret'},
+                    expected_status_int=200
+                ),
+                [{
+                    'id': 'topic_id-1',
+                    'version': 1,
+                    'payload': study_guide.to_dict()
                 }]
             )
 

@@ -27,8 +27,7 @@ from typing import Dict, List, Literal, Optional, overload
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import classroom_models
-    from mypy_imports import transaction_services
+    from mypy_imports import classroom_models, transaction_services
 
 (classroom_models,) = models.Registry.import_models([models.Names.CLASSROOM])
 transaction_services = models.Registry.import_transaction_services()
@@ -345,13 +344,21 @@ def delete_classroom(classroom_id: str) -> None:
 
     Args:
         classroom_id: str. ID of the classroom which is to be deleted.
+
+    Raises:
+        Exception. If the classroom with the given ID does not exist.
     """
     classrooms = get_all_classrooms()
+    index_to_delete = None
 
     for classroom in classrooms:
         if classroom.classroom_id == classroom_id:
             index_to_delete = classroom.index
             break
+
+    if index_to_delete is None:
+        raise Exception(
+            'Classroom with id %s does not exist.' % classroom_id)
 
     for classroom in classrooms:
         if classroom.index > index_to_delete:

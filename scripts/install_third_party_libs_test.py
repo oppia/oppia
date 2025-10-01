@@ -31,13 +31,15 @@ from core.tests import test_utils
 
 from typing import Final, List, Tuple
 
-from . import clean
-from . import common
-from . import install_dependencies_json_packages
-from . import install_python_prod_dependencies
-from . import install_third_party_libs
-from . import pre_commit_hook
-from . import pre_push_hook
+from . import (
+    clean,
+    common,
+    install_dependencies_json_packages,
+    install_python_prod_dependencies,
+    install_third_party_libs,
+    pre_commit_hook,
+    pre_push_hook,
+)
 
 RELEASE_TEST_DIR: Final = os.path.join('core', 'tests', 'release_sources', '')
 MOCK_TMP_UNZIP_PATH: Final = os.path.join(RELEASE_TEST_DIR, 'tmp_unzip.zip')
@@ -154,9 +156,11 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             pass
         def mock_copytree(unused_src: str, unused_dst: str) -> None:
             pass
-        def mock_main_for_pre_commit_hook(args: List[str]) -> None:  # pylint: disable=unused-argument
+        def mock_main_for_pre_commit_hook( # pylint: disable=unused-argument
+            args: List[str]) -> None:
             check_function_calls['pre_commit_hook_main_is_called'] = True
-        def mock_main_for_pre_push_hook(args: List[str]) -> None:  # pylint: disable=unused-argument
+        def mock_main_for_pre_push_hook( # pylint: disable=unused-argument
+            args: List[str]) -> None:
             check_function_calls['pre_push_hook_main_is_called'] = True
         def mock_isdir(path: str) -> bool:
             correct_google_path = os.path.join(
@@ -250,7 +254,8 @@ class InstallRedisAndElasticSearchTests(test_utils.GenericTestBase):
         ) -> None:
             check_function_calls['download_and_untar_files_is_called'] = True
 
-        def mock_call(unused_cmd_tokens: List[str], **kwargs: str) -> Ret:  # pylint: disable=unused-argument
+        def mock_call( # pylint: disable=unused-argument
+            unused_cmd_tokens: List[str], **kwargs: str) -> Ret:
             check_function_calls['subprocess_call_is_called'] = True
 
             # The first subprocess.call() in install_redis_cli needs to throw an
@@ -423,12 +428,12 @@ class SetupTests(test_utils.GenericTestBase):
         self.cd_swap = self.swap(common, 'CD', MockCD)
         version_info = collections.namedtuple(
             'version_info', ['major', 'minor', 'micro'])
-        self.version_info_py39_swap = self.swap(
-            sys, 'version_info', version_info(major=3, minor=9, micro=20)
+        self.version_info_py310_swap = self.swap(
+            sys, 'version_info', version_info(major=3, minor=10, micro=16)
         )
 
     def test_python_version_testing_with_correct_version(self) -> None:
-        with self.version_info_py39_swap:
+        with self.version_info_py310_swap:
             install_third_party_libs.test_python_version()
 
     def test_python_version_testing_with_incorrect_version_and_linux_os(
@@ -470,13 +475,16 @@ class SetupTests(test_utils.GenericTestBase):
             'close_is_called': True,
             'remove_is_called': True
         }
-        def mock_url_retrieve(unused_url: str, filename: str) -> None:  # pylint: disable=unused-argument
+        def mock_url_retrieve( # pylint: disable=unused-argument
+            unused_url: str, filename: str) -> None:
             check_function_calls['url_retrieve_is_called'] = True
         temp_file = tarfile.open(name=MOCK_TMP_UNTAR_PATH)
-        def mock_open(name: str) -> tarfile.TarFile:  # pylint: disable=unused-argument
+        def mock_open( # pylint: disable=unused-argument
+            name: str) -> tarfile.TarFile:
             check_function_calls['open_is_called'] = True
             return temp_file
-        def mock_extractall(unused_self: str, path: str) -> None:  # pylint: disable=unused-argument
+        def mock_extractall( # pylint: disable=unused-argument
+            unused_self: str, path: str) -> None:
             check_function_calls['extractall_is_called'] = True
         def mock_close(unused_self: str) -> None:
             check_function_calls['close_is_called'] = True
@@ -660,12 +668,14 @@ class GoogleCloudSdkInstallationTests(test_utils.GenericTestBase):
         self.raise_error = False
         def mock_remove(unused_path: str) -> None:
             self.check_function_calls['remove_is_called'] = True
-        def mock_makedirs(unused_path: str, exist_ok: bool = False) -> None:  # pylint: disable=unused-argument
+        def mock_makedirs( # pylint: disable=unused-argument
+            unused_path: str, exist_ok: bool = False) -> None:
             self.check_function_calls['makedirs_is_called'] = True
         self.print_arr: List[str] = []
         def mock_print(msg: str) -> None:
             self.print_arr.append(msg)
-        def mock_url_retrieve(unused_url: str, filename: str) -> None:  # pylint: disable=unused-argument
+        def mock_url_retrieve( # pylint: disable=unused-argument
+            unused_url: str, filename: str) -> None:
             self.check_function_calls['url_retrieve_is_called'] = True
             if self.raise_error:
                 raise Exception
@@ -689,10 +699,12 @@ class GoogleCloudSdkInstallationTests(test_utils.GenericTestBase):
                 return False
             return True
         temp_file = tarfile.open(name=MOCK_TMP_UNTAR_PATH)
-        def mock_open(name: str) -> tarfile.TarFile:  # pylint: disable=unused-argument
+        def mock_open( # pylint: disable=unused-argument
+            name: str) -> tarfile.TarFile:
             self.check_function_calls['open_is_called'] = True
             return temp_file
-        def mock_extractall(unused_self: str, path: str) -> None:  # pylint: disable=unused-argument
+        def mock_extractall( # pylint: disable=unused-argument
+            unused_self: str, path: str) -> None:
             self.check_function_calls['extractall_is_called'] = True
         def mock_close(unused_self: str) -> None:
             self.check_function_calls['close_is_called'] = True
@@ -764,14 +776,17 @@ class GoogleCloudSdkInstallationTests(test_utils.GenericTestBase):
             returncode = 0
             stdout = 'No data to report.'
             stderr = 'None'
-        def mock_subprocess_run(*args: str, **kwargs: str) -> MockProcess: # pylint: disable=unused-argument
+        def mock_subprocess_run( # pylint: disable=unused-argument
+            *args: str, **kwargs: str) -> MockProcess:
             return MockProcess()
 
         temp_file = tarfile.open(name=MOCK_TMP_UNTAR_PATH)
-        def mock_open(name: str) -> tarfile.TarFile:  # pylint: disable=unused-argument
+        def mock_open( # pylint: disable=unused-argument
+            name: str) -> tarfile.TarFile:
             self.check_function_calls['open_is_called'] = True
             return temp_file
-        def mock_extractall(unused_self: str, path: str) -> None:  # pylint: disable=unused-argument
+        def mock_extractall( # pylint: disable=unused-argument
+            unused_self: str, path: str) -> None:
             self.check_function_calls['extractall_is_called'] = True
         def mock_close(unused_self: str) -> None:
             self.check_function_calls['close_is_called'] = True

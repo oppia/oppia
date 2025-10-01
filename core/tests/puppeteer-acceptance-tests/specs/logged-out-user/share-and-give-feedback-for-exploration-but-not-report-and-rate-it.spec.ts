@@ -65,7 +65,7 @@ describe('Logged-out User', function () {
     loggedOutUser = await UserFactory.createLoggedOutUser();
 
     await explorationEditor.navigateToCreatorDashboardPage();
-    await explorationEditor.navigateToExplorationEditorPage();
+    await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
     await explorationEditor.dismissWelcomeModal();
     await explorationEditor.updateCardContent('Introduction to Algebra');
     await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
@@ -77,13 +77,11 @@ describe('Logged-out User', function () {
 
     // Navigate to the new card and update its content.
     await explorationEditor.navigateToCard(CARD_NAME.ALGEBRA_BASICS);
-    await explorationEditor.updateCardContent(
-      'Enter a negative number greater than -100.'
-    );
+    await explorationEditor.updateCardContent('Enter a negative number.');
     await explorationEditor.addInteraction(INTERACTION_TYPES.NUMERIC_INPUT);
     await explorationEditor.addResponsesToTheInteraction(
       INTERACTION_TYPES.NUMERIC_INPUT,
-      '-99',
+      '-1',
       'Perfect!',
       CARD_NAME.FINAL_CARD,
       true
@@ -149,9 +147,18 @@ describe('Logged-out User', function () {
         EXPLORATION_ATTRIBUTION_PRINT
       );
       await loggedOutUser.closeAttributionModal();
-      await loggedOutUser.shareExploration('Facebook', explorationId);
-      await loggedOutUser.shareExploration('Twitter', explorationId);
-      await loggedOutUser.shareExploration('Classroom', explorationId);
+      await loggedOutUser.shareExplorationAndVerifyRedirect(
+        'Facebook',
+        explorationId
+      );
+      await loggedOutUser.shareExplorationAndVerifyRedirect(
+        'Twitter',
+        explorationId
+      );
+      await loggedOutUser.shareExplorationAndVerifyRedirect(
+        'Classroom',
+        explorationId
+      );
 
       await loggedOutUser.embedThisLesson(EXPECTED_EMBED_URL(explorationId));
 

@@ -19,7 +19,7 @@
 import {ChangeListService} from './change-list.service';
 import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ExplorationStatesService} from './exploration-states.service';
 import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
@@ -43,7 +43,7 @@ class MockNgbModal {
 describe('ExplorationStatesService', () => {
   let ngbModal: NgbModal;
   let changeListService: ChangeListService;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let explorationStatesService: ExplorationStatesService;
   let answerGroup: AnswerGroup;
   let generateContentIdService: GenerateContentIdService;
@@ -64,7 +64,7 @@ describe('ExplorationStatesService', () => {
   beforeEach(() => {
     ngbModal = TestBed.inject(NgbModal);
     changeListService = TestBed.inject(ChangeListService);
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     explorationStatesService = TestBed.inject(ExplorationStatesService);
     generateContentIdService = TestBed.inject(GenerateContentIdService);
     generateContentIdService.init(
@@ -75,7 +75,7 @@ describe('ExplorationStatesService', () => {
 
   beforeEach(() => {
     let EXP_ID = '7';
-    spyOn(contextService, 'getExplorationId').and.returnValue(EXP_ID);
+    spyOn(pageContextService, 'getExplorationId').and.returnValue(EXP_ID);
 
     answerGroup = AnswerGroup.createFromBackendDict(
       {

@@ -26,11 +26,9 @@ from core.tests import test_utils
 
 from typing import Final
 
-
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import blog_stats_models
+    from mypy_imports import base_models, blog_stats_models
 
 (base_models, blog_stats_models, user_models) = models.Registry.import_models([
     models.Names.BASE_MODEL, models.Names.BLOG_STATISTICS, models.Names.USER
@@ -113,7 +111,10 @@ class BlogPostViewedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         time_in_millisecs = utils.get_current_time_in_millisecs()
         mock_get_current_time_in_millisecs = lambda: time_in_millisecs
         rand_hash = '123456789123'
-        def mock_convert_to_hash(input_string: str, max_length: int) -> str: # pylint: disable=unused-argument
+        def mock_convert_to_hash(
+            input_string: str, # pylint: disable=unused-argument
+            max_length: int, # pylint: disable=unused-argument
+        ) -> str:
             return rand_hash
         with self.swap(
             utils,
@@ -223,7 +224,10 @@ class BlogPostReadEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         time_in_millisecs = utils.get_current_time_in_millisecs()
         rand_hash = '123456789123'
         mock_get_current_time_in_millisecs = lambda: time_in_millisecs
-        def mock_convert_to_hash(input_string: str, max_length: int) -> str: # pylint: disable=unused-argument
+        def mock_convert_to_hash(
+            input_string: str, # pylint: disable=unused-argument
+            max_length: int, # pylint: disable=unused-argument
+        ) -> str:
             return rand_hash
         with self.swap(
             utils,
@@ -352,7 +356,10 @@ class BlogPostExitedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         time_in_millisecs = utils.get_current_time_in_millisecs()
         mock_get_current_time_in_millisecs = lambda: time_in_millisecs
         rand_hash = '123456789123'
-        def mock_convert_to_hash(input_string: str, max_length: int) -> str: # pylint: disable=unused-argument
+        def mock_convert_to_hash(
+            input_string: str, # pylint: disable=unused-argument
+            max_length: int, # pylint: disable=unused-argument
+        ) -> str:
             return rand_hash
         with self.swap(
             utils,

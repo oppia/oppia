@@ -35,7 +35,7 @@ enum INTERACTION_TYPES {
 enum CARD_NAME {
   INTRODUCTION = 'Introduction',
   TEST_QUESTION = 'Test Question',
-  REVISION_CARD = 'Revision Card',
+  STUDY_GUIDE = 'Study Guide',
   FINAL_CARD = 'Final Card',
 }
 
@@ -54,7 +54,7 @@ describe('Logged-out User', function () {
     );
 
     await explorationEditor.navigateToCreatorDashboardPage();
-    await explorationEditor.navigateToExplorationEditorPage();
+    await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
     await explorationEditor.dismissWelcomeModal();
     await explorationEditor.updateCardContent(
       'We will be learning positive numbers.'
@@ -68,15 +68,13 @@ describe('Logged-out User', function () {
 
     // Navigate to the new card and update its content.
     await explorationEditor.navigateToCard(CARD_NAME.TEST_QUESTION);
-    await explorationEditor.updateCardContent(
-      'Enter a negative number greater than -100.'
-    );
+    await explorationEditor.updateCardContent('Enter a negative number.');
     await explorationEditor.addInteraction(INTERACTION_TYPES.NUMERIC_INPUT);
     await explorationEditor.addResponsesToTheInteraction(
       INTERACTION_TYPES.NUMERIC_INPUT,
-      '-99',
+      '-1',
       'Prefect!',
-      CARD_NAME.REVISION_CARD,
+      CARD_NAME.STUDY_GUIDE,
       true
     );
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
@@ -84,8 +82,8 @@ describe('Logged-out User', function () {
     );
     await explorationEditor.saveExplorationDraft();
 
-    // Navigate to the new card and Revision content.
-    await explorationEditor.navigateToCard(CARD_NAME.REVISION_CARD);
+    // Navigate to the new card and Study Guide content.
+    await explorationEditor.navigateToCard(CARD_NAME.STUDY_GUIDE);
     await explorationEditor.updateCardContent(
       'Positive numbers are greater than zero.'
     );
@@ -144,7 +142,7 @@ describe('Logged-out User', function () {
       // Reloading from the current progress.
       await loggedOutUser.reloadPage();
 
-      await loggedOutUser.expectProgressRemainder(true);
+      await loggedOutUser.expectProgressReminder(true);
       // Continue the exploration from where they left off.
       await loggedOutUser.chooseActionInProgressRemainder('Restart');
 
@@ -154,7 +152,7 @@ describe('Logged-out User', function () {
 
       // Again reload the page to check the 'Resume' exploration in the progress remainder as well.
       await loggedOutUser.reloadPage();
-      await loggedOutUser.expectProgressRemainder(true);
+      await loggedOutUser.expectProgressReminder(true);
       await loggedOutUser.chooseActionInProgressRemainder('Resume');
 
       await loggedOutUser.continueToNextCard();

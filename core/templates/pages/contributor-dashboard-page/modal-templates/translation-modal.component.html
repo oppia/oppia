@@ -1,4 +1,4 @@
-<div class="oppia-translate-text-header-container">
+<div class="oppia-translate-text-header-container e2e-test-translate-text-header-container">
   <div class="oppia-translate-text-header">
     <div class="oppia-opportunities-details">
       <div class="oppia-opportunities-subheading">
@@ -15,7 +15,7 @@
       </div>
     </div>
     <button type="button"
-            class="close oppia-close-button-position"
+            class="close oppia-close-button-position e2e-test-close-modal-button"
             (click)="close()"
             aria-label="Close">
       <span aria-hidden="true">&times;</span>
@@ -37,7 +37,7 @@
   <div *ngIf="textToTranslate">
     <div class="oppia-translatable-text-section">
       <strong>Please translate the given {{ activeContentType }} in {{ languageDescription }}:</strong>
-      <a class="oppia-skip-button" *ngIf="moreAvailable" (click)="skipActiveTranslation()">Skip</a>
+      <a class="oppia-skip-button e2e-test-skip-translation-button" *ngIf="moreAvailable" (click)="skipActiveTranslation()">Skip</a>
     </div>
     <div *ngIf="!loadingData && !uploadingTranslation"
          class="oppia-text-to-translate-container"

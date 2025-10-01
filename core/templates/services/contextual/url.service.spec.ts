@@ -195,9 +195,10 @@ describe('Url Service', () => {
   });
 
   it('should correctly retrieve subtopic url fragment from url', () => {
-    mockLocation.pathname = '/learn/math/fractions/revision/xyz';
+    mockLocation.pathname = '/learn/math/fractions/studyguide/xyz';
     expect(urlService.getSubtopicUrlFragmentFromLearnerUrl()).toBe('xyz');
-    mockLocation.pathname = '/learn/math/topic-name/revision/negative-numbers';
+    mockLocation.pathname =
+      '/learn/math/topic-name/studyguide/negative-numbers';
     expect(urlService.getSubtopicUrlFragmentFromLearnerUrl()).toBe(
       'negative-numbers'
     );
@@ -262,9 +263,9 @@ describe('Url Service', () => {
   });
 
   it('should correctly retrieve subtopic id from url', () => {
-    mockLocation.pathname = '/learn/math/abcdefgijklm/revision/1';
+    mockLocation.pathname = '/learn/math/abcdefgijklm/studyguide/1';
     expect(urlService.getSubtopicIdFromUrl()).toBe('1');
-    mockLocation.pathname = '/learn/math/topic%20name/revision/20';
+    mockLocation.pathname = '/learn/math/topic%20name/studyguide/20';
     expect(urlService.getSubtopicIdFromUrl()).toBe('20');
     mockLocation.pathname = '/subtopic/abcdefgijklm';
     expect(function () {

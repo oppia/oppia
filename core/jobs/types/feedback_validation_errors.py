@@ -28,7 +28,7 @@ if MYPY: # pragma: no cover
 (feedback_models,) = models.Registry.import_models([models.Names.FEEDBACK])
 
 
-class InvalidEntityTypeError(base_validation_errors.BaseAuditError):
+class InvalidEntityTypeError(base_validation_errors.BaseValidationError):
     """Error class for models that have invalid entity type."""
 
     def __init__(

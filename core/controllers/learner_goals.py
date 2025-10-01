@@ -17,12 +17,9 @@
 from __future__ import annotations
 
 from core import feconf
-
 from core.constants import constants
-from core.controllers import acl_decorators
-from core.controllers import base
-from core.domain import learner_goals_services
-from core.domain import learner_progress_services
+from core.controllers import acl_decorators, base
+from core.domain import learner_goals_services, learner_progress_services
 
 from typing import Dict
 
@@ -64,7 +61,9 @@ class LearnerGoalsHandler(
     # exception below and use an 'if-else' clause inside the function
     # body to handle the different activity cases properly.
     @acl_decorators.can_access_learner_dashboard
-    def post(self, activity_type: str, topic_id: str) -> None:  # pylint: disable=unused-argument
+    def post(
+        self, activity_type: str, topic_id: str # pylint: disable=unused-argument
+    ) -> None:
         """Adds a topic to the learner's learning goals.
 
         Args:
@@ -93,7 +92,9 @@ class LearnerGoalsHandler(
     # exception below and use an 'if-else' clause inside the function
     # body to handle the different activity cases properly.
     @acl_decorators.can_access_learner_dashboard
-    def delete(self, activity_type: str, topic_id: str) -> None:  # pylint: disable=unused-argument
+    def delete(
+        self, activity_type: str, topic_id: str # pylint: disable=unused-argument
+    ) -> None:
         """Removes a topic from the learner's learning goals.
 
         Args:

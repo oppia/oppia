@@ -20,9 +20,7 @@ import builtins
 import subprocess
 
 from core.tests import test_utils
-from scripts import common
-from scripts import generate_root_files_mapping
-from scripts import run_typescript_checks
+from scripts import common, generate_root_files_mapping, run_typescript_checks
 
 
 class GenerateRootFilesMappingTests(test_utils.GenericTestBase):
@@ -50,9 +48,9 @@ class GenerateRootFilesMappingTests(test_utils.GenericTestBase):
     def test_generate_root_files_mapping_success(self) -> None:
         process = subprocess.Popen(
             ['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        def mock_subprocess_popen(
+        def mock_subprocess_popen( # pylint: disable=unused-argument
             cmd: list[str],
-            stdout: int, stderr: int # pylint: disable=unused-argument
+            stdout: int, stderr: int
         ) -> subprocess.Popen[bytes]:
             self.assertEqual(cmd, [
                 common.NODE_BIN_PATH,
@@ -76,9 +74,9 @@ class GenerateRootFilesMappingTests(test_utils.GenericTestBase):
             return (b'', b'Error')
         process = subprocess.Popen(
             ['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        def mock_subprocess_popen(
+        def mock_subprocess_popen( # pylint: disable=unused-argument
             cmd: list[str],
-            stdout: int, stderr: int # pylint: disable=unused-argument
+            stdout: int, stderr: int
         ) -> subprocess.Popen[bytes]:
             self.assertEqual(cmd, [
                 common.NODE_BIN_PATH,

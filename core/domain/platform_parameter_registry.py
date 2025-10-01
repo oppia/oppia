@@ -19,17 +19,18 @@
 from __future__ import annotations
 
 from core import feconf
-from core.domain import caching_services
-from core.domain import platform_parameter_domain
-from core.domain import platform_parameter_list
+from core.domain import (
+    caching_services,
+    platform_parameter_domain,
+    platform_parameter_list,
+)
 from core.platform import models
 
 from typing import Dict, List, Optional, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import config_models
-    from mypy_imports import suggestion_models
+    from mypy_imports import config_models, suggestion_models
 
 (config_models, suggestion_models) = models.Registry.import_models(
     [models.Names.CONFIG, models.Names.SUGGESTION])
@@ -375,9 +376,7 @@ Registry.create_platform_parameter(
     platform_parameter_domain.DataTypes.STRING,
     default=(
         'You can change your email preferences via the '
-        '<a href="%s%s">Preferences</a> page.' % (
-            feconf.OPPIA_SITE_URL,
-            feconf.PREFERENCES_URL)
+        '<a href="LINK_TO_PREFERENCES_PAGE">Preferences</a> page.'
     )
 )
 

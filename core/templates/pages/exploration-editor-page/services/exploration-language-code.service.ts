@@ -21,7 +21,7 @@ import {ExplorationPropertyService} from './exploration-property.service';
 import {AlertsService} from 'services/alerts.service';
 import {ChangeListService} from './change-list.service';
 import {LoggerService} from 'services/contextual/logger.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 
 import {AppConstants} from 'app.constants';
 
@@ -31,7 +31,7 @@ import {AppConstants} from 'app.constants';
 export class ExplorationLanguageCodeService extends ExplorationPropertyService {
   propertyName: string = 'language_code';
   constructor(
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     protected alertsService: AlertsService,
     protected changeListService: ChangeListService,
     protected loggerService: LoggerService
@@ -41,7 +41,7 @@ export class ExplorationLanguageCodeService extends ExplorationPropertyService {
 
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   getSupportedContentLanguages() {
-    if (this.contextService.isExplorationLinkedToStory()) {
+    if (this.pageContextService.isExplorationLinkedToStory()) {
       return AppConstants.SUPPORTED_CONTENT_LANGUAGES_FOR_ANDROID;
     }
     return AppConstants.SUPPORTED_CONTENT_LANGUAGES;

@@ -54,7 +54,6 @@
 /core/templates/components/oppia-angular-root.component.* @oppia/lace-frontend-reviewers
 /core/templates/modules/ @oppia/lace-frontend-reviewers
 /core/templates/pages/common-imports.ts @oppia/lace-frontend-reviewers
-/core/templates/pages/mock-ajs.ts @oppia/lace-frontend-reviewers
 /core/templates/pages/oppia-root/ @oppia/lace-frontend-reviewers
 /core/templates/pages/lightweight-oppia-root/ @oppia/lace-frontend-reviewers
 /core/templates/i18n/ @oppia/lace-frontend-reviewers
@@ -65,8 +64,6 @@
 /core/templates/services/i18n-language-code.service.ts @oppia/lace-frontend-reviewers
 /core/templates/services/question-validation.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/request-interceptor.service*.ts @oppia/lace-frontend-reviewers
-/core/templates/services/UpgradedServices.ts @oppia/lace-frontend-reviewers
-/core/templates/hybrid-router-module-provider*.ts @oppia/lace-frontend-reviewers
 /core/templates/utility/hashes.ts @oppia/lace-frontend-reviewers
 /core/templates/utility/string-utility*.ts @oppia/lace-frontend-reviewers
 /proxy.conf.json @oppia/lace-frontend-reviewers
@@ -98,6 +95,7 @@
 /core/templates/services/entity-translations.services.ts @oppia/lace-frontend-reviewers
 /core/templates/services/entity-voiceovers.services.ts @oppia/lace-frontend-reviewers
 /core/templates/services/voiceover-language-management-service.ts @oppia/lace-frontend-reviewers
+/core/templates/services/automatic-voiceover-highlight-service.ts @oppia/lace-frontend-reviewers
 
 
 # Audio Voiceover project
@@ -147,7 +145,6 @@
 /CHANGELOG @oppia/release-workflow-reviewers
 /core/templates/pages/android-page/ @oppia/lace-frontend-reviewers
 /core/templates/pages/about-page/ @oppia/lace-frontend-reviewers
-/core/templates/pages/about-page/about-page.constants.ts @oppia/lace-frontend-reviewers
 /core/templates/pages/license-page/ @oppia/lace-frontend-reviewers
 /core/templates/pages/privacy-page/ @oppia/lace-frontend-reviewers
 /core/templates/pages/privacy-page/privacy-page.component.ts @oppia/lace-frontend-reviewers
@@ -194,6 +191,7 @@
 /docker/ @oppia/dev-workflow-reviewers
 /Makefile @oppia/dev-workflow-reviewers
 /tox.ini @oppia/dev-workflow-reviewers
+/pyproject.toml @oppia/dev-workflow-reviewers
 /scripts/*.py @oppia/dev-workflow-reviewers
 /scripts/check_frontend_test_coverage*.py @oppia/dev-workflow-reviewers
 /scripts/install_prerequisites.sh @oppia/dev-workflow-reviewers
@@ -242,7 +240,7 @@
 /core/templates/components/state-editor/ @oppia/lace-frontend-reviewers
 /core/templates/services/blog-search.service.ts @oppia/lace-frontend-reviewers
 /core/templates/services/compute-graph.service.ts @oppia/lace-frontend-reviewers
-/core/templates/services/context.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/page-context.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/editability.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/exploration-features*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/exploration-html-formatter.service*.ts @oppia/lace-frontend-reviewers
@@ -292,6 +290,7 @@
 /core/templates/components/common-layout-directives/common-elements/sharing-links.component*.ts @oppia/lace-frontend-reviewers
 /core/templates/components/common-layout-directives/common-elements/common-elements.module.ts @oppia/lace-frontend-reviewers
 /core/templates/components/custom-snackbar/ @oppia/lace-frontend-reviewers
+/core/templates/components/progress-bar/ @oppia/lace-frontend-reviewers
 /core/templates/components/language-banner/ @oppia/lace-frontend-reviewers
 /core/templates/components/profile-link-directives/ @oppia/lace-frontend-reviewers
 /core/templates/components/summary-tile/ @oppia/lace-frontend-reviewers
@@ -461,6 +460,8 @@
 # Instead of * we have used _* to avoid topics_and_skills_dashboard related files.
 /core/controllers/classroom*.py @oppia/lace-backend-reviewers
 /core/controllers/topic_*.py @oppia/lace-backend-reviewers
+/core/domain/study_guide_domain*.py @oppia/lace-backend-reviewers
+/core/domain/study_guide_services*.py @oppia/lace-backend-reviewers
 /core/domain/subtopic_page_domain*.py @oppia/lace-backend-reviewers
 /core/domain/subtopic_page_services*.py @oppia/lace-backend-reviewers
 /core/domain/topic*.py @oppia/lace-backend-reviewers
@@ -497,6 +498,10 @@
 /core/templates/domain/jobs/ @oppia/lace-frontend-reviewers
 /core/controllers/beam_jobs*.py @oppia/lace-backend-reviewers
 /core/domain/beam_job*.py @oppia/lace-backend-reviewers
+
+# Cloud task run.
+/core/domain/cloud_task_domain*.py @oppia/lace-backend-reviewers
+/core/templates/domain/cloud-task/cloud-task-run.model*.ts @oppia/lace-frontend-reviewers
 
 # Infrastructure.
 /core/controllers/cron*.py @oppia/lace-backend-reviewers
@@ -561,6 +566,7 @@
 /core/templates/pages/blog-admin-page/ @oppia/lace-frontend-reviewers
 /core/templates/pages/classroom-admin-page/ @oppia/lace-frontend-reviewers
 /core/templates/pages/voiceover-admin-page/ @oppia/lace-frontend-reviewers
+
 
 
 # Release team.
@@ -705,7 +711,6 @@
 /core/tests/ @oppia/dev-workflow-reviewers
 /assets/ @oppia/lace-frontend-reviewers
 /data/ @oppia/lace-backend-reviewers
-/core/templates/karma.module.ts @oppia/dev-workflow-reviewers
 /core/tests/webdriverio_utils/ @oppia/dev-workflow-reviewers
 /core/tests/webdriverio_desktop/ @oppia/dev-workflow-reviewers
 /core/tests/webdriverio/ @oppia/dev-workflow-reviewers
@@ -784,8 +789,6 @@
 /core/domain/role_services*.py @oppia/core-reviewers
 /core/storage/ @oppia/core-reviewers
 /core/domain/user*.py @oppia/core-reviewers
-/AUTHORS @oppia/core-reviewers
-/CONTRIBUTORS @oppia/core-reviewers
 /LICENSE @oppia/core-reviewers
 /NOTICE @oppia/core-reviewers
 /core/templates/pages/terms-page/terms-page.component.html @oppia/core-reviewers

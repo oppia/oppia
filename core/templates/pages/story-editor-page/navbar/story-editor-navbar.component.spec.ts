@@ -171,7 +171,6 @@ describe('Story editor navbar component', () => {
         language_code: 'en',
         version: 1,
         misconception_count: 1,
-        worked_examples_count: 1,
         skill_model_created_on: 1,
         skill_model_last_updated: 1,
       },

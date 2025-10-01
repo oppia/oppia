@@ -23,16 +23,17 @@ import os
 import re
 import zipfile
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import exp_domain
-from core.domain import exp_services
-from core.domain import fs_services
-from core.domain import platform_parameter_list
-from core.domain import rights_manager
-from core.domain import subscription_services
-from core.domain import user_services
+from core.domain import (
+    exp_domain,
+    exp_services,
+    fs_services,
+    platform_parameter_list,
+    rights_manager,
+    subscription_services,
+    user_services,
+)
 from core.platform import models
 from core.tests import test_utils
 
@@ -40,8 +41,7 @@ from typing import Final
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import secrets_services
-    from mypy_imports import user_models
+    from mypy_imports import secrets_services, user_models
 
 secrets_services = models.Registry.import_secrets_services()
 (user_models,) = models.Registry.import_models([models.Names.USER])
@@ -662,6 +662,14 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
             (platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT, 'sub'), # pylint: disable=line-too-long
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.OPPIA_PROJECT_ID,
+                'dev-project-id'
+            )
         ]
     )
     def test_send_post_signup_email(self) -> None:
@@ -1092,6 +1100,22 @@ class SignupTests(test_utils.GenericTestBase):
             (platform_parameter_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT, 'body'), # pylint: disable=line-too-long
             (platform_parameter_list.ParamName.EMAIL_FOOTER, 'footer'), # pylint: disable=line-too-long
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'), # pylint: disable=line-too-long
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                'noreply@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.OPPIA_PROJECT_ID,
+                'dev-project-id'
+            )
         ]
     )
     def test_user_settings_of_existing_user(self) -> None:
@@ -1215,8 +1239,6 @@ class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.swap_secret = self.swap_to_always_return(
             secrets_services, 'get_secret', 'secret')
-        self.swap_audience_id = (
-            self.swap(feconf, 'MAILCHIMP_AUDIENCE_ID', 'audience_id'))
         user_services.update_email_preferences(
             self.editor_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE,
             feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
@@ -1249,8 +1271,14 @@ class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
             'Missing key in handler args: data[email].'
         )
 
+    @test_utils.set_platform_parameters(
+        [(
+            platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID,
+            'audience_id'
+        )]
+    )
     def test_post_with_different_audience_id(self) -> None:
-        with self.swap_secret, self.swap_audience_id:
+        with self.swap_secret:
             json_response = self.post_json(
                 '%s/secret' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT, {
                     'data[list_id]': 'invalid_audience_id',
@@ -1259,8 +1287,14 @@ class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
                 }, use_payload=False)
             self.assertEqual(json_response, {})
 
+    @test_utils.set_platform_parameters(
+        [(
+            platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID,
+            'audience_id'
+        )]
+    )
     def test_post_with_invalid_email_id(self) -> None:
-        with self.swap_secret, self.swap_audience_id:
+        with self.swap_secret:
             json_response = self.post_json(
                 '%s/secret' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT, {
                     'data[list_id]': 'audience_id',
@@ -1281,8 +1315,20 @@ class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
                 self.assertIn(
                     'Received invalid Mailchimp webhook secret', captured_logs)
 
+    @test_utils.set_platform_parameters(
+        [(
+            platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID,
+            'audience_id'
+        ), (
+            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+            'system@example.com'
+        ), (
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS,
+            False
+        )]
+    )
     def test_post(self) -> None:
-        with self.swap_secret, self.swap_audience_id:
+        with self.swap_secret:
             user_services.update_email_preferences(
                 self.editor_id,
                 False,

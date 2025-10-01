@@ -18,23 +18,26 @@ from __future__ import annotations
 
 from core import feconf
 from core.constants import constants
-from core.controllers import acl_decorators
-from core.controllers import base
-from core.domain import app_feedback_report_services
-from core.domain import beam_job_services
-from core.domain import cron_services
-from core.domain import email_manager
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_services
-from core.domain import story_services
-from core.domain import suggestion_registry
-from core.domain import suggestion_services
-from core.domain import taskqueue_services
-from core.domain import user_services
-from core.jobs.batch_jobs import blog_post_search_indexing_jobs
-from core.jobs.batch_jobs import exp_recommendation_computation_jobs
-from core.jobs.batch_jobs import exp_search_indexing_jobs
-from core.jobs.batch_jobs import user_stats_computation_jobs
+from core.controllers import acl_decorators, base
+from core.domain import (
+    app_feedback_report_services,
+    beam_job_services,
+    cron_services,
+    email_manager,
+    platform_parameter_list,
+    platform_parameter_services,
+    story_services,
+    suggestion_registry,
+    suggestion_services,
+    taskqueue_services,
+    user_services,
+)
+from core.jobs.batch_jobs import (
+    blog_post_search_indexing_jobs,
+    exp_recommendation_computation_jobs,
+    exp_search_indexing_jobs,
+    user_stats_computation_jobs,
+)
 
 from typing import DefaultDict, Dict, List
 
@@ -78,7 +81,8 @@ class CronUserDeletionHandler(
     def get(self) -> None:
         """Handles GET requests."""
         taskqueue_services.defer(
-            taskqueue_services.FUNCTION_ID_DELETE_USERS_PENDING_TO_BE_DELETED,
+            feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+                'FUNCTION_ID_DELETE_USERS_PENDING_TO_BE_DELETED'],
             taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
         return self.render_json({})
 
@@ -96,7 +100,8 @@ class CronFullyCompleteUserDeletionHandler(
     def get(self) -> None:
         """Handles GET requests."""
         taskqueue_services.defer(
-            taskqueue_services.FUNCTION_ID_CHECK_COMPLETION_OF_USER_DELETION,
+            feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+                'FUNCTION_ID_CHECK_COMPLETION_OF_USER_DELETION'],
             taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
         return self.render_json({})
 

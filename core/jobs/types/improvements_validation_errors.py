@@ -29,7 +29,7 @@ if MYPY: # pragma: no cover
     [models.Names.IMPROVEMENTS])
 
 
-class InvalidCompositeEntityError(base_validation_errors.BaseAuditError):
+class InvalidCompositeEntityError(base_validation_errors.BaseValidationError):
     """Error class for models that have invalid composite entity id."""
 
     def __init__(

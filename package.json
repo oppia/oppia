@@ -1,6 +1,6 @@
 {
   "name": "oppia",
-  "version": "3.4.6",
+  "version": "3.4.7",
   "description": "Oppia enables the creation of interactive online lessons.",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -226,6 +226,8 @@
     "wdio-intercept-service": "^4.2.2"
   },
   "resolutions": {
-    "@types/babel__traverse": "7.20.6"
+    "@types/babel__traverse": "7.20.6",
+    "pretty-format": "27.0.0",
+    "expect": "27.0.0"
   }
 }

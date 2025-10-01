@@ -20,43 +20,42 @@ from __future__ import annotations
 
 import json
 
-from core import android_validation_constants
-from core import feature_flag_list
-from core import feconf
+from core import android_validation_constants, feature_flag_list, feconf
 from core.constants import constants
-from core.controllers import acl_decorators
-from core.controllers import base
-from core.controllers import incoming_app_feedback_report
-from core.domain import blog_services
-from core.domain import exp_domain
-from core.domain import exp_services
-from core.domain import feedback_services
-from core.domain import question_domain
-from core.domain import question_services
-from core.domain import rights_domain
-from core.domain import rights_manager
-from core.domain import skill_services
-from core.domain import state_domain
-from core.domain import story_services
-from core.domain import subtopic_page_domain
-from core.domain import subtopic_page_services
-from core.domain import suggestion_services
-from core.domain import topic_domain
-from core.domain import topic_fetchers
-from core.domain import topic_services
-from core.domain import translation_domain
-from core.domain import user_services
+from core.controllers import acl_decorators, base, incoming_app_feedback_report
+from core.domain import (
+    blog_services,
+    exp_domain,
+    exp_services,
+    feedback_services,
+    question_domain,
+    question_services,
+    rights_domain,
+    rights_manager,
+    skill_services,
+    state_domain,
+    story_services,
+    study_guide_domain,
+    study_guide_services,
+    subtopic_page_domain,
+    subtopic_page_services,
+    suggestion_services,
+    topic_domain,
+    topic_fetchers,
+    topic_services,
+    translation_domain,
+    user_services,
+)
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Final, List, Union
 import webapp2
 import webtest
+from typing import Dict, Final, List, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import datastore_services
-    from mypy_imports import secrets_services
+    from mypy_imports import datastore_services, secrets_services
 
 datastore_services = models.Registry.import_datastore_services()
 secrets_services = models.Registry.import_secrets_services()
@@ -1447,8 +1446,9 @@ class ViewFeedbackThreadTests(test_utils.GenericTestBase):
                 '/mock_view_feedback_thread/%s' % self.private_exp_thread_id,
                 expected_status_int=401)
             self.assertEqual(
-                response['error'], 'You do not have credentials to view '
-                'exploration feedback.')
+                response['error'],
+                'You do not have credentials to view exploration feedback.'
+            )
         self.logout()
 
     def test_viewer_cannot_view_feedback_threads_with_invalid_thread_id(
@@ -1791,7 +1791,8 @@ class CanAccessReleaseCoordinatorPageDecoratorTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.CURRICULUM_ADMIN_USERNAME)
+        self.system_email_address = 'system@example.com'
+        self.signup(self.system_email_address, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
 
         self.signup(
@@ -1828,7 +1829,7 @@ class CanAccessReleaseCoordinatorPageDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_super_admin_cannot_access_release_coordinator_page(self) -> None:
-        self.login(feconf.SYSTEM_EMAIL_ADDRESS)
+        self.login(self.system_email_address)
 
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -2285,7 +2286,8 @@ class CanRunAnyJobDecoratorTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.CURRICULUM_ADMIN_USERNAME)
+        self.system_email_address = 'system@example.com'
+        self.signup(self.system_email_address, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
 
         self.signup(
@@ -2320,7 +2322,7 @@ class CanRunAnyJobDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_super_admin_cannot_access_release_coordinator_page(self) -> None:
-        self.login(feconf.SYSTEM_EMAIL_ADDRESS)
+        self.login(self.system_email_address)
 
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/run-anny-job', expected_status_int=401)
@@ -2417,7 +2419,8 @@ class CanManageMemcacheDecoratorTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.CURRICULUM_ADMIN_USERNAME)
+        self.system_email_address = 'system@example.com'
+        self.signup(self.system_email_address, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
 
         self.signup(
@@ -2454,7 +2457,7 @@ class CanManageMemcacheDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_super_admin_cannot_access_release_coordinator_page(self) -> None:
-        self.login(feconf.SYSTEM_EMAIL_ADDRESS)
+        self.login(self.system_email_address)
 
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -2615,7 +2618,8 @@ class DeleteAnyUserTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.CURRICULUM_ADMIN_USERNAME)
+        self.system_email_address = 'system@example.com'
+        self.signup(self.system_email_address, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/', self.MockHandler)],
@@ -2633,7 +2637,7 @@ class DeleteAnyUserTests(test_utils.GenericTestBase):
             self.get_json('/mock/', expected_status_int=401)
 
     def test_primary_admin_can_delete_any_user(self) -> None:
-        self.login(feconf.SYSTEM_EMAIL_ADDRESS)
+        self.login(self.system_email_address)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/')
         self.assertEqual(response['success'], 1)
@@ -4757,7 +4761,7 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
             response = self.get_json(
                 '/mock_edit_story/%s' % self.story_id, expected_status_int=404)
         error_msg = (
-            'Could not find the resource http://localhost/mock_edit_story/%s.' 
+            'Could not find the resource http://localhost/mock_edit_story/%s.'
             % (self.story_id)
         )
         self.assertEqual(response['error'], error_msg)
@@ -5533,11 +5537,17 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
             '<topic_url_fragment>/<subtopic_url_fragment>')
         subtopic_page_url = (
             '/mock_subtopic_page/<classroom_url_fragment>/'
-            '<topic_url_fragment>/revision/<subtopic_url_fragment>')
+            '<topic_url_fragment>/studyguide/'
+            '<subtopic_url_fragment>')
+        study_guide_url = (
+            '/mock_study_guide/<classroom_url_fragment>/'
+            '<topic_url_fragment>/studyguide/'
+            '<subtopic_url_fragment>')
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [
                 webapp2.Route(subtopic_data_url, self.MockDataHandler),
-                webapp2.Route(subtopic_page_url, self.MockPageHandler)
+                webapp2.Route(subtopic_page_url, self.MockPageHandler),
+                webapp2.Route(study_guide_url, self.MockPageHandler)
             ],
             debug=feconf.DEBUG,
         ))
@@ -5570,6 +5580,34 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
             subtopics=[subtopic_1, subtopic_2], next_subtopic_id=3,
             url_fragment='topic-frag')
 
+        self.topic_id_2 = topic_fetchers.get_new_topic_id()
+        subtopic_3 = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title 3', 'url-frag-three')
+        subtopic_3.skill_ids = ['skill_id_3']
+        subtopic_3.url_fragment = 'sub-three-frag'
+        subtopic_4 = topic_domain.Subtopic.create_default_subtopic(
+            2, 'Subtopic Title 4', 'url-frag-four')
+        subtopic_4.skill_ids = ['skill_id_4']
+        subtopic_4.url_fragment = 'sub-four-frag'
+        self.study_guide_1 = (
+            study_guide_domain.StudyGuide.create_study_guide(
+                1, self.topic_id_2, 'Heading', '<p>Content</p>'))
+        study_guide_services.save_study_guide(
+            self.admin_id, self.study_guide_1, 'Added study guide',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 1,
+                'title': 'Sample',
+                'url_fragment': 'sample-fragment-two'
+            })]
+        )
+        self.save_new_topic(
+            self.topic_id_2, self.admin_id, name='topic name 2',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[subtopic_3, subtopic_4], next_subtopic_id=3,
+            url_fragment='topic-frag-two')
+
     def test_cannot_access_non_existent_subtopic(self) -> None:
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -5582,6 +5620,18 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
                 '/mock_subtopic_data/staging/topic-frag/sub-one-frag',
                 expected_status_int=404)
 
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames
+        .SHOW_RESTRUCTURED_STUDY_GUIDES
+    ])
+    def test_can_access_subtopic_when_topic_is_published_with_flag(
+        self) -> None:
+        topic_services.publish_topic(self.topic_id_2, self.admin_id)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_subtopic_data/staging/topic-frag-two/sub-three-frag',
+                expected_status_int=200)
+
     def test_can_access_subtopic_when_topic_is_published(self) -> None:
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -5593,7 +5643,7 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
         self.login(self.banned_user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
-                '/mock_subtopic_page/staging/topic-frag/revision/000',
+                '/mock_subtopic_page/staging/topic-frag/studyguide/000',
                 expected_status_int=302)
             self.assertEqual(
                 response.headers['location'], 'http://localhost/learn/staging')
@@ -5602,44 +5652,85 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
     def test_can_access_subtopic_when_all_url_fragments_are_valid(self) -> None:
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
+            studyguide_url_fragment = 'studyguide/sub-one-frag'
             self.get_html_response(
-                '/mock_subtopic_page/staging/topic-frag/revision/sub-one-frag',
+                '/mock_subtopic_page/staging/topic-frag/%s'
+                % studyguide_url_fragment,
                 expected_status_int=200)
 
-    def test_fall_back_to_revision_page_if_subtopic_url_frag_is_invalid(
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames
+        .SHOW_RESTRUCTURED_STUDY_GUIDES
+    ])
+    def test_can_access_subtopic_when_all_url_fragments_are_valid_with_flag(
+            self) -> None:
+        topic_services.publish_topic(self.topic_id_2, self.admin_id)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            studyguide_url_fragment = 'studyguide/sub-three-frag'
+            self.get_html_response(
+                '/mock_study_guide/staging/topic-frag-two/%s'
+                % studyguide_url_fragment,
+                expected_status_int=200)
+
+    def test_fall_back_to_studyguide_page_if_subtopic_url_frag_is_invalid(
         self
     ) -> None:
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
-                '/mock_subtopic_page/staging/topic-frag/revision/000',
+                '/mock_subtopic_page/staging/topic-frag/studyguide/000',
                 expected_status_int=302)
             self.assertEqual(
-                'http://localhost/learn/staging/topic-frag/revision',
+                'http://localhost/learn/staging/topic-frag/studyguide',
                 response.headers['location'])
 
-    def test_fall_back_to_revision_page_when_subtopic_page_does_not_exist(
+    def test_fall_back_to_studyguide_page_when_subtopic_page_does_not_exist(
         self
     ) -> None:
+        studyguide_url_fragment = 'studyguide/sub-one-frag'
         topic_services.publish_topic(self.topic_id, self.admin_id)
         testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
         subtopic_swap = self.swap_to_always_return(
             subtopic_page_services, 'get_subtopic_page_by_id', None)
         with testapp_swap, subtopic_swap:
             response = self.get_html_response(
-                '/mock_subtopic_page/staging/topic-frag/revision/sub-one-frag',
+                '/mock_subtopic_page/staging/topic-frag/%s'
+                % studyguide_url_fragment,
                 expected_status_int=302)
             self.assertEqual(
-                'http://localhost/learn/staging/topic-frag/revision',
+                'http://localhost/learn/staging/topic-frag/studyguide',
+                response.headers['location'])
+
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames
+        .SHOW_RESTRUCTURED_STUDY_GUIDES
+    ])
+    def test_fall_back_to_studyguide_page_when_study_guide_does_not_exist(
+        self
+    ) -> None:
+        studyguide_url_fragment = 'studyguide/sub-three-frag'
+        topic_services.publish_topic(self.topic_id_2, self.admin_id)
+        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
+        subtopic_swap = self.swap_to_always_return(
+            study_guide_services, 'get_study_guide_by_id', None)
+        with testapp_swap, subtopic_swap:
+            response = self.get_html_response(
+                '/mock_study_guide/staging/topic-frag-two/%s'
+                % studyguide_url_fragment,
+                expected_status_int=302)
+            self.assertEqual(
+                'http://localhost/learn/staging/topic-frag-two/studyguide',
                 response.headers['location'])
 
     def test_redirect_to_classroom_if_abbreviated_topic_is_invalid(
         self
     ) -> None:
+        studyguide_url_fragment = 'studyguide/sub-one-frag'
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
-                '/mock_subtopic_page/math/invalid-topic/revision/sub-one-frag',
+                '/mock_subtopic_page/math/invalid-topic/%s'
+                % studyguide_url_fragment,
                 expected_status_int=302)
             self.assertEqual(
                 'http://localhost/learn/math',
@@ -5649,21 +5740,23 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
-                '/mock_subtopic_page/math/topic-frag/revision/sub-one-frag',
+                '/mock_subtopic_page/math/topic-frag/studyguide/sub-one-frag',
                 expected_status_int=302)
             self.assertEqual(
-                'http://localhost/learn/staging/topic-frag/revision'
+                'http://localhost/learn/staging/topic-frag/studyguide'
                 '/sub-one-frag',
                 response.headers['location'])
 
     def test_redirect_with_lowercase_subtopic_url_fragment(self) -> None:
+        studyguide_url_fragment = 'studyguide/Sub-One-Frag'
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
-                '/mock_subtopic_page/staging/topic-frag/revision/Sub-One-Frag',
+                '/mock_subtopic_page/staging/topic-frag/%s'
+                % studyguide_url_fragment,
                 expected_status_int=302)
             self.assertEqual(
-                'http://localhost/learn/staging/topic-frag/revision'
+                'http://localhost/learn/staging/topic-frag/studyguide'
                 '/sub-one-frag',
                 response.headers['location'])
 
@@ -6950,8 +7043,9 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
                 feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS, skill_id),
                 expected_status_int=401)
             self.assertEqual(
-                response['error'], 'You do not have credentials to submit'
-                ' images to questions.')
+                response['error'],
+                'You do not have credentials to submit images to questions.'
+            )
         self.logout()
 
     def test_can_submit_images_to_explorations(self) -> None:

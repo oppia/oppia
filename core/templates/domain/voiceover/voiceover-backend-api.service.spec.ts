@@ -26,6 +26,7 @@ import {VoiceoverBackendApiService} from '../../domain/voiceover/voiceover-backe
 import {VoiceoverDomainConstants} from './voiceover-domain.constants';
 import {EntityVoiceovers} from './entity-voiceovers.model';
 import {VoiceoverBackendDict} from 'domain/exploration/voiceover.model';
+import {CloudTaskRun} from 'domain/cloud-task/cloud-task-run.model';
 
 describe('Voiceover backend API service', function () {
   let voiceoverBackendApiService: VoiceoverBackendApiService;
@@ -268,7 +269,7 @@ describe('Voiceover backend API service', function () {
     let languageAccentCode: string = 'en-US';
 
     voiceoverBackendApiService
-      .generateAutotmaticVoiceoverAsync(
+      .generateAutomaticVoiceoverAsync(
         explorationId,
         explorationVersion,
         stateName,
@@ -332,7 +333,7 @@ describe('Voiceover backend API service', function () {
     let languageAccentCode: string = 'en-US';
 
     voiceoverBackendApiService
-      .generateAutotmaticVoiceoverAsync(
+      .generateAutomaticVoiceoverAsync(
         explorationId,
         explorationVersion,
         stateName,
@@ -353,6 +354,80 @@ describe('Voiceover backend API service', function () {
 
     expect(req.request.method).toEqual('PUT');
     expect(req.request.body).toEqual(payload);
+
+    req.flush('Invalid request', {
+      status: 400,
+      statusText: 'Invalid request',
+    });
+
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+  }));
+
+  it('should be able to fetch voiceover regeneration records', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    let startDate = new Date('2023-01-01T00:00:00Z').toISOString();
+    let endDate = new Date('2023-01-02T00:00:00Z').toISOString();
+
+    voiceoverBackendApiService
+      .fetchVoiceoverRegenerationRecordAsync(startDate, endDate)
+      .then(successHandler, failHandler);
+
+    const expectedUrl = `/automatic_voiceover_regeneration_record?start_date=${startDate}&end_date=${endDate}`;
+
+    let req = httpTestingController.expectOne(expectedUrl);
+    expect(req.request.method).toEqual('GET');
+
+    let automaticVoiceoverRegenerationRecords = [
+      {
+        id: '123',
+        cloud_task_name: 'Test Task',
+        latest_job_state: 'RUNNING',
+        function_id: 'function_456',
+        exception_messages_for_failed_runs: ['Error 1', 'Error 2'],
+        current_retry_attempt: 1,
+        last_updated: new Date('2025-01-01T00:00:00Z'),
+        created_on: new Date('2025-01-01T00:00:00Z'),
+      },
+    ];
+
+    let expectedVoiceoverRegenerationRecord = [
+      CloudTaskRun.createFromBackendDict(
+        automaticVoiceoverRegenerationRecords[0]
+      ),
+    ];
+
+    req.flush({
+      automatic_voiceover_regeneration_records:
+        automaticVoiceoverRegenerationRecords,
+    });
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(
+      expectedVoiceoverRegenerationRecord
+    );
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should handle error callback while fetching voiceover regeneration records', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    let startDate = new Date('2023-01-01T00:00:00Z').toISOString();
+    let endDate = new Date('2023-01-02T00:00:00Z').toISOString();
+    voiceoverBackendApiService
+      .fetchVoiceoverRegenerationRecordAsync(startDate, endDate)
+      .then(successHandler, failHandler);
+
+    const expectedUrl = `/automatic_voiceover_regeneration_record?start_date=${startDate}&end_date=${endDate}`;
+
+    let req = httpTestingController.expectOne(expectedUrl);
+    expect(req.request.method).toEqual('GET');
 
     req.flush('Invalid request', {
       status: 400,

@@ -25,15 +25,16 @@ import cloneDeep from 'lodash/cloneDeep';
 
 import {MisconceptionBackendDict} from 'domain/skill/misconception.model';
 import {RecordedVoiceOverBackendDict} from 'domain/exploration/recorded-voiceovers.model';
-import {StateBackendDict} from 'domain/state/StateObjectFactory';
+import {StateBackendDict} from 'domain/state/state.model';
 import {SubtitledHtmlBackendDict} from 'domain/exploration/subtitled-html.model';
-import {WorkedExampleBackendDict} from 'domain/skill/worked-example.model';
 import {Collection} from 'domain/collection/collection.model';
-import {Question} from 'domain/question/QuestionObjectFactory';
-import {Skill} from 'domain/skill/SkillObjectFactory';
+import {Question} from 'domain/question/question.model';
+import {Skill} from 'domain/skill/skill.model.ts';
 import {Story} from 'domain/story/story.model';
 import {Topic} from 'domain/topic/topic-object.model';
 import {SubtopicPage} from 'domain/topic/subtopic-page.model';
+import {StudyGuide} from 'domain/topic/study-guide.model';
+import {StudyGuideSectionBackendDict} from 'domain/topic/study-guide-sections.model';
 
 interface CollectionTitleChange {
   cmd: 'edit_collection_property';
@@ -179,16 +180,7 @@ interface SkillContentsExplanationChange {
   old_value: SubtitledHtmlBackendDict;
 }
 
-export interface SkillContentsWorkedExamplesChange {
-  cmd: 'update_skill_contents_property';
-  property_name: 'worked_examples';
-  new_value: WorkedExampleBackendDict[];
-  old_value: WorkedExampleBackendDict[];
-}
-
-type SkillContentsChange =
-  | SkillContentsExplanationChange
-  | SkillContentsWorkedExamplesChange;
+type SkillContentsChange = SkillContentsExplanationChange;
 
 interface SkillAddMisconceptionChange {
   cmd: 'add_skill_misconception';
@@ -583,6 +575,14 @@ interface TopicSubtopicPageHtmlChange {
   subtopic_id: number;
 }
 
+interface TopicStudyGuidePropertySectionsChange {
+  cmd: 'update_study_guide_property';
+  property_name: 'sections';
+  new_value: StudyGuideSectionBackendDict[];
+  old_value: StudyGuideSectionBackendDict[];
+  subtopic_id: number;
+}
+
 interface TopicSubtopicPageAudioChange {
   cmd: 'update_subtopic_page_property';
   property_name: 'page_contents_audio';
@@ -594,6 +594,8 @@ interface TopicSubtopicPageAudioChange {
 type TopicSubtopicPagePropertyChange =
   | TopicSubtopicPageHtmlChange
   | TopicSubtopicPageAudioChange;
+
+type TopicStudyGuidePropertyChange = TopicStudyGuidePropertySectionsChange;
 
 interface TopicAddSubtopicChange {
   cmd: 'add_subtopic';
@@ -663,6 +665,7 @@ export type TopicChange =
   | TopicPropertyChange
   | TopicSubtopicPropertyChange
   | TopicSubtopicPagePropertyChange
+  | TopicStudyGuidePropertyChange
   | TopicAddSubtopicChange
   | TopicAddUncategorizedSkillId
   | TopicDeleteSubtopicChange
@@ -688,7 +691,8 @@ export type DomainObject =
   | Skill
   | Story
   | Topic
-  | SubtopicPage;
+  | SubtopicPage
+  | StudyGuide;
 
 export class Change {
   _backendChangeObject: BackendChangeObject;

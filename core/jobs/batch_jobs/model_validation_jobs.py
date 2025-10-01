@@ -20,23 +20,21 @@ from __future__ import annotations
 
 import collections
 
-from core.jobs import base_jobs
-from core.jobs import job_utils
+from core.jobs import base_jobs, job_utils
 from core.jobs.io import ndb_io
-from core.jobs.transforms.validation import base_validation
-from core.jobs.transforms.validation import base_validation_registry
-from core.jobs.types import base_validation_errors
-from core.jobs.types import model_property
+from core.jobs.transforms.validation import (
+    base_validation,
+    base_validation_registry,
+)
+from core.jobs.types import base_validation_errors, model_property
 from core.platform import models
 
 import apache_beam as beam
-
 from typing import Dict, FrozenSet, Iterable, Iterator, List, Set, Tuple, Type
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import datastore_services
+    from mypy_imports import base_models, datastore_services
 
 (base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
@@ -83,7 +81,8 @@ class ModelKey(collections.namedtuple('ModelKey', ['model_kind', 'model_id'])):
 class AuditAllStorageModelsJob(base_jobs.JobBase):
     """Runs a comprehensive audit on every model in the datastore."""
 
-    def run(self) -> beam.PCollection[base_validation_errors.BaseAuditError]:
+    def run(self) -> beam.PCollection[
+        base_validation_errors.BaseValidationError]:
         """Returns a PCollection of audit errors aggregated from all models.
 
         Returns:
@@ -208,7 +207,7 @@ class ApplyAuditDoFns(beam.PTransform):  # type: ignore[misc]
 
     def expand(
         self, inputs: beam.PCollection[base_models.BaseModel]
-    ) -> beam.PCollection[base_validation_errors.BaseAuditError]:
+    ) -> beam.PCollection[base_validation_errors.BaseValidationError]:
         """Returns audit errors from every Audit DoFn targeting the models.
 
         This is the method that PTransform requires us to override when
@@ -339,9 +338,8 @@ class GetMissingModelKeyErrors(beam.PTransform):  # type: ignore[misc]
         for property_value in property_of_model.yield_value_from_model(model):
             if property_value is None:
                 continue
-            model_id = job_utils.get_model_id(model)
             referenced_id = property_value
             for referenced_kind in referenced_kinds:
                 error = base_validation_errors.ModelRelationshipError(
-                    property_of_model, model_id, referenced_kind, referenced_id)
+                    property_of_model, model, referenced_kind, referenced_id)
                 yield (ModelKey(referenced_kind, referenced_id), error)

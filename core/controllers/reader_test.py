@@ -20,29 +20,31 @@ import logging
 
 from core import feconf
 from core.constants import constants
-from core.domain import collection_domain
-from core.domain import collection_services
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import learner_progress_services
-from core.domain import param_domain
-from core.domain import platform_parameter_list
-from core.domain import question_services
-from core.domain import recommendations_services
-from core.domain import rights_manager
-from core.domain import skill_services
-from core.domain import stats_domain
-from core.domain import stats_services
-from core.domain import story_domain
-from core.domain import story_fetchers
-from core.domain import story_services
-from core.domain import taskqueue_services
-from core.domain import topic_domain
-from core.domain import topic_fetchers
-from core.domain import topic_services
-from core.domain import translation_domain
-from core.domain import user_services
+from core.domain import (
+    collection_domain,
+    collection_services,
+    exp_domain,
+    exp_fetchers,
+    exp_services,
+    learner_progress_services,
+    param_domain,
+    platform_parameter_list,
+    question_services,
+    recommendations_services,
+    rights_manager,
+    skill_services,
+    stats_domain,
+    stats_services,
+    story_domain,
+    story_fetchers,
+    story_services,
+    taskqueue_services,
+    topic_domain,
+    topic_fetchers,
+    topic_services,
+    translation_domain,
+    user_services,
+)
 from core.platform import models
 from core.tests import test_utils
 
@@ -50,9 +52,7 @@ from typing import Dict, Final, List, Optional, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import exp_models
-    from mypy_imports import stats_models
-    from mypy_imports import translation_models
+    from mypy_imports import exp_models, stats_models, translation_models
 
 (
     exp_models,
@@ -1173,7 +1173,19 @@ class FlagExplorationHandlerTests(test_utils.EmailTestBase):
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'admin')
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'admin'),
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                'noreply@example.com'
+            )
         ]
     )
     def test_that_emails_are_sent(self) -> None:
@@ -2066,7 +2078,7 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
         # TODO(#13059): Here we use MyPy ignore because after we fully type the
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
-        self.aggregated_stats['num_starts'] = 'invalid'  # type: ignore[arg-type]
+        self.aggregated_stats['num_starts'] = 'invalid'  # type: ignore[typeddict-item]
 
         response = self.post_json('/explorehandler/stats_events/%s' % (
             self.exp_id), {

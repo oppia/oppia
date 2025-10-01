@@ -1,11 +1,14 @@
 <div class="oppia-interaction-header-container">
   <div class="modal-header oppia-modal-header"
        [ngClass]="{'modal-header-blue': stateInteractionIdService.displayed && (customizationModalReopened || hasCustomizationArgs)}">
-    <h3 tabindex="0" *ngIf="!stateInteractionIdService.displayed" [oppiaFocusOn]="chooseInteractionHeader">
+    <h3 *ngIf="!stateInteractionIdService.displayed"
+        tabindex="0"
+        [oppiaFocusOn]="chooseInteractionHeader"
+        class="e2e-test-modal-header">
       Choose Interaction
     </h3>
 
-    <h3 class="oppia-customization-header"
+    <h3 class="oppia-customization-header e2e-test-customize-interaction-header e2e-test-modal-header"
         tabindex="0"
         #customizeInteractionHeader
         *ngIf="stateInteractionIdService.displayed && (customizationModalReopened || hasCustomizationArgs)">
@@ -15,7 +18,7 @@
   </div>
 </div>
 
-<div class="customize-interaction-body-container modal-body">
+<div class="customize-interaction-body-container modal-body e2e-test-customize-interaction-body">
   <div [hidden]="!isinteractionOpen">
     <nav ngbNav
          #nav="ngbNav"

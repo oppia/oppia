@@ -1,4 +1,4 @@
-<form autocomplete="off" [attr.disabled]="!isValid" role="form" class="form-horizontal" (submit)="submitAnswer()">
+<form autocomplete="off" [attr.disabled]="!isValid" role="form" class="form-horizontal .e2e-test-float-form-input" (submit)="submitAnswer()">
   <!-- This form is needed for submitting the answer on hitting enter. -->
   <input type="text"
          name="answer"
@@ -8,11 +8,11 @@
          class="form-control"
          [oppiaFocusOn]="labelForFocusTarget">
 
-  <div class="oppia-form-error oppia-units-input-error">
+  <div class="oppia-form-error oppia-units-input-error e2e-test-form-error-container">
     {{ errorMessageI18nKey | translate }}
   </div>
 </form>
-<button class="btn btn-secondary"
+<button class="btn btn-secondary e2e-test-show-unit-formats"
         (click)="showHelp()"
         [innerHTML]="'I18N_INTERACTIONS_NUMBER_WITH_UNITS_POSSIBLE_UNIT_FORMATS' | translate">
 </button>

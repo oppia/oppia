@@ -148,6 +148,7 @@ class ValidModelNames(enum.Enum):
     BLOG = 'blog'
     BLOG_STATISTICS = 'blog_statistics'
     CLASSROOM = 'classroom'
+    CLOUD_TASK = 'cloud_task'
     COLLECTION = 'collection'
     CONFIG = 'CONFIG'
     EMAIL = 'email'
@@ -304,7 +305,7 @@ CURRENT_COLLECTION_SCHEMA_VERSION = 6
 CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 5
 
 # The current version of skill contents dict in the skill schema.
-CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 4
+CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 5
 
 # The current version of misconceptions dict in the skill schema.
 CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 5
@@ -320,6 +321,9 @@ CURRENT_STORY_REFERENCE_SCHEMA_VERSION = 1
 
 # The current version of page_contents dict in the subtopic page schema.
 CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION = 4
+
+# The current version of sections dict in the study guide schema.
+CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION = 1
 
 # This value should be updated in the event of any
 # StateAnswersModel.submitted_answer_list schema change.
@@ -515,14 +519,18 @@ OPPIA_AUTOMATIC_VOICEOVER_PROVIDER = 'azure'
 
 # This flag is used for distinguishing the prod/test environments for feature
 # gating.
-ENV_IS_OPPIA_ORG_PRODUCTION_SERVER = bool(OPPIA_PROJECT_ID == 'oppiaserver')
+ENV_IS_OPPIA_ORG_PRODUCTION_SERVER = bool(
+    os.environ.get('GOOGLE_CLOUD_PROJECT', 'dev-project-id') == 'oppiaserver')
 
-# NOTE TO RELEASE COORDINATORS: Replace these GCS bucket paths with real prod
-# buckets. It's OK for them to be the same.
+# TODO(release-scripts#137): Update once release scripts are updated to remove
+# config updates to these fields.
 DATAFLOW_TEMP_LOCATION = 'gs://todo/todo'
 DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 
-OPPIA_VERSION = '3.4.6'
+DATAFLOW_TEMP_LOCATION_TEMPLATE = 'gs://%s-beam-jobs-temp/'
+DATAFLOW_STAGING_LOCATION_TEMPLATE = 'gs://%s-beam-jobs-staging/'
+
+OPPIA_VERSION = '3.4.7'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia_beam_job-%s.tar.gz' % OPPIA_VERSION
 
 # Committer id for system actions. The username for the system committer
@@ -611,6 +619,8 @@ EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS = (
 EMAIL_INTENT_NOTIFY_CURRICULUM_ADMINS_CHAPTERS = (
     'notify_curriculum_admins_chapters'
 )
+EMAIL_INTENT_VOICEOVER_REGENERATION = 'voiceover_regeneration'
+
 # Possible intents for email sent in bulk.
 BULK_EMAIL_INTENT_MARKETING = 'bulk_email_marketing'
 BULK_EMAIL_INTENT_IMPROVE_EXPLORATION = 'bulk_email_improve_exploration'
@@ -749,6 +759,9 @@ ALLOWED_RTE_EXTENSIONS = {
     'Video': {
         'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Video')
     },
+    'Workedexample': {
+        'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Workedexample')
+    }
 }
 
 # The list of interaction IDs which correspond to interactions that set their
@@ -997,6 +1010,7 @@ UPDATE_QUESTION_SUGGESTION_URL_PREFIX = (
 USER_GROUPS_HANDLER_URL = '/user_groups_handler'
 SUBSCRIBE_URL_PREFIX = '/subscribehandler'
 SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX = '/subtopic_page_editor_handler/data'
+STUDY_GUIDE_EDITOR_DATA_URL_PREFIX = '/study_guide_editor_handler/data'
 TOPIC_VIEWER_URL_PREFIX = (
     '/learn/<classroom_url_fragment>/<topic_url_fragment>')
 TOPIC_DATA_HANDLER = '/topic_data_handler'
@@ -1072,6 +1086,7 @@ COMMIT_MESSAGE_QUESTION_DELETED = 'Question deleted.'
 COMMIT_MESSAGE_SKILL_DELETED = 'Skill deleted.'
 COMMIT_MESSAGE_STORY_DELETED = 'Story deleted.'
 COMMIT_MESSAGE_SUBTOPIC_PAGE_DELETED = 'Subtopic page deleted.'
+COMMIT_MESSAGE_STUDY_GUIDE_DELETED = 'Study Guide deleted.'
 COMMIT_MESSAGE_TOPIC_DELETED = 'Topic deleted.'
 
 # Max number of playthroughs for an issue.
@@ -1231,7 +1246,8 @@ RTE_CONTENT_SPEC: Dict[str, RteTypeTextAngularDict] = {
             'oppia-noninteractive-image': ['b', 'i', 'li', 'p', 'pre'],
             'oppia-noninteractive-collapsible': ['b', 'i', 'li', 'p', 'pre'],
             'oppia-noninteractive-video': ['b', 'i', 'li', 'p', 'pre'],
-            'oppia-noninteractive-tabs': ['b', 'i', 'li', 'p', 'pre']
+            'oppia-noninteractive-tabs': ['b', 'i', 'li', 'p', 'pre'],
+            'oppia-noninteractive-workedexample': ['b', 'i', 'li', 'p', 'pre']
         },
         # Valid html tags in TextAngular.
         'ALLOWED_TAG_LIST': [
@@ -1249,7 +1265,8 @@ RTE_CONTENT_SPEC: Dict[str, RteTypeTextAngularDict] = {
             'oppia-noninteractive-image',
             'oppia-noninteractive-collapsible',
             'oppia-noninteractive-video',
-            'oppia-noninteractive-tabs'
+            'oppia-noninteractive-tabs',
+            'oppia-noninteractive-workedexample'
         ]
     },
     'RTE_TYPE_CKEDITOR': {
@@ -1271,7 +1288,10 @@ RTE_CONTENT_SPEC: Dict[str, RteTypeTextAngularDict] = {
                 'blockquote', 'li', '[document]'
             ],
             'oppia-noninteractive-video': ['blockquote', 'li', '[document]'],
-            'oppia-noninteractive-tabs': ['blockquote', 'li', '[document]']
+            'oppia-noninteractive-tabs': ['blockquote', 'li', '[document]'],
+            'oppia-noninteractive-workedexample': [
+                'blockquote', 'li', '[document]'
+            ]
         },
         # Valid html tags in CKEditor.
         'ALLOWED_TAG_LIST': [
@@ -1289,7 +1309,8 @@ RTE_CONTENT_SPEC: Dict[str, RteTypeTextAngularDict] = {
             'oppia-noninteractive-image',
             'oppia-noninteractive-collapsible',
             'oppia-noninteractive-video',
-            'oppia-noninteractive-tabs'
+            'oppia-noninteractive-tabs',
+            'oppia-noninteractive-workedexample'
         ]
 
     }
@@ -1577,6 +1598,14 @@ SUGGESTION_TARGET_TYPE_CHOICES = [
     ENTITY_TYPE_TOPIC
 ]
 
+TRANSLATABLE_ENTITY_TYPES = [
+    ENTITY_TYPE_EXPLORATION,
+    ENTITY_TYPE_TOPIC,
+    ENTITY_TYPE_SKILL,
+    ENTITY_TYPE_STORY,
+    ENTITY_TYPE_CLASSROOM
+]
+
 # Possible suggestion types.
 SUGGESTION_TYPE_CHOICES = [
     SUGGESTION_TYPE_EDIT_STATE_CONTENT,
@@ -1647,3 +1676,32 @@ class VoiceoverType(enum.Enum):
 
     AUTO = 'auto'
     MANUAL = 'manual'
+
+
+# Function identifiers inform the deferred task handler of which deferred
+# function should be run for the relevant task.
+# NOTE for developers: If you want to defer a function (i.e. run it
+# asynchronously), please visit the file core/controllers/tasks.py, and check
+# the DeferredTasksHandler.
+# 1. If the function you want to defer already exists in the handler, choose the
+#    correct FUNCTION_ID and defer the function using that FUNCTION_ID.
+# 2. If the function does not exist in the handler, add it to the handler and
+#    add another FUNCTION_ID to this list.
+FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS = {
+    'FUNCTION_ID_UPDATE_STATS': 'update_stats',
+    'FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS': (
+        'delete_exps_from_user_models'),
+    'FUNCTION_ID_DELETE_EXPS_FROM_ACTIVITIES': 'delete_exps_from_activities',
+    'FUNCTION_ID_DELETE_USERS_PENDING_TO_BE_DELETED': (
+        'delete_users_pending_to_be_deleted'),
+    'FUNCTION_ID_CHECK_COMPLETION_OF_USER_DELETION': (
+        'check_completion_of_user_deletion'),
+    'FUNCTION_ID_REGENERATE_EXPLORATION_SUMMARY': (
+        'regenerate_exploration_summary'),
+    'FUNCTION_ID_UNTAG_DELETED_MISCONCEPTIONS': (
+        'untag_deleted_misconceptions'),
+    'FUNCTION_ID_REMOVE_USER_FROM_RIGHTS_MODELS': (
+        'remove_user_from_rights_models'),
+    'FUNCTION_ID_REGENERATE_VOICEOVER_ON_EXP_UPDATE': (
+        'regenerate_voiceover_for_updated_exploration')
+}

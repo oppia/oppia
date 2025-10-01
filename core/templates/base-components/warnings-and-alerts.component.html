@@ -1,6 +1,6 @@
 <div class="oppia-toast-container toast-top-center">
   <div *ngFor="let warning of (getWarnings() | limitTo:5)"
-       class="toast oppia-toast-warning oppia-toast">
+       class="toast oppia-toast-warning oppia-toast e2e-test-toast-warning">
     <button type="button"
             class="toast-close-button e2e-test-close-toast-warning"
             (click)="deleteWarning(warning)"

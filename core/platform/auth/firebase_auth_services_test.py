@@ -25,20 +25,18 @@ import json
 import logging
 from unittest import mock
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import auth_domain
-from core.domain import user_services
+from core.domain import auth_domain, user_services
 from core.platform import models
 from core.platform.auth import firebase_auth_services
 from core.tests import test_utils
 
 import firebase_admin
+import webapp2
 from firebase_admin import auth as firebase_auth
 from firebase_admin import exceptions as firebase_exceptions
 from typing import ContextManager, Dict, List, Optional, Tuple, Union, cast
-import webapp2
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -1146,17 +1144,19 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
                 self.create_request(session_cookie=cookie)),
             auth_domain.AuthClaims(self.AUTH_ID, self.EMAIL, False))
 
-    def test_feconf_admin_email_address_is_super_admin(self) -> None:
+    def test_admin_email_address_is_super_admin(self) -> None:
+        admin_email_address = 'testadmin@example.com'
+
         cookie = firebase_auth.create_session_cookie(
             self.firebase_sdk_stub.create_user(
-                self.AUTH_ID, email=feconf.ADMIN_EMAIL_ADDRESS),
+                self.AUTH_ID, email=admin_email_address),
             feconf.FIREBASE_SESSION_COOKIE_MAX_AGE)
 
         self.assertEqual(
             firebase_auth_services.get_auth_claims_from_request(
                 self.create_request(session_cookie=cookie)),
             auth_domain.AuthClaims(
-                self.AUTH_ID, feconf.ADMIN_EMAIL_ADDRESS, True))
+                self.AUTH_ID, admin_email_address, True))
 
     def test_raises_stale_auth_session_error_when_cookie_is_expired(
             self

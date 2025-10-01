@@ -22,19 +22,26 @@ import itertools
 import random
 import string
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
 from core.platform import models
 
 from typing import (
-    Dict, Final, List, Literal, Optional, Sequence, Tuple, TypedDict, Union,
-    overload)
+    Dict,
+    Final,
+    List,
+    Literal,
+    Optional,
+    Sequence,
+    Tuple,
+    TypedDict,
+    Union,
+    overload,
+)
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import datastore_services
+    from mypy_imports import base_models, datastore_services
 
 (base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
@@ -2008,7 +2015,7 @@ class StoryProgressModel(base_models.BaseModel):
 
     @classmethod
     def _generate_id(cls, user_id: str, story_id: str) -> str:
-        """"Generates the id for StoryProgressModel.
+        """Generates the id for StoryProgressModel.
 
         Args:
             user_id: str. The id of the user.
@@ -2064,10 +2071,8 @@ class StoryProgressModel(base_models.BaseModel):
         cls, user_id: str, story_id: str, *, strict: bool = ...
     ) -> Optional[StoryProgressModel]: ...
 
-    # Here we use MyPy ignore because the signature of this method
-    # doesn't match with BaseModel.get().
     @classmethod
-    def get( # type: ignore[override]
+    def get(
         cls, user_id: str, story_id: str, strict: bool = True
     ) -> Optional[StoryProgressModel]:
         """Gets the StoryProgressModel for the given user and story
@@ -2922,7 +2927,8 @@ class UserContributionRightsModel(base_models.BaseModel):
             questions.
         """
         reviewer_keys = cls.query(
-            cls.can_review_questions == True # pylint: disable=singleton-comparison
+            cls.can_review_questions # pylint: disable=singleton-comparison
+            == True
         ).fetch(keys_only=True)
         return [reviewer_key.id() for reviewer_key in reviewer_keys]
 
@@ -2935,7 +2941,8 @@ class UserContributionRightsModel(base_models.BaseModel):
             questions.
         """
         contributor_keys = cls.query(
-            cls.can_submit_questions == True # pylint: disable=singleton-comparison
+            cls.can_submit_questions # pylint: disable=singleton-comparison
+            == True
         ).fetch(keys_only=True)
         return [contributor_key.id() for contributor_key in contributor_keys]
 

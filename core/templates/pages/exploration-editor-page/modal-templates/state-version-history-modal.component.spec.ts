@@ -25,7 +25,7 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {HistoryTabYamlConversionService} from '../services/history-tab-yaml-conversion.service';
 import {VersionHistoryBackendApiService} from '../services/version-history-backend-api.service';
@@ -34,19 +34,15 @@ import {
   VersionHistoryService,
 } from '../services/version-history.service';
 import {StateVersionHistoryModalComponent} from './state-version-history-modal.component';
-import {
-  StateBackendDict,
-  StateObjectFactory,
-} from 'domain/state/StateObjectFactory';
+import {StateBackendDict, State} from 'domain/state/state.model';
 
 describe('State version history modal', () => {
   let component: StateVersionHistoryModalComponent;
   let fixture: ComponentFixture<StateVersionHistoryModalComponent>;
-  let stateObjectFactory: StateObjectFactory;
   let historyTabYamlConversionService: HistoryTabYamlConversionService;
   let versionHistoryService: VersionHistoryService;
   let versionHistoryBackendApiService: VersionHistoryBackendApiService;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let stateObject: StateBackendDict;
 
   beforeEach(waitForAsync(() => {
@@ -55,7 +51,7 @@ describe('State version history modal', () => {
       declarations: [StateVersionHistoryModalComponent],
       providers: [
         NgbActiveModal,
-        ContextService,
+        PageContextService,
         VersionHistoryService,
         VersionHistoryBackendApiService,
         HistoryTabYamlConversionService,
@@ -67,7 +63,6 @@ describe('State version history modal', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(StateVersionHistoryModalComponent);
     component = fixture.componentInstance;
-    stateObjectFactory = TestBed.inject(StateObjectFactory);
     historyTabYamlConversionService = TestBed.inject(
       HistoryTabYamlConversionService
     );
@@ -75,7 +70,7 @@ describe('State version history modal', () => {
     versionHistoryBackendApiService = TestBed.inject(
       VersionHistoryBackendApiService
     );
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
 
     stateObject = {
       classifier_model_id: null,
@@ -138,10 +133,7 @@ describe('State version history modal', () => {
   });
 
   it('should get the last edited version number', () => {
-    const stateData = stateObjectFactory.createFromBackendDict(
-      'State',
-      stateObject
-    );
+    const stateData = State.createFromBackendDict('State', stateObject);
     spyOn(versionHistoryService, 'getBackwardStateDiffData').and.returnValue({
       oldState: stateData,
       newState: stateData,
@@ -164,10 +156,7 @@ describe('State version history modal', () => {
   });
 
   it('should get the last edited committer username', () => {
-    const stateData = stateObjectFactory.createFromBackendDict(
-      'State',
-      stateObject
-    );
+    const stateData = State.createFromBackendDict('State', stateObject);
     spyOn(versionHistoryService, 'getBackwardStateDiffData').and.returnValue({
       oldState: stateData,
       newState: stateData,
@@ -180,10 +169,7 @@ describe('State version history modal', () => {
   });
 
   it('should get the next edited version number', () => {
-    const stateData = stateObjectFactory.createFromBackendDict(
-      'State',
-      stateObject
-    );
+    const stateData = State.createFromBackendDict('State', stateObject);
     spyOn(versionHistoryService, 'getForwardStateDiffData').and.returnValue({
       oldState: stateData,
       newState: stateData,
@@ -206,10 +192,7 @@ describe('State version history modal', () => {
   });
 
   it('should get the next edited committer username', () => {
-    const stateData = stateObjectFactory.createFromBackendDict(
-      'State',
-      stateObject
-    );
+    const stateData = State.createFromBackendDict('State', stateObject);
     spyOn(versionHistoryService, 'getForwardStateDiffData').and.returnValue({
       oldState: stateData,
       newState: stateData,
@@ -225,10 +208,7 @@ describe('State version history modal', () => {
     'should update the left and the right side yaml strings on exploring' +
       ' forward version history',
     fakeAsync(() => {
-      const stateData = stateObjectFactory.createFromBackendDict(
-        'State',
-        stateObject
-      );
+      const stateData = State.createFromBackendDict('State', stateObject);
       spyOn(versionHistoryService, 'getForwardStateDiffData').and.returnValue({
         oldState: stateData,
         newState: stateData,
@@ -260,19 +240,13 @@ describe('State version history modal', () => {
     () => {
       spyOn(versionHistoryService, 'getForwardStateDiffData').and.returnValues(
         {
-          oldState: stateObjectFactory.createFromBackendDict(
-            'State',
-            stateObject
-          ),
-          newState: stateObjectFactory.createFromBackendDict(null, stateObject),
+          oldState: State.createFromBackendDict('State', stateObject),
+          newState: State.createFromBackendDict(null, stateObject),
           oldVersionNumber: 3,
         } as StateDiffData,
         {
-          oldState: stateObjectFactory.createFromBackendDict(null, stateObject),
-          newState: stateObjectFactory.createFromBackendDict(
-            'State',
-            stateObject
-          ),
+          oldState: State.createFromBackendDict(null, stateObject),
+          newState: State.createFromBackendDict('State', stateObject),
           oldVersionNumber: 3,
         } as StateDiffData
       );
@@ -290,10 +264,7 @@ describe('State version history modal', () => {
     'should update the left and the right side yaml strings on exploring' +
       ' backward version history',
     fakeAsync(() => {
-      const stateData = stateObjectFactory.createFromBackendDict(
-        'State',
-        stateObject
-      );
+      const stateData = State.createFromBackendDict('State', stateObject);
       spyOn(versionHistoryService, 'getBackwardStateDiffData').and.returnValue({
         oldState: stateData,
         newState: stateData,
@@ -326,19 +297,13 @@ describe('State version history modal', () => {
     () => {
       spyOn(versionHistoryService, 'getBackwardStateDiffData').and.returnValues(
         {
-          oldState: stateObjectFactory.createFromBackendDict(
-            'State',
-            stateObject
-          ),
-          newState: stateObjectFactory.createFromBackendDict(null, stateObject),
+          oldState: State.createFromBackendDict('State', stateObject),
+          newState: State.createFromBackendDict(null, stateObject),
           oldVersionNumber: 3,
         } as StateDiffData,
         {
-          oldState: stateObjectFactory.createFromBackendDict(null, stateObject),
-          newState: stateObjectFactory.createFromBackendDict(
-            'State',
-            stateObject
-          ),
+          oldState: State.createFromBackendDict(null, stateObject),
+          newState: State.createFromBackendDict('State', stateObject),
           oldVersionNumber: 3,
         } as StateDiffData
       );
@@ -361,11 +326,8 @@ describe('State version history modal', () => {
       versionHistoryService,
       'insertStateVersionHistoryData'
     ).and.callThrough();
-    spyOn(contextService, 'getExplorationId').and.returnValue('exp_1');
-    const stateData = stateObjectFactory.createFromBackendDict(
-      'State',
-      stateObject
-    );
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp_1');
+    const stateData = State.createFromBackendDict('State', stateObject);
     spyOn(versionHistoryService, 'getBackwardStateDiffData').and.returnValue({
       oldState: stateData,
       newState: stateData,
@@ -407,10 +369,7 @@ describe('State version history modal', () => {
         versionHistoryService,
         'shouldFetchNewStateVersionHistory'
       ).and.returnValue(true);
-      const stateData = stateObjectFactory.createFromBackendDict(
-        null,
-        stateObject
-      );
+      const stateData = State.createFromBackendDict(null, stateObject);
       spyOn(versionHistoryService, 'getBackwardStateDiffData').and.returnValues(
         {
           oldState: null,
@@ -442,11 +401,8 @@ describe('State version history modal', () => {
       versionHistoryService,
       'shouldFetchNewStateVersionHistory'
     ).and.returnValue(true);
-    spyOn(contextService, 'getExplorationId').and.returnValue('exp_1');
-    const stateData = stateObjectFactory.createFromBackendDict(
-      'State',
-      stateObject
-    );
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp_1');
+    const stateData = State.createFromBackendDict('State', stateObject);
     spyOn(versionHistoryService, 'getBackwardStateDiffData').and.returnValue({
       oldState: stateData,
       newState: stateData,

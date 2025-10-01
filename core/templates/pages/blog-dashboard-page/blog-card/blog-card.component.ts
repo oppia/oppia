@@ -23,7 +23,7 @@ import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {BlogPostPageConstants} from 'pages/blog-post-page/blog-post-page.constants';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import dayjs from 'dayjs';
 import {UserService} from 'services/user.service';
 
@@ -47,7 +47,7 @@ export class BlogCardComponent implements OnInit {
     private windowRef: WindowRef,
     private assetsBackendApiService: AssetsBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private userService: UserService
   ) {}
 
@@ -70,7 +70,7 @@ export class BlogCardComponent implements OnInit {
     }
     this.publishedDateString = this.getDateStringInWords(publishedOn);
     this.blogCardPreviewModeIsActive =
-      this.contextService.isInBlogPostEditorPage();
+      this.pageContextService.isInBlogPostEditorPage();
   }
 
   getDateStringInWords(naiveDate: string): string {

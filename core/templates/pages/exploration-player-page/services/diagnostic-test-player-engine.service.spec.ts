@@ -18,36 +18,33 @@
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {fakeAsync, TestBed, tick} from '@angular/core/testing';
-import {DiagnosticTestQuestionsModel} from 'domain/question/diagnostic-test-questions.model';
-import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
+import {DiagnosticTestQuestionsModel} from '../../../domain/question/diagnostic-test-questions.model';
+import {QuestionBackendApiService} from '../../../domain/question/question-backend-api.service';
 import {
   Question,
-  QuestionObjectFactory,
   QuestionBackendDict,
-} from 'domain/question/QuestionObjectFactory';
-import {StateObjectFactory} from 'domain/state/StateObjectFactory';
-import {DiagnosticTestTopicTrackerModel} from 'pages/diagnostic-test-player-page/diagnostic-test-topic-tracker.model';
+} from '../../../domain/question/question.model';
+import {State} from '../../../domain/state/state.model';
+import {DiagnosticTestTopicTrackerModel} from '../../../pages/diagnostic-test-player-page/diagnostic-test-topic-tracker.model';
 import {DiagnosticTestPlayerEngineService} from './diagnostic-test-player-engine.service';
-import {TextInputRulesService} from 'interactions/TextInput/directives/text-input-rules.service';
-import {AnswerClassificationResult} from 'domain/classifier/answer-classification-result.model';
-import {Outcome} from 'domain/exploration/outcome.model';
+import {TextInputRulesService} from '../../../../../extensions/interactions/TextInput/directives/text-input-rules.service';
+import {AnswerClassificationResult} from '../../../domain/classifier/answer-classification-result.model';
+import {Outcome} from '../../../domain/exploration/outcome.model';
 import {
   AnswerClassificationService,
   InteractionRulesService,
 } from './answer-classification.service';
-import {AlertsService} from 'services/alerts.service';
-import {ExpressionInterpolationService} from 'expressions/expression-interpolation.service';
+import {AlertsService} from '../../../services/alerts.service';
+import {ExpressionInterpolationService} from '../../../expressions/expression-interpolation.service';
 
 describe('Diagnostic test engine service', () => {
   let diagnosticTestPlayerEngineService: DiagnosticTestPlayerEngineService;
   let questionBackendApiService: QuestionBackendApiService;
   let question1: Question, question2: Question, question3: Question;
   let question4: Question;
-  let stateObject: StateObjectFactory;
   let textInputService: InteractionRulesService;
   let answerClassificationService: AnswerClassificationService;
   let alertsService: AlertsService;
-  let questionObjectFactory: QuestionObjectFactory;
   let expressionInterpolationService: ExpressionInterpolationService;
 
   beforeEach(() => {
@@ -59,11 +56,9 @@ describe('Diagnostic test engine service', () => {
       DiagnosticTestPlayerEngineService
     );
     questionBackendApiService = TestBed.inject(QuestionBackendApiService);
-    stateObject = TestBed.inject(StateObjectFactory);
     textInputService = TestBed.get(TextInputRulesService);
     answerClassificationService = TestBed.inject(AnswerClassificationService);
     alertsService = TestBed.inject(AlertsService);
-    questionObjectFactory = TestBed.inject(QuestionObjectFactory);
     expressionInterpolationService = TestBed.inject(
       ExpressionInterpolationService
     );
@@ -156,11 +151,10 @@ describe('Diagnostic test engine service', () => {
       next_content_id_index: 5,
     };
 
-    question1 =
-      questionObjectFactory.createFromBackendDict(questionBackendDict1);
+    question1 = Question.createFromBackendDict(questionBackendDict1);
     question2 = new Question(
       'question2',
-      stateObject.createDefaultState('state', 'content_0', 'default_outcome_1'),
+      State.createDefaultState('state', 'content_0', 'default_outcome_1'),
       '',
       1,
       ['skillID2'],
@@ -169,7 +163,7 @@ describe('Diagnostic test engine service', () => {
     );
     question3 = new Question(
       'question3',
-      stateObject.createDefaultState('state', 'content_0', 'default_outcome_1'),
+      State.createDefaultState('state', 'content_0', 'default_outcome_1'),
       '',
       1,
       ['skillID3'],
@@ -178,7 +172,7 @@ describe('Diagnostic test engine service', () => {
     );
     question4 = new Question(
       'question4',
-      stateObject.createDefaultState('state', 'content_0', 'default_outcome_1'),
+      State.createDefaultState('state', 'content_0', 'default_outcome_1'),
       '',
       1,
       ['skillID4'],

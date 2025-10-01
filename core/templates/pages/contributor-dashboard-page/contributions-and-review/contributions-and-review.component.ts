@@ -30,11 +30,7 @@ import {Subscription, Observable} from 'rxjs';
 import {Rubric} from 'domain/skill/rubric.model';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {MisconceptionSkillMap} from 'domain/skill/misconception.model';
-import {
-  Question,
-  QuestionBackendDict,
-  QuestionObjectFactory,
-} from 'domain/question/QuestionObjectFactory';
+import {Question, QuestionBackendDict} from 'domain/question/question.model';
 import {
   ActiveContributionDict,
   TranslationSuggestionReviewModalComponent,
@@ -46,7 +42,7 @@ import {TranslationTopicService} from 'pages/exploration-editor-page/translation
 import {FormatRtePreviewPipe} from 'filters/format-rte-preview.pipe';
 import {UserService} from 'services/user.service';
 import {AlertsService} from 'services/alerts.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ContributionAndReviewService} from '../services/contribution-and-review.service';
 import {ContributionOpportunitiesService} from '../services/contribution-opportunities.service';
 import {OpportunitiesListComponent} from '../opportunities-list/opportunities-list.component';
@@ -193,12 +189,11 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
 
   constructor(
     private alertsService: AlertsService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private contributionAndReviewService: ContributionAndReviewService,
     private contributionOpportunitiesService: ContributionOpportunitiesService,
     private formatRtePreviewPipe: FormatRtePreviewPipe,
     private ngbModal: NgbModal,
-    private questionObjectFactory: QuestionObjectFactory,
     private skillBackendApiService: SkillBackendApiService,
     private translationLanguageService: TranslationLanguageService,
     private translationTopicService: TranslationTopicService,
@@ -339,9 +334,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     const suggestionId = suggestion.suggestion_id;
     const updatedQuestion =
       question ||
-      this.questionObjectFactory.createFromBackendDict(
-        suggestion.change_cmd.question_dict
-      );
+      Question.createFromBackendDict(suggestion.change_cmd.question_dict);
 
     const modalRef = this.ngbModal.open(
       QuestionSuggestionReviewModalComponent,
@@ -564,7 +557,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     }
     const skillId = suggestion.change_cmd.skill_id;
 
-    this.contextService.setCustomEntityContext(
+    this.pageContextService.setCustomEntityContext(
       AppConstants.IMAGE_CONTEXT.QUESTION_SUGGESTIONS,
       skillId
     );
@@ -595,7 +588,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
         const contribution = this.contributions[suggestionId];
         suggestionIdToContribution[suggestionId] = contribution;
       }
-      this.contextService.setCustomEntityContext(
+      this.pageContextService.setCustomEntityContext(
         AppConstants.IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,
         suggestion.target_id
       );

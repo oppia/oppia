@@ -31,7 +31,7 @@ import {
 } from '@angular/core/testing';
 import {ImageEditorComponent} from './image-editor.component';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ImagePreloaderService} from 'pages/exploration-player-page/services/image-preloader.service';
 import {AppConstants} from 'app.constants';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
@@ -46,7 +46,7 @@ let gifshot = require('gifshot');
 describe('ImageEditor', () => {
   let component: ImageEditorComponent;
   let fixture: ComponentFixture<ImageEditorComponent>;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let imagePreloaderService: ImagePreloaderService;
   let imageUploadHelperService: ImageUploadHelperService;
   let imageLocalStorageService: ImageLocalStorageService;
@@ -396,12 +396,12 @@ describe('ImageEditor', () => {
     imageUploadHelperService = TestBed.inject(ImageUploadHelperService);
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
     imagePreloaderService = TestBed.inject(ImagePreloaderService);
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     fixture = TestBed.createComponent(ImageEditorComponent);
     component = fixture.componentInstance;
     gifFrames = TestBed.inject(GifFramesService);
-    spyOn(contextService, 'getEntityId').and.returnValue('2');
-    spyOn(contextService, 'getEntityType').and.returnValue('question');
+    spyOn(pageContextService, 'getEntityId').and.returnValue('2');
+    spyOn(pageContextService, 'getEntityType').and.returnValue('question');
     // This throws "Argument of type 'mockImageObject' is not assignable to
     // parameter of type 'HTMLImageElement'.". We need to suppress this
     // error because 'HTMLImageElement' has around 250 more properties.
@@ -585,7 +585,7 @@ describe('ImageEditor', () => {
     'should reset file path editor and delete file when user clicks' +
       "'Delete this image'",
     () => {
-      spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+      spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
       );
       spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(true);
@@ -612,7 +612,7 @@ describe('ImageEditor', () => {
   );
 
   it('should reset file path editor', () => {
-    spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+    spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
     );
     spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(false);
@@ -2286,7 +2286,7 @@ describe('ImageEditor', () => {
 
       spyOn(component, 'saveImage').and.callThrough();
       spyOn(component, 'validateProcessedFilesize').and.stub();
-      spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+      spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
         AppConstants.IMAGE_SAVE_DESTINATION_SERVER
       );
       // This throws an error "Type '{ lastModified: number; name:
@@ -2395,7 +2395,7 @@ describe('ImageEditor', () => {
       ] as never);
       spyOn(component, 'saveImage').and.callThrough();
       spyOn(component, 'validateProcessedFilesize').and.stub();
-      spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+      spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
       );
       // This throws an error "Type '{ lastModified: number; name:
@@ -2436,7 +2436,7 @@ describe('ImageEditor', () => {
           },
         },
       });
-      spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+      spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
       );
       spyOn(component, 'setSavedImageFilename').and.callThrough();
@@ -2481,7 +2481,7 @@ describe('ImageEditor', () => {
           },
         })
       );
-      spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+      spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
       );
       spyOn(component, 'saveImage').and.callThrough();
@@ -2654,7 +2654,7 @@ describe('ImageEditor', () => {
           },
         })
       );
-      spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+      spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
       );
       spyOn(component, 'saveImage').and.callThrough();

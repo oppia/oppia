@@ -208,19 +208,13 @@ describe('Exploration Editor', function () {
 
       // Change status of the second feedback thread to "fixed".
       await explorationEditor.viewFeedbackThread(2);
-      await explorationEditor.changeFeedbackStatus('fixed');
+      await explorationEditor.updateFeedbackStatus('fixed');
       await explorationEditor.expectFeedbackStatusToBe('fixed');
 
       // Change status of the third feedback thread to "ignored".
       await explorationEditor.viewFeedbackThread(2);
-      await explorationEditor.changeFeedbackStatus('ignored');
+      await explorationEditor.updateFeedbackStatus('ignored');
       await explorationEditor.expectFeedbackStatusToBe('ignored');
-
-      // Return to the feedback tab and verify statuses are displayed correctly.
-      await explorationEditor.pressFeedbackThreadBackButton();
-      await explorationEditor.expectFeedbackStatusInList(1, 'Open');
-      await explorationEditor.expectFeedbackStatusInList(2, 'Ignored');
-      await explorationEditor.expectFeedbackStatusInList(3, 'Fixed');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

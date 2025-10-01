@@ -19,12 +19,10 @@ from __future__ import annotations
 import json
 
 from core import feconf
-from core.controllers import acl_decorators
-from core.controllers import base
+from core.controllers import acl_decorators, base
 
 import requests
 from typing import Any, Dict
-
 
 TIMEOUT_SECS = 60
 """Timeout in seconds for firebase requests."""
@@ -88,13 +86,17 @@ class FirebaseProxyPage(
     # Here we use type Any because we accept any number/type of args
     # to accomodate all firebase requests.
     @acl_decorators.open_access
-    def get(self, *args: Any, **kwargs: Any) -> None:  # pylint: disable=unused-argument
+    def get(
+        self, *args: Any, **kwargs: Any # pylint: disable=unused-argument
+    ) -> None:
         """Proxies GET requests to the firebase app."""
         self._firebase_proxy()
 
     # Here we use type Any because we accept any number/type of args
     # to accomodate all firebase requests.
     @acl_decorators.open_access
-    def post(self, *args: Any, **kwargs: Any) -> None:  # pylint: disable=unused-argument
+    def post(
+        self, *args: Any, **kwargs: Any # pylint: disable=unused-argument
+    ) -> None:
         """Proxies POST requests to the firebase app."""
         self._firebase_proxy()

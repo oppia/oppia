@@ -31,6 +31,7 @@ def send_email_to_recipients(
         subject: str,
         plaintext_body: str,
         html_body: str,
+        cc: Optional[List[str]] = None,
         bcc: Optional[List[str]] = None,
         reply_to: Optional[str] = None,
         recipient_variables: Optional[
@@ -51,6 +52,8 @@ def send_email_to_recipients(
             be utf-8.
         html_body: str. The HTML body of the email. Must fit in a datastore
             entity. Format must be utf-8.
+        cc: list(str)|None. Optional argument. List of cc emails. Format must
+            be utf-8.
         bcc: list(str)|None. Optional argument. List of bcc emails. Format must
             be utf-8.
         reply_to: str|None. Optional argument. Reply address formatted like
@@ -78,7 +81,7 @@ def send_email_to_recipients(
     logging.info(
         email_services.convert_email_to_loggable_string(
             sender_email, recipient_emails, subject, plaintext_body, html_body,
-            bcc, reply_to, recipient_variables, attachments
+            cc, bcc, reply_to, recipient_variables, attachments
         )
     )
     logging.info(

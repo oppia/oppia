@@ -20,7 +20,7 @@ import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {State, StateObjectFactory} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {EditabilityService} from 'services/editability.service';
 import {ExternalSaveService} from 'services/external-save.service';
@@ -34,7 +34,7 @@ import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFacto
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
 import {TranslationStatusService} from '../services/translation-status.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {EntityVoiceovers} from 'domain/voiceover/entity-voiceovers.model';
 import {Voiceover} from 'domain/exploration/voiceover.model';
@@ -58,13 +58,12 @@ describe('State Translation Editor Component', () => {
   let entityVoiceoversService: EntityVoiceoversService;
   let changeListService: ChangeListService;
   let explorationStatesService: ExplorationStatesService;
-  let stateObjectFactory: StateObjectFactory;
   let translationLanguageService: TranslationLanguageService;
   let externalSaveService: ExternalSaveService;
   let translationTabActiveContentIdService: TranslationTabActiveContentIdService;
   let translationStatusService: TranslationStatusService;
   let state: State;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
 
   let mockActiveLanguageChangedEventEmitter = new EventEmitter<void>();
   let mockActiveLanguageIdChangedEventEmitter = new EventEmitter<string>();
@@ -101,20 +100,15 @@ describe('State Translation Editor Component', () => {
     );
     editabilityService = TestBed.inject(EditabilityService);
     explorationStatesService = TestBed.inject(ExplorationStatesService);
-    stateObjectFactory = TestBed.inject(StateObjectFactory);
     translationStatusService = TestBed.inject(TranslationStatusService);
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
 
-    state = stateObjectFactory.createDefaultState(
-      '',
-      'content1',
-      'default_outcome'
-    );
+    state = State.createDefaultState('', 'content1', 'default_outcome');
     state.content.html = 'This is a html text1';
     spyOn(explorationStatesService, 'getState').and.returnValue(state);
 
-    spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
-    spyOn(contextService, 'getExplorationVersion').and.returnValue(5);
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp1');
+    spyOn(pageContextService, 'getExplorationVersion').and.returnValue(5);
     spyOn(
       translationTabActiveContentIdService,
       'getActiveContentId'

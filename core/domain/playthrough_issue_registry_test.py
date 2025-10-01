@@ -23,7 +23,8 @@ from core.tests import test_utils
 from extensions.issues.CyclicStateTransitions import CyclicStateTransitions
 from extensions.issues.EarlyQuit import EarlyQuit
 from extensions.issues.MultipleIncorrectSubmissions import (
-    MultipleIncorrectSubmissions)
+    MultipleIncorrectSubmissions,
+)
 
 
 class IssueRegistryUnitTests(test_utils.GenericTestBase):
@@ -41,7 +42,9 @@ class IssueRegistryUnitTests(test_utils.GenericTestBase):
         self.invalid_issue_type = 'InvalidIssueType'
 
     def tearDown(self) -> None:
-        playthrough_issue_registry.Registry._issues = {} # pylint: disable=protected-access
+        playthrough_issue_registry.Registry._issues = ( # pylint: disable=protected-access
+            {}
+        )
         super().tearDown()
 
     def test_issue_registry(self) -> None:

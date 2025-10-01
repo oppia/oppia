@@ -22,11 +22,10 @@ import datetime
 import random
 import string
 
-from core import feconf
-from core import utils
+import core.storage.base_model.gae_models as base_models
+from core import feconf, utils
 from core.constants import constants
 from core.platform import models
-import core.storage.base_model.gae_models as base_models
 
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
 
@@ -172,7 +171,10 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
             raise ValueError(
                 'max_age must be a datetime.timedelta instance or None.')
 
-        query = cls.query(cls.post_commit_is_private == False)  # pylint: disable=singleton-comparison
+        query = cls.query(
+            cls.post_commit_is_private # pylint: disable=singleton-comparison
+            == False
+        )
         if max_age:
             query = query.filter(
                 cls.last_updated >= datetime.datetime.utcnow() - max_age)
@@ -1111,19 +1113,6 @@ class ExpSummaryModel(base_models.BaseModel):
         )).get(keys_only=True) is not None
 
     @classmethod
-    def get_non_private(cls) -> Sequence[ExpSummaryModel]:
-        """Returns an iterable with non-private ExpSummary models.
-
-        Returns:
-            iterable. An iterable with non-private ExpSummary models.
-        """
-        return ExpSummaryModel.query().filter(
-            ExpSummaryModel.status != constants.ACTIVITY_STATUS_PRIVATE
-        ).filter(
-            ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
-        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
-
-    @classmethod
     def get_top_rated(cls, limit: int) -> Sequence[ExpSummaryModel]:
         """Fetches the top-rated exp summaries that are public in descending
         order of scaled_average_rating.
@@ -1138,7 +1127,8 @@ class ExpSummaryModel(base_models.BaseModel):
         return ExpSummaryModel.query().filter(
             ExpSummaryModel.status == constants.ACTIVITY_STATUS_PUBLIC
         ).filter(
-            ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
+            ExpSummaryModel.deleted # pylint: disable=singleton-comparison
+            == False
         ).order(
             -ExpSummaryModel.scaled_average_rating
         ).fetch(limit)
@@ -1166,7 +1156,8 @@ class ExpSummaryModel(base_models.BaseModel):
                 ExpSummaryModel.voice_artist_ids == user_id,
                 ExpSummaryModel.viewer_ids == user_id)
         ).filter(
-            ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
+            ExpSummaryModel.deleted # pylint: disable=singleton-comparison
+            == False
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
@@ -1185,7 +1176,8 @@ class ExpSummaryModel(base_models.BaseModel):
                 ExpSummaryModel.owner_ids == user_id,
                 ExpSummaryModel.editor_ids == user_id)
         ).filter(
-            ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
+            ExpSummaryModel.deleted # pylint: disable=singleton-comparison
+            == False
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
@@ -1203,7 +1195,8 @@ class ExpSummaryModel(base_models.BaseModel):
         return ExpSummaryModel.query().filter(
             ExpSummaryModel.status == constants.ACTIVITY_STATUS_PUBLIC
         ).filter(
-            ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
+            ExpSummaryModel.deleted # pylint: disable=singleton-comparison
+            == False
         ).order(
             -ExpSummaryModel.first_published_msec
         ).fetch(limit)

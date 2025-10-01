@@ -19,36 +19,39 @@ from __future__ import annotations
 import logging
 import random
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.controllers import acl_decorators
-from core.controllers import base
-from core.controllers import domain_objects_validator
-from core.controllers import editor
-from core.domain import collection_services
-from core.domain import event_services
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import feedback_services
-from core.domain import interaction_registry
-from core.domain import learner_progress_services
-from core.domain import moderator_services
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_services
-from core.domain import question_services
-from core.domain import rating_services
-from core.domain import recommendations_services
-from core.domain import rights_manager
-from core.domain import skill_services
-from core.domain import stats_domain
-from core.domain import stats_services
-from core.domain import story_fetchers
-from core.domain import summary_services
-from core.domain import translation_fetchers
-from core.domain import translation_services
-from core.domain import user_services
+from core.controllers import (
+    acl_decorators,
+    base,
+    domain_objects_validator,
+    editor,
+)
+from core.domain import (
+    collection_services,
+    event_services,
+    exp_domain,
+    exp_fetchers,
+    exp_services,
+    feedback_services,
+    interaction_registry,
+    learner_progress_services,
+    moderator_services,
+    platform_parameter_list,
+    platform_parameter_services,
+    question_services,
+    rating_services,
+    recommendations_services,
+    rights_manager,
+    skill_services,
+    stats_domain,
+    stats_services,
+    story_fetchers,
+    summary_services,
+    translation_fetchers,
+    translation_services,
+    user_services,
+)
 
 from typing import Dict, List, Optional, TypedDict, Union
 
@@ -804,8 +807,9 @@ class StateHitEventHandler(
         exploration_version = self.normalized_payload['exploration_version']
         session_id = self.normalized_payload['session_id']
         # TODO(sll): Why do we not record the value of this anywhere?
-        client_time_spent_in_secs = self.normalized_payload[  # pylint: disable=unused-variable
-            'client_time_spent_in_secs']
+        client_time_spent_in_secs = ( # pylint: disable=unused-variable
+            self.normalized_payload['client_time_spent_in_secs']
+        )
         old_params = self.normalized_payload['old_params']
 
         event_services.StateHitEventHandler.record(
@@ -2093,7 +2097,7 @@ class SaveTransientCheckpointProgressHandler(
 
     @acl_decorators.can_play_exploration
     def put(self, exploration_id: str) -> None:
-        """"Handles the PUT requests. Saves the logged-out user's progress."""
+        """Handles the PUT requests. Saves the logged-out user's progress."""
         assert self.normalized_payload is not None
         unique_progress_url_id = (
             self.normalized_payload['unique_progress_url_id'])
@@ -2182,7 +2186,7 @@ class LearnerAnswerDetailsSubmissionHandler(
 
     @acl_decorators.can_play_entity
     def put(self, entity_type: str, entity_id: str) -> None:
-        """"Handles the PUT requests. Stores the answer details submitted
+        """Handles the PUT requests. Stores the answer details submitted
         by the learner.
         """
         assert self.normalized_payload is not None

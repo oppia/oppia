@@ -42,7 +42,7 @@ import {
 } from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {CkEditorCopyContentService} from 'components/ck-editor-helpers/ck-editor-copy-content.service';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {OppiaNoninteractiveSkillreviewConceptCardModalComponent} from './oppia-noninteractive-skillreview-concept-card-modal.component';
@@ -64,7 +64,7 @@ export class NoninteractiveSkillreview implements OnInit, OnChanges {
 
   constructor(
     private ckEditorCopyContentService: CkEditorCopyContentService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private htmlEscaperService: HtmlEscaperService,
     private ngbModal: NgbModal
   ) {}
@@ -108,10 +108,10 @@ export class NoninteractiveSkillreview implements OnInit, OnChanges {
     if (this._shouldOpenRTEModal(event)) {
       return;
     }
-    this.entityId = this.contextService.getEntityId();
-    this.entityType = this.contextService.getEntityType();
+    this.entityId = this.pageContextService.getEntityId();
+    this.entityType = this.pageContextService.getEntityType();
 
-    this.contextService.setCustomEntityContext(
+    this.pageContextService.setCustomEntityContext(
       AppConstants.ENTITY_TYPE.SKILL,
       this.skillId
     );
@@ -128,12 +128,12 @@ export class NoninteractiveSkillreview implements OnInit, OnChanges {
     modalRef.result.then(
       () => {},
       res => {
-        this.contextService.removeCustomEntityContext();
+        this.pageContextService.removeCustomEntityContext();
         // Restore the entity context to that of the state before the concept card
         // editor was initialized. This prevents change of context issues in
         // calling components once the editor is closed.
         if (this.entityId && this.entityType) {
-          this.contextService.setCustomEntityContext(
+          this.pageContextService.setCustomEntityContext(
             this.entityType,
             this.entityId
           );

@@ -24,9 +24,7 @@ import types
 
 from core import feconf
 from core.constants import constants
-from core.domain import exp_domain
-from core.domain import exp_services
-from core.domain import rights_domain
+from core.domain import exp_domain, exp_services, rights_domain
 from core.platform import models
 from core.tests import test_utils
 
@@ -34,9 +32,7 @@ from typing import Dict, Final, List
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import exp_models
-    from mypy_imports import user_models
+    from mypy_imports import base_models, exp_models, user_models
 
 (base_models, exp_models, user_models) = models.Registry.import_models([
     models.Names.BASE_MODEL, models.Names.EXPLORATION, models.Names.USER
@@ -367,8 +363,14 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
         exp_rights_model = exp_models.ExplorationRightsModel(**snapshot_dict)
 
         for field in ['translator_ids', 'all_viewer_ids']:
-            self.assertNotIn(field, exp_rights_model._properties) # pylint: disable=protected-access
-            self.assertNotIn(field, exp_rights_model._values) # pylint: disable=protected-access
+            self.assertNotIn(
+                field,
+                exp_rights_model._properties # pylint: disable=protected-access
+            )
+            self.assertNotIn(
+                field,
+                exp_rights_model._values # pylint: disable=protected-access
+            )
 
 
 class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
@@ -662,56 +664,6 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertFalse(
             exp_models.ExpSummaryModel
             .has_reference_to_user_id('x_id'))
-
-    def test_get_non_private(self) -> None:
-        public_exploration_summary_model = (
-            exp_models.ExpSummaryModel(
-                id='id0',
-                title='title',
-                category='category',
-                objective='objective',
-                language_code='language_code',
-                tags=['tag'],
-                status=constants.ACTIVITY_STATUS_PUBLIC,
-                community_owned=False,
-                owner_ids=['owner_id'],
-                editor_ids=['editor_id'],
-                viewer_ids=['viewer_id'],
-                contributor_ids=[''],
-                contributors_summary={},
-                version=0,
-                exploration_model_last_updated=None,
-                exploration_model_created_on=None,
-            ))
-        public_exploration_summary_model.update_timestamps()
-        public_exploration_summary_model.put()
-
-        private_exploration_summary_model = (
-            exp_models.ExpSummaryModel(
-                id='id1',
-                title='title',
-                category='category',
-                objective='objective',
-                language_code='language_code',
-                tags=['tag'],
-                status=constants.ACTIVITY_STATUS_PRIVATE,
-                community_owned=False,
-                owner_ids=['owner_id'],
-                editor_ids=['editor_id'],
-                viewer_ids=['viewer_id'],
-                contributor_ids=[''],
-                contributors_summary={},
-                version=0,
-                exploration_model_last_updated=None,
-                exploration_model_created_on=None,
-            ))
-        private_exploration_summary_model.update_timestamps()
-        private_exploration_summary_model.put()
-        exploration_summary_models = (
-            exp_models.ExpSummaryModel.get_non_private())
-        self.assertEqual(
-            exploration_summary_models,
-            [public_exploration_summary_model])
 
     def test_get_top_rated(self) -> None:
         good_rating_exploration_summary_model = (

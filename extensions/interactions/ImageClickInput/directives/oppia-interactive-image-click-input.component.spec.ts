@@ -27,7 +27,7 @@ import {InteractiveImageClickInput} from './oppia-interactive-image-click-input.
 import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
 import {ImageClickAnswer} from 'interactions/answer-defs';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ImagePreloaderService} from 'pages/exploration-player-page/services/image-preloader.service';
 import {EventEmitter} from '@angular/core';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
@@ -38,7 +38,7 @@ import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 
 describe('InteractiveImageClickInput', () => {
   let fixture: ComponentFixture<InteractiveImageClickInput>;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let component: InteractiveImageClickInput;
   let imagePreloaderService: ImagePreloaderService;
   let currentInteractionService: CurrentInteractionService;
@@ -89,7 +89,7 @@ describe('InteractiveImageClickInput', () => {
 
   beforeEach(() => {
     imagePreloaderService = TestBed.inject(ImagePreloaderService);
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     currentInteractionService = TestBed.inject(CurrentInteractionService);
     playerPositionService = TestBed.inject(PlayerPositionService);
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
@@ -141,8 +141,8 @@ describe('InteractiveImageClickInput', () => {
       clickPosition: [1, 2],
       clickedRegions: ['region1'],
     } as ImageClickAnswer;
-    spyOn(contextService, 'getEntityType').and.returnValue('exploration');
-    spyOn(contextService, 'getEntityId').and.returnValue('expId');
+    spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
+    spyOn(pageContextService, 'getEntityId').and.returnValue('expId');
   });
 
   afterEach(() => {
@@ -218,7 +218,7 @@ describe('InteractiveImageClickInput', () => {
       spyOn(component, 'loadImage');
       spyOn(component, 'updateCurrentlyHoveredRegions');
       spyOn(currentInteractionService, 'registerCurrentInteraction');
-      spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+      spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
       );
       spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(true);
@@ -240,7 +240,7 @@ describe('InteractiveImageClickInput', () => {
       spyOn(component, 'loadImage');
       spyOn(component, 'updateCurrentlyHoveredRegions');
       spyOn(currentInteractionService, 'registerCurrentInteraction');
-      spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+      spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
       );
       spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(true);
@@ -768,13 +768,13 @@ describe('InteractiveImageClickInput', () => {
   });
 
   it('should show region if in exploration editor', () => {
-    spyOn(contextService, 'getEditorTabContext').and.returnValue('editor');
+    spyOn(pageContextService, 'getEditorTabContext').and.returnValue('editor');
 
     expect(component.getDotDisplay()).toBe('none');
   });
 
   it('should not show region if not in exploration editor', () => {
-    spyOn(contextService, 'getEditorTabContext').and.returnValue('preview');
+    spyOn(pageContextService, 'getEditorTabContext').and.returnValue('preview');
 
     expect(component.getDotDisplay()).toBe('inline');
   });

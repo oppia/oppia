@@ -40,6 +40,7 @@ export class VoiceoverPlayerService {
   public languageAccentDescriptions: string[] = [];
   public languageAccentDescriptionsToCodes: LanguageAccentDescriptionToCode =
     {};
+  public isAutomaticVoiceoverPlaying: boolean = false;
   private _translationLanguageChangedEventEmitter = new EventEmitter<void>();
   private _activeVoiceoverChangedEventEmitter = new EventEmitter<void>();
   constructor(private entityVoiceoversService: EntityVoiceoversService) {}
@@ -52,12 +53,24 @@ export class VoiceoverPlayerService {
         this.entityVoiceoversService.getActiveEntityVoiceovers();
       let voiceoverTypeToVoiceovers =
         activeEntityVoiceover.voiceoversMapping[contentId];
-      this.activeVoiceover = voiceoverTypeToVoiceovers.manual;
+
+      let manualVoiceover = voiceoverTypeToVoiceovers.manual;
+      let automaticVoiceover = voiceoverTypeToVoiceovers.auto;
+
+      if (manualVoiceover?.needsUpdate === false) {
+        this.activeVoiceover = manualVoiceover;
+      } else if (automaticVoiceover?.needsUpdate === false) {
+        this.activeVoiceover = automaticVoiceover;
+      }
     } catch (e: unknown) {
       this.activeVoiceover = undefined;
     }
 
     this._activeVoiceoverChangedEventEmitter.emit();
+  }
+
+  getActiveContentId(): string {
+    return this.activeContentId;
   }
 
   setActiveComponentName(componentName: string): void {
@@ -77,13 +90,14 @@ export class VoiceoverPlayerService {
     languageAccentCodes: string[]
   ): void {
     let retrievedLanguageAccentCodes =
-      this.languageAccentMasterList[languageCode];
+      this.languageAccentMasterList[languageCode] || {};
+
     let languageAccentDescriptions = [];
     this.languageAccentDescriptions = [];
     this.languageAccentDescriptionsToCodes = {};
 
     for (let languageAccentCode in retrievedLanguageAccentCodes) {
-      if (languageAccentCodes.indexOf(languageAccentCode) !== -1) {
+      if (languageAccentCodes.includes(languageAccentCode)) {
         let description = retrievedLanguageAccentCodes[languageAccentCode];
 
         languageAccentDescriptions.push(description);

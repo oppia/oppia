@@ -23,11 +23,9 @@ import json
 import logging
 import os
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import platform_parameter_domain
-from core.domain import platform_parameter_list
+from core.domain import platform_parameter_domain, platform_parameter_list
 from core.domain import platform_parameter_registry as registry
 
 from typing import Dict, Final, List
@@ -38,7 +36,16 @@ DATA_TYPE_TO_SCHEMA_TYPE: Dict[str, str] = {
     'bool': 'bool'
 }
 
-PACKAGE_JSON_FILE_PATH: Final = os.path.join(os.getcwd(), 'package.json')
+# We use a relative path here because functions in this file are used within
+# the oppia-beam-job library in Apache Beam, and the root of the execution
+# cannot be assumed to be at oppia/ (since, in that environment, all the Oppia
+# code is a library in Python's site-packages).
+#
+# Note that os.path.abspath(__file__) provides the path of the current
+# platform_parameter_services.py module.
+PACKAGE_JSON_FILE_PATH: Final = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)),
+    os.pardir, os.pardir, 'package.json')
 
 
 class PlatformParameterNotFoundException(Exception):
@@ -96,7 +103,7 @@ def get_server_mode() -> platform_parameter_domain.ServerMode:
     # TODO(release-scripts#137): Remove once project ID is verified on all
     # servers.
     logging.info('Logging project ID for debugging: %s' % (
-        os.environ['GOOGLE_CLOUD_PROJECT']))
+        os.environ.get('GOOGLE_CLOUD_PROJECT', 'no-project-id-specified')))
     return (
         platform_parameter_domain.ServerMode.DEV
         if constants.DEV_MODE

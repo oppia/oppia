@@ -21,10 +21,8 @@ from __future__ import annotations
 import datetime
 import types
 
-from core import feconf
-from core import utils
-from core.domain import exp_domain
-from core.domain import exp_services
+from core import feconf, utils
+from core.domain import exp_domain, exp_services
 from core.platform import models
 from core.tests import test_utils
 
@@ -32,8 +30,7 @@ from typing import Dict, Final, List, Set, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import user_models
+    from mypy_imports import base_models, user_models
 
 (base_models, user_models) = models.Registry.import_models([
     models.Names.BASE_MODEL, models.Names.USER
@@ -3687,8 +3684,9 @@ class PinnedOpportunityModelTest(test_utils.GenericTestBase):
 
     def test_create_raises_exception_for_existing_instance(self) -> None:
         with self.assertRaisesRegex(
-            Exception, 'There is already a pinned opportunity'
-            ' with the given id:'):
+            Exception,
+            'There is already a pinned opportunity with the given id:'
+        ):
             user_models.PinnedOpportunityModel.create(
                 user_id=self.user_id,
                 language_code=self.language_code,

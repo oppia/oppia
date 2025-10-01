@@ -30,20 +30,23 @@ import time
 import traceback
 import urllib
 
-from core import feconf
-from core import handler_schema_constants
-from core import utils
+from core import feconf, handler_schema_constants, utils
 from core.controllers import payload_validator
-from core.domain import auth_domain
-from core.domain import auth_services
-from core.domain import user_services
-
-from typing import (
-    Any, Dict, Final, Generic, Mapping, Optional, Sequence, TypedDict, TypeVar,
-    Union
-)
+from core.domain import auth_domain, auth_services, user_services
 
 import webapp2
+from typing import (
+    Any,
+    Dict,
+    Final,
+    Generic,
+    Mapping,
+    Optional,
+    Sequence,
+    TypedDict,
+    TypeVar,
+    Union,
+)
 
 # Note: These private type variables are only defined to implement the Generic
 # typing structure of BaseHandler. So, do not make them public in the future.
@@ -568,7 +571,9 @@ class BaseHandler(
 
     # Here we use type Any because the sub-classes of 'Basehandler' can have
     # 'get' method with different number of arguments and types.
-    def get(self, *args: Any, **kwargs: Any) -> None:  # pylint: disable=unused-argument
+    def get(
+        self, *args: Any, **kwargs: Any # pylint: disable=unused-argument
+    ) -> None:
         """Base method to handle GET requests."""
         logging.warning('Invalid URL requested: %s', self.request.uri)
         self.error(404)
@@ -1077,9 +1082,7 @@ class CsrfTokenHandler(BaseHandler[Dict[str, str], Dict[str, str]]):
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-    # Here we use MyPy ignore because the signature of 'get' method is not
-    # compatible with super class's (BaseHandler) 'get' method.
-    def get(self) -> None:  # type: ignore[override]
+    def get(self) -> None:
         csrf_token = CsrfTokenManager.create_csrf_token(
             self.user_id)
         self.render_json({

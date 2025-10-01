@@ -20,26 +20,26 @@ import datetime
 import enum
 import re
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
 from core.platform import models
 
-from typing import Final, Literal, TypedDict
-
-from typing import ( # isort:skip
+from typing import (
     Any,
     Dict,
+    Final,
     List,
+    Literal,
     Mapping,
     Optional,
     Sequence,
     Tuple,
     Type,
-    Union,
+    TypedDict,
     TypeVar,
+    Union,
     cast,
-    overload
+    overload,
 )
 
 SELF_BASE_MODEL = TypeVar(  # pylint: disable=invalid-name
@@ -58,9 +58,8 @@ SELF_BASE_SNAPSHOT_CONTENT_MODEL = TypeVar(  # pylint: disable=invalid-name
 MYPY = False
 if MYPY: # pragma: no cover
     # Here, 'change_domain' is imported only for type checking.
-    from core.domain import change_domain  # pylint: disable=invalid-import # isort:skip
-    from mypy_imports import datastore_services
-    from mypy_imports import transaction_services
+    from core.domain import change_domain  # pylint: disable=invalid-import
+    from mypy_imports import datastore_services, transaction_services
 
     AllowedCommitCmdsListType = Sequence[
         Mapping[str, change_domain.AcceptableChangeDictTypes]
@@ -493,8 +492,12 @@ class BaseModel(datastore_services.Model):
             iterable. Filterable iterable of all entities of this class.
         """
         return (
-            cls.query() if include_deleted else
-            cls.query().filter(cls.deleted == False)) # pylint: disable=singleton-comparison
+            cls.query()
+            if include_deleted
+            else cls.query().filter(
+                cls.deleted == False # pylint: disable=singleton-comparison
+            )
+        )
 
     @classmethod
     def get_new_id(cls, entity_name: str) -> str:
@@ -1589,10 +1592,8 @@ class VersionedModel(BaseModel):
         version: Optional[int] = None
     ) -> Optional[SELF_VERSIONED_MODEL]: ...
 
-    # Here we use MyPy ignore because the signature of this method
-    # doesn't match with BaseModel.get().
     @classmethod
-    def get(  # type: ignore[override]
+    def get(
         cls: Type[SELF_VERSIONED_MODEL],
         entity_id: str,
         strict: bool = True,

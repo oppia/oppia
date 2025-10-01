@@ -22,10 +22,9 @@ import subprocess
 import tempfile
 
 from core.tests import test_utils
-from scripts import check_ci_test_suites_to_run
-from scripts import generate_root_files_mapping
-from typing import List, Sequence
+from scripts import check_ci_test_suites_to_run, generate_root_files_mapping
 
+from typing import List, Sequence
 
 LIGHTHOUSE_PAGES_CONFIG = {
     'splash': {
@@ -280,9 +279,11 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
             'w',
             encoding='utf-8'
         ) as f:
-            f.write(
-                'blog-admin-page.module.ts\n'
-                'blog-dashboard-page.module.ts'
+            f.writelines(
+                [
+                    'blog-admin-page.module.ts\n',
+                    'blog-dashboard-page.module.ts\n'
+                ]
             )
         os.mkdir(
             os.path.join(
@@ -481,8 +482,8 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                     b''
                 )
 
-        def mock_popen(
-            cmd_tokens: List[str], stdout: int, stderr: int # pylint: disable=unused-argument
+        def mock_popen( # pylint: disable=unused-argument
+            cmd_tokens: List[str], stdout: int, stderr: int
         ) -> MockSubprocessPopen:
             return MockSubprocessPopen()
 
@@ -516,8 +517,8 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                     b'fatal: not a valid git branch\n'
                 )
 
-        def mock_popen(
-            cmd_tokens: List[str], stdout: int, stderr: int # pylint: disable=unused-argument
+        def mock_popen( # pylint: disable=unused-argument
+            cmd_tokens: List[str], stdout: int, stderr: int
         ) -> MockSubprocessPopen:
             return MockSubprocessPopen()
 

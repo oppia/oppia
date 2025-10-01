@@ -13,12 +13,11 @@
         </span>
         <div class="oppia-topic-lessons">
           {{ totalPublishedNodeCount }}
-          <div *ngIf="totalPublishedNodeCount === 1" class="lesson-title">
-            <span translate="I18N_TOPIC_VIEWER_LESSON"></span>
-          </div>
-          <div *ngIf="totalPublishedNodeCount !== 1" class="lesson-title">
-            <span translate="I18N_TOPIC_VIEWER_LESSONS"></span>
-          </div>
+          <span [innerHTML]="'I18N_COUNT_OF_LESSONS' | translate: {
+            lessonCountValue: totalPublishedNodeCount,
+            messageFormat: true
+          }">
+          </span>
         </div>
       </div>
     </a>
@@ -33,7 +32,10 @@
       </p>
       <p class="oppia-class-card-text">
         {{ totalPublishedNodeCount }}
-        {{ (totalPublishedNodeCount === 1 ? 'I18N_TOPIC_VIEWER_LESSON' : 'I18N_TOPIC_VIEWER_LESSONS') | translate }}
+        <span [innerHTML]="'I18N_COUNT_OF_LESSONS' | translate: {
+          lessonCountValue: totalPublishedNodeCount,
+          messageFormat: true
+        }"></span>
       </p>
     </div>
   </a>

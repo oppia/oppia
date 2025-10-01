@@ -25,7 +25,7 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {ImageUploaderModalComponent} from './image-uploader-modal.component';
@@ -34,7 +34,7 @@ import {ImageUploaderComponent} from './image-uploader.component';
 describe('ImageUploaderComponent', () => {
   let fixture: ComponentFixture<ImageUploaderComponent>;
   let component: ImageUploaderComponent;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let imageUploadHelperService: ImageUploadHelperService;
   let ngbModal: NgbModal;
   let imageUploaderParameters = {
@@ -70,15 +70,15 @@ describe('ImageUploaderComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ImageUploaderComponent);
     component = fixture.componentInstance;
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     imageUploadHelperService = TestBed.inject(ImageUploadHelperService);
     ngbModal = TestBed.inject(NgbModal);
     component.imageUploaderParameters = imageUploaderParameters;
   });
 
   it('should set editable image on initialization', () => {
-    spyOn(contextService, 'getEntityType').and.returnValue('exploration');
-    spyOn(contextService, 'getEntityId').and.returnValue('expId');
+    spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
+    spyOn(pageContextService, 'getEntityId').and.returnValue('expId');
     component.imageUploaderParameters.filename = 'image-filename';
     component.imageUploaderParameters.imageName = 'Thumbnail';
     component.ngOnInit();
@@ -97,7 +97,7 @@ describe('ImageUploaderComponent', () => {
     'should throw error if no image is present for a preview during file' +
       ' changed',
     () => {
-      spyOn(contextService, 'getEntityType').and.returnValue(undefined);
+      spyOn(pageContextService, 'getEntityType').and.returnValue(undefined);
       component.imageUploaderParameters.filename = 'thumbnail-1';
 
       expect(() => {
@@ -115,8 +115,8 @@ describe('ImageUploaderComponent', () => {
   it(
     'should not show image uploader modal if editing image is' + ' disabled',
     () => {
-      spyOn(contextService, 'getEntityType').and.returnValue('exploration');
-      spyOn(contextService, 'getEntityId').and.returnValue('expId');
+      spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
+      spyOn(pageContextService, 'getEntityId').and.returnValue('expId');
       component.imageUploaderParameters.disabled = true;
       spyOn(ngbModal, 'open');
 
@@ -130,8 +130,8 @@ describe('ImageUploaderComponent', () => {
     'should show image uploader modal when user clicks on edit button and' +
       ' save background color if not opened in upload mode',
     fakeAsync(() => {
-      spyOn(contextService, 'getEntityType').and.returnValue('exploration');
-      spyOn(contextService, 'getEntityId').and.returnValue('expId');
+      spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
+      spyOn(pageContextService, 'getEntityId').and.returnValue('expId');
       class MockNgbModalRef {
         result = Promise.resolve({
           dimensions: {
@@ -187,8 +187,8 @@ describe('ImageUploaderComponent', () => {
   it(
     'should close image uploader modal when cancel button' + ' is clicked',
     fakeAsync(() => {
-      spyOn(contextService, 'getEntityType').and.returnValue('exploration');
-      spyOn(contextService, 'getEntityId').and.returnValue('expId');
+      spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
+      spyOn(pageContextService, 'getEntityId').and.returnValue('expId');
       class MockNgbModalRef {
         componentInstance = imageUploadHelperService;
       }
@@ -213,8 +213,8 @@ describe('ImageUploaderComponent', () => {
   );
 
   it('should return early if imageBlobData is null', fakeAsync(() => {
-    spyOn(contextService, 'getEntityType').and.returnValue('exploration');
-    spyOn(contextService, 'getEntityId').and.returnValue('expId');
+    spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
+    spyOn(pageContextService, 'getEntityId').and.returnValue('expId');
     class MockNgbModalRef {
       result = Promise.resolve({
         newImageDataUrl: 'data:image/png;base64,xyz',

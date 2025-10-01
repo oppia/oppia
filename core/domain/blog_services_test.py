@@ -22,12 +22,13 @@ import datetime
 import logging
 import math
 
-from core import feconf
-from core import utils
-from core.domain import blog_domain
-from core.domain import blog_services
-from core.domain import search_services
-from core.domain import user_services
+from core import feconf, utils
+from core.domain import (
+    blog_domain,
+    blog_services,
+    search_services,
+    user_services,
+)
 from core.platform import models
 from core.tests import test_utils
 
@@ -399,8 +400,8 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
             Exception,
-            'Blog Post URL fragment should be a string. Recieved:'
-            r'\[123\]'):
+            r'Blog Post URL fragment should be a string. Recieved:\s*\[123\]'
+        ):
             blog_services.does_blog_post_with_url_fragment_exist([123])  # type: ignore[arg-type]
 
         # TODO(#13059): Here we use MyPy ignore because after we fully type the
@@ -408,8 +409,8 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
             Exception,
-            'Blog Post URL fragment should be a string. Recieved:'
-            '123'):
+            'Blog Post URL fragment should be a string. Recieved:123'
+        ):
             blog_services.does_blog_post_with_url_fragment_exist(123)  # type: ignore[arg-type]
 
     def test_does_blog_post_with_url_fragment_exist(self) -> None:

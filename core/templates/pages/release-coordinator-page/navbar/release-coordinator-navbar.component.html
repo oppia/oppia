@@ -56,8 +56,7 @@
     <div class="navbar-container oppia-navbar-container">
       <div class="navbar-header e2e-test-navbar-header float-left">
         <a class="oppia-navbar-brand-name oppia-transition-200 float-left"
-           href="/community-library"
-           smartRouterLink="/community-library">
+           href="/community-library">
           <picture>
             <source type="image/webp" [srcset]="logoWebpImageSrc">
             <source type="image/png" [srcset]="logoPngImageSrc">
@@ -89,7 +88,7 @@
                     (mouseenter)="activateDropdownMenu()"
                     (mouseleave)="deactivateDropdownMenu()">
                   <li>
-                    <a class="dropdown-item oppia-dropdown-item-text nav-link oppia-navbar-tab"
+                    <a class="dropdown-item oppia-dropdown-item-text nav-link oppia-navbar-tab e2e-test-beam-jobs-mobile"
                        (click)="switchTab(TAB_ID_BEAM_JOBS)"
                        href="#"
                        [ngClass]="{ 'active': activeTab == TAB_ID_BEAM_JOBS }"
@@ -128,7 +127,7 @@
           <li>
             <ul class="nav oppia-navbar-tabs-release-coordinator oppia-hide-in-small-width-screens">
               <li class="nav-item oppia-clickable-navbar-element float-right">
-                <a class="nav-link oppia-navbar-tab"
+                <a class="nav-link oppia-navbar-tab e2e-test-beam-jobs"
                    (click)="switchTab(TAB_ID_BEAM_JOBS)"
                    href="#"
                    [ngClass]="{ 'active': activeTab == TAB_ID_BEAM_JOBS }"
@@ -199,7 +198,6 @@
                   </li>
                   <li>
                     <a href="/preferences"
-                       [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES.ROUTE"
                        class="dropdown-item oppia-dropdown-item-text">
                       Preferences
                     </a>
@@ -207,7 +205,6 @@
                   <hr class="oppia-top-right-menu-item-separator">
                   <li>
                     <a [href]="logoutUrl"
-                       [smartRouterLink]="logoutUrl"
                        class="dropdown-item oppia-dropdown-item-text">
                       Logout
                     </a>

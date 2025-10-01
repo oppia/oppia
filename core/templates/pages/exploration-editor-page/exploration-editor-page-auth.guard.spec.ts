@@ -27,7 +27,7 @@ import {RouterTestingModule} from '@angular/router/testing';
 import {AppConstants} from 'app.constants';
 import {ExplorationEditorPageAuthGuard} from './exploration-editor-page-auth.guard';
 import {AccessValidationBackendApiService} from '../oppia-root/routing/access-validation-backend-api.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 
 class MockAccessValidationBackendApiService {
   validateAccessToExplorationEditorPage(explorationId: string) {
@@ -41,7 +41,7 @@ class MockRouter {
   }
 }
 
-class MockContextService {
+class MockPageContextService {
   getExplorationId(): string {
     return 'expId123';
   }
@@ -62,7 +62,7 @@ describe('ExplorationEditorPageAuthGuard', () => {
           useClass: MockAccessValidationBackendApiService,
         },
         {provide: Router, useClass: MockRouter},
-        {provide: ContextService, useClass: MockContextService},
+        {provide: PageContextService, useClass: MockPageContextService},
         Location,
       ],
     });

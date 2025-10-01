@@ -21,8 +21,7 @@ from __future__ import annotations
 import datetime
 import types
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.platform import models
 from core.tests import test_utils
 
@@ -30,9 +29,8 @@ from typing import Final, Sequence
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import email_models
     from mypy_imports import user_models  # pylint: disable=unused-import
+    from mypy_imports import base_models, email_models
 
 (base_models, email_models, user_models) = models.Registry.import_models([
     models.Names.BASE_MODEL, models.Names.EMAIL, models.Names.USER
@@ -230,7 +228,10 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
                 'recipient_id2', 'Email Subject', 'Email Body'))
 
     def test_check_duplicate_messages_with_same_hash(self) -> None:
-        def mock_convert_to_hash(input_string: str, max_length: int) -> str: # pylint: disable=unused-argument
+        def mock_convert_to_hash(
+            input_string: str, # pylint: disable=unused-argument
+            max_length: int # pylint: disable=unused-argument
+        ) -> str:
             return 'some_poor_hash'
         swap_generate_hash = self.swap(
             utils, 'convert_to_hash', mock_convert_to_hash)

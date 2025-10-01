@@ -18,8 +18,7 @@
 
 from __future__ import annotations
 
-from core.domain import moderator_services
-from core.domain import platform_parameter_list
+from core.domain import moderator_services, platform_parameter_list
 from core.tests import test_utils
 
 
@@ -56,7 +55,19 @@ class FlagExplorationEmailEnqueueTaskTests(test_utils.EmailTestBase):
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, email_footer),
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'moderator')
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'moderator'),
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                'noreply@example.com'
+            )
         ]
     )
     def test_that_flag_exploration_emails_are_correct(self) -> None:

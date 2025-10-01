@@ -23,8 +23,7 @@ import datetime
 from core import feconf
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import audit_topic_related_models_relation_jobs
-from core.jobs.types import base_validation_errors
-from core.jobs.types import model_property
+from core.jobs.types import base_validation_errors, model_property
 from core.platform import models
 from core.tests import test_utils
 
@@ -144,7 +143,7 @@ class ValidateTopicModelsJobTests(
                 model_property.ModelProperty(
                     topic_models.TopicModel,
                     topic_models.TopicModel.name),
-                    model_id='topic_1',
+                    topic_model,
                     target_kind='TopicRightsModel',
                     target_id='topic_1'),
         ])
@@ -180,7 +179,7 @@ class ValidateTopicModelsJobTests(
                 id_property=model_property.ModelProperty(
                     topic_models.TopicModel,
                     topic_models.TopicModel.name),
-                model_id='topic_1',
+                model=topic_model,
                 target_kind='TopicSummaryModel',
                 target_id='topic_1'),
         ])
@@ -399,14 +398,14 @@ class ValidateTopicModelsJobTests(
                 model_property.ModelProperty(
                     topic_models.TopicModel,
                     topic_models.TopicModel.name),
-                    model_id='topic_2',
+                    model=topic_model2,
                     target_kind='TopicRightsModel',
                     target_id='topic_2'),
             base_validation_errors.ModelRelationshipError(
                 model_property.ModelProperty(
                     topic_models.TopicModel,
                     topic_models.TopicModel.name),
-                    model_id='topic_3',
+                    model=topic_model3,
                     target_kind='TopicSummaryModel',
                     target_id='topic_3'),
         ])

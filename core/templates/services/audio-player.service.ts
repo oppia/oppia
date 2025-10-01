@@ -20,7 +20,7 @@ import {EventEmitter, Injectable, NgZone} from '@angular/core';
 import {AudioFile} from 'domain/utilities/audio-file.model';
 import {AudioTranslations} from 'pages/exploration-player-page/services/audio-translation-manager.service';
 import {AssetsBackendApiService} from './assets-backend-api.service';
-import {ContextService} from './context.service';
+import {PageContextService} from './page-context.service';
 import {Howl} from 'howler';
 import {interval, Subject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
@@ -47,7 +47,7 @@ export class AudioPlayerService {
   private _stopIntervalSubject = new Subject<void>();
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private ngZone: NgZone
   ) {}
 
@@ -60,7 +60,7 @@ export class AudioPlayerService {
       return;
     }
     this.assetsBackendApiService
-      .loadAudio(this.contextService.getExplorationId(), filename)
+      .loadAudio(this.pageContextService.getExplorationId(), filename)
       .then(
         (loadedAudioFile: AudioFile) => {
           this._currentTrack = new Howl({

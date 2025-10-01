@@ -38,23 +38,14 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
                             'es_cloud_id',
                             'es_username',
                             'high_bounce_rate_task_minimum_exploration_starts',
-                            (
-                                'high_bounce_rate_task_state_bounce_'
-                                'rate_creation_threshold'
-                            ),
-                            (
-                                'high_bounce_rate_task_state_bounce_rate_'
-                                'obsoletion_threshold'
-                            ),
+                            'high_bounce_rate_task_state_bounce_rate_creation_threshold',   # pylint: disable=line-too-long
+                            'high_bounce_rate_task_state_bounce_rate_obsoletion_threshold', # pylint: disable=line-too-long
                             'mailchimp_audience_id',
                             'mailchimp_username',
                             'mailgun_domain_name',
                             'max_number_of_suggestions_per_reviewer',
                             'max_number_of_tags_assigned_to_blog_post',
-                            (
-                                'notify_admins_suggestions_waiting_too_long_'
-                                'is_enabled'
-                            ),
+                            'notify_admins_suggestions_waiting_too_long_is_enabled', # pylint: disable=line-too-long
                             'noreply_email_address',
                             'oppia_project_id',
                             'oppia_site_url_for_emails',

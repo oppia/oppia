@@ -25,7 +25,7 @@ import {
   Output,
 } from '@angular/core';
 import {Outcome} from 'domain/exploration/outcome.model';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 
 @Component({
   selector: 'oppia-outcome-feedback-editor',
@@ -40,15 +40,16 @@ export class OutcomeFeedbackEditorComponent implements OnInit {
   OUTCOME_FEEDBACK_SCHEMA!: object;
   constructor(
     private readonly changeDetectorRef: ChangeDetectorRef,
-    private contextService: ContextService
+    private pageContextService: PageContextService
   ) {}
 
   ngOnInit(): void {
     this.OUTCOME_FEEDBACK_SCHEMA = {
       type: 'html',
       ui_config: {
+        rte_component_config_id: 'ALL_COMPONENTS',
         hide_complex_extensions:
-          this.contextService.getEntityType() === 'question',
+          this.pageContextService.getEntityType() === 'question',
       },
     };
   }

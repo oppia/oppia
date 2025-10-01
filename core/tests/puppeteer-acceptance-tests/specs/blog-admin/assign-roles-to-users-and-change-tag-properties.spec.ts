@@ -17,13 +17,14 @@
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
-import testConstants from '../../utilities/common/test-constants';
+import testConstants, {
+  BLOG_RIGHTS,
+} from '../../utilities/common/test-constants';
 import {BlogAdmin} from '../../utilities/user/blog-admin';
 import {SuperAdmin} from '../../utilities/user/super-admin';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
-const BLOG_RIGHTS = testConstants.BlogRights;
 
 describe('Blog Admin', function () {
   let superAdmin: SuperAdmin;
@@ -55,6 +56,7 @@ describe('Blog Admin', function () {
       );
 
       await superAdmin.expectUserNotToHaveRole('guestUsr1', ROLES.BLOG_ADMIN);
+      await blogAdmin.navigateToBlogAdminPage();
       await blogAdmin.assignUserToRoleFromBlogAdminPage(
         'guestUsr1',
         BLOG_RIGHTS.BLOG_ADMIN

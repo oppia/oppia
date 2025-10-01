@@ -18,15 +18,12 @@ from __future__ import annotations
 
 import datetime
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import skill_domain
-from core.domain import state_domain
-from core.domain import translation_domain
+from core.domain import skill_domain, state_domain, translation_domain
 from core.tests import test_utils
 
-from typing import Final, List
+from typing import Final
 
 
 class SkillDomainUnitTests(test_utils.GenericTestBase):
@@ -37,13 +34,9 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        example_1 = skill_domain.WorkedExample(
-            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
-            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
-        )
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
-                '1', '<p>Explanation</p>'), [example_1],
+                '1', '<p>Explanation</p>'),
             state_domain.RecordedVoiceovers.from_dict({
                 'voiceovers_mapping': {
                     '1': {}, '2': {}, '3': {}
@@ -112,7 +105,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
 
     def test_get_all_html_content_strings(self) -> None:
         html_strings = self.skill.get_all_html_content_strings()
-        self.assertEqual(len(html_strings), 8)
+        self.assertEqual(len(html_strings), 6)
 
     def test_valid_misconception_name(self) -> None:
         misconception_name = 'This string is smaller than 50'
@@ -154,18 +147,6 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
                         'explanation': {}
                     }
                 },
-                'worked_examples': [
-                    {
-                        'question': {
-                            'html': '<p>A Question</p>',
-                            'content_id': 'id'
-                        },
-                        'explanation': {
-                            'html': '<p>An explanation</p>',
-                            'content_id': 'id'
-                        }
-                    }
-                ]
             }
         }
         self.skill.update_skill_contents_from_model(
@@ -279,8 +260,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self.skill.validate()
         self.assertEqual(versioned_misconceptions['schema_version'], 4)
         versioned_misconceptions['misconceptions'][0]['feedback'] = (
-            '<span>'
-            'feedback&nbsp;</span>'
+            '<span>feedback&nbsp;</span>'
         )
         self.skill.update_misconceptions_from_model(
             versioned_misconceptions,
@@ -371,11 +351,15 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
     def test_find_prerequisite_skill_id_index(self) -> None:
         # Disabling pylint protected access because this is a test.
         self.assertEqual(
-            self.skill._find_prerequisite_skill_id_index('skill_id_2'), # pylint: disable=protected-access
+            self.skill._find_prerequisite_skill_id_index( # pylint: disable=protected-access
+                'skill_id_2'
+            ),
             0
         )
         self.assertEqual(
-            self.skill._find_prerequisite_skill_id_index('skill_id_3'), # pylint: disable=protected-access
+            self.skill._find_prerequisite_skill_id_index( # pylint: disable=protected-access
+                'skill_id_3'
+            ),
             None
         )
 
@@ -643,37 +627,6 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         # TODO(#13059): Here we use MyPy ignore because after we fully type the
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
-        self.skill.skill_contents.worked_examples = ''  # type: ignore[assignment]
-        self._assert_validation_error('Expected worked examples to be a list')
-
-        # TODO(#13059): Here we use MyPy ignore because after we fully type the
-        # codebase we plan to get rid of the tests that intentionally test wrong
-        # inputs that we can normally catch by typing.
-        self.skill.skill_contents.worked_examples = [1]  # type: ignore[list-item]
-        self._assert_validation_error(
-            'Expected worked example to be a WorkedExample object')
-
-        # TODO(#13059): Here we use MyPy ignore because after we fully type the
-        # codebase we plan to get rid of the tests that intentionally test wrong
-        # inputs that we can normally catch by typing.
-        example = skill_domain.WorkedExample('question', 'explanation')  # type: ignore[arg-type]
-        self.skill.skill_contents.worked_examples = [example]
-        self._assert_validation_error(
-            'Expected example question to be a SubtitledHtml object')
-
-        # TODO(#13059): Here we use MyPy ignore because after we fully type the
-        # codebase we plan to get rid of the tests that intentionally test wrong
-        # inputs that we can normally catch by typing.
-        example = skill_domain.WorkedExample(
-            state_domain.SubtitledHtml(
-                '2', '<p>Example Question 1</p>'), 'explanation')  # type: ignore[arg-type]
-        self.skill.skill_contents.worked_examples = [example]
-        self._assert_validation_error(
-            'Expected example explanation to be a SubtitledHtml object')
-
-        # TODO(#13059): Here we use MyPy ignore because after we fully type the
-        # codebase we plan to get rid of the tests that intentionally test wrong
-        # inputs that we can normally catch by typing.
         self.skill.skill_contents.explanation = 'explanation'  # type: ignore[assignment]
         self._assert_validation_error(
             'Expected skill explanation to be a SubtitledHtml object')
@@ -684,20 +637,6 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self.skill.skill_contents = ''  # type: ignore[assignment]
         self._assert_validation_error(
             'Expected skill_contents to be a SkillContents object')
-
-    def test_validate_duplicate_content_id(self) -> None:
-        self.skill.skill_contents.worked_examples = (
-            [skill_domain.WorkedExample(
-                self.skill.skill_contents.explanation,
-                self.skill.skill_contents.explanation)])
-        self._assert_validation_error('Found a duplicate content id 1')
-
-        example_1 = skill_domain.WorkedExample(
-            state_domain.SubtitledHtml('4', '<p>Example Question 1</p>'),
-            state_domain.SubtitledHtml('1', '<p>Example Explanation 1</p>')
-        )
-        self.skill.skill_contents.worked_examples = [example_1]
-        self._assert_validation_error('Found a duplicate content id 1')
 
     def test_misconception_id_validation(self) -> None:
         self.skill.misconceptions = [
@@ -758,7 +697,6 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
                         'explanation': {}
                     }
                 },
-                'worked_examples': []
             },
             'misconceptions_schema_version': (
                 feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION
@@ -782,12 +720,8 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         """Test that to_dict and from_dict preserve all data within a
         skill_contents and misconception object.
         """
-        example_1 = skill_domain.WorkedExample(
-            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
-            state_domain.SubtitledHtml('3', '<p>Example Answer 1</p>')
-        )
         skill_contents = skill_domain.SkillContents(
-            state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [example_1],
+            state_domain.SubtitledHtml('1', '<p>Explanation</p>'),
             state_domain.RecordedVoiceovers.from_dict({
                 'voiceovers_mapping': {
                     '1': {}, '2': {}, '3': {}
@@ -832,44 +766,6 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             expected_skill_mastery_dict,
             observed_skill_mastery.to_dict())
-
-    def test_update_worked_examples(self) -> None:
-        question_1: state_domain.SubtitledHtmlDict = {
-            'content_id': 'question_1',
-            'html': '<p>Worked example question 1</p>'
-        }
-        explanation_1: state_domain.SubtitledHtmlDict = {
-            'content_id': 'explanation_1',
-            'html': '<p>Worked example explanation 1</p>'
-        }
-        question_2: state_domain.SubtitledHtmlDict = {
-            'content_id': 'question_2',
-            'html': '<p>Worked example question 2</p>'
-        }
-        explanation_2: state_domain.SubtitledHtmlDict = {
-            'content_id': 'explanation_2',
-            'html': '<p>Worked example explanation 2</p>'
-        }
-        worked_examples_dict_list: List[skill_domain.WorkedExampleDict] = [{
-            'question': question_1,
-            'explanation': explanation_1
-        }, {
-            'question': question_2,
-            'explanation': explanation_2
-        }]
-
-        worked_examples_object_list = [
-            skill_domain.WorkedExample.from_dict(worked_example)
-            for worked_example in worked_examples_dict_list]
-
-        self.skill.update_worked_examples(worked_examples_object_list)
-        self.skill.validate()
-
-        # Delete the last worked_example.
-        worked_examples_object_list.pop()
-
-        self.skill.update_worked_examples(worked_examples_object_list)
-        self.skill.validate()
 
     def test_require_valid_description_with_empty_description_raise_error(
         self
@@ -1241,13 +1137,12 @@ class SkillSummaryTests(test_utils.GenericTestBase):
             'language_code': 'en',
             'version': 1,
             'misconception_count': 1,
-            'worked_examples_count': 1,
             'skill_model_created_on': time_in_millisecs,
             'skill_model_last_updated': time_in_millisecs
         }
 
         self.skill_summary = skill_domain.SkillSummary(
-            'skill_id', 'description', 'en', 1, 1, 1,
+            'skill_id', 'description', 'en', 1, 1,
             current_time, current_time)
 
     def test_skill_summary_gets_created(self) -> None:
@@ -1306,24 +1201,6 @@ class SkillSummaryTests(test_utils.GenericTestBase):
                 'received \'-1\'')):
             self.skill_summary.validate()
 
-    # TODO(#13059): Here we use MyPy ignore because after we fully type the
-    # codebase we plan to get rid of the tests that intentionally test wrong
-    # inputs that we can normally catch by typing.
-    def test_validation_fails_with_invalid_worked_examples_count(self) -> None:
-        self.skill_summary.worked_examples_count = '10'  # type: ignore[assignment]
-        with self.assertRaisesRegex(
-            utils.ValidationError,
-            'Expected worked_examples_count to be an int, received \'10\''):
-            self.skill_summary.validate()
-
-    def test_validation_fails_with_negative_worked_examples_count(self) -> None:
-        self.skill_summary.worked_examples_count = -1
-        with self.assertRaisesRegex(
-            utils.ValidationError, (
-                'Expected worked_examples_count to be non-negative, '
-                'received \'-1\'')):
-            self.skill_summary.validate()
-
 
 class AugmentedSkillSummaryTests(test_utils.GenericTestBase):
 
@@ -1333,7 +1210,7 @@ class AugmentedSkillSummaryTests(test_utils.GenericTestBase):
         self.time_in_millisecs = utils.get_time_in_millisecs(current_time)
 
         self.augmented_skill_summary = skill_domain.AugmentedSkillSummary(
-            'skill_id', 'description', 'en', 1, 1, 1,
+            'skill_id', 'description', 'en', 1, 1,
             ['topic1'], ['math'], current_time, current_time)
 
     def test_augmented_skill_summary_gets_created(self) -> None:
@@ -1343,7 +1220,6 @@ class AugmentedSkillSummaryTests(test_utils.GenericTestBase):
             'language_code': 'en',
             'version': 1,
             'misconception_count': 1,
-            'worked_examples_count': 1,
             'topic_names': ['topic1'],
             'classroom_names': ['math'],
             'skill_model_created_on': self.time_in_millisecs,
@@ -1443,7 +1319,7 @@ class ShortSkillSummaryTests(test_utils.GenericTestBase):
         super().setUp()
         self.skill_summary = skill_domain.SkillSummary(
             'skill_1', 'Description 1', 'en', 1,
-            0, 0, datetime.datetime.now(), datetime.datetime.now())
+            0, datetime.datetime.now(), datetime.datetime.now())
         self.short_skill_summary = skill_domain.ShortSkillSummary(
             'skill_1', 'Description 1')
 

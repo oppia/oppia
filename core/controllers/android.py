@@ -18,23 +18,26 @@ from __future__ import annotations
 
 from core import feconf
 from core.constants import constants
-from core.controllers import acl_decorators
-from core.controllers import base
-from core.domain import android_services
-from core.domain import classroom_config_domain
-from core.domain import classroom_config_services
-from core.domain import classroom_domain
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import skill_domain
-from core.domain import skill_fetchers
-from core.domain import story_domain
-from core.domain import story_fetchers
-from core.domain import subtopic_page_domain
-from core.domain import subtopic_page_services
-from core.domain import topic_domain
-from core.domain import topic_fetchers
-from core.domain import translation_fetchers
+from core.controllers import acl_decorators, base
+from core.domain import (
+    android_services,
+    classroom_config_domain,
+    classroom_config_services,
+    classroom_domain,
+    exp_domain,
+    exp_fetchers,
+    skill_domain,
+    skill_fetchers,
+    story_domain,
+    story_fetchers,
+    study_guide_domain,
+    study_guide_services,
+    subtopic_page_domain,
+    subtopic_page_services,
+    topic_domain,
+    topic_fetchers,
+    translation_fetchers,
+)
 
 from typing import Dict, List, Optional, TypedDict, Union
 
@@ -100,6 +103,8 @@ class _ActivityDataResponseDictRequiredFields(TypedDict):
         story_domain.StoryDict,
         skill_domain.SkillDict,
         subtopic_page_domain.SubtopicPageDict,
+        study_guide_domain.StudyGuideAndroidDict,
+        study_guide_domain.StudyGuideDict,
         classroom_config_domain.ClassroomDict,
         topic_domain.TopicDict,
         Dict[str, feconf.TranslatedContentDict],
@@ -144,6 +149,8 @@ class AndroidActivityHandler(base.BaseHandler[
                         constants.ACTIVITY_TYPE_STORY,
                         constants.ACTIVITY_TYPE_SKILL,
                         constants.ACTIVITY_TYPE_SUBTOPIC,
+                        constants.ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE_MIGRATION, # pylint: disable=line-too-long
+                        constants.ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE,
                         constants.ACTIVITY_TYPE_LEARN_TOPIC,
                         constants.ACTIVITY_TYPE_CLASSROOM
                     ]
@@ -229,6 +236,44 @@ class AndroidActivityHandler(base.BaseHandler[
                     'version': activity_data.get('version'),
                     'payload': (
                         subtopic_page.to_dict() if subtopic_page is not None
+                        else None)
+                })
+        elif activity_type == (
+            constants.ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE_MIGRATION
+        ):
+            for activity_data in activities_data:
+                topic_id, study_guide_id = activity_data['id'].split('-')
+                study_guide = study_guide_services.get_study_guide_by_id(
+                    topic_id,
+                    int(study_guide_id),
+                    strict=False,
+                    version=activity_data.get('version')
+                )
+                activities.append({
+                    'id': activity_data['id'],
+                    'version': activity_data.get('version'),
+                    'payload': (
+                        study_guide
+                        .to_subtopic_page_dict_for_android()
+                        if study_guide is not None else None
+                    )
+                })
+        elif activity_type == (
+            constants.ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE
+        ):
+            for activity_data in activities_data:
+                topic_id, study_guide_id = activity_data['id'].split('-')
+                study_guide = study_guide_services.get_study_guide_by_id(
+                    topic_id,
+                    int(study_guide_id),
+                    strict=False,
+                    version=activity_data.get('version')
+                )
+                activities.append({
+                    'id': activity_data['id'],
+                    'version': activity_data.get('version'),
+                    'payload': (
+                        study_guide.to_dict() if study_guide is not None
                         else None)
                 })
         elif activity_type == constants.ACTIVITY_TYPE_CLASSROOM:

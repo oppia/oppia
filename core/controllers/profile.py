@@ -22,20 +22,20 @@ import logging
 import re
 import zipfile
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.controllers import acl_decorators
-from core.controllers import base
-from core.domain import email_manager
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_services
-from core.domain import role_services
-from core.domain import subscription_services
-from core.domain import summary_services
-from core.domain import takeout_service
-from core.domain import user_services
-from core.domain import wipeout_service
+from core.controllers import acl_decorators, base
+from core.domain import (
+    email_manager,
+    platform_parameter_list,
+    platform_parameter_services,
+    role_services,
+    subscription_services,
+    summary_services,
+    takeout_service,
+    user_services,
+    wipeout_service,
+)
 
 from typing import Any, Callable, Dict, Optional, TypedDict
 
@@ -166,9 +166,12 @@ class BulkEmailWebhookEndpoint(
     def post(self, unused_secret: str) -> None:
         """Handles POST requests."""
         assert self.normalized_request is not None
+        mailchimp_audience_id = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID.value))
         if (
             self.normalized_request['data[list_id]'] !=
-            feconf.MAILCHIMP_AUDIENCE_ID
+            mailchimp_audience_id
         ):
             self.render_json({})
             return
@@ -649,7 +652,8 @@ class ExportAccountHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             user_data_json_string = (
                 'There was an error while exporting '
                 'data. Please contact %s to export your data.'
-                % feconf.ADMIN_EMAIL_ADDRESS
+                % platform_parameter_services.get_platform_parameter_value(
+                    platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value)
             )
             user_images = []
 

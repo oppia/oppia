@@ -23,34 +23,36 @@ import logging
 import os
 import re
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import auth_services
-from core.domain import collection_services
-from core.domain import event_services
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import platform_parameter_list
-from core.domain import rights_manager
-from core.domain import state_domain
-from core.domain import suggestion_services
-from core.domain import user_domain
-from core.domain import user_services
+from core.domain import (
+    auth_services,
+    collection_services,
+    event_services,
+    exp_domain,
+    exp_fetchers,
+    exp_services,
+    platform_parameter_list,
+    rights_manager,
+    state_domain,
+    suggestion_services,
+    user_domain,
+    user_services,
+)
 from core.platform import models
 from core.tests import test_utils
 
 import requests_mock
-
 from typing import Dict, Final, List
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import audit_models
-    from mypy_imports import auth_models
-    from mypy_imports import suggestion_models
-    from mypy_imports import user_models
+    from mypy_imports import (
+        audit_models,
+        auth_models,
+        suggestion_models,
+        user_models,
+    )
 
 datastore_services = models.Registry.import_datastore_services()
 (auth_models, user_models, audit_models, suggestion_models) = (
@@ -572,8 +574,9 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
         # Ruling out the possibility of None for mypy type checking.
         assert admin_settings is not None
+        assert admin_settings.last_agreed_to_terms is not None
         self.assertEqual(admin_settings.user_id, user_id)
-        self.assertEqual(admin_settings.email, feconf.SYSTEM_EMAIL_ADDRESS)
+        self.assertEqual(admin_settings.email, 'system@example.com')
         self.assertEqual(admin_settings.roles, roles)
         self.assertFalse(admin_settings.banned)
         self.assertEqual(admin_settings.username, 'admin')
@@ -722,7 +725,13 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                     'email@example.com', 'Android'))
 
     @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            )
+        ]
     )
     def test_set_and_get_user_email_preferences(self) -> None:
         auth_id = 'someUser'
@@ -810,7 +819,13 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertFalse(email_preferences.can_receive_subscription_email)
 
     @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            )
+        ]
     )
     def test_get_and_set_user_email_preferences_with_error(self) -> None:
         auth_id = 'someUser'
@@ -2076,6 +2091,16 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(Exception, 'User not found.'):
             user_services.get_human_readable_user_ids(['unregistered_id'])
 
+    def test_get_human_readable_user_ids_for_nonexistent_user(self) -> None:
+        user_id = 'nonexistent_user_id'
+        self.assertEqual(
+            user_services.get_human_readable_user_ids(
+                [user_id],
+                strict=False,
+                include_deleted=True
+            ),
+            [user_services.LABEL_FOR_DELETED_USER])
+
     def test_record_user_started_state_editor_tutorial(self) -> None:
         user_id = user_services.create_new_user(
             'someUser',
@@ -2091,6 +2116,9 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
         user_services.record_user_started_state_editor_tutorial(user_id)
         user_settings = user_services.get_user_settings(user_id)
+
+        assert user_settings.last_started_state_editor_tutorial is not None
+        assert prev_started_state is not None
 
         self.assertGreaterEqual(
             user_settings.last_started_state_editor_tutorial,
@@ -3245,9 +3273,15 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
         # changed.
         self.login(self.VIEWER_EMAIL)
         self.get_html_response(feconf.LIBRARY_INDEX_URL)
+
+        assert last_logged_in is not None
+        user_settings = user_services.get_user_settings(self.viewer_id)
+        new_last_logged_in = user_settings.last_logged_in
+        assert new_last_logged_in is not None
+
         self.assertLess(
             last_logged_in,
-            user_services.get_user_settings(self.viewer_id).last_logged_in)
+            new_last_logged_in)
         self.logout()
 
     def test_last_logged_in_only_updated_if_enough_time_has_elapsed(
@@ -3274,8 +3308,14 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
         with self.mock_datetime_utcnow(mocked_datetime_utcnow):
             self.login(self.VIEWER_EMAIL)
             self.get_html_response(feconf.LIBRARY_INDEX_URL)
+
+            user_settings = user_services.get_user_settings(self.viewer_id)
+            last_logged_in = user_settings.last_logged_in
+            assert last_logged_in is not None
+            assert previous_last_logged_in_datetime is not None
+
             self.assertGreater(
-                user_services.get_user_settings(self.viewer_id).last_logged_in,
+                last_logged_in,
                 previous_last_logged_in_datetime)
             self.logout()
 
@@ -3351,8 +3391,13 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
 
         # Make sure last exploration edited time gets updated.
         editor_settings = user_services.get_user_settings(self.editor_id)
+
+        last_edited = editor_settings.last_edited_an_exploration
+        assert last_edited is not None
+        assert previous_last_edited_an_exploration is not None
+
         self.assertGreater(
-            (editor_settings.last_edited_an_exploration),
+            last_edited,
             previous_last_edited_an_exploration)
 
 
@@ -3407,8 +3452,13 @@ class LastExplorationCreatedIntegrationTests(test_utils.GenericTestBase):
 
         # Make sure that last exploration created time gets updated.
         owner_settings = user_services.get_user_settings(self.owner_id)
+
+        last_created = owner_settings.last_created_an_exploration
+        assert last_created is not None
+        assert previous_last_created_an_exploration is not None
+
         self.assertGreater(
-            (owner_settings.last_created_an_exploration),
+            last_created,
             previous_last_created_an_exploration)
 
 

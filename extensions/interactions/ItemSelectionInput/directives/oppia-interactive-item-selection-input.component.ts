@@ -20,7 +20,7 @@
  * followed by the name of the arg.
  */
 
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, HostListener, Input, OnInit} from '@angular/core';
 import {ItemSelectionInputCustomizationArgs} from 'interactions/customization-args-defs';
 import {BrowserCheckerService} from 'domain/utilities/browser-checker.service';
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
@@ -177,6 +177,12 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
     this.userSelections[this.choices[index]] = true;
     this.notEnoughSelections = false;
     this.currentInteractionService.updateCurrentAnswer(this.getAnswers());
+  }
+
+  @HostListener('document:keydown.enter', ['$event'])
+  handleEnterKey(event: KeyboardEvent): void {
+    event.preventDefault();
+    this.submitAnswer();
   }
 
   submitAnswer(): void {

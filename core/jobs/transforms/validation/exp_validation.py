@@ -18,8 +18,7 @@
 
 from __future__ import annotations
 
-from core.domain import exp_domain
-from core.domain import rights_domain
+from core.domain import exp_domain, rights_domain
 from core.jobs import job_utils
 from core.jobs.decorators import validation_decorators
 from core.jobs.transforms.validation import base_validation
@@ -30,8 +29,7 @@ from typing import Iterator, List, Optional, Tuple, Type, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import exp_models
-    from mypy_imports import story_models
+    from mypy_imports import exp_models, story_models
 
 (exp_models, story_models) = models.Registry.import_models([
     models.Names.EXPLORATION, models.Names.STORY

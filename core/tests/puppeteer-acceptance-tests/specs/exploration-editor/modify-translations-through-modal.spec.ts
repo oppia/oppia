@@ -79,7 +79,7 @@ describe('Exploration Editor', function () {
 
     // Navigate to the creator dashboard and create a new exploration.
     await explorationEditor.navigateToCreatorDashboardPage();
-    await explorationEditor.navigateToExplorationEditorPage();
+    await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
     await explorationEditor.dismissWelcomeModal();
     await explorationEditor.updateCardContent(INTRODUCTION_CARD_CONTENT);
     await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
@@ -175,7 +175,11 @@ describe('Exploration Editor', function () {
       'Test Topic 1'
     );
 
-    await curriculumAdmin.createSkillForTopic('Test Skill 1', 'Test Topic 1');
+    await curriculumAdmin.createSkillForTopic(
+      'Test Skill 1',
+      'Test Topic 1',
+      false
+    );
     await curriculumAdmin.createQuestionsForSkill('Test Skill 1', 3);
     await curriculumAdmin.assignSkillToSubtopicInTopicEditor(
       'Test Skill 1',

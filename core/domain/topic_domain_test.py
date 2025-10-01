@@ -20,12 +20,9 @@ from __future__ import annotations
 
 import datetime
 
-from core import android_validation_constants
-from core import feconf
-from core import utils
+from core import android_validation_constants, feconf, utils
 from core.constants import constants
-from core.domain import topic_domain
-from core.domain import user_services
+from core.domain import topic_domain, user_services
 from core.tests import test_utils
 
 
@@ -170,8 +167,9 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self
     ) -> None:
         with self.assertRaisesRegex(
-            Exception, 'Expected from_index and to_index values to be '
-                       'different.'):
+            Exception,
+            'Expected from_index and to_index values to be different.'
+        ):
             self.topic.rearrange_canonical_story(1, 1)
 
     def test_rearrange_canonical_story(self) -> None:
@@ -230,8 +228,9 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self
     ) -> None:
         with self.assertRaisesRegex(
-            Exception, 'Expected from_index and to_index values to be '
-                       'different.'):
+            Exception,
+            'Expected from_index and to_index values to be different.'
+        ):
             self.topic.rearrange_skill_in_subtopic(1, 1, 1)
 
     def test_rearrange_skill_in_subtopic(self) -> None:
@@ -282,8 +281,9 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_rearrange_subtopic_fail_with_identical_index_values(self) -> None:
         with self.assertRaisesRegex(
-            Exception, 'Expected from_index and to_index values to be '
-                       'different.'):
+            Exception,
+            'Expected from_index and to_index values to be different.'
+        ):
             self.topic.rearrange_subtopic(1, 1)
 
     def test_rearrange_subtopic(self) -> None:
@@ -512,8 +512,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
         self.topic.subtopics[0].url_fragment = ''
         self._assert_validation_error(
-            'Expected subtopic url fragment to be non '
-            'empty')
+            'Expected subtopic url fragment to be non empty'
+        )
 
         self.topic.subtopics[0].url_fragment = 'invalidFragment'
         self._assert_validation_error(

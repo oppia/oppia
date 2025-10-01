@@ -20,14 +20,12 @@ from __future__ import annotations
 
 import datetime
 
-from core.jobs import base_jobs
-from core.jobs import job_utils
+from core.jobs import base_jobs, job_utils
 from core.jobs.io import ndb_io
 from core.jobs.types import blog_validation_errors
 from core.platform import models
 
 import apache_beam as beam
-
 from typing import Union
 
 MYPY = False
@@ -162,7 +160,10 @@ class GetModelsWithDuplicatePropertyValues(beam.PTransform):  # type: ignore[mis
             | 'Discard models with empty property value' >> (
                 beam.Filter(lambda model: self.get_property_value(model) != ''))
             | 'Generate (%s, model) key value pairs' % self.property_name >> (
-                beam.WithKeys(self.get_property_value)) # pylint: disable=no-value-for-parameter
+                beam.WithKeys( # pylint: disable=no-value-for-parameter
+                    self.get_property_value
+                )
+            )
             | 'Group pairs by their %s' % self.property_name >> (
                 beam.GroupByKey())
             | 'Discard %s key' % self.property_name >> (

@@ -19,7 +19,7 @@
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {
   ExplorationPermissionsBackendDict,
@@ -31,7 +31,7 @@ import {
 })
 export class ExplorationPermissionsBackendApiService {
   constructor(
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService
   ) {}
@@ -40,7 +40,7 @@ export class ExplorationPermissionsBackendApiService {
     let explorationPermissionsUrl = this.urlInterpolationService.interpolateUrl(
       '/createhandler/permissions/<exploration_id>',
       {
-        exploration_id: this.contextService.getExplorationId(),
+        exploration_id: this.pageContextService.getExplorationId(),
       }
     );
 

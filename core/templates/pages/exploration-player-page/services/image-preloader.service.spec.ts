@@ -25,13 +25,14 @@ import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 import {
   Exploration,
   ExplorationBackendDict,
-  ExplorationObjectFactory,
-} from 'domain/exploration/ExplorationObjectFactory';
-import {ImagePreloaderService} from 'pages/exploration-player-page/services/image-preloader.service';
-import {AssetsBackendApiService} from 'services/assets-backend-api.service';
-import {EntityTranslationsService} from 'services/entity-translations.services';
-import {ContextService} from 'services/context.service';
-import {SvgSanitizerService} from 'services/svg-sanitizer.service';
+} from '../../../domain/exploration/exploration.model';
+import {ImagePreloaderService} from './image-preloader.service';
+import {AssetsBackendApiService} from '../../../services/assets-backend-api.service';
+import {LoggerService} from '../../../services/contextual/logger.service';
+import {UrlInterpolationService} from '../../../domain/utilities/url-interpolation.service';
+import {EntityTranslationsService} from '../../../services/entity-translations.services';
+import {PageContextService} from '../../../services/page-context.service';
+import {SvgSanitizerService} from '../../../services/svg-sanitizer.service';
 
 describe('Image preloader service', () => {
   let httpTestingController: HttpTestingController;
@@ -47,8 +48,9 @@ describe('Image preloader service', () => {
 
   let assetsBackendApiService: AssetsBackendApiService;
   let imagePreloaderService: ImagePreloaderService;
-  let explorationObjectFactory: ExplorationObjectFactory;
-  let contextService: ContextService;
+  let loggerService: LoggerService;
+  let urlInterpolationService: UrlInterpolationService;
+  let pageContextService: PageContextService;
   let entityTranslationsService: EntityTranslationsService;
   let svgSanitizerService: SvgSanitizerService;
 
@@ -384,23 +386,27 @@ describe('Image preloader service', () => {
 
   beforeEach(() => {
     imagePreloaderService = TestBed.get(ImagePreloaderService);
-    explorationObjectFactory = TestBed.get(ExplorationObjectFactory);
-    contextService = TestBed.get(ContextService);
+    pageContextService = TestBed.get(PageContextService);
     assetsBackendApiService = TestBed.get(AssetsBackendApiService);
     entityTranslationsService = TestBed.get(EntityTranslationsService);
+    loggerService = TestBed.inject(LoggerService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
     svgSanitizerService = TestBed.inject(SvgSanitizerService);
 
-    spyOn(contextService, 'getExplorationId').and.returnValue('1');
-    spyOn(contextService, 'getEntityType').and.returnValue('exploration');
-    spyOn(contextService, 'getEntityId').and.returnValue('1');
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('1');
+    spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
+    spyOn(pageContextService, 'getEntityId').and.returnValue('1');
     spyOn(entityTranslationsService, 'getHtmlTranslations').and.callFake(
       (unusedLanguageCode, unusedContentIds) => {
         return [];
       }
     );
 
-    exploration =
-      explorationObjectFactory.createFromBackendDict(explorationDict);
+    exploration = Exploration.createFromBackendDict(
+      explorationDict,
+      loggerService,
+      urlInterpolationService
+    );
   });
 
   it('should be in exploration player after init is called', () => {

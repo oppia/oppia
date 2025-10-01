@@ -19,18 +19,18 @@
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {TestBed} from '@angular/core/testing';
 
-import {AnswerClassificationResult} from 'domain/classifier/answer-classification-result.model';
+import {AnswerClassificationResult} from '../../../domain/classifier/answer-classification-result.model';
 import {
   AnswerClassificationService,
   InteractionRulesService,
-} from 'pages/exploration-player-page/services/answer-classification.service';
-import {CamelCaseToHyphensPipe} from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import {ExplorationPlayerConstants} from 'pages/exploration-player-page/exploration-player-page.constants';
-import {InteractionSpecsService} from 'services/interaction-specs.service';
-import {Outcome} from 'domain/exploration/outcome.model';
-import {StateObjectFactory} from 'domain/state/StateObjectFactory';
-import {TextInputRulesService} from 'interactions/TextInput/directives/text-input-rules.service';
-import {AlertsService} from 'services/alerts.service';
+} from './answer-classification.service';
+import {CamelCaseToHyphensPipe} from '../../../filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import {ExplorationPlayerConstants} from '../current-lesson-player/exploration-player-page.constants';
+import {InteractionSpecsService} from '../../../services/interaction-specs.service';
+import {Outcome} from '../../../domain/exploration/outcome.model';
+import {State} from '../../../domain/state/state.model';
+import {TextInputRulesService} from '../../../../../extensions/interactions/TextInput/directives/text-input-rules.service';
+import {AlertsService} from '../../../services/alerts.service';
 
 describe('Answer Classification Service', () => {
   const stateName = 'Test State';
@@ -38,7 +38,6 @@ describe('Answer Classification Service', () => {
   let alertsService: AlertsService;
   let answerClassificationService: AnswerClassificationService;
   let interactionSpecsService: InteractionSpecsService;
-  let stateObjectFactory: StateObjectFactory;
   let textInputRulesService: InteractionRulesService;
 
   beforeEach(() => {
@@ -50,7 +49,6 @@ describe('Answer Classification Service', () => {
     alertsService = TestBed.inject(AlertsService);
     answerClassificationService = TestBed.get(AnswerClassificationService);
     interactionSpecsService = TestBed.get(InteractionSpecsService);
-    stateObjectFactory = TestBed.get(StateObjectFactory);
     textInputRulesService = TestBed.get(TextInputRulesService);
   });
 
@@ -214,10 +212,7 @@ describe('Answer Classification Service', () => {
     });
 
     it('should fail if no frontend rules are provided', () => {
-      const state = stateObjectFactory.createFromBackendDict(
-        stateName,
-        stateDict
-      );
+      const state = State.createFromBackendDict(stateName, stateDict);
 
       expect(() =>
         answerClassificationService.getMatchingClassificationResult(
@@ -235,10 +230,7 @@ describe('Answer Classification Service', () => {
       'should return the first matching answer group and first matching ' +
         'rule spec',
       () => {
-        const state = stateObjectFactory.createFromBackendDict(
-          stateName,
-          stateDict
-        );
+        const state = State.createFromBackendDict(stateName, stateDict);
 
         expect(
           answerClassificationService.getMatchingClassificationResult(
@@ -291,10 +283,7 @@ describe('Answer Classification Service', () => {
     );
 
     it('should return the default rule if no answer group matches', () => {
-      const state = stateObjectFactory.createFromBackendDict(
-        stateName,
-        stateDict
-      );
+      const state = State.createFromBackendDict(stateName, stateDict);
 
       expect(
         answerClassificationService.getMatchingClassificationResult(
@@ -320,10 +309,7 @@ describe('Answer Classification Service', () => {
         spyOn(alertsService, 'addWarning').and.callThrough();
 
         stateDict.interaction.default_outcome = null;
-        const state = stateObjectFactory.createFromBackendDict(
-          stateName,
-          stateDict
-        );
+        const state = State.createFromBackendDict(stateName, stateDict);
 
         expect(() =>
           answerClassificationService.getMatchingClassificationResult(
@@ -374,10 +360,7 @@ describe('Answer Classification Service', () => {
           },
         ];
 
-        const state = stateObjectFactory.createFromBackendDict(
-          stateName,
-          stateDict
-        );
+        const state = State.createFromBackendDict(stateName, stateDict);
 
         expect(() =>
           answerClassificationService.getMatchingClassificationResult(
@@ -473,10 +456,7 @@ describe('Answer Classification Service', () => {
         },
       ];
 
-      const state = stateObjectFactory.createFromBackendDict(
-        stateName,
-        stateDict
-      );
+      const state = State.createFromBackendDict(stateName, stateDict);
 
       expect(
         answerClassificationService.isAnswerOnlyMisspelled(
@@ -619,10 +599,7 @@ describe('Answer Classification Service', () => {
       'should use training data classification if no answer group matches ' +
         'and interaction is trainable',
       () => {
-        const state = stateObjectFactory.createFromBackendDict(
-          stateName,
-          stateDict
-        );
+        const state = State.createFromBackendDict(stateName, stateDict);
 
         expect(
           answerClassificationService.getMatchingClassificationResult(
@@ -662,10 +639,7 @@ describe('Answer Classification Service', () => {
       'should perform explicit classification before doing training data ' +
         'classification',
       () => {
-        const state = stateObjectFactory.createFromBackendDict(
-          stateName,
-          stateDict
-        );
+        const state = State.createFromBackendDict(stateName, stateDict);
 
         expect(
           answerClassificationService.getMatchingClassificationResult(
@@ -698,10 +672,7 @@ describe('Answer Classification Service', () => {
         // default outcome has destination equal to state name.
 
         stateDict.interaction.default_outcome.dest = stateName;
-        let state1 = stateObjectFactory.createFromBackendDict(
-          stateName,
-          stateDict
-        );
+        let state1 = State.createFromBackendDict(stateName, stateDict);
 
         let res1 =
           answerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
@@ -724,10 +695,7 @@ describe('Answer Classification Service', () => {
         // Returns true if any answer group matches.
 
         stateDict.interaction.default_outcome.dest = 'default';
-        let state2 = stateObjectFactory.createFromBackendDict(
-          stateName,
-          stateDict
-        );
+        let state2 = State.createFromBackendDict(stateName, stateDict);
 
         let res2 =
           answerClassificationService.isClassifiedExplicitlyOrGoesToNewState(

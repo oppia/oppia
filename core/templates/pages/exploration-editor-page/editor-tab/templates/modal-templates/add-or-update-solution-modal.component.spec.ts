@@ -22,12 +22,9 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {StateCustomizationArgsService} from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import {StateSolutionService} from 'components/state-editor/state-editor-properties-services/state-solution.service';
-import {
-  Solution,
-  SolutionObjectFactory,
-} from 'domain/exploration/SolutionObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {AddOrUpdateSolutionModalComponent} from './add-or-update-solution-modal.component';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
@@ -47,11 +44,10 @@ class MockActiveModal {
 describe('Add Or Update Solution Modal Component', () => {
   let component: AddOrUpdateSolutionModalComponent;
   let fixture: ComponentFixture<AddOrUpdateSolutionModalComponent>;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let currentInteractionService: CurrentInteractionService;
   let explorationHtmlFormatterService: ExplorationHtmlFormatterService;
   let ngbActiveModal: NgbActiveModal;
-  let solutionObjectFactory: SolutionObjectFactory;
   let stateInteractionIdService: StateInteractionIdService;
   let stateSolutionService: StateSolutionService;
   let generateContentIdService: GenerateContentIdService;
@@ -63,7 +59,7 @@ describe('Add Or Update Solution Modal Component', () => {
     TestBed.configureTestingModule({
       declarations: [AddOrUpdateSolutionModalComponent],
       providers: [
-        ContextService,
+        PageContextService,
         CurrentInteractionService,
         ChangeDetectorRef,
         ExplorationHtmlFormatterService,
@@ -86,7 +82,6 @@ describe('Add Or Update Solution Modal Component', () => {
     explorationHtmlFormatterService = TestBed.inject(
       ExplorationHtmlFormatterService
     );
-    solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
     stateInteractionIdService = TestBed.inject(StateInteractionIdService);
     stateSolutionService = TestBed.inject(StateSolutionService);
     generateContentIdService = TestBed.inject(GenerateContentIdService);
@@ -99,16 +94,15 @@ describe('Add Or Update Solution Modal Component', () => {
   describe('when solution is valid', () => {
     beforeEach(() => {
       ngbActiveModal = TestBed.inject(NgbActiveModal);
-      contextService = TestBed.inject(ContextService);
+      pageContextService = TestBed.inject(PageContextService);
 
-      spyOn(contextService, 'getEntityType').and.returnValue('question');
+      spyOn(pageContextService, 'getEntityType').and.returnValue('question');
       spyOn(
         explorationHtmlFormatterService,
         'getInteractionHtml'
       ).and.returnValue('<p>Interaction Html</p>');
 
       answerEditorHtml = new Solution(
-        explorationHtmlFormatterService,
         true,
         'solution',
         SubtitledHtml.createDefault('Explanation html', 'cont_1')
@@ -134,7 +128,7 @@ describe('Add Or Update Solution Modal Component', () => {
       });
       expect(component.answerIsValid).toBeFalse();
       expect(component.ansOptions).toEqual(['The only', 'One']);
-      expect(component.tempAnsOption).toEqual('One');
+      expect(component.tempAnsOption).toEqual('The only');
     });
 
     it('should update the answerIsExclusive correctly', () => {
@@ -194,7 +188,7 @@ describe('Add Or Update Solution Modal Component', () => {
       component.saveSolution();
 
       expect(ngbActiveModal.close).toHaveBeenCalledWith({
-        solution: solutionObjectFactory.createNew(
+        solution: Solution.createNew(
           true,
           'answer',
           'Explanation html',
@@ -215,9 +209,9 @@ describe('Add Or Update Solution Modal Component', () => {
   describe('when solution is not valid', () => {
     beforeEach(() => {
       ngbActiveModal = TestBed.inject(NgbActiveModal);
-      contextService = TestBed.inject(ContextService);
+      pageContextService = TestBed.inject(PageContextService);
 
-      spyOn(contextService, 'getEntityType').and.returnValue('question');
+      spyOn(pageContextService, 'getEntityType').and.returnValue('question');
       spyOn(
         explorationHtmlFormatterService,
         'getInteractionHtml'

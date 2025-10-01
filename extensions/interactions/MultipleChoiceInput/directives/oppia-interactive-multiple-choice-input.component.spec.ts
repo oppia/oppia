@@ -22,7 +22,7 @@ import {InteractionAttributesExtractorService} from 'interactions/interaction-at
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
 import {InteractiveMultipleChoiceInputComponent} from './oppia-interactive-multiple-choice-input.component';
 import {PlayerTranscriptService} from 'pages/exploration-player-page/services/player-transcript.service';
-import {Interaction} from 'domain/exploration/InteractionObjectFactory';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {TranslateModule} from '@ngx-translate/core';

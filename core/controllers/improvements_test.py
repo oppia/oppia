@@ -20,15 +20,15 @@ from __future__ import annotations
 
 import datetime
 
-from core import feature_flag_list
-from core import feconf
-from core import utils
+from core import feature_flag_list, feconf, utils
 from core.constants import constants
 from core.controllers import improvements
-from core.domain import exp_services
-from core.domain import improvements_domain
-from core.domain import improvements_services
-from core.domain import platform_parameter_list
+from core.domain import (
+    exp_services,
+    improvements_domain,
+    improvements_services,
+    platform_parameter_list,
+)
 from core.platform import models
 from core.tests import test_utils
 
@@ -705,7 +705,8 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
         [
             (platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD, 0.35),  # pylint: disable=line-too-long
             (platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD, 0),  # pylint: disable=line-too-long
-            (platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS, 0) # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS, 0), # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com') # pylint: disable=line-too-long
         ]
     )
     def test_custom_high_bounce_rate_creation_threshold(self) -> None:
@@ -721,7 +722,8 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
         [
             (platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD, 0),  # pylint: disable=line-too-long
             (platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD, 0.05),  # pylint: disable=line-too-long
-            (platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS, 0) # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS, 0), # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com') # pylint: disable=line-too-long
         ]
     )
     def test_custom_high_bounce_rate_obsoletion_threshold(self) -> None:
@@ -737,7 +739,8 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
         [
             (platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD, 0),  # pylint: disable=line-too-long
             (platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD, 0),  # pylint: disable=line-too-long
-            (platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS, 20) # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS, 20), # pylint: disable=line-too-long
+            (platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'system@example.com') # pylint: disable=line-too-long
         ]
     )
     def test_custom_high_bounce_rate_task_minimum_exploration_starts(

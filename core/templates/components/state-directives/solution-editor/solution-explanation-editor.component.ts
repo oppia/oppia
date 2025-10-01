@@ -24,11 +24,11 @@ import {
   Output,
 } from '@angular/core';
 import {Subscription} from 'rxjs';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {EditabilityService} from 'services/editability.service';
 import {ExternalSaveService} from 'services/external-save.service';
 import {StateSolutionService} from 'components/state-editor/state-editor-properties-services/state-solution.service';
-import {Solution} from 'domain/exploration/SolutionObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
 import {
   CALCULATION_TYPE_CHARACTER,
   HtmlLengthService,
@@ -55,7 +55,7 @@ export class SolutionExplanationEditor implements OnDestroy, OnInit {
   explanationEditorIsOpen: boolean = false;
 
   constructor(
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private editabilityService: EditabilityService,
     private externalSaveService: ExternalSaveService,
     private stateSolutionService: StateSolutionService,
@@ -126,8 +126,9 @@ export class SolutionExplanationEditor implements OnDestroy, OnInit {
     this.EXPLANATION_FORM_SCHEMA = {
       type: 'html',
       ui_config: {
+        rte_component_config_id: 'ALL_COMPONENTS',
         hide_complex_extensions:
-          this.contextService.getEntityType() === 'question',
+          this.pageContextService.getEntityType() === 'question',
       },
     };
   }

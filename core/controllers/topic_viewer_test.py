@@ -16,19 +16,20 @@
 
 from __future__ import annotations
 
-
 from core import feconf
 from core.constants import constants
-from core.domain import classroom_config_services
-from core.domain import platform_parameter_list
-from core.domain import question_services
-from core.domain import skill_services
-from core.domain import story_domain
-from core.domain import story_services
-from core.domain import topic_domain
-from core.domain import topic_services
-from core.domain import translation_domain
-from core.domain import user_services
+from core.domain import (
+    classroom_config_services,
+    platform_parameter_list,
+    question_services,
+    skill_services,
+    story_domain,
+    story_services,
+    topic_domain,
+    topic_services,
+    translation_domain,
+    user_services,
+)
 from core.tests import test_utils
 
 
@@ -176,18 +177,32 @@ class TopicPageDataHandlerTests(
         self.assertDictContainsSubset(expected_dict, json_response)
 
     @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            ),
+            (platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
+            (
+                platform_parameter_list.ParamName.OPPIA_PROJECT_ID,
+                'dev-project-id'
+            )
+        ]
     )
     def test_get_with_user_logged_in(self) -> None:
         skill_services.delete_skill(self.admin_id, self.skill_id_1)
         self.login(self.NEW_USER_EMAIL)
-        messages = self._get_sent_email_messages(
-            feconf.ADMIN_EMAIL_ADDRESS)
+        admin_email_address = 'testadmin@example.com'
+        messages = self._get_sent_email_messages(admin_email_address)
         self.assertEqual(len(messages), 0)
         json_response = self.get_json(
             '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'public'))
-        messages = self._get_sent_email_messages(
-            feconf.ADMIN_EMAIL_ADDRESS)
+        messages = self._get_sent_email_messages(admin_email_address)
         expected_email_html_body = (
             'The deleted skills: %s are still'
             ' present in topic with id %s' % (
