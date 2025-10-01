@@ -7033,8 +7033,6 @@ export class ExplorationEditor extends BaseUser {
    * Removes the current interaction.
    */
   async removeInteraction(): Promise<void> {
-    await this.page.waitForTimeout(1000);
-    console.log((await this.page.$$(removeInteractionButttonSelector)).length);
     await this.clickOnElementWithSelector(removeInteractionButttonSelector);
     await this.clickOnElementWithSelector(
       confirmDeleteInteractionButtonSelector
