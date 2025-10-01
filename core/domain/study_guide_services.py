@@ -27,6 +27,8 @@ from core.domain import (
     learner_group_services,
     skill_services,
     study_guide_domain,
+    subtopic_page_services,
+    topic_domain,
     topic_fetchers,
 )
 from core.platform import models
@@ -379,6 +381,44 @@ def does_study_guide_model_exist(topic_id: str, subtopic_id: int) -> bool:
         return study_guide_model is not None
     except Exception:
         return False
+
+
+def generate_study_guide_models(
+        topic_id: str,
+        subtopics: List[topic_domain.Subtopic]
+    ) -> None:
+    """Generates study guide models corresponding to all subtopic page models in the given topic.
+
+    Args:
+        topic_id: str. The ID of the topic that this study guide belongs to.
+        subtopics: list(Subtopic). The subtopics in the topic.
+    """
+    for subtopic in subtopics:
+        if not does_study_guide_model_exist(topic_id, subtopic.id):
+            subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
+                topic_id, subtopic.id
+            )
+            study_guide = study_guide_domain.StudyGuide.create_study_guide(
+                subtopic.id,
+                topic_id,
+                subtopic.title,
+                subtopic_page.page_contents.subtitled_html.html)
+            save_study_guide(
+                feconf.SYSTEM_COMMITTER_ID,
+                study_guide,
+                'Generated Study Guide model corresponding to Subtopic Page Model with id: %s' % (
+                    subtopic_page.id
+                ),
+                [
+                    study_guide_domain.StudyGuideChange(
+                        {
+                            'cmd': 'create_new',
+                            'topic_id': topic_id,
+                            'subtopic_id': subtopic.id
+                        }
+                    )
+                ],
+            )
 
 
 def get_topic_ids_from_study_guide_ids(

@@ -254,6 +254,20 @@ export class AdminMiscTabComponent implements OnInit {
     );
   }
 
+  generateStudyGuideModels(): void {
+    this.setStatusMessage.emit('Generating study guide models...');
+    this.adminBackendApiService.generateStudyGuideModelsAsync().then(
+      () => {
+        this.setStatusMessage.emit(
+          'Successfully generated all study guide models.'
+        );
+      },
+      errorResponse => {
+        this.setStatusMessage.emit('Server error: ' + errorResponse);
+      }
+    );
+  }
+
   getNumberOfPendingDeletionRequestModels(): void {
     this.setStatusMessage.emit(
       'Getting the number of users that are being deleted...'

@@ -3033,6 +3033,30 @@ class RegenerateTopicSummariesHandler(
 
         self.render_json({})
 
+class GenerateStudyGuideModelsHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handler to generate study guide models for all subtopic pages."""
+
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'POST': {}
+    }
+
+    @acl_decorators.can_access_admin_page
+    def post(self) -> None:
+        """Generates study guide models for all subtopic pages."""
+
+        # Fetched topics are sorted only to make the backend tests pass.
+        topics = sorted(
+            topic_fetchers.get_all_topics(),
+            key=operator.attrgetter('created_on'))
+        
+        for topic in topics:
+            study_guide_services.generate_study_guide_models(topic.id, topic.subtopics)
+
+        self.render_json({})
+
 
 class TranslationCoordinatorRoleHandlerNormalizedPayloadDict(TypedDict):
     """Dict representation of TranslationCoordinatorRoleHandler's

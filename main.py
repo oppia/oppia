@@ -401,6 +401,10 @@ URLS = [
         r'%s' % feconf.REGENERATE_TOPIC_SUMMARIES_URL,
         admin.RegenerateTopicSummariesHandler),
     get_redirect_route(
+        r'%s' % feconf.GENERATE_STUDY_GUIDE_MODELS_URL,
+        admin.GenerateStudyGuideModelsHandler
+    ),
+    get_redirect_route(
         r'/contributionrightshandler/<category>',
         contributor_dashboard_admin.ContributionRightsHandler),
     get_redirect_route(

@@ -388,6 +388,25 @@ export class AdminBackendApiService {
     });
   }
 
+  async generateStudyGuideModelsAsync(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.http
+        .post<void>(
+          AdminPageConstants.ADMIN_GENERATE_STUDY_GUIDE_MODELS_URL,
+          {}
+        )
+        .toPromise()
+        .then(
+          response => {
+            resolve(response);
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
+    });
+  }
+
   async rollbackExplorationToSafeState(expId: string): Promise<number> {
     return new Promise((resolve, reject) => {
       this.http
