@@ -58,13 +58,13 @@ describe('Logged-in User', function () {
 
       // Add a lesson to 'play later'.
       await loggedInUser.addLessonToPlayLater('Negative Numbers', true);
-      await loggedInUser.expectToolTipMessage(
+      await loggedInUser.expectToastMessage(
         "Successfully added to your 'Play Later' list."
       );
 
       // Add a lesson to 'play later'.
       await loggedInUser.addLessonToPlayLater('Positive Numbers', true);
-      await loggedInUser.expectToolTipMessage(
+      await loggedInUser.expectToastMessage(
         "Successfully added to your 'Play Later' list."
       );
 

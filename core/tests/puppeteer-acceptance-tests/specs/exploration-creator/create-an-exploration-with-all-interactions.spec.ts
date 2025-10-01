@@ -86,7 +86,15 @@ describe('Exploration Editor', function () {
       CARD_NAMES.SECOND
     );
 
+    // Open appropriate modal on re-clicking an interaction to customize it.
+    await explorationEditor.clickOnTestExploration();
+    await explorationEditor.expectModalTitleToBe(
+      'Customize Interaction (Continue Button)'
+    );
+    await explorationEditor.clickOnElementWithText('Save Interaction');
+
     await explorationEditor.saveExplorationDraft();
+    await explorationEditor.expectSelfLoopWarningToBeVisible(false);
   });
 
   it('should be able to use "Multiple Choice" interaction', async function () {
@@ -759,7 +767,7 @@ describe('Exploration Editor', function () {
       ['C4'],
       'as given in the question.'
     );
-    await explorationEditor.expectToolTipMessage(
+    await explorationEditor.expectToastMessage(
       'The current solution does not lead to another card.'
     );
 

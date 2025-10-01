@@ -1,7 +1,7 @@
-<div class="modal-header">
+<div class="modal-header e2e-test-translation-review-modal">
   <div class="oppia-modal-info" tabindex="0">
     <h1 title="{{ heading }}"
-        class="oppia-modal-info-header">
+        class="oppia-modal-info-header e2e-test-modal-header">
       {{ heading }}
     </h1>
     <span title="{{ subheading }}"
@@ -36,7 +36,7 @@
   <div *ngIf="status == 'rejected'" class="translation-suggestion-review-message alert alert-danger">
     <p>See your submitted translation below. Please submit a new translation to address the requested revisions.</p>
   </div>
-  <section class="oppia-suggestion-review-container">
+  <section class="oppia-suggestion-review-container e2e-test-review-content-container">
     <div class="oppia-suggestion-review-panel-container float-left">
       <div class="oppia-suggestion-review-panel-header-container">
         <strong>Content to translate:</strong>
@@ -70,7 +70,7 @@
           Edit
         </button>
       </div>
-      <div class="oppia-suggestion-review-panel oppia-content"
+      <div class="oppia-suggestion-review-panel oppia-content e2e-test-translated-content"
            [ngClass]="isTranslationExpanded ? 'oppia-content-expanded' : 'oppia-content-collapsed'"
            #translationContainer>
         <div dir="auto">
@@ -198,7 +198,7 @@
     <span ngbTooltip="Enter review message before rejecting"
           placement="bottom"
           [disableTooltip]="reviewMessage.length !== 0">
-      <button class="btn btn-danger oppia-suggestion-resolve-button"
+      <button class="btn btn-danger oppia-suggestion-resolve-button e2e-test-translation-reject-button"
               *ngIf="reviewable"
               [disabled]="reviewMessage.length == 0 || reviewMessage.length > MAX_REVIEW_MESSAGE_LENGTH || resolvingSuggestion || startedEditing"
               (click)="rejectAndReviewNext(reviewMessage)">
@@ -226,13 +226,13 @@
   </div>
   <div class="oppia-pagination-container">
     <button type="button"
-            class="oppia-pagination-button"
+            class="oppia-pagination-button e2e-test-pagination-button-previous"
             (click)="goToPreviousItem()"
             [disabled]="isFirstItem">
       <span class="material-icons">navigate_before</span>Previous
     </button>
     <button type="button"
-            class="oppia-pagination-button"
+            class="oppia-pagination-button e2e-test-pagination-button-next"
             (click)="goToNextItem()"
             [disabled]="isLastItem">
       Next<span class="material-icons">navigate_next</span>

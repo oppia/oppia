@@ -2025,7 +2025,7 @@ def compute_models_to_put_when_saving_new_exp_version(
 
     if (
         voiceover_changes and
-        not does_exploration_support_voiceovers(exploration_id)
+        not does_exploration_support_voiceovers(exploration_id, committer_id)
     ):
         raise utils.ValidationError(
             'Voiceover additions are not allowed for this exploration.')
@@ -3917,11 +3917,12 @@ def rollback_exploration_to_safe_state(exp_id: str) -> int:
     return last_known_safe_version
 
 
-def does_exploration_support_voiceovers(exploration_id: str) -> bool:
+def does_exploration_support_voiceovers(exploration_id: str, committer_id: str) -> bool:
     """Checks if voiceover is allowed for the given exploration.
 
     Args:
         exploration_id: str. The ID of the exploration.
+        committer_id: str. The ID of the given committer.
 
     Returns:
         bool. Whether voiceover is allowed for the given exploration.
@@ -3932,5 +3933,5 @@ def does_exploration_support_voiceovers(exploration_id: str) -> bool:
         return feature_flag_services.is_feature_flag_enabled(
             feature_flag_list.FeatureNames.
             SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS.value,
-            None
+            committer_id
         )
