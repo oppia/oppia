@@ -441,7 +441,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
                 'Expected unicode string, received 1'
             ),
             (
-                {'raw_latex': ['x^2'], 'svg_filename':{}},
+                {'raw_latex': ['x^2'], 'svg_filename': {}},
                 re.escape('Expected unicode string, received [\'x^2\']')
             ),
             (
@@ -965,7 +965,9 @@ class ObjectDefinitionTests(test_utils.GenericTestBase):
                     # skew between it and the key that is used in the default
                     # value.
                     self.assertEqual(
-                        sorted(['contentId', member._value_key_name]),  # pylint: disable=protected-access
+                        sorted(
+                            ['contentId', member._value_key_name] # pylint: disable=protected-access
+                        ),
                         sorted(member.default_value.keys()))
                     self.assertIsNone(member.default_value['contentId'])
 

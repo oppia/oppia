@@ -100,6 +100,14 @@
   line-height: 18.75px;
 }
 
+.oppia-footer-newsletter-warning > p {
+  color: #fc0;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 18.75px;
+  margin-top: 1em;
+}
+
 .oppia-footer-newsletter-input {
   display: flex;
   flex: 1;
@@ -305,6 +313,14 @@
     font-size: 12px;
     font-weight: 400;
     line-height: 14px;
+  }
+
+  .oppia-footer-newsletter-warning > p {
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 14px;
+    margin-top: -3em;
+    max-width: 70%;
   }
 
   .oppia-footer-terms-privacy small,

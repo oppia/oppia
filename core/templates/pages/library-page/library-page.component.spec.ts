@@ -29,6 +29,7 @@ import {
   TestBed,
   tick,
   waitForAsync,
+  flush,
 } from '@angular/core/testing';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
@@ -59,6 +60,7 @@ import {SiteAnalyticsService} from 'services/site-analytics.service';
 
 class MockWindowRef {
   nativeWindow = {
+    innerWidth: 0,
     location: {
       pathname: '/community-library/top-rated',
       href: '',
@@ -400,11 +402,9 @@ describe('Library Page Component', () => {
     spyOn(componentInstance, 'initCarousels');
     spyOn(loggerService, 'error');
     let actualWidth = 200;
-    spyOn(window, '$').and.returnValue({
-      width: () => {
-        return actualWidth;
-      },
-    } as JQLite);
+    spyOn(document, 'querySelector').and.returnValue({
+      clientWidth: 200,
+    } as HTMLElement);
     componentInstance.ngOnInit();
     tick();
     tick();
@@ -648,6 +648,18 @@ describe('Library Page Component', () => {
         protractor_id: '',
       },
     ];
+
+    // When jQuery was used in the component, it could directly query DOM globally
+    // using $('.class-name'). In the updated version without jQuery, the component
+    // uses `this.el.nativeElement.querySelectorAll(...)` instead, which only sees
+    // elements appended to `el.nativeElement` (the component's local DOM).
+    //
+    // So here we manually create a div with the expected class and append it
+    // to the component's root element, so the native DOM queries can find it.
+
+    const tile = document.createElement('div');
+    tile.classList.add('oppia-library-carousel-tiles');
+    componentInstance.el.nativeElement.appendChild(tile);
     componentInstance.initCarousels();
     expect(componentInstance.leftmostCardIndices.length).toEqual(1);
   });
@@ -659,7 +671,7 @@ describe('Library Page Component', () => {
 
   it('should scroll carousel', () => {
     componentInstance.libraryGroups = [];
-    let activityDicts: ActivityDict[] = [];
+    const activityDicts: ActivityDict[] = [];
 
     for (let i = 0; i < 5; i++) {
       activityDicts.push({
@@ -689,21 +701,12 @@ describe('Library Page Component', () => {
       });
     }
 
-    spyOn(window, '$').and.returnValue({
-      animate: (
-        options: string[],
-        arg2: {
-          duration: number;
-          queue: boolean;
-          start: () => void;
-          complete: () => void;
-        }
-      ) => {
-        arg2.start();
-        arg2.complete();
-      },
-      scrollLeft: () => {},
-    } as JQLite);
+    spyOnProperty(HTMLElement.prototype, 'scrollLeft', 'get').and.returnValue(
+      0
+    );
+    spyOn(window, 'requestAnimationFrame').and.callFake(callback =>
+      callback(0)
+    );
 
     componentInstance.scroll(3, false);
     componentInstance.scroll(3, true);
@@ -719,8 +722,8 @@ describe('Library Page Component', () => {
 
   it('should not scroll if all tiles are already showing', () => {
     componentInstance.libraryGroups = [];
-    let activityDicts = [];
-    let summaryDicts: ActivityDict[] = [];
+    const activityDicts: ActivityDict[] = [];
+    const summaryDicts: ActivityDict[] = [];
 
     for (let i = 0; i < 3; i++) {
       activityDicts.push({
@@ -750,21 +753,12 @@ describe('Library Page Component', () => {
       });
     }
 
-    spyOn(window, '$').and.returnValue({
-      animate: (
-        options: string[],
-        arg2: {
-          duration: number;
-          queue: boolean;
-          start: () => void;
-          complete: () => void;
-        }
-      ) => {
-        arg2.start();
-        arg2.complete();
-      },
-      scrollLeft: () => {},
-    } as JQLite);
+    spyOnProperty(HTMLElement.prototype, 'scrollLeft', 'get').and.returnValue(
+      0
+    );
+    spyOn(window, 'requestAnimationFrame').and.callFake(callback =>
+      callback(0)
+    );
 
     componentInstance.tileDisplayCount = 5;
     componentInstance.scroll(1, false);
@@ -900,6 +894,19 @@ describe('Library Page Component', () => {
       'setStyle'
     ).and.callThrough();
 
+    // In ChromeHeadless (Karma), window.innerWidth, documentElement.clientWidth,
+    // and body.clientWidth may return unpredictable values (0, very large, or layout-dependent)
+    // because there is no real browser viewport or reflow happening like in a normal browser.
+    // This causes initCarousels() to calculate different tileDisplayCount values:
+    //   - Too small width  → 1 tile  → max-width = 200px
+    //   - Width in 2-tile range → 2 tiles → max-width = 400px (expected in this test)
+    //   - Too large width  → 3 or 4 tiles → max-width = 600px or 800px
+    // This results in flaky tests where the expected '400px' might become '200px', '600px',
+    // or '800px' depending on the runtime environment.
+    // We mock window.innerWidth to a fixed value within the 2-tile range (e.g., 600px)
+    // to make the calculation deterministic and match the expected '400px' result.
+
+    windowRef.nativeWindow.innerWidth = 600;
     componentInstance.initCarousels();
     tick();
 
@@ -913,4 +920,106 @@ describe('Library Page Component', () => {
 
     AppConstants.LIBRARY_TILE_WIDTH_PX = originalLibraryTileWidth;
   }));
+
+  it('should scroll the carousel to the right smoothly', fakeAsync(() => {
+    const ind = 0;
+    const isLeftScroll = false;
+
+    const mockCarouselElement = document.createElement('div');
+    mockCarouselElement.className = 'oppia-library-carousel-tiles';
+    mockCarouselElement.scrollLeft = 0;
+
+    spyOn(document, 'querySelectorAll').and.returnValue([
+      mockCarouselElement,
+    ] as unknown as NodeListOf<HTMLElement>);
+
+    componentInstance.tileDisplayCount = 2;
+    componentInstance.leftmostCardIndices = [0];
+    componentInstance.libraryGroups = [
+      {
+        activity_summary_dicts: new Array(10),
+        categories: [],
+        header_i18n_id: '',
+        has_full_results_page: false,
+        full_results_url: '',
+        protractor_id: '',
+      },
+    ];
+
+    let currentTime = 0;
+    spyOn(performance, 'now').and.callFake(() => currentTime);
+
+    componentInstance.scroll(ind, isLeftScroll);
+
+    expect(componentInstance.isAnyCarouselCurrentlyScrolling).toBeTrue();
+
+    for (let i = 0; i <= 5; i++) {
+      currentTime += 160;
+      tick(160);
+    }
+
+    expect(componentInstance.isAnyCarouselCurrentlyScrolling).toBeFalse();
+
+    expect(componentInstance.leftmostCardIndices[ind]).toBe(2);
+
+    flush();
+  }));
+
+  it('should not scroll if activity count is too small to allow scrolling', () => {
+    const ind = 0;
+    const shouldScrollLeft = false;
+
+    const mockCarouselElement = document.createElement('div');
+    mockCarouselElement.className = 'oppia-library-carousel-tiles';
+    mockCarouselElement.scrollLeft = 100;
+    spyOn(document, 'querySelectorAll').and.returnValue([
+      mockCarouselElement,
+    ] as unknown as NodeListOf<HTMLElement>);
+
+    componentInstance.tileDisplayCount = 4;
+    componentInstance.leftmostCardIndices = [0];
+    componentInstance.libraryGroups = [
+      {
+        activity_summary_dicts: new Array(2),
+        categories: [],
+        header_i18n_id: '',
+        has_full_results_page: false,
+        full_results_url: '',
+        protractor_id: '',
+      },
+    ];
+
+    componentInstance.scroll(ind, shouldScrollLeft);
+    expect(componentInstance.leftmostCardIndices[ind]).toBe(0);
+  });
+
+  it('should decrease leftmostCardIndices when scrolling left', () => {
+    const ind = 0;
+    const isLeftScroll = true;
+
+    const mockCarouselElement = document.createElement('div');
+    mockCarouselElement.className = 'oppia-library-carousel-tiles';
+    mockCarouselElement.scrollLeft = 200;
+
+    spyOn(document, 'querySelectorAll').and.returnValue([
+      mockCarouselElement,
+    ] as unknown as NodeListOf<HTMLElement>);
+
+    componentInstance.tileDisplayCount = 3;
+    componentInstance.leftmostCardIndices = [5];
+    componentInstance.libraryGroups = [
+      {
+        activity_summary_dicts: new Array(10),
+        categories: [],
+        header_i18n_id: '',
+        has_full_results_page: false,
+        full_results_url: '',
+        protractor_id: '',
+      },
+    ];
+
+    componentInstance.scroll(ind, isLeftScroll);
+
+    expect(componentInstance.leftmostCardIndices[ind]).toBe(2);
+  });
 });

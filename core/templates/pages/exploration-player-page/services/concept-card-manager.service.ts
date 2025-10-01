@@ -22,6 +22,10 @@ import {StateCard} from 'domain/state_card/state-card.model';
 import {ExplorationPlayerConstants} from 'pages/exploration-player-page/current-lesson-player/exploration-player-page.constants';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 import {ExplorationEngineService} from './exploration-engine.service';
+import {ConceptCard} from 'domain/skill/concept-card.model';
+import {PlayerTranscriptService} from './player-transcript.service';
+import {OppiaNoninteractiveSkillreviewConceptCardModalComponent} from '../../../../../extensions/rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview-concept-card-modal.component';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
 @Injectable({
   providedIn: 'root',
@@ -45,6 +49,7 @@ export class ConceptCardManagerService {
   conceptCardConsumed: boolean = false;
   wrongAnswersSinceConceptCardConsumed: number = 0;
   learnerIsReallyStuck: boolean = false;
+  conceptCard!: ConceptCard;
 
   // Variable tooltipIsOpen is a flag which says that the tooltip is currently
   // visible to the learner.
@@ -54,12 +59,14 @@ export class ConceptCardManagerService {
   conceptCardDiscovered: boolean = false;
 
   constructor(
-    playerPositionService: PlayerPositionService,
-    private explorationEngineService: ExplorationEngineService
+    private playerPositionService: PlayerPositionService,
+    private explorationEngineService: ExplorationEngineService,
+    private ngbModal: NgbModal,
+    private playerTranscriptService: PlayerTranscriptService
   ) {
     // TODO(#10904): Refactor to move subscriptions into components.
 
-    playerPositionService.onNewCardOpened.subscribe(
+    this.playerPositionService.onNewCardOpened.subscribe(
       (displayedCard: StateCard) => {
         this.hintsAvailable = displayedCard.getHints().length;
       }
@@ -79,6 +86,15 @@ export class ConceptCardManagerService {
     this.tooltipIsOpen = true;
     this.conceptCardDiscovered = true;
     this._timeoutElapsedEventEmitter.emit();
+  }
+
+  openConceptCardModal(linkedSkillId: string): void {
+    const modalRef = this.ngbModal.open(
+      OppiaNoninteractiveSkillreviewConceptCardModalComponent,
+      {backdrop: true}
+    );
+    this.consumeConceptCard();
+    modalRef.componentInstance.skillId = linkedSkillId;
   }
 
   releaseConceptCard(): void {
@@ -115,12 +131,12 @@ export class ConceptCardManagerService {
   }
 
   reset(newCard: StateCard): void {
-    if (this.hintsAvailable) {
-      return;
-    }
     this.conceptCardReleased = false;
     this.conceptCardConsumed = false;
     this.wrongAnswersSinceConceptCardConsumed = 0;
+    if (this.hintsAvailable) {
+      return;
+    }
     if (this.timeout) {
       clearTimeout(this.timeout);
       this.timeout = null;
@@ -157,6 +173,12 @@ export class ConceptCardManagerService {
     return this.conceptCardConsumed;
   }
 
+  returnToExplorationAfterConceptCard(): void {
+    this.playerTranscriptService.addPreviousCard();
+    let numCards = this.playerTranscriptService.getNumCards();
+    this.playerPositionService.setDisplayedCardIndex(numCards - 1);
+  }
+
   recordWrongAnswer(): void {
     if (this.isConceptCardViewable()) {
       this.wrongAnswersSinceConceptCardConsumed++;
@@ -168,6 +190,14 @@ export class ConceptCardManagerService {
       // Learner is really stuck.
       this.emitLearnerStuckedness();
     }
+  }
+
+  setConceptCard(conceptCard: ConceptCard): void {
+    this.conceptCard = conceptCard;
+  }
+
+  getConceptCard(): ConceptCard {
+    return this.conceptCard;
   }
 
   get onLearnerGetsReallyStuck(): EventEmitter<string> {

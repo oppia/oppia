@@ -24,8 +24,8 @@ import subprocess
 
 from typing import Final, Iterator, List, Tuple
 
-from . import linter_utils
 from .. import concurrent_task_utils
+from . import linter_utils
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -63,8 +63,6 @@ CODEOWNER_IMPORTANT_PATHS: Final = [
     '/core/domain/rights_manager*.py',
     '/core/domain/role_services*.py',
     '/core/domain/user*.py',
-    '/AUTHORS',
-    '/CONTRIBUTORS',
     '/LICENSE',
     '/NOTICE',
     '/core/templates/pages/terms-page/terms-page.component.html',

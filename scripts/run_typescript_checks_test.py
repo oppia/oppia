@@ -38,8 +38,8 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
         super().setUp()
         process = subprocess.Popen(
             ['test'], stdout=subprocess.PIPE, encoding='utf-8')
-        def mock_popen(
-            unused_cmd: str, stdout: str, encoding: str  # pylint: disable=unused-argument
+        def mock_popen( # pylint: disable=unused-argument
+            unused_cmd: str, stdout: str, encoding: str
         ) -> subprocess.Popen[str]:  # pylint: disable=unsubscriptable-object
             return process
 
@@ -127,8 +127,8 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
         """Test that error is produced if stdout is not empty."""
         process = subprocess.Popen(
             ['echo', 'test'], stdout=subprocess.PIPE, encoding='utf-8')
-        def mock_popen_for_errors(
-            unused_cmd: str, stdout: str, encoding: str  # pylint: disable=unused-argument
+        def mock_popen_for_errors( # pylint: disable=unused-argument
+            unused_cmd: str, stdout: str, encoding: str
         ) -> subprocess.Popen[str]:  # pylint: disable=unsubscriptable-object
             return process
 
@@ -144,8 +144,8 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
             ['echo', ''], stdout=subprocess.PIPE, encoding='utf-8')
         non_empty_process = subprocess.Popen(
             ['echo', 'test'], stdout=subprocess.PIPE, encoding='utf-8')
-        def mock_popen_for_errors(
-            cmd_tokens: List[str], stdout: str, encoding: str  # pylint: disable=unused-argument
+        def mock_popen_for_errors( # pylint: disable=unused-argument
+            cmd_tokens: List[str], stdout: str, encoding: str
         ) -> subprocess.Popen[str]:
             if (
                 cmd_tokens == [
@@ -186,8 +186,8 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
 
         class MockProcess:
             stdout = MockOutput()
-        def mock_popen_for_errors(
-            unused_cmd: str, stdout: str, encoding: str  # pylint: disable=unused-argument
+        def mock_popen_for_errors( # pylint: disable=unused-argument
+            unused_cmd: str, stdout: str, encoding: str
         ) -> MockProcess:  # pylint: disable=unsubscriptable-object
             return MockProcess()
 

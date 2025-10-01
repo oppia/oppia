@@ -21,19 +21,20 @@ import json
 import logging
 import os
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import exp_domain
-from core.domain import exp_services
-from core.domain import feedback_services
-from core.domain import fs_services
-from core.domain import rights_domain
-from core.domain import stats_domain
-from core.domain import takeout_domain
-from core.domain import takeout_service
-from core.domain import topic_domain
-from core.domain import user_services
+from core.domain import (
+    exp_domain,
+    exp_services,
+    feedback_services,
+    fs_services,
+    rights_domain,
+    stats_domain,
+    takeout_domain,
+    takeout_service,
+    topic_domain,
+    user_services,
+)
 from core.platform import models
 from core.tests import test_utils
 
@@ -41,24 +42,28 @@ from typing import Any, Dict, Final, List, Optional, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import app_feedback_report_models
-    from mypy_imports import auth_models
-    from mypy_imports import base_models
-    from mypy_imports import blog_models
-    from mypy_imports import collection_models
-    from mypy_imports import config_models
+    from mypy_imports import (
+        app_feedback_report_models,
+        auth_models,
+        base_models,
+        blog_models,
+        collection_models,
+        config_models,
+    )
     from mypy_imports import exp_models as exploration_models
-    from mypy_imports import feedback_models
-    from mypy_imports import improvements_models
-    from mypy_imports import learner_group_models
-    from mypy_imports import question_models
-    from mypy_imports import skill_models
-    from mypy_imports import story_models
-    from mypy_imports import subtopic_models
-    from mypy_imports import suggestion_models
-    from mypy_imports import topic_models
-    from mypy_imports import user_models
-    from mypy_imports import voiceover_models
+    from mypy_imports import (
+        feedback_models,
+        improvements_models,
+        learner_group_models,
+        question_models,
+        skill_models,
+        story_models,
+        subtopic_models,
+        suggestion_models,
+        topic_models,
+        user_models,
+        voiceover_models,
+    )
 
 (
     app_feedback_report_models,
@@ -1192,6 +1197,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_collection_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
         expected_skill_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
         expected_subtopic_page_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
+        expected_study_guide_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
         expected_topic_rights_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
         expected_topic_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
         expected_translation_contribution_stats: Dict[
@@ -1285,6 +1291,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 expected_skill_sm,
             'subtopic_page_snapshot_metadata':
                 expected_subtopic_page_sm,
+            'study_guide_snapshot_metadata':
+                expected_study_guide_sm,
             'topic_rights_snapshot_metadata':
                 expected_topic_rights_sm,
             'topic_snapshot_metadata': expected_topic_sm,
@@ -1832,6 +1840,12 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 'commit_message': self.COMMIT_MESSAGE,
             }
         }
+        expected_study_guide_sm = {
+            self.GENERIC_MODEL_ID: {
+                'commit_type': self.COMMIT_TYPE,
+                'commit_message': self.COMMIT_MESSAGE,
+            }
+        }
         expected_topic_rights_sm = {
             self.GENERIC_MODEL_ID: {
                 'commit_type': self.COMMIT_TYPE,
@@ -2161,6 +2175,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 expected_skill_sm,
             'subtopic_page_snapshot_metadata':
                 expected_subtopic_page_sm,
+            'study_guide_snapshot_metadata':
+                expected_study_guide_sm,
             'topic_rights_snapshot_metadata':
                 expected_topic_rights_sm,
             'topic_snapshot_metadata': expected_topic_sm,

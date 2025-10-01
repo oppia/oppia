@@ -29,8 +29,7 @@ const INTRO_CONTENT_VOICEOVER_IN_HI =
   testConstants.data.IntroContentVoiceoverInHindi;
 const CONTINUE_INTERACTION_VOICEOVER_IN_HI =
   testConstants.data.ContinueInteractionVoiceoverInHindi;
-const LAST_CARD_VOICEOVER_IN_HI =
-  testConstants.data.LastCardContentVoiceoverInHindi;
+const LAST_CARD_VOICEOVER_IN_HI = testConstants.data.VoiceoverEnglishIndia;
 const ROLES = testConstants.Roles;
 
 const INTRODUCTION_CARD_CONTENT: string =
@@ -90,7 +89,7 @@ describe('Exploration Editor', function () {
 
     // Navigate to the creator dashboard and create a new exploration.
     await explorationEditor.navigateToCreatorDashboardPage();
-    await explorationEditor.navigateToExplorationEditorPage();
+    await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
     await explorationEditor.dismissWelcomeModal();
     await explorationEditor.updateCardContent(INTRODUCTION_CARD_CONTENT);
     await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
@@ -210,7 +209,7 @@ describe('Exploration Editor', function () {
     loggedOutUser = await UserFactory.createLoggedOutUser();
 
     // Setup is taking really long.
-  }, 600000);
+  }, 900000);
 
   it(
     'should allow the learner to view and play a lesson entirely in a particular language and start listening to the voiceover from any state',
@@ -245,5 +244,5 @@ describe('Exploration Editor', function () {
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
-  });
+  }, 450000);
 });

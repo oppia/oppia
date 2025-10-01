@@ -19,7 +19,7 @@
 import {Component, Input} from '@angular/core';
 import {NgbActiveModal, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
@@ -34,7 +34,7 @@ import {StateInteractionIdService} from 'components/state-editor/state-editor-pr
 import {
   TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
   TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING,
-} from 'domain/exploration/WrittenTranslationObjectFactory';
+} from 'domain/exploration/written-translation.model';
 
 interface LanguageCodeToContentTranslations {
   [languageCode: string]: TranslatedContent;
@@ -59,7 +59,7 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
   constructor(
     private ngbActiveModal: NgbActiveModal,
     private ngbModal: NgbModal,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private languageUtilService: LanguageUtilService,
     private entityTranslationsService: EntityTranslationsService,
     private changeListService: ChangeListService,
@@ -71,9 +71,9 @@ export class ModifyTranslationsModalComponent extends ConfirmOrCancelModal {
   }
 
   ngOnInit(): void {
-    this.explorationId = this.contextService.getExplorationId();
+    this.explorationId = this.pageContextService.getExplorationId();
     this.explorationVersion =
-      this.contextService.getExplorationVersion() as number;
+      this.pageContextService.getExplorationVersion() as number;
     this.interactionId = this.stateInteractionIdService.savedMemento;
 
     // Populate the content translations via latest draft changes first,

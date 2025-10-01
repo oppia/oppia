@@ -65,6 +65,8 @@ export class HomeTabComponent {
   directiveSubscriptions = new Subscription();
   currentGoalIds: Set<string> = new Set();
   storySummariesWithAvailableNodes: Set<string> = new Set();
+  communityLibraryUrl =
+    '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE;
 
   constructor(
     private i18nLanguageCodeService: I18nLanguageCodeService,
@@ -210,8 +212,8 @@ export class HomeTabComponent {
 
     return (
       totalStories +
-      this.incompleteExplorationsList.length +
-      this.incompleteCollectionsList.length
+      (this.incompleteExplorationsList?.length || 0) +
+      (this.incompleteCollectionsList?.length || 0)
     );
   }
 }

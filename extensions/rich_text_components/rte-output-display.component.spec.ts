@@ -28,6 +28,7 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {By} from '@angular/platform-browser';
+import {EventEmitter} from '@angular/core';
 import {OppiaRteParserService} from 'services/oppia-rte-parser.service';
 import {RichTextComponentsModule} from './rich-text-components.module';
 import {RteOutputDisplayComponent} from './rte-output-display.component';
@@ -36,11 +37,15 @@ import {FeatureStatusChecker} from 'domain/feature-flag/feature-status-summary.m
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {AutomaticVoiceoverHighlightService} from '../../core/templates/services/automatic-voiceover-highlight-service';
 import {EntityVoiceoversService} from '../../core/templates/services/entity-voiceovers.services';
-import {ContextService} from '../../core/templates/services/context.service';
+import {PageContextService} from '../../core/templates/services/page-context.service';
 import {TranslationTabActiveContentIdService} from '../../core/templates/pages/exploration-editor-page/translation-tab/services/translation-tab-active-content-id.service';
 import {VoiceoverPlayerService} from '../../core/templates/pages/exploration-player-page/services/voiceover-player.service';
 import {LocalStorageService} from '../../core/templates/services/local-storage.service';
 import {AudioPlayerService} from 'services/audio-player.service';
+import {
+  EntityVoiceovers,
+  EntityVoiceoversBackendDict,
+} from 'domain/voiceover/entity-voiceovers.model';
 
 class MockPlatformFeatureService {
   get status(): object {
@@ -59,7 +64,7 @@ describe('RTE display component', () => {
   let platformFeatureService: PlatformFeatureService;
   let automaticVoiceoverHighlightService: AutomaticVoiceoverHighlightService;
   let entityVoiceoversService: EntityVoiceoversService;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let translationTabActiveContentIdService: TranslationTabActiveContentIdService;
   let voiceoverPlayerService: VoiceoverPlayerService;
   let localStorageService: LocalStorageService;
@@ -84,12 +89,17 @@ describe('RTE display component', () => {
       TranslationTabActiveContentIdService
     );
     voiceoverPlayerService = TestBed.inject(VoiceoverPlayerService);
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     entityVoiceoversService = TestBed.inject(EntityVoiceoversService);
     fixture = TestBed.createComponent(RteOutputDisplayComponent);
     localStorageService = TestBed.inject(LocalStorageService);
     audioplayerService = TestBed.inject(AudioPlayerService);
     component = fixture.componentInstance;
+
+    spyOn(
+      entityVoiceoversService,
+      'onLanguageAccentCodeChange'
+    ).and.returnValue(new EventEmitter<string>());
   }));
 
   // NOTE: Debugging might be a bit confusing sometimes, especially if this the
@@ -280,7 +290,27 @@ describe('RTE display component', () => {
     expect(outputWrappedString).toBe(expectedOutputWrappedString);
   }));
 
+  it('should correctly wrap html multiple sentences inside span tag for highlighting', fakeAsync(() => {
+    let rteString = '<p>Hi world! I am a content creator.</p>';
+    let expectedOutputWrappedString =
+      '<p><span id="highlightBlock1">Hi world!</span>' +
+      '<span> </span>' +
+      '<span id="highlightBlock2">I am a content creator.</span></p>';
+
+    spyOn(
+      localStorageService,
+      'getLastSelectedTranslationLanguageCode'
+    ).and.returnValue('en');
+    let outputWrappedString =
+      component.wrapSentencesInSpansForHighlighting(rteString);
+    expect(outputWrappedString).toBe(expectedOutputWrappedString);
+  }));
+
   it('should correctly set data for sentence highlighting during voiceover playback in ngOnInit', fakeAsync(() => {
+    spyOn(
+      component,
+      'isManualVoiceoverAvailableForActiveContent'
+    ).and.returnValue(false);
     let regenerateVoiceoverFeatureSpy = spyOn(
       component,
       'isAutomaticVoiceoverRegenerationFromExpFeatureEnabled'
@@ -289,7 +319,13 @@ describe('RTE display component', () => {
       automaticVoiceoverHighlightService,
       'setAutomatedVoiceoversAudioOffsets'
     );
-    spyOn(entityVoiceoversService, 'getActiveEntityVoiceovers');
+    let entityVoiceoverSpy = spyOn(
+      entityVoiceoversService,
+      'getActiveEntityVoiceovers'
+    );
+    entityVoiceoverSpy.and.returnValue({
+      automatedVoiceoversAudioOffsetsMsecs: {},
+    });
 
     regenerateVoiceoverFeatureSpy.and.returnValue(false);
     component.ngOnInit();
@@ -304,9 +340,23 @@ describe('RTE display component', () => {
       entityVoiceoversService.getActiveEntityVoiceovers
     ).not.toHaveBeenCalled();
 
+    entityVoiceoverSpy.and.returnValue({
+      automatedVoiceoversAudioOffsetsMsecs: {
+        content0: [
+          {token: 'Nic', audioOffsetMsecs: 0.0},
+          {token: 'took', audioOffsetMsecs: 100.0},
+          {token: 'Jaime', audioOffsetMsecs: 200.0},
+          {token: 'to', audioOffsetMsecs: 300.0},
+          {token: 'the', audioOffsetMsecs: 400.0},
+          {token: 'arcade', audioOffsetMsecs: 500.0},
+        ],
+      },
+    });
     regenerateVoiceoverFeatureSpy.and.returnValue(true);
     component.ngOnInit();
-    tick(2000);
+    entityVoiceoversService.onLanguageAccentCodeChange.emit();
+
+    tick(5000);
     flush();
     discardPeriodicTasks();
 
@@ -324,7 +374,7 @@ describe('RTE display component', () => {
       component,
       'isAutomaticVoiceoverRegenerationFromExpFeatureEnabled'
     );
-    spyOn(automaticVoiceoverHighlightService, 'setHighlightIdToSenetenceMap');
+    spyOn(automaticVoiceoverHighlightService, 'setHighlightIdToSentenceMap');
     spyOn(automaticVoiceoverHighlightService, 'setActiveContentId');
 
     let changes: SimpleChanges = {
@@ -348,7 +398,7 @@ describe('RTE display component', () => {
     tick(1000);
 
     expect(
-      automaticVoiceoverHighlightService.setHighlightIdToSenetenceMap
+      automaticVoiceoverHighlightService.setHighlightIdToSentenceMap
     ).not.toHaveBeenCalled();
     expect(
       automaticVoiceoverHighlightService.setActiveContentId
@@ -361,7 +411,7 @@ describe('RTE display component', () => {
     tick(1000);
 
     expect(
-      automaticVoiceoverHighlightService.setHighlightIdToSenetenceMap
+      automaticVoiceoverHighlightService.setHighlightIdToSentenceMap
     ).toHaveBeenCalled();
     expect(
       automaticVoiceoverHighlightService.setActiveContentId
@@ -375,14 +425,14 @@ describe('RTE display component', () => {
     );
     let vpsSpy = spyOn(voiceoverPlayerService, 'getActiveContentId');
     let explorationPlayerPageSpy = spyOn(
-      contextService,
+      pageContextService,
       'isInExplorationPlayerPage'
     );
     let explorationEditorPageSpy = spyOn(
-      contextService,
+      pageContextService,
       'isInExplorationEditorPage'
     );
-    let editorTabContextSpy = spyOn(contextService, 'getEditorTabContext');
+    let editorTabContextSpy = spyOn(pageContextService, 'getEditorTabContext');
 
     // Exploration editor page (translation tab).
     explorationPlayerPageSpy.and.returnValue(false);
@@ -464,11 +514,25 @@ describe('RTE display component', () => {
     expect(readableText).toBe(expectedString);
   });
 
+  it('should return space character for unknown tag', () => {
+    let node = document.createElement('span');
+    // eslint-disable-next-line oppia/no-inner-html
+    node.innerHTML = ' ';
+    let expectedString = ' ';
+    let readableText = component.getReadableTextFromNode(node.childNodes[0]);
+    expect(readableText).toBe(expectedString);
+  });
+
   it('should not change bg highlight color when prev and current element are same during voiceover playback', fakeAsync(() => {
+    spyOn(
+      component,
+      'isManualVoiceoverAvailableForActiveContent'
+    ).and.returnValue(false);
+    spyOn(component, 'isInPlayerOrPreviewPage').and.returnValue(true);
     let audioPlayingSpy = spyOn(audioplayerService, 'isPlaying');
     audioPlayingSpy.and.returnValue(true);
 
-    component.highlighIdToSentenceText = {
+    component.highlightIdToSentenceText = {
       highlightBlock1: 'Hello world',
     };
 
@@ -500,10 +564,15 @@ describe('RTE display component', () => {
     'should highlight the current element and remove highlighting from ' +
       'previous element during voiceover playback',
     fakeAsync(() => {
+      spyOn(
+        component,
+        'isManualVoiceoverAvailableForActiveContent'
+      ).and.returnValue(false);
+      spyOn(component, 'isInPlayerOrPreviewPage').and.returnValue(true);
       let audioPlayingSpy = spyOn(audioplayerService, 'isPlaying');
       audioPlayingSpy.and.returnValue(true);
 
-      component.highlighIdToSentenceText = {
+      component.highlightIdToSentenceText = {
         highlightBlock2: 'New element',
       };
 
@@ -552,6 +621,11 @@ describe('RTE display component', () => {
   );
 
   it('should remove highlight when audio is not playing', fakeAsync(() => {
+    spyOn(
+      component,
+      'isManualVoiceoverAvailableForActiveContent'
+    ).and.returnValue(false);
+    spyOn(component, 'isInPlayerOrPreviewPage').and.returnValue(true);
     let audioPlayingSpy = spyOn(audioplayerService, 'isPlaying');
     audioPlayingSpy.and.returnValue(false);
 
@@ -578,4 +652,81 @@ describe('RTE display component', () => {
         .backgroundColor
     ).toBe('');
   }));
+
+  it('should not highlight sentence when manual voiceover is available in player page', () => {
+    component.previousHighlightedElementId = undefined;
+    spyOn(
+      component,
+      'isManualVoiceoverAvailableForActiveContent'
+    ).and.returnValue(true);
+    spyOn(component, 'isInPlayerOrPreviewPage').and.returnValue(true);
+    component.highlightSentenceDuringVoiceoverPlay();
+    // No updates were made to the previously highlighted element ID.
+    expect(component.previousHighlightedElementId).toBe(undefined);
+  });
+
+  it('should not highlight sentence when manual voiceover is playing in editor page', () => {
+    component.previousHighlightedElementId = undefined;
+    spyOn(component, 'isInPlayerOrPreviewPage').and.returnValue(false);
+    let audioPlayingSpy = spyOn(audioplayerService, 'isPlaying');
+    audioPlayingSpy.and.returnValue(true);
+    voiceoverPlayerService.isAutomaticVoiceoverPlaying = false;
+
+    component.highlightSentenceDuringVoiceoverPlay();
+    // No updates were made to the previously highlighted element ID.
+    expect(component.previousHighlightedElementId).toBe(undefined);
+  });
+
+  it('should be able to return manual voiceover status correctly', () => {
+    const voiceover = {
+      filename: 'a.mp3',
+      file_size_bytes: 200000,
+      needs_update: false,
+      duration_secs: 10.0,
+    };
+    let contentIdToVoiceoversMapping = {
+      content0: {
+        manual: voiceover,
+        auto: voiceover,
+      },
+    };
+    const entityVoiceoversBackendDict: EntityVoiceoversBackendDict = {
+      entity_id: 'exp_1',
+      entity_type: 'exploration',
+      entity_version: 1,
+      language_accent_code: 'en-US',
+      voiceovers_mapping: contentIdToVoiceoversMapping,
+      automated_voiceovers_audio_offsets_msecs: {},
+    };
+    const entityVoiceovers = EntityVoiceovers.createFromBackendDict(
+      entityVoiceoversBackendDict
+    );
+
+    spyOn(component, 'getActiveContentId').and.returnValue('content0');
+    spyOn(entityVoiceoversService, 'getActiveEntityVoiceovers').and.returnValue(
+      entityVoiceovers
+    );
+
+    expect(component.isManualVoiceoverAvailableForActiveContent()).toBeTrue();
+  });
+
+  it('should return true when page context is subtopic_preview', () => {
+    spyOn(pageContextService, 'getSubtopicPreviewIsOpen').and.returnValue(true);
+    const result = component.isSolutionCollapsedForWorkedexample();
+    expect(result).toBe(true);
+  });
+
+  it('should return true when page context is studyguide', () => {
+    spyOn(pageContextService, 'getPageContext').and.returnValue('studyguide');
+    const result = component.isSolutionCollapsedForWorkedexample();
+    expect(result).toBe(true);
+  });
+
+  it('should return false when page context is neither topic_editor nor studyguide', () => {
+    spyOn(pageContextService, 'getPageContext').and.returnValue(
+      'exploration_player'
+    );
+    const result = component.isSolutionCollapsedForWorkedexample();
+    expect(result).toBe(false);
+  });
 });

@@ -19,11 +19,11 @@
 import {Injectable} from '@angular/core';
 
 import {AppConstants} from 'app.constants';
-import {Exploration} from 'domain/exploration/ExplorationObjectFactory';
+import {Exploration} from 'domain/exploration/exploration.model';
 import {Voiceover} from 'domain/exploration/voiceover.model';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {ComputeGraphService} from 'services/compute-graph.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 
 @Injectable({
   providedIn: 'root',
@@ -45,7 +45,7 @@ export class AudioPreloaderService {
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
     private computeGraphService: ComputeGraphService,
-    private contextService: ContextService
+    private pageContextService: PageContextService
   ) {}
 
   init(exploration: Exploration): void {
@@ -140,7 +140,7 @@ export class AudioPreloaderService {
 
   private loadAudio(audioFilename: string): void {
     this.assetsBackendApiService
-      .loadAudio(this.contextService.getExplorationId(), audioFilename)
+      .loadAudio(this.pageContextService.getExplorationId(), audioFilename)
       .then(loadedAudio => {
         const index = this.filenamesOfAudioCurrentlyDownloading.findIndex(
           filename => filename === loadedAudio.filename

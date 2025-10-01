@@ -20,7 +20,7 @@ import {TestBed} from '@angular/core/testing';
 
 import {PlayerTranscriptService} from './player-transcript.service';
 import {StateCard} from '../../../domain/state_card/state-card.model';
-import {Interaction} from '../../../domain/exploration/InteractionObjectFactory';
+import {Interaction} from '../../../domain/exploration/interaction.model';
 import {RecordedVoiceovers} from '../../../domain/exploration/recorded-voiceovers.model';
 import {LoggerService} from '../../../services/contextual/logger.service';
 

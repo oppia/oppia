@@ -22,15 +22,33 @@ import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from '../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import {LearnerViewRatingService} from './learner-view-rating.service';
 import {LearnerViewRatingBackendApiService} from './learner-view-rating-backend-api.service';
+import {PageContextService} from '../../../services/page-context.service';
 
 describe('Learner View Rating Service', () => {
   let learnerViewRatingService: LearnerViewRatingService;
   let learnerViewRatingBackendApiService: LearnerViewRatingBackendApiService;
 
+  class MockPageContextService {
+    getExplorationId(): string {
+      return 'test_id';
+    }
+    isInExplorationEditorPage(): boolean {
+      return false;
+    }
+    isInQuestionPlayerMode(): boolean {
+      return false;
+    }
+    setExplorationVersion(_version: number): void {}
+  }
+
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [
+        {
+          provide: PageContextService,
+          useClass: MockPageContextService,
+        },
         {
           provide: TranslateService,
           useClass: MockTranslateService,

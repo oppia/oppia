@@ -28,7 +28,7 @@ import {PlayerPositionService} from '../../services/player-position.service';
 import {PlayerTranscriptService} from '../../services/player-transcript.service';
 import {DisplayHintModalComponent} from './display-hint-modal.component';
 import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
-import {Interaction} from '../../../../domain/exploration/InteractionObjectFactory';
+import {Interaction} from '../../../../domain/exploration/interaction.model';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 
 describe('Display hint modal', () => {

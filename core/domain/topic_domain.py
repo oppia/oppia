@@ -24,20 +24,17 @@ import functools
 import json
 import re
 
-from core import android_validation_constants
-from core import feconf
-from core import utils
+from core import android_validation_constants, feconf, utils
 from core.constants import constants
-from core.domain import change_domain
-from core.domain import subtopic_page_domain
-
-from typing import Dict, List, Literal, Optional, TypedDict
 
 # The fs_services module is required in one of the migration
 # functions in Topic class. This import should be removed
 # once the schema migration functions are moved outside the
 # domain file.
-from core.domain import fs_services # pylint: disable=invalid-import-from # isort:skip
+from core.domain import fs_services  # pylint: disable=invalid-import-from
+from core.domain import change_domain, study_guide_domain, subtopic_page_domain
+
+from typing import Dict, List, Literal, Optional, TypedDict
 
 CMD_CREATE_NEW = feconf.CMD_CREATE_NEW
 CMD_CHANGE_ROLE = feconf.CMD_CHANGE_ROLE
@@ -149,6 +146,11 @@ class TopicChange(change_domain.BaseChange):
     # update_subtopic_page_property command.
     SUBTOPIC_PAGE_PROPERTIES: List[str] = (
         subtopic_page_domain.SubtopicPageChange.SUBTOPIC_PAGE_PROPERTIES)
+
+    # The allowed list of study guide properties which can be used in
+    # update_study_guide_property command.
+    STUDY_GUIDE_PROPERTIES: List[str] = (
+        study_guide_domain.StudyGuideChange.STUDY_GUIDE_PROPERTIES)
 
     ALLOWED_COMMANDS = [{
         'name': CMD_CREATE_NEW,
@@ -278,6 +280,14 @@ class TopicChange(change_domain.BaseChange):
         'optional_attribute_names': [],
         'user_id_attribute_names': [],
         'allowed_values': {'property_name': SUBTOPIC_PAGE_PROPERTIES},
+        'deprecated_values': {}
+    }, {
+        'name': study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY,
+        'required_attribute_names': [
+            'property_name', 'new_value', 'old_value', 'subtopic_id'],
+        'optional_attribute_names': [],
+        'user_id_attribute_names': [],
+        'allowed_values': {'property_name': STUDY_GUIDE_PROPERTIES},
         'deprecated_values': {}
     }, {
         'name': CMD_UPDATE_TOPIC_PROPERTY,

@@ -21,21 +21,21 @@ from __future__ import annotations
 import logging
 
 from core import feconf
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import feedback_services
-from core.domain import stats_domain
-from core.domain import stats_services
-from core.domain import taskqueue_services
+from core.domain import (
+    exp_domain,
+    exp_fetchers,
+    feedback_services,
+    stats_domain,
+    stats_services,
+    taskqueue_services,
+)
 from core.platform import models
 
 from typing import Any, Callable, Dict, Optional, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import stats_models
-    from mypy_imports import transaction_services
-    from mypy_imports import user_models
+    from mypy_imports import stats_models, transaction_services, user_models
 
 (stats_models, user_models) = models.Registry.import_models([
     models.Names.STATISTICS, models.Names.USER
@@ -111,7 +111,8 @@ class StatsEventsHandler(BaseEventHandler):
             return
         if cls._is_latest_version(exploration_id, exp_version):
             taskqueue_services.defer(
-                taskqueue_services.FUNCTION_ID_UPDATE_STATS,
+                feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+                    'FUNCTION_ID_UPDATE_STATS'],
                 taskqueue_services.QUEUE_NAME_STATS,
                 exploration_id,
                 exp_version, aggregated_stats)

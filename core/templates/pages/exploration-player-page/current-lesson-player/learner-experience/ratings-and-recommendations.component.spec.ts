@@ -35,7 +35,7 @@ import {UserService} from '../../../../services/user.service';
 import {LearnerViewRatingService} from '../../services/learner-view-rating.service';
 import {MockLimitToPipe} from '../templates/lesson-information-card-modal.component.spec';
 import {RatingsAndRecommendationsComponent} from './ratings-and-recommendations.component';
-import {ExplorationPlayerStateService} from '../../services/exploration-player-state.service';
+import {ExplorationModeService} from '../../services/exploration-mode.service';
 import {UrlInterpolationService} from '../../../../domain/utilities/url-interpolation.service';
 import {LocalStorageService} from '../../../../services/local-storage.service';
 import {AssetsBackendApiService} from '../../../../services/assets-backend-api.service';
@@ -43,9 +43,11 @@ import {StoryViewerBackendApiService} from '../../../../domain/story_viewer/stor
 import {TopicViewerBackendApiService} from '../../../../domain/topic_viewer/topic-viewer-backend-api.service';
 import {StoryPlaythrough} from '../../../../domain/story_viewer/story-playthrough.model';
 import {ReadOnlyStoryNode} from '../../../../domain/story_viewer/read-only-story-node.model';
-import {ReadOnlyTopic} from '../../../../domain/topic_viewer/read-only-topic-object.factory';
+import {ReadOnlyTopic} from '../../../../domain/topic_viewer/read-only-topic.model';
 import {LearnerExplorationSummary} from '../../../../domain/summary/learner-exploration-summary.model';
 import {SiteAnalyticsService} from '../../../../services/site-analytics.service';
+import {ConversationFlowService} from '../../services/conversation-flow.service';
+import {PageContextService} from '../../../../services/page-context.service';
 
 describe('Ratings and recommendations component', () => {
   let fixture: ComponentFixture<RatingsAndRecommendationsComponent>;
@@ -54,8 +56,9 @@ describe('Ratings and recommendations component', () => {
   let learnerViewRatingService: LearnerViewRatingService;
   let urlService: UrlService;
   let userService: UserService;
-  let explorationPlayerStateService: ExplorationPlayerStateService;
+  let explorationModeService: ExplorationModeService;
   let urlInterpolationService: UrlInterpolationService;
+  let conversationFlowService: ConversationFlowService;
   let localStorageService: LocalStorageService;
   let assetsBackendApiService: AssetsBackendApiService;
   let storyViewerBackendApiService: StoryViewerBackendApiService;
@@ -78,6 +81,26 @@ describe('Ratings and recommendations component', () => {
     };
   }
 
+  class MockPageContextService {
+    private pageContext = 'EXPLORATION_PLAYER';
+    getExplorationId(): string {
+      return 'test_id';
+    }
+    getExplorationVersion(): number {
+      return 1;
+    }
+    isInExplorationEditorPage(): boolean {
+      return false;
+    }
+    isInQuestionPlayerMode(): boolean {
+      return false;
+    }
+    getPageContext(): string {
+      return this.pageContext;
+    }
+    setExplorationVersion(_version: number): void {}
+  }
+
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule, NgbPopoverModule],
@@ -87,8 +110,10 @@ describe('Ratings and recommendations component', () => {
         LearnerViewRatingService,
         UrlService,
         UserService,
-        ExplorationPlayerStateService,
+        ExplorationModeService,
         UrlInterpolationService,
+        ConversationFlowService,
+        {provide: PageContextService, useClass: MockPageContextService},
         AssetsBackendApiService,
         StoryViewerBackendApiService,
         TopicViewerBackendApiService,
@@ -113,9 +138,8 @@ describe('Ratings and recommendations component', () => {
     learnerViewRatingService = TestBed.inject(LearnerViewRatingService);
     urlService = TestBed.inject(UrlService);
     userService = TestBed.inject(UserService);
-    explorationPlayerStateService = TestBed.inject(
-      ExplorationPlayerStateService
-    );
+    conversationFlowService = TestBed.inject(ConversationFlowService);
+    explorationModeService = TestBed.inject(ExplorationModeService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     localStorageService = TestBed.inject(LocalStorageService);
     assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
@@ -178,10 +202,9 @@ describe('Ratings and recommendations component', () => {
           callb(userRating);
         }
       );
-      spyOn(
-        explorationPlayerStateService,
-        'isInStoryChapterMode'
-      ).and.returnValue(true);
+      spyOn(explorationModeService, 'isInStoryChapterMode').and.returnValue(
+        true
+      );
       spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
         'dummy_story_viewer_page_url'
       );
@@ -244,9 +267,7 @@ describe('Ratings and recommendations component', () => {
       mockOnRatingUpdated.emit();
       tick(1000);
 
-      expect(
-        explorationPlayerStateService.isInStoryChapterMode
-      ).toHaveBeenCalled();
+      expect(explorationModeService.isInStoryChapterMode).toHaveBeenCalled();
       expect(componentInstance.inStoryMode).toBe(true);
       expect(componentInstance.storyId).toBe('story_id');
       expect(componentInstance.nextStoryNode).toBe(readOnlyStoryNode2);
@@ -274,10 +295,9 @@ describe('Ratings and recommendations component', () => {
       expect(componentInstance.inStoryMode).toBe(undefined);
       expect(componentInstance.storyViewerUrl).toBe(undefined);
 
-      spyOn(
-        explorationPlayerStateService,
-        'isInStoryChapterMode'
-      ).and.returnValue(false);
+      spyOn(explorationModeService, 'isInStoryChapterMode').and.returnValue(
+        false
+      );
       spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
         'dummy_story_viewer_page_url'
       );
@@ -285,9 +305,7 @@ describe('Ratings and recommendations component', () => {
       componentInstance.ngOnInit();
       tick();
 
-      expect(
-        explorationPlayerStateService.isInStoryChapterMode
-      ).toHaveBeenCalled();
+      expect(explorationModeService.isInStoryChapterMode).toHaveBeenCalled();
       expect(componentInstance.inStoryMode).toBe(false);
       expect(urlInterpolationService.interpolateUrl).not.toHaveBeenCalled();
       expect(componentInstance.storyViewerUrl).toBe(undefined);
@@ -372,6 +390,23 @@ describe('Ratings and recommendations component', () => {
       expect(siteAnalyticsService.registerNewSignupEvent).toHaveBeenCalled();
     })
   );
+
+  it('should return the value from getIsRefresherExploration', () => {
+    spyOn(
+      conversationFlowService,
+      'getIsRefresherExploration'
+    ).and.callThrough();
+    componentInstance.getIsRefresherExploration();
+    expect(
+      conversationFlowService.getIsRefresherExploration
+    ).toHaveBeenCalled();
+  });
+
+  it('should return the value from getParentExplorationIds', () => {
+    spyOn(conversationFlowService, 'getParentExplorationIds').and.callThrough();
+    componentInstance.getParentExplorationIds();
+    expect(conversationFlowService.getParentExplorationIds).toHaveBeenCalled();
+  });
 
   it("should save user's sign up section preference to localStorage", () => {
     spyOn(localStorageService, 'updateEndChapterSignUpSectionHiddenPreference');

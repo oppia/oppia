@@ -54,13 +54,13 @@ describe('Logged-in User', function () {
       await loggedInUser2.enterEmail('logged_in_user2@example.com');
 
       // Checking username availability via entering username that already exists.
-      await loggedInUser2.signInWithUsername('loggedInUser1');
+      await loggedInUser2.signInWithUsername('loggedInUser1', false);
       await loggedInUser2.expectUsernameError(
         'Sorry, this username is already taken.'
       );
 
       // Checking username via entering a username with 'admin' term(which shall is not allowed as  term "admin" is reserved).
-      await loggedInUser2.signInWithUsername('ImAdmin');
+      await loggedInUser2.signInWithUsername('ImAdmin', false);
       await loggedInUser2.expectUsernameError(
         "User names with 'admin' are reserved."
       );

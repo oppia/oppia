@@ -25,8 +25,7 @@ from typing import Dict, Mapping
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import datastore_services
+    from mypy_imports import base_models, datastore_services
 
 (base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 datastore_services = models.Registry.import_datastore_services()
@@ -243,14 +242,29 @@ class StudyGuideCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         })
 
 
+class StudyGuideSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
+    """Storage model for the metadata for a study guide snapshot."""
+
+    pass
+
+
+class StudyGuideSnapshotContentModel(base_models.BaseSnapshotContentModel):
+    """Storage model for the content of a study guide snapshot."""
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+
 class StudyGuideModel(base_models.VersionedModel):
     """Model for storing Study Guides.
 
     This stores the HTML data for a study guide.
     """
 
-    SNAPSHOT_METADATA_CLASS = SubtopicPageSnapshotMetadataModel
-    SNAPSHOT_CONTENT_CLASS = SubtopicPageSnapshotContentModel
+    SNAPSHOT_METADATA_CLASS = StudyGuideSnapshotMetadataModel
+    SNAPSHOT_CONTENT_CLASS = StudyGuideSnapshotContentModel
     COMMIT_LOG_ENTRY_CLASS = StudyGuideCommitLogEntryModel
     ALLOW_REVERT = False
 

@@ -21,28 +21,28 @@ from __future__ import annotations
 import logging
 import os
 
-from core import feature_flag_list
-from core import feconf
-from core import utils
+from core import feature_flag_list, feconf, utils
 from core.constants import constants
-from core.domain import exp_services
-from core.domain import feature_flag_services
-from core.domain import fs_services
-from core.domain import question_domain
-from core.domain import rights_manager
-from core.domain import story_domain
-from core.domain import story_fetchers
-from core.domain import story_services
-from core.domain import study_guide_domain
-from core.domain import study_guide_services
-from core.domain import subtopic_page_domain
-from core.domain import subtopic_page_services
-from core.domain import suggestion_services
-from core.domain import topic_domain
-from core.domain import topic_fetchers
-from core.domain import topic_services
-from core.domain import translation_domain
-from core.domain import user_services
+from core.domain import (
+    exp_services,
+    feature_flag_services,
+    fs_services,
+    question_domain,
+    rights_manager,
+    story_domain,
+    story_fetchers,
+    story_services,
+    study_guide_domain,
+    study_guide_services,
+    subtopic_page_domain,
+    subtopic_page_services,
+    suggestion_services,
+    topic_domain,
+    topic_fetchers,
+    topic_services,
+    translation_domain,
+    user_services,
+)
 from core.platform import models
 from core.tests import test_utils
 
@@ -1590,6 +1590,346 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
             self.TOPIC_ID, 2, strict=False)
         self.assertIsNotNone(subtopic_page)
+
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames
+        .SHOW_RESTRUCTURED_STUDY_GUIDES
+    ])
+    def test_update_topic_and_study_guide(self) -> None:
+        changelist: List[Union[
+            topic_domain.TopicChange,
+            study_guide_domain.StudyGuideChange
+        ]] = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+            'title': 'Title3',
+            'subtopic_id': 3,
+            'url_fragment': 'fragment-three'
+        })]
+        with self.assertRaisesRegex(
+            Exception, 'The given new subtopic id 3 is not equal to '
+            'the expected next subtopic id: 2'):
+            topic_services.update_topic_and_subtopic_pages(
+                self.user_id_admin, self.TOPIC_ID, changelist,
+                'Added subtopic.')
+
+        # Test whether the study guide was created for the above failed
+        # attempt.
+        study_guide = study_guide_services.get_study_guide_by_id(
+            self.TOPIC_ID, 3, strict=False)
+        self.assertIsNone(study_guide)
+
+        # Test exception raised for simultaneous adding and removing of
+        # subtopics.
+        changelist = [
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'title': 'Title2',
+                'subtopic_id': 2,
+                'url_fragment': 'fragment-two'
+            }),
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_DELETE_SUBTOPIC,
+                'subtopic_id': 2
+            })
+        ]
+        with self.assertRaisesRegex(
+            Exception, 'The incoming changelist had simultaneous'
+            ' creation and deletion of subtopics.'):
+            topic_services.update_topic_and_subtopic_pages(
+                self.user_id_admin, self.TOPIC_ID, changelist,
+                'Added and deleted a subtopic.')
+
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+            'title': 'Title2',
+            'subtopic_id': 2,
+            'url_fragment': 'fragment-two'
+        }),
+        study_guide_domain.StudyGuideChange({
+            'cmd': study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY,
+            'property_name': (
+                study_guide_domain.STUDY_GUIDE_PROPERTY_SECTIONS),
+            'subtopic_id': 2,
+            'old_value': [
+                {
+                    'heading': {
+                        'content_id': 'section_heading_0',
+                        'unicode_str': ''
+                    },
+                    'content': {
+                        'content_id': 'section_content_1',
+                        'html': ''
+                    }
+                }
+            ],
+            'new_value': [
+                {
+                    'heading': {
+                        'content_id': 'section_heading_0',
+                        'unicode_str': 'Heading'
+                    },
+                    'content': {
+                        'content_id': 'section_content_1',
+                        'html': '<p>Content</p>'
+                    }
+                }
+            ]
+        })]
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin, self.TOPIC_ID, changelist, 'Added a subtopic')
+
+        # Test whether a study guide already existing in datastore can be
+        # edited.
+        changelist = [study_guide_domain.StudyGuideChange({
+            'cmd': study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY,
+            'property_name': (
+                study_guide_domain.STUDY_GUIDE_PROPERTY_SECTIONS),
+            'subtopic_id': 2,
+            'old_value': [
+                {
+                    'heading': {
+                        'content_id': 'section_heading_0',
+                        'unicode_str': 'Heading'
+                    },
+                    'content': {
+                        'content_id': 'section_content_1',
+                        'html': '<p>Content</p>'
+                    }
+                }
+            ],
+            'new_value': [
+                {
+                    'heading': {
+                        'content_id': 'section_heading_0',
+                        'unicode_str': 'New Heading'
+                    },
+                    'content': {
+                        'content_id': 'section_content_1',
+                        'html': '<p>New content</p>'
+                    }
+                }
+            ]
+        })]
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin, self.TOPIC_ID, changelist,
+            'Updated html data')
+        study_guide = study_guide_services.get_study_guide_by_id(
+            self.TOPIC_ID, 2)
+        self.assertEqual(
+            study_guide.sections[0].to_dict(),
+            {
+                'heading': {
+                    'content_id': 'section_heading_0',
+                    'unicode_str': 'New Heading'
+                },
+                'content': {
+                    'content_id': 'section_content_1',
+                    'html': '<p>New content</p>'
+                }
+            })
+
+        # Test a sequence of changes with both topic and study guide changes.
+        changelist = [
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'title': 'Title3',
+                'subtopic_id': 3,
+                'url_fragment': 'fragment-three'
+            }),
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_DELETE_SUBTOPIC,
+                'subtopic_id': 2
+            }),
+            study_guide_domain.StudyGuideChange({
+            'cmd': study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY,
+            'property_name': (
+                study_guide_domain.STUDY_GUIDE_PROPERTY_SECTIONS),
+            'subtopic_id': 3,
+            'old_value': [
+                    {
+                        'heading': {
+                            'content_id': 'section_heading_0',
+                            'unicode_str': 'heading'
+                        },
+                        'content': {
+                            'content_id': 'section_content_1',
+                            'html': 'content'
+                        }
+                    }
+                ],
+            'new_value': [
+                    {
+                        'heading': {
+                            'content_id': 'section_heading_0',
+                            'unicode_str': 'New Heading'
+                        },
+                        'content': {
+                            'content_id': 'section_content_1',
+                            'html': '<p>New content</p>'
+                        }
+                    }
+                ]
+            }),
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+                'old_subtopic_id': None,
+                'new_subtopic_id': 3,
+                'skill_id': self.skill_id_1
+            })]
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin, self.TOPIC_ID, changelist,
+            'Added and removed a subtopic.')
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        self.assertEqual(len(topic.subtopics), 2)
+        self.assertEqual(topic.next_subtopic_id, 4)
+        self.assertEqual(topic.subtopics[1].title, 'Title3')
+        self.assertEqual(topic.subtopics[1].skill_ids, [self.skill_id_1])
+
+        # Test whether the study guide corresponding to the deleted subtopic
+        # was also deleted.
+        study_guide = study_guide_services.get_study_guide_by_id(
+            self.TOPIC_ID, 2, strict=False)
+        self.assertIsNone(study_guide)
+        # Validate the newly created study guide.
+        study_guide = study_guide_services.get_study_guide_by_id(
+            self.TOPIC_ID, 3, strict=False)
+        # Ruling out the possibility of None for mypy type checking.
+        assert study_guide is not None
+        self.assertEqual(
+            study_guide.sections[0].to_dict(),
+            {
+                'heading': {
+                    'content_id': 'section_heading_0',
+                    'unicode_str': 'New Heading'
+                },
+                'content': {
+                    'content_id': 'section_content_1',
+                    'html': '<p>New content</p>'
+                }
+            })
+
+        # Making sure everything resets when an error is encountered anywhere.
+        changelist = [
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'title': 'Title4',
+                'subtopic_id': 4,
+                'url_fragment': 'fragment-four'
+            }),
+            study_guide_domain.StudyGuideChange({
+            'cmd': study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY,
+            'property_name': (
+                study_guide_domain.STUDY_GUIDE_PROPERTY_SECTIONS),
+            'subtopic_id': 4,
+            'old_value': [
+                    {
+                        'heading': {
+                            'content_id': 'section_heading_0',
+                            'unicode_str': ''
+                        },
+                        'content': {
+                            'content_id': 'section_content_1',
+                            'html': ''
+                        }
+                    }
+                ],
+            'new_value': [
+                    {
+                        'heading': {
+                            'content_id': 'section_heading_0',
+                            'unicode_str': 'Heading'
+                        },
+                        'content': {
+                            'content_id': 'section_content_1',
+                            'html': '<p>Content</p>'
+                        }
+                    }
+                ]
+            }),
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'title': 'Title5',
+                'subtopic_id': 5,
+                'url_fragment': 'fragment-five'
+            }),
+            study_guide_domain.StudyGuideChange({
+            'cmd': study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY,
+            'property_name': (
+                study_guide_domain.STUDY_GUIDE_PROPERTY_SECTIONS),
+            'subtopic_id': 5,
+            'old_value': [
+                    {
+                        'heading': {
+                            'content_id': 'section_heading_0',
+                            'unicode_str': ''
+                        },
+                        'content': {
+                            'content_id': 'section_content_1',
+                            'html': ''
+                        }
+                    }
+                ],
+            'new_value': [
+                    {
+                        'heading': {
+                            'content_id': 'section_heading_0',
+                            'unicode_str': 'Heading'
+                        },
+                        'content': {
+                            'content_id': 'section_content_1',
+                            'html': '<p>Content</p>'
+                        }
+                    }
+                ]
+            }),
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_DELETE_SUBTOPIC,
+                'subtopic_id': 3
+            }),
+            # The following is an invalid command as subtopic with id 3 was
+            # deleted in previous step.
+            study_guide_domain.StudyGuideChange({
+                'cmd': study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY,
+                'property_name': (
+                    study_guide_domain
+                    .STUDY_GUIDE_PROPERTY_SECTIONS),
+                'old_value': '',
+                'subtopic_id': 3,
+                'new_value': [
+                    {
+                        'heading': {
+                            'content_id': 'section_heading_0',
+                            'unicode_str': 'New Heading'
+                        },
+                        'content': {
+                            'content_id': 'section_content_1',
+                            'html': '<p>New content</p>'
+                        }
+                    }
+                ]
+            }),
+        ]
+        with self.assertRaisesRegex(
+            Exception, 'The subtopic with id 3 doesn\'t exist'):
+            topic_services.update_topic_and_subtopic_pages(
+                self.user_id_admin, self.TOPIC_ID, changelist,
+                'Done some changes.')
+
+        # Make sure the topic object in datastore is not affected.
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        self.assertEqual(len(topic.subtopics), 2)
+        self.assertEqual(topic.next_subtopic_id, 4)
+        self.assertEqual(topic.subtopics[1].title, 'Title3')
+
+        study_guide = study_guide_services.get_study_guide_by_id(
+            self.TOPIC_ID, 2, strict=False)
+        self.assertIsNone(study_guide)
+        study_guide = study_guide_services.get_study_guide_by_id(
+            self.TOPIC_ID, 4, strict=False)
+        self.assertIsNone(study_guide)
+        study_guide = study_guide_services.get_study_guide_by_id(
+            self.TOPIC_ID, 3, strict=False)
+        self.assertIsNotNone(study_guide)
 
     def test_update_subtopic_page_without_study_guide(self) -> None:
         # We create a topic and subtopic in this way so as to not create a

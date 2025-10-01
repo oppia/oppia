@@ -22,33 +22,33 @@ import functools
 import logging
 import re
 
-from core import android_validation_constants
-from core import feature_flag_list
-from core import feconf
-from core import utils
+from core import android_validation_constants, feature_flag_list, feconf, utils
 from core.constants import constants
 from core.controllers import base
-from core.domain import android_services
-from core.domain import blog_services
-from core.domain import classroom_config_services
-from core.domain import email_manager
-from core.domain import feature_flag_services
-from core.domain import feedback_services
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_services
-from core.domain import question_services
-from core.domain import rights_manager
-from core.domain import role_services
-from core.domain import skill_domain
-from core.domain import skill_fetchers
-from core.domain import story_domain
-from core.domain import story_fetchers
-from core.domain import subtopic_page_services
-from core.domain import suggestion_services
-from core.domain import topic_domain
-from core.domain import topic_fetchers
-from core.domain import topic_services
-from core.domain import user_services
+from core.domain import (
+    android_services,
+    blog_services,
+    classroom_config_services,
+    email_manager,
+    feature_flag_services,
+    feedback_services,
+    platform_parameter_list,
+    platform_parameter_services,
+    question_services,
+    rights_manager,
+    role_services,
+    skill_domain,
+    skill_fetchers,
+    story_domain,
+    story_fetchers,
+    study_guide_services,
+    subtopic_page_services,
+    suggestion_services,
+    topic_domain,
+    topic_fetchers,
+    topic_services,
+    user_services,
+)
 
 from typing import Any, Callable, Dict, List, Optional, Type, TypeVar
 
@@ -4282,17 +4282,34 @@ def can_access_subtopic_viewer_page(
                 self.GET_HANDLER_ERROR_RETURN_TYPE)
             return None
 
-        subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
-            topic.id, subtopic_id, strict=False)
-        if subtopic_page is None:
-            _redirect_based_on_return_type(
-                self,
-                '/learn/%s/%s/studyguide' % (
-                    classroom_url_fragment, topic_url_fragment),
-                self.GET_HANDLER_ERROR_RETURN_TYPE)
-            return None
+        if feature_flag_services.is_feature_flag_enabled(
+            feature_flag_list.FeatureNames
+            .SHOW_RESTRUCTURED_STUDY_GUIDES.value,
+            self.user_id
+        ):
+            study_guide = study_guide_services.get_study_guide_by_id(
+                topic.id, subtopic_id, strict=False)
+            if study_guide is None:
+                _redirect_based_on_return_type(
+                    self,
+                    '/learn/%s/%s/studyguide' % (
+                        classroom_url_fragment, topic_url_fragment),
+                    self.GET_HANDLER_ERROR_RETURN_TYPE)
+                return None
+            else:
+                return handler(self, topic.name, subtopic_id, **kwargs)
         else:
-            return handler(self, topic.name, subtopic_id, **kwargs)
+            subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
+                topic.id, subtopic_id, strict=False)
+            if subtopic_page is None:
+                _redirect_based_on_return_type(
+                    self,
+                    '/learn/%s/%s/studyguide' % (
+                        classroom_url_fragment, topic_url_fragment),
+                    self.GET_HANDLER_ERROR_RETURN_TYPE)
+                return None
+            else:
+                return handler(self, topic.name, subtopic_id, **kwargs)
 
     return test_can_access
 

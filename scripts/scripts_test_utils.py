@@ -234,7 +234,8 @@ class PopenStub:
         else:
             raise RuntimeError('PopenStub has entered an infinite loop')
 
-    def communicate(self, input: bytes = b'') -> Tuple[bytes, bytes]: # pylint: disable=unused-argument, redefined-builtin
+    def communicate( # pylint: disable=unused-argument, redefined-builtin
+        self, input: bytes = b'') -> Tuple[bytes, bytes]:
         """Mocks an interaction with the process.
 
         Args:

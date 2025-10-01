@@ -20,14 +20,14 @@ from __future__ import annotations
 
 import re
 
-from core import feconf
-from core import utils
+from core import feconf, utils
+from core.domain import (
+    translatable_object_registry,  # pylint: disable=invalid-import-from
+)
 from core.domain import translation_domain
 from core.tests import test_utils
 
 from typing import Optional
-
-from core.domain import translatable_object_registry  # pylint: disable=invalid-import-from # isort:skip
 
 
 class DummyTranslatableObjectWithTwoParams(

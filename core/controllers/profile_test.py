@@ -23,16 +23,17 @@ import os
 import re
 import zipfile
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import exp_domain
-from core.domain import exp_services
-from core.domain import fs_services
-from core.domain import platform_parameter_list
-from core.domain import rights_manager
-from core.domain import subscription_services
-from core.domain import user_services
+from core.domain import (
+    exp_domain,
+    exp_services,
+    fs_services,
+    platform_parameter_list,
+    rights_manager,
+    subscription_services,
+    user_services,
+)
 from core.platform import models
 from core.tests import test_utils
 
@@ -40,8 +41,7 @@ from typing import Final
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import secrets_services
-    from mypy_imports import user_models
+    from mypy_imports import secrets_services, user_models
 
 secrets_services = models.Registry.import_secrets_services()
 (user_models,) = models.Registry.import_models([models.Names.USER])

@@ -22,17 +22,14 @@ from core import feconf
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import model_validation_jobs
 from core.jobs.transforms.validation import base_validation
-from core.jobs.types import base_validation_errors
-from core.jobs.types import model_property
+from core.jobs.types import base_validation_errors, model_property
 from core.platform import models
 
 from typing import Final, Type
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import auth_models
-    from mypy_imports import base_models
-    from mypy_imports import user_models
+    from mypy_imports import auth_models, base_models, user_models
 
 (auth_models, base_models, user_models) = models.Registry.import_models([
     models.Names.AUTH, models.Names.BASE_MODEL, models.Names.USER

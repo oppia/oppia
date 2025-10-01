@@ -48,7 +48,7 @@ describe('Logged-in User', function () {
     );
 
     await explorationEditor.navigateToCreatorDashboardPage();
-    await explorationEditor.navigateToExplorationEditorPage();
+    await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
     await explorationEditor.dismissWelcomeModal();
     await explorationEditor.updateCardContent(
       'We will be learning positive numbers.'
@@ -62,13 +62,11 @@ describe('Logged-in User', function () {
 
     // Navigate to the new card and update its content.
     await explorationEditor.navigateToCard(CARD_NAME.TEST_QUESTION);
-    await explorationEditor.updateCardContent(
-      'Enter a negative number greater than -100.'
-    );
+    await explorationEditor.updateCardContent('Enter a negative number.');
     await explorationEditor.addInteraction(INTERACTION_TYPES.NUMERIC_INPUT);
     await explorationEditor.addResponsesToTheInteraction(
       INTERACTION_TYPES.NUMERIC_INPUT,
-      '-99',
+      '-1',
       'Prefect!',
       CARD_NAME.STUDY_GUIDE,
       true
@@ -132,7 +130,7 @@ describe('Logged-in User', function () {
       // Reloading from the current progress.
       await loggedInUser.reloadPage();
 
-      await loggedInUser.expectProgressRemainder(true);
+      await loggedInUser.expectProgressReminder(true);
       // Continue the exploration from where they left off.
       await loggedInUser.chooseActionInProgressRemainder('Restart');
 
@@ -142,7 +140,7 @@ describe('Logged-in User', function () {
 
       // Again reload the page to check the 'Resume' exploration in the progress remainder as well.
       await loggedInUser.reloadPage();
-      await loggedInUser.expectProgressRemainder(true);
+      await loggedInUser.expectProgressReminder(true);
       await loggedInUser.chooseActionInProgressRemainder('Resume');
 
       await loggedInUser.continueToNextCard();

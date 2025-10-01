@@ -33,7 +33,7 @@ import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {ImagePreloaderService} from 'pages/exploration-player-page/services/image-preloader.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {AlertsService} from 'services/alerts.service';
 import {CsrfTokenService} from 'services/csrf-token.service';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
@@ -70,7 +70,7 @@ var initializeMockDocument = (svgFilenameCtrl: SvgEditorComponent) => {
 describe('SvgEditor', () => {
   var alertSpy: jasmine.Spy<(warning: string) => void>;
   let svgFileFetcherBackendApiService: SvgFileFetcherBackendApiService;
-  var contextService: ContextService;
+  var pageContextService: PageContextService;
   var csrfService: CsrfTokenService;
   let fixture: ComponentFixture<SvgEditorComponent>;
   var component: SvgEditorComponent;
@@ -243,14 +243,14 @@ describe('SvgEditor', () => {
       ],
     }).compileComponents();
     svgSanitizerService = TestBed.inject(SvgSanitizerService);
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     csrfService = TestBed.inject(CsrfTokenService);
     const alertsService = TestBed.inject(AlertsService);
 
     alertSpy = spyOn(alertsService, 'addWarning').and.callThrough();
-    spyOn(contextService, 'getEntityType').and.returnValue('exploration');
-    spyOn(contextService, 'getEntityId').and.returnValue('1');
-    spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+    spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
+    spyOn(pageContextService, 'getEntityId').and.returnValue('1');
+    spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
       AppConstants.IMAGE_SAVE_DESTINATION_SERVER
     );
     spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
@@ -807,7 +807,7 @@ describe('SvgEditor', () => {
 
 describe('SvgEditor initialized with value attribute', () => {
   var component: SvgEditorComponent;
-  var contextService: ContextService;
+  var pageContextService: PageContextService;
   let svgSanitizerService: SvgSanitizerService;
   let imageLocalStorageService: ImageLocalStorageService;
   var samplesvg =
@@ -846,7 +846,7 @@ describe('SvgEditor initialized with value attribute', () => {
     }).compileComponents();
     component = TestBed.createComponent(SvgEditorComponent).componentInstance;
     component.value = 'svgimageFilename1.svg';
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     svgSanitizerService = TestBed.inject(SvgSanitizerService);
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
     const svgFileFetcherBackendApiService: SvgFileFetcherBackendApiService =
@@ -859,8 +859,8 @@ describe('SvgEditor initialized with value attribute', () => {
 
   it('should load the svg file', waitForAsync(
     fakeAsync(() => {
-      spyOn(contextService, 'getEntityType').and.returnValue('exploration');
-      spyOn(contextService, 'getEntityId').and.returnValue('1');
+      spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
+      spyOn(pageContextService, 'getEntityId').and.returnValue('1');
       component.ngOnInit();
       tick(10);
       expect(component.diagramStatus).toBe('saved');
@@ -871,7 +871,7 @@ describe('SvgEditor initialized with value attribute', () => {
   it('should handle previously uploaded svg diagram correctly', waitForAsync(
     fakeAsync(() => {
       spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl');
-      spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+      spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
       );
       let dataUrl =
@@ -890,7 +890,7 @@ describe('SvgEditor initialized with value attribute', () => {
 });
 
 describe('SvgEditor with image save destination as local storage', () => {
-  var contextService: ContextService;
+  var pageContextService: PageContextService;
   let fixture: ComponentFixture<SvgEditorComponent>;
   var component: SvgEditorComponent = null;
   var samplesvg =
@@ -999,11 +999,11 @@ describe('SvgEditor with image save destination as local storage', () => {
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
-    contextService = TestBed.inject(ContextService);
-    spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+    pageContextService = TestBed.inject(PageContextService);
+    spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
     );
-    spyOn(contextService, 'getEntityType').and.returnValue('exploration');
+    spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
 
     // This throws "Argument of type 'mockImageObject' is not assignable to
     // parameter of type 'HTMLImageElement'.". We need to suppress this error

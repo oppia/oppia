@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import re
 import time
 
 from core.platform.taskqueue import cloud_tasks_emulator
@@ -106,31 +107,54 @@ class CloudTasksEmulatorUnitTests(test_utils.TestBase):
         self.unit_test_emulator.process_and_flush_tasks(
             queue_name=self.queue_name1)
 
-        self.assertEqual(
-            set(self.output),
-            {
-                'Task Default in queue %s with payload %s is sent to %s.' % (
-                    self.queue_name1,
-                    str(self.payload1),
-                    self.url)
-            }
-        )
+        patterns = {
+            rf'^Task projects/dev-project-id/locations/us-central/queues/'
+            rf'{re.escape(self.queue_name1)}/tasks/[a-f0-9]+ in queue '
+            rf'{re.escape(self.queue_name1)} with payload '
+            rf'{re.escape(str(self.payload1))} is sent to '
+            rf'{re.escape(self.url)}\.$'
+        }
+
+        matched = set()
+        for line in self.output:
+            for pattern in patterns:
+                if re.match(pattern, line):
+                    matched.add(pattern)
+                    break
+            else:
+                self.fail('No pattern matched for line: %s.' % line)
+
+        self.assertEqual(matched, patterns)
 
         self.assertEqual(self.unit_test_emulator.get_number_of_tasks(), 1)
         self.unit_test_emulator.process_and_flush_tasks()
-        self.assertEqual(
-            set(self.output),
-            {
-                'Task Default in queue %s with payload %s is sent to %s.' % (
-                    self.queue_name1,
-                    str(self.payload1),
-                    self.url),
-                'Task Default in queue %s with payload %s is sent to %s.' % (
-                    self.queue_name2,
-                    str(self.payload2),
-                    self.url),
-            }
-        )
+        patterns = {
+            (
+                rf'^Task projects/dev-project-id/locations/us-central/queues/'
+                rf'{re.escape(self.queue_name1)}/tasks/[a-f0-9]+ in queue '
+                rf'{re.escape(self.queue_name1)} with payload '
+                rf'{re.escape(str(self.payload1))} is sent to '
+                rf'{re.escape(self.url)}\.$'
+            ),
+            (
+                rf'^Task projects/dev-project-id/locations/us-central/queues/'
+                rf'{re.escape(self.queue_name2)}/tasks/[a-f0-9]+ in queue '
+                rf'{re.escape(self.queue_name2)} with payload '
+                rf'{re.escape(str(self.payload2))} is sent to '
+                rf'{re.escape(self.url)}\.$'
+            )
+        }
+
+        matched = set()
+        for line in self.output:
+            for pattern in patterns:
+                if re.match(pattern, line):
+                    matched.add(pattern)
+                    break
+            else:
+                self.fail('No pattern matched for line: %s.' % line)
+
+        self.assertEqual(matched, patterns)
         self.assertEqual(self.unit_test_emulator.get_number_of_tasks(), 0)
 
     def test_tasks_scheduled_for_immediate_execution_are_handled_correctly(
@@ -143,16 +167,30 @@ class CloudTasksEmulatorUnitTests(test_utils.TestBase):
         # Allow the threads to execute the tasks scheduled immediately.
         time.sleep(1)
 
-        self.assertEqual(
-            set(self.output),
-            {
-                'Task Default in queue %s with payload %s is sent to %s.' % (
-                    self.queue_name1,
-                    str(self.payload1),
-                    self.url),
-                'Task Default in queue %s with payload %s is sent to %s.' % (
-                    self.queue_name2,
-                    str(self.payload2),
-                    self.url),
-            }
-        )
+        patterns = {
+            (
+                rf'^Task projects/dev-project-id/locations/us-central/queues/'
+                rf'{re.escape(self.queue_name1)}/tasks/[a-f0-9]+ in queue '
+                rf'{re.escape(self.queue_name1)} with payload '
+                rf'{re.escape(str(self.payload1))} is sent to '
+                rf'{re.escape(self.url)}\.$'
+            ),
+            (
+                rf'^Task projects/dev-project-id/locations/us-central/queues/'
+                rf'{re.escape(self.queue_name2)}/tasks/[a-f0-9]+ in queue '
+                rf'{re.escape(self.queue_name2)} with payload '
+                rf'{re.escape(str(self.payload2))} is sent to '
+                rf'{re.escape(self.url)}\.$'
+            )
+        }
+
+        matched = set()
+        for line in self.output:
+            for pattern in patterns:
+                if re.match(pattern, line):
+                    matched.add(pattern)
+                    break
+            else:
+                self.fail('No pattern matched for line: %s.' % line)
+
+        self.assertEqual(matched, patterns)

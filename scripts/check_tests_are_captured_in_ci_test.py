@@ -34,6 +34,10 @@ ACCEPTANCE_TEST_SUITES: List[check_tests_are_captured_in_ci.TestSuiteDict] = [ #
     {
         'name': 'test2/acceptance_suite2',
         'module': 'acceptance/specs/test2/acceptance_suite2.spec.ts'
+    },
+    {
+        'name': 'test3/acceptance_suite3',
+        'module': 'acceptance/specs-old/test3/acceptance_suite3.spec.ts'
     }
 ]
 
@@ -81,7 +85,10 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
         os.mkdir(self.dummy_acceptance_directory)
         self.dummy_acceptance_specs_directory = os.path.join(
             self.dummy_acceptance_directory, 'specs')
+        self.dummy_acceptance_old_directory = os.path.join(
+            self.dummy_acceptance_directory, 'specs-old')
         os.mkdir(self.dummy_acceptance_specs_directory)
+        os.mkdir(self.dummy_acceptance_old_directory)
         for suite in ACCEPTANCE_TEST_SUITES:
             suite_file = os.path.join(
                 self.temp_directory.name, suite['module'])
@@ -119,6 +126,10 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
         self.acceptance_test_specs_directory_swap = self.swap(
             check_tests_are_captured_in_ci, 'ACCEPTANCE_TEST_SPECS_DIRECTORY',
             self.dummy_acceptance_specs_directory)
+        self.acceptance_test_specs_old_directory_swap = self.swap(
+            check_tests_are_captured_in_ci,
+            'ACCEPTANCE_TEST_SPECS_DIRECTORY_OLD',
+            self.dummy_acceptance_old_directory)
 
     def tearDown(self) -> None:
         super().tearDown()
@@ -264,7 +275,10 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
             return self.temp_directory.name
         os_getcwd_swap = self.swap(os, 'getcwd', mock_get_cwd)
 
-        with self.acceptance_test_specs_directory_swap, os_getcwd_swap:
+        with (
+            self.acceptance_test_specs_directory_swap,
+            self.acceptance_test_specs_old_directory_swap, os_getcwd_swap
+        ):
             acceptance_test_suites = (
                 check_tests_are_captured_in_ci
                     .get_acceptance_test_suites_from_acceptance_directory())
@@ -280,14 +294,17 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
             ['test2/acceptance_suite2'])
         os_getcwd_swap = self.swap(os, 'getcwd', mock_get_cwd)
 
-        with self.acceptance_test_specs_directory_swap, os_getcwd_swap:
+        with (
+            self.acceptance_test_specs_directory_swap,
+            self.acceptance_test_specs_old_directory_swap, os_getcwd_swap
+        ):
             with acceptance_test_suites_that_are_not_run_in_ci_swap:
                 acceptance_test_suites = (
                     check_tests_are_captured_in_ci
                         .get_acceptance_test_suites_from_acceptance_directory())
                 self.assertEqual(
                     acceptance_test_suites,
-                    ACCEPTANCE_TEST_SUITES[:1]
+                    ACCEPTANCE_TEST_SUITES[:1] + ACCEPTANCE_TEST_SUITES[2:]
                 )
 
     def test_check_tests_are_captured_in_ci_with_acceptance_error(self) -> None:
@@ -316,7 +333,7 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
                         'Please update the CI config file for acceptance tests '
                         'at core/tests/ci-test-suite-configs/acceptance.json '
                         'with the suites listed above.' % (
-                            json.dumps(ACCEPTANCE_TEST_SUITES[1:2]))
+                            json.dumps(ACCEPTANCE_TEST_SUITES[1:3]))
                     )
                 ):
                     check_tests_are_captured_in_ci.main()

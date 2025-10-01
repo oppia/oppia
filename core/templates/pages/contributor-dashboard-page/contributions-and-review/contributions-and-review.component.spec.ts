@@ -37,8 +37,8 @@ import {
 } from './contributions-and-review.component';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {TranslationTopicService} from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
-import {SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
-import {ContextService} from 'services/context.service';
+import {Skill} from 'domain/skill/skill.model';
+import {PageContextService} from 'services/page-context.service';
 import {UserService} from 'services/user.service';
 import {ContributionAndReviewService} from '../services/contribution-and-review.service';
 import {ContributionOpportunitiesService} from '../services/contribution-opportunities.service';
@@ -46,7 +46,7 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {UserInfo} from 'domain/user/user-info.model';
 import {CsrfTokenService} from 'services/csrf-token.service';
 import {AlertsService} from 'services/alerts.service';
-import {QuestionObjectFactory} from 'domain/question/QuestionObjectFactory';
+import {Question} from 'domain/question/question.model';
 import {FormatRtePreviewPipe} from 'filters/format-rte-preview.pipe';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {OpportunitiesListComponent} from '../opportunities-list/opportunities-list.component';
@@ -83,15 +83,13 @@ describe('Contributions and review component', () => {
   let fixture: ComponentFixture<ContributionsAndReview>;
   let ngbModal: NgbModal = null;
   let mockPlatformFeatureService = new MockPlatformFeatureService();
-  var contextService: ContextService;
+  var pageContextService: PageContextService;
   var contributionAndReviewService: ContributionAndReviewService;
   var contributionOpportunitiesService: ContributionOpportunitiesService;
   var skillBackendApiService: SkillBackendApiService;
-  var skillObjectFactory: SkillObjectFactory;
   var translationTopicService: TranslationTopicService;
   var userService: UserService;
   let alertsService: AlertsService;
-  let questionObjectFactory: QuestionObjectFactory;
   var getUserCreatedTranslationSuggestionsAsyncSpy = null;
   var getReviewableQuestionSuggestionsAsyncSpy = null;
   var getReviewableTranslationSuggestionsAsyncSpy = null;
@@ -134,14 +132,12 @@ describe('Contributions and review component', () => {
           provide: MatSnackBarRef,
           useClass: MockMatSnackBarRef,
         },
-        ContextService,
+        PageContextService,
         ContributionAndReviewService,
         ContributionOpportunitiesService,
         SkillBackendApiService,
         FormatRtePreviewPipe,
         HtmlEscaperService,
-        QuestionObjectFactory,
-        SkillObjectFactory,
         CsrfTokenService,
         TranslationTopicService,
         {
@@ -162,12 +158,10 @@ describe('Contributions and review component', () => {
     component = fixture.componentInstance;
 
     ngbModal = TestBed.inject(NgbModal);
-    questionObjectFactory = TestBed.inject(QuestionObjectFactory);
     alertsService = TestBed.inject(AlertsService);
-    skillObjectFactory = TestBed.inject(SkillObjectFactory);
     contributionAndReviewService = TestBed.inject(ContributionAndReviewService);
     userService = TestBed.inject(UserService);
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     skillBackendApiService = TestBed.inject(SkillBackendApiService);
     contributionOpportunitiesService = TestBed.inject(
       ContributionOpportunitiesService
@@ -191,7 +185,7 @@ describe('Contributions and review component', () => {
       contributionOpportunitiesService.reloadOpportunitiesEventEmitter,
       'subscribe'
     ).and.callThrough();
-    spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp1');
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve({
         isLoggedIn: () => true,
@@ -491,7 +485,7 @@ describe('Contributions and review component', () => {
     ).and.returnValue(mockActiveTopicEventEmitter);
     spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
       Promise.resolve({
-        skill: skillObjectFactory.createFromBackendDict({
+        skill: Skill.createFromBackendDict({
           id: 'skill1',
           description: 'test description 1',
           misconceptions: [
@@ -514,7 +508,6 @@ describe('Contributions and review component', () => {
               html: 'test explanation',
               content_id: 'explanation',
             },
-            worked_examples: [],
             recorded_voiceovers: {
               voiceovers_mapping: {},
             },
@@ -619,7 +612,7 @@ describe('Contributions and review component', () => {
         skill_description: 'string',
         skill_rubrics: [],
       };
-      let question = questionObjectFactory.createFromBackendDict({
+      let question = Question.createFromBackendDict({
         question_state_data_schema_version: null,
         id: 'question_1',
         question_state_data: {
@@ -738,7 +731,7 @@ describe('Contributions and review component', () => {
         next_content_id_index: 1,
         inapplicable_skill_misconception_ids: ['abc-2'],
       });
-      spyOn(contextService, 'setCustomEntityContext').and.stub();
+      spyOn(pageContextService, 'setCustomEntityContext').and.stub();
 
       component.contributions = {
         suggestion_id: {

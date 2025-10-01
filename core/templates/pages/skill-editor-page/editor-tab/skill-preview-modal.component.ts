@@ -19,7 +19,6 @@
 import {Component, Input} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import {WorkedExample} from 'domain/skill/worked-example.model';
 
 @Component({
   selector: 'skill-preview-modal',
@@ -31,7 +30,6 @@ export class SkillPreviewModalComponent extends ConfirmOrCancelModal {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() skillDescription!: string;
   @Input() skillExplanation!: string;
-  @Input() skillWorkedExamples!: WorkedExample[];
 
   constructor(private ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);

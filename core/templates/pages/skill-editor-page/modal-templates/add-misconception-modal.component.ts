@@ -22,7 +22,7 @@ import {AppConstants} from 'app.constants';
 
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {Misconception} from 'domain/skill/misconception.model';
-import {Skill} from 'domain/skill/SkillObjectFactory';
+import {Skill} from 'domain/skill/skill.model.ts';
 import {SkillEditorStateService} from '../services/skill-editor-state.service';
 
 interface MisconceptionFormSchema {
@@ -54,6 +54,7 @@ export class AddMisconceptionModalComponent
   MISCONCEPTION_PROPERTY_FORM_SCHEMA: MisconceptionFormSchema = {
     type: 'html',
     ui_config: {
+      rte_component_config_id: 'ALL_COMPONENTS',
       startupFocusEnabled: false,
     },
   };
@@ -61,6 +62,7 @@ export class AddMisconceptionModalComponent
   MISCONCEPTION_FEEDBACK_PROPERTY_FORM_SCHEMA: MisconceptionFormSchema = {
     type: 'html',
     ui_config: {
+      rte_component_config_id: 'ALL_COMPONENTS',
       hide_complex_extensions: true,
       startupFocusEnabled: false,
     },

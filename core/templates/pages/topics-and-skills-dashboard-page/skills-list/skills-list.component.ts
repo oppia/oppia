@@ -71,7 +71,6 @@ export class SkillsListComponent {
   SKILL_HEADINGS: string[] = [
     'index',
     'description',
-    'worked_examples_count',
     'misconception_count',
     'status',
   ];

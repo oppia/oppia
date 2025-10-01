@@ -56,7 +56,7 @@ describe('Release Coordinator', function () {
 
     // Creating data for the beam job.
     await explorationEditor.navigateToCreatorDashboardPage();
-    await explorationEditor.navigateToExplorationEditorPage();
+    await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
     await explorationEditor.dismissWelcomeModal();
     await explorationEditor.updateCardContent(
       'We will be learning Expressions today.'

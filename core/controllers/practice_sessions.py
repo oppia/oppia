@@ -18,10 +18,8 @@ from __future__ import annotations
 
 from core import feconf
 from core.constants import constants
-from core.controllers import acl_decorators
-from core.controllers import base
-from core.domain import skill_fetchers
-from core.domain import topic_fetchers
+from core.controllers import acl_decorators, base
+from core.domain import skill_fetchers, topic_fetchers
 
 from typing import Dict, List, TypedDict
 

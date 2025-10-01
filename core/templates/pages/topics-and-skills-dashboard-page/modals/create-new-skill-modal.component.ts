@@ -25,11 +25,12 @@ import {
   SubtitledHtmlBackendDict,
 } from 'domain/exploration/subtitled-html.model';
 import {Rubric} from 'domain/skill/rubric.model';
-import {SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
 import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {TopicsAndSkillsDashboardPageConstants} from '../topics-and-skills-dashboard-page.constants';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {ValidatorsService} from 'services/validators.service';
 
 @Component({
   selector: 'oppia-create-new-skill-modal',
@@ -42,31 +43,40 @@ export class CreateNewSkillModalComponent {
     Rubric.create(AppConstants.SKILL_DIFFICULTIES[2], []),
   ];
 
+  workedExampleLimitExceeded!: boolean;
   newSkillDescription: string = '';
   errorMsg: string = '';
   skillDescriptionExists: boolean = true;
   conceptCardExplanationEditorIsShown: boolean = false;
   bindableDict = {displayedConceptCardExplanation: ''};
-  HTML_SCHEMA: {type: string} = {type: 'html'};
+  HTML_SCHEMA = {
+    type: 'html',
+    ui_config: {
+      rte_component_config_id: 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS',
+    },
+  };
   MAX_CHARS_IN_SKILL_DESCRIPTION = AppConstants.MAX_CHARS_IN_SKILL_DESCRIPTION;
 
   // This property is initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   newExplanationObject!: SubtitledHtmlBackendDict;
+  skillEditorWorkedExampleLimit: number =
+    AppConstants.SKILL_EDITOR_WORKED_EXAMPLE_LIMIT;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private imageLocalStorageService: ImageLocalStorageService,
     private skillCreationService: SkillCreationService,
     private skillEditorStateService: SkillEditorStateService,
-    private skillObjectFactory: SkillObjectFactory,
-    private changeDetectorRef: ChangeDetectorRef
+    private changeDetectorRef: ChangeDetectorRef,
+    private platformFeatureService: PlatformFeatureService,
+    private validatorsService: ValidatorsService
   ) {}
 
   ngOnInit(): void {
-    this.contextService.setImageSaveDestinationToLocalStorage();
+    this.pageContextService.setImageSaveDestinationToLocalStorage();
   }
 
   updateExplanation($event: string): void {
@@ -81,13 +91,19 @@ export class CreateNewSkillModalComponent {
   }
 
   getHtmlSchema(): {type: string} {
+    if (!this.isEnableWorkedexamplesRteComponentFeatureEnabled()) {
+      this.HTML_SCHEMA = {
+        type: 'html',
+        ui_config: {
+          rte_component_config_id: 'ALL_COMPONENTS',
+        },
+      };
+    }
     return this.HTML_SCHEMA;
   }
 
   setErrorMessageIfNeeded(): void {
-    if (
-      !this.skillObjectFactory.hasValidDescription(this.newSkillDescription)
-    ) {
+    if (!this.validatorsService.hasValidDescription(this.newSkillDescription)) {
       this.errorMsg =
         'Please use a non-empty description consisting of ' +
         'alphanumeric characters, spaces and/or hyphens.';
@@ -102,6 +118,20 @@ export class CreateNewSkillModalComponent {
   _skillDescriptionExistsCallback(skillDescriptionExists: boolean): void {
     this.skillDescriptionExists = skillDescriptionExists;
     this.setErrorMessageIfNeeded();
+  }
+
+  checkExtraWorkedexample(): boolean {
+    const workedexampleRegex =
+      /<oppia-noninteractive-workedexample.*?>.*?<\/oppia-noninteractive-workedexample>/g;
+    const matches =
+      this.bindableDict.displayedConceptCardExplanation.match(
+        workedexampleRegex
+      );
+
+    this.workedExampleLimitExceeded = !!(
+      matches && matches.length > this.skillEditorWorkedExampleLimit
+    );
+    return this.workedExampleLimitExceeded;
   }
 
   updateSkillDescriptionAndCheckIfExists(): void {
@@ -121,6 +151,11 @@ export class CreateNewSkillModalComponent {
       this.rubrics[1].setExplanations([this.newSkillDescription]);
       this.skillCreationService.markChangeInSkillDescription();
     }
+  }
+
+  isEnableWorkedexamplesRteComponentFeatureEnabled(): boolean {
+    return this.platformFeatureService.status.EnableWorkedExamplesRteComponent
+      .isEnabled;
   }
 
   resetErrorMsg(): void {

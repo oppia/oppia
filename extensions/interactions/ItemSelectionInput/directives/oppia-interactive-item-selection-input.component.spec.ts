@@ -24,7 +24,7 @@ import {CurrentInteractionService} from 'pages/exploration-player-page/services/
 import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {PlayerTranscriptService} from 'pages/exploration-player-page/services/player-transcript.service';
-import {Interaction} from 'domain/exploration/InteractionObjectFactory';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {InteractionAnswer, ItemSelectionAnswer} from 'interactions/answer-defs';

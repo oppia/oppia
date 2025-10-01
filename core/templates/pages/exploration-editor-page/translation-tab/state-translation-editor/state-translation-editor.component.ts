@@ -35,12 +35,13 @@ import {
 } from 'domain/exploration/TranslatedContentObjectFactory';
 import {ChangeListService} from 'pages/exploration-editor-page/services/change-list.service';
 import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 
 interface HTMLSchema {
   type: string;
   ui_config: {
+    rte_component_config_id: string;
     language: string;
     languageDirection: string;
   };
@@ -96,7 +97,7 @@ export class StateTranslationEditorComponent implements OnInit, OnDestroy {
     private translationLanguageService: TranslationLanguageService,
     private translationStatusService: TranslationStatusService,
     private translationTabActiveContentIdService: TranslationTabActiveContentIdService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private entityVoiceoversService: EntityVoiceoversService
   ) {}
 
@@ -140,6 +141,7 @@ export class StateTranslationEditorComponent implements OnInit, OnDestroy {
     this.HTML_SCHEMA = {
       type: 'html',
       ui_config: {
+        rte_component_config_id: 'ALL_COMPONENTS',
         language: this.languageCode,
         languageDirection:
           this.translationLanguageService.getActiveLanguageDirection(),
@@ -262,9 +264,9 @@ export class StateTranslationEditorComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.dataFormat =
       this.translationTabActiveContentIdService.getActiveDataFormat() as string;
-    this.explorationId = this.contextService.getExplorationId();
+    this.explorationId = this.pageContextService.getExplorationId();
     this.explorationVersion =
-      this.contextService.getExplorationVersion() as number;
+      this.pageContextService.getExplorationVersion() as number;
 
     this.directiveSubscriptions.add(
       this.translationTabActiveContentIdService.onActiveContentIdChanged.subscribe(

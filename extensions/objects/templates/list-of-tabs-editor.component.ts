@@ -45,6 +45,7 @@ interface ListOfTabsEditorSchema {
         schema: {
           type: 'html';
           ui_config: {
+            rte_component_config_id: 'ALL_COMPONENTS';
             hide_complex_extensions: true;
           };
         };
@@ -91,6 +92,7 @@ export class ListOfTabsEditorComponent implements OnInit {
           schema: {
             type: 'html',
             ui_config: {
+              rte_component_config_id: 'ALL_COMPONENTS',
               hide_complex_extensions: true,
             },
           },

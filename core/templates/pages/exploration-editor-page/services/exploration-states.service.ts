@@ -24,19 +24,15 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
 
-import {Interaction} from 'domain/exploration/InteractionObjectFactory';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {ConfirmDeleteStateModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/confirm-delete-state-modal.component';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {
   ChangeListService,
   StatePropertyNames,
   StatePropertyValues,
 } from 'pages/exploration-editor-page/services/change-list.service';
-import {
-  StateObjectsBackendDict,
-  States,
-  StatesObjectFactory,
-} from 'domain/exploration/StatesObjectFactory';
+import {StateObjectsBackendDict, States} from 'domain/exploration/states.model';
 import {SolutionValidityService} from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import {AnswerClassificationService} from 'pages/exploration-player-page/services/answer-classification.service';
 import {AngularNameService} from 'pages/exploration-editor-page/services/angular-name.service';
@@ -45,16 +41,16 @@ import {ValidatorsService} from 'services/validators.service';
 import {ExplorationInitStateNameService} from 'pages/exploration-editor-page/services/exploration-init-state-name.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {StateEditorRefreshService} from 'pages/exploration-editor-page/services/state-editor-refresh.service';
-import {State} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 import {NormalizeWhitespacePipe} from 'filters/string-utility-filters/normalize-whitespace.pipe';
-import {WrittenTranslations} from 'domain/exploration/WrittenTranslationsObjectFactory';
+import {WrittenTranslations} from 'domain/exploration/written-translations.model';
 import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {Hint} from 'domain/exploration/hint-object.model';
-import {Solution} from 'domain/exploration/SolutionObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
-import {ParamSpecs} from 'domain/exploration/ParamSpecsObjectFactory';
-import {ParamChange} from 'domain/exploration/ParamChangeObjectFactory';
+import {ParamSpecs} from 'domain/exploration/param-specs.model';
+import {ParamChange} from 'domain/exploration/param-change.model';
 import {
   SubtitledHtml,
   SubtitledHtmlBackendDict,
@@ -105,7 +101,7 @@ export class ExplorationStatesService {
     private alertsService: AlertsService,
     private answerClassificationService: AnswerClassificationService,
     private changeListService: ChangeListService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private explorationInitStateNameService: ExplorationInitStateNameService,
     private interactionRulesRegistryService: InteractionRulesRegistryService,
     private windowRef: WindowRef,
@@ -114,7 +110,6 @@ export class ExplorationStatesService {
     private solutionValidityService: SolutionValidityService,
     private stateEditorService: StateEditorService,
     private stateEditorRefreshService: StateEditorRefreshService,
-    private statesObjectFactory: StatesObjectFactory,
     private validatorsService: ValidatorsService,
     private generateContentIdService: GenerateContentIdService,
     private explorationNextContentIdIndexService: ExplorationNextContentIdIndexService,
@@ -386,7 +381,7 @@ export class ExplorationStatesService {
         '\nRequested state name: ' +
         stateName +
         '\nExploration ID: ' +
-        this.contextService.getExplorationId() +
+        this.pageContextService.getExplorationId() +
         '\nChange list: ' +
         JSON.stringify(this.changeListService.getChangeList()) +
         '\nAll states names: ' +
@@ -525,8 +520,7 @@ export class ExplorationStatesService {
     statesBackendDict: StateObjectsBackendDict,
     contentChangesCanAffectTranslations: boolean
   ): void {
-    this._states =
-      this.statesObjectFactory.createFromBackendDict(statesBackendDict);
+    this._states = States.createFromBackendDict(statesBackendDict);
     this.contentChangesCanAffectTranslations =
       contentChangesCanAffectTranslations;
     // Initialize the solutionValidityService.

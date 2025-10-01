@@ -5,7 +5,7 @@
                          (localValueChange)="onAnswerChange($event)"
                          [labelForFocusTarget]="getLabelForFocusTarget()">
     </schema-based-editor>
-    <div *ngIf="errorMessageI18nKey" class="oppia-form-error-container">
+    <div *ngIf="errorMessageI18nKey" class="oppia-form-error-container e2e-test-form-error-container">
       {{errorMessageI18nKey | translate}}
     </div>
   </div>

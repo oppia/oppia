@@ -26,7 +26,7 @@ import {StateEditorService} from 'components/state-editor/state-editor-propertie
 import cloneDeep from 'lodash/cloneDeep';
 import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {InteractionAnswer} from 'interactions/answer-defs';
-import {State} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 import {Outcome} from 'domain/exploration/outcome.model';
 
 interface AnswerGroupData {

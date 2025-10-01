@@ -27,7 +27,7 @@ import {NgbActiveModal, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {AlertsService} from 'services/alerts.service';
 import {CkEditorCopyContentService} from 'components/ck-editor-helpers/ck-editor-copy-content.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {
@@ -43,7 +43,7 @@ import {ListSchema, UnicodeSchema} from 'services/schema-default-value.service';
 import {
   TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
   TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING,
-} from 'domain/exploration/WrittenTranslationObjectFactory';
+} from 'domain/exploration/written-translation.model';
 // This throws "TS2307". We need to
 // suppress this error because rte-output-display is not strictly typed yet.
 // @ts-ignore
@@ -57,6 +57,7 @@ const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
 class UiConfig {
   'hide_complex_extensions': boolean;
+  'rte_component_config_id': string;
   'startupFocusEnabled'?: boolean;
   'language'?: string;
   'languageDirection'?: string;
@@ -171,7 +172,7 @@ export class TranslationModalComponent {
     public readonly activeModal: NgbActiveModal,
     private readonly alertsService: AlertsService,
     private readonly ckEditorCopyContentService: CkEditorCopyContentService,
-    private readonly contextService: ContextService,
+    private readonly pageContextService: PageContextService,
     private readonly imageLocalStorageService: ImageLocalStorageService,
     private readonly ngbModal: NgbModal,
     private readonly siteAnalyticsService: SiteAnalyticsService,
@@ -197,14 +198,14 @@ export class TranslationModalComponent {
     this.heading = this.opportunity
       ? this.opportunity.heading
       : this.modifyTranslationOpportunity.heading;
-    this.contextService.setImageSaveDestinationToLocalStorage();
+    this.pageContextService.setImageSaveDestinationToLocalStorage();
     this.languageDescription =
       this.translationLanguageService.getActiveLanguageDescription();
 
     if (!this.modifyTranslationOpportunity) {
       // We need to set the context here so that the rte fetches
       // images for the given ENTITY_TYPE and targetId.
-      this.contextService.setCustomEntityContext(
+      this.pageContextService.setCustomEntityContext(
         AppConstants.ENTITY_TYPE.EXPLORATION,
         this.opportunity.id
       );
@@ -257,6 +258,7 @@ export class TranslationModalComponent {
         // properly since contributors will not be able to view and translate
         // complex extensions.
         hide_complex_extensions: false,
+        rte_component_config_id: 'CURATED_LESSON_COMPONENTS',
         language: this.translationLanguageService.getActiveLanguageCode(),
         languageDirection:
           this.translationLanguageService.getActiveLanguageDirection(),
@@ -430,6 +432,7 @@ export class TranslationModalComponent {
 
   skipActiveTranslation(): void {
     this.checkForUnsavedChanges(() => {
+      this.clearTranslation();
       const translatableItem = this.translateTextService.getTextToTranslate();
       this.updateActiveState(translatableItem);
       ({more: this.moreAvailable} = translatableItem);
@@ -443,6 +446,7 @@ export class TranslationModalComponent {
 
   returnToPreviousTranslation(): void {
     this.checkForUnsavedChanges(() => {
+      this.clearTranslation();
       const translatableItem =
         this.translateTextService.getPreviousTextToTranslate();
       this.updateActiveState(translatableItem);
@@ -541,27 +545,40 @@ export class TranslationModalComponent {
           this.alertsService.addSuccessMessage(
             'Submitted translation for review.'
           );
+          this.clearTranslation();
           this.uploadingTranslation = false;
+
           if (this.moreAvailable) {
             this.skipActiveTranslation();
             this.resetEditor();
           } else {
-            this.activeWrittenTranslation = '';
+            this.closeWithoutUnsavedCheck();
           }
         },
         (errorReason: string) => {
-          this.contextService.resetImageSaveDestination();
+          this.uploadingTranslation = false;
+          this.pageContextService.resetImageSaveDestination();
           this.alertsService.clearWarnings();
           this.alertsService.addWarning(errorReason);
-          this.close();
+          this.closeWithoutUnsavedCheck();
         }
       );
     }
     if (!this.moreAvailable) {
-      this.contextService.resetImageSaveDestination();
-      this.close();
+      this.pageContextService.resetImageSaveDestination();
+      this.closeWithoutUnsavedCheck();
     }
   }
+
+  private clearTranslation(): void {
+    this.activeWrittenTranslation = '';
+  }
+
+  private closeWithoutUnsavedCheck(): void {
+    this.activeModal.close();
+    this.ckEditorCopyContentService.copyModeActive = false;
+  }
+
   updateTranslatedText(): void {
     if (!this.canTranslatedTextBeSubmitted()) {
       return;

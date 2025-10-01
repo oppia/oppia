@@ -18,18 +18,15 @@
 
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
-import {
-  QuestionBackendDict,
-  QuestionObjectFactory,
-} from 'domain/question/QuestionObjectFactory';
-import {Skill} from 'domain/skill/SkillObjectFactory';
+import {QuestionBackendDict, Question} from 'domain/question/question.model';
+import {Skill} from 'domain/skill/skill.model.ts';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {ExplorationPlayerConstants} from 'pages/exploration-player-page/current-lesson-player/exploration-player-page.constants';
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
-import {ExplorationPlayerStateService} from 'pages/exploration-player-page/services/exploration-player-state.service';
 import {QuestionPlayerEngineService} from 'pages/exploration-player-page/services/question-player-engine.service';
 import {Subscription} from 'rxjs';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
+import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
 import {UrlService} from 'services/contextual/url.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {SkillEditorStateService} from '../services/skill-editor-state.service';
@@ -43,11 +40,10 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
     private urlService: UrlService,
     private skillEditorStateService: SkillEditorStateService,
     private questionBackendApiService: QuestionBackendApiService,
-    private contextService: ContextService,
-    private explorationPlayerStateService: ExplorationPlayerStateService,
+    private pageContextService: PageContextService,
     private currentInteractionService: CurrentInteractionService,
+    private conversationFlowService: ConversationFlowService,
     private questionPlayerEngineService: QuestionPlayerEngineService,
-    private questionObjectFactory: QuestionObjectFactory,
     private windowDimensionsService: WindowDimensionsService
   ) {}
 
@@ -108,7 +104,7 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
       this.skillEditorStateService.onSkillChange.subscribe(() => {})
     );
     this.currentInteractionService.setOnSubmitFn(() => {
-      this.explorationPlayerStateService.onOppiaFeedbackAvailable.emit();
+      this.conversationFlowService.onOppiaFeedbackAvailable.emit();
     });
   }
 
@@ -168,17 +164,13 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
     this.questionPlayerEngineService.clearQuestions();
     this.displayCardIsInitialized = false;
     this.questionPlayerEngineService.init(
-      [
-        this.questionObjectFactory.createFromBackendDict(
-          this.displayedQuestions[index]
-        ),
-      ],
+      [Question.createFromBackendDict(this.displayedQuestions[index])],
       this.initializeQuestionCard.bind(this),
       () => {}
     );
   }
 
   ngOnDestroy(): void {
-    this.contextService.clearQuestionPlayerIsOpen();
+    this.pageContextService.clearQuestionPlayerIsOpen();
   }
 }

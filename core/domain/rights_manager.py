@@ -20,27 +20,35 @@ from __future__ import annotations
 
 import logging
 
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import activity_services
-from core.domain import change_domain
-from core.domain import exp_rights_domain
-from core.domain import rights_domain
-from core.domain import role_services
-from core.domain import subscription_services
-from core.domain import taskqueue_services
-from core.domain import user_domain
-from core.domain import user_services
+from core.domain import (
+    activity_services,
+    change_domain,
+    exp_rights_domain,
+    rights_domain,
+    role_services,
+    subscription_services,
+    taskqueue_services,
+    user_domain,
+    user_services,
+)
 from core.platform import models
 
 from typing import (
-    Dict, List, Literal, Mapping, Optional, Sequence, Union, overload)
+    Dict,
+    List,
+    Literal,
+    Mapping,
+    Optional,
+    Sequence,
+    Union,
+    overload,
+)
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import collection_models
-    from mypy_imports import datastore_services
-    from mypy_imports import exp_models
+    from mypy_imports import collection_models, datastore_services, exp_models
 
 (collection_models, exp_models) = models.Registry.import_models([
     models.Names.COLLECTION, models.Names.EXPLORATION
@@ -1617,7 +1625,8 @@ def unpublish_exploration(
     _unpublish_activity(
         committer, exploration_id, constants.ACTIVITY_TYPE_EXPLORATION)
     taskqueue_services.defer(
-        taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_ACTIVITIES,
+        feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+            'FUNCTION_ID_DELETE_EXPS_FROM_ACTIVITIES'],
         taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS, [exploration_id])
 
 

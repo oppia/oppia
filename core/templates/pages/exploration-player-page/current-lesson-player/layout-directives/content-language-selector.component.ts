@@ -38,6 +38,8 @@ import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
 import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
 import {AudioPreloaderService} from '../../services/audio-preloader.service';
 import {AutomaticVoiceoverHighlightService} from 'services/automatic-voiceover-highlight-service';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {PageContextService} from 'services/page-context.service';
 
 @Component({
   selector: 'oppia-content-language-selector',
@@ -58,7 +60,9 @@ export class ContentLanguageSelectorComponent implements OnInit {
     private voiceoverPlayerService: VoiceoverPlayerService,
     private voiceoverBackendApiService: VoiceoverBackendApiService,
     private audioPreloaderService: AudioPreloaderService,
-    private automaticVoiceoverHighlightService: AutomaticVoiceoverHighlightService
+    private automaticVoiceoverHighlightService: AutomaticVoiceoverHighlightService,
+    private stateEditorService: StateEditorService,
+    private pageContextService: PageContextService
   ) {}
 
   // These properties are initialized using Angular lifecycle hooks
@@ -106,10 +110,17 @@ export class ContentLanguageSelectorComponent implements OnInit {
           );
 
           this.audioPreloaderService.kickOffAudioPreloader(
-            this.playerPositionService.getCurrentStateName()
+            this.getCurrentStateName()
           );
         });
     }
+  }
+
+  getCurrentStateName(): string {
+    if (this.pageContextService.isInExplorationPlayerPage()) {
+      return this.playerPositionService.getCurrentStateName();
+    }
+    return this.stateEditorService.getActiveStateName() as string;
   }
 
   onSelectLanguage(newLanguageCode: string): void {

@@ -19,8 +19,7 @@ from __future__ import annotations
 import textwrap
 
 from core.constants import constants
-from core.domain import email_services
-from core.domain import platform_parameter_list
+from core.domain import email_services, platform_parameter_list
 from core.platform import models
 from core.tests import test_utils
 
@@ -86,7 +85,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
         """
         email_services.send_mail(
             self.system_email_address, self.admin_email_address,
-            'subject', 'body', 'html', bcc_admin=True)
+            'subject', 'body', 'html', cc_emails=None, bcc_admin=True)
         messages = self._get_sent_email_messages(self.admin_email_address)
         self.assertEqual(len(messages), 1)
         self.assertEqual(messages[0].bcc, self.admin_email_address)
@@ -277,6 +276,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
                 Data length: %d
                 Html content: html
 
+            Cc: None
             Bcc: None
             Reply_to: None
             Recipient Variables:

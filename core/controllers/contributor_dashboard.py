@@ -21,23 +21,31 @@ import json
 
 from core import feconf
 from core.constants import constants
-from core.controllers import acl_decorators
-from core.controllers import base
-from core.domain import classroom_config_services
-from core.domain import exp_fetchers
-from core.domain import opportunity_domain
-from core.domain import opportunity_services
-from core.domain import suggestion_registry
-from core.domain import suggestion_services
-from core.domain import topic_fetchers
-from core.domain import topic_services
-from core.domain import translation_domain
-from core.domain import translation_services
-from core.domain import user_services
+from core.controllers import acl_decorators, base
+from core.domain import (
+    classroom_config_services,
+    exp_fetchers,
+    opportunity_domain,
+    opportunity_services,
+    suggestion_registry,
+    suggestion_services,
+    topic_fetchers,
+    topic_services,
+    translation_domain,
+    translation_services,
+    user_services,
+)
 
 from typing import (
-    Dict, List, Optional, OrderedDict, Sequence, Tuple,
-    TypedDict, Union)
+    Dict,
+    List,
+    Optional,
+    OrderedDict,
+    Sequence,
+    Tuple,
+    TypedDict,
+    Union,
+)
 
 ListOfContributorDashboardStatsTypes = Sequence[Union[
     suggestion_registry.TranslationContributionStats,
@@ -414,7 +422,7 @@ class ReviewableOpportunitiesHandler(
 
         for item in exp_opp_summaries.values():
             if item is not None:
-                ordered_exp_opp_summaries[getattr(item, 'id', None)] = item
+                ordered_exp_opp_summaries[item.id] = item
         return list(ordered_exp_opp_summaries.values())
 
 
@@ -1279,7 +1287,7 @@ def _get_client_side_stats(
         # and MyPy is unable to infer on which TypedDict 'topic_name' key
         # is added. So, due to this MyPy throws an error. Thus, to avoid
         # the error, we use ignore here.
-        stats_dict['topic_name'] = topic_name_by_topic_id.get(  # type: ignore[index]
+        stats_dict['topic_name'] = topic_name_by_topic_id.get(  # type: ignore[typeddict-item]
             stats_dict['topic_id'], 'UNKNOWN')
         # Here we use MyPy ignore because MyPy doesn't allow key deletion
         # from TypedDict.

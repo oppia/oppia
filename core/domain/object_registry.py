@@ -20,8 +20,7 @@ import copy
 import inspect
 import json
 
-from core import constants
-from core import feconf
+from core import constants, feconf
 from extensions.objects.models import objects
 
 from typing import Dict, List, Optional, Type, Union

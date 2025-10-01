@@ -19,7 +19,7 @@
 import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {QuestionAdmin} from '../../utilities/user/question-admin';
-import {QuestionSubmitter} from '../../utilities/user/question-submitter';
+import {PracticeQuestionSubmitter} from '../../utilities/user/practice-question-submitter';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
@@ -28,7 +28,7 @@ const ROLES = testConstants.Roles;
 describe('Question Submitter', function () {
   let curriculumAdmin: CurriculumAdmin;
   let questionAdmin: QuestionAdmin;
-  let questionSubmitter: QuestionSubmitter;
+  let questionSubmitter: PracticeQuestionSubmitter;
 
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
@@ -40,7 +40,11 @@ describe('Question Submitter', function () {
     // Create a skill and link it to a Topic.
     await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
     await curriculumAdmin.createTopic('Test Topic 1', 'test-topic-one');
-    await curriculumAdmin.createSkillForTopic('Test Skill 1', 'Test Topic 1');
+    await curriculumAdmin.createSkillForTopic(
+      'Test Skill 1',
+      'Test Topic 1',
+      false
+    );
 
     // Add difficulty rubrics to the skill.
     await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
@@ -87,13 +91,15 @@ describe('Question Submitter', function () {
         'Test Skill 1',
         'Test Topic 1'
       );
-      await questionSubmitter.selectQuestionDifficulty('Easy');
+      await questionSubmitter.selectQuestionDifficultyInPracticeQuestionSubmittion(
+        'Easy'
+      );
 
       await questionSubmitter.seedTextToQuestion('Test Question 1');
       await questionSubmitter.addMathExpressionToQuestion();
       await questionSubmitter.addImageToQuestion();
 
-      await questionSubmitter.addImageInteraction();
+      await questionSubmitter.addImageInteractionInQuestionEditor();
 
       await questionSubmitter.addHintToState('Test Hint 1');
       await questionSubmitter.editDefaultResponseFeedbackInQuestionEditorPage(
@@ -116,13 +122,15 @@ describe('Question Submitter', function () {
         'Test Skill 1',
         'Test Topic 1'
       );
-      await questionSubmitter.selectQuestionDifficulty('Medium');
+      await questionSubmitter.selectQuestionDifficultyInPracticeQuestionSubmittion(
+        'Medium'
+      );
 
       await questionSubmitter.seedTextToQuestion('Test Question 2');
       await questionSubmitter.addMathExpressionToQuestion();
       await questionSubmitter.addImageToQuestion();
 
-      await questionSubmitter.addMultipleChoiceInteraction([
+      await questionSubmitter.addMultipleChoiceInteractionByQuestionSubmitter([
         'Option 1',
         'Option 2',
         'Option 3',
@@ -150,13 +158,15 @@ describe('Question Submitter', function () {
         'Test Skill 1',
         'Test Topic 1'
       );
-      await questionSubmitter.selectQuestionDifficulty('Hard');
+      await questionSubmitter.selectQuestionDifficultyInPracticeQuestionSubmittion(
+        'Hard'
+      );
 
       await questionSubmitter.seedTextToQuestion('Test Question 3');
       await questionSubmitter.addMathExpressionToQuestion();
       await questionSubmitter.addImageToQuestion();
 
-      await questionSubmitter.addTextInputInteraction('Answer');
+      await questionSubmitter.addTextInputInteractionInQuestionEditor('Answer');
 
       await questionSubmitter.editDefaultResponseFeedbackInQuestionEditorPage(
         'Wrong Answer'

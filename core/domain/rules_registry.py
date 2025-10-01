@@ -21,8 +21,7 @@ from __future__ import annotations
 import json
 import os
 
-from core import constants
-from core import feconf
+from core import constants, feconf
 
 from typing import Dict, List, Optional, TypedDict
 

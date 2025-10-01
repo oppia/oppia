@@ -21,7 +21,7 @@ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {StateHintsService} from 'components/state-editor/state-editor-properties-services/state-hints.service';
 import {Hint} from 'domain/exploration/hint-object.model';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
 import {AddHintModalComponent} from './add-hint-modal.component';
 
@@ -39,7 +39,7 @@ describe('Add Hint Modal Component', () => {
   let component: AddHintModalComponent;
   let fixture: ComponentFixture<AddHintModalComponent>;
   let ngbActiveModal: NgbActiveModal;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let generateContentIdService: GenerateContentIdService;
   let stateHintsService: StateHintsService;
 
@@ -47,7 +47,7 @@ describe('Add Hint Modal Component', () => {
     TestBed.configureTestingModule({
       declarations: [AddHintModalComponent],
       providers: [
-        ContextService,
+        PageContextService,
         GenerateContentIdService,
         ChangeDetectorRef,
         StateHintsService,
@@ -66,9 +66,9 @@ describe('Add Hint Modal Component', () => {
     stateHintsService = TestBed.inject(StateHintsService);
     generateContentIdService = TestBed.inject(GenerateContentIdService);
     ngbActiveModal = TestBed.inject(NgbActiveModal);
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
 
-    spyOn(contextService, 'getEntityType').and.returnValue('question');
+    spyOn(pageContextService, 'getEntityType').and.returnValue('question');
 
     stateHintsService.init('State1', new Array(4));
     fixture.detectChanges();

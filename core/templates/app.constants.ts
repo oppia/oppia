@@ -146,10 +146,6 @@ export const AppConstants = {
   COMPONENT_NAME_RULE_INPUT: 'rule_input',
   COMPONENT_NAME_SOLUTION: 'solution',
   COMPONENT_NAME_EXPLANATION: 'explanation',
-  COMPONENT_NAME_WORKED_EXAMPLE: {
-    QUESTION: 'worked_example_question',
-    EXPLANATION: 'worked_example_explanation',
-  },
 
   VOICEOVER_TYPE_AUTO: 'auto',
   VOICEOVER_TYPE_MANUAL: 'manual',
@@ -179,6 +175,8 @@ export const AppConstants = {
   // process to follow for Angular constants (#6731).
   SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE:
     '/subtopic_page_editor_handler/data/<topic_id>/<subtopic_id>',
+  STUDY_GUIDE_EDITOR_DATA_URL_TEMPLATE:
+    '/study_guide_editor_handler/data/<topic_id>/<subtopic_id>',
   // This should be synchronized with SUBTOPIC_MASTERY_DATA_URL
   // in feconf.
   SUBTOPIC_MASTERY_DATA_URL_TEMPLATE: '/subtopic_mastery_handler/data',
@@ -335,7 +333,7 @@ export const AppConstants = {
   PARENTS_TEACHERS_PDF_GUIDE_LINK:
     'https://drive.google.com/file/d/1gMixZ2c0j5XAGPx4qDBDvRgiFvF6PMkk/view',
   TEACHER_STORY_TAGGED_BLOGS_LINK:
-    'https://www.oppia.org/blog/search/find?q=&tags=(%22Teacher%20story%22)',
+    '/blog/search/find?q=&tags=(%22Teacher%20story%22)',
   VOLUNTEER_EXPECTATIONS: [
     'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_EXPECTATION_1',
     'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_EXPECTATION_2',
@@ -430,4 +428,5 @@ export enum NavbarAndFooterGATrackingPages {
   VOLUNTEER = 'Volunteer',
   TEACH = 'Teach',
   DONATE = 'Donate',
+  BLOG = 'Blog',
 }

@@ -20,10 +20,7 @@ from __future__ import annotations
 
 import datetime
 
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import rating_services
+from core.domain import exp_domain, exp_fetchers, exp_services, rating_services
 from core.platform import models
 from core.tests import test_utils
 
@@ -110,6 +107,7 @@ class RatingServicesTests(test_utils.GenericTestBase):
 
         # Ruling out the possibility of None for mypy type checking.
         assert first_rating_time is not None
+        assert second_rating_time is not None
         self.assertLess(
             datetime.datetime.utcnow(),
             first_rating_time + time_allowed_for_computation)

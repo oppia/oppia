@@ -28,11 +28,9 @@ from core.tests import test_utils
 from scripts import concurrent_task_utils
 
 import esprima
-
 from typing import Final, List, Tuple
 
-from . import js_ts_linter
-from . import run_lint_checks
+from . import js_ts_linter, run_lint_checks
 
 NAME_SPACE: Final = multiprocessing.Manager().Namespace()
 NAME_SPACE.files = run_lint_checks.FileCache()
@@ -97,8 +95,8 @@ class JsTsLintTests(test_utils.LinterTestBase):
                 continue
 
     def test_compile_all_ts_files_with_error(self) -> None:
-        def mock_popen_error_call(
-            unused_cmd_tokens: List[str], *args: str, **kwargs: str  # pylint: disable=unused-argument
+        def mock_popen_error_call( # pylint: disable=unused-argument
+            unused_cmd_tokens: List[str], *args: str, **kwargs: str
         ) -> Ret:
             return Ret()
 
@@ -179,8 +177,8 @@ class JsTsLintTests(test_utils.LinterTestBase):
         shutil.rmtree(
             js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
         expected_messages = [
-            'The constant \'ADMIN_ROLE_HANDLER_URL\' is already declared '
-            'in', 'Please import the file where the constant is declared '
+            'The constant \'ADMIN_ROLE_HANDLER_URL\' is already declared in',
+            'Please import the file where the constant is declared '
             'or rename the constant.']
         self.validate(lint_task_report, expected_messages, 1)
 
@@ -193,8 +191,8 @@ class JsTsLintTests(test_utils.LinterTestBase):
 
     def test_third_party_linter_with_stderr(self) -> None:
         process = subprocess.Popen(['test'], stdout=subprocess.PIPE)
-        def mock_popen(
-            unused_cmd: str, stdout: int, stderr: int  # pylint: disable=unused-argument
+        def mock_popen( # pylint: disable=unused-argument
+            unused_cmd: str, stdout: int, stderr: int
         ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
             return process
         def mock_communicate(unused_self: str) -> Tuple[bytes, bytes]:

@@ -20,18 +20,17 @@ import copy
 import datetime
 import json
 
-from core import android_validation_constants
-from core import feconf
-from core import utils
+from core import android_validation_constants, feconf, utils
 from core.constants import constants
-from core.domain import change_domain
-from core.domain import state_domain
-from core.domain import translation_domain
+from core.domain import html_cleaner  # pylint: disable=invalid-import-from
+from core.domain import (  # pylint: disable=invalid-import-from
+    change_domain,
+    html_validation_service,
+    state_domain,
+    translation_domain,
+)
 
 from typing import Callable, Dict, Final, List, Literal, Optional, TypedDict
-
-from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
-from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
@@ -45,7 +44,6 @@ SKILL_PROPERTY_ALL_QUESTIONS_MERGED: Final = 'all_questions_merged'
 SKILL_PROPERTY_PREREQUISITE_SKILL_IDS: Final = 'prerequisite_skill_ids'
 
 SKILL_CONTENTS_PROPERTY_EXPLANATION: Final = 'explanation'
-SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES: Final = 'worked_examples'
 
 SKILL_MISCONCEPTIONS_PROPERTY_NAME: Final = 'name'
 SKILL_MISCONCEPTIONS_PROPERTY_NOTES: Final = 'notes'
@@ -108,7 +106,6 @@ class SkillChange(change_domain.BaseChange):
     # update_skill_contents_property command.
     SKILL_CONTENTS_PROPERTIES: List[str] = [
         SKILL_CONTENTS_PROPERTY_EXPLANATION,
-        SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES
     ]
 
     # The allowed list of misconceptions properties which can be used in
@@ -373,18 +370,6 @@ class UpdateSkillContentsPropertyExplanationCmd(SkillChange):
     property_name: Literal['explanation']
     new_value: state_domain.SubtitledHtmlDict
     old_value: state_domain.SubtitledHtmlDict
-
-
-class UpdateSkillContentsPropertyWorkedExamplesCmd(SkillChange):
-    """Class representing the SkillChange's
-    CMD_UPDATE_SKILL_CONTENTS_PROPERTY command
-    with SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES
-    as allowed value.
-    """
-
-    property_name: Literal['worked_examples']
-    new_value: List[WorkedExampleDict]
-    old_value: List[WorkedExampleDict]
 
 
 class MigrateContentsSchemaToLatestVersionCmd(SkillChange):
@@ -653,88 +638,10 @@ class Rubric:
                 'Expected at least one explanation in medium level rubrics')
 
 
-class WorkedExampleDict(TypedDict):
-    """Dictionary representing the WorkedExample object."""
-
-    question: state_domain.SubtitledHtmlDict
-    explanation: state_domain.SubtitledHtmlDict
-
-
-class WorkedExample:
-    """Domain object for representing the worked_example dict."""
-
-    def __init__(
-        self,
-        question: state_domain.SubtitledHtml,
-        explanation: state_domain.SubtitledHtml
-    ) -> None:
-        """Constructs a WorkedExample domain object.
-
-        Args:
-            question: SubtitledHtml. The example question.
-            explanation: SubtitledHtml. The explanation for the above example
-                question.
-        """
-        self.question = question
-        self.explanation = explanation
-
-    def validate(self) -> None:
-        """Validates various properties of the WorkedExample object.
-
-        Raises:
-            ValidationError. One or more attributes of the worked example are
-                invalid.
-        """
-        if not isinstance(self.question, state_domain.SubtitledHtml):
-            raise utils.ValidationError(
-                'Expected example question to be a SubtitledHtml object, '
-                'received %s' % self.question)
-        self.question.validate()
-        if not isinstance(self.explanation, state_domain.SubtitledHtml):
-            raise utils.ValidationError(
-                'Expected example explanation to be a SubtitledHtml object, '
-                'received %s' % self.question)
-        self.explanation.validate()
-
-    def to_dict(self) -> WorkedExampleDict:
-        """Returns a dict representing this WorkedExample domain object.
-
-        Returns:
-            dict. A dict, mapping all fields of WorkedExample instance.
-        """
-        return {
-            'question': self.question.to_dict(),
-            'explanation': self.explanation.to_dict()
-        }
-
-    @classmethod
-    def from_dict(cls, worked_example_dict: WorkedExampleDict) -> WorkedExample:
-        """Return a WorkedExample domain object from a dict.
-
-        Args:
-            worked_example_dict: dict. The dict representation of
-                WorkedExample object.
-
-        Returns:
-            WorkedExample. The corresponding WorkedExample domain object.
-        """
-        worked_example = cls(
-            state_domain.SubtitledHtml(
-                worked_example_dict['question']['content_id'],
-                worked_example_dict['question']['html']),
-            state_domain.SubtitledHtml(
-                worked_example_dict['explanation']['content_id'],
-                worked_example_dict['explanation']['html'])
-        )
-
-        return worked_example
-
-
 class SkillContentsDict(TypedDict):
     """Dictionary representing the SkillContents object."""
 
     explanation: state_domain.SubtitledHtmlDict
-    worked_examples: List[WorkedExampleDict]
     recorded_voiceovers: state_domain.RecordedVoiceoversDict
     written_translations: translation_domain.WrittenTranslationsDict
 
@@ -752,7 +659,6 @@ class SkillContents:
     def __init__(
         self,
         explanation: state_domain.SubtitledHtml,
-        worked_examples: List[WorkedExample],
         recorded_voiceovers: state_domain.RecordedVoiceovers,
         written_translations: translation_domain.WrittenTranslations
     ) -> None:
@@ -761,8 +667,6 @@ class SkillContents:
         Args:
             explanation: SubtitledHtml. An explanation on how to apply the
                 skill.
-            worked_examples: list(WorkedExample). A list of worked examples
-                for the skill. Each element should be a WorkedExample object.
             recorded_voiceovers: RecordedVoiceovers. The recorded voiceovers for
                 the skill contents and their translations in different
                 languages.
@@ -770,7 +674,6 @@ class SkillContents:
                 the skill contents.
         """
         self.explanation = explanation
-        self.worked_examples = worked_examples
         self.recorded_voiceovers = recorded_voiceovers
         self.written_translations = written_translations
 
@@ -788,29 +691,6 @@ class SkillContents:
                 'received %s' % self.explanation)
         self.explanation.validate()
         available_content_ids.add(self.explanation.content_id)
-        if not isinstance(self.worked_examples, list):
-            raise utils.ValidationError(
-                'Expected worked examples to be a list, received %s' %
-                self.worked_examples)
-        for example in self.worked_examples:
-            if not isinstance(example, WorkedExample):
-                raise utils.ValidationError(
-                    'Expected worked example to be a WorkedExample object, '
-                    'received %s' % example)
-            example.validate()
-            if example.question.content_id in available_content_ids:
-                raise utils.ValidationError(
-                    'Found a duplicate content id %s'
-                    % example.question.content_id)
-            if example.explanation.content_id in available_content_ids:
-                raise utils.ValidationError(
-                    'Found a duplicate content id %s'
-                    % example.explanation.content_id)
-            available_content_ids.add(example.question.content_id)
-            available_content_ids.add(example.explanation.content_id)
-
-        self.recorded_voiceovers.validate(list(available_content_ids))
-        self.written_translations.validate(list(available_content_ids))
 
     def to_dict(self) -> SkillContentsDict:
         """Returns a dict representing this SkillContents domain object.
@@ -820,8 +700,6 @@ class SkillContents:
         """
         return {
             'explanation': self.explanation.to_dict(),
-            'worked_examples': [worked_example.to_dict()
-                                for worked_example in self.worked_examples],
             'recorded_voiceovers': self.recorded_voiceovers.to_dict(),
             'written_translations': self.written_translations.to_dict()
         }
@@ -841,8 +719,6 @@ class SkillContents:
             state_domain.SubtitledHtml(
                 skill_contents_dict['explanation']['content_id'],
                 skill_contents_dict['explanation']['html']),
-            [WorkedExample.from_dict(example)
-             for example in skill_contents_dict['worked_examples']],
             state_domain.RecordedVoiceovers.from_dict(skill_contents_dict[
                 'recorded_voiceovers']),
             translation_domain.WrittenTranslations.from_dict(
@@ -1281,7 +1157,7 @@ class Skill:
         explanation_content_id = feconf.DEFAULT_SKILL_EXPLANATION_CONTENT_ID
         skill_contents = SkillContents(
             state_domain.SubtitledHtml(
-                explanation_content_id, feconf.DEFAULT_SKILL_EXPLANATION), [],
+                explanation_content_id, feconf.DEFAULT_SKILL_EXPLANATION),
             state_domain.RecordedVoiceovers.from_dict({
                 'voiceovers_mapping': {
                     explanation_content_id: {}
@@ -1335,13 +1211,6 @@ class Skill:
         skill_contents_dict['explanation']['html'] = conversion_fn(
             skill_contents_dict['explanation']['html'])
 
-        for value_index, value in enumerate(
-                skill_contents_dict['worked_examples']):
-            skill_contents_dict['worked_examples'][value_index][
-                'question']['html'] = conversion_fn(value['question']['html'])
-            skill_contents_dict['worked_examples'][value_index][
-                'explanation']['html'] = conversion_fn(
-                    value['explanation']['html'])
         return skill_contents_dict
 
     @classmethod
@@ -1395,6 +1264,25 @@ class Skill:
         return cls.convert_html_fields_in_skill_contents(
             skill_contents_dict,
             html_validation_service.fix_incorrectly_encoded_chars)
+
+    @classmethod
+    def _convert_skill_contents_v4_dict_to_v5_dict(
+        cls, skill_contents_dict: SkillContentsDict
+    ) -> SkillContentsDict:
+        """Converts v4 skill contents to the v5 schema. The v5 schema
+        removes worked examples from the skills contents.
+
+        Args:
+            skill_contents_dict: dict. The v4 skill_contents_dict.
+
+        Returns:
+            dict. The converted skill_contents_dict.
+        """
+        return {
+            'explanation': skill_contents_dict['explanation'],
+            'recorded_voiceovers': skill_contents_dict['recorded_voiceovers'],
+            'written_translations': skill_contents_dict['written_translations']
+        }
 
     @classmethod
     def update_skill_contents_from_model(
@@ -1553,10 +1441,10 @@ class Skill:
         # are some fields that are discontinued in the latest domain object
         # (eg. explanation). So, while accessing these discontinued fields MyPy
         # throws an error. Thus, to avoid the error, we used ignore here.
-        explanation = rubric_dict['explanation']  # type: ignore[misc]
+        explanation = rubric_dict['explanation']  # type: ignore[typeddict-item]
         # Here we use MyPy ignore because MyPy doesn't allow key deletion from
         # TypedDict.
-        del rubric_dict['explanation']  # type: ignore[misc]
+        del rubric_dict['explanation']  # type: ignore[typeddict-item]
         rubric_dict['explanations'] = [explanation]
         return rubric_dict
 
@@ -1665,10 +1553,6 @@ class Skill:
             for explanation in rubric.explanations:
                 html_content_strings.append(explanation)
 
-        for example in self.skill_contents.worked_examples:
-            html_content_strings.append(example.question.html)
-            html_content_strings.append(example.explanation.html)
-
         for misconception in self.misconceptions:
             html_content_strings.append(misconception.notes)
             html_content_strings.append(misconception.feedback)
@@ -1725,30 +1609,6 @@ class Skill:
         self.skill_contents.explanation = explanation
 
         new_content_ids = [self.skill_contents.explanation.content_id]
-        self._update_content_ids_in_assets(old_content_ids, new_content_ids)
-
-    def update_worked_examples(
-        self, worked_examples: List[WorkedExample]
-    ) -> None:
-        """Updates the worked examples list of the skill by performing a copy
-        of the provided list.
-
-        Args:
-            worked_examples: list(WorkedExample). The new worked examples of
-                the skill.
-        """
-        old_content_ids = [
-            example_field.content_id
-            for example in self.skill_contents.worked_examples
-            for example_field in (example.question, example.explanation)]
-
-        self.skill_contents.worked_examples = list(worked_examples)
-
-        new_content_ids = [
-            example_field.content_id
-            for example in self.skill_contents.worked_examples
-            for example_field in (example.question, example.explanation)]
-
         self._update_content_ids_in_assets(old_content_ids, new_content_ids)
 
     def _update_content_ids_in_assets(
@@ -1984,7 +1844,6 @@ class SkillSummaryDict(TypedDict):
     language_code: str
     version: int
     misconception_count: int
-    worked_examples_count: int
     skill_model_created_on: float
     skill_model_last_updated: float
 
@@ -1999,7 +1858,6 @@ class SkillSummary:
         language_code: str,
         version: int,
         misconception_count: int,
-        worked_examples_count: int,
         skill_model_created_on: datetime.datetime,
         skill_model_last_updated: datetime.datetime
     ) -> None:
@@ -2012,8 +1870,6 @@ class SkillSummary:
             version: int. The version of the skill.
             misconception_count: int. The number of misconceptions associated
                 with the skill.
-            worked_examples_count: int. The number of worked examples in the
-                skill.
             skill_model_created_on: datetime.datetime. Date and time when
                 the skill model is created.
             skill_model_last_updated: datetime.datetime. Date and time
@@ -2024,7 +1880,6 @@ class SkillSummary:
         self.language_code = language_code
         self.version = version
         self.misconception_count = misconception_count
-        self.worked_examples_count = worked_examples_count
         self.skill_model_created_on = skill_model_created_on
         self.skill_model_last_updated = skill_model_last_updated
 
@@ -2059,16 +1914,6 @@ class SkillSummary:
                 'Expected misconception_count to be non-negative, '
                 'received \'%s\'' % self.misconception_count)
 
-        if not isinstance(self.worked_examples_count, int):
-            raise utils.ValidationError(
-                'Expected worked_examples_count to be an int, '
-                'received \'%s\'' % self.worked_examples_count)
-
-        if self.worked_examples_count < 0:
-            raise utils.ValidationError(
-                'Expected worked_examples_count to be non-negative, '
-                'received \'%s\'' % self.worked_examples_count)
-
     def to_dict(self) -> SkillSummaryDict:
         """Returns a dictionary representation of this domain object.
 
@@ -2081,7 +1926,6 @@ class SkillSummary:
             'language_code': self.language_code,
             'version': self.version,
             'misconception_count': self.misconception_count,
-            'worked_examples_count': self.worked_examples_count,
             'skill_model_created_on': utils.get_time_in_millisecs(
                 self.skill_model_created_on),
             'skill_model_last_updated': utils.get_time_in_millisecs(
@@ -2097,7 +1941,6 @@ class AugmentedSkillSummaryDict(TypedDict):
     language_code: str
     version: int
     misconception_count: int
-    worked_examples_count: int
     topic_names: List[str]
     classroom_names: List[str]
     skill_model_created_on: float
@@ -2117,7 +1960,6 @@ class AugmentedSkillSummary:
         language_code: str,
         version: int,
         misconception_count: int,
-        worked_examples_count: int,
         topic_names: List[str],
         classroom_names: List[str],
         skill_model_created_on: datetime.datetime,
@@ -2132,8 +1974,6 @@ class AugmentedSkillSummary:
             version: int. The version of the skill.
             misconception_count: int. The number of misconceptions associated
                 with the skill.
-            worked_examples_count: int. The number of worked examples in the
-                skill.
             topic_names: list(str). The names of the topics to which the skill
                 is assigned.
             classroom_names: list(str). The names of the classrooms to which the
@@ -2148,7 +1988,6 @@ class AugmentedSkillSummary:
         self.language_code = language_code
         self.version = version
         self.misconception_count = misconception_count
-        self.worked_examples_count = worked_examples_count
         self.skill_model_created_on = skill_model_created_on
         self.skill_model_last_updated = skill_model_last_updated
         self.topic_names = topic_names
@@ -2166,7 +2005,6 @@ class AugmentedSkillSummary:
             'language_code': self.language_code,
             'version': self.version,
             'misconception_count': self.misconception_count,
-            'worked_examples_count': self.worked_examples_count,
             'topic_names': self.topic_names,
             'classroom_names': self.classroom_names,
             'skill_model_created_on': utils.get_time_in_millisecs(

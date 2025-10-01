@@ -60,7 +60,7 @@ from core.jobs.types import job_run_result
 
 import apache_beam as beam
 
-from typing import Dict, List, Tuple, Type, cast # isort: skip
+from typing import Dict, List, Tuple, Type # isort: skip
 
 
 class JobMetaclass(type):
@@ -115,12 +115,8 @@ class JobMetaclass(type):
 
         job_cls = super(JobMetaclass, mcs).__new__(mcs, name, bases, namespace)
 
-        # Here we use cast because the return value of '__new__' method
-        # is 'type' but we want to return a more narrower type 'JobMetaclass'.
-        # So, to narrow down the type from 'type' to 'JobMetaclass', we used
-        # cast here.
         if name == 'JobBase':
-            return cast(JobMetaclass, job_cls)
+            return job_cls
 
         if not name.endswith('Base'):
             if issubclass(job_cls, JobBase):
@@ -132,11 +128,7 @@ class JobMetaclass(type):
             else:
                 raise TypeError('%s must inherit from JobBase' % name)
 
-        # Here we use cast because the return value of '__new__' method
-        # is 'type' but we want to return a more narrower type 'JobMetaclass'.
-        # So, to narrow down the type from 'type' to 'JobMetaclass', we used
-        # cast here.
-        return cast(JobMetaclass, job_cls)
+        return job_cls
 
     @classmethod
     def get_all_jobs(mcs) -> List[Type[JobBase]]:

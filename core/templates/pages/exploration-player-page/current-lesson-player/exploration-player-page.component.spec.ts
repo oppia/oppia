@@ -27,7 +27,7 @@ import {
   FetchExplorationBackendResponse,
   ReadOnlyExplorationBackendApiService,
 } from '../../../domain/exploration/read-only-exploration-backend-api.service';
-import {ContextService} from '../../../services/context.service';
+import {PageContextService} from '../../../services/page-context.service';
 import {MetaTagCustomizationService} from '../../../services/contextual/meta-tag-customization.service';
 import {MockTranslatePipe} from '../../../tests/unit-test-utils';
 import {KeyboardShortcutService} from '../../../services/keyboard-shortcut.service';
@@ -51,7 +51,7 @@ class MockTranslateService {
 describe('Exploration Player Page', () => {
   let fixture: ComponentFixture<ExplorationPlayerPageComponent>;
   let componentInstance: ExplorationPlayerPageComponent;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let keyboardShortcutService: KeyboardShortcutService;
   let metaTagCustomizationService: MetaTagCustomizationService;
   let pageTitleService: PageTitleService;
@@ -75,7 +75,7 @@ describe('Exploration Player Page', () => {
 
     fixture = TestBed.createComponent(ExplorationPlayerPageComponent);
     componentInstance = fixture.componentInstance;
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     keyboardShortcutService = TestBed.inject(KeyboardShortcutService);
     metaTagCustomizationService = TestBed.inject(MetaTagCustomizationService);
     pageTitleService = TestBed.inject(PageTitleService);
@@ -105,7 +105,7 @@ describe('Exploration Player Page', () => {
       canPublish: true,
     };
 
-    spyOn(contextService, 'getExplorationId').and.returnValue(expId);
+    spyOn(pageContextService, 'getExplorationId').and.returnValue(expId);
     spyOn(
       readOnlyExplorationBackendApiService,
       'fetchExplorationAsync'
@@ -129,7 +129,7 @@ describe('Exploration Player Page', () => {
     componentInstance.ngOnInit();
     tick();
 
-    expect(contextService.getExplorationId).toHaveBeenCalled();
+    expect(pageContextService.getExplorationId).toHaveBeenCalled();
     expect(
       readOnlyExplorationBackendApiService.fetchExplorationAsync
     ).toHaveBeenCalledWith(expId, null);

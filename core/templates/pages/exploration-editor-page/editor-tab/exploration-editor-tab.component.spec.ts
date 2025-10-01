@@ -32,7 +32,7 @@ import {Outcome} from 'domain/exploration/outcome.model';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {StateCardIsCheckpointService} from 'components/state-editor/state-editor-properties-services/state-card-is-checkpoint.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import {SolutionObjectFactory} from 'domain/exploration/SolutionObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
 import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
@@ -60,13 +60,9 @@ import {
 } from 'ngx-joyride';
 import {Router} from '@angular/router';
 import {ExplorationPermissions} from 'domain/exploration/exploration-permissions.model';
-import {
-  State,
-  StateBackendDict,
-  StateObjectFactory,
-} from 'domain/state/StateObjectFactory';
-import {Interaction} from 'domain/exploration/InteractionObjectFactory';
-import {ContextService} from 'services/context.service';
+import {State, StateBackendDict} from 'domain/state/state.model';
+import {Interaction} from 'domain/exploration/interaction.model';
+import {PageContextService} from 'services/page-context.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {ExplorationNextContentIdIndexService} from '../services/exploration-next-content-id-index.service';
 import {VersionHistoryService} from '../services/version-history.service';
@@ -75,7 +71,7 @@ import {
   FetchSkillResponse,
   SkillBackendApiService,
 } from 'domain/skill/skill-backend-api.service';
-import {SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
+import {Skill} from 'domain/skill/skill.model';
 import {Misconception} from 'domain/skill/misconception.model';
 import {AlertsService} from 'services/alerts.service';
 
@@ -90,21 +86,18 @@ describe('Exploration editor tab component', () => {
   let routerService: RouterService;
   let siteAnalyticsService: SiteAnalyticsService;
   let stateEditorRefreshService: StateEditorRefreshService;
-  let solutionObjectFactory: SolutionObjectFactory;
   let stateCardIsCheckpointService: StateCardIsCheckpointService;
   let stateEditorService: StateEditorService;
   let userExplorationPermissionsService: UserExplorationPermissionsService;
   let focusManagerService: FocusManagerService;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   var generateContentIdService: GenerateContentIdService;
   var explorationNextContentIdIndexService: ExplorationNextContentIdIndexService;
   let mockRefreshStateEditorEventEmitter = null;
   let versionHistoryService: VersionHistoryService;
-  let stateObjectFactory: StateObjectFactory;
   let stateObject: StateBackendDict;
   let versionHistoryBackendApiService: VersionHistoryBackendApiService;
   let skillBackendApiService: SkillBackendApiService;
-  let skillObjectFactory: SkillObjectFactory;
   let alertsService: AlertsService;
 
   class MockJoyrideService {
@@ -212,7 +205,6 @@ describe('Exploration editor tab component', () => {
 
     explorationFeaturesService = TestBed.inject(ExplorationFeaturesService);
     generateContentIdService = TestBed.inject(GenerateContentIdService);
-    solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
     focusManagerService = TestBed.inject(FocusManagerService);
     stateEditorService = TestBed.inject(StateEditorService);
     stateCardIsCheckpointService = TestBed.inject(StateCardIsCheckpointService);
@@ -229,21 +221,21 @@ describe('Exploration editor tab component', () => {
     userExplorationPermissionsService = TestBed.inject(
       UserExplorationPermissionsService
     );
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     explorationNextContentIdIndexService = TestBed.inject(
       ExplorationNextContentIdIndexService
     );
     versionHistoryService = TestBed.inject(VersionHistoryService);
-    stateObjectFactory = TestBed.inject(StateObjectFactory);
     versionHistoryBackendApiService = TestBed.inject(
       VersionHistoryBackendApiService
     );
     skillBackendApiService = TestBed.inject(SkillBackendApiService);
-    skillObjectFactory = TestBed.inject(SkillObjectFactory);
     alertsService = TestBed.inject(AlertsService);
 
     mockRefreshStateEditorEventEmitter = new EventEmitter();
-    spyOn(contextService, 'getExplorationId').and.returnValue('explorationId');
+    spyOn(pageContextService, 'getExplorationId').and.returnValue(
+      'explorationId'
+    );
     spyOn(
       stateEditorService,
       'checkEventListenerRegistrationStatus'
@@ -659,7 +651,7 @@ describe('Exploration editor tab component', () => {
   it('should populate misconceptions for state', fakeAsync(() => {
     spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
       Promise.resolve({
-        skill: skillObjectFactory.createFromBackendDict({
+        skill: Skill.createFromBackendDict({
           id: 'skill_id1',
           description: 'test description 1',
           misconceptions: [
@@ -682,7 +674,6 @@ describe('Exploration editor tab component', () => {
               html: 'test explanation',
               content_id: 'explanation',
             },
-            worked_examples: [],
             recorded_voiceovers: {
               voiceovers_mapping: {},
             },
@@ -841,7 +832,7 @@ describe('Exploration editor tab component', () => {
     );
 
     expect(stateEditorService.interaction.solution).toEqual(
-      solutionObjectFactory.createFromBackendDict({
+      Solution.createFromBackendDict({
         correct_answer: 'This is the correct answer',
         answer_is_exclusive: false,
         explanation: {
@@ -851,7 +842,7 @@ describe('Exploration editor tab component', () => {
       })
     );
 
-    let displayedValue = solutionObjectFactory.createFromBackendDict({
+    let displayedValue = Solution.createFromBackendDict({
       correct_answer: 'This is the second correct answer',
       answer_is_exclusive: true,
       explanation: {
@@ -1054,10 +1045,7 @@ describe('Exploration editor tab component', () => {
 
   it('should fetch the version history data on initialization of state editor', fakeAsync(() => {
     stateEditorService.setActiveStateName('First State');
-    let stateData = stateObjectFactory.createFromBackendDict(
-      'State',
-      stateObject
-    );
+    let stateData = State.createFromBackendDict('State', stateObject);
     spyOn(
       versionHistoryBackendApiService,
       'fetchStateVersionHistoryAsync'

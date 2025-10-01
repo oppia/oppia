@@ -21,19 +21,19 @@ API.
 from __future__ import annotations
 
 from core import feconf
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_services
-from core.domain import search_services
+from core.domain import (
+    platform_parameter_list,
+    platform_parameter_services,
+    search_services,
+)
 from core.platform import models
 
 import elasticsearch
-
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import datastore_services
-    from mypy_imports import secrets_services
+    from mypy_imports import datastore_services, secrets_services
 
 secrets_services = models.Registry.import_secrets_services()
 datastore_services = models.Registry.import_datastore_services()
@@ -57,7 +57,7 @@ class ElasticSearchClient:
                         platform_parameter_list.ParamName.ES_USERNAME.value))
                 self._client = elasticsearch.Elasticsearch(
                     ('%s:%s' % (feconf.ES_HOST, feconf.ES_LOCALHOST_PORT))
-                    if es_cloud_id is None else None,
+                    if es_cloud_id == '' else None,
                     cloud_id=es_cloud_id,
                     http_auth=(
                         (es_username, secrets_services.get_secret(

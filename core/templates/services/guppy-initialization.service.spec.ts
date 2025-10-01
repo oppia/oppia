@@ -60,7 +60,7 @@ describe('GuppyInitializationService', () => {
   it('should assign a random id to the guppy divs', function () {
     let mockDocument = document.createElement('div');
     mockDocument.classList.add('guppy-div-creator', 'guppy_active');
-    angular.element(document).find('body').append(mockDocument.outerHTML);
+    document.body.insertAdjacentHTML('beforeend', mockDocument.outerHTML);
 
     guppyInitializationService.init('guppy-div-creator', 'placeholder', 'x=y');
 
@@ -73,7 +73,7 @@ describe('GuppyInitializationService', () => {
   it('should find active guppy div', function () {
     let mockDocument = document.createElement('div');
     mockDocument.classList.add('guppy-div-creator', 'guppy_active');
-    angular.element(document).find('body').append(mockDocument.outerHTML);
+    document.body.insertAdjacentHTML('beforeend', mockDocument.outerHTML);
 
     guppyInitializationService.init('guppy-div-creator', 'placeholder', 'x');
 

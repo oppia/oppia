@@ -32,6 +32,10 @@ export const ServicesConstants = {
     TOPICS_AND_SKILLS_DASHBOARD: 'topics_and_skills_dashboard',
     CONTRIBUTOR_DASHBOARD: 'contributor_dashboard',
     BLOG_DASHBOARD: 'blog_dashboard',
+    DIAGNOSTIC_TEST_PLAYER: 'diagnostic_test_player',
+    STUDY_GUIDE_VIEWER: 'studyguide',
+    SUBTOPIC_PREVIEW: 'subtopic_preview',
+    SUBTOPIC_EDITOR: 'subtopic_editor',
     OTHER: 'other',
   },
 

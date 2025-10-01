@@ -120,12 +120,17 @@ export default {
       GoogleSignUp: 'https://accounts.google.com/lifecycle/steps/signup/name',
     },
     TeacherStoryTaggedBlogsLink:
-      'https://www.oppia.org/blog/search/find?q=&tags=(%22Teacher%20story%22)',
+      '/blog/search/find?q=&tags=(%22Teacher%20story%22)',
     ParentsTeachersGuideUrl:
       'https://drive.google.com/file/d/1gMixZ2c0j5XAGPx4qDBDvRgiFvF6PMkk/view',
     LessonCreatorLinkedInUrl:
       'https://www.linkedin.com/in/rita-santos-guimaraes-prof-matematica/',
     ReadBlogLink: 'https://medium.com/oppia-org',
+    UserDocumentation: 'https://oppia.github.io/#/',
+    BaseExplorationPlayer: 'http://localhost:8181/explore',
+    ExplorationPlayer: 'http://localhost:8181/explore/',
+    SkillEditor: 'http://localhost:8181/skill_editor',
+    TopicEditor: 'http://localhost:8181/topic_editor',
   },
   Dashboard: {
     MainDashboard: '.e2e-test-splash-page',
@@ -138,20 +143,19 @@ export default {
 
   Roles: {
     TRANSLATION_ADMIN: 'translation admin',
+    TRANSLATION_COORDINATOR: 'translation coordinator',
     BLOG_ADMIN: 'blog admin',
     BLOG_POST_EDITOR: 'blog post editor',
     CURRICULUM_ADMIN: 'curriculum admin',
     QUESTION_ADMIN: 'question admin',
+    QUESTION_COORDINATOR: 'question coordinator',
     VOICEOVER_ADMIN: 'voiceover admin',
     TOPIC_MANAGER: 'topic manager',
     MODERATOR: 'moderator',
     RELEASE_COORDINATOR: 'release coordinator',
     COLLECTION_EDITOR: 'collection editor',
-  } as const,
-
-  BlogRights: {
-    BLOG_ADMIN: 'BLOG_ADMIN',
-    BLOG_POST_EDITOR: 'BLOG_POST_EDITOR',
+    TRANSLATION_REVIEWER: 'translation reviewer',
+    VOICEOVER_SUBMITTER: 'voiceover submitter',
   } as const,
 
   ViewportWidthBreakpoints: {
@@ -183,6 +187,18 @@ export default {
     LastCardContentVoiceoverInHindi: path.resolve(
       __dirname,
       '../../data/last-card-hi.mp3'
+    ),
+    LongVoiceoverInHindi: path.resolve(
+      __dirname,
+      '../../data/audio/voiceover_hindi_25secs.mp3'
+    ),
+    VoiceoverEnglishIndia: path.resolve(
+      __dirname,
+      '../../data/audio/voiceover_english_india_15secs.mp3'
+    ),
+    VoiceoverEnglishIndiaOver5Min: path.resolve(
+      __dirname,
+      '../../data/audio/voiceover_en_in_over5m.mp3'
     ),
   },
   SocialsShare: {
@@ -249,3 +265,46 @@ export default {
   ),
   TEST_DOWNLOAD_DIR: path.resolve('../oppia_acceptance_test_downloads'),
 };
+
+export const FILEPATHS = {
+  PROFILE_PHOTO_BMP: path.resolve(
+    __dirname,
+    '../../data/profile-pictures/profile.bmp'
+  ),
+  PROFILE_PHOTO_GIF: path.resolve(
+    __dirname,
+    '../../data/profile-pictures/profile.gif'
+  ),
+  PROFILE_PHOTO_JPEG: path.resolve(
+    __dirname,
+    '../../data/profile-pictures/profile.jpeg'
+  ),
+  PROFILE_PHOTO_JPG: path.resolve(
+    __dirname,
+    '../../data/profile-pictures/profile.jpg'
+  ),
+  PROFILE_PHOTO_PNG: path.resolve(
+    __dirname,
+    '../../data/profile-pictures/profile.png'
+  ),
+  PROFILE_PHOTO_SVG: path.resolve(
+    __dirname,
+    '../../data/profile-pictures/profile.svg'
+  ),
+  BANNER_BMP: path.resolve(__dirname, '../../data/banners/banner.bmp'),
+  BANNER_GIF: path.resolve(__dirname, '../../data/banners/banner.gif'),
+  BANNER_JPG: path.resolve(__dirname, '../../data/banners/banner.jpg'),
+  BANNER_PNG: path.resolve(__dirname, '../../data/banners/banner.png'),
+  BANNER_SVG: path.resolve(__dirname, '../../data/banners/banner-small.svg'),
+  BANNER_HIGH_RES: path.resolve(
+    __dirname,
+    '../../data/banners/banner-HiRes.png'
+  ),
+} as const;
+
+// Blog Rights.
+export const BLOG_RIGHTS = {
+  BLOG_ADMIN: 'BLOG_ADMIN',
+  BLOG_POST_EDITOR: 'BLOG_POST_EDITOR',
+} as const;
+export type BlogRoles = (typeof BLOG_RIGHTS)[keyof typeof BLOG_RIGHTS];

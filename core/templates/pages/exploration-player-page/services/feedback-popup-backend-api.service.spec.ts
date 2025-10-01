@@ -24,9 +24,9 @@ import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
 import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from '../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import {FeedbackPopupBackendApiService} from './feedback-popup-backend-api.service';
-import {ExplorationEngineService} from './exploration-engine.service';
+import {PageContextService} from '../../../services/page-context.service';
 
-class MockExplorationEngineService {
+class MockPageContextService {
   getExplorationId() {
     return 'expId';
   }
@@ -44,8 +44,8 @@ describe('Feedback Popup Backend Api Service', () => {
       providers: [
         FeedbackPopupBackendApiService,
         {
-          provide: ExplorationEngineService,
-          useClass: MockExplorationEngineService,
+          provide: PageContextService,
+          useClass: MockPageContextService,
         },
         {
           provide: TranslateService,

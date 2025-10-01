@@ -25,7 +25,7 @@ import {
   EventEmitter,
 } from '@angular/core';
 
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {EditabilityService} from 'services/editability.service';
 import {EditorFirstTimeEventsService} from 'pages/exploration-editor-page/services/editor-first-time-events.service';
 import {ExternalSaveService} from 'services/external-save.service';
@@ -38,6 +38,7 @@ import {Subscription} from 'rxjs';
 interface HTMLSchema {
   type: string;
   ui_config: {
+    rte_component_config_id: 'ALL_COMPONENTS';
     hide_complex_extensions: boolean;
   };
 }
@@ -63,7 +64,7 @@ export class StateContentEditorComponent implements OnInit {
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private editorFirstTimeEventsService: EditorFirstTimeEventsService,
     private externalSaveService: ExternalSaveService,
     public stateContentService: StateContentService,
@@ -75,8 +76,9 @@ export class StateContentEditorComponent implements OnInit {
     this.HTML_SCHEMA = {
       type: 'html',
       ui_config: {
+        rte_component_config_id: 'ALL_COMPONENTS',
         hide_complex_extensions:
-          this.contextService.getEntityType() === 'question',
+          this.pageContextService.getEntityType() === 'question',
       },
     };
     if (this.stateContentService.displayed) {
@@ -100,10 +102,14 @@ export class StateContentEditorComponent implements OnInit {
   }
 
   isCardHeightLimitReached(): boolean {
-    let shadowPreviewCard = $(
+    const shadowPreviewCard = document.querySelector(
       '.oppia-shadow-preview-card .oppia-learner-view-card-top-section'
-    );
-    let height = shadowPreviewCard.height() as number;
+    ) as HTMLElement | null;
+
+    if (!shadowPreviewCard) {
+      return false;
+    }
+    const height = shadowPreviewCard.offsetHeight;
     return height > 630;
   }
 

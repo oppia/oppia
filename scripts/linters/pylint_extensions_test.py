@@ -26,12 +26,11 @@ import unittest
 
 from core import utils
 
-from . import pylint_extensions
+import astroid
+from pylint import interfaces, testutils
+from pylint import utils as pylint_utils
 
-import astroid  # isort:skip
-from pylint import interfaces  # isort:skip
-from pylint import testutils  # isort:skip
-from pylint import utils as pylint_utils  # isort:skip
+from . import pylint_extensions
 
 
 class HangingIndentCheckerTests(unittest.TestCase):

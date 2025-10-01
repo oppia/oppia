@@ -10,11 +10,49 @@
 }
 
 .oppia-new-player-content {
-  background-color: #aed2e9;
+  background-color: #cadbda;
   display: flex;
   min-height: calc(100vh - 104px);
 }
 
 .oppia-new-player-main-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
   width: 100%;
+}
+
+.conversation-wrapper {
+  align-items: flex-end;
+  display: flex;
+  flex: 1;
+  z-index: 0;
+}
+
+.conversation-wrapper::before {
+  background-image: url(/assets/images/background/conversation_skin.svg);
+  background-position: center;
+  content: '';
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  z-index: -1;
+}
+
+oppia-new-conversation-skin {
+  width: 100%;
+}
+
+.card-navigation-control {
+  width: 100% ;
+}
+
+oppia-new-audio-bar {
+  z-index: 2;
+}
+
+oppia-player-header {
+  z-index: 2;
 }

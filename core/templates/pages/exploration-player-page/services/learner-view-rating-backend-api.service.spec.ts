@@ -23,9 +23,9 @@ import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
 import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from '../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import {LearnerViewRatingBackendApiService} from './learner-view-rating-backend-api.service';
-import {ExplorationEngineService} from './exploration-engine.service';
+import {PageContextService} from 'services/page-context.service';
 
-class MockExplorationEngineService {
+class MockPageContextService {
   getExplorationId() {
     return 'expId';
   }
@@ -43,8 +43,8 @@ describe('Learner View Rating Backend Api Service', () => {
       providers: [
         LearnerViewRatingBackendApiService,
         {
-          provide: ExplorationEngineService,
-          useClass: MockExplorationEngineService,
+          provide: PageContextService,
+          useClass: MockPageContextService,
         },
         {
           provide: TranslateService,

@@ -18,26 +18,22 @@
 
 from __future__ import annotations
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import change_domain
-from core.domain import state_domain
-from core.domain import translation_domain
+from core.domain import change_domain, state_domain, translation_domain
 
-from typing import Final, List, Literal, Optional, TypedDict, Union
+from typing import Callable, Final, List, Literal, Optional, TypedDict, Union
 
+STUDY_GUIDE_PROPERTY_SECTIONS: Final = 'sections'
+
+# These will be deprecated once we shift to using just study guides.
 STUDY_GUIDE_PROPERTY_SECTIONS_HEADING: Final = 'sections_heading'
 STUDY_GUIDE_PROPERTY_SECTIONS_CONTENT: Final = 'sections_content'
 
+
 CMD_CREATE_NEW: Final = 'create_new'
 # This takes additional 'heading_plaintext' and 'content_html' parameters.
-CMD_ADD_NEW_SECTION: Final = 'add_new_section'
-# This takes additional 'heading_content_id' and 'content_content_id'
-# parameters.
-CMD_DELETE_SECTION: Final = 'delete_section'
-# These take additional 'property_name' and 'new_value' parameters and,
-# optionally, 'old_value'.
+# These take additional 'property_name', 'new_value' and 'old_value' parameters.
 CMD_UPDATE_STUDY_GUIDE_PROPERTY: Final = 'update_study_guide_property'
 CMD_MIGRATE_STUDY_GUIDE_SECTIONS_SCHEMA_TO_LATEST_VERSION: Final = (
     'migrate_study_guide_sections_schema_to_latest_version')
@@ -48,11 +44,6 @@ class StudyGuideChange(change_domain.BaseChange):
 
     The allowed commands, together with the attributes:
         - 'create_new' (with topic_id, subtopic_id).
-        - 'add_new_section' (
-            with heading_plaintext, content_html, subtopic_id).
-        - 'delete_section' (
-            with heading_content_id, content_content_id,
-            subtopic_id).
         - 'update_study_guide_property' (
             with property_name, new_value, old_value, subtopic_id).
     """
@@ -60,31 +51,15 @@ class StudyGuideChange(change_domain.BaseChange):
     # The allowed list of study guide properties which can be used in
     # update_study_guide_property command.
     STUDY_GUIDE_PROPERTIES: List[str] = [
+        STUDY_GUIDE_PROPERTY_SECTIONS,
         STUDY_GUIDE_PROPERTY_SECTIONS_HEADING,
         STUDY_GUIDE_PROPERTY_SECTIONS_CONTENT
+
     ]
 
     ALLOWED_COMMANDS: List[feconf.ValidCmdDict] = [{
         'name': CMD_CREATE_NEW,
         'required_attribute_names': ['topic_id', 'subtopic_id'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_ADD_NEW_SECTION,
-        'required_attribute_names': [
-            'heading_plaintext', 'content_html', 'subtopic_id'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_DELETE_SECTION,
-        'required_attribute_names': [
-            'heading_content_id', 'content_content_id',
-            'subtopic_id'
-        ],
         'optional_attribute_names': [],
         'user_id_attribute_names': [],
         'allowed_values': {},
@@ -122,24 +97,6 @@ class CreateNewStudyGuideCmd(StudyGuideChange):
     subtopic_id: int
 
 
-class AddNewSectionCmd(StudyGuideChange):
-    """Class representing the StudyGuideChange's
-    CMD_ADD_NEW_SECTION command.
-    """
-
-    heading_plaintext: str
-    content_html: str
-
-
-class DeleteSectionCmd(StudyGuideChange):
-    """Class representing the StudyGuideChange's
-    CMD_DELETE_SECTION command.
-    """
-
-    heading_content_id: str
-    content_content_id: str
-
-
 class UpdateStudyGuidePropertyCmd(StudyGuideChange):
     """Class representing the StudyGuideChange's
     CMD_UPDATE_STUDY_GUIDE_PROPERTY command.
@@ -147,8 +104,14 @@ class UpdateStudyGuidePropertyCmd(StudyGuideChange):
 
     subtopic_id: int
     property_name: str
-    new_value: AllowedUpdateStudyGuidePropertyCmdTypes
-    old_value: AllowedUpdateStudyGuidePropertyCmdTypes
+    new_value: (
+        List[StudyGuideSectionDict] |
+        AllowedUpdateStudyGuidePropertyCmdTypes
+    )
+    old_value: (
+        List[StudyGuideSectionDict] |
+        AllowedUpdateStudyGuidePropertyCmdTypes
+    )
 
 
 class UpdateStudyGuidePropertySectionsHeadingCmd(StudyGuideChange):
@@ -396,6 +359,86 @@ class StudyGuide:
             'version': self.version
         }
 
+    # Remove no cover comment once migrations for study guides are available.
+    @classmethod
+    def update_sections_from_model(
+        cls,
+        versioned_sections: VersionedStudyGuideSectionsDict,
+        current_version: int
+    ) -> None: # pragma: no cover
+        """Converts the sections in the sections list contained
+        in the given versioned_sections dict from current_version to
+        current_version + 1. Note that the versioned_sections being
+        passed in is modified in-place.
+
+        Args:
+            versioned_sections: dict. A dict with two keys:
+                - schema_version: str. The schema version for the
+                    sections dict.
+                - sections: List. The list comprising of the study guide
+                    section dicts.
+            current_version: int. The current schema version of sections.
+        """
+        versioned_sections['schema_version'] = current_version + 1
+
+        for i, _ in enumerate(versioned_sections['sections']):
+            conversion_fn = getattr(
+                cls, '_convert_section_v%s_dict_to_v%s_dict' % (
+                    current_version, current_version + 1))
+            versioned_sections['sections'][i] = conversion_fn(
+                versioned_sections['sections'][i]
+            )
+
+    # Remove no cover comment once migrations for study guides are available.
+    @classmethod
+    def convert_html_fields_in_study_guide_section(
+        cls,
+        study_guide_section_dict: StudyGuideSectionDict,
+        conversion_fn: Callable[[str], str]
+    ) -> StudyGuideSectionDict: # pragma: no cover
+        """Applies a conversion function on all the html strings in a study
+        guide section to migrate them to a desired state.
+
+        Args:
+            study_guide_section_dict: dict. The dict containing the
+                study guide section.
+            conversion_fn: function. The conversion function to be applied on
+                the study_guide_section_dict.
+
+        Returns:
+            dict. The converted subtopic_page_contents_dict.
+        """
+        study_guide_section_dict[
+            'content']['html'] = conversion_fn(
+                study_guide_section_dict['content']['html']
+            )
+        return study_guide_section_dict
+
+    # Remove no cover comment once migrations for study guides are available.
+    @classmethod
+    def convert_unicode_fields_in_study_guide_section(
+        cls,
+        study_guide_section_dict: StudyGuideSectionDict,
+        conversion_fn: Callable[[str], str]
+    ) -> StudyGuideSectionDict: # pragma: no cover
+        """Applies a conversion function on all the unicode strings in study
+        guide section to migrate them to a desired state.
+
+        Args:
+            study_guide_section_dict: dict. The dict containing the
+                study guide section.
+            conversion_fn: function. The conversion function to be applied on
+                the study_guide_section_dict.
+
+        Returns:
+            dict. The converted subtopic_page_contents_dict.
+        """
+        study_guide_section_dict['heading']['unicode_str'] = conversion_fn(
+                study_guide_section_dict[
+                    'heading']['unicode_str']
+            )
+        return study_guide_section_dict
+
     @classmethod
     def get_study_guide_id(cls, topic_id: str, subtopic_id: int) -> str:
         """Returns the study_guide_id from the topic_id and subtopic_id.
@@ -523,6 +566,56 @@ class StudyGuide:
             'this study guide' % (old_section_content_content_id)
         )
 
+    def update_sections(
+        self,
+        new_sections: List[StudyGuideSection]
+    ) -> None:
+        """Updates the study guide sections.
+
+        Args:
+            new_sections: list(StudyGuideSection). The new list of
+                sections.
+        """
+        if len(new_sections) == len(self.sections):
+            for new_section, old_section in zip(
+                new_sections, self.sections
+            ):
+                if (
+                    new_section.heading.unicode_str != (
+                        old_section.heading.unicode_str)
+                ):
+                    old_section.heading.unicode_str = (
+                        new_section.heading.unicode_str)
+                if (
+                    new_section.content.html != (
+                        old_section.content.html)
+                ):
+                    old_section.content.html = (
+                        new_section.content.html)
+        elif (len(new_sections) < len(self.sections)):
+            for i, new_section in enumerate(new_sections):
+                old_section = self.sections[i]
+                if (new_section.heading.content_id != (
+                    old_section.heading.content_id) and
+                    new_section.content.content_id != (
+                    old_section.content.content_id)
+                ):
+                    self.delete_section(
+                        old_section.heading.content_id,
+                        old_section.content.content_id
+                    )
+                    return
+            self.delete_section(
+                self.sections[-1].heading.content_id,
+                self.sections[-1].content.content_id,
+            )
+        else:
+            new_section = new_sections[-1]
+            self.add_section(
+                new_section.heading.unicode_str,
+                new_section.content.html
+            )
+
     def add_section(
             self,
             heading_plaintext: str,
@@ -547,6 +640,9 @@ class StudyGuide:
                 'content'
             ),
             content_html
+        )
+        self.next_content_id_index = (
+            content_id_generator.next_content_id_index
         )
         self.sections.append(new_section)
 

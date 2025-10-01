@@ -19,24 +19,21 @@
 
 import {Component, ElementRef, ViewChild} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {QuestionPlayerStateService} from 'components/question-directives/question-player/services/question-player-state.service';
 import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
 import {
   FetchExplorationBackendResponse,
   ReadOnlyExplorationBackendApiService,
 } from 'domain/exploration/read-only-exploration-backend-api.service';
-import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
+import {StateObjectsBackendDict} from 'domain/exploration/states.model';
 import {ExplorationSummaryBackendApiService} from 'domain/summary/exploration-summary-backend-api.service';
 import {LearnerExplorationSummaryBackendDict} from 'domain/summary/learner-exploration-summary.model';
 import {Subscription} from 'rxjs';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {LoggerService} from 'services/contextual/logger.service';
 import {UrlService} from 'services/contextual/url.service';
-import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {UserService} from 'services/user.service';
 import {ExplorationEngineService} from '../../services/exploration-engine.service';
-import {ExplorationPlayerStateService} from '../../services/exploration-player-state.service';
 import {LearnerViewInfoBackendApiService} from '../../services/learner-view-info-backend-api.service';
 import {PlayerPositionService} from '../../services/player-position.service';
 import {PlayerTranscriptService} from '../../services/player-transcript.service';
@@ -45,11 +42,12 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {ProgressReminderModalComponent} from 'pages/exploration-player-page/current-lesson-player/templates/progress-reminder-modal.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {CheckpointCelebrationUtilityService} from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
-
+import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
 import './exploration-footer.component.css';
 import {OppiaNoninteractiveSkillreviewConceptCardModalComponent} from 'rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview-concept-card-modal.component';
 import {ConceptCardManagerService} from '../../services/concept-card-manager.service';
 import {StateCard} from 'domain/state_card/state-card.model';
+import {QuestionPlayerEngineService} from 'pages/exploration-player-page/services/question-player-engine.service';
 
 @Component({
   selector: 'oppia-exploration-footer',
@@ -86,20 +84,19 @@ export class ExplorationFooterComponent {
   @ViewChild('lessonInfoButton') lessonInfoButton!: ElementRef;
 
   constructor(
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
+    private questionPlayerEngineService: QuestionPlayerEngineService,
     private explorationSummaryBackendApiService: ExplorationSummaryBackendApiService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private ngbModal: NgbModal,
     private urlService: UrlService,
-    private windowDimensionsService: WindowDimensionsService,
-    private questionPlayerStateService: QuestionPlayerStateService,
+    private conversationFlowService: ConversationFlowService,
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private learnerViewInfoBackendApiService: LearnerViewInfoBackendApiService,
     private loggerService: LoggerService,
     private playerTranscriptService: PlayerTranscriptService,
     private playerPositionService: PlayerPositionService,
     private explorationEngineService: ExplorationEngineService,
-    private explorationPlayerStateService: ExplorationPlayerStateService,
     private userService: UserService,
     private editableExplorationBackendApiService: EditableExplorationBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
@@ -112,20 +109,20 @@ export class ExplorationFooterComponent {
     // TODO(#13494): Implement a different footer for practice-session-page.
     // This component is used at 'exploration-player-page' and
     // 'practice-session-page' with different usage at both places.
-    // 'contextService.getExplorationId()' throws an error when this component
+    // 'pageContextService.getExplorationId()' throws an error when this component
     // is used at 'practice-session-page' because the author profiles section
     // does not exist and the URL does not contain a valid explorationId.
     // Try-catch is for catching the error thrown from context-service so
     // that the component behaves properly at both the places.
     try {
-      this.explorationId = this.contextService.getExplorationId();
+      this.explorationId = this.pageContextService.getExplorationId();
       this.iframed = this.urlService.isIframed();
       this.userService.getUserInfoAsync().then(userInfo => {
         this.userIsLoggedIn = userInfo.isLoggedIn();
       });
       if (
-        !this.contextService.isInQuestionPlayerMode() ||
-        this.contextService.getQuestionPlayerIsManuallySet()
+        !this.pageContextService.isInQuestionPlayerMode() ||
+        this.pageContextService.getQuestionPlayerIsManuallySet()
       ) {
         this.explorationSummaryBackendApiService
           .loadPublicAndPrivateExplorationSummariesAsync([this.explorationId])
@@ -148,8 +145,8 @@ export class ExplorationFooterComponent {
       }
     } catch (err) {}
 
-    if (this.contextService.isInQuestionPlayerMode()) {
-      this.questionPlayerStateService.resultsPageIsLoadedEventEmitter.subscribe(
+    if (this.pageContextService.isInQuestionPlayerMode()) {
+      this.questionPlayerEngineService.resultsPageIsLoadedEventEmitter.subscribe(
         (resultsLoaded: boolean) => {
           this.hintsAndSolutionsAreSupported = !resultsLoaded;
         }
@@ -198,7 +195,7 @@ export class ExplorationFooterComponent {
     this.completedCheckpointsCount = mostRecentlyReachedCheckpointIndex - 1;
 
     if (this.completedCheckpointsCount === 0) {
-      this.explorationPlayerStateService.onShowProgressModal.emit();
+      this.conversationFlowService.onShowProgressModal.emit();
       return;
     }
 
@@ -233,7 +230,7 @@ export class ExplorationFooterComponent {
     let modalRef = this.ngbModal.open(ProgressReminderModalComponent, {
       windowClass: 'oppia-progress-reminder-modal',
     });
-    this.explorationPlayerStateService.onShowProgressModal.emit();
+    this.conversationFlowService.onShowProgressModal.emit();
 
     let displayedCardIndex = this.playerPositionService.getDisplayedCardIndex();
     if (displayedCardIndex > 0) {

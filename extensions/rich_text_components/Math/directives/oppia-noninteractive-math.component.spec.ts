@@ -28,7 +28,7 @@ import {
 import {AppConstants} from 'app.constants';
 import {ImagePreloaderService} from 'pages/exploration-player-page/services/image-preloader.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
@@ -42,7 +42,7 @@ describe('NoninteractiveMath', () => {
   let fixture: ComponentFixture<NoninteractiveMath>;
   let imagePreloaderService: ImagePreloaderService;
   let imageLocalStorageService: ImageLocalStorageService;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let serverImageUrl =
     '/exploration/expId/assets/image/' +
     'mathImg_20210721_224145_dyim6a131p_height_3d205_width' +
@@ -113,7 +113,7 @@ describe('NoninteractiveMath', () => {
     htmlEscaperService = TestBed.inject(HtmlEscaperService);
     assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     imagePreloaderService = TestBed.get(ImagePreloaderService);
     svgSanitizerService = TestBed.inject(SvgSanitizerService);
     fixture = TestBed.createComponent(NoninteractiveMath);
@@ -129,10 +129,10 @@ describe('NoninteractiveMath', () => {
 
   it('should initialise component when user inserts a math equation', () => {
     spyOn(imagePreloaderService, 'inExplorationPlayer').and.returnValue(false);
-    spyOn(contextService, 'getEntityType').and.returnValue(
+    spyOn(pageContextService, 'getEntityType').and.returnValue(
       AppConstants.ENTITY_TYPE.EXPLORATION
     );
-    spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+    spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
       AppConstants.IMAGE_SAVE_DESTINATION_SERVER
     );
     spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(false);
@@ -150,10 +150,10 @@ describe('NoninteractiveMath', () => {
 
   it('should retrieve image from local storage if present', () => {
     spyOn(imagePreloaderService, 'inExplorationPlayer').and.returnValue(false);
-    spyOn(contextService, 'getEntityType').and.returnValue(
+    spyOn(pageContextService, 'getEntityType').and.returnValue(
       AppConstants.ENTITY_TYPE.EXPLORATION
     );
-    spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+    spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
     );
     spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(true);
@@ -179,7 +179,7 @@ describe('NoninteractiveMath', () => {
       ' exploration player',
     fakeAsync(() => {
       spyOn(imagePreloaderService, 'inExplorationPlayer').and.returnValue(true);
-      spyOn(contextService, 'getEntityType').and.returnValue(
+      spyOn(pageContextService, 'getEntityType').and.returnValue(
         AppConstants.ENTITY_TYPE.EXPLORATION
       );
       spyOn(imagePreloaderService, 'getImageUrlAsync').and.returnValue(
@@ -198,11 +198,11 @@ describe('NoninteractiveMath', () => {
 
   it('should throw error when retrieving from local storage fails', () => {
     spyOn(imagePreloaderService, 'inExplorationPlayer').and.returnValue(false);
-    spyOn(contextService, 'getEntityType').and.returnValue(
+    spyOn(pageContextService, 'getEntityType').and.returnValue(
       AppConstants.ENTITY_TYPE.EXPLORATION
     );
-    spyOn(contextService, 'getEntityId').and.returnValue('expId');
-    spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+    spyOn(pageContextService, 'getEntityId').and.returnValue('expId');
+    spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
     );
     spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(true);
@@ -228,11 +228,11 @@ describe('NoninteractiveMath', () => {
 
   it('should throw error when retrieving from server fails', () => {
     spyOn(imagePreloaderService, 'inExplorationPlayer').and.returnValue(false);
-    spyOn(contextService, 'getEntityType').and.returnValue(
+    spyOn(pageContextService, 'getEntityType').and.returnValue(
       AppConstants.ENTITY_TYPE.EXPLORATION
     );
-    spyOn(contextService, 'getEntityId').and.returnValue('expId');
-    spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+    spyOn(pageContextService, 'getEntityId').and.returnValue('expId');
+    spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
       AppConstants.IMAGE_SAVE_DESTINATION_SERVER
     );
     spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(false);
@@ -310,10 +310,10 @@ describe('NoninteractiveMath', () => {
         '_1d784_vertical_1d306.svg',
     };
     spyOn(imagePreloaderService, 'inExplorationPlayer').and.returnValue(false);
-    spyOn(contextService, 'getEntityType').and.returnValue(
+    spyOn(pageContextService, 'getEntityType').and.returnValue(
       AppConstants.ENTITY_TYPE.EXPLORATION
     );
-    spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+    spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
       AppConstants.IMAGE_SAVE_DESTINATION_SERVER
     );
     spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(false);
