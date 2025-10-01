@@ -47,6 +47,7 @@ if MYPY: # pragma: no cover
 
 datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
+from google.appengine.ext import ndb
 
 
 class UserSettingsModel(base_models.BaseModel):
@@ -3488,3 +3489,22 @@ class PinnedOpportunityModel(base_models.BaseModel):
         multiple languages and topics relevant to a user.
         """
         return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
+
+
+
+class CsrfSecretModel(base_models.BaseModel):
+    """Storage model for per-user CSRF secrets."""
+
+    # The ID of the user this secret belongs to.
+    user_id = ndb.StringProperty(required=True, indexed=True)
+
+    # The actual CSRF secret (base64 or hex encoded).
+    secret = ndb.StringProperty(required=True)
+
+    # A flag to indicate if this secret is active.
+    is_active = ndb.BooleanProperty(default=True, indexed=True)
+
+    # Optional: last time this secret was used.
+    last_used_on = ndb.DateTimeProperty(required=False, indexed=True)
+
+    # created_on and last_updated fields come from BaseModel.
