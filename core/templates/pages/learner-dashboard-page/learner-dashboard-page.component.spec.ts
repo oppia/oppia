@@ -1150,6 +1150,38 @@ describe('Learner dashboard page', () => {
       })
     );
 
+    it('should show an alert warning when fails to get explorations data', fakeAsync(() => {
+      spyOn(
+        learnerDashboardBackendApiService,
+        'fetchLearnerDashboardTopicsAndStoriesDataAsync'
+      ).and.resolveTo({
+        completedStoriesList: [],
+        learntTopicsList: [],
+        partiallyLearntTopicsList: [],
+        topicsToLearnList: [],
+        untrackedTopics: {},
+        allTopicsList: [],
+        learntToPartiallyLearntTopics: [],
+      });
+
+      const fetchExplorationsSpy = spyOn(
+        learnerDashboardBackendApiService,
+        'fetchLearnerDashboardExplorationsDataAsync'
+      ).and.rejectWith(404);
+
+      const alertsSpy = spyOn(alertsService, 'addWarning').and.callThrough();
+
+      component.ngOnInit();
+
+      tick();
+      fixture.detectChanges();
+
+      expect(fetchExplorationsSpy).toHaveBeenCalled();
+      expect(alertsSpy).toHaveBeenCalledWith(
+        'Failed to get learner dashboard explorations data'
+      );
+    }));
+
     it(
       'should show an alert warning when fails to get collections data' +
         'in mobile view',
