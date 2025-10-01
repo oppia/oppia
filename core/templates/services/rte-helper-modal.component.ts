@@ -137,7 +137,7 @@ export class RteHelperModalComponent {
     link: 200,
     tabs_heading: 200,
     tabs_content: 500,
-    workedexample: 500,
+    workedexample: 1500,
     default: 500,
   };
 
@@ -405,6 +405,10 @@ export class RteHelperModalComponent {
           `The question is too long. Please use at most ${this.getCharacterLimit(this.COMPONENT_ID_WORKEDEXAMPLE)} characters.`
         );
         return;
+      } else if (value[0] === '') {
+        this.updateRteErrorMessage(
+          'Please ensure the worked example has a question.'
+        );
       }
 
       if (
@@ -415,6 +419,10 @@ export class RteHelperModalComponent {
           `The answer is too long. Please use at most ${this.getCharacterLimit(this.COMPONENT_ID_WORKEDEXAMPLE)} characters.`
         );
         return;
+      } else if (value[1] === '') {
+        this.updateRteErrorMessage(
+          'Please ensure the worked example has an answer.'
+        );
       }
     }
   }

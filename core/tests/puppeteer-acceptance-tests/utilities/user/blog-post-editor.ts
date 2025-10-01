@@ -80,7 +80,7 @@ export class BlogPostEditor extends BaseUser {
     // Only fill bio field if it's visible (first-time users vs returning users)
     // Bio field may not be visible for returning users who already have bio set.
     if (inputBar) {
-      await this.type(blogAuthorBioField, 'Dummy-User-Bio');
+      await this.typeInInputField(blogAuthorBioField, 'Dummy-User-Bio');
       await this.page.waitForSelector(`${authorBioSaveButton}:not([disabled])`);
       await this.page.click(authorBioSaveButton);
       await this.expectElementToBeVisible(authorBioSaveButton, false);
@@ -113,8 +113,8 @@ export class BlogPostEditor extends BaseUser {
   async updateUserBioInRegisterModal(bio: string): Promise<void> {
     await this.expectElementToBeVisible(blogAuthorBioField);
     await this.clearAllTextFrom(blogAuthorBioField);
-    await this.type(blogAuthorBioField, bio);
-    await this.expectInputValueToBe(blogAuthorBioField, bio);
+    await this.typeInInputField(blogAuthorBioField, bio);
+    await this.expectElementValueToBe(blogAuthorBioField, bio);
   }
 
   /**
@@ -125,8 +125,8 @@ export class BlogPostEditor extends BaseUser {
   async updateUsernameInRegisterModal(username: string): Promise<void> {
     await this.expectElementToBeVisible(usernameInputSelector);
     await this.clearAllTextFrom(usernameInputSelector);
-    await this.type(usernameInputSelector, username);
-    await this.expectInputValueToBe(usernameInputSelector, username);
+    await this.typeInInputField(usernameInputSelector, username);
+    await this.expectElementValueToBe(usernameInputSelector, username);
   }
 
   /**
@@ -339,7 +339,7 @@ export class BlogPostEditor extends BaseUser {
   async typeInRteToDismissError(): Promise<void> {
     await this.page.waitForSelector(pasteErrorBox, {visible: true});
     await this.expectElementToBeVisible(blogBodyInput);
-    await this.type(blogBodyInput, 'qwerty');
+    await this.typeInInputField(blogBodyInput, 'qwerty');
     await this.page.waitForSelector(pasteErrorBox, {hidden: true});
   }
 
@@ -511,7 +511,7 @@ export class BlogPostEditor extends BaseUser {
   async updateBlogPostTitle(newBlogPostTitle: string): Promise<void> {
     await this.expectElementToBeVisible(blogTitleInput);
     await this.clearAllTextFrom(blogTitleInput);
-    await this.type(blogTitleInput, newBlogPostTitle);
+    await this.typeInInputField(blogTitleInput, newBlogPostTitle);
     await this.page.keyboard.press('Tab');
 
     const modelValue = await this.page.$eval(
@@ -535,7 +535,7 @@ export class BlogPostEditor extends BaseUser {
     }
     await this.expectElementToBeVisible(blogBodyInput);
     await this.clearAllTextFrom(blogBodyInput);
-    await this.type(blogBodyInput, newBodyText);
+    await this.typeInInputField(blogBodyInput, newBodyText);
 
     await this.expectTextContentToBe(blogBodyInput, newBodyText);
   }

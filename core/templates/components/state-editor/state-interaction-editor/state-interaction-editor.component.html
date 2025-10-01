@@ -7,7 +7,7 @@
          (click)="toggleInteractionEditor()"
          (keydown.tab)="focusOnCustomizeInteraction($event)"
          (keydown.enter)="toggleInteractionEditor()">
-      <h3 class="oppia-exp-interaction-card-header">
+      <h3 class="oppia-exp-interaction-card-header e2e-test-selected-interaction-name">
         Interaction <span *ngIf="getCurrentInteractionName()">( {{getCurrentInteractionName()}} )</span>
       </h3>
       <div *ngIf="getCurrentInteractionName().length>0">
