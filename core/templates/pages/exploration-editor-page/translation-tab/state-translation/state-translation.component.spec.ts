@@ -31,7 +31,7 @@ import {StateSolutionService} from 'components/state-editor/state-editor-propert
 import {Outcome} from 'domain/exploration/outcome.model';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {Rule} from 'domain/exploration/rule.model';
-import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
+import {StateObjectsBackendDict} from 'domain/exploration/states.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';

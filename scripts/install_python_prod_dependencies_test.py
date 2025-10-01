@@ -29,9 +29,7 @@ import sys
 
 from core import utils
 from core.tests import test_utils
-from scripts import common
-from scripts import install_python_prod_dependencies
-from scripts import scripts_test_utils
+from scripts import common, install_python_prod_dependencies, scripts_test_utils
 
 import pkg_resources
 from typing import Dict, List, Optional, Set, Tuple
@@ -108,11 +106,13 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             self.file_arr.append(msg)
 
         class MockFile:
-            def seek(self, start: int, stop: int) -> None: # pylint: disable=missing-docstring
+            def seek( # pylint: disable=missing-docstring
+                self, start: int, stop: int) -> None:
                 pass
             def read(self) -> str: # pylint: disable=missing-docstring
                 return ''
-            def write(self, buf: str) -> None: # pylint: disable=missing-docstring
+            def write( # pylint: disable=missing-docstring
+                self, buf: str) -> None:
                 mock_write(buf)
 
         class MockOpenFile:
@@ -211,7 +211,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             common, 'COMPILED_REQUIREMENTS_FILE_PATH',
             self.REQUIREMENTS_TEST_TXT_FILE_PATH)
 
-        def mock_find_distributions(paths: List[str]) -> List[Distribution]: # pylint: disable=unused-argument
+        def mock_find_distributions( # pylint: disable=unused-argument
+            paths: List[str]) -> List[Distribution]:
             return [
                 Distribution('dependency1', '1.5.1', {}),
                 Distribution('dependency2', '4.9.1.2', {}),
@@ -509,6 +510,9 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         self.assertEqual(print_statements, [
             'Checking if pip is installed on the local machine',
             'Regenerating "requirements.txt" file...',
+            'Printing diff in requirements.in:',
+            '--------------------------',
+            '--------------------------',
             'All third-party Python libraries are already installed '
             'correctly.'
         ])
@@ -528,7 +532,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             'google_cloud_datastore-1.13.0.dist-info',
             'google'
         ]
-        def mock_list_dir(path: str) -> List[str]:  # pylint: disable=unused-argument
+        def mock_list_dir( # pylint: disable=unused-argument
+            path: str) -> List[str]:
             return directory_names
 
         paths_to_delete = []
@@ -629,8 +634,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             return [
                 'dependency-1-1.5.1.dist-info',
                 'dependency2-5.0.0.egg-info',
-                'dependency-5-0.5.3-py3.9.egg-info',
-                'dependency_6-0.5.3-py3.9.egg-info',
+                'dependency-5-0.5.3-py3.10.egg-info',
+                'dependency_6-0.5.3-py3.10.egg-info',
             ]
 
         def mock_is_dir(unused_path: str) -> bool:
@@ -797,6 +802,29 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28'
             'Windows%29' in self.print_arr)
 
+    def test_normalize_python_library_name(
+        self
+    ) -> None:
+        expected_normalized_names = [
+            ('backports-tarfile', 'backports.tarfile'),
+            ('backports-tarfile-2', 'backports.tarfile-2'),
+            ('apache-beam[gcp]', 'apache-beam'),
+            ('Pillow', 'pillow'),
+            ('pylatexenc', 'pylatexenc'),
+            ('PyYAML', 'pyyaml')
+        ]
+
+        for lib_name, expected_normalized_name in expected_normalized_names:
+            observed_normalized_name = (
+                install_python_prod_dependencies.normalize_python_library_name(
+                    lib_name))
+            self.assertEqual(
+                observed_normalized_name,
+                expected_normalized_name,
+                msg='%s should normalize to %s, but observed %s' % (
+                    lib_name, expected_normalized_name,
+                    observed_normalized_name))
+
     def test_uniqueness_of_normalized_lib_names_in_requirements_file(
         self
     ) -> None:
@@ -826,7 +854,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             lines = f.readlines()
             for line in lines:
                 trimmed_line = line.strip()
-                if not trimmed_line or trimmed_line.startswith(('#', 'git')):
+                if not trimmed_line or trimmed_line.startswith((
+                        '#', 'git', '--hash')):
                     continue
                 library_name_and_version_string = trimmed_line.split(
                     ' ')[0].split('==')

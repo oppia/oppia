@@ -54,7 +54,7 @@ describe('Exploration Creator', function () {
     async function () {
       // Navigate to the creator dashboard and create a new exploration.
       await explorationEditor.navigateToCreatorDashboardPage();
-      await explorationEditor.navigateToExplorationEditorPage();
+      await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
       await explorationEditor.dismissWelcomeModal();
       await explorationEditor.updateCardContent(INTRODUCTION_CARD_CONTENT);
       await explorationEditor.addImageInteraction();

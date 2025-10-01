@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the DeleteWorkedExampleComponent.
+ * @fileoverview Unit tests for the DeleteStudyGuideSectionComponent.
  */
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';

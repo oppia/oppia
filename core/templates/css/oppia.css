@@ -167,6 +167,10 @@ why they need to be overriden.  */
   transform: translate3d(0,-1px,0);
 }
 
+.mat-bottom-sheet-container {
+  border-radius: 28px 28px 0 0;
+}
+
 .oppia-focus-indicator-blue:focus {
   outline: 2px solid rgb(23, 23, 255);
 }
@@ -191,7 +195,6 @@ why they need to be overriden.  */
   line-height: 22px;
   margin: 0;
   min-width: 55px;
-  text-transform: uppercase;
 }
 
 .oppia-length-validation-error {
@@ -318,6 +321,10 @@ legend {
   font-size: 14px;
   min-height: 35px;
   padding: 6px 12px 6px 12px;
+}
+
+.study-guide-heading-field .form-control {
+  width: 100% !important;
 }
 
 .form-group select {
@@ -4062,32 +4069,6 @@ div.oppia-issues-learner-action {
   z-index: 1;
 }
 
-.conversation-skin-oppia-feedback-container .conversation-skin-oppia-avatar {
-  height: 100px;
-  left: -87px;
-  top: -20px;
-  width: 100px;
-}
-
-.conversation-skin-oppia-feedback-content,
-.conversation-skin-learner-answer-content {
-  margin-bottom: 12px;
-  overflow: auto;
-  padding: 8px 12px;
-  word-wrap: break-word;
-}
-
-.conversation-skin-oppia-feedback-content,
-.conversation-skin-help-card-content {
-  background-color: rgba(224,242,241,1);
-  border-top-left-radius: 0;
-}
-
-.conversation-skin-learner-answer-content {
-  background-color: rgba(236,239,241,1);
-  border-bottom-right-radius: 0;
-}
-
 
 /*
     This CSS block is for ensuring that only a response from a multi-line text input preserves newlines.
@@ -4098,13 +4079,6 @@ oppia-response-text-input {
   white-space: pre-wrap;
 }
 
-@media screen and (max-width: 959px) {
-  .conversation-skin-user-avatar,
-  .conversation-skin-oppia-avatar {
-    display: none;
-  }
-}
-
 mat-tooltip-component .mat-tooltip.oppia-mat-tooltip-list {
   font-size: 12px;
   white-space: pre-wrap;
@@ -4113,4 +4087,8 @@ mat-tooltip-component .mat-tooltip.oppia-mat-tooltip-list {
 .oppia-save-draft-warning {
   color: #fc0;
   margin-left: 5px;
+}
+
+.hidden-element {
+  outline: 0;
 }

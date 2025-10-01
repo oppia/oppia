@@ -126,8 +126,8 @@ describe('ClassroomNavigationLinksComponent', () => {
     component.ngOnInit();
     tick();
 
-    // It should store top 2 public classrooms.
-    expect(component.classroomSummaries.length).toEqual(2);
+    // It should store all public classrooms.
+    expect(component.classroomSummaries.length).toEqual(3);
     expect(component.isLoading).toBeFalse();
   }));
 
@@ -206,4 +206,10 @@ describe('ClassroomNavigationLinksComponent', () => {
     expect(component.classroomSummaries).toEqual([]);
     expect(component.isLoading).toBeTrue();
   }));
+
+  it('should return the correct number of classrooms from getClassroomCount', () => {
+    component.classroomSummaries = dummyClassroomSummaries;
+    const countLength = component.getClassroomCount();
+    expect(countLength).toBe(dummyClassroomSummaries.length);
+  });
 });

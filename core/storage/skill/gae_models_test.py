@@ -27,8 +27,7 @@ from core.tests import test_utils
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import skill_models
+    from mypy_imports import base_models, skill_models
 
 (base_models, skill_models) = models.Registry.import_models([
     models.Names.BASE_MODEL, models.Names.SKILL
@@ -210,7 +209,6 @@ class SkillSummaryModelUnitTest(test_utils.GenericTestBase):
             description='description1',
             misconception_count=1,
             version=1,
-            worked_examples_count=1,
             language_code='en',
             skill_model_last_updated=datetime.datetime.utcnow(),
             skill_model_created_on=datetime.datetime.utcnow()
@@ -219,7 +217,6 @@ class SkillSummaryModelUnitTest(test_utils.GenericTestBase):
             id='skill_id2',
             description='description2',
             misconception_count=1,
-            worked_examples_count=1,
             version=1,
             language_code='en',
             skill_model_last_updated=datetime.datetime.utcnow(),
@@ -266,7 +263,6 @@ class SkillSummaryModelUnitTest(test_utils.GenericTestBase):
             'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'misconception_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'worked_examples_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'skill_model_last_updated':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,

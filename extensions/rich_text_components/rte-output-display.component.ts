@@ -45,6 +45,7 @@ import {
 import {ServicesConstants} from 'services/services.constants';
 import {LocalStorageService} from 'services/local-storage.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {Voiceover} from 'domain/exploration/voiceover.model';
 
 type PortalTree = (TemplatePortal<unknown> | PortalTree)[];
 
@@ -75,15 +76,16 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   @ViewChild('svgdiagram') svgdiagramTagPortal: TemplateRef<unknown>;
   @ViewChild('tabs') tabsTagPortal: TemplateRef<unknown>;
   @ViewChild('video') videoTagPortal: TemplateRef<unknown>;
+  @ViewChild('workedexample') workedexampleTagPortal: TemplateRef<unknown>;
   @Input() rteString: string;
   @Input() altTextIsDisplayed: boolean = false;
   node: OppiaRteNode | string = '';
   show = false;
   portalTree: PortalTree = [];
 
-  highlighIdToSentenceText = {};
+  highlightIdToSentenceText = {};
   wrapped = false;
-  previousHighlightedElementId!: string;
+  previousHighlightedElementId!: string | undefined;
   // The background color of the sentence being played in the audio player.
   backgroundColorOfHighlightedSentence = '#f3d140';
 
@@ -95,6 +97,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     'OPPIA-NONINTERACTIVE-VIDEO',
     'OPPIA-NONINTERACTIVE-SKILLREVIEW',
     'OPPIA-NONINTERACTIVE-TABS',
+    'OPPIA-NONINTERACTIVE-WORKEDEXAMPLE',
   ];
 
   // The index is used to assign a unique ID to each sentence of the lesson content.
@@ -148,7 +151,11 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
 
   // The method returns the readable text from the node.
   getReadableTextFromNode(node: Node): string {
-    if (node.nodeType === Node.TEXT_NODE) {
+    if (
+      node.nodeType === Node.TEXT_NODE ||
+      node.nodeName === 'STRONG' ||
+      node.nodeName === 'EM'
+    ) {
       return node.textContent || '';
     } else if (
       node.nodeName === 'OPPIA-NONINTERACTIVE-SKILLREVIEW' ||
@@ -221,7 +228,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         let textContent = '';
 
         for (let tempChildNode of updatedChildNodes) {
-          textContent += this.getReadableTextFromNode(tempChildNode);
+          textContent += this.getReadableTextFromNode(tempChildNode) + ' ';
         }
 
         const sentencesInEarliestParentTag = textContent.split(sentenceRegex);
@@ -247,6 +254,12 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
           spanTagElement.appendChild(childNode);
 
           if (sentence === currentSentenceToMatch) {
+            if (spanNodeList.length > 0) {
+              let spaceElement = document.createElement('span');
+              // eslint-disable-next-line oppia/no-inner-html
+              spaceElement.innerHTML = ' ';
+              spanNodeList.push(spaceElement);
+            }
             spanNodeList.push(spanTagElement);
             spanTagElement = document.createElement('span');
             nextSentenceOffset = '';
@@ -258,19 +271,25 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
 
         let nodeTemp = node.cloneNode();
 
-        spanNodeList.forEach(spanNode => {
-          let elementId = `highlightBlock${this.index}`;
-          spanNode.id = elementId;
-          this.index++;
-
+        for (let spanNode of spanNodeList) {
           let textInsideSpanTag = '';
 
           for (let tempChildNode of spanNode.childNodes) {
             textInsideSpanTag += this.getReadableTextFromNode(tempChildNode);
           }
-          this.highlighIdToSentenceText[elementId] = textInsideSpanTag;
+
+          if (textInsideSpanTag === ' ') {
+            nodeTemp.appendChild(spanNode);
+            continue;
+          }
+
+          let elementId = `highlightBlock${this.index}`;
+          spanNode.id = elementId;
+          this.index++;
+
           nodeTemp.appendChild(spanNode);
-        });
+          this.highlightIdToSentenceText[elementId] = textInsideSpanTag;
+        }
 
         return nodeTemp;
       }
@@ -288,11 +307,12 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     }
     this.wrapped = true;
     this.index = 1;
-    this.highlighIdToSentenceText = {};
+    this.highlightIdToSentenceText = {};
     this.previousHighlightedElementId = undefined;
 
     let languageCode =
-      this.localStorageService.getLastSelectedTranslationLanguageCode();
+      this.localStorageService.getLastSelectedTranslationLanguageCode() ||
+      AppConstants.DEFAULT_LANGUAGE_CODE;
 
     // Sentences in the lesson content are separated using punctuation marks
     // specific to the language.
@@ -304,7 +324,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
 
     // The regex below is used to split sentences from the lesson content.
     const sentenceRegex = new RegExp(
-      `(?<=[${punctuationsForCurrentLanguage}])(?<!\\.\\.)["']?\\s*(?=[A-Za-z”])`,
+      `(?<=[${punctuationsForCurrentLanguage}]["”']?)\\s+`,
       'g'
     );
 
@@ -401,6 +421,21 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       .AutomaticVoiceoverRegenerationFromExp.isEnabled;
   }
 
+  updateAutomatedVoiceoversAudioOffsets(): void {
+    let automatedVoiceoversAudioOffsetsMsecs =
+      this.entityVoiceoversService.getActiveEntityVoiceovers()
+        ?.automatedVoiceoversAudioOffsetsMsecs || {};
+
+    if (Object.keys(automatedVoiceoversAudioOffsetsMsecs).length === 0) {
+      return;
+    }
+
+    this.automaticVoiceoverHighlightService.setAutomatedVoiceoversAudioOffsets(
+      automatedVoiceoversAudioOffsetsMsecs
+    );
+    this.automaticVoiceoverHighlightService.getSentencesToHighlightForTimeRanges();
+  }
+
   ngOnInit(): void {
     // If the below feature flag is not enabld then the sentence highlighting
     // feature will not work.
@@ -408,22 +443,60 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    this.automaticVoiceoverHighlightService.setAutomatedVoiceoversAudioOffsets(
-      this.entityVoiceoversService.getActiveEntityVoiceovers()
-        ?.automatedVoiceoversAudioOffsetsMsecs || {}
-    );
-    this.automaticVoiceoverHighlightService.getSentencesToHighlightForTimeRanges();
+    this.updateAutomatedVoiceoversAudioOffsets();
+
+    this.entityVoiceoversService.onLanguageAccentCodeChange.subscribe(() => {
+      this.updateAutomatedVoiceoversAudioOffsets();
+    });
 
     // The below lines runs on every 200ms to highlight the sentence being
     // played in the audio player.
     setInterval(() => {
       this.highlightSentenceDuringVoiceoverPlay();
-    }, 200);
+    }, 100);
+  }
+
+  isManualVoiceoverAvailableForActiveContent(): boolean {
+    const activeContentId = this.getActiveContentId();
+    const entityVoiceovers =
+      this.entityVoiceoversService.getActiveEntityVoiceovers();
+    const manualVoiceover = entityVoiceovers?.getManualVoiceover(
+      activeContentId
+    ) as Voiceover;
+
+    return !!manualVoiceover && manualVoiceover.needsUpdate === false;
+  }
+
+  isInPlayerOrPreviewPage(): boolean {
+    return (
+      this.pageContextService.isInExplorationPlayerPage() ||
+      (this.pageContextService.isInExplorationEditorPage() &&
+        this.pageContextService.getEditorTabContext() ===
+          ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.PREVIEW)
+    );
   }
 
   highlightSentenceDuringVoiceoverPlay(): void {
-    // Highlight only when the audio is playing.
+    // Manual voiceover should be prioritized over autogenerated voiceover when
+    // available, and it does not require sentence highlighting.
+    if (
+      this.isInPlayerOrPreviewPage() &&
+      this.isManualVoiceoverAvailableForActiveContent()
+    ) {
+      return;
+    }
+
+    // Highlight only when the autogenerated audio is playing.
     if (this.audioPlayerService.isPlaying()) {
+      // Sentence highlighting is not required when a manual voiceover is played
+      // from the exploration editor page.
+      if (
+        !this.isInPlayerOrPreviewPage() &&
+        !this.voiceoverPlayerService.isAutomaticVoiceoverPlaying
+      ) {
+        return;
+      }
+
       let previousHighlightedElement = document.getElementById(
         this.previousHighlightedElementId
       );
@@ -436,15 +509,11 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       // If previous highlighted sentence and current sentence are same, then
       // do not highlight the sentence again.
       if (
+        this.previousHighlightedElementId === currentElementIdToHighlight &&
         previousHighlightedElement?.textContent ===
-        this.highlighIdToSentenceText[currentElementIdToHighlight]
+          this.highlightIdToSentenceText[currentElementIdToHighlight]
       ) {
         return;
-      }
-
-      // Removes the highlight background from the previous sentence.
-      if (previousHighlightedElement) {
-        previousHighlightedElement.style.backgroundColor = '';
       }
 
       let currentElementToHighlight = document.getElementById(
@@ -453,6 +522,10 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
 
       // Highlights the current sentence being played in the audio player.
       if (currentElementToHighlight) {
+        // Removes the highlight background from the previous sentence.
+        if (previousHighlightedElement) {
+          previousHighlightedElement.style.backgroundColor = '';
+        }
         currentElementToHighlight.style.backgroundColor =
           this.backgroundColorOfHighlightedSentence;
 
@@ -484,6 +557,13 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     } else {
       return this.translationTabActiveContentIdService.getActiveContentId();
     }
+  }
+
+  isSolutionCollapsedForWorkedexample(): boolean {
+    return (
+      this.pageContextService.getSubtopicPreviewIsOpen() ||
+      this.pageContextService.getPageContext() === 'studyguide'
+    );
   }
 
   ngAfterViewInit(): void {
@@ -563,8 +643,8 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         );
         this.automaticVoiceoverHighlightService.languageCode =
           this.localStorageService.getLastSelectedTranslationLanguageCode();
-        this.automaticVoiceoverHighlightService.setHighlightIdToSenetenceMap(
-          this.highlighIdToSentenceText
+        this.automaticVoiceoverHighlightService.setHighlightIdToSentenceMap(
+          this.highlightIdToSentenceText
         );
         this.automaticVoiceoverHighlightService.getSentencesToHighlightForTimeRanges();
       }

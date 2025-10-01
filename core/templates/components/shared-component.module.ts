@@ -64,7 +64,7 @@ import {SkillMasteryViewerComponent} from './skill-mastery/skill-mastery.compone
 import {ExplorationSummaryTileComponent} from './summary-tile/exploration-summary-tile.component';
 import {PracticeTabComponent} from 'pages/topic-viewer-page/practice-tab/practice-tab.component';
 import {CollectionSummaryTileComponent} from './summary-tile/collection-summary-tile.component';
-import {TakeBreakModalComponent} from 'pages/exploration-player-page/current-lesson-player/templates/take-break-modal.component';
+import {TakeBreakModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/take-break-modal.component';
 import {TopicsAndSkillsDashboardNavbarBreadcrumbComponent} from 'pages/topics-and-skills-dashboard-page/navbar/topics-and-skills-dashboard-navbar-breadcrumb.component';
 import {ThreadTableComponent} from 'pages/exploration-editor-page/feedback-tab/thread-table/thread-table.component';
 import {SummaryListHeaderComponent} from './state-directives/answer-group-editor/summary-list-header.component';
@@ -106,7 +106,7 @@ import {CompletionGraphComponent} from './statistics-directives/completion-graph
 import {TutorCardComponent} from 'pages/exploration-player-page/current-lesson-player/learner-experience/tutor-card.component';
 import {ContentLanguageSelectorComponent} from 'pages/exploration-player-page/current-lesson-player/layout-directives/content-language-selector.component';
 import {RatingDisplayComponent} from './ratings/rating-display/rating-display.component';
-import {SupplementalCardComponent} from 'pages/exploration-player-page/current-lesson-player/learner-experience/supplemental-card.component';
+import {SupplementalCardComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/supplemental-card.component';
 import {AddOrUpdateSolutionModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-or-update-solution-modal.component';
 import {SavePendingChangesModalComponent} from './save-pending-changes/save-pending-changes-modal.component';
 import {AddHintModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-hint-modal.component';
@@ -190,7 +190,6 @@ import {AuthService} from 'services/auth.service';
 
 // Miscellaneous.
 import {JoyrideModule} from 'ngx-joyride';
-import {SmartRouterModule} from 'hybrid-router-module-provider';
 import {StaleTabInfoModalComponent} from './stale-tab-info/stale-tab-info-modal.component';
 import {UnsavedChangesStatusInfoModalComponent} from './unsaved-changes-status-info/unsaved-changes-status-info-modal.component';
 import {NgbModalModule} from '@ng-bootstrap/ng-bootstrap';
@@ -211,6 +210,26 @@ import {SaveVersionMismatchModalComponent} from 'pages/exploration-editor-page/m
 import {ConfirmDeleteStateModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/confirm-delete-state-modal.component';
 import {SaveValidationFailModalComponent} from 'pages/exploration-editor-page/modal-templates/save-validation-fail-modal.component';
 import {ModifyTranslationsModalComponent} from 'pages/exploration-editor-page/modal-templates/exploration-modify-translations-modal.component';
+import {NewInputResponsePairComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/new-input-response-pair.component';
+import {NewConversationSkinComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/new-conversation-skin.component';
+import {ConversationDisplayComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/conversation-display.component';
+import {CardNavigationControlComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/card-navigation-control.component';
+import {RouterModule} from '@angular/router';
+import {HintSolutionAndConceptCardDisplayComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/hint-solution-and-concept-card-display.component';
+import {DisplayNewHintModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/display-new-hint-modal.component';
+import {DisplayNewSolutionModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/display-new-solution-modal.component';
+import {DisplayNewSolutionInterstititalModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/display-new-solution-interstitial-modal.component';
+import {ShareLessonModalComponent} from 'pages/exploration-player-page/new-lesson-player/sidebar-components/share-lesson-modal.component';
+import {NewCorrectnessFooterComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/new-correctness-footer.component';
+import {NewEndChapterConfettiComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/new-end-chapter-confetti.component';
+import {NewEndChapterCheckMarkComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/new-end-chapter-check-mark.component';
+import {PlayerHeaderComponent} from 'pages/exploration-player-page/new-lesson-player/header-components/player-header.component';
+import {ProgressBarComponent} from './progress-bar/progress-bar.component';
+import {ProgressTrackerComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/progress-tracker.component';
+import {CheckpointBarComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/checkpoint-bar.component';
+import {SaveProgressModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/save-progress-modal.component';
+import {CheckpointCelebrationFooterComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/checkpoint-celebration-footer.component';
+import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/new-ratings-and-recommendations.component';
 @NgModule({
   imports: [
     BackgroundBannerModule,
@@ -221,15 +240,12 @@ import {ModifyTranslationsModalComponent} from 'pages/exploration-editor-page/mo
     CustomFormsComponentsModule,
     CommonElementsModule,
     CodeMirrorModule,
-    // TODO(#13443): Remove smart router module provider once all pages are
-    // migrated to angular router.
-    SmartRouterModule,
+    RouterModule,
     MaterialModule,
     NgBootstrapModule,
     DynamicContentModule,
     FormsModule,
     ReactiveFormsModule,
-    RichTextComponentsModule,
     ObjectComponentsModule,
     OppiaCkEditor4Module,
     OppiaCkEditorCopyToolBarModule,
@@ -263,13 +279,24 @@ import {ModifyTranslationsModalComponent} from 'pages/exploration-editor-page/mo
     AttributionGuideComponent,
     CompletionGraphComponent,
     CorrectnessFooterComponent,
+    NewCorrectnessFooterComponent,
+    CheckpointCelebrationFooterComponent,
     ConfirmLeaveModalComponent,
     ConfirmQuestionExitModalComponent,
     ContinueButtonComponent,
     ContentLanguageSelectorComponent,
     ConversationSkinComponent,
+    ConversationDisplayComponent,
+    CardNavigationControlComponent,
+    ProgressBarComponent,
+    NewConversationSkinComponent,
+    ProgressTrackerComponent,
+    CheckpointBarComponent,
     EndChapterCheckMarkComponent,
+    NewEndChapterCheckMarkComponent,
     EndChapterConfettiComponent,
+    NewEndChapterConfettiComponent,
+    PlayerHeaderComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
     CustomizeInteractionModalComponent,
@@ -279,19 +306,25 @@ import {ModifyTranslationsModalComponent} from 'pages/exploration-editor-page/mo
     DeleteLastHintModalComponent,
     DeleteSolutionModalComponent,
     DisplaySolutionModalComponent,
+    DisplayNewSolutionModalComponent,
     DisplaySolutionInterstititalModalComponent,
+    DisplayNewSolutionInterstititalModalComponent,
     DisplayHintModalComponent,
+    DisplayNewHintModalComponent,
     ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
     FilteredChoicesFieldComponent,
     FeedbackPopupComponent,
     PracticeTabComponent,
+    SaveProgressModalComponent,
     CollectionSummaryTileComponent,
     ExplorationEmbedButtonModalComponent,
     CheckpointCelebrationModalComponent,
     HintAndSolutionButtonsComponent,
+    HintSolutionAndConceptCardDisplayComponent,
     HintEditorComponent,
     InputResponsePairComponent,
+    NewInputResponsePairComponent,
     ImageUploaderComponent,
     ImageUploaderModalComponent,
     KeyboardShortcutHelpModalComponent,
@@ -310,11 +343,13 @@ import {ModifyTranslationsModalComponent} from 'pages/exploration-editor-page/mo
     QuestionEditorSaveModalComponent,
     RatingDisplayComponent,
     RatingsAndRecommendationsComponent,
+    NewRatingsAndRecommendationsComponent,
     ResponseHeaderComponent,
     RubricsEditorComponent,
     ScoreRingComponent,
     SelectSkillModalComponent,
     SharingLinksComponent,
+    ShareLessonModalComponent,
     SkillSelectorComponent,
     SkillMasteryViewerComponent,
     StateContentEditorComponent,
@@ -414,15 +449,27 @@ import {ModifyTranslationsModalComponent} from 'pages/exploration-editor-page/mo
     AudioFileUploaderComponent,
     CompletionGraphComponent,
     CorrectnessFooterComponent,
+    NewCorrectnessFooterComponent,
+    CheckpointCelebrationFooterComponent,
     ConfirmLeaveModalComponent,
+    PlayerHeaderComponent,
     ConfirmQuestionExitModalComponent,
     ContinueButtonComponent,
     ConceptCardComponent,
     ContentLanguageSelectorComponent,
     ConversationSkinComponent,
+    ConversationDisplayComponent,
+    CardNavigationControlComponent,
+    ProgressTrackerComponent,
+    CheckpointBarComponent,
+    NewConversationSkinComponent,
     EndChapterCheckMarkComponent,
+    NewEndChapterCheckMarkComponent,
+    ProgressBarComponent,
     EndChapterConfettiComponent,
+    NewEndChapterConfettiComponent,
     CreateNewSkillModalComponent,
+    SaveProgressModalComponent,
     CreateActivityModalComponent,
     CustomizeInteractionModalComponent,
     DeleteHintModalComponent,
@@ -433,11 +480,13 @@ import {ModifyTranslationsModalComponent} from 'pages/exploration-editor-page/mo
     ExplorationSummaryTileComponent,
     FilteredChoicesFieldComponent,
     FeedbackPopupComponent,
+    HintSolutionAndConceptCardDisplayComponent,
     MultiSelectionFieldComponent,
     PracticeTabComponent,
     QuestionEditorSaveModalComponent,
     CollectionSummaryTileComponent,
     SharingLinksComponent,
+    ShareLessonModalComponent,
     SkillMasteryViewerComponent,
     AttributionGuideComponent,
     LazyLoadingComponent,
@@ -447,8 +496,11 @@ import {ModifyTranslationsModalComponent} from 'pages/exploration-editor-page/mo
     // These elements will remain here even after migration.
     DeleteAnswerGroupModalComponent,
     DisplaySolutionModalComponent,
+    DisplayNewSolutionModalComponent,
     DisplaySolutionInterstititalModalComponent,
+    DisplayNewSolutionInterstititalModalComponent,
     DisplayHintModalComponent,
+    DisplayNewHintModalComponent,
     SelectSkillModalComponent,
     SkillSelectorComponent,
     TakeBreakModalComponent,
@@ -464,6 +516,7 @@ import {ModifyTranslationsModalComponent} from 'pages/exploration-editor-page/mo
     HintAndSolutionButtonsComponent,
     HintEditorComponent,
     InputResponsePairComponent,
+    NewInputResponsePairComponent,
     ImageUploaderComponent,
     ImageUploaderModalComponent,
     KeyboardShortcutHelpModalComponent,
@@ -472,6 +525,7 @@ import {ModifyTranslationsModalComponent} from 'pages/exploration-editor-page/mo
     QuestionDifficultySelectorComponent,
     RatingDisplayComponent,
     RatingsAndRecommendationsComponent,
+    NewRatingsAndRecommendationsComponent,
     ResponseHeaderComponent,
     RubricsEditorComponent,
     StateContentEditorComponent,
@@ -575,6 +629,7 @@ import {ModifyTranslationsModalComponent} from 'pages/exploration-editor-page/mo
     FormsModule,
     MaterialModule,
     NgBootstrapModule,
+    CheckpointCelebrationFooterComponent,
     RichTextComponentsModule,
     ObjectComponentsModule,
     OppiaCkEditor4Module,
@@ -588,14 +643,26 @@ import {ModifyTranslationsModalComponent} from 'pages/exploration-editor-page/mo
     AudioFileUploaderComponent,
     CompletionGraphComponent,
     CorrectnessFooterComponent,
+    NewCorrectnessFooterComponent,
     ConfirmLeaveModalComponent,
     ConfirmQuestionExitModalComponent,
+    SaveProgressModalComponent,
+    ProgressTrackerComponent,
+    CheckpointBarComponent,
     ContinueButtonComponent,
     ContentLanguageSelectorComponent,
+    ProgressBarComponent,
     ConversationSkinComponent,
+    HintSolutionAndConceptCardDisplayComponent,
+    ConversationDisplayComponent,
+    CardNavigationControlComponent,
+    NewConversationSkinComponent,
     EndChapterCheckMarkComponent,
+    NewEndChapterCheckMarkComponent,
     EndChapterConfettiComponent,
+    NewEndChapterConfettiComponent,
     CreateNewSkillModalComponent,
+    PlayerHeaderComponent,
     CreateActivityModalComponent,
     CustomizeInteractionModalComponent,
     DeleteAnswerGroupModalComponent,
@@ -604,8 +671,11 @@ import {ModifyTranslationsModalComponent} from 'pages/exploration-editor-page/mo
     DeleteLastHintModalComponent,
     DeleteSolutionModalComponent,
     DisplaySolutionModalComponent,
+    DisplayNewSolutionModalComponent,
     DisplaySolutionInterstititalModalComponent,
+    DisplayNewSolutionInterstititalModalComponent,
     DisplayHintModalComponent,
+    DisplayNewHintModalComponent,
     ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
     FeedbackPopupComponent,
@@ -618,6 +688,7 @@ import {ModifyTranslationsModalComponent} from 'pages/exploration-editor-page/mo
     HintAndSolutionButtonsComponent,
     HintEditorComponent,
     InputResponsePairComponent,
+    NewInputResponsePairComponent,
     ImageUploaderComponent,
     ImageUploaderModalComponent,
     LazyLoadingComponent,
@@ -626,6 +697,7 @@ import {ModifyTranslationsModalComponent} from 'pages/exploration-editor-page/mo
     PreviewThumbnailComponent,
     RatingDisplayComponent,
     RatingsAndRecommendationsComponent,
+    NewRatingsAndRecommendationsComponent,
     ResponseHeaderComponent,
     RubricsEditorComponent,
     OnScreenKeyboardComponent,
@@ -642,6 +714,7 @@ import {ModifyTranslationsModalComponent} from 'pages/exploration-editor-page/mo
     StateSkillEditorComponent,
     SelectSkillModalComponent,
     SharingLinksComponent,
+    ShareLessonModalComponent,
     SkillSelectorComponent,
     StorySummaryTileComponent,
     SubtopicSummaryTileComponent,

@@ -29,10 +29,7 @@ import {PageContextService} from 'services/page-context.service';
 import {SolutionExplanationEditor} from './solution-explanation-editor.component';
 import {ExternalSaveService} from 'services/external-save.service';
 import {StateSolutionService} from 'components/state-editor/state-editor-properties-services/state-solution.service';
-import {
-  Solution,
-  SolutionObjectFactory,
-} from 'domain/exploration/SolutionObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
 
 class MockStateSolutionService {
   displayed = {
@@ -75,7 +72,6 @@ describe('Solution explanation editor', () => {
         PageContextService,
         EditabilityService,
         ExternalSaveService,
-        SolutionObjectFactory,
         {
           provide: StateSolutionService,
           useClass: MockStateSolutionService,
@@ -112,6 +108,7 @@ describe('Solution explanation editor', () => {
     const schema = {
       type: 'html',
       ui_config: {
+        rte_component_config_id: 'ALL_COMPONENTS',
         hide_complex_extensions: true,
       },
     };
@@ -133,6 +130,7 @@ describe('Solution explanation editor', () => {
     const schema = {
       type: 'html',
       ui_config: {
+        rte_component_config_id: 'ALL_COMPONENTS',
         hide_complex_extensions: true,
       },
     };

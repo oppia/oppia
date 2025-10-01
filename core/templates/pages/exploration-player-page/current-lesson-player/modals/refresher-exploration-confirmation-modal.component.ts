@@ -22,7 +22,7 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {UrlService} from 'services/contextual/url.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import {ExplorationEngineService} from '../../services/exploration-engine.service';
+import {PageContextService} from 'services/page-context.service';
 
 @Component({
   selector: 'oppia-refresher-confirmation-modal',
@@ -37,7 +37,7 @@ export class RefresherExplorationConfirmationModal extends ConfirmOrCancelModal 
   constructor(
     private ngbActiveModal: NgbActiveModal,
     private windowRef: WindowRef,
-    private explorationEngineService: ExplorationEngineService,
+    private pageContextService: PageContextService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService
   ) {
@@ -68,7 +68,7 @@ export class RefresherExplorationConfirmationModal extends ConfirmOrCancelModal 
     url = this.urlService.addField(
       url,
       'parent',
-      this.explorationEngineService.getExplorationId()
+      this.pageContextService.getExplorationId()
     );
 
     // Wait a little before redirecting the page to ensure other

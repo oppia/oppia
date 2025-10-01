@@ -17,7 +17,7 @@
  */
 
 import {fakeAsync, TestBed, tick} from '@angular/core/testing';
-import {State, StateObjectFactory} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 import {YamlService} from 'services/yaml.service';
 import {HistoryTabYamlConversionService} from './history-tab-yaml-conversion.service';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
@@ -30,7 +30,6 @@ import {EntityTranslation} from '../../../domain/translation/EntityTranslationOb
 describe('History tab yaml conversion service', () => {
   let historyTabYamlConversionService: HistoryTabYamlConversionService;
   let yamlService: YamlService;
-  let stateObjectFactory: StateObjectFactory;
   let entityTranslationsService: EntityTranslationsService;
   let testState: State;
   let testStateYamlString: string;
@@ -47,10 +46,9 @@ describe('History tab yaml conversion service', () => {
       HistoryTabYamlConversionService
     );
     yamlService = TestBed.inject(YamlService);
-    stateObjectFactory = TestBed.inject(StateObjectFactory);
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
 
-    testState = stateObjectFactory.createDefaultState(
+    testState = State.createDefaultState(
       'state_1',
       'content_0',
       'default_outcome_1'

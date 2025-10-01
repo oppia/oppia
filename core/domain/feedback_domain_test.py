@@ -18,8 +18,7 @@ from __future__ import annotations
 
 import datetime
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.domain import feedback_domain
 from core.tests import test_utils
 

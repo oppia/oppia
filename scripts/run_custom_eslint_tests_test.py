@@ -22,8 +22,7 @@ import subprocess
 import sys
 
 from core.tests import test_utils
-from scripts import common
-from scripts import run_custom_eslint_tests
+from scripts import common, run_custom_eslint_tests
 
 
 class RunCustomEslintTestsTests(test_utils.GenericTestBase):
@@ -52,7 +51,8 @@ class RunCustomEslintTestsTests(test_utils.GenericTestBase):
 
     def test_custom_eslint_tests_failed_due_to_internal_error(self) -> None:
         class MockTask:
-            def communicate(self) -> tuple[bytes, bytes]:   # pylint: disable=missing-docstring
+            def communicate( # pylint: disable=missing-docstring
+                self) -> tuple[bytes, bytes]:
                 return (
                     b'All files | 100 | 100 | 100 | 100 | ',
                     b'Path not found.')
@@ -73,7 +73,8 @@ class RunCustomEslintTestsTests(test_utils.GenericTestBase):
 
     def test_custom_eslint_tests_failed(self) -> None:
         class MockTask:
-            def communicate(self) -> tuple[bytes, bytes]:   # pylint: disable=missing-docstring
+            def communicate( # pylint: disable=missing-docstring
+                self) -> tuple[bytes, bytes]:
                 return (
                     b'1 in 125 tests failing.\n' +
                     b'All files | 100 | 100 | 100 | 100 | ', b'')
@@ -94,7 +95,8 @@ class RunCustomEslintTestsTests(test_utils.GenericTestBase):
 
     def test_custom_eslint_tests_passed(self) -> None:
         class MockTask:
-            def communicate(self) -> tuple[bytes, bytes]:   # pylint: disable=missing-docstring
+            def communicate( # pylint: disable=missing-docstring
+                self) -> tuple[bytes, bytes]:
                 return (
                     b'All tests passed\n' +
                     b'All files | 100 | 100 | 100 | 100 | ', b'')
@@ -115,7 +117,8 @@ class RunCustomEslintTestsTests(test_utils.GenericTestBase):
 
     def test_incomplete_eslint_coverage_raises_exception(self) -> None:
         class MockTask:
-            def communicate(self) -> tuple[bytes, bytes]:   # pylint: disable=missing-docstring
+            def communicate( # pylint: disable=missing-docstring
+                self) -> tuple[bytes, bytes]:
                 return (
                     b'All tests passed\n' +
                     b'All files | 100 | 98 | 100 | 100 | ', b'')

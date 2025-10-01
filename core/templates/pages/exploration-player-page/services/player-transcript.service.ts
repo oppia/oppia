@@ -110,7 +110,7 @@ export class PlayerTranscriptService {
     });
   }
 
-  addNewResponse(response: string): void {
+  addNewResponse(response: string | null): void {
     let card = this.getLastCard();
     card.setLastOppiaResponse(response);
   }

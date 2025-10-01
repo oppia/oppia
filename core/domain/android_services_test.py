@@ -22,21 +22,22 @@ import logging
 import os
 
 from core import feconf
-from core.domain import android_services
-from core.domain import classroom_config_services
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import skill_fetchers
-from core.domain import story_fetchers
-from core.domain import topic_fetchers
-from core.domain import topic_services
+from core.domain import (
+    android_services,
+    classroom_config_services,
+    exp_fetchers,
+    exp_services,
+    skill_fetchers,
+    story_fetchers,
+    topic_fetchers,
+    topic_services,
+)
 from core.platform import models
 from core.tests import test_utils
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import secrets_services
-    from mypy_imports import translation_models
+    from mypy_imports import secrets_services, translation_models
 
 secrets_services = models.Registry.import_secrets_services()
 
@@ -128,7 +129,8 @@ class InitializeAndroidTestDataTests(test_utils.GenericTestBase):
         new_topic_rights = topic_fetchers.get_topic_rights(
             new_topic.id, strict=True)
         self.assertTrue(new_topic_rights.topic_is_published)
-
+        assert new_topic.last_updated is not None
+        assert old_topic_last_updated is not None
         self.assertGreater(new_topic.last_updated, old_topic_last_updated)
 
     def test_reinitialize_topic_is_published_when_exploration_does_not_exist(

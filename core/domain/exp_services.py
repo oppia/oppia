@@ -34,56 +34,67 @@ import pprint
 import re
 import zipfile
 
-from core import android_validation_constants
-from core import feature_flag_list
-from core import feconf
-from core import utils
+from core import android_validation_constants, feature_flag_list, feconf, utils
 from core.constants import constants
-from core.domain import activity_services
-from core.domain import caching_services
-from core.domain import change_domain
-from core.domain import draft_upgrade_services
-from core.domain import email_manager
-from core.domain import email_subscription_services
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import exp_rights_domain
-from core.domain import feature_flag_services
-from core.domain import feedback_services
-from core.domain import fs_services
-from core.domain import html_cleaner
-from core.domain import html_validation_service
-from core.domain import opportunity_services
-from core.domain import param_domain
-from core.domain import recommendations_services
-from core.domain import rights_domain
-from core.domain import rights_manager
-from core.domain import search_services
-from core.domain import state_domain
-from core.domain import stats_domain
-from core.domain import stats_services
-from core.domain import suggestion_services
-from core.domain import taskqueue_services
-from core.domain import translation_services
-from core.domain import user_domain
-from core.domain import user_services
-from core.domain import voiceover_services
+from core.domain import (
+    activity_services,
+    caching_services,
+    change_domain,
+    draft_upgrade_services,
+    email_manager,
+    email_subscription_services,
+    exp_domain,
+    exp_fetchers,
+    exp_rights_domain,
+    feature_flag_services,
+    feedback_services,
+    fs_services,
+    html_cleaner,
+    html_validation_service,
+    opportunity_services,
+    param_domain,
+    recommendations_services,
+    rights_domain,
+    rights_manager,
+    search_services,
+    state_domain,
+    stats_domain,
+    stats_services,
+    suggestion_services,
+    taskqueue_services,
+    translation_services,
+    user_domain,
+    user_services,
+    voiceover_services,
+)
 from core.platform import models
 from extensions import domain
 
 import deepdiff
 from typing import (
-    Dict, Final, List, Literal, Optional, Sequence, Tuple, Type, TypedDict,
-    Union, cast, overload
+    Dict,
+    Final,
+    List,
+    Literal,
+    Optional,
+    Sequence,
+    Tuple,
+    Type,
+    TypedDict,
+    Union,
+    cast,
+    overload,
 )
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import datastore_services
-    from mypy_imports import exp_models
-    from mypy_imports import stats_models
-    from mypy_imports import user_models
+    from mypy_imports import (
+        base_models,
+        datastore_services,
+        exp_models,
+        stats_models,
+        user_models,
+    )
 
 (base_models, exp_models, stats_models, user_models) = (
     models.Registry.import_models([
@@ -282,19 +293,6 @@ def get_exploration_ids_matching_query(
             '%s retries were needed.' % (query_string, MAX_ITERATIONS))
 
     return (returned_exploration_ids, search_offset)
-
-
-def get_non_private_exploration_summaries(
-) -> Dict[str, exp_domain.ExplorationSummary]:
-    """Returns a dict with all non-private exploration summary domain objects,
-    keyed by their id.
-
-    Returns:
-        dict. The keys are exploration ids and the values are corresponding
-        non-private ExplorationSummary domain objects.
-    """
-    return exp_fetchers.get_exploration_summaries_from_models(
-        exp_models.ExpSummaryModel.get_non_private())
 
 
 def get_top_rated_exploration_summaries(
@@ -1520,11 +1518,13 @@ def delete_explorations(
 
     # Remove from subscribers.
     taskqueue_services.defer(
-        taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS,
+        feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+            'FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS'],
         taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS, exploration_ids)
     # Remove from activities.
     taskqueue_services.defer(
-        taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_ACTIVITIES,
+        feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+            'FUNCTION_ID_DELETE_EXPS_FROM_ACTIVITIES'],
         taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS, exploration_ids)
 
 
@@ -2025,7 +2025,7 @@ def compute_models_to_put_when_saving_new_exp_version(
 
     if (
         voiceover_changes and
-        not does_exploration_support_voiceovers(exploration_id)
+        not does_exploration_support_voiceovers(exploration_id, committer_id)
     ):
         raise utils.ValidationError(
             'Voiceover additions are not allowed for this exploration.')
@@ -2138,6 +2138,7 @@ def compute_models_to_put_when_saving_new_exp_version(
             exp_summary_model, exp_summary
         )
     )
+
     models_to_put.append(updated_exp_summary_model)
     return models_to_put
 
@@ -3916,11 +3917,12 @@ def rollback_exploration_to_safe_state(exp_id: str) -> int:
     return last_known_safe_version
 
 
-def does_exploration_support_voiceovers(exploration_id: str) -> bool:
+def does_exploration_support_voiceovers(exploration_id: str, committer_id: str) -> bool:
     """Checks if voiceover is allowed for the given exploration.
 
     Args:
         exploration_id: str. The ID of the exploration.
+        committer_id: str. The ID of the given committer.
 
     Returns:
         bool. Whether voiceover is allowed for the given exploration.
@@ -3931,5 +3933,5 @@ def does_exploration_support_voiceovers(exploration_id: str) -> bool:
         return feature_flag_services.is_feature_flag_enabled(
             feature_flag_list.FeatureNames.
             SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS.value,
-            None
+            committer_id
         )

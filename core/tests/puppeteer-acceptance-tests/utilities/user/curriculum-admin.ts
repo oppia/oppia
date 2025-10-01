@@ -16,9 +16,11 @@
  * @fileoverview Curriculum Admin users utility file.
  */
 
-import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
+import {TopicManager} from './topic-manager';
+import puppeteer from 'puppeteer';
+import {ElementHandle} from 'puppeteer';
 
 const curriculumAdminThumbnailImage =
   testConstants.data.curriculumAdminThumbnailImage;
@@ -28,11 +30,7 @@ const topicAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
 const baseURL = testConstants.URLs.BaseURL;
 
 const richTextAreaField = 'div.e2e-test-rte';
-const floatTextField = '.e2e-test-rule-details .e2e-test-float-form-input';
-const solutionFloatTextField =
-  'oppia-add-or-update-solution-modal .e2e-test-float-form-input';
-const textStateEditSelector = 'div.e2e-test-state-edit-content';
-const saveContentButton = 'button.e2e-test-save-state-content';
+const richTextParagraphTag = 'div.e2e-test-rte p';
 
 const modalDiv = 'div.modal-content';
 const closeSaveModalButton = '.e2e-test-close-save-modal-button';
@@ -42,35 +40,10 @@ const subtopicPhotoBoxButton =
   '.e2e-test-subtopic-thumbnail .e2e-test-photo-button';
 const uploadPhotoButton = 'button.e2e-test-photo-upload-submit';
 const photoUploadModal = 'edit-thumbnail-modal';
-
-const createQuestionButton = 'div.e2e-test-create-question';
 const removeQuestionConfirmationButton =
   '.e2e-test-remove-question-confirmation-button';
-const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
-const interactionNumberInputButton =
-  'div.e2e-test-interaction-tile-NumericInput';
-const interactionNameDiv = 'div.oppia-interaction-tile-name';
-const saveInteractionButton = 'button.e2e-test-save-interaction';
-const responseRuleDropdown =
-  'oppia-rule-type-selector.e2e-test-answer-description';
-const equalsRuleButtonText = 'is equal to ... ';
-const answersInGroupAreCorrectToggle =
-  'input.e2e-test-editor-correctness-toggle';
-const saveResponseButton = 'button.e2e-test-add-new-response';
-const defaultFeedbackTab = 'a.e2e-test-default-response-tab';
-const openOutcomeFeedBackEditor = 'div.e2e-test-open-outcome-feedback-editor';
-const saveOutcomeFeedbackButton = 'button.e2e-test-save-outcome-feedback';
-const openAnswerGroupFeedBackEditor = 'i.e2e-test-open-feedback-editor';
-const addHintButton = 'button.e2e-test-oppia-add-hint-button';
-const saveHintButton = 'button.e2e-test-save-hint';
-const addSolutionButton = 'button.e2e-test-oppia-add-solution-button';
-const answerTypeDropdown = 'select.e2e-test-answer-is-exclusive-select';
-const submitAnswerButton = 'button.e2e-test-submit-answer-button';
-const submitSolutionButton = 'button.e2e-test-submit-solution-button';
-const saveQuestionButton = 'button.e2e-test-save-question-button';
 
 const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
-const dropdownToggleIcon = '.e2e-test-mobile-options-dropdown';
 
 const topicsTab = 'a.e2e-test-topics-tab';
 const desktopTopicSelector = 'a.e2e-test-topic-name';
@@ -82,7 +55,6 @@ const topicDescriptionField = 'textarea.e2e-test-new-topic-description-field';
 const createTopicButton = 'button.e2e-test-confirm-topic-creation-button';
 const saveTopicButton = 'button.e2e-test-save-topic-button';
 const topicMetaTagInput = '.e2e-test-topic-meta-tag-content-field';
-const publishTopicButton = 'button.e2e-test-publish-topic-button';
 const unpublishTopicButton = 'button.e2e-test-unpublish-topic-button';
 const mobileUnpublishTopicButton = '.e2e-test-mobile-unpublish-topic-button';
 const mobileNavbarDropdownOptions =
@@ -96,7 +68,7 @@ const mobileDeleteTopicButton = '.e2e-test-mobile-delete-topic-button';
 const confirmTopicDeletionButton = '.e2e-test-confirm-topic-deletion-button';
 
 const addSubtopicButton = 'button.e2e-test-add-subtopic-button';
-const subtopicTitleField = 'input.e2e-test-new-subtopic-title-field';
+const subtopicTitleField = 'input.e2e-test-subtopic-title-field';
 const subtopicStudyGuideHeadingField =
   '.e2e-test-new-subtopic-study-guide-section-heading-field';
 const subtopicStudyGuideContentField =
@@ -171,6 +143,9 @@ const confirmDeletionButton =
   'button.e2e-test-really-delete-exploration-button';
 
 const mobileOptionsSelector = '.e2e-test-mobile-options-base';
+const mobileNavbarDropdown =
+  'div.navbar-mobile-options .e2e-test-mobile-navbar-dropdown';
+const topicMobilePreviewTab = '.e2e-test-mobile-preview-tab';
 const mobileTopicSelector = 'div.e2e-test-mobile-topic-name a';
 const mobileSkillSelector = 'span.e2e-test-mobile-skill-name';
 
@@ -178,8 +153,6 @@ const mobileSaveTopicDropdown =
   'div.navbar-mobile-options .e2e-test-mobile-save-topic-dropdown';
 const mobileSaveTopicButton =
   'div.navbar-mobile-options .e2e-test-mobile-save-topic-button';
-const mobilePublishTopicButton =
-  'div.navbar-mobile-options .e2e-test-mobile-publish-topic-button';
 
 const mobileNavToggleButton = '.e2e-test-mobile-options';
 const mobileOptionsDropdown = '.e2e-test-mobile-options-dropdown';
@@ -194,6 +167,8 @@ const newClassroomUrlFragmentInputField =
   '.e2e-test-new-classroom-url-fragment';
 const saveNewClassroomButton = '.e2e-test-create-new-classroom';
 const classroomTileSelector = '.e2e-test-classroom-tile';
+const classroomTileContainerSelector = '.e2e-test-classroom-tile-container';
+const classroomDetailsSelector = '.e2e-test-classroom-details';
 
 const editClassroomConfigButton = '.e2e-test-edit-classroom-config-button';
 const closeClassroomConfigButton = '.e2e-cancel-classroom-changes';
@@ -201,6 +176,7 @@ const editClassroomCourseDetailsInputField =
   '.e2e-test-update-classroom-course-details';
 const editClassroomTeaserTextInputField =
   '.e2e-test-update-classroom-teaser-text';
+const editClassroomUrlFragmentInputField = '.e2e-update-classroom-url-fragment';
 const editClassroomTopicListIntroInputField =
   '.e2e-test-update-classroom-topic-list-intro';
 const classroomThumbnailContainer = '.e2e-test-classroom-thumbnail-container';
@@ -211,6 +187,8 @@ const topicDropDownFormField = '.e2e-test-classroom-category-dropdown';
 const topicSelector = '.e2e-test-classroom-topic-selector-choice';
 const publishClassroomButton =
   '.e2e-test-toggle-classroom-publication-status-btn';
+const enableDiagnosticTestButton =
+  '.e2e-test-toggle-diagnostic-test-status-btn';
 const saveClassroomButton = '.e2e-test-save-classroom-config-button';
 const classroomTileNameSpan = '.e2e-test-classroom-tile-name';
 const deleteClassroomButton = '.e2e-test-delete-classroom-button';
@@ -259,8 +237,329 @@ const saveRubricExplanationButton = '.e2e-test-save-rubric-explanation-button';
 const saveOrPublishSkillSelector = '.e2e-test-save-or-publish-skill';
 const commitMessageInputSelector = '.e2e-test-commit-message-input';
 const closeSaveModalButtonSelector = '.e2e-test-close-save-modal-button';
+const settingsContainerSelector =
+  '.oppia-editor-card.oppia-settings-card-container';
+const deleteButtonSelector = 'button.oppia-delete-button';
+const navigationDropdownInMobileVisibleSelector =
+  '.oppia-exploration-editor-tabs-dropdown.show';
 
-export class CurriculumAdmin extends BaseUser {
+const insertWorkedExampleButton = '.cke_button__oppiaworkedexample';
+const editWorkedExampleModalQuestionRte =
+  '.e2e-test-arg-editor-inner-0 .e2e-test-rte';
+const editWorkedExampleModalAnswerRte =
+  '.e2e-test-arg-editor-inner-1 .e2e-test-rte';
+const rteComponentSaveButton = '.e2e-test-close-rich-text-component-editor';
+const topicPreviewTab = '.e2e-test-topic-preview-tab';
+const expandWorkedExampleButton = '.e2e-test-expand-workedexample';
+const subtopicExpandHeaderSelector = '.e2e-test-show-subtopics-list';
+const practiceTabToggle = '.e2e-test-toggle-practice-tab';
+
+const createNewSkillButton = '.e2e-test-create-skill-button';
+const createSkillButton = '.e2e-test-confirm-skill-creation-button';
+const editConceptCard = '.e2e-test-edit-concept-card';
+const moreThanTwoWorkedExamplesError = '.e2e-test-more-than-2-workedexamples';
+const saveReviewMaterialButton = '.e2e-test-save-concept-card';
+const publishSkillButton = '.e2e-test-publish-skill-changes-button';
+const skillPreviewTabButton = '.e2e-test-question-preview-tab';
+const toggleSkillEditOptionsButton =
+  'div.e2e-test-mobile-toggle-skill-nav-dropdown-icon';
+const mobileSaveSkillButton = '.e2e-test-mobile-save-skill-changes';
+const mobilePreviewTab = '.e2e-test-mobile-preview-tab';
+const navigationDropdown = '.e2e-test-mobile-skill-nav-dropdown-icon';
+const addNewSkillButton = '.e2e-test-create-skill-button-circle';
+const createNewSkillMobileButton =
+  '.e2e-test-mobile-create-skill-button-secondary';
+const toggleSkillRubricsDropdown = '.e2e-test-toggle-rubrics-dropdown';
+const navigationContainerSelector = '.e2e-test-mobile-navigation-bar-container';
+const toggleRubricsDropdownSelector = '.e2e-test-toggle-rubrics-dropdown';
+const mobileSaveOrPublishSkillSelector = '.e2e-test-mobile-save-skill-changes';
+const mobileSkillNavToggle =
+  'div.e2e-test-mobile-toggle-skill-nav-dropdown-icon';
+
+const createNewSkillButtonInSkillDashboardSelector =
+  '.e2e-test-create-skill-button-circle';
+const classroomNameSelector = '.e2e-test-classroom-name-view';
+const classroomURLSelector = '.e2e-test-classroom-url-view';
+const classroomTeaserSelector = '.e2e-test-classroom-teaser-view';
+const classroomTopicListIntroSelector =
+  '.e2e-test-classroom-topic-list-intro-view';
+const classroomCourseDetailsSelector =
+  '.e2e-test-classroom-course-details-view';
+
+const classroomTopicBoxSelector = '.e2e-test-classroom-topic-box';
+const classroomTopicNameSelector = '.e2e-test-classroom-topic-name';
+const movableClassroomTileSelector = '.e2e-test-movable-classroom-tile';
+const matFormFieldSelector = 'mat-form-field';
+const topicPrerequisitesContainerSelector =
+  '.e2e-test-topic-prerquisites-container';
+const mobilePublishTopicButton =
+  'div.navbar-mobile-options .e2e-test-mobile-publish-topic-button';
+const publishTopicButton = 'button.e2e-test-publish-topic-button';
+const topicEditorMainTabFormSelector = '.e2e-test-topic-editor-main-tab';
+const oldTopicNameField = '.e2e-test-topic-name-field';
+
+const floatTextField = '.e2e-test-rule-details .e2e-test-float-form-input';
+const solutionFloatTextField =
+  'oppia-add-or-update-solution-modal .e2e-test-float-form-input';
+const textStateEditSelector = 'div.e2e-test-state-edit-content';
+const saveContentButton = 'button.e2e-test-save-state-content';
+const createQuestionButton = 'div.e2e-test-create-question';
+const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
+const interactionNumberInputButton =
+  'div.e2e-test-interaction-tile-NumericInput';
+const interactionNameDiv = 'div.oppia-interaction-tile-name';
+const saveInteractionButton = 'button.e2e-test-save-interaction';
+const responseRuleDropdown =
+  'oppia-rule-type-selector.e2e-test-answer-description';
+const equalsRuleButtonText = 'is equal to ... ';
+const answersInGroupAreCorrectToggle =
+  'input.e2e-test-editor-correctness-toggle';
+const saveResponseButton = 'button.e2e-test-add-new-response';
+const defaultFeedbackTab = 'a.e2e-test-default-response-tab';
+const openOutcomeFeedBackEditor = 'div.e2e-test-open-outcome-feedback-editor';
+const saveOutcomeFeedbackButton = 'button.e2e-test-save-outcome-feedback';
+const openAnswerGroupFeedBackEditor = 'i.e2e-test-open-feedback-editor';
+const addHintButton = 'button.e2e-test-oppia-add-hint-button';
+const saveHintButton = 'button.e2e-test-save-hint';
+const addSolutionButton = 'button.e2e-test-oppia-add-solution-button';
+const answerTypeDropdown = 'select.e2e-test-answer-is-exclusive-select';
+const submitAnswerButton = 'button.e2e-test-submit-answer-button';
+const submitSolutionButton = 'button.e2e-test-submit-solution-button';
+const saveQuestionButton = 'button.e2e-test-save-question-button';
+
+export class CurriculumAdmin extends TopicManager {
+  /**
+   * Moves the classrooms in the order of the given classroom names.
+   * @param classroomNames The names of the classrooms to move.
+   */
+  async moveClassroomInOrder(classroomNames: string[]): Promise<void> {
+    await this.expectElementToBeVisible(movableClassroomTileSelector);
+    let requiredIndex = 0;
+
+    for (const classroomName of classroomNames) {
+      const classroomElementTexts = await this.page.$$eval(
+        movableClassroomTileSelector,
+        elements => elements.map(element => element.textContent?.trim())
+      );
+
+      let currentIndex = classroomElementTexts.indexOf(classroomName);
+      if (currentIndex === requiredIndex) {
+        requiredIndex += 1;
+        continue;
+      }
+
+      const classroomElements = await this.page.$$(
+        movableClassroomTileSelector
+      );
+      const sourceElement = classroomElements[currentIndex];
+      const targetElement = classroomElements[requiredIndex];
+
+      const sourceBoundingBox = await sourceElement.boundingBox();
+      const targetBoundingBox = await targetElement.boundingBox();
+
+      if (!sourceBoundingBox || !targetBoundingBox) {
+        throw new Error('Could not get bounding box for classroom elements');
+      }
+
+      const sourceCenter = {
+        x: sourceBoundingBox.x + sourceBoundingBox.width / 2,
+        y: sourceBoundingBox.y + sourceBoundingBox.height / 2,
+      };
+
+      const targetCenter = {
+        x: targetBoundingBox.x + targetBoundingBox.width / 2,
+        y: targetBoundingBox.y + targetBoundingBox.height / 2,
+      };
+
+      await this.page.mouse.move(sourceCenter.x, sourceCenter.y);
+      await this.page.mouse.down();
+      await this.page.mouse.move(targetCenter.x, targetCenter.y, {steps: 10});
+      await this.page.mouse.up();
+
+      requiredIndex += 1;
+    }
+
+    const classroomTexts = await this.page.$$eval(
+      movableClassroomTileSelector,
+      elements => elements.map(element => element.textContent?.trim())
+    );
+    expect(classroomTexts).toEqual(classroomNames);
+  }
+
+  /**
+   * Checks if the classrooms are in the correct order.
+   * @param classroomNames The names of the classrooms.
+   */
+  async expectClassroomsInOrder(classroomNames: string[]): Promise<void> {
+    await this.page.waitForFunction(
+      (selector: string, orderedClassroom: string[]) => {
+        const classroomTileNameSpans = document.querySelectorAll(selector);
+        if (classroomTileNameSpans.length !== orderedClassroom.length) {
+          return false;
+        }
+        for (let i = 0; i < classroomTileNameSpans.length; i++) {
+          if (
+            classroomTileNameSpans[i].textContent?.trim() !==
+            orderedClassroom[i]
+          ) {
+            return false;
+          }
+        }
+        return true;
+      },
+      {},
+      classroomTileNameSpan,
+      classroomNames
+    );
+  }
+
+  /**
+   * Checks if the classroom contains a topic with the given name.
+   * @param topicName The name of the topic to check for.
+   * @returns The element handle of the topic box if it exists.
+   */
+  async expectClassroomToContainTopic(
+    topicName: string
+  ): Promise<ElementHandle<Element>> {
+    await this.page.waitForSelector(classroomTopicBoxSelector);
+
+    const topicBoxElements = await this.page.$$(classroomTopicBoxSelector);
+    let topicBoxElement: ElementHandle<Element> | null = null;
+
+    for (const element of topicBoxElements) {
+      const topicBoxElementText = await element.$eval(
+        classroomTopicNameSelector,
+        element => element.textContent?.trim()
+      );
+      if (topicBoxElementText === topicName) {
+        topicBoxElement = element;
+        break;
+      }
+    }
+
+    if (!topicBoxElement) {
+      throw new Error(`Topic ${topicName} not found in classroom.`);
+    }
+
+    return topicBoxElement;
+  }
+
+  /**
+   * Opens the classroom details page for the given classroom.
+   * @param classroomName The name of the classroom to open.
+   */
+  async openClassroomDetails(classroomName: string): Promise<void> {
+    const classroomTileContainerElement =
+      await this.expectClassroomToBeVisible(classroomName);
+
+    try {
+      await classroomTileContainerElement.waitForSelector(
+        classroomDetailsSelector,
+        {
+          hidden: true,
+          timeout: 5000,
+        }
+      );
+    } catch (error) {
+      if (error instanceof puppeteer.errors.TimeoutError) {
+        showMessage('Classroom details are already visible.');
+        return;
+      }
+
+      throw error;
+    }
+
+    const classroomTileElement =
+      await classroomTileContainerElement.waitForSelector(
+        classroomTileSelector
+      );
+
+    if (!classroomTileElement) {
+      throw new Error('Classroom tile not found.');
+    }
+
+    await this.expectElementToBeClickable(classroomTileElement);
+    await classroomTileElement.click();
+
+    await classroomTileContainerElement.waitForSelector(
+      classroomDetailsSelector,
+      {
+        visible: true,
+        timeout: 10000,
+      }
+    );
+  }
+  /**
+   * Checks if the classroom details are as expected.
+   * @param {string} classroomName - The name of the classroom.
+   * @param {string} classroomURL - The URL of the classroom.
+   * @param {string} classroomTeaser - The teaser of the classroom.
+   * @param {string} classroomTopicListIntro - The topic list intro of the classroom.
+   * @param {string} classroomCourseDetails - The course details of the classroom.
+   */
+  async expectClassroomDetailsToBe(
+    classroomName: string,
+    classroomURL: string,
+    classroomTeaser: string,
+    classroomTopicListIntro: string,
+    classroomCourseDetails: string
+  ): Promise<void> {
+    await this.openClassroomDetails(classroomName);
+
+    await this.expectTextContentToBe(classroomNameSelector, classroomName);
+    await this.expectTextContentToBe(classroomURLSelector, classroomURL);
+    await this.expectTextContentToBe(classroomTeaserSelector, classroomTeaser);
+    await this.expectTextContentToBe(
+      classroomTopicListIntroSelector,
+      classroomTopicListIntro
+    );
+    await this.expectTextContentToBe(
+      classroomCourseDetailsSelector,
+      classroomCourseDetails
+    );
+  }
+
+  /**
+   * Checks if the classroom tile is visible.
+   * @param classroomName The name of the classroom.
+   */
+  async expectClassroomToBeVisible(
+    classroomName: string
+  ): Promise<ElementHandle<Element>> {
+    await this.expectElementToBeVisible(classroomTileContainerSelector);
+    const classroomTileElements = await this.page.$$(
+      classroomTileContainerSelector
+    );
+
+    let classroomTileElement: ElementHandle<Element> | null = null;
+    for (const element of classroomTileElements) {
+      if (
+        await element.evaluate((el, classroomName: string) => {
+          const spanElement = el.querySelector('span');
+          return (
+            spanElement && spanElement.textContent?.trim() === classroomName
+          );
+        }, classroomName)
+      ) {
+        classroomTileElement = element;
+        break;
+      }
+    }
+
+    if (!classroomTileElement) {
+      const foundClassrooms = await Promise.all(
+        classroomTileElements.map(el =>
+          el.evaluate(htmlEl => htmlEl?.textContent?.trim())
+        )
+      );
+      throw new Error(
+        `Classroom ${classroomName} not found.\nFound: ${foundClassrooms.join(', ')}`
+      );
+    }
+
+    return classroomTileElement;
+  }
+
   /**
    * Navigate to the topic and skills dashboard page.
    */
@@ -271,30 +570,91 @@ export class CurriculumAdmin extends BaseUser {
   }
 
   /**
+   * Fills the skill info and submits the form.
+   * @param skillName The name of the skill.
+   * @param reviewMaterial The review material text content.
+   * @param addWorkedExample Whether to add a worked example.
+   */
+  async fillSkillInfoAndSubmit(
+    skillName: string,
+    reviewMaterial: string,
+    addWorkedExample: boolean = false
+  ): Promise<void> {
+    await this.typeInInputField(skillDescriptionField, skillName);
+    await this.page.waitForSelector(skillReviewMaterialHeader);
+    await this.clickOn(skillReviewMaterialHeader);
+    await this.clickOn(richTextAreaField);
+    await this.typeInInputField(richTextAreaField, reviewMaterial);
+    if (addWorkedExample) {
+      await this.clickOn(insertWorkedExampleButton);
+      await this.page.waitForSelector(editWorkedExampleModalQuestionRte, {
+        visible: true,
+      });
+      await this.clearAllTextFrom(editWorkedExampleModalQuestionRte);
+      await this.typeInInputField(
+        editWorkedExampleModalQuestionRte,
+        'Type the number one'
+      );
+      await this.page.waitForSelector(editWorkedExampleModalAnswerRte, {
+        visible: true,
+      });
+      await this.clearAllTextFrom(editWorkedExampleModalAnswerRte);
+      await this.waitForElementToStabilize(editWorkedExampleModalAnswerRte);
+      await this.typeInInputField(editWorkedExampleModalAnswerRte, '1');
+      await this.clickOn(rteComponentSaveButton);
+    }
+    await this.page.waitForSelector(
+      `${confirmSkillCreationButton}:not([disabled])`
+    );
+    await this.clickOn(confirmSkillCreationButton);
+    await this.waitForNetworkIdle();
+    await this.page.waitForSelector(confirmSkillCreationButton, {
+      hidden: true,
+    });
+    await this.page.bringToFront();
+  }
+
+  /**
+   * Fill the skill details in the new skill modal and save.
+   * @param {string} description - The description of the skill.
+   * @param {string} reviewMaterial - The review material for the skill.
+   */
+  async fillSkillDetailsInNewSkillModal(
+    description: string,
+    reviewMaterial: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(skillDescriptionField);
+    await this.typeInInputField(skillDescriptionField, description);
+    await this.page.waitForSelector(skillReviewMaterialHeader);
+    await this.clickOn(skillReviewMaterialHeader);
+    await this.clickOn(richTextAreaField);
+    await this.typeInInputField(richTextAreaField, reviewMaterial);
+  }
+
+  /**
    * Create a skill for a particular topic.
+   * @param {string} description - The description of the skill to be created.
+   * @param {string} topicName - The name of the topic for which the skill is
+   * to be created.
+   * @param {boolean} addWorkedExample - True if the skill should have a
+   * WorkedExample, false otherwise.
    */
   async createSkillForTopic(
     description: string,
-    topicName: string
+    topicName: string,
+    addWorkedExample: boolean = false
   ): Promise<void> {
     await this.openTopicEditor(topicName);
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(subtopicReassignHeader);
     }
+    await this.page.waitForSelector(addSkillButton);
     await this.clickOn(addSkillButton);
-    await this.type(skillDescriptionField, description);
-    await this.page.waitForSelector(skillReviewMaterialHeader);
-    await this.clickOn(skillReviewMaterialHeader);
-    await this.clickOn(richTextAreaField);
-    await this.type(
-      richTextAreaField,
-      `Review material text content for ${description}.`
+    await this.fillSkillInfoAndSubmit(
+      description,
+      `Review material text content for ${description}.`,
+      addWorkedExample
     );
-    await this.page.waitForSelector(
-      `${confirmSkillCreationButton}:not([disabled])`
-    );
-    await this.clickOn(confirmSkillCreationButton);
-    await this.page.bringToFront();
   }
 
   /**
@@ -307,6 +667,9 @@ export class CurriculumAdmin extends BaseUser {
       : desktopSkillQuestionTab;
 
     if (isMobileWidth) {
+      await this.page.waitForFunction(() =>
+        window.location.href.includes('skill_editor')
+      );
       const currentUrl = new URL(this.page.url());
       const hashParts = currentUrl.hash.split('/');
 
@@ -319,6 +682,7 @@ export class CurriculumAdmin extends BaseUser {
       await this.goto(currentUrl.toString());
       await this.page.reload({waitUntil: 'networkidle0'});
     } else {
+      await this.page.waitForSelector(skillQuestionTab, {visible: true});
       await this.clickAndWaitForNavigation(skillQuestionTab);
     }
   }
@@ -343,7 +707,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOn(createQuestionButton);
     await this.clickOn(textStateEditSelector);
     await this.page.waitForSelector(richTextAreaField, {visible: true});
-    await this.type(richTextAreaField, 'Add 1+2');
+    await this.typeInInputField(richTextAreaField, 'Add 1+2');
     await this.page.waitForSelector(`${saveContentButton}:not([disabled])`);
     await this.clickOn(saveContentButton);
 
@@ -365,28 +729,29 @@ export class CurriculumAdmin extends BaseUser {
       }
     }, interactionNameDiv);
 
+    await this.waitForElementToStabilize(saveInteractionButton);
     await this.clickOn(saveInteractionButton);
     await this.page.waitForSelector('oppia-add-answer-group-modal-component', {
       visible: true,
     });
     await this.clickOn(responseRuleDropdown);
     await this.clickOn(equalsRuleButtonText);
-    await this.type(floatTextField, '3');
+    await this.typeInInputField(floatTextField, '3');
     await this.clickOn(answersInGroupAreCorrectToggle);
     await this.clickOn(openAnswerGroupFeedBackEditor);
-    await this.type(richTextAreaField, 'Good job!');
+    await this.typeInInputField(richTextAreaField, 'Good job!');
     await this.clickOn(saveResponseButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
 
     await this.clickOn(defaultFeedbackTab);
     await this.clickOn(openOutcomeFeedBackEditor);
     await this.clickOn(richTextAreaField);
-    await this.type(richTextAreaField, 'The answer is 3');
+    await this.typeInInputField(richTextAreaField, 'The answer is 3');
     await this.clickOn(saveOutcomeFeedbackButton);
 
     await this.clickOn(addHintButton);
     await this.page.waitForSelector(modalDiv, {visible: true});
-    await this.type(richTextAreaField, '3');
+    await this.typeInInputField(richTextAreaField, '3');
     await this.clickOn(saveHintButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
 
@@ -395,15 +760,18 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(answerTypeDropdown);
     await this.page.select(answerTypeDropdown, 'The only');
     await this.page.waitForSelector(solutionFloatTextField);
-    await this.type(solutionFloatTextField, '3');
+    await this.typeInInputField(solutionFloatTextField, '3');
     await this.page.waitForSelector(`${submitAnswerButton}:not([disabled])`);
     await this.clickOn(submitAnswerButton);
-    await this.type(richTextAreaField, '1+2 is 3');
+    await this.typeInInputField(richTextAreaField, '1+2 is 3');
     await this.page.waitForSelector(`${submitSolutionButton}:not([disabled])`);
     await this.clickOn(submitSolutionButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
 
     await this.clickOn(saveQuestionButton);
+
+    await this.waitForNetworkIdle();
+    await this.page.waitForSelector(modalDiv, {hidden: true});
   }
 
   /**
@@ -419,13 +787,13 @@ export class CurriculumAdmin extends BaseUser {
       await this.clickOn(createNewTopicMobileButton);
     }
 
-    await this.type(topicNameField, name);
+    await this.typeInInputField(topicNameField, name);
     await this.page.waitForSelector(topicUrlFragmentField, {
       visible: true,
     });
-    await this.type(topicUrlFragmentField, urlFragment);
-    await this.type(topicWebFragmentField, name);
-    await this.type(
+    await this.typeInInputField(topicUrlFragmentField, urlFragment);
+    await this.typeInInputField(topicWebFragmentField, name);
+    await this.typeInInputField(
       topicDescriptionField,
       `Topic creation description test for ${name}.`
     );
@@ -484,6 +852,8 @@ export class CurriculumAdmin extends BaseUser {
       ),
       this.page.waitForNavigation(),
     ]);
+
+    expect(this.page.url()).toContain('/topic_editor/');
   }
 
   /**
@@ -518,6 +888,8 @@ export class CurriculumAdmin extends BaseUser {
       ),
       this.page.waitForNavigation(),
     ]);
+
+    expect(this.page.url()).toContain('/skill_editor/');
   }
 
   /**
@@ -532,7 +904,7 @@ export class CurriculumAdmin extends BaseUser {
       await this.page.waitForSelector('oppia-topic-editor-save-modal', {
         visible: true,
       });
-      await this.type(
+      await this.typeInInputField(
         saveChangesMessageInput,
         'Test saving topic as curriculum admin.'
       );
@@ -548,7 +920,7 @@ export class CurriculumAdmin extends BaseUser {
       await this.clickOn(saveTopicButton);
 
       await this.page.waitForSelector(modalDiv, {visible: true});
-      await this.type(
+      await this.typeInInputField(
         saveChangesMessageInput,
         'Test saving topic as curriculum admin.'
       );
@@ -562,67 +934,29 @@ export class CurriculumAdmin extends BaseUser {
   }
 
   /**
-   * Create a subtopic as a curriculum admin.
-   * @param {string} title - The title of the Subtopic.
-   * @param {string} urlFragment - The url fragment of the Subtopic.
-   * @param {string} topicName - The name of the Topic which storing the new Subtopic.
-   */
-  async createSubtopicForTopic(
-    title: string,
-    urlFragment: string,
-    topicName: string
-  ): Promise<void> {
-    await this.openTopicEditor(topicName);
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(subtopicReassignHeader);
-    }
-    await this.clickOn(addSubtopicButton);
-    await this.type(subtopicTitleField, title);
-    await this.page.waitForSelector(subtopicUrlFragmentField, {
-      visible: true,
-    });
-    await this.page.type(subtopicUrlFragmentField, urlFragment);
-
-    await this.clickOn(subtopicDescriptionEditorToggle);
-    await this.page.waitForSelector(richTextAreaField, {visible: true});
-    await this.type(
-      richTextAreaField,
-      `Subtopic creation description text for ${title}`
-    );
-
-    await this.clickOn(subtopicPhotoBoxButton);
-    await this.page.waitForSelector(photoUploadModal, {visible: true});
-    await this.uploadFile(curriculumAdminThumbnailImage);
-    await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
-    await this.clickOn(uploadPhotoButton);
-
-    await this.page.waitForSelector(photoUploadModal, {hidden: true});
-    await this.clickOn(createSubtopicButton);
-    await this.saveTopicDraft(topicName);
-    showMessage(`Subtopic ${title} is created.`);
-  }
-
-  /**
    * Create a subtopic with study guides as a curriculum admin.
    * @param {string} title - The title of the Subtopic.
    * @param {string} urlFragment - The url fragment of the Subtopic.
    * @param {string} heading - The heading of the initial Subtopic Study Guide Section.
    * @param {string} content - The content of the initial Subtopic Study Guide Section.
    * @param {string} topicName - The name of the Topic which storing the new Subtopic.
+   * @param {boolean} addWorkedExample - True if the study guide should have a WorkedExample,
+   * false otherwise.
    */
   async createSubtopicWithStudyGuideForTopic(
     title: string,
     urlFragment: string,
     heading: string,
     content: string,
-    topicName: string
+    topicName: string,
+    addWorkedExample: boolean = false
   ): Promise<void> {
     await this.openTopicEditor(topicName);
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(subtopicReassignHeader);
     }
     await this.clickOn(addSubtopicButton);
-    await this.type(subtopicTitleField, title);
+    await this.typeInInputField(subtopicTitleField, title);
     await this.page.waitForSelector(subtopicUrlFragmentField, {
       visible: true,
     });
@@ -631,7 +965,24 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.type(subtopicStudyGuideHeadingField, heading);
     await this.clickOn(subtopicStudyGuideContentField);
     await this.page.waitForSelector(richTextAreaField, {visible: true});
-    await this.type(richTextAreaField, content);
+    await this.typeInInputField(richTextAreaField, content);
+    if (addWorkedExample) {
+      await this.clickOn(insertWorkedExampleButton);
+      await this.page.waitForSelector(editWorkedExampleModalQuestionRte, {
+        visible: true,
+      });
+      await this.clearAllTextFrom(editWorkedExampleModalQuestionRte);
+      await this.typeInInputField(
+        editWorkedExampleModalQuestionRte,
+        'Type the number one'
+      );
+      await this.page.waitForSelector(editWorkedExampleModalAnswerRte, {
+        visible: true,
+      });
+      await this.clearAllTextFrom(editWorkedExampleModalAnswerRte);
+      await this.typeInInputField(editWorkedExampleModalAnswerRte, '1');
+      await this.clickOn(rteComponentSaveButton);
+    }
 
     await this.clickOn(subtopicPhotoBoxButton);
     await this.page.waitForSelector(photoUploadModal, {visible: true});
@@ -665,10 +1016,13 @@ export class CurriculumAdmin extends BaseUser {
     currentNumberOfSections: number
   ): Promise<void> {
     await this.clickOn(addStudyGuideSectionButton);
-    await this.type(addStudyGuideSectionModalHeading, sectionHeading);
+    await this.typeInInputField(
+      addStudyGuideSectionModalHeading,
+      sectionHeading
+    );
     await this.clickOn(addStudyGuideSectionModalContent);
     await this.page.waitForSelector(richTextAreaField, {visible: true});
-    await this.type(richTextAreaField, sectionContent);
+    await this.typeInInputField(richTextAreaField, sectionContent);
     await this.clickOn(addStudyGuideSectionModalSaveButton);
     if (this.isViewportAtMobileWidth()) {
       await this.scrollToBottomOfPage();
@@ -682,6 +1036,136 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(deleteStudyGuideSectionButton, {
       visible: true,
     });
+  }
+
+  /**
+   * Add a section with a WorkedExample to the subtopic study guide. Make sure you are
+   * on the subtopic editor tab for this to work.
+   * @param {string} sectionHeading - The heading of the Section to be added.
+   * @param {string} sectionContent - The content of the Section to be added.
+   * @param {number} currentNumberOfSections - The number of the Sections currently in the Study Guide.
+   * @param {string} WorkedExampleQuestion - The WorkedExample question.
+   * @param {string} WorkedExampleAnswer - The WorkedExample answer.
+   */
+  async addSubtopicStudyGuideSectionWithWorkedExample(
+    sectionHeading: string,
+    sectionContent: string,
+    currentNumberOfSections: number,
+    WorkedExampleQuestion: string,
+    WorkedExampleAnswer: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(addStudyGuideSectionButton);
+    await this.clickOn(addStudyGuideSectionButton);
+    await this.typeInInputField(
+      addStudyGuideSectionModalHeading,
+      sectionHeading
+    );
+    await this.clickOn(addStudyGuideSectionModalContent);
+    await this.page.waitForSelector(richTextAreaField, {visible: true});
+    await this.typeInInputField(richTextAreaField, sectionContent);
+    await this.clickOn(insertWorkedExampleButton);
+    await this.page.waitForSelector(editWorkedExampleModalQuestionRte, {
+      visible: true,
+    });
+    await this.typeInInputField(
+      editWorkedExampleModalQuestionRte,
+      WorkedExampleQuestion
+    );
+    await this.page.waitForSelector(editWorkedExampleModalAnswerRte, {
+      visible: true,
+    });
+    await this.typeInInputField(
+      editWorkedExampleModalAnswerRte,
+      WorkedExampleAnswer
+    );
+    await this.clickOn(rteComponentSaveButton);
+    await this.clickOn(addStudyGuideSectionModalSaveButton);
+    if (this.isViewportAtMobileWidth()) {
+      await this.scrollToBottomOfPage();
+    }
+    await this.page.waitForSelector(
+      `.e2e-test-study-guide-section-${currentNumberOfSections}`,
+      {
+        visible: true,
+      }
+    );
+    await this.page.waitForSelector(deleteStudyGuideSectionButton, {
+      visible: true,
+    });
+  }
+
+  /**
+   * Navigates to the study guide Previews tab.
+   */
+  async previewStudyGuide(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeVisible(showSubtopicsList);
+      await this.clickOn(showSubtopicsList);
+      await this.clickOn(firstSubtopicTile);
+      await this.clickOn(mobileOptionsSelector);
+      await this.clickOn(mobileNavbarDropdown);
+      await this.clickOn(topicMobilePreviewTab);
+    } else {
+      await this.expectElementToBeVisible(topicPreviewTab);
+      await this.clickOn(topicPreviewTab);
+    }
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Verifies if the subtopic study guide has the expected title and sections.
+   * @param {string} studyGuideTitle - The expected title of the study guide.
+   * @param {string[][]} studyGuideSections - The expected sections of the study guide.
+   * It is a list of sections. Sections are a list of strings having length of 2 - heading and content.
+   * @param {boolean} expectWorkedExample - If the sections have a WorkedExample or not.
+   */
+  async expectSubtopicStudyGuideToHaveTitleAndSections(
+    studyGuideTitle: string,
+    studyGuideSections: string[][],
+    expectWorkedExample: boolean
+  ): Promise<void> {
+    try {
+      const isTitlePresent = await this.isTextPresentOnPage(studyGuideTitle);
+
+      if (!isTitlePresent) {
+        throw new Error(
+          'Expected study guide title to be present, but it was not found.'
+        );
+      }
+
+      for (var i = 0; i < studyGuideSections.length; i++) {
+        for (var j = 0; j < 2; j++) {
+          const isHeadingPresent = await this.isTextPresentOnPage(
+            studyGuideSections[i][j]
+          );
+          if (!isHeadingPresent) {
+            throw new Error(
+              `Expected study guide section ${i + 1} heading to be present on the page, but it was not found`
+            );
+          }
+          j++;
+          const isContentPresent = await this.isTextPresentOnPage(
+            studyGuideSections[i][j]
+          );
+          if (!isContentPresent) {
+            throw new Error(
+              `Expected study guide section ${i + 1} content to be present on the page, but it was not found`
+            );
+          }
+        }
+      }
+      if (expectWorkedExample) {
+        await this.page.waitForSelector(expandWorkedExampleButton, {
+          visible: true,
+        });
+      }
+    } catch (error) {
+      const newError = new Error(
+        `Failed to verify sections of study guide: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
   }
 
   /**
@@ -700,13 +1184,22 @@ export class CurriculumAdmin extends BaseUser {
       visible: true,
     });
     await this.clickOn(addStudyGuideSectionButton);
-    await this.type(addStudyGuideSectionModalHeading, 'Section Heading');
+    await this.typeInInputField(
+      addStudyGuideSectionModalHeading,
+      'Section Heading'
+    );
     await this.clickOn(addStudyGuideSectionModalContent);
     await this.page.waitForSelector(richTextAreaField, {visible: true});
-    await this.type(
-      richTextAreaField,
-      'Section Content Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam qu'
-    );
+    await this.page.evaluate(async textContent => {
+      await navigator.clipboard.writeText(textContent);
+    }, 'This sentence is 84 characters long. Multiply it by 72 to get more than 6000 chars. '.repeat(72));
+
+    const richTextAreaFieldElement =
+      await this.getElementInParent(richTextAreaField);
+    await richTextAreaFieldElement.focus();
+    await this.page.keyboard.down('Control');
+    await this.page.keyboard.press('KeyV');
+    await this.page.keyboard.up('Control');
     await this.page.waitForSelector(addStudyGuideSectionContentLength, {
       visible: true,
     });
@@ -777,6 +1270,11 @@ export class CurriculumAdmin extends BaseUser {
       `.e2e-test-study-guide-section-${index} ${deleteStudyGuideSectionButton}`
     );
     await this.clickOn(studyGuideSectionDeleteConfirmButton);
+
+    await this.expectElementToBeVisible(
+      studyGuideSectionDeleteConfirmButton,
+      false
+    );
   }
 
   /**
@@ -820,7 +1318,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(assignSubtopicButton, {
       visible: true,
     });
-    await this.clickOn('Assign to Subtopic');
+    await this.clickOnElementWithText('Assign to Subtopic');
 
     await this.page.waitForSelector(subtopicNameSelector, {visible: true});
     await this.page.evaluate(
@@ -846,6 +1344,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(
       `${confirmSkillAssignationButton}:not([disabled])`
     );
+    await this.waitForElementToStabilize(confirmSkillAssignationButton);
     await this.clickOn(confirmSkillAssignationButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
     await this.saveTopicDraft(topicName);
@@ -857,6 +1356,10 @@ export class CurriculumAdmin extends BaseUser {
    * @param {string} explanation - The explanation to update.
    */
   async updateRubric(difficulty: string, explanation: string): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(toggleSkillRubricsDropdown);
+    }
+
     await this.waitForStaticAssetsToLoad();
     let difficultyValue: string;
     switch (difficulty) {
@@ -872,12 +1375,25 @@ export class CurriculumAdmin extends BaseUser {
       default:
         throw new Error(`Unknown difficulty: ${difficulty}`);
     }
+
+    // Expand the difficulty rubric section in mobile.
+    if (
+      this.isViewportAtMobileWidth() &&
+      !(await this.isElementVisible(selectRubricDifficultySelector))
+    ) {
+      await this.expectElementToBeVisible(toggleRubricsDropdownSelector);
+      await this.clickOn(toggleRubricsDropdownSelector);
+    }
     await this.waitForElementToBeClickable(selectRubricDifficultySelector);
     await this.select(selectRubricDifficultySelector, difficultyValue);
     await this.waitForStaticAssetsToLoad();
     await this.clickOn(' + ADD EXPLANATION FOR DIFFICULTY ');
-    await this.type(rteSelector, explanation);
+    await this.typeInInputField(rteSelector, explanation);
     await this.clickOn(saveRubricExplanationButton);
+
+    await this.page.waitForSelector(saveRubricExplanationButton, {
+      hidden: true,
+    });
   }
 
   /**
@@ -885,20 +1401,38 @@ export class CurriculumAdmin extends BaseUser {
    * @param {string} updateMessage - The update message.
    */
   async publishUpdatedSkill(updateMessage: string): Promise<void> {
-    await this.waitForStaticAssetsToLoad();
-    await this.page.waitForSelector(saveOrPublishSkillSelector, {
-      visible: true,
-    });
-    await this.clickOn(saveOrPublishSkillSelector);
+    if (this.isViewportAtMobileWidth()) {
+      if (
+        !(await this.isElementVisible(navigationContainerSelector, true, 5000))
+      ) {
+        await this.expectElementToBeVisible(mobileOptionsSelector);
+        await this.clickOn(mobileOptionsSelector);
+      }
+      // The mobile view has 2 instances of the element, from which
+      // the first one is inapplicable here.
+      const elems = await this.page.$$(mobileSkillNavToggle);
+      await elems[1].click();
+      await this.page.waitForSelector(mobileSaveOrPublishSkillSelector, {
+        visible: true,
+      });
+      await this.clickOn(mobileSaveOrPublishSkillSelector);
+    } else {
+      await this.waitForStaticAssetsToLoad();
+      await this.page.waitForSelector(saveOrPublishSkillSelector, {
+        visible: true,
+      });
+      await this.clickOn(saveOrPublishSkillSelector);
+    }
 
     await this.page.waitForSelector(commitMessageInputSelector, {
       visible: true,
     });
-    await this.type(commitMessageInputSelector, updateMessage);
+    await this.typeInInputField(commitMessageInputSelector, updateMessage);
     await this.page.waitForSelector(closeSaveModalButtonSelector, {
       visible: true,
     });
     await this.clickOn(closeSaveModalButtonSelector);
+    await this.expectToastMessage('Changes Saved.');
     showMessage('Skill updated successful');
   }
 
@@ -947,18 +1481,6 @@ export class CurriculumAdmin extends BaseUser {
       diagnosticTestSkillSelector
     );
     await this.saveTopicDraft(topicName);
-  }
-
-  async publishDraftTopic(topicName: string): Promise<void> {
-    await this.openTopicEditor(topicName);
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileOptionsSelector);
-      await this.clickOn(mobileSaveTopicDropdown);
-      await this.page.waitForSelector(mobilePublishTopicButton);
-      await this.clickOn(mobilePublishTopicButton);
-    } else {
-      await this.clickOn(publishTopicButton);
-    }
   }
 
   /**
@@ -1089,12 +1611,25 @@ export class CurriculumAdmin extends BaseUser {
   async navigateToExplorationSettingsTab(): Promise<void> {
     await this.waitForStaticAssetsToLoad();
     if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileNavToggleButton, {visible: true});
       await this.clickOn(mobileNavToggleButton);
       await this.clickOn(mobileOptionsDropdown);
       await this.clickOn(mobileSettingsButton);
+
+      // Close dropdown if it doesn't automatically close.
+      const isVisible = await this.isElementVisible(
+        navigationDropdownInMobileVisibleSelector
+      );
+      if (isVisible) {
+        // We are using page.click as this button might be overlapped by the
+        // dropdown. Thus, it will fail with onClick.
+        this.page.click(mobileOptionsDropdown);
+      }
     } else {
+      await this.page.waitForSelector(explorationSettingsTab, {visible: true});
       await this.clickOn(explorationSettingsTab);
     }
+    await this.page.waitForSelector(settingsContainerSelector, {visible: true});
     showMessage('Navigation to settings tab is successful.');
   }
 
@@ -1106,6 +1641,10 @@ export class CurriculumAdmin extends BaseUser {
     await this.waitForStaticAssetsToLoad();
     await this.clickOn(deleteExplorationButton);
     await this.clickOn(confirmDeletionButton);
+
+    await this.page.waitForSelector(confirmDeleteClassroomButton, {
+      hidden: true,
+    });
   }
 
   /**
@@ -1113,9 +1652,10 @@ export class CurriculumAdmin extends BaseUser {
    */
   async dismissWelcomeModal(): Promise<void> {
     try {
+      await this.page.waitForNetworkIdle();
       await this.page.waitForSelector(dismissWelcomeModalSelector, {
         visible: true,
-        timeout: 5000,
+        timeout: 10000,
       });
       await this.clickOn(dismissWelcomeModalSelector);
       await this.page.waitForSelector(dismissWelcomeModalSelector, {
@@ -1128,28 +1668,18 @@ export class CurriculumAdmin extends BaseUser {
   }
 
   /**
-   * Function to close editor navigation dropdown. Can be done by clicking
-   * on the dropdown toggle.
-   */
-  async closeEditorNavigationDropdownOnMobile(): Promise<void> {
-    try {
-      await this.page.waitForSelector(dropdownToggleIcon, {
-        visible: true,
-        timeout: 5000,
-      });
-      await this.clickOn(dropdownToggleIcon);
-      showMessage('Editor navigation closed successfully.');
-    } catch (error) {
-      showMessage(`Dropdown Toggle Icon not found: ${error.message}`);
-    }
-  }
-
-  /**
    * Function to open control dropdown so that delete exploration button is visible
    * in mobile view.
    */
   async openExplorationControlDropdown(): Promise<void> {
+    await this.page.waitForSelector(explorationControlsSettingsDropdown, {
+      visible: true,
+    });
     await this.clickOn(explorationControlsSettingsDropdown);
+
+    await this.page.waitForSelector(deleteButtonSelector, {
+      visible: true,
+    });
   }
 
   /**
@@ -1168,12 +1698,12 @@ export class CurriculumAdmin extends BaseUser {
       await this.clickOn(mobileStoryDropdown);
     }
     await this.clickOn(addStoryButton);
-    await this.type(storyTitleField, storyTitle);
+    await this.typeInInputField(storyTitleField, storyTitle);
     await this.page.waitForSelector(storyUrlFragmentField, {
       visible: true,
     });
     await this.page.type(storyUrlFragmentField, storyUrlFragment);
-    await this.type(
+    await this.typeInInputField(
       storyDescriptionField,
       `Story creation description for ${storyTitle}.`
     );
@@ -1211,29 +1741,33 @@ export class CurriculumAdmin extends BaseUser {
    * @param {string} storyTitle - The title of the story.
    * @param {string} storyUrlFragment - The URL fragment of the story.
    * @param {string} topicName - The name of the topic.
+   * @param {string} metaTag - The meta tag of the story.
+   * @param {string} photoURL - The URL of the photo of the story.
    */
   async addStoryToTopic(
     storyTitle: string,
     storyUrlFragment: string,
-    topicName: string
+    topicName: string,
+    metaTag: string = 'meta',
+    photoURL: string = curriculumAdminThumbnailImage
   ): Promise<string> {
     await this.openTopicEditor(topicName);
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileStoryDropdown);
     }
     await this.clickOn(addStoryButton);
-    await this.type(storyTitleField, storyTitle);
+    await this.typeInInputField(storyTitleField, storyTitle);
     await this.page.waitForSelector(storyUrlFragmentField, {
       visible: true,
     });
     await this.page.type(storyUrlFragmentField, storyUrlFragment);
-    await this.type(
+    await this.typeInInputField(
       storyDescriptionField,
       `Story creation description for ${storyTitle}.`
     );
 
     await this.clickOn(storyPhotoBoxButton);
-    await this.uploadFile(curriculumAdminThumbnailImage);
+    await this.uploadFile(photoURL);
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
     await this.clickOn(uploadPhotoButton);
 
@@ -1242,7 +1776,7 @@ export class CurriculumAdmin extends BaseUser {
 
     await this.page.waitForSelector(storyMetaTagInput);
     await this.page.focus(storyMetaTagInput);
-    await this.page.type(storyMetaTagInput, 'meta');
+    await this.page.type(storyMetaTagInput, metaTag);
     await this.page.keyboard.press('Tab');
     await this.saveStoryDraft();
 
@@ -1266,9 +1800,12 @@ export class CurriculumAdmin extends BaseUser {
         await this.clickOn(mobileChapterCollapsibleCard);
       }
     }
+    await this.page.waitForSelector(addChapterButton, {
+      visible: true,
+    });
     await this.clickOn(addChapterButton);
-    await this.type(newChapterTitleField, chapterName);
-    await this.type(newChapterExplorationIdField, explorationId);
+    await this.typeInInputField(newChapterTitleField, chapterName);
+    await this.typeInInputField(newChapterExplorationIdField, explorationId);
 
     await this.clickOn(newChapterPhotoBoxButton);
     await this.uploadFile(curriculumAdminThumbnailImage);
@@ -1292,11 +1829,15 @@ export class CurriculumAdmin extends BaseUser {
       if (!isMobileSaveButtonVisible) {
         await this.clickOn(mobileOptionsSelector);
       }
+      await this.page.waitForSelector(mobileSaveStoryChangesButton, {
+        visible: true,
+      });
       await this.clickOn(mobileSaveStoryChangesButton);
     } else {
+      await this.page.waitForSelector(saveStoryButton, {visible: true});
       await this.clickOn(saveStoryButton);
     }
-    await this.type(
+    await this.typeInInputField(
       saveChangesMessageInput,
       'Test saving story as curriculum admin.'
     );
@@ -1310,13 +1851,40 @@ export class CurriculumAdmin extends BaseUser {
    */
   async publishStoryDraft(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileSaveStoryChangesDropdown, {
+        visible: true,
+      });
       await this.clickOn(mobileSaveStoryChangesDropdown);
       await this.page.waitForSelector(mobilePublishStoryButton);
       await this.clickOn(mobilePublishStoryButton);
+
+      await this.page.waitForFunction(
+        (selector: string) => {
+          const element = document.querySelector(selector);
+          return element?.textContent?.trim() === 'Unpublish Story';
+        },
+        {},
+        mobilePublishStoryButton
+      );
     } else {
       await this.page.waitForSelector(`${publishStoryButton}:not([disabled])`);
       await this.clickOn(publishStoryButton);
       await this.page.waitForSelector(unpublishStoryButton, {visible: true});
+    }
+  }
+
+  /**
+   * Function to verify the unpublish topic button is visible.
+   */
+  async expectUnpublishTopicButtonToBeVisible(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeVisible(mobileOptionsSelector);
+      await this.clickOn(mobileOptionsSelector);
+      await this.clickOn(mobileSaveTopicDropdown);
+      await this.page.waitForSelector(mobileNavbarDropdownOptions);
+      await this.expectElementToBeVisible(mobileUnpublishTopicButton);
+    } else {
+      await this.expectElementToBeVisible(unpublishTopicButton);
     }
   }
 
@@ -1399,6 +1967,7 @@ export class CurriculumAdmin extends BaseUser {
             throw new Error('Delete button not found');
           }
 
+          await this.waitForElementToStabilize(confirmTopicDeletionButton);
           const confirmButton = await this.page.$(confirmTopicDeletionButton);
           if (confirmButton) {
             await this.waitForElementToBeClickable(confirmButton);
@@ -1407,6 +1976,10 @@ export class CurriculumAdmin extends BaseUser {
           } else {
             throw new Error('Confirm button not found');
           }
+
+          await this.page.waitForSelector(confirmTopicDeletionButton, {
+            hidden: true,
+          });
           break;
         }
       }
@@ -1509,6 +2082,10 @@ export class CurriculumAdmin extends BaseUser {
           } else {
             throw new Error('Confirm button not found');
           }
+
+          await this.page.waitForSelector(confirmSkillDeletionButton, {
+            hidden: true,
+          });
           break;
         }
       }
@@ -1592,6 +2169,9 @@ export class CurriculumAdmin extends BaseUser {
 
         try {
           await this.page.waitForSelector(modalDiv, {visible: true});
+          await this.waitForElementToStabilize(
+            removeQuestionConfirmationButton
+          );
           await this.clickOn(removeQuestionConfirmationButton);
           await this.page.waitForSelector(modalDiv, {hidden: true});
         } catch (error) {
@@ -1606,9 +2186,9 @@ export class CurriculumAdmin extends BaseUser {
         `All questions have been successfully removed from the skill "${skillName}".`
       );
     } catch (error) {
-      console.error(
-        `Failed to remove all questions from the skill "${skillName}"`,
-        error.stack
+      throw new Error(
+        `Failed to remove all questions from the skill "${skillName}"` +
+          error.stack
       );
     }
   }
@@ -1670,6 +2250,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(createNewClassroomModal);
     await this.page.type(newClassroomNameInputField, classroomName);
     await this.page.type(newClassroomUrlFragmentInputField, urlFragment);
+    await this.waitForElementToStabilize(saveNewClassroomButton);
     await this.clickOn(saveNewClassroomButton);
     await this.page.waitForSelector(createNewClassroomModal, {visible: false});
     showMessage(`Created ${classroomName} classroom.`);
@@ -1677,44 +2258,125 @@ export class CurriculumAdmin extends BaseUser {
 
   /**
    * Function for updating a classroom.
+   * @param {string} classroomName - The name of the classroom.
+   * @param {string} teaserText - The teaser text of the classroom.
+   * @param {string} topicListIntro - The topic list intro of the classroom.
+   * @param {string} courseDetails - The course details of the classroom.
+   * @param {string} url - The URL of the classroom.
+   * @param {string} thumbnailImage - The thumbnail image of the classroom.
+   * @param {string} bannerImage - The banner image of the classroom.
    */
   async updateClassroom(
     classroomName: string,
     teaserText: string,
     topicListIntro: string,
-    courseDetails: string
+    courseDetails: string,
+    url?: string,
+    thumbnailImage: string = curriculumAdminThumbnailImage,
+    bannerImage: string = classroomBannerImage
   ): Promise<void> {
     await this.navigateToClassroomAdminPage();
     await this.editClassroom(classroomName);
 
-    await this.page.type(editClassroomTeaserTextInputField, teaserText);
-    await this.page.type(editClassroomTopicListIntroInputField, topicListIntro);
-    await this.page.type(editClassroomCourseDetailsInputField, courseDetails);
-    await this.clickOn(classroomThumbnailContainer);
+    if (url) {
+      await this.clearAllTextFrom(editClassroomUrlFragmentInputField);
+      await this.page.type(editClassroomUrlFragmentInputField, url);
+    }
 
-    await this.uploadFile(curriculumAdminThumbnailImage);
+    await this.clearAllTextFrom(editClassroomTeaserTextInputField);
+    await this.page.type(editClassroomTeaserTextInputField, teaserText);
+
+    await this.clearAllTextFrom(editClassroomTopicListIntroInputField);
+    await this.page.type(editClassroomTopicListIntroInputField, topicListIntro);
+
+    await this.clearAllTextFrom(editClassroomCourseDetailsInputField);
+    await this.page.type(editClassroomCourseDetailsInputField, courseDetails);
+
+    await this.clickOn(classroomThumbnailContainer);
+    await this.uploadFile(thumbnailImage);
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
     await this.clickOn(uploadPhotoButton);
     await this.page.waitForSelector(uploadPhotoButton, {hidden: true});
 
     await this.clickOn(classroomBannerContainer);
     await this.page.waitForSelector(imageUploaderModal, {visible: true});
-    await this.uploadFile(classroomBannerImage);
+    await this.uploadFile(bannerImage);
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
     await this.clickOn(uploadPhotoButton);
     await this.page.waitForSelector(imageUploaderModal, {hidden: true});
 
     await this.clickOn(saveClassroomButton);
 
+    await this.page.waitForSelector(saveClassroomButton, {hidden: true});
+
     showMessage(`Updated ${classroomName} classroom.`);
   }
 
   /**
-   * Function for adding a topic to a classroom
+   * Adds a prerequisite topic to a topic in a classroom.
+   * @param topicName The name of the topic.
+   * @param prerequisiteTopicName The name of the prerequisite topic.
+   */
+  async addPrerequisiteTopicForATopicInClassroom(
+    topicName: string,
+    prerequisiteTopicName: string
+  ): Promise<void> {
+    const topicBox = await this.expectClassroomToContainTopic(topicName);
+
+    const prerequisiteInputElement =
+      await topicBox.waitForSelector(matFormFieldSelector);
+    if (!prerequisiteInputElement) {
+      throw new Error('Prerequisite input element not found');
+    }
+    await prerequisiteInputElement.click();
+
+    await this.selectMatOption(prerequisiteTopicName);
+    await this.expectMatChipToBeVisible(prerequisiteTopicName);
+  }
+
+  /**
+   * Checks if the topic contains the given prerequisite topic.
+   * @param topicName The name of the topic.
+   * @param prerequisiteTopic The name of the prerequisite topic. If null, checks if the topic has no prerequisites.
+   */
+  async expectTopicToContainPrerequisiteTopic(
+    topicName: string,
+    prerequisiteTopic: string | null
+  ): Promise<void> {
+    const topicBox = await this.expectClassroomToContainTopic(topicName);
+
+    if (!prerequisiteTopic) {
+      await this.expectTextContentToBe(
+        topicPrerequisitesContainerSelector,
+        'No Prerequisites'
+      );
+    } else {
+      await topicBox.waitForSelector('mat-chip');
+      const matChipElements = await topicBox.$$('mat-chip');
+
+      for (const element of matChipElements) {
+        const textContent = await element.evaluate(el => el.textContent);
+        if (textContent?.includes(prerequisiteTopic)) {
+          return;
+        }
+      }
+
+      throw new Error(
+        `Prerequisite topic ${prerequisiteTopic} not found in topic ${topicName}.`
+      );
+    }
+  }
+
+  /**
+   * Function for adding a topic to a classroom.
+   * @param {string} classroomName - The name of the classroom.
+   * @param {string} topicName - The name of the topic.
+   * @param {string[]} prerequisiteTopics - The prerequisite topics of the topic.
    */
   async addTopicToClassroom(
     classroomName: string,
-    topicName: string
+    topicName: string,
+    prerequisiteTopics: string[] = []
   ): Promise<void> {
     await this.navigateToClassroomAdminPage();
     await this.editClassroom(classroomName);
@@ -1725,7 +2387,16 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.type(addTopicFormFieldInput, topicName);
     await this.clickOn(topicSelector);
     await this.page.waitForSelector(openTopicDropdownButton);
+
+    for (const prerequisiteTopic of prerequisiteTopics) {
+      await this.addPrerequisiteTopicForATopicInClassroom(
+        topicName,
+        prerequisiteTopic
+      );
+    }
+
     await this.clickOn(saveClassroomButton);
+    await this.page.waitForSelector(saveClassroomButton, {hidden: true});
 
     showMessage(`Added ${topicName} topic to the ${classroomName} classroom.`);
   }
@@ -1747,14 +2418,55 @@ export class CurriculumAdmin extends BaseUser {
   }
 
   /**
+   * Checks if the classroom tile is present.
+   * @param {string} classroomName - The name of the classroom.
+   */
+  async expectClassroomTileToBePresent(classroomName: string): Promise<void> {
+    await this.navigateToClassroomAdminPage();
+    const classroomTiles = await this.page.$$(classroomTileNameSpan);
+
+    let classroomTile: ElementHandle<Element> | null = null;
+    for (const classroomTileElement of classroomTiles) {
+      const classroomTileText = await classroomTileElement.evaluate(
+        el => el.textContent?.trim() || ''
+      );
+      if (classroomTileText === classroomName) {
+        classroomTile = classroomTileElement;
+        break;
+      }
+    }
+
+    if (!classroomTile) {
+      throw new Error(`Classroom ${classroomName} not found.`);
+    }
+  }
+
+  /**
    * Function for publishing a classroom.
+   * @param {string} classroomName - The name of the classroom.
    */
   async publishClassroom(classroomName: string): Promise<void> {
     await this.navigateToClassroomAdminPage();
     await this.editClassroom(classroomName);
     await this.clickOn(publishClassroomButton);
     await this.clickOn(saveClassroomButton);
+    await this.page.waitForSelector(saveClassroomButton, {hidden: true});
+
     showMessage(`Published ${classroomName} classroom.`);
+  }
+
+  /**
+   * Enables diagnostic test for a classroom.
+   * @param {string} classroomName - The name of the classroom.
+   */
+  async enableDiagnosticTestForClassroom(classroomName: string): Promise<void> {
+    await this.navigateToClassroomAdminPage();
+    await this.editClassroom(classroomName);
+    await this.clickOn(enableDiagnosticTestButton);
+    await this.clickOn(saveClassroomButton);
+    await this.page.waitForSelector(saveClassroomButton, {hidden: true});
+
+    showMessage(`Enabled diagnostic test for ${classroomName} classroom.`);
   }
 
   /**
@@ -1790,8 +2502,9 @@ export class CurriculumAdmin extends BaseUser {
         }
 
         await this.page.waitForSelector(deleteClassroomModal, {visible: true});
+        await this.waitForElementToStabilize(confirmDeleteClassroomButton);
         await this.clickOn(confirmDeleteClassroomButton);
-        await this.page.waitForSelector(deleteClassroomModal, {visible: false});
+        await this.page.waitForSelector(deleteClassroomModal, {hidden: true});
 
         showMessage(`Deleted ${classroomName} classroom.`);
         foundClassroom = true;
@@ -1855,7 +2568,7 @@ export class CurriculumAdmin extends BaseUser {
       topicName
     );
 
-    await this.createSkillForTopic(skillName, topicName);
+    await this.createSkillForTopic(skillName, topicName, false);
     await this.createQuestionsForSkill(skillName, 3);
     await this.assignSkillToSubtopicInTopicEditor(
       skillName,
@@ -1865,6 +2578,248 @@ export class CurriculumAdmin extends BaseUser {
     await this.addSkillToDiagnosticTest(skillName, topicName);
 
     await this.publishDraftTopic(topicName);
+  }
+
+  /**
+   * Creates a topic with a skill.
+   * @param {string} topicName - The name of the topic.
+   * @param {string} skillName - The name of the skill.
+   */
+  async createTopicWithSkill(
+    topicName: string,
+    skillName: string
+  ): Promise<void> {
+    await this.createTopic(
+      topicName,
+      topicName.toLowerCase().replace(/ /g, '-')
+    );
+    await this.createSkillForTopic(skillName, topicName, true);
+  }
+
+  /**
+   * Creates a skill from the topics and skills dashboard.
+   * @param description - The description of the skill.
+   * @param reviewMaterial - the content of the skill.
+   */
+  async createSkillFromTopicsAndSkillsDashboard(
+    description: string,
+    reviewMaterial: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(createNewSkillButton);
+    await this.clickOn(createNewSkillButton);
+    await this.typeInInputField(skillDescriptionField, description);
+    await this.clickOn(skillReviewMaterialHeader);
+    await this.clickOn(richTextAreaField);
+    await this.typeInInputField(richTextAreaField, reviewMaterial);
+    await this.addWorkedExampleRteComponent('Type the number one', '1');
+    await this.clickOn(createSkillButton);
+    await this.openSkillEditor(description);
+  }
+
+  /**
+   * Click on the edit button of the review material section of
+   * a skill that opens up the rich text editor.
+   */
+  async clickOnReviewMaterialEditButton(): Promise<void> {
+    await this.expectElementToBeVisible(editConceptCard);
+    await this.clickOn(editConceptCard);
+    await this.expectElementToBeVisible(rteSelector);
+  }
+
+  /**
+   * Copies all the content from the review material rich text
+   * editor.
+   */
+  async copyContentFromReviewMaterialRte(): Promise<void> {
+    // OverridePermissions is used to allow clipboard access.
+    const context = this.page.browser().defaultBrowserContext();
+    await context.overridePermissions('http://localhost:8181', [
+      'clipboard-read',
+      'clipboard-write',
+    ]);
+    await this.copyAllTextFrom(richTextParagraphTag);
+  }
+
+  /**
+   * Copies the WorkedExample from the review material rich text
+   * editor.
+   */
+  async copyWorkedExampleFromReviewMaterialRte(): Promise<void> {
+    // OverridePermissions is used to allow clipboard access.
+    const context = this.page.browser().defaultBrowserContext();
+    await context.overridePermissions('http://localhost:8181', [
+      'clipboard-read',
+      'clipboard-write',
+    ]);
+    await this.copyTextFrom(richTextAreaField);
+  }
+
+  /**
+   * Adds a WorkedExample rich text editor component to a
+   * supporting rich text editor.
+   * @param question - The question of the WorkedExample
+   * @param answer - The solution of the WorkedExample.
+   */
+  async addWorkedExampleRteComponent(
+    question: string,
+    answer: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(insertWorkedExampleButton);
+    await this.clickOn(insertWorkedExampleButton);
+    await this.page.waitForSelector(editWorkedExampleModalQuestionRte, {
+      visible: true,
+    });
+    await this.clearAllTextFrom(editWorkedExampleModalQuestionRte);
+    await this.typeInInputField(editWorkedExampleModalQuestionRte, question);
+    await this.page.waitForSelector(editWorkedExampleModalAnswerRte, {
+      visible: true,
+    });
+    await this.clearAllTextFrom(editWorkedExampleModalAnswerRte);
+    await this.waitForElementToStabilize(editWorkedExampleModalAnswerRte);
+    await this.typeInInputField(editWorkedExampleModalAnswerRte, answer);
+    await this.clickOn(rteComponentSaveButton);
+    await this.page.waitForSelector(editWorkedExampleModalAnswerRte, {
+      hidden: true,
+    });
+  }
+
+  /**
+   * Clears all the content from a rich text editor.
+   */
+  async clearRte(): Promise<void> {
+    await this.expectElementToBeVisible(richTextAreaField);
+    await this.clickOn(richTextAreaField);
+    await this.clearAllTextFrom(richTextAreaField);
+  }
+
+  /**
+   * Clears all the content from a rich text editor and checks if the
+   * limit of WorkedExamples error disappears.
+   */
+  async clearRteAndCheckIfErrorDisappears(): Promise<void> {
+    await this.expectElementToBeVisible(richTextAreaField);
+    await this.clickOn(richTextAreaField);
+    await this.clearAllTextFrom(richTextAreaField);
+    await this.page.waitForSelector(moreThanTwoWorkedExamplesError, {
+      hidden: true,
+    });
+  }
+
+  /**
+   * Saves the changes made to the review material.
+   */
+  async saveReviewMaterial(): Promise<void> {
+    await this.expectElementToBeVisible(saveReviewMaterialButton);
+    await this.clickOn(saveReviewMaterialButton);
+  }
+
+  /**
+   * Clicks on the rich text editor and presses enter
+   * to go to the next line.
+   */
+  async clickOnRteAndPressEnter(): Promise<void> {
+    await this.clickOnReviewMaterialEditButton();
+    await this.clickOn(richTextAreaField);
+    await this.page.keyboard.press('Enter');
+  }
+
+  /**
+   * Types the given text in the review material rich text editor.
+   * @param text - The text to be typed in the rich text editor.
+   */
+  async typeTextInReviewMaterialEditor(text: string): Promise<void> {
+    await this.expectElementToBeVisible(richTextAreaField);
+    await this.clickOn(richTextAreaField);
+    await this.typeInInputField(richTextAreaField, text);
+  }
+
+  /**
+   * Publish the changes made to the skill.
+   */
+  async publishSkillChanges(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeVisible(mobileOptionsSelector);
+      await this.clickOn(mobileOptionsSelector);
+      // The mobile view has 2 instances of the element, from which
+      // the first one is inapplicable here.
+      const elems = await this.page.$$(toggleSkillEditOptionsButton);
+      await elems[1].click();
+      await this.clickOn(mobileSaveSkillButton);
+    } else {
+      await this.expectElementToBeVisible(publishSkillButton);
+      await this.clickOn(publishSkillButton);
+    }
+    await this.typeInInputField(
+      saveChangesMessageInput,
+      'Test saving skill as curriculum admin.'
+    );
+    await this.page.waitForSelector(`${closeSaveModalButton}:not([disabled])`);
+    await this.clickOn(closeSaveModalButton);
+    await this.page.waitForSelector('oppia-skill-editor-save-modal', {
+      hidden: true,
+    });
+  }
+
+  /**
+   * Navigate to the skill preview tab.
+   */
+  async navigateToSkillPreviewTab(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      if (
+        !(await this.isElementVisible(navigationContainerSelector, true, 5000))
+      ) {
+        await this.clickOn(mobileOptionsSelector);
+      }
+      const navDropdownElements = await this.page.$$(navigationDropdown);
+      await this.waitForElementToBeClickable(navDropdownElements[1]);
+      await navDropdownElements[1].click();
+
+      await this.page.waitForSelector(mobilePreviewTab);
+      await this.clickOn(mobilePreviewTab);
+    } else {
+      await this.clickOn(skillPreviewTabButton);
+    }
+    await this.waitForPageToFullyLoad();
+    await this.scrollToBottomOfPage();
+  }
+
+  /**
+   * Checks of the WorkedExamples have been correctly added to the
+   * skill.
+   * @param {string[][]} workedExamples - A list of WorkedExamples.
+   * Each entry is a list with 2 strings - Question and Answer.
+   */
+  async checkWorkedExamplesExistForSkill(
+    workedExamples: string[][]
+  ): Promise<void> {
+    if (!this.isViewportAtMobileWidth()) {
+      try {
+        for (var i = 0; i < workedExamples.length; i++) {
+          const isQuestionPresent = this.isTextPresentOnPage(
+            workedExamples[i][0]
+          );
+          if (!isQuestionPresent) {
+            throw new Error(
+              `Expected WorkedExample Question ${workedExamples[i][0]} to be present on the page, but it was not found.`
+            );
+          }
+          const isAnswerPresent = this.isTextPresentOnPage(
+            workedExamples[i][1]
+          );
+          if (!isAnswerPresent) {
+            throw new Error(
+              `Expected WorkedExample Answer ${workedExamples[i][1]} to be present on the page, but it was not found.`
+            );
+          }
+        }
+      } catch (error) {
+        const newError = new Error(
+          `Failed to verify WorkedExamples of skill: ${error}`
+        );
+        newError.stack = error.stack;
+        throw newError;
+      }
+    }
   }
 
   /**
@@ -1887,7 +2842,8 @@ export class CurriculumAdmin extends BaseUser {
       subtopicName.toLowerCase().replace(/ /g, '-'),
       'Adding With Your Fingers',
       'One way to add is using your...',
-      topicName
+      topicName,
+      true
     );
     await this.addSubtopicStudyGuideSection(
       'Using an Addition Table',
@@ -1897,24 +2853,27 @@ export class CurriculumAdmin extends BaseUser {
     await this.saveTopicDraft(topicName);
 
     await this.createSkillForTopic(skillName, topicName);
-    await this.createQuestionsForSkill(skillName, 3);
+    await this.createQuestionsForSkill(skillName, 10);
     await this.assignSkillToSubtopicInTopicEditor(
       skillName,
       subtopicName,
       topicName
     );
     await this.addSkillToDiagnosticTest(skillName, topicName);
+    await this.togglePracticeTabCheckbox();
+    await this.saveTopicDraft(topicName);
 
     await this.createSubtopicWithStudyGuideForTopic(
       'Subtracting Numbers',
       'subtract-nos',
       'Common Mistakes',
       'Some common mistakes students make are...',
-      topicName
+      topicName,
+      true
     );
     await this.saveTopicDraft(topicName);
 
-    await this.createSkillForTopic('Skill 2', topicName);
+    await this.createSkillForTopic('Skill 2', topicName, false);
     await this.assignSkillToSubtopicInTopicEditor(
       'Skill 2',
       'Subtracting Numbers',
@@ -1922,6 +2881,37 @@ export class CurriculumAdmin extends BaseUser {
     );
 
     await this.publishDraftTopic(topicName);
+  }
+
+  /**
+   * Toggles the "Show practice tab to learners" in Topic Editor.
+   */
+  async togglePracticeTabCheckbox(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeVisible(subtopicExpandHeaderSelector);
+      await this.clickOn(subtopicExpandHeaderSelector);
+    }
+    try {
+      await this.page.waitForSelector(practiceTabToggle);
+      const practiceTabToggleElement = await this.page.$(practiceTabToggle);
+      if (!practiceTabToggleElement) {
+        throw new Error('Practice tab toggle not found.');
+      }
+      await this.waitForElementToBeClickable(practiceTabToggleElement);
+      await practiceTabToggleElement.click();
+
+      await this.page.waitForFunction(
+        (selector: string) => {
+          const element = document.querySelector(selector);
+          return (element as HTMLInputElement).checked === true;
+        },
+        {},
+        practiceTabToggle
+      );
+    } catch (error) {
+      console.error(error.stack);
+      throw error;
+    }
   }
 
   /**
@@ -1944,6 +2934,122 @@ export class CurriculumAdmin extends BaseUser {
     );
     await this.addTopicToClassroom(classroomName, topicToBeAssigned);
     await this.publishClassroom(classroomName);
+  }
+
+  /**
+   * Create a skill.
+   * @param {string} skillName - The name of the skill.
+   * @param {string} reviewMaterial - The review material of the skill.
+   */
+  async createSkillFromSkillsDashboard(
+    skillName: string,
+    reviewMaterial: string
+  ): Promise<void> {
+    const skillButtonSelector = this.isViewportAtMobileWidth()
+      ? createNewSkillMobileButton
+      : addNewSkillButton;
+    await this.navigateToTopicAndSkillsDashboardPage();
+
+    await this.navigateToSkillsTab();
+    await this.expectElementToBeVisible(skillButtonSelector);
+    await this.clickOn(skillButtonSelector);
+    await this.fillSkillInfoAndSubmit(skillName, reviewMaterial);
+  }
+
+  /**
+   * Create a subtopic as a curriculum admin.
+   * @param {string} title - The title of the Subtopic.
+   * @param {string} urlFragment - The url fragment of the Subtopic.
+   * @param {string} topicName - The name of the Topic which storing the new Subtopic.
+   */
+  async createSubtopicForTopic(
+    title: string,
+    urlFragment: string,
+    topicName: string
+  ): Promise<void> {
+    await this.openTopicEditor(topicName);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(subtopicReassignHeader);
+    }
+    await this.clickOn(addSubtopicButton);
+    await this.typeInInputField(subtopicTitleField, title);
+    await this.page.waitForSelector(subtopicUrlFragmentField, {
+      visible: true,
+    });
+    await this.page.type(subtopicUrlFragmentField, urlFragment);
+
+    await this.clickOn(subtopicDescriptionEditorToggle);
+    await this.page.waitForSelector(richTextAreaField, {visible: true});
+    await this.typeInInputField(
+      richTextAreaField,
+      `Subtopic creation description text for ${title}`
+    );
+
+    await this.clickOn(subtopicPhotoBoxButton);
+    await this.page.waitForSelector(photoUploadModal, {visible: true});
+    await this.uploadFile(curriculumAdminThumbnailImage);
+    await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
+    await this.clickOn(uploadPhotoButton);
+
+    await this.page.waitForSelector(photoUploadModal, {hidden: true});
+    await this.clickOn(createSubtopicButton);
+    await this.saveTopicDraft(topicName);
+    showMessage(`Subtopic ${title} is created.`);
+  }
+
+  /**
+   * Click on create new skill button in skill dashboard.
+   */
+  async clickOnCreateNewSkillButtonInSkillDashboard(): Promise<void> {
+    const selector = this.isViewportAtMobileWidth()
+      ? createNewSkillMobileButton
+      : createNewSkillButtonInSkillDashboardSelector;
+    await this.expectElementToBeVisible(selector);
+    await this.clickOn(selector);
+    await this.expectModalTitleToBe('New Skill');
+  }
+
+  /**
+   * Checks if we are in topic editor.
+   * @param {string} topicName - Optional topic name to check.
+   *
+   * TODO(#22539): This function has a duplicate in topic-manager.ts.
+   * To avoid unexpected behavior, ensure that any modifications here are also
+   * made in topic-manager.ts.
+   */
+  async expectToBeInTopicEditor(topicName?: string): Promise<void> {
+    await this.expectElementToBeVisible(topicEditorMainTabFormSelector);
+
+    if (topicName) {
+      await this.expectElementValueToBe(oldTopicNameField, topicName);
+    }
+  }
+
+  /**
+   * Publishes a topic draft.
+   * @param topicName - Optional. If not provided, the topic editor will be opened.
+   *
+   * TODO(#22539): This function has a duplicate in topic-manager.ts.
+   * To avoid unexpected behavior, ensure that any modifications here are also
+   * made in topic-manager.ts.
+   */
+  async publishDraftTopic(topicName?: string): Promise<void> {
+    if (topicName) {
+      await this.openTopicEditor(topicName);
+    } else {
+      await this.expectToBeInTopicEditor();
+    }
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileOptionsSelector);
+      await this.clickOn(mobileSaveTopicDropdown);
+      await this.page.waitForSelector(mobilePublishTopicButton);
+      await this.clickOn(mobilePublishTopicButton);
+      await this.page.waitForSelector(mobilePublishTopicButton, {hidden: true});
+    } else {
+      await this.clickOn(publishTopicButton);
+
+      await this.page.waitForSelector(publishTopicButton, {hidden: true});
+    }
   }
 }
 

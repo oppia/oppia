@@ -32,11 +32,11 @@ import {
   ItemSelectionInputCustomizationArgs,
   MultipleChoiceInputCustomizationArgs,
 } from 'extensions/interactions/customization-args-defs';
-import {Interaction} from 'domain/exploration/InteractionObjectFactory';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {Outcome} from 'domain/exploration/outcome.model';
-import {Solution} from 'domain/exploration/SolutionObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
 import {SolutionValidityService} from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
-import {State} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 
 export interface AnswerChoice {
   val: string | number | SubtitledHtml;

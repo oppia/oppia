@@ -53,6 +53,7 @@ export class PageContextService {
   // Null ExplorationVersion implies that no exploration has been created.
   explorationVersion: number | null = null;
   explorationIsLinkedToStory: boolean = false;
+  subtopicPreviewIsOpen: boolean = false;
   questionPlayerIsManuallySet: boolean = false;
   // Context of the editor is null until initialized by init fuctions
   // at respective editors.
@@ -150,6 +151,9 @@ export class PageContextService {
           this.pageContext =
             ServicesConstants.PAGE_CONTEXT.DIAGNOSTIC_TEST_PLAYER;
           return ServicesConstants.PAGE_CONTEXT.DIAGNOSTIC_TEST_PLAYER;
+        } else if (pathnameArray[i] === 'studyguide') {
+          this.pageContext = ServicesConstants.PAGE_CONTEXT.STUDY_GUIDE_VIEWER;
+          return ServicesConstants.PAGE_CONTEXT.STUDY_GUIDE_VIEWER;
         }
       }
 
@@ -169,6 +173,18 @@ export class PageContextService {
 
   getQuestionPlayerIsManuallySet(): boolean {
     return this.questionPlayerIsManuallySet;
+  }
+
+  setSubtopicPreviewIsOpen(): void {
+    this.subtopicPreviewIsOpen = true;
+  }
+
+  setSubtopicPreviewIsClosed(): void {
+    this.subtopicPreviewIsOpen = false;
+  }
+
+  getSubtopicPreviewIsOpen(): boolean {
+    return this.subtopicPreviewIsOpen;
   }
 
   setExplorationIsLinkedToStory(): void {
@@ -301,10 +317,7 @@ export class PageContextService {
         }
       }
     }
-    throw new Error(
-      'PageContextService should not be used outside the ' +
-        'context of an exploration or a question.'
-    );
+    return '';
   }
 
   // Returns a string representing the learnerGroupId (obtained from the

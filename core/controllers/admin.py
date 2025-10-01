@@ -22,50 +22,56 @@ import operator
 import random
 import string
 
-from core import feconf
-from core import utils
+from core import feature_flag_list, feconf, utils
 from core.constants import constants
-from core.controllers import acl_decorators
-from core.controllers import base
+from core.controllers import acl_decorators, base
 from core.controllers import domain_objects_validator as validation_method
-from core.domain import auth_services
-from core.domain import blog_services
-from core.domain import classroom_config_domain
-from core.domain import classroom_config_services
-from core.domain import collection_services
-from core.domain import email_manager
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import fs_services
-from core.domain import opportunity_services
+from core.domain import (
+    auth_services,
+    blog_services,
+    classroom_config_domain,
+    classroom_config_services,
+    collection_services,
+    email_manager,
+    exp_domain,
+    exp_fetchers,
+    exp_services,
+    feature_flag_services,
+    fs_services,
+    opportunity_services,
+)
 from core.domain import platform_parameter_domain as parameter_domain
 from core.domain import platform_parameter_list
 from core.domain import platform_parameter_registry as registry
 from core.domain import platform_parameter_services as parameter_services
-from core.domain import question_domain
-from core.domain import question_services
-from core.domain import recommendations_services
-from core.domain import rights_manager
-from core.domain import role_services
-from core.domain import search_services
-from core.domain import skill_domain
-from core.domain import skill_services
-from core.domain import state_domain
-from core.domain import stats_services
-from core.domain import story_domain
-from core.domain import story_fetchers
-from core.domain import story_services
-from core.domain import subtopic_page_domain
-from core.domain import subtopic_page_services
-from core.domain import suggestion_services
-from core.domain import topic_domain
-from core.domain import topic_fetchers
-from core.domain import topic_services
-from core.domain import translation_domain
-from core.domain import user_services
-from core.domain import voiceover_services
-from core.domain import wipeout_service
+from core.domain import (
+    question_domain,
+    question_services,
+    recommendations_services,
+    rights_manager,
+    role_services,
+    search_services,
+    skill_domain,
+    skill_fetchers,
+    skill_services,
+    state_domain,
+    stats_services,
+    story_domain,
+    story_fetchers,
+    story_services,
+    study_guide_domain,
+    study_guide_services,
+    subtopic_page_domain,
+    subtopic_page_services,
+    suggestion_services,
+    topic_domain,
+    topic_fetchers,
+    topic_services,
+    translation_domain,
+    user_services,
+    voiceover_services,
+    wipeout_service,
+)
 
 from typing import Dict, List, Optional, TypedDict, Union, cast
 
@@ -998,9 +1004,24 @@ class AdminHandler(
             topic_1.move_skill_id_to_subtopic(None, 1, skill_id_2)
             topic_1.move_skill_id_to_subtopic(None, 1, skill_id_3)
 
-            subtopic_page = (
-                subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
-                    1, topic_id_1))
+            if feature_flag_services.is_feature_flag_enabled(
+                feature_flag_list.FeatureNames
+                .SHOW_RESTRUCTURED_STUDY_GUIDES.value,
+                self.user_id
+            ):
+                study_guide = (
+                    study_guide_domain.StudyGuide.create_study_guide(
+                        1, topic_id_1, 'Dummy Study Guide',
+                        'Lorem Ipsum is simply dummy text.'
+                    )
+                )
+            else:
+                subtopic_page = (
+                    subtopic_page_domain.SubtopicPage
+                    .create_default_subtopic_page(
+                        1, topic_id_1
+                    )
+                )
             # These explorations were chosen since they pass the validations
             # for published stories.
             self._reload_exploration('6')
@@ -1070,15 +1091,30 @@ class AdminHandler(
             skill_services.save_new_skill(self.user_id, skill_3)
             story_services.save_new_story(self.user_id, story)
             topic_services.save_new_topic(self.user_id, topic_1)
-            subtopic_page_services.save_subtopic_page(
-                self.user_id, subtopic_page, 'Added subtopic',
-                [topic_domain.TopicChange({
-                    'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                    'subtopic_id': 1,
-                    'title': 'Dummy Subtopic Title',
-                    'url_fragment': 'dummy-fragment'
-                })]
-            )
+            if feature_flag_services.is_feature_flag_enabled(
+                feature_flag_list.FeatureNames
+                .SHOW_RESTRUCTURED_STUDY_GUIDES.value,
+                self.user_id
+            ):
+                study_guide_services.save_study_guide(
+                    self.user_id, study_guide, 'Added study guide',
+                    [topic_domain.TopicChange({
+                        'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                        'subtopic_id': 1,
+                        'title': 'Dummy Subtopic Title',
+                        'url_fragment': 'dummy-fragment'
+                    })]
+                )
+            else:
+                subtopic_page_services.save_subtopic_page(
+                    self.user_id, subtopic_page, 'Added subtopic',
+                    [topic_domain.TopicChange({
+                        'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                        'subtopic_id': 1,
+                        'title': 'Dummy Subtopic Title',
+                        'url_fragment': 'dummy-fragment'
+                    })]
+                )
 
             # Generates translation opportunities for the Contributor Dashboard.
             exp_ids_in_story = story.story_contents.get_all_linked_exp_ids()
@@ -1273,11 +1309,11 @@ class AdminHandler(
                     subtopic_page_domain.SubtopicPage
                     .create_default_subtopic_page(1, topic_id))
             else:
-                skill = skill_services.skill_fetchers.get_skill_by_id(skill_id)
+                skill = skill_fetchers.get_skill_by_id(skill_id)
                 question_1 = question_services.get_question_by_id(question_id_1)
                 question_2 = question_services.get_question_by_id(question_id_2)
                 question_3 = question_services.get_question_by_id(question_id_3)
-                story = story_services.story_fetchers.get_story_by_id(story_id)
+                story = story_fetchers.get_story_by_id(story_id)
 
             # Generating the explorations to be added to the story.
             exploration_ids_to_publish = []

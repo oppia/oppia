@@ -19,7 +19,6 @@ from __future__ import annotations
 import contextlib
 import errno
 import getpass
-from http import client
 import io
 import os
 import platform
@@ -30,12 +29,14 @@ import ssl
 import subprocess
 import sys
 import time
+from http import client
 from urllib import error as urlerror
 from urllib import request as urlrequest
 
 from core import feconf
 from scripts import servers
 
+import certifi
 from typing import Dict, Final, Generator, List, Optional, Tuple, Union
 
 # Add third_party to path. Some scripts access feconf even before
@@ -71,7 +72,7 @@ YARN_VERSION = '1.22.15'
 #    the upgrade to develop.
 # 7. If any tests fail, DO NOT upgrade to this newer version of the redis cli.
 REDIS_CLI_VERSION = '6.2.4'
-ELASTICSEARCH_VERSION = '7.17.0'
+ELASTICSEARCH_VERSION = '7.17.27'
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
 CURR_DIR = os.path.abspath(os.getcwd())
@@ -546,7 +547,7 @@ def ask_user_to_confirm(message: str) -> None:
 
 
 def get_personal_access_token() -> str:
-    """"Returns the personal access token for the GitHub id of user.
+    """Returns the personal access token for the GitHub id of user.
 
     Returns:
         str. The personal access token for the GitHub id of user.
@@ -750,6 +751,21 @@ def write_stdout_safe(string: Union[str, bytes]) -> None:
                 continue
 
             raise
+
+
+def url_open(
+    source_url: Union[str, urlrequest.Request]
+) -> urlrequest._UrlopenRet:
+    """Opens a URL and returns the response.
+
+    Args:
+        source_url: Union[str, Request]. The URL.
+
+    Returns:
+        urlopen. The 'urlopen' object.
+    """
+    context = ssl.create_default_context(cafile=certifi.where())
+    return urlrequest.urlopen(source_url, context=context)
 
 
 def url_retrieve(

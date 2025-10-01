@@ -301,7 +301,7 @@ export class StatsReportingService {
   recordStateTransition(
     oldStateName: string,
     newStateName: string,
-    answer: string,
+    answer: string | null | {answerDetails: string},
     oldParams: Object,
     isFirstHit: boolean,
     chapterNumber: string,

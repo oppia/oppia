@@ -20,10 +20,10 @@
 import cloneDeep from 'lodash/cloneDeep';
 
 import {AppConstants} from 'app.constants';
-import {Interaction} from 'domain/exploration/InteractionObjectFactory';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
 import {Hint} from 'domain/exploration/hint-object.model';
-import {Solution} from 'domain/exploration/SolutionObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
 
 import {
   InteractionSpecsConstants,
@@ -239,7 +239,7 @@ export class StateCard {
     this._inputResponsePairs.push(cloneDeep(inputResponsePair));
   }
 
-  setLastOppiaResponse(response: string): void {
+  setLastOppiaResponse(response: string | null): void {
     // This check is added here to ensure that this._inputReponsePairs is
     // accessed only if there is atleast one input response pair present.
     // In the editor preview tab if a user clicks on restart from beginning

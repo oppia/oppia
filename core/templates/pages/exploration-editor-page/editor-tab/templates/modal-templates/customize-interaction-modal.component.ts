@@ -38,7 +38,7 @@ import {Schema} from 'services/schema-default-value.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {ConfirmLeaveModalComponent} from 'pages/exploration-editor-page/modal-templates/confirm-leave-modal.component';
 import {InteractionDetailsCacheService} from '../../services/interaction-details-cache.service';
-import {InteractionObjectFactory} from 'domain/exploration/InteractionObjectFactory';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {AppConstants} from 'app.constants';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -171,7 +171,6 @@ export class CustomizeInteractionModalComponent
     private focusManagerService: FocusManagerService,
     private injector: Injector,
     private interactionDetailsCacheService: InteractionDetailsCacheService,
-    private interactionObjectFactory: InteractionObjectFactory,
     private ngbActiveModal: NgbActiveModal,
     private ngbModal: NgbModal,
     private stateCustomizationArgsService: StateCustomizationArgsService,
@@ -245,7 +244,7 @@ export class CustomizeInteractionModalComponent
       );
 
       this.stateCustomizationArgsService.displayed =
-        this.interactionObjectFactory.convertFromCustomizationArgsBackendDict(
+        Interaction.convertFromCustomizationArgsBackendDict(
           newInteractionId,
           customizationArgsBackendDict
         );

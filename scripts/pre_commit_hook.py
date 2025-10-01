@@ -37,7 +37,7 @@ import sys
 # When executing Python scripts using `python -m ...` from oppia/oppia,
 # Python adds the repository root to sys.path. See the documentation at
 #
-#   https://docs.python.org/3.9/library/sys.html#sys.path
+#   https://docs.python.org/3.10/library/sys.html#sys.path
 #
 # However, when git executes pre_commit_hook.py from its symlink in
 # /.git/hooks, the shebang #!/usr/bin/env python at the top of this file
@@ -46,8 +46,17 @@ import sys
 # rather than the opipa/oppia root. To correct this problem, we add the
 # current working directory to sys.path.
 sys.path.append(os.getcwd())
-from core import feconf  # isort:skip # pylint: disable=wrong-import-position
-from typing import Final, List, Optional, Tuple  # isort:skip  # pylint: disable=wrong-import-position
+
+# These imports must come after sys.path modification,
+# so the pylint import-position rules are disabled.
+from core import feconf  # pylint: disable=wrong-import-position
+
+from typing import (  # pylint: disable=wrong-import-position
+    Final,
+    List,
+    Optional,
+    Tuple,
+)
 
 FECONF_FILEPATH: Final = os.path.join('core', 'feconf.py')
 CONSTANTS_FILEPATH: Final = os.path.join('.', 'assets', 'constants.ts')

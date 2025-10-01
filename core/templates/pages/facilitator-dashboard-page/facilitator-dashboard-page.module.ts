@@ -27,8 +27,6 @@ import {FacilitatorDashboardPageAuthGuard} from './facilitator-dashboard-page-au
 
 @NgModule({
   imports: [
-    // TODO(#13443): Remove smart router module provider once all pages are
-    // migrated to angular router.
     SharedComponentsModule,
     ToastrModule.forRoot(toastrConfig),
     RouterModule.forChild([

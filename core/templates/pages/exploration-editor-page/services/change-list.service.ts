@@ -39,7 +39,7 @@ import {
 import {
   ParamChange,
   ParamChangeBackendDict,
-} from 'domain/exploration/ParamChangeObjectFactory';
+} from 'domain/exploration/param-change.model';
 import {
   InteractionCustomizationArgs,
   InteractionCustomizationArgsBackendDict,
@@ -50,7 +50,7 @@ import {
 } from 'domain/exploration/answer-group.model';
 import {Hint, HintBackendDict} from 'domain/exploration/hint-object.model';
 import {Outcome, OutcomeBackendDict} from 'domain/exploration/outcome.model';
-import {LostChange} from 'domain/exploration/LostChangeObjectFactory';
+import {LostChange} from 'domain/exploration/lost-change.model';
 import {BaseTranslatableObject} from 'domain/objects/BaseTranslatableObject.model';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 import {VoiceoverTypeToVoiceoversBackendDict} from 'domain/exploration/voiceover.model';

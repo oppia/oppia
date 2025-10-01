@@ -38,22 +38,4 @@ describe('GenerateContentIdService', () => {
       expect(gcis.getNextStateId('feedback')).toEqual('feedback_1');
     }
   );
-
-  it('should generate content id for new worked example', () => {
-    expect(
-      gcis.getNextId(['worked_example_question_1'], 'worked_example_question')
-    ).toEqual('worked_example_question_2');
-    expect(
-      gcis.getNextId(
-        ['worked_example_explanation_1'],
-        'worked_example_explanation'
-      )
-    ).toEqual('worked_example_explanation_2');
-  });
-
-  it('should throw error for unknown content id', () => {
-    expect(function () {
-      gcis.getNextId(['xyz'], 'random_component_name');
-    }).toThrowError('Unknown component name provided.');
-  });
 });

@@ -38,6 +38,7 @@ import {Subscription} from 'rxjs';
 interface HTMLSchema {
   type: string;
   ui_config: {
+    rte_component_config_id: 'ALL_COMPONENTS';
     hide_complex_extensions: boolean;
   };
 }
@@ -75,6 +76,7 @@ export class StateContentEditorComponent implements OnInit {
     this.HTML_SCHEMA = {
       type: 'html',
       ui_config: {
+        rte_component_config_id: 'ALL_COMPONENTS',
         hide_complex_extensions:
           this.pageContextService.getEntityType() === 'question',
       },
@@ -100,10 +102,14 @@ export class StateContentEditorComponent implements OnInit {
   }
 
   isCardHeightLimitReached(): boolean {
-    let shadowPreviewCard = $(
+    const shadowPreviewCard = document.querySelector(
       '.oppia-shadow-preview-card .oppia-learner-view-card-top-section'
-    );
-    let height = shadowPreviewCard.height() as number;
+    ) as HTMLElement | null;
+
+    if (!shadowPreviewCard) {
+      return false;
+    }
+    const height = shadowPreviewCard.offsetHeight;
     return height > 630;
   }
 

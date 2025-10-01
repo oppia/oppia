@@ -56,7 +56,9 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
                 # Pylint doesn't recognize that if we reach this part of the
                 # code, then had_attribute is True, which means that we did set
                 # `original` above.
-                setattr(sys, 'real_prefix', original)  # pylint: disable=used-before-assignment
+                setattr(
+                    sys, 'real_prefix', original # pylint: disable=used-before-assignment
+                )
             else:
                 delattr(sys, 'real_prefix')
 
@@ -114,9 +116,9 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
 
     def test_install_installation_tools(self) -> None:
         expected_tools = {
-            'pip': '24.3.1',
-            'pip-tools': '7.4.1',
-            'setuptools': '75.6.0',
+            'pip': '25.2',
+            'pip-tools': '7.5.0',
+            'setuptools': '80.9.0',
         }
         installed_tools: Dict[str, str] = {}
 
@@ -185,7 +187,8 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             pass
 
         def mock_open(*_args: str, **_kwargs: str) -> io.StringIO:
-            return io.StringIO('mock file contents')
+            return io.StringIO(
+                '#    pip-compile --generate-hashes\nmock file contents')
 
         run_swap = self.swap_with_checks(
             subprocess, 'run', mock_run, expected_args=[
@@ -226,7 +229,8 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
 
         def mock_open(*_args: str, **_kwargs: str) -> io.StringIO:
             counter.append(1)
-            return io.StringIO(f'mock file contents {len(counter)}')
+            return io.StringIO(
+                f'#    pip-compile --generate-hashes\nmock file {len(counter)}')
 
         run_swap = self.swap_with_checks(
             subprocess, 'run', mock_run, expected_args=[

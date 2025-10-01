@@ -24,11 +24,13 @@ import sys
 
 from core.constants import constants
 from core.tests import test_utils
-from scripts import build
-from scripts import common
-from scripts import run_acceptance_tests
-from scripts import scripts_test_utils
-from scripts import servers
+from scripts import (
+    build,
+    common,
+    run_acceptance_tests,
+    scripts_test_utils,
+    servers,
+)
 
 from typing import ContextManager, List, Optional, Tuple
 
@@ -106,8 +108,8 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             super().tearDown()
 
     def test_compile_test_ts_files_with_error(self) -> None:
-        def mock_popen_error_call(
-            unused_cmd_tokens: List[str], *args: str, **kwargs: str # pylint: disable=unused-argument
+        def mock_popen_error_call( # pylint: disable=unused-argument
+            unused_cmd_tokens: List[str], *args: str, **kwargs: str
         ) -> PopenErrorReturn:
             return PopenErrorReturn()
 
@@ -129,13 +131,13 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         def mock_shutil_rmtree(unused_path: str) -> None:
             pass
 
-        def mock_shutil_copytree(
-            src: str, dst: str, *args: str, **kwargs: str # pylint: disable=unused-argument
+        def mock_shutil_copytree( # pylint: disable=unused-argument
+            src: str, dst: str, *args: str, **kwargs: str
         ) -> None:
             pass
 
-        def mock_popen_call(
-            cmd_tokens: List[str], *args: str, **kwargs: str # pylint: disable=unused-argument
+        def mock_popen_call( # pylint: disable=unused-argument
+            cmd_tokens: List[str], *args: str, **kwargs: str
         ) -> subprocess.Popen[bytes]:
             return process
 
@@ -258,7 +260,8 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
                     'stdout': subprocess.PIPE,
                 },
             ]))
-        args = run_acceptance_tests._PARSER.parse_args(args=['--suite', 'testSuite'])  # pylint: disable=protected-access, line-too-long
+        args = run_acceptance_tests._PARSER.parse_args( # pylint: disable=protected-access, line-too-long
+            args=['--suite', 'testSuite'])
 
         with self.swap_mock_set_constants_to_default:
             with self.compile_test_ts_files_swap:

@@ -33,13 +33,13 @@ import {
   SkillLinkageModificationsArray,
 } from 'domain/question/editable-question-backend-api.service';
 import {QuestionSummary} from 'domain/question/question-summary-object.model';
-import {QuestionObjectFactory} from 'domain/question/QuestionObjectFactory';
+import {Question} from 'domain/question/question.model';
 import {Misconception} from 'domain/skill/misconception.model';
 import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {SkillDifficulty} from 'domain/skill/skill-difficulty.model';
-import {SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
-import {State} from 'domain/state/StateObjectFactory';
+import {Skill} from 'domain/skill/skill.model';
+import {State} from 'domain/state/state.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {SkillEditorRoutingService} from 'pages/skill-editor-page/services/skill-editor-routing.service';
 import {AlertsService} from 'services/alerts.service';
@@ -84,15 +84,13 @@ describe('Questions List Component', () => {
   let skillBackendApiService: SkillBackendApiService;
   let alertsService: AlertsService;
   let loggerService: LoggerService;
-  let questionObjectFactory: QuestionObjectFactory;
   let editableQuestionBackendApiService: EditableQuestionBackendApiService;
   let questionUndoRedoService: QuestionUndoRedoService;
   let pageContextService: PageContextService;
   let questionValidationService: QuestionValidationService;
-  let skillObjectFactory: SkillObjectFactory;
+  let skill: Skill;
   let question = null;
   let questionStateData = null;
-  let skill = null;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -108,7 +106,6 @@ describe('Questions List Component', () => {
         SkillEditorRoutingService,
         SkillBackendApiService,
         AlertsService,
-        QuestionObjectFactory,
         EditableQuestionBackendApiService,
         QuestionUndoRedoService,
         {
@@ -127,14 +124,12 @@ describe('Questions List Component', () => {
     component = fixture.componentInstance;
 
     ngbModal = TestBed.inject(NgbModal);
-    skillObjectFactory = TestBed.inject(SkillObjectFactory);
 
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     questionsListService = TestBed.inject(QuestionsListService);
     skillEditorRoutingService = TestBed.inject(SkillEditorRoutingService);
     skillBackendApiService = TestBed.inject(SkillBackendApiService);
     alertsService = TestBed.inject(AlertsService);
-    questionObjectFactory = TestBed.inject(QuestionObjectFactory);
     editableQuestionBackendApiService = TestBed.inject(
       EditableQuestionBackendApiService
     );
@@ -143,7 +138,7 @@ describe('Questions List Component', () => {
     pageContextService = TestBed.inject(PageContextService);
     questionValidationService = TestBed.inject(QuestionValidationService);
 
-    question = questionObjectFactory.createFromBackendDict({
+    question = Question.createFromBackendDict({
       id: '1',
       question_state_data: {
         content: {
@@ -229,7 +224,7 @@ describe('Questions List Component', () => {
 
     questionStateData = question.getStateData();
 
-    skill = skillObjectFactory.createFromBackendDict({
+    skill = Skill.createFromBackendDict({
       id: 'skillId1',
       description: 'test description 1',
       misconceptions: [
@@ -247,7 +242,6 @@ describe('Questions List Component', () => {
           html: 'test explanation',
           content_id: 'explanation',
         },
-        worked_examples: [],
         recorded_voiceovers: {
           voiceovers_mapping: {},
         },
@@ -347,7 +341,7 @@ describe('Questions List Component', () => {
     fakeAsync(() => {
       component.selectedSkillId = 'true';
 
-      const skillWithExplanations = skillObjectFactory.createFromBackendDict({
+      const skillWithExplanations = Skill.createFromBackendDict({
         id: 'skillId1',
         description: 'test description 1',
         misconceptions: [],
@@ -363,7 +357,6 @@ describe('Questions List Component', () => {
         ],
         skill_contents: {
           explanation: {html: 'test explanation', content_id: 'explanation'},
-          worked_examples: [],
           recorded_voiceovers: {voiceovers_mapping: {}},
         },
         language_code: 'en',
@@ -431,7 +424,7 @@ describe('Questions List Component', () => {
   });
 
   it('should populate misconceptions when a question is created', fakeAsync(() => {
-    const skill = skillObjectFactory.createFromBackendDict({
+    const skill = Skill.createFromBackendDict({
       id: 'skillId1',
       description: 'test description 1',
       misconceptions: [
@@ -449,7 +442,6 @@ describe('Questions List Component', () => {
           html: 'test explanation',
           content_id: 'explanation',
         },
-        worked_examples: [],
         recorded_voiceovers: {
           voiceovers_mapping: {},
         },
@@ -1176,7 +1168,6 @@ describe('Questions List Component', () => {
       language_code: 'en',
       version: 1,
       misconception_count: 3,
-      worked_examples_count: 3,
       skill_model_created_on: 1593138898626.193,
       skill_model_last_updated: 1593138898626.193,
     };
@@ -1212,7 +1203,6 @@ describe('Questions List Component', () => {
       language_code: 'en',
       version: 1,
       misconception_count: 3,
-      worked_examples_count: 3,
       skill_model_created_on: 1593138898626.193,
       skill_model_last_updated: 1593138898626.193,
     };
@@ -1268,7 +1258,6 @@ describe('Questions List Component', () => {
       language_code: 'en',
       version: 1,
       misconception_count: 3,
-      worked_examples_count: 3,
       skill_model_created_on: 1593138898626.193,
       skill_model_last_updated: 1593138898626.193,
     };

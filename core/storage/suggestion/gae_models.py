@@ -19,21 +19,28 @@ from __future__ import annotations
 import datetime
 import enum
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
 from core.platform import models
 
 from typing import (
-    Dict, Final, List, Literal, Mapping, Optional, Sequence, Tuple, TypedDict,
-    Union)
+    Dict,
+    Final,
+    List,
+    Literal,
+    Mapping,
+    Optional,
+    Sequence,
+    Tuple,
+    TypedDict,
+    Union,
+)
 
 MYPY = False
 if MYPY: # pragma: no cover
     # Here, 'change_domain' is imported only for type checking.
-    from core.domain import change_domain  # pylint: disable=invalid-import # isort:skip
-    from mypy_imports import base_models
-    from mypy_imports import datastore_services
+    from core.domain import change_domain  # pylint: disable=invalid-import
+    from mypy_imports import base_models, datastore_services
 
 (base_models, user_models) = models.Registry.import_models([
     models.Names.BASE_MODEL, models.Names.USER
@@ -578,7 +585,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         return cls.get_all().filter(datastore_services.all_of(
             cls.status == STATUS_IN_REVIEW,
             cls.score_category.IN(score_categories),
-            cls.author_id != user_id
+            datastore_services.not_equal(cls.author_id, user_id),
         )).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
 
     @classmethod
@@ -604,7 +611,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         return cls.get_all().filter(datastore_services.all_of(
             cls.status == STATUS_IN_REVIEW,
             cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            cls.author_id != user_id,
+            datastore_services.not_equal(cls.author_id, user_id),
             cls.language_code.IN(language_codes)
         )).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
 
@@ -683,7 +690,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         suggestion_query = cls.get_all().filter(datastore_services.all_of(
             cls.status == STATUS_IN_REVIEW,
             cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            cls.author_id != user_id,
+            datastore_services.not_equal(cls.author_id, user_id),
             cls.language_code.IN(language_codes)
         ))
 
@@ -724,7 +731,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         ] = cls.get_all().filter(datastore_services.all_of(
             cls.status == STATUS_IN_REVIEW,
             cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            cls.author_id != user_id,
+            datastore_services.not_equal(cls.author_id, user_id),
             cls.language_code.IN(language_codes)
         )).fetch(
             projection=[cls.target_id]
@@ -868,7 +875,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         suggestion_query = cls.get_all().filter(datastore_services.all_of(
             cls.status == STATUS_IN_REVIEW,
             cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            cls.author_id != user_id,
+            datastore_services.not_equal(cls.author_id, user_id),
             cls.language_code.IN(language_codes),
             cls.target_id.IN(exp_ids)
         ))
@@ -1007,7 +1014,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 offset
             )
 
-        filters.append(cls.author_id != user_id)
+        filters.append(datastore_services.not_equal(cls.author_id, user_id))
         suggestion_query = cls.get_all().filter(
             datastore_services.all_of(*filters))
 
@@ -2353,7 +2360,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
         page_size: int,
         offset: int,
         language_code: str,
-        sort_by: Optional[SortChoices.value],
+        sort_by: Optional[str],
         topic_ids: Optional[List[str]],
         max_days_since_last_activity: Optional[int]
     ) -> Tuple[Sequence[TranslationSubmitterTotalContributionStatsModel],
@@ -2776,7 +2783,7 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
         page_size: int,
         offset: int,
         language_code: str,
-        sort_by: Optional[SortChoices.value],
+        sort_by: Optional[str],
         max_days_since_last_activity: Optional[int]
     ) -> Tuple[Sequence[TranslationReviewerTotalContributionStatsModel],
                 int,
@@ -3101,7 +3108,7 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
         cls,
         page_size: int,
         offset: int,
-        sort_by: Optional[SortChoices.value],
+        sort_by: Optional[str],
         topic_ids: Optional[List[str]],
         max_days_since_last_activity: Optional[int]
     ) -> Tuple[Sequence[QuestionSubmitterTotalContributionStatsModel],
@@ -3401,7 +3408,7 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
         cls,
         page_size: int,
         offset: int,
-        sort_by: Optional[SortChoices.value],
+        sort_by: Optional[str],
         max_days_since_last_activity: Optional[int]
     ) -> Tuple[Sequence[QuestionReviewerTotalContributionStatsModel],
                 int,

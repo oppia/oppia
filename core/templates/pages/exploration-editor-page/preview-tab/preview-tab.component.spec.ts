@@ -24,9 +24,10 @@ import {
   TestBed,
   tick,
   waitForAsync,
+  discardPeriodicTasks,
 } from '@angular/core/testing';
-import {ParamChangeObjectFactory} from 'domain/exploration/ParamChangeObjectFactory';
-import {StateObjectFactory} from 'domain/state/StateObjectFactory';
+import {ParamChange} from 'domain/exploration/param-change.model';
+import {State} from 'domain/state/state.model';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {TranslateService} from '@ngx-translate/core';
@@ -48,10 +49,21 @@ import {ExplorationDataService} from '../services/exploration-data.service';
 import {NumberAttemptsService} from 'pages/exploration-player-page/services/number-attempts.service';
 import {RouterService} from '../services/router.service';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
+import {PlatformFeatureService} from '../../../services/platform-feature.service';
+import {ChangeListService} from '../services/change-list.service';
+import {VoiceoverBackendDict} from 'domain/exploration/voiceover.model';
 
 class MockNgbModalRef {
   componentInstance!: {
     manualParamChanges: null;
+  };
+}
+
+class MockPlatformFeatureService {
+  status = {
+    NewLessonPlayer: {
+      isEnabled: false,
+    },
   };
 }
 
@@ -72,19 +84,19 @@ describe('Preview Tab Component', () => {
   let explorationEngineService: ExplorationEngineService;
   let explorationInitStateNameService: ExplorationInitStateNameService;
   let explorationFeaturesService: ExplorationFeaturesService;
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
   let conversationFlowService: ConversationFlowService;
   let explorationParamChangesService: ExplorationParamChangesService;
   let explorationStatesService: ExplorationStatesService;
   let graphDataService: GraphDataService;
   let routerService: RouterService;
   let stateEditorService: StateEditorService;
-  let stateObjectFactory: StateObjectFactory;
-  let paramChangeObjectFactory: ParamChangeObjectFactory;
   let parameterMetadataService: ParameterMetadataService;
   let mockUpdateActiveStateIfInEditorEventEmitter = new EventEmitter();
   let mockPlayerStateChangeEventEmitter = new EventEmitter();
   let numberAttemptsService: NumberAttemptsService;
   let entityVoiceoversService: EntityVoiceoversService;
+  let changeListService: ChangeListService;
 
   let getUnsetParametersInfo: jasmine.Spy;
   let explorationId = 'exp1';
@@ -139,17 +151,19 @@ describe('Preview Tab Component', () => {
           useClass: MockNgbModal,
         },
         {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService,
+        },
+        {
           provide: ExplorationDataService,
           useValue: {
             getDataAsync: () =>
               Promise.resolve({
                 param_changes: [
-                  paramChangeObjectFactory
-                    .createEmpty(changeObjectName)
-                    .toBackendDict(),
+                  ParamChange.createEmpty(changeObjectName).toBackendDict(),
                 ],
                 states: [
-                  stateObjectFactory.createDefaultState(
+                  State.createDefaultState(
                     stateName,
                     'content_0',
                     'default_outcome_1'
@@ -173,8 +187,6 @@ describe('Preview Tab Component', () => {
     component = fixture.componentInstance;
     numberAttemptsService = TestBed.inject(NumberAttemptsService);
     routerService = TestBed.inject(RouterService);
-    paramChangeObjectFactory = TestBed.inject(ParamChangeObjectFactory);
-    stateObjectFactory = TestBed.inject(StateObjectFactory);
     explorationEngineService = TestBed.inject(ExplorationEngineService);
     editableExplorationBackendApiService = TestBed.inject(
       EditableExplorationBackendApiService
@@ -195,6 +207,7 @@ describe('Preview Tab Component', () => {
     ngbModal = TestBed.inject(NgbModal);
     pageContextService = TestBed.inject(PageContextService);
     entityVoiceoversService = TestBed.inject(EntityVoiceoversService);
+    changeListService = TestBed.inject(ChangeListService);
 
     spyOn(pageContextService, 'getExplorationId').and.returnValue(
       explorationId
@@ -209,7 +222,7 @@ describe('Preview Tab Component', () => {
       'fetchApplyDraftExplorationAsync'
     ).and.returnValue(Promise.resolve(exploration));
     explorationParamChangesService.savedMemento = [
-      paramChangeObjectFactory.createEmpty(changeObjectName).toBackendDict(),
+      ParamChange.createEmpty(changeObjectName).toBackendDict(),
     ];
     spyOnProperty(
       stateEditorService,
@@ -368,5 +381,53 @@ describe('Preview Tab Component', () => {
     flush();
 
     expect(component.loadPreviewState).toHaveBeenCalled();
+  }));
+
+  it('should check new lesson player feature flag is enabled', () => {
+    mockPlatformFeatureService.status.NewLessonPlayer.isEnabled = true;
+    expect(component.isNewLessonPlayerEnabled()).toBe(true);
+  });
+
+  it('should be able to update voiceover with the active change list', fakeAsync(() => {
+    let voiceover1: VoiceoverBackendDict = {
+      filename: 'b.mp3',
+      file_size_bytes: 100000,
+      needs_update: false,
+      duration_secs: 12.0,
+    };
+
+    let changeDicts = [
+      {
+        cmd: 'update_voiceovers',
+        language_accent_code: 'en-US',
+        content_id: 'content_id_1',
+        voiceovers: {
+          manual: voiceover1,
+        },
+      },
+      {
+        cmd: 'update_voiceovers',
+        language_accent_code: 'en-US',
+        content_id: 'content_id_2',
+        voiceovers: {},
+      },
+    ];
+
+    spyOn(changeListService, 'getVoiceoverChangeList').and.returnValue(
+      changeDicts
+    );
+
+    spyOn(
+      entityVoiceoversService,
+      'getEntityVoiceoversByLanguageAccentCode'
+    ).and.returnValue(undefined);
+
+    spyOn(entityVoiceoversService, 'addEntityVoiceovers');
+
+    component.updateManualVoiceoverWithChangeList();
+    flush();
+    discardPeriodicTasks();
+
+    expect(entityVoiceoversService.addEntityVoiceovers).toHaveBeenCalled();
   }));
 });

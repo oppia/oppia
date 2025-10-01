@@ -1,0 +1,9 @@
+from typing import Any
+
+from . import timestamp_pb2
+
+class Message:
+    def SerializeToString(self) -> bytes: ...
+    def ParseFromString(self, data: bytes) -> None: ...
+
+def text_format_message(message: Message) -> str: ...

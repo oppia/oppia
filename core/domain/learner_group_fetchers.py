@@ -18,16 +18,14 @@
 
 from __future__ import annotations
 
-from core.domain import learner_group_domain
-from core.domain import learner_group_services
+from core.domain import learner_group_domain, learner_group_services
 from core.platform import models
 
 from typing import List, Literal, Optional, Sequence, overload
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import learner_group_models
-    from mypy_imports import user_models
+    from mypy_imports import learner_group_models, user_models
 
 (learner_group_models, user_models) = models.Registry.import_models(
     [models.Names.LEARNER_GROUP, models.Names.USER])

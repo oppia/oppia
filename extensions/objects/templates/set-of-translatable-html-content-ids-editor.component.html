@@ -11,8 +11,8 @@
 <div class="set-of-translatable-html-content-ids-editor">
   <div class="container-fluid">
     <div *ngFor="let choice of choices; let idx = index">
-      <mat-checkbox (click)="toggleSelection(idx)"
-                    [(ngModel)]="selections[idx]"
+      <mat-checkbox [(ngModel)]="selections[idx]"
+                    (ngModelChange)="toggleSelection(idx)"
                     class="oppia-check-box fx-row" aria-label="choice">
         <span>
           <oppia-rte-output-display class="e2e-test-html-item-select-option" [rteString]="choice.id">

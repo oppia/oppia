@@ -30,25 +30,38 @@ import json
 import re
 import string
 
-from core import feconf
-from core import schema_utils
-from core import utils
+from core import feconf, schema_utils, utils
 from core.constants import constants
-from core.domain import change_domain
-from core.domain import param_domain
-from core.domain import state_domain
-from core.domain import translation_domain
+from core.domain import html_cleaner  # pylint: disable=invalid-import-from
+from core.domain import (  # pylint: disable=invalid-import-from
+    change_domain,
+    html_validation_service,
+    interaction_registry,
+    param_domain,
+    state_domain,
+    translation_domain,
+)
+from core.platform import models  # pylint: disable=invalid-import-from
 from extensions.objects.models import objects
 
 import bs4
 from typing import (
-    Any, Callable, Dict, Final, List, Literal, Mapping, Optional, Sequence,
-    Set, Tuple, TypedDict, Union, cast, overload)
-
-from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
-from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
-from core.domain import interaction_registry  # pylint: disable=invalid-import-from # isort:skip
-from core.platform import models  # pylint: disable=invalid-import-from # isort:skip
+    Any,
+    Callable,
+    Dict,
+    Final,
+    List,
+    Literal,
+    Mapping,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+    TypedDict,
+    Union,
+    cast,
+    overload,
+)
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
@@ -2514,6 +2527,24 @@ class Exploration(translation_domain.BaseTranslatableObject):
             self.edits_allowed
         )
 
+    def find_content_by_content_id(
+        self, content_id: str
+    ) -> Optional[Union[str, List[str]]]:
+        """Traverse all states and return the content for a given content_id.
+
+        Args:
+            content_id: str. The content_id to search for.
+
+        Returns:
+            str|List[str]|None. The content if found, else None.
+        """
+        for state in self.states.values():
+            contents_collection = state.get_translatable_contents_collection()
+            content_map = contents_collection.content_id_to_translatable_content
+            if content_id in content_map:
+                return content_map[content_id].content_value
+        return None
+
     @classmethod
     def _convert_states_v41_dict_to_v42_dict(
         cls, states_dict: Dict[str, state_domain.StateDict]
@@ -2886,7 +2917,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 translations_mapping = (
                     # Here we use MyPy ignore because the latest schema of state
                     # dict doesn't contains written_translations property.
-                    state_dict['written_translations']['translations_mapping']) # type: ignore[misc]
+                    state_dict['written_translations']['translations_mapping']) # type: ignore[typeddict-item]
                 for content_id in translations_mapping:
                     if content_id in list_of_subtitled_unicode_content_ids:
                         for language_code in translations_mapping[content_id]:
@@ -3134,7 +3165,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains written_translations property.
         translations_mapping = (
-            state_dict['written_translations']['translations_mapping'])  # type: ignore[misc]
+            state_dict['written_translations']['translations_mapping'])  # type: ignore[typeddict-item]
         new_translations_mapping = {
              content_id: translation_item for
              content_id, translation_item in translations_mapping.items()
@@ -3142,20 +3173,20 @@ class Exploration(translation_domain.BaseTranslatableObject):
         }
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains written_translations property.
-        state_dict['written_translations']['translations_mapping'] = (  # type: ignore[misc]
+        state_dict['written_translations']['translations_mapping'] = (  # type: ignore[typeddict-item]
             new_translations_mapping)
 
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains recorded_voiceovers property.
         voiceovers_mapping = (
-            state_dict['recorded_voiceovers']['voiceovers_mapping']) # type: ignore[misc]
+            state_dict['recorded_voiceovers']['voiceovers_mapping']) # type: ignore[typeddict-item]
         new_voiceovers_mapping = {}
         for content_id, voiceover_item in voiceovers_mapping.items():
             if content_id in content_id_list:
                 new_voiceovers_mapping[content_id] = voiceover_item
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains recorded_voiceovers property.
-        state_dict['recorded_voiceovers']['voiceovers_mapping'] = ( # type: ignore[misc]
+        state_dict['recorded_voiceovers']['voiceovers_mapping'] = ( # type: ignore[typeddict-item]
             new_voiceovers_mapping)
 
     @classmethod
@@ -3382,13 +3413,13 @@ class Exploration(translation_domain.BaseTranslatableObject):
         for content_id in content_ids_of_choices_to_update:
             # Here we use MyPy ignore because the latest schema of state
             # dict doesn't contains written_translations property.
-            choice_translations = state_dict['written_translations'][  # type: ignore[misc]
+            choice_translations = state_dict['written_translations'][  # type: ignore[typeddict-item]
                 'translations_mapping'][content_id]
             for translation in choice_translations.values():
                 translation['needs_update'] = True
             # Here we use MyPy ignore because the latest schema of state
             # dict doesn't contains recorded_voiceovers property.
-            choice_voiceovers = state_dict['recorded_voiceovers'][ # type: ignore[misc]
+            choice_voiceovers = state_dict['recorded_voiceovers'][ # type: ignore[typeddict-item]
                 'voiceovers_mapping'][content_id]
             for choice_voiceover in choice_voiceovers.values():
                 choice_voiceover['needs_update'] = True
@@ -3666,13 +3697,13 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
             # Here we use MyPy ignore because the latest schema of state
             # dict doesn't contains written_translations property.
-            continue_button_translations = state_dict['written_translations'][ # type: ignore[misc]
+            continue_button_translations = state_dict['written_translations'][ # type: ignore[typeddict-item]
                 'translations_mapping'][content_id]
             for translation in continue_button_translations.values():
                 translation['needs_update'] = True
             # Here we use MyPy ignore because the latest schema of state
             # dict doesn't contains recorded_voiceovers property.
-            choice_voiceovers = state_dict['recorded_voiceovers'][ # type: ignore[misc]
+            choice_voiceovers = state_dict['recorded_voiceovers'][ # type: ignore[typeddict-item]
                 'voiceovers_mapping'][content_id]
             for choice_voiceover in choice_voiceovers.values():
                 choice_voiceover['needs_update'] = True
@@ -5023,7 +5054,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             # Here we use MyPy ignore because the latest schema of state
             # dict doesn't contains written_translations property.
             written_translations = (
-                state['written_translations']['translations_mapping'])  # type: ignore[misc]
+                state['written_translations']['translations_mapping'])  # type: ignore[typeddict-item]
             for translation_item in written_translations.values():
                 for translation in translation_item.values():
                     if isinstance(translation['translation'], list):
@@ -5090,10 +5121,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
         for _, state_dict in states_dict.items():
             # Here we use MyPy ignore because the latest schema of state
             # dict doesn't contains next_content_id_index property.
-            del state_dict['next_content_id_index'] # type: ignore[misc]
+            del state_dict['next_content_id_index'] # type: ignore[typeddict-item]
             # Here we use MyPy ignore because the latest schema of state
             # dict doesn't contains written_translations property.
-            del state_dict['written_translations'] # type: ignore[misc]
+            del state_dict['written_translations'] # type: ignore[typeddict-item]
         states_dict, next_content_id_index = (
             state_domain.State
             .update_old_content_id_to_new_content_id_in_v54_states(states_dict)
@@ -5141,7 +5172,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         for _, state_dict in states_dict.items():
             # Here we use MyPy ignore because the latest schema of state
             # dict doesn't contains recorded_voiceovers property.
-            del state_dict['recorded_voiceovers'] # type: ignore[misc]
+            del state_dict['recorded_voiceovers'] # type: ignore[typeddict-item]
 
         return states_dict
 
@@ -5755,7 +5786,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         # `schema_version` key, but here we are defining a `schema_version` key
         # which causes MyPy to throw error 'TypedDict has no key schema_version'
         # thus to silence the error, we used ignore here.
-        exp_dict['schema_version'] = self.CURRENT_EXP_SCHEMA_VERSION  # type: ignore[misc]
+        exp_dict['schema_version'] = self.CURRENT_EXP_SCHEMA_VERSION  # type: ignore[typeddict-item]
 
         # The ID is the only property which should not be stored within the
         # YAML representation.

@@ -22,11 +22,10 @@ import datetime
 import random
 import string
 
-from core import feconf
-from core import utils
+import core.storage.base_model.gae_models as base_models
+from core import feconf, utils
 from core.constants import constants
 from core.platform import models
-import core.storage.base_model.gae_models as base_models
 
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
 
@@ -1112,20 +1111,6 @@ class ExpSummaryModel(base_models.BaseModel):
             cls.viewer_ids == user_id,
             cls.contributor_ids == user_id
         )).get(keys_only=True) is not None
-
-    @classmethod
-    def get_non_private(cls) -> Sequence[ExpSummaryModel]:
-        """Returns an iterable with non-private ExpSummary models.
-
-        Returns:
-            iterable. An iterable with non-private ExpSummary models.
-        """
-        return ExpSummaryModel.query().filter(
-            ExpSummaryModel.status != constants.ACTIVITY_STATUS_PRIVATE
-        ).filter(
-            ExpSummaryModel.deleted # pylint: disable=singleton-comparison
-            == False
-        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
     def get_top_rated(cls, limit: int) -> Sequence[ExpSummaryModel]:

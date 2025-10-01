@@ -63,7 +63,6 @@ describe('SkillSelectorEditorComponent', () => {
       version: 1,
       misconceptions: [],
       skill_contents: {
-        worked_examples: [],
         explanation: {
           content_id: 'explanation',
           html: '<p>Release Testing Dec 2020</p>',
@@ -102,7 +101,6 @@ describe('SkillSelectorEditorComponent', () => {
       version: 3,
       misconceptions: [],
       skill_contents: {
-        worked_examples: [],
         explanation: {
           content_id: 'explanation',
           html: '<p>A ratio represents...</p>',

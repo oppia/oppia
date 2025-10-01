@@ -23,12 +23,14 @@ import sys
 import time
 
 from core.tests import test_utils
-from scripts import build
-from scripts import common
-from scripts import install_third_party_libs
-from scripts import run_e2e_tests
-from scripts import scripts_test_utils
-from scripts import servers
+from scripts import (
+    build,
+    common,
+    install_third_party_libs,
+    run_e2e_tests,
+    scripts_test_utils,
+    servers,
+)
 
 from typing import ContextManager, Final, Tuple
 
@@ -201,7 +203,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     'stdout': subprocess.PIPE,
                 },
             ]))
-        args = run_e2e_tests._PARSER.parse_args(args=[])  # pylint: disable=protected-access
+        args = run_e2e_tests._PARSER.parse_args( # pylint: disable=protected-access
+            args=[])
 
         with self.swap_mock_set_constants_to_default:
             lines, _ = run_e2e_tests.run_tests(args)

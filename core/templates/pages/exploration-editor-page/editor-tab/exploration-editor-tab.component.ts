@@ -33,7 +33,7 @@ import {Outcome} from 'domain/exploration/outcome.model';
 import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {Hint} from 'domain/exploration/hint-object.model';
-import {Solution} from 'domain/exploration/SolutionObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
 import {StateCardIsCheckpointService} from 'components/state-editor/state-editor-properties-services/state-card-is-checkpoint.service';
 import {ExplorationInitStateNameService} from '../services/exploration-init-state-name.service';
 import {ExplorationWarningsService} from '../services/exploration-warnings.service';

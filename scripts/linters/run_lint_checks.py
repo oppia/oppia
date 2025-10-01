@@ -65,19 +65,22 @@ import threading
 
 from core import utils
 from scripts import common
-from typing import Dict, List, Optional, Set, Tuple
+
+from typing import Dict, List, Optional, Set, Tuple, cast
+
+from .. import concurrent_task_utils, install_third_party_libs
 
 # Install third party dependencies before proceeding.
-from . import codeowner_linter  # isort:skip
-from . import css_linter  # isort:skip
-from . import general_purpose_linter  # isort:skip
-from . import html_linter  # isort:skip
-from . import js_ts_linter  # isort:skip
-from . import linter_utils  # isort:skip
-from . import other_files_linter  # isort:skip
-from . import python_linter  # isort:skip
-from .. import concurrent_task_utils  # isort:skip
-from .. import install_third_party_libs  # isort:skip
+from . import (
+    codeowner_linter,
+    css_linter,
+    general_purpose_linter,
+    html_linter,
+    js_ts_linter,
+    linter_utils,
+    other_files_linter,
+    python_linter,
+)
 
 OTHER_SHARD_NAME = 'other'
 
@@ -643,7 +646,11 @@ def main(args: Optional[List[str]] = None) -> None:
         return
 
     read_files(all_filepaths, namespace=namespace)
-    files: Dict[str, List[str]] = multiprocessing.Manager().dict()
+    # Here we use cast because multiprocessing.Manager().dict() returns
+    # a DictProxy, which is functionally equivalent to a standard Dict
+    # but is not seen as type-compatible by MyPy. This tells the type
+    # checker to treat it as the correct type for static analysis.
+    files = cast(Dict[str, List[str]], multiprocessing.Manager().dict())
     categorize_files(all_filepaths, files)
 
     # Prepare custom tasks.

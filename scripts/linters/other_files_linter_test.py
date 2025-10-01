@@ -27,8 +27,7 @@ from core.tests import test_utils
 
 from typing import Final, List, Tuple
 
-from . import other_files_linter
-from . import run_lint_checks
+from . import other_files_linter, run_lint_checks
 
 NAME_SPACE: Final = multiprocessing.Manager().Namespace()
 NAME_SPACE.files = run_lint_checks.FileCache()
@@ -187,8 +186,8 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         expected_error_messages = [
             'Line 2: The following keys: chunks, filename, meta, template,'
             ' minify, inject are missing in HtmlWebpackPlugin block in '
-            'webpack.common.config.ts', 'FAILED  Webpack config file check'
-            ' failed']
+            'webpack.common.config.ts', 
+            'FAILED  Webpack config file check failed']
         self.assertEqual(
             error_messages.get_report(), expected_error_messages)
         self.assertEqual('Webpack config file', error_messages.name)

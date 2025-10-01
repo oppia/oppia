@@ -29,7 +29,7 @@ import {
 } from '@angular/core/testing';
 import {TranslateService} from '@ngx-translate/core';
 import {AppConstants} from '../../../../app.constants';
-import {Interaction} from '../../../../domain/exploration/InteractionObjectFactory';
+import {Interaction} from '../../../../domain/exploration/interaction.model';
 import {StateCard} from '../../../../domain/state_card/state-card.model';
 import {UrlInterpolationService} from '../../../../domain/utilities/url-interpolation.service';
 import {AudioBarStatusService} from '../../../../services/audio-bar-status.service';

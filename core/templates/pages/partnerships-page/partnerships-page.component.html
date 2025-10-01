@@ -2,7 +2,7 @@
   <div class="content-container">
     <div class="oppia-partnerships-banner">
       <div class="oppia-partnerships-banner-content flex-gt-sm">
-        <h1 class="oppia-partnerships-h1">{{ 'I18N_PARTNERSHIPS_PAGE_SECTION_ONE' | translate }}</h1>
+        <h1 class="oppia-partnerships-h1 e2e-test-partnership-heading">{{ 'I18N_PARTNERSHIPS_PAGE_SECTION_ONE' | translate }}</h1>
 
         <div class="oppia-partnerships-list">
           <p>{{ 'I18N_PARTNERSHIPS_PAGE_SECTION_ONE_CONTENT' | translate }}</p>
@@ -79,7 +79,7 @@
     <div class="content-container">
       <h3 class="oppia-partnerships-h3">{{ 'I18N_PARTNERSHIPS_PAGE_PARTNERING_HEADING' | translate }}</h3>
       <div class="partnering-with-oppia-container">
-        <img class="partering-with-oppia-image" alt="Partnerships page image" [src]="partneringImgUrl">
+        <img class="partering-with-oppia-image e2e-test-partnering-with-oppia-image" alt="Partnerships page image" [src]="partneringImgUrl">
         <div class="partering-with-oppia-content">
           <p>{{ 'I18N_PARTNERSHIPS_PAGE_PARTNERING_CONTENT' | translate }}</p>
           <oppia-primary-button
@@ -93,7 +93,7 @@
   </div>
 
   <div class="oppia-partners-video">
-    <iframe class="oppia-partners-video-iframe"
+    <iframe class="oppia-partners-video-iframe e2e-test-partnership-youtube-video-iframe"
             src="https://www.youtube.com/embed/mDfiDLn2Rko?si=tTS9OzbANbQJf4CW"
             frameborder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -186,9 +186,9 @@
   </div>
 
   <div class="learner-stories">
-    <h3 class="oppia-partnerships-h3">{{ 'I18N_PARTNERSHIPS_PAGE_LEARNER_STORIES' | translate }}</h3>
+    <h3 class="oppia-partnerships-h3 e2e-test-learner-stories-heading">{{ 'I18N_PARTNERSHIPS_PAGE_LEARNER_STORIES' | translate }}</h3>
     <div class="learners-container">
-      <ngb-carousel>
+      <ngb-carousel class="e2e-test-learner-stories-coursal-container">
         <ng-template ngbSlide>
           <mat-card-content>
             <img alt="learner image" [src]="learner1">

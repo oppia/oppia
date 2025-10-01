@@ -29,7 +29,7 @@ import {PlayerTranscriptService} from './player-transcript.service';
 import {StateCard} from '../../../domain/state_card/state-card.model';
 import {PageContextService} from '../../../services/page-context.service';
 import {InteractionRulesService} from './answer-classification.service';
-import {Interaction} from '../../../domain/exploration/InteractionObjectFactory';
+import {Interaction} from '../../../domain/exploration/interaction.model';
 import {RecordedVoiceovers} from '../../../domain/exploration/recorded-voiceovers.model';
 
 describe('Current Interaction Service', () => {

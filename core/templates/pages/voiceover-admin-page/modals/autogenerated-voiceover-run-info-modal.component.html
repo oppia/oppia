@@ -1,0 +1,103 @@
+<div class="modal-header">
+  <h3>Voiceover Regeneration Information</h3>
+</div>
+<div class="modal-body">
+  <div class="data-container">
+    <div class="date-type-title">
+      <span>Cloud task name:</span>
+    </div>
+    <div class="messages-container">
+      {{cloudTaskRun.cloudTaskName}}
+    </div>
+  </div>
+
+  <div class="data-container">
+    <div class="date-type-title">
+      <span>Function ID:</span>
+    </div>
+    <div class="messages-container">
+      {{cloudTaskRun.functionId}}
+    </div>
+  </div>
+
+  <div class="data-container">
+    <div class="date-type-title">
+      <span>Current state:</span>
+    </div>
+    <div class="messages-container">
+      {{cloudTaskRun.latestJobState}}
+    </div>
+  </div>
+
+  <div class="data-container">
+    <div class="date-type-title">
+      <span>Created on:</span>
+    </div>
+    <div class="messages-container">
+      {{cloudTaskRun.createdOn}}
+    </div>
+  </div>
+
+  <div class="data-container">
+    <div class="date-type-title">
+      <span>Last updated:</span>
+    </div>
+    <div class="messages-container">
+      {{cloudTaskRun.lastUpdated}}
+    </div>
+  </div>
+
+  <div class="data-container">
+    <div class="date-type-title">
+      <span>Error messages:</span>
+    </div>
+    <div *ngIf="cloudTaskRun.exceptionMessagesForFailedRuns.length === 0" class="messages-container">
+      <i>No error messages.</i>
+    </div>
+    <div class="content-container" *ngIf="cloudTaskRun.exceptionMessagesForFailedRuns.length > 0">
+      <mat-tab-group>
+        <mat-tab *ngFor="let error of cloudTaskRun.exceptionMessagesForFailedRuns; index as index" label="Error {{index + 1}}">
+          <div class="error-messages-container">
+            <button class="btn btn-secondary copy-to-clipboard-button" (click)="copyErrorToClipboard(error)">
+              <mat-icon>content_copy</mat-icon>
+            </button>
+            <span>
+              {{error}}
+            </span>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </div>
+  </div>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+</div>
+
+<style>
+  .date-type-title {
+    font-weight: bold;
+    width: 50%;
+  }
+  .data-container {
+    display: flex;
+  }
+  .content-container {
+    width: 100%;
+  }
+  .messages-container {
+    padding: 1%;
+    width: 100%;
+  }
+  .error-messages-container {
+    background-color: rgba(0, 0, 0, 0.06);
+    height: 250px;
+    overflow: scroll;
+    padding: 5%;
+  }
+  .copy-to-clipboard-button {
+    background-color: inherit;
+    border: 0;
+    cursor: pointer;
+  }
+</style>

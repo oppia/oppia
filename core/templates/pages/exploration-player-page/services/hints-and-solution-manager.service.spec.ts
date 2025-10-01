@@ -19,17 +19,13 @@
 import {EventEmitter} from '@angular/core';
 import {TestBed, fakeAsync, flush, tick} from '@angular/core/testing';
 
-import {Hint} from '../../../domain/exploration/hint-object.model';
-import {
-  Solution,
-  SolutionObjectFactory,
-} from '../../../domain/exploration/SolutionObjectFactory';
-import {HintsAndSolutionManagerService} from './hints-and-solution-manager.service';
-import {PlayerPositionService} from './player-position.service';
+import {Hint} from 'domain/exploration/hint-object.model';
+import {Solution} from 'domain/exploration/solution.model';
+import {HintsAndSolutionManagerService} from 'pages/exploration-player-page/services/hints-and-solution-manager.service';
+import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 
 describe('HintsAndSolutionManager service', () => {
   let hasms: HintsAndSolutionManagerService;
-  let sof: SolutionObjectFactory;
   let firstHint: Hint;
   let secondHint: Hint;
   let thirdHint: Hint;
@@ -49,7 +45,6 @@ describe('HintsAndSolutionManager service', () => {
       mockNewCardAvailableEmitter
     );
     hasms = TestBed.inject(HintsAndSolutionManagerService);
-    sof = TestBed.inject(SolutionObjectFactory);
 
     firstHint = Hint.createFromBackendDict({
       hint_content: {
@@ -69,7 +64,7 @@ describe('HintsAndSolutionManager service', () => {
         html: 'three',
       },
     });
-    solution = sof.createFromBackendDict({
+    solution = Solution.createFromBackendDict({
       answer_is_exclusive: false,
       correct_answer: 'This is a correct answer!',
       explanation: {

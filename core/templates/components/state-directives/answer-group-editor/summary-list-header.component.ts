@@ -43,6 +43,8 @@ export class SummaryListHeaderComponent {
   @Input() numItems!: number;
 
   deleteItem(evt: Event): void {
+    evt.stopPropagation();
+    evt.preventDefault();
     let eventData = {
       index: this.index,
       event: evt,

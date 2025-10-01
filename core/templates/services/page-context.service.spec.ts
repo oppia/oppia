@@ -232,6 +232,14 @@ describe('PageContext service', () => {
         expect(ecs.isInExplorationContext()).toBe(false);
       }
     );
+
+    it('should correctly return if subtopic preview is open', () => {
+      expect(ecs.getSubtopicPreviewIsOpen()).toEqual(false);
+      ecs.setSubtopicPreviewIsOpen();
+      expect(ecs.getSubtopicPreviewIsOpen()).toEqual(true);
+      ecs.setSubtopicPreviewIsClosed();
+      expect(ecs.getSubtopicPreviewIsOpen()).toEqual(false);
+    });
   });
 
   describe('behavior in question editor modal', () => {
@@ -479,6 +487,19 @@ describe('PageContext service', () => {
     });
   });
 
+  describe('behavior in the studyguide viewer page', () => {
+    beforeEach(() => {
+      ecs = TestBed.get(PageContextService);
+      urlService = TestBed.get(UrlService);
+      spyOn(urlService, 'getPathname').and.returnValue('/studyguide/example');
+      ecs.removeCustomEntityContext();
+    });
+
+    it('should correctly retrieve the studyguide viewer page context', () => {
+      expect(ecs.getPageContext()).toBe('studyguide');
+    });
+  });
+
   describe('behavior in different pages', () => {
     beforeEach(() => {
       ecs = TestBed.get(PageContextService);
@@ -544,13 +565,6 @@ describe('PageContext service', () => {
       urlService = TestBed.get(UrlService);
       spyOn(urlService, 'getPathname').and.returnValue('/about');
       ecs.removeCustomEntityContext();
-    });
-
-    it('should throw an error when trying to retrieve the exploration id', () => {
-      expect(() => ecs.getExplorationId()).toThrowError(
-        'PageContextService should not be used outside the ' +
-          'context of an exploration or a question.'
-      );
     });
 
     it('should throw an error when trying to retrieve the learner group id', () => {

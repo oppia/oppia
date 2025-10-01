@@ -18,20 +18,19 @@
 
 from __future__ import annotations
 
+import importlib.abc
+import importlib.util
 import inspect
 import os
 import pkgutil
 import re
 import string
 import struct
+from unittest import mock
 
-from core import feconf
-from core import schema_utils
-from core import schema_utils_test
-from core import utils
+from core import feconf, schema_utils, schema_utils_test, utils
 from core.constants import constants
-from core.domain import object_registry
-from core.domain import rte_component_registry
+from core.domain import object_registry, rte_component_registry
 from core.tests import test_utils
 
 from typing import Final, List, Tuple, Type
@@ -288,10 +287,14 @@ class RteComponentRegistryUnitTests(test_utils.GenericTestBase):
 
         for loader, name, _ in pkgutil.iter_modules(path=rte_path):
             if name == 'components':
-                fetched_module = loader.find_module(name)
+                spec = loader.find_spec(name)
                 # Ruling out the possibility of None for mypy type checking.
-                assert fetched_module is not None
-                module = fetched_module.load_module(name)
+                assert spec is not None
+                module = importlib.util.module_from_spec(spec)
+                # Ruling out the possibility of None for mypy type checking.
+                assert spec.loader is not None
+
+                spec.loader.exec_module(module)
                 break
 
         for name, obj in inspect.getmembers(module):
@@ -301,6 +304,18 @@ class RteComponentRegistryUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             set(obtained_component_class_names),
             set(actual_component_class_names))
+
+    @mock.patch('pkgutil.iter_modules')
+    def test_get_non_component_types_to_component_classes(
+        self, mock_iter_modules: mock.Mock
+    ) -> None:
+        mock_loader = mock.MagicMock()
+        mock_iter_modules.return_value = [(mock_loader, 'non_component', None)]
+
+        component_types = (
+            rte_component_registry.Registry.
+            get_component_types_to_component_classes())
+        self.assertEqual(component_types, {})
 
     def test_get_component_tag_names(self) -> None:
         """Test get_component_tag_names method."""

@@ -21,8 +21,7 @@ from __future__ import annotations
 import logging
 
 from core import feconf
-from core.domain import subtopic_page_services
-from core.domain import topic_fetchers
+from core.domain import subtopic_page_services, topic_fetchers
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
@@ -35,9 +34,7 @@ from typing import Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import datastore_services
-    from mypy_imports import subtopic_models
-    from mypy_imports import topic_models
+    from mypy_imports import datastore_services, subtopic_models, topic_models
 
 (topic_models, subtopic_models) = models.Registry.import_models([
     models.Names.TOPIC, models.Names.SUBTOPIC])
@@ -107,12 +104,14 @@ class PopulateStudyGuidesJob(base_jobs.JobBase):
             # Create sections list with heading and content.
             sections = [
                 {
-                    'content_id': 'section_heading_0',
-                    'unicode_str': subtopic_title
-                },
-                {
-                    'content_id': 'section_content_1',
-                    'html': subtopic_page.page_contents.subtitled_html.html
+                    'heading': {
+                        'content_id': 'section_heading_0',
+                        'unicode_str': subtopic_title
+                    },
+                    'content': {
+                        'content_id': 'section_content_1',
+                        'html': subtopic_page.page_contents.subtitled_html.html
+                    }
                 }
             ]
 

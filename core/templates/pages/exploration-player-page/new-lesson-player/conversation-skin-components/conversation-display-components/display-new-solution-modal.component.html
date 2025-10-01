@@ -1,0 +1,27 @@
+<p class="oppia-learner-hint-and-solution-modal-title">
+  {{ 'I18N_SOLUTION_TITLE' | translate }}
+</p>
+
+<div class="modal-body">
+  <label>{{ shortAnswerHtml.prefix }} solution is: &nbsp; </label>
+  <span>
+    <oppia-interaction-display classStr="oppia-learner-hint-and-solution-modal-body"
+                               [htmlData]="shortAnswerHtml.answer">
+    </oppia-interaction-display>
+  </span>
+  <br>
+  <br>
+  <label><span [innerHTML]="'I18N_SOLUTION_EXPLANATION_TITLE' | translate"></span></label>
+  <span>
+    <oppia-rte-output-display class="oppia-learner-hint-and-solution-modal-body"
+                              [rteString]="solutionExplanationHtml">
+    </oppia-rte-output-display>
+  </span>
+</div>
+
+<div class="oppia-learner-solution-container">
+  <button mat-button class="oppia-learner-got-it-button e2e-test-learner-got-it-button"
+          (click)="closeModal()">
+    {{ 'I18N_GOT_IT' | translate }}
+  </button>
+</div>

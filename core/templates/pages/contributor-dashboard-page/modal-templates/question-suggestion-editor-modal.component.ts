@@ -25,10 +25,10 @@ import {
 import {AlertsService} from 'services/alerts.service';
 import {AppConstants} from 'app.constants';
 import {MisconceptionSkillMap} from 'domain/skill/misconception.model';
-import {Question} from 'domain/question/QuestionObjectFactory';
+import {Question} from 'domain/question/question.model';
 import {QuestionUndoRedoService} from 'domain/editor/undo_redo/question-undo-redo.service';
-import {Skill} from 'domain/skill/SkillObjectFactory';
-import {State} from 'domain/state/StateObjectFactory';
+import {Skill} from 'domain/skill/skill.model.ts';
+import {State} from 'domain/state/state.model';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {ConfirmQuestionExitModalComponent} from 'components/question-directives/modal-templates/confirm-question-exit-modal.component';
 import {QuestionsOpportunitiesSelectDifficultyModalComponent} from 'pages/topic-editor-page/modal-templates/questions-opportunities-select-difficulty-modal.component';

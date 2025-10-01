@@ -208,12 +208,12 @@ describe('Exploration Editor', function () {
 
       // Change status of the second feedback thread to "fixed".
       await explorationEditor.viewFeedbackThread(2);
-      await explorationEditor.changeFeedbackStatus('fixed');
+      await explorationEditor.updateFeedbackStatus('fixed');
       await explorationEditor.expectFeedbackStatusToBe('fixed');
 
       // Change status of the third feedback thread to "ignored".
       await explorationEditor.viewFeedbackThread(2);
-      await explorationEditor.changeFeedbackStatus('ignored');
+      await explorationEditor.updateFeedbackStatus('ignored');
       await explorationEditor.expectFeedbackStatusToBe('ignored');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS

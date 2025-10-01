@@ -23,8 +23,7 @@ from typing import Dict, List, Mapping, Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import datastore_services
+    from mypy_imports import base_models, datastore_services
 
 (base_models, user_models,) = models.Registry.import_models([
     models.Names.BASE_MODEL, models.Names.USER
@@ -273,9 +272,6 @@ class SkillSummaryModel(base_models.BaseModel):
     # The number of misconceptions associated with the skill.
     misconception_count = (
         datastore_services.IntegerProperty(required=True, indexed=True))
-    # The number of worked examples in the skill.
-    worked_examples_count = (
-        datastore_services.IntegerProperty(required=True, indexed=True))
     # The ISO 639-1 code for the language this skill is written in.
     language_code = (
         datastore_services.StringProperty(required=True, indexed=True))
@@ -308,7 +304,6 @@ class SkillSummaryModel(base_models.BaseModel):
         return dict(super(cls, cls).get_export_policy(), **{
             'description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'misconception_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'worked_examples_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'skill_model_last_updated':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,

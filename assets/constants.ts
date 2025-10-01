@@ -65,6 +65,13 @@ export default {
       "explanation": "For learners in Nigeria."
     }],
 
+    "RTE_COMPONENT_CONFIGS": {
+      "ALL_COMPONENTS": ["tabs", "skillreview", "collapsible", "math", "image", "link", "video"],
+      "BLOG_COMPONENTS": ["image", "link", "video"],
+      "SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS": ["skillreview", "math", "image", "workedexample"],
+      "CURATED_LESSON_COMPONENTS": ["image", "math", "skillreview"]
+    },
+
   "LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST": [
     "News", "International", "Educators", "Learners", "Community",
     "Partnerships", "Volunteer", "Stories", "Languages", "New features",
@@ -5114,10 +5121,6 @@ export default {
     "Welcome": "#992a2b"
   },
 
-  "INVALID_RTE_COMPONENTS_FOR_BLOG_POST_EDITOR": [
-    "tabs", "math", "collapsible", "skillreview"
-  ],
-
   // This is linked to VALID_RTE_COMPONENTS in android_validation_constants.
   "VALID_RTE_COMPONENTS_FOR_ANDROID": ["image", "math", "skillreview"],
 
@@ -6243,7 +6246,12 @@ export default {
   "MAX_CHARS_IN_TOPIC_DESCRIPTION": 240,
   "MAX_CHARS_IN_SUBTOPIC_TITLE": 64,
   "MAX_CHARS_IN_STUDY_GUIDE_SECTION_HEADING": 200,
-  "STUDY_GUIDE_SECTION_CHARACTER_LIMIT": 1000,
+  "STUDY_GUIDE_SECTION_CHARACTER_LIMIT": 6000,
+  "STUDY_GUIDE_VIEWER_NEXT_SUBTOPIC_TITLE_LENGTH_LIMIT_MOBILE": 18,
+  "STUDY_GUIDE_VIEWER_NEXT_SUBTOPIC_TITLE_TRUNCATED_LENGTH_MOBILE": 15,
+  "STUDY_GUIDE_VIEWER_NEXT_SUBTOPIC_TITLE_LENGTH_LIMIT_DESKTOP": 23,
+  "STUDY_GUIDE_VIEWER_NEXT_SUBTOPIC_TITLE_TRUNCATED_LENGTH_DESKTOP": 20,
+  "SKILL_EDITOR_WORKED_EXAMPLE_LIMIT": 2,
   "DEFAULT_SECTION_HEADING_CONTENT_ID": "section_heading_0",
   "DEFAULT_SECTION_CONTENT_CONTENT_ID": "section_content_1",
   "MAX_CHARS_IN_SKILL_DESCRIPTION": 100,
@@ -6907,6 +6915,15 @@ export default {
     },
     "EXPLORATION_PLAYER_EMBED": {
       "ROUTE": "embed/exploration/:exploration_id",
+      "TITLE": "",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "META": []
+    },
+    "LESSON_PLAYER_EMBED": {
+      "ROUTE": "embed/lesson/:exploration_id",
       "TITLE": "",
       // Some routes contain url fragments, as syntax for url fragments are
       // different for angular router and backend. They have to be registered
@@ -7800,12 +7817,24 @@ export default {
       "-": "نَاقِصْ",
       "*": "ضَرْبْ",
       "×": "ضَرْبْ",
-      "÷": "تَقْسِيمْ",
+      "÷": "قِسْمَةْ عَلَى",
       "=": "يُسَاوِي",
-      "!": "عاملي",
-      "^": "للقوة",
-      "^2": "تربيع",
-      "^3": "تكعيب"
+      "!": "عَامِلِي",
+      "^": "لِلْقُوَّةِ",
+      "^2": "تَرْبِيعْ",
+      "^3": "تَكْعِيبْ"
+    },
+    "es": {
+      "+": "más",
+      "-": "menos",
+      "*": "multiplicado por",
+      "×": "multiplicado por",
+      "÷": "dividido",
+      "=": "igual",
+      "!": "factorial",
+      "^": "elevado a",
+      "^2": "al cuadrado",
+      "^3": "al cubo"
     }
   },
   // Please consult the translation team before adding any entries here.
@@ -7814,6 +7843,7 @@ export default {
   "LANGUAGE_CODE_TO_SENTENCE_ENDING_PUNCTUATION_MARKS": {
     "ar": "؟!",
     "en": ".!?",
+    "es": ".!?",
     "pt": ".!?",
     "hi": "।!?"
   }

@@ -27,7 +27,6 @@ import json
 import os
 import random
 import re
-import ssl
 import string
 import time
 import unicodedata
@@ -37,14 +36,27 @@ import urllib.request
 from core import feconf
 from core.constants import constants
 
-from PIL import Image
-import certifi
 import filetype
 import yaml
-
-from typing import ( # isort:skip
-    Any, BinaryIO, Callable, Dict, Iterable, Iterator, List, Mapping,
-    Literal, Optional, TextIO, Tuple, TypeVar, Union, cast, overload)
+from PIL import Image
+from typing import (
+    Any,
+    BinaryIO,
+    Callable,
+    Dict,
+    Iterable,
+    Iterator,
+    List,
+    Literal,
+    Mapping,
+    Optional,
+    TextIO,
+    Tuple,
+    TypeVar,
+    Union,
+    cast,
+    overload,
+)
 
 DATETIME_FORMAT = '%m/%d/%Y, %H:%M:%S:%f'
 ISO_8601_DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fz'
@@ -1263,12 +1275,14 @@ def compute_list_difference(list_a: List[str], list_b: List[str]) -> List[str]:
     return list(sorted(set(list_a) - set(list_b)))
 
 
-# Here we use MyPy ignore because the flag 'disallow-any-generics' is disabled
-# in MyPy settings and this flag does not allow generic types to be defined
-# without type parameters, but here to count the order elements, we are
-# inheriting from OrderedDict type without providing type parameters which
-# cause MyPy to throw an error. Thus, to avoid the error, we used ignore here.
-class OrderedCounter(collections.Counter, collections.OrderedDict): # type: ignore[type-arg]
+# Here we use MyPy ignore because of the errors from this multiple inheritance
+# [type-arg]: Both `Counter` and `OrderedDict` are generic types that expect
+# type parameters (e.g., Counter[str]). Since we are not providing them here,
+# Mypy raises a `type-arg` error.
+# [misc]: `Counter` and `OrderedDict` both define a `fromkeys` class method,
+# but their type signatures are incompatible. Mypy flags this conflict
+# between parent classes with the general `misc` error code.
+class OrderedCounter(collections.Counter, collections.OrderedDict): # type: ignore[misc, type-arg]
     """Counter that remembers the order elements are first encountered."""
 
     pass
@@ -1394,21 +1408,6 @@ def quoted(s: str) -> str:
         str. The quoted string.
     """
     return json.dumps(s)
-
-
-def url_open(
-    source_url: Union[str, urllib.request.Request]
-) -> urllib.request._UrlopenRet:
-    """Opens a URL and returns the response.
-
-    Args:
-        source_url: Union[str, Request]. The URL.
-
-    Returns:
-        urlopen. The 'urlopen' object.
-    """
-    context = ssl.create_default_context(cafile=certifi.where())
-    return urllib.request.urlopen(source_url, context=context)
 
 
 def escape_html(unescaped_html_data: str) -> str:

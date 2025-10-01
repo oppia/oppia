@@ -18,15 +18,16 @@ from __future__ import annotations
 
 import datetime
 
-from core import feconf
-from core import utils
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import feedback_services
-from core.domain import state_domain
-from core.domain import suggestion_registry
-from core.domain import suggestion_services
+from core import feconf, utils
+from core.domain import (
+    exp_domain,
+    exp_fetchers,
+    exp_services,
+    feedback_services,
+    state_domain,
+    suggestion_registry,
+    suggestion_services,
+)
 from core.platform import models
 from core.tests import test_utils
 

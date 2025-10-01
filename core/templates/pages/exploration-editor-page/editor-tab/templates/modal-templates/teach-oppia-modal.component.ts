@@ -38,7 +38,7 @@ import {TrainingModalService} from '../../training-panel/training-modal.service'
 import {TruncateInputBasedOnInteractionAnswerTypePipe} from 'filters/truncate-input-based-on-interaction-answer-type.pipe';
 import {ExplorationPlayerConstants} from 'pages/exploration-player-page/current-lesson-player/exploration-player-page.constants';
 import {LoggerService} from 'services/contextual/logger.service';
-import {State} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 import {InteractionAnswer} from 'interactions/answer-defs';
 import {TeachOppiaModalBackendApiService} from './teach-oppia-modal-backend-api.service';
 import {AnswerClassificationResult} from 'domain/classifier/answer-classification-result.model';

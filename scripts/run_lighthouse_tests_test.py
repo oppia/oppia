@@ -25,10 +25,7 @@ import sys
 from core import feconf
 from core.constants import constants
 from core.tests import test_utils
-from scripts import build
-from scripts import common
-from scripts import run_lighthouse_tests
-from scripts import servers
+from scripts import build, common, run_lighthouse_tests, servers
 
 GOOGLE_APP_ENGINE_PORT = 8181
 LIGHTHOUSE_MODE_PERFORMANCE = 'performance'
@@ -163,7 +160,8 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
     def test_run_lighthouse_puppeteer_script_successfully(self) -> None:
         class MockTask:
             returncode = 0
-            def communicate(self) -> tuple[bytes, bytes]:   # pylint: disable=missing-docstring
+            def communicate( # pylint: disable=missing-docstring
+                self) -> tuple[bytes, bytes]:
                 return (
                     b'https://oppia.org/create/4\n' +
                     b'https://oppia.org/topic_editor/4\n' +
@@ -187,7 +185,8 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
     def test_run_lighthouse_puppeteer_script_failed(self) -> None:
         class MockTask:
             returncode = 1
-            def communicate(self) -> tuple[bytes, bytes]:   # pylint: disable=missing-docstring
+            def communicate( # pylint: disable=missing-docstring
+                self) -> tuple[bytes, bytes]:
                 return (
                     b'https://oppia.org/create/4\n' +
                     b'https://oppia.org/topic_editor/4\n' +
@@ -213,7 +212,8 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
     def test_puppeteer_script_succeeds_when_recording_succeeds(self) -> None:
         class MockTask:
             returncode = 0
-            def communicate(self) -> tuple[bytes, bytes]:   # pylint: disable=missing-docstring
+            def communicate( # pylint: disable=missing-docstring
+                self) -> tuple[bytes, bytes]:
                 return (
                     b'https://oppia.org/create/4\n' +
                     b'https://oppia.org/topic_editor/4\n' +
@@ -243,7 +243,8 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
     def test_puppeteer_script_fails_when_recording_succeeds(self) -> None:
         class MockTask:
             returncode = 1
-            def communicate(self) -> tuple[bytes, bytes]:   # pylint: disable=missing-docstring
+            def communicate( # pylint: disable=missing-docstring
+                self) -> tuple[bytes, bytes]:
                 return (
                     b'https://oppia.org/create/4\n' +
                     b'https://oppia.org/topic_editor/4\n' +
@@ -329,7 +330,8 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
     def test_run_lighthouse_checks_succesfully(self) -> None:
         class MockTask:
             returncode = 0
-            def communicate(self) -> tuple[bytes, bytes]:   # pylint: disable=missing-docstring
+            def communicate( # pylint: disable=missing-docstring
+                self) -> tuple[bytes, bytes]:
                 return (
                     b'Task output',
                     b'No error.')
@@ -346,8 +348,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             'http://localhost:8181/contact'
         )
         os.environ['LIGHTHOUSE_URLS_TO_RUN'] = (
-            'http://localhost:8181/,'
-            'http://localhost:8181/about'
+            'http://localhost:8181/, http://localhost:8181/about'
         )
         with self.print_swap, swap_popen:
             run_lighthouse_tests.run_lighthouse_checks(
@@ -365,7 +366,8 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
     def test_run_lighthouse_checks_failed(self) -> None:
         class MockTask:
             returncode = 1
-            def communicate(self) -> tuple[bytes, bytes]:   # pylint: disable=missing-docstring
+            def communicate( # pylint: disable=missing-docstring
+                self) -> tuple[bytes, bytes]:
                 return (
                     b'Task failed.',
                     b'ABC error.')
@@ -389,7 +391,8 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
     def test_run_lighthouse_tests_in_accessibility_mode(self) -> None:
         class MockTask:
             returncode = 0
-            def communicate(self) -> tuple[bytes, bytes]:   # pylint: disable=missing-docstring
+            def communicate( # pylint: disable=missing-docstring
+                self) -> tuple[bytes, bytes]:
                 return (
                     b'Task output',
                     b'No error.')
@@ -431,7 +434,8 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
     def test_run_lighthouse_tests_in_performance_mode(self) -> None:
         class MockTask:
             returncode = 0
-            def communicate(self) -> tuple[bytes, bytes]:   # pylint: disable=missing-docstring
+            def communicate( # pylint: disable=missing-docstring
+                self) -> tuple[bytes, bytes]:
                 return (
                     b'Task output',
                     b'No error.')
@@ -474,7 +478,8 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
     def test_run_lighthouse_tests_with_specific_pages(self) -> None:
         class MockTask:
             returncode = 0
-            def communicate(self) -> tuple[bytes, bytes]:   # pylint: disable=missing-docstring
+            def communicate( # pylint: disable=missing-docstring
+                self) -> tuple[bytes, bytes]:
                 return (
                     b'Task output',
                     b'No error.')
@@ -526,7 +531,8 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         self) -> None:
         class MockTask:
             returncode = 0
-            def communicate(self) -> tuple[bytes, bytes]:   # pylint: disable=missing-docstring
+            def communicate( # pylint: disable=missing-docstring
+                self) -> tuple[bytes, bytes]:
                 return (
                     b'Task output',
                     b'No error.')
@@ -564,7 +570,8 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
     def test_main_function_calls_puppeteer_record(self) -> None:
         class MockTask:
             returncode = 0
-            def communicate(self) -> tuple[bytes, bytes]:   # pylint: disable=missing-docstring
+            def communicate( # pylint: disable=missing-docstring
+                self) -> tuple[bytes, bytes]:
                 return (
                     b'Task output',
                     b'No error.')

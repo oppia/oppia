@@ -27,7 +27,7 @@ import {ExplorationInitStateNameService} from './exploration-init-state-name.ser
 import {ParameterMetadataService} from 'pages/exploration-editor-page/services/parameter-metadata.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {AppConstants} from 'app.constants';
-import {State} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 import {
   ComputeGraphService,
   GraphLink,
@@ -53,7 +53,7 @@ import {PencilCodeEditorValidationService} from 'interactions/PencilCodeEditor/d
 import {RatioExpressionInputValidationService} from 'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
 import {SetInputValidationService} from 'interactions/SetInput/directives/set-input-validation.service';
 import {TextInputValidationService} from 'interactions/TextInput/directives/text-input-validation.service';
-import {States} from 'domain/exploration/StatesObjectFactory';
+import {States} from 'domain/exploration/states.model';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 var Dequeue = require('dequeue');

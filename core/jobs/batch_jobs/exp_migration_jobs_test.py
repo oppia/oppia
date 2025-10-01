@@ -18,37 +18,40 @@
 
 from __future__ import annotations
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import caching_services
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import opportunity_services
-from core.domain import rights_domain
-from core.domain import rights_manager
-from core.domain import story_domain
-from core.domain import story_services
-from core.domain import topic_domain
-from core.domain import topic_services
-from core.domain import translation_domain
-from core.domain import translation_services
-from core.domain import user_services
+from core.domain import (
+    caching_services,
+    exp_domain,
+    exp_fetchers,
+    exp_services,
+    opportunity_services,
+    rights_domain,
+    rights_manager,
+    story_domain,
+    story_services,
+    topic_domain,
+    topic_services,
+    translation_domain,
+    translation_services,
+    user_services,
+)
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import exp_migration_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Sequence
+from typing import Sequence, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import exp_models
-    from mypy_imports import opportunity_models
-    from mypy_imports import stats_models
-    from mypy_imports import translation_models
+    from mypy_imports import (
+        exp_models,
+        opportunity_models,
+        stats_models,
+        translation_models,
+    )
 
 (
     exp_models, opportunity_models,
@@ -1290,8 +1293,16 @@ class ExpSnapshotsMigrationAuditJobTests(
 
         # Make a mock conversion function that raises an error when trying to
         # convert the old snapshot.
+        # Here we use cast because mypy infers the return type of the
+        # dictionary access as `Any`, which causes a `no-any-return`
+        # error. The cast satisfies the static type checker.
         mock_conversion = classmethod(
-            lambda cls, exploration_dict: exploration_dict['property_that_dne'])
+            lambda cls, exploration_dict: cast(
+                # Here we use object because it's the most generic type that
+                # satisfies the function's signature. A specific type isn't
+                # needed since this line is expected to raise an exception.
+                object, exploration_dict['property_that_dne'])
+            )
 
         with self.swap(
             exp_domain.Exploration, '_convert_states_v46_dict_to_v47_dict',
@@ -1732,8 +1743,16 @@ class ExpSnapshotsMigrationJobTests(
 
         # Make a mock conversion function that raises an error when trying to
         # convert the old snapshot.
+        # Here we use cast because mypy infers the return type of the
+        # dictionary access as `Any`, which causes a `no-any-return`
+        # error. The cast satisfies the static type checker.
         mock_conversion = classmethod(
-            lambda cls, exploration_dict: exploration_dict['property_that_dne'])
+            lambda cls, exploration_dict: cast(
+                # Here we use object because it's the most generic type that
+                # satisfies the function's signature. A specific type isn't
+                # needed since this line is expected to raise an exception.
+                object, exploration_dict['property_that_dne'])
+            )
 
         with self.swap(
             exp_domain.Exploration, '_convert_states_v46_dict_to_v47_dict',

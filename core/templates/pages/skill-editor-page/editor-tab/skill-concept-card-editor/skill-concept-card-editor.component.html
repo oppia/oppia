@@ -31,71 +31,6 @@
   </button>
 </mat-card>
 
-<mat-card class="oppia-editor-card-with-avatar oppia-mobile-collapsible-card">
-  <div class="oppia-editor-card-body">
-    <div class="oppia-editor-card-section worked-example-content">
-      <div class="oppia-worked-examples-header oppia-mobile-collapsible-card-header" (click)="toggleWorkedExampleList()">
-        <strong class="heading-text">Worked Examples</strong>
-        <i class="fa fa-caret-down"
-           *ngIf="!workedExamplesListIsShown"
-           [attr.aria-hidden]="true">
-        </i>
-        <i class="fa fa-caret-up"
-           *ngIf="workedExamplesListIsShown"
-           [attr.aria-hidden]="true">
-        </i>
-      </div>
-      <div *ngIf="workedExamplesListIsShown" class="oppia-mobile-collapsible-card-content e2e-test-skill-editor-collapsible-card">
-        <div class="concept-card-subtitle">
-          These will be displayed one-by-one to the learner, in order, if they ask for them.
-        </div>
-        <div *ngIf="bindableFieldsDict.displayedWorkedExamples.length > 0">
-          <ul cdkDropList (cdkDropListDropped)="drop($event)"
-              class="oppia-skill-concept-card-preview oppia-option-list nav-stacked nav-pills worked-examples-list">
-            <li cdkDrag *ngFor="let workedExample of bindableFieldsDict.displayedWorkedExamples; let index = index"
-                [ngClass]="{'active': activeWorkedExampleIndex === index, 'last-element': index === bindableFieldsDict.displayedWorkedExamples.length - 1}"
-                class="oppia-rule-block oppia-sortable-worked-example oppia-prevent-selection">
-              <span class="oppia-worked-example-sort-handle"
-                    *ngIf="bindableFieldsDict.displayedWorkedExamples.length > 1"
-                    (mousedown)="changeActiveWorkedExampleIndex(-1)">
-                <picture>
-                  <source type="image/webp" [src]="getStaticImageUrl('/general/drag_dots.webp')">
-                  <source type="image/png" [src]="getStaticImageUrl('/general/drag_dots.png')">
-                  <img [src]="getStaticImageUrl('/general/drag_dots.png')" width="10">
-                </picture>
-              </span>
-              <a (click)="changeActiveWorkedExampleIndex(index)"
-                 class="oppia-rule-tab e2e-test-worked-example-{{ index }} oppia-skill-concept-card-preview-list"
-                 [ngClass]="{'oppia-rule-tab-active': activeWorkedExampleIndex === index}">
-                <oppia-summary-list-header [index]="index"
-                                           [disableSorting]="bindableFieldsDict.displayedWorkedExamples.length === 1"
-                                           [summary]="getWorkedExampleSummary(workedExample.getQuestion().html)"
-                                           [shortSummary]="getWorkedExampleSummary(workedExample.getQuestion().html)"
-                                           [isActive]="index === activeWorkedExampleIndex"
-                                           [isDeleteAvailable]="isEditable"
-                                           (summaryDelete)="deleteWorkedExample($event.index, $event.event)">
-                </oppia-summary-list-header>
-              </a>
-              <div *ngIf="activeWorkedExampleIndex === index">
-                <div class="oppia-editor-card-section">
-                  <oppia-worked-example-editor [workedExample]="workedExample"
-                                               [index]="index"
-                                               [isEditable]="isEditable">
-                  </oppia-worked-example-editor>
-                </div>
-              </div>
-            </li>
-          </ul>
-        </div>
-        <button type="button"
-                class="btn btn-add-skill-example skill-editor-add-btn e2e-test-add-worked-example"
-                (click)="openAddWorkedExampleModal()">
-          + ADD WORKED EXAMPLE
-        </button>
-      </div>
-    </div>
-  </div>
-</mat-card>
 <style>
   .cdk-drag-animating {
     transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
@@ -110,7 +45,7 @@
                 0 3px 14px 2px rgba(0, 0, 0, 0.12);
     box-sizing: border-box;
   }
-  .oppia-option-list.cdk-drop-list-dragging .oppia-sortable-worked-example:not(.cdk-drag-placeholder) {
+  .oppia-option-list.cdk-drop-list-dragging {
     transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
   }
   .oppia-concept-card-preview-btn {
@@ -128,13 +63,6 @@
   .review-material-text {
     font-size: 16px;
   }
-  .worked-examples-list {
-    position: relative;
-  }
-  .btn-add-skill-example {
-    background-color: #058ca6;
-    color: #fff;
-  }
   .btn-show-preview {
     border-top: 1px solid #c1c1c1;
     color: #00645d;
@@ -143,13 +71,6 @@
   }
   .last-element {
     border-bottom: 1px solid #ccc;
-  }
-  .oppia-worked-examples-header {
-    display: flex;
-    justify-content: space-between;
-  }
-  .oppia-worked-examples-header i {
-    display: none;
   }
   .skill-card-header-text {
     font-size: 19px;
@@ -182,15 +103,11 @@
     position: relative;
   }
   @media screen and (max-width: 768px) {
-    .oppia-worked-examples-header i,
     .skill-card-header i {
       display: block;
     }
     .skill-card-header-text {
       margin: 0;
-    }
-    .worked-example-content {
-      padding: 0;
     }
     .review-material-container {
       margin-top: 30px;
