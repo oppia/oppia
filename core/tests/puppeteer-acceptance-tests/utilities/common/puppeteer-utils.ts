@@ -460,6 +460,11 @@ export class BaseUser {
     try {
       await this.page.waitForFunction(isElementClickable, {}, element);
     } catch (error) {
+      // TODO: for debugging.
+      await this.page.evaluate(
+        (el: Element) => console.log(`[debug] Is connected: ${el.isConnected}`),
+        element
+      );
       if (error instanceof Error) {
         await this.page.evaluate(isElementClickable, element, true, true);
         error.message =

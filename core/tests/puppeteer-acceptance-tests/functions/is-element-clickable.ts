@@ -180,7 +180,10 @@ export default function isElementClickable(
     if (showDebugLogs) {
       // eslint-disable-next-line no-console
       console.log(
-        `[debug]: Element ${element.tagName} is in viewport: ${verticalInView}, ${horizontalInView}`
+        `[debug]: Element ${element.tagName} is in viewport: ${verticalInView}, ${horizontalInView}\n` +
+          'Element Dimensions (Top, Top + Height, Left, Left + Width): ' +
+          `${elementDimensions.top}, ${elementDimensions.top + elementDimensions.height}, ${elementDimensions.left}, ${elementDimensions.left + elementDimensions.width}\n` +
+          `Window Dimensions: ${windowHeight}, ${windowWidth}`
       );
     }
     return verticalInView && horizontalInView;
@@ -198,7 +201,7 @@ export default function isElementClickable(
     if (showDebugLogs) {
       // eslint-disable-next-line no-console
       console.log(
-        `[debug]: Element ${element.tagName} is disabled: ${isDisabled}`
+        `[debug]: Element (tag: ${element.tagName.toLowerCase()}, text: ${element.textContent}) is ${isDisabled ? 'disabled' : 'enabled'}.`
       );
     }
     return isDisabled;
