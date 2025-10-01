@@ -20,9 +20,11 @@ from __future__ import annotations
 
 import logging
 
-from core.domain import email_services
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_services
+from core.domain import (
+    email_services,
+    platform_parameter_list,
+    platform_parameter_services,
+)
 from core.platform import models
 
 import requests

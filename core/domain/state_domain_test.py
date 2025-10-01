@@ -24,17 +24,17 @@ import logging
 import os
 import re
 
-from core import feconf
-from core import schema_utils
-from core import utils
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import html_validation_service
-from core.domain import interaction_registry
-from core.domain import rules_registry
-from core.domain import state_domain
-from core.domain import translation_domain
+from core import feconf, schema_utils, utils
+from core.domain import (
+    exp_domain,
+    exp_fetchers,
+    exp_services,
+    html_validation_service,
+    interaction_registry,
+    rules_registry,
+    state_domain,
+    translation_domain,
+)
 from core.tests import test_utils
 from extensions.interactions import base
 
@@ -1226,6 +1226,41 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         # Should be able to successfully delete it.
         exploration.delete_state('END')
         self.assertNotIn('END', exploration.states)
+
+    def test_update_answer_groups_invalid_translatable_input(self) -> None:
+        """Ensure update_interaction_answer_groups raises when rule input
+        for a translatable object is not a dict with 'contentId'.
+        """
+        state = state_domain.State.create_default_state(
+            'Intro',
+            content_id_for_state_content='c',
+            content_id_for_default_outcome='d'
+        )
+        state.interaction.id = 'TextInput'
+
+        rg = state_domain.AnswerGroup(
+            rule_specs=[state_domain.RuleSpec(
+                rule_type='Equals',
+                inputs={'x': 'not_a_dict'}
+            )],
+            outcome=state_domain.Outcome(
+                dest='Intro',
+                feedback=state_domain.SubtitledHtml('f', 'fc'),
+                labelled_as_correct=False,
+                param_changes=[],
+                refresher_exploration_id=None,
+                missing_prerequisite_skill_id=None,
+                dest_if_really_stuck=None
+            ),
+            training_data=[],
+            tagged_skill_misconception_id=None
+        )
+
+        with self.assertRaisesRegex(
+            Exception,
+            r'Expected value to be a dictionary with a "contentId" key'
+        ):
+            state.update_interaction_answer_groups([rg])
 
     def test_update_solicit_answer_details(self) -> None:
         """Test updating solicit_answer_details."""

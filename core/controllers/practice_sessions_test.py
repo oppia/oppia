@@ -18,9 +18,7 @@ from __future__ import annotations
 
 from core import feconf
 from core.constants import constants
-from core.domain import topic_domain
-from core.domain import topic_services
-from core.domain import user_services
+from core.domain import topic_domain, topic_services, user_services
 from core.tests import test_utils
 
 

@@ -18,17 +18,18 @@
 
 from __future__ import annotations
 
-from core.platform import models
 import core.storage.base_model.gae_models as base_models
+from core.platform import models
 
 from typing import Dict, List
 
 MYPY = False
 if MYPY: # pragma: no cover
     # Here, we are importing 'platform_parameter_domain' only for type checking.
-    from core.domain import platform_parameter_domain  # pylint: disable=invalid-import # isort:skip
-    from mypy_imports import base_models
-    from mypy_imports import datastore_services
+    from core.domain import (  # pylint: disable=invalid-import
+        platform_parameter_domain,
+    )
+    from mypy_imports import base_models, datastore_services
 
 datastore_services = models.Registry.import_datastore_services()
 

@@ -22,19 +22,26 @@ import itertools
 import random
 import string
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
 from core.platform import models
 
 from typing import (
-    Dict, Final, List, Literal, Optional, Sequence, Tuple, TypedDict, Union,
-    overload)
+    Dict,
+    Final,
+    List,
+    Literal,
+    Optional,
+    Sequence,
+    Tuple,
+    TypedDict,
+    Union,
+    overload,
+)
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import datastore_services
+    from mypy_imports import base_models, datastore_services
 
 (base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
@@ -2064,10 +2071,8 @@ class StoryProgressModel(base_models.BaseModel):
         cls, user_id: str, story_id: str, *, strict: bool = ...
     ) -> Optional[StoryProgressModel]: ...
 
-    # Here we use MyPy ignore because the signature of this method
-    # doesn't match with BaseModel.get().
     @classmethod
-    def get( # type: ignore[override]
+    def get(
         cls, user_id: str, story_id: str, strict: bool = True
     ) -> Optional[StoryProgressModel]:
         """Gets the StoryProgressModel for the given user and story

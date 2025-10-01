@@ -19,21 +19,28 @@ from __future__ import annotations
 import datetime
 import enum
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
 from core.platform import models
 
 from typing import (
-    Dict, Final, List, Literal, Mapping, Optional, Sequence, Tuple, TypedDict,
-    Union)
+    Dict,
+    Final,
+    List,
+    Literal,
+    Mapping,
+    Optional,
+    Sequence,
+    Tuple,
+    TypedDict,
+    Union,
+)
 
 MYPY = False
 if MYPY: # pragma: no cover
     # Here, 'change_domain' is imported only for type checking.
-    from core.domain import change_domain  # pylint: disable=invalid-import # isort:skip
-    from mypy_imports import base_models
-    from mypy_imports import datastore_services
+    from core.domain import change_domain  # pylint: disable=invalid-import
+    from mypy_imports import base_models, datastore_services
 
 (base_models, user_models) = models.Registry.import_models([
     models.Names.BASE_MODEL, models.Names.USER
@@ -2353,7 +2360,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
         page_size: int,
         offset: int,
         language_code: str,
-        sort_by: Optional[SortChoices.value],
+        sort_by: Optional[str],
         topic_ids: Optional[List[str]],
         max_days_since_last_activity: Optional[int]
     ) -> Tuple[Sequence[TranslationSubmitterTotalContributionStatsModel],
@@ -2776,7 +2783,7 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
         page_size: int,
         offset: int,
         language_code: str,
-        sort_by: Optional[SortChoices.value],
+        sort_by: Optional[str],
         max_days_since_last_activity: Optional[int]
     ) -> Tuple[Sequence[TranslationReviewerTotalContributionStatsModel],
                 int,
@@ -3101,7 +3108,7 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
         cls,
         page_size: int,
         offset: int,
-        sort_by: Optional[SortChoices.value],
+        sort_by: Optional[str],
         topic_ids: Optional[List[str]],
         max_days_since_last_activity: Optional[int]
     ) -> Tuple[Sequence[QuestionSubmitterTotalContributionStatsModel],
@@ -3401,7 +3408,7 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
         cls,
         page_size: int,
         offset: int,
-        sort_by: Optional[SortChoices.value],
+        sort_by: Optional[str],
         max_days_since_last_activity: Optional[int]
     ) -> Tuple[Sequence[QuestionReviewerTotalContributionStatsModel],
                 int,

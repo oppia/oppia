@@ -15,20 +15,21 @@
 """Controllers for the contributor dashboard admin page."""
 
 from __future__ import annotations
+
 import datetime
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.controllers import acl_decorators
-from core.controllers import base
-from core.domain import contribution_stats_services
-from core.domain import email_manager
-from core.domain import suggestion_registry
-from core.domain import suggestion_services
-from core.domain import topic_fetchers
-from core.domain import user_domain
-from core.domain import user_services
+from core.controllers import acl_decorators, base
+from core.domain import (
+    contribution_stats_services,
+    email_manager,
+    suggestion_registry,
+    suggestion_services,
+    topic_fetchers,
+    user_domain,
+    user_services,
+)
 
 from typing import Dict, List, Optional, TypedDict, Union
 
@@ -795,7 +796,7 @@ def get_translation_coordinator_frontend_dict(
         coordinator_activity_list = []
         # Here we use MyPy ignore because MyPy doesn't allow key addition
         # to TypedDict.
-        stats_dict['translators_count'] = ( # type: ignore[misc]
+        stats_dict['translators_count'] = ( # type: ignore[typeddict-item]
             contribution_stats_services.get_translator_counts(
                 stats_dict['language_id']))
 
@@ -803,7 +804,7 @@ def get_translation_coordinator_frontend_dict(
 
         # Here we use MyPy ignore because MyPy doesn't allow key addition
         # to TypedDict.
-        stats_dict['reviewers_count'] = ( # type: ignore[misc]
+        stats_dict['reviewers_count'] = ( # type: ignore[typeddict-item]
             community_stats.translation_reviewer_counts_by_lang_code[
                 stats_dict['language_id']])
 
@@ -822,7 +823,7 @@ def get_translation_coordinator_frontend_dict(
 
         # Here we use MyPy ignore because MyPy doesn't allow key addition
         # to TypedDict.
-        stats_dict['coordinator_activity_list'] = coordinator_activity_list # type: ignore[misc]
+        stats_dict['coordinator_activity_list'] = coordinator_activity_list # type: ignore[typeddict-item]
 
         # Here we use MyPy ignore because MyPy doesn't allow key deletion
         # from TypedDict.

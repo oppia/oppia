@@ -19,24 +19,23 @@ from __future__ import annotations
 import copy
 import logging
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import opportunity_services
-from core.domain import question_domain
-from core.domain import question_fetchers
-from core.domain import skill_domain
-from core.domain import skill_fetchers
-from core.domain import state_domain
+from core.domain import (
+    opportunity_services,
+    question_domain,
+    question_fetchers,
+    skill_domain,
+    skill_fetchers,
+    state_domain,
+)
 from core.platform import models
 
 from typing import Dict, List, Literal, Optional, Tuple, Union, cast, overload
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import question_models
-    from mypy_imports import skill_models
-    from mypy_imports import transaction_services
+    from mypy_imports import question_models, skill_models, transaction_services
 
 (question_models, skill_models) = models.Registry.import_models(
     [models.Names.QUESTION, models.Names.SKILL])

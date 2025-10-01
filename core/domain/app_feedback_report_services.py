@@ -20,18 +20,18 @@ from __future__ import annotations
 
 import datetime
 
-from core import feconf
-from core import utils
-from core.domain import app_feedback_report_constants
-from core.domain import app_feedback_report_domain
+from core import feconf, utils
+from core.domain import (
+    app_feedback_report_constants,
+    app_feedback_report_domain,
+)
 from core.platform import models
 
 from typing import Dict, List, Literal, Optional, Sequence, cast, overload
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import app_feedback_report_models
-    from mypy_imports import transaction_services
+    from mypy_imports import app_feedback_report_models, transaction_services
 
 (app_feedback_report_models,) = models.Registry.import_models(
     [models.Names.APP_FEEDBACK_REPORT])

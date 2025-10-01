@@ -167,6 +167,31 @@ describe('Html Length Service', () => {
   );
 
   it(
+    'should compute word count of content with text' + '(1 worked example tag)',
+    () => {
+      const htmlString =
+        '<p>naghiue abghy gjuh &nbsp;</p>' +
+        '<oppia-noninteractive-workedexample question-with-value="&amp;quot;' +
+        'ques for demo&amp;quot;" answer-with-value="&amp;quot;l;Sv' +
+        'h&amp;quot;"></oppia-noninteractive-workedexample>';
+
+      const result = htmlLengthService.computeHtmlLength(
+        htmlString,
+        'character'
+      );
+
+      /*
+      "naghiue abghy gjuh &nbsp;" is a paragraph with 18 characters.
+      "ques for demo" is the question value for a worked example, contributing
+      13 chars.
+      Therefore, the total char count is 18 (paragraph) + 13 (alt text)
+      = 31 words.
+    */
+      expect(result).toBe(31);
+    }
+  );
+
+  it(
     'should compute word count of content with text and non-text ' +
       '(1 math tag and 1 image tag)',
     () => {

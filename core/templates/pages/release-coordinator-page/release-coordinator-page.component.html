@@ -83,13 +83,14 @@
       <div>
         <div *ngFor="let userGroup of userGroups">
           <div *ngIf="!(userGroupInEditMode && userGroupIdsToDetailsShowRecord[userGroup.userGroupId])"
-               class="oppia-user-group"
+               class="oppia-user-group e2e-test-user-group-item"
                (click)="toggleUserGroupDetailsSection(userGroup.userGroupId)">
             {{ userGroup.name }}
             <button mat-button matSuffix mat-icon-button
                     aria-label="Clear"
                     *ngIf="userGroupIdsToDetailsShowRecord[userGroup.userGroupId]"
-                    (click)="deleteUserGroup(userGroup.userGroupId); $event.stopPropagation()">
+                    (click)="deleteUserGroup(userGroup.userGroupId); $event.stopPropagation()"
+                    class="e2e-test-remove-user-group-button">
               <mat-icon matListIcon>close</mat-icon>
             </button>
           </div>
@@ -173,7 +174,7 @@
           </div>
         </div>
       </div>
-      <div class="oppia-add-user-group">
+      <div class="oppia-add-user-group e2e-test-add-user-group-container">
         <input placeholder="New user group name"
                type="text"
                [(ngModel)]="newUserGroupName"
@@ -185,7 +186,7 @@
           + Add new user group
         </button>
         <p *ngIf="userGroupValidationError.length > 0"
-           class="oppia-warning-text">
+           class="oppia-warning-text e2e-test-user-group-save-error">
           {{ userGroupValidationError }}
         </p>
       </div>

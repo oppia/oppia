@@ -23,11 +23,9 @@ import json
 import logging
 import os
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import platform_parameter_domain
-from core.domain import platform_parameter_list
+from core.domain import platform_parameter_domain, platform_parameter_list
 from core.domain import platform_parameter_registry as registry
 
 from typing import Dict, Final, List

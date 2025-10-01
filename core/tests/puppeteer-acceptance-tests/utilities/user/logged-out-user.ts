@@ -581,6 +581,8 @@ const toastMessageSelector = '.e2e-test-toast-message';
 const voiceoverSelectSelector = '.e2e-test-audio-lang-select';
 
 const conceptCardCloseButtonSelector = '.e2e-test-close-concept-card';
+const promoBarTextSelector = '.e2e-test-promo-bar-text';
+
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
  * According to this specification, the keys for the numbers 0 through 9 are named 'Digit0' through 'Digit9'.
@@ -640,6 +642,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async navigateToDonationThanksModalOnAboutPage(): Promise<void> {
     await this.goto(aboutPageThanksModalURL);
+    await this.page.waitForSelector(thanksForDonatingClass, {visible: true});
   }
 
   /**
@@ -835,7 +838,7 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(blogSearchInputSelector, {
       visible: true,
     });
-    await this.type(blogSearchInputSelector, keyword);
+    await this.typeInInputField(blogSearchInputSelector, keyword);
     await this.clickAndWaitForNavigation(blogSubmitButtonSelector);
 
     const url = new URL(this.page.url());
@@ -3099,6 +3102,7 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * This function verifies that the user is on the correct classroom page.
+   * @param statusCode The status code of the error page.
    */
   async expectToBeOnErrorPage(statusCode: number): Promise<void> {
     await this.page.waitForSelector(errorPageHeading);
@@ -3158,13 +3162,13 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForTimeout(1000);
     await this.waitForElementToBeClickable(submitResponseToInteractionInput);
     await this.clearAllTextFrom(submitResponseToInteractionInput);
-    await this.type(submitResponseToInteractionInput, answer);
+    await this.typeInInputField(submitResponseToInteractionInput, answer);
     await this.clickOn(submitAnswerButton);
   }
 
   async submitAnswerInTextArea(answer: string): Promise<void> {
     await this.waitForElementToBeClickable(submitResponseToInteractionTextArea);
-    await this.type(submitResponseToInteractionTextArea, answer);
+    await this.typeInInputField(submitResponseToInteractionTextArea, answer);
     await this.clickOn(submitAnswerButton);
   }
 
@@ -3173,7 +3177,7 @@ export class LoggedOutUser extends BaseUser {
    * @param {string} value - The value to check.
    */
   async expectAnswerInputValueToBe(value: string): Promise<void> {
-    await this.expectInputValueToBe(floatFormInput, value);
+    await this.expectElementValueToBe(floatFormInput, value);
   }
 
   /**
@@ -3206,7 +3210,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async submitEmailForNewsletter(email: string): Promise<void> {
     await this.waitForElementToBeClickable(newsletterEmailInputField);
-    await this.type(newsletterEmailInputField, email);
+    await this.typeInInputField(newsletterEmailInputField, email);
     await this.clickOn(newsletterSubscribeButton);
     await this.expectElementToBeVisible(newsletterSubscriptionThanksMessage);
   }
@@ -3371,7 +3375,7 @@ export class LoggedOutUser extends BaseUser {
       visible: true,
     });
     await this.clickOn(searchInputSelector);
-    await this.type(searchInputSelector, lessonName);
+    await this.typeInInputField(searchInputSelector, lessonName);
 
     await this.page.keyboard.press('Enter');
     await this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']});
@@ -4269,7 +4273,7 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector('nav-options', {visible: true});
     await this.clickOn(feedbackPopupSelector);
     await this.page.waitForSelector(feedbackTextarea, {visible: true});
-    await this.type(feedbackTextarea, feedback);
+    await this.typeInInputField(feedbackTextarea, feedback);
 
     // If stayAnonymous is true, clicking on the "stay anonymous" checkbox.
     if (stayAnonymous) {
@@ -5093,10 +5097,10 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(testConstants.SignInDetails.inputField, {
       visible: true,
     });
-    await this.type(testConstants.SignInDetails.inputField, email);
+    await this.typeInInputField(testConstants.SignInDetails.inputField, email);
     await this.clickOn('Sign In');
     await this.page.waitForNavigation({waitUntil: 'networkidle0'});
-    await this.type('input.e2e-test-username-input', username);
+    await this.typeInInputField('input.e2e-test-username-input', username);
     await this.clickOn('input.e2e-test-agree-to-terms-checkbox');
     await this.page.waitForSelector(
       'button.e2e-test-register-user:not([disabled])'
@@ -5546,7 +5550,7 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(feedbackTextarea, {
       visible: true,
     });
-    await this.type(feedbackTextarea, feedback);
+    await this.typeInInputField(feedbackTextarea, feedback);
 
     // If stayAnonymous is true, clicking on the "stay anonymous" checkbox.
     if (stayAnonymous) {
@@ -6789,6 +6793,30 @@ export class LoggedOutUser extends BaseUser {
       `The blog post "${expectedBlog}" was not found on the blog dashboard.\n` +
         `Found blog posts: "${blogTitles.join('", "')}"`
     );
+  }
+
+  /**
+   * Checks if the promo bar is visible and if the promotion content is correct.
+   * @param {boolean} visible - Whether the promo bar should be visible or not.
+   * @param {string} promotionContent - The expected promotion content.
+   */
+  async expectPromoBarToBeVisible(
+    visible: boolean = true,
+    promotionContent?: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(promoBarTextSelector, visible);
+
+    if (visible && promotionContent) {
+      await this.expectTextContentToBe(promoBarTextSelector, promotionContent);
+    }
+  }
+
+  /**
+   * Compares the text content of next button in lesson player.
+   * @param buttonText - Expected button text.
+   */
+  async expectNextCardButtonTextToBe(buttonText: string): Promise<void> {
+    await this.expectTextContentToBe(nextCardButton, buttonText);
   }
 }
 

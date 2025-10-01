@@ -18,8 +18,7 @@ from __future__ import annotations
 
 from core import feconf
 from core.constants import constants
-from core.domain import learner_playlist_services
-from core.domain import learner_progress_services
+from core.domain import learner_playlist_services, learner_progress_services
 from core.tests import test_utils
 
 

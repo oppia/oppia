@@ -29,6 +29,7 @@ from typing import Any, Dict, List, Optional, Union
 MYPY = False
 if MYPY:  # pragma: no cover
     from extensions import domain
+
     from typing import TypedDict
 
     class CheckedProofDict(TypedDict):

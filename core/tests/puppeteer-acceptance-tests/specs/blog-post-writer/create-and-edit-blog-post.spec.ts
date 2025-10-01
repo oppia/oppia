@@ -49,7 +49,7 @@ describe('Blog Post Writer', function () {
     await blogPostWriter.navigateToPageUsingProfileMenu('Blog Dashboard');
     await blogPostWriter.updateUserBioInRegisterModal('I am the test user.');
     await blogPostWriter.clickOnSaveProfileButton();
-    await blogPostWriter.expectToolTipMessage(
+    await blogPostWriter.expectToastMessage(
       'Author Details saved successfully.'
     );
     await blogPostWriter.expectNewBlogPostButtonToBeVisible(false);
@@ -70,7 +70,7 @@ describe('Blog Post Writer', function () {
 
     // Upload SVG format thumbnail image.
     await blogPostWriter.uploadBlogPostThumbnailImage(FILEPATHS.BANNER_SVG);
-    await blogPostWriter.expectToolTipMessage('Thumbnail Saved Successfully.');
+    await blogPostWriter.expectToastMessage('Thumbnail Saved Successfully.');
 
     // Upload BMP format thumbnail image.
     await blogPostWriter.clickOnThumbnailImage();
@@ -146,7 +146,7 @@ describe('Blog Post Writer', function () {
 
     // Save blog post draft.
     await blogPostWriter.saveTheDraftBlogPost();
-    await blogPostWriter.expectToolTipMessage('Blog Post Saved Successfully.');
+    await blogPostWriter.expectToastMessage('Blog Post Saved Successfully.');
   });
 
   it('should be able to edit draft blog post', async function () {
@@ -166,9 +166,7 @@ describe('Blog Post Writer', function () {
     await blogPostWriter.expectToBeOnBlogEditorPage();
     await blogPostWriter.navigateToBlogDashboardPage();
     await blogPostWriter.deleteDraftBlogPostWithTitle('Test Blog Post Title');
-    await blogPostWriter.expectToolTipMessage(
-      'Blog Post Deleted Successfully.'
-    );
+    await blogPostWriter.expectToastMessage('Blog Post Deleted Successfully.');
   });
 
   it('should be able to publish a new blog post', async function () {
