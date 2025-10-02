@@ -3295,8 +3295,11 @@ export class LoggedOutUser extends BaseUser {
     if (buttonText !== 'Watch a video') {
       throw new Error('The Watch A Video button does not exist!');
     }
-    this.clickAndWaitForNavigation(watchAVideoButtonInThanksForSubscribe, true),
-      await this.waitForPageToFullyLoad();
+    await this.clickAndWaitForNavigation(
+      watchAVideoButtonInThanksForSubscribe,
+      true
+    );
+    await this.waitForPageToFullyLoad();
 
     const url = this.page.url();
     if (!url.includes(testConstants.OppiaSocials.YouTube.Domain)) {
