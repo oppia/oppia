@@ -227,7 +227,7 @@ class AndroidActivityHandler(base.BaseHandler[
             )
             for activity_data, exploration in zip(activities_data, fetched_entities):
                 exploration_dict_for_android: Optional[
-                    exp_domain.ExplorationDictForAndroid] = None          
+                    exp_domain.ExplorationDictForAndroid] = None
                 if exploration is not None:
                     exploration_dict_for_android = (
                         exp_services.to_exploration_dict_for_android(exploration)
