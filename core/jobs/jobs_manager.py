@@ -24,7 +24,7 @@ import pprint
 import traceback
 
 from core import feconf
-from core.domain import beam_job_services, caching_services,
+from core.domain import beam_job_services, caching_services
 from core.jobs import base_jobs, job_options
 from core.jobs.io import cache_io, job_io
 from core.platform import models
