@@ -47,7 +47,6 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
                             'max_number_of_tags_assigned_to_blog_post',
                             'notify_admins_suggestions_waiting_too_long_is_enabled', # pylint: disable=line-too-long
                             'noreply_email_address',
-                            'oppia_project_id',
                             'oppia_site_url_for_emails',
                             'promo_bar_enabled',
                             'promo_bar_message',
