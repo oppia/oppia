@@ -60,14 +60,13 @@ class ActivityReference:
         Raises:
             Exception. The activity type is invalid.
         """
-        if (self.type not in (
-                constants.ACTIVITY_TYPE_EXPLORATION,
-                constants.ACTIVITY_TYPE_COLLECTION
-        )):
+        if self.type not in (
+            constants.ACTIVITY_TYPE_EXPLORATION,
+            constants.ACTIVITY_TYPE_COLLECTION,
+        ):
             raise Exception('Invalid activity type: %s' % self.type)
         if not isinstance(self.id, str):
-            raise Exception(
-                'Expected id to be a string but found %s' % self.id)
+            raise Exception('Expected id to be a string but found %s' % self.id)
 
     def to_dict(self) -> Dict[str, str]:
         """Returns a dict representing this ActivityReference domain object.
@@ -95,7 +94,8 @@ class ActivityReference:
             ActivityReference. The corresponding ActivityReference object.
         """
         return cls(
-            activity_reference_dict['type'], activity_reference_dict['id'])
+            activity_reference_dict['type'], activity_reference_dict['id']
+        )
 
 
 class ActivityReferences:

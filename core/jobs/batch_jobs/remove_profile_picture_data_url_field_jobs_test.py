@@ -34,22 +34,22 @@ if MYPY:  # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 
 
-class MockUserSettingsModelWithProfilePicture(
-    user_models.UserSettingsModel
-):
+class MockUserSettingsModelWithProfilePicture(user_models.UserSettingsModel):
     """Mock UserSettingsModel so that it allows to set
     profile_picture_data_url.
     """
 
-    profile_picture_data_url = (
-        datastore_services.TextProperty(default=None, indexed=False))
+    profile_picture_data_url = datastore_services.TextProperty(
+        default=None, indexed=False
+    )
 
 
 class RemoveProfilePictureFieldJobTests(job_test_utils.JobTestBase):
     """Tests for remove_profile_picture_data_url_field_jobs."""
 
     JOB_CLASS = (
-        remove_profile_picture_data_url_field_jobs.RemoveProfilePictureFieldJob)
+        remove_profile_picture_data_url_field_jobs.RemoveProfilePictureFieldJob
+    )
 
     def test_run_with_no_models(self) -> None:
         self.assert_job_output_is([])
@@ -60,44 +60,48 @@ class RemoveProfilePictureFieldJobTests(job_test_utils.JobTestBase):
             id='test_id_1',
             email='test_1@example.com',
             username='test_1',
-            roles=[
-                feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_CURRICULUM_ADMIN]
+            roles=[feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_CURRICULUM_ADMIN],
         )
         self.assertNotIn('profile_picture_data_url', user_1.to_dict())
         self.assertNotIn(
             'profile_picture_data_url',
-            user_1._values # pylint: disable=protected-access
+            user_1._values,  # pylint: disable=protected-access
         )
         self.assertNotIn(
             'profile_picture_data_url',
-            user_1._properties # pylint: disable=protected-access
+            user_1._properties,  # pylint: disable=protected-access
         )
 
         self.put_multi([user_1])
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(
-                stdout='USER MODELS ITERATED OR UPDATED SUCCESS: 1'
-            )
-        ])
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout='USER MODELS ITERATED OR UPDATED SUCCESS: 1'
+                )
+            ]
+        )
 
-        migrated_setting_model = (
-            user_models.UserSettingsModel.get_by_id(user_1.id))
+        migrated_setting_model = user_models.UserSettingsModel.get_by_id(
+            user_1.id
+        )
 
         self.assertNotIn(
-            'profile_picture_data_url', migrated_setting_model.to_dict())
-        self.assertNotIn(
-            'profile_picture_data_url',
-            migrated_setting_model._values # pylint: disable=protected-access
+            'profile_picture_data_url', migrated_setting_model.to_dict()
         )
         self.assertNotIn(
             'profile_picture_data_url',
-            migrated_setting_model._properties # pylint: disable=protected-access
+            migrated_setting_model._values,  # pylint: disable=protected-access
+        )
+        self.assertNotIn(
+            'profile_picture_data_url',
+            migrated_setting_model._properties,  # pylint: disable=protected-access
         )
 
     def test_removal_of_profile_field(self) -> None:
         with self.swap(
-            user_models, 'UserSettingsModel',
-            MockUserSettingsModelWithProfilePicture
+            user_models,
+            'UserSettingsModel',
+            MockUserSettingsModelWithProfilePicture,
         ):
             user_1 = self.create_model(
                 user_models.UserSettingsModel,
@@ -105,9 +109,12 @@ class RemoveProfilePictureFieldJobTests(job_test_utils.JobTestBase):
                 email='test_1@example.com',
                 username='test_1',
                 roles=[
-                    feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_CURRICULUM_ADMIN],
+                    feconf.ROLE_ID_FULL_USER,
+                    feconf.ROLE_ID_CURRICULUM_ADMIN,
+                ],
                 profile_picture_data_url=(
-                    user_services.DEFAULT_IDENTICON_DATA_URL)
+                    user_services.DEFAULT_IDENTICON_DATA_URL
+                ),
             )
 
             user_2 = self.create_model(
@@ -116,60 +123,68 @@ class RemoveProfilePictureFieldJobTests(job_test_utils.JobTestBase):
                 email='test_2@example.com',
                 username='test_2',
                 roles=[
-                    feconf.ROLE_ID_FULL_USER, feconf.ROLE_ID_CURRICULUM_ADMIN],
-                profile_picture_data_url=None
+                    feconf.ROLE_ID_FULL_USER,
+                    feconf.ROLE_ID_CURRICULUM_ADMIN,
+                ],
+                profile_picture_data_url=None,
             )
             self.put_multi([user_1, user_2])
 
             self.assertIn(
                 'profile_picture_data_url',
-                user_1._values # pylint: disable=protected-access
+                user_1._values,  # pylint: disable=protected-access
             )
             self.assertIn(
                 'profile_picture_data_url',
-                user_1._properties # pylint: disable=protected-access
+                user_1._properties,  # pylint: disable=protected-access
             )
 
             self.assertIn(
                 'profile_picture_data_url',
-                user_2._values # pylint: disable=protected-access
+                user_2._values,  # pylint: disable=protected-access
             )
             self.assertIn(
                 'profile_picture_data_url',
-                user_2._properties # pylint: disable=protected-access
+                user_2._properties,  # pylint: disable=protected-access
             )
 
-            self.assert_job_output_is([
-                job_run_result.JobRunResult(
-                    stdout='USER MODELS ITERATED OR UPDATED SUCCESS: 2'
-                )
-            ])
+            self.assert_job_output_is(
+                [
+                    job_run_result.JobRunResult(
+                        stdout='USER MODELS ITERATED OR UPDATED SUCCESS: 2'
+                    )
+                ]
+            )
 
             migrated_setting_model_user_1 = (
-                user_models.UserSettingsModel.get_by_id(user_1.id))
-            self.assertNotIn(
-                'profile_picture_data_url',
-                migrated_setting_model_user_1.to_dict())
-            self.assertNotIn(
-                'profile_picture_data_url',
-                migrated_setting_model_user_1._values # pylint: disable=protected-access
+                user_models.UserSettingsModel.get_by_id(user_1.id)
             )
             self.assertNotIn(
                 'profile_picture_data_url',
-                migrated_setting_model_user_1._properties # pylint: disable=protected-access
+                migrated_setting_model_user_1.to_dict(),
+            )
+            self.assertNotIn(
+                'profile_picture_data_url',
+                migrated_setting_model_user_1._values,  # pylint: disable=protected-access
+            )
+            self.assertNotIn(
+                'profile_picture_data_url',
+                migrated_setting_model_user_1._properties,  # pylint: disable=protected-access
             )
 
             migrated_setting_model_user_2 = (
-                user_models.UserSettingsModel.get_by_id(user_2.id))
+                user_models.UserSettingsModel.get_by_id(user_2.id)
+            )
 
             self.assertNotIn(
                 'profile_picture_data_url',
-                migrated_setting_model_user_2.to_dict())
-            self.assertNotIn(
-                'profile_picture_data_url',
-                migrated_setting_model_user_2._values # pylint: disable=protected-access
+                migrated_setting_model_user_2.to_dict(),
             )
             self.assertNotIn(
                 'profile_picture_data_url',
-                migrated_setting_model_user_2._properties # pylint: disable=protected-access
+                migrated_setting_model_user_2._values,  # pylint: disable=protected-access
+            )
+            self.assertNotIn(
+                'profile_picture_data_url',
+                migrated_setting_model_user_2._properties,  # pylint: disable=protected-access
             )

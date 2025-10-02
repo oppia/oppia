@@ -41,42 +41,46 @@ Run this script from the oppia root folder:
 The root folder MUST be named 'oppia'.
 Note: You can replace 'it' with 'fit' or 'describe' with 'fdescribe' to run
 a single test or test suite.
-""")
+"""
+)
 
 _PARSER.add_argument(
     '--dtslint_only',
     help='optional; if specified, only runs dtslint type tests.',
-    action='store_true'
+    action='store_true',
 )
 _PARSER.add_argument(
     '--skip_install',
     help='optional; if specified, skips installing dependencies',
-    action='store_true')
+    action='store_true',
+)
 _PARSER.add_argument(
     '--verbose',
     help='optional; if specified, enables the karma terminal and prints all the'
     ' logs.',
-    action='store_true')
+    action='store_true',
+)
 _PARSER.add_argument(
     '--run_minified_tests',
     help='optional; if specified, runs frontend karma tests on both minified '
     'and non-minified code',
-    action='store_true')
+    action='store_true',
+)
 _PARSER.add_argument(
     '--check_coverage',
     help='optional; if specified, checks frontend test coverage',
-    action='store_true'
+    action='store_true',
 )
 _PARSER.add_argument(
     '--download_combined_frontend_spec_file',
     help='optional; if specified, downloads the combined frontend file',
-    action='store_true'
+    action='store_true',
 )
 _PARSER.add_argument(
     '--run_on_changed_files_in_branch',
     help='optional; if specified, runs the frontend karma tests on the '
     'files that were changed in the current branch.',
-    action='store_true'
+    action='store_true',
 )
 _PARSER.add_argument(
     '--specs_to_run',
@@ -87,7 +91,7 @@ _PARSER.add_argument(
     '--allow_no_spec',
     help='optional; if specified, exits with status code 0 if no specs are '
     'found to run.',
-    action='store_true'
+    action='store_true',
 )
 
 
@@ -97,10 +101,12 @@ def run_dtslint_type_tests() -> None:
 
     # Pass the local version of typescript. Otherwise, dtslint will download and
     # install all versions of typescript.
-    cmd = ['./node_modules/dtslint/bin/index.js',
-           DTSLINT_TYPE_TESTS_DIR_RELATIVE_PATH,
-           '--localTs',
-           TYPESCRIPT_DIR_RELATIVE_PATH]
+    cmd = [
+        './node_modules/dtslint/bin/index.js',
+        DTSLINT_TYPE_TESTS_DIR_RELATIVE_PATH,
+        '--localTs',
+        TYPESCRIPT_DIR_RELATIVE_PATH,
+    ]
     task = subprocess.Popen(cmd, stdout=subprocess.PIPE)
     output_lines = []
     # The value of `process.stdout` should not be None since we passed
@@ -130,10 +136,9 @@ def get_file_spec(file_path: str) -> str | None:
         str | None. The path of the spec file if it exists, otherwise None.
         If the file is not a TypeScript or JavaScript file, None is returned.
     """
-    if (
-        file_path.endswith(('.spec.ts', '.spec.js', 'Spec.ts', 'Spec.js')) and
-        os.path.exists(file_path)
-    ):
+    if file_path.endswith(
+        ('.spec.ts', '.spec.js', 'Spec.ts', 'Spec.js')
+    ) and os.path.exists(file_path):
         return file_path
 
     if file_path.endswith(('.ts', '.js')):
@@ -142,7 +147,8 @@ def get_file_spec(file_path: str) -> str | None:
             return spec_file_path
 
         spec_file_path = file_path.replace('.ts', 'Spec.ts').replace(
-            '.js', 'Spec.js')
+            '.js', 'Spec.js'
+        )
         if os.path.exists(spec_file_path):
             return spec_file_path
 
@@ -164,16 +170,22 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     # We need to create an empty hashes.json file for the build so that
     # we don't get the error "assets/hashes.json file doesn't exist".
     build.save_hashes_to_file({})
-    common.print_each_string_after_two_new_lines([
-        'View interactive frontend test coverage reports by navigating to',
-        '../karma_coverage_reports',
-        'on your filesystem.',
-        'Running test in development environment'])
+    common.print_each_string_after_two_new_lines(
+        [
+            'View interactive frontend test coverage reports by navigating to',
+            '../karma_coverage_reports',
+            'on your filesystem.',
+            'Running test in development environment',
+        ]
+    )
 
     cmd = [
-        common.NODE_BIN_PATH, '--max-old-space-size=4096',
+        common.NODE_BIN_PATH,
+        '--max-old-space-size=4096',
         os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
-        'start', os.path.join('core', 'tests', 'karma.conf.ts')]
+        'start',
+        os.path.join('core', 'tests', 'karma.conf.ts'),
+    ]
 
     specs_to_run: Set[str] = set()
     if parsed_args.specs_to_run:
@@ -182,40 +194,37 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             if spec_file:
                 specs_to_run.add(spec_file)
             elif not parsed_args.allow_no_spec:
-                raise ValueError(
-                    'No spec file found for the file: %s' % spec
-                )
+                raise ValueError('No spec file found for the file: %s' % spec)
 
     if parsed_args.run_on_changed_files_in_branch:
         remote = git_changes_utils.get_local_git_repository_remote_name()
         if not remote:
             sys.exit('Error: No remote repository found.')
         refs = git_changes_utils.get_refs()
-        collected_files = git_changes_utils.get_changed_files(
-            refs, remote)
+        collected_files = git_changes_utils.get_changed_files(refs, remote)
         for _, (_, acmrt_files) in collected_files.items():
             if not acmrt_files:
                 continue
 
             files_to_run = git_changes_utils.get_js_or_ts_files_from_diff(
-                acmrt_files)
+                acmrt_files
+            )
             for file_path in files_to_run:
                 spec_file = get_file_spec(file_path)
                 if spec_file:
                     specs_to_run.add(spec_file)
         staged_files = git_changes_utils.get_staged_acmrt_files()
         staged_files_to_run = git_changes_utils.get_js_or_ts_files_from_diff(
-            staged_files)
+            staged_files
+        )
         for file_path in staged_files_to_run:
             spec_file = get_file_spec(file_path)
             if spec_file:
                 specs_to_run.add(spec_file)
 
     if (
-        (parsed_args.specs_to_run or
-        parsed_args.run_on_changed_files_in_branch) and
-        not specs_to_run
-    ):
+        parsed_args.specs_to_run or parsed_args.run_on_changed_files_in_branch
+    ) and not specs_to_run:
         print('No valid specs found to run.')
         exit_code = 0 if parsed_args.allow_no_spec else 1
         sys.exit(exit_code)
@@ -262,24 +271,30 @@ def main(args: Optional[Sequence[str]] = None) -> None:
                 print(line.decode('utf-8'), end='')
                 output_lines.append(line)
             # Download the combined-tests.js file from the web-server.
-            if ('Executed' in line.decode('utf-8') and
-                not combined_spec_file_started_downloading and
-                parsed_args.download_combined_frontend_spec_file):
+            if (
+                'Executed' in line.decode('utf-8')
+                and not combined_spec_file_started_downloading
+                and parsed_args.download_combined_frontend_spec_file
+            ):
                 download_task = subprocess.Popen(
-                    ['wget',
-                    (
-                        'http://localhost:9876/base/core/templates/'
-                        'combined-tests.spec.js'
-                    ),
-                    '-P',
-                    os.path.join('../karma_coverage_reports')])
+                    [
+                        'wget',
+                        (
+                            'http://localhost:9876/base/core/templates/'
+                            'combined-tests.spec.js'
+                        ),
+                        '-P',
+                        os.path.join('../karma_coverage_reports'),
+                    ]
+                )
                 # Wait for the wget command to download the
                 # combined-tests.spec.js file to complete.
                 download_task.wait()
                 combined_spec_file_started_downloading = True
         # Standard output is in bytes, we need to decode the line to print it.
         concatenated_output = ''.join(
-            line.decode('utf-8') for line in output_lines)
+            line.decode('utf-8') for line in output_lines
+        )
         if download_task:
             # The result of the download is printed at the end for
             # easy access to it.
@@ -288,7 +303,8 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             else:
                 print(
                     'Downloaded the combined-tests.spec.js file and stored'
-                    'in ../karma_coverage_reports')
+                    'in ../karma_coverage_reports'
+                )
         print('Done!')
 
         if 'Trying to get the Angular injector' in concatenated_output:
@@ -296,12 +312,14 @@ def main(args: Optional[Sequence[str]] = None) -> None:
                 'If you run into the error "Trying to get the Angular '
                 'injector", please see https://github.com/oppia/oppia/wiki/'
                 'Frontend-unit-tests-guide#how-to-handle-common-errors'
-                ' for details on how to fix it.')
+                ' for details on how to fix it.'
+            )
 
         if 'Disconnected , because no message' in concatenated_output:
             print(
                 'Detected chrome disconnected flake (#16607), so rerunning '
-                'if attempts allow.')
+                'if attempts allow.'
+            )
         else:
             break
 
@@ -309,16 +327,15 @@ def main(args: Optional[Sequence[str]] = None) -> None:
         if task.returncode:
             sys.exit(
                 'The frontend tests failed. Please fix it before running the'
-                ' test coverage check.')
+                ' test coverage check.'
+            )
         else:
             check_frontend_test_coverage_args = []
             if len(specs_to_run) > 0:
                 check_frontend_test_coverage_args.append(
                     '--files_to_check=%s' % ','.join(sorted(specs_to_run))
                 )
-            check_frontend_test_coverage.main(
-                check_frontend_test_coverage_args
-            )
+            check_frontend_test_coverage.main(check_frontend_test_coverage_args)
     elif task.returncode:
         sys.exit(task.returncode)
 

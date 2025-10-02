@@ -31,8 +31,7 @@ class ItemSelectionInput(base.BaseInteraction):
     """Interaction for item selection input."""
 
     name: str = 'Item Selection'
-    description: str = (
-        'Allows learners to select various options.')
+    description: str = 'Allows learners to select various options.'
     display_mode: str = base.DISPLAY_MODE_INLINE
     _dependency_ids: List[str] = []
     answer_type: str = 'SetOfTranslatableHtmlContentIds'
@@ -42,67 +41,73 @@ class ItemSelectionInput(base.BaseInteraction):
     # ItemSelectionInput interaction must contain a generic submit button.
     show_generic_submit_button: bool = True
 
-    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{
-        'name': 'minAllowableSelectionCount',
-        'description': 'Minimum number of selections permitted',
-        'schema': {
-            'type': 'int',
-            'validators': [{
-                'id': 'is_at_least',
-                'min_value': 0,
-            }],
-        },
-        'default_value': 1,
-    }, {
-        'name': 'maxAllowableSelectionCount',
-        'description': 'Maximum number of selections permitted',
-        'schema': {
-            'type': 'int',
-            'validators': [{
-                'id': 'is_at_least',
-                'min_value': 1,
-            }],
-        },
-        'default_value': 1,
-    }, {
-        'name': 'choices',
-        'description': 'Items for selection',
-        'schema': {
-            'type': 'list',
-            'validators': [{
-                'id': 'has_unique_subtitled_contents'
-            }],
-            'items': {
-                'type': 'custom',
-                'obj_type': 'SubtitledHtml',
-                'validators': [{
-                    'id': 'has_subtitled_html_non_empty'
-                }],
-                'replacement_ui_config': {
-                    'rte_component_config_id': 'ALL_COMPONENTS',
-                    'html': {
-                        'hide_complex_extensions': True,
-                        'placeholder': 'Sample item answer',
+    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [
+        {
+            'name': 'minAllowableSelectionCount',
+            'description': 'Minimum number of selections permitted',
+            'schema': {
+                'type': 'int',
+                'validators': [
+                    {
+                        'id': 'is_at_least',
+                        'min_value': 0,
                     }
-                }
+                ],
             },
-            'ui_config': {
-                'add_element_text': 'Add item for selection',
-            }
+            'default_value': 1,
         },
-        'default_value': [{
-            'content_id': None,
-            'html': ''
-        }],
-    }]
+        {
+            'name': 'maxAllowableSelectionCount',
+            'description': 'Maximum number of selections permitted',
+            'schema': {
+                'type': 'int',
+                'validators': [
+                    {
+                        'id': 'is_at_least',
+                        'min_value': 1,
+                    }
+                ],
+            },
+            'default_value': 1,
+        },
+        {
+            'name': 'choices',
+            'description': 'Items for selection',
+            'schema': {
+                'type': 'list',
+                'validators': [{'id': 'has_unique_subtitled_contents'}],
+                'items': {
+                    'type': 'custom',
+                    'obj_type': 'SubtitledHtml',
+                    'validators': [{'id': 'has_subtitled_html_non_empty'}],
+                    'replacement_ui_config': {
+                        'rte_component_config_id': 'ALL_COMPONENTS',
+                        'html': {
+                            'hide_complex_extensions': True,
+                            'placeholder': 'Sample item answer',
+                        },
+                    },
+                },
+                'ui_config': {
+                    'add_element_text': 'Add item for selection',
+                },
+            },
+            'default_value': [{'content_id': None, 'html': ''}],
+        },
+    ]
 
-    _answer_visualization_specs: List[base.AnswerVisualizationSpecsDict] = [{
-        # Table with keyed answer counts for top N answers.
-        'id': 'EnumeratedFrequencyTable',
-        'options': {
-            'column_headers': ['Answer (click to expand/collapse)', 'Count'],
-            'title': 'Top answers',
-        },
-        'calculation_id': 'Top10AnswerFrequencies',
-        'addressed_info_is_supported': True,
-    }]
+    _answer_visualization_specs: List[base.AnswerVisualizationSpecsDict] = [
+        {
+            # Table with keyed answer counts for top N answers.
+            'id': 'EnumeratedFrequencyTable',
+            'options': {
+                'column_headers': [
+                    'Answer (click to expand/collapse)',
+                    'Count',
+                ],
+                'title': 'Top answers',
+            },
+            'calculation_id': 'Top10AnswerFrequencies',
+            'addressed_info_is_supported': True,
+        }
+    ]

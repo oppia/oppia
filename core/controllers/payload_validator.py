@@ -67,7 +67,7 @@ def validate_arguments_against_schema(
     handler_args: Dict[str, Any],
     handler_args_schemas: Dict[str, Any],
     allowed_extra_args: bool,
-    allow_string_to_bool_conversion: bool = False
+    allow_string_to_bool_conversion: bool = False,
 ) -> Tuple[Dict[str, Any], List[str]]:
     """Calls schema utils for normalization of object against its schema
     and collects all the errors.
@@ -104,16 +104,18 @@ def validate_arguments_against_schema(
         # Below normalization is for arguments which are expected to be boolean
         # but from API request they are received as string type.
         if (
-                allow_string_to_bool_conversion and
-                get_schema_type(arg_schema) == schema_utils.SCHEMA_TYPE_BOOL
-                and isinstance(handler_args[arg_key], str)
+            allow_string_to_bool_conversion
+            and get_schema_type(arg_schema) == schema_utils.SCHEMA_TYPE_BOOL
+            and isinstance(handler_args[arg_key], str)
         ):
-            handler_args[arg_key] = (
-                convert_string_to_bool(handler_args[arg_key]))
+            handler_args[arg_key] = convert_string_to_bool(
+                handler_args[arg_key]
+            )
 
         try:
             normalized_value = schema_utils.normalize_against_schema(
-                handler_args[arg_key], arg_schema['schema'])
+                handler_args[arg_key], arg_schema['schema']
+            )
 
             # Modification of argument name if new_key_for_argument
             # field is present in the schema.
@@ -122,7 +124,8 @@ def validate_arguments_against_schema(
             normalized_values[arg_key] = normalized_value
         except Exception as e:
             errors.append(
-                'Schema validation for \'%s\' failed: %s' % (arg_key, e))
+                'Schema validation for \'%s\' failed: %s' % (arg_key, e)
+            )
 
     extra_args = set(handler_args.keys()) - set(handler_args_schemas.keys())
 

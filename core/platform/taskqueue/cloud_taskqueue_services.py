@@ -37,17 +37,20 @@ from typing import Any, Dict, Optional
 CLIENT = tasks_v2.CloudTasksClient(
     credentials=(
         auth.credentials.AnonymousCredentials()
-        if constants.EMULATOR_MODE else auth.default()[0]))
+        if constants.EMULATOR_MODE
+        else auth.default()[0]
+    )
+)
 
 
 # Here we use type Any because the payload here has no constraints, so that's
 # why payload is annotated with 'Dict[str, Any]' type.
 def create_http_task(
-        queue_name: str,
-        url: str,
-        payload: Optional[Dict[str, Any]] = None,
-        scheduled_for: Optional[datetime.datetime] = None,
-        task_name: Optional[str] = None
+    queue_name: str,
+    url: str,
+    payload: Optional[Dict[str, Any]] = None,
+    scheduled_for: Optional[datetime.datetime] = None,
+    task_name: Optional[str] = None,
 ) -> tasks_v2.types.Task:
     """Creates an http task with the correct http headers/payload and sends
     that task to the Cloud Tasks API. An http task is an asynchronous task that
@@ -69,12 +72,13 @@ def create_http_task(
     """
     # The cloud tasks library requires the Oppia project id and region, as well
     # as the queue name as the path to be able to find the correct queue.
-    oppia_project_id = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.OPPIA_PROJECT_ID.value))
+    oppia_project_id = platform_parameter_services.get_platform_parameter_value(
+        platform_parameter_list.ParamName.OPPIA_PROJECT_ID.value
+    )
     assert isinstance(oppia_project_id, str)
     parent = CLIENT.queue_path(
-        oppia_project_id, feconf.GOOGLE_APP_ENGINE_REGION, queue_name)
+        oppia_project_id, feconf.GOOGLE_APP_ENGINE_REGION, queue_name
+    )
 
     # Here we use type Any because task's structure can vary a lot. So, to allow
     # every type of value we used Dict[str, Any] type here.

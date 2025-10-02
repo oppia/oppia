@@ -79,7 +79,7 @@ class UpdatedFeedbackMessageDict(TypedDict):
 
 
 def update_original_and_last_message_author_id_in_feedback_thread_dicts(
-    feedback_thread_dicts: List[feedback_domain.FeedbackThreadDict]
+    feedback_thread_dicts: List[feedback_domain.FeedbackThreadDict],
 ) -> List[UpdatedLastMessageAuthorFeedbackThreadDict]:
     """Replaces original author id and last message author id with there
     corresponding username in the given feedback thread dictionaries.
@@ -93,9 +93,9 @@ def update_original_and_last_message_author_id_in_feedback_thread_dicts(
     """
     updated_feedback_thread_dicts = []
     for feedback_thread_dict in feedback_thread_dicts:
-        last_nonempty_message_author_id = (
-            feedback_thread_dict['last_nonempty_message_author_id']
-        )
+        last_nonempty_message_author_id = feedback_thread_dict[
+            'last_nonempty_message_author_id'
+        ]
         updated_feedback_thread_dict: (
             UpdatedLastMessageAuthorFeedbackThreadDict
         ) = {
@@ -104,7 +104,8 @@ def update_original_and_last_message_author_id_in_feedback_thread_dicts(
                 user_services.get_username(
                     feedback_thread_dict['original_author_id']
                 )
-                if feedback_thread_dict['original_author_id'] else None
+                if feedback_thread_dict['original_author_id']
+                else None
             ),
             'state_name': feedback_thread_dict['state_name'],
             'status': feedback_thread_dict['status'],
@@ -116,17 +117,17 @@ def update_original_and_last_message_author_id_in_feedback_thread_dicts(
                 feedback_thread_dict['last_nonempty_message_text']
             ),
             'last_nonempty_message_author': (
-                user_services.get_username(
-                    last_nonempty_message_author_id
-                ) if last_nonempty_message_author_id else None
-            )
+                user_services.get_username(last_nonempty_message_author_id)
+                if last_nonempty_message_author_id
+                else None
+            ),
         }
         updated_feedback_thread_dicts.append(updated_feedback_thread_dict)
     return updated_feedback_thread_dicts
 
 
 def update_original_author_id_in_feedback_thread_dicts(
-    feedback_thread_dicts: List[feedback_domain.FeedbackThreadDict]
+    feedback_thread_dicts: List[feedback_domain.FeedbackThreadDict],
 ) -> List[UpdatedAuthorUsernameFeedbackThreadDict]:
     """Replaces original author id with the corresponding username in the
     given feedback thread dictionaries.
@@ -148,7 +149,8 @@ def update_original_author_id_in_feedback_thread_dicts(
                 user_services.get_username(
                     feedback_thread_dict['original_author_id']
                 )
-                if feedback_thread_dict['original_author_id'] else None
+                if feedback_thread_dict['original_author_id']
+                else None
             ),
             'state_name': feedback_thread_dict['state_name'],
             'status': feedback_thread_dict['status'],
@@ -161,14 +163,14 @@ def update_original_author_id_in_feedback_thread_dicts(
             ),
             'last_nonempty_message_author_id': (
                 feedback_thread_dict['last_nonempty_message_author_id']
-            )
+            ),
         }
         updated_feedback_thread_dicts.append(updated_feedback_thread_dict)
     return updated_feedback_thread_dicts
 
 
 def update_author_id_in_message_dicts(
-    message_dicts: List[feedback_domain.FeedbackMessageDict]
+    message_dicts: List[feedback_domain.FeedbackMessageDict],
 ) -> List[UpdatedFeedbackMessageDict]:
     """Replaces author id with the corresponding username in the
     given message dictionaries.
@@ -184,10 +186,9 @@ def update_author_id_in_message_dicts(
     for message_dict in message_dicts:
         updated_message_dict: UpdatedFeedbackMessageDict = {
             'author_username': (
-                user_services.get_username(
-                    message_dict['author_id']
-                )
-                if message_dict['author_id'] else None
+                user_services.get_username(message_dict['author_id'])
+                if message_dict['author_id']
+                else None
             ),
             'created_on_msecs': message_dict['created_on_msecs'],
             'entity_type': message_dict['entity_type'],
@@ -195,7 +196,7 @@ def update_author_id_in_message_dicts(
             'message_id': message_dict['message_id'],
             'text': message_dict['text'],
             'updated_status': message_dict['updated_status'],
-            'updated_subject': message_dict['updated_subject']
+            'updated_subject': message_dict['updated_subject'],
         }
         updated_message_dicts.append(updated_message_dict)
     return updated_message_dicts
@@ -211,9 +212,7 @@ class ThreadListHandlerNormalizedPayloadDict(TypedDict):
 
 
 class ThreadListHandler(
-    base.BaseHandler[
-        ThreadListHandlerNormalizedPayloadDict, Dict[str, str]
-    ]
+    base.BaseHandler[ThreadListHandlerNormalizedPayloadDict, Dict[str, str]]
 ):
     """Handles operations relating to feedback thread lists."""
 
@@ -222,44 +221,41 @@ class ThreadListHandler(
         'exploration_id': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': r'^[a-zA-Z0-9\-_]{1,12}$'
-                }]
+                'validators': [
+                    {
+                        'id': 'is_regex_matched',
+                        'regex_pattern': r'^[a-zA-Z0-9\-_]{1,12}$',
+                    }
+                ],
             }
         }
     }
     HANDLER_ARGS_SCHEMAS = {
         'GET': {},
         'POST': {
-            'subject': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
-            'text': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            }
-        }
+            'subject': {'schema': {'type': 'basestring'}},
+            'text': {'schema': {'type': 'basestring'}},
+        },
     }
 
     @acl_decorators.can_play_exploration
     def get(self, exploration_id: str) -> None:
 
         feedback_thread_dicts = [
-            thread.to_dict() for thread in feedback_services.get_all_threads(
-               feconf.ENTITY_TYPE_EXPLORATION, exploration_id, False
+            thread.to_dict()
+            for thread in feedback_services.get_all_threads(
+                feconf.ENTITY_TYPE_EXPLORATION, exploration_id, False
             )
         ]
-        self.values.update({
-            'feedback_thread_dicts': (
-                update_original_and_last_message_author_id_in_feedback_thread_dicts(  # pylint: disable=line-too-long
-                    feedback_thread_dicts
+        self.values.update(
+            {
+                'feedback_thread_dicts': (
+                    update_original_and_last_message_author_id_in_feedback_thread_dicts(  # pylint: disable=line-too-long
+                        feedback_thread_dicts
+                    )
                 )
-            )
-        })
+            }
+        )
         self.render_json(self.values)
 
     @acl_decorators.can_create_feedback_thread
@@ -269,8 +265,12 @@ class ThreadListHandler(
         text = self.normalized_payload['text']
 
         feedback_services.create_thread(
-            feconf.ENTITY_TYPE_EXPLORATION, exploration_id, self.user_id,
-            subject, text)
+            feconf.ENTITY_TYPE_EXPLORATION,
+            exploration_id,
+            self.user_id,
+            subject,
+            text,
+        )
         self.render_json(self.values)
 
 
@@ -284,10 +284,12 @@ class ThreadListHandlerForTopicsHandler(
         'topic_id': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': r'^[a-zA-Z0-9\-_]{1,12}$'
-                }]
+                'validators': [
+                    {
+                        'id': 'is_regex_matched',
+                        'regex_pattern': r'^[a-zA-Z0-9\-_]{1,12}$',
+                    }
+                ],
             }
         }
     }
@@ -297,17 +299,20 @@ class ThreadListHandlerForTopicsHandler(
     def get(self, topic_id: str) -> None:
 
         suggestion_thread_dicts = [
-            thread.to_dict() for thread in feedback_services.get_all_threads(
+            thread.to_dict()
+            for thread in feedback_services.get_all_threads(
                 feconf.ENTITY_TYPE_TOPIC, topic_id, True
             )
         ]
-        self.values.update({
-            'suggestion_thread_dicts': (
-                update_original_author_id_in_feedback_thread_dicts(
-                    suggestion_thread_dicts
+        self.values.update(
+            {
+                'suggestion_thread_dicts': (
+                    update_original_author_id_in_feedback_thread_dicts(
+                        suggestion_thread_dicts
+                    )
                 )
-            )
-        })
+            }
+        )
         self.render_json(self.values)
 
 
@@ -331,10 +336,12 @@ class ThreadHandler(
         'thread_id': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.VALID_THREAD_ID_REGEX
-                }]
+                'validators': [
+                    {
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.VALID_THREAD_ID_REGEX,
+                    }
+                ],
             }
         }
     }
@@ -342,23 +349,15 @@ class ThreadHandler(
         'GET': {},
         'POST': {
             'updated_status': {
-                'schema': {
-                    'type': 'basestring'
-                },
-                'default_value': None
+                'schema': {'type': 'basestring'},
+                'default_value': None,
             },
-            'text': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
+            'text': {'schema': {'type': 'basestring'}},
             'updated_subject': {
-                'schema': {
-                    'type': 'basestring'
-                },
-                'default_value': None
-            }
-        }
+                'schema': {'type': 'basestring'},
+                'default_value': None,
+            },
+        },
     }
 
     @acl_decorators.can_view_feedback_thread
@@ -369,21 +368,21 @@ class ThreadHandler(
         )
 
         message_dicts = [
-            message.to_dict() for message in feedback_services.get_messages(
-                thread_id
-            )
+            message.to_dict()
+            for message in feedback_services.get_messages(thread_id)
         ]
         message_ids = [message['message_id'] for message in message_dicts]
         if self.user_id:
             feedback_services.update_messages_read_by_the_user(
-                self.user_id, thread_id, message_ids)
+                self.user_id, thread_id, message_ids
+            )
 
-        self.values.update({
-            'messages': update_author_id_in_message_dicts(
-                message_dicts
-            ),
-            'suggestion': suggestion.to_dict() if suggestion else None
-        })
+        self.values.update(
+            {
+                'messages': update_author_id_in_message_dicts(message_dicts),
+                'suggestion': suggestion.to_dict() if suggestion else None,
+            }
+        )
         self.render_json(self.values)
 
     @acl_decorators.can_comment_on_feedback_thread
@@ -399,11 +398,13 @@ class ThreadHandler(
 
         if suggestion and updated_status:
             raise self.InvalidInputException(
-                'Suggestion thread status cannot be changed manually.')
+                'Suggestion thread status cannot be changed manually.'
+            )
 
         messages = feedback_services.get_messages(thread_id)
         new_message = feedback_services.create_message(
-            thread_id, self.user_id, updated_status, updated_subject, text)
+            thread_id, self.user_id, updated_status, updated_subject, text
+        )
 
         # Currently we are manually adding new message to the messages list as
         # the feedback_services.get_messages is not returning a correct list of
@@ -412,11 +413,9 @@ class ThreadHandler(
         messages.append(new_message)
         message_dict = [message.to_dict() for message in messages]
 
-        self.render_json({
-            'messages': update_author_id_in_message_dicts(
-                message_dict
-            )
-        })
+        self.render_json(
+            {'messages': update_author_id_in_message_dicts(message_dict)}
+        )
 
 
 class RecentFeedbackMessagesHandlerNormalizedRequestDict(TypedDict):
@@ -442,12 +441,7 @@ class RecentFeedbackMessagesHandler(
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
-            'cursor': {
-                'schema': {
-                    'type': 'basestring'
-                },
-                'default_value': None
-            }
+            'cursor': {'schema': {'type': 'basestring'}, 'default_value': None}
         }
     }
 
@@ -458,25 +452,25 @@ class RecentFeedbackMessagesHandler(
 
         all_feedback_messages, new_urlsafe_start_cursor, more = (
             feedback_services.get_next_page_of_all_feedback_messages(
-                urlsafe_start_cursor=urlsafe_start_cursor))
+                urlsafe_start_cursor=urlsafe_start_cursor
+            )
+        )
 
         message_dict = [message.to_dict() for message in all_feedback_messages]
 
-        self.render_json({
-            'results': update_author_id_in_message_dicts(
-                message_dict
-            ),
-            'cursor': new_urlsafe_start_cursor,
-            'more': more,
-        })
+        self.render_json(
+            {
+                'results': update_author_id_in_message_dicts(message_dict),
+                'cursor': new_urlsafe_start_cursor,
+                'more': more,
+            }
+        )
 
 
-class FeedbackStatsHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class FeedbackStatsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Returns Feedback stats for an exploration.
-        - Number of open threads.
-        - Number of total threads.
+    - Number of open threads.
+    - Number of total threads.
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -484,10 +478,12 @@ class FeedbackStatsHandler(
         'exploration_id': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': r'^[a-zA-Z0-9\-_]{1,12}$'
-                }]
+                'validators': [
+                    {
+                        'id': 'is_regex_matched',
+                        'regex_pattern': r'^[a-zA-Z0-9\-_]{1,12}$',
+                    }
+                ],
             }
         }
     }
@@ -495,15 +491,19 @@ class FeedbackStatsHandler(
 
     @acl_decorators.can_play_exploration
     def get(self, exploration_id: str) -> None:
-        feedback_thread_analytics = (
-            feedback_services.get_thread_analytics(
-                exploration_id))
-        self.values.update({
-            'num_open_threads': (
-                feedback_thread_analytics.num_open_threads),
-            'num_total_threads': (
-                feedback_thread_analytics.num_total_threads),
-        })
+        feedback_thread_analytics = feedback_services.get_thread_analytics(
+            exploration_id
+        )
+        self.values.update(
+            {
+                'num_open_threads': (
+                    feedback_thread_analytics.num_open_threads
+                ),
+                'num_total_threads': (
+                    feedback_thread_analytics.num_total_threads
+                ),
+            }
+        )
         self.render_json(self.values)
 
 
@@ -519,10 +519,12 @@ class FeedbackThreadViewEventHandler(
         'thread_id': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.VALID_THREAD_ID_REGEX
-                }]
+                'validators': [
+                    {
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.VALID_THREAD_ID_REGEX,
+                    }
+                ],
             }
         }
     }
@@ -532,5 +534,6 @@ class FeedbackThreadViewEventHandler(
     def post(self, thread_id: str) -> None:
         exploration_id = feedback_services.get_exp_id_from_thread_id(thread_id)
         feedback_services.clear_feedback_message_references_transactional(
-            self.user_id, exploration_id, thread_id)
+            self.user_id, exploration_id, thread_id
+        )
         self.render_json(self.values)

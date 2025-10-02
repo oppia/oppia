@@ -77,9 +77,7 @@ class InitializeAndroidTestDataHandler(
             raise Exception('Cannot load new structures data in production.')
 
         topic_id = android_services.initialize_android_test_data()
-        self.render_json({
-            'generated_topic_id': topic_id
-        })
+        self.render_json({'generated_topic_id': topic_id})
 
 
 class ActivityDataRequestDict(TypedDict):
@@ -109,12 +107,13 @@ class _ActivityDataResponseDictRequiredFields(TypedDict):
         topic_domain.TopicDict,
         Dict[str, feconf.TranslatedContentDict],
         classroom_domain.ClassroomDict,
-        None
+        None,
     ]
 
 
 class ActivityDataResponseDict(
-        _ActivityDataResponseDictRequiredFields, total=False):
+    _ActivityDataResponseDictRequiredFields, total=False
+):
     """Dict representation of items returned in the activities response list."""
 
     version: Optional[int]
@@ -130,9 +129,11 @@ class AndroidActivityHandlerHandlerNormalizedRequestDict(TypedDict):
     activities_data: List[ActivityDataRequestDict]
 
 
-class AndroidActivityHandler(base.BaseHandler[
-    Dict[str, str], AndroidActivityHandlerHandlerNormalizedRequestDict
-]):
+class AndroidActivityHandler(
+    base.BaseHandler[
+        Dict[str, str], AndroidActivityHandlerHandlerNormalizedRequestDict
+    ]
+):
     """Handler for providing activities to Android."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -149,19 +150,16 @@ class AndroidActivityHandler(base.BaseHandler[
                         constants.ACTIVITY_TYPE_STORY,
                         constants.ACTIVITY_TYPE_SKILL,
                         constants.ACTIVITY_TYPE_SUBTOPIC,
-                        constants.ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE_MIGRATION, # pylint: disable=line-too-long
+                        constants.ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE_MIGRATION,  # pylint: disable=line-too-long
                         constants.ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE,
                         constants.ACTIVITY_TYPE_LEARN_TOPIC,
-                        constants.ACTIVITY_TYPE_CLASSROOM
-                    ]
+                        constants.ACTIVITY_TYPE_CLASSROOM,
+                    ],
                 },
             },
             'activities_data': {
-                'schema': {
-                    'type': 'custom',
-                    'obj_type': 'JsonEncodedInString'
-                }
-            }
+                'schema': {'type': 'custom', 'obj_type': 'JsonEncodedInString'}
+            },
         }
     }
 
@@ -179,7 +177,8 @@ class AndroidActivityHandler(base.BaseHandler[
 
         hashed_activities_data = [
             tuple(sorted((k, v) for k, v in activity_data.items()))
-            for activity_data in activities_data]
+            for activity_data in activities_data
+        ]
         if len(set(hashed_activities_data)) != len(hashed_activities_data):
             raise self.InvalidInputException(
                 'Entries in activities_data should be unique'
@@ -190,38 +189,51 @@ class AndroidActivityHandler(base.BaseHandler[
                 exploration = exp_fetchers.get_exploration_by_id(
                     activity_data['id'],
                     strict=False,
-                    version=activity_data.get('version'))
-                activities.append({
-                    'id': activity_data['id'],
-                    'version': activity_data.get('version'),
-                    'payload': (
-                        exploration.to_dict() if exploration is not None
-                        else None)
-                })
+                    version=activity_data.get('version'),
+                )
+                activities.append(
+                    {
+                        'id': activity_data['id'],
+                        'version': activity_data.get('version'),
+                        'payload': (
+                            exploration.to_dict()
+                            if exploration is not None
+                            else None
+                        ),
+                    }
+                )
         elif activity_type == constants.ACTIVITY_TYPE_STORY:
             for activity_data in activities_data:
                 story = story_fetchers.get_story_by_id(
                     activity_data['id'],
                     strict=False,
-                    version=activity_data.get('version'))
-                activities.append({
-                    'id': activity_data['id'],
-                    'version': activity_data.get('version'),
-                    'payload': (
-                        story.to_dict() if story is not None else None)
-                })
+                    version=activity_data.get('version'),
+                )
+                activities.append(
+                    {
+                        'id': activity_data['id'],
+                        'version': activity_data.get('version'),
+                        'payload': (
+                            story.to_dict() if story is not None else None
+                        ),
+                    }
+                )
         elif activity_type == constants.ACTIVITY_TYPE_SKILL:
             for activity_data in activities_data:
                 skill = skill_fetchers.get_skill_by_id(
                     activity_data['id'],
                     strict=False,
-                    version=activity_data.get('version'))
-                activities.append({
-                    'id': activity_data['id'],
-                    'version': activity_data.get('version'),
-                    'payload': (
-                        skill.to_dict() if skill is not None else None)
-                })
+                    version=activity_data.get('version'),
+                )
+                activities.append(
+                    {
+                        'id': activity_data['id'],
+                        'version': activity_data.get('version'),
+                        'payload': (
+                            skill.to_dict() if skill is not None else None
+                        ),
+                    }
+                )
         elif activity_type == constants.ACTIVITY_TYPE_SUBTOPIC:
             for activity_data in activities_data:
                 topic_id, subtopic_page_id = activity_data['id'].split('-')
@@ -229,15 +241,19 @@ class AndroidActivityHandler(base.BaseHandler[
                     topic_id,
                     int(subtopic_page_id),
                     strict=False,
-                    version=activity_data.get('version')
+                    version=activity_data.get('version'),
                 )
-                activities.append({
-                    'id': activity_data['id'],
-                    'version': activity_data.get('version'),
-                    'payload': (
-                        subtopic_page.to_dict() if subtopic_page is not None
-                        else None)
-                })
+                activities.append(
+                    {
+                        'id': activity_data['id'],
+                        'version': activity_data.get('version'),
+                        'payload': (
+                            subtopic_page.to_dict()
+                            if subtopic_page is not None
+                            else None
+                        ),
+                    }
+                )
         elif activity_type == (
             constants.ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE_MIGRATION
         ):
@@ -247,17 +263,19 @@ class AndroidActivityHandler(base.BaseHandler[
                     topic_id,
                     int(study_guide_id),
                     strict=False,
-                    version=activity_data.get('version')
+                    version=activity_data.get('version'),
                 )
-                activities.append({
-                    'id': activity_data['id'],
-                    'version': activity_data.get('version'),
-                    'payload': (
-                        study_guide
-                        .to_subtopic_page_dict_for_android()
-                        if study_guide is not None else None
-                    )
-                })
+                activities.append(
+                    {
+                        'id': activity_data['id'],
+                        'version': activity_data.get('version'),
+                        'payload': (
+                            study_guide.to_subtopic_page_dict_for_android()
+                            if study_guide is not None
+                            else None
+                        ),
+                    }
+                )
         elif activity_type == (
             constants.ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE
         ):
@@ -267,31 +285,44 @@ class AndroidActivityHandler(base.BaseHandler[
                     topic_id,
                     int(study_guide_id),
                     strict=False,
-                    version=activity_data.get('version')
+                    version=activity_data.get('version'),
                 )
-                activities.append({
-                    'id': activity_data['id'],
-                    'version': activity_data.get('version'),
-                    'payload': (
-                        study_guide.to_dict() if study_guide is not None
-                        else None)
-                })
+                activities.append(
+                    {
+                        'id': activity_data['id'],
+                        'version': activity_data.get('version'),
+                        'payload': (
+                            study_guide.to_dict()
+                            if study_guide is not None
+                            else None
+                        ),
+                    }
+                )
         elif activity_type == constants.ACTIVITY_TYPE_CLASSROOM:
             for activity_data in activities_data:
                 if activity_data.get('version') is not None:
                     raise self.InvalidInputException(
-                        'Version cannot be specified for classroom')
+                        'Version cannot be specified for classroom'
+                    )
                 classroom = (
                     classroom_config_services.get_classroom_by_url_fragment(
-                        activity_data['id']))
-                activities.append({
-                    'id': activity_data['id'],
-                    'payload': (
-                        classroom.to_dict() if classroom is not None else None)
-                })
+                        activity_data['id']
+                    )
+                )
+                activities.append(
+                    {
+                        'id': activity_data['id'],
+                        'payload': (
+                            classroom.to_dict()
+                            if classroom is not None
+                            else None
+                        ),
+                    }
+                )
         elif activity_type == constants.ACTIVITY_TYPE_EXPLORATION_TRANSLATIONS:
             entity_type = feconf.TranslatableEntityType(
-                feconf.ENTITY_TYPE_EXPLORATION)
+                feconf.ENTITY_TYPE_EXPLORATION
+            )
             for activity_data in activities_data:
                 version = activity_data.get('version')
                 language_code = activity_data.get('language_code')
@@ -301,31 +332,35 @@ class AndroidActivityHandler(base.BaseHandler[
                         'for translation'
                     )
                 translation = translation_fetchers.get_entity_translation(
-                    entity_type,
-                    activity_data['id'],
-                    version,
-                    language_code
+                    entity_type, activity_data['id'], version, language_code
                 )
-                activities.append({
-                    'id': activity_data['id'],
-                    'version': version,
-                    'language_code': language_code,
-                    'payload': (
-                        translation.to_dict()['translations']
-                        if translation is not None
-                        else None)
-                })
+                activities.append(
+                    {
+                        'id': activity_data['id'],
+                        'version': version,
+                        'language_code': language_code,
+                        'payload': (
+                            translation.to_dict()['translations']
+                            if translation is not None
+                            else None
+                        ),
+                    }
+                )
         else:
             for activity_data in activities_data:
                 topic = topic_fetchers.get_topic_by_id(
                     activity_data['id'],
                     strict=False,
-                    version=activity_data.get('version'))
-                activities.append({
-                    'id': activity_data['id'],
-                    'version': activity_data.get('version'),
-                    'payload': (
-                        topic.to_dict() if topic is not None else None)
-                })
+                    version=activity_data.get('version'),
+                )
+                activities.append(
+                    {
+                        'id': activity_data['id'],
+                        'version': activity_data.get('version'),
+                        'payload': (
+                            topic.to_dict() if topic is not None else None
+                        ),
+                    }
+                )
 
         self.render_json(activities)
