@@ -218,14 +218,16 @@ class AndroidActivityHandler(base.BaseHandler[
             )
 
         if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
-            for activity_data in activities_data:
-                exploration = exp_fetchers.get_exploration_by_id(
-                    activity_data['id'],
-                    strict=False,
-                    version=activity_data.get('version'))
-
+            ids_and_versions = [
+                (activity_data['id'], activity_data.get('version'))
+                for activity_data in activities_data
+            ]
+            fetched_entities: Sequence[Optional[exp_domain.Exploration]] = (
+                exp_fetchers.get_multiple_explorations_by_ids_and_version(ids_and_versions)
+            )
+            for activity_data, exploration in zip(activities_data, fetched_entities):
                 exploration_dict_for_android: Optional[
-                    exp_domain.ExplorationDictForAndroid] = None
+                    exp_domain.ExplorationDictForAndroid] = None          
                 if exploration is not None:
                     exploration_dict_for_android = (
                         exp_services.to_exploration_dict_for_android(exploration)
