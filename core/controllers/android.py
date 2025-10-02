@@ -268,8 +268,9 @@ class AndroidActivityHandler(base.BaseHandler[
                 for activity_data in activities_data]
             topic_subtopic_version_tuples = [
                 (
-                    (topic_id, int(stringified_subtopic_index),
-                    subtopic_page_version)
+                    topic_id,
+                    int(stringified_subtopic_index),
+                    subtopic_page_version,
                 )
                 for (
                     (topic_id, stringified_subtopic_index),
