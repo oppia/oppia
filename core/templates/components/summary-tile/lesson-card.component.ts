@@ -68,11 +68,9 @@ export class LessonCardComponent implements OnInit {
       } else {
         this.storyNode = allNodes[allNodes.length - 1];
       }
-      const inProgressNodeId = this.storyNode.getId();
 
       this.statusIsPublished = this.storyNode?.getStatus() === 'Published';
       this.isChapterDraft = this.storyNode?.getStatus() === 'Draft';
-      console.log(this.isChapterDraft);
       if (this.statusIsPublished) {
         this.lessonUrl = this.getStorySummaryLessonUrl(
           this.story.getClassroomUrlFragment(),
@@ -111,7 +109,6 @@ export class LessonCardComponent implements OnInit {
     this.progress = Math.floor((completedCount / allNodes.length) * 100);
     this.lessonTopic = this.topic;
 
-    // If this card is for recommendation, pick the next published, uncompleted, non-draft node
     if (this.isRecommendation) {
       const recommendedNode = allNodes.find(
         node =>
@@ -235,7 +232,7 @@ export class LessonCardComponent implements OnInit {
     }
   }
 
-  onStoryClick(event: Event) {
+  onStoryClick(event: Event): void {
     if (!this.statusIsPublished) {
       event.preventDefault();
     }
