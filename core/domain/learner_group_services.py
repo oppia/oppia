@@ -448,7 +448,7 @@ def get_matching_story_syllabus_item_dicts(
         )
     ]
     matching_stories = story_fetchers.get_story_summaries_by_ids(story_ids)
-    stories = story_fetchers.get_stories_by_ids(story_ids, strict=True)
+    stories = story_fetchers.get_stories_by_ids(story_ids)
 
     matching_story_syllabus_item_dicts: List[
         story_domain.LearnerGroupSyllabusStorySummaryDict] = []
