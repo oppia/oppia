@@ -222,10 +222,10 @@ class AndroidActivityHandler(base.BaseHandler[
                 (activity_data['id'], activity_data.get('version'))
                 for activity_data in activities_data
             ]
-            fetched_entities: Sequence[Optional[exp_domain.Exploration]] = (
+            fetched_explorations: Sequence[Optional[exp_domain.Exploration]] = (
                 exp_fetchers.get_multiple_explorations_by_ids_and_version(ids_and_versions)
             )
-            for activity_data, exploration in zip(activities_data, fetched_entities):
+            for activity_data, exploration in zip(activities_data, fetched_explorations):
                 exploration_dict_for_android: Optional[
                     exp_domain.ExplorationDictForAndroid] = None
                 if exploration is not None:
@@ -446,7 +446,6 @@ class AndroidActivityHandler(base.BaseHandler[
                 for activity_data in activities_data]
 
             fetched_entities: Sequence[Optional[Union[
-                exp_domain.Exploration,
                 story_domain.Story,
                 skill_domain.Skill,
                 question_domain.Question,
