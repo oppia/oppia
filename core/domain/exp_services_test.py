@@ -1606,7 +1606,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             })], 'Changed title.')
 
         self.assertFalse(
-            exp_services.does_exploration_support_voiceovers(self.EXP_0_ID))
+            exp_services.does_exploration_support_voiceovers(self.EXP_0_ID, self.owner_id))
 
         story_id = story_services.get_new_story_id()
         topic_id = topic_fetchers.get_new_topic_id()
@@ -1638,7 +1638,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             self.owner_id, story_id, change_list, 'Added node.')
 
         self.assertTrue(
-            exp_services.does_exploration_support_voiceovers(self.EXP_0_ID))
+            exp_services.does_exploration_support_voiceovers(self.EXP_0_ID, self.owner_id))
 
     def test_raise_error_when_adding_voiceover_for_non_curated_exploration(
         self

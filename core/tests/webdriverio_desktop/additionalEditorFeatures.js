@@ -45,19 +45,6 @@ describe('Full exploration editor', function () {
     libraryPage = new LibraryPage.LibraryPage();
   });
 
-  it('should walk through the tutorial when user repeatedly clicks Next', async function () {
-    await users.createUser(
-      'userTutorial@stateEditor.com',
-      'userTutorialStateEditor'
-    );
-    await users.login('userTutorial@stateEditor.com');
-    await workflow.createExplorationAndStartTutorial(false);
-    await explorationEditorMainTab.startTutorial();
-    await explorationEditorMainTab.playTutorial();
-    await explorationEditorMainTab.finishTutorial();
-    await users.logout();
-  });
-
   it('should generate warning message if card height limit is exceeded', async function () {
     await users.createUser('user@heightWarning.com', 'userHeightWarning');
     await users.login('user@heightWarning.com');

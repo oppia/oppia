@@ -1197,6 +1197,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_collection_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
         expected_skill_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
         expected_subtopic_page_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
+        expected_study_guide_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
         expected_topic_rights_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
         expected_topic_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
         expected_translation_contribution_stats: Dict[
@@ -1290,6 +1291,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 expected_skill_sm,
             'subtopic_page_snapshot_metadata':
                 expected_subtopic_page_sm,
+            'study_guide_snapshot_metadata':
+                expected_study_guide_sm,
             'topic_rights_snapshot_metadata':
                 expected_topic_rights_sm,
             'topic_snapshot_metadata': expected_topic_sm,
@@ -1837,6 +1840,12 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 'commit_message': self.COMMIT_MESSAGE,
             }
         }
+        expected_study_guide_sm = {
+            self.GENERIC_MODEL_ID: {
+                'commit_type': self.COMMIT_TYPE,
+                'commit_message': self.COMMIT_MESSAGE,
+            }
+        }
         expected_topic_rights_sm = {
             self.GENERIC_MODEL_ID: {
                 'commit_type': self.COMMIT_TYPE,
@@ -2166,6 +2175,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 expected_skill_sm,
             'subtopic_page_snapshot_metadata':
                 expected_subtopic_page_sm,
+            'study_guide_snapshot_metadata':
+                expected_study_guide_sm,
             'topic_rights_snapshot_metadata':
                 expected_topic_rights_sm,
             'topic_snapshot_metadata': expected_topic_sm,

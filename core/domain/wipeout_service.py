@@ -489,7 +489,7 @@ def delete_user(
             request object for which to delete or pseudonymize all the models.
     """
     user_id = pending_deletion_request.user_id
-    user_roles = user_models.UserSettingsModel.get_by_id(user_id).roles
+    user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
 
     auth_services.delete_external_auth_associations(user_id)
 
@@ -499,7 +499,10 @@ def delete_user(
     _delete_models(user_id, models.Names.FEEDBACK)
     _delete_models(user_id, models.Names.SUGGESTION)
     remove_user_from_user_groups(user_id)
-    if feconf.ROLE_ID_MOBILE_LEARNER not in user_roles:
+
+    # Explicitly handle the case where the user settings model is deleted.
+    if (user_settings_model is None or
+        feconf.ROLE_ID_MOBILE_LEARNER not in user_settings_model.roles):
         remove_user_from_activities_with_associated_rights_models(
             pending_deletion_request.user_id)
         _pseudonymize_one_model_class(
@@ -624,23 +627,27 @@ def verify_user_deleted(
         bool. True if all the models were correctly deleted, False otherwise.
     """
     if not auth_services.verify_external_auth_associations_are_deleted(user_id):
+        logging.error(
+            'External auth association is not deleted for user with ID %s' % (
+                user_id))
         return False
 
     policies_not_to_verify = [
         base_models.DELETION_POLICY.KEEP,
         base_models.DELETION_POLICY.NOT_APPLICABLE
     ]
+
     if not include_delete_at_end_models:
         policies_not_to_verify.append(
             base_models.DELETION_POLICY.DELETE_AT_END)
 
         # Verify if user profile picture is deleted.
-        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
-        username = user_settings_model.username
-        user_roles = user_settings_model.roles
-        if feconf.ROLE_ID_MOBILE_LEARNER not in user_roles:
-            if not _verify_profile_picture_is_deleted(username):
-                return False
+        pending_deletion_request = get_pending_deletion_request(user_id)
+        username = pending_deletion_request.username
+        # A username of None indicates a ROLE_ID_MOBILE_LEARNER.
+        if username is not None and not _verify_profile_picture_is_deleted(
+                username):
+            return False
 
     user_is_verified = True
     for model_class in models.Registry.get_all_storage_model_classes():

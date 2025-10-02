@@ -1,24 +1,24 @@
-<div *ngIf="isUnlocked && contributionType === 'question'" class="question-badge-container">
+<div *ngIf="isUnlocked && contributionType === 'question'" class="question-badge-container e2e-test-badge">
   <img class="question-badge"
        src="/assets/images/contributor_dashboard/question-{{contributionSubType}}-badge.component.svg">
-  <div class="question-badge-value">
+  <div class="question-badge-value e2e-test-badge-value">
       {{contributionCount}}
   </div>
-  <div class="question-badge-caption">
+  <div class="question-badge-caption e2e-test-badge-caption">
       {{contributionSubTypeText}}
   </div>
 </div>
 <div *ngIf="isUnlocked && contributionType === 'translation'"
-     class="translation-badge-container">
+     class="translation-badge-container e2e-test-badge">
   <img class="translation-badge"
        src="/assets/images/contributor_dashboard/translation-{{contributionSubType}}-badge.component.svg">
-  <div class="translation-badge-value">
+  <div class="translation-badge-value e2e-test-badge-value">
     {{contributionCount}}
   </div>
-  <div class="translation-badge-caption">
+  <div class="translation-badge-caption e2e-test-badge-caption">
     {{contributionSubTypeText}}
   </div>
-  <div class="translation-badge-language"
+  <div class="translation-badge-language e2e-test-badge-language"
        [ngStyle]="{'font-size': fontSize, 'line-height': lineHeight}">
     {{language}}
   </div>

@@ -717,15 +717,15 @@ class Collection:
         # the current version of Collection domain object and here in _convert_*
         # functions, we can ignore some MyPy errors as we work with the previous
         # versions of the domain objects.
-        collection_dict['skills'] = new_collection_dict['skills'] # type: ignore[misc]
+        collection_dict['skills'] = new_collection_dict['skills'] # type: ignore[typeddict-item]
         # Here we use MyPy ignore because 'next_skill_id' key is
         # deprecated from the latest domain object and while accessing
         # this key MyPy throws an error.
-        collection_dict['next_skill_id'] = ( # type: ignore[misc]
+        collection_dict['next_skill_id'] = ( # type: ignore[typeddict-item]
             # Here we use MyPy ignore because 'next_skill_id' key is
             # deprecated from the latest domain object and while accessing
             # this key MyPy throws an error.
-            new_collection_dict['next_skill_id']) # type: ignore[misc]
+            new_collection_dict['next_skill_id']) # type: ignore[typeddict-item]
 
         collection_dict['schema_version'] = 4
         return collection_dict
@@ -756,10 +756,10 @@ class Collection:
 
         # Here we use MyPy ignore because MyPy doesn't allow key deletion
         # from TypedDict.
-        del collection_dict['skills'] # type: ignore[misc]
+        del collection_dict['skills'] # type: ignore[typeddict-item]
         # Here we use MyPy ignore because MyPy doesn't allow key deletion
         # from TypedDict.
-        del collection_dict['next_skill_index'] # type: ignore[misc]
+        del collection_dict['next_skill_index'] # type: ignore[typeddict-item]
 
         collection_dict['schema_version'] = 6
         return collection_dict
@@ -891,11 +891,11 @@ class Collection:
             # to match the current version of CollectionNode domain object
             # and here in _convert_* functions, we can ignore some MyPy errors
             # as we work with the previous versions of the domain objects.
-            skill_names.update(node['acquired_skills']) # type: ignore[misc]
+            skill_names.update(node['acquired_skills']) # type: ignore[typeddict-item]
             # Here we use MyPy ignore because 'prerequisite_skills' key is
             # deprecated from the latest domain object and while accessing
             # this key MyPy throw an error.
-            skill_names.update(node['prerequisite_skills']) # type: ignore[misc]
+            skill_names.update(node['prerequisite_skills']) # type: ignore[typeddict-item]
         skill_names_to_ids = {
             name: '%s%s' % (_SKILL_ID_PREFIX, str(index))
             for index, name in enumerate(sorted(skill_names))
@@ -919,7 +919,7 @@ class Collection:
         # the current version of Collection domain object and here in _convert_*
         # functions, we can ignore some MyPy errors as we work with the previous
         # versions of the domain objects.
-        collection_contents['skills'] = { # type: ignore[misc]
+        collection_contents['skills'] = { # type: ignore[typeddict-item]
             skill_id: {
                 'name': skill_name,
                 'question_ids': []
@@ -930,7 +930,7 @@ class Collection:
         # Here we use MyPy ignore because 'next_skill_id' key is
         # deprecated from the latest domain object and while accessing
         # this key MyPy throw an error.
-        collection_contents['next_skill_id'] = len(skill_names) # type: ignore[misc]
+        collection_contents['next_skill_id'] = len(skill_names) # type: ignore[typeddict-item]
 
         return collection_contents
 
@@ -953,15 +953,15 @@ class Collection:
         # Here we use MyPy ignore because 'next_skill_index' key is
         # deprecated from the latest domain object and while accessing
         # this key MyPy throw an error.
-        collection_contents['next_skill_index'] = collection_contents[ # type: ignore[misc]
+        collection_contents['next_skill_index'] = collection_contents[ # type: ignore[typeddict-item]
             # Here we use MyPy ignore because 'next_skill_id' key is
             # deprecated from the latest domain object and while accessing
             # this key MyPy throw an error.
-            'next_skill_id'] # type: ignore[misc]
+            'next_skill_id'] # type: ignore[typeddict-item]
 
         # Here we use MyPy ignore because MyPy doesn't allow key deletion
         # from TypedDict.
-        del collection_contents['next_skill_id'] # type: ignore[misc]
+        del collection_contents['next_skill_id'] # type: ignore[typeddict-item]
 
         return collection_contents
 
@@ -983,10 +983,10 @@ class Collection:
         for node in collection_contents['nodes']:
             # Here we use MyPy ignore because MyPy doesn't allow key deletion
             # from TypedDict.
-            del node['prerequisite_skill_ids'] # type: ignore[misc]
+            del node['prerequisite_skill_ids'] # type: ignore[typeddict-item]
             # Here we use MyPy ignore because MyPy doesn't allow key deletion
             # from TypedDict.
-            del node['acquired_skill_ids'] # type: ignore[misc]
+            del node['acquired_skill_ids'] # type: ignore[typeddict-item]
 
         return collection_contents
 
