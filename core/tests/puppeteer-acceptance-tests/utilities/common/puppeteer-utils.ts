@@ -1771,7 +1771,7 @@ export class BaseUser {
     selector: string | ElementHandle<Element>,
     timeout: number = 5000
   ): Promise<void> {
-    const element =
+    let element =
       typeof selector === 'string'
         ? await this.page.waitForSelector(selector, {visible: true})
         : selector;
@@ -1784,6 +1784,14 @@ export class BaseUser {
 
     while (Date.now() - startTime < timeout) {
       await this.page.waitForTimeout(100);
+
+      // If selector is given, try getting the latest attached element.
+      element =
+        typeof selector === 'string' ? await this.page.$(selector) : element;
+      if (!element) {
+        showMessage('It seems element has detached.');
+        continue;
+      }
       const currentBox = await element.boundingBox();
 
       if (

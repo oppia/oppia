@@ -7033,6 +7033,9 @@ export class ExplorationEditor extends BaseUser {
    * Removes the current interaction.
    */
   async removeInteraction(): Promise<void> {
+    // We need to wait for element to stabalize explicitly, as it gets detached
+    // this is not handled by waitForElementToStabalize in clickOnElementWithSelector.
+    await this.waitForElementToStabilize(removeInteractionButttonSelector);
     await this.clickOnElementWithSelector(removeInteractionButttonSelector);
     await this.clickOnElementWithSelector(
       confirmDeleteInteractionButtonSelector
