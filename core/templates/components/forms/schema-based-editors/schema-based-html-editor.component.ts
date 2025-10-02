@@ -92,7 +92,6 @@ export class SchemaBasedHtmlEditorComponent
   updateValue(value: string): void {
     if (this.localValue !== value) {
       this.localValue = value;
-      this.onChange(value);
       this.localValueChange.emit(value);
     }
   }
