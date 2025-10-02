@@ -215,7 +215,7 @@ class AndroidActivityHandler(base.BaseHandler[
         if len(set(hashed_activities_data)) != len(hashed_activities_data):
             raise self.InvalidInputException(
                 'Entries in activities_data should be unique'
- )
+            )
 
         if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
             for activity_data in activities_data:
@@ -268,8 +268,8 @@ class AndroidActivityHandler(base.BaseHandler[
                 for activity_data in activities_data]
             topic_subtopic_version_tuples = [
                 (
-                    (topic_id, stringified_subtopic_index),
-                    subtopic_page_version
+                    (topic_id, int(stringified_subtopic_index),
+                    subtopic_page_version)
                 )
                 for (
                     (topic_id, stringified_subtopic_index),
