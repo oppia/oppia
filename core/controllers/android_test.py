@@ -891,7 +891,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                 ),
                 [
                     {'id': 'exp_id', 'version': 1,
-                     'payload': exploration.to_dict()},
+                     'payload': exp_services.to_exploration_dict_for_android(exploration)},
                     {'id': 'nonexistent_exp', 'version': 1, 'payload': None}
                 ]
             )
