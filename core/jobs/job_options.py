@@ -23,14 +23,14 @@ import argparse
 from core import feconf
 from core.platform import models
 
+from apache_beam.options import pipeline_options
+from typing import List, Optional
+
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import app_identity_services
 
 app_identity_services = models.Registry.import_app_identity_services()
-
-from apache_beam.options import pipeline_options
-from typing import List, Optional
 
 
 # TODO(#15613): Here we use MyPy ignore because the incomplete typing of

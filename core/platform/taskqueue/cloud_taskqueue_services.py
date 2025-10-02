@@ -25,6 +25,7 @@ import logging
 from core import feconf
 from core.constants import constants
 from core.platform import models
+
 from google import auth
 from google.api_core import retry
 from google.cloud import tasks_v2

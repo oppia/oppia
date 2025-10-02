@@ -30,7 +30,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import (
         app_identity_services,
         base_models,
-        datastore_services
+        datastore_services,
     )
 
 app_identity_services = models.Registry.import_app_identity_services()

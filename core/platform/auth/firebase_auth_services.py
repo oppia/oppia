@@ -75,15 +75,14 @@ if MYPY: # pragma: no cover
     from mypy_imports import (
         app_identity_services,
         auth_models,
-        datastore_services
+        datastore_services,
     )
 
 auth_models, user_models = (
     models.Registry.import_models([models.Names.AUTH, models.Names.USER]))
-
 app_identity_services = models.Registry.import_app_identity_services()
-transaction_services = models.Registry.import_transaction_services()
 datastore_services = models.Registry.import_datastore_services()
+transaction_services = models.Registry.import_transaction_services()
 
 
 def establish_firebase_connection() -> None:
