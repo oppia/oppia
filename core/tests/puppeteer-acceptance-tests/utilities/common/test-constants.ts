@@ -154,6 +154,7 @@ export default {
     MODERATOR: 'moderator',
     RELEASE_COORDINATOR: 'release coordinator',
     COLLECTION_EDITOR: 'collection editor',
+    TRANSLATION_REVIEWER: 'translation reviewer',
     VOICEOVER_SUBMITTER: 'voiceover submitter',
   } as const,
 
@@ -289,6 +290,10 @@ export const FILEPATHS = {
   PROFILE_PHOTO_SVG: path.resolve(
     __dirname,
     '../../data/profile-pictures/profile.svg'
+  ),
+  PROFILE_PHOTO_HIRES: path.resolve(
+    __dirname,
+    '../../data/profile-pictures/profile-1920.png'
   ),
   BANNER_BMP: path.resolve(__dirname, '../../data/banners/banner.bmp'),
   BANNER_GIF: path.resolve(__dirname, '../../data/banners/banner.gif'),

@@ -636,17 +636,18 @@ def verify_user_deleted(
         base_models.DELETION_POLICY.KEEP,
         base_models.DELETION_POLICY.NOT_APPLICABLE
     ]
+
     if not include_delete_at_end_models:
         policies_not_to_verify.append(
             base_models.DELETION_POLICY.DELETE_AT_END)
 
         # Verify if user profile picture is deleted.
-        user_settings_model = user_models.UserSettingsModel.get_by_id(user_id)
-        username = user_settings_model.username
-        user_roles = user_settings_model.roles
-        if feconf.ROLE_ID_MOBILE_LEARNER not in user_roles:
-            if not _verify_profile_picture_is_deleted(username):
-                return False
+        pending_deletion_request = get_pending_deletion_request(user_id)
+        username = pending_deletion_request.username
+        # A username of None indicates a ROLE_ID_MOBILE_LEARNER.
+        if username is not None and not _verify_profile_picture_is_deleted(
+                username):
+            return False
 
     user_is_verified = True
     for model_class in models.Registry.get_all_storage_model_classes():

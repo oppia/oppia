@@ -66,7 +66,6 @@ const desktopLessonCardTitleSelector = '.e2e-test-exploration-tile-title';
 const lessonCardTitleSelector = '.e2e-test-exploration-tile-title';
 const desktopAddToPlayLaterButton = '.e2e-test-add-to-playlist-btn';
 const mobileAddToPlayLaterButton = '.e2e-test-mobile-add-to-playlist-btn';
-const toastMessageSelector = '.e2e-test-toast-message';
 const mobileLessonCardTitleSelector = '.e2e-test-exp-summary-tile-title';
 const mobileCommunityLessonSectionButton = '.e2e-test-mobile-lessons-section';
 const communityLessonsSectionButton = '.e2e-test-community-lessons-section';
@@ -216,6 +215,8 @@ const completedGoalsContainerSelector = '.e2e-test-completed-goals-section';
 const goalContainerSelector = 'oppia-goal-list';
 const goalTitleSelector = '.e2e-test-goal-title';
 const startGoalButtonSelector = '.e2e-test-start-lesson-button';
+const emptyProgressSectionContainerSelector =
+  '.e2e-test-empty-progress-section';
 
 // Learner Dashboard > Home Tab Seclectors.
 const hometabSectionHeadingSelector =
@@ -256,6 +257,7 @@ const explorationLanguagePerferenceChipsSelector =
 const siteLanguageValueSelector = `${siteLanguageInputSelector} span.mat-select-min-line`;
 const audioLanguageValueSelector = `${audioLanguageInputSelector} span.mat-select-min-line`;
 const photoUploadErrorMessage = '.e2e-test-upload-error';
+const subscribedCreatorSelector = '.e2e-test-subscription-name';
 
 // Profile Page selectors.
 const profileContainerSelector = '.e2e-test-profile-container';
@@ -306,6 +308,7 @@ const mobileGetInvolvedMenuContainerSelector =
   '.e2e-mobile-test-sidebar-get-involved-menu';
 const mobileLearnDropdownSelector = '.e2e-mobile-test-learn';
 const mobileLearnSubMenuSelector = '.e2e-test-mobile-learn-submenu';
+const mobileNavBarOpenSelector = '.oppia-sidebar-menu-open';
 
 const commonPlayLaterIconSelector = '.e2e-test-lesson-playlist-icon';
 const learnerDashboardIconsSelector = 'oppia-learner-dashboard-icons';
@@ -317,6 +320,9 @@ const profileDropdownContainerSelector = '.e2e-test-profile-dropdown-container';
 const profileDropdownAnchorSelector = `${profileDropdownContainerSelector} .nav-link`;
 const closeModalButton = '.e2e-test-close-modal-btn';
 const goalsSectionContainerSelector = '.e2e-test-goals-section-container';
+const usernameSelector = '.e2e-test-username';
+const continueWhereYouLeftOffSection = '.e2e-test-continue-section';
+const nonEmptySectionSelector = '.e2e-test-non-empty-section';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -343,18 +349,20 @@ export class LoggedInUser extends BaseUser {
    * Function for clicking on the profile dropdown.
    */
   async clickOnProfileDropdown(): Promise<void> {
-    await this.isElementVisible(profileDropdownToggleSelector);
+    await this.expectElementToBeVisible(profileDropdownToggleSelector);
     await this.clickOn(profileDropdownToggleSelector);
   }
 
   /**
    * Checks if the profile dropdown contains the given element.
    * @param item The element to check for.
+   * @param visible - Whether the element should be visible or not.
    */
   async expectProfileDropdownToContainElementWithContent(
-    item: string
+    item: string,
+    visible: boolean = true
   ): Promise<void> {
-    await this.isElementVisible(profileDropdownContainerSelector);
+    await this.expectElementToBeVisible(profileDropdownContainerSelector);
 
     const elementsContents = await this.page.$$eval(
       profileDropdownAnchorSelector,
@@ -362,7 +370,11 @@ export class LoggedInUser extends BaseUser {
         elements.map(el => (el as HTMLAnchorElement).textContent?.trim())
     );
 
-    expect(elementsContents).toContain(item);
+    if (visible) {
+      expect(elementsContents).toContain(item);
+    } else {
+      expect(elementsContents).not.toContain(item);
+    }
   }
 
   /**
@@ -439,17 +451,21 @@ export class LoggedInUser extends BaseUser {
 
   /**
    * Function to subscribe to a creator with the given username.
+   * @param {string} username - The username of the creator to subscribe to.
+   *     If not provided, the function will subscribe to the creator of the
+   *     current page.
    */
-  async subscribeToCreator(username: string): Promise<void> {
-    const profilePageUrl = `${profilePageUrlPrefix}/${username}`;
-
-    if (this.page.url() !== profilePageUrl) {
+  async subscribeToCreator(username?: string): Promise<void> {
+    // Navigate to user's profile if username is given.
+    if (username) {
       await this.navigateToProfilePage(username);
     }
 
     await this.clickOn(subscribeButton);
-    await this.page.waitForSelector(unsubscribeLabel);
-    showMessage(`Subscribed to the creator with username ${username}.`);
+    await this.expectElementToBeVisible(unsubscribeLabel);
+    showMessage(
+      `Subscribed to the creator${username ? ` (${username})` : ''}.`
+    );
   }
 
   /**
@@ -707,7 +723,7 @@ export class LoggedInUser extends BaseUser {
       await this.waitForElementToBeClickable(ratingStars[rating - 1]);
       await ratingStars[rating - 1].click();
 
-      await this.type(feedbackTextareaSelector, feedback);
+      await this.typeInInputField(feedbackTextareaSelector, feedback);
       if (stayAnonymous) {
         await this.clickOn(anonymousCheckboxSelector);
       }
@@ -771,7 +787,7 @@ export class LoggedInUser extends BaseUser {
       visible: true,
     });
     await this.clickOn(accountDeletionButtonInDeleteAccountPage);
-    await this.type(confirmUsernameField, username);
+    await this.typeInInputField(confirmUsernameField, username);
     await this.clickAndWaitForNavigation(confirmAccountDeletionButton);
 
     await this.page.waitForSelector(deleteMyAcccountButton, {
@@ -820,7 +836,7 @@ export class LoggedInUser extends BaseUser {
       visible: true,
     });
     await this.clearAllTextFrom(signUpUsernameField);
-    await this.type(signUpUsernameField, username);
+    await this.typeInInputField(signUpUsernameField, username);
     // Using blur() to remove focus from signUpUsernameField.
     await this.page.evaluate(selector => {
       document.querySelector(selector).blur();
@@ -857,7 +873,7 @@ export class LoggedInUser extends BaseUser {
       visible: true,
     });
     await this.clearAllTextFrom(signUpEmailField);
-    await this.type(signUpEmailField, email);
+    await this.typeInInputField(signUpEmailField, email);
 
     await this.waitForPageToFullyLoad();
     const invalidEmailErrorContainerElement = await this.page.$(
@@ -1007,7 +1023,7 @@ export class LoggedInUser extends BaseUser {
 
       // Post-check: Verify if the tooltip appears.
       if (!skipVerification) {
-        await this.expectToolTipMessage(
+        await this.expectToastMessage(
           "Successfully added to your 'Play Later' list."
         );
       }
@@ -1115,29 +1131,6 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Expects the text content of the toast message to match the given expected message.
-   * @param {string} expectedMessage - The expected message to match the toast message against.
-   */
-  async expectToolTipMessage(expectedMessage: string): Promise<void> {
-    await this.page.waitForSelector(toastMessageSelector, {visible: true});
-    const toastMessageElement = await this.page.$(toastMessageSelector);
-    const toastMessage = await this.page.evaluate(
-      el => el.textContent.trim(),
-      toastMessageElement
-    );
-
-    if (toastMessage !== expectedMessage) {
-      throw new Error(
-        `Expected toast message to be "${expectedMessage}", but it was "${toastMessage}".`
-      );
-    }
-    if (this.isViewportAtMobileWidth()) {
-      await this.page.click(toastMessageSelector);
-    }
-    await this.expectElementToBeVisible(toastMessageSelector, false);
-  }
-
-  /**
    * Function to play a specific lesson from the community library tab in learner dashboard.
    * @param {string} lessonName - The name of the lesson to be played.
    */
@@ -1208,6 +1201,7 @@ export class LoggedInUser extends BaseUser {
       await removeFromPlayLaterButton?.click();
 
       // Confirm removal.
+      await this.waitForElementToStabilize(confirmRemovalFromPlayLaterButton);
       await this.clickOn(confirmRemovalFromPlayLaterButton);
 
       await this.page.waitForSelector(confirmRemovalFromPlayLaterButton, {
@@ -1276,6 +1270,7 @@ export class LoggedInUser extends BaseUser {
     });
     await this.clickOn(editProfilePictureButton);
     await this.uploadFile(picturePath);
+    await this.waitForElementToStabilize(addProfilePictureButton);
     await this.clickOn(addProfilePictureButton);
 
     await this.page.waitForSelector(addProfilePictureButton, {
@@ -1336,7 +1331,7 @@ export class LoggedInUser extends BaseUser {
       visible: true,
     });
     await this.clickOn(bioTextareaSelector);
-    await this.type(bioTextareaSelector, bio);
+    await this.typeInInputField(bioTextareaSelector, bio);
 
     const updatedValue = await this.page.$eval(
       bioTextareaSelector,
@@ -1385,7 +1380,7 @@ export class LoggedInUser extends BaseUser {
    */
   async updateSubjectInterestsWithEnterKey(interests: string[]): Promise<void> {
     for (const interest of interests) {
-      await this.type(subjectInterestsInputSelector, interest);
+      await this.typeInInputField(subjectInterestsInputSelector, interest);
       await this.page.keyboard.press('Enter');
     }
 
@@ -1419,7 +1414,7 @@ export class LoggedInUser extends BaseUser {
       visible: true,
     });
     for (const interest of interests) {
-      await this.type(subjectInterestsInputSelector, interest);
+      await this.typeInInputField(subjectInterestsInputSelector, interest);
       await this.page.click(matFormTextSelector);
     }
 
@@ -1482,7 +1477,7 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(siteLanguageInputSelector, {
       visible: true,
     });
-    await this.type(siteLanguageInputSelector, language);
+    await this.typeInInputField(siteLanguageInputSelector, language);
     await this.page.keyboard.press('Enter');
 
     // Post-check: Ensure the site language is properly selected.
@@ -1511,7 +1506,7 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(audioLanguageInputSelector, {
       visible: true,
     });
-    await this.type(audioLanguageInputSelector, language);
+    await this.typeInInputField(audioLanguageInputSelector, language);
     await this.page.keyboard.press('Enter');
 
     // Post-check: Ensure the audio language is properly selected.
@@ -1797,7 +1792,10 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(issueTypeSelector);
     await this.waitForElementToStabilize(issueTypeSelector);
     await this.page.click(issueTypeSelector);
-    await this.type(reportExplorationTextAreaSelector, issueDescription);
+    await this.typeInInputField(
+      reportExplorationTextAreaSelector,
+      issueDescription
+    );
 
     await this.clickOn(submitReportButtonSelector);
 
@@ -2122,19 +2120,13 @@ export class LoggedInUser extends BaseUser {
    * Navigates to the Contributor Dashboard Using Profile Dropdown Menu.
    */
   async navigateToContributorDashboardUsingProfileDropdown(): Promise<void> {
-    await this.page.waitForSelector(profileDropdown, {
-      visible: true,
-    });
+    await this.expectElementToBeVisible(profileDropdown);
     await this.clickOn(profileDropdown);
 
-    await this.page.waitForSelector(contributorDashboardMenuLink, {
-      visible: true,
-    });
+    await this.expectElementToBeVisible(contributorDashboardMenuLink);
     await this.clickOn(contributorDashboardMenuLink);
 
-    await this.page.waitForSelector(contributorDashboardContainerSelector, {
-      visible: true,
-    });
+    await this.expectElementToBeVisible(contributorDashboardContainerSelector);
   }
 
   /**
@@ -2183,7 +2175,7 @@ export class LoggedInUser extends BaseUser {
       visible: true,
     });
     await this.clearAllTextFrom(addTitleBar);
-    await this.type(addTitleBar, title);
+    await this.typeInInputField(addTitleBar, title);
     await this.page.keyboard.press('Tab');
 
     const currentTitle = await this.page.$eval(
@@ -2298,7 +2290,7 @@ export class LoggedInUser extends BaseUser {
       visible: true,
     });
     await this.clickOn(stateEditSelector);
-    await this.type(stateContentInputField, `${content}`);
+    await this.typeInInputField(stateContentInputField, `${content}`);
     await this.clickOn(saveContentButton);
     await this.page.waitForSelector(stateContentInputField, {hidden: true});
     showMessage('Card content is updated successfully.');
@@ -2314,7 +2306,7 @@ export class LoggedInUser extends BaseUser {
       visible: true,
     });
     await this.clickOn(stateEditSelector);
-    await this.type(stateContentInputField, `${content}`);
+    await this.typeInInputField(stateContentInputField, `${content}`);
     await this.clickOn(addSkillReviewComponentButton);
     await this.clickOn(skillInSkillreviewModal);
     await this.clickOn(saveRteComponentAndCloseCustomizationModalButton);
@@ -2442,7 +2434,7 @@ export class LoggedInUser extends BaseUser {
       await this.clickOn(saveChangesButton);
     }
     await this.clickOn(commitMessageSelector);
-    await this.type(commitMessageSelector, commitMessage);
+    await this.typeInInputField(commitMessageSelector, commitMessage);
     await this.clickOn(saveDraftButton);
     await this.page.waitForSelector(saveDraftButton, {hidden: true});
 
@@ -2473,13 +2465,13 @@ export class LoggedInUser extends BaseUser {
   ): Promise<string> {
     const fillExplorationMetadataDetails = async () => {
       await this.clickOn(explorationTitleInput);
-      await this.type(explorationTitleInput, `${title}`);
+      await this.typeInInputField(explorationTitleInput, `${title}`);
       await this.clickOn(explorationGoalInput);
-      await this.type(explorationGoalInput, `${goal}`);
+      await this.typeInInputField(explorationGoalInput, `${goal}`);
       await this.clickOn(explorationCategoryDropdown);
       await this.clickOn(`${category}`);
       if (tags) {
-        await this.type(tagsField, tags);
+        await this.typeInInputField(tagsField, tags);
       }
     };
     const publishExploration = async () => {
@@ -2738,7 +2730,7 @@ export class LoggedInUser extends BaseUser {
    */
   async giveFeedback(feedback: string, stayAnonymous: boolean): Promise<void> {
     await this.page.waitForSelector(feedbackTextareaSelector);
-    await this.type(feedbackTextareaSelector, feedback);
+    await this.typeInInputField(feedbackTextareaSelector, feedback);
     if (stayAnonymous) {
       await this.clickOn(anonymousCheckboxSelector);
     }
@@ -2846,7 +2838,8 @@ export class LoggedInUser extends BaseUser {
     visible: boolean = true
   ): Promise<void> {
     await this.expectElementToBeVisible(
-      continueFromWhereLeftOffSectionSelector
+      `${continueWhereYouLeftOffSection}${nonEmptySectionSelector}`,
+      visible
     );
   }
 
@@ -3200,43 +3193,80 @@ export class LoggedInUser extends BaseUser {
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileNavbarOpenSidebarButton);
       // Learn Dropdown.
-      await this.isElementVisible(mobileLearnDropdownSelector);
-      await this.isElementVisible(mobileLearnSubMenuSelector);
+      await this.expectElementToBeVisible(mobileLearnDropdownSelector);
+      await this.expectElementToBeVisible(mobileLearnSubMenuSelector);
       await this.clickOn(mobileLearnDropdownSelector);
-      await this.isElementVisible(mobileLearnSubMenuSelector, false);
+      await this.expectElementToBeVisible(mobileLearnSubMenuSelector, false);
       await this.clickOn(mobileLearnDropdownSelector);
 
       // About Dropdown.
-      await this.isElementVisible(mobileAboutMenuDropdownSelector);
-      await this.isElementVisible(mobileAboutPageButtonSelector, false);
+      await this.expectElementToBeVisible(mobileAboutMenuDropdownSelector);
+      await this.expectElementToBeVisible(mobileAboutPageButtonSelector, false);
       await this.clickOn(mobileAboutMenuDropdownSelector);
-      await this.isElementVisible(mobileAboutPageButtonSelector);
+      await this.expectElementToBeVisible(mobileAboutPageButtonSelector);
       await this.clickOn(mobileAboutMenuDropdownSelector);
 
       // Get Involved Dropdown.
-      await this.isElementVisible(mobileGetInvolvedDropdownSelector);
-      await this.isElementVisible(
+      await this.expectElementToBeVisible(mobileGetInvolvedDropdownSelector);
+      await this.expectElementToBeVisible(
         mobileGetInvolvedMenuContainerSelector,
         false
       );
       await this.clickOn(mobileGetInvolvedDropdownSelector);
-      await this.isElementVisible(mobileGetInvolvedMenuContainerSelector);
+      await this.expectElementToBeVisible(
+        mobileGetInvolvedMenuContainerSelector
+      );
       await this.clickOn(mobileGetInvolvedDropdownSelector);
 
       // Close Navmenu.
       await this.clickOn(mobileNavbarOpenSidebarButton);
+      await this.expectElementToBeVisible(mobileNavBarOpenSelector, false);
     }
     // Desktop view port.
     else {
       await this.clickOn(navbarLearnTab);
-      await this.isElementVisible(navbarLearnDropdownContainerSelector);
+      await this.expectElementToBeVisible(navbarLearnDropdownContainerSelector);
 
       await this.clickOn(navbarAboutTab);
-      await this.isElementVisible(navbarAboutDropdownConatinaerSelector);
+      await this.expectElementToBeVisible(
+        navbarAboutDropdownConatinaerSelector
+      );
 
       await this.clickOn(navbarGetInvolvedTab);
-      await this.isElementVisible(navbarGetInvolvedDropdownContainerSelector);
+      await this.expectElementToBeVisible(
+        navbarGetInvolvedDropdownContainerSelector
+      );
     }
+  }
+
+  /**
+   * Checks if the subscribed creators contain the given creator name.
+   * Requires the user to be on Preferences page.
+   * @param {string} creatorName - The name of the creator to check.
+   */
+  async expectSubscribedCreatorsToContain(creatorName: string): Promise<void> {
+    await this.expectElementToBeVisible(subscribedCreatorSelector);
+    const subscribedCreators = await this.page.$$eval(
+      subscribedCreatorSelector,
+      elements => elements.map(el => el.textContent?.trim())
+    );
+
+    expect(subscribedCreators).toContain(creatorName);
+  }
+
+  /**
+   * Checks if the progress section in new learner dashboard is empty.
+   */
+  async expectProgressSectionToBeEmptyInNewLD(): Promise<void> {
+    await this.expectElementToBeVisible(emptyProgressSectionContainerSelector);
+  }
+
+  /**
+   * Checks if the username matches the expected username.
+   * @param expectedUsername - The expected username.
+   */
+  async expectUsernameToBe(expectedUsername: string): Promise<void> {
+    await this.expectTextContentToBe(usernameSelector, expectedUsername);
   }
 }
 
