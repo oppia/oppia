@@ -451,22 +451,18 @@ class AndroidActivityHandler(base.BaseHandler[
                 topic_domain.Topic
             ]]] = []
 
-            if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
-                fetched_entities = (
-                    exp_fetchers.get_multiple_explorations_by_ids_and_version(
-                        ids_and_versions))
-            elif activity_type == constants.ACTIVITY_TYPE_STORY:
-                fetched_entities = (
-                    story_fetchers.get_multiple_stories_by_ids_and_version(
-                        ids_and_versions))
-            elif activity_type == constants.ACTIVITY_TYPE_SKILL:
-                fetched_entities = (
-                    skill_fetchers.get_multiple_skills_by_ids_and_version(
-                        ids_and_versions))
-            else:
-                fetched_entities = (
-                    topic_fetchers.get_multiple_topics_by_ids_and_version(
-                        ids_and_versions))
+        if activity_type == constants.ACTIVITY_TYPE_STORY:
+            fetched_entities = (
+                story_fetchers.get_multiple_stories_by_ids_and_version(
+                    ids_and_versions))
+        elif activity_type == constants.ACTIVITY_TYPE_SKILL:
+            fetched_entities = (
+                skill_fetchers.get_multiple_skills_by_ids_and_version(
+                    ids_and_versions))
+        else:
+            fetched_entities = (
+                topic_fetchers.get_multiple_topics_by_ids_and_version(
+                    ids_and_versions))
 
             for activity_data, entity in zip(activities_data, fetched_entities):
                 response_dict: ActivityDataResponseDict = {
