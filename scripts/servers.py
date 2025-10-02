@@ -251,7 +251,7 @@ def managed_firebase_auth_emulator(
         '--only',
         'auth',
         '--project',
-        feconf.OPPIA_PROJECT_ID,
+        common.DEV_PROJECT_ID,
         '--config',
         feconf.FIREBASE_EMULATOR_CONFIG_PATH,
     ]
@@ -333,7 +333,7 @@ def managed_cloud_datastore_emulator(
         'datastore',
         'start',
         '--project',
-        feconf.OPPIA_PROJECT_ID,
+        common.DEV_PROJECT_ID,
         '--data-dir',
         common.CLOUD_DATASTORE_EMULATOR_DATA_DIR,
         '--host-port',
@@ -370,7 +370,7 @@ def managed_cloud_datastore_emulator(
 
         # Environment variables required to communicate with the emulator.
         stack.enter_context(
-            common.swap_env('DATASTORE_DATASET', feconf.OPPIA_PROJECT_ID)
+            common.swap_env('DATASTORE_DATASET', common.DEV_PROJECT_ID)
         )
         stack.enter_context(
             common.swap_env('DATASTORE_EMULATOR_HOST', emulator_hostport)
@@ -385,13 +385,13 @@ def managed_cloud_datastore_emulator(
             common.swap_env('DATASTORE_HOST', 'http://%s' % emulator_hostport)
         )
         stack.enter_context(
-            common.swap_env('DATASTORE_PROJECT_ID', feconf.OPPIA_PROJECT_ID)
+            common.swap_env('DATASTORE_PROJECT_ID', common.DEV_PROJECT_ID)
         )
         stack.enter_context(
             common.swap_env('DATASTORE_USE_PROJECT_ID_AS_APP_ID', 'true')
         )
         stack.enter_context(
-            common.swap_env('GOOGLE_CLOUD_PROJECT', feconf.OPPIA_PROJECT_ID)
+            common.swap_env('GOOGLE_CLOUD_PROJECT', common.DEV_PROJECT_ID)
         )
 
         yield proc

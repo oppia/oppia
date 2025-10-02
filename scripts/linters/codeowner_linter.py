@@ -63,8 +63,6 @@ CODEOWNER_IMPORTANT_PATHS: Final = [
     '/core/domain/rights_manager*.py',
     '/core/domain/role_services*.py',
     '/core/domain/user*.py',
-    '/AUTHORS',
-    '/CONTRIBUTORS',
     '/LICENSE',
     '/NOTICE',
     '/core/templates/pages/terms-page/terms-page.component.html',

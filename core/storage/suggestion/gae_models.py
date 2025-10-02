@@ -2517,7 +2517,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
         page_size: int,
         offset: int,
         language_code: str,
-        sort_by: Optional[SortChoices.value],
+        sort_by: Optional[str],
         topic_ids: Optional[List[str]],
         max_days_since_last_activity: Optional[int],
     ) -> Tuple[
@@ -2943,7 +2943,7 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
         page_size: int,
         offset: int,
         language_code: str,
-        sort_by: Optional[SortChoices.value],
+        sort_by: Optional[str],
         max_days_since_last_activity: Optional[int],
     ) -> Tuple[
         Sequence[TranslationReviewerTotalContributionStatsModel], int, bool
@@ -3280,7 +3280,7 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
         cls,
         page_size: int,
         offset: int,
-        sort_by: Optional[SortChoices.value],
+        sort_by: Optional[str],
         topic_ids: Optional[List[str]],
         max_days_since_last_activity: Optional[int],
     ) -> Tuple[
@@ -3572,7 +3572,7 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
         cls,
         page_size: int,
         offset: int,
-        sort_by: Optional[SortChoices.value],
+        sort_by: Optional[str],
         max_days_since_last_activity: Optional[int],
     ) -> Tuple[
         Sequence[QuestionReviewerTotalContributionStatsModel], int, bool

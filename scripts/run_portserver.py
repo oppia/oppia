@@ -434,7 +434,7 @@ class Server:
             socket_path: str. Path to socket file.
         """
         self.socket_path = socket_path
-        self.socket = self._start_server(self.socket_path)
+        self.socket: socket.socket = self._start_server(self.socket_path)
         self.handler = handler
 
     def run(self) -> None:
@@ -475,8 +475,7 @@ class Server:
 
     @staticmethod
     def handle_connection(
-        connection: socket.SocketType,
-        handler: Callable[[bytes], socket.SocketType],
+        connection: socket.socket, handler: Callable[[bytes], Optional[bytes]]
     ) -> None:
         """Handle a socket connection.
 
@@ -489,13 +488,18 @@ class Server:
             handler: Callable. The handler function that will handle the
                 request. Should accept a string with the PID of the
                 requesting process and return allocated socket.
+
+        Raises:
+            ValueError. If the handler returns None instead of bytes.
         """
         request = connection.recv(Server.message_size)
         response = handler(request)
+        if response is None:
+            raise ValueError('Handler returned None, expected bytes.')
         connection.sendall(response)
         connection.close()
 
-    def _start_server(self, path: str) -> socket.SocketType:
+    def _start_server(self, path: str) -> socket.socket:
         """Start the server bound to a socket file.
 
         Args:
@@ -518,7 +522,7 @@ class Server:
         sock.listen(self.max_backlog)
         return sock
 
-    def _get_socket(self) -> socket.SocketType:
+    def _get_socket(self) -> socket.socket:
         """Get a new socket.
 
         Returns:

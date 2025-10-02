@@ -627,6 +627,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
         # Ruling out the possibility of None for mypy type checking.
         assert admin_settings is not None
+        assert admin_settings.last_agreed_to_terms is not None
         self.assertEqual(admin_settings.user_id, user_id)
         self.assertEqual(admin_settings.email, 'system@example.com')
         self.assertEqual(admin_settings.roles, roles)
@@ -2323,6 +2324,9 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_services.record_user_started_state_editor_tutorial(user_id)
         user_settings = user_services.get_user_settings(user_id)
 
+        assert user_settings.last_started_state_editor_tutorial is not None
+        assert prev_started_state is not None
+
         self.assertGreaterEqual(
             user_settings.last_started_state_editor_tutorial, prev_started_state
         )
@@ -3722,10 +3726,13 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
         # changed.
         self.login(self.VIEWER_EMAIL)
         self.get_html_response(feconf.LIBRARY_INDEX_URL)
-        self.assertLess(
-            last_logged_in,
-            user_services.get_user_settings(self.viewer_id).last_logged_in,
-        )
+
+        assert last_logged_in is not None
+        user_settings = user_services.get_user_settings(self.viewer_id)
+        new_last_logged_in = user_settings.last_logged_in
+        assert new_last_logged_in is not None
+
+        self.assertLess(last_logged_in, new_last_logged_in)
         self.logout()
 
     def test_last_logged_in_only_updated_if_enough_time_has_elapsed(
@@ -3754,10 +3761,13 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
         with self.mock_datetime_utcnow(mocked_datetime_utcnow):
             self.login(self.VIEWER_EMAIL)
             self.get_html_response(feconf.LIBRARY_INDEX_URL)
-            self.assertGreater(
-                user_services.get_user_settings(self.viewer_id).last_logged_in,
-                previous_last_logged_in_datetime,
-            )
+
+            user_settings = user_services.get_user_settings(self.viewer_id)
+            last_logged_in = user_settings.last_logged_in
+            assert last_logged_in is not None
+            assert previous_last_logged_in_datetime is not None
+
+            self.assertGreater(last_logged_in, previous_last_logged_in_datetime)
             self.logout()
 
 
@@ -3857,10 +3867,12 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
 
         # Make sure last exploration edited time gets updated.
         editor_settings = user_services.get_user_settings(self.editor_id)
-        self.assertGreater(
-            (editor_settings.last_edited_an_exploration),
-            previous_last_edited_an_exploration,
-        )
+
+        last_edited = editor_settings.last_edited_an_exploration
+        assert last_edited is not None
+        assert previous_last_edited_an_exploration is not None
+
+        self.assertGreater(last_edited, previous_last_edited_an_exploration)
 
 
 class LastExplorationCreatedIntegrationTests(test_utils.GenericTestBase):
@@ -3919,10 +3931,12 @@ class LastExplorationCreatedIntegrationTests(test_utils.GenericTestBase):
 
         # Make sure that last exploration created time gets updated.
         owner_settings = user_services.get_user_settings(self.owner_id)
-        self.assertGreater(
-            (owner_settings.last_created_an_exploration),
-            previous_last_created_an_exploration,
-        )
+
+        last_created = owner_settings.last_created_an_exploration
+        assert last_created is not None
+        assert previous_last_created_an_exploration is not None
+
+        self.assertGreater(last_created, previous_last_created_an_exploration)
 
 
 class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):

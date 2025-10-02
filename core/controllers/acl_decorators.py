@@ -4458,7 +4458,7 @@ def can_access_subtopic_viewer_page(
 
         if feature_flag_services.is_feature_flag_enabled(
             feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value,
-            None,
+            self.user_id,
         ):
             study_guide = study_guide_services.get_study_guide_by_id(
                 topic.id, subtopic_id, strict=False

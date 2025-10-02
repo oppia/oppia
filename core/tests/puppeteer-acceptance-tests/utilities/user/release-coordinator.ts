@@ -520,7 +520,7 @@ export class ReleaseCoordinator extends BaseUser {
    */
   async selectAndRunJob(jobName: string): Promise<void> {
     await this.page.waitForSelector(jobInputField, {visible: true});
-    await this.type(jobInputField, jobName);
+    await this.typeInInputField(jobInputField, jobName);
     await this.page.keyboard.press('Enter');
     await this.page.waitForSelector(startNewJobButton, {visible: true});
     await this.page.evaluate(selector => {
@@ -766,7 +766,7 @@ export class ReleaseCoordinator extends BaseUser {
 
     await this.expectElementToBeVisible(addUserGroupContainerSelector);
     await this.clearAllTextFrom(userGroupInputSelector);
-    await this.type(userGroupInputSelector, groupName);
+    await this.typeInInputField(userGroupInputSelector, groupName);
     await this.clickOn(addNewUserGroupButtonSelector);
 
     await this.expectUserGroupToBePresent(groupName);

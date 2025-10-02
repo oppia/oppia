@@ -1946,7 +1946,9 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         )
 
         self.assertFalse(
-            exp_services.does_exploration_support_voiceovers(self.EXP_0_ID)
+            exp_services.does_exploration_support_voiceovers(
+                self.EXP_0_ID, self.owner_id
+            )
         )
 
         story_id = story_services.get_new_story_id()
@@ -1991,7 +1993,9 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         )
 
         self.assertTrue(
-            exp_services.does_exploration_support_voiceovers(self.EXP_0_ID)
+            exp_services.does_exploration_support_voiceovers(
+                self.EXP_0_ID, self.owner_id
+            )
         )
 
     def test_raise_error_when_adding_voiceover_for_non_curated_exploration(

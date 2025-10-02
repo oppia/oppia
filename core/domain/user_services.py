@@ -409,7 +409,7 @@ def fetch_gravatar(user_email: str) -> str:
     try:
         response = requests.get(
             gravatar_url,
-            headers={b'Content-Type': b'image/png'},
+            headers={'Content-Type': 'image/png'},
             allow_redirects=False,
             timeout=TIMEOUT_SECS,
         )

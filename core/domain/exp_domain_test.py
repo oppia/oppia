@@ -19299,10 +19299,6 @@ class ExplorationChangesMergeabilityUnitTests(
                 'system@example.com',
             ),
             (platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
-            (
-                platform_parameter_list.ParamName.OPPIA_PROJECT_ID,
-                'dev-project-id',
-            ),
         ]
     )
     def test_email_is_sent_to_admin_in_case_of_adding_deleting_state_changes(
@@ -19710,10 +19706,6 @@ class ExplorationChangesMergeabilityUnitTests(
                 'system@example.com',
             ),
             (platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
-            (
-                platform_parameter_list.ParamName.OPPIA_PROJECT_ID,
-                'dev-project-id',
-            ),
         ]
     )
     def test_email_is_sent_to_admin_in_case_of_state_renames_changes_conflict(

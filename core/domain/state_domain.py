@@ -4211,8 +4211,13 @@ class State(translation_domain.BaseTranslatableObject):
                         if issubclass(
                             param_type, objects.BaseTranslatableObject
                         ):
-                            new_content_id_list.append(value['contentId'])
-
+                            if isinstance(value, dict) and 'contentId' in value:
+                                new_content_id_list.append(value['contentId'])
+                            else:
+                                raise Exception(
+                                    'Expected value to be a dictionary with a '
+                                    '"contentId" key, received %s' % value
+                                )
                         try:
                             normalized_param = param_type.normalize(value)
                         except Exception as e:
@@ -4772,7 +4777,6 @@ class State(translation_domain.BaseTranslatableObject):
         object_content_ids_replacers['TranslatableHtmlContentId'] = (
             _replace_content_id
         )
-
         object_content_ids_replacers['SetOfTranslatableHtmlContentIds'] = (
             lambda ids_set, id_mapping: [
                 _replace_content_id(old_id, id_mapping) for old_id in ids_set
@@ -4784,14 +4788,16 @@ class State(translation_domain.BaseTranslatableObject):
             [_replace_content_id(old_id, id_mapping) for old_id in ids_set]
             for ids_set in items
         ]
+
         content_id_generator = translation_domain.ContentIdGenerator()
         for state_name in sorted(states_dict.keys()):
             state: StateDict = states_dict[state_name]
             new_voiceovers_mapping: Dict[str, Dict[str, VoiceoverDict]] = {}
             old_to_new_content_id: Dict[str, str] = {}
+
             # Here we use MyPy ignore because the latest schema of state
             # dict doesn't contains recorded_voiceovers property.
-            old_voiceovers_mapping = state['recorded_voiceovers'][  # type: ignore[misc]
+            old_voiceovers_mapping = state['recorded_voiceovers'][  # type: ignore[typeddict-item]
                 'voiceovers_mapping'
             ]
 
@@ -4803,29 +4809,32 @@ class State(translation_domain.BaseTranslatableObject):
                 new_content_id = content_id_generator.generate(
                     content_type, extra_prefix=extra_prefix
                 )
-                content_id_key = 'content_id'
+
+                # Here we use type Any because the content dict may
+                # contain keys not defined in the TypedDict. Since TypedDicts
+                # require string literal keys, Any allows us to bypass the
+                # strict key checks during migration.
+                # Here we use cast because the content dict may contain
+                # either "content_id" or "contentId". The SubtitledHtmlDict
+                # TypedDict only defines "content_id", so we treat it as
+                # a generic dict to allow safe access in both cases.
+                content_any = cast(Dict[str, Any], content)
                 if content_type == translation_domain.ContentType.RULE:
-                    content_id_key = 'contentId'
+                    old_content_id = content_any['contentId']
+                    content_any['contentId'] = new_content_id
+                else:
+                    old_content_id = content_any['content_id']
+                    content_any['content_id'] = new_content_id
 
-                # Here we use MyPy ignore because the content Id key for the
-                # contents in the rule inputs is contentId instead of
-                # content_id.
-                old_content_id = content[content_id_key]  # type: ignore[misc]
-                # Here we use MyPy ignore because the content Id key for the
-                # contents in the rule inputs is contentId instead of
-                # content_id.
-                content[content_id_key] = new_content_id  # type: ignore[index]
+                    assert isinstance(old_content_id, str)
+                    old_to_new_content_id[old_content_id] = new_content_id
 
-                assert isinstance(old_content_id, str)
-                old_to_new_content_id[old_content_id] = new_content_id
-
-                new_voiceovers_mapping[new_content_id] = old_voiceovers_mapping[
-                    old_content_id
-                ]
-
+                    new_voiceovers_mapping[new_content_id] = (
+                        old_voiceovers_mapping[old_content_id]
+                    )
             # Here we use MyPy ignore because the latest schema of state
             # dict doesn't contains recorded_voiceovers property.
-            state['recorded_voiceovers']['voiceovers_mapping'] = (  # type: ignore[misc]
+            state['recorded_voiceovers']['voiceovers_mapping'] = (  # type: ignore[typeddict-item]
                 new_voiceovers_mapping
             )
 
@@ -4920,7 +4929,7 @@ class State(translation_domain.BaseTranslatableObject):
                     # Here we use MyPy ignore because the content Id key for the
                     # contents in the rule inputs is contentId instead of
                     # content_id.
-                    content_id = content['contentId']  # type: ignore[misc]
+                    content_id = content['contentId']  # type: ignore[typeddict-item]
                 else:
                     content_id = content['content_id']
 

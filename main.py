@@ -1445,6 +1445,11 @@ URLS.extend(
             oppia_root.OppiaRootPage,
         ),
         get_redirect_route(
+            r'%s/studyguide/<subtopic_url_fragment>'
+            % feconf.TOPIC_VIEWER_URL_PREFIX,
+            oppia_root.OppiaRootPage,
+        ),
+        get_redirect_route(
             r'%s/practice' % feconf.TOPIC_VIEWER_URL_PREFIX,
             oppia_root.OppiaRootPage,
         ),

@@ -798,10 +798,6 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
                 platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
-            (
-                platform_parameter_list.ParamName.OPPIA_PROJECT_ID,
-                'dev-project-id',
-            ),
         ]
     )
     def test_run_user_deletion_completion_with_user_properly_deleted(
@@ -856,10 +852,6 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
             (
                 platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
-            ),
-            (
-                platform_parameter_list.ParamName.OPPIA_PROJECT_ID,
-                'dev-project-id',
             ),
         ]
     )
@@ -6358,10 +6350,6 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
                 platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
             ),
-            (
-                platform_parameter_list.ParamName.OPPIA_PROJECT_ID,
-                'dev-project-id',
-            ),
         ]
     )
     def test_repeated_deletion_is_successful_when_emails_enabled(self) -> None:
@@ -6409,10 +6397,6 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
             (
                 platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
-            ),
-            (
-                platform_parameter_list.ParamName.OPPIA_PROJECT_ID,
-                'dev-project-id',
             ),
         ]
     )
@@ -6534,10 +6518,6 @@ class CheckCompletionOfUserDeletionTaskServiceTests(test_utils.GenericTestBase):
                 platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
                 'noreply@example.com',
             ),
-            (
-                platform_parameter_list.ParamName.OPPIA_PROJECT_ID,
-                'dev-project-id',
-            ),
         ]
     )
     def test_verification_when_user_is_deleted_is_successful(self) -> None:
@@ -6565,10 +6545,6 @@ class CheckCompletionOfUserDeletionTaskServiceTests(test_utils.GenericTestBase):
             (
                 platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
-            ),
-            (
-                platform_parameter_list.ParamName.OPPIA_PROJECT_ID,
-                'dev-project-id',
             ),
         ]
     )
