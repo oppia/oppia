@@ -507,7 +507,7 @@ export class PracticeQuestionSubmitter extends Contributor {
    * Adds an Image interaction to the current exploration.
    */
   async addImageInteractionInQuestionEditor(): Promise<void> {
-    await this.isElementVisible(addInteractionButton);
+    await this.expectElementToBeVisible(addInteractionButton);
 
     await this.clickOnElementWithSelector(addInteractionButton);
     await this.clickOnElementWithText('Image Region');
