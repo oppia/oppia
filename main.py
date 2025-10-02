@@ -405,6 +405,10 @@ URLS = [
         admin.GenerateStudyGuideModelsHandler
     ),
     get_redirect_route(
+        r'%s' % feconf.DELETE_STUDY_GUIDE_MODELS_URL,
+        admin.DeleteStudyGuideModelsHandler
+    ),
+    get_redirect_route(
         r'/contributionrightshandler/<category>',
         contributor_dashboard_admin.ContributionRightsHandler),
     get_redirect_route(

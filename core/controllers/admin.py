@@ -3058,6 +3058,31 @@ class GenerateStudyGuideModelsHandler(
         self.render_json({})
 
 
+class DeleteStudyGuideModelsHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handler to delete all study guide models."""
+
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'DELETE': {}
+    }
+
+    @acl_decorators.can_access_admin_page
+    def delete(self) -> None:
+        """Deletes all study guide models."""
+
+        # Fetched topics are sorted only to make the backend tests pass.
+        topics = sorted(
+            topic_fetchers.get_all_topics(),
+            key=operator.attrgetter('created_on'))
+        
+        for topic in topics:
+            study_guide_services.delete_study_guide_models(topic.id, topic.subtopics)
+
+        self.render_json({})
+
+
 class TranslationCoordinatorRoleHandlerNormalizedPayloadDict(TypedDict):
     """Dict representation of TranslationCoordinatorRoleHandler's
     normalized_payload dictionary.

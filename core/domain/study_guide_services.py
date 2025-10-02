@@ -384,9 +384,9 @@ def does_study_guide_model_exist(topic_id: str, subtopic_id: int) -> bool:
 
 
 def generate_study_guide_models(
-        topic_id: str,
-        subtopics: List[topic_domain.Subtopic]
-    ) -> None:
+    topic_id: str,
+    subtopics: List[topic_domain.Subtopic]
+) -> None:
     """Generates study guide models corresponding to all subtopic page models in the given topic.
 
     Args:
@@ -418,6 +418,26 @@ def generate_study_guide_models(
                         }
                     )
                 ],
+            )
+
+
+def delete_study_guide_models(
+    topic_id: str,
+    subtopics: List[topic_domain.Subtopic]
+) -> None:
+    """Deletes all study guide models corresponding to the given topic id.
+
+    Args:
+        topic_id: str. The ID of the topic that this study guide belongs to.
+        subtopics: list(Subtopic). The subtopics in the topic.
+    """
+    for subtopic in subtopics:
+        if does_study_guide_model_exist(topic_id, subtopic.id):
+            delete_study_guide(
+                feconf.SYSTEM_COMMITTER_ID,
+                topic_id,
+                subtopic.id,
+                force_deletion=True
             )
 
 
