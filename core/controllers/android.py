@@ -226,17 +226,15 @@ class AndroidActivityHandler(base.BaseHandler[
                 exp_fetchers.get_multiple_explorations_by_ids_and_version(ids_and_versions)
             )
             for activity_data, exploration in zip(activities_data, fetched_explorations):
-                exploration_dict_for_android: Optional[
-                    exp_domain.ExplorationDictForAndroid] = None
-                if exploration is not None:
-                    exploration_dict_for_android = (
-                        exp_services.to_exploration_dict_for_android(exploration)
-                    )
-                    activities.append({
-                        'id': activity_data['id'],
-                        'version': activity_data.get('version'),
-                        'payload': exploration_dict_for_android
-                    })
+                exploration_dict_for_android: Optional[exp_domain.ExplorationDictForAndroid] = (
+                    exp_services.to_exploration_dict_for_android(exploration)
+                    if exploration is not None else None
+                )
+                activities.append({
+                    'id': activity_data['id'],
+                    'version': activity_data.get('version'),
+                    'payload': exploration_dict_for_android
+                })
         elif activity_type == constants.ACTIVITY_TYPE_SUBTOPIC:
             # Subtopic pages require special handling because their IDs are
             # compound keys (topic_id-subtopic_id) that need to be split and
