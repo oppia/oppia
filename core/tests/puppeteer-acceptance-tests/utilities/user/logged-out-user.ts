@@ -3082,7 +3082,7 @@ export class LoggedOutUser extends BaseUser {
     // Wait for 1s to ensure the selected answer is updated in Angular component.
     await this.page.waitForTimeout(1000);
     // Click on Submit Answer button.
-    await this.clickOn(submitAnswerButton);
+    await this.clickOnElementWithSelector(submitAnswerButton);
 
     // Wait for either element to change content.
     await this.page.waitForFunction(
@@ -3169,10 +3169,10 @@ export class LoggedOutUser extends BaseUser {
     );
     try {
       await this.page.waitForSelector(nextCardButton, {timeout: 7000});
-      await this.clickOn(nextCardButton);
+      await this.clickOnElementWithSelector(nextCardButton);
     } catch (error) {
       if (error instanceof puppeteer.errors.TimeoutError) {
-        await this.clickOn(nextCardArrowButton);
+        await this.clickOnElementWithSelector(nextCardArrowButton);
       } else {
         throw error;
       }
