@@ -217,15 +217,6 @@ class AndroidActivityHandler(base.BaseHandler[
                 'Entries in activities_data should be unique'
  )
 
-        if activity_type == constants.ACTIVITY_TYPE_SUBTOPIC:
-            # Subtopic pages require special handling because their IDs are
-            # compound keys (topic_id-subtopic_id) that need to be split and
-            # processed separately.
-            split_ids_and_versions = [
-                (activity_data['id'].split('-'), activity_data.get('version'))
-                for activity_data in activities_data]
-            topic_subtopic_version_tuples = [
-                (
         if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
             for activity_data in activities_data:
                 exploration = exp_fetchers.get_exploration_by_id(
@@ -269,11 +260,15 @@ class AndroidActivityHandler(base.BaseHandler[
                         skill.to_dict() if skill is not None else None)
                 })
         elif activity_type == constants.ACTIVITY_TYPE_SUBTOPIC:
-            for activity_data in activities_data:
-                topic_id, subtopic_page_id = activity_data['id'].split('-')
-                subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
-                    topic_id,
-                    int(stringified_subtopic_index),
+            # Subtopic pages require special handling because their IDs are
+            # compound keys (topic_id-subtopic_id) that need to be split and
+            # processed separately.
+            split_ids_and_versions = [
+                (activity_data['id'].split('-'), activity_data.get('version'))
+                for activity_data in activities_data]
+            topic_subtopic_version_tuples = [
+                (
+                    (topic_id, stringified_subtopic_index),
                     subtopic_page_version
                 )
                 for (
