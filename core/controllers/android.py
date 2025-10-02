@@ -232,35 +232,11 @@ class AndroidActivityHandler(base.BaseHandler[
                     exploration_dict_for_android = (
                         exp_services.to_exploration_dict_for_android(exploration)
                     )
-                activities.append({
-                    'id': activity_data['id'],
-                    'version': activity_data.get('version'),
-                    'payload': exploration_dict_for_android
-                })
-        elif activity_type == constants.ACTIVITY_TYPE_STORY:
-            for activity_data in activities_data:
-                story = story_fetchers.get_story_by_id(
-                    activity_data['id'],
-                    strict=False,
-                    version=activity_data.get('version'))
-                activities.append({
-                    'id': activity_data['id'],
-                    'version': activity_data.get('version'),
-                    'payload': (
-                        story.to_dict() if story is not None else None)
-                })
-        elif activity_type == constants.ACTIVITY_TYPE_SKILL:
-            for activity_data in activities_data:
-                skill = skill_fetchers.get_skill_by_id(
-                    activity_data['id'],
-                    strict=False,
-                    version=activity_data.get('version'))
-                activities.append({
-                    'id': activity_data['id'],
-                    'version': activity_data.get('version'),
-                    'payload': (
-                        skill.to_dict() if skill is not None else None)
-                })
+                    activities.append({
+                        'id': activity_data['id'],
+                        'version': activity_data.get('version'),
+                        'payload': exploration_dict_for_android
+                    })
         elif activity_type == constants.ACTIVITY_TYPE_SUBTOPIC:
             # Subtopic pages require special handling because their IDs are
             # compound keys (topic_id-subtopic_id) that need to be split and
@@ -452,18 +428,18 @@ class AndroidActivityHandler(base.BaseHandler[
                 topic_domain.Topic
             ]]] = []
 
-        if activity_type == constants.ACTIVITY_TYPE_STORY:
-            fetched_entities = (
-                story_fetchers.get_multiple_stories_by_ids_and_version(
-                    ids_and_versions))
-        elif activity_type == constants.ACTIVITY_TYPE_SKILL:
-            fetched_entities = (
-                skill_fetchers.get_multiple_skills_by_ids_and_version(
-                    ids_and_versions))
-        else:
-            fetched_entities = (
-                topic_fetchers.get_multiple_topics_by_ids_and_version(
-                    ids_and_versions))
+            if activity_type == constants.ACTIVITY_TYPE_STORY:
+                fetched_entities = (
+                    story_fetchers.get_multiple_stories_by_ids_and_version(
+                        ids_and_versions))
+            elif activity_type == constants.ACTIVITY_TYPE_SKILL:
+                fetched_entities = (
+                    skill_fetchers.get_multiple_skills_by_ids_and_version(
+                        ids_and_versions))
+            else:
+                fetched_entities = (
+                    topic_fetchers.get_multiple_topics_by_ids_and_version(
+                        ids_and_versions))
 
             for activity_data, entity in zip(activities_data, fetched_entities):
                 response_dict: ActivityDataResponseDict = {
