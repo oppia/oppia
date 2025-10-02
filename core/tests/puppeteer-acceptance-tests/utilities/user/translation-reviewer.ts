@@ -182,7 +182,7 @@ export class TranslationReviewer extends BaseUser {
         : rejectTranslationButtonSelector;
     if (reviewMessage) {
       await this.expectElementToBeVisible(reviewCommentInputSelector);
-      await this.type(reviewCommentInputSelector, reviewMessage);
+      await this.typeInInputField(reviewCommentInputSelector, reviewMessage);
     }
 
     await this.expectElementToBeVisible(reviewContentContainerSelector);

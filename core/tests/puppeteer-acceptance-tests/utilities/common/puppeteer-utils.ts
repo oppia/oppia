@@ -76,6 +76,7 @@ export type ModalUserInteractions = (
 
 export class BaseUser {
   page!: Page;
+  pages: Page[] = [];
   browserObject!: Browser;
   userHasAcceptedCookies: boolean = false;
   email: string | null = null;
@@ -128,6 +129,7 @@ export class BaseUser {
           TestToModulesMatcher.registerPuppeteerBrowser(browser);
         }
         this.page = await browser.newPage();
+        this.pages.push(this.page);
 
         if (mobile) {
           // This is the default viewport and user agent settings for iPhone 6.
@@ -358,7 +360,7 @@ export class BaseUser {
       this.userHasAcceptedCookies = true;
     }
     await this.clickOn('Sign in');
-    await this.type(testConstants.SignInDetails.inputField, email);
+    await this.typeInInputField(testConstants.SignInDetails.inputField, email);
     await this.clickAndWaitForNavigation('Sign In');
   }
 
@@ -367,7 +369,7 @@ export class BaseUser {
    */
   async signUpNewUser(username: string, email: string): Promise<void> {
     await this.signInWithEmail(email);
-    await this.type('input.e2e-test-username-input', username);
+    await this.typeInInputField('input.e2e-test-username-input', username);
     await this.clickOn('input.e2e-test-agree-to-terms-checkbox');
     await this.page.waitForSelector(
       'button.e2e-test-register-user:not([disabled])'
@@ -563,11 +565,16 @@ export class BaseUser {
   /**
    * The function clicks the element using the text on the button
    * and wait until the new page is fully loaded.
+   * @param selector - The selector of button to click.
+   * @param options - The navigation options.
    */
-  async clickAndWaitForNavigation(selector: string): Promise<void> {
-    const navigationPromise = this.page.waitForNavigation({
+  async clickAndWaitForNavigation(
+    selector: string,
+    options: puppeteer.WaitForOptions = {
       waitUntil: ['networkidle2', 'load'],
-    });
+    }
+  ): Promise<void> {
+    const navigationPromise = this.page.waitForNavigation(options);
 
     await this.clickOn(selector, false);
     await navigationPromise;
@@ -586,9 +593,9 @@ export class BaseUser {
    * The function selects all text content and delete it.
    */
   async clearAllTextFrom(selector: string): Promise<void> {
-    await this.waitForElementToBeClickable(selector);
     // Clicking three times on a line of text selects all the text.
     const element = await this.getElementInParent(selector);
+    await this.waitForElementToBeClickable(element);
     await element.click({clickCount: 3});
     await this.page.keyboard.press('Backspace');
   }
@@ -636,12 +643,25 @@ export class BaseUser {
 
   /**
    * This function types the text in the input field using its CSS selector.
+   * @param selector The CSS selector of the input field.
+   * @param text The text to type.
    */
-  async type(selector: string, text: string): Promise<void> {
-    await this.page.waitForSelector(selector, {visible: true});
+  async typeInInputField(
+    selector: string | ElementHandle<Element>,
+    text: string
+  ): Promise<void> {
+    let element =
+      typeof selector === 'string'
+        ? await this.page.waitForSelector(selector)
+        : selector;
+    if (!element) {
+      throw new Error(`Element not found for selector: ${selector}`);
+    }
+    await this.waitForElementToStabilize(element);
+    await this.waitForElementToBeClickable(element);
     await this.waitForElementToStabilize(selector);
-    await this.waitForElementToBeClickable(selector);
-    await this.page.type(selector, text);
+
+    await element.type(text);
   }
 
   /**
@@ -823,7 +843,7 @@ export class BaseUser {
   async isElementVisible(
     selector: string,
     visible: boolean = true,
-    timeout: number = 30000
+    timeout: number = 10000
   ): Promise<boolean> {
     try {
       if (visible) {
@@ -924,7 +944,8 @@ export class BaseUser {
   async expectScreenshotToMatch(
     imageName: string,
     testPath: string,
-    newPage?: Page
+    newPage: Page | undefined = undefined,
+    screenshotOptions: puppeteer.ScreenshotOptions = {}
   ): Promise<void> {
     const currentPage = typeof newPage !== 'undefined' ? newPage : this.page;
     await currentPage.mouse.move(0, 0);
@@ -965,7 +986,8 @@ export class BaseUser {
     }
 
     try {
-      expect(await currentPage.screenshot()).toMatchImageSnapshot({
+      const screenshot = await currentPage.screenshot(screenshotOptions);
+      expect(screenshot).toMatchImageSnapshot({
         failureThreshold: failureTrigger,
         failureThresholdType: 'percent',
         customSnapshotIdentifier: imageName,
@@ -1075,62 +1097,11 @@ export class BaseUser {
   }
 
   /**
-   * Clicks on an anchor element with the given inner text and verifies that the
-   * target page URL contains the given URL.
-   * @param anchorInnerText The inner text of the anchor element.
-   * @param targetPageUrl The URL of the target page.
-   * @param context The context in which the anchor element is located.
-   */
-  async clickAndVerifyAnchorWithInnerText(
-    anchorInnerText: string,
-    targetPageUrl: string,
-    context: Page = this.page
-  ): Promise<void> {
-    // Get an anchor element with the given inner text.
-    await context.waitForSelector('a');
-    const anchorElements = await context.$$('a');
-    let element: puppeteer.ElementHandle<Element> | null = null;
-    for (const anchorElement of anchorElements) {
-      const innerText = await anchorElement.evaluate(el =>
-        (el as HTMLAnchorElement).innerText.trim()
-      );
-      if (innerText === anchorInnerText) {
-        element = anchorElement;
-        break;
-      }
-    }
-    if (!element) {
-      throw new Error(`Anchor with inner text ${anchorInnerText} not found.`);
-    }
-
-    // Check if anchor target is the same as the current page.
-    const isTargetSamePage = await element.evaluate(el => {
-      return (el as HTMLAnchorElement).target !== '_blank';
-    });
-    if (!isTargetSamePage) {
-      showMessage('Anchor target is not the same as the current page.');
-      const pageTarget = context.target();
-      await element.click();
-      const newTarget = await this.browserObject.waitForTarget(
-        target => target.opener() === pageTarget
-      );
-      const newTabPage = await newTarget.page();
-      expect(newTabPage).toBeDefined();
-      expect(newTabPage?.url()).toBe(targetPageUrl);
-      await newTabPage?.close();
-    } else {
-      showMessage('Anchor target is the same as the current page.');
-      await element.click();
-      await this.expectPageURLToContain(targetPageUrl, context);
-      await context.goBack();
-    }
-  }
-
-  /**
    * Creates a new tab in the browser and switches to it.
    */
   async createAndSwitchToNewTab(): Promise<puppeteer.Page> {
     const newPage = await this.browserObject.newPage();
+    this.pages.push(newPage);
 
     if (this.isViewportAtMobileWidth()) {
       // Set viewport for mobile.
@@ -1155,6 +1126,35 @@ export class BaseUser {
     await newPage.bringToFront();
     this.page = newPage;
     return newPage;
+  }
+
+  /**
+   * Switches to the previous page.
+   */
+  async switchToNextPage(): Promise<void> {
+    const currentPageIndex = this.pages.indexOf(this.page);
+    if (currentPageIndex === -1) {
+      throw new Error('Current page not found in pages array.');
+    }
+    const nextPageIndex = (currentPageIndex + 1) % this.pages.length;
+    this.page = this.pages[nextPageIndex];
+
+    this.page.bringToFront();
+  }
+
+  /**
+   * Switches to the previous page.
+   */
+  async switchToPreviousPage(): Promise<void> {
+    const currentPageIndex = this.pages.indexOf(this.page);
+    if (currentPageIndex === -1) {
+      throw new Error('Current page not found in pages array.');
+    }
+    const previousPageIndex =
+      (currentPageIndex - 1 + this.pages.length) % this.pages.length;
+    this.page = this.pages[previousPageIndex];
+
+    this.page.bringToFront();
   }
 
   /**
@@ -1258,27 +1258,44 @@ export class BaseUser {
    * content matches the expected text.
    * @param {string} selector - The selector of the element to get text from.
    * @param {string} text - The expected text content.
+   * @param {ElementHandle<Element>} context - The context in which the element is located.
    */
-  async expectTextContentToBe(selector: string, text: string): Promise<void> {
+  async expectTextContentToBe(
+    selector: string,
+    text: string,
+    context: ElementHandle<Element> | null = null
+  ): Promise<void> {
     await this.expectElementToBeVisible(selector);
 
     try {
       await this.page.waitForFunction(
-        (selector: string, text: string) => {
-          const element = document.querySelector(selector);
-          return element?.textContent?.trim() === text.trim();
+        (selector: string, text: string, context: HTMLElement | null) => {
+          const element = context
+            ? context.querySelector(selector)
+            : document.querySelector(selector);
+          return element && element.textContent?.trim() === text.trim();
         },
         {},
         selector,
-        text
+        text,
+        context
       );
 
       showMessage(`Text content of "${selector}" is "${text}".`);
     } catch (error) {
-      const actualTextContent = await this.page.evaluate((selector: string) => {
-        const element = document.querySelector(selector);
-        return element?.textContent?.trim();
-      }, selector);
+      const actualTextContent = await this.page.evaluate(
+        (selector: string, context: HTMLElement | null) => {
+          const element = context
+            ? context.querySelector(selector)
+            : document.querySelector(selector);
+          return (
+            element?.textContent?.trim() +
+            `" (inside ${context ? 'context' : 'document'})`
+          );
+        },
+        selector,
+        context
+      );
       error.message =
         `Text content of "${selector}" does not match the expected text.\n` +
         `Expected: "${text}"\n` +
@@ -1731,6 +1748,58 @@ export class BaseUser {
   }
 
   /**
+   * Clicks on an anchor element with the given inner text and verifies that the
+   * target page URL contains the given URL.
+   * @param anchorInnerText The inner text of the anchor element.
+   * @param targetPageUrl The URL of the target page.
+   * @param context The context in which the anchor element is located.
+   */
+  async clickAndVerifyAnchorWithInnerText(
+    anchorInnerText: string,
+    targetPageUrl: string,
+    context: Page = this.page
+  ): Promise<void> {
+    // Get an anchor element with the given inner text.
+    await context.waitForSelector('a');
+    const anchorElements = await context.$$('a');
+    let element: puppeteer.ElementHandle<Element> | null = null;
+    for (const anchorElement of anchorElements) {
+      const innerText = await anchorElement.evaluate(el =>
+        (el as HTMLAnchorElement).innerText.trim()
+      );
+      if (innerText === anchorInnerText) {
+        element = anchorElement;
+        break;
+      }
+    }
+    if (!element) {
+      throw new Error(`Anchor with inner text ${anchorInnerText} not found.`);
+    }
+
+    // Check if anchor target is the same as the current page.
+    const isTargetSamePage = await element.evaluate(el => {
+      return (el as HTMLAnchorElement).target !== '_blank';
+    });
+    if (!isTargetSamePage) {
+      showMessage('Anchor target is not the same as the current page.');
+      const pageTarget = context.target();
+      await element.click();
+      const newTarget = await this.browserObject.waitForTarget(
+        target => target.opener() === pageTarget
+      );
+      const newTabPage = await newTarget.page();
+      expect(newTabPage).toBeDefined();
+      expect(newTabPage?.url()).toBe(targetPageUrl);
+      await newTabPage?.close();
+    } else {
+      showMessage('Anchor target is the same as the current page.');
+      await element.click();
+      await this.expectPageURLToContain(targetPageUrl, context);
+      await context.goBack();
+    }
+  }
+
+  /**
    * Expects the text content of the toast message to match the given expected message.
    * @param {string} expectedMessage - The expected message to match the toast message against.
    */
@@ -1789,27 +1858,6 @@ export class BaseUser {
     );
   }
 
-  /**
-   * Clicks on the element with the given text.
-   * @param text The text of the element to click on.
-   */
-  async clickOnElementWithText(text: string): Promise<void> {
-    // Normalize-space is used to remove the extra spaces in the text.
-    // Check the documentation for the normalize-space function here :
-    // https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space.
-    const element = await this.page.waitForXPath(
-      `//*[contains(normalize-space(text()), normalize-space("${text}"))]`,
-      {timeout: 10000}
-    );
-
-    if (!element) {
-      throw new Error(`Element not found for text: ${text}`);
-    }
-    await this.waitForElementToStabilize(element);
-    await this.waitForElementToBeClickable(element);
-    await element.click();
-    showMessage(`Element (text: ${text}) is clicked.`);
-  }
   /**
    * Checks if the toast warning message matches the expected warning message.
    * @param {string} expectedWarningMessage - The expected warning message.
@@ -1907,6 +1955,42 @@ export class BaseUser {
 
     // If no pattern matches, throw an error.
     throw new Error(`Unable to parse date string: "${dateString}"`);
+  }
+
+  /**
+   * Clicks on the given element after waiting for it to be clickable.
+   * Note: This function does not have post-check.
+   * @param element The element to click on.
+   * @param options The options to pass to the click function.
+   */
+  async clickOnElement(
+    element: ElementHandle<Element>,
+    options: puppeteer.ClickOptions = {}
+  ): Promise<void> {
+    await this.waitForElementToBeClickable(element);
+    await element.click(options);
+  }
+
+  /**
+   * Clicks on the element with the given text.
+   * @param text The text of the element to click on.
+   */
+  async clickOnElementWithText(text: string): Promise<void> {
+    // Normalize-space is used to remove the extra spaces in the text.
+    // Check the documentation for the normalize-space function here :
+    // https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space.
+    const element = await this.page.waitForXPath(
+      `//*[contains(normalize-space(text()), normalize-space("${text}"))]`,
+      {timeout: 10000}
+    );
+
+    if (!element) {
+      throw new Error(`Element not found for text: ${text}`);
+    }
+    await this.waitForElementToStabilize(element);
+    await this.waitForElementToBeClickable(element);
+    await element.click();
+    showMessage(`Element (text: ${text}) is clicked.`);
   }
 }
 

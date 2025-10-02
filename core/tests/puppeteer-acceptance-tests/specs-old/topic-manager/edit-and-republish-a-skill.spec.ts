@@ -95,6 +95,27 @@ describe('Topic Manager User Journey', function () {
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
+  it('should be able to see stale message when skill is edited', async function () {
+    await topicManager.closeConceptCardPreview();
+    await topicManager.createAndSwitchToNewTab();
+    await topicManager.navigateToTopicAndSkillsDashboardPage();
+    await topicManager.openSkillEditor('Double Digit Addition');
+
+    // Change skill review material.
+    await topicManager.switchToPreviousPage();
+    await topicManager.updateReviewMaterial(
+      'Review material text content for Double Digit Addition.'
+    );
+    await topicManager.switchToNextPage();
+    await topicManager.expectUnsavedChangesStatusInfoModalToBeVisible();
+
+    // Save skill.
+    await topicManager.switchToPreviousPage();
+    await topicManager.publishUpdatedSkill('Updated review material');
+    await topicManager.switchToNextPage();
+    await topicManager.expectStaleTabInfoModalToBeVisible();
+  });
+
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });

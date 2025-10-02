@@ -44,7 +44,7 @@ describe('Topic Manager', function () {
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
-      'curriculumAdmin1@example.com',
+      'curriculumAdm@example.com',
       [ROLES.CURRICULUM_ADMIN]
     );
 

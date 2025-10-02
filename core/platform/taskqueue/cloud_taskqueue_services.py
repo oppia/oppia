@@ -24,13 +24,19 @@ import logging
 
 from core import feconf
 from core.constants import constants
-from core.domain import platform_parameter_list, platform_parameter_services
+from core.platform import models
 
 from google import auth
 from google.api_core import retry
 from google.cloud import tasks_v2
 from google.protobuf import timestamp_pb2
 from typing import Any, Dict, Optional
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import app_identity_services
+
+app_identity_services = models.Registry.import_app_identity_services()
 
 # The 'auth.default()' returns tuple of credentials and project ID. As we are
 # only interested in credentials, we are using '[0]' to access it.
@@ -69,10 +75,7 @@ def create_http_task(
     """
     # The cloud tasks library requires the Oppia project id and region, as well
     # as the queue name as the path to be able to find the correct queue.
-    oppia_project_id = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.OPPIA_PROJECT_ID.value))
-    assert isinstance(oppia_project_id, str)
+    oppia_project_id = app_identity_services.get_application_id()
     parent = CLIENT.queue_path(
         oppia_project_id, feconf.GOOGLE_APP_ENGINE_REGION, queue_name)
 

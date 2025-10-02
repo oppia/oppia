@@ -66,7 +66,7 @@ import threading
 from core import utils
 from scripts import common
 
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Dict, List, Optional, Set, Tuple, cast
 
 from .. import concurrent_task_utils, install_third_party_libs
 
@@ -646,7 +646,11 @@ def main(args: Optional[List[str]] = None) -> None:
         return
 
     read_files(all_filepaths, namespace=namespace)
-    files: Dict[str, List[str]] = multiprocessing.Manager().dict()
+    # Here we use cast because multiprocessing.Manager().dict() returns
+    # a DictProxy, which is functionally equivalent to a standard Dict
+    # but is not seen as type-compatible by MyPy. This tells the type
+    # checker to treat it as the correct type for static analysis.
+    files = cast(Dict[str, List[str]], multiprocessing.Manager().dict())
     categorize_files(all_filepaths, files)
 
     # Prepare custom tasks.

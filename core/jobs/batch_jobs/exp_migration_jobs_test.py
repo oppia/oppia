@@ -42,7 +42,7 @@ from core.jobs.types import job_run_result
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Sequence
+from typing import Sequence, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -1293,8 +1293,16 @@ class ExpSnapshotsMigrationAuditJobTests(
 
         # Make a mock conversion function that raises an error when trying to
         # convert the old snapshot.
+        # Here we use cast because mypy infers the return type of the
+        # dictionary access as `Any`, which causes a `no-any-return`
+        # error. The cast satisfies the static type checker.
         mock_conversion = classmethod(
-            lambda cls, exploration_dict: exploration_dict['property_that_dne'])
+            lambda cls, exploration_dict: cast(
+                # Here we use object because it's the most generic type that
+                # satisfies the function's signature. A specific type isn't
+                # needed since this line is expected to raise an exception.
+                object, exploration_dict['property_that_dne'])
+            )
 
         with self.swap(
             exp_domain.Exploration, '_convert_states_v46_dict_to_v47_dict',
@@ -1735,8 +1743,16 @@ class ExpSnapshotsMigrationJobTests(
 
         # Make a mock conversion function that raises an error when trying to
         # convert the old snapshot.
+        # Here we use cast because mypy infers the return type of the
+        # dictionary access as `Any`, which causes a `no-any-return`
+        # error. The cast satisfies the static type checker.
         mock_conversion = classmethod(
-            lambda cls, exploration_dict: exploration_dict['property_that_dne'])
+            lambda cls, exploration_dict: cast(
+                # Here we use object because it's the most generic type that
+                # satisfies the function's signature. A specific type isn't
+                # needed since this line is expected to raise an exception.
+                object, exploration_dict['property_that_dne'])
+            )
 
         with self.swap(
             exp_domain.Exploration, '_convert_states_v46_dict_to_v47_dict',
