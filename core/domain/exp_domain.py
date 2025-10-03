@@ -1321,6 +1321,30 @@ class ExplorationDict(TypedDict):
     version: int
 
 
+class ExplorationDictForAndroid(TypedDict):
+    """Dictionary representing the Exploration object for Android (with old
+    schema).
+    """
+
+    id: str
+    title: str
+    category: str
+    objective: str
+    language_code: str
+    tags: List[str]
+    blurb: str
+    author_notes: str
+    states_schema_version: int
+    init_state_name: str
+    states: Dict[str, state_domain.StateDictForAndroid]
+    param_specs: Dict[str, param_domain.ParamSpecDict]
+    param_changes: List[param_domain.ParamChangeDict]
+    auto_tts_enabled: bool
+    edits_allowed: bool
+    next_content_id_index: int
+    version: int
+
+
 class VersionedExplorationDict(ExplorationDict):
     """Dictionary representing versioned Exploration object."""
 

@@ -3639,6 +3639,20 @@ class StateDict(TypedDict):
     inapplicable_skill_misconception_ids: List[str]
 
 
+class StateDictForAndroid(TypedDict):
+    """Dictionary representing the State object for Android (in old schema)."""
+
+    content: SubtitledHtmlDict
+    param_changes: List[param_domain.ParamChangeDict]
+    interaction: InteractionInstanceDict
+    recorded_voiceovers: RecordedVoiceoversDict
+    solicit_answer_details: bool
+    card_is_checkpoint: bool
+    linked_skill_id: Optional[str]
+    classifier_model_id: Optional[str]
+    inapplicable_skill_misconception_ids: List[str]
+
+
 class State(translation_domain.BaseTranslatableObject):
     """Domain object for a state."""
 
