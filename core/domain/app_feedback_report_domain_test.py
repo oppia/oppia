@@ -631,8 +631,8 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
             % ('invalid_entry_point_name'),
         ):
             feedback_report.get_entry_point_from_json(
-                invalid_json
-            )  # type: ignore[arg-type]
+                invalid_json  # type: ignore[arg-type]
+            )
 
     def test_get_android_network_type_from_string_returns_expected_network_type(
         self,
@@ -781,8 +781,8 @@ class UserSuppliedFeedbackDomainTests(test_utils.GenericTestBase):
         self.user_supplied_feedback.category = CATEGORY_ISSUE_TOPICS
         self.user_supplied_feedback.user_feedback_selected_items = [
             '123',
-            123,
-        ]  # type: ignore[list-item]
+            123,  # type: ignore[list-item]
+        ]
         self.user_supplied_feedback.user_feedback_other_text_input = ''
         self._assert_validation_error(
             self.user_supplied_feedback, 'Invalid option 123 selected by user.'

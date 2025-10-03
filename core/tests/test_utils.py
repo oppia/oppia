@@ -1840,8 +1840,8 @@ class TestBase(unittest.TestCase):
                     args,
                     next_args,
                     msg='*args to call #%d of %s'
-                    % (new_function_with_checks.call_num, msg),
-                )  # type: ignore[attr-defined]
+                    % (new_function_with_checks.call_num, msg),  # type: ignore[attr-defined]
+                )
 
             # Here we use MyPy ignore because we are accessing the 'call_num'
             # attribute on a function which is of type 'callable' and functions
@@ -1854,8 +1854,8 @@ class TestBase(unittest.TestCase):
                     kwargs,
                     next_kwargs,
                     msg='**kwargs to call #%d of %s'
-                    % (new_function_with_checks.call_num, msg),
-                )  # type: ignore[attr-defined]
+                    % (new_function_with_checks.call_num, msg),  # type: ignore[attr-defined]
+                )
 
             # Reset self.longMessage just in case `new_function()` raises.
             self.longMessage = original_long_message_value
@@ -1880,8 +1880,8 @@ class TestBase(unittest.TestCase):
             # because of this, MyPy throws a '"Callable" has no attribute
             # "call_num"' error. Thus to avoid the error, we used ignore here.
             self.assertEqual(
-                new_function_with_checks.call_num > 0, called, msg=msg
-            )  # type: ignore[attr-defined]
+                new_function_with_checks.call_num > 0, called, msg=msg  # type: ignore[attr-defined]
+            )
             pretty_unused_args: List[str] = []
 
             # Here we use type Any because the expected_args can contains
@@ -1922,9 +1922,9 @@ class TestBase(unittest.TestCase):
                     # error. Thus to avoid the error, we used ignore here.
                     for i, call_args in enumerate(
                         pretty_unused_args,
-                        start=new_function_with_checks.call_num + 1,
+                        start=new_function_with_checks.call_num + 1,  # type: ignore[attr-defined]
                     )
-                )  # type: ignore[attr-defined]
+                )
                 # Here we use MyPy ignore because we are accessing the
                 # 'call_num' attribute on a function which is of type
                 # 'callable' and functions of type 'callable' do not
@@ -1937,8 +1937,8 @@ class TestBase(unittest.TestCase):
                     'Missing:\n'
                     '%s : %s'
                     % (
-                        new_function_with_checks.call_num,
-                        num_expected_calls,  # type: ignore[attr-defined]
+                        new_function_with_checks.call_num,  # type: ignore[attr-defined]
+                        num_expected_calls,
                         missing_call_summary,
                         msg,
                     )

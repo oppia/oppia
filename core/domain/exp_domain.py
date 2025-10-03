@@ -3098,8 +3098,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 translations_mapping = (
                     # Here we use MyPy ignore because the latest schema of state
                     # dict doesn't contains written_translations property.
-                    state_dict['written_translations']['translations_mapping']
-                )  # type: ignore[typeddict-item]
+                    state_dict['written_translations']['translations_mapping']  # type: ignore[typeddict-item]
+                )
                 for content_id in translations_mapping:
                     if content_id in list_of_subtitled_unicode_content_ids:
                         for language_code in translations_mapping[content_id]:
@@ -3356,9 +3356,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains written_translations property.
-        translations_mapping = state_dict['written_translations'][
+        translations_mapping = state_dict['written_translations'][  # type: ignore[typeddict-item]
             'translations_mapping'
-        ]  # type: ignore[typeddict-item]
+        ]
         new_translations_mapping = {
             content_id: translation_item
             for content_id, translation_item in translations_mapping.items()
@@ -3372,9 +3372,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains recorded_voiceovers property.
-        voiceovers_mapping = state_dict['recorded_voiceovers'][
+        voiceovers_mapping = state_dict['recorded_voiceovers'][  # type: ignore[typeddict-item]
             'voiceovers_mapping'
-        ]  # type: ignore[typeddict-item]
+        ]
         new_voiceovers_mapping = {}
         for content_id, voiceover_item in voiceovers_mapping.items():
             if content_id in content_id_list:
@@ -5276,9 +5276,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
             # Fix tags for written translations.
             # Here we use MyPy ignore because the latest schema of state
             # dict doesn't contains written_translations property.
-            written_translations = state['written_translations'][
+            written_translations = state['written_translations'][  # type: ignore[typeddict-item]
                 'translations_mapping'
-            ]  # type: ignore[typeddict-item]
+            ]
             for translation_item in written_translations.values():
                 for translation in translation_item.values():
                     if isinstance(translation['translation'], list):

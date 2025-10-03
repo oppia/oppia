@@ -219,9 +219,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             cls: Type[interaction_registry.Registry], interaction_id: str
         ) -> base.BaseInteraction:
             interaction = copy.deepcopy(
-                cls._interactions[
+                cls._interactions[  # pylint: disable=protected-access
                     interaction_id
-                ]  # pylint: disable=protected-access
+                ]
             )
             interaction.answer_type = 'ListOfSetsOfHtmlStrings'
             return interaction
@@ -527,9 +527,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             cls: Type[interaction_registry.Registry], interaction_id: str
         ) -> base.BaseInteraction:
             interaction = copy.deepcopy(
-                cls._interactions[
+                cls._interactions[  # pylint: disable=protected-access
                     interaction_id
-                ]  # pylint: disable=protected-access
+                ]
             )
             interaction.answer_type = 'SetOfHtmlString'
             interaction.can_have_solution = True
@@ -691,8 +691,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'Expected content id to be a string, received None',
         ):
             state.update_interaction_customization_args(
-                state_customization_args_dict
-            )  # type: ignore[arg-type]
+                state_customization_args_dict  # type: ignore[arg-type]
+            )
 
     def test_rule_spec_with_html_having_invalid_input_variable(self) -> None:
         """Test the method for extracting all the HTML from a state
@@ -3059,8 +3059,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             )
 
             exploration.init_state.convert_state_dict_to_yaml(
-                'invalid_state_dict', 10
-            )  # type: ignore[arg-type]
+                'invalid_state_dict', 10  # type: ignore[arg-type]
+            )
 
         self.assertEqual(len(captured_logs), 1)
         self.assertIn('Bad state dict: invalid_state_dict', captured_logs[0])
@@ -3146,9 +3146,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         ):
             (
                 exploration.init_state.update_interaction_confirmed_unclassified_answers(
-                    {}
+                    {}  # type: ignore[arg-type]
                 )
-            )  # type: ignore[arg-type]
+            )
 
     def test_update_interaction_confirmed_unclassified_answers(self) -> None:
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
@@ -3193,8 +3193,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             Exception, 'Expected interaction_answer_groups to be a list'
         ):
             exploration.init_state.update_interaction_answer_groups(
-                'invalid_answer_groups'
-            )  # type: ignore[arg-type]
+                'invalid_answer_groups'  # type: ignore[arg-type]
+            )
 
     def test_cannot_update_answer_groups_with_non_dict_rule_inputs(
         self,
@@ -3560,10 +3560,10 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
             Exception, 'Expected content_id to be a string, received 123'
         ):
             recorded_voiceovers.add_content_id_for_voiceover(
-                invalid_content_id
-            )  # type: ignore[arg-type]
+                invalid_content_id  # type: ignore[arg-type]
+            )
 
-    def test_add_content_id_for_voiceover_with_existing_content_id_raise_error(  # pylint: disable=line-too-long
+    def test_add_content_id_for_voiceover_with_existing_content_id_raise_error(
         self,
     ) -> None:
         recorded_voiceovers_dict: state_domain.RecordedVoiceoversDict = {
@@ -3648,8 +3648,8 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
             Exception, 'Expected content_id to be a string, '
         ):
             recorded_voiceovers.delete_content_id_for_voiceover(
-                invalid_content_id_to_delete
-            )  # type: ignore[arg-type]
+                invalid_content_id_to_delete  # type: ignore[arg-type]
+            )
 
     def test_validation_with_invalid_content_id_raise_error(self) -> None:
         # TODO(#13059): Here we use MyPy ignore because after we fully type the

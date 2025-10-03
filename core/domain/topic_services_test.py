@@ -4343,8 +4343,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         # -> Here we use MyPy ignore because we introduce the mapping
         # value of None.
         topic_summary_without_exp_ids.published_story_exploration_mapping = (
-            None
-        )  # type: ignore[assignment]
+            None  # type: ignore[assignment]
+        )
 
         with self.swap_to_always_return(
             topic_fetchers,

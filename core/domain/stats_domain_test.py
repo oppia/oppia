@@ -1368,8 +1368,8 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
     # test updating exp_issue with no schema_version.
     def test_cannot_update_exp_issue_with_no_schema_version(self) -> None:
         exp_issue = stats_domain.ExplorationIssue(
-            'EarlyQuit', {}, [], None, True
-        )  # type: ignore[arg-type]
+            'EarlyQuit', {}, [], None, True  # type: ignore[arg-type]
+        )
         exp_issue_dict = exp_issue.to_dict()
         stats_models.ExplorationIssuesModel.create(
             'exp_id', 1, [exp_issue_dict]
@@ -1625,8 +1625,8 @@ class LearnerActionTests(test_utils.GenericTestBase):
     # updating learner_action with no schema_version.
     def test_cannot_update_learner_action_with_no_schema_version(self) -> None:
         learner_action = stats_domain.LearnerAction(
-            'ExplorationStart', {}, None
-        )  # type: ignore[arg-type]
+            'ExplorationStart', {}, None  # type: ignore[arg-type]
+        )
         learner_action_dict = learner_action.to_dict()
 
         playthrough_id = stats_models.PlaythroughModel.create(
@@ -2546,8 +2546,8 @@ class StateAnswersCalcOutputValidationTests(test_utils.GenericTestBase):
     # test that calculation_output is a known type.
     def test_calculation_output_must_be_known_type(self) -> None:
         self.state_answers_calc_output.calculation_output = (
-            self.MockCalculationOutputObjectWithUnknownType()
-        )  # type: ignore[assignment]
+            self.MockCalculationOutputObjectWithUnknownType()  # type: ignore[assignment]
+        )
         self._assert_validation_error(
             self.state_answers_calc_output,
             'Expected calculation output to be one of',
@@ -2840,8 +2840,8 @@ class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
     # test that accumulated_answer_info_json_size_bytes is a string.
     def test_accumulated_answer_info_json_size_bytes_must_be_int(self) -> None:
         self.learner_answer_details.accumulated_answer_info_json_size_bytes = (
-            'size'
-        )  # type: ignore[assignment]
+            'size'  # type: ignore[assignment]
+        )
         self._assert_validation_error(
             self.learner_answer_details,
             'Expected accumulated_answer_info_json_size_bytes to be an int',

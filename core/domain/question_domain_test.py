@@ -852,8 +852,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # Here we use MyPy ignore because the latest schema of state
         # dict doesn't contains recorded_voiceovers property.
         self.assertEqual(
-            test_value['state']['recorded_voiceovers'], test_data
-        )  # type: ignore[typeddict-item]
+            test_value['state']['recorded_voiceovers'], test_data  # type: ignore[typeddict-item]
+        )
 
     def test_question_state_dict_conversion_from_v28_to_v29(self) -> None:
 

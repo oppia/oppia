@@ -401,8 +401,8 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             ValueError, 'must_be_addressed should be a bool value'
         ):
             self.skill.update_misconception_must_be_addressed(
-                0, must_be_addressed
-            )  # type: ignore[arg-type]
+                0, must_be_addressed  # type: ignore[arg-type]
+            )
 
         # TODO(#13059): Here we use MyPy ignore because after we fully type the
         # codebase we plan to get rid of the tests that intentionally test wrong

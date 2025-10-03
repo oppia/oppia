@@ -512,8 +512,8 @@ class UtilsTests(test_utils.GenericTestBase):
         # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(Exception, invalid_type_error):
             utils.require_valid_page_title_fragment_for_web(
-                non_string_page_title_fragment_for_web
-            )  # type: ignore[arg-type]
+                non_string_page_title_fragment_for_web  # type: ignore[arg-type]
+            )
         lengthy_page_title_fragment_for_web = 'a' * 60
         max_length_error = (
             'Page title fragment should not be longer than %s characters.'
@@ -731,8 +731,8 @@ class UtilsTests(test_utils.GenericTestBase):
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
         self._assert_valid_thumbnail_filename(
-            'Expected thumbnail filename to be a string, received 10', 10
-        )  # type: ignore[arg-type]
+            'Expected thumbnail filename to be a string, received 10', 10  # type: ignore[arg-type]
+        )
         self._assert_valid_thumbnail_filename(
             'Thumbnail filename should not start with a dot.', '.name'
         )
@@ -770,8 +770,8 @@ class UtilsTests(test_utils.GenericTestBase):
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
         self._assert_valid_image_filename(
-            'Expected image filename to be a string, received 10', 10
-        )  # type: ignore[arg-type]
+            'Expected image filename to be a string, received 10', 10  # type: ignore[arg-type]
+        )
         self._assert_valid_image_filename(
             'Image filename should not start with a dot.', '.name'
         )

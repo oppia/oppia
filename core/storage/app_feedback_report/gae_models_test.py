@@ -441,8 +441,8 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
                 # InvalidFilter to type class filter_field_names. This is done
                 # to ensure that InvalidInputException is thrown.
                 model_class.get_filter_options_for_field(
-                    InvalidFilter.INVALID_FIELD
-                )  # type: ignore[arg-type]
+                    InvalidFilter.INVALID_FIELD  # type: ignore[arg-type]
+                )
 
     def test_get_filter_options_returns_correctly(self) -> None:
         model = app_feedback_report_models.AppFeedbackReportModel

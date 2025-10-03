@@ -762,8 +762,8 @@ class Collection:
             # Here we use MyPy ignore because 'next_skill_id' key is
             # deprecated from the latest domain object and while accessing
             # this key MyPy throws an error.
-            new_collection_dict['next_skill_id']
-        )  # type: ignore[typeddict-item]
+            new_collection_dict['next_skill_id']  # type: ignore[typeddict-item]
+        )
 
         collection_dict['schema_version'] = 4
         return collection_dict
@@ -1003,8 +1003,8 @@ class Collection:
             # Here we use MyPy ignore because 'next_skill_id' key is
             # deprecated from the latest domain object and while accessing
             # this key MyPy throw an error.
-            'next_skill_id'
-        ]  # type: ignore[typeddict-item]
+            'next_skill_id'  # type: ignore[typeddict-item]
+        ]
 
         # Here we use MyPy ignore because MyPy doesn't allow key deletion
         # from TypedDict.

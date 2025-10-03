@@ -663,8 +663,8 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
                 _,
                 _,
             ) = exp_models.ExplorationCommitLogEntryModel.get_all_non_private_commits(
-                2, None, max_age=1
-            )  # type: ignore[arg-type]
+                2, None, max_age=1  # type: ignore[arg-type]
+            )
 
         max_age = datetime.timedelta(hours=1)
         results, _, more = (

@@ -861,10 +861,10 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
             'objective',
             'en',
             [],
-            None,
+            None,  # type: ignore[arg-type]
             [],
             0,
-        )  # type: ignore[arg-type]
+        )
 
         yaml_content = collection.to_yaml()
 

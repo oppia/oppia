@@ -6880,8 +6880,8 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
             Exception, 'max_age must be a datetime.timedelta instance. or None.'
         ):
             exp_services.get_next_page_of_all_non_private_commits(
-                max_age='invalid_max_age'
-            )  # type: ignore[arg-type]
+                max_age='invalid_max_age'  # type: ignore[arg-type]
+            )
 
     def test_get_next_page_of_all_non_private_commits(self) -> None:
         all_commits = exp_services.get_next_page_of_all_non_private_commits()[0]

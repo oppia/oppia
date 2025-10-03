@@ -364,8 +364,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
         self._assert_valid_thumbnail_filename_for_story(
-            'Expected thumbnail filename to be a string, received 10', 10
-        )  # type: ignore[arg-type]
+            'Expected thumbnail filename to be a string, received 10', 10  # type: ignore[arg-type]
+        )
         self._assert_valid_thumbnail_filename_for_story(
             'Thumbnail filename should not start with a dot.', '.name'
         )
@@ -391,8 +391,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
         self._assert_valid_thumbnail_filename_for_story_node(
-            'Expected thumbnail filename to be a string, received 10', 10
-        )  # type: ignore[arg-type]
+            'Expected thumbnail filename to be a string, received 10', 10  # type: ignore[arg-type]
+        )
         self._assert_valid_thumbnail_filename_for_story_node(
             'Thumbnail filename should not start with a dot.', '.name'
         )

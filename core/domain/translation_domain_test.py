@@ -812,10 +812,10 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             Exception, 'Expected content_id to be a string, received 123'
         ):
             written_translations.add_content_id_for_translation(
-                invalid_content_id
-            )  # type: ignore[arg-type]
+                invalid_content_id  # type: ignore[arg-type]
+            )
 
-    def test_add_content_id_for_translation_with_existing_content_id_raise_error(  # pylint: disable=line-too-long
+    def test_add_content_id_for_translation_with_existing_content_id_raise_error(
         self,
     ) -> None:
         written_translations_dict: (
@@ -904,8 +904,8 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             Exception, 'Expected content_id to be a string, '
         ):
             written_translations.delete_content_id_for_translation(
-                invalid_content_id_to_delete
-            )  # type: ignore[arg-type]
+                invalid_content_id_to_delete  # type: ignore[arg-type]
+            )
 
     def test_validation_with_invalid_content_id_raise_error(self) -> None:
         # TODO(#13059): Here we use MyPy ignore because after we fully type the

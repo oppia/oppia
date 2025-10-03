@@ -195,8 +195,8 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
     # test wrong inputs that we can normally catch by typing.
     def test_title_with_strict_validation(self) -> None:
         self._assert_strict_valid_title_for_blog_post(
-            'Title should be a string.', 123
-        )  # type: ignore[arg-type]
+            'Title should be a string.', 123  # type: ignore[arg-type]
+        )
         self._assert_strict_valid_title_for_blog_post(
             'Title should not be empty', ''
         )
@@ -293,8 +293,8 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         self._assert_valid_tags_for_blog_post(
             'Expected each tag in \'tags\' to be a string, received: '
             '\'%s\'' % '123',
-            [123],
-        )  # type: ignore[list-item]
+            [123],  # type: ignore[list-item]
+        )
         self._assert_valid_tags_for_blog_post(
             'Tags should only contain alphanumeric characters and spaces, '
             'received: \'%s\'' % 'Alpha@',
@@ -741,7 +741,7 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         self.blog_post_summary.validate(strict=True)
 
     def test_tags_validation_for_blog_post(self) -> None:
-        """ "Tests tags validation for blog post."""
+        """Tests tags validation for blog post."""
         self._assert_valid_tags_for_blog_post(
             'Tags should only contain alphanumeric characters and spaces, '
             'received: \'%s\'' % 'Alpha@',

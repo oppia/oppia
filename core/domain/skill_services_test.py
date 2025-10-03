@@ -133,8 +133,8 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         # wrong inputs that we can normally catch by typing.
         with self.assertRaisesRegex(Exception, 'Invalid change dict.'):
             skill_services.apply_change_list(
-                self.SKILL_ID, invalid_skill_change_list, self.user_id_a
-            )  # type: ignore[arg-type]
+                self.SKILL_ID, invalid_skill_change_list, self.user_id_a  # type: ignore[arg-type]
+            )
 
     def test_compute_summary(self) -> None:
         skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)

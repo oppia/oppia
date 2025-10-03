@@ -1119,8 +1119,8 @@ class ObjectDefinitionTests(test_utils.GenericTestBase):
                         sorted(
                             [
                                 'contentId',
-                                member._value_key_name,
-                            ]  # pylint: disable=protected-access
+                                member._value_key_name,  # pylint: disable=protected-access
+                            ]
                         ),
                         sorted(member.default_value.keys()),
                     )
@@ -1417,8 +1417,8 @@ class TranslatableSetOfNormalizedStringTests(test_utils.GenericTestBase):
             AssertionError, 'Expected unicode string, received 2'
         ):
             objects.TranslatableSetOfNormalizedString.normalize_value(
-                ['1', 2, '3']
-            )  # type: ignore[list-item]
+                ['1', 2, '3']  # type: ignore[list-item]
+            )
 
         with self.assertRaisesRegex(
             AssertionError, 'Validation failed: is_uniquified'
@@ -1482,8 +1482,8 @@ class TranslatableSetOfUnicodeStringTests(test_utils.GenericTestBase):
             AssertionError, 'Expected unicode string, received 2'
         ):
             objects.TranslatableSetOfUnicodeString.normalize_value(
-                ['1', 2, '3']
-            )  # type: ignore[list-item]
+                ['1', 2, '3']  # type: ignore[list-item]
+            )
 
         with self.assertRaisesRegex(
             AssertionError, 'Validation failed: is_uniquified'

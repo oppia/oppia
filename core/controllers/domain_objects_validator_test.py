@@ -169,8 +169,8 @@ class ValidateNewPlatformParamsValueForBlogAdminTests(
                 # intentionally test wrong inputs that we can normally catch
                 # by typing.
                 domain_objects_validator.validate_platform_params_values_for_blog_admin(
-                    new_platform_parameter_values
-                )  # type: ignore[arg-type]
+                    new_platform_parameter_values  # type: ignore[arg-type]
+                )
             )
 
     def test_with_invalid_type_raises_error(self) -> None:
@@ -189,8 +189,8 @@ class ValidateNewPlatformParamsValueForBlogAdminTests(
                 # intentionally test wrong inputs that we can normally catch
                 # by typing.
                 domain_objects_validator.validate_platform_params_values_for_blog_admin(
-                    new_platform_parameter_values
-                )  # type: ignore[arg-type]
+                    new_platform_parameter_values  # type: ignore[arg-type]
+                )
             )
 
     def test_value_less_or_equal_0_for_max_no_of_tags_raises_errors(
@@ -239,8 +239,8 @@ class ValidateNewDefaultValueForPlatformParametersTests(
             # by typing.
             (
                 domain_objects_validator.validate_new_default_value_of_platform_parameter(
-                    default_value
-                )  # type: ignore[arg-type]
+                    default_value  # type: ignore[arg-type]
+                )
             )
 
 
@@ -310,8 +310,8 @@ class ValidateChangeDictForBlogPost(test_utils.GenericTestBase):
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
         domain_objects_validator.validate_change_dict_for_blog_post(
-            blog_post_change_no_tags
-        )  # type: ignore[arg-type]
+            blog_post_change_no_tags  # type: ignore[arg-type]
+        )
 
         blog_post_change_no_thumbnail = {
             'title': 'Hello Bloggers',
@@ -322,8 +322,8 @@ class ValidateChangeDictForBlogPost(test_utils.GenericTestBase):
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
         domain_objects_validator.validate_change_dict_for_blog_post(
-            blog_post_change_no_thumbnail
-        )  # type: ignore[arg-type]
+            blog_post_change_no_thumbnail  # type: ignore[arg-type]
+        )
 
         blog_post_change_no_content = {
             'title': 'Hello Bloggers',
@@ -334,8 +334,8 @@ class ValidateChangeDictForBlogPost(test_utils.GenericTestBase):
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
         domain_objects_validator.validate_change_dict_for_blog_post(
-            blog_post_change_no_content
-        )  # type: ignore[arg-type]
+            blog_post_change_no_content  # type: ignore[arg-type]
+        )
 
         blog_post_change_no_title = {
             'tags': ['News', 'Learners'],
@@ -346,8 +346,8 @@ class ValidateChangeDictForBlogPost(test_utils.GenericTestBase):
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
         domain_objects_validator.validate_change_dict_for_blog_post(
-            blog_post_change_no_title
-        )  # type: ignore[arg-type]
+            blog_post_change_no_title  # type: ignore[arg-type]
+        )
 
     def test_valid_dict_raises_no_exception(self) -> None:
         blog_post_change: blog_services.BlogPostChangeDict = {
@@ -540,8 +540,8 @@ class ValidateQuestionStateDict(test_utils.GenericTestBase):
         # The error is representing the keyerror.
         with self.assertRaisesRegex(Exception, 'content'):
             domain_objects_validator.validate_question_state_dict(
-                invalid_question_state_dict
-            )  # type: ignore[arg-type]
+                invalid_question_state_dict  # type: ignore[arg-type]
+            )
 
 
 class ValidateSuggestionImagesTests(test_utils.GenericTestBase):

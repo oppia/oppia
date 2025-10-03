@@ -344,8 +344,8 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
             # None which causes MyPy to throw incompatible argument type
             # error. Thus to avoid the error, we used ignore here.
             collection_services.update_collection(
-                self.owner_id, 'collection_id', None, 'commit message'
-            )  # type: ignore[arg-type]
+                self.owner_id, 'collection_id', None, 'commit message'  # type: ignore[arg-type]
+            )
 
     def test_save_collection_with_mismatch_of_versions_raises_error(
         self,

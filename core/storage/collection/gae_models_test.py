@@ -634,9 +634,9 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             # input type.
             (
                 collection_models.CollectionCommitLogEntryModel.get_all_non_private_commits(
-                    2, None, max_age='invalid_max_age'
+                    2, None, max_age='invalid_max_age'  # type: ignore[arg-type]
                 )
-            )  # type: ignore[arg-type]
+            )
 
     def test_get_all_non_private_commits_with_max_age(self) -> None:
         private_commit = collection_models.CollectionCommitLogEntryModel.create(

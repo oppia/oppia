@@ -1622,7 +1622,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         )
         self._assert_validation_error(
             self.new_exploration,
-            'Video tag does not have \'autoplay-with' '-value\' attribute.',
+            'Video tag does not have \'autoplay-with-value\' attribute.',
         )
 
         self.state.content.html = (
@@ -1677,7 +1677,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         )
         self._assert_validation_error(
             self.new_exploration,
-            'Link tag does not have \'url-with-value\' ' 'attribute.',
+            'Link tag does not have \'url-with-value\' attribute.',
         )
 
         self.state.content.html = (
@@ -3363,8 +3363,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # the codebase we plan to get rid of the tests that intentionally test
         # wrong inputs that we can normally catch by typing.
         outcome.param_changes = [
-            param_domain.ParamChange(0, 'generator_id', {})
-        ]  # type: ignore[arg-type]
+            param_domain.ParamChange(0, 'generator_id', {})  # type: ignore[arg-type]
+        ]
         self._assert_validation_error(
             exploration, 'Expected param_change name to be a string, received 0'
         )
@@ -3474,8 +3474,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # the codebase we plan to get rid of the tests that intentionally test
         # wrong inputs that we can normally catch by typing.
         interaction.customization_args = {
-            15: state_domain.InteractionCustomizationArg(
-                '', {'type': 'unicode'}  # type: ignore[dict-item]
+            15: state_domain.InteractionCustomizationArg(  # type: ignore[dict-item]
+                '', {'type': 'unicode'}
             )
         }
         self._assert_validation_error(

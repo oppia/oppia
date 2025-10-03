@@ -86,8 +86,8 @@ class VisualizationRegistryUnitTests(test_utils.GenericTestBase):
         )
         option_names = {'header': 'Pretty Tiles!', 'use_percentages': True}
         sorted_tiles_instance = sorted_tiles(
-            'AnswerFrequencies', option_names, 'invalid_value'
-        )  # type: ignore[arg-type]
+            'AnswerFrequencies', option_names, 'invalid_value'  # type: ignore[arg-type]
+        )
 
         with self.assertRaisesRegex(
             Exception,

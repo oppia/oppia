@@ -535,8 +535,8 @@ class TestUtilsTests(test_utils.GenericTestBase):
     def test_cannot_get_response_with_non_dict_params(self) -> None:
         with self.assertRaisesRegex(Exception, 'Expected params to be a dict'):
             self.get_response_without_checking_for_errors(
-                'random_url', [200], params='invalid_params'
-            )  # type: ignore[arg-type]
+                'random_url', [200], params='invalid_params'  # type: ignore[arg-type]
+            )
 
     def test_capture_logging(self) -> None:
         logging.info('0')

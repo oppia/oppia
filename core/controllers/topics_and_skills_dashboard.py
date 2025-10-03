@@ -59,8 +59,8 @@ class TopicsAndSkillsDashboardPageDataHandler(
         # 'FrontendTopicSummaryDict', and this is done because below we
         # are adding new keys that are not defined on the 'TopicSummaryDict'.
         topic_summary_dicts: List[topic_domain.FrontendTopicSummaryDict] = [
-            summary.to_dict() for summary in topic_summaries
-        ]  # type: ignore[misc]
+            summary.to_dict() for summary in topic_summaries  # type: ignore[misc]
+        ]
 
         skill_summaries = skill_services.get_all_skill_summaries()
         skill_summary_dicts = [summary.to_dict() for summary in skill_summaries]

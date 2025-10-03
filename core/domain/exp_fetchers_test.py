@@ -339,9 +339,9 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
         ):
             (
                 exp_fetchers.get_multiple_versioned_exp_interaction_ids_mapping_by_version(
-                    self.EXP_1_ID, [1, 2, 2.5, 3]
+                    self.EXP_1_ID, [1, 2, 2.5, 3]  # type: ignore[list-item]
                 )
-            )  # type: ignore[list-item]
+            )
 
     def test_retrieval_of_multiple_uncached_explorations(self) -> None:
         exp_ids = [self.EXP_1_ID, self.EXP_2_ID, self.EXP_3_ID]

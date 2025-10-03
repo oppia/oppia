@@ -166,12 +166,12 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, 'voiceover type must be VoiceoverType'
         ):
             self.entity_voiceovers_instance.voiceovers_mapping['content_id_0'][
-                1
-            ] = (  # type: ignore[index]
-                self.entity_voiceovers_instance.voiceovers_mapping[
-                    'content_id_0'
-                ]['manual']
-            )
+                1  # type: ignore[index]
+            ] = self.entity_voiceovers_instance.voiceovers_mapping[
+                'content_id_0'
+            ][
+                'manual'
+            ]
             self.entity_voiceovers_instance.validate()
 
     def test_validate_language_accent_code(self) -> None:

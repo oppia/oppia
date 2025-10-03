@@ -62,5 +62,5 @@ class BaseVisualizationTests(test_utils.GenericTestBase):
         )
         with self.assertRaisesRegex(utils.ValidationError, error_message):
             models.BaseVisualization(
-                'AnswerFrequencies', {}, 'false'
-            ).validate()  # type: ignore[arg-type]
+                'AnswerFrequencies', {}, 'false'  # type: ignore[arg-type]
+            ).validate()

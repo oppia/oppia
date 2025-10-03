@@ -115,8 +115,8 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             'Expected list of filenames, got \'invalid source filename\'',
         ):
             install_dependencies_json_packages.download_files(
-                'source_url', 'target_dir', 'invalid source filename'
-            )  # type: ignore[arg-type]
+                'source_url', 'target_dir', 'invalid source filename'  # type: ignore[arg-type]
+            )
 
     def test_download_files_with_valid_source_filenames(self) -> None:
         check_file_downloads = {

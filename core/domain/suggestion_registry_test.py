@@ -2657,8 +2657,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'create_new_fully_specified_question',
         ):
             suggestion.pre_update_validate(
-                question_domain.QuestionChange(change)
-            )  # type: ignore[arg-type]
+                question_domain.QuestionChange(change)  # type: ignore[arg-type]
+            )
 
     def test_pre_update_validate_change_skill_id(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
@@ -4100,8 +4100,8 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         )
         (
             community_contribution_stats.set_translation_reviewer_count_for_language_code(
-                self.sample_language_code, self.non_integer_count
-            )  # type: ignore[arg-type]
+                self.sample_language_code, self.non_integer_count  # type: ignore[arg-type]
+            )
         )
 
         with self.assertRaisesRegex(
@@ -4123,8 +4123,8 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         )
         (
             community_contribution_stats.set_translation_suggestion_count_for_language_code(
-                self.sample_language_code, self.non_integer_count
-            )  # type: ignore[arg-type]
+                self.sample_language_code, self.non_integer_count  # type: ignore[arg-type]
+            )
         )
 
         with self.assertRaisesRegex(
