@@ -104,9 +104,9 @@ def get_model_class(kind: Optional[str]) -> Type[datastore_services.Model]:
     # to all the workers.
     models.Registry.get_all_storage_model_classes()
 
-    model_class = datastore_services.Model._lookup_model(
+    model_class = datastore_services.Model._lookup_model(  # pylint: disable=protected-access
         kind
-    )  # pylint: disable=protected-access
+    )
     # Here we use cast because mypy cannot infer the return type of the
     # protected _lookup_model method. We know it returns a model class,
     # so cast tells the type checker to treat it as such.
