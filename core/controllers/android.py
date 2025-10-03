@@ -26,6 +26,7 @@ from core.domain import (
     classroom_domain,
     exp_domain,
     exp_fetchers,
+    exp_services,
     question_domain,
     question_fetchers,
     skill_domain,
@@ -39,6 +40,8 @@ from core.domain import (
     topic_domain,
     topic_fetchers,
     translation_fetchers,
+    voiceover_domain,
+    voiceover_services,
 )
 
 from typing import Dict, List, Optional, Sequence, TypedDict, Union
@@ -105,7 +108,7 @@ class _ActivityDataResponseDictRequiredFields(TypedDict):
 
     id: str
     payload: Union[
-        exp_domain.ExplorationDict,
+        exp_domain.ExplorationDictForAndroid,
         story_domain.StoryDict,
         skill_domain.SkillDict,
         subtopic_page_domain.SubtopicPageDict,
@@ -116,6 +119,7 @@ class _ActivityDataResponseDictRequiredFields(TypedDict):
         question_domain.QuestionDict,
         Dict[str, feconf.TranslatedContentDict],
         Dict[str, List[str]],
+        Dict[str, voiceover_domain.EntityVoiceoversDict],
         classroom_domain.ClassroomDict,
         None
     ]
@@ -155,6 +159,7 @@ class AndroidActivityHandler(base.BaseHandler[
                     'choices': [
                         constants.ACTIVITY_TYPE_EXPLORATION,
                         constants.ACTIVITY_TYPE_EXPLORATION_TRANSLATIONS,
+                        constants.ACTIVITY_TYPE_EXPLORATION_VOICEOVERS,
                         constants.ACTIVITY_TYPE_STORY,
                         constants.ACTIVITY_TYPE_SKILL,
                         constants.ACTIVITY_TYPE_SUBTOPIC,
@@ -210,9 +215,27 @@ class AndroidActivityHandler(base.BaseHandler[
         if len(set(hashed_activities_data)) != len(hashed_activities_data):
             raise self.InvalidInputException(
                 'Entries in activities_data should be unique'
- )
+            )
 
-        if activity_type == constants.ACTIVITY_TYPE_SUBTOPIC:
+        if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
+            ids_and_versions = [
+                (activity_data['id'], activity_data.get('version'))
+                for activity_data in activities_data
+            ]
+            fetched_explorations: Sequence[Optional[exp_domain.Exploration]] = (
+                exp_fetchers.get_multiple_explorations_by_ids_and_version(ids_and_versions)
+            )
+            for activity_data, exploration in zip(activities_data, fetched_explorations):
+                exploration_dict_for_android: Optional[exp_domain.ExplorationDictForAndroid] = (
+                    exp_services.to_exploration_dict_for_android(exploration)
+                    if exploration is not None else None
+                )
+                activities.append({
+                    'id': activity_data['id'],
+                    'version': activity_data.get('version'),
+                    'payload': exploration_dict_for_android
+                })
+        elif activity_type == constants.ACTIVITY_TYPE_SUBTOPIC:
             # Subtopic pages require special handling because their IDs are
             # compound keys (topic_id-subtopic_id) that need to be split and
             # processed separately.
@@ -223,7 +246,7 @@ class AndroidActivityHandler(base.BaseHandler[
                 (
                     topic_id,
                     int(stringified_subtopic_index),
-                    subtopic_page_version
+                    subtopic_page_version,
                 )
                 for (
                     (topic_id, stringified_subtopic_index),
@@ -355,6 +378,37 @@ class AndroidActivityHandler(base.BaseHandler[
             self.render_json(activities)
             return
 
+        elif activity_type == constants.ACTIVITY_TYPE_EXPLORATION_VOICEOVERS:
+            for activity_data in activities_data:
+                version = activity_data.get('version')
+                language_code = activity_data.get('language_code')
+                if version is None or language_code is None:
+                    raise self.InvalidInputException(
+                        'Version and language code must be specified '
+                        'for voiceovers'
+                    )
+                entity_voiceovers = (
+                    voiceover_services.
+                    fetch_entity_voiceovers_by_language_code(
+                        activity_data['id'],
+                        feconf.ENTITY_TYPE_EXPLORATION,
+                        version,
+                        language_code
+                    )
+                )
+
+                language_accent_code_to_entity_voiceover = {}
+                for entity_voiceover in entity_voiceovers:
+                    language_accent_code_to_entity_voiceover[
+                        entity_voiceover.language_accent_code
+                    ] = entity_voiceover.to_dict()
+
+                activities.append({
+                    'id': activity_data['id'],
+                    'version': version,
+                    'language_code': language_code,
+                    'payload': language_accent_code_to_entity_voiceover
+                })
         else:
             # All other activities are standard versioned models
             # that can be fetched in bulk using their
@@ -366,18 +420,13 @@ class AndroidActivityHandler(base.BaseHandler[
                 for activity_data in activities_data]
 
             fetched_entities: Sequence[Optional[Union[
-                exp_domain.Exploration,
                 story_domain.Story,
                 skill_domain.Skill,
                 question_domain.Question,
                 topic_domain.Topic
             ]]] = []
 
-            if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
-                fetched_entities = (
-                    exp_fetchers.get_multiple_explorations_by_ids_and_version(
-                        ids_and_versions))
-            elif activity_type == constants.ACTIVITY_TYPE_STORY:
+            if activity_type == constants.ACTIVITY_TYPE_STORY:
                 fetched_entities = (
                     story_fetchers.get_multiple_stories_by_ids_and_version(
                         ids_and_versions))
