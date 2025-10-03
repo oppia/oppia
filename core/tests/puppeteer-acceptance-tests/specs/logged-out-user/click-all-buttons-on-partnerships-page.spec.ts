@@ -35,9 +35,9 @@ describe('Logged-out User in Partnerships page', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should open the Partnerships form when the "Partner with us" button is clicked at the top.',
+    'should open the correct Blog Post when the "Read Blog Post" button is clicked.',
     async function () {
-      await loggedOutUser.clickPartnerWithUsButtonInPartnershipsPage();
+      await loggedOutUser.clickReadBlogPostLinkInPartnershipsPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
