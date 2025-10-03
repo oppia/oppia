@@ -409,37 +409,6 @@ class AndroidActivityHandler(base.BaseHandler[
                     'language_code': language_code,
                     'payload': language_accent_code_to_entity_voiceover
                 })
-        elif activity_type == constants.ACTIVITY_TYPE_EXPLORATION_VOICEOVERS:
-            for activity_data in activities_data:
-                version = activity_data.get('version')
-                language_code = activity_data.get('language_code')
-                if version is None or language_code is None:
-                    raise self.InvalidInputException(
-                        'Version and language code must be specified '
-                        'for voiceovers'
-                    )
-                entity_voiceovers = (
-                    voiceover_services.
-                    fetch_entity_voiceovers_by_language_code(
-                        activity_data['id'],
-                        feconf.ENTITY_TYPE_EXPLORATION,
-                        version,
-                        language_code
-                    )
-                )
-
-                language_accent_code_to_entity_voiceover = {}
-                for entity_voiceover in entity_voiceovers:
-                    language_accent_code_to_entity_voiceover[
-                        entity_voiceover.language_accent_code
-                    ] = entity_voiceover.to_dict()
-
-                activities.append({
-                    'id': activity_data['id'],
-                    'version': version,
-                    'language_code': language_code,
-                    'payload': language_accent_code_to_entity_voiceover
-                })
         else:
             # All other activities are standard versioned models
             # that can be fetched in bulk using their
