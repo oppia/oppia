@@ -1908,9 +1908,11 @@ class TestBase(unittest.TestCase):
             # because of this, MyPy throws a '"Callable" has no attribute
             # "call_num"' error. Thus to avoid the error, we used ignore here.
             if pretty_unused_args:
-                num_expected_calls = new_function_with_checks.call_num + len(
-                    pretty_unused_args
-                )  # type: ignore[attr-defined]
+                num_expected_calls = (
+                    new_function_with_checks.call_num  # type: ignore[attr-defined]
+                    + len(pretty_unused_args)
+                )
+
                 missing_call_summary = '\n'.join(
                     '\tCall %d of %d: %s(%s)'
                     % (i, num_expected_calls, attr, call_args)
