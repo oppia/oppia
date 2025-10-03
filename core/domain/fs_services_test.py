@@ -27,7 +27,14 @@ from core.domain import (
     platform_parameter_list,
     user_services,
 )
+from core.platform import models
 from core.tests import test_utils
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import app_identity_services
+
+app_identity_services = models.Registry.import_app_identity_services()
 
 
 class GcsFileSystemUnitTests(test_utils.GenericTestBase):
@@ -360,7 +367,6 @@ class GetStaticAssetUrlTests(test_utils.GenericTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.OPPIA_PROJECT_ID, 'project-id'),
             (
                 platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS,
                 'test-url'
@@ -369,7 +375,9 @@ class GetStaticAssetUrlTests(test_utils.GenericTestBase):
     )
     def test_function_returns_correct_url_for_non_emulator_mode(self) -> None:
         with self.swap(constants, 'EMULATOR_MODE', False):
-            with self.swap(feconf, 'OPPIA_PROJECT_ID', 'project-id'):
+            with self.swap(
+                    app_identity_services, 'get_application_id',
+                    lambda: 'project-id'):
                 self.assertEqual(
                     fs_services.get_static_asset_url('test/image.png'),
                     'https://storage.googleapis.com/project-id-static/'

@@ -24,12 +24,7 @@ import pprint
 import traceback
 
 from core import feconf
-from core.domain import (
-    beam_job_services,
-    caching_services,
-    platform_parameter_list,
-    platform_parameter_services,
-)
+from core.domain import beam_job_services, caching_services
 from core.jobs import base_jobs, job_options
 from core.jobs.io import cache_io, job_io
 from core.platform import models
@@ -42,8 +37,9 @@ from typing import Iterator, Optional, Type
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import datastore_services
+    from mypy_imports import app_identity_services, datastore_services
 
+app_identity_services = models.Registry.import_app_identity_services()
 datastore_services = models.Registry.import_datastore_services()
 
 # This is a mapping from the Google Cloud Dataflow JobState enum to our enum.
@@ -186,10 +182,7 @@ def refresh_state_of_beam_job_run_model(
         return
 
     try:
-        oppia_project_id = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.OPPIA_PROJECT_ID.value))
-        assert isinstance(oppia_project_id, str)
+        oppia_project_id = app_identity_services.get_application_id()
         job = dataflow.JobsV1Beta3Client().get_job(dataflow.GetJobRequest(
             job_id=job_id, project_id=oppia_project_id,
             location=feconf.GOOGLE_APP_ENGINE_REGION))
@@ -238,10 +231,7 @@ def cancel_job(beam_job_run_model: beam_job_models.BeamJobRunModel) -> None:
         raise ValueError('dataflow_job_id must not be None')
 
     try:
-        oppia_project_id = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.OPPIA_PROJECT_ID.value))
-        assert isinstance(oppia_project_id, str)
+        oppia_project_id = app_identity_services.get_application_id()
         dataflow.JobsV1Beta3Client().update_job(dataflow.UpdateJobRequest(
             job_id=job_id, project_id=oppia_project_id,
             location=feconf.GOOGLE_APP_ENGINE_REGION,

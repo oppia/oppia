@@ -83,7 +83,6 @@ class EmailToAdminTest(test_utils.EmailTestBase):
             (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'admin@system.com'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'dummy@system.com'),
             (param_list.ParamName.SYSTEM_EMAIL_NAME, 'DUMMY_SYSTEM_NAME'),
-            (param_list.ParamName.OPPIA_PROJECT_ID, 'dev-project-id')
         ]
     )
     def test_email_to_admin_is_sent_correctly(self) -> None:
@@ -706,10 +705,6 @@ class SignupEmailTests(test_utils.EmailTestBase):
               param_list.ParamName.SYSTEM_EMAIL_ADDRESS,
               'system@example.com'
             ),
-            (
-              param_list.ParamName.OPPIA_PROJECT_ID,
-              'dev-project-id'
-            )
         ]
     )
     def test_email_not_sent_if_config_does_not_permit_it(self) -> None:
@@ -759,10 +754,6 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 param_list.ParamName.NOREPLY_EMAIL_ADDRESS,
                 'noreply@example.com'
             ),
-            (
-                param_list.ParamName.OPPIA_PROJECT_ID,
-                'dev-project-id'
-            )
         ]
     )
     def test_email_not_sent_if_content_parameter_is_not_modified(self) -> None:
@@ -822,10 +813,6 @@ class SignupEmailTests(test_utils.EmailTestBase):
               param_list.ParamName.SYSTEM_EMAIL_ADDRESS,
               'system@example.com'
             ),
-            (
-              param_list.ParamName.OPPIA_PROJECT_ID,
-              'dev-project-id'
-            )
         ]
     )
     def test_email_not_sent_if_content_config_is_partially_modified(
@@ -914,10 +901,6 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 param_list.ParamName.NOREPLY_EMAIL_ADDRESS,
                 'noreply@example.com'
             ),
-            (
-                param_list.ParamName.OPPIA_PROJECT_ID,
-                'dev-project-id'
-            )
         ]
     )
     def test_email_with_bad_content_is_not_sent(self) -> None:
@@ -986,10 +969,6 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 param_list.ParamName.NOREPLY_EMAIL_ADDRESS,
                 'noreply@example.com'
             ),
-            (
-                param_list.ParamName.OPPIA_PROJECT_ID,
-                'dev-project-id'
-            )
         ]
     )
     def test_contents_of_signup_email_are_correct(self) -> None:
@@ -1096,10 +1075,6 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 param_list.ParamName.NOREPLY_EMAIL_ADDRESS,
                 'noreply@example.com'
             ),
-            (
-                param_list.ParamName.OPPIA_PROJECT_ID,
-                'dev-project-id'
-            )
         ]
     )
     def test_email_only_sent_once_for_repeated_signups_by_same_user(
@@ -1176,10 +1151,6 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 param_list.ParamName.NOREPLY_EMAIL_ADDRESS,
                 'noreply@example.com'
             ),
-            (
-                param_list.ParamName.OPPIA_PROJECT_ID,
-                'dev-project-id'
-            )
         ]
     )
     def test_email_only_sent_if_signup_was_successful(self) -> None:
@@ -1254,10 +1225,6 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 param_list.ParamName.NOREPLY_EMAIL_ADDRESS,
                 'noreply@example.com'
             ),
-            (
-                param_list.ParamName.OPPIA_PROJECT_ID,
-                'dev-project-id'
-            )
         ]
     )
     def test_record_of_sent_email_is_written_to_datastore(self) -> None:
@@ -6896,10 +6863,6 @@ class QueryStatusNotificationEmailTests(test_utils.EmailTestBase):
                 param_list.ParamName.NOREPLY_EMAIL_ADDRESS,
                 'noreply@example.com'
             ),
-            (
-                param_list.ParamName.OPPIA_PROJECT_ID,
-                'dev-project-id'
-            )
         ]
     )
     def test_that_correct_failure_email_is_sent(self) -> None:
@@ -7062,10 +7025,6 @@ class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
                 param_list.ParamName.SYSTEM_EMAIL_NAME,
                 '.'
             ),
-            (
-                param_list.ParamName.OPPIA_PROJECT_ID,
-                'dev-project-id'
-            )
         ]
     )
     def test_account_deletion_failed_email_is_sent_correctly(self) -> None:
@@ -7929,10 +7888,6 @@ class NotMergeableChangesEmailUnitTest(test_utils.EmailTestBase):
                 'system@example.com'
             ),
             (param_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
-            (
-                param_list.ParamName.OPPIA_PROJECT_ID,
-                'dev-project-id'
-            )
         ]
     )
     def test_not_mergeable_change_list_email_is_sent_correctly(self) -> None:
