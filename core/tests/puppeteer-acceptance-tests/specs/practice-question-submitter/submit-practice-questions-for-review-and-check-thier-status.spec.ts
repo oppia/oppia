@@ -148,7 +148,9 @@ describe('Practice Question Submitter', function () {
       'Addition',
       'Arithmetic Operations'
     );
-    await questionSubmitter.selectQuestionDifficulty('Easy');
+    await questionSubmitter.selectQuestionDifficultyInPracticeQuestionSubmittion(
+      'Easy'
+    );
     await questionSubmitter.seedTextToQuestion('What is 2 + 3?');
     await questionSubmitter.addMultipleChoiceInteractionByQuestionSubmitter([
       '5',
@@ -167,7 +169,9 @@ describe('Practice Question Submitter', function () {
       'Addition',
       'Arithmetic Operations'
     );
-    await questionSubmitter.selectQuestionDifficulty('Medium');
+    await questionSubmitter.selectQuestionDifficultyInPracticeQuestionSubmittion(
+      'Medium'
+    );
     await questionSubmitter.seedTextToQuestion('14 + 12');
     await questionSubmitter.addMultipleChoiceInteractionByQuestionSubmitter([
       '26',
@@ -186,7 +190,9 @@ describe('Practice Question Submitter', function () {
       'Addition',
       'Arithmetic Operations'
     );
-    await questionSubmitter.selectQuestionDifficulty('Hard');
+    await questionSubmitter.selectQuestionDifficultyInPracticeQuestionSubmittion(
+      'Hard'
+    );
     await questionSubmitter.seedTextToQuestion('What is 10 + 11?');
     await questionSubmitter.addMultipleChoiceInteractionByQuestionSubmitter([
       '13',
@@ -258,7 +264,9 @@ describe('Practice Question Submitter', function () {
       'Addition',
       'Arithmetic Operations'
     );
-    await questionSubmitter.selectQuestionDifficulty('Easy');
+    await questionSubmitter.selectQuestionDifficultyInPracticeQuestionSubmittion(
+      'Easy'
+    );
     await questionSubmitter.seedTextToQuestion('What is 10 + 11?');
     await questionSubmitter.addImageInteractionInQuestionEditor();
     await questionSubmitter.editDefaultResponseFeedbackInQuestionEditorPage(
@@ -274,7 +282,9 @@ describe('Practice Question Submitter', function () {
       'Addition',
       'Arithmetic Operations'
     );
-    await questionSubmitter.selectQuestionDifficulty('Medium');
+    await questionSubmitter.selectQuestionDifficultyInPracticeQuestionSubmittion(
+      'Medium'
+    );
     await questionSubmitter.seedTextToQuestion('What is 14 + 12?');
     await questionSubmitter.addInteraction(
       INTERACTION_TYPES.ITEM_SELECTION,
@@ -304,7 +314,9 @@ describe('Practice Question Submitter', function () {
       'Addition',
       'Arithmetic Operations'
     );
-    await questionSubmitter.selectQuestionDifficulty('Medium');
+    await questionSubmitter.selectQuestionDifficultyInPracticeQuestionSubmittion(
+      'Medium'
+    );
     await questionSubmitter.seedTextToQuestion('What is 12 + 13?');
     await questionSubmitter.addMultipleChoiceInteraction([
       'Option 1',
@@ -331,7 +343,9 @@ describe('Practice Question Submitter', function () {
       'Addition',
       'Arithmetic Operations'
     );
-    await questionSubmitter.selectQuestionDifficulty('Hard');
+    await questionSubmitter.selectQuestionDifficultyInPracticeQuestionSubmittion(
+      'Hard'
+    );
     await questionSubmitter.seedTextToQuestion('What is 10 + 11?');
     await questionSubmitter.addTextInputInteractionInQuestionEditor(
       'Correct Answer'
@@ -352,7 +366,9 @@ describe('Practice Question Submitter', function () {
       'Addition',
       'Arithmetic Operations'
     );
-    await questionSubmitter.selectQuestionDifficulty('Hard');
+    await questionSubmitter.selectQuestionDifficultyInPracticeQuestionSubmittion(
+      'Hard'
+    );
     await questionSubmitter.seedTextToQuestion('What is 14 + 12?');
     await questionSubmitter.addInteraction(
       INTERACTION_TYPES.DRAG_AND_DROP_SORT,
@@ -386,7 +402,9 @@ describe('Practice Question Submitter', function () {
       'Addition',
       'Arithmetic Operations'
     );
-    await questionSubmitter.selectQuestionDifficulty('Hard');
+    await questionSubmitter.selectQuestionDifficultyInPracticeQuestionSubmittion(
+      'Hard'
+    );
     await questionSubmitter.seedTextToQuestion('What is 10 + 11?');
     await questionSubmitter.addInteraction(
       INTERACTION_TYPES.NUMBER_INPUT,
@@ -417,7 +435,9 @@ describe('Practice Question Submitter', function () {
       'Addition',
       'Arithmetic Operations'
     );
-    await questionSubmitter.selectQuestionDifficulty('Hard');
+    await questionSubmitter.selectQuestionDifficultyInPracticeQuestionSubmittion(
+      'Hard'
+    );
     await questionSubmitter.seedTextToQuestion('What is 10/11?');
     await questionSubmitter.addInteraction(
       INTERACTION_TYPES.FRACTION_INPUT,
@@ -443,7 +463,9 @@ describe('Practice Question Submitter', function () {
       'Addition',
       'Arithmetic Operations'
     );
-    await questionSubmitter.selectQuestionDifficulty('Hard');
+    await questionSubmitter.selectQuestionDifficultyInPracticeQuestionSubmittion(
+      'Hard'
+    );
     await questionSubmitter.seedTextToQuestion('What is 10km + 11km?');
     await questionSubmitter.addInteraction(
       INTERACTION_TYPES.NUMBER_WITH_UNITS,

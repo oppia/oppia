@@ -18,20 +18,23 @@
 
 from __future__ import annotations
 
-from core.domain import platform_parameter_list, platform_parameter_services
 from core.platform import models
 
 from apache_beam.io.gcp.datastore.v1new import types as beam_datastore_types
 from google.cloud.ndb import model as ndb_model
 from google.cloud.ndb import query as ndb_query
-from typing import Any, List, Optional, Tuple, Type, Union
+from typing import Any, List, Optional, Tuple, Type, Union, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models, datastore_services
+    from mypy_imports import (
+        app_identity_services,
+        base_models,
+        datastore_services,
+    )
 
+app_identity_services = models.Registry.import_app_identity_services()
 datastore_services = models.Registry.import_datastore_services()
-
 (base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 
@@ -100,9 +103,12 @@ def get_model_class(kind: Optional[str]) -> Type[datastore_services.Model]:
     # separate workers and some parts of the jobs are probably not available
     # to all the workers.
     models.Registry.get_all_storage_model_classes()
-    return datastore_services.Model._lookup_model( # pylint: disable=protected-access
-        kind
-    )
+
+    model_class = datastore_services.Model._lookup_model(kind) # pylint: disable=protected-access
+    # Here we use cast because mypy cannot infer the return type of the
+    # protected _lookup_model method. We know it returns a model class,
+    # so cast tells the type checker to treat it as such.
+    return cast(Type[datastore_services.Model], model_class)
 
 
 def get_model_kind(
@@ -285,10 +291,7 @@ def get_beam_query_from_ndb_query(
         # its results by __key__ (the models' .key() value).
         order = ('__key__',)
 
-    oppia_project_id = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.OPPIA_PROJECT_ID.value))
-    assert isinstance(oppia_project_id, str)
+    oppia_project_id = app_identity_services.get_application_id()
     return beam_datastore_types.Query(
         kind=kind, namespace=namespace, project=oppia_project_id,
         filters=filters, order=order)

@@ -69,8 +69,12 @@ describe('Exploration Editor', function () {
     await explorationEditor.updateTitleTo('A Simple Exploration');
     await explorationEditor.expectTitleToBe('A Simple Exploration');
 
-    await explorationEditor.updateGoalTo('OppiaAcceptanceTestsCheck');
-    await explorationEditor.expectGoalToBe('OppiaAcceptanceTestsCheck');
+    await explorationEditor.updateGoalTo('Goal Here');
+    await explorationEditor.expectGoalToBe('Goal Here');
+    await explorationEditor.expectGoalWarningToBeVisible();
+
+    await explorationEditor.updateGoalTo('This is the long goal');
+    await explorationEditor.expectGoalToBe('This is the long goal');
 
     await explorationEditor.selectCategory('Algebra');
     await explorationEditor.expectSelectedCategoryToBe('Algebra');

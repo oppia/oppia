@@ -80,7 +80,7 @@
         </div>
       </div>
       <div class="skill-nav-dropdown-container save-options-dropdown">
-        <div class="skill-nav-skill-nav-dropdown-options"
+        <div class="skill-nav-skill-nav-dropdown-options e2e-test-skill-edit-options-container"
              *ngIf="showSkillEditOptions">
           <div class="skill-nav-dropdown-option"
                (click)="saveChanges()">
@@ -89,7 +89,7 @@
           </div>
         </div>
         <div class="skill-nav-dropdown-content right-container">
-          <div class="skill-nav-dropdown-text"
+          <div class="skill-nav-dropdown-text e2e-test-mobile-discard-changes-direct"
                (click)="discardChanges()">
             Discard Changes
             <span *ngIf="getChangeListCount() > 0">

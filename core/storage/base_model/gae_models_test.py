@@ -857,6 +857,48 @@ class VersionedModelTests(test_utils.GenericTestBase):
             # type.
             TestVersionedModel.get_multi_versions('model_id1', [1, 1.5, 2]) # type: ignore[list-item]
 
+    def test_versioned_models_have_correct_names_for_related_classes(
+            self) -> None:
+        all_model_classes = models.Registry.get_all_storage_model_classes()
+        all_versioned_classes = [
+            clazz for clazz in all_model_classes
+            if issubclass(clazz, base_models.VersionedModel)]
+        self.assertGreater(len(all_versioned_classes), 0)
+
+        for clazz in all_versioned_classes:
+            class_name = clazz.__name__
+
+            self.assertTrue(class_name.endswith('Model'))
+            class_name_root = class_name[:-len('Model')]
+            expected_snapshot_metadata_class_name = (
+                '%sSnapshotMetadataModel' % class_name_root)
+            expected_snapshot_content_class_name = (
+                '%sSnapshotContentModel' % class_name_root)
+            expected_commit_log_entry_class_name = (
+                '%sCommitLogEntryModel' % class_name_root)
+
+            # The following two assertions enforce that both classes are not
+            # None, otherwise MyPy will complain that those optional fields
+            # does not have a `__name__` attribute.
+            assert clazz.SNAPSHOT_METADATA_CLASS is not None
+            assert clazz.SNAPSHOT_CONTENT_CLASS is not None
+
+            self.assertEqual(
+                expected_snapshot_metadata_class_name,
+                clazz.SNAPSHOT_METADATA_CLASS.__name__,
+                'Incorrect snapshot metadata class name: %s' % class_name)
+            self.assertEqual(
+                expected_snapshot_content_class_name,
+                clazz.SNAPSHOT_CONTENT_CLASS.__name__,
+                'Incorrect snapshot content class name: %s' % class_name)
+            # Some VersionedModels don't have an associated commit log entry
+            # class.
+            if clazz.COMMIT_LOG_ENTRY_CLASS is not None:
+                self.assertEqual(
+                    expected_commit_log_entry_class_name,
+                    clazz.COMMIT_LOG_ENTRY_CLASS.__name__,
+                    'Incorrect commit log entry class name: %s' % class_name)
+
 
 class TestBaseModel(base_models.BaseModel):
     """Model that inherits BaseModel for testing. This is required as BaseModel

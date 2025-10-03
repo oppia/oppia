@@ -217,12 +217,12 @@ export class TranslationSubmitter extends BaseUser {
     await this.expectElementToBeVisible(textInputSelector);
     await this.waitForElementToStabilize(textInputSelector);
     await this.clearAllTextFrom(textInputSelector);
-    await this.type(textInputSelector, caption);
+    await this.typeInInputField(textInputSelector, caption);
 
     // Add a description to the image.
     await this.expectElementToBeVisible(descriptionSelector);
     await this.clearAllTextFrom(descriptionSelector);
-    await this.type(descriptionSelector, description);
+    await this.typeInInputField(descriptionSelector, description);
 
     // Save the image.
     await this.clickOnSaveButtonInCustomizeRTEModal();
@@ -511,7 +511,7 @@ export class TranslationSubmitter extends BaseUser {
    * @param {string} skill - The skill to fill the concept card modal with.
    */
   async selectSkillInConceptCard(skill: string): Promise<void> {
-    await this.type(skillNameInput, skill);
+    await this.typeInInputField(skillNameInput, skill);
     await this.clickOn(skillItemInRTESelector);
     await this.expectTextContentToContain(
       `${selectedSkillSelector} label`,

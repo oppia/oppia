@@ -21,10 +21,16 @@ from __future__ import annotations
 import argparse
 
 from core import feconf
-from core.domain import platform_parameter_list, platform_parameter_services
+from core.platform import models
 
 from apache_beam.options import pipeline_options
 from typing import List, Optional
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import app_identity_services
+
+app_identity_services = models.Registry.import_app_identity_services()
 
 
 # TODO(#15613): Here we use MyPy ignore because the incomplete typing of
@@ -63,9 +69,7 @@ class JobOptions(pipeline_options.PipelineOptions): # type: ignore[misc]
             joined_unsupported_options = ', '.join(sorted(unsupported_options))
             raise ValueError(
                 'Unsupported option(s): %s' % joined_unsupported_options)
-        oppia_project_id = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.OPPIA_PROJECT_ID.value))
+        oppia_project_id = app_identity_services.get_application_id()
         assert isinstance(oppia_project_id, str)
         super().__init__(
             # Needed by PipelineOptions.

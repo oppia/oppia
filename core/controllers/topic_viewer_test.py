@@ -188,10 +188,6 @@ class TopicPageDataHandlerTests(
                 'system@example.com'
             ),
             (platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
-            (
-                platform_parameter_list.ParamName.OPPIA_PROJECT_ID,
-                'dev-project-id'
-            )
         ]
     )
     def test_get_with_user_logged_in(self) -> None:

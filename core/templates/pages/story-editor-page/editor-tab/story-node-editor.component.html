@@ -198,7 +198,8 @@
 
       <div class="story-skill-mobile">
         <mat-card class="oppia-page-card oppia-long-text story-node-card skill-requirements-card oppia-mobile-collapsible-card">
-          <div class="story-node-header skill-requirements-header oppia-mobile-collapsible-card-header" (click)="togglePrerequisiteSkillsList()">
+          <div class="story-node-header skill-requirements-header oppia-mobile-collapsible-card-header e2e-test-section-header-prerequisite-skills"
+               (click)="togglePrerequisiteSkillsList()">
             <span>Prerequisite Skills</span>
             <i class="fa fa-caret-down"
                *ngIf="!prerequisiteSkillIsShown"
@@ -209,7 +210,7 @@
                aria-hidden="true">
             </i>
           </div>
-          <div class="story-skill-requirements oppia-mobile-collapsible-card-content" *ngIf="prerequisiteSkillIsShown">
+          <div class="story-skill-requirements oppia-mobile-collapsible-card-content e2e-test-section-body-prerequisite-skills" *ngIf="prerequisiteSkillIsShown">
             <div>
               <span class="oppia-input-box-subtitle">
                 <i>
@@ -220,14 +221,16 @@
             <div class="prerequisite-skills">
               <div>
                 <div class="skills-card-item" *ngFor="let skillId of prerequisiteSkillIds">
-                  <div class="skill-description-card">
+                  <div class="skill-description-card e2e-test-mobile-prerequisite-skill-description-card">
                     <a [href]="getSkillEditorUrl(skillId)" target="_blank" rel="noopener">{{ prerequisiteSkillIdToSummaryMap[skillId] }}</a>
-                    <span class="e2e-test-remove-prerequisite-skill" (click)="removePrerequisiteSkillId(skillId)" aria-hidden="true">
+                    <span class="e2e-test-remove-prerequisite-skill"
+                          (click)="removePrerequisiteSkillId(skillId)"
+                          aria-hidden="true">
                       <i class="fas fa-times md-18"></i>
                     </span>
                   </div>
                 </div>
-                <button class="btn add-skill-btn e2e-test-add-prerequisite-skill" (click)="addPrerequisiteSkillId()" [disabled]="!skillInfoHasLoaded">+ ADD PREREQUISITE SKILL</button>
+                <button class="btn add-skill-btn e2e-test-add-prerequisite-skill e2e-test-mobile-add-prerequisite-skill" (click)="addPrerequisiteSkillId()" [disabled]="!skillInfoHasLoaded">+ ADD PREREQUISITE SKILL</button>
               </div>
             </div>
           </div>
@@ -256,7 +259,7 @@
             <div class="acquired-skills">
               <div>
                 <div class="skills-card-item" *ngFor="let skillId of acquiredSkillIds">
-                  <div class="skill-description-card">
+                  <div class="skill-description-card e2e-test-mobile-acquired-skill-description-card">
                     <a [href]="getSkillEditorUrl(skillId)" target="_blank" rel="noopener">{{ acquiredSkillIdToSummaryMap[skillId] }}</a>
                     <span class="e2e-test-remove-acquired-skill" (click)="removeAcquiredSkillId(skillId)" aria-hidden="true">
                       <i class="fas fa-times md-18"></i>
