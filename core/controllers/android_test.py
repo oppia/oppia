@@ -25,6 +25,7 @@ from core.domain import (
     exp_services,
     question_services,
     skill_services,
+    state_domain,
     topic_fetchers,
     translation_domain,
 )
@@ -33,12 +34,18 @@ from core.tests import test_utils
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import secrets_services, translation_models
+    from mypy_imports import (
+        secrets_services,
+        translation_models,
+        voiceover_models,
+    )
 
 secrets_services = models.Registry.import_secrets_services()
 
-(translation_models,) = models.Registry.import_models([
-    models.Names.TRANSLATION])
+(translation_models, voiceover_models,) = models.Registry.import_models([
+    models.Names.TRANSLATION,
+    models.Names.VOICEOVER
+])
 
 
 class InitializeAndroidTestDataHandlerTest(test_utils.GenericTestBase):
@@ -151,7 +158,8 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                 [{
                     'id': 'exp_id',
                     'version': 1,
-                    'payload': exploration.to_dict()
+                    'payload': exp_services.to_exploration_dict_for_android(
+                        exploration)
                 }]
             )
 
@@ -184,7 +192,8 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                 [{
                     'id': 'exp_id',
                     'version': 1,
-                    'payload': exploration.to_dict()
+                    'payload': exp_services.to_exploration_dict_for_android(
+                        exploration)
                 }]
             )
             self.assertEqual(
@@ -197,7 +206,8 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                 [{
                     'id': 'exp_id',
                     'version': 2,
-                    'payload': new_exploration.to_dict()
+                    'payload': exp_services.to_exploration_dict_for_android(
+                        new_exploration)
                 }]
             )
 
@@ -230,11 +240,13 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                 [{
                     'id': 'exp_id',
                     'version': 2,
-                    'payload': new_exploration.to_dict()
+                    'payload': exp_services.to_exploration_dict_for_android(
+                        new_exploration)
                 }, {
                     'id': 'exp_id',
                     'version': 1,
-                    'payload': exploration.to_dict()
+                    'payload': exp_services.to_exploration_dict_for_android(
+                        exploration)
                 }]
             )
 
@@ -249,11 +261,13 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                 [{
                     'id': 'exp_id',
                     'version': 1,
-                    'payload': exploration.to_dict()
+                    'payload': exp_services.to_exploration_dict_for_android(
+                        exploration)
                 }, {
                     'id': 'exp_id',
                     'version': 2,
-                    'payload': new_exploration.to_dict()
+                    'payload': exp_services.to_exploration_dict_for_android(
+                        new_exploration)
                 }]
             )
 
@@ -277,7 +291,8 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                 }, {
                     'id': 'exp_id',
                     'version': 1,
-                    'payload': exploration.to_dict()
+                    'payload': exp_services.to_exploration_dict_for_android(
+                        exploration)
                 }]
             )
 
@@ -293,7 +308,8 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                 [{
                     'id': 'exp_id',
                     'version': 1,
-                    'payload': exploration.to_dict()
+                    'payload': exp_services.to_exploration_dict_for_android(
+                        exploration)
                 }, {
                     'id': 'exp_id',
                     'version': 3,
@@ -493,6 +509,146 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
             self.assertEqual(
                 self.get_json(
                     '/android_data?activity_type=exp_translations&'
+                    'activities_data=[]',
+                    headers={'X-ApiKey': 'secret'},
+                    expected_status_int=200
+                ),
+                []
+            )
+
+    def test_get_exploration_voiceover_without_version_fails(self) -> None:
+        with self.secrets_swap:
+            self.assertEqual(
+                self.get_json(
+                    '/android_data?activity_type=exp_voiceovers&'
+                    'activities_data=['
+                    '  {"id": "voiceover_id", "language_code": "es"}'
+                    ']',
+                    headers={'X-ApiKey': 'secret'},
+                    expected_status_int=400
+                )['error'],
+                'Version and language code must be specified '
+                'for voiceovers'
+            )
+
+    def test_get_exploration_voiceover_returns_correct_json(self) -> None:
+        dummy_manual_voiceover_dict_1: state_domain.VoiceoverDict = {
+            'filename': 'filename1.mp3',
+            'file_size_bytes': 3000,
+            'needs_update': False,
+            'duration_secs': 6.1
+        }
+        dummy_autogenerated_voiceover_dict: state_domain.VoiceoverDict = {
+            'filename': 'filename2.mp3',
+            'file_size_bytes': 3500,
+            'needs_update': False,
+            'duration_secs': 5.9
+        }
+        dummy_manual_voiceover_dict_2: state_domain.VoiceoverDict = {
+            'filename': 'filename3.mp3',
+            'file_size_bytes': 3500,
+            'needs_update': False,
+            'duration_secs': 5.9
+        }
+        voiceover_models.EntityVoiceoversModel.create_new(
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id_1', 1, 'en-US', {
+                'content_0': {
+                    'manual': dummy_manual_voiceover_dict_1,
+                    'auto': dummy_autogenerated_voiceover_dict
+                    }
+                }, {}).put()
+
+        voiceover_models.EntityVoiceoversModel.create_new(
+            feconf.ENTITY_TYPE_EXPLORATION, 'exp_id_1', 1, 'en-NG', {
+                'content_0': {
+                    'manual': dummy_manual_voiceover_dict_2,
+                    'auto': None
+                    }
+                }, {}).put()
+
+        voiceover_autogeneration_policy_model = (
+            voiceover_models.VoiceoverAutogenerationPolicyModel(
+                id=voiceover_models.VOICEOVER_AUTOGENERATION_POLICY_ID)
+        )
+        voiceover_autogeneration_policy_model.language_codes_mapping = {
+            'en': {
+                'en-US': True,
+                'en-NG': False
+            }
+        }
+        (
+            voiceover_autogeneration_policy_model.
+            autogenerated_voiceovers_are_enabled
+        ) = True
+        voiceover_autogeneration_policy_model.update_timestamps()
+        voiceover_autogeneration_policy_model.put()
+
+        expected_payload = {
+            'en-NG': {
+                'automated_voiceovers_audio_offsets_msecs': {},
+                'entity_id': 'exp_id_1',
+                'entity_type': 'exploration',
+                'entity_version': 1,
+                'language_accent_code': 'en-NG',
+                'voiceovers_mapping': {
+                    'content_0': {
+                        'auto': None,
+                        'manual': {
+                            'duration_secs': 5.9,
+                            'file_size_bytes': 3500,
+                            'filename': 'filename3.mp3',
+                            'needs_update': False,
+                        },
+                    }
+                },
+            },
+            'en-US': {
+                'automated_voiceovers_audio_offsets_msecs': {},
+                'entity_id': 'exp_id_1',
+                'entity_type': 'exploration',
+                'entity_version': 1,
+                'language_accent_code': 'en-US',
+                'voiceovers_mapping': {
+                    'content_0': {
+                        'auto': {
+                            'duration_secs': 5.9,
+                            'file_size_bytes': 3500,
+                            'filename': 'filename2.mp3',
+                            'needs_update': False,
+                        },
+                        'manual': {
+                            'duration_secs': 6.1,
+                            'file_size_bytes': 3000,
+                            'filename': 'filename1.mp3',
+                            'needs_update': False,
+                        },
+                    }
+                },
+            },
+        }
+        with self.secrets_swap:
+            response = self.get_json(
+                        '/android_data?activity_type=exp_voiceovers&'
+                        'activities_data=[{'
+                        '    "id": "exp_id_1", '
+                        '    "language_code": "en", '
+                        '    "version": 1'
+                        '}]',
+                        headers={'X-ApiKey': 'secret'},
+                        expected_status_int=200
+                    )
+        self.assertEqual(response[0]['payload'], expected_payload)
+        self.assertEqual(response[0]['id'], 'exp_id_1')
+        self.assertEqual(response[0]['language_code'], 'en')
+        self.assertEqual(response[0]['version'], 1)
+
+    def test_get_exploration_voiceovers_with_zero_items_returns_correct_json(
+        self
+    ) -> None:
+        with self.secrets_swap:
+            self.assertEqual(
+                self.get_json(
+                    '/android_data?activity_type=exp_voiceovers&'
                     'activities_data=[]',
                     headers={'X-ApiKey': 'secret'},
                     expected_status_int=200
@@ -735,7 +891,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                 ),
                 [
                     {'id': 'exp_id', 'version': 1,
-                     'payload': exploration.to_dict()},
+                     'payload': exp_services.to_exploration_dict_for_android(exploration)},
                     {'id': 'nonexistent_exp', 'version': 1, 'payload': None}
                 ]
             )
