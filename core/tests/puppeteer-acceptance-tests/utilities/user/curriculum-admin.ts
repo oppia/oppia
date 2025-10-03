@@ -896,7 +896,7 @@ export class CurriculumAdmin extends TopicManager {
    * Save a topic as a curriculum admin.
    * @param {string} topicName - The name of the Topic whose draft is to be saved.
    */
-  async saveTopicDraft(topicName: string): Promise<void> {
+  async saveTopicDraft(topicName?: string): Promise<void> {
     await this.page.waitForSelector(modalDiv, {hidden: true});
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileOptionsSelector);
@@ -915,7 +915,9 @@ export class CurriculumAdmin extends TopicManager {
       await this.page.waitForSelector('oppia-topic-editor-save-modal', {
         hidden: true,
       });
-      await this.openTopicEditor(topicName);
+      if (topicName) {
+        await this.openTopicEditor(topicName);
+      }
     } else {
       await this.clickOn(saveTopicButton);
 
@@ -1442,9 +1444,11 @@ export class CurriculumAdmin extends TopicManager {
    */
   async addSkillToDiagnosticTest(
     skillName: string,
-    topicName: string
+    topicName?: string
   ): Promise<void> {
-    await this.openTopicEditor(topicName);
+    if (topicName) {
+      await this.openTopicEditor(topicName);
+    }
     await this.clickOn(addDiagnosticTestSkillButton);
     await this.page.waitForSelector(diagnosticTestSkillSelector, {
       visible: true,
@@ -1691,9 +1695,11 @@ export class CurriculumAdmin extends TopicManager {
     storyUrlFragment: string,
     chapterTitle: string,
     explorationId: string,
-    topicName: string
+    topicName?: string
   ): Promise<void> {
-    await this.openTopicEditor(topicName);
+    if (topicName) {
+      await this.openTopicEditor(topicName);
+    }
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileStoryDropdown);
     }

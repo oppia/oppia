@@ -103,7 +103,7 @@ describe('Logged-Out Learner', function () {
     // Play full practice session.
     for (let i = 0; i < 10; i++) {
       await loggedOutLearner.submitAnswer('3');
-      await loggedOutLearner.continueToNextCard();
+      await loggedOutLearner.continueToNextPracticeQuestion();
     }
 
     expect(
