@@ -491,6 +491,10 @@
     {
       "name": "site-moderator/featured-activities-section",
       "module": "core/tests/puppeteer-acceptance-tests/specs/site-moderator/featured-activities-section.spec.ts"
+    },
+    {
+      "name": "logged-out-user/click-all-buttons-on-partnerships-page",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-partnerships-page.spec.ts"
     }
   ],
   "docker_suites": []
