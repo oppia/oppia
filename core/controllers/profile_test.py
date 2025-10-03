@@ -666,10 +666,6 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
                 platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com'
             ),
-            (
-                platform_parameter_list.ParamName.OPPIA_PROJECT_ID,
-                'dev-project-id'
-            )
         ]
     )
     def test_send_post_signup_email(self) -> None:
@@ -1112,10 +1108,6 @@ class SignupTests(test_utils.GenericTestBase):
                 platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
                 'noreply@example.com'
             ),
-            (
-                platform_parameter_list.ParamName.OPPIA_PROJECT_ID,
-                'dev-project-id'
-            )
         ]
     )
     def test_user_settings_of_existing_user(self) -> None:

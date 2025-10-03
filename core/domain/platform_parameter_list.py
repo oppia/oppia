@@ -64,7 +64,6 @@ class ParamName(enum.Enum):
     MAILGUN_DOMAIN_NAME = 'mailgun_domain_name'
     ES_CLOUD_ID = 'es_cloud_id'
     ES_USERNAME = 'es_username'
-    OPPIA_PROJECT_ID = 'oppia_project_id'
     OPPIA_SITE_URL_FOR_EMAILS = 'oppia_site_url_for_emails'
 
 
@@ -103,6 +102,5 @@ ALL_PLATFORM_PARAMS_LIST: List[ParamName] = [
     ParamName.MAILGUN_DOMAIN_NAME,
     ParamName.ES_CLOUD_ID,
     ParamName.ES_USERNAME,
-    ParamName.OPPIA_PROJECT_ID,
     ParamName.OPPIA_SITE_URL_FOR_EMAILS
 ]

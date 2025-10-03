@@ -24,8 +24,6 @@ import tempfile
 
 from core.tests import test_utils
 
-from typing import Dict, List
-
 from . import python_linter, run_lint_checks
 
 LINTER_TESTS_DIR = os.path.join(os.getcwd(), 'scripts', 'linters', 'test_files')
@@ -58,7 +56,6 @@ class FakeClass:
         yield (name, name)"""
 
 NAME_SPACE = multiprocessing.Manager().Namespace()
-PROCESSES: Dict[str, List[str]] = multiprocessing.Manager().dict()
 NAME_SPACE.files = run_lint_checks.FileCache()
 FILE_CACHE = NAME_SPACE.files
 

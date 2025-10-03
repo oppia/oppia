@@ -422,7 +422,7 @@ class ReviewableOpportunitiesHandler(
 
         for item in exp_opp_summaries.values():
             if item is not None:
-                ordered_exp_opp_summaries[getattr(item, 'id', None)] = item
+                ordered_exp_opp_summaries[item.id] = item
         return list(ordered_exp_opp_summaries.values())
 
 
@@ -1287,7 +1287,7 @@ def _get_client_side_stats(
         # and MyPy is unable to infer on which TypedDict 'topic_name' key
         # is added. So, due to this MyPy throws an error. Thus, to avoid
         # the error, we use ignore here.
-        stats_dict['topic_name'] = topic_name_by_topic_id.get(  # type: ignore[index]
+        stats_dict['topic_name'] = topic_name_by_topic_id.get(  # type: ignore[typeddict-item]
             stats_dict['topic_id'], 'UNKNOWN')
         # Here we use MyPy ignore because MyPy doesn't allow key deletion
         # from TypedDict.
