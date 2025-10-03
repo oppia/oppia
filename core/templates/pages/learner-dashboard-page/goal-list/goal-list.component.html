@@ -49,10 +49,10 @@
             </div>
             <a *ngIf="!story.isNodeCompleted(storyNode.getTitle())"
                class="oppia-learner-dash-button-sm oppia-learner-dash-button--goals-list"
-               [ngClass]="allCurrentNodes[i] === j ? (story.getAllNodes()[allCurrentNodes[i]]?.getPublishedStatus()  ? 'oppia-learner-dash-button--default' : 'oppia-learner-dash-button--disabled')
-                : (story.getAllNodes()[allCurrentNodes[i]]?.getPublishedStatus()  ? 'oppia-learner-dash-button--inverse oppia-learner-dash-button--incomplete-goal' : 'oppia-learner-dash-button--disabled')"
-               [attr.href]="story.getAllNodes()[allCurrentNodes[i]]?.getPublishedStatus()  ? getNodeLessonUrl(story, storyNode) : null">
-                {{ story.getAllNodes()[allCurrentNodes[i]]?.getPublishedStatus()  ? ('I18N_LEARNER_DASHBOARD_CARD_BUTTON_START' | translate) : 'Coming Soon' }}
+               [ngClass]="allCurrentNodes[i] === j ? (storyNode.getPublishedStatus()  ? 'oppia-learner-dash-button--default' : 'oppia-learner-dash-button--disabled')
+                : (storyNode.getPublishedStatus()  ? 'oppia-learner-dash-button--inverse oppia-learner-dash-button--incomplete-goal' : 'oppia-learner-dash-button--disabled')"
+               [attr.href]="storyNode.getPublishedStatus()  ? getNodeLessonUrl(story, storyNode) : null">
+                {{ storyNode.getPublishedStatus()  ? ('I18N_LEARNER_DASHBOARD_CARD_BUTTON_START' | translate) : 'Coming Soon' }}
             </a>
           </div>
           <div class="goal-list-story-node-line-container">
