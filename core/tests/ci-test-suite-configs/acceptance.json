@@ -495,6 +495,10 @@
     {
       "name": "logged-out-user/click-all-buttons-on-partnerships-page",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-buttons-on-partnerships-page.spec.ts"
+    },
+    {
+      "name": "logged-out-user/select-and-play-topic-from-classroom-page",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/select-and-play-topic-from-classroom-page.spec.ts"
     }
   ],
   "docker_suites": []
