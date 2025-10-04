@@ -67,7 +67,7 @@ export class HomeTabComponent {
   storySummariesWithAvailableNodes: Set<string> = new Set();
   communityLibraryUrl =
     '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE;
-  hasMultipleUnfinishedPublished!: boolean;
+  hasMultipleUnfinishedPublished: boolean = false;
 
   constructor(
     private i18nLanguageCodeService: I18nLanguageCodeService,
@@ -117,9 +117,6 @@ export class HomeTabComponent {
             currentStorySummary[j].getId()
           );
         }
-        console.log(this.storySummariesWithAvailableNodes);
-        console.log(publishedNodes);
-        console.log(this.hasMultipleUnfinishedPublished);
       }
     }
 
