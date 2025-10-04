@@ -44,7 +44,7 @@ export class LessonCardComponent implements OnInit {
   progress!: number;
   title!: string;
   lessonTopic!: string;
-  statusIsPublished: boolean;
+  statusIsPublished!: boolean;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
