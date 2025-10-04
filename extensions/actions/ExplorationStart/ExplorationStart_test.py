@@ -19,10 +19,9 @@
 from __future__ import annotations
 
 from core.tests import test_utils
-
-from extensions.actions.ExplorationStart import (
+from extensions.actions.ExplorationStart import (  # pylint: disable=unused-import
     ExplorationStart,
-)  # pylint: disable=unused-import # isort: skip
+)
 
 
 class ExplorationStartTests(test_utils.GenericTestBase):

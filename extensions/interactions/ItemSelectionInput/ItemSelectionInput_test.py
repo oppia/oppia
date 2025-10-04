@@ -19,10 +19,9 @@
 from __future__ import annotations
 
 from core.tests import test_utils
-
-from extensions.interactions.ItemSelectionInput import (
+from extensions.interactions.ItemSelectionInput import (  # pylint: disable=unused-import
     ItemSelectionInput,
-)  # pylint: disable=unused-import, line-too-long # isort: skip
+)
 
 
 class ItemSelectionInputTests(test_utils.GenericTestBase):

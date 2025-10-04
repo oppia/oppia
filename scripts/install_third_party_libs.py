@@ -37,38 +37,33 @@ import sys
 import tarfile
 
 from core import feconf
+from scripts import (  # pylint: disable=wrong-import-position, wrong-import-order
+    install_python_dev_dependencies,
+)
 
 from typing import Final
-
-from scripts import (
-    install_python_dev_dependencies,
-)  # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
 
 if not feconf.OPPIA_IS_DOCKERIZED:
     install_python_dev_dependencies.main(['--assert_compiled'])
     from . import (
         pre_commit_hook,
-    )  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+    )  # pylint: disable=wrong-import-position, wrong-import-order
     from . import (
         pre_push_hook,
-    )  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+    )  # pylint: disable=wrong-import-position, wrong-import-order
 
-from . import (
-    clean,
-)  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-from . import (
-    common,
-)  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-
-from core import (
+from core import (  # pylint: disable=wrong-import-position, wrong-import-order
     utils,
-)  # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-from scripts import (
+)
+from scripts import (  # pylint: disable=wrong-import-position, wrong-import-order
     install_dependencies_json_packages,
-)  # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
-from scripts import (
     install_python_prod_dependencies,
-)  # isort:skip   pylint: disable=wrong-import-position, wrong-import-order
+)
+
+from . import (  # pylint: disable=wrong-import-position, wrong-import-order
+    clean,
+    common,
+)
 
 # Place to download zip files for temporary storage.
 TMP_UNZIP_PATH: Final = os.path.join('.', 'tmp_unzip.zip')

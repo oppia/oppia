@@ -19,10 +19,9 @@
 from __future__ import annotations
 
 from core.tests import test_utils
-
-from extensions.interactions.DragAndDropSortInput import (
+from extensions.interactions.DragAndDropSortInput import (  # pylint: disable=unused-import
     DragAndDropSortInput,
-)  # pylint: disable=unused-import, line-too-long # isort: skip
+)
 
 
 class DragAndDropSortInputTests(test_utils.GenericTestBase):
