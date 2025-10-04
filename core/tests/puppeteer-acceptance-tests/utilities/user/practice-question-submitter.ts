@@ -112,7 +112,7 @@ export class PracticeQuestionSubmitter extends Contributor {
     topicName: string
   ): Promise<void> {
     await this.expectElementToBeVisible(submitQuestionTab);
-    await this.clickOn(submitQuestionTab);
+    await this.clickOnElementWithSelector(submitQuestionTab);
 
     const questionElement = await this.expectOpportunityToBePresent(
       skillName,
@@ -149,8 +149,8 @@ export class PracticeQuestionSubmitter extends Contributor {
     // TODO(#23370): Currently, the difficulty selector is not visible.
     // Uncomment the following line when the issue is fixed.
     // const skillDifficultySelector = `.e2e-test-skill-difficulty-${difficulty.toLocaleLowerCase()}`;
-    // await this.clickOn(skillDifficultySelector);
-    await this.clickOn(confirmSkillDificultyButton);
+    // await this.clickOnElementWithSelector(skillDifficultySelector);
+    await this.clickOnElementWithSelector(confirmSkillDificultyButton);
 
     await this.expectElementToBeVisible(confirmSkillDificultyButton, false);
   }
@@ -162,11 +162,11 @@ export class PracticeQuestionSubmitter extends Contributor {
   async seedTextToQuestion(text: string): Promise<void> {
     await this.expectElementToBeVisible(textStateEditSelector);
     await this.waitForElementToStabilize(textStateEditSelector);
-    await this.clickOn(textStateEditSelector);
+    await this.clickOnElementWithSelector(textStateEditSelector);
     await this.page.waitForSelector(stateContentInputField, {visible: true});
     await this.waitForElementToStabilize(stateContentInputField);
     await this.typeInInputField(stateContentInputField, text);
-    await this.clickOn(saveStateEditorContentButton);
+    await this.clickOnElementWithSelector(saveStateEditorContentButton);
 
     await this.expectElementToBeVisible(saveStateEditorContentButton, false);
   }
@@ -176,9 +176,9 @@ export class PracticeQuestionSubmitter extends Contributor {
    */
   async addMathExpressionToQuestion(): Promise<void> {
     await this.expectElementToBeVisible(textStateEditSelector);
-    await this.clickOn(textStateEditSelector);
+    await this.clickOnElementWithSelector(textStateEditSelector);
     await this.page.waitForSelector(stateContentInputField, {visible: true});
-    await this.clickOn(stateContentInputField);
+    await this.clickOnElementWithSelector(stateContentInputField);
     const insertMathExpressionButton = await this.page.$(mathButtonSelector);
     await this.page.evaluate(
       (b: HTMLElement) => b.click(),
@@ -194,8 +194,8 @@ export class PracticeQuestionSubmitter extends Contributor {
     );
 
     await this.waitForElementToBeClickable(closeRichTextEditorButton);
-    await this.clickOn(closeRichTextEditorButton);
-    await this.clickOn(saveStateEditorContentButton);
+    await this.clickOnElementWithSelector(closeRichTextEditorButton);
+    await this.clickOnElementWithSelector(saveStateEditorContentButton);
 
     await this.expectElementToBeVisible(saveStateEditorContentButton, false);
   }
@@ -205,16 +205,16 @@ export class PracticeQuestionSubmitter extends Contributor {
    */
   async addImageToQuestion(): Promise<void> {
     await this.expectElementToBeVisible(textStateEditSelector);
-    await this.clickOn(textStateEditSelector);
+    await this.clickOnElementWithSelector(textStateEditSelector);
     await this.page.waitForSelector(stateContentInputField, {visible: true});
 
     const insertImageButton = await this.page.$(imageButtonSelector);
     await this.page.evaluate((b: HTMLElement) => b.click(), insertImageButton);
 
     await this.page.waitForSelector(uploadImageButton, {visible: true});
-    await this.clickOn(uploadImageButton);
+    await this.clickOnElementWithSelector(uploadImageButton);
     await this.uploadFile(imageToUploadInQuestion);
-    await this.clickOn(useTheUploadImageButton);
+    await this.clickOnElementWithSelector(useTheUploadImageButton);
     await this.waitForPageToFullyLoad();
     await this.typeInInputField(
       imageDescriptionTextInputSelector,
@@ -222,8 +222,8 @@ export class PracticeQuestionSubmitter extends Contributor {
     );
 
     await this.waitForElementToBeClickable(closeRichTextEditorButton);
-    await this.clickOn(closeRichTextEditorButton);
-    await this.clickOn(saveStateEditorContentButton);
+    await this.clickOnElementWithSelector(closeRichTextEditorButton);
+    await this.clickOnElementWithSelector(saveStateEditorContentButton);
 
     await this.expectElementToBeVisible(saveStateEditorContentButton);
   }
@@ -234,9 +234,9 @@ export class PracticeQuestionSubmitter extends Contributor {
    */
   async addHintToState(hint: string): Promise<void> {
     await this.expectElementToBeVisible(addHintButton);
-    await this.clickOn(addHintButton);
+    await this.clickOnElementWithSelector(addHintButton);
     await this.typeInInputField(stateContentInputField, hint);
-    await this.clickOn(saveHintButton);
+    await this.clickOnElementWithSelector(saveHintButton);
 
     await this.expectElementToBeVisible(saveHintButton, false);
   }
@@ -253,7 +253,7 @@ export class PracticeQuestionSubmitter extends Contributor {
     isSolutionNumericInput: boolean
   ): Promise<void> {
     await this.expectElementToBeVisible(addSolutionButton);
-    await this.clickOn(addSolutionButton);
+    await this.clickOnElementWithSelector(addSolutionButton);
 
     const solutionSelector = isSolutionNumericInput
       ? solutionInputNumeric
@@ -261,10 +261,10 @@ export class PracticeQuestionSubmitter extends Contributor {
     await this.page.waitForSelector(solutionSelector, {visible: true});
     await this.typeInInputField(solutionSelector, answer);
     await this.page.waitForSelector(`${submitAnswerButton}:not([disabled])`);
-    await this.clickOn(submitAnswerButton);
+    await this.clickOnElementWithSelector(submitAnswerButton);
     await this.typeInInputField(stateContentInputField, answerExplanation);
     await this.page.waitForSelector(`${submitSolutionButton}:not([disabled])`);
-    await this.clickOn(submitSolutionButton);
+    await this.clickOnElementWithSelector(submitSolutionButton);
 
     await this.expectElementToBeVisible(submitSolutionButton, false);
   }
@@ -274,7 +274,7 @@ export class PracticeQuestionSubmitter extends Contributor {
    */
   async submitQuestionSuggestion(): Promise<void> {
     await this.expectElementToBeVisible(submitQuestionButon);
-    await this.clickOn(submitQuestionButon);
+    await this.clickOnElementWithSelector(submitQuestionButon);
 
     await this.expectElementToBeVisible(submitQuestionButon, false);
   }
@@ -391,15 +391,15 @@ export class PracticeQuestionSubmitter extends Contributor {
     options: string[]
   ): Promise<void> {
     await this.expectElementToBeVisible(addInteractionButton);
-    await this.clickOn(addInteractionButton);
+    await this.clickOnElementWithSelector(addInteractionButton);
     await this.page.waitForSelector(multipleChoiceInteractionButton, {
       visible: true,
     });
-    await this.clickOn(multipleChoiceInteractionButton);
+    await this.clickOnElementWithSelector(multipleChoiceInteractionButton);
 
     for (let i = 0; i < options.length - 1; i++) {
       await this.page.waitForSelector(addResponseOptionButton, {visible: true});
-      await this.clickOn(addResponseOptionButton);
+      await this.clickOnElementWithSelector(addResponseOptionButton);
     }
 
     const responseInputs = await this.page.$$(stateContentInputField);
@@ -407,7 +407,7 @@ export class PracticeQuestionSubmitter extends Contributor {
       await responseInputs[i].type(`${options[i]}`);
     }
 
-    await this.clickOn(saveInteractionButton);
+    await this.clickOnElementWithSelector(saveInteractionButton);
     await this.page.waitForSelector(addInteractionModalSelector, {
       hidden: true,
     });
@@ -417,11 +417,11 @@ export class PracticeQuestionSubmitter extends Contributor {
       : editFeedbackButtonSelector;
 
     await this.waitForElementToStabilize(editFeedbackSelector);
-    await this.clickOn(editFeedbackSelector);
+    await this.clickOnElementWithSelector(editFeedbackSelector);
     await this.page.waitForSelector(stateContentInputField, {visible: true});
     await this.typeInInputField(stateContentInputField, 'Last Card');
-    await this.clickOn(correctAnswerInTheGroupSelector);
-    await this.clickOn(addNewResponseButton);
+    await this.clickOnElementWithSelector(correctAnswerInTheGroupSelector);
+    await this.clickOnElementWithSelector(addNewResponseButton);
 
     await this.expectElementToBeVisible(addNewResponseButton, false);
     showMessage('Multiple Choice interaction has been added successfully.');
@@ -433,18 +433,18 @@ export class PracticeQuestionSubmitter extends Contributor {
    */
   async addTextInputInteractionInQuestionEditor(answer: string): Promise<void> {
     await this.expectElementToBeVisible(addInteractionButton);
-    await this.clickOn(addInteractionButton);
+    await this.clickOnElementWithSelector(addInteractionButton);
     await this.page.waitForSelector(textInputInteractionButton, {
       visible: true,
     });
-    await this.clickOn(textInputInteractionButton);
-    await this.clickOn(saveInteractionButton);
+    await this.clickOnElementWithSelector(textInputInteractionButton);
+    await this.clickOnElementWithSelector(saveInteractionButton);
     await this.page.waitForSelector(addInteractionModalSelector, {
       hidden: true,
     });
     await this.waitForNetworkIdle();
 
-    await this.clickOn(addElementToTextInputInteraction);
+    await this.clickOnElementWithSelector(addElementToTextInputInteraction);
     await this.page.waitForSelector(textInputField, {visible: true});
     await this.typeInInputField(textInputField, answer);
 
@@ -452,11 +452,11 @@ export class PracticeQuestionSubmitter extends Contributor {
       ? editFeedbackButtonMobileSelector
       : editFeedbackButtonSelector;
     await this.waitForElementToBeClickable(editFeedbackSelector);
-    await this.clickOn(editFeedbackSelector);
+    await this.clickOnElementWithSelector(editFeedbackSelector);
     await this.page.waitForSelector(stateContentInputField, {visible: true});
     await this.typeInInputField(stateContentInputField, 'Last Card');
-    await this.clickOn(correctAnswerInTheGroupSelector);
-    await this.clickOn(addNewResponseButton);
+    await this.clickOnElementWithSelector(correctAnswerInTheGroupSelector);
+    await this.clickOnElementWithSelector(addNewResponseButton);
 
     await this.expectElementToBeVisible(addNewResponseButton, false);
     showMessage('Text input interaction has been added successfully.');
@@ -468,10 +468,10 @@ export class PracticeQuestionSubmitter extends Contributor {
    */
   async addMathInteraction(interactionToAdd: string): Promise<void> {
     await this.expectElementToBeVisible(addInteractionButton);
-    await this.clickOn(addInteractionButton);
-    await this.clickOn(mathInteractionsTab);
-    await this.clickOn(` ${interactionToAdd} `);
-    await this.clickOn(saveInteractionButton);
+    await this.clickOnElementWithSelector(addInteractionButton);
+    await this.clickOnElementWithSelector(mathInteractionsTab);
+    await this.clickOnElementWithText(interactionToAdd);
+    await this.clickOnElementWithSelector(saveInteractionButton);
     await this.page.waitForSelector(addInteractionModalSelector, {
       hidden: true,
     });
@@ -492,13 +492,13 @@ export class PracticeQuestionSubmitter extends Contributor {
       : editFeedbackButtonSelector;
 
     await this.waitForElementToBeClickable(editFeedbackSelector);
-    await this.clickOn(editFeedbackSelector);
+    await this.clickOnElementWithSelector(editFeedbackSelector);
 
     await this.typeInInputField(stateContentInputField, feedback);
     if (correctResponse) {
-      await this.clickOn(correctAnswerInTheGroupSelector);
+      await this.clickOnElementWithSelector(correctAnswerInTheGroupSelector);
     }
-    await this.clickOn(addNewResponseButton);
+    await this.clickOnElementWithSelector(addNewResponseButton);
 
     await this.expectElementToBeVisible(addNewResponseButton, false);
   }
@@ -509,11 +509,11 @@ export class PracticeQuestionSubmitter extends Contributor {
   async addImageInteractionInQuestionEditor(): Promise<void> {
     await this.expectElementToBeVisible(addInteractionButton);
 
-    await this.clickOn(addInteractionButton);
-    await this.clickOn('Image Region');
-    await this.clickOn(uploadImageButton);
+    await this.clickOnElementWithSelector(addInteractionButton);
+    await this.clickOnElementWithText('Image Region');
+    await this.clickOnElementWithSelector(uploadImageButton);
     await this.uploadFile(imageToUpload);
-    await this.clickOn(useTheUploadImageButton);
+    await this.clickOnElementWithSelector(useTheUploadImageButton);
     await this.waitForPageToFullyLoad();
     await this.page.waitForSelector('.btn-danger', {visible: true});
 
@@ -545,7 +545,7 @@ export class PracticeQuestionSubmitter extends Contributor {
       console.error('Image element not found.');
     }
 
-    await this.clickOn(saveInteractionButton);
+    await this.clickOnElementWithSelector(saveInteractionButton);
     await this.page.waitForSelector(addInteractionModalSelector, {
       hidden: true,
     });
@@ -553,16 +553,14 @@ export class PracticeQuestionSubmitter extends Contributor {
     const editButtonSelector = this.isViewportAtMobileWidth()
       ? editFeedbackButtonMobileSelector
       : editFeedbackButtonSelector;
-    await this.waitForElementToStabilize(editButtonSelector);
-    await this.waitForElementToBeClickable(editButtonSelector);
-    await this.clickOn(editButtonSelector);
+    await this.clickOnElementWithSelector(editButtonSelector);
     await this.page.waitForSelector(addAnswerGroupComponentSelector, {
       visible: true,
     });
     await this.page.waitForSelector(stateContentInputField, {visible: true});
     await this.typeInInputField(stateContentInputField, 'Last Card');
-    await this.clickOn(correctAnswerInTheGroupSelector);
-    await this.clickOn(addNewResponseButton);
+    await this.clickOnElementWithSelector(correctAnswerInTheGroupSelector);
+    await this.clickOnElementWithSelector(addNewResponseButton);
 
     await this.expectElementToBeVisible(addNewResponseButton, false);
     showMessage('Image interaction has been added successfully.');
@@ -582,35 +580,35 @@ export class PracticeQuestionSubmitter extends Contributor {
     directToCard?: string,
     directToCardWhenStuck?: string
   ): Promise<void> {
-    await this.clickOn(defaultFeedbackTab);
+    await this.clickOnElementWithSelector(defaultFeedbackTab);
 
     if (defaultResponseFeedback) {
-      await this.clickOn(openOutcomeFeedBackEditor);
-      await this.clickOn(stateContentInputField);
+      await this.clickOnElementWithSelector(openOutcomeFeedBackEditor);
+      await this.clickOnElementWithSelector(stateContentInputField);
       await this.typeInInputField(
         stateContentInputField,
         `${defaultResponseFeedback}`
       );
-      await this.clickOn(saveOutcomeFeedbackButton);
+      await this.clickOnElementWithSelector(saveOutcomeFeedbackButton);
       await this.expectElementToBeVisible(saveOutcomeFeedbackButton, false);
     }
 
     if (directToCard) {
-      await this.clickOn(openOutcomeDestButton);
+      await this.clickOnElementWithSelector(openOutcomeDestButton);
       await this.page.select(destinationSelectorDropdown, directToCard);
-      await this.clickOn(saveDestinationButtonSelector);
+      await this.clickOnElementWithSelector(saveDestinationButtonSelector);
       await this.expectElementToBeVisible(saveDestinationButtonSelector, false);
     }
 
     if (directToCardWhenStuck) {
-      await this.clickOn(outcomeDestWhenStuckSelector);
+      await this.clickOnElementWithSelector(outcomeDestWhenStuckSelector);
       // The '4: /' value is used to select the 'a new card called' option in the dropdown.
       await this.select(destinationWhenStuckSelectorDropdown, '4: /');
       await this.typeInInputField(
         addDestinationStateWhenStuckInput,
         directToCardWhenStuck
       );
-      await this.clickOn(saveStuckDestinationButtonSelector);
+      await this.clickOnElementWithSelector(saveStuckDestinationButtonSelector);
       await this.expectElementToBeVisible(
         saveStuckDestinationButtonSelector,
         false
@@ -725,7 +723,7 @@ export class PracticeQuestionSubmitter extends Contributor {
    */
   async closePracticeQuestionModal(): Promise<void> {
     await this.expectElementToBeVisible(closeModalButtonSelector);
-    await this.clickOn(closeModalButtonSelector);
+    await this.clickOnElementWithSelector(closeModalButtonSelector);
 
     // Verify that the modal is closed.
     await this.expectElementToBeVisible(closeModalButtonSelector, false);
