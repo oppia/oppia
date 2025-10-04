@@ -17,7 +17,7 @@
 """Services for the learner groups."""
 
 from __future__ import annotations
-
+import logging
 from core import feature_flag_list
 from core.constants import constants
 from core.domain import (
@@ -30,6 +30,8 @@ from core.domain import (
     subtopic_page_domain,
     topic_domain,
     topic_fetchers,
+    skill_fetchers,
+    question_fetchers,
 )
 from core.platform import models
 
@@ -339,11 +341,19 @@ def get_matching_learner_group_syllabus_to_add(
                     constants.DEFAULT_ADD_SYLLABUS_FILTER
                 )
             ):
-                matching_subtopics_dicts.extend(
-                    get_matching_subtopic_syllabus_item_dicts(
-                        topic, group_subtopic_page_ids
-                    )
+                # Need to show only the topics which have a number of question greater
+                # than 10.
+                skill_ids= topic.get_all_skill_ids()
+                questions, _ = question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
+                10, skill_ids, 0
                 )
+                question_count = len(questions)
+                if(question_count == 10):
+                    matching_subtopics_dicts.extend(
+                        get_matching_subtopic_syllabus_item_dicts(
+                            topic, group_subtopic_page_ids
+                        )
+                    )
         else:
             # If search type is set to default or search type is set to
             # 'Skill', add the subtopics which have the keyword in their
@@ -354,11 +364,19 @@ def get_matching_learner_group_syllabus_to_add(
                     constants.DEFAULT_ADD_SYLLABUS_FILTER
                 )
             ):
-                matching_subtopics_dicts.extend(
-                    get_matching_subtopic_syllabus_item_dicts(
-                        topic, group_subtopic_page_ids, keyword
-                    )
+                # Need to show only the topics which have a number of question greater
+                # than 10.
+                skill_ids= topic.get_all_skill_ids()
+                questions, _ = question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
+                10, skill_ids, 0
                 )
+                question_count = len(questions)
+                if(question_count == 10):
+                    matching_subtopics_dicts.extend(
+                        get_matching_subtopic_syllabus_item_dicts(
+                            topic, group_subtopic_page_ids, keyword
+                        )
+                    )
 
             # If search type is set to default or search type is set to
             # 'Story', add all story ids of this topic to the possible
