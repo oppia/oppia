@@ -16,7 +16,7 @@
  * @fileoverview Component for a lesson
  */
 
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {UrlService} from 'services/contextual/url.service';
@@ -36,8 +36,6 @@ export class LessonCardComponent implements OnInit {
   @Input() isCommunityLessonComplete?: boolean;
   @Input() isGoal?: boolean;
   @Input() isRecommendation?: boolean;
-  @Output() cardVisibilityChange = new EventEmitter<boolean>();
-  storyNode!: StoryNode;
 
   desc!: string;
   imgColor!: string;
@@ -46,9 +44,7 @@ export class LessonCardComponent implements OnInit {
   progress!: number;
   title!: string;
   lessonTopic!: string;
-  statusIsPublished!: boolean;
-  isChapterDraft!: boolean;
-  showCard: boolean = true;
+  statusIsPublished: boolean;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -59,26 +55,6 @@ export class LessonCardComponent implements OnInit {
   ngOnInit(): void {
     if (this.story instanceof StorySummary) {
       this.setStorySummary(this.story);
-
-      const allNodes = this.story.getAllNodes();
-      const completedCount = this.story.getCompletedNodeTitles().length;
-
-      if (completedCount < allNodes.length) {
-        this.storyNode = allNodes[completedCount];
-      } else {
-        this.storyNode = allNodes[allNodes.length - 1];
-      }
-
-      this.statusIsPublished = this.storyNode?.getStatus() === 'Published';
-      this.isChapterDraft = this.storyNode?.getStatus() === 'Draft';
-      if (this.statusIsPublished) {
-        this.lessonUrl = this.getStorySummaryLessonUrl(
-          this.story.getClassroomUrlFragment(),
-          this.story.getTopicUrlFragment(),
-          this.story.getUrlFragment(),
-          this.storyNode
-        );
-      }
     } else if (this.story instanceof CollectionSummary) {
       this.setCollectionSummary(this.story);
     } else {
@@ -87,65 +63,93 @@ export class LessonCardComponent implements OnInit {
   }
 
   setStorySummary(storyModel: StorySummary): void {
-    const allNodes = storyModel.getAllNodes();
-    const completedCount = storyModel.getCompletedNodeTitles().length;
-
-    const inProgressNode =
-      completedCount < allNodes.length
-        ? allNodes[completedCount]
-        : allNodes[allNodes.length - 1];
-
-    this.statusIsPublished = inProgressNode.getStatus() === 'Published';
-    this.isChapterDraft = inProgressNode.getStatus() === 'Draft';
-
-    this.storyNode = inProgressNode;
-
+    const completedStories = storyModel.getCompletedNodeTitles().length;
     this.desc = storyModel.getTitle();
     this.imgColor = storyModel.getThumbnailBgColor();
     this.imgUrl = this.getStorySummaryThumbnailUrl(
       storyModel.getThumbnailFilename(),
       storyModel.getId()
     );
-    this.progress = Math.floor((completedCount / allNodes.length) * 100);
-    this.lessonTopic = this.topic;
 
-    if (this.isRecommendation) {
-      const recommendedNode = allNodes.find(
-        node =>
-          node.getStatus() === 'Published' &&
-          !storyModel.isNodeCompleted(node.getTitle()) &&
-          node.getId() !== inProgressNode.getId()
-      );
-
-      if (!recommendedNode) {
-        this.showCard = false;
-        this.cardVisibilityChange.emit(this.showCard);
-        return;
+    let nextStory = 0;
+    const completedNodeIndices: {[title: string]: number} = {};
+    for (let j = 0; j < storyModel.getAllNodes().length; j++) {
+      if (storyModel.isNodeCompleted(storyModel.getAllNodes()[j].getTitle())) {
+        completedNodeIndices[storyModel.getAllNodes()[j].getTitle()] = j;
       }
-      this.cardVisibilityChange.emit(this.showCard);
-      this.storyNode = recommendedNode;
-      this.statusIsPublished = recommendedNode.getStatus() === 'Published';
-      this.isChapterDraft = recommendedNode.getStatus() === 'Draft';
-
-      const nodeIndex = allNodes.indexOf(recommendedNode);
-      this.title = `Chapter ${nodeIndex + 1}: ${recommendedNode.getTitle()}`;
-      this.lessonUrl = this.getStorySummaryLessonUrl(
-        storyModel.getClassroomUrlFragment(),
-        storyModel.getTopicUrlFragment(),
-        storyModel.getUrlFragment(),
-        recommendedNode
-      );
-      return;
     }
 
-    const inProgressIndex = allNodes.indexOf(inProgressNode);
-    this.title = `Chapter ${inProgressIndex + 1}: ${inProgressNode.getTitle()}`;
+    for (let i = completedStories - 1; i >= 0; i--) {
+      let currentIndex =
+        completedNodeIndices[storyModel.getCompletedNodeTitles()[i]];
+      if (
+        currentIndex === storyModel.getAllNodes().length - 1 &&
+        !storyModel.isNodeCompleted(storyModel.getAllNodes()[0].getTitle())
+      ) {
+        nextStory = 0;
+        break;
+      } else if (
+        currentIndex + 1 < storyModel.getAllNodes().length &&
+        !storyModel.isNodeCompleted(
+          storyModel.getAllNodes()[currentIndex + 1].getTitle()
+        )
+      ) {
+        nextStory = currentIndex + 1;
+        break;
+      }
+    }
+    if (this.isRecommendation) {
+      if (completedStories === 0) {
+        nextStory = 1;
+      } else {
+        let nextRecommendation = nextStory;
+        let recommend = -1;
+        while (nextRecommendation < storyModel.getAllNodes().length - 1) {
+          nextRecommendation += 1;
+          if (
+            !storyModel.isNodeCompleted(
+              storyModel.getAllNodes()[nextRecommendation].getTitle()
+            )
+          ) {
+            recommend = nextRecommendation;
+            break;
+          }
+        }
+
+        if (recommend === -1) {
+          nextRecommendation = 0;
+          while (nextRecommendation < nextStory) {
+            if (
+              !storyModel.isNodeCompleted(
+                storyModel.getAllNodes()[nextRecommendation].getTitle()
+              )
+            ) {
+              recommend = nextRecommendation;
+              break;
+            }
+            nextRecommendation += 1;
+          }
+        }
+        nextStory = recommend;
+      }
+    }
+    // TODO(#18384): Returns next unplayed node from the earliest completed node. Does not account for if played out of order.
+
     this.lessonUrl = this.getStorySummaryLessonUrl(
       storyModel.getClassroomUrlFragment(),
       storyModel.getTopicUrlFragment(),
       storyModel.getUrlFragment(),
-      inProgressNode
+      storyModel.getAllNodes()[nextStory]
     );
+
+    this.title = `Chapter ${nextStory + 1}: ${storyModel.getNodeTitles()[nextStory]}`;
+    this.statusIsPublished = storyModel
+      .getAllNodes()
+      [nextStory].getPublishedStatus();
+    this.progress = Math.floor(
+      (completedStories / storyModel.getNodeTitles().length) * 100
+    );
+    this.lessonTopic = this.topic;
   }
 
   setCollectionSummary(collectionModel: CollectionSummary): void {
@@ -229,12 +233,6 @@ export class LessonCardComponent implements OnInit {
         return 'I18N_LEARNER_DASHBOARD_CARD_BUTTON_START';
       default:
         return 'I18N_LEARNER_DASHBOARD_CARD_BUTTON_RESUME';
-    }
-  }
-
-  onStoryClick(event: Event): void {
-    if (!this.statusIsPublished) {
-      event.preventDefault();
     }
   }
 }

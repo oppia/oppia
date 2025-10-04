@@ -149,7 +149,7 @@ export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
         this.storyNode = allNodes[completedNodesCount];
       }
 
-      this.statusIsPublished = this.storyNode?.getStatus() === 'Published';
+      this.statusIsPublished = this.storyNode?.getPublishedStatus();
       this.storyProgress = Math.floor(
         (completedNodesCount / totalStoryNodesCount) * 100
       );

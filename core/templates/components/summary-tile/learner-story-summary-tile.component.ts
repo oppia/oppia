@@ -116,7 +116,7 @@ export class LearnerStorySummaryTileComponent implements OnInit {
     if (allNodes.length > this.completedNodeCount) {
       this.storyNode = allNodes[this.completedNodeCount];
     }
-    this.statusIsPublished = this.storyNode?.getStatus() === 'Published';
+    this.statusIsPublished = this.storyNode?.getPublishedStatus();
     this.storyProgress = Math.floor(
       (this.completedNodeCount / this.nodeCount) * 100
     );
