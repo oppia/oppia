@@ -163,7 +163,7 @@ export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
     return 'height: 144px; width: 192px;';
   }
 
-  onStoryClick(event: Event) {
+  onStoryClick(event: Event): void {
     if (!this.statusIsPublished) {
       event.preventDefault();
     }
