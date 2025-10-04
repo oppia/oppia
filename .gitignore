@@ -5,7 +5,6 @@
 *.bak
 *.egg-info
 __pycache__/
-.mypy_cache/
 gae_runtime/*
 # Ignore the auto-generated protobuf python code.
 proto_files/*.py
