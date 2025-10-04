@@ -112,7 +112,7 @@ export class HomeTabComponent {
             publishedNodes.length > 1 && remainingPublished > 0;
         }
 
-        if (publishedNodes.length > completedNodes.length) {
+        if (publishedNodes.length - 1 > completedNodes.length) {
           this.storySummariesWithAvailableNodes.add(
             currentStorySummary[j].getId()
           );
