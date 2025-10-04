@@ -86,7 +86,7 @@
 
   <div *ngIf="redesignFeatureFlag">
      <!--TODO(#18384): Hides recommendations if no classroom topics in-progress (isNonemptyObject(untrackedTopics) not sure what this does)-->
-    <div class="oppia-learner-dash-section" *ngIf="getTotalInProgressLessons() > 0">
+    <div class="oppia-learner-dash-section" *ngIf="getTotalInProgressLessons() > 0 && storySummariesWithAvailableNodes.size > 0">
       <p class="oppia-learner-dash-section-heading">
         {{ 'I18N_LEARNER_DASHBOARD_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate }}
       </p>
@@ -109,7 +109,8 @@
           </ng-container>
         </oppia-card-display>
         <!--TODO(#18384): Styling: https://shorturl.at/oAUY5 (links to Figma frame) -->
-        <oppia-card-display *ngIf="storySummariesWithAvailableNodes.size !== 0" [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_RECOMMEND_SECTION'" [numCards]="storySummariesWithAvailableNodes.size" [displayMaxWidth]="'fit-content'">
+        <oppia-card-display *ngIf="hasMultipleUnfinishedPublished &&
+        storySummariesWithAvailableNodes.size > 0" [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_RECOMMEND_SECTION'" [numCards]="storySummariesWithAvailableNodes.size" [displayMaxWidth]="'fit-content'">
           <ng-container *ngFor="let topicSummaryTile of continueWhereYouLeftOffList">
             <ng-container *ngFor="let storySummaryTile of topicSummaryTile.canonicalStorySummaryDicts">
               <lesson-card *ngIf="storySummariesWithAvailableNodes.has(storySummaryTile.getId())" [story]="storySummaryTile" [topic]="topicSummaryTile.name" [isGoal]="currentGoalIds.has(topicSummaryTile.id)" [isRecommendation]="true"> </lesson-card>

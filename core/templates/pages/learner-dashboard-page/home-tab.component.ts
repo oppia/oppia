@@ -67,6 +67,7 @@ export class HomeTabComponent {
   storySummariesWithAvailableNodes: Set<string> = new Set();
   communityLibraryUrl =
     '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE;
+  hasMultipleUnfinishedPublished!: boolean;
 
   constructor(
     private i18nLanguageCodeService: I18nLanguageCodeService,
@@ -99,14 +100,23 @@ export class HomeTabComponent {
       let currentStorySummary =
         this.continueWhereYouLeftOffList[i].getCanonicalStorySummaryDicts();
       for (let j = 0; j < currentStorySummary.length; j++) {
-        if (
-          currentStorySummary[j].getAllNodes().length - 1 >
-          currentStorySummary[j].getCompletedNodeTitles().length
-        ) {
+        const publishedNodes = currentStorySummary[j]
+          .getAllNodes()
+          .filter(node => node.getPublishedStatus());
+
+        const completed =
+          currentStorySummary[j].getCompletedNodeTitles().length;
+        const remainingPublished = publishedNodes.length - completed;
+        this.hasMultipleUnfinishedPublished! =
+          publishedNodes.length > 1 && remainingPublished > 0;
+
+        if (remainingPublished > 0) {
           this.storySummariesWithAvailableNodes.add(
             currentStorySummary[j].getId()
           );
         }
+        console.log(this.storySummariesWithAvailableNodes);
+        console.log(publishedNodes);
       }
     }
 
