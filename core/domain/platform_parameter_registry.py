@@ -573,13 +573,6 @@ Registry.create_platform_parameter(
 )
 
 Registry.create_platform_parameter(
-    ParamName.OPPIA_PROJECT_ID,
-    'Project ID of oppia server.',
-    platform_parameter_domain.DataTypes.STRING,
-    default='dev-project-id'
-)
-
-Registry.create_platform_parameter(
     ParamName.OPPIA_SITE_URL_FOR_EMAILS,
     'Oppia site URL used in emails.',
     platform_parameter_domain.DataTypes.STRING,

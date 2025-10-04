@@ -3540,6 +3540,10 @@ class VerifyUserModelsDeletedHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_user_id = (
+            self.get_user_id_from_email(self.EDITOR_EMAIL))
+
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         self.admin_user_id = (
@@ -3555,9 +3559,10 @@ class VerifyUserModelsDeletedHandlerTest(test_utils.GenericTestBase):
         self.assertFalse(response['related_models_exist'])
 
     def test_get_with_existing_user_id_returns_true(self) -> None:
+        wipeout_service.pre_delete_user(self.editor_user_id)
         response = self.get_json(
             '/verifyusermodelsdeletedhandler',
-            params={'user_id': self.admin_user_id}
+            params={'user_id': self.editor_user_id}
         )
         self.assertTrue(response['related_models_exist'])
 

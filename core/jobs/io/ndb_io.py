@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-from core.domain import platform_parameter_list, platform_parameter_services
 from core.jobs import job_utils
 from core.platform import models
 
@@ -29,8 +28,9 @@ from typing import Optional
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import datastore_services
+    from mypy_imports import app_identity_services, datastore_services
 
+app_identity_services = models.Registry.import_app_identity_services()
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -100,10 +100,7 @@ class PutModels(beam.PTransform): # type: ignore[misc]
             PCollection. An empty PCollection. This is needed because all
             expand() methods need to return some PCollection.
         """
-        oppia_project_id = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.OPPIA_PROJECT_ID.value))
-        assert isinstance(oppia_project_id, str)
+        oppia_project_id = app_identity_services.get_application_id()
         return (
             entities
             | 'Transforming the NDB models into Apache Beam entities' >> (
@@ -135,10 +132,7 @@ class DeleteModels(beam.PTransform): # type: ignore[misc]
             PCollection. An empty PCollection. This is needed because all
             expand() methods need to return some PCollection.
         """
-        oppia_project_id = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.OPPIA_PROJECT_ID.value))
-        assert isinstance(oppia_project_id, str)
+        oppia_project_id = app_identity_services.get_application_id()
         return (
             entities
             | 'Transforming the NDB keys into Apache Beam keys' >> (

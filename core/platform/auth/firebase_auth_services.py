@@ -72,13 +72,17 @@ from typing import List, Optional
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import auth_models, datastore_services
+    from mypy_imports import (
+        app_identity_services,
+        auth_models,
+        datastore_services,
+    )
 
 auth_models, user_models = (
     models.Registry.import_models([models.Names.AUTH, models.Names.USER]))
-
-transaction_services = models.Registry.import_transaction_services()
+app_identity_services = models.Registry.import_app_identity_services()
 datastore_services = models.Registry.import_datastore_services()
+transaction_services = models.Registry.import_transaction_services()
 
 
 def establish_firebase_connection() -> None:
@@ -97,12 +101,7 @@ def establish_firebase_connection() -> None:
             firebase_admin.get_app()
         except ValueError as error:
             if 'initialize_app' in str(error):
-                oppia_project_id = (
-                    platform_parameter_services.get_platform_parameter_value(
-                        platform_parameter_list.ParamName.OPPIA_PROJECT_ID.value
-                    )
-                )
-                assert isinstance(oppia_project_id, str)
+                oppia_project_id = app_identity_services.get_application_id()
                 firebase_admin.initialize_app(
                     options={'projectId': oppia_project_id})
             else:

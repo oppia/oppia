@@ -134,6 +134,7 @@ HOTFIX_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)-hotfix-[1-9]+$'
 TEST_BRANCH_REGEX = r'test-[A-Za-z0-9-]*$'
 USER_PREFERENCES: Dict[str, Optional[str]] = {'open_new_tab_in_browser': None}
 
+DEV_PROJECT_ID = 'dev-project-id'
 FECONF_PATH = os.path.join('core', 'feconf.py')
 CONSTANTS_FILE_PATH = os.path.join('assets', 'constants.ts')
 APP_DEV_YAML_PATH = os.path.join('app_dev.yaml')
