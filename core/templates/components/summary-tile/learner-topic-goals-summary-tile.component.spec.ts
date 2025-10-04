@@ -179,4 +179,22 @@ describe('Learner Topic Goals Summary Tile Component', () => {
       expect(component.getStoryNodeLink()).toBe(storyNodeLink);
     }
   );
+
+  it('should prevent default when story is not published', () => {
+    component.statusIsPublished = false;
+    const mockEvent = jasmine.createSpyObj('event', ['preventDefault']);
+
+    component.onStoryClick(mockEvent);
+
+    expect(mockEvent.preventDefault).toHaveBeenCalled();
+  });
+
+  it('should not prevent default when story is published', () => {
+    component.statusIsPublished = true;
+    const mockEvent = jasmine.createSpyObj('event', ['preventDefault']);
+
+    component.onStoryClick(mockEvent);
+
+    expect(mockEvent.preventDefault).not.toHaveBeenCalled();
+  });
 });
