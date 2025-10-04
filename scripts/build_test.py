@@ -190,8 +190,11 @@ class BuildTests(test_utils.GenericTestBase):
             'path/to/file.654321.js',
         )
         self.assertEqual(
-            build._insert_hash('file.min.js', 'abcdef'), 'file.min.abcdef.js'
-        )  # pylint: disable=protected-access
+            build._insert_hash(  # pylint: disable=protected-access
+                'file.min.js', 'abcdef'
+            ),
+            'file.min.abcdef.js',
+        )
         self.assertEqual(
             build._insert_hash(  # pylint: disable=protected-access
                 'path/to/file.min.js', 'fedcba'
