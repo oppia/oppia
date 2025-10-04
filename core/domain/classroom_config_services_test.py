@@ -348,7 +348,7 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             Exception,
-            ('Classroom with id ' 'non_existent_classroom_id does not exist'),
+            ('Classroom with id non_existent_classroom_id does not exist'),
         ):
             classroom_config_services.delete_classroom(
                 'non_existent_classroom_id'
@@ -364,7 +364,7 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             Exception,
-            ('Classroom with id ' 'non_existent_classroom_id does not exist'),
+            ('Classroom with id non_existent_classroom_id does not exist'),
         ):
             classroom_config_services.delete_classroom(
                 'non_existent_classroom_id'

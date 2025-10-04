@@ -128,7 +128,7 @@ class BaseValidationJob(base_jobs.JobBase):
                 classes.
         """
         raise NotImplementedError(
-            'Missing implementation for get_validation_fns ' 'in derived class.'
+            'Missing implementation for get_validation_fns in derived class.'
         )
 
     def validate_created_on_less_than_last_updated(

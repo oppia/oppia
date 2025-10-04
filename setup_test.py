@@ -31,7 +31,7 @@ class SetupTests(test_utils.GenericTestBase):
     """Unit tests for setup.py."""
 
     def test_setuptools_is_invoked_with_correct_parameters(self) -> None:
-        packages = 'module1==2.1.2\n' 'module2==3.2.3\n' 'module3==4.3.4\n'
+        packages = 'module1==2.1.2\nmodule2==3.2.3\nmodule3==4.3.4\n'
         with open('dummy_requirements.txt', 'w', encoding='utf-8') as f:
             f.write(packages)
 

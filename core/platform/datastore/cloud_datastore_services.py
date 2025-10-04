@@ -59,9 +59,9 @@ JsonProperty = ndb.JsonProperty
 StringProperty = ndb.StringProperty
 TextProperty = ndb.TextProperty
 
-TYPE_MODEL_SUBCLASS = TypeVar(
+TYPE_MODEL_SUBCLASS = TypeVar(  # pylint: disable=invalid-name
     'TYPE_MODEL_SUBCLASS', bound=Model
-)  # pylint: disable=invalid-name
+)
 MAX_GET_RETRIES = 3
 
 CLIENT = ndb.Client()

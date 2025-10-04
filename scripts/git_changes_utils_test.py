@@ -140,8 +140,8 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         )
 
         def mock_popen(
-            cmd_tokens: List[str],
-            stdout: int,
+            cmd_tokens: List[str],  # pylint: disable=unused-argument
+            stdout: int,  # pylint: disable=unused-argument
             stderr: int,  # pylint: disable=unused-argument
         ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
             if 'config' in cmd_tokens:

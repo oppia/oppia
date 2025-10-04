@@ -66,8 +66,8 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
             self.printed_messages.append(message)
 
         def mock_check_call(
-            command: str,
-        ) -> None:  # pylint: disable=unused-argument
+            command: str,  # pylint: disable=unused-argument
+        ) -> None:
             self.check_function_calls['check_call_is_called'] = True
 
         self.open_file_swap = self.swap(utils, 'open_file', mock_open_file)

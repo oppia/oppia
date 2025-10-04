@@ -286,8 +286,8 @@ class CloudTaskRunModel(base_models.BaseModel):
             CloudTaskRunModel.query(
                 datastore_services.all_of(
                     cls.queue_id == queue_id,
-                    cls.deleted
-                    == False,  # pylint: disable=singleton-comparison
+                    cls.deleted  # pylint: disable=singleton-comparison
+                    == False,
                 )
             ).fetch()
         )

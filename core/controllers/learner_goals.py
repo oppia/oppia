@@ -58,8 +58,8 @@ class LearnerGoalsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     @acl_decorators.can_access_learner_dashboard
     def post(
         self,
-        activity_type: str,
-        topic_id: str,  # pylint: disable=unused-argument
+        activity_type: str,  # pylint: disable=unused-argument
+        topic_id: str,
     ) -> None:
         """Adds a topic to the learner's learning goals.
 
@@ -95,7 +95,7 @@ class LearnerGoalsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     @acl_decorators.can_access_learner_dashboard
     def delete(
         self,
-        activity_type: str,
+        activity_type: str,  # pylint: disable=unused-argument
         topic_id: str,  # pylint: disable=unused-argument
     ) -> None:
         """Removes a topic from the learner's learning goals.
