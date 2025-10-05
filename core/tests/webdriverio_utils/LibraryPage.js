@@ -184,22 +184,28 @@ var LibraryPage = function () {
 
   this.playCollection = async function (collectionName) {
     await waitFor.pageToFullyLoad();
+
     await waitFor.visibilityOf(
       allCollectionSummaryTile,
       'Library Page does not have any collections'
     );
-    var collectionCardElement = $(
+
+    const collectionTitleElement = $(
       `.e2e-test-collection-summary-tile-title=${collectionName}`
     );
+
     await waitFor.visibilityOf(
-      collectionCardElement,
-      'Unable to find collection ' + collectionName
+      collectionTitleElement,
+      `Collection title "${collectionName}" not found`
     );
-    // The Collection summary card is masked by a dummy element. Therefore, a
-    // Javascript click is used.
-    var collectionCard = await allCollectionsTitled(collectionName)[0];
-    await collectionCard.waitForClickable({timeout: 60000});
-    await action.click('Collection Card', collectionCard, true);
+
+    // Get the parent clickable <a> or <mat-card>.
+    const collectionTileElement =
+      await collectionTitleElement.$('./ancestor::a');
+
+    // Click via JS to avoid overlay issues.
+    await browser.execute(el => el.click(), collectionTileElement);
+
     await waitFor.pageToFullyLoad();
   };
 
