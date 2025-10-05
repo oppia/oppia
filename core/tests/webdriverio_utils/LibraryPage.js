@@ -45,9 +45,6 @@ var LibraryPage = function () {
   var allExplorationsTitled = function (explorationName) {
     return $$(`.e2e-test-exp-summary-tile-title=${explorationName}`);
   };
-  var allCollectionsTitled = function (collectionName) {
-    return $$(`.e2e-test-collection-summary-tile-title=${collectionName}`);
-  };
   var categorySelector = forms.MultiSelectEditor(
     $('.e2e-test-search-bar-category-selector')
   );
@@ -190,7 +187,7 @@ var LibraryPage = function () {
       'Library Page does not have any collections'
     );
 
-    const collectionTitleElement = $(
+    let collectionTitleElement = $(
       `.e2e-test-collection-summary-tile-title=${collectionName}`
     );
 
@@ -200,8 +197,7 @@ var LibraryPage = function () {
     );
 
     // Get the parent clickable <a> or <mat-card>.
-    const collectionTileElement =
-      await collectionTitleElement.$('./ancestor::a');
+    let collectionTileElement = await collectionTitleElement.$('./ancestor::a');
 
     // Click via JS to avoid overlay issues.
     await browser.execute(el => el.click(), collectionTileElement);
