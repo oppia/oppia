@@ -171,7 +171,6 @@ describe('Collections', function () {
     await users.login('alice@collections.com');
     await libraryPage.get();
     await libraryPage.findCollection('Test Collection');
-    await waitFor.pageToFullyLoad();
     await libraryPage.playCollection('Test Collection');
     await users.logout();
   });

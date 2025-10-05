@@ -198,6 +198,7 @@ var LibraryPage = function () {
     // The Collection summary card is masked by a dummy element. Therefore, a
     // Javascript click is used.
     var collectionCard = await allCollectionsTitled(collectionName)[0];
+    await collectionCard.waitForClickable({timeout: 5000});
     await action.click('Collection Card', collectionCard, true);
     await waitFor.pageToFullyLoad();
   };
