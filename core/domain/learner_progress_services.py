@@ -340,14 +340,24 @@ def mark_story_as_completed(user_id: str, story_id: str) -> None:
 
 
 def mark_topic_as_learnt(user_id: str, topic_id: str) -> None:
-    """Adds the topic id to the learnt list of the user unless the
-    topic has already been learnt by the user. It is also removed from
-    the partially learnt list and topics to learn list(if present).
-
-    Args:
-        user_id: str. The id of the user who has learnt the topic.
-        topic_id: str. The id of the learnt topic.
+    """Marks the topic as learnt only if all stories under it are completed.
+    If not all stories are completed, marks the topic as partially learnt instead.
     """
+
+    from core.domain import topic_fetchers
+
+    all_story_ids_in_topic = topic_fetchers.get_story_ids_linked_to_topic(
+        topic_id
+    )
+    completed_story_ids = get_all_completed_story_ids(user_id)
+
+    all_completed = all(
+        story_id in completed_story_ids for story_id in all_story_ids_in_topic
+    )
+
+    if not all_completed:
+        record_topic_started(user_id, topic_id)
+        return
 
     completed_activities_model = user_models.CompletedActivitiesModel.get(
         user_id, strict=False
@@ -356,10 +366,10 @@ def mark_topic_as_learnt(user_id: str, topic_id: str) -> None:
         completed_activities_model = user_models.CompletedActivitiesModel(
             id=user_id
         )
+
     topic_ids_to_learn = learner_goals_services.get_all_topic_ids_to_learn(
         user_id
     )
-
     activities_completed = _get_completed_activities_from_model(
         completed_activities_model
     )
