@@ -1058,7 +1058,9 @@ VOICE_ARTIST_METADATA_HANDLER = '/voice_artist_metadata_handler'
 GET_SAMPLE_VOICEOVERS_FOR_VOICE_ARTIST = '/get_sample_voiceovers'
 REGENERATE_AUTOMATIC_VOICEOVER_HANDLER_URL = (
     '/regenerate_automatic_voiceover/<exploration_id>')
-
+REGENERATE_VOICEOVER_ON_EXP_UPDATE_URL = (
+    '/regenerate_voiceover_on_exp_update/<exploration_id>/'
+    '<exploration_version>/<exploration_title>')
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'
 EVENT_TYPE_STATE_HIT = 'state_hit'
