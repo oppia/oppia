@@ -297,9 +297,9 @@ class JsTsLintTests(test_utils.LinterTestBase):
         def mock_exists(unused_path: str) -> bool:
             return True
 
-        def mock_popen(
+        def mock_popen(  # pylint: disable=unused-argument
             *args: str, **kwargs: str
-        ) -> MockProcess:  # pylint: disable=unused-argument
+        ) -> MockProcess:
             return MockProcess(
                 returncode=1,
                 stdout=mock_eslint_output.encode('utf-8'),
@@ -349,9 +349,9 @@ class JsTsLintTests(test_utils.LinterTestBase):
         def mock_exists(unused_path: str) -> bool:
             return True
 
-        def mock_popen(
+        def mock_popen(  # pylint: disable=unused-argument
             *args: str, **kwargs: str
-        ) -> MockProcess:  # pylint: disable=unused-argument
+        ) -> MockProcess:
             return MockProcess(
                 returncode=1,
                 stdout=mock_eslint_output.encode('utf-8'),
@@ -385,9 +385,9 @@ class JsTsLintTests(test_utils.LinterTestBase):
         def mock_exists(unused_path: str) -> bool:
             return True
 
-        def mock_popen(
+        def mock_popen(  # pylint: disable=unused-argument
             *args: str, **kwargs: str
-        ) -> MockProcess:  # pylint: disable=unused-argument
+        ) -> MockProcess:
             return MockProcess(
                 returncode=1,
                 stdout=mock_eslint_output.encode('utf-8'),
@@ -412,9 +412,9 @@ class JsTsLintTests(test_utils.LinterTestBase):
         def mock_exists(unused_path: str) -> bool:
             return True
 
-        def mock_popen(
+        def mock_popen(  # pylint: disable=unused-argument
             *args: str, **kwargs: str
-        ) -> MockProcess:  # pylint: disable=unused-argument
+        ) -> MockProcess:
             return MockProcess(returncode=0, stdout=b'', stderr=b'')
 
         exists_swap = self.swap(os.path, 'exists', mock_exists)
