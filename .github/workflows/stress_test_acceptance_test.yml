@@ -1,0 +1,143 @@
+name: Stress Test (Acceptance Test)
+
+permissions: read-all
+on:
+  workflow_dispatch:
+    inputs:
+      num_runs:
+        description: 'Number of times to run the acceptance tests (Max: 128).'
+        required: true
+        default: '10'
+        type: string
+      test_suite:
+        description: 'Acceptance test to run.'
+        required: true
+        type: string
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  generate-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Generate matrix
+        id: set-matrix
+        run: |
+          NUM_RUNS=${{ inputs.num_runs }}
+          MATRIX=$(seq 1 $NUM_RUNS | jq -R . | jq -s -c .)
+          echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
+
+  build:
+    name: Build the app, and store build files as an artifact
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository so that local actions can be used
+        uses: actions/checkout@v4
+      - name: Merge develop and set up dependencies
+        uses: ./.github/actions/merge-develop-and-set-up-dependencies
+      - name: Generate build files
+        uses: ./.github/actions/generate-build-files
+
+  acceptance_test_with_python_installation:
+    needs: [build, generate-matrix]
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        suite: ${{ inputs.test_suite }}
+        mobile: [false, true]
+    name: \[${{ matrix.mobile && 'M' || 'D' }}\] ${{ matrix.suite }}
+    steps:
+      - name: Check for broken suites
+        id: check_skip
+        # TODO(#22448): Remove once all suites are fixed.
+        run: |
+          broken_suites=("exploration-editor/manage-exploration-misconceptions" "exploration-editor/modify-translations-through-modal" "exploration-editor/publish-the-exploration-with-an-interaction" "practice-question-submitter/submit-practice-questions-with-different-interactions-and-difficulties")
+          for suite in "${broken_suites[@]}"; do
+            if [[ "${{ matrix.suite }}" == "$suite" ]]; then
+              echo "Suite '${{ matrix.suite }}' is marked to be skipped."
+              echo "SKIP_SUITE=true" >> $GITHUB_OUTPUT
+              break
+            fi
+          done
+      - name: Checkout repository so that local actions can be used
+        uses: actions/checkout@v4
+      - name: Merge develop and set up dependencies
+        uses: ./.github/actions/merge-develop-and-set-up-dependencies
+      - name: Generate build files
+        uses: ./.github/actions/generate-build-files
+      - name: Generate modified suite name for artifacts
+        id: generate_suite_name_for_artifacts
+        # Replace slashes in the filename with underscores.
+        run: |
+          SUITE_NAME=${{ matrix.suite }}-${{ matrix.run }}-${{ matrix.mobile && 'mobile' || 'desktop' }}
+          echo "MODIFIED_SUITE_NAME=${SUITE_NAME//\//_}" >> $GITHUB_OUTPUT
+      - name: Run Desktop Acceptance Test ${{ matrix.suite }}
+        # TODO(#22448): Remove once all suites are fixed.
+        if: ${{ steps.check_skip.outputs.SKIP_SUITE != 'true' }}
+        run: >
+          set -o pipefail;
+          VIDEO_RECORDING_IS_ENABLED=1
+          xvfb-run -a --server-args="-screen 0, 1920x1080x24"
+          python -m scripts.run_acceptance_tests
+          --suite=${{ matrix.suite }} ${{ matrix.mobile && '--mobile' || '' }}
+          | tee desktop_acceptance_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
+      - name: Upload Desktop test recordings as Artifacts
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-acceptance-test-video-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}-original
+          path: /home/runner/work/oppia/oppia_full_stack_test_video_recordings/acceptance
+      - name: Upload desktop acceptance test logs
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-acceptance-test-logs-${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}
+          path: desktop_acceptance_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
+      - name: Upload desktop test failure screenshots as artifacts
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-acceptance-test-failure-screenshot-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
+          path: /home/runner/work/oppia/oppia_full_stack_test_failure_screenshots/acceptance
+        # TODO(#22667): We are running this step twice, as snapshot gets deleted if 2nd attempt passes.
+      - name: Uploading diff screenshots as an artifact
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: diff-snapshots-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
+          # Note: The path must be kept in sync with the one specified in
+          # core/tests/puppeteer-acceptance-tests/utilities/common/puppeteer-utils.ts
+          path: /home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/diff-snapshots
+      - name: Upload PNG snapshots
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: png-snapshots-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}-new
+          path: core/tests/puppeteer-acceptance-tests/specs/**/*.png
+
+  # New job to collect all PNG snapshots into a single artifact
+  collect_all_screenshots:
+    name: Collect all screenshots into single artifact
+    needs: [acceptance_test_with_python_installation]
+    runs-on: ubuntu-22.04
+    if: ${{ always() }}
+    steps:
+      - name: Download all PNG snapshot artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: png-snapshots-*-new
+          path: temp-screenshots
+          merge-multiple: true
+        continue-on-error: true
+
+      - name: Upload all screenshots as single artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: all-png-snapshots-combined
+          path: temp-screenshots
+          if-no-files-found: warn
