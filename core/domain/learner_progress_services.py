@@ -344,8 +344,6 @@ def mark_topic_as_learnt(user_id: str, topic_id: str) -> None:
     If not all stories are completed, marks the topic as partially learnt instead.
     """
 
-    from core.domain import topic_fetchers
-
     all_story_ids_in_topic = topic_fetchers.get_story_ids_linked_to_topic(
         topic_id
     )
