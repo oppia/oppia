@@ -23,7 +23,7 @@ from core.platform import models
 from typing import Dict, Final, Sequence
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import base_models, datastore_services
 
 (base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
@@ -58,9 +58,14 @@ class JobModel(base_models.BaseModel):
         indexed=True,
         default=STATUS_CODE_NEW,
         choices=[
-            STATUS_CODE_NEW, STATUS_CODE_QUEUED, STATUS_CODE_STARTED,
-            STATUS_CODE_COMPLETED, STATUS_CODE_FAILED, STATUS_CODE_CANCELED
-        ])
+            STATUS_CODE_NEW,
+            STATUS_CODE_QUEUED,
+            STATUS_CODE_STARTED,
+            STATUS_CODE_COMPLETED,
+            STATUS_CODE_FAILED,
+            STATUS_CODE_CANCELED,
+        ],
+    )
     # Any metadata for the job, such as the root pipeline id for mapreduce
     # jobs.
     metadata = datastore_services.JsonProperty(indexed=False)
@@ -73,8 +78,9 @@ class JobModel(base_models.BaseModel):
     error = datastore_services.TextProperty(indexed=False)
     # Whether the datastore models associated with this job have been cleaned
     # up (i.e., deleted).
-    has_been_cleaned_up = (
-        datastore_services.BooleanProperty(default=False, indexed=True))
+    has_been_cleaned_up = datastore_services.BooleanProperty(
+        default=False, indexed=True
+    )
     # Store additional params passed with job.
     additional_job_params = datastore_services.JsonProperty(default=None)
 
@@ -89,26 +95,30 @@ class JobModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user(
-    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
-            'job_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'time_queued_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'time_started_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'time_finished_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'status_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'metadata': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'output': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'error': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'has_been_cleaned_up': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'additional_job_params': base_models.EXPORT_POLICY.NOT_APPLICABLE
-        })
+        return dict(
+            super(cls, cls).get_export_policy(),
+            **{
+                'job_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'time_queued_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'time_started_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'time_finished_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'status_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'metadata': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'output': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'error': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'has_been_cleaned_up': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'additional_job_params': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            },
+        )
 
     @property
     def is_cancelable(self) -> bool:
@@ -131,9 +141,16 @@ class JobModel(base_models.BaseModel):
             list(JobModel) or None. A list of at most `limit` number
             of unfinished jobs.
         """
-        return cls.query().filter(
-            JobModel.status_code.IN([STATUS_CODE_QUEUED, STATUS_CODE_STARTED])
-        ).order(-cls.time_queued_msec).fetch(limit)
+        return (
+            cls.query()
+            .filter(
+                JobModel.status_code.IN(
+                    [STATUS_CODE_QUEUED, STATUS_CODE_STARTED]
+                )
+            )
+            .order(-cls.time_queued_msec)
+            .fetch(limit)
+        )
 
     @classmethod
     def get_unfinished_jobs(cls, job_type: str) -> datastore_services.Query:
@@ -146,8 +163,15 @@ class JobModel(base_models.BaseModel):
             list(JobModel) or None. A list of all jobs that belong
             to the given job_type.
         """
-        return cls.query().filter(cls.job_type == job_type).filter(
-            JobModel.status_code.IN([STATUS_CODE_QUEUED, STATUS_CODE_STARTED]))
+        return (
+            cls.query()
+            .filter(cls.job_type == job_type)
+            .filter(
+                JobModel.status_code.IN(
+                    [STATUS_CODE_QUEUED, STATUS_CODE_STARTED]
+                )
+            )
+        )
 
     @classmethod
     def do_unfinished_jobs_exist(cls, job_type: str) -> bool:

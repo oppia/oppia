@@ -28,7 +28,7 @@ from core import constants, feconf
 from typing import Dict, List, Optional
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from extensions.interactions import base
 
 
@@ -39,18 +39,21 @@ class Registry:
     _interactions: Dict[str, base.BaseInteraction] = {}
     # Dict mapping State schema version (XX) to interaction specs dict,
     # retrieved from interaction_specs_vXX.json.
-    _state_schema_version_to_interaction_specs: (
-        Dict[int, Dict[str, base.BaseInteractionDict]]
-    ) = {}
+    _state_schema_version_to_interaction_specs: Dict[
+        int, Dict[str, base.BaseInteractionDict]
+    ] = {}
 
     @classmethod
     def get_all_interaction_ids(cls) -> List[str]:
         """Get a list of all interaction ids."""
-        return list(set(itertools.chain.from_iterable(
-            interaction_category['interaction_ids']
-            for interaction_category
-            in constants.constants.ALLOWED_INTERACTION_CATEGORIES
-        )))
+        return list(
+            set(
+                itertools.chain.from_iterable(
+                    interaction_category['interaction_ids']
+                    for interaction_category in constants.constants.ALLOWED_INTERACTION_CATEGORIES
+                )
+            )
+        )
 
     @classmethod
     def _refresh(cls) -> None:
@@ -131,9 +134,7 @@ class Registry:
 
     @classmethod
     def get_all_specs_for_state_schema_version(
-        cls,
-        state_schema_version: int,
-        can_fetch_latest_specs: bool = False
+        cls, state_schema_version: int, can_fetch_latest_specs: bool = False
     ) -> Dict[str, base.BaseInteractionDict]:
         """Returns a dict containing the full specs of each interaction for the
         given state schema version, if available else return all specs or an
@@ -154,12 +155,14 @@ class Registry:
             OSError. No interaction specs json file found for the given state
                 schema version.
         """
-        if (state_schema_version not in
-                cls._state_schema_version_to_interaction_specs):
+        if (
+            state_schema_version
+            not in cls._state_schema_version_to_interaction_specs
+        ):
             spec_file_path = os.path.join(
                 'interactions',
                 'legacy_interaction_specs_by_state_version',
-                'interaction_specs_state_v%i.json' % state_schema_version
+                'interaction_specs_state_v%i.json' % state_schema_version,
             )
             spec_file_contents: Optional[str]
             try:
@@ -174,15 +177,19 @@ class Registry:
                     json.loads(spec_file_contents)
                 )
                 cls._state_schema_version_to_interaction_specs[
-                    state_schema_version] = specs_from_json
+                    state_schema_version
+                ] = specs_from_json
                 return cls._state_schema_version_to_interaction_specs[
-                    state_schema_version]
+                    state_schema_version
+                ]
             elif can_fetch_latest_specs:
                 return cls.get_all_specs()
             else:
                 raise IOError(
-                    'No specs JSON file found for state schema v%i' %
-                    state_schema_version)
+                    'No specs JSON file found for state schema v%i'
+                    % state_schema_version
+                )
 
         return cls._state_schema_version_to_interaction_specs[
-            state_schema_version]
+            state_schema_version
+        ]

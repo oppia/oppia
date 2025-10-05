@@ -47,7 +47,8 @@ class ThirdPartyLibDict(TypedDict):
 
 STRICT_TS_CONFIG_FILE_NAME: Final = 'tsconfig-strict.json'
 STRICT_TS_CONFIG_FILEPATH: Final = os.path.join(
-    os.getcwd(), STRICT_TS_CONFIG_FILE_NAME)
+    os.getcwd(), STRICT_TS_CONFIG_FILE_NAME
+)
 
 WEBPACK_CONFIG_FILE_NAME: Final = 'webpack.common.config.ts'
 WEBPACK_CONFIG_FILEPATH: Final = os.path.join(
@@ -73,26 +74,26 @@ THIRD_PARTY_LIBS: List[ThirdPartyLibDict] = [
         'name': 'Guppy',
         'dependency_key': 'guppy-dev',
         'dependency_source': _DEPENDENCY_SOURCE_PACKAGE,
-        'type_defs_filename_prefix': 'guppy-defs-'
+        'type_defs_filename_prefix': 'guppy-defs-',
     },
     {
         'name': 'Skulpt',
         'dependency_key': 'skulpt-dist',
         'dependency_source': _DEPENDENCY_SOURCE_PACKAGE,
-        'type_defs_filename_prefix': 'skulpt-defs-'
+        'type_defs_filename_prefix': 'skulpt-defs-',
     },
     {
         'name': 'MIDI',
         'dependency_key': 'midi',
         'dependency_source': _DEPENDENCY_SOURCE_PACKAGE,
-        'type_defs_filename_prefix': 'midi-defs-'
+        'type_defs_filename_prefix': 'midi-defs-',
     },
     {
         'name': 'Nerdamer',
         'dependency_key': 'nerdamer',
         'dependency_source': _DEPENDENCY_SOURCE_PACKAGE,
-        'type_defs_filename_prefix': 'nerdamer-defs-'
-    }
+        'type_defs_filename_prefix': 'nerdamer-defs-',
+    },
 ]
 
 
@@ -109,7 +110,7 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
         self.file_cache = file_cache
 
     def check_skip_files_in_app_dev_yaml(
-        self
+        self,
     ) -> concurrent_task_utils.TaskResult:
         """Check to ensure that all lines in skip_files in app_dev.yaml
         reference valid files in the repository.
@@ -119,8 +120,9 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
         failed = False
         error_messages = []
         skip_files_section_found = False
-        for line_num, line in enumerate(self.file_cache.readlines(
-                APP_YAML_FILEPATH)):
+        for line_num, line in enumerate(
+            self.file_cache.readlines(APP_YAML_FILEPATH)
+        ):
             stripped_line = line.strip()
             if '# Third party files:' in stripped_line:
                 skip_files_section_found = True
@@ -130,7 +132,7 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
                 continue
             # Extract the file pattern from the line as all skipped file
             # lines start with a dash(-).
-            line_in_concern = stripped_line[len('- '):]
+            line_in_concern = stripped_line[len('- ') :]
             # Adjustments to the dir paths in app_dev.yaml file
             # for glob-style patterns to match correctly.
             if line_in_concern.endswith('/'):
@@ -138,16 +140,17 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
             if not glob.glob(line_in_concern):
                 error_message = (
                     '%s --> Pattern on line %s doesn\'t match '
-                    'any file or directory' % (
-                        APP_YAML_FILEPATH, line_num + 1))
+                    'any file or directory' % (APP_YAML_FILEPATH, line_num + 1)
+                )
                 error_messages.append(error_message)
                 failed = True
 
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages)
+            name, failed, error_messages, error_messages
+        )
 
     def check_third_party_libs_type_defs(
-        self
+        self,
     ) -> concurrent_task_utils.TaskResult:
         """Checks the type definitions for third party libs
         are up to date.
@@ -161,11 +164,11 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
         failed = False
         error_messages = []
 
-        package = json.load(utils.open_file(
-            PACKAGE_JSON_FILE_PATH, 'r'))['dependencies']
+        package = json.load(utils.open_file(PACKAGE_JSON_FILE_PATH, 'r'))[
+            'dependencies'
+        ]
 
-        files_in_typings_dir = os.listdir(
-            os.path.join(os.getcwd(), 'typings'))
+        files_in_typings_dir = os.listdir(os.path.join(os.getcwd(), 'typings'))
 
         for third_party_lib in THIRD_PARTY_LIBS:
             lib_dependency_source = third_party_lib['dependency_source']
@@ -192,40 +195,51 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
             files_with_prefix_name = []
 
             files_with_prefix_name = [
-                file_name for file_name in files_in_typings_dir
-                if file_name.startswith(prefix_name)]
+                file_name
+                for file_name in files_in_typings_dir
+                if file_name.startswith(prefix_name)
+            ]
 
             if len(files_with_prefix_name) > 1:
                 error_message = (
                     'There are multiple type definitions for %s in the typings '
-                    'dir.' % third_party_lib['name'])
+                    'dir.' % third_party_lib['name']
+                )
                 error_messages.append(error_message)
                 failed = True
             elif len(files_with_prefix_name) == 0:
                 error_message = (
                     'There are no type definitions for %s in the typings '
-                    'dir.' % third_party_lib['name'])
+                    'dir.' % third_party_lib['name']
+                )
                 error_messages.append(error_message)
                 failed = True
             else:
                 type_defs_filename = files_with_prefix_name[0]
 
                 type_defs_version = type_defs_filename[
-                    len(prefix_name): -_TYPE_DEFS_FILE_EXTENSION_LENGTH]
+                    len(prefix_name) : -_TYPE_DEFS_FILE_EXTENSION_LENGTH
+                ]
 
                 if lib_version != type_defs_version:
                     error_message = (
                         'Type definitions for %s are not up to date. The '
                         'current version of %s is %s and the type definitions '
                         'are for version %s. Please refer typings/README.md '
-                        'for more details.' % (
-                            third_party_lib['name'], third_party_lib['name'],
-                            lib_version, type_defs_version))
+                        'for more details.'
+                        % (
+                            third_party_lib['name'],
+                            third_party_lib['name'],
+                            lib_version,
+                            type_defs_version,
+                        )
+                    )
                     error_messages.append(error_message)
                     failed = True
 
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages)
+            name, failed, error_messages, error_messages
+        )
 
     def check_webpack_config_file(self) -> concurrent_task_utils.TaskResult:
         """Check to ensure that the instances of HtmlWebpackPlugin in
@@ -241,8 +255,9 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
         error_messages = []
         plugins_section_found = False
         htmlwebpackplugin_section_found = False
-        for line_num, line in enumerate(self.file_cache.readlines(
-                WEBPACK_CONFIG_FILEPATH)):
+        for line_num, line in enumerate(
+            self.file_cache.readlines(WEBPACK_CONFIG_FILEPATH)
+        ):
             stripped_line = line.strip()
             if stripped_line.startswith('plugins:'):
                 plugins_section_found = True
@@ -252,18 +267,27 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
                 error_line_num = line_num
                 htmlwebpackplugin_section_found = True
                 keys = [
-                    'chunks', 'filename', 'meta', 'template', 'minify',
-                    'inject']
-            elif (
-                    htmlwebpackplugin_section_found and
-                    stripped_line.startswith('}),')):
+                    'chunks',
+                    'filename',
+                    'meta',
+                    'template',
+                    'minify',
+                    'inject',
+                ]
+            elif htmlwebpackplugin_section_found and stripped_line.startswith(
+                '}),'
+            ):
                 htmlwebpackplugin_section_found = False
                 if keys:
                     error_message = (
                         'Line %s: The following keys: %s are missing in '
-                        'HtmlWebpackPlugin block in %s' % (
-                            error_line_num + 1, ', '.join(keys),
-                            WEBPACK_CONFIG_FILE_NAME))
+                        'HtmlWebpackPlugin block in %s'
+                        % (
+                            error_line_num + 1,
+                            ', '.join(keys),
+                            WEBPACK_CONFIG_FILE_NAME,
+                        )
+                    )
                     error_messages.append(error_message)
                     failed = True
             if htmlwebpackplugin_section_found:
@@ -272,10 +296,11 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
                     keys.remove(key)
 
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages)
+            name, failed, error_messages, error_messages
+        )
 
     def check_github_workflows_have_name(
-        self
+        self,
     ) -> concurrent_task_utils.TaskResult:
         """Checks that all github actions workflow steps have a name.
 
@@ -294,9 +319,11 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
             workflow_str = self.file_cache.read(workflow_path)
             workflow_dict = yaml.safe_load(workflow_str)
             errors += self._check_that_workflow_steps_have_name(
-                workflow_dict, workflow_path)
+                workflow_dict, workflow_path
+            )
         return concurrent_task_utils.TaskResult(
-            name, bool(errors), errors, errors)
+            name, bool(errors), errors, errors
+        )
 
     # Here we use type Any because the argument 'workflow_dict' accepts
     # dictionaries that represents the content of workflow YAML file and
@@ -318,12 +345,12 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
         """
         jobs_with_unnamed_step = []
         for job, job_dict in workflow_dict['jobs'].items():
-            if ('steps' in job_dict and
-                    any('name' not in step for step in job_dict['steps'])):
+            if 'steps' in job_dict and any(
+                'name' not in step for step in job_dict['steps']
+            ):
                 jobs_with_unnamed_step.append(job)
         return [
-            '%s --> Job %s has an unnamed step' % (
-                workflow_path, job)
+            '%s --> Job %s has an unnamed step' % (workflow_path, job)
             for job in jobs_with_unnamed_step
         ]
 
@@ -346,7 +373,7 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
 
 
 def get_linters(
-    file_cache: run_lint_checks.FileCache
+    file_cache: run_lint_checks.FileCache,
 ) -> Tuple[CustomLintChecksManager, None]:
     """Creates CustomLintChecksManager and returns it.
 

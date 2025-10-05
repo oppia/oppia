@@ -56,9 +56,12 @@ def compile_all_ts_files() -> None:
     run. For more details, please see issue #9458.
     """
     cmd = ('./node_modules/typescript/bin/tsc -p %s -outDir %s') % (
-        './tsconfig-lint.json', COMPILED_TYPESCRIPT_TMP_PATH)
+        './tsconfig-lint.json',
+        COMPILED_TYPESCRIPT_TMP_PATH,
+    )
     proc = subprocess.Popen(
-        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
+    )
 
     _, encoded_stderr = proc.communicate()
     stderr = encoded_stderr.decode('utf-8')
@@ -74,7 +77,7 @@ class JsTsLintChecksManager(linter_utils.BaseLinter):
         self,
         js_files: List[str],
         ts_files: List[str],
-        file_cache: run_lint_checks.FileCache
+        file_cache: run_lint_checks.FileCache,
     ) -> None:
         """Constructs a JsTsLintChecksManager object.
 
@@ -117,11 +120,14 @@ class JsTsLintChecksManager(linter_utils.BaseLinter):
         error_messages: List[str] = []
         injectable_pattern = '%s%s' % (
             'Injectable\\({\\n*\\s*providedIn: \'root\'\\n*}\\)\\n',
-            'export class ([A-Za-z0-9]*)')
+            'export class ([A-Za-z0-9]*)',
+        )
         angular_services_index_path = (
-            './core/templates/services/angular-services.index.ts')
+            './core/templates/services/angular-services.index.ts'
+        )
         angular_services_index = self.file_cache.read(
-            angular_services_index_path)
+            angular_services_index_path
+        )
         error_messages = []
         failed = False
         for file_path in self.ts_files:
@@ -132,21 +138,28 @@ class JsTsLintChecksManager(linter_utils.BaseLinter):
                     continue
                 import_statement_regex = 'import {[\\s*\\w+,]*%s' % class_name
                 if not re.search(
-                        import_statement_regex, angular_services_index):
+                    import_statement_regex, angular_services_index
+                ):
                     error_message = (
                         'Please import %s to Angular Services Index file in %s'
                         'from %s'
-                        % (class_name, angular_services_index_path, file_path))
+                        % (class_name, angular_services_index_path, file_path)
+                    )
                     error_messages.append(error_message)
                     failed = True
 
-                service_name_type_pair_regex = (
-                    '\\[\'%s\',\\n*\\s*%s\\]' % (class_name, class_name))
-                service_name_type_pair = (
-                    '[\'%s\', %s]' % (class_name, class_name))
+                service_name_type_pair_regex = '\\[\'%s\',\\n*\\s*%s\\]' % (
+                    class_name,
+                    class_name,
+                )
+                service_name_type_pair = '[\'%s\', %s]' % (
+                    class_name,
+                    class_name,
+                )
 
                 if not re.search(
-                        service_name_type_pair_regex, angular_services_index):
+                    service_name_type_pair_regex, angular_services_index
+                ):
                     error_message = (
                         'Please add the pair %s to the angularServices in %s'
                         % (service_name_type_pair, angular_services_index_path)
@@ -154,7 +167,8 @@ class JsTsLintChecksManager(linter_utils.BaseLinter):
                     error_messages.append(error_message)
                     failed = True
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages)
+            name, failed, error_messages, error_messages
+        )
 
     def perform_all_lint_checks(self) -> List[concurrent_task_utils.TaskResult]:
         """Perform all the lint checks and returns the messages returned by all
@@ -168,8 +182,12 @@ class JsTsLintChecksManager(linter_utils.BaseLinter):
         if not self.all_filepaths:
             return [
                 concurrent_task_utils.TaskResult(
-                    'JS TS lint', False, [],
-                    ['There are no JavaScript or Typescript files to lint.'])]
+                    'JS TS lint',
+                    False,
+                    [],
+                    ['There are no JavaScript or Typescript files to lint.'],
+                )
+            ]
 
         # Clear temp compiled typescript files from the previous runs.
         shutil.rmtree(COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
@@ -226,11 +244,14 @@ class ThirdPartyJsTsLintChecksManager(linter_utils.BaseLinter):
         # Check if we have enough lines before accessing indices.
         if len(eslint_output_lines) >= 4:
             newlines_present = eslint_output_lines[-1] == '' and (
-                eslint_output_lines[-2] == '')
-            fix_option_present = eslint_output_lines[-3].endswith('`--fix` option.')
+                eslint_output_lines[-2] == ''
+            )
+            fix_option_present = eslint_output_lines[-3].endswith(
+                '`--fix` option.'
+            )
             unicode_x_present = eslint_output_lines[-4].startswith('\u2716')
 
-            if (newlines_present and fix_option_present and unicode_x_present):
+            if newlines_present and fix_option_present and unicode_x_present:
                 eslint_output_lines = eslint_output_lines[:-4]
 
         for line in eslint_output_lines:
@@ -265,12 +286,12 @@ class ThirdPartyJsTsLintChecksManager(linter_utils.BaseLinter):
             Exception. The start.py file not executed.
         """
         node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
-        eslint_path = os.path.join(
-            'node_modules', 'eslint', 'bin', 'eslint.js')
+        eslint_path = os.path.join('node_modules', 'eslint', 'bin', 'eslint.js')
         if not os.path.exists(eslint_path):
             raise Exception(
                 'ERROR    Please run start.py first to install node-eslint '
-                'and its dependencies.')
+                'and its dependencies.'
+            )
 
         files_to_lint = self.all_filepaths
         error_messages = []
@@ -281,7 +302,8 @@ class ThirdPartyJsTsLintChecksManager(linter_utils.BaseLinter):
         eslint_cmd_args = [node_path, eslint_path, '--quiet']
         proc_args = eslint_cmd_args + files_to_lint
         proc = subprocess.Popen(
-            proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        )
 
         encoded_linter_stdout, encoded_linter_stderr = proc.communicate()
         # Standard and error output is in bytes, we need to decode the line to
@@ -297,7 +319,8 @@ class ThirdPartyJsTsLintChecksManager(linter_utils.BaseLinter):
             error_messages.append(self._get_trimmed_error_output(linter_stdout))
 
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, full_error_messages)
+            name, failed, error_messages, full_error_messages
+        )
 
     def perform_all_lint_checks(self) -> List[concurrent_task_utils.TaskResult]:
         """Perform all the lint checks and returns the messages returned by all
@@ -310,8 +333,12 @@ class ThirdPartyJsTsLintChecksManager(linter_utils.BaseLinter):
         if not self.all_filepaths:
             return [
                 concurrent_task_utils.TaskResult(
-                    'JS TS lint', False, [],
-                    ['There are no JavaScript or Typescript files to lint.'])]
+                    'JS TS lint',
+                    False,
+                    [],
+                    ['There are no JavaScript or Typescript files to lint.'],
+                )
+            ]
 
         return [self._lint_js_and_ts_files()]
 
@@ -319,7 +346,7 @@ class ThirdPartyJsTsLintChecksManager(linter_utils.BaseLinter):
 def get_linters(
     js_filepaths: List[str],
     ts_filepaths: List[str],
-    file_cache: run_lint_checks.FileCache
+    file_cache: run_lint_checks.FileCache,
 ) -> Tuple[JsTsLintChecksManager, ThirdPartyJsTsLintChecksManager]:
     """Creates JsTsLintChecksManager and ThirdPartyJsTsLintChecksManager
         objects and return them.
@@ -337,7 +364,8 @@ def get_linters(
     js_ts_file_paths = js_filepaths + ts_filepaths
 
     custom_linter = JsTsLintChecksManager(
-        js_filepaths, ts_filepaths, file_cache)
+        js_filepaths, ts_filepaths, file_cache
+    )
 
     third_party_linter = ThirdPartyJsTsLintChecksManager(js_ts_file_paths)
 

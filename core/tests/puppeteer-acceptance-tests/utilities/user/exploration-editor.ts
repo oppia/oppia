@@ -160,6 +160,7 @@ const saveTranslationButton = 'button.e2e-test-save-translation';
 const stateSolutionTab = '.e2e-test-oppia-solution-tab';
 const editStateSolutionExplanationSelector =
   '.e2e-test-edit-solution-explanation';
+const editSolutionDivSelector = '.e2e-test-edit-solution';
 const saveSolutionEditButton = 'button.e2e-test-save-solution-explanation-edit';
 
 const stateHintTab = '.e2e-test-hint-tab';
@@ -427,8 +428,14 @@ const confirmDeleteInteractionButtonSelector =
   '.e2e-test-confirm-delete-interaction';
 const selectedInteractionNameSelector = '.e2e-test-selected-interaction-name';
 
+const responseInputSelector = '.e2e-test-answer-tab';
+const answerInputSelector = '.e2e-test-answer-description-fragment input';
+const saveAnswerButtonInResponseGroupSelector = '.e2e-test-save-answer';
+const activeRuleTabClass = 'oppia-rule-tab-active';
+const activeTabClass = 'e2e-test-active-tab';
+
 export enum INTERACTION_TYPES {
-  ALGEBRAIC_EXPRESSION = 'Algebric Expression Input',
+  ALGEBRAIC_EXPRESSION = 'Algebraic Expression Input',
   CODE_EDITOR = 'Code Editor',
   CONTINUE_BUTTON = 'Continue Button',
   DRAG_AND_DROP_SORT = 'Drag And Drop Sort',
@@ -449,25 +456,6 @@ export enum INTERACTION_TYPES {
   WORLD_MAP = 'World Map',
   NUMERIC_INPUT = 'Number Input',
 }
-
-const INTERACTION_SELECTORS: Record<string, string> = {
-  [INTERACTION_TYPES.DRAG_AND_DROP_SORT]:
-    '.e2e-test-interaction-tile-DragAndDropSortInput',
-  [INTERACTION_TYPES.SET_INPUT]: '.e2e-test-interaction-tile-SetInput',
-  [INTERACTION_TYPES.NUMERIC_EXPRESSION]:
-    '.e2e-test-interaction-tile-NumericExpressionInput',
-  [INTERACTION_TYPES.ALGEBRAIC_EXPRESSION]:
-    '.e2e-test-interaction-tile-AlgebraicExpressionInput',
-  [INTERACTION_TYPES.MATH_EQUATION]:
-    '.e2e-test-interaction-tile-MathEquationInput',
-  [INTERACTION_TYPES.NUMBER_WITH_UNITS]:
-    '.e2e-test-interaction-tile-NumberWithUnits',
-  [INTERACTION_TYPES.RATIO_EXPRESSION_INPUT]:
-    '.e2e-test-interaction-tile-RatioExpressionInput',
-  [INTERACTION_TYPES.WORLD_MAP]: '.e2e-test-interaction-tile-InteractiveMap',
-  [INTERACTION_TYPES.MUSIC_NOTES_INPUT]:
-    '.e2e-test-interaction-tile-MusicNotesInput',
-} as const;
 
 enum INTERACTION_TABS {
   PROGRAMMING = 'PROGRAMMING',
@@ -515,7 +503,7 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeVisible(feedbackResponseRemoveSelector);
     // Wait for the response modal animation to finish, else it causes flakiness.
     await this.page.waitForTimeout(2000);
-    await this.clickOn(feedbackResponseRemoveSelector);
+    await this.clickOnElementWithSelector(feedbackResponseRemoveSelector);
     await this.expectElementToBeVisible(feedbackResponseRemoveSelector, false);
   }
 
@@ -544,7 +532,7 @@ export class ExplorationEditor extends BaseUser {
     // Wait for 1s to ensure the selected answer is updated in Angular component.
     await this.page.waitForTimeout(1000);
     // Click on Submit Answer button.
-    await this.clickOn(submitAnswerButton);
+    await this.clickOnElementWithSelector(submitAnswerButton);
 
     // Wait for either element to change content.
     await this.page.waitForFunction(
@@ -584,6 +572,9 @@ export class ExplorationEditor extends BaseUser {
     );
   }
 
+  /**
+   * Clicks on the image in the interaction preview card.
+   */
   async clickOnImageInInteractionPreviewCard(): Promise<void> {
     await this.expectElementToBeVisible(imageContainerSelector);
     await this.page.click(imageContainerSelector);
@@ -673,7 +664,7 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(deleteExplorationButton, {
       visible: true,
     });
-    await this.clickOn(deleteExplorationButton);
+    await this.clickOnElementWithSelector(deleteExplorationButton);
     await this.expectElementToBeVisible(confirmExplorationDeletetionButton);
   }
 
@@ -684,7 +675,7 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(confirmExplorationDeletetionButton, {
       visible: true,
     });
-    await this.clickOn(confirmExplorationDeletetionButton);
+    await this.clickOnElementWithSelector(confirmExplorationDeletetionButton);
     await this.page.waitForSelector(confirmExplorationDeletetionButton, {
       visible: false,
     });
@@ -698,7 +689,7 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeVisible(historyUserFilterSelector);
 
     await this.clearAllTextFrom(historyUserFilterSelector);
-    await this.type(historyUserFilterSelector, username);
+    await this.typeInInputField(historyUserFilterSelector, username);
 
     await this.page.keyboard.press('Enter');
   }
@@ -713,7 +704,7 @@ export class ExplorationEditor extends BaseUser {
       : historyPaginationDesktopSelector;
     await this.page.waitForSelector(selector);
 
-    await this.clickOn(selector);
+    await this.clickOnElementWithSelector(selector);
 
     await this.page.waitForSelector('mat-option');
     const optionsElements = await this.page.$$('mat-option');
@@ -784,13 +775,16 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(startNewFeedbackButtonSelector, {
       visible: true,
     });
-    await this.clickOn(startNewFeedbackButtonSelector);
+    await this.clickOnElementWithSelector(startNewFeedbackButtonSelector);
 
     await this.isTextPresentOnPage('Start New Feedback Thread');
 
     await this.page.waitForSelector(newFeedbackThreadModalSelector);
-    await this.type(feedbackSubjectSelectorInNewFeedbackModal, subject);
-    await this.type(feedbackSelectorInNewFeedbackModal, feedback);
+    await this.typeInInputField(
+      feedbackSubjectSelectorInNewFeedbackModal,
+      subject
+    );
+    await this.typeInInputField(feedbackSelectorInNewFeedbackModal, feedback);
 
     expect(
       await this.page.$eval(
@@ -805,7 +799,7 @@ export class ExplorationEditor extends BaseUser {
       )
     ).toBe(feedback);
 
-    await this.clickOn(createThreadButtonSelector);
+    await this.clickOnElementWithSelector(createThreadButtonSelector);
     await this.page.waitForSelector(newFeedbackThreadModalSelector, {
       visible: false,
     });
@@ -841,7 +835,7 @@ export class ExplorationEditor extends BaseUser {
    * Resets the graph differences in the history tab.
    */
   async resetGraphDifferenceInHistoryTab(): Promise<void> {
-    await this.clickOn(resetGraphButton);
+    await this.clickOnElementWithSelector(resetGraphButton);
 
     await this.expectGraphDifferencesToBeVisible(false);
   }
@@ -859,32 +853,31 @@ export class ExplorationEditor extends BaseUser {
     responseIsCorrect?: boolean,
     isLastResponse: boolean = true
   ): Promise<void> {
-    await this.waitForElementToStabilize(feedbackEditorSelector);
-    await this.clickOn(feedbackEditorSelector);
-    await this.type(stateContentInputField, feedback);
+    await this.clickOnElementWithSelector(feedbackEditorSelector);
+    await this.typeInInputField(stateContentInputField, feedback);
     await this.expectTextContentToBe(stateContentInputField, feedback);
     // The '/' value is used to select the 'a new card called' option in the dropdown.
     if (destination) {
       await this.select(destinationCardSelector, '/');
-      await this.type(addStateInput, destination);
+      await this.typeInInputField(addStateInput, destination);
     }
     if (responseIsCorrect) {
-      await this.clickOn(correctAnswerInTheGroupSelector);
+      await this.clickOnElementWithSelector(correctAnswerInTheGroupSelector);
     }
     if (isLastResponse) {
       await this.page.waitForSelector(addNewResponseButton, {
         visible: true,
       });
-      await this.clickOn(addNewResponseButton);
+      await this.clickOnElementWithSelector(addNewResponseButton);
       await this.page
         .waitForSelector(responseModalHeaderSelector, {
           hidden: true,
         })
         .catch(async () => {
-          await this.clickOn(addNewResponseButton);
+          await this.clickOnElementWithSelector(addNewResponseButton);
         });
     } else {
-      await this.clickOn(addAnotherResponseButton);
+      await this.clickOnElementWithSelector(addAnotherResponseButton);
       // The waitForNetworkIdle method waits for the response
       // to the "Save Draft" request from change-list.service.ts
       // to get executed, the Add Response modal to fully appear
@@ -904,7 +897,7 @@ export class ExplorationEditor extends BaseUser {
 
     for (let i = 0; i < zoomLevel; i++) {
       await this.expectElementToBeVisible(zoomIncreaseSelctor);
-      await this.clickOn(zoomIncreaseSelctor);
+      await this.clickOnElementWithSelector(zoomIncreaseSelctor);
       await this.page.waitForTimeout(1000);
     }
 
@@ -960,15 +953,16 @@ export class ExplorationEditor extends BaseUser {
   async customizeDragAndDropSortInteraction(options: string[]): Promise<void> {
     for (let i = 0; i < options.length - 1; i++) {
       await this.page.waitForSelector(addResponseOptionButton, {visible: true});
-      await this.clickOn(addResponseOptionButton);
+      await this.clickOnElementWithSelector(addResponseOptionButton);
     }
 
     const responseInputs = await this.page.$$(stateContentInputField);
     for (let i = 0; i < options.length; i++) {
+      await responseInputs[i].click({clickCount: 3});
       await responseInputs[i].type(`${options[i]}`);
     }
 
-    await this.clickOn(saveInteractionButton);
+    await this.clickOnElementWithSelector(saveInteractionButton);
     await this.page.waitForSelector(addInteractionModalSelector, {
       hidden: true,
     });
@@ -1054,7 +1048,7 @@ export class ExplorationEditor extends BaseUser {
       );
     }
 
-    await this.clickOn(saveInteractionButton);
+    await this.clickOnElementWithSelector(saveInteractionButton);
     await this.page.waitForSelector(addInteractionModalSelector, {
       hidden: true,
     });
@@ -1135,7 +1129,7 @@ export class ExplorationEditor extends BaseUser {
       }
     }
 
-    await this.clickOn(saveInteractionButton);
+    await this.clickOnElementWithSelector(saveInteractionButton);
     await this.page.waitForSelector(addInteractionModalSelector, {
       hidden: true,
     });
@@ -1150,9 +1144,12 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeVisible(
       `${customizeInteractionBodySelector} input`
     );
-    await this.type(`${customizeInteractionBodySelector} input`, customLabel);
+    await this.typeInInputField(
+      `${customizeInteractionBodySelector} input`,
+      customLabel
+    );
 
-    await this.clickOn(saveInteractionButton);
+    await this.clickOnElementWithSelector(saveInteractionButton);
     await this.page.waitForSelector(addInteractionModalSelector, {
       hidden: true,
     });
@@ -1207,7 +1204,7 @@ export class ExplorationEditor extends BaseUser {
     }
 
     // Save.
-    await this.clickOn(saveInteractionButton);
+    await this.clickOnElementWithSelector(saveInteractionButton);
     await this.page.waitForSelector(addInteractionModalSelector, {
       hidden: true,
     });
@@ -1273,7 +1270,7 @@ export class ExplorationEditor extends BaseUser {
     }
 
     // Save.
-    await this.clickOn(saveInteractionButton);
+    await this.clickOnElementWithSelector(saveInteractionButton);
     await this.page.waitForSelector(addInteractionModalSelector, {
       hidden: true,
     });
@@ -1317,7 +1314,7 @@ export class ExplorationEditor extends BaseUser {
       );
     }
 
-    await this.clickOn(saveInteractionButton);
+    await this.clickOnElementWithSelector(saveInteractionButton);
     await this.page.waitForSelector(addInteractionModalSelector, {
       hidden: true,
     });
@@ -1375,7 +1372,7 @@ export class ExplorationEditor extends BaseUser {
       );
     }
 
-    await this.clickOn(saveInteractionButton);
+    await this.clickOnElementWithSelector(saveInteractionButton);
     await this.page.waitForSelector(addInteractionModalSelector, {
       hidden: true,
     });
@@ -1440,7 +1437,7 @@ export class ExplorationEditor extends BaseUser {
       initialZoom
     );
 
-    await this.clickOn(saveInteractionButton);
+    await this.clickOnElementWithSelector(saveInteractionButton);
     await this.page.waitForSelector(addInteractionModalSelector, {
       hidden: true,
     });
@@ -1491,7 +1488,7 @@ export class ExplorationEditor extends BaseUser {
     // Add options.
     for (let i = 0; i < options.length - 1; i++) {
       await this.page.waitForSelector(addResponseOptionButton, {visible: true});
-      await this.clickOn(addResponseOptionButton);
+      await this.clickOnElementWithSelector(addResponseOptionButton);
     }
 
     const responseInputs = await this.page.$$(stateContentInputField);
@@ -1499,7 +1496,7 @@ export class ExplorationEditor extends BaseUser {
       await responseInputs[i].type(`${options[i]}`);
     }
 
-    await this.clickOn(saveInteractionButton);
+    await this.clickOnElementWithSelector(saveInteractionButton);
     await this.page.waitForSelector(addInteractionModalSelector, {
       hidden: true,
     });
@@ -1556,7 +1553,7 @@ export class ExplorationEditor extends BaseUser {
     }
 
     // Save the interaction.
-    await this.clickOn(saveInteractionButton);
+    await this.clickOnElementWithSelector(saveInteractionButton);
     await this.page.waitForSelector(addInteractionModalSelector, {
       hidden: true,
     });
@@ -1596,7 +1593,7 @@ export class ExplorationEditor extends BaseUser {
     );
 
     // Save the interaction.
-    await this.clickOn(saveInteractionButton);
+    await this.clickOnElementWithSelector(saveInteractionButton);
     await this.page.waitForSelector(addInteractionModalSelector, {
       hidden: true,
     });
@@ -1686,7 +1683,7 @@ export class ExplorationEditor extends BaseUser {
     await algebricExpressionEditor.click();
     await algebricExpressionEditor.type(solution);
 
-    await this.clickOn(submitAnswerButton);
+    await this.clickOnElementWithSelector(submitAnswerButton);
 
     // Add explanation.
     await this.addSolutionExplanationAndSave(explaination);
@@ -1741,7 +1738,7 @@ export class ExplorationEditor extends BaseUser {
     await numericExpressionEditor.click();
     await numericExpressionEditor.type(solution);
 
-    await this.clickOn(submitAnswerButton);
+    await this.clickOnElementWithSelector(submitAnswerButton);
 
     // Add explanation.
     await this.addSolutionExplanationAndSave(explaination);
@@ -1756,17 +1753,22 @@ export class ExplorationEditor extends BaseUser {
     interactionType: INTERACTION_TYPES,
     answer: string
   ): Promise<void> {
-    const responseModal = await this.getRuleEditorModal();
     switch (interactionType) {
       case INTERACTION_TYPES.NUMBER_INPUT:
-        (await responseModal.waitForSelector(floatFormInput))?.type(answer);
+        await this.waitForElementToStabilize(
+          `${responseModalBodySelector} ${floatFormInput}`
+        );
+        await this.typeInInputField(
+          `${responseModalBodySelector} ${floatFormInput}`,
+          answer
+        );
         break;
       case INTERACTION_TYPES.MULTIPLE_CHOICE:
         await this.page.waitForSelector(multipleChoiceResponseDropdown, {
           visible: true,
           timeout: 5000,
         });
-        await this.clickOn(multipleChoiceResponseDropdown);
+        await this.clickOnElementWithSelector(multipleChoiceResponseDropdown);
         await this.page.waitForSelector(multipleChoiceResponseOption, {
           visible: true,
         });
@@ -1790,10 +1792,7 @@ export class ExplorationEditor extends BaseUser {
         );
         break;
       case INTERACTION_TYPES.TEXT_INPUT:
-        await this.page.waitForSelector(addResponseOptionButton, {
-          visible: true,
-        });
-        await this.clickOn(addResponseOptionButton);
+        await this.clickOnElementWithSelector(addResponseOptionButton);
         await this.page.waitForSelector(textInputInteractionOption);
         await this.page.type(textInputInteractionOption, answer);
         break;
@@ -1802,7 +1801,7 @@ export class ExplorationEditor extends BaseUser {
           visible: true,
         });
         await this.clearAllTextFrom(intEditorField);
-        await this.type(intEditorField, answer);
+        await this.typeInInputField(intEditorField, answer);
         break;
       // Add cases for other interaction types here
       // case 'otherInteractionType':
@@ -1860,7 +1859,7 @@ export class ExplorationEditor extends BaseUser {
 
     await this.page.type(codeEditorInSolutionModal, solution);
 
-    await this.clickOn(submitAnswerButton);
+    await this.clickOnElementWithSelector(submitAnswerButton);
 
     // Add Explaination.
     await this.addSolutionExplanationAndSave(explaination);
@@ -2020,7 +2019,7 @@ export class ExplorationEditor extends BaseUser {
     await equationBox.click();
     await equationBox.type(solution);
 
-    await this.clickOn(submitAnswerButton);
+    await this.clickOnElementWithSelector(submitAnswerButton);
 
     // Add explanation.
     await this.addSolutionExplanationAndSave(explaination);
@@ -2072,7 +2071,7 @@ export class ExplorationEditor extends BaseUser {
       await nodeSelectElement.select(musicNodes[i]);
     }
 
-    await this.clickOn(submitAnswerButton);
+    await this.clickOnElementWithSelector(submitAnswerButton);
 
     await this.addSolutionExplanationAndSave(explaination);
   }
@@ -2315,13 +2314,13 @@ export class ExplorationEditor extends BaseUser {
     let firstOption = true;
     for (const option of set) {
       if (!firstOption) {
-        await this.clickOn(addResponseOptionButton);
+        await this.clickOnElementWithSelector(addResponseOptionButton);
         firstOption = false;
       }
-      await this.type(`${solutionModal} ${textInputField}`, option);
+      await this.typeInInputField(`${solutionModal} ${textInputField}`, option);
     }
 
-    await this.clickOn(submitAnswerButton);
+    await this.clickOnElementWithSelector(submitAnswerButton);
 
     await this.addSolutionExplanationAndSave(explaination);
   }
@@ -2339,7 +2338,7 @@ export class ExplorationEditor extends BaseUser {
     for (let i = 0; i < answer.length; i++) {
       if (!first) {
         this.expectElementToBeVisible(addResponseOptionButton);
-        this.clickOn(addResponseOptionButton);
+        this.clickOnElementWithSelector(addResponseOptionButton);
       }
       await this.page.waitForFunction(
         (selector: string, numberOfElements: number) => {
@@ -2378,10 +2377,10 @@ export class ExplorationEditor extends BaseUser {
     let firstOption = true;
     for (const option of answer) {
       if (!firstOption) {
-        await this.clickOn(addResponseOptionButton);
+        await this.clickOnElementWithSelector(addResponseOptionButton);
         firstOption = false;
       }
-      await this.type(`${solutionModal} ${textInputField}`, option);
+      await this.typeInInputField(`${solutionModal} ${textInputField}`, option);
     }
 
     await this.clickOnSubmitAnswerButton();
@@ -2429,7 +2428,7 @@ export class ExplorationEditor extends BaseUser {
    */
   async navigateToExplorationEditorFromCreatorDashboard(): Promise<void> {
     await this.page.waitForSelector(createExplorationButtonSelector);
-    await this.clickAndWaitForNavigation(createExplorationButtonSelector);
+    await this.clickAndWaitForNavigation(createExplorationButtonSelector, true);
 
     await this.page.waitForFunction(
       (targetURL: string) => {
@@ -2444,7 +2443,7 @@ export class ExplorationEditor extends BaseUser {
    * Function to navigate to exploration editor.
    */
   async navigateToExplorationEditorPage(): Promise<void> {
-    await this.clickAndWaitForNavigation(createExplorationButtonSelector);
+    await this.clickAndWaitForNavigation(createExplorationButtonSelector, true);
   }
 
   /**
@@ -2477,26 +2476,26 @@ export class ExplorationEditor extends BaseUser {
         await this.page.waitForSelector(mobileOptionsButtonSelector, {
           visible: true,
         });
-        await this.clickOn(mobileOptionsButtonSelector);
+        await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
       }
       await this.page.waitForSelector(mobileNavbarDropdown, {
         visible: true,
       });
-      await this.clickOn(mobileNavbarDropdown);
-      await this.clickOn(mobileSettingsBarSelector);
+      await this.clickOnElementWithSelector(mobileNavbarDropdown);
+      await this.clickOnElementWithSelector(mobileSettingsBarSelector);
 
       // Open all dropdowns because by default all dropdowns are closed in mobile view.
-      await this.clickOn(basicSettingsDropdown);
-      await this.clickOn(advanceSettingsDropdown);
-      await this.clickOn(rolesSettingsDropdown);
-      await this.clickOn(voiceArtistSettingsDropdown);
-      await this.clickOn(permissionSettingsDropdown);
-      await this.clickOn(feedbackSettingsDropdown);
+      await this.clickOnElementWithSelector(basicSettingsDropdown);
+      await this.clickOnElementWithSelector(advanceSettingsDropdown);
+      await this.clickOnElementWithSelector(rolesSettingsDropdown);
+      await this.clickOnElementWithSelector(voiceArtistSettingsDropdown);
+      await this.clickOnElementWithSelector(permissionSettingsDropdown);
+      await this.clickOnElementWithSelector(feedbackSettingsDropdown);
     } else {
       await this.page.waitForSelector(settingsTabSelector, {
         visible: true,
       });
-      await this.clickOn(settingsTabSelector);
+      await this.clickOnElementWithSelector(settingsTabSelector);
     }
 
     await this.page.waitForSelector(settingsContainerSelector, {
@@ -2554,7 +2553,7 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(explorationControlsSettingsDropdown, {
       visible: true,
     });
-    await this.clickOn(explorationControlsSettingsDropdown);
+    await this.clickOnElementWithSelector(explorationControlsSettingsDropdown);
 
     await this.page.waitForSelector(deleteButtonSelector, {
       visible: true,
@@ -2575,7 +2574,7 @@ export class ExplorationEditor extends BaseUser {
 
     // Open the navigation only if it is not open.
     if (!(await this.isElementVisible(openNavbarIconSelector))) {
-      await this.clickOn(mobileOptionsButtonSelector);
+      await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
       await this.expectElementToBeVisible(`${openNavbarIconSelector}`);
       showMessage('Opened Navigation Menu (mobile).');
     }
@@ -2585,7 +2584,7 @@ export class ExplorationEditor extends BaseUser {
       dropdown === 'State Changes' &&
       !(await this.isElementVisible(`${stateChangesDropdownSelector}.show`))
     ) {
-      await this.clickOn(mobileChangesDropdownSelector);
+      await this.clickOnElementWithSelector(mobileChangesDropdownSelector);
       await this.expectElementToBeVisible(
         `${stateChangesDropdownSelector}.show`
       );
@@ -2620,37 +2619,37 @@ export class ExplorationEditor extends BaseUser {
         // The option to save changes appears only in the mobile view after clicking on the mobile options button,
         // which expands the mobile navigation bar.
         if (!element) {
-          await this.clickOn(mobileOptionsButtonSelector);
+          await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
         }
-        await this.clickOn(mobileChangesDropdownSelector);
-        await this.clickOn(mobilePublishButtonSelector);
+        await this.clickOnElementWithSelector(mobileChangesDropdownSelector);
+        await this.clickOnElementWithSelector(mobilePublishButtonSelector);
       } else {
         await this.page.waitForSelector(publishExplorationButtonSelector, {
           visible: true,
         });
-        await this.clickOn(publishExplorationButtonSelector);
+        await this.clickOnElementWithSelector(publishExplorationButtonSelector);
       }
     };
 
     const fillExplorationMetadataDetails = async () => {
-      await this.clickOn(explorationTitleInput);
-      await this.type(explorationTitleInput, title);
-      await this.clickOn(explorationGoalInput);
-      await this.type(explorationGoalInput, goal);
-      await this.clickOn(explorationCategoryDropdown);
-      await this.clickOn(category);
+      await this.clickOnElementWithSelector(explorationTitleInput);
+      await this.typeInInputField(explorationTitleInput, title);
+      await this.clickOnElementWithSelector(explorationGoalInput);
+      await this.typeInInputField(explorationGoalInput, goal);
+      await this.clickOnElementWithSelector(explorationCategoryDropdown);
+      await this.clickOnElementWithText(category);
       if (tags) {
-        await this.type(tagsField, tags);
+        await this.typeInInputField(tagsField, tags);
       }
     };
 
     const confirmPublish = async (): Promise<string> => {
-      await this.clickOn(saveExplorationChangesButton);
+      await this.clickOnElementWithSelector(saveExplorationChangesButton);
+      await this.waitForPageToFullyLoad();
       await this.page.waitForSelector(explorationConfirmPublishButton, {
         visible: true,
       });
-      await this.waitForElementToStabilize(explorationConfirmPublishButton);
-      await this.clickOn(explorationConfirmPublishButton);
+      await this.clickOnElementWithSelector(explorationConfirmPublishButton);
       await this.page.waitForSelector(explorationIdElement);
       const explorationIdUrl = await this.page.$eval(
         explorationIdElement,
@@ -2658,7 +2657,7 @@ export class ExplorationEditor extends BaseUser {
       );
       const explorationId = explorationIdUrl.replace(/^.*\/explore\//, '');
       await this.waitForElementToStabilize(closePublishedPopUpButton);
-      await this.clickOn(closePublishedPopUpButton);
+      await this.clickOnElementWithSelector(closePublishedPopUpButton);
       await this.expectElementToBeVisible(closePublishedPopUpButton, false);
 
       if (!explorationId) {
@@ -2679,7 +2678,7 @@ export class ExplorationEditor extends BaseUser {
         errorSavingExplorationModal
       );
       if (errorSavingExplorationElement) {
-        await this.clickOn(errorSavingExplorationModal);
+        await this.clickOnElementWithSelector(errorSavingExplorationModal);
         await this.page.waitForNavigation({
           waitUntil: ['load', 'networkidle0'],
         });
@@ -2696,13 +2695,13 @@ export class ExplorationEditor extends BaseUser {
     if (this.isViewportAtMobileWidth()) {
       const mobileNavbarElement = await this.page.$(mobileNavbarOptions);
       if (!mobileNavbarElement) {
-        await this.clickOn(mobileOptionsButtonSelector);
+        await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
       }
-      await this.clickOn(mobileNavbarDropdown);
+      await this.clickOnElementWithSelector(mobileNavbarDropdown);
       await this.page.waitForSelector(mobileNavbarPane);
-      await this.clickOn(mobileFeedbackTabButton);
+      await this.clickOnElementWithSelector(mobileFeedbackTabButton);
     } else {
-      await this.clickOn(feedBackButtonTab);
+      await this.clickOnElementWithSelector(feedBackButtonTab);
       await this.waitForNetworkIdle();
     }
 
@@ -2736,7 +2735,7 @@ export class ExplorationEditor extends BaseUser {
         visible: true,
         timeout: 5000,
       });
-      await this.clickOn(dismissWelcomeModalSelector);
+      await this.clickOnElementWithSelector(dismissWelcomeModalSelector);
       await this.page.waitForSelector(dismissWelcomeModalSelector, {
         hidden: true,
       });
@@ -2781,7 +2780,9 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(dismissTranslationWelcomeModalSelector, {
       visible: true,
     });
-    await this.clickOn(dismissTranslationWelcomeModalSelector);
+    await this.clickOnElementWithSelector(
+      dismissTranslationWelcomeModalSelector
+    );
     await this.page.waitForSelector(dismissTranslationWelcomeModalSelector, {
       hidden: true,
     });
@@ -2796,10 +2797,10 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(stateEditSelector, {
       visible: true,
     });
-    await this.clickOn(stateEditSelector);
+    await this.clickOnElementWithSelector(stateEditSelector);
     await this.clearAllTextFrom(stateContentInputField);
-    await this.type(stateContentInputField, `${content}`);
-    await this.clickOn(saveContentButton);
+    await this.typeInInputField(stateContentInputField, `${content}`);
+    await this.clickOnElementWithSelector(saveContentButton);
     await this.page.waitForSelector(stateContentInputField, {hidden: true});
 
     // TODO(#23019): Currently, the content automatically changes spaces in the
@@ -2841,7 +2842,9 @@ export class ExplorationEditor extends BaseUser {
         await this.waitForElementToStabilize(
           INTERACTION_TABS_SELECTORS[interaction]
         );
-        await this.clickOn(INTERACTION_TABS_SELECTORS[interaction]);
+        await this.clickOnElementWithSelector(
+          INTERACTION_TABS_SELECTORS[interaction]
+        );
         showMessage(`Switched to ${interaction} tab.`);
         break;
       }
@@ -2852,7 +2855,6 @@ export class ExplorationEditor extends BaseUser {
    * Function to add an interaction to the exploration.
    * @param {string} interactionToAdd - The interaction type to add to the Exploration.
    * @param {boolean} skipInteractionCustoization - Whether to skip interaction customization.
-   * Note: A space is added before and after the interaction name to match the format in the UI.
    */
   async addInteraction(
     interactionToAdd: string,
@@ -2862,7 +2864,7 @@ export class ExplorationEditor extends BaseUser {
       visible: true,
     });
 
-    await this.clickOn(addInteractionButton);
+    await this.clickOnElementWithSelector(addInteractionButton);
 
     // Check if modal title is correct.
     await this.expectModalTitleToBe('Choose Interaction');
@@ -2871,13 +2873,8 @@ export class ExplorationEditor extends BaseUser {
       interactionToAdd as INTERACTION_TYPES
     );
 
-    const selector =
-      INTERACTION_SELECTORS[interactionToAdd] ?? ` ${interactionToAdd} `;
-    if (INTERACTION_SELECTORS[interactionToAdd]) {
-      await this.page.waitForSelector(selector);
-    }
     await this.waitForNetworkIdle();
-    await this.clickOn(selector);
+    await this.clickOnElementWithText(interactionToAdd);
     if (skipInteractionCustoization) {
       await this.expectCustomizeInteractionTitleToBe(
         `Customize Interaction (${interactionToAdd})`
@@ -2885,7 +2882,7 @@ export class ExplorationEditor extends BaseUser {
       await this.page.waitForSelector(saveInteractionButton, {
         visible: true,
       });
-      await this.clickOn(saveInteractionButton);
+      await this.clickOnElementWithSelector(saveInteractionButton);
       await this.page.waitForSelector(addInteractionModalSelector, {
         hidden: true,
       });
@@ -2903,13 +2900,13 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(addInteractionButton, {
       visible: true,
     });
-    await this.clickOn(addInteractionButton);
+    await this.clickOnElementWithSelector(addInteractionButton);
 
     await this.expectModalTitleToBe('Choose Interaction');
     await this.page.waitForSelector(multipleChoiceInteractionButton, {
       visible: true,
     });
-    await this.clickOn(multipleChoiceInteractionButton);
+    await this.clickOnElementWithSelector(multipleChoiceInteractionButton);
 
     await this.expectCustomizeInteractionTitleToBe(
       'Customize Interaction (Multiple Choice)'
@@ -2917,7 +2914,7 @@ export class ExplorationEditor extends BaseUser {
 
     for (let i = 0; i < options.length - 1; i++) {
       await this.page.waitForSelector(addResponseOptionButton, {visible: true});
-      await this.clickOn(addResponseOptionButton);
+      await this.clickOnElementWithSelector(addResponseOptionButton);
     }
 
     const responseInputs = await this.page.$$(stateContentInputField);
@@ -2925,7 +2922,7 @@ export class ExplorationEditor extends BaseUser {
       await responseInputs[i].type(`${options[i]}`);
     }
 
-    await this.clickOn(saveInteractionButton);
+    await this.clickOnElementWithSelector(saveInteractionButton);
     await this.page.waitForSelector(addInteractionModalSelector, {
       hidden: true,
     });
@@ -2939,12 +2936,12 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(addInteractionButton, {
       visible: true,
     });
-    await this.clickOn(addInteractionButton);
+    await this.clickOnElementWithSelector(addInteractionButton);
     await this.page.waitForSelector(textInputInteractionButton, {
       visible: true,
     });
-    await this.clickOn(textInputInteractionButton);
-    await this.clickOn(saveInteractionButton);
+    await this.clickOnElementWithSelector(textInputInteractionButton);
+    await this.clickOnElementWithSelector(saveInteractionButton);
     await this.page.waitForSelector(addInteractionModalSelector, {
       hidden: true,
     });
@@ -2959,10 +2956,10 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(interactionDiv, {
       visible: true,
     });
-    await this.clickOn(interactionDiv);
-    await this.clickOn(textInputField);
-    await this.type(textInputField, content);
-    await this.clickOn(saveInteractionButton);
+    await this.clickOnElementWithSelector(interactionDiv);
+    await this.clickOnElementWithSelector(textInputField);
+    await this.typeInInputField(textInputField, content);
+    await this.clickOnElementWithSelector(saveInteractionButton);
     await this.page.waitForSelector(addInteractionModalSelector, {
       hidden: true,
     });
@@ -2976,10 +2973,10 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(addInteractionButton, {
       visible: true,
     });
-    await this.clickOn(addInteractionButton);
-    await this.clickOn(mathInteractionsTab);
-    await this.clickOn(` ${interactionToAdd} `);
-    await this.clickOn(saveInteractionButton);
+    await this.clickOnElementWithSelector(addInteractionButton);
+    await this.clickOnElementWithSelector(mathInteractionsTab);
+    await this.clickOnElementWithText(` ${interactionToAdd} `);
+    await this.clickOnElementWithSelector(saveInteractionButton);
     await this.page.waitForSelector(addInteractionModalSelector, {
       hidden: true,
     });
@@ -3002,41 +2999,36 @@ export class ExplorationEditor extends BaseUser {
    */
   async addImageInteraction(
     feedback: string = 'Correct!',
-    nextCard: string = 'Last Card'
+    nextCard?: string
   ): Promise<void> {
     await this.page.waitForSelector(addInteractionButton, {
       visible: true,
     });
     // Click on add interaction button.
-    await this.clickOn(addInteractionButton);
+    await this.clickOnElementWithSelector(addInteractionButton);
     await this.expectModalTitleToBe('Choose Interaction');
 
     // Click on image region interaction.
-    await this.clickOn('Image Region');
+    await this.clickOnElementWithText('Image Region');
     await this.expectCustomizeInteractionTitleToBe(
       'Customize Interaction (Image Region)'
     );
-    await this.clickOn(uploadImageButton);
+    await this.clickOnElementWithSelector(uploadImageButton);
     await this.uploadFile(imageToUpload);
-    await this.clickOn(useTheUploadImageButton);
+    await this.clickOnElementWithSelector(useTheUploadImageButton);
     await this.waitForPageToFullyLoad();
     await this.page.waitForSelector('.btn-danger', {visible: true});
 
     const imageRegionHepler = new ImageAreaSelection(this.page);
     await imageRegionHepler.selectArea(5, 50, 90, 45);
-    await this.clickOn(saveInteractionButton);
+    await this.clickOnElementWithSelector(saveInteractionButton);
     await this.page.waitForSelector(addInteractionModalSelector, {
       hidden: true,
     });
 
     // Update correct response.
     await this.expectModalTitleToBe('Add Response');
-    await this.addResponseDetailsInResponseModal(
-      feedback,
-      nextCard,
-      true,
-      true
-    );
+    await this.addResponseDetailsInResponseModal(feedback, nextCard, true);
   }
 
   /**
@@ -3048,7 +3040,7 @@ export class ExplorationEditor extends BaseUser {
       visible: true,
     });
     await this.clearAllTextFrom(addTitleBar);
-    await this.type(addTitleBar, title);
+    await this.typeInInputField(addTitleBar, title);
     await this.page.keyboard.press('Tab');
 
     const newTitle = await this.page.$eval(addTitleBar, el =>
@@ -3102,9 +3094,9 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(addGoalInputBox, {
       visible: true,
     });
-    await this.clickOn(addGoalInputBox);
+    await this.clickOnElementWithSelector(addGoalInputBox);
     await this.clearAllTextFrom(addGoalInputBox);
-    await this.type(addGoalInputBox, goal);
+    await this.typeInInputField(addGoalInputBox, goal);
     await this.page.keyboard.press('Tab');
 
     const addGoalInput = await this.page.$(addGoalInputBox);
@@ -3150,8 +3142,8 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(categoryDropdown, {
       visible: true,
     });
-    await this.clickOn(categoryDropdown);
-    await this.clickOn(category);
+    await this.clickOnElementWithSelector(categoryDropdown);
+    await this.clickOnElementWithText(category);
     await this.expectSelectedCategoryToBe(category);
   }
 
@@ -3190,8 +3182,8 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(languageUpdateDropdown, {
       visible: true,
     });
-    await this.clickOn(languageUpdateDropdown);
-    await this.clickOn(language);
+    await this.clickOnElementWithSelector(languageUpdateDropdown);
+    await this.clickOnElementWithText(language);
     await this.page.waitForNetworkIdle();
 
     await this.expectSelectedLanguageToBe(language);
@@ -3247,8 +3239,8 @@ export class ExplorationEditor extends BaseUser {
       visible: true,
     });
     for (let i = 0; i < tagNames.length; i++) {
-      await this.clickOn(addTagsInputBox);
-      await this.type(addTagsInputBox, tagNames[i].toLowerCase());
+      await this.clickOnElementWithSelector(addTagsInputBox);
+      await this.typeInInputField(addTagsInputBox, tagNames[i].toLowerCase());
       await this.page.keyboard.press('Tab');
     }
 
@@ -3291,7 +3283,7 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(previewSummaryButton, {
       visible: true,
     });
-    await this.clickOn(previewSummaryButton);
+    await this.clickOnElementWithSelector(previewSummaryButton);
     await this.expectPreviewSummaryToBeVisible();
   }
 
@@ -3299,7 +3291,7 @@ export class ExplorationEditor extends BaseUser {
    * Closes preview summary modal by clicking on the "Return to editor" button.
    */
   async closePreviewSummary(): Promise<void> {
-    await this.clickOn(dismissPreviewButton);
+    await this.clickOnElementWithSelector(dismissPreviewButton);
     await this.page.waitForSelector(dismissPreviewButton, {
       hidden: true,
     });
@@ -3335,7 +3327,7 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(textToSpeechToggle, {
       visible: true,
     });
-    await this.clickOn(textToSpeechToggle);
+    await this.clickOnElementWithSelector(textToSpeechToggle);
     await this.expectAutomaticTextToSpeechToBeEnabled();
   }
 
@@ -3363,10 +3355,10 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(editRolesButtonSelector, {
       visible: true,
     });
-    await this.clickOn(editRoleButton);
-    await this.clickOn(addUsernameInputBox);
-    await this.type(addUsernameInputBox, username);
-    await this.clickOn(addRoleDropdown);
+    await this.clickOnElementWithSelector(editRoleButton);
+    await this.clickOnElementWithSelector(addUsernameInputBox);
+    await this.typeInInputField(addUsernameInputBox, username);
+    await this.clickOnElementWithSelector(addRoleDropdown);
     const [managerOption] = await this.page.$x(
       "//mat-option[contains(., 'Manager (can edit permissions)')]"
     );
@@ -3374,7 +3366,7 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(tagFilterDropdownSelector, {
       hidden: true,
     });
-    await this.clickOn(saveRoleButton);
+    await this.clickOnElementWithSelector(saveRoleButton);
     await this.page.waitForSelector(saveRoleButton, {hidden: true});
     showMessage(`${username} has been added as manager role.`);
   }
@@ -3386,13 +3378,13 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(editRolesButtonSelector, {
       visible: true,
     });
-    await this.clickOn(editRoleButton);
-    await this.clickOn(addUsernameInputBox);
-    await this.type(addUsernameInputBox, username);
-    await this.clickOn(addRoleDropdown);
-    await this.clickOn(collaboratorRoleOption);
+    await this.clickOnElementWithSelector(editRoleButton);
+    await this.clickOnElementWithSelector(addUsernameInputBox);
+    await this.typeInInputField(addUsernameInputBox, username);
+    await this.clickOnElementWithSelector(addRoleDropdown);
+    await this.clickOnElementWithText(collaboratorRoleOption);
     await this.waitForElementToStabilize(saveRoleButton);
-    await this.clickOn(saveRoleButton);
+    await this.clickOnElementWithSelector(saveRoleButton);
     await this.page.waitForSelector(saveRoleButton, {hidden: true});
     showMessage(`${username} has been added as collaboratorRole.`);
   }
@@ -3404,15 +3396,15 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(editRolesButtonSelector, {
       visible: true,
     });
-    await this.clickOn(editRoleButton);
+    await this.clickOnElementWithSelector(editRoleButton);
     await this.page.waitForSelector('.e2e-test-editor-role-names', {
       visible: true,
     });
-    await this.clickOn(addUsernameInputBox);
-    await this.type(addUsernameInputBox, username);
-    await this.clickOn(addRoleDropdown);
-    await this.clickOn(playtesterRoleOption);
-    await this.clickOn(saveRoleButton);
+    await this.clickOnElementWithSelector(addUsernameInputBox);
+    await this.typeInInputField(addUsernameInputBox, username);
+    await this.clickOnElementWithSelector(addRoleDropdown);
+    await this.clickOnElementWithText(playtesterRoleOption);
+    await this.clickOnElementWithSelector(saveRoleButton);
     await this.page.waitForSelector(saveRoleButton, {hidden: true});
     showMessage(`${username} has been added as playtester.`);
   }
@@ -3424,7 +3416,7 @@ export class ExplorationEditor extends BaseUser {
     let publishButtonSelector = '.e2e-test-publish-exploration';
     if (this.isViewportAtMobileWidth()) {
       publishButtonSelector = mobilePublishButtonSelector;
-      await this.clickOn(mobileChangesDropdownSelector);
+      await this.clickOnElementWithSelector(mobileChangesDropdownSelector);
     }
     const publishButton = await this.page.$(publishButtonSelector);
     if (!publishButton) {
@@ -3445,7 +3437,7 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(feedbackToggle, {
       visible: true,
     });
-    await this.clickOn(feedbackToggle);
+    await this.clickOnElementWithSelector(feedbackToggle);
     await this.expectEmailNotificationsToBeActivated();
   }
 
@@ -3486,26 +3478,26 @@ export class ExplorationEditor extends BaseUser {
         await this.page.waitForSelector(mobileOptionsButtonSelector, {
           visible: true,
         });
-        await this.clickOn(mobileOptionsButtonSelector);
+        await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
       }
 
       await this.page.waitForSelector(
         `${mobileSaveChangesButtonSelector}:not([disabled])`,
         {visible: true}
       );
-      await this.clickOn(mobileSaveChangesButtonSelector);
+      await this.clickOnElementWithSelector(mobileSaveChangesButtonSelector);
     } else {
       await this.page.waitForSelector(saveChangesButton, {
         visible: true,
       });
-      await this.clickOn(saveChangesButton);
+      await this.clickOnElementWithSelector(saveChangesButton);
     }
     // We skip the commit message if it's an empty string.
     if (commitMessage) {
-      await this.clickOn(commitMessageSelector);
-      await this.type(commitMessageSelector, commitMessage);
+      await this.clickOnElementWithSelector(commitMessageSelector);
+      await this.typeInInputField(commitMessageSelector, commitMessage);
     }
-    await this.clickOn(saveDraftButton);
+    await this.clickOnElementWithSelector(saveDraftButton);
     await this.page.waitForSelector(saveDraftButton, {hidden: true});
 
     // Toast message confirms that the draft has been saved.
@@ -3527,15 +3519,15 @@ export class ExplorationEditor extends BaseUser {
       await this.page.waitForSelector(mobileChangesDropdownSelector, {
         visible: true,
       });
-      await this.clickOn(mobileChangesDropdownSelector);
-      await this.clickOn(mobilePublishButtonSelector);
+      await this.clickOnElementWithSelector(mobileChangesDropdownSelector);
+      await this.clickOnElementWithSelector(mobilePublishButtonSelector);
     } else {
       await this.page.waitForSelector(publishExplorationButtonSelector, {
         visible: true,
       });
-      await this.clickOn(publishExplorationButtonSelector);
+      await this.clickOnElementWithSelector(publishExplorationButtonSelector);
     }
-    await this.clickOn(explorationConfirmPublishButton);
+    await this.clickOnElementWithSelector(explorationConfirmPublishButton);
     await this.page.waitForSelector(closePublishedPopUpButton, {visible: true});
 
     const explorationUrlAfterPublished = await this.page.url();
@@ -3543,7 +3535,7 @@ export class ExplorationEditor extends BaseUser {
       .replace(/^.*\/create\//, '')
       .replace(/#\/.*/, '');
 
-    await this.clickOn(closePublishedPopUpButton);
+    await this.clickOnElementWithSelector(closePublishedPopUpButton);
     await this.expectExplorationToBePublished();
 
     return explorationId;
@@ -3557,22 +3549,25 @@ export class ExplorationEditor extends BaseUser {
       await this.page.waitForSelector(mobileChangesDropdownSelector, {
         visible: true,
       });
-      await this.clickOn(mobileChangesDropdownSelector);
-      await this.clickOn(mobileDiscardButtonSelector);
+      await this.clickOnElementWithSelector(mobileChangesDropdownSelector);
+      await this.clickOnElementWithSelector(mobileDiscardButtonSelector);
     } else {
       await this.page.waitForSelector(discardDraftDropdownSelector, {
         visible: true,
       });
-      await this.clickOn(discardDraftDropdownSelector);
+      await this.clickOnElementWithSelector(discardDraftDropdownSelector);
       await this.page.waitForSelector(desktopDiscardDraftButton, {
         visible: true,
       });
-      await this.clickOn(desktopDiscardDraftButton);
+      await this.clickOnElementWithSelector(desktopDiscardDraftButton);
     }
     await this.page.waitForSelector(confirmDiscardButton, {
       visible: true,
     });
-    await this.clickAndWaitForNavigation(confirmDiscardButton);
+    await Promise.all([
+      this.clickOnElementWithSelector(confirmDiscardButton),
+      this.page.waitForNavigation({waitUntil: 'networkidle0'}),
+    ]);
     await this.waitForStaticAssetsToLoad();
     await this.expectElementToBeVisible(confirmDiscardButton, false);
   }
@@ -3584,7 +3579,7 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(stateResponsesSelector, {
       visible: true,
     });
-    await this.clickOn(stateResponsesSelector);
+    await this.clickOnElementWithSelector(stateResponsesSelector);
     await this.page.waitForSelector(oppiaFeebackEditorContainerSelector, {
       visible: true,
     });
@@ -3598,12 +3593,12 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(openOutcomeDestButton, {
       visible: true,
     });
-    await this.clickOn(openOutcomeDestButton);
+    await this.clickOnElementWithSelector(openOutcomeDestButton);
     await this.waitForElementToBeClickable(destinationCardSelector);
     // The '/' value is used to select the 'a new card called' option in the dropdown.
     await this.select(destinationCardSelector, '/');
-    await this.type(addStateInput, cardName);
-    await this.clickOn(saveOutcomeDestButton);
+    await this.typeInInputField(addStateInput, cardName);
+    await this.clickOnElementWithSelector(saveOutcomeDestButton);
     await this.page.waitForSelector(saveOutcomeDestButton, {
       hidden: true,
     });
@@ -3617,10 +3612,10 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(openOutcomeDestButton, {
       visible: true,
     });
-    await this.clickOn(openOutcomeDestButton);
+    await this.clickOnElementWithSelector(openOutcomeDestButton);
     await this.waitForElementToBeClickable(destinationCardSelector);
     await this.select(destinationCardSelector, cardName);
-    await this.clickOn(saveOutcomeDestButton);
+    await this.clickOnElementWithSelector(saveOutcomeDestButton);
     await this.page.waitForSelector(saveOutcomeDestButton, {
       hidden: true,
     });
@@ -3631,7 +3626,7 @@ export class ExplorationEditor extends BaseUser {
    */
   async openExplorationStateGraphInMobileView(): Promise<void> {
     await this.expectElementToBeVisible(mobileStateGraphResizeButton);
-    await this.clickOn(mobileStateGraphResizeButton);
+    await this.clickOnElementWithSelector(mobileStateGraphResizeButton);
     await this.expectElementToBeVisible(explorationStateGraphModalSelector);
   }
 
@@ -3645,7 +3640,7 @@ export class ExplorationEditor extends BaseUser {
       await this.page.waitForSelector(mobileStateGraphResizeButton, {
         visible: true,
       });
-      await this.clickOn(mobileStateGraphResizeButton);
+      await this.clickOnElementWithSelector(mobileStateGraphResizeButton);
     }
 
     await this.page.waitForSelector(stateNodeSelector);
@@ -3711,10 +3706,13 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(openOutcomeFeedBackEditor, {
       visible: true,
     });
-    await this.clickOn(openOutcomeFeedBackEditor);
-    await this.clickOn(stateContentInputField);
-    await this.type(stateContentInputField, defaultResponseFeedback);
-    await this.clickOn(saveOutcomeFeedbackButton);
+    await this.clickOnElementWithSelector(openOutcomeFeedBackEditor);
+    await this.clickOnElementWithSelector(stateContentInputField);
+    await this.typeInInputField(
+      stateContentInputField,
+      defaultResponseFeedback
+    );
+    await this.clickOnElementWithSelector(saveOutcomeFeedbackButton);
 
     await this.page.waitForSelector(saveOutcomeDestButton, {
       hidden: true,
@@ -3738,7 +3736,7 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(defaultFeedbackTab, {
       visible: true,
     });
-    await this.clickOn(defaultFeedbackTab);
+    await this.clickOnElementWithSelector(defaultFeedbackTab);
 
     if (defaultResponseFeedback) {
       await this.updateDefaultResponseFeedbackInExplorationEditorPage(
@@ -3747,17 +3745,20 @@ export class ExplorationEditor extends BaseUser {
     }
 
     if (directToCard) {
-      await this.clickOn(openOutcomeDestButton);
+      await this.clickOnElementWithSelector(openOutcomeDestButton);
       await this.page.select(destinationSelectorDropdown, directToCard);
       await this.page.click(saveDestinationButtonSelector);
       await this.expectElementToBeVisible(saveDestinationButtonSelector, false);
     }
 
     if (directToCardWhenStuck) {
-      await this.clickOn(outcomeDestWhenStuckSelector);
+      await this.clickOnElementWithSelector(outcomeDestWhenStuckSelector);
       // The '4: /' value is used to select the 'a new card called' option in the dropdown.
       await this.select(destinationWhenStuckSelectorDropdown, '4: /');
-      await this.type(addDestinationStateWhenStuckInput, directToCardWhenStuck);
+      await this.typeInInputField(
+        addDestinationStateWhenStuckInput,
+        directToCardWhenStuck
+      );
       await this.page.click(saveStuckDestinationButtonSelector);
       await this.expectElementToBeVisible(
         saveStuckDestinationButtonSelector,
@@ -3781,11 +3782,11 @@ export class ExplorationEditor extends BaseUser {
       ? solutionInputNumeric
       : solutionInputTextArea;
     await this.page.waitForSelector(stateSolutionTab, {visible: true});
-    await this.clickOn(addSolutionButton);
+    await this.clickOnElementWithSelector(addSolutionButton);
     await this.page.waitForSelector(solutionSelector, {visible: true});
-    await this.type(solutionSelector, answer);
+    await this.typeInInputField(solutionSelector, answer);
     await this.page.waitForSelector(`${submitAnswerButton}:not([disabled])`);
-    await this.clickOn(submitAnswerButton);
+    await this.clickOnElementWithSelector(submitAnswerButton);
     await this.addSolutionExplanationAndSave(answerExplanation);
   }
 
@@ -3794,9 +3795,9 @@ export class ExplorationEditor extends BaseUser {
    * @param explanation - The solution explanation to add to the state card.
    */
   async addSolutionExplanationAndSave(explanation: string): Promise<void> {
-    await this.type(stateContentInputField, explanation);
+    await this.typeInInputField(stateContentInputField, explanation);
     await this.page.waitForSelector(`${submitSolutionButton}:not([disabled])`);
-    await this.clickOn(submitSolutionButton);
+    await this.clickOnElementWithSelector(submitSolutionButton);
     await this.page.waitForSelector(submitSolutionButton, {
       hidden: true,
     });
@@ -3808,13 +3809,40 @@ export class ExplorationEditor extends BaseUser {
    */
   async updateSolutionExplanation(explanation: string): Promise<void> {
     await this.page.waitForSelector(stateSolutionTab, {visible: true});
-    await this.clickOn(stateSolutionTab);
-    await this.clickOn(editStateSolutionExplanationSelector);
-    await this.type(stateContentInputField, explanation);
-    await this.clickOn(saveSolutionEditButton);
+    await this.clickOnElementWithSelector(stateSolutionTab);
+    await this.clickOnElementWithSelector(editStateSolutionExplanationSelector);
+    await this.typeInInputField(stateContentInputField, explanation);
+    await this.clickOnElementWithSelector(saveSolutionEditButton);
     await this.page.waitForSelector(saveSolutionEditButton, {
       hidden: true,
     });
+  }
+
+  /**
+   * Clicks on the first solution and updates it.
+   * @param solution - The new solution.
+   * @param explaination - The new explaination.
+   * @param isSolutionNumericInput - Weather the solution is numeric or not.
+   */
+  async updateSolution(
+    solution: string,
+    explaination: string,
+    isSolutionNumericInput: boolean = true
+  ): Promise<void> {
+    await this.page.waitForSelector(stateSolutionTab, {visible: true});
+    await this.clickOnElementWithSelector(stateSolutionTab);
+    await this.clickOnElementWithSelector(editSolutionDivSelector);
+
+    // Add solution.
+    const solutionSelector = isSolutionNumericInput
+      ? solutionInputNumeric
+      : solutionInputTextArea;
+    await this.page.waitForSelector(solutionSelector, {visible: true});
+    await this.clearAllTextFrom(solutionSelector);
+    await this.typeInInputField(solutionSelector, solution);
+    await this.page.waitForSelector(`${submitAnswerButton}:not([disabled])`);
+    await this.clickOnElementWithSelector(submitAnswerButton);
+    await this.addSolutionExplanationAndSave(explaination);
   }
 
   /**
@@ -3831,7 +3859,7 @@ export class ExplorationEditor extends BaseUser {
     );
 
     if (!checkboxState) {
-      await this.clickOn(setAsCheckpointButton);
+      await this.clickOnElementWithSelector(setAsCheckpointButton);
     }
 
     // Check checkbox value again and throw error if it's still not checked.
@@ -3853,9 +3881,9 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(addHintButton, {
       visible: true,
     });
-    await this.clickOn(addHintButton);
-    await this.type(stateContentInputField, hint);
-    await this.clickOn(saveHintButton);
+    await this.clickOnElementWithSelector(addHintButton);
+    await this.typeInInputField(stateContentInputField, hint);
+    await this.clickOnElementWithSelector(saveHintButton);
     await this.page.waitForSelector(saveHintButton, {
       hidden: true,
     });
@@ -3869,10 +3897,10 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(stateHintTab, {
       visible: true,
     });
-    await this.clickOn(stateHintTab);
-    await this.clickOn(editStateHintSelector);
-    await this.type(stateContentInputField, hint);
-    await this.clickOn(saveHintEditButton);
+    await this.clickOnElementWithSelector(stateHintTab);
+    await this.clickOnElementWithSelector(editStateHintSelector);
+    await this.typeInInputField(stateContentInputField, hint);
+    await this.clickOnElementWithSelector(saveHintEditButton);
     await this.page.waitForSelector(saveHintEditButton, {
       hidden: true,
     });
@@ -3896,7 +3924,7 @@ export class ExplorationEditor extends BaseUser {
       const element = await this.page.$(responseGroupDiv);
       // If the responses were collapsed in mobile view.
       if (!element) {
-        await this.clickOn(toggleResponseTab);
+        await this.clickOnElementWithSelector(toggleResponseTab);
       }
     }
     await this.page.waitForSelector(responseGroupDiv, {
@@ -3904,8 +3932,20 @@ export class ExplorationEditor extends BaseUser {
     });
     let responseTabs = await this.page.$$(responseGroupDiv);
 
-    await responseTabs[responseIndex].click();
-    await this.clickOn('Tag with misconception');
+    const responseTab = responseTabs[responseIndex];
+
+    // Check if tab is active.
+    const isActive = await responseTab.evaluate(
+      (el: Element, className: string) => {
+        return el.classList.contains(className);
+      },
+      activeTabClass
+    );
+
+    if (!isActive) {
+      await this.clickOnElement(responseTabs[responseIndex]);
+    }
+    await this.clickOnElementWithText('Tag with misconception');
 
     await this.page.waitForSelector(misconceptionTitle, {
       timeout: 5000,
@@ -3922,11 +3962,11 @@ export class ExplorationEditor extends BaseUser {
       }
     }
 
-    await this.clickOn('Done');
+    await this.clickOnElementWithText('Done');
     await this.page.waitForSelector(leaveTranslationsAsIsButton, {
       visible: true,
     });
-    await this.clickOn(leaveTranslationsAsIsButton);
+    await this.clickOnElementWithSelector(leaveTranslationsAsIsButton);
     await this.page.waitForSelector(leaveTranslationsAsIsButton, {
       hidden: true,
     });
@@ -3950,7 +3990,7 @@ export class ExplorationEditor extends BaseUser {
       const element = await this.page.$(responseGroupDiv);
       // If the responses were collapsed in mobile view.
       if (!element) {
-        await this.clickOn(toggleResponseTab);
+        await this.clickOnElementWithSelector(toggleResponseTab);
       }
     }
     await this.page.waitForSelector(responseGroupDiv, {
@@ -3958,7 +3998,7 @@ export class ExplorationEditor extends BaseUser {
     });
     let responseTabs = await this.page.$$(responseGroupDiv);
     await responseTabs[responseIndex].click();
-    await this.clickOn(misconceptionEditorTab);
+    await this.clickOnElementWithSelector(misconceptionEditorTab);
     await this.page.waitForSelector(misconceptionTitle, {
       timeout: 5000,
       visible: true,
@@ -3973,11 +4013,11 @@ export class ExplorationEditor extends BaseUser {
         await misconceptionTitle.click();
       }
     }
-    await this.clickOn('Save Misconception');
+    await this.clickOnElementWithText('Save Misconception');
     await this.page.waitForSelector(leaveTranslationsAsIsButton, {
       visible: true,
     });
-    await this.clickOn(leaveTranslationsAsIsButton);
+    await this.clickOnElementWithSelector(leaveTranslationsAsIsButton);
     await this.page.waitForSelector(leaveTranslationsAsIsButton, {
       hidden: true,
     });
@@ -3997,7 +4037,7 @@ export class ExplorationEditor extends BaseUser {
         const element = await this.page.$(responseGroupDiv);
         // If the responses were collapsed in mobile view.
         if (!element) {
-          await this.clickOn(toggleResponseTab);
+          await this.clickOnElementWithSelector(toggleResponseTab);
         }
       }
       await this.page.waitForSelector(misconceptionDiv, {
@@ -4048,7 +4088,7 @@ export class ExplorationEditor extends BaseUser {
       const element = await this.page.$(responseGroupDiv);
       // If the responses were collapsed in mobile view.
       if (!element) {
-        await this.clickOn(toggleResponseTab);
+        await this.clickOnElementWithSelector(toggleResponseTab);
       }
     }
     await this.page.waitForSelector(optionalMisconceptionDiv, {
@@ -4074,7 +4114,7 @@ export class ExplorationEditor extends BaseUser {
         await this.page.waitForSelector(misconceptionApplicableToggle, {
           visible: true,
         });
-        await this.clickOn(misconceptionApplicableToggle);
+        await this.clickOnElementWithSelector(misconceptionApplicableToggle);
         misconceptionFound = true;
         break;
       }
@@ -4099,7 +4139,7 @@ export class ExplorationEditor extends BaseUser {
       const element = await this.page.$(responseGroupDiv);
       // If the responses were collapsed in mobile view.
       if (!element) {
-        await this.clickOn(toggleResponseTab);
+        await this.clickOnElementWithSelector(toggleResponseTab);
       }
     }
     if (!isApplicable) {
@@ -4145,7 +4185,7 @@ export class ExplorationEditor extends BaseUser {
         await this.page.waitForSelector(mobileOptionsButtonSelector, {
           visible: true,
         });
-        await this.clickOn(mobileOptionsButtonSelector);
+        await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
       }
 
       // Check if dropdown is open or not, if open skip clicking on dropdown.
@@ -4158,7 +4198,7 @@ export class ExplorationEditor extends BaseUser {
         await this.page.waitForSelector(mobileNavbarDropdown, {
           visible: true,
         });
-        await this.clickOn(mobileNavbarDropdown);
+        await this.clickOnElementWithSelector(mobileNavbarDropdown);
         await this.page.waitForTimeout(500);
       }
 
@@ -4173,7 +4213,7 @@ export class ExplorationEditor extends BaseUser {
       await this.page.waitForSelector(previewTabButton, {
         visible: true,
       });
-      await this.clickOn(previewTabButton);
+      await this.clickOnElementWithSelector(previewTabButton);
     }
 
     await this.expectElementToBeVisible(previewTabContainer);
@@ -4185,11 +4225,11 @@ export class ExplorationEditor extends BaseUser {
    */
   async navigateToHistoryTab(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileNavbarDropdown);
+      await this.clickOnElementWithSelector(mobileNavbarDropdown);
       await this.expectElementToBeVisible(mobileHistoryTabButton);
-      await this.clickOn(mobileHistoryTabButton);
+      await this.clickOnElementWithSelector(mobileHistoryTabButton);
     } else {
-      await this.clickOn(historyTabButton);
+      await this.clickOnElementWithSelector(historyTabButton);
     }
 
     await this.expectElementToBeVisible(historyTabContentContainerSelector);
@@ -4319,14 +4359,14 @@ export class ExplorationEditor extends BaseUser {
       // The option to save changes appears only in the mobile view after clicking on the mobile options button,
       // which expands the mobile navigation bar.
       if (!element) {
-        await this.clickOn(mobileOptionsButtonSelector);
+        await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
       }
       await this.page.waitForSelector(mobileNavbarDropdown, {
         visible: true,
       });
-      await this.clickOn(mobileNavbarDropdown);
+      await this.clickOnElementWithSelector(mobileNavbarDropdown);
       await this.page.waitForSelector(mobileNavbarPane);
-      await this.clickAndWaitForNavigation(mobileTranslationTabButton);
+      await this.clickAndWaitForNavigation(mobileTranslationTabButton, true);
 
       // Close dropdown if it doesn't automatically close.
       const isVisible = await this.isElementVisible(
@@ -4341,7 +4381,7 @@ export class ExplorationEditor extends BaseUser {
       await this.page.waitForSelector(translationTabButton, {
         visible: true,
       });
-      await this.clickAndWaitForNavigation(translationTabButton);
+      await this.clickAndWaitForNavigation(translationTabButton, true);
     }
 
     await this.expectElementToBeVisible(translationTabContainer);
@@ -4357,14 +4397,14 @@ export class ExplorationEditor extends BaseUser {
       // The option to save changes appears only in the mobile view after clicking on the mobile options button,
       // which expands the mobile navigation bar.
       if (!element) {
-        await this.clickOn(mobileOptionsButtonSelector);
+        await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
       }
       await this.page.waitForSelector(mobileNavbarDropdown, {
         visible: true,
       });
-      await this.clickOn(mobileNavbarDropdown);
+      await this.clickOnElementWithSelector(mobileNavbarDropdown);
       await this.page.waitForSelector(mobileNavbarPane);
-      await this.clickOn(mobileMainTabButton);
+      await this.clickOnElementWithSelector(mobileMainTabButton);
 
       // Close dropdown if it doesn't automatically close.
       const isVisible = await this.isElementVisible(
@@ -4379,7 +4419,7 @@ export class ExplorationEditor extends BaseUser {
       await this.page.waitForSelector(mainTabButton, {
         visible: true,
       });
-      await this.clickOn(mainTabButton);
+      await this.clickOnElementWithSelector(mainTabButton);
     }
 
     await this.expectElementToBeVisible(mainTabContainerSelector);
@@ -4425,10 +4465,10 @@ export class ExplorationEditor extends BaseUser {
   async continueToNextCard(skipVerification: boolean = false): Promise<void> {
     try {
       await this.page.waitForSelector(nextCardButton, {timeout: 7000});
-      await this.clickOn(nextCardButton);
+      await this.clickOnElementWithSelector(nextCardButton);
     } catch (error) {
       if (error instanceof puppeteer.errors.TimeoutError) {
-        await this.clickOn(nextCardArrowButton);
+        await this.clickOnElementWithSelector(nextCardArrowButton);
       } else {
         throw error;
       }
@@ -4464,7 +4504,7 @@ export class ExplorationEditor extends BaseUser {
         throw new Error(`Unsupported input type: ${inputType}`);
     }
 
-    await this.clickOn(submitAnswerButton);
+    await this.clickOnSubmitAnswerButton();
   }
 
   /**
@@ -4474,7 +4514,7 @@ export class ExplorationEditor extends BaseUser {
   async submitTextInputAnsswer(answer: string): Promise<void> {
     await this.expectElementToBeVisible(textAreaInputSelector);
 
-    await this.type(textAreaInputSelector, answer);
+    await this.typeInInputField(textAreaInputSelector, answer);
     await this.expectElementValueToBe(textAreaInputSelector, answer);
 
     await this.clickOnSubmitAnswerButton();
@@ -4543,13 +4583,13 @@ export class ExplorationEditor extends BaseUser {
       // making it unclickable. So, we check for its presence and collapse it.
       const element = await this.page.$(mobileNavbarOptions);
       if (element) {
-        await this.clickOn(mobileOptionsButtonSelector);
+        await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
       }
     }
     await this.page.waitForSelector(previewRestartButton, {
       visible: true,
     });
-    await this.clickOn(previewRestartButton);
+    await this.clickOnElementWithSelector(previewRestartButton);
 
     await this.waitForNetworkIdle();
     await this.page.waitForSelector(previousCardButton, {
@@ -4589,7 +4629,7 @@ export class ExplorationEditor extends BaseUser {
    * Ends at same page, after adding programming interaction and saving the
    * draft.
    */
-  async createSimpleProgrammingExploration(): Promise<string | null> {
+  async createSimpleProgrammingExploration(): Promise<string> {
     // Check if element to add interaction is visible (pre-check)
     await this.page.waitForSelector(stateEditSelector, {
       visible: true,
@@ -4603,9 +4643,9 @@ export class ExplorationEditor extends BaseUser {
     const lastInteraction = 'Last Card';
     await this.waitForElementToBeClickable(destinationCardSelector);
     await this.select(destinationCardSelector, '/');
-    await this.type(addStateInput, lastInteraction);
-    await this.clickOn(addNewResponseButton);
-    await this.clickOn(correctAnswerInTheGroupSelector);
+    await this.typeInInputField(addStateInput, lastInteraction);
+    await this.clickOnElementWithSelector(addNewResponseButton);
+    await this.clickOnElementWithSelector(correctAnswerInTheGroupSelector);
 
     await this.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong Answer. Please try again'
@@ -4734,7 +4774,7 @@ export class ExplorationEditor extends BaseUser {
       await this.navigateToCreatorDashboardPage();
     }
 
-    await this.clickOn(subscriberTabButton);
+    await this.clickOnElementWithSelector(subscriberTabButton);
     await this.page.waitForSelector('.e2e-test-subscription-card');
   }
 
@@ -4791,16 +4831,16 @@ export class ExplorationEditor extends BaseUser {
       return;
     }
     await this.page.waitForSelector('nav-options', {visible: true});
-    await this.clickOn(feedbackPopupSelector);
+    await this.clickOnElementWithSelector(feedbackPopupSelector);
     await this.page.waitForSelector(feedbackTextarea, {visible: true});
-    await this.type(feedbackTextarea, feedback);
+    await this.typeInInputField(feedbackTextarea, feedback);
 
     // If stayAnonymous is true, clicking on the "stay anonymous" checkbox.
     if (stayAnonymous) {
-      await this.clickOn(stayAnonymousCheckbox);
+      await this.clickOnElementWithSelector(stayAnonymousCheckbox);
     }
 
-    await this.clickOn('Submit');
+    await this.clickOnElementWithText('Submit');
 
     try {
       await this.page.waitForFunction(
@@ -4827,7 +4867,7 @@ export class ExplorationEditor extends BaseUser {
     feedbackIndex?: number
   ): Promise<void> {
     await this.expectElementToBeVisible(voiceoverLanguageSelector);
-    await this.clickOn(voiceoverLanguageSelector);
+    await this.clickOnElementWithSelector(voiceoverLanguageSelector);
 
     await this.expectElementToBeVisible(voiceoverLanguageOptionSelector);
     const languageOptions = await this.page.$$(voiceoverLanguageOptionSelector);
@@ -4843,7 +4883,7 @@ export class ExplorationEditor extends BaseUser {
     }
 
     await this.page.waitForSelector(translationModeButton);
-    await this.clickOn(translationModeButton);
+    await this.clickOnElementWithSelector(translationModeButton);
     const activeContentType = await this.page.$eval(activeTranslationTab, el =>
       el.textContent?.trim()
     );
@@ -4851,30 +4891,35 @@ export class ExplorationEditor extends BaseUser {
       showMessage(
         `Switching content type from ${activeContentType} to ${contentType}`
       );
-      await this.clickOn(contentType);
+      await this.clickOnElementWithText(contentType);
     }
-    await this.clickOn(editTranslationSelector);
+    await this.clickOnElementWithSelector(editTranslationSelector);
     switch (contentType) {
       case 'Content':
       case 'Hint':
       case 'Solution':
-        await this.clickOn(stateContentInputField);
-        await this.type(stateContentInputField, translation);
+        await this.clickOnElementWithSelector(stateContentInputField);
+        await this.typeInInputField(stateContentInputField, translation);
         break;
       case 'Interaction':
-        await this.clickOn(stateTranslationEditorSelector);
-        await this.type(stateTranslationEditorSelector, translation);
+        await this.clickOnElementWithSelector(stateTranslationEditorSelector);
+        await this.typeInInputField(
+          stateTranslationEditorSelector,
+          translation
+        );
         break;
       case 'Feedback':
-        await this.clickOn(`.e2e-test-feedback-${feedbackIndex}`);
-        await this.clickOn(editTranslationSelector);
-        await this.clickOn(stateContentInputField);
-        await this.type(stateContentInputField, translation);
+        await this.clickOnElementWithSelector(
+          `.e2e-test-feedback-${feedbackIndex}`
+        );
+        await this.clickOnElementWithSelector(editTranslationSelector);
+        await this.clickOnElementWithSelector(stateContentInputField);
+        await this.typeInInputField(stateContentInputField, translation);
         break;
       default:
         throw new Error(`Invalid content type: ${contentType}`);
     }
-    await this.clickOn(saveTranslationButton);
+    await this.clickOnElementWithSelector(saveTranslationButton);
 
     await this.waitForNetworkIdle();
     await this.expectElementToBeVisible(saveTranslationButton, false);
@@ -4888,7 +4933,7 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(modifyExistingTranslationsButton, {
       visible: true,
     });
-    await this.clickOn(modifyExistingTranslationsButton);
+    await this.clickOnElementWithSelector(modifyExistingTranslationsButton);
     await this.waitForNetworkIdle();
 
     await this.page.waitForSelector(modifyTranslationModalSelector, {
@@ -4937,31 +4982,36 @@ export class ExplorationEditor extends BaseUser {
     contentType: string,
     newTranslation: string
   ): Promise<void> {
-    await this.clickOn(`.e2e-test-${languageCode}-translation-edit`);
+    await this.clickOnElementWithSelector(
+      `.e2e-test-${languageCode}-translation-edit`
+    );
     switch (contentType) {
       case 'Content':
       case 'Hint':
       case 'Solution':
       case 'Feedback':
-        await this.clickOn(stateContentInputField);
+        await this.clickOnElementWithSelector(stateContentInputField);
         await this.page.evaluate(selector => {
           document.querySelector(selector).textContent = '';
         }, `${stateContentInputField} p`);
-        await this.type(stateContentInputField, newTranslation);
+        await this.typeInInputField(stateContentInputField, newTranslation);
         break;
       case 'Interaction':
-        await this.clickOn(stateTranslationEditorSelector);
+        await this.clickOnElementWithSelector(stateTranslationEditorSelector);
         await this.page.evaluate(selector => {
           document.querySelector(selector).value = '';
         }, `${textInputField}`);
-        await this.type(stateTranslationEditorSelector, newTranslation);
+        await this.typeInInputField(
+          stateTranslationEditorSelector,
+          newTranslation
+        );
         break;
       default:
         throw new Error(`Invalid content type: ${contentType}`);
     }
 
-    await this.clickOn(modalSaveButton);
-    await this.clickOn(modifyTranslationsModalDoneButton);
+    await this.clickOnElementWithSelector(modalSaveButton);
+    await this.clickOnElementWithSelector(modifyTranslationsModalDoneButton);
 
     await this.page.waitForSelector(modifyTranslationsModalDoneButton, {
       hidden: true,
@@ -4982,7 +5032,7 @@ export class ExplorationEditor extends BaseUser {
   ): Promise<void> {
     let translation: string | null = '';
     await this.navigateToTranslationsTab();
-    await this.clickOn(translationModeButton);
+    await this.clickOnElementWithSelector(translationModeButton);
 
     const activeContentType = await this.page.$eval(activeTranslationTab, el =>
       el.textContent?.trim()
@@ -4992,10 +5042,10 @@ export class ExplorationEditor extends BaseUser {
       showMessage(
         `Switching content type from ${activeContentType} to ${contentType}`
       );
-      await this.clickOn(contentType);
+      await this.clickOnElementWithSelector(contentType);
     }
 
-    await this.clickOn(editTranslationSelector);
+    await this.clickOnElementWithSelector(editTranslationSelector);
     switch (contentType) {
       case 'Content':
       case 'Hint':
@@ -5012,8 +5062,10 @@ export class ExplorationEditor extends BaseUser {
         );
         break;
       case 'Feedback':
-        await this.clickOn(`.e2e-test-feedback-${feedbackIndex}`);
-        await this.clickOn(editTranslationSelector);
+        await this.clickOnElementWithSelector(
+          `.e2e-test-feedback-${feedbackIndex}`
+        );
+        await this.clickOnElementWithSelector(editTranslationSelector);
         translation = await this.page.$eval(
           stateContentInputField,
           el => el.textContent
@@ -5057,10 +5109,10 @@ export class ExplorationEditor extends BaseUser {
       showMessage(
         `Switching content type from ${activeContentType} to ${contentType}`
       );
-      await this.clickOn(contentType);
+      await this.clickOnElementWithText(contentType);
     }
 
-    await this.clickOn(voiceoverLanguageSelector);
+    await this.clickOnElementWithSelector(voiceoverLanguageSelector);
     await this.page.waitForSelector(voiceoverLanguageOptionSelector);
     const languageOptions = await this.page.$$(voiceoverLanguageOptionSelector);
 
@@ -5074,7 +5126,7 @@ export class ExplorationEditor extends BaseUser {
       }
     }
 
-    await this.clickOn(voiceoverLanguageAccentSelector);
+    await this.clickOnElementWithSelector(voiceoverLanguageAccentSelector);
     await this.page.waitForSelector(voiceoverLanguageAccentOptionSelector);
     const languageAccentOptions = await this.page.$$(
       voiceoverLanguageAccentOptionSelector
@@ -5090,10 +5142,10 @@ export class ExplorationEditor extends BaseUser {
       }
     }
 
-    await this.clickOn(addManualVoiceoverButton);
+    await this.clickOnElementWithSelector(addManualVoiceoverButton);
     await this.uploadFile(voiceoverFilePath);
     await this.waitForElementToStabilize(saveUploadedAudioButton);
-    await this.clickOn(saveUploadedAudioButton);
+    await this.clickOnElementWithSelector(saveUploadedAudioButton);
     await this.waitForNetworkIdle();
 
     await this.page.waitForSelector(saveUploadedAudioButton, {
@@ -5124,10 +5176,10 @@ export class ExplorationEditor extends BaseUser {
       showMessage(
         `Switching content type from ${activeContentType} to ${contentType}`
       );
-      await this.clickOn(contentType);
+      await this.clickOnElementWithText(contentType);
     }
 
-    await this.clickOn(voiceoverLanguageSelector);
+    await this.clickOnElementWithSelector(voiceoverLanguageSelector);
     await this.page.waitForSelector(voiceoverLanguageOptionSelector);
     const languageOptions = await this.page.$$(voiceoverLanguageOptionSelector);
 
@@ -5141,7 +5193,7 @@ export class ExplorationEditor extends BaseUser {
       }
     }
 
-    await this.clickOn(voiceoverLanguageAccentSelector);
+    await this.clickOnElementWithSelector(voiceoverLanguageAccentSelector);
     await this.page.waitForSelector(voiceoverLanguageAccentOptionSelector);
     const languageAccentOptions = await this.page.$$(
       voiceoverLanguageAccentOptionSelector
@@ -5157,14 +5209,15 @@ export class ExplorationEditor extends BaseUser {
       }
     }
 
-    await this.clickOn(regenerateAutomaticVoiceoverButton);
+    await this.clickOnElementWithSelector(regenerateAutomaticVoiceoverButton);
 
     await this.page.waitForSelector(voiceoverConfirmationModalButton, {
       visible: true,
       timeout: 5000,
     });
 
-    await this.clickOn(voiceoverConfirmationModalButton);
+    await this.waitForElementToStabilize(voiceoverConfirmationModalButton);
+    await this.clickOnElementWithSelector(voiceoverConfirmationModalButton);
 
     await this.page.waitForSelector(voiceoverConfirmationModalButton, {
       hidden: true,
@@ -5191,7 +5244,7 @@ export class ExplorationEditor extends BaseUser {
    * Function to click on the add solution button.
    */
   async clickOnAddSolutionButton(): Promise<void> {
-    await this.clickOn(addSolutionButton);
+    await this.clickOnElementWithSelector(addSolutionButton);
   }
 
   /**
@@ -5256,6 +5309,7 @@ export class ExplorationEditor extends BaseUser {
         continue;
       }
 
+      // Ensure that elements have stopped animating before we start dragging.
       await this.waitForElementToStabilize(sourceElement);
       await this.waitForElementToStabilize(destinationElement);
 
@@ -5276,7 +5330,7 @@ export class ExplorationEditor extends BaseUser {
       );
     }
 
-    await this.clickOn(submitAnswerButton);
+    await this.clickOnElementWithSelector(submitAnswerButton);
 
     // Add explaination.
     await this.addSolutionExplanationAndSave(explaination);
@@ -5564,8 +5618,8 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(responseTextareaSelector, {
       visible: true,
     });
-    await this.type(responseTextareaSelector, reply);
-    await this.clickOn(sendButtonSelector);
+    await this.typeInInputField(responseTextareaSelector, reply);
+    await this.clickOnElementWithSelector(sendButtonSelector);
 
     // Check if button is disabled after clicking
     await this.page.waitForFunction(
@@ -5605,7 +5659,7 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(feedbackTabBackButtonSelector, {
       visible: true,
     });
-    await this.clickOn(feedbackTabBackButtonSelector);
+    await this.clickOnElementWithSelector(feedbackTabBackButtonSelector);
     await this.page.waitForSelector(feedbackTabBackButtonSelector, {
       hidden: true,
     });
@@ -5620,7 +5674,7 @@ export class ExplorationEditor extends BaseUser {
       visible: true,
     });
     if (statusValue === 'ignored' || statusValue === 'not_actionable') {
-      await this.type(responseTextareaSelector, statusValue);
+      await this.typeInInputField(responseTextareaSelector, statusValue);
     }
     await this.select(feedbackStatusMenu, statusValue);
   }
@@ -5631,7 +5685,7 @@ export class ExplorationEditor extends BaseUser {
    */
   async updateFeedbackStatus(statusValue: string): Promise<void> {
     await this.changeFeedbackStatus(statusValue);
-    await this.clickOn(sendButtonSelector);
+    await this.clickOnElementWithSelector(sendButtonSelector);
 
     await this.expectElementToBeClickable(sendButtonSelector, false);
   }
@@ -5707,7 +5761,7 @@ export class ExplorationEditor extends BaseUser {
   async clickOnHelpButton(): Promise<void> {
     await this.expectElementToBeVisible(helpTabSelector);
 
-    await this.clickOn(helpTabSelector);
+    await this.clickOnElementWithSelector(helpTabSelector);
     await this.expectElementToBeVisible(helpModalContainerSelector);
   }
 
@@ -5716,14 +5770,14 @@ export class ExplorationEditor extends BaseUser {
       await this.openExplorationNavigationInMobileView();
 
       await this.expectElementToBeVisible(mobileChangesDropdownSelector);
-      await this.clickOn(mobileChangesDropdownSelector);
+      await this.clickOnElementWithSelector(mobileChangesDropdownSelector);
     }
 
     const publishButtonSelector = this.isViewportAtMobileWidth()
       ? mobilePublishButtonSelector
       : publishExplorationButtonSelector;
     await this.expectElementToBeVisible(publishButtonSelector);
-    await this.clickOn(publishButtonSelector);
+    await this.clickOnElementWithSelector(publishButtonSelector);
 
     await this.expectElementToBeVisible(
       publishMetadataExplorationHeaderSelector
@@ -5734,15 +5788,15 @@ export class ExplorationEditor extends BaseUser {
    * Navigates to the tour tab in the exploration editor.
    */
   async clickOnTakeATourButton(): Promise<void> {
-    await this.isElementVisible(takeATourButtonSelector);
-    await this.clickOn(takeATourButtonSelector);
+    await this.expectElementToBeVisible(takeATourButtonSelector);
+    await this.clickOnElementWithSelector(takeATourButtonSelector);
 
     await this.expectElementToBeVisible(joyrideBodySelector);
   }
 
   async clickOnTakeATranslationsTourButton(): Promise<void> {
-    await this.isElementVisible(translationTourButtonSelector);
-    await this.clickOn(translationTourButtonSelector);
+    await this.expectElementToBeVisible(translationTourButtonSelector);
+    await this.clickOnElementWithSelector(translationTourButtonSelector);
 
     await this.expectElementToBeVisible(joyrideBodySelector);
   }
@@ -5752,7 +5806,7 @@ export class ExplorationEditor extends BaseUser {
    */
   async clickOnPublishButtonInPublishModal(): Promise<void> {
     await this.expectElementToBeVisible(explorationConfirmPublishButton);
-    await this.clickOn(explorationConfirmPublishButton);
+    await this.clickOnElementWithSelector(explorationConfirmPublishButton);
     await this.expectElementToBeVisible(explorationConfirmPublishButton, false);
   }
 
@@ -5761,7 +5815,7 @@ export class ExplorationEditor extends BaseUser {
    */
   async clickOnSaveChangesButtonInPublishModal(): Promise<void> {
     await this.expectElementToBeVisible(saveExplorationChangesButton);
-    await this.clickOn(saveExplorationChangesButton);
+    await this.clickOnElementWithSelector(saveExplorationChangesButton);
 
     await this.expectElementToBeVisible(saveExplorationChangesButton, false);
   }
@@ -5800,7 +5854,7 @@ export class ExplorationEditor extends BaseUser {
       : saveChangesButton;
     await this.expectElementToBeClickable(saveButtonSelector);
 
-    await this.clickOn(saveButtonSelector);
+    await this.clickOnElementWithSelector(saveButtonSelector);
     await this.expectElementToBeVisible(saveExplorationModalContainerSelector);
   }
 
@@ -6174,7 +6228,7 @@ export class ExplorationEditor extends BaseUser {
    */
   async fillDescriptionInSaveDraftModal(description: string): Promise<void> {
     await this.expectElementToBeVisible(commitMessageSelector);
-    await this.type(commitMessageSelector, description);
+    await this.typeInInputField(commitMessageSelector, description);
 
     await this.page.waitForFunction(
       (selector: string, value: string) => {
@@ -6195,29 +6249,29 @@ export class ExplorationEditor extends BaseUser {
     tags: string[]
   ): Promise<void> {
     await this.expectElementToBeVisible(explorationTitleInput);
-    await this.clickOn(explorationTitleInput);
-    await this.type(explorationTitleInput, explorationTitle);
+    await this.clickOnElementWithSelector(explorationTitleInput);
+    await this.typeInInputField(explorationTitleInput, explorationTitle);
     await this.expectElementValueToBe(explorationTitleInput, explorationTitle);
 
     await this.expectElementToBeVisible(explorationGoalInput);
-    await this.clickOn(explorationGoalInput);
-    await this.type(explorationGoalInput, goal);
+    await this.clickOnElementWithSelector(explorationGoalInput);
+    await this.typeInInputField(explorationGoalInput, goal);
     await this.expectElementValueToBe(explorationGoalInput, goal);
 
     await this.expectElementToBeVisible(explorationCategoryDropdown);
-    await this.clickOn(explorationCategoryDropdown);
-    await this.clickOn(category);
+    await this.clickOnElementWithSelector(explorationCategoryDropdown);
+    await this.clickOnElementWithText(category);
     await this.expectTextContentToBe(categoryDropdown, category);
 
     await this.expectElementToBeVisible(explorationLanguageSelector);
-    await this.clickOn(explorationLanguageSelector);
-    await this.clickOn(language);
+    await this.clickOnElementWithSelector(explorationLanguageSelector);
+    await this.clickOnElementWithText(language);
     await this.expectTextContentToBe(explorationLanguageSelector, language);
 
     await this.expectElementToBeVisible(tagsField);
-    await this.clickOn(tagsField);
+    await this.clickOnElementWithSelector(tagsField);
     for (const tag of tags) {
-      await this.type(tagsField, tag);
+      await this.typeInInputField(tagsField, tag);
       await this.page.keyboard.press('Enter');
     }
   }
@@ -6240,7 +6294,7 @@ export class ExplorationEditor extends BaseUser {
     await this.waitForPageToFullyLoad();
     await this.expectElementToBeVisible('input');
     await this.clearAllTextFrom('input');
-    await this.type('input', answer);
+    await this.typeInInputField('input', answer);
 
     await this.clickOnSubmitAnswerButton();
   }
@@ -6275,7 +6329,7 @@ export class ExplorationEditor extends BaseUser {
       throw new Error('Code editor not found.');
     }
 
-    await this.clickOn(codeEditorInSolutionModal);
+    await this.clickOnElementWithSelector(codeEditorInSolutionModal);
     await this.page.keyboard.down('Control');
     await this.page.keyboard.press('KeyA');
     await this.page.keyboard.up('Control');
@@ -6309,7 +6363,7 @@ export class ExplorationEditor extends BaseUser {
     await this.page.click(showUnitFormatsButtonSelector);
     await this.expectElementToBeVisible(numberWithUnitsModalSelector);
     await this.expectElementToBeVisible(closeModalButtonSelector);
-    await this.clickOn(closeModalButtonSelector);
+    await this.clickOnElementWithSelector(closeModalButtonSelector);
     await this.expectElementToBeVisible(closeModalButtonSelector, false);
   }
 
@@ -6333,11 +6387,16 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Moves the node in the graph.
+   * Checks if the graph node can be moved.
+   * @param {'response modal' | 'answer page'} state - The state of the node.
    */
-  async expectGraphNodeCanBeMoved(): Promise<void> {
+  async expectGraphNodeCanBeMoved(
+    state: 'response modal' | 'answer page' = 'answer page'
+  ): Promise<void> {
     // Check if the graph interaction is present.
-    const graphHelper = new GraphViz(this.page);
+    const context =
+      state === 'response modal' ? await this.getRuleEditorModal() : this.page;
+    const graphHelper = new GraphViz(this.page, context);
     await graphHelper.expectGraphInteractionToBePresent();
 
     // Move the node to the given position.
@@ -6357,9 +6416,14 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Checks if graph node can be removed.
+   * @param {'response modal' | 'answer page'} state - The state of the node.
    */
-  async expectGraphNodeCanBeRemoved(): Promise<void> {
-    const graphHelper = new GraphViz(this.page);
+  async expectGraphNodeCanBeRemoved(
+    state: 'response modal' | 'answer page' = 'answer page'
+  ): Promise<void> {
+    const context =
+      state === 'response modal' ? await this.getRuleEditorModal() : this.page;
+    const graphHelper = new GraphViz(this.page, context);
 
     const nodes = await graphHelper.getVertices();
     await graphHelper.removeNode(nodes[0]);
@@ -6369,13 +6433,15 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Checks if graph node can be added.
+   * @param {'response modal' | 'answer page'} state - The state of the node.
    */
-  async expectGraphNodeCanBeAdded(): Promise<void> {
-    const graphHelper = new GraphViz(this.page);
-    const nodes = await graphHelper.getVertices();
+  async expectGraphNodeCanBeAdded(
+    state: 'response modal' | 'answer page' = 'answer page'
+  ): Promise<void> {
+    const context =
+      state === 'response modal' ? await this.getRuleEditorModal() : this.page;
+    const graphHelper = new GraphViz(this.page, context);
     await graphHelper.addNode(60, 60);
-    const newNodes = await graphHelper.getVertices();
-    expect(newNodes.length).toEqual(nodes.length + 1);
   }
 
   /**
@@ -6398,7 +6464,7 @@ export class ExplorationEditor extends BaseUser {
 
     for (let i = 0; i < tabContents.length; i++) {
       if (i > 1) {
-        await this.clickOn('.e2e-test-add-list-entry');
+        await this.clickOnElementWithSelector('.e2e-test-add-list-entry');
       }
       await this.clearAllTextFrom(
         `oppia-rte-helper-model input.e2e-test-text-input:nth-child(${i + 1})`
@@ -6409,7 +6475,7 @@ export class ExplorationEditor extends BaseUser {
       await tabTitleInputElements?.[i]?.type(tabContents[i].title);
       await tabContentInputElements?.[i]?.type(tabContents[i].content);
     }
-    await this.clickOn(closeButtonForExtraModel);
+    await this.clickOnElementWithSelector(closeButtonForExtraModel);
     await this.expectElementToBeVisible(closeButtonForExtraModel, false);
   }
 
@@ -6425,9 +6491,9 @@ export class ExplorationEditor extends BaseUser {
     imageCaption: string | null
   ): Promise<void> {
     await this.expectElementToBeVisible(stateEditSelector);
-    await this.clickOn(stateEditSelector);
+    await this.clickOnElementWithSelector(stateEditSelector);
     await this.addImageRTE(imageFilePath, imageDescription, imageCaption);
-    await this.clickOn(saveContentButton);
+    await this.clickOnElementWithSelector(saveContentButton);
     await this.expectElementToBeVisible(stateContentInputField, false);
   }
 
@@ -6439,45 +6505,45 @@ export class ExplorationEditor extends BaseUser {
   async addExplorationDescriptionContainingBasicRTEComponents(): Promise<void> {
     // Click on RTE.
     await this.page.waitForSelector(stateEditSelector, {visible: true});
-    await this.clickOn(stateEditSelector);
+    await this.clickOnElementWithSelector(stateEditSelector);
 
     // Add Bold text.
     await this.clickOnRTEOptionWithTitle('Bold');
-    await this.type(stateContentInputField, 'Bold text');
+    await this.typeInInputField(stateContentInputField, 'Bold text');
     await this.page.keyboard.press('Enter');
     await this.clickOnRTEOptionWithTitle('Bold');
 
     // Add Italic text.
     await this.clickOnRTEOptionWithTitle('Italic');
-    await this.type(stateContentInputField, 'Italic text');
+    await this.typeInInputField(stateContentInputField, 'Italic text');
     await this.page.keyboard.press('Enter');
     await this.clickOnRTEOptionWithTitle('Italic');
 
     // Add Numbered List.
     await this.clickOnRTEOptionWithTitle('Numbered List');
-    await this.type(stateContentInputField, 'Numbered List Item 1');
+    await this.typeInInputField(stateContentInputField, 'Numbered List Item 1');
     await this.page.keyboard.press('Enter');
-    await this.type(stateContentInputField, 'Numbered List Item 2');
+    await this.typeInInputField(stateContentInputField, 'Numbered List Item 2');
     await this.page.keyboard.press('Enter');
     await this.page.keyboard.press('Enter');
 
     // Add Bulleted List.
     await this.clickOnRTEOptionWithTitle('Bulleted List');
-    await this.type(stateContentInputField, 'Bulleted List Item 1');
+    await this.typeInInputField(stateContentInputField, 'Bulleted List Item 1');
     await this.page.keyboard.press('Enter');
-    await this.type(stateContentInputField, 'Bulleted List Item 2');
+    await this.typeInInputField(stateContentInputField, 'Bulleted List Item 2');
     await this.page.keyboard.press('Enter');
     await this.page.keyboard.press('Enter');
 
     // Add Pre formatted Text.
     await this.clickOnRTEOptionWithTitle('Pre');
-    await this.type(stateContentInputField, 'Pre formatted text');
+    await this.typeInInputField(stateContentInputField, 'Pre formatted text');
     await this.clickOnRTEOptionWithTitle('Pre');
     await this.page.keyboard.press('Enter');
 
     // Add Block Quote.
     await this.clickOnRTEOptionWithTitle('Block Quote');
-    await this.type(stateContentInputField, 'Block Quote text');
+    await this.typeInInputField(stateContentInputField, 'Block Quote text');
     await this.page.keyboard.press('Enter');
     await this.clickOnRTEOptionWithTitle('Block Quote');
 
@@ -6498,7 +6564,7 @@ export class ExplorationEditor extends BaseUser {
       'textarea[placeholder*="Enter a math expression using LaTeX"]'
     );
     await textareaElement?.type('x^2 + y^2 = z^2');
-    await this.clickOn(closeButtonForExtraModel);
+    await this.clickOnElementWithSelector(closeButtonForExtraModel);
     await this.waitForNetworkIdle();
     await this.page.keyboard.press('Enter');
 
@@ -6507,14 +6573,14 @@ export class ExplorationEditor extends BaseUser {
     await this.waitForNetworkIdle();
     const skillSearchElement = await this.page.$(skillNameInput);
     await skillSearchElement?.type('Math');
-    await this.clickOn(skillItemInRTESelector);
+    await this.clickOnElementWithSelector(skillItemInRTESelector);
     await this.page.keyboard.press('Enter');
-    await this.clickOn(closeButtonForExtraModel);
+    await this.clickOnElementWithSelector(closeButtonForExtraModel);
     await this.waitForNetworkIdle();
     await this.page.keyboard.press('Enter');
 
     // Save content.
-    await this.clickOn(saveContentButton);
+    await this.clickOnElementWithSelector(saveContentButton);
     await this.expectElementToBeVisible(saveContentButton, false);
   }
 
@@ -6524,45 +6590,45 @@ export class ExplorationEditor extends BaseUser {
   async addExplorationDescriptionContainingAllRTEComponents(): Promise<void> {
     // Click on RTE.
     await this.page.waitForSelector(stateEditSelector, {visible: true});
-    await this.clickOn(stateEditSelector);
+    await this.clickOnElementWithSelector(stateEditSelector);
 
     // Add Bold text.
     await this.clickOnRTEOptionWithTitle('Bold');
-    await this.type(stateContentInputField, 'Bold text');
+    await this.typeInInputField(stateContentInputField, 'Bold text');
     await this.page.keyboard.press('Enter');
     await this.clickOnRTEOptionWithTitle('Bold');
 
     // Add Italic text.
     await this.clickOnRTEOptionWithTitle('Italic');
-    await this.type(stateContentInputField, 'Italic text');
+    await this.typeInInputField(stateContentInputField, 'Italic text');
     await this.page.keyboard.press('Enter');
     await this.clickOnRTEOptionWithTitle('Italic');
 
     // Add Numbered List.
     await this.clickOnRTEOptionWithTitle('Numbered List');
-    await this.type(stateContentInputField, 'Numbered List Item 1');
+    await this.typeInInputField(stateContentInputField, 'Numbered List Item 1');
     await this.page.keyboard.press('Enter');
-    await this.type(stateContentInputField, 'Numbered List Item 2');
+    await this.typeInInputField(stateContentInputField, 'Numbered List Item 2');
     await this.page.keyboard.press('Enter');
     await this.page.keyboard.press('Enter');
 
     // Add Bulleted List.
     await this.clickOnRTEOptionWithTitle('Bulleted List');
-    await this.type(stateContentInputField, 'Bulleted List Item 1');
+    await this.typeInInputField(stateContentInputField, 'Bulleted List Item 1');
     await this.page.keyboard.press('Enter');
-    await this.type(stateContentInputField, 'Bulleted List Item 2');
+    await this.typeInInputField(stateContentInputField, 'Bulleted List Item 2');
     await this.page.keyboard.press('Enter');
     await this.page.keyboard.press('Enter');
 
     // Add Pre formatted Text.
     await this.clickOnRTEOptionWithTitle('Pre');
-    await this.type(stateContentInputField, 'Pre formatted text');
+    await this.typeInInputField(stateContentInputField, 'Pre formatted text');
     await this.clickOnRTEOptionWithTitle('Pre');
     await this.page.keyboard.press('Enter');
 
     // Add Block Quote.
     await this.clickOnRTEOptionWithTitle('Block Quote');
-    await this.type(stateContentInputField, 'Block Quote text');
+    await this.typeInInputField(stateContentInputField, 'Block Quote text');
     await this.page.keyboard.press('Enter');
     await this.clickOnRTEOptionWithTitle('Block Quote');
 
@@ -6587,7 +6653,7 @@ export class ExplorationEditor extends BaseUser {
     await this.page.keyboard.press('ArrowRight');
 
     // Add Link.
-    await this.addTextWithLinkRTE('Oppia', oppiaWebURL);
+    await this.addTextWithLinkRTE('Go to Oppia.org website', oppiaWebURL);
     await this.waitForNetworkIdle();
     await this.page.keyboard.press('Enter');
 
@@ -6598,7 +6664,7 @@ export class ExplorationEditor extends BaseUser {
       'textarea[placeholder*="Enter a math expression using LaTeX"]'
     );
     await textareaElement?.type('x^2 + y^2 = z^2');
-    await this.clickOn(closeButtonForExtraModel);
+    await this.clickOnElementWithSelector(closeButtonForExtraModel);
     await this.waitForNetworkIdle();
     await this.page.keyboard.press('Enter');
 
@@ -6607,9 +6673,9 @@ export class ExplorationEditor extends BaseUser {
     await this.waitForNetworkIdle();
     const skillSearchElement = await this.page.$(skillNameInput);
     await skillSearchElement?.type('Math');
-    await this.clickOn(skillItemInRTESelector);
+    await this.clickOnElementWithSelector(skillItemInRTESelector);
     await this.page.keyboard.press('Enter');
-    await this.clickOn(closeButtonForExtraModel);
+    await this.clickOnElementWithSelector(closeButtonForExtraModel);
     await this.waitForNetworkIdle();
     await this.page.keyboard.press('Enter');
 
@@ -6617,7 +6683,7 @@ export class ExplorationEditor extends BaseUser {
     await this.addTabContentsRTE();
     await this.page.keyboard.press('ArrowRight');
 
-    await this.clickOn(saveContentButton);
+    await this.clickOnElementWithSelector(saveContentButton);
     await this.expectElementToBeVisible(saveContentButton, false);
   }
 
@@ -6637,7 +6703,7 @@ export class ExplorationEditor extends BaseUser {
    */
   async addCollapsibleBlockRTE(): Promise<void> {
     await this.clickOnRTEOptionWithTitle('collapsible block');
-    await this.clickOn(closeButtonForExtraModel);
+    await this.clickOnElementWithSelector(closeButtonForExtraModel);
     await this.expectElementToBeVisible(closeButtonForExtraModel, false);
   }
 
@@ -6664,7 +6730,7 @@ export class ExplorationEditor extends BaseUser {
       throw new Error('Link input fields not found in the helper modal');
     }
 
-    await this.clickOn(closeButtonForExtraModel);
+    await this.clickOnElementWithSelector(closeButtonForExtraModel);
     await this.expectElementToBeVisible(closeButtonForExtraModel, false);
   }
 
@@ -6697,11 +6763,11 @@ export class ExplorationEditor extends BaseUser {
       await imageCaptionInput.type(imageCaption);
     }
 
-    await this.clickOn(uploadImageButton);
+    await this.clickOnElementWithSelector(uploadImageButton);
     await this.uploadFile(imageFilePath);
-    await this.clickOn(useTheUploadImageButton);
+    await this.clickOnElementWithSelector(useTheUploadImageButton);
 
-    await this.clickOn(closeButtonForExtraModel);
+    await this.clickOnElementWithSelector(closeButtonForExtraModel);
     await this.expectElementToBeVisible(closeButtonForExtraModel, false);
   }
 
@@ -6768,6 +6834,97 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Fills the value in the response modal.
+   * @param {string} value - The value to be filled in the response modal.
+   * @param {'input' | 'textarea'} inputType - The type of the input.
+   * @param {number} index - The index of the input.
+   */
+  async fillValueInInteractionResponseModal(
+    value: string,
+    inputType: 'input' | 'textarea',
+    index: number = 0
+  ): Promise<void> {
+    const selector = `${responseModalBodySelector} ${inputType}`;
+    await this.expectElementToBeVisible(selector);
+
+    const elements = await this.page.$$(selector);
+    if (elements.length < index + 1) {
+      throw new Error(`Element ${index} not found.`);
+    }
+
+    const element = elements[index];
+
+    // Clear all text from the element.
+    await this.clickOnElement(element, {
+      clickCount: 3,
+    });
+    await this.page.keyboard.press('Backspace');
+
+    await this.typeInInputField(element, value);
+    await this.page.waitForFunction(
+      (element: HTMLInputElement, value: string) => {
+        return (element as HTMLInputElement).value === value;
+      },
+      {},
+      element,
+      value
+    );
+  }
+
+  /**
+   * Updates the response.
+   * @param index The zero-based index of the response.
+   * @param newAnswer The new answer.
+   * @param responseFeedback The new response feedback.
+   */
+  async updateResponse(
+    index: number,
+    newAnswer: string,
+    responseFeedback: string
+  ): Promise<void> {
+    // Expand response group if not expanded already.
+    if (
+      this.isViewportAtMobileWidth() &&
+      !(await this.isElementVisible(responseGroupDiv, true, 5000))
+    ) {
+      await this.clickOnElementWithSelector(toggleResponseTab);
+    }
+    await this.page.waitForSelector(responseGroupDiv);
+    const elements = await this.page.$$(responseGroupDiv);
+    if (elements.length < index + 1) {
+      throw new Error(`Element ${index} not found.`);
+    }
+    await this.clickOnElement(elements[index]);
+    await this.page.waitForFunction(
+      (element: HTMLElement, className: string) => {
+        return element.className.includes(className);
+      },
+      {},
+      elements[index],
+      activeRuleTabClass
+    );
+
+    if (newAnswer) {
+      await this.clickOnElementWithSelector(responseInputSelector);
+      await this.clearAllTextFrom(answerInputSelector);
+      await this.typeInInputField(answerInputSelector, newAnswer);
+      await this.clickOnElementWithSelector(
+        saveAnswerButtonInResponseGroupSelector
+      );
+      await this.expectElementToBeVisible(
+        saveAnswerButtonInResponseGroupSelector,
+        false
+      );
+    }
+
+    if (responseFeedback) {
+      await this.updateDefaultResponseFeedbackInExplorationEditorPage(
+        responseFeedback
+      );
+    }
+  }
+
+  /**
    * Checks if the self loop warning is visible.
    * @param {boolean} visible - Whether the self loop warning should be visible or not.
    */
@@ -6826,9 +6983,11 @@ export class ExplorationEditor extends BaseUser {
     await this.waitForElementToBeClickable(historyOption);
     await historyOption.click();
 
-    await this.clickOn(`${dropdownMenuShown} ${revertVersionButtonSelector}`);
+    await this.clickOnElementWithSelector(
+      `${dropdownMenuShown} ${revertVersionButtonSelector}`
+    );
     await this.waitForElementToStabilize(confirmRevertButtonSelector);
-    await this.clickAndWaitForNavigation(confirmRevertButtonSelector, {
+    await this.clickAndWaitForNavigation(confirmRevertButtonSelector, true, {
       waitUntil: ['networkidle0', 'load'],
     });
     await this.page.waitForFunction(
@@ -6868,7 +7027,7 @@ export class ExplorationEditor extends BaseUser {
    */
   async clickOnTestExploration(): Promise<void> {
     await this.expectElementToBeVisible(interactionPreviewSelector);
-    await this.clickOn(interactionPreviewSelector);
+    await this.clickOnElementWithSelector(interactionPreviewSelector);
     await this.page.waitForFunction(
       (selector: string, h1: string, h2: string) => {
         const element = document.querySelector(selector);
@@ -6889,11 +7048,13 @@ export class ExplorationEditor extends BaseUser {
    * Removes the current interaction.
    */
   async removeInteraction(): Promise<void> {
-    await this.expectElementToBeVisible(removeInteractionButttonSelector);
+    // We need to wait for element to stabalize explicitly, as it gets detached
+    // this is not handled by waitForElementToStabalize in clickOnElementWithSelector.
     await this.waitForElementToStabilize(removeInteractionButttonSelector);
-    await this.clickOn(removeInteractionButttonSelector);
-    await this.expectElementToBeVisible(confirmDeleteInteractionButtonSelector);
-    await this.clickOn(confirmDeleteInteractionButtonSelector);
+    await this.clickOnElementWithSelector(removeInteractionButttonSelector);
+    await this.clickOnElementWithSelector(
+      confirmDeleteInteractionButtonSelector
+    );
     await this.expectElementToBeVisible(
       confirmDeleteInteractionButtonSelector,
       false
