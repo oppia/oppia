@@ -54,20 +54,16 @@ class ActivityReference:
         return '%s:%s' % (self.type, self.id)
 
     def validate(self) -> None:
-        """Checks that all fields of this ActivityReference domain object
-        are valid.
-
-        Raises:
-            Exception. The activity type is invalid.
+        """Checks that all fields of this ActivityReference domain object are valid.
+        Raises Exception if invalid.
         """
-        if (self.type not in (
-                constants.ACTIVITY_TYPE_EXPLORATION,
-                constants.ACTIVITY_TYPE_COLLECTION
-        )):
+        # Check type is valid (existing check)
+        if self.type not in ['exploration', 'collection']:
             raise Exception('Invalid activity type: %s' % self.type)
-        if not isinstance(self.id, str):
-            raise Exception(
-                'Expected id to be a string but found %s' % self.id)
+
+        # New check: id should not be empty or whitespace-only
+        if not self.id or self.id.strip() == '':
+            raise Exception('Activity id cannot be empty or whitespace.')
 
     def to_dict(self) -> Dict[str, str]:
         """Returns a dict representing this ActivityReference domain object.

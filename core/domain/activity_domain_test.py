@@ -119,3 +119,13 @@ class ActivityReferencesDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             Exception, 'Invalid activity type: invalid_activity_type'):
             self.invalid_activity_references.validate()
+
+    def test_validate_with_empty_id(self) -> None:
+        empty_id_ref = activity_domain.ActivityReference('exploration', '')
+        with self.assertRaisesRegex(Exception, 'Activity id cannot be empty'):
+            empty_id_ref.validate()
+
+    def test_validate_with_whitespace_id(self) -> None:
+        whitespace_id_ref = activity_domain.ActivityReference('exploration', '   ')
+        with self.assertRaisesRegex(Exception, 'Activity id cannot be empty'):
+            whitespace_id_ref.validate()
