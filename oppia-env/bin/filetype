@@ -1,4 +1,4 @@
-#!/home/namanuix/oppia/oppia-env/bin/python3.11
+#!/home/namanuix/oppia/oppia-env/bin/python3.10
 # -*- coding: utf-8 -*-
 import re
 import sys

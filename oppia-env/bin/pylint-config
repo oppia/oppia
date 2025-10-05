@@ -1,4 +1,4 @@
-#!/home/namanuix/oppia/oppia-env/bin/python3
+#!/home/namanuix/oppia/oppia-env/bin/python
 import sys
 from pylint import _run_pylint_config
 if __name__ == '__main__':

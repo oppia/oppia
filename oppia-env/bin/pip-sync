@@ -1,4 +1,4 @@
-#!/home/namanuix/oppia/oppia-env/bin/python3
+#!/home/namanuix/oppia/oppia-env/bin/python
 import sys
 from piptools.scripts.sync import cli
 if __name__ == '__main__':
