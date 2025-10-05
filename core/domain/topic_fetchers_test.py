@@ -20,7 +20,6 @@ from __future__ import annotations
 
 from core import feconf
 from core.domain import (
-    learner_progress_services,
     topic_domain,
     topic_fetchers,
     topic_services,
