@@ -343,6 +343,7 @@ def mark_topic_as_learnt(user_id: str, topic_id: str) -> None:
     """Adds the topic id to the learnt list of the user unless the
     topic has already been learnt by the user. It is also removed from
     the partially learnt list and topics to learn list(if present).
+
     Args:
         user_id: str. The id of the user who has learnt the topic.
         topic_id: str. The id of the learnt topic.
@@ -372,6 +373,7 @@ def mark_topic_as_learnt(user_id: str, topic_id: str) -> None:
     topic_ids_to_learn = learner_goals_services.get_all_topic_ids_to_learn(
         user_id
     )
+
     activities_completed = _get_completed_activities_from_model(
         completed_activities_model
     )
