@@ -38,37 +38,46 @@ SERVER_MODE_DEV: Final = 'prod'
 GOOGLE_APP_ENGINE_PORT: Final = 8181
 LIGHTHOUSE_CONFIG_FILENAMES: Final = {
     LIGHTHOUSE_MODE_PERFORMANCE: '.lighthouserc-performance.js',
-    LIGHTHOUSE_MODE_ACCESSIBILITY: '.lighthouserc-accessibility.js'
+    LIGHTHOUSE_MODE_ACCESSIBILITY: '.lighthouserc-accessibility.js',
 }
 APP_YAML_FILENAMES: Final = {
     SERVER_MODE_PROD: 'app.yaml',
-    SERVER_MODE_DEV: 'app_dev.yaml'
+    SERVER_MODE_DEV: 'app_dev.yaml',
 }
 LIGHTHOUSE_PAGES_JSON_FILEPATH = os.path.join(
-    'core', 'tests', 'lighthouse-pages.json')
+    'core', 'tests', 'lighthouse-pages.json'
+)
 
 _PARSER: Final = argparse.ArgumentParser(
     description="""
 Run the script from the oppia root folder:
     python -m scripts.run_lighthouse_tests
 Note that the root folder MUST be named 'oppia'.
-""")
+"""
+)
 
 _PARSER.add_argument(
-    '--mode', help='Sets the mode for the lighthouse tests',
+    '--mode',
+    help='Sets the mode for the lighthouse tests',
     required=True,
-    choices=['accessibility', 'performance'])
+    choices=['accessibility', 'performance'],
+)
 
 _PARSER.add_argument(
-    '--pages', help='Sets the pages to run the lighthouse tests on')
+    '--pages', help='Sets the pages to run the lighthouse tests on'
+)
 
 _PARSER.add_argument(
-    '--skip_build', help='Sets whether to skip webpack build',
-    action='store_true')
+    '--skip_build',
+    help='Sets whether to skip webpack build',
+    action='store_true',
+)
 
 _PARSER.add_argument(
-    '--record_screen', help='Sets whether LHCI Puppeteer script is recorded',
-    action='store_true')
+    '--record_screen',
+    help='Sets whether LHCI Puppeteer script is recorded',
+    action='store_true',
+)
 
 
 def run_lighthouse_puppeteer_script(record: bool = False) -> dict[str, str]:
@@ -82,8 +91,9 @@ def run_lighthouse_puppeteer_script(record: bool = False) -> dict[str, str]:
     Returns:
         dict(str, str). The entities and their IDs that were collected.
     """
-    puppeteer_path = (
-        os.path.join('core', 'tests', 'puppeteer', 'lighthouse_setup.js'))
+    puppeteer_path = os.path.join(
+        'core', 'tests', 'puppeteer', 'lighthouse_setup.js'
+    )
     bash_command = [common.NODE_BIN_PATH, puppeteer_path]
     if record:
         # Add arguments to lighthouse_setup that enable video recording.
@@ -97,7 +107,8 @@ def run_lighthouse_puppeteer_script(record: bool = False) -> dict[str, str]:
         print('Video Path:' + video_path)
 
     process = subprocess.Popen(
-        bash_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        bash_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
     stdout, stderr = process.communicate()
     if process.returncode == 0:
         print(stdout)
@@ -157,7 +168,7 @@ def get_entity(line: str) -> tuple[str, str] | None:
     """Gets the entity in the given line if the line is a URL.
 
     Args:
-        line: str. The line to parse and extract the entity name and ID from. 
+        line: str. The line to parse and extract the entity name and ID from.
             If no recognizable URL is present, nothing is returned.
 
     Returns:
@@ -188,13 +199,16 @@ def run_lighthouse_checks(lighthouse_mode: str) -> None:
     # The max-old-space-size is a quick fix for node running out of heap memory
     # when executing the performance tests: https://stackoverflow.com/a/59572966
     bash_command = [
-        common.NODE_BIN_PATH, lhci_path, 'autorun',
+        common.NODE_BIN_PATH,
+        lhci_path,
+        'autorun',
         '--config=%s' % LIGHTHOUSE_CONFIG_FILENAMES[lighthouse_mode],
-        '--max-old-space-size=4096'
+        '--max-old-space-size=4096',
     ]
 
     process = subprocess.Popen(
-        bash_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        bash_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
     stdout, stderr = process.communicate()
 
     print('OUTPUT:')
@@ -246,7 +260,7 @@ def inject_entities_into_url(url: str, entities: dict[str, str]) -> str:
         str. The URL with the entity ID injected into it.
 
     Raises:
-        ValueError. The entity referenced in the URL is not found in the 
+        ValueError. The entity referenced in the URL is not found in the
             entities.
     """
     entity_matcher = r'\{\{(.*?)\}\}'
@@ -256,20 +270,19 @@ def inject_entities_into_url(url: str, entities: dict[str, str]) -> str:
         if entity_name not in entities:
             raise ValueError('Entity %s not found in entities.' % entity_name)
         injected_url = url.replace(
-            '{{%s}}' % entity_name, entities[entity_name])
+            '{{%s}}' % entity_name, entities[entity_name]
+        )
     return injected_url
 
 
 def get_lighthouse_urls_to_run(
-    pages: List[str],
-    entities: dict[str, str],
-    pages_config: dict[str, str]
+    pages: List[str], entities: dict[str, str], pages_config: dict[str, str]
 ) -> List[str]:
     """Gets the URLs to run Lighthouse checks on.
 
     Args:
         pages: list(str). The pages to run the Lighthouse checks on.
-        entities: dict(str, str). The available entities to inject 
+        entities: dict(str, str). The available entities to inject
             into the URLs.
         pages_config: dict(str, str). The configuration for the pages.
 
@@ -305,7 +318,8 @@ def main(args: Optional[List[str]] = None) -> None:
             else:
                 # Skip webpack build if skip_build flag is passed.
                 print(
-                    'Building files in production mode skipping webpack build.')
+                    'Building files in production mode skipping webpack build.'
+                )
                 build.main(args=[])
                 common.run_ng_compilation()
                 run_webpack_compilation()
@@ -326,20 +340,21 @@ def main(args: Optional[List[str]] = None) -> None:
 
             env = os.environ.copy()
             env['PIP_NO_DEPS'] = 'True'
-            stack.enter_context(servers.managed_dev_appserver(
-                APP_YAML_FILENAMES[server_mode],
-                port=GOOGLE_APP_ENGINE_PORT,
-                log_level='critical',
-                skip_sdk_update_check=True,
-                env=env))
+            stack.enter_context(
+                servers.managed_dev_appserver(
+                    APP_YAML_FILENAMES[server_mode],
+                    port=GOOGLE_APP_ENGINE_PORT,
+                    log_level='critical',
+                    skip_sdk_update_check=True,
+                    env=env,
+                )
+            )
 
         entities = run_lighthouse_puppeteer_script(parsed_args.record_screen)
         pages_config: dict[str, str] = get_lighthouse_pages_config()
         os.environ['ALL_LIGHTHOUSE_URLS'] = ','.join(
             get_lighthouse_urls_to_run(
-                list(pages_config.keys()),
-                entities,
-                pages_config
+                list(pages_config.keys()), entities, pages_config
             )
         )
         if parsed_args.pages:
@@ -347,12 +362,12 @@ def main(args: Optional[List[str]] = None) -> None:
                 get_lighthouse_urls_to_run(
                     [page.strip() for page in parsed_args.pages.split(',')],
                     entities,
-                    pages_config
+                    pages_config,
                 )
             )
 
         run_lighthouse_checks(lighthouse_mode)
 
 
-if __name__ == '__main__': # pragma: no cover
+if __name__ == '__main__':  # pragma: no cover
     main()

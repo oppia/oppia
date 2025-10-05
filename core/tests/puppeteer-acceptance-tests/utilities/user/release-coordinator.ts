@@ -92,11 +92,11 @@ export class ReleaseCoordinator extends BaseUser {
     try {
       if (this.isViewportAtMobileWidth()) {
         await this.expectElementToBeVisible(mobileNavBar);
-        await this.clickOn(mobileNavBar);
-        await this.clickOn(mobileFeaturesTab);
+        await this.clickOnElementWithSelector(mobileNavBar);
+        await this.clickOnElementWithSelector(mobileFeaturesTab);
       } else {
         await this.expectElementToBeVisible(featuresTab);
-        await this.clickOn(featuresTab);
+        await this.clickOnElementWithSelector(featuresTab);
       }
 
       await this.page.waitForSelector(featureFlagSelector, {
@@ -116,11 +116,11 @@ export class ReleaseCoordinator extends BaseUser {
   async navigateToBeamJobsTab(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.expectElementToBeVisible(mobileNavBar);
-      await this.clickOn(mobileNavBar);
-      await this.clickOn(mobileBeamJobsTab);
+      await this.clickOnElementWithSelector(mobileNavBar);
+      await this.clickOnElementWithSelector(mobileBeamJobsTab);
     } else {
       await this.expectElementToBeVisible(beamJobsTab);
-      await this.clickOn(beamJobsTab);
+      await this.clickOnElementWithSelector(beamJobsTab);
     }
 
     await this.expectElementToBeVisible(beamJobsTabContainerSelector);
@@ -131,9 +131,9 @@ export class ReleaseCoordinator extends BaseUser {
    */
   async navigateToMiscTab(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileNavBar);
+      await this.clickOnElementWithSelector(mobileNavBar);
       await this.page.waitForSelector(mobileMiscTab, {visible: true});
-      await this.clickOn(mobileMiscTab);
+      await this.clickOnElementWithSelector(mobileMiscTab);
     } else {
       await this.page.waitForSelector(navbarElementSelector);
       const navbarElements = await this.page.$$(navbarElementSelector);
@@ -158,12 +158,12 @@ export class ReleaseCoordinator extends BaseUser {
 
       if (this.isViewportAtMobileWidth()) {
         await this.page.waitForSelector(mobileNavBar);
-        await this.clickOn(mobileNavBar);
+        await this.clickOnElementWithSelector(mobileNavBar);
         await this.page.waitForSelector(mobileFeaturesTab);
-        await this.clickOn(mobileFeaturesTab);
+        await this.clickOnElementWithSelector(mobileFeaturesTab);
       } else {
         await this.page.waitForSelector(featuresTab);
-        await this.clickOn(featuresTab);
+        await this.clickOnElementWithSelector(featuresTab);
       }
 
       await this.page.waitForSelector(featureFlagDiv);
@@ -263,12 +263,12 @@ export class ReleaseCoordinator extends BaseUser {
 
       if (this.isViewportAtMobileWidth()) {
         await this.page.waitForSelector(mobileNavBar);
-        await this.clickOn(mobileNavBar);
+        await this.clickOnElementWithSelector(mobileNavBar);
         await this.page.waitForSelector(mobileFeaturesTab);
-        await this.clickOn(mobileFeaturesTab);
+        await this.clickOnElementWithSelector(mobileFeaturesTab);
       } else {
         await this.page.waitForSelector(featuresTab);
-        await this.clickOn(featuresTab);
+        await this.clickOnElementWithSelector(featuresTab);
       }
 
       await this.page.waitForSelector(featureFlagDiv);
@@ -335,7 +335,7 @@ export class ReleaseCoordinator extends BaseUser {
     expectedState: 'enabled' | 'disabled' = 'enabled'
   ): Promise<void> {
     await this.page.waitForSelector(promoBarToggleSelector);
-    await this.clickOn(promoBarToggleSelector);
+    await this.clickOnElementWithSelector(promoBarToggleSelector);
 
     await this.page.waitForFunction(
       (selector: string, checked: boolean) => {
@@ -363,7 +363,7 @@ export class ReleaseCoordinator extends BaseUser {
    * Saves the promo bar message.
    */
   async savePromoBarMessage(): Promise<void> {
-    await this.clickOn(' Save changes ');
+    await this.clickOnElementWithText(' Save changes ');
     await this.page.waitForSelector(actionStatusMessageSelector, {
       visible: true,
     });
@@ -396,7 +396,7 @@ export class ReleaseCoordinator extends BaseUser {
    * Clicks on the 'Flush Cache' button.
    */
   async flushCache(): Promise<void> {
-    await this.clickOn('Flush Cache');
+    await this.clickOnElementWithText('Flush Cache');
     await this.expectActionStatusMessageToBe('Success! Memory Cache Flushed.');
   }
 
@@ -573,7 +573,7 @@ export class ReleaseCoordinator extends BaseUser {
       const pages = await this.browserObject.pages();
       this.page = pages[pages.length - 1];
 
-      await this.clickOn('View Output');
+      await this.clickOnElementWithText('View Output');
       await this.page.waitForSelector(beamJobRunOutputSelector, {
         visible: true,
       });
@@ -584,7 +584,7 @@ export class ReleaseCoordinator extends BaseUser {
         el => el.textContent
       );
 
-      await this.clickOn(copyOutputButton);
+      await this.clickOnElementWithSelector(copyOutputButton);
 
       // Reading the clipboard data.
       const clipboardData = await this.page.evaluate(async () => {
@@ -767,7 +767,7 @@ export class ReleaseCoordinator extends BaseUser {
     await this.expectElementToBeVisible(addUserGroupContainerSelector);
     await this.clearAllTextFrom(userGroupInputSelector);
     await this.typeInInputField(userGroupInputSelector, groupName);
-    await this.clickOn(addNewUserGroupButtonSelector);
+    await this.clickOnElementWithSelector(addNewUserGroupButtonSelector);
 
     await this.expectUserGroupToBePresent(groupName);
   }

@@ -3,8 +3,7 @@ from google import auth
 
 class Client(object):
     def __init__(
-            self,
-            credentials: auth.credentials.Credentials = ...
+        self, credentials: auth.credentials.Credentials = ...
     ) -> None: ...
     def translate(
         self,

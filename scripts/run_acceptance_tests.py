@@ -34,61 +34,67 @@ Run this script from the oppia root folder:
    python -m scripts.run_acceptance_tests
 
 The root folder MUST be named 'oppia'.
-""")
+"""
+)
 
 _PARSER.add_argument(
     '--skip-build',
     help='If true, skips building files. The default value is false.',
-    action='store_true')
+    action='store_true',
+)
 _PARSER.add_argument(
     '--prod_env',
     help='Run the tests in prod mode. Static resources are served from '
-         'build directory and use cache slugs.',
-    action='store_true')
+    'build directory and use cache slugs.',
+    action='store_true',
+)
 _PARSER.add_argument(
-    '--suite', required=True,
+    '--suite',
+    required=True,
     help='Specifies the test suite to run. '
-         'For performing a full test, no argument is required.')
+    'For performing a full test, no argument is required.',
+)
 _PARSER.add_argument(
     '--server_log_level',
     help='Sets the log level for the appengine server. The default value is '
-         'set to error.',
+    'set to error.',
     default='error',
-    choices=['critical', 'error', 'warning', 'info'])
+    choices=['critical', 'error', 'warning', 'info'],
+)
 _PARSER.add_argument(
-    '--source_maps',
-    help='Build webpack with source maps.',
-    action='store_true')
+    '--source_maps', help='Build webpack with source maps.', action='store_true'
+)
 
 _PARSER.add_argument(
-    '--headless',
-    help='Run the tests in headless mode.',
-    action='store_true')
+    '--headless', help='Run the tests in headless mode.', action='store_true'
+)
 
 _PARSER.add_argument(
-    '--mobile',
-    help='Run the tests in mobile mode.',
-    action='store_true')
+    '--mobile', help='Run the tests in mobile mode.', action='store_true'
+)
 
 
 def compile_test_ts_files() -> None:
     """Compiles the test typescript files into a build directory."""
     puppeteer_acceptance_tests_dir_path = os.path.join(
-        common.CURR_DIR, 'core', 'tests', 'puppeteer-acceptance-tests')
+        common.CURR_DIR, 'core', 'tests', 'puppeteer-acceptance-tests'
+    )
     build_dir_path = os.path.join(
         puppeteer_acceptance_tests_dir_path,
         'build',
-        'puppeteer-acceptance-tests'
+        'puppeteer-acceptance-tests',
     )
 
     if os.path.exists(build_dir_path):
         shutil.rmtree(build_dir_path)
 
     cmd = (
-        './node_modules/typescript/bin/tsc -p %s' %
-        './tsconfig.puppeteer-acceptance-tests.json')
+        './node_modules/typescript/bin/tsc -p %s'
+        % './tsconfig.puppeteer-acceptance-tests.json'
+    )
     proc = subprocess.Popen(
-        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
+    )
 
     _, encoded_stderr = proc.communicate()
     stderr = encoded_stderr.decode('utf-8')
@@ -98,7 +104,8 @@ def compile_test_ts_files() -> None:
 
     shutil.copytree(
         os.path.join(puppeteer_acceptance_tests_dir_path, 'data'),
-        os.path.join(build_dir_path, 'data'))
+        os.path.join(build_dir_path, 'data'),
+    )
 
 
 def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
@@ -108,7 +115,8 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
             """
             Oppia server is already running. Try shutting all the servers down
             before running the script.
-        """)
+        """
+        )
 
     with contextlib.ExitStack() as stack:
         dev_mode = not args.prod_env
@@ -125,29 +133,36 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
         if constants.EMULATOR_MODE:
             stack.enter_context(servers.managed_firebase_auth_emulator())
             stack.enter_context(
-                servers.managed_cloud_datastore_emulator(clear_datastore=True))
+                servers.managed_cloud_datastore_emulator(clear_datastore=True)
+            )
 
         app_yaml_path = 'app.yaml' if args.prod_env else 'app_dev.yaml'
-        stack.enter_context(servers.managed_dev_appserver(
-            app_yaml_path,
-            port=common.GAE_PORT_FOR_E2E_TESTING,
-            log_level=args.server_log_level,
-            # Automatic restart can be disabled since we don't expect code
-            # changes to happen while the acceptance tests are running.
-            automatic_restart=False,
-            skip_sdk_update_check=True,
-            env={
-                **os.environ,
-                'PORTSERVER_ADDRESS': common.PORTSERVER_SOCKET_FILEPATH,
-                'PIP_NO_DEPS': 'True'
-            }))
+        stack.enter_context(
+            servers.managed_dev_appserver(
+                app_yaml_path,
+                port=common.GAE_PORT_FOR_E2E_TESTING,
+                log_level=args.server_log_level,
+                # Automatic restart can be disabled since we don't expect code
+                # changes to happen while the acceptance tests are running.
+                automatic_restart=False,
+                skip_sdk_update_check=True,
+                env={
+                    **os.environ,
+                    'PORTSERVER_ADDRESS': common.PORTSERVER_SOCKET_FILEPATH,
+                    'PIP_NO_DEPS': 'True',
+                },
+            )
+        )
 
-        proc = stack.enter_context(servers.managed_acceptance_tests_server(
-            suite_name=args.suite,
-            headless=args.headless,
-            mobile=args.mobile,
-            prod_env=args.prod_env,
-            stdout=subprocess.PIPE))
+        proc = stack.enter_context(
+            servers.managed_acceptance_tests_server(
+                suite_name=args.suite,
+                headless=args.headless,
+                mobile=args.mobile,
+                prod_env=args.prod_env,
+                stdout=subprocess.PIPE,
+            )
+        )
 
         print('Servers have come up.\n')
 

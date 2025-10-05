@@ -47,9 +47,7 @@ class BlogAdminHandlerNormalizedPayloadDict(TypedDict):
 
 
 class BlogAdminHandler(
-    base.BaseHandler[
-        BlogAdminHandlerNormalizedPayloadDict, Dict[str, str]
-    ]
+    base.BaseHandler[BlogAdminHandlerNormalizedPayloadDict, Dict[str, str]]
 ):
     """Handler for the blog admin page."""
 
@@ -61,57 +59,58 @@ class BlogAdminHandler(
             'action': {
                 'schema': {
                     'type': 'basestring',
-                    'choices': [
-                        'save_platform_parameters'
-                    ]
+                    'choices': ['save_platform_parameters'],
                 }
             },
             'new_platform_parameter_values': {
                 'schema': {
                     'type': 'object_dict',
                     'validation_method': (
-                        validation_method.
-                        validate_platform_params_values_for_blog_admin),
+                        validation_method.validate_platform_params_values_for_blog_admin
+                    ),
                 },
-                'default_value': None
-            }
-        }
+                'default_value': None,
+            },
+        },
     }
 
     @acl_decorators.can_access_blog_admin_page
     def get(self) -> None:
         """Handles GET requests."""
-        max_no_of_tags_parameter = (
-            platform_parameter_registry.Registry.get_platform_parameter(
-                platform_parameter_list.ParamName.
-                MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value)
+        max_no_of_tags_parameter = platform_parameter_registry.Registry.get_platform_parameter(
+            platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
         )
         platform_params_for_blog_admin = {
             'max_number_of_tags_assigned_to_blog_post': {
                 'schema': (
                     platform_parameter_services.get_platform_parameter_schema(
-                        max_no_of_tags_parameter.name)
+                        max_no_of_tags_parameter.name
+                    )
                 ),
                 'description': max_no_of_tags_parameter.description,
                 'value': (
                     platform_parameter_services.get_platform_parameter_value(
-                        max_no_of_tags_parameter.name)
-                )
+                        max_no_of_tags_parameter.name
+                    )
+                ),
             }
         }
         role_to_action = role_services.get_role_actions()
-        self.render_json({
-            'platform_parameters': platform_params_for_blog_admin,
-            'role_to_actions': {
-                BLOG_POST_EDITOR: role_to_action[BLOG_POST_EDITOR],
-                BLOG_ADMIN: role_to_action[BLOG_ADMIN]
-            },
-            'updatable_roles': {
-                BLOG_POST_EDITOR: (
-                    role_services.HUMAN_READABLE_ROLES[BLOG_POST_EDITOR]),
-                BLOG_ADMIN: role_services.HUMAN_READABLE_ROLES[BLOG_ADMIN]
+        self.render_json(
+            {
+                'platform_parameters': platform_params_for_blog_admin,
+                'role_to_actions': {
+                    BLOG_POST_EDITOR: role_to_action[BLOG_POST_EDITOR],
+                    BLOG_ADMIN: role_to_action[BLOG_ADMIN],
+                },
+                'updatable_roles': {
+                    BLOG_POST_EDITOR: (
+                        role_services.HUMAN_READABLE_ROLES[BLOG_POST_EDITOR]
+                    ),
+                    BLOG_ADMIN: role_services.HUMAN_READABLE_ROLES[BLOG_ADMIN],
+                },
             }
-        })
+        )
 
     @acl_decorators.can_access_blog_admin_page
     def post(self) -> None:
@@ -122,7 +121,8 @@ class BlogAdminHandler(
         assert action == 'save_platform_parameters'
 
         new_platform_parameter_values = self.normalized_payload.get(
-            'new_platform_parameter_values')
+            'new_platform_parameter_values'
+        )
         if new_platform_parameter_values is None:
             raise Exception(
                 'The new_platform_parameter_values cannot be None when the'
@@ -130,29 +130,33 @@ class BlogAdminHandler(
             )
         for name, value in new_platform_parameter_values.items():
             param = platform_parameter_registry.Registry.get_platform_parameter(
-                name)
+                name
+            )
             rules_for_platform_parameter = [
-                platform_parameter_domain.PlatformParameterRule.from_dict({
-                    'filters': [
-                        {
-                            'type': 'platform_type',
-                            'conditions': [['=', 'Web']]
-                        }
-                    ],
-                    'value_when_matched': value
-                })
+                platform_parameter_domain.PlatformParameterRule.from_dict(
+                    {
+                        'filters': [
+                            {
+                                'type': 'platform_type',
+                                'conditions': [['=', 'Web']],
+                            }
+                        ],
+                        'value_when_matched': value,
+                    }
+                )
             ]
             platform_parameter_registry.Registry.update_platform_parameter(
                 name,
                 self.user_id,
                 'Update platform parameter property from blog admin page.',
                 rules_for_platform_parameter,
-                param.default_value
+                param.default_value,
             )
 
         logging.info(
-            '[BLOG ADMIN] %s saved platform parameter values: %s' %
-            (self.user_id, new_platform_parameter_values))
+            '[BLOG ADMIN] %s saved platform parameter values: %s'
+            % (self.user_id, new_platform_parameter_values)
+        )
 
         self.render_json({})
 
@@ -167,9 +171,7 @@ class BlogAdminRolesHandlerNormalizedPayloadDict(TypedDict):
 
 
 class BlogAdminRolesHandler(
-    base.BaseHandler[
-        BlogAdminRolesHandlerNormalizedPayloadDict, Dict[str, str]
-    ]
+    base.BaseHandler[BlogAdminRolesHandlerNormalizedPayloadDict, Dict[str, str]]
 ):
     """Handler for the blog admin page."""
 
@@ -180,22 +182,14 @@ class BlogAdminRolesHandler(
             'role': {
                 'schema': {
                     'type': 'basestring',
-                    'choices': [BLOG_ADMIN, BLOG_POST_EDITOR]
+                    'choices': [BLOG_ADMIN, BLOG_POST_EDITOR],
                 }
             },
-            'username': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
+            'username': {'schema': {'type': 'basestring'}},
         },
         'PUT': {
-            'username': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
-        }
+            'username': {'schema': {'type': 'basestring'}},
+        },
     }
 
     @acl_decorators.can_manage_blog_post_editors
@@ -208,11 +202,12 @@ class BlogAdminRolesHandler(
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
             raise self.InvalidInputException(
-                'User with given username does not exist.')
+                'User with given username does not exist.'
+            )
         user_services.add_user_role(user_id, role)
         role_services.log_role_query(
-            self.user_id, feconf.ROLE_ACTION_ADD, role=role,
-            username=username)
+            self.user_id, feconf.ROLE_ACTION_ADD, role=role, username=username
+        )
         self.render_json({})
 
     @acl_decorators.can_manage_blog_post_editors
@@ -222,8 +217,7 @@ class BlogAdminRolesHandler(
         username = self.normalized_payload['username']
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
-            raise self.InvalidInputException(
-                'Invalid username: %s' % username)
+            raise self.InvalidInputException('Invalid username: %s' % username)
 
         user_services.remove_user_role(user_id, feconf.ROLE_ID_BLOG_POST_EDITOR)
         blog_services.deassign_user_from_all_blog_posts(user_id)

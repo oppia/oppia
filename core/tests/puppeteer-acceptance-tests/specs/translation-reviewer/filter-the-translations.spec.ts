@@ -115,7 +115,7 @@ describe('Translation Reviewer', function () {
       'The Picnic Problem'
     );
     await translationSubmitter.typeTextForRTE('सामग्री 0 (पाई काटना)');
-    await translationSubmitter.clickOn('Save and close');
+    await translationSubmitter.clickOnElementWithText('Save and close');
 
     // Add translations to "Trading Slices" in Akan.
     await translationSubmitter.selectLanguageFilter('Ákán (Akan)');
@@ -126,7 +126,7 @@ describe('Translation Reviewer', function () {
     await translationSubmitter.typeTextForRTE(
       'emu nsɛm 0 (slices a wɔde sesa wɔn ho wɔn ho)'
     );
-    await translationSubmitter.clickOn('Save and close');
+    await translationSubmitter.clickOnElementWithText('Save and close');
 
     // Add translations to "Chemical Reactions" in Hindi.
     await translationSubmitter.selectLanguageFilter('हिन्दी (Hindi)');
@@ -135,7 +135,7 @@ describe('Translation Reviewer', function () {
       'The Ideal Gas Law'
     );
     await translationSubmitter.typeTextForRTE('सामग्री 0');
-    await translationSubmitter.clickOn('Save and close');
+    await translationSubmitter.clickOnElementWithText('Save and close');
   }, 1200000);
 
   it('should be able to filter by topic', async function () {
