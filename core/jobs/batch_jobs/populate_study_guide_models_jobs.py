@@ -33,11 +33,12 @@ import result
 from typing import Tuple
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import datastore_services, subtopic_models, topic_models
 
-(topic_models, subtopic_models) = models.Registry.import_models([
-    models.Names.TOPIC, models.Names.SUBTOPIC])
+(topic_models, subtopic_models) = models.Registry.import_models(
+    [models.Names.TOPIC, models.Names.SUBTOPIC]
+)
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -50,20 +51,17 @@ class PopulateStudyGuidesJob(base_jobs.JobBase):
     def _create_study_guide_model(
         data_tuple: Tuple[
             str,
-            Tuple[
-                subtopic_models.SubtopicPageModel,
-                topic_models.TopicModel
-            ]
-        ]
+            Tuple[subtopic_models.SubtopicPageModel, topic_models.TopicModel],
+        ],
     ) -> result.Result[
         Tuple[
             str,
             Tuple[
                 subtopic_models.StudyGuideModel,
-                subtopic_models.StudyGuideCommitLogEntryModel
-            ]
+                subtopic_models.StudyGuideCommitLogEntryModel,
+            ],
         ],
-     Tuple[str, Exception]
+        Tuple[str, Exception],
     ]:
         """Creates a study guide model and commit log entry from
             a subtopic page model and topic model.
@@ -86,8 +84,7 @@ class PopulateStudyGuidesJob(base_jobs.JobBase):
         try:
             with datastore_services.get_ndb_context():
                 subtopic_page = (
-                    subtopic_page_services
-                    .get_subtopic_page_from_model
+                    subtopic_page_services.get_subtopic_page_from_model
                 )(subtopic_page_model)
                 topic = topic_fetchers.get_topic_from_model(topic_model)
 
@@ -106,12 +103,12 @@ class PopulateStudyGuidesJob(base_jobs.JobBase):
                 {
                     'heading': {
                         'content_id': 'section_heading_0',
-                        'unicode_str': subtopic_title
+                        'unicode_str': subtopic_title,
                     },
                     'content': {
                         'content_id': 'section_content_1',
-                        'html': subtopic_page.page_contents.subtitled_html.html
-                    }
+                        'html': subtopic_page.page_contents.subtitled_html.html,
+                    },
                 }
             ]
 
@@ -127,7 +124,7 @@ class PopulateStudyGuidesJob(base_jobs.JobBase):
                 sections_schema_version=1,
                 language_code=subtopic_page.language_code,
                 next_content_id_index=2,
-                version=1
+                version=1,
             )
 
             # Create commit log entry model.
@@ -135,13 +132,12 @@ class PopulateStudyGuidesJob(base_jobs.JobBase):
                 {
                     'cmd': 'create_new',
                     'topic_id': subtopic_page.topic_id,
-                    'subtopic_id': subtopic_id
+                    'subtopic_id': subtopic_id,
                 }
             ]
 
             study_guide_commit_log_entry_model = (
-                subtopic_models
-                .StudyGuideCommitLogEntryModel
+                subtopic_models.StudyGuideCommitLogEntryModel
             )(
                 id='studyguide-%s-1' % subtopic_page_id,
                 study_guide_id=subtopic_page_id,
@@ -152,7 +148,7 @@ class PopulateStudyGuidesJob(base_jobs.JobBase):
                 post_commit_status='public',
                 post_commit_community_owned=False,
                 post_commit_is_private=False,
-                version=1
+                version=1,
             )
 
         study_guide_model.update_timestamps()
@@ -161,10 +157,7 @@ class PopulateStudyGuidesJob(base_jobs.JobBase):
         return result.Ok(
             (
                 subtopic_page_id,
-                (
-                    study_guide_model,
-                    study_guide_commit_log_entry_model
-                )
+                (study_guide_model, study_guide_commit_log_entry_model),
             )
         )
 
@@ -178,40 +171,44 @@ class PopulateStudyGuidesJob(base_jobs.JobBase):
         """
         all_subtopic_page_models = (
             self.pipeline
-            | 'Get all subtopic page models' >> (
-                ndb_io.GetModels(subtopic_models.SubtopicPageModel.get_all()))
-            | 'Add subtopic page keys' >> beam.WithKeys( # pylint: disable=no-value-for-parameter
-                lambda model: model.id)
+            | 'Get all subtopic page models'
+            >> (ndb_io.GetModels(subtopic_models.SubtopicPageModel.get_all()))
+            | 'Add subtopic page keys'
+            >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
+                lambda model: model.id
+            )
         )
 
         all_topic_models = (
             self.pipeline
-            | 'Get all topic models' >> (
-                ndb_io.GetModels(topic_models.TopicModel.get_all()))
-            | 'Add topic keys' >> beam.WithKeys( # pylint: disable=no-value-for-parameter
-                lambda model: model.id)
+            | 'Get all topic models'
+            >> (ndb_io.GetModels(topic_models.TopicModel.get_all()))
+            | 'Add topic keys'
+            >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
+                lambda model: model.id
+            )
         )
 
         # Join subtopic pages with their corresponding topics.
         subtopic_pages_with_topic_keys = (
             all_subtopic_page_models
-            | 'Re-key subtopic pages by topic_id' >> beam.Map(
-                lambda kv: (kv[1].topic_id, (kv[0], kv[1])))
+            | 'Re-key subtopic pages by topic_id'
+            >> beam.Map(lambda kv: (kv[1].topic_id, (kv[0], kv[1])))
         )
 
         joined_data = (
             {
                 'subtopic_pages': subtopic_pages_with_topic_keys,
-                'topics': all_topic_models
+                'topics': all_topic_models,
             }
             | 'Join subtopic pages with topics' >> beam.CoGroupByKey()
-            | 'Flatten joined data' >> beam.FlatMap(
+            | 'Flatten joined data'
+            >> beam.FlatMap(
                 lambda kv: [
                     (subtopic_page_id, (subtopic_page_model, topic_model))
-                    for (
-                        subtopic_page_id,
-                        subtopic_page_model
-                    ) in kv[1]['subtopic_pages']
+                    for (subtopic_page_id, subtopic_page_model) in kv[1][
+                        'subtopic_pages'
+                    ]
                     for topic_model in kv[1]['topics']
                 ]
             )
@@ -219,26 +216,30 @@ class PopulateStudyGuidesJob(base_jobs.JobBase):
 
         study_guide_models = (
             joined_data
-            | 'Create study guide models' >> beam.Map(
-                self._create_study_guide_model)
+            | 'Create study guide models'
+            >> beam.Map(self._create_study_guide_model)
         )
 
         created_study_guide_results = (
             study_guide_models
-            | 'Generate results' >> (
+            | 'Generate results'
+            >> (
                 job_result_transforms.ResultsToJobRunResults(
-                    'STUDY GUIDES PROCESSED'))
+                    'STUDY GUIDES PROCESSED'
+                )
+            )
         )
 
         study_guide_models_to_put = (
             study_guide_models
-            | 'Filter oks' >> beam.Filter(
-                lambda result_item: result_item.is_ok())
-            | 'Unwrap ok' >> beam.Map(
-                lambda result_item: result_item.unwrap())
-            | 'Get rid of ID and flatten models' >> beam.FlatMap( # pylint: disable=no-value-for-parameter
+            | 'Filter oks'
+            >> beam.Filter(lambda result_item: result_item.is_ok())
+            | 'Unwrap ok' >> beam.Map(lambda result_item: result_item.unwrap())
+            | 'Get rid of ID and flatten models'
+            >> beam.FlatMap(  # pylint: disable=no-value-for-parameter
                 # Extract both models from tuple.
-                lambda kv: [kv[1][0], kv[1][1]])
+                lambda kv: [kv[1][0], kv[1][1]]
+            )
         )
 
         if self.DATASTORE_UPDATES_ALLOWED:

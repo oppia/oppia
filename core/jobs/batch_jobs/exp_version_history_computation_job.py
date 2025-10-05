@@ -45,11 +45,12 @@ class UnformattedModelGroupForVerificationJobDict(TypedDict):
 
     all_exp_models: List[exp_domain.Exploration]
     exp_models_vlatest: List[exp_domain.Exploration]
-    snapshot_metadata_models: List[Optional[
-        exp_models.ExplorationSnapshotMetadataModel]]
-    version_history_models: (
-        List[Optional[exp_models.ExplorationVersionHistoryModel]]
-    )
+    snapshot_metadata_models: List[
+        Optional[exp_models.ExplorationSnapshotMetadataModel]
+    ]
+    version_history_models: List[
+        Optional[exp_models.ExplorationVersionHistoryModel]
+    ]
 
 
 class FormattedModelGroupForVerificationJobDict(TypedDict):
@@ -60,11 +61,12 @@ class FormattedModelGroupForVerificationJobDict(TypedDict):
 
     exp_vlatest: exp_domain.Exploration
     all_explorations: List[exp_domain.Exploration]
-    snapshot_metadata_models: List[Optional[
-        exp_models.ExplorationSnapshotMetadataModel]]
-    version_history_models: (
-        List[Optional[exp_models.ExplorationVersionHistoryModel]]
-    )
+    snapshot_metadata_models: List[
+        Optional[exp_models.ExplorationSnapshotMetadataModel]
+    ]
+    version_history_models: List[
+        Optional[exp_models.ExplorationVersionHistoryModel]
+    ]
 
 
 class UnformattedModelGroupForComputationJobDict(TypedDict):
@@ -75,11 +77,12 @@ class UnformattedModelGroupForComputationJobDict(TypedDict):
 
     all_exp_models: List[exp_models.ExplorationModel]
     exp_models_vlatest: List[exp_models.ExplorationModel]
-    snapshot_metadata_models: List[Optional[
-        exp_models.ExplorationSnapshotMetadataModel]]
-    version_history_models: (
-        List[Optional[exp_models.ExplorationVersionHistoryModel]]
-    )
+    snapshot_metadata_models: List[
+        Optional[exp_models.ExplorationSnapshotMetadataModel]
+    ]
+    version_history_models: List[
+        Optional[exp_models.ExplorationVersionHistoryModel]
+    ]
 
 
 class FormattedModelGroupForComputationJobDict(TypedDict):
@@ -90,11 +93,12 @@ class FormattedModelGroupForComputationJobDict(TypedDict):
 
     exp_vlatest: exp_models.ExplorationModel
     all_explorations: List[exp_models.ExplorationModel]
-    snapshot_metadata_models: List[Optional[
-        exp_models.ExplorationSnapshotMetadataModel]]
-    version_history_models: (
-        List[Optional[exp_models.ExplorationVersionHistoryModel]]
-    )
+    snapshot_metadata_models: List[
+        Optional[exp_models.ExplorationSnapshotMetadataModel]
+    ]
+    version_history_models: List[
+        Optional[exp_models.ExplorationVersionHistoryModel]
+    ]
 
 
 class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
@@ -123,7 +127,7 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
                 exp_id = snapshot_model.get_unversioned_instance_id()
                 model_class = exp_models.ExplorationModel
                 reconstituted_model = (
-                    model_class( # pylint: disable=protected-access
+                    model_class(  # pylint: disable=protected-access
                         id=exp_id
                     )._reconstitute(snapshot_dict)
                 )
@@ -152,57 +156,57 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
         snapshot_metadata_models = model_group['snapshot_metadata_models']
         version_history_models = model_group['version_history_models']
 
-        response_dict: Optional[
-            FormattedModelGroupForVerificationJobDict] = None
+        response_dict: Optional[FormattedModelGroupForVerificationJobDict] = (
+            None
+        )
 
         model_group_is_valid = len(exp_models_vlatest) == 1
-        if model_group_is_valid: # pragma: no cover
+        if model_group_is_valid:  # pragma: no cover
             exp_model_vlatest = exp_models_vlatest[0]
 
-            all_explorations: List[Optional[exp_domain.Exploration]] = (
-                [None] * exp_model_vlatest.version
-            )
+            all_explorations: List[Optional[exp_domain.Exploration]] = [
+                None
+            ] * exp_model_vlatest.version
             for exp_model in all_exp_models:
                 if (
-                    exp_model is not None and
-                    exp_model.version >= 1 and
-                    exp_model.version <= exp_model_vlatest.version
-                ): # pragma: no cover
+                    exp_model is not None
+                    and exp_model.version >= 1
+                    and exp_model.version <= exp_model_vlatest.version
+                ):  # pragma: no cover
                     all_explorations[exp_model.version - 1] = exp_model
             model_group_is_valid = all_explorations.count(None) == 0
 
             if model_group_is_valid:
-                all_snapshot_metadata_models: List[Optional[
-                    exp_models.ExplorationSnapshotMetadataModel
-                ]] = (
-                    [None] * exp_model_vlatest.version
-                )
+                all_snapshot_metadata_models: List[
+                    Optional[exp_models.ExplorationSnapshotMetadataModel]
+                ] = [None] * exp_model_vlatest.version
                 for snapshot_metadata in snapshot_metadata_models:
                     if (
-                        snapshot_metadata is not None and
-                        int(snapshot_metadata.get_version_string()) >= 1 and
-                        int(snapshot_metadata.get_version_string()) <= (
-                            exp_model_vlatest.version)
+                        snapshot_metadata is not None
+                        and int(snapshot_metadata.get_version_string()) >= 1
+                        and int(snapshot_metadata.get_version_string())
+                        <= (exp_model_vlatest.version)
                     ):
                         version = int(snapshot_metadata.get_version_string())
-                        all_snapshot_metadata_models[
-                            version - 1] = snapshot_metadata
+                        all_snapshot_metadata_models[version - 1] = (
+                            snapshot_metadata
+                        )
                 model_group_is_valid = (
                     all_snapshot_metadata_models.count(None) == 0
                 )
 
-                if model_group_is_valid: # pragma: no cover
-                    all_version_history_models: List[Optional[
-                        exp_models.ExplorationVersionHistoryModel
-                    ]] = [None] * exp_model_vlatest.version
+                if model_group_is_valid:  # pragma: no cover
+                    all_version_history_models: List[
+                        Optional[exp_models.ExplorationVersionHistoryModel]
+                    ] = [None] * exp_model_vlatest.version
                     for version_history in version_history_models:
                         if (
-                            version_history is not None and
-                            version_history.exploration_version is not None and
-                            version_history.exploration_version >= 1 and
-                            version_history.exploration_version <=
-                                exp_model_vlatest.version
-                        ): # pragma: no cover
+                            version_history is not None
+                            and version_history.exploration_version is not None
+                            and version_history.exploration_version >= 1
+                            and version_history.exploration_version
+                            <= exp_model_vlatest.version
+                        ):  # pragma: no cover
                             all_version_history_models[
                                 version_history.exploration_version - 1
                             ] = version_history
@@ -213,18 +217,18 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
                     # The following lists are just to fix the MyPy errors.
                     # No entity in the above lists are None if the model group
                     # is valid.
-                    explorations_without_none: List[
-                        exp_domain.Exploration] = []
+                    explorations_without_none: List[exp_domain.Exploration] = []
                     for exploration in all_explorations:
-                        if exploration is not None: # pragma: no cover
+                        if exploration is not None:  # pragma: no cover
                             explorations_without_none.append(exploration)
-                    if model_group_is_valid: # pragma: no cover
+                    if model_group_is_valid:  # pragma: no cover
                         response_dict = {
                             'exp_vlatest': exp_model_vlatest,
                             'all_explorations': explorations_without_none,
                             'snapshot_metadata_models': (
-                                all_snapshot_metadata_models),
-                            'version_history_models': all_version_history_models
+                                all_snapshot_metadata_models
+                            ),
+                            'version_history_models': all_version_history_models,
                         }
         return response_dict
 
@@ -257,24 +261,27 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
             change_list: List[exp_domain.ExplorationChange] = []
             for change_dict in snapshot_metadata_model.commit_cmds:
                 try:
-                    change_list.append(exp_domain.ExplorationChange(
-                        change_dict
-                    ))
+                    change_list.append(
+                        exp_domain.ExplorationChange(change_dict)
+                    )
                 except Exception:
                     continue
 
             exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
 
             effective_old_to_new_state_names = {}
-            for old_state_name, new_state_name in (
-                exp_versions_diff.old_to_new_state_names.items()
-            ):
-                if old_state_name != new_state_name: # pragma: no cover
-                    effective_old_to_new_state_names[
-                        old_state_name] = new_state_name
-            for old_state_name, new_state_name in (
-                effective_old_to_new_state_names.items()
-            ):
+            for (
+                old_state_name,
+                new_state_name,
+            ) in exp_versions_diff.old_to_new_state_names.items():
+                if old_state_name != new_state_name:  # pragma: no cover
+                    effective_old_to_new_state_names[old_state_name] = (
+                        new_state_name
+                    )
+            for (
+                old_state_name,
+                new_state_name,
+            ) in effective_old_to_new_state_names.items():
                 if new_state_name not in vh_model.state_version_history:
                     verified = False
                     break
@@ -292,8 +299,8 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
                     break
                 state_vh = vh_model.state_version_history[state_name]
                 if (
-                    state_vh['previously_edited_in_version'] is not None or
-                    state_vh['state_name_in_previous_version'] is not None
+                    state_vh['previously_edited_in_version'] is not None
+                    or state_vh['state_name_in_previous_version'] is not None
                 ):
                     verified = False
                     break
@@ -327,122 +334,123 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         all_explorations = (
             self.pipeline
-            | 'Get all the exploration snapshot models' >> ndb_io.GetModels(
+            | 'Get all the exploration snapshot models'
+            >> ndb_io.GetModels(
                 exp_models.ExplorationSnapshotContentModel.get_all(
                     include_deleted=False
                 )
             )
-            | 'Filter the exploration snapshot models without None' >>
-                beam.Filter(lambda model: model is not None)
-            | 'Get reconstituted exploration models' >>
-                beam.Map(self.generate_exploration_from_snapshot)
-            | 'Get Exploration objects from models' >>
-                beam.Map(self.get_exploration_from_model)
-            | 'Filter explorations without None' >>
-                beam.Filter(lambda x: x is not None)
-            | 'Get id-model pair for exploration models' >>
-                beam.Map(lambda exploration: (exploration.id, exploration))
+            | 'Filter the exploration snapshot models without None'
+            >> beam.Filter(lambda model: model is not None)
+            | 'Get reconstituted exploration models'
+            >> beam.Map(self.generate_exploration_from_snapshot)
+            | 'Get Exploration objects from models'
+            >> beam.Map(self.get_exploration_from_model)
+            | 'Filter explorations without None'
+            >> beam.Filter(lambda x: x is not None)
+            | 'Get id-model pair for exploration models'
+            >> beam.Map(lambda exploration: (exploration.id, exploration))
         )
 
         all_explorations_vlatest = (
             self.pipeline
-            | 'Get all the exploration models at latest version' >>
-                ndb_io.GetModels(exp_models.ExplorationModel.get_all(
-                        include_deleted=False
-                ))
-            | 'Get Exploration objects from exp models vlatest' >>
-                beam.Map(self.get_exploration_from_model)
-            | 'Filter the explorations without None' >>
-                beam.Filter(lambda x: x is not None)
-            | 'Get id-model pair for exploration models at vlatest' >>
-                beam.Map(lambda exploration: (exploration.id, exploration))
+            | 'Get all the exploration models at latest version'
+            >> ndb_io.GetModels(
+                exp_models.ExplorationModel.get_all(include_deleted=False)
+            )
+            | 'Get Exploration objects from exp models vlatest'
+            >> beam.Map(self.get_exploration_from_model)
+            | 'Filter the explorations without None'
+            >> beam.Filter(lambda x: x is not None)
+            | 'Get id-model pair for exploration models at vlatest'
+            >> beam.Map(lambda exploration: (exploration.id, exploration))
         )
 
         all_snapshot_metadata = (
             self.pipeline
-            | 'Get all ExplorationSnapshotMetadataModels' >> ndb_io.GetModels(
+            | 'Get all ExplorationSnapshotMetadataModels'
+            >> ndb_io.GetModels(
                 exp_models.ExplorationSnapshotMetadataModel.get_all(
                     include_deleted=False
                 )
             )
-            | 'Create key-value pairs with id and metadata models' >>
-                beam.Map(lambda model: (
-                    model.get_unversioned_instance_id(), model
-                )
+            | 'Create key-value pairs with id and metadata models'
+            >> beam.Map(
+                lambda model: (model.get_unversioned_instance_id(), model)
             )
         )
 
         all_version_history_models = (
             self.pipeline
-            | 'Get all ExplorationVersionHistoryModels' >>
-                ndb_io.GetModels(
-                    exp_models.ExplorationVersionHistoryModel.get_all(
-                        include_deleted=False
-                    )
+            | 'Get all ExplorationVersionHistoryModels'
+            >> ndb_io.GetModels(
+                exp_models.ExplorationVersionHistoryModel.get_all(
+                    include_deleted=False
                 )
-            | 'Create key-value pairs with id and version history models' >>
-                beam.Map(lambda model: (model.exploration_id, model))
+            )
+            | 'Create key-value pairs with id and version history models'
+            >> beam.Map(lambda model: (model.exploration_id, model))
         )
 
         verification_results = (
-            ({
-                'all_exp_models': all_explorations,
-                'exp_models_vlatest': all_explorations_vlatest,
-                'snapshot_metadata_models': all_snapshot_metadata,
-                'version_history_models': all_version_history_models
-            })
+            (
+                {
+                    'all_exp_models': all_explorations,
+                    'exp_models_vlatest': all_explorations_vlatest,
+                    'snapshot_metadata_models': all_snapshot_metadata,
+                    'version_history_models': all_version_history_models,
+                }
+            )
             | 'Group by key' >> beam.CoGroupByKey()
-            | 'Get rid of exploration id' >>
-                beam.Values() # pylint: disable=no-value-for-parameter
-            | 'Get formatted model groups' >> beam.Map(
-                self.convert_to_formatted_model_group
-            )
-            | 'Filter valid model groups' >> beam.Filter(
-                lambda x: x is not None
-            )
-            | 'Get the verification result for each model group' >>
-                beam.Map(self.verify_version_history_models)
+            | 'Get rid of exploration id'
+            >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Get formatted model groups'
+            >> beam.Map(self.convert_to_formatted_model_group)
+            | 'Filter valid model groups'
+            >> beam.Filter(lambda x: x is not None)
+            | 'Get the verification result for each model group'
+            >> beam.Map(self.verify_version_history_models)
         )
 
         verification_success = (
             verification_results
-            | 'Filter the verified explorations' >>
-                beam.Filter(lambda x: x[1])
+            | 'Filter the verified explorations' >> beam.Filter(lambda x: x[1])
         )
 
         verification_failed = (
             verification_results
-            | 'Filter the unverified explorations' >>
-                beam.Filter(lambda x: not x[1])
+            | 'Filter the unverified explorations'
+            >> beam.Filter(lambda x: not x[1])
         )
 
         report_number_of_explorations_queried = (
             all_explorations_vlatest
-            | 'Count the number of explorations' >>
-                job_result_transforms.CountObjectsToJobRunResult(
-                    'ALL EXPLORATIONS'
-                )
+            | 'Count the number of explorations'
+            >> job_result_transforms.CountObjectsToJobRunResult(
+                'ALL EXPLORATIONS'
+            )
         )
 
         report_number_of_verified_explorations = (
             verification_success
-            | 'Count the number of verified explorations' >>
-                job_result_transforms.CountObjectsToJobRunResult(
-                    'VERIFIED EXPLORATIONS'
-                )
+            | 'Count the number of verified explorations'
+            >> job_result_transforms.CountObjectsToJobRunResult(
+                'VERIFIED EXPLORATIONS'
+            )
         )
 
         report_number_of_unverified_explorations = (
             verification_failed
-            | 'Count the number of unverified explorations' >>
-                job_result_transforms.CountObjectsToJobRunResult(
-                    'UNVERIFIED EXPLORATIONS'
-                )
+            | 'Count the number of unverified explorations'
+            >> job_result_transforms.CountObjectsToJobRunResult(
+                'UNVERIFIED EXPLORATIONS'
+            )
         )
 
         report_details_of_unverified_explorations = (
             verification_failed
-            | 'Save info on the unverified explorations' >> beam.Map(
+            | 'Save info on the unverified explorations'
+            >> beam.Map(
                 lambda x: job_run_result.JobRunResult.as_stderr(
                     'Version history for exploration with ID %s was not '
                     'created correctly' % (x[0])
@@ -451,14 +459,11 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
         )
 
         return (
-            (
-                report_number_of_explorations_queried,
-                report_number_of_verified_explorations,
-                report_number_of_unverified_explorations,
-                report_details_of_unverified_explorations
-            )
-            | 'Flatten' >> beam.Flatten()
-        )
+            report_number_of_explorations_queried,
+            report_number_of_verified_explorations,
+            report_number_of_unverified_explorations,
+            report_details_of_unverified_explorations,
+        ) | 'Flatten' >> beam.Flatten()
 
 
 class DeleteExplorationVersionHistoryModelsJob(base_jobs.JobBase):
@@ -474,12 +479,12 @@ class DeleteExplorationVersionHistoryModelsJob(base_jobs.JobBase):
         """
         version_history_models = (
             self.pipeline
-            | 'Get all ExplorationVersionHistoryModels' >>
-                ndb_io.GetModels(
-                    exp_models.ExplorationVersionHistoryModel.get_all(
-                        include_deleted=False
-                    )
+            | 'Get all ExplorationVersionHistoryModels'
+            >> ndb_io.GetModels(
+                exp_models.ExplorationVersionHistoryModel.get_all(
+                    include_deleted=False
                 )
+            )
         )
 
         unused_delete_result = (
@@ -488,10 +493,8 @@ class DeleteExplorationVersionHistoryModelsJob(base_jobs.JobBase):
             | 'Delete all models' >> ndb_io.DeleteModels()
         )
 
-        return (
-            version_history_models
-            | 'Create job run result' >> (
-                job_result_transforms.CountObjectsToJobRunResult())
+        return version_history_models | 'Create job run result' >> (
+            job_result_transforms.CountObjectsToJobRunResult()
         )
 
 
@@ -517,57 +520,55 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
         snapshot_metadata_models = model_group['snapshot_metadata_models']
         version_history_models = model_group['version_history_models']
 
-        response_dict: Optional[
-            FormattedModelGroupForComputationJobDict] = None
+        response_dict: Optional[FormattedModelGroupForComputationJobDict] = None
 
         model_group_is_valid = len(exp_models_vlatest) == 1
-        if model_group_is_valid: # pragma: no cover
+        if model_group_is_valid:  # pragma: no cover
             exp_model_vlatest = exp_models_vlatest[0]
 
-            all_explorations: List[Optional[exp_models.ExplorationModel]] = (
-                [None] * exp_model_vlatest.version
-            )
+            all_explorations: List[Optional[exp_models.ExplorationModel]] = [
+                None
+            ] * exp_model_vlatest.version
             for exp_model in all_exp_models:
                 if (
-                    exp_model is not None and
-                    exp_model.version >= 1 and
-                    exp_model.version <= exp_model_vlatest.version
+                    exp_model is not None
+                    and exp_model.version >= 1
+                    and exp_model.version <= exp_model_vlatest.version
                 ):
                     all_explorations[exp_model.version - 1] = exp_model
             model_group_is_valid = all_explorations.count(None) == 0
 
             if model_group_is_valid:
-                all_snapshot_metadata_models: List[Optional[
-                    exp_models.ExplorationSnapshotMetadataModel
-                ]] = (
-                    [None] * exp_model_vlatest.version
-                )
+                all_snapshot_metadata_models: List[
+                    Optional[exp_models.ExplorationSnapshotMetadataModel]
+                ] = [None] * exp_model_vlatest.version
                 for snapshot_metadata in snapshot_metadata_models:
                     if (
-                        snapshot_metadata is not None and
-                        int(snapshot_metadata.get_version_string()) >= 1 and
-                        int(snapshot_metadata.get_version_string()) <= (
-                            exp_model_vlatest.version)
+                        snapshot_metadata is not None
+                        and int(snapshot_metadata.get_version_string()) >= 1
+                        and int(snapshot_metadata.get_version_string())
+                        <= (exp_model_vlatest.version)
                     ):
                         version = int(snapshot_metadata.get_version_string())
-                        all_snapshot_metadata_models[
-                            version - 1] = snapshot_metadata
+                        all_snapshot_metadata_models[version - 1] = (
+                            snapshot_metadata
+                        )
                 model_group_is_valid = (
                     all_snapshot_metadata_models.count(None) == 0
                 )
 
                 if model_group_is_valid:
-                    all_version_history_models: List[Optional[
-                        exp_models.ExplorationVersionHistoryModel
-                    ]] = [None] * exp_model_vlatest.version
+                    all_version_history_models: List[
+                        Optional[exp_models.ExplorationVersionHistoryModel]
+                    ] = [None] * exp_model_vlatest.version
                     for version_history in version_history_models:
                         if (
-                            version_history is not None and
-                            version_history.exploration_version is not None and
-                            version_history.exploration_version >= 1 and
-                            version_history.exploration_version <=
-                                exp_model_vlatest.version
-                        ): # pragma: no cover
+                            version_history is not None
+                            and version_history.exploration_version is not None
+                            and version_history.exploration_version >= 1
+                            and version_history.exploration_version
+                            <= exp_model_vlatest.version
+                        ):  # pragma: no cover
                             all_version_history_models[
                                 version_history.exploration_version - 1
                             ] = version_history
@@ -576,7 +577,8 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                     # No entity in the above lists are None if the model group
                     # is valid.
                     explorations_without_none: List[
-                        exp_models.ExplorationModel] = []
+                        exp_models.ExplorationModel
+                    ] = []
                     for exploration in all_explorations:
                         if exploration is not None:
                             explorations_without_none.append(exploration)
@@ -586,7 +588,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                         'snapshot_metadata_models': (
                             all_snapshot_metadata_models
                         ),
-                        'version_history_models': all_version_history_models
+                        'version_history_models': all_version_history_models,
                     }
         return response_dict
 
@@ -598,7 +600,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
         committer_id: str,
         updated_states_vh: Dict[str, state_domain.StateVersionHistory],
         updated_metadata_vh: exp_domain.MetadataVersionHistory,
-        updated_committer_ids: List[str]
+        updated_committer_ids: List[str],
     ) -> exp_models.ExplorationVersionHistoryModel:
         """Updates the version history model or creates one for the given
         version of the exploration.
@@ -635,7 +637,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                 state_version_history={},
                 metadata_last_edited_version_number=None,
                 metadata_last_edited_committer_id=committer_id,
-                committer_ids=[committer_id]
+                committer_ids=[committer_id],
             )
         # Update the required fields in the model.
         vh_model.state_version_history = {
@@ -656,7 +658,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
         revert_to_vh_model: exp_models.ExplorationVersionHistoryModel,
         current_vh_model: Optional[exp_models.ExplorationVersionHistoryModel],
         exp_id: str,
-        current_version: int
+        current_version: int,
     ) -> exp_models.ExplorationVersionHistoryModel:
         """Updates the version history model for the current version of the
         exploration with the model data of the reverted version.
@@ -692,7 +694,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                 metadata_last_edited_committer_id=(
                     revert_to_vh_model.metadata_last_edited_committer_id
                 ),
-                committer_ids=revert_to_vh_model.committer_ids
+                committer_ids=revert_to_vh_model.committer_ids,
             )
         else:
             current_vh_model.state_version_history = (
@@ -733,8 +735,8 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
             str,
             List[exp_models.ExplorationVersionHistoryModel],
             Union[Exception, str],
-            int
-        ]
+            int,
+        ],
     ]:
         """Creates the version history models for a particular exploration.
 
@@ -780,8 +782,12 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
             committer_ids_at_v1 = [committer_id_v1]
             vh_model_at_v1 = self.get_updated_version_history_model(
                 version_history_models[0],
-                versioned_explorations[0].id, 1, committer_id_v1,
-                states_vh_at_v1, metadata_vh_at_v1, committer_ids_at_v1
+                versioned_explorations[0].id,
+                1,
+                committer_id_v1,
+                states_vh_at_v1,
+                metadata_vh_at_v1,
+                committer_ids_at_v1,
             )
             vh_model_at_v1.update_timestamps()
             version_history_models[0] = vh_model_at_v1
@@ -793,36 +799,33 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                 change_list: List[exp_domain.ExplorationChange] = []
                 for change_dict in snapshot_metadata_model.commit_cmds:
                     try:
-                        change_list.append(exp_domain.ExplorationChange(
-                            change_dict
-                        ))
+                        change_list.append(
+                            exp_domain.ExplorationChange(change_dict)
+                        )
                     except Exception:
                         continue
 
                 old_exploration = versioned_explorations[version - 2]
                 new_exploration = versioned_explorations[version - 1]
-                revert_to_version = self.check_for_revert_commit(
-                    change_list
-                )
+                revert_to_version = self.check_for_revert_commit(change_list)
                 if revert_to_version is not None:
-                    if (
-                        revert_to_version <= 0 or
-                        revert_to_version >= version
-                    ):
+                    if revert_to_version <= 0 or revert_to_version >= version:
                         return (
-                            exp_id, [],
+                            exp_id,
+                            [],
                             'Reverting to the version %d which is out of the '
                             'range [1, %d]' % (revert_to_version, version - 1),
-                            version
+                            version,
                         )
-                    revert_to_vh_model = (
-                        version_history_models[revert_to_version - 1]
-                    )
+                    revert_to_vh_model = version_history_models[
+                        revert_to_version - 1
+                    ]
                     assert revert_to_vh_model is not None
                     new_vh_model = self.get_reverted_version_history_model(
                         revert_to_vh_model,
                         version_history_models[version - 1],
-                        exp_id, version
+                        exp_id,
+                        version,
                     )
                     new_vh_model.update_timestamps()
                     version_history_models[version - 1] = new_vh_model
@@ -844,7 +847,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                         'param_specs': old_exploration.param_specs,
                         'param_changes': old_exploration.param_changes,
                         'auto_tts_enabled': old_exploration.auto_tts_enabled,
-                        'edits_allowed': old_exploration.edits_allowed
+                        'edits_allowed': old_exploration.edits_allowed,
                     }
                     new_metadata_dict: exp_domain.ExplorationMetadataDict = {
                         'title': new_exploration.title,
@@ -861,7 +864,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                         'param_specs': new_exploration.param_specs,
                         'param_changes': new_exploration.param_changes,
                         'auto_tts_enabled': new_exploration.auto_tts_enabled,
-                        'edits_allowed': new_exploration.edits_allowed
+                        'edits_allowed': new_exploration.edits_allowed,
                     }
 
                     old_vh_model = version_history_models[version - 2]
@@ -872,37 +875,48 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                                 state_vh_dict
                             )
                         )
-                        for state_name, state_vh_dict in
-                        old_vh_model.state_version_history.items()
+                        for state_name, state_vh_dict in old_vh_model.state_version_history.items()
                     }
                     old_metadata_vh = exp_domain.MetadataVersionHistory(
                         old_vh_model.metadata_last_edited_version_number,
-                        old_vh_model.metadata_last_edited_committer_id
+                        old_vh_model.metadata_last_edited_committer_id,
                     )
 
                     try:
                         new_states_vh = (
                             exp_services.update_states_version_history(
-                                old_states_vh, change_list, old_states_dict,
-                                new_states_dict, version, committer_id
+                                old_states_vh,
+                                change_list,
+                                old_states_dict,
+                                new_states_dict,
+                                version,
+                                committer_id,
                             )
                         )
                         new_metadata_vh = (
                             exp_services.update_metadata_version_history(
-                                old_metadata_vh, change_list, old_metadata_dict,
-                                new_metadata_dict, version, committer_id
+                                old_metadata_vh,
+                                change_list,
+                                old_metadata_dict,
+                                new_metadata_dict,
+                                version,
+                                committer_id,
                             )
                         )
                         new_committer_ids = (
                             exp_services.get_updated_committer_ids(
                                 new_states_vh,
-                                new_metadata_vh.last_edited_committer_id
+                                new_metadata_vh.last_edited_committer_id,
                             )
                         )
                         new_vh_model = self.get_updated_version_history_model(
                             version_history_models[version - 1],
-                            exp_id, version, committer_id,
-                            new_states_vh, new_metadata_vh, new_committer_ids
+                            exp_id,
+                            version,
+                            committer_id,
+                            new_states_vh,
+                            new_metadata_vh,
+                            new_committer_ids,
                         )
                         new_vh_model.update_timestamps()
                         version_history_models[version - 1] = new_vh_model
@@ -911,9 +925,10 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
 
             # The following block is used to prevent MyPy errors.
             vh_models_without_none: List[
-                exp_models.ExplorationVersionHistoryModel] = []
+                exp_models.ExplorationVersionHistoryModel
+            ] = []
             for vh_model in version_history_models:
-                if vh_model is not None: # pragma: no cover
+                if vh_model is not None:  # pragma: no cover
                     vh_models_without_none.append(vh_model)
             return (exp_id, vh_models_without_none)
 
@@ -935,7 +950,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                 exp_id = snapshot_model.get_unversioned_instance_id()
                 model_class = exp_models.ExplorationModel
                 reconstituted_model = (
-                    model_class( # pylint: disable=protected-access
+                    model_class(  # pylint: disable=protected-access
                         id=exp_id
                     )._reconstitute(snapshot_dict)
                 )
@@ -948,107 +963,104 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         all_explorations = (
             self.pipeline
-            | 'Get all the exploration snapshot models' >> ndb_io.GetModels(
+            | 'Get all the exploration snapshot models'
+            >> ndb_io.GetModels(
                 exp_models.ExplorationSnapshotContentModel.get_all(
                     include_deleted=False
                 )
             )
-            | 'Filter the exploration snapshot models without None' >>
-                beam.Filter(lambda model: model is not None)
-            | 'Get reconstituted exploration models' >>
-                beam.Map(self.generate_exploration_from_snapshot)
-            | 'Filter explorations without None' >>
-                beam.Filter(lambda x: x is not None)
-            | 'Get id-model pair for exploration models' >>
-                beam.Map(lambda exploration: (exploration.id, exploration))
+            | 'Filter the exploration snapshot models without None'
+            >> beam.Filter(lambda model: model is not None)
+            | 'Get reconstituted exploration models'
+            >> beam.Map(self.generate_exploration_from_snapshot)
+            | 'Filter explorations without None'
+            >> beam.Filter(lambda x: x is not None)
+            | 'Get id-model pair for exploration models'
+            >> beam.Map(lambda exploration: (exploration.id, exploration))
         )
 
         all_explorations_vlatest = (
             self.pipeline
-            | 'Get all the exploration models at latest version' >>
-                ndb_io.GetModels(exp_models.ExplorationModel.get_all(
-                        include_deleted=False
-                ))
-            | 'Filter the explorations without None' >>
-                beam.Filter(lambda x: x is not None)
-            | 'Get id-model pair for exploration models at vlatest' >>
-                beam.Map(lambda exploration: (exploration.id, exploration))
+            | 'Get all the exploration models at latest version'
+            >> ndb_io.GetModels(
+                exp_models.ExplorationModel.get_all(include_deleted=False)
+            )
+            | 'Filter the explorations without None'
+            >> beam.Filter(lambda x: x is not None)
+            | 'Get id-model pair for exploration models at vlatest'
+            >> beam.Map(lambda exploration: (exploration.id, exploration))
         )
 
         all_snapshot_metadata = (
             self.pipeline
-            | 'Get all ExplorationSnapshotMetadataModels' >> ndb_io.GetModels(
+            | 'Get all ExplorationSnapshotMetadataModels'
+            >> ndb_io.GetModels(
                 exp_models.ExplorationSnapshotMetadataModel.get_all(
                     include_deleted=False
                 )
             )
-            | 'Create key-value pairs with id and metadata models' >>
-                beam.Map(lambda model: (
-                    model.get_unversioned_instance_id(), model
-                )
+            | 'Create key-value pairs with id and metadata models'
+            >> beam.Map(
+                lambda model: (model.get_unversioned_instance_id(), model)
             )
         )
 
         all_version_history_models = (
             self.pipeline
-            | 'Get already existing ExplorationVersionHistoryModels' >>
-                ndb_io.GetModels(
-                    exp_models.ExplorationVersionHistoryModel.get_all(
-                        include_deleted=False
-                    )
+            | 'Get already existing ExplorationVersionHistoryModels'
+            >> ndb_io.GetModels(
+                exp_models.ExplorationVersionHistoryModel.get_all(
+                    include_deleted=False
                 )
-            | 'Create key-value pairs with id and version history models' >>
-                beam.Map(lambda model: (model.exploration_id, model))
+            )
+            | 'Create key-value pairs with id and version history models'
+            >> beam.Map(lambda model: (model.exploration_id, model))
         )
 
         model_groups = (
-            ({
+            {
                 'all_exp_models': all_explorations,
                 'exp_models_vlatest': all_explorations_vlatest,
                 'snapshot_metadata_models': all_snapshot_metadata,
-                'version_history_models': all_version_history_models
-            })
-            | 'Group by key' >> beam.CoGroupByKey()
-        )
+                'version_history_models': all_version_history_models,
+            }
+        ) | 'Group by key' >> beam.CoGroupByKey()
 
         valid_model_groups = (
             model_groups
-            | 'Get rid of exploration id' >>
-                beam.Values() # pylint: disable=no-value-for-parameter
-            | 'Get formatted model groups' >> beam.Map(
-                self.convert_to_formatted_model_group
-            )
-            | 'Filter valid model groups' >> beam.Filter(
-                lambda x: x is not None
-            )
+            | 'Get rid of exploration id'
+            >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Get formatted model groups'
+            >> beam.Map(self.convert_to_formatted_model_group)
+            | 'Filter valid model groups'
+            >> beam.Filter(lambda x: x is not None)
         )
 
         version_history_models = (
             valid_model_groups
-            | 'Create the version history models for each valid exploration' >>
-                beam.Map(self.create_version_history_models)
+            | 'Create the version history models for each valid exploration'
+            >> beam.Map(self.create_version_history_models)
         )
 
         exps_having_invalid_change_list = (
             version_history_models
-            | 'Filter exps having invalid change list' >>
-                beam.Filter(lambda models: len(models[1]) == 0)
-            | 'Extract the exp ids having invalid change list' >>
-                beam.Map(lambda models: (models[0], models[2], models[3]))
+            | 'Filter exps having invalid change list'
+            >> beam.Filter(lambda models: len(models[1]) == 0)
+            | 'Extract the exp ids having invalid change list'
+            >> beam.Map(lambda models: (models[0], models[2], models[3]))
         )
 
         exps_for_which_version_history_was_computed = (
             version_history_models
-            | 'Filter exps for which version history was computed' >>
-                beam.Filter(lambda models: len(models[1]) > 0)
-            | 'Extract the exp ids for which version history was computed' >>
-                beam.Map(lambda models: models[0])
+            | 'Filter exps for which version history was computed'
+            >> beam.Filter(lambda models: len(models[1]) > 0)
+            | 'Extract the exp ids for which version history was computed'
+            >> beam.Map(lambda models: models[0])
         )
 
         flattened_vh_models = (
             version_history_models
-            | 'Drop the exploration ids' >>
-                beam.Map(lambda models: models[1])
+            | 'Drop the exploration ids' >> beam.Map(lambda models: models[1])
             | 'Flatten the models' >> beam.FlatMap(lambda x: x)
         )
 
@@ -1059,59 +1071,58 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
 
         report_number_of_exps_queried = (
             all_explorations_vlatest
-            | 'Count queried explorations' >>
-                job_result_transforms.CountObjectsToJobRunResult('ALL EXPS')
+            | 'Count queried explorations'
+            >> job_result_transforms.CountObjectsToJobRunResult('ALL EXPS')
         )
 
         report_exps_count_for_which_version_history_can_be_computed = (
             valid_model_groups
-            | 'Count exps for which version history can be computed' >>
-                job_result_transforms.CountObjectsToJobRunResult(
-                    'EXPS FOR WHICH VERSION HISTORY CAN BE COMPUTED'
-                )
+            | 'Count exps for which version history can be computed'
+            >> job_result_transforms.CountObjectsToJobRunResult(
+                'EXPS FOR WHICH VERSION HISTORY CAN BE COMPUTED'
+            )
         )
 
         report_number_of_exps_with_invalid_change_list = (
             exps_having_invalid_change_list
-            | 'Count explorations having invalid change list' >>
-                job_result_transforms.CountObjectsToJobRunResult(
-                    'EXPS HAVING INVALID CHANGE LIST'
-                )
+            | 'Count explorations having invalid change list'
+            >> job_result_transforms.CountObjectsToJobRunResult(
+                'EXPS HAVING INVALID CHANGE LIST'
+            )
         )
 
         report_details_of_exps_having_invalid_change_list = (
             exps_having_invalid_change_list
-            | 'Save info on explorations having invalid change list' >>
-                beam.Map(lambda error: job_run_result.JobRunResult.as_stderr(
+            | 'Save info on explorations having invalid change list'
+            >> beam.Map(
+                lambda error: job_run_result.JobRunResult.as_stderr(
                     'Exploration %s has invalid change list. '
                     'Error: %s. Version: %s' % (error[0], error[1], error[2])
-                ))
+                )
+            )
         )
 
         report_number_of_exps_for_which_version_history_was_computed = (
             exps_for_which_version_history_was_computed
-            | 'Count explorations for which version history was computed' >>
-                job_result_transforms.CountObjectsToJobRunResult(
-                    'EXPS FOR WHICH VERSION HISTORY CAN WAS COMPUTED'
-                )
+            | 'Count explorations for which version history was computed'
+            >> job_result_transforms.CountObjectsToJobRunResult(
+                'EXPS FOR WHICH VERSION HISTORY CAN WAS COMPUTED'
+            )
         )
 
         report_number_of_models_modified = (
             flattened_vh_models
-            | 'Count number of models created' >>
-                job_result_transforms.CountObjectsToJobRunResult(
-                    'CREATED OR MODIFIED VERSION HISTORY MODELS'
-                )
+            | 'Count number of models created'
+            >> job_result_transforms.CountObjectsToJobRunResult(
+                'CREATED OR MODIFIED VERSION HISTORY MODELS'
+            )
         )
 
         return (
-            (
-                report_number_of_exps_queried,
-                report_exps_count_for_which_version_history_can_be_computed,
-                report_number_of_exps_with_invalid_change_list,
-                report_details_of_exps_having_invalid_change_list,
-                report_number_of_exps_for_which_version_history_was_computed,
-                report_number_of_models_modified
-            )
-            | 'Flatten' >> beam.Flatten()
-        )
+            report_number_of_exps_queried,
+            report_exps_count_for_which_version_history_can_be_computed,
+            report_number_of_exps_with_invalid_change_list,
+            report_details_of_exps_having_invalid_change_list,
+            report_number_of_exps_for_which_version_history_was_computed,
+            report_number_of_models_modified,
+        ) | 'Flatten' >> beam.Flatten()

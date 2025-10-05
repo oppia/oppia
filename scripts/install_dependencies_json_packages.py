@@ -71,14 +71,20 @@ DOWNLOAD_FORMATS_TO_DEPENDENCIES_KEYS: Dict[
     'zip': {
         'mandatory_keys': ['version', 'url', 'downloadFormat'],
         'optional_key_pairs': [
-            ['rootDir', 'rootDirPrefix'], ['targetDir', 'targetDirPrefix']]
+            ['rootDir', 'rootDirPrefix'],
+            ['targetDir', 'targetDirPrefix'],
+        ],
     },
     'files': {
         'mandatory_keys': [
-            'version', 'url', 'files',
-            'targetDirPrefix', 'downloadFormat'],
-        'optional_key_pairs': []
-    }
+            'version',
+            'url',
+            'files',
+            'targetDirPrefix',
+            'downloadFormat',
+        ],
+        'optional_key_pairs': [],
+    },
 }
 
 TextModeTypes = Literal['r', 'w', 'a', 'x', 'r+', 'w+', 'a+']
@@ -86,8 +92,10 @@ BinaryModeTypes = Literal['rb', 'wb', 'ab', 'xb', 'r+b', 'w+b', 'a+b', 'x+b']
 
 
 def url_retrieve(
-        url: str, output_path: str, max_attempts: int = 2,
-        enforce_https: bool = True
+    url: str,
+    output_path: str,
+    max_attempts: int = 2,
+    enforce_https: bool = True,
 ) -> None:
     """Retrieve a file from a URL and write the file to the file system.
 
@@ -113,8 +121,7 @@ def url_retrieve(
     failures = 0
     success = False
     if enforce_https and not url.startswith('https://'):
-        raise Exception(
-            'The URL %s should use HTTPS.' % url)
+        raise Exception('The URL %s should use HTTPS.' % url)
     while not success and failures < max_attempts:
         try:
             with urlrequest.urlopen(
@@ -123,11 +130,15 @@ def url_retrieve(
                 with open(output_path, 'wb') as output_file:
                     output_file.write(response.read())
         except (
-            urlerror.URLError, ssl.SSLError, client.IncompleteRead
+            urlerror.URLError,
+            ssl.SSLError,
+            client.IncompleteRead,
         ) as exception:
             failures += 1
-            print('Attempt %d of %d failed when downloading %s.' % (
-                failures, max_attempts, url))
+            print(
+                'Attempt %d of %d failed when downloading %s.'
+                % (failures, max_attempts, url)
+            )
             if failures >= max_attempts:
                 raise exception
             print('Error: %s' % exception)
@@ -137,7 +148,7 @@ def url_retrieve(
 
 
 def url_open(
-    source_url: Union[str, urllib.request.Request]
+    source_url: Union[str, urllib.request.Request],
 ) -> urllib.request._UrlopenRet:
     """Opens a URL and returns the response.
 
@@ -181,7 +192,7 @@ def open_file(
     filename: str,
     mode: TextModeTypes,
     encoding: str = 'utf-8',
-    newline: Union[str, None] = None
+    newline: Union[str, None] = None,
 ) -> TextIO: ...
 
 
@@ -190,7 +201,7 @@ def open_file(
     filename: str,
     mode: BinaryModeTypes,
     encoding: Union[str, None] = 'utf-8',
-    newline: Union[str, None] = None
+    newline: Union[str, None] = None,
 ) -> BinaryIO: ...
 
 
@@ -198,7 +209,7 @@ def open_file(
     filename: str,
     mode: Union[TextModeTypes, BinaryModeTypes],
     encoding: Union[str, None] = 'utf-8',
-    newline: Union[str, None] = None
+    newline: Union[str, None] = None,
 ) -> Union[BinaryIO, TextIO]:
     """Open file and return a corresponding file object.
 
@@ -218,15 +229,13 @@ def open_file(
     # to Union[BinaryIO, TextIO].
     file = cast(
         Union[BinaryIO, TextIO],
-        open(filename, mode, encoding=encoding, newline=newline)
+        open(filename, mode, encoding=encoding, newline=newline),
     )
     return file
 
 
 def download_files(
-    source_url_root: str,
-    target_dir: str,
-    source_filenames: List[str]
+    source_url_root: str, target_dir: str, source_filenames: List[str]
 ) -> None:
     """Downloads a group of files and saves them to a given directory.
 
@@ -241,14 +250,16 @@ def download_files(
             and retains the same filename.
     """
     assert isinstance(source_filenames, list), (
-        'Expected list of filenames, got \'%s\'' % source_filenames)
+        'Expected list of filenames, got \'%s\'' % source_filenames
+    )
     pathlib.Path(target_dir).mkdir(parents=True, exist_ok=True)
     for filename in source_filenames:
         if not os.path.exists(os.path.join(target_dir, filename)):
             print('Downloading file %s to %s ...' % (filename, target_dir))
             url_retrieve(
                 '%s/%s' % (source_url_root, filename),
-                os.path.join(target_dir, filename))
+                os.path.join(target_dir, filename),
+            )
 
             print('Download of %s succeeded.' % filename)
 
@@ -257,7 +268,7 @@ def download_and_unzip_files(
     source_url: str,
     target_parent_dir: str,
     zip_root_name: str,
-    target_root_name: str
+    target_root_name: str,
 ) -> None:
     """Downloads a zip file, unzips it, and saves the result in a given dir.
 
@@ -277,8 +288,10 @@ def download_and_unzip_files(
             renamed to in the local directory.
     """
     if not os.path.exists(os.path.join(target_parent_dir, target_root_name)):
-        print('Downloading and unzipping file %s to %s ...' % (
-            zip_root_name, target_parent_dir))
+        print(
+            'Downloading and unzipping file %s to %s ...'
+            % (zip_root_name, target_parent_dir)
+        )
         pathlib.Path(target_parent_dir).mkdir(parents=True, exist_ok=True)
 
         url_retrieve(source_url, TMP_UNZIP_PATH)
@@ -303,7 +316,8 @@ def download_and_unzip_files(
         # Rename the target directory.
         os.rename(
             os.path.join(target_parent_dir, zip_root_name),
-            os.path.join(target_parent_dir, target_root_name))
+            os.path.join(target_parent_dir, target_root_name),
+        )
 
         print('Download of %s succeeded.' % zip_root_name)
 
@@ -329,15 +343,11 @@ def return_json(filepath: str) -> DependenciesDict:
     # Here we use cast because we are narrowing down the type from to
     # DependenciesDict since we know the type of dependencies
     # as it is the content of the file dependencies.json.
-    return cast(
-        DependenciesDict,
-        json.loads(response)
-    )
+    return cast(DependenciesDict, json.loads(response))
 
 
 def test_dependencies_syntax(
-    dependency_type: DownloadFormatType,
-    dependency_dict: DependencyDict
+    dependency_type: DownloadFormatType, dependency_dict: DependencyDict
 ) -> None:
     """This checks syntax of the dependencies.json dependencies.
     Display warning message when there is an error and terminate the program.
@@ -347,12 +357,14 @@ def test_dependencies_syntax(
         dependency_dict: dict. A dependencies.json dependency dict.
     """
     keys = list(dependency_dict.keys())
-    mandatory_keys = DOWNLOAD_FORMATS_TO_DEPENDENCIES_KEYS[
-        dependency_type]['mandatory_keys']
+    mandatory_keys = DOWNLOAD_FORMATS_TO_DEPENDENCIES_KEYS[dependency_type][
+        'mandatory_keys'
+    ]
     # Optional keys requires exactly one member of the pair
     # to be available as a key in the dependency_dict.
-    optional_key_pairs = DOWNLOAD_FORMATS_TO_DEPENDENCIES_KEYS[
-        dependency_type]['optional_key_pairs']
+    optional_key_pairs = DOWNLOAD_FORMATS_TO_DEPENDENCIES_KEYS[dependency_type][
+        'optional_key_pairs'
+    ]
     for key in mandatory_keys:
         if key not in keys:
             print('------------------------------------------')
@@ -364,14 +376,16 @@ def test_dependencies_syntax(
     if optional_key_pairs:
         for optional_keys in optional_key_pairs:
             optional_keys_in_dict = [
-                key for key in optional_keys if key in keys]
+                key for key in optional_keys if key in keys
+            ]
             if len(optional_keys_in_dict) != 1:
                 print('------------------------------------------')
                 print('There is syntax error in this dependency')
                 print(dependency_dict)
                 print(
                     'Only one of these keys pair must be used: "%s".'
-                    % ', '.join(optional_keys))
+                    % ', '.join(optional_keys)
+                )
                 print('Exiting')
                 sys.exit(1)
 
@@ -380,13 +394,19 @@ def test_dependencies_syntax(
     if '#' in dependency_url:
         dependency_url = dependency_url.rpartition('#')[0]
     is_zip_file_format = dependency_type == _DOWNLOAD_FORMAT_ZIP
-    if (dependency_url.endswith('.zip') and not is_zip_file_format or
-            is_zip_file_format and not dependency_url.endswith('.zip')):
+    if (
+        dependency_url.endswith('.zip')
+        and not is_zip_file_format
+        or is_zip_file_format
+        and not dependency_url.endswith('.zip')
+    ):
         print('------------------------------------------')
         print('There is syntax error in this dependency')
         print(dependency_dict)
-        print('This url %s is invalid for %s file format.' % (
-            dependency_url, dependency_type))
+        print(
+            'This url %s is invalid for %s file format.'
+            % (dependency_url, dependency_type)
+        )
         print('Exiting.')
         sys.exit(1)
 
@@ -424,20 +444,29 @@ def download_all_dependencies(filepath: str) -> None:
         if download_format == _DOWNLOAD_FORMAT_FILES:
             dependency_dst = os.path.join(
                 THIRD_PARTY_STATIC_DIR,
-                dependency['targetDirPrefix'] + dependency['version'])
+                dependency['targetDirPrefix'] + dependency['version'],
+            )
             download_files(
-                dependency['url'], dependency_dst, dependency['files'])
+                dependency['url'], dependency_dst, dependency['files']
+            )
 
         elif download_format == _DOWNLOAD_FORMAT_ZIP:
             dependency_zip_root_name = (
-                dependency['rootDir'] if 'rootDir' in dependency
-                else dependency['rootDirPrefix'] + dependency['version'])
+                dependency['rootDir']
+                if 'rootDir' in dependency
+                else dependency['rootDirPrefix'] + dependency['version']
+            )
             dependency_target_root_name = (
-                dependency['targetDir'] if 'targetDir' in dependency
-                else dependency['targetDirPrefix'] + dependency['version'])
+                dependency['targetDir']
+                if 'targetDir' in dependency
+                else dependency['targetDirPrefix'] + dependency['version']
+            )
             download_and_unzip_files(
-                dependency['url'], THIRD_PARTY_STATIC_DIR,
-                dependency_zip_root_name, dependency_target_root_name)
+                dependency['url'],
+                THIRD_PARTY_STATIC_DIR,
+                dependency_zip_root_name,
+                dependency_target_root_name,
+            )
 
 
 def main() -> None:
@@ -448,5 +477,5 @@ def main() -> None:
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
 # it will only be called when this Python file is used as a script.
-if __name__ == '__main__': # pragma: no cover
+if __name__ == '__main__':  # pragma: no cover
     main()

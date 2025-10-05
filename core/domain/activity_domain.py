@@ -91,7 +91,8 @@ class ActivityReference:
             ActivityReference. The corresponding ActivityReference object.
         """
         return cls(
-            activity_reference_dict['type'], activity_reference_dict['id'])
+            activity_reference_dict['type'], activity_reference_dict['id']
+        )
 
 
 class ActivityReferences:

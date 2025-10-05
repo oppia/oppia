@@ -145,4 +145,14 @@ describe('SubtopicSummaryTileComponent', () => {
 
     expect(windowRef.nativeWindow.open).toHaveBeenCalledWith('/url', '_self');
   });
+
+  it('should open subtopic page when user clicks on subtopic card with Ctrl+click', () => {
+    spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue('/url');
+    const mockEvent = new MouseEvent('click', {ctrlKey: true});
+    spyOn(windowRef.nativeWindow, 'open');
+
+    component.openSubtopicPage(mockEvent);
+
+    expect(windowRef.nativeWindow.open).toHaveBeenCalledWith('/url', '_blank');
+  });
 });

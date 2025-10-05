@@ -32,19 +32,20 @@ class FeatureNames(enum.Enum):
     END_CHAPTER_CELEBRATION = 'end_chapter_celebration'
     CHECKPOINT_CELEBRATION = 'checkpoint_celebration'
     CONTRIBUTOR_DASHBOARD_ACCOMPLISHMENTS = (
-        'contributor_dashboard_accomplishments')
+        'contributor_dashboard_accomplishments'
+    )
     ANDROID_BETA_LANDING_PAGE = 'android_beta_landing_page'
     BLOG_PAGES = 'blog_pages'
     DIAGNOSTIC_TEST = 'diagnostic_test'
     SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW = (
-        'serial_chapter_launch_curriculum_admin_view')
-    SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW = (
-        'serial_chapter_launch_learner_view')
-    SHOW_REDESIGNED_LEARNER_DASHBOARD = (
-        'show_redesigned_learner_dashboard')
+        'serial_chapter_launch_curriculum_admin_view'
+    )
+    SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW = 'serial_chapter_launch_learner_view'
+    SHOW_REDESIGNED_LEARNER_DASHBOARD = 'show_redesigned_learner_dashboard'
     SHOW_TRANSLATION_SIZE = 'show_translation_size'
     SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROPDOWN = (
-        'show_feedback_updates_in_profile_pic_dropdown')
+        'show_feedback_updates_in_profile_pic_dropdown'
+    )
     CD_ADMIN_DASHBOARD_NEW_UI = 'cd_admin_dashboard_new_ui'
     IS_IMPROVEMENTS_TAB_ENABLED = 'is_improvements_tab_enabled'
     LEARNER_GROUPS_ARE_ENABLED = 'learner_groups_are_enabled'
@@ -54,20 +55,24 @@ class FeatureNames(enum.Enum):
     ENABLE_VOICEOVER_CONTRIBUTION = 'enable_voiceover_contribution'
     AUTO_UPDATE_EXP_VOICE_ARTIST_LINK = 'auto_update_exp_voice_artist_link'
     EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS = (
-        'exploration_editor_can_modify_translations')
+        'exploration_editor_can_modify_translations'
+    )
     EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS = (
-        'exploration_editor_can_tag_misconceptions')
+        'exploration_editor_can_tag_misconceptions'
+    )
     ENABLE_MULTIPLE_CLASSROOMS = 'enable_multiple_classrooms'
     REDESIGNED_TOPIC_VIEWER_PAGE = 'redesigned_topic_viewer_page'
     AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP = (
-        'automatic_voiceover_regeneration_from_exp')
+        'automatic_voiceover_regeneration_from_exp'
+    )
     LABEL_ACCENT_TO_VOICE_ARTIST = 'label_accent_to_voice_artist'
     SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS = (
-        'show_voiceover_tab_for_non_curated_explorations')
-    SHOW_RESTRUCTURED_STUDY_GUIDES = (
-        'show_restructured_study_guides')
+        'show_voiceover_tab_for_non_curated_explorations'
+    )
+    SHOW_RESTRUCTURED_STUDY_GUIDES = 'show_restructured_study_guides'
     ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS = (
-        'enable_translation_opps_with_new_opp_models')
+        'enable_translation_opps_with_new_opp_models'
+    )
     ENABLE_WORKED_EXAMPLES_RTE_COMPONENT = (
         'enable_worked_examples_rte_component'
     )
@@ -114,7 +119,7 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
     FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES,
     FeatureNames.SHOW_REGENERATED_VOICEOVERS_TO_LEARNERS,
-    FeatureNames.ENABLE_WORKED_EXAMPLES_RTE_COMPONENT
+    FeatureNames.ENABLE_WORKED_EXAMPLES_RTE_COMPONENT,
 ]
 
 # Names of features in prod stage, the corresponding feature flag instances must
@@ -129,7 +134,7 @@ PROD_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS,
     FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS,
     FeatureNames.LABEL_ACCENT_TO_VOICE_ARTIST,
-    FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD
+    FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
 ]
 
 # Names of features that should not be used anymore, e.g. features that are
@@ -148,80 +153,77 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
     FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value: (
         (
             'This is a dummy feature flag for the e2e tests.',
-            feature_flag_domain.ServerMode.PROD
+            feature_flag_domain.ServerMode.PROD,
         )
     ),
     FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW.value: (
         (
             'This flag is for serial chapter launch feature and making changes '
             'only in the curriculum admin view.',
-            feature_flag_domain.ServerMode.TEST
+            feature_flag_domain.ServerMode.TEST,
         )
     ),
     FeatureNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW.value: (
         (
             'This flag is for serial chapter launch feature and making changes '
             'only in the learner view.',
-            feature_flag_domain.ServerMode.TEST
+            feature_flag_domain.ServerMode.TEST,
         )
     ),
     FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD.value: (
         (
             'This flag is to show redesigned learner dashboard.',
-            feature_flag_domain.ServerMode.PROD
+            feature_flag_domain.ServerMode.PROD,
         )
     ),
     FeatureNames.SHOW_TRANSLATION_SIZE.value: (
         (
             'This flag is to show translation size on translation cards in '
             'contributor dashboard.',
-            feature_flag_domain.ServerMode.DEV
+            feature_flag_domain.ServerMode.DEV,
         )
     ),
     FeatureNames.SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROPDOWN.value: (
         (
             'This flag is to show feedback updates in the '
             'profile pic drop-down menu.',
-            feature_flag_domain.ServerMode.DEV
+            feature_flag_domain.ServerMode.DEV,
         )
     ),
     FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI.value: (
         (
             'This flag is to show new contributor admin dashboard.',
-            feature_flag_domain.ServerMode.TEST
+            feature_flag_domain.ServerMode.TEST,
         )
     ),
     FeatureNames.IS_IMPROVEMENTS_TAB_ENABLED.value: (
         (
             'Exposes the Improvements Tab for creators in the exploration '
             'editor.',
-            feature_flag_domain.ServerMode.PROD
+            feature_flag_domain.ServerMode.PROD,
         )
     ),
     FeatureNames.LEARNER_GROUPS_ARE_ENABLED.value: (
-        (
-            'Enable learner groups feature',
-            feature_flag_domain.ServerMode.PROD
-        )
+        ('Enable learner groups feature', feature_flag_domain.ServerMode.PROD)
     ),
     FeatureNames.NEW_LESSON_PLAYER.value: (
         (
             'This flag is to enable the exploration player redesign.',
-            feature_flag_domain.ServerMode.TEST
+            feature_flag_domain.ServerMode.TEST,
         )
     ),
     FeatureNames.ADD_VOICEOVER_WITH_ACCENT.value: (
         (
             'The flag allows voice artists to add voiceovers in a specific '
             'accent for the given language.',
-            feature_flag_domain.ServerMode.PROD
+            feature_flag_domain.ServerMode.PROD,
         )
     ),
     FeatureNames.CD_ALLOW_UNDOING_TRANSLATION_REVIEW.value: (
         (
             'This flag allows translation reviewers to undo translation '
             'suggestion review on the contributor dashboard.',
-            feature_flag_domain.ServerMode.TEST
+            feature_flag_domain.ServerMode.TEST,
         )
     ),
     FeatureNames.ENABLE_VOICEOVER_CONTRIBUTION.value: (
@@ -229,14 +231,14 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'The flag controls whether voiceover contributions from the '
             'voiceover tab of the exploration editor page is enabled or '
             'disabled during voiceover migration.',
-            feature_flag_domain.ServerMode.PROD
+            feature_flag_domain.ServerMode.PROD,
         )
     ),
     FeatureNames.AUTO_UPDATE_EXP_VOICE_ARTIST_LINK.value: (
         (
             'The flag allows auto-updating of the exploration voice artists '
             'link model after an exploration update.',
-            feature_flag_domain.ServerMode.PROD
+            feature_flag_domain.ServerMode.PROD,
         )
     ),
     FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS.value: (
@@ -244,7 +246,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'This flag allows exploration editors to promptly update '
             'translations of content they are editing in the exploration '
             'editor page.',
-            feature_flag_domain.ServerMode.PROD
+            feature_flag_domain.ServerMode.PROD,
         )
     ),
     FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS.value: (
@@ -252,41 +254,41 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'This flag allows exploration editors to view a list of '
             'misconceptions and tag answer groups with misconceptions '
             'for a curated exploration.',
-            feature_flag_domain.ServerMode.PROD
+            feature_flag_domain.ServerMode.PROD,
         )
     ),
     FeatureNames.ENABLE_MULTIPLE_CLASSROOMS.value: (
         (
             'The flag enables flow for multiple classrooms '
             'and makes the classrooms page available to learners.',
-            feature_flag_domain.ServerMode.TEST
+            feature_flag_domain.ServerMode.TEST,
         )
     ),
     FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE.value: (
         (
             'This flag activates the redesigned topic viewer page'
             'and makes it accessible to learners.',
-            feature_flag_domain.ServerMode.DEV
+            feature_flag_domain.ServerMode.DEV,
         )
     ),
     FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP.value: (
         (
             'The flag enables the automatic regeneration of voiceovers '
             'directly from the exploration editor page.',
-            feature_flag_domain.ServerMode.TEST
+            feature_flag_domain.ServerMode.TEST,
         )
     ),
     FeatureNames.LABEL_ACCENT_TO_VOICE_ARTIST.value: (
         (
             'The flag enables the voice artist accent labeling feature '
             'on the voiceover admin page.',
-            feature_flag_domain.ServerMode.PROD
+            feature_flag_domain.ServerMode.PROD,
         )
     ),
     FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS.value: (
         (
             'The flag enables the voiceover tab for non-curated explorations.',
-            feature_flag_domain.ServerMode.TEST
+            feature_flag_domain.ServerMode.TEST,
         )
     ),
     FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value: (
@@ -295,28 +297,28 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'and learners to access the updated study guide user interface '
             '(the actual content displayed by the study guides will be the '
             'same, just the user interface will be different).',
-            feature_flag_domain.ServerMode.TEST
+            feature_flag_domain.ServerMode.TEST,
         )
     ),
     FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value: (
         (
             'This flag enables the new translation opportunity structure to '
             'the contributor dashboard.',
-            feature_flag_domain.ServerMode.DEV
+            feature_flag_domain.ServerMode.DEV,
         )
     ),
     FeatureNames.ENABLE_WORKED_EXAMPLES_RTE_COMPONENT.value: (
         (
             'Allows creators to add worked examples to the review material '
             'section of skills and explanation of the study guides.',
-            feature_flag_domain.ServerMode.TEST
+            feature_flag_domain.ServerMode.TEST,
         )
     ),
     FeatureNames.SHOW_REGENERATED_VOICEOVERS_TO_LEARNERS.value: (
         (
             'This flag allows learners to see the regenerated voiceovers '
             'in the exploration player.',
-            feature_flag_domain.ServerMode.TEST
+            feature_flag_domain.ServerMode.TEST,
         )
     ),
 }

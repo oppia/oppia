@@ -26,11 +26,12 @@ from core.platform import models
 import apache_beam as beam
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import improvements_models
 
 (improvements_models,) = models.Registry.import_models(
-    [models.Names.IMPROVEMENTS])
+    [models.Names.IMPROVEMENTS]
+)
 
 
 class ValidateCompositeEntityIdTests(job_test_utils.PipelinedTestBase):
@@ -54,9 +55,10 @@ class ValidateCompositeEntityIdTests(job_test_utils.PipelinedTestBase):
             | beam.Create([model])
             | beam.ParDo(improvements_validation.ValidateCompositeEntityId())
         )
-        self.assert_pcoll_equal(output, [
-            improvements_validation_errors.InvalidCompositeEntityError(model)
-        ])
+        self.assert_pcoll_equal(
+            output,
+            [improvements_validation_errors.InvalidCompositeEntityError(model)],
+        )
 
     def test_model_with_valid_composite_entity(self) -> None:
         # Value has the form: "[entity_type].[entity_id].[entity_version]".

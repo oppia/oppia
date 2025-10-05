@@ -10,8 +10,8 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Store build URL in an environment variable
-      run: echo "BUILD_URL=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" >> $GITHUB_ENV
+    - name: Store job URL in an environment variable
+      run: echo "JOB_URL=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/job/$GITHUB_JOB" >> $GITHUB_ENV
       shell: bash
     - name: Send notification
       run: |
@@ -19,6 +19,6 @@ runs:
         -H 'Content-Type: application/json' \
         '${{ inputs.webhook-url }}' \
         -d '{
-          "text": "${{ format('*Message*: {0}\n*Build url*: {1}', inputs.message, env.BUILD_URL) }}"
+          "text": "${{ format('*Message*: {0}\n*Build url*: {1}', inputs.message, env.JOB_URL) }}"
         }'
       shell: bash

@@ -31,7 +31,7 @@ class CloudSecretsServicesTests(test_utils.GenericTestBase):
         with self.swap_to_always_return(
             cloud_secrets_services.CLIENT,
             'access_secret_version',
-            types.SimpleNamespace(payload=types.SimpleNamespace(data=b'secre'))
+            types.SimpleNamespace(payload=types.SimpleNamespace(data=b'secre')),
         ):
             self.assertEqual(cloud_secrets_services.get_secret('name'), 'secre')
 
@@ -39,6 +39,6 @@ class CloudSecretsServicesTests(test_utils.GenericTestBase):
         with self.swap_to_always_raise(
             cloud_secrets_services.CLIENT,
             'access_secret_version',
-            Exception('Secret not found')
+            Exception('Secret not found'),
         ):
             self.assertIsNone(cloud_secrets_services.get_secret('name2'))

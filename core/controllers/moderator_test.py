@@ -46,16 +46,16 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(self.EXP_ID_2, self.user_id)
 
         self.save_new_valid_collection(
-            self.COL_ID_1, self.user_id, exploration_id=self.EXP_ID_1)
+            self.COL_ID_1, self.user_id, exploration_id=self.EXP_ID_1
+        )
 
         rights_manager.publish_collection(self.user, self.COL_ID_1)
 
         self.save_new_valid_collection(
-            self.COL_ID_2, self.user_id, exploration_id=self.EXP_ID_1)
+            self.COL_ID_2, self.user_id, exploration_id=self.EXP_ID_1
+        )
 
-    def test_nonexistent_exploration_id_should_fail(
-        self
-    ) -> None:
+    def test_nonexistent_exploration_id_should_fail(self) -> None:
         self.login(self.MODERATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -63,17 +63,21 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
         # results in an error.
 
         self.post_json(
-            '/moderatorhandler/featured', {
-                'featured_activity_reference_dicts': [{
-                    'type': 'exploration',
-                    'id': self.EXP_ID_3,
-                }],
-            }, csrf_token=csrf_token, expected_status_int=400)
+            '/moderatorhandler/featured',
+            {
+                'featured_activity_reference_dicts': [
+                    {
+                        'type': 'exploration',
+                        'id': self.EXP_ID_3,
+                    }
+                ],
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
         self.logout()
 
-    def test_nonexistent_collection_id_should_fail(
-        self
-    ) -> None:
+    def test_nonexistent_collection_id_should_fail(self) -> None:
         self.login(self.MODERATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -81,17 +85,21 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
         # results in an error.
 
         self.post_json(
-            '/moderatorhandler/featured', {
-                'featured_activity_reference_dicts': [{
-                    'type': 'collection',
-                    'id': self.COL_ID_3,
-                }],
-            }, csrf_token=csrf_token, expected_status_int=400)
+            '/moderatorhandler/featured',
+            {
+                'featured_activity_reference_dicts': [
+                    {
+                        'type': 'collection',
+                        'id': self.COL_ID_3,
+                    }
+                ],
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
         self.logout()
 
-    def test_public_and_nonexistent_exploration_ids_should_fail(
-        self
-    ) -> None:
+    def test_public_and_nonexistent_exploration_ids_should_fail(self) -> None:
         self.login(self.MODERATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -99,20 +107,25 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
         # and a nonexistent exploration results in an error.
 
         self.post_json(
-            '/moderatorhandler/featured', {
-                'featured_activity_reference_dicts': [{
-                    'type': 'exploration',
-                    'id': self.EXP_ID_1,
-                }, {
-                    'type': 'exploration',
-                    'id': self.EXP_ID_3,
-                }],
-            }, csrf_token=csrf_token, expected_status_int=400)
+            '/moderatorhandler/featured',
+            {
+                'featured_activity_reference_dicts': [
+                    {
+                        'type': 'exploration',
+                        'id': self.EXP_ID_1,
+                    },
+                    {
+                        'type': 'exploration',
+                        'id': self.EXP_ID_3,
+                    },
+                ],
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
         self.logout()
 
-    def test_public_and_nonexistent_collection_ids_should_fail(
-        self
-    ) -> None:
+    def test_public_and_nonexistent_collection_ids_should_fail(self) -> None:
         self.login(self.MODERATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -120,19 +133,26 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
         # and a nonexistent collection results in an error.
 
         self.post_json(
-            '/moderatorhandler/featured', {
-                'featured_activity_reference_dicts': [{
-                    'type': 'collection',
-                    'id': self.COL_ID_1,
-                }, {
-                    'type': 'collection',
-                    'id': self.COL_ID_3,
-                }],
-            }, csrf_token=csrf_token, expected_status_int=400)
+            '/moderatorhandler/featured',
+            {
+                'featured_activity_reference_dicts': [
+                    {
+                        'type': 'collection',
+                        'id': self.COL_ID_1,
+                    },
+                    {
+                        'type': 'collection',
+                        'id': self.COL_ID_3,
+                    },
+                ],
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
         self.logout()
 
     def test_nonexistent_exploration_and_collection_ids_should_fail(
-        self
+        self,
     ) -> None:
         self.login(self.MODERATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -141,19 +161,26 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
         # and a nonexistent collection results in an error.
 
         self.post_json(
-            '/moderatorhandler/featured', {
-                'featured_activity_reference_dicts': [{
-                    'type': 'exploration',
-                    'id': self.EXP_ID_3,
-                }, {
-                    'type': 'collection',
-                    'id': self.COL_ID_3,
-                }],
-            }, csrf_token=csrf_token, expected_status_int=400)
+            '/moderatorhandler/featured',
+            {
+                'featured_activity_reference_dicts': [
+                    {
+                        'type': 'exploration',
+                        'id': self.EXP_ID_3,
+                    },
+                    {
+                        'type': 'collection',
+                        'id': self.COL_ID_3,
+                    },
+                ],
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
         self.logout()
 
     def test_public_exploration_and_nonexistent_collection_ids_should_fail(
-        self
+        self,
     ) -> None:
         self.login(self.MODERATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -162,19 +189,26 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
         # and a nonexistent collection results in an error.
 
         self.post_json(
-            '/moderatorhandler/featured', {
-                'featured_activity_reference_dicts': [{
-                    'type': 'exploration',
-                    'id': self.EXP_ID_1,
-                }, {
-                    'type': 'collection',
-                    'id': self.COL_ID_3,
-                }],
-            }, csrf_token=csrf_token, expected_status_int=400)
+            '/moderatorhandler/featured',
+            {
+                'featured_activity_reference_dicts': [
+                    {
+                        'type': 'exploration',
+                        'id': self.EXP_ID_1,
+                    },
+                    {
+                        'type': 'collection',
+                        'id': self.COL_ID_3,
+                    },
+                ],
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
         self.logout()
 
     def test_public_collection_and_nonexistent_exploration_ids_should_fail(
-        self
+        self,
     ) -> None:
         self.login(self.MODERATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -183,20 +217,25 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
         # and a nonexistent exploration results in an error.
 
         self.post_json(
-            '/moderatorhandler/featured', {
-                'featured_activity_reference_dicts': [{
-                    'type': 'collection',
-                    'id': self.COL_ID_1,
-                }, {
-                    'type': 'exploration',
-                    'id': self.EXP_ID_3,
-                }],
-            }, csrf_token=csrf_token, expected_status_int=400)
+            '/moderatorhandler/featured',
+            {
+                'featured_activity_reference_dicts': [
+                    {
+                        'type': 'collection',
+                        'id': self.COL_ID_1,
+                    },
+                    {
+                        'type': 'exploration',
+                        'id': self.EXP_ID_3,
+                    },
+                ],
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
         self.logout()
 
-    def test_private_exploration_id_should_fail(
-        self
-    ) -> None:
+    def test_private_exploration_id_should_fail(self) -> None:
         self.login(self.MODERATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -204,17 +243,21 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
         # results in an error.
 
         self.post_json(
-            '/moderatorhandler/featured', {
-                'featured_activity_reference_dicts': [{
-                    'type': 'exploration',
-                    'id': self.EXP_ID_2,
-                }],
-            }, csrf_token=csrf_token, expected_status_int=400)
+            '/moderatorhandler/featured',
+            {
+                'featured_activity_reference_dicts': [
+                    {
+                        'type': 'exploration',
+                        'id': self.EXP_ID_2,
+                    }
+                ],
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
         self.logout()
 
-    def test_private_collection_id_should_fail(
-        self
-    ) -> None:
+    def test_private_collection_id_should_fail(self) -> None:
         self.login(self.MODERATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -222,17 +265,21 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
         # results in an error.
 
         self.post_json(
-            '/moderatorhandler/featured', {
-                'featured_activity_reference_dicts': [{
-                    'type': 'collection',
-                    'id': self.COL_ID_2,
-                }],
-            }, csrf_token=csrf_token, expected_status_int=400)
+            '/moderatorhandler/featured',
+            {
+                'featured_activity_reference_dicts': [
+                    {
+                        'type': 'collection',
+                        'id': self.COL_ID_2,
+                    }
+                ],
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
         self.logout()
 
-    def test_public_and_private_exploration_ids_should_fail(
-        self
-    ) -> None:
+    def test_public_and_private_exploration_ids_should_fail(self) -> None:
         self.login(self.MODERATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -240,20 +287,25 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
         # and private exploration results in an error.
 
         self.post_json(
-            '/moderatorhandler/featured', {
-                'featured_activity_reference_dicts': [{
-                    'type': 'exploration',
-                    'id': self.EXP_ID_1,
-                }, {
-                    'type': 'exploration',
-                    'id': self.EXP_ID_2,
-                }],
-            }, csrf_token=csrf_token, expected_status_int=400)
+            '/moderatorhandler/featured',
+            {
+                'featured_activity_reference_dicts': [
+                    {
+                        'type': 'exploration',
+                        'id': self.EXP_ID_1,
+                    },
+                    {
+                        'type': 'exploration',
+                        'id': self.EXP_ID_2,
+                    },
+                ],
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
         self.logout()
 
-    def test_public_and_private_collection_ids_should_fail(
-        self
-    ) -> None:
+    def test_public_and_private_collection_ids_should_fail(self) -> None:
         self.login(self.MODERATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -261,19 +313,26 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
         # and private exploration results in an error.
 
         self.post_json(
-            '/moderatorhandler/featured', {
-                'featured_activity_reference_dicts': [{
-                    'type': 'collection',
-                    'id': self.COL_ID_1,
-                }, {
-                    'type': 'collection',
-                    'id': self.COL_ID_2,
-                }],
-            }, csrf_token=csrf_token, expected_status_int=400)
+            '/moderatorhandler/featured',
+            {
+                'featured_activity_reference_dicts': [
+                    {
+                        'type': 'collection',
+                        'id': self.COL_ID_1,
+                    },
+                    {
+                        'type': 'collection',
+                        'id': self.COL_ID_2,
+                    },
+                ],
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
         self.logout()
 
     def test_private_exploration_and_private_collection_ids_should_fail(
-        self
+        self,
     ) -> None:
         self.login(self.MODERATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -282,19 +341,26 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
         # and private collection results in an error.
 
         self.post_json(
-            '/moderatorhandler/featured', {
-                'featured_activity_reference_dicts': [{
-                    'type': 'exploration',
-                    'id': self.EXP_ID_2,
-                }, {
-                    'type': 'collection',
-                    'id': self.COL_ID_2,
-                }],
-            }, csrf_token=csrf_token, expected_status_int=400)
+            '/moderatorhandler/featured',
+            {
+                'featured_activity_reference_dicts': [
+                    {
+                        'type': 'exploration',
+                        'id': self.EXP_ID_2,
+                    },
+                    {
+                        'type': 'collection',
+                        'id': self.COL_ID_2,
+                    },
+                ],
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
         self.logout()
 
     def test_public_exploration_and_private_collection_ids_should_fail(
-        self
+        self,
     ) -> None:
         self.login(self.MODERATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -303,19 +369,26 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
         # and private collection results in an error.
 
         self.post_json(
-            '/moderatorhandler/featured', {
-                'featured_activity_reference_dicts': [{
-                    'type': 'exploration',
-                    'id': self.EXP_ID_1,
-                }, {
-                    'type': 'collection',
-                    'id': self.COL_ID_2,
-                }],
-            }, csrf_token=csrf_token, expected_status_int=400)
+            '/moderatorhandler/featured',
+            {
+                'featured_activity_reference_dicts': [
+                    {
+                        'type': 'exploration',
+                        'id': self.EXP_ID_1,
+                    },
+                    {
+                        'type': 'collection',
+                        'id': self.COL_ID_2,
+                    },
+                ],
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
         self.logout()
 
     def test_public_collection_and_private_exploration_ids_should_fail(
-        self
+        self,
     ) -> None:
         self.login(self.MODERATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -324,19 +397,26 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
         # and private exploration results in an error.
 
         self.post_json(
-            '/moderatorhandler/featured', {
-                'featured_activity_reference_dicts': [{
-                    'type': 'collection',
-                    'id': self.COL_ID_1,
-                }, {
-                    'type': 'exploration',
-                    'id': self.EXP_ID_2,
-                }],
-            }, csrf_token=csrf_token, expected_status_int=400)
+            '/moderatorhandler/featured',
+            {
+                'featured_activity_reference_dicts': [
+                    {
+                        'type': 'collection',
+                        'id': self.COL_ID_1,
+                    },
+                    {
+                        'type': 'exploration',
+                        'id': self.EXP_ID_2,
+                    },
+                ],
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
         self.logout()
 
     def test_public_exploration_and_public_collection_ids_should_succeed(
-        self
+        self,
     ) -> None:
         self.login(self.MODERATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
@@ -344,17 +424,24 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
 
         # Public Exploration & Public Collection.
         self.post_json(
-            '/moderatorhandler/featured', {
-                'featured_activity_reference_dicts': [{
-                    'type': 'exploration',
-                    'id': self.EXP_ID_1,
-                }, {
-                    'type': 'collection',
-                    'id': self.COL_ID_1,
-                }],
-            }, csrf_token=csrf_token)
+            '/moderatorhandler/featured',
+            {
+                'featured_activity_reference_dicts': [
+                    {
+                        'type': 'exploration',
+                        'id': self.EXP_ID_1,
+                    },
+                    {
+                        'type': 'collection',
+                        'id': self.COL_ID_1,
+                    },
+                ],
+            },
+            csrf_token=csrf_token,
+        )
         featured_activity_references = self.get_json(
-            '/moderatorhandler/featured')['featured_activity_references']
+            '/moderatorhandler/featured'
+        )['featured_activity_references']
         self.assertEqual(featured_activity_references[0]['id'], self.EXP_ID_1)
         self.assertEqual(featured_activity_references[1]['id'], self.COL_ID_1)
         self.logout()
@@ -372,20 +459,22 @@ class EmailDraftHandlerTests(test_utils.GenericTestBase):
             (
                 platform_parameter_list.ParamName.UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY,  # pylint: disable=line-too-long
                 'I\'m writing to inform you that '
-                'I have unpublished the above exploration.'
+                'I have unpublished the above exploration.',
             ),
             (
                 platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
-                'system@example.com'
-            )
+                'system@example.com',
+            ),
         ]
     )
     def test_get_draft_email_body(self) -> None:
         self.login(self.MODERATOR_EMAIL)
         expected_draft_text_body = (
             'I\'m writing to inform you that '
-            'I have unpublished the above exploration.')
-        d_text = self.get_json(
-            '/moderatorhandler/email_draft')['draft_email_body']
+            'I have unpublished the above exploration.'
+        )
+        d_text = self.get_json('/moderatorhandler/email_draft')[
+            'draft_email_body'
+        ]
         self.assertEqual(d_text, expected_draft_text_body)
         self.logout()
