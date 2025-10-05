@@ -1,29 +1,42 @@
-<div class="example-box">
-  <strong class="example-title">Example</strong>
-  <div class="protractor-panel-body">
-    <oppia-rte-output-display class="e2e-test-workedexample-question" [rteString]="question">
-    </oppia-rte-output-display>
+<div *ngIf="isEnableWorkedexamplesRteComponentFeatureEnabled()">
+  <div class="example-box">
+    <strong class="example-title">Example</strong>
+    <div class="protractor-panel-body">
+      <oppia-rte-output-display class="e2e-test-workedexample-question" [rteString]="question">
+      </oppia-rte-output-display>
+    </div>
+  </div>
+
+  <div class="solution-box">
+    <strong class="solution-title"
+            (click)="allowSolutionToBeCollapsed ? changeSolutionState() : null"
+            [attr.tabindex]="allowSolutionToBeCollapsed ? '0' : null"
+            [attr.role]="allowSolutionToBeCollapsed ? 'button' : null"
+            [attr.aria-expanded]="allowSolutionToBeCollapsed ? !isSolutionCollapsed : null"
+            [ngClass]="{'collapsed-title': allowSolutionToBeCollapsed && isSolutionCollapsed}"
+            (keydown.enter)="allowSolutionToBeCollapsed ? changeSolutionState() : null"
+            (keydown.space)="allowSolutionToBeCollapsed ? changeSolutionState() : null">
+      <span *ngIf="allowSolutionToBeCollapsed && isSolutionCollapsed">Solution (click to reveal)</span>
+      <span *ngIf="!allowSolutionToBeCollapsed || !isSolutionCollapsed">Solution</span>
+      <i *ngIf="allowSolutionToBeCollapsed && isSolutionCollapsed" class="material-icons e2e-test-expand-workedexample icon-expand-workedexample">expand_more</i>
+      <i *ngIf="allowSolutionToBeCollapsed && !isSolutionCollapsed" class="material-icons e2e-test-collapse-workedexample icon-collapse-workedexample">expand_less</i>
+    </strong>
+    <div class="protractor-panel-body" *ngIf="!isSolutionCollapsed">
+      <oppia-rte-output-display class="e2e-test-workedexample-answer" [rteString]="answer">
+      </oppia-rte-output-display>
+    </div>
   </div>
 </div>
 
-<div class="solution-box">
-  <strong class="solution-title"
-          (click)="allowSolutionToBeCollapsed ? changeSolutionState() : null"
-          [attr.tabindex]="allowSolutionToBeCollapsed ? '0' : null"
-          [attr.role]="allowSolutionToBeCollapsed ? 'button' : null"
-          [attr.aria-expanded]="allowSolutionToBeCollapsed ? !isSolutionCollapsed : null"
-          [ngClass]="{'collapsed-title': allowSolutionToBeCollapsed && isSolutionCollapsed}"
-          (keydown.enter)="allowSolutionToBeCollapsed ? changeSolutionState() : null"
-          (keydown.space)="allowSolutionToBeCollapsed ? changeSolutionState() : null">
-    <span *ngIf="allowSolutionToBeCollapsed && isSolutionCollapsed">Solution (click to reveal)</span>
-    <span *ngIf="!allowSolutionToBeCollapsed || !isSolutionCollapsed">Solution</span>
-    <i *ngIf="allowSolutionToBeCollapsed && isSolutionCollapsed" class="material-icons e2e-test-expand-workedexample icon-expand-workedexample">expand_more</i>
-    <i *ngIf="allowSolutionToBeCollapsed && !isSolutionCollapsed" class="material-icons e2e-test-collapse-workedexample icon-collapse-workedexample">expand_less</i>
-  </strong>
-  <div class="protractor-panel-body" *ngIf="!isSolutionCollapsed">
+<div *ngIf="!isEnableWorkedexamplesRteComponentFeatureEnabled()">
+  <p>
+    <strong>Question</strong><br>
+    <oppia-rte-output-display class="e2e-test-workedexample-question" [rteString]="question">
+    </oppia-rte-output-display><br>
+    <strong>Answer</strong><br>
     <oppia-rte-output-display class="e2e-test-workedexample-answer" [rteString]="answer">
-    </oppia-rte-output-display>
-  </div>
+    </oppia-rte-output-display><br><br>
+  </p>
 </div>
 
 <style>

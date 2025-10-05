@@ -750,32 +750,35 @@ def apply_change_list(
                         'content', concatenated_html
                     )
                     page_contents.validate()
-                    modified_subtopic_pages[subtopic_page_id] = subtopic_page_services.get_subtopic_page_by_id(
-                        topic_id, change.subtopic_id
-                    )
-                    old_value = modified_subtopic_pages[subtopic_page_id].page_contents.subtitled_html.html
-                    update_subtopic_page_property_cmd = (
-                        subtopic_page_domain.SubtopicPageChange
-                    )({
-                        'cmd': 'update_subtopic_page_property',
-                        'property_name': 'page_contents_html',
-                        'new_value': (
-                            concatenated_html
-                        ),
-                        'old_value': old_value,
-                        'subtopic_id': (
-                            # We use update_subtopic_page_property_cmd
-                            # here to avoid mypy errors. We will replace
-                            # this with a study guide alternative once
-                            # we start using study guides exclusively.
-                            change.subtopic_id
+                    temporary_subtopic_page: Union[subtopic_page_domain.SubtopicPage, None] = (
+                        subtopic_page_services.get_subtopic_page_by_id(
+                            topic_id, change.subtopic_id, False
                         )
-                    })
-                    modified_subtopic_change_cmds[subtopic_page_id].append(
-                        update_subtopic_page_property_cmd)
-                    modified_subtopic_pages[
-                        subtopic_page_id].update_page_contents_html(
-                            page_contents)
+                    )
+                    if temporary_subtopic_page is not None:
+                        modified_subtopic_pages[subtopic_page_id] = temporary_subtopic_page
+                        old_value = temporary_subtopic_page.page_contents.subtitled_html.html
+                        update_subtopic_page_property_cmd = (
+                            subtopic_page_domain.SubtopicPageChange
+                        )({
+                            'cmd': 'update_subtopic_page_property',
+                            'property_name': 'page_contents_html',
+                            'new_value': (
+                                concatenated_html
+                            ),
+                            'old_value': old_value,
+                            'subtopic_id': (
+                                # We use update_subtopic_page_property_cmd
+                                # here to avoid mypy errors. We will replace
+                                # this with a study guide alternative once
+                                # we start using study guides exclusively.
+                                change.subtopic_id
+                            )
+                        })
+                        modified_subtopic_change_cmds[subtopic_page_id].append(
+                            update_subtopic_page_property_cmd)
+                        temporary_subtopic_page.update_page_contents_html(
+                                page_contents)
             elif (change.cmd ==
                   subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY):
                 # Ruling out the possibility of any other type for mypy

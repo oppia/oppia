@@ -274,7 +274,27 @@ export class AdminMiscTabComponent implements OnInit {
     );
     this.adminBackendApiService.deleteStudyGuideModelsAsync().then(
       () => {
-        this.setStatusMessage.emit('The deletion process was started.');
+        this.setStatusMessage.emit(
+          'Successfully deleted all study guide models.'
+        );
+      },
+      errorResponse => {
+        this.setStatusMessage.emit('Server error: ' + errorResponse);
+      }
+    );
+  }
+
+  verifyStudyGuideModels(): void {
+    this.setStatusMessage.emit(
+      'Starting the verification of all Study Guide Models...'
+    );
+    this.adminBackendApiService.verifyStudyGuideModelsAsync().then(
+      issues => {
+        if (issues.issues[0].length === 0) {
+          this.setStatusMessage.emit('No issues found.');
+        } else {
+          this.setStatusMessage.emit('Issues found: ' + issues.issues);
+        }
       },
       errorResponse => {
         this.setStatusMessage.emit('Server error: ' + errorResponse);

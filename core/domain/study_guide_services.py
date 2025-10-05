@@ -441,6 +441,96 @@ def delete_study_guide_models(
             )
 
 
+def verify_study_guide_models(
+    topic_id: str,
+    subtopics: List[topic_domain.Subtopic]
+) -> List[str]:
+    """Verifies all study guide models corresponding to the given topic id.
+
+    Args:
+        topic_id: str. The ID of the topic that this study guide belongs to.
+        subtopics: list(Subtopic). The subtopics in the topic.
+
+    Returns:
+        list(str). A list of issues found with the study guide models. If no issues
+        are found, an empty list is returned.
+    """
+    study_guide_snapshot_metadata_ids = []
+    study_guide_snapshot_content_ids = []
+    study_guide_commit_log_entry_ids = []
+    
+    for subtopic in subtopics:
+        if does_study_guide_model_exist(topic_id, subtopic.id):
+            study_guide = get_study_guide_by_id(topic_id, subtopic.id)
+            study_guide_id = study_guide.id
+            model_version = study_guide.version
+            
+            for version in range(1, model_version + 1):
+                snapshot_id = '%s-%d' % (study_guide_id, version)
+                study_guide_snapshot_content_ids.append(snapshot_id)
+                study_guide_snapshot_metadata_ids.append(snapshot_id)
+                
+                commit_log_id = 'studyguide-%s-%d' % (study_guide_id, version)
+                study_guide_commit_log_entry_ids.append(commit_log_id)
+    
+    snapshot_content_models = (
+        subtopic_models.StudyGuideSnapshotContentModel.get_multi(
+            study_guide_snapshot_content_ids
+        )
+    )
+    snapshot_metadata_models = (
+        subtopic_models.StudyGuideSnapshotMetadataModel.get_multi(
+            study_guide_snapshot_metadata_ids
+        )
+    )
+    commit_log_entry_models = (
+        subtopic_models.StudyGuideCommitLogEntryModel.get_multi(
+            study_guide_commit_log_entry_ids
+        )
+    )
+    
+    issues = []
+    
+    # Check for missing snapshot content models
+    print(commit_log_entry_models)
+    missing_snapshot_content_ids = [
+        study_guide_snapshot_content_ids[i] 
+        for i, model in enumerate(snapshot_content_models) 
+        if model is None
+    ]
+    if missing_snapshot_content_ids:
+        issues.append(
+            'Missing snapshot content models: %s' % 
+            ', '.join(missing_snapshot_content_ids)
+        )
+    
+    # Check for missing snapshot metadata models
+    missing_snapshot_metadata_ids = [
+        study_guide_snapshot_metadata_ids[i] 
+        for i, model in enumerate(snapshot_metadata_models) 
+        if model is None
+    ]
+    if missing_snapshot_metadata_ids:
+        issues.append(
+            'Missing snapshot metadata models: %s' % 
+            ', '.join(missing_snapshot_metadata_ids)
+        )
+    
+    # Check for missing commit log entry models
+    missing_commit_log_entry_ids = [
+        study_guide_commit_log_entry_ids[i] 
+        for i, model in enumerate(commit_log_entry_models) 
+        if model is None
+    ]
+    if missing_commit_log_entry_ids:
+        issues.append(
+            'Missing commit log entry models: %s' % 
+            ', '.join(missing_commit_log_entry_ids)
+        )
+    
+    return issues
+
+
 def get_topic_ids_from_study_guide_ids(
     study_guide_ids: List[str]
 ) -> List[str]:
