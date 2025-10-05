@@ -132,15 +132,15 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
         """Test that non-question activity with offset returns error."""
         with self.secrets_swap:
             response = self.get_json(
-                    '/android_data?activity_type=exploration&'
-                    'activities_data=[{"id": "exp_id"}]&offset=0',
-                    headers={'X-ApiKey': 'secret'},
-                    expected_status_int=400
-                )
+                '/android_data?activity_type=exploration&'
+                'activities_data=[{"id": "exp_id"}]&offset=0',
+                headers={'X-ApiKey': 'secret'},
+                expected_status_int=400,
+            )
             self.assertEqual(
-                    response['error'],
-                    'Offset should only be provided for fetching questions'
-                )
+                response['error'],
+                'Offset should only be provided for fetching questions',
+            )
 
     def test_get_non_existent_activity_returns_null_payload(self) -> None:
         with self.secrets_swap:
@@ -508,12 +508,15 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                 'Version and language code must be specified '
                 'for translation',
             )
-            
+
     def test_get_exploration_translation_returns_correct_json(self) -> None:
         translation_model = (
-          translation_models.EntityTranslationsModel.create_new(
-            feconf.TranslatableEntityType.EXPLORATION.value,
-                'translation_id', 1, 'es', {
+            translation_models.EntityTranslationsModel.create_new(
+                feconf.TranslatableEntityType.EXPLORATION.value,
+                'translation_id',
+                1,
+                'es',
+                {
                     'content_id_123': {
                         'content_value': 'Hello world!',
                         'needs_update': False,
@@ -533,28 +536,30 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                 '    "version": 1'
                 '}]',
                 headers={'X-ApiKey': 'secret'},
-                expected_status_int=200
+                expected_status_int=200,
             )
 
             self.assertEqual(
                 response,
-                [{
-                    'id': 'translation_id',
-                    'language_code': 'es',
-                    'version': 1,
-                    'payload': {
-                        'content_id_123': {
-                            'content_value': 'Hello world!',
-                            'needs_update': False,
-                            'content_format': 'html'
-                        }
+                [
+                    {
+                        'id': 'translation_id',
+                        'language_code': 'es',
+                        'version': 1,
+                        'payload': {
+                            'content_id_123': {
+                                'content_value': 'Hello world!',
+                                'needs_update': False,
+                                'content_format': 'html',
+                            }
+                        },
                     }
                 ],
             )
 
             self.assertEqual(
                 translation_model.entity_type,
-                feconf.TranslatableEntityType.EXPLORATION.value
+                feconf.TranslatableEntityType.EXPLORATION.value,
             )
 
     def test_get_exploration_translation_with_zero_items_returns_correct_json(
@@ -740,24 +745,30 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
         question_id2 = question_services.get_new_question_id()
         content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
-            question_id1, 'owner_id',
+            question_id1,
+            'owner_id',
             self._create_valid_question_data(
-                'Test Question 1', content_id_generator),
+                'Test Question 1', content_id_generator
+            ),
             [skill_id],
-            content_id_generator.next_content_id_index
+            content_id_generator.next_content_id_index,
         )
         self.save_new_question(
-            question_id2, 'owner_id',
+            question_id2,
+            'owner_id',
             self._create_valid_question_data(
-                'Test Question 2', content_id_generator),
+                'Test Question 2', content_id_generator
+            ),
             [skill_id],
-            content_id_generator.next_content_id_index
+            content_id_generator.next_content_id_index,
         )
         # Create links between each question and the skill.
         question_services.create_new_question_skill_link(
-            'owner_id', question_id1, skill_id, 0.1)
+            'owner_id', question_id1, skill_id, 0.1
+        )
         question_services.create_new_question_skill_link(
-            'owner_id', question_id2, skill_id, 0.1)
+            'owner_id', question_id2, skill_id, 0.1
+        )
 
         with self.secrets_swap:
             response = self.get_json(
@@ -765,19 +776,19 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                 '&activities_data=[{"language_code": "en"}]'
                 '&offset=0',
                 headers={'X-ApiKey': 'secret'},
-                expected_status_int=200
+                expected_status_int=200,
             )
             # Response should be a list of question dictionaries.
             returned_question_ids = [entry['id'] for entry in response]
             # Sort the lists to compare them.
             self.assertEqual(
                 sorted(returned_question_ids),
-                sorted([question_id1, question_id2])
+                sorted([question_id1, question_id2]),
             )
             for entry in response:
                 self.assertEqual(
                     entry['payload'],
-                    question_services.get_question_by_id(entry['id']).to_dict()
+                    question_services.get_question_by_id(entry['id']).to_dict(),
                 )
 
     def test_get_questions_with_version_fails(self) -> None:
@@ -788,11 +799,11 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                 '&activities_data=[{"language_code": "en", "version": 1}]'
                 '&offset=0',
                 headers={'X-ApiKey': 'secret'},
-                expected_status_int=400
+                expected_status_int=400,
             )
             self.assertEqual(
                 response['error'],
-                'Version cannot be specified when fetching questions'
+                'Version cannot be specified when fetching questions',
             )
 
     def test_get_questions_without_offset_fails(self) -> None:
@@ -802,11 +813,10 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                 '/android_data?activity_type=questions'
                 '&activities_data=[{"language_code": "en"}]',
                 headers={'X-ApiKey': 'secret'},
-                expected_status_int=400
+                expected_status_int=400,
             )
             self.assertEqual(
-                response['error'],
-                'Offset required when fetching questions'
+                response['error'], 'Offset required when fetching questions'
             )
 
     def test_get_questions_pagination(self) -> None:
@@ -820,14 +830,17 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
             question_id = question_services.get_new_question_id()
             question_ids.append(question_id)
             self.save_new_question(
-                question_id, 'owner_id',
+                question_id,
+                'owner_id',
                 self._create_valid_question_data(
-                    f'Test Question {i+1}', content_id_generator),
+                    f'Test Question {i+1}', content_id_generator
+                ),
                 [skill_id],
-                content_id_generator.next_content_id_index
+                content_id_generator.next_content_id_index,
             )
             question_services.create_new_question_skill_link(
-                'owner_id', question_id, skill_id, 0.1)
+                'owner_id', question_id, skill_id, 0.1
+            )
 
         with self.secrets_swap:
             # Use an offset of 1 to skip the first created question.
@@ -836,7 +849,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                 '&activities_data=[{"language_code": "en"}]'
                 '&offset=1',
                 headers={'X-ApiKey': 'secret'},
-                expected_status_int=200
+                expected_status_int=200,
             )
             # The number of questions returned should equal the total created.
             # Minus the offset.
@@ -854,13 +867,9 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                     'activities_data='
                     '[{"id": "nonexistent_topic_id", "version": 1}]',
                     headers={'X-ApiKey': 'secret'},
-                    expected_status_int=200
+                    expected_status_int=200,
                 ),
-                [{
-                    'id': 'nonexistent_topic_id',
-                    'version': 1,
-                    'payload': None
-                }]
+                [{'id': 'nonexistent_topic_id', 'version': 1, 'payload': None}],
             )
 
     def test_get_nonexistent_classroom_returns_null_payload(self) -> None:
@@ -871,12 +880,9 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                     '/android_data?activity_type=classroom&'
                     'activities_data=[{"id": "nonexistent_classroom"}]',
                     headers={'X-ApiKey': 'secret'},
-                    expected_status_int=200
+                    expected_status_int=200,
                 ),
-                [{
-                    'id': 'nonexistent_classroom',
-                    'payload': None
-                }]
+                [{'id': 'nonexistent_classroom', 'payload': None}],
             )
 
     def test_get_nonexistent_subtopic_returns_null_payload(self) -> None:
@@ -887,13 +893,9 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                     '/android_data?activity_type=subtopic&'
                     'activities_data=[{"id": "topic_id-999", "version": 1}]',
                     headers={'X-ApiKey': 'secret'},
-                    expected_status_int=200
+                    expected_status_int=200,
                 ),
-                [{
-                    'id': 'topic_id-999',
-                    'version': 1,
-                    'payload': None
-                }]
+                [{'id': 'topic_id-999', 'version': 1, 'payload': None}],
             )
 
     def test_get_nonexistent_skill_returns_null_payload(self) -> None:
@@ -905,13 +907,9 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                     'activities_data='
                     '[{"id": "nonexistent_skill_id", "version": 1}]',
                     headers={'X-ApiKey': 'secret'},
-                    expected_status_int=200
+                    expected_status_int=200,
                 ),
-                [{
-                    'id': 'nonexistent_skill_id',
-                    'version': 1,
-                    'payload': None
-                }]
+                [{'id': 'nonexistent_skill_id', 'version': 1, 'payload': None}],
             )
 
     def test_get_nonexistent_translation_returns_empty_payload(self) -> None:
@@ -924,14 +922,16 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                     '[{"id": "nonexistent_id", "version": 1,'
                     '"language_code": "es"}]',
                     headers={'X-ApiKey': 'secret'},
-                    expected_status_int=200
+                    expected_status_int=200,
                 ),
-                [{
-                    'id': 'nonexistent_id',
-                    'version': 1,
-                    'language_code': 'es',
-                    'payload': {}
-                }]
+                [
+                    {
+                        'id': 'nonexistent_id',
+                        'version': 1,
+                        'language_code': 'es',
+                        'payload': {},
+                    }
+                ],
             )
 
     def test_multiple_different_activities_handling(self) -> None:
@@ -943,16 +943,21 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
             self.assertEqual(
                 self.get_json(
                     '/android_data?activity_type=exploration&'
-                    'activities_data=[{"id": "exp_id", "version": 1},' 
+                    'activities_data=[{"id": "exp_id", "version": 1},'
                     '{"id": "nonexistent_exp", "version": 1}]',
                     headers={'X-ApiKey': 'secret'},
-                    expected_status_int=200
+                    expected_status_int=200,
                 ),
                 [
-                    {'id': 'exp_id', 'version': 1,
-                     'payload': exp_services.to_exploration_dict_for_android(exploration)},
-                    {'id': 'nonexistent_exp', 'version': 1, 'payload': None}
-                ]
+                    {
+                        'id': 'exp_id',
+                        'version': 1,
+                        'payload': exp_services.to_exploration_dict_for_android(
+                            exploration
+                        ),
+                    },
+                    {'id': 'nonexistent_exp', 'version': 1, 'payload': None},
+                ],
             )
 
             self.assertEqual(
@@ -962,13 +967,16 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                     '[{"id": "story_id", "version": 1},'
                     '{"id": "nonexistent_story", "version": 1}]',
                     headers={'X-ApiKey': 'secret'},
-                    expected_status_int=200
+                    expected_status_int=200,
                 ),
                 [
-                    {'id': 'story_id', 'version': 1,
-                     'payload': story.to_dict()},
-                    {'id': 'nonexistent_story', 'version': 1, 'payload': None}
-                ]
+                    {
+                        'id': 'story_id',
+                        'version': 1,
+                        'payload': story.to_dict(),
+                    },
+                    {'id': 'nonexistent_story', 'version': 1, 'payload': None},
+                ],
             )
 
     def test_get_multiple_subtopics_at_once(self) -> None:
@@ -984,14 +992,20 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                     '[{"id": "topic_id-1", "version": 1},'
                     '{"id": "topic_id-2", "version": 1}]',
                     headers={'X-ApiKey': 'secret'},
-                    expected_status_int=200
+                    expected_status_int=200,
                 ),
                 [
-                    {'id': 'topic_id-1', 'version': 1,
-                     'payload': subtopic1.to_dict()},
-                    {'id': 'topic_id-2', 'version': 1,
-                     'payload': subtopic2.to_dict()}
-                ]
+                    {
+                        'id': 'topic_id-1',
+                        'version': 1,
+                        'payload': subtopic1.to_dict(),
+                    },
+                    {
+                        'id': 'topic_id-2',
+                        'version': 1,
+                        'payload': subtopic2.to_dict(),
+                    },
+                ],
             )
 
     def test_get_exploration_translations_missing_language_code(self) -> None:
@@ -1002,9 +1016,9 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                     '/android_data?activity_type=exp_translations&'
                     'activities_data=[{"id": "translation_id", "version": 1}]',
                     headers={'X-ApiKey': 'secret'},
-                    expected_status_int=400
+                    expected_status_int=400,
                 )['error'],
-                'Version and language code must be specified for translation'
+                'Version and language code must be specified for translation',
             )
 
     def test_get_exploration_translations_missing_version(self) -> None:
@@ -1016,7 +1030,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                     'activities_data='
                     '[{"id": "translation_id", "language_code": "es"}]',
                     headers={'X-ApiKey': 'secret'},
-                    expected_status_int=400
+                    expected_status_int=400,
                 )['error'],
-                'Version and language code must be specified for translation'
+                'Version and language code must be specified for translation',
             )
