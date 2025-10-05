@@ -340,8 +340,12 @@ def mark_story_as_completed(user_id: str, story_id: str) -> None:
 
 
 def mark_topic_as_learnt(user_id: str, topic_id: str) -> None:
-    """Marks the topic as learnt only if all stories under it are completed.
-    If not all stories are completed, marks the topic as partially learnt instead.
+    """Adds the topic id to the learnt list of the user unless the
+    topic has already been learnt by the user. It is also removed from
+    the partially learnt list and topics to learn list(if present).
+    Args:
+        user_id: str. The id of the user who has learnt the topic.
+        topic_id: str. The id of the learnt topic.
     """
 
     all_story_ids_in_topic = topic_fetchers.get_story_ids_linked_to_topic(
