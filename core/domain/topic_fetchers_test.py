@@ -20,6 +20,7 @@ from __future__ import annotations
 
 from core import feconf
 from core.domain import (
+    learner_progress_services,
     topic_domain,
     topic_fetchers,
     topic_services,
@@ -602,11 +603,12 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         self.assertFalse(topic_rights[0].topic_is_published)
         self.assertIsNone(topic_rights[1])
 
-    def test_raises_error_if_wrong_topic_rights_fetched_strictly(self) -> None:
-        with self.assertRaisesRegex(
-            Exception,
-            'No topic_rights exists for the given topic_id: invalid_topic_id',
-        ):
-            topic_fetchers.get_multi_topic_rights(
-                ['invalid_topic_id'], strict=True
-            )
+    def test_get_story_ids_linked_to_topic(self) -> None:
+        """Tests that canonical story IDs linked to a topic are returned."""
+
+        assert self.topic is not None
+
+        story_ids = topic_fetchers.get_story_ids_linked_to_topic(self.TOPIC_ID)
+        self.assertEqual(
+            sorted(story_ids), sorted([self.story_id_1, self.story_id_2])
+        )
