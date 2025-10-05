@@ -20,7 +20,9 @@ from __future__ import annotations
 
 from core.tests import test_utils
 
-from extensions.issues.MultipleIncorrectSubmissions import MultipleIncorrectSubmissions # pylint: disable=unused-import, line-too-long # isort: skip
+from extensions.issues.MultipleIncorrectSubmissions import (  # pylint: disable=unused-import, line-too-long # isort: skip
+    MultipleIncorrectSubmissions,
+)
 
 
 class MultipleIncorrectSubmissionsTests(test_utils.GenericTestBase):

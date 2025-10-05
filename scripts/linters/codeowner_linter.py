@@ -109,14 +109,17 @@ class CodeownerLintChecksManager(linter_utils.BaseLinter):
                 file_paths.append(os.path.join(root, name))
 
         yield [
-            file_path for file_path in file_paths if not self._is_path_ignored(
-                file_path)]
+            file_path
+            for file_path in file_paths
+            if not self._is_path_ignored(file_path)
+        ]
 
         for dir_path in dirs:
             # Adding "/" in the end of the dir path according to the git dir
             # path structure.
             if (not self._is_path_ignored(dir_path + '/')) and (
-                    dir_path not in exclude_dirs):
+                dir_path not in exclude_dirs
+            ):
                 for x in self._walk_with_gitignore(dir_path, exclude_dirs):
                     yield x
 
@@ -164,28 +167,33 @@ class CodeownerLintChecksManager(linter_utils.BaseLinter):
         if len(important_patterns_set) != len(important_patterns):
             error_message = (
                 '%s --> Duplicate pattern(s) found in critical rules'
-                ' section.' % CODEOWNER_FILEPATH)
+                ' section.' % CODEOWNER_FILEPATH
+            )
             self.error_messages.append(error_message)
             self.failed = True
         if len(codeowner_important_paths_set) != len(CODEOWNER_IMPORTANT_PATHS):
             error_message = (
                 'scripts/linters/codeowner_linter.py --> Duplicate pattern(s) '
-                'found in CODEOWNER_IMPORTANT_PATHS list.')
+                'found in CODEOWNER_IMPORTANT_PATHS list.'
+            )
             self.error_messages.append(error_message)
             self.failed = True
 
         # Check missing rules by set difference operation.
         critical_rule_section_minus_list_set = (
-            important_patterns_set.difference(codeowner_important_paths_set))
+            important_patterns_set.difference(codeowner_important_paths_set)
+        )
         list_minus_critical_rule_section_set = (
-            codeowner_important_paths_set.difference(important_patterns_set))
+            codeowner_important_paths_set.difference(important_patterns_set)
+        )
         for rule in critical_rule_section_minus_list_set:
             error_message = (
                 '%s --> Rule %s is not present in the '
                 'CODEOWNER_IMPORTANT_PATHS list in '
                 'scripts/linters/codeowner_linter.py. Please add this rule in '
                 'the mentioned list or remove this rule from the \'Critical '
-                'files\' section.' % (CODEOWNER_FILEPATH, rule))
+                'files\' section.' % (CODEOWNER_FILEPATH, rule)
+            )
             self.error_messages.append(error_message)
             self.failed = True
         for rule in list_minus_critical_rule_section_set:
@@ -195,7 +203,8 @@ class CodeownerLintChecksManager(linter_utils.BaseLinter):
                 'section since it is an important rule. Alternatively please '
                 'remove it from the \'CODEOWNER_IMPORTANT_PATHS\' list in '
                 'scripts/linters/codeowner_linter.py if it is no longer an '
-                'important rule.' % (CODEOWNER_FILEPATH, rule))
+                'important rule.' % (CODEOWNER_FILEPATH, rule)
+            )
             self.error_messages.append(error_message)
             self.failed = True
 
@@ -220,8 +229,9 @@ class CodeownerLintChecksManager(linter_utils.BaseLinter):
         important_rules_in_critical_section = []
         file_patterns = []
         ignored_dir_patterns = []
-        for line_num, line in enumerate(self.file_cache.readlines(
-                CODEOWNER_FILEPATH)):
+        for line_num, line in enumerate(
+            self.file_cache.readlines(CODEOWNER_FILEPATH)
+        ):
             stripped_line = line.strip()
             if '# Critical files' in line:
                 critical_file_section_found = True
@@ -234,15 +244,17 @@ class CodeownerLintChecksManager(linter_utils.BaseLinter):
             if stripped_line and stripped_line[0] != '#':
                 if '#' in line:
                     error_message = (
-                        '%s --> Please remove inline comment from line %s' % (
-                            CODEOWNER_FILEPATH, line_num + 1))
+                        '%s --> Please remove inline comment from line %s'
+                        % (CODEOWNER_FILEPATH, line_num + 1)
+                    )
                     self.error_messages.append(error_message)
                     self.failed = True
 
                 if '@' not in line:
                     error_message = (
                         '%s --> Pattern on line %s doesn\'t have '
-                        'codeowner' % (CODEOWNER_FILEPATH, line_num + 1))
+                        'codeowner' % (CODEOWNER_FILEPATH, line_num + 1)
+                    )
                     self.error_messages.append(error_message)
                     self.failed = True
                 else:
@@ -252,29 +264,33 @@ class CodeownerLintChecksManager(linter_utils.BaseLinter):
                     # check.
                     if critical_file_section_found:
                         important_rules_in_critical_section.append(
-                            line_in_concern)
+                            line_in_concern
+                        )
                     # Checks if the path is the full path relative to the
                     # root oppia directory.
                     if not line_in_concern.startswith('/'):
                         error_message = (
                             '%s --> Pattern on line %s is invalid. Use '
                             'full path relative to the root directory'
-                            % (CODEOWNER_FILEPATH, line_num + 1))
+                            % (CODEOWNER_FILEPATH, line_num + 1)
+                        )
                         self.error_messages.append(error_message)
                         self.failed = True
 
                     # The double asterisks should be allowed only when path
                     # includes all the frontend spec files.
                     if not self._is_path_contains_frontend_specs(
-                            line_in_concern):
+                        line_in_concern
+                    ):
                         # The double asterisks pattern is supported by the
                         # CODEOWNERS syntax but not the glob in Python 2.
                         # The following condition checks this.
                         if '**' in line_in_concern:
                             error_message = (
                                 '%s --> Pattern on line %s is invalid. '
-                                '\'**\' wildcard not allowed' % (
-                                    CODEOWNER_FILEPATH, line_num + 1))
+                                '\'**\' wildcard not allowed'
+                                % (CODEOWNER_FILEPATH, line_num + 1)
+                            )
                             self.error_messages.append(error_message)
                             self.failed = True
                     # Adjustments to the dir paths in CODEOWNERS syntax
@@ -293,12 +309,14 @@ class CodeownerLintChecksManager(linter_utils.BaseLinter):
                     # The checking for path existence won't happen if the path
                     # is getting all the frontend spec files.
                     if not self._is_path_contains_frontend_specs(
-                            line_in_concern):
+                        line_in_concern
+                    ):
                         if not glob.glob(line_in_concern):
                             error_message = (
                                 '%s --> Pattern on line %s doesn\'t match '
-                                'any file or directory' % (
-                                    CODEOWNER_FILEPATH, line_num + 1))
+                                'any file or directory'
+                                % (CODEOWNER_FILEPATH, line_num + 1)
+                            )
                             self.error_messages.append(error_message)
                             self.failed = True
                     # The following list is being populated with the
@@ -328,16 +346,19 @@ class CodeownerLintChecksManager(linter_utils.BaseLinter):
                         break
                 if not match:
                     error_message = (
-                        '%s is not listed in the .github/CODEOWNERS file.' % (
-                            file_path))
+                        '%s is not listed in the .github/CODEOWNERS file.'
+                        % (file_path)
+                    )
                     self.error_messages.append(error_message)
                     self.failed = True
 
         self._check_for_important_patterns_at_bottom_of_codeowners(
-            important_rules_in_critical_section)
+            important_rules_in_critical_section
+        )
 
         return concurrent_task_utils.TaskResult(
-            name, self.failed, self.error_messages, self.error_messages)
+            name, self.failed, self.error_messages, self.error_messages
+        )
 
     def perform_all_lint_checks(self) -> List[concurrent_task_utils.TaskResult]:
         """Perform all the lint checks and returns the messages returned by all
@@ -352,7 +373,7 @@ class CodeownerLintChecksManager(linter_utils.BaseLinter):
 
 
 def get_linters(
-    file_cache: run_lint_checks.FileCache
+    file_cache: run_lint_checks.FileCache,
 ) -> Tuple[CodeownerLintChecksManager, None]:
     """Creates CodeownerLintChecksManager object and returns it.
 

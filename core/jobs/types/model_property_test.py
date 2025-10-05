@@ -25,7 +25,7 @@ from core.platform import models
 from core.tests import test_utils
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import base_models, datastore_services
 
 (base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
@@ -55,26 +55,32 @@ class ModelPropertyTests(test_utils.TestBase):
 
     def setUp(self) -> None:
         self.id_property = model_property.ModelProperty(
-            SubclassOfBaseModel, SubclassOfBaseModel.id)
+            SubclassOfBaseModel, SubclassOfBaseModel.id
+        )
         self.ndb_property = model_property.ModelProperty(
-            SubclassOfBaseModel, SubclassOfBaseModel.value)
+            SubclassOfBaseModel, SubclassOfBaseModel.value
+        )
         self.ndb_repeated_property = model_property.ModelProperty(
-            RepeatedValueModel, RepeatedValueModel.values)
+            RepeatedValueModel, RepeatedValueModel.values
+        )
 
     def test_init_with_id_property(self) -> None:
         # Does not raise.
         model_property.ModelProperty(
-            SubclassOfBaseModel, SubclassOfBaseModel.id)
+            SubclassOfBaseModel, SubclassOfBaseModel.id
+        )
 
     def test_init_with_ndb_property(self) -> None:
         # Does not raise.
         model_property.ModelProperty(
-            SubclassOfBaseModel, SubclassOfBaseModel.value)
+            SubclassOfBaseModel, SubclassOfBaseModel.value
+        )
 
     def test_init_with_ndb_repeated_property(self) -> None:
         # Does not raise.
         model_property.ModelProperty(
-            RepeatedValueModel, RepeatedValueModel.values)
+            RepeatedValueModel, RepeatedValueModel.values
+        )
 
     def test_init_raises_type_error_when_model_is_not_a_class(self) -> None:
         model = SubclassOfBaseModel()
@@ -88,7 +94,7 @@ class ModelPropertyTests(test_utils.TestBase):
             model_property.ModelProperty(model, SubclassOfBaseModel.value)  # type: ignore[arg-type]
 
     def test_init_raises_type_error_when_model_is_unrelated_to_base_model(
-        self
+        self,
     ) -> None:
         with self.assertRaisesRegex(TypeError, 'not a subclass of BaseModel'):
             # Here we use MyPy ignore because ModelProperty has model_class
@@ -97,10 +103,11 @@ class ModelPropertyTests(test_utils.TestBase):
             # datastore_services.Model. Thus to silence mypy error, we added an
             # ignore here.
             model_property.ModelProperty(
-                SubclassOfNdbModel, SubclassOfNdbModel.value)  # type: ignore[arg-type]
+                SubclassOfNdbModel, SubclassOfNdbModel.value  # type: ignore[arg-type]
+            )
 
     def test_init_raises_type_error_when_property_is_not_an_ndb_property(
-        self
+        self,
     ) -> None:
         model = SubclassOfBaseModel(value='123')
 
@@ -108,11 +115,12 @@ class ModelPropertyTests(test_utils.TestBase):
             model_property.ModelProperty(SubclassOfBaseModel, model.value)
 
     def test_init_raises_value_error_when_property_is_not_in_model(
-        self
+        self,
     ) -> None:
         with self.assertRaisesRegex(ValueError, 'not a property of'):
             model_property.ModelProperty(
-                SubclassOfBaseModel, SubclassOfNdbModel.value)
+                SubclassOfBaseModel, SubclassOfNdbModel.value
+            )
 
     def test_model_kind_of_id_property(self) -> None:
         self.assertEqual(self.id_property.model_kind, 'SubclassOfBaseModel')
@@ -122,7 +130,8 @@ class ModelPropertyTests(test_utils.TestBase):
 
     def test_model_kind_of_ndb_repeated_property(self) -> None:
         self.assertEqual(
-            self.ndb_repeated_property.model_kind, 'RepeatedValueModel')
+            self.ndb_repeated_property.model_kind, 'RepeatedValueModel'
+        )
 
     def test_property_name_of_id_property(self) -> None:
         self.assertEqual(self.id_property.property_name, 'id')
@@ -141,22 +150,26 @@ class ModelPropertyTests(test_utils.TestBase):
 
     def test_str_of_ndb_repeated_property(self) -> None:
         self.assertEqual(
-            str(self.ndb_repeated_property), 'RepeatedValueModel.values')
+            str(self.ndb_repeated_property), 'RepeatedValueModel.values'
+        )
 
     def test_repr_of_id_property(self) -> None:
         self.assertEqual(
             repr(self.id_property),
-            'ModelProperty(SubclassOfBaseModel, SubclassOfBaseModel.id)')
+            'ModelProperty(SubclassOfBaseModel, SubclassOfBaseModel.id)',
+        )
 
     def test_repr_of_ndb_property(self) -> None:
         self.assertEqual(
             repr(self.ndb_property),
-            'ModelProperty(SubclassOfBaseModel, SubclassOfBaseModel.value)')
+            'ModelProperty(SubclassOfBaseModel, SubclassOfBaseModel.value)',
+        )
 
     def test_repr_of_ndb_repeated_property(self) -> None:
         self.assertEqual(
             repr(self.ndb_repeated_property),
-            'ModelProperty(RepeatedValueModel, RepeatedValueModel.values)')
+            'ModelProperty(RepeatedValueModel, RepeatedValueModel.values)',
+        )
 
     def test_equality(self) -> None:
         self.assertNotEqual(self.id_property, self.ndb_property)
@@ -166,20 +179,27 @@ class ModelPropertyTests(test_utils.TestBase):
         self.assertEqual(
             self.id_property,
             model_property.ModelProperty(
-                SubclassOfBaseModel, SubclassOfBaseModel.id))
+                SubclassOfBaseModel, SubclassOfBaseModel.id
+            ),
+        )
         self.assertEqual(
             self.ndb_property,
             model_property.ModelProperty(
-                SubclassOfBaseModel, SubclassOfBaseModel.value))
+                SubclassOfBaseModel, SubclassOfBaseModel.value
+            ),
+        )
         self.assertEqual(
             self.ndb_repeated_property,
             model_property.ModelProperty(
-                RepeatedValueModel, RepeatedValueModel.values))
+                RepeatedValueModel, RepeatedValueModel.values
+            ),
+        )
 
     def test_hash_of_id_property(self) -> None:
         id_property_set = {
             model_property.ModelProperty(
-                SubclassOfBaseModel, SubclassOfBaseModel.id),
+                SubclassOfBaseModel, SubclassOfBaseModel.id
+            ),
         }
 
         self.assertIn(self.id_property, id_property_set)
@@ -189,7 +209,8 @@ class ModelPropertyTests(test_utils.TestBase):
     def test_hash_of_ndb_property(self) -> None:
         ndb_property_set = {
             model_property.ModelProperty(
-                SubclassOfBaseModel, SubclassOfBaseModel.value),
+                SubclassOfBaseModel, SubclassOfBaseModel.value
+            ),
         }
 
         self.assertIn(self.ndb_property, ndb_property_set)
@@ -199,7 +220,8 @@ class ModelPropertyTests(test_utils.TestBase):
     def test_hash_of_ndb_repeated_property(self) -> None:
         ndb_repeated_property_set = {
             model_property.ModelProperty(
-                RepeatedValueModel, RepeatedValueModel.values),
+                RepeatedValueModel, RepeatedValueModel.values
+            ),
         }
 
         self.assertIn(self.ndb_repeated_property, ndb_repeated_property_set)
@@ -210,23 +232,26 @@ class ModelPropertyTests(test_utils.TestBase):
         model = SubclassOfBaseModel(id='123')
 
         self.assertEqual(
-            list(self.id_property.yield_value_from_model(model)), ['123'])
+            list(self.id_property.yield_value_from_model(model)), ['123']
+        )
 
     def test_yield_value_from_ndb_property(self) -> None:
         model = SubclassOfBaseModel(value='abc')
 
         self.assertEqual(
-            list(self.ndb_property.yield_value_from_model(model)), ['abc'])
+            list(self.ndb_property.yield_value_from_model(model)), ['abc']
+        )
 
     def test_yield_value_from_ndb_repeated_property(self) -> None:
         model = RepeatedValueModel(values=['123', '456', '789'])
 
         self.assertEqual(
             list(self.ndb_repeated_property.yield_value_from_model(model)),
-            ['123', '456', '789'])
+            ['123', '456', '789'],
+        )
 
     def test_yield_value_from_model_raises_type_error_if_not_right_kind(
-        self
+        self,
     ) -> None:
         model = RepeatedValueModel(values=['123', '456', '789'])
 

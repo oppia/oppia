@@ -41,13 +41,16 @@ class OldLearnerDashboardRedirectPageTest(test_utils.GenericTestBase):
         to the new one.
         """
         response = self.get_html_response(
-            '/learner_dashboard', expected_status_int=301)
+            '/learner_dashboard', expected_status_int=301
+        )
         self.assertEqual(
-            'http://localhost/learner-dashboard', response.headers['location'])
+            'http://localhost/learner-dashboard', response.headers['location']
+        )
 
 
 class LearnerDashboardTopicsAndStoriesProgressHandlerTests(
-    test_utils.GenericTestBase):
+    test_utils.GenericTestBase
+):
 
     EXP_ID_1: Final = 'EXP_ID_1'
     EXP_TITLE_1: Final = 'Exploration title 1'
@@ -78,14 +81,24 @@ class LearnerDashboardTopicsAndStoriesProgressHandlerTests(
     TOPIC_NAME_3: Final = 'Topic title 3'
 
     subtopic_0 = topic_domain.Subtopic(
-        0, 'Title 1', ['skill_id_1'], 'image.svg',
-        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
-        'dummy-subtopic-zero')
+        0,
+        'Title 1',
+        ['skill_id_1'],
+        'image.svg',
+        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+        21131,
+        'dummy-subtopic-zero',
+    )
 
     subtopic_1 = topic_domain.Subtopic(
-        0, 'Title 1', ['skill_id_1'], 'image.svg',
-        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
-        'dummy-subtopic-zero')
+        0,
+        'Title 1',
+        ['skill_id_1'],
+        'image.svg',
+        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+        21131,
+        'dummy-subtopic-zero',
+    )
 
     def setUp(self) -> None:
         super().setUp()
@@ -102,180 +115,242 @@ class LearnerDashboardTopicsAndStoriesProgressHandlerTests(
         self.login(self.VIEWER_EMAIL)
 
         response = self.get_json(
-            feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL)
+            feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL
+        )
         self.assertEqual(len(response['completed_stories_list']), 0)
 
         self.save_new_topic(
-            self.TOPIC_ID_1, self.owner_id, name=self.TOPIC_NAME_1,
+            self.TOPIC_ID_1,
+            self.owner_id,
+            name=self.TOPIC_NAME_1,
             url_fragment='topic-one',
-            description='A new topic', canonical_story_ids=[],
-            additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[self.subtopic_0], next_subtopic_id=1)
+            description='A new topic',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[self.subtopic_0],
+            next_subtopic_id=1,
+        )
         self.save_new_story(self.STORY_ID_1, self.owner_id, self.TOPIC_ID_1)
         topic_services.add_canonical_story(
-            self.owner_id, self.TOPIC_ID_1, self.STORY_ID_1)
+            self.owner_id, self.TOPIC_ID_1, self.STORY_ID_1
+        )
 
         topic_services.publish_story(
-            self.TOPIC_ID_1, self.STORY_ID_1, self.admin_id)
+            self.TOPIC_ID_1, self.STORY_ID_1, self.admin_id
+        )
         topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
 
         learner_progress_services.mark_story_as_completed(
-            self.viewer_id, self.STORY_ID_1)
+            self.viewer_id, self.STORY_ID_1
+        )
         response = self.get_json(
-            feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL)
+            feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL
+        )
         self.assertEqual(len(response['completed_stories_list']), 1)
         self.assertEqual(
-            response['completed_stories_list'][0]['id'], self.STORY_ID_1)
+            response['completed_stories_list'][0]['id'], self.STORY_ID_1
+        )
         self.logout()
 
     def test_can_see_learnt_topics(self) -> None:
         self.login(self.VIEWER_EMAIL)
 
         response = self.get_json(
-            feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL)
+            feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL
+        )
         self.assertEqual(len(response['learnt_topics_list']), 0)
 
         self.save_new_topic(
-            self.TOPIC_ID_1, self.owner_id, name=self.TOPIC_NAME_1,
+            self.TOPIC_ID_1,
+            self.owner_id,
+            name=self.TOPIC_NAME_1,
             url_fragment='topic-one',
-            description='A new topic', canonical_story_ids=[],
-            additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[self.subtopic_0], next_subtopic_id=1)
+            description='A new topic',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[self.subtopic_0],
+            next_subtopic_id=1,
+        )
         self.save_new_story(self.STORY_ID_1, self.owner_id, self.TOPIC_ID_1)
         topic_services.add_canonical_story(
-            self.owner_id, self.TOPIC_ID_1, self.STORY_ID_1)
+            self.owner_id, self.TOPIC_ID_1, self.STORY_ID_1
+        )
 
         topic_services.publish_story(
-            self.TOPIC_ID_1, self.STORY_ID_1, self.admin_id)
+            self.TOPIC_ID_1, self.STORY_ID_1, self.admin_id
+        )
         topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
 
         learner_progress_services.mark_story_as_completed(
-            self.viewer_id, self.STORY_ID_1)
+            self.viewer_id, self.STORY_ID_1
+        )
         learner_progress_services.mark_topic_as_learnt(
-            self.viewer_id, self.TOPIC_ID_1)
+            self.viewer_id, self.TOPIC_ID_1
+        )
         response = self.get_json(
-            feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL)
+            feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL
+        )
         self.assertEqual(len(response['learnt_topics_list']), 1)
         self.assertEqual(
-            response['learnt_topics_list'][0]['id'], self.TOPIC_ID_1)
+            response['learnt_topics_list'][0]['id'], self.TOPIC_ID_1
+        )
         self.logout()
 
     def test_can_see_partially_learnt_topics(self) -> None:
         self.login(self.VIEWER_EMAIL)
 
         response = self.get_json(
-            feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL)
+            feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL
+        )
         self.assertEqual(len(response['partially_learnt_topics_list']), 0)
 
         self.save_new_topic(
-            self.TOPIC_ID_1, self.owner_id, name=self.TOPIC_NAME_1,
+            self.TOPIC_ID_1,
+            self.owner_id,
+            name=self.TOPIC_NAME_1,
             url_fragment='topic-one',
-            description='A new topic', canonical_story_ids=[],
-            additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[self.subtopic_0], next_subtopic_id=1)
+            description='A new topic',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[self.subtopic_0],
+            next_subtopic_id=1,
+        )
         topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
 
         learner_progress_services.record_topic_started(
-            self.viewer_id, self.TOPIC_ID_1)
+            self.viewer_id, self.TOPIC_ID_1
+        )
         response = self.get_json(
-            feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL)
+            feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL
+        )
         self.assertEqual(len(response['partially_learnt_topics_list']), 1)
         self.assertEqual(
-            response['partially_learnt_topics_list'][0]['id'], self.TOPIC_ID_1)
+            response['partially_learnt_topics_list'][0]['id'], self.TOPIC_ID_1
+        )
         self.logout()
 
     def test_can_see_topics_to_learn(self) -> None:
         self.login(self.VIEWER_EMAIL)
 
         response = self.get_json(
-            feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL)
+            feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL
+        )
         self.assertEqual(len(response['topics_to_learn_list']), 0)
 
         self.save_new_topic(
-            self.TOPIC_ID_1, self.owner_id, name=self.TOPIC_NAME_1,
+            self.TOPIC_ID_1,
+            self.owner_id,
+            name=self.TOPIC_NAME_1,
             url_fragment='topic-one',
-            description='A new topic', canonical_story_ids=[],
-            additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[self.subtopic_0], next_subtopic_id=1)
+            description='A new topic',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[self.subtopic_0],
+            next_subtopic_id=1,
+        )
         topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
         self.save_new_story(self.STORY_ID_2, self.owner_id, self.TOPIC_ID_1)
         topic_services.add_canonical_story(
-            self.owner_id, self.TOPIC_ID_1, self.STORY_ID_2)
+            self.owner_id, self.TOPIC_ID_1, self.STORY_ID_2
+        )
         topic_services.publish_story(
-            self.TOPIC_ID_1, self.STORY_ID_2, self.admin_id)
+            self.TOPIC_ID_1, self.STORY_ID_2, self.admin_id
+        )
 
         learner_progress_services.validate_and_add_topic_to_learn_goal(
-            self.viewer_id, self.TOPIC_ID_1)
+            self.viewer_id, self.TOPIC_ID_1
+        )
         response = self.get_json(
-            feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL)
+            feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL
+        )
         self.assertEqual(len(response['topics_to_learn_list']), 1)
         self.assertEqual(
-            response['topics_to_learn_list'][0]['id'], self.TOPIC_ID_1)
+            response['topics_to_learn_list'][0]['id'], self.TOPIC_ID_1
+        )
         self.logout()
 
     def test_can_see_all_topics(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         response = self.get_json(
-            feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL)
+            feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL
+        )
         self.assertEqual(len(response['all_topics_list']), 0)
 
         self.save_new_topic(
-            self.TOPIC_ID_1, self.owner_id, name=self.TOPIC_NAME_1,
+            self.TOPIC_ID_1,
+            self.owner_id,
+            name=self.TOPIC_NAME_1,
             url_fragment='topic-one',
-            description='A new topic', canonical_story_ids=[],
-            additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[self.subtopic_0], next_subtopic_id=1)
+            description='A new topic',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[self.subtopic_0],
+            next_subtopic_id=1,
+        )
         topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
         self.save_new_story(self.STORY_ID_2, self.owner_id, self.TOPIC_ID_1)
         topic_services.add_canonical_story(
-            self.owner_id, self.TOPIC_ID_1, self.STORY_ID_2)
+            self.owner_id, self.TOPIC_ID_1, self.STORY_ID_2
+        )
         topic_services.publish_story(
-            self.TOPIC_ID_1, self.STORY_ID_2, self.admin_id)
+            self.TOPIC_ID_1, self.STORY_ID_2, self.admin_id
+        )
         self.save_new_valid_classroom(
-            topic_id_to_prerequisite_topic_ids={
-                self.TOPIC_ID_1: []
-            }
+            topic_id_to_prerequisite_topic_ids={self.TOPIC_ID_1: []}
         )
         self.logout()
 
         self.login(self.VIEWER_EMAIL)
         response = self.get_json(
-            feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL)
+            feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL
+        )
         self.assertEqual(len(response['all_topics_list']), 1)
-        self.assertEqual(
-            response['all_topics_list'][0]['id'], self.TOPIC_ID_1)
+        self.assertEqual(response['all_topics_list'][0]['id'], self.TOPIC_ID_1)
         self.logout()
 
     def test_can_see_untracked_topics(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
         response = self.get_json(
-            feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL)
+            feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL
+        )
         self.assertEqual(len(response['untracked_topics']), 0)
 
         self.save_new_topic(
-            self.TOPIC_ID_1, self.owner_id, name=self.TOPIC_NAME_1,
+            self.TOPIC_ID_1,
+            self.owner_id,
+            name=self.TOPIC_NAME_1,
             url_fragment='topic-one',
-            description='A new topic', canonical_story_ids=[],
-            additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[self.subtopic_0], next_subtopic_id=1)
+            description='A new topic',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[self.subtopic_0],
+            next_subtopic_id=1,
+        )
         topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
         self.save_new_story(self.STORY_ID_2, self.owner_id, self.TOPIC_ID_1)
         topic_services.add_canonical_story(
-            self.owner_id, self.TOPIC_ID_1, self.STORY_ID_2)
+            self.owner_id, self.TOPIC_ID_1, self.STORY_ID_2
+        )
         topic_services.publish_story(
-            self.TOPIC_ID_1, self.STORY_ID_2, self.admin_id)
+            self.TOPIC_ID_1, self.STORY_ID_2, self.admin_id
+        )
         self.save_new_valid_classroom(
-            topic_id_to_prerequisite_topic_ids={
-                self.TOPIC_ID_1: []
-            }
+            topic_id_to_prerequisite_topic_ids={self.TOPIC_ID_1: []}
         )
         self.logout()
 
         self.login(self.VIEWER_EMAIL)
         response = self.get_json(
-            feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL)
+            feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL
+        )
         self.assertEqual(len(response['untracked_topics']), 1)
         self.logout()
 
@@ -283,131 +358,182 @@ class LearnerDashboardTopicsAndStoriesProgressHandlerTests(
         self.login(self.VIEWER_EMAIL)
 
         self.save_new_default_exploration(
-            self.EXP_ID_1, self.owner_id, title=self.EXP_TITLE_1)
+            self.EXP_ID_1, self.owner_id, title=self.EXP_TITLE_1
+        )
         self.publish_exploration(self.owner_id, self.EXP_ID_1)
         self.save_new_default_exploration(
-            self.EXP_ID_2, self.owner_id, title=self.EXP_TITLE_2)
+            self.EXP_ID_2, self.owner_id, title=self.EXP_TITLE_2
+        )
         self.publish_exploration(self.owner_id, self.EXP_ID_2)
         self.save_new_default_exploration(
-            self.EXP_ID_3, self.owner_id, title=self.EXP_TITLE_3)
+            self.EXP_ID_3, self.owner_id, title=self.EXP_TITLE_3
+        )
         self.publish_exploration(self.owner_id, self.EXP_ID_3)
 
         self.save_new_default_collection(
-            self.COL_ID_1, self.owner_id, title=self.COL_TITLE_1)
+            self.COL_ID_1, self.owner_id, title=self.COL_TITLE_1
+        )
         self.publish_collection(self.owner_id, self.COL_ID_1)
         self.save_new_default_collection(
-            self.COL_ID_2, self.owner_id, title=self.COL_TITLE_2)
+            self.COL_ID_2, self.owner_id, title=self.COL_TITLE_2
+        )
         self.publish_collection(self.owner_id, self.COL_ID_2)
         self.save_new_default_collection(
-            self.COL_ID_3, self.owner_id, title=self.COL_TITLE_3)
+            self.COL_ID_3, self.owner_id, title=self.COL_TITLE_3
+        )
         self.publish_collection(self.owner_id, self.COL_ID_3)
 
         self.save_new_topic(
-            self.TOPIC_ID_1, self.owner_id, name=self.TOPIC_NAME_1,
+            self.TOPIC_ID_1,
+            self.owner_id,
+            name=self.TOPIC_NAME_1,
             url_fragment='topic-one',
-            description='A new topic', canonical_story_ids=[],
-            additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[self.subtopic_0], next_subtopic_id=1)
+            description='A new topic',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[self.subtopic_0],
+            next_subtopic_id=1,
+        )
         self.save_new_story(self.STORY_ID_1, self.owner_id, self.TOPIC_ID_1)
         topic_services.add_canonical_story(
-            self.owner_id, self.TOPIC_ID_1, self.STORY_ID_1)
+            self.owner_id, self.TOPIC_ID_1, self.STORY_ID_1
+        )
 
         topic_services.publish_story(
-            self.TOPIC_ID_1, self.STORY_ID_1, self.admin_id)
+            self.TOPIC_ID_1, self.STORY_ID_1, self.admin_id
+        )
         topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
 
         self.save_new_topic(
-            self.TOPIC_ID_2, self.owner_id, name=self.TOPIC_NAME_2,
+            self.TOPIC_ID_2,
+            self.owner_id,
+            name=self.TOPIC_NAME_2,
             url_fragment='topic-two',
-            description='A new topic', canonical_story_ids=[],
-            additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[self.subtopic_1], next_subtopic_id=1)
+            description='A new topic',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[self.subtopic_1],
+            next_subtopic_id=1,
+        )
         self.save_new_story(self.STORY_ID_2, self.owner_id, self.TOPIC_ID_2)
         topic_services.add_canonical_story(
-            self.owner_id, self.TOPIC_ID_2, self.STORY_ID_2)
+            self.owner_id, self.TOPIC_ID_2, self.STORY_ID_2
+        )
 
         topic_services.publish_story(
-            self.TOPIC_ID_2, self.STORY_ID_2, self.admin_id)
+            self.TOPIC_ID_2, self.STORY_ID_2, self.admin_id
+        )
         topic_services.publish_topic(self.TOPIC_ID_2, self.admin_id)
 
         self.save_new_topic(
-            self.TOPIC_ID_3, self.owner_id, name=self.TOPIC_NAME_3,
+            self.TOPIC_ID_3,
+            self.owner_id,
+            name=self.TOPIC_NAME_3,
             url_fragment='topic-three',
-            description='A new topic', canonical_story_ids=[],
-            additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[self.subtopic_1], next_subtopic_id=1)
+            description='A new topic',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[self.subtopic_1],
+            next_subtopic_id=1,
+        )
         self.save_new_story(self.STORY_ID_3, self.owner_id, self.TOPIC_ID_3)
         topic_services.add_canonical_story(
-            self.owner_id, self.TOPIC_ID_3, self.STORY_ID_3)
+            self.owner_id, self.TOPIC_ID_3, self.STORY_ID_3
+        )
 
         topic_services.publish_story(
-            self.TOPIC_ID_3, self.STORY_ID_3, self.admin_id)
+            self.TOPIC_ID_3, self.STORY_ID_3, self.admin_id
+        )
         topic_services.publish_topic(self.TOPIC_ID_3, self.admin_id)
 
         state_name = 'state_name'
         version = 1
 
         learner_progress_services.mark_exploration_as_completed(
-            self.viewer_id, self.EXP_ID_1)
+            self.viewer_id, self.EXP_ID_1
+        )
         learner_progress_services.mark_exploration_as_incomplete(
-            self.viewer_id, self.EXP_ID_2, state_name, version)
+            self.viewer_id, self.EXP_ID_2, state_name, version
+        )
         learner_progress_services.add_exp_to_learner_playlist(
-            self.viewer_id, self.EXP_ID_3)
+            self.viewer_id, self.EXP_ID_3
+        )
 
         learner_progress_services.mark_collection_as_completed(
-            self.viewer_id, self.COL_ID_1)
+            self.viewer_id, self.COL_ID_1
+        )
         learner_progress_services.mark_collection_as_incomplete(
-            self.viewer_id, self.COL_ID_2)
+            self.viewer_id, self.COL_ID_2
+        )
         learner_progress_services.add_collection_to_learner_playlist(
-            self.viewer_id, self.COL_ID_3)
+            self.viewer_id, self.COL_ID_3
+        )
 
         learner_progress_services.mark_story_as_completed(
-            self.viewer_id, self.STORY_ID_1)
+            self.viewer_id, self.STORY_ID_1
+        )
 
         learner_progress_services.mark_topic_as_learnt(
-            self.viewer_id, self.TOPIC_ID_1)
+            self.viewer_id, self.TOPIC_ID_1
+        )
         learner_progress_services.record_topic_started(
-            self.viewer_id, self.TOPIC_ID_2)
+            self.viewer_id, self.TOPIC_ID_2
+        )
         learner_progress_services.validate_and_add_topic_to_learn_goal(
-            self.viewer_id, self.TOPIC_ID_3)
+            self.viewer_id, self.TOPIC_ID_3
+        )
 
         response = self.get_json(feconf.LEARNER_DASHBOARD_IDS_DATA_URL)
-        learner_dashboard_activity_ids = (
-            response['learner_dashboard_activity_ids'])
+        learner_dashboard_activity_ids = response[
+            'learner_dashboard_activity_ids'
+        ]
 
         self.assertEqual(
             learner_dashboard_activity_ids['completed_exploration_ids'],
-            [self.EXP_ID_1])
+            [self.EXP_ID_1],
+        )
         self.assertEqual(
             learner_dashboard_activity_ids['incomplete_exploration_ids'],
-            [self.EXP_ID_2])
+            [self.EXP_ID_2],
+        )
         self.assertEqual(
             learner_dashboard_activity_ids['exploration_playlist_ids'],
-            [self.EXP_ID_3])
+            [self.EXP_ID_3],
+        )
 
         self.assertEqual(
             learner_dashboard_activity_ids['completed_collection_ids'],
-            [self.COL_ID_1])
+            [self.COL_ID_1],
+        )
         self.assertEqual(
             learner_dashboard_activity_ids['incomplete_collection_ids'],
-            [self.COL_ID_2])
+            [self.COL_ID_2],
+        )
         self.assertEqual(
             learner_dashboard_activity_ids['collection_playlist_ids'],
-            [self.COL_ID_3])
+            [self.COL_ID_3],
+        )
 
         self.assertEqual(
             learner_dashboard_activity_ids['completed_story_ids'],
-            [self.STORY_ID_1])
+            [self.STORY_ID_1],
+        )
 
         self.assertEqual(
             learner_dashboard_activity_ids['learnt_topic_ids'],
-            [self.TOPIC_ID_1])
+            [self.TOPIC_ID_1],
+        )
         self.assertEqual(
             learner_dashboard_activity_ids['partially_learnt_topic_ids'],
-            [self.TOPIC_ID_2])
+            [self.TOPIC_ID_2],
+        )
         self.assertEqual(
             learner_dashboard_activity_ids['topic_ids_to_learn'],
-            [self.TOPIC_ID_3])
+            [self.TOPIC_ID_3],
+        )
 
 
 class LearnerCompletedChaptersCountHandlerTests(test_utils.GenericTestBase):
@@ -441,14 +567,24 @@ class LearnerCompletedChaptersCountHandlerTests(test_utils.GenericTestBase):
     TOPIC_NAME_3: Final = 'Topic title 3'
 
     subtopic_0 = topic_domain.Subtopic(
-        0, 'Title 1', ['skill_id_1'], 'image.svg',
-        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
-        'dummy-subtopic-zero')
+        0,
+        'Title 1',
+        ['skill_id_1'],
+        'image.svg',
+        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+        21131,
+        'dummy-subtopic-zero',
+    )
 
     subtopic_1 = topic_domain.Subtopic(
-        0, 'Title 1', ['skill_id_1'], 'image.svg',
-        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
-        'dummy-subtopic-zero')
+        0,
+        'Title 1',
+        ['skill_id_1'],
+        'image.svg',
+        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+        21131,
+        'dummy-subtopic-zero',
+    )
 
     def setUp(self) -> None:
         super().setUp()
@@ -463,61 +599,84 @@ class LearnerCompletedChaptersCountHandlerTests(test_utils.GenericTestBase):
 
     def test_can_get_completed_chapters_count(self) -> None:
         self.save_new_topic(
-            self.TOPIC_ID_1, self.owner_id, name=self.TOPIC_NAME_1,
+            self.TOPIC_ID_1,
+            self.owner_id,
+            name=self.TOPIC_NAME_1,
             url_fragment='topic-one',
-            description='A new topic', canonical_story_ids=[],
-            additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[self.subtopic_0], next_subtopic_id=1)
+            description='A new topic',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[self.subtopic_0],
+            next_subtopic_id=1,
+        )
         self.save_new_story(self.STORY_ID_1, self.owner_id, self.TOPIC_ID_1)
         topic_services.add_canonical_story(
-            self.owner_id, self.TOPIC_ID_1, self.STORY_ID_1)
+            self.owner_id, self.TOPIC_ID_1, self.STORY_ID_1
+        )
         self.save_new_default_exploration(
-            self.EXP_ID_1, self.owner_id, 'Title 1')
+            self.EXP_ID_1, self.owner_id, 'Title 1'
+        )
         self.publish_exploration(self.owner_id, self.EXP_ID_1)
-        changelist = [story_domain.StoryChange({
-            'cmd': story_domain.CMD_ADD_STORY_NODE,
-            'node_id': 'node_1',
-            'title': 'Title 1'
-        }), story_domain.StoryChange({
-            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-            'property_name': (
-                story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
-            'node_id': 'node_1',
-            'old_value': None,
-            'new_value': self.EXP_ID_1
-        })]
+        changelist = [
+            story_domain.StoryChange(
+                {
+                    'cmd': story_domain.CMD_ADD_STORY_NODE,
+                    'node_id': 'node_1',
+                    'title': 'Title 1',
+                }
+            ),
+            story_domain.StoryChange(
+                {
+                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
+                    'node_id': 'node_1',
+                    'old_value': None,
+                    'new_value': self.EXP_ID_1,
+                }
+            ),
+        ]
         story_services.update_story(
-            self.owner_id, self.STORY_ID_1, changelist,
-            'Added first node.')
+            self.owner_id, self.STORY_ID_1, changelist, 'Added first node.'
+        )
         topic_services.publish_story(
-            self.TOPIC_ID_1, self.STORY_ID_1, self.admin_id)
+            self.TOPIC_ID_1, self.STORY_ID_1, self.admin_id
+        )
         topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
 
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         self.save_new_valid_classroom(
-            topic_id_to_prerequisite_topic_ids={
-                self.TOPIC_ID_1: []
-            }
+            topic_id_to_prerequisite_topic_ids={self.TOPIC_ID_1: []}
         )
         self.logout()
 
         self.login(self.VIEWER_EMAIL)
 
         self.assertEqual(
-            self.get_json(feconf.LEARNER_COMPLETED_CHAPTERS_COUNT_DATA_URL)
-                ['completed_chapters_count'], 0)
+            self.get_json(feconf.LEARNER_COMPLETED_CHAPTERS_COUNT_DATA_URL)[
+                'completed_chapters_count'
+            ],
+            0,
+        )
 
         story_services.record_completed_node_in_story_context(
-            self.viewer_id, self.STORY_ID_1, 'node_1')
+            self.viewer_id, self.STORY_ID_1, 'node_1'
+        )
 
         self.assertEqual(
-            self.get_json(feconf.LEARNER_COMPLETED_CHAPTERS_COUNT_DATA_URL)
-                ['completed_chapters_count'], 1)
+            self.get_json(feconf.LEARNER_COMPLETED_CHAPTERS_COUNT_DATA_URL)[
+                'completed_chapters_count'
+            ],
+            1,
+        )
         self.logout()
 
 
 class LearnerDashboardCollectionsProgressHandlerTests(
-    test_utils.GenericTestBase):
+    test_utils.GenericTestBase
+):
 
     EXP_ID_1: Final = 'EXP_ID_1'
     EXP_TITLE_1: Final = 'Exploration title 1'
@@ -548,14 +707,24 @@ class LearnerDashboardCollectionsProgressHandlerTests(
     TOPIC_NAME_3: Final = 'Topic title 3'
 
     subtopic_0 = topic_domain.Subtopic(
-        0, 'Title 1', ['skill_id_1'], 'image.svg',
-        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
-        'dummy-subtopic-zero')
+        0,
+        'Title 1',
+        ['skill_id_1'],
+        'image.svg',
+        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+        21131,
+        'dummy-subtopic-zero',
+    )
 
     subtopic_1 = topic_domain.Subtopic(
-        0, 'Title 1', ['skill_id_1'], 'image.svg',
-        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
-        'dummy-subtopic-zero')
+        0,
+        'Title 1',
+        ['skill_id_1'],
+        'image.svg',
+        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+        21131,
+        'dummy-subtopic-zero',
+    )
 
     def setUp(self) -> None:
         super().setUp()
@@ -571,21 +740,22 @@ class LearnerDashboardCollectionsProgressHandlerTests(
     def test_can_see_completed_collections(self) -> None:
         self.login(self.VIEWER_EMAIL)
 
-        response = self.get_json(
-            feconf.LEARNER_DASHBOARD_COLLECTION_DATA_URL)
+        response = self.get_json(feconf.LEARNER_DASHBOARD_COLLECTION_DATA_URL)
         self.assertEqual(len(response['completed_collections_list']), 0)
 
         self.save_new_default_collection(
-            self.COL_ID_1, self.owner_id, title=self.COL_TITLE_1)
+            self.COL_ID_1, self.owner_id, title=self.COL_TITLE_1
+        )
         self.publish_collection(self.owner_id, self.COL_ID_1)
 
         learner_progress_services.mark_collection_as_completed(
-            self.viewer_id, self.COL_ID_1)
-        response = self.get_json(
-            feconf.LEARNER_DASHBOARD_COLLECTION_DATA_URL)
+            self.viewer_id, self.COL_ID_1
+        )
+        response = self.get_json(feconf.LEARNER_DASHBOARD_COLLECTION_DATA_URL)
         self.assertEqual(len(response['completed_collections_list']), 1)
         self.assertEqual(
-            response['completed_collections_list'][0]['id'], self.COL_ID_1)
+            response['completed_collections_list'][0]['id'], self.COL_ID_1
+        )
         self.logout()
 
     def test_can_see_incomplete_collections(self) -> None:
@@ -595,15 +765,18 @@ class LearnerDashboardCollectionsProgressHandlerTests(
         self.assertEqual(len(response['incomplete_collections_list']), 0)
 
         self.save_new_default_collection(
-            self.COL_ID_1, self.owner_id, title=self.COL_TITLE_1)
+            self.COL_ID_1, self.owner_id, title=self.COL_TITLE_1
+        )
         self.publish_collection(self.owner_id, self.COL_ID_1)
 
         learner_progress_services.mark_collection_as_incomplete(
-            self.viewer_id, self.COL_ID_1)
+            self.viewer_id, self.COL_ID_1
+        )
         response = self.get_json(feconf.LEARNER_DASHBOARD_COLLECTION_DATA_URL)
         self.assertEqual(len(response['incomplete_collections_list']), 1)
         self.assertEqual(
-            response['incomplete_collections_list'][0]['id'], self.COL_ID_1)
+            response['incomplete_collections_list'][0]['id'], self.COL_ID_1
+        )
         self.logout()
 
     def test_can_see_collection_playlist(self) -> None:
@@ -613,20 +786,24 @@ class LearnerDashboardCollectionsProgressHandlerTests(
         self.assertEqual(len(response['collection_playlist']), 0)
 
         self.save_new_default_collection(
-            self.COL_ID_1, self.owner_id, title=self.COL_TITLE_1)
+            self.COL_ID_1, self.owner_id, title=self.COL_TITLE_1
+        )
         self.publish_collection(self.owner_id, self.COL_ID_1)
 
         learner_progress_services.add_collection_to_learner_playlist(
-            self.viewer_id, self.COL_ID_1)
+            self.viewer_id, self.COL_ID_1
+        )
         response = self.get_json(feconf.LEARNER_DASHBOARD_COLLECTION_DATA_URL)
         self.assertEqual(len(response['collection_playlist']), 1)
         self.assertEqual(
-            response['collection_playlist'][0]['id'], self.COL_ID_1)
+            response['collection_playlist'][0]['id'], self.COL_ID_1
+        )
         self.logout()
 
 
 class LearnerDashboardExplorationsProgressHandlerTests(
-    test_utils.GenericTestBase):
+    test_utils.GenericTestBase
+):
 
     EXP_ID_1: Final = 'EXP_ID_1'
     EXP_TITLE_1: Final = 'Exploration title 1'
@@ -657,14 +834,24 @@ class LearnerDashboardExplorationsProgressHandlerTests(
     TOPIC_NAME_3: Final = 'Topic title 3'
 
     subtopic_0 = topic_domain.Subtopic(
-        0, 'Title 1', ['skill_id_1'], 'image.svg',
-        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
-        'dummy-subtopic-zero')
+        0,
+        'Title 1',
+        ['skill_id_1'],
+        'image.svg',
+        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+        21131,
+        'dummy-subtopic-zero',
+    )
 
     subtopic_1 = topic_domain.Subtopic(
-        0, 'Title 1', ['skill_id_1'], 'image.svg',
-        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
-        'dummy-subtopic-zero')
+        0,
+        'Title 1',
+        ['skill_id_1'],
+        'image.svg',
+        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+        21131,
+        'dummy-subtopic-zero',
+    )
 
     def setUp(self) -> None:
         super().setUp()
@@ -684,15 +871,18 @@ class LearnerDashboardExplorationsProgressHandlerTests(
         self.assertEqual(len(response['completed_explorations_list']), 0)
 
         self.save_new_default_exploration(
-            self.EXP_ID_1, self.owner_id, title=self.EXP_TITLE_1)
+            self.EXP_ID_1, self.owner_id, title=self.EXP_TITLE_1
+        )
         self.publish_exploration(self.owner_id, self.EXP_ID_1)
 
         learner_progress_services.mark_exploration_as_completed(
-            self.viewer_id, self.EXP_ID_1)
+            self.viewer_id, self.EXP_ID_1
+        )
         response = self.get_json(feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL)
         self.assertEqual(len(response['completed_explorations_list']), 1)
         self.assertEqual(
-            response['completed_explorations_list'][0]['id'], self.EXP_ID_1)
+            response['completed_explorations_list'][0]['id'], self.EXP_ID_1
+        )
         self.logout()
 
     def test_can_see_incomplete_explorations(self) -> None:
@@ -702,18 +892,21 @@ class LearnerDashboardExplorationsProgressHandlerTests(
         self.assertEqual(len(response['incomplete_explorations_list']), 0)
 
         self.save_new_default_exploration(
-            self.EXP_ID_1, self.owner_id, title=self.EXP_TITLE_1)
+            self.EXP_ID_1, self.owner_id, title=self.EXP_TITLE_1
+        )
         self.publish_exploration(self.owner_id, self.EXP_ID_1)
 
         state_name = 'state_name'
         version = 1
 
         learner_progress_services.mark_exploration_as_incomplete(
-            self.viewer_id, self.EXP_ID_1, state_name, version)
+            self.viewer_id, self.EXP_ID_1, state_name, version
+        )
         response = self.get_json(feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL)
         self.assertEqual(len(response['incomplete_explorations_list']), 1)
         self.assertEqual(
-            response['incomplete_explorations_list'][0]['id'], self.EXP_ID_1)
+            response['incomplete_explorations_list'][0]['id'], self.EXP_ID_1
+        )
         self.logout()
 
     def test_can_see_exploration_playlist(self) -> None:
@@ -723,15 +916,18 @@ class LearnerDashboardExplorationsProgressHandlerTests(
         self.assertEqual(len(response['exploration_playlist']), 0)
 
         self.save_new_default_exploration(
-            self.EXP_ID_1, self.owner_id, title=self.EXP_TITLE_1)
+            self.EXP_ID_1, self.owner_id, title=self.EXP_TITLE_1
+        )
         self.publish_exploration(self.owner_id, self.EXP_ID_1)
 
         learner_progress_services.add_exp_to_learner_playlist(
-            self.viewer_id, self.EXP_ID_1)
+            self.viewer_id, self.EXP_ID_1
+        )
         response = self.get_json(feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL)
         self.assertEqual(len(response['exploration_playlist']), 1)
         self.assertEqual(
-            response['exploration_playlist'][0]['id'], self.EXP_ID_1)
+            response['exploration_playlist'][0]['id'], self.EXP_ID_1
+        )
         self.logout()
 
     def test_can_see_subscription(self) -> None:
@@ -741,10 +937,12 @@ class LearnerDashboardExplorationsProgressHandlerTests(
         self.assertEqual(len(response['subscription_list']), 0)
 
         subscription_services.subscribe_to_creator(
-            self.viewer_id, self.owner_id)
+            self.viewer_id, self.owner_id
+        )
         response = self.get_json(feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL)
         self.assertEqual(len(response['subscription_list']), 1)
         self.assertEqual(
             response['subscription_list'][0]['creator_username'],
-            self.OWNER_USERNAME)
+            self.OWNER_USERNAME,
+        )
         self.logout()

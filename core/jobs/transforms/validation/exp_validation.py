@@ -28,25 +28,27 @@ from core.platform import models
 from typing import Iterator, List, Optional, Tuple, Type, Union
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import exp_models, story_models
 
-(exp_models, story_models) = models.Registry.import_models([
-    models.Names.EXPLORATION, models.Names.STORY
-])
+(exp_models, story_models) = models.Registry.import_models(
+    [models.Names.EXPLORATION, models.Names.STORY]
+)
 
 
 @validation_decorators.AuditsExisting(
-    exp_models.ExplorationSnapshotMetadataModel)
+    exp_models.ExplorationSnapshotMetadataModel
+)
 class ValidateExplorationSnapshotMetadataModel(
     base_validation.BaseValidateCommitCmdsSchema[
         exp_models.ExplorationSnapshotMetadataModel
     ]
 ):
-    """Overrides _get_change_domain_class for exploration models """
+    """Overrides _get_change_domain_class for exploration models"""
 
     def _get_change_domain_class(
-        self, input_model: exp_models.ExplorationSnapshotMetadataModel  # pylint: disable=unused-argument
+        self,
+        input_model: exp_models.ExplorationSnapshotMetadataModel,  # pylint: disable=unused-argument
     ) -> Type[exp_domain.ExplorationChange]:
         """Returns a change domain class.
 
@@ -59,6 +61,7 @@ class ValidateExplorationSnapshotMetadataModel(
         """
         return exp_domain.ExplorationChange
 
+
 # TODO(#12688): Implement the skipped model.ID relationship checks (listed in
 # 12688). These are skipped at the moment as, Realationshipsof is only capable
 # of handling straigtforward model.ID relations.
@@ -66,11 +69,11 @@ class ValidateExplorationSnapshotMetadataModel(
 
 @validation_decorators.RelationshipsOf(exp_models.ExplorationContextModel)
 def exploration_context_model_relationships(
-    model: Type[exp_models.ExplorationContextModel]
+    model: Type[exp_models.ExplorationContextModel],
 ) -> Iterator[
     Tuple[
         model_property.PropertyType,
-        List[Type[Union[story_models.StoryModel, exp_models.ExplorationModel]]]
+        List[Type[Union[story_models.StoryModel, exp_models.ExplorationModel]]],
     ]
 ]:
     """Yields how the properties of the model relates to the ID of others."""
@@ -81,13 +84,18 @@ def exploration_context_model_relationships(
 
 @validation_decorators.RelationshipsOf(exp_models.ExpSummaryModel)
 def exp_summary_model_relationships(
-    model: Type[exp_models.ExpSummaryModel]
+    model: Type[exp_models.ExpSummaryModel],
 ) -> Iterator[
     Tuple[
         model_property.PropertyType,
-        List[Type[Union[
-            exp_models.ExplorationModel, exp_models.ExplorationRightsModel
-        ]]]
+        List[
+            Type[
+                Union[
+                    exp_models.ExplorationModel,
+                    exp_models.ExplorationRightsModel,
+                ]
+            ]
+        ],
     ]
 ]:
     """Yields how the properties of the model relates to the ID of others."""
@@ -97,16 +105,18 @@ def exp_summary_model_relationships(
 
 
 @validation_decorators.AuditsExisting(
-    exp_models.ExplorationRightsSnapshotMetadataModel)
+    exp_models.ExplorationRightsSnapshotMetadataModel
+)
 class ValidateExplorationRightsSnapshotMetadataModel(
     base_validation.BaseValidateCommitCmdsSchema[
         exp_models.ExplorationRightsSnapshotMetadataModel
     ]
 ):
-    """Overrides _get_change_domain_class for exploration models """
+    """Overrides _get_change_domain_class for exploration models"""
 
     def _get_change_domain_class(
-        self, input_model: exp_models.ExplorationRightsSnapshotMetadataModel  # pylint: disable=unused-argument
+        self,
+        input_model: exp_models.ExplorationRightsSnapshotMetadataModel,  # pylint: disable=unused-argument
     ) -> Type[rights_domain.ExplorationRightsChange]:
         """Returns a change domain class.
 
@@ -120,24 +130,25 @@ class ValidateExplorationRightsSnapshotMetadataModel(
         return rights_domain.ExplorationRightsChange
 
 
-@validation_decorators.AuditsExisting(
-    exp_models.ExplorationCommitLogEntryModel)
+@validation_decorators.AuditsExisting(exp_models.ExplorationCommitLogEntryModel)
 class ValidateExplorationCommitLogEntryModel(
     base_validation.BaseValidateCommitCmdsSchema[
         exp_models.ExplorationCommitLogEntryModel
     ]
 ):
-    """Overrides _get_change_domain_class for exploration models """
+    """Overrides _get_change_domain_class for exploration models"""
 
     # Here we use MyPy ignore because the signature of this method doesn't
     # match with super class's _get_change_domain_class() method.
     def _get_change_domain_class(  # type: ignore[override]
         self, input_model: exp_models.ExplorationCommitLogEntryModel
     ) -> Optional[
-        Type[Union[
-            rights_domain.ExplorationRightsChange,
-            exp_domain.ExplorationChange
-        ]]
+        Type[
+            Union[
+                rights_domain.ExplorationRightsChange,
+                exp_domain.ExplorationChange,
+            ]
+        ]
     ]:
         """Returns a change domain class.
 

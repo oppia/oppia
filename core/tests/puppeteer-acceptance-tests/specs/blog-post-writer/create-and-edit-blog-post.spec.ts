@@ -56,7 +56,9 @@ describe('Blog Post Writer', function () {
     await blogPostWriter.expectFirstBlogPostButtonToBeVisible(true);
 
     // Click on "Create new blog post" button.
-    await blogPostWriter.clickOn(LABELS.CREATE_NEW_BLOG_POST_BTN);
+    await blogPostWriter.clickOnElementWithText(
+      LABELS.CREATE_NEW_BLOG_POST_BTN
+    );
     await blogPostWriter.expectToBeOnBlogEditorPage();
 
     // Upload GIF format thumbnail image.
@@ -116,7 +118,7 @@ describe('Blog Post Writer', function () {
     // Close the thumbnail image upload modal. If the viewport is mobile, the
     // cancel button isn't visible as the modal is embedded in page itself.
     if (!blogPostWriter.isViewportAtMobileWidth()) {
-      await blogPostWriter.clickOn('Cancel');
+      await blogPostWriter.clickOnElementWithText('Cancel');
     }
 
     // Update blog title of less than 5 characters.
@@ -171,7 +173,9 @@ describe('Blog Post Writer', function () {
 
   it('should be able to publish a new blog post', async function () {
     // Create a new blog post.
-    await blogPostWriter.clickOn(LABELS.CREATE_NEW_BLOG_POST_BTN);
+    await blogPostWriter.clickOnElementWithText(
+      LABELS.CREATE_NEW_BLOG_POST_BTN
+    );
     await blogPostWriter.updateBlogPostTitle('Test Blog Post Title');
     await blogPostWriter.updateBodyTextTo('Test Blog Post Body');
     await blogPostWriter.saveBlogBodyChanges();
@@ -199,9 +203,9 @@ describe('Blog Post Writer', function () {
 
     // Click on publish button.
     await blogPostWriter.selectTag('News');
-    await blogPostWriter.clickOn(LABELS.PUBLISH_BUTTON);
+    await blogPostWriter.clickOnElementWithText(LABELS.PUBLISH_BUTTON);
     await blogPostWriter.expectScreenshotToMatch('blogPostPublish', __dirname);
-    await blogPostWriter.clickOn(LABELS.CONFIRM_PUBLISH_BUTTON);
+    await blogPostWriter.clickOnElementWithText(LABELS.CONFIRM_PUBLISH_BUTTON);
     await blogPostWriter.navigateToBlogPage();
     await blogPostWriter.expectBlogPostToBePresent('Test Blog Post Title');
   });
