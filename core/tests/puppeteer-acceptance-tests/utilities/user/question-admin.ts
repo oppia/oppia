@@ -72,7 +72,7 @@ export class QuestionAdmin extends BaseUser {
       addContributonRightsCategorySelector,
       reviewQuestionRightValue
     );
-    await this.clickOn(addContributionRightsSubmitButton);
+    await this.clickOnElementWithSelector(addContributionRightsSubmitButton);
 
     await this.waitForNetworkIdle();
     await this.expectElementToBeClickable(
@@ -90,7 +90,7 @@ export class QuestionAdmin extends BaseUser {
       addContributonRightsCategorySelector,
       submitQuestionRightValue
     );
-    await this.clickOn(addContributionRightsSubmitButton);
+    await this.clickOnElementWithSelector(addContributionRightsSubmitButton);
 
     await this.waitForNetworkIdle();
     await this.expectElementToBeClickable(
@@ -108,7 +108,7 @@ export class QuestionAdmin extends BaseUser {
       removeContributonRightsCategorySelector,
       reviewQuestionRightValue
     );
-    await this.clickOn(removeContributionRightsSubmitButton);
+    await this.clickOnElementWithSelector(removeContributionRightsSubmitButton);
 
     await this.waitForNetworkIdle();
     await this.expectElementToBeClickable(
@@ -126,7 +126,7 @@ export class QuestionAdmin extends BaseUser {
       removeContributonRightsCategorySelector,
       submitQuestionRightValue
     );
-    await this.clickOn(removeContributionRightsSubmitButton);
+    await this.clickOnElementWithSelector(removeContributionRightsSubmitButton);
 
     await this.waitForNetworkIdle();
     await this.expectElementToBeClickable(
@@ -144,7 +144,7 @@ export class QuestionAdmin extends BaseUser {
       viewContributorCategorySelector,
       reviewQuestionRightValue
     );
-    await this.clickOn(viewContributorSubmitButton);
+    await this.clickOnElementWithSelector(viewContributorSubmitButton);
 
     await this.waitForNetworkIdle();
 
@@ -171,7 +171,7 @@ export class QuestionAdmin extends BaseUser {
       viewContributorCategorySelector,
       submitQuestionRightValue
     );
-    await this.clickOn(viewContributorSubmitButton);
+    await this.clickOnElementWithSelector(viewContributorSubmitButton);
 
     await this.waitForNetworkIdle();
 
@@ -198,7 +198,7 @@ export class QuestionAdmin extends BaseUser {
   ): Promise<string> {
     await this.select(viewContributorFilterMethodSelector, usernameMethodValue);
     await this.typeInInputField(viewContributerUsernameInput, username);
-    await this.clickOn(viewContributorSubmitButton);
+    await this.clickOnElementWithSelector(viewContributorSubmitButton);
 
     await this.waitForNetworkIdle();
 

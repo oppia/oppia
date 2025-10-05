@@ -86,9 +86,7 @@ class InitializeAndroidTestDataHandler(
             raise Exception('Cannot load new structures data in production.')
 
         topic_id = android_services.initialize_android_test_data()
-        self.render_json({
-            'generated_topic_id': topic_id
-        })
+        self.render_json({'generated_topic_id': topic_id})
 
 
 class ActivityDataRequestDict(TypedDict):
@@ -121,12 +119,13 @@ class _ActivityDataResponseDictRequiredFields(TypedDict):
         Dict[str, List[str]],
         Dict[str, voiceover_domain.EntityVoiceoversDict],
         classroom_domain.ClassroomDict,
-        None
+        None,
     ]
 
 
 class ActivityDataResponseDict(
-        _ActivityDataResponseDictRequiredFields, total=False):
+    _ActivityDataResponseDictRequiredFields, total=False
+):
     """Dict representation of items returned in the activities response list."""
 
     version: Optional[int]
@@ -143,9 +142,11 @@ class AndroidActivityHandlerHandlerNormalizedRequestDict(TypedDict):
     offset: Optional[int]
 
 
-class AndroidActivityHandler(base.BaseHandler[
-    Dict[str, str], AndroidActivityHandlerHandlerNormalizedRequestDict
-]):
+class AndroidActivityHandler(
+    base.BaseHandler[
+        Dict[str, str], AndroidActivityHandlerHandlerNormalizedRequestDict
+    ]
+):
     """Handler for providing activities to Android."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -163,7 +164,7 @@ class AndroidActivityHandler(base.BaseHandler[
                         constants.ACTIVITY_TYPE_STORY,
                         constants.ACTIVITY_TYPE_SKILL,
                         constants.ACTIVITY_TYPE_SUBTOPIC,
-                        constants.ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE_MIGRATION, # pylint: disable=line-too-long
+                        constants.ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE_MIGRATION,
                         constants.ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE,
                         constants.ACTIVITY_TYPE_LEARN_TOPIC,
                         constants.ACTIVITY_TYPE_CLASSROOM,
@@ -187,6 +188,7 @@ class AndroidActivityHandler(base.BaseHandler[
                 },
                 'default_value': None
             }
+
         }
     }
 
@@ -211,7 +213,8 @@ class AndroidActivityHandler(base.BaseHandler[
 
         hashed_activities_data = [
             tuple(sorted((k, v) for k, v in activity_data.items()))
-            for activity_data in activities_data]
+            for activity_data in activities_data
+        ]
         if len(set(hashed_activities_data)) != len(hashed_activities_data):
             raise self.InvalidInputException(
                 'Entries in activities_data should be unique'
@@ -235,6 +238,7 @@ class AndroidActivityHandler(base.BaseHandler[
                     'version': activity_data.get('version'),
                     'payload': exploration_dict_for_android
                 })
+
         elif activity_type == constants.ACTIVITY_TYPE_SUBTOPIC:
             # Subtopic pages require special handling because their IDs are
             # compound keys (topic_id-subtopic_id) that need to be split and
@@ -296,17 +300,19 @@ class AndroidActivityHandler(base.BaseHandler[
                     topic_id,
                     int(study_guide_id),
                     strict=False,
-                    version=activity_data.get('version')
+                    version=activity_data.get('version'),
                 )
-                activities.append({
-                    'id': activity_data['id'],
-                    'version': activity_data.get('version'),
-                    'payload': (
-                        study_guide
-                        .to_subtopic_page_dict_for_android()
-                        if study_guide is not None else None
-                    )
-                })
+                activities.append(
+                    {
+                        'id': activity_data['id'],
+                        'version': activity_data.get('version'),
+                        'payload': (
+                            study_guide.to_subtopic_page_dict_for_android()
+                            if study_guide is not None
+                            else None
+                        ),
+                    }
+                )
         elif activity_type == (
             constants.ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE
         ):
@@ -316,34 +322,46 @@ class AndroidActivityHandler(base.BaseHandler[
                     topic_id,
                     int(study_guide_id),
                     strict=False,
-                    version=activity_data.get('version')
+                    version=activity_data.get('version'),
                 )
-                activities.append({
-                    'id': activity_data['id'],
-                    'version': activity_data.get('version'),
-                    'payload': (
-                        study_guide.to_dict() if study_guide is not None
-                        else None)
-                })
+                activities.append(
+                    {
+                        'id': activity_data['id'],
+                        'version': activity_data.get('version'),
+                        'payload': (
+                            study_guide.to_dict()
+                            if study_guide is not None
+                            else None
+                        ),
+                    }
+                )
         elif activity_type == constants.ACTIVITY_TYPE_CLASSROOM:
             for activity_data in activities_data:
                 if activity_data.get('version') is not None:
                     raise self.InvalidInputException(
-                        'Version cannot be specified for classroom')
+                        'Version cannot be specified for classroom'
+                    )
                 classroom = (
                     classroom_config_services.get_classroom_by_url_fragment(
-                        activity_data['id']))
-                activities.append({
-                    'id': activity_data['id'],
-                    'payload': (
-                        classroom.to_dict() if classroom is not None else None)
-                })
+                        activity_data['id']
+                    )
+                )
+                activities.append(
+                    {
+                        'id': activity_data['id'],
+                        'payload': (
+                            classroom.to_dict()
+                            if classroom is not None
+                            else None
+                        ),
+                    }
+                )
 
         elif activity_type == constants.ACTIVITY_TYPE_EXPLORATION_TRANSLATIONS:
             # Translations require both version and language code, and use a
             # different payload structure than other activities.
             entity_type = feconf.TranslatableEntityType(
-                feconf.ENTITY_TYPE_EXPLORATION)
+
             translation_references: List[
                 translation_models.EntityTranslationReferenceDict
             ] = []
@@ -355,6 +373,7 @@ class AndroidActivityHandler(base.BaseHandler[
                         'Version and language code must be specified '
                         'for translation'
                     )
+
                 translation_references.append({
                     'entity_type': entity_type,
                     'entity_id': activity_data['id'],
@@ -388,12 +407,11 @@ class AndroidActivityHandler(base.BaseHandler[
                         'for voiceovers'
                     )
                 entity_voiceovers = (
-                    voiceover_services.
-                    fetch_entity_voiceovers_by_language_code(
+                    voiceover_services.fetch_entity_voiceovers_by_language_code(
                         activity_data['id'],
                         feconf.ENTITY_TYPE_EXPLORATION,
                         version,
-                        language_code
+                        language_code,
                     )
                 )
 
@@ -403,12 +421,14 @@ class AndroidActivityHandler(base.BaseHandler[
                         entity_voiceover.language_accent_code
                     ] = entity_voiceover.to_dict()
 
-                activities.append({
-                    'id': activity_data['id'],
-                    'version': version,
-                    'language_code': language_code,
-                    'payload': language_accent_code_to_entity_voiceover
-                })
+                activities.append(
+                    {
+                        'id': activity_data['id'],
+                        'version': version,
+                        'language_code': language_code,
+                        'payload': language_accent_code_to_entity_voiceover,
+                    }
+                )
         else:
             # All other activities are standard versioned models
             # that can be fetched in bulk using their

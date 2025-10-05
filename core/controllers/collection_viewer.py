@@ -28,11 +28,7 @@ class CollectionDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
-        'collection_id': {
-            'schema': {
-                'type': 'basestring'
-            }
-        }
+        'collection_id': {'schema': {'type': 'basestring'}}
     }
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
@@ -43,22 +39,26 @@ class CollectionDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         Args:
             collection_id: str. The ID of the collection.
         """
-        collection_dict = (
-            summary_services.get_learner_collection_dict_by_id(
-                collection_id, self.user,
-                allow_invalid_explorations=False))
+        collection_dict = summary_services.get_learner_collection_dict_by_id(
+            collection_id, self.user, allow_invalid_explorations=False
+        )
 
         collection_rights = rights_manager.get_collection_rights(
-            collection_id, strict=False)
-        self.values.update({
-            'can_edit': rights_manager.check_can_edit_activity(
-                self.user, collection_rights),
-            'collection': collection_dict,
-            'is_logged_in': bool(self.user_id),
-            'session_id': utils.generate_new_session_id(),
-            'meta_name': collection_dict['title'],
-            'meta_description': utils.capitalize_string(
-                collection_dict['objective'])
-        })
+            collection_id, strict=False
+        )
+        self.values.update(
+            {
+                'can_edit': rights_manager.check_can_edit_activity(
+                    self.user, collection_rights
+                ),
+                'collection': collection_dict,
+                'is_logged_in': bool(self.user_id),
+                'session_id': utils.generate_new_session_id(),
+                'meta_name': collection_dict['title'],
+                'meta_description': utils.capitalize_string(
+                    collection_dict['objective']
+                ),
+            }
+        )
 
         self.render_json(self.values)

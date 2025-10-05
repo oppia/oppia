@@ -25,23 +25,23 @@ from core.tests import test_utils
 from typing import List
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     # Here, we are importing 'platform_parameter_domain' only for type checking.
     from core.domain import platform_parameter_domain
     from mypy_imports import base_models, config_models
 
-(base_models, config_models) = models.Registry.import_models([
-    models.Names.BASE_MODEL, models.Names.CONFIG
-])
+(base_models, config_models) = models.Registry.import_models(
+    [models.Names.BASE_MODEL, models.Names.CONFIG]
+)
 
 
 class PlatformParameterSnapshotContentModelTests(test_utils.GenericTestBase):
 
     def test_get_deletion_policy_is_not_applicable(self) -> None:
         self.assertEqual(
-            config_models.PlatformParameterSnapshotContentModel
-            .get_deletion_policy(),
-            base_models.DELETION_POLICY.NOT_APPLICABLE)
+            config_models.PlatformParameterSnapshotContentModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE,
+        )
 
 
 class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
@@ -50,23 +50,26 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
     def test_get_deletion_policy_is_not_applicable(self) -> None:
         self.assertEqual(
             config_models.PlatformParameterModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.NOT_APPLICABLE)
+            base_models.DELETION_POLICY.NOT_APPLICABLE,
+        )
 
     def test_create_model(self) -> None:
         param_model = config_models.PlatformParameterModel.create(
             param_name='parameter_name',
             rule_dicts=[{'filters': [], 'value_when_matched': False}],
             rule_schema_version=(
-                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
-            default_value=False
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
+            ),
+            default_value=False,
         )
         self.assertEqual(param_model.id, 'parameter_name')
         self.assertEqual(
             param_model.rule_schema_version,
-            feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION)
+            feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION,
+        )
         self.assertEqual(
-            param_model.rules,
-            [{'filters': [], 'value_when_matched': False}])
+            param_model.rules, [{'filters': [], 'value_when_matched': False}]
+        )
         self.assertEqual(param_model.default_value, False)
 
     def test_commit(self) -> None:
@@ -79,14 +82,16 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
             param_name=parameter_name,
             rule_dicts=rule_dicts,
             rule_schema_version=(
-                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
-            default_value=False
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
+            ),
+            default_value=False,
         )
 
         param_model.commit(feconf.SYSTEM_COMMITTER_ID, 'commit message', [])
 
         retrieved_model1 = config_models.PlatformParameterModel.get_version(
-            parameter_name, 1)
+            parameter_name, 1
+        )
         # Ruling out the possibility of None for mypy type checking.
         assert retrieved_model1 is not None
 
@@ -97,16 +102,18 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
                 'filters': [
                     {'type': 'app_version', 'conditions': [['>', '1.2.3']]}
                 ],
-                'value_when_matched': True
+                'value_when_matched': True,
             },
             {'filters': [], 'value_when_matched': False},
         ]
 
         retrieved_model1.rules = new_rules
         retrieved_model1.commit(
-            feconf.SYSTEM_COMMITTER_ID, 'commit message', [])
+            feconf.SYSTEM_COMMITTER_ID, 'commit message', []
+        )
         retrieved_model2 = config_models.PlatformParameterModel.get_version(
-            parameter_name, 2)
+            parameter_name, 2
+        )
         # Ruling out the possibility of None for mypy type checking.
         assert retrieved_model2 is not None
 
@@ -122,14 +129,16 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
             param_name=parameter_name,
             rule_dicts=rule_dicts,
             rule_schema_version=(
-                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
-            default_value=False
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
+            ),
+            default_value=False,
         )
 
         param_model.commit(feconf.SYSTEM_COMMITTER_ID, 'commit message', [])
 
         retrieved_model1 = config_models.PlatformParameterModel.get_version(
-            parameter_name, 1)
+            parameter_name, 1
+        )
         # Ruling out the possibility of None for mypy type checking.
         assert retrieved_model1 is not None
         self.assertEqual(retrieved_model1.rules, rule_dicts)
@@ -144,8 +153,9 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
             param_name=parameter_name,
             rule_dicts=rule_dicts,
             rule_schema_version=(
-                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION),
-            default_value=False
+                feconf.CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION
+            ),
+            default_value=False,
         )
         param_model.commit(feconf.SYSTEM_COMMITTER_ID, 'commit message', [])
 
@@ -154,7 +164,7 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
                 'filters': [
                     {'type': 'app_version', 'conditions': [['>', '1.2.3']]}
                 ],
-                'value_when_matched': True
+                'value_when_matched': True,
             },
             {'filters': [], 'value_when_matched': False},
         ]
@@ -162,7 +172,8 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
         param_model.rules = new_rules
         param_model.commit(feconf.SYSTEM_COMMITTER_ID, 'commit message', [])
         retrieved_model = config_models.PlatformParameterModel.get_version(
-            parameter_name, 2)
+            parameter_name, 2
+        )
         # Ruling out the possibility of None for mypy type checking.
         assert retrieved_model is not None
 
@@ -170,8 +181,8 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
-            config_models.PlatformParameterModel.get_model_association_to_user(), # pylint: disable=line-too-long
-            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+            config_models.PlatformParameterModel.get_model_association_to_user(),  # pylint: disable=line-too-long
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER,
         )
 
     def test_get_export_policy(self) -> None:
@@ -182,11 +193,11 @@ class PlatformParameterModelUnitTests(test_utils.GenericTestBase):
             'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'rules': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'rule_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'default_value': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'default_value': base_models.EXPORT_POLICY.NOT_APPLICABLE,
         }
         self.assertEqual(
             config_models.PlatformParameterModel.get_export_policy(),
-            expected_export_policy_dict
+            expected_export_policy_dict,
         )
 
 
@@ -196,26 +207,27 @@ class FeatureFlagConfigModelUnitTests(test_utils.GenericTestBase):
     def test_get_deletion_policy_is_not_applicable(self) -> None:
         self.assertEqual(
             config_models.FeatureFlagConfigModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.NOT_APPLICABLE)
+            base_models.DELETION_POLICY.NOT_APPLICABLE,
+        )
 
     def test_create_model(self) -> None:
         feature_model = config_models.FeatureFlagConfigModel.create(
             feature_flag_name='feature_name',
             force_enable_for_all_users=False,
             rollout_percentage=50,
-            user_group_ids=['User Group 1', 'User Group 2']
+            user_group_ids=['User Group 1', 'User Group 2'],
         )
         self.assertEqual(feature_model.id, 'feature_name')
         self.assertEqual(feature_model.rollout_percentage, 50)
         self.assertEqual(
-            feature_model.user_group_ids,
-            ['User Group 1', 'User Group 2'])
+            feature_model.user_group_ids, ['User Group 1', 'User Group 2']
+        )
         self.assertEqual(feature_model.force_enable_for_all_users, False)
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
-            config_models.FeatureFlagConfigModel.get_model_association_to_user(), # pylint: disable=line-too-long
-            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+            config_models.FeatureFlagConfigModel.get_model_association_to_user(),  # pylint: disable=line-too-long
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER,
         )
 
     def test_get_export_policy(self) -> None:
@@ -224,11 +236,12 @@ class FeatureFlagConfigModelUnitTests(test_utils.GenericTestBase):
             'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'force_enable_for_all_users': (
-                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
+            ),
             'rollout_percentage': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'user_group_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'user_group_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
         }
         self.assertEqual(
             config_models.FeatureFlagConfigModel.get_export_policy(),
-            expected_export_policy_dict
+            expected_export_policy_dict,
         )
