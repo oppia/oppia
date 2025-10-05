@@ -1185,12 +1185,13 @@ def _get_all_recipient_ids(
                 given author.
     """
     exploration_rights = rights_manager.get_exploration_rights(exploration_id)
-
+    messages = get_messages(thread_id)
     owner_ids = set(exploration_rights.owner_ids)
     participant_ids = {
-        message.author_id for message in get_messages(thread_id)
-        if user_services.is_user_registered(message.author_id)
-    }
+    message.author_id
+    for message in messages
+    if message.author_id and user_services.is_user_registered(message.author_id)
+}
 
     batch_recipient_ids = owner_ids - {author_id}
     other_recipient_ids = participant_ids - batch_recipient_ids - {author_id}

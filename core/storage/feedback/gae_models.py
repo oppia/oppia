@@ -17,7 +17,7 @@
 """Models for Oppia feedback threads and messages."""
 
 from __future__ import annotations
-
+from google.cloud import ndb
 from core import feconf, utils
 
 # TODO(#13594): After the domain layer is refactored to be independent of
@@ -292,7 +292,11 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
 
     # We use the model id as a key in the Takeout dict.
     ID_IS_USED_AS_TAKEOUT_KEY: Literal[True] = True
-
+    author_id = ndb.StringProperty(required=True)
+    def validate(self):
+    # Add this check to require non-empty author_id
+        if not self.author_id or self.author_id.strip() == "":
+            raise Exception("author_id cannot be empty or whitespace for feedback messages")
     # ID corresponding to an entry of FeedbackThreadModel.
     thread_id = datastore_services.StringProperty(required=True, indexed=True)
     # 0-based sequential numerical ID. Sorting by this field will create the
