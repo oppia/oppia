@@ -47,7 +47,7 @@ from core.domain import (
 from typing import Dict, List, Optional, Sequence, TypedDict, Union
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import translation_models
 
 
@@ -169,26 +169,19 @@ class AndroidActivityHandler(
                         constants.ACTIVITY_TYPE_LEARN_TOPIC,
                         constants.ACTIVITY_TYPE_CLASSROOM,
                         constants.ACTIVITY_TYPE_QUESTIONS,
-                    ]
+                    ],
                 },
             },
             'activities_data': {
-                'schema': {
-                    'type': 'custom',
-                    'obj_type': 'JsonEncodedInString'
-                }
+                'schema': {'type': 'custom', 'obj_type': 'JsonEncodedInString'}
             },
             'offset': {
                 'schema': {
                     'type': 'int',
-                    'validators': [{
-                        'id': 'is_at_least',
-                        'min_value': 0
-                    }]
+                    'validators': [{'id': 'is_at_least', 'min_value': 0}],
                 },
-                'default_value': None
-            }
-
+                'default_value': None,
+            },
         }
     }
 
@@ -205,11 +198,13 @@ class AndroidActivityHandler(
         offset = self.normalized_request.get('offset')
         activities: List[ActivityDataResponseDict] = []
 
-        if (activity_type != constants.ACTIVITY_TYPE_QUESTIONS and
-                offset is not None):
+        if (
+            activity_type != constants.ACTIVITY_TYPE_QUESTIONS
+            and offset is not None
+        ):
             raise self.InvalidInputException(
                 'Offset should only be provided for fetching questions'
-        )
+            )
 
         hashed_activities_data = [
             tuple(sorted((k, v) for k, v in activity_data.items()))
@@ -226,18 +221,27 @@ class AndroidActivityHandler(
                 for activity_data in activities_data
             ]
             fetched_explorations: Sequence[Optional[exp_domain.Exploration]] = (
-                exp_fetchers.get_multiple_explorations_by_ids_and_version(ids_and_versions)
-            )
-            for activity_data, exploration in zip(activities_data, fetched_explorations):
-                exploration_dict_for_android: Optional[exp_domain.ExplorationDictForAndroid] = (
-                    exp_services.to_exploration_dict_for_android(exploration)
-                    if exploration is not None else None
+                exp_fetchers.get_multiple_explorations_by_ids_and_version(
+                    ids_and_versions
                 )
-                activities.append({
-                    'id': activity_data['id'],
-                    'version': activity_data.get('version'),
-                    'payload': exploration_dict_for_android
-                })
+            )
+            for activity_data, exploration in zip(
+                activities_data, fetched_explorations
+            ):
+                exploration_dict_for_android: Optional[
+                    exp_domain.ExplorationDictForAndroid
+                ] = (
+                    exp_services.to_exploration_dict_for_android(exploration)
+                    if exploration is not None
+                    else None
+                )
+                activities.append(
+                    {
+                        'id': activity_data['id'],
+                        'version': activity_data.get('version'),
+                        'payload': exploration_dict_for_android,
+                    }
+                )
 
         elif activity_type == constants.ACTIVITY_TYPE_SUBTOPIC:
             # Subtopic pages require special handling because their IDs are
@@ -245,7 +249,8 @@ class AndroidActivityHandler(
             # processed separately.
             split_ids_and_versions = [
                 (activity_data['id'].split('-'), activity_data.get('version'))
-                for activity_data in activities_data]
+                for activity_data in activities_data
+            ]
             topic_subtopic_version_tuples = [
                 (
                     topic_id,
@@ -254,20 +259,30 @@ class AndroidActivityHandler(
                 )
                 for (
                     (topic_id, stringified_subtopic_index),
-                    subtopic_page_version
+                    subtopic_page_version,
                 ) in split_ids_and_versions
             ]
             subtopic_pages = (
                 subtopic_page_services.get_subtopic_pages_with_ids_and_versions(
-                    topic_subtopic_version_tuples))
-            activities.extend([{
-                'id': activity_data['id'],
-                'version': activity_data.get('version'),
-                'payload': (
-                    subtopic_page.to_dict()
-                    if subtopic_page is not None else None)
-            } for (activity_data, subtopic_page) in zip(
-                activities_data, subtopic_pages)])
+                    topic_subtopic_version_tuples
+                )
+            )
+            activities.extend(
+                [
+                    {
+                        'id': activity_data['id'],
+                        'version': activity_data.get('version'),
+                        'payload': (
+                            subtopic_page.to_dict()
+                            if subtopic_page is not None
+                            else None
+                        ),
+                    }
+                    for (activity_data, subtopic_page) in zip(
+                        activities_data, subtopic_pages
+                    )
+                ]
+            )
 
         elif activity_type == constants.ACTIVITY_TYPE_QUESTIONS:
             # Questions require special handling as they are fetched in bulk.
@@ -276,20 +291,22 @@ class AndroidActivityHandler(
             for activity_data in activities_data:
                 if activity_data.get('version') is not None:
                     raise self.InvalidInputException(
-                        'Version cannot be specified when fetching questions')
+                        'Version cannot be specified when fetching questions'
+                    )
 
             if offset is None:
                 raise self.InvalidInputException(
                     'Offset required when fetching questions'
-                    )
+                )
 
-            questions = (
-                question_fetchers.get_all_questions(offset=offset))
+            questions = question_fetchers.get_all_questions(offset=offset)
 
-            activities.extend([{
-                'id': question.id,
-                'payload': question.to_dict()
-            } for question in questions])
+            activities.extend(
+                [
+                    {'id': question.id, 'payload': question.to_dict()}
+                    for question in questions
+                ]
+            )
 
         elif activity_type == (
             constants.ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE_MIGRATION
@@ -361,7 +378,8 @@ class AndroidActivityHandler(
             # Translations require both version and language code, and use a
             # different payload structure than other activities.
             entity_type = feconf.TranslatableEntityType(
-
+                feconf.ENTITY_TYPE_EXPLORATION
+            )
             translation_references: List[
                 translation_models.EntityTranslationReferenceDict
             ] = []
@@ -374,26 +392,38 @@ class AndroidActivityHandler(
                         'for translation'
                     )
 
-                translation_references.append({
-                    'entity_type': entity_type,
-                    'entity_id': activity_data['id'],
-                    'entity_version': version,
-                    'language_code': language_code,
-                })
+                translation_references.append(
+                    {
+                        'entity_type': entity_type,
+                        'entity_id': activity_data['id'],
+                        'entity_version': version,
+                        'language_code': language_code,
+                    }
+                )
 
             translations = (
                 translation_fetchers.get_multiple_entity_translations(
-                    translation_references))
+                    translation_references
+                )
+            )
 
-            activities.extend([{
-                'id': activity_data['id'],
-                'version': activity_data.get('version'),
-                'language_code': activity_data.get('language_code'),
-                'payload': (
-                    translation.to_dict()['translations']
-                    if translation is not None else {})
-            } for activity_data, translation in zip(
-                activities_data, translations)])
+            activities.extend(
+                [
+                    {
+                        'id': activity_data['id'],
+                        'version': activity_data.get('version'),
+                        'language_code': activity_data.get('language_code'),
+                        'payload': (
+                            translation.to_dict()['translations']
+                            if translation is not None
+                            else {}
+                        ),
+                    }
+                    for activity_data, translation in zip(
+                        activities_data, translations
+                    )
+                ]
+            )
             self.render_json(activities)
             return
 
@@ -435,35 +465,45 @@ class AndroidActivityHandler(
             # respective get_multiple_*_by_ids_and_version
             # methods.
             ids_and_versions = [
-                (activity_data['id'],
-                 activity_data.get('version'))
-                for activity_data in activities_data]
+                (activity_data['id'], activity_data.get('version'))
+                for activity_data in activities_data
+            ]
 
-            fetched_entities: Sequence[Optional[Union[
-                story_domain.Story,
-                skill_domain.Skill,
-                question_domain.Question,
-                topic_domain.Topic
-            ]]] = []
+            fetched_entities: Sequence[
+                Optional[
+                    Union[
+                        story_domain.Story,
+                        skill_domain.Skill,
+                        question_domain.Question,
+                        topic_domain.Topic,
+                    ]
+                ]
+            ] = []
 
             if activity_type == constants.ACTIVITY_TYPE_STORY:
                 fetched_entities = (
                     story_fetchers.get_multiple_stories_by_ids_and_version(
-                        ids_and_versions))
+                        ids_and_versions
+                    )
+                )
             elif activity_type == constants.ACTIVITY_TYPE_SKILL:
                 fetched_entities = (
                     skill_fetchers.get_multiple_skills_by_ids_and_version(
-                        ids_and_versions))
+                        ids_and_versions
+                    )
+                )
             else:
                 fetched_entities = (
                     topic_fetchers.get_multiple_topics_by_ids_and_version(
-                        ids_and_versions))
+                        ids_and_versions
+                    )
+                )
 
             for activity_data, entity in zip(activities_data, fetched_entities):
                 response_dict: ActivityDataResponseDict = {
                     'id': activity_data['id'],
                     'version': activity_data.get('version'),
-                    'payload': entity.to_dict() if entity is not None else None
+                    'payload': entity.to_dict() if entity is not None else None,
                 }
                 activities.append(response_dict)
 
