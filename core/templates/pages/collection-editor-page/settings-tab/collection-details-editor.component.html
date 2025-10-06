@@ -1,6 +1,6 @@
 <div role="form" class="form-horizontal">
   <div class="mb-3" [ngClass]="{'has-error': !displayedCollectionTitle}">
-    <label for="collectionTitle" class="col-lg-2 col-md-2 col-sm-2">Title</label>
+    <label for="collectionTitle" class="col-lg-2 col-md-2 col-sm-2 form-label">Title</label>
     <div class="col-lg-10 col-md-10 col-sm-10">
       <input id="collectionTitle" type="text" class="form-control"
              [(ngModel)]="displayedCollectionTitle"
@@ -11,7 +11,7 @@
   </div>
 
   <div class="mb-3" [ngClass]="{'has-error': !displayedCollectionObjective}">
-    <label for="collectionObjective" class="col-lg-2 col-md-2 col-sm-2">Goal</label>
+    <label for="collectionObjective" class="col-lg-2 col-md-2 col-sm-2 form-label">Goal</label>
     <div class="col-lg-10 col-md-10 col-sm-10">
       <input id="collectionObjective" type="text" class="form-control"
              [(ngModel)]="displayedCollectionObjective"
@@ -24,7 +24,7 @@
   </div>
 
   <div class="mb-3" [ngClass]="{'has-error': !displayedCollectionCategory}">
-    <label for="collectionCategory" class="col-lg-2 col-md-2 col-sm-2">Category</label>
+    <label for="collectionCategory" class="col-lg-2 col-md-2 col-sm-2 form-label">Category</label>
     <div class="col-lg-10 col-md-10 col-sm-10">
       <div *ngIf="hasPageLoaded()">
         <oppia-filtered-choices-field id="collectionCategory"
@@ -39,7 +39,7 @@
   </div>
 
   <div class="mb-3">
-    <label for="collectionLanguage" class="col-lg-2 col-md-2 col-sm-2">Language</label>
+    <label for="collectionLanguage" class="col-lg-2 col-md-2 col-sm-2 form-label">Language</label>
     <div class="col-lg-10 col-md-10 col-sm-10">
       <select id="collectionLanguageCode"
               class="form-select e2e-test-exploration-language-select"
@@ -56,7 +56,7 @@
   </div>
 
   <div class="mb-3">
-    <label for="collectionTags" class="col-lg-2 col-md-2 col-sm-2">Tags</label>
+    <label for="collectionTags" class="col-lg-2 col-md-2 col-sm-2 form-label">Tags</label>
     <div class="col-lg-10 col-md-10 col-sm-10">
       <div *ngIf="hasPageLoaded">
         <oppia-multi-selection-field [(selections)]="displayedCollectionTags"

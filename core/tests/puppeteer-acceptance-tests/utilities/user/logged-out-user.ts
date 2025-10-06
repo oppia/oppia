@@ -2448,8 +2448,7 @@ export class LoggedOutUser extends BaseUser {
 
     // Toggle to the next tab.
     if (!this.isViewportAtMobileWidth()) {
-      // More reliable for complex components - https://stackoverflow.com/questions/70398134/
-      await tabLablels[1].evaluate(el => (el as HTMLElement).click());
+      await tabLablels[1].click();
     } else {
       await this.clickOn(tabsNextButtonInVolunteerPage);
     }
@@ -2466,7 +2465,7 @@ export class LoggedOutUser extends BaseUser {
 
     // Toggle to the previous tab.
     if (!this.isViewportAtMobileWidth()) {
-      await tabLablels[0].evaluate(el => (el as HTMLElement).click());
+      await tabLablels[0].click();
     } else {
       await this.clickOn(tabsPreviousButtonInVolunteerPage);
     }

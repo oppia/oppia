@@ -13,7 +13,7 @@
         -->
         <div class="container">
           <div class="mb-3 row">
-            <label class="col-lg-4 col-md-4 col-sm-4" tabindex="0" [attr.aria-label]="'Username: ' + username">
+            <label class="col-lg-4 col-md-4 col-sm-4 form-label" tabindex="0" [attr.aria-label]="'Username: ' + username">
               {{ 'I18N_PREFERENCES_USERNAME' | translate }}
             </label>
             <div class="col-lg-8 col-md-8 col-sm-8">
@@ -30,7 +30,7 @@
           </div>
 
           <div class="mb-3 row">
-            <label class="col-lg-4 col-md-4 col-sm-4">
+            <label class="col-lg-4 col-md-4 col-sm-4 form-label">
               {{ 'I18N_PREFERENCES_PICTURE' | translate }}
             </label>
             <div class="col-lg-8 col-md-8 col-sm-8">
@@ -66,7 +66,7 @@
           </div>
 
           <div class="mb-3 row">
-            <label class="col-lg-4 col-md-4 col-sm-4">
+            <label class="col-lg-4 col-md-4 col-sm-4 form-label">
               {{ 'I18N_PREFERENCES_BIO' | translate }}
             </label>
             <div class="col-lg-8 col-md-8 col-sm-8">
@@ -84,7 +84,7 @@
         </div>
 
         <div class="mb-3 row">
-          <label class="col-lg-4 col-md-4 col-sm-4"
+          <label class="col-lg-4 col-md-4 col-sm-4 form-label"
                  tabindex="0"
                  [attr.aria-label]="('I18N_PREFERENCES_PREFERRED_DASHBOARD' | translate) + ('I18N_PREFERENCES_PREFERRED_DASHBOARD_EXPLAIN' | translate)">
             {{ 'I18N_PREFERENCES_PREFERRED_DASHBOARD' | translate }}
@@ -134,7 +134,7 @@
 
         <div class="mb-3 row">
           <label for="label-target-interests-dropdown"
-                 class="col-lg-4 col-md-4 col-sm-4"
+                 class="col-lg-4 col-md-4 col-sm-4 form-label"
                  tabindex="0"
                  [attr.aria-label]="('I18N_PREFERENCES_SUBJECT_INTERESTS' | translate) + ('I18N_PREFERENCES_SUBJECT_INTERESTS_HELP_BLOCK' | translate)">
             {{ 'I18N_PREFERENCES_SUBJECT_INTERESTS' | translate }}
@@ -151,7 +151,7 @@
         </div>
 
         <div class="mb-3 row">
-          <label class="col-lg-4 col-md-4 col-sm-4" tabindex="0">
+          <label class="col-lg-4 col-md-4 col-sm-4 form-label" tabindex="0">
             {{ 'I18N_PREFERENCES_SUBSCRIBED_CREATORS' | translate }}
           </label>
           <div class="col-lg-8 col-md-8 col-sm-8">
@@ -200,7 +200,7 @@
         </div>
 
         <div class="mb-3 row">
-          <label class="col-lg-4 col-md-4 col-sm-4"
+          <label class="col-lg-4 col-md-4 col-sm-4 form-label"
                  tabindex="0"
                  [attr.aria-label]="('I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE' | translate) + ('I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE_EXPLAIN' | translate)">
             {{ 'I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE' | translate }}
@@ -211,14 +211,14 @@
                                          [choices]="LANGUAGE_CHOICES">
               </oppia-preferred-languages>
             </div>
-            <span class="form-tex d-blockt oppia-form-text">
+            <span class="form-text d-blockt oppia-form-text">
               {{ 'I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE_EXPLAIN' | translate }}
             </span>
           </div>
         </div>
 
         <div class="mb-3 row">
-          <label class="col-lg-4 col-md-4 col-sm-4"
+          <label class="col-lg-4 col-md-4 col-sm-4 form-label"
                  tabindex="0"
                  [attr.aria-label]="('I18N_PREFERENCES_PREFERRED_SITE_LANGUAGE' | translate) + ('I18N_PREFERENCES_PREFERRED_SITE_LANGUAGE_EXPLAIN' | translate)">
             {{ 'I18N_PREFERENCES_PREFERRED_SITE_LANGUAGE' | translate }}
@@ -238,7 +238,7 @@
         </div>
 
         <div class="mb-3 row">
-          <label class="col-lg-4 col-md-4 col-sm-4"
+          <label class="col-lg-4 col-md-4 col-sm-4 form-label"
                  tabindex="0"
                  [attr.aria-label]="('I18N_PREFERENCES_PREFERRED_AUDIO_LANGUAGE' | translate) + ('I18N_PREFERENCES_PREFERRED_AUDIO_LANGUAGE_EXPLAIN' | translate)">
             {{ "I18N_PREFERENCES_PREFERRED_AUDIO_LANGUAGE" | translate }}
@@ -258,7 +258,7 @@
         </div>
         <hr>
         <div role="form" class="mb-3 row">
-          <label class="col-lg-4 col-md-4 col-sm-4" tabindex="0">
+          <label class="col-lg-4 col-md-4 col-sm-4 form-label" tabindex="0">
             {{ 'I18N_PREFERENCES_EMAIL' | translate }}
           </label>
           <div class="col-lg-8 col-md-8 col-sm-8" formGroupName="emailPreferences">
@@ -329,7 +329,7 @@
 
       <hr>
       <div role="form" class="mb-3 row">
-        <label class="col-lg-4 col-md-4 col-sm-4" tabindex="0">
+        <label class="col-lg-4 col-md-4 col-sm-4 form-label" tabindex="0">
           {{ 'I18N_DELETE_ACCOUNT_PAGE_HEADING' | translate }}
         </label>
         <div class="col-lg-8 col-md-8 col-sm-8">
@@ -349,7 +349,7 @@
       <hr>
 
       <div role="form" class="mb-3 row">
-        <label class="col-lg-4 col-md-4 col-sm-4 text-capitalize" tabindex="0">
+        <label class="col-lg-4 col-md-4 col-sm-4 text-capitalize form-label" tabindex="0">
           {{ 'I18N_PREFERENCES_EXPORT_ACCOUNT' | translate }}
         </label>
         <div class="col-lg-8 col-md-8 col-sm-8" *ngIf="!exportingData">

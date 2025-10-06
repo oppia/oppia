@@ -337,7 +337,7 @@
           <strong>Add or Change Role</strong>
           <div class="mb-3">
             <form>
-              <label for="newMemberUsername">Username of invited user</label>
+              <label for="newMemberUsername" class="form-label">Username of invited user</label>
               <div>
                 <mat-form-field class="example-full-width" appearance="fill">
                   <mat-label>username</mat-label>
@@ -345,7 +345,7 @@
                 </mat-form-field>
               </div>
               <br>
-              <label for="newMemberRole" tabindex="0">Role of invited user</label>
+              <label for="newMemberRole" class="form-label" tabindex="0">Role of invited user</label>
               <div>
                 <mat-form-field appearance="fill">
                   <mat-select class="e2e-test-role-select" [(ngModel)]="newMemberRole" name="newMemberRole">
@@ -423,7 +423,7 @@
           <div class="mb-3">
             <form>
               <div>
-                <label>Add new voice artist: </label>
+                <label class="form-label">Add new voice artist: </label>
                 <input id="newVoicAartistUsername"
                        class="form-control e2e-test-new-voice-artist-username"
                        [(ngModel)]="newVoicAartistUsername"
