@@ -316,6 +316,21 @@ body {
   width: 100%;
 }
 
+.carousel-indicators {
+  display: flex;
+  justify-content: center;
+  left: 50%;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  transform: translateX(-50%);
+}
+
+.carousel-indicators li {
+  margin: 0 3px;
+}
+
 legend {
   border-bottom: 1px solid #e5e5e5;
   font-size: 21px;
