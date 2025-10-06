@@ -17,7 +17,6 @@
  */
 import {Component, Inject} from '@angular/core';
 import {MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
-
 @Component({
   selector: 'oppia-add-goals-modal',
   templateUrl: './add-goals-modal.component.html',
@@ -26,8 +25,6 @@ export class AddGoalsModalComponent {
   checkedTopics: Set<string>;
   completedTopics: Set<string>;
   topics: {[topicId: string]: string} = {};
-  publishedClassroomTopics: Set<string> = new Set();
-  originalCheckedTopics: Set<string>;
 
   constructor(
     public dialogRef: MatDialogRef<AddGoalsModalComponent>,
@@ -36,35 +33,15 @@ export class AddGoalsModalComponent {
       checkedTopics: Set<string>;
       completedTopics: Set<string>;
       topics: {[topicId: string]: string};
-      publishedClassroomTopics?: Set<string>;
     }
   ) {
-    this.checkedTopics = new Set(data.checkedTopics || []);
-    this.originalCheckedTopics = new Set(this.checkedTopics);
-
+    this.checkedTopics = new Set(data.checkedTopics);
     this.completedTopics = new Set(data.completedTopics);
     this.topics = data.topics;
-    this.publishedClassroomTopics =
-      data.publishedClassroomTopics || new Set(Object.keys(data.topics));
-  }
-
-  getPublishedTopics(): {[topicId: string]: string} {
-    const filteredTopics: {[topicId: string]: string} = {};
-
-    for (const [topicId, topicName] of Object.entries(this.topics)) {
-      if (this.publishedClassroomTopics.has(topicId)) {
-        filteredTopics[topicId] = topicName;
-      }
-    }
-
-    return filteredTopics;
   }
 
   onChange(id: string): void {
     if (!this.checkedTopics.has(id)) {
-      if (this.checkedTopics.size >= 5) {
-        return;
-      }
       this.checkedTopics.add(id);
     } else {
       this.checkedTopics.delete(id);
@@ -76,31 +53,6 @@ export class AddGoalsModalComponent {
   }
 
   onSubmit(): void {
-    if (!this.isSaveDisabled) {
-      this.dialogRef.close(this.checkedTopics);
-    }
-  }
-
-  get isSaveDisabled(): boolean {
-    return this.setsAreEqual(this.checkedTopics, this.originalCheckedTopics);
-  }
-
-  isCheckboxDisabled(topicId: string): boolean {
-    return (
-      this.completedTopics.has(topicId) ||
-      (this.checkedTopics.size >= 5 && !this.checkedTopics.has(topicId))
-    );
-  }
-
-  setsAreEqual(a: Set<string>, b: Set<string>): boolean {
-    if (a.size !== b.size) {
-      return false;
-    }
-    for (const val of a) {
-      if (!b.has(val)) {
-        return false;
-      }
-    }
-    return true;
+    this.dialogRef.close(this.checkedTopics);
   }
 }
