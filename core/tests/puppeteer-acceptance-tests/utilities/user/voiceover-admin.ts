@@ -87,13 +87,13 @@ export class VoiceoverAdmin extends BaseUser {
         await this.page.waitForSelector(mobileOptionsButtonSelector, {
           visible: true,
         });
-        await this.clickOn(mobileOptionsButtonSelector);
+        await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
       }
       await this.page.waitForSelector(mobileNavbarDropdown, {
         visible: true,
       });
-      await this.clickOn(mobileNavbarDropdown);
-      await this.clickOn(mobileSettingsBarSelector);
+      await this.clickOnElementWithSelector(mobileNavbarDropdown);
+      await this.clickOnElementWithSelector(mobileSettingsBarSelector);
 
       // Close dropdown if it doesn't automatically close.
       const isVisible = await this.isElementVisible(
@@ -106,17 +106,17 @@ export class VoiceoverAdmin extends BaseUser {
       }
 
       // Open all dropdowns because by default all dropdowns are closed in mobile view.
-      await this.clickOn(basicSettingsDropdown);
-      await this.clickOn(advanceSettingsDropdown);
-      await this.clickOn(rolesSettingsDropdown);
-      await this.clickOn(voiceArtistSettingsDropdown);
-      await this.clickOn(permissionSettingsDropdown);
-      await this.clickOn(feedbackSettingsDropdown);
+      await this.clickOnElementWithSelector(basicSettingsDropdown);
+      await this.clickOnElementWithSelector(advanceSettingsDropdown);
+      await this.clickOnElementWithSelector(rolesSettingsDropdown);
+      await this.clickOnElementWithSelector(voiceArtistSettingsDropdown);
+      await this.clickOnElementWithSelector(permissionSettingsDropdown);
+      await this.clickOnElementWithSelector(feedbackSettingsDropdown);
     } else {
       await this.page.waitForSelector(settingsTabSelector, {
         visible: true,
       });
-      await this.clickOn(settingsTabSelector);
+      await this.clickOnElementWithSelector(settingsTabSelector);
     }
 
     await this.page.waitForSelector(settingsContainerSelector, {
@@ -139,7 +139,7 @@ export class VoiceoverAdmin extends BaseUser {
     await this.page.waitForSelector(dismissWelcomeModalSelector, {
       visible: true,
     });
-    await this.clickOn(dismissWelcomeModalSelector);
+    await this.clickOnElementWithSelector(dismissWelcomeModalSelector);
     await this.page.waitForSelector(dismissWelcomeModalSelector, {
       hidden: true,
     });
@@ -175,7 +175,7 @@ export class VoiceoverAdmin extends BaseUser {
       this.isViewportAtMobileWidth() &&
       (await this.isElementVisible(mobileVoiceoverArtistsHeader))
     ) {
-      await this.clickOn(mobileVoiceoverArtistsHeader);
+      await this.clickOnElementWithSelector(mobileVoiceoverArtistsHeader);
     }
 
     await this.page.waitForFunction(
@@ -208,19 +208,19 @@ export class VoiceoverAdmin extends BaseUser {
     verify: boolean = true
   ): Promise<void> {
     if (!(await this.isElementVisible(voiceArtistSectionBodySelector))) {
-      await this.clickOn(voiceArtistSectionHeaderSelector);
+      await this.clickOnElementWithSelector(voiceArtistSectionHeaderSelector);
       await this.expectElementToBeVisible(voiceArtistSectionBodySelector);
     }
     for (let i = 0; i < voiceArtists.length; i++) {
       await this.expectElementToBeVisible(editVoiceoverArtistButton);
-      await this.clickOn(editVoiceoverArtistButton);
-      await this.clickOn(voiceArtistUsernameInputBox);
+      await this.clickOnElementWithSelector(editVoiceoverArtistButton);
+      await this.clickOnElementWithSelector(voiceArtistUsernameInputBox);
       await this.page.waitForSelector(voiceArtistUsernameInputBox, {
         visible: true,
       });
       await this.clearAllTextFrom(voiceArtistUsernameInputBox);
       await this.typeInInputField(voiceArtistUsernameInputBox, voiceArtists[i]);
-      await this.clickOn(saveVoiceoverArtistEditButton);
+      await this.clickOnElementWithSelector(saveVoiceoverArtistEditButton);
       // Adding try catch here to avoid unnecessary waiting for selector if
       // the added voice artist is not an user.
       if (verify) {
@@ -248,7 +248,7 @@ export class VoiceoverAdmin extends BaseUser {
     const removeVoiceoverArtistBtnSelector =
       '.e2e-test-remove-voice-artist-button';
     await this.expectElementToBeVisible(editVoiceoverArtistButton);
-    await this.clickOn(editVoiceoverArtistButton);
+    await this.clickOnElementWithSelector(editVoiceoverArtistButton);
 
     const selector = `div.e2e-test-voice-artist-${voiceArtistUsername}`;
     await this.expectElementToBeVisible(selector);
@@ -307,7 +307,7 @@ export class VoiceoverAdmin extends BaseUser {
    */
   async closeToastMessage(): Promise<void> {
     await this.expectElementToBeVisible(toastWarningContainer);
-    await this.clickOn(closeToastMessageButton);
+    await this.clickOnElementWithSelector(closeToastMessageButton);
 
     await this.expectElementToBeVisible(toastWarningContainer, false);
   }
@@ -383,10 +383,10 @@ export class VoiceoverAdmin extends BaseUser {
     await this.waitForPageToFullyLoad();
 
     await this.page.waitForSelector(addNewLanguageAccentButtonSelector);
-    await this.clickOn(addNewLanguageAccentButtonSelector);
+    await this.clickOnElementWithSelector(addNewLanguageAccentButtonSelector);
 
     await this.page.waitForSelector(languageAccentDropdownSelector);
-    await this.clickOn(languageAccentDropdownSelector);
+    await this.clickOnElementWithSelector(languageAccentDropdownSelector);
 
     await this.page.waitForSelector(languageAccentOptionSelector);
     const languageOptions = await this.page.$$(languageAccentOptionSelector);
@@ -414,7 +414,7 @@ export class VoiceoverAdmin extends BaseUser {
     const enableAutogenerationSelector =
       enableAutogenerationSelectorTemplate(languageAccentCode);
     await this.page.waitForSelector(enableAutogenerationSelector);
-    await this.clickOn(enableAutogenerationSelector);
+    await this.clickOnElementWithSelector(enableAutogenerationSelector);
 
     await this.page.waitForSelector(enableAutogenerationOptionSelector);
     const options = await this.page.$$(enableAutogenerationOptionSelector);
@@ -435,7 +435,9 @@ export class VoiceoverAdmin extends BaseUser {
         timeout: 5000,
       }
     );
-    await this.clickOn(enableAutogenerationConfirmationButtonSelector);
+    await this.clickOnElementWithSelector(
+      enableAutogenerationConfirmationButtonSelector
+    );
     await this.page.waitForSelector(
       enableAutogenerationConfirmationButtonSelector,
       {

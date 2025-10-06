@@ -49,8 +49,7 @@ class EmailTests(test_utils.GenericTestBase):
             """Mocks logging.info()."""
             observed_log_messages.append(msg % args)
 
-        msg_body = (
-            """
+        msg_body = """
             EmailService.SendMail
             From: %s
             To: %s
@@ -71,22 +70,33 @@ class EmailTests(test_utils.GenericTestBase):
 
             Attachments: None
             """ % (
-                self.system_email_address, self.admin_email_address,
-                'subject', 4, 4, 'html'))
+            self.system_email_address,
+            self.admin_email_address,
+            'subject',
+            4,
+            4,
+            'html',
+        )
         logging_info_email_body = textwrap.dedent(msg_body)
         logging_info_notification = (
             'You are not currently sending out real emails since this is a '
             'dev environment. Emails are sent out in the production'
-            ' environment.')
+            ' environment.'
+        )
 
         with self.swap(logging, 'info', _mock_logging_function):
             dev_mode_email_services.send_email_to_recipients(
-                self.system_email_address, [self.admin_email_address],
-                'subject', 'body', 'html')
+                self.system_email_address,
+                [self.admin_email_address],
+                'subject',
+                'body',
+                'html',
+            )
         self.assertEqual(len(observed_log_messages), 2)
         self.assertEqual(
             observed_log_messages,
-            [logging_info_email_body, logging_info_notification])
+            [logging_info_email_body, logging_info_notification],
+        )
 
     @test_utils.set_platform_parameters(
         [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
@@ -104,15 +114,13 @@ class EmailTests(test_utils.GenericTestBase):
         recipient_email_list_str = 'a@a.com b@b.com c@c.com... Total: 4 emails.'
         bcc_email_list_str = 'e@e.com f@f.com g@g.com... Total: 4 emails.'
         cc_email_list_str = 'a@n.com b@n.com c@n.com... Total: 5 emails.'
-        recipient_variables: Dict[str, Dict[str, Union[str, float]]] = (
-            {
-                'a@a.com': {'first': 'Bob', 'id': 1},
-                'b@b.com': {'first': 'Jane', 'id': 2},
-                'c@c.com': {'first': 'Rob', 'id': 3},
-                'd@d.com': {'first': 'Emily', 'id': 4},
-            })
-        msg_body = (
-            """
+        recipient_variables: Dict[str, Dict[str, Union[str, float]]] = {
+            'a@a.com': {'first': 'Bob', 'id': 1},
+            'b@b.com': {'first': 'Jane', 'id': 2},
+            'c@c.com': {'first': 'Rob', 'id': 3},
+            'd@d.com': {'first': 'Emily', 'id': 4},
+        }
+        msg_body = """
             EmailService.SendMail
             From: %s
             To: %s
@@ -133,29 +141,42 @@ class EmailTests(test_utils.GenericTestBase):
 
             Attachments: %s
             """ % (
-                self.system_email_address, recipient_email_list_str,
-                'subject', 4, 4, 'html', cc_email_list_str, bcc_email_list_str,
-                '123', len(recipient_variables), 'attachment.txt'))
+            self.system_email_address,
+            recipient_email_list_str,
+            'subject',
+            4,
+            4,
+            'html',
+            cc_email_list_str,
+            bcc_email_list_str,
+            '123',
+            len(recipient_variables),
+            'attachment.txt',
+        )
         logging_info_email_body = textwrap.dedent(msg_body)
         logging_info_notification = (
             'You are not currently sending out real emails since this is a '
             'dev environment. Emails are sent out in the production'
-            ' environment.')
+            ' environment.'
+        )
 
         with self.swap(logging, 'info', _mock_logging_function):
             dev_mode_email_services.send_email_to_recipients(
                 self.system_email_address,
                 ['a@a.com', 'b@b.com', 'c@c.com', 'd@d.com'],
-                'subject', 'body', 'html',
+                'subject',
+                'body',
+                'html',
                 cc=['a@n.com', 'b@n.com', 'c@n.com', 'd@n.com', 'e@n.com'],
                 bcc=['e@e.com', 'f@f.com', 'g@g.com', 'h@h.com'],
                 reply_to='123',
                 recipient_variables=recipient_variables,
-                attachments=[{
-                    'filename': 'attachment.txt',
-                    'path': '/dummypath'
-                }])
+                attachments=[
+                    {'filename': 'attachment.txt', 'path': '/dummypath'}
+                ],
+            )
         self.assertEqual(len(observed_log_messages), 2)
         self.assertEqual(
             observed_log_messages,
-            [logging_info_email_body, logging_info_notification])
+            [logging_info_email_body, logging_info_notification],
+        )

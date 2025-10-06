@@ -28,7 +28,7 @@ from google.cloud import secretmanager
 from typing import Optional
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import app_identity_services
 
 app_identity_services = models.Registry.import_app_identity_services()
@@ -38,7 +38,10 @@ app_identity_services = models.Registry.import_app_identity_services()
 CLIENT = secretmanager.SecretManagerServiceClient(
     credentials=(
         auth.credentials.AnonymousCredentials()
-        if constants.EMULATOR_MODE else auth.default()[0]))
+        if constants.EMULATOR_MODE
+        else auth.default()[0]
+    )
+)
 
 
 @functools.lru_cache(maxsize=64)
@@ -52,8 +55,7 @@ def get_secret(name: str) -> Optional[str]:
         str. The value of the secret.
     """
     oppia_project_id = app_identity_services.get_application_id()
-    secret_name = (
-        f'projects/{oppia_project_id}/secrets/{name}/versions/latest')
+    secret_name = f'projects/{oppia_project_id}/secrets/{name}/versions/latest'
     try:
         response = CLIENT.access_secret_version(request={'name': secret_name})
     except Exception:

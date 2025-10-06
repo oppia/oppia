@@ -26,10 +26,13 @@ from typing import Dict, Final, List, Optional, TypedDict
 _PARSER: Final = argparse.ArgumentParser(
     description="""
 Checks the status of a GitHub workflow run using the status of its jobs.
-""")
+"""
+)
 
 _PARSER.add_argument(
-    '--jobs', type=str, required=True,
+    '--jobs',
+    type=str,
+    required=True,
 )
 
 
@@ -58,13 +61,14 @@ class GithubJobDict(TypedDict):
 def get_workflow_status(jobs: Dict[str, GithubJobDict]) -> WorkflowStatusEnum:
     """Gets the status of a GitHub workflow run using the status of its jobs."""
     workflow_is_successful = all(
-        GithubJobResultEnum(job['result']) in [
-            GithubJobResultEnum.SUCCESS, GithubJobResultEnum.SKIPPED
-        ] for job in jobs.values()
+        GithubJobResultEnum(job['result'])
+        in [GithubJobResultEnum.SUCCESS, GithubJobResultEnum.SKIPPED]
+        for job in jobs.values()
     )
 
     return (
-        WorkflowStatusEnum.SUCCESS if workflow_is_successful
+        WorkflowStatusEnum.SUCCESS
+        if workflow_is_successful
         else WorkflowStatusEnum.FAILURE
     )
 

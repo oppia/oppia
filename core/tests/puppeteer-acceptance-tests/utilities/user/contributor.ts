@@ -225,8 +225,7 @@ export class Contributor extends ExplorationEditor {
       button === 'previous'
         ? paginationButtonPreviousSelector
         : paginationButtonNextSelector;
-    await this.expectElementToBeVisible(selector);
-    await this.clickOn(selector);
+    await this.clickOnElementWithSelector(selector);
 
     await this.page.waitForFunction(
       (selector: string, initialContent: string) => {
@@ -257,7 +256,7 @@ export class Contributor extends ExplorationEditor {
         {},
         viewDropdownSelector
       );
-      await this.clickOn(viewDropdownSelector);
+      await this.clickOnElementWithSelector(viewDropdownSelector);
 
       const xpath = `//*[contains(@class, '${viewDropdownOptionClass}') and contains(text(), "${tabName}")]`;
 
@@ -355,8 +354,7 @@ export class Contributor extends ExplorationEditor {
       return;
     }
 
-    await this.expectElementToBeVisible(topicSelector);
-    await this.clickOn(topicSelector);
+    await this.clickOnElementWithSelector(topicSelector);
 
     await this.expectElementToBeVisible(topicOptionSelector);
 
@@ -391,8 +389,7 @@ export class Contributor extends ExplorationEditor {
       await this.waitForPageToFullyLoad();
     }
 
-    await this.expectElementToBeVisible(selectedOptionSelector);
-    await this.clickOn(selectedOptionSelector);
+    await this.clickOnElementWithSelector(selectedOptionSelector);
 
     await this.expectElementToBeVisible(topicOptionSelector);
     const contibutionTypeOptions = await this.page.$$(topicOptionSelector);
@@ -426,8 +423,7 @@ export class Contributor extends ExplorationEditor {
    * @param {string} topicName - The name of the topic to filter by.
    */
   async filterContentByTopic(topicName: string): Promise<void> {
-    await this.expectElementToBeVisible(topicSelector);
-    await this.clickOn(topicSelector);
+    await this.clickOnElementWithSelector(topicSelector);
 
     await this.expectElementToBeVisible(topicOptionSelector);
     const optionElements = await this.page.$$(topicOptionSelector);
@@ -583,8 +579,7 @@ export class Contributor extends ExplorationEditor {
    */
   async clickOnLanguageFilterDropdown(): Promise<void> {
     // Open the language selector dropdown.
-    await this.expectElementToBeVisible(languageSelector);
-    await this.clickOn(languageSelector);
+    await this.clickOnElementWithSelector(languageSelector);
     await this.waitForPageToFullyLoad();
 
     await this.expectElementToBeVisible(languageOptionSelector);
@@ -684,7 +679,7 @@ export class Contributor extends ExplorationEditor {
       tooltipMessage
     );
 
-    await this.clickOn(languageDropdownToggleArrowSelector);
+    await this.clickOnElementWithSelector(languageDropdownToggleArrowSelector);
 
     await this.expectElementToBeVisible(languageOptionSelector, false);
   }

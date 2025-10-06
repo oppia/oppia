@@ -356,10 +356,10 @@ export class BaseUser {
   async signInWithEmail(email: string): Promise<void> {
     await this.goto(testConstants.URLs.Home);
     if (!this.userHasAcceptedCookies) {
-      await this.clickOn('OK');
+      await this.clickOnElementWithText('OK');
       this.userHasAcceptedCookies = true;
     }
-    await this.clickOn('Sign in');
+    await this.clickOnElementWithText('Sign in');
     await this.typeInInputField(testConstants.SignInDetails.inputField, email);
     await this.clickAndWaitForNavigation('Sign In');
   }
@@ -370,7 +370,9 @@ export class BaseUser {
   async signUpNewUser(username: string, email: string): Promise<void> {
     await this.signInWithEmail(email);
     await this.typeInInputField('input.e2e-test-username-input', username);
-    await this.clickOn('input.e2e-test-agree-to-terms-checkbox');
+    await this.clickOnElementWithSelector(
+      'input.e2e-test-agree-to-terms-checkbox'
+    );
     await this.page.waitForSelector(
       'button.e2e-test-register-user:not([disabled])'
     );
@@ -470,55 +472,97 @@ export class BaseUser {
   }
 
   /**
-   * The function clicks the element using the text on the button.
-   * @param selector The text of the button to click on.
-   * @param forceSelector If true, the function will try to find the element by its CSS selector.
-   * @param parentElement The parent element to search within.
+   * Clicks on the given element after checking if it's clickable and not in
+   * tansition animation.
+   * Note: This function doesn't have post-check.
+   * @param element - The Puppeteer element to click on.
+   * @param options - Click options.
    */
-  async clickOn(
+  async clickOnElement(
+    element: ElementHandle<Element>,
+    options: puppeteer.ClickOptions = {}
+  ): Promise<void> {
+    await this.waitForElementToStabilize(element);
+    await this.waitForElementToBeClickable(element);
+    await element.click(options);
+  }
+
+  /**
+   * The function clicks the element using the text on the button.
+   * @param selector - The text of the button to click on.
+   * @param parentElement - The parent element to search within.
+   * @param elementPlace - 1-based index to select nth element with the given selector.
+   */
+  async clickOnElementWithSelector(
     selector: string,
-    forceSelector: boolean = false,
-    parentElement?: puppeteer.ElementHandle
+    parentElement?: puppeteer.ElementHandle | null,
+    elementPlace?: number
   ): Promise<void> {
     const context = parentElement ?? this.page;
-    /** Normalize-space is used to remove the extra spaces in the text.
-     * Check the documentation for the normalize-space function here :
-     * https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space */
-    const [button] = await context.$x(
-      `\/\/*[contains(text(), normalize-space('${selector}'))]`
-    );
-    // If we fail to find the element by its XPATH, then the button is undefined and
-    // we try to find it by its CSS selector.
-    if (button !== undefined && !forceSelector) {
-      await this.waitForElementToBeClickable(button);
-      showMessage(`Button (text: ${selector}) is clickable, as expected.`);
-      await button.click();
-      showMessage(`Button (text: ${selector}) is clicked.`);
-    } else {
-      const element = await context.waitForSelector(selector, {visible: true});
-      if (!element) {
-        throw new Error(`Element not found for selector ${selector}`);
+    let element = await context.waitForSelector(selector, {timeout: 15000});
+
+    // Get nth element if elementPlace is given.
+    if (elementPlace) {
+      const elements = await context.$$(selector);
+      if (elements.length < elementPlace) {
+        throw Error(
+          `Only ${elements.length} elements found for selecter "${selector}".\n` +
+            `Required atleast ${elementPlace}`
+        );
       }
-      await this.waitForElementToBeClickable(element);
-      showMessage(`Element (selector: ${selector}) is clickable, as expected.`);
-      await element.click();
-      showMessage(`Element (selector: ${selector}) is clicked.`);
+
+      element = elements[elementPlace - 1];
     }
+
+    // Click on the element.
+    if (!element) {
+      throw new Error(`Element not found for selector ${selector}`);
+    }
+    await this.clickOnElement(element);
+    showMessage(`Element (selector: ${selector}) clicked.`);
+  }
+
+  /**
+   * Clicks on the element with the given text.
+   * @param text The text of the element to click on.
+   */
+  async clickOnElementWithText(text: string): Promise<void> {
+    // Normalize-space is used to remove the extra spaces in the text.
+    // Check the documentation for the normalize-space function here :
+    // https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space.
+    const element = await this.page.waitForXPath(
+      `//*[contains(normalize-space(text()), normalize-space("${text}"))]`,
+      {timeout: 10000}
+    );
+
+    if (!element) {
+      throw new Error(`Element not found for text: ${text}`);
+    }
+    await this.clickOnElement(element);
+    showMessage(`Element (text: ${text}) clicked.`);
   }
 
   /**
    * Clicks on the element and returns a new page opened by the click.
    * @param selector The selector of the element.
+   * @param useSelector - Whether to use selector or textcontent.
    * @returns The new page opened by the click.
    */
-  async clickOnElementAndGetNewPage(selector: string): Promise<Page> {
+  async clickOnElementAndGetNewPage(
+    selector: string,
+    useSelector: boolean = false
+  ): Promise<Page> {
     const newPagePromise: Promise<Page> = new Promise<Page>(resolve =>
       this.browserObject.once('targetcreated', async target => {
         const page = await target.page();
         resolve(page);
       })
     );
-    await this.clickOn(selector);
+    if (useSelector) {
+      await this.clickOnElementWithSelector(selector);
+    } else {
+      await this.clickOnElementWithText(selector);
+    }
     const newPage = await newPagePromise;
     return newPage;
   }
@@ -566,17 +610,24 @@ export class BaseUser {
    * The function clicks the element using the text on the button
    * and wait until the new page is fully loaded.
    * @param selector - The selector of button to click.
+   * @param useSelector - Whether to use the selector or the text.
    * @param options - The navigation options.
    */
   async clickAndWaitForNavigation(
     selector: string,
+    useSelector: boolean = false,
     options: puppeteer.WaitForOptions = {
       waitUntil: ['networkidle2', 'load'],
     }
   ): Promise<void> {
     const navigationPromise = this.page.waitForNavigation(options);
 
-    await this.clickOn(selector, false);
+    if (useSelector) {
+      await this.waitForElementToStabilize(selector);
+      await this.clickOnElementWithSelector(selector);
+    } else {
+      await this.clickOnElementWithText(selector);
+    }
     await navigationPromise;
   }
 
@@ -1058,8 +1109,15 @@ export class BaseUser {
   ): Promise<Page | null> {
     const xpath = `//a[normalize-space(.)="${anchorInnerText}"]`;
     const element = await context.waitForXPath(xpath);
+
+    if (!element) {
+      throw new Error(`No element found for text: ${anchorInnerText}`);
+    }
+
     const pageTarget = context.target();
-    await element?.click();
+    await this.waitForElementToBeClickable(element);
+    await this.waitForElementToStabilize(element);
+    await element.click();
     const newTarget = await this.browserObject.waitForTarget(
       target => target.opener() === pageTarget
     );
@@ -1661,7 +1719,7 @@ export class BaseUser {
     selector: string | ElementHandle<Element>,
     timeout: number = 5000
   ): Promise<void> {
-    const element =
+    let element =
       typeof selector === 'string'
         ? await this.page.waitForSelector(selector, {visible: true})
         : selector;
@@ -1674,6 +1732,14 @@ export class BaseUser {
 
     while (Date.now() - startTime < timeout) {
       await this.page.waitForTimeout(100);
+
+      // If selector is given, try getting the latest attached element.
+      element =
+        typeof selector === 'string' ? await this.page.$(selector) : element;
+      if (!element) {
+        showMessage('It seems element has detached.');
+        continue;
+      }
       const currentBox = await element.boundingBox();
 
       if (
@@ -1839,7 +1905,7 @@ export class BaseUser {
         ? commonModalConfirmBtnSelector
         : commonModalCancelBtnSelector;
     await this.expectElementToBeVisible(currentActionBtnSelector);
-    await this.clickOn(currentActionBtnSelector);
+    await this.clickOnElementWithSelector(currentActionBtnSelector);
 
     await this.expectElementToBeVisible(currentActionBtnSelector, false);
   }
@@ -1877,7 +1943,7 @@ export class BaseUser {
    */
   async closeToastWarningMessage(): Promise<void> {
     await this.expectElementToBeVisible(warningToastCloseButtonSelector);
-    await this.clickOn(warningToastCloseButtonSelector);
+    await this.clickOnElementWithSelector(warningToastCloseButtonSelector);
     await this.expectElementToBeVisible(warningToastMessageSelector, false);
   }
 
@@ -1955,42 +2021,6 @@ export class BaseUser {
 
     // If no pattern matches, throw an error.
     throw new Error(`Unable to parse date string: "${dateString}"`);
-  }
-
-  /**
-   * Clicks on the given element after waiting for it to be clickable.
-   * Note: This function does not have post-check.
-   * @param element The element to click on.
-   * @param options The options to pass to the click function.
-   */
-  async clickOnElement(
-    element: ElementHandle<Element>,
-    options: puppeteer.ClickOptions = {}
-  ): Promise<void> {
-    await this.waitForElementToBeClickable(element);
-    await element.click(options);
-  }
-
-  /**
-   * Clicks on the element with the given text.
-   * @param text The text of the element to click on.
-   */
-  async clickOnElementWithText(text: string): Promise<void> {
-    // Normalize-space is used to remove the extra spaces in the text.
-    // Check the documentation for the normalize-space function here :
-    // https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space.
-    const element = await this.page.waitForXPath(
-      `//*[contains(normalize-space(text()), normalize-space("${text}"))]`,
-      {timeout: 10000}
-    );
-
-    if (!element) {
-      throw new Error(`Element not found for text: ${text}`);
-    }
-    await this.waitForElementToStabilize(element);
-    await this.waitForElementToBeClickable(element);
-    await element.click();
-    showMessage(`Element (text: ${text}) is clicked.`);
   }
 }
 

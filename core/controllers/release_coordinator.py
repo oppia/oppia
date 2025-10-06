@@ -27,27 +27,24 @@ from core.domain import user_services
 from typing import Dict, List, TypedDict
 
 
-class MemoryCacheHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class MemoryCacheHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Handler for memory cache profile."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
-        'GET': {},
-        'DELETE': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}, 'DELETE': {}}
 
     @acl_decorators.can_manage_memcache
     def get(self) -> None:
         """Retrieves statistics about the memory cache."""
         cache_stats = caching_services.get_memory_cache_stats()
-        self.render_json({
-            'total_allocation': cache_stats.total_allocated_in_bytes,
-            'peak_allocation': cache_stats.peak_memory_usage_in_bytes,
-            'total_keys_stored': cache_stats.total_number_of_keys_stored
-        })
+        self.render_json(
+            {
+                'total_allocation': cache_stats.total_allocated_in_bytes,
+                'peak_allocation': cache_stats.peak_memory_usage_in_bytes,
+                'total_keys_stored': cache_stats.total_number_of_keys_stored,
+            }
+        )
 
     @acl_decorators.can_manage_memcache
     def delete(self) -> None:
@@ -67,10 +64,7 @@ class UserGroupHandlerNormalizePayloadDict(TypedDict):
 
 
 class UserGroupHandler(
-    base.BaseHandler[
-        UserGroupHandlerNormalizePayloadDict,
-        Dict[str, str]
-    ]
+    base.BaseHandler[UserGroupHandlerNormalizePayloadDict, Dict[str, str]]
 ):
     """Handler for user groups."""
 
@@ -79,47 +73,19 @@ class UserGroupHandler(
     HANDLER_ARGS_SCHEMAS = {
         'GET': {},
         'POST': {
-            'name': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
+            'name': {'schema': {'type': 'basestring'}},
             'member_usernames': {
-                'schema': {
-                    'type': 'list',
-                    'items': {
-                        'type': 'basestring'
-                    }
-                }
-            }
+                'schema': {'type': 'list', 'items': {'type': 'basestring'}}
+            },
         },
         'PUT': {
-            'user_group_id': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
-            'name': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
+            'user_group_id': {'schema': {'type': 'basestring'}},
+            'name': {'schema': {'type': 'basestring'}},
             'member_usernames': {
-                'schema': {
-                    'type': 'list',
-                    'items': {
-                        'type': 'basestring'
-                    }
-                }
-            }
+                'schema': {'type': 'list', 'items': {'type': 'basestring'}}
+            },
         },
-        'DELETE': {
-            'user_group_id': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            }
-        }
+        'DELETE': {'user_group_id': {'schema': {'type': 'basestring'}}},
     }
 
     @acl_decorators.can_access_release_coordinator_page
@@ -130,9 +96,7 @@ class UserGroupHandler(
         for user_group in user_groups:
             user_groups_dict_list.append(user_group.to_dict())
 
-        self.render_json({
-            'user_group_dicts': user_groups_dict_list
-        })
+        self.render_json({'user_group_dicts': user_groups_dict_list})
 
     @acl_decorators.can_access_release_coordinator_page
     def post(self) -> None:
@@ -142,8 +106,7 @@ class UserGroupHandler(
         assert self.normalized_payload is not None
         name = self.normalized_payload['name']
         member_usernames = self.normalized_payload['member_usernames']
-        user_group = user_services.create_new_user_group(
-            name, member_usernames)
+        user_group = user_services.create_new_user_group(name, member_usernames)
         self.render_json({'user_group_dict': user_group.to_dict()})
 
     @acl_decorators.can_access_release_coordinator_page
@@ -154,8 +117,7 @@ class UserGroupHandler(
         user_group_id = self.normalized_payload['user_group_id']
         name = self.normalized_payload['name']
         member_usernames = self.normalized_payload['member_usernames']
-        user_services.update_user_group(
-            user_group_id, name, member_usernames)
+        user_services.update_user_group(user_group_id, name, member_usernames)
         self.render_json(self.values)
 
     @acl_decorators.can_access_release_coordinator_page
@@ -180,8 +142,7 @@ class FeatureFlagsHandlerNormalizedPayloadDict(TypedDict):
 
 
 class FeatureFlagsHandler(
-    base.BaseHandler[
-        FeatureFlagsHandlerNormalizedPayloadDict, Dict[str, str]]
+    base.BaseHandler[FeatureFlagsHandlerNormalizedPayloadDict, Dict[str, str]]
 ):
     """Handler for feature-flags."""
 
@@ -193,47 +154,33 @@ class FeatureFlagsHandler(
             'action': {
                 'schema': {
                     'type': 'basestring',
-                    'choices': [
-                        'update_feature_flag'
-                    ]
+                    'choices': ['update_feature_flag'],
                 },
-                'default_value': None
+                'default_value': None,
             },
             'feature_flag_name': {
-                'schema': {
-                    'type': 'basestring'
-                },
-                'default_value': None
+                'schema': {'type': 'basestring'},
+                'default_value': None,
             },
             'force_enable_for_all_users': {
-                'schema': {
-                    'type': 'bool'
-                },
-                'default_value': None
+                'schema': {'type': 'bool'},
+                'default_value': None,
             },
             'rollout_percentage': {
                 'schema': {
                     'type': 'int',
-                    'validators': [{
-                        'id': 'is_at_least',
-                        'min_value': 0
-                    }, {
-                        'id': 'is_at_most',
-                        'max_value': 100
-                    }]
+                    'validators': [
+                        {'id': 'is_at_least', 'min_value': 0},
+                        {'id': 'is_at_most', 'max_value': 100},
+                    ],
                 },
-                'default_value': None
+                'default_value': None,
             },
             'user_group_ids': {
-                'schema': {
-                    'type': 'list',
-                    'items': {
-                        'type': 'unicode'
-                    }
-                },
-                'default_value': None
-            }
-        }
+                'schema': {'type': 'list', 'items': {'type': 'unicode'}},
+                'default_value': None,
+            },
+        },
     }
 
     @acl_decorators.can_access_release_coordinator_page
@@ -247,11 +194,13 @@ class FeatureFlagsHandler(
         user_group_dicts = []
         for user_group in user_groups:
             user_group_dicts.append(user_group.to_dict())
-        self.render_json({
-            'feature_flags': feature_flags_dict,
-            'server_stage': feature_flag_domain.get_server_mode().value,
-            'user_group_dicts': user_group_dicts
-        })
+        self.render_json(
+            {
+                'feature_flags': feature_flags_dict,
+                'server_stage': feature_flag_domain.get_server_mode().value,
+                'user_group_dicts': user_group_dicts,
+            }
+        )
 
     @acl_decorators.can_access_release_coordinator_page
     def put(self) -> None:
@@ -273,12 +222,14 @@ class FeatureFlagsHandler(
                 )
 
             force_enable_for_all_users = self.normalized_payload.get(
-                'force_enable_for_all_users')
+                'force_enable_for_all_users'
+            )
             # Ruling out the possibility of any other type for mypy
             # type checking.
             assert force_enable_for_all_users is not None
             rollout_percentage = self.normalized_payload.get(
-                'rollout_percentage')
+                'rollout_percentage'
+            )
             # Ruling out the possibility of any other type for mypy
             # type checking.
             assert rollout_percentage is not None
@@ -291,22 +242,26 @@ class FeatureFlagsHandler(
                     feature_flag_name,
                     force_enable_for_all_users,
                     rollout_percentage,
-                    user_group_ids
+                    user_group_ids,
                 )
             except (
-                    utils.ValidationError,
-                    feature_services.FeatureFlagNotFoundException) as e:
+                utils.ValidationError,
+                feature_services.FeatureFlagNotFoundException,
+            ) as e:
                 raise self.InvalidInputException(e)
 
             logging.info(
                 '[RELEASE-COORDINATOR] %s updated feature %s with new values: '
                 'rollout_percentage - %d, force_enable_for_all_users - %s, '
-                'user_group_ids - %s.' % (
-                    self.user_id, feature_flag_name,
+                'user_group_ids - %s.'
+                % (
+                    self.user_id,
+                    feature_flag_name,
                     rollout_percentage,
                     force_enable_for_all_users,
-                    user_group_ids)
+                    user_group_ids,
                 )
+            )
             self.render_json(self.values)
         except Exception as e:
             logging.exception('[RELEASE-COORDINATOR] %s', e)
