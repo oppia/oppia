@@ -51,7 +51,7 @@ body:
   - type: textarea
     id: screenshots
     attributes:
-      label: Screenshots
+      label: Screenshots / Screen Recordings
       description: >
         If screenshots or screen recordings would help explain the failure,
         include them here.
