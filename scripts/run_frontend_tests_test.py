@@ -235,17 +235,17 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                     run_frontend_tests.main(
                         args=['--check_coverage', '--specs_to_run='
                               'home-page.component.spec.ts,'
-                              'about-page.component.ts,'
-                              'test-module.js'])
-                        args=[
+                              'about-page.component.spec.ts,'
+                              'test-module.spec.js'])
+                args=[
                             '--check_coverage',
                             '--specs_to_run='
                             'home-page.component.spec.ts,'
-                            'about-page.component.ts,'
+                            'about-page.component.spec.ts,'
                             'test-module.js,'
-                            'ExplorationObjectFactory.ts',
+                            'exploration.model.ts',
                         ]
-                    )
+                    
 
         cmd = [
             common.NODE_BIN_PATH,
@@ -271,7 +271,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             [
                 [
                     '--files_to_check='
-                    'ExplorationObjectFactorySpec.ts,'
+                    'exploration.model.spec.ts,'
                     'about-page.component.spec.ts,'
                     'home-page.component.spec.ts,'
                     'test-module.spec.js'
