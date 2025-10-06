@@ -48,20 +48,13 @@ class ClassroomAccessValidationHandler(
         Dict[str, str], ClassroomAccessValidationHandlerNormalizedRequestDict
     ]
 ):
-    """Validates whether request made to /learn route.
-    """
+    """Validates whether request made to /learn route."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
-        'GET': {
-            'classroom_url_fragment': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            }
-        }
+        'GET': {'classroom_url_fragment': {'schema': {'type': 'basestring'}}}
     }
 
     @acl_decorators.open_access
@@ -76,14 +69,16 @@ class ClassroomAccessValidationHandler(
             'classroom_url_fragment'
         ]
         classroom = classroom_config_services.get_classroom_by_url_fragment(
-            classroom_url_fragment)
+            classroom_url_fragment
+        )
 
         if not classroom:
             raise self.NotFoundException
 
         if not classroom.is_published:
             if self.user_id is None or not user_services.is_curriculum_admin(
-                self.user_id):
+                self.user_id
+            ):
                 raise self.NotFoundException
 
 
@@ -94,9 +89,7 @@ class ClassroomsPageAccessValidationHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
     def get(self) -> None:
@@ -125,15 +118,18 @@ class SubtopicViewerPageRevisionRedirectHandler(
         'subtopic_url_fragment': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.VALID_URL_FRAGMENT_REGEX
-                }, {
-                    'id': 'has_length_at_most',
-                    'max_value': constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT
-                }]
+                'validators': [
+                    {
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.VALID_URL_FRAGMENT_REGEX,
+                    },
+                    {
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT,
+                    },
+                ],
             }
-        }
+        },
     }
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
@@ -141,14 +137,16 @@ class SubtopicViewerPageRevisionRedirectHandler(
     def get(self, *args: str) -> None:
         """Handles GET requests and redirects to study guide URL."""
         classroom_url_fragment = self.request.route_kwargs.get(
-            'classroom_url_fragment')
+            'classroom_url_fragment'
+        )
         topic_url_fragment = self.request.route_kwargs.get('topic_url_fragment')
         subtopic_url_fragment = self.request.route_kwargs.get(
-            'subtopic_url_fragment')
+            'subtopic_url_fragment'
+        )
         new_url = '/learn/%s/%s/studyguide/%s' % (
             classroom_url_fragment,
             topic_url_fragment,
-            subtopic_url_fragment
+            subtopic_url_fragment,
         )
         self.redirect(new_url, permanent=True)
 
@@ -156,7 +154,7 @@ class SubtopicViewerPageRevisionRedirectHandler(
 class SubtopicViewerPageAccessValidationHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
-    """ Validates access to the Subtopic Viewer Page """
+    """Validates access to the Subtopic Viewer Page"""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
@@ -165,15 +163,18 @@ class SubtopicViewerPageAccessValidationHandler(
         'subtopic_url_fragment': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.VALID_URL_FRAGMENT_REGEX
-                }, {
-                    'id': 'has_length_at_most',
-                    'max_value': constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT
-                }]
+                'validators': [
+                    {
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.VALID_URL_FRAGMENT_REGEX,
+                    },
+                    {
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT,
+                    },
+                ],
             }
-        }
+        },
     }
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
@@ -191,11 +192,7 @@ class CollectionViewerPageAccessValidationHandler(
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     URL_PATH_ARGS_SCHEMAS = {
-       'collection_id': {
-           'schema': {
-               'type': 'basestring'
-           }
-       }
+        'collection_id': {'schema': {'type': 'basestring'}}
     }
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
@@ -213,7 +210,7 @@ class TopicViewerPageRevisionRedirectHandler(
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
         'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
-        'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS
+        'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
     }
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
@@ -221,11 +218,12 @@ class TopicViewerPageRevisionRedirectHandler(
     def get(self, *args: str) -> None:
         """Handles GET requests and redirects to study guide URL."""
         classroom_url_fragment = self.request.route_kwargs.get(
-            'classroom_url_fragment')
+            'classroom_url_fragment'
+        )
         topic_url_fragment = self.request.route_kwargs.get('topic_url_fragment')
         new_url = '/learn/%s/%s/studyguide' % (
             classroom_url_fragment,
-            topic_url_fragment
+            topic_url_fragment,
         )
         self.redirect(new_url, permanent=True)
 
@@ -239,7 +237,7 @@ class TopicViewerPageAccessValidationHandler(
 
     URL_PATH_ARGS_SCHEMAS = {
         'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
-        'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS
+        'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
     }
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
@@ -276,15 +274,12 @@ class FacilitatorDashboardPageAccessValidationHandler(
 class ManageOwnAccountValidationHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
-    """Validates access to preferences page.
-    """
+    """Validates access to preferences page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_manage_own_account
     def get(self) -> None:
@@ -295,20 +290,16 @@ class ManageOwnAccountValidationHandler(
 class PracticeSessionAccessValidationPage(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
-    """Validates access to practice seesion page.
-    """
+    """Validates access to practice seesion page."""
 
     URL_PATH_ARGS_SCHEMAS = {
         'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
-        'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS
+        'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
     }
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'selected_subtopic_ids': {
-                'schema': {
-                    'type': 'custom',
-                    'obj_type': 'JsonEncodedInString'
-                }
+                'schema': {'type': 'custom', 'obj_type': 'JsonEncodedInString'}
             }
         }
     }
@@ -318,17 +309,15 @@ class PracticeSessionAccessValidationPage(
         """Handles GET requests."""
 
         assert self.normalized_request is not None
-        subtopics = self.normalized_request.get(
-            'selected_subtopic_ids')
+        subtopics = self.normalized_request.get('selected_subtopic_ids')
 
         if not isinstance(subtopics, list) or not all(
-                isinstance(s, int) for s in subtopics):
+            isinstance(s, int) for s in subtopics
+        ):
             raise self.InvalidInputException('Invalid subtopic IDs')
 
-        topic_url_fragment = self.request.route_kwargs.get(
-            'topic_url_fragment')
-        topic = topic_fetchers.get_topic_by_url_fragment(
-            topic_url_fragment)
+        topic_url_fragment = self.request.route_kwargs.get('topic_url_fragment')
+        topic = topic_fetchers.get_topic_by_url_fragment(topic_url_fragment)
 
         subtopics_ids = {subtopic.id for subtopic in topic.subtopics}
 
@@ -344,13 +333,7 @@ class ProfileExistsValidationHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    URL_PATH_ARGS_SCHEMAS = {
-        'username': {
-            'schema': {
-                'type': 'basestring'
-            }
-        }
-    }
+    URL_PATH_ARGS_SCHEMAS = {'username': {'schema': {'type': 'basestring'}}}
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
@@ -364,8 +347,7 @@ class ProfileExistsValidationHandler(
             NotFoundException. No user settings found for the given
                 username.
         """
-        user_settings = user_services.get_user_settings_from_username(
-            username)
+        user_settings = user_services.get_user_settings_from_username(username)
 
         if not user_settings:
             raise self.NotFoundException
@@ -395,9 +377,7 @@ class ReleaseCoordinatorAccessValidationHandler(
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_release_coordinator_page
     def get(self) -> None:
@@ -416,16 +396,16 @@ class ViewLearnerGroupPageAccessValidationHandler(
         'learner_group_id': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.LEARNER_GROUP_ID_REGEX
-                }]
+                'validators': [
+                    {
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.LEARNER_GROUP_ID_REGEX,
+                    }
+                ],
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_learner_groups
     def get(self, learner_group_id: str) -> None:
@@ -446,7 +426,8 @@ class ViewLearnerGroupPageAccessValidationHandler(
             raise self.NotFoundException
 
         is_valid_request = learner_group_services.is_user_learner(
-            self.user_id, learner_group_id)
+            self.user_id, learner_group_id
+        )
 
         if not is_valid_request:
             raise self.NotFoundException
@@ -464,52 +445,42 @@ class ExplorationPlayerPageNormalizedRequestDict(TypedDict):
 
 
 class ExplorationPlayerAccessValidationPage(
-    base.BaseHandler[
-        Dict[str, str], ExplorationPlayerPageNormalizedRequestDict
-    ]
+    base.BaseHandler[Dict[str, str], ExplorationPlayerPageNormalizedRequestDict]
 ):
     """Page describing a single exploration."""
 
     URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {
-            'schema': editor.SCHEMA_FOR_EXPLORATION_ID
-        }
+        'exploration_id': {'schema': editor.SCHEMA_FOR_EXPLORATION_ID}
     }
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'v': {
                 'schema': {
                     'type': 'int',
-                    'validators': [{
-                        'id': 'is_at_least',
-                        # Version must be greater than zero.
-                        'min_value': 1
-                    }]
+                    'validators': [
+                        {
+                            'id': 'is_at_least',
+                            # Version must be greater than zero.
+                            'min_value': 1,
+                        }
+                    ],
                 },
-                'default_value': None
+                'default_value': None,
             },
-            'parent': {
-                'schema': {
-                    'type': 'basestring'
-                },
-                'default_value': None
-            },
-            'iframed': {
-                'schema': {
-                    'type': 'bool'
-                },
-                'default_value': None
-            },
+            'parent': {'schema': {'type': 'basestring'}, 'default_value': None},
+            'iframed': {'schema': {'type': 'bool'}, 'default_value': None},
             'collection_id': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'is_regex_matched',
-                        'regex_pattern': constants.ENTITY_ID_REGEX
-                    }]
+                    'validators': [
+                        {
+                            'id': 'is_regex_matched',
+                            'regex_pattern': constants.ENTITY_ID_REGEX,
+                        }
+                    ],
                 },
-                'default_value': None
-            }
+                'default_value': None,
+            },
         }
     }
 
@@ -531,8 +502,9 @@ class ExplorationPlayerAccessValidationPage(
         else:
             collection_id = self.normalized_request.get('collection_id')
 
-        if not reader._does_exploration_exist( # pylint: disable=protected-access
-            exploration_id, version, collection_id):
+        if not reader._does_exploration_exist(  # pylint: disable=protected-access
+            exploration_id, version, collection_id
+        ):
             raise self.NotFoundException
 
 
@@ -543,9 +515,7 @@ class CreateLearnerGroupPageAccessValidationHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_learner_groups
     def get(self) -> None:
@@ -572,16 +542,16 @@ class EditLearnerGroupPageAccessValidationHandler(
         'learner_group_id': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.LEARNER_GROUP_ID_REGEX
-                }]
+                'validators': [
+                    {
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.LEARNER_GROUP_ID_REGEX,
+                    }
+                ],
             }
         }
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_learner_groups
     def get(self, learner_group_id: str) -> None:
@@ -602,7 +572,8 @@ class EditLearnerGroupPageAccessValidationHandler(
             raise self.NotFoundException
 
         is_valid_request = learner_group_services.is_user_facilitator(
-            self.user_id, learner_group_id)
+            self.user_id, learner_group_id
+        )
 
         if not is_valid_request:
             raise self.NotFoundException
@@ -616,9 +587,7 @@ class BlogHomePageAccessValidationHandler(
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
     def get(self) -> None:
@@ -645,13 +614,7 @@ class BlogPostPageAccessValidationHandler(
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
-        'GET': {
-            'blog_post_url_fragment': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            }
-        }
+        'GET': {'blog_post_url_fragment': {'schema': {'type': 'basestring'}}}
     }
 
     @acl_decorators.open_access
@@ -663,9 +626,11 @@ class BlogPostPageAccessValidationHandler(
         """
         assert self.normalized_request is not None
         blog_post_url_fragment = self.normalized_request[
-            'blog_post_url_fragment']
+            'blog_post_url_fragment'
+        ]
         blog_post = blog_services.get_blog_post_by_url_fragment(
-            blog_post_url_fragment)
+            blog_post_url_fragment
+        )
 
         if not blog_post:
             raise self.NotFoundException
@@ -680,18 +645,16 @@ class BlogAuthorProfilePageAccessValidationHandler(
 
     URL_PATH_ARGS_SCHEMAS = {
         'author_username': {
-            'schema': {
-                'type': 'basestring'
-            },
-            'validators': [{
-                'id': 'has_length_at_most',
-                'max_value': constants.MAX_AUTHOR_NAME_LENGTH
-            }]
+            'schema': {'type': 'basestring'},
+            'validators': [
+                {
+                    'id': 'has_length_at_most',
+                    'max_value': constants.MAX_AUTHOR_NAME_LENGTH,
+                }
+            ],
         }
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
     def get(self, author_username: str) -> None:
@@ -705,8 +668,9 @@ class BlogAuthorProfilePageAccessValidationHandler(
             NotFoundException. User with given username is not a blog
                 post author.
         """
-        author_settings = (
-            user_services.get_user_settings_from_username(author_username))
+        author_settings = user_services.get_user_settings_from_username(
+            author_username
+        )
 
         if author_settings is None:
             raise self.NotFoundException(
@@ -730,10 +694,12 @@ class SkillEditorPageAccessValidationHandler(
         'skill_id': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.ENTITY_ID_REGEX
-                }]
+                'validators': [
+                    {
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                    }
+                ],
             }
         }
     }
@@ -755,7 +721,8 @@ class SkillEditorPageAccessValidationHandler(
 
         if skill is None:
             raise self.NotFoundException(
-                'The skill with the given id doesn\'t exist.')
+                'The skill with the given id doesn\'t exist.'
+            )
 
 
 class CollectionEditorAccessValidationPage(
@@ -764,11 +731,7 @@ class CollectionEditorAccessValidationPage(
     """Validates access to collection editor page."""
 
     URL_PATH_ARGS_SCHEMAS = {
-        'collection_id': {
-            'schema': {
-                'type': 'basestring'
-            }
-        }
+        'collection_id': {'schema': {'type': 'basestring'}}
     }
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
@@ -780,17 +743,19 @@ class CollectionEditorAccessValidationPage(
 
 class ExplorationEditorAccessValidationHandlerPage(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
-    ):
+):
     """The editor page for a single exploration."""
 
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.ENTITY_ID_REGEX
-                }]
+                'validators': [
+                    {
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                    }
+                ],
             }
         }
     }
@@ -807,17 +772,20 @@ class ExplorationEditorAccessValidationHandlerPage(
 
 
 class TopicEditorAccessValidationPage(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]):
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
     """The editor page for a single topic."""
 
     URL_PATH_ARGS_SCHEMAS = {
         'topic_id': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.ENTITY_ID_REGEX
-                }]
+                'validators': [
+                    {
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                    }
+                ],
             }
         }
     }
@@ -838,7 +806,8 @@ class TopicEditorAccessValidationPage(
 
         if topic is None:
             raise self.NotFoundException(
-                Exception('The topic with the given id doesn\'t exist.'))
+                Exception('The topic with the given id doesn\'t exist.')
+            )
 
 
 class StoryEditorAccessValidationHandlerPage(
@@ -850,10 +819,9 @@ class StoryEditorAccessValidationHandlerPage(
         'story_id': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'has_length',
-                    'value': constants.STORY_ID_LENGTH
-                }]
+                'validators': [
+                    {'id': 'has_length', 'value': constants.STORY_ID_LENGTH}
+                ],
             }
         }
     }
@@ -879,7 +847,7 @@ class ReviewTestsPageAccessValidationHandler(
     URL_PATH_ARGS_SCHEMAS = {
         'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
         'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
-        'story_url_fragment': constants.SCHEMA_FOR_STORY_URL_FRAGMENTS
+        'story_url_fragment': constants.SCHEMA_FOR_STORY_URL_FRAGMENTS,
     }
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 

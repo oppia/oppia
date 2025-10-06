@@ -28,13 +28,13 @@ import apache_beam as beam
 from typing import Iterable, Tuple
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import collection_models, feedback_models, user_models
 
 (collection_models, feedback_models, user_models) = (
-    models.Registry.import_models([
-        models.Names.COLLECTION, models.Names.FEEDBACK, models.Names.USER
-    ])
+    models.Registry.import_models(
+        [models.Names.COLLECTION, models.Names.FEEDBACK, models.Names.USER]
+    )
 )
 
 
@@ -43,7 +43,7 @@ class GetCollectionOwnersEmailsJob(base_jobs.JobBase):
 
     @staticmethod
     def _extract_user_and_collection_ids(
-        collection_rights_model: collection_models.CollectionRightsModel
+        collection_rights_model: collection_models.CollectionRightsModel,
     ) -> Iterable[Tuple[str, str]]:
         """Extracts user id and collection id.
 
@@ -62,37 +62,46 @@ class GetCollectionOwnersEmailsJob(base_jobs.JobBase):
 
         collection_pairs = (
             self.pipeline
-            | 'get collection models ' >> ndb_io.GetModels(
-                collection_models.CollectionRightsModel.get_all())
-            | 'Flatten owner_ids and format' >> beam.FlatMap(
-                self._extract_user_and_collection_ids)
+            | 'get collection models '
+            >> ndb_io.GetModels(
+                collection_models.CollectionRightsModel.get_all()
+            )
+            | 'Flatten owner_ids and format'
+            >> beam.FlatMap(self._extract_user_and_collection_ids)
         )
 
         user_pairs = (
             self.pipeline
-            | 'Get all user settings models' >> ndb_io.GetModels(
-                user_models.UserSettingsModel.get_all())
-            | 'Extract id and email' >> beam.Map(
-                    lambda user_setting: (
-                        user_setting.id, user_setting.email))
+            | 'Get all user settings models'
+            >> ndb_io.GetModels(user_models.UserSettingsModel.get_all())
+            | 'Extract id and email'
+            >> beam.Map(
+                lambda user_setting: (user_setting.id, user_setting.email)
+            )
         )
 
         collection_ids_to_email_mapping = (
             (collection_pairs, user_pairs)
             | 'Group by user_id' >> beam.CoGroupByKey()
-            | 'Drop user id' >> beam.Values()  # pylint: disable=no-value-for-parameter
-            | 'Filter out results without any collection' >> beam.Filter(
+            | 'Drop user id'
+            >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Filter out results without any collection'
+            >> beam.Filter(
                 lambda collection_ids_and_email: len(
-                    collection_ids_and_email[0]) > 0
+                    collection_ids_and_email[0]
+                )
+                > 0
             )
         )
 
         return (
             collection_ids_to_email_mapping
-            | 'Get final result' >> beam.MapTuple(
+            | 'Get final result'
+            >> beam.MapTuple(
                 lambda collection, email: job_run_result.JobRunResult.as_stdout(
                     'collection_ids: %s, email: %s' % (collection, email)
-                ))
+                )
+            )
         )
 
 
@@ -109,16 +118,16 @@ class MatchEntityTypeCollectionJob(base_jobs.JobBase):
         """
         feedback_model_matched_as_collection = (
             self.pipeline
-            | 'Get all GeneralFeedbackThread models' >> ndb_io.GetModels(
-                feedback_models.GeneralFeedbackThreadModel.get_all())
-            | 'Extract entity_type' >> beam.Map(
-                    lambda feeback_model: feeback_model.entity_type)
-            | 'Match entity_type' >> beam.Filter(
-                lambda entity_type: entity_type == 'collection')
+            | 'Get all GeneralFeedbackThread models'
+            >> ndb_io.GetModels(
+                feedback_models.GeneralFeedbackThreadModel.get_all()
+            )
+            | 'Extract entity_type'
+            >> beam.Map(lambda feeback_model: feeback_model.entity_type)
+            | 'Match entity_type'
+            >> beam.Filter(lambda entity_type: entity_type == 'collection')
         )
 
-        return (
-            feedback_model_matched_as_collection
-            | 'Count the output' >> (
-                job_result_transforms.CountObjectsToJobRunResult())
+        return feedback_model_matched_as_collection | 'Count the output' >> (
+            job_result_transforms.CountObjectsToJobRunResult()
         )

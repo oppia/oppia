@@ -44,63 +44,102 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
         self.subtopic_id_2 = 2
         self.subtopic_page_1 = (
             subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
-                self.subtopic_id_1, self.topic_id))
+                self.subtopic_id_1, self.topic_id
+            )
+        )
         self.subtopic_page_2 = (
             subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
-                self.subtopic_id_2, self.topic_id))
-        subtopic_page_services.save_subtopic_page(
-            self.admin_id, self.subtopic_page_1, 'Added subtopic',
-            [topic_domain.TopicChange({
-                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                'subtopic_id': self.subtopic_id_1,
-                'title': 'Sample',
-                'url_fragment': 'sample-fragment'
-            })]
+                self.subtopic_id_2, self.topic_id
+            )
         )
         subtopic_page_services.save_subtopic_page(
-            self.admin_id, self.subtopic_page_2, 'Added subtopic',
-            [topic_domain.TopicChange({
-                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                'subtopic_id': self.subtopic_id_2,
-                'title': 'Sample',
-                'url_fragment': 'dummy-fragment'
-            })]
+            self.admin_id,
+            self.subtopic_page_1,
+            'Added subtopic',
+            [
+                topic_domain.TopicChange(
+                    {
+                        'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                        'subtopic_id': self.subtopic_id_1,
+                        'title': 'Sample',
+                        'url_fragment': 'sample-fragment',
+                    }
+                )
+            ],
+        )
+        subtopic_page_services.save_subtopic_page(
+            self.admin_id,
+            self.subtopic_page_2,
+            'Added subtopic',
+            [
+                topic_domain.TopicChange(
+                    {
+                        'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                        'subtopic_id': self.subtopic_id_2,
+                        'title': 'Sample',
+                        'url_fragment': 'dummy-fragment',
+                    }
+                )
+            ],
         )
         subtopic_page_private_topic = (
             subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
-                self.subtopic_id_1, 'topic_id_2'))
+                self.subtopic_id_1, 'topic_id_2'
+            )
+        )
         subtopic_page_services.save_subtopic_page(
-            self.admin_id, subtopic_page_private_topic, 'Added subtopic',
-            [topic_domain.TopicChange({
-                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                'subtopic_id': self.subtopic_id_1,
-                'title': 'Sample',
-                'url_fragment': 'dummy-fragment-one'
-            })]
+            self.admin_id,
+            subtopic_page_private_topic,
+            'Added subtopic',
+            [
+                topic_domain.TopicChange(
+                    {
+                        'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                        'subtopic_id': self.subtopic_id_1,
+                        'title': 'Sample',
+                        'url_fragment': 'dummy-fragment-one',
+                    }
+                )
+            ],
         )
         subtopic = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title', 'url-frag')
+            1, 'Subtopic Title', 'url-frag'
+        )
         subtopic.skill_ids = ['skill_id_1']
         subtopic.url_fragment = 'sub-url-frag-one'
         subtopic2 = topic_domain.Subtopic.create_default_subtopic(
-            2, 'Subtopic Title 2', 'url-frag-two')
+            2, 'Subtopic Title 2', 'url-frag-two'
+        )
         subtopic2.skill_ids = ['skill_id_2']
         subtopic2.url_fragment = 'sub-url-frag-two'
 
         self.save_new_topic(
-            self.topic_id, self.admin_id, name='Name',
-            abbreviated_name='name', url_fragment='name',
-            description='Description', canonical_story_ids=[],
-            additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[subtopic, subtopic2], next_subtopic_id=3)
-        topic_services.publish_topic(self.topic_id, self.admin_id)
-        self.save_new_topic(
-            'topic_id_2', self.admin_id, name='Private_Name',
-            abbreviated_name='pvttopic', url_fragment='pvttopic',
-            description='Description', canonical_story_ids=[],
+            self.topic_id,
+            self.admin_id,
+            name='Name',
+            abbreviated_name='name',
+            url_fragment='name',
+            description='Description',
+            canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[],
-            subtopics=[subtopic], next_subtopic_id=2)
+            subtopics=[subtopic, subtopic2],
+            next_subtopic_id=3,
+        )
+        topic_services.publish_topic(self.topic_id, self.admin_id)
+        self.save_new_topic(
+            'topic_id_2',
+            self.admin_id,
+            name='Private_Name',
+            abbreviated_name='pvttopic',
+            url_fragment='pvttopic',
+            description='Description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[subtopic],
+            next_subtopic_id=2,
+        )
         self.recorded_voiceovers_dict: state_domain.RecordedVoiceoversDict = {
             'voiceovers_mapping': {
                 'content': {
@@ -108,221 +147,275 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
                         'filename': 'test.mp3',
                         'file_size_bytes': 100,
                         'needs_update': False,
-                        'duration_secs': 0.34234
+                        'duration_secs': 0.34234,
                     }
                 }
             }
         }
         self.written_translations_dict: (
             translation_domain.WrittenTranslationsDict
-        ) = {
-            'translations_mapping': {
-                'content': {}
-            }
-        }
+        ) = {'translations_mapping': {'content': {}}}
         self.subtopic_page_1.update_page_contents_html(
-            state_domain.SubtitledHtml.from_dict({
-                'html': '<p>hello world</p>',
-                'content_id': 'content'
-            }))
+            state_domain.SubtitledHtml.from_dict(
+                {'html': '<p>hello world</p>', 'content_id': 'content'}
+            )
+        )
         self.subtopic_page_1.update_page_contents_audio(
             state_domain.RecordedVoiceovers.from_dict(
-                self.recorded_voiceovers_dict))
+                self.recorded_voiceovers_dict
+            )
+        )
         subtopic_page_services.save_subtopic_page(
-            self.admin_id, self.subtopic_page_1, 'Updated page contents',
-            [subtopic_page_domain.SubtopicPageChange({
-                'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
-                'subtopic_id': self.subtopic_id_1,
-                'property_name': 'page_contents_html',
-                'new_value': '<p>hello world</p>',
-                'old_value': ''
-            })]
+            self.admin_id,
+            self.subtopic_page_1,
+            'Updated page contents',
+            [
+                subtopic_page_domain.SubtopicPageChange(
+                    {
+                        'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
+                        'subtopic_id': self.subtopic_id_1,
+                        'property_name': 'page_contents_html',
+                        'new_value': '<p>hello world</p>',
+                        'old_value': '',
+                    }
+                )
+            ],
         )
         self.subtopic_page_2.update_page_contents_html(
-            state_domain.SubtitledHtml.from_dict({
-                'html': '<p>hello world 2</p>',
-                'content_id': 'content'
-            }))
+            state_domain.SubtitledHtml.from_dict(
+                {'html': '<p>hello world 2</p>', 'content_id': 'content'}
+            )
+        )
         self.subtopic_page_2.update_page_contents_audio(
             state_domain.RecordedVoiceovers.from_dict(
-                self.recorded_voiceovers_dict))
+                self.recorded_voiceovers_dict
+            )
+        )
         subtopic_page_services.save_subtopic_page(
-            self.admin_id, self.subtopic_page_2, 'Updated page contents',
-            [subtopic_page_domain.SubtopicPageChange({
-                'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
-                'subtopic_id': self.subtopic_id_2,
-                'property_name': 'page_contents_html',
-                'new_value': '<p>hello world 2</p>',
-                'old_value': ''
-            })]
+            self.admin_id,
+            self.subtopic_page_2,
+            'Updated page contents',
+            [
+                subtopic_page_domain.SubtopicPageChange(
+                    {
+                        'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
+                        'subtopic_id': self.subtopic_id_2,
+                        'property_name': 'page_contents_html',
+                        'new_value': '<p>hello world 2</p>',
+                        'old_value': '',
+                    }
+                )
+            ],
         )
 
         self.topic_id_2 = 'topic_id_2'
         self.subtopic_id_3 = 1
         self.subtopic_id_4 = 2
-        self.study_guide_1 = (
-            study_guide_domain.StudyGuide.create_study_guide(
-                self.subtopic_id_3, self.topic_id_2,
-                'heading', 'content'
-            ))
-        self.study_guide_2 = (
-            study_guide_domain.StudyGuide.create_study_guide(
-                self.subtopic_id_4, self.topic_id_2,
-                'heading 2', 'content 2'))
-        study_guide_services.save_study_guide(
-            self.admin_id, self.study_guide_1, 'Added study guide',
-            [topic_domain.TopicChange({
-                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                'subtopic_id': self.subtopic_id_3,
-                'title': 'Sample',
-                'url_fragment': 'sample-fragment-three'
-            })]
+        self.study_guide_1 = study_guide_domain.StudyGuide.create_study_guide(
+            self.subtopic_id_3, self.topic_id_2, 'heading', 'content'
+        )
+        self.study_guide_2 = study_guide_domain.StudyGuide.create_study_guide(
+            self.subtopic_id_4, self.topic_id_2, 'heading 2', 'content 2'
         )
         study_guide_services.save_study_guide(
-            self.admin_id, self.study_guide_2, 'Added study guide',
-            [topic_domain.TopicChange({
-                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                'subtopic_id': self.subtopic_id_4,
-                'title': 'Sample',
-                'url_fragment': 'dummy-fragment-four'
-            })]
+            self.admin_id,
+            self.study_guide_1,
+            'Added study guide',
+            [
+                topic_domain.TopicChange(
+                    {
+                        'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                        'subtopic_id': self.subtopic_id_3,
+                        'title': 'Sample',
+                        'url_fragment': 'sample-fragment-three',
+                    }
+                )
+            ],
+        )
+        study_guide_services.save_study_guide(
+            self.admin_id,
+            self.study_guide_2,
+            'Added study guide',
+            [
+                topic_domain.TopicChange(
+                    {
+                        'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                        'subtopic_id': self.subtopic_id_4,
+                        'title': 'Sample',
+                        'url_fragment': 'dummy-fragment-four',
+                    }
+                )
+            ],
         )
         study_guide_private_topic = (
             study_guide_domain.StudyGuide.create_study_guide(
-                self.subtopic_id_3, 'topic_id_3',
-                'private', 'private content'))
+                self.subtopic_id_3, 'topic_id_3', 'private', 'private content'
+            )
+        )
         study_guide_services.save_study_guide(
-            self.admin_id, study_guide_private_topic, 'Added study guide',
-            [topic_domain.TopicChange({
-                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                'subtopic_id': self.subtopic_id_3,
-                'title': 'Sample',
-                'url_fragment': 'dummy-fragment-three'
-            })]
+            self.admin_id,
+            study_guide_private_topic,
+            'Added study guide',
+            [
+                topic_domain.TopicChange(
+                    {
+                        'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                        'subtopic_id': self.subtopic_id_3,
+                        'title': 'Sample',
+                        'url_fragment': 'dummy-fragment-three',
+                    }
+                )
+            ],
         )
         subtopic = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title', 'url-frag-one')
+            1, 'Subtopic Title', 'url-frag-one'
+        )
         subtopic.skill_ids = ['skill_id_one']
         subtopic.url_fragment = 'sub-url-frag-onee'
         subtopic2 = topic_domain.Subtopic.create_default_subtopic(
-            2, 'Subtopic Title 2', 'url-frag-twoo')
+            2, 'Subtopic Title 2', 'url-frag-twoo'
+        )
         subtopic2.skill_ids = ['skill_id_two']
         subtopic2.url_fragment = 'sub-url-frag-twoo'
 
         self.save_new_topic(
-            self.topic_id_2, self.admin_id, name='Name new',
-            abbreviated_name='name', url_fragment='nameone',
-            description='Description', canonical_story_ids=[],
-            additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[subtopic, subtopic2], next_subtopic_id=3)
-        topic_services.publish_topic(self.topic_id_2, self.admin_id)
-        self.save_new_topic(
-            'topic_id_3', self.admin_id, name='Private_Name new',
-            abbreviated_name='pvttopic', url_fragment='pvttopicone',
-            description='Description', canonical_story_ids=[],
+            self.topic_id_2,
+            self.admin_id,
+            name='Name new',
+            abbreviated_name='name',
+            url_fragment='nameone',
+            description='Description',
+            canonical_story_ids=[],
             additional_story_ids=[],
             uncategorized_skill_ids=[],
-            subtopics=[subtopic], next_subtopic_id=2)
+            subtopics=[subtopic, subtopic2],
+            next_subtopic_id=3,
+        )
+        topic_services.publish_topic(self.topic_id_2, self.admin_id)
+        self.save_new_topic(
+            'topic_id_3',
+            self.admin_id,
+            name='Private_Name new',
+            abbreviated_name='pvttopic',
+            url_fragment='pvttopicone',
+            description='Description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[subtopic],
+            next_subtopic_id=2,
+        )
         self.study_guide_1.update_sections(
             [
-                study_guide_domain.StudyGuideSection
-                .create_study_guide_section(
+                study_guide_domain.StudyGuideSection.create_study_guide_section(
                     'section_heading_0',
                     'hello',
                     'section_content_1',
-                    'How are ya?'
+                    'How are ya?',
                 )
             ]
         )
         study_guide_services.save_study_guide(
-            self.admin_id, self.study_guide_1, 'Updated sections',
-            [study_guide_domain.StudyGuideChange({
-                'cmd': study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY,
-                'subtopic_id': self.subtopic_id_3,
-                'property_name': 'sections',
-                'new_value': [
+            self.admin_id,
+            self.study_guide_1,
+            'Updated sections',
+            [
+                study_guide_domain.StudyGuideChange(
                     {
-                        'heading': {
-                            'content_id': 'section_heading_0',
-                            'unicode_str': 'hello'
-                        },
-                        'content': {
-                            'content_id': 'section_content_1',
-                            'html': 'How are ya?'
-                        }
+                        'cmd': study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY,
+                        'subtopic_id': self.subtopic_id_3,
+                        'property_name': 'sections',
+                        'new_value': [
+                            {
+                                'heading': {
+                                    'content_id': 'section_heading_0',
+                                    'unicode_str': 'hello',
+                                },
+                                'content': {
+                                    'content_id': 'section_content_1',
+                                    'html': 'How are ya?',
+                                },
+                            }
+                        ],
+                        'old_value': [
+                            {
+                                'heading': {
+                                    'content_id': 'section_heading_0',
+                                    'unicode_str': 'hello',
+                                },
+                                'content': {
+                                    'content_id': 'section_content_1',
+                                    'html': 'How are ya?',
+                                },
+                            }
+                        ],
                     }
-                ],
-                'old_value': [
-                    {
-                        'heading': {
-                            'content_id': 'section_heading_0',
-                            'unicode_str': 'hello'
-                        },
-                        'content': {
-                            'content_id': 'section_content_1',
-                            'html': 'How are ya?'
-                        }
-                    }
-                ]
-            })]
+                )
+            ],
         )
         self.study_guide_2.update_sections(
             [
-                study_guide_domain.StudyGuideSection
-                .create_study_guide_section(
+                study_guide_domain.StudyGuideSection.create_study_guide_section(
                     'section_heading_0',
                     'hello 2',
                     'section_content_1',
-                    'How are ya? 2'
+                    'How are ya? 2',
                 )
             ]
         )
         study_guide_services.save_study_guide(
-            self.admin_id, self.study_guide_2, 'Updated sections',
-            [study_guide_domain.StudyGuideChange({
-                'cmd': study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY,
-                'subtopic_id': self.subtopic_id_4,
-                'property_name': 'sections',
-                'new_value': [
+            self.admin_id,
+            self.study_guide_2,
+            'Updated sections',
+            [
+                study_guide_domain.StudyGuideChange(
                     {
-                        'heading': {
-                            'content_id': 'section_heading_0',
-                            'unicode_str': 'hello 2'
-                        },
-                        'content': {
-                            'content_id': 'section_content_1',
-                            'html': 'How are ya? 2'
-                        }
+                        'cmd': study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY,
+                        'subtopic_id': self.subtopic_id_4,
+                        'property_name': 'sections',
+                        'new_value': [
+                            {
+                                'heading': {
+                                    'content_id': 'section_heading_0',
+                                    'unicode_str': 'hello 2',
+                                },
+                                'content': {
+                                    'content_id': 'section_content_1',
+                                    'html': 'How are ya? 2',
+                                },
+                            }
+                        ],
+                        'old_value': [
+                            {
+                                'heading': {
+                                    'content_id': 'section_heading_0',
+                                    'unicode_str': 'hello 2',
+                                },
+                                'content': {
+                                    'content_id': 'section_content_1',
+                                    'html': 'How are ya? 2',
+                                },
+                            }
+                        ],
                     }
-                ],
-                'old_value': [
-                    {
-                        'heading': {
-                            'content_id': 'section_heading_0',
-                            'unicode_str': 'hello 2'
-                        },
-                        'content': {
-                            'content_id': 'section_content_1',
-                            'html': 'How are ya? 2'
-                        }
-                    }
-                ]
-            })]
+                )
+            ],
         )
 
 
 class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
     def test_get_for_first_subtopic_in_topic(self) -> None:
         json_response = self.get_json(
-            '%s/staging/%s/%s' % (
-                feconf.SUBTOPIC_DATA_HANDLER, 'name', 'sub-url-frag-one'))
+            '%s/staging/%s/%s'
+            % (feconf.SUBTOPIC_DATA_HANDLER, 'name', 'sub-url-frag-one')
+        )
         expected_page_contents_dict = {
             'recorded_voiceovers': self.recorded_voiceovers_dict,
             'subtitled_html': {
                 'content_id': 'content',
-                'html': '<p>hello world</p>'
+                'html': '<p>hello world</p>',
             },
-            'written_translations': self.written_translations_dict
+            'written_translations': self.written_translations_dict,
         }
         expected_next_subtopic_dict = {
             'thumbnail_bg_color': None,
@@ -331,7 +424,7 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
             'thumbnail_filename': None,
             'thumbnail_size_in_bytes': None,
             'title': 'Subtopic Title 2',
-            'url_fragment': 'sub-url-frag-two'
+            'url_fragment': 'sub-url-frag-two',
         }
 
         expected_dict = {
@@ -340,28 +433,28 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
             'subtopic_title': 'Subtopic Title',
             'current_subtopic_id': 1,
             'next_subtopic_dict': expected_next_subtopic_dict,
-            'prev_subtopic_dict': None
+            'prev_subtopic_dict': None,
         }
         self.assertDictContainsSubset(expected_dict, json_response)
 
-    @test_utils.enable_feature_flags([
-        feature_flag_list.FeatureNames
-        .SHOW_RESTRUCTURED_STUDY_GUIDES
-    ])
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES]
+    )
     def test_get_for_first_subtopic_with_study_guides_in_topic(self) -> None:
         json_response = self.get_json(
-            '%s/staging/%s/%s' % (
-                feconf.SUBTOPIC_DATA_HANDLER, 'nameone', 'sub-url-frag-onee'))
+            '%s/staging/%s/%s'
+            % (feconf.SUBTOPIC_DATA_HANDLER, 'nameone', 'sub-url-frag-onee')
+        )
         expected_sections_dicts_list = [
             {
                 'heading': {
                     'content_id': 'section_heading_0',
-                    'unicode_str': 'hello'
+                    'unicode_str': 'hello',
                 },
                 'content': {
                     'content_id': 'section_content_1',
-                    'html': 'How are ya?'
-                }
+                    'html': 'How are ya?',
+                },
             }
         ]
         expected_next_subtopic_dict = {
@@ -371,7 +464,7 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
             'thumbnail_filename': None,
             'thumbnail_size_in_bytes': None,
             'title': 'Subtopic Title 2',
-            'url_fragment': 'sub-url-frag-twoo'
+            'url_fragment': 'sub-url-frag-twoo',
         }
 
         expected_dict = {
@@ -380,18 +473,18 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
             'subtopic_title': 'Subtopic Title',
             'current_subtopic_id': 1,
             'next_subtopic_dict': expected_next_subtopic_dict,
-            'prev_subtopic_dict': None
+            'prev_subtopic_dict': None,
         }
         self.assertDictContainsSubset(expected_dict, json_response)
 
-    @test_utils.enable_feature_flags([
-        feature_flag_list.FeatureNames
-        .SHOW_RESTRUCTURED_STUDY_GUIDES
-    ])
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES]
+    )
     def test_get_for_last_subtopic_with_study_guides_in_topic(self) -> None:
         json_response = self.get_json(
-            '%s/staging/%s/%s' % (
-                feconf.SUBTOPIC_DATA_HANDLER, 'nameone', 'sub-url-frag-twoo'))
+            '%s/staging/%s/%s'
+            % (feconf.SUBTOPIC_DATA_HANDLER, 'nameone', 'sub-url-frag-twoo')
+        )
 
         expected_prev_subtopic_dict = {
             'thumbnail_bg_color': None,
@@ -400,7 +493,7 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
             'thumbnail_filename': None,
             'thumbnail_size_in_bytes': None,
             'title': 'Subtopic Title',
-            'url_fragment': 'sub-url-frag-onee'
+            'url_fragment': 'sub-url-frag-onee',
         }
 
         expected_dict = {
@@ -409,32 +502,33 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
                 {
                     'heading': {
                         'content_id': 'section_heading_0',
-                        'unicode_str': 'hello 2'
+                        'unicode_str': 'hello 2',
                     },
                     'content': {
                         'content_id': 'section_content_1',
-                        'html': 'How are ya? 2'
-                    }
+                        'html': 'How are ya? 2',
+                    },
                 }
             ],
             'subtopic_title': 'Subtopic Title 2',
             'current_subtopic_id': 2,
             'next_subtopic_dict': None,
-            'prev_subtopic_dict': expected_prev_subtopic_dict
+            'prev_subtopic_dict': expected_prev_subtopic_dict,
         }
         self.assertDictContainsSubset(expected_dict, json_response)
 
     def test_get_for_last_subtopic_in_topic(self) -> None:
         json_response = self.get_json(
-            '%s/staging/%s/%s' % (
-                feconf.SUBTOPIC_DATA_HANDLER, 'name', 'sub-url-frag-two'))
+            '%s/staging/%s/%s'
+            % (feconf.SUBTOPIC_DATA_HANDLER, 'name', 'sub-url-frag-two')
+        )
         expected_page_contents_dict = {
             'recorded_voiceovers': self.recorded_voiceovers_dict,
             'subtitled_html': {
                 'content_id': 'content',
-                'html': '<p>hello world 2</p>'
+                'html': '<p>hello world 2</p>',
             },
-            'written_translations': self.written_translations_dict
+            'written_translations': self.written_translations_dict,
         }
         expected_prev_subtopic_dict = {
             'thumbnail_bg_color': None,
@@ -443,7 +537,7 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
             'thumbnail_filename': None,
             'thumbnail_size_in_bytes': None,
             'title': 'Subtopic Title',
-            'url_fragment': 'sub-url-frag-one'
+            'url_fragment': 'sub-url-frag-one',
         }
 
         expected_dict = {
@@ -452,49 +546,49 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
             'subtopic_title': 'Subtopic Title 2',
             'current_subtopic_id': 2,
             'next_subtopic_dict': None,
-            'prev_subtopic_dict': expected_prev_subtopic_dict
+            'prev_subtopic_dict': expected_prev_subtopic_dict,
         }
         self.assertDictContainsSubset(expected_dict, json_response)
 
     def test_cannot_get_with_unpublished_topic(self) -> None:
         topic_services.unpublish_topic(self.topic_id, self.admin_id)
         response = self.get_json(
-            '%s/staging/%s/%s' % (
-                feconf.SUBTOPIC_DATA_HANDLER, 'name', 'sub-url-frag-one'
-            ),
-            expected_status_int=404
+            '%s/staging/%s/%s'
+            % (feconf.SUBTOPIC_DATA_HANDLER, 'name', 'sub-url-frag-one'),
+            expected_status_int=404,
         )
         self.assertIn('Could not find the resource', response['error'])
 
     def test_cannot_get_with_invalid_topic_name(self) -> None:
         response = self.get_json(
-            '%s/staging/%s/%s' % (
-                feconf.SUBTOPIC_DATA_HANDLER, 'Invalid Name',
-                'sub-url-frag-one'
+            '%s/staging/%s/%s'
+            % (
+                feconf.SUBTOPIC_DATA_HANDLER,
+                'Invalid Name',
+                'sub-url-frag-one',
             ),
-            expected_status_int=400
+            expected_status_int=400,
         )
         self.assertIn(
             '\nSchema validation for \'topic_url_fragment\' failed',
-            response['error']
+            response['error'],
         )
 
     def test_cannot_get_with_invalid_subtopic_id(self) -> None:
         response = self.get_json(
-            '%s/staging/%s/%s' % (
-                feconf.SUBTOPIC_DATA_HANDLER, 'name', 'sub-url-frag-zero'
-            ),
-            expected_status_int=404
+            '%s/staging/%s/%s'
+            % (feconf.SUBTOPIC_DATA_HANDLER, 'name', 'sub-url-frag-zero'),
+            expected_status_int=404,
         )
         self.assertIn('Could not find the resource', response['error'])
 
     def test_cannot_get_with_deleted_subtopic_page(self) -> None:
         subtopic_page_services.delete_subtopic_page(
-            self.admin_id, self.topic_id, 1)
+            self.admin_id, self.topic_id, 1
+        )
         response = self.get_json(
-            '%s/staging/%s/%s' % (
-                feconf.SUBTOPIC_DATA_HANDLER, 'name', 'sub-url-frag-one'
-            ),
-            expected_status_int=404
+            '%s/staging/%s/%s'
+            % (feconf.SUBTOPIC_DATA_HANDLER, 'name', 'sub-url-frag-one'),
+            expected_status_int=404,
         )
         self.assertIn('Could not find the resource', response['error'])

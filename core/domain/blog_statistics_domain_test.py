@@ -28,13 +28,13 @@ from core.tests import test_utils
 from typing import Final
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import blog_models, blog_stats_models
 
 
-(blog_stats_models, blog_models) = models.Registry.import_models([
-    models.Names.BLOG_STATISTICS, models.Names.BLOG
-])
+(blog_stats_models, blog_models) = models.Registry.import_models(
+    [models.Names.BLOG_STATISTICS, models.Names.BLOG]
+)
 
 
 class AuthorBlogPostsReadingTimeDomainUnitTests(test_utils.GenericTestBase):
@@ -66,7 +66,8 @@ class AuthorBlogPostsReadingTimeDomainUnitTests(test_utils.GenericTestBase):
     ) -> None:
         """Checks that reading time domain object passes validation."""
         with self.assertRaisesRegex(
-            utils.ValidationError, expected_error_substring):
+            utils.ValidationError, expected_error_substring
+        ):
             self.stats_obj.validate()
 
     def test_reading_time_stats_validation(self) -> None:
@@ -87,7 +88,7 @@ class AuthorBlogPostsReadingTimeDomainUnitTests(test_utils.GenericTestBase):
         # where instance of 'PlatformParameter' is expected, and this is
         # done to Replace the stored instance with None in order to
         # trigger the unexpected exception during update.
-        self.stats_obj.author_id = 1234 # type: ignore[assignment]
+        self.stats_obj.author_id = 1234  # type: ignore[assignment]
         self._assert_valid_reading_time_stats_domain_obj(
             'Author ID must be a string, but got 1234'
         )
@@ -120,7 +121,8 @@ class BlogPostsReadingTimeDomainUnitTests(test_utils.GenericTestBase):
     ) -> None:
         """Checks that reading time domain object passes validation."""
         with self.assertRaisesRegex(
-            utils.ValidationError, expected_error_substring):
+            utils.ValidationError, expected_error_substring
+        ):
             self.stats_obj.validate()
 
     def test_reading_time_stats_validation(self) -> None:
@@ -143,7 +145,7 @@ class BlogPostsReadingTimeDomainUnitTests(test_utils.GenericTestBase):
         # where instance of 'PlatformParameter' is expected, and this is
         # done to Replace the stored instance with None in order to
         # trigger the unexpected exception during update.
-        self.stats_obj.blog_post_id = 1234 # type: ignore[assignment]
+        self.stats_obj.blog_post_id = 1234  # type: ignore[assignment]
         self._assert_valid_reading_time_stats_domain_obj(
             'Blog Post ID must be a string, but got 1234'
         )
@@ -161,9 +163,8 @@ class AuthorBlogPostsReadsStatsDomainUnitTests(test_utils.GenericTestBase):
         self.user_id_a = self.get_user_id_from_email('a@example.com')
 
         with self.mock_datetime_utcnow(self.MOCK_DATE):
-            stats_model = (
-                blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel
-                    .create(self.user_id_a)
+            stats_model = blog_stats_models.AuthorBlogPostReadsAggregatedStatsModel.create(
+                self.user_id_a
             )
 
         self.author_stats = (
@@ -172,7 +173,7 @@ class AuthorBlogPostsReadsStatsDomainUnitTests(test_utils.GenericTestBase):
                 stats_model.reads_by_hour,
                 stats_model.reads_by_date,
                 stats_model.reads_by_month,
-                stats_model.created_on
+                stats_model.created_on,
             )
         )
 
@@ -181,7 +182,8 @@ class AuthorBlogPostsReadsStatsDomainUnitTests(test_utils.GenericTestBase):
     ) -> None:
         """Checks that reading time domain object passes validation."""
         with self.assertRaisesRegex(
-            utils.ValidationError, expected_error_substring):
+            utils.ValidationError, expected_error_substring
+        ):
             self.author_stats.validate()
 
     def test_author_blog_post_reads_stats_validation(self) -> None:
@@ -202,7 +204,7 @@ class AuthorBlogPostsReadsStatsDomainUnitTests(test_utils.GenericTestBase):
         # where instance of 'PlatformParameter' is expected, and this is
         # done to Replace the stored instance with None in order to
         # trigger the unexpected exception during update.
-        self.author_stats.author_id = 1234 # type: ignore[assignment]
+        self.author_stats.author_id = 1234  # type: ignore[assignment]
         self._assert_valid_author_blog_post_reads_domain_obj(
             'Author ID must be a string, but got 1234'
         )
@@ -220,9 +222,8 @@ class AuthorBlogPostsViewsStatsDomainUnitTests(test_utils.GenericTestBase):
         self.user_id_a = self.get_user_id_from_email('a@example.com')
 
         with self.mock_datetime_utcnow(self.MOCK_DATE):
-            stats_model = (
-                blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel
-                    .create(self.user_id_a)
+            stats_model = blog_stats_models.AuthorBlogPostViewsAggregatedStatsModel.create(
+                self.user_id_a
             )
 
         self.author_stats = (
@@ -231,7 +232,7 @@ class AuthorBlogPostsViewsStatsDomainUnitTests(test_utils.GenericTestBase):
                 stats_model.views_by_hour,
                 stats_model.views_by_date,
                 stats_model.views_by_month,
-                stats_model.created_on
+                stats_model.created_on,
             )
         )
 
@@ -242,7 +243,8 @@ class AuthorBlogPostsViewsStatsDomainUnitTests(test_utils.GenericTestBase):
         validation.
         """
         with self.assertRaisesRegex(
-            utils.ValidationError, expected_error_substring):
+            utils.ValidationError, expected_error_substring
+        ):
             self.author_stats.validate()
 
     def test_author_blog_post_views_stats_validation(self) -> None:
@@ -280,18 +282,17 @@ class BlogPostsReadsStatsDomainUnitTests(test_utils.GenericTestBase):
         self.blog_id_a = blog_models.BlogPostModel.generate_new_blog_post_id()
         with self.mock_datetime_utcnow(self.MOCK_DATE):
             stats_model = (
-                blog_stats_models.BlogPostReadsAggregatedStatsModel
-                    .create(self.blog_id_a)
+                blog_stats_models.BlogPostReadsAggregatedStatsModel.create(
+                    self.blog_id_a
+                )
             )
 
-        self.blog_stats = (
-            blog_statistics_domain.BlogPostReadsAggregatedStats(
-                self.blog_id_a,
-                stats_model.reads_by_hour,
-                stats_model.reads_by_date,
-                stats_model.reads_by_month,
-                stats_model.created_on
-            )
+        self.blog_stats = blog_statistics_domain.BlogPostReadsAggregatedStats(
+            self.blog_id_a,
+            stats_model.reads_by_hour,
+            stats_model.reads_by_date,
+            stats_model.reads_by_month,
+            stats_model.created_on,
         )
 
     def _assert_valid_blog_post_reads_domain_obj(
@@ -299,7 +300,8 @@ class BlogPostsReadsStatsDomainUnitTests(test_utils.GenericTestBase):
     ) -> None:
         """Checks that reading time domain object passes validation."""
         with self.assertRaisesRegex(
-            utils.ValidationError, expected_error_substring):
+            utils.ValidationError, expected_error_substring
+        ):
             self.blog_stats.validate()
 
     def test_author_blog_post_reads_stats_validation(self) -> None:
@@ -339,18 +341,17 @@ class BlogPostsViewsStatsDomainUnitTests(test_utils.GenericTestBase):
         self.blog_id_a = blog_models.BlogPostModel.generate_new_blog_post_id()
         with self.mock_datetime_utcnow(self.MOCK_DATE):
             stats_model = (
-                blog_stats_models.BlogPostViewsAggregatedStatsModel
-                    .create(self.blog_id_a)
+                blog_stats_models.BlogPostViewsAggregatedStatsModel.create(
+                    self.blog_id_a
+                )
             )
 
-        self.blog_stats = (
-            blog_statistics_domain.BlogPostViewsAggregatedStats(
-                self.blog_id_a,
-                stats_model.views_by_hour,
-                stats_model.views_by_date,
-                stats_model.views_by_month,
-                stats_model.created_on
-            )
+        self.blog_stats = blog_statistics_domain.BlogPostViewsAggregatedStats(
+            self.blog_id_a,
+            stats_model.views_by_hour,
+            stats_model.views_by_date,
+            stats_model.views_by_month,
+            stats_model.created_on,
         )
 
     def _assert_valid_blog_post_views_domain_obj(
@@ -360,7 +361,8 @@ class BlogPostsViewsStatsDomainUnitTests(test_utils.GenericTestBase):
         validation.
         """
         with self.assertRaisesRegex(
-            utils.ValidationError, expected_error_substring):
+            utils.ValidationError, expected_error_substring
+        ):
             self.blog_stats.validate()
 
     def test_blog_post_views_stats_validation(self) -> None:

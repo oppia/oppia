@@ -144,6 +144,9 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.expectGoBackToPreviousCardButton(true);
     await loggedOutLearner.expectContinueToNextCardButtonToBePresent(false);
 
+    // Note: All of the RTE components below check for default values,
+    // added by addExplorationDescriptionContainingAllRTEComponents function.
+
     // Concept Card RTE.
     await loggedOutLearner.expectConceptCardLinkInLessonToWorkProperly(
       'Review material text content for Math.'
@@ -153,7 +156,10 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.expectVideoRTEToBePresent();
 
     // Link RTE.
-    await loggedOutLearner.expectLinkRTEToPresent('https://www.oppia.org');
+    await loggedOutLearner.clickAndVerifyAnchorWithInnerText(
+      'Go to Oppia.org website',
+      'https://www.oppia.org/'
+    );
 
     // Collapsible RTE.
     await loggedOutLearner.expectCollapsibleRTEToBePresent();
