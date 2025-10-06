@@ -30,6 +30,10 @@ describe('Interested Donor', function () {
   });
 
   it('should be able to find the donate page', async function () {
+    await interestedDonor.clickDonateButtonInGetInvolvedMenuOnNavbar();
+    await interestedDonor.expectScreenshotToMatch('donatePage', __dirname);
+
+    await interestedDonor.navigateToSplashPage();
     await interestedDonor.clickDonateButtonOnNavbar();
     await interestedDonor.expectScreenshotToMatch('donatePage', __dirname);
 

@@ -58,6 +58,15 @@ describe('Logged-out User', function () {
   );
 
   it(
+    'should be able to navigate to "privacy policy" page from the link' +
+      'in "privacy policy" section.',
+    async function () {
+      await loggedOutUser.clickPrivacyPolicyLinkInTermsPage();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
     'should be able to scroll to the correct section when a bookmark is clicked' +
       'in the "Terms of Use" bookmark menu.',
     async function () {
