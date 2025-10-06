@@ -37,7 +37,7 @@ class ResultsToJobRunResultsTests(job_test_utils.PipelinedTestBase):
 
         self.assert_pcoll_equal(
             transform_result,
-            [job_run_result.JobRunResult.as_stdout('SUCCESS: 2')]
+            [job_run_result.JobRunResult.as_stdout('SUCCESS: 2')],
         )
 
     def test_ok_results_with_prefix_correctly_outputs(self) -> None:
@@ -49,17 +49,15 @@ class ResultsToJobRunResultsTests(job_test_utils.PipelinedTestBase):
 
         self.assert_pcoll_equal(
             transform_result,
-            [job_run_result.JobRunResult.as_stdout('PREFIX SUCCESS: 2')]
+            [job_run_result.JobRunResult.as_stdout('PREFIX SUCCESS: 2')],
         )
 
     def test_err_results_without_prefix_correctly_outputs(self) -> None:
         transform_result = (
             self.pipeline
-            | beam.Create([
-                    result.Err('err 1'),
-                    result.Err('err 2'),
-                    result.Err('err 2')
-                ])
+            | beam.Create(
+                [result.Err('err 1'), result.Err('err 2'), result.Err('err 2')]
+            )
             | job_result_transforms.ResultsToJobRunResults()
         )
 
@@ -67,18 +65,16 @@ class ResultsToJobRunResultsTests(job_test_utils.PipelinedTestBase):
             transform_result,
             [
                 job_run_result.JobRunResult.as_stderr('ERROR: "err 1": 1'),
-                job_run_result.JobRunResult.as_stderr('ERROR: "err 2": 2')
-            ]
+                job_run_result.JobRunResult.as_stderr('ERROR: "err 2": 2'),
+            ],
         )
 
     def test_err_results_with_prefix_correctly_outputs(self) -> None:
         transform_result = (
             self.pipeline
-            | beam.Create([
-                    result.Err('err 1'),
-                    result.Err('err 2'),
-                    result.Err('err 2')
-                ])
+            | beam.Create(
+                [result.Err('err 1'), result.Err('err 2'), result.Err('err 2')]
+            )
             | job_result_transforms.ResultsToJobRunResults('PRE')
         )
 
@@ -86,8 +82,8 @@ class ResultsToJobRunResultsTests(job_test_utils.PipelinedTestBase):
             transform_result,
             [
                 job_run_result.JobRunResult.as_stderr('PRE ERROR: "err 1": 1'),
-                job_run_result.JobRunResult.as_stderr('PRE ERROR: "err 2": 2')
-            ]
+                job_run_result.JobRunResult.as_stderr('PRE ERROR: "err 2": 2'),
+            ],
         )
 
 
@@ -102,7 +98,7 @@ class CountObjectsToJobRunResultTests(job_test_utils.PipelinedTestBase):
 
         self.assert_pcoll_equal(
             transform_result,
-            [job_run_result.JobRunResult.as_stdout('SUCCESS: 3')]
+            [job_run_result.JobRunResult.as_stdout('SUCCESS: 3')],
         )
 
     def test_three_objects_with_prefix_correctly_outputs(self) -> None:
@@ -114,7 +110,7 @@ class CountObjectsToJobRunResultTests(job_test_utils.PipelinedTestBase):
 
         self.assert_pcoll_equal(
             transform_result,
-            [job_run_result.JobRunResult.as_stdout('PREFIX SUCCESS: 3')]
+            [job_run_result.JobRunResult.as_stdout('PREFIX SUCCESS: 3')],
         )
 
     def test_zero_objects_correctly_outputs(self) -> None:

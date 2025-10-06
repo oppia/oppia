@@ -25,8 +25,8 @@
                        [localValue]="editableExplanation"
                        (localValueChange)="updateLocalExp($event)">
   </schema-based-editor>
-  <div *ngIf="workedExampleLimitExceeded" class="oppia-length-validation-error e2e-test-more-than-2-workedexamples" aria-live="assertive">
-    <p>Skills can have a maximum of 2 workedexamples. Please remove any additional ones.</p>
+  <div *ngIf="checkExtraWorkedexample()" class="oppia-length-validation-error e2e-test-more-than-2-workedexamples" aria-live="assertive">
+    <p>Skills can have a maximum of {{ skillEditorWorkedExampleLimit }} worked examples. Please remove any additional ones.</p>
   </div>
   <div class="editor-buttons">
     <button type="button"

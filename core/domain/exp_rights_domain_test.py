@@ -38,7 +38,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(self.exp_id, self.owner_id)
         rights_manager.publish_exploration(self.owner, self.exp_id)
         self.exploration_rights = rights_manager.get_exploration_rights(
-            self.exp_id)
+            self.exp_id
+        )
 
     def test_validation_passes_with_valid_properties(self) -> None:
         self.exploration_rights.validate()
@@ -47,12 +48,13 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
     # the codebase we plan to get rid of the tests that intentionally test
     # wrong inputs that we can normally catch by typing.
     def test_validation_fails_with_invalid_type_of_community_owned(
-        self
+        self,
     ) -> None:
         self.exploration_rights.community_owned = 'owned'  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'Expected community_owned to be bool, received owned'):
+            'Expected community_owned to be bool, received owned',
+        ):
             self.exploration_rights.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type
@@ -62,7 +64,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.exploration_rights.owner_ids = 'owner_id_1'  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'Expected owner_ids to be list, received owner_id_1'):
+            'Expected owner_ids to be list, received owner_id_1',
+        ):
             self.exploration_rights.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type
@@ -72,7 +75,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.exploration_rights.owner_ids = [123]  # type: ignore[list-item]
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'Expected each id in owner_ids to be string, received 123'):
+            'Expected each id in owner_ids to be string, received 123',
+        ):
             self.exploration_rights.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type
@@ -82,7 +86,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.exploration_rights.editor_ids = 'editor'  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'Expected editor_ids to be list, received editor'):
+            'Expected editor_ids to be list, received editor',
+        ):
             self.exploration_rights.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type
@@ -92,19 +97,21 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.exploration_rights.editor_ids = [True]  # type: ignore[list-item]
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'Expected each id in editor_ids to be string, received True'):
+            'Expected each id in editor_ids to be string, received True',
+        ):
             self.exploration_rights.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type
     # the codebase we plan to get rid of the tests that intentionally test
     # wrong inputs that we can normally catch by typing.
     def test_validation_fails_with_invalid_type_of_voice_artist_ids(
-        self
+        self,
     ) -> None:
         self.exploration_rights.voice_artist_ids = 123  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'Expected voice_artist_ids to be list, received 123'):
+            'Expected voice_artist_ids to be list, received 123',
+        ):
             self.exploration_rights.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type
@@ -115,7 +122,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected each id in voice_artist_ids to be string, '
-            'received None'):
+            'received None',
+        ):
             self.exploration_rights.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type
@@ -125,7 +133,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.exploration_rights.viewer_ids = 123  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'Expected viewer_ids to be list, received 123'):
+            'Expected viewer_ids to be list, received 123',
+        ):
             self.exploration_rights.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type
@@ -135,19 +144,21 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.exploration_rights.viewer_ids = [{}]  # type: ignore[list-item]
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'Expected each id in viewer_ids to be string, received {}'):
+            'Expected each id in viewer_ids to be string, received {}',
+        ):
             self.exploration_rights.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type
     # the codebase we plan to get rid of the tests that intentionally test
     # wrong inputs that we can normally catch by typing.
     def test_validation_fails_with_invalid_type_of_viewable_if_private(
-        self
+        self,
     ) -> None:
         self.exploration_rights.viewable_if_private = 'yes'  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'Expected viewable_if_private to be boolean, received yes'):
+            'Expected viewable_if_private to be boolean, received yes',
+        ):
             self.exploration_rights.validate()
 
     def test_validation_fails_with_invalid_status(self) -> None:
@@ -155,7 +166,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected status to be either "private" or "public", '
-            'received "archived"'):
+            'received "archived"',
+        ):
             self.exploration_rights.validate()
 
     def test_validation_fails_with_negative_first_published_msec(self) -> None:
@@ -163,17 +175,17 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected first_published_msec to be non-negative, '
-            'received -123.456'):
+            'received -123.456',
+        ):
             self.exploration_rights.validate()
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type
     # the codebase we plan to get rid of the tests that intentionally test
     # wrong inputs that we can normally catch by typing.
-    def test_validation_fails_with_non_float_first_published_msec(
-        self
-    ) -> None:
+    def test_validation_fails_with_non_float_first_published_msec(self) -> None:
         self.exploration_rights.first_published_msec = '123'  # type: ignore[assignment]
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'Expected first_published_msec to be a float, received 123'):
+            'Expected first_published_msec to be a float, received 123',
+        ):
             self.exploration_rights.validate()

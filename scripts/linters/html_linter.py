@@ -43,10 +43,7 @@ class CustomHTMLParser(html.parser.HTMLParser):
     """Custom HTML parser to check indentation."""
 
     def __init__(
-        self,
-        filepath: str,
-        file_lines: Tuple[str, ...],
-        failed: bool = False
+        self, filepath: str, file_lines: Tuple[str, ...], failed: bool = False
     ) -> None:
         """Define various variables to parse HTML.
 
@@ -64,9 +61,21 @@ class CustomHTMLParser(html.parser.HTMLParser):
         self.indentation_level = 0
         self.indentation_width = 2
         self.void_elements = [
-            'area', 'base', 'br', 'col', 'embed',
-            'hr', 'img', 'input', 'link', 'meta',
-            'param', 'source', 'track', 'wbr']
+            'area',
+            'base',
+            'br',
+            'col',
+            'embed',
+            'hr',
+            'img',
+            'input',
+            'link',
+            'meta',
+            'param',
+            'source',
+            'track',
+            'wbr',
+        ]
 
     def handle_starttag(
         self, tag: str, attrs: List[Tuple[str, Optional[str]]]
@@ -90,27 +99,41 @@ class CustomHTMLParser(html.parser.HTMLParser):
             # Getting next line after style tag.
             next_line = self.file_lines[line_number]
             next_line_expected_indentation = (
-                self.indentation_level + 1) * self.indentation_width
+                self.indentation_level + 1
+            ) * self.indentation_width
             next_line_column_number = len(next_line) - len(next_line.lstrip())
 
             if next_line_column_number != next_line_expected_indentation:
                 error_message = (
                     '%s --> Expected indentation '
                     'of %s, found indentation of %s '
-                    'for content of %s tag on line %s ' % (
-                        self.filepath, next_line_expected_indentation,
-                        next_line_column_number, tag, line_number + 1))
+                    'for content of %s tag on line %s '
+                    % (
+                        self.filepath,
+                        next_line_expected_indentation,
+                        next_line_column_number,
+                        tag,
+                        line_number + 1,
+                    )
+                )
                 self.error_messages.append(error_message)
                 self.failed = True
 
         if tag_line.startswith(opening_tag) and (
-                column_number != expected_indentation):
+            column_number != expected_indentation
+        ):
             error_message = (
                 '%s --> Expected indentation '
                 'of %s, found indentation of %s '
-                'for %s tag on line %s ' % (
-                    self.filepath, expected_indentation,
-                    column_number, tag, line_number))
+                'for %s tag on line %s '
+                % (
+                    self.filepath,
+                    expected_indentation,
+                    column_number,
+                    tag,
+                    line_number,
+                )
+            )
             self.error_messages.append(error_message)
             self.failed = True
 
@@ -119,8 +142,7 @@ class CustomHTMLParser(html.parser.HTMLParser):
             self.indentation_level += 1
 
         # Check the indentation of the attributes of the tag.
-        indentation_of_first_attribute = (
-            column_number + len(tag) + 2)
+        indentation_of_first_attribute = column_number + len(tag) + 2
         starttag_text = self.get_starttag_text()
         # Ruling out the possibility of None of 'starttag_text' for mypy
         # type checking, because 'starttag_text' can only be None when no
@@ -150,14 +172,19 @@ class CustomHTMLParser(html.parser.HTMLParser):
                     error_message = (
                         '%s --> The value %s of attribute '
                         '%s for the tag %s on line %s should '
-                        'be enclosed within double quotes.' % (
-                            self.filepath, value, attr,
-                            tag, line_number))
+                        'be enclosed within double quotes.'
+                        % (self.filepath, value, attr, tag, line_number)
+                    )
                     self.error_messages.append(error_message)
 
                 self._check_space_between_attributes_and_values(
-                    tag, attr, value, rendered_text,
-                    value_in_quotes, attr_pos_mapping)
+                    tag,
+                    attr,
+                    value,
+                    rendered_text,
+                    value_in_quotes,
+                    attr_pos_mapping,
+                )
 
         for line_num, line in enumerate(starttag_text.splitlines()):
             if line_num == 0:
@@ -176,9 +203,9 @@ class CustomHTMLParser(html.parser.HTMLParser):
                 error_message = (
                     '%s --> Attribute for tag %s on line '
                     '%s should align with the leftmost '
-                    'attribute on line %s ' % (
-                        self.filepath, tag,
-                        line_num_of_error, line_number))
+                    'attribute on line %s '
+                    % (self.filepath, tag, line_num_of_error, line_number)
+                )
                 self.error_messages.append(error_message)
                 self.failed = True
 
@@ -198,23 +225,33 @@ class CustomHTMLParser(html.parser.HTMLParser):
 
         try:
             last_starttag, last_starttag_line_num, last_starttag_col_num = (
-                self.tag_stack.pop())
+                self.tag_stack.pop()
+            )
         except IndexError as e:
-            raise TagMismatchException('Error in line %s of file %s\n' % (
-                line_number, self.filepath)) from e
+            raise TagMismatchException(
+                'Error in line %s of file %s\n' % (line_number, self.filepath)
+            ) from e
 
         if last_starttag != tag:
-            raise TagMismatchException('Error in line %s of file %s\n' % (
-                line_number, self.filepath))
+            raise TagMismatchException(
+                'Error in line %s of file %s\n' % (line_number, self.filepath)
+            )
 
         if leading_spaces_count != last_starttag_col_num and (
-                last_starttag_line_num != line_number):
+            last_starttag_line_num != line_number
+        ):
             error_message = (
                 '%s --> Indentation for end tag %s on line '
                 '%s does not match the indentation of the '
-                'start tag %s on line %s ' % (
-                    self.filepath, tag, line_number,
-                    last_starttag, last_starttag_line_num))
+                'start tag %s on line %s '
+                % (
+                    self.filepath,
+                    tag,
+                    line_number,
+                    last_starttag,
+                    last_starttag_line_num,
+                )
+            )
             self.error_messages.append(error_message)
             self.failed = True
 
@@ -228,7 +265,8 @@ class CustomHTMLParser(html.parser.HTMLParser):
         """
         data_lines = data.split('\n')
         opening_block = tuple(
-            ['{% block', '{% macro', '{% if', '% for', '% if'])
+            ['{% block', '{% macro', '{% if', '% for', '% if']
+        )
         ending_block = tuple(['{% end', '{%- end', '% } %>'])
         for data_line in data_lines:
             data_line = data_line.lstrip()
@@ -244,7 +282,7 @@ class CustomHTMLParser(html.parser.HTMLParser):
         value: str,
         rendered_text: str,
         value_in_quotes: bool,
-        attr_pos_mapping: Dict[str, List[int]]
+        attr_pos_mapping: Dict[str, List[int]],
     ) -> None:
         """Checks if there are any spaces between attributes and their value.
 
@@ -266,21 +304,24 @@ class CustomHTMLParser(html.parser.HTMLParser):
                 start, end = match.start(), match.end()
                 # Appends the position only if it is an attribute.
                 # It will not append the position if it is a substring.
-                if (rendered_text[start - 1] in [' ', '"']
-                        and rendered_text[end] in [' ', '=']):
+                if rendered_text[start - 1] in [' ', '"'] and rendered_text[
+                    end
+                ] in [' ', '=']:
                     attr_positions.append(start)
             attr_pos_mapping[attr] = attr_positions
         attr_pos = attr_pos_mapping[attr].pop(0)
-        rendered_attr_name = rendered_text[attr_pos:attr_pos + len(attr)]
+        rendered_attr_name = rendered_text[attr_pos : attr_pos + len(attr)]
         attr_val_structure = '{}="{}"' if value_in_quotes else '{}={}'
         expected_attr_assignment = attr_val_structure.format(
-            rendered_attr_name, value)
+            rendered_attr_name, value
+        )
         if not rendered_text.startswith(expected_attr_assignment, attr_pos):
             self.failed = True
             error_message = (
                 '%s --> Attribute %s for tag %s on line '
-                '%s has unwanted white spaces around it' % (
-                    self.filepath, attr, tag, line_number))
+                '%s has unwanted white spaces around it'
+                % (self.filepath, attr, tag, line_number)
+            )
             self.error_messages.append(error_message)
 
 
@@ -311,7 +352,7 @@ class HTMLLintChecksManager(linter_utils.BaseLinter):
         return self.html_filepaths
 
     def check_html_tags_and_attributes(
-        self
+        self,
     ) -> concurrent_task_utils.TaskResult:
         """This function checks the indentation of lines in HTML files.
 
@@ -341,7 +382,8 @@ class HTMLLintChecksManager(linter_utils.BaseLinter):
                 error_messages.extend(parser.error_messages)
                 failed = True
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages)
+            name, failed, error_messages, error_messages
+        )
 
     def perform_all_lint_checks(self) -> List[concurrent_task_utils.TaskResult]:
         """Perform all the lint checks and returns the messages returned by all
@@ -355,8 +397,9 @@ class HTMLLintChecksManager(linter_utils.BaseLinter):
         if not self.all_filepaths:
             return [
                 concurrent_task_utils.TaskResult(
-                    'HTML lint', False, [],
-                    ['There are no HTML files to lint.'])]
+                    'HTML lint', False, [], ['There are no HTML files to lint.']
+                )
+            ]
 
         return [self.check_html_tags_and_attributes()]
 
@@ -420,7 +463,8 @@ class ThirdPartyHTMLLintChecksManager(linter_utils.BaseLinter):
         """
         node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
         htmllint_path = os.path.join(
-            'node_modules', 'htmllint-cli', 'bin', 'cli.js')
+            'node_modules', 'htmllint-cli', 'bin', 'cli.js'
+        )
 
         failed = False
         name = 'HTMLLint'
@@ -429,7 +473,8 @@ class ThirdPartyHTMLLintChecksManager(linter_utils.BaseLinter):
         htmllint_cmd_args = [node_path, htmllint_path, '--rc=.htmllintrc']
         proc_args = htmllint_cmd_args + self.html_filepaths
         proc = subprocess.Popen(
-            proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        )
 
         encoded_linter_stdout, _ = proc.communicate()
         # Standard output is in bytes, we need to decode the line to
@@ -438,16 +483,15 @@ class ThirdPartyHTMLLintChecksManager(linter_utils.BaseLinter):
         # This line splits the output of the linter and extracts digits
         # from it. The digits are stored in a list. The second last
         # digit in the list represents the number of errors in the file.
-        error_count = (
-            [int(s) for s in linter_stdout.split() if s.isdigit()][-2])
+        error_count = [int(s) for s in linter_stdout.split() if s.isdigit()][-2]
         if error_count:
             failed = True
             full_error_messages.append(linter_stdout)
-            error_messages.append(
-                self._get_trimmed_error_output(linter_stdout))
+            error_messages.append(self._get_trimmed_error_output(linter_stdout))
 
         return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, full_error_messages)
+            name, failed, error_messages, full_error_messages
+        )
 
     def perform_all_lint_checks(self) -> List[concurrent_task_utils.TaskResult]:
         """Perform all the lint checks and returns the messages returned by all
@@ -460,8 +504,9 @@ class ThirdPartyHTMLLintChecksManager(linter_utils.BaseLinter):
         if not self.all_filepaths:
             return [
                 concurrent_task_utils.TaskResult(
-                    'HTML lint', False, [],
-                    ['There are no HTML files to lint.'])]
+                    'HTML lint', False, [], ['There are no HTML files to lint.']
+                )
+            ]
 
         return [self.lint_html_files()]
 

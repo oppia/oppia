@@ -34,7 +34,7 @@ import azure.cognitiveservices.speech as speechsdk
 from typing import Dict, List, Optional, Tuple, Union
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import secrets_services
 
 secrets_services = models.Registry.import_secrets_services()
@@ -80,7 +80,7 @@ class WordBoundaryCollection:
         """
         audio_offset_record: Dict[str, Union[str, float]] = {
             'token': '',
-            'audio_offset_msecs': 0.0
+            'audio_offset_msecs': 0.0,
         }
 
         audio_offset_record['token'] = event.text
@@ -90,7 +90,7 @@ class WordBoundaryCollection:
 
 
 def get_azure_voicecode_from_language_accent_code(
-        language_accent_code: str
+    language_accent_code: str,
 ) -> str:
     """The method retrieves the voice code associated with the given language
     accent code from the `autogeneratable_language_accent_list.json` file.
@@ -104,20 +104,20 @@ def get_azure_voicecode_from_language_accent_code(
         code.
     """
     file_path = os.path.join(
-        feconf.VOICEOVERS_DATA_DIR,
-        'autogeneratable_language_accent_list.json'
+        feconf.VOICEOVERS_DATA_DIR, 'autogeneratable_language_accent_list.json'
     )
     with utils.open_file(file_path, 'r') as f:
-        autogeneratable_language_accent_list = json.loads(
-            f.read())
+        autogeneratable_language_accent_list = json.loads(f.read())
 
     voice_code: str = autogeneratable_language_accent_list[
-        language_accent_code]['voice_code']
+        language_accent_code
+    ]['voice_code']
     return voice_code
 
 
 def process_factorial_in_text(
-        text: str, math_symbol_pronunciations: Dict[str, str]) -> str:
+    text: str, math_symbol_pronunciations: Dict[str, str]
+) -> str:
     """Process the text to convert factorial expressions into their
     corresponding words or phrases.
 
@@ -135,7 +135,8 @@ def process_factorial_in_text(
 
 
 def process_superscript_in_text(
-        text: str, math_symbol_pronunciations: Dict[str, str]) -> str:
+    text: str, math_symbol_pronunciations: Dict[str, str]
+) -> str:
     """Process the text to convert superscript characters into their
     corresponding words or phrases.
 
@@ -199,11 +200,12 @@ def process_superscript_in_text(
             return ' ' + math_symbol_pronunciations[superscript_chars]
 
         return (
-            ' ' + math_symbol_pronunciations['^'] +
-            ' ' + superscript_chars[1:])
+            ' ' + math_symbol_pronunciations['^'] + ' ' + superscript_chars[1:]
+        )
 
     result = re.sub(
-        r'\^([\d]+)', lambda m: get_pronounciation(m.group(0)), result)
+        r'\^([\d]+)', lambda m: get_pronounciation(m.group(0)), result
+    )
 
     return result
 
@@ -247,31 +249,35 @@ def convert_plaintext_to_ssml_content(
 
     language_code = (
         voiceover_services.get_language_code_from_language_accent_code(
-            language_accent_code))
+            language_accent_code
+        )
+    )
 
     math_symbol_pronunciations = (
         constants.LANGUAGE_CODE_TO_MATH_SYMBOL_PRONUNCIATIONS.get(
-            language_code, {}))
+            language_code, {}
+        )
+    )
 
     main_ssml_content = ''
     for content in content_list:
         # Updates the content to pronounce `-` correctly in the given language.
         if ' - ' in content:
             content = content.replace(
-                '-',
-                MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronunciations['-'])
+                '-', MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronunciations['-']
+            )
 
         # Update the content to pronounce `*` correctly in the given language.
         if ' * ' in content:
             content = content.replace(
-                '*',
-                MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronunciations['*'])
+                '*', MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronunciations['*']
+            )
 
         # Update the content to pronounce `×` correctly in the given language.
         if '×' in content:
             content = content.replace(
-                '×',
-                MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronunciations['×'])
+                '×', MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronunciations['×']
+            )
 
         # Update the content of algebraic fractions to contain spaces around
         # the slashes.
@@ -280,53 +286,53 @@ def convert_plaintext_to_ssml_content(
         # Update the content to pronounce `/` correctly in the given language.
         if ' / ' in content:
             content = content.replace(
-                '/',
-                MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronunciations['÷'])
+                '/', MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronunciations['÷']
+            )
 
         # Update the content to pronounce `÷` correctly in the given language.
         if '÷' in content:
             content = content.replace(
-                '÷',
-                MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronunciations['÷'])
+                '÷', MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronunciations['÷']
+            )
 
         # Update the content to pronounce `+` correctly in the given language.
         if ' + ' in content:
             content = content.replace(
-                '+',
-                MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronunciations['+'])
+                '+', MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronunciations['+']
+            )
 
         # Update the content to pronounce `=` correctly in the given language.
         if ' = ' in content:
             content = content.replace(
                 ' = ',
-                MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronunciations['='])
+                MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronunciations['='],
+            )
 
         # Update the content to pronounce factorials correctly in the given
         # language.
-        content = process_factorial_in_text(
-            content, math_symbol_pronunciations)
+        content = process_factorial_in_text(content, math_symbol_pronunciations)
 
         # Update the content to pronounce superscripts correctly in the given
         # language.
         content = process_superscript_in_text(
-            content, math_symbol_pronunciations)
+            content, math_symbol_pronunciations
+        )
 
         # Update the content to pronounce 'dash' for two or more underscores in
         # the content.
         content = re.sub(r'_{2,}', ' dash ', content)
 
-        main_ssml_content += (MAIN_CONTENT_SSML_TEMPLATE_BLOCK % content)
+        main_ssml_content += MAIN_CONTENT_SSML_TEMPLATE_BLOCK % content
 
     return SSML_TEMPLATE_FOR_SPEECH_SYNTHESIS % (
         language_accent_code,
         get_azure_voicecode_from_language_accent_code(language_accent_code),
-        main_ssml_content
+        main_ssml_content,
     )
 
 
 def regenerate_speech_from_text(
-    plaintext: str,
-    language_accent_code: str
+    plaintext: str, language_accent_code: str
 ) -> Tuple[bytes, List[Dict[str, Union[str, float]]], Optional[str]]:
     """Regenerates speech (Oppia's voiceovers) from the provided text.
 
@@ -364,26 +370,32 @@ def regenerate_speech_from_text(
 
     # Speech Configuration for Azure TTS.
     speech_config = speechsdk.SpeechConfig(
-        subscription=azure_tts_api_key,
-        region=azure_tts_region)
+        subscription=azure_tts_api_key, region=azure_tts_region
+    )
 
     # Configuring audio format to MP3.
     speech_config.set_speech_synthesis_output_format(
-        speechsdk.SpeechSynthesisOutputFormat.Audio24Khz160KBitRateMonoMp3)
+        speechsdk.SpeechSynthesisOutputFormat.Audio24Khz160KBitRateMonoMp3
+    )
 
     speech_synthesizer = speechsdk.SpeechSynthesizer(
-        speech_config=speech_config, audio_config=None)
+        speech_config=speech_config, audio_config=None
+    )
 
     word_boundary_collection_instance: WordBoundaryCollection = (
-        WordBoundaryCollection())
+        WordBoundaryCollection()
+    )
     speech_synthesizer.synthesis_word_boundary.connect(
-        word_boundary_collection_instance.word_boundary_event)
+        word_boundary_collection_instance.word_boundary_event
+    )
 
     ssml_text_for_speech_synthesis = convert_plaintext_to_ssml_content(
-        plaintext, language_accent_code)
+        plaintext, language_accent_code
+    )
 
     speech_synthesis_result = speech_synthesizer.speak_ssml_async(
-        ssml_text_for_speech_synthesis).get()
+        ssml_text_for_speech_synthesis
+    ).get()
 
     binary_audio_data = speech_synthesis_result.audio_data
 
@@ -397,5 +409,5 @@ def regenerate_speech_from_text(
     return (
         binary_audio_data,
         word_boundary_collection_instance.audio_offset_list,
-        error_details
+        error_details,
     )

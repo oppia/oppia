@@ -19,7 +19,7 @@
                 </option>
               </select>
             </div>
-            <div *ngFor="let question of displayedQuestions; index as idx" class="question-list-item">
+            <div *ngFor="let question of displayedQuestions; index as idx" class="question-list-item e2e-test-preview-question">
               <div (click)="selectQuestionToPreview(idx)">
                 <div class="question-data">
                   <oppia-rte-output-display class="question-text"

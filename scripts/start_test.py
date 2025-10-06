@@ -33,11 +33,11 @@ MANAGED_WEB_BROWSER_ERROR = 'Mock Exception while launching web browser.'
 
 
 class MockCompiler:
-    def wait(self) -> None: # pylint: disable=missing-docstring
+    def wait(self) -> None:  # pylint: disable=missing-docstring
         pass
 
 
-class MockCompilerContextManager():
+class MockCompilerContextManager:
     def __init__(self) -> None:
         pass
 
@@ -55,12 +55,17 @@ class StartTests(test_utils.GenericTestBase):
         super().setUp()
 
         self.print_arr: list[str] = []
+
         def mock_print(msg: str) -> None:
             self.print_arr.append(msg)
+
         def mock_context_manager() -> MockCompilerContextManager:
             return MockCompilerContextManager()
+
         self.swap_print = self.swap(
-            common, 'print_each_string_after_two_new_lines', mock_print)
+            common, 'print_each_string_after_two_new_lines', mock_print
+        )
+
         def mock_constants() -> None:
             print('mock_set_constants_to_default')
 
@@ -70,64 +75,91 @@ class StartTests(test_utils.GenericTestBase):
         # scripts/start.py installs third party libraries whenever it is
         # imported.
         self.swap_install_third_party_libs = self.swap(
-            install_third_party_libs, 'main', lambda: None)
+            install_third_party_libs, 'main', lambda: None
+        )
         self.swap_extend_index_yaml = self.swap(
-            extend_index_yaml, 'main', lambda: None)
+            extend_index_yaml, 'main', lambda: None
+        )
         self.swap_webpack_compiler = self.swap_with_checks(
-            servers, 'managed_webpack_compiler',
+            servers,
+            'managed_webpack_compiler',
             lambda **unused_kwargs: MockCompilerContextManager(),
-            expected_kwargs=[{
-                'use_prod_env': False,
-                'use_source_maps': False,
-                'watch_mode': True
-            }])
+            expected_kwargs=[
+                {
+                    'use_prod_env': False,
+                    'use_source_maps': False,
+                    'watch_mode': True,
+                }
+            ],
+        )
         self.swap_ng_build = self.swap_with_checks(
             servers,
             'managed_ng_build',
             lambda **unused_kwargs: MockCompilerContextManager(),
-            expected_kwargs=[{'watch_mode': True}]
+            expected_kwargs=[{'watch_mode': True}],
         )
         self.swap_redis_server = self.swap(
-            servers, 'managed_redis_server', mock_context_manager)
+            servers, 'managed_redis_server', mock_context_manager
+        )
         self.swap_elasticsearch_dev_server = self.swap(
-            servers, 'managed_elasticsearch_dev_server', mock_context_manager)
+            servers, 'managed_elasticsearch_dev_server', mock_context_manager
+        )
         self.swap_firebase_auth_emulator = self.swap_with_checks(
-            servers, 'managed_firebase_auth_emulator',
+            servers,
+            'managed_firebase_auth_emulator',
             lambda **unused_kwargs: MockCompilerContextManager(),
-            expected_kwargs=[{'recover_users': False}])
+            expected_kwargs=[{'recover_users': False}],
+        )
         self.swap_cloud_datastore_emulator = self.swap_with_checks(
-            servers, 'managed_cloud_datastore_emulator',
+            servers,
+            'managed_cloud_datastore_emulator',
             lambda **unused_kwargs: MockCompilerContextManager(),
-            expected_kwargs=[{'clear_datastore': True}])
+            expected_kwargs=[{'clear_datastore': True}],
+        )
         self.swap_dev_appserver = self.swap_with_checks(
-            servers, 'managed_dev_appserver',
+            servers,
+            'managed_dev_appserver',
             lambda *unused_args, **unused_kwargs: MockCompilerContextManager(),
-            expected_kwargs=[{
-                'enable_host_checking': True,
-                'automatic_restart': True,
-                'skip_sdk_update_check': True,
-                'port': PORT_NUMBER_FOR_GAE_SERVER,
-                'env': env
-            }])
+            expected_kwargs=[
+                {
+                    'enable_host_checking': True,
+                    'automatic_restart': True,
+                    'skip_sdk_update_check': True,
+                    'port': PORT_NUMBER_FOR_GAE_SERVER,
+                    'env': env,
+                }
+            ],
+        )
         self.swap_create_server = self.swap_with_checks(
-            servers, 'create_managed_web_browser',
+            servers,
+            'create_managed_web_browser',
             lambda _: MockCompilerContextManager(),
-            expected_args=((PORT_NUMBER_FOR_GAE_SERVER,),))
+            expected_args=((PORT_NUMBER_FOR_GAE_SERVER,),),
+        )
         self.swap_create_managed_web_browser = self.swap_to_always_raise(
-            servers, 'create_managed_web_browser',
-            Exception(MANAGED_WEB_BROWSER_ERROR))
+            servers,
+            'create_managed_web_browser',
+            Exception(MANAGED_WEB_BROWSER_ERROR),
+        )
         self.swap_mock_set_constants_to_default = self.swap(
-            common, 'set_constants_to_default', mock_constants)
+            common, 'set_constants_to_default', mock_constants
+        )
 
     def test_start_servers_successfully(self) -> None:
         with self.swap_install_third_party_libs:
             from scripts import start
         swap_build = self.swap_with_checks(
-            build, 'main', lambda **unused_kwargs: None,
-            expected_kwargs=[{'args': []}])
+            build,
+            'main',
+            lambda **unused_kwargs: None,
+            expected_kwargs=[{'args': []}],
+        )
         swap_check_port_in_use = self.swap_with_checks(
-            common, 'is_port_in_use', lambda _: False,
-            expected_args=((PORT_NUMBER_FOR_GAE_SERVER,),))
+            common,
+            'is_port_in_use',
+            lambda _: False,
+            expected_args=((PORT_NUMBER_FOR_GAE_SERVER,),),
+        )
         with self.swap_cloud_datastore_emulator, self.swap_ng_build, swap_build:
             with self.swap_elasticsearch_dev_server, self.swap_redis_server:
                 with self.swap_create_server, self.swap_webpack_compiler:
@@ -144,19 +176,26 @@ class StartTests(test_utils.GenericTestBase):
                     'Local development server is ready! Opening a default web '
                     'browser window pointing to it: '
                     'http://localhost:%s/' % PORT_NUMBER_FOR_GAE_SERVER
-                )
+                ),
             ],
-            self.print_arr)
+            self.print_arr,
+        )
 
     def test_start_servers_successfully_in_production_mode(self) -> None:
         with self.swap_install_third_party_libs:
             from scripts import start
         swap_build = self.swap_with_checks(
-            build, 'main', lambda **unused_kwargs: None,
-            expected_kwargs=[{'args': ['--prod_env']}])
+            build,
+            'main',
+            lambda **unused_kwargs: None,
+            expected_kwargs=[{'args': ['--prod_env']}],
+        )
         swap_check_port_in_use = self.swap_with_checks(
-            common, 'is_port_in_use', lambda _: False,
-            expected_args=((PORT_NUMBER_FOR_GAE_SERVER,),))
+            common,
+            'is_port_in_use',
+            lambda _: False,
+            expected_args=((PORT_NUMBER_FOR_GAE_SERVER,),),
+        )
         with self.swap_cloud_datastore_emulator, self.swap_create_server:
             with self.swap_elasticsearch_dev_server, self.swap_redis_server:
                 with self.swap_firebase_auth_emulator, self.swap_dev_appserver:
@@ -172,21 +211,26 @@ class StartTests(test_utils.GenericTestBase):
                     'Local development server is ready! Opening a default web '
                     'browser window pointing to it: '
                     'http://localhost:%s/' % PORT_NUMBER_FOR_GAE_SERVER
-                )
+                ),
             ],
-            self.print_arr)
+            self.print_arr,
+        )
 
     def test_start_servers_successfully_in_maintenance_mode(self) -> None:
         with self.swap_install_third_party_libs:
             from scripts import start
         swap_build = self.swap_with_checks(
-            build, 'main', lambda **unused_kwargs: None,
-            expected_kwargs=[{
-                'args': ['--maintenance_mode']
-            }])
+            build,
+            'main',
+            lambda **unused_kwargs: None,
+            expected_kwargs=[{'args': ['--maintenance_mode']}],
+        )
         swap_check_port_in_use = self.swap_with_checks(
-            common, 'is_port_in_use', lambda _: False,
-            expected_args=((PORT_NUMBER_FOR_GAE_SERVER,),))
+            common,
+            'is_port_in_use',
+            lambda _: False,
+            expected_args=((PORT_NUMBER_FOR_GAE_SERVER,),),
+        )
         with self.swap_cloud_datastore_emulator, swap_build, self.swap_ng_build:
             with self.swap_elasticsearch_dev_server, self.swap_redis_server:
                 with self.swap_create_server, self.swap_webpack_compiler:
@@ -203,19 +247,26 @@ class StartTests(test_utils.GenericTestBase):
                     'Local development server is ready! Opening a default web '
                     'browser window pointing to it: '
                     'http://localhost:%s/' % PORT_NUMBER_FOR_GAE_SERVER
-                )
+                ),
             ],
-            self.print_arr)
+            self.print_arr,
+        )
 
     def test_could_not_start_new_server_when_port_is_in_use(self) -> None:
         with self.swap_install_third_party_libs:
             from scripts import start
         swap_build = self.swap_with_checks(
-            build, 'main', lambda **unused_kwargs: None,
-            expected_kwargs=[{'args': []}])
+            build,
+            'main',
+            lambda **unused_kwargs: None,
+            expected_kwargs=[{'args': []}],
+        )
         swap_check_port_in_use = self.swap_with_checks(
-            common, 'is_port_in_use', lambda _: True,
-            expected_args=((PORT_NUMBER_FOR_GAE_SERVER,),))
+            common,
+            'is_port_in_use',
+            lambda _: True,
+            expected_args=((PORT_NUMBER_FOR_GAE_SERVER,),),
+        )
         with self.swap_cloud_datastore_emulator, self.swap_webpack_compiler:
             with self.swap_elasticsearch_dev_server, self.swap_redis_server:
                 with self.swap_firebase_auth_emulator, self.swap_dev_appserver:
@@ -230,9 +281,10 @@ class StartTests(test_utils.GenericTestBase):
                 (
                     'Could not start new server. There is already an existing '
                     'server running at port %s.' % PORT_NUMBER_FOR_GAE_SERVER
-                )
+                ),
             ],
-            self.print_arr)
+            self.print_arr,
+        )
 
         self.assertIn(
             [
@@ -241,25 +293,33 @@ class StartTests(test_utils.GenericTestBase):
                     'Local development server is ready! You can access it by '
                     'navigating to http://localhost:%s/ in a web '
                     'browser.' % PORT_NUMBER_FOR_GAE_SERVER
-                )
+                ),
             ],
-            self.print_arr)
+            self.print_arr,
+        )
 
     def test_source_maps_are_compiled_by_webpack(self) -> None:
         with self.swap_install_third_party_libs:
             from scripts import start
         swap_build = self.swap_with_checks(
-            build, 'main', lambda **unused_kwargs: None,
-            expected_kwargs=[{'args': ['--source_maps']}])
+            build,
+            'main',
+            lambda **unused_kwargs: None,
+            expected_kwargs=[{'args': ['--source_maps']}],
+        )
         swap_emulator_mode = self.swap(constants, 'EMULATOR_MODE', False)
         self.swap_webpack_compiler = self.swap_with_checks(
-            servers, 'managed_webpack_compiler',
+            servers,
+            'managed_webpack_compiler',
             lambda **unused_kwargs: MockCompilerContextManager(),
-            expected_kwargs=[{
-                'use_prod_env': False,
-                'use_source_maps': True,
-                'watch_mode': True
-            }])
+            expected_kwargs=[
+                {
+                    'use_prod_env': False,
+                    'use_source_maps': True,
+                    'watch_mode': True,
+                }
+            ],
+        )
         with self.swap_webpack_compiler, self.swap_create_server:
             with self.swap_elasticsearch_dev_server, self.swap_redis_server:
                 with swap_emulator_mode, self.swap_dev_appserver:
@@ -275,16 +335,20 @@ class StartTests(test_utils.GenericTestBase):
                     'Local development server is ready! Opening a default web '
                     'browser window pointing to it: '
                     'http://localhost:%s/' % PORT_NUMBER_FOR_GAE_SERVER
-                )
+                ),
             ],
-            self.print_arr)
+            self.print_arr,
+        )
 
     def test_could_not_auto_launch_web_browser(self) -> None:
         with self.swap_install_third_party_libs:
             from scripts import start
         swap_build = self.swap_with_checks(
-            build, 'main', lambda **unused_kwargs: None,
-            expected_kwargs=[{'args': []}])
+            build,
+            'main',
+            lambda **unused_kwargs: None,
+            expected_kwargs=[{'args': []}],
+        )
 
         with self.swap_cloud_datastore_emulator, self.swap_ng_build, swap_build:
             with self.swap_elasticsearch_dev_server, self.swap_redis_server:
@@ -301,9 +365,10 @@ class StartTests(test_utils.GenericTestBase):
                 (
                     'Error occurred while attempting to automatically launch '
                     'the web browser: %s' % MANAGED_WEB_BROWSER_ERROR
-                )
+                ),
             ],
-            self.print_arr)
+            self.print_arr,
+        )
 
         self.assertIn(
             [
@@ -312,18 +377,23 @@ class StartTests(test_utils.GenericTestBase):
                     'Local development server is ready! You can access it by '
                     'navigating to http://localhost:%s/ in a web '
                     'browser.' % PORT_NUMBER_FOR_GAE_SERVER
-                )
+                ),
             ],
-            self.print_arr)
+            self.print_arr,
+        )
 
     def test_not_mock_set_constants_to_default_error(self) -> None:
         with self.swap_install_third_party_libs:
             from scripts import start
         swap_build = self.swap_with_checks(
-            build, 'main', lambda **unused_kwargs: None,
-            expected_kwargs=[{'args': []}])
+            build,
+            'main',
+            lambda **unused_kwargs: None,
+            expected_kwargs=[{'args': []}],
+        )
         assert_raises_regexp = self.assertRaisesRegex(
-            Exception, 'Please mock this method in the test.')
+            Exception, 'Please mock this method in the test.'
+        )
 
         with self.swap_cloud_datastore_emulator, self.swap_ng_build, swap_build:
             with self.swap_elasticsearch_dev_server, self.swap_redis_server:

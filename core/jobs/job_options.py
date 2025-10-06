@@ -21,10 +21,16 @@ from __future__ import annotations
 import argparse
 
 from core import feconf
-from core.domain import platform_parameter_list, platform_parameter_services
+from core.platform import models
 
 from apache_beam.options import pipeline_options
 from typing import List, Optional
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import app_identity_services
+
+app_identity_services = models.Registry.import_app_identity_services()
 
 
 # TODO(#15613): Here we use MyPy ignore because the incomplete typing of
@@ -32,18 +38,18 @@ from typing import List, Optional
 # assume that PipelineOptions class is of type Any. Thus to avoid MyPy's
 # error (Class cannot subclass 'PipelineOptions' (has type 'Any')), we
 # added an ignore here.
-class JobOptions(pipeline_options.PipelineOptions): # type: ignore[misc]
+class JobOptions(pipeline_options.PipelineOptions):  # type: ignore[misc]
     """Option class for configuring the behavior of Oppia jobs."""
 
     JOB_OPTIONS = {
         'namespace': (
-            str, 'Namespace for isolating the NDB operations during tests.'),
+            str,
+            'Namespace for isolating the NDB operations during tests.',
+        ),
     }
 
     def __init__(
-        self,
-        flags: Optional[List[str]] = None,
-        **job_options: Optional[str]
+        self, flags: Optional[List[str]] = None, **job_options: Optional[str]
     ) -> None:
         """Initializes a new JobOptions instance.
 
@@ -62,10 +68,9 @@ class JobOptions(pipeline_options.PipelineOptions): # type: ignore[misc]
         if unsupported_options:
             joined_unsupported_options = ', '.join(sorted(unsupported_options))
             raise ValueError(
-                'Unsupported option(s): %s' % joined_unsupported_options)
-        oppia_project_id = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.OPPIA_PROJECT_ID.value))
+                'Unsupported option(s): %s' % joined_unsupported_options
+            )
+        oppia_project_id = app_identity_services.get_application_id()
         assert isinstance(oppia_project_id, str)
         super().__init__(
             # Needed by PipelineOptions.
@@ -74,9 +79,11 @@ class JobOptions(pipeline_options.PipelineOptions): # type: ignore[misc]
             project=oppia_project_id,
             region=feconf.GOOGLE_APP_ENGINE_REGION,
             temp_location=(
-                feconf.DATAFLOW_TEMP_LOCATION_TEMPLATE % oppia_project_id),
+                feconf.DATAFLOW_TEMP_LOCATION_TEMPLATE % oppia_project_id
+            ),
             staging_location=(
-                feconf.DATAFLOW_STAGING_LOCATION_TEMPLATE % oppia_project_id),
+                feconf.DATAFLOW_STAGING_LOCATION_TEMPLATE % oppia_project_id
+            ),
             # The 'use_runner_v2' is used since some of our jobs require
             # the v2 of the runner. See the docs:
             # https://cloud.google.com/dataflow/docs/guides/deploying-a-pipeline#dataflow-runner-v2
@@ -85,7 +92,8 @@ class JobOptions(pipeline_options.PipelineOptions): # type: ignore[misc]
             # the Dataflow dashboard that is available to the Oppia admins.
             experiments=['use_runner_v2', 'enable_recommendations'],
             extra_packages=[feconf.OPPIA_PYTHON_PACKAGE_PATH],
-            **job_options)
+            **job_options,
+        )
 
     @classmethod
     def _add_argparse_args(cls, parser: argparse.ArgumentParser) -> None:
@@ -96,4 +104,5 @@ class JobOptions(pipeline_options.PipelineOptions): # type: ignore[misc]
         """
         for option_name, (option_type, option_doc) in cls.JOB_OPTIONS.items():
             parser.add_argument(
-                '--%s' % option_name, help=option_doc, type=option_type)
+                '--%s' % option_name, help=option_doc, type=option_type
+            )

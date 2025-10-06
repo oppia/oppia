@@ -36,7 +36,7 @@ class ReviewTestsPageDataHandler(
     URL_PATH_ARGS_SCHEMAS = {
         'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
         'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
-        'story_url_fragment': constants.SCHEMA_FOR_STORY_URL_FRAGMENTS
+        'story_url_fragment': constants.SCHEMA_FOR_STORY_URL_FRAGMENTS,
     }
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
@@ -45,8 +45,14 @@ class ReviewTestsPageDataHandler(
         """Handles GET requests."""
         story = story_fetchers.get_story_by_id(story_id)
         latest_completed_node_ids = (
-            story_fetchers.get_latest_completed_node_ids(self.user_id, story_id)
-        ) if self.user_id else []
+            (
+                story_fetchers.get_latest_completed_node_ids(
+                    self.user_id, story_id
+                )
+            )
+            if self.user_id
+            else []
+        )
 
         if len(latest_completed_node_ids) == 0:
             raise self.NotFoundException
@@ -55,15 +61,18 @@ class ReviewTestsPageDataHandler(
             skills = skill_fetchers.get_multi_skills(
                 story.get_acquired_skill_ids_for_node_ids(
                     latest_completed_node_ids
-                ))
+                )
+            )
         except Exception as e:
             raise self.NotFoundException(e)
         skill_descriptions = {}
         for skill in skills:
             skill_descriptions[skill.id] = skill.description
 
-        self.values.update({
-            'skill_descriptions': skill_descriptions,
-            'story_name': story.title
-        })
+        self.values.update(
+            {
+                'skill_descriptions': skill_descriptions,
+                'story_name': story.title,
+            }
+        )
         self.render_json(self.values)
