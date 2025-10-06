@@ -20,7 +20,9 @@ body:
       label: CI Test Type
       description: >
         In which CI test did this failure occur? For E2E or Acceptance test failures,
-        please use our dedicated template instead.
+        please use our dedicated template instead by navigating to our
+        [issues page](https://github.com/oppia/oppia/issues), clicking "New issue",
+        and selecting the template for "E2E or Acceptance Test CI Failure Report".
       options:
         - Frontend
         - Backend
