@@ -45,7 +45,6 @@ import {ChangeListService} from '../../services/change-list.service';
 import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
-import {PlatformFeatureService} from 'services/platform-feature.service';
 import {EntityVoiceovers} from '../../../../domain/voiceover/entity-voiceovers.model';
 import {Voiceover} from '../../../../domain/exploration/voiceover.model';
 import {LocalStorageService} from 'services/local-storage.service';
@@ -503,7 +502,8 @@ describe('Translator Overview component', () => {
         content_8: {
           manual: manualVoiceover2,
         },
-      }
+      },
+      {}
     );
     component.languageCode = 'en';
     let languageAccentMasterList = {

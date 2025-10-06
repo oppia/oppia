@@ -32,11 +32,26 @@ import {EntityVoiceovers} from 'domain/voiceover/entity-voiceovers.model';
 import {Voiceover} from 'domain/exploration/voiceover.model';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {FeatureStatusChecker} from 'domain/feature-flag/feature-status-summary.model';
 
 class MockNgbModal {
   open() {
     return {
       result: Promise.resolve(),
+    };
+  }
+}
+
+class MockPlatformFeatureService {
+  get status(): object {
+    return {
+      AddVoiceoverWithAccent: {
+        isEnabled: false,
+      },
+      AutomaticVoiceoverRegenerationFromExp: {
+        isEnabled: false,
+      },
     };
   }
 }
@@ -50,6 +65,7 @@ describe('Translation status service', () => {
   let tls: TranslationLanguageService;
   let entityVoiceoversService: EntityVoiceoversService;
   let stateEditorService: StateEditorService;
+  let platformFeatureService: PlatformFeatureService;
 
   let ALL_ASSETS_AVAILABLE_COLOR = '#16A765';
   let FEW_ASSETS_AVAILABLE_COLOR = '#E9B330';
@@ -68,6 +84,10 @@ describe('Translation status service', () => {
         {
           provide: NgbModal,
           useClass: MockNgbModal,
+        },
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService,
         },
         {
           provide: ExplorationDataService,
@@ -89,6 +109,7 @@ describe('Translation status service', () => {
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
     generateContentIdService = TestBed.inject(GenerateContentIdService);
     entityVoiceoversService = TestBed.inject(EntityVoiceoversService);
+    platformFeatureService = TestBed.inject(PlatformFeatureService);
     let currentIndex = 9;
     generateContentIdService.init(
       () => currentIndex++,
@@ -437,6 +458,18 @@ describe('Translation status service', () => {
   );
 
   it('should return a correct count of missing audio with accent in an exploration', () => {
+    let platformFeatureServiceSpy = spyOnProperty(
+      platformFeatureService,
+      'status',
+      'get'
+    );
+
+    platformFeatureServiceSpy.and.returnValue({
+      AutomaticVoiceoverRegenerationFromExp: {
+        isEnabled: false,
+      },
+    } as FeatureStatusChecker);
+
     let voiceover1 = new Voiceover('a.mp3', 1000, false, 10.0);
     let voiceover2 = new Voiceover('b.mp3', 1000, false, 10.0);
 
@@ -471,6 +504,12 @@ describe('Translation status service', () => {
     expect(tss.getExplorationContentNotAvailableCount()).toEqual(7);
     let color = tss.getActiveStateContentIdStatusColor('content_0');
     expect(tss.NO_ASSETS_AVAILABLE_COLOR).toEqual(color);
+
+    platformFeatureServiceSpy.and.returnValue({
+      AutomaticVoiceoverRegenerationFromExp: {
+        isEnabled: true,
+      },
+    } as FeatureStatusChecker);
 
     tss.refresh();
     expect(tss.getExplorationContentNotAvailableCount()).toEqual(6);
@@ -770,4 +809,28 @@ describe('Translation status service', () => {
       expect(activeStateContentIdNeedsUpdateStatus).toBe(true);
     }
   );
+
+  it('should disable voiceover regeneration feature flag', () => {
+    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
+      AutomaticVoiceoverRegenerationFromExp: {
+        isEnabled: false,
+      },
+    } as FeatureStatusChecker);
+
+    expect(
+      tss.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()
+    ).toBeFalse();
+  });
+
+  it('should enable voiceover regeneration feature flag', () => {
+    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
+      AutomaticVoiceoverRegenerationFromExp: {
+        isEnabled: true,
+      },
+    } as FeatureStatusChecker);
+
+    expect(
+      tss.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()
+    ).toBeTrue();
+  });
 });
