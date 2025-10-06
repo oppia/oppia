@@ -316,6 +316,8 @@ def get_translation_opportunity_summary_from_model(
         entity_id=model.entity_id,
         topic_ids=model.topic_ids,
         content_count=model.content_count,
+        incomplete_translation_language_codes=(
+            model.incomplete_translation_language_codes),
         translation_counts=model.translation_counts
     )
 
@@ -354,7 +356,8 @@ def compute_translation_opportunity_models_with_updated_entity(
         if translation_count == content_count:
             complete_translation_language_list.append(language_code)
     
-    model = opportunity_models.TranslationOpportunityModel.get(entity_id)
+    model_id = f'{entity_type}.{entity_id}'
+    model = opportunity_models.TranslationOpportunityModel.get(model_id)
     translation_opportunity = get_translation_opportunity_summary_from_model(
         model)
     translation_opportunity.content_count = content_count
@@ -1319,8 +1322,29 @@ def _save_multi_translation_opportunities(
     )
 
     if models:
-        opportunity_models.TranslationOpportunityModel.update_timestamps_multi(
-            models)
+        # Only update timestamps and save models that are actually new or changed
+        models_to_save = []
+        for model in models:
+            existing_model = opportunity_models.TranslationOpportunityModel.get(
+                model.id, strict=False)
+            
+            if existing_model is None:
+                # New model - needs to be saved
+                models_to_save.append(model)
+            else:
+                # Check if the model content has actually changed
+                if (existing_model.content_count != model.content_count or
+                    existing_model.translation_counts != model.translation_counts or
+                    set(existing_model.incomplete_translation_language_codes) != 
+                    set(model.incomplete_translation_language_codes) or
+                    existing_model.topic_ids != model.topic_ids):
+                    # Model has changed - needs to be saved
+                    models_to_save.append(model)
+        
+        if models_to_save:
+            opportunity_models.TranslationOpportunityModel.update_timestamps_multi(
+                models_to_save)
+            opportunity_models.TranslationOpportunityModel.put_multi(models_to_save)
 
 
 def _construct_new_translation_opportunity_models(

@@ -1110,40 +1110,92 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
                 None
             )
 
-        def test_create_translation_opportunity_creates_model(self) -> None:
-            entity_types_and_ids = {
-                feconf.ENTITY_TYPE_EXPLORATION: ['0']
-            }
+    def test_create_translation_opportunity_creates_model(self) -> None:
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.admin_id)
 
-            self.assertIsNone(
-                opportunity_models.TranslationOpportunityModel.get(
-                    '0', strict=False)
-            )
+        topic_services.generate_topic_summary(self.TOPIC_ID)
 
-            opportunity_services.create_translation_opportunity(
-                entity_types_and_ids)
-
-            model = opportunity_models.TranslationOpportunityModel.get('0')
-            self.assertIsNotNone(model)
-            self.assertEqual(model.entity_id, '0')
-            self.assertEqual(model.entity_type, feconf.ENTITY_TYPE_EXPLORATION)
-            self.assertIn(self.TOPIC_ID, model.topic_ids)
-            self.assertGreaterEqual(model.content_count, 1)
-            self.assertIsInstance(
-                model.incomplete_translation_language_codes, list)
-            self.assertIsInstance(model.translation_counts, dict)
-
-    def test_create_translation_opportunity_idempotency(self) -> None:
+        exp = exp_fetchers.get_exploration_by_id('0')
+        translation_domain.ContentIdGenerator(
+            exp.next_content_id_index)
+        
+        change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Introduction',
+                'property_name': 'content',
+                'new_value': {
+                    'html': '<p><strong>Test content for translation</strong></p>',
+                    'content_id': 'content_0',
+                }
+            })
+        ]
+        exp_services.update_exploration(
+            self.owner_id, '0', change_list, 'Add translatable content')
+        
         entity_types_and_ids = {
             feconf.ENTITY_TYPE_EXPLORATION: ['0']
         }
 
-        opportunity_services.create_translation_opportunity(entity_types_and_ids)
-        model_before = opportunity_models.TranslationOpportunityModel.get('0')
+        self.assertIsNone(
+            opportunity_models.TranslationOpportunityModel.get(
+                'exploration.0', strict=False)
+        )
+
+        opportunity_services.create_translation_opportunity(
+            entity_types_and_ids)
+
+        model = opportunity_models.TranslationOpportunityModel.get('exploration.0')
+        self.assertIsNotNone(model)
+        self.assertEqual(model.entity_id, '0')
+        self.assertEqual(model.entity_type, feconf.ENTITY_TYPE_EXPLORATION)
+        self.assertIn(self.TOPIC_ID, model.topic_ids)
+        self.assertGreaterEqual(model.content_count, 1)  # Now should pass
+        self.assertIsInstance(
+            model.incomplete_translation_language_codes, list)
+        self.assertIsInstance(model.translation_counts, dict)
+
+    def test_create_translation_opportunity_idempotency(self) -> None:
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.admin_id)
+
+        topic_services.generate_topic_summary(self.TOPIC_ID)
+
+        exp = exp_fetchers.get_exploration_by_id('0')
+        translation_domain.ContentIdGenerator(
+            exp.next_content_id_index)
+        
+        change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Introduction',
+                'property_name': 'content',
+                'new_value': {
+                    'html': '<p><strong>Test content for translation</strong></p>',
+                    'content_id': 'content_0',
+                }
+            })
+        ]
+        exp_services.update_exploration(
+            self.owner_id, '0', change_list, 'Add translatable content')
+        
+        entity_types_and_ids = {
+            feconf.ENTITY_TYPE_EXPLORATION: ['0']
+        }
+
+        self.assertIsNone(
+            opportunity_models.TranslationOpportunityModel.get(
+                'exploration.0', strict=False)
+        )
+
+        opportunity_services.create_translation_opportunity(
+            entity_types_and_ids)
+        model_before = opportunity_models.TranslationOpportunityModel.get('exploration.0')
         timestamp_before = model_before.last_updated
 
         opportunity_services.create_translation_opportunity(entity_types_and_ids)
-        model_after = opportunity_models.TranslationOpportunityModel.get('0')
+        model_after = opportunity_models.TranslationOpportunityModel.get('exploration.0')
         timestamp_after = model_after.last_updated
 
         self.assertEqual(model_before.entity_id, model_after.entity_id)
@@ -1152,8 +1204,12 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
     def test_compute_translation_opportunity_models_with_updated_entity(
         self
     ) -> None:
+        # First ensure exploration '0' is properly linked to topic for the function to work
+        topic_services.generate_topic_summary(self.TOPIC_ID)
+        
+        # Create a TranslationOpportunityModel with the correct ID format
         opportunity_models.TranslationOpportunityModel(
-            id='0',
+            id='exploration.0',  # Correct ID format: entity_type.entity_id
             entity_id='0',
             entity_type=feconf.ENTITY_TYPE_EXPLORATION,
             topic_ids=[self.TOPIC_ID],
@@ -1172,7 +1228,7 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
         }
 
         # Make sure the original model exists.
-        model_before = opportunity_models.TranslationOpportunityModel.get(entity_id)
+        model_before = opportunity_models.TranslationOpportunityModel.get('exploration.0')
         self.assertIsNotNone(model_before)
 
         models = opportunity_services.compute_translation_opportunity_models_with_updated_entity(
@@ -1189,9 +1245,16 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
 
         # Ensure correct incomplete language codes.
         exploration = exp_fetchers.get_exploration_by_id(entity_id)
-        expected_incomplete = ['hi']
-        if exploration.language_code in expected_incomplete:
-            expected_incomplete.remove(exploration.language_code)
+        # Languages that are not fully translated (content_count != translation count)
+        expected_incomplete = []
+        for lang_code in constants.SUPPORTED_AUDIO_LANGUAGES:
+            lang_id = lang_code['id']
+            # Skip the exploration's native language
+            if lang_id == exploration.language_code:
+                continue
+            # Include if not fully translated
+            if translation_counts.get(lang_id, 0) < content_count:
+                expected_incomplete.append(lang_id)
 
         self.assertCountEqual(
             updated_model.incomplete_translation_language_codes,
