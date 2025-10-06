@@ -45,6 +45,7 @@ import {ExplorationTagsService} from './exploration-tags.service';
 import {ExplorationTitleService} from './exploration-title.service';
 import {ExplorationWarningsService} from './exploration-warnings.service';
 import {RouterService} from './router.service';
+import {PlatformFeatureService} from '../../../services/platform-feature.service';
 
 class MockNgbModal {
   open() {
@@ -55,6 +56,14 @@ class MockNgbModal {
 class MockrouterService {
   savePendingChanges() {}
   onRefreshVersionHistory = new EventEmitter();
+}
+
+class MockPlatformFeatureService {
+  status = {
+    EnableBackgroundVoiceoverSynthesis: {
+      isEnabled: true,
+    },
+  };
 }
 
 describe(
@@ -122,6 +131,10 @@ describe(
           {
             provide: RouterService,
             useClass: MockrouterService,
+          },
+          {
+            provide: PlatformFeatureService,
+            useClass: MockPlatformFeatureService,
           },
           {
             provide: WindowRef,
@@ -301,6 +314,10 @@ describe(
           {
             provide: RouterService,
             useClass: MockrouterService,
+          },
+          {
+            provide: PlatformFeatureService,
+            useClass: MockPlatformFeatureService,
           },
           {
             provide: WindowRef,
@@ -515,6 +532,10 @@ describe(
           {
             provide: RouterService,
             useClass: MockrouterService,
+          },
+          {
+            provide: PlatformFeatureService,
+            useClass: MockPlatformFeatureService,
           },
           {
             provide: WindowRef,
@@ -837,6 +858,10 @@ describe('Exploration save service ' + 'while saving changes', () => {
         {
           provide: RouterService,
           useClass: MockrouterService,
+        },
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService,
         },
         {
           provide: WindowRef,

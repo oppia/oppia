@@ -503,10 +503,27 @@ class RegenerateVoiceoverOnExpUpdateHandlerTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
         deferred_calls = []
 
-        def mock_defer(*args, **kwargs):
-            deferred_calls.append((args, kwargs))
+        def mock_defer(
+            function_id: str,
+            queue_name: str,
+            exploration_id: str,
+            exploration_title: str,
+            exploration_version: int,
+            committer_id: str,
+            datetime_str: str,
+        ) -> None:
+            deferred_calls.append(
+                {
+                    'function_id': function_id,
+                    'queue_name': queue_name,
+                    'exploration_id': exploration_id,
+                    'exploration_title': exploration_title,
+                    'exploration_version': exploration_version,
+                    'committer_id': committer_id,
+                    'datetime_str': datetime_str,
+                }
+            )
 
-        payload = {}
         exploration_id = self.exploration.id
         exploration_version = self.exploration.version
         exploration_title = self.exploration.title
@@ -525,10 +542,10 @@ class RegenerateVoiceoverOnExpUpdateHandlerTests(test_utils.GenericTestBase):
             ),
             self.swap(taskqueue_services, 'defer', mock_defer),
         ):
-            self.post_json(handler_url, payload, csrf_token=csrf_token)
+            self.post_json(handler_url, {}, csrf_token=csrf_token)
 
         self.assertEqual(len(deferred_calls), 1)
-        args, _ = deferred_calls[0]
+        args = deferred_calls[0]
 
         expected_func_name = (
             feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
@@ -536,14 +553,12 @@ class RegenerateVoiceoverOnExpUpdateHandlerTests(test_utils.GenericTestBase):
             ]
         )
 
-        self.assertEqual(args[0], expected_func_name)
-        self.assertEqual(
-            args[1], taskqueue_services.QUEUE_NAME_VOICEOVER_REGENERATION
-        )
-        self.assertEqual(args[2], exploration_id)
-        self.assertEqual(args[3], exploration_title)
-        self.assertEqual(args[4], exploration_version)
-        self.assertEqual(args[5], feconf.SYSTEM_COMMITTER_ID)
+        self.assertEqual(args['function_id'], expected_func_name)
+        self.assertEqual(args['queue_name'], 'voiceover-regeneration')
+        self.assertEqual(args['exploration_id'], exploration_id)
+        self.assertEqual(args['exploration_title'], exploration_title)
+        self.assertEqual(args['exploration_version'], exploration_version)
+        self.assertEqual(args['committer_id'], feconf.SYSTEM_COMMITTER_ID)
         self.logout()
 
 

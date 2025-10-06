@@ -202,9 +202,9 @@ export class ExplorationSaveService {
                 voiceoverRegenerationInBackgroundIsEnabled
               ) {
                 this.voiceoverBackendApiService.regenerateVoiceoverOnExplorationUpdateAsync(
-                  this.explorationDataService.explorationId,
-                  this.explorationDataService.data.version,
-                  this.explorationTitleService.displayed
+                  this.explorationDataService.explorationId as string,
+                  this.explorationDataService.data.version as number,
+                  this.explorationTitleService.displayed as string
                 );
                 this.alertsService.addSuccessMessage(
                   'Voiceovers will be regenerated automatically in the ' +
