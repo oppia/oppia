@@ -48,9 +48,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        suite: ${{ inputs.test_suite }}
+        run: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
         mobile: [false, true]
-    name: \[${{ matrix.mobile && 'M' || 'D' }}\] ${{ matrix.suite }}
+    name: \[${{ matrix.mobile && 'M' || 'D' }}\] ${{ inputs.test_suite }}
     steps:
       - name: Check for broken suites
         id: check_skip
@@ -58,8 +58,8 @@ jobs:
         run: |
           broken_suites=("exploration-editor/manage-exploration-misconceptions" "exploration-editor/modify-translations-through-modal" "exploration-editor/publish-the-exploration-with-an-interaction" "practice-question-submitter/submit-practice-questions-with-different-interactions-and-difficulties")
           for suite in "${broken_suites[@]}"; do
-            if [[ "${{ matrix.suite }}" == "$suite" ]]; then
-              echo "Suite '${{ matrix.suite }}' is marked to be skipped."
+            if [[ "${{ inputs.test_suite }}" == "$suite" ]]; then
+              echo "Suite '${{ inputs.test_suite }}' is marked to be skipped."
               echo "SKIP_SUITE=true" >> $GITHUB_OUTPUT
               break
             fi
@@ -74,9 +74,9 @@ jobs:
         id: generate_suite_name_for_artifacts
         # Replace slashes in the filename with underscores.
         run: |
-          SUITE_NAME=${{ matrix.suite }}-${{ matrix.run }}-${{ matrix.mobile && 'mobile' || 'desktop' }}
+          SUITE_NAME=${{ inputs.test_suite }}-${{ matrix.run }}-${{ matrix.mobile && 'mobile' || 'desktop' }}
           echo "MODIFIED_SUITE_NAME=${SUITE_NAME//\//_}" >> $GITHUB_OUTPUT
-      - name: Run Desktop Acceptance Test ${{ matrix.suite }}
+      - name: Run Desktop Acceptance Test ${{ inputs.test_suite }}
         # TODO(#22448): Remove once all suites are fixed.
         if: ${{ steps.check_skip.outputs.SKIP_SUITE != 'true' }}
         run: >
@@ -84,7 +84,7 @@ jobs:
           VIDEO_RECORDING_IS_ENABLED=1
           xvfb-run -a --server-args="-screen 0, 1920x1080x24"
           python -m scripts.run_acceptance_tests
-          --suite=${{ matrix.suite }} ${{ matrix.mobile && '--mobile' || '' }}
+          --suite=${{ inputs.test_suite }} ${{ matrix.mobile && '--mobile' || '' }}
           | tee desktop_acceptance_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
       - name: Upload Desktop test recordings as Artifacts
         if: ${{ failure() }}
