@@ -50,7 +50,7 @@ jobs:
       matrix:
         run: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
         mobile: [false, true]
-    name: \[${{ matrix.mobile && 'M' || 'D' }}\] ${{ inputs.test_suite }}
+    name: (${{ matrix.mobile && 'M' || 'D' }}) ${{ inputs.test_suite }}
     steps:
       - name: Check for broken suites
         id: check_skip
