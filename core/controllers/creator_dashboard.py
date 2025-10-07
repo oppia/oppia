@@ -119,12 +119,11 @@ class CreatorDashboardHandler(
                 'schema': {
                     'type': 'basestring',
                     'choices': (
-                        constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS
-                        .values()
-                    )
+                        constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.values()
+                    ),
                 }
             }
-        }
+        },
     }
 
     @acl_decorators.can_access_creator_dashboard
@@ -142,87 +141,105 @@ class CreatorDashboardHandler(
             Returns:
                 float. The rounded average value of rating.
             """
-            return round(
-                rating, feconf.AVERAGE_RATINGS_DASHBOARD_PRECISION)
+            return round(rating, feconf.AVERAGE_RATINGS_DASHBOARD_PRECISION)
 
         subscribed_exploration_summaries = (
-            exp_fetchers.get_exploration_summaries_subscribed_to(
-                self.user_id))
+            exp_fetchers.get_exploration_summaries_subscribed_to(self.user_id)
+        )
         subscribed_collection_summaries = (
             collection_services.get_collection_summaries_subscribed_to(
-                self.user_id))
+                self.user_id
+            )
+        )
 
         exploration_ids_subscribed_to = [
-            summary.id for summary in subscribed_exploration_summaries]
+            summary.id for summary in subscribed_exploration_summaries
+        ]
 
         exp_summary_dicts = summary_services.get_displayable_exp_summary_dicts(
-            subscribed_exploration_summaries)
+            subscribed_exploration_summaries
+        )
         collection_summary_dicts = []
 
         feedback_thread_analytics = (
             feedback_services.get_thread_analytics_multi(
-                exploration_ids_subscribed_to))
+                exploration_ids_subscribed_to
+            )
+        )
 
         displayable_exploration_summary_dicts: List[
             DisplayableExplorationSummaryDict
         ] = []
         for ind, exploration in enumerate(exp_summary_dicts):
             feedback_analytics_dict = feedback_thread_analytics[ind].to_dict()
-            displayable_exploration_summary_dicts.append({
-                'id': exploration['id'],
-                'title': exploration['title'],
-                'activity_type': exploration['activity_type'],
-                'category': exploration['category'],
-                'created_on_msec': exploration['created_on_msec'],
-                'objective': exploration['objective'],
-                'language_code': exploration['language_code'],
-                'last_updated_msec': exploration['last_updated_msec'],
-                'human_readable_contributors_summary': (
-                    exploration['human_readable_contributors_summary']),
-                'status': exploration['status'],
-                'ratings': exploration['ratings'],
-                'community_owned': exploration['community_owned'],
-                'tags': exploration['tags'],
-                'thumbnail_icon_url': exploration['thumbnail_icon_url'],
-                'thumbnail_bg_color': exploration['thumbnail_bg_color'],
-                'num_views': exploration['num_views'],
-                'num_open_threads': feedback_analytics_dict['num_open_threads'],
-                'num_total_threads': (
-                    feedback_analytics_dict['num_total_threads'])
-            })
+            displayable_exploration_summary_dicts.append(
+                {
+                    'id': exploration['id'],
+                    'title': exploration['title'],
+                    'activity_type': exploration['activity_type'],
+                    'category': exploration['category'],
+                    'created_on_msec': exploration['created_on_msec'],
+                    'objective': exploration['objective'],
+                    'language_code': exploration['language_code'],
+                    'last_updated_msec': exploration['last_updated_msec'],
+                    'human_readable_contributors_summary': (
+                        exploration['human_readable_contributors_summary']
+                    ),
+                    'status': exploration['status'],
+                    'ratings': exploration['ratings'],
+                    'community_owned': exploration['community_owned'],
+                    'tags': exploration['tags'],
+                    'thumbnail_icon_url': exploration['thumbnail_icon_url'],
+                    'thumbnail_bg_color': exploration['thumbnail_bg_color'],
+                    'num_views': exploration['num_views'],
+                    'num_open_threads': feedback_analytics_dict[
+                        'num_open_threads'
+                    ],
+                    'num_total_threads': (
+                        feedback_analytics_dict['num_total_threads']
+                    ),
+                }
+            )
 
         displayable_exploration_summary_dicts = sorted(
             displayable_exploration_summary_dicts,
             key=lambda x: (x['num_open_threads'], x['last_updated_msec']),
-            reverse=True)
+            reverse=True,
+        )
 
         topic_summaries = topic_fetchers.get_all_topic_summaries()
-        topic_summary_dicts = [
-            summary.to_dict() for summary in topic_summaries]
+        topic_summary_dicts = [summary.to_dict() for summary in topic_summaries]
 
         if role_services.ACTION_CREATE_COLLECTION in self.user.actions:
             for collection_summary in subscribed_collection_summaries:
                 # TODO(sll): Reuse _get_displayable_collection_summary_dicts()
                 # in summary_services, instead of replicating it like this.
-                collection_summary_dicts.append({
-                    'id': collection_summary.id,
-                    'title': collection_summary.title,
-                    'category': collection_summary.category,
-                    'objective': collection_summary.objective,
-                    'language_code': collection_summary.language_code,
-                    'last_updated_msec': utils.get_time_in_millisecs(
-                        collection_summary.collection_model_last_updated),
-                    'created_on': utils.get_time_in_millisecs(
-                        collection_summary.collection_model_created_on),
-                    'status': collection_summary.status,
-                    'node_count': collection_summary.node_count,
-                    'community_owned': collection_summary.community_owned,
-                    'thumbnail_icon_url': (
-                        utils.get_thumbnail_icon_url_for_category(
-                            collection_summary.category)),
-                    'thumbnail_bg_color': utils.get_hex_color_for_category(
-                        collection_summary.category),
-                })
+                collection_summary_dicts.append(
+                    {
+                        'id': collection_summary.id,
+                        'title': collection_summary.title,
+                        'category': collection_summary.category,
+                        'objective': collection_summary.objective,
+                        'language_code': collection_summary.language_code,
+                        'last_updated_msec': utils.get_time_in_millisecs(
+                            collection_summary.collection_model_last_updated
+                        ),
+                        'created_on': utils.get_time_in_millisecs(
+                            collection_summary.collection_model_created_on
+                        ),
+                        'status': collection_summary.status,
+                        'node_count': collection_summary.node_count,
+                        'community_owned': collection_summary.community_owned,
+                        'thumbnail_icon_url': (
+                            utils.get_thumbnail_icon_url_for_category(
+                                collection_summary.category
+                            )
+                        ),
+                        'thumbnail_bg_color': utils.get_hex_color_for_category(
+                            collection_summary.category
+                        ),
+                    }
+                )
 
         dashboard_stats = user_services.get_dashboard_stats(self.user_id)
         dashboard_stats_dict = {
@@ -230,36 +247,43 @@ class CreatorDashboardHandler(
             'average_ratings': dashboard_stats['average_ratings'],
             'total_plays': dashboard_stats['total_plays'],
             'total_open_feedback': feedback_services.get_total_open_threads(
-                feedback_thread_analytics)
+                feedback_thread_analytics
+            ),
         }
         if dashboard_stats:
             average_ratings = dashboard_stats_dict.get('average_ratings')
             if average_ratings:
                 dashboard_stats_dict['average_ratings'] = (
-                    _round_average_ratings(average_ratings))
+                    _round_average_ratings(average_ratings)
+                )
 
-        last_week_stats = (
-            user_services.get_last_week_dashboard_stats(self.user_id))
+        last_week_stats = user_services.get_last_week_dashboard_stats(
+            self.user_id
+        )
 
         if last_week_stats and len(list(last_week_stats.keys())) != 1:
             logging.error(
                 '\'last_week_stats\' should contain only one key-value pair'
                 ' denoting last week dashboard stats of the user keyed by a'
-                ' datetime string.')
+                ' datetime string.'
+            )
             last_week_stats = None
 
         if last_week_stats:
             # 'last_week_stats' is a dict with only one key-value pair denoting
             # last week dashboard stats of the user keyed by a datetime string.
             datetime_of_stats = list(last_week_stats.keys())[0]
-            last_week_stats_average_ratings = (
-                list(last_week_stats.values())[0].get('average_ratings'))
+            last_week_stats_average_ratings = list(last_week_stats.values())[
+                0
+            ].get('average_ratings')
             if last_week_stats_average_ratings:
                 last_week_stats[datetime_of_stats]['average_ratings'] = (
-                    _round_average_ratings(last_week_stats_average_ratings))
+                    _round_average_ratings(last_week_stats_average_ratings)
+                )
 
         subscriber_ids = subscription_services.get_all_subscribers_of_creator(
-            self.user_id)
+            self.user_id
+        )
         subscribers_settings = user_services.get_users_settings(
             subscriber_ids, strict=True
         )
@@ -268,24 +292,28 @@ class CreatorDashboardHandler(
             subscriber_summary = {
                 'subscriber_username': subscriber_settings.username,
                 'subscriber_impact': (
-                    user_services.get_user_impact_score(subscriber_ids[index]))
+                    user_services.get_user_impact_score(subscriber_ids[index])
+                ),
             }
 
             subscribers_list.append(subscriber_summary)
 
         user_settings = user_services.get_user_settings(
-            self.user_id, strict=True)
+            self.user_id, strict=True
+        )
         creator_dashboard_display_pref = (
-            user_settings.creator_dashboard_display_pref)
+            user_settings.creator_dashboard_display_pref
+        )
 
         suggestions_created_by_user = suggestion_services.query_suggestions(
-            [('author_id', self.user_id),
-             (
-                 'suggestion_type',
-                 feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT)])
-        suggestions_which_can_be_reviewed = (
-            suggestion_services
-            .get_all_suggestions_that_can_be_reviewed_by_user(self.user_id))
+            [
+                ('author_id', self.user_id),
+                ('suggestion_type', feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+            ]
+        )
+        suggestions_which_can_be_reviewed = suggestion_services.get_all_suggestions_that_can_be_reviewed_by_user(
+            self.user_id
+        )
 
         for s in suggestions_created_by_user:
             s.populate_old_value_of_change()
@@ -293,40 +321,54 @@ class CreatorDashboardHandler(
         for s in suggestions_which_can_be_reviewed:
             s.populate_old_value_of_change()
 
-        suggestion_dicts_created_by_user = (
-            [s.to_dict() for s in suggestions_created_by_user])
-        suggestion_dicts_which_can_be_reviewed = (
-            [s.to_dict() for s in suggestions_which_can_be_reviewed])
+        suggestion_dicts_created_by_user = [
+            s.to_dict() for s in suggestions_created_by_user
+        ]
+        suggestion_dicts_which_can_be_reviewed = [
+            s.to_dict() for s in suggestions_which_can_be_reviewed
+        ]
 
-        ids_of_suggestions_created_by_user = (
-            [s['suggestion_id'] for s in suggestion_dicts_created_by_user])
-        ids_of_suggestions_which_can_be_reviewed = (
-            [s['suggestion_id']
-             for s in suggestion_dicts_which_can_be_reviewed])
+        ids_of_suggestions_created_by_user = [
+            s['suggestion_id'] for s in suggestion_dicts_created_by_user
+        ]
+        ids_of_suggestions_which_can_be_reviewed = [
+            s['suggestion_id'] for s in suggestion_dicts_which_can_be_reviewed
+        ]
 
-        threads_linked_to_suggestions_by_user = (
-            [t.to_dict() for t in feedback_services.get_multiple_threads(
-                ids_of_suggestions_created_by_user)])
-        threads_linked_to_suggestions_which_can_be_reviewed = (
-            [t.to_dict() for t in feedback_services.get_multiple_threads(
-                ids_of_suggestions_which_can_be_reviewed)])
+        threads_linked_to_suggestions_by_user = [
+            t.to_dict()
+            for t in feedback_services.get_multiple_threads(
+                ids_of_suggestions_created_by_user
+            )
+        ]
+        threads_linked_to_suggestions_which_can_be_reviewed = [
+            t.to_dict()
+            for t in feedback_services.get_multiple_threads(
+                ids_of_suggestions_which_can_be_reviewed
+            )
+        ]
 
-        self.values.update({
-            'explorations_list': displayable_exploration_summary_dicts,
-            'collections_list': collection_summary_dicts,
-            'dashboard_stats': dashboard_stats_dict,
-            'last_week_stats': last_week_stats,
-            'subscribers_list': subscribers_list,
-            'display_preference': creator_dashboard_display_pref,
-            'threads_for_created_suggestions_list': (
-                threads_linked_to_suggestions_by_user),
-            'threads_for_suggestions_to_review_list': (
-                threads_linked_to_suggestions_which_can_be_reviewed),
-            'created_suggestions_list': suggestion_dicts_created_by_user,
-            'suggestions_to_review_list': (
-                suggestion_dicts_which_can_be_reviewed),
-            'topic_summary_dicts': topic_summary_dicts
-        })
+        self.values.update(
+            {
+                'explorations_list': displayable_exploration_summary_dicts,
+                'collections_list': collection_summary_dicts,
+                'dashboard_stats': dashboard_stats_dict,
+                'last_week_stats': last_week_stats,
+                'subscribers_list': subscribers_list,
+                'display_preference': creator_dashboard_display_pref,
+                'threads_for_created_suggestions_list': (
+                    threads_linked_to_suggestions_by_user
+                ),
+                'threads_for_suggestions_to_review_list': (
+                    threads_linked_to_suggestions_which_can_be_reviewed
+                ),
+                'created_suggestions_list': suggestion_dicts_created_by_user,
+                'suggestions_to_review_list': (
+                    suggestion_dicts_which_can_be_reviewed
+                ),
+                'topic_summary_dicts': topic_summary_dicts,
+            }
+        )
 
         self.render_json(self.values)
 
@@ -336,10 +378,12 @@ class CreatorDashboardHandler(
         assert self.user_id is not None
         assert self.normalized_payload is not None
         creator_dashboard_display_pref = self.normalized_payload[
-            'display_preference']
+            'display_preference'
+        ]
         user_settings = user_services.get_user_settings(self.user_id)
         user_settings.creator_dashboard_display_pref = (
-            creator_dashboard_display_pref)
+            creator_dashboard_display_pref
+        )
         user_services.save_user_settings(user_settings)
         self.render_json({})
 
@@ -353,10 +397,7 @@ class NewExplorationHandlerNormalizedPayloadDict(TypedDict):
 
 
 class NewExplorationHandler(
-    base.BaseHandler[
-        NewExplorationHandlerNormalizedPayloadDict,
-        Dict[str, str]
-    ]
+    base.BaseHandler[NewExplorationHandlerNormalizedPayloadDict, Dict[str, str]]
 ):
     """Creates a new exploration."""
 
@@ -364,10 +405,8 @@ class NewExplorationHandler(
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
             'title': {
-                'schema': {
-                    'type': 'basestring'
-                },
-                'default_value': feconf.DEFAULT_EXPLORATION_TITLE
+                'schema': {'type': 'basestring'},
+                'default_value': feconf.DEFAULT_EXPLORATION_TITLE,
             }
         }
     }
@@ -381,17 +420,14 @@ class NewExplorationHandler(
 
         new_exploration_id = exp_fetchers.get_new_exploration_id()
         exploration = exp_domain.Exploration.create_default_exploration(
-            new_exploration_id, title=title)
+            new_exploration_id, title=title
+        )
         exp_services.save_new_exploration(self.user_id, exploration)
 
-        self.render_json({
-            EXPLORATION_ID_KEY: new_exploration_id
-        })
+        self.render_json({EXPLORATION_ID_KEY: new_exploration_id})
 
 
-class NewCollectionHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class NewCollectionHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Creates a new collection."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
@@ -403,12 +439,11 @@ class NewCollectionHandler(
         assert self.user_id is not None
         new_collection_id = collection_services.get_new_collection_id()
         collection = collection_domain.Collection.create_default_collection(
-            new_collection_id)
+            new_collection_id
+        )
         collection_services.save_new_collection(self.user_id, collection)
 
-        self.render_json({
-            COLLECTION_ID_KEY: new_collection_id
-        })
+        self.render_json({COLLECTION_ID_KEY: new_collection_id})
 
 
 class UploadExplorationHandlerNormalizedRequestDict(TypedDict):
@@ -421,21 +456,14 @@ class UploadExplorationHandlerNormalizedRequestDict(TypedDict):
 
 class UploadExplorationHandler(
     base.BaseHandler[
-        Dict[str, str],
-        UploadExplorationHandlerNormalizedRequestDict
+        Dict[str, str], UploadExplorationHandlerNormalizedRequestDict
     ]
 ):
     """Uploads a new exploration."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
-        'POST': {
-            'yaml_file': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            }
-        }
+        'POST': {'yaml_file': {'schema': {'type': 'basestring'}}}
     }
 
     @acl_decorators.can_upload_exploration
@@ -448,10 +476,10 @@ class UploadExplorationHandler(
         new_exploration_id = exp_fetchers.get_new_exploration_id()
         if constants.ALLOW_YAML_FILE_UPLOAD:
             exp_services.save_new_exploration_from_yaml_and_assets(
-                self.user_id, yaml_content, new_exploration_id, [])
-            self.render_json({
-                EXPLORATION_ID_KEY: new_exploration_id
-            })
+                self.user_id, yaml_content, new_exploration_id, []
+            )
+            self.render_json({EXPLORATION_ID_KEY: new_exploration_id})
         else:
             raise self.InvalidInputException(
-                'This server does not allow file uploads.')
+                'This server does not allow file uploads.'
+            )

@@ -91,7 +91,9 @@ describe('Question Submitter', function () {
         'Test Skill 1',
         'Test Topic 1'
       );
-      await questionSubmitter.selectQuestionDifficulty('Easy');
+      await questionSubmitter.selectQuestionDifficultyInPracticeQuestionSubmittion(
+        'Easy'
+      );
 
       await questionSubmitter.seedTextToQuestion('Test Question 1');
       await questionSubmitter.addMathExpressionToQuestion();
@@ -120,7 +122,9 @@ describe('Question Submitter', function () {
         'Test Skill 1',
         'Test Topic 1'
       );
-      await questionSubmitter.selectQuestionDifficulty('Medium');
+      await questionSubmitter.selectQuestionDifficultyInPracticeQuestionSubmittion(
+        'Medium'
+      );
 
       await questionSubmitter.seedTextToQuestion('Test Question 2');
       await questionSubmitter.addMathExpressionToQuestion();
@@ -154,7 +158,9 @@ describe('Question Submitter', function () {
         'Test Skill 1',
         'Test Topic 1'
       );
-      await questionSubmitter.selectQuestionDifficulty('Hard');
+      await questionSubmitter.selectQuestionDifficultyInPracticeQuestionSubmittion(
+        'Hard'
+      );
 
       await questionSubmitter.seedTextToQuestion('Test Question 3');
       await questionSubmitter.addMathExpressionToQuestion();

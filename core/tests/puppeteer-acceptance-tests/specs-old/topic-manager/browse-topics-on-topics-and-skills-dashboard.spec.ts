@@ -58,7 +58,10 @@ describe('Topic Manager', function () {
         await topicManager.expectFilteredTopics(['Addition', 'Subtraction']),
         await topicManager.filterTopicsByStatus('Published'),
         // No topics are published in the setup.
-        await topicManager.expectFilteredTopics([]),
+        await topicManager.expectFilteredTopics(
+          ['Addition', 'Subtraction'],
+          false
+        ),
         await topicManager.filterTopicsByClassroom('Math'),
         await topicManager.expectFilteredTopics(['Addition']),
         await topicManager.filterTopicsByKeyword('Addition'),

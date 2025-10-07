@@ -62,7 +62,10 @@ describe('Topic Manager', function () {
 
       await topicManager.filterSkillsByStatus('Unassigned');
       // All the skills are already assigned as they were created for the topic in the setup.
-      await topicManager.expectFilteredSkills([]);
+      await topicManager.expectFilteredSkills(
+        ['Multiplication', 'Subtraction'],
+        false
+      );
 
       await topicManager.filterSkillsByStatus('Assigned');
       await topicManager.expectFilteredSkills([

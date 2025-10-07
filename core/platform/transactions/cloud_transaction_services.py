@@ -42,6 +42,7 @@ def run_in_transaction_wrapper(fn: Callable[..., Any]) -> Callable[..., Any]:
         Exception. Whatever fn() raises.
         datastore_errors.TransactionFailedError. The transaction failed.
     """
+
     # Here we use type Any because this function is used as a decorator for
     # other functions, and these functions can have almost any types of
     # arguments.
