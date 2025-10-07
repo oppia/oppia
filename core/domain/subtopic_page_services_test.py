@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import copy
 import re
 
 from core import feconf
@@ -662,3 +663,202 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             populated_model.language_code, subtopic_page.language_code
         )
+
+    def test_get_subtopic_pages_with_ids_and_versions(self) -> None:
+        """Test fetching multiple subtopic pages with specific versions."""
+        topic_id = self.TOPIC_ID_1
+
+        subtopic_page_1 = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                1, topic_id)
+        )
+        subtopic_page_1.update_page_contents_html(
+            state_domain.SubtitledHtml.from_dict({
+                'html': '<p>Original Content 1</p>',
+                'content_id': 'content'
+            })
+        )
+        subtopic_page_services.save_subtopic_page(
+            self.user_id, subtopic_page_1, 'Create subtopic page 1',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 1,
+                'title': 'Subtopic 1',
+                'url_fragment': 'subtopic-1'
+            })]
+        )
+
+        subtopic_page_2 = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                2, topic_id)
+        )
+        subtopic_page_2.update_page_contents_html(
+            state_domain.SubtitledHtml.from_dict({
+                'html': '<p>Original Content</p>',
+                'content_id': 'content'
+            })
+        )
+        subtopic_page_services.save_subtopic_page(
+            self.user_id, subtopic_page_2, 'Create subtopic page 2',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 2,
+                'title': 'Subtopic 2',
+                'url_fragment': 'subtopic-2'
+            })]
+        )
+
+        updated_page_1 = copy.deepcopy(subtopic_page_1)
+        updated_page_1.update_page_contents_html(
+            state_domain.SubtitledHtml.from_dict({
+                'html': '<p>Updated Content 1</p>',
+                'content_id': 'content'
+            })
+        )
+        subtopic_page_services.save_subtopic_page(
+            self.user_id, updated_page_1, 'Update subtopic page 1',
+            [subtopic_page_domain.SubtopicPageChange({
+                'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
+                'property_name': 'page_contents_html',
+                'subtopic_id': 1,
+                'new_value': '<p>Updated Content 1</p>',
+                'old_value': '<p>Original Content 1</p>'
+            })]
+        )
+
+        results = (
+            subtopic_page_services.get_subtopic_pages_with_ids_and_versions(
+                [
+                    (topic_id, 1, 1),
+                    (topic_id, 1, 2),
+                    (topic_id, 2, 1),
+                    (topic_id, 1, None),
+                    ('nonexistent', 1, 1),
+                ]
+            )
+        )
+
+        self.assertEqual(len(results), 5)
+
+        (
+            original_page_1,
+            updated_page_1_from_result,
+            subtopic_page_2_result,
+            latest_page_1,
+            non_existent
+        ) = results
+
+        assert original_page_1 is not None
+        self.assertIsNotNone(original_page_1)
+        self.assertEqual(
+            original_page_1.page_contents.subtitled_html.html,
+            '<p>Original Content 1</p>'
+        )
+
+        assert updated_page_1_from_result is not None
+        self.assertIsNotNone(updated_page_1_from_result)
+        self.assertEqual(
+            updated_page_1_from_result.page_contents.subtitled_html.html,
+            '<p>Updated Content 1</p>'
+        )
+
+        assert subtopic_page_2_result is not None
+        self.assertIsNotNone(subtopic_page_2_result)
+        self.assertEqual(
+            subtopic_page_2_result.page_contents.subtitled_html.html,
+            '<p>Original Content</p>'
+        )
+
+        assert latest_page_1 is not None
+        self.assertIsNotNone(latest_page_1)
+        self.assertEqual(
+            latest_page_1.page_contents.subtitled_html.html,
+            '<p>Updated Content 1</p>'
+        )
+
+        self.assertIsNone(non_existent)
+
+    def test_get_subtopic_pages_with_ids_and_versions_with_invalid_version(
+        self
+    ) -> None:
+        """Test fetching subtopic pages with invalid version numbers."""
+        topic_id = self.TOPIC_ID_1
+
+        subtopic_page = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+            1, topic_id))
+        subtopic_page_services.save_subtopic_page(
+            self.user_id, subtopic_page, 'Create subtopic page',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 1,
+                'title': 'Test Subtopic',
+                'url_fragment': 'test-subtopic'
+            })])
+
+        results = (
+            (subtopic_page_services.get_subtopic_pages_with_ids_and_versions([
+            (topic_id, 1, 999)
+        ])))
+        self.assertEqual(len(results), 1)
+        self.assertIsNone(results[0])
+
+    def test_get_subtopic_pages_with_ids_and_versions_deleted(self) -> None:
+        """Test fetching deleted subtopic pages returns None."""
+        topic_id = self.TOPIC_ID_1
+
+        subtopic_page = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+            1, topic_id))
+        subtopic_page_services.save_subtopic_page(
+            self.user_id, subtopic_page, 'Create subtopic page',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 1,
+                'title': 'Test Subtopic',
+                'url_fragment': 'test-subtopic'
+            })])
+        subtopic_page_services.delete_subtopic_page(
+            self.user_id, topic_id, 1)
+
+        results = (
+            subtopic_page_services.get_subtopic_pages_with_ids_and_versions([
+            (topic_id, 1, 1)
+        ]))
+        self.assertEqual(len(results), 1)
+        self.assertIsNone(results[0])
+
+    def test_get_subtopic_pages_with_ids_and_versions_empty_list(self) -> None:
+        """Test fetching with empty list of IDs."""
+        results = (
+            subtopic_page_services.get_subtopic_pages_with_ids_and_versions([]))
+        self.assertEqual(results, [])
+
+    def test_get_subtopic_pages_with_ids_and_versions_schema_versions(
+        self
+    ) -> None:
+        """Test fetching subtopic pages maintains correct schema versions."""
+        topic_id = self.TOPIC_ID_1
+
+        subtopic_page = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+            1, topic_id))
+        subtopic_page_services.save_subtopic_page(
+            self.user_id, subtopic_page, 'Create subtopic page',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 1,
+                'title': 'Test Subtopic',
+                'url_fragment': 'test-subtopic'
+            })])
+
+        results = (
+            subtopic_page_services.get_subtopic_pages_with_ids_and_versions([
+            (topic_id, 1, 1)
+        ]))
+        self.assertEqual(len(results), 1)
+        self.assertIsNotNone(results[0])
+        assert results[0] is not None
+        self.assertEqual(
+            results[0].page_contents_schema_version,
+            feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION)
