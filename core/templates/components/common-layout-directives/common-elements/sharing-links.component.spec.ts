@@ -176,7 +176,7 @@ describe('SharingLinksComponent', () => {
       'https://www.facebook.com/sharer/sharer.php?sdk=joey&u=undefined/undefined/undefined&display=popup&ref=plugin&src=share_button'
     );
     expect(component.getUrl('twitter')).toBe(
-      'https://twitter.com/share?text=undefined&url=undefined/undefined/undefined'
+      'https://x.com/share?text=undefined&url=undefined/undefined/undefined'
     );
     expect(component.getUrl('classroom')).toBe(
       'https://classroom.google.com/share?url=undefined/undefined/undefined'
@@ -193,7 +193,7 @@ describe('SharingLinksComponent', () => {
       'https://www.facebook.com/sharer/sharer.php?sdk=joey&u=https://www.oppia.org/explore/exp1&display=popup&ref=plugin&src=share_button'
     );
     expect(component.getUrl('twitter')).toBe(
-      'https://twitter.com/share?text=Check out this interactive lesson on Oppia - a free platform for teaching and learning!&url=https://www.oppia.org/explore/exp1'
+      'https://x.com/share?text=Check out this interactive lesson on Oppia - a free platform for teaching and learning!&url=https://www.oppia.org/explore/exp1'
     );
     expect(component.getUrl('classroom')).toBe(
       'https://classroom.google.com/share?url=https://www.oppia.org/explore/exp1'
@@ -209,7 +209,7 @@ describe('SharingLinksComponent', () => {
       'https://www.facebook.com/sharer/sharer.php?sdk=joey&u=https://www.oppia.org/blog/sample-blog-post-url&display=popup&ref=plugin&src=share_button'
     );
     expect(component.getUrl('twitter')).toBe(
-      'https://twitter.com/share?text=Check out this new blog post on Oppia - a free platform for teaching and learning!&url=https://www.oppia.org/blog/sample-blog-post-url'
+      'https://x.com/share?text=Check out this new blog post on Oppia - a free platform for teaching and learning!&url=https://www.oppia.org/blog/sample-blog-post-url'
     );
     expect(component.getUrl('linkedin')).toBe(
       'https://www.linkedin.com/sharing/share-offsite/?url=https://www.oppia.org/blog/sample-blog-post-url'

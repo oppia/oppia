@@ -79490,7 +79490,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     2: INPUT_TYPE_TOUCH,
     3: INPUT_TYPE_PEN,
     4: INPUT_TYPE_MOUSE,
-    5: INPUT_TYPE_KINECT, // see https://twitter.com/jacobrossi/status/480596438489890816
+    5: INPUT_TYPE_KINECT, // see https://x.com/jacobrossi/status/480596438489890816
   };
 
   var POINTER_ELEMENT_EVENTS = 'pointerdown';

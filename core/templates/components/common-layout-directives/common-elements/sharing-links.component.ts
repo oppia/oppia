@@ -129,7 +129,7 @@ export class SharingLinksComponent implements OnInit {
 
       case 'twitter':
         queryString = `text=${this.escapedTwitterText}&` + `url=${url}`;
-        return `https://twitter.com/share?${queryString}`;
+        return `https://x.com/share?${queryString}`;
 
       case 'classroom':
         queryString = `url=${url}`;
