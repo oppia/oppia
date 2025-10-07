@@ -35,7 +35,7 @@ class Copier(value_generators_domain.BaseValueGenerator):
         self,
         unused_context_params: Optional[Dict[str, str]],
         value: str,
-        parse_with_jinja: bool = False  # pylint: disable=unused-argument
+        parse_with_jinja: bool = False,  # pylint: disable=unused-argument
     ) -> str:
         """Returns a copy of the input value.
 
@@ -59,8 +59,6 @@ class RandomSelector(value_generators_domain.BaseValueGenerator):
     default_value: str = ''
 
     def generate_value(
-        self,
-        unused_context_params: Dict[str, str],
-        list_of_values: List[str]
+        self, unused_context_params: Dict[str, str], list_of_values: List[str]
     ) -> str:
         return copy.deepcopy(utils.get_random_choice(list_of_values))

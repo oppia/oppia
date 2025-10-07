@@ -126,5 +126,5 @@ __all__ = [
     'translate_services',
     'transaction_services',
     'user_models',
-    'voiceover_models'
+    'voiceover_models',
 ]

@@ -25,7 +25,7 @@ from core.platform import models
 from typing import Dict
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import datastore_services
 
 datastore_services = models.Registry.import_datastore_services()
@@ -48,17 +48,19 @@ class ActivityReferencesModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user(
-    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
-            'activity_references': base_models.EXPORT_POLICY.NOT_APPLICABLE
-        })
+        return dict(
+            super(cls, cls).get_export_policy(),
+            **{'activity_references': base_models.EXPORT_POLICY.NOT_APPLICABLE},
+        )
 
     @classmethod
     def get_or_create(cls, list_name: str) -> ActivityReferencesModel:
@@ -66,8 +68,7 @@ class ActivityReferencesModel(base_models.BaseModel):
         exist.
         """
         if list_name not in feconf.ALL_ACTIVITY_REFERENCE_LIST_TYPES:
-            raise Exception(
-                'Invalid ActivityListModel id: %s' % list_name)
+            raise Exception('Invalid ActivityListModel id: %s' % list_name)
 
         entity = cls.get(list_name, strict=False)
         if entity is None:
