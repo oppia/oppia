@@ -59,7 +59,7 @@ import {Subscription} from 'rxjs';
 
 interface UiConfig {
   (): UiConfig;
-  rte_components: string;
+  rte_component_config_id: string;
   hide_complex_extensions: boolean;
   startupFocusEnabled?: boolean;
   language?: string;
@@ -67,12 +67,12 @@ interface UiConfig {
 }
 
 interface ExtendedCKEditorConfig extends CKEDITOR.config {
-  rte_components?: string;
+  rte_component_config_id?: string;
 }
 export interface RteConfig extends CKEDITOR.config {
   format_heading?: CKEDITOR.config.styleObject;
   format_normal?: CKEDITOR.config.styleObject;
-  rte_components?: string;
+  rte_component_config_id?: string;
 }
 
 @Component({
@@ -134,14 +134,14 @@ export class CkEditor4RteComponent
   }
 
   private validateConfiguration(): void {
-    if (!this.uiConfig || !this.uiConfig.rte_components) {
+    if (!this.uiConfig || !this.uiConfig.rte_component_config_id) {
       this.configError =
-        'No component set specified. Please provide a "rte_components" config in uiConfig.';
+        'No component set specified. Please provide a "rte_component_config_id" config in uiConfig.';
       console.error('Error: ' + this.configError);
       return;
     }
 
-    const rteComponents = this.uiConfig.rte_components;
+    const rteComponents = this.uiConfig.rte_component_config_id;
     const componentList = AppConstants.RTE_COMPONENT_CONFIGS[rteComponents];
 
     if (!componentList) {
@@ -192,6 +192,20 @@ export class CkEditor4RteComponent
       }
     }
 
+    // Remove empty oppia-rte-component-container divs that might be left after
+    // component removal.
+    validContent = validContent.replace(
+      /<div[^>]*class="[^"]*oppia-rte-component-container[^"]*"[^>]*>\s*<\/div>/g,
+      ''
+    );
+
+    // Also handle cases where the div might have other attributes or the class
+    // might be in different positions.
+    validContent = validContent.replace(
+      /<div[^>]*oppia-rte-component-container[^>]*>\s*<\/div>/g,
+      ''
+    );
+
     // Clean up any empty paragraphs or extra whitespace left after removing components.
     validContent = validContent.replace(/<p>\s*<\/p>/g, '');
     validContent = validContent.replace(/<div>\s*<\/div>/g, '');
@@ -235,7 +249,7 @@ export class CkEditor4RteComponent
 
     const hasMeaningfulContent = textOnlyContent.length > 0;
 
-    // FIXED: Only return hasValidContent as true if there are invalid components AND meaningful valid content.
+    // Only return hasValidContent as true if there are invalid components AND meaningful valid content.
     const hasValidContent =
       invalidComponents.length > 0 && hasMeaningfulContent;
 
@@ -499,7 +513,7 @@ export class CkEditor4RteComponent
     }
 
     // Get component list from AppConstants.
-    const rteComponents = this.uiConfig.rte_components;
+    const rteComponents = this.uiConfig.rte_component_config_id;
     const componentList = AppConstants.RTE_COMPONENT_CONFIGS[rteComponents];
 
     // Filter components based on the defined list and other criteria.
@@ -613,8 +627,8 @@ export class CkEditor4RteComponent
       sharedSpaces
     ) as ExtendedCKEditorConfig;
 
-    if (this.uiConfig && this.uiConfig.rte_components) {
-      ckConfig.rte_components = this.uiConfig.rte_components;
+    if (this.uiConfig && this.uiConfig.rte_component_config_id) {
+      ckConfig.rte_component_config_id = this.uiConfig.rte_component_config_id;
     }
 
     // Initialize CKEditor.

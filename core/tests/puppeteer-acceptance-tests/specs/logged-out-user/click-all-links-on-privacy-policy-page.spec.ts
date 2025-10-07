@@ -65,8 +65,8 @@ describe('Logged-out Users', function () {
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
-});
 
-afterAll(async function () {
-  await UserFactory.closeAllBrowsers();
+  afterAll(async function () {
+    await UserFactory.closeAllBrowsers();
+  });
 });

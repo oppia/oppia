@@ -21,7 +21,7 @@ import {ParameterMetadataService} from 'pages/exploration-editor-page/services/p
 import {ExplorationParamChangesService} from 'pages/exploration-editor-page/services/exploration-param-changes.service';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {GraphDataService} from 'pages/exploration-editor-page/services/graph-data.service';
-import {StatesObjectFactory} from 'domain/exploration/StatesObjectFactory';
+import {States} from 'domain/exploration/states.model';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 
 class MockExplorationParamChangesService {
@@ -78,12 +78,11 @@ class MockGraphDataService {
 
 describe('Parameter Metadata Service', () => {
   let parameterMetadataService: ParameterMetadataService;
-  let statesObjectFactory: StatesObjectFactory;
 
   beforeEach(() => {
     class MockExplorationStatesService {
       getStates() {
-        return statesObjectFactory.createFromBackendDict({
+        return States.createFromBackendDict({
           Hola: {
             classifier_model_id: null,
             solicit_answer_details: false,
@@ -384,7 +383,6 @@ describe('Parameter Metadata Service', () => {
     });
 
     parameterMetadataService = TestBed.inject(ParameterMetadataService);
-    statesObjectFactory = TestBed.inject(StatesObjectFactory);
   });
 
   it('should get unset parameters info', () => {

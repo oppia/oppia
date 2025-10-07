@@ -1,6 +1,6 @@
-<div class="username-input-modal" [ngClass]="{'disabled': isChecking}">
+<div class="username-input-modal e2e-test-modal-container" [ngClass]="{'disabled': isChecking}">
   <div class="modal-header">
-    <h4 class="modal-title">Enter the username to add {{activeTab}} rights</h4>
+    <h4 class="modal-title e2e-test-modal-header">Enter the username to add {{activeTab}} rights</h4>
   </div>
   <div class="modal-body">
     <input class="username-input-box" type="text" placeholder="Username" [(ngModel)]="username">
@@ -10,7 +10,7 @@
   </div>
   <div class="question-role-editor-footer">
     <button class="cancel-button" (click)="close()" autofocus>Cancel</button>
-    <button class="save-button" (click)="saveAndClose()">Add Rights</button>
+    <button class="save-button e2e-test-add-rights-button" (click)="saveAndClose()">Add Rights</button>
   </div>
 </div>
 

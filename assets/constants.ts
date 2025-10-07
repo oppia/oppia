@@ -67,7 +67,9 @@ export default {
 
     "RTE_COMPONENT_CONFIGS": {
       "ALL_COMPONENTS": ["tabs", "skillreview", "collapsible", "math", "image", "link", "video"],
-      "BLOG_COMPONENTS": ["image", "link", "video"]
+      "BLOG_COMPONENTS": ["image", "link", "video"],
+      "SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS": ["skillreview", "math", "image", "workedexample"],
+      "CURATED_LESSON_COMPONENTS": ["image", "math", "skillreview"]
     },
 
   "LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST": [
@@ -85,6 +87,7 @@ export default {
     "Statistics", "Trigonometry", "Welcome"],
   "ACTIVITY_TYPE_EXPLORATION": "exploration",
   "ACTIVITY_TYPE_EXPLORATION_TRANSLATIONS": "exp_translations",
+  "ACTIVITY_TYPE_EXPLORATION_VOICEOVERS": "exp_voiceovers",
   "ACTIVITY_TYPE_COLLECTION": "collection",
   "ACTIVITY_TYPE_STORY": "story",
   "ACTIVITY_TYPE_SKILL": "skill",
@@ -6244,7 +6247,12 @@ export default {
   "MAX_CHARS_IN_TOPIC_DESCRIPTION": 240,
   "MAX_CHARS_IN_SUBTOPIC_TITLE": 64,
   "MAX_CHARS_IN_STUDY_GUIDE_SECTION_HEADING": 200,
-  "STUDY_GUIDE_SECTION_CHARACTER_LIMIT": 1000,
+  "STUDY_GUIDE_SECTION_CHARACTER_LIMIT": 6000,
+  "STUDY_GUIDE_VIEWER_NEXT_SUBTOPIC_TITLE_LENGTH_LIMIT_MOBILE": 18,
+  "STUDY_GUIDE_VIEWER_NEXT_SUBTOPIC_TITLE_TRUNCATED_LENGTH_MOBILE": 15,
+  "STUDY_GUIDE_VIEWER_NEXT_SUBTOPIC_TITLE_LENGTH_LIMIT_DESKTOP": 23,
+  "STUDY_GUIDE_VIEWER_NEXT_SUBTOPIC_TITLE_TRUNCATED_LENGTH_DESKTOP": 20,
+  "SKILL_EDITOR_WORKED_EXAMPLE_LIMIT": 2,
   "DEFAULT_SECTION_HEADING_CONTENT_ID": "section_heading_0",
   "DEFAULT_SECTION_CONTENT_CONTENT_ID": "section_content_1",
   "MAX_CHARS_IN_SKILL_DESCRIPTION": 100,
@@ -7816,6 +7824,18 @@ export default {
       "^": "لِلْقُوَّةِ",
       "^2": "تَرْبِيعْ",
       "^3": "تَكْعِيبْ"
+    },
+    "es": {
+      "+": "más",
+      "-": "menos",
+      "*": "multiplicado por",
+      "×": "multiplicado por",
+      "÷": "dividido",
+      "=": "igual",
+      "!": "factorial",
+      "^": "elevado a",
+      "^2": "al cuadrado",
+      "^3": "al cubo"
     }
   },
   // Please consult the translation team before adding any entries here.
@@ -7824,6 +7844,7 @@ export default {
   "LANGUAGE_CODE_TO_SENTENCE_ENDING_PUNCTUATION_MARKS": {
     "ar": "؟!",
     "en": ".!?",
+    "es": ".!?",
     "pt": ".!?",
     "hi": "।!?"
   }

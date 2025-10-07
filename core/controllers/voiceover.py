@@ -19,11 +19,12 @@ from __future__ import annotations
 import datetime
 
 from core import feconf
-from core.controllers import acl_decorators
-from core.controllers import base
-from core.domain import taskqueue_services
-from core.domain import voiceover_regeneration_services
-from core.domain import voiceover_services
+from core.controllers import acl_decorators, base
+from core.domain import (
+    taskqueue_services,
+    voiceover_regeneration_services,
+    voiceover_services,
+)
 
 from typing import Dict, TypedDict
 
@@ -42,21 +43,24 @@ class VoiceoverAdminDataHandler(
         """Retrieves relevant data for the voiceover admin page."""
 
         language_accent_master_list: Dict[str, Dict[str, str]] = (
-            voiceover_services.get_language_accent_master_list())
+            voiceover_services.get_language_accent_master_list()
+        )
 
         language_codes_mapping: Dict[str, Dict[str, bool]] = (
-            voiceover_services.get_all_language_accent_codes_for_voiceovers())
+            voiceover_services.get_all_language_accent_codes_for_voiceovers()
+        )
 
         autogeneratable_language_accent_codes = (
-            voiceover_services.get_autogeneratable_language_accent_codes())
+            voiceover_services.get_autogeneratable_language_accent_codes()
+        )
 
-        self.values.update({
-            'language_accent_master_list':
-                language_accent_master_list,
-            'language_codes_mapping': language_codes_mapping,
-            'autogeneratable_language_accent_codes':
-                autogeneratable_language_accent_codes
-        })
+        self.values.update(
+            {
+                'language_accent_master_list': language_accent_master_list,
+                'language_codes_mapping': language_codes_mapping,
+                'autogeneratable_language_accent_codes': autogeneratable_language_accent_codes,
+            }
+        )
         self.render_json(self.values)
 
 
@@ -70,8 +74,7 @@ class PutLanguageCodesHandlerNormalizedPayloadDict(TypedDict):
 
 class VoiceoverLanguageCodesMappingHandler(
     base.BaseHandler[
-        PutLanguageCodesHandlerNormalizedPayloadDict,
-        Dict[str, str]
+        PutLanguageCodesHandlerNormalizedPayloadDict, Dict[str, str]
     ]
 ):
     """Updates the language codes mapping field in the backend."""
@@ -83,26 +86,14 @@ class VoiceoverLanguageCodesMappingHandler(
             'language_codes_mapping': {
                 'schema': {
                     'type': 'variable_keys_dict',
-                    'keys': {
-                        'schema': {
-                            'type': 'basestring'
-                        }
-                    },
+                    'keys': {'schema': {'type': 'basestring'}},
                     'values': {
                         'schema': {
                             'type': 'variable_keys_dict',
-                            'keys': {
-                                'schema': {
-                                    'type': 'basestring'
-                                }
-                            },
-                            'values': {
-                                'schema': {
-                                    'type': 'bool'
-                                }
-                            }
+                            'keys': {'schema': {'type': 'basestring'}},
+                            'values': {'schema': {'type': 'bool'}},
                         }
-                    }
+                    },
                 }
             }
         }
@@ -114,11 +105,11 @@ class VoiceoverLanguageCodesMappingHandler(
         voiceovers.
         """
         assert self.normalized_payload is not None
-        language_codes_mapping = (
-            self.normalized_payload['language_codes_mapping'])
+        language_codes_mapping = self.normalized_payload[
+            'language_codes_mapping'
+        ]
 
-        voiceover_services.save_language_accent_support(
-            language_codes_mapping)
+        voiceover_services.save_language_accent_support(language_codes_mapping)
         self.render_json(self.values)
 
 
@@ -134,50 +125,38 @@ class PutVoiceArtistMetadataHandlerNormalizedPayloadDict(TypedDict):
 
 class VoiceArtistMetadataHandler(
     base.BaseHandler[
-        PutVoiceArtistMetadataHandlerNormalizedPayloadDict,
-        Dict[str, str]
+        PutVoiceArtistMetadataHandlerNormalizedPayloadDict, Dict[str, str]
     ]
 ):
-    """Handler class to manage voice artist data for the voiceover admin page.
-    """
+    """Handler class to manage voice artist data for the voiceover admin page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {},
         'PUT': {
-            'voice_artist_id': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
-            'language_code': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
-            'language_accent_code': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            }
-        }
+            'voice_artist_id': {'schema': {'type': 'basestring'}},
+            'language_code': {'schema': {'type': 'basestring'}},
+            'language_accent_code': {'schema': {'type': 'basestring'}},
+        },
     }
 
     @acl_decorators.can_access_voiceover_admin_page
     def get(self) -> None:
         """Retrieves voice artist data for the voiceover admin page."""
         voice_artist_id_to_language_mapping = (
-            voiceover_services.get_all_voice_artist_language_accent_mapping())
+            voiceover_services.get_all_voice_artist_language_accent_mapping()
+        )
         voice_artist_id_to_voice_artist_name = (
-            voiceover_services.get_voice_artist_ids_to_voice_artist_names())
+            voiceover_services.get_voice_artist_ids_to_voice_artist_names()
+        )
 
-        self.values.update({
-            'voice_artist_id_to_language_mapping':
-                voice_artist_id_to_language_mapping,
-            'voice_artist_id_to_voice_artist_name':
-                voice_artist_id_to_voice_artist_name
-        })
+        self.values.update(
+            {
+                'voice_artist_id_to_language_mapping': voice_artist_id_to_language_mapping,
+                'voice_artist_id_to_voice_artist_name': voice_artist_id_to_voice_artist_name,
+            }
+        )
         self.render_json(self.values)
 
     @acl_decorators.can_access_voiceover_admin_page
@@ -189,7 +168,8 @@ class VoiceArtistMetadataHandler(
         language_accent_code = self.normalized_payload['language_accent_code']
 
         voiceover_services.update_voice_artist_language_mapping(
-            voice_artist_id, language_code, language_accent_code)
+            voice_artist_id, language_code, language_accent_code
+        )
         self.render_json(self.values)
 
 
@@ -202,16 +182,8 @@ class GetSampleVoiceoversForGivenVoiceArtistHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
-        'voice_artist_id': {
-            'schema': {
-                'type': 'basestring'
-            }
-        },
-        'language_code': {
-            'schema': {
-                'type': 'basestring'
-            }
-        }
+        'voice_artist_id': {'schema': {'type': 'basestring'}},
+        'language_code': {'schema': {'type': 'basestring'}},
     }
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
@@ -219,14 +191,15 @@ class GetSampleVoiceoversForGivenVoiceArtistHandler(
     def get(self, voice_artist_id: str, language_code: str) -> None:
         exploration_id_to_filenames = (
             voiceover_services.get_voiceover_filenames(
-                voice_artist_id=voice_artist_id,
-                language_code=language_code
+                voice_artist_id=voice_artist_id, language_code=language_code
             )
         )
 
-        self.values.update({
-            'exploration_id_to_filenames': exploration_id_to_filenames,
-        })
+        self.values.update(
+            {
+                'exploration_id_to_filenames': exploration_id_to_filenames,
+            }
+        )
         self.render_json(self.values)
 
 
@@ -239,26 +212,10 @@ class EntityVoiceoversBulkHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
-        'entity_type': {
-            'schema': {
-                'type': 'basestring'
-            }
-        },
-        'entity_id': {
-            'schema': {
-                'type': 'basestring'
-            }
-        },
-        'entity_version': {
-            'schema': {
-                'type': 'int'
-            }
-        },
-        'language_code': {
-            'schema': {
-                'type': 'basestring'
-            }
-        }
+        'entity_type': {'schema': {'type': 'basestring'}},
+        'entity_id': {'schema': {'type': 'basestring'}},
+        'entity_version': {'schema': {'type': 'int'}},
+        'language_code': {'schema': {'type': 'basestring'}},
     }
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
@@ -272,16 +229,15 @@ class EntityVoiceoversBulkHandler(
     ) -> None:
         entity_voiceovers_objects = (
             voiceover_services.fetch_entity_voiceovers_by_language_code(
-                entity_id, entity_type, entity_version, language_code)
+                entity_id, entity_type, entity_version, language_code
+            )
         )
         entity_voiceovers_dicts = []
 
         for entity_voiceovers in entity_voiceovers_objects:
             entity_voiceovers_dicts.append(entity_voiceovers.to_dict())
 
-        self.values.update({
-            'entity_voiceovers_list': entity_voiceovers_dicts
-        })
+        self.values.update({'entity_voiceovers_list': entity_voiceovers_dicts})
         self.render_json(self.values)
 
 
@@ -292,48 +248,49 @@ class AutomaticVoiceoverRegenerationRecordHandler(
     within a specified date range."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {
-        'start_date': {
-            'schema': {
-                'type': 'basestring'
-            }
-        },
-        'end_date': {
-            'schema': {
-                'type': 'basestring'
-            }
-        },
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'start_date': {'schema': {'type': 'basestring'}},
+            'end_date': {'schema': {'type': 'basestring'}},
+        }
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_voiceover_admin_page
-    def get(self, start_date: str, end_date: str) -> None:
+    def get(self) -> None:
         """Retrieves automatic voiceover regeneration records within the
         specified start and end dates.
-
-        Args:
-            start_date: str. The start date for filtering records.
-            end_date: str. The end date for filtering records.
         """
+        assert self.normalized_request is not None
+        start_date: str = self.normalized_request.get('start_date', '')
+        end_date: str = self.normalized_request.get('end_date', '')
+
         # Convert start_date and end_date to datetime objects.
-        start_date_obj: datetime.datetime = datetime.datetime.strptime(
-            start_date, '%a %b %d %Y')
-        end_date_obj: datetime.datetime = datetime.datetime.strptime(
-            end_date, '%a %b %d %Y')
+        start_date_obj: datetime.datetime = datetime.datetime.fromisoformat(
+            start_date.replace('Z', '+00:00')
+        )
+        end_date_obj: datetime.datetime = datetime.datetime.fromisoformat(
+            end_date.replace('Z', '+00:00')
+        )
 
         # Fetch only those records that are related to voiceover regeneration
         # and are within the specified date range.
         cloud_task_run_objects = (
             taskqueue_services.get_cloud_task_run_by_given_params(
                 taskqueue_services.QUEUE_NAME_VOICEOVER_REGENERATION,
-                start_date_obj, end_date_obj))
+                start_date_obj,
+                end_date_obj,
+            )
+        )
 
-        self.values.update({
-            'automatic_voiceover_regeneration_records': [
-                cloud_task_run.to_dict()
-                for cloud_task_run in cloud_task_run_objects
-            ]
-        })
+        self.values.update(
+            {
+                'automatic_voiceover_regeneration_records': [
+                    cloud_task_run.to_dict()
+                    for cloud_task_run in cloud_task_run_objects
+                ]
+            }
+        )
         self.render_json(self.values)
 
 
@@ -344,34 +301,14 @@ class RegenerateAutomaticVoiceoverHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {
-            'schema': {
-                'type': 'basestring'
-            }
-        }
+        'exploration_id': {'schema': {'type': 'basestring'}}
     }
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
-            'exploration_version': {
-                'schema': {
-                    'type': 'int'
-                }
-            },
-            'state_name': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
-            'content_id': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
-            'language_accent_code': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            }
+            'exploration_version': {'schema': {'type': 'int'}},
+            'state_name': {'schema': {'type': 'basestring'}},
+            'content_id': {'schema': {'type': 'basestring'}},
+            'language_accent_code': {'schema': {'type': 'basestring'}},
         }
     }
 
@@ -382,27 +319,30 @@ class RegenerateAutomaticVoiceoverHandler(
         state_name: str = self.normalized_payload['state_name']
         content_id: str = self.normalized_payload['content_id']
         language_accent_code: str = self.normalized_payload[
-            'language_accent_code']
-        exploration_version: int = int(self.normalized_payload[
-            'exploration_version'])
+            'language_accent_code'
+        ]
+        exploration_version: int = int(
+            self.normalized_payload['exploration_version']
+        )
 
         generated_voiceover, sentence_tokens_with_durations = (
-            voiceover_regeneration_services.
-            regenerate_voiceover_for_exploration_content(
+            voiceover_regeneration_services.regenerate_voiceover_for_exploration_content(
                 exploration_id,
                 exploration_version,
                 state_name,
                 content_id,
-                language_accent_code
+                language_accent_code,
             )
         )
 
-        self.values.update({
-            'filename': generated_voiceover.filename,
-            'duration_secs': generated_voiceover.duration_secs,
-            'file_size_bytes': generated_voiceover.file_size_bytes,
-            'needs_update': generated_voiceover.needs_update,
-            'sentence_tokens_with_durations': sentence_tokens_with_durations
-        })
+        self.values.update(
+            {
+                'filename': generated_voiceover.filename,
+                'duration_secs': generated_voiceover.duration_secs,
+                'file_size_bytes': generated_voiceover.file_size_bytes,
+                'needs_update': generated_voiceover.needs_update,
+                'sentence_tokens_with_durations': sentence_tokens_with_durations,
+            }
+        )
 
         self.render_json(self.values)

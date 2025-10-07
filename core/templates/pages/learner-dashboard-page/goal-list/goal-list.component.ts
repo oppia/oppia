@@ -32,7 +32,7 @@ export class GoalListComponent implements OnInit {
   @Input() goalTopic!: LearnerTopicSummary;
 
   imgUrl: string = '';
-  displayAllNodes: boolean = false;
+  expandedStories: {[storyId: string]: boolean} = {};
   allCurrentNodes: number[] = [];
 
   constructor(
@@ -133,7 +133,11 @@ export class GoalListComponent implements OnInit {
     return earliestCompletedNode + 1;
   }
 
-  handleToggleState(updateState: boolean): void {
-    this.displayAllNodes = updateState;
+  handleToggleState(updateState: boolean, storyId: string): void {
+    this.expandedStories[storyId] = updateState;
+  }
+
+  isExpanded(storyId: string): boolean {
+    return !!this.expandedStories[storyId];
   }
 }

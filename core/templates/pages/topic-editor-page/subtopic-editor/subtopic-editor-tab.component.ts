@@ -63,9 +63,7 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
   editableUrlFragment: string;
   subtopicPage: SubtopicPage;
   studyGuide: StudyGuide;
-  // Index can be null. It means that no section is active.
-  // This also help in closing the study guide section editor.
-  activeSectionIndex!: number;
+  activeSectionIndex: number = -1;
   allowedBgColors;
   htmlData: string;
   sections: StudyGuideSection[];
@@ -85,7 +83,7 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
   SUBTOPIC_PAGE_SCHEMA: {
     type: string;
     ui_config: {
-      rte_components: string;
+      rte_component_config_id: string;
       rows: number;
     };
   };
@@ -169,6 +167,11 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
           this.editableUrlFragment
         );
     }
+  }
+
+  isEnableWorkedexamplesRteComponentFeatureEnabled(): boolean {
+    return this.platformFeatureService.status.EnableWorkedExamplesRteComponent
+      .isEnabled;
   }
 
   updateSubtopicTitle(title: string): void {
@@ -431,12 +434,13 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    const rteComponents =
+      this.isEnableWorkedexamplesRteComponentFeatureEnabled()
+        ? 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS'
+        : 'ALL_COMPONENTS';
     this.SUBTOPIC_PAGE_SCHEMA = {
       type: 'html',
-      ui_config: {
-        rte_components: 'ALL_COMPONENTS',
-        rows: 100,
-      },
+      ui_config: {rte_component_config_id: rteComponents, rows: 100},
     };
     this.htmlData = '';
     this.sections = [];

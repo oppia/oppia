@@ -34,8 +34,8 @@ import {
   VersionHistoryService,
 } from '../services/version-history.service';
 import {MetadataVersionHistoryModalComponent} from './metadata-version-history-modal.component';
-import {ExplorationMetadata} from 'domain/exploration/ExplorationMetadataObjectFactory';
-import {ParamSpecs} from 'domain/exploration/ParamSpecsObjectFactory';
+import {ExplorationMetadata} from 'domain/exploration/exploration-metadata.model';
+import {ParamSpecs} from 'domain/exploration/param-specs.model';
 
 describe('Metadata version history modal', () => {
   let component: MetadataVersionHistoryModalComponent;

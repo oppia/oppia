@@ -1,14 +1,14 @@
-<div class="oppia-customization-arg-form-container">
-  <div class="modal-header">
+<div class="oppia-customization-arg-form-container e2e-test-rte-helper-modal-container">
+  <div class="modal-header e2e-test-modal-header e2e-test-rte-helper-modal-header">
     <h3>Customize This Component</h3>
   </div>
 
   <div class="modal-body">
     <form *ngIf="customizationArgsForm" [formGroup]="customizationArgsForm">
       <div *ngFor="let customizationArgSpec of customizationArgSpecs;let ind = index"
-           class="oppia-customization-arg-editor">
+           class="oppia-customization-arg-editor e2e-test-arg-editor-{{ ind }}">
         <strong>{{ customizationArgSpec.description }}</strong>
-        <div class="oppia-customization-arg-editor-inner">
+        <div class="oppia-customization-arg-editor-inner e2e-test-arg-editor-inner-{{ ind }}">
           <schema-based-editor [formControlName]="ind"
                                [schema]="customizationArgSpec.schema">
           </schema-based-editor>

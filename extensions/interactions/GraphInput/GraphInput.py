@@ -45,88 +45,104 @@ class GraphInput(base.BaseInteraction):
     show_generic_submit_button: bool = True
 
     _graph_default_value: domain.GraphDict = {
-        'vertices': [{
-            'x': 150.0,
-            'y': 50.0,
-            'label': '',
-        }, {
-            'x': 200.0,
-            'y': 50.0,
-            'label': '',
-        }, {
-            'x': 150.0,
-            'y': 100.0,
-            'label': '',
-        }],
-        'edges': [{
-            'src': 0,
-            'dst': 1,
-            'weight': 1,
-        }, {
-            'src': 1,
-            'dst': 2,
-            'weight': 1,
-        }],
+        'vertices': [
+            {
+                'x': 150.0,
+                'y': 50.0,
+                'label': '',
+            },
+            {
+                'x': 200.0,
+                'y': 50.0,
+                'label': '',
+            },
+            {
+                'x': 150.0,
+                'y': 100.0,
+                'label': '',
+            },
+        ],
+        'edges': [
+            {
+                'src': 0,
+                'dst': 1,
+                'weight': 1,
+            },
+            {
+                'src': 1,
+                'dst': 2,
+                'weight': 1,
+            },
+        ],
         'isLabeled': False,
         'isDirected': False,
         'isWeighted': False,
     }
 
-    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{
-        'name': 'graph',
-        'description': 'Initial graph',
-        'schema': {
-            'type': 'custom',
-            'obj_type': 'Graph',
+    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [
+        {
+            'name': 'graph',
+            'description': 'Initial graph',
+            'schema': {
+                'type': 'custom',
+                'obj_type': 'Graph',
+            },
+            'default_value': _graph_default_value,
         },
-        'default_value': _graph_default_value
-    }, {
-        'name': 'canAddVertex',
-        'description': 'Allow learner to add vertices',
-        'schema': {
-            'type': 'bool',
+        {
+            'name': 'canAddVertex',
+            'description': 'Allow learner to add vertices',
+            'schema': {
+                'type': 'bool',
+            },
+            'default_value': False,
         },
-        'default_value': False
-    }, {
-        'name': 'canDeleteVertex',
-        'description': 'Allow learner to delete vertices',
-        'schema': {
-            'type': 'bool',
+        {
+            'name': 'canDeleteVertex',
+            'description': 'Allow learner to delete vertices',
+            'schema': {
+                'type': 'bool',
+            },
+            'default_value': False,
         },
-        'default_value': False
-    }, {
-        'name': 'canMoveVertex',
-        'description': 'Allow learner to move vertices',
-        'schema': {
-            'type': 'bool',
+        {
+            'name': 'canMoveVertex',
+            'description': 'Allow learner to move vertices',
+            'schema': {
+                'type': 'bool',
+            },
+            'default_value': True,
         },
-        'default_value': True
-    }, {
-        'name': 'canEditVertexLabel',
-        'description': 'Allow learner to edit vertex labels',
-        'schema': {
-            'type': 'bool',
+        {
+            'name': 'canEditVertexLabel',
+            'description': 'Allow learner to edit vertex labels',
+            'schema': {
+                'type': 'bool',
+            },
+            'default_value': False,
         },
-        'default_value': False
-    }, {
-        'name': 'canAddEdge',
-        'description': 'Allow learner to add edges',
-        'schema': {
-            'type': 'bool',
+        {
+            'name': 'canAddEdge',
+            'description': 'Allow learner to add edges',
+            'schema': {
+                'type': 'bool',
+            },
+            'default_value': True,
         },
-        'default_value': True
-    }, {
-        'name': 'canDeleteEdge',
-        'description': 'Allow learner to delete edges',
-        'schema': {
-            'type': 'bool',
+        {
+            'name': 'canDeleteEdge',
+            'description': 'Allow learner to delete edges',
+            'schema': {
+                'type': 'bool',
+            },
+            'default_value': True,
         },
-        'default_value': True
-    }, {
-        'name': 'canEditEdgeWeight',
-        'description': 'Allow learner to edit edge weights',
-        'schema': {
-            'type': 'bool',
+        {
+            'name': 'canEditEdgeWeight',
+            'description': 'Allow learner to edit edge weights',
+            'schema': {
+                'type': 'bool',
+            },
+            'default_value': False,
         },
-        'default_value': False
-    }]
+    ]

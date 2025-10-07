@@ -1,6 +1,6 @@
 <i class="fa fa-book show-mobile-navbar-icon e2e-test-mobile-options" (click)="toggleMobileNavOptions()" [ngClass]="{'mobile-navbar-toggled': mobileNavOptionsAreShown}" aria-label="Mobile navbar options" role="button"></i>
 <div class="navbar-mobile-container">
-  <div class="navbar-mobile-options" *ngIf="mobileNavOptionsAreShown">
+  <div class="navbar-mobile-options e2e-test-mobile-navigation-bar-container" *ngIf="mobileNavOptionsAreShown">
     <div  placement="top-start" class="exp-nav-dropdown-container">
       <div ngbDropdown class="exp-nav-dropdown-content" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <a>
@@ -37,7 +37,7 @@
           </li>
           <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item e2e-test-mobile-settings-button" [ngClass]="{'active': getActiveTabName() === 'settings'}">
             <a href="#" ngbTooltip="Settings" placement="bottom" (click)="selectSettingsTab()"
-               class="oppia-exploration-editor-tabs-dropdown-element">
+               class="oppia-exploration-editor-tabs-dropdown-element e2e-test-mobile-settings-button">
               <i class="fa fa-cog oppia-mobile-exploration-editor-tabs-icon"></i>
               <span class="oppia-exploration-editor-tabs-dropdown-inner">Settings</span>
             </a>

@@ -44,6 +44,7 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {AppConstants} from 'app.constants';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
 
 class MockTranslateService {
   onLangChange: EventEmitter<string> = new EventEmitter();
@@ -63,7 +64,16 @@ class MockPlatformFeatureService {
 class MockWindowRef {
   nativeWindow = {
     open: jasmine.createSpy('open'),
+    location: {
+      href: '',
+    },
   };
+}
+
+class MockSiteAnalyticsService {
+  registerPracticeSessionStartEvent = jasmine.createSpy(
+    'registerPracticeSessionStartEvent'
+  );
 }
 
 describe('Subtopic viewer page', function () {
@@ -82,6 +92,7 @@ describe('Subtopic viewer page', function () {
   let platformFeatureService: PlatformFeatureService;
   let windowRef: WindowRef;
   let urlInterpolationService: UrlInterpolationService;
+  let siteAnalyticsService: SiteAnalyticsService;
 
   let topicName = 'Topic Name';
   let topicId = '123abcd';
@@ -203,6 +214,10 @@ describe('Subtopic viewer page', function () {
           provide: WindowRef,
           useClass: MockWindowRef,
         },
+        {
+          provide: SiteAnalyticsService,
+          useClass: MockSiteAnalyticsService,
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -226,6 +241,7 @@ describe('Subtopic viewer page', function () {
     platformFeatureService = TestBed.inject(PlatformFeatureService);
     windowRef = TestBed.inject(WindowRef);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
 
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
       true
@@ -291,7 +307,7 @@ describe('Subtopic viewer page', function () {
         subtopicDataObject.getParentTopicId()
       );
       expect(component.parentTopicTitle).toEqual(
-        subtopicDataObject.getParentTopicName()
+        topicDataObject.getTopicName()
       );
       expect(component.nextSubtopic).toEqual(
         subtopicDataObject.getNextSubtopic()
@@ -340,7 +356,6 @@ describe('Subtopic viewer page', function () {
       'subtopic-url'
     );
     spyOn(loaderService, 'showLoadingScreen');
-    spyOn(subtopicDataObject, 'getSections').and.returnValue([]);
 
     spyOn(
       subtopicViewerBackendApiService,
@@ -353,7 +368,7 @@ describe('Subtopic viewer page', function () {
     component.ngOnInit();
     tick();
 
-    expect(component.sections).toEqual([]);
+    expect(component.sections).toEqual(subtopicDataObject.getSections());
     expect(component.pageContents).toBeNull();
   }));
 
@@ -500,6 +515,26 @@ describe('Subtopic viewer page', function () {
     );
   });
 
+  it('should open study guide when openStudyGuide is called with Ctrl+click event', () => {
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'algebra';
+    component.nextSubtopic = {
+      getUrlFragment: () => 'linear-equations',
+    };
+    const mockEvent = new MouseEvent('click', {ctrlKey: true});
+
+    spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
+      '/test-url'
+    );
+
+    component.openStudyGuide(mockEvent);
+
+    expect(windowRef.nativeWindow.open).toHaveBeenCalledWith(
+      '/test-url',
+      '_blank'
+    );
+  });
+
   it('should not open study guide when required fragments are missing', () => {
     component.classroomUrlFragment = '';
     component.topicUrlFragment = 'algebra';
@@ -528,6 +563,23 @@ describe('Subtopic viewer page', function () {
     );
   });
 
+  it('should open study guide menu when openStudyGuideMenu is called with Ctrl+click event', () => {
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'algebra';
+    const mockEvent = new MouseEvent('click', {ctrlKey: true});
+
+    spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
+      '/study-guide-menu'
+    );
+
+    component.openStudyGuideMenu(mockEvent);
+
+    expect(windowRef.nativeWindow.open).toHaveBeenCalledWith(
+      '/study-guide-menu',
+      '_blank'
+    );
+  });
+
   it('should not open study guide menu when required fragments are missing', () => {
     component.classroomUrlFragment = '';
     component.topicUrlFragment = 'algebra';
@@ -540,26 +592,44 @@ describe('Subtopic viewer page', function () {
   it('should open practice menu when openPracticeMenu is called', () => {
     component.classroomUrlFragment = 'math';
     component.topicUrlFragment = 'algebra';
+    component.currentSubtopicId = 1;
+    component.parentTopicTitle = 'Test Topic';
 
     spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
       '/practice-menu'
     );
+    spyOn(loaderService, 'showLoadingScreen');
 
     component.openPracticeMenu();
 
-    expect(windowRef.nativeWindow.open).toHaveBeenCalledWith(
-      '/practice-menu',
-      '_self'
-    );
+    expect(
+      siteAnalyticsService.registerPracticeSessionStartEvent
+    ).toHaveBeenCalledWith('math', 'Test Topic', '1');
+    expect(windowRef.nativeWindow.location.href).toBe('/practice-menu');
+    expect(loaderService.showLoadingScreen).toHaveBeenCalledWith('Loading');
   });
 
-  it('should not open practice menu when required fragments are missing', () => {
-    component.classroomUrlFragment = '';
+  it('should open practice menu when openPracticeMenu is called with Ctrl+click', () => {
+    component.classroomUrlFragment = 'math';
     component.topicUrlFragment = 'algebra';
+    component.currentSubtopicId = 1;
+    component.parentTopicTitle = 'Test Topic';
+    const mockEvent = new MouseEvent('click', {ctrlKey: true});
 
-    component.openPracticeMenu();
+    spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
+      '/practice-menu'
+    );
+    spyOn(loaderService, 'showLoadingScreen');
 
-    expect(windowRef.nativeWindow.open).not.toHaveBeenCalled();
+    component.openPracticeMenu(mockEvent);
+
+    expect(
+      siteAnalyticsService.registerPracticeSessionStartEvent
+    ).toHaveBeenCalledWith('math', 'Test Topic', '1');
+    expect(windowRef.nativeWindow.open).toHaveBeenCalledWith(
+      '/practice-menu',
+      '_blank'
+    );
   });
 
   it('should navigate back to topic when backToTopic is called', () => {
@@ -575,6 +645,23 @@ describe('Subtopic viewer page', function () {
     expect(windowRef.nativeWindow.open).toHaveBeenCalledWith(
       '/topic-viewer',
       '_self'
+    );
+  });
+
+  it('should navigate back to topic when backToTopic is called with Ctrl+click event', () => {
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'algebra';
+    const mockEvent = new MouseEvent('click', {ctrlKey: true});
+
+    spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
+      '/topic-viewer'
+    );
+
+    component.backToTopic(mockEvent);
+
+    expect(windowRef.nativeWindow.open).toHaveBeenCalledWith(
+      '/topic-viewer',
+      '_blank'
     );
   });
 
@@ -606,21 +693,37 @@ describe('Subtopic viewer page', function () {
   it('should modify next subtopic title based on length', () => {
     const longTitle =
       'This is a very long subtopic title that exceeds twenty characters';
+
+    // Test desktop view (default behavior).
+    spyOn(component, 'checkMobileView').and.returnValue(false);
     component.nextSubtopic = {
       getTitle: () => longTitle,
       getUrlFragment: () => 'test-fragment',
     };
-    const result1 = component.checkNextSubtopicTitleLengthAndModify();
-    expect(result1).toBe('This is a very lo...');
-    expect(result1.length).toBe(20);
 
+    const desktopResult = component.checkNextSubtopicTitleLengthAndModify();
+    // 20 chars + '...'.
+    expect(desktopResult).toBe('This is a very long ...');
+    // 20 + 3 for '...'.
+    expect(desktopResult.length).toBe(23);
+
+    // Test mobile view.
+    (component.checkMobileView as jasmine.Spy).and.returnValue(true);
+    const mobileResult = component.checkNextSubtopicTitleLengthAndModify();
+    // 15 chars + '...'.
+    expect(mobileResult).toBe('This is a very ...');
+    // 15 + 3 for '...'.
+    expect(mobileResult.length).toBe(18);
+
+    // Test short title (should not be truncated).
     const shortTitle = 'Short title';
     component.nextSubtopic = {
       getTitle: () => shortTitle,
       getUrlFragment: () => 'test-fragment',
     };
-    const result2 = component.checkNextSubtopicTitleLengthAndModify();
-    expect(result2).toBe(shortTitle);
-    expect(result2).toBe('Short title');
+
+    const shortResult = component.checkNextSubtopicTitleLengthAndModify();
+    expect(shortResult).toBe(shortTitle);
+    expect(shortResult).toBe('Short title');
   });
 });

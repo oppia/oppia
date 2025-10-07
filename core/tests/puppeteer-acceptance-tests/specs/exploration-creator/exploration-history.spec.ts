@@ -63,10 +63,11 @@ describe('Exploration Editor', function () {
     await explorationEditor.expectNumberOfHistoryItemsToBe(0);
 
     await explorationEditor.searchUserInHistoryTab('');
-    // TODO(#22976): After searching pagination doesn't work and shows
-    // all of the history items, until we change max items per page to a
-    // different value.
+    await explorationEditor.expectNumberOfHistoryItemsToBe(10);
+
     await explorationEditor.changePaginationInHistoryTabTo(15);
+    await explorationEditor.expectNumberOfHistoryItemsToBe(15);
+
     await explorationEditor.changePaginationInHistoryTabTo(10);
     await explorationEditor.expectNumberOfHistoryItemsToBe(10);
 
@@ -78,6 +79,17 @@ describe('Exploration Editor', function () {
     await explorationEditor.compareExplorationVersionsInHistoryTab('1', '5');
     await explorationEditor.expectGraphDifferencesToBeVisible();
     await explorationEditor.resetGraphDifferenceInHistoryTab();
+  });
+
+  it('should be able to revert to a previous version of an exploration', async function () {
+    // Check if exploration version date is properly formatted.
+    await explorationEditor.expectExplorationHistoryDateHasProperFormat();
+
+    // Revert exploration to an older version.
+    await explorationEditor.revertExplorationToVersion('10');
+    await explorationEditor.navigateToEditorTab();
+    await explorationEditor.navigateToCard('Second Card');
+    await explorationEditor.expectCardContentToBe('Thanks for playing! 6');
   });
 
   afterAll(async function () {

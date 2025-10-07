@@ -25,10 +25,10 @@ import cloneDeep from 'lodash/cloneDeep';
 
 import {MisconceptionBackendDict} from 'domain/skill/misconception.model';
 import {RecordedVoiceOverBackendDict} from 'domain/exploration/recorded-voiceovers.model';
-import {StateBackendDict} from 'domain/state/StateObjectFactory';
+import {StateBackendDict} from 'domain/state/state.model';
 import {SubtitledHtmlBackendDict} from 'domain/exploration/subtitled-html.model';
 import {Collection} from 'domain/collection/collection.model';
-import {Question} from 'domain/question/QuestionObjectFactory';
+import {Question} from 'domain/question/question.model';
 import {Skill} from 'domain/skill/skill.model.ts';
 import {Story} from 'domain/story/story.model';
 import {Topic} from 'domain/topic/topic-object.model';

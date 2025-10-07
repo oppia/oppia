@@ -111,10 +111,16 @@ describe('Logged-In Learner', function () {
 
   it('should be able add a goal', async function () {
     await loggedInLearner.navigateToLearnerDashboardUsingProfileDropdown();
+    await loggedInLearner.expectLearnSomethingNewSectionInRedesignedDashboardToBePresent();
+    await loggedInLearner.expectContinueWhereYouLeftOffSectionInLDToBePresent(
+      false
+    );
+    await loggedInLearner.navigateToProgressSection();
+    await loggedInLearner.expectProgressSectionToBeEmptyInNewLD();
     await loggedInLearner.navigateToGoalsSection();
     await loggedInLearner.addGoalInRedesignedLearnerDashboard('Algebra I');
     await loggedInLearner.expectCurrentGoalsInRedesignedDashboardToContain(
-      'Algebra I'
+      'Algebra I: The Broken Calculator'
     );
   });
 
@@ -128,7 +134,7 @@ describe('Logged-In Learner', function () {
     // Once this feature/bug is fixed, update the test.
     await loggedInLearner.navigateToGoalsSection();
     await loggedInLearner.startGoalFromGoalsSectionInRedesignedDashboard(
-      'Algebra I'
+      'Algebra I: The Broken Calculator'
     );
     await loggedInLearner.waitForNetworkIdle();
 

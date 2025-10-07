@@ -24,9 +24,7 @@ from unittest import mock
 
 from core import feconf
 from core.domain import beam_job_services
-from core.jobs import base_jobs
-from core.jobs import job_options
-from core.jobs import jobs_manager
+from core.jobs import base_jobs, job_options, jobs_manager
 from core.jobs.types import job_run_result
 from core.storage.beam_job import gae_models as beam_job_models
 from core.tests import test_utils
@@ -40,9 +38,8 @@ class WorkingJob(base_jobs.JobBase):
     """Simple job that outputs string literals."""
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        return (
-            self.pipeline
-            | beam.Create([job_run_result.JobRunResult(stdout='o', stderr='e')])
+        return self.pipeline | beam.Create(
+            [job_run_result.JobRunResult(stdout='o', stderr='e')]
         )
 
 
@@ -65,7 +62,8 @@ class RunJobTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             beam_job_services.get_beam_job_run_result(run.id).to_dict(),
-            {'stdout': 'o', 'stderr': 'e'})
+            {'stdout': 'o', 'stderr': 'e'},
+        )
 
     def test_failing_sync_job(self) -> None:
         run = jobs_manager.run_job(FailingJob, True, namespace=self.namespace)
@@ -76,8 +74,8 @@ class RunJobTests(test_utils.GenericTestBase):
         self.assertEqual(run, run_model)
 
         self.assertIn(
-            'uh-oh',
-            beam_job_services.get_beam_job_run_result(run.id).stderr)
+            'uh-oh', beam_job_services.get_beam_job_run_result(run.id).stderr
+        )
 
     def test_async_job(self) -> None:
         mock_run_result = mock.Mock()
@@ -87,7 +85,8 @@ class RunJobTests(test_utils.GenericTestBase):
 
         pipeline = beam.Pipeline(
             runner=runners.DirectRunner(),
-            options=job_options.JobOptions(namespace=self.namespace))
+            options=job_options.JobOptions(namespace=self.namespace),
+        )
 
         with self.swap_to_always_return(pipeline, 'run', value=mock_run_result):
             run = jobs_manager.run_job(WorkingJob, False, pipeline=pipeline)
@@ -103,7 +102,8 @@ class RunJobTests(test_utils.GenericTestBase):
 
         pipeline = beam.Pipeline(
             runner=runners.DirectRunner(),
-            options=job_options.JobOptions(namespace=self.namespace))
+            options=job_options.JobOptions(namespace=self.namespace),
+        )
 
         with self.swap_to_always_return(pipeline, 'run', value=mock_run_result):
             run = jobs_manager.run_job(WorkingJob, False, pipeline=pipeline)
@@ -120,21 +120,26 @@ class RefreshStateOfBeamJobRunModelTests(test_utils.GenericTestBase):
         super().setUp()
 
         self.run_model = beam_job_services.create_beam_job_run_model(
-            'WorkingJob', dataflow_job_id='123')
+            'WorkingJob', dataflow_job_id='123'
+        )
 
         self.dataflow_job = dataflow.Job(
             id='123',
             project_id='dev-project-id',
             location=feconf.GOOGLE_APP_ENGINE_REGION,
             current_state=dataflow.JobState.JOB_STATE_PENDING,
-            current_state_time=datetime.datetime.utcnow())
+            current_state_time=datetime.datetime.utcnow(),
+        )
 
         self.dataflow_client_mock = mock.Mock()
         self.dataflow_client_mock.get_job.return_value = self.dataflow_job
 
         self.exit_stack = contextlib.ExitStack()
-        self.exit_stack.enter_context(self.swap_to_always_return(
-            dataflow, 'JobsV1Beta3Client', value=self.dataflow_client_mock))
+        self.exit_stack.enter_context(
+            self.swap_to_always_return(
+                dataflow, 'JobsV1Beta3Client', value=self.dataflow_client_mock
+            )
+        )
 
     def tearDown(self) -> None:
         try:
@@ -191,9 +196,7 @@ class RefreshStateOfBeamJobRunModelTests(test_utils.GenericTestBase):
             jobs_manager.refresh_state_of_beam_job_run_model(self.run_model)
 
         self.assertGreater(len(logs), 0)
-        # TODO(release-scripts#137): Update once project ID is verified on
-        # all servers. logs[0] is the debug message to verify project ID.
-        self.assertIn('uh-oh', logs[1])
+        self.assertIn('uh-oh', logs[0])
 
 
 class CancelJobTests(test_utils.GenericTestBase):
@@ -202,21 +205,26 @@ class CancelJobTests(test_utils.GenericTestBase):
         super().setUp()
 
         self.run_model = beam_job_services.create_beam_job_run_model(
-            'WorkingJob', dataflow_job_id='123')
+            'WorkingJob', dataflow_job_id='123'
+        )
 
         self.dataflow_job = dataflow.Job(
             id='123',
             project_id='dev-project-id',
             location=feconf.GOOGLE_APP_ENGINE_REGION,
             current_state=dataflow.JobState.JOB_STATE_CANCELLING,
-            current_state_time=datetime.datetime.utcnow())
+            current_state_time=datetime.datetime.utcnow(),
+        )
 
         self.dataflow_client_mock = mock.Mock()
         self.dataflow_client_mock.update_job.return_value = self.dataflow_job
 
         self.exit_stack = contextlib.ExitStack()
-        self.exit_stack.enter_context(self.swap_to_always_return(
-            dataflow, 'JobsV1Beta3Client', value=self.dataflow_client_mock))
+        self.exit_stack.enter_context(
+            self.swap_to_always_return(
+                dataflow, 'JobsV1Beta3Client', value=self.dataflow_client_mock
+            )
+        )
 
     def tearDown(self) -> None:
         try:
@@ -244,6 +252,4 @@ class CancelJobTests(test_utils.GenericTestBase):
             jobs_manager.cancel_job(self.run_model)
 
         self.assertGreater(len(logs), 0)
-        # TODO(release-scripts#137): Update once project ID is verified on
-        # all servers. logs[0] is the debug message to verify project ID.
-        self.assertIn('uh-oh', logs[1])
+        self.assertIn('uh-oh', logs[0])

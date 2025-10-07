@@ -29,6 +29,7 @@ import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-ed
 import {PageContextService} from 'services/page-context.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {TopicsAndSkillsDashboardPageConstants} from '../topics-and-skills-dashboard-page.constants';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 import {ValidatorsService} from 'services/validators.service';
 
 @Component({
@@ -42,6 +43,7 @@ export class CreateNewSkillModalComponent {
     Rubric.create(AppConstants.SKILL_DIFFICULTIES[2], []),
   ];
 
+  workedExampleLimitExceeded!: boolean;
   newSkillDescription: string = '';
   errorMsg: string = '';
   skillDescriptionExists: boolean = true;
@@ -50,7 +52,7 @@ export class CreateNewSkillModalComponent {
   HTML_SCHEMA = {
     type: 'html',
     ui_config: {
-      rte_components: 'ALL_COMPONENTS',
+      rte_component_config_id: 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS',
     },
   };
   MAX_CHARS_IN_SKILL_DESCRIPTION = AppConstants.MAX_CHARS_IN_SKILL_DESCRIPTION;
@@ -59,6 +61,8 @@ export class CreateNewSkillModalComponent {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   newExplanationObject!: SubtitledHtmlBackendDict;
+  skillEditorWorkedExampleLimit: number =
+    AppConstants.SKILL_EDITOR_WORKED_EXAMPLE_LIMIT;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -67,6 +71,7 @@ export class CreateNewSkillModalComponent {
     private skillCreationService: SkillCreationService,
     private skillEditorStateService: SkillEditorStateService,
     private changeDetectorRef: ChangeDetectorRef,
+    private platformFeatureService: PlatformFeatureService,
     private validatorsService: ValidatorsService
   ) {}
 
@@ -86,6 +91,14 @@ export class CreateNewSkillModalComponent {
   }
 
   getHtmlSchema(): {type: string} {
+    if (!this.isEnableWorkedexamplesRteComponentFeatureEnabled()) {
+      this.HTML_SCHEMA = {
+        type: 'html',
+        ui_config: {
+          rte_component_config_id: 'ALL_COMPONENTS',
+        },
+      };
+    }
     return this.HTML_SCHEMA;
   }
 
@@ -107,6 +120,20 @@ export class CreateNewSkillModalComponent {
     this.setErrorMessageIfNeeded();
   }
 
+  checkExtraWorkedexample(): boolean {
+    const workedexampleRegex =
+      /<oppia-noninteractive-workedexample.*?>.*?<\/oppia-noninteractive-workedexample>/g;
+    const matches =
+      this.bindableDict.displayedConceptCardExplanation.match(
+        workedexampleRegex
+      );
+
+    this.workedExampleLimitExceeded = !!(
+      matches && matches.length > this.skillEditorWorkedExampleLimit
+    );
+    return this.workedExampleLimitExceeded;
+  }
+
   updateSkillDescriptionAndCheckIfExists(): void {
     this.resetErrorMsg();
 
@@ -124,6 +151,11 @@ export class CreateNewSkillModalComponent {
       this.rubrics[1].setExplanations([this.newSkillDescription]);
       this.skillCreationService.markChangeInSkillDescription();
     }
+  }
+
+  isEnableWorkedexamplesRteComponentFeatureEnabled(): boolean {
+    return this.platformFeatureService.status.EnableWorkedExamplesRteComponent
+      .isEnabled;
   }
 
   resetErrorMsg(): void {

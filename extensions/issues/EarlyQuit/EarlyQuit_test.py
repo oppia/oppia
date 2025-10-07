@@ -19,7 +19,10 @@
 from __future__ import annotations
 
 from core.tests import test_utils
-from extensions.issues.EarlyQuit import EarlyQuit # pylint: disable=unused-import # isort: skip
+
+from extensions.issues.EarlyQuit import (  # pylint: disable=unused-import # isort: skip
+    EarlyQuit,
+)
 
 
 class EarlyQuitTests(test_utils.GenericTestBase):

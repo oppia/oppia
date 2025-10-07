@@ -23,8 +23,7 @@ import {Outcome} from '../../../domain/exploration/outcome.model';
 import {
   Question,
   QuestionBackendDict,
-  QuestionObjectFactory,
-} from '../../../domain/question/QuestionObjectFactory';
+} from '../../../domain/question/question.model';
 import {StateCard} from '../../../domain/state_card/state-card.model';
 import {ExpressionInterpolationService} from '../../../expressions/expression-interpolation.service';
 import {TextInputRulesService} from '../../../../../extensions/interactions/TextInput/directives/text-input-rules.service';
@@ -37,7 +36,7 @@ import {
 } from './answer-classification.service';
 import {QuestionBackendApiService} from '../../../domain/question/question-backend-api.service.ts';
 import {QuestionPlayerEngineService} from './question-player-engine.service';
-import {StateObjectFactory} from '../../../domain/state/StateObjectFactory';
+import {State} from '../../../domain/state/state.model';
 
 describe('Question player engine service', () => {
   let alertsService: AlertsService;
@@ -46,7 +45,6 @@ describe('Question player engine service', () => {
   let expressionInterpolationService: ExpressionInterpolationService;
   let focusManagerService: FocusManagerService;
   let multipleQuestionsBackendDict: QuestionBackendDict[];
-  let questionObjectFactory: QuestionObjectFactory;
   let questionPlayerEngineService: QuestionPlayerEngineService;
   let singleQuestionBackendDict: QuestionBackendDict;
   let singleQuestionObject: Question;
@@ -55,7 +53,6 @@ describe('Question player engine service', () => {
   let textInputService: InteractionRulesService;
 
   let questionId = 'question_id';
-  let stateObject: StateObjectFactory;
   let question: Question;
 
   beforeEach(() => {
@@ -382,9 +379,7 @@ describe('Question player engine service', () => {
       imports: [HttpClientTestingModule],
       providers: [
         QuestionPlayerEngineService,
-        QuestionObjectFactory,
         QuestionBackendApiService,
-        StateObjectFactory,
         ExpressionInterpolationService,
         FocusManagerService,
         AlertsService,
@@ -395,29 +390,27 @@ describe('Question player engine service', () => {
     });
 
     alertsService = TestBed.inject(AlertsService);
-    stateObject = TestBed.inject(StateObjectFactory);
     answerClassificationService = TestBed.inject(AnswerClassificationService);
     pageContextService = TestBed.inject(PageContextService);
     expressionInterpolationService = TestBed.inject(
       ExpressionInterpolationService
     );
     questionBackendApiService = TestBed.inject(QuestionBackendApiService);
-    questionObjectFactory = TestBed.inject(QuestionObjectFactory);
     questionPlayerEngineService = TestBed.inject(QuestionPlayerEngineService);
     focusManagerService = TestBed.inject(FocusManagerService);
     textInputService = TestBed.get(TextInputRulesService);
 
-    singleQuestionObject = questionObjectFactory.createFromBackendDict(
+    singleQuestionObject = Question.createFromBackendDict(
       singleQuestionBackendDict
     );
     multipleQuestionsObjects = multipleQuestionsBackendDict.map(
       function (questionDict) {
-        return questionObjectFactory.createFromBackendDict(questionDict);
+        return Question.createFromBackendDict(questionDict);
       }
     );
     question = new Question(
       questionId,
-      stateObject.createDefaultState('state', 'content_0', 'default_outcome_1'),
+      State.createDefaultState('state', 'content_0', 'default_outcome_1'),
       '',
       7,
       [],
@@ -567,7 +560,7 @@ describe('Question player engine service', () => {
     spyOn(questionBackendApiService, 'fetchQuestionsAsync').and.returnValue(
       Promise.resolve([singleQuestionBackendDict])
     );
-    spyOn(questionObjectFactory, 'createFromBackendDict').and.returnValue(
+    spyOn(Question, 'createFromBackendDict').and.returnValue(
       singleQuestionObject
     );
     spyOn(questionPlayerEngineService.onTotalQuestionsReceived, 'emit');
@@ -715,11 +708,7 @@ describe('Question player engine service', () => {
       );
 
       questionPlayerEngineService.init(
-        [
-          questionObjectFactory.createFromBackendDict(
-            singleQuestionBackendDict
-          ),
-        ],
+        [Question.createFromBackendDict(singleQuestionBackendDict)],
         initSuccessCb,
         initErrorCb
       );
@@ -852,11 +841,7 @@ describe('Question player engine service', () => {
         singleQuestionBackendDict.question_state_data.interaction.default_outcome.feedback.html =
           null;
         questionPlayerEngineService.init(
-          [
-            questionObjectFactory.createFromBackendDict(
-              singleQuestionBackendDict
-            ),
-          ],
+          [Question.createFromBackendDict(singleQuestionBackendDict)],
           initSuccessCb,
           initErrorCb
         );
@@ -887,7 +872,7 @@ describe('Question player engine service', () => {
       answerClassificationResult.outcome.labelledAsCorrect = true;
 
       singleQuestionBackendDict.question_state_data.content.html = null;
-      let sampleQuestion = questionObjectFactory.createFromBackendDict(
+      let sampleQuestion = Question.createFromBackendDict(
         singleQuestionBackendDict
       );
 

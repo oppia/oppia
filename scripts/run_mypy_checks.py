@@ -33,11 +33,12 @@ EXCLUDED_DIRECTORIES: Final = [
     'scripts/linters/test_files/',
     'third_party/',
     'venv/',
+    '.direnv/',
     # The files in 'build_sources' and 'data' directories can be
     # ignored while type checking, because these files are only
     # used as resources for the tests.
     'core/tests/build_sources/',
-    'core/tests/data/'
+    'core/tests/data/',
 ]
 
 CONFIG_FILE_PATH: Final = os.path.join('.', 'mypy.ini')
@@ -46,10 +47,7 @@ _PARSER: Final = argparse.ArgumentParser(
     description='Python type checking using mypy script.'
 )
 _PARSER.add_argument(
-    '--files',
-    help='Files to type-check',
-    action='store',
-    nargs='+'
+    '--files', help='Files to type-check', action='store', nargs='+'
 )
 
 
@@ -70,8 +68,12 @@ def get_mypy_cmd(files: Optional[List[str]]) -> List[str]:
     else:
         excluded_files_regex = '|'.join(EXCLUDED_DIRECTORIES)
         cmd = [
-            mypy_cmd, '--exclude', excluded_files_regex,
-            '--config-file', CONFIG_FILE_PATH, '.'
+            mypy_cmd,
+            '--exclude',
+            excluded_files_regex,
+            '--config-file',
+            CONFIG_FILE_PATH,
+            '.',
         ]
     return cmd
 
@@ -90,7 +92,8 @@ def main(args: Optional[List[str]] = None) -> int:
 
     print('Starting Mypy type checks.')
     process = subprocess.Popen(
-        mypy_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        mypy_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
     stdout, stderr = process.communicate()
     # Standard and error output is in bytes, we need to decode the line to
     # print it.
@@ -102,10 +105,11 @@ def main(args: Optional[List[str]] = None) -> int:
         print(
             'Mypy type checks unsuccessful. Please fix the errors. '
             'For more information, visit: '
-            'https://github.com/oppia/oppia/wiki/Backend-Type-Annotations')
+            'https://github.com/oppia/oppia/wiki/Backend-Type-Annotations'
+        )
         sys.exit(1)
     return process.returncode
 
 
-if __name__ == '__main__': # pragma: no cover
+if __name__ == '__main__':  # pragma: no cover
     main()
