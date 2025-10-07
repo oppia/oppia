@@ -410,3 +410,169 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(user_progress[0]['exploration_id'], exp_id_1)
         self.assertEqual(user_progress[0]['visited_checkpoints_count'], 1)
         self.assertEqual(user_progress[0]['total_checkpoints_count'], 1)
+
+    def test_get_multiple_stories_by_ids_and_version(self) -> None:
+        """Test fetching multiple stories with specific versions."""
+
+        story_1_id = story_services.get_new_story_id()
+        self.save_new_story(
+            story_1_id, self.USER_ID, self.TOPIC_ID,
+            title='Original Story 1',
+            description='Original Description 1')
+
+        story_2_id = story_services.get_new_story_id()
+        self.save_new_story(
+            story_2_id, self.USER_ID, self.TOPIC_ID,
+            title='Original Story 2',
+            description='Original Description 2')
+
+        topic_services.add_canonical_story(
+            self.USER_ID, self.TOPIC_ID, story_1_id)
+        topic_services.add_canonical_story(
+            self.USER_ID, self.TOPIC_ID, story_2_id)
+
+        story_services.update_story(
+            self.USER_ID, story_1_id,
+            [story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_PROPERTY,
+                'property_name': 'title',
+                'old_value': 'Original Story 1',
+                'new_value': 'Updated Story 1'
+            })],
+            'Update story 1 title')
+
+        results = story_fetchers.get_multiple_stories_by_ids_and_version([
+            (story_1_id, 1),
+            (story_1_id, 2),
+            (story_2_id, 1),
+            (story_1_id, None),
+            ('nonexistent', 1),
+        ])
+
+        self.assertEqual(len(results), 5)
+
+        self.assertIsNotNone(results[0])
+        assert results[0] is not None
+        self.assertEqual(results[0].id, story_1_id)
+        self.assertEqual(results[0].title, 'Original Story 1')
+        self.assertEqual(results[0].version, 1)
+
+        self.assertIsNotNone(results[1])
+        assert results[1] is not None
+        self.assertEqual(results[1].id, story_1_id)
+        self.assertEqual(results[1].title, 'Updated Story 1')
+        self.assertEqual(results[1].version, 2)
+
+        self.assertIsNotNone(results[2])
+        assert results[2] is not None
+        self.assertEqual(results[2].id, story_2_id)
+        self.assertEqual(results[2].title, 'Original Story 2')
+        self.assertEqual(results[2].version, 1)
+
+        self.assertIsNotNone(results[3])
+        assert results[3] is not None
+        self.assertEqual(results[3].id, story_1_id)
+        self.assertEqual(results[3].title, 'Updated Story 1')
+        self.assertEqual(results[3].version, 2)
+
+        self.assertIsNone(results[4])
+
+    def test_get_multiple_stories_by_ids_and_version_with_invalid_version(
+        self
+    ) -> None:
+        """Test fetching stories with invalid version numbers."""
+        story_id = story_services.get_new_story_id()
+        self.save_new_story(story_id, self.USER_ID, self.TOPIC_ID)
+
+        results = story_fetchers.get_multiple_stories_by_ids_and_version([
+            (story_id, 999)
+        ])
+        self.assertEqual(len(results), 1)
+        self.assertIsNone(results[0])
+
+    def test_get_multiple_stories_by_ids_and_version_deleted(self) -> None:
+        """Test fetching deleted stories returns None."""
+        story_id = story_services.get_new_story_id()
+        self.save_new_story(story_id, self.USER_ID, self.TOPIC_ID)
+        story_services.delete_story(self.USER_ID, story_id)
+
+        results = story_fetchers.get_multiple_stories_by_ids_and_version([
+            (story_id, 1)
+        ])
+        self.assertEqual(len(results), 1)
+        self.assertIsNone(results[0])
+
+    def test_get_multiple_stories_by_ids_and_version_empty_list(self) -> None:
+        """Test fetching with empty list of IDs."""
+        results = story_fetchers.get_multiple_stories_by_ids_and_version([])
+        self.assertEqual(results, [])
+
+    def test_get_multiple_stories_by_ids_and_version_schema_versions(
+        self
+    ) -> None:
+        """Test fetching stories maintains correct schema versions."""
+        story_id = story_services.get_new_story_id()
+        self.save_new_story(story_id, self.USER_ID, self.TOPIC_ID)
+
+        results = story_fetchers.get_multiple_stories_by_ids_and_version([
+            (story_id, 1)
+        ])
+        self.assertEqual(len(results), 1)
+        self.assertIsNotNone(results[0])
+        assert results[0] is not None
+        self.assertEqual(
+            results[0].story_contents_schema_version,
+            feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION)
+
+    def test_get_multiple_stories_by_ids_and_version_nodes(self) -> None:
+        """Test fetching stories with nodes returns correct data."""
+        story_id = story_services.get_new_story_id()
+        self.save_new_story(story_id, self.USER_ID, self.TOPIC_ID)
+        topic_services.add_canonical_story(
+            self.USER_ID, self.TOPIC_ID, story_id)
+        changelist = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
+                'node_id': self.NODE_ID_1,
+                'title': 'Node 1'
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
+                'node_id': self.NODE_ID_2,
+                'title': 'Node 2'
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': 
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID,
+                'node_id': self.NODE_ID_1,
+                'old_value': None,
+                'new_value': 'exp_id_1'
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': 
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID,
+                'node_id': self.NODE_ID_2,
+                'old_value': None,
+                'new_value': 'exp_id_2'
+            })
+        ]
+        story_services.update_story(
+            self.USER_ID, story_id,
+            changelist, 'Added nodes with exploration IDs.'
+        )
+
+        results = story_fetchers.get_multiple_stories_by_ids_and_version([
+            (story_id, 2)
+        ])
+        self.assertEqual(len(results), 1)
+        self.assertIsNotNone(results[0])
+        assert results[0] is not None
+
+        nodes = results[0].story_contents.nodes
+        self.assertEqual(len(nodes), 2)
+        self.assertEqual(nodes[0].id, self.NODE_ID_1)
+        self.assertEqual(nodes[0].title, 'Node 1')
+        self.assertEqual(nodes[1].id, self.NODE_ID_2)
+        self.assertEqual(nodes[1].title, 'Node 2')

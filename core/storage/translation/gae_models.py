@@ -21,7 +21,7 @@ from __future__ import annotations
 from core import feconf, utils
 from core.platform import models
 
-from typing import Dict, Optional, Sequence
+from typing import Dict, List, Optional, Sequence, TypedDict
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -30,6 +30,15 @@ if MYPY:  # pragma: no cover
 (base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 datastore_services = models.Registry.import_datastore_services()
+
+
+class EntityTranslationReferenceDict(TypedDict):
+    """Dictionary representing the reference to an entity translation model."""
+
+    entity_type: feconf.TranslatableEntityType
+    entity_id: str
+    entity_version: int
+    language_code: str
 
 
 class EntityTranslationsModel(base_models.BaseModel):
@@ -137,6 +146,31 @@ class EntityTranslationsModel(base_models.BaseModel):
             entity_type, entity_id, entity_version, language_code
         )
         return cls.get_by_id(model_id)
+
+    @classmethod
+    def get_model_multi(
+            cls,
+            entity_translation_references: List[EntityTranslationReferenceDict]
+    ) -> List[Optional[EntityTranslationsModel]]:
+        """Gets multiple EntityTranslationsModels by their references.
+
+        Args:
+            entity_translation_references: List[EntityTranslationReferenceDict]. 
+                List of dictionaries containing entity translation references.
+
+        Returns:
+            List[Optional[EntityTranslationsModel]]. List of entity translation
+            models corresponding to the given references.
+        """
+        model_ids = [
+            cls._generate_id(
+                reference['entity_type'],
+                reference['entity_id'],
+                reference['entity_version'],
+                reference['language_code'])
+            for reference in entity_translation_references
+        ]
+        return cls.get_multi(model_ids)
 
     @classmethod
     def get_all_for_entity(

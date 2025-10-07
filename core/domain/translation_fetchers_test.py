@@ -129,3 +129,156 @@ class EntityTranslationFetchersTests(test_utils.GenericTestBase):
         )
         self.assertEqual(entity_translation.language_code, 'hi')
         self.assertEqual(entity_translation.translations, {})
+
+    def test_get_entity_translation_returns_empty_if_not_found(self) -> None:
+        """Test fetching translations that do not exist
+         returns an empty object.
+         """
+        result = translation_fetchers.get_entity_translation(
+            feconf.TranslatableEntityType.EXPLORATION, 'nonexistent', 1, 'hi'
+        )
+        self.assertEqual(result.translations, {})
+
+    def test_get_multiple_entity_translations(self) -> None:
+        """Test fetching multiple entity translations with specific versions."""
+        exp_id_1 = 'exp1'
+        exp_id_2 = 'exp2'
+
+        translation_models.EntityTranslationsModel.create_new(
+            'exploration', exp_id_1, 1, 'hi',
+            {'content_1': {
+                'content_format': 'html',
+                'content_value': 'Translation 1',
+                'needs_update': False}}
+        ).put()
+
+        translation_models.EntityTranslationsModel.create_new(
+            'exploration', exp_id_2, 1, 'hi',
+            {'content_2': {
+                'content_format': 'html',
+                'content_value': 'Translation 2',
+                'needs_update': False}}
+        ).put()
+
+        translation_models.EntityTranslationsModel.create_new(
+            'exploration', exp_id_1, 2, 'hi',
+            {'content_1': {
+                'content_format': 'html',
+                'content_value': 'Updated Translation 1',
+                'needs_update': False}}
+        ).put()
+
+        results = translation_fetchers.get_multiple_entity_translations([
+            {
+                'entity_type': feconf.TranslatableEntityType.EXPLORATION,
+                'entity_id': exp_id_1,
+                'entity_version': 1,
+                'language_code': 'hi'
+            },
+            {
+                'entity_type': feconf.TranslatableEntityType.EXPLORATION,
+                'entity_id': exp_id_1,
+                'entity_version': 2,
+                'language_code': 'hi'
+            },
+            {
+                'entity_type': feconf.TranslatableEntityType.EXPLORATION,
+                'entity_id': exp_id_2,
+                'entity_version': 1,
+                'language_code': 'hi'
+            },
+            {
+                'entity_type': feconf.TranslatableEntityType.EXPLORATION,
+                'entity_id': 'nonexistent',
+                'entity_version': 1,
+                'language_code': 'hi'
+            }
+        ])
+
+        self.assertEqual(len(results), 4)
+
+        self.assertIsNotNone(results[0])
+        assert results[0] is not None
+        self.assertEqual(results[0].entity_id, exp_id_1)
+        self.assertEqual(results[0].entity_version, 1)
+        self.assertEqual(
+            results[0].translations['content_1'].content_value, 'Translation 1'
+        )
+
+        self.assertIsNotNone(results[1])
+        assert results[1] is not None
+        self.assertEqual(results[1].entity_id, exp_id_1)
+        self.assertEqual(results[1].entity_version, 2)
+        self.assertEqual(
+            results[1].translations['content_1'].content_value,
+            'Updated Translation 1'
+        )
+
+        self.assertIsNotNone(results[2])
+        assert results[2] is not None
+        self.assertEqual(results[2].entity_id, exp_id_2)
+        self.assertEqual(results[2].entity_version, 1)
+        self.assertEqual(
+            results[2].translations['content_2'].content_value,
+            'Translation 2'
+        )
+
+        self.assertIsNone(results[3])
+
+    def test_get_entity_translations_with_different_languages(self) -> None:
+        """Test fetching translations in multiple 
+        languages for the same entity.
+        """
+        exp_id = 'exp_lang'
+        translation_models.EntityTranslationsModel.create_new(
+            'exploration', exp_id, 1, 'hi',
+            {'content_1': {
+                'content_format': 'html',
+                'content_value': 'नमस्ते',
+                'needs_update': False}}
+        ).put()
+
+        translation_models.EntityTranslationsModel.create_new(
+            'exploration', exp_id, 1, 'fr',
+            {'content_1': {
+                'content_format': 'html',
+                'content_value': 'Bonjour',
+                'needs_update': False}}
+        ).put()
+
+        hi_result = translation_fetchers.get_entity_translation(
+            feconf.TranslatableEntityType.EXPLORATION, exp_id, 1, 'hi'
+        )
+        fr_result = translation_fetchers.get_entity_translation(
+            feconf.TranslatableEntityType.EXPLORATION, exp_id, 1, 'fr'
+        )
+
+        self.assertIsNotNone(hi_result)
+        self.assertEqual(
+            hi_result.translations['content_1'].content_value, 'नमस्ते'
+        )
+        self.assertIsNotNone(fr_result)
+        self.assertEqual(
+            fr_result.translations['content_1'].content_value, 'Bonjour'
+        )
+
+    def test_get_entity_translations_with_needs_update_flag(self) -> None:
+        """Test fetching translations where needs_update flag is set."""
+        exp_id = 'exp_update'
+        translation_models.EntityTranslationsModel.create_new(
+            'exploration', exp_id, 1, 'hi',
+            {'content_1': {
+                'content_format': 'html',
+                'content_value': 'पुराना',
+                'needs_update': True}}
+        ).put()
+
+        result = translation_fetchers.get_entity_translation(
+            feconf.TranslatableEntityType.EXPLORATION, exp_id, 1, 'hi'
+        )
+
+        self.assertIsNotNone(result)
+        self.assertTrue(result.translations['content_1'].needs_update)
+        self.assertEqual(
+            result.translations['content_1'].content_value, 'पुराना'
+        )

@@ -24,7 +24,7 @@ from core import feconf
 from core.domain import caching_services, skill_domain
 from core.platform import models
 
-from typing import List, Literal, Optional, overload
+from typing import List, Literal, Optional, Tuple, overload
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -325,3 +325,28 @@ def _migrate_rubrics_to_latest_schema(
             versioned_rubrics, rubric_schema_version
         )
         rubric_schema_version += 1
+
+
+def get_multiple_skills_by_ids_and_version(
+    skill_ids_and_versions: List[Tuple[str, Optional[int]]]
+) -> List[Optional[skill_domain.Skill]]:
+    """Returns a list of skills matching the IDs and versions provided.
+
+    Args:
+        skill_ids_and_versions: list(tuple(str, int|None)). List of tuples of
+            skill ID and version number. If version number is None, the latest
+            version will be returned.
+
+    Returns:
+        list(Skill|None). The list of skills corresponding to the given IDs
+        and versions. If a skill does not exist, the corresponding entry will
+        be None.
+    """
+    skill_model_list = skill_models.SkillModel.get_version_multi(
+        skill_ids_and_versions
+        )
+    return [
+        get_skill_from_model(skill_model)
+        if skill_model is not None else None
+        for skill_model in skill_model_list
+    ]
