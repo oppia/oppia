@@ -29,12 +29,12 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import exp_models, suggestion_models
 
-(exp_models, suggestion_models) = models.Registry.import_models([
-    models.Names.EXPLORATION, models.Names.SUGGESTION
-])
+(exp_models, suggestion_models) = models.Registry.import_models(
+    [models.Names.EXPLORATION, models.Names.SUGGESTION]
+)
 
 STATE_DICT_IN_V52 = {
     'content': {'content_id': 'content', 'html': ''},
@@ -46,48 +46,43 @@ STATE_DICT_IN_V52 = {
             'param_changes': [],
             'feedback': {
                 'content_id': 'default_outcome',
-                'html': 'Default outcome'
+                'html': 'Default outcome',
             },
             'dest': 'Introduction',
             'dest_if_really_stuck': None,
             'refresher_exploration_id': None,
             'missing_prerequisite_skill_id': None,
-            'labelled_as_correct': False
+            'labelled_as_correct': False,
         },
         'customization_args': {
-            'rows': {
-                'value': 1
-            },
+            'rows': {'value': 1},
             'placeholder': {
-                'value': {
-                    'unicode_str': '',
-                    'content_id': 'ca_placeholder_1'
-                }
-            }
+                'value': {'unicode_str': '', 'content_id': 'ca_placeholder_1'}
+            },
         },
         'confirmed_unclassified_answers': [],
         'id': 'TextInput',
-        'hints': []
+        'hints': [],
     },
     'linked_skill_id': None,
     'recorded_voiceovers': {
         'voiceovers_mapping': {
             'content': {},
             'default_outcome': {},
-            'ca_placeholder_1': {}
+            'ca_placeholder_1': {},
         }
     },
     'written_translations': {
         'translations_mapping': {
             'content': {},
             'default_outcome': {},
-            'ca_placeholder_1': {}
+            'ca_placeholder_1': {},
         }
     },
     'classifier_model_id': None,
     'card_is_checkpoint': False,
     'solicit_answer_details': False,
-    'next_content_id_index': 2
+    'next_content_id_index': 2,
 }
 
 TRANSLATION_HTML = (
@@ -103,7 +98,7 @@ CHANGE_DICT = {
     'language_code': 'hi',
     'content_html': 'html',
     'state_name': 'Introduction',
-    'translation_html': TRANSLATION_HTML
+    'translation_html': TRANSLATION_HTML,
 }
 
 
@@ -112,8 +107,7 @@ class RejectTranslationSuggestionsWithMissingContentIdJobTests(
 ):
 
     JOB_CLASS = (
-        rejecting_suggestion_for_invalid_content_ids_jobs
-        .RejectTranslationSuggestionsWithMissingContentIdJob
+        rejecting_suggestion_for_invalid_content_ids_jobs.RejectTranslationSuggestionsWithMissingContentIdJob
     )
     TARGET_ID = 'exp1'
 
@@ -155,16 +149,18 @@ class RejectTranslationSuggestionsWithMissingContentIdJobTests(
             target_type='exploration',
             target_id=self.TARGET_ID,
             target_version_at_submission=0,
-            language_code='bn'
+            language_code='bn',
         )
         suggestion.update_timestamps()
         suggestion_models.GeneralSuggestionModel.put_multi([suggestion])
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(
-                stdout='TOTAL PROCESSED SUGGESTIONS COUNT SUCCESS: 1'
-            )
-        ])
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout='TOTAL PROCESSED SUGGESTIONS COUNT SUCCESS: 1'
+                )
+            ]
+        )
 
     def test_obsolete_suggestion_is_rejected(self) -> None:
         CHANGE_DICT['content_id'] = 'non_existent_content_id'
@@ -178,25 +174,27 @@ class RejectTranslationSuggestionsWithMissingContentIdJobTests(
             target_type='exploration',
             target_id=self.TARGET_ID,
             target_version_at_submission=0,
-            language_code='bn'
+            language_code='bn',
         )
         suggestion.update_timestamps()
         suggestion_models.GeneralSuggestionModel.put_multi([suggestion])
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(
-                stdout='TOTAL PROCESSED SUGGESTIONS COUNT SUCCESS: 1'
-            ),
-            job_run_result.JobRunResult(
-                stdout='REJECTED SUGGESTIONS COUNT SUCCESS: 1'
-            )
-        ])
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout='TOTAL PROCESSED SUGGESTIONS COUNT SUCCESS: 1'
+                ),
+                job_run_result.JobRunResult(
+                    stdout='REJECTED SUGGESTIONS COUNT SUCCESS: 1'
+                ),
+            ]
+        )
 
         updated_suggestion = suggestion_models.GeneralSuggestionModel.get(
-            suggestion.id)
+            suggestion.id
+        )
         self.assertEqual(
-            updated_suggestion.status,
-            suggestion_models.STATUS_REJECTED
+            updated_suggestion.status, suggestion_models.STATUS_REJECTED
         )
 
 
@@ -204,8 +202,7 @@ class AuditTranslationSuggestionsWithMissingContentIdJobTests(
     job_test_utils.JobTestBase
 ):
     JOB_CLASS = (
-        rejecting_suggestion_for_invalid_content_ids_jobs
-        .AuditTranslationSuggestionsWithMissingContentIdJob
+        rejecting_suggestion_for_invalid_content_ids_jobs.AuditTranslationSuggestionsWithMissingContentIdJob
     )
     TARGET_ID = 'exp2'
 
@@ -245,11 +242,10 @@ class AuditTranslationSuggestionsWithMissingContentIdJobTests(
             target_type='exploration',
             target_id=self.TARGET_ID,
             target_version_at_submission=0,
-            language_code='bn'
+            language_code='bn',
         )
         suggestion_model.update_timestamps()
-        suggestion_models.GeneralSuggestionModel.put_multi([
-            suggestion_model])
+        suggestion_models.GeneralSuggestionModel.put_multi([suggestion_model])
 
         errored_value = (
             '{\'exp_id\': \'exp2\', \'obsolete_content\': '
@@ -257,24 +253,25 @@ class AuditTranslationSuggestionsWithMissingContentIdJobTests(
             '\'Introduction\'}]}'
         )
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(
-                stdout='TOTAL PROCESSED SUGGESTIONS COUNT SUCCESS: 1'
-            ),
-            job_run_result.JobRunResult(
-                stdout='OBSOLETE SUGGESTIONS COUNT SUCCESS: 1'
-            ),
-            job_run_result.JobRunResult.as_stdout(
-                f'Results are - {errored_value}'
-            )
-        ])
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout='TOTAL PROCESSED SUGGESTIONS COUNT SUCCESS: 1'
+                ),
+                job_run_result.JobRunResult(
+                    stdout='OBSOLETE SUGGESTIONS COUNT SUCCESS: 1'
+                ),
+                job_run_result.JobRunResult.as_stdout(
+                    f'Results are - {errored_value}'
+                ),
+            ]
+        )
 
         obsolete_suggestion_model = (
             suggestion_models.GeneralSuggestionModel.get(suggestion_model.id)
         )
         self.assertEqual(
-            obsolete_suggestion_model.status,
-            suggestion_models.STATUS_IN_REVIEW
+            obsolete_suggestion_model.status, suggestion_models.STATUS_IN_REVIEW
         )
 
     def test_non_obsolete_suggestions_are_not_reported(self) -> None:
@@ -290,23 +287,24 @@ class AuditTranslationSuggestionsWithMissingContentIdJobTests(
             target_type='exploration',
             target_id=self.TARGET_ID,
             target_version_at_submission=0,
-            language_code='bn'
+            language_code='bn',
         )
         valid_suggestion_model.update_timestamps()
-        suggestion_models.GeneralSuggestionModel.put_multi([
-            valid_suggestion_model])
+        suggestion_models.GeneralSuggestionModel.put_multi(
+            [valid_suggestion_model]
+        )
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(
-                stdout='TOTAL PROCESSED SUGGESTIONS COUNT SUCCESS: 1'
-            )
-        ])
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout='TOTAL PROCESSED SUGGESTIONS COUNT SUCCESS: 1'
+                )
+            ]
+        )
 
-        suggestion_model = (
-            suggestion_models.GeneralSuggestionModel.get(
-                valid_suggestion_model.id)
+        suggestion_model = suggestion_models.GeneralSuggestionModel.get(
+            valid_suggestion_model.id
         )
         self.assertEqual(
-            suggestion_model.status,
-            suggestion_models.STATUS_IN_REVIEW
+            suggestion_model.status, suggestion_models.STATUS_IN_REVIEW
         )

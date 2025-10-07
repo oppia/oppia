@@ -23,7 +23,7 @@ from core.platform import models
 from core.tests import test_utils
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import stats_models
 
 (stats_models,) = models.Registry.import_models([models.Names.STATISTICS])
@@ -36,97 +36,121 @@ class ActionUnitTests(test_utils.GenericTestBase):
         """Test the standard properties of exploration start action."""
 
         action = action_registry.Registry.get_action_by_type(
-            stats_models.ACTION_TYPE_EXPLORATION_START)
+            stats_models.ACTION_TYPE_EXPLORATION_START
+        )
 
         action_dict = action.to_dict()
-        self.assertItemsEqual(list(action_dict.keys()), [
-            'customization_arg_specs'])
+        self.assertItemsEqual(
+            list(action_dict.keys()), ['customization_arg_specs']
+        )
         self.assertEqual(
-            action_dict['customization_arg_specs'], [{
-                'name': 'state_name',
-                'description': 'Initial state name',
-                'schema': {
-                    'type': 'unicode',
-                },
-                'default_value': ''
-            }])
+            action_dict['customization_arg_specs'],
+            [
+                {
+                    'name': 'state_name',
+                    'description': 'Initial state name',
+                    'schema': {
+                        'type': 'unicode',
+                    },
+                    'default_value': '',
+                }
+            ],
+        )
 
     def test_action_properties_for_answer_submit(self) -> None:
         """Test the standard properties of answer submit action."""
 
         action = action_registry.Registry.get_action_by_type(
-            stats_models.ACTION_TYPE_ANSWER_SUBMIT)
+            stats_models.ACTION_TYPE_ANSWER_SUBMIT
+        )
 
         action_dict = action.to_dict()
-        self.assertItemsEqual(list(action_dict.keys()), [
-            'customization_arg_specs'])
+        self.assertItemsEqual(
+            list(action_dict.keys()), ['customization_arg_specs']
+        )
         self.assertEqual(
-            action_dict['customization_arg_specs'], [{
-                'name': 'state_name',
-                'description': 'State name',
-                'schema': {
-                    'type': 'unicode',
+            action_dict['customization_arg_specs'],
+            [
+                {
+                    'name': 'state_name',
+                    'description': 'State name',
+                    'schema': {
+                        'type': 'unicode',
+                    },
+                    'default_value': '',
                 },
-                'default_value': ''
-            }, {
-                'name': 'dest_state_name',
-                'description': 'Destination state name',
-                'schema': {
-                    'type': 'unicode',
+                {
+                    'name': 'dest_state_name',
+                    'description': 'Destination state name',
+                    'schema': {
+                        'type': 'unicode',
+                    },
+                    'default_value': '',
                 },
-                'default_value': ''
-            }, {
-                'name': 'interaction_id',
-                'description': 'ID of the interaction',
-                'schema': {
-                    'type': 'unicode',
+                {
+                    'name': 'interaction_id',
+                    'description': 'ID of the interaction',
+                    'schema': {
+                        'type': 'unicode',
+                    },
+                    'default_value': '',
                 },
-                'default_value': ''
-            }, {
-                'name': 'submitted_answer',
-                'description': 'Submitted answer',
-                'schema': {
-                    'type': 'unicode',
+                {
+                    'name': 'submitted_answer',
+                    'description': 'Submitted answer',
+                    'schema': {
+                        'type': 'unicode',
+                    },
+                    'default_value': '',
                 },
-                'default_value': ''
-            }, {
-                'name': 'feedback',
-                'description': 'Feedback for the submitted answer',
-                'schema': {
-                    'type': 'unicode',
+                {
+                    'name': 'feedback',
+                    'description': 'Feedback for the submitted answer',
+                    'schema': {
+                        'type': 'unicode',
+                    },
+                    'default_value': '',
                 },
-                'default_value': ''
-            }, {
-                'name': 'time_spent_state_in_msecs',
-                'description': 'Time spent in state in milliseconds',
-                'schema': {
-                    'type': 'int',
+                {
+                    'name': 'time_spent_state_in_msecs',
+                    'description': 'Time spent in state in milliseconds',
+                    'schema': {
+                        'type': 'int',
+                    },
+                    'default_value': 0,
                 },
-                'default_value': 0
-            }])
+            ],
+        )
 
     def test_action_properties_for_exp_quit(self) -> None:
         """Test the standard properties of exploration quit action."""
 
         action = action_registry.Registry.get_action_by_type(
-            stats_models.ACTION_TYPE_EXPLORATION_QUIT)
+            stats_models.ACTION_TYPE_EXPLORATION_QUIT
+        )
 
         action_dict = action.to_dict()
-        self.assertItemsEqual(list(action_dict.keys()), [
-            'customization_arg_specs'])
+        self.assertItemsEqual(
+            list(action_dict.keys()), ['customization_arg_specs']
+        )
         self.assertEqual(
-            action_dict['customization_arg_specs'], [{
-                'name': 'state_name',
-                'description': 'State name',
-                'schema': {
-                    'type': 'unicode',
+            action_dict['customization_arg_specs'],
+            [
+                {
+                    'name': 'state_name',
+                    'description': 'State name',
+                    'schema': {
+                        'type': 'unicode',
+                    },
+                    'default_value': '',
                 },
-                'default_value': ''
-            }, {
-                'name': 'time_spent_in_state_in_msecs',
-                'description': 'Time spent in state in milliseconds',
-                'schema': {
-                    'type': 'int',
+                {
+                    'name': 'time_spent_in_state_in_msecs',
+                    'description': 'Time spent in state in milliseconds',
+                    'schema': {
+                        'type': 'int',
+                    },
+                    'default_value': 0,
                 },
-                'default_value': 0
-            }])
+            ],
+        )

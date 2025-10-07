@@ -30,13 +30,14 @@ from typing import List, Optional
 _PARSER = argparse.ArgumentParser(
     description="""
 Checks the frontend test coverage.
-""")
+"""
+)
 
 _PARSER.add_argument(
     '--files_to_check',
     help='optional; if specified, only the files in this list will be checked '
     'for coverage.',
-    type=str
+    type=str,
 )
 
 LCOV_FILE_PATH = os.path.join(os.pardir, 'karma_coverage_reports', 'lcov.info')
@@ -54,23 +55,23 @@ EXCLUDED_DIRECTORIES = [
 NOT_FULLY_COVERED_FILENAMES = [
     'core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts',
     'core/templates/components/ck-editor-helpers/'
-        'ck-editor-4-widgets.initializer.ts',
+    'ck-editor-4-widgets.initializer.ts',
     'core/templates/components/forms/custom-forms-directives/'
-        'object-editor.directive.ts',
+    'object-editor.directive.ts',
     'core/templates/components/state-directives/rule-editor/'
-        'rule-type-selector.directive.ts',
+    'rule-type-selector.directive.ts',
     'core/templates/domain/question/question-update.service.ts',
     'core/templates/domain/question/question.model.ts',
     'core/templates/expressions/expression-interpolation.service.ts',
     'core/templates/google-analytics.initializer.ts',
     'core/templates/pages/exploration-editor-page/services/'
-        'exploration-states.service.ts',
+    'exploration-states.service.ts',
     'core/templates/pages/exploration-player-page/services/'
-        'learner-answer-info.service.ts',
+    'learner-answer-info.service.ts',
     'extensions/interactions/MusicNotesInput/directives/'
-        'oppia-interactive-music-notes-input.component.ts',
+    'oppia-interactive-music-notes-input.component.ts',
     'extensions/interactions/PencilCodeEditor/directives/'
-        'oppia-interactive-pencil-code-editor.component.ts'
+    'oppia-interactive-pencil-code-editor.component.ts',
 ]
 
 
@@ -94,7 +95,8 @@ class LcovStanzaRelevantLines:
         if match is None:
             raise Exception(
                 'The test path is empty or null. '
-                'It\'s not possible to diff the test coverage correctly.')
+                'It\'s not possible to diff the test coverage correctly.'
+            )
         _, file_name = os.path.split(match.group(1))
         self.file_name = file_name
         self.file_path = match.group(1)
@@ -103,16 +105,20 @@ class LcovStanzaRelevantLines:
         if match is None:
             raise Exception(
                 'It wasn\'t possible to get the total lines of {} file.'
-                'It\'s not possible to diff the test coverage correctly.'
-                .format(file_name))
+                'It\'s not possible to diff the test coverage correctly.'.format(
+                    file_name
+                )
+            )
         self.total_lines = int(match.group(1))
 
         match = re.search(r'LH:(\d+)\n', stanza)
         if match is None:
             raise Exception(
                 'It wasn\'t possible to get the covered lines of {} file.'
-                'It\'s not possible to diff the test coverage correctly.'
-                .format(file_name))
+                'It\'s not possible to diff the test coverage correctly.'.format(
+                    file_name
+                )
+            )
         self.covered_lines = int(match.group(1))
 
 
@@ -147,16 +153,17 @@ def get_stanzas_from_lcov_file() -> List[LcovStanzaRelevantLines]:
 def check_not_fully_covered_filenames_list_is_sorted() -> None:
     """Check if NOT_FULLY_COVERED_FILENAMES list is in alphabetical order."""
     if NOT_FULLY_COVERED_FILENAMES != sorted(
-            NOT_FULLY_COVERED_FILENAMES, key=lambda s: s.lower()):
+        NOT_FULLY_COVERED_FILENAMES, key=lambda s: s.lower()
+    ):
         logging.error(
             'The \033[1mNOT_FULLY_COVERED_FILENAMES\033[0m list must be'
-            ' kept in alphabetical order.')
+            ' kept in alphabetical order.'
+        )
         sys.exit(1)
 
 
 def check_if_file_should_be_checked(
-    file_path: str,
-    files_to_check: Optional[List[str]] = None
+    file_path: str, files_to_check: Optional[List[str]] = None
 ) -> bool:
     """Checks if a specific file should be checked based on the list of files
     that should be checked for coverage changes.
@@ -180,9 +187,7 @@ def check_if_file_should_be_checked(
     return False
 
 
-def check_coverage_changes(
-    files_to_check: Optional[List[str]] = None
-) -> None:
+def check_coverage_changes(files_to_check: Optional[List[str]] = None) -> None:
     """Checks if the denylist for not fully covered files needs to be changed
     by:
     - File renaming
@@ -199,7 +204,8 @@ def check_coverage_changes(
     if not os.path.exists(LCOV_FILE_PATH):
         raise Exception(
             'Expected lcov file to be available at {}, but the'
-            ' file does not exist.'.format(LCOV_FILE_PATH))
+            ' file does not exist.'.format(LCOV_FILE_PATH)
+        )
 
     stanzas = get_stanzas_from_lcov_file()
     remaining_denylisted_files = list(NOT_FULLY_COVERED_FILENAMES)
@@ -211,14 +217,17 @@ def check_coverage_changes(
             continue
         total_lines = stanza.total_lines
         covered_lines = stanza.covered_lines
-        if any(fnmatch.fnmatch(
-                stanza.file_path, pattern) for pattern in EXCLUDED_DIRECTORIES):
+        if any(
+            fnmatch.fnmatch(stanza.file_path, pattern)
+            for pattern in EXCLUDED_DIRECTORIES
+        ):
             continue
         if file_path not in remaining_denylisted_files:
             if total_lines != covered_lines:
                 errors += (
                     '\033[1m{}\033[0m seems to be not completely tested.'
-                    ' Make sure it\'s fully covered.\n'.format(file_path))
+                    ' Make sure it\'s fully covered.\n'.format(file_path)
+                )
         else:
             if total_lines == covered_lines:
                 errors += (
@@ -229,7 +238,8 @@ def check_coverage_changes(
                     ' make sure you\'ve followed the unit tests rules'
                     ' correctly on:'
                     ' https://github.com/oppia/oppia/wiki/Frontend'
-                    '-unit-tests-guide#rules\n'.format(file_path))
+                    '-unit-tests-guide#rules\n'.format(file_path)
+                )
 
             remaining_denylisted_files.remove(file_path)
 
@@ -242,8 +252,10 @@ def check_coverage_changes(
                 ' denylist but it doesn\'t exist anymore. If you have'
                 ' renamed it, please make sure to remove the old file'
                 ' path and add the new file path in the denylist in'
-                ' the file scripts/check_frontend_test_coverage.py.\n'
-                .format(test_path))
+                ' the file scripts/check_frontend_test_coverage.py.\n'.format(
+                    test_path
+                )
+            )
 
     if errors:
         print('------------------------------------')
@@ -267,8 +279,8 @@ def main(args: Optional[List[str]] = None) -> None:
     files_to_check = None
     if parsed_args.files_to_check:
         files_to_check = [
-            file_path.strip() for file_path in
-                parsed_args.files_to_check.split(',')
+            file_path.strip()
+            for file_path in parsed_args.files_to_check.split(',')
         ]
     check_coverage_changes(files_to_check)
 
@@ -276,5 +288,5 @@ def main(args: Optional[List[str]] = None) -> None:
 # The 'no coverage' pragma is used as this line is un-testable. This is because
 # it will only be called when check_frontend_test_coverage.py
 # is used as a script.
-if __name__ == '__main__': # pragma: no cover
+if __name__ == '__main__':  # pragma: no cover
     main()

@@ -38,8 +38,7 @@ class FeaturedActivitiesHandlerNormalizedPayloadDict(TypedDict):
 
 class FeaturedActivitiesHandler(
     base.BaseHandler[
-        FeaturedActivitiesHandlerNormalizedPayloadDict,
-        Dict[str, str]
+        FeaturedActivitiesHandlerNormalizedPayloadDict, Dict[str, str]
     ]
 ):
     """The moderator page handler for featured activities."""
@@ -54,29 +53,32 @@ class FeaturedActivitiesHandler(
                     'type': 'list',
                     'items': {
                         'type': 'object_dict',
-                        'object_class': activity_domain.ActivityReference
-                    }
+                        'object_class': activity_domain.ActivityReference,
+                    },
                 }
             }
-        }
+        },
     }
 
     @acl_decorators.can_access_moderator_page
     def get(self) -> None:
         """Handles GET requests."""
-        self.render_json({
-            'featured_activity_references': [
-                activity_reference.to_dict() for activity_reference in
-                activity_services.get_featured_activity_references()
-            ],
-        })
+        self.render_json(
+            {
+                'featured_activity_references': [
+                    activity_reference.to_dict()
+                    for activity_reference in activity_services.get_featured_activity_references()
+                ],
+            }
+        )
 
     @acl_decorators.can_access_moderator_page
     def post(self) -> None:
         """Handles POST requests."""
         assert self.normalized_payload is not None
         featured_activity_references = self.normalized_payload[
-            'featured_activity_reference_dicts']
+            'featured_activity_reference_dicts'
+        ]
 
         try:
             # Retrieve the list for each type of inavlid ID.
@@ -84,22 +86,23 @@ class FeaturedActivitiesHandler(
                 non_existent_exploration_ids,
                 non_existent_collection_ids,
                 private_exploration_ids,
-                private_collection_ids
-            ) = (
-                summary_services.check_activity_id_validity(
-                featured_activity_references)
+                private_collection_ids,
+            ) = summary_services.check_activity_id_validity(
+                featured_activity_references
             )
 
             # If all of the lists are empty, there are no invalid IDs.
             # Since there are no invalid IDs, the Featured Activity
             # References are allowed to be updated.
-            if ((not non_existent_exploration_ids) &
-            (not non_existent_collection_ids) &
-            (not private_exploration_ids) &
-            (not private_collection_ids)
+            if (
+                (not non_existent_exploration_ids)
+                & (not non_existent_collection_ids)
+                & (not private_exploration_ids)
+                & (not private_collection_ids)
             ):
                 activity_services.update_featured_activity_references(
-                featured_activity_references)
+                    featured_activity_references
+                )
                 self.render_json({})
             else:
 
@@ -113,10 +116,7 @@ class FeaturedActivitiesHandler(
                 # with the beginning component of the message.
                 if non_existent_exploration_ids:
                     ids = ', '.join(map(str, non_existent_exploration_ids))
-                    error = (
-                        f'These Exploration IDs do not exist: '
-                        f'{ids}. '
-                    )
+                    error = f'These Exploration IDs do not exist: ' f'{ids}. '
                     # Join specific error with general error
                     # message.
                     error_message = error_message + error
@@ -127,10 +127,7 @@ class FeaturedActivitiesHandler(
                 # list with the beginning component of the message.
                 if non_existent_collection_ids:
                     ids = ', '.join(map(str, non_existent_collection_ids))
-                    error = (
-                        f'These Collection IDs do not exist: '
-                        f'{ids}. '
-                    )
+                    error = f'These Collection IDs do not exist: ' f'{ids}. '
                     # Join specific error with general error
                     # message.
                     error_message = error_message + error
@@ -141,10 +138,7 @@ class FeaturedActivitiesHandler(
                 # the beginning component of the message.
                 if private_exploration_ids:
                     ids = ', '.join(map(str, private_exploration_ids))
-                    error = (
-                        f'These Exploration IDs are private: '
-                        f'{ids}. '
-                    )
+                    error = f'These Exploration IDs are private: ' f'{ids}. '
                     # Join specific error with general error
                     # message.
                     error_message = error_message + error
@@ -155,10 +149,7 @@ class FeaturedActivitiesHandler(
                 # the beginning component of the message.
                 if private_collection_ids:
                     ids = ', '.join(map(str, private_collection_ids))
-                    error = (
-                        f'These Collection IDs are private: '
-                        f'{ids}. '
-                    )
+                    error = f'These Collection IDs are private: ' f'{ids}. '
                     # Join specific error with general error
                     # message.
                     error_message = error_message + error
@@ -185,7 +176,10 @@ class EmailDraftHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     @acl_decorators.can_send_moderator_emails
     def get(self) -> None:
         """Handles GET requests."""
-        self.render_json({
-            'draft_email_body': (
-                email_manager.get_moderator_unpublish_exploration_email()),
-        })
+        self.render_json(
+            {
+                'draft_email_body': (
+                    email_manager.get_moderator_unpublish_exploration_email()
+                ),
+            }
+        )

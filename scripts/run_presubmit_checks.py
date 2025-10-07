@@ -45,11 +45,14 @@ Only when frontend files are changed will it run Frontend Karma unit tests.
 If any of these tests result in errors, this script will terminate.
 Note: The test scripts are arranged in increasing order of time taken. This
 enables a broken build to be detected as quickly as possible.
-""")
+"""
+)
 
 _PARSER.add_argument(
-    '--branch', '-b',
-    help='optional; if specified, the origin branch to compare against.')
+    '--branch',
+    '-b',
+    help='optional; if specified, the origin branch to compare against.',
+)
 
 
 def main(args: Optional[List[str]] = None) -> None:
@@ -70,10 +73,16 @@ def main(args: Optional[List[str]] = None) -> None:
     # else matched_branch_num=0.
     matched_branch_num = subprocess.check_output(
         [
-            'git', 'ls-remote', '--heads', 'origin', current_branch, '|',
-            'wc', '-l'
+            'git',
+            'ls-remote',
+            '--heads',
+            'origin',
+            current_branch,
+            '|',
+            'wc',
+            '-l',
         ],
-        encoding='utf-8'
+        encoding='utf-8',
     )
 
     # Set the origin branch to develop if it's not specified.
@@ -87,11 +96,8 @@ def main(args: Optional[List[str]] = None) -> None:
     print('Comparing the current branch with %s' % branch)
 
     all_changed_files = subprocess.check_output(
-        [
-            'git', 'diff', '--cached', '--name-only', '--diff-filter=ACM',
-            branch
-        ],
-        encoding='utf-8'
+        ['git', 'diff', '--cached', '--name-only', '--diff-filter=ACM', branch],
+        encoding='utf-8',
     )
 
     if common.FRONTEND_DIR in all_changed_files:
@@ -101,9 +107,9 @@ def main(args: Optional[List[str]] = None) -> None:
         print('Frontend tests passed.')
     else:
         # If files in common.FRONTEND_DIR were not changed, skip the tests.
-        common.print_each_string_after_two_new_lines([
-            'No frontend files were changed.',
-            'Skipped frontend tests'])
+        common.print_each_string_after_two_new_lines(
+            ['No frontend files were changed.', 'Skipped frontend tests']
+        )
 
     # Run backend tests.
     print('Running backend tests')

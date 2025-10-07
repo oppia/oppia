@@ -45,7 +45,7 @@ export class GraphViz {
    */
   constructor(
     page: puppeteer.Page,
-    context?: puppeteer.ElementHandle<Element>
+    context?: puppeteer.ElementHandle<Element> | puppeteer.Page
   ) {
     this.parentPage = page;
     this.context = context ?? this.parentPage;
@@ -302,7 +302,12 @@ export class GraphViz {
    */
   async getVertices(): Promise<ElementHandle<Element>[]> {
     const graphContainer = await this.getGraphContainer();
-    await graphContainer.waitForSelector(graphVertexSelector);
+    try {
+      await graphContainer.waitForSelector(graphVertexSelector);
+    } catch (error) {
+      return [];
+    }
+
     const vertices = await graphContainer.$$(graphVertexSelector);
     return vertices;
   }

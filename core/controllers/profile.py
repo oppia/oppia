@@ -40,9 +40,7 @@ from core.domain import (
 from typing import Any, Callable, Dict, Optional, TypedDict
 
 
-class ProfileHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class ProfileHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Provides data for the profile page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -50,9 +48,7 @@ class ProfileHandler(
         'username': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'is_valid_username_string'
-                }]
+                'validators': [{'id': 'is_valid_username_string'}],
             }
         }
     }
@@ -70,36 +66,47 @@ class ProfileHandler(
         edited_exp_summary_dicts = []
 
         subscriber_ids = subscription_services.get_all_subscribers_of_creator(
-            user_settings.user_id)
+            user_settings.user_id
+        )
         is_already_subscribed = self.user_id in subscriber_ids
         is_user_visiting_own_profile = self.user_id == user_settings.user_id
 
         user_contributions = user_services.get_user_contributions(
-            user_settings.user_id)
+            user_settings.user_id
+        )
         if user_contributions:
             created_exp_summary_dicts = (
                 summary_services.get_displayable_exp_summary_dicts_matching_ids(
-                    user_contributions.created_exploration_ids))
+                    user_contributions.created_exploration_ids
+                )
+            )
             edited_exp_summary_dicts = (
                 summary_services.get_displayable_exp_summary_dicts_matching_ids(
-                    user_contributions.edited_exploration_ids))
+                    user_contributions.edited_exploration_ids
+                )
+            )
         profile_is_of_current_user = self.username == username
 
-        self.values.update({
-            'profile_is_of_current_user': profile_is_of_current_user,
-            'username_of_viewed_profile': user_settings.username,
-            'user_bio': user_settings.user_bio,
-            'subject_interests': user_settings.subject_interests,
-            'first_contribution_msec': (
-                user_settings.first_contribution_msec
-                if user_settings.first_contribution_msec else None),
-            'user_impact_score': user_services.get_user_impact_score(
-                user_settings.user_id),
-            'created_exp_summary_dicts': created_exp_summary_dicts,
-            'edited_exp_summary_dicts': edited_exp_summary_dicts,
-            'is_already_subscribed': is_already_subscribed,
-            'is_user_visiting_own_profile': is_user_visiting_own_profile
-        })
+        self.values.update(
+            {
+                'profile_is_of_current_user': profile_is_of_current_user,
+                'username_of_viewed_profile': user_settings.username,
+                'user_bio': user_settings.user_bio,
+                'subject_interests': user_settings.subject_interests,
+                'first_contribution_msec': (
+                    user_settings.first_contribution_msec
+                    if user_settings.first_contribution_msec
+                    else None
+                ),
+                'user_impact_score': user_services.get_user_impact_score(
+                    user_settings.user_id
+                ),
+                'created_exp_summary_dicts': created_exp_summary_dicts,
+                'edited_exp_summary_dicts': edited_exp_summary_dicts,
+                'is_already_subscribed': is_already_subscribed,
+                'is_user_visiting_own_profile': is_user_visiting_own_profile,
+            }
+        )
         self.render_json(self.values)
 
 
@@ -111,39 +118,29 @@ class BulkEmailWebhookEndpoint(
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {
-        'secret': {
-            'schema': {
-                'type': 'basestring'
-            }
-        }
-    }
+    URL_PATH_ARGS_SCHEMAS = {'secret': {'schema': {'type': 'basestring'}}}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {},
         'POST': {
-            'data[list_id]': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
+            'data[list_id]': {'schema': {'type': 'basestring'}},
             'data[email]': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'is_regex_matched',
-                        'regex_pattern': constants.EMAIL_REGEX
-                    }]
+                    'validators': [
+                        {
+                            'id': 'is_regex_matched',
+                            'regex_pattern': constants.EMAIL_REGEX,
+                        }
+                    ],
                 }
             },
             'type': {
                 'schema': {
                     'type': 'basestring',
-                    'choices': [
-                        'subscribe', 'unsubscribe'
-                    ]
+                    'choices': ['subscribe', 'unsubscribe'],
                 }
-            }
-        }
+            },
+        },
     }
 
     # Here, the 'secret' url_path_argument is not used in the function body
@@ -168,11 +165,10 @@ class BulkEmailWebhookEndpoint(
         assert self.normalized_request is not None
         mailchimp_audience_id = (
             platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID.value))
-        if (
-            self.normalized_request['data[list_id]'] !=
-            mailchimp_audience_id
-        ):
+                platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID.value
+            )
+        )
+        if self.normalized_request['data[list_id]'] != mailchimp_audience_id:
             self.render_json({})
             return
 
@@ -188,18 +184,22 @@ class BulkEmailWebhookEndpoint(
         user_email_preferences = user_services.get_email_preferences(user_id)
         if self.normalized_request['type'] == 'subscribe':
             user_services.update_email_preferences(
-                user_id, True,
+                user_id,
+                True,
                 user_email_preferences.can_receive_editor_role_email,
                 user_email_preferences.can_receive_feedback_message_email,
                 user_email_preferences.can_receive_subscription_email,
-                bulk_email_db_already_updated=True)
+                bulk_email_db_already_updated=True,
+            )
         elif self.normalized_request['type'] == 'unsubscribe':
             user_services.update_email_preferences(
-                user_id, False,
+                user_id,
+                False,
                 user_email_preferences.can_receive_editor_role_email,
                 user_email_preferences.can_receive_feedback_message_email,
                 user_email_preferences.can_receive_subscription_email,
-                bulk_email_db_already_updated=True)
+                bulk_email_db_already_updated=True,
+            )
         self.render_json({})
 
 
@@ -226,29 +226,27 @@ class MailingListSubscriptionHandler(
             'email': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'is_regex_matched',
-                        'regex_pattern': constants.EMAIL_REGEX
-                    }]
+                    'validators': [
+                        {
+                            'id': 'is_regex_matched',
+                            'regex_pattern': constants.EMAIL_REGEX,
+                        }
+                    ],
                 }
             },
             'name': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'is_nonempty'
-                    }]
+                    'validators': [{'id': 'is_nonempty'}],
                 },
-                'default_value': None
+                'default_value': None,
             },
             'tag': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'is_nonempty'
-                    }]
+                    'validators': [{'id': 'is_nonempty'}],
                 }
-            }
+            },
         }
     }
 
@@ -270,7 +268,8 @@ class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
     # Here we use type Any because we don't know the data type of input.
     def __validate_data_type(
-        self, update_type: str, required_type: type, data: Any) -> None:
+        self, update_type: str, required_type: type, data: Any
+    ) -> None:
         """Validates the type of the input data.This method checks if the
         provided input data is of the required type.
 
@@ -286,7 +285,8 @@ class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         if not isinstance(data, required_type):
             raise self.InvalidInputException(
                 'Expected %s to be a %s, received %s'
-                % (update_type, required_type.__name__, type(data).__name__))
+                % (update_type, required_type.__name__, type(data).__name__)
+            )
 
     @acl_decorators.can_manage_own_account
     def get(self) -> None:
@@ -294,10 +294,12 @@ class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         assert self.user_id is not None
         user_settings = user_services.get_user_settings(self.user_id)
         user_email_preferences = user_services.get_email_preferences(
-            self.user_id)
+            self.user_id
+        )
 
-        creators_subscribed_to = subscription_services.get_all_creators_subscribed_to( # pylint: disable=line-too-long
-            self.user_id)
+        creators_subscribed_to = subscription_services.get_all_creators_subscribed_to(  # pylint: disable=line-too-long
+            self.user_id
+        )
         creators_settings = user_services.get_users_settings(
             creators_subscribed_to, strict=True
         )
@@ -308,32 +310,43 @@ class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 'creator_username': creator_settings.username,
                 'creator_impact': (
                     user_services.get_user_impact_score(
-                        creators_subscribed_to[index]))
+                        creators_subscribed_to[index]
+                    )
+                ),
             }
 
             subscription_list.append(subscription_summary)
 
-        self.values.update({
-            'preferred_language_codes': user_settings.preferred_language_codes,
-            'preferred_site_language_code': (
-                user_settings.preferred_site_language_code),
-            'preferred_audio_language_code': (
-                user_settings.preferred_audio_language_code),
-            'preferred_translation_language_code': (
-                user_settings.preferred_translation_language_code),
-            'default_dashboard': user_settings.default_dashboard,
-            'user_bio': user_settings.user_bio,
-            'subject_interests': user_settings.subject_interests,
-            'can_receive_email_updates': (
-                user_email_preferences.can_receive_email_updates),
-            'can_receive_editor_role_email': (
-                user_email_preferences.can_receive_editor_role_email),
-            'can_receive_feedback_message_email': (
-                user_email_preferences.can_receive_feedback_message_email),
-            'can_receive_subscription_email': (
-                user_email_preferences.can_receive_subscription_email),
-            'subscription_list': subscription_list
-        })
+        self.values.update(
+            {
+                'preferred_language_codes': user_settings.preferred_language_codes,
+                'preferred_site_language_code': (
+                    user_settings.preferred_site_language_code
+                ),
+                'preferred_audio_language_code': (
+                    user_settings.preferred_audio_language_code
+                ),
+                'preferred_translation_language_code': (
+                    user_settings.preferred_translation_language_code
+                ),
+                'default_dashboard': user_settings.default_dashboard,
+                'user_bio': user_settings.user_bio,
+                'subject_interests': user_settings.subject_interests,
+                'can_receive_email_updates': (
+                    user_email_preferences.can_receive_email_updates
+                ),
+                'can_receive_editor_role_email': (
+                    user_email_preferences.can_receive_editor_role_email
+                ),
+                'can_receive_feedback_message_email': (
+                    user_email_preferences.can_receive_feedback_message_email
+                ),
+                'can_receive_subscription_email': (
+                    user_email_preferences.can_receive_subscription_email
+                ),
+                'subscription_list': subscription_list,
+            }
+        )
         self.render_json(self.values)
 
     @acl_decorators.can_manage_own_account
@@ -359,35 +372,43 @@ class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                     'can_receive_email_updates',
                     'can_receive_editor_role_email',
                     'can_receive_feedback_message_email',
-                    'can_receive_subscription_email']
-                missing_keys = [
-                    key for key in required_keys if key not in data]
+                    'can_receive_subscription_email',
+                ]
+                missing_keys = [key for key in required_keys if key not in data]
                 if missing_keys:
                     raise self.InvalidInputException(
                         'Expected data dict to have all the required keys. '
-                        'Missing keys: %s .' % ', '.join(missing_keys))
+                        'Missing keys: %s .' % ', '.join(missing_keys)
+                    )
 
                 non_boolean_keys = [
-                    key for key, value in data.items()
-                    if not isinstance(value, bool)]
+                    key
+                    for key, value in data.items()
+                    if not isinstance(value, bool)
+                ]
                 if non_boolean_keys:
                     raise self.InvalidInputException(
                         'Expected all values of data to be booleans. '
                         'Non-boolean values found for keys: %s .'
-                        % ', '.join(non_boolean_keys))
+                        % ', '.join(non_boolean_keys)
+                    )
 
                 bulk_email_signup_message_should_be_shown = (
                     user_services.update_email_preferences(
-                        self.user_id, data['can_receive_email_updates'],
+                        self.user_id,
+                        data['can_receive_email_updates'],
                         data['can_receive_editor_role_email'],
                         data['can_receive_feedback_message_email'],
-                        data['can_receive_subscription_email']))
+                        data['can_receive_subscription_email'],
+                    )
+                )
             elif update_type == 'user_bio':
                 self.__validate_data_type(update_type, str, data)
                 if len(data) > feconf.MAX_BIO_LENGTH_IN_CHARS:
                     raise self.InvalidInputException(
                         'User bio exceeds maximum character limit: %s'
-                        % feconf.MAX_BIO_LENGTH_IN_CHARS)
+                        % feconf.MAX_BIO_LENGTH_IN_CHARS
+                    )
                 user_settings.user_bio = data
             elif update_type == 'preferred_site_language_code':
                 self.__validate_data_type(update_type, str, data)
@@ -405,16 +426,21 @@ class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 self.__validate_data_type(update_type, str, data)
                 assert user_settings.username is not None
                 user_services.update_profile_picture_data_url(
-                    user_settings.username, data)
+                    user_settings.username, data
+                )
             else:
                 raise self.InvalidInputException(
-                    'Invalid update type: %s' % update_type)
+                    'Invalid update type: %s' % update_type
+                )
 
         user_services.save_user_settings(user_settings)
-        self.render_json({
-            'bulk_email_signup_message_should_be_shown': (
-                bulk_email_signup_message_should_be_shown)
-        })
+        self.render_json(
+            {
+                'bulk_email_signup_message_should_be_shown': (
+                    bulk_email_signup_message_should_be_shown
+                )
+            }
+        )
 
 
 class SignupPageNormalizedRequestDict(TypedDict):
@@ -435,10 +461,8 @@ class SignupPage(
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'return_url': {
-                'schema': {
-                    'type': 'basestring'
-                },
-                'default_value': None
+                'schema': {'type': 'basestring'},
+                'default_value': None,
             }
         }
     }
@@ -472,9 +496,7 @@ class SignupHandlerNormalizedPayloadDict(TypedDict):
 
 
 class SignupHandler(
-    base.BaseHandler[
-        SignupHandlerNormalizedPayloadDict, Dict[str, str]
-    ]
+    base.BaseHandler[SignupHandlerNormalizedPayloadDict, Dict[str, str]]
 ):
     """Provides data for the editor prerequisites page."""
 
@@ -487,16 +509,12 @@ class SignupHandler(
             'username': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'is_valid_username_string'
-                    }]
+                    'validators': [{'id': 'is_valid_username_string'}],
                 }
             },
             'agreed_to_terms': {
-                'schema': {
-                    'type': 'bool'
-                },
-                'default_value': False
+                'schema': {'type': 'bool'},
+                'default_value': False,
             },
             'default_dashboard': {
                 'schema': {
@@ -504,16 +522,12 @@ class SignupHandler(
                     'choices': [
                         constants.DASHBOARD_TYPE_LEARNER,
                         constants.DASHBOARD_TYPE_CREATOR,
-                        constants.DASHBOARD_TYPE_CONTRIBUTOR
-                    ]
+                        constants.DASHBOARD_TYPE_CONTRIBUTOR,
+                    ],
                 }
             },
-            'can_receive_email_updates': {
-                'schema': {
-                    'type': 'bool'
-                }
-            }
-        }
+            'can_receive_email_updates': {'schema': {'type': 'bool'}},
+        },
     }
 
     @acl_decorators.require_user_id_else_redirect_to_homepage
@@ -523,17 +537,24 @@ class SignupHandler(
         user_settings = user_services.get_user_settings(self.user_id)
         server_can_send_emails = (
             platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value))
-        self.render_json({
-            'server_can_send_emails': server_can_send_emails,
-            'has_agreed_to_latest_terms': bool(
-                user_settings.last_agreed_to_terms and
-                user_settings.last_agreed_to_terms >=
-                feconf.TERMS_PAGE_LAST_UPDATED_UTC),
-            'has_ever_registered': bool(
-                user_settings.username and user_settings.last_agreed_to_terms),
-            'username': user_settings.username,
-        })
+                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+            )
+        )
+        self.render_json(
+            {
+                'server_can_send_emails': server_can_send_emails,
+                'has_agreed_to_latest_terms': bool(
+                    user_settings.last_agreed_to_terms
+                    and user_settings.last_agreed_to_terms
+                    >= feconf.TERMS_PAGE_LAST_UPDATED_UTC
+                ),
+                'has_ever_registered': bool(
+                    user_settings.username
+                    and user_settings.last_agreed_to_terms
+                ),
+                'username': user_settings.username,
+            }
+        )
 
     @acl_decorators.require_user_id_else_redirect_to_homepage
     def post(self) -> None:
@@ -544,11 +565,13 @@ class SignupHandler(
         agreed_to_terms = self.normalized_payload['agreed_to_terms']
         default_dashboard = self.normalized_payload['default_dashboard']
         can_receive_email_updates = self.normalized_payload[
-            'can_receive_email_updates']
+            'can_receive_email_updates'
+        ]
         bulk_email_signup_message_should_be_shown = False
 
         config_bulk_email_failed = user_services.update_email_preferences(
-            self.user_id, can_receive_email_updates,
+            self.user_id,
+            can_receive_email_updates,
             feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
             feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
             feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE,
@@ -556,19 +579,23 @@ class SignupHandler(
         # Only block registration if bulk email configuration failed and the
         # user requested bulk emails.
         bulk_email_signup_message_should_be_shown = (
-            can_receive_email_updates and config_bulk_email_failed)
+            can_receive_email_updates and config_bulk_email_failed
+        )
         if bulk_email_signup_message_should_be_shown:
-            self.render_json({
-                'bulk_email_signup_message_should_be_shown': (
-                    bulk_email_signup_message_should_be_shown
-                )
-            })
+            self.render_json(
+                {
+                    'bulk_email_signup_message_should_be_shown': (
+                        bulk_email_signup_message_should_be_shown
+                    )
+                }
+            )
             return
         # Ruling out the possibility of None for mypy type checking.
         assert self.user_id is not None
         has_ever_registered = user_services.has_ever_registered(self.user_id)
         has_fully_registered_account = (
-            user_services.has_fully_registered_account(self.user_id))
+            user_services.has_fully_registered_account(self.user_id)
+        )
 
         if has_fully_registered_account:
             self.render_json({})
@@ -577,7 +604,8 @@ class SignupHandler(
         if not agreed_to_terms:
             raise self.InvalidInputException(
                 'In order to edit explorations on this site, you will '
-                'need to accept the license terms.')
+                'need to accept the license terms.'
+            )
 
         user_services.record_agreement_to_terms(self.user_id)
 
@@ -588,16 +616,20 @@ class SignupHandler(
         # time.
         server_can_send_emails = (
             platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value))
+                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+            )
+        )
         if server_can_send_emails and not has_ever_registered:
             email_manager.send_post_signup_email(self.user_id)
 
         user_settings = user_services.get_user_settings(self.user_id)
         initial_profile_picture = user_services.fetch_gravatar(
-            user_settings.email)
+            user_settings.email
+        )
         assert user_settings.username is not None
         user_services.update_profile_picture_data_url(
-            user_settings.username, initial_profile_picture)
+            user_settings.username, initial_profile_picture
+        )
 
         if not has_ever_registered:
             # Set the default dashboard for new users.
@@ -605,10 +637,13 @@ class SignupHandler(
 
         user_services.save_user_settings(user_settings)
 
-        self.render_json({
-            'bulk_email_signup_message_should_be_shown': (
-                bulk_email_signup_message_should_be_shown)
-        })
+        self.render_json(
+            {
+                'bulk_email_signup_message_should_be_shown': (
+                    bulk_email_signup_message_should_be_shown
+                )
+            }
+        )
 
 
 class DeleteAccountHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
@@ -637,9 +672,7 @@ class ExportAccountHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         """Handles GET requests."""
         assert self.user_id is not None
         # Retrieve user data.
-        user_takeout_object = takeout_service.export_data_for_user(
-            self.user_id
-        )
+        user_takeout_object = takeout_service.export_data_for_user(self.user_id)
         user_data = user_takeout_object.user_data
         user_images = user_takeout_object.user_images
 
@@ -648,12 +681,14 @@ class ExportAccountHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         if re.search(feconf.USER_ID_REGEX, user_data_json_string):
             logging.error(
                 '[TAKEOUT] User ID found in the JSON generated for user %s'
-                % self.user_id)
+                % self.user_id
+            )
             user_data_json_string = (
                 'There was an error while exporting '
                 'data. Please contact %s to export your data.'
                 % platform_parameter_services.get_platform_parameter_value(
-                    platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value)
+                    platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value
+                )
             )
             user_images = []
 
@@ -666,20 +701,25 @@ class ExportAccountHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             for image in user_images:
                 if image.b64_image_data.startswith(utils.PNG_DATA_URL_PREFIX):
                     decoded_png = utils.convert_data_url_to_binary(
-                        image.b64_image_data, 'png')
+                        image.b64_image_data, 'png'
+                    )
                     zfile.writestr(
-                        'images/' + image.image_export_path, decoded_png)
+                        'images/' + image.image_export_path, decoded_png
+                    )
                 elif image.b64_image_data.startswith(
                     utils.DATA_URL_FORMAT_PREFIX % 'webp'
                 ):
                     decoded_webp = utils.convert_data_url_to_binary(
-                        image.b64_image_data, 'webp')
+                        image.b64_image_data, 'webp'
+                    )
                     zfile.writestr(
-                        'images/' + image.image_export_path, decoded_webp)
+                        'images/' + image.image_export_path, decoded_webp
+                    )
 
         # Render file for download.
         self.render_downloadable_file(
-            temp_file, 'oppia_takeout_data.zip', 'text/plain')
+            temp_file, 'oppia_takeout_data.zip', 'text/plain'
+        )
 
 
 class UsernameCheckHandlerNormalizedPayloadDict(TypedDict):
@@ -691,9 +731,7 @@ class UsernameCheckHandlerNormalizedPayloadDict(TypedDict):
 
 
 class UsernameCheckHandler(
-    base.BaseHandler[
-        UsernameCheckHandlerNormalizedPayloadDict, Dict[str, str]
-    ]
+    base.BaseHandler[UsernameCheckHandlerNormalizedPayloadDict, Dict[str, str]]
 ):
     """Checks whether a username has already been taken."""
 
@@ -704,9 +742,7 @@ class UsernameCheckHandler(
             'username': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'is_valid_username_string'
-                    }]
+                    'validators': [{'id': 'is_valid_username_string'}],
                 }
             }
         }
@@ -719,9 +755,11 @@ class UsernameCheckHandler(
         username = self.normalized_payload['username']
 
         username_is_taken = user_services.is_username_taken(username)
-        self.render_json({
-            'username_is_taken': username_is_taken,
-        })
+        self.render_json(
+            {
+                'username_is_taken': username_is_taken,
+            }
+        )
 
 
 class SiteLanguageHandlerNormalizedPayloadDict(TypedDict):
@@ -733,9 +771,7 @@ class SiteLanguageHandlerNormalizedPayloadDict(TypedDict):
 
 
 class SiteLanguageHandler(
-    base.BaseHandler[
-        SiteLanguageHandlerNormalizedPayloadDict, Dict[str, str]
-    ]
+    base.BaseHandler[SiteLanguageHandlerNormalizedPayloadDict, Dict[str, str]]
 ):
     """Changes the preferred system language in the user's preferences."""
 
@@ -748,10 +784,12 @@ class SiteLanguageHandler(
             'site_language_code': {
                 'schema': {
                     'type': 'basestring',
-                    'choices': list(map(
-                        LANGUAGE_ID_PROVIDER_FUNC,
-                        constants.SUPPORTED_SITE_LANGUAGES
-                    ))
+                    'choices': list(
+                        map(
+                            LANGUAGE_ID_PROVIDER_FUNC,
+                            constants.SUPPORTED_SITE_LANGUAGES,
+                        )
+                    ),
                 }
             }
         }
@@ -778,9 +816,7 @@ class UserInfoHandlerNormalizedPayloadDict(TypedDict):
 
 
 class UserInfoHandler(
-    base.BaseHandler[
-        UserInfoHandlerNormalizedPayloadDict, Dict[str, str]
-    ]
+    base.BaseHandler[UserInfoHandlerNormalizedPayloadDict, Dict[str, str]]
 ):
     """Provides info about user. If user is not logged in,
     return dict containing false as logged in status."""
@@ -791,11 +827,9 @@ class UserInfoHandler(
         'GET': {},
         'PUT': {
             'user_has_viewed_lesson_info_modal_once': {
-                'schema': {
-                    'type': 'bool'
-                },
+                'schema': {'type': 'bool'},
             }
-        }
+        },
     }
 
     @acl_decorators.open_access
@@ -809,28 +843,32 @@ class UserInfoHandler(
                 self.user_id
             ).actions
             user_settings = user_services.get_user_settings(
-                self.user_id, strict=True)
-            self.render_json({
-                'roles': self.roles,
-                'is_moderator': (
-                    user_services.is_moderator(self.user_id)),
-                'is_curriculum_admin': user_services.is_curriculum_admin(
-                    self.user_id),
-                'is_super_admin': self.current_user_is_super_admin,
-                'is_topic_manager': (
-                    user_services.is_topic_manager(self.user_id)),
-                'can_create_collections': bool(
-                    role_services.ACTION_CREATE_COLLECTION in user_actions),
-                'preferred_site_language_code': (
-                    user_settings.preferred_site_language_code),
-                'username': user_settings.username,
-                'email': user_settings.email,
-                'user_is_logged_in': True
-            })
+                self.user_id, strict=True
+            )
+            self.render_json(
+                {
+                    'roles': self.roles,
+                    'is_moderator': (user_services.is_moderator(self.user_id)),
+                    'is_curriculum_admin': user_services.is_curriculum_admin(
+                        self.user_id
+                    ),
+                    'is_super_admin': self.current_user_is_super_admin,
+                    'is_topic_manager': (
+                        user_services.is_topic_manager(self.user_id)
+                    ),
+                    'can_create_collections': bool(
+                        role_services.ACTION_CREATE_COLLECTION in user_actions
+                    ),
+                    'preferred_site_language_code': (
+                        user_settings.preferred_site_language_code
+                    ),
+                    'username': user_settings.username,
+                    'email': user_settings.email,
+                    'user_is_logged_in': True,
+                }
+            )
         else:
-            self.render_json({
-                'user_is_logged_in': False
-            })
+            self.render_json({'user_is_logged_in': False})
 
     @acl_decorators.open_access
     def put(self) -> None:
@@ -845,10 +883,12 @@ class UserInfoHandler(
 
         assert self.normalized_payload is not None
         user_has_viewed_lesson_info_modal_once = self.normalized_payload[
-            'user_has_viewed_lesson_info_modal_once']
+            'user_has_viewed_lesson_info_modal_once'
+        ]
         if user_has_viewed_lesson_info_modal_once:
             user_services.set_user_has_viewed_lesson_info_modal_once(
-                self.user_id)
+                self.user_id
+            )
         self.render_json({'success': True})
 
 
@@ -861,22 +901,14 @@ class UrlHandlerNormalizedRequestDict(TypedDict):
 
 
 class UrlHandler(
-    base.BaseHandler[
-        Dict[str, str], UrlHandlerNormalizedRequestDict
-    ]
+    base.BaseHandler[Dict[str, str], UrlHandlerNormalizedRequestDict]
 ):
     """The handler for generating login URL."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
-        'GET': {
-            'current_url': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            }
-        }
+        'GET': {'current_url': {'schema': {'type': 'basestring'}}}
     }
 
     @acl_decorators.open_access

@@ -38,10 +38,12 @@ class ExplorationFeaturesHandler(
         'exploration_id': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.ENTITY_ID_REGEX
-                }]
+                'validators': [
+                    {
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                    }
+                ],
             }
         }
     }
@@ -54,12 +56,13 @@ class ExplorationFeaturesHandler(
         Args:
             exploration_id: str. The ID of the exploration.
         """
-        self.render_json({
-            'exploration_is_curated':
-                opportunity_services.is_exploration_available_for_contribution(
-                    exploration_id),
-            'always_ask_learners_for_answer_details':
-                platform_parameter_services.get_platform_parameter_value(
-                    platform_parameter_list.ParamName.
-                    ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS.value)
-        })
+        self.render_json(
+            {
+                'exploration_is_curated': opportunity_services.is_exploration_available_for_contribution(
+                    exploration_id
+                ),
+                'always_ask_learners_for_answer_details': platform_parameter_services.get_platform_parameter_value(
+                    platform_parameter_list.ParamName.ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS.value
+                ),
+            }
+        )

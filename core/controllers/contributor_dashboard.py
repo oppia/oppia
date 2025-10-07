@@ -47,20 +47,24 @@ from typing import (
     Union,
 )
 
-ListOfContributorDashboardStatsTypes = Sequence[Union[
-    suggestion_registry.TranslationContributionStats,
-    suggestion_registry.TranslationReviewStats,
-    suggestion_registry.QuestionContributionStats,
-    suggestion_registry.QuestionReviewStats
-]]
+ListOfContributorDashboardStatsTypes = Sequence[
+    Union[
+        suggestion_registry.TranslationContributionStats,
+        suggestion_registry.TranslationReviewStats,
+        suggestion_registry.QuestionContributionStats,
+        suggestion_registry.QuestionReviewStats,
+    ]
+]
 
 
-ListOfContributorDashboardStatsDictTypes = Sequence[Union[
-    suggestion_registry.TranslationContributionStatsFrontendDict,
-    suggestion_registry.TranslationReviewStatsFrontendDict,
-    suggestion_registry.QuestionContributionStatsFrontendDict,
-    suggestion_registry.QuestionReviewStatsFrontendDict
-]]
+ListOfContributorDashboardStatsDictTypes = Sequence[
+    Union[
+        suggestion_registry.TranslationContributionStatsFrontendDict,
+        suggestion_registry.TranslationReviewStatsFrontendDict,
+        suggestion_registry.QuestionContributionStatsFrontendDict,
+        suggestion_registry.QuestionReviewStatsFrontendDict,
+    ]
+]
 
 
 class ClientSideSkillOpportunityDict(opportunity_domain.SkillOpportunityDict):
@@ -88,35 +92,22 @@ class ContributionOpportunitiesHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
-        'opportunity_type': {
-            'schema': {
-                'type': 'basestring'
-            }
-        }
+        'opportunity_type': {'schema': {'type': 'basestring'}}
     }
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
-            'cursor': {
-                'schema': {
-                    'type': 'basestring'
-                },
-                'default_value': None
-            },
+            'cursor': {'schema': {'type': 'basestring'}, 'default_value': None},
             'language_code': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'is_supported_audio_language_code'
-                    }]
+                    'validators': [{'id': 'is_supported_audio_language_code'}],
                 },
-                'default_value': None
+                'default_value': None,
             },
             'topic_name': {
-                'schema': {
-                    'type': 'basestring'
-                },
-                'default_value': None
-            }
+                'schema': {'type': 'basestring'},
+                'default_value': None,
+            },
         }
     }
 
@@ -141,7 +132,9 @@ class ContributionOpportunitiesHandler(
         if opportunity_type == constants.OPPORTUNITY_TYPE_SKILL:
             skill_opportunities, next_cursor, more = (
                 self._get_skill_opportunities_with_corresponding_topic_name(
-                    search_cursor))
+                    search_cursor
+                )
+            )
 
         elif opportunity_type == constants.OPPORTUNITY_TYPE_TRANSLATION:
             topic_name = self.normalized_request.get('topic_name')
@@ -149,7 +142,9 @@ class ContributionOpportunitiesHandler(
                 raise self.InvalidInputException
             translation_opportunities, next_cursor, more = (
                 self._get_translation_opportunity_dicts(
-                    language_code, topic_name, search_cursor))
+                    language_code, topic_name, search_cursor
+                )
+            )
         else:
             raise self.NotFoundException
 
@@ -160,15 +155,13 @@ class ContributionOpportunitiesHandler(
                 else translation_opportunities
             ),
             'next_cursor': next_cursor,
-            'more': more
+            'more': more,
         }
         self.render_json(self.values)
 
     def _get_skill_opportunities_with_corresponding_topic_name(
         self, cursor: Optional[str]
-    ) -> Tuple[
-        List[ClientSideSkillOpportunityDict], Optional[str], bool
-    ]:
+    ) -> Tuple[List[ClientSideSkillOpportunityDict], Optional[str], bool]:
         """Returns a list of skill opportunities available for questions with
         a corresponding topic name.
 
@@ -206,15 +199,17 @@ class ContributionOpportunitiesHandler(
                 classroom_topic_skill_id_to_topic_name[skill_id] = topic.name
 
         skill_opportunities, cursor, more = (
-            opportunity_services.get_skill_opportunities(cursor))
+            opportunity_services.get_skill_opportunities(cursor)
+        )
         opportunities: List[ClientSideSkillOpportunityDict] = []
         # Fetch opportunities until we have at least a page's worth that
         # correspond to a classroom or there are no more opportunities.
         while len(opportunities) < constants.OPPORTUNITIES_PAGE_SIZE:
             for skill_opportunity in skill_opportunities:
                 if (
-                        skill_opportunity.id
-                        in classroom_topic_skill_id_to_topic_name):
+                    skill_opportunity.id
+                    in classroom_topic_skill_id_to_topic_name
+                ):
                     skill_opportunity_dict = skill_opportunity.to_dict()
                     client_side_skill_opportunity_dict: (
                         ClientSideSkillOpportunityDict
@@ -228,16 +223,19 @@ class ContributionOpportunitiesHandler(
                         ],
                         'topic_name': (
                             classroom_topic_skill_id_to_topic_name[
-                                skill_opportunity.id]
-                            )
+                                skill_opportunity.id
+                            ]
+                        ),
                     }
                     opportunities.append(client_side_skill_opportunity_dict)
             if (
-                    not more or
-                    len(opportunities) >= constants.OPPORTUNITIES_PAGE_SIZE):
+                not more
+                or len(opportunities) >= constants.OPPORTUNITIES_PAGE_SIZE
+            ):
                 break
             skill_opportunities, cursor, more = (
-                opportunity_services.get_skill_opportunities(cursor))
+                opportunity_services.get_skill_opportunities(cursor)
+            )
 
         return opportunities, cursor, more
 
@@ -245,11 +243,11 @@ class ContributionOpportunitiesHandler(
         self,
         language_code: str,
         topic_name: Optional[str],
-        search_cursor: Optional[str]
+        search_cursor: Optional[str],
     ) -> Tuple[
         List[opportunity_domain.PartialExplorationOpportunitySummaryDict],
         Optional[str],
-        bool
+        bool,
     ]:
         """Returns a list of translation opportunity dicts.
 
@@ -275,7 +273,9 @@ class ContributionOpportunitiesHandler(
         """
         opportunities, next_cursor, more = (
             opportunity_services.get_translation_opportunities(
-                language_code, topic_name, search_cursor))
+                language_code, topic_name, search_cursor
+            )
+        )
         opportunity_dicts = [opp.to_dict() for opp in opportunities]
         return opportunity_dicts, next_cursor, more
 
@@ -301,17 +301,13 @@ class ReviewableOpportunitiesHandler(
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'topic_name': {
-                'schema': {
-                    'type': 'basestring'
-                },
-                'default_value': None
+                'schema': {'type': 'basestring'},
+                'default_value': None,
             },
             'language_code': {
-                'schema': {
-                    'type': 'basestring'
-                },
-                'default_value': None
-            }
+                'schema': {'type': 'basestring'},
+                'default_value': None,
+            },
         }
     }
 
@@ -325,11 +321,10 @@ class ReviewableOpportunitiesHandler(
         language = self.normalized_request.get('language_code')
         opportunity_dicts: List[
             opportunity_domain.PartialExplorationOpportunitySummaryDict
-            ] = []
+        ] = []
         if self.user_id:
-            for opp in (
-                self._get_reviewable_exploration_opportunity_summaries(
-                    self.user_id, topic_name, language)
+            for opp in self._get_reviewable_exploration_opportunity_summaries(
+                self.user_id, topic_name, language
             ):
                 opportunity_dicts.append(opp.to_dict())
         self.values = {
@@ -383,9 +378,7 @@ class ReviewableOpportunitiesHandler(
             if language and self.user_id:
                 pinned_opportunity_summary = (
                     opportunity_services.get_pinned_lesson(
-                        self.user_id,
-                        language,
-                        topic.id
+                        self.user_id, language, topic.id
                     )
                 )
             topic_exp_ids = (
@@ -393,11 +386,8 @@ class ReviewableOpportunitiesHandler(
                     topic_id=topic.id
                 )
             )
-        in_review_suggestion_target_ids = (
-            suggestion_services
-            .get_reviewable_translation_suggestion_target_ids(
-                user_id, language
-            )
+        in_review_suggestion_target_ids = suggestion_services.get_reviewable_translation_suggestion_target_ids(
+            user_id, language
         )
         topic_exp_ids_targeted_by_in_review_suggestions = [
             exp_id
@@ -417,8 +407,9 @@ class ReviewableOpportunitiesHandler(
         if pinned_opportunity_summary:
             pinned_opportunity_id = pinned_opportunity_summary.id
             exp_opp_summaries.pop(pinned_opportunity_id, None)
-            ordered_exp_opp_summaries[
-                pinned_opportunity_id] = pinned_opportunity_summary
+            ordered_exp_opp_summaries[pinned_opportunity_id] = (
+                pinned_opportunity_summary
+            )
 
         for item in exp_opp_summaries.values():
             if item is not None:
@@ -447,22 +438,12 @@ class LessonsPinningHandler(
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
-            'language_code': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
-            'topic_id': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
+            'language_code': {'schema': {'type': 'basestring'}},
+            'topic_id': {'schema': {'type': 'basestring'}},
             'opportunity_id': {
-                'schema': {
-                    'type': 'basestring'
-                },
-                'default_value': None
-            }
+                'schema': {'type': 'basestring'},
+                'default_value': None,
+            },
         },
     }
 
@@ -506,16 +487,10 @@ class TranslatableTextHandler(
             'language_code': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'is_supported_audio_language_code'
-                    }]
+                    'validators': [{'id': 'is_supported_audio_language_code'}],
                 }
             },
-            'exp_id': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            }
+            'exp_id': {'schema': {'type': 'basestring'}},
         }
     }
 
@@ -532,35 +507,39 @@ class TranslatableTextHandler(
 
         exp = exp_fetchers.get_exploration_by_id(exp_id)
         if not opportunity_services.is_exploration_available_for_contribution(
-                exp_id):
+            exp_id
+        ):
             raise self.InvalidInputException('Invalid exp_id: %s' % exp_id)
 
         state_names_to_content_id_mapping = (
-            translation_services.get_translatable_text(exp, language_code))
+            translation_services.get_translatable_text(exp, language_code)
+        )
 
         reviewable_language_codes = []
         if self.user_id:
             contribution_rights = user_services.get_user_contribution_rights(
-                self.user_id)
+                self.user_id
+            )
             reviewable_language_codes = (
-                contribution_rights.can_review_translation_for_language_codes)
+                contribution_rights.can_review_translation_for_language_codes
+            )
         if language_code not in reviewable_language_codes:
             state_names_to_content_id_mapping = (
                 self._get_state_names_to_not_set_content_id_mapping(
                     state_names_to_content_id_mapping
-                ))
-        state_names_to_not_in_review_content_id_mapping = (
-            self._get_state_names_to_not_in_review_content_id_mapping(
-                state_names_to_content_id_mapping,
-                suggestion_services
-                .get_translation_suggestions_in_review_by_exploration(
-                    exp_id, language_code)
+                )
             )
+        state_names_to_not_in_review_content_id_mapping = self._get_state_names_to_not_in_review_content_id_mapping(
+            state_names_to_content_id_mapping,
+            suggestion_services.get_translation_suggestions_in_review_by_exploration(
+                exp_id, language_code
+            ),
         )
         self.values = {
             'state_names_to_content_id_mapping': (
-                state_names_to_not_in_review_content_id_mapping),
-            'version': exp.version
+                state_names_to_not_in_review_content_id_mapping
+            ),
+            'version': exp.version,
         }
 
         self.render_json(self.values)
@@ -569,7 +548,7 @@ class TranslatableTextHandler(
         self,
         state_names_to_content_id_mapping: Dict[
             str, Dict[str, translation_domain.TranslatableContent]
-        ]
+        ],
     ) -> Dict[str, Dict[str, translation_domain.TranslatableContent]]:
         """Returns a copy of the supplied state_names_to_content_id_mapping
         minus any contents of which the data is set of strings.
@@ -587,17 +566,22 @@ class TranslatableTextHandler(
         """
         mapping_without_set_data_format = {}
         for state_name in state_names_to_content_id_mapping:
-            content_id_to_translatable_item = (
-                state_names_to_content_id_mapping[state_name])
+            content_id_to_translatable_item = state_names_to_content_id_mapping[
+                state_name
+            ]
             content_id_to_not_set_translatable_item = {}
-            for content_id, translatable_item in (
-                    content_id_to_translatable_item.items()):
+            for (
+                content_id,
+                translatable_item,
+            ) in content_id_to_translatable_item.items():
                 if not translatable_item.is_data_format_list():
                     content_id_to_not_set_translatable_item[content_id] = (
-                        translatable_item)
+                        translatable_item
+                    )
             if content_id_to_not_set_translatable_item:
                 mapping_without_set_data_format[state_name] = (
-                    content_id_to_not_set_translatable_item)
+                    content_id_to_not_set_translatable_item
+                )
         return mapping_without_set_data_format
 
     def _get_state_names_to_not_in_review_content_id_mapping(
@@ -605,7 +589,7 @@ class TranslatableTextHandler(
         state_names_to_content_id_mapping: Dict[
             str, Dict[str, translation_domain.TranslatableContent]
         ],
-        suggestions: List[suggestion_registry.BaseSuggestion]
+        suggestions: List[suggestion_registry.BaseSuggestion],
     ) -> Dict[str, Dict[str, translation_domain.TranslatableContentDict]]:
         """Returns a copy of the supplied state_names_to_content_id_mapping
         minus any contents found in suggestions.
@@ -625,18 +609,22 @@ class TranslatableTextHandler(
         final_mapping = {}
         for state_name in state_names_to_content_id_mapping:
             content_id_to_translatable_item = dict(
-                state_names_to_content_id_mapping[state_name])
+                state_names_to_content_id_mapping[state_name]
+            )
             content_id_to_unsubmitted_translatable_item = {}
             for content_id, item in content_id_to_translatable_item.items():
                 if not self._is_content_in_review(
-                        state_name, content_id, suggestions):
+                    state_name, content_id, suggestions
+                ):
                     content_id_to_unsubmitted_translatable_item[content_id] = (
-                        item)
+                        item
+                    )
             if content_id_to_unsubmitted_translatable_item:
                 final_mapping[state_name] = {
                     cid: translatable_item.to_dict()
                     for cid, translatable_item in (
-                        content_id_to_unsubmitted_translatable_item.items())
+                        content_id_to_unsubmitted_translatable_item.items()
+                    )
                 }
         return final_mapping
 
@@ -644,7 +632,7 @@ class TranslatableTextHandler(
         self,
         state_name: str,
         content_id: str,
-        suggestions: List[suggestion_registry.BaseSuggestion]
+        suggestions: List[suggestion_registry.BaseSuggestion],
     ) -> bool:
         """Returns whether a suggestion exists in suggestions with a
         change_cmd dict matching the supplied state_name and content_id.
@@ -659,8 +647,10 @@ class TranslatableTextHandler(
             dict matching state_name and content_id, False otherwise.
         """
         return any(
-            s.change_cmd.state_name == state_name and
-            s.change_cmd.content_id == content_id for s in suggestions)
+            s.change_cmd.state_name == state_name
+            and s.change_cmd.content_id == content_id
+            for s in suggestions
+        )
 
 
 class MachineTranslationStateTextsHandlerNormalizedRequestDict(TypedDict):
@@ -685,31 +675,18 @@ class MachineTranslationStateTextsHandler(
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
-            'exp_id': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
-            'state_name': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
-            'content_ids': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
+            'exp_id': {'schema': {'type': 'basestring'}},
+            'state_name': {'schema': {'type': 'basestring'}},
+            'content_ids': {'schema': {'type': 'basestring'}},
             'target_language_code': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'is_supported_audio_language_code'
-                    }, {
-                        'id': 'is_valid_audio_language_code'
-                    }]
+                    'validators': [
+                        {'id': 'is_supported_audio_language_code'},
+                        {'id': 'is_valid_audio_language_code'},
+                    ],
                 }
-            }
+            },
         }
     }
 
@@ -764,16 +741,16 @@ class MachineTranslationStateTextsHandler(
         exp = exp_fetchers.get_exploration_by_id(exp_id, strict=False)
         if exp is None:
             raise self.NotFoundException()
-        state_names_to_content_id_mapping: (
-            Dict[str, Dict[str, translation_domain.TranslatableContent]]
-        ) = (
-            translation_services.get_translatable_text(
-                exp, target_language_code)
+        state_names_to_content_id_mapping: Dict[
+            str, Dict[str, translation_domain.TranslatableContent]
+        ] = translation_services.get_translatable_text(
+            exp, target_language_code
         )
         if state_name not in state_names_to_content_id_mapping:
             raise self.NotFoundException()
         content_id_to_translatable_item_mapping = (
-            state_names_to_content_id_mapping[state_name])
+            state_names_to_content_id_mapping[state_name]
+        )
         translated_texts: Dict[str, Optional[str]] = {}
         for content_id in content_ids:
             if content_id not in content_id_to_translatable_item_mapping:
@@ -781,21 +758,21 @@ class MachineTranslationStateTextsHandler(
                 continue
 
             source_text = content_id_to_translatable_item_mapping[
-                content_id].content_value
+                content_id
+            ].content_value
 
             # Here we use MyPy ignore because the flag the
             # get_and_cache_machine_translation is not written correctly and it
             # only handles str.
             # TODO(#16621): Fix get_and_cache_machine_translation to handle
             # translatable content of rule_spec [list(str)].
-            translated_texts[content_id] = (
-                translation_services.get_and_cache_machine_translation(
-                    exp.language_code, target_language_code, source_text) # type: ignore[arg-type]
+            translated_texts[
+                content_id
+            ] = translation_services.get_and_cache_machine_translation(
+                exp.language_code, target_language_code, source_text  # type: ignore[arg-type]
             )
 
-        self.values = {
-            'translated_texts': translated_texts
-        }
+        self.values = {'translated_texts': translated_texts}
         self.render_json(self.values)
 
 
@@ -821,21 +798,34 @@ class UserContributionRightsDataHandler(
             # user claims an authentication and successfully logged in.
             assert self.user_id is not None
             contribution_rights = user_services.get_user_contribution_rights(
-                self.user_id)
-        self.render_json({
-            'can_review_translation_for_language_codes': (
-                contribution_rights.can_review_translation_for_language_codes
-                if contribution_rights else []),
-            'can_review_voiceover_for_language_codes': (
-                contribution_rights.can_review_voiceover_for_language_codes
-                if contribution_rights else []),
-            'can_review_questions': (
-                contribution_rights.can_review_questions
-                if contribution_rights else False),
-            'can_suggest_questions': (
-                (contribution_rights.can_submit_questions
-                 if contribution_rights else False))
-        })
+                self.user_id
+            )
+        self.render_json(
+            {
+                'can_review_translation_for_language_codes': (
+                    contribution_rights.can_review_translation_for_language_codes
+                    if contribution_rights
+                    else []
+                ),
+                'can_review_voiceover_for_language_codes': (
+                    contribution_rights.can_review_voiceover_for_language_codes
+                    if contribution_rights
+                    else []
+                ),
+                'can_review_questions': (
+                    contribution_rights.can_review_questions
+                    if contribution_rights
+                    else False
+                ),
+                'can_suggest_questions': (
+                    (
+                        contribution_rights.can_submit_questions
+                        if contribution_rights
+                        else False
+                    )
+                ),
+            }
+        )
 
 
 class FeaturedTranslationLanguagesHandler(
@@ -850,10 +840,11 @@ class FeaturedTranslationLanguagesHandler(
     @acl_decorators.open_access
     def get(self) -> None:
         """Handles GET requests."""
-        self.render_json({
-            'featured_translation_languages':
-                constants.FEATURED_TRANSLATION_LANGUAGES
-        })
+        self.render_json(
+            {
+                'featured_translation_languages': constants.FEATURED_TRANSLATION_LANGUAGES
+            }
+        )
 
 
 class TranslatableTopicNamesHandler(
@@ -870,9 +861,7 @@ class TranslatableTopicNamesHandler(
         # Only published topics are translatable.
         topic_summaries = topic_fetchers.get_published_topic_summaries()
         topic_names = [summary.name for summary in topic_summaries]
-        self.values = {
-            'topic_names': topic_names
-        }
+        self.values = {'topic_names': topic_names}
         self.render_json(self.values)
 
 
@@ -909,13 +898,15 @@ class TranslatableTopicNamesPerClassroomHandler(
         topics_per_classroom: Dict[str, List[str]] = {}
         for summary in topic_fetchers.get_published_topic_summaries():
             classroom_name = topic_id_to_classroom.get(summary.id, '')
-            topics_per_classroom.setdefault(
-                classroom_name, []).append(summary.name)
+            topics_per_classroom.setdefault(classroom_name, []).append(
+                summary.name
+            )
 
         self.values = {
             'topic_names_per_classroom': [
                 TranslatableTopicNamesPerClassroomHandlerDict(
-                    classroom=classroom, topics=topics)
+                    classroom=classroom, topics=topics
+                )
                 for classroom, topics in topics_per_classroom.items()
             ]
         }
@@ -950,12 +941,10 @@ class TranslationPreferenceHandler(
             'language_code': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'is_supported_audio_language_code'
-                    }]
+                    'validators': [{'id': 'is_supported_audio_language_code'}],
                 }
             }
-        }
+        },
     }
 
     @acl_decorators.can_manage_own_account
@@ -963,10 +952,13 @@ class TranslationPreferenceHandler(
         """Handles GET requests."""
         assert self.user_id is not None
         user_settings = user_services.get_user_settings(self.user_id)
-        return self.render_json({
-            'preferred_translation_language_code': (
-                user_settings.preferred_translation_language_code)
-        })
+        return self.render_json(
+            {
+                'preferred_translation_language_code': (
+                    user_settings.preferred_translation_language_code
+                )
+            }
+        )
 
     @acl_decorators.can_manage_own_account
     def post(self) -> None:
@@ -987,30 +979,15 @@ class ContributorStatsSummariesHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
-        'username': {
-            'schema': {
-                'type': 'basestring'
-            }
-        },
-        'contribution_type': {
-            'schema': {
-                'type': 'basestring'
-            }
-        },
-        'contribution_subtype': {
-            'schema': {
-                'type': 'basestring'
-            }
-        }
+        'username': {'schema': {'type': 'basestring'}},
+        'contribution_type': {'schema': {'type': 'basestring'}},
+        'contribution_subtype': {'schema': {'type': 'basestring'}},
     }
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_fetch_contributor_dashboard_stats
     def get(
-        self,
-        contribution_type: str,
-        contribution_subtype: str,
-        username: str
+        self, contribution_type: str, contribution_subtype: str, username: str
     ) -> None:
         """Handles GET requests.
 
@@ -1036,14 +1013,14 @@ class ContributorStatsSummariesHandler(
         """
         if contribution_type not in [
             feconf.CONTRIBUTION_TYPE_TRANSLATION,
-            feconf.CONTRIBUTION_TYPE_QUESTION
+            feconf.CONTRIBUTION_TYPE_QUESTION,
         ]:
             raise self.InvalidInputException(
                 'Invalid contribution type %s.' % (contribution_type)
             )
         if contribution_subtype not in [
             feconf.CONTRIBUTION_SUBTYPE_SUBMISSION,
-            feconf.CONTRIBUTION_SUBTYPE_REVIEW
+            feconf.CONTRIBUTION_SUBTYPE_REVIEW,
         ]:
             raise self.InvalidInputException(
                 'Invalid contribution subtype %s.' % (contribution_subtype)
@@ -1059,32 +1036,36 @@ class ContributorStatsSummariesHandler(
             if contribution_subtype == feconf.CONTRIBUTION_SUBTYPE_SUBMISSION:
                 stats: ListOfContributorDashboardStatsTypes = (
                     suggestion_services.get_all_translation_contribution_stats(
-                        user_id))
+                        user_id
+                    )
+                )
                 self.values = {
                     'translation_contribution_stats': _get_client_side_stats(
-                        stats)
+                        stats
+                    )
                 }
 
             if contribution_subtype == feconf.CONTRIBUTION_SUBTYPE_REVIEW:
                 stats = suggestion_services.get_all_translation_review_stats(
-                    user_id)
+                    user_id
+                )
                 self.values = {
-                    'translation_review_stats': _get_client_side_stats(
-                        stats)
+                    'translation_review_stats': _get_client_side_stats(stats)
                 }
 
         if contribution_type == feconf.CONTRIBUTION_TYPE_QUESTION:
             if contribution_subtype == feconf.CONTRIBUTION_SUBTYPE_SUBMISSION:
                 stats = suggestion_services.get_all_question_contribution_stats(
-                    user_id)
+                    user_id
+                )
                 self.values = {
-                    'question_contribution_stats': _get_client_side_stats(
-                        stats)
+                    'question_contribution_stats': _get_client_side_stats(stats)
                 }
 
             if contribution_subtype == feconf.CONTRIBUTION_SUBTYPE_REVIEW:
                 stats = suggestion_services.get_all_question_review_stats(
-                    user_id)
+                    user_id
+                )
                 self.values = {
                     'question_review_stats': _get_client_side_stats(stats)
                 }
@@ -1112,55 +1093,57 @@ class ContributorCertificateHandler(
         'username': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'has_length_at_most',
-                    'max_value': constants.MAX_USERNAME_LENGTH
-                }]
+                'validators': [
+                    {
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_USERNAME_LENGTH,
+                    }
+                ],
             }
         },
         'suggestion_type': {
             'schema': {
                 'type': 'basestring',
-                'choices': feconf.SUGGESTION_TYPE_CHOICES
+                'choices': feconf.SUGGESTION_TYPE_CHOICES,
             }
-        }
+        },
     }
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'from_date': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'is_regex_matched',
-                        'regex_pattern': constants.DATE_REGEX
-                    }]
+                    'validators': [
+                        {
+                            'id': 'is_regex_matched',
+                            'regex_pattern': constants.DATE_REGEX,
+                        }
+                    ],
                 }
             },
             'to_date': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'is_regex_matched',
-                        'regex_pattern': constants.DATE_REGEX
-                    }]
+                    'validators': [
+                        {
+                            'id': 'is_regex_matched',
+                            'regex_pattern': constants.DATE_REGEX,
+                        }
+                    ],
                 }
             },
             'language': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'is_supported_audio_language_code'
-                    }]
+                    'validators': [{'id': 'is_supported_audio_language_code'}],
                 },
-                'default_value': None
+                'default_value': None,
             },
         }
     }
 
     @acl_decorators.can_fetch_all_contributor_dashboard_stats
-    def get(
-        self, username: str, suggestion_type: str
-    ) -> None:
+    def get(self, username: str, suggestion_type: str) -> None:
         """Generates data for contributor certificates.
 
         Args:
@@ -1181,12 +1164,14 @@ class ContributorCertificateHandler(
         to_datetime = datetime.datetime.strptime(to_date, '%Y-%m-%d')
         if to_datetime.date() > datetime.datetime.now().date():
             raise self.InvalidInputException(
-                'To date should not be a future date.')
+                'To date should not be a future date.'
+            )
 
         certificate_data = (
             suggestion_services.generate_contributor_certificate_data(
-                username, suggestion_type, language, from_datetime,
-                to_datetime))
+                username, suggestion_type, language, from_datetime, to_datetime
+            )
+        )
 
         response: CertificateDataResponse = {
             'certificate_data': certificate_data
@@ -1201,13 +1186,7 @@ class ContributorAllStatsSummariesHandler(
     """Returns all contribution statistics associated with the user."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {
-        'username': {
-            'schema': {
-                'type': 'basestring'
-            }
-        }
-    }
+    URL_PATH_ARGS_SCHEMAS = {'username': {'schema': {'type': 'basestring'}}}
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_fetch_all_contributor_dashboard_stats
@@ -1228,25 +1207,29 @@ class ContributorAllStatsSummariesHandler(
 
         if stats.translation_contribution_stats is not None:
             response['translation_contribution_stats'] = _get_client_side_stats(
-                stats.translation_contribution_stats)
+                stats.translation_contribution_stats
+            )
 
         if stats.translation_review_stats is not None:
             response['translation_review_stats'] = _get_client_side_stats(
-                stats.translation_review_stats)
+                stats.translation_review_stats
+            )
 
         if stats.question_contribution_stats is not None:
             response['question_contribution_stats'] = _get_client_side_stats(
-                stats.question_contribution_stats)
+                stats.question_contribution_stats
+            )
 
         if stats.question_review_stats is not None:
             response['question_review_stats'] = _get_client_side_stats(
-                stats.question_review_stats)
+                stats.question_review_stats
+            )
 
         self.render_json(response)
 
 
 def _get_client_side_stats(
-    backend_stats: ListOfContributorDashboardStatsTypes
+    backend_stats: ListOfContributorDashboardStatsTypes,
 ) -> ListOfContributorDashboardStatsDictTypes:
     """Returns corresponding stats dicts with all the necessary
     information for the frontend.
@@ -1267,16 +1250,15 @@ def _get_client_side_stats(
     Raises:
         Exception. No topic_id associated with stats object.
     """
-    stats_dicts = [
-        stats.to_frontend_dict() for stats in backend_stats
-    ]
+    stats_dicts = [stats.to_frontend_dict() for stats in backend_stats]
     topic_ids = []
     for stats_dict in stats_dicts:
         topic_ids.append(stats_dict['topic_id'])
     topic_summaries = topic_fetchers.get_multi_topic_summaries(topic_ids)
     topic_name_by_topic_id = {
         topic_summary.id: topic_summary.name
-        for topic_summary in topic_summaries if topic_summary is not None
+        for topic_summary in topic_summaries
+        if topic_summary is not None
     }
     for stats_dict in stats_dicts:
         # Here we are asserting that 'stats_dict['topic_id']' will never be None
@@ -1288,7 +1270,8 @@ def _get_client_side_stats(
         # is added. So, due to this MyPy throws an error. Thus, to avoid
         # the error, we use ignore here.
         stats_dict['topic_name'] = topic_name_by_topic_id.get(  # type: ignore[typeddict-item]
-            stats_dict['topic_id'], 'UNKNOWN')
+            stats_dict['topic_id'], 'UNKNOWN'
+        )
         # Here we use MyPy ignore because MyPy doesn't allow key deletion
         # from TypedDict.
         del stats_dict['topic_id']  # type: ignore[misc]
