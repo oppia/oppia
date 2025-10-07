@@ -3033,6 +3033,7 @@ class RegenerateTopicSummariesHandler(
 
         self.render_json({})
 
+
 class GenerateStudyGuideModelsHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
@@ -3051,7 +3052,7 @@ class GenerateStudyGuideModelsHandler(
         topics = sorted(
             topic_fetchers.get_all_topics(),
             key=operator.attrgetter('created_on'))
-        
+
         for topic in topics:
             study_guide_services.generate_study_guide_models(topic.id, topic.subtopics)
 
@@ -3076,7 +3077,7 @@ class DeleteStudyGuideModelsHandler(
         topics = sorted(
             topic_fetchers.get_all_topics(),
             key=operator.attrgetter('created_on'))
-        
+
         for topic in topics:
             study_guide_services.delete_study_guide_models(topic.id, topic.subtopics)
 

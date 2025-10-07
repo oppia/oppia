@@ -42,7 +42,6 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import {HtmlEscaperService} from 'services/html-escaper.service';
-import {PlatformFeatureService} from 'services/platform-feature.service';
 
 @Component({
   selector: 'oppia-noninteractive-workedexample',
@@ -59,10 +58,7 @@ export class NoninteractiveWorkedexample implements OnInit, OnChanges {
   isSolutionCollapsed: boolean = true;
   question: string = '';
   answer: string = '';
-  constructor(
-    private htmlEscaperService: HtmlEscaperService,
-    private platformFeatureService: PlatformFeatureService
-  ) {}
+  constructor(private htmlEscaperService: HtmlEscaperService) {}
 
   private _updateViewOnInputChange(): void {
     if (!this.questionWithValue || !this.answerWithValue) {
@@ -78,11 +74,6 @@ export class NoninteractiveWorkedexample implements OnInit, OnChanges {
 
   changeSolutionState(): void {
     this.isSolutionCollapsed = !this.isSolutionCollapsed;
-  }
-
-  isEnableWorkedexamplesRteComponentFeatureEnabled(): boolean {
-    return this.platformFeatureService.status.EnableWorkedExamplesRteComponent
-      .isEnabled;
   }
 
   ngOnInit(): void {
