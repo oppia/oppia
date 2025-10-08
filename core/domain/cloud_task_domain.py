@@ -52,7 +52,7 @@ class CloudTaskRun:
         exception_messages_for_failed_runs: List[str],
         current_retry_attempt: int,
         last_updated: datetime.datetime,
-        created_on: datetime.datetime
+        created_on: datetime.datetime,
     ) -> None:
         self.task_run_id = task_run_id
         self.cloud_task_name = cloud_task_name
@@ -61,7 +61,8 @@ class CloudTaskRun:
         self.latest_job_state = latest_job_state
         self.function_id = function_id
         self.exception_messages_for_failed_runs = (
-            exception_messages_for_failed_runs)
+            exception_messages_for_failed_runs
+        )
         self.current_retry_attempt = current_retry_attempt
         self.last_updated = last_updated
         self.created_on = created_on
@@ -81,10 +82,11 @@ class CloudTaskRun:
             'latest_job_state': self.latest_job_state,
             'function_id': self.function_id,
             'exception_messages_for_failed_runs': (
-                self.exception_messages_for_failed_runs),
+                self.exception_messages_for_failed_runs
+            ),
             'current_retry_attempt': self.current_retry_attempt,
             'last_updated': self.last_updated.isoformat(),
-            'created_on': self.created_on.isoformat()
+            'created_on': self.created_on.isoformat(),
         }
 
     @classmethod
@@ -107,10 +109,13 @@ class CloudTaskRun:
             latest_job_state=cloud_task_run_dict['latest_job_state'],
             function_id=cloud_task_run_dict['function_id'],
             exception_messages_for_failed_runs=cloud_task_run_dict[
-                'exception_messages_for_failed_runs'],
+                'exception_messages_for_failed_runs'
+            ],
             current_retry_attempt=cloud_task_run_dict['current_retry_attempt'],
             last_updated=datetime.datetime.fromisoformat(
-                cloud_task_run_dict['last_updated']),
+                cloud_task_run_dict['last_updated']
+            ),
             created_on=datetime.datetime.fromisoformat(
-                cloud_task_run_dict['created_on'])
+                cloud_task_run_dict['created_on']
+            ),
         )

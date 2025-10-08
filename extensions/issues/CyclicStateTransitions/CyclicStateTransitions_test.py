@@ -20,7 +20,9 @@ from __future__ import annotations
 
 from core.tests import test_utils
 
-from extensions.issues.CyclicStateTransitions import CyclicStateTransitions # pylint: disable=unused-import, line-too-long # isort: skip
+from extensions.issues.CyclicStateTransitions import (  # pylint: disable=unused-import, line-too-long # isort: skip
+    CyclicStateTransitions,
+)
 
 
 class CyclicStateTransitionsTests(test_utils.GenericTestBase):

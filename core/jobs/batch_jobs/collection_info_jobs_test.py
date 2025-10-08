@@ -28,21 +28,21 @@ from core.platform import models
 from typing import Final, Type
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import collection_models, feedback_models, user_models
 
 (collection_models, feedback_models, user_models) = (
-    models.Registry.import_models([
-        models.Names.COLLECTION, models.Names.FEEDBACK, models.Names.USER
-    ])
+    models.Registry.import_models(
+        [models.Names.COLLECTION, models.Names.FEEDBACK, models.Names.USER]
+    )
 )
 
 
 class GetCollectionOwnersEmailsJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS: Type[
+    JOB_CLASS: Type[collection_info_jobs.GetCollectionOwnersEmailsJob] = (
         collection_info_jobs.GetCollectionOwnersEmailsJob
-    ] = collection_info_jobs.GetCollectionOwnersEmailsJob
+    )
 
     USER_ID_1: Final = 'id_1'
     USER_ID_2: Final = 'id_2'
@@ -56,7 +56,7 @@ class GetCollectionOwnersEmailsJobTests(job_test_utils.JobTestBase):
             user_models.UserSettingsModel,
             id=self.USER_ID_1,
             email='some@email.com',
-            roles=[feconf.ROLE_ID_COLLECTION_EDITOR]
+            roles=[feconf.ROLE_ID_COLLECTION_EDITOR],
         )
         user.update_timestamps()
         collection = self.create_model(
@@ -68,36 +68,40 @@ class GetCollectionOwnersEmailsJobTests(job_test_utils.JobTestBase):
             community_owned=False,
             status=constants.ACTIVITY_STATUS_PUBLIC,
             viewable_if_private=False,
-            first_published_msec=0.2
+            first_published_msec=0.2,
         )
         collection.update_timestamps()
         self.put_multi([user, collection])
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(
-                stdout=(
-                    'collection_ids: [\'col_1\'], email: [\'some@email.com\']'))
-        ])
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout=(
+                        'collection_ids: [\'col_1\'], email: [\'some@email.com\']'
+                    )
+                )
+            ]
+        )
 
     def test_counts_multiple_collection(self) -> None:
         user1 = self.create_model(
             user_models.UserSettingsModel,
             id=self.USER_ID_1,
             email='some@email.com',
-            roles=[feconf.ROLE_ID_COLLECTION_EDITOR]
+            roles=[feconf.ROLE_ID_COLLECTION_EDITOR],
         )
         user2 = self.create_model(
             user_models.UserSettingsModel,
             id=self.USER_ID_2,
             email='some2@email.com',
-            roles=[feconf.ROLE_ID_COLLECTION_EDITOR]
+            roles=[feconf.ROLE_ID_COLLECTION_EDITOR],
         )
         # Checking a user who has no collection.
         user3 = self.create_model(
             user_models.UserSettingsModel,
             id=self.USER_ID_3,
             email='some3@email.com',
-            roles=[feconf.ROLE_ID_COLLECTION_EDITOR]
+            roles=[feconf.ROLE_ID_COLLECTION_EDITOR],
         )
         user1.update_timestamps()
         user2.update_timestamps()
@@ -111,7 +115,7 @@ class GetCollectionOwnersEmailsJobTests(job_test_utils.JobTestBase):
             community_owned=False,
             status=constants.ACTIVITY_STATUS_PUBLIC,
             viewable_if_private=False,
-            first_published_msec=0.2
+            first_published_msec=0.2,
         )
         collection1.update_timestamps()
         collection2 = self.create_model(
@@ -123,29 +127,34 @@ class GetCollectionOwnersEmailsJobTests(job_test_utils.JobTestBase):
             community_owned=False,
             status=constants.ACTIVITY_STATUS_PUBLIC,
             viewable_if_private=False,
-            first_published_msec=0.2
+            first_published_msec=0.2,
         )
         collection2.update_timestamps()
         self.put_multi([user1, user2, user3, collection1, collection2])
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(
-                stdout=(
-                    'collection_ids: [\'col_1\'], email: '
-                    '[\'some@email.com\']')),
-            job_run_result.JobRunResult(
-                stdout=(
-                    'collection_ids: [\'col_1\', \'col_2\'], email: '
-                    '[\'some2@email.com\']')
-                )
-        ])
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout=(
+                        'collection_ids: [\'col_1\'], email: '
+                        '[\'some@email.com\']'
+                    )
+                ),
+                job_run_result.JobRunResult(
+                    stdout=(
+                        'collection_ids: [\'col_1\', \'col_2\'], email: '
+                        '[\'some2@email.com\']'
+                    )
+                ),
+            ]
+        )
 
 
 class MatchEntityTypeCollectionJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS: Type[
+    JOB_CLASS: Type[collection_info_jobs.MatchEntityTypeCollectionJob] = (
         collection_info_jobs.MatchEntityTypeCollectionJob
-    ] = collection_info_jobs.MatchEntityTypeCollectionJob
+    )
 
     USER_ID: Final = 'user_1'
     ENTITY_ID: Final = 'col_id_1'
@@ -176,14 +185,14 @@ class MatchEntityTypeCollectionJobTests(job_test_utils.JobTestBase):
             subject=self.SUBJECT,
             has_suggestion=self.HAS_SUGGESTION,
             summary=self.SUMMARY,
-            message_count=self.MESSAGE_COUNT
+            message_count=self.MESSAGE_COUNT,
         )
         feedback_thread_model.update_timestamps()
         feedback_thread_model.put()
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS: 1')
-        ])
+        self.assert_job_output_is(
+            [job_run_result.JobRunResult(stdout='SUCCESS: 1')]
+        )
 
     def test_match_multiple_collection(self) -> None:
         feedback_thread_model = self.create_model(
@@ -196,7 +205,7 @@ class MatchEntityTypeCollectionJobTests(job_test_utils.JobTestBase):
             subject=self.SUBJECT,
             has_suggestion=self.HAS_SUGGESTION,
             summary=self.SUMMARY,
-            message_count=self.MESSAGE_COUNT
+            message_count=self.MESSAGE_COUNT,
         )
         feedback_thread_model.update_timestamps()
         feedback_thread_model.put()
@@ -211,7 +220,7 @@ class MatchEntityTypeCollectionJobTests(job_test_utils.JobTestBase):
             subject=self.SUBJECT,
             has_suggestion=self.HAS_SUGGESTION,
             summary=self.SUMMARY,
-            message_count=self.MESSAGE_COUNT
+            message_count=self.MESSAGE_COUNT,
         )
         feedback_thread_model1.update_timestamps()
         feedback_thread_model1.put()
@@ -226,11 +235,11 @@ class MatchEntityTypeCollectionJobTests(job_test_utils.JobTestBase):
             subject=self.SUBJECT,
             has_suggestion=self.HAS_SUGGESTION,
             summary=self.SUMMARY,
-            message_count=self.MESSAGE_COUNT
+            message_count=self.MESSAGE_COUNT,
         )
         feedback_thread_model2.update_timestamps()
         feedback_thread_model2.put()
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='SUCCESS: 1')
-        ])
+        self.assert_job_output_is(
+            [job_run_result.JobRunResult(stdout='SUCCESS: 1')]
+        )

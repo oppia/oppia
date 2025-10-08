@@ -86,10 +86,12 @@ describe('Translation Submitter', function () {
       'Fractions - The Picnic Problem'
     );
     await translationSubmitter.typeTextForRTE('सामग्री 0');
-    await translationSubmitter.clickOn('Save and translate another');
+    await translationSubmitter.clickOnElementWithText(
+      'Save and translate another'
+    );
     await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE('सामग्री 1');
-    await translationSubmitter.clickOn('Save and close');
+    await translationSubmitter.clickOnElementWithText('Save and close');
     await translationSubmitter.switchToTabInContributionDashboard(
       'My Contributions'
     );

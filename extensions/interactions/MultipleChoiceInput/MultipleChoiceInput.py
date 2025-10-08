@@ -32,7 +32,8 @@ class MultipleChoiceInput(base.BaseInteraction):
 
     name: str = 'Multiple Choice'
     description: str = (
-        'Allows learners to select one of a list of multiple-choice options.')
+        'Allows learners to select one of a list of multiple-choice options.'
+    )
     display_mode: str = base.DISPLAY_MODE_INLINE
     _dependency_ids: List[str] = []
     answer_type: str = 'NonnegativeInt'
@@ -45,55 +46,54 @@ class MultipleChoiceInput(base.BaseInteraction):
     # MultipleChoiceInput interaction must contain a generic submit button.
     show_generic_submit_button: bool = True
 
-    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{
-        'name': 'choices',
-        'description': 'Multiple Choice options',
-        'schema': {
-            'type': 'list',
-            'validators': [
-                {
-                    'id': 'has_length_at_least',
-                    'min_value': 1,
+    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [
+        {
+            'name': 'choices',
+            'description': 'Multiple Choice options',
+            'schema': {
+                'type': 'list',
+                'validators': [
+                    {
+                        'id': 'has_length_at_least',
+                        'min_value': 1,
+                    },
+                    {'id': 'has_unique_subtitled_contents'},
+                ],
+                'items': {
+                    'type': 'custom',
+                    'obj_type': 'SubtitledHtml',
+                    'validators': [{'id': 'has_subtitled_html_non_empty'}],
+                    'replacement_ui_config': {
+                        'rte_component_config_id': 'ALL_COMPONENTS',
+                        'html': {
+                            'hide_complex_extensions': True,
+                            'placeholder': (
+                                'Enter an option for the learner to select'
+                            ),
+                        },
+                    },
                 },
-                {
-                    'id': 'has_unique_subtitled_contents'
-                }
-            ],
-            'items': {
-                'type': 'custom',
-                'obj_type': 'SubtitledHtml',
-                'validators': [{
-                    'id': 'has_subtitled_html_non_empty'
-                }],
-                'replacement_ui_config': {
-                    'rte_component_config_id': 'ALL_COMPONENTS',
-                    'html': {
-                        'hide_complex_extensions': True,
-                        'placeholder': (
-                            'Enter an option for the learner to select'),
-                    }
-                }
+                'ui_config': {
+                    'add_element_text': 'Add multiple choice option',
+                },
             },
-            'ui_config': {
-                'add_element_text': 'Add multiple choice option',
-            }
+            'default_value': [{'content_id': None, 'html': ''}],
         },
-        'default_value': [{
-            'content_id': None,
-            'html': ''
-        }],
-    }, {
-        'name': 'showChoicesInShuffledOrder',
-        'description': 'Shuffle answer choices',
-        'schema': {
-            'type': 'bool',
+        {
+            'name': 'showChoicesInShuffledOrder',
+            'description': 'Shuffle answer choices',
+            'schema': {
+                'type': 'bool',
+            },
+            'default_value': True,
         },
-        'default_value': True
-    }]
+    ]
 
-    _answer_visualization_specs: List[base.AnswerVisualizationSpecsDict] = [{
-        'id': 'SortedTiles',
-        'options': {'header': 'Top answers', 'use_percentages': True},
-        'calculation_id': 'AnswerFrequencies',
-        'addressed_info_is_supported': True,
-    }]
+    _answer_visualization_specs: List[base.AnswerVisualizationSpecsDict] = [
+        {
+            'id': 'SortedTiles',
+            'options': {'header': 'Top answers', 'use_percentages': True},
+            'calculation_id': 'AnswerFrequencies',
+            'addressed_info_is_supported': True,
+        }
+    ]

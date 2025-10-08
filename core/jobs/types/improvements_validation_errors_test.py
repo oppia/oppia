@@ -25,15 +25,17 @@ from core.jobs.types import (
 from core.platform import models
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import improvements_models
 
 (improvements_models,) = models.Registry.import_models(
-    [models.Names.IMPROVEMENTS])
+    [models.Names.IMPROVEMENTS]
+)
 
 
 class InvalidCompositeEntityErrorTests(
-        base_validation_errors_test.AuditErrorsTestBase):
+    base_validation_errors_test.AuditErrorsTestBase
+):
 
     def test_message(self) -> None:
         model = improvements_models.ExplorationStatsTaskEntryModel(
@@ -50,10 +52,12 @@ class InvalidCompositeEntityErrorTests(
             last_updated=self.NOW,
         )
         error = improvements_validation_errors.InvalidCompositeEntityError(
-            model)
+            model
+        )
 
         self.assertEqual(
             error.stderr,
             'InvalidCompositeEntityError in '
             'ExplorationStatsTaskEntryModel(id="23"): model '
-            'has invalid composite entity %s' % model.composite_entity_id)
+            'has invalid composite entity %s' % model.composite_entity_id,
+        )

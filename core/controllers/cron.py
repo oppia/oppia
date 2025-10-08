@@ -68,9 +68,7 @@ class CronModelsCleanupHandler(
         return self.render_json({})
 
 
-class CronUserDeletionHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class CronUserDeletionHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Handler for running the user deletion one off job."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -82,8 +80,10 @@ class CronUserDeletionHandler(
         """Handles GET requests."""
         taskqueue_services.defer(
             feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
-                'FUNCTION_ID_DELETE_USERS_PENDING_TO_BE_DELETED'],
-            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
+                'FUNCTION_ID_DELETE_USERS_PENDING_TO_BE_DELETED'
+            ],
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
+        )
         return self.render_json({})
 
 
@@ -101,8 +101,10 @@ class CronFullyCompleteUserDeletionHandler(
         """Handles GET requests."""
         taskqueue_services.defer(
             feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
-                'FUNCTION_ID_CHECK_COMPLETION_OF_USER_DELETION'],
-            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS)
+                'FUNCTION_ID_CHECK_COMPLETION_OF_USER_DELETION'
+            ],
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
+        )
         return self.render_json({})
 
 
@@ -128,27 +130,25 @@ class CronMailReviewersContributorDashboardSuggestionsHandler(
         # are reviewers to notify.
         server_can_send_emails = (
             platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.
-                SERVER_CAN_SEND_EMAILS.value
+                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
             )
         )
         if not server_can_send_emails:
             return self.render_json({})
         if not platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.
-            CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
+            platform_parameter_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
         ):
             return self.render_json({})
         reviewer_ids = user_services.get_reviewer_user_ids_to_notify()
         if not reviewer_ids:
             return self.render_json({})
 
-        reviewers_suggestion_email_infos = (
-            suggestion_services
-            .get_suggestions_waiting_for_review_info_to_notify_reviewers(
-                reviewer_ids))
+        reviewers_suggestion_email_infos = suggestion_services.get_suggestions_waiting_for_review_info_to_notify_reviewers(
+            reviewer_ids
+        )
         email_manager.send_mail_to_notify_contributor_dashboard_reviewers(
-            reviewer_ids, reviewers_suggestion_email_infos)
+            reviewer_ids, reviewers_suggestion_email_infos
+        )
         return self.render_json({})
 
 
@@ -172,46 +172,48 @@ class CronMailAdminContributorDashboardBottlenecksHandler(
         """
         server_can_send_emails = (
             platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value))
+                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+            )
+        )
         if not server_can_send_emails:
             return self.render_json({})
 
         admin_ids = user_services.get_user_ids_by_role(
-            feconf.ROLE_ID_CURRICULUM_ADMIN)
+            feconf.ROLE_ID_CURRICULUM_ADMIN
+        )
         question_admin_ids = user_services.get_user_ids_by_role(
-            feconf.ROLE_ID_QUESTION_ADMIN)
+            feconf.ROLE_ID_QUESTION_ADMIN
+        )
         translation_admin_ids = user_services.get_user_ids_by_role(
-            feconf.ROLE_ID_TRANSLATION_ADMIN)
+            feconf.ROLE_ID_TRANSLATION_ADMIN
+        )
 
         if platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.
-            ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE.value
+            platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE.value
         ):
             suggestion_types_needing_reviewers = (
-                suggestion_services
-                .get_suggestion_types_that_need_reviewers()
+                suggestion_services.get_suggestion_types_that_need_reviewers()
             )
             email_manager.send_mail_to_notify_admins_that_reviewers_are_needed(
                 admin_ids,
                 translation_admin_ids,
                 question_admin_ids,
-                suggestion_types_needing_reviewers)
+                suggestion_types_needing_reviewers,
+            )
 
         if platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.
-            ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW.value
+            platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_SUGGESTIONS_NEEDING_REVIEW.value
         ):
             info_about_suggestions_waiting_too_long_for_review = (
-                suggestion_services
-                .get_info_about_suggestions_waiting_too_long_for_review()
+                suggestion_services.get_info_about_suggestions_waiting_too_long_for_review()
             )
             (
-                email_manager
-                .send_mail_to_notify_admins_suggestions_waiting_long(
+                email_manager.send_mail_to_notify_admins_suggestions_waiting_long(
                     admin_ids,
                     translation_admin_ids,
                     question_admin_ids,
-                    info_about_suggestions_waiting_too_long_for_review)
+                    info_about_suggestions_waiting_too_long_for_review,
+                )
             )
         return self.render_json({})
 
@@ -234,27 +236,28 @@ class CronMailReviewerNewSuggestionsHandler(
         """
         server_can_send_emails = (
             platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value))
+                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+            )
+        )
         if not server_can_send_emails:
             return self.render_json({})
 
         if not platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.
-            CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
+            platform_parameter_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED.value
         ):
             return self.render_json({})
 
         new_suggestions_info = (
-            suggestion_services
-                .get_new_suggestions_for_reviewer_notifications())
+            suggestion_services.get_new_suggestions_for_reviewer_notifications()
+        )
 
         # Initialize dictionaries to organize data.
-        reviewer_ids_by_language: DefaultDict[
-            str, List[str]] = DefaultDict(list)
+        reviewer_ids_by_language: DefaultDict[str, List[str]] = DefaultDict(
+            list
+        )
         suggestions_by_language: DefaultDict[
-            str, List[
-                suggestion_registry.
-                    ReviewableSuggestionEmailInfo]] = DefaultDict(list)
+            str, List[suggestion_registry.ReviewableSuggestionEmailInfo]
+        ] = DefaultDict(list)
 
         for suggestion in new_suggestions_info:
             language_property = suggestion.language_code
@@ -262,23 +265,27 @@ class CronMailReviewerNewSuggestionsHandler(
             # Collect reviewer IDs.
             reviewer_usernames = user_services.get_contributor_usernames(
                 constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
-                language_property
+                language_property,
             )
 
             reviewer_ids = [
-                user_services.get_user_id_from_username(
-                    username) for username in reviewer_usernames]
+                user_services.get_user_id_from_username(username)
+                for username in reviewer_usernames
+            ]
             filtered_reviewer_ids = [
-                id for id in reviewer_ids if id is not None]
+                id for id in reviewer_ids if id is not None
+            ]
             reviewer_ids_by_language[language_property].extend(
-                filtered_reviewer_ids)
+                filtered_reviewer_ids
+            )
 
             # Collect suggestions.
             suggestions_by_language[language_property].append(suggestion)
 
         # Send email notifications to reviewers based on the organized data.
         email_manager.send_reviewer_notifications(
-            reviewer_ids_by_language, suggestions_by_language)
+            reviewer_ids_by_language, suggestions_by_language
+        )
 
         return self.render_json({})
 
@@ -299,7 +306,8 @@ class CronAppFeedbackReportsScrubberHandlerPage(
         before tthe date this services is called.
         """
         app_feedback_report_services.scrub_all_unscrubbed_expiring_reports(
-            feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID)
+            feconf.APP_FEEDBACK_REPORT_SCRUBBER_BOT_ID
+        )
 
 
 class CronDashboardStatsHandler(
@@ -316,7 +324,9 @@ class CronDashboardStatsHandler(
         """Handles GET requests."""
         beam_job_services.run_beam_job(
             job_class=(
-                user_stats_computation_jobs.CollectWeeklyDashboardStatsJob))
+                user_stats_computation_jobs.CollectWeeklyDashboardStatsJob
+            )
+        )
 
 
 class CronExplorationRecommendationsHandler(
@@ -333,8 +343,9 @@ class CronExplorationRecommendationsHandler(
         """Handles GET requests."""
         beam_job_services.run_beam_job(
             job_class=(
-                exp_recommendation_computation_jobs
-                .ComputeExplorationRecommendationsJob))
+                exp_recommendation_computation_jobs.ComputeExplorationRecommendationsJob
+            )
+        )
 
 
 class CronActivitySearchRankHandler(
@@ -350,7 +361,8 @@ class CronActivitySearchRankHandler(
     def get(self) -> None:
         """Handles GET requests."""
         beam_job_services.run_beam_job(
-            job_class=exp_search_indexing_jobs.IndexExplorationsInSearchJob)
+            job_class=exp_search_indexing_jobs.IndexExplorationsInSearchJob
+        )
 
 
 class CronBlogPostSearchRankHandler(
@@ -390,14 +402,19 @@ class CronMailChapterPublicationsNotificationsHandler(
         """
         server_can_send_emails = (
             platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value))
+                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+            )
+        )
         if not server_can_send_emails:
             return self.render_json({})
 
         admin_ids = user_services.get_user_ids_by_role(
-            feconf.ROLE_ID_CURRICULUM_ADMIN)
+            feconf.ROLE_ID_CURRICULUM_ADMIN
+        )
         chapter_notifications_stories_list = (
-            story_services.get_chapter_notifications_stories_list())
+            story_services.get_chapter_notifications_stories_list()
+        )
         email_manager.send_reminder_mail_to_notify_curriculum_admins(
-            admin_ids, chapter_notifications_stories_list)
+            admin_ids, chapter_notifications_stories_list
+        )
         return self.render_json({})
