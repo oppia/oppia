@@ -33,11 +33,12 @@ from core.platform import models
 from core.tests import test_utils
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import base_models, subtopic_models
 
-(base_models, subtopic_models) = models.Registry.import_models([
-    models.Names.BASE_MODEL, models.Names.SUBTOPIC])
+(base_models, subtopic_models) = models.Registry.import_models(
+    [models.Names.BASE_MODEL, models.Names.SUBTOPIC]
+)
 
 
 class StudyGuideServicesUnitTests(test_utils.GenericTestBase):
@@ -53,48 +54,61 @@ class StudyGuideServicesUnitTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.signup(
-            self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.admin_id = self.get_user_id_from_email(
-            self.CURRICULUM_ADMIN_EMAIL)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         self.TOPIC_ID = topic_fetchers.get_new_topic_id()
 
         # Create a study guide.
-        self.study_guide = (
-            study_guide_domain.StudyGuide.create_study_guide(
-                self.subtopic_id,
-                self.TOPIC_ID,
-                'heading',
-                'content'))
-        study_guide_services.save_study_guide(
-            self.user_id, self.study_guide, 'Added study guide',
-            [study_guide_domain.StudyGuideChange({
-                'cmd': study_guide_domain.CMD_CREATE_NEW,
-                'topic_id': self.TOPIC_ID,
-                'subtopic_id': self.subtopic_id
-            })]
+        self.study_guide = study_guide_domain.StudyGuide.create_study_guide(
+            self.subtopic_id, self.TOPIC_ID, 'heading', 'content'
         )
-        self.study_guide_id = (
-            study_guide_domain.StudyGuide.get_study_guide_id(
-                self.TOPIC_ID, self.subtopic_id))
+        study_guide_services.save_study_guide(
+            self.user_id,
+            self.study_guide,
+            'Added study guide',
+            [
+                study_guide_domain.StudyGuideChange(
+                    {
+                        'cmd': study_guide_domain.CMD_CREATE_NEW,
+                        'topic_id': self.TOPIC_ID,
+                        'subtopic_id': self.subtopic_id,
+                    }
+                )
+            ],
+        )
+        self.study_guide_id = study_guide_domain.StudyGuide.get_study_guide_id(
+            self.TOPIC_ID, self.subtopic_id
+        )
 
         self.TOPIC_ID_1 = topic_fetchers.get_new_topic_id()
         # Set up topic and subtopic.
         topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID_1, 'Place Values', 'abbrev', 'description', 'fragm')
+            self.TOPIC_ID_1, 'Place Values', 'abbrev', 'description', 'fragm'
+        )
         topic.thumbnail_filename = 'thumbnail.svg'
         topic.thumbnail_bg_color = '#C6DCDA'
         topic.subtopics = [
             topic_domain.Subtopic(
-                1, 'Naming Numbers', ['skill_id_1'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
-                'dummy-subtopic-url'),
+                1,
+                'Naming Numbers',
+                ['skill_id_1'],
+                'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                21131,
+                'dummy-subtopic-url',
+            ),
             topic_domain.Subtopic(
-                2, 'Subtopic Name', ['skill_id_2'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
-                'other-subtopic-url')]
+                2,
+                'Subtopic Name',
+                ['skill_id_2'],
+                'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                21131,
+                'other-subtopic-url',
+            ),
+        ]
         topic.next_subtopic_id = 3
         topic.skill_ids_for_diagnostic_test = ['skill_id_1']
         topic_services.save_new_topic(self.admin_id, topic)
@@ -103,217 +117,258 @@ class StudyGuideServicesUnitTests(test_utils.GenericTestBase):
         topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
 
     def test_get_study_guide_from_model(self) -> None:
-        current_study_guide = (
-            study_guide_services
-            .get_study_guide_by_id
-        )(
+        current_study_guide = (study_guide_services.get_study_guide_by_id)(
             self.TOPIC_ID, self.subtopic_id
         )
         study_guide_model = subtopic_models.StudyGuideModel.get(
-            self.study_guide_id)
+            self.study_guide_id
+        )
         study_guide = study_guide_services.get_study_guide_from_model(
-            study_guide_model)
+            study_guide_model
+        )
         self.assertEqual(study_guide.to_dict(), current_study_guide.to_dict())
 
     def test_get_study_guide_by_id(self) -> None:
         study_guide_1 = study_guide_services.get_study_guide_by_id(
-            self.TOPIC_ID, self.subtopic_id)
+            self.TOPIC_ID, self.subtopic_id
+        )
         self.assertEqual(study_guide_1.version, 1)
         self.assertEqual(study_guide_1.topic_id, self.TOPIC_ID)
         self.assertEqual(
             study_guide_1.get_subtopic_id_from_study_guide_id(),
-            self.subtopic_id
+            self.subtopic_id,
         )
 
         # When the study guide with the given subtopic id and topic id
         # doesn't exist.
         study_guide_2 = study_guide_services.get_study_guide_by_id(
-            'topic_id', 1, strict=False)
+            'topic_id', 1, strict=False
+        )
         self.assertEqual(study_guide_2, None)
 
     def test_get_study_guide_by_id_with_version(self) -> None:
         # Test getting study guide with specific version.
         study_guide = study_guide_services.get_study_guide_by_id(
-            self.TOPIC_ID, self.subtopic_id, version=1)
+            self.TOPIC_ID, self.subtopic_id, version=1
+        )
         self.assertEqual(study_guide.version, 1)
 
         # Test getting study guide with non-existent version.
         study_guide_none = study_guide_services.get_study_guide_by_id(
-            self.TOPIC_ID, self.subtopic_id, version=999, strict=False)
+            self.TOPIC_ID, self.subtopic_id, version=999, strict=False
+        )
         self.assertIsNone(study_guide_none)
 
     def test_get_study_guides_with_ids(self) -> None:
         subtopic_ids = [self.subtopic_id]
         study_guides = study_guide_services.get_study_guides_with_ids(
-            self.TOPIC_ID, subtopic_ids)
+            self.TOPIC_ID, subtopic_ids
+        )
         # Ruling out the possibility of None for mypy type checking.
         assert study_guides[0] is not None
-        current_study_guide = (
-            study_guide_services
-            .get_study_guide_by_id
-        )(
+        current_study_guide = (study_guide_services.get_study_guide_by_id)(
             self.TOPIC_ID, self.subtopic_id
         )
         self.assertEqual(
-            study_guides[0].to_dict(), current_study_guide.to_dict())
+            study_guides[0].to_dict(), current_study_guide.to_dict()
+        )
 
         subtopic_ids = [2]
         study_guides = study_guide_services.get_study_guides_with_ids(
-            self.TOPIC_ID, subtopic_ids)
+            self.TOPIC_ID, subtopic_ids
+        )
         self.assertEqual(study_guides, [None])
 
         subtopic_ids = [self.subtopic_id, 2]
         study_guides = study_guide_services.get_study_guides_with_ids(
-            self.TOPIC_ID, subtopic_ids)
+            self.TOPIC_ID, subtopic_ids
+        )
         expected_study_guides = [current_study_guide.to_dict(), None]
         # Ruling out the possibility of None for mypy type checking.
         assert study_guides[0] is not None
         self.assertEqual(
-            [study_guides[0].to_dict(), study_guides[1]],
-            expected_study_guides)
+            [study_guides[0].to_dict(), study_guides[1]], expected_study_guides
+        )
 
         subtopic_ids = []
         study_guides = study_guide_services.get_study_guides_with_ids(
-            self.TOPIC_ID, subtopic_ids)
+            self.TOPIC_ID, subtopic_ids
+        )
         self.assertEqual(study_guides, [])
 
         subtopic_ids = [2, 2]
         study_guides = study_guide_services.get_study_guides_with_ids(
-            self.TOPIC_ID, subtopic_ids)
+            self.TOPIC_ID, subtopic_ids
+        )
         self.assertEqual(study_guides, [None, None])
 
     def test_get_study_guide_sections_by_id(self) -> None:
-        current_study_guide = (
-            study_guide_services
-            .get_study_guide_by_id
-        )(
+        current_study_guide = (study_guide_services.get_study_guide_by_id)(
             self.TOPIC_ID, self.subtopic_id
         )
         sections = study_guide_services.get_study_guide_sections_by_id(
-            self.TOPIC_ID, self.subtopic_id)
+            self.TOPIC_ID, self.subtopic_id
+        )
         expected_sections_dicts = [
-            section.to_dict() for section in (
-                current_study_guide.sections
-            )
+            section.to_dict() for section in (current_study_guide.sections)
         ]
         actual_sections_dicts = [section.to_dict() for section in sections]
         self.assertEqual(expected_sections_dicts, actual_sections_dicts)
 
         # When the study guide doesn't exist.
         sections_none = study_guide_services.get_study_guide_sections_by_id(
-            'nonexistent_topic', 999, strict=False)
+            'nonexistent_topic', 999, strict=False
+        )
         self.assertIsNone(sections_none)
 
     def test_save_study_guide(self) -> None:
-        study_guide_1 = (
-            study_guide_domain.StudyGuide.create_study_guide(
-                1, 'topic_id_1', 'heading', 'content'))
+        study_guide_1 = study_guide_domain.StudyGuide.create_study_guide(
+            1, 'topic_id_1', 'heading', 'content'
+        )
         study_guide_services.save_study_guide(
-            self.user_id, study_guide_1, 'Added study guide',
-            [study_guide_domain.StudyGuideChange({
-                'cmd': study_guide_domain.CMD_CREATE_NEW,
-                'topic_id': 'topic_id_1',
-                'subtopic_id': 1
-            })])
+            self.user_id,
+            study_guide_1,
+            'Added study guide',
+            [
+                study_guide_domain.StudyGuideChange(
+                    {
+                        'cmd': study_guide_domain.CMD_CREATE_NEW,
+                        'topic_id': 'topic_id_1',
+                        'subtopic_id': 1,
+                    }
+                )
+            ],
+        )
 
         # Test saving with empty change list should raise exception.
         with self.assertRaisesRegex(
-            Exception, 'Unexpected error: received an invalid change list *'):
+            Exception, 'Unexpected error: received an invalid change list *'
+        ):
             study_guide_services.save_study_guide(
-                self.user_id, study_guide_1, 'Added study guide', [])
+                self.user_id, study_guide_1, 'Added study guide', []
+            )
 
-        study_guide_id_1 = (
-            study_guide_domain.StudyGuide.get_study_guide_id(
-                'topic_id_1', 1))
+        study_guide_id_1 = study_guide_domain.StudyGuide.get_study_guide_id(
+            'topic_id_1', 1
+        )
         study_guide_model_1 = subtopic_models.StudyGuideModel.get(
-            study_guide_id_1)
+            study_guide_id_1
+        )
 
         # Test version conflict - trying to update newer version from older.
         study_guide_1.version = 2
         study_guide_model_1.version = 3
         with self.assertRaisesRegex(
-            Exception,
-            'Please reload the page and try again.*'
+            Exception, 'Please reload the page and try again.*'
         ):
             study_guide_services.save_study_guide(
-                self.user_id, study_guide_1, 'Added study guide',
-                [study_guide_domain.StudyGuideChange({
-                    'cmd': study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY,
-                    'property_name': 'sections_heading',
-                    'new_value': 'new_heading',
-                    'old_value': 'sections_heading_0',
-                    'subtopic_id': self.subtopic_id
-                })])
+                self.user_id,
+                study_guide_1,
+                'Added study guide',
+                [
+                    study_guide_domain.StudyGuideChange(
+                        {
+                            'cmd': study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY,
+                            'property_name': 'sections_heading',
+                            'new_value': 'new_heading',
+                            'old_value': 'sections_heading_0',
+                            'subtopic_id': self.subtopic_id,
+                        }
+                    )
+                ],
+            )
 
         # Test version conflict - trying to update older version from newer.
         study_guide_1.version = 3
         study_guide_model_1.version = 2
         with self.assertRaisesRegex(
-            Exception, 'Unexpected error: trying to update version *'):
+            Exception, 'Unexpected error: trying to update version *'
+        ):
             study_guide_services.save_study_guide(
-                self.user_id, study_guide_1, 'Added study guide',
-                [study_guide_domain.StudyGuideChange({
-                    'cmd': study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY,
-                    'property_name': 'sections_heading',
-                    'new_value': 'new_heading',
-                    'old_value': 'sections_heading_0',
-                    'subtopic_id': self.subtopic_id
-                })])
+                self.user_id,
+                study_guide_1,
+                'Added study guide',
+                [
+                    study_guide_domain.StudyGuideChange(
+                        {
+                            'cmd': study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY,
+                            'property_name': 'sections_heading',
+                            'new_value': 'new_heading',
+                            'old_value': 'sections_heading_0',
+                            'subtopic_id': self.subtopic_id,
+                        }
+                    )
+                ],
+            )
 
     def test_delete_study_guide(self) -> None:
-        study_guide_id = (
-            study_guide_domain.StudyGuide.get_study_guide_id(
-                self.TOPIC_ID, self.subtopic_id))
+        study_guide_id = study_guide_domain.StudyGuide.get_study_guide_id(
+            self.TOPIC_ID, self.subtopic_id
+        )
         study_guide_services.delete_study_guide(
-            self.user_id, self.TOPIC_ID, self.subtopic_id)
+            self.user_id, self.TOPIC_ID, self.subtopic_id
+        )
 
         with self.assertRaisesRegex(
             base_models.BaseModel.EntityNotFoundError,
             re.escape(
-                'Entity for class StudyGuideModel with id %s not found' % (
-                    study_guide_id))):
+                'Entity for class StudyGuideModel with id %s not found'
+                % (study_guide_id)
+            ),
+        ):
             subtopic_models.StudyGuideModel.get(study_guide_id)
 
         # Test deleting non-existent study guide.
         with self.assertRaisesRegex(
             base_models.BaseModel.EntityNotFoundError,
             re.escape(
-                'Entity for class StudyGuideModel with id %s not found' % (
-                    study_guide_id))):
+                'Entity for class StudyGuideModel with id %s not found'
+                % (study_guide_id)
+            ),
+        ):
             study_guide_services.delete_study_guide(
-                self.user_id, self.TOPIC_ID, self.subtopic_id)
+                self.user_id, self.TOPIC_ID, self.subtopic_id
+            )
 
     def test_delete_study_guide_with_force_deletion(self) -> None:
         # Create a new study guide for force deletion test.
-        study_guide_temp = (
-            study_guide_domain.StudyGuide.create_study_guide(
-                2, 'temp_topic', 'heading', 'content'))
+        study_guide_temp = study_guide_domain.StudyGuide.create_study_guide(
+            2, 'temp_topic', 'heading', 'content'
+        )
         study_guide_services.save_study_guide(
-            self.user_id, study_guide_temp, 'Added temp study guide',
-            [study_guide_domain.StudyGuideChange({
-                'cmd': study_guide_domain.CMD_CREATE_NEW,
-                'topic_id': 'temp_topic',
-                'subtopic_id': 2
-            })])
+            self.user_id,
+            study_guide_temp,
+            'Added temp study guide',
+            [
+                study_guide_domain.StudyGuideChange(
+                    {
+                        'cmd': study_guide_domain.CMD_CREATE_NEW,
+                        'topic_id': 'temp_topic',
+                        'subtopic_id': 2,
+                    }
+                )
+            ],
+        )
 
         study_guide_services.delete_study_guide(
-            self.user_id, 'temp_topic', 2, force_deletion=True)
+            self.user_id, 'temp_topic', 2, force_deletion=True
+        )
 
-        study_guide_id = (
-            study_guide_domain.StudyGuide.get_study_guide_id(
-                'temp_topic', 2))
+        study_guide_id = study_guide_domain.StudyGuide.get_study_guide_id(
+            'temp_topic', 2
+        )
         with self.assertRaisesRegex(
             base_models.BaseModel.EntityNotFoundError,
             re.escape(
-                'Entity for class StudyGuideModel with id %s not found' % (
-                    study_guide_id))):
+                'Entity for class StudyGuideModel with id %s not found'
+                % (study_guide_id)
+            ),
+        ):
             subtopic_models.StudyGuideModel.get(study_guide_id)
 
     def test_get_topic_ids_from_study_guide_ids(self) -> None:
-        topic_ids = (
-            study_guide_services.get_topic_ids_from_study_guide_ids(
-                ['topic1:subtopic1', 'topic2:subtopic2', 'topic1:subtopic3']
-            )
+        topic_ids = study_guide_services.get_topic_ids_from_study_guide_ids(
+            ['topic1:subtopic1', 'topic2:subtopic2', 'topic1:subtopic3']
         )
         self.assertEqual(topic_ids, ['topic1', 'topic2'])
 
@@ -328,10 +383,8 @@ class StudyGuideServicesUnitTests(test_utils.GenericTestBase):
         )
 
         study_guide_id = '{}:{}'.format(self.TOPIC_ID_1, 1)
-        progress = (
-            study_guide_services.get_multi_users_study_guides_progress(
-                [learner_id_1, learner_id_2], [study_guide_id]
-            )
+        progress = study_guide_services.get_multi_users_study_guides_progress(
+            [learner_id_1, learner_id_2], [study_guide_id]
         )
 
         learner_1_progress = progress[learner_id_1]
@@ -356,22 +409,24 @@ class StudyGuideServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_learner_group_syllabus_study_guide_summaries(self) -> None:
         study_guide_id = '{}:{}'.format(self.TOPIC_ID_1, 1)
-        expected_summaries = [{
-            'subtopic_id': 1,
-            'subtopic_title': 'Naming Numbers',
-            'parent_topic_id': self.TOPIC_ID_1,
-            'parent_topic_name': 'Place Values',
-            'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color':
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
-            'subtopic_mastery': None,
-            'parent_topic_url_fragment': 'abbrev',
-            'classroom_url_fragment': None
-        }]
-        summaries = (
-            study_guide_services
-                .get_learner_group_syllabus_study_guide_summaries(
-                    [study_guide_id]))
+        expected_summaries = [
+            {
+                'subtopic_id': 1,
+                'subtopic_title': 'Naming Numbers',
+                'parent_topic_id': self.TOPIC_ID_1,
+                'parent_topic_name': 'Place Values',
+                'thumbnail_filename': 'image.svg',
+                'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                    'subtopic'
+                ][0],
+                'subtopic_mastery': None,
+                'parent_topic_url_fragment': 'abbrev',
+                'classroom_url_fragment': None,
+            }
+        ]
+        summaries = study_guide_services.get_learner_group_syllabus_study_guide_summaries(
+            [study_guide_id]
+        )
         self.assertEqual(summaries, expected_summaries)
 
     def test_populate_study_guide_model_fields(self) -> None:
@@ -381,13 +436,15 @@ class StudyGuideServicesUnitTests(test_utils.GenericTestBase):
             sections=[],
             sections_schema_version=1,
             language_code='en',
-            next_content_id_index=0
+            next_content_id_index=0,
         )
         study_guide = study_guide_services.get_study_guide_by_id(
-            self.TOPIC_ID, self.subtopic_id)
+            self.TOPIC_ID, self.subtopic_id
+        )
         populated_model = (
             study_guide_services.populate_study_guide_model_fields(
-                model, study_guide)
+                model, study_guide
+            )
         )
 
         self.assertEqual(populated_model.topic_id, study_guide.topic_id)
@@ -397,15 +454,15 @@ class StudyGuideServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(populated_model.sections, expected_sections)
         self.assertEqual(
             populated_model.sections_schema_version,
-            study_guide.sections_schema_version
+            study_guide.sections_schema_version,
         )
         self.assertEqual(
-            populated_model.language_code,
-            study_guide.language_code
+            populated_model.language_code, study_guide.language_code
         )
 
     def test_get_multi_users_study_guides_progress_with_multiple_skills(
-            self) -> None:
+        self,
+    ) -> None:
         """Test progress calculation with multiple skills per subtopic."""
         learner_id = 'test_learner'
 
@@ -415,10 +472,7 @@ class StudyGuideServicesUnitTests(test_utils.GenericTestBase):
 
         # Second subtopic has skill_id_2.
         study_guide_id = '{}:{}'.format(self.TOPIC_ID_1, 2)
-        progress = (
-            study_guide_services
-            .get_multi_users_study_guides_progress
-        )(
+        progress = (study_guide_services.get_multi_users_study_guides_progress)(
             [learner_id], [study_guide_id]
         )
 
@@ -441,19 +495,27 @@ class StudyGuideServicesUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(learner_progress[0]['subtopic_mastery'])
 
     def test_get_learner_group_syllabus_study_guide_summaries_multiple_topics(
-            self) -> None:
+        self,
+    ) -> None:
         """Test getting summaries for study guides from multiple topics."""
         # Create another topic.
         topic_id_2 = topic_fetchers.get_new_topic_id()
         topic_2 = topic_domain.Topic.create_default_topic(
-            topic_id_2, 'Another Topic', 'another', 'description', 'frag2')
+            topic_id_2, 'Another Topic', 'another', 'description', 'frag2'
+        )
         topic_2.thumbnail_filename = 'thumbnail.svg'
         topic_2.thumbnail_bg_color = '#C6DCDA'
         topic_2.subtopics = [
             topic_domain.Subtopic(
-                1, 'Another Subtopic', ['skill_id_3'], 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
-                'another-subtopic-url')]
+                1,
+                'Another Subtopic',
+                ['skill_id_3'],
+                'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                21131,
+                'another-subtopic-url',
+            )
+        ]
         topic_2.next_subtopic_id = 2
         topic_2.skill_ids_for_diagnostic_test = ['skill_id_3']
         topic_services.save_new_topic(self.admin_id, topic_2)
@@ -461,12 +523,11 @@ class StudyGuideServicesUnitTests(test_utils.GenericTestBase):
 
         study_guide_ids = [
             '{}:{}'.format(self.TOPIC_ID_1, 1),
-            '{}:{}'.format(topic_id_2, 1)
+            '{}:{}'.format(topic_id_2, 1),
         ]
-        summaries = (
-            study_guide_services
-                .get_learner_group_syllabus_study_guide_summaries(
-                    study_guide_ids))
+        summaries = study_guide_services.get_learner_group_syllabus_study_guide_summaries(
+            study_guide_ids
+        )
 
         self.assertEqual(len(summaries), 2)
         # Verify both topics are represented.
@@ -478,45 +539,52 @@ class StudyGuideServicesUnitTests(test_utils.GenericTestBase):
         """Test that commit log entries are created properly."""
         study_guide_commit_log_entry = (
             subtopic_models.StudyGuideCommitLogEntryModel.get_commit(
-                self.study_guide_id, 1)
+                self.study_guide_id, 1
+            )
         )
         # Ruling out the possibility of None for mypy type checking.
         assert study_guide_commit_log_entry is not None
         self.assertEqual(study_guide_commit_log_entry.commit_type, 'create')
         self.assertEqual(
-            study_guide_commit_log_entry.study_guide_id,
-            self.study_guide_id)
+            study_guide_commit_log_entry.study_guide_id, self.study_guide_id
+        )
         self.assertEqual(study_guide_commit_log_entry.user_id, self.user_id)
 
     def test_get_study_guide_sections_by_id_with_strict_mode(self) -> None:
-        """Test getting study guide sections with strict mode 
-            enabled/disabled.
+        """Test getting study guide sections with strict mode
+        enabled/disabled.
         """
         # Test with strict=True (default) - should not raise exception
         # for existing guide.
         sections = study_guide_services.get_study_guide_sections_by_id(
-            self.TOPIC_ID, self.subtopic_id, strict=True)
+            self.TOPIC_ID, self.subtopic_id, strict=True
+        )
         self.assertIsNotNone(sections)
 
         # Test with strict=False for non-existent guide.
         sections_none = study_guide_services.get_study_guide_sections_by_id(
-            'nonexistent', 999, strict=False)
+            'nonexistent', 999, strict=False
+        )
         self.assertIsNone(sections_none)
 
     def test_does_study_guide_model_exist_returns_true_for_existing_guide(
-            self) -> None:
+        self,
+    ) -> None:
         """Test that the function returns True for an
-            existing study guide.
+        existing study guide.
         """
         result = study_guide_services.does_study_guide_model_exist(
-            self.TOPIC_ID, self.subtopic_id)
+            self.TOPIC_ID, self.subtopic_id
+        )
         self.assertTrue(result)
 
     def test_does_study_guide_model_exist_returns_false_for_nonexistent_guide(
-            self) -> None:
+        self,
+    ) -> None:
         """Test that the function returns False for a non-existent
-            study guide.
+        study guide.
         """
         result = study_guide_services.does_study_guide_model_exist(
-            'nonexistent_topic_id', 999)
+            'nonexistent_topic_id', 999
+        )
         self.assertFalse(result)

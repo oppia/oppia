@@ -35,7 +35,8 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
 
     @contextlib.contextmanager
     def sys_real_prefix_context(
-        self, new_value: str,
+        self,
+        new_value: str,
     ) -> Generator[None, None, None]:
         """Create a context manager to temporarily set sys.real_prefix.
 
@@ -57,58 +58,65 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
                 # code, then had_attribute is True, which means that we did set
                 # `original` above.
                 setattr(
-                    sys, 'real_prefix', original # pylint: disable=used-before-assignment
+                    sys,
+                    'real_prefix',
+                    original,  # pylint: disable=used-before-assignment
                 )
             else:
                 delattr(sys, 'real_prefix')
 
     def test_check_python_env_is_suitable_passes_when_in_venv(self) -> None:
         prefix_swap = self.swap(
-            sys, 'prefix', '/home/user/.pyenv/versions/3.7.10')
+            sys, 'prefix', '/home/user/.pyenv/versions/3.7.10'
+        )
         base_prefix_swap = self.swap(
-            sys, 'base_prefix', '/home/user/.pyenv/versions/oppia')
+            sys, 'base_prefix', '/home/user/.pyenv/versions/oppia'
+        )
         real_prefix_manager = self.sys_real_prefix_context('')
         environ_swap = self.swap(os, 'environ', {})
         with prefix_swap, base_prefix_swap, real_prefix_manager, environ_swap:
             install_python_dev_dependencies.check_python_env_is_suitable()
 
     def test_check_python_env_is_suitable_passes_when_in_venv_real_prefix(
-        self
+        self,
     ) -> None:
         prefix_swap = self.swap(
-            sys, 'prefix', '/home/user/.pyenv/versions/3.7.10')
+            sys, 'prefix', '/home/user/.pyenv/versions/3.7.10'
+        )
         base_prefix_swap = self.swap(
-            sys, 'base_prefix', '/home/user/.pyenv/versions/3.7.10')
+            sys, 'base_prefix', '/home/user/.pyenv/versions/3.7.10'
+        )
         real_prefix_manager = self.sys_real_prefix_context(
-            '/home/user/.pyenv/versions/oppia')
+            '/home/user/.pyenv/versions/oppia'
+        )
         environ_swap = self.swap(os, 'environ', {})
         with prefix_swap, base_prefix_swap, real_prefix_manager, environ_swap:
             install_python_dev_dependencies.check_python_env_is_suitable()
 
     def test_check_python_env_is_suitable_fails_when_out_of_venv(self) -> None:
         prefix_swap = self.swap(
-            sys, 'prefix', '/home/user/.pyenv/versions/3.7.10')
+            sys, 'prefix', '/home/user/.pyenv/versions/3.7.10'
+        )
         base_prefix_swap = self.swap(
-            sys, 'base_prefix', '/home/user/.pyenv/versions/3.7.10')
+            sys, 'base_prefix', '/home/user/.pyenv/versions/3.7.10'
+        )
         real_prefix_manager = self.sys_real_prefix_context('')
         environ_swap = self.swap(os, 'environ', {})
-        expected_error = (
-            'Oppia must be developed within a virtual environment.')
-        with self.assertRaisesRegex(
-            AssertionError, expected_error
-        ):
+        expected_error = 'Oppia must be developed within a virtual environment.'
+        with self.assertRaisesRegex(AssertionError, expected_error):
             with prefix_swap, base_prefix_swap, real_prefix_manager:
                 with environ_swap:
                     (
-                        install_python_dev_dependencies
-                        .check_python_env_is_suitable()
+                        install_python_dev_dependencies.check_python_env_is_suitable()
                     )
 
     def test_check_python_env_is_suitable_passes_when_on_ci(self) -> None:
         prefix_swap = self.swap(
-            sys, 'prefix', '/home/user/.pyenv/versions/3.7.10')
+            sys, 'prefix', '/home/user/.pyenv/versions/3.7.10'
+        )
         base_prefix_swap = self.swap(
-            sys, 'base_prefix', '/home/user/.pyenv/versions/3.7.10')
+            sys, 'base_prefix', '/home/user/.pyenv/versions/3.7.10'
+        )
         real_prefix_manager = self.sys_real_prefix_context('')
         environ_swap = self.swap(os, 'environ', {'GITHUB_ACTION': '1'})
         with prefix_swap, base_prefix_swap, real_prefix_manager, environ_swap:
@@ -123,18 +131,28 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
         installed_tools: Dict[str, str] = {}
 
         process = subprocess.Popen(
-            ['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            ['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        )
+
         def mock_popen(  # pylint: disable=unused-argument
-            cmd_tokens: List[str], stdout: int, stdin: Optional[int] = None,
-            stderr: Optional[int] = None
+            cmd_tokens: List[str],
+            stdout: int,
+            stdin: Optional[int] = None,
+            stderr: Optional[int] = None,
         ) -> subprocess.Popen[bytes]:
             if len(cmd_tokens) > 3 and cmd_tokens[3] == 'install':
                 package, version = cmd_tokens[4].split('==')
                 installed_tools[package] = version
-                self.assertEqual(cmd_tokens, [
-                    sys.executable, '-m', 'pip', 'install',
-                    f'{package}=={version}',
-                ])
+                self.assertEqual(
+                    cmd_tokens,
+                    [
+                        sys.executable,
+                        '-m',
+                        'pip',
+                        'install',
+                        f'{package}=={version}',
+                    ],
+                )
             return process
 
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
@@ -146,19 +164,28 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
 
     def test_install_dev_dependencies(self) -> None:
 
-        def mock_run(*_args: str, **_kwargs: str) -> None:  # pylint: disable=unused-argument
+        def mock_run(
+            *_args: str, **_kwargs: str
+        ) -> None:  # pylint: disable=unused-argument
             pass
 
         run_swap = self.swap_with_checks(
-            subprocess, 'run', mock_run, expected_args=[
+            subprocess,
+            'run',
+            mock_run,
+            expected_args=[
                 (
-                    ['pip-sync', 'requirements_dev.txt',
-                    '--pip-args', '--require-hashes --no-deps'],
+                    [
+                        'pip-sync',
+                        'requirements_dev.txt',
+                        '--pip-args',
+                        '--require-hashes --no-deps',
+                    ],
                 ),
             ],
             expected_kwargs=[
                 {'check': True, 'encoding': 'utf-8'},
-            ]
+            ],
         )
 
         with run_swap:
@@ -166,16 +193,21 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
 
     def test_uninstall_dev_dependencies(self) -> None:
 
-        def mock_run(*_args: str, **_kwargs: str) -> None:  # pylint: disable=unused-argument
+        def mock_run(
+            *_args: str, **_kwargs: str
+        ) -> None:  # pylint: disable=unused-argument
             pass
 
         run_swap = self.swap_with_checks(
-            subprocess, 'run', mock_run, expected_args=[
+            subprocess,
+            'run',
+            mock_run,
+            expected_args=[
                 (['pip', 'uninstall', '-r', 'requirements_dev.txt', '-y'],),
             ],
             expected_kwargs=[
                 {'check': True, 'encoding': 'utf-8'},
-            ]
+            ],
         )
 
         with run_swap:
@@ -183,28 +215,43 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
 
     def test_compile_pip_requirements_no_change(self) -> None:
 
-        def mock_run(*_args: str, **_kwargs: str) -> None:  # pylint: disable=unused-argument
+        def mock_run(
+            *_args: str, **_kwargs: str
+        ) -> None:  # pylint: disable=unused-argument
             pass
 
         def mock_open(*_args: str, **_kwargs: str) -> io.StringIO:
             return io.StringIO(
-                '#    pip-compile --generate-hashes\nmock file contents')
+                '#    pip-compile --generate-hashes\nmock file contents'
+            )
 
         run_swap = self.swap_with_checks(
-            subprocess, 'run', mock_run, expected_args=[
-                ([
-                    'pip-compile', '--no-emit-index-url', '--quiet',
-                    '--strip-extras', '--generate-hashes',
-                    'requirements_dev.in',
-                    '--output-file', 'requirements_dev.txt',
-                ],),
+            subprocess,
+            'run',
+            mock_run,
+            expected_args=[
+                (
+                    [
+                        'pip-compile',
+                        '--no-emit-index-url',
+                        '--quiet',
+                        '--strip-extras',
+                        '--generate-hashes',
+                        'requirements_dev.in',
+                        '--output-file',
+                        'requirements_dev.txt',
+                    ],
+                ),
             ],
             expected_kwargs=[
                 {'check': True, 'encoding': 'utf-8'},
-            ]
+            ],
         )
         open_swap = self.swap_with_checks(
-            builtins, 'open', mock_open, expected_args=[
+            builtins,
+            'open',
+            mock_open,
+            expected_args=[
                 ('requirements_dev.txt', 'r'),
                 ('requirements_dev.txt', 'r'),
             ],
@@ -215,14 +262,16 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
         )
 
         with run_swap, open_swap:
-            change = (
-                install_python_dev_dependencies.compile_pip_requirements(
-                    'requirements_dev.in', 'requirements_dev.txt'))
+            change = install_python_dev_dependencies.compile_pip_requirements(
+                'requirements_dev.in', 'requirements_dev.txt'
+            )
         self.assertFalse(change)
 
     def test_compile_pip_requirements_change(self) -> None:
 
-        def mock_run(*_args: str, **_kwargs: str) -> None:  # pylint: disable=unused-argument
+        def mock_run(
+            *_args: str, **_kwargs: str
+        ) -> None:  # pylint: disable=unused-argument
             pass
 
         counter = []
@@ -230,23 +279,36 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
         def mock_open(*_args: str, **_kwargs: str) -> io.StringIO:
             counter.append(1)
             return io.StringIO(
-                f'#    pip-compile --generate-hashes\nmock file {len(counter)}')
+                f'#    pip-compile --generate-hashes\nmock file {len(counter)}'
+            )
 
         run_swap = self.swap_with_checks(
-            subprocess, 'run', mock_run, expected_args=[
-                ([
-                    'pip-compile', '--no-emit-index-url', '--quiet',
-                    '--strip-extras', '--generate-hashes',
-                    'requirements_dev.in',
-                    '--output-file', 'requirements_dev.txt',
-                ],),
+            subprocess,
+            'run',
+            mock_run,
+            expected_args=[
+                (
+                    [
+                        'pip-compile',
+                        '--no-emit-index-url',
+                        '--quiet',
+                        '--strip-extras',
+                        '--generate-hashes',
+                        'requirements_dev.in',
+                        '--output-file',
+                        'requirements_dev.txt',
+                    ],
+                ),
             ],
             expected_kwargs=[
                 {'check': True, 'encoding': 'utf-8'},
-            ]
+            ],
         )
         open_swap = self.swap_with_checks(
-            builtins, 'open', mock_open, expected_args=[
+            builtins,
+            'open',
+            mock_open,
+            expected_args=[
                 ('requirements_dev.txt', 'r'),
                 ('requirements_dev.txt', 'r'),
             ],
@@ -257,9 +319,9 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
         )
 
         with run_swap, open_swap:
-            change = (
-                install_python_dev_dependencies.compile_pip_requirements(
-                    'requirements_dev.in', 'requirements_dev.txt'))
+            change = install_python_dev_dependencies.compile_pip_requirements(
+                'requirements_dev.in', 'requirements_dev.txt'
+            )
         self.assertTrue(change)
 
     def test_main_passes_with_no_assert_and_no_change(self) -> None:
@@ -270,17 +332,25 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             return False
 
         assert_swap = self.swap_with_checks(
-            install_python_dev_dependencies, 'check_python_env_is_suitable',
-            mock_func)
+            install_python_dev_dependencies,
+            'check_python_env_is_suitable',
+            mock_func,
+        )
         install_tools_swap = self.swap_with_checks(
             install_python_dev_dependencies,
-            'install_installation_tools', mock_func)
+            'install_installation_tools',
+            mock_func,
+        )
         compile_swap = self.swap_with_checks(
             install_python_dev_dependencies,
-            'compile_pip_requirements', mock_compile)
+            'compile_pip_requirements',
+            mock_compile,
+        )
         install_dependencies_swap = self.swap_with_checks(
             install_python_dev_dependencies,
-            'install_dev_dependencies', mock_func)
+            'install_dev_dependencies',
+            mock_func,
+        )
 
         with assert_swap, install_tools_swap, compile_swap:
             with install_dependencies_swap:
@@ -291,17 +361,25 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             return False
 
         assert_swap = self.swap_with_checks(
-            install_python_dev_dependencies, 'check_python_env_is_suitable',
-            lambda: None)
+            install_python_dev_dependencies,
+            'check_python_env_is_suitable',
+            lambda: None,
+        )
         install_tools_swap = self.swap_with_checks(
             install_python_dev_dependencies,
-            'install_installation_tools', lambda: None)
+            'install_installation_tools',
+            lambda: None,
+        )
         compile_swap = self.swap_with_checks(
             install_python_dev_dependencies,
-            'compile_pip_requirements', mock_compile)
+            'compile_pip_requirements',
+            mock_compile,
+        )
         uninstall_dependencies_swap = self.swap_with_checks(
             install_python_dev_dependencies,
-            'uninstall_dev_dependencies', lambda: None)
+            'uninstall_dev_dependencies',
+            lambda: None,
+        )
 
         with assert_swap, install_tools_swap, compile_swap:
             with uninstall_dependencies_swap:
@@ -315,22 +393,29 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             return False
 
         assert_swap = self.swap_with_checks(
-            install_python_dev_dependencies, 'check_python_env_is_suitable',
-            mock_func)
+            install_python_dev_dependencies,
+            'check_python_env_is_suitable',
+            mock_func,
+        )
         install_tools_swap = self.swap_with_checks(
             install_python_dev_dependencies,
-            'install_installation_tools', mock_func)
+            'install_installation_tools',
+            mock_func,
+        )
         compile_swap = self.swap_with_checks(
             install_python_dev_dependencies,
-            'compile_pip_requirements', mock_compile)
+            'compile_pip_requirements',
+            mock_compile,
+        )
         install_dependencies_swap = self.swap_with_checks(
             install_python_dev_dependencies,
-            'install_dev_dependencies', mock_func)
+            'install_dev_dependencies',
+            mock_func,
+        )
 
         with assert_swap, install_tools_swap, compile_swap:
             with install_dependencies_swap:
-                install_python_dev_dependencies.main(
-                    ['--assert_compiled'])
+                install_python_dev_dependencies.main(['--assert_compiled'])
 
     def test_main_passes_with_no_assert_and_change(self) -> None:
         def mock_func() -> None:
@@ -340,17 +425,25 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             return True
 
         assert_swap = self.swap_with_checks(
-            install_python_dev_dependencies, 'check_python_env_is_suitable',
-            mock_func)
+            install_python_dev_dependencies,
+            'check_python_env_is_suitable',
+            mock_func,
+        )
         install_tools_swap = self.swap_with_checks(
             install_python_dev_dependencies,
-            'install_installation_tools', mock_func)
+            'install_installation_tools',
+            mock_func,
+        )
         compile_swap = self.swap_with_checks(
             install_python_dev_dependencies,
-            'compile_pip_requirements', mock_compile)
+            'compile_pip_requirements',
+            mock_compile,
+        )
         install_dependencies_swap = self.swap_with_checks(
             install_python_dev_dependencies,
-            'install_dev_dependencies', mock_func)
+            'install_dev_dependencies',
+            mock_func,
+        )
 
         with assert_swap, install_tools_swap, compile_swap:
             with install_dependencies_swap:
@@ -364,25 +457,32 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             return True
 
         assert_swap = self.swap_with_checks(
-            install_python_dev_dependencies, 'check_python_env_is_suitable',
-            mock_func)
+            install_python_dev_dependencies,
+            'check_python_env_is_suitable',
+            mock_func,
+        )
         install_tools_swap = self.swap_with_checks(
             install_python_dev_dependencies,
-            'install_installation_tools', mock_func)
+            'install_installation_tools',
+            mock_func,
+        )
         compile_swap = self.swap_with_checks(
             install_python_dev_dependencies,
-            'compile_pip_requirements', mock_compile)
+            'compile_pip_requirements',
+            mock_compile,
+        )
         install_dependencies_swap = self.swap_with_checks(
             install_python_dev_dependencies,
-            'install_dev_dependencies', mock_func)
+            'install_dev_dependencies',
+            mock_func,
+        )
 
         error_regex = (
             'The Python development requirements file '
-            'requirements_dev.txt was changed')
+            'requirements_dev.txt was changed'
+        )
 
         with assert_swap, install_tools_swap, compile_swap:
             with install_dependencies_swap:
-                with self.assertRaisesRegex(
-                        RuntimeError, error_regex):
-                    install_python_dev_dependencies.main(
-                        ['--assert_compiled'])
+                with self.assertRaisesRegex(RuntimeError, error_regex):
+                    install_python_dev_dependencies.main(['--assert_compiled'])

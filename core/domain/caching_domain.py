@@ -33,7 +33,7 @@ class MemoryCacheStats:
         self,
         total_allocated_in_bytes: int,
         peak_memory_usage_in_bytes: int,
-        total_number_of_keys_stored: int
+        total_number_of_keys_stored: int,
     ) -> None:
         """Initializes a Memory Cache Stats domain object.
 

@@ -30,10 +30,20 @@ from core.constants import constants
 # These are linked to the ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES
 # constants in constants.ts.
 VALID_INTERACTION_IDS = [
-    'AlgebraicExpressionInput', 'Continue', 'DragAndDropSortInput',
-    'EndExploration', 'FractionInput', 'ImageClickInput', 'ItemSelectionInput',
-    'MathEquationInput', 'MultipleChoiceInput', 'NumericExpressionInput',
-    'NumericInput', 'NumberWithUnits', 'RatioExpressionInput', 'TextInput'
+    'AlgebraicExpressionInput',
+    'Continue',
+    'DragAndDropSortInput',
+    'EndExploration',
+    'FractionInput',
+    'ImageClickInput',
+    'ItemSelectionInput',
+    'MathEquationInput',
+    'MultipleChoiceInput',
+    'NumericExpressionInput',
+    'NumericInput',
+    'NumberWithUnits',
+    'RatioExpressionInput',
+    'TextInput',
 ]
 
 # This is linked to SUPPORTED_CONTENT_LANGUAGES_FOR_ANDROID in constants.ts.
@@ -59,10 +69,12 @@ MAX_CHARS_IN_MISCONCEPTION_NAME = 100
 
 # The URL that Android feedback reports are sent to.
 INCOMING_ANDROID_FEEDBACK_REPORT_URL = (
-    '/appfeedbackreporthandler/incoming_android_report')
+    '/appfeedbackreporthandler/incoming_android_report'
+)
 
 # Constants used to validate Android message request headers.
 ANDROID_API_KEY = ''
 ANDROID_APP_PACKAGE_NAME = 'org.oppia.android'
 APP_VERSION_WITH_HASH_REGEXP = re.compile(
-    constants.PLATFORM_PARAMETER_APP_VERSION_WITH_HASH_REGEXP)
+    constants.PLATFORM_PARAMETER_APP_VERSION_WITH_HASH_REGEXP
+)

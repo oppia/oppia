@@ -178,7 +178,7 @@ describe('Translation Reviewer', function () {
     await translationReviewer.clickOnElementWithText('Edit');
     // TODO(#23250): RTE not usable. Once the issue is fixed, uncomment the following line.
     // await translationReviewer.typeTextForRTE('Review comment');
-    await translationReviewer.clickOnElementWithText('Update');
+    await translationReviewer.clickOnUpdateTranslationButton();
     await translationReviewer.submitTranslationReview(
       'accept',
       'I have added some changes.'

@@ -44,8 +44,9 @@ def parse_json_from_ts(ts_file_contents: str) -> Dict[str, Any]:
     json_end = text_without_comments.rindex('}') + 1
     # Here we use type Any because 'json_dict' is a generic JSON object and
     # generic JSON objects are of type Dict[str, Any].
-    json_dict: Dict[str, Any] = (
-        json.loads(text_without_comments[json_start:json_end]))
+    json_dict: Dict[str, Any] = json.loads(
+        text_without_comments[json_start:json_end]
+    )
     return json_dict
 
 
@@ -159,10 +160,13 @@ class Constants(dict):  # type: ignore[type-arg]
         self.__dict__ = d
 
 
-constants = Constants(parse_json_from_ts(  # pylint:disable=invalid-name
-    get_package_file_contents('assets', 'constants.ts')))
+constants = Constants(
+    parse_json_from_ts(  # pylint:disable=invalid-name
+        get_package_file_contents('assets', 'constants.ts')
+    )
+)
 
 
-release_constants = Constants( # pylint:disable=invalid-name
+release_constants = Constants(  # pylint:disable=invalid-name
     json.loads(get_package_file_contents('assets', 'release_constants.json'))
 )
