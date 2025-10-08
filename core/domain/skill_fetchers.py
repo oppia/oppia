@@ -24,7 +24,7 @@ from core import feconf
 from core.domain import caching_services, skill_domain
 from core.platform import models
 
-from typing import List, Literal, Optional, overload
+from typing import List, Literal, Optional, Tuple, overload
 
 MYPY = False
 if MYPY:  # pragma: no cover

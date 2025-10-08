@@ -21,6 +21,7 @@ from __future__ import annotations
 import copy
 
 from core import feconf
+from core.constants import constants
 from core.domain import question_domain, state_domain
 from core.platform import models
 

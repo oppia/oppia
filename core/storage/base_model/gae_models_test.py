@@ -34,6 +34,7 @@ if MYPY:  # pragma: no cover
     from mypy_imports import base_models, datastore_services
 
 (base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
+datastore_services = models.Registry.import_datastore_services()
 
 
 class BaseModelUnitTests(test_utils.GenericTestBase):
@@ -465,6 +466,8 @@ class TestVersionedModel(base_models.VersionedModel):
     SNAPSHOT_METADATA_CLASS = TestSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = TestSnapshotContentModel
     COMMIT_LOG_ENTRY_CLASS = TestCommitLogEntryModel
+    # Field to seed some content into different versions.
+    description = datastore_services.StringProperty(indexed=True)
 
 
 class BaseCommitLogEntryModelTests(test_utils.GenericTestBase):
