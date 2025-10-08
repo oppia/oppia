@@ -50,7 +50,7 @@ export class VoiceoverSubmitter extends BaseUser {
 
     // Play the voiceover.
     await this.expectElementToBeVisible(voiceoverPlayIconSelector);
-    await this.clickOn(voiceoverPlayPauseBtnSelector);
+    await this.clickOnElementWithSelector(voiceoverPlayPauseBtnSelector);
 
     // Wait for the voiceover to finish playing.
     await this.page.waitForFunction(
@@ -68,7 +68,7 @@ export class VoiceoverSubmitter extends BaseUser {
 
     // Stop the voiceover.
     await this.expectElementToBeVisible(voiceoverPauseIconSelector);
-    await this.clickOn(voiceoverPlayPauseBtnSelector);
+    await this.clickOnElementWithSelector(voiceoverPlayPauseBtnSelector);
     await this.expectElementToBeVisible(voiceoverPlayIconSelector);
   }
 
@@ -91,7 +91,7 @@ export class VoiceoverSubmitter extends BaseUser {
    */
   async deleteVoiceoverInCurrentCard(): Promise<void> {
     await this.expectElementToBeVisible(deleteVoiceoverBtnSelector);
-    await this.clickOn(deleteVoiceoverBtnSelector);
+    await this.clickOnElementWithSelector(deleteVoiceoverBtnSelector);
     await this.clickButtonInModal(
       'Are you sure you want to remove this voiceover?',
       'confirm'
@@ -103,7 +103,7 @@ export class VoiceoverSubmitter extends BaseUser {
    */
   async clickOnAddManualVoiceoverButton(): Promise<void> {
     await this.expectElementToBeVisible(addManualVoiceoverBtnSelector);
-    await this.clickOn(addManualVoiceoverBtnSelector);
+    await this.clickOnElementWithSelector(addManualVoiceoverBtnSelector);
     await this.expectModalTitleToBe('Add Voiceover');
   }
 
@@ -112,7 +112,7 @@ export class VoiceoverSubmitter extends BaseUser {
    */
   async clickOnSaveUploadVoiceoverButton(): Promise<void> {
     await this.expectElementToBeVisible(saveUploadedAudioBtnSelector);
-    await this.clickOn(saveUploadedAudioBtnSelector);
+    await this.clickOnElementWithSelector(saveUploadedAudioBtnSelector);
     await this.expectElementToBeClickable(saveUploadedAudioBtnSelector, false);
   }
 
@@ -125,7 +125,7 @@ export class VoiceoverSubmitter extends BaseUser {
       `${audioStatusUpdateBtnSelector}${audioNeedsUpdateIconSelector}`
     );
 
-    await this.clickOn(audioStatusUpdateBtnSelector);
+    await this.clickOnElementWithSelector(audioStatusUpdateBtnSelector);
 
     await this.expectElementToBeVisible(
       `${audioStatusUpdateBtnSelector}${audioNeedsUpdateIconSelector}`,

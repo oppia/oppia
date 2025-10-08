@@ -53,7 +53,7 @@ export class Moderator extends BaseUser {
    */
   async navigateToFeaturedActivitiesTab(): Promise<void> {
     await this.expectElementToBeVisible(featuredActivitiesTab);
-    await this.clickOn(featuredActivitiesTab);
+    await this.clickOnElementWithSelector(featuredActivitiesTab);
     await this.expectElementToBeVisible(featuredActivitiesHeaderSelector);
   }
 
@@ -415,7 +415,7 @@ export class Moderator extends BaseUser {
       {},
       explorationID
     );
-    await this.clickAndWaitForNavigation(` ${explorationID} ` as string);
+    await this.clickAndWaitForNavigation(explorationID as string);
 
     await this.expectElementToBeVisible(
       explorationFeedbackTabContainerSelector
@@ -427,7 +427,7 @@ export class Moderator extends BaseUser {
    */
   async navigateToRecentFeedbackMessagesTab(): Promise<void> {
     await this.expectElementToBeVisible(feedbackMessagesTab);
-    await this.clickOn(feedbackMessagesTab);
+    await this.clickOnElementWithSelector(feedbackMessagesTab);
 
     await this.expectElementToBeVisible(feedbackMessagesHeaderSelector);
   }
@@ -441,7 +441,7 @@ export class Moderator extends BaseUser {
     explorationId: string | null,
     activityIndex: number = 0
   ): Promise<void> {
-    await this.clickOn('Add element');
+    await this.clickOnElementWithText('Add element');
 
     await this.page.waitForSelector(explorationIDField);
     const explorationIdFieldElement = await this.page.$$(explorationIDField);
@@ -460,7 +460,7 @@ export class Moderator extends BaseUser {
       explorationId as string
     );
 
-    await this.clickOn('Save Featured Activities');
+    await this.clickOnElementWithText('Save Featured Activities');
 
     expect(
       (await this.isElementVisible(toastMessageSelector, true, 5000)) ||
@@ -503,7 +503,7 @@ export class Moderator extends BaseUser {
     await this.waitForElementToBeClickable(deleteButton);
     await deleteButton.click();
 
-    await this.clickOn(' Save Featured Activities ');
+    await this.clickOnElementWithText(' Save Featured Activities ');
 
     // Check if either success or warning toast message is visible.
     if (

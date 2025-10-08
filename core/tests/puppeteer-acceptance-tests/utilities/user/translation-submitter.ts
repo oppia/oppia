@@ -75,7 +75,7 @@ export class TranslationSubmitter extends BaseUser {
       opportunityItemHeadingSelector,
       el => el.textContent
     );
-    await this.clickOn(selector);
+    await this.clickOnElementWithSelector(selector);
 
     await this.page.waitForFunction(
       (selector: string, preClickFirstHeading: string) => {
@@ -109,7 +109,7 @@ export class TranslationSubmitter extends BaseUser {
     }, textToTranslateContainerSelector);
 
     await this.expectElementToBeVisible(skipTranslationButtonSelector);
-    await this.clickOn(skipTranslationButtonSelector);
+    await this.clickOnElementWithSelector(skipTranslationButtonSelector);
 
     // Verify that the text to translate container is updated.
     await this.page.waitForFunction(
@@ -129,7 +129,7 @@ export class TranslationSubmitter extends BaseUser {
   async clickOnDiscardChangesButton(): Promise<void> {
     await this.expectElementToBeVisible(discardChangeButton);
     await this.waitForElementToStabilize(discardChangeButton);
-    await this.clickOn(discardChangeButton);
+    await this.clickOnElementWithSelector(discardChangeButton);
     await this.expectElementToBeVisible(discardChangeButton, false);
   }
 
@@ -176,7 +176,7 @@ export class TranslationSubmitter extends BaseUser {
    */
   async closeTranslateTextModal(): Promise<void> {
     await this.expectElementToBeVisible(closeModalButtonSelector);
-    await this.clickOn(closeModalButtonSelector);
+    await this.clickOnElementWithSelector(closeModalButtonSelector);
 
     // Verify that the modal is closed.
     await this.expectElementToBeVisible(
@@ -211,7 +211,7 @@ export class TranslationSubmitter extends BaseUser {
 
     // Click on the image.
     await this.expectElementToBeVisible(imageSelector);
-    await this.clickOn(imageSelector);
+    await this.clickOnElementWithSelector(imageSelector);
 
     // Add a caption to the image.
     await this.expectElementToBeVisible(textInputSelector);
@@ -244,7 +244,7 @@ export class TranslationSubmitter extends BaseUser {
   async clickOnSaveButtonInCustomizeRTEModal(): Promise<void> {
     await this.expectElementToBeVisible(saveRTECustomizationButtonSelector);
     await this.waitForElementToStabilize(saveRTECustomizationButtonSelector);
-    await this.clickOn(saveRTECustomizationButtonSelector);
+    await this.clickOnElementWithSelector(saveRTECustomizationButtonSelector);
     await this.expectElementToBeVisible(
       saveRTECustomizationButtonSelector,
       false
@@ -308,7 +308,7 @@ export class TranslationSubmitter extends BaseUser {
   async searchAndSelectSkillInRTE(skillName: string): Promise<void> {
     const skillSearchElement = await this.page.$(skillNameInput);
     await skillSearchElement?.type(skillName);
-    await this.clickOn(skillItemInRTESelector);
+    await this.clickOnElementWithSelector(skillItemInRTESelector);
     await this.page.keyboard.press('Enter');
   }
 
@@ -318,7 +318,7 @@ export class TranslationSubmitter extends BaseUser {
    */
   async selectSubjectInTranslateTextTab(subject: string): Promise<void> {
     await this.expectElementToBeVisible(topicSelector);
-    await this.clickOn(topicSelector);
+    await this.clickOnElementWithSelector(topicSelector);
 
     // Find the subject option in the dropdown.
     let subjectOption: ElementHandle<Element> | null = null;
@@ -353,7 +353,7 @@ export class TranslationSubmitter extends BaseUser {
       mode === 'On' ? 'Off' : 'On'
     );
 
-    await this.clickOn(copyButtonSelector);
+    await this.clickOnElementWithSelector(copyButtonSelector);
     await this.expectTextContentToBe(
       copyButtonSelector,
       mode === 'On' ? 'On' : 'Off'
@@ -378,7 +378,7 @@ export class TranslationSubmitter extends BaseUser {
       5000
     );
     if (!isRTEFocused) {
-      await this.clickOn(rteEditorBodySelector);
+      await this.clickOnElementWithSelector(rteEditorBodySelector);
     }
 
     // Type the text in the RTE editor.
@@ -512,7 +512,7 @@ export class TranslationSubmitter extends BaseUser {
    */
   async selectSkillInConceptCard(skill: string): Promise<void> {
     await this.typeInInputField(skillNameInput, skill);
-    await this.clickOn(skillItemInRTESelector);
+    await this.clickOnElementWithSelector(skillItemInRTESelector);
     await this.expectTextContentToContain(
       `${selectedSkillSelector} label`,
       skill

@@ -58,24 +58,26 @@ class BaseValueGenerator:
         Returns:
             str. The HTML template corresponding to the class.
         """
-        return utils.get_file_contents(os.path.join(
-            os.getcwd(), feconf.VALUE_GENERATORS_DIR, 'templates',
-            '%s.component.html' % cls.__name__))
+        return utils.get_file_contents(
+            os.path.join(
+                os.getcwd(),
+                feconf.VALUE_GENERATORS_DIR,
+                'templates',
+                '%s.component.html' % cls.__name__,
+            )
+        )
 
     # Here we use type Any because child classes of BaseValueGenerator can use
     # the 'generate_value' function with different types of arguments, 'args',
     # 'kwargs' and return type are set to 'Any'.
-    def generate_value(
-        self,
-        *args: Any,
-        **kwargs: Any
-    ) -> Any:
+    def generate_value(self, *args: Any, **kwargs: Any) -> Any:
         """Generates a new value, using the given customization args.
 
         The first arg should be context_params.
         """
         raise NotImplementedError(
-            'generate_value() method has not yet been implemented')
+            'generate_value() method has not yet been implemented'
+        )
 
 
 class Registry:

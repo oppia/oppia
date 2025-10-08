@@ -24,12 +24,12 @@ from core.platform import models
 from typing import Dict, Final, Optional
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import base_models, datastore_services, user_models
 
-base_models, user_models = models.Registry.import_models([
-    models.Names.BASE_MODEL, models.Names.USER
-])
+base_models, user_models = models.Registry.import_models(
+    [models.Names.BASE_MODEL, models.Names.USER]
+)
 datastore_services = models.Registry.import_datastore_services()
 
 ONLY_FIREBASE_SEED_MODEL_ID: Final = '1'
@@ -50,8 +50,9 @@ class UserAuthDetailsModel(base_models.BaseModel):
     # None for full users. Required for profiles because gae_id/firebase_auth_id
     # attribute is None for them, hence this attribute stores their association
     # with a full user who do have a gae_id/firebase_auth_id.
-    parent_user_id = (
-        datastore_services.StringProperty(indexed=True, default=None))
+    parent_user_id = datastore_services.StringProperty(
+        indexed=True, default=None
+    )
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -61,8 +62,9 @@ class UserAuthDetailsModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.DELETE_AT_END
 
     @staticmethod
-    def get_model_association_to_user(
-    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
         """Currently, the model holds authentication details relevant only for
         backend. Currently the only relevant user data is the username of the
         parent.
@@ -74,9 +76,7 @@ class UserAuthDetailsModel(base_models.BaseModel):
         """We do not want to export the internal user id for the parent, so we
         export the username instead.
         """
-        return {
-            'parent_user_id': 'parent_username'
-        }
+        return {'parent_user_id': 'parent_username'}
 
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
@@ -85,11 +85,14 @@ class UserAuthDetailsModel(base_models.BaseModel):
         backend, and no exportable user data. It may contain user data in the
         future.
         """
-        return dict(super(cls, cls).get_export_policy(), **{
-            'gae_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'firebase_auth_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'parent_user_id': base_models.EXPORT_POLICY.EXPORTED
-        })
+        return dict(
+            super(cls, cls).get_export_policy(),
+            **{
+                'gae_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'firebase_auth_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'parent_user_id': base_models.EXPORT_POLICY.EXPORTED,
+            },
+        )
 
     @classmethod
     def export_data(cls, user_id: str) -> Dict[str, str]:
@@ -97,7 +100,8 @@ class UserAuthDetailsModel(base_models.BaseModel):
         user_auth_model = cls.get(user_id, strict=False)
         if user_auth_model and user_auth_model.parent_user_id:
             parent_model = user_models.UserSettingsModel.get(
-                user_auth_model.parent_user_id)
+                user_auth_model.parent_user_id
+            )
             parent_username = parent_model.username
             return {'parent_username': parent_username}
         else:
@@ -165,8 +169,9 @@ class UserIdentifiersModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.DELETE_AT_END
 
     @staticmethod
-    def get_model_association_to_user(
-    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
         """Currently, the model holds identifiers relevant only for backend that
         should not be exported.
         """
@@ -179,9 +184,10 @@ class UserIdentifiersModel(base_models.BaseModel):
         backend, and no exportable user data. It may contain user data in the
         future.
         """
-        return dict(super(cls, cls).get_export_policy(), **{
-            'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
-        })
+        return dict(
+            super(cls, cls).get_export_policy(),
+            **{'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE},
+        )
 
     @classmethod
     def apply_deletion_policy(cls, user_id: str) -> None:
@@ -246,8 +252,9 @@ class UserIdByFirebaseAuthIdModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.DELETE_AT_END
 
     @staticmethod
-    def get_model_association_to_user(
-    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
         """Currently, the model holds IDs relevant only for backend that should
         not be exported.
         """
@@ -262,7 +269,8 @@ class UserIdByFirebaseAuthIdModel(base_models.BaseModel):
         """
         return dict(
             super(UserIdByFirebaseAuthIdModel, cls).get_export_policy(),
-            **{'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE})
+            **{'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE},
+        )
 
     @classmethod
     def apply_deletion_policy(cls, user_id: str) -> None:
@@ -312,8 +320,9 @@ class FirebaseSeedModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.KEEP
 
     @staticmethod
-    def get_model_association_to_user(
-    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
         """Model does not correspond to any users."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -339,15 +348,16 @@ class CsrfSecretModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user(
-    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
-            'oppia_csrf_secret':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE
-        })
+        return dict(
+            super(cls, cls).get_export_policy(),
+            **{'oppia_csrf_secret': base_models.EXPORT_POLICY.NOT_APPLICABLE},
+        )

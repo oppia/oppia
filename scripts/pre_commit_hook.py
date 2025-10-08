@@ -61,20 +61,33 @@ from typing import (  # pylint: disable=wrong-import-position
 FECONF_FILEPATH: Final = os.path.join('core', 'feconf.py')
 CONSTANTS_FILEPATH: Final = os.path.join('.', 'assets', 'constants.ts')
 RELEASE_CONSTANTS_FILEPATH: Final = os.path.join(
-    '.', 'assets', 'release_constants.json')
+    '.', 'assets', 'release_constants.json'
+)
 KEYS_UPDATED_IN_FECONF: Final = [
     b'ADMIN_EMAIL_ADDRESS',
-    b'SYSTEM_EMAIL_ADDRESS', b'NOREPLY_EMAIL_ADDRESS',
-    b'SERVER_CAN_SEND_EMAILS', b'CAN_SEND_TRANSACTIONAL_EMAILS',
-    b'EMAIL_SERVICE_PROVIDER', b'SYSTEM_EMAIL_NAME', b'MAILGUN_DOMAIN_NAME'
+    b'SYSTEM_EMAIL_ADDRESS',
+    b'NOREPLY_EMAIL_ADDRESS',
+    b'SERVER_CAN_SEND_EMAILS',
+    b'CAN_SEND_TRANSACTIONAL_EMAILS',
+    b'EMAIL_SERVICE_PROVIDER',
+    b'SYSTEM_EMAIL_NAME',
+    b'MAILGUN_DOMAIN_NAME',
 ]
 KEYS_UPDATED_IN_CONSTANTS: Final = [
-    b'SITE_FEEDBACK_FORM_URL', b'FIREBASE_CONFIG_API_KEY',
-    b'FIREBASE_CONFIG_APP_ID', b'FIREBASE_CONFIG_AUTH_DOMAIN',
-    b'FIREBASE_CONFIG_MESSAGING_SENDER_ID', b'FIREBASE_CONFIG_PROJECT_ID',
-    b'FIREBASE_CONFIG_STORAGE_BUCKET', b'FIREBASE_CONFIG_GOOGLE_CLIENT_ID']
-NPX_CMD: Final = 'npx' if feconf.OPPIA_IS_DOCKERIZED else os.path.join(
-    os.pardir, 'oppia_tools', 'node-16.13.0', 'bin', 'npx')
+    b'SITE_FEEDBACK_FORM_URL',
+    b'FIREBASE_CONFIG_API_KEY',
+    b'FIREBASE_CONFIG_APP_ID',
+    b'FIREBASE_CONFIG_AUTH_DOMAIN',
+    b'FIREBASE_CONFIG_MESSAGING_SENDER_ID',
+    b'FIREBASE_CONFIG_PROJECT_ID',
+    b'FIREBASE_CONFIG_STORAGE_BUCKET',
+    b'FIREBASE_CONFIG_GOOGLE_CLIENT_ID',
+]
+NPX_CMD: Final = (
+    'npx'
+    if feconf.OPPIA_IS_DOCKERIZED
+    else os.path.join(os.pardir, 'oppia_tools', 'node-16.13.0', 'bin', 'npx')
+)
 
 
 def install_hook() -> None:
@@ -118,8 +131,7 @@ def install_hook() -> None:
 
 def start_subprocess_for_result(cmd: List[str]) -> Tuple[bytes, bytes]:
     """Starts subprocess and returns (stdout, stderr)."""
-    task = subprocess.Popen(
-        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    task = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = task.communicate()
     return out, err
 
@@ -172,11 +184,13 @@ def check_changes(filetype: str) -> bool:
     else:
         return True
 
-    diff_output = subprocess.check_output([
-        'git', 'diff', filepath])[:-1].split(b'\n')
+    diff_output = subprocess.check_output(['git', 'diff', filepath])[:-1].split(
+        b'\n'
+    )
     for line in diff_output:
         if (line.startswith(b'-') or line.startswith(b'+')) and any(
-                key in line for key in keys_to_check):
+            key in line for key in keys_to_check
+        ):
             return False
     return True
 
@@ -190,17 +204,19 @@ def check_changes_in_config() -> None:
     """
     if not check_changes('feconf'):
         raise Exception(
-            'Changes to %s made for deployment cannot be committed.' % (
-                FECONF_FILEPATH))
+            'Changes to %s made for deployment cannot be committed.'
+            % (FECONF_FILEPATH)
+        )
 
     if not check_changes('constants'):
         raise Exception(
-            'Changes to %s made for deployment cannot be committed.' % (
-                CONSTANTS_FILEPATH))
+            'Changes to %s made for deployment cannot be committed.'
+            % (CONSTANTS_FILEPATH)
+        )
 
 
-def run_prettier() -> None:
-    """Runs prettier formatter."""
+def run_formatters() -> None:
+    """Runs prettier and black formatters."""
     subprocess.run([NPX_CMD, 'lint-staged'], check=True)
 
 
@@ -210,8 +226,11 @@ def main(args: Optional[List[str]] = None) -> None:
     """
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '--install', action='store_true', default=False,
-        help='Install pre_commit_hook to the .git/hooks dir')
+        '--install',
+        action='store_true',
+        default=False,
+        help='Install pre_commit_hook to the .git/hooks dir',
+    )
     parsed_args = parser.parse_args(args=args)
     if parsed_args.install:
         install_hook()
@@ -221,7 +240,8 @@ def main(args: Optional[List[str]] = None) -> None:
     check_changes_in_config()
     print('Running pre-commit check for package-lock.json ...')
     if does_diff_include_package_lock_file() and (
-            does_current_folder_contain_have_package_lock_file()):
+        does_current_folder_contain_have_package_lock_file()
+    ):
         # The following message is necessary since there git commit aborts
         # quietly when the status is non-zero.
         print('-----------COMMIT ABORTED-----------')
@@ -232,13 +252,13 @@ def main(args: Optional[List[str]] = None) -> None:
             'on how to use yarn, see https://yarnpkg.com/en/docs/usage.'
         )
         sys.exit(1)
-    print('Running prettier ...')
-    run_prettier()
+    print('Running the code formatters: Prettier and Black')
+    run_formatters()
 
     return
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
 # it will only be called when pre_commit_hook.py is used as a script.
-if __name__ == '__main__': # pragma: no cover
+if __name__ == '__main__':  # pragma: no cover
     main()

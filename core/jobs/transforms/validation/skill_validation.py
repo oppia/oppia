@@ -27,7 +27,7 @@ from core.platform import models
 from typing import Optional, Type
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import skill_models
 
 (skill_models,) = models.Registry.import_models([models.Names.SKILL])
@@ -42,7 +42,8 @@ class ValidateSkillSnapshotMetadataModel(
     """Overrides _get_change_domain_class for SkillSnapshotMetadataModel."""
 
     def _get_change_domain_class(
-        self, unused_input_model: skill_models.SkillSnapshotMetadataModel  # pylint: disable=unused-argument
+        self,
+        unused_input_model: skill_models.SkillSnapshotMetadataModel,  # pylint: disable=unused-argument
     ) -> Type[skill_domain.SkillChange]:
         """Returns a change domain class.
 
