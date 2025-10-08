@@ -1055,20 +1055,20 @@ class TopicEditorTests(
 
         # Test if the corresponding subtopic pages were created.
         json_response = self.get_json(
-            '%s/%s/%s' % (
-                feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
-                self.topic_id, 1))
-        self.assertEqual({
-            'subtitled_html': {
-                'html': '<p><strong>new heading</strong></p>\n'
-+                             '\n'
-+                             '<p>New Data</p>',
-                'content_id': 'content'
-            },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {
-                    'content': {}
-                }
+            '%s/%s/%s'
+            % (feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX, self.topic_id, 1)
+        )
+        self.assertEqual(
+            {
+                'subtitled_html': {
+                    'html': '<p><strong>new heading</strong></p>\n\n'
+                    + '<p>New Data</p>',
+                    'content_id': 'content',
+                },
+                'recorded_voiceovers': {'voiceovers_mapping': {'content': {}}},
+                'written_translations': {
+                    'translations_mapping': {'content': {}}
+                },
             },
             json_response['subtopic_page']['page_contents'],
         )

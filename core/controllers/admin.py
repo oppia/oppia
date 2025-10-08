@@ -3266,9 +3266,7 @@ class GenerateStudyGuideModelsHandler(
     """Handler to generate study guide models for all subtopic pages."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
-        'POST': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
 
     @acl_decorators.can_access_admin_page
     def post(self) -> None:
@@ -3277,10 +3275,13 @@ class GenerateStudyGuideModelsHandler(
         # Fetched topics are sorted only to make the backend tests pass.
         topics = sorted(
             topic_fetchers.get_all_topics(),
-            key=operator.attrgetter('created_on'))
+            key=operator.attrgetter('created_on'),
+        )
 
         for topic in topics:
-            study_guide_services.generate_study_guide_models(topic.id, topic.subtopics)
+            study_guide_services.generate_study_guide_models(
+                topic.id, topic.subtopics
+            )
 
         self.render_json({})
 
@@ -3291,9 +3292,7 @@ class DeleteStudyGuideModelsHandler(
     """Handler to delete all study guide models."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
-        'DELETE': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'DELETE': {}}
 
     @acl_decorators.can_access_admin_page
     def delete(self) -> None:
@@ -3302,10 +3301,13 @@ class DeleteStudyGuideModelsHandler(
         # Fetched topics are sorted only to make the backend tests pass.
         topics = sorted(
             topic_fetchers.get_all_topics(),
-            key=operator.attrgetter('created_on'))
+            key=operator.attrgetter('created_on'),
+        )
 
         for topic in topics:
-            study_guide_services.delete_study_guide_models(topic.id, topic.subtopics)
+            study_guide_services.delete_study_guide_models(
+                topic.id, topic.subtopics
+            )
 
         self.render_json({})
 
@@ -3317,27 +3319,29 @@ class VerifyStudyGuideModelsHandler(
     corresponding snapshot and commitlog models."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.can_access_admin_page
     def get(self) -> None:
         """Verifies all study guide models have the correct snapshot and
-        commitlog models."""
+        commitlog models.
+        """
 
         # Fetched topics are sorted only to make the backend tests pass.
         topics = sorted(
             topic_fetchers.get_all_topics(),
-            key=operator.attrgetter('created_on'))
-        
+            key=operator.attrgetter('created_on'),
+        )
+
         issues = []
         for topic in topics:
-            issues.append(study_guide_services.verify_study_guide_models(topic.id, topic.subtopics))
+            issues.append(
+                study_guide_services.verify_study_guide_models(
+                    topic.id, topic.subtopics
+                )
+            )
 
-        self.render_json({
-            'issues': issues
-        })
+        self.render_json({'issues': issues})
 
 
 class TranslationCoordinatorRoleHandlerNormalizedPayloadDict(TypedDict):
