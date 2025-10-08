@@ -23,7 +23,6 @@ from core.domain import (
     question_domain,
     question_fetchers,
     question_services,
-    skill_services,
     translation_domain,
     user_services,
 )

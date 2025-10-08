@@ -21,7 +21,7 @@ from __future__ import annotations
 from core import feconf, utils
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence, TypedDict
+from typing import Dict, Optional, Sequence
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -30,15 +30,6 @@ if MYPY:  # pragma: no cover
 (base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 datastore_services = models.Registry.import_datastore_services()
-
-
-class EntityTranslationReferenceDict(TypedDict):
-    """Dictionary representing the reference to an entity translation model."""
-
-    entity_type: feconf.TranslatableEntityType
-    entity_id: str
-    entity_version: int
-    language_code: str
 
 
 class EntityTranslationsModel(base_models.BaseModel):

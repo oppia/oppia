@@ -36,7 +36,7 @@ from core.domain import (
 )
 from core.platform import models
 
-from typing import Dict, List, Literal, Optional, Sequence, Tuple, overload
+from typing import Dict, List, Literal, Optional, Sequence, overload
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -548,7 +548,7 @@ def get_multiple_explorations_by_id(
 
 
 def get_multiple_explorations_by_ids_and_version(
-    exp_ids_and_versions: List[Tuple[str, Optional[int]]],
+    exp_ids_and_versions: List[Tuple[str, Optional[int]]], s
 ) -> List[Optional[exp_domain.Exploration]]:
     """Returns a list of explorations matching the IDs and versions provided.
 

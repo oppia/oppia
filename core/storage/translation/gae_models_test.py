@@ -22,8 +22,6 @@ from core import feconf
 from core.platform import models
 from core.tests import test_utils
 
-from typing import List
-
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import base_models, translation_models
