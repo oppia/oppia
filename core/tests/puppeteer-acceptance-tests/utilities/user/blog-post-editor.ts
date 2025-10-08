@@ -92,7 +92,7 @@ export class BlogPostEditor extends BaseUser {
    */
   async closePreviewModal(): Promise<void> {
     await this.expectElementToBeVisible(closePreivewModalButtonSelector);
-    await this.clickOn(closePreivewModalButtonSelector);
+    await this.clickOnElementWithSelector(closePreivewModalButtonSelector);
     await this.expectElementToBeVisible(closePreivewModalButtonSelector, false);
   }
 
@@ -101,7 +101,7 @@ export class BlogPostEditor extends BaseUser {
    */
   async previewBlogPost(): Promise<void> {
     await this.expectElementToBeVisible(previewBlogPostButtonSelector);
-    await this.clickOn(previewBlogPostButtonSelector);
+    await this.clickOnElementWithSelector(previewBlogPostButtonSelector);
     await this.expectModalTitleToBe('Blog Card Preview');
   }
 
@@ -150,13 +150,13 @@ export class BlogPostEditor extends BaseUser {
    */
   async clickOnUpdateUsernameIcon(): Promise<void> {
     await this.expectElementToBeVisible(updateUsernameIconSelector);
-    await this.clickOn(updateUsernameIconSelector);
+    await this.clickOnElementWithSelector(updateUsernameIconSelector);
     await this.expectModalTitleToBe('Add your Author Name and Biography:');
   }
 
   async clickOnUpdateBioIcon(): Promise<void> {
     await this.expectElementToBeVisible(updateBioIconSelector);
-    await this.clickOn(updateBioIconSelector);
+    await this.clickOnElementWithSelector(updateBioIconSelector);
     await this.expectModalTitleToBe('Add your Author Name and Biography:');
   }
 
@@ -165,7 +165,7 @@ export class BlogPostEditor extends BaseUser {
    */
   async clickOnSaveProfileButton(): Promise<void> {
     await this.expectElementToBeVisible(authorBioSaveButton);
-    await this.clickOn(authorBioSaveButton);
+    await this.clickOnElementWithSelector(authorBioSaveButton);
     await this.expectElementToBeVisible(authorBioSaveButton, false);
   }
 
@@ -243,7 +243,7 @@ export class BlogPostEditor extends BaseUser {
     draftBlogPostTitle: string
   ): Promise<void> {
     await this.addUserBioInBlogDashboard();
-    await this.clickOn(newBlogPostButtonSelector);
+    await this.clickOnElementWithSelector(newBlogPostButtonSelector);
     await this.updateBlogPostTitle(draftBlogPostTitle);
     await this.updateBodyTextTo('test blog post body content');
     await this.saveBlogBodyChanges();
@@ -262,7 +262,7 @@ export class BlogPostEditor extends BaseUser {
     draftBlogPostTitle: string
   ): Promise<void> {
     await this.addUserBioInBlogDashboard();
-    await this.clickOn(newBlogPostButtonSelector);
+    await this.clickOnElementWithSelector(newBlogPostButtonSelector);
     await this.updateBlogPostTitle(draftBlogPostTitle);
     await this.updateBodyTextTo('test blog post body content');
   }
@@ -291,7 +291,7 @@ export class BlogPostEditor extends BaseUser {
    */
   async clickOnDismissPasteErrorButton(): Promise<void> {
     await this.page.waitForSelector(pasteErrorBox, {visible: true});
-    await this.clickOn(dismissPasteErrorButton);
+    await this.clickOnElementWithSelector(dismissPasteErrorButton);
     await this.page.waitForSelector(pasteErrorBox, {hidden: true});
   }
 
@@ -303,7 +303,7 @@ export class BlogPostEditor extends BaseUser {
    */
   async clickOnPasteValidComponentsButton(textPasted: string): Promise<void> {
     await this.page.waitForSelector(pasteErrorBox, {visible: true});
-    await this.clickOn(pasteValidComponentsButton);
+    await this.clickOnElementWithSelector(pasteValidComponentsButton);
     await this.page.waitForSelector(pasteErrorBox, {hidden: true});
     try {
       const isTextPresent = await this.isTextPresentOnPage(textPasted);
@@ -327,7 +327,7 @@ export class BlogPostEditor extends BaseUser {
    */
   async clickOnCancelPasteButton(): Promise<void> {
     await this.page.waitForSelector(pasteErrorBox, {visible: true});
-    await this.clickOn(cancelPasteButton);
+    await this.clickOnElementWithSelector(cancelPasteButton);
     await this.page.waitForSelector(pasteErrorBox, {hidden: true});
   }
 
@@ -361,7 +361,7 @@ export class BlogPostEditor extends BaseUser {
           element => (element as HTMLElement).click()
         );
 
-        await this.clickOn(editBlogPostBtnSelector);
+        await this.clickOnElementWithSelector(editBlogPostBtnSelector);
         return;
       }
     }
@@ -389,7 +389,7 @@ export class BlogPostEditor extends BaseUser {
           '.e2e-test-blog-post-edit-box',
           element => (element as HTMLElement).click()
         );
-        await this.clickOn(LABEL_FOR_DELETE_BUTTON);
+        await this.clickOnElementWithText(LABEL_FOR_DELETE_BUTTON);
         await this.expectModalTitleToBe('DELETE BLOG POST');
         await this.expectModalBodyToContain(
           'This action is irreversible and will permanently delete the blog post. Are you sure?'
@@ -397,7 +397,7 @@ export class BlogPostEditor extends BaseUser {
         await this.doWithinModal({
           selector: 'div.modal-dialog',
           whenOpened: async (_this: BaseUser, container: string) => {
-            _this.clickOn(confirmButtonSelector);
+            _this.clickOnElementWithSelector(confirmButtonSelector);
           },
         });
 
@@ -443,7 +443,7 @@ export class BlogPostEditor extends BaseUser {
     }
 
     await this.expectElementToBeVisible(thumbnailPhotoBox);
-    await this.clickOn(thumbnailPhotoBox);
+    await this.clickOnElementWithSelector(thumbnailPhotoBox);
     await this.expectModalTitleToBe('Add a thumbnail');
   }
 
@@ -463,15 +463,15 @@ export class BlogPostEditor extends BaseUser {
   ): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.uploadFile(imagePath);
-      await this.clickOn(addThumbnailImageButton);
+      await this.clickOnElementWithSelector(addThumbnailImageButton);
 
       await this.expectElementToBeVisible(addThumbnailImageButton, false);
     } else {
       await this.expectElementToBeVisible(thumbnailPhotoBox);
-      await this.clickOn(thumbnailPhotoBox);
+      await this.clickOnElementWithSelector(thumbnailPhotoBox);
       await this.uploadFile(imagePath);
       await this.waitForElementToStabilize(addThumbnailImageButton);
-      await this.clickOn(addThumbnailImageButton);
+      await this.clickOnElementWithSelector(addThumbnailImageButton);
       await this.page.waitForSelector('body.modal-open', {hidden: true});
     }
   }
@@ -501,7 +501,7 @@ export class BlogPostEditor extends BaseUser {
    */
   async openBlogEditorPage(): Promise<void> {
     await this.addUserBioInBlogDashboard();
-    await this.clickOn(newBlogPostButtonSelector);
+    await this.clickOnElementWithSelector(newBlogPostButtonSelector);
     await this.expectPublishButtonToBeDisabled();
   }
 
@@ -531,7 +531,7 @@ export class BlogPostEditor extends BaseUser {
   async updateBodyTextTo(newBodyText: string): Promise<void> {
     if (!(await this.isElementVisible(blogBodyInput))) {
       await this.expectElementToBeVisible(editBlogSelector);
-      await this.clickOn(editBlogSelector);
+      await this.clickOnElementWithSelector(editBlogSelector);
     }
     await this.expectElementToBeVisible(blogBodyInput);
     await this.clearAllTextFrom(blogBodyInput);
@@ -546,7 +546,7 @@ export class BlogPostEditor extends BaseUser {
    */
   async saveBlogBodyChanges(skipVerification: boolean = false): Promise<void> {
     await this.expectElementToBeVisible(blogBodySaveButtonSelector);
-    await this.clickOn(blogBodySaveButtonSelector);
+    await this.clickOnElementWithSelector(blogBodySaveButtonSelector);
     if (!skipVerification) {
       await this.expectElementToBeVisible(blogBodySaveButtonSelector, false);
     }
@@ -565,7 +565,7 @@ export class BlogPostEditor extends BaseUser {
       !(await this.isElementVisible(blogBodyInput))
     ) {
       await this.expectElementToBeVisible(editBlogSelector);
-      await this.clickOn(editBlogSelector);
+      await this.clickOnElementWithSelector(editBlogSelector);
     }
     await this.expectElementToBeVisible(tagSelector);
     const tagElements = await this.page.$$(tagSelector);
@@ -597,7 +597,7 @@ export class BlogPostEditor extends BaseUser {
    */
   async saveTheDraftBlogPost(): Promise<void> {
     await this.expectElementToBeVisible(saveDraftButtonSelector);
-    await this.clickOn(saveDraftButtonSelector);
+    await this.clickOnElementWithSelector(saveDraftButtonSelector);
 
     await this.page.waitForFunction(
       (selector: string) => {
@@ -613,9 +613,10 @@ export class BlogPostEditor extends BaseUser {
    * This function publishes the blog post.
    */
   async publishTheBlogPost(): Promise<void> {
-    await this.clickOn('PUBLISH');
+    await this.clickOnElementWithText('PUBLISH');
+    await this.expectElementToBeVisible(confirmButtonSelector);
     await this.waitForElementToStabilize(confirmButtonSelector);
-    await this.clickOn(confirmButtonSelector);
+    await this.clickOnElementWithSelector(confirmButtonSelector);
     await this.expectElementToBeVisible(confirmButtonSelector, false);
     showMessage('Successfully published a blog post!');
   }
@@ -624,7 +625,7 @@ export class BlogPostEditor extends BaseUser {
    * This function creates a new blog post with the given title.
    */
   async createNewBlogPostWithTitle(newBlogPostTitle: string): Promise<void> {
-    await this.clickOn('NEW POST');
+    await this.clickOnElementWithText('NEW POST');
     await this.expectPublishButtonToBeDisabled();
 
     await this.uploadBlogPostThumbnailImage();
@@ -703,7 +704,7 @@ export class BlogPostEditor extends BaseUser {
    * This function deletes a published blog post with the given title.
    */
   async deletePublishedBlogPostWithTitle(blogPostTitle: string): Promise<void> {
-    await this.clickOn('PUBLISHED');
+    await this.clickOnElementWithText('PUBLISHED');
     const allPublishedBlogPosts = await this.page.$$(
       listOfBlogsInBlogDashboard
     );
@@ -717,9 +718,9 @@ export class BlogPostEditor extends BaseUser {
           '.e2e-test-blog-post-edit-box',
           element => (element as HTMLElement).click()
         );
-        await this.clickOn(LABEL_FOR_DELETE_BUTTON);
+        await this.clickOnElementWithText(LABEL_FOR_DELETE_BUTTON);
         await this.page.waitForSelector(confirmButtonSelector);
-        await this.clickOn(confirmButtonSelector);
+        await this.clickOnElementWithSelector(confirmButtonSelector);
         await this.expectElementToBeVisible(confirmButtonSelector, false);
         showMessage(
           'Published blog post with given title deleted successfully!'
@@ -778,7 +779,7 @@ export class BlogPostEditor extends BaseUser {
    */
   async navigateToPublishTab(): Promise<void> {
     await this.goto(blogDashboardUrl);
-    await this.clickOn('PUBLISHED');
+    await this.clickOnElementWithText('PUBLISHED');
 
     await this.expectElementToBeVisible(publisedBlogsTabContainerSelector);
     showMessage('Navigated to publish tab.');
@@ -825,7 +826,7 @@ export class BlogPostEditor extends BaseUser {
     blogPostTitle: string
   ): Promise<void> {
     await this.goto(blogDashboardUrl);
-    await this.clickOn('PUBLISHED');
+    await this.clickOnElementWithText('PUBLISHED');
     await this.waitForPageToFullyLoad();
 
     const allPublishedBlogPosts = await this.page.$$(
@@ -932,7 +933,7 @@ export class BlogPostEditor extends BaseUser {
     const selector = `.e2e-test-${view}-view-button`;
     const viewContainerSelector = `.e2e-test-${view}-view-dashboard`;
     await this.expectElementToBeVisible(selector);
-    await this.clickOn(selector);
+    await this.clickOnElementWithSelector(selector);
     await this.expectElementToBeVisible(viewContainerSelector);
   }
 }

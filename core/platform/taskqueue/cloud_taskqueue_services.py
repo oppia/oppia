@@ -33,7 +33,7 @@ from google.protobuf import timestamp_pb2
 from typing import Any, Dict, Optional
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import app_identity_services
 
 app_identity_services = models.Registry.import_app_identity_services()
@@ -43,17 +43,20 @@ app_identity_services = models.Registry.import_app_identity_services()
 CLIENT = tasks_v2.CloudTasksClient(
     credentials=(
         auth.credentials.AnonymousCredentials()
-        if constants.EMULATOR_MODE else auth.default()[0]))
+        if constants.EMULATOR_MODE
+        else auth.default()[0]
+    )
+)
 
 
 # Here we use type Any because the payload here has no constraints, so that's
 # why payload is annotated with 'Dict[str, Any]' type.
 def create_http_task(
-        queue_name: str,
-        url: str,
-        payload: Optional[Dict[str, Any]] = None,
-        scheduled_for: Optional[datetime.datetime] = None,
-        task_name: Optional[str] = None
+    queue_name: str,
+    url: str,
+    payload: Optional[Dict[str, Any]] = None,
+    scheduled_for: Optional[datetime.datetime] = None,
+    task_name: Optional[str] = None,
 ) -> tasks_v2.types.Task:
     """Creates an http task with the correct http headers/payload and sends
     that task to the Cloud Tasks API. An http task is an asynchronous task that
@@ -77,7 +80,8 @@ def create_http_task(
     # as the queue name as the path to be able to find the correct queue.
     oppia_project_id = app_identity_services.get_application_id()
     parent = CLIENT.queue_path(
-        oppia_project_id, feconf.GOOGLE_APP_ENGINE_REGION, queue_name)
+        oppia_project_id, feconf.GOOGLE_APP_ENGINE_REGION, queue_name
+    )
 
     # Here we use type Any because task's structure can vary a lot. So, to allow
     # every type of value we used Dict[str, Any] type here.

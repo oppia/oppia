@@ -20,7 +20,9 @@ from __future__ import annotations
 
 from core.tests import test_utils
 
-from extensions.interactions.NumericInput import NumericInput # pylint: disable=unused-import # isort: skip
+from extensions.interactions.NumericInput import (  # pylint: disable=unused-import # isort: skip
+    NumericInput,
+)
 
 
 class NumericInputTests(test_utils.GenericTestBase):

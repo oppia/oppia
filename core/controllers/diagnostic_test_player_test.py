@@ -44,121 +44,148 @@ class DiagnosticTestQuestionsHandlerTest(test_utils.GenericTestBase):
 
         self.topic_id = topic_fetchers.get_new_topic_id()
         subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title 1', 'url-frag-one')
+            1, 'Subtopic Title 1', 'url-frag-one'
+        )
         subtopic_1.skill_ids = ['skill_id_1', 'skill_id_2', 'skill_id_3']
         subtopic_1.url_fragment = 'sub-one-frag'
         self.save_new_topic(
-            self.topic_id, self.admin_id, name='Name',
-            description='Description', canonical_story_ids=[],
-            additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[subtopic_1], next_subtopic_id=2)
+            self.topic_id,
+            self.admin_id,
+            name='Name',
+            description='Description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[subtopic_1],
+            next_subtopic_id=2,
+        )
 
         self.save_new_skill(
-            'skill_id_1', self.admin_id, description='Skill Description 1')
+            'skill_id_1', self.admin_id, description='Skill Description 1'
+        )
         self.save_new_skill(
-            'skill_id_2', self.admin_id, description='Skill Description 2')
+            'skill_id_2', self.admin_id, description='Skill Description 2'
+        )
         self.save_new_skill(
-            'skill_id_3', self.admin_id, description='Skill Description 3')
+            'skill_id_3', self.admin_id, description='Skill Description 3'
+        )
 
         self.question_id_1 = question_services.get_new_question_id()
         content_id_generator = translation_domain.ContentIdGenerator()
         self.question_1 = self.save_new_question(
-            self.question_id_1, self.editor_id,
-            self._create_valid_question_data(
-                'ABC', content_id_generator),
+            self.question_id_1,
+            self.editor_id,
+            self._create_valid_question_data('ABC', content_id_generator),
             ['skill_id_1'],
-            content_id_generator.next_content_id_index
+            content_id_generator.next_content_id_index,
         )
         self.question_dict_1 = self.question_1.to_dict()
 
         self.question_id_2 = question_services.get_new_question_id()
         self.question_2 = self.save_new_question(
-            self.question_id_2, self.editor_id,
-            self._create_valid_question_data(
-                'ABC', content_id_generator),
+            self.question_id_2,
+            self.editor_id,
+            self._create_valid_question_data('ABC', content_id_generator),
             ['skill_id_1'],
-            content_id_generator.next_content_id_index
+            content_id_generator.next_content_id_index,
         )
         self.question_dict_2 = self.question_2.to_dict()
 
         self.question_id_3 = question_services.get_new_question_id()
         self.question_3 = self.save_new_question(
-            self.question_id_3, self.editor_id,
-            self._create_valid_question_data(
-                'ABC', content_id_generator
-            ), ['skill_id_2'], content_id_generator.next_content_id_index
+            self.question_id_3,
+            self.editor_id,
+            self._create_valid_question_data('ABC', content_id_generator),
+            ['skill_id_2'],
+            content_id_generator.next_content_id_index,
         )
         self.question_dict_3 = self.question_3.to_dict()
 
         self.question_id_4 = question_services.get_new_question_id()
         self.question_4 = self.save_new_question(
-            self.question_id_4, self.editor_id,
-            self._create_valid_question_data(
-                'ABC', content_id_generator
-            ), ['skill_id_2'], content_id_generator.next_content_id_index
+            self.question_id_4,
+            self.editor_id,
+            self._create_valid_question_data('ABC', content_id_generator),
+            ['skill_id_2'],
+            content_id_generator.next_content_id_index,
         )
         self.question_dict_4 = self.question_4.to_dict()
 
         self.question_id_5 = question_services.get_new_question_id()
         self.question_5 = self.save_new_question(
-            self.question_id_5, self.editor_id,
-            self._create_valid_question_data(
-                'ABC', content_id_generator
-            ), ['skill_id_2'], content_id_generator.next_content_id_index
+            self.question_id_5,
+            self.editor_id,
+            self._create_valid_question_data('ABC', content_id_generator),
+            ['skill_id_2'],
+            content_id_generator.next_content_id_index,
         )
         self.question_dict_5 = self.question_5.to_dict()
 
         self.question_id_6 = question_services.get_new_question_id()
         self.question_6 = self.save_new_question(
-            self.question_id_6, self.editor_id,
-            self._create_valid_question_data(
-                'ABC', content_id_generator
-            ), ['skill_id_3'], content_id_generator.next_content_id_index
+            self.question_id_6,
+            self.editor_id,
+            self._create_valid_question_data('ABC', content_id_generator),
+            ['skill_id_3'],
+            content_id_generator.next_content_id_index,
         )
         self.question_dict_6 = self.question_6.to_dict()
 
         self.question_id_7 = question_services.get_new_question_id()
         self.question_7 = self.save_new_question(
-            self.question_id_7, self.editor_id,
-            self._create_valid_question_data(
-                'ABC', content_id_generator
-            ), ['skill_id_1'], content_id_generator.next_content_id_index
+            self.question_id_7,
+            self.editor_id,
+            self._create_valid_question_data('ABC', content_id_generator),
+            ['skill_id_1'],
+            content_id_generator.next_content_id_index,
         )
         self.question_dict_7 = self.question_7.to_dict()
 
     def test_get_skill_id_to_question_dict_for_valid_topic_id(self) -> None:
         question_services.create_new_question_skill_link(
-            self.editor_id, self.question_id_1, 'skill_id_1', 0.5)
+            self.editor_id, self.question_id_1, 'skill_id_1', 0.5
+        )
         question_services.create_new_question_skill_link(
-            self.editor_id, self.question_id_2, 'skill_id_1', 0.5)
+            self.editor_id, self.question_id_2, 'skill_id_1', 0.5
+        )
         question_services.create_new_question_skill_link(
-            self.editor_id, self.question_id_7, 'skill_id_1', 0.5)
+            self.editor_id, self.question_id_7, 'skill_id_1', 0.5
+        )
         question_services.create_new_question_skill_link(
-            self.editor_id, self.question_id_3, 'skill_id_2', 0.5)
+            self.editor_id, self.question_id_3, 'skill_id_2', 0.5
+        )
         question_services.create_new_question_skill_link(
-            self.editor_id, self.question_id_4, 'skill_id_2', 0.5)
+            self.editor_id, self.question_id_4, 'skill_id_2', 0.5
+        )
         question_services.create_new_question_skill_link(
-            self.editor_id, self.question_id_5, 'skill_id_2', 0.5)
+            self.editor_id, self.question_id_5, 'skill_id_2', 0.5
+        )
 
         # Skill 3 is only linked to a single question i.e., not satisfying the
         # condition for the main and backup question. So the response dict will
         # not contain skill 3.
         question_services.create_new_question_skill_link(
-            self.editor_id, self.question_id_6, 'skill_id_3', 0.5)
+            self.editor_id, self.question_id_6, 'skill_id_3', 0.5
+        )
 
         url = '%s/%s?excluded_question_ids=%s' % (
-            feconf.DIAGNOSTIC_TEST_QUESTIONS_HANDLER_URL, self.topic_id,
-            self.question_id_5
+            feconf.DIAGNOSTIC_TEST_QUESTIONS_HANDLER_URL,
+            self.topic_id,
+            self.question_id_5,
         )
 
         json_response = self.get_json(url)
         received_skill_id_to_questions_dict = json_response[
-            'skill_id_to_questions_dict']
+            'skill_id_to_questions_dict'
+        ]
 
         expected_skill_id_to_question_ids = {
             'skill_id_1': [
-                self.question_id_1, self.question_id_2, self.question_id_7],
-            'skill_id_2': [self.question_id_3, self.question_id_5]
+                self.question_id_1,
+                self.question_id_2,
+                self.question_id_7,
+            ],
+            'skill_id_2': [self.question_id_3, self.question_id_5],
         }
 
         # The equality of received dict and expected dict is not directly
@@ -168,17 +195,17 @@ class DiagnosticTestQuestionsHandlerTest(test_utils.GenericTestBase):
         # dict are validated individually.
         self.assertItemsEqual(
             list(received_skill_id_to_questions_dict.keys()),
-            list(expected_skill_id_to_question_ids.keys())
+            list(expected_skill_id_to_question_ids.keys()),
         )
 
         for skill_id, questions in received_skill_id_to_questions_dict.items():
             self.assertTrue(
                 questions['main_question']['id'],
-                expected_skill_id_to_question_ids[skill_id]
+                expected_skill_id_to_question_ids[skill_id],
             )
             self.assertTrue(
                 questions['backup_question']['id'],
-                expected_skill_id_to_question_ids[skill_id]
+                expected_skill_id_to_question_ids[skill_id],
             )
 
     def test_raise_error_for_non_existent_topic_id(self) -> None:
@@ -186,6 +213,8 @@ class DiagnosticTestQuestionsHandlerTest(test_utils.GenericTestBase):
 
         url = '%s/%s?excluded_question_ids=%s' % (
             feconf.DIAGNOSTIC_TEST_QUESTIONS_HANDLER_URL,
-            non_existent_topic_id, '')
+            non_existent_topic_id,
+            '',
+        )
 
         self.get_json(url, expected_status_int=404)

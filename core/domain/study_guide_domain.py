@@ -36,7 +36,8 @@ CMD_CREATE_NEW: Final = 'create_new'
 # These take additional 'property_name', 'new_value' and 'old_value' parameters.
 CMD_UPDATE_STUDY_GUIDE_PROPERTY: Final = 'update_study_guide_property'
 CMD_MIGRATE_STUDY_GUIDE_SECTIONS_SCHEMA_TO_LATEST_VERSION: Final = (
-    'migrate_study_guide_sections_schema_to_latest_version')
+    'migrate_study_guide_sections_schema_to_latest_version'
+)
 
 
 class StudyGuideChange(change_domain.BaseChange):
@@ -53,33 +54,40 @@ class StudyGuideChange(change_domain.BaseChange):
     STUDY_GUIDE_PROPERTIES: List[str] = [
         STUDY_GUIDE_PROPERTY_SECTIONS,
         STUDY_GUIDE_PROPERTY_SECTIONS_HEADING,
-        STUDY_GUIDE_PROPERTY_SECTIONS_CONTENT
-
+        STUDY_GUIDE_PROPERTY_SECTIONS_CONTENT,
     ]
 
-    ALLOWED_COMMANDS: List[feconf.ValidCmdDict] = [{
-        'name': CMD_CREATE_NEW,
-        'required_attribute_names': ['topic_id', 'subtopic_id'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_UPDATE_STUDY_GUIDE_PROPERTY,
-        'required_attribute_names': [
-            'property_name', 'new_value', 'old_value', 'subtopic_id'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {'property_name': STUDY_GUIDE_PROPERTIES},
-        'deprecated_values': {}
-    }, {
-        'name': CMD_MIGRATE_STUDY_GUIDE_SECTIONS_SCHEMA_TO_LATEST_VERSION,
-        'required_attribute_names': ['from_version', 'to_version'],
-        'optional_attribute_names': [],
-        'user_id_attribute_names': [],
-        'allowed_values': {},
-        'deprecated_values': {}
-    }]
+    ALLOWED_COMMANDS: List[feconf.ValidCmdDict] = [
+        {
+            'name': CMD_CREATE_NEW,
+            'required_attribute_names': ['topic_id', 'subtopic_id'],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': [],
+            'allowed_values': {},
+            'deprecated_values': {},
+        },
+        {
+            'name': CMD_UPDATE_STUDY_GUIDE_PROPERTY,
+            'required_attribute_names': [
+                'property_name',
+                'new_value',
+                'old_value',
+                'subtopic_id',
+            ],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': [],
+            'allowed_values': {'property_name': STUDY_GUIDE_PROPERTIES},
+            'deprecated_values': {},
+        },
+        {
+            'name': CMD_MIGRATE_STUDY_GUIDE_SECTIONS_SCHEMA_TO_LATEST_VERSION,
+            'required_attribute_names': ['from_version', 'to_version'],
+            'optional_attribute_names': [],
+            'user_id_attribute_names': [],
+            'allowed_values': {},
+            'deprecated_values': {},
+        },
+    ]
 
 
 AllowedUpdateStudyGuidePropertyCmdTypes = Union[
@@ -105,12 +113,10 @@ class UpdateStudyGuidePropertyCmd(StudyGuideChange):
     subtopic_id: int
     property_name: str
     new_value: (
-        List[StudyGuideSectionDict] |
-        AllowedUpdateStudyGuidePropertyCmdTypes
+        List[StudyGuideSectionDict] | AllowedUpdateStudyGuidePropertyCmdTypes
     )
     old_value: (
-        List[StudyGuideSectionDict] |
-        AllowedUpdateStudyGuidePropertyCmdTypes
+        List[StudyGuideSectionDict] | AllowedUpdateStudyGuidePropertyCmdTypes
     )
 
 
@@ -186,7 +192,7 @@ class StudyGuideSection:
         heading_content_id: str,
         heading_plaintext: str,
         content_content_id: str,
-        content_html: str
+        content_html: str,
     ) -> StudyGuideSection:
         """Creates a default study guide section object.
 
@@ -195,11 +201,10 @@ class StudyGuideSection:
         """
         return cls(
             state_domain.SubtitledUnicode(
-                heading_content_id,
-                heading_plaintext),
-            state_domain.SubtitledHtml(
-                content_content_id,
-                content_html))
+                heading_content_id, heading_plaintext
+            ),
+            state_domain.SubtitledHtml(content_content_id, content_html),
+        )
 
     def to_dict(self) -> StudyGuideSectionDict:
         """Returns a dict representing this StudyGuideSection domain object.
@@ -226,15 +231,12 @@ class StudyGuideSection:
             StudyGuideSection. The corresponding object.
         """
         heading = state_domain.SubtitledUnicode.from_dict(
-            section_dict['heading'])
-        content = state_domain.SubtitledHtml.from_dict(
-            section_dict['content']
+            section_dict['heading']
         )
+        content = state_domain.SubtitledHtml.from_dict(section_dict['content'])
         heading.validate()
         content.validate()
-        return cls(
-            heading,
-            content)
+        return cls(heading, content)
 
 
 class StudyGuideDict(TypedDict):
@@ -279,7 +281,7 @@ class StudyGuide:
         sections_schema_version: int,
         next_content_id_index: int,
         language_code: str,
-        version: int
+        version: int,
     ) -> None:
         """Constructs a StudyGuide domain object.
 
@@ -321,7 +323,7 @@ class StudyGuide:
             'sections': sections_dicts,
             'sections_schema_version': self.sections_schema_version,
             'language_code': self.language_code,
-            'version': self.version
+            'version': self.version,
         }
 
     def to_subtopic_page_dict_for_android(self) -> StudyGuideAndroidDict:
@@ -336,9 +338,9 @@ class StudyGuide:
         for section in self.sections:
             section_dict = section.to_dict()
             heading_html = (
-                '<p><strong>' +
-                f'{section_dict["heading"]["unicode_str"]}' +
-                '</strong></p>'
+                '<p><strong>'
+                + f'{section_dict["heading"]["unicode_str"]}'
+                + '</strong></p>'
             )
             concatenated_html_parts.append(heading_html)
             concatenated_html_parts.append(section_dict['content']['html'])
@@ -351,12 +353,12 @@ class StudyGuide:
             'page_contents': {
                 'subtitled_html': {
                     'content_id': 'content',
-                    'html': concatenated_html
+                    'html': concatenated_html,
                 }
             },
             'page_contents_schema_version': self.sections_schema_version,
             'language_code': self.language_code,
-            'version': self.version
+            'version': self.version,
         }
 
     # Remove no cover comment once migrations for study guides are available.
@@ -364,8 +366,8 @@ class StudyGuide:
     def update_sections_from_model(
         cls,
         versioned_sections: VersionedStudyGuideSectionsDict,
-        current_version: int
-    ) -> None: # pragma: no cover
+        current_version: int,
+    ) -> None:  # pragma: no cover
         """Converts the sections in the sections list contained
         in the given versioned_sections dict from current_version to
         current_version + 1. Note that the versioned_sections being
@@ -383,8 +385,10 @@ class StudyGuide:
 
         for i, _ in enumerate(versioned_sections['sections']):
             conversion_fn = getattr(
-                cls, '_convert_section_v%s_dict_to_v%s_dict' % (
-                    current_version, current_version + 1))
+                cls,
+                '_convert_section_v%s_dict_to_v%s_dict'
+                % (current_version, current_version + 1),
+            )
             versioned_sections['sections'][i] = conversion_fn(
                 versioned_sections['sections'][i]
             )
@@ -394,8 +398,8 @@ class StudyGuide:
     def convert_html_fields_in_study_guide_section(
         cls,
         study_guide_section_dict: StudyGuideSectionDict,
-        conversion_fn: Callable[[str], str]
-    ) -> StudyGuideSectionDict: # pragma: no cover
+        conversion_fn: Callable[[str], str],
+    ) -> StudyGuideSectionDict:  # pragma: no cover
         """Applies a conversion function on all the html strings in a study
         guide section to migrate them to a desired state.
 
@@ -408,10 +412,9 @@ class StudyGuide:
         Returns:
             dict. The converted subtopic_page_contents_dict.
         """
-        study_guide_section_dict[
-            'content']['html'] = conversion_fn(
-                study_guide_section_dict['content']['html']
-            )
+        study_guide_section_dict['content']['html'] = conversion_fn(
+            study_guide_section_dict['content']['html']
+        )
         return study_guide_section_dict
 
     # Remove no cover comment once migrations for study guides are available.
@@ -419,8 +422,8 @@ class StudyGuide:
     def convert_unicode_fields_in_study_guide_section(
         cls,
         study_guide_section_dict: StudyGuideSectionDict,
-        conversion_fn: Callable[[str], str]
-    ) -> StudyGuideSectionDict: # pragma: no cover
+        conversion_fn: Callable[[str], str],
+    ) -> StudyGuideSectionDict:  # pragma: no cover
         """Applies a conversion function on all the unicode strings in study
         guide section to migrate them to a desired state.
 
@@ -434,9 +437,8 @@ class StudyGuide:
             dict. The converted subtopic_page_contents_dict.
         """
         study_guide_section_dict['heading']['unicode_str'] = conversion_fn(
-                study_guide_section_dict[
-                    'heading']['unicode_str']
-            )
+            study_guide_section_dict['heading']['unicode_str']
+        )
         return study_guide_section_dict
 
     @classmethod
@@ -460,7 +462,7 @@ class StudyGuide:
         subtopic_id: int,
         topic_id: str,
         heading_plaintext: str,
-        content_html: str
+        content_html: str,
     ) -> StudyGuide:
         """Creates a StudyGuide object with default values.
 
@@ -477,27 +479,28 @@ class StudyGuide:
             sections field.
         """
         content_id_generator = translation_domain.ContentIdGenerator()
-        study_guide_id = cls.get_study_guide_id(
-            topic_id,
-            subtopic_id
-        )
+        study_guide_id = cls.get_study_guide_id(topic_id, subtopic_id)
         sections = []
         section = StudyGuideSection.create_study_guide_section(
-                content_id_generator.generate(
-                    translation_domain.ContentType.SECTION,
-                    'heading'),
-                    heading_plaintext,
-                content_id_generator.generate(
-                    translation_domain.ContentType.SECTION,
-                    'content'),
-                    content_html)
+            content_id_generator.generate(
+                translation_domain.ContentType.SECTION, 'heading'
+            ),
+            heading_plaintext,
+            content_id_generator.generate(
+                translation_domain.ContentType.SECTION, 'content'
+            ),
+            content_html,
+        )
         sections.append(section)
         return cls(
-            study_guide_id, topic_id,
+            study_guide_id,
+            topic_id,
             sections,
             feconf.CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION,
             content_id_generator.next_content_id_index,
-            constants.DEFAULT_LANGUAGE_CODE, 0)
+            constants.DEFAULT_LANGUAGE_CODE,
+            0,
+        )
 
     def get_subtopic_id_from_study_guide_id(self) -> int:
         """Returns the subtopic_id from the study_guide_id
@@ -506,12 +509,10 @@ class StudyGuide:
         Returns:
             int. The subtopic_id of the object.
         """
-        return int(self.id[len(self.topic_id) + 1:])
+        return int(self.id[len(self.topic_id) + 1 :])
 
     def update_section_heading(
-        self,
-        new_section_heading: str,
-        old_section_heading_content_id: str
+        self, new_section_heading: str, old_section_heading_content_id: str
     ) -> None:
         """The new value for the heading data field.
 
@@ -538,9 +539,7 @@ class StudyGuide:
         )
 
     def update_section_content(
-        self,
-        new_section_content: str,
-        old_section_content_content_id: str
+        self, new_section_content: str, old_section_content_content_id: str
     ) -> None:
         """The new value for the content data field.
 
@@ -566,10 +565,7 @@ class StudyGuide:
             'this study guide' % (old_section_content_content_id)
         )
 
-    def update_sections(
-        self,
-        new_sections: List[StudyGuideSection]
-    ) -> None:
+    def update_sections(self, new_sections: List[StudyGuideSection]) -> None:
         """Updates the study guide sections.
 
         Args:
@@ -577,32 +573,26 @@ class StudyGuide:
                 sections.
         """
         if len(new_sections) == len(self.sections):
-            for new_section, old_section in zip(
-                new_sections, self.sections
-            ):
-                if (
-                    new_section.heading.unicode_str != (
-                        old_section.heading.unicode_str)
+            for new_section, old_section in zip(new_sections, self.sections):
+                if new_section.heading.unicode_str != (
+                    old_section.heading.unicode_str
                 ):
                     old_section.heading.unicode_str = (
-                        new_section.heading.unicode_str)
-                if (
-                    new_section.content.html != (
-                        old_section.content.html)
-                ):
-                    old_section.content.html = (
-                        new_section.content.html)
-        elif (len(new_sections) < len(self.sections)):
+                        new_section.heading.unicode_str
+                    )
+                if new_section.content.html != (old_section.content.html):
+                    old_section.content.html = new_section.content.html
+        elif len(new_sections) < len(self.sections):
             for i, new_section in enumerate(new_sections):
                 old_section = self.sections[i]
-                if (new_section.heading.content_id != (
-                    old_section.heading.content_id) and
-                    new_section.content.content_id != (
-                    old_section.content.content_id)
+                if new_section.heading.content_id != (
+                    old_section.heading.content_id
+                ) and new_section.content.content_id != (
+                    old_section.content.content_id
                 ):
                     self.delete_section(
                         old_section.heading.content_id,
-                        old_section.content.content_id
+                        old_section.content.content_id,
                     )
                     return
             self.delete_section(
@@ -612,15 +602,10 @@ class StudyGuide:
         else:
             new_section = new_sections[-1]
             self.add_section(
-                new_section.heading.unicode_str,
-                new_section.content.html
+                new_section.heading.unicode_str, new_section.content.html
             )
 
-    def add_section(
-            self,
-            heading_plaintext: str,
-            content_html: str
-    ) -> None:
+    def add_section(self, heading_plaintext: str, content_html: str) -> None:
         """Adds a section to the study guide.
 
         Args:
@@ -628,28 +613,23 @@ class StudyGuide:
             content_html: str. The content of the new section.
         """
         content_id_generator = translation_domain.ContentIdGenerator(
-            self.next_content_id_index)
+            self.next_content_id_index
+        )
         new_section = StudyGuideSection.create_study_guide_section(
             content_id_generator.generate(
-                translation_domain.ContentType.SECTION,
-                'heading'
+                translation_domain.ContentType.SECTION, 'heading'
             ),
             heading_plaintext,
             content_id_generator.generate(
-                translation_domain.ContentType.SECTION,
-                'content'
+                translation_domain.ContentType.SECTION, 'content'
             ),
-            content_html
+            content_html,
         )
-        self.next_content_id_index = (
-            content_id_generator.next_content_id_index
-        )
+        self.next_content_id_index = content_id_generator.next_content_id_index
         self.sections.append(new_section)
 
     def delete_section(
-        self,
-        heading_content_id: str,
-        content_content_id: str
+        self, heading_content_id: str, content_content_id: str
     ) -> None:
         """Deletes a section from the study guide.
 
@@ -664,15 +644,17 @@ class StudyGuide:
                 content_content_id does not exist.
         """
         for i, section in enumerate(self.sections):
-            if (section.heading.content_id == heading_content_id and
-                section.content.content_id == content_content_id):
+            if (
+                section.heading.content_id == heading_content_id
+                and section.content.content_id == content_content_id
+            ):
                 del self.sections[i]
                 return
 
         raise Exception(
             'Invalid section content_ids: heading=%s, content=%s; '
-            'no matching section found in this study guide' % (
-                heading_content_id, content_content_id)
+            'no matching section found in this study guide'
+            % (heading_content_id, content_content_id)
         )
 
     def validate(self) -> None:
@@ -684,39 +666,45 @@ class StudyGuide:
         """
         if not isinstance(self.topic_id, str):
             raise utils.ValidationError(
-                'Expected topic_id to be a string, received %s' %
-                self.topic_id)
+                'Expected topic_id to be a string, received %s' % self.topic_id
+            )
         if not isinstance(self.version, int):
             raise utils.ValidationError(
-                'Expected version number to be an int, received %s' %
-                self.version)
+                'Expected version number to be an int, received %s'
+                % self.version
+            )
         for section in self.sections:
             section.validate()
 
         if not isinstance(self.sections_schema_version, int):
             raise utils.ValidationError(
                 'Expected sections schema version to be an integer, '
-                'received %s' % self.sections_schema_version)
+                'received %s' % self.sections_schema_version
+            )
         if (
-                self.sections_schema_version !=
-                feconf.CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION):
+            self.sections_schema_version
+            != feconf.CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION
+        ):
             raise utils.ValidationError(
                 'Expected sections schema version to be %s, received %s'
                 % (
                     feconf.CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION,
-                    self.sections_schema_version)
+                    self.sections_schema_version,
+                )
             )
 
         if not isinstance(self.language_code, str):
             raise utils.ValidationError(
-                'Expected language code to be a string, received %s' %
-                self.language_code)
+                'Expected language code to be a string, received %s'
+                % self.language_code
+            )
         if not any(
-                self.language_code == lc['code']
-                for lc in constants.SUPPORTED_CONTENT_LANGUAGES
+            self.language_code == lc['code']
+            for lc in constants.SUPPORTED_CONTENT_LANGUAGES
         ):
             raise utils.ValidationError(
-                'Invalid language code: %s' % self.language_code)
+                'Invalid language code: %s' % self.language_code
+            )
 
 
 class StudyGuideSummaryDict(TypedDict):
@@ -746,7 +734,7 @@ class StudyGuideSummary:
         thumbnail_bg_color: Optional[str],
         subtopic_mastery: Optional[float],
         parent_topic_url_fragment: Optional[str],
-        classroom_url_fragment: Optional[str]
+        classroom_url_fragment: Optional[str],
     ):
         """Initialize a StudyGuideSummary object.
 
@@ -790,5 +778,5 @@ class StudyGuideSummary:
             'thumbnail_bg_color': self.thumbnail_bg_color,
             'subtopic_mastery': self.subtopic_mastery,
             'parent_topic_url_fragment': self.parent_topic_url_fragment,
-            'classroom_url_fragment': self.classroom_url_fragment
+            'classroom_url_fragment': self.classroom_url_fragment,
         }

@@ -194,4 +194,8 @@ oppia-conversation-skin .oppia-button-icon {
   .conversation-skin-oppia-avatar.show-tutor-card:hover {
     opacity: 0.8;
   }
+
+  oppia-conversation-skin .conversation-skin-oppia-avatar {
+    display: none;
+  }
 }

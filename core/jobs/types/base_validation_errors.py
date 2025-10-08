@@ -27,7 +27,7 @@ from core.platform import models
 from typing import Mapping, Union
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import base_models
 
 (base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
@@ -61,7 +61,7 @@ class BaseValidationError(job_run_result.JobRunResult):
             self.__class__.__name__,
             job_utils.get_model_kind(model),
             utils.quoted(model_id),
-            message
+            message,
         )
         super().__init__(stderr=error_message)
 
@@ -72,7 +72,8 @@ class InconsistentTimestampsError(BaseValidationError):
     def __init__(self, model: base_models.BaseModel) -> None:
         message = 'created_on=%s is later than last_updated=%s' % (
             model.created_on.strftime('%Y-%m-%d %H:%M:%S'),
-            model.last_updated.strftime('%Y-%m-%d %H:%M:%S'))
+            model.last_updated.strftime('%Y-%m-%d %H:%M:%S'),
+        )
         super().__init__(message, model)
 
 
@@ -88,9 +89,10 @@ class InvalidPublicCommitStatusError(BaseValidationError):
     """Error class for commit models with inconsistent public status values."""
 
     def __init__(self, model: base_models.BaseCommitLogEntryModel) -> None:
-        message = (
-            'post_commit_status=%s but post_commit_community_owned=%s' % (
-                model.post_commit_status, model.post_commit_community_owned))
+        message = 'post_commit_status=%s but post_commit_community_owned=%s' % (
+            model.post_commit_status,
+            model.post_commit_community_owned,
+        )
         super().__init__(message, model)
 
 
@@ -98,9 +100,10 @@ class InvalidPrivateCommitStatusError(BaseValidationError):
     """Error class for commit models with inconsistent private status values."""
 
     def __init__(self, model: base_models.BaseCommitLogEntryModel) -> None:
-        message = (
-            'post_commit_status=%s but post_commit_is_private=%r' % (
-                model.post_commit_status, model.post_commit_is_private))
+        message = 'post_commit_status=%s but post_commit_is_private=%r' % (
+            model.post_commit_status,
+            model.post_commit_is_private,
+        )
         super().__init__(message, model)
 
 
@@ -109,19 +112,19 @@ class ModelMutatedDuringJobError(BaseValidationError):
 
     def __init__(self, model: base_models.BaseModel) -> None:
         message = (
-            'last_updated=%s is later than the audit job\'s start time' % (
-                model.last_updated.strftime('%Y-%m-%d %H:%M:%S')))
+            'last_updated=%s is later than the audit job\'s start time'
+            % (model.last_updated.strftime('%Y-%m-%d %H:%M:%S'))
+        )
         super().__init__(message, model)
 
 
 class ModelIdRegexError(BaseValidationError):
     """Error class for models with ids that fail to match a regex pattern."""
 
-    def __init__(
-        self, model: base_models.BaseModel, regex_string: str
-    ) -> None:
+    def __init__(self, model: base_models.BaseModel, regex_string: str) -> None:
         message = 'id does not match the expected regex=%s' % (
-            utils.quoted(regex_string))
+            utils.quoted(regex_string)
+        )
         super().__init__(message, model)
 
 
@@ -132,7 +135,8 @@ class ModelDomainObjectValidateError(BaseValidationError):
         self, model: base_models.BaseModel, error_message: str
     ) -> None:
         message = 'Entity fails domain validation with the error: %s' % (
-            error_message)
+            error_message
+        )
         super().__init__(message, model)
 
 
@@ -141,7 +145,8 @@ class ModelExpiredError(BaseValidationError):
 
     def __init__(self, model: base_models.BaseModel) -> None:
         message = 'deleted=True when older than %s days' % (
-            feconf.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED.days)
+            feconf.PERIOD_TO_HARD_DELETE_MODELS_MARKED_AS_DELETED.days
+        )
         super().__init__(message, model)
 
 
@@ -152,8 +157,8 @@ class InvalidCommitTypeError(BaseValidationError):
         self,
         model: Union[
             base_models.BaseCommitLogEntryModel,
-            base_models.BaseSnapshotMetadataModel
-        ]
+            base_models.BaseSnapshotMetadataModel,
+        ],
     ) -> None:
         message = 'Commit type %s is not allowed' % model.commit_type
         super().__init__(message, model)
@@ -167,7 +172,7 @@ class ModelRelationshipError(BaseValidationError):
         id_property: model_property.ModelProperty,
         model: base_models.BaseModel,
         target_kind: str,
-        target_id: str
+        target_id: str,
     ) -> None:
         """Initializes a new ModelRelationshipError.
 
@@ -184,8 +189,8 @@ class ModelRelationshipError(BaseValidationError):
         # and written to the datastore.
         message = (
             '%s=%s should correspond to the ID of an existing %s, but no such '
-            'model exists' % (
-                id_property, utils.quoted(target_id), target_kind))
+            'model exists' % (id_property, utils.quoted(target_id), target_kind)
+        )
         super().__init__(message, model)
 
 
@@ -196,12 +201,13 @@ class CommitCmdsNoneError(BaseValidationError):
         self,
         model: Union[
             base_models.BaseCommitLogEntryModel,
-            base_models.BaseSnapshotMetadataModel
-        ]
+            base_models.BaseSnapshotMetadataModel,
+        ],
     ) -> None:
         message = (
             'No commit command domain object defined for entity with commands: '
-            '%s' % model.commit_cmds)
+            '%s' % model.commit_cmds
+        )
         super().__init__(message, model)
 
 
@@ -212,12 +218,13 @@ class CommitCmdsValidateError(BaseValidationError):
         self,
         model: Union[
             base_models.BaseCommitLogEntryModel,
-            base_models.BaseSnapshotMetadataModel
+            base_models.BaseSnapshotMetadataModel,
         ],
         commit_cmd_dict: Mapping[str, change_domain.AcceptableChangeDictTypes],
-        e: str
+        e: str,
     ) -> None:
         message = (
             'Commit command domain validation for command: %s failed with '
-            'error: %s' % (commit_cmd_dict, e))
+            'error: %s' % (commit_cmd_dict, e)
+        )
         super().__init__(message, model)

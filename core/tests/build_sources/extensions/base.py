@@ -166,7 +166,8 @@ class BaseInteraction:
     def customization_arg_specs(self) -> List[domain.CustomizationArgSpec]:
         return [
             domain.CustomizationArgSpec(**cas)
-            for cas in self._customization_arg_specs]
+            for cas in self._customization_arg_specs
+        ]
 
     @property
     def answer_visualization_specs(self) -> List[Dict[str, str]]:
@@ -178,18 +179,24 @@ class BaseInteraction:
         for spec in self._answer_visualization_specs:
             factory_cls = (
                 visualization_registry.Registry.get_visualization_class(
-                    spec['id']))
+                    spec['id']
+                )
+            )
             result.append(
                 factory_cls(
-                    spec['calculation_id'], spec['options'],
-                    spec['addressed_info_is_supported']))
+                    spec['calculation_id'],
+                    spec['options'],
+                    spec['addressed_info_is_supported'],
+                )
+            )
         return result
 
     @property
     def answer_calculation_ids(self) -> Set[str]:
         visualizations = self.answer_visualizations
         return set(
-            [visualization.calculation_id for visualization in visualizations])
+            [visualization.calculation_id for visualization in visualizations]
+        )
 
     @property
     def dependency_ids(self) -> List[str]:
@@ -204,7 +211,8 @@ class BaseInteraction:
             return None
         else:
             return object_registry.Registry.get_object_class_by_type(
-                self.answer_type).normalize(answer)
+                self.answer_type
+            ).normalize(answer)
 
     @property
     def rules_dict(self) -> Dict[str, Dict[str, str]]:
@@ -214,7 +222,9 @@ class BaseInteraction:
 
         rules_index_dict = json.loads(
             constants.get_package_file_contents(
-                'extensions', feconf.RULES_DESCRIPTIONS_EXTENSIONS_MODULE_PATH))
+                'extensions', feconf.RULES_DESCRIPTIONS_EXTENSIONS_MODULE_PATH
+            )
+        )
         self._cached_rules_dict = rules_index_dict[self.id]
 
         return self._cached_rules_dict
@@ -236,8 +246,9 @@ class BaseInteraction:
         interaction itself and the other for displaying the learner's response
         in a read-only view after it has been submitted.
         """
-        html_templates = utils.get_file_contents(os.path.join(
-            feconf.INTERACTIONS_DIR, self.id, '%s.html' % self.id))
+        html_templates = utils.get_file_contents(
+            os.path.join(feconf.INTERACTIONS_DIR, self.id, '%s.html' % self.id)
+        )
         return html_templates
 
     @property
@@ -245,12 +256,13 @@ class BaseInteraction:
         """The HTML code containing validators for the interaction's
         customization_args and submission handler.
         """
-        return (
-            '<script>%s</script>\n' %
-            utils.get_file_contents(os.path.join(
+        return '<script>%s</script>\n' % utils.get_file_contents(
+            os.path.join(
                 feconf.INTERACTIONS_DIR,
                 self.id,
-                '%sValidationService.js' % self.id)))
+                '%sValidationService.js' % self.id,
+            )
+        )
 
     def to_dict(self) -> BaseInteractionDict:
         """Gets a dict representing this interaction. Only default values are
@@ -266,12 +278,15 @@ class BaseInteraction:
             'is_trainable': self.is_trainable,
             'is_linear': self.is_linear,
             'needs_summary': self.needs_summary,
-            'customization_arg_specs': [{
-                'name': ca_spec.name,
-                'description': ca_spec.description,
-                'default_value': ca_spec.default_value,
-                'schema': ca_spec.schema,
-            } for ca_spec in self.customization_arg_specs],
+            'customization_arg_specs': [
+                {
+                    'name': ca_spec.name,
+                    'description': ca_spec.description,
+                    'default_value': ca_spec.default_value,
+                    'schema': ca_spec.schema,
+                }
+                for ca_spec in self.customization_arg_specs
+            ],
             'instructions': self.instructions,
             'narrow_instructions': self.narrow_instructions,
             'default_outcome_heading': self.default_outcome_heading,
@@ -296,19 +311,17 @@ class BaseInteraction:
         param_list = []
         while description.find('{{') != -1:
             opening_index = description.find('{{')
-            description = description[opening_index + 2:]
+            description = description[opening_index + 2 :]
 
             bar_index = description.find('|')
             param_name = description[:bar_index]
-            description = description[bar_index + 1:]
+            description = description[bar_index + 1 :]
 
             closing_index = description.find('}}')
             normalizer_string = description[:closing_index]
-            description = description[closing_index + 2:]
+            description = description[closing_index + 2 :]
 
-            param_list.append(
-                (param_name, getattr(objects, normalizer_string))
-            )
+            param_list.append((param_name, getattr(objects, normalizer_string)))
 
         return param_list
 
@@ -322,4 +335,5 @@ class BaseInteraction:
             if param_name == rule_param_name:
                 return param_type
         raise Exception(
-            'Rule %s has no param called %s' % (rule_name, rule_param_name))
+            'Rule %s has no param called %s' % (rule_name, rule_param_name)
+        )

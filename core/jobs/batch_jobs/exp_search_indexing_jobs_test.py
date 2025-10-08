@@ -41,9 +41,9 @@ StatsType = List[Tuple[str, List[Dict[str, Union[bool, int, str]]]]]
 
 class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS: Type[
+    JOB_CLASS: Type[exp_search_indexing_jobs.IndexExplorationsInSearchJob] = (
         exp_search_indexing_jobs.IndexExplorationsInSearchJob
-    ] = exp_search_indexing_jobs.IndexExplorationsInSearchJob
+    )
 
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
@@ -58,7 +58,7 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
             objective='objective',
             language_code='lang',
             community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC
+            status=constants.ACTIVITY_STATUS_PUBLIC,
         )
         exp_summary.update_timestamps()
         exp_summary.put()
@@ -68,22 +68,27 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
             'add_documents_to_index',
             lambda _, __: None,
             expected_args=[
-                ([{
-                    'id': 'abcd',
-                    'language_code': 'lang',
-                    'title': 'title',
-                    'category': 'category',
-                    'tags': [],
-                    'objective': 'objective',
-                    'rank': 20,
-                }], search_services.SEARCH_INDEX_EXPLORATIONS)
-            ]
+                (
+                    [
+                        {
+                            'id': 'abcd',
+                            'language_code': 'lang',
+                            'title': 'title',
+                            'category': 'category',
+                            'tags': [],
+                            'objective': 'objective',
+                            'rank': 20,
+                        }
+                    ],
+                    search_services.SEARCH_INDEX_EXPLORATIONS,
+                )
+            ],
         )
 
         with add_docs_to_index_swap:
-            self.assert_job_output_is([
-                job_run_result.JobRunResult.as_stdout('SUCCESS: 1')
-            ])
+            self.assert_job_output_is(
+                [job_run_result.JobRunResult.as_stdout('SUCCESS: 1')]
+            )
 
     def test_indexes_non_deleted_models(self) -> None:
         for i in range(5):
@@ -96,7 +101,7 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
                 objective='objective',
                 language_code='lang',
                 community_owned=False,
-                status=constants.ACTIVITY_STATUS_PUBLIC
+                status=constants.ACTIVITY_STATUS_PUBLIC,
             )
             exp_summary.update_timestamps()
             exp_summary.put()
@@ -107,28 +112,33 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
             lambda _, __: None,
             expected_args=[
                 (
-                    [{
-                        'id': 'abcd%s' % i,
-                        'language_code': 'lang',
-                        'title': 'title',
-                        'category': 'category',
-                        'tags': [],
-                        'objective': 'objective',
-                        'rank': 20,
-                    }],
-                    search_services.SEARCH_INDEX_EXPLORATIONS
-                ) for i in range(5)
-            ]
+                    [
+                        {
+                            'id': 'abcd%s' % i,
+                            'language_code': 'lang',
+                            'title': 'title',
+                            'category': 'category',
+                            'tags': [],
+                            'objective': 'objective',
+                            'rank': 20,
+                        }
+                    ],
+                    search_services.SEARCH_INDEX_EXPLORATIONS,
+                )
+                for i in range(5)
+            ],
         )
 
         max_batch_size_swap = self.swap(
             exp_search_indexing_jobs.IndexExplorationsInSearchJob,
-            'MAX_BATCH_SIZE', 1)
+            'MAX_BATCH_SIZE',
+            1,
+        )
 
         with add_docs_to_index_swap, max_batch_size_swap:
-            self.assert_job_output_is([
-                job_run_result.JobRunResult.as_stdout('SUCCESS: 5')
-            ])
+            self.assert_job_output_is(
+                [job_run_result.JobRunResult.as_stdout('SUCCESS: 5')]
+            )
 
     def test_reports_failed_when_indexing_fails(self) -> None:
         exp_summary = self.create_model(
@@ -140,14 +150,14 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
             objective='objective',
             language_code='lang',
             community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC
+            status=constants.ACTIVITY_STATUS_PUBLIC,
         )
         exp_summary.update_timestamps()
         exp_summary.put()
 
         def add_docs_to_index_mock(
-                unused_documents: Dict[str, Union[int, str, List[str]]],
-                unused_index_name: str
+            unused_documents: Dict[str, Union[int, str, List[str]]],
+            unused_index_name: str,
         ) -> None:
             raise platform_search_services.SearchException('search exception')
 
@@ -157,26 +167,30 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
             add_docs_to_index_mock,
             expected_args=[
                 (
-                    [{
-                        'id': 'abcd',
-                        'language_code': 'lang',
-                        'title': 'title',
-                        'category': 'category',
-                        'tags': [],
-                        'objective': 'objective',
-                        'rank': 20,
-                    }],
-                    search_services.SEARCH_INDEX_EXPLORATIONS
+                    [
+                        {
+                            'id': 'abcd',
+                            'language_code': 'lang',
+                            'title': 'title',
+                            'category': 'category',
+                            'tags': [],
+                            'objective': 'objective',
+                            'rank': 20,
+                        }
+                    ],
+                    search_services.SEARCH_INDEX_EXPLORATIONS,
                 )
-            ]
+            ],
         )
 
         with add_docs_to_index_swap:
-            self.assert_job_output_is([
-                job_run_result.JobRunResult.as_stderr(
-                    'ERROR: "search exception": 1'
-                )
-            ])
+            self.assert_job_output_is(
+                [
+                    job_run_result.JobRunResult.as_stderr(
+                        'ERROR: "search exception": 1'
+                    )
+                ]
+            )
 
     def test_skips_deleted_model(self) -> None:
         exp_summary = self.create_model(
@@ -188,7 +202,7 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
             objective='objective',
             language_code='lang',
             community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC
+            status=constants.ACTIVITY_STATUS_PUBLIC,
         )
         exp_summary.update_timestamps()
         exp_summary.put()
@@ -197,7 +211,7 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
             platform_search_services,
             'add_documents_to_index',
             lambda _, __: None,
-            called=False
+            called=False,
         )
 
         with add_docs_to_index_swap:
@@ -213,7 +227,7 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
             objective='objective',
             language_code='lang',
             community_owned=False,
-            status=constants.ACTIVITY_STATUS_PRIVATE
+            status=constants.ACTIVITY_STATUS_PRIVATE,
         )
         exp_summary.update_timestamps()
         exp_summary.put()
@@ -222,10 +236,10 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
             platform_search_services,
             'add_documents_to_index',
             lambda _, __: None,
-            expected_args=[([], search_services.SEARCH_INDEX_EXPLORATIONS)]
+            expected_args=[([], search_services.SEARCH_INDEX_EXPLORATIONS)],
         )
 
         with add_docs_to_index_swap:
-            self.assert_job_output_is([
-                job_run_result.JobRunResult.as_stdout('SUCCESS: 1')
-            ])
+            self.assert_job_output_is(
+                [job_run_result.JobRunResult.as_stdout('SUCCESS: 1')]
+            )

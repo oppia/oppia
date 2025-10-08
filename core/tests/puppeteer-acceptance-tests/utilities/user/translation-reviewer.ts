@@ -37,6 +37,7 @@ const rejectTranslationButtonSelector = '.e2e-test-translation-reject-button';
 const reviewContentContainerSelector = '.e2e-test-review-content-container';
 const translatedContentContainerSelector = '.e2e-test-translated-content';
 const reviewModalContainerSelector = '.e2e-test-translation-review-modal';
+const updateTranslationBtnSelector = '.e2e-test-update-translation-button';
 
 export class TranslationReviewer extends BaseUser {
   /**
@@ -191,7 +192,7 @@ export class TranslationReviewer extends BaseUser {
       el => el.textContent
     );
 
-    await this.clickOn(buttonSelector);
+    await this.clickOnElementWithSelector(buttonSelector);
 
     await this.page.waitForFunction(
       (selector: string, initialContent: string) => {
@@ -234,6 +235,14 @@ export class TranslationReviewer extends BaseUser {
    */
   async expectReviewModalToBePresent(present: boolean = true): Promise<void> {
     await this.expectElementToBeVisible(reviewModalContainerSelector, present);
+  }
+
+  /**
+   * Clicks on update translation button.
+   */
+  async clickOnUpdateTranslationButton(): Promise<void> {
+    await this.clickOnElementWithSelector(updateTranslationBtnSelector);
+    await this.expectElementToBeVisible(updateTranslationBtnSelector, false);
   }
 }
 

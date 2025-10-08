@@ -66,49 +66,65 @@ class JobRunResultTests(test_utils.TestBase):
         self.assertEqual(run_result.stdout, '')
 
     def test_accumulate(self) -> None:
-        single_job_run_result = job_run_result.JobRunResult.accumulate([
-            job_run_result.JobRunResult(stdout='abc', stderr=''),
-            job_run_result.JobRunResult(stdout='', stderr='123'),
-            job_run_result.JobRunResult(stdout='def', stderr='456'),
-        ])[0]
+        single_job_run_result = job_run_result.JobRunResult.accumulate(
+            [
+                job_run_result.JobRunResult(stdout='abc', stderr=''),
+                job_run_result.JobRunResult(stdout='', stderr='123'),
+                job_run_result.JobRunResult(stdout='def', stderr='456'),
+            ]
+        )[0]
 
         self.assertItemsEqual(
-            single_job_run_result.stdout.split('\n'), ['abc', 'def'])
+            single_job_run_result.stdout.split('\n'), ['abc', 'def']
+        )
         self.assertItemsEqual(
-            single_job_run_result.stderr.split('\n'), ['123', '456'])
+            single_job_run_result.stderr.split('\n'), ['123', '456']
+        )
 
     def test_accumulate_one_less_than_limit_is_not_truncated(self) -> None:
-        accumulated_results = job_run_result.JobRunResult.accumulate([
-            job_run_result.JobRunResult(stdout='', stderr='a' * 1999),
-            job_run_result.JobRunResult(stdout='', stderr='b' * 3000),
-        ])
+        accumulated_results = job_run_result.JobRunResult.accumulate(
+            [
+                job_run_result.JobRunResult(stdout='', stderr='a' * 1999),
+                job_run_result.JobRunResult(stdout='', stderr='b' * 3000),
+            ]
+        )
 
         self.assertEqual(len(accumulated_results), 1)
 
         self.assertItemsEqual(
-            accumulated_results[0].stderr.split('\n'), ['a' * 1999, 'b' * 3000])
+            accumulated_results[0].stderr.split('\n'), ['a' * 1999, 'b' * 3000]
+        )
 
     def test_accumulate_one_more_than_limit_case_is_split(self) -> None:
-        accumulated_results = job_run_result.JobRunResult.accumulate([
-            job_run_result.JobRunResult(stdout='', stderr='a' * 2000),
-            job_run_result.JobRunResult(stdout='', stderr='b' * 3000),
-        ])
+        accumulated_results = job_run_result.JobRunResult.accumulate(
+            [
+                job_run_result.JobRunResult(stdout='', stderr='a' * 2000),
+                job_run_result.JobRunResult(stdout='', stderr='b' * 3000),
+            ]
+        )
 
         self.assertEqual(len(accumulated_results), 2)
 
     def test_accumulate_with_enormous_outputs(self) -> None:
-        accumulated_results = job_run_result.JobRunResult.accumulate([
-            job_run_result.JobRunResult(
-                stdout='a' * 5002, stderr='b' * 5002),
-            job_run_result.JobRunResult(
-                stdout='a' * 2000, stderr='b' * 2000),
-            job_run_result.JobRunResult(
-                stdout='a' * 1000, stderr='b' * 1000),
-            job_run_result.JobRunResult(
-                stdout='a' * 1000, stderr='b' * 1000),
-            job_run_result.JobRunResult(
-                stdout='a' * 2000, stderr='b' * 2000),
-        ])
+        accumulated_results = job_run_result.JobRunResult.accumulate(
+            [
+                job_run_result.JobRunResult(
+                    stdout='a' * 5002, stderr='b' * 5002
+                ),
+                job_run_result.JobRunResult(
+                    stdout='a' * 2000, stderr='b' * 2000
+                ),
+                job_run_result.JobRunResult(
+                    stdout='a' * 1000, stderr='b' * 1000
+                ),
+                job_run_result.JobRunResult(
+                    stdout='a' * 1000, stderr='b' * 1000
+                ),
+                job_run_result.JobRunResult(
+                    stdout='a' * 2000, stderr='b' * 2000
+                ),
+            ]
+        )
 
         # 100000 and 200000 are small enough ot fit as one, but the others will
         # each need their own result.
@@ -142,4 +158,5 @@ class JobRunResultTests(test_utils.TestBase):
         run_result = job_run_result.JobRunResult(stdout='abc', stderr='123')
 
         self.assertEqual(
-            repr(run_result), 'JobRunResult(stdout="abc", stderr="123")')
+            repr(run_result), 'JobRunResult(stdout="abc", stderr="123")'
+        )
