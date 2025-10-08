@@ -171,3 +171,28 @@ def get_entity_translation(
     return translation_domain.EntityTranslation.create_empty(
         entity_type, entity_id, language_code, entity_version=entity_version
     )
+
+
+def get_multiple_entity_translations(
+    entity_references: List[translation_models.EntityTranslationReferenceDict]
+) -> List[Optional[translation_domain.EntityTranslation]]:
+    """Gets multiple entity translations by their references.
+
+    Args:
+        entity_references: list(EntityTranslationReferenceDict). List of
+            dictionaries containing entity translation references.
+
+    Returns:
+        list(EntityTranslation|None). List of entity translations corresponding
+        to the given references. If a translation does not exist, the
+        corresponding entry will be None.
+    """
+    entity_translation_models = (
+        translation_models.EntityTranslationsModel.get_model_multi(
+            entity_references)
+    )
+    return [
+        _get_entity_translation_from_model(entity_translation_model)
+        if entity_translation_model is not None else None
+        for entity_translation_model in entity_translation_models
+    ]

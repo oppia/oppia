@@ -484,6 +484,89 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
                 ).to_dict(),
             )
 
+    def test_get_multiple_explorations_by_ids_and_version(self) -> None:
+        """Test fetching multiple explorations with specific versions."""
+        self.save_new_valid_exploration(
+            'exp1', self.owner_id, title='Original Exp1')
+        self.save_new_valid_exploration(
+            'exp2', self.owner_id, title='Original Exp2')
+
+        exp_services.update_exploration(
+            self.owner_id, 'exp1',
+            [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'Updated Exp1'
+            })],
+            'Update exp1 title'
+        )
+
+        results = exp_fetchers.get_multiple_explorations_by_ids_and_version([
+            ('exp1', 1),
+            ('exp1', 2),
+            ('exp2', 1),
+            ('exp1', None),
+            ('nonexistent', 1),
+        ])
+
+        self.assertEqual(len(results), 5)
+
+        self.assertIsNotNone(results[0])
+        assert results[0] is not None
+        self.assertEqual(results[0].id, 'exp1')
+        self.assertEqual(results[0].title, 'Original Exp1')
+        self.assertEqual(results[0].version, 1)
+
+        self.assertIsNotNone(results[1])
+        assert results[1] is not None
+        self.assertEqual(results[1].id, 'exp1')
+        self.assertEqual(results[1].title, 'Updated Exp1')
+        self.assertEqual(results[1].version, 2)
+
+        self.assertIsNotNone(results[2])
+        assert results[2] is not None
+        self.assertEqual(results[2].id, 'exp2')
+        self.assertEqual(results[2].title, 'Original Exp2')
+        self.assertEqual(results[2].version, 1)
+
+        self.assertIsNotNone(results[3])
+        assert results[3] is not None
+        self.assertEqual(results[3].id, 'exp1')
+        self.assertEqual(results[3].title, 'Updated Exp1')
+        self.assertEqual(results[3].version, 2)
+
+        self.assertIsNone(results[4])
+
+    def test_get_multiple_explorations_by_ids_and_version_with_invalid_version(
+        self
+    ) -> None:
+        """Test fetching explorations with invalid version numbers."""
+        self.save_new_valid_exploration('exp1', self.owner_id)
+
+        results = exp_fetchers.get_multiple_explorations_by_ids_and_version([
+            ('exp1', 999)
+        ])
+        self.assertEqual(len(results), 1)
+        self.assertIsNone(results[0])
+
+    def test_get_multiple_explorations_by_ids_and_version_deleted(self) -> None:
+        """Test fetching deleted explorations returns None."""
+        self.save_new_valid_exploration('exp1', self.owner_id)
+        exp_services.delete_exploration(self.owner_id, 'exp1')
+
+        results = exp_fetchers.get_multiple_explorations_by_ids_and_version([
+            ('exp1', 1)
+        ])
+        self.assertEqual(len(results), 1)
+        self.assertIsNone(results[0])
+
+    def test_get_multiple_explorations_by_empty_ids_and_version_list(
+        self
+    ) -> None:
+        """Test fetching with empty list of IDs."""
+        results = exp_fetchers.get_multiple_explorations_by_ids_and_version([])
+        self.assertEqual(results, [])
+
 
 class LoggedOutUserProgressTests(test_utils.GenericTestBase):
     """Tests the fetching of the logged-out user progress."""

@@ -36,7 +36,7 @@ from core.domain import (
 )
 from core.platform import models
 
-from typing import Dict, List, Literal, Optional, Sequence, overload
+from typing import Dict, List, Literal, Optional, Sequence, Tuple, overload
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -545,6 +545,30 @@ def get_multiple_explorations_by_id(
 
     result.update(db_results_dict)
     return result
+
+
+def get_multiple_explorations_by_ids_and_version(
+    exp_ids_and_versions: List[Tuple[str, Optional[int]]]
+) -> List[Optional[exp_domain.Exploration]]:
+    """Returns a list of explorations matching the IDs and versions provided.
+
+    Args:
+        exp_ids_and_versions: list(tuple(str, int|None)). List of tuples of
+            exploration ID and version number. If version number is None, the
+            latest version will be returned.
+
+    Returns:
+        list(Exploration|None). The list of explorations corresponding to the
+        given IDs and versions. If an exploration does not exist, the
+        corresponding entry will be None.
+    """
+    exp_models_list = exp_models.ExplorationModel.get_version_multi(
+        exp_ids_and_versions)
+    return [
+        get_exploration_from_model(exp_model)
+        if exp_model is not None else None
+        for exp_model in exp_models_list
+    ]
 
 
 def get_exploration_summaries_where_user_has_role(
