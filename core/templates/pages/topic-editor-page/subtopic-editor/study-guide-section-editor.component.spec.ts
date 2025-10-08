@@ -131,7 +131,7 @@ describe('Study Guide Section editor component', () => {
     expect(component.STUDY_GUIDE_SECTION_CONTENT_FORM_SCHEMA).toEqual({
       type: 'html',
       ui_config: {
-        rte_components: 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS',
+        rte_component_config_id: 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS',
       },
     });
   });
@@ -245,7 +245,7 @@ describe('Study Guide Section editor component', () => {
     expect(schema).toEqual({
       type: 'html',
       ui_config: {
-        rte_components: 'ALL_COMPONENTS',
+        rte_component_config_id: 'ALL_COMPONENTS',
         rows: 100,
       },
     });
@@ -290,7 +290,7 @@ describe('Study Guide Section editor component', () => {
     let isExceeded = component.isSectionContentLengthExceeded();
     expect(isExceeded).toBe(false);
 
-    computeHtmlLengthSpy.and.returnValue(1500);
+    computeHtmlLengthSpy.and.returnValue(6500);
     isExceeded = component.isSectionContentLengthExceeded();
     expect(isExceeded).toBe(true);
   });

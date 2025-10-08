@@ -18,12 +18,14 @@
 
 from __future__ import annotations
 
-from core.jobs.types import base_validation_errors_test
-from core.jobs.types import feedback_validation_errors
+from core.jobs.types import (
+    base_validation_errors_test,
+    feedback_validation_errors,
+)
 from core.platform import models
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import feedback_models
 
 (feedback_models,) = models.Registry.import_models([models.Names.FEEDBACK])
@@ -32,7 +34,8 @@ datastore_services = models.Registry.import_datastore_services()
 
 
 class InvalidEntityTypeErrorTests(
-        base_validation_errors_test.AuditErrorsTestBase):
+    base_validation_errors_test.AuditErrorsTestBase
+):
 
     def test_message(self) -> None:
         model = feedback_models.GeneralFeedbackThreadModel(
@@ -48,4 +51,5 @@ class InvalidEntityTypeErrorTests(
         self.assertEqual(
             error.stderr,
             'InvalidEntityTypeError in GeneralFeedbackThreadModel(id="123"):'
-            ' entity type %s is invalid.' % model.entity_type)
+            ' entity type %s is invalid.' % model.entity_type,
+        )

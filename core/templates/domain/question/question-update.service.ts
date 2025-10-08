@@ -26,7 +26,7 @@ import {QuestionDomainConstants} from 'domain/question/question-domain.constants
 import cloneDeep from 'lodash/cloneDeep';
 import {Injectable} from '@angular/core';
 import {StateBackendDict} from 'domain/state/state.model';
-import {Question} from './QuestionObjectFactory';
+import {Question} from './question.model';
 
 interface ApplyParams {
   property_name: string;

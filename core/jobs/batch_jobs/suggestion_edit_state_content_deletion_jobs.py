@@ -32,8 +32,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import suggestion_models
 
-(suggestion_models, ) = models.Registry.import_models([
-    models.Names.SUGGESTION])
+(suggestion_models,) = models.Registry.import_models([models.Names.SUGGESTION])
 
 
 # TODO(#15613): Here we use MyPy ignore because the incomplete typing of
@@ -41,32 +40,40 @@ if MYPY:  # pragma: no cover
 # assume that PTransform class is of type Any. Thus to avoid MyPy's error
 # (Class cannot subclass 'PTransform' (has type 'Any')), we added an
 # ignore here.
-class GetDeprecatedSuggestionEditStateContentModels(beam.PTransform): # type: ignore[misc]
+class GetDeprecatedSuggestionEditStateContentModels(beam.PTransform):  # type: ignore[misc]
     """Transform that gets all edit state content suggestion models."""
 
-    def expand(
-        self, pipeline: beam.Pipeline
-    ) -> Tuple[
+    def expand(self, pipeline: beam.Pipeline) -> Tuple[
         beam.PCollection[suggestion_models.GeneralSuggestionModel],
-        beam.PCollection[job_run_result.JobRunResult]
+        beam.PCollection[job_run_result.JobRunResult],
     ]:
         suggestion_edit_state_content_model_to_delete = (
             pipeline
-            | 'Get all general suggestion models' >> ndb_io.GetModels(
-                suggestion_models.GeneralSuggestionModel.get_all())
-            | 'Filter edit state content suggestion' >> (
+            | 'Get all general suggestion models'
+            >> ndb_io.GetModels(
+                suggestion_models.GeneralSuggestionModel.get_all()
+            )
+            | 'Filter edit state content suggestion'
+            >> (
                 beam.Filter(
-                    lambda model: ((
-                        model.suggestion_type == (
-                            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT)))
-                ))
+                    lambda model: (
+                        (
+                            model.suggestion_type
+                            == (feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT)
+                        )
+                    )
+                )
+            )
         )
 
         suggestion_edit_state_content_model_to_delete_count = (
             suggestion_edit_state_content_model_to_delete
-            | 'Count edit state content suggestion to be deleted' >> (
+            | 'Count edit state content suggestion to be deleted'
+            >> (
                 job_result_transforms.CountObjectsToJobRunResult(
-                    'EDIT STATE CONTENT SUGGESTION'))
+                    'EDIT STATE CONTENT SUGGESTION'
+                )
+            )
         )
 
         return (
@@ -82,11 +89,11 @@ class DeleteDeprecatedSuggestionEditStateContentModelsJob(base_jobs.JobBase):
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
 
-        (suggestion_edit_state_content_model_to_delete, (
-        suggestion_edit_state_content_model_to_delete_result)) = (
-            self.pipeline
-            | 'Get edit state content suggestion models' >> (
-                GetDeprecatedSuggestionEditStateContentModels())
+        (
+            suggestion_edit_state_content_model_to_delete,
+            (suggestion_edit_state_content_model_to_delete_result),
+        ) = self.pipeline | 'Get edit state content suggestion models' >> (
+            GetDeprecatedSuggestionEditStateContentModels()
         )
 
         unused_models_deletion_result = (
@@ -99,7 +106,8 @@ class DeleteDeprecatedSuggestionEditStateContentModelsJob(base_jobs.JobBase):
 
 
 class AuditDeprecatedSuggestionEditStateContentModelsDeletionJob(
-    base_jobs.JobBase):
+    base_jobs.JobBase
+):
     """Job that audit edit state content suggestion."""
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
@@ -107,8 +115,8 @@ class AuditDeprecatedSuggestionEditStateContentModelsDeletionJob(
         job_run_results = (
             self.pipeline
             | 'Perform fetching and deletion of edit state content'
-                ' suggestion results' >> (
-                GetDeprecatedSuggestionEditStateContentModels())
+            ' suggestion results'
+            >> (GetDeprecatedSuggestionEditStateContentModels())
         )[1]
 
         return job_run_results

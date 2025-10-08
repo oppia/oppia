@@ -21,19 +21,27 @@ from __future__ import annotations
 import functools
 
 from core.constants import constants
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_services
+from core.platform import models
 
 from google import auth
 from google.cloud import secretmanager
 from typing import Optional
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import app_identity_services
+
+app_identity_services = models.Registry.import_app_identity_services()
 
 # The 'auth.default()' returns tuple of credentials and project ID. As we are
 # only interested in credentials, we are using '[0]' to access it.
 CLIENT = secretmanager.SecretManagerServiceClient(
     credentials=(
         auth.credentials.AnonymousCredentials()
-        if constants.EMULATOR_MODE else auth.default()[0]))
+        if constants.EMULATOR_MODE
+        else auth.default()[0]
+    )
+)
 
 
 @functools.lru_cache(maxsize=64)
@@ -46,12 +54,8 @@ def get_secret(name: str) -> Optional[str]:
     Returns:
         str. The value of the secret.
     """
-    oppia_project_id = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.OPPIA_PROJECT_ID.value))
-    assert isinstance(oppia_project_id, str)
-    secret_name = (
-        f'projects/{oppia_project_id}/secrets/{name}/versions/latest')
+    oppia_project_id = app_identity_services.get_application_id()
+    secret_name = f'projects/{oppia_project_id}/secrets/{name}/versions/latest'
     try:
         response = CLIENT.access_secret_version(request={'name': secret_name})
     except Exception:

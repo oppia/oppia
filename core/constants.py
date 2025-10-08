@@ -44,8 +44,9 @@ def parse_json_from_ts(ts_file_contents: str) -> Dict[str, Any]:
     json_end = text_without_comments.rindex('}') + 1
     # Here we use type Any because 'json_dict' is a generic JSON object and
     # generic JSON objects are of type Dict[str, Any].
-    json_dict: Dict[str, Any] = (
-        json.loads(text_without_comments[json_start:json_end]))
+    json_dict: Dict[str, Any] = json.loads(
+        text_without_comments[json_start:json_end]
+    )
     return json_dict
 
 
@@ -142,10 +143,30 @@ class Constants(dict):  # type: ignore[type-arg]
     def __getattr__(self, name: str) -> Any:
         return self[name]
 
+    # This is needed for pickling when instances of Constants are passed as
+    # part of predicates in Beam jobs.
+    # Here we use type Any because this method parses and stores the values of
+    # constants defined in constants.ts file and we cannot define a single type
+    # which works for all of them.
+    def __getstate__(self) -> Dict[str, Any]:
+        return self.__dict__
 
-constants = Constants(parse_json_from_ts(  # pylint:disable=invalid-name
-    get_package_file_contents('assets', 'constants.ts')))
+    # This is needed for unpickling when instances of Constants are passed as
+    # part of predicates in Beam jobs.
+    # Here we use type Any because this method parses and stores the values of
+    # constants defined in constants.ts file and we cannot define a single type
+    # which works for all of them.
+    def __setstate__(self, d: Dict[str, Any]) -> None:
+        self.__dict__ = d
 
-release_constants = Constants( # pylint:disable=invalid-name
+
+constants = Constants(
+    parse_json_from_ts(  # pylint:disable=invalid-name
+        get_package_file_contents('assets', 'constants.ts')
+    )
+)
+
+
+release_constants = Constants(  # pylint:disable=invalid-name
     json.loads(get_package_file_contents('assets', 'release_constants.json'))
 )

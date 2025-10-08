@@ -38,7 +38,7 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
 import {StateCard} from 'domain/state_card/state-card.model';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {Interaction} from 'domain/exploration/interaction.model';
-import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
+import {StateObjectsBackendDict} from 'domain/exploration/states.model';
 import {ExplorationModeService} from 'pages/exploration-player-page/services/exploration-mode.service';
 
 class MockCheckpointCelebrationUtilityService {

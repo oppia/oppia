@@ -56,9 +56,11 @@ export class ReviewMaterialEditorComponent implements OnInit {
   HTML_SCHEMA: HtmlSchema = {
     type: 'html',
     ui_config: {
-      rte_components: 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS',
+      rte_component_config_id: 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS',
     },
   };
+  skillEditorWorkedExampleLimit: number =
+    AppConstants.SKILL_EDITOR_WORKED_EXAMPLE_LIMIT;
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -79,7 +81,7 @@ export class ReviewMaterialEditorComponent implements OnInit {
       this.HTML_SCHEMA = {
         type: 'html',
         ui_config: {
-          rte_components: 'ALL_COMPONENTS',
+          rte_component_config_id: 'ALL_COMPONENTS',
         },
       };
     }
@@ -87,21 +89,20 @@ export class ReviewMaterialEditorComponent implements OnInit {
   }
 
   updateLocalExp($event: string): void {
-    if (
-      this.editableExplanation !== $event &&
-      !this.checkExtraWorkedexample($event)
-    ) {
+    if (this.editableExplanation !== $event) {
       this.editableExplanation = $event;
       this.changeDetectorRef.detectChanges();
     }
   }
 
-  checkExtraWorkedexample(html: string): boolean {
+  checkExtraWorkedexample(): boolean {
     const workedexampleRegex =
       /<oppia-noninteractive-workedexample.*?>.*?<\/oppia-noninteractive-workedexample>/g;
-    const matches = html.match(workedexampleRegex);
+    const matches = this.editableExplanation.match(workedexampleRegex);
 
-    this.workedExampleLimitExceeded = !!(matches && matches.length > 2);
+    this.workedExampleLimitExceeded = !!(
+      matches && matches.length > this.skillEditorWorkedExampleLimit
+    );
     return this.workedExampleLimitExceeded;
   }
 
