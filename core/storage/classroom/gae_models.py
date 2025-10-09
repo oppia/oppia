@@ -24,7 +24,7 @@ from core.platform import models
 from typing import Dict, List, Optional
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import base_models, datastore_services
 
 datastore_services = models.Registry.import_datastore_services()
@@ -42,31 +42,36 @@ class ClassroomModel(base_models.BaseModel):
     name = datastore_services.StringProperty(required=True, indexed=True)
     # The url fragment of the classroom.
     url_fragment = datastore_services.StringProperty(
-        required=True, indexed=True)
+        required=True, indexed=True
+    )
     # A text to provide course details present in the classroom.
     course_details = datastore_services.StringProperty(
-        indexed=True, required=True)
+        indexed=True, required=True
+    )
     # A text to provide a summary of the classroom.
-    teaser_text = datastore_services.StringProperty(
-        indexed=True, required=True)
+    teaser_text = datastore_services.StringProperty(indexed=True, required=True)
     # A text to provide an introduction for all the topics in the classroom.
     topic_list_intro = datastore_services.StringProperty(
-        indexed=True, required=True)
+        indexed=True, required=True
+    )
     # A property that is used to establish dependencies among the topics in the
     # classroom. This field contains a dict with topic ID as key and a list of
     # prerequisite topic IDs as value.
     topic_id_to_prerequisite_topic_ids = datastore_services.JsonProperty(
-        indexed=False, required=False)
+        indexed=False, required=False
+    )
     # Whether this classroom is published or not.
     # False if classroom is hidden, True if published.
     is_published = datastore_services.BooleanProperty(
-        indexed=True, required=True, default=False)
+        indexed=True, required=True, default=False
+    )
     # Whether this classroom's diagnostic test
     #  functionality is enabled or not.
     # False if diagnostic test functionality
     #  is hidden, True if enabled.
     diagnostic_test_is_enabled = datastore_services.BooleanProperty(
-        indexed=True, required=True, default=False)
+        indexed=True, required=True, default=False
+    )
     # The thumbnail filename of the classroom.
     thumbnail_filename = datastore_services.StringProperty(indexed=True)
     # The thumbnail background color of the classroom.
@@ -88,33 +93,39 @@ class ClassroomModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user(
-    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
-            'name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'course_details': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'teaser_text': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'topic_list_intro': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'topic_id_to_prerequisite_topic_ids': (
-                base_models.EXPORT_POLICY.NOT_APPLICABLE),
-            'is_published': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'diagnostic_test_is_enabled': (
-                base_models.EXPORT_POLICY.NOT_APPLICABLE),
-            'thumbnail_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'thumbnail_bg_color': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'thumbnail_size_in_bytes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'banner_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'banner_bg_color': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'banner_size_in_bytes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'index': base_models.EXPORT_POLICY.NOT_APPLICABLE
-        })
+        return dict(
+            super(cls, cls).get_export_policy(),
+            **{
+                'name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'course_details': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'teaser_text': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'topic_list_intro': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'topic_id_to_prerequisite_topic_ids': (
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE
+                ),
+                'is_published': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'diagnostic_test_is_enabled': (
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE
+                ),
+                'thumbnail_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'thumbnail_bg_color': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'thumbnail_size_in_bytes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'banner_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'banner_bg_color': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'banner_size_in_bytes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'index': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            },
+        )
 
     @classmethod
     def generate_new_classroom_id(cls) -> str:
@@ -132,21 +143,33 @@ class ClassroomModel(base_models.BaseModel):
         for _ in range(base_models.MAX_RETRIES):
             classroom_id = utils.convert_to_hash(
                 str(utils.get_random_int(base_models.RAND_RANGE)),
-                base_models.ID_LENGTH)
+                base_models.ID_LENGTH,
+            )
             if not cls.get_by_id(classroom_id):
                 return classroom_id
         raise Exception(
-            'New classroom id generator is producing too many collisions.')
+            'New classroom id generator is producing too many collisions.'
+        )
 
     @classmethod
     def create(
-        cls, classroom_id: str, name: str, url_fragment: str,
-        course_details: str, teaser_text: str, topic_list_intro: str,
+        cls,
+        classroom_id: str,
+        name: str,
+        url_fragment: str,
+        course_details: str,
+        teaser_text: str,
+        topic_list_intro: str,
         topic_id_to_prerequisite_topic_ids: Dict[str, List[str]],
-        is_published: bool, diagnostic_test_is_enabled: bool,
-        thumbnail_filename: str, thumbnail_bg_color: str,
-        thumbnail_size_in_bytes: int, banner_filename: str,
-        banner_bg_color: str, banner_size_in_bytes: int, index: int
+        is_published: bool,
+        diagnostic_test_is_enabled: bool,
+        thumbnail_filename: str,
+        thumbnail_bg_color: str,
+        thumbnail_size_in_bytes: int,
+        banner_filename: str,
+        banner_bg_color: str,
+        banner_size_in_bytes: int,
+        index: int,
     ) -> ClassroomModel:
         """Creates a new ClassroomModel entry.
 
@@ -162,7 +185,7 @@ class ClassroomModel(base_models.BaseModel):
             topic_id_to_prerequisite_topic_ids: dict(str, list(str)). A dict
                 with topic ID as key and list of topic IDs as value.
             is_published: bool. Whether this classroom is published or not.
-            diagnostic_test_is_enabled: bool. Whether diagnostic test 
+            diagnostic_test_is_enabled: bool. Whether diagnostic test
                 is enabled.
             thumbnail_filename: str. Classroom's thumbnail filename.
             thumbnail_bg_color: str. Classroom's thumbnail background color.
@@ -180,7 +203,8 @@ class ClassroomModel(base_models.BaseModel):
         """
         if cls.get_by_id(classroom_id):
             raise Exception(
-                'A classroom with the given classroom ID already exists.')
+                'A classroom with the given classroom ID already exists.'
+            )
 
         entity = cls(
             id=classroom_id,
@@ -190,7 +214,8 @@ class ClassroomModel(base_models.BaseModel):
             teaser_text=teaser_text,
             topic_list_intro=topic_list_intro,
             topic_id_to_prerequisite_topic_ids=(
-                topic_id_to_prerequisite_topic_ids),
+                topic_id_to_prerequisite_topic_ids
+            ),
             is_published=is_published,
             diagnostic_test_is_enabled=diagnostic_test_is_enabled,
             thumbnail_filename=thumbnail_filename,
@@ -199,7 +224,7 @@ class ClassroomModel(base_models.BaseModel):
             banner_filename=banner_filename,
             banner_bg_color=banner_bg_color,
             banner_size_in_bytes=banner_size_in_bytes,
-            index=index
+            index=index,
         )
         entity.update_timestamps()
         entity.put()
@@ -220,7 +245,7 @@ class ClassroomModel(base_models.BaseModel):
         return ClassroomModel.query(
             datastore_services.all_of(
                 cls.url_fragment == url_fragment,
-                cls.deleted == False # pylint: disable=singleton-comparison
+                cls.deleted == False,  # pylint: disable=singleton-comparison
             )
         ).get()
 
@@ -238,6 +263,6 @@ class ClassroomModel(base_models.BaseModel):
         return ClassroomModel.query(
             datastore_services.all_of(
                 cls.name == classroom_name,
-                cls.deleted == False  # pylint: disable=singleton-comparison
+                cls.deleted == False,  # pylint: disable=singleton-comparison
             )
         ).get()

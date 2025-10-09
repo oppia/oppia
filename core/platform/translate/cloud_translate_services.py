@@ -30,14 +30,17 @@ from google.cloud import translate_v2 as translate
 CLIENT = translate.Client(
     credentials=(
         auth.credentials.AnonymousCredentials()
-        if constants.EMULATOR_MODE else auth.default()[0]))
+        if constants.EMULATOR_MODE
+        else auth.default()[0]
+    )
+)
 
 # List of languages with adequate Google Translate accuracy.
 LANGUAGE_CODE_ALLOWLIST = ('en', 'es', 'fr', 'zh', 'pt')
 
 
 def translate_text(
-        text: str, source_language: str, target_language: str
+    text: str, source_language: str, target_language: str
 ) -> str:
     """Translates text into the target language.
 
@@ -66,10 +69,9 @@ def translate_text(
     if source_language == target_language:
         return text
 
-    result = (
-        CLIENT.translate(
-            text, target_language=target_language,
-            source_language=source_language))
+    result = CLIENT.translate(
+        text, target_language=target_language, source_language=source_language
+    )
     # Letting mypy know that result is a dict.
     assert isinstance(result, dict)
     translated_text = result['translatedText']

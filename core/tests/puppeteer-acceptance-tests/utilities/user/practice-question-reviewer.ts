@@ -32,7 +32,8 @@ const reviewModalHeaderSelector =
 // Question Suggestion Editor Modal Selectors.
 const questionSuggestionEditorModalSelector =
   '.e2e-test-question-suggestion-editor-modal';
-const editQuestionPencilIconSelector = '.e2e-test-edit-content-pencil-button';
+const editQuestionPencilIconSelector =
+  'button.e2e-test-edit-content-pencil-button';
 const saveQuestionButtonSelector = '.e2e-test-save-question-button';
 
 // Other Selectors.
@@ -84,8 +85,7 @@ export class PracticeQuestionReviewer extends Contributor {
       await this.fillReviewComment(reviewMessage);
     }
 
-    await this.waitForElementToStabilize(buttonSelector);
-    await this.clickOn(buttonSelector);
+    await this.clickOnElementWithSelector(buttonSelector);
     await this.expectToastMessage('Submitted suggestion review.');
   }
 
@@ -94,9 +94,8 @@ export class PracticeQuestionReviewer extends Contributor {
    * @param {string} question - The question to edit.
    */
   async editQuestionInQuestionEditorModal(question: string): Promise<void> {
-    await this.expectElementToBeVisible(editQuestionPencilIconSelector);
     await this.waitForElementToStabilize(editQuestionPencilIconSelector);
-    await this.clickOn(editQuestionPencilIconSelector);
+    await this.clickOnElementWithSelector(editQuestionPencilIconSelector);
 
     const questionEditorModal = await this.page.$(
       questionSuggestionEditorModalSelector
@@ -116,8 +115,7 @@ export class PracticeQuestionReviewer extends Contributor {
    */
   async editQuestionInReview(question: string): Promise<void> {
     // Click on edit button.
-    await this.expectElementToBeVisible(editButtonSelector);
-    await this.clickOn(editButtonSelector);
+    await this.clickOnElementWithSelector(editButtonSelector);
 
     await this.expectElementToBeVisible(questionSuggestionEditorModalSelector);
 
@@ -125,8 +123,9 @@ export class PracticeQuestionReviewer extends Contributor {
     await this.editQuestionInQuestionEditorModal(question);
 
     // Save the question.
-    await this.clickOn(saveQuestionButtonSelector);
+    await this.clickOnElementWithSelector(saveQuestionButtonSelector);
     await this.expectToastMessage('Updated question.');
+    await this.expectElementToBeVisible(saveQuestionButtonSelector, false);
   }
 
   /**
@@ -135,7 +134,7 @@ export class PracticeQuestionReviewer extends Contributor {
   async editQuestionInteractionInReview(): Promise<void> {
     // Click on edit button.
     await this.expectElementToBeVisible(editButtonSelector);
-    await this.clickOn(editButtonSelector);
+    await this.clickOnElementWithSelector(editButtonSelector);
 
     await this.removeInteraction();
 
@@ -161,7 +160,7 @@ export class PracticeQuestionReviewer extends Contributor {
     );
 
     // Save the question.
-    await this.clickOn(saveQuestionButtonSelector);
+    await this.clickOnElementWithSelector(saveQuestionButtonSelector);
     await this.expectToastMessage('Updated question.');
   }
 
