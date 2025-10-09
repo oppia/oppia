@@ -22,7 +22,7 @@ from core.domain import search_services
 from core.platform.search import elastic_search_services
 from core.tests import test_utils
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Mapping, Sequence
 
 
 class ElasticSearchUnitTests(test_utils.GenericTestBase):
