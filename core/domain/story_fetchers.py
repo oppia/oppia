@@ -36,7 +36,7 @@ from core.domain import (
 )
 from core.platform import models
 
-from typing import Dict, List, Literal, Optional, Sequence, overload
+from typing import Dict, List, Literal, Optional, Sequence, Tuple, overload
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -231,6 +231,30 @@ def get_story_by_id(
             return story
         else:
             return None
+
+
+def get_multiple_stories_by_ids_and_version(
+    story_ids_and_versions: List[Tuple[str, Optional[int]]]
+) -> List[Optional[story_domain.Story]]:
+    """Returns a list of stories matching the IDs and versions provided.
+
+    Args:
+        story_ids_and_versions: list(tuple(str, int|None)). List of tuples of
+            story ID and version number. If version number is None, the latest
+            version will be returned.
+
+    Returns:
+        list(Story|None). The list of stories corresponding to the given IDs
+        and versions. If a story does not exist, the corresponding entry will
+        be None.
+    """
+    story_model_list = story_models.StoryModel.get_version_multi(
+        story_ids_and_versions)
+    return [
+        get_story_from_model(story_model)
+        if story_model is not None else None
+        for story_model in story_model_list
+    ]
 
 
 def get_story_by_url_fragment(

@@ -77,6 +77,10 @@
   width: max-content;
 }
 
+.oppia-invite-learners .invited-learner-card picture img {
+  max-width: 15%;
+}
+
 .oppia-invite-learners .invited-learner-card .close-button {
   align-items: center;
   display: grid;

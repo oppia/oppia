@@ -37,6 +37,7 @@ from typing import (
     Optional,
     Sequence,
     Set,
+    Tuple,
     TypedDict,
     overload,
 )
@@ -323,6 +324,30 @@ def get_topics_by_ids(
         if topic_model is not None:
             topics.append(get_topic_from_model(topic_model))
     return topics
+
+
+def get_multiple_topics_by_ids_and_version(
+    topic_ids_and_versions: List[Tuple[str, Optional[int]]]
+) -> List[Optional[topic_domain.Topic]]:
+    """Returns a list of topics matching the IDs and versions provided.
+
+    Args:
+        topic_ids_and_versions: list(tuple(str, int|None)). List of tuples of
+            topic ID and version number. If version number is None, the latest
+            version will be returned.
+
+    Returns:
+        list(Topic|None). The list of topics corresponding to the given IDs
+        and versions. If a topic does not exist, the corresponding entry will
+        be None.
+    """
+    topic_models_list = topic_models.TopicModel.get_version_multi(
+        topic_ids_and_versions)
+    return [
+        get_topic_from_model(topic_model)
+        if topic_model is not None else None
+        for topic_model in topic_models_list
+    ]
 
 
 @overload

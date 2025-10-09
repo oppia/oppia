@@ -30,10 +30,11 @@ from core.tests import test_utils
 from typing import Dict, List, Set, Union, cast
 
 MYPY = False
-if MYPY:  # pragma: no cover
-    from mypy_imports import base_models
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models, datastore_services
 
 (base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
+datastore_services = models.Registry.import_datastore_services()
 
 
 class BaseModelUnitTests(test_utils.GenericTestBase):
@@ -465,6 +466,8 @@ class TestVersionedModel(base_models.VersionedModel):
     SNAPSHOT_METADATA_CLASS = TestSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = TestSnapshotContentModel
     COMMIT_LOG_ENTRY_CLASS = TestCommitLogEntryModel
+    # Field to seed some content into different versions.
+    description = datastore_services.StringProperty(indexed=True)
 
 
 class BaseCommitLogEntryModelTests(test_utils.GenericTestBase):
@@ -1035,3 +1038,124 @@ class BaseModelTests(test_utils.GenericTestBase):
 
         with assert_raises_regexp_context_manager, get_by_id_swap:
             TestBaseModel.get_new_id('exploration')
+
+    def test_get_version_multi(self) -> None:
+        """Test fetching multiple versions of multiple entities."""
+        model1 = TestVersionedModel(id='model_id1')
+        model1.commit(feconf.SYSTEM_COMMITTER_ID, 'First commit', [])
+        model1.commit(feconf.SYSTEM_COMMITTER_ID, 'Second commit', [])
+        model2 = TestVersionedModel(id='model_id2')
+        model2.commit(feconf.SYSTEM_COMMITTER_ID, 'First commit', [])
+
+        results = TestVersionedModel.get_version_multi([
+            ('model_id1', 1),
+            ('model_id1', 2),
+            ('model_id2', 1),
+            ('model_id1', None),
+            ('nonexistent', 1),
+        ])
+
+        self.assertEqual(len(results), 5)
+
+        self.assertIsNotNone(results[0])
+        assert results[0] is not None
+        self.assertEqual(results[0].id, 'model_id1')
+        self.assertEqual(results[0].version, 1)
+
+        self.assertIsNotNone(results[1])
+        assert results[1] is not None
+        self.assertEqual(results[1].id, 'model_id1')
+        self.assertEqual(results[1].version, 2)
+
+        self.assertIsNotNone(results[2])
+        assert results[2] is not None
+        self.assertEqual(results[2].id, 'model_id2')
+        self.assertEqual(results[2].version, 1)
+
+        self.assertIsNotNone(results[3])
+        assert results[3] is not None
+        self.assertEqual(results[3].id, 'model_id1')
+        self.assertEqual(results[3].version, 2)
+
+        self.assertIsNone(results[4])
+
+    def test_get_version_multi_with_invalid_version(self) -> None:
+        """Test fetching versions with invalid version numbers."""
+        model = TestVersionedModel(id='model_id1')
+        model.commit(feconf.SYSTEM_COMMITTER_ID, 'First commit', [])
+
+        results = TestVersionedModel.get_version_multi([
+            ('model_id1', 999)
+        ])
+        self.assertEqual(len(results), 1)
+        self.assertIsNone(results[0])
+
+    def test_get_version_multi_deleted(self) -> None:
+        """Test fetching deleted models returns None."""
+        model = TestVersionedModel(id='model_id1')
+        model.commit(feconf.SYSTEM_COMMITTER_ID, 'First commit', [])
+        model.delete(feconf.SYSTEM_COMMITTER_ID, 'Delete model')
+
+        results = TestVersionedModel.get_version_multi([
+            ('model_id1', 1)
+        ])
+        self.assertEqual(len(results), 1)
+        self.assertIsNone(results[0])
+
+    def test_get_version_multi_empty_list(self) -> None:
+        """Test fetching with empty list of IDs."""
+        results = TestVersionedModel.get_version_multi([])
+        self.assertEqual(results, [])
+
+    def test_get_version_multi_with_multiple_snapshots(self) -> None:
+        """Test fetching multiple versions with snapshots."""
+        model = TestVersionedModel(id='model_id1')
+
+        for i in range(3):
+            model.commit(
+                feconf.SYSTEM_COMMITTER_ID,
+                'Commit %d' % (i + 1),
+                [{'cmd': 'create_new'}])
+
+        results = TestVersionedModel.get_version_multi([
+            ('model_id1', 1),
+            ('model_id1', 2),
+            ('model_id1', 3)
+        ])
+
+        self.assertEqual(len(results), 3)
+        for i, result in enumerate(results, start=1):
+            self.assertIsNotNone(result)
+            assert result is not None
+            self.assertEqual(result.id, 'model_id1')
+            self.assertEqual(result.version, i)
+
+    def test_get_version_multi_with_same_id_different_versions(self) -> None:
+        """Test fetching multiple versions of same model different content."""
+        model = TestVersionedModel(id='model_id1')
+
+        model.description = 'Version 1 content'
+        model.commit(feconf.SYSTEM_COMMITTER_ID, 'First commit', [])
+
+        model.description = 'Version 2 content'
+        model.commit(feconf.SYSTEM_COMMITTER_ID, 'Second commit', [])
+
+        results = TestVersionedModel.get_version_multi([
+            ('model_id1', 1),
+            ('model_id1', 1),
+            ('model_id1', 2)
+        ])
+
+        self.assertEqual(len(results), 3)
+
+        assert results[0] is not None
+        assert results[1] is not None
+        assert results[2] is not None
+
+        self.assertEqual(results[0].version, 1)
+        self.assertEqual(results[1].version, 1)
+        self.assertEqual(results[2].version, 2)
+
+        self.assertEqual(results[0].description, 'Version 1 content')
+        self.assertEqual(results[1].description, 'Version 1 content')
+        self.assertEqual(results[2].description, 'Version 2 content')
