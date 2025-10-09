@@ -28,6 +28,10 @@ runs:
         ls -la oppia/build
         echo "Files in third_party:"
         ls -la oppia/third_party
+        echo "Contents of requirements_dev.txt:"
+        cat ./oppia/requirements_dev.txt
+        echo "Contents of requirements.txt:"
+        cat ./oppia/requirements.txt
       working-directory: /home/runner/work/oppia
       shell: bash
     - name: Build Webpack

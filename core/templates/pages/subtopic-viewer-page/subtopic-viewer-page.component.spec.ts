@@ -515,6 +515,26 @@ describe('Subtopic viewer page', function () {
     );
   });
 
+  it('should open study guide when openStudyGuide is called with Ctrl+click event', () => {
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'algebra';
+    component.nextSubtopic = {
+      getUrlFragment: () => 'linear-equations',
+    };
+    const mockEvent = new MouseEvent('click', {ctrlKey: true});
+
+    spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
+      '/test-url'
+    );
+
+    component.openStudyGuide(mockEvent);
+
+    expect(windowRef.nativeWindow.open).toHaveBeenCalledWith(
+      '/test-url',
+      '_blank'
+    );
+  });
+
   it('should not open study guide when required fragments are missing', () => {
     component.classroomUrlFragment = '';
     component.topicUrlFragment = 'algebra';
@@ -540,6 +560,23 @@ describe('Subtopic viewer page', function () {
     expect(windowRef.nativeWindow.open).toHaveBeenCalledWith(
       '/study-guide-menu',
       '_self'
+    );
+  });
+
+  it('should open study guide menu when openStudyGuideMenu is called with Ctrl+click event', () => {
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'algebra';
+    const mockEvent = new MouseEvent('click', {ctrlKey: true});
+
+    spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
+      '/study-guide-menu'
+    );
+
+    component.openStudyGuideMenu(mockEvent);
+
+    expect(windowRef.nativeWindow.open).toHaveBeenCalledWith(
+      '/study-guide-menu',
+      '_blank'
     );
   });
 
@@ -572,6 +609,29 @@ describe('Subtopic viewer page', function () {
     expect(loaderService.showLoadingScreen).toHaveBeenCalledWith('Loading');
   });
 
+  it('should open practice menu when openPracticeMenu is called with Ctrl+click', () => {
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'algebra';
+    component.currentSubtopicId = 1;
+    component.parentTopicTitle = 'Test Topic';
+    const mockEvent = new MouseEvent('click', {ctrlKey: true});
+
+    spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
+      '/practice-menu'
+    );
+    spyOn(loaderService, 'showLoadingScreen');
+
+    component.openPracticeMenu(mockEvent);
+
+    expect(
+      siteAnalyticsService.registerPracticeSessionStartEvent
+    ).toHaveBeenCalledWith('math', 'Test Topic', '1');
+    expect(windowRef.nativeWindow.open).toHaveBeenCalledWith(
+      '/practice-menu',
+      '_blank'
+    );
+  });
+
   it('should navigate back to topic when backToTopic is called', () => {
     component.classroomUrlFragment = 'math';
     component.topicUrlFragment = 'algebra';
@@ -585,6 +645,23 @@ describe('Subtopic viewer page', function () {
     expect(windowRef.nativeWindow.open).toHaveBeenCalledWith(
       '/topic-viewer',
       '_self'
+    );
+  });
+
+  it('should navigate back to topic when backToTopic is called with Ctrl+click event', () => {
+    component.classroomUrlFragment = 'math';
+    component.topicUrlFragment = 'algebra';
+    const mockEvent = new MouseEvent('click', {ctrlKey: true});
+
+    spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
+      '/topic-viewer'
+    );
+
+    component.backToTopic(mockEvent);
+
+    expect(windowRef.nativeWindow.open).toHaveBeenCalledWith(
+      '/topic-viewer',
+      '_blank'
     );
   });
 
@@ -616,21 +693,37 @@ describe('Subtopic viewer page', function () {
   it('should modify next subtopic title based on length', () => {
     const longTitle =
       'This is a very long subtopic title that exceeds twenty characters';
+
+    // Test desktop view (default behavior).
+    spyOn(component, 'checkMobileView').and.returnValue(false);
     component.nextSubtopic = {
       getTitle: () => longTitle,
       getUrlFragment: () => 'test-fragment',
     };
-    const result1 = component.checkNextSubtopicTitleLengthAndModify();
-    expect(result1).toBe('This is a very lo...');
-    expect(result1.length).toBe(20);
 
+    const desktopResult = component.checkNextSubtopicTitleLengthAndModify();
+    // 20 chars + '...'.
+    expect(desktopResult).toBe('This is a very long ...');
+    // 20 + 3 for '...'.
+    expect(desktopResult.length).toBe(23);
+
+    // Test mobile view.
+    (component.checkMobileView as jasmine.Spy).and.returnValue(true);
+    const mobileResult = component.checkNextSubtopicTitleLengthAndModify();
+    // 15 chars + '...'.
+    expect(mobileResult).toBe('This is a very ...');
+    // 15 + 3 for '...'.
+    expect(mobileResult.length).toBe(18);
+
+    // Test short title (should not be truncated).
     const shortTitle = 'Short title';
     component.nextSubtopic = {
       getTitle: () => shortTitle,
       getUrlFragment: () => 'test-fragment',
     };
-    const result2 = component.checkNextSubtopicTitleLengthAndModify();
-    expect(result2).toBe(shortTitle);
-    expect(result2).toBe('Short title');
+
+    const shortResult = component.checkNextSubtopicTitleLengthAndModify();
+    expect(shortResult).toBe(shortTitle);
+    expect(shortResult).toBe('Short title');
   });
 });

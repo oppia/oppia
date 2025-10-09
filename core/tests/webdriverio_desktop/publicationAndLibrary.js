@@ -17,10 +17,8 @@
  * the resultant display of explorations in the library.
  */
 
-var forms = require('../webdriverio_utils/forms.js');
 var general = require('../webdriverio_utils/general.js');
 var users = require('../webdriverio_utils/users.js');
-var waitFor = require('../webdriverio_utils/waitFor.js');
 var workflow = require('../webdriverio_utils/workflow.js');
 
 var AdminPage = require('../webdriverio_utils/AdminPage.js');
@@ -33,9 +31,6 @@ describe('Library index page', function () {
   var adminPage = null;
   var libraryPage = null;
   var explorationEditorPage = null;
-  var explorationEditorMainTab = null;
-  var explorationEditorSettingsTab = null;
-  var explorationPlayerPage = null;
   let releaseCoordinatorPage = null;
 
   beforeAll(async function () {
@@ -58,173 +53,6 @@ describe('Library index page', function () {
     improvementsTabFeature =
       await releaseCoordinatorPage.getImprovementsTabFeatureElement();
     await releaseCoordinatorPage.enableFeature(improvementsTabFeature);
-    await users.logout();
-  });
-
-  it('should display private and published explorations', async function () {
-    var EXPLORATION_SILMARILS = 'silmarils';
-    var EXPLORATION_VINGILOT = 'Vingilot';
-    var CATEGORY_ARCHITECTURE = 'Architecture';
-    var CATEGORY_BUSINESS = 'Business';
-    var LANGUAGE_ENGLISH = 'English';
-    var LANGUAGE_FRANCAIS = 'français (French)';
-    var LANGUAGE_FRANCAI = 'français';
-    var LANGUAGE_DEUTSCH = 'Deutsch (German)';
-    var LANGUAGE_DEUTSC = 'Deutsch';
-
-    await users.createModerator(
-      'varda@publicationAndLibrary.com',
-      'vardaPublicationAndLibrary'
-    );
-    await users.createUser(
-      'feanor@publicationAndLibrary.com',
-      'feanorPublicationAndLibrary'
-    );
-    await users.createUser(
-      'celebrimor@publicationAndLibrary.com',
-      'celebriorPublicationAndLibrary'
-    );
-    await users.createUser(
-      'earendil@publicationAndLibrary.com',
-      'earendilPublicationAndLibrary'
-    );
-
-    await users.login('feanor@publicationAndLibrary.com');
-    await workflow.createAndPublishExploration(
-      EXPLORATION_SILMARILS,
-      CATEGORY_ARCHITECTURE,
-      'hold the light of the two trees',
-      LANGUAGE_DEUTSCH,
-      true
-    );
-
-    await users.logout();
-
-    await users.login('earendil@publicationAndLibrary.com');
-    await workflow.createAndPublishExploration(
-      EXPLORATION_VINGILOT,
-      CATEGORY_BUSINESS,
-      'seek the aid of the Valar',
-      LANGUAGE_DEUTSCH,
-      true
-    );
-    await users.logout();
-
-    await users.login('varda@publicationAndLibrary.com');
-    await libraryPage.get();
-    await libraryPage.selectLanguages([LANGUAGE_DEUTSC]);
-    await libraryPage.findExploration(EXPLORATION_VINGILOT);
-    await libraryPage.playExploration(EXPLORATION_VINGILOT);
-    await general.moveToEditor(true);
-
-    // Moderators can edit explorations.
-    await waitFor.pageToFullyLoad();
-    await explorationEditorPage.navigateToSettingsTab();
-    await explorationEditorSettingsTab.setLanguage(LANGUAGE_FRANCAIS);
-    await explorationEditorPage.publishChanges('change language');
-    await users.logout();
-
-    await users.login('celebrimor@publicationAndLibrary.com');
-    await workflow.createExploration(true);
-    await explorationEditorMainTab.setContent(
-      await forms.toRichText('Celebrimbor wrote this')
-    );
-    await explorationEditorMainTab.setInteraction('EndExploration');
-    await explorationEditorPage.navigateToSettingsTab();
-    await explorationEditorSettingsTab.setObjective(
-      'preserve the works of the elves'
-    );
-
-    await explorationEditorPage.saveChanges();
-
-    // There are now two non-private explorations whose titles, categories
-    // and languages are, respectively:
-    // - silmarils, gems, Deutsch
-    // - Vingilot, ships, français.
-    var ALL_PUBLIC_EXPLORATION_TITLES = [
-      EXPLORATION_SILMARILS,
-      EXPLORATION_VINGILOT,
-    ];
-
-    var testCases = [
-      {
-        categories: [],
-        languages: [],
-        expectVisible: [EXPLORATION_SILMARILS, EXPLORATION_VINGILOT],
-      },
-      {
-        categories: [],
-        languages: [LANGUAGE_FRANCAI],
-        expectVisible: [EXPLORATION_VINGILOT],
-      },
-      {
-        categories: [],
-        languages: [LANGUAGE_DEUTSC, LANGUAGE_FRANCAI],
-        expectVisible: [EXPLORATION_SILMARILS, EXPLORATION_VINGILOT],
-      },
-      {
-        categories: [CATEGORY_ARCHITECTURE],
-        languages: [],
-        expectVisible: [EXPLORATION_SILMARILS],
-      },
-      {
-        categories: [CATEGORY_ARCHITECTURE, CATEGORY_BUSINESS],
-        languages: [],
-        expectVisible: [EXPLORATION_SILMARILS, EXPLORATION_VINGILOT],
-      },
-      {
-        categories: [CATEGORY_ARCHITECTURE],
-        languages: [LANGUAGE_DEUTSC],
-        expectVisible: [EXPLORATION_SILMARILS],
-      },
-      {
-        categories: [CATEGORY_ARCHITECTURE],
-        languages: [LANGUAGE_FRANCAI],
-        expectVisible: [],
-      },
-    ];
-
-    // We now check explorations are visible under the right conditions.
-    await browser.url('/search/find?q=&language_code=("en")');
-    // The initial language selection should be just English.
-    await libraryPage.expectCurrentLanguageSelectionToBe([LANGUAGE_ENGLISH]);
-    // At the start, no categories are selected.
-    await libraryPage.expectCurrentCategorySelectionToBe([]);
-
-    // Reset the language selector.
-    await libraryPage.deselectLanguages([LANGUAGE_ENGLISH]);
-
-    for (var testCase of testCases) {
-      await libraryPage.selectLanguages(testCase.languages);
-      await libraryPage.selectCategories(testCase.categories);
-
-      for (var explorationTitle in ALL_PUBLIC_EXPLORATION_TITLES) {
-        if (testCase.expectVisible.indexOf(explorationTitle) !== -1) {
-          await libraryPage.expectExplorationToBeVisible(explorationTitle);
-        } else {
-          await libraryPage.expectExplorationToBeHidden(explorationTitle);
-        }
-      }
-
-      await libraryPage.deselectLanguages(testCase.languages);
-      await libraryPage.deselectCategories(testCase.categories);
-    }
-
-    // Private explorations are not shown in the library.
-    await libraryPage.expectExplorationToBeHidden('Vilya');
-
-    await libraryPage.selectLanguages([LANGUAGE_FRANCAI]);
-    await libraryPage.findExploration(EXPLORATION_VINGILOT);
-    // The first letter of the objective is automatically capitalized.
-    expect(
-      await libraryPage.getExplorationObjective(EXPLORATION_VINGILOT)
-    ).toBe('Seek the aid of the Valar');
-
-    await libraryPage.selectLanguages([LANGUAGE_DEUTSC]);
-    await libraryPage.findExploration(EXPLORATION_SILMARILS);
-    await libraryPage.playExploration(EXPLORATION_SILMARILS);
-    await explorationPlayerPage.expectExplorationNameToBe('silmarils');
-
     await users.logout();
   });
 

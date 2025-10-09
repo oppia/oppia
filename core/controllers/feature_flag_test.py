@@ -50,43 +50,33 @@ class FeatureFlagsEvaluationHandlerTest(test_utils.GenericTestBase):
 
         self.swapped_value = {
             FeatureNames.FEATURE_A.value: (
-                'a feature in dev stage', FeatureStages.DEV
+                'a feature in dev stage',
+                FeatureStages.DEV,
             ),
             FeatureNames.FEATURE_B.value: (
-                'a feature in prod stage', FeatureStages.PROD
-            )
+                'a feature in prod stage',
+                FeatureStages.PROD,
+            ),
         }
         self.swap_name_to_description_feature_stage_registry_dict = self.swap(
             registry,
             'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
-            self.swapped_value
+            self.swapped_value,
         )
 
         self.dev_feature_flag = feature_flag_domain.FeatureFlag(
             FeatureNames.FEATURE_A.value,
             feature_flag_domain.FeatureFlagSpec(
-                'a feature in dev stage',
-                FeatureStages.DEV
+                'a feature in dev stage', FeatureStages.DEV
             ),
-            feature_flag_domain.FeatureFlagConfig(
-                False,
-                0,
-                [],
-                None
-            )
+            feature_flag_domain.FeatureFlagConfig(False, 0, [], None),
         )
         self.prod_feature_flag = feature_flag_domain.FeatureFlag(
             FeatureNames.FEATURE_B.value,
             feature_flag_domain.FeatureFlagSpec(
-                'a feature in prod stage',
-                FeatureStages.PROD
+                'a feature in prod stage', FeatureStages.PROD
             ),
-            feature_flag_domain.FeatureFlagConfig(
-                False,
-                0,
-                [],
-                None
-            )
+            feature_flag_domain.FeatureFlagConfig(False, 0, [], None),
         )
         with self.swap_name_to_description_feature_stage_registry_dict:
             registry.Registry.update_feature_flag(
@@ -112,25 +102,23 @@ class FeatureFlagsEvaluationHandlerTest(test_utils.GenericTestBase):
         swap_name_to_description_feature_stage_dict = self.swap(
             feature_services,
             'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
-            self.swapped_value
+            self.swapped_value,
         )
         swap_name_to_description_feature_stage_registry_dict = self.swap(
             registry,
             'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
-            self.swapped_value
+            self.swapped_value,
         )
 
         with swap_name_to_description_feature_stage_dict:
             with swap_name_to_description_feature_stage_registry_dict:
-                result = self.get_json(
-                    '/feature_flags_evaluation_handler'
-                )
+                result = self.get_json('/feature_flags_evaluation_handler')
         self.assertEqual(
             result,
             {
                 self.dev_feature_flag.name: False,
-                self.prod_feature_flag.name: True
-            }
+                self.prod_feature_flag.name: True,
+            },
         )
 
 
@@ -138,7 +126,8 @@ class FeatureFlagDummyHandlerTest(test_utils.GenericTestBase):
     """Tests for the FeatureFlagDummyHandler."""
 
     @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS])
+        [feature_flag_list.FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS]
+    )
     def test_get_with_dummy_feature_flag_enabled_returns_true(self) -> None:
         result = self.get_json(
             '/feature_flag_dummy_handler',
@@ -146,7 +135,5 @@ class FeatureFlagDummyHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(result, {'msg': 'ok', 'is_enabled': True})
 
     def test_get_with_dummy_feature_flag_disabled_returns_false(self) -> None:
-        result = self.get_json(
-            '/feature_flag_dummy_handler'
-        )
+        result = self.get_json('/feature_flag_dummy_handler')
         self.assertEqual(result, {'msg': 'ok', 'is_enabled': False})
