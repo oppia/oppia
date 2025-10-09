@@ -1076,7 +1076,7 @@ def update_blog_author_details(
         author_bio: str. The bio of the blog author.
 
     Raises:
-    Exception. Unable to fetch blog author details for the given user ID.
+        Exception. Unable to fetch blog author details for the given user ID.
     """
     blog_author_model = blog_models.BlogAuthorDetailsModel.get_by_author(
         user_id

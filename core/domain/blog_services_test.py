@@ -32,7 +32,7 @@ from core.domain import (
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, List, Tuple, Any
+from typing import Any, Dict, List, Tuple
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -396,7 +396,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
                 self.blog_post_a_id, self.change_dict_one
             )
         except Exception as e:
-            self.fail(f"update_blog_post() raised Exception unexpectedly: {e}")
+            self.fail(f'update_blog_post() raised Exception unexpectedly: {e}')
 
         updated_blog_post = blog_services.get_blog_post_by_id(
             self.blog_post_a_id
@@ -858,7 +858,10 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
             'content': '<p>Old Content</p>',
             'tags': ['tag0'],
         }
-
+        # Here we use MyPy ignore because dictionary of type BlogPostChangeDict
+        # should contain 'content','title','thumbnail_filename' key but for testing purpose here we are not
+        # providing some keys, which causes MyPy to throw error. Thus to
+        # silent the error, we used ignore here.
         title_dict: blog_services.BlogPostChangeDict = {  # type: ignore[typeddict-item]
             'title': 'New Title'
         }
@@ -871,7 +874,10 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(updated.content, expected['content'])
         self.assertEqual(updated.tags, expected['tags'])
-
+        # Here we use MyPy ignore because dictionary of type BlogPostChangeDict
+        # should contain 'content','title','thumbnail_filename' key but for testing purpose here we are not
+        # providing some keys, which causes MyPy to throw error. Thus to
+        # silent the error, we used ignore here.
         thumbnail_dict: blog_services.BlogPostChangeDict = {  # type: ignore[typeddict-item]
             'thumbnail_filename': 'thumb_new.svg'
         }
@@ -884,7 +890,10 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(updated.title, expected['title'])
         self.assertEqual(updated.content, expected['content'])
         self.assertEqual(updated.tags, expected['tags'])
-
+        # Here we use MyPy ignore because dictionary of type BlogPostChangeDict
+        # should contain 'content','title','thumbnail_filename' key but for testing purpose here we are not
+        # providing some keys, which causes MyPy to throw error. Thus to
+        # silent the error, we used ignore here.
         content_dict: blog_services.BlogPostChangeDict = {  # type: ignore[typeddict-item]
             'content': '<p>Updated Content</p>'
         }
@@ -897,7 +906,10 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
             updated.thumbnail_filename, expected['thumbnail_filename']
         )
         self.assertEqual(updated.tags, expected['tags'])
-
+        # Here we use MyPy ignore because dictionary of type BlogPostChangeDict
+        # should contain 'content','title','thumbnail_filename' key but for testing purpose here we are not
+        # providing some keys, which causes MyPy to throw error. Thus to
+        # silent the error, we used ignore here.
         tags_dict: blog_services.BlogPostChangeDict = {  # type: ignore[typeddict-item]
             'tags': ['new1', 'new2']
         }
@@ -955,7 +967,7 @@ class BlogAuthorDetailsTests(test_utils.GenericTestBase):
         def _mock_get_by_author(unused_user_id: str) -> None:
             return None
 
-        def _mock_get_user_settings(unused_user_id: str, strict: bool) -> None:
+        def _mock_get_user_settings(unused_user_id: str, _strict: bool) -> None:
             return None
 
         get_by_author_swap = self.swap(
@@ -1398,28 +1410,37 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
         observed_calls = []
 
         def mock_search_blog_post_summaries(
-            query: str, tag: List[str], size: int, offset: int | None = None
+            _query: str,
+            _tags: List[str],
+            _size: int,
+            _offset: int | None = None,
         ) -> Tuple[List[str], str]:
-            observed_calls.append(offset)
-            return (["valid_id_1"], "next_offset")
+            """Mock search function for blog post summaries."""
+            observed_calls.append(_offset)
+            return (['valid_id_1'], 'next_offset')
 
-        def mock_get_multi(ids: Any) -> Any:
+        # Here we use type Any because this mocks the original function.
+        def mock_get_multi(_ids: Any) -> Any:
+            """Mock get_multi function returning dummy models."""
+
             class DummyModel:
+                """Dummy model used for mocking get_multi."""
+
                 pass
 
             return [DummyModel()]
 
         with self.swap(
             og_search_services,
-            "search_blog_post_summaries",
+            'search_blog_post_summaries',
             mock_search_blog_post_summaries,
         ), self.swap(
-            blog_models.BlogPostSummaryModel, "get_multi", mock_get_multi
+            blog_models.BlogPostSummaryModel, 'get_multi', mock_get_multi
         ), self.swap(
-            feconf, "MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE", 3
+            feconf, 'MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE', 3
         ), self.swap(
-            blog_services, "MAX_ITERATIONS", 2
+            blog_services, 'MAX_ITERATIONS', 2
         ):
-            blog_services.get_blog_post_ids_matching_query("", [], 3)
+            blog_services.get_blog_post_ids_matching_query('', [], 3)
 
         self.assertGreater(len(observed_calls), 1)
