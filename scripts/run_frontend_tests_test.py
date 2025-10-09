@@ -237,7 +237,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                             '--check_coverage',
                             '--specs_to_run='
                             'home-page.component.spec.ts,'
-                            'about-page.component.spec.ts,'
+                            'about-page.component.ts,'
                             'test-module.js,'
                             'exploration.model.ts',
                         ])
@@ -254,12 +254,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         ]
         self.assertIn(cmd, self.cmd_token_list)
         self.assertTrue(self.frontend_coverage_checks_called)
-        self.assertEqual(self.frontend_coverage_checks_args, [[
-            '--files_to_check='
-            'about-page.component.spec.ts,'
-            'home-page.component.spec.ts,'
-            'test-module.spec.js'
-        ]])
+        
         self.assertEqual(
             self.frontend_coverage_checks_args,
             [
