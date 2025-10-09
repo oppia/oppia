@@ -316,6 +316,26 @@ class QuestionModel(base_models.VersionedModel):
         cls.update_timestamps_multi(questions)
         cls.put_multi(questions)
 
+    @classmethod
+    def get_all_questions(
+        cls,
+        offset: int,
+        question_count: int = constants.MAX_QUESTIONS_FETCHABLE
+    ) -> Sequence[QuestionModel]:
+        """Fetches the list of questions in batches.
+
+        Args:
+            question_count: int. The number of questions to be returned.
+            offset: int. Number of query results to skip.
+
+        Returns:
+            list(QuestionModel). The list of questions.
+        """
+        question_count = min(question_count, constants.MAX_QUESTIONS_FETCHABLE)
+
+        return cls.query().order(-cls.last_updated).fetch(
+            question_count, offset=offset)
+
 
 class QuestionSkillLinkModel(base_models.BaseModel):
     """Model for storing Question-Skill Links.

@@ -74,9 +74,12 @@ class MigrateExplorationModels(beam.PTransform):  # type: ignore[misc]
         """
         try:
             exploration = exp_fetchers.get_exploration_from_model(exp_model)
-            exploration.validate(strict=exp_is_published)
 
             with datastore_services.get_ndb_context():
+                # This needs to be done in the ndb context
+                # because feature flags need to be fetched from the
+                # datastore as part of validation.
+                exploration.validate(strict=exp_is_published)
                 if (
                     exp_services.get_story_id_linked_to_exploration(
                         exp_model.id

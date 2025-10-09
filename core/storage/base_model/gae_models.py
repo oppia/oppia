@@ -1536,6 +1536,64 @@ class VersionedModel(BaseModel):
             raise e
 
     @classmethod
+    def get_version_multi(
+            cls: Type[SELF_VERSIONED_MODEL],
+            entity_ids_and_versions: List[Tuple[str, Optional[int]]]
+        ) -> List[Optional[SELF_VERSIONED_MODEL]]:
+        """Gets model instances for each version specified in 
+        entity_ids_and_versions.
+
+        Args:
+            entity_ids_and_versions: list(tuple(str, int|None)). List of tuples
+                where each tuple contains the entity id and version number. If
+                the version number is None, the latest version is retrieved.
+
+        Returns:
+            list(VersionedModel). Model instances representing the given
+            versions.
+        """
+        entity_ids = list({
+            entity_id for (entity_id, _) in entity_ids_and_versions})
+        current_version_models = cls.get_multi(
+            entity_ids, include_deleted=False)
+
+        latest_versions_by_id = {
+            model.id: model.version
+            for model in current_version_models
+            if model is not None
+        }
+
+        results: List[Optional[SELF_VERSIONED_MODEL]] = [None] * len(
+            entity_ids_and_versions)
+        valid_snapshot_ids = []
+        valid_indices = []
+
+        for idx, (entity_id, version_number) in enumerate(
+            entity_ids_and_versions):
+            if entity_id in latest_versions_by_id:
+                version = (
+                    version_number if version_number is not None
+                    else latest_versions_by_id[entity_id])
+                snapshot_id = cls.get_snapshot_id(entity_id, version)
+                valid_snapshot_ids.append(snapshot_id)
+                valid_indices.append(idx)
+
+        assert cls.SNAPSHOT_CONTENT_CLASS is not None
+
+        snapshot_models = cls.SNAPSHOT_CONTENT_CLASS.get_multi(
+            valid_snapshot_ids)
+
+        for idx, snapshot_model in zip(valid_indices, snapshot_models):
+            if snapshot_model is not None:
+                entity_id, version_number = entity_ids_and_versions[idx]
+                version = (
+                    version_number if version_number is not None
+                    else latest_versions_by_id[entity_id])
+                model = cls(id=entity_id, version=version)
+                results[idx] = model._reconstitute(snapshot_model.content)
+        return results
+
+    @classmethod
     def get_multi_versions(
         cls: Type[SELF_VERSIONED_MODEL],
         entity_id: str,

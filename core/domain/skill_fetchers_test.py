@@ -320,3 +320,113 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             skill.rubric_schema_version, feconf.CURRENT_RUBRIC_SCHEMA_VERSION
         )
+
+    def test_get_multiple_skills_by_ids_and_version(self) -> None:
+        """Test fetching multiple skills with specific versions."""
+        skill_1_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            skill_1_id, self.USER_ID, description='Original Skill 1')
+
+        skill_2_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            skill_2_id, self.USER_ID, description='Original Skill 2')
+
+        changelist = [
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                'property_name': skill_domain.SKILL_PROPERTY_DESCRIPTION,
+                'old_value': 'Original Skill 1',
+                'new_value': 'Updated Skill 1'
+            })
+        ]
+        skill_services.update_skill(
+            self.user_id_admin, skill_1_id, changelist, 'Update skill 1')
+
+        results = skill_fetchers.get_multiple_skills_by_ids_and_version([
+            (skill_1_id, 1),
+            (skill_1_id, 2),
+            (skill_2_id, 1),
+            (skill_1_id, None),
+            ('nonexistent', 1),
+        ])
+
+        self.assertEqual(len(results), 5)
+
+        self.assertIsNotNone(results[0])
+        assert results[0] is not None
+        self.assertEqual(results[0].id, skill_1_id)
+        self.assertEqual(results[0].description, 'Original Skill 1')
+        self.assertEqual(results[0].version, 1)
+
+        self.assertIsNotNone(results[1])
+        assert results[1] is not None
+        self.assertEqual(results[1].id, skill_1_id)
+        self.assertEqual(results[1].description, 'Updated Skill 1')
+        self.assertEqual(results[1].version, 2)
+
+        self.assertIsNotNone(results[2])
+        assert results[2] is not None
+        self.assertEqual(results[2].id, skill_2_id)
+        self.assertEqual(results[2].description, 'Original Skill 2')
+        self.assertEqual(results[2].version, 1)
+
+        self.assertIsNotNone(results[3])
+        assert results[3] is not None
+        self.assertEqual(results[3].id, skill_1_id)
+        self.assertEqual(results[3].description, 'Updated Skill 1')
+        self.assertEqual(results[3].version, 2)
+
+        self.assertIsNone(results[4])
+
+    def test_get_multiple_skills_by_ids_and_version_with_invalid_version(
+        self
+    ) -> None:
+        """Test fetching skills with invalid version numbers."""
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id, self.USER_ID)
+
+        results = skill_fetchers.get_multiple_skills_by_ids_and_version([
+            (skill_id, 999)
+        ])
+        self.assertEqual(len(results), 1)
+        self.assertIsNone(results[0])
+
+    def test_get_multiple_skills_by_ids_and_version_deleted(self) -> None:
+        """Test fetching deleted skills returns None."""
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id, self.USER_ID)
+        skill_services.delete_skill(self.USER_ID, skill_id)
+
+        results = skill_fetchers.get_multiple_skills_by_ids_and_version([
+            (skill_id, 1)
+        ])
+        self.assertEqual(len(results), 1)
+        self.assertIsNone(results[0])
+
+    def test_get_multiple_skills_by_ids_and_version_empty_list(self) -> None:
+        """Test fetching with empty list of IDs."""
+        results = skill_fetchers.get_multiple_skills_by_ids_and_version([])
+        self.assertEqual(results, [])
+
+    def test_get_multiple_skills_by_ids_and_version_schema_versions(
+        self
+    ) -> None:
+        """Test fetching skills maintains correct schema versions."""
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id, self.USER_ID)
+
+        results = skill_fetchers.get_multiple_skills_by_ids_and_version([
+            (skill_id, 1)
+        ])
+        self.assertEqual(len(results), 1)
+        self.assertIsNotNone(results[0])
+        assert results[0] is not None
+        self.assertEqual(
+            results[0].skill_contents_schema_version,
+            feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION)
+        self.assertEqual(
+            results[0].misconceptions_schema_version,
+            feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION)
+        self.assertEqual(
+            results[0].rubric_schema_version,
+            feconf.CURRENT_RUBRIC_SCHEMA_VERSION)
