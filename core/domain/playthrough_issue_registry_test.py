@@ -35,14 +35,16 @@ class IssueRegistryUnitTests(test_utils.GenericTestBase):
         self.issues_dict = {
             'EarlyQuit': EarlyQuit.EarlyQuit,
             'CyclicStateTransitions': (
-                CyclicStateTransitions.CyclicStateTransitions),
+                CyclicStateTransitions.CyclicStateTransitions
+            ),
             'MultipleIncorrectSubmissions': (
-                MultipleIncorrectSubmissions.MultipleIncorrectSubmissions)
+                MultipleIncorrectSubmissions.MultipleIncorrectSubmissions
+            ),
         }
         self.invalid_issue_type = 'InvalidIssueType'
 
     def tearDown(self) -> None:
-        playthrough_issue_registry.Registry._issues = ( # pylint: disable=protected-access
+        playthrough_issue_registry.Registry._issues = (  # pylint: disable=protected-access
             {}
         )
         super().tearDown()
@@ -50,7 +52,8 @@ class IssueRegistryUnitTests(test_utils.GenericTestBase):
     def test_issue_registry(self) -> None:
         """Do some sanity checks on the issue registry."""
         self.assertEqual(
-            len(playthrough_issue_registry.Registry.get_all_issues()), 3)
+            len(playthrough_issue_registry.Registry.get_all_issues()), 3
+        )
 
     def test_correct_issue_registry_types(self) -> None:
         """Tests issue registry for fetching of issue instances of correct
@@ -59,7 +62,10 @@ class IssueRegistryUnitTests(test_utils.GenericTestBase):
         for issue_type, _class in self.issues_dict.items():
             self.assertIsInstance(
                 playthrough_issue_registry.Registry.get_issue_by_type(
-                    issue_type), _class)
+                    issue_type
+                ),
+                _class,
+            )
 
     def test_incorrect_issue_registry_types(self) -> None:
         """Tests that an error is raised when fetching an incorrect issue
@@ -67,4 +73,5 @@ class IssueRegistryUnitTests(test_utils.GenericTestBase):
         """
         with self.assertRaisesRegex(KeyError, self.invalid_issue_type):
             playthrough_issue_registry.Registry.get_issue_by_type(
-                self.invalid_issue_type)
+                self.invalid_issue_type
+            )

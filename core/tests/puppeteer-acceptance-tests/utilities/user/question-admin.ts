@@ -67,12 +67,12 @@ export class QuestionAdmin extends BaseUser {
    * Function for adding a right of reviewing questions to a user.
    */
   async addReviewQuestionRights(username: string): Promise<void> {
-    await this.type(addContributorUsernameInput, username);
+    await this.typeInInputField(addContributorUsernameInput, username);
     await this.select(
       addContributonRightsCategorySelector,
       reviewQuestionRightValue
     );
-    await this.clickOn(addContributionRightsSubmitButton);
+    await this.clickOnElementWithSelector(addContributionRightsSubmitButton);
 
     await this.waitForNetworkIdle();
     await this.expectElementToBeClickable(
@@ -85,12 +85,12 @@ export class QuestionAdmin extends BaseUser {
    * Function for adding a right of submitting questions to a user.
    */
   async addSubmitQuestionRights(username: string): Promise<void> {
-    await this.type(addContributorUsernameInput, username);
+    await this.typeInInputField(addContributorUsernameInput, username);
     await this.select(
       addContributonRightsCategorySelector,
       submitQuestionRightValue
     );
-    await this.clickOn(addContributionRightsSubmitButton);
+    await this.clickOnElementWithSelector(addContributionRightsSubmitButton);
 
     await this.waitForNetworkIdle();
     await this.expectElementToBeClickable(
@@ -103,12 +103,12 @@ export class QuestionAdmin extends BaseUser {
    * Function for removng a right of reviewing questions to a user.
    */
   async removeReviewQuestionRights(username: string): Promise<void> {
-    await this.type(removeContributorUsernameInput, username);
+    await this.typeInInputField(removeContributorUsernameInput, username);
     await this.select(
       removeContributonRightsCategorySelector,
       reviewQuestionRightValue
     );
-    await this.clickOn(removeContributionRightsSubmitButton);
+    await this.clickOnElementWithSelector(removeContributionRightsSubmitButton);
 
     await this.waitForNetworkIdle();
     await this.expectElementToBeClickable(
@@ -121,12 +121,12 @@ export class QuestionAdmin extends BaseUser {
    * Function for removing a right of reviewing questions to a user.
    */
   async removeSubmitQuestionRights(username: string): Promise<void> {
-    await this.type(removeContributorUsernameInput, username);
+    await this.typeInInputField(removeContributorUsernameInput, username);
     await this.select(
       removeContributonRightsCategorySelector,
       submitQuestionRightValue
     );
-    await this.clickOn(removeContributionRightsSubmitButton);
+    await this.clickOnElementWithSelector(removeContributionRightsSubmitButton);
 
     await this.waitForNetworkIdle();
     await this.expectElementToBeClickable(
@@ -144,7 +144,7 @@ export class QuestionAdmin extends BaseUser {
       viewContributorCategorySelector,
       reviewQuestionRightValue
     );
-    await this.clickOn(viewContributorSubmitButton);
+    await this.clickOnElementWithSelector(viewContributorSubmitButton);
 
     await this.waitForNetworkIdle();
 
@@ -171,7 +171,7 @@ export class QuestionAdmin extends BaseUser {
       viewContributorCategorySelector,
       submitQuestionRightValue
     );
-    await this.clickOn(viewContributorSubmitButton);
+    await this.clickOnElementWithSelector(viewContributorSubmitButton);
 
     await this.waitForNetworkIdle();
 
@@ -197,8 +197,8 @@ export class QuestionAdmin extends BaseUser {
     contribution: string
   ): Promise<string> {
     await this.select(viewContributorFilterMethodSelector, usernameMethodValue);
-    await this.type(viewContributerUsernameInput, username);
-    await this.clickOn(viewContributorSubmitButton);
+    await this.typeInInputField(viewContributerUsernameInput, username);
+    await this.clickOnElementWithSelector(viewContributorSubmitButton);
 
     await this.waitForNetworkIdle();
 

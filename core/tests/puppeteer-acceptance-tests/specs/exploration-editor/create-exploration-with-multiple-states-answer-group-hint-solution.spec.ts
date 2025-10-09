@@ -63,12 +63,12 @@ describe('Exploration Editor', function () {
     // Navigate to the new card and update its content.
     await explorationEditor.navigateToCard(CARD_NAME.TEST_QUESTION);
     await explorationEditor.createMinimalExploration(
-      'Enter a negative number greater than -100.',
+      'Enter a negative number less than -100.',
       INTERACTION_TYPES.NUMERIC_INPUT
     );
     await explorationEditor.addResponsesToTheInteraction(
       INTERACTION_TYPES.NUMERIC_INPUT,
-      '-99',
+      '-100',
       'Perfect!',
       CARD_NAME.FINAL_CARD,
       true
@@ -78,7 +78,7 @@ describe('Exploration Editor', function () {
     // ✅ Add hints and solutions.
     await explorationEditor.addHintToState('Think of negative numbers.');
     await explorationEditor.addSolutionToState(
-      '-40',
+      '-140',
       'Yes, that is correct.',
       true
     );
@@ -108,7 +108,7 @@ describe('Exploration Editor', function () {
 
       // Continue to the next card, enter an answer, and submit it.
       await explorationEditor.continueToNextCard();
-      await explorationEditor.submitAnswer('-40');
+      await explorationEditor.submitAnswer('-140');
       await explorationEditor.continueToNextCard();
 
       // Check the completion message and restart the exploration.
