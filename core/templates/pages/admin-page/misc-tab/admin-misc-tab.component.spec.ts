@@ -873,6 +873,7 @@ describe('Admin misc tab component ', () => {
         component.verifyStudyGuideModels();
         tick();
 
+        expect(studyGuideModelSpy).toHaveBeenCalled();
         expect(statusMessageSpy).toHaveBeenCalledTimes(2);
         expect(statusMessageSpy).toHaveBeenCalledWith(
           'Starting the verification of all Study Guide Models...'
@@ -895,6 +896,7 @@ describe('Admin misc tab component ', () => {
         component.verifyStudyGuideModels();
         tick();
 
+        expect(studyGuideModelSpy).toHaveBeenCalled();
         expect(statusMessageSpy).toHaveBeenCalledTimes(2);
         expect(statusMessageSpy).toHaveBeenCalledWith(
           'Starting the verification of all Study Guide Models...'
