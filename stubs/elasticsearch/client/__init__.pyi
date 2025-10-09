@@ -10,12 +10,14 @@ class Elasticsearch(object):
     indices: IndicesClient
 
     def __init__(
-        self, hosts: Any = ..., transport_class: Type[Transport] = ..., **kwargs: Any
+        self,
+        hosts: Any = ...,
+        transport_class: Type[Transport] = ...,
+        **kwargs: Any
     ) -> None: ...
     def __repr__(self) -> str: ...
     def __enter__(self) -> 'Elasticsearch': ...
     def __exit__(self, *_: Any) -> None: ...
-
     def index(
         self,
         index: Any,
@@ -42,9 +44,8 @@ class Elasticsearch(object):
         ignore: Optional[Union[int, Collection[int]]] = ...,
         opaque_id: Optional[str] = ...,
         params: Optional[MutableMapping[str, Any]] = ...,
-        headers: Optional[MutableMapping[str, str]] = ...
+        headers: Optional[MutableMapping[str, str]] = ...,
     ) -> Any: ...
-
     def exists(
         self,
         index: Any,
@@ -72,7 +73,6 @@ class Elasticsearch(object):
         params: Optional[MutableMapping[str, Any]] = ...,
         headers: Optional[MutableMapping[str, str]] = ...
     ) -> bool: ...
-
     def delete(
         self,
         index: Any,
@@ -98,7 +98,6 @@ class Elasticsearch(object):
         params: Optional[MutableMapping[str, Any]] = ...,
         headers: Optional[MutableMapping[str, str]] = ...
     ) -> Any: ...
-
     def delete_by_query(
         self,
         index: Any,
@@ -146,9 +145,8 @@ class Elasticsearch(object):
         ignore: Optional[Union[int, Collection[int]]] = ...,
         opaque_id: Optional[str] = ...,
         params: Optional[MutableMapping[str, Any]] = ...,
-        headers: Optional[MutableMapping[str, str]] = ...
+        headers: Optional[MutableMapping[str, str]] = ...,
     ) -> Any: ...
-
     def search(
         self,
         *,

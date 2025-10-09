@@ -34,8 +34,7 @@ REPO_OWNER = 'oppia'
 REPO_NAME = 'oppia'
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s'
 )
 
 
@@ -55,7 +54,7 @@ class Issue:
         number: int,
         assignee_username: Optional[str],
         events_url: str,
-        last_active_date: Optional[datetime.datetime] = None
+        last_active_date: Optional[datetime.datetime] = None,
     ):
         self.number = number
         self.assignee_username = assignee_username
@@ -78,7 +77,7 @@ class Issue:
         return cls(
             number=data['number'],
             assignee_username=assignee_username,
-            events_url=data['events_url']
+            events_url=data['events_url'],
         )
 
     def is_inactive_for_seven_days(self) -> bool:
@@ -124,11 +123,11 @@ class GitHubService:
         self.repo_name = repo_name
         self.rest_headers = {
             'Authorization': f'token {token}',
-            'Accept': 'application/vnd.github.v3+json'
+            'Accept': 'application/vnd.github.v3+json',
         }
         self.graphql_headers = {
             'Authorization': f'Bearer {token}',
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
         }
         self.base_url = f'https://api.github.com/repos/{repo_owner}/{repo_name}'
 
@@ -159,7 +158,7 @@ class GitHubService:
             typed_issue_data: IssueDict = {
                 'number': issue_data['number'],
                 'assignee': issue_data.get('assignee'),
-                'events_url': issue_data['events_url']
+                'events_url': issue_data['events_url'],
             }
             issue = Issue.from_github_data(typed_issue_data)
             issues_list.append(issue)
@@ -206,9 +205,7 @@ class GitHubService:
             requests.HTTPError. Raised if the request fails.
         """
         response = requests.get(
-            issue.events_url,
-            headers=self.rest_headers,
-            timeout=10
+            issue.events_url, headers=self.rest_headers, timeout=10
         )
         if response is None:
             raise AssertionError('Received null res while fetching events')
@@ -229,8 +226,7 @@ class GitHubService:
 
         latest_event_date = max(
             datetime.datetime.strptime(
-                event['created_at'],
-                '%Y-%m-%dT%H:%M:%SZ'
+                event['created_at'], '%Y-%m-%dT%H:%M:%SZ'
             ).replace(tzinfo=datetime.timezone.utc)
             for event in assignee_events
         )
@@ -270,7 +266,7 @@ class GitHubService:
         req_credentials = {
             'owner': self.repo_owner,
             'name': self.repo_name,
-            'cursor': None
+            'cursor': None,
         }
 
         issue_to_prs = collections.defaultdict(set)
@@ -281,7 +277,7 @@ class GitHubService:
                 'https://api.github.com/graphql',
                 headers=self.graphql_headers,
                 json={'query': query, 'variables': req_credentials},
-                timeout=10
+                timeout=10,
             )
             if response is None:
                 raise AssertionError('Received null res while fetching PRs')
@@ -324,7 +320,7 @@ class GitHubService:
             url,
             headers=self.rest_headers,
             json={'assignees': [issue.assignee_username]},
-            timeout=10
+            timeout=10,
         )
         if response is None:
             raise AssertionError('Received null res while unassigning issue')
@@ -357,10 +353,7 @@ class GitHubService:
             f'know, so that we can help you. Thanks!'
         )
         response = requests.post(
-            url,
-            headers=self.rest_headers,
-            json={'body': comment},
-            timeout=10
+            url, headers=self.rest_headers, json={'body': comment}, timeout=10
         )
         if response is None:
             raise AssertionError('Received null res while commenting on issue')
@@ -383,10 +376,7 @@ class GitHubService:
             f'This issue is now open for other contributors to take up.'
         )
         response = requests.post(
-            url,
-            headers=self.rest_headers,
-            json={'body': comment},
-            timeout=10
+            url, headers=self.rest_headers, json={'body': comment}, timeout=10
         )
         if response is None:
             raise AssertionError('Received null res while commenting on issue')
@@ -422,14 +412,16 @@ class IssueManager:
             if issue.assignee_username in collaborators:
                 logging.info(
                     'Skipping issue #%d: assignee %s is a collaborator',
-                    issue.number, issue.assignee_username
+                    issue.number,
+                    issue.assignee_username,
                 )
                 continue
 
             if issue.number in issues_with_prs:
                 logging.info(
                     'Skipping issue #%d: has open PR #%s',
-                    issue.number, issues_with_prs[issue.number]
+                    issue.number,
+                    issues_with_prs[issue.number],
                 )
                 continue
 
@@ -439,14 +431,16 @@ class IssueManager:
                 self.github.add_alert_comment_on_issue(issue)
                 logging.info(
                     'Issue #%d has been inactive for >%d days',
-                    issue.number, INACTIVE_DAYS_THRESHOLD
+                    issue.number,
+                    INACTIVE_DAYS_THRESHOLD,
                 )
 
             if issue.is_inactive_for_ten_days():
                 inactive_issues.append(issue)
                 logging.info(
                     'Issue #%d has been inactive for >%d days',
-                    issue.number, UNASSIGN_DAYS_THRESHOLD
+                    issue.number,
+                    UNASSIGN_DAYS_THRESHOLD,
                 )
 
         return inactive_issues
@@ -463,17 +457,14 @@ class IssueManager:
                     self.github.post_unassignment_comment(issue)
                     logging.info(
                         'Unassigned issue #%d from %s',
-                        issue.number, issue.assignee_username
+                        issue.number,
+                        issue.assignee_username,
                     )
                 else:
-                    logging.error(
-                        'Failed to unassign issue #%d',
-                        issue.number
-                    )
+                    logging.error('Failed to unassign issue #%d', issue.number)
             except Exception as e:
                 logging.error(
-                    'Error processing issue #%d: %s',
-                    issue.number, str(e)
+                    'Error processing issue #%d: %s', issue.number, str(e)
                 )
 
 
@@ -496,7 +487,7 @@ def main() -> None:
             logging.info(
                 'Issue #%d (assignee: %s)',
                 inactive_issue.number,
-                inactive_issue.assignee_username
+                inactive_issue.assignee_username,
             )
 
         if os.environ['DEASSIGN_INACTIVE_CONTRIBUTORS'] == 'true':
@@ -508,7 +499,7 @@ def main() -> None:
         logging.info('No inactive issues found that need unassignment.')
 
 
-if __name__ == '__main__': # pragma: no cover
+if __name__ == '__main__':  # pragma: no cover
     # This installs third party libraries (requests) before
     # importing other files or importing libraries that use
     # the builtins python module (e.g. build, utils).

@@ -31,19 +31,18 @@ class AzureSpeechSynthesisSimulationTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.swap_api_key_secrets_return_none = self.swap_to_always_return(
-            secrets_services, 'get_secret', None)
+            secrets_services, 'get_secret', None
+        )
         self.swap_api_key_secrets_return_secret = self.swap_with_checks(
             secrets_services,
             'get_secret',
             lambda _: 'azure_key',
             expected_args=[
                 ('AZURE_TTS_API_KEY',),
-            ]
+            ],
         )
 
-    def test_regenerate_speech_from_text_success(
-        self
-    ) -> None:
+    def test_regenerate_speech_from_text_success(self) -> None:
         plaintext = 'This is a test text'
         language_accent_code = 'en-US'
 
@@ -56,15 +55,17 @@ class AzureSpeechSynthesisSimulationTests(test_utils.GenericTestBase):
         ]
 
         result_binary_data, result_audio_offsets, result_error = (
-            dev_mode_speech_synthesis_services.
-            regenerate_speech_from_text(plaintext, language_accent_code))
+            dev_mode_speech_synthesis_services.regenerate_speech_from_text(
+                plaintext, language_accent_code
+            )
+        )
 
         self.assertTrue(isinstance(result_binary_data, bytes))
         self.assertEqual(result_audio_offsets, mock_word_boundaries)
         self.assertIsNone(result_error)
 
     def test_should_select_default_language_as_english_and_return_correctly(
-        self
+        self,
     ) -> None:
         plaintext = 'This is a test text'
 
@@ -81,8 +82,10 @@ class AzureSpeechSynthesisSimulationTests(test_utils.GenericTestBase):
         ]
 
         result_binary_data, result_audio_offsets, result_error = (
-            dev_mode_speech_synthesis_services.
-            regenerate_speech_from_text(plaintext, language_accent_code))
+            dev_mode_speech_synthesis_services.regenerate_speech_from_text(
+                plaintext, language_accent_code
+            )
+        )
 
         self.assertTrue(isinstance(result_binary_data, bytes))
         self.assertEqual(result_audio_offsets, mock_word_boundaries)

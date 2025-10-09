@@ -573,6 +573,10 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/blog-post-writer/create-and-edit-blog-post.spec.ts"
     },
     {
+      "name": "community-library-browser/subscribe-to-a-favourite-creator",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/community-library-browser/subscribe-to-a-favourite-creator.spec.ts"
+    },
+    {
       "name": "topic-manager/access-dashboard-using-profile-dropdown",
       "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/access-dashboard-using-profile-dropdown.spec.ts"
     },

@@ -35,7 +35,7 @@ from typing import Dict, List, Optional, TypedDict
 
 
 def get_task_dict_with_username_and_profile_picture(
-    task_entry: improvements_domain.TaskEntry
+    task_entry: improvements_domain.TaskEntry,
 ) -> improvements_domain.TaskEntryDict:
     """Returns a task entry dict with the username and profile picture
     URL inserted.
@@ -52,9 +52,9 @@ def get_task_dict_with_username_and_profile_picture(
     task_entry_dict = task_entry.to_dict()
     if task_entry.resolver_id:
         resolver_settings = user_services.get_user_settings(
-            task_entry.resolver_id, strict=True)
-        task_entry_dict['resolver_username'] = (
-            resolver_settings.username)
+            task_entry.resolver_id, strict=True
+        )
+        task_entry_dict['resolver_username'] = resolver_settings.username
     return task_entry_dict
 
 
@@ -68,8 +68,7 @@ class ExplorationImprovementsHandlerNormalizedPayloadDict(TypedDict):
 
 class ExplorationImprovementsHandler(
     base.BaseHandler[
-        ExplorationImprovementsHandlerNormalizedPayloadDict,
-        Dict[str, str]
+        ExplorationImprovementsHandlerNormalizedPayloadDict, Dict[str, str]
     ]
 ):
     """Handles operations related to managing exploration improvement tasks.
@@ -82,10 +81,12 @@ class ExplorationImprovementsHandler(
         'exploration_id': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.ENTITY_ID_REGEX
-                }]
+                'validators': [
+                    {
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                    }
+                ],
             }
         }
     }
@@ -99,27 +100,31 @@ class ExplorationImprovementsHandler(
                         'type': 'object_dict',
                         'validation_method': (
                             domain_objects_validator.validate_task_entries
-                        )
-                    }
+                        ),
+                    },
                 }
             }
-        }
+        },
     }
 
     @acl_decorators.can_edit_exploration
     def get(self, exploration_id: str) -> None:
         open_tasks, resolved_task_types_by_state_name = (
             improvements_services.fetch_exploration_tasks(
-                exp_fetchers.get_exploration_by_id(exploration_id)))
-        self.render_json({
-            'open_tasks': [
-                get_task_dict_with_username_and_profile_picture(
-                    task
-                ) for task in open_tasks
-            ],
-            'resolved_task_types_by_state_name': (
-                resolved_task_types_by_state_name),
-        })
+                exp_fetchers.get_exploration_by_id(exploration_id)
+            )
+        )
+        self.render_json(
+            {
+                'open_tasks': [
+                    get_task_dict_with_username_and_profile_picture(task)
+                    for task in open_tasks
+                ],
+                'resolved_task_types_by_state_name': (
+                    resolved_task_types_by_state_name
+                ),
+            }
+        )
 
     @acl_decorators.can_edit_exploration
     def post(self, exploration_id: str) -> None:
@@ -144,7 +149,9 @@ class ExplorationImprovementsHandler(
                     issue_description,
                     status,
                     self.user_id,
-                    datetime.datetime.utcnow()))
+                    datetime.datetime.utcnow(),
+                )
+            )
         improvements_services.put_tasks(task_entries_to_put)
         self.render_json({})
 
@@ -160,7 +167,7 @@ class ExplorationImprovementsHistoryHandlerNormalizedRequestDict(TypedDict):
 class ExplorationImprovementsHistoryHandler(
     base.BaseHandler[
         Dict[str, str],
-        ExplorationImprovementsHistoryHandlerNormalizedRequestDict
+        ExplorationImprovementsHistoryHandlerNormalizedRequestDict,
     ]
 ):
     """Handles fetching the history of resolved exploration tasks.
@@ -173,21 +180,18 @@ class ExplorationImprovementsHistoryHandler(
         'exploration_id': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.ENTITY_ID_REGEX
-                }]
+                'validators': [
+                    {
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                    }
+                ],
             }
         }
     }
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
-            'cursor': {
-                'schema': {
-                    'type': 'basestring'
-                },
-                'default_value': None
-            }
+            'cursor': {'schema': {'type': 'basestring'}, 'default_value': None}
         }
     }
 
@@ -199,17 +203,20 @@ class ExplorationImprovementsHistoryHandler(
         results, new_urlsafe_start_cursor, more = (
             improvements_services.fetch_exploration_task_history_page(
                 exp_fetchers.get_exploration_by_id(exploration_id),
-                urlsafe_start_cursor=urlsafe_start_cursor))
+                urlsafe_start_cursor=urlsafe_start_cursor,
+            )
+        )
 
-        self.render_json({
-            'results': [
-                get_task_dict_with_username_and_profile_picture(
-                    task
-                ) for task in results
-            ],
-            'cursor': new_urlsafe_start_cursor,
-            'more': more,
-        })
+        self.render_json(
+            {
+                'results': [
+                    get_task_dict_with_username_and_profile_picture(task)
+                    for task in results
+                ],
+                'cursor': new_urlsafe_start_cursor,
+                'more': more,
+            }
+        )
 
 
 class ExplorationImprovementsConfigHandler(
@@ -222,10 +229,12 @@ class ExplorationImprovementsConfigHandler(
         'exploration_id': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.ENTITY_ID_REGEX
-                }]
+                'validators': [
+                    {
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                    }
+                ],
             }
         }
     }
@@ -233,30 +242,32 @@ class ExplorationImprovementsConfigHandler(
 
     @acl_decorators.can_edit_exploration
     def get(self, exploration_id: str) -> None:
-        self.render_json({
-            'exploration_id': exploration_id,
-            'exploration_version': (
-                exp_fetchers.get_exploration_by_id(exploration_id).version),
-            'is_improvements_tab_enabled': (
-                feature_flag_services.is_feature_flag_enabled(
-                    feature_flag_list.FeatureNames.
-                    IS_IMPROVEMENTS_TAB_ENABLED.value,
-                    self.user_id)),
-            'high_bounce_rate_task_state_bounce_rate_creation_threshold': (
-                platform_parameter_services.get_platform_parameter_value(
-                    platform_parameter_list.ParamName.
-                    HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD.
-                    value
-                )),
-            'high_bounce_rate_task_state_bounce_rate_obsoletion_threshold': (
-                platform_parameter_services.get_platform_parameter_value(
-                    platform_parameter_list.ParamName.
-                    HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD
-                    .value
-                )),
-            'high_bounce_rate_task_minimum_exploration_starts': (
-                platform_parameter_services.get_platform_parameter_value(
-                    platform_parameter_list.ParamName.
-                    HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS.value
-                )),
-        })
+        self.render_json(
+            {
+                'exploration_id': exploration_id,
+                'exploration_version': (
+                    exp_fetchers.get_exploration_by_id(exploration_id).version
+                ),
+                'is_improvements_tab_enabled': (
+                    feature_flag_services.is_feature_flag_enabled(
+                        feature_flag_list.FeatureNames.IS_IMPROVEMENTS_TAB_ENABLED.value,
+                        self.user_id,
+                    )
+                ),
+                'high_bounce_rate_task_state_bounce_rate_creation_threshold': (
+                    platform_parameter_services.get_platform_parameter_value(
+                        platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_CREATION_THRESHOLD.value
+                    )
+                ),
+                'high_bounce_rate_task_state_bounce_rate_obsoletion_threshold': (
+                    platform_parameter_services.get_platform_parameter_value(
+                        platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_STATE_BOUNCE_RATE_OBSOLETION_THRESHOLD.value
+                    )
+                ),
+                'high_bounce_rate_task_minimum_exploration_starts': (
+                    platform_parameter_services.get_platform_parameter_value(
+                        platform_parameter_list.ParamName.HIGH_BOUNCE_RATE_TASK_MINIMUM_EXPLORATION_STARTS.value
+                    )
+                ),
+            }
+        )

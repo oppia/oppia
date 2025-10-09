@@ -52,11 +52,21 @@ ALLOWED_TERMINATING_PUNCTUATIONS: Final = ['.', '?', '}', ']', ')']
 # the punctuation and capital letter checks will be skipped for that
 # comment or docstring.
 EXCLUDED_PHRASES: Final = [
-    'coding:', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node'
+    'coding:',
+    'pylint:',
+    'http://',
+    'https://',
+    'scripts/',
+    'extract_node',
 ]
 
 ALLOWED_PRAGMAS_FOR_INLINE_COMMENTS: Final = [
-    'pylint:', 'isort:', 'type: ignore', 'pragma:', 'https:', 'docker:'
+    'pylint:',
+    'isort:',
+    'type: ignore',
+    'pragma:',
+    'https:',
+    'docker:',
 ]
 
 ALLOWED_LINES_OF_GAP_IN_COMMENT: Final = 15
@@ -99,11 +109,13 @@ class HangingIndentChecker(checkers.BaseChecker):  # type: ignore[misc]
         'C0002': (
             (
                 'There should be a break after parenthesis when content within '
-                'parenthesis spans multiple lines.'),
+                'parenthesis spans multiple lines.'
+            ),
             'no-break-after-hanging-indent',
             (
                 'If something within parenthesis extends along multiple lines, '
-                'break after opening parenthesis.')
+                'break after opening parenthesis.'
+            ),
         ),
     }
 
@@ -116,7 +128,7 @@ class HangingIndentChecker(checkers.BaseChecker):  # type: ignore[misc]
         escape_character_indicator = '\\'
         string_indicator = '\''
         excluded = False
-        for (token_type, token, (line_num, _), _, line) in tokens:
+        for token_type, token, (line_num, _), _, line in tokens:
             # Check if token type is an operator and is either a
             # left parenthesis '(' or a right parenthesis ')'.
             if token_type == tokenize.OP and token in ('(', ')'):
@@ -130,8 +142,9 @@ class HangingIndentChecker(checkers.BaseChecker):  # type: ignore[misc]
                     split_line = line.split()
                     if '#' in split_line:
                         comment_index = split_line.index('#')
-                        if (split_line[comment_index - 1].endswith(':') or
-                                split_line[comment_index - 1].endswith('):')):
+                        if split_line[comment_index - 1].endswith(
+                            ':'
+                        ) or split_line[comment_index - 1].endswith('):'):
                             excluded = False
                     elif line.endswith(':') or line.endswith('):'):
                         excluded = False
@@ -145,8 +158,9 @@ class HangingIndentChecker(checkers.BaseChecker):  # type: ignore[misc]
                 for char_num in range(line_length):
                     char = line[char_num]
                     if in_string and (
-                            char == escape_character_indicator or
-                            escape_character_found):
+                        char == escape_character_indicator
+                        or escape_character_found
+                    ):
                         escape_character_found = not escape_character_found
                         continue
 
@@ -171,7 +185,7 @@ class HangingIndentChecker(checkers.BaseChecker):  # type: ignore[misc]
                     separators = set('[{( ')
                     if line[line_length - 1] in separators:
                         continue
-                    content = line[position + 1:]
+                    content = line[position + 1 :]
                     # Skip check if there is nothing after the bracket.
                     split_content = content.split()
                     # Skip check if there is a comment at the end of line.
@@ -180,14 +194,16 @@ class HangingIndentChecker(checkers.BaseChecker):  # type: ignore[misc]
                         if comment_index == 0:
                             continue
 
-                        last_content_before_comment = (
-                            split_content[comment_index - 1])
+                        last_content_before_comment = split_content[
+                            comment_index - 1
+                        ]
                         if last_content_before_comment.endswith(
-                                ('(', '[', '{')
+                            ('(', '[', '{')
                         ):
                             continue
                     self.add_message(
-                        'no-break-after-hanging-indent', line=line_num)
+                        'no-break-after-hanging-indent', line=line_num
+                    )
 
 
 # The following class was derived from
@@ -225,24 +241,29 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
             'documented in class and __init__',
             'multiple-constructor-doc',
             'Please remove parameter declarations '
-            'in the class or constructor.'),
+            'in the class or constructor.',
+        ),
         'W9006': (
             '"%s" not documented as being raised',
             'missing-raises-doc',
-            'Please document exceptions for all raised exception types.'),
+            'Please document exceptions for all raised exception types.',
+        ),
         'W9008': (
             'Redundant returns documentation',
             'redundant-returns-doc',
-            'Please remove the return/rtype documentation from this method.'),
+            'Please remove the return/rtype documentation from this method.',
+        ),
         'W9010': (
             'Redundant yields documentation',
             'redundant-yields-doc',
-            'Please remove the yields documentation from this method.'),
+            'Please remove the yields documentation from this method.',
+        ),
         'W9011': (
             'Missing return documentation',
             'missing-return-doc',
             'Please add documentation about what this method returns.',
-            {'old_names': [('W9007', 'missing-returns-doc')]}),
+            {'old_names': [('W9007', 'missing-returns-doc')]},
+        ),
         'W9012': (
             'Missing return type documentation',
             'missing-return-type-doc',
@@ -254,7 +275,8 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
             'Missing yield documentation',
             'missing-yield-doc',
             'Please add documentation about what this generator yields.',
-            {'old_names': [('W9009', 'missing-yields-doc')]}),
+            {'old_names': [('W9009', 'missing-yields-doc')]},
+        ),
         'W9014': (
             'Missing yield type documentation',
             'missing-yield-type-doc',
@@ -264,11 +286,12 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
             '"%s" missing in parameter documentation',
             'missing-param-doc',
             'Please add parameter declarations for all parameters.',
-            {'old_names': [('W9003', 'old-missing-param-doc')]}),
+            {'old_names': [('W9003', 'old-missing-param-doc')]},
+        ),
         'W9016': (
             '"%s" missing in parameter type documentation',
             'missing-type-doc',
-            'Please add parameter type declarations for all parameters.'
+            'Please add parameter type declarations for all parameters.',
         ),
         'W9017': (
             '"%s" differing in parameter documentation',
@@ -285,145 +308,161 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
             ' args line indentation',
             '4-space-indentation-for-arg-parameters-doc',
             'Please use 4 space indentation in parameter definitions relative'
-            ' to the args line indentation.'
+            ' to the args line indentation.',
         ),
         'W9020': (
             'Line starting with "%s" requires 8 space indentation relative to'
             ' args line indentation',
             '8-space-indentation-for-arg-in-descriptions-doc',
             'Please indent wrap-around descriptions by 8 relative to the args'
-            ' line indentation.'
+            ' line indentation.',
         ),
         'W9021': (
             'Args: indentation is incorrect, must be at the outermost'
             ' indentation level.',
             'incorrect-indentation-for-arg-header-doc',
-            'Please indent args line to the outermost indentation level.'
+            'Please indent args line to the outermost indentation level.',
         ),
         'W9022': (
             '4 space indentation in docstring.',
             '4-space-indentation-in-docstring',
             'Please use 4 space indentation for parameters relative to section'
-            ' headers.'
+            ' headers.',
         ),
         'W9023': (
             '8 space indentation in docstring.',
             '8-space-indentation-in-docstring',
             'Please use 8 space indentation in wrap around messages'
-            ' relative to section headers.'
+            ' relative to section headers.',
         ),
         'W9024': (
             'Raises section should be the following form: Exception_name. '
             'Description.',
             'malformed-raises-section',
-            'The parameter is incorrectly formatted.'
+            'The parameter is incorrectly formatted.',
         ),
         'W9025': (
             'Period is not used at the end of the docstring.',
             'no-period-used',
-            'Please use a period at the end of the docstring,'
+            'Please use a period at the end of the docstring,',
         ),
         'W9026': (
             'Multiline docstring should end with a new line.',
             'no-newline-used-at-end',
-            'Please end multiline docstring with a new line.'
+            'Please end multiline docstring with a new line.',
         ),
         'W9027': (
             'Single line docstring should not span two lines.',
             'single-line-docstring-span-two-lines',
             'Please do not use two lines for a single line docstring. '
             'If line length exceeds 80 characters, '
-            'convert the single line docstring to a multiline docstring.'
+            'convert the single line docstring to a multiline docstring.',
         ),
         'W9028': (
             'Empty line before the end of multi-line docstring.',
             'empty-line-before-end',
             'Please do not use empty line before '
-            'the end of the multi-line docstring.'
+            'the end of the multi-line docstring.',
         ),
         'W9029': (
             'Space after """ in docstring.',
             'space-after-triple-quote',
-            'Please do not use space after """ in docstring.'
+            'Please do not use space after """ in docstring.',
         ),
         'W9030': (
             'Missing single newline below class docstring.',
             'newline-below-class-docstring',
-            'Please add a single newline below class docstring.'
+            'Please add a single newline below class docstring.',
         ),
         'W9031': (
             'Files must have a single newline above args in doc string.',
             'single-space-above-args',
-            'Please enter a single newline above args in doc string.'
+            'Please enter a single newline above args in doc string.',
         ),
         'W9032': (
             'Files must have a single newline above returns in doc string.',
             'single-space-above-returns',
-            'Please enter a single newline above returns in doc string.'
+            'Please enter a single newline above returns in doc string.',
         ),
         'W9033': (
             'Files must have a single newline above raises in doc string.',
             'single-space-above-raises',
-            'Please enter a single newline above raises in doc string.'
+            'Please enter a single newline above raises in doc string.',
         ),
         'W9034': (
             'Files must have a single newline above yield in doc string.',
             'single-space-above-yield',
-            'Please enter a single newline above yield in doc string.'
+            'Please enter a single newline above yield in doc string.',
         ),
         'W9035': (
             'Arguments should be in following form: variable_name: typeinfo. '
             'Description.',
             'malformed-args-section',
-            'The parameter is incorrectly formatted.'
+            'The parameter is incorrectly formatted.',
         ),
         'W9036': (
             'Returns should be in the following form: typeinfo. Description.',
             'malformed-returns-section',
-            'The parameter is incorrectly formatted.'
+            'The parameter is incorrectly formatted.',
         ),
         'W9037': (
             'Yields should be in the following form: typeinfo. Description.',
             'malformed-yields-section',
-            'The parameter is incorrectly formatted.'
+            'The parameter is incorrectly formatted.',
         ),
         'W9038': (
             'Arguments starting with *args should be formatted in the following'
             ' form: *args: list(*). Description.',
             'malformed-args-argument',
-            'The parameter is incorrectly formatted.'
-        )
+            'The parameter is incorrectly formatted.',
+        ),
     }
 
     options = (
         (
             'accept-no-param-doc',
-            {'default': True, 'type': 'yn', 'metavar': '<y or n>',
-             'help': 'Whether to accept totally missing parameter '
-                     'documentation in the docstring of a '
-                     'function that has parameters.'
-            }),
+            {
+                'default': True,
+                'type': 'yn',
+                'metavar': '<y or n>',
+                'help': 'Whether to accept totally missing parameter '
+                'documentation in the docstring of a '
+                'function that has parameters.',
+            },
+        ),
         (
             'accept-no-raise-doc',
-            {'default': True, 'type': 'yn', 'metavar': '<y or n>',
-             'help': 'Whether to accept totally missing raises '
-                     'documentation in the docstring of a function that '
-                     'raises an exception.'
-            }),
+            {
+                'default': True,
+                'type': 'yn',
+                'metavar': '<y or n>',
+                'help': 'Whether to accept totally missing raises '
+                'documentation in the docstring of a function that '
+                'raises an exception.',
+            },
+        ),
         (
             'accept-no-return-doc',
-            {'default': True, 'type': 'yn', 'metavar': '<y or n>',
-             'help': 'Whether to accept totally missing return '
-                     'documentation in the docstring of a function that '
-                     'returns a statement.'
-            }),
+            {
+                'default': True,
+                'type': 'yn',
+                'metavar': '<y or n>',
+                'help': 'Whether to accept totally missing return '
+                'documentation in the docstring of a function that '
+                'returns a statement.',
+            },
+        ),
         (
             'accept-no-yields-doc',
-            {'default': True, 'type': 'yn', 'metavar': '<y or n>',
-             'help': 'Whether to accept totally missing yields '
-                     'documentation in the docstring of a generator.'
-            }),
-        )
+            {
+                'default': True,
+                'type': 'yn',
+                'metavar': '<y or n>',
+                'help': 'Whether to accept totally missing yields '
+                'documentation in the docstring of a generator.',
+            },
+        ),
+    )
 
     priority = -2
 
@@ -461,9 +500,11 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
         doc_length = len(node.doc.split('\n'))
         line_number += doc_length
         first_line_after_doc = linecache.getline(
-            node.root().file, line_number).strip()
+            node.root().file, line_number
+        ).strip()
         second_line_after_doc = linecache.getline(
-            node.root().file, line_number + 1).strip()
+            node.root().file, line_number + 1
+        ).strip()
         if first_line_after_doc != '':
             self.add_message('newline-below-class-docstring', node=node)
         elif second_line_after_doc == '':
@@ -487,7 +528,7 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
     def check_typeinfo(
         self,
         node: astroid.nodes.FunctionDef,
-        node_doc: _check_docs_utils.Docstring
+        node_doc: _check_docs_utils.Docstring,
     ) -> None:
         """Checks whether all parameters in a function definition are
         properly formatted.
@@ -512,16 +553,20 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
                 [.]+\s )+ \s*
             \s*  [A-Z0-9](.*)[.\]}}\)]+$     # beginning of optional description
         """.format(
-            type=_check_docs_utils.GoogleDocstring.re_multiple_type,
-        ), flags=re.X | re.S | re.M)
+                type=_check_docs_utils.GoogleDocstring.re_multiple_type,
+            ),
+            flags=re.X | re.S | re.M,
+        )
 
         re_returns_line = re.compile(
             r"""
             \s* (({type}|\S*|[\s\S]*).[.]+\s)+        # identifier
             \s* [A-Z0-9](.*)[.\]}}\)]+$               # beginning of description
         """.format(
-            type=_check_docs_utils.GoogleDocstring.re_multiple_type,
-        ), flags=re.X | re.S | re.M)
+                type=_check_docs_utils.GoogleDocstring.re_multiple_type,
+            ),
+            flags=re.X | re.S | re.M,
+        )
 
         re_yields_line = re_returns_line
 
@@ -530,19 +575,25 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
             \s* ({type}[.])+                    # identifier
             \s* [A-Z0-9](.*)[.\]}}\)]+$         # beginning of description
         """.format(
-            type=_check_docs_utils.GoogleDocstring.re_multiple_type,
-        ), flags=re.X | re.S | re.M)
+                type=_check_docs_utils.GoogleDocstring.re_multiple_type,
+            ),
+            flags=re.X | re.S | re.M,
+        )
 
         # We need to extract the information from the given section for that
         # we need to use _parse_section as this will extract all the arguments
         # from the Args section, as this is a private method hence we need to
         # use the pylint pragma to escape the pylint warning.
         if node_doc.has_params():
-            entries = node_doc._parse_section(  # pylint: disable=protected-access
-                _check_docs_utils.GoogleDocstring.re_param_section)
+            entries = (
+                node_doc._parse_section(  # pylint: disable=protected-access
+                    _check_docs_utils.GoogleDocstring.re_param_section
+                )
+            )
             for entry in entries:
                 if entry.lstrip().startswith('*args') and not (
-                        entry.lstrip().startswith('*args: list(*)')):
+                    entry.lstrip().startswith('*args: list(*)')
+                ):
                     self.add_message('malformed-args-argument', node=node)
                 match = re_param_line.match(entry)
                 if not match:
@@ -553,8 +604,11 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
         # from the Returns section, as this is a private method hence we need to
         # use the pylint pragma to escape the pylint warning.
         if node_doc.has_returns():
-            entries = node_doc._parse_section(  # pylint: disable=protected-access
-                _check_docs_utils.GoogleDocstring.re_returns_section)
+            entries = (
+                node_doc._parse_section(  # pylint: disable=protected-access
+                    _check_docs_utils.GoogleDocstring.re_returns_section
+                )
+            )
             entries = [''.join(entries)]
             for entry in entries:
                 match = re_returns_line.match(entry)
@@ -566,8 +620,11 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
         # from the Yields section, as this is a private method hence we need to
         # use the pylint pragma to escape the pylint warning.
         if node_doc.has_yields():
-            entries = node_doc._parse_section(  # pylint: disable=protected-access
-                _check_docs_utils.GoogleDocstring.re_yields_section)
+            entries = (
+                node_doc._parse_section(  # pylint: disable=protected-access
+                    _check_docs_utils.GoogleDocstring.re_yields_section
+                )
+            )
             entries = [''.join(entries)]
             for entry in entries:
                 match = re_yields_line.match(entry)
@@ -579,8 +636,11 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
         # from the Raises section, as this is a private method hence we need to
         # use the pylint pragma to escape the pylint warning.
         if node_doc.exceptions():
-            entries = node_doc._parse_section(  # pylint: disable=protected-access
-                _check_docs_utils.GoogleDocstring.re_raise_section)
+            entries = (
+                node_doc._parse_section(  # pylint: disable=protected-access
+                    _check_docs_utils.GoogleDocstring.re_raise_section
+                )
+            )
             for entry in entries:
                 match = re_raise_line.match(entry)
                 if not match:
@@ -589,7 +649,7 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
     def check_functiondef_params(
         self,
         node: astroid.nodes.FunctionDef,
-        node_doc: _check_docs_utils.Docstring
+        node_doc: _check_docs_utils.Docstring,
     ) -> None:
         """Checks whether all parameters in a function definition are
         documented.
@@ -606,32 +666,34 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
             if class_node is not None:
                 class_doc = docstrings_checker.docstringify(class_node.doc_node)
                 self.check_single_constructor_params(
-                    class_doc, node_doc, class_node)
+                    class_doc, node_doc, class_node
+                )
 
                 # __init__ or class docstrings can have no parameters documented
                 # as long as the other documents them.
                 node_allow_no_param = (
-                    class_doc.has_params() or
-                    class_doc.params_documented_elsewhere() or
-                    None
+                    class_doc.has_params()
+                    or class_doc.params_documented_elsewhere()
+                    or None
                 )
                 class_allow_no_param = (
-                    node_doc.has_params() or
-                    node_doc.params_documented_elsewhere() or
-                    None
+                    node_doc.has_params()
+                    or node_doc.params_documented_elsewhere()
+                    or None
                 )
 
                 self.check_arguments_in_docstring(
-                    class_doc, node.args, class_node,
-                    accept_no_param_doc=class_allow_no_param)
+                    class_doc,
+                    node.args,
+                    class_node,
+                    accept_no_param_doc=class_allow_no_param,
+                )
 
         self.check_arguments_in_docstring(
-            node_doc, node.args, node,
-            accept_no_param_doc=node_allow_no_param)
+            node_doc, node.args, node, accept_no_param_doc=node_allow_no_param
+        )
 
-    def check_docstring_style(
-        self, node: astroid.nodes.FunctionDef
-    ) -> None:
+    def check_docstring_style(self, node: astroid.nodes.FunctionDef) -> None:
         """It fetches a function node and extract the class node from function
         node if it is inside a class body and passes it to
         check_docstring_structure which checks whether the docstring has a
@@ -648,9 +710,7 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
         self.check_docstring_structure(node)
 
     def check_newline_above_args(
-        self,
-        node: astroid.nodes.FunctionDef,
-        docstring: List[str]
+        self, node: astroid.nodes.FunctionDef, docstring: List[str]
     ) -> None:
         """Checks to ensure that there is a single space above the
         argument parameters in the docstring.
@@ -667,23 +727,17 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
                 blank_line_counter += 1
             if blank_line_counter == 0 or blank_line_counter > 1:
                 if line == 'Args:':
-                    self.add_message(
-                        'single-space-above-args', node=node)
+                    self.add_message('single-space-above-args', node=node)
                 elif line == 'Returns:':
-                    self.add_message(
-                        'single-space-above-returns', node=node)
+                    self.add_message('single-space-above-returns', node=node)
                 elif line == 'Raises:':
-                    self.add_message(
-                        'single-space-above-raises', node=node)
+                    self.add_message('single-space-above-raises', node=node)
                 elif line == 'Yields:':
-                    self.add_message(
-                        'single-space-above-yield', node=node)
+                    self.add_message('single-space-above-yield', node=node)
             if line != '':
                 blank_line_counter = 0
 
-    def check_docstring_structure(
-        self, node: astroid.NodeNG
-    ) -> None:
+    def check_docstring_structure(self, node: astroid.NodeNG) -> None:
         """Checks whether the docstring has the correct structure i.e.
         do not have space at the beginning and have a period at the end of
         docstring.
@@ -700,21 +754,25 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
             # Check if single line docstring span two lines.
             if len(docstring) == 2 and docstring[-1].strip() == '':
                 self.add_message(
-                    'single-line-docstring-span-two-lines', node=node)
+                    'single-line-docstring-span-two-lines', node=node
+                )
             # Check for punctuation at end of a single line docstring.
-            elif (len(docstring) == 1 and docstring[-1][-1] not in
-                  ALLOWED_TERMINATING_PUNCTUATIONS):
+            elif (
+                len(docstring) == 1
+                and docstring[-1][-1] not in ALLOWED_TERMINATING_PUNCTUATIONS
+            ):
                 self.add_message('no-period-used', node=node)
             # Check for punctuation at the end of a multiline docstring.
             elif len(docstring) > 1:
                 if docstring[-2].strip() == '':
                     self.add_message('empty-line-before-end', node=node)
                 elif docstring[-1].strip() != '':
-                    self.add_message(
-                        'no-newline-used-at-end', node=node)
-                elif (docstring[-2][-1] not in
-                      ALLOWED_TERMINATING_PUNCTUATIONS and not
-                      any(word in docstring[-2] for word in EXCLUDED_PHRASES)):
+                    self.add_message('no-newline-used-at-end', node=node)
+                elif docstring[-2][
+                    -1
+                ] not in ALLOWED_TERMINATING_PUNCTUATIONS and not any(
+                    word in docstring[-2] for word in EXCLUDED_PHRASES
+                ):
                     self.add_message('no-period-used', node=node)
 
     def check_docstring_section_indentation(
@@ -732,9 +790,13 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
         """
         arguments_node = node.args
         expected_argument_names = set(
-            None if (arg.name in self.not_needed_param_in_docstring)
-            else (arg.name + ':') for arg
-            in arguments_node.args + arguments_node.kwonlyargs)
+            (
+                None
+                if (arg.name in self.not_needed_param_in_docstring)
+                else (arg.name + ':')
+            )
+            for arg in arguments_node.args + arguments_node.kwonlyargs
+        )
         currently_in_args_section = False
         # When we are in the args section and a line ends in a colon,
         # we can ignore the indentation styling in the next section of
@@ -767,8 +829,7 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
                 # If line starts with Raises: , it is the header of a Raises
                 # subsection.
                 elif stripped_line.startswith('Raises:'):
-                    current_docstring_section = (
-                        self.DOCSTRING_SECTION_RAISES)
+                    current_docstring_section = self.DOCSTRING_SECTION_RAISES
                     in_freeform_section = False
                     in_description = False
                     args_indentation_in_spaces = current_line_indentation
@@ -776,25 +837,27 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
                 # If line starts with Yields: , it is the header of a Yields
                 # subsection.
                 elif stripped_line.startswith('Yields:'):
-                    current_docstring_section = (
-                        self.DOCSTRING_SECTION_YIELDS)
+                    current_docstring_section = self.DOCSTRING_SECTION_YIELDS
                     in_freeform_section = False
                     in_description = False
                     args_indentation_in_spaces = current_line_indentation
 
                 # Check if we are in a docstring raises section.
                 elif (
-                    current_docstring_section and
-                    current_docstring_section == self.DOCSTRING_SECTION_RAISES
+                    current_docstring_section
+                    and current_docstring_section
+                    == self.DOCSTRING_SECTION_RAISES
                 ):
                     # In the raises section, if we see this regex expression, we
                     # can assume it's the start of a new parameter definition.
                     # We check the indentation of the parameter definition.
                     if re.search(r'^[a-zA-Z0-9_\.\*]+[.] ', stripped_line):
                         if current_line_indentation != (
-                                args_indentation_in_spaces + 4):
+                            args_indentation_in_spaces + 4
+                        ):
                             self.add_message(
-                                '4-space-indentation-in-docstring', node=node)
+                                '4-space-indentation-in-docstring', node=node
+                            )
                         in_description = True
 
                     # In a description line that is wrapped around (doesn't
@@ -802,31 +865,36 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
                     # the indentation is 8.
                     elif in_description:
                         if current_line_indentation != (
-                                args_indentation_in_spaces + 8):
+                            args_indentation_in_spaces + 8
+                        ):
                             self.add_message(
-                                '8-space-indentation-in-docstring', node=node)
+                                '8-space-indentation-in-docstring', node=node
+                            )
 
                 # Check if we are in a docstring returns or yields section.
                 # NOTE: Each function should only have one yield or return
                 # object. If a tuple is returned, wrap both in a tuple parameter
                 # section.
                 elif (
-                    current_docstring_section and
-                    current_docstring_section in (
+                    current_docstring_section
+                    and current_docstring_section
+                    in (
                         self.DOCSTRING_SECTION_RETURNS,
-                        self.DOCSTRING_SECTION_YIELDS
+                        self.DOCSTRING_SECTION_YIELDS,
                     )
                 ):
                     # Check for the start of a new parameter definition in the
                     # format "type (elaboration)." and check the indentation.
                     if (
-                        re.search(r'^[a-zA-Z_() -:,\*]+\.', stripped_line) and
-                        not in_description
+                        re.search(r'^[a-zA-Z_() -:,\*]+\.', stripped_line)
+                        and not in_description
                     ):
                         if current_line_indentation != (
-                                args_indentation_in_spaces + 4):
+                            args_indentation_in_spaces + 4
+                        ):
                             self.add_message(
-                                '4-space-indentation-in-docstring', node=node)
+                                '4-space-indentation-in-docstring', node=node
+                            )
 
                         # If the line ends with a colon, we can assume the rest
                         # of the section is free form.
@@ -839,12 +907,13 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
                     # indentation the same as the definition line.
                     elif in_description:
                         if (
-                            current_line_indentation !=
-                            args_indentation_in_spaces + 4 and
-                            not in_freeform_section
+                            current_line_indentation
+                            != args_indentation_in_spaces + 4
+                            and not in_freeform_section
                         ):
                             self.add_message(
-                                '4-space-indentation-in-docstring', node=node)
+                                '4-space-indentation-in-docstring', node=node
+                            )
 
                         # If the description line ends with a colon, we can
                         # assume the rest of the section is free form.
@@ -859,7 +928,7 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
                     if current_line_indentation % 4 != 0:
                         self.add_message(
                             'incorrect-indentation-for-arg-header-doc',
-                            node=node
+                            node=node,
                         )
                         # Since other checks are based on relative indentation,
                         # we need to fix this indentation first.
@@ -872,9 +941,9 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
                 # arguments that start with * which means it's autofill and will
                 # not appear in the node args list so we handle those too.
                 elif (
-                    currently_in_args_section and
-                    parameter and
-                    (
+                    currently_in_args_section
+                    and parameter
+                    and (
                         parameter.group(0).strip('*') in expected_argument_names
                         or re.search(r'\*[^ ]+: ', stripped_line)
                     )
@@ -886,11 +955,12 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
                     if current_line_indentation != args_indentation + 4:
                         # Use the first word in the line to identify the error.
                         beginning_of_line = (
-                            words_in_line[0] if words_in_line else None)
+                            words_in_line[0] if words_in_line else None
+                        )
                         self.add_message(
                             '4-space-indentation-for-arg-parameters-doc',
                             node=node,
-                            args=beginning_of_line
+                            args=beginning_of_line,
                         )
 
                     # If the line ends with a colon, that means
@@ -903,16 +973,17 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
                     # If it is not a freeform section, we check the indentation.
                     words_in_line = stripped_line.split(' ')
                     if (
-                        not currently_in_freeform_section and
-                        current_line_indentation != args_indentation + 8
+                        not currently_in_freeform_section
+                        and current_line_indentation != args_indentation + 8
                     ):
                         # Use the first word in the line to identify the error.
                         beginning_of_line = (
-                            words_in_line[0] if words_in_line else None)
+                            words_in_line[0] if words_in_line else None
+                        )
                         self.add_message(
                             '8-space-indentation-for-arg-in-descriptions-doc',
                             node=node,
-                            args=beginning_of_line
+                            args=beginning_of_line,
                         )
 
                     # If the line ends with a colon, that
@@ -923,7 +994,7 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
     def check_functiondef_returns(
         self,
         node: astroid.nodes.FunctionDef,
-        node_doc: _check_docs_utils.Docstring
+        node_doc: _check_docs_utils.Docstring,
     ) -> None:
         """Checks whether a function documented with a return value actually has
         a return statement in its definition.
@@ -938,19 +1009,16 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
             return
 
         return_nodes = node.nodes_of_class(astroid.Return)
-        if ((
-                node_doc.has_returns() or node_doc.has_rtype()) and
-                not any(
-                    docstrings_checker.returns_something(
-                        ret_node) for ret_node in return_nodes)):
-            self.add_message(
-                'redundant-returns-doc',
-                node=node)
+        if (node_doc.has_returns() or node_doc.has_rtype()) and not any(
+            docstrings_checker.returns_something(ret_node)
+            for ret_node in return_nodes
+        ):
+            self.add_message('redundant-returns-doc', node=node)
 
     def check_functiondef_yields(
         self,
         node: astroid.nodes.FunctionDef,
-        node_doc: _check_docs_utils.Docstring
+        node_doc: _check_docs_utils.Docstring,
     ) -> None:
         """Checks whether a function documented with a yield value actually has
         a yield statement in its definition.
@@ -964,15 +1032,12 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
         if not node_doc.supports_yields:
             return
 
-        if ((node_doc.has_yields() or node_doc.has_yields_type()) and
-                not node.is_generator()):
-            self.add_message(
-                'redundant-yields-doc',
-                node=node)
+        if (
+            node_doc.has_yields() or node_doc.has_yields_type()
+        ) and not node.is_generator():
+            self.add_message('redundant-yields-doc', node=node)
 
-    def visit_raise(
-        self, node: astroid.nodes.FunctionDef
-    ) -> None:
+    def visit_raise(self, node: astroid.nodes.FunctionDef) -> None:
         """Visits a function node that raises an exception and verifies that all
         exceptions raised in the function definition are documented.
 
@@ -992,7 +1057,8 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
             # If this is a property setter,
             # the property should have the docstring instead.
             setters_property = docstrings_checker.get_setters_property(
-                func_node)
+                func_node
+            )
             if setters_property:
                 func_node = setters_property
 
@@ -1006,9 +1072,7 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
         missing_excs = expected_excs - found_excs
         self._add_raise_message(missing_excs, func_node)
 
-    def visit_return(
-        self, node: astroid.nodes.FunctionDef
-    ) -> None:
+    def visit_return(self, node: astroid.nodes.FunctionDef) -> None:
         """Visits a function node that contains a return statement and verifies
         that the return value and the return type are documented.
 
@@ -1027,23 +1091,15 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
 
         is_property = checker_utils.decorated_with_property(func_node)
 
-        if not (doc.has_returns() or
-                (doc.has_property_returns() and is_property)):
-            self.add_message(
-                'missing-return-doc',
-                node=func_node
-            )
+        if not (
+            doc.has_returns() or (doc.has_property_returns() and is_property)
+        ):
+            self.add_message('missing-return-doc', node=func_node)
 
-        if not (doc.has_rtype() or
-                (doc.has_property_type() and is_property)):
-            self.add_message(
-                'missing-return-type-doc',
-                node=func_node
-            )
+        if not (doc.has_rtype() or (doc.has_property_type() and is_property)):
+            self.add_message('missing-return-type-doc', node=func_node)
 
-    def visit_yield(
-        self, node: astroid.nodes.FunctionDef
-    ) -> None:
+    def visit_yield(self, node: astroid.nodes.FunctionDef) -> None:
         """Visits a function node that contains a yield statement and verifies
         that the yield value and the yield type are documented.
 
@@ -1061,20 +1117,12 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
         doc_has_yields_type = doc.has_yields_type()
 
         if not doc_has_yields:
-            self.add_message(
-                'missing-yield-doc',
-                node=func_node
-            )
+            self.add_message('missing-yield-doc', node=func_node)
 
         if not doc_has_yields_type:
-            self.add_message(
-                'missing-yield-type-doc',
-                node=func_node
-            )
+            self.add_message('missing-yield-type-doc', node=func_node)
 
-    def visit_yieldfrom(
-        self, node: astroid.nodes.FunctionDef
-    ) -> None:
+    def visit_yieldfrom(self, node: astroid.nodes.FunctionDef) -> None:
         """Visits a function node that contains a yield from statement and
         verifies that the yield from value and the yield from type are
         documented.
@@ -1089,7 +1137,7 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
         doc: _check_docs_utils.Docstring,
         arguments_node: astroid.nodes.Arguments,
         warning_node: astroid.nodes.NodeNG,
-        accept_no_param_doc: Optional[bool] = None
+        accept_no_param_doc: Optional[bool] = None,
     ) -> None:
         """Check that all parameters in a function, method or class constructor
         on the one hand and the parameters mentioned in the parameter
@@ -1129,12 +1177,11 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
         tolerate_missing_params = doc.params_documented_elsewhere()
 
         # Collect the function arguments.
-        expected_argument_names = set(
-            arg.name for arg in arguments_node.args)
+        expected_argument_names = set(arg.name for arg in arguments_node.args)
         expected_argument_names.update(
-            arg.name for arg in arguments_node.kwonlyargs)
-        not_needed_type_in_docstring = (
-            self.not_needed_param_in_docstring.copy())
+            arg.name for arg in arguments_node.kwonlyargs
+        )
+        not_needed_type_in_docstring = self.not_needed_param_in_docstring.copy()
 
         if arguments_node.vararg is not None:
             expected_argument_names.add(arguments_node.vararg)
@@ -1145,14 +1192,13 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
         params_with_doc, params_with_type = doc.match_param_docs()
 
         # Tolerate no parameter documentation at all.
-        if (not params_with_doc and not params_with_type
-                and accept_no_param_doc):
+        if not params_with_doc and not params_with_type and accept_no_param_doc:
             tolerate_missing_params = True
 
         def _compare_missing_args(
             found_argument_names: Set[str],
             message_id: str,
-            not_needed_names: Set[str]
+            not_needed_names: Set[str],
         ) -> None:
             """Compare the found argument names with the expected ones and
             generate a message if there are arguments missing.
@@ -1165,19 +1211,19 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
             """
             if not tolerate_missing_params:
                 missing_argument_names = (
-                    (expected_argument_names - found_argument_names)
-                    - not_needed_names)
+                    expected_argument_names - found_argument_names
+                ) - not_needed_names
                 if missing_argument_names:
                     self.add_message(
                         message_id,
-                        args=(', '.join(
-                            sorted(missing_argument_names)),),
-                        node=warning_node)
+                        args=(', '.join(sorted(missing_argument_names)),),
+                        node=warning_node,
+                    )
 
         def _compare_different_args(
             found_argument_names: Set[str],
             message_id: str,
-            not_needed_names: Set[str]
+            not_needed_names: Set[str],
         ) -> None:
             """Compare the found argument names with the expected ones and
             generate a message if there are extra arguments found.
@@ -1190,33 +1236,40 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
             """
             differing_argument_names = (
                 (expected_argument_names ^ found_argument_names)
-                - not_needed_names - expected_argument_names)
+                - not_needed_names
+                - expected_argument_names
+            )
 
             if differing_argument_names:
                 self.add_message(
                     message_id,
-                    args=(', '.join(
-                        sorted(differing_argument_names)),),
-                    node=warning_node)
+                    args=(', '.join(sorted(differing_argument_names)),),
+                    node=warning_node,
+                )
 
         _compare_missing_args(
-            params_with_doc, 'missing-param-doc',
-            self.not_needed_param_in_docstring)
+            params_with_doc,
+            'missing-param-doc',
+            self.not_needed_param_in_docstring,
+        )
         _compare_missing_args(
-            params_with_type, 'missing-type-doc', not_needed_type_in_docstring)
+            params_with_type, 'missing-type-doc', not_needed_type_in_docstring
+        )
 
         _compare_different_args(
-            params_with_doc, 'differing-param-doc',
-            self.not_needed_param_in_docstring)
+            params_with_doc,
+            'differing-param-doc',
+            self.not_needed_param_in_docstring,
+        )
         _compare_different_args(
-            params_with_type, 'differing-type-doc',
-            not_needed_type_in_docstring)
+            params_with_type, 'differing-type-doc', not_needed_type_in_docstring
+        )
 
     def check_single_constructor_params(
         self,
         class_doc: _check_docs_utils.Docstring,
         init_doc: _check_docs_utils.Docstring,
-        class_node: astroid.nodes.ClassDef
+        class_node: astroid.nodes.ClassDef,
     ) -> None:
         """Checks whether a class and corresponding  init() method are
         documented. If both of them are documented, it adds an error message.
@@ -1234,7 +1287,8 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
             self.add_message(
                 'multiple-constructor-doc',
                 args=(class_node.name,),
-                node=class_node)
+                node=class_node,
+            )
 
     def _handle_no_raise_doc(
         self, excs: Set[str], node: astroid.nodes.FunctionDef
@@ -1266,7 +1320,8 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
         self.add_message(
             'missing-raises-doc',
             args=(', '.join(sorted(missing_excs)),),
-            node=node)
+            node=node,
+        )
 
 
 # TODO(#16567): Here we use MyPy ignore because the incomplete typing of
@@ -1325,7 +1380,7 @@ class ImportOnlyModulesChecker(checkers.BaseChecker):  # type: ignore[misc]
             return
 
         modname = node.modname
-        for (name, _) in node.names:
+        for name, _ in node.names:
             try:
                 imported_module.import_module(name, True)
             except astroid.AstroidImportError:
@@ -1355,9 +1410,10 @@ class BackslashContinuationChecker(checkers.BaseChecker):  # type: ignore[misc]
         'C0004': (
             (
                 'Backslash should not be used to break continuation lines. '
-                'Use braces to break long lines.'),
+                'Use braces to break long lines.'
+            ),
             'backslash-continuation',
-            'Use braces to break long lines instead of backslash.'
+            'Use braces to break long lines instead of backslash.',
         ),
     }
 
@@ -1368,10 +1424,9 @@ class BackslashContinuationChecker(checkers.BaseChecker):  # type: ignore[misc]
             node: astroid.scoped_nodes.Module. Node to access module content.
         """
         file_content = read_from_node(node)
-        for (line_num, line) in enumerate(file_content):
+        for line_num, line in enumerate(file_content):
             if line.rstrip('\r\n').endswith('\\'):
-                self.add_message(
-                    'backslash-continuation', line=line_num + 1)
+                self.add_message('backslash-continuation', line=line_num + 1)
 
 
 # TODO(#16567): Here we use MyPy ignore because the incomplete typing of
@@ -1380,7 +1435,7 @@ class BackslashContinuationChecker(checkers.BaseChecker):  # type: ignore[misc]
 # Thus to avoid MyPy's error
 # (Class cannot subclass 'BaseChecker' (has type 'Any')),
 # we added an ignore here.
-class FunctionArgsOrderChecker(checkers.BaseChecker): # type: ignore[misc]
+class FunctionArgsOrderChecker(checkers.BaseChecker):  # type: ignore[misc]
     """Custom pylint checker which checks the order of arguments in function
     definition.
     """
@@ -1393,12 +1448,14 @@ class FunctionArgsOrderChecker(checkers.BaseChecker): # type: ignore[misc]
             'Wrong order of arguments in function definition '
             '\'self\' should come first.',
             'function-args-order-self',
-            '\'self\' should come first',),
+            '\'self\' should come first',
+        ),
         'C0006': (
             'Wrong order of arguments in function definition '
             '\'cls\' should come first.',
             'function-args-order-cls',
-            '\'cls\' should come first'),
+            '\'cls\' should come first',
+        ),
     }
 
     def visit_functiondef(self, node: astroid.nodes.FunctionDef) -> None:
@@ -1435,13 +1492,13 @@ class RestrictedImportChecker(checkers.BaseChecker):  # type: ignore[misc]
         'C0009': (
             'Importing any file from module %s in module "%s" is prohibited.',
             'invalid-import',
-            'Some modules cannot be imported in other modules.'
+            'Some modules cannot be imported in other modules.',
         ),
         'C0010': (
             'Importing file named "%s" from module "%s" '
             'in module "%s" is prohibited.',
             'invalid-import-from',
-            'Some modules cannot be imported in other modules.'
+            'Some modules cannot be imported in other modules.',
         ),
     }
 
@@ -1460,8 +1517,8 @@ class RestrictedImportChecker(checkers.BaseChecker):  # type: ignore[misc]
                     'the \':\' separator, and after that a list of the imports '
                     'that are forbidden separated by \'|\', these imports are '
                     'relative to the root module (e.g. \'core.domain\').'
-                )
-            }
+                ),
+            },
         ),
     )
 
@@ -1483,17 +1540,19 @@ class RestrictedImportChecker(checkers.BaseChecker):  # type: ignore[misc]
             for forbidden_import in forbidden_imports.split('|'):
                 stripped_forbidden_import = forbidden_import.strip()
                 if stripped_forbidden_import.startswith('from'):
-                    from_part, import_part = (
-                        stripped_forbidden_import[4:].split(' import '))
+                    from_part, import_part = stripped_forbidden_import[
+                        4:
+                    ].split(' import ')
                     processed_forbidden_imports.append(
-                        (from_part.strip(), import_part.strip()))
+                        (from_part.strip(), import_part.strip())
+                    )
                 else:
                     processed_forbidden_imports.append(
-                        (stripped_forbidden_import[7:].strip(), None))
-            self._module_to_forbidden_imports.append((
-                module_regex.strip(),
-                processed_forbidden_imports
-            ))
+                        (stripped_forbidden_import[7:].strip(), None)
+                    )
+            self._module_to_forbidden_imports.append(
+                (module_regex.strip(), processed_forbidden_imports)
+            )
 
     def _iterate_forbidden_imports(
         self, node: astroid.nodes.Import
@@ -1512,8 +1571,8 @@ class RestrictedImportChecker(checkers.BaseChecker):  # type: ignore[misc]
         for module_name, forbidden_imports in self._module_to_forbidden_imports:
             for forbidden_import in forbidden_imports:
                 if (
-                        fnmatch.fnmatch(modnode.name, module_name) and
-                        not '_test' in modnode.name
+                    fnmatch.fnmatch(modnode.name, module_name)
+                    and not '_test' in modnode.name
                 ):
                     yield module_name, forbidden_import
 
@@ -1521,7 +1580,7 @@ class RestrictedImportChecker(checkers.BaseChecker):  # type: ignore[misc]
         self,
         node: astroid.nodes.Import,
         module_name: str,
-        forbidden_import_names: Tuple[str, Optional[str]]
+        forbidden_import_names: Tuple[str, Optional[str]],
     ) -> None:
         """Adds pylint message about the invalid import.
 
@@ -1536,7 +1595,7 @@ class RestrictedImportChecker(checkers.BaseChecker):  # type: ignore[misc]
             self.add_message(
                 'invalid-import',
                 node=node,
-                args=(forbidden_import_names[0], module_name)
+                args=(forbidden_import_names[0], module_name),
             )
         else:
             self.add_message(
@@ -1545,8 +1604,8 @@ class RestrictedImportChecker(checkers.BaseChecker):  # type: ignore[misc]
                 args=(
                     forbidden_import_names[1],
                     forbidden_import_names[0],
-                    module_name
-                )
+                    module_name,
+                ),
             )
 
     def visit_import(self, node: astroid.nodes.Import) -> None:
@@ -1562,13 +1621,14 @@ class RestrictedImportChecker(checkers.BaseChecker):  # type: ignore[misc]
             if forbidden_import_names[1] is not None:
                 import_to_check = '%s.%s' % (
                     forbidden_import_names[0],
-                    forbidden_import_names[1]
+                    forbidden_import_names[1],
                 )
             else:
                 import_to_check = forbidden_import_names[0]
             if any(fnmatch.fnmatch(name, import_to_check) for name in names):
                 self._add_invalid_import_message(
-                    node, module_name, forbidden_import_names)
+                    node, module_name, forbidden_import_names
+                )
 
     def visit_importfrom(self, node: astroid.Import) -> None:
         """Visits all import-from statements in a python file and checks that
@@ -1583,13 +1643,15 @@ class RestrictedImportChecker(checkers.BaseChecker):  # type: ignore[misc]
             if fnmatch.fnmatch(node.modname, forbidden_import_names[0]):
                 if forbidden_import_names[1] is None:
                     self._add_invalid_import_message(
-                        node, module_name, forbidden_import_names)
+                        node, module_name, forbidden_import_names
+                    )
                 elif any(
-                        fnmatch.fnmatch(name[0], forbidden_import_names[1])
-                        for name in node.names
+                    fnmatch.fnmatch(name[0], forbidden_import_names[1])
+                    for name in node.names
                 ):
                     self._add_invalid_import_message(
-                        node, module_name, forbidden_import_names)
+                        node, module_name, forbidden_import_names
+                    )
 
 
 # TODO(#16567): Here we use MyPy ignore because the incomplete typing of
@@ -1608,11 +1670,13 @@ class SingleCharAndNewlineAtEOFChecker(checkers.BaseChecker):  # type: ignore[mi
         'C0007': (
             'Files should end in a single newline character.',
             'newline-at-eof',
-            'Please enter a single newline at the end of the file.'),
+            'Please enter a single newline at the end of the file.',
+        ),
         'C0008': (
             'Only one character in file',
             'only-one-character',
-            'Files with only one character are not allowed.'),
+            'Files with only one character are not allowed.',
+        ),
     }
 
     def process_module(self, node: astroid.Module) -> None:
@@ -1647,33 +1711,36 @@ class SingleLineCommentChecker(checkers.BaseChecker):  # type: ignore[misc]
         'C0016': (
             'Invalid punctuation is used.',
             'invalid-punctuation-used',
-            'Please use valid punctuation.'
+            'Please use valid punctuation.',
         ),
         'C0017': (
             'Please use single space at beginning of comment.',
             'no-space-at-beginning',
-            'Please use single space at the beginning of comment.'
+            'Please use single space at the beginning of comment.',
         ),
         'C0018': (
             'Please use a capital letter at the beginning of comment.',
             'no-capital-letter-at-beginning',
-            'Please use capital letter to begin the content of comment.'
+            'Please use capital letter to begin the content of comment.',
         ),
         'C0040': (
             'This inline comment does not start with any allowed pragma. Please'
             ' put this comment in a new line.',
             'no-allowed-inline-pragma',
-            'Inline comments should always start with an allowed inline pragma.'
-        )
+            'Inline comments should always start with an allowed inline pragma.',
+        ),
     }
-    options = ((
-        'allowed-comment-prefixes',
-        {
-            'default': ('int', 'str', 'float', 'bool', 'v'),
-            'type': 'csv', 'metavar': '<comma separated list>',
-            'help': 'List of allowed prefixes in a comment.'
-        }
-    ),)
+    options = (
+        (
+            'allowed-comment-prefixes',
+            {
+                'default': ('int', 'str', 'float', 'bool', 'v'),
+                'type': 'csv',
+                'metavar': '<comma separated list>',
+                'help': 'List of allowed prefixes in a comment.',
+            },
+        ),
+    )
 
     def _check_space_at_beginning_of_comments(
         self, line: str, line_num: int
@@ -1685,8 +1752,7 @@ class SingleLineCommentChecker(checkers.BaseChecker):  # type: ignore[misc]
             line_num: int. Line number of the current comment.
         """
         if re.search(r'^#[^\s].*$', line) and not line.startswith('#!'):
-            self.add_message(
-                'no-space-at-beginning', line=line_num)
+            self.add_message('no-space-at-beginning', line=line_num)
 
     def _check_comment_starts_with_capital_letter(
         self, line: str, line_num: int
@@ -1709,21 +1775,22 @@ class SingleLineCommentChecker(checkers.BaseChecker):  # type: ignore[misc]
 
         # Check if allowed prefix is used.
         allowed_prefix_is_present = any(
-            line[2:].startswith(word) for word in
-            self.config.allowed_comment_prefixes)
+            line[2:].startswith(word)
+            for word in self.config.allowed_comment_prefixes
+        )
 
         # Check if comment contains any excluded phrase.
         excluded_phrase_is_present = any(
-            line[1:].strip().startswith(word) for word in EXCLUDED_PHRASES)
-        if (re.search(r'^# [a-z].*', line) and not (
-                excluded_phrase_is_present or
-                starts_with_underscore or allowed_prefix_is_present)):
-            self.add_message(
-                'no-capital-letter-at-beginning', line=line_num)
+            line[1:].strip().startswith(word) for word in EXCLUDED_PHRASES
+        )
+        if re.search(r'^# [a-z].*', line) and not (
+            excluded_phrase_is_present
+            or starts_with_underscore
+            or allowed_prefix_is_present
+        ):
+            self.add_message('no-capital-letter-at-beginning', line=line_num)
 
-    def _check_punctuation(
-        self, line: str, line_num: int
-    ) -> None:
+    def _check_punctuation(self, line: str, line_num: int) -> None:
         """Checks if the comment starts with a correct punctuation.
 
         Args:
@@ -1731,16 +1798,20 @@ class SingleLineCommentChecker(checkers.BaseChecker):  # type: ignore[misc]
             line_num: int. Line number of the current comment.
         """
         excluded_phrase_is_present_at_end = any(
-            word in line for word in EXCLUDED_PHRASES)
+            word in line for word in EXCLUDED_PHRASES
+        )
         # Comments must end with the proper punctuation.
         last_char_is_invalid = line[-1] not in (
-            ALLOWED_TERMINATING_PUNCTUATIONS)
+            ALLOWED_TERMINATING_PUNCTUATIONS
+        )
 
         excluded_phrase_at_beginning_of_line = any(
-            line[1:].startswith(word) for word in EXCLUDED_PHRASES)
-        if (last_char_is_invalid and not (
-                excluded_phrase_is_present_at_end or
-                excluded_phrase_at_beginning_of_line)):
+            line[1:].startswith(word) for word in EXCLUDED_PHRASES
+        )
+        if last_char_is_invalid and not (
+            excluded_phrase_is_present_at_end
+            or excluded_phrase_at_beginning_of_line
+        ):
             self.add_message('invalid-punctuation-used', line=line_num)
 
     def _check_trailing_comment_starts_with_allowed_pragma(
@@ -1760,8 +1831,8 @@ class SingleLineCommentChecker(checkers.BaseChecker):  # type: ignore[misc]
         line = line[comment_start_index:]
         self._check_space_at_beginning_of_comments(line, line_num)
         allowed_inline_pragma_present = any(
-            line[2:].startswith(word) for word in
-            ALLOWED_PRAGMAS_FOR_INLINE_COMMENTS
+            line[2:].startswith(word)
+            for word in ALLOWED_PRAGMAS_FOR_INLINE_COMMENTS
         )
         if allowed_inline_pragma_present:
             return
@@ -1777,21 +1848,23 @@ class SingleLineCommentChecker(checkers.BaseChecker):  # type: ignore[misc]
         comments_group_list: List[List[Tuple[str, int]]] = []
         comments_index = -1
 
-        for (token_type, _, (line_num, _), _, line) in tokens:
+        for token_type, _, (line_num, _), _, line in tokens:
             if token_type == tokenize.COMMENT:
                 line = line.strip()
                 if line.startswith('#'):
                     self._check_space_at_beginning_of_comments(line, line_num)
                     if prev_line_num + 1 == line_num:
                         comments_group_list[comments_index].append(
-                            (line, line_num))
+                            (line, line_num)
+                        )
                     else:
                         comments_group_list.append([(line, line_num)])
                         comments_index += 1
                     prev_line_num = line_num
                 else:
                     self._check_trailing_comment_starts_with_allowed_pragma(
-                        line, line_num)
+                        line, line_num
+                    )
 
         for comments in comments_group_list:
             # Checks first line of comment.
@@ -1820,13 +1893,13 @@ class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):  # type: ignore[m
         'C0024': (
             'Please add an empty line below the fileoverview docstring.',
             'no-empty-line-provided-below-fileoverview',
-            'please provide an empty line below the fileoverview.'
+            'please provide an empty line below the fileoverview.',
         ),
         'C0025': (
             'Single empty line should be provided below the fileoverview.',
             'only-a-single-empty-line-should-be-provided',
-            'please provide an empty line below the fileoverview.'
-        )
+            'please provide an empty line below the fileoverview.',
+        ),
     }
 
     def visit_module(self, node: astroid.Module) -> None:
@@ -1851,15 +1924,19 @@ class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):  # type: ignore[m
         doc_length = len(node.doc.split('\n'))
         line_number += doc_length
         first_line_after_doc = linecache.getline(
-            node.root().file, line_number).strip()
+            node.root().file, line_number
+        ).strip()
         second_line_after_doc = linecache.getline(
-            node.root().file, line_number + 1).strip()
+            node.root().file, line_number + 1
+        ).strip()
         if first_line_after_doc != '':
             self.add_message(
-                'no-empty-line-provided-below-fileoverview', node=node)
+                'no-empty-line-provided-below-fileoverview', node=node
+            )
         elif second_line_after_doc == '':
             self.add_message(
-                'only-a-single-empty-line-should-be-provided', node=node)
+                'only-a-single-empty-line-should-be-provided', node=node
+            )
 
 
 # TODO(#16567): Here we use MyPy ignore because the incomplete typing of
@@ -1882,7 +1959,7 @@ class SingleLinePragmaChecker(checkers.BaseChecker):  # type: ignore[misc]
             'Pylint pragmas should be used to disable a rule '
             'for a single line only',
             'single-line-pragma',
-            'Please use pylint pragmas to disable a rule for a single line only'
+            'Please use pylint pragmas to disable a rule for a single line only',
         )
     }
 
@@ -1893,7 +1970,7 @@ class SingleLinePragmaChecker(checkers.BaseChecker):  # type: ignore[misc]
         Args:
             tokens: List[TokenInfo]. Object to access all tokens of a module.
         """
-        for (token_type, _, (line_num, _), _, line) in tokens:
+        for token_type, _, (line_num, _), _, line in tokens:
             if token_type == tokenize.COMMENT:
                 line = line.lstrip()
                 # Ignore line that is enabling this check.
@@ -1908,8 +1985,7 @@ class SingleLinePragmaChecker(checkers.BaseChecker):  # type: ignore[misc]
                 if re.search(r'^(#\s*pylint:)', line):
                     if 'enable' in line and 'single-line-pragma' in line:
                         continue
-                    self.add_message(
-                        'single-line-pragma', line=line_num)
+                    self.add_message('single-line-pragma', line=line_num)
 
 
 # TODO(#16567): Here we use MyPy ignore because the incomplete typing of
@@ -1935,13 +2011,13 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):  # type: ignore[misc]
             ' should be -> Here we use MyPy ignore because ...',
             'mypy-ignore-used',
             'MyPy ignores should be accompanied by proper comments. The format '
-            ' of comments should be -> Here we use MyPy ignore because ...'
+            ' of comments should be -> Here we use MyPy ignore because ...',
         ),
         'C0046': (
             'Extra comment is present for MyPy type: ignore. Please'
             ' remove it.',
             'redundant-type-comment',
-            'No corresponding \'type: ignore\' is found for the comment.'
+            'No corresponding \'type: ignore\' is found for the comment.',
         ),
         'C0050': (
             'Please avoid the usage of \'type: ignore[%s]\' as it is'
@@ -1950,7 +2026,7 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):  # type: ignore[misc]
             ' more information, visit :'
             ' https://github.com/oppia/oppia/wiki/Backend-Type-Annotations',
             'prohibited-type-ignore-used',
-            'Only a limited number of type ignores are allowed in the codebase.'
+            'Only a limited number of type ignores are allowed in the codebase.',
         ),
         'C0051': (
             'Usage of generic MyPy type ignores is prohibited. '
@@ -1959,18 +2035,19 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):  # type: ignore[misc]
             'generic-mypy-ignore-used',
             'Generic type ignore can be ambiguous while reading and could be '
             'dangerous for python static typing. So, only error code specific '
-            'type ignores are allowed.'
-        )
+            'type ignores are allowed.',
+        ),
     }
 
     options = (
         (
             'allowed-type-ignore-error-codes',
-                {
-                    'default': [],
-                    'type': 'csv', 'metavar': '<comma separated list>',
-                    'help': 'List of allowed MyPy type ignore error codes.'
-                }
+            {
+                'default': [],
+                'type': 'csv',
+                'metavar': '<comma separated list>',
+                'help': 'List of allowed MyPy type ignore error codes.',
+            },
         ),
     )
 
@@ -2003,7 +2080,7 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):  # type: ignore[misc]
         previous_comment_line_number = 0
         comment_line_number = 0
 
-        for (token_type, _, (line_num, _), _, line) in tokens:
+        for token_type, _, (line_num, _), _, line in tokens:
             if token_type == tokenize.COMMENT:
                 line = line.lstrip()
 
@@ -2016,7 +2093,7 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):  # type: ignore[misc]
                         self.add_message(
                             'redundant-type-comment',
                             line=previous_comment_line_number,
-                            node=node
+                            node=node,
                         )
 
                     comment_line_number = line_num
@@ -2025,17 +2102,15 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):  # type: ignore[misc]
                     r'(\s*type:\s*ignore)\[([a-z-\s\,]*)\]', line
                 )
                 if specific_type_ignore_matches:
-                    error_codes = (
-                        specific_type_ignore_matches.group(2)
-                    )
+                    error_codes = specific_type_ignore_matches.group(2)
 
                     encountered_error_codes = []
                     encountered_prohibited_error_codes = []
                     for error_code in error_codes.split(','):
                         error_code = error_code.strip()
                         if (
-                            error_code not in
-                            self.config.allowed_type_ignore_error_codes
+                            error_code
+                            not in self.config.allowed_type_ignore_error_codes
                         ):
                             encountered_prohibited_error_codes.append(
                                 error_code
@@ -2047,14 +2122,10 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):  # type: ignore[misc]
                             'prohibited-type-ignore-used',
                             line=line_num,
                             args=tuple(encountered_prohibited_error_codes),
-                            node=node
+                            node=node,
                         )
-                    if (
-                        type_ignore_comment_present and
-                        line_num <= (
-                            comment_line_number +
-                            ALLOWED_LINES_OF_GAP_IN_COMMENT
-                        )
+                    if type_ignore_comment_present and line_num <= (
+                        comment_line_number + ALLOWED_LINES_OF_GAP_IN_COMMENT
                     ):
                         type_ignore_comment_present = False
                         no_of_type_ignore_comments = 0
@@ -2069,7 +2140,8 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):  # type: ignore[misc]
 
         if type_ignore_comment_present:
             self.add_message(
-                'redundant-type-comment', line=comment_line_number, node=node)
+                'redundant-type-comment', line=comment_line_number, node=node
+            )
 
 
 # TODO(#16567): Here we use MyPy ignore because the incomplete typing of
@@ -2104,7 +2176,7 @@ class SingleSpaceAfterKeyWordChecker(checkers.BaseChecker):  # type: ignore[misc
         Args:
             tokens: List[TokenInfo]. Object to access all tokens of a module.
         """
-        for (token_type, token, (line_num, _), _, line) in tokens:
+        for token_type, token, (line_num, _), _, line in tokens:
             if token_type == tokenize.NAME and token in self.keywords:
                 line = line.strip()
                 # Regex evaluates to True if the line is of the form "if #" or
@@ -2113,7 +2185,8 @@ class SingleSpaceAfterKeyWordChecker(checkers.BaseChecker):  # type: ignore[misc
                     self.add_message(
                         'single-space-after-keyword',
                         args=(token),
-                        line=line_num)
+                        line=line_num,
+                    )
 
 
 class ImportStatusDict(TypedDict):
@@ -2175,7 +2248,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):  # type: ignore[misc
             ' -> Here we use type Any because ...',
             'any-type-used',
             'Annotations with Any type should only be done for exceptional'
-            ' cases with proper explanation in the code comment.'
+            ' cases with proper explanation in the code comment.',
         ),
         'C0048': (
             'cast function is used. If the cast is really needed, then please'
@@ -2184,7 +2257,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):  # type: ignore[misc
             ' because ...',
             'cast-func-used',
             'Casting of any value should be done with a proper explanation in'
-            ' the code comment.'
+            ' the code comment.',
         ),
         'C0049': (
             'object class is used. If the object class is really needed, then'
@@ -2193,8 +2266,8 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):  # type: ignore[misc
             ' be -> Here we use object because ...',
             'object-class-used',
             'Annotations with object should only be done for exceptional'
-            ' cases with proper explanation in the code comment.'
-        )
+            ' cases with proper explanation in the code comment.',
+        ),
     }
 
     def visit_module(self, node: astroid.Module) -> None:
@@ -2227,7 +2300,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):  # type: ignore[misc
         import_status_dict: ImportStatusDict,
         token_type: int,
         token: str,
-        line_num: int
+        line_num: int,
     ) -> None:
         """Checks whether the single-line import or multi-line import is
         present inside the module. If multi-line import is present then
@@ -2267,8 +2340,8 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):  # type: ignore[misc
                 import_status_dict['inside_multi_line_import_scope'] = True
                 import_status_dict['single_line_import'] = False
             if (
-                import_status_dict['inside_multi_line_import_scope'] and
-                token == ')'
+                import_status_dict['inside_multi_line_import_scope']
+                and token == ')'
             ):
                 import_status_dict['inside_multi_line_import_scope'] = False
 
@@ -2281,7 +2354,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):  # type: ignore[misc
         line: str,
         line_num: int,
         exceptional_type: str,
-        node: astroid.Module
+        node: astroid.Module,
     ) -> None:
         """Checks whether the given exceptional type in a module has been
         documented or not. If the exceptional type is not documented then
@@ -2326,32 +2399,31 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):  # type: ignore[misc
             if not type_status_dict['outside_args_section']:
                 type_status_dict['type_present_inside_arg_section'] = True
             elif (
-                type_status_dict['outside_args_section'] and
-                type_status_dict['args_section_end_line_num'] == line_num
+                type_status_dict['outside_args_section']
+                and type_status_dict['args_section_end_line_num'] == line_num
             ):
                 type_status_dict['type_present_inside_return_section'] = True
 
         if (
-            type_status_dict['type_present_inside_arg_section'] or
-            type_status_dict['type_present_inside_return_section']
+            type_status_dict['type_present_inside_arg_section']
+            or type_status_dict['type_present_inside_return_section']
         ):
             type_status_dict['type_present_in_function_signature'] = True
 
         if type_status_dict['outside_function_signature_block']:
             if type_status_dict['type_present_in_function_signature']:
-                if (
-                    type_status_dict['type_comment_pending'] and
-                    type_status_dict['func_def_start_line'] <= (
-                        type_status_dict['type_comment_line_num'] +
-                        ALLOWED_LINES_OF_GAP_IN_COMMENT
-                    )
+                if type_status_dict[
+                    'type_comment_pending'
+                ] and type_status_dict['func_def_start_line'] <= (
+                    type_status_dict['type_comment_line_num']
+                    + ALLOWED_LINES_OF_GAP_IN_COMMENT
                 ):
                     type_status_dict['type_comment_pending'] = False
                 else:
                     self._add_exceptional_type_error_message(
                         exceptional_type,
                         type_status_dict['func_def_start_line'],
-                        node
+                        node,
                     )
 
                 type_status_dict['type_present_in_function_signature'] = False
@@ -2366,20 +2438,17 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):  # type: ignore[misc
                 # Passing those cases where Any is imported.
                 if exceptional_type == 'Any' and import_status_dict:
                     if (
-                        import_status_dict['single_line_import'] and
-                        import_status_dict['import_line_num'] == line_num
+                        import_status_dict['single_line_import']
+                        and import_status_dict['import_line_num'] == line_num
                     ):
                         return
                     elif import_status_dict['inside_multi_line_import_scope']:
                         return
                 # Checking if comment for exceptional_type is present and it's
                 # with in the range (minimum 15 line of gaps).
-                if (
-                    type_status_dict['type_comment_pending'] and
-                    line_num <= (
-                        type_status_dict['type_comment_line_num'] +
-                        ALLOWED_LINES_OF_GAP_IN_COMMENT
-                    )
+                if type_status_dict['type_comment_pending'] and line_num <= (
+                    type_status_dict['type_comment_line_num']
+                    + ALLOWED_LINES_OF_GAP_IN_COMMENT
                 ):
                     type_status_dict['type_comment_pending'] = False
                 else:
@@ -2402,17 +2471,11 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):  # type: ignore[misc
             node: astroid.scoped_nodes.Module. Node to access module content.
         """
         if exceptional_type == 'Any':
-            self.add_message(
-                'any-type-used', line=line_num, node=node
-            )
+            self.add_message('any-type-used', line=line_num, node=node)
         if exceptional_type == 'object':
-            self.add_message(
-                'object-class-used', line=line_num, node=node
-            )
+            self.add_message('object-class-used', line=line_num, node=node)
         if exceptional_type == 'cast':
-            self.add_message(
-                'cast-func-used', line=line_num, node=node
-            )
+            self.add_message('cast-func-used', line=line_num, node=node)
 
     def check_comment_is_present_with_object_class(
         self, tokens: List[tokenize.TokenInfo], node: astroid.Module
@@ -2431,19 +2494,23 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):  # type: ignore[misc
 
         expected_object_class_comment_substring = r'Here we use object because'
 
-        for (token_type, token, (line_num, _), _, line) in tokens:
+        for token_type, token, (line_num, _), _, line in tokens:
             line = line.strip()
 
             if token_type == tokenize.COMMENT:
                 if expected_object_class_comment_substring in line:
-                    object_class_status_dict[
-                        'type_comment_pending'
-                    ] = True
+                    object_class_status_dict['type_comment_pending'] = True
                     object_class_status_dict['type_comment_line_num'] = line_num
 
             self._check_exceptional_type_is_documented(
-                object_class_status_dict, None, token_type, token,
-                line, line_num, 'object', node
+                object_class_status_dict,
+                None,
+                token_type,
+                token,
+                line,
+                line_num,
+                'object',
+                node,
             )
 
     def check_comment_is_present_with_cast_method(
@@ -2463,10 +2530,10 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):  # type: ignore[misc
         import_status_dict: ImportStatusDict = {
             'single_line_import': False,
             'import_line_num': 0,
-            'inside_multi_line_import_scope': False
+            'inside_multi_line_import_scope': False,
         }
 
-        for (token_type, token, (line_num, _), _, line) in tokens:
+        for token_type, token, (line_num, _), _, line in tokens:
             line = line.strip()
 
             if token_type == tokenize.COMMENT:
@@ -2481,20 +2548,16 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):  # type: ignore[misc
             if token_type == tokenize.NAME and token == 'cast':
                 # Passing those cases where cast is imported.
                 if (
-                    import_status_dict['single_line_import'] and
-                    import_status_dict['import_line_num'] == line_num
+                    import_status_dict['single_line_import']
+                    and import_status_dict['import_line_num'] == line_num
                 ):
                     pass
                 elif import_status_dict['inside_multi_line_import_scope']:
                     pass
                 # Throwing an error when cast is encountered but there is no
                 # corresponding comment exist.
-                elif (
-                    cast_comment_present and
-                    line_num <= (
-                        cast_comment_line_num +
-                        ALLOWED_LINES_OF_GAP_IN_COMMENT
-                    )
+                elif cast_comment_present and line_num <= (
+                    cast_comment_line_num + ALLOWED_LINES_OF_GAP_IN_COMMENT
                 ):
                     cast_comment_present = False
                 else:
@@ -2516,7 +2579,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):  # type: ignore[misc
         import_status_dict: ImportStatusDict = {
             'single_line_import': False,
             'import_line_num': 0,
-            'inside_multi_line_import_scope': False
+            'inside_multi_line_import_scope': False,
         }
 
         any_type_status_dict: TypeStatusDict = copy.deepcopy(
@@ -2525,14 +2588,12 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):  # type: ignore[misc
 
         expected_any_type_comment_substring = r'Here we use type Any because'
 
-        for (token_type, token, (line_num, _), _, line) in tokens:
+        for token_type, token, (line_num, _), _, line in tokens:
             line = line.strip()
 
             if token_type == tokenize.COMMENT:
                 if expected_any_type_comment_substring in line:
-                    any_type_status_dict[
-                        'type_comment_pending'
-                    ] = True
+                    any_type_status_dict['type_comment_pending'] = True
                     any_type_status_dict['type_comment_line_num'] = line_num
 
             self._check_import_status(
@@ -2540,8 +2601,14 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):  # type: ignore[misc
             )
 
             self._check_exceptional_type_is_documented(
-                any_type_status_dict, import_status_dict, token_type, token,
-                line, line_num, 'Any', node
+                any_type_status_dict,
+                import_status_dict,
+                token_type,
+                token,
+                line,
+                line_num,
+                'Any',
+                node,
             )
 
 
@@ -2565,7 +2632,7 @@ class InequalityWithNoneChecker(checkers.BaseChecker):  # type: ignore[misc]
             'Please refrain from using "x != None" '
             'and use "x is not None" instead.',
             'inequality-with-none',
-            'Use "is" to assert equality or inequality against None.'
+            'Use "is" to assert equality or inequality against None.',
         )
     }
 
@@ -2607,7 +2674,7 @@ class NonTestFilesFunctionNameChecker(checkers.BaseChecker):  # type: ignore[mis
             '"test_only" as its prefix in non-test files.',
             'non-test-files-function-name-checker',
             'Prohibit use of "test_only" prefix in function names of non-test '
-            'files.'
+            'files.',
         )
     }
 
@@ -2624,8 +2691,7 @@ class NonTestFilesFunctionNameChecker(checkers.BaseChecker):  # type: ignore[mis
             return
         function_name = node.name
         if function_name.startswith('test_only'):
-            self.add_message(
-                'non-test-files-function-name-checker', node=node)
+            self.add_message('non-test-files-function-name-checker', node=node)
 
 
 # TODO(#16567): Here we use MyPy ignore because the incomplete typing of
@@ -2648,14 +2714,16 @@ class DisallowedFunctionsChecker(checkers.BaseChecker):  # type: ignore[misc]
             'remove-disallowed-function-calls',
             (
                 'Disallows usage of black-listed functions that '
-                'should be removed.'),
+                'should be removed.'
+            ),
         ),
         'C0033': (
             'Please replace the call to %s with %s.',
             'replace-disallowed-function-calls',
             (
                 'Disallows usage of black-listed functions that '
-                'should be replaced by allowed alternatives.'),
+                'should be replaced by allowed alternatives.'
+            ),
         ),
     }
 
@@ -2671,7 +2739,8 @@ class DisallowedFunctionsChecker(checkers.BaseChecker):  # type: ignore[misc]
                     'Strings should be either in the format (1) "A=>B", '
                     'where A is the disallowed function and B is the '
                     'replacement, or (2) in the format "A", which signifies '
-                    'that A should just be removed.')
+                    'that A should just be removed.'
+                ),
             },
         ),
         (
@@ -2687,9 +2756,11 @@ class DisallowedFunctionsChecker(checkers.BaseChecker):  # type: ignore[misc]
                     'is the replacement or in the format "A", which '
                     ' signifies that A should just be removed. '
                     'An example regex entry is: ".*func=>other", which '
-                    'suggests "somefunc" be replaced by "other".')
+                    'suggests "somefunc" be replaced by "other".'
+                ),
             },
-        ),)
+        ),
+    )
 
     def __init__(self, linter: Optional[lint.PyLinter] = None) -> None:
         super().__init__(linter=linter)
@@ -2730,8 +2801,9 @@ class DisallowedFunctionsChecker(checkers.BaseChecker):  # type: ignore[misc]
 
         # Store removal regexes as one large regex, concatenated by "|".
         if len(remove_regexes) > 0:
-            self.funcs_to_remove_regex = (
-                re.compile(r'{}'.format('|'.join(remove_regexes))))
+            self.funcs_to_remove_regex = re.compile(
+                r'{}'.format('|'.join(remove_regexes))
+            )
 
     def visit_call(self, node: astroid.Call) -> None:
         """Visit a function call to ensure that the call is
@@ -2744,17 +2816,16 @@ class DisallowedFunctionsChecker(checkers.BaseChecker):  # type: ignore[misc]
         if func in self.funcs_to_replace_str:
             self.add_message(
                 'replace-disallowed-function-calls',
-                node=node, args=(func, self.funcs_to_replace_str[func]))
-        elif (
-                func in self.funcs_to_remove_str
-                or (
-                    self.funcs_to_remove_regex is not None
-                    and self.funcs_to_remove_regex.match(func) is not None
-                )
-            ):
+                node=node,
+                args=(func, self.funcs_to_replace_str[func]),
+            )
+        elif func in self.funcs_to_remove_str or (
+            self.funcs_to_remove_regex is not None
+            and self.funcs_to_remove_regex.match(func) is not None
+        ):
             self.add_message(
-                'remove-disallowed-function-calls',
-                node=node, args=func)
+                'remove-disallowed-function-calls', node=node, args=func
+            )
         else:
             # Search through list of replacement regexes entries
             # (tuple(rgx, replacement)). If a match is found, return the
@@ -2763,7 +2834,9 @@ class DisallowedFunctionsChecker(checkers.BaseChecker):  # type: ignore[misc]
                 if rgx.match(func) is not None:
                     self.add_message(
                         'replace-disallowed-function-calls',
-                        node=node, args=(func, replacement))
+                        node=node,
+                        args=(func, replacement),
+                    )
                     break
 
 
@@ -2789,7 +2862,7 @@ class DisallowHandlerWithoutSchema(checkers.BaseChecker):  # type: ignore[misc]
             'handler-args'
             'to learn how to write schema for handlers.',
             'no-schema-for-url-path-elements',
-            'Enforce writing schema for url path arguments of handler class.'
+            'Enforce writing schema for url path arguments of handler class.',
         ),
         'C0036': (
             'Please add schema in HANDLER_ARGS_SCHEMA for %s class. \nVisit '
@@ -2797,18 +2870,18 @@ class DisallowHandlerWithoutSchema(checkers.BaseChecker):  # type: ignore[misc]
             'handler-args'
             'to learn how to write schema for handlers.',
             'no-schema-for-handler-args',
-            'Enforce writing schema for request arguments of handler class.'
+            'Enforce writing schema for request arguments of handler class.',
         ),
         'C0037': (
             'URL_PATH_ARGS_SCHEMAS for %s class must be dict.',
             'url-path-args-schemas-must-be-dict',
-            'Enforce URL_ARGS_PATH_SCHEMAS to be of dict type.'
+            'Enforce URL_ARGS_PATH_SCHEMAS to be of dict type.',
         ),
         'C0038': (
             'HANDLER_ARGS_SCHEMAS for %s class must be dict.',
             'handler-args-schemas-must-be-dict',
-            'Enforce HANDLER_ARGS_SCHEMAS to be of dict type.'
-        )
+            'Enforce HANDLER_ARGS_SCHEMAS to be of dict type.',
+        ),
     }
 
     def check_given_variable_is_a_dict(
@@ -2824,17 +2897,16 @@ class DisallowHandlerWithoutSchema(checkers.BaseChecker):  # type: ignore[misc]
         Returns:
             bool. Whether schema variable of a class is of dict type.
         """
-        generator_object_for_value_of_schemas = (
-            node.locals[variable_name][0].assigned_stmts())
+        generator_object_for_value_of_schemas = node.locals[variable_name][
+            0
+        ].assigned_stmts()
 
         for value_of_schemas in generator_object_for_value_of_schemas:
             if value_of_schemas.name != 'dict':
                 return False
         return True
 
-    def check_parent_class_is_basehandler(
-        self, node: astroid.ClassDef
-    ) -> bool:
+    def check_parent_class_is_basehandler(self, node: astroid.ClassDef) -> bool:
         """Checks whether the parent class of given class is BaseHandler.
 
         Args:
@@ -2861,28 +2933,32 @@ class DisallowHandlerWithoutSchema(checkers.BaseChecker):  # type: ignore[misc]
             return
 
         if (
-            node.name in
-            handler_schema_constants.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA
+            node.name
+            in handler_schema_constants.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA
         ):
             return
 
         if 'URL_PATH_ARGS_SCHEMAS' not in node.locals:
             self.add_message(
-                'no-schema-for-url-path-elements', node=node, args=node.name)
+                'no-schema-for-url-path-elements', node=node, args=node.name
+            )
         elif not self.check_given_variable_is_a_dict(
-                node, 'URL_PATH_ARGS_SCHEMAS'):
+            node, 'URL_PATH_ARGS_SCHEMAS'
+        ):
             self.add_message(
-                'url-path-args-schemas-must-be-dict',
-                node=node, args=node.name)
+                'url-path-args-schemas-must-be-dict', node=node, args=node.name
+            )
 
         if 'HANDLER_ARGS_SCHEMAS' not in node.locals:
             self.add_message(
-                'no-schema-for-handler-args', node=node, args=node.name)
+                'no-schema-for-handler-args', node=node, args=node.name
+            )
         elif not self.check_given_variable_is_a_dict(
-                node, 'HANDLER_ARGS_SCHEMAS'):
+            node, 'HANDLER_ARGS_SCHEMAS'
+        ):
             self.add_message(
-                'handler-args-schemas-must-be-dict',
-                node=node, args=node.name)
+                'handler-args-schemas-must-be-dict', node=node, args=node.name
+            )
 
 
 # TODO(#16567): Here we use MyPy ignore because the incomplete typing of
@@ -2916,7 +2992,7 @@ class DisallowedImportsChecker(checkers.BaseChecker):  # type: ignore[misc]
         """
         if node.modname != 'typing':
             return
-        for (name, _) in node.names:
+        for name, _ in node.names:
             if name == 'Text':
                 self.add_message('disallowed-text-import', node=node)
 
@@ -2927,7 +3003,7 @@ class DisallowedImportsChecker(checkers.BaseChecker):  # type: ignore[misc]
 # Thus to avoid MyPy's error
 # (Class cannot subclass 'BaseChecker' (has type 'Any')),
 # we added an ignore here.
-class PreventStringConcatenationChecker(checkers.BaseChecker): # type: ignore[misc]
+class PreventStringConcatenationChecker(checkers.BaseChecker):  # type: ignore[misc]
     """Checks for string concactenation and encourages string interpolation."""
 
     __implements__ = interfaces.IAstroidChecker
@@ -2957,17 +3033,17 @@ class PreventStringConcatenationChecker(checkers.BaseChecker): # type: ignore[mi
                 return
             # Ignore operation if either side is inferred to be a datetime obj.
             if any(
-                isinstance(inferred, (astroid.Instance, astroid.Const)) and
-                isinstance(inferred.pytype(), str) and
-                'datetime.datetime' in inferred.pytype()
+                isinstance(inferred, (astroid.Instance, astroid.Const))
+                and isinstance(inferred.pytype(), str)
+                and 'datetime.datetime' in inferred.pytype()
                 for inferred in [left_inferred, right_inferred]
             ):
                 return
             if (
-                isinstance(left_inferred, astroid.Const) and
-                isinstance(right_inferred, astroid.Const) and
-                isinstance(left_inferred.value, str) and
-                isinstance(right_inferred.value, str)
+                isinstance(left_inferred, astroid.Const)
+                and isinstance(right_inferred, astroid.Const)
+                and isinstance(left_inferred.value, str)
+                and isinstance(right_inferred.value, str)
             ):
                 self.add_message('use-string-interpolation', node=node)
 

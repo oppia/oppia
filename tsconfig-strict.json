@@ -78,11 +78,6 @@
       "./node_modules/@types"
     ]
   },
-  "exclude": [
-    "extensions/objects/**/*.spec.ts",
-    "core/templates/**/*.spec.ts",
-    "extensions/interactions/**/*.spec.ts"
-  ],
   "include": [
     "core",
     "extensions",
