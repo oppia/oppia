@@ -60,7 +60,7 @@ class ExplorationRights(rights_domain.ActivityRights):
         viewable_if_private: bool = False,
         first_published_msec: Optional[float] = None,
         status: str = ACTIVITY_STATUS_PRIVATE,
-        deleted: bool = False
+        deleted: bool = False,
     ) -> None:
         """Initializes a ExplorationRights domain object.
 
@@ -98,7 +98,7 @@ class ExplorationRights(rights_domain.ActivityRights):
             cloned_from,
             status,
             viewable_if_private,
-            first_published_msec
+            first_published_msec,
         )
         self.deleted = deleted
 
@@ -113,58 +113,67 @@ class ExplorationRights(rights_domain.ActivityRights):
         """
         if not isinstance(self.community_owned, bool):
             raise utils.ValidationError(
-                'Expected community_owned to be bool, received %s' % (
-                    self.community_owned))
+                'Expected community_owned to be bool, received %s'
+                % (self.community_owned)
+            )
 
         if not isinstance(self.owner_ids, list):
             raise utils.ValidationError(
-                'Expected owner_ids to be list, received %s' % self.owner_ids)
+                'Expected owner_ids to be list, received %s' % self.owner_ids
+            )
         for owner_id in self.owner_ids:
             if not isinstance(owner_id, str):
                 raise utils.ValidationError(
                     'Expected each id in owner_ids to '
-                    'be string, received %s' % owner_id)
+                    'be string, received %s' % owner_id
+                )
 
         if not isinstance(self.editor_ids, list):
             raise utils.ValidationError(
                 'Expected editor_ids to be list, '
-                'received %s' % self.editor_ids)
+                'received %s' % self.editor_ids
+            )
         for editor_id in self.editor_ids:
             if not isinstance(editor_id, str):
                 raise utils.ValidationError(
                     'Expected each id in editor_ids to '
-                    'be string, received %s' % editor_id)
+                    'be string, received %s' % editor_id
+                )
 
         if not isinstance(self.voice_artist_ids, list):
             raise utils.ValidationError(
-                'Expected voice_artist_ids to be list, received %s' % (
-                    self.voice_artist_ids))
+                'Expected voice_artist_ids to be list, received %s'
+                % (self.voice_artist_ids)
+            )
         for voice_artist_id in self.voice_artist_ids:
             if not isinstance(voice_artist_id, str):
                 raise utils.ValidationError(
                     'Expected each id in voice_artist_ids to '
-                    'be string, received %s' % voice_artist_id)
+                    'be string, received %s' % voice_artist_id
+                )
 
         if not isinstance(self.viewer_ids, list):
             raise utils.ValidationError(
                 'Expected viewer_ids to be list, '
-                'received %s' % self.viewer_ids)
+                'received %s' % self.viewer_ids
+            )
         for viewer_id in self.viewer_ids:
             if not isinstance(viewer_id, str):
                 raise utils.ValidationError(
                     'Expected each id in viewer_ids to '
-                    'be string, received %s' % viewer_id)
+                    'be string, received %s' % viewer_id
+                )
 
         if not isinstance(self.viewable_if_private, bool):
             raise utils.ValidationError(
                 'Expected viewable_if_private to '
-                'be boolean, received %s' % self.viewable_if_private)
+                'be boolean, received %s' % self.viewable_if_private
+            )
 
-        if self.status not in (
-            ACTIVITY_STATUS_PRIVATE, ACTIVITY_STATUS_PUBLIC):
+        if self.status not in (ACTIVITY_STATUS_PRIVATE, ACTIVITY_STATUS_PUBLIC):
             raise utils.ValidationError(
-                'Expected status to be either "%s" or "%s", received "%s"' %
-                (ACTIVITY_STATUS_PRIVATE, ACTIVITY_STATUS_PUBLIC, self.status)
+                'Expected status to be either "%s" or "%s", received "%s"'
+                % (ACTIVITY_STATUS_PRIVATE, ACTIVITY_STATUS_PUBLIC, self.status)
             )
 
         if self.first_published_msec is not None:

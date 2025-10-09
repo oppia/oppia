@@ -42,13 +42,7 @@ class TopicLandingRedirectPage(
 ):
     """The handler redirecting the old landing page URL to the new one."""
 
-    URL_PATH_ARGS_SCHEMAS = {
-        'topic': {
-            'schema': {
-                'type': 'basestring'
-            }
-        }
-    }
+    URL_PATH_ARGS_SCHEMAS = {'topic': {'schema': {'type': 'basestring'}}}
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access

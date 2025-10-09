@@ -28,13 +28,12 @@ from core.platform import models
 from typing import Any, Dict, Final, List, Optional
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import cloud_task_models, platform_taskqueue_services
 
 platform_taskqueue_services = models.Registry.import_taskqueue_services()
 
-(cloud_task_models,) = models.Registry.import_models([
-    models.Names.CLOUD_TASK])
+(cloud_task_models,) = models.Registry.import_models([models.Names.CLOUD_TASK])
 
 # NOTE: The following constants should match the queue names on the
 # Cloud Tasks UI.
@@ -62,10 +61,7 @@ CLOUD_TASK_MAX_RETRIES = 2
 # the keyword arguments of any other function and those can also accept
 # different types of values like '*args'.
 def defer(
-    fn_identifier: str,
-    queue_name: str,
-    *args: Any,
-    **kwargs: Any
+    fn_identifier: str, queue_name: str, *args: Any, **kwargs: Any
 ) -> None:
     """Adds a new task to a specified deferred queue scheduled for immediate
     execution.
@@ -89,24 +85,27 @@ def defer(
         'fn_identifier': fn_identifier,
         'cloud_task_model_id': new_cloud_task_model_id,
         'args': (args if args else []),
-        'kwargs': (kwargs if kwargs else {})
+        'kwargs': (kwargs if kwargs else {}),
     }
     try:
         json.dumps(payload)
     except TypeError as e:
         raise ValueError(
             'The args or kwargs passed to the deferred call with '
-            'function_identifier, %s, are not json serializable.' %
-            fn_identifier) from e
+            'function_identifier, %s, are not json serializable.'
+            % fn_identifier
+        ) from e
     # This is a workaround for a known python bug.
     # See https://bugs.python.org/issue7980
     datetime.datetime.strptime('', '')
 
     task = platform_taskqueue_services.create_http_task(
-        queue_name=queue_name, url=feconf.TASK_URL_DEFERRED, payload=payload)
+        queue_name=queue_name, url=feconf.TASK_URL_DEFERRED, payload=payload
+    )
     assert task.name is not None
     cloud_task_model = create_new_cloud_task_model(
-        new_cloud_task_model_id, task.name, fn_identifier)
+        new_cloud_task_model_id, task.name, fn_identifier
+    )
     cloud_task_model.update_timestamps()
     cloud_task_model.put()
 
@@ -134,16 +133,18 @@ def enqueue_task(url: str, params: Dict[str, Any], countdown: int) -> None:
             'The params added to the email task call cannot be json serialized'
         ) from e
     scheduled_datetime = datetime.datetime.utcnow() + datetime.timedelta(
-        seconds=countdown)
+        seconds=countdown
+    )
     platform_taskqueue_services.create_http_task(
-        queue_name=QUEUE_NAME_EMAILS, url=url, payload=params,
-        scheduled_for=scheduled_datetime)
+        queue_name=QUEUE_NAME_EMAILS,
+        url=url,
+        payload=params,
+        scheduled_for=scheduled_datetime,
+    )
 
 
 def create_new_cloud_task_model(
-    new_model_id: str,
-    task_name: str,
-    function_id: str
+    new_model_id: str, task_name: str, function_id: str
 ) -> cloud_task_models.CloudTaskRunModel:
     """The function creates a new CloudTaskRunModel with the provided model ID,
     task name, and function ID.
@@ -165,7 +166,7 @@ def create_new_cloud_task_model(
 
 
 def update_cloud_task_run_model(
-    cloud_task_run_domain_instance: cloud_task_domain.CloudTaskRun
+    cloud_task_run_domain_instance: cloud_task_domain.CloudTaskRun,
 ) -> None:
     """Updates the CloudTaskRunModel with the latest job state and exception
     messages for failed runs.
@@ -177,24 +178,29 @@ def update_cloud_task_run_model(
         ValueError. If the CloudTaskRunModel with the given ID does not exist.
     """
     cloud_task_model = cloud_task_models.CloudTaskRunModel.get(
-        cloud_task_run_domain_instance.task_run_id, strict=False)
+        cloud_task_run_domain_instance.task_run_id, strict=False
+    )
     if cloud_task_model is None:
         raise ValueError(
-            'CloudTaskRunModel with id %s does not exist.' %
-            cloud_task_run_domain_instance.task_run_id)
+            'CloudTaskRunModel with id %s does not exist.'
+            % cloud_task_run_domain_instance.task_run_id
+        )
 
     cloud_task_model.latest_job_state = (
-        cloud_task_run_domain_instance.latest_job_state)
+        cloud_task_run_domain_instance.latest_job_state
+    )
     cloud_task_model.exception_messages_for_failed_runs = (
-        cloud_task_run_domain_instance.exception_messages_for_failed_runs)
+        cloud_task_run_domain_instance.exception_messages_for_failed_runs
+    )
     cloud_task_model.current_retry_attempt = (
-        cloud_task_run_domain_instance.current_retry_attempt)
+        cloud_task_run_domain_instance.current_retry_attempt
+    )
     cloud_task_model.update_timestamps()
     cloud_task_model.put()
 
 
 def get_cloud_task_run_by_model_id(
-    model_id: str
+    model_id: str,
 ) -> Optional[cloud_task_domain.CloudTaskRun]:
     """Fetches the CloudTaskRunModel using the provided model_id.
 
@@ -206,7 +212,8 @@ def get_cloud_task_run_by_model_id(
         model_id, or None if no such model exists.
     """
     cloud_task_model = cloud_task_models.CloudTaskRunModel.get(
-        model_id, strict=False)
+        model_id, strict=False
+    )
 
     if cloud_task_model is None:
         return None
@@ -214,7 +221,7 @@ def get_cloud_task_run_by_model_id(
 
 
 def convert_cloud_task_run_model_to_domain_object(
-    cloud_task_model: cloud_task_models.CloudTaskRunModel
+    cloud_task_model: cloud_task_models.CloudTaskRunModel,
 ) -> cloud_task_domain.CloudTaskRun:
     """Converts a CloudTaskRunModel to a CloudTaskRun domain object.
 
@@ -233,10 +240,11 @@ def convert_cloud_task_run_model_to_domain_object(
         'function_id': cloud_task_model.function_id,
         'latest_job_state': cloud_task_model.latest_job_state,
         'exception_messages_for_failed_runs': (
-            cloud_task_model.exception_messages_for_failed_runs),
+            cloud_task_model.exception_messages_for_failed_runs
+        ),
         'current_retry_attempt': cloud_task_model.current_retry_attempt,
         'last_updated': cloud_task_model.last_updated.isoformat(),
-        'created_on': cloud_task_model.created_on.isoformat()
+        'created_on': cloud_task_model.created_on.isoformat(),
     }
     cloud_task_run = cloud_task_domain.CloudTaskRun.from_dict(model_dict)
     return cloud_task_run
@@ -245,7 +253,7 @@ def convert_cloud_task_run_model_to_domain_object(
 def get_cloud_task_run_by_given_params(
     queue_id: str,
     start_datetime: datetime.datetime,
-    end_datetime: datetime.datetime
+    end_datetime: datetime.datetime,
 ) -> List[cloud_task_domain.CloudTaskRun]:
     """Fetches all CloudTaskRunModels with the given queue ID, start datetime,
     and end datetime.
@@ -262,15 +270,17 @@ def get_cloud_task_run_by_given_params(
         specified queue ID.
     """
     cloud_task_run_models = cloud_task_models.CloudTaskRunModel.get_by_queue_id(
-        queue_id)
+        queue_id
+    )
     filtered_models = [
-            model for model in cloud_task_run_models
-            if (
-                start_datetime <=
-                model.last_updated.replace(tzinfo=datetime.timezone.utc) <=
-                end_datetime
-            )
-        ]
+        model
+        for model in cloud_task_run_models
+        if (
+            start_datetime
+            <= model.last_updated.replace(tzinfo=datetime.timezone.utc)
+            <= end_datetime
+        )
+    ]
     return [
         convert_cloud_task_run_model_to_domain_object(model)
         for model in filtered_models

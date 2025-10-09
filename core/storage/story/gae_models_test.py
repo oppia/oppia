@@ -24,12 +24,12 @@ from core.platform import models
 from core.tests import test_utils
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import base_models, story_models
 
-(base_models, story_models) = models.Registry.import_models([
-    models.Names.BASE_MODEL, models.Names.STORY
-])
+(base_models, story_models) = models.Registry.import_models(
+    [models.Names.BASE_MODEL, models.Names.STORY]
+)
 
 
 class StorySnapshotContentModelTests(test_utils.GenericTestBase):
@@ -37,7 +37,8 @@ class StorySnapshotContentModelTests(test_utils.GenericTestBase):
     def test_get_deletion_policy_is_not_applicable(self) -> None:
         self.assertEqual(
             story_models.StorySnapshotContentModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.NOT_APPLICABLE)
+            base_models.DELETION_POLICY.NOT_APPLICABLE,
+        )
 
 
 class StoryModelTest(test_utils.GenericTestBase):
@@ -46,7 +47,8 @@ class StoryModelTest(test_utils.GenericTestBase):
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             story_models.StoryModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.NOT_APPLICABLE)
+            base_models.DELETION_POLICY.NOT_APPLICABLE,
+        )
 
     def test_get_export_policy(self) -> None:
         expexted_export_policy_dict = {
@@ -59,7 +61,8 @@ class StoryModelTest(test_utils.GenericTestBase):
             'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'story_contents': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'story_contents_schema_version': (
-                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
+            ),
             'corresponding_topic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'meta_tag_content': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -70,13 +73,14 @@ class StoryModelTest(test_utils.GenericTestBase):
         }
         self.assertEqual(
             story_models.StoryModel.get_export_policy(),
-            expexted_export_policy_dict)
+            expexted_export_policy_dict,
+        )
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
-            story_models.StoryModel.
-                get_model_association_to_user(),
-            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+            story_models.StoryModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER,
+        )
 
     def test_story_model(self) -> None:
         """Method to test the StoryModel."""
@@ -91,10 +95,12 @@ class StoryModelTest(test_utils.GenericTestBase):
             description='description',
             notes='notes',
             story_contents_schema_version=(
-                feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION),
+                feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION
+            ),
             corresponding_topic_id='topic_id',
             language_code='language_code',
-            url_fragment='title')
+            url_fragment='title',
+        )
         story_instance.commit(committer_id, commit_message, commit_cmds)
         story_by_id = story_models.StoryModel.get_by_id('id')
 
@@ -116,10 +122,12 @@ class StoryModelTest(test_utils.GenericTestBase):
             description='description',
             notes='notes',
             story_contents_schema_version=(
-                feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION),
+                feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION
+            ),
             corresponding_topic_id='topic_id',
             language_code='language_code',
-            url_fragment='unique-url')
+            url_fragment='unique-url',
+        )
         story_instance.commit(committer_id, commit_message, commit_cmds)
         story_by_id = story_models.StoryModel.get_by_url_fragment('unique-url')
 
@@ -146,37 +154,50 @@ class StoryCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             'commit_message': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'commit_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'post_commit_community_owned': (
-                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
+            ),
             'post_commit_is_private': (
-                base_models.EXPORT_POLICY.NOT_APPLICABLE),
-            'post_commit_status': (
-                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
+            ),
+            'post_commit_status': (base_models.EXPORT_POLICY.NOT_APPLICABLE),
             'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
         }
         self.assertEqual(
             story_models.StoryCommitLogEntryModel.get_export_policy(),
-            expexted_export_policy_dict)
+            expexted_export_policy_dict,
+        )
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
-            story_models.StoryCommitLogEntryModel.
-                get_model_association_to_user(),
-            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+            story_models.StoryCommitLogEntryModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER,
+        )
 
     def test_has_reference_to_user_id(self) -> None:
         commit = story_models.StoryCommitLogEntryModel.create(
-            'b', 0, 'committer_id', 'msg', 'create', [{}],
-            constants.ACTIVITY_STATUS_PUBLIC, False)
+            'b',
+            0,
+            'committer_id',
+            'msg',
+            'create',
+            [{}],
+            constants.ACTIVITY_STATUS_PUBLIC,
+            False,
+        )
         commit.story_id = 'b'
         commit.update_timestamps()
         commit.put()
         self.assertTrue(
-            story_models.StoryCommitLogEntryModel
-            .has_reference_to_user_id('committer_id'))
+            story_models.StoryCommitLogEntryModel.has_reference_to_user_id(
+                'committer_id'
+            )
+        )
         self.assertFalse(
-            story_models.StoryCommitLogEntryModel
-            .has_reference_to_user_id('x_id'))
+            story_models.StoryCommitLogEntryModel.has_reference_to_user_id(
+                'x_id'
+            )
+        )
 
 
 class StorySummaryModelTest(test_utils.GenericTestBase):
@@ -185,7 +206,8 @@ class StorySummaryModelTest(test_utils.GenericTestBase):
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             story_models.StorySummaryModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.NOT_APPLICABLE)
+            base_models.DELETION_POLICY.NOT_APPLICABLE,
+        )
 
     def test_get_export_policy(self) -> None:
         expexted_export_policy_dict = {
@@ -193,7 +215,8 @@ class StorySummaryModelTest(test_utils.GenericTestBase):
             'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'story_model_last_updated': (
-                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
+            ),
             'story_model_created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'node_titles': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'thumbnail_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -202,17 +225,18 @@ class StorySummaryModelTest(test_utils.GenericTestBase):
             'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
         }
         self.assertEqual(
             story_models.StorySummaryModel.get_export_policy(),
-            expexted_export_policy_dict)
+            expexted_export_policy_dict,
+        )
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
-            story_models.StorySummaryModel.
-                get_model_association_to_user(),
-            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+            story_models.StorySummaryModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER,
+        )
 
     def test_story_summary_model(self) -> None:
         """Method to test the StorySummaryModel."""
@@ -228,7 +252,8 @@ class StorySummaryModelTest(test_utils.GenericTestBase):
             thumbnail_filename='image.svg',
             thumbnail_bg_color='#F8BF74',
             version=1,
-            url_fragment='story-summary-frag')
+            url_fragment='story-summary-frag',
+        )
         story_summary_model.update_timestamps()
         story_summary_model.put()
         story_summary_by_id = story_models.StorySummaryModel.get_by_id('id')
@@ -240,5 +265,4 @@ class StorySummaryModelTest(test_utils.GenericTestBase):
         self.assertEqual(story_summary_by_id.thumbnail_bg_color, '#F8BF74')
         self.assertEqual(story_summary_by_id.thumbnail_filename, 'image.svg')
         self.assertEqual(story_summary_by_id.version, 1)
-        self.assertEqual(
-            story_summary_by_id.url_fragment, 'story-summary-frag')
+        self.assertEqual(story_summary_by_id.url_fragment, 'story-summary-frag')
