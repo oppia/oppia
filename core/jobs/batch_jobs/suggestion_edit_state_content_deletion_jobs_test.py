@@ -14,8 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for jobs.batch_jobs.suggestion_edit_state_content_deletion_jobs.
-"""
+"""Unit tests for jobs.batch_jobs.suggestion_edit_state_content_deletion_jobs."""
 
 from __future__ import annotations
 
@@ -28,18 +27,17 @@ from core.platform import models
 from typing import Type
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import suggestion_models
 
-(suggestion_models, ) = models.Registry.import_models([
-    models.Names.SUGGESTION
-])
+(suggestion_models,) = models.Registry.import_models([models.Names.SUGGESTION])
 
 suggestion_model = suggestion_models.GeneralSuggestionModel
 
 
 class DeleteDeprecatedSuggestionEditStateContentModelsJobTests(
-    job_test_utils.JobTestBase):
+    job_test_utils.JobTestBase
+):
 
     jobs = suggestion_edit_state_content_deletion_jobs
 
@@ -48,14 +46,14 @@ class DeleteDeprecatedSuggestionEditStateContentModelsJobTests(
     ] = jobs.DeleteDeprecatedSuggestionEditStateContentModelsJob
 
     def create_suggestion(
-            self,
-            suggestion_type: str,
-            target_type: str,
-            target_id: str,
-            author_id: str,
-            final_reviewer_id: str,
-            language_code: None | str
-            ) -> suggestion_model:
+        self,
+        suggestion_type: str,
+        target_type: str,
+        target_id: str,
+        author_id: str,
+        final_reviewer_id: str,
+        language_code: None | str,
+    ) -> suggestion_model:
         """Creates new suggestion.
 
         Args:
@@ -84,11 +82,14 @@ class DeleteDeprecatedSuggestionEditStateContentModelsJobTests(
             author_id=author_id,
             final_reviewer_id=final_reviewer_id,
             change_cmd={},
-            score_category=('%s%sEnglish' % (
-                suggestion_models.SCORE_TYPE_TRANSLATION,
-                suggestion_models.SCORE_CATEGORY_DELIMITER
-            )),
-            language_code=language_code
+            score_category=(
+                '%s%sEnglish'
+                % (
+                    suggestion_models.SCORE_TYPE_TRANSLATION,
+                    suggestion_models.SCORE_CATEGORY_DELIMITER,
+                )
+            ),
+            language_code=language_code,
         )
 
     def setUp(self) -> None:
@@ -101,8 +102,9 @@ class DeleteDeprecatedSuggestionEditStateContentModelsJobTests(
                 'target_1',
                 'author_1',
                 'reviewer_1',
-                None
-            ))
+                None,
+            )
+        )
 
         self.state_content_suggestion_model_2: suggestion_model = (
             self.create_suggestion(
@@ -111,8 +113,9 @@ class DeleteDeprecatedSuggestionEditStateContentModelsJobTests(
                 'target_2',
                 'author_2',
                 'reviewer_2',
-                None
-            ))
+                None,
+            )
+        )
 
         self.translation_suggestion_model: suggestion_model = (
             self.create_suggestion(
@@ -121,8 +124,9 @@ class DeleteDeprecatedSuggestionEditStateContentModelsJobTests(
                 'target_3',
                 'author_3',
                 'reviewer_3',
-                'hi'
-            ))
+                'hi',
+            )
+        )
 
         self.question_suggestion_model: suggestion_model = (
             self.create_suggestion(
@@ -131,37 +135,44 @@ class DeleteDeprecatedSuggestionEditStateContentModelsJobTests(
                 'target_4',
                 'author_4',
                 'reviewer_4',
-                'en'
-            ))
+                'en',
+            )
+        )
 
     def test_job_deletes_suggestion_edit_state_content_model(self) -> None:
         self.state_content_suggestion_model_1.update_timestamps()
         self.state_content_suggestion_model_2.update_timestamps()
         self.translation_suggestion_model.update_timestamps()
         self.question_suggestion_model.update_timestamps()
-        suggestion_model.put_multi([
-            self.state_content_suggestion_model_1,
-            self.state_content_suggestion_model_2,
-            self.translation_suggestion_model,
-            self.question_suggestion_model])
+        suggestion_model.put_multi(
+            [
+                self.state_content_suggestion_model_1,
+                self.state_content_suggestion_model_2,
+                self.translation_suggestion_model,
+                self.question_suggestion_model,
+            ]
+        )
 
-        queries = [(
-            'suggestion_type',
-            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT)]
+        queries = [
+            ('suggestion_type', feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT)
+        ]
 
-        self.assertEqual(
-            len(suggestion_model.query_suggestions(queries)), 2)
+        self.assertEqual(len(suggestion_model.query_suggestions(queries)), 2)
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(
-                stdout='EDIT STATE CONTENT SUGGESTION SUCCESS: 2')])
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout='EDIT STATE CONTENT SUGGESTION SUCCESS: 2'
+                )
+            ]
+        )
 
-        self.assertEqual(
-            len(suggestion_model.query_suggestions(queries)), 0)
+        self.assertEqual(len(suggestion_model.query_suggestions(queries)), 0)
 
 
 class AuditDeleteDeprecatedSuggestionEditStateContentModelsJobTests(
-    job_test_utils.JobTestBase):
+    job_test_utils.JobTestBase
+):
 
     jobs = suggestion_edit_state_content_deletion_jobs
 
@@ -170,14 +181,14 @@ class AuditDeleteDeprecatedSuggestionEditStateContentModelsJobTests(
     ] = jobs.AuditDeprecatedSuggestionEditStateContentModelsDeletionJob
 
     def create_suggestion(
-            self,
-            suggestion_type: str,
-            target_type: str,
-            target_id: str,
-            author_id: str,
-            final_reviewer_id: str,
-            language_code: None | str
-            ) -> suggestion_model:
+        self,
+        suggestion_type: str,
+        target_type: str,
+        target_id: str,
+        author_id: str,
+        final_reviewer_id: str,
+        language_code: None | str,
+    ) -> suggestion_model:
         """Creates new suggestion.
 
         Args:
@@ -206,11 +217,14 @@ class AuditDeleteDeprecatedSuggestionEditStateContentModelsJobTests(
             author_id=author_id,
             final_reviewer_id=final_reviewer_id,
             change_cmd={},
-            score_category=('%s%sEnglish' % (
-                suggestion_models.SCORE_TYPE_TRANSLATION,
-                suggestion_models.SCORE_CATEGORY_DELIMITER
-            )),
-            language_code=language_code
+            score_category=(
+                '%s%sEnglish'
+                % (
+                    suggestion_models.SCORE_TYPE_TRANSLATION,
+                    suggestion_models.SCORE_CATEGORY_DELIMITER,
+                )
+            ),
+            language_code=language_code,
         )
 
     def setUp(self) -> None:
@@ -223,8 +237,9 @@ class AuditDeleteDeprecatedSuggestionEditStateContentModelsJobTests(
                 'target_1',
                 'author_1',
                 'reviewer_1',
-                None
-            ))
+                None,
+            )
+        )
 
         self.state_content_suggestion_model_2: suggestion_model = (
             self.create_suggestion(
@@ -233,8 +248,9 @@ class AuditDeleteDeprecatedSuggestionEditStateContentModelsJobTests(
                 'target_2',
                 'author_2',
                 'reviewer_2',
-                None
-            ))
+                None,
+            )
+        )
 
         self.translation_suggestion_model: suggestion_model = (
             self.create_suggestion(
@@ -243,8 +259,9 @@ class AuditDeleteDeprecatedSuggestionEditStateContentModelsJobTests(
                 'target_3',
                 'author_3',
                 'reviewer_3',
-                'hi'
-            ))
+                'hi',
+            )
+        )
 
         self.question_suggestion_model: suggestion_model = (
             self.create_suggestion(
@@ -253,30 +270,36 @@ class AuditDeleteDeprecatedSuggestionEditStateContentModelsJobTests(
                 'target_4',
                 'author_4',
                 'reviewer_4',
-                'en'
-            ))
+                'en',
+            )
+        )
 
     def test_job_deletes_suggestion_edit_state_content_model(self) -> None:
         self.state_content_suggestion_model_1.update_timestamps()
         self.state_content_suggestion_model_2.update_timestamps()
         self.translation_suggestion_model.update_timestamps()
         self.question_suggestion_model.update_timestamps()
-        suggestion_model.put_multi([
-            self.state_content_suggestion_model_1,
-            self.state_content_suggestion_model_2,
-            self.translation_suggestion_model,
-            self.question_suggestion_model])
+        suggestion_model.put_multi(
+            [
+                self.state_content_suggestion_model_1,
+                self.state_content_suggestion_model_2,
+                self.translation_suggestion_model,
+                self.question_suggestion_model,
+            ]
+        )
 
-        queries = [(
-            'suggestion_type',
-            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT)]
+        queries = [
+            ('suggestion_type', feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT)
+        ]
 
-        self.assertEqual(
-            len(suggestion_model.query_suggestions(queries)), 2)
+        self.assertEqual(len(suggestion_model.query_suggestions(queries)), 2)
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(
-                stdout='EDIT STATE CONTENT SUGGESTION SUCCESS: 2')])
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout='EDIT STATE CONTENT SUGGESTION SUCCESS: 2'
+                )
+            ]
+        )
 
-        self.assertEqual(
-            len(suggestion_model.query_suggestions(queries)), 2)
+        self.assertEqual(len(suggestion_model.query_suggestions(queries)), 2)

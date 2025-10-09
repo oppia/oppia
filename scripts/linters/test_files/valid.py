@@ -20,7 +20,9 @@ python_linter_test.py. This file contain valid python syntax.
 
 from __future__ import annotations
 
-from core.domain import action_registry      # pylint: disable=unused-import  # isort: skip
+from core.domain import (  # pylint: disable=unused-import  # isort: skip
+    action_registry,
+)
 
 
 class FakeClass:

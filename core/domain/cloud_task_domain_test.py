@@ -37,16 +37,26 @@ class CloudTaskDomainTests(test_utils.GenericTestBase):
         current_run_state = 'running'
         last_updated = datetime.datetime.utcnow()
         created_on = datetime.datetime.utcnow()
-        task_name = (
-            'projects/%s/locations/%s/queues/%s/tasks/%s' % (
-                project_id, location_id, queue_name, task_id
-            )
+        task_name = 'projects/%s/locations/%s/queues/%s/tasks/%s' % (
+            project_id,
+            location_id,
+            queue_name,
+            task_id,
         )
         function_id = 'delete_exps_from_user_models'
 
         cloud_task_run = cloud_task_domain.CloudTaskRun(
-            cloud_task_run_id, task_name, task_id, queue_name,
-            current_run_state, function_id, [], 0, last_updated, created_on)
+            cloud_task_run_id,
+            task_name,
+            task_id,
+            queue_name,
+            current_run_state,
+            function_id,
+            [],
+            0,
+            last_updated,
+            created_on,
+        )
 
         self.assertEqual(cloud_task_run.task_run_id, cloud_task_run_id)
         self.assertEqual(cloud_task_run.cloud_task_name, task_name)
@@ -54,8 +64,7 @@ class CloudTaskDomainTests(test_utils.GenericTestBase):
         self.assertEqual(cloud_task_run.queue_id, queue_name)
         self.assertEqual(cloud_task_run.latest_job_state, current_run_state)
         self.assertEqual(cloud_task_run.function_id, function_id)
-        self.assertEqual(
-            cloud_task_run.exception_messages_for_failed_runs, [])
+        self.assertEqual(cloud_task_run.exception_messages_for_failed_runs, [])
         self.assertEqual(cloud_task_run.current_retry_attempt, 0)
         self.assertEqual(cloud_task_run.last_updated, last_updated)
         self.assertEqual(cloud_task_run.created_on, created_on)
@@ -69,10 +78,11 @@ class CloudTaskDomainTests(test_utils.GenericTestBase):
         current_run_state = 'running'
         last_updated = datetime.datetime.utcnow()
         created_on = datetime.datetime.utcnow()
-        task_name = (
-            'projects/%s/locations/%s/queues/%s/tasks/%s' % (
-                project_id, location_id, queue_name, task_id
-            )
+        task_name = 'projects/%s/locations/%s/queues/%s/tasks/%s' % (
+            project_id,
+            location_id,
+            queue_name,
+            task_id,
         )
         function_id = 'delete_exps_from_user_models'
 
@@ -86,10 +96,11 @@ class CloudTaskDomainTests(test_utils.GenericTestBase):
             'exception_messages_for_failed_runs': [],
             'current_retry_attempt': 0,
             'last_updated': last_updated.isoformat(),
-            'created_on': created_on.isoformat()
+            'created_on': created_on.isoformat(),
         }
 
         cloud_task_run = cloud_task_domain.CloudTaskRun.from_dict(
-            cloud_task_run_dict)
+            cloud_task_run_dict
+        )
 
         self.assertEqual(cloud_task_run.to_dict(), cloud_task_run_dict)

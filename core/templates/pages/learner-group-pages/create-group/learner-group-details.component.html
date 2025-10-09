@@ -8,19 +8,34 @@
            tabindex="0"
            [attr.aria-invalid]="false"
            required="true"
+           placeholder="Enter a title for the Group."
+           [maxlength]="MAX_CHARS_IN_GROUP_TITLE"
            [readonly]="isReadOnlyModeActive()">
+    <small class="form-text text-muted">
+      <em> Group title should be at most {{MAX_CHARS_IN_GROUP_TITLE}} characters.</em>
+      <span *ngIf="learnerGroupTitle?.length > 0">
+        <em> Characters used: {{learnerGroupTitle.length}}/{{MAX_CHARS_IN_GROUP_TITLE}}</em>
+      </span>
+    </small>
   </div>
   <div class="form-group oppia-long-text">
     <b>{{ 'I18N_LEARNER_GROUP_DETAILS_GROUP_DESCRIPTION' | translate }}<span class="required-field">*</span></b>
     <textarea rows="3"
               cols="50"
-              [maxlength]="250"
+              [maxlength]="MAX_CHARS_IN_GROUP_DESCRIPTION"
               [(ngModel)]="learnerGroupDescription"
               (ngModelChange)="updateGroupDescription($event)"
               class="form-control"
               autofocus
               required="true"
+              placeholder="Enter a learner Group Description."
               [readonly]="isReadOnlyModeActive()">
     </textarea>
+    <small class="form-text text-muted">
+      <em> Group description should be at most {{MAX_CHARS_IN_GROUP_DESCRIPTION}} characters.</em>
+      <span *ngIf="learnerGroupDescription?.length > 0">
+        <em> Characters used: {{learnerGroupDescription.length}}/{{MAX_CHARS_IN_GROUP_DESCRIPTION}}</em>
+      </span>
+    </small>
   </div>
 </div>

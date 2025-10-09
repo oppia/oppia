@@ -60,7 +60,8 @@ from typing import (
 # sub-handlers as well, we used generics here. So, do not make these
 # private type variables public in the future.
 _SuggestionsProviderHandlerNormalizedRequestDictType = TypeVar(
-    '_SuggestionsProviderHandlerNormalizedRequestDictType')
+    '_SuggestionsProviderHandlerNormalizedRequestDictType'
+)
 _SuggestionsProviderHandlerNormalizedPayloadDictType = TypeVar(
     '_SuggestionsProviderHandlerNormalizedPayloadDictType'
 )
@@ -105,35 +106,28 @@ SuggestionsProviderHandlerArgsSchemaDictType = Dict[
             str,
             Union[
                 Optional[
-                    Dict[str, Union[str, List[Dict[str, Union[str, int]]]]]],
-                List[str]
-            ]
-        ]
-    ]
+                    Dict[str, Union[str, List[Dict[str, Union[str, int]]]]]
+                ],
+                List[str],
+            ],
+        ],
+    ],
 ]
 
 
 SCHEMA_FOR_SUBTITLED_HTML_DICT = {
     'type': 'dict',
-    'properties': [{
-        'name': 'content_id',
-        'schema': {
-            'type': 'basestring'
-        }
-    }, {
-        'name': 'html',
-        'schema': {
-            'type': 'basestring'
-        }
-    }]
+    'properties': [
+        {'name': 'content_id', 'schema': {'type': 'basestring'}},
+        {'name': 'html', 'schema': {'type': 'basestring'}},
+    ],
 }
 
 SCHEMA_FOR_TARGET_ID = {
     'type': 'basestring',
-    'validators': [{
-        'id': 'is_regex_matched',
-        'regex_pattern': constants.ENTITY_ID_REGEX
-    }]
+    'validators': [
+        {'id': 'is_regex_matched', 'regex_pattern': constants.ENTITY_ID_REGEX}
+    ],
 }
 
 
@@ -152,12 +146,9 @@ class SuggestionHandlerNormalizedPayloadDict(TypedDict):
 
 
 class SuggestionHandler(
-    base.BaseHandler[
-        SuggestionHandlerNormalizedPayloadDict,
-        Dict[str, str]
-    ]
+    base.BaseHandler[SuggestionHandlerNormalizedPayloadDict, Dict[str, str]]
 ):
-    """"Handles operations relating to suggestions."""
+    """ "Handles operations relating to suggestions."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
@@ -165,27 +156,20 @@ class SuggestionHandler(
             'suggestion_type': {
                 'schema': {
                     'type': 'basestring',
-                    'choices': feconf.SUGGESTION_TYPE_CHOICES
+                    'choices': feconf.SUGGESTION_TYPE_CHOICES,
                 }
             },
             'target_type': {
                 'schema': {
                     'type': 'basestring',
-                    'choices': feconf.SUGGESTION_TARGET_TYPE_CHOICES
+                    'choices': feconf.SUGGESTION_TARGET_TYPE_CHOICES,
                 }
             },
-            'target_id': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
+            'target_id': {'schema': {'type': 'basestring'}},
             'target_version_at_submission': {
                 'schema': {
                     'type': 'int',
-                    'validators': [{
-                        'id': 'is_at_least',
-                        'min_value': 1
-                    }]
+                    'validators': [{'id': 'is_at_least', 'min_value': 1}],
                 }
             },
             'change_cmd': {
@@ -193,24 +177,19 @@ class SuggestionHandler(
                     'type': 'object_dict',
                     'validation_method': (
                         domain_objects_validator.validate_suggestion_change
-                    )
+                    ),
                 }
             },
-            'description': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
+            'description': {'schema': {'type': 'basestring'}},
             'files': {
                 'schema': {
                     'type': 'object_dict',
                     'validation_method': (
-                        domain_objects_validator.
-                        validate_suggestion_images
-                    )
+                        domain_objects_validator.validate_suggestion_images
+                    ),
                 },
-                'default_value': None
-            }
+                'default_value': None,
+            },
         }
     }
 
@@ -225,11 +204,10 @@ class SuggestionHandler(
         assert self.user_id is not None
         assert self.normalized_payload is not None
         suggestion_type = self.normalized_payload['suggestion_type']
-        if (
-            suggestion_type == feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT
-        ):
+        if suggestion_type == feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT:
             raise self.InvalidInputException(
-                'Content suggestion submissions are no longer supported.')
+                'Content suggestion submissions are no longer supported.'
+            )
 
         suggestion = suggestion_services.create_suggestion(
             suggestion_type,
@@ -238,7 +216,7 @@ class SuggestionHandler(
             self.normalized_payload['target_version_at_submission'],
             self.user_id,
             self.normalized_payload['change_cmd'],
-            self.normalized_payload['description']
+            self.normalized_payload['description'],
         )
 
         if suggestion.suggestion_type == (
@@ -248,19 +226,16 @@ class SuggestionHandler(
                 suggestion_services
             ).update_translation_contribution_stats_at_submission(suggestion)
 
-        if suggestion.suggestion_type == (
-            feconf.SUGGESTION_TYPE_ADD_QUESTION
-        ):
+        if suggestion.suggestion_type == (feconf.SUGGESTION_TYPE_ADD_QUESTION):
             (
                 suggestion_services
             ).update_question_contribution_stats_at_submission(suggestion)
 
         suggestion_change = suggestion.change_cmd
-        if (
-                suggestion_change.cmd == 'add_written_translation' and (
-                    translation_domain.TranslatableContentFormat
-                    .is_data_format_list(suggestion_change.data_format)
-                )
+        if suggestion_change.cmd == 'add_written_translation' and (
+            translation_domain.TranslatableContentFormat.is_data_format_list(
+                suggestion_change.data_format
+            )
         ):
             self.render_json(self.values)
             return
@@ -273,8 +248,7 @@ class SuggestionHandler(
         # See more - https://github.com/oppia/oppia/issues/14298
         if suggestion_type != feconf.SUGGESTION_TYPE_ADD_QUESTION:
             assert isinstance(
-                suggestion,
-                suggestion_registry.SuggestionTranslateContent
+                suggestion, suggestion_registry.SuggestionTranslateContent
             )
             self._copy_images_from_target_exploration_content_to_translation(
                 suggestion
@@ -287,8 +261,7 @@ class SuggestionHandler(
             if new_image_filenames and files is not None:
                 new_image_files = {
                     filename: image_blob
-                    for filename, image_blob
-                    in files.items()
+                    for filename, image_blob in files.items()
                     if filename in new_image_filenames
                 }
                 self._save_new_images_added_in_translation(
@@ -300,7 +273,7 @@ class SuggestionHandler(
     def _save_new_images_added_in_translation(
         self,
         new_files: Dict[str, str],
-        suggestion: suggestion_registry.SuggestionTranslateContent
+        suggestion: suggestion_registry.SuggestionTranslateContent,
     ) -> None:
         """Saves new images introduced in translation suggestion to storage.
 
@@ -312,18 +285,23 @@ class SuggestionHandler(
         """
         for filename, image in new_files.items():
             decoded_image = base64.decodebytes(image.encode('utf-8'))
-            file_format = (
-                image_validation_services.validate_image_and_filename(
-                    decoded_image, filename))
+            file_format = image_validation_services.validate_image_and_filename(
+                decoded_image, filename
+            )
             image_is_compressible = (
-                file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
+                file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS
+            )
             fs_services.save_original_and_compressed_versions_of_image(
-                filename, suggestion.image_context, suggestion.target_id,
-                decoded_image, 'image', image_is_compressible)
+                filename,
+                suggestion.image_context,
+                suggestion.target_id,
+                decoded_image,
+                'image',
+                image_is_compressible,
+            )
 
     def _copy_images_from_target_exploration_content_to_translation(
-        self,
-        suggestion: suggestion_registry.SuggestionTranslateContent
+        self, suggestion: suggestion_registry.SuggestionTranslateContent
     ) -> None:
         """Creates copies of images from the suggestion's target exploration
         for the translation suggestion to use.
@@ -343,9 +321,11 @@ class SuggestionHandler(
         )
         try:
             fs_services.copy_images(
-                suggestion.target_type, suggestion.target_id,
-                suggestion.image_context, suggestion.target_id,
-                target_image_filenames
+                suggestion.target_type,
+                suggestion.target_id,
+                suggestion.image_context,
+                suggestion.target_id,
+                target_image_filenames,
             )
         except ValueError as error:
             _, source_asset_path, *_ = error.args
@@ -354,11 +334,10 @@ class SuggestionHandler(
             source_asset_directory = source_asset_path[:filename_start_index]
             raise Exception(
                 'An image in the submitted translation\'s original content '
-                'named "%s" cannot be found. Please save it to the ' % (
-                    source_asset_filename
-                ) + 'backend file system at /%s ' % (
-                    source_asset_directory
-                ) + 'before submitting this translation again.'
+                'named "%s" cannot be found. Please save it to the '
+                % (source_asset_filename)
+                + 'backend file system at /%s ' % (source_asset_directory)
+                + 'before submitting this translation again.'
             ) from error
 
 
@@ -375,21 +354,15 @@ class SuggestionToExplorationActionHandlerNormalizedPayloadDict(TypedDict):
 class SuggestionToExplorationActionHandler(
     base.BaseHandler[
         SuggestionToExplorationActionHandlerNormalizedPayloadDict,
-        Dict[str, str]
+        Dict[str, str],
     ]
 ):
     """Handles actions performed on suggestions to explorations."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
-        'target_id': {
-            'schema': SCHEMA_FOR_TARGET_ID
-        },
-        'suggestion_id': {
-            'schema': {
-                'type': 'basestring'
-            }
-        }
+        'target_id': {'schema': SCHEMA_FOR_TARGET_ID},
+        'suggestion_id': {'schema': {'type': 'basestring'}},
     }
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
@@ -398,34 +371,39 @@ class SuggestionToExplorationActionHandler(
                     'type': 'basestring',
                     'choices': [
                         constants.ACTION_ACCEPT_SUGGESTION,
-                        constants.ACTION_REJECT_SUGGESTION
-                    ]
+                        constants.ACTION_REJECT_SUGGESTION,
+                    ],
                 }
             },
             'commit_message': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'has_length_at_most',
-                        'max_value': constants.MAX_COMMIT_MESSAGE_LENGTH
-                    }]
+                    'validators': [
+                        {
+                            'id': 'has_length_at_most',
+                            'max_value': constants.MAX_COMMIT_MESSAGE_LENGTH,
+                        }
+                    ],
                 },
-                'default_value': None
+                'default_value': None,
             },
             'review_message': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'has_length_at_most',
-                        'max_value': constants.MAX_REVIEW_MESSAGE_LENGTH
-                    }]
+                    'validators': [
+                        {
+                            'id': 'has_length_at_most',
+                            'max_value': constants.MAX_REVIEW_MESSAGE_LENGTH,
+                        }
+                    ],
                 }
-            }
+            },
         }
     }
 
     @acl_decorators.get_decorator_for_accepting_suggestion(
-        acl_decorators.can_edit_exploration)
+        acl_decorators.can_edit_exploration
+    )
     def put(self, target_id: str, suggestion_id: str) -> None:
         """Handles PUT requests.
 
@@ -439,24 +417,25 @@ class SuggestionToExplorationActionHandler(
         """
         assert self.user_id is not None
         assert self.normalized_payload is not None
-        if (
-                suggestion_id.split('.')[0] !=
-                feconf.ENTITY_TYPE_EXPLORATION):
+        if suggestion_id.split('.')[0] != feconf.ENTITY_TYPE_EXPLORATION:
             raise self.InvalidInputException(
                 'This handler allows actions only'
-                ' on suggestions to explorations.')
+                ' on suggestions to explorations.'
+            )
 
         if suggestion_id.split('.')[1] != target_id:
             raise self.InvalidInputException(
                 'The exploration id provided does not match the exploration id '
-                'present as part of the suggestion_id')
+                'present as part of the suggestion_id'
+            )
 
         action = self.normalized_payload['action']
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
 
         if suggestion.author_id == self.user_id:
             raise self.UnauthorizedUserException(
-                'You cannot accept/reject your own suggestion.')
+                'You cannot accept/reject your own suggestion.'
+            )
 
         if action == constants.ACTION_ACCEPT_SUGGESTION:
             commit_message = self.normalized_payload.get('commit_message')
@@ -466,19 +445,23 @@ class SuggestionToExplorationActionHandler(
                     'action is \'accept suggestion\'.'
                 )
             suggestion_services.accept_suggestion(
-                suggestion_id, self.user_id, commit_message,
-                self.normalized_payload['review_message']
+                suggestion_id,
+                self.user_id,
+                commit_message,
+                self.normalized_payload['review_message'],
             )
         else:
             assert action == constants.ACTION_REJECT_SUGGESTION
             suggestion_services.reject_suggestion(
-                suggestion_id, self.user_id,
-                self.normalized_payload['review_message']
+                suggestion_id,
+                self.user_id,
+                self.normalized_payload['review_message'],
             )
 
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
         if suggestion.suggestion_type == (
-            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+        ):
             suggestion_services.update_translation_review_stats(suggestion)
 
         self.render_json(self.values)
@@ -496,64 +479,53 @@ class ResubmitSuggestionHandlerNormalizedPayloadDict(TypedDict):
 
 class ResubmitSuggestionHandler(
     base.BaseHandler[
-        ResubmitSuggestionHandlerNormalizedPayloadDict,
-        Dict[str, str]
+        ResubmitSuggestionHandlerNormalizedPayloadDict, Dict[str, str]
     ]
 ):
     """Handler to reopen a rejected suggestion."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
-        'suggestion_id': {
-            'schema': {
-                'type': 'basestring'
-            }
-        }
+        'suggestion_id': {'schema': {'type': 'basestring'}}
     }
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
             'action': {
-                'schema': {
-                    'type': 'basestring',
-                    'choices': ['resubmit']
-                }
+                'schema': {'type': 'basestring', 'choices': ['resubmit']}
             },
             'change_cmd': {
                 'schema': {
                     'type': 'dict',
-                    'properties': [{
-                        'name': 'cmd',
-                        'schema': {
-                            'type': 'basestring'
-                        }
-                    }, {
-                        'name': 'property_name',
-                        'schema': {
-                            'type': 'basestring'
-                        }
-                    }, {
-                        'name': 'state_name',
-                        'schema': {
-                            'type': 'basestring',
-                            'validators': [{
-                                'id': 'has_length_at_most',
-                                'max_value': constants.MAX_STATE_NAME_LENGTH
-                            }]
-                        }
-                    }, {
-                        'name': 'new_value',
-                        'schema': SCHEMA_FOR_SUBTITLED_HTML_DICT
-                    }, {
-                        'name': 'old_value',
-                        'schema': SCHEMA_FOR_SUBTITLED_HTML_DICT
-                    }]
+                    'properties': [
+                        {'name': 'cmd', 'schema': {'type': 'basestring'}},
+                        {
+                            'name': 'property_name',
+                            'schema': {'type': 'basestring'},
+                        },
+                        {
+                            'name': 'state_name',
+                            'schema': {
+                                'type': 'basestring',
+                                'validators': [
+                                    {
+                                        'id': 'has_length_at_most',
+                                        'max_value': constants.MAX_STATE_NAME_LENGTH,
+                                    }
+                                ],
+                            },
+                        },
+                        {
+                            'name': 'new_value',
+                            'schema': SCHEMA_FOR_SUBTITLED_HTML_DICT,
+                        },
+                        {
+                            'name': 'old_value',
+                            'schema': SCHEMA_FOR_SUBTITLED_HTML_DICT,
+                        },
+                    ],
                 }
             },
-            'summary_message': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            }
+            'summary_message': {'schema': {'type': 'basestring'}},
         }
     }
 
@@ -572,7 +544,8 @@ class ResubmitSuggestionHandler(
         change_object = change_cls(new_change)
         summary_message = self.normalized_payload['summary_message']
         suggestion_services.resubmit_rejected_suggestion(
-            suggestion_id, summary_message, self.user_id, change_object)
+            suggestion_id, summary_message, self.user_id, change_object
+        )
         self.render_json(self.values)
 
 
@@ -588,22 +561,15 @@ class SuggestionToSkillActionHandlerNormalizedPayloadDict(TypedDict):
 
 class SuggestionToSkillActionHandler(
     base.BaseHandler[
-        SuggestionToSkillActionHandlerNormalizedPayloadDict,
-        Dict[str, str]
+        SuggestionToSkillActionHandlerNormalizedPayloadDict, Dict[str, str]
     ]
 ):
     """Handles actions performed on suggestions to skills."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
-        'target_id': {
-            'schema': SCHEMA_FOR_TARGET_ID
-        },
-        'suggestion_id': {
-            'schema': {
-                'type': 'basestring'
-            }
-        }
+        'target_id': {'schema': SCHEMA_FOR_TARGET_ID},
+        'suggestion_id': {'schema': {'type': 'basestring'}},
     }
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
@@ -612,37 +578,37 @@ class SuggestionToSkillActionHandler(
                     'type': 'basestring',
                     'choices': [
                         constants.ACTION_ACCEPT_SUGGESTION,
-                        constants.ACTION_REJECT_SUGGESTION
-                    ]
+                        constants.ACTION_REJECT_SUGGESTION,
+                    ],
                 }
             },
             'review_message': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'has_length_at_most',
-                        'max_value': constants.MAX_REVIEW_MESSAGE_LENGTH
-                    }]
+                    'validators': [
+                        {
+                            'id': 'has_length_at_most',
+                            'max_value': constants.MAX_REVIEW_MESSAGE_LENGTH,
+                        }
+                    ],
                 }
             },
             'skill_difficulty': {
                 'schema': {
                     'type': 'float',
-                    'validators': [{
-                        'id': 'is_at_least',
-                        'min_value': 0
-                    }, {
-                        'id': 'is_at_most',
-                        'max_value': 1
-                    }]
+                    'validators': [
+                        {'id': 'is_at_least', 'min_value': 0},
+                        {'id': 'is_at_most', 'max_value': 1},
+                    ],
                 },
-                'default_value': None
-            }
+                'default_value': None,
+            },
         }
     }
 
     @acl_decorators.get_decorator_for_accepting_suggestion(
-        acl_decorators.can_edit_skill)
+        acl_decorators.can_edit_skill
+    )
     def put(self, target_id: str, suggestion_id: str) -> None:
         """Handles PUT requests.
 
@@ -658,37 +624,49 @@ class SuggestionToSkillActionHandler(
         assert self.normalized_payload is not None
         if suggestion_id.split('.')[0] != feconf.ENTITY_TYPE_SKILL:
             raise self.InvalidInputException(
-                'This handler allows actions only on suggestions to skills.')
+                'This handler allows actions only on suggestions to skills.'
+            )
 
         if suggestion_id.split('.')[1] != target_id:
             raise self.InvalidInputException(
                 'The skill id provided does not match the skill id present as '
-                'part of the suggestion_id')
+                'part of the suggestion_id'
+            )
 
         action = self.normalized_payload['action']
 
         if action == constants.ACTION_ACCEPT_SUGGESTION:
             # Question suggestions do not use commit messages.
             suggestion_services.accept_suggestion(
-                suggestion_id, self.user_id, 'UNUSED_COMMIT_MESSAGE',
-                self.normalized_payload['review_message'])
+                suggestion_id,
+                self.user_id,
+                'UNUSED_COMMIT_MESSAGE',
+                self.normalized_payload['review_message'],
+            )
 
             suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
             target_entity_html_list = (
-                suggestion.get_target_entity_html_strings())
+                suggestion.get_target_entity_html_strings()
+            )
             target_image_filenames = (
                 html_cleaner.get_image_filenames_from_html_strings(
-                    target_entity_html_list))
+                    target_entity_html_list
+                )
+            )
 
             fs_services.copy_images(
-                suggestion.target_type, suggestion.target_id,
-                feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS, suggestion.target_id,
-                target_image_filenames)
+                suggestion.target_type,
+                suggestion.target_id,
+                feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS,
+                suggestion.target_id,
+                target_image_filenames,
+            )
         else:
             assert action == constants.ACTION_REJECT_SUGGESTION
             suggestion_services.reject_suggestion(
-                suggestion_id, self.user_id,
-                self.normalized_payload['review_message']
+                suggestion_id,
+                self.user_id,
+                self.normalized_payload['review_message'],
             )
 
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
@@ -701,7 +679,7 @@ class SuggestionToSkillActionHandler(
 class SuggestionsProviderHandler(
     base.BaseHandler[
         _SuggestionsProviderHandlerNormalizedPayloadDictType,
-        _SuggestionsProviderHandlerNormalizedRequestDictType
+        _SuggestionsProviderHandlerNormalizedRequestDictType,
     ]
 ):
     """Provides suggestions for a user and given suggestion type."""
@@ -727,16 +705,19 @@ class SuggestionsProviderHandler(
         """
         if target_type not in feconf.SUGGESTION_TARGET_TYPE_CHOICES:
             raise self.InvalidInputException(
-                'Invalid target_type: %s' % target_type)
+                'Invalid target_type: %s' % target_type
+            )
 
         if suggestion_type not in feconf.SUGGESTION_TYPE_CHOICES:
             raise self.InvalidInputException(
-                'Invalid suggestion_type: %s' % suggestion_type)
+                'Invalid suggestion_type: %s' % suggestion_type
+            )
 
     def _render_suggestions(
-        self, target_type: str,
+        self,
+        target_type: str,
         suggestions: Sequence[suggestion_registry.BaseSuggestion],
-        next_offset: int
+        next_offset: int,
     ) -> None:
         """Renders retrieved suggestions.
 
@@ -748,22 +729,28 @@ class SuggestionsProviderHandler(
         """
         if target_type == feconf.ENTITY_TYPE_EXPLORATION:
             target_id_to_exp_opportunity_dict = (
-                _get_target_id_to_exploration_opportunity_dict(suggestions))
-            self.render_json({
-                'suggestions': _construct_exploration_suggestions(suggestions),
-                'target_id_to_opportunity_dict':
-                    target_id_to_exp_opportunity_dict,
-                'next_offset': next_offset
-            })
+                _get_target_id_to_exploration_opportunity_dict(suggestions)
+            )
+            self.render_json(
+                {
+                    'suggestions': _construct_exploration_suggestions(
+                        suggestions
+                    ),
+                    'target_id_to_opportunity_dict': target_id_to_exp_opportunity_dict,
+                    'next_offset': next_offset,
+                }
+            )
         elif target_type == feconf.ENTITY_TYPE_SKILL:
             target_id_to_skill_opportunity_dict = (
-                _get_target_id_to_skill_opportunity_dict(suggestions))
-            self.render_json({
-                'suggestions': [s.to_dict() for s in suggestions],
-                'target_id_to_opportunity_dict':
-                    target_id_to_skill_opportunity_dict,
-                'next_offset': next_offset
-            })
+                _get_target_id_to_skill_opportunity_dict(suggestions)
+            )
+            self.render_json(
+                {
+                    'suggestions': [s.to_dict() for s in suggestions],
+                    'target_id_to_opportunity_dict': target_id_to_skill_opportunity_dict,
+                    'next_offset': next_offset,
+                }
+            )
         else:
             self.render_json({})
 
@@ -794,73 +781,62 @@ class ReviewableSuggestionsHandler(
             'schema': {
                 'type': 'basestring',
             },
-            'choices': feconf.SUGGESTION_TARGET_TYPE_CHOICES
+            'choices': feconf.SUGGESTION_TARGET_TYPE_CHOICES,
         },
         'suggestion_type': {
             'schema': {
                 'type': 'basestring',
             },
-            'choices': feconf.SUGGESTION_TYPE_CHOICES
-        }
+            'choices': feconf.SUGGESTION_TYPE_CHOICES,
+        },
     }
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'limit': {
                 'schema': {
                     'type': 'int',
-                    'validators': [{
-                        'id': 'is_at_least',
-                        'min_value': 1
-                    }]
+                    'validators': [{'id': 'is_at_least', 'min_value': 1}],
                 },
-                'default_value': None
+                'default_value': None,
             },
             'offset': {
                 'schema': {
                     'type': 'int',
-                    'validators': [{
-                        'id': 'is_at_least',
-                        'min_value': 0
-                    }]
+                    'validators': [{'id': 'is_at_least', 'min_value': 0}],
                 }
             },
             'sort_key': {
-                'schema': {
-                    'type': 'basestring'
-                },
+                'schema': {'type': 'basestring'},
                 'choices': feconf.SUGGESTIONS_SORT_KEYS,
             },
             'exploration_id': {
-                'schema': {
-                    'type': 'basestring'
-                },
-                'default_value': None
+                'schema': {'type': 'basestring'},
+                'default_value': None,
             },
             'topic_name': {
-                'schema': {
-                    'type': 'basestring'
-                },
-                'default_value': None
+                'schema': {'type': 'basestring'},
+                'default_value': None,
             },
         }
     }
 
     def _get_skill_ids_for_topic(
-            self, topic_name: Optional[str]
+        self, topic_name: Optional[str]
     ) -> Optional[List[str]]:
         """Gets all skill ids for the provided topic.
 
         Returns None to indicate that no filtering is needed.
         """
         if (
-            topic_name is None or
-            topic_name == constants.TOPIC_SENTINEL_NAME_ALL
+            topic_name is None
+            or topic_name == constants.TOPIC_SENTINEL_NAME_ALL
         ):
             return None
         topic = topic_fetchers.get_topic_by_name(topic_name)
         if topic is None:
             raise self.InvalidInputException(
-                f'The topic \'{topic_name}\' is not valid')
+                f'The topic \'{topic_name}\' is not valid'
+            )
         return topic.get_all_skill_ids()
 
     @acl_decorators.can_view_reviewable_suggestions
@@ -877,7 +853,8 @@ class ReviewableSuggestionsHandler(
         assert self.user_id is not None
         assert self.normalized_request is not None
         self._require_valid_suggestion_and_target_types(
-            target_type, suggestion_type)
+            target_type, suggestion_type
+        )
         limit = self.normalized_request.get('limit')
         offset = self.normalized_request['offset']
         sort_key = self.normalized_request['sort_key']
@@ -887,42 +864,48 @@ class ReviewableSuggestionsHandler(
         # User_settings.preferred_translation_language_code is the language
         # selected by user in language filter of contributor dashboard.
         language_code_to_filter_by = (
-            user_settings.preferred_translation_language_code)
+            user_settings.preferred_translation_language_code
+        )
         suggestions: Sequence[suggestion_registry.BaseSuggestion] = []
         next_offset = 0
         if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
             reviewable_suggestions: List[
-                suggestion_registry.SuggestionTranslateContent] = []
-            if (exp_ids and len(exp_ids) == 1 and language_code_to_filter_by):
+                suggestion_registry.SuggestionTranslateContent
+            ] = []
+            if exp_ids and len(exp_ids) == 1 and language_code_to_filter_by:
                 reviewable_suggestions, next_offset = (
-                    suggestion_services
-                    .get_reviewable_translation_suggestions_for_single_exp(
-                        self.user_id, exp_ids[0],
-                        language_code_to_filter_by))
+                    suggestion_services.get_reviewable_translation_suggestions_for_single_exp(
+                        self.user_id, exp_ids[0], language_code_to_filter_by
+                    )
+                )
             else:
                 # TODO(#18745): Deprecate the
                 # get_reviewable_translation_suggestions_by_offset method
                 # as its limit is unbounded and it can be given an
                 # unlimited number of exp_ids.
                 reviewable_suggestions, next_offset = (
-                    suggestion_services
-                    .get_reviewable_translation_suggestions_by_offset(
-                        self.user_id, exp_ids, limit, offset, sort_key))
+                    suggestion_services.get_reviewable_translation_suggestions_by_offset(
+                        self.user_id, exp_ids, limit, offset, sort_key
+                    )
+                )
             suggestions = (
-                suggestion_services
-                .get_suggestions_with_editable_explorations(
-                    reviewable_suggestions))
+                suggestion_services.get_suggestions_with_editable_explorations(
+                    reviewable_suggestions
+                )
+            )
         elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
             if limit is None:
                 raise ValueError(
-                    'Limit must be provided for question suggestions.')
+                    'Limit must be provided for question suggestions.'
+                )
             topic_name = self.normalized_request.get('topic_name')
             skill_ids = self._get_skill_ids_for_topic(topic_name)
 
             suggestions, next_offset = (
-                suggestion_services
-                .get_reviewable_question_suggestions_by_offset(
-                    self.user_id, limit, offset, sort_key, skill_ids))
+                suggestion_services.get_reviewable_question_suggestions_by_offset(
+                    self.user_id, limit, offset, sort_key, skill_ids
+                )
+            )
         self._render_suggestions(target_type, suggestions, next_offset)
 
 
@@ -938,8 +921,7 @@ class UserSubmittedSuggestionsHandlerNormalizedRequestDict(TypedDict):
 
 class UserSubmittedSuggestionsHandler(
     SuggestionsProviderHandler[
-        Dict[str, str],
-        UserSubmittedSuggestionsHandlerNormalizedRequestDict
+        Dict[str, str], UserSubmittedSuggestionsHandlerNormalizedRequestDict
     ]
 ):
     """Provides all suggestions which are submitted by the user for a given
@@ -951,41 +933,33 @@ class UserSubmittedSuggestionsHandler(
             'schema': {
                 'type': 'basestring',
             },
-            'choices': feconf.SUGGESTION_TARGET_TYPE_CHOICES
+            'choices': feconf.SUGGESTION_TARGET_TYPE_CHOICES,
         },
         'suggestion_type': {
             'schema': {
                 'type': 'basestring',
             },
-            'choices': feconf.SUGGESTION_TYPE_CHOICES
-        }
+            'choices': feconf.SUGGESTION_TYPE_CHOICES,
+        },
     }
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'limit': {
                 'schema': {
                     'type': 'int',
-                    'validators': [{
-                        'id': 'is_at_least',
-                        'min_value': 1
-                    }]
+                    'validators': [{'id': 'is_at_least', 'min_value': 1}],
                 }
             },
             'offset': {
                 'schema': {
                     'type': 'int',
-                    'validators': [{
-                        'id': 'is_at_least',
-                        'min_value': 0
-                    }]
+                    'validators': [{'id': 'is_at_least', 'min_value': 0}],
                 }
             },
             'sort_key': {
-                'schema': {
-                    'type': 'basestring'
-                },
+                'schema': {'type': 'basestring'},
                 'choices': feconf.SUGGESTIONS_SORT_KEYS,
-            }
+            },
         }
     }
 
@@ -1000,7 +974,8 @@ class UserSubmittedSuggestionsHandler(
         assert self.user_id is not None
         assert self.normalized_request is not None
         self._require_valid_suggestion_and_target_types(
-            target_type, suggestion_type)
+            target_type, suggestion_type
+        )
         limit = self.normalized_request['limit']
         offset = self.normalized_request['offset']
         sort_key = self.normalized_request['sort_key']
@@ -1018,15 +993,16 @@ class UserSubmittedSuggestionsHandler(
             # SuggestionTranslateContent], we have used cast here.
             translatable_suggestions = cast(
                 Sequence[suggestion_registry.SuggestionTranslateContent],
-                suggestions
+                suggestions,
             )
             suggestions_with_translatable_exps = (
-                suggestion_services
-                .get_suggestions_with_editable_explorations(
-                    translatable_suggestions))
+                suggestion_services.get_suggestions_with_editable_explorations(
+                    translatable_suggestions
+                )
+            )
             while (
-                len(translatable_suggestions) > 0 and
-                len(suggestions_with_translatable_exps) == 0
+                len(translatable_suggestions) > 0
+                and len(suggestions_with_translatable_exps) == 0
             ):
                 # If all of the fetched suggestions are filtered out, then keep
                 # fetching until we have some suggestions to return or there
@@ -1037,23 +1013,18 @@ class UserSubmittedSuggestionsHandler(
                         feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                         limit,
                         next_offset,
-                        sort_key
+                        sort_key,
                     )
                 )
-                suggestions_with_translatable_exps = (
-                    suggestion_services
-                    .get_suggestions_with_editable_explorations(
-                        translatable_suggestions
-                    )
+                suggestions_with_translatable_exps = suggestion_services.get_suggestions_with_editable_explorations(
+                    translatable_suggestions
                 )
             suggestions = suggestions_with_translatable_exps
 
         self._render_suggestions(target_type, suggestions, next_offset)
 
 
-class SuggestionListHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class SuggestionListHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Handles list operations on suggestions."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -1063,30 +1034,28 @@ class SuggestionListHandler(
             'suggestion_type': {
                 'schema': {
                     'type': 'basestring',
-                    'choices': feconf.SUGGESTION_TYPE_CHOICES
+                    'choices': feconf.SUGGESTION_TYPE_CHOICES,
                 },
-                'default_value': None
+                'default_value': None,
             },
             'target_type': {
                 'schema': {
                     'type': 'basestring',
-                    'choices': feconf.SUGGESTION_TARGET_TYPE_CHOICES
+                    'choices': feconf.SUGGESTION_TARGET_TYPE_CHOICES,
                 },
-                'default_value': None
+                'default_value': None,
             },
             'target_id': {
                 'schema': SCHEMA_FOR_TARGET_ID,
-                'default_value': None
+                'default_value': None,
             },
             'author_id': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'is_valid_user_id'
-                    }]
+                    'validators': [{'id': 'is_valid_user_id'}],
                 },
-                'default_value': None
-            }
+                'default_value': None,
+            },
         }
     }
 
@@ -1101,7 +1070,8 @@ class SuggestionListHandler(
         # ?field1=value1&field2=value2...fieldN=valueN.
         query_fields_and_values = list(self.request.GET.items())
         suggestions = suggestion_services.query_suggestions(
-            query_fields_and_values)
+            query_fields_and_values
+        )
 
         self.values.update({'suggestions': [s.to_dict() for s in suggestions]})
         self.render_json(self.values)
@@ -1117,8 +1087,7 @@ class UpdateTranslationSuggestionHandlerNormalizedPayloadDict(TypedDict):
 
 class UpdateTranslationSuggestionHandler(
     base.BaseHandler[
-        UpdateTranslationSuggestionHandlerNormalizedPayloadDict,
-        Dict[str, str]
+        UpdateTranslationSuggestionHandlerNormalizedPayloadDict, Dict[str, str]
     ]
 ):
     """Handles update operations relating to translation suggestions."""
@@ -1175,8 +1144,7 @@ class UpdateQuestionSuggestionHandlerNormalizedPayloadDict(TypedDict):
 
 class UpdateQuestionSuggestionHandler(
     base.BaseHandler[
-        UpdateQuestionSuggestionHandlerNormalizedPayloadDict,
-        Dict[str, str]
+        UpdateQuestionSuggestionHandlerNormalizedPayloadDict, Dict[str, str]
     ]
 ):
     """Handles update operations relating to question suggestions."""
@@ -1194,13 +1162,10 @@ class UpdateQuestionSuggestionHandler(
             'skill_difficulty': {
                 'schema': {
                     'type': 'float',
-                    'validators': [{
-                        'id': 'is_at_least',
-                        'min_value': 0
-                    }, {
-                        'id': 'is_at_most',
-                        'max_value': 1
-                    }]
+                    'validators': [
+                        {'id': 'is_at_least', 'min_value': 0},
+                        {'id': 'is_at_most', 'max_value': 1},
+                    ],
                 }
             },
             'question_state_data': {
@@ -1208,14 +1173,10 @@ class UpdateQuestionSuggestionHandler(
                     'type': 'object_dict',
                     'validation_method': (
                         domain_objects_validator.validate_question_state_dict
-                    )
+                    ),
                 }
             },
-            'next_content_id_index': {
-                'schema': {
-                    'type': 'int'
-                }
-            }
+            'next_content_id_index': {'schema': {'type': 'int'}},
         }
     }
 
@@ -1238,14 +1199,14 @@ class UpdateQuestionSuggestionHandler(
             suggestion_id,
             self.normalized_payload['skill_difficulty'],
             self.normalized_payload['question_state_data'],
-            self.normalized_payload['next_content_id_index']
+            self.normalized_payload['next_content_id_index'],
         )
 
         self.render_json(self.values)
 
 
 def _get_target_id_to_exploration_opportunity_dict(
-    suggestions: Sequence[suggestion_registry.BaseSuggestion]
+    suggestions: Sequence[suggestion_registry.BaseSuggestion],
 ) -> Dict[
     str, Optional[opportunity_domain.PartialExplorationOpportunitySummaryDict]
 ]:
@@ -1264,13 +1225,15 @@ def _get_target_id_to_exploration_opportunity_dict(
         opp_id: (opp.to_dict() if opp is not None else None)
         for opp_id, opp in (
             opportunity_services.get_exploration_opportunity_summaries_by_ids(
-                list(target_ids)).items())
+                list(target_ids)
+            ).items()
+        )
     }
     return opportunity_id_to_opportunity_dict
 
 
 def _get_target_id_to_skill_opportunity_dict(
-    suggestions: Sequence[suggestion_registry.BaseSuggestion]
+    suggestions: Sequence[suggestion_registry.BaseSuggestion],
 ) -> Dict[str, Optional[FrontendSkillOpportunityDict]]:
     """Returns a dict of target_id to skill opportunity summary dict.
 
@@ -1291,14 +1254,18 @@ def _get_target_id_to_skill_opportunity_dict(
     ] = {
         opp_id: opp.to_dict() if opp is not None else None  # type: ignore[misc]
         for opp_id, opp in opportunity_services.get_skill_opportunities_by_ids(
-            list(target_ids)).items()
+            list(target_ids)
+        ).items()
     }
     opportunity_id_to_skill = {
         skill.id: skill
-        for skill in skill_fetchers.get_multi_skills([
-            opp['id']
-            for opp in opportunity_id_to_opportunity_dict.values()
-            if opp is not None])
+        for skill in skill_fetchers.get_multi_skills(
+            [
+                opp['id']
+                for opp in opportunity_id_to_opportunity_dict.values()
+                if opp is not None
+            ]
+        )
     }
 
     for opp_id, skill in opportunity_id_to_skill.items():
@@ -1312,7 +1279,7 @@ def _get_target_id_to_skill_opportunity_dict(
 
 
 def _construct_exploration_suggestions(
-    suggestions: Sequence[suggestion_registry.BaseSuggestion]
+    suggestions: Sequence[suggestion_registry.BaseSuggestion],
 ) -> List[FrontendBaseSuggestionDict]:
     """Returns exploration suggestions with current exploration content. If the
     exploration content is no longer available, e.g. the exploration state or
@@ -1339,7 +1306,8 @@ def _construct_exploration_suggestions(
         try:
             content_html = exploration.get_content_html(
                 suggestion.change_cmd.state_name,
-                suggestion.change_cmd.content_id)
+                suggestion.change_cmd.content_id,
+            )
         except ValueError:
             # Exploration content is no longer available.
             pass
@@ -1360,7 +1328,7 @@ def _construct_exploration_suggestions(
             'language_code': suggestion_dict['language_code'],
             'last_updated': suggestion_dict['last_updated'],
             'edited_by_reviewer': suggestion_dict['edited_by_reviewer'],
-            'exploration_content_html': content_html
+            'exploration_content_html': content_html,
         }
         suggestion_dicts.append(updated_suggestion_dict)
     return suggestion_dicts

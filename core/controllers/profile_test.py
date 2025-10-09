@@ -56,42 +56,50 @@ class ProfilePageTests(test_utils.GenericTestBase):
 
     def test_page_not_found(self) -> None:
         exception = 'Could not find the resource {}/profilehandler/data/{}.'
-        message = exception.format(
-            'http://localhost', self.EDITOR_USERNAME
-        )
-        error = {
-            'error': message, 'status_code': 404
-        }
+        message = exception.format('http://localhost', self.EDITOR_USERNAME)
+        error = {'error': message, 'status_code': 404}
         with self.swap_to_always_return(
             user_services, 'get_user_settings_from_username', False
         ):
             self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
             self.login(self.EDITOR_EMAIL)
             csrf_token = self.get_new_csrf_token()
-            self.put_json(feconf.PREFERENCES_DATA_URL, {
-                'updates': [{
-                    'update_type': 'user_bio',
-                    'data': 'Bio data of the editor'
-                }]
-            }, csrf_token=csrf_token)
-            self.put_json(feconf.PREFERENCES_DATA_URL, {
-                'updates': [{
-                    'update_type': 'subject_interests',
-                    'data': ['editor', 'writing']
-                }]
-            }, csrf_token=csrf_token)
+            self.put_json(
+                feconf.PREFERENCES_DATA_URL,
+                {
+                    'updates': [
+                        {
+                            'update_type': 'user_bio',
+                            'data': 'Bio data of the editor',
+                        }
+                    ]
+                },
+                csrf_token=csrf_token,
+            )
+            self.put_json(
+                feconf.PREFERENCES_DATA_URL,
+                {
+                    'updates': [
+                        {
+                            'update_type': 'subject_interests',
+                            'data': ['editor', 'writing'],
+                        }
+                    ]
+                },
+                csrf_token=csrf_token,
+            )
             self.logout()
             self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
             self.login(self.VIEWER_EMAIL)
             response = self.get_json(
                 '/profilehandler/data/%s' % self.EDITOR_USERNAME,
-                expected_status_int=404
+                expected_status_int=404,
             )
             self.assertEqual(response, error)
             self.logout()
             response = self.get_json(
                 '/profilehandler/data/%s' % self.EDITOR_USERNAME,
-                expected_status_int=404
+                expected_status_int=404,
             )
             self.assertEqual(response, error)
 
@@ -101,8 +109,7 @@ class ProfilePageTests(test_utils.GenericTestBase):
         ):
             self.login(self.EDITOR_EMAIL)
             self.get_html_response(
-                '%s?return_url=/' % feconf.SIGNUP_URL,
-                expected_status_int=302
+                '%s?return_url=/' % feconf.SIGNUP_URL, expected_status_int=302
             )
             csrf_token = self.get_new_csrf_token()
             response = self.post_json(
@@ -113,9 +120,9 @@ class ProfilePageTests(test_utils.GenericTestBase):
                     'default_dashboard': constants.DASHBOARD_TYPE_CREATOR,
                     'can_receive_email_updates': (
                         feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
-                    )
+                    ),
                 },
-                csrf_token=csrf_token
+                csrf_token=csrf_token,
             )
             self.assertEqual(response, {})
             self.logout()
@@ -129,84 +136,128 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
         original_preferences = self.get_json(feconf.PREFERENCES_DATA_URL)
         self.assertEqual(
-            ['en'], original_preferences['preferred_language_codes'])
+            ['en'], original_preferences['preferred_language_codes']
+        )
         self.assertIsNone(original_preferences['preferred_site_language_code'])
         self.assertIsNone(original_preferences['preferred_audio_language_code'])
         self.assertIsNone(
-            original_preferences['preferred_translation_language_code'])
-        self.put_json(feconf.PREFERENCES_DATA_URL, {
-            'updates': [{
-                'update_type': 'preferred_site_language_code',
-                'data': 'en'
-            }]
-        }, csrf_token=csrf_token)
-        self.put_json(feconf.PREFERENCES_DATA_URL, {
-            'updates': [{
-                'update_type': 'preferred_audio_language_code',
-                'data': 'hi-en'
-            }]
-        }, csrf_token=csrf_token)
-        self.put_json(feconf.PREFERENCES_DATA_URL, {
-            'updates': [{
-                'update_type': 'preferred_translation_language_code',
-                'data': 'en'
-            }]
-        }, csrf_token=csrf_token)
-        self.put_json(feconf.PREFERENCES_DATA_URL, {
-            'updates': [{
-                'update_type': 'preferred_language_codes',
-                'data': ['de']
-            }]
-        }, csrf_token=csrf_token)
+            original_preferences['preferred_translation_language_code']
+        )
+        self.put_json(
+            feconf.PREFERENCES_DATA_URL,
+            {
+                'updates': [
+                    {
+                        'update_type': 'preferred_site_language_code',
+                        'data': 'en',
+                    }
+                ]
+            },
+            csrf_token=csrf_token,
+        )
+        self.put_json(
+            feconf.PREFERENCES_DATA_URL,
+            {
+                'updates': [
+                    {
+                        'update_type': 'preferred_audio_language_code',
+                        'data': 'hi-en',
+                    }
+                ]
+            },
+            csrf_token=csrf_token,
+        )
+        self.put_json(
+            feconf.PREFERENCES_DATA_URL,
+            {
+                'updates': [
+                    {
+                        'update_type': 'preferred_translation_language_code',
+                        'data': 'en',
+                    }
+                ]
+            },
+            csrf_token=csrf_token,
+        )
+        self.put_json(
+            feconf.PREFERENCES_DATA_URL,
+            {
+                'updates': [
+                    {'update_type': 'preferred_language_codes', 'data': ['de']}
+                ]
+            },
+            csrf_token=csrf_token,
+        )
         new_preferences = self.get_json(feconf.PREFERENCES_DATA_URL)
         self.assertEqual(new_preferences['preferred_language_codes'], ['de'])
         self.assertEqual(new_preferences['preferred_site_language_code'], 'en')
         self.assertEqual(
-            new_preferences['preferred_audio_language_code'], 'hi-en')
+            new_preferences['preferred_audio_language_code'], 'hi-en'
+        )
         self.assertEqual(
-            new_preferences['preferred_translation_language_code'], 'en')
+            new_preferences['preferred_translation_language_code'], 'en'
+        )
 
     def test_profile_data_is_independent_of_currently_logged_in_user(
-        self
+        self,
     ) -> None:
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        self.put_json(feconf.PREFERENCES_DATA_URL, {
-            'updates': [{
-                'update_type': 'user_bio',
-                'data': 'My new editor bio'
-            }]
-        }, csrf_token=csrf_token)
-        self.put_json(feconf.PREFERENCES_DATA_URL, {
-            'updates': [{
-                'update_type': 'subject_interests',
-                'data': ['editor', 'editing']
-            }]
-        }, csrf_token=csrf_token)
+        self.put_json(
+            feconf.PREFERENCES_DATA_URL,
+            {
+                'updates': [
+                    {'update_type': 'user_bio', 'data': 'My new editor bio'}
+                ]
+            },
+            csrf_token=csrf_token,
+        )
+        self.put_json(
+            feconf.PREFERENCES_DATA_URL,
+            {
+                'updates': [
+                    {
+                        'update_type': 'subject_interests',
+                        'data': ['editor', 'editing'],
+                    }
+                ]
+            },
+            csrf_token=csrf_token,
+        )
         self.logout()
 
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        self.put_json(feconf.PREFERENCES_DATA_URL, {
-            'updates': [{
-                'update_type': 'user_bio',
-                'data': 'My new viewer bio'
-            }]
-        }, csrf_token=csrf_token)
-        self.put_json(feconf.PREFERENCES_DATA_URL, {
-            'updates': [{
-                'update_type': 'subject_interests',
-                'data': ['viewer', 'viewing']
-            }]
-        }, csrf_token=csrf_token)
+        self.put_json(
+            feconf.PREFERENCES_DATA_URL,
+            {
+                'updates': [
+                    {'update_type': 'user_bio', 'data': 'My new viewer bio'}
+                ]
+            },
+            csrf_token=csrf_token,
+        )
+        self.put_json(
+            feconf.PREFERENCES_DATA_URL,
+            {
+                'updates': [
+                    {
+                        'update_type': 'subject_interests',
+                        'data': ['viewer', 'viewing'],
+                    }
+                ]
+            },
+            csrf_token=csrf_token,
+        )
         self.logout()
 
         # Viewer looks at editor's profile page.
         self.login(self.VIEWER_EMAIL)
         response = self.get_json(
-            '/profilehandler/data/%s' % self.EDITOR_USERNAME)
+            '/profilehandler/data/%s' % self.EDITOR_USERNAME
+        )
         self.assertEqual(response['user_bio'], 'My new editor bio')
         self.assertEqual(response['subject_interests'], ['editor', 'editing'])
         self.logout()
@@ -214,14 +265,16 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
         # Editor looks at their own profile page.
         self.login(self.EDITOR_EMAIL)
         response = self.get_json(
-            '/profilehandler/data/%s' % self.EDITOR_USERNAME)
+            '/profilehandler/data/%s' % self.EDITOR_USERNAME
+        )
         self.assertEqual(response['user_bio'], 'My new editor bio')
         self.assertEqual(response['subject_interests'], ['editor', 'editing'])
         self.logout()
 
         # Looged-out user looks at editor's profile page.
         response = self.get_json(
-            '/profilehandler/data/%s' % self.EDITOR_USERNAME)
+            '/profilehandler/data/%s' % self.EDITOR_USERNAME
+        )
         self.assertEqual(response['user_bio'], 'My new editor bio')
         self.assertEqual(response['subject_interests'], ['editor', 'editing'])
 
@@ -248,11 +301,10 @@ class UserContributionsTests(test_utils.GenericTestBase):
         # that they have 0 created/edited explorations.
         self.signup(self.EMAIL_A, self.USERNAME_A)
         response_dict = self.get_json(
-            '/profilehandler/data/%s' % self.USERNAME_A)
-        self.assertEqual(
-            response_dict['created_exp_summary_dicts'], [])
-        self.assertEqual(
-            response_dict['edited_exp_summary_dicts'], [])
+            '/profilehandler/data/%s' % self.USERNAME_A
+        )
+        self.assertEqual(response_dict['created_exp_summary_dicts'], [])
+        self.assertEqual(response_dict['edited_exp_summary_dicts'], [])
 
     def test_created(self) -> None:
         # Check that the profile page for a user who has created
@@ -261,21 +313,21 @@ class UserContributionsTests(test_utils.GenericTestBase):
         user_a_id = self.get_user_id_from_email(self.EMAIL_A)
         user_a = user_services.get_user_actions_info(user_a_id)
         self.save_new_valid_exploration(
-            self.EXP_ID_1, user_a_id, end_state_name='End')
+            self.EXP_ID_1, user_a_id, end_state_name='End'
+        )
         rights_manager.publish_exploration(user_a, self.EXP_ID_1)
 
         response_dict = self.get_json(
-            '/profilehandler/data/%s' % self.USERNAME_A)
-        self.assertEqual(len(
-            response_dict['created_exp_summary_dicts']), 1)
-        self.assertEqual(len(
-            response_dict['edited_exp_summary_dicts']), 1)
+            '/profilehandler/data/%s' % self.USERNAME_A
+        )
+        self.assertEqual(len(response_dict['created_exp_summary_dicts']), 1)
+        self.assertEqual(len(response_dict['edited_exp_summary_dicts']), 1)
         self.assertEqual(
-            response_dict['created_exp_summary_dicts'][0]['id'],
-            self.EXP_ID_1)
+            response_dict['created_exp_summary_dicts'][0]['id'], self.EXP_ID_1
+        )
         self.assertEqual(
-            response_dict['edited_exp_summary_dicts'][0]['id'],
-            self.EXP_ID_1)
+            response_dict['edited_exp_summary_dicts'][0]['id'], self.EXP_ID_1
+        )
 
     def test_edited(self) -> None:
         # Check that the profile page for a user who has created
@@ -287,29 +339,38 @@ class UserContributionsTests(test_utils.GenericTestBase):
         user_b_id = self.get_user_id_from_email(self.EMAIL_B)
         user_a = user_services.get_user_actions_info(user_a_id)
         self.save_new_valid_exploration(
-            self.EXP_ID_1, user_a_id, end_state_name='End')
+            self.EXP_ID_1, user_a_id, end_state_name='End'
+        )
         rights_manager.publish_exploration(user_a, self.EXP_ID_1)
 
         exp_services.update_exploration(
-            user_b_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
-                'cmd': 'edit_exploration_property',
-                'property_name': 'objective',
-                'new_value': 'the objective'
-            })], 'Test edit')
+            user_b_id,
+            self.EXP_ID_1,
+            [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': 'edit_exploration_property',
+                        'property_name': 'objective',
+                        'new_value': 'the objective',
+                    }
+                )
+            ],
+            'Test edit',
+        )
         self.process_and_flush_pending_tasks()
 
         response_dict = self.get_json(
-            '/profilehandler/data/%s' % self.USERNAME_B)
-        self.assertEqual(len(
-            response_dict['created_exp_summary_dicts']), 0)
-        self.assertEqual(len(
-            response_dict['edited_exp_summary_dicts']), 1)
+            '/profilehandler/data/%s' % self.USERNAME_B
+        )
+        self.assertEqual(len(response_dict['created_exp_summary_dicts']), 0)
+        self.assertEqual(len(response_dict['edited_exp_summary_dicts']), 1)
         self.assertEqual(
-            response_dict['edited_exp_summary_dicts'][0]['id'],
-            self.EXP_ID_1)
+            response_dict['edited_exp_summary_dicts'][0]['id'], self.EXP_ID_1
+        )
         self.assertEqual(
             response_dict['edited_exp_summary_dicts'][0]['objective'],
-            'the objective')
+            'the objective',
+        )
 
 
 class FirstContributionDateTests(test_utils.GenericTestBase):
@@ -322,8 +383,7 @@ class FirstContributionDateTests(test_utils.GenericTestBase):
         self.signup(self.EMAIL, self.USERNAME)
         self.login(self.EMAIL)
         user_id = self.get_user_id_from_email(self.EMAIL)
-        response_dict = self.get_json(
-            '/profilehandler/data/%s' % self.USERNAME)
+        response_dict = self.get_json('/profilehandler/data/%s' % self.USERNAME)
         self.assertIsNone(response_dict['first_contribution_msec'])
 
         # Update the first_contribution_msec to the current time in
@@ -336,11 +396,10 @@ class FirstContributionDateTests(test_utils.GenericTestBase):
         user_services.save_user_settings(user_settings_to_update)
 
         # Test the contribution date correctly changes to current_time_in_msecs.
-        response_dict = self.get_json(
-            '/profilehandler/data/%s' % self.USERNAME)
+        response_dict = self.get_json('/profilehandler/data/%s' % self.USERNAME)
         self.assertEqual(
-            response_dict['first_contribution_msec'],
-            first_time_in_msecs)
+            response_dict['first_contribution_msec'], first_time_in_msecs
+        )
 
         # Test that the contribution date is not changed after the first time it
         # is set.
@@ -350,11 +409,10 @@ class FirstContributionDateTests(test_utils.GenericTestBase):
             second_time_in_msecs
         )
         user_services.save_user_settings(user_settings_to_update)
-        response_dict = self.get_json(
-            '/profilehandler/data/%s' % self.USERNAME)
+        response_dict = self.get_json('/profilehandler/data/%s' % self.USERNAME)
         self.assertEqual(
-            response_dict['first_contribution_msec'],
-            first_time_in_msecs)
+            response_dict['first_contribution_msec'], first_time_in_msecs
+        )
 
 
 class PreferencesHandlerTests(test_utils.GenericTestBase):
@@ -378,16 +436,19 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
 
         # Subscribe to user.
         subscription_services.subscribe_to_creator(
-            self.viewer_id, self.owner_id)
+            self.viewer_id, self.owner_id
+        )
         response = self.get_json(feconf.PREFERENCES_DATA_URL)
         self.assertEqual(len(response['subscription_list']), 1)
         self.assertEqual(
             response['subscription_list'][0]['creator_username'],
-            self.OWNER_USERNAME)
+            self.OWNER_USERNAME,
+        )
 
         # Unsubscribe from user.
         subscription_services.unsubscribe_from_creator(
-            self.viewer_id, self.owner_id)
+            self.viewer_id, self.owner_id
+        )
         response = self.get_json(feconf.PREFERENCES_DATA_URL)
         self.assertEqual(len(response['subscription_list']), 0)
         self.logout()
@@ -401,20 +462,28 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
         with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_png_img.png'),
             'rb',
-            encoding=None
+            encoding=None,
         ) as f:
             raw_image = f.read()
         fs = fs_services.GcsFileSystem(
-            feconf.ENTITY_TYPE_USER, user_settings.username)
+            feconf.ENTITY_TYPE_USER, user_settings.username
+        )
         fs.commit('profile_picture.png', raw_image, mimetype='image/png')
-        self.put_json(feconf.PREFERENCES_DATA_URL, {
-            'updates': [{
-                'update_type': 'profile_picture_data_url',
-                'data': user_services.DEFAULT_IDENTICON_DATA_URL
-            }]
-        }, csrf_token=csrf_token)
+        self.put_json(
+            feconf.PREFERENCES_DATA_URL,
+            {
+                'updates': [
+                    {
+                        'update_type': 'profile_picture_data_url',
+                        'data': user_services.DEFAULT_IDENTICON_DATA_URL,
+                    }
+                ]
+            },
+            csrf_token=csrf_token,
+        )
         profile_data = utils.convert_image_binary_to_data_url(
-            fs.get('profile_picture.png'), 'png')
+            fs.get('profile_picture.png'), 'png'
+        )
         self.assertEqual(profile_data, user_services.DEFAULT_IDENTICON_DATA_URL)
         self.logout()
 
@@ -422,57 +491,83 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         user_settings = user_services.get_user_settings(self.owner_id)
-        self.put_json(feconf.PREFERENCES_DATA_URL, {
-            'updates': [{
-                'update_type': 'default_dashboard',
-                'data': constants.DASHBOARD_TYPE_CREATOR
-            }]
-        }, csrf_token=csrf_token)
+        self.put_json(
+            feconf.PREFERENCES_DATA_URL,
+            {
+                'updates': [
+                    {
+                        'update_type': 'default_dashboard',
+                        'data': constants.DASHBOARD_TYPE_CREATOR,
+                    }
+                ]
+            },
+            csrf_token=csrf_token,
+        )
         user_settings = user_services.get_user_settings(self.owner_id)
         self.assertEqual(
-            user_settings.default_dashboard, constants.DASHBOARD_TYPE_CREATOR)
+            user_settings.default_dashboard, constants.DASHBOARD_TYPE_CREATOR
+        )
         self.logout()
 
     def test_update_preferences_with_invalid_update_type_raises_exception(
-        self
+        self,
     ) -> None:
         self.login(self.OWNER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         with self.assertRaisesRegex(Exception, 'Invalid update type:'):
-            self.put_json(feconf.PREFERENCES_DATA_URL, {
-                'updates': [{
-                    'update_type': 'invalid_update_type',
-                    'data': 'data'
-                }]
-            }, csrf_token=csrf_token)
+            self.put_json(
+                feconf.PREFERENCES_DATA_URL,
+                {
+                    'updates': [
+                        {'update_type': 'invalid_update_type', 'data': 'data'}
+                    ]
+                },
+                csrf_token=csrf_token,
+            )
         self.logout()
 
     def test_update_subject_interests_non_list_input_raises_exception(
-        self) -> None:
+        self,
+    ) -> None:
         self.login(self.OWNER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         with self.assertRaisesRegex(
-            Exception, 'Expected subject_interests to be a list'):
-            self.put_json(feconf.PREFERENCES_DATA_URL, {
-                'updates': [{
-                    'update_type': 'subject_interests',
-                    'data': 'not a list'
-                }]
-            }, csrf_token=csrf_token)
+            Exception, 'Expected subject_interests to be a list'
+        ):
+            self.put_json(
+                feconf.PREFERENCES_DATA_URL,
+                {
+                    'updates': [
+                        {
+                            'update_type': 'subject_interests',
+                            'data': 'not a list',
+                        }
+                    ]
+                },
+                csrf_token=csrf_token,
+            )
         self.logout()
 
     def test_update_preferrd_language_codes_non_list_input_raises_exception(
-        self) -> None:
+        self,
+    ) -> None:
         self.login(self.OWNER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         with self.assertRaisesRegex(
-            Exception, 'Expected preferred_language_codes to be a list'):
-            self.put_json(feconf.PREFERENCES_DATA_URL, {
-                'updates': [{
-                    'update_type': 'preferred_language_codes',
-                    'data': 'en'
-                }]
-            }, csrf_token=csrf_token)
+            Exception, 'Expected preferred_language_codes to be a list'
+        ):
+            self.put_json(
+                feconf.PREFERENCES_DATA_URL,
+                {
+                    'updates': [
+                        {
+                            'update_type': 'preferred_language_codes',
+                            'data': 'en',
+                        }
+                    ]
+                },
+                csrf_token=csrf_token,
+            )
         self.logout()
 
     def test_incorrect_key_in_email_data_dict_raises_exception(self) -> None:
@@ -482,16 +577,20 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
             'can_receive_email_updates': False,
             'can_receive_editor_role_email': False,
             'can_receive_feedback_message_email': False,
-            'can_receive_subscription_email_this_key_is_wrong': False
+            'can_receive_subscription_email_this_key_is_wrong': False,
         }
         with self.assertRaisesRegex(
-            Exception, 'Missing keys: can_receive_subscription_email'):
-            self.put_json(feconf.PREFERENCES_DATA_URL, {
-                'updates': [{
-                    'update_type': 'email_preferences',
-                    'data': data
-                }]
-            }, csrf_token=csrf_token)
+            Exception, 'Missing keys: can_receive_subscription_email'
+        ):
+            self.put_json(
+                feconf.PREFERENCES_DATA_URL,
+                {
+                    'updates': [
+                        {'update_type': 'email_preferences', 'data': data}
+                    ]
+                },
+                csrf_token=csrf_token,
+            )
         self.logout()
 
     def test_missing_key_in_email_data_dict_raises_exception(self) -> None:
@@ -503,52 +602,68 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
             'can_receive_feedback_message_email': False,
         }
         with self.assertRaisesRegex(
-            Exception, 'Missing keys: can_receive_subscription_email'):
-            self.put_json(feconf.PREFERENCES_DATA_URL, {
-                'updates': [{
-                    'update_type': 'email_preferences',
-                    'data': data
-                }]
-            }, csrf_token=csrf_token)
+            Exception, 'Missing keys: can_receive_subscription_email'
+        ):
+            self.put_json(
+                feconf.PREFERENCES_DATA_URL,
+                {
+                    'updates': [
+                        {'update_type': 'email_preferences', 'data': data}
+                    ]
+                },
+                csrf_token=csrf_token,
+            )
         self.logout()
 
     def test_non_boolean_values_in_email_data_dict_raises_exception(
-        self) -> None:
+        self,
+    ) -> None:
         self.login(self.OWNER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         data = {
             'can_receive_email_updates': False,
             'can_receive_editor_role_email': False,
             'can_receive_feedback_message_email': False,
-            'can_receive_subscription_email': 1
+            'can_receive_subscription_email': 1,
         }
         with self.assertRaisesRegex(
-            Exception, 'Non-boolean values found for keys: '
-                'can_receive_subscription_email'):
-            self.put_json(feconf.PREFERENCES_DATA_URL, {
-                'updates': [{
-                    'update_type': 'email_preferences',
-                    'data': data
-                }]
-            }, csrf_token=csrf_token)
+            Exception,
+            'Non-boolean values found for keys: '
+            'can_receive_subscription_email',
+        ):
+            self.put_json(
+                feconf.PREFERENCES_DATA_URL,
+                {
+                    'updates': [
+                        {'update_type': 'email_preferences', 'data': data}
+                    ]
+                },
+                csrf_token=csrf_token,
+            )
         self.logout()
 
     def test_update_prfrence_which_need_str_with_non_str_input_raise_exception(
-        self) -> None:
+        self,
+    ) -> None:
         self.login(self.OWNER_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        update_types = ['user_bio', 'preferred_translation_language_code',
-            'preferred_audio_language_code', 'preferred_site_language_code',
-            'default_dashboard', 'profile_picture_data_url'
+        update_types = [
+            'user_bio',
+            'preferred_translation_language_code',
+            'preferred_audio_language_code',
+            'preferred_site_language_code',
+            'default_dashboard',
+            'profile_picture_data_url',
         ]
         for update_type in update_types:
             with self.assertRaisesRegex(
-                Exception, 'Expected %s to be a str' % update_type):
-                self.put_json(feconf.PREFERENCES_DATA_URL, {
-                    'updates': [{
-                        'update_type': update_type, 'data': 1
-                    }]
-                }, csrf_token=csrf_token)
+                Exception, 'Expected %s to be a str' % update_type
+            ):
+                self.put_json(
+                    feconf.PREFERENCES_DATA_URL,
+                    {'updates': [{'update_type': update_type, 'data': 1}]},
+                    csrf_token=csrf_token,
+                )
         self.logout()
 
 
@@ -562,33 +677,46 @@ class LongUserBioHandlerTests(test_utils.GenericTestBase):
         self.signup(self.EMAIL_A, self.USERNAME_A)
         self.login(self.EMAIL_A)
         csrf_token = self.get_new_csrf_token()
-        self.put_json(feconf.PREFERENCES_DATA_URL, {
-            'updates': [{
-                'update_type': 'user_bio',
-                'data': 'I am within 2000 char limit'
-            }]
-        }, csrf_token=csrf_token)
+        self.put_json(
+            feconf.PREFERENCES_DATA_URL,
+            {
+                'updates': [
+                    {
+                        'update_type': 'user_bio',
+                        'data': 'I am within 2000 char limit',
+                    }
+                ]
+            },
+            csrf_token=csrf_token,
+        )
         preferences = self.get_json(feconf.PREFERENCES_DATA_URL)
         self.assertIsNotNone(preferences)
-        self.assertEqual(
-            preferences['user_bio'], 'I am within 2000 char limit')
+        self.assertEqual(preferences['user_bio'], 'I am within 2000 char limit')
         self.logout()
 
     def test_user_bio_exceeds_limit(self) -> None:
         self.signup(self.EMAIL_B, self.USERNAME_B)
         self.login(self.EMAIL_B)
         csrf_token = self.get_new_csrf_token()
-        user_bio_response = self.put_json(feconf.PREFERENCES_DATA_URL, {
-            'updates': [{
-                'update_type': 'user_bio',
-                'data': 'I am not within 2000 char limit' * 200
-            }]
-        }, csrf_token=csrf_token, expected_status_int=400)
+        user_bio_response = self.put_json(
+            feconf.PREFERENCES_DATA_URL,
+            {
+                'updates': [
+                    {
+                        'update_type': 'user_bio',
+                        'data': 'I am not within 2000 char limit' * 200,
+                    }
+                ]
+            },
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
         self.assertEqual(user_bio_response['status_code'], 400)
         self.assertIn(
             'User bio exceeds maximum character limit: %s'
             % feconf.MAX_BIO_LENGTH_IN_CHARS,
-            user_bio_response['error'])
+            user_bio_response['error'],
+        )
         self.logout()
 
 
@@ -603,16 +731,16 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
             {
                 'username': self.EDITOR_USERNAME,
                 'agreed_to_terms': True,
-                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
+                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
             },
             csrf_token=csrf_token,
-            expected_status_int=400
+            expected_status_int=400,
         )
         self.assertEqual(
             response['error'],
             'At \'http://localhost/signuphandler/data\' '
             'these errors are happening:\n'
-            'Missing key in handler args: can_receive_email_updates.'
+            'Missing key in handler args: can_receive_email_updates.',
         )
 
     def test_user_allowing_emails_on_signup(self) -> None:
@@ -625,11 +753,13 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
                 'username': self.EDITOR_USERNAME,
                 'agreed_to_terms': True,
                 'can_receive_email_updates': True,
-                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
+                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
             },
-            csrf_token=csrf_token)
+            csrf_token=csrf_token,
+        )
         self.assertFalse(
-            json_response['bulk_email_signup_message_should_be_shown'])
+            json_response['bulk_email_signup_message_should_be_shown']
+        )
 
         # The email update preference should be True in all cases.
         editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
@@ -638,33 +768,42 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
             self.assertEqual(email_preferences.can_receive_email_updates, True)
             self.assertEqual(
                 email_preferences.can_receive_editor_role_email,
-                feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
+                feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+            )
             self.assertEqual(
                 email_preferences.can_receive_feedback_message_email,
-                feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE)
+                feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+            )
             self.assertEqual(
                 email_preferences.can_receive_subscription_email,
-                feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
+                feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE,
+            )
         with self.swap(feconf, 'DEFAULT_EMAIL_UPDATES_PREFERENCE', False):
             email_preferences = user_services.get_email_preferences(editor_id)
             self.assertEqual(email_preferences.can_receive_email_updates, True)
             self.assertEqual(
                 email_preferences.can_receive_editor_role_email,
-                feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
+                feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+            )
             self.assertEqual(
                 email_preferences.can_receive_feedback_message_email,
-                feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE)
+                feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+            )
             self.assertEqual(
                 email_preferences.can_receive_subscription_email,
-                feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
+                feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE,
+            )
 
     @test_utils.set_platform_parameters(
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
-            (platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT, 'sub'), # pylint: disable=line-too-long
+            (
+                platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT,
+                'sub',
+            ),  # pylint: disable=line-too-long
             (
                 platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
-                'system@example.com'
+                'system@example.com',
             ),
         ]
     )
@@ -683,9 +822,9 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
                     'default_dashboard': constants.DASHBOARD_TYPE_CREATOR,
                     'can_receive_email_updates': (
                         feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
-                    )
+                    ),
                 },
-                csrf_token=csrf_token
+                csrf_token=csrf_token,
             )
             self.assertFalse(
                 json_response['bulk_email_signup_message_should_be_shown']
@@ -704,10 +843,13 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
                     'username': self.EDITOR_USERNAME,
                     'agreed_to_terms': True,
                     'can_receive_email_updates': True,
-                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
-                }, csrf_token=csrf_token)
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                },
+                csrf_token=csrf_token,
+            )
             self.assertTrue(
-                json_response['bulk_email_signup_message_should_be_shown'])
+                json_response['bulk_email_signup_message_should_be_shown']
+            )
 
     def test_user_disallowing_emails_on_signup(self) -> None:
         self.login(self.EDITOR_EMAIL)
@@ -719,9 +861,10 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
                 'username': self.EDITOR_USERNAME,
                 'agreed_to_terms': True,
                 'can_receive_email_updates': False,
-                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
+                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
             },
-            csrf_token=csrf_token)
+            csrf_token=csrf_token,
+        )
 
         # The email update preference should be False in all cases.
         editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
@@ -730,26 +873,32 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
             self.assertEqual(email_preferences.can_receive_email_updates, False)
             self.assertEqual(
                 email_preferences.can_receive_editor_role_email,
-                feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
+                feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+            )
             self.assertEqual(
                 email_preferences.can_receive_feedback_message_email,
-                feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE)
+                feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+            )
             self.assertEqual(
                 email_preferences.can_receive_subscription_email,
-                feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
+                feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE,
+            )
 
         with self.swap(feconf, 'DEFAULT_EMAIL_UPDATES_PREFERENCE', False):
             email_preferences = user_services.get_email_preferences(editor_id)
             self.assertEqual(email_preferences.can_receive_email_updates, False)
             self.assertEqual(
                 email_preferences.can_receive_editor_role_email,
-                feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
+                feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+            )
             self.assertEqual(
                 email_preferences.can_receive_feedback_message_email,
-                feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE)
+                feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+            )
             self.assertEqual(
                 email_preferences.can_receive_subscription_email,
-                feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
+                feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE,
+            )
 
     def test_email_preferences_updates(self) -> None:
         """Test that Preferences Handler correctly updates the email
@@ -762,20 +911,23 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         payload = {
-            'updates': [{
-                'update_type': 'email_preferences',
-                'data': {
-                    'can_receive_email_updates': True,
-                    'can_receive_editor_role_email': True,
-                    'can_receive_feedback_message_email': True,
-                    'can_receive_subscription_email': True
+            'updates': [
+                {
+                    'update_type': 'email_preferences',
+                    'data': {
+                        'can_receive_email_updates': True,
+                        'can_receive_editor_role_email': True,
+                        'can_receive_feedback_message_email': True,
+                        'can_receive_subscription_email': True,
+                    },
                 }
-            }]
+            ]
         }
 
         # Allow all emails.
         self.put_json(
-            feconf.PREFERENCES_DATA_URL, payload, csrf_token=csrf_token)
+            feconf.PREFERENCES_DATA_URL, payload, csrf_token=csrf_token
+        )
 
         email_preferences = user_services.get_email_preferences(editor_id)
         self.assertTrue(email_preferences.can_receive_email_updates)
@@ -784,20 +936,23 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         self.assertTrue(email_preferences.can_receive_subscription_email)
 
         payload = {
-            'updates': [{
-                'update_type': 'email_preferences',
-                'data': {
-                    'can_receive_email_updates': False,
-                    'can_receive_editor_role_email': False,
-                    'can_receive_feedback_message_email': False,
-                    'can_receive_subscription_email': False
+            'updates': [
+                {
+                    'update_type': 'email_preferences',
+                    'data': {
+                        'can_receive_email_updates': False,
+                        'can_receive_editor_role_email': False,
+                        'can_receive_feedback_message_email': False,
+                        'can_receive_subscription_email': False,
+                    },
                 }
-            }]
+            ]
         }
 
         # Disallow all emails.
         self.put_json(
-            feconf.PREFERENCES_DATA_URL, payload, csrf_token=csrf_token)
+            feconf.PREFERENCES_DATA_URL, payload, csrf_token=csrf_token
+        )
 
         email_preferences = user_services.get_email_preferences(editor_id)
         self.assertFalse(email_preferences.can_receive_email_updates)
@@ -842,9 +997,9 @@ class SignupTests(test_utils.GenericTestBase):
                 'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
                 'can_receive_email_updates': (
                     feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
-                )
+                ),
             },
-            csrf_token=csrf_token
+            csrf_token=csrf_token,
         )
 
         def strip_domain_from_location_header(url: str) -> str:
@@ -854,30 +1009,42 @@ class SignupTests(test_utils.GenericTestBase):
             return splitted_url.group(3)
 
         response = self.get_html_response(
-            '/signup?return_url=https://google.com', expected_status_int=302)
-        self.assertEqual('', strip_domain_from_location_header(
-            response.headers['location']))
-
-        response = self.get_html_response(
-            '/signup?return_url=//google.com', expected_status_int=302)
-        self.assertEqual('', strip_domain_from_location_header(
-            response.headers['location']))
-
-        response = self.get_html_response(
-            '/signup?return_url=/page#hello', expected_status_int=302)
-        self.assertEqual('page', strip_domain_from_location_header(
-            response.headers['location']))
-
-        response = self.get_html_response(
-            '/signup?return_url=/page/hello', expected_status_int=302)
-        self.assertEqual('page/hello', strip_domain_from_location_header(
-            response.headers['location']))
-
-        response = self.get_html_response(
-            '/signup?return_url=/page/hello?id=tests', expected_status_int=302)
+            '/signup?return_url=https://google.com', expected_status_int=302
+        )
         self.assertEqual(
-            'page/hello?id=tests', strip_domain_from_location_header(
-                response.headers['location']))
+            '', strip_domain_from_location_header(response.headers['location'])
+        )
+
+        response = self.get_html_response(
+            '/signup?return_url=//google.com', expected_status_int=302
+        )
+        self.assertEqual(
+            '', strip_domain_from_location_header(response.headers['location'])
+        )
+
+        response = self.get_html_response(
+            '/signup?return_url=/page#hello', expected_status_int=302
+        )
+        self.assertEqual(
+            'page',
+            strip_domain_from_location_header(response.headers['location']),
+        )
+
+        response = self.get_html_response(
+            '/signup?return_url=/page/hello', expected_status_int=302
+        )
+        self.assertEqual(
+            'page/hello',
+            strip_domain_from_location_header(response.headers['location']),
+        )
+
+        response = self.get_html_response(
+            '/signup?return_url=/page/hello?id=tests', expected_status_int=302
+        )
+        self.assertEqual(
+            'page/hello?id=tests',
+            strip_domain_from_location_header(response.headers['location']),
+        )
 
         self.logout()
 
@@ -894,10 +1061,10 @@ class SignupTests(test_utils.GenericTestBase):
                 'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
                 'can_receive_email_updates': (
                     feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
-                )
+                ),
             },
             csrf_token=csrf_token,
-            expected_status_int=400
+            expected_status_int=400,
         )
         error_msg = (
             'In order to edit explorations on this site, you will need to'
@@ -905,7 +1072,9 @@ class SignupTests(test_utils.GenericTestBase):
         )
         self.assertIn(
             'In order to edit explorations on this site, you will need to'
-            ' accept the license terms.', response_dict['error'])
+            ' accept the license terms.',
+            response_dict['error'],
+        )
 
         response_dict = self.post_json(
             feconf.SIGNUP_DATA_URL,
@@ -915,10 +1084,10 @@ class SignupTests(test_utils.GenericTestBase):
                 'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
                 'can_receive_email_updates': (
                     feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
-                )
+                ),
             },
             csrf_token=csrf_token,
-            expected_status_int=400
+            expected_status_int=400,
         )
         self.assertIn(error_msg, response_dict['error'])
 
@@ -930,9 +1099,9 @@ class SignupTests(test_utils.GenericTestBase):
                 'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
                 'can_receive_email_updates': (
                     feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
-                )
+                ),
             },
-            csrf_token=csrf_token
+            csrf_token=csrf_token,
         )
 
         self.logout()
@@ -946,39 +1115,47 @@ class SignupTests(test_utils.GenericTestBase):
             feconf.SIGNUP_DATA_URL,
             {
                 'agreed_to_terms': True,
-                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
+                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
             },
-            csrf_token=csrf_token, expected_status_int=400)
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
         self.assertIn(
-            'Missing key in handler args: username.',
-            response_dict['error'])
+            'Missing key in handler args: username.', response_dict['error']
+        )
 
         response_dict = self.post_json(
             feconf.SIGNUP_DATA_URL,
             {
                 'username': '',
                 'agreed_to_terms': True,
-                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
+                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
             },
-            csrf_token=csrf_token, expected_status_int=400)
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
         error_msg = 'Validation failed: is_valid_username_string ({})'
         self.assertIn(
             'Schema validation for \'username\' failed: %s for object'
             % error_msg,
-            response_dict['error'])
+            response_dict['error'],
+        )
 
         response_dict = self.post_json(
             feconf.SIGNUP_DATA_URL,
             {
                 'username': '!a!',
                 'agreed_to_terms': True,
-                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER
+                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
             },
-            csrf_token=csrf_token, expected_status_int=400)
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
         self.assertIn(
             'Schema validation for \'username\' failed: %s for object !a!'
             % error_msg,
-            response_dict['error'])
+            response_dict['error'],
+        )
 
         response_dict = self.post_json(
             feconf.SIGNUP_DATA_URL,
@@ -988,15 +1165,16 @@ class SignupTests(test_utils.GenericTestBase):
                 'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
                 'can_receive_email_updates': (
                     feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
-                )
+                ),
             },
             csrf_token=csrf_token,
-            expected_status_int=400
+            expected_status_int=400,
         )
         self.assertIn(
             'Schema validation for \'username\' failed: %s for object %s'
             % (error_msg, self.UNICODE_TEST_STRING),
-            response_dict['error'])
+            response_dict['error'],
+        )
 
         response_dict = self.post_json(
             feconf.SIGNUP_DATA_URL,
@@ -1006,9 +1184,9 @@ class SignupTests(test_utils.GenericTestBase):
                 'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
                 'can_receive_email_updates': (
                     feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
-                )
+                ),
             },
-            csrf_token=csrf_token
+            csrf_token=csrf_token,
         )
 
         self.logout()
@@ -1022,13 +1200,14 @@ class SignupTests(test_utils.GenericTestBase):
         self.post_json(
             feconf.SIGNUP_DATA_URL,
             {
-                'agreed_to_terms': True, 'username': self.EDITOR_USERNAME,
+                'agreed_to_terms': True,
+                'username': self.EDITOR_USERNAME,
                 'default_dashboard': constants.DASHBOARD_TYPE_CREATOR,
                 'can_receive_email_updates': (
                     feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
-                )
+                ),
             },
-            csrf_token=csrf_token
+            csrf_token=csrf_token,
         )
 
         editor_user_id = user_services.get_user_id_from_username(
@@ -1039,12 +1218,14 @@ class SignupTests(test_utils.GenericTestBase):
             editor_user_id, strict=True
         )
         self.assertEqual(
-            user_settings.default_dashboard, constants.DASHBOARD_TYPE_CREATOR)
+            user_settings.default_dashboard, constants.DASHBOARD_TYPE_CREATOR
+        )
 
         self.logout()
 
         user_services.create_new_user(
-            self.get_auth_id_from_email(self.VIEWER_EMAIL), self.VIEWER_EMAIL)
+            self.get_auth_id_from_email(self.VIEWER_EMAIL), self.VIEWER_EMAIL
+        )
         self.login(self.VIEWER_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -1057,9 +1238,9 @@ class SignupTests(test_utils.GenericTestBase):
                 'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
                 'can_receive_email_updates': (
                     feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
-                )
+                ),
             },
-            csrf_token=csrf_token
+            csrf_token=csrf_token,
         )
 
         viewer_user_id = user_services.get_user_id_from_username(
@@ -1070,7 +1251,8 @@ class SignupTests(test_utils.GenericTestBase):
             viewer_user_id, strict=True
         )
         self.assertEqual(
-            user_settings.default_dashboard, constants.DASHBOARD_TYPE_LEARNER)
+            user_settings.default_dashboard, constants.DASHBOARD_TYPE_LEARNER
+        )
 
         self.logout()
 
@@ -1092,21 +1274,33 @@ class SignupTests(test_utils.GenericTestBase):
     @test_utils.set_platform_parameters(
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
-            (platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT, 'sub'), # pylint: disable=line-too-long
-            (platform_parameter_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT, 'body'), # pylint: disable=line-too-long
-            (platform_parameter_list.ParamName.EMAIL_FOOTER, 'footer'), # pylint: disable=line-too-long
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'), # pylint: disable=line-too-long
+            (
+                platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT,
+                'sub',
+            ),  # pylint: disable=line-too-long
+            (
+                platform_parameter_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT,
+                'body',
+            ),  # pylint: disable=line-too-long
+            (
+                platform_parameter_list.ParamName.EMAIL_FOOTER,
+                'footer',
+            ),  # pylint: disable=line-too-long
+            (
+                platform_parameter_list.ParamName.EMAIL_SENDER_NAME,
+                'sender',
+            ),  # pylint: disable=line-too-long
             (
                 platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
-                'testadmin@example.com'
+                'testadmin@example.com',
             ),
             (
                 platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
-                'system@example.com'
+                'system@example.com',
             ),
             (
                 platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
-                'noreply@example.com'
+                'noreply@example.com',
             ),
         ]
     )
@@ -1142,8 +1336,10 @@ class MailingListSubscriptionHandlerTests(test_utils.GenericTestBase):
 
     def test_put_function(self) -> None:
         swap_add_fn = self.swap(
-            user_services, 'add_user_to_mailing_list', lambda *args,
-            **kwargs: True)
+            user_services,
+            'add_user_to_mailing_list',
+            lambda *args, **kwargs: True,
+        )
 
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
@@ -1151,30 +1347,36 @@ class MailingListSubscriptionHandlerTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
         with swap_add_fn:
             json_response = self.put_json(
-                '/mailinglistsubscriptionhandler', {
-                    'email': 'email@example.com',
-                    'tag': 'Web',
-                    'name': 'Name'
-                }, csrf_token=csrf_token)
+                '/mailinglistsubscriptionhandler',
+                {'email': 'email@example.com', 'tag': 'Web', 'name': 'Name'},
+                csrf_token=csrf_token,
+            )
             self.assertEqual(json_response, {'status': True})
 
             # Name parameter should be optional.
             json_response = self.put_json(
-                '/mailinglistsubscriptionhandler', {
+                '/mailinglistsubscriptionhandler',
+                {
                     'email': 'email2@example.com',
                     'tag': 'Web',
-                }, csrf_token=csrf_token)
+                },
+                csrf_token=csrf_token,
+            )
             self.assertEqual(json_response, {'status': True})
 
         self.logout()
 
     def test_email_provider_error(self) -> None:
         def mock_add_user_to_raise_exception(
-                unused_email: str, unused_tag: str, name: str) -> None:
+            unused_email: str, unused_tag: str, name: str
+        ) -> None:
             raise Exception('Backend error')
+
         swap_add_fn = self.swap(
-            user_services, 'add_user_to_mailing_list',
-            mock_add_user_to_raise_exception)
+            user_services,
+            'add_user_to_mailing_list',
+            mock_add_user_to_raise_exception,
+        )
 
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
@@ -1182,17 +1384,18 @@ class MailingListSubscriptionHandlerTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
         with swap_add_fn:
             self.put_json(
-                '/mailinglistsubscriptionhandler', {
-                    'email': 'email@example.com',
-                    'tag': 'Web',
-                    'name': 'Name'
-                }, csrf_token=csrf_token, expected_status_int=500)
+                '/mailinglistsubscriptionhandler',
+                {'email': 'email@example.com', 'tag': 'Web', 'name': 'Name'},
+                csrf_token=csrf_token,
+                expected_status_int=500,
+            )
 
         self.logout()
 
     def test_invalid_inputs(self) -> None:
         swap_add_fn = self.swap(
-            user_services, 'add_user_to_mailing_list', lambda *args: True)
+            user_services, 'add_user_to_mailing_list', lambda *args: True
+        )
 
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
@@ -1200,25 +1403,25 @@ class MailingListSubscriptionHandlerTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
         with swap_add_fn:
             self.put_json(
-                '/mailinglistsubscriptionhandler', {
-                    'email': 'invalidemail.com',
-                    'tag': 'Web',
-                    'name': 'Name'
-                }, csrf_token=csrf_token, expected_status_int=400)
+                '/mailinglistsubscriptionhandler',
+                {'email': 'invalidemail.com', 'tag': 'Web', 'name': 'Name'},
+                csrf_token=csrf_token,
+                expected_status_int=400,
+            )
 
             self.put_json(
-                '/mailinglistsubscriptionhandler', {
-                    'email': 'email@example.com',
-                    'tag': 'Web',
-                    'name': ''
-                }, csrf_token=csrf_token, expected_status_int=400)
+                '/mailinglistsubscriptionhandler',
+                {'email': 'email@example.com', 'tag': 'Web', 'name': ''},
+                csrf_token=csrf_token,
+                expected_status_int=400,
+            )
 
             self.put_json(
-                '/mailinglistsubscriptionhandler', {
-                    'email': 'email@example.com',
-                    'tag': '',
-                    'name': 'Name'
-                }, csrf_token=csrf_token, expected_status_int=400)
+                '/mailinglistsubscriptionhandler',
+                {'email': 'email@example.com', 'tag': '', 'name': 'Name'},
+                csrf_token=csrf_token,
+                expected_status_int=400,
+            )
 
         self.logout()
 
@@ -1230,94 +1433,111 @@ class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.swap_secret = self.swap_to_always_return(
-            secrets_services, 'get_secret', 'secret')
+            secrets_services, 'get_secret', 'secret'
+        )
         user_services.update_email_preferences(
-            self.editor_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE,
+            self.editor_id,
+            feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE,
             feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
             feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
-            feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
+            feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE,
+        )
 
     def test_get_function(self) -> None:
         # The GET function should not throw any error and should return status
         # 200. No other check required here.
         with self.swap_secret:
             self.get_html_response(
-                '%s/secret' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT)
+                '%s/secret' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT
+            )
 
     def test_raises_error_if_audience_id_provided_without_email_id(
-        self
+        self,
     ) -> None:
         response = self.post_json(
-                '%s/secret' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT,
-                {
-                    'data[list_id]': 'audience_id',
-                    'type': 'subscribe'
-                },
-                use_payload=False,
-                expected_status_int=400
-            )
+            '%s/secret' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT,
+            {'data[list_id]': 'audience_id', 'type': 'subscribe'},
+            use_payload=False,
+            expected_status_int=400,
+        )
         self.assertEqual(
             response['error'],
             'At \'http://localhost/bulk_email_webhook_endpoint/secret\' '
             'these errors are happening:\n'
-            'Missing key in handler args: data[email].'
+            'Missing key in handler args: data[email].',
         )
 
     @test_utils.set_platform_parameters(
-        [(
-            platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID,
-            'audience_id'
-        )]
+        [
+            (
+                platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID,
+                'audience_id',
+            )
+        ]
     )
     def test_post_with_different_audience_id(self) -> None:
         with self.swap_secret:
             json_response = self.post_json(
-                '%s/secret' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT, {
+                '%s/secret' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT,
+                {
                     'data[list_id]': 'invalid_audience_id',
                     'data[email]': self.EDITOR_EMAIL,
-                    'type': 'subscribe'
-                }, use_payload=False)
+                    'type': 'subscribe',
+                },
+                use_payload=False,
+            )
             self.assertEqual(json_response, {})
 
     @test_utils.set_platform_parameters(
-        [(
-            platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID,
-            'audience_id'
-        )]
+        [
+            (
+                platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID,
+                'audience_id',
+            )
+        ]
     )
     def test_post_with_invalid_email_id(self) -> None:
         with self.swap_secret:
             json_response = self.post_json(
-                '%s/secret' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT, {
+                '%s/secret' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT,
+                {
                     'data[list_id]': 'audience_id',
                     'data[email]': 'invalid_email@example.com',
-                    'type': 'subscribe'
-                }, use_payload=False)
+                    'type': 'subscribe',
+                },
+                use_payload=False,
+            )
             self.assertEqual(json_response, {})
 
     def test_post_with_invalid_secret(self) -> None:
         with self.swap_secret:
             with self.capture_logging(min_level=logging.ERROR) as captured_logs:
                 self.post_json(
-                    '%s/invalid_secret' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT, {
+                    '%s/invalid_secret' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT,
+                    {
                         'data[list_id]': 'audience_id',
                         'data[email]': self.EDITOR_EMAIL,
-                        'type': 'subscribe'
-                    }, use_payload=False, expected_status_int=404)
+                        'type': 'subscribe',
+                    },
+                    use_payload=False,
+                    expected_status_int=404,
+                )
                 self.assertIn(
-                    'Received invalid Mailchimp webhook secret', captured_logs)
+                    'Received invalid Mailchimp webhook secret', captured_logs
+                )
 
     @test_utils.set_platform_parameters(
-        [(
-            platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID,
-            'audience_id'
-        ), (
-            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
-            'system@example.com'
-        ), (
-            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS,
-            False
-        )]
+        [
+            (
+                platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID,
+                'audience_id',
+            ),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com',
+            ),
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
+        ]
     )
     def test_post(self) -> None:
         with self.swap_secret:
@@ -1326,34 +1546,43 @@ class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
                 False,
                 feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
                 feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
-                feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE
+                feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE,
             )
             email_preferences = user_services.get_email_preferences(
-                self.editor_id)
+                self.editor_id
+            )
             self.assertEqual(email_preferences.can_receive_email_updates, False)
 
             # User subscribed externally.
             json_response = self.post_json(
-                '%s/secret' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT, {
+                '%s/secret' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT,
+                {
                     'data[list_id]': 'audience_id',
                     'data[email]': self.EDITOR_EMAIL,
-                    'type': 'subscribe'
-                }, use_payload=False)
+                    'type': 'subscribe',
+                },
+                use_payload=False,
+            )
             self.assertEqual(json_response, {})
             email_preferences = user_services.get_email_preferences(
-                self.editor_id)
+                self.editor_id
+            )
             self.assertEqual(email_preferences.can_receive_email_updates, True)
 
             # User unsubscribed externally.
             json_response = self.post_json(
-                '%s/secret' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT, {
+                '%s/secret' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT,
+                {
                     'data[list_id]': 'audience_id',
                     'data[email]': self.EDITOR_EMAIL,
-                    'type': 'unsubscribe'
-                }, use_payload=False)
+                    'type': 'unsubscribe',
+                },
+                use_payload=False,
+            )
             self.assertEqual(json_response, {})
             email_preferences = user_services.get_email_preferences(
-                self.editor_id)
+                self.editor_id
+            )
             self.assertEqual(email_preferences.can_receive_email_updates, False)
 
 
@@ -1383,7 +1612,8 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
             creator_ids=[],
             collection_ids=[],
             exploration_ids=[],
-            general_feedback_thread_ids=[]).put()
+            general_feedback_thread_ids=[],
+        ).put()
 
     def test_export_account_handler(self) -> None:
         # Update user settings to constants.
@@ -1400,47 +1630,56 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
             normalized_username=user_settings.normalized_username,
             last_agreed_to_terms=user_settings.last_agreed_to_terms,
             last_started_state_editor_tutorial=(
-                user_settings.last_started_state_editor_tutorial),
+                user_settings.last_started_state_editor_tutorial
+            ),
             last_started_state_translation_tutorial=(
-                user_settings.last_started_state_translation_tutorial),
+                user_settings.last_started_state_translation_tutorial
+            ),
             last_logged_in=user_settings.last_logged_in,
             last_edited_an_exploration=user_settings.last_edited_an_exploration,
             last_created_an_exploration=(
-                user_settings.last_created_an_exploration),
+                user_settings.last_created_an_exploration
+            ),
             default_dashboard=user_settings.default_dashboard,
             creator_dashboard_display_pref=(
-                user_settings.creator_dashboard_display_pref),
+                user_settings.creator_dashboard_display_pref
+            ),
             user_bio=user_settings.user_bio,
             subject_interests=user_settings.subject_interests,
             first_contribution_msec=user_settings.first_contribution_msec,
             preferred_language_codes=user_settings.preferred_language_codes,
             preferred_site_language_code=(
-                user_settings.preferred_site_language_code),
+                user_settings.preferred_site_language_code
+            ),
             preferred_audio_language_code=(
-                user_settings.preferred_audio_language_code),
-            deleted=user_settings.deleted
+                user_settings.preferred_audio_language_code
+            ),
+            deleted=user_settings.deleted,
         ).put()
 
         time_swap = self.swap(
-            user_services, 'record_user_logged_in', lambda *args: None)
+            user_services, 'record_user_logged_in', lambda *args: None
+        )
 
         with time_swap:
             data = self.get_custom_response(
-                '/export-account-handler', 'text/plain')
+                '/export-account-handler', 'text/plain'
+            )
 
             # Check downloaded zip file.
             filename = 'oppia_takeout_data.zip'
             self.assertEqual(
                 data.headers['Content-Disposition'],
-                'attachment; filename=%s' % filename)
+                'attachment; filename=%s' % filename,
+            )
             zf_saved = zipfile.ZipFile(io.BytesIO(data.body))
             self.assertEqual(
                 zf_saved.namelist(),
                 [
                     'oppia_takeout_data.json',
                     'images/user_settings_profile_picture.png',
-                    'images/user_settings_profile_picture.webp'
-                ]
+                    'images/user_settings_profile_picture.webp',
+                ],
             )
 
     def test_data_does_not_export_if_user_id_leaked(self) -> None:
@@ -1462,64 +1701,75 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
             normalized_username=user_settings.normalized_username,
             last_agreed_to_terms=user_settings.last_agreed_to_terms,
             last_started_state_editor_tutorial=(
-                user_settings.last_started_state_editor_tutorial),
+                user_settings.last_started_state_editor_tutorial
+            ),
             last_started_state_translation_tutorial=(
-                user_settings.last_started_state_translation_tutorial),
+                user_settings.last_started_state_translation_tutorial
+            ),
             last_logged_in=user_settings.last_logged_in,
             last_edited_an_exploration=user_settings.last_edited_an_exploration,
             last_created_an_exploration=(
-                user_settings.last_created_an_exploration),
+                user_settings.last_created_an_exploration
+            ),
             default_dashboard=user_settings.default_dashboard,
             creator_dashboard_display_pref=(
-                user_settings.creator_dashboard_display_pref),
+                user_settings.creator_dashboard_display_pref
+            ),
             user_bio=user_settings.user_bio,
             subject_interests=user_settings.subject_interests,
             first_contribution_msec=user_settings.first_contribution_msec,
             preferred_language_codes=user_settings.preferred_language_codes,
             preferred_site_language_code=(
-                user_settings.preferred_site_language_code),
+                user_settings.preferred_site_language_code
+            ),
             preferred_audio_language_code=(
-                user_settings.preferred_audio_language_code),
+                user_settings.preferred_audio_language_code
+            ),
             preferred_translation_language_code=(
-                user_settings.preferred_translation_language_code),
-            deleted=user_settings.deleted
+                user_settings.preferred_translation_language_code
+            ),
+            deleted=user_settings.deleted,
         ).put()
 
         with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_png_img.png'),
             'rb',
-            encoding=None
+            encoding=None,
         ) as f:
             raw_image_png = f.read()
         with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_png_img.webp'),
             'rb',
-            encoding=None
+            encoding=None,
         ) as f:
             raw_image_webp = f.read()
         fs = fs_services.GcsFileSystem(
-            feconf.ENTITY_TYPE_USER, user_settings.username)
+            feconf.ENTITY_TYPE_USER, user_settings.username
+        )
         fs.commit('profile_picture.png', raw_image_png, mimetype='image/png')
         fs.commit('profile_picture.webp', raw_image_webp, mimetype='image/webp')
 
         time_swap = self.swap(
-            user_services, 'record_user_logged_in', lambda *args: None)
+            user_services, 'record_user_logged_in', lambda *args: None
+        )
 
         with time_swap:
             data = self.get_custom_response(
-                '/export-account-handler', 'text/plain')
+                '/export-account-handler', 'text/plain'
+            )
 
             # Check downloaded zip file.
             filename = 'oppia_takeout_data.zip'
             self.assertEqual(
                 data.headers['Content-Disposition'],
-                'attachment; filename=%s' % filename)
+                'attachment; filename=%s' % filename,
+            )
             zf_saved = zipfile.ZipFile(io.BytesIO(data.body))
             self.assertEqual(
                 zf_saved.namelist(),
                 [
                     'oppia_takeout_data.json',
-                ]
+                ],
             )
 
     def test_export_account_handler_enabled_logged_out(self) -> None:
@@ -1540,40 +1790,46 @@ class UsernameCheckHandlerTests(test_utils.GenericTestBase):
         self.signup('abc@example.com', 'abc')
 
         user_services.create_new_user(
-            self.get_auth_id_from_email(self.EDITOR_EMAIL), self.EDITOR_EMAIL)
+            self.get_auth_id_from_email(self.EDITOR_EMAIL), self.EDITOR_EMAIL
+        )
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
         response_dict = self.post_json(
-            feconf.USERNAME_CHECK_DATA_URL, {'username': 'abc'},
-            csrf_token=csrf_token)
-        self.assertEqual(
-            response_dict, {
-                'username_is_taken': True
-            })
+            feconf.USERNAME_CHECK_DATA_URL,
+            {'username': 'abc'},
+            csrf_token=csrf_token,
+        )
+        self.assertEqual(response_dict, {'username_is_taken': True})
 
         response_dict = self.post_json(
-            feconf.USERNAME_CHECK_DATA_URL, {'username': 'def'},
-            csrf_token=csrf_token)
-        self.assertEqual(
-            response_dict, {
-                'username_is_taken': False
-            })
+            feconf.USERNAME_CHECK_DATA_URL,
+            {'username': 'def'},
+            csrf_token=csrf_token,
+        )
+        self.assertEqual(response_dict, {'username_is_taken': False})
 
         response_dict = self.post_json(
-            feconf.USERNAME_CHECK_DATA_URL, {'username': '!!!INVALID!!!'},
-            csrf_token=csrf_token, expected_status_int=400)
+            feconf.USERNAME_CHECK_DATA_URL,
+            {'username': '!!!INVALID!!!'},
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
         self.assertIn(
             'Validation failed: is_valid_username_string ({}) for object ',
-            response_dict['error'])
+            response_dict['error'],
+        )
 
         response_dict = self.post_json(
             feconf.USERNAME_CHECK_DATA_URL,
             {'username': self.UNICODE_TEST_STRING},
-            csrf_token=csrf_token, expected_status_int=400)
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
         self.assertIn(
             'Validation failed: is_valid_username_string ({}) for object ',
-            response_dict['error'])
+            response_dict['error'],
+        )
 
         self.logout()
 
@@ -1592,31 +1848,42 @@ class SiteLanguageHandlerTests(test_utils.GenericTestBase):
         language_code = 'es'
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        self.put_json(feconf.PREFERENCES_DATA_URL, {
-            'updates': [{
-                'update_type': 'preferred_site_language_code',
-                'data': language_code
-            }]
-        }, csrf_token=csrf_token)
+        self.put_json(
+            feconf.PREFERENCES_DATA_URL,
+            {
+                'updates': [
+                    {
+                        'update_type': 'preferred_site_language_code',
+                        'data': language_code,
+                    }
+                ]
+            },
+            csrf_token=csrf_token,
+        )
 
         preferences = self.get_json(feconf.PREFERENCES_DATA_URL)
         self.assertIsNotNone(preferences)
         self.assertEqual(
-            preferences['preferred_site_language_code'], language_code)
+            preferences['preferred_site_language_code'], language_code
+        )
 
         self.logout()
 
     def test_can_update_site_language_code(self) -> None:
         self.login(self.EDITOR_EMAIL)
         user_settings = user_services.get_user_settings(
-            self.editor_id, strict=True)
+            self.editor_id, strict=True
+        )
         self.assertIsNone(user_settings.preferred_site_language_code)
         csrf_token = self.get_new_csrf_token()
         self.put_json(
-            feconf.SITE_LANGUAGE_DATA_URL, {'site_language_code': 'en'},
-            csrf_token=csrf_token)
+            feconf.SITE_LANGUAGE_DATA_URL,
+            {'site_language_code': 'en'},
+            csrf_token=csrf_token,
+        )
         user_settings = user_services.get_user_settings(
-            self.editor_id, strict=True)
+            self.editor_id, strict=True
+        )
         self.assertEqual(user_settings.preferred_site_language_code, 'en')
         self.logout()
 
@@ -1630,49 +1897,51 @@ class UserInfoHandlerTests(test_utils.GenericTestBase):
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.login(self.EDITOR_EMAIL)
         json_response = self.get_json('/userinfohandler')
-        self.assertDictEqual({
-            'roles': ['EXPLORATION_EDITOR'],
-            'is_moderator': False,
-            'is_curriculum_admin': False,
-            'is_topic_manager': False,
-            'is_super_admin': False,
-            'can_create_collections': False,
-            'preferred_site_language_code': None,
-            'username': self.EDITOR_USERNAME,
-            'email': self.EDITOR_EMAIL,
-            'user_is_logged_in': True}, json_response)
+        self.assertDictEqual(
+            {
+                'roles': ['EXPLORATION_EDITOR'],
+                'is_moderator': False,
+                'is_curriculum_admin': False,
+                'is_topic_manager': False,
+                'is_super_admin': False,
+                'can_create_collections': False,
+                'preferred_site_language_code': None,
+                'username': self.EDITOR_USERNAME,
+                'email': self.EDITOR_EMAIL,
+                'user_is_logged_in': True,
+            },
+            json_response,
+        )
         self.logout()
 
         json_response = self.get_json('/userinfohandler')
-        self.assertDictEqual({
-            'user_is_logged_in': False
-        }, json_response)
+        self.assertDictEqual({'user_is_logged_in': False}, json_response)
 
-    def test_set_user_has_viewed_lesson_info_modal_once_to_true(
-        self
-    ) -> None:
+    def test_set_user_has_viewed_lesson_info_modal_once_to_true(self) -> None:
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
         user_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
         user_settings = user_services.get_user_settings(user_id)
-        self.assertEqual(
-            user_settings.has_viewed_lesson_info_modal_once, False)
+        self.assertEqual(user_settings.has_viewed_lesson_info_modal_once, False)
 
         csrf_token = self.get_new_csrf_token()
-        self.put_json('/userinfohandler/data', {
-            'user_has_viewed_lesson_info_modal_once': True
-        }, csrf_token=csrf_token)
+        self.put_json(
+            '/userinfohandler/data',
+            {'user_has_viewed_lesson_info_modal_once': True},
+            csrf_token=csrf_token,
+        )
 
         user_settings = user_services.get_user_settings(user_id)
-        self.assertEqual(
-            user_settings.has_viewed_lesson_info_modal_once, True)
+        self.assertEqual(user_settings.has_viewed_lesson_info_modal_once, True)
 
     def test_no_user_info_provided_if_user_is_not_logged_in(self) -> None:
         csrf_token = self.get_new_csrf_token()
-        self.put_json('/userinfohandler/data', {
-            'user_has_viewed_lesson_info_modal_once': True
-        }, csrf_token=csrf_token)
+        self.put_json(
+            '/userinfohandler/data',
+            {'user_has_viewed_lesson_info_modal_once': True},
+            csrf_token=csrf_token,
+        )
 
 
 class UrlHandlerTests(test_utils.GenericTestBase):
@@ -1686,18 +1955,18 @@ class UrlHandlerTests(test_utils.GenericTestBase):
 
     def test_login_url_gets_created_for_signed_out_users(self) -> None:
         response = self.get_json(
-            '/url_handler', params={'current_url': 'random_url'})
+            '/url_handler', params={'current_url': 'random_url'}
+        )
         self.assertTrue(response['login_url'].endswith('random_url'))
 
     def test_invalid_input_exception(self) -> None:
-        response = self.get_json(
-            '/url_handler', expected_status_int=400)
+        response = self.get_json('/url_handler', expected_status_int=400)
         error = {
             'error': (
                 'At \'http://localhost/url_handler\' '
                 'these errors are happening:\n'
                 'Missing key in handler args: current_url.'
             ),
-            'status_code': 400
+            'status_code': 400,
         }
         self.assertEqual(response, error)

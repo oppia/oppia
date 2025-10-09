@@ -37,7 +37,8 @@ class BaseRteComponent:
 
     package, filepath = os.path.split(feconf.RTE_EXTENSIONS_DEFINITIONS_PATH)
     rich_text_component_specs = constants.parse_json_from_ts(
-        constants.get_package_file_contents(package, filepath))
+        constants.get_package_file_contents(package, filepath)
+    )
 
     obj_types_to_obj_classes = {
         'unicode': objects.UnicodeString,
@@ -49,7 +50,7 @@ class BaseRteComponent:
         'SvgFilename': objects.SvgFilename,
         'int': objects.Int,
         'bool': objects.Boolean,
-        'SkillSelector': objects.SkillSelector
+        'SkillSelector': objects.SkillSelector,
     }
 
     # TODO(#16047): Here we use type Any because BaseRteComponent class is not
@@ -65,8 +66,9 @@ class BaseRteComponent:
             TypeError. If any customization arg is invalid.
         """
         arg_names_to_obj_classes = {}
-        customization_arg_specs = cls.rich_text_component_specs[
-            cls.__name__]['customization_arg_specs']
+        customization_arg_specs = cls.rich_text_component_specs[cls.__name__][
+            'customization_arg_specs'
+        ]
         for customization_arg_spec in customization_arg_specs:
             arg_name = '%s-with-value' % customization_arg_spec['name']
             schema = customization_arg_spec['schema']
@@ -82,13 +84,12 @@ class BaseRteComponent:
 
         if set(attr_names) != set(required_attr_names):
             missing_attr_names = list(
-                set(required_attr_names) - set(attr_names))
+                set(required_attr_names) - set(attr_names)
+            )
             extra_attr_names = list(set(attr_names) - set(required_attr_names))
             raise utils.ValidationError(
-                'Missing attributes: %s, Extra attributes: %s' % (
-                    ', '.join(missing_attr_names),
-                    ', '.join(extra_attr_names)
-                )
+                'Missing attributes: %s, Extra attributes: %s'
+                % (', '.join(missing_attr_names), ', '.join(extra_attr_names))
             )
 
         for arg_name in required_attr_names:
@@ -106,9 +107,9 @@ class Collapsible(BaseRteComponent):
         content = value_dict['content-with-value']
         inner_soup = bs4.BeautifulSoup(content, 'html.parser')
         collapsible_components = inner_soup.findAll(
-            name='oppia-noninteractive-collapsible')
-        tabs_components = inner_soup.findAll(
-            name='oppia-noninteractive-tabs')
+            name='oppia-noninteractive-collapsible'
+        )
+        tabs_components = inner_soup.findAll(name='oppia-noninteractive-tabs')
         if collapsible_components or tabs_components:
             raise utils.ValidationError('Nested tabs and collapsible')
 
@@ -143,8 +144,9 @@ class Math(BaseRteComponent):
         filename = value_dict['math_content-with-value']['svg_filename']
         if not re.match(filename_pattern_regex, filename):
             raise utils.ValidationError(
-                'Invalid svg_filename attribute in math component: %s' % (
-                    filename))
+                'Invalid svg_filename attribute in math component: %s'
+                % (filename)
+            )
 
 
 class Skillreview(BaseRteComponent):
@@ -162,12 +164,15 @@ class Tabs(BaseRteComponent):
         super(Tabs, cls).validate(value_dict)
         tab_contents = value_dict['tab_contents-with-value']
         for tab_content in tab_contents:
-            inner_soup = (
-                bs4.BeautifulSoup(tab_content['content'], 'html.parser'))
+            inner_soup = bs4.BeautifulSoup(
+                tab_content['content'], 'html.parser'
+            )
             collapsible_components = inner_soup.findAll(
-                name='oppia-noninteractive-collapsible')
+                name='oppia-noninteractive-collapsible'
+            )
             tabs_components = inner_soup.findAll(
-                name='oppia-noninteractive-tabs')
+                name='oppia-noninteractive-tabs'
+            )
             if collapsible_components or tabs_components:
                 raise utils.ValidationError('Nested tabs and collapsible')
 

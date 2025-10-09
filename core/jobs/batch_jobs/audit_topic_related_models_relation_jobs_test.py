@@ -30,20 +30,19 @@ from core.tests import test_utils
 from typing import Type
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import topic_models
 
-(topic_models,) = models.Registry.import_models([
-    models.Names.TOPIC])
+(topic_models,) = models.Registry.import_models([models.Names.TOPIC])
 
 
 class ValidateTopicModelsJobTests(
-    job_test_utils.JobTestBase,
-    test_utils.GenericTestBase):
+    job_test_utils.JobTestBase, test_utils.GenericTestBase
+):
 
-    JOB_CLASS: Type[(
-        audit_topic_related_models_relation_jobs.ValidateTopicModelsJob)] = (
-        audit_topic_related_models_relation_jobs.ValidateTopicModelsJob)
+    JOB_CLASS: Type[
+        (audit_topic_related_models_relation_jobs.ValidateTopicModelsJob)
+    ] = audit_topic_related_models_relation_jobs.ValidateTopicModelsJob
 
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
@@ -59,18 +58,21 @@ class ValidateTopicModelsJobTests(
             description='description',
             subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
             story_reference_schema_version=(
-                feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION),
+                feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION
+            ),
             next_subtopic_id=1,
             language_code='en',
             page_title_fragment_for_web='fragm',
             skill_ids_for_diagnostic_test=[],
-            deleted=False)
+            deleted=False,
+        )
         topic_rights_model = self.create_model(
             topic_models.TopicRightsModel,
             id='topic_1',
             manager_ids=[],
             topic_is_published=True,
-            deleted=False)
+            deleted=False,
+        )
         topic_summary_model = self.create_model(
             topic_models.TopicSummaryModel,
             id='topic_1',
@@ -91,7 +93,8 @@ class ValidateTopicModelsJobTests(
             thumbnail_bg_color='#FFFFFF',
             version=1,
             published_story_exploration_mapping={},
-            deleted=False)
+            deleted=False,
+        )
 
         self.put_multi([topic_model, topic_rights_model, topic_summary_model])
 
@@ -108,12 +111,14 @@ class ValidateTopicModelsJobTests(
             description='description',
             subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
             story_reference_schema_version=(
-                feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION),
+                feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION
+            ),
             next_subtopic_id=1,
             language_code='en',
             page_title_fragment_for_web='fragm',
             skill_ids_for_diagnostic_test=[],
-            deleted=False)
+            deleted=False,
+        )
         topic_summary_model = self.create_model(
             topic_models.TopicSummaryModel,
             id='topic_1',
@@ -134,19 +139,23 @@ class ValidateTopicModelsJobTests(
             thumbnail_bg_color='#FFFFFF',
             version=1,
             published_story_exploration_mapping={},
-            deleted=False)
+            deleted=False,
+        )
 
         self.put_multi([topic_model, topic_summary_model])
 
-        self.assert_job_output_is([
-            base_validation_errors.ModelRelationshipError(
-                model_property.ModelProperty(
-                    topic_models.TopicModel,
-                    topic_models.TopicModel.name),
+        self.assert_job_output_is(
+            [
+                base_validation_errors.ModelRelationshipError(
+                    model_property.ModelProperty(
+                        topic_models.TopicModel, topic_models.TopicModel.name
+                    ),
                     topic_model,
                     target_kind='TopicRightsModel',
-                    target_id='topic_1'),
-        ])
+                    target_id='topic_1',
+                ),
+            ]
+        )
 
     def test_missing_topic_summary_model(self) -> None:
         topic_model = self.create_model(
@@ -159,30 +168,36 @@ class ValidateTopicModelsJobTests(
             description='description',
             subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
             story_reference_schema_version=(
-                feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION),
+                feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION
+            ),
             next_subtopic_id=1,
             language_code='en',
             page_title_fragment_for_web='fragm',
             skill_ids_for_diagnostic_test=[],
-            deleted=False)
+            deleted=False,
+        )
         topic_rights_model = self.create_model(
             topic_models.TopicRightsModel,
             id='topic_1',
             manager_ids=[],
             topic_is_published=True,
-            deleted=False)
+            deleted=False,
+        )
 
         self.put_multi([topic_model, topic_rights_model])
 
-        self.assert_job_output_is([
-            base_validation_errors.ModelRelationshipError(
-                id_property=model_property.ModelProperty(
-                    topic_models.TopicModel,
-                    topic_models.TopicModel.name),
-                model=topic_model,
-                target_kind='TopicSummaryModel',
-                target_id='topic_1'),
-        ])
+        self.assert_job_output_is(
+            [
+                base_validation_errors.ModelRelationshipError(
+                    id_property=model_property.ModelProperty(
+                        topic_models.TopicModel, topic_models.TopicModel.name
+                    ),
+                    model=topic_model,
+                    target_kind='TopicSummaryModel',
+                    target_id='topic_1',
+                ),
+            ]
+        )
 
     def test_multiple_topics_with_correct_relations(self) -> None:
         topic_model1 = self.create_model(
@@ -195,18 +210,21 @@ class ValidateTopicModelsJobTests(
             description='description',
             subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
             story_reference_schema_version=(
-                feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION),
+                feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION
+            ),
             next_subtopic_id=1,
             language_code='en',
             page_title_fragment_for_web='fragm',
             skill_ids_for_diagnostic_test=[],
-            deleted=False)
+            deleted=False,
+        )
         topic_rights_model1 = self.create_model(
             topic_models.TopicRightsModel,
             id='topic_1',
             manager_ids=[],
             topic_is_published=True,
-            deleted=False)
+            deleted=False,
+        )
         topic_summary_model1 = self.create_model(
             topic_models.TopicSummaryModel,
             id='topic_1',
@@ -227,7 +245,8 @@ class ValidateTopicModelsJobTests(
             thumbnail_bg_color='#FFFFFF',
             version=1,
             published_story_exploration_mapping={},
-            deleted=False)
+            deleted=False,
+        )
 
         topic_model2 = self.create_model(
             topic_models.TopicModel,
@@ -239,18 +258,21 @@ class ValidateTopicModelsJobTests(
             description='description',
             subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
             story_reference_schema_version=(
-                feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION),
+                feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION
+            ),
             next_subtopic_id=1,
             language_code='en',
             page_title_fragment_for_web='fragm',
             skill_ids_for_diagnostic_test=[],
-            deleted=False)
+            deleted=False,
+        )
         topic_rights_model2 = self.create_model(
             topic_models.TopicRightsModel,
             id='topic_2',
             manager_ids=[],
             topic_is_published=True,
-            deleted=False)
+            deleted=False,
+        )
         topic_summary_model2 = self.create_model(
             topic_models.TopicSummaryModel,
             id='topic_2',
@@ -271,13 +293,19 @@ class ValidateTopicModelsJobTests(
             thumbnail_bg_color='#FFFFFF',
             version=1,
             published_story_exploration_mapping={},
-            deleted=False)
+            deleted=False,
+        )
 
-        self.put_multi([
-            topic_model1, topic_model2,
-            topic_rights_model1, topic_rights_model2,
-            topic_summary_model1, topic_summary_model2,
-        ])
+        self.put_multi(
+            [
+                topic_model1,
+                topic_model2,
+                topic_rights_model1,
+                topic_rights_model2,
+                topic_summary_model1,
+                topic_summary_model2,
+            ]
+        )
 
         self.assert_job_output_is_empty()
 
@@ -292,18 +320,21 @@ class ValidateTopicModelsJobTests(
             description='description',
             subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
             story_reference_schema_version=(
-                feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION),
+                feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION
+            ),
             next_subtopic_id=1,
             language_code='en',
             page_title_fragment_for_web='fragm',
             skill_ids_for_diagnostic_test=[],
-            deleted=False)
+            deleted=False,
+        )
         topic_rights_model1 = self.create_model(
             topic_models.TopicRightsModel,
             id='topic_1',
             manager_ids=[],
             topic_is_published=True,
-            deleted=False)
+            deleted=False,
+        )
         topic_summary_model1 = self.create_model(
             topic_models.TopicSummaryModel,
             id='topic_1',
@@ -324,7 +355,8 @@ class ValidateTopicModelsJobTests(
             thumbnail_bg_color='#FFFFFF',
             version=1,
             published_story_exploration_mapping={},
-            deleted=False)
+            deleted=False,
+        )
 
         topic_model2 = self.create_model(
             topic_models.TopicModel,
@@ -336,12 +368,14 @@ class ValidateTopicModelsJobTests(
             description='description',
             subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
             story_reference_schema_version=(
-                feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION),
+                feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION
+            ),
             next_subtopic_id=1,
             language_code='en',
             page_title_fragment_for_web='fragm',
             skill_ids_for_diagnostic_test=[],
-            deleted=False)
+            deleted=False,
+        )
         topic_summary_model2 = self.create_model(
             topic_models.TopicSummaryModel,
             id='topic_2',
@@ -362,7 +396,8 @@ class ValidateTopicModelsJobTests(
             thumbnail_bg_color='#FFFFFF',
             version=1,
             published_story_exploration_mapping={},
-            deleted=False)
+            deleted=False,
+        )
 
         topic_model3 = self.create_model(
             topic_models.TopicModel,
@@ -374,38 +409,51 @@ class ValidateTopicModelsJobTests(
             description='description',
             subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
             story_reference_schema_version=(
-                feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION),
+                feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION
+            ),
             next_subtopic_id=1,
             language_code='en',
             page_title_fragment_for_web='fragm',
             skill_ids_for_diagnostic_test=[],
-            deleted=False)
+            deleted=False,
+        )
         topic_rights_model3 = self.create_model(
             topic_models.TopicRightsModel,
             id='topic_3',
             manager_ids=[],
             topic_is_published=True,
-            deleted=False)
+            deleted=False,
+        )
 
-        self.put_multi([
-            topic_model1, topic_rights_model1, topic_summary_model1,
-            topic_model2, topic_summary_model2,
-            topic_model3, topic_rights_model3
-        ])
+        self.put_multi(
+            [
+                topic_model1,
+                topic_rights_model1,
+                topic_summary_model1,
+                topic_model2,
+                topic_summary_model2,
+                topic_model3,
+                topic_rights_model3,
+            ]
+        )
 
-        self.assert_job_output_is([
-            base_validation_errors.ModelRelationshipError(
-                model_property.ModelProperty(
-                    topic_models.TopicModel,
-                    topic_models.TopicModel.name),
+        self.assert_job_output_is(
+            [
+                base_validation_errors.ModelRelationshipError(
+                    model_property.ModelProperty(
+                        topic_models.TopicModel, topic_models.TopicModel.name
+                    ),
                     model=topic_model2,
                     target_kind='TopicRightsModel',
-                    target_id='topic_2'),
-            base_validation_errors.ModelRelationshipError(
-                model_property.ModelProperty(
-                    topic_models.TopicModel,
-                    topic_models.TopicModel.name),
+                    target_id='topic_2',
+                ),
+                base_validation_errors.ModelRelationshipError(
+                    model_property.ModelProperty(
+                        topic_models.TopicModel, topic_models.TopicModel.name
+                    ),
                     model=topic_model3,
                     target_kind='TopicSummaryModel',
-                    target_id='topic_3'),
-        ])
+                    target_id='topic_3',
+                ),
+            ]
+        )

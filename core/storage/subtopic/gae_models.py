@@ -24,7 +24,7 @@ from core.platform import models
 from typing import Dict, Mapping
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import base_models, datastore_services
 
 (base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
@@ -48,8 +48,9 @@ class SubtopicPageCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """
 
     # The id of the subtopic page being edited.
-    subtopic_page_id = (
-        datastore_services.StringProperty(indexed=True, required=True))
+    subtopic_page_id = datastore_services.StringProperty(
+        indexed=True, required=True
+    )
 
     @classmethod
     def get_instance_id(cls, subtopic_page_id: str, version: int) -> str:
@@ -67,8 +68,9 @@ class SubtopicPageCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         return 'subtopicpage-%s-%s' % (subtopic_page_id, version)
 
     @staticmethod
-    def get_model_association_to_user(
-    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
         """The history of commits is not relevant for the purposes of Takeout
         since commits don't contain relevant data corresponding to users.
         """
@@ -80,9 +82,10 @@ class SubtopicPageCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         because the history of commits isn't deemed as useful for users since
         commit logs don't contain relevant data corresponding to those users.
         """
-        return dict(super(cls, cls).get_export_policy(), **{
-            'subtopic_page_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
-        })
+        return dict(
+            super(cls, cls).get_export_policy(),
+            **{'subtopic_page_id': base_models.EXPORT_POLICY.NOT_APPLICABLE},
+        )
 
 
 class SubtopicPageSnapshotContentModel(base_models.BaseSnapshotContentModel):
@@ -112,10 +115,12 @@ class SubtopicPageModel(base_models.VersionedModel):
     page_contents = datastore_services.JsonProperty(required=True)
     # The schema version for the page_contents field.
     page_contents_schema_version = datastore_services.IntegerProperty(
-        required=True, indexed=True)
+        required=True, indexed=True
+    )
     # The ISO 639-1 code for the language this subtopic page is written in.
-    language_code = (
-        datastore_services.StringProperty(required=True, indexed=True))
+    language_code = datastore_services.StringProperty(
+        required=True, indexed=True
+    )
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -135,7 +140,7 @@ class SubtopicPageModel(base_models.VersionedModel):
         # We expect Mapping because we want to allow models that inherit
         # from BaseModel as the values, if we used Dict this wouldn't
         # be allowed.
-        additional_models: Mapping[str, base_models.BaseModel]
+        additional_models: Mapping[str, base_models.BaseModel],
     ) -> base_models.ModelsToPutDict:
         """Record the event to the commit log after the model commit.
 
@@ -164,12 +169,18 @@ class SubtopicPageModel(base_models.VersionedModel):
             commit_type,
             commit_message,
             commit_cmds,
-            additional_models
+            additional_models,
         )
 
         subtopic_page_commit_log_entry = SubtopicPageCommitLogEntryModel.create(
-            self.id, self.version, committer_id, commit_type, commit_message,
-            commit_cmds, constants.ACTIVITY_STATUS_PUBLIC, False
+            self.id,
+            self.version,
+            committer_id,
+            commit_type,
+            commit_message,
+            commit_cmds,
+            constants.ACTIVITY_STATUS_PUBLIC,
+            False,
         )
         subtopic_page_commit_log_entry.subtopic_page_id = self.id
         # The order is important here, as the 'versioned_model' needs to be
@@ -185,13 +196,15 @@ class SubtopicPageModel(base_models.VersionedModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
-            'topic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'page_contents': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'page_contents_schema_version':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE
-        })
+        return dict(
+            super(cls, cls).get_export_policy(),
+            **{
+                'topic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'page_contents': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'page_contents_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            },
+        )
 
 
 class StudyGuideCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
@@ -205,8 +218,9 @@ class StudyGuideCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """
 
     # The id of the study guide being edited.
-    study_guide_id = (
-        datastore_services.StringProperty(indexed=True, required=True))
+    study_guide_id = datastore_services.StringProperty(
+        indexed=True, required=True
+    )
 
     @classmethod
     def get_instance_id(cls, study_guide_id: str, version: int) -> str:
@@ -224,8 +238,9 @@ class StudyGuideCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         return 'studyguide-%s-%s' % (study_guide_id, version)
 
     @staticmethod
-    def get_model_association_to_user(
-    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
         """The history of commits is not relevant for the purposes of Takeout
         since commits don't contain relevant data corresponding to users.
         """
@@ -237,9 +252,10 @@ class StudyGuideCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         because the history of commits isn't deemed as useful for users since
         commit logs don't contain relevant data corresponding to those users.
         """
-        return dict(super(cls, cls).get_export_policy(), **{
-            'study_guide_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
-        })
+        return dict(
+            super(cls, cls).get_export_policy(),
+            **{'study_guide_id': base_models.EXPORT_POLICY.NOT_APPLICABLE},
+        )
 
 
 class StudyGuideSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
@@ -272,16 +288,19 @@ class StudyGuideModel(base_models.VersionedModel):
     topic_id = datastore_services.StringProperty(required=True, indexed=True)
     # The next_content_id index to use for generation of new content ids.
     next_content_id_index = datastore_services.IntegerProperty(
-        required=True, default=0, indexed=True)
+        required=True, default=0, indexed=True
+    )
     # The json data of the study guide consisting of sections which
     # is a list of heading and content pairs (sections).
     sections = datastore_services.JsonProperty(required=True)
     # The schema version for the sections field.
     sections_schema_version = datastore_services.IntegerProperty(
-        required=True, indexed=True)
+        required=True, indexed=True
+    )
     # The ISO 639-1 code for the language this study guide is written in.
-    language_code = (
-        datastore_services.StringProperty(required=True, indexed=True))
+    language_code = datastore_services.StringProperty(
+        required=True, indexed=True
+    )
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -301,7 +320,7 @@ class StudyGuideModel(base_models.VersionedModel):
         # We expect Mapping because we want to allow models that inherit
         # from BaseModel as the values, if we used Dict this wouldn't
         # be allowed.
-        additional_models: Mapping[str, base_models.BaseModel]
+        additional_models: Mapping[str, base_models.BaseModel],
     ) -> base_models.ModelsToPutDict:
         """Record the event to the commit log after the model commit.
 
@@ -330,12 +349,18 @@ class StudyGuideModel(base_models.VersionedModel):
             commit_type,
             commit_message,
             commit_cmds,
-            additional_models
+            additional_models,
         )
 
         study_guide_commit_log_entry = StudyGuideCommitLogEntryModel().create(
-            self.id, self.version, committer_id, commit_type, commit_message,
-            commit_cmds, constants.ACTIVITY_STATUS_PUBLIC, False
+            self.id,
+            self.version,
+            committer_id,
+            commit_type,
+            commit_message,
+            commit_cmds,
+            constants.ACTIVITY_STATUS_PUBLIC,
+            False,
         )
         study_guide_commit_log_entry.study_guide_id = self.id
         # The order is important here, as the 'versioned_model' needs to be
@@ -351,11 +376,13 @@ class StudyGuideModel(base_models.VersionedModel):
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
-            'topic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'next_content_id_index': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'sections': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'sections_schema_version':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE
-        })
+        return dict(
+            super(cls, cls).get_export_policy(),
+            **{
+                'topic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'next_content_id_index': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'sections': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'sections_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            },
+        )

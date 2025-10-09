@@ -20,7 +20,9 @@ from __future__ import annotations
 
 from core.tests import test_utils
 
-from extensions.interactions.PencilCodeEditor import PencilCodeEditor # pylint: disable=unused-import, line-too-long # isort: skip
+from extensions.interactions.PencilCodeEditor import (  # pylint: disable=unused-import, line-too-long # isort: skip
+    PencilCodeEditor,
+)
 
 
 class PencilCodeEditorTests(test_utils.GenericTestBase):
