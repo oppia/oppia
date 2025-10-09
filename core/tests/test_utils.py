@@ -697,7 +697,7 @@ class ElasticSearchStub:
             '_type': '_doc',
         }
 
-    def mock_exists(self, index: str, id: str) -> bool:
+    def mock_exists(self, index: str, _id: str) -> bool:
         """Checks whether a document with the given ID exists in the mock
         database.
 
@@ -713,9 +713,9 @@ class ElasticSearchStub:
         """
         if index not in self._DB:
             self._generate_index_not_found_error(index)
-        return any(d['id'] == id for d in self._DB[index])
+        return any(d['id'] == _id for d in self._DB[index])
 
-    def mock_delete(self, index: str, id: str) -> ExistingIndexDict:
+    def mock_delete(self, index: str, _id: str) -> ExistingIndexDict:
         """Deletes a document from an index in the mock database. Does nothing
         if the document is not in the index.
 
@@ -733,7 +733,7 @@ class ElasticSearchStub:
         """
         if index not in self._DB:
             self._generate_index_not_found_error(index)
-        docs = [d for d in self._DB[index] if d['id'] != id]
+        docs = [d for d in self._DB[index] if d['id'] != _id]
         if len(self._DB[index]) != len(docs):
             self._DB[index] = docs
             return {
@@ -750,7 +750,7 @@ class ElasticSearchStub:
         body = {
             '_index': index,
             '_type': '_doc',
-            '_id': id,
+            '_id': _id,
             '_version': 1,
             'result': 'not_found',
             '_shards': {'total': 2, 'successful': 1, 'failed': 0},
@@ -759,7 +759,7 @@ class ElasticSearchStub:
         }
         meta = type('Meta', (), {'status': 404})()
         raise elasticsearch.NotFoundError(
-            f'document not found: [{index}][{id}]', meta, body
+            f'document not found: [{index}][{_id}]', meta, body
         )
 
     def mock_delete_by_query(
