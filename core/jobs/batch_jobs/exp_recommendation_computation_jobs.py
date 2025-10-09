@@ -29,16 +29,16 @@ import apache_beam as beam
 from typing import Dict, Final, Iterable, List, Tuple, Union
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import (
         datastore_services,
         exp_models,
         recommendations_models,
     )
 
-(exp_models, recommendations_models) = models.Registry.import_models([
-    models.Names.EXPLORATION, models.Names.RECOMMENDATIONS
-])
+(exp_models, recommendations_models) = models.Registry.import_models(
+    [models.Names.EXPLORATION, models.Names.RECOMMENDATIONS]
+)
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -62,24 +62,28 @@ class ComputeExplorationRecommendationsJob(base_jobs.JobBase):
 
         exp_summary_objects = (
             self.pipeline
-            | 'Get all non-deleted models' >> (
-                ndb_io.GetModels(exp_models.ExpSummaryModel.get_all()))
-            | 'Convert ExpSummaryModels to domain objects' >> beam.Map(
-                exp_fetchers.get_exploration_summary_from_model)
+            | 'Get all non-deleted models'
+            >> (ndb_io.GetModels(exp_models.ExpSummaryModel.get_all()))
+            | 'Convert ExpSummaryModels to domain objects'
+            >> beam.Map(exp_fetchers.get_exploration_summary_from_model)
         )
 
         exp_summary_iter = beam.pvalue.AsIter(exp_summary_objects)
 
         exp_recommendations_models = (
             exp_summary_objects
-            | 'Compute similarity' >> beam.ParDo(
-                ComputeSimilarity(), exp_summary_iter)
+            | 'Compute similarity'
+            >> beam.ParDo(ComputeSimilarity(), exp_summary_iter)
             | 'Group similarities per exploration ID' >> beam.GroupByKey()
-            | 'Sort and slice similarities' >> beam.MapTuple(
+            | 'Sort and slice similarities'
+            >> beam.MapTuple(
                 lambda exp_id, similarities: (
-                    exp_id, self._sort_and_slice_similarities(similarities)))
-            | 'Create recommendation models' >> beam.MapTuple(
-                self._create_recommendation)
+                    exp_id,
+                    self._sort_and_slice_similarities(similarities),
+                )
+            )
+            | 'Create recommendation models'
+            >> beam.MapTuple(self._create_recommendation)
         )
 
         unused_put_result = (
@@ -87,15 +91,13 @@ class ComputeExplorationRecommendationsJob(base_jobs.JobBase):
             | 'Put models into the datastore' >> ndb_io.PutModels()
         )
 
-        return (
-            exp_recommendations_models
-            | 'Create job run result' >> (
-                job_result_transforms.CountObjectsToJobRunResult())
+        return exp_recommendations_models | 'Create job run result' >> (
+            job_result_transforms.CountObjectsToJobRunResult()
         )
 
     @staticmethod
     def _sort_and_slice_similarities(
-        similarities: Iterable[Dict[str, Union[str, float]]]
+        similarities: Iterable[Dict[str, Union[str, float]]],
     ) -> List[str]:
         """Sorts similarities of explorations and slices them to
         a maximum length.
@@ -111,10 +113,11 @@ class ComputeExplorationRecommendationsJob(base_jobs.JobBase):
             list(str). List of exploration IDs, sorted by the similarity.
         """
         sorted_similarities = sorted(
-            similarities, reverse=True, key=lambda x: x['similarity_score'])
-        return [
-                str(item['exp_id']) for item in sorted_similarities
-            ][:MAX_RECOMMENDATIONS]
+            similarities, reverse=True, key=lambda x: x['similarity_score']
+        )
+        return [str(item['exp_id']) for item in sorted_similarities][
+            :MAX_RECOMMENDATIONS
+        ]
 
     @staticmethod
     def _create_recommendation(
@@ -134,7 +137,9 @@ class ComputeExplorationRecommendationsJob(base_jobs.JobBase):
         with datastore_services.get_ndb_context():
             exp_recommendation_model = (
                 recommendations_models.ExplorationRecommendationsModel(
-                    id=exp_id, recommended_exploration_ids=recommended_exp_ids))
+                    id=exp_id, recommended_exploration_ids=recommended_exp_ids
+                )
+            )
         exp_recommendation_model.update_timestamps()
         return exp_recommendation_model
 
@@ -149,7 +154,7 @@ class ComputeSimilarity(beam.DoFn):  # type: ignore[misc]
     def process(
         self,
         ref_exp_summary: exp_domain.ExplorationSummary,
-        compared_exp_summaries: Iterable[exp_domain.ExplorationSummary]
+        compared_exp_summaries: Iterable[exp_domain.ExplorationSummary],
     ) -> Iterable[Tuple[str, Dict[str, Union[str, float]]]]:
         """Compute similarities between exploraitons.
 
@@ -178,8 +183,9 @@ class ComputeSimilarity(beam.DoFn):  # type: ignore[misc]
                 )
                 if similarity_score >= SIMILARITY_SCORE_THRESHOLD:
                     yield (
-                        ref_exp_summary.id, {
+                        ref_exp_summary.id,
+                        {
                             'similarity_score': similarity_score,
-                            'exp_id': compared_exp_summary.id
-                        }
+                            'exp_id': compared_exp_summary.id,
+                        },
                     )
