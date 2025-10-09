@@ -63,7 +63,7 @@ from typing import Callable, Deque, Final, List, Optional, Sequence
 
 _PROTOCOLS: Final = [
     (socket.SOCK_STREAM, socket.IPPROTO_TCP),
-    (socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+    (socket.SOCK_DGRAM, socket.IPPROTO_UDP),
 ]
 
 
@@ -148,8 +148,7 @@ def is_port_free(port: int) -> bool:
         bool. Whether the port is free to use for both TCP and UDP.
     """
     return bool(
-        sock_bind(port, *_PROTOCOLS[0]) and
-        sock_bind(port, *_PROTOCOLS[1])
+        sock_bind(port, *_PROTOCOLS[0]) and sock_bind(port, *_PROTOCOLS[1])
     )
 
 
@@ -249,9 +248,10 @@ class PortPool:
             candidate = self._port_queue.pop()
             self._port_queue.appendleft(candidate)
             check_count += 1
-            if (candidate.start_time == 0
-                    or candidate.start_time
-                    != get_process_start_time(candidate.pid)):
+            if (
+                candidate.start_time == 0
+                or candidate.start_time != get_process_start_time(candidate.pid)
+            ):
                 if is_port_free(candidate.port):
                     candidate.pid = pid
                     candidate.start_time = get_process_start_time(pid)
@@ -262,7 +262,9 @@ class PortPool:
                 else:
                     logging.info(
                         'Port %d unexpectedly in use, last owning pid %d.',
-                        candidate.port, candidate.pid)
+                        candidate.port,
+                        candidate.pid,
+                    )
 
         logging.info('All ports in use.')
         self.ports_checked_for_last_request = check_count
@@ -279,7 +281,8 @@ class PortPool:
         """
         if port < 1 or port > 65535:
             raise ValueError(
-                'Port must be in the [1, 65535] range, not %d.' % port)
+                'Port must be in the [1, 65535] range, not %d.' % port
+            )
         port_info = _PortInfo(port=port)
         self._port_queue.append(port_info)
 
@@ -306,9 +309,7 @@ class PortServerRequestHandler:
         for port in ports_to_serve:
             self._port_pool.add_port_to_free_pool(port)
 
-    def handle_port_request(
-        self, client_data: bytes
-    ) -> Optional[bytes]:
+    def handle_port_request(self, client_data: bytes) -> Optional[bytes]:
         """Given a port request body, parse it and respond appropriately.
 
         Args:
@@ -346,11 +347,15 @@ class PortServerRequestHandler:
         logging.info('Dumping statistics:')
         stats = []
         stats.append(
-            'client-request-errors {}'.format(self._client_request_errors))
+            'client-request-errors {}'.format(self._client_request_errors)
+        )
         stats.append('denied-allocations {}'.format(self._denied_allocations))
         stats.append('num-ports-managed {}'.format(self._port_pool.num_ports()))
-        stats.append('num-ports-checked-for-last-request {}'.format(
-            self._port_pool.ports_checked_for_last_request))
+        stats.append(
+            'num-ports-checked-for-last-request {}'.format(
+                self._port_pool.ports_checked_for_last_request
+            )
+        )
         stats.append('total-allocations {}'.format(self._total_allocations))
         for stat in stats:
             logging.info(stat)
@@ -367,12 +372,14 @@ def _parse_command_line(args: Optional[List[str]] = None) -> argparse.Namespace:
         '--portserver_static_pool',
         type=str,
         default='15000-24999',
-        help='Comma separated N-P Range(s) of ports to manage (inclusive).')
+        help='Comma separated N-P Range(s) of ports to manage (inclusive).',
+    )
     parser.add_argument(
         '--portserver_unix_socket_address',
         type=str,
         default='portserver.sock',
-        help='Address of AF_UNIX socket on which to listen (first @ is a NUL).')
+        help='Address of AF_UNIX socket on which to listen (first @ is a NUL).',
+    )
 
     if not args:
         args = sys.argv[1:]
@@ -417,9 +424,7 @@ class Server:
     message_size = 1024
 
     def __init__(
-        self,
-        handler: Callable[[bytes], Optional[bytes]],
-        socket_path: str
+        self, handler: Callable[[bytes], Optional[bytes]], socket_path: str
     ) -> None:
         """Runs the portserver
 
@@ -443,7 +448,7 @@ class Server:
         # However, while testing the code it is not possible to mock
         # sys.exit() since it would totally stop the execution rather
         # than simply breaking away from the loop.
-        while True: # pragma: no cover
+        while True:  # pragma: no cover
             connection, _ = self.socket.accept()
             thread = threading.Thread(
                 target=Server.handle_connection,
@@ -470,8 +475,7 @@ class Server:
 
     @staticmethod
     def handle_connection(
-        connection: socket.socket,
-        handler: Callable[[bytes], Optional[bytes]]
+        connection: socket.socket, handler: Callable[[bytes], Optional[bytes]]
     ) -> None:
         """Handle a socket connection.
 
@@ -553,7 +557,8 @@ def main(args: Optional[List[str]] = None) -> None:
         config.portserver_unix_socket_address.replace('@', '\0', 1),
     )
     logging.info(
-        'Serving portserver on %s' % config.portserver_unix_socket_address)
+        'Serving portserver on %s' % config.portserver_unix_socket_address
+    )
     try:
         server.run()
     except KeyboardInterrupt:
@@ -565,5 +570,5 @@ def main(args: Optional[List[str]] = None) -> None:
         sys.exit(0)
 
 
-if __name__ == '__main__': # pragma: no cover
+if __name__ == '__main__':  # pragma: no cover
     main()

@@ -305,7 +305,9 @@ describe('Translation Submitter', function () {
 
   it('should be able to use copy tool', async function () {
     // Check if anchor text for copy tool works properly.
-    await translationSubmitter.clickOn('Save and translate another');
+    await translationSubmitter.clickOnElementWithText(
+      'Save and translate another'
+    );
     await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.clickAndVerifyAnchorWithInnerText(
       'here',
@@ -318,7 +320,7 @@ describe('Translation Submitter', function () {
   });
 
   it('should be able to submit the translation', async function () {
-    await translationSubmitter.clickOn('Save and close');
+    await translationSubmitter.clickOnElementWithText('Save and close');
     await translationSubmitter.expectToastMessage(
       'Submitted translation for review.'
     );

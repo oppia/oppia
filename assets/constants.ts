@@ -87,6 +87,7 @@ export default {
     "Statistics", "Trigonometry", "Welcome"],
   "ACTIVITY_TYPE_EXPLORATION": "exploration",
   "ACTIVITY_TYPE_EXPLORATION_TRANSLATIONS": "exp_translations",
+  "ACTIVITY_TYPE_EXPLORATION_VOICEOVERS": "exp_voiceovers",
   "ACTIVITY_TYPE_COLLECTION": "collection",
   "ACTIVITY_TYPE_STORY": "story",
   "ACTIVITY_TYPE_SKILL": "skill",
@@ -95,6 +96,7 @@ export default {
   "ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE": "subtopic_with_study_guide",
   "ACTIVITY_TYPE_LEARN_TOPIC": "learntopic",
   "ACTIVITY_TYPE_CLASSROOM": "classroom",
+  "ACTIVITY_TYPE_QUESTIONS": "questions",
   "DISABLED_EXPLORATION_IDS": ["5"],
   "TESTING_CONSTANT": "test",
   "LIBRARY_TILE_WIDTH_PX": 208,
@@ -129,6 +131,8 @@ export default {
     "DecreasingUpcomingLaunches": "Most Upcoming Launches",
     "DecreasingOverdueLaunches": "Most Launches Behind Schedule"
   },
+
+  "MAX_QUESTIONS_FETCHABLE": 800,
 
   // Sorting categories for contributor admin dashboard.
   "CD_ADMIN_STATS_SORT_OPTIONS": {

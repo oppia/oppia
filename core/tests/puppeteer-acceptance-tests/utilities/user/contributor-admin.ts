@@ -69,7 +69,7 @@ export class ContributorAdmin extends BaseUser {
       const tabNameInLowerCase = tabName.toLocaleLowerCase().replace(' ', '-');
       const tabSelector = `.e2e-test-${tabNameInLowerCase}-tab`;
       await this.expectElementToBeVisible(tabSelector);
-      await this.clickOn(tabSelector);
+      await this.clickOnElementWithSelector(tabSelector);
 
       const activeTabSelector = `${activeTabInContributorAdminPageSelector} ${tabSelector}`;
       await this.expectTextContentToBe(
@@ -84,7 +84,7 @@ export class ContributorAdmin extends BaseUser {
    */
   async clickOnAddReviewerOrSubmitterButton(): Promise<void> {
     await this.expectElementToBeVisible(addContributorButtonSelector);
-    await this.clickOn(addContributorButtonSelector);
+    await this.clickOnElementWithSelector(addContributorButtonSelector);
 
     await this.expectElementToBeVisible(commonModalTitleSelector);
     await this.expectTextContentToContain(
@@ -107,7 +107,7 @@ export class ContributorAdmin extends BaseUser {
     const usernameInputSelector = `${commonModalContainerSelector} input`;
     await this.typeInInputField(usernameInputSelector, username);
 
-    await this.clickOn(addRightsButtonSelector);
+    await this.clickOnElementWithSelector(addRightsButtonSelector);
     await this.expectElementToBeVisible(addRightsButtonSelector, false);
   }
 

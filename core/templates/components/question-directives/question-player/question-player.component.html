@@ -26,7 +26,7 @@
         Beta
       </span>
       <div *ngIf="!questionsLoading && totalQuestions > 0">
-        <h2 class="oppia-question-player-header"
+        <h2 class="oppia-question-player-header e2e-test-practice-question-header"
             tabindex="0"
             [attr.aria-label]="'Question ' + currentQuestion + ' out of ' + totalQuestions">
           Question {{currentQuestion}}/{{totalQuestions}}

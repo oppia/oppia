@@ -32,13 +32,12 @@ LANGUAGE_CODE_TO_VOICEOVER_FILENAMES: Dict[str, str] = {
     'ar': 'arabic.mp3',
     'en': 'english.mp3',
     'hi': 'hindi.mp3',
-    'pt': 'portuguese.mp3'
+    'pt': 'portuguese.mp3',
 }
 
 
 def regenerate_speech_from_text(
-    _: str,
-    language_accent_code: str
+    _: str, language_accent_code: str
 ) -> Tuple[bytes, List[Dict[str, Union[str, float]]], Optional[str]]:
     """The method provides mock data to simulate the Azure text-to-speech
     synthesis service in the development environment.
@@ -60,7 +59,9 @@ def regenerate_speech_from_text(
     """
     language_code = (
         voiceover_services.get_language_code_from_language_accent_code(
-            language_accent_code))
+            language_accent_code
+        )
+    )
 
     if language_code not in LANGUAGE_CODE_TO_VOICEOVER_FILENAMES:
         # Default language code.
@@ -68,10 +69,12 @@ def regenerate_speech_from_text(
 
     assert isinstance(language_code, str)
     voiceover_filename: str = LANGUAGE_CODE_TO_VOICEOVER_FILENAMES[
-        language_code]
+        language_code
+    ]
 
     voiceover_path = os.path.join(
-        feconf.SAMPLE_AUTO_VOICEOVERS_DATA_DIR, voiceover_filename)
+        feconf.SAMPLE_AUTO_VOICEOVERS_DATA_DIR, voiceover_filename
+    )
 
     with open(voiceover_path, 'rb') as file:
         binary_audio_data = file.read()
@@ -85,8 +88,4 @@ def regenerate_speech_from_text(
         {'token': 'text', 'audio_offset_msecs': 400.0},
     ]
 
-    return (
-        binary_audio_data,
-        dummy_word_to_audio_offset,
-        error_details
-    )
+    return (binary_audio_data, dummy_word_to_audio_offset, error_details)
