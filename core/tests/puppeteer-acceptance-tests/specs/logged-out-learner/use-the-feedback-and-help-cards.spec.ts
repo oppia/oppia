@@ -72,6 +72,15 @@ describe('Logged-Out Learner', function () {
       '2',
       'Perfect!',
       CARD_NAME.FINAL_CARD,
+      true,
+      false
+    );
+    await explorationEditor.addResponsesToTheInteraction(
+      INTERACTION_TYPES.FRACTION_INPUT,
+      '9',
+      'Wrong!',
+      CARD_NAME.INTRODUCTION,
+      false,
       true
     );
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
@@ -167,6 +176,16 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.submitAnswer('2/3');
     await loggedOutLearner.viewSolution(180000);
     await loggedOutLearner.closeSolutionModal();
+  });
+
+  it('should be able to learn again on wrong answer', async function () {
+    await loggedOutLearner.submitAnswer('2/9');
+    await loggedOutLearner.expectNextCardButtonTextToBe('LEARN AGAIN');
+    await loggedOutLearner.continueToNextCard();
+    await loggedOutLearner.expectCardContentToMatch(
+      'Welcome, to the Place Values Exploration.'
+    );
+    await loggedOutLearner.continueToNextCard();
   });
 
   it('should be able to submit a correct answer and see the celebration pop-up', async function () {

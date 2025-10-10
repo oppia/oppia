@@ -19,7 +19,10 @@
 from __future__ import annotations
 
 from core.tests import test_utils
-from extensions.interactions.SetInput import SetInput # pylint: disable=unused-import # isort: skip
+
+from extensions.interactions.SetInput import (  # pylint: disable=unused-import # isort: skip
+    SetInput,
+)
 
 
 class SetInputTests(test_utils.GenericTestBase):

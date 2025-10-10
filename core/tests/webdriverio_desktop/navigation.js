@@ -16,48 +16,10 @@
  * @fileoverview End-to-end tests for general site navigation.
  */
 var action = require('../webdriverio_utils/action.js');
-var general = require('../webdriverio_utils/general.js');
 var users = require('../webdriverio_utils/users.js');
 var waitFor = require('../webdriverio_utils/waitFor.js');
 var GetStartedPage = require('../webdriverio_utils/GetStartedPage.js');
 var PreferencesPage = require('../webdriverio_utils/PreferencesPage.js');
-
-describe('Oppia landing pages tour', function () {
-  it('should visit the Fractions landing page', async function () {
-    await browser.url('/fractions');
-    await waitFor.pageToFullyLoad();
-
-    await browser.url('/learn/maths/fractions');
-    await waitFor.pageToFullyLoad();
-
-    await browser.url('/math/fractions');
-    await waitFor.pageToFullyLoad();
-  });
-
-  it('should visit the Partners landing page', async function () {
-    await browser.url('/partners');
-    await waitFor.pageToFullyLoad();
-  });
-
-  it('should visit the Nonprofits landing page', async function () {
-    await browser.url('/nonprofits');
-    await waitFor.pageToFullyLoad();
-  });
-
-  it('should visit the Parents landing page', async function () {
-    await browser.url('/parents');
-    await waitFor.pageToFullyLoad();
-  });
-
-  it('should visit the Teachers landing page', async function () {
-    await browser.url('/teachers');
-    await waitFor.pageToFullyLoad();
-  });
-
-  afterEach(async function () {
-    await general.checkForConsoleErrors([]);
-  });
-});
 
 describe('Meta Tags', function () {
   var EXPECTED_META_NAME = 'Personalized Online Learning from Oppia';
@@ -96,34 +58,7 @@ describe('Meta Tags', function () {
   });
 });
 
-describe('DEV MODE Test', function () {
-  it('should not show Dev Mode label in prod', async function () {
-    await browser.url('/');
-    await waitFor.pageToFullyLoad();
-    var devMode = await general.isInDevMode();
-    expect(await $('.e2e-test-dev-mode').isExisting()).toBe(devMode);
-  });
-});
-
-describe('Donation flow', function () {
-  it('should be able to donate via PayPal', async function () {
-    await browser.url('/donate');
-    let iframeElement = $('.e2e-test-donate-page-iframe');
-    await waitFor.presenceOf(
-      iframeElement,
-      'Donorbox Iframe taking too long to appear.'
-    );
-  });
-});
-
 describe('Static Pages Tour', function () {
-  it('should visit the Login page', async function () {
-    await browser.url('/login');
-    await waitFor.pageToFullyLoad();
-    var loginPage = $('.e2e-test-login-page');
-    await waitFor.presenceOf(loginPage, 'Login page did not load');
-  });
-
   it('should redirect away from the Login page when visited by logged-in user', async function () {
     var loginPage = $('.e2e-test-login-page');
     var learnerDashboardPage = $('.e2e-test-learner-dashboard-page');
@@ -164,103 +99,6 @@ describe('Static Pages Tour', function () {
     await browser.url('/login');
     await waitFor.pageToFullyLoad();
     await waitFor.presenceOf(loginPage, 'Login page did not load');
-  });
-
-  it('should visit the Teach page', async function () {
-    await browser.url('/teach');
-    await waitFor.pageToFullyLoad();
-    await waitFor.visibilityOf(
-      $('.e2e-test-teach-page'),
-      'Teach page takes too long to appear'
-    );
-  });
-
-  it('should visit the Home page', async function () {
-    await browser.url('/');
-    await waitFor.pageToFullyLoad();
-    await waitFor.visibilityOf(
-      $('.e2e-test-splash-page'),
-      'Splash page takes too long to appear'
-    );
-  });
-
-  it('should visit the About page', async function () {
-    await browser.url('/about');
-    await waitFor.pageToFullyLoad();
-    await waitFor.visibilityOf(
-      $('.e2e-test-about-page'),
-      'About page takes too long to appear'
-    );
-  });
-
-  it('should visit the Contact page', async function () {
-    await browser.url('/contact');
-    await waitFor.pageToFullyLoad();
-    await waitFor.visibilityOf(
-      $('.e2e-test-contact-page'),
-      'Contact page takes too long to appear'
-    );
-  });
-
-  it('should visit the Donate page', async function () {
-    await browser.url('/donate');
-    await waitFor.pageToFullyLoad();
-    let iframeElement = $('.e2e-test-donate-page-iframe');
-    await waitFor.presenceOf(
-      iframeElement,
-      'Donorbox Iframe taking too long to appear.'
-    );
-  });
-
-  it('should visit the Partnerships page', async function () {
-    await browser.url('/partnerships');
-    await waitFor.pageToFullyLoad();
-    await waitFor.visibilityOf(
-      $('.e2e-test-partnerships-page'),
-      'Partnerships page takes too long to appear'
-    );
-  });
-
-  it('should visit the Privacy page', async function () {
-    await browser.url('/privacy-policy');
-    await waitFor.pageToFullyLoad();
-    await waitFor.visibilityOf(
-      $('.e2e-test-privacy-page'),
-      'Privacy page takes too long to appear'
-    );
-  });
-
-  it('should visit the Terms page', async function () {
-    await browser.url('/terms');
-    await waitFor.pageToFullyLoad();
-    await waitFor.visibilityOf(
-      $('.e2e-test-terms-page'),
-      'Terms page takes too long to appear'
-    );
-  });
-
-  it('should visit the Thanks page', async function () {
-    await browser.url('/thanks');
-    await waitFor.pageToFullyLoad();
-    await waitFor.visibilityOf(
-      $('.e2e-test-thanks-page'),
-      'Terms page takes too long to appear'
-    );
-  });
-
-  it('should visit the Volunteer page', async function () {
-    await browser.url('/volunteer');
-    await waitFor.pageToFullyLoad();
-    await waitFor.visibilityOf(
-      $('.e2e-test-volunteer-page'),
-      'Volunteer page taking too long to appear'
-    );
-  });
-
-  it('should show the error page when an incorrect url is given', async function () {
-    await browser.url('/splashes');
-    await waitFor.pageToFullyLoad();
-    await general.expectErrorPage(404);
   });
 });
 

@@ -20,8 +20,7 @@ import copy
 import inspect
 import json
 
-from core import constants
-from core import feconf
+from core import constants, feconf
 from extensions.objects.models import objects
 
 from typing import Dict, List, Optional, Type, Union
@@ -46,12 +45,14 @@ class Registry:
 
         # Add new object instances to the registry.
         for name, clazz in inspect.getmembers(
-                objects, predicate=inspect.isclass):
+            objects, predicate=inspect.isclass
+        ):
             if name == 'BaseObject':
                 continue
 
             ancestor_names = [
-                base_class.__name__ for base_class in inspect.getmro(clazz)]
+                base_class.__name__ for base_class in inspect.getmro(clazz)
+            ]
 
             assert 'BaseObject' in ancestor_names
             cls.objects_dict[clazz.__name__] = clazz
