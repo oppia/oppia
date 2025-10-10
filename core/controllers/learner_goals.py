@@ -17,19 +17,14 @@
 from __future__ import annotations
 
 from core import feconf
-
 from core.constants import constants
-from core.controllers import acl_decorators
-from core.controllers import base
-from core.domain import learner_goals_services
-from core.domain import learner_progress_services
+from core.controllers import acl_decorators, base
+from core.domain import learner_goals_services, learner_progress_services
 
 from typing import Dict
 
 
-class LearnerGoalsHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class LearnerGoalsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Handles operations related to the learner goals."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -37,25 +32,22 @@ class LearnerGoalsHandler(
         'topic_id': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': r'^[a-zA-Z0-9\-_]{1,12}$'
-                }]
+                'validators': [
+                    {
+                        'id': 'is_regex_matched',
+                        'regex_pattern': r'^[a-zA-Z0-9\-_]{1,12}$',
+                    }
+                ],
             }
         },
         'activity_type': {
             'schema': {
                 'type': 'basestring',
-                'choices': [
-                    constants.ACTIVITY_TYPE_LEARN_TOPIC
-                ]
+                'choices': [constants.ACTIVITY_TYPE_LEARN_TOPIC],
             }
-        }
+        },
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
-        'POST': {},
-        'DELETE': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}, 'DELETE': {}}
 
     # Note: Currently this handler only accepts one type of activity
     # which is 'ACTIVITY_TYPE_LEARN_TOPIC', so 'activity_type' argument
@@ -65,7 +57,9 @@ class LearnerGoalsHandler(
     # body to handle the different activity cases properly.
     @acl_decorators.can_access_learner_dashboard
     def post(
-        self, activity_type: str, topic_id: str # pylint: disable=unused-argument
+        self,
+        activity_type: str,  # pylint: disable=unused-argument
+        topic_id: str,
     ) -> None:
         """Adds a topic to the learner's learning goals.
 
@@ -79,12 +73,16 @@ class LearnerGoalsHandler(
 
         belongs_to_learnt_list, goals_limit_exceeded = (
             learner_progress_services.validate_and_add_topic_to_learn_goal(
-                self.user_id, topic_id))
+                self.user_id, topic_id
+            )
+        )
 
-        self.values.update({
-            'belongs_to_learnt_list': belongs_to_learnt_list,
-            'goals_limit_exceeded': goals_limit_exceeded
-        })
+        self.values.update(
+            {
+                'belongs_to_learnt_list': belongs_to_learnt_list,
+                'goals_limit_exceeded': goals_limit_exceeded,
+            }
+        )
 
         self.render_json(self.values)
 
@@ -96,7 +94,9 @@ class LearnerGoalsHandler(
     # body to handle the different activity cases properly.
     @acl_decorators.can_access_learner_dashboard
     def delete(
-        self, activity_type: str, topic_id: str # pylint: disable=unused-argument
+        self,
+        activity_type: str,  # pylint: disable=unused-argument
+        topic_id: str,  # pylint: disable=unused-argument
     ) -> None:
         """Removes a topic from the learner's learning goals.
 
@@ -106,6 +106,7 @@ class LearnerGoalsHandler(
         """
         assert self.user_id is not None
         learner_goals_services.remove_topics_from_learn_goal(
-            self.user_id, [topic_id])
+            self.user_id, [topic_id]
+        )
 
         self.render_json(self.values)

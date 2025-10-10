@@ -17,7 +17,7 @@
     <div class="oppia-list-group-item-text list-group-item e2e-test-rte-skill-selector-item"
          *ngFor="let skill of skillsToShow"
          (click)="selectSkill(skill.id, skill.description)"
-         [ngClass]="{'list-group-item-success': (skill.id === value)}">
+         [ngClass]="{'list-group-item-success e2e-test-rte-skill-selected': (skill.id === value)}">
       <label class="list-group-item-heading">{{ skill.description }}</label>
       <div *ngIf="skill.id === value" class="oppia-skill-summary-text">
         <strong> Explanation </strong>

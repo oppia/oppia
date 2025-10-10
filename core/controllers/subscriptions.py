@@ -17,10 +17,8 @@
 from __future__ import annotations
 
 from core import feconf
-from core.controllers import acl_decorators
-from core.controllers import base
-from core.domain import subscription_services
-from core.domain import user_services
+from core.controllers import acl_decorators, base
+from core.domain import subscription_services, user_services
 
 from typing import Dict, TypedDict
 
@@ -34,10 +32,7 @@ class SubscribeHandlerNormalizedPayloadDict(TypedDict):
 
 
 class SubscribeHandler(
-    base.BaseHandler[
-        SubscribeHandlerNormalizedPayloadDict,
-        Dict[str, str]
-    ]
+    base.BaseHandler[SubscribeHandlerNormalizedPayloadDict, Dict[str, str]]
 ):
     """Handles operations relating to new subscriptions."""
 
@@ -48,9 +43,7 @@ class SubscribeHandler(
             'creator_username': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'is_valid_username_string'
-                    }]
+                    'validators': [{'id': 'is_valid_username_string'}],
                 }
             }
         }
@@ -78,10 +71,7 @@ class UnsubscribeHandlerNormalizedPayloadDict(TypedDict):
 
 
 class UnsubscribeHandler(
-    base.BaseHandler[
-        UnsubscribeHandlerNormalizedPayloadDict,
-        Dict[str, str]
-    ]
+    base.BaseHandler[UnsubscribeHandlerNormalizedPayloadDict, Dict[str, str]]
 ):
     """Handles operations related to unsubscriptions."""
 
@@ -92,9 +82,7 @@ class UnsubscribeHandler(
             'creator_username': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'is_valid_username_string'
-                    }]
+                    'validators': [{'id': 'is_valid_username_string'}],
                 }
             }
         }
@@ -106,14 +94,11 @@ class UnsubscribeHandler(
         assert self.user_id is not None
         assert self.normalized_payload is not None
         creator_username = self.normalized_payload['creator_username']
-        creator_id = user_services.get_user_id_from_username(
-            creator_username
-        )
+        creator_id = user_services.get_user_id_from_username(creator_username)
         if creator_id is None:
             raise Exception(
-                'No creator user_id found for the given creator username: %s' %
-                creator_username
+                'No creator user_id found for the given creator username: %s'
+                % creator_username
             )
-        subscription_services.unsubscribe_from_creator(
-            self.user_id, creator_id)
+        subscription_services.unsubscribe_from_creator(self.user_id, creator_id)
         self.render_json(self.values)
