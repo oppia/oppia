@@ -68,6 +68,7 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import
     user_bios_change_jobs,
     user_stats_computation_jobs,
     user_validation_jobs,
+    audit_topics_with_hanging_stories_job,
 )
 
 from typing import List, Type
