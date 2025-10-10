@@ -30,8 +30,6 @@ from core.domain import (
     subtopic_page_domain,
     topic_domain,
     topic_fetchers,
-    skill_fetchers,
-    question_fetchers,
 )
 from core.platform import models
 
