@@ -17,6 +17,7 @@
 """Services for the learner groups."""
 
 from __future__ import annotations
+
 from core import feature_flag_list
 from core.constants import constants
 from core.domain import (
