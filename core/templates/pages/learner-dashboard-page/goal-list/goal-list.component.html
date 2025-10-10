@@ -27,7 +27,7 @@
              [ngClass]="story.getAllNodes()[allCurrentNodes[i]]?.getPublishedStatus() ? 'oppia-learner-dash-button--default' : 'oppia-learner-dash-button--disabled'"
              [attr.href]="story.getAllNodes()[allCurrentNodes[i]]?.getPublishedStatus() ?
              getNodeLessonUrl(story, story.getAllNodes()[allCurrentNodes[i]]) : null">
-             {{ story.getAllNodes()[allCurrentNodes[i]]?.getPublishedStatus() ? ('I18N_LEARNER_DASHBOARD_CARD_BUTTON_START' | translate) : 'Coming Soon' }}
+             {{ story.getAllNodes()[allCurrentNodes[i]]?.getPublishedStatus() ? ('I18N_LEARNER_DASHBOARD_CARD_BUTTON_START' | translate) : ('I18N_LEARNER_STORY_TILE_COMING_SOON' | translate) }}
           </a>
         </div>
       </div>
@@ -48,7 +48,7 @@
                [ngClass]="allCurrentNodes[i] === j ? (storyNode.getPublishedStatus()  ? 'oppia-learner-dash-button--default' : 'oppia-learner-dash-button--disabled')
                : (storyNode.getPublishedStatus()  ? 'oppia-learner-dash-button--inverse oppia-learner-dash-button--incomplete-goal' : 'oppia-learner-dash-button--disabled')"
                [attr.href]="storyNode.getPublishedStatus()  ? getNodeLessonUrl(story, storyNode) : null">
-                {{ storyNode.getPublishedStatus()  ? ('I18N_LEARNER_DASHBOARD_CARD_BUTTON_START' | translate) : 'Coming Soon' }}
+                {{ storyNode.getPublishedStatus()  ? ('I18N_LEARNER_DASHBOARD_CARD_BUTTON_START' | translate) : ('I18N_LEARNER_STORY_TILE_COMING_SOON' | translate) }}
             </a>
           </div>
           <div class="goal-list-story-node-line-container">
