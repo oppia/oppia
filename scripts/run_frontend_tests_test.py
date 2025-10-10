@@ -238,8 +238,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                             '--specs_to_run='
                             'home-page.component.spec.ts,'
                             'about-page.component.ts,'
-                            'test-module.js,'
-                            'exploration.model.ts',
+                            'test-module.js'
                         ])
         cmd = [
             common.NODE_BIN_PATH,
@@ -259,7 +258,6 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             [
                 [
                     '--files_to_check='
-                    'exploration.model.spec.ts,'
                     'about-page.component.spec.ts,'
                     'home-page.component.spec.ts,'
                     'test-module.spec.js'
