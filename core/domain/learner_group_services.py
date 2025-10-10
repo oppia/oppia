@@ -278,6 +278,9 @@ def get_matching_learner_group_syllabus_to_add(
         language_code: str. The language of the topics in which the stories
             and subtopics are to be searched.
 
+    Raises:
+        Exception. Topic with id could not be fetched.
+
     Returns:
         dict. The matching syllabus items to add to the learner group.
     """
@@ -325,7 +328,7 @@ def get_matching_learner_group_syllabus_to_add(
                 raise Exception(
                     'Topic with id %s could not be fetched: %s'
                     % (topic_summary.id, e)
-                )
+                ) from e
 
     keyword = keyword.lower()
     for topic in matching_topics:
