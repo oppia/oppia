@@ -313,7 +313,21 @@ def get_matching_learner_group_syllabus_to_add(
             topic_fetchers.get_topics_by_ids(matching_topic_ids, strict=True)
         )
     else:
-        matching_topics = topic_fetchers.get_all_topics()
+        published_topics_summary = (
+            topic_fetchers.get_published_topic_summaries()
+        )
+        matching_topics = []
+        for topic_summary in published_topics_summary:
+            try:
+                topic = topic_fetchers.get_topic_by_id(
+                    topic_summary.id, strict=True
+                )
+                matching_topics.append(topic)
+            except Exception as e:
+                logging.error(
+                    'Topic with id %s could not be fetched: %s'
+                    % (topic_summary.id, e)
+                )
 
     keyword = keyword.lower()
     for topic in matching_topics:
@@ -344,19 +358,11 @@ def get_matching_learner_group_syllabus_to_add(
                 constants.LEARNER_GROUP_ADD_SKILL_FILTER,
                 constants.DEFAULT_ADD_SYLLABUS_FILTER,
             ):
-                # Need to show only the topics which have a number of question greater
-                # than 10.
-                skill_ids= topic.get_all_skill_ids()
-                questions, _ = question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
-                10, skill_ids, 0
-                )
-                question_count = len(questions)
-                if(question_count == 10):
-                    matching_subtopics_dicts.extend(
-                        get_matching_subtopic_syllabus_item_dicts(
-                            topic, group_subtopic_page_ids
-                        )
+                matching_subtopics_dicts.extend(
+                    get_matching_subtopic_syllabus_item_dicts(
+                        topic, group_subtopic_page_ids
                     )
+                )
         else:
             # If search type is set to default or search type is set to
             # 'Skill', add the subtopics which have the keyword in their
@@ -365,19 +371,11 @@ def get_matching_learner_group_syllabus_to_add(
                 constants.LEARNER_GROUP_ADD_SKILL_FILTER,
                 constants.DEFAULT_ADD_SYLLABUS_FILTER,
             ):
-                # Need to show only the topics which have a number of question greater
-                # than 10.
-                skill_ids= topic.get_all_skill_ids()
-                questions, _ = question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
-                10, skill_ids, 0
-                )
-                question_count = len(questions)
-                if(question_count == 10):
-                    matching_subtopics_dicts.extend(
-                        get_matching_subtopic_syllabus_item_dicts(
-                            topic, group_subtopic_page_ids, keyword
-                        )
+                matching_subtopics_dicts.extend(
+                    get_matching_subtopic_syllabus_item_dicts(
+                        topic, group_subtopic_page_ids, keyword
                     )
+                )
 
             # If search type is set to default or search type is set to
             # 'Story', add all story ids of this topic to the possible
@@ -468,7 +466,7 @@ def get_matching_story_syllabus_item_dicts(
         )
     ]
     matching_stories = story_fetchers.get_story_summaries_by_ids(story_ids)
-    stories = story_fetchers.get_stories_by_ids(story_ids)
+    stories = story_fetchers.get_stories_by_ids(story_ids, strict=True)
 
     matching_story_syllabus_item_dicts: List[
         story_domain.LearnerGroupSyllabusStorySummaryDict
