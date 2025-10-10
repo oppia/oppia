@@ -610,3 +610,174 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             topic_fetchers.get_multi_topic_rights(
                 ['invalid_topic_id'], strict=True
             )
+
+    def test_get_multiple_topics_by_ids_and_version(self) -> None:
+        """Test fetching multiple topics with specific versions."""
+        topic_1_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_1_id, self.user_id, name='Original Topic 1',
+            abbreviated_name='topic-1', url_fragment='topic-one',
+            description='Original Description 1',
+            canonical_story_ids=[], additional_story_ids=[],
+            uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=1)
+
+        topic_2_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_2_id, self.user_id, name='Original Topic 2',
+            abbreviated_name='topic-2', url_fragment='topic-two',
+            description='Original Description 2',
+            canonical_story_ids=[], additional_story_ids=[],
+            uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=1)
+
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+            'property_name': topic_domain.TOPIC_PROPERTY_NAME,
+            'old_value': 'Original Topic 1',
+            'new_value': 'Updated Topic 1'
+        })]
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id, topic_1_id, changelist, 'Update topic 1 name')
+
+        results = topic_fetchers.get_multiple_topics_by_ids_and_version([
+            (topic_1_id, 1),
+            (topic_1_id, 2),
+            (topic_2_id, 1),
+            (topic_1_id, None),
+            ('nonexistent', 1),
+        ])
+
+        self.assertEqual(len(results), 5)
+
+        self.assertIsNotNone(results[0])
+        assert results[0] is not None
+        self.assertEqual(results[0].id, topic_1_id)
+        self.assertEqual(results[0].name, 'Original Topic 1')
+        self.assertEqual(results[0].version, 1)
+
+        self.assertIsNotNone(results[1])
+        assert results[1] is not None
+        self.assertEqual(results[1].id, topic_1_id)
+        self.assertEqual(results[1].name, 'Updated Topic 1')
+        self.assertEqual(results[1].version, 2)
+
+        self.assertIsNotNone(results[2])
+        assert results[2] is not None
+        self.assertEqual(results[2].id, topic_2_id)
+        self.assertEqual(results[2].name, 'Original Topic 2')
+        self.assertEqual(results[2].version, 1)
+
+        self.assertIsNotNone(results[3])
+        assert results[3] is not None
+        self.assertEqual(results[3].id, topic_1_id)
+        self.assertEqual(results[3].name, 'Updated Topic 1')
+        self.assertEqual(results[3].version, 2)
+
+        self.assertIsNone(results[4])
+
+    def test_get_multiple_topics_by_ids_and_version_with_invalid_version(
+        self
+    ) -> None:
+        """Test fetching topics with invalid version numbers."""
+        topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id, self.user_id, name='Topic',
+            abbreviated_name='topic', url_fragment='topic',
+            description='Description',
+            canonical_story_ids=[], additional_story_ids=[],
+            uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=1)
+
+        results = topic_fetchers.get_multiple_topics_by_ids_and_version([
+            (topic_id, 999)
+        ])
+        self.assertEqual(len(results), 1)
+        self.assertIsNone(results[0])
+
+    def test_get_multiple_topics_by_ids_and_version_deleted(self) -> None:
+        """Test fetching deleted topics returns None."""
+        topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id, self.user_id, name='Topic',
+            abbreviated_name='topic', url_fragment='topic',
+            description='Description',
+            canonical_story_ids=[], additional_story_ids=[],
+            uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=1)
+        topic_services.delete_topic(self.user_id, topic_id)
+
+        results = topic_fetchers.get_multiple_topics_by_ids_and_version([
+            (topic_id, 1)
+        ])
+        self.assertEqual(len(results), 1)
+        self.assertIsNone(results[0])
+
+    def test_get_multiple_topics_by_ids_and_version_empty_list(self) -> None:
+        """Test fetching with empty list of IDs."""
+        results = topic_fetchers.get_multiple_topics_by_ids_and_version([])
+        self.assertEqual(results, [])
+
+    def test_get_multiple_topics_by_ids_and_version_schema_versions(
+        self
+    ) -> None:
+        """Test fetching topics maintains correct schema versions."""
+        topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id, self.user_id, name='Topic',
+            abbreviated_name='topic', url_fragment='topic',
+            description='Description',
+            canonical_story_ids=[], additional_story_ids=[],
+            uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=1)
+
+        results = topic_fetchers.get_multiple_topics_by_ids_and_version([
+            (topic_id, 1)
+        ])
+        self.assertEqual(len(results), 1)
+        self.assertIsNotNone(results[0])
+        assert results[0] is not None
+        self.assertEqual(
+            results[0].subtopic_schema_version,
+            feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION)
+        self.assertEqual(
+            results[0].story_reference_schema_version,
+            feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION)
+
+    def test_get_multiple_topics_by_ids_and_version_subtopics(self) -> None:
+        """Test fetching topics with subtopics returns correct data."""
+        topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id, self.user_id, name='Topic',
+            abbreviated_name='topic', url_fragment='topic',
+            description='Description',
+            canonical_story_ids=[], additional_story_ids=[],
+            uncategorized_skill_ids=[], subtopics=[], next_subtopic_id=1)
+
+        changelist = [
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'title': 'Subtopic 1',
+                'subtopic_id': 1,
+                'url_fragment': 'subtopic-one'
+            }),
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'title': 'Subtopic 2',
+                'subtopic_id': 2,
+                'url_fragment': 'subtopic-two'
+            })
+        ]
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id, topic_id, changelist, 'Added subtopics')
+
+        results = topic_fetchers.get_multiple_topics_by_ids_and_version([
+            (topic_id, 2)
+        ])
+        self.assertEqual(len(results), 1)
+        self.assertIsNotNone(results[0])
+        assert results[0] is not None
+
+        subtopics = results[0].subtopics
+        self.assertEqual(len(subtopics), 2)
+        self.assertEqual(subtopics[0].id, 1)
+        self.assertEqual(subtopics[0].title, 'Subtopic 1')
+        self.assertEqual(subtopics[0].url_fragment, 'subtopic-one')
+        self.assertEqual(subtopics[1].id, 2)
+        self.assertEqual(subtopics[1].title, 'Subtopic 2')
+        self.assertEqual(subtopics[1].url_fragment, 'subtopic-two')
