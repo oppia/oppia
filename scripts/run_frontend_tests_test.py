@@ -253,7 +253,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             'test-module.spec.js',
         ]
         self.assertIn(cmd, self.cmd_token_list)
-        self.assertTrue(self.frontend_coverage_checks_called)   
+        self.assertTrue(self.frontend_coverage_checks_called)
         self.assertEqual(
             self.frontend_coverage_checks_args,
             [
