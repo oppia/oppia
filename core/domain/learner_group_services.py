@@ -322,7 +322,7 @@ def get_matching_learner_group_syllabus_to_add(
                 )
                 matching_topics.append(topic)
             except Exception as e:
-                logging.error(
+                raise Exception(
                     'Topic with id %s could not be fetched: %s'
                     % (topic_summary.id, e)
                 )
