@@ -30,6 +30,8 @@ from core.domain import (
 from core.platform import models
 from core.tests import test_utils
 
+from typing import Literal, Optional, Union
+
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import user_models
@@ -346,10 +348,13 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         # Test that get_matching_learner_group_syllabus_to_add raises an
         # exception when a published topic cannot be fetched.
 
-        def mock_get_topic_by_id(topic_id, strict):
+        def mock_get_topic_by_id(
+            topic_id: str,
+            strict: Union[Literal[True], Literal[False]],
+        ) -> Optional[topic_domain.Topic]:
             if topic_id == self.TOPIC_ID_0:
                 raise Exception('Topic not found')
-            return topic_fetchers.get_topic_by_id(topic_id, strict)
+            return topic_fetchers.get_topic_by_id(topic_id, strict=strict)
 
         with self.assertRaisesRegex(
             Exception,
