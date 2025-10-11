@@ -139,7 +139,6 @@ def get_file_spec(file_path: str) -> str | None:
     if file_path.endswith(
         ('.spec.ts', '.spec.js', 'Spec.js')
     ) and os.path.exists(file_path):
-        
         return file_path
 
     if file_path.endswith(('.ts', '.js')):
