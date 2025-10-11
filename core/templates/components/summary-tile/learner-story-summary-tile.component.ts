@@ -161,6 +161,15 @@ export class LearnerStorySummaryTileComponent implements OnInit {
     return 'height: 144px; width: 192px;';
   }
 
+  isNewChapterVisible(): boolean {
+    const firstPub = this.storyNode.getFirstPublicationDateMsecs();
+    if (!firstPub) return false;
+
+    const diffDays = (Date.now() - Number(firstPub)) / (1000 * 60 * 60 * 24);
+    const visited = this.storySummary.getVisitedChapterTitles() || [];
+    return diffDays < 28 && !visited.includes(this.storyNode.getTitle());
+  }
+
   onStoryClick(event: Event): void {
     if (!this.statusIsPublished) {
       event.preventDefault();

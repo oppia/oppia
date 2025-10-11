@@ -45,6 +45,7 @@ export class LessonCardComponent implements OnInit {
   title!: string;
   lessonTopic!: string;
   statusIsPublished!: boolean;
+  storyNode: StoryNode;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -134,7 +135,7 @@ export class LessonCardComponent implements OnInit {
       }
     }
     // TODO(#18384): Returns next unplayed node from the earliest completed node. Does not account for if played out of order.
-
+    this.storyNode = storyModel.getAllNodes()[nextStory];
     this.lessonUrl = this.getStorySummaryLessonUrl(
       storyModel.getClassroomUrlFragment(),
       storyModel.getTopicUrlFragment(),
@@ -223,6 +224,16 @@ export class LessonCardComponent implements OnInit {
       currentStory.getId()
     );
     return resultUrl;
+  }
+
+  isNewChapterVisible(): boolean {
+    if (!this.storyNode || !(this.story instanceof StorySummary)) return false;
+    const firstPub = this.storyNode.getFirstPublicationDateMsecs();
+    if (!firstPub) return false;
+
+    const diffDays = (Date.now() - Number(firstPub)) / (1000 * 60 * 60 * 24);
+    const visited = this.story.getVisitedChapterTitles() || [];
+    return diffDays < 28 && !visited.includes(this.storyNode.getTitle());
   }
 
   getButtonTranslationKey(): string {

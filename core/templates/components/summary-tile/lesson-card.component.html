@@ -8,6 +8,9 @@
         <span aria-hidden="true" class="fas fa-bullseye lesson-card-tags-icon"></span>
         <p class="lesson-card-tags-text"> {{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION' | translate }} </p>
       </div>
+      <div class="classroom-new-chapter" *ngIf="isNewChapterVisible()">
+        <p class="classroom-status">New</p>
+      </div>
     </div>
   </div>
   <div class="bg-white d-flex flex-column lesson-card-info justify-content-between">
@@ -36,6 +39,29 @@
 </div>
 
 <style>
+  .classroom-new-chapter{
+    align-items: center;
+    background:  #00609C;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: row;
+    height: 24px;
+    justify-content: center;
+    padding: 5px;
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    width: 38px;
+    width: 42px;
+  }
+  .classroom-new-chapter .classroom-status {
+    color: #ffffff;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 13px;
+    font-style: Bold;
+    font-weight: 700;
+    line-height: 100%;
+  }
   .lesson-card-button {
     background-color: #fff;
     border: 1px solid #00645c;
