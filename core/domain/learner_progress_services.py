@@ -349,6 +349,19 @@ def mark_topic_as_learnt(user_id: str, topic_id: str) -> None:
         topic_id: str. The id of the learnt topic.
     """
 
+    all_story_ids_in_topic = topic_fetchers.get_story_ids_linked_to_topic(
+        topic_id
+    )
+    completed_story_ids = get_all_completed_story_ids(user_id)
+
+    all_completed = all(
+        story_id in completed_story_ids for story_id in all_story_ids_in_topic
+    )
+
+    if not all_completed:
+        record_topic_started(user_id, topic_id)
+        return
+
     completed_activities_model = user_models.CompletedActivitiesModel.get(
         user_id, strict=False
     )
@@ -356,6 +369,7 @@ def mark_topic_as_learnt(user_id: str, topic_id: str) -> None:
         completed_activities_model = user_models.CompletedActivitiesModel(
             id=user_id
         )
+
     topic_ids_to_learn = learner_goals_services.get_all_topic_ids_to_learn(
         user_id
     )
