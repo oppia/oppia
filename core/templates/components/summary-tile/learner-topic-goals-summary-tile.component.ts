@@ -165,8 +165,9 @@ export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
 
   isNewChapterVisible(): boolean {
     const firstPub = this.storyNode.getFirstPublicationDateMsecs();
-    if (!firstPub) return false;
-
+    if (!firstPub) {
+      return false;
+    }
     const diffDays = (Date.now() - Number(firstPub)) / (1000 * 60 * 60 * 24);
     const visited = this.storySummaryToDisplay.getVisitedChapterTitles() || [];
     return diffDays < 28 && !visited.includes(this.storyNode.getTitle());

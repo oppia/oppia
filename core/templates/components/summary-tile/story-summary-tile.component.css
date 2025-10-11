@@ -65,9 +65,9 @@ oppia-story-summary-tile .chapter-title {
 }
 
 oppia-story-summary-tile .incomplete-chapter {
-  margin-left: 30px;
   display: flex;
   justify-content: space-between;
+  margin-left: 30px;
 }
 
 oppia-story-summary-tile .complete-chapter {
@@ -338,10 +338,10 @@ oppia-story-summary-tile .stories-can-play {
   }
 
   oppia-story-summary-tile .chapter-text {
-    margin-top: 10px;
     display: flex;
-    justify-content: space-between;
     flex: 1;
+    justify-content: space-between;
+    margin-top: 10px;
   }
 
   oppia-story-summary-tile .story-status-element {
@@ -364,27 +364,27 @@ oppia-story-summary-tile .up-caret-position {
   width: 24px;
 }
 
-oppia-story-summary-tile .classroom-new-chapter{
-    align-items: center;
-    background: #106502;
-    border-radius: 4px;
-    display: flex;
-    flex-direction: row;
-    height: 24px;
-    justify-content: center;
-    padding: 5px;
-    width: 42px;
-    margin-right: 4px;
-  }
+oppia-story-summary-tile .classroom-new-chapter {
+  align-items: center;
+  background: #106502;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: row;
+  height: 24px;
+  justify-content: center;
+  margin-right: 4px;
+  padding: 5px;
+  width: 42px;
+}
 
 oppia-story-summary-tile .classroom-new-chapter .classroom-status {
-    color: #ffffff;
-    font-family: 'Roboto', Arial, sans-serif;
-    font-size: 13px;
-    font-style: Bold;
-    font-weight: 700;
-    line-height: 100%;
-  }
+  color: #fff;
+  font-family: 'Roboto', Arial, sans-serif;
+  font-size: 13px;
+  font-style: Bold;
+  font-weight: 700;
+  line-height: 100%;
+}
 
 :lang(ar) .oppia-story-summary-tile .story-progress-svg {
   transform: rotate(270deg);
