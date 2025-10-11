@@ -282,6 +282,19 @@ export class StorySummaryTileComponent implements OnInit {
     this.getStoryStatus();
   }
 
+  isNewChapterVisible(node: StoryNode): boolean {
+    const firstPub = node.getFirstPublicationDateMsecs();
+    if (!firstPub) return false;
+
+    const now = Date.now();
+    const diffDays = (now - Number(firstPub)) / (1000 * 60 * 60 * 24);
+
+    // Show "New" if published within 28 days and not yet completed
+    return (
+      diffDays <= 28 && !this.storySummary.isNodeCompleted(node.getTitle())
+    );
+  }
+
   isHackyStoryTitleTranslationDisplayed(): boolean {
     return (
       this.i18nLanguageCodeService.isHackyTranslationAvailable(
