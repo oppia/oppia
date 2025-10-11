@@ -45,7 +45,7 @@ export class LessonCardComponent implements OnInit {
   title!: string;
   lessonTopic!: string;
   statusIsPublished!: boolean;
-  storyNode: StoryNode;
+  storyNode!: StoryNode;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
