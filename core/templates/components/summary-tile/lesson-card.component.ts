@@ -230,7 +230,7 @@ export class LessonCardComponent implements OnInit {
     if (!this.storyNode || !(this.story instanceof StorySummary)) {
       return false;
     }
-    const firstPub = this.storyNode.getFirstPublicationDateMsecs();
+    const firstPub = this.storyNode?.getFirstPublicationDateMsecs();
     if (!firstPub) {
       return false;
     }

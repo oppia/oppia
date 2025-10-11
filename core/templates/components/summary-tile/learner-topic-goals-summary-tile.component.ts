@@ -164,7 +164,7 @@ export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
   }
 
   isNewChapterVisible(): boolean {
-    const firstPub = this.storyNode.getFirstPublicationDateMsecs();
+    const firstPub = this.storyNode?.getFirstPublicationDateMsecs();
     if (!firstPub) {
       return false;
     }
