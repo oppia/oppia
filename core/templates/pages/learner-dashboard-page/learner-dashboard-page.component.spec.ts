@@ -302,7 +302,7 @@ describe('Learner dashboard page', () => {
     isLoggedIn: () => true,
   };
 
-  describe('when succesfully fetching learner dashboard data', () => {
+  describe('when successfully fetching learner dashboard data', () => {
     beforeEach(async(() => {
       mockResizeEmitter = new EventEmitter();
       TestBed.configureTestingModule({
@@ -582,6 +582,124 @@ describe('Learner dashboard page', () => {
       flush();
       fixture.detectChanges();
       flush();
+    }));
+
+    it('should populate curated exploration IDs from topics with canonical story summaries', fakeAsync(() => {
+      (
+        learnerDashboardBackendApiService.fetchLearnerDashboardTopicsAndStoriesDataAsync as jasmine.Spy
+      ).and.returnValue(
+        Promise.resolve({
+          completedStoriesList: [],
+          learntTopicsList: [],
+          partiallyLearntTopicsList: [],
+          topicsToLearnList: [],
+          allTopicsList: [
+            {
+              id: 'topic1',
+              getCanonicalStorySummaryDicts: () => [
+                {
+                  getAllNodes: () => [
+                    {getExplorationId: () => '1'},
+                    {getExplorationId: () => '2'},
+                  ],
+                },
+              ],
+            },
+          ],
+          untrackedTopics: {},
+          completedToIncompleteStories: [],
+          learntToPartiallyLearntTopics: [],
+          numberOfNonexistentTopicsAndStories:
+            NonExistentTopicsAndStories.createFromBackendDict({
+              number_of_nonexistent_topics: 0,
+              number_of_nonexistent_stories: 0,
+            }),
+        })
+      );
+
+      component.ngOnInit();
+      flush();
+      fixture.detectChanges();
+
+      expect(component.curatedExplorationIds).toBeDefined();
+      expect(component.curatedExplorationIds.size).toBe(2);
+      expect(component.curatedExplorationIds.has('1')).toBeTrue();
+      expect(component.curatedExplorationIds.has('2')).toBeTrue();
+    }));
+
+    it('should handle topics without canonical story summary dicts gracefully', fakeAsync(() => {
+      (
+        learnerDashboardBackendApiService.fetchLearnerDashboardTopicsAndStoriesDataAsync as jasmine.Spy
+      ).and.returnValue(
+        Promise.resolve({
+          completedStoriesList: [],
+          learntTopicsList: [],
+          partiallyLearntTopicsList: [],
+          topicsToLearnList: [],
+          allTopicsList: [
+            {
+              id: 'topic2',
+              getCanonicalStorySummaryDicts: () => [],
+            },
+          ],
+          untrackedTopics: {},
+          completedToIncompleteStories: [],
+          learntToPartiallyLearntTopics: [],
+          numberOfNonexistentTopicsAndStories:
+            NonExistentTopicsAndStories.createFromBackendDict({
+              number_of_nonexistent_topics: 0,
+              number_of_nonexistent_stories: 0,
+            }),
+        })
+      );
+
+      component.ngOnInit();
+      flush();
+      fixture.detectChanges();
+
+      expect(component.curatedExplorationIds).toBeDefined();
+      expect(component.curatedExplorationIds.size).toBe(0);
+    }));
+
+    it('should skip null explorationIds when building curatedExplorationIds', fakeAsync(() => {
+      (
+        learnerDashboardBackendApiService.fetchLearnerDashboardTopicsAndStoriesDataAsync as jasmine.Spy
+      ).and.returnValue(
+        Promise.resolve({
+          completedStoriesList: [],
+          learntTopicsList: [],
+          partiallyLearntTopicsList: [],
+          topicsToLearnList: [],
+          allTopicsList: [
+            {
+              id: 'topic3',
+              getCanonicalStorySummaryDicts: () => [
+                {
+                  getAllNodes: () => [
+                    {getExplorationId: () => 'exp1'},
+                    {getExplorationId: () => null},
+                  ],
+                },
+              ],
+            },
+          ],
+          untrackedTopics: {},
+          completedToIncompleteStories: [],
+          learntToPartiallyLearntTopics: [],
+          numberOfNonexistentTopicsAndStories:
+            NonExistentTopicsAndStories.createFromBackendDict({
+              number_of_nonexistent_topics: 0,
+              number_of_nonexistent_stories: 0,
+            }),
+        })
+      );
+
+      component.ngOnInit();
+      flush();
+      fixture.detectChanges();
+
+      expect(component.curatedExplorationIds.size).toBe(1);
+      expect(component.curatedExplorationIds.has('exp1')).toBeTrue();
     }));
 
     it(
@@ -1031,6 +1149,38 @@ describe('Learner dashboard page', () => {
         expect(fetchDataSpy).toHaveBeenCalled();
       })
     );
+
+    it('should show an alert warning when fails to get explorations data', fakeAsync(() => {
+      spyOn(
+        learnerDashboardBackendApiService,
+        'fetchLearnerDashboardTopicsAndStoriesDataAsync'
+      ).and.resolveTo({
+        completedStoriesList: [],
+        learntTopicsList: [],
+        partiallyLearntTopicsList: [],
+        topicsToLearnList: [],
+        untrackedTopics: {},
+        allTopicsList: [],
+        learntToPartiallyLearntTopics: [],
+      });
+
+      const fetchExplorationsSpy = spyOn(
+        learnerDashboardBackendApiService,
+        'fetchLearnerDashboardExplorationsDataAsync'
+      ).and.rejectWith(404);
+
+      const alertsSpy = spyOn(alertsService, 'addWarning').and.callThrough();
+
+      component.ngOnInit();
+
+      tick();
+      fixture.detectChanges();
+
+      expect(fetchExplorationsSpy).toHaveBeenCalled();
+      expect(alertsSpy).toHaveBeenCalledWith(
+        'Failed to get learner dashboard explorations data'
+      );
+    }));
 
     it(
       'should show an alert warning when fails to get collections data' +

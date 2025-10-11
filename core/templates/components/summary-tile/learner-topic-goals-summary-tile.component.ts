@@ -38,6 +38,7 @@ export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
   @Input() displayArea!: string;
   @Input() topicName!: string;
   incompleteStoryNodes!: StoryNode[];
+  storyNode!: StoryNode;
   storySummaryToDisplay!: StorySummary;
   storyName!: string;
   storyProgress!: number;
@@ -51,6 +52,7 @@ export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
   isStoryChapterDisplayed: boolean = false;
   cardIsHovered: boolean = false;
   openInNewWindow: boolean = false;
+  statusIsPublished!: boolean;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -142,6 +144,12 @@ export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
         this.storySummaryToDisplay.getAllNodes().length;
       let completedNodesCount =
         this.storySummaryToDisplay.getCompletedNodeTitles().length;
+      const allNodes = this.storySummaryToDisplay.getAllNodes();
+      if (allNodes.length > completedNodesCount) {
+        this.storyNode = allNodes[completedNodesCount];
+      }
+
+      this.statusIsPublished = this.storyNode?.getPublishedStatus();
       this.storyProgress = Math.floor(
         (completedNodesCount / totalStoryNodesCount) * 100
       );
@@ -153,5 +161,11 @@ export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
       return '-webkit-filter: blur(2px); filter: blur(2px);';
     }
     return 'height: 144px; width: 192px;';
+  }
+
+  onStoryClick(event: Event): void {
+    if (!this.statusIsPublished) {
+      event.preventDefault();
+    }
   }
 }
