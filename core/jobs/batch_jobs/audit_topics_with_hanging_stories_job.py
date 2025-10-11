@@ -29,12 +29,11 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-from typing import Dict, Iterable, List, Set, Tuple
+from typing import Iterable, List, Tuple
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import topic_models
-    from mypy_imports import story_models
+    from mypy_imports import story_models, topic_models
 
 (topic_models, story_models) = models.Registry.import_models(
     [models.Names.TOPIC, models.Names.STORY]
@@ -81,8 +80,7 @@ class AuditTopicsWithHangingStoriesJob(base_jobs.JobBase):
             | 'Format the results'
             >> beam.Map(
                 lambda result: job_run_result.JobRunResult.as_stdout(
-                    f"Topic with ID: '{result[0]}' has hanging story references: "
-                    f"{', '.join(result[1])}."
+                    f'Topic with ID: {result[0]} has hanging story references: {", ".join(result[1])}.'
                 )
             )
         )
@@ -103,12 +101,12 @@ class FindHangingStoriesInTopic(beam.DoFn):  # type: ignore[misc]
         """Checks a topic for canonical story references that don't exist.
 
         Args:
-            topic_model: The TopicModel to check.
-            all_story_ids: A list containing all existing story IDs. This is
-                           passed as a side input.
+            topic_model: TopicModel. The TopicModel to check.
+            all_story_ids: List[str]. A list containing all existing story IDs.
+                This is passed as a side input.
 
         Yields:
-            A tuple of (topic_id, list_of_hanging_story_ids).
+            Tuple[str, List[str]]. A tuple of (topic_id, list_of_hanging_story_ids).
         """
         all_story_ids_set = set(all_story_ids)
         hanging_story_ids: List[str] = []
