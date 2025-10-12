@@ -282,7 +282,7 @@ export class StorySummaryTileComponent implements OnInit {
     this.getStoryStatus();
   }
 
-  isNewChapterVisible(node: StoryNode): boolean {
+  isNewChapterLabelVisible(node: StoryNode): boolean {
     const firstPub = node.getFirstPublicationDateMsecs();
     if (!firstPub) {
       return false;

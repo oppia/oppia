@@ -198,4 +198,72 @@ describe('Learner Topic Goals Summary Tile Component', () => {
 
     expect(mockEvent.preventDefault).not.toHaveBeenCalled();
   });
+
+  describe('when checking if new Label is visible', () => {
+    interface MockStoryNodeInterface {
+      getTitle: () => string;
+      getFirstPublicationDateMsecs: () => number | null;
+    }
+    let mockStoryNode: jasmine.SpyObj<MockStoryNodeInterface>;
+    const RECENT_PUB_DATE = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    const OLD_PUB_DATE = Date.now() - 30 * 24 * 60 * 60 * 1000;
+    const CHAPTER_TITLE = 'The Chapter Title for Testing';
+
+    beforeEach(() => {
+      mockStoryNode = jasmine.createSpyObj('StoryNode', [
+        'getTitle',
+        'getFirstPublicationDateMsecs',
+      ]);
+      component.storyNode = mockStoryNode;
+
+      spyOn(
+        component.storySummaryToDisplay,
+        'getVisitedChapterTitles'
+      ).and.returnValue(['Other Chapter Title', CHAPTER_TITLE]);
+    });
+
+    it('should return FALSE if chapter is NEW (<28 days) AND visited', () => {
+      mockStoryNode.getFirstPublicationDateMsecs.and.returnValue(
+        RECENT_PUB_DATE
+      );
+      mockStoryNode.getTitle.and.returnValue(CHAPTER_TITLE);
+
+      const isVisible = component.isNewChapterLabelVisible();
+      expect(isVisible).toBe(false);
+    });
+
+    it('should return FALSE if chapter is OLD (>=28 days) AND visited', () => {
+      mockStoryNode.getFirstPublicationDateMsecs.and.returnValue(OLD_PUB_DATE);
+      mockStoryNode.getTitle.and.returnValue(CHAPTER_TITLE);
+
+      const isVisible = component.isNewChapterLabelVisible();
+      expect(isVisible).toBe(false);
+    });
+
+    it('should return FALSE if chapter is OLD (>=28 days) and NOT visited', () => {
+      mockStoryNode.getFirstPublicationDateMsecs.and.returnValue(OLD_PUB_DATE);
+      mockStoryNode.getTitle.and.returnValue('Unvisited Old Chapter');
+
+      const isVisible = component.isNewChapterLabelVisible();
+      expect(isVisible).toBe(false);
+    });
+
+    it('should return TRUE if chapter is NEW (<28 days) and NOT visited', () => {
+      mockStoryNode.getFirstPublicationDateMsecs.and.returnValue(
+        RECENT_PUB_DATE
+      );
+      mockStoryNode.getTitle.and.returnValue('A New, Unvisited Chapter');
+
+      const isVisible = component.isNewChapterLabelVisible();
+      expect(isVisible).toBe(true);
+    });
+
+    it('should return FALSE if publication date is null', () => {
+      mockStoryNode.getFirstPublicationDateMsecs.and.returnValue(null);
+      mockStoryNode.getTitle.and.returnValue('Some Chapter');
+
+      const isVisible = component.isNewChapterLabelVisible();
+      expect(isVisible).toBe(false);
+    });
+  });
 });

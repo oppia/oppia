@@ -763,4 +763,70 @@ describe('StorySummaryTileComponent', () => {
       expect(component.chaptersDisplayed).toBe(1);
     }
   );
+  describe('when checking if new Label is visible', () => {
+    interface MockStoryNodeInterface {
+      getTitle: () => string;
+      getFirstPublicationDateMsecs: () => number | null;
+    }
+    let mockStoryNode: jasmine.SpyObj<MockStoryNodeInterface>;
+    let mockStorySummary: jasmine.SpyObj<StorySummary>;
+    const RECENT_PUB_DATE = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    const OLD_PUB_DATE = Date.now() - 30 * 24 * 60 * 60 * 1000;
+    const TEST_CHAPTER_TITLE = 'A Test Chapter Title';
+
+    beforeEach(() => {
+      mockStorySummary = jasmine.createSpyObj('StorySummary', [
+        'getVisitedChapterTitles',
+        'isNodeCompleted',
+      ]);
+      component.storySummary = mockStorySummary as StorySummary;
+
+      mockStoryNode = jasmine.createSpyObj('StoryNode', [
+        'getTitle',
+        'getFirstPublicationDateMsecs',
+      ]);
+
+      mockStoryNode.getTitle.and.returnValue(TEST_CHAPTER_TITLE);
+    });
+
+    it('should return TRUE if chapter is new (less than 28 days) and NOT visited', () => {
+      mockStoryNode.getFirstPublicationDateMsecs.and.returnValue(
+        RECENT_PUB_DATE
+      );
+      mockStorySummary.isNodeCompleted.and.returnValue(false);
+
+      const isVisible = component.isNewChapterLabelVisible(mockStoryNode);
+
+      expect(isVisible).toBe(true);
+    });
+
+    it('should return FALSE if chapter is OLD (28 or more days) but IS visited', () => {
+      mockStoryNode.getFirstPublicationDateMsecs.and.returnValue(OLD_PUB_DATE);
+      mockStorySummary.isNodeCompleted.and.returnValue(true);
+
+      const isVisible = component.isNewChapterLabelVisible(mockStoryNode);
+
+      expect(isVisible).toBe(false);
+    });
+
+    it('should return FALSE if chapter is OLD (28 or more days) and NOT visited', () => {
+      mockStoryNode.getFirstPublicationDateMsecs.and.returnValue(OLD_PUB_DATE);
+      mockStorySummary.isNodeCompleted.and.returnValue(false);
+
+      const isVisible = component.isNewChapterLabelVisible(mockStoryNode);
+
+      expect(isVisible).toBe(false);
+    });
+
+    it('should return FALSE if chapter is new (less than 28 days) but IS visited', () => {
+      mockStoryNode.getFirstPublicationDateMsecs.and.returnValue(
+        RECENT_PUB_DATE
+      );
+      mockStorySummary.isNodeCompleted.and.returnValue(true);
+
+      const isVisible = component.isNewChapterLabelVisible(mockStoryNode);
+
+      expect(isVisible).toBe(false);
+    });
+  });
 });

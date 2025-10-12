@@ -145,7 +145,7 @@
                   {{ nodeTitlesTranslationKeys[idx] | translate }}
                 </span>
               </a>
-              <div class="classroom-new-chapter" *ngIf="isNewChapterVisible(node)">
+              <div class="classroom-new-chapter" *ngIf="isNewChapterLabelVisible(node)">
                 <p class="classroom-status">New</p>
               </div>
             </div>
@@ -226,7 +226,7 @@
                 {{ nodeTitlesTranslationKeys[idx] | translate }}
               </span>
             </a>
-            <div class="classroom-new-chapter" *ngIf="isNewChapterVisible(node)">
+            <div class="classroom-new-chapter" *ngIf="isNewChapterLabelVisible(node)">
               <p class="classroom-status">New</p>
             </div>
           </div>

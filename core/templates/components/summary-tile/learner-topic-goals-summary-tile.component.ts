@@ -163,7 +163,7 @@ export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
     return 'height: 144px; width: 192px;';
   }
 
-  isNewChapterVisible(): boolean {
+  isNewChapterLabelVisible(): boolean {
     const firstPub = this.storyNode?.getFirstPublicationDateMsecs();
     if (!firstPub) {
       return false;
