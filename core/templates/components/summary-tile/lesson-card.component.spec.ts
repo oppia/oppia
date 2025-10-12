@@ -548,6 +548,7 @@ describe('LessonCardComponent', () => {
         'getVisitedChapterTitles',
         'isNodeCompleted',
       ]);
+      Object.setPrototypeOf(mockStorySummary, StorySummary.prototype);
       component.story = mockStorySummary as StorySummary;
       mockStoryNode = jasmine.createSpyObj('StoryNode', [
         'getTitle',

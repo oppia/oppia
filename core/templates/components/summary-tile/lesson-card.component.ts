@@ -227,7 +227,7 @@ export class LessonCardComponent implements OnInit {
   }
 
   isNewChapterLabelVisible(): boolean {
-    if (!this.storyNode || !this.story) {
+    if (!this.storyNode || !(this.story instanceof StorySummary)) {
       return false;
     }
     const firstPub = this.storyNode?.getFirstPublicationDateMsecs();
