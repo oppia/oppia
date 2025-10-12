@@ -182,6 +182,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
 
   changeLinkedSkillDifficulty(): void {
     this.isSkillDifficultyChanged = true;
+
     if (this.newQuestionSkillIds.length === 1) {
       this.newQuestionSkillDifficulties = [
         this.linkedSkillsWithDifficulty[0].getDifficulty(),
@@ -199,9 +200,17 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
       });
     }
     this.linkedSkillsWithDifficulty.forEach(linkedSkillWithDifficulty => {
+      let task: string | null = null;
+
+      if (this.questionIsBeingUpdated && this.isSkillDifficultyChanged) {
+        task = 'update_difficulty';
+      } else if (this.questionIsBeingUpdated) {
+        task = 'update';
+      }
+
       this.skillLinkageModificationsArray.push({
         id: linkedSkillWithDifficulty.getId(),
-        task: this.questionIsBeingUpdated ? 'update_difficulty' : '',
+        task: task,
         difficulty: linkedSkillWithDifficulty.getDifficulty(),
       });
     });
@@ -403,7 +412,6 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     if (!this.question) {
       return false;
     }
-
     const interactionId = this.question.getStateData().interaction.id;
     if (!interactionId) {
       return false;
@@ -411,7 +419,11 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     const spec = (
       INTERACTION_SPECS as Record<string, {can_have_solution?: boolean}>
     )[interactionId];
-    return spec ? Boolean(spec.can_have_solution) : false;
+    return !!(
+      interactionId &&
+      INTERACTION_SPECS[interactionId] &&
+      INTERACTION_SPECS[interactionId].can_have_solution === true
+    );
   }
 
   addSkill(): void {
