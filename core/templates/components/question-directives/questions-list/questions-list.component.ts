@@ -201,7 +201,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     this.linkedSkillsWithDifficulty.forEach(linkedSkillWithDifficulty => {
       this.skillLinkageModificationsArray.push({
         id: linkedSkillWithDifficulty.getId(),
-        task: '',
+        task: this.newQuestionIsBeingCreated ? '' : 'update_difficulty',
         difficulty: linkedSkillWithDifficulty.getDifficulty(),
       });
     });
@@ -408,10 +408,8 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     if (!interactionId) {
       return false;
     }
-    const spec = (
-      INTERACTION_SPECS as Record<string, {can_have_solution?: boolean}>
-    )[interactionId];
-    return !!(spec && spec.can_have_solution === true);
+    const spec = INTERACTION_SPECS[interactionId];
+    return spec?.can_have_solution === true;
   }
 
   addSkill(): void {
