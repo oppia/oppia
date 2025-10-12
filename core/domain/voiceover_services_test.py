@@ -29,7 +29,6 @@ from core.domain import platform_parameter_list as param_list
 from core.domain import (
     state_domain,
     translation_domain,
-    user_services,
     voiceover_domain,
     voiceover_regeneration_services,
     voiceover_services,
