@@ -42,14 +42,16 @@ class PencilCodeEditor(base.BaseInteraction):
     can_have_solution: bool = True
     show_generic_submit_button: bool = False
 
-    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{
-        'name': 'initialCode',
-        'description': 'The initial code',
-        'schema': {
-            'type': 'unicode',
-            'ui_config': {
-                'coding_mode': 'coffeescript',
+    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [
+        {
+            'name': 'initialCode',
+            'description': 'The initial code',
+            'schema': {
+                'type': 'unicode',
+                'ui_config': {
+                    'coding_mode': 'coffeescript',
+                },
             },
-        },
-        'default_value': '# Add the initial code snippet here.'
-    }]
+            'default_value': '# Add the initial code snippet here.',
+        }
+    ]

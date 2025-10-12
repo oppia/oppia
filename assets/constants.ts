@@ -87,6 +87,7 @@ export default {
     "Statistics", "Trigonometry", "Welcome"],
   "ACTIVITY_TYPE_EXPLORATION": "exploration",
   "ACTIVITY_TYPE_EXPLORATION_TRANSLATIONS": "exp_translations",
+  "ACTIVITY_TYPE_EXPLORATION_VOICEOVERS": "exp_voiceovers",
   "ACTIVITY_TYPE_COLLECTION": "collection",
   "ACTIVITY_TYPE_STORY": "story",
   "ACTIVITY_TYPE_SKILL": "skill",
@@ -95,6 +96,7 @@ export default {
   "ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE": "subtopic_with_study_guide",
   "ACTIVITY_TYPE_LEARN_TOPIC": "learntopic",
   "ACTIVITY_TYPE_CLASSROOM": "classroom",
+  "ACTIVITY_TYPE_QUESTIONS": "questions",
   "DISABLED_EXPLORATION_IDS": ["5"],
   "TESTING_CONSTANT": "test",
   "LIBRARY_TILE_WIDTH_PX": 208,
@@ -129,6 +131,8 @@ export default {
     "DecreasingUpcomingLaunches": "Most Upcoming Launches",
     "DecreasingOverdueLaunches": "Most Launches Behind Schedule"
   },
+
+  "MAX_QUESTIONS_FETCHABLE": 800,
 
   // Sorting categories for contributor admin dashboard.
   "CD_ADMIN_STATS_SORT_OPTIONS": {
@@ -6246,7 +6250,12 @@ export default {
   "MAX_CHARS_IN_TOPIC_DESCRIPTION": 240,
   "MAX_CHARS_IN_SUBTOPIC_TITLE": 64,
   "MAX_CHARS_IN_STUDY_GUIDE_SECTION_HEADING": 200,
-  "STUDY_GUIDE_SECTION_CHARACTER_LIMIT": 1000,
+  "STUDY_GUIDE_SECTION_CHARACTER_LIMIT": 6000,
+  "STUDY_GUIDE_VIEWER_NEXT_SUBTOPIC_TITLE_LENGTH_LIMIT_MOBILE": 18,
+  "STUDY_GUIDE_VIEWER_NEXT_SUBTOPIC_TITLE_TRUNCATED_LENGTH_MOBILE": 15,
+  "STUDY_GUIDE_VIEWER_NEXT_SUBTOPIC_TITLE_LENGTH_LIMIT_DESKTOP": 23,
+  "STUDY_GUIDE_VIEWER_NEXT_SUBTOPIC_TITLE_TRUNCATED_LENGTH_DESKTOP": 20,
+  "SKILL_EDITOR_WORKED_EXAMPLE_LIMIT": 2,
   "DEFAULT_SECTION_HEADING_CONTENT_ID": "section_heading_0",
   "DEFAULT_SECTION_CONTENT_CONTENT_ID": "section_content_1",
   "MAX_CHARS_IN_SKILL_DESCRIPTION": 100,
@@ -6259,6 +6268,7 @@ export default {
   "MIN_CHARS_IN_BLOG_POST_TITLE": 5,
   "MAX_CHARS_IN_BLOG_POST_SUMMARY": 300,
   "MAX_CHARS_IN_LEARNER_GROUP_TITLE": 36,
+  "MAX_CHARS_IN_LEARNER_GROUP_DESCRIPTION": 250,
   "STORY_ID_LENGTH": 12,
   // This represents the maximum number of characters in the URL fragment for
   // story in the story page URL. E.g.

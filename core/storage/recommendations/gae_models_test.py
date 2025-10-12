@@ -22,12 +22,12 @@ from core.tests import test_utils
 from typing import Final
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import base_models, recommendations_models
 
-(base_models, recommendations_models) = models.Registry.import_models([
-    models.Names.BASE_MODEL, models.Names.RECOMMENDATIONS
-])
+(base_models, recommendations_models) = models.Registry.import_models(
+    [models.Names.BASE_MODEL, models.Names.RECOMMENDATIONS]
+)
 
 
 class ExplorationRecommendationsModelUnitTests(test_utils.GenericTestBase):
@@ -39,15 +39,15 @@ class ExplorationRecommendationsModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
-            recommendations_models.ExplorationRecommendationsModel
-            .get_deletion_policy(),
-            base_models.DELETION_POLICY.NOT_APPLICABLE)
+            recommendations_models.ExplorationRecommendationsModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE,
+        )
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
-            recommendations_models.ExplorationRecommendationsModel.
-                get_model_association_to_user(),
-            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+            recommendations_models.ExplorationRecommendationsModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER,
+        )
 
     def test_get_export_policy(self) -> None:
         expected_export_policy_dict = {
@@ -55,12 +55,13 @@ class ExplorationRecommendationsModelUnitTests(test_utils.GenericTestBase):
             'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'recommended_exploration_ids': (
-                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
+            ),
         }
         self.assertEqual(
-            recommendations_models.ExplorationRecommendationsModel
-            .get_export_policy(),
-            expected_export_policy_dict)
+            recommendations_models.ExplorationRecommendationsModel.get_export_policy(),
+            expected_export_policy_dict,
+        )
 
 
 class TopicSimilaritiesModelUnitTests(test_utils.GenericTestBase):
@@ -69,13 +70,14 @@ class TopicSimilaritiesModelUnitTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             recommendations_models.TopicSimilaritiesModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.NOT_APPLICABLE)
+            base_models.DELETION_POLICY.NOT_APPLICABLE,
+        )
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
-            recommendations_models.TopicSimilaritiesModel.
-                get_model_association_to_user(),
-            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+            recommendations_models.TopicSimilaritiesModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER,
+        )
 
     def test_get_export_policy(self) -> None:
         expected_export_policy_dict = {
@@ -86,4 +88,5 @@ class TopicSimilaritiesModelUnitTests(test_utils.GenericTestBase):
         }
         self.assertEqual(
             recommendations_models.TopicSimilaritiesModel.get_export_policy(),
-            expected_export_policy_dict)
+            expected_export_policy_dict,
+        )

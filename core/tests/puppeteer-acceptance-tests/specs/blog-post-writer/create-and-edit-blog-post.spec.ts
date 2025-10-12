@@ -49,14 +49,16 @@ describe('Blog Post Writer', function () {
     await blogPostWriter.navigateToPageUsingProfileMenu('Blog Dashboard');
     await blogPostWriter.updateUserBioInRegisterModal('I am the test user.');
     await blogPostWriter.clickOnSaveProfileButton();
-    await blogPostWriter.expectToolTipMessage(
+    await blogPostWriter.expectToastMessage(
       'Author Details saved successfully.'
     );
     await blogPostWriter.expectNewBlogPostButtonToBeVisible(false);
     await blogPostWriter.expectFirstBlogPostButtonToBeVisible(true);
 
     // Click on "Create new blog post" button.
-    await blogPostWriter.clickOn(LABELS.CREATE_NEW_BLOG_POST_BTN);
+    await blogPostWriter.clickOnElementWithText(
+      LABELS.CREATE_NEW_BLOG_POST_BTN
+    );
     await blogPostWriter.expectToBeOnBlogEditorPage();
 
     // Upload GIF format thumbnail image.
@@ -70,7 +72,7 @@ describe('Blog Post Writer', function () {
 
     // Upload SVG format thumbnail image.
     await blogPostWriter.uploadBlogPostThumbnailImage(FILEPATHS.BANNER_SVG);
-    await blogPostWriter.expectToolTipMessage('Thumbnail Saved Successfully.');
+    await blogPostWriter.expectToastMessage('Thumbnail Saved Successfully.');
 
     // Upload BMP format thumbnail image.
     await blogPostWriter.clickOnThumbnailImage();
@@ -116,7 +118,7 @@ describe('Blog Post Writer', function () {
     // Close the thumbnail image upload modal. If the viewport is mobile, the
     // cancel button isn't visible as the modal is embedded in page itself.
     if (!blogPostWriter.isViewportAtMobileWidth()) {
-      await blogPostWriter.clickOn('Cancel');
+      await blogPostWriter.clickOnElementWithText('Cancel');
     }
 
     // Update blog title of less than 5 characters.
@@ -146,7 +148,7 @@ describe('Blog Post Writer', function () {
 
     // Save blog post draft.
     await blogPostWriter.saveTheDraftBlogPost();
-    await blogPostWriter.expectToolTipMessage('Blog Post Saved Successfully.');
+    await blogPostWriter.expectToastMessage('Blog Post Saved Successfully.');
   });
 
   it('should be able to edit draft blog post', async function () {
@@ -166,14 +168,14 @@ describe('Blog Post Writer', function () {
     await blogPostWriter.expectToBeOnBlogEditorPage();
     await blogPostWriter.navigateToBlogDashboardPage();
     await blogPostWriter.deleteDraftBlogPostWithTitle('Test Blog Post Title');
-    await blogPostWriter.expectToolTipMessage(
-      'Blog Post Deleted Successfully.'
-    );
+    await blogPostWriter.expectToastMessage('Blog Post Deleted Successfully.');
   });
 
   it('should be able to publish a new blog post', async function () {
     // Create a new blog post.
-    await blogPostWriter.clickOn(LABELS.CREATE_NEW_BLOG_POST_BTN);
+    await blogPostWriter.clickOnElementWithText(
+      LABELS.CREATE_NEW_BLOG_POST_BTN
+    );
     await blogPostWriter.updateBlogPostTitle('Test Blog Post Title');
     await blogPostWriter.updateBodyTextTo('Test Blog Post Body');
     await blogPostWriter.saveBlogBodyChanges();
@@ -201,9 +203,9 @@ describe('Blog Post Writer', function () {
 
     // Click on publish button.
     await blogPostWriter.selectTag('News');
-    await blogPostWriter.clickOn(LABELS.PUBLISH_BUTTON);
+    await blogPostWriter.clickOnElementWithText(LABELS.PUBLISH_BUTTON);
     await blogPostWriter.expectScreenshotToMatch('blogPostPublish', __dirname);
-    await blogPostWriter.clickOn(LABELS.CONFIRM_PUBLISH_BUTTON);
+    await blogPostWriter.clickOnElementWithText(LABELS.CONFIRM_PUBLISH_BUTTON);
     await blogPostWriter.navigateToBlogPage();
     await blogPostWriter.expectBlogPostToBePresent('Test Blog Post Title');
   });

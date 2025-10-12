@@ -710,8 +710,8 @@ describe('RTE display component', () => {
     expect(component.isManualVoiceoverAvailableForActiveContent()).toBeTrue();
   });
 
-  it('should return true when page context is topic_editor', () => {
-    spyOn(pageContextService, 'getPageContext').and.returnValue('topic_editor');
+  it('should return true when page context is subtopic_preview', () => {
+    spyOn(pageContextService, 'getSubtopicPreviewIsOpen').and.returnValue(true);
     const result = component.isSolutionCollapsedForWorkedexample();
     expect(result).toBe(true);
   });

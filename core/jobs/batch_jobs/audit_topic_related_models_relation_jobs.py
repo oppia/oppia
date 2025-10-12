@@ -28,18 +28,18 @@ import apache_beam as beam
 from typing import List
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import topic_models
 
-(topic_models,) = models.Registry.import_models([
-    models.Names.TOPIC])
+(topic_models,) = models.Registry.import_models([models.Names.TOPIC])
 
 
 class ValidateTopicModelsJob(base_jobs.JobBase):
     """Job that validates Topic models and their associated models."""
 
-    def run(self) -> beam.PCollection[
-        base_validation_errors.BaseValidationError]:
+    def run(
+        self,
+    ) -> beam.PCollection[base_validation_errors.BaseValidationError]:
         """Returns a PCollection of audit errors aggregated from all
         Topic models.
 
@@ -49,37 +49,39 @@ class ValidateTopicModelsJob(base_jobs.JobBase):
         """
         topic_models_pcoll = (
             self.pipeline
-            | 'Get all TopicModels' >> ndb_io.GetModels(
-                topic_models.TopicModel.get_all(
-                    include_deleted=False))
+            | 'Get all TopicModels'
+            >> ndb_io.GetModels(
+                topic_models.TopicModel.get_all(include_deleted=False)
+            )
         )
 
         topic_rights_models_pcoll = (
             self.pipeline
-            | 'Get all TopicRightsModels' >> ndb_io.GetModels(
-                topic_models.TopicRightsModel.get_all(
-                    include_deleted=False))
+            | 'Get all TopicRightsModels'
+            >> ndb_io.GetModels(
+                topic_models.TopicRightsModel.get_all(include_deleted=False)
+            )
         )
 
         topic_summary_models_pcoll = (
             self.pipeline
-            | 'Get all TopicSummaryModels' >> ndb_io.GetModels(
-                topic_models.TopicSummaryModel.get_all(
-                    include_deleted=False))
+            | 'Get all TopicSummaryModels'
+            >> ndb_io.GetModels(
+                topic_models.TopicSummaryModel.get_all(include_deleted=False)
+            )
         )
 
-        return (
-            topic_models_pcoll
-            | 'Validate Topic Models' >> beam.ParDo(
-                self._validate_topic_models,
-                beam.pvalue.AsIter(topic_rights_models_pcoll),
-                beam.pvalue.AsIter(topic_summary_models_pcoll)))
+        return topic_models_pcoll | 'Validate Topic Models' >> beam.ParDo(
+            self._validate_topic_models,
+            beam.pvalue.AsIter(topic_rights_models_pcoll),
+            beam.pvalue.AsIter(topic_summary_models_pcoll),
+        )
 
     def _validate_topic_models(
         self,
         topic_model: topic_models.TopicModel,
         topic_rights_models: List[topic_models.TopicRightsModel],
-        topic_summary_models: List[topic_models.TopicSummaryModel]
+        topic_summary_models: List[topic_models.TopicSummaryModel],
     ) -> List[base_validation_errors.ModelRelationshipError]:
         """Validates that the given TopicModel has corresponding
         TopicRightsModels and TopicSummaryModels. Yields validation
@@ -99,26 +101,31 @@ class ValidateTopicModelsJob(base_jobs.JobBase):
 
         if not any(
             rights_model.id == topic_model.id
-            for rights_model in topic_rights_models):
+            for rights_model in topic_rights_models
+        ):
             errors.append(
                 base_validation_errors.ModelRelationshipError(
                     id_property=model_property.ModelProperty(
-                        topic_models.TopicModel,
-                        topic_models.TopicModel.name),
+                        topic_models.TopicModel, topic_models.TopicModel.name
+                    ),
                     model=topic_model,
                     target_kind='TopicRightsModel',
-                    target_id=topic_model.name
-            ))
+                    target_id=topic_model.name,
+                )
+            )
 
         if not any(
             summary_model.id == topic_model.id
-            for summary_model in topic_summary_models):
+            for summary_model in topic_summary_models
+        ):
             errors.append(
                 base_validation_errors.ModelRelationshipError(
                     id_property=model_property.ModelProperty(
-                        topic_models.TopicModel,
-                        topic_models.TopicModel.name),
+                        topic_models.TopicModel, topic_models.TopicModel.name
+                    ),
                     model=topic_model,
                     target_kind='TopicSummaryModel',
-                    target_id=topic_model.name))
+                    target_id=topic_model.name,
+                )
+            )
         return errors

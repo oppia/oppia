@@ -38,12 +38,14 @@ class Registry:
 
         # Add new visualization instances to the registry.
         for name, clazz in inspect.getmembers(
-                models, predicate=inspect.isclass):
+            models, predicate=inspect.isclass
+        ):
             if name.endswith('_test') or name == 'BaseCalculation':
                 continue
 
             ancestor_names = [
-                base_class.__name__ for base_class in inspect.getmro(clazz)]
+                base_class.__name__ for base_class in inspect.getmro(clazz)
+            ]
             if 'BaseCalculation' in ancestor_names:
                 cls._calculations_dict[clazz.__name__] = clazz
 
@@ -102,5 +104,6 @@ class Registry:
             cls._refresh_registry()
         if calculation_id not in cls._calculations_dict:
             raise TypeError(
-                '\'%s\' is not a valid calculation id.' % calculation_id)
+                '\'%s\' is not a valid calculation id.' % calculation_id
+            )
         return cls._calculations_dict[calculation_id]()

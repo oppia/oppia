@@ -26,7 +26,7 @@ import redis
 from typing import Dict, List, Optional
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import datastore_services
 
 datastore_services = models.Registry.import_datastore_services()
@@ -48,16 +48,26 @@ class RedisClient:
         if new_redishost != self._redishost:
             self._redishost = new_redishost
             if self._redishost:
-                self._oppia_redis_client = redis.StrictRedis(
+                # Redis client for our own implementation of caching.
+                # Here we use MyPy ignore because our stubs define StrictRedis as a
+                # generic (e.g., StrictRedis[str]) to represent the runtime behavior
+                # controlled by the `decode_responses` argument, and mypy 1.0+ now
+                # requires these explicit type arguments.
+                self._oppia_redis_client = redis.StrictRedis(  # type: ignore[type-arg]
                     host=self._redishost,
                     port=feconf.REDISPORT,
                     db=feconf.OPPIA_REDIS_DB_INDEX,
-                    decode_responses=True
+                    decode_responses=True,
                 )
-                self._cloud_ndb_redis_client = redis.StrictRedis(
+                # Redis client for the Cloud NDB cache.
+                # Here we use MyPy ignore because our stubs define StrictRedis as a
+                # generic (e.g., StrictRedis[str]) to represent the runtime behavior
+                # controlled by the `decode_responses` argument, and mypy 1.0+ now
+                # requires these explicit type arguments.
+                self._cloud_ndb_redis_client = redis.StrictRedis(  # type: ignore[type-arg]
                     host=self._redishost,
                     port=feconf.REDISPORT,
-                    db=feconf.CLOUD_NDB_REDIS_DB_INDEX
+                    db=feconf.CLOUD_NDB_REDIS_DB_INDEX,
                 )
             else:
                 self._oppia_redis_client = None
@@ -102,7 +112,7 @@ def get_memory_cache_stats() -> caching_domain.MemoryCacheStats:
     return caching_domain.MemoryCacheStats(
         redis_full_profile['total.allocated'],
         redis_full_profile['peak.allocated'],
-        redis_full_profile['keys.count']
+        redis_full_profile['keys.count'],
     )
 
 

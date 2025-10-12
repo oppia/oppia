@@ -23,6 +23,7 @@ import {Input} from '@angular/core';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {AppConstants} from 'app.constants';
 import {StorySummary} from 'domain/story/story-summary.model';
+import {StoryNode} from 'domain/story/story-node.model';
 import {UrlService} from 'services/contextual/url.service';
 
 @Component({
@@ -37,6 +38,7 @@ export class LearnerStorySummaryTileComponent implements OnInit {
   @Input() displayArea!: string;
   @Input() topicName!: string;
   @Input() redesignFeatureFlag!: boolean;
+  storyNode!: StoryNode;
   nodeCount!: number;
   completedNodeCount!: number;
   storyProgress!: number;
@@ -49,6 +51,7 @@ export class LearnerStorySummaryTileComponent implements OnInit {
   storyCompleted: boolean = false;
   cardIsHovered: boolean = false;
   openInNewWindow = false;
+  statusIsPublished!: boolean;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -108,13 +111,16 @@ export class LearnerStorySummaryTileComponent implements OnInit {
   ngOnInit(): void {
     this.nodeCount = this.storySummary.getNodeTitles().length;
     this.completedNodeCount = this.storySummary.getCompletedNodeTitles().length;
+
+    const allNodes = this.storySummary.getAllNodes();
+    if (allNodes.length > this.completedNodeCount) {
+      this.storyNode = allNodes[this.completedNodeCount];
+    }
+    this.statusIsPublished = this.storyNode?.getPublishedStatus();
     this.storyProgress = Math.floor(
       (this.completedNodeCount / this.nodeCount) * 100
     );
-    if (this.storyProgress === 100) {
-      this.storyCompleted = true;
-    }
-
+    this.storyCompleted = this.storyProgress === 100;
     if (this.storySummary.getThumbnailFilename()) {
       this.thumbnailUrl =
         this.assetsBackendApiService.getThumbnailUrlForPreview(
@@ -123,14 +129,17 @@ export class LearnerStorySummaryTileComponent implements OnInit {
           this.storySummary.getThumbnailFilename()
         );
     }
+
     this.storyLink = this.getStoryLink();
     this.storyTitle = this.storySummary.getTitle();
     this.thumbnailBgColor = this.storySummary.getThumbnailBgColor();
+
     if (this.nodeCount !== this.completedNodeCount) {
-      let nextIncompleteNode =
+      const nextIncompleteNode =
         this.storySummary.getNodeTitles()[this.completedNodeCount];
       this.nextIncompleteNodeTitle = `Chapter ${this.completedNodeCount + 1}: ${nextIncompleteNode}`;
     }
+
     this.starImageUrl = this.getStaticImageUrl('/learner_dashboard/star.svg');
   }
 
@@ -150,5 +159,11 @@ export class LearnerStorySummaryTileComponent implements OnInit {
       return '-webkit-filter: blur(2px); filter: blur(2px);';
     }
     return 'height: 144px; width: 192px;';
+  }
+
+  onStoryClick(event: Event): void {
+    if (!this.statusIsPublished) {
+      event.preventDefault();
+    }
   }
 }
