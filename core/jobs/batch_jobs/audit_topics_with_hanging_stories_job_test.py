@@ -234,3 +234,30 @@ class AuditTopicsWithHangingStoriesJobTests(job_test_utils.JobTestBase):
                 )
             ]
         )
+
+    def test_topic_with_non_string_story_id(self) -> None:
+        """Tests that the job correctly identifies a non-string story ID."""
+        topic_1 = self.create_model(
+            topic_models.TopicModel,
+            id=self.TOPIC_ID_1,
+            name=self.TOPIC_NAME_1,
+            canonical_story_references=[self.CORRUPTED_NON_STRING_ID],
+            canonical_name='topic-one-canonical-name',
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            next_subtopic_id=1,
+            page_title_fragment_for_web='topic-one-web-fragment',
+            story_reference_schema_version=feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
+            subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
+            url_fragment='topic-one-fragment',
+        )
+        self.put_multi([topic_1])
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout=(
+                        f'Topic with ID: {self.TOPIC_ID_1} has hanging story references: INVALID_REFERENCE (non-string story_id: int).'
+                    )
+                )
+            ]
+        )
