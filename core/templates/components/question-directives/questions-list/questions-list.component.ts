@@ -210,7 +210,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
 
       this.skillLinkageModificationsArray.push({
         id: linkedSkillWithDifficulty.getId(),
-        task: task,
+        task: task ?? '',
         difficulty: linkedSkillWithDifficulty.getDifficulty(),
       });
     });
