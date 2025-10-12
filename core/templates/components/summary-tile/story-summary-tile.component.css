@@ -106,7 +106,8 @@ oppia-story-summary-tile .disabled-link,
 oppia-story-summary-tile .disabled-link:hover,
 oppia-story-summary-tile .disabled-link:active {
   color: #000;
-  cursor: default;
+  pointer-events: none; 
+  text-decoration: none;
 }
 
 oppia-story-summary-tile .img-thumbnail {
@@ -153,7 +154,7 @@ oppia-story-summary-tile .chapters-list {
 
 oppia-story-summary-tile .coming-soon-chapters {
   opacity: 0.4;
-  pointer-events: none;
+  pointer-events: auto;
 }
 
 oppia-story-summary-tile .chapters-heading {
