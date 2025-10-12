@@ -202,10 +202,12 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     this.linkedSkillsWithDifficulty.forEach(linkedSkillWithDifficulty => {
       let task: string | null = null;
 
-      if (this.questionIsBeingUpdated && this.isSkillDifficultyChanged) {
-        task = 'update_difficulty';
-      } else if (this.questionIsBeingUpdated) {
-        task = 'update';
+      if (this.questionIsBeingUpdated) {
+        if (this.isSkillDifficultyChanged) {
+          task = 'update_difficulty';
+        } else if (this.questionIsBeingUpdated) {
+          task = 'update';
+        }
       }
 
       this.skillLinkageModificationsArray.push({
