@@ -208,6 +208,8 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
         } else if (this.questionIsBeingUpdated) {
           task = 'update';
         }
+      } else if (this.isSkillDifficultyChanged) {
+        task = 'update_difficulty';
       }
 
       this.skillLinkageModificationsArray.push({
@@ -560,9 +562,15 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
               this.skillLinkageModificationsArray &&
               this.skillLinkageModificationsArray.length > 0
             ) {
+              const modifiedArray = this.skillLinkageModificationsArray.map(
+                item => ({
+                  ...item,
+                  task: null,
+                })
+              );
               this.editableQuestionBackendApiService.editQuestionSkillLinksAsync(
                 response.questionId,
-                this.skillLinkageModificationsArray
+                modifiedArray
               );
             }
             this.questionsListService.resetPageNumber();

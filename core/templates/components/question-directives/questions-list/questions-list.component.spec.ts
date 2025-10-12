@@ -836,6 +836,7 @@ describe('Questions List Component', () => {
     component.newQuestionSkillIds = ['skillId1'];
     component.linkedSkillsWithDifficulty = [];
     component.skillLinkageModificationsArray = [];
+    component.questionIsBeingUpdated = false;
 
     component.updateSkillWithDifficulty(skill, 0);
 
@@ -853,6 +854,7 @@ describe('Questions List Component', () => {
     component.linkedSkillsWithDifficulty = [];
     component.skillLinkageModificationsArray = [];
     component.newQuestionSkillDifficulties = [];
+    component.questionIsBeingUpdated = false;
 
     component.updateSkillWithDifficulty(skill, 0);
 
@@ -1169,7 +1171,13 @@ describe('Questions List Component', () => {
 
     expect(component.showSolutionCheckpoint()).toBe(true);
 
+    // Resetting the spy to return the original state data without TextInput id
     component.question = question;
+    (component.question.getStateData as jasmine.Spy).and.returnValue({
+      interaction: {
+        id: null,
+      },
+    } as State);
     expect(component.showSolutionCheckpoint()).toBe(false);
   });
 
