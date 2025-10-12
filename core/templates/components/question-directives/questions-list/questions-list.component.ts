@@ -412,17 +412,19 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     if (!this.question) {
       return false;
     }
+
     const interactionId = this.question.getStateData().interaction.id;
     if (!interactionId) {
       return false;
     }
-    const spec = (
-      INTERACTION_SPECS as Record<string, {can_have_solution?: boolean}>
-    )[interactionId];
+
+    const interactionSpec =
+      INTERACTION_SPECS[interactionId as keyof typeof INTERACTION_SPECS];
+
     return !!(
       interactionId &&
-      INTERACTION_SPECS[interactionId] &&
-      INTERACTION_SPECS[interactionId].can_have_solution === true
+      interactionSpec &&
+      interactionSpec.can_have_solution === true
     );
   }
 
