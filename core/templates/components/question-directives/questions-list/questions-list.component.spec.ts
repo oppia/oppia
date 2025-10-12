@@ -1171,7 +1171,7 @@ describe('Questions List Component', () => {
 
     expect(component.showSolutionCheckpoint()).toBe(true);
 
-    // Resetting the spy to return the original state data without TextInput id
+    // Reset the spy to return the original state data without TextInput id.
     component.question = question;
     (component.question.getStateData as jasmine.Spy).and.returnValue({
       interaction: {

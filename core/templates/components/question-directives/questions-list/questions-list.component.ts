@@ -565,7 +565,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
               const modifiedArray = this.skillLinkageModificationsArray.map(
                 item => ({
                   ...item,
-                  task: null as any,
+                  task: null as unknown as string,
                 })
               );
               this.editableQuestionBackendApiService.editQuestionSkillLinksAsync(
