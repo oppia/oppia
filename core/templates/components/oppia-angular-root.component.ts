@@ -229,7 +229,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     }
     this.ngZone.runOutsideAngular(() => {
       CkEditorInitializerService.ckEditorInitializer(
-        OppiaAngularRootComponent.rteHelperService as RteHelperService,
+        OppiaAngularRootComponent.rteHelperService as unknown as import('./ck-editor-helpers/ck-editor-4-widgets.initializer').RteHelperService,
         this.htmlEscaperService,
         this.pageContextService,
         this.ngZone
