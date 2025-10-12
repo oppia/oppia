@@ -506,7 +506,7 @@ describe('Admin backend api service', () => {
   });
 
   describe('deleteStudyGuideModelsAsync', () => {
-    it('should make request to delete study guide models', fakeAsync(() => {
+    it('should make request to delete all study guide models', fakeAsync(() => {
       abas.deleteStudyGuideModelsAsync().then(successHandler, failHandler);
 
       const req = httpTestingController.expectOne(
@@ -543,7 +543,7 @@ describe('Admin backend api service', () => {
   });
 
   describe('verifyStudyGuideModelsAsync', () => {
-    it('should make request to verify study guide models', fakeAsync(() => {
+    it('should make request to verify all study guide models', fakeAsync(() => {
       abas.verifyStudyGuideModelsAsync().then(successHandler, failHandler);
 
       const req = httpTestingController.expectOne(

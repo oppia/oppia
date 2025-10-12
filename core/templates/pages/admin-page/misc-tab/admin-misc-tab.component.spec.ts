@@ -791,11 +791,15 @@ describe('Admin misc tab component ', () => {
   });
 
   describe('when generating study guide models', () => {
-    it('should generate all study guide models successfully', fakeAsync(() => {
-      const studyGuideModelSpy = spyOn(
+    let studyGuideModelSpy: jasmine.Spy;
+    beforeEach(() => {
+      studyGuideModelSpy = spyOn(
         adminBackendApiService,
         'generateStudyGuideModelsAsync'
-      ).and.returnValue(Promise.resolve());
+      );
+    });
+    it('should generate all study guide models successfully', fakeAsync(() => {
+      studyGuideModelSpy.and.returnValue(Promise.resolve());
 
       component.generateStudyGuideModels();
       tick();
@@ -809,10 +813,7 @@ describe('Admin misc tab component ', () => {
     it(
       'should not generate study guide models in case of ' + 'server error',
       fakeAsync(() => {
-        const studyGuideModelSpy = spyOn(
-          adminBackendApiService,
-          'generateStudyGuideModelsAsync'
-        ).and.rejectWith('Internal Server Error');
+        studyGuideModelSpy.and.rejectWith('Internal Server Error');
 
         component.generateStudyGuideModels();
         tick();
@@ -826,11 +827,15 @@ describe('Admin misc tab component ', () => {
   });
 
   describe('when deleting study guide models', () => {
-    it('should delete all study guide models successfully', fakeAsync(() => {
-      const studyGuideModelSpy = spyOn(
+    let studyGuideModelSpy: jasmine.Spy;
+    beforeEach(() => {
+      studyGuideModelSpy = spyOn(
         adminBackendApiService,
         'deleteStudyGuideModelsAsync'
-      ).and.returnValue(Promise.resolve());
+      );
+    });
+    it('should delete all study guide models successfully', fakeAsync(() => {
+      studyGuideModelSpy.and.returnValue(Promise.resolve());
 
       component.deleteStudyGuideModels();
       tick();
@@ -844,10 +849,7 @@ describe('Admin misc tab component ', () => {
     it(
       'should not delete study guide models in case of ' + 'server error',
       fakeAsync(() => {
-        const studyGuideModelSpy = spyOn(
-          adminBackendApiService,
-          'deleteStudyGuideModelsAsync'
-        ).and.rejectWith('Internal Server Error');
+        studyGuideModelSpy.and.rejectWith('Internal Server Error');
 
         component.deleteStudyGuideModels();
         tick();
@@ -861,14 +863,20 @@ describe('Admin misc tab component ', () => {
   });
 
   describe('when verifying study guide models', () => {
+    let studyGuideModelSpy: jasmine.Spy;
+    beforeEach(() => {
+      studyGuideModelSpy = spyOn(
+        adminBackendApiService,
+        'verifyStudyGuideModelsAsync'
+      );
+    });
     it(
       'should verify all study guide models successfully ' +
         'and return issues if they exist',
       fakeAsync(() => {
-        const studyGuideModelSpy = spyOn(
-          adminBackendApiService,
-          'verifyStudyGuideModelsAsync'
-        ).and.returnValue(Promise.resolve({issues: [['issue1', 'issue2']]}));
+        studyGuideModelSpy.and.returnValue(
+          Promise.resolve({issues: [['issue1', 'issue2']]})
+        );
 
         component.verifyStudyGuideModels();
         tick();
@@ -888,10 +896,7 @@ describe('Admin misc tab component ', () => {
       'should verify all study guide models successfully ' +
         "and return no issues found if they don't exist",
       fakeAsync(() => {
-        const studyGuideModelSpy = spyOn(
-          adminBackendApiService,
-          'verifyStudyGuideModelsAsync'
-        ).and.returnValue(Promise.resolve({issues: [[]]}));
+        studyGuideModelSpy.and.returnValue(Promise.resolve({issues: [[]]}));
 
         component.verifyStudyGuideModels();
         tick();
@@ -908,10 +913,7 @@ describe('Admin misc tab component ', () => {
     it(
       'should not verify study guide models in case of ' + 'server error',
       fakeAsync(() => {
-        const studyGuideModelSpy = spyOn(
-          adminBackendApiService,
-          'verifyStudyGuideModelsAsync'
-        ).and.rejectWith('Internal Server Error');
+        studyGuideModelSpy.and.rejectWith('Internal Server Error');
 
         component.verifyStudyGuideModels();
         tick();
