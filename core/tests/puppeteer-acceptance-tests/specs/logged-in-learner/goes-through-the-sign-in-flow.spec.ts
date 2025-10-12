@@ -23,7 +23,7 @@ import {UserFactory} from '../../utilities/common/user-factory';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
-describe('Logged-Out Learner', function () {
+describe('Logged In Learner', function () {
   const loggedInUser: LoggedInUser & LoggedOutUser = Object.assign(
     new LoggedInUser(),
     new LoggedOutUser()
@@ -43,7 +43,14 @@ describe('Logged-Out Learner', function () {
   });
 
   it('should land on navbar', async function () {
+    // Check if "Learn", "About", and "Get Involved" works properly.
     await loggedInUser.expectNavbarToWorkProperly();
+
+    // Check if profile dropdown works properly.
+    await loggedInUser.clickOnProfileDropdown();
+    await loggedInUser.expectProfileDropdownToContainElementWithContent(
+      'loggedInUser'
+    );
   });
 
   afterAll(async function () {

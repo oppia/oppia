@@ -76,21 +76,25 @@ from core.domain import (
 from typing import Dict, List, Optional, TypedDict, Union, cast
 
 # Platform paramters that we plan to show on the the release-coordinator page.
-PLATFORM_PARAMS_TO_SHOW_IN_RC_PAGE = set([
-    platform_parameter_list.ParamName.PROMO_BAR_ENABLED.value,
-    platform_parameter_list.ParamName.PROMO_BAR_MESSAGE.value
-])
+PLATFORM_PARAMS_TO_SHOW_IN_RC_PAGE = set(
+    [
+        platform_parameter_list.ParamName.PROMO_BAR_ENABLED.value,
+        platform_parameter_list.ParamName.PROMO_BAR_MESSAGE.value,
+    ]
+)
 
 # Platform parameters that we plan to show on the blog admin page.
-PLATFORM_PARAMS_TO_SHOW_IN_BLOG_ADMIN_PAGE = set([
-    (
-        platform_parameter_list.ParamName.
-        MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
-    )
-])
+PLATFORM_PARAMS_TO_SHOW_IN_BLOG_ADMIN_PAGE = set(
+    [
+        (
+            platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
+        )
+    ]
+)
 
 supported_languages: List[str] = [
-    lang['id'] for lang in constants.SUPPORTED_AUDIO_LANGUAGES]
+    lang['id'] for lang in constants.SUPPORTED_AUDIO_LANGUAGES
+]
 
 EDUCATION_BLOG_POST_TITLE = 'Education'
 
@@ -158,55 +162,57 @@ ARABIC_BLOG_POST_CONTENT = """
     </ul>
 """
 
-SAMPLE_EXPLORATION_DICT = exp_domain.ExplorationDict({
-    'id': '%s',
-    'title': 'Dummy Exploration',
-    'category': 'Algorithms',
-    'author_notes': '',
-    'blurb': '',
-    'states_schema_version': 57,
-    'init_state_name': 'Introduction',
-    'language_code': 'en',
-    'objective': 'Learn the exploration',
-    'param_changes': [],
-    'param_specs': {},
-    'tags': ['exploration'],
-    'auto_tts_enabled': False,
-    'next_content_id_index': 2,
-    'edits_allowed': True,
-    'states': {
-        'Introduction': {
-            'content': {
-                'content_id': 'content_0',
-                'html': 'Congratulations, you have finished!'
-            },
-            'param_changes': [],
-            'interaction': {
-                'id': 'EndExploration',
-                'customization_args': {
-                    'recommendedExplorationIds': {
-                        # Here we use MyPy ignore because the value of 'value'
-                        # is a List[Any] empty list as it is the EndExploration,
-                        # but the type of 'value' is defined as
-                        # Dict[str, UnionOfCustomizationArgsDictValues].
-                        'value': [] # type: ignore[dict-item]
-                    }
+SAMPLE_EXPLORATION_DICT = exp_domain.ExplorationDict(
+    {
+        'id': '%s',
+        'title': 'Dummy Exploration',
+        'category': 'Algorithms',
+        'author_notes': '',
+        'blurb': '',
+        'states_schema_version': 57,
+        'init_state_name': 'Introduction',
+        'language_code': 'en',
+        'objective': 'Learn the exploration',
+        'param_changes': [],
+        'param_specs': {},
+        'tags': ['exploration'],
+        'auto_tts_enabled': False,
+        'next_content_id_index': 2,
+        'edits_allowed': True,
+        'states': {
+            'Introduction': {
+                'content': {
+                    'content_id': 'content_0',
+                    'html': 'Congratulations, you have finished!',
                 },
-                'answer_groups': [],
-                'default_outcome': None,
-                'confirmed_unclassified_answers': [],
-                'hints': [],
-                'solution': None
-            },
-            'classifier_model_id': None,
-            'linked_skill_id': None,
-            'solicit_answer_details': False,
-            'card_is_checkpoint': True,
-            'inapplicable_skill_misconception_ids': []
-        }
-    },
-    'version': 3
-})
+                'param_changes': [],
+                'interaction': {
+                    'id': 'EndExploration',
+                    'customization_args': {
+                        'recommendedExplorationIds': {
+                            # Here we use MyPy ignore because the value of 'value'
+                            # is a List[Any] empty list as it is the EndExploration,
+                            # but the type of 'value' is defined as
+                            # Dict[str, UnionOfCustomizationArgsDictValues].
+                            'value': []  # type: ignore[dict-item]
+                        }
+                    },
+                    'answer_groups': [],
+                    'default_outcome': None,
+                    'confirmed_unclassified_answers': [],
+                    'hints': [],
+                    'solution': None,
+                },
+                'classifier_model_id': None,
+                'linked_skill_id': None,
+                'solicit_answer_details': False,
+                'card_is_checkpoint': True,
+                'inapplicable_skill_misconception_ids': [],
+            }
+        },
+        'version': 3,
+    }
+)
 
 
 class ClassroomPageDataDict(TypedDict):
@@ -259,7 +265,8 @@ class AdminHandler(
                 'schema': {
                     'type': 'basestring',
                     'choices': [
-                        'reload_exploration', 'reload_collection',
+                        'reload_exploration',
+                        'reload_collection',
                         'generate_dummy_explorations',
                         'generate_dummy_translation_opportunities',
                         'clear_search_index',
@@ -273,107 +280,76 @@ class AdminHandler(
                         'upload_topic_similarities',
                         'regenerate_topic_related_opportunities',
                         'update_platform_parameter_rules',
-                        'rollback_exploration_to_safe_state'
-                    ]
+                        'rollback_exploration_to_safe_state',
+                    ],
                 },
                 # TODO(#13331): Remove default_value when it is confirmed that,
                 # for clearing the search indices of exploration & collection
                 # 'action' field must be provided in the payload.
-                'default_value': None
+                'default_value': None,
             },
             'exploration_id': {
-                'schema': {
-                    'type': 'basestring'
-                },
-                'default_value': None
+                'schema': {'type': 'basestring'},
+                'default_value': None,
             },
             'collection_id': {
-                'schema': {
-                    'type': 'basestring'
-                },
-                'default_value': None
+                'schema': {'type': 'basestring'},
+                'default_value': None,
             },
             'num_dummy_exps_to_generate': {
-                'schema': {
-                    'type': 'int'
-                },
-                'default_value': None
+                'schema': {'type': 'int'},
+                'default_value': None,
             },
             'skill_id': {
-                'schema': {
-                    'type': 'basestring'
-                },
-                'default_value': None
+                'schema': {'type': 'basestring'},
+                'default_value': None,
             },
             'num_dummy_question_suggestions_generate': {
-                'schema': {
-                    'type': 'int'
-                },
-                'default_value': None
+                'schema': {'type': 'int'},
+                'default_value': None,
             },
             'num_dummy_chapters_to_generate': {
-                'schema': {
-                    'type': 'int'
-                },
-                'default_value': None
+                'schema': {'type': 'int'},
+                'default_value': None,
             },
             'num_dummy_exps_to_publish': {
-                'schema': {
-                    'type': 'int'
-                },
-                'default_value': None
+                'schema': {'type': 'int'},
+                'default_value': None,
             },
             'num_dummy_translation_opportunities_to_generate': {
-                'schema': {
-                    'type': 'int'
-                },
-                'default_value': None
+                'schema': {'type': 'int'},
+                'default_value': None,
             },
             'num_dummy_stories_to_generate': {
-                'schema': {
-                    'type': 'int'
-                },
-                'default_value': None
+                'schema': {'type': 'int'},
+                'default_value': None,
             },
-            'data': {
-                'schema': {
-                    'type': 'basestring'
-                },
-                'default_value': None
-            },
+            'data': {'schema': {'type': 'basestring'}, 'default_value': None},
             'topic_id': {
-                'schema': {
-                    'type': 'basestring'
-                },
-                'default_value': None
+                'schema': {'type': 'basestring'},
+                'default_value': None,
             },
             'story_id': {
-                'schema': {
-                    'type': 'basestring'
-                },
-                'default_value': None
+                'schema': {'type': 'basestring'},
+                'default_value': None,
             },
             'platform_param_name': {
-                'schema': {
-                    'type': 'basestring'
-                },
-                'default_value': None
+                'schema': {'type': 'basestring'},
+                'default_value': None,
             },
             'commit_message': {
-                'schema': {
-                    'type': 'basestring'
-                },
-                'default_value': None
+                'schema': {'type': 'basestring'},
+                'default_value': None,
             },
             'new_rules': {
                 'schema': {
                     'type': 'list',
                     'items': {
                         'type': 'object_dict',
-                        'object_class': parameter_domain.PlatformParameterRule
-                    }
+                        'object_class': parameter_domain.PlatformParameterRule,
+                    },
                 },
-                'default_value': None
+                'default_value': None,
             },
             'blog_post_title': {
                 'schema': {
@@ -382,39 +358,32 @@ class AdminHandler(
                         ARABIC_BLOG_POST_TITLE,
                         EDUCATION_BLOG_POST_TITLE,
                         FORMATTING_BLOG_POST_TITLE,
-                    ]
+                    ],
                 },
-                'default_value': None
+                'default_value': None,
             },
-            'exp_id': {
-                'schema': {
-                    'type': 'basestring'
-                },
-                'default_value': None
-            },
+            'exp_id': {'schema': {'type': 'basestring'}, 'default_value': None},
             'default_value': {
                 'schema': {
                     'type': 'object_dict',
                     'validation_method': (
-                        validation_method.
-                        validate_new_default_value_of_platform_parameter)
+                        validation_method.validate_new_default_value_of_platform_parameter
+                    ),
                 },
-                'default_value': None
-            }
-        }
+                'default_value': None,
+            },
+        },
     }
 
     @acl_decorators.can_access_admin_page
     def get(self) -> None:
         """Populates the data on the admin page."""
         skill_summaries = skill_services.get_all_skill_summaries()
-        skill_summary_dicts = [
-            summary.to_dict() for summary in skill_summaries]
+        skill_summary_dicts = [summary.to_dict() for summary in skill_summaries]
         demo_exploration_ids = list(feconf.DEMO_EXPLORATIONS.keys())
 
         topic_summaries = topic_fetchers.get_all_topic_summaries()
-        topic_summary_dicts = [
-            summary.to_dict() for summary in topic_summaries]
+        topic_summary_dicts = [summary.to_dict() for summary in topic_summaries]
 
         story_ids = []
         for topic_summary in topic_summaries:
@@ -424,39 +393,42 @@ class AdminHandler(
                 story_ids.append(story_reference.story_id)
 
         story_dicts = [
-            story.to_dict() for story in
-            story_fetchers.get_stories_by_ids(story_ids) if
-            story is not None
+            story.to_dict()
+            for story in story_fetchers.get_stories_by_ids(story_ids)
+            if story is not None
         ]
 
         platform_params_dicts = (
-            parameter_services.
-            get_all_platform_parameters_dicts()
+            parameter_services.get_all_platform_parameters_dicts()
         )
         # Removes promo-bar related and blog related platform params as
         # they are handled in release-coordinator page and blog admin page
         # respectively.
         platform_params_dicts = [
-            param for param in platform_params_dicts
+            param
+            for param in platform_params_dicts
             if (
-                param['name'] not in PLATFORM_PARAMS_TO_SHOW_IN_RC_PAGE and
-                param['name'] not in PLATFORM_PARAMS_TO_SHOW_IN_BLOG_ADMIN_PAGE
+                param['name'] not in PLATFORM_PARAMS_TO_SHOW_IN_RC_PAGE
+                and param['name']
+                not in PLATFORM_PARAMS_TO_SHOW_IN_BLOG_ADMIN_PAGE
             )
         ]
 
-        self.render_json({
-            'demo_collections': sorted(feconf.DEMO_COLLECTIONS.items()),
-            'demo_explorations': sorted(feconf.DEMO_EXPLORATIONS.items()),
-            'demo_exploration_ids': demo_exploration_ids,
-            'updatable_roles': role_services.UPDATABLE_ROLES,
-            'viewable_roles': role_services.VIEWABLE_ROLES,
-            'human_readable_roles': role_services.HUMAN_READABLE_ROLES,
-            'role_to_actions': role_services.get_role_actions(),
-            'topic_summaries': topic_summary_dicts,
-            'platform_params_dicts': platform_params_dicts,
-            'skill_list': skill_summary_dicts,
-            'story_list': story_dicts,
-        })
+        self.render_json(
+            {
+                'demo_collections': sorted(feconf.DEMO_COLLECTIONS.items()),
+                'demo_explorations': sorted(feconf.DEMO_EXPLORATIONS.items()),
+                'demo_exploration_ids': demo_exploration_ids,
+                'updatable_roles': role_services.UPDATABLE_ROLES,
+                'viewable_roles': role_services.VIEWABLE_ROLES,
+                'human_readable_roles': role_services.HUMAN_READABLE_ROLES,
+                'role_to_actions': role_services.get_role_actions(),
+                'topic_summaries': topic_summary_dicts,
+                'platform_params_dicts': platform_params_dicts,
+                'skill_list': skill_summary_dicts,
+                'story_list': story_dicts,
+            }
+        )
 
     @acl_decorators.can_access_admin_page
     def post(self) -> None:
@@ -473,7 +445,7 @@ class AdminHandler(
             Exception. The num_dummy_exps_to_publish must be provided when
                 the action is generate_dummy_explorations.
             Exception. The num_dummy_translation_opportunities_to_generate
-                must be provided when the action is 
+                must be provided when the action is
                 generate_dummy_translation_opportunities.
             InvalidInputException. Generate count cannot be less than publish
                 count.
@@ -492,15 +464,15 @@ class AdminHandler(
             InvalidInputException. The input provided is not valid.
             Exception. The skill_id must be provided when
                 the action is generate_dummy_question_suggestions.
-            Exception. The num_dummy_question_suggestions_generate must be 
+            Exception. The num_dummy_question_suggestions_generate must be
                 provided when the action is generate_dummy_question_suggestions.
             Exception. The topic_id must be provided when
                 the action is generate_dummy_stories.
-            Exception. The num_dummy_question_stories must be 
+            Exception. The num_dummy_question_stories must be
                 provided when the action is generate_dummy_stories.
             Exception. The story_id must be provided when
                 the action is generate_dummy_chapters.
-            Exception. The num_dummy_chapters_to_generate must be 
+            Exception. The num_dummy_chapters_to_generate must be
                 provided when the action is generate_dummy_chapters.
         """
         assert self.user_id is not None
@@ -526,14 +498,16 @@ class AdminHandler(
                 self._reload_collection(collection_id)
             elif action == 'generate_dummy_explorations':
                 num_dummy_exps_to_generate = self.normalized_payload.get(
-                    'num_dummy_exps_to_generate')
+                    'num_dummy_exps_to_generate'
+                )
                 if num_dummy_exps_to_generate is None:
                     raise Exception(
                         'The \'num_dummy_exps_to_generate\' must be provided'
                         ' when the action is generate_dummy_explorations.'
                     )
                 num_dummy_exps_to_publish = self.normalized_payload.get(
-                    'num_dummy_exps_to_publish')
+                    'num_dummy_exps_to_publish'
+                )
                 if num_dummy_exps_to_publish is None:
                     raise Exception(
                         'The \'num_dummy_exps_to_publish\' must be provided'
@@ -542,14 +516,18 @@ class AdminHandler(
 
                 if num_dummy_exps_to_generate < num_dummy_exps_to_publish:
                     raise self.InvalidInputException(
-                        'Generate count cannot be less than publish count')
+                        'Generate count cannot be less than publish count'
+                    )
 
                 self._generate_dummy_explorations(
-                    num_dummy_exps_to_generate, num_dummy_exps_to_publish)
+                    num_dummy_exps_to_generate, num_dummy_exps_to_publish
+                )
             elif action == 'generate_dummy_translation_opportunities':
                 num_dummy_translation_opportunities_to_generate = (
                     self.normalized_payload.get(
-                        'num_dummy_translation_opportunities_to_generate'))
+                        'num_dummy_translation_opportunities_to_generate'
+                    )
+                )
                 if num_dummy_translation_opportunities_to_generate is None:
                     raise Exception(
                         'The '
@@ -559,10 +537,10 @@ class AdminHandler(
                     )
 
                 self._generate_dummy_translation_opportunities(
-                    num_dummy_translation_opportunities_to_generate)
+                    num_dummy_translation_opportunities_to_generate
+                )
             elif action == 'generate_dummy_blog_post':
-                blog_post_title = self.normalized_payload.get(
-                    'blog_post_title')
+                blog_post_title = self.normalized_payload.get('blog_post_title')
                 if blog_post_title is None:
                     raise Exception(
                         'The \'blog_post_title\' must be provided when the'
@@ -588,7 +566,8 @@ class AdminHandler(
                     )
                 num_dummy_question_suggestions_generate = (
                     self.normalized_payload.get(
-                        'num_dummy_question_suggestions_generate')
+                        'num_dummy_question_suggestions_generate'
+                    )
                 )
                 if num_dummy_question_suggestions_generate is None:
                     raise Exception(
@@ -597,7 +576,8 @@ class AdminHandler(
                         '_generate_dummy_question_suggestions.'
                     )
                 self._generate_dummy_question_suggestions(
-                    skill_id, num_dummy_question_suggestions_generate)
+                    skill_id, num_dummy_question_suggestions_generate
+                )
             elif action == 'generate_dummy_stories':
                 topic_id = self.normalized_payload.get('topic_id')
                 if topic_id is None:
@@ -605,9 +585,8 @@ class AdminHandler(
                         'The \'topic_id\' must be provided when'
                         ' the action is generate_dummy_stories.'
                     )
-                num_dummy_stories_to_generate = (
-                    self.normalized_payload.get(
-                        'num_dummy_stories_to_generate')
+                num_dummy_stories_to_generate = self.normalized_payload.get(
+                    'num_dummy_stories_to_generate'
                 )
                 if num_dummy_stories_to_generate is None:
                     raise Exception(
@@ -616,7 +595,8 @@ class AdminHandler(
                         'generate_dummy_stories.'
                     )
                 self._generate_dummy_stories(
-                    topic_id, num_dummy_stories_to_generate)
+                    topic_id, num_dummy_stories_to_generate
+                )
             elif action == 'generate_dummy_chapters':
                 story_id = self.normalized_payload.get('story_id')
                 if story_id is None:
@@ -624,9 +604,8 @@ class AdminHandler(
                         'The \'story_id\' must be provided when'
                         ' the action is generate_dummy_chapters.'
                     )
-                num_dummy_chapters_to_generate = (
-                    self.normalized_payload.get(
-                        'num_dummy_chapters_to_generate')
+                num_dummy_chapters_to_generate = self.normalized_payload.get(
+                    'num_dummy_chapters_to_generate'
                 )
                 if num_dummy_chapters_to_generate is None:
                     raise Exception(
@@ -635,7 +614,8 @@ class AdminHandler(
                         'generate_dummy_chapters.'
                     )
                 self._generate_dummy_chapters(
-                    story_id, num_dummy_chapters_to_generate)
+                    story_id, num_dummy_chapters_to_generate
+                )
             elif action == 'upload_topic_similarities':
                 data = self.normalized_payload.get('data')
                 if data is None:
@@ -651,13 +631,10 @@ class AdminHandler(
                         'The \'topic_id\' must be provided when the action'
                         ' is regenerate_topic_related_opportunities.'
                     )
-                opportunities_count = (
-                    opportunity_services
-                    .regenerate_opportunities_related_to_topic(
-                        topic_id, delete_existing_opportunities=True))
-                result = {
-                    'opportunities_count': opportunities_count
-                }
+                opportunities_count = opportunity_services.regenerate_opportunities_related_to_topic(
+                    topic_id, delete_existing_opportunities=True
+                )
+                result = {'opportunities_count': opportunities_count}
             elif action == 'rollback_exploration_to_safe_state':
                 exp_id = self.normalized_payload.get('exp_id')
                 if exp_id is None:
@@ -665,11 +642,10 @@ class AdminHandler(
                         'The \'exp_id\' must be provided when the action'
                         ' is rollback_exploration_to_safe_state.'
                     )
-                version = (
-                    exp_services.rollback_exploration_to_safe_state(exp_id))
-                result = {
-                    'version': version
-                }
+                version = exp_services.rollback_exploration_to_safe_state(
+                    exp_id
+                )
+                result = {'version': version}
             else:
                 # The handler schema defines the possible values of 'action'.
                 # If 'action' has a value other than those defined in the
@@ -702,20 +678,23 @@ class AdminHandler(
 
                 try:
                     registry.Registry.update_platform_parameter(
-                        platform_param_name, self.user_id, commit_message,
+                        platform_param_name,
+                        self.user_id,
+                        commit_message,
                         new_rules,
-                        default_value['value']
+                        default_value['value'],
                     )
                 except (
                     utils.ValidationError,
-                    parameter_services.PlatformParameterNotFoundException
+                    parameter_services.PlatformParameterNotFoundException,
                 ) as e:
                     raise self.InvalidInputException(e)
 
                 new_rule_dicts = [rule.to_dict() for rule in new_rules]
                 logging.info(
                     '[ADMIN] %s updated feature %s with new rules: '
-                    '%s.' % (self.user_id, platform_param_name, new_rule_dicts))
+                    '%s.' % (self.user_id, platform_param_name, new_rule_dicts)
+                )
             self.render_json(result)
         except Exception as e:
             logging.exception('[ADMIN] %s', e)
@@ -734,11 +713,13 @@ class AdminHandler(
         """
         if constants.DEV_MODE:
             logging.info(
-                '[ADMIN] %s reloaded exploration %s' %
-                (self.user_id, exploration_id))
+                '[ADMIN] %s reloaded exploration %s'
+                % (self.user_id, exploration_id)
+            )
             exp_services.load_demo(exploration_id)
             rights_manager.release_ownership_of_exploration(
-                user_services.get_system_user(), exploration_id)
+                user_services.get_system_user(), exploration_id
+            )
         else:
             raise Exception('Cannot reload an exploration in production.')
 
@@ -746,7 +727,7 @@ class AdminHandler(
         self,
         question_id: str,
         question_content: str,
-        linked_skill_ids: List[str]
+        linked_skill_ids: List[str],
     ) -> question_domain.Question:
         """Creates a dummy question object with the given question ID.
 
@@ -764,42 +745,54 @@ class AdminHandler(
         state = state_domain.State.create_default_state(
             'ABC',
             content_id_generator.generate(
-                translation_domain.ContentType.CONTENT),
+                translation_domain.ContentType.CONTENT
+            ),
             content_id_generator.generate(
-                translation_domain.ContentType.DEFAULT_OUTCOME),
-            is_initial_state=True)
+                translation_domain.ContentType.DEFAULT_OUTCOME
+            ),
+            is_initial_state=True,
+        )
 
         state.update_interaction_id('TextInput')
-        state.update_interaction_customization_args({
-            'placeholder': {
-                'value': {
-                    'content_id': content_id_generator.generate(
-                        translation_domain.ContentType.CUSTOMIZATION_ARG
-                    ),
-                    'unicode_str': ''
-                }
-            },
-            'rows': {'value': 1},
-            'catchMisspellings': {
-                'value': False
+        state.update_interaction_customization_args(
+            {
+                'placeholder': {
+                    'value': {
+                        'content_id': content_id_generator.generate(
+                            translation_domain.ContentType.CUSTOMIZATION_ARG
+                        ),
+                        'unicode_str': '',
+                    }
+                },
+                'rows': {'value': 1},
+                'catchMisspellings': {'value': False},
             }
-        })
+        )
 
         state.update_linked_skill_id(None)
-        state.update_content(state_domain.SubtitledHtml(
-            'content_0', question_content))
+        state.update_content(
+            state_domain.SubtitledHtml('content_0', question_content)
+        )
 
         solution = state_domain.Solution(
-            'TextInput', False, 'Solution', state_domain.SubtitledHtml(
+            'TextInput',
+            False,
+            'Solution',
+            state_domain.SubtitledHtml(
                 content_id_generator.generate(
-                    translation_domain.ContentType.SOLUTION),
-                '<p>This is a solution.</p>'))
+                    translation_domain.ContentType.SOLUTION
+                ),
+                '<p>This is a solution.</p>',
+            ),
+        )
         hints_list = [
             state_domain.Hint(
                 state_domain.SubtitledHtml(
                     content_id_generator.generate(
-                        translation_domain.ContentType.HINT),
-                    '<p>This is a hint.</p>')
+                        translation_domain.ContentType.HINT
+                    ),
+                    '<p>This is a hint.</p>',
+                )
             )
         ]
 
@@ -807,19 +800,30 @@ class AdminHandler(
         state.update_interaction_hints(hints_list)
         state.update_interaction_default_outcome(
             state_domain.Outcome(
-                None, None,
+                None,
+                None,
                 state_domain.SubtitledHtml(
                     content_id_generator.generate(
-                        translation_domain.ContentType.DEFAULT_OUTCOME),
-                    '<p>Dummy Feedback</p>'),
-                True, [], None, None
+                        translation_domain.ContentType.DEFAULT_OUTCOME
+                    ),
+                    '<p>Dummy Feedback</p>',
+                ),
+                True,
+                [],
+                None,
+                None,
             )
         )
         question = question_domain.Question(
-            question_id, state,
+            question_id,
+            state,
             feconf.CURRENT_STATE_SCHEMA_VERSION,
-            constants.DEFAULT_LANGUAGE_CODE, 0, linked_skill_ids, [],
-            content_id_generator.next_content_id_index)
+            constants.DEFAULT_LANGUAGE_CODE,
+            0,
+            linked_skill_ids,
+            [],
+            content_id_generator.next_content_id_index,
+        )
         return question
 
     def _create_dummy_skill(
@@ -837,13 +841,18 @@ class AdminHandler(
         """
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
+                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']
+            ),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
+                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']
+            ),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], ['Explanation 3'])]
+                constants.SKILL_DIFFICULTIES[2], ['Explanation 3']
+            ),
+        ]
         skill = skill_domain.Skill.create_default_skill(
-            skill_id, skill_description, rubrics)
+            skill_id, skill_description, rubrics
+        )
         skill.update_explanation(state_domain.SubtitledHtml('1', explanation))
         return skill
 
@@ -859,39 +868,39 @@ class AdminHandler(
 
         blog_post = blog_services.create_new_blog_post(self.user_id)
         fs = fs_services.GcsFileSystem('blog_post', blog_post.id)
-        with open(
-            './assets/images/general/learner1.png', 'rb'
-        ) as thumbnail:
+        with open('./assets/images/general/learner1.png', 'rb') as thumbnail:
             fs.commit(
-                'thumbnail/blog_thumbnail.png',
-                thumbnail.read(),
-                'image/png'
+                'thumbnail/blog_thumbnail.png', thumbnail.read(), 'image/png'
             )
-        with open(
-            './assets/images/subjects/Art.svg', 'rb'
-        ) as image:
+        with open('./assets/images/subjects/Art.svg', 'rb') as image:
             fs.commit(
                 'image/blog_post_image_height_326_width_490.svg',
                 image.read(),
-                'image/svg+xml'
+                'image/svg+xml',
             )
 
         if blog_post_title == EDUCATION_BLOG_POST_TITLE:
-            blog_services.update_blog_post(blog_post.id, {
-                'title':
-                    '%s-%s' % (EDUCATION_BLOG_POST_TITLE, blog_post.id),
-                'thumbnail_filename': 'blog_thumbnail.png',
-                'content': EDUCATION_BLOG_POST_CONTENT,
-                'tags': ['Community']
-            })
+            blog_services.update_blog_post(
+                blog_post.id,
+                {
+                    'title': '%s-%s'
+                    % (EDUCATION_BLOG_POST_TITLE, blog_post.id),
+                    'thumbnail_filename': 'blog_thumbnail.png',
+                    'content': EDUCATION_BLOG_POST_CONTENT,
+                    'tags': ['Community'],
+                },
+            )
         elif blog_post_title == FORMATTING_BLOG_POST_TITLE:
-            blog_services.update_blog_post(blog_post.id, {
-                'title':
-                    '%s-%s' % (FORMATTING_BLOG_POST_TITLE, blog_post.id),
-                'content': FORMATTING_BLOG_POST_CONTENT,
-                'tags': ['Learners', 'Languages'],
-                'thumbnail_filename': 'blog_thumbnail.png'
-            })
+            blog_services.update_blog_post(
+                blog_post.id,
+                {
+                    'title': '%s-%s'
+                    % (FORMATTING_BLOG_POST_TITLE, blog_post.id),
+                    'content': FORMATTING_BLOG_POST_CONTENT,
+                    'tags': ['Learners', 'Languages'],
+                    'thumbnail_filename': 'blog_thumbnail.png',
+                },
+            )
         else:
             # The handler schema defines the possible values of
             # 'blog_post_title'. If 'blog_post_title' has a value other than
@@ -899,19 +908,21 @@ class AdminHandler(
             # Hence, 'blog_post_title' must be 'ARABIC_BLOG_POST_TITLE' if
             # this branch is executed.
             assert blog_post_title == ARABIC_BLOG_POST_TITLE
-            blog_services.update_blog_post(blog_post.id, {
-                'title':
-                    '%s-%s' % (ARABIC_BLOG_POST_TITLE, blog_post.id),
-                'content': ARABIC_BLOG_POST_CONTENT,
-                'tags': [
-                    'Learners',
-                    'Volunteer',
-                    'New features',
-                    'Community',
-                    'Languages'
-                ],
-                'thumbnail_filename': 'blog_thumbnail.png'
-            })
+            blog_services.update_blog_post(
+                blog_post.id,
+                {
+                    'title': '%s-%s' % (ARABIC_BLOG_POST_TITLE, blog_post.id),
+                    'content': ARABIC_BLOG_POST_CONTENT,
+                    'tags': [
+                        'Learners',
+                        'Volunteer',
+                        'New features',
+                        'Community',
+                        'Languages',
+                    ],
+                    'thumbnail_filename': 'blog_thumbnail.png',
+                },
+            )
         blog_services.publish_blog_post(blog_post.id)
 
     def _load_dummy_new_structures_data(self) -> None:
@@ -927,7 +938,8 @@ class AdminHandler(
         if constants.DEV_MODE:
             if feconf.ROLE_ID_CURRICULUM_ADMIN not in self.user.roles:
                 raise Exception(
-                    'User does not have enough rights to generate data.')
+                    'User does not have enough rights to generate data.'
+                )
             topic_id_1 = topic_fetchers.get_new_topic_id()
             story_id = story_services.get_new_story_id()
 
@@ -942,22 +954,30 @@ class AdminHandler(
             question_id_5 = question_services.get_new_question_id()
 
             skill_1 = self._create_dummy_skill(
-                skill_id_1, 'Dummy Skill 1', '<p>Dummy Explanation 1</p>')
+                skill_id_1, 'Dummy Skill 1', '<p>Dummy Explanation 1</p>'
+            )
             skill_2 = self._create_dummy_skill(
-                skill_id_2, 'Dummy Skill 2', '<p>Dummy Explanation 2</p>')
+                skill_id_2, 'Dummy Skill 2', '<p>Dummy Explanation 2</p>'
+            )
             skill_3 = self._create_dummy_skill(
-                skill_id_3, 'Dummy Skill 3', '<p>Dummy Explanation 3</p>')
+                skill_id_3, 'Dummy Skill 3', '<p>Dummy Explanation 3</p>'
+            )
 
             question_1 = self._create_dummy_question(
-                question_id_1, 'Question 1', [skill_id_1])
+                question_id_1, 'Question 1', [skill_id_1]
+            )
             question_2 = self._create_dummy_question(
-                question_id_2, 'Question 2', [skill_id_2])
+                question_id_2, 'Question 2', [skill_id_2]
+            )
             question_3 = self._create_dummy_question(
-                question_id_3, 'Question 3', [skill_id_3])
+                question_id_3, 'Question 3', [skill_id_3]
+            )
             question_4 = self._create_dummy_question(
-                question_id_4, 'Question 4', [skill_id_1])
+                question_id_4, 'Question 4', [skill_id_1]
+            )
             question_5 = self._create_dummy_question(
-                question_id_5, 'Question 5', [skill_id_1])
+                question_id_5, 'Question 5', [skill_id_1]
+            )
             question_services.add_question(self.user_id, question_1)
             question_services.add_question(self.user_id, question_2)
             question_services.add_question(self.user_id, question_3)
@@ -965,30 +985,44 @@ class AdminHandler(
             question_services.add_question(self.user_id, question_5)
 
             question_services.create_new_question_skill_link(
-                self.user_id, question_id_1, skill_id_1, 0.3)
+                self.user_id, question_id_1, skill_id_1, 0.3
+            )
             question_services.create_new_question_skill_link(
-                self.user_id, question_id_4, skill_id_1, 0.3)
+                self.user_id, question_id_4, skill_id_1, 0.3
+            )
             question_services.create_new_question_skill_link(
-                self.user_id, question_id_5, skill_id_1, 0.3)
+                self.user_id, question_id_5, skill_id_1, 0.3
+            )
             question_services.create_new_question_skill_link(
-                self.user_id, question_id_2, skill_id_2, 0.5)
+                self.user_id, question_id_2, skill_id_2, 0.5
+            )
             question_services.create_new_question_skill_link(
-                self.user_id, question_id_3, skill_id_3, 0.7)
+                self.user_id, question_id_3, skill_id_3, 0.7
+            )
 
             topic_1 = topic_domain.Topic.create_default_topic(
-                topic_id_1, 'Dummy Topic 1', 'dummy-topic-one', 'description',
-                'fragm')
+                topic_id_1,
+                'Dummy Topic 1',
+                'dummy-topic-one',
+                'description',
+                'fragm',
+            )
 
             topic_1.update_meta_tag_content('dummy-meta')
             raw_image = b''
             with open(
-                'core/tests/data/thumbnail.svg', 'rt',
-                encoding='utf-8') as svg_file:
+                'core/tests/data/thumbnail.svg', 'rt', encoding='utf-8'
+            ) as svg_file:
                 svg_file_content = svg_file.read()
                 raw_image = svg_file_content.encode('ascii')
             fs_services.save_original_and_compressed_versions_of_image(
-                'thumbnail.svg', feconf.ENTITY_TYPE_TOPIC, topic_id_1,
-                raw_image, 'thumbnail', False)
+                'thumbnail.svg',
+                feconf.ENTITY_TYPE_TOPIC,
+                topic_id_1,
+                raw_image,
+                'thumbnail',
+                False,
+            )
             topic_services.update_thumbnail_filename(topic_1, 'thumbnail.svg')
             topic_1.update_thumbnail_bg_color('#C6DCDA')
             topic_1.add_canonical_story(story_id)
@@ -998,29 +1032,27 @@ class AdminHandler(
             topic_1.update_skill_ids_for_diagnostic_test([skill_id_1])
             topic_1.add_subtopic(1, 'Dummy Subtopic Title', 'dummysubtopic')
             topic_services.update_subtopic_thumbnail_filename(
-                topic_1, 1, 'thumbnail.svg')
+                topic_1, 1, 'thumbnail.svg'
+            )
             topic_1.update_subtopic_thumbnail_bg_color(
-                1, constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0])
+                1, constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0]
+            )
             topic_1.move_skill_id_to_subtopic(None, 1, skill_id_2)
             topic_1.move_skill_id_to_subtopic(None, 1, skill_id_3)
 
             if feature_flag_services.is_feature_flag_enabled(
-                feature_flag_list.FeatureNames
-                .SHOW_RESTRUCTURED_STUDY_GUIDES.value,
-                self.user_id
+                feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value,
+                self.user_id,
             ):
-                study_guide = (
-                    study_guide_domain.StudyGuide.create_study_guide(
-                        1, topic_id_1, 'Dummy Study Guide',
-                        'Lorem Ipsum is simply dummy text.'
-                    )
+                study_guide = study_guide_domain.StudyGuide.create_study_guide(
+                    1,
+                    topic_id_1,
+                    'Dummy Study Guide',
+                    'Lorem Ipsum is simply dummy text.',
                 )
             else:
-                subtopic_page = (
-                    subtopic_page_domain.SubtopicPage
-                    .create_default_subtopic_page(
-                        1, topic_id_1
-                    )
+                subtopic_page = subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                    1, topic_id_1
                 )
             # These explorations were chosen since they pass the validations
             # for published stories.
@@ -1029,26 +1061,36 @@ class AdminHandler(
             self._reload_exploration('13')
 
             story = story_domain.Story.create_default_story(
-                story_id, 'Help Jaime win the Arcade', 'Description',
-                topic_id_1, 'help-jamie-win-arcade', 'dummy-meta-content',
-                'thumbnail.svg', '#F8BF74')
+                story_id,
+                'Help Jaime win the Arcade',
+                'Description',
+                topic_id_1,
+                'help-jamie-win-arcade',
+                'dummy-meta-content',
+                'thumbnail.svg',
+                '#F8BF74',
+            )
 
-            story_node_dicts = [{
-                'exp_id': '6',
-                'title': 'What are the place values?',
-                'description': 'Jaime learns the place value of each digit '
-                               'in a big number.'
-            }, {
-                'exp_id': '25',
-                'title': 'Finding the value of a number',
-                'description': 'Jaime understands the value of his '
-                               'arcade score.'
-            }, {
-                'exp_id': '13',
-                'title': 'Comparing Numbers',
-                'description': 'Jaime learns if a number is smaller or '
-                               'greater than another number.'
-            }]
+            story_node_dicts = [
+                {
+                    'exp_id': '6',
+                    'title': 'What are the place values?',
+                    'description': 'Jaime learns the place value of each digit '
+                    'in a big number.',
+                },
+                {
+                    'exp_id': '25',
+                    'title': 'Finding the value of a number',
+                    'description': 'Jaime understands the value of his '
+                    'arcade score.',
+                },
+                {
+                    'exp_id': '13',
+                    'title': 'Comparing Numbers',
+                    'description': 'Jaime learns if a number is smaller or '
+                    'greater than another number.',
+                },
+            ]
 
             def generate_dummy_story_nodes(
                 node_id: int, exp_id: str, title: str, description: str
@@ -1063,25 +1105,35 @@ class AdminHandler(
                 """
                 assert self.user_id is not None
                 story.add_node(
-                    '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
-                    title)
+                    '%s%d' % (story_domain.NODE_ID_PREFIX, node_id), title
+                )
                 story.update_node_description(
-                    '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
-                    description)
+                    '%s%d' % (story_domain.NODE_ID_PREFIX, node_id), description
+                )
                 story.update_node_exploration_id(
-                    '%s%d' % (story_domain.NODE_ID_PREFIX, node_id), exp_id)
+                    '%s%d' % (story_domain.NODE_ID_PREFIX, node_id), exp_id
+                )
 
                 if node_id != len(story_node_dicts):
                     story.update_node_destination_node_ids(
                         '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
-                        ['%s%d' % (story_domain.NODE_ID_PREFIX, node_id + 1)])
+                        ['%s%d' % (story_domain.NODE_ID_PREFIX, node_id + 1)],
+                    )
 
                 exp_services.update_exploration(
-                    self.user_id, exp_id, [exp_domain.ExplorationChange({
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'category',
-                        'new_value': 'Astronomy'
-                    })], 'Change category')
+                    self.user_id,
+                    exp_id,
+                    [
+                        exp_domain.ExplorationChange(
+                            {
+                                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                                'property_name': 'category',
+                                'new_value': 'Astronomy',
+                            }
+                        )
+                    ],
+                    'Change category',
+                )
 
             for i, story_node_dict in enumerate(story_node_dicts):
                 generate_dummy_story_nodes(i + 1, **story_node_dict)
@@ -1092,34 +1144,46 @@ class AdminHandler(
             story_services.save_new_story(self.user_id, story)
             topic_services.save_new_topic(self.user_id, topic_1)
             if feature_flag_services.is_feature_flag_enabled(
-                feature_flag_list.FeatureNames
-                .SHOW_RESTRUCTURED_STUDY_GUIDES.value,
-                self.user_id
+                feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value,
+                self.user_id,
             ):
                 study_guide_services.save_study_guide(
-                    self.user_id, study_guide, 'Added study guide',
-                    [topic_domain.TopicChange({
-                        'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                        'subtopic_id': 1,
-                        'title': 'Dummy Subtopic Title',
-                        'url_fragment': 'dummy-fragment'
-                    })]
+                    self.user_id,
+                    study_guide,
+                    'Added study guide',
+                    [
+                        topic_domain.TopicChange(
+                            {
+                                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                                'subtopic_id': 1,
+                                'title': 'Dummy Subtopic Title',
+                                'url_fragment': 'dummy-fragment',
+                            }
+                        )
+                    ],
                 )
             else:
                 subtopic_page_services.save_subtopic_page(
-                    self.user_id, subtopic_page, 'Added subtopic',
-                    [topic_domain.TopicChange({
-                        'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                        'subtopic_id': 1,
-                        'title': 'Dummy Subtopic Title',
-                        'url_fragment': 'dummy-fragment'
-                    })]
+                    self.user_id,
+                    subtopic_page,
+                    'Added subtopic',
+                    [
+                        topic_domain.TopicChange(
+                            {
+                                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                                'subtopic_id': 1,
+                                'title': 'Dummy Subtopic Title',
+                                'url_fragment': 'dummy-fragment',
+                            }
+                        )
+                    ],
                 )
 
             # Generates translation opportunities for the Contributor Dashboard.
             exp_ids_in_story = story.story_contents.get_all_linked_exp_ids()
             opportunity_services.add_new_exploration_opportunities(
-                story_id, exp_ids_in_story)
+                story_id, exp_ids_in_story
+            )
 
             topic_services.publish_story(topic_id_1, story_id, self.user_id)
             topic_services.publish_topic(topic_id_1, self.user_id)
@@ -1138,23 +1202,28 @@ class AdminHandler(
         if constants.DEV_MODE:
             if feconf.ROLE_ID_CURRICULUM_ADMIN not in self.user.roles:
                 raise Exception(
-                    'User does not have enough rights to generate data.')
+                    'User does not have enough rights to generate data.'
+                )
             skill_id = skill_services.get_new_skill_id()
             skill_name = 'Dummy Skill %s' % str(random.getrandbits(32))
             skill = self._create_dummy_skill(
-                skill_id, skill_name, '<p>Dummy Explanation 1</p>')
+                skill_id, skill_name, '<p>Dummy Explanation 1</p>'
+            )
             skill_services.save_new_skill(self.user_id, skill)
             for i in range(15):
                 question_id = question_services.get_new_question_id()
                 question_name = 'Question number %s %s' % (str(i), skill_name)
                 question = self._create_dummy_question(
-                    question_id, question_name, [skill_id])
+                    question_id, question_name, [skill_id]
+                )
                 question_services.add_question(self.user_id, question)
                 question_difficulty = list(
-                    constants.SKILL_DIFFICULTY_LABEL_TO_FLOAT.values())
+                    constants.SKILL_DIFFICULTY_LABEL_TO_FLOAT.values()
+                )
                 random_difficulty = random.choice(question_difficulty)
                 question_services.create_new_question_skill_link(
-                    self.user_id, question_id, skill_id, random_difficulty)
+                    self.user_id, question_id, skill_id, random_difficulty
+                )
         else:
             raise Exception('Cannot generate dummy skills in production.')
 
@@ -1171,11 +1240,13 @@ class AdminHandler(
         assert self.user_id is not None
         if constants.DEV_MODE:
             logging.info(
-                '[ADMIN] %s reloaded collection %s' %
-                (self.user_id, collection_id))
+                '[ADMIN] %s reloaded collection %s'
+                % (self.user_id, collection_id)
+            )
             collection_services.load_demo(collection_id)
             rights_manager.release_ownership_of_collection(
-                user_services.get_system_user(), collection_id)
+                user_services.get_system_user(), collection_id
+            )
         else:
             raise Exception('Cannot reload a collection in production.')
 
@@ -1196,27 +1267,36 @@ class AdminHandler(
         assert self.user_id is not None
         if constants.DEV_MODE:
             logging.info(
-                '[ADMIN] %s generated %s number of dummy explorations' %
-                (self.user_id, num_dummy_exps_to_generate))
-            possible_titles = ['Hulk Neuroscience', 'Quantum Starks',
-                               'Wonder Anatomy',
-                               'Elvish, language of "Lord of the Rings',
-                               'The Science of Superheroes']
+                '[ADMIN] %s generated %s number of dummy explorations'
+                % (self.user_id, num_dummy_exps_to_generate)
+            )
+            possible_titles = [
+                'Hulk Neuroscience',
+                'Quantum Starks',
+                'Wonder Anatomy',
+                'Elvish, language of "Lord of the Rings',
+                'The Science of Superheroes',
+            ]
             exploration_ids_to_publish = []
             for i in range(num_dummy_exps_to_generate):
                 title = random.choice(possible_titles)
                 category = random.choice(constants.SEARCH_DROPDOWN_CATEGORIES)
                 new_exploration_id = exp_fetchers.get_new_exploration_id()
                 exploration = exp_domain.Exploration.create_default_exploration(
-                    new_exploration_id, title=title, category=category,
-                    objective='Dummy Objective')
+                    new_exploration_id,
+                    title=title,
+                    category=category,
+                    objective='Dummy Objective',
+                )
                 exp_services.save_new_exploration(self.user_id, exploration)
                 if i <= num_dummy_exps_to_publish - 1:
                     exploration_ids_to_publish.append(new_exploration_id)
                     rights_manager.publish_exploration(
-                        self.user, new_exploration_id)
+                        self.user, new_exploration_id
+                    )
             exp_services.index_explorations_given_ids(
-                exploration_ids_to_publish)
+                exploration_ids_to_publish
+            )
         else:
             raise Exception('Cannot generate dummy explorations in production.')
 
@@ -1236,11 +1316,15 @@ class AdminHandler(
         if constants.DEV_MODE:
             if feconf.ROLE_ID_CURRICULUM_ADMIN not in self.user.roles:
                 raise Exception(
-                    'User does not have enough rights to generate data.')
+                    'User does not have enough rights to generate data.'
+                )
             logging.info(
                 '[ADMIN] %s generated %s number of dummy '
-                'translation opportunities (explorations)' % 
-                (self.user_id, num_dummy_translation_opportunities_to_generate)
+                'translation opportunities (explorations)'
+                % (
+                    self.user_id,
+                    num_dummy_translation_opportunities_to_generate,
+                )
             )
 
             # Generate a new topic, story, skill and questions id.
@@ -1254,60 +1338,84 @@ class AdminHandler(
 
             initial_dummy_opportunites_generation = (
                 skill_services.does_skill_with_description_exist(
-                'Dummy Skill 1') is False)
+                    'Dummy Skill 1'
+                )
+                is False
+            )
 
             if initial_dummy_opportunites_generation:
                 skill = self._create_dummy_skill(
-                    skill_id, 'Dummy Skill 1', '<p>Dummy Explanation 1</p>')
+                    skill_id, 'Dummy Skill 1', '<p>Dummy Explanation 1</p>'
+                )
                 question_1 = self._create_dummy_question(
-                    question_id_1, 'Question 1', [skill_id])
+                    question_id_1, 'Question 1', [skill_id]
+                )
                 question_2 = self._create_dummy_question(
-                    question_id_2, 'Question 2', [skill_id])
+                    question_id_2, 'Question 2', [skill_id]
+                )
                 question_3 = self._create_dummy_question(
-                    question_id_3, 'Question 3', [skill_id])
+                    question_id_3, 'Question 3', [skill_id]
+                )
                 story = story_domain.Story.create_default_story(
-                    story_id, 'Dummy Story', 'Description',
-                    topic_id, 'dummy-story')
+                    story_id,
+                    'Dummy Story',
+                    'Description',
+                    topic_id,
+                    'dummy-story',
+                )
 
                 question_services.add_question(self.user_id, question_1)
                 question_services.add_question(self.user_id, question_2)
                 question_services.add_question(self.user_id, question_3)
 
                 question_services.create_new_question_skill_link(
-                    self.user_id, question_id_1, skill_id, 0.3)
+                    self.user_id, question_id_1, skill_id, 0.3
+                )
                 question_services.create_new_question_skill_link(
-                    self.user_id, question_id_2, skill_id, 0.3)
+                    self.user_id, question_id_2, skill_id, 0.3
+                )
                 question_services.create_new_question_skill_link(
-                    self.user_id, question_id_3, skill_id, 0.3)
+                    self.user_id, question_id_3, skill_id, 0.3
+                )
                 topic = topic_domain.Topic.create_default_topic(
-                    topic_id, 'Dummy Topic 1', 'dummy-topic-one', 'description',
-                    'fragm')
+                    topic_id,
+                    'Dummy Topic 1',
+                    'dummy-topic-one',
+                    'description',
+                    'fragm',
+                )
                 topic.update_meta_tag_content('dummy-meta')
                 raw_image = b''
                 with open(
-                    'core/tests/data/thumbnail.svg', 'rt',
-                    encoding='utf-8') as svg_file:
+                    'core/tests/data/thumbnail.svg', 'rt', encoding='utf-8'
+                ) as svg_file:
                     svg_file_content = svg_file.read()
                     raw_image = svg_file_content.encode('ascii')
                 fs_services.save_original_and_compressed_versions_of_image(
-                    'thumbnail.svg', feconf.ENTITY_TYPE_TOPIC, topic_id,
-                    raw_image, 'thumbnail', False)
-                topic_services.update_thumbnail_filename(
-                    topic, 'thumbnail.svg')
+                    'thumbnail.svg',
+                    feconf.ENTITY_TYPE_TOPIC,
+                    topic_id,
+                    raw_image,
+                    'thumbnail',
+                    False,
+                )
+                topic_services.update_thumbnail_filename(topic, 'thumbnail.svg')
                 topic.update_thumbnail_bg_color('#C6DCDA')
                 topic.add_canonical_story(story_id)
                 topic.add_uncategorized_skill_id(skill_id)
                 topic.update_skill_ids_for_diagnostic_test([skill_id])
                 topic.add_subtopic(1, 'Dummy Subtopic Title', 'dummysubtopic')
                 topic_services.update_subtopic_thumbnail_filename(
-                    topic, 1, 'thumbnail.svg')
+                    topic, 1, 'thumbnail.svg'
+                )
                 topic.update_subtopic_thumbnail_bg_color(
-                    1, constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0])
+                    1, constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0]
+                )
                 topic.move_skill_id_to_subtopic(None, 1, skill_id)
 
-                subtopic_page = (
-                    subtopic_page_domain.SubtopicPage
-                    .create_default_subtopic_page(1, topic_id))
+                subtopic_page = subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                    1, topic_id
+                )
             else:
                 skill = skill_fetchers.get_skill_by_id(skill_id)
                 question_1 = question_services.get_question_by_id(question_id_1)
@@ -1329,24 +1437,28 @@ class AdminHandler(
                 exploration_dict['id'] = new_exploration_id
                 exploration_dict['title'] = title
                 exploration_dict['category'] = category
-                exploration = exp_domain.Exploration.from_dict(
-                    exploration_dict)
+                exploration = exp_domain.Exploration.from_dict(exploration_dict)
                 exp_services.save_new_exploration(self.user_id, exploration)
                 exploration_ids_to_publish.append(new_exploration_id)
                 rights_manager.publish_exploration(
-                    self.user, new_exploration_id)
+                    self.user, new_exploration_id
+                )
                 story_node_dict = {
                     'exp_id': new_exploration_id,
                     'title': title,
-                    'description': 'Description'
+                    'description': 'Description',
                 }
                 story_node_dicts.append(story_node_dict)
             exp_services.index_explorations_given_ids(
-                exploration_ids_to_publish)
+                exploration_ids_to_publish
+            )
 
             def generate_dummy_story_nodes(
-                node_id: int, stop_update: bool, exp_id: str,
-                title: str, description: str
+                node_id: int,
+                stop_update: bool,
+                exp_id: str,
+                title: str,
+                description: str,
             ) -> None:
                 """Generates and connects sequential story nodes.
 
@@ -1361,85 +1473,115 @@ class AdminHandler(
                 assert self.user_id is not None
                 if initial_dummy_opportunites_generation:
                     story.add_node(
-                        '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
-                        title)
+                        '%s%d' % (story_domain.NODE_ID_PREFIX, node_id), title
+                    )
                     story.update_node_description(
                         '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
-                        description)
+                        description,
+                    )
                     story.update_node_exploration_id(
-                        '%s%d' % (story_domain.NODE_ID_PREFIX, node_id), exp_id)
+                        '%s%d' % (story_domain.NODE_ID_PREFIX, node_id), exp_id
+                    )
 
                     if stop_update is False:
                         story.update_node_destination_node_ids(
                             '%s%d' % (story_domain.NODE_ID_PREFIX, node_id),
-                            ['%s%d' % (
-                                story_domain.NODE_ID_PREFIX, node_id + 1)])
+                            [
+                                '%s%d'
+                                % (story_domain.NODE_ID_PREFIX, node_id + 1)
+                            ],
+                        )
                 else:
                     change_list = [
-                        story_domain.StoryChange({
-                            'cmd': 'add_story_node',
-                            'node_id': '%s%d' % (
-                                story_domain.NODE_ID_PREFIX, node_id),
-                            'title': title,
-                        }),
-                        story_domain.StoryChange({
-                            'cmd': 'update_story_node_property',
-                            'node_id': '%s%d' % (
-                                story_domain.NODE_ID_PREFIX, node_id),
-                            'property_name': '%s' % (
-                                story_domain.STORY_NODE_PROPERTY_DESCRIPTION),
-                            'old_value': None,
-                            'new_value': description
-                        }),
-                        story_domain.StoryChange({
-                            'cmd': 'update_story_node_property',
-                            'node_id': '%s%d' % (
-                                story_domain.NODE_ID_PREFIX, node_id),
-                            'property_name': '%s' % (
-                                story_domain
-                                .STORY_NODE_PROPERTY_EXPLORATION_ID),
-                            'old_value': None,
-                            'new_value': exp_id
-                        })
+                        story_domain.StoryChange(
+                            {
+                                'cmd': 'add_story_node',
+                                'node_id': '%s%d'
+                                % (story_domain.NODE_ID_PREFIX, node_id),
+                                'title': title,
+                            }
+                        ),
+                        story_domain.StoryChange(
+                            {
+                                'cmd': 'update_story_node_property',
+                                'node_id': '%s%d'
+                                % (story_domain.NODE_ID_PREFIX, node_id),
+                                'property_name': '%s'
+                                % (
+                                    story_domain.STORY_NODE_PROPERTY_DESCRIPTION
+                                ),
+                                'old_value': None,
+                                'new_value': description,
+                            }
+                        ),
+                        story_domain.StoryChange(
+                            {
+                                'cmd': 'update_story_node_property',
+                                'node_id': '%s%d'
+                                % (story_domain.NODE_ID_PREFIX, node_id),
+                                'property_name': '%s'
+                                % (
+                                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                                ),
+                                'old_value': None,
+                                'new_value': exp_id,
+                            }
+                        ),
                     ]
                     story_services.update_story(
                         self.user_id, story_id, change_list, 'Added story node'
                     )
 
                 exp_services.update_exploration(
-                    self.user_id, exp_id, [exp_domain.ExplorationChange({
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'category',
-                        'new_value': 'Astronomy'
-                    })], 'Change category')
+                    self.user_id,
+                    exp_id,
+                    [
+                        exp_domain.ExplorationChange(
+                            {
+                                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                                'property_name': 'category',
+                                'new_value': 'Astronomy',
+                            }
+                        )
+                    ],
+                    'Change category',
+                )
 
             story_node_index = 0
             if story.story_contents is not None:
-                story_node_index = int(
-                    story.story_contents.next_node_id[5:]) - 1
+                story_node_index = (
+                    int(story.story_contents.next_node_id[5:]) - 1
+                )
             if story_node_index > 0:
                 story.update_node_destination_node_ids(
-                    '%s%d' % (
-                        story_domain.NODE_ID_PREFIX, story_node_index),
-                    [story.story_contents.next_node_id])
+                    '%s%d' % (story_domain.NODE_ID_PREFIX, story_node_index),
+                    [story.story_contents.next_node_id],
+                )
             for i, story_node_dict in enumerate(story_node_dicts):
                 story_node_index += 1
                 stop_update = i is len(story_node_dicts) - 1
                 generate_dummy_story_nodes(
-                    story_node_index, stop_update, **story_node_dict)
+                    story_node_index, stop_update, **story_node_dict
+                )
 
             if initial_dummy_opportunites_generation:
                 skill_services.save_new_skill(self.user_id, skill)
                 story_services.save_new_story(self.user_id, story)
                 topic_services.save_new_topic(self.user_id, topic)
                 subtopic_page_services.save_subtopic_page(
-                    self.user_id, subtopic_page, 'Added subtopic',
-                    [topic_domain.TopicChange({
-                        'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                        'subtopic_id': 1,
-                        'title': 'Dummy Subtopic Title',
-                        'url_fragment': 'dummy-subtopic-fragment'
-                    })]
+                    self.user_id,
+                    subtopic_page,
+                    'Added subtopic',
+                    [
+                        topic_domain.TopicChange(
+                            {
+                                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                                'subtopic_id': 1,
+                                'title': 'Dummy Subtopic Title',
+                                'url_fragment': 'dummy-subtopic-fragment',
+                            }
+                        )
+                    ],
                 )
 
             # Generates translation opportunities for the
@@ -1447,7 +1589,8 @@ class AdminHandler(
             exp_ids_in_story = story.story_contents.get_all_linked_exp_ids()
             exp_ids_in_story = exploration_ids_to_publish
             opportunity_services.add_new_exploration_opportunities(
-                story_id, exp_ids_in_story)
+                story_id, exp_ids_in_story
+            )
 
             topic_services.publish_story(topic_id, story_id, self.user_id)
 
@@ -1467,9 +1610,9 @@ class AdminHandler(
         if constants.DEV_MODE:
             if feconf.ROLE_ID_CURRICULUM_ADMIN not in self.user.roles:
                 raise Exception(
-                    'User does not have enough rights to generate data.')
-            logging.info(
-                '[ADMIN] %s generated dummy classroom.' % self.user_id)
+                    'User does not have enough rights to generate data.'
+                )
+            logging.info('[ADMIN] %s generated dummy classroom.' % self.user_id)
 
             topic_id_1 = topic_fetchers.get_new_topic_id()
             topic_id_2 = topic_fetchers.get_new_topic_id()
@@ -1500,110 +1643,165 @@ class AdminHandler(
             question_id_15 = question_services.get_new_question_id()
 
             question_1 = self._create_dummy_question(
-                question_id_1, 'Question 1', [skill_id_1])
+                question_id_1, 'Question 1', [skill_id_1]
+            )
             question_2 = self._create_dummy_question(
-                question_id_2, 'Question 2', [skill_id_1])
+                question_id_2, 'Question 2', [skill_id_1]
+            )
             question_3 = self._create_dummy_question(
-                question_id_3, 'Question 3', [skill_id_1])
+                question_id_3, 'Question 3', [skill_id_1]
+            )
             question_4 = self._create_dummy_question(
-                question_id_4, 'Question 4', [skill_id_2])
+                question_id_4, 'Question 4', [skill_id_2]
+            )
             question_5 = self._create_dummy_question(
-                question_id_5, 'Question 5', [skill_id_2])
+                question_id_5, 'Question 5', [skill_id_2]
+            )
             question_6 = self._create_dummy_question(
-                question_id_6, 'Question 6', [skill_id_2])
+                question_id_6, 'Question 6', [skill_id_2]
+            )
             question_7 = self._create_dummy_question(
-                question_id_7, 'Question 7', [skill_id_3])
+                question_id_7, 'Question 7', [skill_id_3]
+            )
             question_8 = self._create_dummy_question(
-                question_id_8, 'Question 8', [skill_id_3])
+                question_id_8, 'Question 8', [skill_id_3]
+            )
             question_9 = self._create_dummy_question(
-                question_id_9, 'Question 9', [skill_id_3])
+                question_id_9, 'Question 9', [skill_id_3]
+            )
             question_10 = self._create_dummy_question(
-                question_id_10, 'Question 10', [skill_id_4])
+                question_id_10, 'Question 10', [skill_id_4]
+            )
             question_11 = self._create_dummy_question(
-                question_id_11, 'Question 11', [skill_id_4])
+                question_id_11, 'Question 11', [skill_id_4]
+            )
             question_12 = self._create_dummy_question(
-                question_id_12, 'Question 12', [skill_id_4])
+                question_id_12, 'Question 12', [skill_id_4]
+            )
             question_13 = self._create_dummy_question(
-                question_id_13, 'Question 13', [skill_id_5])
+                question_id_13, 'Question 13', [skill_id_5]
+            )
             question_14 = self._create_dummy_question(
-                question_id_14, 'Question 14', [skill_id_5])
+                question_id_14, 'Question 14', [skill_id_5]
+            )
             question_15 = self._create_dummy_question(
-                question_id_15, 'Question 15', [skill_id_5])
+                question_id_15, 'Question 15', [skill_id_5]
+            )
 
             topic_1 = topic_domain.Topic.create_default_topic(
-                topic_id_1, 'Addition', 'add', 'description', 'fragm')
+                topic_id_1, 'Addition', 'add', 'description', 'fragm'
+            )
             topic_1.skill_ids_for_diagnostic_test = [skill_id_1]
             topic_1.thumbnail_filename = 'thumbnail.svg'
             topic_1.thumbnail_bg_color = '#C6DCDA'
             topic_1.subtopics = [
                 topic_domain.Subtopic(
-                    1, 'Title', [skill_id_1], 'image.svg',
-                    constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
-                    'dummy-subtopic-three')]
+                    1,
+                    'Title',
+                    [skill_id_1],
+                    'image.svg',
+                    constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                    21131,
+                    'dummy-subtopic-three',
+                )
+            ]
             topic_1.next_subtopic_id = 2
 
             topic_2 = topic_domain.Topic.create_default_topic(
-                topic_id_2, 'Subtraction', 'subtraction',
-                'description', 'fragm'
+                topic_id_2, 'Subtraction', 'subtraction', 'description', 'fragm'
             )
             topic_2.skill_ids_for_diagnostic_test = [skill_id_2]
             topic_2.thumbnail_filename = 'thumbnail.svg'
             topic_2.thumbnail_bg_color = '#C6DCDA'
             topic_2.subtopics = [
                 topic_domain.Subtopic(
-                    1, 'Title', [skill_id_2], 'image.svg',
-                    constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
-                    'dummy-subtopic-three')]
+                    1,
+                    'Title',
+                    [skill_id_2],
+                    'image.svg',
+                    constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                    21131,
+                    'dummy-subtopic-three',
+                )
+            ]
             topic_2.next_subtopic_id = 2
 
             topic_3 = topic_domain.Topic.create_default_topic(
-                topic_id_3, 'Multiplication', 'multiplication',
-                'description', 'fragm'
+                topic_id_3,
+                'Multiplication',
+                'multiplication',
+                'description',
+                'fragm',
             )
             topic_3.skill_ids_for_diagnostic_test = [skill_id_3]
             topic_3.thumbnail_filename = 'thumbnail.svg'
             topic_3.thumbnail_bg_color = '#C6DCDA'
             topic_3.subtopics = [
                 topic_domain.Subtopic(
-                    1, 'Title', [skill_id_3], 'image.svg',
-                    constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
-                    'dummy-subtopic-three')]
+                    1,
+                    'Title',
+                    [skill_id_3],
+                    'image.svg',
+                    constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                    21131,
+                    'dummy-subtopic-three',
+                )
+            ]
             topic_3.next_subtopic_id = 2
 
             topic_4 = topic_domain.Topic.create_default_topic(
-                topic_id_4, 'Division', 'division', 'description', 'fragm')
+                topic_id_4, 'Division', 'division', 'description', 'fragm'
+            )
             topic_4.skill_ids_for_diagnostic_test = [skill_id_4]
             topic_4.thumbnail_filename = 'thumbnail.svg'
             topic_4.thumbnail_bg_color = '#C6DCDA'
             topic_4.subtopics = [
                 topic_domain.Subtopic(
-                    1, 'Title', [skill_id_4], 'image.svg',
-                    constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
-                    'dummy-subtopic-three')]
+                    1,
+                    'Title',
+                    [skill_id_4],
+                    'image.svg',
+                    constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                    21131,
+                    'dummy-subtopic-three',
+                )
+            ]
             topic_4.next_subtopic_id = 2
 
             topic_5 = topic_domain.Topic.create_default_topic(
-                topic_id_5, 'Fraction', 'fraction', 'description', 'fragm')
+                topic_id_5, 'Fraction', 'fraction', 'description', 'fragm'
+            )
             topic_5.skill_ids_for_diagnostic_test = [skill_id_5]
             topic_5.thumbnail_filename = 'thumbnail.svg'
             topic_5.thumbnail_bg_color = '#C6DCDA'
             topic_5.subtopics = [
                 topic_domain.Subtopic(
-                    1, 'Title', [skill_id_5], 'image.svg',
-                    constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
-                    'dummy-subtopic-three')]
+                    1,
+                    'Title',
+                    [skill_id_5],
+                    'image.svg',
+                    constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                    21131,
+                    'dummy-subtopic-three',
+                )
+            ]
             topic_5.next_subtopic_id = 2
 
             skill_1 = self._create_dummy_skill(
-                skill_id_1, 'Skill1', '<p>Dummy Explanation 1</p>')
+                skill_id_1, 'Skill1', '<p>Dummy Explanation 1</p>'
+            )
             skill_2 = self._create_dummy_skill(
-                skill_id_2, 'Skill2', '<p>Dummy Explanation 2</p>')
+                skill_id_2, 'Skill2', '<p>Dummy Explanation 2</p>'
+            )
             skill_3 = self._create_dummy_skill(
-                skill_id_3, 'Skill3', '<p>Dummy Explanation 3</p>')
+                skill_id_3, 'Skill3', '<p>Dummy Explanation 3</p>'
+            )
             skill_4 = self._create_dummy_skill(
-                skill_id_4, 'Skill4', '<p>Dummy Explanation 4</p>')
+                skill_id_4, 'Skill4', '<p>Dummy Explanation 4</p>'
+            )
             skill_5 = self._create_dummy_skill(
-                skill_id_5, 'Skill5', '<p>Dummy Explanation 5</p>')
+                skill_id_5, 'Skill5', '<p>Dummy Explanation 5</p>'
+            )
 
             question_services.add_question(self.user_id, question_1)
             question_services.add_question(self.user_id, question_2)
@@ -1643,35 +1841,50 @@ class AdminHandler(
             topic_services.publish_topic(topic_id_5, self.user_id)
 
             question_services.create_new_question_skill_link(
-                self.user_id, question_id_1, skill_id_1, 0.5)
+                self.user_id, question_id_1, skill_id_1, 0.5
+            )
             question_services.create_new_question_skill_link(
-                self.user_id, question_id_2, skill_id_1, 0.5)
+                self.user_id, question_id_2, skill_id_1, 0.5
+            )
             question_services.create_new_question_skill_link(
-                self.user_id, question_id_3, skill_id_1, 0.5)
+                self.user_id, question_id_3, skill_id_1, 0.5
+            )
             question_services.create_new_question_skill_link(
-                self.user_id, question_id_4, skill_id_2, 0.5)
+                self.user_id, question_id_4, skill_id_2, 0.5
+            )
             question_services.create_new_question_skill_link(
-                self.user_id, question_id_5, skill_id_2, 0.5)
+                self.user_id, question_id_5, skill_id_2, 0.5
+            )
             question_services.create_new_question_skill_link(
-                self.user_id, question_id_6, skill_id_2, 0.5)
+                self.user_id, question_id_6, skill_id_2, 0.5
+            )
             question_services.create_new_question_skill_link(
-                self.user_id, question_id_7, skill_id_3, 0.5)
+                self.user_id, question_id_7, skill_id_3, 0.5
+            )
             question_services.create_new_question_skill_link(
-                self.user_id, question_id_8, skill_id_3, 0.5)
+                self.user_id, question_id_8, skill_id_3, 0.5
+            )
             question_services.create_new_question_skill_link(
-                self.user_id, question_id_9, skill_id_3, 0.5)
+                self.user_id, question_id_9, skill_id_3, 0.5
+            )
             question_services.create_new_question_skill_link(
-                self.user_id, question_id_10, skill_id_4, 0.5)
+                self.user_id, question_id_10, skill_id_4, 0.5
+            )
             question_services.create_new_question_skill_link(
-                self.user_id, question_id_11, skill_id_4, 0.5)
+                self.user_id, question_id_11, skill_id_4, 0.5
+            )
             question_services.create_new_question_skill_link(
-                self.user_id, question_id_12, skill_id_4, 0.5)
+                self.user_id, question_id_12, skill_id_4, 0.5
+            )
             question_services.create_new_question_skill_link(
-                self.user_id, question_id_13, skill_id_5, 0.5)
+                self.user_id, question_id_13, skill_id_5, 0.5
+            )
             question_services.create_new_question_skill_link(
-                self.user_id, question_id_14, skill_id_5, 0.5)
+                self.user_id, question_id_14, skill_id_5, 0.5
+            )
             question_services.create_new_question_skill_link(
-                self.user_id, question_id_15, skill_id_5, 0.5)
+                self.user_id, question_id_15, skill_id_5, 0.5
+            )
 
             classroom_id_1 = classroom_config_services.get_new_classroom_id()
             topic_dependency_for_classroom_1: Dict[str, list[str]] = {
@@ -1679,53 +1892,64 @@ class AdminHandler(
                 topic_id_2: [topic_id_1],
                 topic_id_3: [topic_id_1],
                 topic_id_4: [topic_id_2],
-                topic_id_5: [topic_id_2, topic_id_3]
+                topic_id_5: [topic_id_2, topic_id_3],
             }
 
             thumbnail_image = b''
             with open(
-                'core/tests/data/thumbnail.svg', 'rt',
-                encoding='utf-8') as svg_file:
+                'core/tests/data/thumbnail.svg', 'rt', encoding='utf-8'
+            ) as svg_file:
                 svg_file_content = svg_file.read()
                 thumbnail_image = svg_file_content.encode('ascii')
             fs_services.save_original_and_compressed_versions_of_image(
-                'thumbnail.svg', feconf.ENTITY_TYPE_CLASSROOM, classroom_id_1,
-                thumbnail_image, 'thumbnail', False)
+                'thumbnail.svg',
+                feconf.ENTITY_TYPE_CLASSROOM,
+                classroom_id_1,
+                thumbnail_image,
+                'thumbnail',
+                False,
+            )
 
             banner_image = b''
             with open('core/tests/data/classroom-banner.png', 'rb') as png_file:
                 banner_image = png_file.read()
             fs_services.save_original_and_compressed_versions_of_image(
-                'banner.png', feconf.ENTITY_TYPE_CLASSROOM, classroom_id_1,
-                banner_image, 'image', False)
+                'banner.png',
+                feconf.ENTITY_TYPE_CLASSROOM,
+                classroom_id_1,
+                banner_image,
+                'image',
+                False,
+            )
 
             classroom_1 = classroom_config_domain.Classroom(
-                            classroom_id=classroom_id_1,
-                            name='math',
-                            url_fragment='math',
-                            course_details='Math course  details',
-                            teaser_text='Math teaser text',
-                            topic_list_intro='Start with our first topic.',
-                            topic_id_to_prerequisite_topic_ids=(
-                                topic_dependency_for_classroom_1),
-                            is_published=True,
-                            diagnostic_test_is_enabled=False,
-                            thumbnail_data=classroom_config_domain.ImageData(
-                                'thumbnail.svg', 'transparent', 1000
-                            ),
-                            banner_data=classroom_config_domain.ImageData(
-                                'banner.png', 'transparent', 1000
-                            ),
-                            index=0
-                        )
+                classroom_id=classroom_id_1,
+                name='math',
+                url_fragment='math',
+                course_details='Math course  details',
+                teaser_text='Math teaser text',
+                topic_list_intro='Start with our first topic.',
+                topic_id_to_prerequisite_topic_ids=(
+                    topic_dependency_for_classroom_1
+                ),
+                is_published=True,
+                diagnostic_test_is_enabled=False,
+                thumbnail_data=classroom_config_domain.ImageData(
+                    'thumbnail.svg', 'transparent', 1000
+                ),
+                banner_data=classroom_config_domain.ImageData(
+                    'banner.png', 'transparent', 1000
+                ),
+                index=0,
+            )
 
             classroom_config_services.create_new_classroom(classroom_1)
         else:
             raise Exception('Cannot generate dummy classroom in production.')
 
     def _generate_dummy_question_suggestions(
-            self, skill_id: str,
-            num_dummy_question_suggestions_generate: int) -> None:
+        self, skill_id: str, num_dummy_question_suggestions_generate: int
+    ) -> None:
         """Generates and loads the database with a specified number of
             suggestion question for the selected skill.
 
@@ -1735,33 +1959,42 @@ class AdminHandler(
         """
         assert self.user_id is not None
         if constants.DEV_MODE:
-            if ((feconf.ROLE_ID_QUESTION_ADMIN not in self.user.roles)
-                and (not user_services.can_submit_question_suggestions(
-                    self.user_id))):
-                raise Exception((
-                    'User \'%s\' must be a question submitter or question admin'
-                    ' in order to generate question suggestions.'
-                    ) % self.username)
+            if (feconf.ROLE_ID_QUESTION_ADMIN not in self.user.roles) and (
+                not user_services.can_submit_question_suggestions(self.user_id)
+            ):
+                raise Exception(
+                    (
+                        'User \'%s\' must be a question submitter or question admin'
+                        ' in order to generate question suggestions.'
+                    )
+                    % self.username
+                )
             for _ in range(num_dummy_question_suggestions_generate):
                 content_id_generator = translation_domain.ContentIdGenerator()
                 content_id_generator.generate(
-                    translation_domain.ContentType.CONTENT)
+                    translation_domain.ContentType.CONTENT
+                )
                 content_id_generator.generate(
-                    translation_domain.ContentType.DEFAULT_OUTCOME)
+                    translation_domain.ContentType.DEFAULT_OUTCOME
+                )
                 state = state_domain.State.create_default_state(
                     'default_state',
                     content_id_generator.generate(
-                        translation_domain.ContentType.CONTENT),
+                        translation_domain.ContentType.CONTENT
+                    ),
                     content_id_generator.generate(
-                        translation_domain.ContentType.DEFAULT_OUTCOME),
-                    is_initial_state=True)
+                        translation_domain.ContentType.DEFAULT_OUTCOME
+                    ),
+                    is_initial_state=True,
+                )
                 state.update_interaction_id('TextInput')
                 solution_dict: state_domain.SolutionDict = {
                     'answer_is_exclusive': False,
                     'correct_answer': 'Solution',
                     'explanation': {
                         'content_id': content_id_generator.generate(
-                            translation_domain.ContentType.SOLUTION),
+                            translation_domain.ContentType.SOLUTION
+                        ),
                         'html': '<p>This is a solution.</p>',
                     },
                 }
@@ -1769,28 +2002,35 @@ class AdminHandler(
                     state_domain.Hint(
                         state_domain.SubtitledHtml(
                             content_id_generator.generate(
-                                translation_domain.ContentType.HINT),
-                            '<p>This is a hint.</p>')),
+                                translation_domain.ContentType.HINT
+                            ),
+                            '<p>This is a hint.</p>',
+                        )
+                    ),
                 ]
                 # Ruling out None for mypy type checking,
                 # as interaction_id is already updated.
                 assert state.interaction.id is not None
                 solution = state_domain.Solution.from_dict(
-                    state.interaction.id, solution_dict)
+                    state.interaction.id, solution_dict
+                )
                 state.update_interaction_solution(solution)
                 state.update_interaction_hints(hints_list)
-                state.update_interaction_customization_args({
-                    'placeholder': {
-                        'value': {
-                            'content_id': content_id_generator.generate(
-                                translation_domain.ContentType.CUSTOMIZATION_ARG, # pylint: disable=line-too-long
-                                extra_prefix='placeholder'),
-                            'unicode_str': 'Enter text here',
+                state.update_interaction_customization_args(
+                    {
+                        'placeholder': {
+                            'value': {
+                                'content_id': content_id_generator.generate(
+                                    translation_domain.ContentType.CUSTOMIZATION_ARG,  # pylint: disable=line-too-long
+                                    extra_prefix='placeholder',
+                                ),
+                                'unicode_str': 'Enter text here',
+                            },
                         },
-                    },
-                    'rows': {'value': 1},
-                    'catchMisspellings': {'value': False}
-                })
+                        'rows': {'value': 1},
+                        'catchMisspellings': {'value': False},
+                    }
+                )
                 # Here, state is a State domain object and it is created using
                 # 'create_default_state' method. So, 'state' is a default_state
                 # and it is always going to contain a default_outcome. Thus to
@@ -1803,8 +2043,8 @@ class AdminHandler(
                     str, Union[str, float, question_domain.QuestionDict]
                 ] = {
                     'cmd': (
-                        question_domain
-                        .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+                        question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION
+                    ),
                     'question_dict': {
                         'id': '',
                         'version': 0,
@@ -1814,29 +2054,36 @@ class AdminHandler(
                         'linked_skill_ids': [skill_id],
                         'inapplicable_skill_misconception_ids': [],
                         'next_content_id_index': (
-                            content_id_generator.next_content_id_index)
+                            content_id_generator.next_content_id_index
+                        ),
                     },
                     'skill_id': skill_id,
-                    'skill_difficulty': 0.3
+                    'skill_difficulty': 0.3,
                 }
 
                 suggestion = suggestion_services.create_suggestion(
                     feconf.SUGGESTION_TYPE_ADD_QUESTION,
                     feconf.ENTITY_TYPE_SKILL,
-                    skill_id, 1,
-                    self.user_id, suggestion_change, 'test description')
+                    skill_id,
+                    1,
+                    self.user_id,
+                    suggestion_change,
+                    'test description',
+                )
 
                 (
-                    suggestion_services
-                    .update_question_contribution_stats_at_submission(
-                        suggestion))
+                    suggestion_services.update_question_contribution_stats_at_submission(
+                        suggestion
+                    )
+                )
         else:
             raise Exception(
-                'Cannot generate dummy question suggestion in production.')
+                'Cannot generate dummy question suggestion in production.'
+            )
 
     def _generate_dummy_stories(
-            self, topic_id: str,
-            num_dummy_stories_to_generate: int) -> None:
+        self, topic_id: str, num_dummy_stories_to_generate: int
+    ) -> None:
         """Generates and loads the database with a specified number of
             stories for the selected topic.
 
@@ -1846,31 +2093,41 @@ class AdminHandler(
         """
         if constants.DEV_MODE:
             if feconf.ROLE_ID_CURRICULUM_ADMIN not in self.user.roles:
-                raise Exception((
-                    'User \'%s\' must be a curriculum admin'
-                    ' in order to generate stories.'
-                    ) % self.username)
+                raise Exception(
+                    (
+                        'User \'%s\' must be a curriculum admin'
+                        ' in order to generate stories.'
+                    )
+                    % self.username
+                )
             for i in range(num_dummy_stories_to_generate):
                 story_id = story_services.get_new_story_id()
-                url_fragment = ''.join(random.choices(
-                    string.ascii_lowercase, k=10))
+                url_fragment = ''.join(
+                    random.choices(string.ascii_lowercase, k=10)
+                )
                 story = story_domain.Story.create_default_story(
-                    story_id, f'dummy_title{i}', 'description',
-                    topic_id, url_fragment, 'dummy_meta',
-                    'thumbnail.svg', '#B3D8F1')
+                    story_id,
+                    f'dummy_title{i}',
+                    'description',
+                    topic_id,
+                    url_fragment,
+                    'dummy_meta',
+                    'thumbnail.svg',
+                    '#B3D8F1',
+                )
                 story_services.save_new_story(str(self.user_id), story)
                 topic_services.add_canonical_story(
-                    str(self.user_id), topic_id, story_id)
+                    str(self.user_id), topic_id, story_id
+                )
                 topic_services.publish_story(
                     topic_id, story_id, str(self.user_id)
                 )
         else:
-            raise Exception(
-                'Cannot generate dummy stories in production.')
+            raise Exception('Cannot generate dummy stories in production.')
 
     def _generate_dummy_chapters(
-            self, story_id: str,
-            num_dummy_chapters_to_generate: int) -> None:
+        self, story_id: str, num_dummy_chapters_to_generate: int
+    ) -> None:
         """Generates and loads the database with a specified number of
             chapters for the selected story.
 
@@ -1881,10 +2138,13 @@ class AdminHandler(
         assert self.user_id is not None
         if constants.DEV_MODE:
             if feconf.ROLE_ID_CURRICULUM_ADMIN not in self.user.roles:
-                raise Exception((
-                    'User \'%s\' must be a curriculum admin'
-                    ' in order to generate chapters.'
-                    ) % self.username)
+                raise Exception(
+                    (
+                        'User \'%s\' must be a curriculum admin'
+                        ' in order to generate chapters.'
+                    )
+                    % self.username
+                )
 
             category = random.choice(constants.SEARCH_DROPDOWN_CATEGORIES)
             story = story_fetchers.get_story_by_id(story_id)
@@ -1892,7 +2152,8 @@ class AdminHandler(
 
             if len(exp_ids) > 0:
                 category = exp_services.get_exploration_titles_and_categories(
-                    exp_ids)[exp_ids[0]]['category']
+                    exp_ids
+                )[exp_ids[0]]['category']
             exp_ids_to_publish = []
 
             for i in range(num_dummy_chapters_to_generate):
@@ -1900,60 +2161,70 @@ class AdminHandler(
                 new_exp_id = exp_fetchers.get_new_exploration_id()
 
                 exploration = exp_domain.Exploration.create_default_exploration(
-                    new_exp_id, title, category=category,
-                    objective='Dummy Objective')
+                    new_exp_id,
+                    title,
+                    category=category,
+                    objective='Dummy Objective',
+                )
                 exp_services.save_new_exploration(self.user_id, exploration)
 
                 exp_change_list = [
-                    exp_domain.ExplorationChange({
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'state_name': 'Introduction',
-                        'property_name': exp_domain
-                                         .STATE_PROPERTY_INTERACTION_ID,
-                        'new_value': 'EndExploration'
-                    }),
-                    exp_domain.ExplorationChange({
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'state_name': 'Introduction',
-                        'property_name': exp_domain
-                                         .STATE_PROPERTY_INTERACTION_CUST_ARGS,
-                        'new_value': {
-                            'recommendedExplorationIds': {
-                                'value': []
-                            }
+                    exp_domain.ExplorationChange(
+                        {
+                            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                            'state_name': 'Introduction',
+                            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                            'new_value': 'EndExploration',
                         }
-                    }),
-                    exp_domain.ExplorationChange({
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'state_name': 'Introduction',
-                        'property_name': (
-                            exp_domain
-                            .STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME
-                        ),
-                        'new_value': None
-                    }),
+                    ),
+                    exp_domain.ExplorationChange(
+                        {
+                            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                            'state_name': 'Introduction',
+                            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                            'new_value': {
+                                'recommendedExplorationIds': {'value': []}
+                            },
+                        }
+                    ),
+                    exp_domain.ExplorationChange(
+                        {
+                            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                            'state_name': 'Introduction',
+                            'property_name': (
+                                exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME
+                            ),
+                            'new_value': None,
+                        }
+                    ),
                 ]
 
                 exp_services.update_exploration(
-                    self.user_id, new_exp_id,
-                    exp_change_list, 'Change Interaction')
+                    self.user_id,
+                    new_exp_id,
+                    exp_change_list,
+                    'Change Interaction',
+                )
 
                 exp_ids_to_publish.append(new_exp_id)
-                rights_manager.publish_exploration(
-                    self.user, new_exp_id)
+                rights_manager.publish_exploration(self.user, new_exp_id)
 
-            exp_services.index_explorations_given_ids(
-                exp_ids_to_publish)
+            exp_services.index_explorations_given_ids(exp_ids_to_publish)
 
             raw_image = b''
             with open(
-                'core/tests/data/thumbnail.svg', 'rt',
-                encoding='utf-8') as svg_file:
+                'core/tests/data/thumbnail.svg', 'rt', encoding='utf-8'
+            ) as svg_file:
                 svg_file_content = svg_file.read()
                 raw_image = svg_file_content.encode('ascii')
             fs_services.save_original_and_compressed_versions_of_image(
-                'thumbnail.svg', feconf.ENTITY_TYPE_STORY, story_id,
-                raw_image, 'thumbnail', False)
+                'thumbnail.svg',
+                feconf.ENTITY_TYPE_STORY,
+                story_id,
+                raw_image,
+                'thumbnail',
+                False,
+            )
 
             for i, exp_id in enumerate(exp_ids_to_publish):
                 suffix = i + 1
@@ -1963,49 +2234,56 @@ class AdminHandler(
                 chapter_title = f'dummy chapter {suffix}'
 
                 story_change_list = [
-                    story_domain.StoryChange({
-                        'cmd': 'add_story_node',
-                        'title': chapter_title,
-                        'node_id': node_id
-                    }),
-                    story_domain.StoryChange({
-                        'cmd': 'update_story_node_property',
-                        'property_name': (
-                            story_domain
-                            .STORY_NODE_PROPERTY_EXPLORATION_ID
-                        ),
-                        'new_value': exp_id,
-                        'node_id': node_id,
-                        'old_value': 'exploration_id'
-                    }),
-                    story_domain.StoryChange({
-                        'cmd': 'update_story_node_property',
-                        'property_name': (
-                            story_domain
-                            .STORY_NODE_PROPERTY_THUMBNAIL_FILENAME
-                        ),
-                        'new_value': 'thumbnail.svg',
-                        'node_id': node_id,
-                        'old_value': 'thumbnail_filename'
-                    }),
-                    story_domain.StoryChange({
-                        'cmd': 'update_story_node_property',
-                        'property_name': (
-                            story_domain
-                            .STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR
-                        ),
-                        'new_value': '#B3D8F1',
-                        'node_id': node_id,
-                        'old_value': 'thumbnail_bg_color'
-                    }),
+                    story_domain.StoryChange(
+                        {
+                            'cmd': 'add_story_node',
+                            'title': chapter_title,
+                            'node_id': node_id,
+                        }
+                    ),
+                    story_domain.StoryChange(
+                        {
+                            'cmd': 'update_story_node_property',
+                            'property_name': (
+                                story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                            ),
+                            'new_value': exp_id,
+                            'node_id': node_id,
+                            'old_value': 'exploration_id',
+                        }
+                    ),
+                    story_domain.StoryChange(
+                        {
+                            'cmd': 'update_story_node_property',
+                            'property_name': (
+                                story_domain.STORY_NODE_PROPERTY_THUMBNAIL_FILENAME
+                            ),
+                            'new_value': 'thumbnail.svg',
+                            'node_id': node_id,
+                            'old_value': 'thumbnail_filename',
+                        }
+                    ),
+                    story_domain.StoryChange(
+                        {
+                            'cmd': 'update_story_node_property',
+                            'property_name': (
+                                story_domain.STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR
+                            ),
+                            'new_value': '#B3D8F1',
+                            'node_id': node_id,
+                            'old_value': 'thumbnail_bg_color',
+                        }
+                    ),
                 ]
                 topic_services.update_story_and_topic_summary(
-                    self.user_id, story_id, story_change_list,
-                    'add node', story.corresponding_topic_id
+                    self.user_id,
+                    story_id,
+                    story_change_list,
+                    'add node',
+                    story.corresponding_topic_id,
                 )
         else:
-            raise Exception(
-                'Cannot generate dummy chapters in production.')
+            raise Exception('Cannot generate dummy chapters in production.')
 
 
 class AdminRoleHandlerNormalizedGetRequestDict(TypedDict):
@@ -2041,8 +2319,8 @@ class AdminRoleHandler(
         AdminRoleHandlerNormalizedPayloadDict,
         Union[
             AdminRoleHandlerNormalizedGetRequestDict,
-            AdminRoleHandlerNormalizedDeleteRequestDict
-        ]
+            AdminRoleHandlerNormalizedDeleteRequestDict,
+        ],
     ]
 ):
     """Handler for roles tab of admin page. Used to view and update roles."""
@@ -2056,50 +2334,40 @@ class AdminRoleHandler(
                     'type': 'basestring',
                     'choices': [
                         feconf.USER_FILTER_CRITERION_ROLE,
-                        feconf.USER_FILTER_CRITERION_USERNAME
-                    ]
+                        feconf.USER_FILTER_CRITERION_USERNAME,
+                    ],
                 }
             },
             'role': {
                 'schema': {
                     'type': 'basestring',
-                    'choices': role_services.VIEWABLE_ROLES
+                    'choices': role_services.VIEWABLE_ROLES,
                 },
-                'default_value': None
+                'default_value': None,
             },
             'username': {
-                'schema': {
-                    'type': 'basestring'
-                },
-                'default_value': None
-            }
+                'schema': {'type': 'basestring'},
+                'default_value': None,
+            },
         },
         'PUT': {
             'role': {
                 'schema': {
                     'type': 'basestring',
-                    'choices': feconf.ALLOWED_USER_ROLES
+                    'choices': feconf.ALLOWED_USER_ROLES,
                 }
             },
-            'username': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            }
+            'username': {'schema': {'type': 'basestring'}},
         },
         'DELETE': {
             'role': {
                 'schema': {
                     'type': 'basestring',
-                    'choices': feconf.ALLOWED_USER_ROLES
+                    'choices': feconf.ALLOWED_USER_ROLES,
                 }
             },
-            'username': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            }
-        }
+            'username': {'schema': {'type': 'basestring'}},
+        },
     }
 
     @acl_decorators.open_access
@@ -2120,8 +2388,7 @@ class AdminRoleHandler(
         # particular TypedDict that was defined according to the schemas.
         # So that the type of fetched values is not considered as Any type.
         request_data = cast(
-            AdminRoleHandlerNormalizedGetRequestDict,
-            self.normalized_request
+            AdminRoleHandlerNormalizedGetRequestDict, self.normalized_request
         )
         filter_criterion = request_data['filter_criterion']
         if filter_criterion == feconf.USER_FILTER_CRITERION_ROLE:
@@ -2132,13 +2399,17 @@ class AdminRoleHandler(
                     'is \'role\'.'
                 )
             role_services.log_role_query(
-                self.user_id, feconf.ROLE_ACTION_VIEW_BY_ROLE,
-                role=role)
-            self.render_json({
-                'usernames': (
-                    user_services.get_usernames_by_role(role) if role else []
-                )
-            })
+                self.user_id, feconf.ROLE_ACTION_VIEW_BY_ROLE, role=role
+            )
+            self.render_json(
+                {
+                    'usernames': (
+                        user_services.get_usernames_by_role(role)
+                        if role
+                        else []
+                    )
+                }
+            )
         else:
             # The handler schema defines the possible values of
             # 'filter_criterion'. If 'filter_criterion' has a value other than
@@ -2146,23 +2417,23 @@ class AdminRoleHandler(
             # Hence, 'filter_criterion' must be
             # 'feconf.USER_FILTER_CRITERION_USERNAME' if this branch is
             # executed.
-            assert filter_criterion == (
-                feconf.USER_FILTER_CRITERION_USERNAME)
+            assert filter_criterion == (feconf.USER_FILTER_CRITERION_USERNAME)
             username = request_data.get(feconf.USER_FILTER_CRITERION_USERNAME)
             if username is None:
                 raise Exception(
                     'The username must be provided when the filter criterion '
                     'is \'username\'.'
                 )
-            user_id = (
-                user_services.get_user_id_from_username(username)
-            )
+            user_id = user_services.get_user_id_from_username(username)
             role_services.log_role_query(
-                self.user_id, feconf.ROLE_ACTION_VIEW_BY_USERNAME,
-                username=username)
+                self.user_id,
+                feconf.ROLE_ACTION_VIEW_BY_USERNAME,
+                username=username,
+            )
             if user_id is None:
                 raise self.NotFoundException(
-                    'User with given username does not exist.')
+                    'User with given username does not exist.'
+                )
 
             user_settings = user_services.get_user_settings(user_id)
             user_roles = user_settings.roles
@@ -2170,18 +2441,23 @@ class AdminRoleHandler(
             coordinated_language_ids = []
             if feconf.ROLE_ID_TOPIC_MANAGER in user_roles:
                 managed_topic_ids = [
-                    rights.id for rights in
-                    topic_fetchers.get_topic_rights_with_user(user_id)]
+                    rights.id
+                    for rights in topic_fetchers.get_topic_rights_with_user(
+                        user_id
+                    )
+                ]
             if feconf.ROLE_ID_TRANSLATION_COORDINATOR in user_roles:
                 coordinated_language_ids = [
-                    rights.language_id for rights in
-                    user_services.get_translation_rights_with_user(
-                        user_id)]
+                    rights.language_id
+                    for rights in user_services.get_translation_rights_with_user(
+                        user_id
+                    )
+                ]
             user_roles_dict = {
                 'roles': user_roles,
                 'managed_topic_ids': managed_topic_ids,
                 'coordinated_language_ids': coordinated_language_ids,
-                'banned': user_settings.banned
+                'banned': user_settings.banned,
             }
             self.render_json(user_roles_dict)
 
@@ -2200,13 +2476,15 @@ class AdminRoleHandler(
 
         if user_settings is None:
             raise self.NotFoundException(
-                'User with given username does not exist.')
+                'User with given username does not exist.'
+            )
 
         if role == feconf.ROLE_ID_TOPIC_MANAGER:
             # The Topic manager role assignment is handled via
             # TopicManagerRoleHandler.
             raise self.InvalidInputException(
-                'Unsupported role for this handler.')
+                'Unsupported role for this handler.'
+            )
 
         user_services.add_user_role(user_settings.user_id, role)
 
@@ -2224,8 +2502,7 @@ class AdminRoleHandler(
         # particular TypedDict that was defined according to the schemas.
         # So that the type of fetched values is not considered as Any type.
         request_data = cast(
-            AdminRoleHandlerNormalizedDeleteRequestDict,
-            self.normalized_request
+            AdminRoleHandlerNormalizedDeleteRequestDict, self.normalized_request
         )
         username = request_data['username']
         role = request_data['role']
@@ -2233,14 +2510,14 @@ class AdminRoleHandler(
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
             raise self.NotFoundException(
-                'User with given username does not exist.')
+                'User with given username does not exist.'
+            )
 
         if role == feconf.ROLE_ID_TOPIC_MANAGER:
             topic_services.deassign_user_from_all_topics(self.user, user_id)
 
         if role == feconf.ROLE_ID_TRANSLATION_COORDINATOR:
-            user_services.deassign_user_from_all_languages(
-                self.user, user_id)
+            user_services.deassign_user_from_all_languages(self.user, user_id)
 
         user_services.remove_user_role(user_id, role)
 
@@ -2268,22 +2545,14 @@ class TopicManagerRoleHandler(
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
-            'username': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
+            'username': {'schema': {'type': 'basestring'}},
             'action': {
                 'schema': {
                     'type': 'basestring',
-                    'choices': ['assign', 'deassign']
+                    'choices': ['assign', 'deassign'],
                 }
             },
-            'topic_id': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            }
+            'topic_id': {'schema': {'type': 'basestring'}},
         }
     }
 
@@ -2304,18 +2573,23 @@ class TopicManagerRoleHandler(
 
         if user_settings is None:
             raise self.NotFoundException(
-                'User with given username does not exist.')
+                'User with given username does not exist.'
+            )
 
         user_id = user_settings.user_id
         if action == 'assign':
             if not feconf.ROLE_ID_TOPIC_MANAGER in user_settings.roles:
                 user_services.add_user_role(
-                    user_id, feconf.ROLE_ID_TOPIC_MANAGER)
+                    user_id, feconf.ROLE_ID_TOPIC_MANAGER
+                )
 
             topic_manager = user_services.get_user_actions_info(user_id)
             topic_services.assign_role(
                 user_services.get_system_user(),
-                topic_manager, topic_domain.ROLE_MANAGER, topic_id)
+                topic_manager,
+                topic_domain.ROLE_MANAGER,
+                topic_id,
+            )
         else:
             # The handler schema defines the possible values of 'action'.
             # If 'action' has a value other than those defined in the schema,
@@ -2323,14 +2597,16 @@ class TopicManagerRoleHandler(
             # 'deassign' if this branch is executed.
             assert action == 'deassign'
             topic_services.deassign_manager_role_from_topic(
-                user_services.get_system_user(), user_id, topic_id)
+                user_services.get_system_user(), user_id, topic_id
+            )
 
             # The case where user does not have manager rights it will be
             # caught before in topic_services.deassign_manager_role_from_topic
             # method.
             assert not topic_fetchers.get_topic_rights_with_user(user_id)
             user_services.remove_user_role(
-                user_id, feconf.ROLE_ID_TOPIC_MANAGER)
+                user_id, feconf.ROLE_ID_TOPIC_MANAGER
+            )
 
         self.render_json({})
 
@@ -2354,7 +2630,7 @@ class BannedUsersHandlerNormalizedRequestDict(TypedDict):
 class BannedUsersHandler(
     base.BaseHandler[
         BannedUsersHandlerNormalizedPayloadDict,
-        BannedUsersHandlerNormalizedRequestDict
+        BannedUsersHandlerNormalizedRequestDict,
     ]
 ):
     """Handler to ban and unban users."""
@@ -2362,20 +2638,8 @@ class BannedUsersHandler(
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
-        'PUT': {
-            'username': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            }
-        },
-        'DELETE': {
-            'username': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            }
-        }
+        'PUT': {'username': {'schema': {'type': 'basestring'}}},
+        'DELETE': {'username': {'schema': {'type': 'basestring'}}},
     }
 
     @acl_decorators.can_access_admin_page
@@ -2391,7 +2655,8 @@ class BannedUsersHandler(
 
         if user_id is None:
             raise self.NotFoundException(
-                'User with given username does not exist.')
+                'User with given username does not exist.'
+            )
         topic_services.deassign_user_from_all_topics(self.user, user_id)
         user_services.mark_user_banned(user_id)
 
@@ -2410,7 +2675,8 @@ class BannedUsersHandler(
 
         if user_id is None:
             raise self.NotFoundException(
-                'User with given username does not exist.')
+                'User with given username does not exist.'
+            )
         user_services.unmark_user_banned(user_id)
 
         self.render_json({})
@@ -2435,7 +2701,7 @@ class AdminSuperAdminPrivilegesHandlerNormalizedRequestDict(TypedDict):
 class AdminSuperAdminPrivilegesHandler(
     base.BaseHandler[
         AdminSuperAdminPrivilegesHandlerNormalizedPayloadDict,
-        AdminSuperAdminPrivilegesHandlerNormalizedRequestDict
+        AdminSuperAdminPrivilegesHandlerNormalizedRequestDict,
     ]
 ):
     """Handler for granting a user super admin privileges."""
@@ -2444,20 +2710,8 @@ class AdminSuperAdminPrivilegesHandler(
     DELETE_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
-        'PUT': {
-            'username': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            }
-        },
-        'DELETE': {
-            'username': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            }
-        }
+        'PUT': {'username': {'schema': {'type': 'basestring'}}},
+        'DELETE': {'username': {'schema': {'type': 'basestring'}}},
     }
 
     @acl_decorators.can_access_admin_page
@@ -2474,7 +2728,8 @@ class AdminSuperAdminPrivilegesHandler(
             platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value
         ):
             raise self.UnauthorizedUserException(
-                'Only the default system admin can manage super admins')
+                'Only the default system admin can manage super admins'
+            )
         username = self.normalized_payload['username']
 
         user_id = user_services.get_user_id_from_username(username)
@@ -2497,10 +2752,12 @@ class AdminSuperAdminPrivilegesHandler(
         """
         assert self.normalized_request is not None
         admin_email_address = parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value)
+            platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value
+        )
         if self.email != admin_email_address:
             raise self.UnauthorizedUserException(
-                'Only the default system admin can manage super admins')
+                'Only the default system admin can manage super admins'
+            )
         username = self.normalized_request['username']
 
         user_settings = user_services.get_user_settings_from_username(username)
@@ -2509,7 +2766,8 @@ class AdminSuperAdminPrivilegesHandler(
 
         if user_settings.email == admin_email_address:
             raise self.InvalidInputException(
-                'Cannot revoke privileges from the default super admin account')
+                'Cannot revoke privileges from the default super admin account'
+            )
 
         auth_services.revoke_super_admin_privileges(user_settings.user_id)
         self.render_json(self.values)
@@ -2535,7 +2793,7 @@ class AdminTopicsCsvFileDownloader(
         self.render_downloadable_file(
             io.BytesIO(topic_similarities.encode('utf-8')),
             'topic_similarities.csv',
-            'text/csv'
+            'text/csv',
         )
 
 
@@ -2550,7 +2808,7 @@ class AutomaticVoiceoverAdminControlHandlerNormalizedPayloadDict(TypedDict):
 class AutomaticVoiceoverAdminControlHandler(
     base.BaseHandler[
         AutomaticVoiceoverAdminControlHandlerNormalizedPayloadDict,
-        Dict[str, str]
+        Dict[str, str],
     ]
 ):
     """Retrieves and updates automatic voiceover admin control."""
@@ -2561,34 +2819,34 @@ class AutomaticVoiceoverAdminControlHandler(
         'GET': {},
         'POST': {
             'autogenerated_voiceovers_are_enabled': {
-                'schema': {
-                    'type': 'bool'
-                },
+                'schema': {'type': 'bool'},
             }
-        }
+        },
     }
 
     @acl_decorators.open_access
     def get(self) -> None:
         """Retrieves the admin config data for automatic voiceovers."""
-        self.render_json({
-            'autogenerated_voiceovers_are_enabled': (
-                voiceover_services.
-                is_voiceover_autogeneration_using_cloud_service_enabled()
-            )
-        })
+        self.render_json(
+            {
+                'autogenerated_voiceovers_are_enabled': (
+                    voiceover_services.is_voiceover_autogeneration_using_cloud_service_enabled()
+                )
+            }
+        )
 
     @acl_decorators.can_access_admin_page
     def post(self) -> None:
         """Updates the admin config data for automatic voiceovers."""
         assert self.normalized_payload is not None
-        autogenerated_voiceovers_are_enabled: bool = (
-            self.normalized_payload[
-                'autogenerated_voiceovers_are_enabled'])
+        autogenerated_voiceovers_are_enabled: bool = self.normalized_payload[
+            'autogenerated_voiceovers_are_enabled'
+        ]
         assert isinstance(autogenerated_voiceovers_are_enabled, bool)
 
         voiceover_services.update_admin_config_for_voiceover_autogeneration(
-            autogenerated_voiceovers_are_enabled)
+            autogenerated_voiceovers_are_enabled
+        )
         self.render_json({})
 
 
@@ -2614,26 +2872,10 @@ class DataExtractionQueryHandler(
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
-            'exp_id': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
-            'exp_version': {
-                'schema': {
-                    'type': 'int'
-                }
-            },
-            'state_name': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
-            'num_answers': {
-                'schema': {
-                    'type': 'int'
-                }
-            }
+            'exp_id': {'schema': {'type': 'basestring'}},
+            'exp_version': {'schema': {'type': 'int'}},
+            'state_name': {'schema': {'type': 'basestring'}},
+            'num_answers': {'schema': {'type': 'int'}},
         }
     }
 
@@ -2652,11 +2894,13 @@ class DataExtractionQueryHandler(
         exp_version = self.normalized_request['exp_version']
 
         exploration = exp_fetchers.get_exploration_by_id(
-            exp_id, strict=False, version=exp_version)
+            exp_id, strict=False, version=exp_version
+        )
         if exploration is None:
             raise self.NotFoundException(
                 'Entity for exploration with id %s and version '
-                '%s not found.' % (exp_id, exp_version))
+                '%s not found.' % (exp_id, exp_version)
+            )
 
         state_name = self.normalized_request['state_name']
         num_answers = self.normalized_request['num_answers']
@@ -2664,25 +2908,24 @@ class DataExtractionQueryHandler(
         if state_name not in exploration.states:
             raise self.InvalidInputException(
                 'Exploration \'%s\' does not have \'%s\' state.'
-                % (exp_id, state_name))
+                % (exp_id, state_name)
+            )
 
         state_answers = stats_services.get_state_answers(
-            exp_id, exp_version, state_name)
+            exp_id, exp_version, state_name
+        )
         if state_answers is None:
             raise Exception(
                 'No state answer exists for the given exp_id: %s,'
-                ' exp_version: %s and state_name: %s' %
-                (exp_id, exp_version, state_name)
-
+                ' exp_version: %s and state_name: %s'
+                % (exp_id, exp_version, state_name)
             )
         extracted_answers = state_answers.get_submitted_answer_dict_list()
 
         if num_answers > 0:
             extracted_answers = extracted_answers[:num_answers]
 
-        response = {
-            'data': extracted_answers
-        }
+        response = {'data': extracted_answers}
         self.render_json(response)
 
 
@@ -2706,8 +2949,7 @@ class SendDummyMailToAdminHandler(
         assert username is not None
         server_can_send_emails = (
             parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.
-                SERVER_CAN_SEND_EMAILS.value
+                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
             )
         )
         if server_can_send_emails:
@@ -2727,29 +2969,25 @@ class UpdateUsernameHandlerNormalizedPayloadDict(TypedDict):
 
 
 class UpdateUsernameHandler(
-    base.BaseHandler[
-        UpdateUsernameHandlerNormalizedPayloadDict, Dict[str, str]
-    ]
+    base.BaseHandler[UpdateUsernameHandlerNormalizedPayloadDict, Dict[str, str]]
 ):
     """Handler for renaming usernames."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
-            'old_username': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
+            'old_username': {'schema': {'type': 'basestring'}},
             'new_username': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'has_length_at_most',
-                        'max_value': constants.MAX_USERNAME_LENGTH
-                    }]
+                    'validators': [
+                        {
+                            'id': 'has_length_at_most',
+                            'max_value': constants.MAX_USERNAME_LENGTH,
+                        }
+                    ],
                 }
-            }
+            },
         }
     }
 
@@ -2771,41 +3009,43 @@ class UpdateUsernameHandler(
 
         user_id = user_services.get_user_id_from_username(old_username)
         if user_id is None:
-            raise self.NotFoundException(
-                'Invalid username: %s' % old_username)
+            raise self.NotFoundException('Invalid username: %s' % old_username)
 
         if user_services.is_username_taken(new_username):
             raise self.InvalidInputException('Username already taken.')
 
         # Update profile picture.
         old_fs = fs_services.GcsFileSystem(
-            feconf.ENTITY_TYPE_USER, old_username)
+            feconf.ENTITY_TYPE_USER, old_username
+        )
         new_fs = fs_services.GcsFileSystem(
-            feconf.ENTITY_TYPE_USER, new_username)
+            feconf.ENTITY_TYPE_USER, new_username
+        )
 
         if not old_fs.isfile('profile_picture.png'):
             raise self.NotFoundException(
                 'The user with username %s does not have a '
-                'profile picture with png extension.' % old_username)
+                'profile picture with png extension.' % old_username
+            )
 
         if not old_fs.isfile('profile_picture.webp'):
             raise self.NotFoundException(
                 'The user with username %s does not have a '
-                'profile picture with webp extension.' % old_username)
+                'profile picture with webp extension.' % old_username
+            )
 
         image_png = old_fs.get('profile_picture.png')
         old_fs.delete('profile_picture.png')
-        new_fs.commit(
-            'profile_picture.png', image_png, mimetype='image/png')
+        new_fs.commit('profile_picture.png', image_png, mimetype='image/png')
 
         image_webp = old_fs.get('profile_picture.webp')
         old_fs.delete('profile_picture.webp')
-        new_fs.commit(
-            'profile_picture.webp', image_webp, mimetype='image/webp')
+        new_fs.commit('profile_picture.webp', image_webp, mimetype='image/webp')
 
         user_services.set_username(user_id, new_username)
         user_services.log_username_change(
-            self.user_id, old_username, new_username)
+            self.user_id, old_username, new_username
+        )
 
         self.render_json({})
 
@@ -2824,10 +3064,13 @@ class NumberOfDeletionRequestsHandler(
     @acl_decorators.can_access_admin_page
     def get(self) -> None:
         """Retrieves the number of pending deletion requests for models."""
-        self.render_json({
-            'number_of_pending_deletion_models': (
-                wipeout_service.get_number_of_pending_deletion_requests())
-        })
+        self.render_json(
+            {
+                'number_of_pending_deletion_models': (
+                    wipeout_service.get_number_of_pending_deletion_requests()
+                )
+            }
+        )
 
 
 class VerifyUserModelsDeletedHandlerNormalizedRequestDict(TypedDict):
@@ -2848,13 +3091,7 @@ class VerifyUserModelsDeletedHandler(
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
-        'GET': {
-            'user_id': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            }
-        }
+        'GET': {'user_id': {'schema': {'type': 'basestring'}}}
     }
 
     @acl_decorators.can_access_admin_page
@@ -2866,7 +3103,8 @@ class VerifyUserModelsDeletedHandler(
         user_id = self.normalized_request['user_id']
 
         user_is_deleted = wipeout_service.verify_user_deleted(
-            user_id, include_delete_at_end_models=True)
+            user_id, include_delete_at_end_models=True
+        )
         self.render_json({'related_models_exist': not user_is_deleted})
 
 
@@ -2880,25 +3118,15 @@ class DeleteUserHandlerNormalizedRequestDict(TypedDict):
 
 
 class DeleteUserHandler(
-    base.BaseHandler[
-        Dict[str, str], DeleteUserHandlerNormalizedRequestDict
-    ]
+    base.BaseHandler[Dict[str, str], DeleteUserHandlerNormalizedRequestDict]
 ):
     """Handler for deleting a user with specific ID."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'DELETE': {
-            'user_id': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
-            'username': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            }
+            'user_id': {'schema': {'type': 'basestring'}},
+            'username': {'schema': {'type': 'basestring'}},
         }
     }
 
@@ -2915,11 +3143,13 @@ class DeleteUserHandler(
         user_id = self.normalized_request['user_id']
         username = self.normalized_request['username']
 
-        user_id_from_username = (
-            user_services.get_user_id_from_username(username))
+        user_id_from_username = user_services.get_user_id_from_username(
+            username
+        )
         if user_id_from_username is None:
             raise self.NotFoundException(
-                'The username doesn\'t belong to any user')
+                'The username doesn\'t belong to any user'
+            )
 
         if user_id_from_username != user_id:
             raise self.InvalidInputException(
@@ -2941,9 +3171,7 @@ class UpdateBlogPostHandlerNormalizedPayloadDict(TypedDict):
 
 
 class UpdateBlogPostHandler(
-    base.BaseHandler[
-        UpdateBlogPostHandlerNormalizedPayloadDict, Dict[str, str]
-    ]
+    base.BaseHandler[UpdateBlogPostHandlerNormalizedPayloadDict, Dict[str, str]]
 ):
     """Handler for changing author ids and published on date in
     blog posts."""
@@ -2951,25 +3179,19 @@ class UpdateBlogPostHandler(
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
-            'blog_post_id': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
+            'blog_post_id': {'schema': {'type': 'basestring'}},
             'author_username': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'has_length_at_most',
-                        'max_value': constants.MAX_USERNAME_LENGTH
-                    }]
+                    'validators': [
+                        {
+                            'id': 'has_length_at_most',
+                            'max_value': constants.MAX_USERNAME_LENGTH,
+                        }
+                    ],
                 }
             },
-            'published_on': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            }
+            'published_on': {'schema': {'type': 'basestring'}},
         }
     }
 
@@ -2992,21 +3214,26 @@ class UpdateBlogPostHandler(
         author_id = user_services.get_user_id_from_username(author_username)
         if author_id is None:
             raise self.NotFoundException(
-                'Invalid username: %s' % author_username)
+                'Invalid username: %s' % author_username
+            )
 
         user_actions = user_services.get_user_actions_info(author_id).actions
         if role_services.ACTION_ACCESS_BLOG_DASHBOARD not in user_actions:
             raise self.UnauthorizedUserException(
-                'User does not have enough rights to be blog post author.')
+                'User does not have enough rights to be blog post author.'
+            )
 
-        blog_post = (
-            blog_services.get_blog_post_by_id(blog_post_id, strict=False))
+        blog_post = blog_services.get_blog_post_by_id(
+            blog_post_id, strict=False
+        )
         if blog_post is None:
             raise self.NotFoundException(
-                'The blog post with the given id or url doesn\'t exist.')
+                'The blog post with the given id or url doesn\'t exist.'
+            )
 
         blog_services.update_blog_models_author_and_published_on_date(
-            blog_post_id, author_id, published_on)
+            blog_post_id, author_id, published_on
+        )
         self.render_json({})
 
 
@@ -3016,9 +3243,7 @@ class RegenerateTopicSummariesHandler(
     """Handler to regenerate the summaries of all topics."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
-        'PUT': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'PUT': {}}
 
     @acl_decorators.can_access_admin_page
     def put(self) -> None:
@@ -3027,7 +3252,8 @@ class RegenerateTopicSummariesHandler(
         # Fetched topics are sorted only to make the backend tests pass.
         topics = sorted(
             topic_fetchers.get_all_topics(),
-            key=operator.attrgetter('created_on'))
+            key=operator.attrgetter('created_on'),
+        )
         for topic in topics:
             topic_services.generate_topic_summary(topic.id)
 
@@ -3055,23 +3281,16 @@ class TranslationCoordinatorRoleHandler(
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
-            'username': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
+            'username': {'schema': {'type': 'basestring'}},
             'action': {
                 'schema': {
                     'type': 'basestring',
-                    'choices': ['assign', 'deassign']
+                    'choices': ['assign', 'deassign'],
                 }
             },
             'language_id': {
-                'schema': {
-                    'type': 'basestring',
-                    'choices': supported_languages
-                }
-            }
+                'schema': {'type': 'basestring', 'choices': supported_languages}
+            },
         }
     }
 
@@ -3092,20 +3311,25 @@ class TranslationCoordinatorRoleHandler(
 
         if user_settings is None:
             raise self.NotFoundException(
-                'User with given username does not exist.')
+                'User with given username does not exist.'
+            )
 
         user_id = user_settings.user_id
         if action == 'assign':
             if not feconf.ROLE_ID_TRANSLATION_COORDINATOR in (
-                user_settings.roles):
+                user_settings.roles
+            ):
                 user_services.add_user_role(
-                    user_id, feconf.ROLE_ID_TRANSLATION_COORDINATOR)
+                    user_id, feconf.ROLE_ID_TRANSLATION_COORDINATOR
+                )
 
             language_coordinator = user_services.get_user_actions_info(user_id)
 
             user_services.assign_coordinator(
                 user_services.get_system_user(),
-                language_coordinator, language_id)
+                language_coordinator,
+                language_id,
+            )
         else:
             # The handler schema defines the possible values of 'action'.
             # If 'action' has a value other than those defined in the schema,
@@ -3115,7 +3339,9 @@ class TranslationCoordinatorRoleHandler(
             language_coordinator = user_services.get_user_actions_info(user_id)
             user_services.deassign_coordinator(
                 user_services.get_system_user(),
-                language_coordinator, language_id)
+                language_coordinator,
+                language_id,
+            )
 
         self.render_json({})
 
@@ -3140,13 +3366,7 @@ class InteractionsByExplorationIdHandler(
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
-        'GET': {
-            'exp_id': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            }
-        }
+        'GET': {'exp_id': {'schema': {'type': 'basestring'}}}
     }
 
     @acl_decorators.can_access_admin_page
@@ -3155,7 +3375,8 @@ class InteractionsByExplorationIdHandler(
         exploration_id = self.normalized_request['exp_id']
 
         exploration = exp_fetchers.get_exploration_by_id(
-            exploration_id, strict=False)
+            exploration_id, strict=False
+        )
         if exploration is None:
             raise self.NotFoundException('Exploration does not exist.')
 

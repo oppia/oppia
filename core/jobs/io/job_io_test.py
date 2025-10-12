@@ -33,7 +33,8 @@ class PutResultsTests(job_test_utils.PipelinedTestBase):
     def test_single_output(self) -> None:
         messages = [
             job_run_result.JobRunResult(
-                stdout='Hello, World!', stderr='Uh-oh, World!'),
+                stdout='Hello, World!', stderr='Uh-oh, World!'
+            ),
         ]
 
         self.assert_pcoll_empty(

@@ -46,19 +46,20 @@ class Continue(base.BaseInteraction):
     # change depending on the customization args.
     show_generic_submit_button: bool = False
 
-    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{
-        'name': 'buttonText',
-        'description': 'Button label',
-        'schema': {
-            'type': 'custom',
-            'obj_type': 'SubtitledUnicode',
-            'validators': [{
-                'id': 'has_expected_subtitled_content_length',
-                'max_value': 20
-            }],
-        },
-        'default_value': {
-            'content_id': None,
-            'unicode_str': 'Continue'
-        },
-    }]
+    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [
+        {
+            'name': 'buttonText',
+            'description': 'Button label',
+            'schema': {
+                'type': 'custom',
+                'obj_type': 'SubtitledUnicode',
+                'validators': [
+                    {
+                        'id': 'has_expected_subtitled_content_length',
+                        'max_value': 20,
+                    }
+                ],
+            },
+            'default_value': {'content_id': None, 'unicode_str': 'Continue'},
+        }
+    ]

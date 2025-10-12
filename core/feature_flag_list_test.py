@@ -34,7 +34,8 @@ from typing import Final, List
 FRONTEND_FEATURE_NAMES_PATH: Final = os.path.join(
     os.getcwd(),
     'core/templates/domain/feature-flag',
-    'feature-status-summary.model.ts')
+    'feature-status-summary.model.ts',
+)
 
 ENUM_BODY_REGEXP: Final = re.compile(
     r'enum FeatureNames \{(.+?)\}', flags=re.DOTALL
@@ -51,9 +52,10 @@ class FeatureFlagListTest(test_utils.GenericTestBase):
         super().setUp()
 
         self.all_features_list = (
-            feature_flag_list.DEV_FEATURES_LIST +
-            feature_flag_list.TEST_FEATURES_LIST +
-            feature_flag_list.PROD_FEATURES_LIST)
+            feature_flag_list.DEV_FEATURES_LIST
+            + feature_flag_list.TEST_FEATURES_LIST
+            + feature_flag_list.PROD_FEATURES_LIST
+        )
         self.all_features_set = set(self.all_features_list)
 
     def _parse_feature_names_in_frontend(self) -> List[str]:
@@ -71,14 +73,13 @@ class FeatureFlagListTest(test_utils.GenericTestBase):
         missing_names = []
         for feature in self.all_features_set:
             if feature.value not in (
-                feature_flag_list.
-                FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE
+                feature_flag_list.FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE
             ):
                 missing_names.append(feature.value)
         self.assertTrue(
             len(missing_names) == 0,
-            msg='Following entries in feature lists are not defined: %s.' % (
-                missing_names)
+            msg='Following entries in feature lists are not defined: %s.'
+            % (missing_names),
         )
 
     def test_no_duplicated_names_in_features_lists(self) -> None:
@@ -89,7 +90,7 @@ class FeatureFlagListTest(test_utils.GenericTestBase):
         self.assertTrue(
             len(duplicate_names) == 0,
             msg='Following entries appear more than once in features lists'
-            ': %s.' % (duplicate_names)
+            ': %s.' % (duplicate_names),
         )
 
     def test_no_duplicate_names_in_deprecated_names_list(self) -> None:
@@ -101,12 +102,11 @@ class FeatureFlagListTest(test_utils.GenericTestBase):
         self.assertTrue(
             len(duplicate_names) == 0,
             msg='Following entries appear more than once in deprecated name '
-            'list: %s.' % (duplicate_names)
+            'list: %s.' % (duplicate_names),
         )
 
     def test_no_deprecated_names_in_features_lists(self) -> None:
-        deprecated_names_set = set(
-            feature_flag_list.DEPRECATED_FEATURE_NAMES)
+        deprecated_names_set = set(feature_flag_list.DEPRECATED_FEATURE_NAMES)
         found_deprecated_names = []
         for feature in self.all_features_set:
             if feature in deprecated_names_set:
@@ -114,77 +114,91 @@ class FeatureFlagListTest(test_utils.GenericTestBase):
         self.assertTrue(
             len(found_deprecated_names) == 0,
             msg='Following names in feature lists are deprecated and should '
-            'not be used: %s.' % (found_deprecated_names)
+            'not be used: %s.' % (found_deprecated_names),
         )
 
     def test_all_entries_in_dev_features_list_are_in_dev_stage(self) -> None:
         invalid_feature_names = []
         for feature in feature_flag_list.DEV_FEATURES_LIST:
-            feature_flag = (
-                feature_flag_registry.Registry.get_feature_flag(feature.value))
-            if (feature_flag.feature_flag_spec.feature_stage !=
-                    feature_flag_domain.FeatureStages.DEV):
+            feature_flag = feature_flag_registry.Registry.get_feature_flag(
+                feature.value
+            )
+            if (
+                feature_flag.feature_flag_spec.feature_stage
+                != feature_flag_domain.FeatureStages.DEV
+            ):
                 invalid_feature_names.append(feature.value)
         self.assertTrue(
             len(invalid_feature_names) == 0,
             msg='Following entries defined in DEV_FEATURES_LIST are not in '
-            '\'dev\' stage: %s.' % (invalid_feature_names)
+            '\'dev\' stage: %s.' % (invalid_feature_names),
         )
 
     def test_all_entries_in_test_features_list_are_in_test_stage(self) -> None:
         invalid_feature_names = []
         for feature in feature_flag_list.TEST_FEATURES_LIST:
-            feature_flag = (
-                feature_flag_registry.Registry.get_feature_flag(feature.value))
-            if (feature_flag.feature_flag_spec.feature_stage !=
-                    feature_flag_domain.FeatureStages.TEST):
+            feature_flag = feature_flag_registry.Registry.get_feature_flag(
+                feature.value
+            )
+            if (
+                feature_flag.feature_flag_spec.feature_stage
+                != feature_flag_domain.FeatureStages.TEST
+            ):
                 invalid_feature_names.append(feature.value)
         self.assertTrue(
             len(invalid_feature_names) == 0,
             msg='Following entries defined in TEST_FEATURES_LIST are not in '
-            '\'test\' stage: %s.' % (invalid_feature_names)
+            '\'test\' stage: %s.' % (invalid_feature_names),
         )
 
     def test_all_entries_in_prod_features_list_are_in_prod_stage(self) -> None:
         invalid_feature_names = []
         for feature in feature_flag_list.PROD_FEATURES_LIST:
-            feature_flag = (
-                feature_flag_registry.Registry.get_feature_flag(feature.value))
-            if (feature_flag.feature_flag_spec.feature_stage !=
-                    feature_flag_domain.FeatureStages.PROD):
+            feature_flag = feature_flag_registry.Registry.get_feature_flag(
+                feature.value
+            )
+            if (
+                feature_flag.feature_flag_spec.feature_stage
+                != feature_flag_domain.FeatureStages.PROD
+            ):
                 invalid_feature_names.append(feature.value)
         self.assertTrue(
             len(invalid_feature_names) == 0,
             msg='Following entries defined in PROD_FEATURES_LIST are not in '
-            '\'prod\' stage: %s.' % (invalid_feature_names)
+            '\'prod\' stage: %s.' % (invalid_feature_names),
         )
 
     def test_all_names_in_features_lists_exist_in_frontend(self) -> None:
         feature_names_in_frontend = self._parse_feature_names_in_frontend()
         all_feature_names_set = [
-            feature.value for feature in self.all_features_set]
-        missing_features = (
-            set(all_feature_names_set) - set(feature_names_in_frontend))
+            feature.value for feature in self.all_features_set
+        ]
+        missing_features = set(all_feature_names_set) - set(
+            feature_names_in_frontend
+        )
         self.assertTrue(
             len(missing_features) == 0,
-            msg='Following entries are not defined in frontend: %s.' % (
-                list(missing_features))
+            msg='Following entries are not defined in frontend: %s.'
+            % (list(missing_features)),
         )
 
     def test_all_names_in_frontend_are_known(self) -> None:
         feature_names_in_frontend = self._parse_feature_names_in_frontend()
         all_feature_names_set = [
-            feature.value for feature in self.all_features_set]
-        missing_features = (
-            set(feature_names_in_frontend) - set(all_feature_names_set))
+            feature.value for feature in self.all_features_set
+        ]
+        missing_features = set(feature_names_in_frontend) - set(
+            all_feature_names_set
+        )
         self.assertTrue(
             len(missing_features) == 0,
             msg='Following entries are defined in frontend but not defined'
-                ' in the backend feature list: %s.' % list(missing_features)
+            ' in the backend feature list: %s.' % list(missing_features),
         )
 
     def test_feature_flag_names_and_platform_parameter_names_are_unique(
-        self) -> None:
+        self,
+    ) -> None:
         feature_flag_names = []
         for feature_flag_enum in feature_flag_list.FeatureNames:
             feature_flag_names.append(feature_flag_enum.name)
