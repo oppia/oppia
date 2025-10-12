@@ -51,7 +51,7 @@ class CloudTranslateEmulator:
         ('en', 'pt', 'Correct!'): 'Correto!',
         ('en', 'es', 'hello world'): 'Hola Mundo',
         ('en', 'pt', 'Please continue.'): 'Por favor continue.',
-        ('en', 'fr', 'hello world'): 'Bonjour le monde'
+        ('en', 'fr', 'hello world'): 'Bonjour le monde',
     }
 
     DEFAULT_RESPONSE = (
@@ -67,10 +67,7 @@ class CloudTranslateEmulator:
         self.expected_responses = self.PREGENERATED_TRANSLATIONS
 
     def translate(
-            self,
-            text: str,
-            source_language_code: str,
-            target_language_code: str
+        self, text: str, source_language_code: str, target_language_code: str
     ) -> str:
         """Returns the saved expected response for a given input. If no
         response exists for the given input, returns a default response.
@@ -89,20 +86,22 @@ class CloudTranslateEmulator:
         """
         if not utils.is_valid_language_code(source_language_code):
             raise ValueError(
-                'Invalid source language code: %s' % source_language_code)
+                'Invalid source language code: %s' % source_language_code
+            )
         if not utils.is_valid_language_code(target_language_code):
             raise ValueError(
-                'Invalid target language code: %s' % target_language_code)
+                'Invalid target language code: %s' % target_language_code
+            )
 
         key = (source_language_code, target_language_code, text)
         return self.expected_responses.get(key, self.DEFAULT_RESPONSE)
 
     def add_expected_response(
-            self,
-            source_language_code: str,
-            target_language_code: str,
-            source_text: str,
-            response: str
+        self,
+        source_language_code: str,
+        target_language_code: str,
+        source_text: str,
+        response: str,
     ) -> None:
         """Adds an expected response for a given set of inputs.
 

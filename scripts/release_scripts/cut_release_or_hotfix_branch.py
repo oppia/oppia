@@ -71,7 +71,8 @@ def require_release_version_to_have_correct_format(
     """
     if not pattern.match(arg):
         raise argparse.ArgumentTypeError(
-            'The format of "release_version" should be: x.x.x')
+            'The format of "release_version" should be: x.x.x'
+        )
     return arg
 
 
@@ -80,8 +81,10 @@ _PARSER.add_argument(
     '--release_version',
     help=(
         'version of the release for which the branch cut is being made or the '
-        'hotfix is being created'),
-    type=require_release_version_to_have_correct_format)
+        'hotfix is being created'
+    ),
+    type=require_release_version_to_have_correct_format,
+)
 _PARSER.add_argument('--hotfix_number', default=0)
 
 
@@ -111,18 +114,20 @@ def verify_target_branch_does_not_already_exist(
     if new_branch_name in git_branch_output:
         raise Exception(
             'ERROR: The target branch name already exists locally. '
-            'Run "git branch -D %s" to delete it.' % new_branch_name)
+            'Run "git branch -D %s" to delete it.' % new_branch_name
+        )
     git_ls_remote_output = subprocess.check_output(
         ['git', 'ls-remote', '--heads', remote_alias], encoding='utf-8'
     ).split('\n')
     remote_branch_ref = 'refs/heads/%s' % new_branch_name
     if remote_branch_ref in git_ls_remote_output:
         raise Exception(
-            'ERROR: The target branch name already exists on the remote repo.')
+            'ERROR: The target branch name already exists on the remote repo.'
+        )
 
 
 def verify_target_version_compatible_with_latest_release(
-    target_version: str
+    target_version: str,
 ) -> None:
     """Checks that the target version is consistent with the latest released
     version on GitHub.
@@ -143,10 +148,12 @@ def verify_target_version_compatible_with_latest_release(
         AssertionError. The current patch version is different than 0.
     """
     response = common.url_open(
-        'https://api.github.com/repos/oppia/oppia/releases/latest')
+        'https://api.github.com/repos/oppia/oppia/releases/latest'
+    )
     if response.getcode() != 200:
         raise Exception(
-            'ERROR: Failed to fetch latest release info from GitHub.')
+            'ERROR: Failed to fetch latest release info from GitHub.'
+        )
 
     data = json.load(response)
     latest_release_tag_name = data['tag_name']
@@ -154,14 +161,13 @@ def verify_target_version_compatible_with_latest_release(
     match_result = re.match(r'v(\d)\.(\d)\.(\d)', latest_release_tag_name)
     if match_result is None:
         raise Exception(
-            'ERROR: Could not parse version number of latest GitHub release.')
+            'ERROR: Could not parse version number of latest GitHub release.'
+        )
     prev_major, prev_minor, prev_patch = match_result.group(1, 2, 3)
 
     match_result = re.match(r'(\d)\.(\d)\.(\d)', target_version)
     if match_result is None:
-        raise Exception(
-            'ERROR: Could not parse target version.'
-        )
+        raise Exception('ERROR: Could not parse target version.')
     curr_major, curr_minor, curr_patch = match_result.group(1, 2, 3)
 
     # This will need to be overridden if the major version changes.
@@ -169,13 +175,16 @@ def verify_target_version_compatible_with_latest_release(
     if prev_minor == curr_minor:
         assert int(curr_patch) == int(prev_patch) + 1, (
             'The current patch version is not equal to previous patch '
-            'version plus one.')
+            'version plus one.'
+        )
     else:
         assert int(curr_minor) == int(prev_minor) + 1, (
             'The current minor version is not equal to previous '
-            'minor version plus one.')
-        assert int(curr_patch) == 0, (
-            'The current patch version is different than 0.')
+            'minor version plus one.'
+        )
+        assert (
+            int(curr_patch) == 0
+        ), 'The current patch version is different than 0.'
 
 
 def verify_hotfix_number_is_one_ahead_of_previous_hotfix_number(
@@ -204,20 +213,27 @@ def verify_hotfix_number_is_one_ahead_of_previous_hotfix_number(
     last_hotfix_number = 0
     release_branch_exists = False
     hotfix_branch_name_regex = '^remotes/%s/release-%s-hotfix-\\d*$' % (
-        remote_alias, target_version)
+        remote_alias,
+        target_version,
+    )
     for branch_name in all_branches:
         branch_name = branch_name.lstrip().rstrip()
         if branch_name == 'remotes/%s/release-%s' % (
-                remote_alias, target_version):
+            remote_alias,
+            target_version,
+        ):
             release_branch_exists = True
         if re.match(hotfix_branch_name_regex, branch_name):
-            branch_hotfix_number = int(branch_name[branch_name.rfind('-') + 1:])
+            branch_hotfix_number = int(
+                branch_name[branch_name.rfind('-') + 1 :]
+            )
             if branch_hotfix_number > last_hotfix_number:
                 last_hotfix_number = branch_hotfix_number
 
     assert release_branch_exists, 'Release branch is missing.'
-    assert hotfix_number == last_hotfix_number + 1, (
-        'The difference between two continuous hotfix numbers is not one.')
+    assert (
+        hotfix_number == last_hotfix_number + 1
+    ), 'The difference between two continuous hotfix numbers is not one.'
 
 
 def _get_release_branch_type_and_name(target_version: str) -> Tuple[str, str]:
@@ -229,9 +245,7 @@ def _get_release_branch_type_and_name(target_version: str) -> Tuple[str, str]:
     Returns:
         tuple(str, str). The type and name of release branch.
     """
-    return (
-        BRANCH_TYPE_RELEASE,
-        'release-%s' % target_version)
+    return (BRANCH_TYPE_RELEASE, 'release-%s' % target_version)
 
 
 def _get_hotfix_branch_type_and_name(
@@ -248,7 +262,8 @@ def _get_hotfix_branch_type_and_name(
     """
     return (
         BRANCH_TYPE_HOTFIX,
-        'release-%s-hotfix-%s' % (target_version, hotfix_number))
+        'release-%s-hotfix-%s' % (target_version, hotfix_number),
+    )
 
 
 def execute_branch_cut(target_version: str, hotfix_number: int) -> None:
@@ -266,10 +281,12 @@ def execute_branch_cut(target_version: str, hotfix_number: int) -> None:
     # Construct the new branch name.
     if not hotfix_number:
         new_branch_type, new_branch_name = _get_release_branch_type_and_name(
-            target_version)
+            target_version
+        )
     else:
         new_branch_type, new_branch_name = _get_hotfix_branch_type_and_name(
-            target_version, hotfix_number)
+            target_version, hotfix_number
+        )
 
     # Do prerequisite checks.
     common.require_cwd_to_be_oppia()
@@ -278,7 +295,8 @@ def execute_branch_cut(target_version: str, hotfix_number: int) -> None:
 
     # Update the local repo.
     remote_alias = common.get_remote_alias(
-        constants.release_constants.REMOTE_URLS)
+        constants.release_constants.REMOTE_URLS
+    )
     subprocess.check_call(['git', 'pull', remote_alias, 'develop'])
 
     verify_target_branch_does_not_already_exist(remote_alias, new_branch_name)
@@ -289,38 +307,46 @@ def execute_branch_cut(target_version: str, hotfix_number: int) -> None:
         branch_to_check = 'release-%s' % target_version
     else:
         branch_to_check = 'release-%s-hotfix-%s' % (
-            target_version, hotfix_number - 1)
+            target_version,
+            hotfix_number - 1,
+        )
     # The release coordinator should verify that tests are passing on
     # the parent branch before checking out the new branch.
     common.open_new_tab_in_browser_if_possible(
         'https://github.com/oppia/oppia/actions?query=branch:%s'
-        % branch_to_check)
+        % branch_to_check
+    )
     print(
-        'Please confirm: are Actions checks passing on %s? (y/n) ' % (
-            branch_to_check))
+        'Please confirm: are Actions checks passing on %s? (y/n) '
+        % (branch_to_check)
+    )
     answer = input().lower()
     if answer not in common.AFFIRMATIVE_CONFIRMATIONS:
         raise Exception(
-            'Tests should pass on %s before this script is run.' % (
-                branch_to_check))
+            'Tests should pass on %s before this script is run.'
+            % (branch_to_check)
+        )
 
     # Cut a new release or hotfix branch.
     if new_branch_type == BRANCH_TYPE_HOTFIX:
         verify_hotfix_number_is_one_ahead_of_previous_hotfix_number(
-            remote_alias, target_version, hotfix_number)
+            remote_alias, target_version, hotfix_number
+        )
         if hotfix_number == 1:
             branch_to_cut_from = 'release-%s' % target_version
         else:
             branch_to_cut_from = 'release-%s-hotfix-%s' % (
-                target_version, hotfix_number - 1)
+                target_version,
+                hotfix_number - 1,
+            )
         print('Cutting a new hotfix branch: %s' % new_branch_name)
         subprocess.check_call(['git', 'checkout', branch_to_cut_from])
         common.update_branch_with_upstream()
-        subprocess.check_call([
-            'git', 'checkout', '-b', new_branch_name, branch_to_cut_from])
+        subprocess.check_call(
+            ['git', 'checkout', '-b', new_branch_name, branch_to_cut_from]
+        )
     else:
-        verify_target_version_compatible_with_latest_release(
-            target_version)
+        verify_target_version_compatible_with_latest_release(target_version)
         print('Cutting a new release branch: %s' % new_branch_name)
         subprocess.check_call(['git', 'checkout', '-b', new_branch_name])
 
@@ -333,12 +359,14 @@ def execute_branch_cut(target_version: str, hotfix_number: int) -> None:
             'Please cherrypick the required PRs and push the branch '
             'to Github once this script is done.\n'
             'Note: It is fine to push the branch only after creating the '
-            'branch protection rule and doing all the cherrypicks.')
+            'branch protection rule and doing all the cherrypicks.'
+        )
 
     print('')
     print(
-        'New %s branch successfully cut. You are now on branch %s' % (
-            new_branch_type, new_branch_name))
+        'New %s branch successfully cut. You are now on branch %s'
+        % (new_branch_type, new_branch_name)
+    )
     print('Done!')
 
 
@@ -356,5 +384,5 @@ def main(args: Optional[List[str]] = None) -> None:
 # The 'no coverage' pragma is used as this line is un-testable. This is because
 # it will only be called when cut_release_or_hotfix_branch.py is used as a
 # script.
-if __name__ == '__main__': # pragma: no cover
+if __name__ == '__main__':  # pragma: no cover
     main()

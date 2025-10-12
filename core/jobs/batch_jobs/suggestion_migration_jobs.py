@@ -38,11 +38,12 @@ import result
 from typing import List, Tuple
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import exp_models, suggestion_models
 
 (exp_models, suggestion_models) = models.Registry.import_models(
-    [models.Names.EXPLORATION, models.Names.SUGGESTION])
+    [models.Names.EXPLORATION, models.Names.SUGGESTION]
+)
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -57,11 +58,12 @@ class RegenerateContentIdForTranslationSuggestionsInReviewJob(
     @staticmethod
     def _update_content_id_in_translation_suggestions(
         suggestions: List[suggestion_models.GeneralSuggestionModel],
-        exp_model: exp_models.ExplorationModel
-    ) -> List[result.Result[
-        suggestion_models.GeneralSuggestionModel,
-        Tuple[str, Exception]
-    ]]:
+        exp_model: exp_models.ExplorationModel,
+    ) -> List[
+        result.Result[
+            suggestion_models.GeneralSuggestionModel, Tuple[str, Exception]
+        ]
+    ]:
         """Updates content id in translation suggestion.
 
         Args:
@@ -76,8 +78,7 @@ class RegenerateContentIdForTranslationSuggestionsInReviewJob(
             successful and Exception is returned otherwise.
         """
         old_to_new_content_id_mapping, _ = (
-            state_domain.State
-            .generate_old_content_id_to_new_content_id_in_v54_states(
+            state_domain.State.generate_old_content_id_to_new_content_id_in_v54_states(
                 exp_model.states
             )
         )
@@ -88,26 +89,35 @@ class RegenerateContentIdForTranslationSuggestionsInReviewJob(
             state_name = suggestion.change_cmd['state_name']
 
             if not state_name in old_to_new_content_id_mapping:
-                results.append(result.Err((
-                    suggestion.id,
-                    'State name %s does not exist in the exploration'
-                    % state_name)))
+                results.append(
+                    result.Err(
+                        (
+                            suggestion.id,
+                            'State name %s does not exist in the exploration'
+                            % state_name,
+                        )
+                    )
+                )
                 continue
 
             old_to_new_content_id_in_state = old_to_new_content_id_mapping[
-                state_name]
+                state_name
+            ]
             if suggestion_content_id not in old_to_new_content_id_in_state:
-                results.append(result.Err(
-                    (
-                        suggestion.id,
-                        'Content ID %s does not exist in the exploration'
-                        % suggestion_content_id
+                results.append(
+                    result.Err(
+                        (
+                            suggestion.id,
+                            'Content ID %s does not exist in the exploration'
+                            % suggestion_content_id,
+                        )
                     )
-                ))
+                )
                 continue
 
             suggestion.change_cmd['content_id'] = (
-                old_to_new_content_id_in_state[suggestion_content_id])
+                old_to_new_content_id_in_state[suggestion_content_id]
+            )
             results.append(result.Ok(suggestion))
 
         return results
@@ -121,48 +131,58 @@ class RegenerateContentIdForTranslationSuggestionsInReviewJob(
         """
         target_id_to_suggestion_models = (
             self.pipeline
-            | 'Get translation suggestion models in review' >> ndb_io.GetModels(
+            | 'Get translation suggestion models in review'
+            >> ndb_io.GetModels(
                 suggestion_models.GeneralSuggestionModel.get_all(
-                    include_deleted=False).filter(
-                        (
-                            suggestion_models
-                            .GeneralSuggestionModel.suggestion_type
-                        ) == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
-                    ).filter(
-                        suggestion_models.GeneralSuggestionModel.status == (
-                            suggestion_models.STATUS_IN_REVIEW
-                        )
-                    )
+                    include_deleted=False
+                )
+                .filter(
+                    (suggestion_models.GeneralSuggestionModel.suggestion_type)
+                    == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+                )
+                .filter(
+                    suggestion_models.GeneralSuggestionModel.status
+                    == (suggestion_models.STATUS_IN_REVIEW)
+                )
             )
-            | 'Add target id as key' >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
-                lambda model: model.target_id)
+            | 'Add target id as key'
+            >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
+                lambda model: model.target_id
+            )
             | 'Group exploration suggestions' >> beam.GroupByKey()
         )
 
         exploration_models = (
             self.pipeline
-            | 'Get all exploration models' >> ndb_io.GetModels(
-                exp_models.ExplorationModel.get_all())
-            | 'Add exploration id as key' >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
-                lambda model: model.id)
+            | 'Get all exploration models'
+            >> ndb_io.GetModels(exp_models.ExplorationModel.get_all())
+            | 'Add exploration id as key'
+            >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
+                lambda model: model.id
+            )
         )
 
         migrated_suggestion_results = (
             {
                 'suggestion_models': target_id_to_suggestion_models,
-                'exploration_model': exploration_models
+                'exploration_model': exploration_models,
             }
             | 'Merge objects' >> beam.CoGroupByKey()
-            | 'Get rid of ID' >> beam.Values() # pylint: disable=no-value-for-parameter
-            | 'Filter unwanted exploration' >> beam.Filter(
-                lambda objects: len(objects['suggestion_models']) != 0)
-            | 'Transform and migrate model' >> beam.Map(
+            | 'Get rid of ID'
+            >> beam.Values()  # pylint: disable=no-value-for-parameter
+            | 'Filter unwanted exploration'
+            >> beam.Filter(
+                lambda objects: len(objects['suggestion_models']) != 0
+            )
+            | 'Transform and migrate model'
+            >> beam.Map(
                 lambda objects: (
                     self._update_content_id_in_translation_suggestions(
                         objects['suggestion_models'][0],
-                        objects['exploration_model'][0]
+                        objects['exploration_model'][0],
                     )
-                ))
+                )
+            )
             | 'Flatten results' >> beam.FlatMap(lambda x: x)
         )
 
@@ -174,16 +194,22 @@ class RegenerateContentIdForTranslationSuggestionsInReviewJob(
 
         migrated_suggestion_job_run_results = (
             migrated_suggestion_results
-            | 'Generate results for migration' >> (
+            | 'Generate results for migration'
+            >> (
                 job_result_transforms.ResultsToJobRunResults(
-                    'SUGGESTION TARGET PROCESSED'))
+                    'SUGGESTION TARGET PROCESSED'
+                )
+            )
         )
 
         migrated_suggestions_count_job_run_results = (
             migrated_suggestion_models
-            | 'Transform suggestion objects into job run results' >> (
+            | 'Transform suggestion objects into job run results'
+            >> (
                 job_result_transforms.CountObjectsToJobRunResult(
-                    'SUGGESTION MIGRATED'))
+                    'SUGGESTION MIGRATED'
+                )
+            )
         )
 
         if self.DATASTORE_UPDATES_ALLOWED:
@@ -193,12 +219,9 @@ class RegenerateContentIdForTranslationSuggestionsInReviewJob(
             )
 
         return (
-            (
-                migrated_suggestion_job_run_results,
-                migrated_suggestions_count_job_run_results
-            )
-            | beam.Flatten()
-        )
+            migrated_suggestion_job_run_results,
+            migrated_suggestions_count_job_run_results,
+        ) | beam.Flatten()
 
 
 class AuditRegenerateContentIdForTranslationSuggestionsInReviewJob(
@@ -216,10 +239,9 @@ class MigrateQuestionSuggestionsJob(base_jobs.JobBase):
 
     @staticmethod
     def _migrate_question_dict(
-        question_suggestion_model: suggestion_models.GeneralSuggestionModel
+        question_suggestion_model: suggestion_models.GeneralSuggestionModel,
     ) -> result.Result[
-        suggestion_models.GeneralSuggestionModel,
-        Tuple[str, Exception]
+        suggestion_models.GeneralSuggestionModel, Tuple[str, Exception]
     ]:
         """Migrates question dict in the question suggestion model to the latest
         schema.
@@ -228,19 +250,23 @@ class MigrateQuestionSuggestionsJob(base_jobs.JobBase):
         versioned_question_state: question_domain.VersionedQuestionStateDict = {
             'state': question_dict['question_state_data'],
             'state_schema_version': question_dict[
-                'question_state_data_schema_version']
+                'question_state_data_schema_version'
+            ],
         }
 
         try:
             next_content_id_index = question_fetchers.migrate_state_schema(
-                versioned_question_state)
+                versioned_question_state
+            )
 
             question_dict['next_content_id_index'] = next_content_id_index
             question_dict['question_state_data_schema_version'] = (
-                versioned_question_state['state_schema_version'])
+                versioned_question_state['state_schema_version']
+            )
 
             suggestion = suggestion_services.get_suggestion_from_model(
-                question_suggestion_model)
+                question_suggestion_model
+            )
             suggestion.validate()
         except Exception as e:
             logging.exception(e)
@@ -251,52 +277,64 @@ class MigrateQuestionSuggestionsJob(base_jobs.JobBase):
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         question_suggestions = (
             self.pipeline
-            | 'Get all GeneralSuggestionModels' >> ndb_io.GetModels(
+            | 'Get all GeneralSuggestionModels'
+            >> ndb_io.GetModels(
                 suggestion_models.GeneralSuggestionModel.get_all(
-                    include_deleted=False))
-            | 'Filter question suggestions' >> (
+                    include_deleted=False
+                )
+            )
+            | 'Filter question suggestions'
+            >> (
                 beam.Filter(
                     lambda model: (
-                        model.suggestion_type ==
-                        feconf.SUGGESTION_TYPE_ADD_QUESTION
+                        model.suggestion_type
+                        == feconf.SUGGESTION_TYPE_ADD_QUESTION
                         and model.status == suggestion_models.STATUS_IN_REVIEW
                     ),
-                ))
+                )
+            )
         )
 
         models_count_job_run_results = (
             question_suggestions
-            | 'Transform suggestions into job run results' >> (
+            | 'Transform suggestions into job run results'
+            >> (
                 job_result_transforms.CountObjectsToJobRunResult(
-                    'QUESTION MODELS COUNT'))
+                    'QUESTION MODELS COUNT'
+                )
+            )
         )
 
         migrate_suggestion_results = (
             question_suggestions
-            | 'Filter suggestions required migration' >> beam.Filter(
+            | 'Filter suggestions required migration'
+            >> beam.Filter(
                 lambda model: (
                     model.change_cmd['question_dict'][
-                        'question_state_data_schema_version'] != (
-                            feconf.CURRENT_STATE_SCHEMA_VERSION)
-                ))
-            | 'Migrate question_dict in change field' >> beam.Map(
-                self._migrate_question_dict
+                        'question_state_data_schema_version'
+                    ]
+                    != (feconf.CURRENT_STATE_SCHEMA_VERSION)
+                )
             )
+            | 'Migrate question_dict in change field'
+            >> beam.Map(self._migrate_question_dict)
         )
 
         migrated_suggestions = (
             migrate_suggestion_results
-            | 'Filter oks' >> beam.Filter(
-                lambda result_item: result_item.is_ok())
-            | 'Unwrap ok' >> beam.Map(
-                lambda result_item: result_item.unwrap())
+            | 'Filter oks'
+            >> beam.Filter(lambda result_item: result_item.is_ok())
+            | 'Unwrap ok' >> beam.Map(lambda result_item: result_item.unwrap())
         )
 
         migrated_exp_job_run_results = (
             migrate_suggestion_results
-            | 'Generate results for migration' >> (
+            | 'Generate results for migration'
+            >> (
                 job_result_transforms.ResultsToJobRunResults(
-                    'SUGGESTION MIGRATED'))
+                    'SUGGESTION MIGRATED'
+                )
+            )
         )
 
         if self.DATASTORE_UPDATES_ALLOWED:
@@ -306,12 +344,9 @@ class MigrateQuestionSuggestionsJob(base_jobs.JobBase):
             )
 
         return (
-            (
-                models_count_job_run_results,
-                migrated_exp_job_run_results
-            )
-            | beam.Flatten()
-        )
+            models_count_job_run_results,
+            migrated_exp_job_run_results,
+        ) | beam.Flatten()
 
 
 class AuditMigrateQuestionSuggestionsJob(MigrateQuestionSuggestionsJob):

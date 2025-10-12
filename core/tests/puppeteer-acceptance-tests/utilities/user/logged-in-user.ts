@@ -66,7 +66,6 @@ const desktopLessonCardTitleSelector = '.e2e-test-exploration-tile-title';
 const lessonCardTitleSelector = '.e2e-test-exploration-tile-title';
 const desktopAddToPlayLaterButton = '.e2e-test-add-to-playlist-btn';
 const mobileAddToPlayLaterButton = '.e2e-test-mobile-add-to-playlist-btn';
-const toastMessageSelector = '.e2e-test-toast-message';
 const mobileLessonCardTitleSelector = '.e2e-test-exp-summary-tile-title';
 const mobileCommunityLessonSectionButton = '.e2e-test-mobile-lessons-section';
 const communityLessonsSectionButton = '.e2e-test-community-lessons-section';
@@ -216,6 +215,8 @@ const completedGoalsContainerSelector = '.e2e-test-completed-goals-section';
 const goalContainerSelector = 'oppia-goal-list';
 const goalTitleSelector = '.e2e-test-goal-title';
 const startGoalButtonSelector = '.e2e-test-start-lesson-button';
+const emptyProgressSectionContainerSelector =
+  '.e2e-test-empty-progress-section';
 
 // Learner Dashboard > Home Tab Seclectors.
 const hometabSectionHeadingSelector =
@@ -256,6 +257,7 @@ const explorationLanguagePerferenceChipsSelector =
 const siteLanguageValueSelector = `${siteLanguageInputSelector} span.mat-select-min-line`;
 const audioLanguageValueSelector = `${audioLanguageInputSelector} span.mat-select-min-line`;
 const photoUploadErrorMessage = '.e2e-test-upload-error';
+const subscribedCreatorSelector = '.e2e-test-subscription-name';
 
 // Profile Page selectors.
 const profileContainerSelector = '.e2e-test-profile-container';
@@ -306,6 +308,7 @@ const mobileGetInvolvedMenuContainerSelector =
   '.e2e-mobile-test-sidebar-get-involved-menu';
 const mobileLearnDropdownSelector = '.e2e-mobile-test-learn';
 const mobileLearnSubMenuSelector = '.e2e-test-mobile-learn-submenu';
+const mobileNavBarOpenSelector = '.oppia-sidebar-menu-open';
 
 const commonPlayLaterIconSelector = '.e2e-test-lesson-playlist-icon';
 const learnerDashboardIconsSelector = 'oppia-learner-dashboard-icons';
@@ -317,6 +320,9 @@ const profileDropdownContainerSelector = '.e2e-test-profile-dropdown-container';
 const profileDropdownAnchorSelector = `${profileDropdownContainerSelector} .nav-link`;
 const closeModalButton = '.e2e-test-close-modal-btn';
 const goalsSectionContainerSelector = '.e2e-test-goals-section-container';
+const usernameSelector = '.e2e-test-username';
+const continueWhereYouLeftOffSection = '.e2e-test-continue-section';
+const nonEmptySectionSelector = '.e2e-test-non-empty-section';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -329,9 +335,9 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(removeModalContainerSelector);
 
     if (button === 'Remove') {
-      await this.clickOn(removeModalConfirmButtonSelector);
+      await this.clickOnElementWithSelector(removeModalConfirmButtonSelector);
     } else if (button === 'Cancel') {
-      await this.clickOn(removeModalCancelButtonSelector);
+      await this.clickOnElementWithSelector(removeModalCancelButtonSelector);
     }
 
     await this.page.waitForSelector(removeModalContainerSelector, {
@@ -343,18 +349,20 @@ export class LoggedInUser extends BaseUser {
    * Function for clicking on the profile dropdown.
    */
   async clickOnProfileDropdown(): Promise<void> {
-    await this.isElementVisible(profileDropdownToggleSelector);
-    await this.clickOn(profileDropdownToggleSelector);
+    await this.expectElementToBeVisible(profileDropdownToggleSelector);
+    await this.clickOnElementWithSelector(profileDropdownToggleSelector);
   }
 
   /**
    * Checks if the profile dropdown contains the given element.
    * @param item The element to check for.
+   * @param visible - Whether the element should be visible or not.
    */
   async expectProfileDropdownToContainElementWithContent(
-    item: string
+    item: string,
+    visible: boolean = true
   ): Promise<void> {
-    await this.isElementVisible(profileDropdownContainerSelector);
+    await this.expectElementToBeVisible(profileDropdownContainerSelector);
 
     const elementsContents = await this.page.$$eval(
       profileDropdownAnchorSelector,
@@ -362,7 +370,11 @@ export class LoggedInUser extends BaseUser {
         elements.map(el => (el as HTMLAnchorElement).textContent?.trim())
     );
 
-    expect(elementsContents).toContain(item);
+    if (visible) {
+      expect(elementsContents).toContain(item);
+    } else {
+      expect(elementsContents).not.toContain(item);
+    }
   }
 
   /**
@@ -410,7 +422,7 @@ export class LoggedInUser extends BaseUser {
     await this.waitForPageToFullyLoad();
     if (this.isViewportAtMobileWidth()) {
       await this.page.waitForSelector(mobileProgressSectionButton);
-      await this.clickOn(mobileProgressSectionButton);
+      await this.clickOnElementWithSelector(mobileProgressSectionButton);
 
       try {
         await this.page.waitForSelector(mobileCommunityLessonSectionButton, {
@@ -419,12 +431,12 @@ export class LoggedInUser extends BaseUser {
       } catch (error) {
         if (error instanceof puppeteer.errors.TimeoutError) {
           // Try clicking again if does not opens the expected page.
-          await this.clickOn(mobileProgressSectionButton);
+          await this.clickOnElementWithSelector(mobileProgressSectionButton);
         } else {
           throw error;
         }
       }
-      await this.clickOn(mobileCommunityLessonSectionButton);
+      await this.clickOnElementWithSelector(mobileCommunityLessonSectionButton);
     } else {
       await this.page.waitForSelector(progressSectionSelector, {
         visible: true,
@@ -439,17 +451,21 @@ export class LoggedInUser extends BaseUser {
 
   /**
    * Function to subscribe to a creator with the given username.
+   * @param {string} username - The username of the creator to subscribe to.
+   *     If not provided, the function will subscribe to the creator of the
+   *     current page.
    */
-  async subscribeToCreator(username: string): Promise<void> {
-    const profilePageUrl = `${profilePageUrlPrefix}/${username}`;
-
-    if (this.page.url() !== profilePageUrl) {
+  async subscribeToCreator(username?: string): Promise<void> {
+    // Navigate to user's profile if username is given.
+    if (username) {
       await this.navigateToProfilePage(username);
     }
 
-    await this.clickOn(subscribeButton);
-    await this.page.waitForSelector(unsubscribeLabel);
-    showMessage(`Subscribed to the creator with username ${username}.`);
+    await this.clickOnElementWithSelector(subscribeButton);
+    await this.expectElementToBeVisible(unsubscribeLabel);
+    showMessage(
+      `Subscribed to the creator${username ? ` (${username})` : ''}.`
+    );
   }
 
   /**
@@ -467,12 +483,12 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(profileDropdown, {
       visible: true,
     });
-    await this.clickOn(profileDropdown);
+    await this.clickOnElementWithSelector(profileDropdown);
 
     await this.page.waitForSelector(learnerDashboardMenuLink, {
       visible: true,
     });
-    await this.clickOn(learnerDashboardMenuLink);
+    await this.clickOnElementWithSelector(learnerDashboardMenuLink);
 
     await this.waitForPageToFullyLoad();
     await this.page.waitForSelector(homeTabSectionInLearnerDashboard, {
@@ -489,10 +505,10 @@ export class LoggedInUser extends BaseUser {
       window.scrollTo(0, 0);
     });
     await this.expectElementToBeVisible(profileDropdown);
-    await this.clickOn(profileDropdown);
+    await this.clickOnElementWithSelector(profileDropdown);
 
     const selector = `.e2e-test-${page.toLowerCase().replace(/ /g, '-')}-link`;
-    await this.clickOn(selector);
+    await this.clickOnElementWithSelector(selector);
     await this.expectElementToBeVisible(`${profileDropdown}.show`, false);
   }
 
@@ -502,7 +518,7 @@ export class LoggedInUser extends BaseUser {
   async navigateToProgressSection(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.page.waitForSelector(mobileProgressSectionButton);
-      await this.clickOn(mobileProgressSectionButton);
+      await this.clickOnElementWithSelector(mobileProgressSectionButton);
 
       try {
         await this.page.waitForSelector(mobileCommunityLessonSectionButton, {
@@ -511,12 +527,12 @@ export class LoggedInUser extends BaseUser {
       } catch (error) {
         if (error instanceof puppeteer.errors.TimeoutError) {
           // Try clicking again if does not opens the expected page.
-          await this.clickOn(mobileProgressSectionButton);
+          await this.clickOnElementWithSelector(mobileProgressSectionButton);
         } else {
           throw error;
         }
       }
-      await this.clickOn('Stories');
+      await this.clickOnElementWithText('Stories');
 
       await this.page.waitForSelector(progressTabSectionInLearnerDashboard, {
         visible: true,
@@ -542,7 +558,7 @@ export class LoggedInUser extends BaseUser {
   async navigateToHomeSection(): Promise<void> {
     if (await this.isViewportAtMobileWidth()) {
       await this.page.waitForSelector(mobileHomeSectionSelector);
-      await this.clickOn(mobileHomeSectionSelector);
+      await this.clickOnElementWithSelector(mobileHomeSectionSelector);
 
       try {
         await this.page.waitForSelector(homeSectionGreetingElement, {
@@ -551,7 +567,7 @@ export class LoggedInUser extends BaseUser {
       } catch (error) {
         if (error instanceof puppeteer.errors.TimeoutError) {
           // Try clicking again if does not opens the expected page.
-          await this.clickOn(mobileHomeSectionSelector);
+          await this.clickOnElementWithSelector(mobileHomeSectionSelector);
         } else {
           throw error;
         }
@@ -582,7 +598,7 @@ export class LoggedInUser extends BaseUser {
   async navigateToGoalsSection(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.page.waitForSelector(mobileGoalsSectionSelector);
-      await this.clickOn(mobileGoalsSectionSelector);
+      await this.clickOnElementWithSelector(mobileGoalsSectionSelector);
 
       try {
         await this.page.waitForSelector(currentGoalsSectionSelector, {
@@ -591,7 +607,7 @@ export class LoggedInUser extends BaseUser {
       } catch (error) {
         if (error instanceof puppeteer.errors.TimeoutError) {
           // Try clicking again if does not opens the expected page.
-          await this.clickOn(mobileGoalsSectionSelector);
+          await this.clickOnElementWithSelector(mobileGoalsSectionSelector);
         } else {
           throw error;
         }
@@ -707,12 +723,12 @@ export class LoggedInUser extends BaseUser {
       await this.waitForElementToBeClickable(ratingStars[rating - 1]);
       await ratingStars[rating - 1].click();
 
-      await this.type(feedbackTextareaSelector, feedback);
+      await this.typeInInputField(feedbackTextareaSelector, feedback);
       if (stayAnonymous) {
-        await this.clickOn(anonymousCheckboxSelector);
+        await this.clickOnElementWithSelector(anonymousCheckboxSelector);
       }
 
-      await this.clickOn(submitButtonSelector);
+      await this.clickOnElementWithSelector(submitButtonSelector);
 
       // Wait for the submitted message to appear and check its text.
       await this.page.waitForSelector(submittedMessageSelector);
@@ -755,7 +771,7 @@ export class LoggedInUser extends BaseUser {
    * Clicks the delete account button and waits for navigation.
    */
   async deleteAccount(): Promise<void> {
-    await this.clickAndWaitForNavigation(deleteAccountButton);
+    await this.clickAndWaitForNavigation(deleteAccountButton, true);
 
     await this.page.waitForSelector(deleteAccountPage, {
       visible: true,
@@ -770,9 +786,11 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(accountDeletionButtonInDeleteAccountPage, {
       visible: true,
     });
-    await this.clickOn(accountDeletionButtonInDeleteAccountPage);
-    await this.type(confirmUsernameField, username);
-    await this.clickAndWaitForNavigation(confirmAccountDeletionButton);
+    await this.clickOnElementWithSelector(
+      accountDeletionButtonInDeleteAccountPage
+    );
+    await this.typeInInputField(confirmUsernameField, username);
+    await this.clickAndWaitForNavigation(confirmAccountDeletionButton, true);
 
     await this.page.waitForSelector(deleteMyAcccountButton, {
       hidden: true,
@@ -786,10 +804,10 @@ export class LoggedInUser extends BaseUser {
   async navigateToSignUpPage(): Promise<void> {
     await this.goto(homePageUrl);
     if (!this.userHasAcceptedCookies) {
-      await this.clickOn('OK');
+      await this.clickOnElementWithText('OK');
       this.userHasAcceptedCookies = true;
     }
-    await this.clickOn('Sign in');
+    await this.clickOnElementWithText('Sign in');
 
     await this.page.waitForSelector(loginPage, {
       visible: true,
@@ -820,7 +838,7 @@ export class LoggedInUser extends BaseUser {
       visible: true,
     });
     await this.clearAllTextFrom(signUpUsernameField);
-    await this.type(signUpUsernameField, username);
+    await this.typeInInputField(signUpUsernameField, username);
     // Using blur() to remove focus from signUpUsernameField.
     await this.page.evaluate(selector => {
       document.querySelector(selector).blur();
@@ -831,11 +849,11 @@ export class LoggedInUser extends BaseUser {
       invalidUsernameErrorContainer
     );
     if (!invalidUsernameErrorContainerElement) {
-      await this.clickOn(agreeToTermsCheckbox);
+      await this.clickOnElementWithSelector(agreeToTermsCheckbox);
       await this.page.waitForSelector(registerNewUserButton);
       await Promise.all([
         this.page.waitForNavigation({waitUntil: 'networkidle0'}),
-        this.clickOn(LABEL_FOR_SUBMIT_BUTTON),
+        this.clickOnElementWithText(LABEL_FOR_SUBMIT_BUTTON),
       ]);
 
       await this.page.waitForSelector(learnerDashboardContainerSelector, {
@@ -857,14 +875,14 @@ export class LoggedInUser extends BaseUser {
       visible: true,
     });
     await this.clearAllTextFrom(signUpEmailField);
-    await this.type(signUpEmailField, email);
+    await this.typeInInputField(signUpEmailField, email);
 
     await this.waitForPageToFullyLoad();
     const invalidEmailErrorContainerElement = await this.page.$(
       invalidEmailErrorContainer
     );
     if (!invalidEmailErrorContainerElement) {
-      await this.clickOn('Sign In');
+      await this.clickOnElementWithText('Sign In');
       await this.page.waitForNavigation({waitUntil: 'networkidle0'});
 
       // Post Check: Check if the login page is closed. We can't check if user
@@ -920,7 +938,7 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(signUpEmailField, {
       visible: true,
     });
-    await this.clickOn(signUpEmailField);
+    await this.clickOnElementWithSelector(signUpEmailField);
     await this.page.waitForSelector(optionText);
     const suggestion = await this.page.$eval(optionText, el => el.textContent);
 
@@ -1007,7 +1025,7 @@ export class LoggedInUser extends BaseUser {
 
       // Post-check: Verify if the tooltip appears.
       if (!skipVerification) {
-        await this.expectToolTipMessage(
+        await this.expectToastMessage(
           "Successfully added to your 'Play Later' list."
         );
       }
@@ -1058,7 +1076,7 @@ export class LoggedInUser extends BaseUser {
 
     await this.isTextPresentOnPage("Remove from 'Play Later' list?");
 
-    await this.clickOn(confirmRemovalFromPlayLaterButton);
+    await this.clickOnElementWithSelector(confirmRemovalFromPlayLaterButton);
     await this.page.waitForSelector(learnerPlaylistModalSelector, {
       hidden: true,
     });
@@ -1112,29 +1130,6 @@ export class LoggedInUser extends BaseUser {
     // Check the tooltip content.
     const tooltipText = await this.page.$eval('.tooltip', el => el.textContent);
     expect(tooltipText).toBe(expectedTooltip);
-  }
-
-  /**
-   * Expects the text content of the toast message to match the given expected message.
-   * @param {string} expectedMessage - The expected message to match the toast message against.
-   */
-  async expectToolTipMessage(expectedMessage: string): Promise<void> {
-    await this.page.waitForSelector(toastMessageSelector, {visible: true});
-    const toastMessageElement = await this.page.$(toastMessageSelector);
-    const toastMessage = await this.page.evaluate(
-      el => el.textContent.trim(),
-      toastMessageElement
-    );
-
-    if (toastMessage !== expectedMessage) {
-      throw new Error(
-        `Expected toast message to be "${expectedMessage}", but it was "${toastMessage}".`
-      );
-    }
-    if (this.isViewportAtMobileWidth()) {
-      await this.page.click(toastMessageSelector);
-    }
-    await this.expectElementToBeVisible(toastMessageSelector, false);
   }
 
   /**
@@ -1208,7 +1203,7 @@ export class LoggedInUser extends BaseUser {
       await removeFromPlayLaterButton?.click();
 
       // Confirm removal.
-      await this.clickOn(confirmRemovalFromPlayLaterButton);
+      await this.clickOnElementWithSelector(confirmRemovalFromPlayLaterButton);
 
       await this.page.waitForSelector(confirmRemovalFromPlayLaterButton, {
         hidden: true,
@@ -1274,9 +1269,9 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(editProfilePictureButton, {
       visible: true,
     });
-    await this.clickOn(editProfilePictureButton);
+    await this.clickOnElementWithSelector(editProfilePictureButton);
     await this.uploadFile(picturePath);
-    await this.clickOn(addProfilePictureButton);
+    await this.clickOnElementWithSelector(addProfilePictureButton);
 
     await this.page.waitForSelector(addProfilePictureButton, {
       hidden: true,
@@ -1290,14 +1285,14 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(editProfilePictureButton, {
       visible: true,
     });
-    await this.clickOn(editProfilePictureButton);
+    await this.clickOnElementWithSelector(editProfilePictureButton);
     await this.uploadFile(picturePath);
 
     await this.expectElementToBeClickable(addProfilePictureButton, false);
     await this.page.waitForSelector(photoUploadErrorMessage, {
       visible: true,
     });
-    await this.clickOn(cancelProfileUploadButtonSelector);
+    await this.clickOnElementWithSelector(cancelProfileUploadButtonSelector);
     await this.page.waitForSelector(addProfilePictureButton, {
       hidden: true,
     });
@@ -1320,7 +1315,7 @@ export class LoggedInUser extends BaseUser {
    */
   async cancelPhotoUpload(): Promise<void> {
     await this.expectElementToBeVisible(cancelProfileUploadButtonSelector);
-    await this.clickOn(cancelProfileUploadButtonSelector);
+    await this.clickOnElementWithSelector(cancelProfileUploadButtonSelector);
     await this.expectElementToBeVisible(
       cancelProfileUploadButtonSelector,
       false
@@ -1335,8 +1330,8 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(bioTextareaSelector, {
       visible: true,
     });
-    await this.clickOn(bioTextareaSelector);
-    await this.type(bioTextareaSelector, bio);
+    await this.clickOnElementWithSelector(bioTextareaSelector);
+    await this.typeInInputField(bioTextareaSelector, bio);
 
     const updatedValue = await this.page.$eval(
       bioTextareaSelector,
@@ -1368,7 +1363,7 @@ export class LoggedInUser extends BaseUser {
     const dashboardInSelector = dashboard.toLowerCase().replace(/\s+/g, '-');
     const dashboardSelector = `.e2e-test-${dashboardInSelector}-radio`;
 
-    await this.clickOn(dashboardSelector);
+    await this.clickOnElementWithSelector(dashboardSelector);
 
     const isChecked = await this.page.$eval(
       dashboardSelector,
@@ -1385,7 +1380,7 @@ export class LoggedInUser extends BaseUser {
    */
   async updateSubjectInterestsWithEnterKey(interests: string[]): Promise<void> {
     for (const interest of interests) {
-      await this.type(subjectInterestsInputSelector, interest);
+      await this.typeInInputField(subjectInterestsInputSelector, interest);
       await this.page.keyboard.press('Enter');
     }
 
@@ -1419,7 +1414,7 @@ export class LoggedInUser extends BaseUser {
       visible: true,
     });
     for (const interest of interests) {
-      await this.type(subjectInterestsInputSelector, interest);
+      await this.typeInInputField(subjectInterestsInputSelector, interest);
       await this.page.click(matFormTextSelector);
     }
 
@@ -1447,7 +1442,7 @@ export class LoggedInUser extends BaseUser {
   async updatePreferredExplorationLanguage(language: string): Promise<void> {
     await this.waitForPageToFullyLoad();
 
-    await this.clickOn(explorationLanguageInputSelector);
+    await this.clickOnElementWithSelector(explorationLanguageInputSelector);
 
     await this.page.waitForSelector(optionText);
     const options = await this.page.$$(optionText);
@@ -1482,7 +1477,7 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(siteLanguageInputSelector, {
       visible: true,
     });
-    await this.type(siteLanguageInputSelector, language);
+    await this.typeInInputField(siteLanguageInputSelector, language);
     await this.page.keyboard.press('Enter');
 
     // Post-check: Ensure the site language is properly selected.
@@ -1511,7 +1506,7 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(audioLanguageInputSelector, {
       visible: true,
     });
-    await this.type(audioLanguageInputSelector, language);
+    await this.typeInInputField(audioLanguageInputSelector, language);
     await this.page.keyboard.press('Enter');
 
     // Post-check: Ensure the audio language is properly selected.
@@ -1596,7 +1591,7 @@ export class LoggedInUser extends BaseUser {
         throw new Error('Profile tab not found');
       }
 
-      await this.clickAndWaitForNavigation(goToProfilePageButton);
+      await this.clickAndWaitForNavigation(goToProfilePageButton, true);
       await this.waitForPageToFullyLoad();
       if (!this.page.url().includes('/profile')) {
         throw new Error('Failed to navigate to Profile tab');
@@ -1619,7 +1614,7 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(saveChangesButtonSelector, {
       visible: true,
     });
-    await this.clickAndWaitForNavigation(saveChangesButtonSelector);
+    await this.clickAndWaitForNavigation(saveChangesButtonSelector, true);
     const isDisabled = await this.page.$eval(
       `button${saveChangesButtonSelector}`,
       btn => (btn as HTMLButtonElement).disabled
@@ -1793,16 +1788,19 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(reportExplorationButtonSelector, {
       visible: true,
     });
-    await this.clickOn(reportExplorationButtonSelector);
+    await this.clickOnElementWithSelector(reportExplorationButtonSelector);
     await this.page.waitForSelector(issueTypeSelector);
     await this.waitForElementToStabilize(issueTypeSelector);
     await this.page.click(issueTypeSelector);
-    await this.type(reportExplorationTextAreaSelector, issueDescription);
+    await this.typeInInputField(
+      reportExplorationTextAreaSelector,
+      issueDescription
+    );
 
-    await this.clickOn(submitReportButtonSelector);
+    await this.clickOnElementWithSelector(submitReportButtonSelector);
 
     await this.waitForElementToStabilize(closeModalButton);
-    await this.clickOn(closeModalButton);
+    await this.clickOnElementWithSelector(closeModalButton);
 
     await this.page.waitForSelector(explorationSuccessfullyFlaggedMessage, {
       hidden: true,
@@ -2106,12 +2104,12 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(profileDropdown, {
       visible: true,
     });
-    await this.clickOn(profileDropdown);
+    await this.clickOnElementWithSelector(profileDropdown);
 
     await this.page.waitForSelector(creatorDashboardMenuLink, {
       visible: true,
     });
-    await this.clickOn(creatorDashboardMenuLink);
+    await this.clickOnElementWithSelector(creatorDashboardMenuLink);
 
     await this.page.waitForSelector(creatorDashboardContainerSelector, {
       visible: true,
@@ -2122,19 +2120,10 @@ export class LoggedInUser extends BaseUser {
    * Navigates to the Contributor Dashboard Using Profile Dropdown Menu.
    */
   async navigateToContributorDashboardUsingProfileDropdown(): Promise<void> {
-    await this.page.waitForSelector(profileDropdown, {
-      visible: true,
-    });
-    await this.clickOn(profileDropdown);
+    await this.clickOnElementWithSelector(profileDropdown);
+    await this.clickOnElementWithSelector(contributorDashboardMenuLink);
 
-    await this.page.waitForSelector(contributorDashboardMenuLink, {
-      visible: true,
-    });
-    await this.clickOn(contributorDashboardMenuLink);
-
-    await this.page.waitForSelector(contributorDashboardContainerSelector, {
-      visible: true,
-    });
+    await this.expectElementToBeVisible(contributorDashboardContainerSelector);
   }
 
   /**
@@ -2144,12 +2133,12 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(profileDropdown, {
       visible: true,
     });
-    await this.clickOn(profileDropdown);
+    await this.clickOnElementWithSelector(profileDropdown);
 
     await this.page.waitForSelector(preferencesMenuLink, {
       visible: true,
     });
-    await this.clickOn(preferencesMenuLink);
+    await this.clickOnElementWithSelector(preferencesMenuLink);
 
     await this.page.waitForSelector(preferencesContainerSelector, {
       visible: true,
@@ -2163,12 +2152,12 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(profileDropdown, {
       visible: true,
     });
-    await this.clickOn(profileDropdown);
+    await this.clickOnElementWithSelector(profileDropdown);
 
     await this.page.waitForSelector(profileMenuLink, {
       visible: true,
     });
-    await this.clickOn(profileMenuLink);
+    await this.clickOnElementWithSelector(profileMenuLink);
 
     await this.page.waitForSelector(profileContainerSelector, {
       visible: true,
@@ -2183,7 +2172,7 @@ export class LoggedInUser extends BaseUser {
       visible: true,
     });
     await this.clearAllTextFrom(addTitleBar);
-    await this.type(addTitleBar, title);
+    await this.typeInInputField(addTitleBar, title);
     await this.page.keyboard.press('Tab');
 
     const currentTitle = await this.page.$eval(
@@ -2211,20 +2200,20 @@ export class LoggedInUser extends BaseUser {
       // which expands the mobile navigation bar.
       if (!element) {
         await this.page.waitForSelector(mobileOptionsButton, {visible: true});
-        await this.clickOn(mobileOptionsButton);
+        await this.clickOnElementWithSelector(mobileOptionsButton);
       }
-      await this.clickOn(mobileNavbarDropdown);
-      await this.clickOn(mobileSettingsBar);
+      await this.clickOnElementWithSelector(mobileNavbarDropdown);
+      await this.clickOnElementWithSelector(mobileSettingsBar);
 
       // Open all dropdowns because by default all dropdowns are closed in mobile view.
-      await this.clickOn(basicSettingsDropdown);
-      await this.clickOn(advanceSettingsDropdown);
-      await this.clickOn(rolesSettingsDropdown);
-      await this.clickOn(voiceArtistSettingsDropdown);
-      await this.clickOn(permissionSettingsDropdown);
-      await this.clickOn(feedbackSettingsDropdown);
+      await this.clickOnElementWithSelector(basicSettingsDropdown);
+      await this.clickOnElementWithSelector(advanceSettingsDropdown);
+      await this.clickOnElementWithSelector(rolesSettingsDropdown);
+      await this.clickOnElementWithSelector(voiceArtistSettingsDropdown);
+      await this.clickOnElementWithSelector(permissionSettingsDropdown);
+      await this.clickOnElementWithSelector(feedbackSettingsDropdown);
     } else {
-      await this.clickOn(settingsTab);
+      await this.clickOnElementWithSelector(settingsTab);
     }
 
     await this.page.waitForSelector(settingsTabMainContent, {visible: true});
@@ -2259,7 +2248,7 @@ export class LoggedInUser extends BaseUser {
    * Function to navigate to exploration editor from creator dashboard.
    */
   async navigateToExplorationEditorPageFromCreatorDashboard(): Promise<void> {
-    await this.clickAndWaitForNavigation(createExplorationButton);
+    await this.clickAndWaitForNavigation(createExplorationButton, true);
 
     if (!this.page.url().includes('/create/')) {
       throw new Error(
@@ -2278,7 +2267,7 @@ export class LoggedInUser extends BaseUser {
         visible: true,
         timeout: 10000,
       });
-      await this.clickOn(dismissWelcomeModalSelector);
+      await this.clickOnElementWithSelector(dismissWelcomeModalSelector);
       await this.page.waitForSelector(dismissWelcomeModalSelector, {
         hidden: true,
       });
@@ -2297,9 +2286,9 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(stateEditSelector, {
       visible: true,
     });
-    await this.clickOn(stateEditSelector);
-    await this.type(stateContentInputField, `${content}`);
-    await this.clickOn(saveContentButton);
+    await this.clickOnElementWithSelector(stateEditSelector);
+    await this.typeInInputField(stateContentInputField, `${content}`);
+    await this.clickOnElementWithSelector(saveContentButton);
     await this.page.waitForSelector(stateContentInputField, {hidden: true});
     showMessage('Card content is updated successfully.');
   }
@@ -2313,12 +2302,14 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(stateEditSelector, {
       visible: true,
     });
-    await this.clickOn(stateEditSelector);
-    await this.type(stateContentInputField, `${content}`);
-    await this.clickOn(addSkillReviewComponentButton);
-    await this.clickOn(skillInSkillreviewModal);
-    await this.clickOn(saveRteComponentAndCloseCustomizationModalButton);
-    await this.clickOn(saveContentButton);
+    await this.clickOnElementWithSelector(stateEditSelector);
+    await this.typeInInputField(stateContentInputField, `${content}`);
+    await this.clickOnElementWithSelector(addSkillReviewComponentButton);
+    await this.clickOnElementWithSelector(skillInSkillreviewModal);
+    await this.clickOnElementWithSelector(
+      saveRteComponentAndCloseCustomizationModalButton
+    );
+    await this.clickOnElementWithSelector(saveContentButton);
     await this.page.waitForSelector(stateContentInputField, {hidden: true});
     showMessage('Card content is updated successfully with concept card.');
   }
@@ -2331,14 +2322,14 @@ export class LoggedInUser extends BaseUser {
       await this.page.waitForSelector(mobileNavbarDropdown, {
         visible: true,
       });
-      await this.clickOn(mobileNavbarDropdown);
+      await this.clickOnElementWithSelector(mobileNavbarDropdown);
       await this.page.waitForSelector(mobileNavbarPane);
-      await this.clickOn(mobilePreviewTabButton);
+      await this.clickOnElementWithSelector(mobilePreviewTabButton);
     } else {
       await this.page.waitForSelector(previewTabButton, {
         visible: true,
       });
-      await this.clickOn(previewTabButton);
+      await this.clickOnElementWithSelector(previewTabButton);
     }
 
     await this.expectElementToBeVisible(previewTabContainer);
@@ -2349,7 +2340,7 @@ export class LoggedInUser extends BaseUser {
    */
   async clickOnSkillReviewComponent(): Promise<void> {
     await this.expectElementToBeVisible(skillReviewComponent);
-    await this.clickOn(skillReviewComponent);
+    await this.clickOnElementWithSelector(skillReviewComponent);
     await this.expectElementToBeVisible(skillReviewComponentModal);
   }
 
@@ -2393,9 +2384,9 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(addInteractionButton, {
       visible: true,
     });
-    await this.clickOn(addInteractionButton);
-    await this.clickOn(` ${interactionToAdd} `);
-    await this.clickOn(saveInteractionButton);
+    await this.clickOnElementWithSelector(addInteractionButton);
+    await this.clickOnElementWithText(` ${interactionToAdd} `);
+    await this.clickOnElementWithSelector(saveInteractionButton);
     await this.page.waitForSelector(addInteractionModalSelector, {
       hidden: true,
     });
@@ -2431,19 +2422,19 @@ export class LoggedInUser extends BaseUser {
       // The option to save changes appears only in the mobile view after clicking on the mobile options button,
       // which expands the mobile navigation bar.
       if (!element) {
-        await this.clickOn(mobileOptionsButton);
+        await this.clickOnElementWithSelector(mobileOptionsButton);
       }
       await this.page.waitForSelector(
         `${mobileSaveChangesButton}:not([disabled])`,
         {visible: true}
       );
-      await this.clickOn(mobileSaveChangesButton);
+      await this.clickOnElementWithSelector(mobileSaveChangesButton);
     } else {
-      await this.clickOn(saveChangesButton);
+      await this.clickOnElementWithSelector(saveChangesButton);
     }
-    await this.clickOn(commitMessageSelector);
-    await this.type(commitMessageSelector, commitMessage);
-    await this.clickOn(saveDraftButton);
+    await this.clickOnElementWithSelector(commitMessageSelector);
+    await this.typeInInputField(commitMessageSelector, commitMessage);
+    await this.clickOnElementWithSelector(saveDraftButton);
     await this.page.waitForSelector(saveDraftButton, {hidden: true});
 
     // Toast message confirms that the draft has been saved.
@@ -2472,14 +2463,14 @@ export class LoggedInUser extends BaseUser {
     tags?: string
   ): Promise<string> {
     const fillExplorationMetadataDetails = async () => {
-      await this.clickOn(explorationTitleInput);
-      await this.type(explorationTitleInput, `${title}`);
-      await this.clickOn(explorationGoalInput);
-      await this.type(explorationGoalInput, `${goal}`);
-      await this.clickOn(explorationCategoryDropdown);
-      await this.clickOn(`${category}`);
+      await this.clickOnElementWithSelector(explorationTitleInput);
+      await this.typeInInputField(explorationTitleInput, `${title}`);
+      await this.clickOnElementWithSelector(explorationGoalInput);
+      await this.typeInInputField(explorationGoalInput, `${goal}`);
+      await this.clickOnElementWithSelector(explorationCategoryDropdown);
+      await this.clickOnElementWithText(`${category}`);
       if (tags) {
-        await this.type(tagsField, tags);
+        await this.typeInInputField(tagsField, tags);
       }
     };
     const publishExploration = async () => {
@@ -2490,24 +2481,24 @@ export class LoggedInUser extends BaseUser {
         // The option to save changes appears only in the mobile view after clicking on the mobile options button,
         // which expands the mobile navigation bar.
         if (!element) {
-          await this.clickOn(mobileOptionsButton);
+          await this.clickOnElementWithSelector(mobileOptionsButton);
         }
-        await this.clickOn(mobileChangesDropdown);
-        await this.clickOn(mobilePublishButton);
+        await this.clickOnElementWithSelector(mobileChangesDropdown);
+        await this.clickOnElementWithSelector(mobilePublishButton);
       } else {
         await this.page.waitForSelector(publishExplorationButton, {
           visible: true,
         });
-        await this.clickOn(publishExplorationButton);
+        await this.clickOnElementWithSelector(publishExplorationButton);
       }
     };
     const confirmPublish = async () => {
-      await this.clickOn(saveExplorationChangesButton);
+      await this.clickOnElementWithSelector(saveExplorationChangesButton);
       await this.waitForPageToFullyLoad();
       await this.page.waitForSelector(explorationConfirmPublishButton, {
         visible: true,
       });
-      await this.clickOn(explorationConfirmPublishButton);
+      await this.clickOnElementWithSelector(explorationConfirmPublishButton);
       await this.page.waitForSelector(explorationIdElement);
       const explorationIdUrl = await this.page.$eval(
         explorationIdElement,
@@ -2515,7 +2506,7 @@ export class LoggedInUser extends BaseUser {
       );
       const explorationId = explorationIdUrl.replace(/^.*\/explore\//, '');
       await this.waitUntilClickFunctionIsAttached(closePublishedPopUpButton);
-      await this.clickOn(closePublishedPopUpButton);
+      await this.clickOnElementWithSelector(closePublishedPopUpButton);
 
       await this.page.waitForSelector(closePublishedPopUpButton, {
         hidden: true,
@@ -2534,7 +2525,7 @@ export class LoggedInUser extends BaseUser {
         errorSavingExplorationModal
       );
       if (errorSavingExplorationElement) {
-        await this.clickOn(errorSavingExplorationModal);
+        await this.clickOnElementWithSelector(errorSavingExplorationModal);
         await this.page.waitForNavigation({
           waitUntil: ['load', 'networkidle0'],
         });
@@ -2610,7 +2601,9 @@ export class LoggedInUser extends BaseUser {
         visible: true,
       }
     );
-    await this.clickOn(addGoalsButtonInRedesignedLearnerDashboard);
+    await this.clickOnElementWithSelector(
+      addGoalsButtonInRedesignedLearnerDashboard
+    );
 
     await this.waitForPageToFullyLoad();
     await this.page.waitForSelector(newGoalsListInRedesignedLearnerDashboard, {
@@ -2674,6 +2667,10 @@ export class LoggedInUser extends BaseUser {
    * Function to submit a goal in the redesigned learner dashboard.
    */
   async submitGoalInRedesignedLearnerDashboard(): Promise<void> {
+    await this.page.waitForSelector(
+      `${addNewGoalButtonSelector}:not([disabled])`,
+      {visible: true}
+    );
     await this.waitForElementToBeClickable(addNewGoalButtonSelector);
     await this.page.click(addNewGoalButtonSelector);
 
@@ -2696,7 +2693,9 @@ export class LoggedInUser extends BaseUser {
 
   async removeGoalInRedesignedLearnerDashboard(goal: string): Promise<void> {
     await this.page.waitForSelector(addGoalsButtonInRedesignedLearnerDashboard);
-    await this.clickOn(addGoalsButtonInRedesignedLearnerDashboard);
+    await this.clickOnElementWithSelector(
+      addGoalsButtonInRedesignedLearnerDashboard
+    );
 
     const newGoalsCheckboxes = await this.page.$$(
       goalCheckboxInRedesignedLearnerDashboard
@@ -2726,7 +2725,7 @@ export class LoggedInUser extends BaseUser {
 
     await this.waitForElementToBeClickable(addNewGoalButtonSelector);
     await this.page.click(addNewGoalButtonSelector);
-    await this.clickOn('Remove');
+    await this.clickOnElementWithText('Remove');
 
     await this.expectElementToBeVisible(removeModalContainerSelector, false);
   }
@@ -2738,11 +2737,11 @@ export class LoggedInUser extends BaseUser {
    */
   async giveFeedback(feedback: string, stayAnonymous: boolean): Promise<void> {
     await this.page.waitForSelector(feedbackTextareaSelector);
-    await this.type(feedbackTextareaSelector, feedback);
+    await this.typeInInputField(feedbackTextareaSelector, feedback);
     if (stayAnonymous) {
-      await this.clickOn(anonymousCheckboxSelector);
+      await this.clickOnElementWithSelector(anonymousCheckboxSelector);
     }
-    await this.clickOn(submitButtonSelector);
+    await this.clickOnElementWithSelector(submitButtonSelector);
 
     await this.page.waitForSelector(feedbackTextareaSelector, {
       hidden: true,
@@ -2846,7 +2845,8 @@ export class LoggedInUser extends BaseUser {
     visible: boolean = true
   ): Promise<void> {
     await this.expectElementToBeVisible(
-      continueFromWhereLeftOffSectionSelector
+      `${continueWhereYouLeftOffSection}${nonEmptySectionSelector}`,
+      visible
     );
   }
 
@@ -3198,45 +3198,82 @@ export class LoggedInUser extends BaseUser {
   async expectNavbarToWorkProperly(): Promise<void> {
     // Mobile view port.
     if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileNavbarOpenSidebarButton);
+      await this.clickOnElementWithSelector(mobileNavbarOpenSidebarButton);
       // Learn Dropdown.
-      await this.isElementVisible(mobileLearnDropdownSelector);
-      await this.isElementVisible(mobileLearnSubMenuSelector);
-      await this.clickOn(mobileLearnDropdownSelector);
-      await this.isElementVisible(mobileLearnSubMenuSelector, false);
-      await this.clickOn(mobileLearnDropdownSelector);
+      await this.expectElementToBeVisible(mobileLearnDropdownSelector);
+      await this.expectElementToBeVisible(mobileLearnSubMenuSelector);
+      await this.clickOnElementWithSelector(mobileLearnDropdownSelector);
+      await this.expectElementToBeVisible(mobileLearnSubMenuSelector, false);
+      await this.clickOnElementWithSelector(mobileLearnDropdownSelector);
 
       // About Dropdown.
-      await this.isElementVisible(mobileAboutMenuDropdownSelector);
-      await this.isElementVisible(mobileAboutPageButtonSelector, false);
-      await this.clickOn(mobileAboutMenuDropdownSelector);
-      await this.isElementVisible(mobileAboutPageButtonSelector);
-      await this.clickOn(mobileAboutMenuDropdownSelector);
+      await this.expectElementToBeVisible(mobileAboutMenuDropdownSelector);
+      await this.expectElementToBeVisible(mobileAboutPageButtonSelector, false);
+      await this.clickOnElementWithSelector(mobileAboutMenuDropdownSelector);
+      await this.expectElementToBeVisible(mobileAboutPageButtonSelector);
+      await this.clickOnElementWithSelector(mobileAboutMenuDropdownSelector);
 
       // Get Involved Dropdown.
-      await this.isElementVisible(mobileGetInvolvedDropdownSelector);
-      await this.isElementVisible(
+      await this.expectElementToBeVisible(mobileGetInvolvedDropdownSelector);
+      await this.expectElementToBeVisible(
         mobileGetInvolvedMenuContainerSelector,
         false
       );
-      await this.clickOn(mobileGetInvolvedDropdownSelector);
-      await this.isElementVisible(mobileGetInvolvedMenuContainerSelector);
-      await this.clickOn(mobileGetInvolvedDropdownSelector);
+      await this.clickOnElementWithSelector(mobileGetInvolvedDropdownSelector);
+      await this.expectElementToBeVisible(
+        mobileGetInvolvedMenuContainerSelector
+      );
+      await this.clickOnElementWithSelector(mobileGetInvolvedDropdownSelector);
 
       // Close Navmenu.
-      await this.clickOn(mobileNavbarOpenSidebarButton);
+      await this.clickOnElementWithSelector(mobileNavbarOpenSidebarButton);
+      await this.expectElementToBeVisible(mobileNavBarOpenSelector, false);
     }
     // Desktop view port.
     else {
-      await this.clickOn(navbarLearnTab);
-      await this.isElementVisible(navbarLearnDropdownContainerSelector);
+      await this.clickOnElementWithSelector(navbarLearnTab);
+      await this.expectElementToBeVisible(navbarLearnDropdownContainerSelector);
 
-      await this.clickOn(navbarAboutTab);
-      await this.isElementVisible(navbarAboutDropdownConatinaerSelector);
+      await this.clickOnElementWithSelector(navbarAboutTab);
+      await this.expectElementToBeVisible(
+        navbarAboutDropdownConatinaerSelector
+      );
 
-      await this.clickOn(navbarGetInvolvedTab);
-      await this.isElementVisible(navbarGetInvolvedDropdownContainerSelector);
+      await this.clickOnElementWithSelector(navbarGetInvolvedTab);
+      await this.expectElementToBeVisible(
+        navbarGetInvolvedDropdownContainerSelector
+      );
     }
+  }
+
+  /**
+   * Checks if the subscribed creators contain the given creator name.
+   * Requires the user to be on Preferences page.
+   * @param {string} creatorName - The name of the creator to check.
+   */
+  async expectSubscribedCreatorsToContain(creatorName: string): Promise<void> {
+    await this.expectElementToBeVisible(subscribedCreatorSelector);
+    const subscribedCreators = await this.page.$$eval(
+      subscribedCreatorSelector,
+      elements => elements.map(el => el.textContent?.trim())
+    );
+
+    expect(subscribedCreators).toContain(creatorName);
+  }
+
+  /**
+   * Checks if the progress section in new learner dashboard is empty.
+   */
+  async expectProgressSectionToBeEmptyInNewLD(): Promise<void> {
+    await this.expectElementToBeVisible(emptyProgressSectionContainerSelector);
+  }
+
+  /**
+   * Checks if the username matches the expected username.
+   * @param expectedUsername - The expected username.
+   */
+  async expectUsernameToBe(expectedUsername: string): Promise<void> {
+    await this.expectTextContentToBe(usernameSelector, expectedUsername);
   }
 }
 
