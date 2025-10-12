@@ -565,12 +565,12 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
               const modifiedArray = this.skillLinkageModificationsArray.map(
                 item => ({
                   ...item,
-                  task: null,
+                  task: null as any,
                 })
               );
               this.editableQuestionBackendApiService.editQuestionSkillLinksAsync(
                 response.questionId,
-                modifiedArray
+                modifiedArray as SkillLinkageModificationsArray[]
               );
             }
             this.questionsListService.resetPageNumber();
