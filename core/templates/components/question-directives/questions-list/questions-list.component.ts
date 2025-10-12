@@ -525,10 +525,10 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     }
 
     if (!this.questionIsBeingUpdated) {
-      // Filtering out any entries with null blobs to satisfy backend type.
+      // Filtering out entries with null blobs to satisfy backend type.
       const imagesData = this.imageLocalStorageService
         .getStoredImagesData()
-        .filter(d => d.imageBlob !== null) as any;
+        .filter(d => d.imageBlob !== null);
       this.imageLocalStorageService.flushStoredImagesData();
       this.editableQuestionBackendApiService
         .createQuestionAsync(

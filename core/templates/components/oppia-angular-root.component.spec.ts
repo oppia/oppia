@@ -110,11 +110,14 @@ describe('OppiaAngularRootComponent', function () {
 
   it('should only intialize rteElements once', () => {
     expect(OppiaAngularRootComponent.rteElementsAreInitialized).toBeTrue();
-    const componentInstance = TestBed.createComponent(
+    const _ = TestBed.createComponent(
       OppiaAngularRootComponent
     ).componentInstance;
-    OppiaAngularRootComponent.pageContextService =
-      undefined as unknown as import('services/page-context.service').PageContextService;
+    (
+      OppiaAngularRootComponent as unknown as {
+        pageContextService: unknown;
+      }
+    ).pageContextService = undefined;
     spyOn(customElements, 'get').and.callFake(() => WordCount);
     registerCustomElements(TestBed.inject(Injector));
   });
@@ -141,7 +144,11 @@ describe('OppiaAngularRootComponent', function () {
   });
 
   it('should set OppiaAngularRootComponent.pageContextService if not set', () => {
-    OppiaAngularRootComponent.pageContextService = undefined as any;
+    (
+      OppiaAngularRootComponent as unknown as {
+        pageContextService: unknown;
+      }
+    ).pageContextService = undefined;
     expect(OppiaAngularRootComponent.pageContextService).toBeUndefined();
 
     component.ngAfterViewInit();
