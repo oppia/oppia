@@ -201,7 +201,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     this.linkedSkillsWithDifficulty.forEach(linkedSkillWithDifficulty => {
       this.skillLinkageModificationsArray.push({
         id: linkedSkillWithDifficulty.getId(),
-        task: 'update_difficulty',
+        task: null,
         difficulty: linkedSkillWithDifficulty.getDifficulty(),
       });
     });
@@ -411,7 +411,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     const spec = (
       INTERACTION_SPECS as Record<string, {can_have_solution?: boolean}>
     )[interactionId];
-    return Boolean(spec && spec.can_have_solution);
+    return !!(spec && spec.can_have_solution === true);
   }
 
   addSkill(): void {
