@@ -201,7 +201,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     this.linkedSkillsWithDifficulty.forEach(linkedSkillWithDifficulty => {
       this.skillLinkageModificationsArray.push({
         id: linkedSkillWithDifficulty.getId(),
-        task: null,
+        task: '',
         difficulty: linkedSkillWithDifficulty.getDifficulty(),
       });
     });
