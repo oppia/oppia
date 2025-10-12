@@ -234,7 +234,7 @@ def get_story_by_id(
 
 
 def get_multiple_stories_by_ids_and_version(
-    story_ids_and_versions: List[Tuple[str, Optional[int]]]
+    story_ids_and_versions: List[Tuple[str, Optional[int]]],
 ) -> List[Optional[story_domain.Story]]:
     """Returns a list of stories matching the IDs and versions provided.
 
@@ -249,10 +249,10 @@ def get_multiple_stories_by_ids_and_version(
         be None.
     """
     story_model_list = story_models.StoryModel.get_version_multi(
-        story_ids_and_versions)
+        story_ids_and_versions
+    )
     return [
-        get_story_from_model(story_model)
-        if story_model is not None else None
+        get_story_from_model(story_model) if story_model is not None else None
         for story_model in story_model_list
     ]
 
