@@ -611,6 +611,16 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
                 ['invalid_topic_id'], strict=True
             )
 
+    def test_get_story_ids_linked_to_topic(self) -> None:
+        """Tests that canonical story IDs linked to a topic are returned."""
+
+        assert self.topic is not None
+
+        story_ids = topic_fetchers.get_story_ids_linked_to_topic(self.TOPIC_ID)
+        self.assertEqual(
+            sorted(story_ids), sorted([self.story_id_1, self.story_id_2])
+        )
+
     def test_get_multiple_topics_by_ids_and_version(self) -> None:
         """Test fetching multiple topics with specific versions."""
         topic_1_id = topic_fetchers.get_new_topic_id()

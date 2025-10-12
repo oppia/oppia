@@ -56,6 +56,13 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 
 import './learner-dashboard-page.component.css';
 
+interface LearnerDashboardExplorationsData {
+  completedExplorationsList: LearnerExplorationSummary[];
+  incompleteExplorationsList: LearnerExplorationSummary[];
+  subscriptionList: ProfileSummary[];
+  explorationPlaylist: LearnerExplorationSummary[];
+}
+
 @Component({
   selector: 'oppia-learner-dashboard-page',
   templateUrl: './learner-dashboard-page.component.html',
@@ -178,6 +185,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
   totalLessonsInPlaylists: (LearnerExplorationSummary | CollectionSummary)[] =
     [];
   subtopicMasteries: Record<string, SubtopicMasterySummaryBackendDict> = {};
+  curatedExplorationIds = new Set<string>();
 
   constructor(
     private alertsService: AlertsService,
@@ -197,6 +205,41 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     private urlService: UrlService,
     private platFeatService: PlatformFeatureService
   ) {}
+
+  populateCuratedExplorationIds(): void {
+    this.curatedExplorationIds.clear();
+    (this.allTopics || []).forEach(topic => {
+      (topic.getCanonicalStorySummaryDicts() || []).forEach(storySummary => {
+        (storySummary.getAllNodes() || []).forEach(nodeSummary => {
+          const expId = nodeSummary.getExplorationId();
+          if (expId !== null) {
+            this.curatedExplorationIds.add(expId);
+          }
+        });
+      });
+    });
+  }
+
+  filterExplorationsData(responseData: LearnerDashboardExplorationsData): void {
+    this.populateCuratedExplorationIds();
+
+    this.completedExplorationsList = (
+      responseData.completedExplorationsList || []
+    ).filter(
+      (exp: LearnerExplorationSummary) =>
+        !this.curatedExplorationIds.has(exp.id)
+    );
+
+    this.incompleteExplorationsList = (
+      responseData.incompleteExplorationsList || []
+    ).filter(
+      (exp: LearnerExplorationSummary) =>
+        !this.curatedExplorationIds.has(exp.id)
+    );
+
+    this.subscriptionsList = responseData.subscriptionList;
+    this.explorationPlaylist = responseData.explorationPlaylist;
+  }
 
   ngOnInit(): void {
     this.loaderService.showLoadingScreen('Loading');
@@ -290,24 +333,22 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
 
     let dashboardExplorationsDataPromise =
       this.learnerDashboardBackendApiService.fetchLearnerDashboardExplorationsDataAsync();
-    dashboardExplorationsDataPromise.then(
-      responseData => {
-        this.completedExplorationsList = responseData.completedExplorationsList;
-        this.incompleteExplorationsList =
-          responseData.incompleteExplorationsList || [];
-        this.subscriptionsList = responseData.subscriptionList;
-        this.explorationPlaylist = responseData.explorationPlaylist;
-      },
-      errorResponseStatus => {
-        if (
-          AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus) !== -1
-        ) {
-          this.alertsService.addWarning(
-            'Failed to get learner dashboard explorations data'
-          );
+    dashboardTopicAndStoriesDataPromise.finally(() => {
+      dashboardExplorationsDataPromise.then(
+        responseData => {
+          this.filterExplorationsData(responseData);
+        },
+        errorResponseStatus => {
+          if (
+            AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus) !== -1
+          ) {
+            this.alertsService.addWarning(
+              'Failed to get learner dashboard explorations data'
+            );
+          }
         }
-      }
-    );
+      );
+    });
 
     Promise.all([
       userInfoPromise,
@@ -404,12 +445,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
         this.learnerDashboardBackendApiService.fetchLearnerDashboardExplorationsDataAsync();
       dashboardExplorationsDataPromise.then(
         responseData => {
-          this.completedExplorationsList =
-            responseData.completedExplorationsList;
-          this.incompleteExplorationsList =
-            responseData.incompleteExplorationsList;
-          this.subscriptionsList = responseData.subscriptionList;
-          this.explorationPlaylist = responseData.explorationPlaylist;
+          this.filterExplorationsData(responseData);
         },
         errorResponseStatus => {
           if (
@@ -473,12 +509,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
         this.learnerDashboardBackendApiService.fetchLearnerDashboardExplorationsDataAsync();
       dashboardExplorationsDataPromise.then(
         responseData => {
-          this.completedExplorationsList =
-            responseData.completedExplorationsList;
-          this.incompleteExplorationsList =
-            responseData.incompleteExplorationsList;
-          this.subscriptionsList = responseData.subscriptionList;
-          this.explorationPlaylist = responseData.explorationPlaylist;
+          this.filterExplorationsData(responseData);
         },
         errorResponseStatus => {
           if (
