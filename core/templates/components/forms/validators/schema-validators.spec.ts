@@ -64,7 +64,7 @@ describe('Schema validators', () => {
           expect(errorsReturned).toBe(null, testCase.toString());
           return;
         }
-        expect(errorsReturned!.hasLengthAtLeast)
+        expect(errorsReturned?.hasLengthAtLeast)
           .withContext(testCase.toString())
           .toBeDefined();
       });
@@ -109,7 +109,7 @@ describe('Schema validators', () => {
           expect(errorsReturned).toBe(null, testCase.toString());
           return;
         }
-        expect(errorsReturned!.hasLengthAtMost)
+        expect(errorsReturned?.hasLengthAtMost)
           .withContext(testCase.toString())
           .toBeDefined();
       });
@@ -155,7 +155,7 @@ describe('Schema validators', () => {
           expect(errorsReturned).toBe(null, testCase.toString());
           return;
         }
-        expect(errorsReturned!.isAtLeast)
+        expect(errorsReturned?.isAtLeast)
           .withContext(testCase.toString())
           .toBeDefined();
       });
@@ -187,7 +187,7 @@ describe('Schema validators', () => {
           expect(errorsReturned).toBe(null, testCase.toString());
           return;
         }
-        expect(errorsReturned!.isAtMost)
+        expect(errorsReturned?.isAtMost)
           .withContext(testCase.toString())
           .toBeDefined();
       });
@@ -267,7 +267,7 @@ describe('Schema validators', () => {
           expect(errorsReturned).toBe(null, testCase.toString());
           return;
         }
-        expect(errorsReturned!.isInteger)
+        expect(errorsReturned?.isInteger)
           .withContext(testCase.toString())
           .toBeDefined();
       });
@@ -292,7 +292,7 @@ describe('Schema validators', () => {
           expect(errorsReturned).toBe(null, testCase.toString());
           return;
         }
-        expect(errorsReturned!.isNonempty)
+        expect(errorsReturned?.isNonempty)
           .withContext(testCase.toString())
           .toBeDefined();
       });

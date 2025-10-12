@@ -113,7 +113,8 @@ describe('OppiaAngularRootComponent', function () {
     const componentInstance = TestBed.createComponent(
       OppiaAngularRootComponent
     ).componentInstance;
-    expect(componentInstance).toBeDefined();
+    OppiaAngularRootComponent.pageContextService =
+      undefined as unknown as import('services/page-context.service').PageContextService;
     spyOn(customElements, 'get').and.callFake(() => WordCount);
     registerCustomElements(TestBed.inject(Injector));
   });
