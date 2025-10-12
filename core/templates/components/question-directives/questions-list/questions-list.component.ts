@@ -77,39 +77,39 @@ interface GroupedSkillSummaries {
   templateUrl: './questions-list.component.html',
 })
 export class QuestionsListComponent implements OnInit, OnDestroy {
-  @Input() allSkillSummaries: ShortSkillSummary[];
-  @Input() canEditQuestion: boolean;
-  @Input() groupedSkillSummaries: GroupedSkillSummaries;
-  @Input() selectedSkillId: string;
-  @Input() selectSkillModalIsShown: boolean;
-  @Input() skillIdToRubricsObject: Record<string, Rubric>;
-  @Input() skillsCategorizedByTopics: CategorizedSkills;
-  @Input() untriagedSkillSummaries: SkillSummary[];
-  @Input() skillDescriptionsAreShown: boolean;
+  @Input() allSkillSummaries!: ShortSkillSummary[];
+  @Input() canEditQuestion!: boolean;
+  @Input() groupedSkillSummaries!: GroupedSkillSummaries;
+  @Input() selectedSkillId!: string;
+  @Input() selectSkillModalIsShown!: boolean;
+  @Input() skillIdToRubricsObject!: Record<string, Rubric>;
+  @Input() skillsCategorizedByTopics!: CategorizedSkills;
+  @Input() untriagedSkillSummaries!: SkillSummary[];
+  @Input() skillDescriptionsAreShown!: boolean;
 
-  associatedSkillSummaries: ShortSkillSummary[];
-  deletedQuestionIds: string[];
-  difficulty: number;
-  difficultyCardIsShown: boolean;
-  editorIsOpen: boolean;
-  isSkillDifficultyChanged: boolean;
-  linkedSkillsWithDifficulty: SkillDifficulty[];
-  misconceptionIdsForSelectedSkill: number[];
-  misconceptionsBySkill: MisconceptionSkillMap;
-  newQuestionIsBeingCreated: boolean;
-  newQuestionSkillDifficulties: number[];
-  newQuestionSkillIds: string[];
-  question: Question;
-  questionId: string;
-  questionIsBeingSaved: boolean;
-  questionIsBeingUpdated: boolean;
-  questionStateData: State;
+  associatedSkillSummaries!: ShortSkillSummary[];
+  deletedQuestionIds!: string[];
+  difficulty!: number;
+  difficultyCardIsShown!: boolean;
+  editorIsOpen!: boolean;
+  isSkillDifficultyChanged!: boolean;
+  linkedSkillsWithDifficulty!: SkillDifficulty[];
+  misconceptionIdsForSelectedSkill!: number[];
+  misconceptionsBySkill!: MisconceptionSkillMap;
+  newQuestionIsBeingCreated!: boolean;
+  newQuestionSkillDifficulties!: number[];
+  newQuestionSkillIds!: string[];
+  question!: Question;
+  questionId!: string;
+  questionIsBeingSaved!: boolean;
+  questionIsBeingUpdated!: boolean;
+  questionStateData!: State;
   questionSummariesForOneSkill: QuestionSummaryForOneSkill[] = [];
-  showDifficultyChoices: boolean;
-  skillLinkageModificationsArray: SkillLinkageModificationsArray[];
+  showDifficultyChoices!: boolean;
+  skillLinkageModificationsArray!: SkillLinkageModificationsArray[];
   directiveSubscriptions = new Subscription();
   MAX_SKILLS_PER_QUESTION: number = AppConstants.MAX_SKILLS_PER_QUESTION;
-  difficultyCount: number;
+  difficultyCount!: number;
 
   constructor(
     private alertsService: AlertsService,
@@ -161,7 +161,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
 
     this.question = Question.createDefaultQuestion(this.newQuestionSkillIds);
     this.questionUndoRedoService.clearChanges();
-    this.questionId = this.question.getId();
+    this.questionId = this.question.getId() || '';
     this.questionStateData = this.question.getStateData();
     this.questionIsBeingUpdated = false;
     this.newQuestionIsBeingCreated = true;
@@ -264,7 +264,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
             });
           }
           this.question = cloneDeep(response.questionObject);
-          this.questionId = this.question.getId();
+          this.questionId = this.question.getId() || '';
           this.questionStateData = this.question.getStateData();
           this.questionIsBeingUpdated = true;
           this.newQuestionIsBeingCreated = false;
@@ -405,7 +405,11 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     }
 
     const interactionId = this.question.getStateData().interaction.id;
-    return interactionId && INTERACTION_SPECS[interactionId].can_have_solution;
+    if (!interactionId) {
+      return false;
+    }
+    const spec = (INTERACTION_SPECS as Record<string, any>)[interactionId];
+    return Boolean(spec && spec.can_have_solution);
   }
 
   addSkill(): void {
@@ -519,7 +523,10 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     }
 
     if (!this.questionIsBeingUpdated) {
-      let imagesData = this.imageLocalStorageService.getStoredImagesData();
+      // Filtering out any entries with null blobs to satisfy backend type.
+      const imagesData = this.imageLocalStorageService
+        .getStoredImagesData()
+        .filter(d => d.imageBlob !== null) as any;
       this.imageLocalStorageService.flushStoredImagesData();
       this.editableQuestionBackendApiService
         .createQuestionAsync(
@@ -619,7 +626,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
           this.pageContextService.resetImageSaveDestination();
           this.editorIsOpen = false;
           this.topicEditorStateService.toggleQuestionEditor(false);
-          this.windowRef.nativeWindow.location.hash = null;
+          this.windowRef.nativeWindow.location.hash = '';
           this.skillEditorRoutingService.questionIsBeingCreated = false;
         },
         () => {
@@ -665,7 +672,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
   saveQuestion(): void {
     this.questionIsBeingSaved = true;
     this.pageContextService.resetImageSaveDestination();
-    this.windowRef.nativeWindow.location.hash = null;
+    this.windowRef.nativeWindow.location.hash = '';
     if (this.questionIsBeingUpdated) {
       this.ngbModal
         .open(QuestionEditorSaveModalComponent, {

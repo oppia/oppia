@@ -43,7 +43,7 @@ export class InteractionDisplayComponent {
   @Input() classStr!: string;
   // TODO(#13015): Remove use of unknown as a type.
   // The passed htmlData sometimes accesses property from parent scope.
-  @Input() parentScope!: unknown;
+  @Input() parentScope!: Record<string, unknown> | undefined;
 
   @ViewChild('interactionContainer', {
     read: ViewContainerRef,
@@ -66,10 +66,13 @@ export class InteractionDisplayComponent {
 
       if (
         dom.body.firstElementChild &&
-        TAG_TO_INTERACTION_MAPPING[dom.body.firstElementChild.tagName]
+        (TAG_TO_INTERACTION_MAPPING as Record<string, unknown>)[
+          dom.body.firstElementChild.tagName
+        ]
       ) {
-        let interaction =
-          TAG_TO_INTERACTION_MAPPING[dom.body.firstElementChild.tagName];
+        type TagKeys = keyof typeof TAG_TO_INTERACTION_MAPPING;
+        const tag = dom.body.firstElementChild.tagName as TagKeys;
+        let interaction = TAG_TO_INTERACTION_MAPPING[tag];
 
         const componentFactory =
           this.componentFactoryResolver.resolveComponentFactory(interaction);
@@ -92,9 +95,11 @@ export class InteractionDisplayComponent {
           // is irrelevant for this usecase).
           if (/[\])}[{(]/g.test(attribute.name)) {
             if (this.parentScope) {
-              attributeValue = this.parentScope[attributeNameInCamelCase];
+              attributeValue = (this.parentScope as Record<string, unknown>)[
+                attributeNameInCamelCase
+              ] as string;
             } else {
-              attributeValue = null;
+              attributeValue = '';
             }
           } else {
             componentRef.location.nativeElement.setAttribute(
@@ -103,7 +108,9 @@ export class InteractionDisplayComponent {
             );
           }
 
-          componentRef.instance[attributeNameInCamelCase] = attributeValue;
+          (componentRef.instance as Record<string, unknown>)[
+            attributeNameInCamelCase
+          ] = attributeValue as unknown;
         });
 
         componentRef.changeDetectorRef.detectChanges();

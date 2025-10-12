@@ -49,7 +49,7 @@ class MockWindowRef {
       },
     },
     history: {
-      pushState(data, title: string, url?: string | null) {},
+      pushState(data: unknown, title: string, url?: string | null) {},
     },
   };
 }
@@ -85,7 +85,7 @@ describe('OppiaAngularRootComponent', function () {
         {
           provide: DocumentAttributeCustomizationService,
           useValue: {
-            addAttribute: (attr, code) => {},
+            addAttribute: (attr: string, code: string) => {},
           },
         },
         {
@@ -100,12 +100,11 @@ describe('OppiaAngularRootComponent', function () {
     component = fixture.componentInstance;
     let metaTagCustomizationService = TestBed.inject(
       MetaTagCustomizationService
-    );
+    ) as MetaTagCustomizationService;
     emitSpy = spyOn(component.initialized, 'emit');
-    spyOn(
-      metaTagCustomizationService,
-      'addOrReplaceMetaTags'
-    ).and.returnValue();
+    spyOn(metaTagCustomizationService, 'addOrReplaceMetaTags').and.returnValue(
+      undefined
+    );
     i18nService = TestBed.inject(I18nService);
   }));
 
@@ -124,7 +123,9 @@ describe('OppiaAngularRootComponent', function () {
       () => {}
     );
     component.ngAfterViewInit();
-    TestBed.inject(I18nLanguageCodeService).setI18nLanguageCode('en');
+    (
+      TestBed.inject(I18nLanguageCodeService) as I18nLanguageCodeService
+    ).setI18nLanguageCode('en');
 
     expect(emitSpy).toHaveBeenCalled();
   });
@@ -139,7 +140,7 @@ describe('OppiaAngularRootComponent', function () {
   });
 
   it('should set OppiaAngularRootComponent.pageContextService if not set', () => {
-    OppiaAngularRootComponent.pageContextService = undefined;
+    OppiaAngularRootComponent.pageContextService = undefined as any;
     expect(OppiaAngularRootComponent.pageContextService).toBeUndefined();
 
     component.ngAfterViewInit();

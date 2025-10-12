@@ -23,16 +23,17 @@ import {SchemaValidators} from './schema-validators';
 class MockFormControl extends AbstractControl {
   value: SchemaDefaultValue = '1';
 
-  patchValue(value: SchemaDefaultValue, options?: Object): void {
+  patchValue(value: SchemaDefaultValue | undefined, options?: Object): void {
     return;
   }
 
-  reset(value?: SchemaDefaultValue, options?: Object): void {
+  reset(value?: SchemaDefaultValue | undefined, options?: Object): void {
     return;
   }
 
-  setValue(value: SchemaDefaultValue, options?: Object): void {
-    this.value = value;
+  setValue(value: unknown, options?: Object): void {
+    // Allowing any test value to be assigned for validation purposes.
+    this.value = value as SchemaDefaultValue;
   }
 }
 
@@ -63,7 +64,7 @@ describe('Schema validators', () => {
           expect(errorsReturned).toBe(null, testCase.toString());
           return;
         }
-        expect(errorsReturned.hasLengthAtLeast)
+        expect(errorsReturned!.hasLengthAtLeast)
           .withContext(testCase.toString())
           .toBeDefined();
       });
@@ -108,7 +109,7 @@ describe('Schema validators', () => {
           expect(errorsReturned).toBe(null, testCase.toString());
           return;
         }
-        expect(errorsReturned.hasLengthAtMost)
+        expect(errorsReturned!.hasLengthAtMost)
           .withContext(testCase.toString())
           .toBeDefined();
       });
@@ -154,7 +155,7 @@ describe('Schema validators', () => {
           expect(errorsReturned).toBe(null, testCase.toString());
           return;
         }
-        expect(errorsReturned.isAtLeast)
+        expect(errorsReturned!.isAtLeast)
           .withContext(testCase.toString())
           .toBeDefined();
       });
@@ -186,7 +187,7 @@ describe('Schema validators', () => {
           expect(errorsReturned).toBe(null, testCase.toString());
           return;
         }
-        expect(errorsReturned.isAtMost)
+        expect(errorsReturned!.isAtMost)
           .withContext(testCase.toString())
           .toBeDefined();
       });
@@ -266,7 +267,7 @@ describe('Schema validators', () => {
           expect(errorsReturned).toBe(null, testCase.toString());
           return;
         }
-        expect(errorsReturned.isInteger)
+        expect(errorsReturned!.isInteger)
           .withContext(testCase.toString())
           .toBeDefined();
       });
@@ -291,7 +292,7 @@ describe('Schema validators', () => {
           expect(errorsReturned).toBe(null, testCase.toString());
           return;
         }
-        expect(errorsReturned.isNonempty)
+        expect(errorsReturned!.isNonempty)
           .withContext(testCase.toString())
           .toBeDefined();
       });

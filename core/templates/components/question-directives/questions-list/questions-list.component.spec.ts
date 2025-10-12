@@ -69,7 +69,7 @@ class MockNgbModal {
 }
 
 class MockUrlInterpolationService {
-  interpolateUrl(value) {
+  interpolateUrl(value: string) {
     return value;
   }
 }
@@ -89,8 +89,8 @@ describe('Questions List Component', () => {
   let pageContextService: PageContextService;
   let questionValidationService: QuestionValidationService;
   let skill: Skill;
-  let question = null;
-  let questionStateData = null;
+  let question!: Question;
+  let questionStateData!: State;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -161,7 +161,7 @@ describe('Questions List Component', () => {
                 missing_prerequisite_skill_id: null,
               },
               rule_specs: [],
-              training_data: null,
+              training_data: [],
               tagged_skill_misconception_id: null,
             },
           ],
@@ -179,7 +179,7 @@ describe('Questions List Component', () => {
             },
           },
           default_outcome: {
-            dest: null,
+            dest: '',
             dest_if_really_stuck: null,
             feedback: {
               html: 'Correct Answer',
@@ -213,8 +213,9 @@ describe('Questions List Component', () => {
         solicit_answer_details: false,
         card_is_checkpoint: false,
         linked_skill_id: null,
+        inapplicable_skill_misconception_ids: [],
       },
-      inapplicable_skill_misconception_ids: null,
+      inapplicable_skill_misconception_ids: [],
       language_code: 'en',
       linked_skill_ids: [],
       next_content_id_index: 5,
@@ -249,9 +250,9 @@ describe('Questions List Component', () => {
       language_code: 'en',
       version: 3,
       prerequisite_skill_ids: [],
-      all_questions_merged: null,
-      next_misconception_id: null,
-      superseding_skill_id: null,
+      all_questions_merged: false,
+      next_misconception_id: 0,
+      superseding_skill_id: '',
     });
 
     component.selectedSkillId = 'skillId1';
@@ -327,7 +328,7 @@ describe('Questions List Component', () => {
         })
       );
 
-      expect(component.misconceptionIdsForSelectedSkill).toEqual(undefined);
+      expect(component.misconceptionIdsForSelectedSkill).toBeUndefined();
 
       component.ngOnInit();
       tick();
@@ -362,9 +363,9 @@ describe('Questions List Component', () => {
         language_code: 'en',
         version: 3,
         prerequisite_skill_ids: [],
-        all_questions_merged: null,
-        next_misconception_id: null,
-        superseding_skill_id: null,
+        all_questions_merged: false,
+        next_misconception_id: 0,
+        superseding_skill_id: '',
       });
 
       spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
@@ -375,7 +376,7 @@ describe('Questions List Component', () => {
         })
       );
 
-      expect(component.difficultyCount).toEqual(undefined);
+      expect(component.difficultyCount).toBeUndefined();
 
       component.ngOnInit();
       tick();
@@ -410,7 +411,7 @@ describe('Questions List Component', () => {
   it('should get selected skill id when a question is created', () => {
     // When modal is not shown, then newQuestionSkillIds get the values of
     // skillIds.
-    expect(component.newQuestionSkillIds).toEqual(undefined);
+    expect(component.newQuestionSkillIds).toBeUndefined();
 
     component.selectSkillModalIsShown = true;
     component.createQuestion();
@@ -449,9 +450,9 @@ describe('Questions List Component', () => {
       language_code: 'en',
       version: 3,
       prerequisite_skill_ids: [],
-      all_questions_merged: null,
-      next_misconception_id: null,
-      superseding_skill_id: null,
+      all_questions_merged: false,
+      next_misconception_id: 0,
+      superseding_skill_id: '',
     });
     spyOn(skillBackendApiService, 'fetchMultiSkillsAsync').and.returnValue(
       Promise.resolve([skill])
@@ -460,7 +461,7 @@ describe('Questions List Component', () => {
       SkillDifficulty.create('skillId1', '', 1),
     ];
 
-    expect(component.misconceptionsBySkill).toEqual(undefined);
+    expect(component.misconceptionsBySkill).toBeUndefined();
 
     component.createQuestion();
     tick();
@@ -599,7 +600,7 @@ describe('Questions List Component', () => {
       ).and.returnValue([]);
       spyOn(alertsService, 'addWarning');
 
-      component.saveAndPublishQuestion(null);
+      component.saveAndPublishQuestion('');
       tick();
 
       expect(alertsService.addWarning).toHaveBeenCalledWith('Error');
@@ -616,17 +617,17 @@ describe('Questions List Component', () => {
       component.skillLinkageModificationsArray = [
         {
           id: '1',
-          task: null,
+          task: 'update',
           difficulty: 1,
         },
         {
           id: '2',
-          task: null,
+          task: 'update',
           difficulty: 2,
         },
         {
           id: '1',
-          task: null,
+          task: 'update',
           difficulty: 1,
         },
       ];
@@ -874,12 +875,19 @@ describe('Questions List Component', () => {
       question_content: '',
     });
     let skillDescription = 'Skill Description';
-    let difficulty: 0.9;
+    let difficulty: number = 0.9;
 
     it('should return null if editor is already opened', () => {
       component.editorIsOpen = true;
 
-      expect(component.editQuestion(null, null, null)).toBe(undefined);
+      // Passing dummy arguments to satisfy TS types.
+      expect(
+        component.editQuestion(
+          questionSummaryForOneSkill,
+          skillDescription,
+          difficulty
+        )
+      ).toBe(undefined);
     });
 
     it(
@@ -888,7 +896,11 @@ describe('Questions List Component', () => {
         component.canEditQuestion = false;
         spyOn(alertsService, 'addWarning');
 
-        component.editQuestion(null, null, null);
+        component.editQuestion(
+          questionSummaryForOneSkill,
+          skillDescription,
+          difficulty
+        );
 
         expect(alertsService.addWarning).toHaveBeenCalledWith(
           'User does not have enough rights to edit the question'
@@ -1005,7 +1017,7 @@ describe('Questions List Component', () => {
         'editQuestionSkillLinksAsync'
       ).and.returnValue(Promise.resolve());
 
-      component.removeQuestionFromSkill(questionId);
+      component.removeQuestionFromSkill(questionId, 0.6);
       tick();
 
       expect(ngbModal.open).toHaveBeenCalled();
@@ -1037,7 +1049,7 @@ describe('Questions List Component', () => {
         'editQuestionSkillLinksAsync'
       ).and.returnValue(Promise.resolve());
 
-      component.removeQuestionFromSkill(questionId);
+      component.removeQuestionFromSkill(questionId, 0.6);
       tick();
 
       expect(ngbModal.open).toHaveBeenCalled();
@@ -1069,7 +1081,7 @@ describe('Questions List Component', () => {
       ).and.returnValue(Promise.resolve());
       spyOn(component, 'removeQuestionSkillLinkAsync');
 
-      component.removeQuestionFromSkill(questionId);
+      component.removeQuestionFromSkill(questionId, 0.6);
       tick();
       expect(ngbModal.open).toHaveBeenCalled();
       expect(component.removeQuestionSkillLinkAsync).not.toHaveBeenCalled();
@@ -1085,7 +1097,7 @@ describe('Questions List Component', () => {
     ];
     spyOn(alertsService, 'addInfoMessage');
 
-    component.removeSkill(null);
+    component.removeSkill('1');
 
     expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
       'A question should be linked to at least one skill.'
@@ -1157,7 +1169,7 @@ describe('Questions List Component', () => {
 
     expect(component.showSolutionCheckpoint()).toBe(true);
 
-    component.question = null;
+    component.question = question;
     expect(component.showSolutionCheckpoint()).toBe(false);
   });
 
@@ -1340,7 +1352,7 @@ describe('Questions List Component', () => {
       component.skillLinkageModificationsArray = [
         {
           id: '1',
-          task: null,
+          task: 'update',
           difficulty: 1,
         },
       ];
@@ -1383,12 +1395,12 @@ describe('Questions List Component', () => {
     component.skillLinkageModificationsArray = [
       {
         id: '1',
-        task: null,
+        task: 'update',
         difficulty: 1,
       },
       {
         id: '2',
-        task: null,
+        task: 'update',
         difficulty: 2,
       },
     ];
@@ -1408,7 +1420,7 @@ describe('Questions List Component', () => {
       undefined
     );
 
-    expect(component.getQuestionSummariesForOneSkill()).toEqual(undefined);
+    expect(component.getQuestionSummariesForOneSkill()).toBeUndefined();
   });
 
   it('should not toggle difficulty card if window is not narrow', () => {
