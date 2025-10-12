@@ -109,7 +109,7 @@
 <mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
   <h3>Delete Study Guide Models:</h3>
   <p>
-    Deletes all Study Guide Models.
+    Deletes all Study Guide Models and their corresponding StudyGuideSnapshotMetadataModels, StudyGuideSnapshotContentModels, StudyGuideCommitLogEntryModels.
   </p>
   <div class="oppia-query-form">
     <form class="form" (submit)="deleteStudyGuideModels()">
@@ -123,7 +123,7 @@
 <mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
   <h3>Verify Study Guide Models:</h3>
   <p>
-    Verifies all Study Guide Models.
+    Verifies all Study Guide Models. This will check that the StudyGuideSnapshotMetadataModels, StudyGuideSnapshotContentModels, StudyGuideCommitLogEntryModels and their quantities for each of the StudyGuideModels is accurate. (If a StudyGuideModel has version 4, there should be 4 of each of these models - 1 for each version)
   </p>
   <div class="oppia-query-form">
     <form class="form" (submit)="verifyStudyGuideModels()">
