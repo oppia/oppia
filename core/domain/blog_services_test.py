@@ -962,12 +962,19 @@ class BlogAuthorDetailsTests(test_utils.GenericTestBase):
                 blog_services.get_blog_author_details(self.user_id)
 
     def test_get_blog_author_details_create_fails(self) -> None:
-        """Raises when create_blog_author_details_model fails."""
+        """Tests that get_blog_author_details raises an error when user details cannot be fetched."""
 
         def _mock_get_by_author(unused_user_id: str) -> None:
+            """Always returns None to simulate missing author details."""
             return None
 
-        def _mock_get_user_settings(unused_user_id: str, _strict: bool) -> None:
+        # Here we use type Any because this mock replaces the real get_user_settings function,
+        # which accepts flexible keyword arguments (like 'strict')
+        # whose types vary and are not relevant to the test.
+        def _mock_get_user_settings(
+            unused_user_id: str, **_kwargs: Any
+        ) -> None:
+            """Mocked get_user_settings that always returns None."""
             return None
 
         get_by_author_swap = self.swap(
@@ -981,6 +988,7 @@ class BlogAuthorDetailsTests(test_utils.GenericTestBase):
             'get_user_settings',
             _mock_get_user_settings,
         )
+
         with get_by_author_swap, get_user_settings_swap:
             with self.assertRaisesRegex(
                 Exception, 'Unable to fetch user details for the given user'
@@ -1413,18 +1421,19 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
             _query: str,
             _tags: List[str],
             _size: int,
-            _offset: int | None = None,
+            offset: int | None = None,
         ) -> Tuple[List[str], str]:
             """Mock search function for blog post summaries."""
-            observed_calls.append(_offset)
+            observed_calls.append(offset)
             return (['valid_id_1'], 'next_offset')
 
-        # Here we use type Any because this mocks the original function.
+        # Here we use type Any because this mocks the original get_multi method,
+        # which can accept and return various model types.
         def mock_get_multi(_ids: Any) -> Any:
             """Mock get_multi function returning dummy models."""
 
             class DummyModel:
-                """Dummy model used for mocking get_multi."""
+                """Dummy model used for mocking get_multi return value."""
 
                 pass
 
