@@ -177,6 +177,7 @@ class ExplorationHandler(
         has_seen_editor_tutorial = False
         has_seen_translation_tutorial = False
 
+        assert user_settings is not None
         if user_settings.last_started_state_editor_tutorial:
             has_seen_editor_tutorial = True
         if user_settings.last_started_state_translation_tutorial:
