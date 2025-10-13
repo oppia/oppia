@@ -74,8 +74,8 @@ class MockUrlInterpolationService {
   }
 }
 
-// Helper types to access component's private services in tests without using 'any'.
-type ComponentPrivateDeps = {
+// Helper type to access component's private services in tests without using 'any'.
+interface ComponentPrivateDeps {
   focusManagerService: {setFocus: (...args: unknown[]) => unknown};
   imageLocalStorageService: {
     flushStoredImagesData: (...args: unknown[]) => unknown;
@@ -84,7 +84,7 @@ type ComponentPrivateDeps = {
     toggleQuestionEditor: (...args: unknown[]) => unknown;
   };
   utilsService: {isEquivalent: (...args: unknown[]) => boolean};
-};
+}
 
 const asPrivates = (comp: QuestionsListComponent): ComponentPrivateDeps =>
   comp as unknown as ComponentPrivateDeps;
