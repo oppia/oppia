@@ -74,6 +74,21 @@ class MockUrlInterpolationService {
   }
 }
 
+// Helper types to access component's private services in tests without using 'any'.
+type ComponentPrivateDeps = {
+  focusManagerService: {setFocus: (...args: unknown[]) => unknown};
+  imageLocalStorageService: {
+    flushStoredImagesData: (...args: unknown[]) => unknown;
+  };
+  topicEditorStateService: {
+    toggleQuestionEditor: (...args: unknown[]) => unknown;
+  };
+  utilsService: {isEquivalent: (...args: unknown[]) => boolean};
+};
+
+const asPrivates = (comp: QuestionsListComponent): ComponentPrivateDeps =>
+  comp as unknown as ComponentPrivateDeps;
+
 describe('Questions List Component', () => {
   let component: QuestionsListComponent;
   let fixture: ComponentFixture<QuestionsListComponent>;
@@ -481,14 +496,17 @@ describe('Questions List Component', () => {
 
   it('should create question with proper skill linkage initialization', () => {
     component.selectedSkillId = 'skillId2';
-    spyOn((component as any).focusManagerService, 'setFocus');
+    spyOn(asPrivates(component).focusManagerService, 'setFocus');
     spyOn(component, 'populateMisconceptions');
-    spyOn((component as any).imageLocalStorageService, 'flushStoredImagesData');
     spyOn(
-      (component as any).pageContextService,
-      'setImageSaveDestinationToLocalStorage'
+      asPrivates(component).imageLocalStorageService,
+      'flushStoredImagesData'
     );
-    spyOn((component as any).topicEditorStateService, 'toggleQuestionEditor');
+    spyOn(pageContextService, 'setImageSaveDestinationToLocalStorage');
+    spyOn(
+      asPrivates(component).topicEditorStateService,
+      'toggleQuestionEditor'
+    );
 
     component.createQuestion();
 
@@ -627,7 +645,7 @@ describe('Questions List Component', () => {
 
   it('should handle skill misconception IDs that do not start with selected skill ID', () => {
     component.misconceptionIdsForSelectedSkill = [1];
-    spyOn((component as any).utilsService, 'isEquivalent').and.returnValue(
+    spyOn(asPrivates(component).utilsService, 'isEquivalent').and.returnValue(
       true
     );
 
@@ -637,10 +655,9 @@ describe('Questions List Component', () => {
     ]);
 
     expect(result).toBe(true);
-    expect((component as any).utilsService.isEquivalent).toHaveBeenCalledWith(
-      [1, undefined],
-      [1]
-    );
+    expect(
+      asPrivates(component).utilsService.isEquivalent
+    ).toHaveBeenCalledWith([1, undefined], [1]);
   });
 
   it("should get skill editor's URL", () => {
@@ -1112,18 +1129,24 @@ describe('Questions List Component', () => {
     component.newQuestionIsBeingCreated = false;
     component.questionId = 'testQuestionId';
     spyOn(questionUndoRedoService, 'clearChanges');
-    spyOn((component as any).topicEditorStateService, 'toggleQuestionEditor');
-    spyOn((component as any).imageLocalStorageService, 'flushStoredImagesData');
+    spyOn(
+      asPrivates(component).topicEditorStateService,
+      'toggleQuestionEditor'
+    );
+    spyOn(
+      asPrivates(component).imageLocalStorageService,
+      'flushStoredImagesData'
+    );
 
     component.openQuestionEditor();
 
     expect(questionUndoRedoService.clearChanges).toHaveBeenCalled();
     expect(component.editorIsOpen).toBe(true);
     expect(
-      (component as any).topicEditorStateService.toggleQuestionEditor
+      asPrivates(component).topicEditorStateService.toggleQuestionEditor
     ).toHaveBeenCalledWith(true);
     expect(
-      (component as any).imageLocalStorageService.flushStoredImagesData
+      asPrivates(component).imageLocalStorageService.flushStoredImagesData
     ).toHaveBeenCalled();
   });
 
