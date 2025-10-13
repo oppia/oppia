@@ -714,7 +714,7 @@ describe('Image preloader service', () => {
     // to parameter of type 'FileReader'.". We need to suppress this error
     // because 'FileReader' has around 15 more properties. We have only defined
     // the properties we need in 'mockReaderObject'.
-    // ...existing code...
+    // @ts-expect-error
     spyOn(window, 'FileReader').and.returnValue(new mockReaderObject());
 
     imagePreloaderService
@@ -754,7 +754,7 @@ describe('Image preloader service', () => {
     // to parameter of type 'FileReader'.". We need to suppress this error
     // because 'FileReader' has around 15 more properties. We have only defined
     // the properties we need in 'mockReaderObject'.
-    // ...existing code...
+    // @ts-expect-error
     spyOn(window, 'FileReader').and.returnValue(new mockReaderObject());
     spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl');
 
@@ -799,7 +799,7 @@ describe('Image preloader service', () => {
       // to parameter of type 'FileReader'.". We need to suppress this error
       // because 'FileReader' has around 15 more properties. We have only defined
       // the properties we need in 'mockReaderObject'.
-      // ...existing code...
+      // @ts-expect-error
       spyOn(window, 'FileReader').and.returnValue(new mockReaderObject());
 
       imagePreloaderService
@@ -875,7 +875,7 @@ describe('Image preloader service', () => {
       // to parameter of type 'FileReader'.". We need to suppress this error
       // because 'FileReader' has around 15 more properties. We have only defined
       // the properties we need in 'mockReaderObject'.
-      // ...existing code...
+      // @ts-expect-error
       spyOn(window, 'FileReader').and.returnValue(new mockReaderObject());
 
       imagePreloaderService
