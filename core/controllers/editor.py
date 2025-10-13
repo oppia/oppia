@@ -176,11 +176,11 @@ class ExplorationHandler(
         )
         has_seen_editor_tutorial = False
         has_seen_translation_tutorial = False
-        if user_settings is not None:
-            if user_settings.last_started_state_editor_tutorial:
-                has_seen_editor_tutorial = True
-            if user_settings.last_started_state_translation_tutorial:
-                has_seen_translation_tutorial = True
+
+        if user_settings.last_started_state_editor_tutorial:
+            has_seen_editor_tutorial = True
+        if user_settings.last_started_state_translation_tutorial:
+            has_seen_translation_tutorial = True
 
         try:
             exploration_data = exp_services.get_user_exploration_data(
@@ -266,7 +266,10 @@ class ExplorationHandler(
                 exp_services.update_exploration(
                     self.user_id, exploration_id, change_list, commit_message
                 )
-            elif can_voiceover and changes_are_mergeable:
+            else:
+                # Unauthorized users are blocked by decorator.
+                # Assertion serves to make coverage and intent explicit.
+                assert can_voiceover and changes_are_mergeable
                 exp_services.update_exploration(
                     self.user_id,
                     exploration_id,
@@ -828,7 +831,10 @@ class UserExplorationEmailsHandler(
             user_services.set_email_preferences_for_exploration(
                 self.user_id, exploration_id, mute_feedback_notifications=mute
             )
-        elif message_type == feconf.MESSAGE_TYPE_SUGGESTION:
+        else:
+            # Message must be MESSAGE_TYPE_SUGGESTION.
+            # Invalid message type exception guarantees this behavior.
+            assert message_type == feconf.MESSAGE_TYPE_SUGGESTION
             user_services.set_email_preferences_for_exploration(
                 self.user_id, exploration_id, mute_suggestion_notifications=mute
             )
@@ -914,7 +920,8 @@ class ExplorationFileDownloader(
                 filename,
                 'text/plain',
             )
-        elif output_format == feconf.OUTPUT_FORMAT_JSON:
+        else:
+            assert output_format == feconf.OUTPUT_FORMAT_JSON
             self.render_json(
                 exp_services.export_states_to_yaml(
                     exploration_id, version=version
@@ -1520,7 +1527,10 @@ class EditorAutosaveHandler(ExplorationHandler):
                     version,
                     datetime.datetime.utcnow(),
                 )
-            elif can_voiceover:
+            else:
+                # Unauthorized users are blocked by the decorator.
+                # Assertion serves to make coverage and intent explicit.
+                assert can_voiceover
                 exp_services.create_or_update_draft(
                     exploration_id,
                     self.user_id,
@@ -1735,7 +1745,7 @@ class LearnerAnswerInfoHandler(
                             ],
                         }
                     )
-        elif entity_type == feconf.ENTITY_TYPE_QUESTION:
+        if entity_type == feconf.ENTITY_TYPE_QUESTION:
             question = question_services.get_question_by_id(entity_id)
             state_reference = stats_services.get_state_reference_for_question(
                 entity_id
@@ -1793,7 +1803,7 @@ class LearnerAnswerInfoHandler(
                     entity_id, state_name
                 )
             )
-        elif entity_type == feconf.ENTITY_TYPE_QUESTION:
+        if entity_type == feconf.ENTITY_TYPE_QUESTION:
             state_reference = stats_services.get_state_reference_for_question(
                 entity_id
             )

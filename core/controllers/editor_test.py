@@ -4053,6 +4053,49 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
             self.assertEqual(response, learner_answer_info_data)
         self.logout()
 
+    def test_get_exp_answer_details_when_none_returns_empty_list(self) -> None:
+        self.login(self.OWNER_EMAIL)
+        with self.swap_to_always_return(
+            stats_services, 'get_learner_answer_details', value=None
+        ):
+            response = self.get_json(
+                '%s/%s/%s'
+                % (
+                    feconf.LEARNER_ANSWER_INFO_HANDLER_URL,
+                    feconf.ENTITY_TYPE_EXPLORATION,
+                    self.exp_id,
+                )
+            )
+            self.assertEqual(response, {'learner_answer_info_data': []})
+        self.logout()
+
+    def test_get_question_answer_details_when_none_returns_dict(self) -> None:
+        self.login(self.OWNER_EMAIL)
+        question_id = question_services.get_new_question_id()
+        content_id_generator = translation_domain.ContentIdGenerator()
+        self.save_new_question(
+            question_id,
+            self.owner_id,
+            self._create_valid_question_data('ABC', content_id_generator),
+            ['skill_1'],
+            content_id_generator.next_content_id_index,
+        )
+
+        with self.swap_to_always_return(
+            stats_services, 'get_learner_answer_details', value=None
+        ):
+            response = self.get_json(
+                '%s/%s/%s'
+                % (
+                    feconf.LEARNER_ANSWER_INFO_HANDLER_URL,
+                    feconf.ENTITY_TYPE_QUESTION,
+                    question_id,
+                )
+            )
+            self.assertEqual(response, {'learner_answer_info_data': {}})
+
+        self.logout()
+
     def test_delete_learner_answer_info_of_exploration_states(self) -> None:
         self.login(self.OWNER_EMAIL)
         with self.swap(
