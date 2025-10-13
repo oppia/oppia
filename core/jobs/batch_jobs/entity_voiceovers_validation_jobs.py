@@ -18,22 +18,19 @@
 
 from __future__ import annotations
 
-import logging
-
-from core.domain import opportunity_services, state_domain
+from core import feconf
 from core.domain import voiceover_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.types import job_run_result
 from core.platform import models
-from core import feconf
 
 import apache_beam as beam
-from typing import Iterable, Optional
+from typing import Iterable
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import datastore_services, exp_models, voiceover_models
+    from mypy_imports import exp_models, voiceover_models
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -52,15 +49,23 @@ class EntityVoiceoversValidationAuditJob(base_jobs.JobBase):
 
     def validate_models(
         self,
-        exploration_model: Optional[exp_models.ExplorationModel],
+        exploration_model: exp_models.ExplorationModel,
         entity_voiceovers_models: Iterable[
             voiceover_models.EntityVoiceoversModel
         ],
-    ):
-        print('\n\nNikhil')
-        with datastore_services.get_ndb_context():
-            print(entity_voiceovers_models)
-            print(exploration_model)
+    ) -> str:
+        """Validates the EntityVoiceoversModels against the corresponding
+        ExplorationModel.
+
+        Args:
+            exploration_model: ExplorationModel. The exploration model to
+                validate against.
+            entity_voiceovers_models: iterable(EntityVoiceoversModel). The
+                entity voiceovers models to validate.
+
+        Returns:
+            str. The validation logs.
+        """
         entity_voiceovers_list = []
         for entity_voiceovers_model in entity_voiceovers_models:
 

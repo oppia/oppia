@@ -57,7 +57,8 @@
         "core.jobs.batch_jobs.dummy_jobs_test",
         "core.storage.cloud_task.gae_models_test",
         "core.domain.cloud_task_domain_test",
-        "core.jobs.batch_jobs.exploration_voiceover_sync_jobs_test"
+        "core.jobs.batch_jobs.exploration_voiceover_sync_jobs_test",
+        "core.jobs.batch_jobs.entity_voiceovers_validation_jobs_test"
     ],
     "2": [
         "core.domain.rights_manager_test",
