@@ -479,6 +479,79 @@ describe('Questions List Component', () => {
     });
   }));
 
+  it('should create question with proper skill linkage initialization', () => {
+    component.selectedSkillId = 'skillId2';
+    spyOn(component['focusManagerService'], 'setFocus');
+    spyOn(component, 'populateMisconceptions');
+    spyOn(component['imageLocalStorageService'], 'flushStoredImagesData');
+    spyOn(
+      component['pageContextService'],
+      'setImageSaveDestinationToLocalStorage'
+    );
+    spyOn(component['topicEditorStateService'], 'toggleQuestionEditor');
+
+    component.createQuestion();
+
+    expect(component.newQuestionSkillIds).toEqual(['skillId2']);
+    expect(component.linkedSkillsWithDifficulty.length).toBe(1);
+    expect(component.linkedSkillsWithDifficulty[0].getId()).toBe('skillId2');
+    expect(component.newQuestionSkillDifficulties).toEqual([0.6]);
+    expect(component.showDifficultyChoices).toBe(true);
+    expect(component.newQuestionIsBeingCreated).toBe(true);
+    expect(component.editorIsOpen).toBe(true);
+    expect(component.skillLinkageModificationsArray).toEqual([]);
+    expect(component.isSkillDifficultyChanged).toBe(false);
+  });
+
+  it('should create question with multiple skills', () => {
+    component.selectedSkillId = 'skillId1';
+    component.createQuestion();
+
+    // Add additional skill
+    component.linkedSkillsWithDifficulty.push(
+      SkillDifficulty.create('skillId2', 'Skill 2', 0.8)
+    );
+    component.changeLinkedSkillDifficulty();
+
+    expect(component.newQuestionSkillIds).toContain('skillId2');
+    expect(component.newQuestionSkillDifficulties).toContain(0.8);
+    expect(component.skillLinkageModificationsArray.length).toBeGreaterThan(0);
+  });
+
+  it('should handle changeLinkedSkillDifficulty for question being updated', () => {
+    component.questionIsBeingUpdated = true;
+    component.isSkillDifficultyChanged = true;
+    component.newQuestionSkillIds = ['skillId1'];
+    component.linkedSkillsWithDifficulty = [
+      SkillDifficulty.create('skillId1', 'Skill 1', 0.7),
+    ];
+    component.skillLinkageModificationsArray = [];
+
+    component.changeLinkedSkillDifficulty();
+
+    expect(component.skillLinkageModificationsArray).toEqual([
+      {
+        id: 'skillId1',
+        task: 'update_difficulty',
+        difficulty: 0.7,
+      },
+    ]);
+  });
+
+  it('should handle changeLinkedSkillDifficulty for single skill', () => {
+    component.questionIsBeingUpdated = false;
+    component.newQuestionSkillIds = ['skillId1'];
+    component.linkedSkillsWithDifficulty = [
+      SkillDifficulty.create('skillId1', 'Skill 1', 0.9),
+    ];
+    component.skillLinkageModificationsArray = [];
+
+    component.changeLinkedSkillDifficulty();
+
+    expect(component.newQuestionSkillDifficulties).toEqual([0.9]);
+    expect(component.isSkillDifficultyChanged).toBe(true);
+  });
+
   it('should show warning message if fetching skills fails', () => {
     spyOn(alertsService, 'addWarning');
     spyOn(skillBackendApiService, 'fetchMultiSkillsAsync').and.returnValue(
@@ -552,6 +625,22 @@ describe('Questions List Component', () => {
     }
   );
 
+  it('should handle skill misconception IDs that do not start with selected skill ID', () => {
+    component.misconceptionIdsForSelectedSkill = [1];
+    spyOn(component['utilsService'], 'isEquivalent').and.returnValue(true);
+
+    const result = component.showUnaddressedSkillMisconceptionWarning([
+      'skillId1-1',
+      'otherskill-2',
+    ]);
+
+    expect(result).toBe(true);
+    expect(component['utilsService'].isEquivalent).toHaveBeenCalledWith(
+      [1, undefined],
+      [1]
+    );
+  });
+
   it("should get skill editor's URL", () => {
     expect(component.getSkillEditorUrl('skillId1')).toBe(
       '/skill_editor/skillId1'
@@ -583,6 +672,25 @@ describe('Questions List Component', () => {
       expect(alertsService.addWarning).toHaveBeenCalledWith('Error');
     }
   );
+
+  it('should not save and publish question if there are unaddressed misconceptions', () => {
+    component.question = question;
+    spyOn(alertsService, 'addWarning');
+    spyOn(
+      questionValidationService,
+      'getValidationErrorMessage'
+    ).and.returnValue('');
+    spyOn(
+      component.question,
+      'getUnaddressedMisconceptionNames'
+    ).and.returnValue(['misconception1', 'misconception2']);
+
+    component.saveAndPublishQuestion('Commit');
+
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'Remaining misconceptions that need to be addressed: misconception1, misconception2'
+    );
+  });
 
   it(
     'should show an error and not save question if there are' +
@@ -998,6 +1106,25 @@ describe('Questions List Component', () => {
     }
   );
 
+  it('should properly initialize question editor when opened', () => {
+    component.newQuestionIsBeingCreated = false;
+    component.questionId = 'testQuestionId';
+    spyOn(questionUndoRedoService, 'clearChanges');
+    spyOn(component['topicEditorStateService'], 'toggleQuestionEditor');
+    spyOn(component['imageLocalStorageService'], 'flushStoredImagesData');
+
+    component.openQuestionEditor();
+
+    expect(questionUndoRedoService.clearChanges).toHaveBeenCalled();
+    expect(component.editorIsOpen).toBe(true);
+    expect(
+      component['topicEditorStateService'].toggleQuestionEditor
+    ).toHaveBeenCalledWith(true);
+    expect(
+      component['imageLocalStorageService'].flushStoredImagesData
+    ).toHaveBeenCalled();
+  });
+
   describe('when removing question from skill', () => {
     let questionId = 'qId';
 
@@ -1090,6 +1217,58 @@ describe('Questions List Component', () => {
     }));
   });
 
+  it('should remove question skill link asynchronously', fakeAsync(() => {
+    component.selectedSkillId = 'skillId1';
+    component.deletedQuestionIds = [];
+    spyOn(questionsListService, 'resetPageNumber');
+    spyOn(questionsListService, 'getQuestionSummariesAsync');
+    spyOn(alertsService, 'addSuccessMessage');
+    spyOn(component, '_removeArrayElement');
+    spyOn(
+      editableQuestionBackendApiService,
+      'editQuestionSkillLinksAsync'
+    ).and.returnValue(Promise.resolve());
+
+    component.removeQuestionSkillLinkAsync('questionId', 'skillId1', 0.8);
+    tick();
+
+    expect(
+      editableQuestionBackendApiService.editQuestionSkillLinksAsync
+    ).toHaveBeenCalledWith('questionId', [
+      {
+        id: 'skillId1',
+        task: 'remove',
+        difficulty: 0.8,
+      },
+    ]);
+    expect(questionsListService.resetPageNumber).toHaveBeenCalled();
+    expect(questionsListService.getQuestionSummariesAsync).toHaveBeenCalledWith(
+      'skillId1',
+      true,
+      true
+    );
+    expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
+      'Question Removed'
+    );
+    expect(component._removeArrayElement).toHaveBeenCalledWith('questionId');
+  }));
+
+  it('should remove array element from deleted question IDs', () => {
+    component.deletedQuestionIds = ['question1', 'question2', 'question3'];
+
+    component._removeArrayElement('question2');
+
+    expect(component.deletedQuestionIds).toEqual(['question1', 'question3']);
+  });
+
+  it('should do nothing if element to remove is not in deleted question IDs array', () => {
+    component.deletedQuestionIds = ['question1', 'question2'];
+
+    component._removeArrayElement('nonexistent');
+
+    expect(component.deletedQuestionIds).toEqual(['question1', 'question2']);
+  });
+
   it('should not remove skill if it is the only one', () => {
     component.associatedSkillSummaries = [
       ShortSkillSummary.createFromBackendDict({
@@ -1178,6 +1357,22 @@ describe('Questions List Component', () => {
         id: null,
       },
     } as State);
+    expect(component.showSolutionCheckpoint()).toBe(false);
+  });
+
+  it('should return false for showSolutionCheckpoint when question is null', () => {
+    component.question = null as any;
+    expect(component.showSolutionCheckpoint()).toBe(false);
+  });
+
+  it('should return false for showSolutionCheckpoint when interactionSpec is undefined', () => {
+    component.question = question;
+    spyOn(component.question, 'getStateData').and.returnValue({
+      interaction: {
+        id: 'UnknownInteractionType',
+      },
+    } as State);
+
     expect(component.showSolutionCheckpoint()).toBe(false);
   });
 
@@ -1453,5 +1648,39 @@ describe('Questions List Component', () => {
     spyOn(questionsListService, 'getCurrentPageNumber').and.returnValue(5);
 
     expect(component.getCurrentPageNumber()).toBe(5);
+  });
+
+  it('should handle _initTab when selectedSkillId is not set', () => {
+    component.selectedSkillId = '';
+    spyOn(skillBackendApiService, 'fetchSkillAsync');
+    spyOn(questionsListService, 'getQuestionSummariesAsync');
+    spyOn(
+      skillEditorRoutingService,
+      'navigateToQuestionEditor'
+    ).and.returnValue(false);
+
+    component._initTab(true);
+
+    expect(skillBackendApiService.fetchSkillAsync).not.toHaveBeenCalled();
+    expect(questionsListService.getQuestionSummariesAsync).toHaveBeenCalled();
+  });
+
+  it('should handle getQuestionSummariesForOneSkill correctly', () => {
+    const mockSummaries: any[] = [];
+    spyOn(questionsListService, 'getCachedQuestionSummaries').and.returnValue(
+      mockSummaries
+    );
+
+    component.getQuestionSummariesForOneSkill();
+
+    expect(component.questionSummariesForOneSkill).toBe(mockSummaries);
+  });
+
+  it('should handle ngOnDestroy', () => {
+    spyOn(component.directiveSubscriptions, 'unsubscribe');
+
+    component.ngOnDestroy();
+
+    expect(component.directiveSubscriptions.unsubscribe).toHaveBeenCalled();
   });
 });
