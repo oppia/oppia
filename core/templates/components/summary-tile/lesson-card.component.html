@@ -1,4 +1,4 @@
-<div class="lesson-card-container e2e-test-redesigned-lesson-card-container">
+<div class="lesson-card-container e2e-test-redesigned-lesson-card-container"  *ngIf="!isRecommendation || statusIsPublished">
   <div class="align-items-center d-flex justify-content-center lesson-card-img relative rounded-top w-100" [ngStyle]="{'background-color': imgColor}">
     <img alt="" class="h-100" [src]="imgUrl">
     <div class="d-flex flex-column lesson-card-tags w-100">
@@ -21,10 +21,16 @@
     <div class="align-items-center d-flex justify-content-between mt-2">
       <circle-progress [percent]="progress"> </circle-progress>
       <a [href]="lessonUrl"
+         *ngIf="statusIsPublished"
          class="align-items-center d-inline-flex justify-content-center lesson-card-button text-decoration-none e2e-test-resume-lesson-btn"
          target="_self">
         {{ getButtonTranslationKey() | translate }}
       </a>
+      <span *ngIf="!statusIsPublished "
+            class="align-items-center d-inline-flex justify-content-center lesson-card-button upcoming"
+            title="'I18N_LEARNER_STORY_TILE_COMING_SOON_TOOLTIP' | translate">
+            {{ 'I18N_LEARNER_STORY_TILE_COMING_SOON' | translate }}
+      </span>
     </div>
   </div>
 </div>
@@ -51,6 +57,13 @@
     background-color: #429488;
     border-color: #429488;
     color: #fff;
+  }
+
+  .lesson-card-button.upcoming {
+    background-color: #f5f5f5;
+    border: 1px dashed #aaa;
+    color: #888;
+    pointer-events: auto;
   }
 
   .lesson-card-container {

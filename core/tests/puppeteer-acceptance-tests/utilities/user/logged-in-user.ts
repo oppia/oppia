@@ -2667,6 +2667,10 @@ export class LoggedInUser extends BaseUser {
    * Function to submit a goal in the redesigned learner dashboard.
    */
   async submitGoalInRedesignedLearnerDashboard(): Promise<void> {
+    await this.page.waitForSelector(
+      `${addNewGoalButtonSelector}:not([disabled])`,
+      {visible: true}
+    );
     await this.waitForElementToBeClickable(addNewGoalButtonSelector);
     await this.page.click(addNewGoalButtonSelector);
 

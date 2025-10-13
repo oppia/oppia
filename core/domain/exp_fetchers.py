@@ -548,7 +548,7 @@ def get_multiple_explorations_by_id(
 
 
 def get_multiple_explorations_by_ids_and_version(
-    exp_ids_and_versions: List[Tuple[str, Optional[int]]]
+    exp_ids_and_versions: List[Tuple[str, Optional[int]]],
 ) -> List[Optional[exp_domain.Exploration]]:
     """Returns a list of explorations matching the IDs and versions provided.
 
@@ -563,10 +563,10 @@ def get_multiple_explorations_by_ids_and_version(
         corresponding entry will be None.
     """
     exp_models_list = exp_models.ExplorationModel.get_version_multi(
-        exp_ids_and_versions)
+        exp_ids_and_versions
+    )
     return [
-        get_exploration_from_model(exp_model)
-        if exp_model is not None else None
+        get_exploration_from_model(exp_model) if exp_model is not None else None
         for exp_model in exp_models_list
     ]
 
