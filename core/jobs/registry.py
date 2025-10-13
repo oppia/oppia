@@ -49,6 +49,7 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import
     delete_voiceover_models_data_job,
     dummy_jobs,
     email_deletion_jobs,
+    entity_voiceovers_validation_jobs,
     exp_migration_jobs,
     exp_search_indexing_jobs,
     exploration_voiceover_sync_jobs,

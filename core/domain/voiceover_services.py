@@ -51,7 +51,7 @@ if MYPY:  # pragma: no cover
 MAX_SAMPLE_VOICEOVERS_FOR_GIVEN_VOICE_ARTIST = 5
 
 
-def _get_entity_voiceovers_from_model(
+def get_entity_voiceovers_from_model(
     entity_voiceovers_model: voiceover_models.EntityVoiceoversModel,
 ) -> voiceover_domain.EntityVoiceovers:
     """Returns the EntityVoiceovers domain object from its model representation
@@ -102,7 +102,7 @@ def get_voiceovers_for_given_language_accent_code(
     )
 
     if entity_voiceovers_model:
-        return _get_entity_voiceovers_from_model(entity_voiceovers_model)
+        return get_entity_voiceovers_from_model(entity_voiceovers_model)
     return voiceover_domain.EntityVoiceovers.create_empty(
         entity_type=entity_type,
         entity_id=entity_id,
@@ -135,7 +135,7 @@ def get_entity_voiceovers_for_given_exploration(
 
     for model_instance in entity_voiceovers_models:
         entity_voiceovers_objects.append(
-            _get_entity_voiceovers_from_model(model_instance)
+            get_entity_voiceovers_from_model(model_instance)
         )
     return entity_voiceovers_objects
 
