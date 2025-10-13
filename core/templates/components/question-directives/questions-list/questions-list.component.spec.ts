@@ -507,7 +507,7 @@ describe('Questions List Component', () => {
     component.selectedSkillId = 'skillId1';
     component.createQuestion();
 
-    // Add additional skill
+    // Add additional skill.
     component.linkedSkillsWithDifficulty.push(
       SkillDifficulty.create('skillId2', 'Skill 2', 0.8)
     );
@@ -1361,7 +1361,7 @@ describe('Questions List Component', () => {
   });
 
   it('should return false for showSolutionCheckpoint when question is null', () => {
-    component.question = null as any;
+    component.question = null!;
     expect(component.showSolutionCheckpoint()).toBe(false);
   });
 
@@ -1666,7 +1666,7 @@ describe('Questions List Component', () => {
   });
 
   it('should handle getQuestionSummariesForOneSkill correctly', () => {
-    const mockSummaries: any[] = [];
+    const mockSummaries: unknown[] = [];
     spyOn(questionsListService, 'getCachedQuestionSummaries').and.returnValue(
       mockSummaries
     );
