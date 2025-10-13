@@ -481,14 +481,14 @@ describe('Questions List Component', () => {
 
   it('should create question with proper skill linkage initialization', () => {
     component.selectedSkillId = 'skillId2';
-    spyOn(component['focusManagerService'], 'setFocus');
+    spyOn((component as any).focusManagerService, 'setFocus');
     spyOn(component, 'populateMisconceptions');
-    spyOn(component['imageLocalStorageService'], 'flushStoredImagesData');
+    spyOn((component as any).imageLocalStorageService, 'flushStoredImagesData');
     spyOn(
-      component['pageContextService'],
+      (component as any).pageContextService,
       'setImageSaveDestinationToLocalStorage'
     );
-    spyOn(component['topicEditorStateService'], 'toggleQuestionEditor');
+    spyOn((component as any).topicEditorStateService, 'toggleQuestionEditor');
 
     component.createQuestion();
 
@@ -627,7 +627,9 @@ describe('Questions List Component', () => {
 
   it('should handle skill misconception IDs that do not start with selected skill ID', () => {
     component.misconceptionIdsForSelectedSkill = [1];
-    spyOn(component['utilsService'], 'isEquivalent').and.returnValue(true);
+    spyOn((component as any).utilsService, 'isEquivalent').and.returnValue(
+      true
+    );
 
     const result = component.showUnaddressedSkillMisconceptionWarning([
       'skillId1-1',
@@ -635,7 +637,7 @@ describe('Questions List Component', () => {
     ]);
 
     expect(result).toBe(true);
-    expect(component['utilsService'].isEquivalent).toHaveBeenCalledWith(
+    expect((component as any).utilsService.isEquivalent).toHaveBeenCalledWith(
       [1, undefined],
       [1]
     );
@@ -1110,18 +1112,18 @@ describe('Questions List Component', () => {
     component.newQuestionIsBeingCreated = false;
     component.questionId = 'testQuestionId';
     spyOn(questionUndoRedoService, 'clearChanges');
-    spyOn(component['topicEditorStateService'], 'toggleQuestionEditor');
-    spyOn(component['imageLocalStorageService'], 'flushStoredImagesData');
+    spyOn((component as any).topicEditorStateService, 'toggleQuestionEditor');
+    spyOn((component as any).imageLocalStorageService, 'flushStoredImagesData');
 
     component.openQuestionEditor();
 
     expect(questionUndoRedoService.clearChanges).toHaveBeenCalled();
     expect(component.editorIsOpen).toBe(true);
     expect(
-      component['topicEditorStateService'].toggleQuestionEditor
+      (component as any).topicEditorStateService.toggleQuestionEditor
     ).toHaveBeenCalledWith(true);
     expect(
-      component['imageLocalStorageService'].flushStoredImagesData
+      (component as any).imageLocalStorageService.flushStoredImagesData
     ).toHaveBeenCalled();
   });
 
@@ -1361,7 +1363,7 @@ describe('Questions List Component', () => {
   });
 
   it('should return false for showSolutionCheckpoint when question is null', () => {
-    component.question = null!;
+    component.question = null as unknown as Question;
     expect(component.showSolutionCheckpoint()).toBe(false);
   });
 
