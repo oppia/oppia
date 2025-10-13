@@ -47,7 +47,7 @@ export class TranslationCoordinator extends BaseUser {
     await this.select(`${languageSelectorModalSelector} select`, languageCode);
 
     await this.expectElementToBeVisible(addLanguageButtonSelector);
-    await this.clickOn(addLanguageButtonSelector);
+    await this.clickOnElementWithSelector(addLanguageButtonSelector);
 
     await this.expectLanguageModalToContainLanguage(language);
   }
@@ -85,7 +85,7 @@ export class TranslationCoordinator extends BaseUser {
    */
   async closeLanguageSelectorModal(): Promise<void> {
     await this.expectElementToBeVisible(closeButtonSelector);
-    await this.clickOn(closeButtonSelector);
+    await this.clickOnElementWithSelector(closeButtonSelector);
     await this.expectElementToBeVisible(languageSelectorModalSelector, false);
   }
 
@@ -95,7 +95,7 @@ export class TranslationCoordinator extends BaseUser {
    */
   async selectLanguageInAdminPage(language: string): Promise<void> {
     await this.expectElementToBeVisible(languageSelectorInAdminPageSelector);
-    await this.clickOn(languageSelectorInAdminPageSelector);
+    await this.clickOnElementWithSelector(languageSelectorInAdminPageSelector);
 
     await this.expectElementToBeVisible(languageOptionInAdminPageSelector);
     const languageOptions = await this.page.$$(

@@ -30,38 +30,43 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.mock_supported_audio_languages = [{
-            'id': 'en'
-        }, {
-            'id': 'hi'
-        }, {
-            'id': 'hi-en'
-        }]
+        self.mock_supported_audio_languages = [
+            {'id': 'en'},
+            {'id': 'hi'},
+            {'id': 'hi-en'},
+        ]
         self.mock_supported_audio_languages_context = self.swap(
-            constants, 'SUPPORTED_AUDIO_LANGUAGES',
-            self.mock_supported_audio_languages)
+            constants,
+            'SUPPORTED_AUDIO_LANGUAGES',
+            self.mock_supported_audio_languages,
+        )
 
         with self.mock_supported_audio_languages_context:
             self.valid_exp_opp_summary = (
-                opportunity_domain.ExplorationOpportunitySummary.from_dict({
-                    'id': 'exp_1',
-                    'topic_id': 'topic_1',
-                    'topic_name': 'A topic',
-                    'story_id': 'story_1',
-                    'story_title': 'A new story',
-                    'chapter_title': 'A new chapter',
-                    'content_count': 5,
-                    'incomplete_translation_language_codes': ['hi-en'],
-                    'translation_counts': {},
-                    'language_codes_needing_voice_artists': ['en'],
-                    'language_codes_with_assigned_voice_artists': ['hi'],
-                    'translation_in_review_counts': {},
-                    'is_pinned': False
-                }))
+                opportunity_domain.ExplorationOpportunitySummary.from_dict(
+                    {
+                        'id': 'exp_1',
+                        'topic_id': 'topic_1',
+                        'topic_name': 'A topic',
+                        'story_id': 'story_1',
+                        'story_title': 'A new story',
+                        'chapter_title': 'A new chapter',
+                        'content_count': 5,
+                        'incomplete_translation_language_codes': ['hi-en'],
+                        'translation_counts': {},
+                        'language_codes_needing_voice_artists': ['en'],
+                        'language_codes_with_assigned_voice_artists': ['hi'],
+                        'translation_in_review_counts': {},
+                        'is_pinned': False,
+                    }
+                )
+            )
         # Re-initializing this swap, so that we can use this in test method.
         self.mock_supported_audio_languages_context = self.swap(
-            constants, 'SUPPORTED_AUDIO_LANGUAGES',
-            self.mock_supported_audio_languages)
+            constants,
+            'SUPPORTED_AUDIO_LANGUAGES',
+            self.mock_supported_audio_languages,
+        )
 
     def test_to_and_from_dict_works_correctly(self) -> None:
         exploration_opportunity_summary_dict: (
@@ -79,29 +84,35 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
             'language_codes_needing_voice_artists': ['en'],
             'language_codes_with_assigned_voice_artists': [],
             'translation_in_review_counts': {},
-            'is_pinned': False
+            'is_pinned': False,
         }
 
         with self.mock_supported_audio_languages_context:
             obj = opportunity_domain.ExplorationOpportunitySummary.from_dict(
-                exploration_opportunity_summary_dict)
+                exploration_opportunity_summary_dict
+            )
 
         self.assertIsInstance(
-            obj, opportunity_domain.ExplorationOpportunitySummary)
-        self.assertEqual(obj.to_dict(), {
-            'id': 'exp_1',
-            'topic_name': 'A topic',
-            'story_title': 'A new story',
-            'chapter_title': 'A new chapter',
-            'content_count': 5,
-            'translation_counts': {},
-            'translation_in_review_counts': {},
-            'is_pinned': False
-        })
+            obj, opportunity_domain.ExplorationOpportunitySummary
+        )
+        self.assertEqual(
+            obj.to_dict(),
+            {
+                'id': 'exp_1',
+                'topic_name': 'A topic',
+                'story_title': 'A new story',
+                'chapter_title': 'A new chapter',
+                'content_count': 5,
+                'translation_counts': {},
+                'translation_in_review_counts': {},
+                'is_pinned': False,
+            },
+        )
 
     def test_negative_content_count_fails_validation_check(self) -> None:
-        self.assertTrue(isinstance(
-            self.valid_exp_opp_summary.content_count, int))
+        self.assertTrue(
+            isinstance(self.valid_exp_opp_summary.content_count, int)
+        )
 
         with self.mock_supported_audio_languages_context:
             # Object with content_count as int passes the validation check.
@@ -110,36 +121,45 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
             self._assert_validation_error(
                 self.valid_exp_opp_summary,
                 'Expected content_count to be a non-negative integer, '
-                'received -5'
+                'received -5',
             )
 
     def test_same_language_for_need_and_assigend_voice_artist_fails_validation(
-        self
+        self,
     ) -> None:
         need_voice_artist_languages = (
-            self.valid_exp_opp_summary.language_codes_needing_voice_artists)
+            self.valid_exp_opp_summary.language_codes_needing_voice_artists
+        )
         assigned_voice_artist_languages = (
-            self.valid_exp_opp_summary.
-            language_codes_with_assigned_voice_artists)
+            self.valid_exp_opp_summary.language_codes_with_assigned_voice_artists
+        )
 
         self.assertTrue(
             set(need_voice_artist_languages).isdisjoint(
-                assigned_voice_artist_languages))
+                assigned_voice_artist_languages
+            )
+        )
         with self.mock_supported_audio_languages_context:
             self.valid_exp_opp_summary.validate()
             self.valid_exp_opp_summary.language_codes_needing_voice_artists = [
-                'hi']
+                'hi'
+            ]
             valid_exp_opp_summary = self.valid_exp_opp_summary
             valid_exp_opp_summary.language_codes_with_assigned_voice_artists = [
-                'hi', 'en']
+                'hi',
+                'en',
+            ]
             need_voice_artist_languages = (
-                valid_exp_opp_summary.language_codes_needing_voice_artists)
+                valid_exp_opp_summary.language_codes_needing_voice_artists
+            )
             assigned_voice_artist_languages = (
-                valid_exp_opp_summary.
-                language_codes_with_assigned_voice_artists)
+                valid_exp_opp_summary.language_codes_with_assigned_voice_artists
+            )
             self.assertFalse(
                 set(need_voice_artist_languages).isdisjoint(
-                    assigned_voice_artist_languages))
+                    assigned_voice_artist_languages
+                )
+            )
 
             self._assert_validation_error(
                 self.valid_exp_opp_summary,
@@ -147,15 +167,13 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
                     'Expected voice_artist "needed" and "assigned" list of '
                     'languages to be disjoint, received: '
                     '[\'hi\'], [\'hi\', \'en\']'
-                )
+                ),
             )
 
     def test_translation_counts_with_invalid_language_code_fails_validation(
-        self
+        self,
     ) -> None:
-        self.valid_exp_opp_summary.translation_counts = {
-            'hi': 4
-        }
+        self.valid_exp_opp_summary.translation_counts = {'hi': 4}
         with self.mock_supported_audio_languages_context:
             # Object with valid language_code in translation_counts passes the
             # validation.
@@ -166,73 +184,67 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
             # Object with chapter_id as boolean fails the validation check.
             self._assert_validation_error(
                 self.valid_exp_opp_summary,
-                'Invalid language_code: invalid_language_code'
+                'Invalid language_code: invalid_language_code',
             )
 
     def test_translation_counts_with_invalid_count_fails_validation(
-        self
+        self,
     ) -> None:
-        self.valid_exp_opp_summary.translation_counts = {
-            'hi': 4
-        }
+        self.valid_exp_opp_summary.translation_counts = {'hi': 4}
         with self.mock_supported_audio_languages_context:
             # Object with valid language_code in translation_counts passes the
             # validation.
             self.valid_exp_opp_summary.validate()
-            self.valid_exp_opp_summary.translation_counts = {
-                'hi': -5
-            }
+            self.valid_exp_opp_summary.translation_counts = {'hi': -5}
             # Object with invalid language_code in translation_counts fails the
             # validation.
             self._assert_validation_error(
                 self.valid_exp_opp_summary,
                 'Expected count for language_code hi to be a non-negative '
-                'integer, received -5'
+                'integer, received -5',
             )
 
     def test_translation_counts_with_invalid_count_value_fails_validation(
-        self
+        self,
     ) -> None:
         self.valid_exp_opp_summary.content_count = 5
-        self.valid_exp_opp_summary.translation_counts = {
-            'hi': 4
-        }
+        self.valid_exp_opp_summary.translation_counts = {'hi': 4}
         with self.mock_supported_audio_languages_context:
             # Object with valid count value i.e, less than or equal to
             # content_count in translation_counts passes the validation.
             self.valid_exp_opp_summary.validate()
-            self.valid_exp_opp_summary.translation_counts = {
-                'hi': 8
-            }
+            self.valid_exp_opp_summary.translation_counts = {'hi': 8}
             # Object with invalid count value i.e, more than content_count
             # in translation_counts fails the validation.
             self._assert_validation_error(
                 self.valid_exp_opp_summary,
                 'Expected translation count for language_code hi to be '
-                r'less than or equal to content_count\(5\), received 8'
+                r'less than or equal to content_count\(5\), received 8',
             )
 
     def test_invalid_lang_code_in_incomplete_translation_langs_fails_validation(
-        self
+        self,
     ) -> None:
         self.valid_exp_opp_summary.incomplete_translation_language_codes = [
-            'hi-en']
+            'hi-en'
+        ]
         with self.mock_supported_audio_languages_context:
             # Object with valid language code inside
             # incomplete_translation_language_codes passes the validation.
             self.valid_exp_opp_summary.validate()
             valid_exp_opp_summary = self.valid_exp_opp_summary
             valid_exp_opp_summary.incomplete_translation_language_codes = [
-                'invalid_language_code']
+                'invalid_language_code'
+            ]
             # Object with invalid language code inside
             # incomplete_translation_language_codes fails the validation.
             self._assert_validation_error(
                 self.valid_exp_opp_summary,
-                'Invalid language_code: invalid_language_code'
+                'Invalid language_code: invalid_language_code',
             )
 
     def test_invalid_lang_code_in_need_voice_artist_languages_fails_validation(
-        self
+        self,
     ) -> None:
         self.valid_exp_opp_summary.language_codes_needing_voice_artists = ['en']
         with self.mock_supported_audio_languages_context:
@@ -240,46 +252,49 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
             # language_codes_needing_voice_artists passes the validation.
             self.valid_exp_opp_summary.validate()
             self.valid_exp_opp_summary.language_codes_needing_voice_artists = [
-                'invalid_language_code']
+                'invalid_language_code'
+            ]
             # Object with invalid language code inside
             # language_codes_needing_voice_artists fails the validation.
             self._assert_validation_error(
                 self.valid_exp_opp_summary,
-                'Invalid language_code: invalid_language_code'
+                'Invalid language_code: invalid_language_code',
             )
 
     def test_invalid_lang_code_in_assigned_voice_artist_langs_fails_validation(
-        self
+        self,
     ) -> None:
         (
-            self.valid_exp_opp_summary.
-            language_codes_with_assigned_voice_artists) = ['hi']
+            self.valid_exp_opp_summary.language_codes_with_assigned_voice_artists
+        ) = ['hi']
         with self.mock_supported_audio_languages_context:
             # Object with valid language code inside
             # language_codes_with_assigned_voice_artists passes the validation.
             self.valid_exp_opp_summary.validate()
             valid_exp_opp_summary = self.valid_exp_opp_summary
             valid_exp_opp_summary.language_codes_with_assigned_voice_artists = [
-                'invalid_language_code']
+                'invalid_language_code'
+            ]
             # Object with invalid language code inside
             # language_codes_with_assigned_voice_artists fails the validation.
             self._assert_validation_error(
                 self.valid_exp_opp_summary,
-                'Invalid language_code: invalid_language_code'
+                'Invalid language_code: invalid_language_code',
             )
 
     def test_all_languages_in_summary_equals_supported_languages(self) -> None:
         (
-            self.valid_exp_opp_summary
-            .language_codes_with_assigned_voice_artists
+            self.valid_exp_opp_summary.language_codes_with_assigned_voice_artists
         ) = ['hi-en']
         self.valid_exp_opp_summary.language_codes_needing_voice_artists = ['hi']
         self.valid_exp_opp_summary.incomplete_translation_language_codes = [
-            'en']
+            'en'
+        ]
         with self.mock_supported_audio_languages_context:
             self.valid_exp_opp_summary.validate()
             self.valid_exp_opp_summary.language_codes_needing_voice_artists = [
-                'en']
+                'en'
+            ]
             self._assert_validation_error(
                 self.valid_exp_opp_summary,
                 re.escape(
@@ -287,7 +302,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
                     'incomplete_translation, needs_voiceover and '
                     'assigned_voiceover to be the same as the supported audio '
                     'languages, received [\'en\', \'hi-en\']'
-                )
+                ),
             )
 
 
@@ -306,7 +321,8 @@ class SkillOpportunityDomainTest(test_utils.GenericTestBase):
         self.valid_skill_opportunity = (
             opportunity_domain.SkillOpportunity.from_dict(
                 valid_skill_opportunity_dict
-        ))
+            )
+        )
 
     def test_to_and_from_dict_works_correctly(self) -> None:
         skill_opportunity_dict: opportunity_domain.SkillOpportunityDict = {
@@ -316,19 +332,25 @@ class SkillOpportunityDomainTest(test_utils.GenericTestBase):
         }
 
         skill_opportunity = opportunity_domain.SkillOpportunity.from_dict(
-            skill_opportunity_dict)
+            skill_opportunity_dict
+        )
 
-        self.assertTrue(isinstance(
-            skill_opportunity, opportunity_domain.SkillOpportunity))
-        self.assertEqual(skill_opportunity.to_dict(), {
-            'id': 'skill_1',
-            'skill_description': 'A new skill',
-            'question_count': 5,
-        })
+        self.assertTrue(
+            isinstance(skill_opportunity, opportunity_domain.SkillOpportunity)
+        )
+        self.assertEqual(
+            skill_opportunity.to_dict(),
+            {
+                'id': 'skill_1',
+                'skill_description': 'A new skill',
+                'question_count': 5,
+            },
+        )
 
     def test_negative_question_count_fails_validation_check(self) -> None:
-        self.assertTrue(isinstance(
-            self.valid_skill_opportunity.question_count, int))
+        self.assertTrue(
+            isinstance(self.valid_skill_opportunity.question_count, int)
+        )
 
         # Object with question_count as int passes the validation check.
         self.valid_skill_opportunity.validate()
@@ -336,7 +358,7 @@ class SkillOpportunityDomainTest(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.valid_skill_opportunity,
             'Expected question_count to be a non-negative integer, '
-            'received -5'
+            'received -5',
         )
 
 
@@ -345,12 +367,14 @@ class PinnedOpportunityDomainTest(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        valid_pinned_opportunity_dict: opportunity_domain.PinnedOpportunityDict = { # pylint: disable=line-too-long
+        valid_pinned_opportunity_dict: (
+            opportunity_domain.PinnedOpportunityDict
+        ) = {  # pylint: disable=line-too-long
             'language_code': 'en',
             'topic_id': 'topic_id_1',
-            'opportunity_id': 'opportunity_id1'
+            'opportunity_id': 'opportunity_id1',
         }
-        self.valid_pinned_opportunity = opportunity_domain.PinnedOpportunity.from_dict( # pylint: disable=line-too-long
+        self.valid_pinned_opportunity = opportunity_domain.PinnedOpportunity.from_dict(  # pylint: disable=line-too-long
             valid_pinned_opportunity_dict
         )
 
@@ -358,20 +382,24 @@ class PinnedOpportunityDomainTest(test_utils.GenericTestBase):
         pinned_opportunity_dict: opportunity_domain.PinnedOpportunityDict = {
             'language_code': 'en',
             'topic_id': 'topic_id_1',
-            'opportunity_id': 'opportunity_id1'
+            'opportunity_id': 'opportunity_id1',
         }
 
-        pinned_opportunity = (
-            opportunity_domain.PinnedOpportunity.
-                from_dict(pinned_opportunity_dict))
+        pinned_opportunity = opportunity_domain.PinnedOpportunity.from_dict(
+            pinned_opportunity_dict
+        )
 
-        self.assertTrue(isinstance(
-            pinned_opportunity, opportunity_domain.PinnedOpportunity))
-        self.assertEqual(pinned_opportunity.to_dict(), {
-            'language_code': 'en',
-            'topic_id': 'topic_id_1',
-            'opportunity_id': 'opportunity_id1'
-        })
+        self.assertTrue(
+            isinstance(pinned_opportunity, opportunity_domain.PinnedOpportunity)
+        )
+        self.assertEqual(
+            pinned_opportunity.to_dict(),
+            {
+                'language_code': 'en',
+                'topic_id': 'topic_id_1',
+                'opportunity_id': 'opportunity_id1',
+            },
+        )
 
 
 class TranslationOpportunityDomainTest(test_utils.GenericTestBase):
@@ -382,11 +410,13 @@ class TranslationOpportunityDomainTest(test_utils.GenericTestBase):
         self.mock_supported_audio_languages = [
             {'id': 'en'},
             {'id': 'hi'},
-            {'id': 'hi-en'}
+            {'id': 'hi-en'},
         ]
         self.mock_supported_audio_languages_context = self.swap(
-            constants, 'SUPPORTED_AUDIO_LANGUAGES',
-            self.mock_supported_audio_languages)
+            constants,
+            'SUPPORTED_AUDIO_LANGUAGES',
+            self.mock_supported_audio_languages,
+        )
 
         self.valid_translation_opportunity_dict: (
             opportunity_domain.TranslationOpportunityDict
@@ -396,59 +426,66 @@ class TranslationOpportunityDomainTest(test_utils.GenericTestBase):
             'content_count': 5,
             'incomplete_translation_language_codes': ['en', 'hi'],
             'translation_counts': {'en': 2, 'hi': 1},
-            'entity_type': 'exploration'
+            'entity_type': 'exploration',
         }
 
         with self.mock_supported_audio_languages_context:
             self.valid_translation_opportunity = (
                 opportunity_domain.TranslationOpportunity.from_dict(
-                    self.valid_translation_opportunity_dict))
+                    self.valid_translation_opportunity_dict
+                )
+            )
 
     def test_to_and_from_dict_works_correctly(self) -> None:
         with self.swap(
-            constants, 'SUPPORTED_AUDIO_LANGUAGES',
-            self.mock_supported_audio_languages
+            constants,
+            'SUPPORTED_AUDIO_LANGUAGES',
+            self.mock_supported_audio_languages,
         ):
-            opportunity = (
-                opportunity_domain.TranslationOpportunity.from_dict(
-                    self.valid_translation_opportunity_dict))
+            opportunity = opportunity_domain.TranslationOpportunity.from_dict(
+                self.valid_translation_opportunity_dict
+            )
 
         self.assertIsInstance(
-            opportunity, opportunity_domain.TranslationOpportunity)
+            opportunity, opportunity_domain.TranslationOpportunity
+        )
         self.assertEqual(
-            opportunity.to_dict(), self.valid_translation_opportunity_dict)
+            opportunity.to_dict(), self.valid_translation_opportunity_dict
+        )
 
     def test_negative_content_count_fails_validation_check(self) -> None:
         self.valid_translation_opportunity.content_count = -1
         self._assert_validation_error(
             self.valid_translation_opportunity,
-            'Expected content_count to be a non-negative integer, received -1'
+            'Expected content_count to be a non-negative integer, received -1',
         )
 
     def test_invalid_entity_type_fails_validation(self) -> None:
         self.valid_translation_opportunity.entity_type = 'invalid_entity'
         self._assert_validation_error(
             self.valid_translation_opportunity,
-            'Invalid entity_type: invalid_entity'
+            'Invalid entity_type: invalid_entity',
         )
 
     def test_invalid_language_code_in_incomplete_list_fails_validation(
-        self
+        self,
     ) -> None:
-        self.valid_translation_opportunity.incomplete_translation_language_codes = ['xyz']  # pylint: disable=line-too-long
+        self.valid_translation_opportunity.incomplete_translation_language_codes = [
+            'xyz'
+        ]  # pylint: disable=line-too-long
         self._assert_validation_error(
             self.valid_translation_opportunity,
             'Invalid language_code in '
-            'incomplete_translation_language_codes: xyz'
+            'incomplete_translation_language_codes: xyz',
         )
 
     def test_invalid_language_code_in_translation_counts_fails_validation(
-        self
+        self,
     ) -> None:
         self.valid_translation_opportunity.translation_counts = {'bad-lang': 1}
         self._assert_validation_error(
             self.valid_translation_opportunity,
-            'Invalid language_code in translation_counts: bad-lang'
+            'Invalid language_code in translation_counts: bad-lang',
         )
 
     def test_negative_translation_count_fails_validation(self) -> None:
@@ -456,17 +493,17 @@ class TranslationOpportunityDomainTest(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.valid_translation_opportunity,
             'Expected translation count for language_code en to be '
-            'non-negative, received -3'
+            'non-negative, received -3',
         )
 
     def test_translation_count_exceeds_content_count_fails_validation(
-        self
+        self,
     ) -> None:
         self.valid_translation_opportunity.translation_counts = {'en': 10}
         self._assert_validation_error(
             self.valid_translation_opportunity,
             'Expected translation count for language_code en to be '
-            r'less than or equal to content_count\(5\), received 10'
+            r'less than or equal to content_count\(5\), received 10',
         )
 
 
@@ -478,11 +515,13 @@ class TranslationOpportunityCardInfoDomainTest(test_utils.GenericTestBase):
         self.mock_supported_audio_languages = [
             {'id': 'en'},
             {'id': 'hi'},
-            {'id': 'hi-en'}
+            {'id': 'hi-en'},
         ]
         self.mock_supported_audio_languages_context = self.swap(
-            constants, 'SUPPORTED_AUDIO_LANGUAGES',
-            self.mock_supported_audio_languages)
+            constants,
+            'SUPPORTED_AUDIO_LANGUAGES',
+            self.mock_supported_audio_languages,
+        )
 
         self.valid_card_info = (
             opportunity_domain.TranslationOpportunityCardInfo(
@@ -495,7 +534,7 @@ class TranslationOpportunityCardInfoDomainTest(test_utils.GenericTestBase):
                 topic_name='Fractions',
                 entity_description='Introduction to Fractions',
                 is_pinned=True,
-                currently_available_to_learners=True
+                currently_available_to_learners=True,
             )
         )
 
@@ -510,7 +549,7 @@ class TranslationOpportunityCardInfoDomainTest(test_utils.GenericTestBase):
             topic_name='Fractions',
             entity_description='Introduction to Fractions',
             is_pinned=True,
-            currently_available_to_learners=True
+            currently_available_to_learners=True,
         )
 
         expected_dict = {
@@ -523,7 +562,7 @@ class TranslationOpportunityCardInfoDomainTest(test_utils.GenericTestBase):
             'topic_name': 'Fractions',
             'entity_description': 'Introduction to Fractions',
             'is_pinned': True,
-            'currently_available_to_learners': True
+            'currently_available_to_learners': True,
         }
 
         self.assertEqual(card_info.to_dict(), expected_dict)

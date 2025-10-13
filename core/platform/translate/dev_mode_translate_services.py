@@ -31,7 +31,7 @@ CLIENT = cloud_translate_emulator.CloudTranslateEmulator()
 
 
 def translate_text(
-        text: str, source_language: str, target_language: str
+    text: str, source_language: str, target_language: str
 ) -> str:
     """Translates text into the target language.
 

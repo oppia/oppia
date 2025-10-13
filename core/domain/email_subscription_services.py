@@ -37,4 +37,5 @@ def inform_subscribers(
     """
 
     email_manager.send_emails_to_subscribers(
-        creator_id, exploration_id, exploration_title)
+        creator_id, exploration_id, exploration_title
+    )

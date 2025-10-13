@@ -54,12 +54,17 @@ export class SubtopicSummaryTileComponent implements OnInit {
     private i18nLanguageCodeService: I18nLanguageCodeService
   ) {}
 
-  openSubtopicPage(): void {
+  openSubtopicPage(event?: MouseEvent): void {
     // This component is being used in the topic editor as well and
     // we want to disable the linking in this case.
     const urlFragment = this.subtopic.getUrlFragment();
     if (!this.classroomUrlFragment || !this.topicUrlFragment || !urlFragment) {
       return;
+    }
+    let window = '_self';
+    if (event && (event.ctrlKey || event.metaKey)) {
+      // Open in new tab.
+      window = '_blank';
     }
     this.windowRef.nativeWindow.open(
       this.urlInterpolationService.interpolateUrl(
@@ -70,7 +75,7 @@ export class SubtopicSummaryTileComponent implements OnInit {
           subtopic_url_fragment: urlFragment,
         }
       ),
-      '_self'
+      window
     );
   }
 
