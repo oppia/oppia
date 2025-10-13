@@ -1698,7 +1698,9 @@ describe('Questions List Component', () => {
 
     component.getQuestionSummariesForOneSkill();
 
-    expect(component.questionSummariesForOneSkill).toBe(mockSummaries);
+    expect(component.questionSummariesForOneSkill as unknown as unknown[]).toBe(
+      mockSummaries
+    );
   });
 
   it('should handle ngOnDestroy', () => {
