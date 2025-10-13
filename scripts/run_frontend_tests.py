@@ -145,14 +145,7 @@ def get_file_spec(file_path: str) -> str | None:
         spec_file_path = '%s.spec%s' % (file_path[:-3], file_path[-3:])
         if os.path.exists(spec_file_path):
             return spec_file_path
-
-        spec_file_path = file_path.replace('.ts', 'Spec.ts').replace(
-            '.js', 'Spec.js'
-        )
-        if os.path.exists(spec_file_path):
-            return spec_file_path
-
-    return None
+        return None
 
 
 def main(args: Optional[Sequence[str]] = None) -> None:
