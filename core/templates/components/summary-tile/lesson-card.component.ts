@@ -36,6 +36,7 @@ export class LessonCardComponent implements OnInit {
   @Input() isCommunityLessonComplete?: boolean;
   @Input() isGoal?: boolean;
   @Input() isRecommendation?: boolean;
+  @Input() isSavedSection?: boolean;
 
   desc!: string;
   imgColor!: string;

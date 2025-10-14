@@ -134,7 +134,7 @@
       </ng-container>
       <oppia-card-display *ngIf="totalLessonsInPlaylists.length !== 0" [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_SAVED_SECTION'" [numCards]="totalLessonsInPlaylists.length">
         <ng-container *ngFor="let lesson of totalLessonsInPlaylists">
-          <lesson-card [story]="lesson"></lesson-card>
+          <lesson-card [story]="lesson" [isSavedSection]="true"></lesson-card>
         </ng-container>
       </oppia-card-display>
     </div>
