@@ -1279,19 +1279,15 @@ describe('Questions List Component', () => {
   }));
 
   it('should remove array element from deleted question IDs', () => {
-    component.deletedQuestionIds = ['question1', 'question2', 'question3'];
-
-    component._removeArrayElement('question2');
-
-    expect(component.deletedQuestionIds).toEqual(['question1', 'question3']);
+    component.deletedQuestionIds = ['q1', 'q2', 'q3'];
+    component['_removeArrayElement']('q2');
+    expect(component.deletedQuestionIds).toEqual(['q1', 'q3']);
   });
 
-  it('should do nothing if element to remove is not in deleted question IDs array', () => {
-    component.deletedQuestionIds = ['question1', 'question2'];
-
-    component._removeArrayElement('nonexistent');
-
-    expect(component.deletedQuestionIds).toEqual(['question1', 'question2']);
+  it('should do nothing if element to remove is not in deleted question IDs', () => {
+    component.deletedQuestionIds = ['q1', 'q3'];
+    component['_removeArrayElement']('q2');
+    expect(component.deletedQuestionIds).toEqual(['q1', 'q3']);
   });
 
   it('should not remove skill if it is the only one', () => {
@@ -1669,45 +1665,47 @@ describe('Questions List Component', () => {
     expect(component.difficultyCardIsShown).toBe(false);
   });
 
-  it('should get current page number', () => {
-    spyOn(questionsListService, 'getCurrentPageNumber').and.returnValue(5);
-
-    expect(component.getCurrentPageNumber()).toBe(5);
+  it('should return current page number', () => {
+    spyOn(questionsListService, 'getCurrentPageNumber').and.returnValue(7);
+    expect(component.getCurrentPageNumber()).toBe(7);
   });
 
-  it('should handle _initTab when selectedSkillId is not set', () => {
-    component.selectedSkillId = '';
-    spyOn(skillBackendApiService, 'fetchSkillAsync');
-    spyOn(questionsListService, 'getQuestionSummariesAsync');
-    spyOn(
-      skillEditorRoutingService,
-      'navigateToQuestionEditor'
-    ).and.returnValue(false);
-
-    component._initTab(true);
-
-    expect(skillBackendApiService.fetchSkillAsync).not.toHaveBeenCalled();
-    expect(questionsListService.getQuestionSummariesAsync).toHaveBeenCalled();
-  });
-
-  it('should handle getQuestionSummariesForOneSkill correctly', () => {
-    const mockSummaries: unknown[] = [];
-    spyOn(questionsListService, 'getCachedQuestionSummaries').and.returnValue(
-      mockSummaries
-    );
-
-    component.getQuestionSummariesForOneSkill();
-
-    expect(component.questionSummariesForOneSkill as unknown as unknown[]).toBe(
-      mockSummaries
-    );
-  });
-
-  it('should handle ngOnDestroy', () => {
-    spyOn(component.directiveSubscriptions, 'unsubscribe');
-
+  it('should call unsubscribe on ngOnDestroy', () => {
+    const spy = spyOn(component['directiveSubscriptions'], 'unsubscribe');
     component.ngOnDestroy();
+    expect(spy).toHaveBeenCalled();
+  });
 
-    expect(component.directiveSubscriptions.unsubscribe).toHaveBeenCalled();
+  it('should return false for isQuestionSavable if no changes', () => {
+    component.skillLinkageModificationsArray = [];
+    component.isSkillDifficultyChanged = false;
+    spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(false);
+    expect(component.isQuestionSavable()).toBe(false);
+  });
+
+  it('should return true for isQuestionSavable if new question and valid', () => {
+    component.questionIsBeingUpdated = false;
+    component.newQuestionSkillDifficulties = [0.5];
+    spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
+    spyOn(questionValidationService, 'isQuestionValid').and.returnValue(true);
+    expect(component.isQuestionSavable()).toBe(true);
+  });
+
+  it('should return false for isQuestionSavable if updated question and not valid', () => {
+    component.questionIsBeingUpdated = true;
+    spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
+    spyOn(questionValidationService, 'isQuestionValid').and.returnValue(false);
+    expect(component.isQuestionSavable()).toBe(false);
+  });
+
+  it('should handle showUnaddressedSkillMisconceptionWarning with no matching ids', () => {
+    component.selectedSkillId = 'skillId1';
+    component.misconceptionIdsForSelectedSkill = [1, 2];
+    spyOn(component['utilsService'], 'isEquivalent').and.returnValue(false);
+    const result = component.showUnaddressedSkillMisconceptionWarning([
+      'skillId2-3',
+      'skillId2-4',
+    ]);
+    expect(result).toBe(false);
   });
 });
