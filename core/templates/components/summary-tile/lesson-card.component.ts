@@ -25,6 +25,7 @@ import {CollectionSummary} from 'domain/collection/collection-summary.model';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
 import {StorySummary} from 'domain/story/story-summary.model';
 import {StoryNode} from 'domain/story/story-node.model';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 @Component({
   selector: 'lesson-card',
@@ -51,7 +52,8 @@ export class LessonCardComponent implements OnInit {
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private assetsBackendApiService: AssetsBackendApiService,
-    private urlService: UrlService
+    private urlService: UrlService,
+    private platformFeatureService: PlatformFeatureService
   ) {}
 
   ngOnInit(): void {
@@ -188,6 +190,11 @@ export class LessonCardComponent implements OnInit {
       id,
       filename
     );
+  }
+
+  isSerialChapterFeatureLearnerFlagEnabled(): boolean {
+    return this.platformFeatureService.status.SerialChapterLaunchLearnerView
+      .isEnabled;
   }
 
   getStorySummaryLessonUrl(

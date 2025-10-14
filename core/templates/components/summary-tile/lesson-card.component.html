@@ -8,7 +8,7 @@
         <span aria-hidden="true" class="fas fa-bullseye lesson-card-tags-icon"></span>
         <p class="lesson-card-tags-text"> {{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION' | translate }} </p>
       </div>
-      <div class="classroom-new-chapter" *ngIf="isNewChapterLabelVisible()">
+      <div class="classroom-new-chapter" *ngIf="isNewChapterLabelVisible() && isSerialChapterFeatureLearnerFlagEnabled()">
         <p class="classroom-status">New</p>
       </div>
     </div>
@@ -24,14 +24,14 @@
     <div class="align-items-center d-flex justify-content-between mt-2">
       <circle-progress [percent]="progress"> </circle-progress>
       <a [href]="lessonUrl"
-         *ngIf="statusIsPublished || isSavedSection"
+         *ngIf="statusIsPublished || isSavedSection || !isSerialChapterFeatureLearnerFlagEnabled()"
          class="align-items-center d-inline-flex justify-content-center lesson-card-button text-decoration-none e2e-test-resume-lesson-btn"
          target="_self">
         {{ getButtonTranslationKey() | translate }}
       </a>
-      <span *ngIf="!statusIsPublished && !isSavedSection"
+      <span *ngIf="isSerialChapterFeatureLearnerFlagEnabled() && !statusIsPublished && !isSavedSection"
             class="align-items-center d-inline-flex justify-content-center lesson-card-button upcoming"
-            [attr.title]="'I18N_LEARNER_STORY_TILE_COMING_SOON_TOOLTIP' | translate" >
+            [attr.title]="isSerialChapterFeatureLearnerFlagEnabled() ? ('I18N_LEARNER_STORY_TILE_COMING_SOON_TOOLTIP' | translate) : null" >
             {{ 'I18N_LEARNER_STORY_TILE_COMING_SOON' | translate }}
       </span>
     </div>

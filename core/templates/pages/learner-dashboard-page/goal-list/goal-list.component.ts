@@ -24,6 +24,8 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
 import {StorySummary} from 'domain/story/story-summary.model';
 import {StoryNode} from 'domain/story/story-node.model';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+
 @Component({
   selector: 'oppia-goal-list',
   templateUrl: './goal-list.component.html',
@@ -38,7 +40,8 @@ export class GoalListComponent implements OnInit {
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
-    private urlService: UrlService
+    private urlService: UrlService,
+    private platformFeatureService: PlatformFeatureService
   ) {}
 
   ngOnInit(): void {
@@ -131,6 +134,11 @@ export class GoalListComponent implements OnInit {
       earliestCompletedNode = earliestNode;
     }
     return earliestCompletedNode + 1;
+  }
+
+  isSerialChapterFeatureLearnerFlagEnabled(): boolean {
+    return this.platformFeatureService.status.SerialChapterLaunchLearnerView
+      .isEnabled;
   }
 
   handleToggleState(updateState: boolean, storyId: string): void {

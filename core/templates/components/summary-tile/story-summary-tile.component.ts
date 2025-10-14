@@ -89,6 +89,11 @@ export class StorySummaryTileComponent implements OnInit {
       .SerialChapterLaunchCurriculumAdminView.isEnabled;
   }
 
+  isSerialChapterFeatureLearnerFlagEnabled(): boolean {
+    return this.platformFeatureService.status.SerialChapterLaunchLearnerView
+      .isEnabled;
+  }
+
   getStoryLink(): string {
     // This component is being used in the topic editor as well and
     // we want to disable the linking in this case.

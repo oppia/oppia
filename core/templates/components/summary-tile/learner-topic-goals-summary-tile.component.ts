@@ -25,7 +25,7 @@ import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
 import {UrlService} from 'services/contextual/url.service';
 import {StoryNode} from 'domain/story/story-node.model';
 import {StorySummary} from 'domain/story/story-summary.model';
-
+import {PlatformFeatureService} from 'services/platform-feature.service';
 @Component({
   selector: 'oppia-learner-topic-goals-summary-tile',
   templateUrl: './learner-topic-goals-summary-tile.component.html',
@@ -57,7 +57,8 @@ export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private assetsBackendApiService: AssetsBackendApiService,
-    private urlService: UrlService
+    private urlService: UrlService,
+    private platformFeatureService: PlatformFeatureService
   ) {}
 
   getAllIncompleteStoryNodes(): StoryNode[] {
@@ -161,6 +162,11 @@ export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
       return '-webkit-filter: blur(2px); filter: blur(2px);';
     }
     return 'height: 144px; width: 192px;';
+  }
+
+  isSerialChapterFeatureLearnerFlagEnabled(): boolean {
+    return this.platformFeatureService.status.SerialChapterLaunchLearnerView
+      .isEnabled;
   }
 
   isNewChapterLabelVisible(): boolean {
