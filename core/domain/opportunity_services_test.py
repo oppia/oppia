@@ -21,7 +21,7 @@ from __future__ import annotations
 import logging
 import unittest.mock
 
-from core import feconf
+from core import feature_flag_list, feconf
 from core.constants import constants
 from core.domain import (
     exp_domain,
@@ -843,6 +843,9 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         )
         self.assertEqual(len(skill_opportunities), 0)
 
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS]
+    )
     def test_publish_story_creates_exploration_opportunity(self) -> None:
         self.add_exploration_0_to_story()
         # Story is already published, so unpublish first.
