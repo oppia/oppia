@@ -79,6 +79,7 @@ interface ComponentPrivateDeps {
   focusManagerService: {setFocus: (...args: unknown[]) => unknown};
   imageLocalStorageService: {
     flushStoredImagesData: (...args: unknown[]) => unknown;
+    getStoredImagesData: (...args: unknown[]) => unknown;
   };
   topicEditorStateService: {
     toggleQuestionEditor: (...args: unknown[]) => unknown;
@@ -570,6 +571,21 @@ describe('Questions List Component', () => {
     expect(component.isSkillDifficultyChanged).toBe(true);
   });
 
+  it('should initialize undefined arrays in changeLinkedSkillDifficulty', () => {
+    component.questionIsBeingUpdated = false;
+    component.newQuestionSkillIds = undefined as unknown as string[];
+    component.newQuestionSkillDifficulties = undefined as unknown as number[];
+    component.linkedSkillsWithDifficulty = [
+      SkillDifficulty.create('skillId1', 'Skill 1', 0.9),
+    ];
+    component.skillLinkageModificationsArray = [];
+
+    component.changeLinkedSkillDifficulty();
+
+    expect(component.newQuestionSkillIds).toEqual(['skillId1']);
+    expect(component.newQuestionSkillDifficulties).toEqual([0.9]);
+  });
+
   it('should show warning message if fetching skills fails', () => {
     spyOn(alertsService, 'addWarning');
     spyOn(skillBackendApiService, 'fetchMultiSkillsAsync').and.returnValue(
@@ -801,6 +817,58 @@ describe('Questions List Component', () => {
       ]);
     })
   );
+
+  it('should handle stored images when creating a new question', fakeAsync(() => {
+    component.question = question;
+    component.questionIsBeingUpdated = false;
+    component.skillLinkageModificationsArray = [];
+
+    const mockImageData = [
+      {
+        filename: 'image1.png',
+        imageBlob: new Blob(['image data'], {type: 'image/png'}),
+      },
+      {
+        filename: 'image2.png',
+        imageBlob: null,
+      },
+    ];
+
+    spyOn(
+      questionValidationService,
+      'getValidationErrorMessage'
+    ).and.returnValue('');
+    spyOn(
+      component.question,
+      'getUnaddressedMisconceptionNames'
+    ).and.returnValue([]);
+    spyOn(
+      asPrivates(component).imageLocalStorageService,
+      'getStoredImagesData'
+    ).and.returnValue(mockImageData);
+    spyOn(
+      asPrivates(component).imageLocalStorageService,
+      'flushStoredImagesData'
+    );
+    spyOn(
+      editableQuestionBackendApiService,
+      'createQuestionAsync'
+    ).and.returnValue(
+      Promise.resolve({
+        questionId: 'qId',
+      })
+    );
+
+    component.saveAndPublishQuestion('');
+    tick();
+
+    expect(
+      asPrivates(component).imageLocalStorageService.getStoredImagesData
+    ).toHaveBeenCalled();
+    expect(
+      asPrivates(component).imageLocalStorageService.flushStoredImagesData
+    ).toHaveBeenCalled();
+  }));
 
   it('should save question when another question is being updated', fakeAsync(() => {
     component.question = question;
@@ -1698,6 +1766,99 @@ describe('Questions List Component', () => {
     expect(component.isQuestionSavable()).toBe(false);
   });
 
+  it('should return true for isQuestionSavable if updated question and valid', () => {
+    component.questionIsBeingUpdated = true;
+    spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
+    spyOn(questionValidationService, 'isQuestionValid').and.returnValue(true);
+    expect(component.isQuestionSavable()).toBe(true);
+  });
+
+  it('should set update_difficulty task when changing linked skill difficulty for updated question', () => {
+    component.questionIsBeingUpdated = true;
+    component.isSkillDifficultyChanged = true;
+    component.newQuestionSkillIds = ['skillId1'];
+    component.linkedSkillsWithDifficulty = [
+      SkillDifficulty.create('skillId1', 'Skill 1', 0.7),
+    ];
+    component.skillLinkageModificationsArray = [];
+
+    component.changeLinkedSkillDifficulty();
+
+    expect(component.skillLinkageModificationsArray).toEqual([
+      {
+        id: 'skillId1',
+        task: 'update_difficulty',
+        difficulty: 0.7,
+      },
+    ]);
+  });
+
+  it('should set update task when question is being updated but difficulty unchanged', () => {
+    component.questionIsBeingUpdated = true;
+    // Initial state arrays reflect a single linked skill.
+    component.newQuestionSkillIds = ['skillId1'];
+    component.newQuestionSkillDifficulties = [0.7];
+    component.linkedSkillsWithDifficulty = [
+      SkillDifficulty.create('skillId1', 'Skill 1', 0.7),
+    ];
+    component.skillLinkageModificationsArray = [];
+    component.isSkillDifficultyChanged = false;
+
+    // Call the real method; with no change it should compute update not update_difficulty.
+    component.changeLinkedSkillDifficulty();
+
+    expect(component.isSkillDifficultyChanged).toBeFalse();
+    expect(component.skillLinkageModificationsArray).toEqual([
+      {
+        id: 'skillId1',
+        task: 'update',
+        difficulty: 0.7,
+      },
+    ]);
+  });
+
+  it('should return false for showSolutionCheckpoint when interaction has spec but cannot have solution', () => {
+    // Provide a question with an interaction id known but with can_have_solution false.
+    component.question = question;
+    spyOn(component.question, 'getStateData').and.returnValue({
+      interaction: {id: 'Continue'}, // Continue has can_have_solution = false in specs.
+    } as State);
+    expect(component.showSolutionCheckpoint()).toBe(false);
+  });
+
+  it('should initialize tab to fetch summaries when not navigating to editor', fakeAsync(() => {
+    // Cover branch in _initTab where navigateToQuestionEditor returns false but selectedSkillId truthy.
+    component.selectedSkillId = 'skillId1';
+    spyOn(
+      skillEditorRoutingService,
+      'navigateToQuestionEditor'
+    ).and.returnValue(false);
+    spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
+      Promise.resolve({
+        skill: skill,
+        assignedSkillTopicData: {},
+        groupedSkillSummaries: {},
+      })
+    );
+    spyOn(questionsListService, 'getQuestionSummariesAsync');
+
+    // Directly call private method via bracket notation.
+    component['_initTab'](true);
+    tick();
+
+    expect(questionsListService.getQuestionSummariesAsync).toHaveBeenCalledWith(
+      'skillId1',
+      true,
+      true
+    );
+  }));
+
+  it('should set difficultyCardIsShown true on ngOnInit for wide window', () => {
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+    component.ngOnInit();
+    expect(component.difficultyCardIsShown).toBe(true);
+  });
+
   it('should handle showUnaddressedSkillMisconceptionWarning with no matching ids', () => {
     component.selectedSkillId = 'skillId1';
     component.misconceptionIdsForSelectedSkill = [1, 2];
@@ -1710,4 +1871,93 @@ describe('Questions List Component', () => {
     ]);
     expect(result).toBe(false);
   });
+
+  it('should not save question when being updated but has no changes', () => {
+    component.question = question;
+    component.questionIsBeingUpdated = true;
+    spyOn(
+      questionValidationService,
+      'getValidationErrorMessage'
+    ).and.returnValue('');
+    spyOn(
+      component.question,
+      'getUnaddressedMisconceptionNames'
+    ).and.returnValue([]);
+    spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(false);
+    spyOn(editableQuestionBackendApiService, 'updateQuestionAsync');
+
+    component.saveAndPublishQuestion('Commit');
+
+    expect(
+      editableQuestionBackendApiService.updateQuestionAsync
+    ).not.toHaveBeenCalled();
+  });
+
+  it('should handle _initTab when selectedSkillId is null', () => {
+    component.selectedSkillId = '';
+    spyOn(skillBackendApiService, 'fetchSkillAsync');
+    spyOn(
+      skillEditorRoutingService,
+      'navigateToQuestionEditor'
+    ).and.returnValue(false);
+    spyOn(questionsListService, 'getQuestionSummariesAsync');
+    spyOn(component, 'getQuestionSummariesForOneSkill');
+
+    component['_initTab'](true);
+
+    expect(skillBackendApiService.fetchSkillAsync).not.toHaveBeenCalled();
+    expect(questionsListService.getQuestionSummariesAsync).toHaveBeenCalledWith(
+      '',
+      true,
+      true
+    );
+  });
+
+  it('should handle editQuestion when no associated_skill_dicts in response', fakeAsync(() => {
+    const questionSummaryForOneSkill = QuestionSummary.createFromBackendDict({
+      id: 'qId',
+      interaction_id: '',
+      misconception_ids: [],
+      question_content: '',
+    });
+    component.editorIsOpen = false;
+    component.canEditQuestion = true;
+
+    spyOn(
+      editableQuestionBackendApiService,
+      'fetchQuestionAsync'
+    ).and.returnValue(
+      Promise.resolve({
+        associated_skill_dicts: null,
+        questionObject: question,
+      } as any)
+    );
+    spyOn(component, 'openQuestionEditor');
+
+    component.editQuestion(
+      questionSummaryForOneSkill,
+      'Skill Description',
+      0.9
+    );
+    tick();
+
+    expect(component.associatedSkillSummaries).toEqual([]);
+    expect(component.openQuestionEditor).toHaveBeenCalled();
+  }));
+
+  it('should handle addSkill when modal result is rejected with error', fakeAsync(() => {
+    component.groupedSkillSummaries = {
+      current: [],
+      others: [],
+    };
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: new MockNgbModalRef(),
+      result: Promise.reject('User cancelled'),
+    } as NgbModalRef);
+
+    component.addSkill();
+    tick();
+
+    expect(ngbModal.open).toHaveBeenCalled();
+  }));
 });

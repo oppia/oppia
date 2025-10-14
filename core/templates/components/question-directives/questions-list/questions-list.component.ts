@@ -181,44 +181,50 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
   }
 
   changeLinkedSkillDifficulty(): void {
-    this.isSkillDifficultyChanged = true;
+    // Capture previous difficulties to determine if anything actually changed.
+    const prevDifficulties = (this.newQuestionSkillDifficulties || []).slice();
+    const prevIds = (this.newQuestionSkillIds || []).slice();
 
-    // If there is only one linked skill, simply reflect its difficulty.
-    if (this.linkedSkillsWithDifficulty.length === 1) {
-      const only = this.linkedSkillsWithDifficulty[0];
-      const id = only.getId();
-      const difficulty = only.getDifficulty();
-      this.newQuestionSkillDifficulties = [difficulty];
-      // Ensure the single linked skill is reflected in the IDs list.
-      if (!this.newQuestionSkillIds || !this.newQuestionSkillIds.includes(id)) {
-        this.newQuestionSkillIds = [id];
-      }
-    } else {
-      // For multiple linked skills, ensure both IDs and difficulties are
-      // reflected in the arrays. Only append new skills to preserve
-      // existing ordering and avoid duplicates.
-      this.linkedSkillsWithDifficulty.forEach(linkedSkillWithDifficulty => {
-        const id = linkedSkillWithDifficulty.getId();
-        const difficulty = linkedSkillWithDifficulty.getDifficulty();
-        if (!this.newQuestionSkillIds.includes(id)) {
-          this.newQuestionSkillIds.push(id);
-          this.newQuestionSkillDifficulties.push(difficulty);
-        }
-      });
+    // Reset arrays if they are undefined (should not normally happen but keeps logic safe).
+    if (!this.newQuestionSkillIds) {
+      this.newQuestionSkillIds = [];
     }
+    if (!this.newQuestionSkillDifficulties) {
+      this.newQuestionSkillDifficulties = [];
+    }
+
+    // Build fresh arrays of current linked skills & difficulties in order.
+    const currentIds: string[] = [];
+    const currentDifficulties: number[] = [];
+    this.linkedSkillsWithDifficulty.forEach(linked => {
+      currentIds.push(linked.getId());
+      currentDifficulties.push(linked.getDifficulty());
+    });
+
+    // Replace tracked arrays with current snapshot (preserving semantics used elsewhere).
+    this.newQuestionSkillIds = currentIds.slice();
+    this.newQuestionSkillDifficulties = currentDifficulties.slice();
+
+    // Determine if any change actually occurred (length or element-wise difference).
+    const lengthsDiffer =
+      prevIds.length !== currentIds.length ||
+      prevDifficulties.length !== currentDifficulties.length;
+    const idsDiffer =
+      !lengthsDiffer && prevIds.some((id, i) => id !== currentIds[i]);
+    const diffsDiffer =
+      !lengthsDiffer &&
+      prevDifficulties.some((diff, i) => diff !== currentDifficulties[i]);
+    this.isSkillDifficultyChanged = lengthsDiffer || idsDiffer || diffsDiffer;
+
+    // Clear previous modifications before pushing new ones.
+    this.skillLinkageModificationsArray = [];
     this.linkedSkillsWithDifficulty.forEach(linkedSkillWithDifficulty => {
       let task: string | null = null;
-
       if (this.questionIsBeingUpdated) {
-        if (this.isSkillDifficultyChanged) {
-          task = 'update_difficulty';
-        } else if (this.questionIsBeingUpdated) {
-          task = 'update';
-        }
+        task = this.isSkillDifficultyChanged ? 'update_difficulty' : 'update';
       } else if (this.isSkillDifficultyChanged) {
         task = 'update_difficulty';
       }
-
       this.skillLinkageModificationsArray.push({
         id: linkedSkillWithDifficulty.getId(),
         task: task ?? '',
