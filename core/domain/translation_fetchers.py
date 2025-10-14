@@ -83,7 +83,7 @@ def get_machine_translation(
     return get_translation_from_model(translation_model)
 
 
-def _get_entity_translation_from_model(
+def get_entity_translation_from_model(
     entity_translation_model: translation_models.EntityTranslationsModel,
 ) -> translation_domain.EntityTranslation:
     """Returns the EntityTranslation domain object from its model representation
@@ -134,7 +134,7 @@ def get_all_entity_translations_for_entity(
     )
     entity_translation_objects = []
     for model in entity_translation_models:
-        domain_object = _get_entity_translation_from_model(model)
+        domain_object = get_entity_translation_from_model(model)
         entity_translation_objects.append(domain_object)
 
     return entity_translation_objects
@@ -164,7 +164,7 @@ def get_entity_translation(
     )
 
     if entity_translation_model:
-        domain_object = _get_entity_translation_from_model(
+        domain_object = get_entity_translation_from_model(
             entity_translation_model
         )
         return domain_object
@@ -194,7 +194,7 @@ def get_multiple_entity_translations(
     )
     return [
         (
-            _get_entity_translation_from_model(entity_translation_model)
+            get_entity_translation_from_model(entity_translation_model)
             if entity_translation_model is not None
             else None
         )
