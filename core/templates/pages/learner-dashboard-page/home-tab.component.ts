@@ -106,13 +106,13 @@ export class HomeTabComponent {
 
         const completedNodes = currentStorySummary[j].getCompletedNodeTitles();
         const remainingPublished =
-          publishedNodes.length - completedNodes.length;
+          publishedNodes.length - completedNodes.length - 1;
         if (this.hasMultipleUnfinishedPublished !== true) {
           this.hasMultipleUnfinishedPublished =
             publishedNodes.length > 1 && remainingPublished > 0;
         }
 
-        if (publishedNodes.length - 1 > completedNodes.length) {
+        if (publishedNodes.length > completedNodes.length) {
           this.storySummariesWithAvailableNodes.add(
             currentStorySummary[j].getId()
           );
