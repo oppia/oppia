@@ -1280,13 +1280,13 @@ describe('Questions List Component', () => {
 
   it('should remove array element from deleted question IDs', () => {
     component.deletedQuestionIds = ['q1', 'q2', 'q3'];
-    component['_removeArrayElement']('q2');
+    component._removeArrayElement('q2');
     expect(component.deletedQuestionIds).toEqual(['q1', 'q3']);
   });
 
   it('should do nothing if element to remove is not in deleted question IDs', () => {
     component.deletedQuestionIds = ['q1', 'q3'];
-    component['_removeArrayElement']('q2');
+    component._removeArrayElement('q2');
     expect(component.deletedQuestionIds).toEqual(['q1', 'q3']);
   });
 
@@ -1671,7 +1671,7 @@ describe('Questions List Component', () => {
   });
 
   it('should call unsubscribe on ngOnDestroy', () => {
-    const spy = spyOn(component['directiveSubscriptions'], 'unsubscribe');
+    const spy = spyOn(component.directiveSubscriptions, 'unsubscribe');
     component.ngOnDestroy();
     expect(spy).toHaveBeenCalled();
   });
@@ -1701,7 +1701,9 @@ describe('Questions List Component', () => {
   it('should handle showUnaddressedSkillMisconceptionWarning with no matching ids', () => {
     component.selectedSkillId = 'skillId1';
     component.misconceptionIdsForSelectedSkill = [1, 2];
-    spyOn(component['utilsService'], 'isEquivalent').and.returnValue(false);
+    spyOn((component as any).utilsService, 'isEquivalent').and.returnValue(
+      false
+    );
     const result = component.showUnaddressedSkillMisconceptionWarning([
       'skillId2-3',
       'skillId2-4',
