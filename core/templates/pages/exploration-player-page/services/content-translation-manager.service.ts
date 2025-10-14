@@ -22,7 +22,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import {PlayerTranscriptService} from 'pages/exploration-player-page/services/player-transcript.service';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {ExtensionTagAssemblerService} from 'services/extension-tag-assembler.service';
-import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
+import {EntityTranslation} from 'domain/translation/entity-translation.model';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {PageContextService} from 'services/page-context.service';

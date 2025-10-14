@@ -13,15 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for StateTopAnswerStatsObjectFactory.
+ * @fileoverview Tests for StateTopAnswerStats.
  */
 
 import {AnswerStats} from 'domain/exploration/answer-stats.model';
-import {StateTopAnswersStatsObjectFactory} from 'domain/statistics/state-top-answers-stats-object.factory';
+import {StateTopAnswersStats} from 'domain/statistics/state-top-answers-stats.model';
 
-describe('State top answers stats object factory', () => {
-  var stasof = new StateTopAnswersStatsObjectFactory();
-
+describe('State top answers stats', () => {
   it('should create a state top answers stats object from a backend dict', () => {
     var backendDict = {
       answers: {
@@ -51,7 +49,8 @@ describe('State top answers stats object factory', () => {
       ),
     };
 
-    var stateTopAnswerStats = stasof.createFromBackendDict(backendDict);
+    var stateTopAnswerStats =
+      StateTopAnswersStats.createFromBackendDict(backendDict);
 
     expect(stateTopAnswerStats.answers).toEqual(stateAnswers);
     expect(stateTopAnswerStats.interactionIds).toEqual(
