@@ -183,19 +183,21 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
   changeLinkedSkillDifficulty(): void {
     this.isSkillDifficultyChanged = true;
 
-    if (this.newQuestionSkillIds.length === 1) {
+    // If there is only one linked skill, simply reflect its difficulty.
+    if (this.linkedSkillsWithDifficulty.length === 1) {
       this.newQuestionSkillDifficulties = [
         this.linkedSkillsWithDifficulty[0].getDifficulty(),
       ];
     } else {
+      // For multiple linked skills, ensure both IDs and difficulties are
+      // reflected in the arrays. Only append new skills to preserve
+      // existing ordering and avoid duplicates.
       this.linkedSkillsWithDifficulty.forEach(linkedSkillWithDifficulty => {
-        if (
-          !this.newQuestionSkillIds.includes(linkedSkillWithDifficulty.getId())
-        ) {
-          this.newQuestionSkillIds.push(linkedSkillWithDifficulty.getId());
-          this.newQuestionSkillDifficulties.push(
-            linkedSkillWithDifficulty.getDifficulty()
-          );
+        const id = linkedSkillWithDifficulty.getId();
+        const difficulty = linkedSkillWithDifficulty.getDifficulty();
+        if (!this.newQuestionSkillIds.includes(id)) {
+          this.newQuestionSkillIds.push(id);
+          this.newQuestionSkillDifficulties.push(difficulty);
         }
       });
     }
