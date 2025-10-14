@@ -1930,7 +1930,7 @@ describe('Questions List Component', () => {
       'fetchQuestionAsync'
     ).and.returnValue(
       Promise.resolve({
-        associated_skill_dicts: null,
+        associated_skill_dicts: [],
         questionObject: question,
       } as FetchQuestionResponse)
     );
