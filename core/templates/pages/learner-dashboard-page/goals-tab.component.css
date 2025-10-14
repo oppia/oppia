@@ -426,11 +426,17 @@
   margin-bottom: 0;
 }
 
+@media screen and (max-width: 1024px) {
+  .oppia-learner-dash-goals-modal {
+    width: 85%;
+  }
+}
+
 .oppia-learner-dash-goals-modal {
   border-radius: 4px;
   height: 343px;
   max-width: 851px;
-  width: 75%;
+  width: 50%;
 }
 
 .oppia-learner-dash-goals-section {

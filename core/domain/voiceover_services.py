@@ -23,10 +23,16 @@ import json
 import os
 
 from core import feconf, utils
+from core.constants import constants
 from core.domain import (
     email_manager,
     exp_domain,
+    exp_fetchers,
+    platform_parameter_list,
+    platform_parameter_services,
     state_domain,
+    translation_domain,
+    translation_fetchers,
     user_services,
     voiceover_domain,
     voiceover_regeneration_services,
@@ -1099,6 +1105,107 @@ def send_email_to_voiceover_admins_and_tech_leads_after_regeneration(
     )
 
 
+def _remove_empty_contents_for_voiceover_regeneration(
+    language_code_to_contents_mapping: Dict[str, Dict[str, str]],
+) -> None:
+    """Removes empty contents from the provided input.
+
+    Args:
+        language_code_to_contents_mapping: dict. A dictionary mapping language
+            codes to the corresponding content IDs and their associated HTML
+            that require voiceover regeneration.
+    """
+    for (
+        _,
+        content_ids_to_content_values,
+    ) in language_code_to_contents_mapping.items():
+        content_ids_to_remove = [
+            content_id
+            for content_id, html in (content_ids_to_content_values.items())
+            if not html.strip()
+        ]
+        for content_id in content_ids_to_remove:
+            del content_ids_to_content_values[content_id]
+
+
+def extract_english_voiceover_texts_from_exploration(
+    exploration: exp_domain.Exploration,
+) -> Dict[str, Dict[str, str]]:
+    """Extracts English voiceover texts from the given exploration.
+
+    Args:
+        exploration: Exploration. The exploration from which to
+            extract English voiceover texts.
+
+    Returns:
+        dict. A dictionary that maps the language code (English) to its
+        corresponding content IDs and their associated values.
+    """
+    language_code_to_contents_mapping: Dict[str, Dict[str, str]] = {}
+
+    for state in exploration.states.values():
+        content_id_to_translatable_content = (
+            state.get_translatable_contents_collection()
+        ).content_id_to_translatable_content
+
+        for translatable_content in content_id_to_translatable_content.values():
+            content_id = translatable_content.content_id
+
+            # Rule inputs are not considered for voiceover generation.
+            if content_id.startswith('rule_input'):
+                continue
+
+            content_value = translatable_content.content_value
+            assert isinstance(content_value, str)
+
+            language_code_to_contents_mapping.setdefault('en', {})[
+                content_id
+            ] = content_value
+
+    return language_code_to_contents_mapping
+
+
+def extract_translated_voiceover_texts_from_entity_translations(
+    entity_translations: List[translation_domain.EntityTranslation],
+) -> Dict[str, Dict[str, str]]:
+    """Retrieves translated voiceover texts from an exploration’s entity
+    translations object.
+
+    Args:
+        entity_translations: List[translation_domain.EntityTranslation]. A list
+            of entity translations to extract voiceover texts from.
+
+    Returns:
+        dict. A dictionary mapping language codes to their corresponding content
+        IDs and translated values.
+    """
+    language_code_to_contents_mapping: Dict[str, Dict[str, str]] = {}
+
+    for entity_translation in entity_translations:
+        language_code = entity_translation.language_code
+        translations = entity_translation.translations
+
+        for content_id, translated_content in translations.items():
+
+            # Rule inputs are not considered for voiceover generation.
+            if content_id.startswith('rule_input'):
+                continue
+
+            # Voiceovers should only be regenerated if the translation is
+            # updated.
+            if translated_content.needs_update:
+                continue
+
+            content_value = translated_content.content_value
+            assert isinstance(content_value, str)
+
+            language_code_to_contents_mapping.setdefault(language_code, {})[
+                content_id
+            ] = content_value
+
+    return language_code_to_contents_mapping
+
+
 def _regenerate_voiceovers_for_given_contents(
     exploration_id: str,
     exploration_title: str,
@@ -1128,6 +1235,11 @@ def _regenerate_voiceovers_for_given_contents(
     # A dictionary mapping each language code to a list of accent codes that
     # support autogeneration.
     language_code_to_autogeneratable_accent_codes = {}
+
+    # Remove empty contents from the voiceover regeneration mapping.
+    _remove_empty_contents_for_voiceover_regeneration(
+        language_code_to_contents_mapping
+    )
 
     # A list of error collections that occurred during the
     # voiceover regeneration.
@@ -1204,19 +1316,26 @@ def _regenerate_voiceovers_for_given_contents(
                     errors_while_voiceover_regeneration
                 )
 
-    send_email_to_voiceover_admins_and_tech_leads_after_regeneration(
-        exploration_id,
-        exploration_title,
-        date_time,
-        language_accents_used_for_voiceover_regeneration,
-        error_collections_during_voiceover_regeneration,
-        number_of_contents_for_voiceover_regeneration,
-        number_of_contents_failed_to_regenerate,
-        author_id,
+    # Confirming that the app can deliver emails.
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
     )
+    if server_can_send_emails:
+        send_email_to_voiceover_admins_and_tech_leads_after_regeneration(
+            exploration_id,
+            exploration_title,
+            date_time,
+            language_accents_used_for_voiceover_regeneration,
+            error_collections_during_voiceover_regeneration,
+            number_of_contents_for_voiceover_regeneration,
+            number_of_contents_failed_to_regenerate,
+            author_id,
+        )
 
 
-def regenerate_voiceover_for_updated_exploration(
+def regenerate_voiceovers_for_updated_exploration(
     exploration_id: str,
     exploration_title: str,
     exploration_version: int,
@@ -1298,4 +1417,173 @@ def regenerate_voiceover_for_updated_exploration(
         language_code_to_contents_mapping,
         date_time,
         author_id,
+    )
+
+
+def regenerate_voiceovers_on_exploration_curation(
+    exploration_id: str,
+    date_time: str,
+    author_id: str,
+) -> None:
+    """Regenerates all voiceovers (in English and in all the available
+    translated languages) for the given exploration when it is curated — i.e.,
+    added to a published story.
+
+    NOTE: This is a time-intensive operation and must be executed via a
+    deferred task to ensure it runs asynchronously.
+
+    Args:
+        exploration_id: str. The ID of the exploration to regenerate
+            voiceovers for.
+        date_time: str. The timestamp when the exploration was curated.
+        author_id: str. The ID of the user who curated the exploration.
+    """
+    # A dictionary where each key is a language code, and each value is a
+    # content mapping dictionary. The content mapping dictionary contains
+    # content IDs as keys and their corresponding HTML content as values.
+    language_code_to_contents_mapping: Dict[str, Dict[str, str]] = {}
+
+    exploration = exp_fetchers.get_exploration_by_id(exploration_id)
+    assert exploration is not None
+
+    exploration_version = exploration.version
+    exploration_title = exploration.title
+
+    # Retrieve all English-language contents from the exploration.
+    language_code_to_contents_mapping.update(
+        extract_english_voiceover_texts_from_exploration(exploration)
+    )
+
+    # Retrieve all translated contents of the exploration.
+    entity_translations = (
+        translation_fetchers.get_all_entity_translations_for_entity(
+            feconf.TranslatableEntityType.EXPLORATION,
+            exploration_id,
+            exploration_version,
+        )
+    )
+    language_code_to_contents_mapping.update(
+        extract_translated_voiceover_texts_from_entity_translations(
+            entity_translations
+        )
+    )
+
+    _regenerate_voiceovers_for_given_contents(
+        exploration_id,
+        exploration_title,
+        exploration_version,
+        language_code_to_contents_mapping,
+        date_time,
+        author_id,
+    )
+
+
+def regenerate_voiceovers_of_exploration_for_given_language_accent(
+    exploration_id: str,
+    language_accent_code: str,
+    author_id: str,
+    date_time: str,
+) -> None:
+    """Regenerates voiceovers of the provided exploration for the given
+    language accent code.
+
+    NOTE: This is a time-intensive operation and must be executed via a
+    deferred task to ensure it runs asynchronously.
+
+    Args:
+        exploration_id: str. The ID of the exploration for which voiceovers
+            need to be regenerated.
+        language_accent_code: str. The language accent code for which
+            voiceovers need to be regenerated.
+        author_id: str. The ID of the user who initiated the voiceover
+            regeneration.
+        date_time: str. The timestamp when the voiceover regeneration was
+            initiated.
+
+    Raises:
+        Exception. If the provided language accent code is invalid.
+    """
+    # A dictionary where each key is a language code, and each value is a
+    # content mapping dictionary. The content mapping dictionary contains
+    # content IDs as keys and their corresponding HTML content as values.
+    language_code_to_contents_mapping: Dict[str, Dict[str, str]] = {}
+
+    language_code = get_language_code_from_language_accent_code(
+        language_accent_code
+    )
+
+    if language_code is None:
+        raise Exception(
+            'Invalid language accent code: %s' % language_accent_code
+        )
+
+    exploration = exp_fetchers.get_exploration_by_id(exploration_id)
+    assert exploration is not None
+
+    exploration_version = exploration.version
+    exploration_title = exploration.title
+
+    if language_code == constants.DEFAULT_LANGUAGE_CODE:
+        # Retrieve all English-language contents from the exploration.
+        language_code_to_contents_mapping.update(
+            extract_english_voiceover_texts_from_exploration(exploration)
+        )
+    else:
+        # Retrieve all translated contents of the exploration in the given
+        # language code.
+        entity_translation = translation_fetchers.get_entity_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            exploration_id,
+            exploration_version,
+            language_code,
+        )
+        language_code_to_contents_mapping.update(
+            extract_translated_voiceover_texts_from_entity_translations(
+                [entity_translation]
+            )
+        )
+
+    _regenerate_voiceovers_for_given_contents(
+        exploration_id,
+        exploration_title,
+        exploration_version,
+        language_code_to_contents_mapping,
+        date_time,
+        author_id,
+    )
+
+
+def generate_voiceover_from_translated_content(
+    exploration_id: str,
+    exploration_version: int,
+    translation_content: str,
+    content_id: str,
+    language_code: str,
+) -> None:
+    """Generates a new voiceover for translated content once translation
+    suggestions are approved by reviewers.
+
+    Args:
+        exploration_id: str. The ID of the exploration.
+        exploration_version: int. The version of the exploration.
+        translation_content: str. The translated content for which the
+            voiceover needs to be generated.
+        content_id: str. The content ID for which the voiceover is being
+            generated.
+        language_code: str. The language code for the voiceover.
+    """
+    language_code_to_contents_mapping = {
+        language_code: {content_id: translation_content}
+    }
+    exploration = exp_fetchers.get_exploration_by_id(exploration_id)
+    assert exploration is not None
+    exploration_title = exploration.title
+
+    _regenerate_voiceovers_for_given_contents(
+        exploration_id,
+        exploration_title,
+        exploration_version,
+        language_code_to_contents_mapping,
+        datetime.datetime.utcnow().isoformat(),
+        feconf.SYSTEM_COMMITTER_ID,
     )
