@@ -46,7 +46,7 @@
           </div>
           <div class="story-node-exploration">
             <label class="form-heading"> Exploration ID*</label>
-            <form class="form-horizontal">
+            <form class="row">
               <input class="form-control e2e-test-exploration-id-input" type="text" [(ngModel)]="explorationId" [ngModelOptions]="{standalone: true}" (change)="checkCanSaveExpId()"
                      (focus)="toggleExplorationInputButtons()">
               <div class="save-button-container" *ngIf="explorationInputButtonsAreShown">

@@ -11,7 +11,7 @@
 
 <div class="oppia-contributor-dashboard-admin-page-tabs-container" *ngIf="!isNewUiEnabled">
   <mat-card class="oppia-page-card oppia-long-text e2e-test-view-contribution-rights-form">
-    <form class="form-horizontal" (ngSubmit)="submitViewContributorUsersForm(formData.viewContributionReviewers)">
+    <form class="row" (ngSubmit)="submitViewContributorUsersForm(formData.viewContributionReviewers)">
       <legend class="text-center">View Contributor Dashboard Users</legend>
       <div class="d-xl-inline-flex mb-3">
         <label class="col-md-4 col-lg-4 col-sm-4 col-form-label" for="view-contributor-filter-method-select">
@@ -109,7 +109,7 @@
   </mat-card>
 
   <mat-card class="oppia-page-card oppia-long-text e2e-test-add-contribution-rights-form">
-    <form class="form-horizontal" (ngSubmit)="submitAddContributionRightsForm(formData.addContributionReviewer)">
+    <form class="row" (ngSubmit)="submitAddContributionRightsForm(formData.addContributionReviewer)">
       <legend class="text-center">Add Contribution Rights</legend>
       <div class="d-xl-inline-flex mb-3">
         <label for="add-contribution-rights-user-input" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
@@ -154,7 +154,7 @@
   </mat-card>
 
   <mat-card class="oppia-page-card oppia-long-text e2e-test-remove-reviewer-form">
-    <form class="form-horizontal" (ngSubmit)="submitRemoveContributionRightsForm(formData.removeContributionReviewer)">
+    <form class="row" (ngSubmit)="submitRemoveContributionRightsForm(formData.removeContributionReviewer)">
       <legend class="text-center">Remove Contribution Rights</legend>
       <div class="d-xl-inline-flex mb-3">
         <label for="remove-contribution-rights-user-input" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
@@ -203,7 +203,7 @@
   </mat-card>
 
   <mat-card class="oppia-page-card oppia-long-text" *ngIf="UserIsTranslationAdmin">
-    <form class="form-horizontal"
+    <form class="row"
           (ngSubmit)="submitViewTranslationContributionStatsForm(formData.viewTranslationContributionStats)">
       <legend class="text-center">View Translation Contribution Stats</legend>
       <div class="d-xl-inline-flex mb-3">
