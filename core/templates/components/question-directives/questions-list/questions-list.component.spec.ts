@@ -1701,7 +1701,7 @@ describe('Questions List Component', () => {
   it('should handle showUnaddressedSkillMisconceptionWarning with no matching ids', () => {
     component.selectedSkillId = 'skillId1';
     component.misconceptionIdsForSelectedSkill = [1, 2];
-    spyOn((component as any).utilsService, 'isEquivalent').and.returnValue(
+    spyOn(asPrivates(component).utilsService, 'isEquivalent').and.returnValue(
       false
     );
     const result = component.showUnaddressedSkillMisconceptionWarning([
