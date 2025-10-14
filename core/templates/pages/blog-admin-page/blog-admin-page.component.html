@@ -9,7 +9,7 @@
     <div class="col-md-8 me-auto ms-auto">
       <div class="roles-tab">
         <mat-card class="oppia-page-card oppia-long-text">
-          <form class="row" (submit)="submitUpdateRoleForm(formData.updateRole)">
+          <form class="form-horizontal" (submit)="submitUpdateRoleForm(formData.updateRole)">
             <legend class="text-center">Update Role</legend>
             <div class="d-xl-inline-flex mb-3">
               <label for="label-target-update-form-name" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
@@ -43,7 +43,7 @@
         </mat-card>
 
         <mat-card class="oppia-page-card oppia-long-text">
-          <form class="row" (submit)="submitRemoveEditorRoleForm(formData.removeEditorRole)">
+          <form class="form-horizontal" (submit)="submitRemoveEditorRoleForm(formData.removeEditorRole)">
             <legend class="text-center">Remove Blog Editor</legend>
             <div class="d-xl-inline-flex mb-3">
               <label for="label-target-form-reviewer-username" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
@@ -99,7 +99,7 @@
     padding: 30px 55px 30px 45px;
     position: relative;
   }
-  .roles-tab .row .col-form-label {
+  .roles-tab .form-horizontal .col-form-label {
     padding-left: 0;
     text-align: left;
   }
