@@ -7,7 +7,13 @@
       <div class="classroom-name-container">
         <p class="classroom-name">{{ storySummary.getClassroomName() }}</p>
       </div>
-      <a [href]="getStoryLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}" class="oppia-story-link">
+      <a class="oppia-story-link"
+         [attr.href]="statusIsPublished ? getStoryLink() : null"
+         [title]="!statusIsPublished ? ('I18N_LEARNER_STORY_TILE_COMING_SOON_TOOLTIP' | translate) : ''"
+         (click)="onStoryClick($event)"
+         (contextmenu)="onStoryClick($event)"
+         [attr.tabindex]="statusIsPublished ? 0 : -1"
+         target="{{ statusIsPublished && openInNewWindow ? '_blank' : '_self' }}">
         <div class="story-card">
           <div class="oppia-title-section" [ngStyle]="{'background-color': thumbnailBgColor}">
               <!-- We add an empty alt text so that the screen reader does not read the thumbnail image filename and ignores it as the thumbnail does not convey any significant information. -->
@@ -30,7 +36,7 @@
         </div>
         <div class="continue-button" *ngIf="isDisplayAreaHome()">
           <p class="continue-button-text">
-            Continue
+            {{ statusIsPublished ? ('I18N_LEARNER_STORY_TILE_CONTINUE' | translate) : ('I18N_LEARNER_STORY_TILE_COMING_SOON' | translate) }}
           </p>
         </div>
       </a>

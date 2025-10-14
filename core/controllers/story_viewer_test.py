@@ -824,10 +824,10 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
 
         csrf_token = self.get_new_csrf_token()
         story_services.record_completed_node_in_story_context(
-            self.viewer_id, self.STORY_ID, self.NODE_ID_2
+            self.viewer_id, self.STORY_ID, self.NODE_ID_1
         )
         story_services.record_completed_node_in_story_context(
-            self.viewer_id, self.STORY_ID, self.NODE_ID_1
+            self.viewer_id, self.STORY_ID, self.NODE_ID_2
         )
         self.post_json(
             '%s/staging/topic/%s/%s'
@@ -835,6 +835,20 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
                 feconf.STORY_PROGRESS_URL_PREFIX,
                 self.STORY_URL_FRAGMENT,
                 self.NODE_ID_3,
+            ),
+            {},
+            csrf_token=csrf_token,
+        )
+
+        story_services.record_completed_node_in_story_context(
+            self.viewer_id, self.NEW_STORY_ID, self.NODE_ID_1
+        )
+        self.post_json(
+            '%s/staging/topic/%s/%s'
+            % (
+                feconf.STORY_PROGRESS_URL_PREFIX,
+                self.STORY_URL_FRAGMENT_TWO,
+                self.NODE_ID_1,
             ),
             {},
             csrf_token=csrf_token,
@@ -848,13 +862,14 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             ),
             1,
         )
+
         self.assertEqual(
             len(
                 learner_progress_services.get_all_completed_story_ids(
                     self.viewer_id
                 )
             ),
-            1,
+            2,
         )
 
         def _mock_none_function(_: str) -> None:
