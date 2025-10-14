@@ -593,5 +593,12 @@ describe('LessonCardComponent', () => {
 
       expect(component.isNewChapterLabelVisible()).toBe(true);
     });
+
+    it('should return FALSE if publication date is null', () => {
+      component.storyNode.setFirstPublicationDateMsecs(null);
+      component.storyNode.setTitle('A New, Unvisited Chapter');
+
+      expect(component.isNewChapterLabelVisible()).toBe(false);
+    });
   });
 });

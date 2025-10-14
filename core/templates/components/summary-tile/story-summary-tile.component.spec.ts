@@ -835,5 +835,13 @@ describe('StorySummaryTileComponent', () => {
       const isVisible = component.isNewChapterLabelVisible(component.nodes[0]);
       expect(isVisible).toBe(false);
     });
+
+    it('should return FALSE if publication date is null', () => {
+      component.nodes[0].setFirstPublicationDateMsecs(null);
+      (storySummary.isNodeCompleted as jasmine.Spy).and.returnValue(false);
+
+      const isVisible = component.isNewChapterLabelVisible(component.nodes[0]);
+      expect(isVisible).toBe(false);
+    });
   });
 });
