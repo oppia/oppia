@@ -1843,6 +1843,7 @@ describe('Questions List Component', () => {
     spyOn(questionsListService, 'getQuestionSummariesAsync');
 
     // Directly call private method via bracket notation.
+    // eslint-disable-next-line dot-notation
     component['_initTab'](true);
     tick();
 
@@ -1903,6 +1904,7 @@ describe('Questions List Component', () => {
     spyOn(questionsListService, 'getQuestionSummariesAsync');
     spyOn(component, 'getQuestionSummariesForOneSkill');
 
+    // eslint-disable-next-line dot-notation
     component['_initTab'](true);
 
     expect(skillBackendApiService.fetchSkillAsync).not.toHaveBeenCalled();
@@ -1930,7 +1932,7 @@ describe('Questions List Component', () => {
       Promise.resolve({
         associated_skill_dicts: null,
         questionObject: question,
-      } as any)
+      } as FetchQuestionResponse)
     );
     spyOn(component, 'openQuestionEditor');
 
