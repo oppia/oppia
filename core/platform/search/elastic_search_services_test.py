@@ -22,7 +22,7 @@ from core.domain import search_services
 from core.platform.search import elastic_search_services
 from core.tests import test_utils
 
-from typing import Any, Dict, List, Mapping, Sequence
+from typing import Any, Dict, List, Mapping
 
 
 class ElasticSearchUnitTests(test_utils.GenericTestBase):
@@ -34,10 +34,12 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
 
         def mock_index(
             index: str,
-            documents: Sequence[Mapping[str, Any]],
+            document: Mapping[str, str],
             id: str,  # pylint: disable=redefined-builtin
         ) -> Dict[str, Dict[str, int]]:
+
             self.assertEqual(index, correct_index_name)
+            self.assertEqual(document, {'id': correct_id})
             self.assertEqual(id, correct_id)
             return {'_shards': {'failed': 0}}
 
@@ -53,12 +55,12 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
 
         def mock_index(
             index: str,
-            body: Dict[str, str],
+            document: Mapping[str, str],
             id: str,  # pylint: disable=redefined-builtin
         ) -> Dict[str, Dict[str, int]]:
             self.assertEqual(index, correct_index_name)
             self.assertEqual(id, correct_id)
-            self.assertEqual(body, {'id': correct_id})
+            self.assertEqual(document, {'id': correct_id})
             return {'_shards': {'failed': 2}}
 
         documents = [{'id': correct_id}]

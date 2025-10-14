@@ -697,7 +697,9 @@ class ElasticSearchStub:
             '_type': '_doc',
         }
 
-    def mock_exists(self, index: str, id: str) -> bool:
+    def mock_exists(
+        self, index: str, id: str  # pylint: disable=redefined-builtin
+    ) -> bool:
         """Checks whether a document with the given ID exists in the mock
         database.
 
@@ -715,13 +717,15 @@ class ElasticSearchStub:
             self._generate_index_not_found_error(index)
         return any(d['id'] == id for d in self._DB[index])
 
-    def mock_delete(self, index: str, id: str) -> ExistingIndexDict:
+    def mock_delete(
+        self, index: str, id: str  # pylint: disable=redefined-builtin
+    ) -> ExistingIndexDict:
         """Deletes a document from an index in the mock database. Does nothing
         if the document is not in the index.
 
         Args:
             index: str. The name of the index to delete the document from.
-            id_: str. The document id to be deleted from the index.
+            id: str. The document id to be deleted from the index.
 
         Returns:
             dict. A dict representing the ElasticSearch API response.
