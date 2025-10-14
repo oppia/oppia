@@ -4,23 +4,33 @@
   <div class="oppia-learner-dash-goals-modal-content pt-1 e2e-test-new-goals-list" mat-dialog-content>
     <!--TODO(#18384): What if all the goals are completed, should they be disabled and checked?-->
     <!--TODO(#18384): Topic name translate keys-->
-    <ng-container *ngFor="let topic of topics | keyvalue">
+    <ng-container *ngFor="let topic of getPublishedTopics() | keyvalue">
       <mat-checkbox color="primary"
                     class="oppia-learner-dash-goals-checkbox"
                     (change)="onChange(topic.key)"
                     [checked]="checkedTopics.has(topic.key) || completedTopics.has(topic.key)"
-                    [disabled]="checkedTopics.size === 5 && !checkedTopics.has(topic.key) || completedTopics.has(topic.key)">
+                    [disabled]="isCheckboxDisabled(topic.key)">
         <span class="oppia-learner-dash-goals-checkbox-text"> {{ topic.value }} </span>
       </mat-checkbox>
     </ng-container>
   </div>
   <div class="oppia-learner-dash-goals-modal-actions w-100" mat-dialog-actions>
     <button (click)="onClose()" class="oppia-learner-dash-button--inverse oppia-learner-dash-button-sm oppia-learner-dash-button--modal outline" mat-button> {{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_MODAL_CANCEL' | translate }} </button>
-    <button (click)="onSubmit()" class="oppia-learner-dash-button--default oppia-learner-dash-button-sm oppia-learner-dash-button--modal e2e-test-add-new-goal-button" mat-button> {{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_MODAL_SAVE' | translate }} </button>
+    <button (click)="onSubmit()" [disabled]="isSaveDisabled" class="oppia-learner-dash-button--default oppia-learner-dash-button-sm oppia-learner-dash-button--modal e2e-test-add-new-goal-button" mat-button> {{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_MODAL_SAVE' | translate }} </button>
   </div>
 </div>
 
 <style>
+  .oppia-learner-dash-button--default[disabled],
+  .oppia-learner-dash-button--default:disabled {
+    background-color: #f2f2f2 !important;
+    border: 1px solid #ccc !important;
+    color: #888 !important;
+    cursor: not-allowed;
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
   .oppia-learner-dash-button--modal {
     height: 44px;
     width: 178px;
@@ -43,10 +53,11 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: normal;
-    word-break: break-all;
+    word-break: break-word;
   }
 
   .oppia-learner-dash-goals-modal-content {
+    box-sizing: border-box;
     display: grid;
     gap: 0 4px;
     grid-template-columns: repeat(3, 1fr);
@@ -101,8 +112,39 @@
     }
 
     .oppia-learner-dash-goals-modal-content {
+      gap: 16px 8px;
       grid-template-columns: repeat(2, 1fr);
     }
   }
+  @media screen and (max-width: 480px) {
+    .oppia-learner-dash-goals-modal-content {
+      padding: 20px 16px;
+    }
+
+    .oppia-learner-dash-goals-checkbox {
+      align-items: center;
+      display: flex;
+      min-height: 48px;
+    }
+  }
+
+@media screen and (max-width: 360px) {
+  .mat-dialog-actions .mat-button-base+.mat-button-base,
+  .mat-dialog-actions .mat-mdc-button-base+.mat-mdc-button-base {
+    margin-left: 0 !important;
+    margin-top: 8px;
+  }
+
+  .oppia-learner-dash-goals-modal-actions {
+    align-items: stretch;
+    gap: 0;
+  }
+
+  .oppia-learner-dash-button--modal {
+    max-width: none !important;
+    width: 100% !important;
+  }
+}
+
 
 </style>

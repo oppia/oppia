@@ -44,6 +44,7 @@ export class LessonCardComponent implements OnInit {
   progress!: number;
   title!: string;
   lessonTopic!: string;
+  statusIsPublished!: boolean;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -142,7 +143,9 @@ export class LessonCardComponent implements OnInit {
     );
 
     this.title = `Chapter ${nextStory + 1}: ${storyModel.getNodeTitles()[nextStory]}`;
-
+    this.statusIsPublished = storyModel
+      .getAllNodes()
+      [nextStory].getPublishedStatus();
     this.progress = Math.floor(
       (completedStories / storyModel.getNodeTitles().length) * 100
     );

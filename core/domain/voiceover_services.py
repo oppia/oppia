@@ -1165,7 +1165,7 @@ def extract_english_voiceover_texts_from_exploration(
     return language_code_to_contents_mapping
 
 
-def extract_translated_voiceover_texts_from_exploration(
+def extract_translated_voiceover_texts_from_entity_translations(
     entity_translations: List[translation_domain.EntityTranslation],
 ) -> Dict[str, Dict[str, str]]:
     """Retrieves translated voiceover texts from an exploration’s entity
@@ -1463,7 +1463,9 @@ def regenerate_voiceovers_on_exploration_curation(
         )
     )
     language_code_to_contents_mapping.update(
-        extract_translated_voiceover_texts_from_exploration(entity_translations)
+        extract_translated_voiceover_texts_from_entity_translations(
+            entity_translations
+        )
     )
 
     _regenerate_voiceovers_for_given_contents(
@@ -1536,7 +1538,7 @@ def regenerate_voiceovers_of_exploration_for_given_language_accent(
             language_code,
         )
         language_code_to_contents_mapping.update(
-            extract_translated_voiceover_texts_from_exploration(
+            extract_translated_voiceover_texts_from_entity_translations(
                 [entity_translation]
             )
         )
