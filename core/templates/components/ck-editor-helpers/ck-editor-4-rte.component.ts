@@ -58,7 +58,7 @@ import {InternetConnectivityService} from 'services/internet-connectivity.servic
 import {Subscription} from 'rxjs';
 
 interface UiConfig {
-  (): UiConfig;
+  
   rte_component_config_id: string;
   hide_complex_extensions: boolean;
   startupFocusEnabled?: boolean;
@@ -83,12 +83,13 @@ export interface RteConfig extends CKEDITOR.config {
 export class CkEditor4RteComponent
   implements AfterViewInit, OnChanges, OnDestroy, OnInit
 {
-  @Input() uiConfig: UiConfig;
-  @Input() value;
+  @Input() uiConfig!: UiConfig;
+  @Input() value!: string;
+
   @Output() valueChange: EventEmitter<string> = new EventEmitter();
   rteHelperService;
-  ck: CKEDITOR.editor;
-  currentValue: string;
+  ck!: CKEDITOR.editor;
+  currentValue!: string;
   connectedToInternet = true;
   headersEnabled = false;
   windowIsNarrow = false;
@@ -103,7 +104,7 @@ export class CkEditor4RteComponent
   pendingPasteValidContent: string | null = null;
   showPasteConfirmation: boolean = false;
 
-  @ViewChild('oppiaRTE') oppiaRTE: ElementRef;
+  @ViewChild('oppiaRTE') oppiaRTE!: ElementRef;
 
   constructor(
     private ckEditorCopyContentService: CkEditorCopyContentService,
@@ -142,7 +143,10 @@ export class CkEditor4RteComponent
     }
 
     const rteComponents = this.uiConfig.rte_component_config_id;
-    const componentList = AppConstants.RTE_COMPONENT_CONFIGS[rteComponents];
+    const componentList = (AppConstants.RTE_COMPONENT_CONFIGS as any)[
+      rteComponents as keyof typeof AppConstants.RTE_COMPONENT_CONFIGS
+    ];
+    
 
     if (!componentList) {
       this.configError = `Component set "${rteComponents}" is not defined in AppConstants.RTE_COMPONENT_CONFIGS.`;
@@ -391,7 +395,7 @@ export class CkEditor4RteComponent
     pluginNames: string,
     buttonNames: string[],
     extraAllowedContentRules: string,
-    sharedSpaces: CKEDITOR.sharedSpace
+    sharedSpaces: { top?: HTMLElement; bottom?: HTMLElement }
   ): CKEDITOR.config {
     // Language configs use default language when undefined.
     const ckConfig: RteConfig = {
@@ -475,7 +479,7 @@ export class CkEditor4RteComponent
     if (html === undefined) {
       return html;
     }
-    return html.replace(this.componentRe, (match, p1, p2, p3) => {
+    return html.replace(this.componentRe, (match: string, p1: string, p2: string, p3: string) => {
       // Here we remove the 'ckeditor' part of the string p3 to get the name
       // of the RTE Component.
       let rteComponentName = p3.split('-')[1];
@@ -503,9 +507,9 @@ export class CkEditor4RteComponent
   } {
     const _RICH_TEXT_COMPONENTS = this.rteHelperService.getRichTextComponents();
     const result = {
-      names: [],
-      icons: [],
-      componentsThatRequireInternet: [],
+      names: [] as string[],
+      icons: [] as string[],
+      componentsThatRequireInternet: [] as string[],
     };
 
     if (this.configError) {
@@ -514,10 +518,10 @@ export class CkEditor4RteComponent
 
     // Get component list from AppConstants.
     const rteComponents = this.uiConfig.rte_component_config_id;
-    const componentList = AppConstants.RTE_COMPONENT_CONFIGS[rteComponents];
+    const componentList = (AppConstants.RTE_COMPONENT_CONFIGS as any)[rteComponents];
 
     // Filter components based on the defined list and other criteria.
-    _RICH_TEXT_COMPONENTS.forEach(componentDefn => {
+    _RICH_TEXT_COMPONENTS.forEach((componentDefn: any) => {
       // Check if component is in the specified component list.
       const isInComponentList = componentList.includes(componentDefn.id);
 
@@ -589,9 +593,10 @@ export class CkEditor4RteComponent
         return 'oppia' + name;
       })
       .join(',');
-    var buttonNames = [];
+    var buttonNames: string[] = [];
+
     if (this.pageContextService.canAddOrEditComponents()) {
-      names.forEach(name => {
+      names.forEach((name: string, index: number) => {
         buttonNames.push('Oppia' + name);
         buttonNames.push('-');
       });
@@ -685,9 +690,10 @@ export class CkEditor4RteComponent
       const buttonIcons =
         this.elementRef.nativeElement.querySelectorAll('.cke_button_icon');
 
-      buttonIcons.forEach(buttonIcon => {
+      buttonIcons.forEach((buttonIcon: HTMLElement) => {
+        if(buttonIcon){
         this.renderer.setStyle(buttonIcon, 'height', '24px');
-        this.renderer.setStyle(buttonIcon, 'width', '24px');
+        this.renderer.setStyle(buttonIcon, 'width', '24px')}
       });
 
       var changeComboPanel = () => {
@@ -739,7 +745,7 @@ export class CkEditor4RteComponent
     });
 
     // Add paste event listener to validate pasted content.
-    ck.on('paste', event => {
+    ck.on('paste', (event: { data: { dataValue: string }; cancel: () => void }) => {
       const pastedData = event.data.dataValue || '';
       const validation = this.validatePastedContent(pastedData);
 
@@ -777,7 +783,7 @@ export class CkEditor4RteComponent
     // we hide all of that stuff away from CKEditor.
     ck.on(
       'getSnapshot',
-      event => {
+      (event: { data?: string }) => {
         if (event.data === undefined) {
           return;
         }
@@ -810,7 +816,7 @@ export class CkEditor4RteComponent
           const node = parent.childNodes[j - 1];
           if (
             node.nodeName === 'BR' ||
-            (node.nodeName === '#text' && node.nodeValue.trim() === '')
+            (node.nodeName === '#text' && node.nodeValue?.trim() === '')
           ) {
             node.remove();
           } else {
@@ -820,7 +826,7 @@ export class CkEditor4RteComponent
         if (parent.childNodes.length === 0) {
           if (
             parent.nodeName === 'BR' ||
-            (parent.nodeName === '#text' && parent.nodeValue.trim() === '') ||
+            (parent.nodeName === '#text' && parent.nodeValue?.trim() === '') ||
             parent.nodeName === 'P'
           ) {
             parent.remove();

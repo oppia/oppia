@@ -39,7 +39,7 @@ import {SchemaValidators} from '../validators/schema-validators';
   ],
 })
 export class ApplyValidationDirective implements Validator {
-  @Input() validators: OppiaValidator[];
+  @Input() validators!: OppiaValidator[];
   underscoresToCamelCasePipe = new UnderscoresToCamelCasePipe();
   validate(control: AbstractControl): ValidationErrors | null {
     if (!this.validators || this.validators.length === 0) {
@@ -51,15 +51,17 @@ export class ApplyValidationDirective implements Validator {
       const validatorName = this.underscoresToCamelCasePipe.transform(
         validatorSpec.id
       );
-      const filterArgs = {};
+      const filterArgs : {[key: string]: any}={};
       for (let key in validatorSpec) {
         if (key !== 'id') {
           filterArgs[this.underscoresToCamelCasePipe.transform(key)] =
-            cloneDeep(validatorSpec[key]);
+            cloneDeep((validatorSpec as any)[key]);
         }
       }
-      if (SchemaValidators[validatorName]) {
-        const error = SchemaValidators[validatorName](filterArgs)(control);
+      const schemaValidatorsDict = SchemaValidators as {[key: string]: any};
+
+      if (schemaValidatorsDict[validatorName]) {
+        const error = schemaValidatorsDict[validatorName](filterArgs)(control);
         if (error !== null) {
           errorsPresent = true;
           allValidationErrors = {...allValidationErrors, ...error};

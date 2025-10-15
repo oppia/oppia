@@ -31,7 +31,7 @@ if (typeof String.prototype.trim !== 'function') {
 if (typeof Object.create !== 'function') {
   (function () {
     var F = function () {};
-    Object.create = function (o) {
+    Object.create = function (o: any) {
       if (arguments.length > 1) {
         throw new Error('Second argument for Object.create() is not supported');
       }
@@ -42,7 +42,7 @@ if (typeof Object.create !== 'function') {
         throw new TypeError('Argument must be an object');
       }
       F.prototype = o;
-      return new F();
+      return new (F as any)();
     };
   })();
 }
@@ -61,7 +61,7 @@ Number.isInteger =
 // Add Array.fill() polyfill for IE.
 if (!Array.prototype.fill) {
   Object.defineProperty(Array.prototype, 'fill', {
-    value: function (value) {
+    value: function (value: any) {
       // Steps 1-2.
       if (this === null) {
         throw new TypeError('this is null or not defined');
@@ -163,16 +163,16 @@ if (navigator.mediaDevices.getUserMedia === undefined) {
   };
 }
 
-// Object.entries() polyfill for Chrome 53 and below.
+// Object.entries() polyfill for Chrome 53 and below
 if (!Object.entries) {
-  Object.entries = (obj: Object) => {
+  Object.entries = (obj: Object): [string, any][] => {
     let objectProperties = Object.keys(obj);
     let i = objectProperties.length;
     let objectEntriesArray = new Array(i); // Preallocate the array.
 
     while (i--) {
-      objectEntriesArray[i] = [objectProperties[i], obj[objectProperties[i]]];
-      return objectEntriesArray;
+      objectEntriesArray[i] = [objectProperties[i], (obj as any)[objectProperties[i]]];
     }
+    return objectEntriesArray;
   };
 }

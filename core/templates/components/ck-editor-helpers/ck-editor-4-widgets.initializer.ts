@@ -38,20 +38,21 @@ export interface RteComponentSpecs {
 }
 
 export interface RteHelperService {
-  createCustomizationArgDictFromAttrs: (attrs) => Record<string, string>;
+  createCustomizationArgDictFromAttrs: (attrs:any) => Record<string, string>;
   getRichTextComponents: () => RteComponentSpecs[];
-  isInlineComponent: (string) => boolean;
+  isInlineComponent: (arg0: string) => boolean;
   openCustomizationModal: (
-    componentIsNewlyCreated,
-    componentId,
-    customizationArgSpecs,
-    attrsCustomizationArgsDict,
-    onSubmitCallback,
-    onDismissCallback
+    componentIsNewlyCreated: boolean,
+    componentId: string,
+    customizationArgSpecs: any,
+    attrsCustomizationArgsDict:any,
+    onSubmitCallback: any,
+    onDismissCallback: any
   ) => void;
 }
 
 import {Injectable} from '@angular/core';
+import { boolean } from 'mathjs';
 
 @Injectable({
   providedIn: 'root',
@@ -69,7 +70,7 @@ export class CkEditorInitializerService {
     }
     ngZone.runOutsideAngular(() => {
       var _RICH_TEXT_COMPONENTS = rteHelperService.getRichTextComponents();
-      _RICH_TEXT_COMPONENTS.forEach(function (componentDefn) {
+      _RICH_TEXT_COMPONENTS.forEach(function (componentDefn: any) {
         // The name of the CKEditor widget corresponding to this component.
         var ckName = 'oppia' + componentDefn.id;
 
@@ -110,7 +111,7 @@ export class CkEditorInitializerService {
             '</div>';
         }
         CKEDITOR.plugins.add(ckName, {
-          init: function (editor) {
+          init: function (editor: any) {
             // Create the widget itself.
             editor.widgets.add(ckName, {
               button: componentDefn.tooltip,
@@ -127,23 +128,23 @@ export class CkEditorInitializerService {
                   dontUpdate: true,
                 });
                 // Save this for creating the widget later.
-                var container = this.wrapper.getParent(true);
+                var container = this.wrapper?.getParent(true);
                 var that = this;
-                var customizationArgs = {};
-                customizationArgSpecs.forEach(function (spec) {
-                  customizationArgs[spec.name] =
-                    that.data[spec.name] || spec.default_value;
+                var customizationArgs: { [key: string]: any } = {};
+                customizationArgSpecs.forEach(function (spec: any) {
+                  (customizationArgs as any)[spec.name] =
+                    (that.data as any)[spec.name] || spec.default_value;
                 });
 
-                const componentIsNewlyCreated: boolean = !that.isReady();
+                const componentIsNewlyCreated: boolean = !(that.isReady?.() ?? false);
 
                 rteHelperService.openCustomizationModal(
                   componentIsNewlyCreated,
                   componentId,
                   customizationArgSpecs,
                   customizationArgs,
-                  function (customizationArgsDict) {
-                    that.data.isCopied = false;
+                  function (customizationArgsDict: { [key: string]: any }) {
+                    (that.data as any).isCopied = false;
                     for (var arg in customizationArgsDict) {
                       if (customizationArgsDict.hasOwnProperty(arg)) {
                         that.setData(arg, customizationArgsDict[arg]);
@@ -155,18 +156,19 @@ export class CkEditorInitializerService {
                      * has already been inserted into the RTE, we do not
                      * need to finalizeCreation again).
                      */
-                    if (componentIsNewlyCreated) {
+                    if (componentIsNewlyCreated && container) {
                       // Actually create the widget, if we have not already.
                       editor.widgets.finalizeCreation(container);
                     }
 
                     if (isInline) {
                       var range = editor.createRange();
-                      var widgetContainer = that.element.getParent();
+                      var widgetContainer = that.element?.getParent();
+                      if(widgetContainer) {
                       range.moveToPosition(
                         widgetContainer,
                         CKEDITOR.POSITION_AFTER_END
-                      );
+                      )};
                       editor.getSelection().selectRanges([range]);
                       // Another timeout needed so the undo snapshot is
                       // not taken until the caret is in the right place.
@@ -179,17 +181,17 @@ export class CkEditorInitializerService {
                       editor.fire('saveSnapshot');
                     }
                   },
-                  function (widgetShouldBeRemoved) {
+                  function (widgetShouldBeRemoved:boolean) {
                     if (widgetShouldBeRemoved || that.data.isCopied) {
                       const defaultValueObtainableFromHighlight =
-                        customizationArgSpecs.some(function (spec) {
+                        customizationArgSpecs.some(function (spec: any) {
                           return spec.default_value_obtainable_from_highlight;
                         });
 
                       that.data.isCopied = false;
                       var newWidgetSelector =
                         '[data-cke-widget-id="' + that.id + '"]';
-                      if (newWidgetSelector === null) {
+                      if (!newWidgetSelector) {
                         return;
                       }
                       var widgetElement = editor
@@ -224,7 +226,7 @@ export class CkEditorInitializerService {
                * This is how the widget will be represented in the outputs
                * source, so it is called when we call editor.getData().
                */
-              downcast: function (element) {
+              downcast: function (element: any) {
                 // Clear the angular rendering content, which we don't
                 // want in the output.
                 (element.children[0] as CKEDITOR.htmlParser.element).setHtml(
@@ -238,7 +240,7 @@ export class CkEditorInitializerService {
                * when we first load data in. Returns a boolean,
                * true iff "element" is an instance of this widget.
                */
-              upcast: function (element) {
+              upcast: function (element: any) {
                 return (
                   element.name !== 'p' &&
                   element.children.length > 0 &&
@@ -249,9 +251,9 @@ export class CkEditorInitializerService {
               data: function () {
                 var that = this;
                 // Set attributes of component according to data values.
-                customizationArgSpecs.forEach(function (spec) {
+                customizationArgSpecs.forEach(function (spec : any) {
                   let arr = spec.name.split('_');
-                  let capital = arr.map((item, index) =>
+                  let capital = arr.map((item: any, index: any) =>
                     // eslint-disable-next-line max-len
                     index
                       ? item.charAt(0).toUpperCase() +
@@ -267,30 +269,36 @@ export class CkEditorInitializerService {
                   const selection = that.editor
                     .getSelection()
                     .getSelectedText();
-                  if (!that.data[spec.name]) {
+                  if (!(that.data as any)[spec.name]) {
                     if (
                       spec.default_value_obtainable_from_highlight &&
                       selection
                     ) {
-                      that.setData(spec.name, selection);
+                      (that as any).setData(spec.name, selection);
                     }
                   }
 
                   capital.join('');
-                  const customEl = that.element.getChild(0).$;
-                  customEl[capital.join('') + 'WithValue'] =
+                  const child = that.element.getChild(0);
+                  if(child){
+                  const customEl = child.$;
+                  customEl[capital.join('') + 'WithValue'] = 
+                  child.setAttribute(
+                    spec.name + '-with-value',
                     htmlEscaperService.objToEscapedJson(
-                      that.data[spec.name] !== undefined
-                        ? that.data[spec.name]
+                      (that.data as any)[spec.name] !== undefined
+                        ? (that.data as any)[spec.name]
                         : ''
-                    );
+                    )
+                  )
+                    };
                   that.element
                     .getChild(0)
                     .setAttribute(
                       spec.name + '-with-value',
                       htmlEscaperService.objToEscapedJson(
-                        that.data[spec.name] !== undefined
-                          ? that.data[spec.name]
+                        (that.data as any)[spec.name] !== undefined
+                          ? (that.data as any)[spec.name]
                           : ''
                       )
                     );
@@ -301,14 +309,14 @@ export class CkEditorInitializerService {
                   dontUpdate: true,
                 });
                 var that = this;
-                that.initialSnapshot = editor.getSnapshot();
+                (that as any).initialSnapshot = editor.getSnapshot();
                 // On init, read values from component attributes and save them.
-                customizationArgSpecs.forEach(function (spec) {
+                customizationArgSpecs.forEach(function (spec: any) {
                   var value = that.element
                     .getChild(0)
                     .getAttribute(spec.name + '-with-value');
                   if (value) {
-                    that.setData(
+                    (that as any).setData(
                       spec.name,
                       htmlEscaperService.escapedJsonToObj(value)
                     );
