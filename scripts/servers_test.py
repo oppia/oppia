@@ -530,7 +530,7 @@ class ManagedProcessTests(test_utils.TestBase):
 
         self.assertEqual(
             popen_calls[0].program_args,
-            '%s/bin/elasticsearch -q -E xpack.security.enabled=false -E xpack.security.transport.ssl.enabled=false'
+            '%s/bin/elasticsearch -q -E discovery.type=single-node -E xpack.security.enabled=false -E xpack.security.transport.ssl.enabled=false -E xpack.security.http.ssl.enabled=false'
             % common.ES_PATH,
         )
         self.assertEqual(
