@@ -111,8 +111,8 @@ export class HomeTabComponent {
           this.hasMultipleUnfinishedPublished =
             publishedNodes.length > 1 && remainingPublished > 0;
         }
-
-        if (publishedNodes.length > completedNodes.length) {
+        const remainingNodes = publishedNodes.length - completedNodes.length;
+        if (remainingNodes >= 2) {
           this.storySummariesWithAvailableNodes.add(
             currentStorySummary[j].getId()
           );
