@@ -27,12 +27,12 @@ from core.tests import test_utils
 from typing import Dict, Final, List
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import base_models, topic_models
 
-(base_models, topic_models, user_models) = models.Registry.import_models([
-    models.Names.BASE_MODEL, models.Names.TOPIC, models.Names.USER
-])
+(base_models, topic_models, user_models) = models.Registry.import_models(
+    [models.Names.BASE_MODEL, models.Names.TOPIC, models.Names.USER]
+)
 
 
 class TopicSnapshotContentModelTests(test_utils.GenericTestBase):
@@ -40,7 +40,8 @@ class TopicSnapshotContentModelTests(test_utils.GenericTestBase):
     def test_get_deletion_policy_is_not_applicable(self) -> None:
         self.assertEqual(
             topic_models.TopicSnapshotContentModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.NOT_APPLICABLE)
+            base_models.DELETION_POLICY.NOT_APPLICABLE,
+        )
 
 
 class TopicModelUnitTests(test_utils.GenericTestBase):
@@ -53,17 +54,16 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             topic_models.TopicModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.NOT_APPLICABLE)
+            base_models.DELETION_POLICY.NOT_APPLICABLE,
+        )
 
     def test_that_subsidiary_models_are_created_when_new_model_is_saved(
-        self
+        self,
     ) -> None:
         """Tests the _trusted_commit() method."""
 
         topic_rights = topic_models.TopicRightsModel(
-            id=self.TOPIC_ID,
-            manager_ids=[],
-            topic_is_published=True
+            id=self.TOPIC_ID, manager_ids=[], topic_is_published=True
         )
         # Topic is created but not committed/saved.
         topic = topic_models.TopicModel(
@@ -75,11 +75,12 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
             canonical_name=self.TOPIC_CANONICAL_NAME,
             subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
             story_reference_schema_version=(
-                feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION),
+                feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION
+            ),
             next_subtopic_id=1,
             language_code='en',
             page_title_fragment_for_web='fragm',
-            skill_ids_for_diagnostic_test=[]
+            skill_ids_for_diagnostic_test=[],
         )
         # We check that topic has not been saved before calling commit().
         self.assertIsNone(topic_models.TopicModel.get_by_name(self.TOPIC_NAME))
@@ -88,12 +89,12 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
         topic_rights.commit(
             committer_id=feconf.SYSTEM_COMMITTER_ID,
             commit_message='Created new topic rights',
-            commit_cmds=[{'cmd': topic_domain.CMD_CREATE_NEW}]
+            commit_cmds=[{'cmd': topic_domain.CMD_CREATE_NEW}],
         )
         topic.commit(
             committer_id=feconf.SYSTEM_COMMITTER_ID,
             commit_message='Created new topic',
-            commit_cmds=[{'cmd': topic_domain.CMD_CREATE_NEW}]
+            commit_cmds=[{'cmd': topic_domain.CMD_CREATE_NEW}],
         )
         # Now we check that topic is not None and that actually
         # now topic exists, that means that commit() worked fine.
@@ -103,7 +104,8 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_by_name(self) -> None:
         topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID, self.TOPIC_NAME, 'name', 'description', 'fragm')
+            self.TOPIC_ID, self.TOPIC_NAME, 'name', 'description', 'fragm'
+        )
         topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, topic)
 
         topic_model = topic_models.TopicModel.get_by_name(self.TOPIC_NAME)
@@ -116,23 +118,16 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
     def test_get_by_url_fragment(self) -> None:
         url_fragment = 'name'
         topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID, self.TOPIC_NAME, url_fragment, 'description',
-            'fragm')
+            self.TOPIC_ID, self.TOPIC_NAME, url_fragment, 'description', 'fragm'
+        )
         topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, topic)
 
-        topic_model = topic_models.TopicModel.get_by_url_fragment(
-            url_fragment)
+        topic_model = topic_models.TopicModel.get_by_url_fragment(url_fragment)
 
         # Ruling out the possibility of None for mypy type checking.
         assert topic_model is not None
-        self.assertEqual(
-            topic_model.url_fragment,
-            url_fragment
-        )
-        self.assertEqual(
-            topic_model.id,
-            self.TOPIC_ID
-        )
+        self.assertEqual(topic_model.url_fragment, url_fragment)
+        self.assertEqual(topic_model.id, self.TOPIC_ID)
 
 
 class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
@@ -140,37 +135,43 @@ class TopicCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
 
     def test_has_reference_to_user_id(self) -> None:
         commit = topic_models.TopicCommitLogEntryModel.create(
-            'b', 0, 'committer_id', 'msg', 'create', [{}],
-            constants.ACTIVITY_STATUS_PUBLIC, False)
+            'b',
+            0,
+            'committer_id',
+            'msg',
+            'create',
+            [{}],
+            constants.ACTIVITY_STATUS_PUBLIC,
+            False,
+        )
         commit.topic_id = 'b'
         commit.update_timestamps()
         commit.put()
         self.assertTrue(
-            topic_models.TopicCommitLogEntryModel
-            .has_reference_to_user_id('committer_id'))
+            topic_models.TopicCommitLogEntryModel.has_reference_to_user_id(
+                'committer_id'
+            )
+        )
         self.assertFalse(
-            topic_models.TopicCommitLogEntryModel
-            .has_reference_to_user_id('x_id'))
+            topic_models.TopicCommitLogEntryModel.has_reference_to_user_id(
+                'x_id'
+            )
+        )
 
     def test__get_instance(self) -> None:
         # Calling create() method calls _get_instance (a protected method)
         # and sets the instance id equal to the result of calling that method.
-        topic_commit_log_entry = (
-            topic_models.TopicCommitLogEntryModel.create(
-                entity_id='entity_id',
-                version=1,
-                committer_id='committer_id',
-                commit_type='create',
-                commit_message='Created new TopicCommitLogEntry',
-                commit_cmds=[{'cmd': 'create_new'}],
-                status=constants.ACTIVITY_STATUS_PRIVATE,
-                community_owned=True
-            )
+        topic_commit_log_entry = topic_models.TopicCommitLogEntryModel.create(
+            entity_id='entity_id',
+            version=1,
+            committer_id='committer_id',
+            commit_type='create',
+            commit_message='Created new TopicCommitLogEntry',
+            commit_cmds=[{'cmd': 'create_new'}],
+            status=constants.ACTIVITY_STATUS_PRIVATE,
+            community_owned=True,
         )
-        self.assertEqual(
-            topic_commit_log_entry.id,
-            'topic-entity_id-1'
-        )
+        self.assertEqual(topic_commit_log_entry.id, 'topic-entity_id-1')
 
 
 class TopicSummaryModelUnitTests(test_utils.GenericTestBase):
@@ -179,7 +180,8 @@ class TopicSummaryModelUnitTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             topic_models.TopicSummaryModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.NOT_APPLICABLE)
+            base_models.DELETION_POLICY.NOT_APPLICABLE,
+        )
 
 
 class TopicRightsRightsSnapshotContentModelTests(test_utils.GenericTestBase):
@@ -192,28 +194,39 @@ class TopicRightsRightsSnapshotContentModelTests(test_utils.GenericTestBase):
     def test_get_deletion_policy_is_locally_pseudonymize(self) -> None:
         self.assertEqual(
             topic_models.TopicRightsSnapshotContentModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
+            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE,
+        )
 
     def test_has_reference_to_user_id(self) -> None:
         topic_models.TopicRightsModel(
             id=self.TOPIC_ID_1,
             manager_ids=[self.USER_ID_1, self.USER_ID_2],
         ).commit(
-            self.USER_ID_COMMITTER, 'Created new topic right',
-            [{'cmd': topic_domain.CMD_CREATE_NEW}])
+            self.USER_ID_COMMITTER,
+            'Created new topic right',
+            [{'cmd': topic_domain.CMD_CREATE_NEW}],
+        )
 
         self.assertTrue(
-            topic_models.TopicRightsSnapshotContentModel
-            .has_reference_to_user_id(self.USER_ID_1))
+            topic_models.TopicRightsSnapshotContentModel.has_reference_to_user_id(
+                self.USER_ID_1
+            )
+        )
         self.assertTrue(
-            topic_models.TopicRightsSnapshotContentModel
-            .has_reference_to_user_id(self.USER_ID_2))
+            topic_models.TopicRightsSnapshotContentModel.has_reference_to_user_id(
+                self.USER_ID_2
+            )
+        )
         self.assertFalse(
-            topic_models.TopicRightsSnapshotContentModel
-            .has_reference_to_user_id(self.USER_ID_COMMITTER))
+            topic_models.TopicRightsSnapshotContentModel.has_reference_to_user_id(
+                self.USER_ID_COMMITTER
+            )
+        )
         self.assertFalse(
-            topic_models.TopicRightsSnapshotContentModel
-            .has_reference_to_user_id('x_id'))
+            topic_models.TopicRightsSnapshotContentModel.has_reference_to_user_id(
+                'x_id'
+            )
+        )
 
 
 class TopicRightsModelUnitTests(test_utils.GenericTestBase):
@@ -238,38 +251,46 @@ class TopicRightsModelUnitTests(test_utils.GenericTestBase):
         topic_models.TopicRightsModel(
             id=self.TOPIC_4_ID,
             manager_ids=[self.USER_ID_2],
-            topic_is_published=True
+            topic_is_published=True,
         ).commit(
             'commiter_id',
             'New topic rights',
-            [{'cmd': topic_domain.CMD_CREATE_NEW}])
+            [{'cmd': topic_domain.CMD_CREATE_NEW}],
+        )
         topic_models.TopicRightsModel(
             id=self.TOPIC_5_ID,
             manager_ids=[self.USER_ID_2],
-            topic_is_published=True
+            topic_is_published=True,
         ).commit(
             'commiter_id',
             'New topic rights',
-            [{'cmd': topic_domain.CMD_CREATE_NEW}])
+            [{'cmd': topic_domain.CMD_CREATE_NEW}],
+        )
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             topic_models.TopicRightsModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
+            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE,
+        )
 
     def test_has_reference_to_user_id(self) -> None:
         with self.swap(base_models, 'FETCH_BATCH_SIZE', 1):
             topic_rights = topic_models.TopicRightsModel(
-                id=self.TOPIC_1_ID, manager_ids=['manager_id'])
+                id=self.TOPIC_1_ID, manager_ids=['manager_id']
+            )
             topic_rights.commit(
                 'committer_id',
                 'New topic rights',
-                [{'cmd': topic_domain.CMD_CREATE_NEW}])
+                [{'cmd': topic_domain.CMD_CREATE_NEW}],
+            )
             self.assertTrue(
-                topic_models.TopicRightsModel
-                .has_reference_to_user_id('manager_id'))
+                topic_models.TopicRightsModel.has_reference_to_user_id(
+                    'manager_id'
+                )
+            )
             self.assertFalse(
-                topic_models.TopicRightsModel.has_reference_to_user_id('x_id'))
+                topic_models.TopicRightsModel.has_reference_to_user_id('x_id')
+            )
 
     def test_export_data_nontrivial(self) -> None:
         """Tests nontrivial export data on user with some managed topics."""
@@ -282,7 +303,5 @@ class TopicRightsModelUnitTests(test_utils.GenericTestBase):
     def test_export_data_trivial(self) -> None:
         """Tests trivial export data on user with no managed topics."""
         user_data = topic_models.TopicRightsModel.export_data(self.USER_ID_1)
-        expected_data: Dict[str, List[str]] = {
-            'managed_topic_ids': []
-        }
+        expected_data: Dict[str, List[str]] = {'managed_topic_ids': []}
         self.assertEqual(user_data, expected_data)

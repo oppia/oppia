@@ -34,7 +34,7 @@ from core.platform import models
 from typing import Dict, List, Literal, Optional, Sequence, overload
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import subtopic_models
 
 (subtopic_models,) = models.Registry.import_models([models.Names.SUBTOPIC])
@@ -42,10 +42,8 @@ if MYPY: # pragma: no cover
 
 # Remove no cover comment once migrations for study guides are available.
 def _migrate_sections_to_latest_schema(
-    versioned_sections: (
-        study_guide_domain.VersionedStudyGuideSectionsDict
-    )
-) -> None: # pragma: no cover
+    versioned_sections: study_guide_domain.VersionedStudyGuideSectionsDict,
+) -> None:  # pragma: no cover
     """Holds the responsibility of performing a step-by-step, sequential update
     of the sections structure based on the schema version of the input
     sections dictionary. If the current sections schema changes, a
@@ -62,21 +60,28 @@ def _migrate_sections_to_latest_schema(
             is supported at present.
     """
     sections_schema_version = versioned_sections['schema_version']
-    if not (1 <= sections_schema_version
-            <= feconf.CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION):
+    if not (
+        1
+        <= sections_schema_version
+        <= feconf.CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION
+    ):
         raise Exception(
             'Sorry, we can only process v1-v%d page schemas at '
-            'present.' % feconf.CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION)
+            'present.' % feconf.CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION
+        )
 
-    while (sections_schema_version <
-           feconf.CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION):
+    while (
+        sections_schema_version
+        < feconf.CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION
+    ):
         study_guide_domain.StudyGuide.update_sections_from_model(
-            versioned_sections, sections_schema_version)
+            versioned_sections, sections_schema_version
+        )
         sections_schema_version += 1
 
 
 def get_study_guide_from_model(
-    study_guide_model: subtopic_models.StudyGuideModel
+    study_guide_model: subtopic_models.StudyGuideModel,
 ) -> study_guide_domain.StudyGuide:
     """Returns a domain object for an StudyGuide given a study guide model.
 
@@ -87,23 +92,19 @@ def get_study_guide_from_model(
     Returns:
         StudyGuide. The domain object corresponding to the given model object.
     """
-    versioned_sections: (
-        study_guide_domain.VersionedStudyGuideSectionsDict
-    ) = {
+    versioned_sections: study_guide_domain.VersionedStudyGuideSectionsDict = {
         'schema_version': study_guide_model.sections_schema_version,
-        'sections': copy.deepcopy(study_guide_model.sections)
+        'sections': copy.deepcopy(study_guide_model.sections),
     }
     # Remove no cover comment once migrations for study guides are available.
-    if (study_guide_model.sections_schema_version !=
-            feconf.CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION): # pragma: no cover pylint: disable=line-too-long
+    if (
+        study_guide_model.sections_schema_version
+        != feconf.CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION
+    ):  # pragma: no cover pylint: disable=line-too-long
         _migrate_sections_to_latest_schema(versioned_sections)
     sections = []
     for section in versioned_sections['sections']:
-        sections.append(
-            study_guide_domain.StudyGuideSection.from_dict(
-                section
-            )
-        )
+        sections.append(study_guide_domain.StudyGuideSection.from_dict(section))
     return study_guide_domain.StudyGuide(
         study_guide_model.id,
         study_guide_model.topic_id,
@@ -111,7 +112,7 @@ def get_study_guide_from_model(
         versioned_sections['schema_version'],
         study_guide_model.next_content_id_index,
         study_guide_model.language_code,
-        study_guide_model.version
+        study_guide_model.version,
     )
 
 
@@ -133,7 +134,7 @@ def get_study_guide_by_id(
     subtopic_id: int,
     *,
     strict: Literal[True],
-    version: Optional[int] = ...
+    version: Optional[int] = ...,
 ) -> study_guide_domain.StudyGuide: ...
 
 
@@ -143,7 +144,7 @@ def get_study_guide_by_id(
     subtopic_id: int,
     *,
     strict: Literal[False],
-    version: Optional[int] = ...
+    version: Optional[int] = ...,
 ) -> Optional[study_guide_domain.StudyGuide]: ...
 
 
@@ -153,7 +154,7 @@ def get_study_guide_by_id(
     subtopic_id: int,
     *,
     strict: bool = ...,
-    version: Optional[int] = ...
+    version: Optional[int] = ...,
 ) -> Optional[study_guide_domain.StudyGuide]: ...
 
 
@@ -161,7 +162,7 @@ def get_study_guide_by_id(
     topic_id: str,
     subtopic_id: int,
     strict: bool = True,
-    version: Optional[int] = None
+    version: Optional[int] = None,
 ) -> Optional[study_guide_domain.StudyGuide]:
     """Returns a domain object representing a study guide.
 
@@ -177,9 +178,11 @@ def get_study_guide_by_id(
         with the given id, or None if it does not exist.
     """
     study_guide_id = study_guide_domain.StudyGuide.get_study_guide_id(
-        topic_id, subtopic_id)
+        topic_id, subtopic_id
+    )
     study_guide_model = subtopic_models.StudyGuideModel.get(
-        study_guide_id, strict=strict, version=version)
+        study_guide_id, strict=strict, version=version
+    )
     if study_guide_model:
         study_guide = get_study_guide_from_model(study_guide_model)
         return study_guide
@@ -188,8 +191,7 @@ def get_study_guide_by_id(
 
 
 def get_study_guides_with_ids(
-    topic_id: str,
-    subtopic_ids: List[int]
+    topic_id: str, subtopic_ids: List[int]
 ) -> List[Optional[study_guide_domain.StudyGuide]]:
     """Returns a list of domain objects with given ids.
 
@@ -206,16 +208,18 @@ def get_study_guides_with_ids(
     for subtopic_id in subtopic_ids:
         study_guide_ids.append(
             study_guide_domain.StudyGuide.get_study_guide_id(
-                topic_id, subtopic_id))
+                topic_id, subtopic_id
+            )
+        )
     study_guide_models = subtopic_models.StudyGuideModel.get_multi(
-        study_guide_ids)
+        study_guide_ids
+    )
     study_guides: List[Optional[study_guide_domain.StudyGuide]] = []
     for study_guide_model in study_guide_models:
         if study_guide_model is None:
             study_guides.append(study_guide_model)
         else:
-            study_guides.append(
-                get_study_guide_from_model(study_guide_model))
+            study_guides.append(get_study_guide_from_model(study_guide_model))
     return study_guides
 
 
@@ -227,26 +231,18 @@ def get_study_guide_sections_by_id(
 
 @overload
 def get_study_guide_sections_by_id(
-    topic_id: str,
-    subtopic_id: int,
-    *,
-    strict: Literal[True]
+    topic_id: str, subtopic_id: int, *, strict: Literal[True]
 ) -> List[study_guide_domain.StudyGuideSection]: ...
 
 
 @overload
 def get_study_guide_sections_by_id(
-    topic_id: str,
-    subtopic_id: int,
-    *,
-    strict: Literal[False]
+    topic_id: str, subtopic_id: int, *, strict: Literal[False]
 ) -> Optional[List[study_guide_domain.StudyGuideSection]]: ...
 
 
 def get_study_guide_sections_by_id(
-    topic_id: str,
-    subtopic_id: int,
-    strict: bool = True
+    topic_id: str, subtopic_id: int, strict: bool = True
 ) -> Optional[List[study_guide_domain.StudyGuideSection]]:
     """Returns the list of sections of a study guide
 
@@ -260,8 +256,7 @@ def get_study_guide_sections_by_id(
         List[StudyGuideSection] or None. The list of sections for a study guide,
         or None if study guide does not exist.
     """
-    study_guide = get_study_guide_by_id(
-        topic_id, subtopic_id, strict=strict)
+    study_guide = get_study_guide_by_id(topic_id, subtopic_id, strict=strict)
     if study_guide is not None:
         return study_guide.sections
     else:
@@ -272,7 +267,7 @@ def save_study_guide(
     committer_id: str,
     study_guide: study_guide_domain.StudyGuide,
     commit_message: Optional[str],
-    change_list: Sequence[change_domain.BaseChange]
+    change_list: Sequence[change_domain.BaseChange],
 ) -> None:
     """Validates a study guide and commits it to persistent storage. If
     successful, increments the version number of the incoming study guide
@@ -295,26 +290,29 @@ def save_study_guide(
     if not change_list:
         raise Exception(
             'Unexpected error: received an invalid change list when trying to '
-            'save topic %s: %s' % (study_guide.id, change_list))
+            'save topic %s: %s' % (study_guide.id, change_list)
+        )
     study_guide.validate()
 
     study_guide_model = subtopic_models.StudyGuideModel.get(
-        study_guide.id, strict=False)
+        study_guide.id, strict=False
+    )
     if study_guide_model is None:
-        study_guide_model = subtopic_models.StudyGuideModel(
-            id=study_guide.id)
+        study_guide_model = subtopic_models.StudyGuideModel(id=study_guide.id)
     else:
         if study_guide.version > study_guide_model.version:
             raise Exception(
                 'Unexpected error: trying to update version %s of topic '
                 'from version %s. Please reload the page and try again.'
-                % (study_guide_model.version, study_guide.version))
+                % (study_guide_model.version, study_guide.version)
+            )
 
         if study_guide.version < study_guide_model.version:
             raise Exception(
                 'Trying to update version %s of topic from version %s, '
                 'which is too old. Please reload the page and try again.'
-                % (study_guide_model.version, study_guide.version))
+                % (study_guide_model.version, study_guide.version)
+            )
 
     study_guide_model.topic_id = study_guide.topic_id
     sections = []
@@ -323,9 +321,9 @@ def save_study_guide(
     study_guide_model.sections = sections
     study_guide_model.language_code = study_guide.language_code
     study_guide_model.sections_schema_version = (
-        study_guide.sections_schema_version)
-    study_guide_model.next_content_id_index = (
-        study_guide.next_content_id_index)
+        study_guide.sections_schema_version
+    )
+    study_guide_model.next_content_id_index = study_guide.next_content_id_index
     change_dicts = [change.to_dict() for change in change_list]
     study_guide_model.commit(committer_id, commit_message, change_dicts)
     study_guide.version += 1
@@ -335,7 +333,7 @@ def delete_study_guide(
     committer_id: str,
     topic_id: str,
     subtopic_id: int,
-    force_deletion: bool = False
+    force_deletion: bool = False,
 ) -> None:
     """Delete a study guide model.
 
@@ -351,12 +349,16 @@ def delete_study_guide(
             preferred one.
     """
     study_guide_id = study_guide_domain.StudyGuide.get_study_guide_id(
-        topic_id, subtopic_id)
+        topic_id, subtopic_id
+    )
     subtopic_models.StudyGuideModel.get(study_guide_id).delete(
-        committer_id, feconf.COMMIT_MESSAGE_STUDY_GUIDE_DELETED,
-        force_deletion=force_deletion)
+        committer_id,
+        feconf.COMMIT_MESSAGE_STUDY_GUIDE_DELETED,
+        force_deletion=force_deletion,
+    )
     learner_group_services.remove_study_guide_reference_from_learner_groups(
-        topic_id, subtopic_id)
+        topic_id, subtopic_id
+    )
 
 
 def does_study_guide_model_exist(topic_id: str, subtopic_id: int) -> bool:
@@ -371,19 +373,16 @@ def does_study_guide_model_exist(topic_id: str, subtopic_id: int) -> bool:
         boolean. Whether the study guide model exists or not.
     """
     study_guide_id = study_guide_domain.StudyGuide.get_study_guide_id(
-        topic_id, subtopic_id)
+        topic_id, subtopic_id
+    )
     try:
-        study_guide_model = subtopic_models.StudyGuideModel.get(
-            study_guide_id
-        )
+        study_guide_model = subtopic_models.StudyGuideModel.get(study_guide_id)
         return study_guide_model is not None
     except Exception:
         return False
 
 
-def get_topic_ids_from_study_guide_ids(
-    study_guide_ids: List[str]
-) -> List[str]:
+def get_topic_ids_from_study_guide_ids(study_guide_ids: List[str]) -> List[str]:
     """Returns the topic ids corresponding to the given set of study guide
     ids.
 
@@ -395,15 +394,15 @@ def get_topic_ids_from_study_guide_ids(
         The returned list of topic ids is deduplicated and ordered
         alphabetically.
     """
-    return sorted(list({
-        study_guide_id.split(':')[0] for study_guide_id in
-        study_guide_ids
-    }))
+    return sorted(
+        list(
+            {study_guide_id.split(':')[0] for study_guide_id in study_guide_ids}
+        )
+    )
 
 
 def get_multi_users_study_guides_progress(
-    user_ids: List[str],
-    study_guide_ids: List[str]
+    user_ids: List[str], study_guide_ids: List[str]
 ) -> Dict[str, List[study_guide_domain.StudyGuideSummaryDict]]:
     """Returns the progress of the given user on the given study guides.
 
@@ -425,15 +424,14 @@ def get_multi_users_study_guides_progress(
     ]
     all_skill_ids = list(
         {
-            skill_id for skill_list in all_skill_ids_lists
+            skill_id
+            for skill_list in all_skill_ids_lists
             for skill_id in skill_list
         }
     )
 
     all_users_skill_mastery_dicts = (
-        skill_services.get_multi_users_skills_mastery(
-            user_ids, all_skill_ids
-        )
+        skill_services.get_multi_users_skills_mastery(user_ids, all_skill_ids)
     )
 
     all_users_study_guide_prog_summaries: Dict[
@@ -444,45 +442,46 @@ def get_multi_users_study_guides_progress(
             study_guide_id = '{}:{}'.format(topic.id, subtopic.id)
             if study_guide_id not in study_guide_ids:
                 continue
-            for user_id, skills_mastery_dict in (
-                all_users_skill_mastery_dicts.items()
-            ):
+            for (
+                user_id,
+                skills_mastery_dict,
+            ) in all_users_skill_mastery_dicts.items():
                 skill_mastery_dict = {
                     skill_id: mastery
                     for skill_id, mastery in skills_mastery_dict.items()
-                    if mastery is not None and (
-                        skill_id in subtopic.skill_ids
-                    )
+                    if mastery is not None and (skill_id in subtopic.skill_ids)
                 }
                 subtopic_mastery: Optional[float] = None
 
                 # Subtopic mastery is average of skill masteries.
                 if skill_mastery_dict:
-                    subtopic_mastery = (
-                        sum(skill_mastery_dict.values()) /
-                        len(skill_mastery_dict)
+                    subtopic_mastery = sum(skill_mastery_dict.values()) / len(
+                        skill_mastery_dict
                     )
 
-                all_users_study_guide_prog_summaries[user_id].append({
-                    'subtopic_id': subtopic.id,
-                    'subtopic_title': subtopic.title,
-                    'parent_topic_id': topic.id,
-                    'parent_topic_name': topic.name,
-                    'thumbnail_filename': subtopic.thumbnail_filename,
-                    'thumbnail_bg_color': subtopic.thumbnail_bg_color,
-                    'subtopic_mastery': subtopic_mastery,
-                    'parent_topic_url_fragment': topic.url_fragment,
-                    'classroom_url_fragment': (
-                        classroom_config_services
-                            .get_classroom_url_fragment_for_topic_id(
-                                topic.id))
-                })
+                all_users_study_guide_prog_summaries[user_id].append(
+                    {
+                        'subtopic_id': subtopic.id,
+                        'subtopic_title': subtopic.title,
+                        'parent_topic_id': topic.id,
+                        'parent_topic_name': topic.name,
+                        'thumbnail_filename': subtopic.thumbnail_filename,
+                        'thumbnail_bg_color': subtopic.thumbnail_bg_color,
+                        'subtopic_mastery': subtopic_mastery,
+                        'parent_topic_url_fragment': topic.url_fragment,
+                        'classroom_url_fragment': (
+                            classroom_config_services.get_classroom_url_fragment_for_topic_id(
+                                topic.id
+                            )
+                        ),
+                    }
+                )
 
     return all_users_study_guide_prog_summaries
 
 
 def get_learner_group_syllabus_study_guide_summaries(
-    study_guide_ids: List[str]
+    study_guide_ids: List[str],
 ) -> List[study_guide_domain.StudyGuideSummaryDict]:
     """Returns summary dicts corresponding to the given study guide ids.
 
@@ -504,24 +503,26 @@ def get_learner_group_syllabus_study_guide_summaries(
             study_guide_id = '{}:{}'.format(topic.id, subtopic.id)
             if study_guide_id not in study_guide_ids:
                 continue
-            all_learner_group_study_guide_summaries.append({
-                'subtopic_id': subtopic.id,
-                'subtopic_title': subtopic.title,
-                'parent_topic_id': topic.id,
-                'parent_topic_name': topic.name,
-                'thumbnail_filename': subtopic.thumbnail_filename,
-                'thumbnail_bg_color': subtopic.thumbnail_bg_color,
-                'subtopic_mastery': None,
-                'parent_topic_url_fragment': topic.url_fragment,
-                'classroom_url_fragment': None
-            })
+            all_learner_group_study_guide_summaries.append(
+                {
+                    'subtopic_id': subtopic.id,
+                    'subtopic_title': subtopic.title,
+                    'parent_topic_id': topic.id,
+                    'parent_topic_name': topic.name,
+                    'thumbnail_filename': subtopic.thumbnail_filename,
+                    'thumbnail_bg_color': subtopic.thumbnail_bg_color,
+                    'subtopic_mastery': None,
+                    'parent_topic_url_fragment': topic.url_fragment,
+                    'classroom_url_fragment': None,
+                }
+            )
 
     return all_learner_group_study_guide_summaries
 
 
 def populate_study_guide_model_fields(
     study_guide_model: subtopic_models.StudyGuideModel,
-    study_guide: study_guide_domain.StudyGuide
+    study_guide: study_guide_domain.StudyGuide,
 ) -> subtopic_models.StudyGuideModel:
     """Populate study guide model with the data from study guide object.
 
@@ -539,7 +540,8 @@ def populate_study_guide_model_fields(
         sections.append(section.to_dict())
     study_guide_model.sections = sections
     study_guide_model.sections_schema_version = (
-        study_guide.sections_schema_version)
+        study_guide.sections_schema_version
+    )
 
     study_guide_model.language_code = study_guide.language_code
 

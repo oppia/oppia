@@ -33,39 +33,40 @@ class DragAndDropSortInput(base.BaseInteraction):
     can_have_solution = True
     show_generic_submit_button = True
 
-    _customization_arg_specs = [{
-        'name': 'choices',
-        'description': 'Items for drag and drop',
-        'schema': {
-            'type': 'list',
-            'validators': [{
-                'id': 'has_length_at_least',
-                # NOTE: There is slightly stricter validation of the number of
-                # minimum choices in frontend. It should be at least 2 from the
-                # frontend perspective but we can't impose it here as min_value
-                # in the customization schema determines the number of RTEs that
-                # appear in the customization modal initially that needs to be
-                # 1. Here min_value: 2 and default_value: [''] aren't allowed as
-                # default_value needs to be at least of same length as min_value
-                # else schema tests for customization args will fail.
-                'min_value': 1
-            }],
-            'items': {
-                'type': 'SubtitledHtml',
+    _customization_arg_specs = [
+        {
+            'name': 'choices',
+            'description': 'Items for drag and drop',
+            'schema': {
+                'type': 'list',
+                'validators': [
+                    {
+                        'id': 'has_length_at_least',
+                        # NOTE: There is slightly stricter validation of the number of
+                        # minimum choices in frontend. It should be at least 2 from the
+                        # frontend perspective but we can't impose it here as min_value
+                        # in the customization schema determines the number of RTEs that
+                        # appear in the customization modal initially that needs to be
+                        # 1. Here min_value: 2 and default_value: [''] aren't allowed as
+                        # default_value needs to be at least of same length as min_value
+                        # else schema tests for customization args will fail.
+                        'min_value': 1,
+                    }
+                ],
+                'items': {
+                    'type': 'SubtitledHtml',
+                    'ui_config': {
+                        'hide_complex_extensions': True,
+                        'placeholder': 'Enter an option for the learner to drag'
+                        + ' and drop.',
+                    },
+                },
                 'ui_config': {
-                    'hide_complex_extensions': True,
-                    'placeholder': 'Enter an option for the learner to drag' +
-                                   ' and drop.',
+                    'add_element_text': 'Add a new item',
                 },
             },
-            'ui_config': {
-                'add_element_text': 'Add a new item',
-            }
-        },
-        'default_value': [{
-            'content_id': None,
-            'html': ''
-        }],
-    }]
+            'default_value': [{'content_id': None, 'html': ''}],
+        }
+    ]
 
     _answer_visualization_specs = []

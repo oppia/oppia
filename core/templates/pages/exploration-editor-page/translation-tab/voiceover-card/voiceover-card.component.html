@@ -63,7 +63,7 @@
       <div *ngIf="manualVoiceover" class="stale-manual-voiceover-warning">
         <i *ngIf="manualVoiceover.needsUpdate">The current manual voiceover is stale.</i>
       </div>
-      <div class="add-new-manual-voiceovers" *ngIf="!manualVoiceover">
+      <div class="add-voiceover-button-container" *ngIf="!manualVoiceover">
         <button (click)="addManualVoiceover()"
                 class="add-manual-voiceover-button e2e-test-voiceover-upload-audio"
                 [disabled]="!contentAvailableForVoiceovers">
@@ -104,7 +104,7 @@
             </button>
           </div>
         </div>
-        <div class="add-new-manual-voiceovers" *ngIf="!automaticVoiceover">
+        <div class="add-voiceover-button-container" *ngIf="!automaticVoiceover">
           <button (click)="generateVoiceover()"
                   class="add-automatic-voiceover-button e2e-test-regenerate-voiceover"
                   [disabled]="!isGenerateAutomaticVoiceoverOptionEnabled || !contentAvailableForVoiceovers">
@@ -192,7 +192,7 @@
     height: 50px;
     margin: 0 4%;
   }
-  .add-new-manual-voiceovers {
+  .add-voiceover-button-container {
     align-items: center;
     color: #009688;
     display: flex;

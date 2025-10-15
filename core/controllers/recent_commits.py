@@ -33,9 +33,7 @@ class RecentCommitsHandlerNormalizedRequestDict(TypedDict):
 
 
 class RecentCommitsHandler(
-    base.BaseHandler[
-        Dict[str, str], RecentCommitsHandlerNormalizedRequestDict
-    ]
+    base.BaseHandler[Dict[str, str], RecentCommitsHandlerNormalizedRequestDict]
 ):
     """Returns a list of recent commits."""
 
@@ -43,20 +41,13 @@ class RecentCommitsHandler(
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
-            'cursor': {
-                'schema': {
-                    'type': 'basestring'
-                },
-                'default_value': None
-            },
+            'cursor': {'schema': {'type': 'basestring'}, 'default_value': None},
             'query_type': {
                 'schema': {
                     'type': 'basestring',
-                    'choices': [
-                        'all_non_private_commits'
-                    ]
+                    'choices': ['all_non_private_commits'],
                 }
-            }
+            },
         }
     }
 
@@ -69,11 +60,14 @@ class RecentCommitsHandler(
 
         all_commits, new_urlsafe_start_cursor, more = (
             exp_services.get_next_page_of_all_non_private_commits(
-                urlsafe_start_cursor=urlsafe_start_cursor))
+                urlsafe_start_cursor=urlsafe_start_cursor
+            )
+        )
 
         exp_ids = set(commit.exploration_id for commit in all_commits)
         exp_ids_to_exp_data = (
-            exp_services.get_exploration_titles_and_categories(list(exp_ids)))
+            exp_services.get_exploration_titles_and_categories(list(exp_ids))
+        )
 
         unique_user_ids = list(set(commit.user_id for commit in all_commits))
         unique_usernames = user_services.get_usernames(unique_user_ids)
@@ -92,13 +86,15 @@ class RecentCommitsHandler(
                     commit_dict['post_commit_community_owned']
                 ),
                 'post_commit_is_private': commit_dict['post_commit_is_private'],
-                'username': user_id_to_username[commit.user_id]
+                'username': user_id_to_username[commit.user_id],
             }
             all_commit_dicts.append(commit_dict_with_username)
 
-        self.render_json({
-            'results': all_commit_dicts,
-            'cursor': new_urlsafe_start_cursor,
-            'more': more,
-            'exp_ids_to_exp_data': exp_ids_to_exp_data,
-        })
+        self.render_json(
+            {
+                'results': all_commit_dicts,
+                'cursor': new_urlsafe_start_cursor,
+                'more': more,
+                'exp_ids_to_exp_data': exp_ids_to_exp_data,
+            }
+        )

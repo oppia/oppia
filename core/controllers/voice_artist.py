@@ -55,10 +55,12 @@ class AudioUploadHandler(
         'exploration_id': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.ENTITY_ID_REGEX
-                }]
+                'validators': [
+                    {
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                    }
+                ],
             }
         }
     }
@@ -68,20 +70,20 @@ class AudioUploadHandler(
             'raw_audio_file': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'is_valid_audio_file'
-                    }]
+                    'validators': [{'id': 'is_valid_audio_file'}],
                 }
             },
             'filename': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'is_regex_matched',
-                        'regex_pattern': r'[^\s]+(\.(?i)(mp3))$'
-                    }]
+                    'validators': [
+                        {
+                            'id': 'is_regex_matched',
+                            'regex_pattern': r'[^\s]+(\.(?i)(mp3))$',
+                        }
+                    ],
                 }
-            }
+            },
         }
     }
 
@@ -121,10 +123,13 @@ class AudioUploadHandler(
         # Audio files are stored to the datastore in the dev env, and to GCS
         # in production.
         fs = fs_services.GcsFileSystem(
-            feconf.ENTITY_TYPE_EXPLORATION, exploration_id)
+            feconf.ENTITY_TYPE_EXPLORATION, exploration_id
+        )
         fs.commit(
             '%s/%s' % (self._FILENAME_PREFIX, filename),
-            raw_audio_file, mimetype=mimetype)
+            raw_audio_file,
+            mimetype=mimetype,
+        )
 
         self.render_json({'filename': filename, 'duration_secs': duration_secs})
 
@@ -139,10 +144,12 @@ class StartedTranslationTutorialEventHandler(
         'exploration_id': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.ENTITY_ID_REGEX
-                }]
+                'validators': [
+                    {
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                    }
+                ],
             }
         }
     }
@@ -156,7 +163,8 @@ class StartedTranslationTutorialEventHandler(
         """
         assert self.user_id is not None
         user_services.record_user_started_state_translation_tutorial(
-            self.user_id)
+            self.user_id
+        )
         self.render_json({})
 
 
@@ -179,7 +187,7 @@ class VoiceArtistManagementHandlerNormalizedRequestDict(TypedDict):
 class VoiceArtistManagementHandler(
     base.BaseHandler[
         VoiceArtistManagementHandlerNormalizedPayloadDict,
-        VoiceArtistManagementHandlerNormalizedRequestDict
+        VoiceArtistManagementHandlerNormalizedRequestDict,
     ]
 ):
     """Handles assignment of voice artists."""
@@ -189,29 +197,27 @@ class VoiceArtistManagementHandler(
         'entity_type': {
             'schema': {
                 'type': 'basestring',
-                'choices': [
-                    feconf.ENTITY_TYPE_EXPLORATION
-                ]
+                'choices': [feconf.ENTITY_TYPE_EXPLORATION],
             }
         },
         'entity_id': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.ENTITY_ID_REGEX
-                }]
+                'validators': [
+                    {
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                    }
+                ],
             }
-        }
+        },
     }
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
             'username': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'is_valid_username_string'
-                    }]
+                    'validators': [{'id': 'is_valid_username_string'}],
                 }
             }
         },
@@ -219,12 +225,10 @@ class VoiceArtistManagementHandler(
             'voice_artist': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'is_valid_username_string'
-                    }]
+                    'validators': [{'id': 'is_valid_username_string'}],
                 }
             }
-        }
+        },
     }
 
     @acl_decorators.can_add_voice_artist
@@ -237,14 +241,17 @@ class VoiceArtistManagementHandler(
         """
         assert self.normalized_payload is not None
         voice_artist = self.normalized_payload['username']
-        voice_artist_id = user_services.get_user_id_from_username(
-            voice_artist)
+        voice_artist_id = user_services.get_user_id_from_username(voice_artist)
         if voice_artist_id is None:
             raise self.InvalidInputException(
-                'Sorry, we could not find the specified user.')
+                'Sorry, we could not find the specified user.'
+            )
         rights_manager.assign_role_for_exploration(
-            self.user, entity_id, voice_artist_id,
-            rights_domain.ROLE_VOICE_ARTIST)
+            self.user,
+            entity_id,
+            voice_artist_id,
+            rights_domain.ROLE_VOICE_ARTIST,
+        )
 
         self.render_json({})
 
@@ -258,10 +265,10 @@ class VoiceArtistManagementHandler(
         """
         assert self.normalized_request is not None
         voice_artist = self.normalized_request['voice_artist']
-        voice_artist_id = user_services.get_user_id_from_username(
-            voice_artist)
+        voice_artist_id = user_services.get_user_id_from_username(voice_artist)
         assert voice_artist_id is not None
         rights_manager.deassign_role_for_exploration(
-            self.user, entity_id, voice_artist_id)
+            self.user, entity_id, voice_artist_id
+        )
 
         self.render_json({})

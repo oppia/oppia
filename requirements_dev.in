@@ -3,6 +3,7 @@
 #    python -m scripts.install_python_dev_dependencies
 #
 # to update `requirements_dev.txt` and your current Python environment.
+black==25.9.0
 certifi==2025.8.3
 coverage==7.10.6
 esprima==4.0.1
