@@ -28,9 +28,6 @@ import {PlatformFeatureService} from '../../services/platform-feature.service';
 
 class MockPlatformFeatureService {
   status = {
-    SerialChapterLaunchCurriculumAdminView: {
-      isEnabled: false,
-    },
     SerialChapterLaunchLearnerView: {
       isEnabled: false,
     },
@@ -66,14 +63,6 @@ describe('StorySummaryTileComponent', () => {
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
       true
     );
-  });
-
-  it('should get status of Serial Chapter Launch Feature flag', () => {
-    expect(component.isSerialChapterFeatureFlagEnabled()).toEqual(false);
-
-    mockPlatformFeatureService.status.SerialChapterLaunchLearnerView.isEnabled =
-      true;
-    expect(component.isSerialChapterFeatureFlagEnabled()).toEqual(true);
   });
 
   it('should get status of Serial Chapter Launch Learner Feature flag', () => {

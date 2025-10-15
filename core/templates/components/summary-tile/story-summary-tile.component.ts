@@ -84,11 +84,6 @@ export class StorySummaryTileComponent implements OnInit {
     return this.windowDimensionsService.getWidth() < 768;
   }
 
-  isSerialChapterFeatureFlagEnabled(): boolean {
-    return this.platformFeatureService.status
-      .SerialChapterLaunchCurriculumAdminView.isEnabled;
-  }
-
   isSerialChapterFeatureLearnerFlagEnabled(): boolean {
     return this.platformFeatureService.status.SerialChapterLaunchLearnerView
       .isEnabled;
