@@ -69,7 +69,7 @@ class ElasticSearchClient:
                     self._client = elasticsearch.Elasticsearch(
                         cloud_id=es_cloud_id,
                         basic_auth=(es_username, es_password),
-                        request_timeout=30,
+                        request_timeout=60,
                         verify_certs=True,
                     )
                 else:
@@ -78,7 +78,7 @@ class ElasticSearchClient:
                             f'http://{feconf.ES_HOST}:{feconf.ES_LOCALHOST_PORT}'
                         ],
                         basic_auth=(es_username, es_password),
-                        request_timeout=30,
+                        request_timeout=60,
                         verify_certs=False,
                     )
 

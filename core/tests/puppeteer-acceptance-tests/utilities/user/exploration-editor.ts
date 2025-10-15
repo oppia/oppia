@@ -2684,6 +2684,7 @@ export class ExplorationEditor extends BaseUser {
         });
       }
       await publishExploration();
+      await this.page.waitForTimeout(5000);
       return await confirmPublish();
     }
   }
