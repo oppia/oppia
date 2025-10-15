@@ -70,6 +70,7 @@ CODEOWNER_IMPORTANT_PATHS: Final = [
     '/core/templates/pages/license-page/license-page.component.html',
     '/core/domain/takeout_*.py',
     '/core/domain/wipeout_*.py',
+    "/testfile.txt",
 ]
 
 
