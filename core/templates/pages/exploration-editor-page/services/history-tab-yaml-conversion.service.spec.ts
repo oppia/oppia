@@ -25,7 +25,7 @@ import {
   EntityTranslationsService,
   LanguageCodeToEntityTranslations,
 } from '../../../services/entity-translations.services';
-import {EntityTranslation} from '../../../domain/translation/EntityTranslationObjectFactory';
+import {EntityTranslation} from '../../../domain/translation/entity-translation.model';
 
 describe('History tab yaml conversion service', () => {
   let historyTabYamlConversionService: HistoryTabYamlConversionService;

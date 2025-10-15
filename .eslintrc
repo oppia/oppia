@@ -20,7 +20,7 @@
       // they are never minified. Also, we exclude no-loss-of-precision check as
       // it is only relevant for non-test files, since when running
       // frontend tests there is no loss of precision.
-      "files": ["*Spec.js", "*Spec.ts", "*.spec.ts"],
+      "files": ["*Spec.js","*.spec.ts"],
       "rules": {
         "angular/di": "off",
         "no-loss-of-precision": "off"

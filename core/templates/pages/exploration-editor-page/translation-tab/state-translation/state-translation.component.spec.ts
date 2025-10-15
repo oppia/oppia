@@ -34,7 +34,7 @@ import {Rule} from 'domain/exploration/rule.model';
 import {StateObjectsBackendDict} from 'domain/exploration/states.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
-import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
+import {EntityTranslation} from 'domain/translation/entity-translation.model';
 import {ParameterizeRuleDescriptionPipe} from 'filters/parameterize-rule-description.pipe';
 import {ConvertToPlainTextPipe} from 'filters/string-utility-filters/convert-to-plain-text.pipe';
 import {WrapTextWithEllipsisPipe} from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
@@ -54,7 +54,7 @@ import {TranslationTabActiveContentIdService} from '../services/translation-tab-
 import {TranslationTabActiveModeService} from '../services/translation-tab-active-mode.service';
 import {StateTranslationComponent} from './state-translation.component';
 import {RouterService} from 'pages/exploration-editor-page/services/router.service';
-import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
+import {TranslatedContent} from 'domain/exploration/translated-content.model';
 import {Hint} from 'domain/exploration/hint-object.model';
 import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {PlatformFeatureService} from 'services/platform-feature.service';
