@@ -19,7 +19,7 @@
 import {
   TranslatedContent,
   TranslatedContentBackendDict,
-} from './TranslatedContentObjectFactory';
+} from './translated-content.model';
 
 describe('TranslatedContent', () => {
   let translatedContentBackendDict: TranslatedContentBackendDict;

@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of
- * TranslatedContent domain objects.
+ * @fileoverview Model for creating new frontend instances of
+ * TranslatedContent.
  */
 
 import cloneDeep from 'lodash/cloneDeep';
