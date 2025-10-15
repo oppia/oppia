@@ -21,6 +21,7 @@ import {FormsModule} from '@angular/forms';
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 import {GoalListComponent} from './goal-list.component';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
@@ -176,10 +177,22 @@ describe('GoalListComponent', () => {
     },
   };
 
+  class MockPlatformFeatureService {
+    status = {
+      SerialChapterLaunchLearnerView: {
+        isEnabled: false,
+      },
+    };
+  }
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
+
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [FormsModule, HttpClientTestingModule],
-      providers: [AssetsBackendApiService],
+      providers: [
+        {provide: PlatformFeatureService, useValue: mockPlatformFeatureService},
+        AssetsBackendApiService,
+      ],
       declarations: [GoalListComponent, MockTranslatePipe],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
