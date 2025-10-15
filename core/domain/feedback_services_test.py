@@ -62,7 +62,7 @@ class FeedbackServicesUnitTests(test_utils.EmailTestBase):
 
     def test_feedback_ids(self) -> None:
         """Test various conventions for thread and message ids."""
-        exp_id = '55'
+        exp_id = '0'
         feedback_services.create_thread(
             'exploration', exp_id, 'test_user', 'a subject', 'some text'
         )
