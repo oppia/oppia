@@ -21,8 +21,8 @@ import {TestBed} from '@angular/core/testing';
 import {Solution} from 'domain/exploration/solution.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 
-describe('Solution object factory', () => {
-  describe('SolutionObjectFactory', () => {
+describe('Solution', () => {
+  describe('Solution', () => {
     let solution: Solution;
     beforeEach(() => {
       TestBed.configureTestingModule({});

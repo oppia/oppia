@@ -18,7 +18,7 @@
 
 import {fakeAsync, tick} from '@angular/core/testing';
 import {AnswerStats} from 'domain/exploration/answer-stats.model';
-import {StateTopAnswersStats} from 'domain/statistics/state-top-answers-stats-object.factory';
+import {StateTopAnswersStats} from 'domain/statistics/state-top-answers-stats.model';
 import {TestBed} from '@angular/core/testing';
 import {ExplorationParamChangesService} from 'pages/exploration-editor-page/services/exploration-param-changes.service';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
