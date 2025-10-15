@@ -22,13 +22,32 @@
             <oppia-content-toggle-button (contentToggleEmitter)="handleToggleState($event, story.getId())"> </oppia-content-toggle-button>
           </div>
             <!--TODO(#18384): Resume state, can only check if node is completed or not.-->
-          <a *ngIf="story.getAllNodes().length !== story.getCompletedNodeTitles().length && !isExpanded(story.getId())"
-             class="oppia-learner-dash-button-sm oppia-learner-dash-button--goals-list align-self-end e2e-test-start-lesson-button"
-             [ngClass]="isSerialChapterFeatureLearnerFlagEnabled() ? (story.getAllNodes()[allCurrentNodes[i]]?.getPublishedStatus() ? 'oppia-learner-dash-button--default' : 'oppia-learner-dash-button--disabled') : 'oppia-learner-dash-button--default'"
-             [attr.href]="isSerialChapterFeatureLearnerFlagEnabled() ? story.getAllNodes()[allCurrentNodes[i]]?.getPublishedStatus() ?
-             getNodeLessonUrl(story, story.getAllNodes()[allCurrentNodes[i]]) : null : getNodeLessonUrl(story, story.getAllNodes()[allCurrentNodes[i]])">
-             {{ isSerialChapterFeatureLearnerFlagEnabled() ? story.getAllNodes()[allCurrentNodes[i]]?.getPublishedStatus() ? ('I18N_LEARNER_DASHBOARD_CARD_BUTTON_START' | translate) : ('I18N_LEARNER_STORY_TILE_COMING_SOON' | translate) : ('I18N_LEARNER_DASHBOARD_CARD_BUTTON_START' | translate) }}
-          </a>
+            <a
+              *ngIf="story.getAllNodes().length !== story.getCompletedNodeTitles().length && !isExpanded(story.getId())"
+              class="oppia-learner-dash-button-sm oppia-learner-dash-button--goals-list align-self-end e2e-test-start-lesson-button"
+              [ngClass]="
+                isSerialChapterFeatureLearnerFlagEnabled()
+                  ? (story.getAllNodes()[allCurrentNodes[i]]?.getPublishedStatus()
+                      ? 'oppia-learner-dash-button--default'
+                      : 'oppia-learner-dash-button--disabled')
+                  : 'oppia-learner-dash-button--default'
+              "
+              [attr.href]="
+                isSerialChapterFeatureLearnerFlagEnabled()
+                  ? (story.getAllNodes()[allCurrentNodes[i]]?.getPublishedStatus()
+                      ? getNodeLessonUrl(story, story.getAllNodes()[allCurrentNodes[i]])
+                      : null)
+                  : getNodeLessonUrl(story, story.getAllNodes()[allCurrentNodes[i]])
+              "
+            >
+              {{
+                isSerialChapterFeatureLearnerFlagEnabled()
+                  ? (story.getAllNodes()[allCurrentNodes[i]]?.getPublishedStatus()
+                      ? ('I18N_LEARNER_DASHBOARD_CARD_BUTTON_START' | translate)
+                      : ('I18N_LEARNER_STORY_TILE_COMING_SOON' | translate))
+                  : ('I18N_LEARNER_DASHBOARD_CARD_BUTTON_START' | translate)
+              }}
+            </a>
         </div>
       </div>
     </div>
@@ -43,33 +62,32 @@
               <circle-progress [percent]="story.isNodeCompleted(storyNode.getTitle()) ? 100 : 0"> </circle-progress>
               <p class="mb-0"> {{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_LIST_NODE_TITLE' | translate: {number: (j + 1), title: storyNode.getTitle()} }} </p>
             </div>
-            <a *ngIf="!story.isNodeCompleted(storyNode.getTitle())"
-               class="oppia-learner-dash-button-sm oppia-learner-dash-button--goals-list"
-               [ngClass]="
-                isSerialChapterFeatureLearnerFlagEnabled()
-                  ? storyNode.getPublishedStatus()
-                    ? (allCurrentNodes[i] === j
-                      ? 'oppia-learner-dash-button--default'
-                      : 'oppia-learner-dash-button--disabled')
+              <a
+                *ngIf="!story.isNodeCompleted(storyNode.getTitle())"
+                class="oppia-learner-dash-button-sm oppia-learner-dash-button--goals-list"
+                [ngClass]="
+                  isSerialChapterFeatureLearnerFlagEnabled()
+                    ? (!storyNode.getPublishedStatus() || allCurrentNodes[i] !== j
+                        ? 'oppia-learner-dash-button--disabled'
+                        : 'oppia-learner-dash-button--default')
                     : 'oppia-learner-dash-button--default'
-                  : 'oppia-learner-dash-button--default'"
-               [attr.href]="isSerialChapterFeatureLearnerFlagEnabled()
-                ? (storyNode.getPublishedStatus()
-                  ? (allCurrentNodes[i] === j
-                    ? getNodeLessonUrl(story, storyNode)
-                    : null)
-                  : null)
-                : getNodeLessonUrl(story, storyNode)">
-              {{
-                isSerialChapterFeatureLearnerFlagEnabled()
-                  ? (storyNode.getPublishedStatus()
-                    ? (allCurrentNodes[i] === j
-                      ? ('I18N_LEARNER_DASHBOARD_CARD_BUTTON_START' | translate)
-                      : ('I18N_LEARNER_DASHBOARD_CARD_BUTTON_START' | translate))
-                    : ('I18N_LEARNER_STORY_TILE_COMING_SOON' | translate))
-                  : ('I18N_LEARNER_DASHBOARD_CARD_BUTTON_START' | translate)
-              }}
-            </a>
+                "
+                [attr.href]="
+                  isSerialChapterFeatureLearnerFlagEnabled()
+                    ? (storyNode.getPublishedStatus() && allCurrentNodes[i] === j
+                        ? getNodeLessonUrl(story, storyNode)
+                        : null)
+                    : getNodeLessonUrl(story, storyNode)
+                "
+              >
+                {{
+                  isSerialChapterFeatureLearnerFlagEnabled()
+                    ? (storyNode.getPublishedStatus()
+                        ? ('I18N_LEARNER_DASHBOARD_CARD_BUTTON_START' | translate)
+                        : ('I18N_LEARNER_STORY_TILE_COMING_SOON' | translate))
+                    : ('I18N_LEARNER_DASHBOARD_CARD_BUTTON_START' | translate)
+                }}
+              </a>
           </div>
           <div class="goal-list-story-node-line-container">
             <div *ngIf="j !== story.getAllNodes().length - 1" class="goal-list-story-node-line"></div>

@@ -31,6 +31,9 @@ class MockPlatformFeatureService {
     SerialChapterLaunchCurriculumAdminView: {
       isEnabled: false,
     },
+    SerialChapterLaunchLearnerView: {
+      isEnabled: false,
+    },
   };
 }
 
@@ -68,9 +71,17 @@ describe('StorySummaryTileComponent', () => {
   it('should get status of Serial Chapter Launch Feature flag', () => {
     expect(component.isSerialChapterFeatureFlagEnabled()).toEqual(false);
 
-    mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled =
+    mockPlatformFeatureService.status.SerialChapterLaunchLearnerView.isEnabled =
       true;
     expect(component.isSerialChapterFeatureFlagEnabled()).toEqual(true);
+  });
+
+  it('should get status of Serial Chapter Launch Learner Feature flag', () => {
+    expect(component.isSerialChapterFeatureLearnerFlagEnabled()).toEqual(false);
+
+    mockPlatformFeatureService.status.SerialChapterLaunchLearnerView.isEnabled =
+      true;
+    expect(component.isSerialChapterFeatureLearnerFlagEnabled()).toEqual(true);
   });
 
   it('should set properties on initialization', () => {

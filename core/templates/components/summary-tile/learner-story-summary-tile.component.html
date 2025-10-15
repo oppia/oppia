@@ -13,7 +13,7 @@
         </div>
       </div>
       <a class="oppia-story-link"
-         [attr.href]="isSerialChapterFeatureLearnerFlagEnabled() ? getStoryLink() : statusIsPublished ? getStoryLink() : null"
+         [attr.href]="isSerialChapterFeatureLearnerFlagEnabled() ?  statusIsPublished ? getStoryLink() : null : getStoryLink()"
          [title]="isSerialChapterFeatureLearnerFlagEnabled() && !statusIsPublished ? ('I18N_LEARNER_STORY_TILE_COMING_SOON_TOOLTIP' | translate) : ''"
          (click)="isSerialChapterFeatureLearnerFlagEnabled() ? onStoryClick($event) : null"
          (contextmenu)="isSerialChapterFeatureLearnerFlagEnabled() ? onStoryClick($event) : null"
