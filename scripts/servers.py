@@ -291,6 +291,8 @@ def managed_elasticsearch_dev_server() -> Iterator[psutil.Process]:
         '-q',
         '-E',
         'xpack.security.enabled=false',
+        '-E',
+        'xpack.security.transport.ssl.enabled=false',
     ]
     # Override the default path to ElasticSearch config files.
     es_env = {
