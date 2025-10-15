@@ -114,7 +114,7 @@
         <ng-container *ngFor="let actionButton of questionPlayerConfig.resultActionButtons">
           <span *ngIf="!(actionButton.type === 'RETRY_SESSION') && !(actionButton.type === 'DASHBOARD' && !userIsLoggedIn) && !(actionButton.type === 'REVIEW_LOWEST_SCORED_SKILL' && getWorstSkillIds().length === 0)"
                 (click)="performAction(actionButton)">
-            <div class="action-button-inner {{getActionButtonInnerClass(actionButton.type)}}" 
+            <div class="action-button-inner {{getActionButtonInnerClass(actionButton.type)}}"
                  role="button"
                  tabindex="0">
               <span [innerHTML]="getActionButtonIconHtml(actionButton.type)"></span>
