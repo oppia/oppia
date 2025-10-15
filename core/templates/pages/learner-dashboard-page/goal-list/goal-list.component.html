@@ -44,8 +44,8 @@
               <p class="mb-0"> {{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_LIST_NODE_TITLE' | translate: {number: (j + 1), title: storyNode.getTitle()} }} </p>
             </div>
             <a *ngIf="!story.isNodeCompleted(storyNode.getTitle())"
-              class="oppia-learner-dash-button-sm oppia-learner-dash-button--goals-list"
-              [ngClass]="
+               class="oppia-learner-dash-button-sm oppia-learner-dash-button--goals-list"
+               [ngClass]="
                 isSerialChapterFeatureLearnerFlagEnabled()
                   ? storyNode.getPublishedStatus()
                     ? (allCurrentNodes[i] === j
@@ -53,7 +53,7 @@
                       : 'oppia-learner-dash-button--disabled')
                     : 'oppia-learner-dash-button--default'
                   : 'oppia-learner-dash-button--default'"
-              [attr.href]="isSerialChapterFeatureLearnerFlagEnabled()
+               [attr.href]="isSerialChapterFeatureLearnerFlagEnabled()
                 ? (storyNode.getPublishedStatus()
                   ? (allCurrentNodes[i] === j
                     ? getNodeLessonUrl(story, storyNode)
