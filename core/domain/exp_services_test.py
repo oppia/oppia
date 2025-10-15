@@ -7875,6 +7875,9 @@ title: Old Title
                 user_id, exp_id, change_list, 'By voice artist', True
             )
 
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS]
+    )
     def test_update_exploration_linked_to_story(self) -> None:
         story_id = story_services.get_new_story_id()
         topic_id = topic_fetchers.get_new_topic_id()

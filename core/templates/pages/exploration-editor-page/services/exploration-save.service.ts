@@ -49,6 +49,9 @@ import {LoggerService} from 'services/contextual/logger.service';
 import {HttpErrorResponse} from '@angular/common/http';
 import {ParamChange} from 'domain/exploration/param-change.model';
 import {DiffNodeData} from 'components/version-diff-visualization/version-diff-visualization.component';
+import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {PageContextService} from 'services/page-context.service';
 
 @Injectable({
   providedIn: 'root',
@@ -85,11 +88,14 @@ export class ExplorationSaveService {
     private explorationTitleService: ExplorationTitleService,
     private explorationWarningsService: ExplorationWarningsService,
     private externalSaveService: ExternalSaveService,
+    private voiceoverBackendApiService: VoiceoverBackendApiService,
     private logger: LoggerService,
     private ngbModal: NgbModal,
     private routerService: RouterService,
     private siteAnalyticsService: SiteAnalyticsService,
-    private windowRef: WindowRef
+    private windowRef: WindowRef,
+    private platformFeatureService: PlatformFeatureService,
+    private pageContextService: PageContextService
   ) {}
 
   showCongratulatorySharingModal(): void {
@@ -184,6 +190,29 @@ export class ExplorationSaveService {
               this.saveIsInProgress = false;
               this.editabilityService.markEditable();
               resolve();
+
+              let voiceoverRegenerationInBackgroundIsEnabled =
+                this.platformFeatureService.status
+                  .EnableBackgroundVoiceoverSynthesis.isEnabled;
+              let isExplorationLinkedToStory =
+                this.pageContextService.isExplorationLinkedToStory();
+
+              if (
+                isExplorationLinkedToStory &&
+                voiceoverRegenerationInBackgroundIsEnabled
+              ) {
+                this.voiceoverBackendApiService.regenerateVoiceoverOnExplorationUpdateAsync(
+                  this.explorationDataService.explorationId as string,
+                  this.explorationDataService.data.version as number,
+                  this.explorationTitleService.displayed as string
+                );
+                this.alertsService.addSuccessMessage(
+                  'Voiceovers will be regenerated automatically in the ' +
+                    'background, please reload the page after a few minutes to ' +
+                    'see the changes.',
+                  10000
+                );
+              }
             },
             () => {
               this.editabilityService.markEditable();

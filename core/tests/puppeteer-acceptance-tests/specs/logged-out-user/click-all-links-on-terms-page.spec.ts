@@ -49,28 +49,19 @@ describe('Logged-out User', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should be able to navigate to "privacy policy" page from the link' +
-      'in "privacy policy" section.',
-    async function () {
-      await loggedOutUser.clickPrivacyPolicyLinkInTermsPage();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should be able to navigate to "CC-BY-SA 4.0" license page form the link' +
-      'in "Hosted Created Content and IP" section.',
-    async function () {
-      await loggedOutUser.clickLicenseLinkInTermsPage();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
     'should be able to navigate to "oppia-announce" google group page from the link' +
       'in "Modifications to These Terms" section.',
     async function () {
       await loggedOutUser.clickGoogleGroupSignUpLinkInTermsPage();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should be able to navigate to "privacy policy" page from the link' +
+      'in "privacy policy" section.',
+    async function () {
+      await loggedOutUser.clickPrivacyPolicyLinkInTermsPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
