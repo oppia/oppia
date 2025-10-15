@@ -289,10 +289,7 @@ def managed_elasticsearch_dev_server() -> Iterator[psutil.Process]:
         '%s/bin/elasticsearch' % common.ES_PATH,
         # -q is the quiet flag.
         '-q',
-        '-E',
-        'xpack.security.enabled=false',
-        '-E',
-        'xpack.security.transport.ssl.enabled=false',
+        '-E xpack.security.enabled=false',
     ]
     # Override the default path to ElasticSearch config files.
     es_env = {
