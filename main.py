@@ -610,6 +610,10 @@ URLS = [
         voiceover.RegenerateAutomaticVoiceoverHandler,
     ),
     get_redirect_route(
+        r'%s' % feconf.REGENERATE_VOICEOVER_ON_EXP_UPDATE_URL,
+        voiceover.RegenerateVoiceoverOnExpUpdateHandler,
+    ),
+    get_redirect_route(
         r'%s/<classroom_url_fragment>/<topic_url_fragment>'
         r'/<story_url_fragment>/<node_id>' % feconf.STORY_PROGRESS_URL_PREFIX,
         story_viewer.StoryProgressHandler,

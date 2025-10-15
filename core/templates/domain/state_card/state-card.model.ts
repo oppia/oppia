@@ -29,8 +29,8 @@ import {
   InteractionSpecsConstants,
   InteractionSpecsKey,
 } from 'pages/interaction-specs.constants';
-import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
-import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
+import {EntityTranslation} from 'domain/translation/entity-translation.model';
+import {TranslatedContent} from 'domain/exploration/translated-content.model';
 import {InteractionAnswer} from 'interactions/answer-defs';
 
 export interface InputResponsePair {
