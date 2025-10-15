@@ -328,7 +328,7 @@ def _migrate_rubrics_to_latest_schema(
 
 
 def get_multiple_skills_by_ids_and_version(
-    skill_ids_and_versions: List[Tuple[str, Optional[int]]]
+    skill_ids_and_versions: List[Tuple[str, Optional[int]]],
 ) -> List[Optional[skill_domain.Skill]]:
     """Returns a list of skills matching the IDs and versions provided.
 
@@ -344,9 +344,8 @@ def get_multiple_skills_by_ids_and_version(
     """
     skill_model_list = skill_models.SkillModel.get_version_multi(
         skill_ids_and_versions
-        )
+    )
     return [
-        get_skill_from_model(skill_model)
-        if skill_model is not None else None
+        get_skill_from_model(skill_model) if skill_model is not None else None
         for skill_model in skill_model_list
     ]

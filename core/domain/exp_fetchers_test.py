@@ -487,27 +487,36 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
     def test_get_multiple_explorations_by_ids_and_version(self) -> None:
         """Test fetching multiple explorations with specific versions."""
         self.save_new_valid_exploration(
-            'exp1', self.owner_id, title='Original Exp1')
+            'exp1', self.owner_id, title='Original Exp1'
+        )
         self.save_new_valid_exploration(
-            'exp2', self.owner_id, title='Original Exp2')
-
-        exp_services.update_exploration(
-            self.owner_id, 'exp1',
-            [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                'property_name': 'title',
-                'new_value': 'Updated Exp1'
-            })],
-            'Update exp1 title'
+            'exp2', self.owner_id, title='Original Exp2'
         )
 
-        results = exp_fetchers.get_multiple_explorations_by_ids_and_version([
-            ('exp1', 1),
-            ('exp1', 2),
-            ('exp2', 1),
-            ('exp1', None),
-            ('nonexistent', 1),
-        ])
+        exp_services.update_exploration(
+            self.owner_id,
+            'exp1',
+            [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                        'property_name': 'title',
+                        'new_value': 'Updated Exp1',
+                    }
+                )
+            ],
+            'Update exp1 title',
+        )
+
+        results = exp_fetchers.get_multiple_explorations_by_ids_and_version(
+            [
+                ('exp1', 1),
+                ('exp1', 2),
+                ('exp2', 1),
+                ('exp1', None),
+                ('nonexistent', 1),
+            ]
+        )
 
         self.assertEqual(len(results), 5)
 
@@ -538,14 +547,14 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
         self.assertIsNone(results[4])
 
     def test_get_multiple_explorations_by_ids_and_version_with_invalid_version(
-        self
+        self,
     ) -> None:
         """Test fetching explorations with invalid version numbers."""
         self.save_new_valid_exploration('exp1', self.owner_id)
 
-        results = exp_fetchers.get_multiple_explorations_by_ids_and_version([
-            ('exp1', 999)
-        ])
+        results = exp_fetchers.get_multiple_explorations_by_ids_and_version(
+            [('exp1', 999)]
+        )
         self.assertEqual(len(results), 1)
         self.assertIsNone(results[0])
 
@@ -554,14 +563,14 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration('exp1', self.owner_id)
         exp_services.delete_exploration(self.owner_id, 'exp1')
 
-        results = exp_fetchers.get_multiple_explorations_by_ids_and_version([
-            ('exp1', 1)
-        ])
+        results = exp_fetchers.get_multiple_explorations_by_ids_and_version(
+            [('exp1', 1)]
+        )
         self.assertEqual(len(results), 1)
         self.assertIsNone(results[0])
 
     def test_get_multiple_explorations_by_empty_ids_and_version_list(
-        self
+        self,
     ) -> None:
         """Test fetching with empty list of IDs."""
         results = exp_fetchers.get_multiple_explorations_by_ids_and_version([])
