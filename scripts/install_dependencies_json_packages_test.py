@@ -390,12 +390,13 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                         'rootDir': 'bootstrap-4.3.1-dist',
                         'targetDir': 'bootstrap',
                     },
-                    'angularTest': {
-                        'version': '1.8.2',
+                    'jqueryUI': {
+                        'version': '1.12.1',
                         'downloadFormat': 'files',
-                        'url': 'https://code.angularjs.org/1.8.2',
-                        'targetDirPrefix': 'angularjs-',
-                        'files': ['angular-mocks.js'],
+                        'url': 'https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1',
+                        'rootDirPrefix': 'jqueryui-',
+                        'targetDirPrefix': 'jqueryui-',
+                        'files': ['jquery-ui.min.js'],
                     },
                 }
             }
