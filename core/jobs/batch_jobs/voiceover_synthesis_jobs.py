@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2022 The Oppia Authors. All Rights Reserved.
+# Copyright 2025 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Jobs used for migrating the exploration models."""
+"""Jobs used for regenerating voiceovers for all the curated explorations."""
 
 from __future__ import annotations
 
@@ -73,7 +73,7 @@ class GenerateVoiceoversFn(beam.DoFn):  # type: ignore[misc]
 
     def process(
         self,
-        kv: Tuple[
+        combined_models: Tuple[
             str,
             Dict[
                 str,
@@ -94,10 +94,10 @@ class GenerateVoiceoversFn(beam.DoFn):  # type: ignore[misc]
         """Method to process each element in the PCollection.
 
         Args:
-            kv: tuple(str, dict). A tuple where the first element is the
-                exploration ID and the second element is a dictionary with keys
-                'exploration', 'translations' and 'voiceovers' mapping to a
-                list of corresponding models.
+            combined_models: tuple(str, dict). A tuple where the first element
+                is the exploration ID and the second element is a dictionary
+                with keys 'exploration', 'translations' and 'voiceovers' mapping
+                to a list of corresponding models.
             autogeneration_policy_model: VoiceoverAutogenerationPolicyModel.
                 The voiceover autogeneration policy model.
 
@@ -106,21 +106,22 @@ class GenerateVoiceoversFn(beam.DoFn):  # type: ignore[misc]
             str. The status string for the voiceover generation process.
         """
         # Here we use cast because we are narrowing down the type of
-        # exploration field in kv to Exploration model.
+        # exploration field in combined_models to Exploration model.
         exploration_model = cast(
-            exp_models.ExplorationModel, kv[1]['exploration'][0]
+            exp_models.ExplorationModel, combined_models[1]['exploration'][0]
         )
         # Here we use cast because we are narrowing down the type of
-        # translations field in kv to Sequence of EntityTranslationsModel.
+        # translations field in combined_models to Sequence of
+        # EntityTranslationsModel.
         entity_translation_models = cast(
             Sequence[translation_models.EntityTranslationsModel],
-            kv[1]['translations'],
+            combined_models[1]['translations'],
         )
         # Here we use cast because we are narrowing down the type of
-        # voiceovers field in kv to Sequence of EntityVoiceoversModel.
+        # voiceovers field in combined_models to Sequence of EntityVoiceoversModel.
         entity_voiceover_models = cast(
             Sequence[voiceover_models.EntityVoiceoversModel],
-            kv[1]['voiceovers'],
+            combined_models[1]['voiceovers'],
         )
 
         entity_voiceovers_list, status_string = (
