@@ -36,7 +36,7 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-from typing import Dict, Iterator, List, Optional, Sequence, Tuple
+from typing import Dict, Iterator, List, Optional, Sequence, Tuple, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -77,15 +77,20 @@ class GenerateVoiceoversFn(beam.DoFn):  # type: ignore[misc]
             str,
             Dict[
                 str,
-                Iterator[exp_models.ExplorationModel]
-                | Iterator[voiceover_models.EntityVoiceoversModel]
-                | Iterator[translation_models.EntityTranslationsModel],
+                Sequence[exp_models.ExplorationModel]
+                | Sequence[voiceover_models.EntityVoiceoversModel]
+                | Sequence[translation_models.EntityTranslationsModel],
             ],
         ],
         autogeneration_policy_model: (
             voiceover_models.VoiceoverAutogenerationPolicyModel
         ),
-    ) -> str:
+    ) -> Iterator[
+        Union[
+            voiceover_models.EntityVoiceoversModel,
+            beam.pvalue.TaggedOutput[str],
+        ]
+    ]:
         """Method to process each element in the PCollection.
 
         Args:
@@ -100,9 +105,23 @@ class GenerateVoiceoversFn(beam.DoFn):  # type: ignore[misc]
             EntityVoiceoversModel. The generated entity voiceover models.
             str. The status string for the voiceover generation process.
         """
-        exploration_model = kv[1]['exploration'][0]
-        entity_translation_models = kv[1]['translations']
-        entity_voiceover_models = kv[1]['voiceovers']
+        # Here we use cast because we are narrowing down the type of
+        # exploration field in kv to Exploration model.
+        exploration_model = cast(
+            exp_models.ExplorationModel, kv[1]['exploration'][0]
+        )
+        # Here we use cast because we are narrowing down the type of
+        # translations field in kv to Sequence of EntityTranslationsModel.
+        entity_translation_models = cast(
+            Sequence[translation_models.EntityTranslationsModel],
+            kv[1]['translations'],
+        )
+        # Here we use cast because we are narrowing down the type of
+        # voiceovers field in kv to Sequence of EntityVoiceoversModel.
+        entity_voiceover_models = cast(
+            Sequence[voiceover_models.EntityVoiceoversModel],
+            kv[1]['voiceovers'],
+        )
 
         entity_voiceovers_list, status_string = (
             VoiceoverSynthesisJob.generate_voiceovers_for_exploration(
@@ -470,7 +489,7 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
             combined_models
             | 'Generate voiceovers for each exploration'
             >> beam.ParDo(
-                GenerateVoiceoversFn(self.generate_voiceovers_for_exploration),
+                GenerateVoiceoversFn(),
                 beam.pvalue.AsSingleton(voiceover_policy_model),
             ).with_outputs('status', main='voiceovers')
         )
