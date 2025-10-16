@@ -28,6 +28,7 @@ from core.domain import (
     story_services,
     topic_domain,
     topic_services,
+    voiceover_regeneration_services,
 )
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import voiceover_synthesis_jobs
@@ -35,7 +36,7 @@ from core.jobs.types import job_run_result
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Type
+from typing import Dict, List, Type, Union
 
 MYPY = False
 if MYPY:
@@ -361,6 +362,20 @@ class VoiceoverSynthesisBaseClass(
         voiceover_models.EntityVoiceoversModel.create_new(
             feconf.ENTITY_TYPE_EXPLORATION,
             self.CURATED_EXPLORATION_ID_1,
+            1,
+            'en-US',
+            {
+                'content_0': {
+                    'manual': None,
+                    'auto': None,
+                }
+            },
+            {},
+        ).put()
+
+        voiceover_models.EntityVoiceoversModel.create_new(
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.CURATED_EXPLORATION_ID_1,
             2,
             'en-US',
             {
@@ -470,6 +485,60 @@ class VoiceoverSynthesisJobRunTests(VoiceoverSynthesisBaseClass):
         ]
 
         self.assert_job_output_is(expected_output)
+
+    def test_check_is_exploration_curated_for_invalid_id(self) -> None:
+        is_exploration_curated = voiceover_synthesis_jobs.VoiceoverSynthesisJob.is_exploration_curated(
+            exploration_id=''
+        )
+        self.assertFalse(is_exploration_curated)
+
+    def test_should_handle_failures_during_voiceover_regneration(self) -> None:
+        def mock_synthesize_voiceover_for_html_string(
+            _exploration_id: str,
+            _content_html: str,
+            _language_accent_code: str,
+            _voiceover_filename: str,
+        ) -> List[Dict[str, Union[str, float]]]:
+            raise Exception('Failed to generate voiceovers.')
+
+        self._create_data_for_testing()
+
+        expected_output_1 = (
+            'Exploration ID: exploration_id_1.\n'
+            'Generating voiceovers for Entityvoiceover with ID: exploration-exploration_id_1-2-en-US.\n'
+            'Error for exploration_id: exploration_id_1, content_id: content_0, language_accent_code: en-US: Failed to generate voiceovers.\n'
+            'Error for exploration_id: exploration_id_1, content_id: default_outcome_1, language_accent_code: en-US: Failed to generate voiceovers.\n'
+            'Error for exploration_id: exploration_id_1, content_id: ca_placeholder_2, language_accent_code: en-US: Failed to generate voiceovers.\n'
+            'Error for exploration_id: exploration_id_1, content_id: content_3, language_accent_code: en-US: Failed to generate voiceovers.\n'
+            'Generating voiceovers for Entityvoiceover with ID: exploration-exploration_id_1-2-hi-IN.\n'
+            'Error for exploration_id: exploration_id_1, content_id: content_0, language_accent_code: hi-IN: Failed to generate voiceovers.\n'
+        )
+        expected_output_2 = (
+            'Exploration ID: exploration_id_2.\n'
+            'Generating voiceovers for Entityvoiceover with ID: exploration-exploration_id_2-2-en-US.\n'
+            'Error for exploration_id: exploration_id_2, content_id: content_0, language_accent_code: en-US: Failed to generate voiceovers.\n'
+            'Error for exploration_id: exploration_id_2, content_id: default_outcome_1, language_accent_code: en-US: Failed to generate voiceovers.\n'
+            'Error for exploration_id: exploration_id_2, content_id: ca_placeholder_2, language_accent_code: en-US: Failed to generate voiceovers.\n'
+            'Error for exploration_id: exploration_id_2, content_id: content_3, language_accent_code: en-US: Failed to generate voiceovers.\n'
+            'Generating voiceovers for Entityvoiceover with ID: exploration-exploration_id_2-2-pt-BR.\n'
+            'Error for exploration_id: exploration_id_2, content_id: content_0, language_accent_code: pt-BR: Failed to generate voiceovers.\n'
+        )
+
+        with self.swap(
+            voiceover_regeneration_services,
+            'synthesize_voiceover_for_html_string',
+            mock_synthesize_voiceover_for_html_string,
+        ):
+            expected_output = [
+                job_run_result.JobRunResult(
+                    stdout=expected_output_1, stderr=''
+                ),
+                job_run_result.JobRunResult(
+                    stdout=expected_output_2, stderr=''
+                ),
+            ]
+
+            self.assert_job_output_is(expected_output)
 
 
 class VoiceoverSynthesisAuditJobRunTests(VoiceoverSynthesisBaseClass):
