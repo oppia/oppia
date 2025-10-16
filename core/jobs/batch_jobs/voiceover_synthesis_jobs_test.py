@@ -18,49 +18,38 @@
 
 from __future__ import annotations
 
+from core import feconf
+from core.constants import constants
+from core.domain import (
+    exp_domain,
+    exp_services,
+    state_domain,
+    story_domain,
+    story_services,
+    topic_domain,
+    topic_services,
+)
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import voiceover_synthesis_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
-from core.domain import exp_domain
-from core.domain import exp_services
-from core.domain import exp_fetchers
-from core.domain import story_domain
-from core.domain import state_domain
-from core.domain import story_services
-from core.domain import topic_domain
-from core.domain import topic_services
-from core.domain import voiceover_services
-from core.domain import translation_services
 from core.tests import test_utils
-from core.constants import constants
-from core import feconf
 
-from typing import Final, Type, Dict
+from typing import Type
 
 MYPY = False
 if MYPY:
-    from mypy_imports import user_models
-    from mypy_imports import translation_models
-    from mypy_imports import voiceover_models
+    from mypy_imports import translation_models, voiceover_models
 
-(user_models, translation_models, voiceover_models) = (
-    models.Registry.import_models(
-        [models.Names.USER, models.Names.TRANSLATION, models.Names.VOICEOVER]
-    )
+(translation_models, voiceover_models) = models.Registry.import_models(
+    [models.Names.TRANSLATION, models.Names.VOICEOVER]
 )
 
 
-class VoiceoverSynthesisJobRunTests(
+class VoiceoverSynthesisBaseClass(
     job_test_utils.JobTestBase, test_utils.GenericTestBase
 ):
-
-    JOB_CLASS: Type[voiceover_synthesis_jobs.VoiceoverSynthesisJob] = (
-        voiceover_synthesis_jobs.VoiceoverSynthesisJob
-    )
-
-    def test_empty_storage(self) -> None:
-        self.assert_job_output_is_empty()
+    """Base class for voiceover synthesis job tests."""
 
     EDITOR_EMAIL_1 = 'editor1@example.com'
     EDITOR_EMAIL_2 = 'editor2@example.com'
@@ -91,8 +80,6 @@ class VoiceoverSynthesisJobRunTests(
             ]
         )
 
-        self.editor_id_1 = self.get_user_id_from_email(self.EDITOR_EMAIL_1)
-        self.editor_id_2 = self.get_user_id_from_email(self.EDITOR_EMAIL_2)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
@@ -108,43 +95,14 @@ class VoiceoverSynthesisJobRunTests(
             'needs_update': False,
             'duration_secs': 40,
         }
-        self.voiceover_dict_3: state_domain.VoiceoverDict = {
-            'filename': 'filename3.mp3',
-            'file_size_bytes': 3000,
-            'needs_update': False,
-            'duration_secs': 20,
-        }
-        self.voiceover_dict_4: state_domain.VoiceoverDict = {
-            'filename': 'filename4.mp3',
-            'file_size_bytes': 3000,
-            'needs_update': False,
-            'duration_secs': 20,
-        }
-        self.voiceover_dict_5: state_domain.VoiceoverDict = {
-            'filename': 'filename5.mp3',
-            'file_size_bytes': 5000,
-            'needs_update': False,
-            'duration_secs': 42.43,
-        }
-        self.voiceover_dict_6: state_domain.VoiceoverDict = {
-            'filename': 'filename6.mp3',
-            'file_size_bytes': 1000,
-            'needs_update': False,
-            'duration_secs': 25,
-        }
-        self.voiceover_dict_7: state_domain.VoiceoverDict = {
-            'filename': 'filename7.mp3',
-            'file_size_bytes': 3000,
-            'needs_update': False,
-            'duration_secs': 42.43,
-        }
 
     def _create_data_for_testing(self) -> None:
-        # This method creates three explorations — two curated and one
-        # non-curated. It adds Hindi translations to the first curated
-        # exploration and Portuguese translations to the second. Additionally,
-        # it adds voiceovers in Hindi, Portuguese, and English to selected
-        # content within the curated explorations.
+        """This method creates three explorations — two curated and one
+        non-curated. It adds Hindi translations to the first curated
+        exploration and Portuguese translations to the second. Additionally,
+        it adds voiceovers in Hindi, Portuguese, and English to selected
+        content within the curated explorations.
+        """
 
         # Creating and publishing two topics.
         topic_1 = topic_domain.Topic.create_default_topic(
@@ -361,17 +319,7 @@ class VoiceoverSynthesisJobRunTests(
         )
         self.publish_exploration(self.owner_id, exploration_3.id)
 
-        exploration_1 = exp_fetchers.get_exploration_by_id(
-            self.CURATED_EXPLORATION_ID_1
-        )
-        exploration_2 = exp_fetchers.get_exploration_by_id(
-            self.CURATED_EXPLORATION_ID_2
-        )
-        exploration_3 = exp_fetchers.get_exploration_by_id(
-            self.NON_CURATED_EXPLORATION_ID
-        )
-
-        # Adding Hindi and Portuguese translations to the first and second
+        # Adding Hindi and Portuguese translations to the first and second.
         translation_models.EntityTranslationsModel.create_new(
             'exploration',
             self.CURATED_EXPLORATION_ID_1,
@@ -465,3 +413,97 @@ class VoiceoverSynthesisJobRunTests(
             },
             {},
         ).put()
+
+        voiceover_autogeneration_policy_model = (
+            voiceover_models.VoiceoverAutogenerationPolicyModel(
+                id=voiceover_models.VOICEOVER_AUTOGENERATION_POLICY_ID
+            )
+        )
+        voiceover_autogeneration_policy_model.language_codes_mapping = {
+            'en': {'en-US': True, 'en-NG': False},
+            'hi': {'hi-IN': True},
+            'pt': {'pt-BR': True},
+        }
+        (
+            voiceover_autogeneration_policy_model.autogenerated_voiceovers_are_enabled
+        ) = True
+        voiceover_autogeneration_policy_model.update_timestamps()
+        voiceover_autogeneration_policy_model.put()
+
+
+class VoiceoverSynthesisJobRunTests(VoiceoverSynthesisBaseClass):
+
+    JOB_CLASS: Type[voiceover_synthesis_jobs.VoiceoverSynthesisJob] = (
+        voiceover_synthesis_jobs.VoiceoverSynthesisJob
+    )
+
+    def test_empty_storage(self) -> None:
+        self.assert_job_output_is_empty()
+
+    def test_should_regenerate_voiceover_successfully(self) -> None:
+        self._create_data_for_testing()
+
+        expected_output_1 = (
+            'Exploration ID: exploration_id_1.\n'
+            'Generating voiceovers for Entityvoiceover with ID: exploration-exploration_id_1-2-en-US.\n'
+            'Generated voiceover for content_id: content_0.\n'
+            'Generated voiceover for content_id: default_outcome_1.\n'
+            'Generated voiceover for content_id: ca_placeholder_2.\n'
+            'Generated voiceover for content_id: content_3.\n'
+            'Generating voiceovers for Entityvoiceover with ID: exploration-exploration_id_1-2-hi-IN.\n'
+            'Generated voiceover for content_id: content_0.\n'
+        )
+        expected_output_2 = (
+            'Exploration ID: exploration_id_2.\n'
+            'Generating voiceovers for Entityvoiceover with ID: exploration-exploration_id_2-2-en-US.\n'
+            'Generated voiceover for content_id: content_0.\n'
+            'Generated voiceover for content_id: default_outcome_1.\n'
+            'Generated voiceover for content_id: ca_placeholder_2.\n'
+            'Generated voiceover for content_id: content_3.\n'
+            'Generating voiceovers for Entityvoiceover with ID: exploration-exploration_id_2-2-pt-BR.\n'
+            'Generated voiceover for content_id: content_0.\n'
+        )
+
+        expected_output = [
+            job_run_result.JobRunResult(stdout=expected_output_1, stderr=''),
+            job_run_result.JobRunResult(stdout=expected_output_2, stderr=''),
+        ]
+
+        self.assert_job_output_is(expected_output)
+
+
+class VoiceoverSynthesisAuditJobRunTests(VoiceoverSynthesisBaseClass):
+
+    JOB_CLASS: Type[voiceover_synthesis_jobs.VoiceoverSynthesisJobAuditJob] = (
+        voiceover_synthesis_jobs.VoiceoverSynthesisJobAuditJob
+    )
+
+    def test_should_regenerate_voiceover_successfully(self) -> None:
+        self._create_data_for_testing()
+
+        expected_output_1 = (
+            'Exploration ID: exploration_id_1.\n'
+            'Generating voiceovers for Entityvoiceover with ID: exploration-exploration_id_1-2-en-US.\n'
+            'Generated voiceover for content_id: content_0.\n'
+            'Generated voiceover for content_id: default_outcome_1.\n'
+            'Generated voiceover for content_id: ca_placeholder_2.\n'
+            'Generated voiceover for content_id: content_3.\n'
+            'Generating voiceovers for Entityvoiceover with ID: exploration-exploration_id_1-2-hi-IN.\n'
+            'Generated voiceover for content_id: content_0.\n'
+        )
+        expected_output_2 = (
+            'Exploration ID: exploration_id_2.\n'
+            'Generating voiceovers for Entityvoiceover with ID: exploration-exploration_id_2-2-en-US.\n'
+            'Generated voiceover for content_id: content_0.\n'
+            'Generated voiceover for content_id: default_outcome_1.\n'
+            'Generated voiceover for content_id: ca_placeholder_2.\n'
+            'Generated voiceover for content_id: content_3.\n'
+            'Generating voiceovers for Entityvoiceover with ID: exploration-exploration_id_2-2-pt-BR.\n'
+            'Generated voiceover for content_id: content_0.\n'
+        )
+
+        expected_output = [
+            job_run_result.JobRunResult(stdout=expected_output_1, stderr=''),
+            job_run_result.JobRunResult(stdout=expected_output_2, stderr=''),
+        ]
+        self.assert_job_output_is(expected_output)
