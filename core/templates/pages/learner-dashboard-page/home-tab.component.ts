@@ -96,26 +96,27 @@ export class HomeTabComponent {
     }
 
     // TODO(#18384): Test cases - current lesson is last lesson.
-    for (let i = 0; i < this.continueWhereYouLeftOffList.length; i++) {
-      let currentStorySummary =
-        this.continueWhereYouLeftOffList[i].getCanonicalStorySummaryDicts();
-      for (let j = 0; j < currentStorySummary.length; j++) {
-        const publishedNodes = currentStorySummary[j]
+    for (const topic of this.partiallyLearntTopicsList) {
+      const storySummaries = topic.getCanonicalStorySummaryDicts();
+
+      for (const story of storySummaries) {
+        const publishedNodes = story
           .getAllNodes()
           .filter(node => node.getPublishedStatus());
-
-        const completedNodes = currentStorySummary[j].getCompletedNodeTitles();
+        const completedNodes = story.getCompletedNodeTitles();
         const remainingPublished =
-          publishedNodes.length - completedNodes.length - 1;
-        if (this.hasMultipleUnfinishedPublished !== true) {
+          publishedNodes.length - completedNodes.length;
+
+        if (
+          remainingPublished > 0 &&
+          remainingPublished < publishedNodes.length
+        ) {
+          this.storySummariesWithAvailableNodes.add(story.getId());
+        }
+
+        if (!this.hasMultipleUnfinishedPublished) {
           this.hasMultipleUnfinishedPublished =
             publishedNodes.length > 1 && remainingPublished > 0;
-        }
-        const remainingNodes = publishedNodes.length - completedNodes.length;
-        if (remainingNodes >= 2) {
-          this.storySummariesWithAvailableNodes.add(
-            currentStorySummary[j].getId()
-          );
         }
       }
     }
