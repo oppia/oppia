@@ -23,6 +23,7 @@ import {Input} from '@angular/core';
 import {UrlService} from 'services/contextual/url.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {ChapterLabelVisibilityService} from 'services/chapter-label-visibility.service';
 import {AppConstants} from 'app.constants';
 import {StorySummary} from 'domain/story/story-summary.model';
 import {
@@ -77,6 +78,7 @@ export class StorySummaryTileComponent implements OnInit {
     private urlService: UrlService,
     private windowDimensionsService: WindowDimensionsService,
     private assetsBackendApiService: AssetsBackendApiService,
+    private chapterLabelVisibilityService: ChapterLabelVisibilityService,
     private platformFeatureService: PlatformFeatureService
   ) {}
 
@@ -283,15 +285,9 @@ export class StorySummaryTileComponent implements OnInit {
   }
 
   isNewChapterLabelVisible(node: StoryNode): boolean {
-    const firstPub = node.getFirstPublicationDateMsecs();
-    if (!firstPub) {
-      return false;
-    }
-    const now = Date.now();
-    const diffDays = (now - Number(firstPub)) / (1000 * 60 * 60 * 24);
-
-    return (
-      diffDays <= 28 && !this.storySummary.isNodeCompleted(node.getTitle())
+    return this.chapterLabelVisibilityService.isNewChapterLabelVisible(
+      node,
+      this.storySummary
     );
   }
 

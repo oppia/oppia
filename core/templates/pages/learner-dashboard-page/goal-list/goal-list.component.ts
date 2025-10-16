@@ -141,6 +141,70 @@ export class GoalListComponent implements OnInit {
       .isEnabled;
   }
 
+  getStartButtonClass(story: StorySummary, nodeIndex: number): string {
+    const node = story.getAllNodes()[nodeIndex];
+
+    if (!this.isSerialChapterFeatureLearnerFlagEnabled()) {
+      return 'oppia-learner-dash-button--default';
+    }
+
+    if (!node.getPublishedStatus()) {
+      return 'oppia-learner-dash-button--disabled';
+    }
+
+    if (!this.isExpanded(story.getId())) {
+      return 'oppia-learner-dash-button--default';
+    }
+
+    const currentPlayableNode =
+      this.allCurrentNodes[
+        this.goalTopic.getCanonicalStorySummaryDicts().indexOf(story)
+      ];
+
+    if (currentPlayableNode === nodeIndex) {
+      return 'oppia-learner-dash-button--default';
+    }
+
+    return 'oppia-learner-dash-button--inverse oppia-learner-dash-button--incomplete-goal';
+  }
+
+  getStartButtonHref(story: StorySummary, nodeIndex: number): string | null {
+    const node = story.getAllNodes()[nodeIndex];
+
+    if (!this.isSerialChapterFeatureLearnerFlagEnabled()) {
+      return this.getNodeLessonUrl(story, node);
+    }
+
+    if (!node.getPublishedStatus()) {
+      return null;
+    }
+
+    if (this.isExpanded(story.getId())) {
+      return this.getNodeLessonUrl(story, node);
+    }
+
+    const currentPlayableNode =
+      this.allCurrentNodes[
+        this.goalTopic.getCanonicalStorySummaryDicts().indexOf(story)
+      ];
+
+    if (currentPlayableNode === nodeIndex) {
+      return this.getNodeLessonUrl(story, node);
+    }
+
+    return null;
+  }
+
+  getStartButtonLabel(story: StorySummary, nodeIndex: number): string {
+    const node = story.getAllNodes()[nodeIndex];
+    if (!this.isSerialChapterFeatureLearnerFlagEnabled()) {
+      return 'I18N_LEARNER_DASHBOARD_CARD_BUTTON_START';
+    }
+    return node.getPublishedStatus()
+      ? 'I18N_LEARNER_DASHBOARD_CARD_BUTTON_START'
+      : 'I18N_LEARNER_STORY_TILE_COMING_SOON';
+  }
+
   handleToggleState(updateState: boolean, storyId: string): void {
     this.expandedStories[storyId] = updateState;
   }

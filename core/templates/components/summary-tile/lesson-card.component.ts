@@ -26,6 +26,7 @@ import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summ
 import {StorySummary} from 'domain/story/story-summary.model';
 import {StoryNode} from 'domain/story/story-node.model';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {ChapterLabelVisibilityService} from 'services/chapter-label-visibility.service';
 
 @Component({
   selector: 'lesson-card',
@@ -52,6 +53,7 @@ export class LessonCardComponent implements OnInit {
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private assetsBackendApiService: AssetsBackendApiService,
+    private chapterLabelVisibilityService: ChapterLabelVisibilityService,
     private urlService: UrlService,
     private platformFeatureService: PlatformFeatureService
   ) {}
@@ -238,13 +240,10 @@ export class LessonCardComponent implements OnInit {
     if (!this.storyNode || !(this.story instanceof StorySummary)) {
       return false;
     }
-    const firstPub = this.storyNode?.getFirstPublicationDateMsecs();
-    if (!firstPub) {
-      return false;
-    }
-    const diffDays = (Date.now() - Number(firstPub)) / (1000 * 60 * 60 * 24);
-    const visited = this.story.getVisitedChapterTitles() || [];
-    return diffDays < 28 && !visited.includes(this.storyNode.getTitle());
+    return this.chapterLabelVisibilityService.isNewChapterLabelVisible(
+      this.storyNode,
+      this.story
+    );
   }
 
   getButtonTranslationKey(): string {

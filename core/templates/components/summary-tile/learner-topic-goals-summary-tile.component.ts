@@ -20,6 +20,7 @@ import {Component, OnInit} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {Input} from '@angular/core';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {ChapterLabelVisibilityService} from 'services/chapter-label-visibility.service';
 import {AppConstants} from 'app.constants';
 import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
 import {UrlService} from 'services/contextual/url.service';
@@ -57,6 +58,7 @@ export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private assetsBackendApiService: AssetsBackendApiService,
+    private chapterLabelVisibilityService: ChapterLabelVisibilityService,
     private urlService: UrlService,
     private platformFeatureService: PlatformFeatureService
   ) {}
@@ -170,13 +172,10 @@ export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
   }
 
   isNewChapterLabelVisible(): boolean {
-    const firstPub = this.storyNode?.getFirstPublicationDateMsecs();
-    if (!firstPub) {
-      return false;
-    }
-    const diffDays = (Date.now() - Number(firstPub)) / (1000 * 60 * 60 * 24);
-    const visited = this.storySummaryToDisplay.getVisitedChapterTitles() || [];
-    return diffDays < 28 && !visited.includes(this.storyNode.getTitle());
+    return this.chapterLabelVisibilityService.isNewChapterLabelVisible(
+      this.storyNodeToDisplay,
+      this.storySummaryToDisplay
+    );
   }
 
   onStoryClick(event: Event): void {
