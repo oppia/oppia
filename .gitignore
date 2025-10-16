@@ -60,7 +60,6 @@ yarn-error.log
 .envrc
 portserver.socket
 temp-tsconfig-strict.json
-oppia-venv
 
 # Oppia uses cache slugs for various resources and we need separate resource
 # directories for dev and prod. Resource directories for prod are generated
