@@ -260,21 +260,6 @@ class DeferredTasksHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         fn_ids_to_names['FUNCTION_ID_REGENERATE_EXPLORATION_SUMMARY']: (
             exp_services.regenerate_exploration_summary_with_new_contributor
         ),
-        fn_ids_to_names['FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS']: (
-            exp_services.delete_explorations_from_user_models
-        ),
-        fn_ids_to_names['FUNCTION_ID_DELETE_EXPS_FROM_ACTIVITIES']: (
-            exp_services.delete_explorations_from_activities
-        ),
-        fn_ids_to_names['FUNCTION_ID_DELETE_USERS_PENDING_TO_BE_DELETED']: (
-            wipeout_service.delete_users_pending_to_be_deleted
-        ),
-        fn_ids_to_names['FUNCTION_ID_CHECK_COMPLETION_OF_USER_DELETION']: (
-            wipeout_service.check_completion_of_user_deletion
-        ),
-        fn_ids_to_names['FUNCTION_ID_REGENERATE_EXPLORATION_SUMMARY']: (
-            exp_services.regenerate_exploration_summary_with_new_contributor
-        ),
         fn_ids_to_names[
             'FUNCTION_ID_UPDATE_STATS'
         ]: stats_services.update_stats,
