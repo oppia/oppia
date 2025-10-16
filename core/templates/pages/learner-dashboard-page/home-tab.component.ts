@@ -105,7 +105,7 @@ export class HomeTabComponent {
           .filter(node => node.getPublishedStatus());
         const completedNodes = story.getCompletedNodeTitles();
         const remainingPublished =
-          publishedNodes.length - completedNodes.length;
+          publishedNodes.length - completedNodes.length - 1;
 
         if (
           remainingPublished > 0 &&
