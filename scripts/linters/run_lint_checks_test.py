@@ -354,3 +354,95 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
             with self.oppia_is_dockerized_swap:
                 with self.install_swap, subprocess_swap:
                     run_lint_checks.main()
+
+    def test_get_linters_for_file_extension_with_unhandled_extension(
+        self,
+    ) -> None:
+        files_dict = {
+            '.js': [],
+            '.ts': [],
+            '.html': [],
+            '.css': [],
+            '.py': [],
+            'other': [],
+            '.txt': ['some_file.txt'],
+        }
+
+        manager = multiprocessing.Manager()
+        namespace = manager.Namespace()
+
+        custom_linters, third_party_linters = (
+            run_lint_checks._get_linters_for_file_extension(
+                file_extension_to_lint='txt',
+                namespace=namespace,
+                files=files_dict,
+            )
+        )
+
+        self.assertEqual(len(custom_linters), 1)
+        self.assertEqual(len(third_party_linters), 0)
+
+    def test_get_all_files_in_directory_excludes_patterns(self) -> None:
+        """Test that _get_all_files_in_directory correctly excludes files
+        matching excluded glob patterns.
+        """
+        # Mock os.walk to simulate a directory structure
+        mock_files_structure = [
+            ('/mock/dir', ('subdir',), ('file1.py', 'file2.txt', 'ignore.me')),
+            ('/mock/dir/subdir', (), ('file3.js', 'file4.css')),
+        ]
+
+        def mock_os_walk(dir_path):
+            # Ignore dir_path input since this is a mock
+            return mock_files_structure
+
+        os_walk_swap = self.swap(os, 'walk', mock_os_walk)
+
+        # Define patterns to exclude
+        excluded_patterns = ['*.txt', '*.me']
+
+        with os_walk_swap:
+            all_files = run_lint_checks._get_all_files_in_directory(
+                dir_path='/mock/dir', excluded_glob_patterns=excluded_patterns
+            )
+
+        # We expect that 'file2.txt' and 'ignore.me' are excluded
+        # And relative paths are returned
+        expected_files = [
+            os.path.relpath('/mock/dir/file1.py', start=os.getcwd()),
+            os.path.relpath('/mock/dir/subdir/file3.js', start=os.getcwd()),
+            os.path.relpath('/mock/dir/subdir/file4.css', start=os.getcwd()),
+        ]
+
+        self.assertCountEqual(all_files, expected_files)
+
+    def test_get_filepaths_from_non_other_shard_raises_for_duplicates(
+        self,
+    ) -> None:
+        """Test that _get_filepaths_from_non_other_shard raises RuntimeError
+        when a file appears in multiple shards.
+        """
+        mock_namespace = multiprocessing.Manager().Namespace()
+
+        mock_shards = {
+            '1': ['file_b.py', 'file_a.py', 'file_a.py'],
+        }
+
+        shards_swap = self.swap(run_lint_checks, 'SHARDS', mock_shards)
+
+        def mock_get_filepaths_from_path(filepath, namespace):
+            return [filepath]
+
+        get_filepaths_swap = self.swap(
+            run_lint_checks,
+            '_get_filepaths_from_path',
+            mock_get_filepaths_from_path,
+        )
+
+        with shards_swap, get_filepaths_swap:
+            with self.assertRaisesRegex(
+                RuntimeError, 'file_a.py in multiple shards'
+            ):
+                run_lint_checks._get_filepaths_from_non_other_shard(
+                    '1', mock_namespace
+                )
