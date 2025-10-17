@@ -49,7 +49,7 @@ describe('ChapterLabelVisibilityService', () => {
 
   beforeEach(() => {
     service = new ChapterLabelVisibilityService();
-    storySummary = jasmine.createSpyObj<StorySummary>('StorySummary', [
+    storySummary = jasmine.createSpyObj('StorySummary', [
       'getVisitedChapterTitles',
       'isNodeCompleted',
     ]);
