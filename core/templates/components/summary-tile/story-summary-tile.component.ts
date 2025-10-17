@@ -285,9 +285,21 @@ export class StorySummaryTileComponent implements OnInit {
   }
 
   isNewChapterLabelVisible(node: StoryNode): boolean {
-    return this.chapterLabelVisibilityService.isNewChapterLabelVisible(
-      node,
-      this.storySummary
+    const firstPublicationTimestampMsecs = node.getFirstPublicationDateMsecs();
+    if (!firstPublicationTimestampMsecs) {
+      return false;
+    }
+    const millisecondsPerDay = 1000 * 60 * 60 * 24;
+    const daysSinceFirstPublication =
+      (Date.now() - Number(firstPublicationTimestampMsecs)) /
+      millisecondsPerDay;
+
+    const visitedChapterTitles =
+      this.storySummary.getVisitedChapterTitles() || [];
+
+    return (
+      daysSinceFirstPublication <= 28 &&
+      !this.storySummary.isNodeCompleted(node.getTitle())
     );
   }
 

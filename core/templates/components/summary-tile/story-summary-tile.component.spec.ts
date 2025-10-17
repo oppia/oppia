@@ -19,6 +19,7 @@
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {StorySummary} from 'domain/story/story-summary.model';
+import {StoryNode} from 'domain/story/story-node.model';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
@@ -763,4 +764,84 @@ describe('StorySummaryTileComponent', () => {
       expect(component.chaptersDisplayed).toBe(1);
     }
   );
+
+  describe('when checking if new Label is visible', () => {
+    let storySummary: StorySummary;
+    const RECENT_PUB_DATE = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    const OLD_PUB_DATE = Date.now() - 30 * 24 * 60 * 60 * 1000;
+    const CHAPTER_TITLE = 'The Chapter Title for Testing';
+    const ChapterDetails = {
+      id: 'node_1',
+      title: CHAPTER_TITLE,
+      description: 'desc',
+      destination_node_ids: [],
+      prerequisite_skill_ids: [],
+      acquired_skill_ids: [],
+      outline: '',
+      exploration_id: 'exp_1',
+      outline_is_finalized: true,
+      thumbnail_filename: '',
+      thumbnail_bg_color: '',
+      status: 'Published',
+      planned_publication_date_msecs: null,
+      last_modified_msecs: null,
+      first_publication_date_msecs: RECENT_PUB_DATE,
+      unpublishing_reason: null,
+    };
+
+    beforeEach(() => {
+      storySummary = jasmine.createSpyObj('StorySummary', [
+        'getVisitedChapterTitles',
+        'isNodeCompleted',
+      ]);
+      Object.setPrototypeOf(storySummary, StorySummary.prototype);
+
+      component.storySummary = storySummary as StorySummary;
+      component.nodes = [StoryNode.createFromBackendDict(ChapterDetails)];
+
+      (storySummary.getVisitedChapterTitles as jasmine.Spy).and.returnValue([
+        'Other Chapter Title',
+      ]);
+    });
+
+    it('should return TRUE if chapter is new (less than 28 days) and NOT visited', () => {
+      component.nodes[0].setFirstPublicationDateMsecs(RECENT_PUB_DATE);
+      (storySummary.isNodeCompleted as jasmine.Spy).and.returnValue(false);
+
+      const isVisible = component.isNewChapterLabelVisible(component.nodes[0]);
+      expect(isVisible).toBe(true);
+    });
+
+    it('should return FALSE if chapter is OLD (28 or more days) but IS visited', () => {
+      component.nodes[0].setFirstPublicationDateMsecs(OLD_PUB_DATE);
+      (storySummary.isNodeCompleted as jasmine.Spy).and.returnValue(true);
+
+      const isVisible = component.isNewChapterLabelVisible(component.nodes[0]);
+      expect(isVisible).toBe(false);
+    });
+
+    it('should return FALSE if chapter is OLD (28 or more days) and NOT visited', () => {
+      component.nodes[0].setFirstPublicationDateMsecs(OLD_PUB_DATE);
+      (storySummary.isNodeCompleted as jasmine.Spy).and.returnValue(false);
+
+      const isVisible = component.isNewChapterLabelVisible(component.nodes[0]);
+      expect(isVisible).toBe(false);
+    });
+
+    it('should return FALSE if chapter is new (less than 28 days) but IS visited', () => {
+      component.nodes[0].setFirstPublicationDateMsecs(RECENT_PUB_DATE);
+      (storySummary.isNodeCompleted as jasmine.Spy).and.returnValue(true);
+
+      const isVisible = component.isNewChapterLabelVisible(component.nodes[0]);
+      expect(isVisible).toBe(false);
+    });
+
+    it('should return FALSE if publication date is null', () => {
+      component.nodes[0].setFirstPublicationDateMsecs(null);
+      (storySummary.isNodeCompleted as jasmine.Spy).and.returnValue(false);
+
+      const isVisible = component.isNewChapterLabelVisible(component.nodes[0]);
+      expect(isVisible).toBe(false);
+    });
+  });
 });

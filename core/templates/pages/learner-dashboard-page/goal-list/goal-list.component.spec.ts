@@ -396,4 +396,117 @@ describe('GoalListComponent', () => {
       expect(component.isExpanded(storyId)).toBeTrue();
     });
   });
+
+  describe('GoalListComponent start button methods', () => {
+    let storySummary: StorySummary;
+    let storyNode: StoryNode;
+
+    beforeEach(() => {
+      storyNode = StoryNode.createFromBackendDict({
+        id: 'node_1',
+        title: 'Title 1',
+        description: 'Desc',
+        destination_node_ids: [],
+        prerequisite_skill_ids: [],
+        acquired_skill_ids: [],
+        outline: '',
+        exploration_id: 'exp_1',
+        outline_is_finalized: true,
+        thumbnail_filename: '',
+        thumbnail_bg_color: '',
+        status: 'Published',
+        planned_publication_date_msecs: 100,
+        last_modified_msecs: 100,
+        first_publication_date_msecs: Date.now() - 7 * 24 * 60 * 60 * 1000,
+        unpublishing_reason: null,
+      });
+
+      storySummary = StorySummary.createFromBackendDict({
+        id: 'story_1',
+        title: 'Story 1',
+        description: 'Desc',
+        node_titles: ['Title 1'],
+        thumbnail_filename: '',
+        thumbnail_bg_color: '#FFF',
+        story_is_published: true,
+        completed_node_titles: [],
+        url_fragment: 'story-1',
+        all_node_dicts: [storyNode],
+        topic_name: 'Topic',
+        classroom_url_fragment: 'math',
+        topic_url_fragment: 'topic',
+      });
+
+      component.allCurrentNodes = [0];
+      storyNode = storySummary.getAllNodes()[0];
+    });
+
+    it('getStartButtonClass returns default if serial feature disabled', () => {
+      spyOn(
+        component,
+        'isSerialChapterFeatureLearnerFlagEnabled'
+      ).and.returnValue(false);
+      expect(component.getStartButtonClass(storySummary, 0)).toBe(
+        'oppia-learner-dash-button--default'
+      );
+    });
+
+    it('getStartButtonClass returns disabled if node unpublished', () => {
+      spyOn(
+        component,
+        'isSerialChapterFeatureLearnerFlagEnabled'
+      ).and.returnValue(true);
+      spyOn(storyNode, 'getPublishedStatus').and.returnValue(false);
+
+      expect(component.getStartButtonClass(storySummary, 0)).toBe(
+        'oppia-learner-dash-button--disabled'
+      );
+    });
+
+    it('getStartButtonHref returns null if node unpublished', () => {
+      spyOn(
+        component,
+        'isSerialChapterFeatureLearnerFlagEnabled'
+      ).and.returnValue(true);
+      spyOn(storyNode, 'getPublishedStatus').and.returnValue(false);
+
+      expect(component.getStartButtonHref(storySummary, 0)).toBeNull();
+    });
+
+    it('getStartButtonHref returns lesson url if serial feature disabled', () => {
+      spyOn(
+        component,
+        'isSerialChapterFeatureLearnerFlagEnabled'
+      ).and.returnValue(false);
+      spyOn(component, 'getNodeLessonUrl').and.returnValue('/lesson/exp_1');
+
+      expect(component.getStartButtonHref(storySummary, 0)).toBe(
+        '/lesson/exp_1'
+      );
+    });
+
+    it('getStartButtonLabel returns coming soon if node unpublished', () => {
+      spyOn(
+        component,
+        'isSerialChapterFeatureLearnerFlagEnabled'
+      ).and.returnValue(true);
+      spyOn(storyNode, 'getPublishedStatus').and.returnValue(false);
+
+      expect(component.getStartButtonLabel(storySummary, 0)).toBe(
+        'I18N_LEARNER_STORY_TILE_COMING_SOON'
+      );
+    });
+
+    it('getStartButtonLabel returns start if node published', () => {
+      spyOn(
+        component,
+        'isSerialChapterFeatureLearnerFlagEnabled'
+      ).and.returnValue(true);
+      spyOn(storyNode, 'getPublishedStatus').and.returnValue(true);
+
+      expect(component.getStartButtonLabel(storySummary, 0)).toBe(
+        'I18N_LEARNER_DASHBOARD_CARD_BUTTON_START'
+      );
+    });
+  });
 });
