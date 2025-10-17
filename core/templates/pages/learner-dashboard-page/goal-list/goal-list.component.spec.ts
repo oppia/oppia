@@ -438,7 +438,7 @@ describe('GoalListComponent', () => {
       });
 
       component.allCurrentNodes = [0];
-      storyNode = storySummary.getAllNodes()[0];
+      storyNode = storySummary.getAllNodes()[0] as StoryNode;
     });
 
     it('should (getStartButtonClass) returns default if serial feature disabled', () => {
