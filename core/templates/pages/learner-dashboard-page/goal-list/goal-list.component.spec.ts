@@ -397,70 +397,17 @@ describe('GoalListComponent', () => {
     });
   });
 
-  describe('GoalListComponent start button methods', () => {
+  describe('getStartButtonClass', () => {
     let storySummary: StorySummary;
     let storyNode: StoryNode;
 
     beforeEach(() => {
-      storyNode = StoryNode.createFromBackendDict({
-        id: 'node_1',
-        title: 'Title 1',
-        description: 'Desc',
-        destination_node_ids: [],
-        prerequisite_skill_ids: [],
-        acquired_skill_ids: [],
-        outline: '',
-        exploration_id: 'exp_1',
-        outline_is_finalized: true,
-        thumbnail_filename: '',
-        thumbnail_bg_color: '',
-        status: 'Published',
-        planned_publication_date_msecs: 100,
-        last_modified_msecs: 100,
-        first_publication_date_msecs: Date.now() - 7 * 24 * 60 * 60 * 1000,
-        unpublishing_reason: null,
-      });
-
-      storySummary = StorySummary.createFromBackendDict({
-        id: 'story_1',
-        title: 'Story 1',
-        description: 'Desc',
-        node_titles: ['Title 1'],
-        thumbnail_filename: '',
-        thumbnail_bg_color: '#FFF',
-        story_is_published: true,
-        completed_node_titles: [],
-        url_fragment: 'story-1',
-        all_node_dicts: [
-          {
-            id: 'node_1',
-            title: 'Title 1',
-            description: 'Desc',
-            destination_node_ids: [],
-            prerequisite_skill_ids: [],
-            acquired_skill_ids: [],
-            outline: '',
-            exploration_id: 'exp_1',
-            outline_is_finalized: true,
-            thumbnail_filename: '',
-            thumbnail_bg_color: '',
-            status: 'Published',
-            planned_publication_date_msecs: 100,
-            last_modified_msecs: 100,
-            first_publication_date_msecs: Date.now() - 7 * 24 * 60 * 60 * 1000,
-            unpublishing_reason: null,
-          },
-        ],
-        topic_name: 'Topic',
-        classroom_url_fragment: 'math',
-        topic_url_fragment: 'topic',
-      });
-
-      component.allCurrentNodes = [0];
+      component.allCurrentNodes = [0, 1, 0];
+      storySummary = component.goalTopic.getCanonicalStorySummaryDicts()[0];
       storyNode = storySummary.getAllNodes()[0] as StoryNode;
     });
 
-    it('should (getStartButtonClass) returns default if serial feature disabled', () => {
+    it('should (getStartButtonClass) return default if serial feature disabled', () => {
       spyOn(
         component,
         'isSerialChapterFeatureLearnerFlagEnabled'
@@ -470,7 +417,7 @@ describe('GoalListComponent', () => {
       );
     });
 
-    it('should (getStartButtonClass) returns disabled if node unpublished', () => {
+    it('should (getStartButtonClass) return disabled if node unpublished', () => {
       spyOn(
         component,
         'isSerialChapterFeatureLearnerFlagEnabled'
@@ -482,17 +429,73 @@ describe('GoalListComponent', () => {
       );
     });
 
-    it('should (getStartButtonHref) returns null if node unpublished', () => {
+    it('should (getStartButtonClass) return default if story is not expanded', () => {
       spyOn(
         component,
         'isSerialChapterFeatureLearnerFlagEnabled'
       ).and.returnValue(true);
-      spyOn(storyNode, 'getPublishedStatus').and.returnValue(false);
+      spyOn(storyNode, 'getPublishedStatus').and.returnValue(true);
+      spyOn(component, 'isExpanded').and.returnValue(false);
 
-      expect(component.getStartButtonHref(storySummary, 0)).toBeNull();
+      const className = component.getStartButtonClass(storySummary, 0);
+      expect(className).toBe('oppia-learner-dash-button--default');
     });
 
-    it('should (getStartButtonHref) returns lesson url if serial feature disabled', () => {
+    it('should (getStartButtonClass) return inverse-incomplete if story expanded but node not current', () => {
+      spyOn(
+        component,
+        'isSerialChapterFeatureLearnerFlagEnabled'
+      ).and.returnValue(true);
+      const nodes = storySummary.getAllNodes();
+      spyOn(nodes[1], 'getPublishedStatus').and.returnValue(true);
+      spyOn(component, 'isExpanded').and.returnValue(true);
+      component.allCurrentNodes = [0, 1, 0];
+
+      const className = component.getStartButtonClass(storySummary, 1);
+      expect(className).toBe(
+        'oppia-learner-dash-button--inverse oppia-learner-dash-button--incomplete-goal'
+      );
+    });
+
+    it('should (getStartButtonClass) return default if story expanded and node is current', () => {
+      spyOn(
+        component,
+        'isSerialChapterFeatureLearnerFlagEnabled'
+      ).and.returnValue(true);
+      spyOn(storyNode, 'getPublishedStatus').and.returnValue(true);
+      spyOn(component, 'isExpanded').and.returnValue(true);
+      component.allCurrentNodes = [0, 1, 0];
+
+      const className = component.getStartButtonClass(storySummary, 0);
+      expect(className).toBe('oppia-learner-dash-button--default');
+    });
+
+    it('should (getStartButtonClass) return default when story expanded and checking the exact current playable node', () => {
+      spyOn(
+        component,
+        'isSerialChapterFeatureLearnerFlagEnabled'
+      ).and.returnValue(true);
+      const nodes = storySummary.getAllNodes();
+      spyOn(nodes[1], 'getPublishedStatus').and.returnValue(true);
+      spyOn(component, 'isExpanded').and.returnValue(true);
+      component.allCurrentNodes = [1, 1, 0];
+
+      const className = component.getStartButtonClass(storySummary, 1);
+      expect(className).toBe('oppia-learner-dash-button--default');
+    });
+  });
+
+  describe('getStartButtonHref', () => {
+    let storySummary: StorySummary;
+    let storyNode: StoryNode;
+
+    beforeEach(() => {
+      component.allCurrentNodes = [0, 1, 0];
+      storySummary = component.goalTopic.getCanonicalStorySummaryDicts()[0];
+      storyNode = storySummary.getAllNodes()[0] as StoryNode;
+    });
+
+    it('should (getStartButtonHref) return lesson url if serial feature disabled', () => {
       spyOn(
         component,
         'isSerialChapterFeatureLearnerFlagEnabled'
@@ -504,7 +507,95 @@ describe('GoalListComponent', () => {
       );
     });
 
-    it('should (getStartButtonLabel) returns coming soon if node unpublished', () => {
+    it('should (getStartButtonHref) return null if node unpublished', () => {
+      spyOn(
+        component,
+        'isSerialChapterFeatureLearnerFlagEnabled'
+      ).and.returnValue(true);
+      spyOn(storyNode, 'getPublishedStatus').and.returnValue(false);
+
+      expect(component.getStartButtonHref(storySummary, 0)).toBeNull();
+    });
+
+    it('should (getStartButtonHref) return lesson URL if story is expanded', () => {
+      spyOn(
+        component,
+        'isSerialChapterFeatureLearnerFlagEnabled'
+      ).and.returnValue(true);
+      spyOn(storyNode, 'getPublishedStatus').and.returnValue(true);
+      spyOn(component, 'isExpanded').and.returnValue(true);
+      spyOn(component, 'getNodeLessonUrl').and.returnValue('/lesson/exp_1');
+
+      const href = component.getStartButtonHref(storySummary, 0);
+      expect(href).toBe('/lesson/exp_1');
+    });
+
+    it('should (getStartButtonHref) return null if story not expanded and checking non-current node', () => {
+      spyOn(
+        component,
+        'isSerialChapterFeatureLearnerFlagEnabled'
+      ).and.returnValue(true);
+      const nodes = storySummary.getAllNodes();
+      spyOn(nodes[1], 'getPublishedStatus').and.returnValue(true);
+      spyOn(component, 'isExpanded').and.returnValue(false);
+      component.allCurrentNodes = [0, 1, 0];
+
+      const href = component.getStartButtonHref(storySummary, 1);
+      expect(href).toBeNull();
+    });
+
+    it('should (getStartButtonHref) return lesson URL if story not expanded but checking current node', () => {
+      spyOn(
+        component,
+        'isSerialChapterFeatureLearnerFlagEnabled'
+      ).and.returnValue(true);
+      spyOn(storyNode, 'getPublishedStatus').and.returnValue(true);
+      spyOn(component, 'isExpanded').and.returnValue(false);
+      spyOn(component, 'getNodeLessonUrl').and.returnValue('/lesson/exp_1');
+      component.allCurrentNodes = [0, 1, 0];
+
+      const href = component.getStartButtonHref(storySummary, 0);
+      expect(href).toBe('/lesson/exp_1');
+    });
+
+    it('should (getStartButtonHref) return lesson URL when story expanded and node matches current playable node', () => {
+      spyOn(
+        component,
+        'isSerialChapterFeatureLearnerFlagEnabled'
+      ).and.returnValue(true);
+      const nodes = storySummary.getAllNodes();
+      spyOn(nodes[1], 'getPublishedStatus').and.returnValue(true);
+      spyOn(component, 'isExpanded').and.returnValue(true);
+      spyOn(component, 'getNodeLessonUrl').and.returnValue('/lesson/exp_2');
+      component.allCurrentNodes = [1, 1, 0];
+
+      const href = component.getStartButtonHref(storySummary, 1);
+      expect(href).toBe('/lesson/exp_2');
+    });
+  });
+
+  describe('getStartButtonLabel', () => {
+    let storySummary: StorySummary;
+    let storyNode: StoryNode;
+
+    beforeEach(() => {
+      component.allCurrentNodes = [0, 1, 0];
+      storySummary = component.goalTopic.getCanonicalStorySummaryDicts()[0];
+      storyNode = storySummary.getAllNodes()[0] as StoryNode;
+    });
+
+    it('should (getStartButtonLabel) return start label if serial feature disabled', () => {
+      spyOn(
+        component,
+        'isSerialChapterFeatureLearnerFlagEnabled'
+      ).and.returnValue(false);
+
+      expect(component.getStartButtonLabel(storySummary, 0)).toBe(
+        'I18N_LEARNER_DASHBOARD_CARD_BUTTON_START'
+      );
+    });
+
+    it('should (getStartButtonLabel) return coming soon if node unpublished', () => {
       spyOn(
         component,
         'isSerialChapterFeatureLearnerFlagEnabled'
@@ -516,7 +607,7 @@ describe('GoalListComponent', () => {
       );
     });
 
-    it('should (getStartButtonLabel) returns start if node published', () => {
+    it('should (getStartButtonLabel) return start if node published', () => {
       spyOn(
         component,
         'isSerialChapterFeatureLearnerFlagEnabled'
