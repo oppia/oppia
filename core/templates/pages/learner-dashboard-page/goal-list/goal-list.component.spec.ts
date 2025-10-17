@@ -441,7 +441,7 @@ describe('GoalListComponent', () => {
       storyNode = storySummary.getAllNodes()[0];
     });
 
-    it('getStartButtonClass returns default if serial feature disabled', () => {
+    it('should (getStartButtonClass) returns default if serial feature disabled', () => {
       spyOn(
         component,
         'isSerialChapterFeatureLearnerFlagEnabled'
@@ -451,7 +451,7 @@ describe('GoalListComponent', () => {
       );
     });
 
-    it('getStartButtonClass returns disabled if node unpublished', () => {
+    it('should (getStartButtonClass) returns disabled if node unpublished', () => {
       spyOn(
         component,
         'isSerialChapterFeatureLearnerFlagEnabled'
@@ -463,7 +463,7 @@ describe('GoalListComponent', () => {
       );
     });
 
-    it('getStartButtonHref returns null if node unpublished', () => {
+    it('should (getStartButtonHref) returns null if node unpublished', () => {
       spyOn(
         component,
         'isSerialChapterFeatureLearnerFlagEnabled'
@@ -473,7 +473,7 @@ describe('GoalListComponent', () => {
       expect(component.getStartButtonHref(storySummary, 0)).toBeNull();
     });
 
-    it('getStartButtonHref returns lesson url if serial feature disabled', () => {
+    it('should (getStartButtonHref) returns lesson url if serial feature disabled', () => {
       spyOn(
         component,
         'isSerialChapterFeatureLearnerFlagEnabled'
@@ -485,7 +485,7 @@ describe('GoalListComponent', () => {
       );
     });
 
-    it('getStartButtonLabel returns coming soon if node unpublished', () => {
+    it('should (getStartButtonLabel) returns coming soon if node unpublished', () => {
       spyOn(
         component,
         'isSerialChapterFeatureLearnerFlagEnabled'
@@ -497,7 +497,7 @@ describe('GoalListComponent', () => {
       );
     });
 
-    it('getStartButtonLabel returns start if node published', () => {
+    it('should (getStartButtonLabel) returns start if node published', () => {
       spyOn(
         component,
         'isSerialChapterFeatureLearnerFlagEnabled'

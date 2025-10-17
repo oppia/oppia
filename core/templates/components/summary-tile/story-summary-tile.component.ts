@@ -294,9 +294,6 @@ export class StorySummaryTileComponent implements OnInit {
       (Date.now() - Number(firstPublicationTimestampMsecs)) /
       millisecondsPerDay;
 
-    const visitedChapterTitles =
-      this.storySummary.getVisitedChapterTitles() || [];
-
     return (
       daysSinceFirstPublication <= 28 &&
       !this.storySummary.isNodeCompleted(node.getTitle())
