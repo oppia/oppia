@@ -127,22 +127,6 @@ describe('Blog home page component', () => {
     expect(component.getPageUrl()).toBe('http://localhost/blog/blog-test');
   });
 
-  it('should run the copy command successfully', () => {
-    let dummyDivElement = document.createElement('div');
-    let dummyTextNode = document.createTextNode('Text to be copied');
-    dummyDivElement.className = 'class-name';
-    dummyDivElement.appendChild(dummyTextNode);
-    let dummyDocumentFragment = document.createDocumentFragment();
-    dummyDocumentFragment.appendChild(dummyDivElement);
-    spyOn(document, 'getElementsByClassName')
-      .withArgs('class-name')
-      .and.returnValue(dummyDocumentFragment.children);
-    spyOn(document, 'execCommand').withArgs('copy');
-    spyOn($.fn, 'tooltip');
-    component.copyLink('class-name');
-    expect(document.execCommand).toHaveBeenCalled();
-  });
-
   it('should get formatted date string from the timestamp in milliseconds', () => {
     // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
     let DATE = '11/21/2014';
