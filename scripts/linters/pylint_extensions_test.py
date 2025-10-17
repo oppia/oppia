@@ -29,6 +29,7 @@ from core import utils
 import astroid
 from pylint import interfaces, testutils
 from pylint import utils as pylint_utils
+from pylint.lint import PyLinter
 
 from . import pylint_extensions
 
@@ -231,6 +232,57 @@ class HangingIndentCheckerTests(unittest.TestCase):
             msg_id='no-break-after-hanging-indent', line=7
         )
 
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+    def test_if_with_comment_but_no_colon_continues_due_to_excluded(
+        self,
+    ) -> None:
+        """Tests branch where comment exists but excluded remains True."""
+        node_with_no_message = astroid.scoped_nodes.Module(
+            name='test', doc='Custom test'
+        )
+
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                """if (a > 1 and b > 2)  # comment without colon
+                    print(a)
+                """
+            )
+        node_with_no_message.file = filename
+        node_with_no_message.path = filename
+
+        self.checker_test_object.checker.process_tokens(
+            pylint_utils.tokenize_module(node_with_no_message)
+        )
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_add_message_triggered_when_comment_after_bracket_not_followed_by_separator(
+        self,
+    ) -> None:
+        node = astroid.scoped_nodes.Module(name='test', doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                """self.post_json(a * b  # comment
+    )
+    """
+            )
+        node.file = filename
+        node.path = filename
+
+        self.checker_test_object.checker.process_tokens(
+            pylint_utils.tokenize_module(node)
+        )
+
+        message = testutils.MessageTest(
+            msg_id='no-break-after-hanging-indent', line=1
+        )
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
 
@@ -1545,6 +1597,72 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             self.checker_test_object.checker.visit_functiondef(
                 valid_indentation_with_kw_args_node
             )
+
+    def test_constructor_not_within_class(self) -> None:
+        """Tests that check_functiondef_params handles __init__ outside a class correctly."""
+        node_constructor_outside_class = astroid.extract_node(
+            """def __init__(self, arg1): #@
+                \"\"\"Initializes something.
+
+                Args:
+                    arg1: Argument description.
+                \"\"\"
+                self.arg1 = arg1
+            """
+        )
+
+        message = testutils.MessageTest(
+            msg_id='malformed-args-section',
+            node=node_constructor_outside_class,
+        )
+
+        with self.checker_test_object.assertAddsMessages(
+            message, ignore_position=True
+        ):
+            self.checker_test_object.checker.visit_functiondef(
+                node_constructor_outside_class
+            )
+
+    def test_function_with_no_docstring_in_indentation_check(self) -> None:
+        """Tests that check_docstring_section_indentation handles functions with no docstring."""
+        node_function_no_doc = astroid.extract_node(
+            """def func_without_doc(arg1): #@
+                a = arg1 + 10
+                return a
+            """
+        )
+
+        self.assertIsNone(node_function_no_doc.doc)
+
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_functiondef(
+                node_function_no_doc
+            )
+
+    def test_returns_section_without_description_triggers_in_description_false(
+        self,
+    ):
+        """Tests that check_docstring_section_indentation handles Returns section
+        when in_description is False (no indented return lines)."""
+
+        func_node = astroid.extract_node(
+            '''
+            def sample_func(): #@
+                """Function summary.
+
+                Returns:
+                    Something
+                """
+                return "something"
+            '''
+        )
+
+        # We don't want to call visit_functiondef, since that will invoke all checks.
+        checker = self.checker_test_object.checker
+
+        # Directly call only the indentation check.
+        with self.checker_test_object.assertNoMessages():
+            checker.check_docstring_section_indentation(func_node)
 
     def test_finds_docstring_parameter(self) -> None:
         self.checker_test_object = testutils.CheckerTestCase()
@@ -4445,6 +4563,23 @@ class InequalityWithNoneCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_compare(compare_node)
 
+    def test_inequality_op_on_non_none_operand_does_not_add_message(
+        self,
+    ) -> None:
+        """Test that 'x != y' where y is not None does not trigger a message."""
+
+        if_node = astroid.extract_node(
+            """
+            if x != y: #@
+                pass
+            """
+        )
+        compare_node = if_node.test
+        # Here, operand.value does not exist (since 'y' is a Name node),
+        # so 'value' in vars(operand)' is False.
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_compare(compare_node)
+
 
 class DisallowedFunctionsCheckerTests(unittest.TestCase):
     """Unit tests for DisallowedFunctionsChecker"""
@@ -4904,6 +5039,49 @@ class DisallowHandlerWithoutSchemaTests(unittest.TestCase):
                 schemaless_class_node
             )
 
+    def test_check_parent_class_is_basehandler_returns_false_for_non_basehandler(
+        self,
+    ) -> None:
+        """Test that check_parent_class_is_basehandler returns False when class
+        does not inherit from BaseHandler.
+        """
+
+        class_node = astroid.extract_node(
+            """
+            class UnrelatedClass:
+                pass
+            """
+        )
+
+        result = (
+            self.checker_test_object.checker.check_parent_class_is_basehandler(
+                class_node
+            )
+        )
+
+        self.assertFalse(
+            result,
+            msg='Expected False since UnrelatedClass does not inherit from BaseHandler.',
+        )
+
+    def test_visit_classdef_skips_non_basehandler_class(self) -> None:
+        """Test that visit_classdef returns early and does not add messages
+        when the class does not inherit from BaseHandler.
+        """
+
+        non_basehandler_node = astroid.extract_node(
+            """
+            class SomeRandomClass:
+                HANDLER_ARGS_SCHEMAS = None
+                URL_PATH_ARGS_SCHEMAS = None
+            """
+        )
+
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_classdef(
+                non_basehandler_node
+            )
+
 
 class DisallowedImportsCheckerTests(unittest.TestCase):
 
@@ -4954,6 +5132,30 @@ class DisallowedImportsCheckerTests(unittest.TestCase):
         )
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_importfrom(node)
+
+    def test_visit_importfrom_adds_message_for_text_import(self) -> None:
+        """Test that visit_importfrom adds message when 'Text' is imported from typing."""
+
+        import_node = astroid.extract_node("from typing import Text")
+
+        with self.checker_test_object.assertAddsMessages(
+            testutils.MessageTest(
+                msg_id='disallowed-text-import',
+                node=import_node,
+            ),
+            ignore_position=True,
+        ):
+            self.checker_test_object.checker.visit_importfrom(import_node)
+
+    def test_visit_importfrom_returns_early_for_non_typing_import(self) -> None:
+        """Test that visit_importfrom returns immediately (does nothing)
+        when importing from a module other than 'typing'.
+        """
+
+        import_node = astroid.extract_node("from os import path")
+
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_importfrom(import_node)
 
 
 class PreventStringConcatenationCheckerTests(unittest.TestCase):
@@ -5059,3 +5261,51 @@ class PreventStringConcatenationCheckerTests(unittest.TestCase):
 
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_binop(expression_node)
+
+    def test_does_not_trigger_for_non_addition_binop(self) -> None:
+        """Should not trigger when the binary operation is not '+', e.g., subtraction."""
+        node = astroid.extract_node(
+            """
+            result = 'a' - 'b' #@
+            """
+        )
+
+        expression_node = node.value
+        # Since the operator is '-', the condition (node.op == '+') is `False.
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_binop(expression_node)
+
+
+class RegisterFunctionTests(unittest.TestCase):
+    """Tests for the register() function that registers all custom pylint checkers."""
+
+    def setUp(self) -> None:
+        self.linter = PyLinter()
+
+    def test_register_function_registers_all_checkers(self) -> None:
+        """Tests that all custom checkers, including PreventStringConcatenationChecker, are registered."""
+        pylint_extensions.register(self.linter)
+
+        registered_checker_classes = {
+            checker.__class__.__name__ for checker in self.linter.get_checkers()
+        }
+
+        self.assertIn(
+            'PreventStringConcatenationChecker',
+            registered_checker_classes,
+            msg='PreventStringConcatenationChecker should be registered with the linter',
+        )
+
+        expected_checkers = {
+            'HangingIndentChecker',
+            'DocstringParameterChecker',
+            'ImportOnlyModulesChecker',
+            'PreventStringConcatenationChecker',
+        }
+
+        for checker_name in expected_checkers:
+            self.assertIn(
+                checker_name,
+                registered_checker_classes,
+                msg=f'{checker_name} should be registered with the linter',
+            )
