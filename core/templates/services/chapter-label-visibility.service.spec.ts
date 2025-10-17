@@ -22,60 +22,112 @@ import {StorySummary} from 'domain/story/story-summary.model';
 
 describe('ChapterLabelVisibilityService', () => {
   let service: ChapterLabelVisibilityService;
+  let storySummary: StorySummary;
+  let storyNode: StoryNode;
+
+  const RECENT_PUB_DATE = Date.now() - 7 * 24 * 60 * 60 * 1000;
+  const CHAPTER_TITLE = 'The Chapter Title for Testing';
+
+  const chapterDetails = {
+    id: 'node_1',
+    title: CHAPTER_TITLE,
+    description: 'desc',
+    destination_node_ids: [],
+    prerequisite_skill_ids: [],
+    acquired_skill_ids: [],
+    outline: '',
+    exploration_id: 'exp_1',
+    outline_is_finalized: true,
+    thumbnail_filename: '',
+    thumbnail_bg_color: '',
+    status: 'Published',
+    planned_publication_date_msecs: null,
+    last_modified_msecs: null,
+    first_publication_date_msecs: RECENT_PUB_DATE,
+    unpublishing_reason: null,
+  };
 
   beforeEach(() => {
     service = new ChapterLabelVisibilityService();
+    storySummary = jasmine.createSpyObj<StorySummary>('StorySummary', [
+      'getVisitedChapterTitles',
+      'isNodeCompleted',
+    ]);
+    Object.setPrototypeOf(storySummary, StorySummary.prototype);
+    storyNode = StoryNode.createFromBackendDict(chapterDetails);
+    (storySummary.getVisitedChapterTitles as jasmine.Spy).and.returnValue([
+      'Other Chapter Title',
+      CHAPTER_TITLE,
+    ]);
   });
 
   it('should return true if chapter is new and not visited', () => {
-    const now = Date.now();
-    const storyNode = {
-      getFirstPublicationDateMsecs: () => now - 5 * 24 * 60 * 60 * 1000,
-      getTitle: () => 'Intro',
-    } as StoryNode;
-    const storySummary = {getVisitedChapterTitles: () => []} as StorySummary;
+    const node = jasmine.createSpyObj<StoryNode>('StoryNode', [
+      'getFirstPublicationDateMsecs',
+      'getTitle',
+    ]);
+    node.getFirstPublicationDateMsecs.and.returnValue(
+      Date.now() - 5 * 24 * 60 * 60 * 1000
+    );
+    node.getTitle.and.returnValue('Intro');
 
-    expect(
-      service.isNewChapterLabelVisible(storyNode, storySummary)
-    ).toBeTrue();
+    const summary = jasmine.createSpyObj<StorySummary>('StorySummary', [
+      'getVisitedChapterTitles',
+    ]);
+    summary.getVisitedChapterTitles.and.returnValue([]);
+
+    expect(service.isNewChapterLabelVisible(node, summary)).toBeTrue();
   });
 
-  it('should return false if older than 28 days', () => {
-    const storyNode = {
-      getFirstPublicationDateMsecs: () => Date.now() - 40 * 24 * 60 * 60 * 1000,
-      getTitle: () => 'Intro',
-    } as StoryNode;
-    const storySummary = {getVisitedChapterTitles: () => []} as StorySummary;
+  it('should return false if chapter is older than 28 days', () => {
+    const node = jasmine.createSpyObj<StoryNode>('StoryNode', [
+      'getFirstPublicationDateMsecs',
+      'getTitle',
+    ]);
+    node.getFirstPublicationDateMsecs.and.returnValue(
+      Date.now() - 40 * 24 * 60 * 60 * 1000
+    );
+    node.getTitle.and.returnValue('Intro');
 
-    expect(
-      service.isNewChapterLabelVisible(storyNode, storySummary)
-    ).toBeFalse();
+    const summary = jasmine.createSpyObj<StorySummary>('StorySummary', [
+      'getVisitedChapterTitles',
+    ]);
+    summary.getVisitedChapterTitles.and.returnValue([]);
+
+    expect(service.isNewChapterLabelVisible(node, summary)).toBeFalse();
   });
 
   it('should return false if chapter is visited', () => {
-    const now = Date.now();
-    const storyNode = {
-      getFirstPublicationDateMsecs: () => now - 5 * 24 * 60 * 60 * 1000,
-      getTitle: () => 'Intro',
-    } as StoryNode;
-    const storySummary = {
-      getVisitedChapterTitles: () => ['Intro'],
-    } as StorySummary;
+    const node = jasmine.createSpyObj<StoryNode>('StoryNode', [
+      'getFirstPublicationDateMsecs',
+      'getTitle',
+    ]);
+    node.getFirstPublicationDateMsecs.and.returnValue(
+      Date.now() - 5 * 24 * 60 * 60 * 1000
+    );
+    node.getTitle.and.returnValue('Intro');
 
-    expect(
-      service.isNewChapterLabelVisible(storyNode, storySummary)
-    ).toBeFalse();
+    const summary = jasmine.createSpyObj<StorySummary>('StorySummary', [
+      'getVisitedChapterTitles',
+    ]);
+    summary.getVisitedChapterTitles.and.returnValue(['Intro']);
+
+    expect(service.isNewChapterLabelVisible(node, summary)).toBeFalse();
   });
 
-  it('should return false if first publication date is not available', () => {
-    const storyNode = {
-      getFirstPublicationDateMsecs: () => null,
-      getTitle: () => 'Intro',
-    } as StoryNode;
-    const storySummary = {getVisitedChapterTitles: () => []} as StorySummary;
+  it('should return false if publication date is missing', () => {
+    const node = jasmine.createSpyObj<StoryNode>('StoryNode', [
+      'getFirstPublicationDateMsecs',
+      'getTitle',
+    ]);
+    node.getFirstPublicationDateMsecs.and.returnValue(null);
+    node.getTitle.and.returnValue('Intro');
 
-    expect(
-      service.isNewChapterLabelVisible(storyNode, storySummary)
-    ).toBeFalse();
+    const summary = jasmine.createSpyObj<StorySummary>('StorySummary', [
+      'getVisitedChapterTitles',
+    ]);
+    summary.getVisitedChapterTitles.and.returnValue([]);
+
+    expect(service.isNewChapterLabelVisible(node, summary)).toBeFalse();
   });
 });
