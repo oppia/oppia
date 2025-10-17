@@ -29,7 +29,6 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {LearnerTopicGoalsSummaryTileComponent} from './learner-topic-goals-summary-tile.component';
 import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
 import {StoryNode} from 'domain/story/story-node.model';
-import {StorySummary} from 'domain/story/story-summary.model';
 
 describe('Learner Topic Goals Summary Tile Component', () => {
   let component: LearnerTopicGoalsSummaryTileComponent;

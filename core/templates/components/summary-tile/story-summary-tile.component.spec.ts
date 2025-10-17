@@ -19,7 +19,6 @@
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {StorySummary} from 'domain/story/story-summary.model';
-import {StoryNode} from 'domain/story/story-node.model';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';

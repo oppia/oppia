@@ -27,7 +27,6 @@ import {PlatformFeatureService} from '../../services/platform-feature.service';
 import {CollectionSummary} from 'domain/collection/collection-summary.model';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
 import {StorySummary} from 'domain/story/story-summary.model';
-import {StoryNode} from 'domain/story/story-node.model';
 
 describe('LessonCardComponent', () => {
   let component: LessonCardComponent;
