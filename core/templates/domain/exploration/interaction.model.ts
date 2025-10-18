@@ -16,7 +16,6 @@
  * @fileoverview Factory for creating new frontend instances of Interaction
  * domain objects.
  */
-import {} from '@angular/upgrade/static';
 
 import cloneDeep from 'lodash/cloneDeep';
 
