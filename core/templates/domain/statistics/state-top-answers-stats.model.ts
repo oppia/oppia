@@ -13,10 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Domain object for state top answers stats.
+ * @fileoverview Model for state top answers stats.
  */
-
-import {Injectable} from '@angular/core';
 
 import {
   AnswerStats,
@@ -45,13 +43,8 @@ export class StateTopAnswersStats {
     public answers: StateTopAnswers,
     public interactionIds: StateInteractionIds
   ) {}
-}
 
-@Injectable({
-  providedIn: 'root',
-})
-export class StateTopAnswersStatsObjectFactory {
-  createFromBackendDict(
+  static createFromBackendDict(
     backendDict: StateTopAnswersStatsBackendDict
   ): StateTopAnswersStats {
     let stateTopAnswers: StateTopAnswers = {};

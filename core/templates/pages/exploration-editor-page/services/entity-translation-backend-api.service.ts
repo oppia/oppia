@@ -21,7 +21,7 @@ import {Injectable} from '@angular/core';
 import {
   EntityTranslation,
   EntityTranslationBackendDict,
-} from 'domain/translation/EntityTranslationObjectFactory';
+} from 'domain/translation/entity-translation.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {AppConstants} from 'app.constants';
 
