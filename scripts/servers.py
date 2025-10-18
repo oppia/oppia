@@ -288,9 +288,6 @@ def managed_elasticsearch_dev_server() -> Iterator[psutil.Process]:
     es_args = [
         '%s/bin/elasticsearch' % common.ES_PATH,
         # -q is the quiet flag.
-        '-q',
-        '-E',
-        'network.host=127.0.0.1',
         '-E',
         'xpack.security.enabled=false',
     ]
