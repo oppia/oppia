@@ -143,6 +143,29 @@ describe('Voiceover backend API service', function () {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
+  it('should be able to regenerate voiceovers on exploration update', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    let payload = {};
+    voiceoverBackendApiService
+      .regenerateVoiceoverOnExplorationUpdateAsync('expId', 1, 'Exp title')
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/regenerate_voiceover_on_exp_update/expId/1/Exp%20title'
+    );
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(payload);
+
+    req.flush({status: 200, statusText: 'Success.'});
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
   it('should be able to handle error callback while updating language codes', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');

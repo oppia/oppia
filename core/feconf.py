@@ -1069,6 +1069,10 @@ VOICEOVER_LANGUAGE_CODES_MAPPING_HANDLER_URL = (
 REGENERATE_AUTOMATIC_VOICEOVER_HANDLER_URL = (
     '/regenerate_automatic_voiceover/<exploration_id>'
 )
+REGENERATE_VOICEOVER_ON_EXP_UPDATE_URL = (
+    '/regenerate_voiceover_on_exp_update/<exploration_id>/'
+    '<exploration_version>/<exploration_title>'
+)
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'
@@ -1767,7 +1771,10 @@ FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS = {
     'FUNCTION_ID_REMOVE_USER_FROM_RIGHTS_MODELS': (
         'remove_user_from_rights_models'
     ),
-    'FUNCTION_ID_REGENERATE_VOICEOVER_ON_EXP_UPDATE': (
-        'regenerate_voiceover_for_updated_exploration'
+    'FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_UPDATE': (
+        'regenerate_voiceovers_for_updated_exploration'
+    ),
+    'FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_CURATION': (
+        'regenerate_voiceovers_on_exploration_curation'
     ),
 }

@@ -79,6 +79,9 @@ class FeatureNames(enum.Enum):
     SHOW_REGENERATED_VOICEOVERS_TO_LEARNERS = (
         'show_regenerated_voiceovers_to_learners'
     )
+    ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS = (
+        'enable_background_voiceover_synthesis'
+    )
 
 
 # Names of feature objects defined in FeatureNames should be added
@@ -96,6 +99,7 @@ class FeatureNames(enum.Enum):
 # still requires further testing or approvals, which can be enabled for QA
 # testers. 'prod' feature has been fully tested so that it can be enabled in the
 # production environment.
+
 
 # Names of features in dev stage, the corresponding feature flag instances must
 # be in dev stage otherwise it will cause a test error in the backend test.
@@ -119,7 +123,7 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
     FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES,
     FeatureNames.SHOW_REGENERATED_VOICEOVERS_TO_LEARNERS,
-    FeatureNames.ENABLE_WORKED_EXAMPLES_RTE_COMPONENT,
+    FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS,
 ]
 
 # Names of features in prod stage, the corresponding feature flag instances must
@@ -131,6 +135,7 @@ PROD_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS,
     FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS,
     FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
+    FeatureNames.ENABLE_WORKED_EXAMPLES_RTE_COMPONENT,
 ]
 
 # Names of features that should not be used anymore, e.g. features that are
@@ -282,13 +287,20 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
         (
             'Allows creators to add worked examples to the review material '
             'section of skills and explanation of the study guides.',
-            feature_flag_domain.ServerMode.TEST,
+            feature_flag_domain.ServerMode.PROD,
         )
     ),
     FeatureNames.SHOW_REGENERATED_VOICEOVERS_TO_LEARNERS.value: (
         (
             'This flag allows learners to see the regenerated voiceovers '
             'in the exploration player.',
+            feature_flag_domain.ServerMode.TEST,
+        )
+    ),
+    FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS.value: (
+        (
+            'The flag enables the asynchronous voiceover synthesis for the '
+            'curated exploration contents.',
             feature_flag_domain.ServerMode.TEST,
         )
     ),
