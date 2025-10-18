@@ -71,7 +71,7 @@ import {ExplorationPermissions} from 'domain/exploration/exploration-permissions
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {ExplorationPermissionsBackendApiService} from 'domain/exploration/exploration-permissions-backend-api.service';
 import {EntityTranslationsService} from 'services/entity-translations.services';
-import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
+import {EntityTranslation} from 'domain/translation/entity-translation.model';
 import {EntityBulkTranslationsBackendApiService} from './services/entity-bulk-translations-backend-api.service';
 import {LanguageCodeToEntityTranslations} from '../../services/entity-translations.services';
 import {PlatformFeatureService} from 'services/platform-feature.service';
