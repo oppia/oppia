@@ -27,7 +27,7 @@
         <div class="oppia-footer-newsletter-warning" *ngIf="emailDuplicated">
           <p>{{ 'I18N_FOOTER_NEWSLETTER_WARNING' | translate }}</p>
         </div>
-          <div class="oppia-footer-newsletter-warning" *ngIf="newsletterTouched && (!emailAddress || (emailAddress && emailAddress.trim() === ''))">
+        <div class="oppia-footer-newsletter-warning" *ngIf="newsletterTouched && (!emailAddress || (emailAddress && emailAddress.trim() === ''))">
           <p>{{ 'I18N_FOOTER_NEWSLETTER_REQUIRED' | translate }}</p>
         </div>
         <div class="oppia-footer-newsletter-warning" *ngIf="newsletterTouched && emailAddress && !validateEmailAddress()">
