@@ -22,7 +22,6 @@ import {FormsModule} from '@angular/forms';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 
-import {PlatformFeatureService} from 'services/platform-feature.service';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
@@ -34,15 +33,6 @@ describe('Learner Topic Goals Summary Tile Component', () => {
   let component: LearnerTopicGoalsSummaryTileComponent;
   let fixture: ComponentFixture<LearnerTopicGoalsSummaryTileComponent>;
 
-  class MockPlatformFeatureService {
-    status = {
-      SerialChapterLaunchLearnerView: {
-        isEnabled: false,
-      },
-    };
-  }
-  let mockPlatformFeatureService = new MockPlatformFeatureService();
-
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
@@ -52,10 +42,7 @@ describe('Learner Topic Goals Summary Tile Component', () => {
         HttpClientTestingModule,
       ],
       declarations: [LearnerTopicGoalsSummaryTileComponent, MockTranslatePipe],
-      providers: [
-        {provide: PlatformFeatureService, useValue: mockPlatformFeatureService},
-        UrlInterpolationService,
-      ],
+      providers: [UrlInterpolationService],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));

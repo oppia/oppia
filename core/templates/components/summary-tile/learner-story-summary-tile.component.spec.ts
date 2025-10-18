@@ -21,7 +21,6 @@ import {MaterialModule} from 'modules/material.module';
 import {FormsModule} from '@angular/forms';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {PlatformFeatureService} from 'services/platform-feature.service';
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {StorySummary} from 'domain/story/story-summary.model';
@@ -34,15 +33,6 @@ describe('Learner Story Summary Tile Component', () => {
   let fixture: ComponentFixture<LearnerStorySummaryTileComponent>;
   let urlInterpolationService: UrlInterpolationService;
 
-  class MockPlatformFeatureService {
-    status = {
-      SerialChapterLaunchLearnerView: {
-        isEnabled: false,
-      },
-    };
-  }
-  let mockPlatformFeatureService = new MockPlatformFeatureService();
-
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
@@ -52,10 +42,7 @@ describe('Learner Story Summary Tile Component', () => {
         HttpClientTestingModule,
       ],
       declarations: [LearnerStorySummaryTileComponent, MockTranslatePipe],
-      providers: [
-        {provide: PlatformFeatureService, useValue: mockPlatformFeatureService},
-        UrlInterpolationService,
-      ],
+      providers: [UrlInterpolationService],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
