@@ -32,8 +32,10 @@
   }
 
   .oppia-learner-dash-button--modal {
+    flex: 1 1 auto;
+    max-width: 178px;
     height: 44px;
-    width: 178px;
+    min-width: 95px;
   }
 
   .oppia-learner-dash-button--modal.outline {
@@ -91,7 +93,7 @@
     }
 
     .oppia-learner-dash-goals-modal-content {
-      align-items: center;
+      align-items: flex-start;
       display: flex;
       flex-direction: column;
       gap: 12px 0;
@@ -111,25 +113,15 @@
     }
   }
 
-  @media screen and (max-width: 576px) {
-    .mat-dialog-actions .mat-button-base+.mat-button-base,
-    .mat-dialog-actions .mat-mdc-button-base+.mat-mdc-button-base {
-      margin-left: 0 !important;
-      margin-top: 8px;
-    }
-
+   @media screen and (max-width: 576px) {
     .oppia-learner-dash-goals-modal-actions {
-      align-items: stretch;
-      gap: 0;
-      margin-top: auto;
-      margin-bottom: auto;
+      justify-content: center;
+      align-items: center;
+      gap: 0 0;
     }
-
     .oppia-learner-dash-button--modal {
-      max-width: none !important;
-      width: 100% !important;
+      flex: 1 1 45%;
     }
   }
-
 
 </style>

@@ -429,7 +429,7 @@
 .oppia-learner-dash-goals-modal {
   border-radius: 4px;
   height: 343px;
-  max-width: 851px;
+  max-width: 851px !important;
   width: 50%;
 }
 
@@ -443,14 +443,16 @@
   flex-grow: 1;
   font-size: 18px;
 }
-@media screen and (max-width: 1024px) {
+
+@media screen and (max-width: 768px) {
   .oppia-learner-dash-goals-modal {
-    height: 50%;
-    width: 85%;
+    max-height: 643px;
+    min-height: 452px;
+    width: 416px;
   }
 }
 
-@media screen and (max-width: 500px) {
+@media screen and (max-width: 640px) {
   .oppia-learner-dash-button--add-goals {
     flex-direction: row-reverse;
   }
@@ -464,7 +466,7 @@
 
   .oppia-learner-dash-goals-modal {
     height: 452px;
-    max-width: 328px;
+    max-width: 328px !important;
     width: 80%;
   }
 
