@@ -18,14 +18,12 @@
 
 from __future__ import annotations
 
-import collections
 import os
 import re
 import shutil
 import subprocess
 
-import esprima
-from typing import Dict, Final, List, Optional, Tuple, Union
+from typing import Final, List, Tuple
 
 from .. import common, concurrent_task_utils
 from . import linter_utils
@@ -33,8 +31,6 @@ from . import linter_utils
 MYPY = False
 if MYPY:  # pragma: no cover
     from scripts.linters import run_lint_checks
-
-ParsedExpressionsType = Dict[str, Dict[str, List[esprima.nodes.Node]]]
 
 COMPILED_TYPESCRIPT_TMP_PATH: Final = 'tmpcompiledjs/'
 
@@ -47,88 +43,9 @@ COMPILED_TYPESCRIPT_TMP_PATH: Final = 'tmpcompiledjs/'
 INJECTABLES_TO_IGNORE: Final = [
     # This file is required for the js-ts-linter-test.
     'MockIgnoredService',
-    # We don't want this service to be present in the index.
-    'UpgradedServices',
     # Route guards cannot be made injectables until migration is complete.
     'CanAccessSplashPageGuard',
 ]
-
-
-def _parse_js_or_ts_file(
-    filepath: str, file_content: str, comment: bool = False
-) -> Union[esprima.nodes.Module, esprima.nodes.Script]:
-    """Runs the correct function to parse the given file's source code.
-
-    With ES2015 and later, a JavaScript program can be either a script or a
-    module. It is a very important distinction, since a parser such as Esprima
-    needs to know the type of the source to be able to analyze its syntax
-    correctly. This is achieved by choosing the parseScript function to parse a
-    script and the parseModule function to parse a module.
-
-    https://esprima.readthedocs.io/en/latest/syntactic-analysis.html#distinguishing-a-script-and-a-module
-
-    Args:
-        filepath: str. Path of the source file.
-        file_content: str. Code to compile.
-        comment: bool. Whether to collect comments while parsing the js or ts
-            files.
-
-    Returns:
-        Union[Script, Module]. Parsed contents produced by esprima.
-    """
-    parse_function = (
-        esprima.parseScript if filepath.endswith('.js') else esprima.parseModule
-    )
-    return parse_function(file_content, comment=comment)
-
-
-def _get_expression_from_node_if_one_exists(
-    parsed_node: esprima.nodes.Node, possible_component_names: List[str]
-) -> Optional[esprima.nodes.Node]:
-    """This function first checks whether the parsed node represents
-    the required angular component that needs to be derived by checking if
-    it's in the 'possible_component_names' list. If yes, then it will return
-    the expression part of the node from which the component can be derived.
-    If no, it will return None. It is done by filtering out
-    'AssignmentExpression' (as it represents an assignment) and 'Identifier'
-    (as it represents a static expression).
-
-    Args:
-        parsed_node: Node. Parsed node of the body of a JS file.
-        possible_component_names: list(str). List of angular components to check
-            in a JS file. These include directives, factories, controllers,
-            etc.
-
-    Returns:
-        expression: Optional[Node]. Expression part of the node if the node
-        represents a component else None.
-    """
-    if parsed_node.type != 'ExpressionStatement':
-        return None
-    # Separate the expression part of the node which is the actual
-    # content of the node.
-    expression = parsed_node.expression
-    # Check whether the expression belongs to a
-    # 'CallExpression' which always contains a call
-    # and not an 'AssignmentExpression'.
-    # For example, func() is a CallExpression.
-    if expression.type != 'CallExpression':
-        return None
-    # Check whether the expression belongs to a 'MemberExpression' which
-    # represents a computed expression or an Identifier which represents
-    # a static expression.
-    # For example, 'thing.func' is a MemberExpression where
-    # 'thing' is the object of the MemberExpression and
-    # 'func' is the property of the MemberExpression.
-    # Another example of a MemberExpression within a CallExpression is
-    # 'thing.func()' where 'thing.func' is the callee of the CallExpression.
-    if expression.callee.type != 'MemberExpression':
-        return None
-    # Get the component in the JS file.
-    component = expression.callee.property.name
-    if component not in possible_component_names:
-        return None
-    return expression
 
 
 def compile_all_ts_files() -> None:
@@ -175,8 +92,6 @@ class JsTsLintChecksManager(linter_utils.BaseLinter):
         self.js_files = js_files
         self.ts_files = ts_files
         self.file_cache = file_cache
-        self.parsed_js_and_ts_files: Dict[str, esprima.nodes.Module] = {}
-        self.parsed_expressions_in_files: ParsedExpressionsType = {}
 
     @property
     def js_filepaths(self) -> List[str]:
@@ -192,205 +107,6 @@ class JsTsLintChecksManager(linter_utils.BaseLinter):
     def all_filepaths(self) -> List[str]:
         """Return all filepaths."""
         return self.js_filepaths + self.ts_filepaths
-
-    def _validate_and_parse_js_and_ts_files(
-        self,
-    ) -> Dict[str, Union[esprima.nodes.Module, esprima.nodes.Script]]:
-        """This function validates JavaScript and Typescript files and
-        returns the parsed contents as a Python dictionary.
-
-        Returns:
-            dict. A dict which has key as filepath and value as contents of js
-            and ts files after validating and parsing the files.
-
-        Raises:
-            Exception. The filepath ends with '.js'.
-        """
-
-        # Select JS files which need to be checked.
-        files_to_check = self.all_filepaths
-        parsed_js_and_ts_files = {}
-        concurrent_task_utils.log('Validating and parsing JS and TS files ...')
-        for filepath in files_to_check:
-            file_content = self.file_cache.read(filepath)
-
-            try:
-                # Use esprima to parse a JS or TS file.
-                parsed_js_and_ts_files[filepath] = _parse_js_or_ts_file(
-                    filepath, file_content, comment=True
-                )
-            except Exception:
-                if filepath.endswith('.js'):
-                    raise
-                # Compile typescript file which has syntax invalid for JS file.
-                compiled_js_filepath = self._get_compiled_ts_filepath(filepath)
-
-                file_content = self.file_cache.read(compiled_js_filepath)
-                parsed_js_and_ts_files[filepath] = _parse_js_or_ts_file(
-                    filepath, file_content
-                )
-
-        return parsed_js_and_ts_files
-
-    def _get_expressions_from_parsed_script(self) -> ParsedExpressionsType:
-        """This function returns the expressions in the script parsed using
-        js and ts files.
-
-        Returns:
-            dict. A dict which has key as filepath and value as the expressions
-            in the script parsed using js and ts files.
-        """
-
-        parsed_expressions_in_files: ParsedExpressionsType = (
-            collections.defaultdict(dict)
-        )
-        components_to_check = ['controller', 'directive', 'factory', 'filter']
-
-        for filepath, parsed_script in self.parsed_js_and_ts_files.items():
-            parsed_expressions_in_files[filepath] = collections.defaultdict(
-                list
-            )
-            parsed_nodes = parsed_script.body
-            for parsed_node in parsed_nodes:
-                for component in components_to_check:
-                    expression = _get_expression_from_node_if_one_exists(
-                        parsed_node, [component]
-                    )
-                    parsed_expressions_in_files[filepath][component].append(
-                        expression
-                    )
-
-        return parsed_expressions_in_files
-
-    def _get_compiled_ts_filepath(self, filepath: str) -> str:
-        """Returns the path for compiled ts file.
-
-        Args:
-            filepath: str. Filepath of ts file.
-
-        Returns:
-            str. Filepath of compiled ts file.
-        """
-        compiled_js_filepath = os.path.join(
-            os.getcwd(),
-            COMPILED_TYPESCRIPT_TMP_PATH,
-            os.path.relpath(filepath).replace('.ts', '.js'),
-        )
-        return compiled_js_filepath
-
-    def _check_constants_declaration(self) -> concurrent_task_utils.TaskResult:
-        """Checks the declaration of constants in the TS files to ensure that
-        the constants are not declared in files other than *.constants.ajs.ts
-        and that the constants are declared only single time. This also checks
-        that the constants are declared in both *.constants.ajs.ts (for
-        AngularJS) and in *.constants.ts (for Angular 8).
-
-        Returns:
-            TaskResult. A TaskResult object representing the result of the lint
-            check.
-        """
-        name = 'Constants declaration'
-        error_messages = []
-        failed = False
-
-        ts_files_to_check = self.ts_filepaths
-        constants_to_source_filepaths_dict: Dict[str, str] = {}
-        for filepath in ts_files_to_check:
-            # The following block extracts the corresponding Angularjs
-            # constants file for the Angular constants file. This is
-            # required since the check cannot proceed if the AngularJS
-            # constants file is not provided before the Angular constants
-            # file.
-            is_corresponding_angularjs_filepath = False
-            if filepath.endswith('.constants.ts'):
-                filename_without_extension = filepath[:-3]
-                corresponding_angularjs_filepath = (
-                    filename_without_extension + '.ajs.ts'
-                )
-
-                is_corresponding_angularjs_filepath = os.path.isfile(
-                    corresponding_angularjs_filepath
-                )
-                if is_corresponding_angularjs_filepath:
-                    compiled_js_filepath = self._get_compiled_ts_filepath(
-                        corresponding_angularjs_filepath
-                    )
-                    file_content = self.file_cache.read(compiled_js_filepath)
-
-                    parsed_script = _parse_js_or_ts_file(filepath, file_content)
-                    parsed_nodes = parsed_script.body
-                    angularjs_constants_list = []
-                    components_to_check = ['constant']
-                    for parsed_node in parsed_nodes:
-                        expression = _get_expression_from_node_if_one_exists(
-                            parsed_node, components_to_check
-                        )
-                        if not expression:
-                            continue
-
-                        # The following block populates a set to
-                        # store constants for the Angular-AngularJS
-                        # constants file consistency check.
-                        angularjs_constants_name = expression.arguments[0].value
-                        angularjs_constants_value = expression.arguments[1]
-                        # Check if const is declared outside the
-                        # class.
-                        if angularjs_constants_value.property:
-                            angularjs_constants_value = (
-                                angularjs_constants_value.property.name
-                            )
-                        if angularjs_constants_value != (
-                            angularjs_constants_name
-                        ):
-                            failed = True
-                            error_messages.append(
-                                '%s --> Please ensure that the '
-                                'constant %s is initialized '
-                                'from the value from the '
-                                'corresponding Angular constants'
-                                ' file (the *.constants.ts '
-                                'file). Please create one in the'
-                                ' Angular constants file if it '
-                                'does not exist there.'
-                                % (filepath, angularjs_constants_name)
-                            )
-                        angularjs_constants_list.append(
-                            angularjs_constants_name
-                        )
-
-            # Check if the constant has multiple declarations which is
-            # prohibited.
-            parsed_script = self.parsed_js_and_ts_files[filepath]
-            parsed_nodes = parsed_script.body
-            components_to_check = ['constant']
-            for parsed_node in parsed_nodes:
-                expression = _get_expression_from_node_if_one_exists(
-                    parsed_node, components_to_check
-                )
-                if not expression:
-                    continue
-
-                constant_name = expression.arguments[0].raw
-                if constant_name in constants_to_source_filepaths_dict:
-                    failed = True
-                    error_message = (
-                        '%s --> The constant %s is already declared '
-                        'in %s. Please import the file where the '
-                        'constant is declared or rename the constant'
-                        '.'
-                        % (
-                            filepath,
-                            constant_name,
-                            constants_to_source_filepaths_dict[constant_name],
-                        )
-                    )
-                    error_messages.append(error_message)
-                else:
-                    constants_to_source_filepaths_dict[constant_name] = filepath
-
-        return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages
-        )
 
     def _check_angular_services_index(self) -> concurrent_task_utils.TaskResult:
         """Finds all @Injectable classes and makes sure that they are added to
@@ -473,29 +189,23 @@ class JsTsLintChecksManager(linter_utils.BaseLinter):
                 )
             ]
 
-        # Clear temp compiled typescipt files from the previous runs.
+        # Clear temp compiled typescript files from the previous runs.
         shutil.rmtree(COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
-        # Compiles all typescipt files into COMPILED_TYPESCRIPT_TMP_PATH.
+        # Compiles all typescript files into COMPILED_TYPESCRIPT_TMP_PATH.
         compile_all_ts_files()
-
-        self.parsed_js_and_ts_files = self._validate_and_parse_js_and_ts_files()
-        self.parsed_expressions_in_files = (
-            self._get_expressions_from_parsed_script()
-        )
 
         linter_stdout = []
 
-        linter_stdout.append(self._check_constants_declaration())
         linter_stdout.append(self._check_angular_services_index())
 
-        # Clear temp compiled typescipt files.
+        # Clear temp compiled typescript files.
         shutil.rmtree(COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
 
         return linter_stdout
 
 
 class ThirdPartyJsTsLintChecksManager(linter_utils.BaseLinter):
-    """Manages all the third party Python linting functions."""
+    """Manages all the third party JavaScript/TypeScript linting functions."""
 
     def __init__(self, files_to_lint: List[str]) -> None:
         """Constructs a ThirdPartyJsTsLintChecksManager object.
@@ -521,22 +231,28 @@ class ThirdPartyJsTsLintChecksManager(linter_utils.BaseLinter):
         Returns:
             str. A string with the trimmed messages.
         """
+
         trimmed_error_messages = []
         # Extract the message from list and split the message by newline
         # so that we can use them and remove last four lines from the end.
-        # Becuase last two lines are empty strings and third one have a message
+        # Because last two lines are empty strings and third one have a message
         # with number of errors.
         # Example: \u2716 2 problems (2 errors, 0 warnings)
         # 1 error and 0 warnings potentially fixable with the `--fix` option.
         eslint_output_lines = eslint_output.split('\n')
-        newlines_present = eslint_output_lines[-1] == '' and (
-            eslint_output_lines[-2] == ''
-        )
-        fix_option_present = eslint_output_lines[-3].endswith('`--fix` option.')
-        unicode_x_present = eslint_output_lines[-4].startswith('\u2716')
 
-        if newlines_present and fix_option_present and unicode_x_present:
-            eslint_output_lines = eslint_output_lines[:-4]
+        # Check if we have enough lines before accessing indices.
+        if len(eslint_output_lines) >= 4:
+            newlines_present = eslint_output_lines[-1] == '' and (
+                eslint_output_lines[-2] == ''
+            )
+            fix_option_present = eslint_output_lines[-3].endswith(
+                '`--fix` option.'
+            )
+            unicode_x_present = eslint_output_lines[-4].startswith('\u2716')
+
+            if newlines_present and fix_option_present and unicode_x_present:
+                eslint_output_lines = eslint_output_lines[:-4]
 
         for line in eslint_output_lines:
             # ESlint messages start with line numbers and then a

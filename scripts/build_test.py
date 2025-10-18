@@ -97,44 +97,6 @@ class BuildTests(test_utils.GenericTestBase):
                 INVALID_FILENAME,
             )
 
-    def test_minify_and_create_sourcemap(self) -> None:
-        """Tests _minify_and_create_sourcemap with an invalid filepath."""
-        with self.assertRaisesRegex(
-            subprocess.CalledProcessError, 'returned non-zero exit status 1'
-        ) as called_process:
-            build._minify_and_create_sourcemap(  # pylint: disable=protected-access
-                INVALID_INPUT_FILEPATH, INVALID_OUTPUT_FILEPATH
-            )
-        # Here we use MyPy ignore because the stubs of 'assertRaisesRegex' do
-        # not contain any returncode attribute, so because of this MyPy throws
-        # an '"Exception" has no attribute "returncode"' error. Thus to avoid
-        # the error, we used ignore here.
-        # `returncode` is the exit status of the child process.
-        self.assertEqual(called_process.exception.returncode, 1)  # type: ignore[attr-defined]
-
-    def test_minify_and_create_sourcemap_under_docker_environment(self) -> None:
-        """Tests _minify_and_create_sourcemap with an invalid filepath."""
-
-        def mock_subprocess_check_call(  # pylint: disable=unused-argument
-            command: str, **kwargs: bool
-        ) -> None:
-            """Mock method for replacing subprocess.check_call()."""
-            excepted_cmd = (
-                'node /app/oppia/node_modules/uglify-js/bin/uglifyjs '
-                '/app/oppia/third_party/generated/js/third_party.js -c -m'
-                ' --source-map includeSources,url=\'third_party.min.js.map\' '
-                '-o /app/oppia/third_party/generated/js/third_party.min.js'
-            )
-            self.assertEqual(command, excepted_cmd)
-
-        with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', True):
-            with self.swap(
-                subprocess, 'check_call', mock_subprocess_check_call
-            ):
-                build._minify_and_create_sourcemap(  # pylint: disable=protected-access
-                    INVALID_INPUT_FILEPATH, INVALID_OUTPUT_FILEPATH
-                )
-
     def test_join_files(self) -> None:
         """Determine third_party.js contains the content of the first 10 JS
         files in /third_party/static.
@@ -381,12 +343,7 @@ class BuildTests(test_utils.GenericTestBase):
         with self.swap(
             build,
             'FILEPATHS_NOT_TO_RENAME',
-            (
-                '*.py',
-                'path/to/fonts/*',
-                'path/to/third_party.min.js.map',
-                'path/to/third_party.min.css.map',
-            ),
+            ('*.py', 'path/to/fonts/*', 'path/to/third_party.min.css.map'),
         ):
             self.assertFalse(
                 build.hash_should_be_inserted(
@@ -395,9 +352,6 @@ class BuildTests(test_utils.GenericTestBase):
             )
             self.assertFalse(
                 build.hash_should_be_inserted('path/to/third_party.min.css.map')
-            )
-            self.assertFalse(
-                build.hash_should_be_inserted('path/to/third_party.min.js.map')
             )
             self.assertTrue(
                 build.hash_should_be_inserted('path/to/wrongFonts/fonta.eot')
@@ -1006,14 +960,6 @@ class BuildTests(test_utils.GenericTestBase):
                 'core/tests/data/third_party/css/third_party.min.css'
             )
         )
-        self.assertFalse(
-            os.path.isfile('core/tests/data/third_party/js/third_party.min.js')
-        )
-        self.assertFalse(
-            os.path.isfile(
-                'core/tests/data/third_party/js/third_party.min.js.map'
-            )
-        )
 
         with self.swap(build, 'safe_delete_file', _mock_safe_delete_file):
             build.minify_third_party_libs('core/tests/data/third_party')
@@ -1023,14 +969,6 @@ class BuildTests(test_utils.GenericTestBase):
                 'core/tests/data/third_party/css/third_party.min.css'
             )
         )
-        self.assertTrue(
-            os.path.isfile('core/tests/data/third_party/js/third_party.min.js')
-        )
-        self.assertTrue(
-            os.path.isfile(
-                'core/tests/data/third_party/js/third_party.min.js.map'
-            )
-        )
 
         self.assertLess(
             os.path.getsize(
@@ -1038,21 +976,9 @@ class BuildTests(test_utils.GenericTestBase):
             ),
             os.path.getsize('core/tests/data/third_party/css/third_party.css'),
         )
-        self.assertLess(
-            os.path.getsize(
-                'core/tests/data/third_party/js/third_party.min.js'
-            ),
-            os.path.getsize('core/tests/data/third_party/js/third_party.js'),
-        )
 
         build.safe_delete_file(
             'core/tests/data/third_party/css/third_party.min.css'
-        )
-        build.safe_delete_file(
-            'core/tests/data/third_party/js/third_party.min.js'
-        )
-        build.safe_delete_file(
-            'core/tests/data/third_party/js/third_party.min.js.map'
         )
 
     def test_clean(self) -> None:

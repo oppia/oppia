@@ -45,9 +45,6 @@ var LibraryPage = function () {
   var allExplorationsTitled = function (explorationName) {
     return $$(`.e2e-test-exp-summary-tile-title=${explorationName}`);
   };
-  var allCollectionsTitled = function (collectionName) {
-    return $$(`.e2e-test-collection-summary-tile-title=${collectionName}`);
-  };
   var categorySelector = forms.MultiSelectEditor(
     $('.e2e-test-search-bar-category-selector')
   );
@@ -184,21 +181,27 @@ var LibraryPage = function () {
 
   this.playCollection = async function (collectionName) {
     await waitFor.pageToFullyLoad();
+
     await waitFor.visibilityOf(
       allCollectionSummaryTile,
       'Library Page does not have any collections'
     );
-    var collectionCardElement = $(
+
+    let collectionTitleElement = $(
       `.e2e-test-collection-summary-tile-title=${collectionName}`
     );
+
     await waitFor.visibilityOf(
-      collectionCardElement,
-      'Unable to find collection ' + collectionName
+      collectionTitleElement,
+      `Collection title "${collectionName}" not found`
     );
-    // The Collection summary card is masked by a dummy element. Therefore, a
-    // Javascript click is used.
-    var collectionCard = await allCollectionsTitled(collectionName)[0];
-    await action.click('Collection Card', collectionCard, true);
+
+    // Get the parent clickable <a> or <mat-card>.
+    let collectionTileElement = await collectionTitleElement.$('./ancestor::a');
+
+    // Click via JS to avoid overlay issues.
+    await browser.execute(el => el.click(), collectionTileElement);
+
     await waitFor.pageToFullyLoad();
   };
 
