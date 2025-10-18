@@ -1,7 +1,7 @@
 <div class="partnerships-page e2e-test-partnerships-page">
   <div class="content-container">
     <div class="oppia-partnerships-banner">
-      <div class="oppia-partnerships-banner-content flex-gt-sm">
+      <div class="oppia-partnerships-banner-content">
         <h1 class="oppia-partnerships-h1 e2e-test-partnership-heading">{{ 'I18N_PARTNERSHIPS_PAGE_SECTION_ONE' | translate }}</h1>
 
         <div class="oppia-partnerships-list">
@@ -711,6 +711,30 @@
 
     .partner-container mat-card-content a {
       font-size: 0.8em;
+    }
+  }
+
+  @media (max-width: 599px) {
+    .hide-xs {
+      display: none ;
+    }
+  }
+
+  @media (min-width: 600px) {
+    .hide-gt-xs {
+      display: none;
+    }
+  }
+
+  @media (min-width: 600px) and (max-width: 959px) {
+    .hide-sm {
+      display: none;
+    }
+  }
+
+  @media (min-width: 960px) {
+    .hide-gt-sm {
+      display: none;
     }
   }
 

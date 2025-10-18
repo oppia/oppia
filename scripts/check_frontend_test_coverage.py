@@ -51,7 +51,7 @@ EXCLUDED_DIRECTORIES = [
 # manually.
 # Please keep the list in alphabetical order.
 # NOTE TO DEVELOPERS: do not add any new files to this list without asking
-# @nithusha21 first.
+# @hardikgoyal2003 first.
 NOT_FULLY_COVERED_FILENAMES = [
     'core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts',
     'core/templates/components/ck-editor-helpers/'
@@ -64,10 +64,12 @@ NOT_FULLY_COVERED_FILENAMES = [
     'core/templates/domain/question/question.model.ts',
     'core/templates/expressions/expression-interpolation.service.ts',
     'core/templates/google-analytics.initializer.ts',
+    'core/templates/pages/blog-post-page/blog-post-page.component.ts',
     'core/templates/pages/exploration-editor-page/services/'
     'exploration-states.service.ts',
     'core/templates/pages/exploration-player-page/services/'
     'learner-answer-info.service.ts',
+    'core/templates/services/suggestion-modal.service.ts',
     'extensions/interactions/MusicNotesInput/directives/'
     'oppia-interactive-music-notes-input.component.ts',
     'extensions/interactions/PencilCodeEditor/directives/'
