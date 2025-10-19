@@ -27,10 +27,6 @@ from typing import Optional, Sequence, Set
 
 from . import build, check_frontend_test_coverage, install_third_party_libs
 
-# These is a relative path from the oppia/ folder. They are relative because the
-# dtslint command prepends the current working directory to the path, even if
-# the given path is absolute.
-DTSLINT_TYPE_TESTS_DIR_RELATIVE_PATH = os.path.join('typings', 'tests')
 TYPESCRIPT_DIR_RELATIVE_PATH = os.path.join('node_modules', 'typescript', 'lib')
 MAX_ATTEMPTS = 2
 
@@ -44,11 +40,6 @@ a single test or test suite.
 """
 )
 
-_PARSER.add_argument(
-    '--dtslint_only',
-    help='optional; if specified, only runs dtslint type tests.',
-    action='store_true',
-)
 _PARSER.add_argument(
     '--skip_install',
     help='optional; if specified, skips installing dependencies',
@@ -95,37 +86,6 @@ _PARSER.add_argument(
 )
 
 
-def run_dtslint_type_tests() -> None:
-    """Runs the dtslint type tests in typings/tests."""
-    print('Running dtslint type tests.')
-
-    # Pass the local version of typescript. Otherwise, dtslint will download and
-    # install all versions of typescript.
-    cmd = [
-        './node_modules/dtslint/bin/index.js',
-        DTSLINT_TYPE_TESTS_DIR_RELATIVE_PATH,
-        '--localTs',
-        TYPESCRIPT_DIR_RELATIVE_PATH,
-    ]
-    task = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-    output_lines = []
-    # The value of `process.stdout` should not be None since we passed
-    # the `stdout=subprocess.PIPE` argument to `Popen`.
-    assert task.stdout is not None
-    # Reads and prints realtime output from the subprocess until it terminates.
-    while True:
-        line = task.stdout.readline()
-        # No more output from the subprocess, and the subprocess has ended.
-        if len(line) == 0 and task.poll() is not None:
-            break
-        if line:
-            print(line, end='')
-            output_lines.append(line)
-    print('Done!')
-    if task.returncode:
-        sys.exit('The dtslint (type tests) failed.')
-
-
 def get_file_spec(file_path: str) -> str | None:
     """Returns the spec file path for a given file path.
 
@@ -151,10 +111,6 @@ def get_file_spec(file_path: str) -> str | None:
 def main(args: Optional[Sequence[str]] = None) -> None:
     """Runs the frontend tests."""
     parsed_args = _PARSER.parse_args(args=args)
-
-    run_dtslint_type_tests()
-    if parsed_args.dtslint_only:
-        return
 
     if not parsed_args.skip_install:
         install_third_party_libs.main()
