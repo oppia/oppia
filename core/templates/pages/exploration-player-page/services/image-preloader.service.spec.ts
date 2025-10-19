@@ -440,13 +440,7 @@ describe('Image preloader service', () => {
     imagePreloaderService.init(exploration);
     imagePreloaderService.kickOffImagePreloader(initStateName);
 
-    // Flush feature flags request to avoid open request error in CI.
-    const featureFlagsReq = httpTestingController.match(req =>
-      req.url.includes('/feature_flags_evaluation_handler')
-    );
-    if (featureFlagsReq && featureFlagsReq.length) {
-      featureFlagsReq.forEach(req => req.flush({}));
-    }
+    flushFeatureFlagsIfQueued();
 
     // Max files to download simultaneously is 3.
     httpTestingController.expectOne(requestUrl1).flush(imageBlob);
@@ -587,13 +581,7 @@ describe('Image preloader service', () => {
       imagePreloaderService.kickOffImagePreloader(initStateName);
       flushMicrotasks();
 
-      // Flush feature flags request to avoid open request error in CI.
-      const featureFlagsReq = httpTestingController.match(req =>
-        req.url.includes('/feature_flags_evaluation_handler')
-      );
-      if (featureFlagsReq && featureFlagsReq.length) {
-        featureFlagsReq.forEach(req => req.flush({}));
-      }
+      flushFeatureFlagsIfQueued();
 
       expect(
         imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
@@ -625,13 +613,7 @@ describe('Image preloader service', () => {
     imagePreloaderService.init(exploration);
     imagePreloaderService.kickOffImagePreloader(initStateName);
 
-    // Flush feature flags request to avoid open request error in CI.
-    const featureFlagsReq = httpTestingController.match(req =>
-      req.url.includes('/feature_flags_evaluation_handler')
-    );
-    if (featureFlagsReq && featureFlagsReq.length) {
-      featureFlagsReq.forEach(req => req.flush({}));
-    }
+    flushFeatureFlagsIfQueued();
 
     httpTestingController.expectOne(requestUrl1).flush(imageBlob);
     httpTestingController.expectOne(requestUrl2).flush(imageBlob);
@@ -713,14 +695,6 @@ describe('Image preloader service', () => {
     imagePreloaderService.kickOffImagePreloader(initStateName);
 
     flushFeatureFlagsIfQueued();
-
-    // Flush feature flags request to avoid open request error in CI.
-    const featureFlagsReq = httpTestingController.match(req =>
-      req.url.includes('/feature_flags_evaluation_handler')
-    );
-    if (featureFlagsReq && featureFlagsReq.length) {
-      featureFlagsReq.forEach(req => req.flush({}));
-    }
 
     httpTestingController.expectOne(requestUrl1).flush(imageBlob);
     httpTestingController.expectOne(requestUrl2);
@@ -853,13 +827,7 @@ describe('Image preloader service', () => {
     imagePreloaderService.init(exploration);
     imagePreloaderService.kickOffImagePreloader(initStateName);
 
-    // Flush feature flags request to avoid open request error in CI.
-    const featureFlagsReq = httpTestingController.match(req =>
-      req.url.includes('/feature_flags_evaluation_handler')
-    );
-    if (featureFlagsReq && featureFlagsReq.length) {
-      featureFlagsReq.forEach(req => req.flush({}));
-    }
+    flushFeatureFlagsIfQueued();
 
     httpTestingController
       .expectOne(requestUrl1)
@@ -945,13 +913,7 @@ describe('Image preloader service', () => {
       imagePreloaderService.init(exploration);
       imagePreloaderService.kickOffImagePreloader(initStateName);
 
-      // Flush feature flags request to avoid open request error in CI.
-      const featureFlagsReq = httpTestingController.match(req =>
-        req.url.includes('/feature_flags_evaluation_handler')
-      );
-      if (featureFlagsReq && featureFlagsReq.length) {
-        featureFlagsReq.forEach(req => req.flush({}));
-      }
+      flushFeatureFlagsIfQueued();
 
       var onSuccess = jasmine.createSpy('success');
       var onFailure = jasmine.createSpy('fail');
