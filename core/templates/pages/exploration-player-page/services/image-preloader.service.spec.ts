@@ -384,6 +384,16 @@ describe('Image preloader service', () => {
 
   let exploration: Exploration;
 
+  // Helper to flush platform feature-flags evaluation request if present.
+  const flushFeatureFlagsIfQueued = () => {
+    const featureFlagsReq = httpTestingController.match(req =>
+      req.url.includes('/feature_flags_evaluation_handler')
+    );
+    if (featureFlagsReq && featureFlagsReq.length) {
+      featureFlagsReq.forEach(req => req.flush({}));
+    }
+  };
+
   beforeEach(() => {
     imagePreloaderService = TestBed.get(ImagePreloaderService);
     pageContextService = TestBed.get(PageContextService);
@@ -412,6 +422,8 @@ describe('Image preloader service', () => {
   it('should be in exploration player after init is called', () => {
     imagePreloaderService.init(exploration);
     imagePreloaderService.kickOffImagePreloader(initStateName);
+
+    flushFeatureFlagsIfQueued();
 
     expect(imagePreloaderService.inExplorationPlayer()).toBeTruthy();
 
@@ -483,6 +495,8 @@ describe('Image preloader service', () => {
     imagePreloaderService.init(exploration);
     imagePreloaderService.kickOffImagePreloader(initStateName);
 
+    flushFeatureFlagsIfQueued();
+
     httpTestingController.expectOne(requestUrl1);
     httpTestingController.expectOne(requestUrl2);
     httpTestingController.expectOne(requestUrl3);
@@ -505,6 +519,8 @@ describe('Image preloader service', () => {
     fakeAsync(() => {
       imagePreloaderService.init(exploration);
       imagePreloaderService.kickOffImagePreloader(initStateName);
+
+      flushFeatureFlagsIfQueued();
 
       httpTestingController.expectOne(requestUrl1);
       httpTestingController.expectOne(requestUrl2);
@@ -534,6 +550,8 @@ describe('Image preloader service', () => {
     fakeAsync(() => {
       imagePreloaderService.init(exploration);
       imagePreloaderService.kickOffImagePreloader(initStateName);
+
+      flushFeatureFlagsIfQueued();
 
       httpTestingController.expectOne(requestUrl1).flush(imageBlob);
       httpTestingController.expectOne(requestUrl2).flush(imageBlob);
@@ -651,6 +669,8 @@ describe('Image preloader service', () => {
     imagePreloaderService.init(exploration);
     imagePreloaderService.kickOffImagePreloader(initStateName);
 
+    flushFeatureFlagsIfQueued();
+
     httpTestingController.expectOne(requestUrl1);
     httpTestingController.expectOne(requestUrl2);
     httpTestingController.expectOne(requestUrl3);
@@ -692,6 +712,16 @@ describe('Image preloader service', () => {
     imagePreloaderService.init(exploration);
     imagePreloaderService.kickOffImagePreloader(initStateName);
 
+    flushFeatureFlagsIfQueued();
+
+    // Flush feature flags request to avoid open request error in CI.
+    const featureFlagsReq = httpTestingController.match(req =>
+      req.url.includes('/feature_flags_evaluation_handler')
+    );
+    if (featureFlagsReq && featureFlagsReq.length) {
+      featureFlagsReq.forEach(req => req.flush({}));
+    }
+
     httpTestingController.expectOne(requestUrl1).flush(imageBlob);
     httpTestingController.expectOne(requestUrl2);
     httpTestingController.expectOne(requestUrl3);
@@ -729,6 +759,8 @@ describe('Image preloader service', () => {
   it('should fetch an SVG image', fakeAsync(() => {
     imagePreloaderService.init(exploration);
     imagePreloaderService.kickOffImagePreloader(initStateName);
+
+    flushFeatureFlagsIfQueued();
 
     httpTestingController
       .expectOne(requestUrl1)
@@ -774,6 +806,8 @@ describe('Image preloader service', () => {
     fakeAsync(() => {
       imagePreloaderService.init(exploration);
       imagePreloaderService.kickOffImagePreloader(initStateName);
+
+      flushFeatureFlagsIfQueued();
 
       httpTestingController
         .expectOne(requestUrl1)
@@ -868,6 +902,8 @@ describe('Image preloader service', () => {
     fakeAsync(() => {
       imagePreloaderService.init(exploration);
       imagePreloaderService.kickOffImagePreloader(initStateName);
+
+      flushFeatureFlagsIfQueued();
 
       var onSuccess = jasmine.createSpy('success');
       var onFailure = jasmine.createSpy('fail');
