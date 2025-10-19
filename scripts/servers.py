@@ -288,15 +288,23 @@ def managed_elasticsearch_dev_server() -> Iterator[psutil.Process]:
     es_args = [
         '%s/bin/elasticsearch' % common.ES_PATH,
         # -q is the quiet flag.
+        '-q',
         '-E',
+        # Disable security for the local ElasticSearch server.
         'xpack.security.enabled=false',
+        # https://www.elastic.co/guide/en/elasticsearch/reference/8.17/modules-cluster.html#disk-based-shard-allocation
+        '-E',
+        'cluster.routing.allocation.disk.watermark.low=95%',
+        '-E',
+        'cluster.routing.allocation.disk.watermark.high=95%',
+        '-E',
+        'cluster.routing.allocation.disk.watermark.flood_stage=95%',
     ]
     # Override the default path to ElasticSearch config files.
     es_env = {
         'ES_PATH_CONF': common.ES_PATH_CONFIG_DIR,
         # Set the minimum heap size to 100 MB and maximum to 500 MB.
-        # 'ES_JAVA_OPTS': '-Xms100m -Xmx500m',
-        'ES_JAVA_OPTS': '-Xms512m -Xmx1g',
+        'ES_JAVA_OPTS': '-Xms100m -Xmx500m',
     }
     # OK to use shell=True here because we are passing string literals and
     # constants, so there is no risk of a shell-injection attack.

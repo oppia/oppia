@@ -530,8 +530,7 @@ class ManagedProcessTests(test_utils.TestBase):
 
         self.assertEqual(
             popen_calls[0].program_args,
-            '%s/bin/elasticsearch -q -E xpack.security.enabled=false'
-            % common.ES_PATH,
+            f'{common.ES_PATH}/bin/elasticsearch -q -E xpack.security.enabled=false -E cluster.routing.allocation.disk.watermark.low=95% -E cluster.routing.allocation.disk.watermark.high=95% -E cluster.routing.allocation.disk.watermark.flood_stage=95%',
         )
         self.assertEqual(
             popen_calls[0].kwargs,
