@@ -290,14 +290,6 @@ def managed_elasticsearch_dev_server() -> Iterator[psutil.Process]:
         # -q is the quiet flag.
         '-E',
         'xpack.security.enabled=false',
-        '-E',
-        'cluster.routing.allocation.disk.watermark.low.max_headroom=0b',
-        '-E',
-        'cluster.routing.allocation.disk.watermark.high.max_headroom=0b',
-        '-E',
-        'cluster.routing.allocation.disk.watermark.flood_stage.max_headroom=0b',
-        '-E',
-        'cluster.routing.allocation.disk.watermark.high=95%',
     ]
     # Override the default path to ElasticSearch config files.
     es_env = {
