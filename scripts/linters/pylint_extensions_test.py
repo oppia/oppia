@@ -27,9 +27,8 @@ import unittest
 from core import utils
 
 import astroid
-from pylint import interfaces, testutils
+from pylint import interfaces, lint, testutils
 from pylint import utils as pylint_utils
-from pylint.lint import PyLinter
 
 from . import pylint_extensions
 
@@ -1641,20 +1640,18 @@ class DocstringParameterCheckerTests(unittest.TestCase):
 
     def test_returns_section_without_description_triggers_in_description_false(
         self,
-    ):
-        """Tests that check_docstring_section_indentation handles Returns section
-        when in_description is False (no indented return lines)."""
+    ) -> None:
 
         func_node = astroid.extract_node(
-            '''
+            """
             def sample_func(): #@
-                """Function summary.
+                '''Function summary.
 
                 Returns:
                     Something
-                """
+                '''
                 return "something"
-            '''
+            """
         )
 
         # We don't want to call visit_functiondef, since that will invoke all checks.
@@ -5134,9 +5131,8 @@ class DisallowedImportsCheckerTests(unittest.TestCase):
             self.checker_test_object.checker.visit_importfrom(node)
 
     def test_visit_importfrom_adds_message_for_text_import(self) -> None:
-        """Test that visit_importfrom adds message when 'Text' is imported from typing."""
 
-        import_node = astroid.extract_node("from typing import Text")
+        import_node = astroid.extract_node('from typing import Text')
 
         with self.checker_test_object.assertAddsMessages(
             testutils.MessageTest(
@@ -5148,11 +5144,8 @@ class DisallowedImportsCheckerTests(unittest.TestCase):
             self.checker_test_object.checker.visit_importfrom(import_node)
 
     def test_visit_importfrom_returns_early_for_non_typing_import(self) -> None:
-        """Test that visit_importfrom returns immediately (does nothing)
-        when importing from a module other than 'typing'.
-        """
 
-        import_node = astroid.extract_node("from os import path")
+        import_node = astroid.extract_node('from os import path')
 
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_importfrom(import_node)
@@ -5280,7 +5273,7 @@ class RegisterFunctionTests(unittest.TestCase):
     """Tests for the register() function that registers all custom pylint checkers."""
 
     def setUp(self) -> None:
-        self.linter = PyLinter()
+        self.linter = lint.PyLinter()
 
     def test_register_function_registers_all_checkers(self) -> None:
         """Tests that all custom checkers, including PreventStringConcatenationChecker, are registered."""

@@ -26,7 +26,7 @@ import sys
 from core import feconf
 from core.tests import test_utils
 
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from .. import concurrent_task_utils, install_third_party_libs
 from . import run_lint_checks
@@ -358,7 +358,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
     def test_get_linters_for_file_extension_with_unhandled_extension(
         self,
     ) -> None:
-        files_dict = {
+        files_dict: Dict[str, List[str]] = {
             '.js': [],
             '.ts': [],
             '.html': [],
@@ -378,7 +378,6 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
                 files=files_dict,
             )
         )
-
         self.assertEqual(len(custom_linters), 1)
         self.assertEqual(len(third_party_linters), 0)
 
@@ -386,19 +385,19 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
         """Test that _get_all_files_in_directory correctly excludes files
         matching excluded glob patterns.
         """
-        # Mock os.walk to simulate a directory structure
+
         mock_files_structure = [
             ('/mock/dir', ('subdir',), ('file1.py', 'file2.txt', 'ignore.me')),
             ('/mock/dir/subdir', (), ('file3.js', 'file4.css')),
         ]
 
-        def mock_os_walk(dir_path):
-            # Ignore dir_path input since this is a mock
+        def mock_os_walk(
+            dir_path: str,
+        ) -> list[tuple[str, tuple[str, ...], tuple[str, ...]]]:
             return mock_files_structure
 
         os_walk_swap = self.swap(os, 'walk', mock_os_walk)
 
-        # Define patterns to exclude
         excluded_patterns = ['*.txt', '*.me']
 
         with os_walk_swap:
@@ -406,8 +405,6 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
                 dir_path='/mock/dir', excluded_glob_patterns=excluded_patterns
             )
 
-        # We expect that 'file2.txt' and 'ignore.me' are excluded
-        # And relative paths are returned
         expected_files = [
             os.path.relpath('/mock/dir/file1.py', start=os.getcwd()),
             os.path.relpath('/mock/dir/subdir/file3.js', start=os.getcwd()),
@@ -430,7 +427,9 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
 
         shards_swap = self.swap(run_lint_checks, 'SHARDS', mock_shards)
 
-        def mock_get_filepaths_from_path(filepath, namespace):
+        def mock_get_filepaths_from_path(
+            filepath: str, namespace: multiprocessing.managers.Namespace
+        ) -> List[str]:
             return [filepath]
 
         get_filepaths_swap = self.swap(
