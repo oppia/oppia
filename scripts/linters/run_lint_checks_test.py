@@ -372,7 +372,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
         namespace = manager.Namespace()
 
         custom_linters, third_party_linters = (
-            run_lint_checks._get_linters_for_file_extension(
+            run_lint_checks._get_linters_for_file_extension(  # pylint: disable=protected-access
                 file_extension_to_lint='txt',
                 namespace=namespace,
                 files=files_dict,
@@ -382,9 +382,6 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
         self.assertEqual(len(third_party_linters), 0)
 
     def test_get_all_files_in_directory_excludes_patterns(self) -> None:
-        """Test that _get_all_files_in_directory correctly excludes files
-        matching excluded glob patterns.
-        """
 
         mock_files_structure = [
             ('/mock/dir', ('subdir',), ('file1.py', 'file2.txt', 'ignore.me')),
@@ -392,16 +389,15 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
         ]
 
         def mock_os_walk(
-            dir_path: str,
+            _dir_path: str,
         ) -> list[tuple[str, tuple[str, ...], tuple[str, ...]]]:
             return mock_files_structure
 
         os_walk_swap = self.swap(os, 'walk', mock_os_walk)
 
         excluded_patterns = ['*.txt', '*.me']
-
         with os_walk_swap:
-            all_files = run_lint_checks._get_all_files_in_directory(
+            all_files = run_lint_checks._get_all_files_in_directory(  # pylint: disable=protected-access
                 dir_path='/mock/dir', excluded_glob_patterns=excluded_patterns
             )
 
@@ -416,9 +412,6 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
     def test_get_filepaths_from_non_other_shard_raises_for_duplicates(
         self,
     ) -> None:
-        """Test that _get_filepaths_from_non_other_shard raises RuntimeError
-        when a file appears in multiple shards.
-        """
         mock_namespace = multiprocessing.Manager().Namespace()
 
         mock_shards = {
@@ -428,7 +421,8 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
         shards_swap = self.swap(run_lint_checks, 'SHARDS', mock_shards)
 
         def mock_get_filepaths_from_path(
-            filepath: str, namespace: multiprocessing.managers.Namespace
+            filepath: str,
+            namespace: multiprocessing.managers.Namespace,  # pylint: disable=unused-argument
         ) -> List[str]:
             return [filepath]
 
@@ -442,6 +436,6 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
             with self.assertRaisesRegex(
                 RuntimeError, 'file_a.py in multiple shards'
             ):
-                run_lint_checks._get_filepaths_from_non_other_shard(
+                run_lint_checks._get_filepaths_from_non_other_shard(  # pylint: disable=protected-access
                     '1', mock_namespace
                 )
