@@ -294,7 +294,8 @@ def managed_elasticsearch_dev_server() -> Iterator[psutil.Process]:
         'cluster.routing.allocation.disk.watermark.low.max_headroom=0b',
         '-E',
         'cluster.routing.allocation.disk.watermark.high.max_headroom=0b',
-        # Your existing high watermark setting, now relying on percentage:
+        '-E',
+        'cluster.routing.allocation.disk.watermark.flood_stage.max_headroom=0b',
         '-E',
         'cluster.routing.allocation.disk.watermark.high=95%',
     ]
