@@ -3,6 +3,7 @@
 Oppia is an online learning tool that enables anyone to easily create and share interactive activities (called 'explorations'). These activities simulate a one-on-one conversation with a tutor, enabling students to learn by doing while getting feedback.
 
 In addition to developing the Oppia platform, the team has developed free and effective [lessons](https://www.oppia.org/fractions) on basic mathematics, and we are planning to expand our educational offering to basic science and financial literacy. These lessons help learners who lack appropriate access to educational resources.
+Oppia is very helpful for students who want to learn their own way  if they dont like anything then they can give feedbacks and study the way they want.
 
 The Oppia web application is built using Python, Angular, and Google App Engine. See also:
 
