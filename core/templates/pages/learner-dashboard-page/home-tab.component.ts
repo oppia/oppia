@@ -27,6 +27,7 @@ import {Subscription} from 'rxjs';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 import './home-tab.component.css';
 
@@ -73,8 +74,14 @@ export class HomeTabComponent {
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private windowDimensionService: WindowDimensionsService,
     private urlInterpolationService: UrlInterpolationService,
-    private siteAnalyticsService: SiteAnalyticsService
+    private siteAnalyticsService: SiteAnalyticsService,
+    private platformFeatureService: PlatformFeatureService
   ) {}
+
+  isSerialChapterFeatureLearnerFlagEnabled(): boolean {
+    return this.platformFeatureService.status.SerialChapterLaunchLearnerView
+      .isEnabled;
+  }
 
   ngOnInit(): void {
     this.width = this.widthConst * this.currentGoals.length;
@@ -100,23 +107,37 @@ export class HomeTabComponent {
       const storySummaries = topic.getCanonicalStorySummaryDicts();
 
       for (const story of storySummaries) {
-        const publishedNodes = story
-          .getAllNodes()
-          .filter(node => node.getPublishedStatus());
+        let publishedNodesCount: number;
+        if (this.isSerialChapterFeatureLearnerFlagEnabled()) {
+          const publishedNodes = story
+            .getAllNodes()
+            .filter(node => node.getPublishedStatus());
+          publishedNodesCount = publishedNodes.length;
+        } else {
+          publishedNodesCount = story.getAllNodes().length;
+        }
+
         const completedNodes = story.getCompletedNodeTitles();
         const remainingPublished =
-          publishedNodes.length - completedNodes.length - 1;
+          publishedNodesCount - completedNodes.length - 1;
+        console.log({
+          storyId: story.getId(),
+          publishedNodes: publishedNodesCount,
+          completedNodes: completedNodes.length,
+          remainingPublished,
+        });
 
         if (
           remainingPublished > 0 &&
-          remainingPublished < publishedNodes.length
+          remainingPublished < publishedNodesCount
         ) {
           this.storySummariesWithAvailableNodes.add(story.getId());
+          console.log(this.storySummariesWithAvailableNodes);
         }
 
         if (!this.hasMultipleUnfinishedPublished) {
           this.hasMultipleUnfinishedPublished =
-            publishedNodes.length > 1 && remainingPublished > 0;
+            publishedNodesCount > 1 && remainingPublished > 0;
         }
       }
     }
