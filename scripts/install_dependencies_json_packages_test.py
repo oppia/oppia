@@ -207,6 +207,32 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         )
         self.assertEqual(exists_arr, [False, True])
 
+    def test_download_and_unzip_files_with_existing_target_dir(self) -> None:
+        def mock_exists(path: str) -> bool:
+            if path == os.path.join('target dir', 'target root'):
+                return True
+            return False
+
+        exists_swap = self.swap(os.path, 'exists', mock_exists)
+
+        self.check_function_calls['url_retrieve_is_called'] = False
+        self.check_function_calls['extractall_is_called'] = False
+        self.check_function_calls['remove_is_called'] = False
+        self.check_function_calls['rename_is_called'] = False
+
+        self.expected_check_function_calls = dict(self.check_function_calls)
+
+        with (
+            exists_swap
+        ), self.url_retrieve_swap, self.remove_swap, self.rename_swap, self.extract_swap:
+            install_dependencies_json_packages.download_and_unzip_files(
+                'source url', 'target dir', 'zip root', 'target root'
+            )
+
+        self.assertEqual(
+            self.check_function_calls, self.expected_check_function_calls
+        )
+
     def test_get_file_contents(self) -> None:
         temp_file = tempfile.NamedTemporaryFile().name
         actual_text = 'Testing install third party file.'
