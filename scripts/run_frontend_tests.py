@@ -118,9 +118,8 @@ def run_dtslint_type_tests() -> None:
         # No more output from the subprocess, and the subprocess has ended.
         if len(line) == 0 and task.poll() is not None:
             break
-        if line:
-            print(line, end='')
-            output_lines.append(line)
+        print(line, end='')
+        output_lines.append(line)
     print('Done!')
     if task.returncode:
         sys.exit('The dtslint (type tests) failed.')
