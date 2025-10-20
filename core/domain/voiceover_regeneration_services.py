@@ -88,6 +88,33 @@ def _extract_text_from_skillreview_tag(element: bs4.Tag) -> str:
     return output_str
 
 
+def _extract_text_from_workedexample_tag(element: bs4.Tag) -> str:
+    """Extracts and returns the text from an oppia-noninteractive-workedexample
+    tag.
+
+    Args:
+        element: Tag. The oppia-noninteractive-workedexample tag from which to
+            extract text.
+
+    Returns:
+        str. The extracted text.
+    """
+    escaped_text_question = element.get('question-with-value')
+    question_text = html.unescape(escaped_text_question)
+    output_str_question: str = (
+        json.loads(question_text) if escaped_text_question else ''
+    )
+
+    escaped_text_answer = element.get('answer-with-value')
+    answer_text = html.unescape(escaped_text_answer)
+    output_str_answer: str = (
+        json.loads(answer_text) if escaped_text_answer else ''
+    )
+    return (
+        f'Example:\n\n{output_str_question}\n\nSolution:\n\n{output_str_answer}'
+    )
+
+
 def _extract_text_from_math_tag(element: bs4.Tag) -> str:
     """Extracts and returns the text from an oppia-noninteractive-math tag.
 
@@ -132,7 +159,7 @@ CUSTOM_RTE_TAGS_TO_VOICEOVER_TEXT_EXTRACTION_RULES = {
     'oppia-noninteractive-image': _return_empty_string,
     'oppia-noninteractive-video': _return_empty_string,
     'oppia-noninteractive-tabs': _return_empty_string,
-    'oppia-noninteractive-workedexample': _return_empty_string,
+    'oppia-noninteractive-workedexample': _extract_text_from_workedexample_tag,
 }
 
 

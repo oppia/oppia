@@ -33,8 +33,8 @@ import {PageContextService} from 'services/page-context.service';
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {LoaderService} from 'services/loader.service';
 import {ChangeListService} from 'pages/exploration-editor-page/services/change-list.service';
-import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
-import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
+import {EntityTranslation} from 'domain/translation/entity-translation.model';
+import {TranslatedContent} from 'domain/exploration/translated-content.model';
 import {
   ExplorationChangeEditTranslation,
   ExplorationChangeMarkTranslationsNeedsUpdate,
