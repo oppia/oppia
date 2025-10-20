@@ -27,6 +27,7 @@ import {StorySummary} from 'domain/story/story-summary.model';
 import {StoryNode} from 'domain/story/story-node.model';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {ChapterLabelVisibilityService} from 'services/chapter-label-visibility.service';
+import {ChapterProgressLoaderService} from 'services/chapter-progress-loader.service';
 
 @Component({
   selector: 'lesson-card',
@@ -55,7 +56,8 @@ export class LessonCardComponent implements OnInit {
     private assetsBackendApiService: AssetsBackendApiService,
     private chapterLabelVisibilityService: ChapterLabelVisibilityService,
     private urlService: UrlService,
-    private platformFeatureService: PlatformFeatureService
+    private platformFeatureService: PlatformFeatureService,
+    private chapterProgressLoaderService: ChapterProgressLoaderService
   ) {}
 
   ngOnInit(): void {
@@ -68,7 +70,7 @@ export class LessonCardComponent implements OnInit {
     }
   }
 
-  setStorySummary(storyModel: StorySummary): void {
+  async setStorySummary(storyModel: StorySummary): Promise<void> {
     const completedStories = storyModel.getCompletedNodeTitles().length;
     this.desc = storyModel.getTitle();
     this.imgColor = storyModel.getThumbnailBgColor();
@@ -152,9 +154,31 @@ export class LessonCardComponent implements OnInit {
     this.statusIsPublished = storyModel
       .getAllNodes()
       [nextStory].getPublishedStatus();
-    this.progress = Math.floor(
-      (completedStories / storyModel.getNodeTitles().length) * 100
-    );
+    this.progress = 0;
+    if (this.storyNode) {
+      const explorationId = this.storyNode.getExplorationId();
+      if (explorationId) {
+        this.progress =
+          this.chapterProgressLoaderService.getLessonProgress(explorationId);
+
+        if (this.progress === 0) {
+          const explorationIds = storyModel
+            .getAllNodes()
+            .map(node => node.getExplorationId())
+            .filter(id => id !== null) as string[];
+
+          await this.chapterProgressLoaderService.loadChapterProgressForStory(
+            storyModel.getId(),
+            explorationIds
+          );
+
+          this.progress =
+            this.chapterProgressLoaderService.computeLessonProgress(
+              explorationId
+            );
+        }
+      }
+    }
     this.lessonTopic = this.topic;
   }
 
