@@ -58,10 +58,7 @@ DISPLAY_MODE_INLINE: Final = 'inline'
 # separate object from the conversation.
 DISPLAY_MODE_SUPPLEMENTAL: Final = 'supplemental'
 
-ALLOWED_DISPLAY_MODES: Final = [
-    DISPLAY_MODE_SUPPLEMENTAL,
-    DISPLAY_MODE_INLINE
-]
+ALLOWED_DISPLAY_MODES: Final = [DISPLAY_MODE_SUPPLEMENTAL, DISPLAY_MODE_INLINE]
 
 
 class AnswerVisualizationSpecsDict(TypedDict):
@@ -173,7 +170,8 @@ class BaseInteraction:
         """The customization arg specs for the interaction."""
         return [
             domain.CustomizationArgSpec(**cas)
-            for cas in self._customization_arg_specs]
+            for cas in self._customization_arg_specs
+        ]
 
     @property
     def answer_visualization_specs(self) -> List[AnswerVisualizationSpecsDict]:
@@ -187,11 +185,16 @@ class BaseInteraction:
         for spec in self._answer_visualization_specs:
             factory_cls = (
                 visualization_registry.Registry.get_visualization_class(
-                    spec['id']))
+                    spec['id']
+                )
+            )
             result.append(
                 factory_cls(
-                    spec['calculation_id'], spec['options'],
-                    spec['addressed_info_is_supported']))
+                    spec['calculation_id'],
+                    spec['options'],
+                    spec['addressed_info_is_supported'],
+                )
+            )
         return result
 
     @property
@@ -207,9 +210,10 @@ class BaseInteraction:
             return None
         else:
             answers: state_domain.AcceptableCorrectAnswerTypes = (
-                    object_registry.Registry.get_object_class_by_type(
-                        self.answer_type).normalize(answer)
-                )
+                object_registry.Registry.get_object_class_by_type(
+                    self.answer_type
+                ).normalize(answer)
+            )
             return answers
 
     @property
@@ -220,7 +224,9 @@ class BaseInteraction:
 
         rules_index_dict = json.loads(
             constants.get_package_file_contents(
-                'extensions', feconf.RULES_DESCRIPTIONS_EXTENSIONS_MODULE_PATH))
+                'extensions', feconf.RULES_DESCRIPTIONS_EXTENSIONS_MODULE_PATH
+            )
+        )
         self._cached_rules_dict = rules_index_dict[self.id]
 
         return self._cached_rules_dict
@@ -252,12 +258,15 @@ class BaseInteraction:
             'is_trainable': self.is_trainable,
             'is_linear': self.is_linear,
             'needs_summary': self.needs_summary,
-            'customization_arg_specs': [{
-                'name': ca_spec.name,
-                'description': ca_spec.description,
-                'default_value': ca_spec.default_value,
-                'schema': ca_spec.schema,
-            } for ca_spec in self.customization_arg_specs],
+            'customization_arg_specs': [
+                {
+                    'name': ca_spec.name,
+                    'description': ca_spec.description,
+                    'default_value': ca_spec.default_value,
+                    'schema': ca_spec.schema,
+                }
+                for ca_spec in self.customization_arg_specs
+            ],
             'instructions': self.instructions,
             'narrow_instructions': self.narrow_instructions,
             'default_outcome_heading': self.default_outcome_heading,
@@ -282,19 +291,17 @@ class BaseInteraction:
         param_list = []
         while description.find('{{') != -1:
             opening_index = description.find('{{')
-            description = description[opening_index + 2:]
+            description = description[opening_index + 2 :]
 
             bar_index = description.find('|')
             param_name = description[:bar_index]
-            description = description[bar_index + 1:]
+            description = description[bar_index + 1 :]
 
             closing_index = description.find('}}')
             normalizer_string = description[:closing_index]
-            description = description[closing_index + 2:]
+            description = description[closing_index + 2 :]
 
-            param_list.append(
-                (param_name, getattr(objects, normalizer_string))
-            )
+            param_list.append((param_name, getattr(objects, normalizer_string)))
 
         return param_list
 
@@ -308,4 +315,5 @@ class BaseInteraction:
             if param_name == rule_param_name:
                 return param_type
         raise Exception(
-            'Rule %s has no param called %s' % (rule_name, rule_param_name))
+            'Rule %s has no param called %s' % (rule_name, rule_param_name)
+        )

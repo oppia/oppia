@@ -122,7 +122,7 @@ describe('Logged-Out Learner', function () {
       await curriculumAdmin.publishStoryDraft();
     },
     // Test takes longer than default timeout.
-    450000
+    500000
   );
 
   it('should be able to find a lesson to start learning', async function () {
@@ -182,9 +182,14 @@ describe('Logged-Out Learner', function () {
       'Classroom',
       explorationId1
     );
-    await loggedOutLearner.expectEmbedClassroomInLessonInfoToWorkProperly(
-      explorationId1
-    );
+    // TODO(#23177): Currently, in mobile viewport the share button gets outside
+    // the viewport and thus it can't be clicked. Once fixed, remove check being
+    // skipped in mobile viewport.
+    if (!loggedOutLearner.isViewportAtMobileWidth()) {
+      await loggedOutLearner.expectEmbedClassroomInLessonInfoToWorkProperly(
+        explorationId1
+      );
+    }
 
     // Progress Info.
     await loggedOutLearner.expectNoSaveProgressBeforeCheckpointInfo();

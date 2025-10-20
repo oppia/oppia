@@ -59,7 +59,7 @@
           class="nav-item icon nav-list-item"
           role="menu"
           (click)="selectQuestionsTab()">
-        <a class="nav-link  navbar-tab e2e-test-questions-tab-button"
+        <a class="nav-link  navbar-tab e2e-test-questions-tab-button e2e-test-topic-questions-tab"
            ngbTooltip="Questions Editor"
            placement="bottom"
            aria-label="Question editor"
@@ -76,7 +76,7 @@
           class="nav-item icon nav-list-item e2e-test-topic-preview-tab"
           role="menu"
           (click)="openTopicViewer()">
-        <a class="nav-link navbar-tab"
+        <a class="nav-link navbar-tab e2e-test-preview-tab-button"
            ngbTooltip="Preview"
            placement="bottom"
            tabindex="0"
@@ -96,7 +96,8 @@
     <oppia-topic-editor-tab></oppia-topic-editor-tab>
   </div>
 
-  <div *ngIf="getActiveTabName() === 'questions'">
+  <div *ngIf="getActiveTabName() === 'questions'"
+       class="e2e-test-topic-questions-tab-container">
     <oppia-topic-questions-tab></oppia-topic-questions-tab>
   </div>
 
@@ -104,7 +105,8 @@
     <oppia-subtopic-editor-tab></oppia-subtopic-editor-tab>
   </div>
 
-  <div *ngIf="getActiveTabName() === 'topic_preview'">
+  <div *ngIf="getActiveTabName() === 'topic_preview'"
+       class="e2e-test-topic-preview-tab-container">
     <oppia-topic-preview-tab></oppia-topic-preview-tab>
   </div>
 

@@ -34,13 +34,12 @@ class DummyPassJob(base_jobs.JobBase):
             PCollection. A PCollection containing a single JobRunResult with
             stdout indicating success.
         """
-        return (
-            self.pipeline
-            | 'Create success result' >> beam.Create([
+        return self.pipeline | 'Create success result' >> beam.Create(
+            [
                 job_run_result.JobRunResult.as_stdout(
                     'SUCCESS: Dummy job completed successfully'
                 )
-            ])
+            ]
         )
 
 
@@ -54,11 +53,10 @@ class DummyFailJob(base_jobs.JobBase):
             PCollection. A PCollection containing a single JobRunResult with
             stderr indicating failure.
         """
-        return (
-            self.pipeline
-            | 'Create failure result' >> beam.Create([
+        return self.pipeline | 'Create failure result' >> beam.Create(
+            [
                 job_run_result.JobRunResult.as_stderr(
                     'ERROR: Dummy job failed as expected'
                 )
-            ])
+            ]
         )
