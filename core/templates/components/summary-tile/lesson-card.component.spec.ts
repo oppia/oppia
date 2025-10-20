@@ -22,6 +22,7 @@ import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {LessonCardComponent} from './lesson-card.component';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {PlatformFeatureService} from '../../services/platform-feature.service';
 
 import {CollectionSummary} from 'domain/collection/collection-summary.model';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
@@ -259,11 +260,26 @@ describe('LessonCardComponent', () => {
     topic_url_fragment: 'topic',
   };
 
+  class MockPlatformFeatureService {
+    status = {
+      SerialChapterLaunchLearnerView: {
+        isEnabled: false,
+      },
+    };
+  }
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
+
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [FormsModule, HttpClientTestingModule],
       declarations: [LessonCardComponent, MockTranslatePipe],
       schemas: [NO_ERRORS_SCHEMA],
+      providers: [
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService,
+        },
+      ],
     }).compileComponents();
   }));
 

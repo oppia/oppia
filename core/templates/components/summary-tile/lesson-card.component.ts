@@ -25,6 +25,8 @@ import {CollectionSummary} from 'domain/collection/collection-summary.model';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
 import {StorySummary} from 'domain/story/story-summary.model';
 import {StoryNode} from 'domain/story/story-node.model';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {ChapterLabelVisibilityService} from 'services/chapter-label-visibility.service';
 
 @Component({
   selector: 'lesson-card',
@@ -36,6 +38,7 @@ export class LessonCardComponent implements OnInit {
   @Input() isCommunityLessonComplete?: boolean;
   @Input() isGoal?: boolean;
   @Input() isRecommendation?: boolean;
+  @Input() isSavedSection?: boolean;
 
   desc!: string;
   imgColor!: string;
@@ -45,11 +48,14 @@ export class LessonCardComponent implements OnInit {
   title!: string;
   lessonTopic!: string;
   statusIsPublished!: boolean;
+  storyNode!: StoryNode;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private assetsBackendApiService: AssetsBackendApiService,
-    private urlService: UrlService
+    private chapterLabelVisibilityService: ChapterLabelVisibilityService,
+    private urlService: UrlService,
+    private platformFeatureService: PlatformFeatureService
   ) {}
 
   ngOnInit(): void {
@@ -134,7 +140,7 @@ export class LessonCardComponent implements OnInit {
       }
     }
     // TODO(#18384): Returns next unplayed node from the earliest completed node. Does not account for if played out of order.
-
+    this.storyNode = storyModel.getAllNodes()[nextStory];
     this.lessonUrl = this.getStorySummaryLessonUrl(
       storyModel.getClassroomUrlFragment(),
       storyModel.getTopicUrlFragment(),
@@ -188,6 +194,11 @@ export class LessonCardComponent implements OnInit {
     );
   }
 
+  isSerialChapterFeatureLearnerFlagEnabled(): boolean {
+    return this.platformFeatureService.status.SerialChapterLaunchLearnerView
+      .isEnabled;
+  }
+
   getStorySummaryLessonUrl(
     classroomUrl: string | undefined,
     topicUrl: string | undefined,
@@ -223,6 +234,16 @@ export class LessonCardComponent implements OnInit {
       currentStory.getId()
     );
     return resultUrl;
+  }
+
+  isNewChapterLabelVisible(): boolean {
+    if (!this.storyNode || !(this.story instanceof StorySummary)) {
+      return false;
+    }
+    return this.chapterLabelVisibilityService.isNewChapterLabelVisible(
+      this.storyNode,
+      this.story
+    );
   }
 
   getButtonTranslationKey(): string {
