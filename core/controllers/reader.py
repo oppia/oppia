@@ -72,14 +72,16 @@ def _does_exploration_exist(
         bool. True if the exploration exists False otherwise.
     """
     exploration = exp_fetchers.get_exploration_by_id(
-        exploration_id, strict=False, version=version)
+        exploration_id, strict=False, version=version
+    )
 
     if exploration is None:
         return False
 
     if collection_id:
         collection = collection_services.get_collection_by_id(
-            collection_id, strict=False)
+            collection_id, strict=False
+        )
         if collection is None:
             return False
 
@@ -96,9 +98,7 @@ class ExplorationHandlerNormalizedRequestDict(TypedDict):
 
 
 class ExplorationHandler(
-    base.BaseHandler[
-        Dict[str, str], ExplorationHandlerNormalizedRequestDict
-    ]
+    base.BaseHandler[Dict[str, str], ExplorationHandlerNormalizedRequestDict]
 ):
     """Provides the initial data for a single exploration."""
 
@@ -107,10 +107,12 @@ class ExplorationHandler(
         'exploration_id': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.ENTITY_ID_REGEX
-                }]
+                'validators': [
+                    {
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                    }
+                ],
             }
         }
     }
@@ -119,24 +121,28 @@ class ExplorationHandler(
             'v': {
                 'schema': {
                     'type': 'int',
-                    'validators': [{
-                        'id': 'is_at_least',
-                        # Version must be greater than zero.
-                        'min_value': 1
-                    }]
+                    'validators': [
+                        {
+                            'id': 'is_at_least',
+                            # Version must be greater than zero.
+                            'min_value': 1,
+                        }
+                    ],
                 },
-                'default_value': None
+                'default_value': None,
             },
             'pid': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'has_length_at_most',
-                        'max_value': constants.MAX_PROGRESS_URL_ID_LENGTH
-                    }]
+                    'validators': [
+                        {
+                            'id': 'has_length_at_most',
+                            'max_value': constants.MAX_PROGRESS_URL_ID_LENGTH,
+                        }
+                    ],
                 },
-                'default_value': None
-            }
+                'default_value': None,
+            },
         }
     }
 
@@ -152,15 +158,19 @@ class ExplorationHandler(
         unique_progress_url_id = self.normalized_request.get('pid')
 
         exploration = exp_fetchers.get_exploration_by_id(
-            exploration_id, strict=False, version=version)
+            exploration_id, strict=False, version=version
+        )
         if exploration is None:
             raise self.NotFoundException()
 
         exploration_rights = rights_manager.get_exploration_rights(
-            exploration_id, strict=False)
-        user_settings = user_services.get_user_settings(
-            self.user_id, strict=False
-        ) if self.user_id else None
+            exploration_id, strict=False
+        )
+        user_settings = (
+            user_services.get_user_settings(self.user_id, strict=False)
+            if self.user_id
+            else None
+        )
 
         preferred_audio_language_code = None
         preferred_language_codes = None
@@ -170,15 +180,18 @@ class ExplorationHandler(
         if exp_services.get_story_id_linked_to_exploration(exploration_id):
             displayable_language_codes = (
                 translation_services.get_displayable_translation_languages(
-                    feconf.TranslatableEntityType.EXPLORATION, exploration))
+                    feconf.TranslatableEntityType.EXPLORATION, exploration
+                )
+            )
 
         if user_settings is not None:
             preferred_audio_language_code = (
-                user_settings.preferred_audio_language_code)
-            preferred_language_codes = (
-                user_settings.preferred_language_codes)
+                user_settings.preferred_audio_language_code
+            )
+            preferred_language_codes = user_settings.preferred_language_codes
             has_viewed_lesson_info_modal_once = (
-                user_settings.has_viewed_lesson_info_modal_once)
+                user_settings.has_viewed_lesson_info_modal_once
+            )
 
         furthest_reached_checkpoint_exp_version = None
         furthest_reached_checkpoint_state_name = None
@@ -186,41 +199,44 @@ class ExplorationHandler(
         most_recently_reached_checkpoint_state_name = None
 
         if not self.user_id and unique_progress_url_id is not None:
-            logged_out_user_data = (
-                exp_fetchers.get_logged_out_user_progress(
-                    unique_progress_url_id, strict=True))
+            logged_out_user_data = exp_fetchers.get_logged_out_user_progress(
+                unique_progress_url_id, strict=True
+            )
 
             synced_exp_user_data = None
             # If the latest exploration version is ahead of the most recently
             # interacted exploration version.
             if (
-                logged_out_user_data.most_recently_reached_checkpoint_exp_version is not None and # pylint: disable=line-too-long
-                logged_out_user_data.most_recently_reached_checkpoint_exp_version < exploration.version # pylint: disable=line-too-long
+                logged_out_user_data.most_recently_reached_checkpoint_exp_version
+                is not None  # pylint: disable=line-too-long
+                and logged_out_user_data.most_recently_reached_checkpoint_exp_version
+                < exploration.version  # pylint: disable=line-too-long
             ):
-                synced_exp_user_data = (
-                    exp_services.sync_logged_out_learner_checkpoint_progress_with_current_exp_version( # pylint: disable=line-too-long
-                        logged_out_user_data.exploration_id,
-                        unique_progress_url_id,
-                        strict=True
-                    )
+                synced_exp_user_data = exp_services.sync_logged_out_learner_checkpoint_progress_with_current_exp_version(  # pylint: disable=line-too-long
+                    logged_out_user_data.exploration_id,
+                    unique_progress_url_id,
+                    strict=True,
                 )
             else:
                 synced_exp_user_data = logged_out_user_data
 
             furthest_reached_checkpoint_exp_version = (
-                synced_exp_user_data.furthest_reached_checkpoint_exp_version)
+                synced_exp_user_data.furthest_reached_checkpoint_exp_version
+            )
             furthest_reached_checkpoint_state_name = (
-                synced_exp_user_data.furthest_reached_checkpoint_state_name)
+                synced_exp_user_data.furthest_reached_checkpoint_state_name
+            )
             most_recently_reached_checkpoint_exp_version = (
-                synced_exp_user_data
-                    .most_recently_reached_checkpoint_exp_version)
+                synced_exp_user_data.most_recently_reached_checkpoint_exp_version
+            )
             most_recently_reached_checkpoint_state_name = (
-                synced_exp_user_data
-                    .most_recently_reached_checkpoint_state_name)
+                synced_exp_user_data.most_recently_reached_checkpoint_state_name
+            )
 
         elif self.user_id is not None:
             exp_user_data = exp_fetchers.get_exploration_user_data(
-                self.user_id, exploration_id)
+                self.user_id, exploration_id
+            )
 
             # If exp_user_data is None, it means the exploration is started
             # for the first time and no checkpoint progress of the user
@@ -235,57 +251,69 @@ class ExplorationHandler(
                 # If the latest exploration version is ahead of the most
                 # recently interacted exploration version.
                 if (
-                    exp_user_data.most_recently_reached_checkpoint_exp_version is not None and # pylint: disable=line-too-long
-                    exp_user_data.most_recently_reached_checkpoint_exp_version < exploration.version # pylint: disable=line-too-long
+                    exp_user_data.most_recently_reached_checkpoint_exp_version
+                    is not None  # pylint: disable=line-too-long
+                    and exp_user_data.most_recently_reached_checkpoint_exp_version
+                    < exploration.version  # pylint: disable=line-too-long
                 ):
-                    synced_exp_logged_in_user_data = (
-                        user_services.sync_logged_in_learner_checkpoint_progress_with_current_exp_version( # pylint: disable=line-too-long
-                            self.user_id, exploration_id, strict=True))
+                    synced_exp_logged_in_user_data = user_services.sync_logged_in_learner_checkpoint_progress_with_current_exp_version(  # pylint: disable=line-too-long
+                        self.user_id, exploration_id, strict=True
+                    )
                 else:
                     synced_exp_logged_in_user_data = exp_user_data
 
                 furthest_reached_checkpoint_exp_version = (
-                    synced_exp_logged_in_user_data.furthest_reached_checkpoint_exp_version) # pylint: disable=line-too-long
+                    synced_exp_logged_in_user_data.furthest_reached_checkpoint_exp_version
+                )  # pylint: disable=line-too-long
                 furthest_reached_checkpoint_state_name = (
-                    synced_exp_logged_in_user_data.furthest_reached_checkpoint_state_name) # pylint: disable=line-too-long
+                    synced_exp_logged_in_user_data.furthest_reached_checkpoint_state_name
+                )  # pylint: disable=line-too-long
                 most_recently_reached_checkpoint_exp_version = (
-                    synced_exp_logged_in_user_data
-                        .most_recently_reached_checkpoint_exp_version)
-                most_recently_reached_checkpoint_state_name = (
-                    synced_exp_logged_in_user_data
-                        .most_recently_reached_checkpoint_state_name)
-
-        self.values.update({
-            'can_edit': (
-                rights_manager.check_can_edit_activity(
-                    self.user, exploration_rights)),
-            'exploration': exploration.to_player_dict(),
-            'exploration_metadata': exploration.get_metadata().to_dict(),
-            'exploration_id': exploration_id,
-            'is_logged_in': bool(self.user_id),
-            'session_id': utils.generate_new_session_id(),
-            'version': exploration.version,
-            'preferred_audio_language_code': preferred_audio_language_code,
-            'preferred_language_codes': preferred_language_codes,
-            'auto_tts_enabled': exploration.auto_tts_enabled,
-            'record_playthrough_probability': (
-                platform_parameter_services.get_platform_parameter_value(
-                    platform_parameter_list.ParamName.
-                    RECORD_PLAYTHROUGH_PROBABILITY.value
+                    synced_exp_logged_in_user_data.most_recently_reached_checkpoint_exp_version
                 )
-            ),
-            'has_viewed_lesson_info_modal_once': (
-                has_viewed_lesson_info_modal_once),
-            'furthest_reached_checkpoint_exp_version': (
-                furthest_reached_checkpoint_exp_version),
-            'furthest_reached_checkpoint_state_name': (
-                furthest_reached_checkpoint_state_name),
-            'most_recently_reached_checkpoint_exp_version': (
-                most_recently_reached_checkpoint_exp_version),
-            'most_recently_reached_checkpoint_state_name': (
-                most_recently_reached_checkpoint_state_name),
-            'displayable_language_codes': displayable_language_codes
-        })
+                most_recently_reached_checkpoint_state_name = (
+                    synced_exp_logged_in_user_data.most_recently_reached_checkpoint_state_name
+                )
+
+        self.values.update(
+            {
+                'can_edit': (
+                    rights_manager.check_can_edit_activity(
+                        self.user, exploration_rights
+                    )
+                ),
+                'exploration': exploration.to_player_dict(),
+                'exploration_metadata': exploration.get_metadata().to_dict(),
+                'exploration_id': exploration_id,
+                'is_logged_in': bool(self.user_id),
+                'session_id': utils.generate_new_session_id(),
+                'version': exploration.version,
+                'preferred_audio_language_code': preferred_audio_language_code,
+                'preferred_language_codes': preferred_language_codes,
+                'auto_tts_enabled': exploration.auto_tts_enabled,
+                'record_playthrough_probability': (
+                    platform_parameter_services.get_platform_parameter_value(
+                        platform_parameter_list.ParamName.RECORD_PLAYTHROUGH_PROBABILITY.value
+                    )
+                ),
+                'has_viewed_lesson_info_modal_once': (
+                    has_viewed_lesson_info_modal_once
+                ),
+                'furthest_reached_checkpoint_exp_version': (
+                    furthest_reached_checkpoint_exp_version
+                ),
+                'furthest_reached_checkpoint_state_name': (
+                    furthest_reached_checkpoint_state_name
+                ),
+                'most_recently_reached_checkpoint_exp_version': (
+                    most_recently_reached_checkpoint_exp_version
+                ),
+                'most_recently_reached_checkpoint_state_name': (
+                    most_recently_reached_checkpoint_state_name
+                ),
+                'displayable_language_codes': displayable_language_codes,
+            }
+        )
         self.render_json(self.values)
 
 
@@ -303,41 +331,41 @@ class EntityTranslationHandler(
                 'type': 'basestring',
                 'choices': [
                     feconf.ENTITY_TYPE_EXPLORATION,
-                    feconf.ENTITY_TYPE_QUESTION
-                ]
+                    feconf.ENTITY_TYPE_QUESTION,
+                ],
             }
         },
         'entity_id': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.ENTITY_ID_REGEX
-                }]
+                'validators': [
+                    {
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                    }
+                ],
             }
         },
         'entity_version': {
             'schema': {
                 'type': 'int',
-                'validators': [{
-                    'id': 'is_at_least',
-                    # Version must be greater than zero.
-                    'min_value': 1
-                }]
+                'validators': [
+                    {
+                        'id': 'is_at_least',
+                        # Version must be greater than zero.
+                        'min_value': 1,
+                    }
+                ],
             }
         },
         'language_code': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'is_supported_audio_language_code'
-                }]
+                'validators': [{'id': 'is_supported_audio_language_code'}],
             }
-        }
+        },
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
     def get(
@@ -345,11 +373,14 @@ class EntityTranslationHandler(
         entity_type: str,
         entity_id: str,
         entity_version: int,
-        language_code: str
+        language_code: str,
     ) -> None:
         entity_translation = translation_fetchers.get_entity_translation(
-            feconf.TranslatableEntityType(entity_type), entity_id,
-            entity_version, language_code)
+            feconf.TranslatableEntityType(entity_type),
+            entity_id,
+            entity_version,
+            language_code,
+        )
 
         self.render_json(entity_translation.to_dict())
 
@@ -363,9 +394,7 @@ class PretestHandlerNormalizedRequestDict(TypedDict):
 
 
 class PretestHandler(
-    base.BaseHandler[
-        Dict[str, str], PretestHandlerNormalizedRequestDict
-    ]
+    base.BaseHandler[Dict[str, str], PretestHandlerNormalizedRequestDict]
 ):
     """Provides subsequent pretest questions after initial batch."""
 
@@ -373,10 +402,12 @@ class PretestHandler(
         'exploration_id': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.ENTITY_ID_REGEX
-                }]
+                'validators': [
+                    {
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                    }
+                ],
             }
         }
     }
@@ -406,17 +437,16 @@ class PretestHandler(
                 'No prerequisite skill_ids found for the exploration with '
                 'exploration_id: %s' % exploration_id
             )
-        pretest_questions = (
-            question_services.get_questions_by_skill_ids(
-                feconf.NUM_PRETEST_QUESTIONS,
-                prerequisite_skill_ids,
-                True)
+        pretest_questions = question_services.get_questions_by_skill_ids(
+            feconf.NUM_PRETEST_QUESTIONS, prerequisite_skill_ids, True
         )
         question_dicts = [question.to_dict() for question in pretest_questions]
 
-        self.values.update({
-            'pretest_question_dicts': question_dicts,
-        })
+        self.values.update(
+            {
+                'pretest_question_dicts': question_dicts,
+            }
+        )
         self.render_json(self.values)
 
 
@@ -440,10 +470,12 @@ class StorePlaythroughHandler(
         'exploration_id': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.ENTITY_ID_REGEX
-                }]
+                'validators': [
+                    {
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                    }
+                ],
             }
         }
     }
@@ -452,16 +484,13 @@ class StorePlaythroughHandler(
             'issue_schema_version': {
                 'schema': {
                     'type': 'int',
-                    'validators': [{
-                        'id': 'is_at_least',
-                        'min_value': 1
-                    }]
+                    'validators': [{'id': 'is_at_least', 'min_value': 1}],
                 },
             },
             'playthrough_data': {
                 'schema': {
                     'type': 'object_dict',
-                    'object_class': stats_domain.Playthrough
+                    'object_class': stats_domain.Playthrough,
                 }
             },
         }
@@ -476,16 +505,17 @@ class StorePlaythroughHandler(
             exploration_id: str. The ID of the exploration.
         """
         assert self.normalized_payload is not None
-        issue_schema_version = self.normalized_payload[
-            'issue_schema_version']
+        issue_schema_version = self.normalized_payload['issue_schema_version']
 
         playthrough = self.normalized_payload['playthrough_data']
 
         exp_issues = stats_services.get_exp_issues(
-            exploration_id, playthrough.exp_version)
+            exploration_id, playthrough.exp_version
+        )
 
         if stats_services.assign_playthrough_to_corresponding_issue(
-                playthrough, exp_issues, issue_schema_version):
+            playthrough, exp_issues, issue_schema_version
+        ):
             stats_services.save_exp_issues_model(exp_issues)
         self.render_json({})
 
@@ -500,9 +530,7 @@ class StatsEventsHandlerNormalizedPayloadDict(TypedDict):
 
 
 class StatsEventsHandler(
-    base.BaseHandler[
-        StatsEventsHandlerNormalizedPayloadDict, Dict[str, str]
-    ]
+    base.BaseHandler[StatsEventsHandlerNormalizedPayloadDict, Dict[str, str]]
 ):
     """Handles a batch of events coming in from the frontend."""
 
@@ -512,10 +540,12 @@ class StatsEventsHandler(
         'exploration_id': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.ENTITY_ID_REGEX
-                }]
+                'validators': [
+                    {
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                    }
+                ],
             }
         }
     }
@@ -525,19 +555,22 @@ class StatsEventsHandler(
                 'schema': {
                     'type': 'object_dict',
                     'validation_method': (
-                        domain_objects_validator.validate_aggregated_stats),
+                        domain_objects_validator.validate_aggregated_stats
+                    ),
                 }
             },
             'exp_version': {
                 'schema': {
                     'type': 'int',
-                    'validators': [{
-                        'id': 'is_at_least',
-                        # Version must be greater than zero.
-                        'min_value': 1
-                    }]
+                    'validators': [
+                        {
+                            'id': 'is_at_least',
+                            # Version must be greater than zero.
+                            'min_value': 1,
+                        }
+                    ],
                 }
-            }
+            },
         }
     }
 
@@ -547,7 +580,8 @@ class StatsEventsHandler(
         aggregated_stats = self.normalized_payload['aggregated_stats']
         exp_version = self.normalized_payload['exp_version']
         event_services.StatsEventsHandler.record(
-            exploration_id, exp_version, aggregated_stats)
+            exploration_id, exp_version, aggregated_stats
+        )
         self.render_json({})
 
 
@@ -569,8 +603,7 @@ class AnswerSubmittedEventHandlerNormalizedPayloadDict(TypedDict):
 
 class AnswerSubmittedEventHandler(
     base.BaseHandler[
-        AnswerSubmittedEventHandlerNormalizedPayloadDict,
-        Dict[str, str]
+        AnswerSubmittedEventHandlerNormalizedPayloadDict, Dict[str, str]
     ]
 ):
     """Tracks a learner submitting an answer."""
@@ -580,10 +613,12 @@ class AnswerSubmittedEventHandler(
         'exploration_id': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.ENTITY_ID_REGEX
-                }]
+                'validators': [
+                    {
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                    }
+                ],
             }
         }
     }
@@ -592,70 +627,53 @@ class AnswerSubmittedEventHandler(
             'params': {
                 'schema': {
                     'type': 'variable_keys_dict',
-                    'keys': {
-                        'schema': {
-                            'type': 'basestring'
-                        }
-                    },
+                    'keys': {'schema': {'type': 'basestring'}},
                     'values': {
                         'schema': {
                             'type': 'weak_multiple',
-                            'options': ['int', 'basestring', 'dict', 'list']
+                            'options': ['int', 'basestring', 'dict', 'list'],
                         }
-                    }
+                    },
                 },
-                'default_value': {}
+                'default_value': {},
             },
-            'session_id': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
+            'session_id': {'schema': {'type': 'basestring'}},
             'old_state_name': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'has_length_at_most',
-                        'max_value': constants.MAX_STATE_NAME_LENGTH
-                    }]
+                    'validators': [
+                        {
+                            'id': 'has_length_at_most',
+                            'max_value': constants.MAX_STATE_NAME_LENGTH,
+                        }
+                    ],
                 }
             },
             'answer': {
                 'schema': {
                     'type': 'weak_multiple',
-                    'options': ['int', 'basestring', 'dict', 'list']
+                    'options': ['int', 'basestring', 'dict', 'list'],
                 }
             },
             'client_time_spent_in_secs': {
                 'schema': {
                     'type': 'float',
-                    'validators': [{
-                        'id': 'is_at_least',
-                        'min_value': 0
-                    }]
+                    'validators': [{'id': 'is_at_least', 'min_value': 0}],
                 }
             },
             'answer_group_index': {
                 'schema': {
                     'type': 'int',
-                    'validators': [{
-                        'id': 'is_at_least',
-                        'min_value': 0
-                    }]
+                    'validators': [{'id': 'is_at_least', 'min_value': 0}],
                 }
             },
             'rule_spec_index': {
                 'schema': {
                     'type': 'int',
-                    'validators': [{
-                        'id': 'is_at_least',
-                        'min_value': 0
-                    }]
+                    'validators': [{'id': 'is_at_least', 'min_value': 0}],
                 }
             },
-            'version': {
-                'schema': editor.SCHEMA_FOR_VERSION
-            },
+            'version': {'schema': editor.SCHEMA_FOR_VERSION},
             'classification_categorization': {
                 'schema': {
                     'type': 'basestring',
@@ -663,10 +681,10 @@ class AnswerSubmittedEventHandler(
                         exp_domain.EXPLICIT_CLASSIFICATION,
                         exp_domain.TRAINING_DATA_CLASSIFICATION,
                         exp_domain.STATISTICAL_CLASSIFICATION,
-                        exp_domain.DEFAULT_OUTCOME_CLASSIFICATION
-                    ]
+                        exp_domain.DEFAULT_OUTCOME_CLASSIFICATION,
+                    ],
                 }
-            }
+            },
         }
     }
 
@@ -687,30 +705,43 @@ class AnswerSubmittedEventHandler(
         version = self.normalized_payload['version']
         session_id = self.normalized_payload['session_id']
         client_time_spent_in_secs = self.normalized_payload[
-            'client_time_spent_in_secs']
+            'client_time_spent_in_secs'
+        ]
         # The answer group and rule spec indexes, which will be used to get
         # the rule spec string.
         answer_group_index = self.normalized_payload['answer_group_index']
         rule_spec_index = self.normalized_payload['rule_spec_index']
         classification_categorization = self.normalized_payload[
-            'classification_categorization']
+            'classification_categorization'
+        ]
 
         exploration = exp_fetchers.get_exploration_by_id(
-            exploration_id, version=version)
+            exploration_id, version=version
+        )
 
         old_interaction = exploration.states[old_state_name].interaction
 
         old_interaction_instance = (
             interaction_registry.Registry.get_interaction_by_id(
-                old_interaction.id))
+                old_interaction.id
+            )
+        )
 
         normalized_answer = old_interaction_instance.normalize_answer(answer)
 
         event_services.AnswerSubmissionEventHandler.record(
-            exploration_id, version, old_state_name,
+            exploration_id,
+            version,
+            old_state_name,
             exploration.states[old_state_name].interaction.id,
-            answer_group_index, rule_spec_index, classification_categorization,
-            session_id, client_time_spent_in_secs, params, normalized_answer)
+            answer_group_index,
+            rule_spec_index,
+            classification_categorization,
+            session_id,
+            client_time_spent_in_secs,
+            params,
+            normalized_answer,
+        )
         self.render_json({})
 
 
@@ -727,71 +758,60 @@ class StateHitEventHandlerNormalizedPayloadDict(TypedDict):
 
 
 class StateHitEventHandler(
-    base.BaseHandler[
-        StateHitEventHandlerNormalizedPayloadDict, Dict[str, str]
-    ]
+    base.BaseHandler[StateHitEventHandlerNormalizedPayloadDict, Dict[str, str]]
 ):
     """Tracks a learner hitting a new state."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     REQUIRE_PAYLOAD_CSRF_CHECK = False
     URL_PATH_ARGS_SCHEMAS = {
-         'exploration_id': {
-            'schema': editor.SCHEMA_FOR_EXPLORATION_ID
-        }
+        'exploration_id': {'schema': editor.SCHEMA_FOR_EXPLORATION_ID}
     }
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
-            'session_id': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
+            'session_id': {'schema': {'type': 'basestring'}},
             'exploration_version': {
                 'schema': {
                     'type': 'int',
-                    'validators': [{
-                        'id': 'is_at_least',
-                        # Version must be greater than zero.
-                        'min_value': 1
-                    }]
+                    'validators': [
+                        {
+                            'id': 'is_at_least',
+                            # Version must be greater than zero.
+                            'min_value': 1,
+                        }
+                    ],
                 }
             },
             'new_state_name': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'has_length_at_most',
-                        'max_value': constants.MAX_STATE_NAME_LENGTH
-                    }]
+                    'validators': [
+                        {
+                            'id': 'has_length_at_most',
+                            'max_value': constants.MAX_STATE_NAME_LENGTH,
+                        }
+                    ],
                 }
             },
             'client_time_spent_in_secs': {
                 'schema': {
                     'type': 'float',
-                    'validators': [{
-                        'id': 'is_at_least',
-                        'min_value': 0
-                    }]
+                    'validators': [{'id': 'is_at_least', 'min_value': 0}],
                 }
             },
             'old_params': {
                 'schema': {
                     'type': 'variable_keys_dict',
-                    'keys': {
-                        'schema': {
-                            'type': 'basestring'
-                        }
-                    },
+                    'keys': {'schema': {'type': 'basestring'}},
                     'values': {
                         'schema': {
                             'type': 'weak_multiple',
-                            'options': ['int', 'basestring', 'dict', 'list']
+                            'options': ['int', 'basestring', 'dict', 'list'],
                         },
                     },
-                    'default_value': {}
+                    'default_value': {},
                 }
-            }
+            },
         }
     }
 
@@ -807,14 +827,19 @@ class StateHitEventHandler(
         exploration_version = self.normalized_payload['exploration_version']
         session_id = self.normalized_payload['session_id']
         # TODO(sll): Why do we not record the value of this anywhere?
-        client_time_spent_in_secs = ( # pylint: disable=unused-variable
+        client_time_spent_in_secs = (  # pylint: disable=unused-variable
             self.normalized_payload['client_time_spent_in_secs']
         )
         old_params = self.normalized_payload['old_params']
 
         event_services.StateHitEventHandler.record(
-            exploration_id, exploration_version, new_state_name,
-            session_id, old_params, feconf.PLAY_TYPE_NORMAL)
+            exploration_id,
+            exploration_version,
+            new_state_name,
+            session_id,
+            old_params,
+            feconf.PLAY_TYPE_NORMAL,
+        )
         self.render_json({})
 
 
@@ -841,9 +866,7 @@ class StateCompleteEventHandler(
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
     URL_PATH_ARGS_SCHEMAS = {
-         'exploration_id': {
-            'schema': editor.SCHEMA_FOR_EXPLORATION_ID
-        }
+        'exploration_id': {'schema': editor.SCHEMA_FOR_EXPLORATION_ID}
     }
 
     HANDLER_ARGS_SCHEMAS = {
@@ -851,36 +874,33 @@ class StateCompleteEventHandler(
             'state_name': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'has_length_at_most',
-                        'max_value': constants.MAX_STATE_NAME_LENGTH
-                    }]
+                    'validators': [
+                        {
+                            'id': 'has_length_at_most',
+                            'max_value': constants.MAX_STATE_NAME_LENGTH,
+                        }
+                    ],
                 }
             },
-             'session_id': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
+            'session_id': {'schema': {'type': 'basestring'}},
             'time_spent_in_state_secs': {
                 'schema': {
                     'type': 'float',
-                    'validators': [{
-                        'id': 'is_at_least',
-                        'min_value': 0
-                    }]
+                    'validators': [{'id': 'is_at_least', 'min_value': 0}],
                 }
             },
             'exp_version': {
                 'schema': {
                     'type': 'int',
-                    'validators': [{
-                        'id': 'is_at_least',
-                        # Version must be greater than zero.
-                        'min_value': 1
-                    }]
+                    'validators': [
+                        {
+                            'id': 'is_at_least',
+                            # Version must be greater than zero.
+                            'min_value': 1,
+                        }
+                    ],
                 }
-            }
+            },
         }
     }
 
@@ -891,14 +911,15 @@ class StateCompleteEventHandler(
         state_name = self.normalized_payload['state_name']
         session_id = self.normalized_payload['session_id']
         time_spent_in_state_secs = self.normalized_payload[
-            'time_spent_in_state_secs']
+            'time_spent_in_state_secs'
+        ]
         exp_version = self.normalized_payload['exp_version']
         event_services.StateCompleteEventHandler.record(
             exploration_id,
             exp_version,
             state_name,
             session_id,
-            time_spent_in_state_secs
+            time_spent_in_state_secs,
         )
         self.render_json({})
 
@@ -917,8 +938,7 @@ class LeaveForRefresherExpEventHandlerNormalizedPayloadDict(TypedDict):
 
 class LeaveForRefresherExpEventHandler(
     base.BaseHandler[
-        LeaveForRefresherExpEventHandlerNormalizedPayloadDict,
-        Dict[str, str]
+        LeaveForRefresherExpEventHandlerNormalizedPayloadDict, Dict[str, str]
     ]
 ):
     """Tracks a learner leaving an exploration for a refresher exploration."""
@@ -926,51 +946,42 @@ class LeaveForRefresherExpEventHandler(
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
     URL_PATH_ARGS_SCHEMAS = {
-         'exploration_id': {
-            'schema': editor.SCHEMA_FOR_EXPLORATION_ID
-        }
+        'exploration_id': {'schema': editor.SCHEMA_FOR_EXPLORATION_ID}
     }
 
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
-            'refresher_exp_id': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
+            'refresher_exp_id': {'schema': {'type': 'basestring'}},
             'exp_version': {
                 'schema': {
                     'type': 'int',
-                    'validators': [{
-                        'id': 'is_at_least',
-                        # Version must be greater than zero.
-                        'min_value': 1
-                    }]
+                    'validators': [
+                        {
+                            'id': 'is_at_least',
+                            # Version must be greater than zero.
+                            'min_value': 1,
+                        }
+                    ],
                 }
             },
             'state_name': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'has_length_at_most',
-                        'max_value': constants.MAX_STATE_NAME_LENGTH
-                    }]
+                    'validators': [
+                        {
+                            'id': 'has_length_at_most',
+                            'max_value': constants.MAX_STATE_NAME_LENGTH,
+                        }
+                    ],
                 }
             },
-            'session_id': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
+            'session_id': {'schema': {'type': 'basestring'}},
             'time_spent_in_state_secs': {
                 'schema': {
                     'type': 'float',
-                    'validators': [{
-                        'id': 'is_at_least',
-                        'min_value': 0
-                    }]
+                    'validators': [{'id': 'is_at_least', 'min_value': 0}],
                 }
-            }
+            },
         }
     }
 
@@ -983,7 +994,8 @@ class LeaveForRefresherExpEventHandler(
         state_name = self.normalized_payload['state_name']
         session_id = self.normalized_payload['session_id']
         time_spent_in_state_secs = self.normalized_payload[
-            'time_spent_in_state_secs']
+            'time_spent_in_state_secs'
+        ]
 
         event_services.LeaveForRefresherExpEventHandler.record(
             exploration_id,
@@ -991,7 +1003,7 @@ class LeaveForRefresherExpEventHandler(
             exp_version,
             state_name,
             session_id,
-            time_spent_in_state_secs
+            time_spent_in_state_secs,
         )
         self.render_json({})
 
@@ -1008,10 +1020,7 @@ class ReaderFeedbackHandlerNormalizedPayloadDict(TypedDict):
 
 
 class ReaderFeedbackHandler(
-    base.BaseHandler[
-        ReaderFeedbackHandlerNormalizedPayloadDict,
-        Dict[str, str]
-    ]
+    base.BaseHandler[ReaderFeedbackHandlerNormalizedPayloadDict, Dict[str, str]]
 ):
     """Submits feedback from the reader."""
 
@@ -1021,46 +1030,45 @@ class ReaderFeedbackHandler(
         'exploration_id': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.ENTITY_ID_REGEX
-                }]
+                'validators': [
+                    {
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                    }
+                ],
             }
         }
     }
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
             'subject': {
-                'schema': {
-                    'type': 'basestring'
-                },
-                'default_value': 'Feedback from a learner'
+                'schema': {'type': 'basestring'},
+                'default_value': 'Feedback from a learner',
             },
             'feedback': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'has_length_at_most',
-                        'max_value': 10000
-                    }]
+                    'validators': [
+                        {'id': 'has_length_at_most', 'max_value': 10000}
+                    ],
                 }
             },
             'include_author': {
-                'schema': {
-                    'type': 'bool'
-                },
-                'default_value': True
+                'schema': {'type': 'bool'},
+                'default_value': True,
             },
             'state_name': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'has_length_at_most',
-                        'max_value': constants.MAX_STATE_NAME_LENGTH
-                    }]
+                    'validators': [
+                        {
+                            'id': 'has_length_at_most',
+                            'max_value': constants.MAX_STATE_NAME_LENGTH,
+                        }
+                    ],
                 },
-                'default_value': None
-            }
+                'default_value': None,
+            },
         }
     }
 
@@ -1081,7 +1089,8 @@ class ReaderFeedbackHandler(
             exploration_id,
             self.user_id if include_author else None,
             subject,
-            feedback)
+            feedback,
+        )
         self.render_json(self.values)
 
 
@@ -1098,8 +1107,7 @@ class ExplorationStartEventHandlerNormalizedPayloadDict(TypedDict):
 
 class ExplorationStartEventHandler(
     base.BaseHandler[
-        ExplorationStartEventHandlerNormalizedPayloadDict,
-        Dict[str, str]
+        ExplorationStartEventHandlerNormalizedPayloadDict, Dict[str, str]
     ]
 ):
     """Tracks a learner starting an exploration."""
@@ -1110,10 +1118,12 @@ class ExplorationStartEventHandler(
         'exploration_id': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.ENTITY_ID_REGEX
-                }]
+                'validators': [
+                    {
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                    }
+                ],
             }
         }
     }
@@ -1122,36 +1132,21 @@ class ExplorationStartEventHandler(
             'params': {
                 'schema': {
                     'type': 'variable_keys_dict',
-                    'keys': {
-                        'schema': {
-                            'type': 'basestring'
-                        }
-                    },
+                    'keys': {'schema': {'type': 'basestring'}},
                     'values': {
                         'schema': {
                             'type': 'weak_multiple',
-                            'options': ['int', 'basestring']
+                            'options': ['int', 'basestring'],
                         }
-                    }
+                    },
                 }
             },
-            'session_id': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
-            'state_name': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
+            'session_id': {'schema': {'type': 'basestring'}},
+            'state_name': {'schema': {'type': 'basestring'}},
             'version': {
                 'schema': {
                     'type': 'int',
-                    'validators': [{
-                        'id': 'is_at_least',
-                        'min_value': 1
-                    }]
+                    'validators': [{'id': 'is_at_least', 'min_value': 1}],
                 }
             },
         }
@@ -1171,7 +1166,8 @@ class ExplorationStartEventHandler(
             self.normalized_payload['state_name'],
             self.normalized_payload['session_id'],
             self.normalized_payload['params'],
-            feconf.PLAY_TYPE_NORMAL)
+            feconf.PLAY_TYPE_NORMAL,
+        )
         self.render_json({})
 
 
@@ -1187,8 +1183,7 @@ class ExplorationActualStartEventHandlerNormalizedPayloadDict(TypedDict):
 
 class ExplorationActualStartEventHandler(
     base.BaseHandler[
-        ExplorationActualStartEventHandlerNormalizedPayloadDict,
-        Dict[str, str]
+        ExplorationActualStartEventHandlerNormalizedPayloadDict, Dict[str, str]
     ]
 ):
     """Tracks a learner actually starting an exploration. These are the learners
@@ -1201,10 +1196,12 @@ class ExplorationActualStartEventHandler(
         'exploration_id': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.ENTITY_ID_REGEX
-                }]
+                'validators': [
+                    {
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                    }
+                ],
             }
         }
     }
@@ -1213,22 +1210,11 @@ class ExplorationActualStartEventHandler(
             'exploration_version': {
                 'schema': {
                     'type': 'int',
-                    'validators': [{
-                        'id': 'is_at_least',
-                        'min_value': 1
-                    }]
+                    'validators': [{'id': 'is_at_least', 'min_value': 1}],
                 }
             },
-            'state_name': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
-            'session_id': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
+            'state_name': {'schema': {'type': 'basestring'}},
+            'session_id': {'schema': {'type': 'basestring'}},
         }
     }
 
@@ -1240,7 +1226,8 @@ class ExplorationActualStartEventHandler(
             exploration_id,
             self.normalized_payload['exploration_version'],
             self.normalized_payload['state_name'],
-            self.normalized_payload['session_id'])
+            self.normalized_payload['session_id'],
+        )
         self.render_json({})
 
 
@@ -1257,45 +1244,35 @@ class SolutionHitEventHandlerNormalizedPayloadDict(TypedDict):
 
 class SolutionHitEventHandler(
     base.BaseHandler[
-        SolutionHitEventHandlerNormalizedPayloadDict,
-        Dict[str, str]
+        SolutionHitEventHandlerNormalizedPayloadDict, Dict[str, str]
     ]
 ):
     """Tracks a learner clicking on the 'View Solution' button."""
 
     URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {
-            'schema': editor.SCHEMA_FOR_EXPLORATION_ID
-        }
+        'exploration_id': {'schema': editor.SCHEMA_FOR_EXPLORATION_ID}
     }
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
-            'exploration_version': {
-                'schema': editor.SCHEMA_FOR_VERSION
-            },
+            'exploration_version': {'schema': editor.SCHEMA_FOR_VERSION},
             'state_name': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'has_length_at_most',
-                        'max_value': constants.MAX_STATE_NAME_LENGTH
-                    }]
+                    'validators': [
+                        {
+                            'id': 'has_length_at_most',
+                            'max_value': constants.MAX_STATE_NAME_LENGTH,
+                        }
+                    ],
                 }
             },
-            'session_id': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
+            'session_id': {'schema': {'type': 'basestring'}},
             'time_spent_in_state_secs': {
                 'schema': {
                     'type': 'float',
-                    'validators': [{
-                        'id': 'is_at_least',
-                        'min_value': 0
-                    }]
+                    'validators': [{'id': 'is_at_least', 'min_value': 0}],
                 }
-            }
+            },
         }
     }
 
@@ -1310,7 +1287,8 @@ class SolutionHitEventHandler(
             self.normalized_payload['exploration_version'],
             self.normalized_payload['state_name'],
             self.normalized_payload['session_id'],
-            self.normalized_payload['time_spent_in_state_secs'])
+            self.normalized_payload['time_spent_in_state_secs'],
+        )
         self.render_json({})
 
 
@@ -1338,62 +1316,51 @@ class ExplorationCompleteEventHandler(
     """
 
     URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {
-            'schema': editor.SCHEMA_FOR_EXPLORATION_ID
-        }
+        'exploration_id': {'schema': editor.SCHEMA_FOR_EXPLORATION_ID}
     }
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
             'collection_id': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'is_regex_matched',
-                        'regex_pattern': constants.ENTITY_ID_REGEX
-                    }]
+                    'validators': [
+                        {
+                            'id': 'is_regex_matched',
+                            'regex_pattern': constants.ENTITY_ID_REGEX,
+                        }
+                    ],
                 },
-                'default_value': None
+                'default_value': None,
             },
-            'version': {
-                'schema': editor.SCHEMA_FOR_VERSION
-            },
+            'version': {'schema': editor.SCHEMA_FOR_VERSION},
             'state_name': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'has_length_at_most',
-                        'max_value': constants.MAX_STATE_NAME_LENGTH
-                    }]
+                    'validators': [
+                        {
+                            'id': 'has_length_at_most',
+                            'max_value': constants.MAX_STATE_NAME_LENGTH,
+                        }
+                    ],
                 }
             },
-            'session_id': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
+            'session_id': {'schema': {'type': 'basestring'}},
             'client_time_spent_in_secs': {
                 'schema': {
                     'type': 'float',
-                    'validators': [{
-                        'id': 'is_at_least',
-                        'min_value': 0
-                    }]
+                    'validators': [{'id': 'is_at_least', 'min_value': 0}],
                 }
             },
             'params': {
                 'schema': {
                     'type': 'variable_keys_dict',
-                    'keys': {
-                        'schema': {
-                            'type': 'basestring'
-                        }
-                    },
+                    'keys': {'schema': {'type': 'basestring'}},
                     'values': {
                         'schema': {
                             'type': 'weak_multiple',
-                            'options': ['int', 'basestring', 'dict', 'list']
+                            'options': ['int', 'basestring', 'dict', 'list'],
                         }
-                    }
+                    },
                 }
             },
         }
@@ -1421,25 +1388,30 @@ class ExplorationCompleteEventHandler(
             self.normalized_payload['session_id'],
             self.normalized_payload['client_time_spent_in_secs'],
             self.normalized_payload['params'],
-            feconf.PLAY_TYPE_NORMAL)
+            feconf.PLAY_TYPE_NORMAL,
+        )
 
         if user_id:
             learner_progress_services.mark_exploration_as_completed(
-                user_id, exploration_id)
+                user_id, exploration_id
+            )
 
         if user_id and collection_id:
             collection_services.record_played_exploration_in_collection_context(
-                user_id, collection_id, exploration_id)
-            next_exp_id_to_complete = (
-                collection_services.get_next_exploration_id_to_complete_by_user( # pylint: disable=line-too-long
-                    user_id, collection_id))
+                user_id, collection_id, exploration_id
+            )
+            next_exp_id_to_complete = collection_services.get_next_exploration_id_to_complete_by_user(  # pylint: disable=line-too-long
+                user_id, collection_id
+            )
 
             if not next_exp_id_to_complete:
                 learner_progress_services.mark_collection_as_completed(
-                    user_id, collection_id)
+                    user_id, collection_id
+                )
             else:
                 learner_progress_services.mark_collection_as_incomplete(
-                    user_id, collection_id)
+                    user_id, collection_id
+                )
 
         self.render_json(self.values)
 
@@ -1468,62 +1440,51 @@ class ExplorationMaybeLeaveHandler(
     """
 
     URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {
-            'schema': editor.SCHEMA_FOR_EXPLORATION_ID
-        }
+        'exploration_id': {'schema': editor.SCHEMA_FOR_EXPLORATION_ID}
     }
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
-            'version': {
-                'schema': editor.SCHEMA_FOR_VERSION
-            },
+            'version': {'schema': editor.SCHEMA_FOR_VERSION},
             'state_name': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'has_length_at_most',
-                        'max_value': constants.MAX_STATE_NAME_LENGTH
-                    }]
+                    'validators': [
+                        {
+                            'id': 'has_length_at_most',
+                            'max_value': constants.MAX_STATE_NAME_LENGTH,
+                        }
+                    ],
                 }
             },
             'collection_id': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'is_regex_matched',
-                        'regex_pattern': constants.ENTITY_ID_REGEX
-                    }]
+                    'validators': [
+                        {
+                            'id': 'is_regex_matched',
+                            'regex_pattern': constants.ENTITY_ID_REGEX,
+                        }
+                    ],
                 },
-                'default_value': None
+                'default_value': None,
             },
-            'session_id': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
+            'session_id': {'schema': {'type': 'basestring'}},
             'client_time_spent_in_secs': {
                 'schema': {
                     'type': 'float',
-                    'validators': [{
-                        'id': 'is_at_least',
-                        'min_value': 0
-                    }]
+                    'validators': [{'id': 'is_at_least', 'min_value': 0}],
                 }
             },
             'params': {
                 'schema': {
                     'type': 'variable_keys_dict',
-                    'keys': {
-                        'schema': {
-                            'type': 'basestring'
-                        }
-                    },
+                    'keys': {'schema': {'type': 'basestring'}},
                     'values': {
                         'schema': {
                             'type': 'weak_multiple',
-                            'options': ['int', 'basestring', 'dict', 'list']
+                            'options': ['int', 'basestring', 'dict', 'list'],
                         }
-                    }
+                    },
                 }
             },
         }
@@ -1544,28 +1505,34 @@ class ExplorationMaybeLeaveHandler(
         user_id = self.user_id
         collection_id = self.normalized_payload.get('collection_id')
         story_id = exp_services.get_story_id_linked_to_exploration(
-            exploration_id)
+            exploration_id
+        )
 
         if user_id:
             learner_progress_services.mark_exploration_as_incomplete(
-                user_id, exploration_id, state_name, version)
+                user_id, exploration_id, state_name, version
+            )
 
         if user_id and collection_id:
             learner_progress_services.mark_collection_as_incomplete(
-                user_id, collection_id)
+                user_id, collection_id
+            )
 
         if user_id and story_id:
             story = story_fetchers.get_story_by_id(story_id)
             if story is not None:
                 learner_progress_services.record_story_started(
-                    user_id, story.id)
+                    user_id, story.id
+                )
                 if story.corresponding_topic_id is not None:
                     learner_progress_services.record_topic_started(
-                        user_id, story.corresponding_topic_id)
+                        user_id, story.corresponding_topic_id
+                    )
             else:
                 logging.error(
                     'Could not find a story corresponding to %s '
-                    'id.' % story_id)
+                    'id.' % story_id
+                )
                 self.render_json({})
                 return
 
@@ -1576,7 +1543,8 @@ class ExplorationMaybeLeaveHandler(
             self.normalized_payload['session_id'],
             self.normalized_payload['client_time_spent_in_secs'],
             self.normalized_payload['params'],
-            feconf.PLAY_TYPE_NORMAL)
+            feconf.PLAY_TYPE_NORMAL,
+        )
         self.render_json(self.values)
 
 
@@ -1595,19 +1563,21 @@ class LearnerIncompleteActivityHandler(
                     constants.ACTIVITY_TYPE_EXPLORATION,
                     constants.ACTIVITY_TYPE_COLLECTION,
                     constants.ACTIVITY_TYPE_STORY,
-                    constants.ACTIVITY_TYPE_LEARN_TOPIC
-                ]
+                    constants.ACTIVITY_TYPE_LEARN_TOPIC,
+                ],
             }
         },
         'activity_id': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.ENTITY_ID_REGEX
-                }]
+                'validators': [
+                    {
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                    }
+                ],
             }
-        }
+        },
     }
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'DELETE': {}}
 
@@ -1624,16 +1594,20 @@ class LearnerIncompleteActivityHandler(
         assert self.user_id is not None
         if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
             learner_progress_services.remove_exp_from_incomplete_list(
-                self.user_id, activity_id)
+                self.user_id, activity_id
+            )
         elif activity_type == constants.ACTIVITY_TYPE_COLLECTION:
             learner_progress_services.remove_collection_from_incomplete_list(
-                self.user_id, activity_id)
+                self.user_id, activity_id
+            )
         elif activity_type == constants.ACTIVITY_TYPE_STORY:
             learner_progress_services.remove_story_from_incomplete_list(
-                self.user_id, activity_id)
+                self.user_id, activity_id
+            )
         elif activity_type == constants.ACTIVITY_TYPE_LEARN_TOPIC:
             learner_progress_services.remove_topic_from_partially_learnt_list(
-                self.user_id, activity_id)
+                self.user_id, activity_id
+            )
 
         self.render_json(self.values)
 
@@ -1647,9 +1621,7 @@ class RatingHandlerNormalizedPayloadDict(TypedDict):
 
 
 class RatingHandler(
-    base.BaseHandler[
-        RatingHandlerNormalizedPayloadDict, Dict[str, str]
-    ]
+    base.BaseHandler[RatingHandlerNormalizedPayloadDict, Dict[str, str]]
 ):
     """Records the rating of an exploration submitted by a user.
 
@@ -1661,10 +1633,12 @@ class RatingHandler(
         'exploration_id': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.ENTITY_ID_REGEX
-                }]
+                'validators': [
+                    {
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                    }
+                ],
             }
         }
     }
@@ -1672,12 +1646,9 @@ class RatingHandler(
         'GET': {},
         'PUT': {
             'user_rating': {
-                'schema': {
-                    'type': 'int',
-                    'choices': [1, 2, 3, 4, 5]
-                }
+                'schema': {'type': 'int', 'choices': [1, 2, 3, 4, 5]}
             }
-        }
+        },
     }
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -1685,14 +1656,20 @@ class RatingHandler(
     @acl_decorators.can_play_exploration
     def get(self, exploration_id: str) -> None:
         """Handles GET requests."""
-        self.values.update({
-            'overall_ratings':
-                rating_services.get_overall_ratings_for_exploration(
-                    exploration_id),
-            'user_rating': (
-                rating_services.get_user_specific_rating_for_exploration(
-                    self.user_id, exploration_id) if self.user_id else None)
-        })
+        self.values.update(
+            {
+                'overall_ratings': rating_services.get_overall_ratings_for_exploration(
+                    exploration_id
+                ),
+                'user_rating': (
+                    rating_services.get_user_specific_rating_for_exploration(
+                        self.user_id, exploration_id
+                    )
+                    if self.user_id
+                    else None
+                ),
+            }
+        )
         self.render_json(self.values)
 
     @acl_decorators.can_rate_exploration
@@ -1704,7 +1681,8 @@ class RatingHandler(
         assert self.normalized_payload is not None
         user_rating = self.normalized_payload['user_rating']
         rating_services.assign_rating_to_exploration(
-            self.user_id, exploration_id, user_rating)
+            self.user_id, exploration_id, user_rating
+        )
         self.render_json({})
 
 
@@ -1738,10 +1716,12 @@ class RecommendationsHandler(
         'exploration_id': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.ENTITY_ID_REGEX
-                }]
+                'validators': [
+                    {
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                    }
+                ],
             }
         }
     }
@@ -1750,45 +1730,46 @@ class RecommendationsHandler(
             'collection_id': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'is_regex_matched',
-                        'regex_pattern': constants.ENTITY_ID_REGEX
-                    }]
+                    'validators': [
+                        {
+                            'id': 'is_regex_matched',
+                            'regex_pattern': constants.ENTITY_ID_REGEX,
+                        }
+                    ],
                 },
-                'default_value': None
+                'default_value': None,
             },
             'include_system_recommendations': {
-                'schema': {
-                    'type': 'bool'
-                },
-                'default_value': True
+                'schema': {'type': 'bool'},
+                'default_value': True,
             },
             'author_recommended_ids': {
-                'schema': {
-                    'type': 'custom',
-                    'obj_type': 'JsonEncodedInString'
-                }
+                'schema': {'type': 'custom', 'obj_type': 'JsonEncodedInString'}
             },
             'story_id': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'is_regex_matched',
-                        'regex_pattern': constants.ENTITY_ID_REGEX
-                    }]
+                    'validators': [
+                        {
+                            'id': 'is_regex_matched',
+                            'regex_pattern': constants.ENTITY_ID_REGEX,
+                        }
+                    ],
                 },
-                'default_value': None
+                'default_value': None,
             },
             'current_node_id': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'is_regex_matched',
-                        'regex_pattern': constants.ENTITY_ID_REGEX
-                    }]
+                    'validators': [
+                        {
+                            'id': 'is_regex_matched',
+                            'regex_pattern': constants.ENTITY_ID_REGEX,
+                        }
+                    ],
                 },
-                'default_value': None
-            }
+                'default_value': None,
+            },
         }
     }
 
@@ -1798,44 +1779,56 @@ class RecommendationsHandler(
         assert self.normalized_request is not None
         collection_id = self.normalized_request.get('collection_id')
         include_system_recommendations = self.normalized_request[
-            'include_system_recommendations']
+            'include_system_recommendations'
+        ]
         author_recommended_exp_ids = self.normalized_request[
-            'author_recommended_ids']
+            'author_recommended_ids'
+        ]
 
         system_recommended_exp_ids = []
         next_exp_id = None
 
         if collection_id:
             if self.user_id:
-                next_exp_id = (
-                    collection_services.get_next_exploration_id_to_complete_by_user(  # pylint: disable=line-too-long
-                        self.user_id, collection_id))
+                next_exp_id = collection_services.get_next_exploration_id_to_complete_by_user(  # pylint: disable=line-too-long
+                    self.user_id, collection_id
+                )
             else:
                 collection = collection_services.get_collection_by_id(
-                    collection_id)
-                next_exp_id = (
-                    collection.get_next_exploration_id_in_sequence(
-                        exploration_id))
+                    collection_id
+                )
+                next_exp_id = collection.get_next_exploration_id_in_sequence(
+                    exploration_id
+                )
         elif include_system_recommendations:
             system_chosen_exp_ids = (
                 recommendations_services.get_exploration_recommendations(
-                    exploration_id))
+                    exploration_id
+                )
+            )
             filtered_exp_ids = list(
-                set(system_chosen_exp_ids) - set(author_recommended_exp_ids))
+                set(system_chosen_exp_ids) - set(author_recommended_exp_ids)
+            )
             system_recommended_exp_ids = random.sample(
                 filtered_exp_ids,
-                min(MAX_SYSTEM_RECOMMENDATIONS, len(filtered_exp_ids)))
+                min(MAX_SYSTEM_RECOMMENDATIONS, len(filtered_exp_ids)),
+            )
 
         recommended_exp_ids = set(
-            author_recommended_exp_ids + system_recommended_exp_ids)
+            author_recommended_exp_ids + system_recommended_exp_ids
+        )
         if next_exp_id is not None:
             recommended_exp_ids.add(next_exp_id)
 
-        self.values.update({
-            'summaries': (
-                summary_services.get_displayable_exp_summary_dicts_matching_ids(
-                    list(recommended_exp_ids))),
-        })
+        self.values.update(
+            {
+                'summaries': (
+                    summary_services.get_displayable_exp_summary_dicts_matching_ids(
+                        list(recommended_exp_ids)
+                    )
+                ),
+            }
+        )
         self.render_json(self.values)
 
 
@@ -1849,8 +1842,7 @@ class FlagExplorationHandlerNormalizedPayloadDict(TypedDict):
 
 class FlagExplorationHandler(
     base.BaseHandler[
-        FlagExplorationHandlerNormalizedPayloadDict,
-        Dict[str, str]
+        FlagExplorationHandlerNormalizedPayloadDict, Dict[str, str]
     ]
 ):
     """Handles operations relating to learner flagging of explorations."""
@@ -1859,21 +1851,17 @@ class FlagExplorationHandler(
         'exploration_id': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.ENTITY_ID_REGEX
-                }]
+                'validators': [
+                    {
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                    }
+                ],
             }
         }
     }
     HANDLER_ARGS_SCHEMAS = {
-        'POST': {
-            'report_text': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            }
-        }
+        'POST': {'report_text': {'schema': {'type': 'basestring'}}}
     }
 
     @acl_decorators.can_flag_exploration
@@ -1886,9 +1874,8 @@ class FlagExplorationHandler(
         assert self.user_id is not None
         assert self.normalized_payload is not None
         moderator_services.enqueue_flag_exploration_email_task(
-            exploration_id,
-            self.normalized_payload['report_text'],
-            self.user_id)
+            exploration_id, self.normalized_payload['report_text'], self.user_id
+        )
         self.render_json(self.values)
 
 
@@ -1903,9 +1890,7 @@ class QuestionPlayerHandlerNormalizedRequestDict(TypedDict):
 
 
 class QuestionPlayerHandler(
-    base.BaseHandler[
-        Dict[str, str], QuestionPlayerHandlerNormalizedRequestDict
-    ]
+    base.BaseHandler[Dict[str, str], QuestionPlayerHandlerNormalizedRequestDict]
 ):
     """Provides questions with given skill ids."""
 
@@ -1914,28 +1899,24 @@ class QuestionPlayerHandler(
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'skill_ids': {
-            'schema': {
-                'type': 'object_dict',
-                'validation_method': domain_objects_validator.validate_skill_ids
-            }
+                'schema': {
+                    'type': 'object_dict',
+                    'validation_method': domain_objects_validator.validate_skill_ids,
+                }
             },
             'question_count': {
                 'schema': {
                     'type': 'int',
-                    'validators': [{
-                        'id': 'is_at_least',
-                        'min_value': 1
-                    }, {
-                        'id': 'is_at_most',
-                        'max_value': feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME
-                    }]
+                    'validators': [
+                        {'id': 'is_at_least', 'min_value': 1},
+                        {
+                            'id': 'is_at_most',
+                            'max_value': feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME,
+                        },
+                    ],
                 }
             },
-            'fetch_by_difficulty': {
-                'schema': {
-                    'type': 'bool'
-                }
-            }
+            'fetch_by_difficulty': {'schema': {'type': 'bool'}},
         }
     }
 
@@ -1947,24 +1928,24 @@ class QuestionPlayerHandler(
         assert self.normalized_request is not None
         skill_ids = self.normalized_request['skill_ids'].split(',')
         question_count = self.normalized_request['question_count']
-        fetch_by_difficulty = self.normalized_request[
-            'fetch_by_difficulty'
-        ]
+        fetch_by_difficulty = self.normalized_request['fetch_by_difficulty']
 
         if len(skill_ids) > feconf.MAX_NUMBER_OF_SKILL_IDS:
-            skill_ids = skill_services.filter_skills_by_mastery(
-                self.user_id, skill_ids) if self.user_id else skill_ids
+            skill_ids = (
+                skill_services.filter_skills_by_mastery(self.user_id, skill_ids)
+                if self.user_id
+                else skill_ids
+            )
 
-        questions = (
-            question_services.get_questions_by_skill_ids(
-                int(question_count), skill_ids, fetch_by_difficulty)
+        questions = question_services.get_questions_by_skill_ids(
+            int(question_count), skill_ids, fetch_by_difficulty
         )
         random.shuffle(questions)
 
         question_dicts = [question.to_dict() for question in questions]
-        self.values.update({
-            'question_dicts': question_dicts[:feconf.QUESTION_BATCH_SIZE]
-        })
+        self.values.update(
+            {'question_dicts': question_dicts[: feconf.QUESTION_BATCH_SIZE]}
+        )
         self.render_json(self.values)
 
 
@@ -1978,10 +1959,12 @@ class TransientCheckpointUrlPage(
         'unique_progress_url_id': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'has_length_at_most',
-                    'max_value': constants.MAX_PROGRESS_URL_ID_LENGTH
-                }]
+                'validators': [
+                    {
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_PROGRESS_URL_ID_LENGTH,
+                    }
+                ],
             },
         }
     }
@@ -1991,8 +1974,9 @@ class TransientCheckpointUrlPage(
     def get(self, unique_progress_url_id: str) -> None:
         """Handles GET requests. Fetches the logged-out learner's progress."""
 
-        logged_out_user_data = (
-            exp_fetchers.get_logged_out_user_progress(unique_progress_url_id))
+        logged_out_user_data = exp_fetchers.get_logged_out_user_progress(
+            unique_progress_url_id
+        )
 
         if logged_out_user_data is None:
             raise self.NotFoundException()
@@ -2000,7 +1984,8 @@ class TransientCheckpointUrlPage(
         redirect_url = '%s/%s?pid=%s' % (
             feconf.EXPLORATION_URL_PREFIX,
             logged_out_user_data.exploration_id,
-            unique_progress_url_id)
+            unique_progress_url_id,
+        )
 
         self.redirect(redirect_url)
 
@@ -2018,30 +2003,30 @@ class SaveTransientCheckpointProgressHandlerNormalizedPayloadDict(TypedDict):
 class SaveTransientCheckpointProgressHandler(
     base.BaseHandler[
         SaveTransientCheckpointProgressHandlerNormalizedPayloadDict,
-        Dict[str, str]
+        Dict[str, str],
     ]
 ):
     """Responsible for storing progress of a logged-out learner."""
 
     URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {
-            'schema': editor.SCHEMA_FOR_EXPLORATION_ID
-        },
+        'exploration_id': {'schema': editor.SCHEMA_FOR_EXPLORATION_ID},
     }
     HANDLER_ARGS_SCHEMAS = {
         'POST': {
             'most_recently_reached_checkpoint_state_name': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'has_length_at_most',
-                        'max_value': constants.MAX_STATE_NAME_LENGTH
-                    }]
+                    'validators': [
+                        {
+                            'id': 'has_length_at_most',
+                            'max_value': constants.MAX_STATE_NAME_LENGTH,
+                        }
+                    ],
                 }
             },
             'most_recently_reached_checkpoint_exp_version': {
                 'schema': editor.SCHEMA_FOR_VERSION
-            }
+            },
         },
         'PUT': {
             'unique_progress_url_id': {
@@ -2052,16 +2037,18 @@ class SaveTransientCheckpointProgressHandler(
             'most_recently_reached_checkpoint_state_name': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'has_length_at_most',
-                        'max_value': constants.MAX_STATE_NAME_LENGTH
-                    }]
+                    'validators': [
+                        {
+                            'id': 'has_length_at_most',
+                            'max_value': constants.MAX_STATE_NAME_LENGTH,
+                        }
+                    ],
                 }
             },
             'most_recently_reached_checkpoint_exp_version': {
                 'schema': editor.SCHEMA_FOR_VERSION
-            }
-        }
+            },
+        },
     }
 
     @acl_decorators.can_play_exploration
@@ -2073,46 +2060,48 @@ class SaveTransientCheckpointProgressHandler(
             exploration_id: str. The ID of the exploration.
         """
         assert self.normalized_payload is not None
-        most_recently_reached_checkpoint_state_name = (
-            self.normalized_payload[
-                'most_recently_reached_checkpoint_state_name'])
-        most_recently_reached_checkpoint_exp_version = (
-            self.normalized_payload[
-                'most_recently_reached_checkpoint_exp_version'])
+        most_recently_reached_checkpoint_state_name = self.normalized_payload[
+            'most_recently_reached_checkpoint_state_name'
+        ]
+        most_recently_reached_checkpoint_exp_version = self.normalized_payload[
+            'most_recently_reached_checkpoint_exp_version'
+        ]
 
         # Create a new unique_progress_url_id.
         new_unique_progress_url_id = (
-            exp_fetchers.get_new_unique_progress_url_id())
+            exp_fetchers.get_new_unique_progress_url_id()
+        )
 
         # Create a new model corresponding to the new progress id.
         exp_services.update_logged_out_user_progress(
             exploration_id,
             new_unique_progress_url_id,
             most_recently_reached_checkpoint_state_name,
-            most_recently_reached_checkpoint_exp_version)
+            most_recently_reached_checkpoint_exp_version,
+        )
 
-        self.render_json({
-            'unique_progress_url_id': new_unique_progress_url_id
-        })
+        self.render_json({'unique_progress_url_id': new_unique_progress_url_id})
 
     @acl_decorators.can_play_exploration
     def put(self, exploration_id: str) -> None:
         """Handles the PUT requests. Saves the logged-out user's progress."""
         assert self.normalized_payload is not None
-        unique_progress_url_id = (
-            self.normalized_payload['unique_progress_url_id'])
-        most_recently_reached_checkpoint_state_name = (
-            self.normalized_payload[
-                'most_recently_reached_checkpoint_state_name'])
-        most_recently_reached_checkpoint_exp_version = (
-            self.normalized_payload[
-                'most_recently_reached_checkpoint_exp_version'])
+        unique_progress_url_id = self.normalized_payload[
+            'unique_progress_url_id'
+        ]
+        most_recently_reached_checkpoint_state_name = self.normalized_payload[
+            'most_recently_reached_checkpoint_state_name'
+        ]
+        most_recently_reached_checkpoint_exp_version = self.normalized_payload[
+            'most_recently_reached_checkpoint_exp_version'
+        ]
 
         exp_services.update_logged_out_user_progress(
             exploration_id,
             unique_progress_url_id,
             most_recently_reached_checkpoint_state_name,
-            most_recently_reached_checkpoint_exp_version)
+            most_recently_reached_checkpoint_exp_version,
+        )
 
         self.render_json(self.values)
 
@@ -2131,7 +2120,7 @@ class LearnerAnswerDetailsSubmissionHandlerNormalizedPayloadDict(TypedDict):
 class LearnerAnswerDetailsSubmissionHandler(
     base.BaseHandler[
         LearnerAnswerDetailsSubmissionHandlerNormalizedPayloadDict,
-        Dict[str, str]
+        Dict[str, str],
     ]
 ):
     """Handles the learner answer details submission."""
@@ -2143,44 +2132,36 @@ class LearnerAnswerDetailsSubmissionHandler(
                 'type': 'basestring',
                 'choices': [
                     feconf.ENTITY_TYPE_EXPLORATION,
-                    feconf.ENTITY_TYPE_QUESTION
-                ]
+                    feconf.ENTITY_TYPE_QUESTION,
+                ],
             }
         },
         'entity_id': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.ENTITY_ID_REGEX
-                }]
+                'validators': [
+                    {
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                    }
+                ],
             }
-        }
+        },
     }
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
             'state_name': {
-                'schema': {
-                    'type': 'basestring'
-                },
-                'default_value': None
+                'schema': {'type': 'basestring'},
+                'default_value': None,
             },
-            'interaction_id': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            },
+            'interaction_id': {'schema': {'type': 'basestring'}},
             'answer': {
                 'schema': {
                     'type': 'weak_multiple',
-                    'options': ['int', 'basestring', 'dict', 'list']
+                    'options': ['int', 'basestring', 'dict', 'list'],
                 }
             },
-            'answer_details': {
-                'schema': {
-                    'type': 'basestring'
-                }
-            }
+            'answer_details': {'schema': {'type': 'basestring'}},
         }
     }
 
@@ -2203,27 +2184,33 @@ class LearnerAnswerDetailsSubmissionHandler(
                 )
             state_reference = (
                 stats_services.get_state_reference_for_exploration(
-                    entity_id, state_name))
+                    entity_id, state_name
+                )
+            )
             if interaction_id != exp_services.get_interaction_id_for_state(
-                    entity_id, state_name):
+                entity_id, state_name
+            ):
                 raise utils.InvalidInputException(
                     'Interaction id given does not match with the '
-                    'interaction id of the state')
+                    'interaction id of the state'
+                )
         elif entity_type == feconf.ENTITY_TYPE_QUESTION:
-            state_reference = (
-                stats_services.get_state_reference_for_question(entity_id))
+            state_reference = stats_services.get_state_reference_for_question(
+                entity_id
+            )
             if interaction_id != (
-                    question_services.get_interaction_id_for_question(
-                        entity_id)):
+                question_services.get_interaction_id_for_question(entity_id)
+            ):
                 raise utils.InvalidInputException(
                     'Interaction id given does not match with the '
-                    'interaction id of the question')
+                    'interaction id of the question'
+                )
 
         answer = self.normalized_payload['answer']
         answer_details = self.normalized_payload['answer_details']
         stats_services.record_learner_answer_info(
-            entity_type, state_reference,
-            interaction_id, answer, answer_details)
+            entity_type, state_reference, interaction_id, answer, answer_details
+        )
         self.render_json({})
 
 
@@ -2238,16 +2225,13 @@ class CheckpointReachedEventHandlerNormalizedPayloadDict(TypedDict):
 
 class CheckpointReachedEventHandler(
     base.BaseHandler[
-        CheckpointReachedEventHandlerNormalizedPayloadDict,
-        Dict[str, str]
+        CheckpointReachedEventHandlerNormalizedPayloadDict, Dict[str, str]
     ]
 ):
     """Tracks a learner reaching a checkpoint."""
 
     URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {
-            'schema': editor.SCHEMA_FOR_EXPLORATION_ID
-        }
+        'exploration_id': {'schema': editor.SCHEMA_FOR_EXPLORATION_ID}
     }
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
@@ -2257,10 +2241,12 @@ class CheckpointReachedEventHandler(
             'most_recently_reached_checkpoint_state_name': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'has_length_at_most',
-                        'max_value': constants.MAX_STATE_NAME_LENGTH
-                    }]
+                    'validators': [
+                        {
+                            'id': 'has_length_at_most',
+                            'max_value': constants.MAX_STATE_NAME_LENGTH,
+                        }
+                    ],
                 }
             },
         }
@@ -2274,19 +2260,19 @@ class CheckpointReachedEventHandler(
             exploration_id: str. The ID of the exploration.
         """
         assert self.normalized_payload is not None
-        most_recently_reached_checkpoint_state_name = (
-            self.normalized_payload[
-                'most_recently_reached_checkpoint_state_name'])
-        most_recently_reached_checkpoint_exp_version = (
-            self.normalized_payload[
-                'most_recently_reached_checkpoint_exp_version'])
+        most_recently_reached_checkpoint_state_name = self.normalized_payload[
+            'most_recently_reached_checkpoint_state_name'
+        ]
+        most_recently_reached_checkpoint_exp_version = self.normalized_payload[
+            'most_recently_reached_checkpoint_exp_version'
+        ]
 
         if self.user_id is not None:
             user_services.update_learner_checkpoint_progress(
                 self.user_id,
                 exploration_id,
                 most_recently_reached_checkpoint_state_name,
-                most_recently_reached_checkpoint_exp_version
+                most_recently_reached_checkpoint_exp_version,
             )
 
         self.render_json(self.values)
@@ -2302,28 +2288,27 @@ class ExplorationRestartEventHandlerNormalizedPayloadDict(TypedDict):
 
 class ExplorationRestartEventHandler(
     base.BaseHandler[
-        ExplorationRestartEventHandlerNormalizedPayloadDict,
-        Dict[str, str]
+        ExplorationRestartEventHandlerNormalizedPayloadDict, Dict[str, str]
     ]
 ):
     """Tracks a learner restarting an exploration."""
 
     URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {
-            'schema': editor.SCHEMA_FOR_EXPLORATION_ID
-        }
+        'exploration_id': {'schema': editor.SCHEMA_FOR_EXPLORATION_ID}
     }
     HANDLER_ARGS_SCHEMAS = {
         'PUT': {
             'most_recently_reached_checkpoint_state_name': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'has_length_at_most',
-                        'max_value': constants.MAX_STATE_NAME_LENGTH
-                    }]
+                    'validators': [
+                        {
+                            'id': 'has_length_at_most',
+                            'max_value': constants.MAX_STATE_NAME_LENGTH,
+                        }
+                    ],
                 },
-                'default_value': None
+                'default_value': None,
             },
         }
     }
@@ -2338,12 +2323,15 @@ class ExplorationRestartEventHandler(
         assert self.normalized_payload is not None
         most_recently_reached_checkpoint_state_name = (
             self.normalized_payload.get(
-                'most_recently_reached_checkpoint_state_name'))
+                'most_recently_reached_checkpoint_state_name'
+            )
+        )
 
         if most_recently_reached_checkpoint_state_name is None:
             if self.user_id is not None:
                 user_services.clear_learner_checkpoint_progress(
-                    self.user_id, exploration_id)
+                    self.user_id, exploration_id
+                )
 
         self.render_json(self.values)
 
@@ -2358,8 +2346,7 @@ class SyncLoggedOutLearnerProgressHandlerNormalizedPayloadDict(TypedDict):
 
 class SyncLoggedOutLearnerProgressHandler(
     base.BaseHandler[
-        SyncLoggedOutLearnerProgressHandlerNormalizedPayloadDict,
-        Dict[str, str]
+        SyncLoggedOutLearnerProgressHandlerNormalizedPayloadDict, Dict[str, str]
     ]
 ):
     """Syncs logged out progress of a learner with the logged in progress."""
@@ -2368,10 +2355,12 @@ class SyncLoggedOutLearnerProgressHandler(
         'exploration_id': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.ENTITY_ID_REGEX
-                }]
+                'validators': [
+                    {
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                    }
+                ],
             }
         }
     }
@@ -2390,12 +2379,11 @@ class SyncLoggedOutLearnerProgressHandler(
         """Handles POST requests."""
         assert self.normalized_payload is not None
         unique_progress_url_id = self.normalized_payload[
-            'unique_progress_url_id']
+            'unique_progress_url_id'
+        ]
         if self.user_id is not None:
-            exp_services.sync_logged_out_learner_progress_with_logged_in_progress( # pylint: disable=line-too-long
-                self.user_id,
-                exploration_id,
-                unique_progress_url_id
+            exp_services.sync_logged_out_learner_progress_with_logged_in_progress(  # pylint: disable=line-too-long
+                self.user_id, exploration_id, unique_progress_url_id
             )
 
         self.render_json(self.values)
@@ -2413,30 +2401,31 @@ class StateVersionHistoryHandler(
         'exploration_id': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.ENTITY_ID_REGEX
-                }]
+                'validators': [
+                    {
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                    }
+                ],
             }
         },
         'state_name': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'has_length_at_most',
-                    'max_value': constants.MAX_STATE_NAME_LENGTH
-                }]
+                'validators': [
+                    {
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_STATE_NAME_LENGTH,
+                    }
+                ],
             }
         },
         'version': {
             'schema': {
                 'type': 'int',
-                'validators': [{
-                    'id': 'is_at_least',
-                    'min_value': 1
-                }]
+                'validators': [{'id': 'is_at_least', 'min_value': 1}],
             }
-        }
+        },
     }
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
@@ -2450,9 +2439,9 @@ class StateVersionHistoryHandler(
         if version_history is None:
             raise self.NotFoundException
 
-        state_version_history = (
-            version_history.state_version_history[state_name]
-        )
+        state_version_history = version_history.state_version_history[
+            state_name
+        ]
         last_edited_version_number = (
             state_version_history.previously_edited_in_version
         )
@@ -2467,25 +2456,28 @@ class StateVersionHistoryHandler(
         # If the state has not been updated after it was added for the
         # first time, the value of last_edited_version_number will be None.
         if (
-            last_edited_version_number is not None and
-            state_name_in_previous_version is not None
+            last_edited_version_number is not None
+            and state_name_in_previous_version is not None
         ):
             exploration = exp_fetchers.get_exploration_by_id(
                 exploration_id, version=last_edited_version_number
             )
-            state_in_previous_version = (
-                exploration.states[state_name_in_previous_version]
-            )
+            state_in_previous_version = exploration.states[
+                state_name_in_previous_version
+            ]
 
-        self.render_json({
-            'last_edited_version_number': last_edited_version_number,
-            'state_name_in_previous_version': state_name_in_previous_version,
-            'state_dict_in_previous_version': (
-                state_in_previous_version.to_dict()
-                if state_in_previous_version is not None else None
-            ),
-            'last_edited_committer_username': last_edited_committer_username
-        })
+        self.render_json(
+            {
+                'last_edited_version_number': last_edited_version_number,
+                'state_name_in_previous_version': state_name_in_previous_version,
+                'state_dict_in_previous_version': (
+                    state_in_previous_version.to_dict()
+                    if state_in_previous_version is not None
+                    else None
+                ),
+                'last_edited_committer_username': last_edited_committer_username,
+            }
+        )
 
 
 class MetadataVersionHistoryHandler(
@@ -2500,21 +2492,20 @@ class MetadataVersionHistoryHandler(
         'exploration_id': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.ENTITY_ID_REGEX
-                }]
+                'validators': [
+                    {
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                    }
+                ],
             }
         },
         'version': {
             'schema': {
                 'type': 'int',
-                'validators': [{
-                    'id': 'is_at_least',
-                    'min_value': 1
-                }]
+                'validators': [{'id': 'is_at_least', 'min_value': 1}],
             }
-        }
+        },
     }
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
@@ -2536,19 +2527,22 @@ class MetadataVersionHistoryHandler(
         if metadata_version_history.last_edited_version_number is not None:
             exploration = exp_fetchers.get_exploration_by_id(
                 exploration_id,
-                version=metadata_version_history.last_edited_version_number
+                version=metadata_version_history.last_edited_version_number,
             )
             metadata_in_previous_version = exploration.get_metadata()
 
-        self.render_json({
-            'last_edited_version_number': (
-                metadata_version_history.last_edited_version_number
-            ),
-            'last_edited_committer_username': user_services.get_username(
-                metadata_version_history.last_edited_committer_id
-            ),
-            'metadata_dict_in_previous_version': (
-                metadata_in_previous_version.to_dict()
-                if metadata_in_previous_version is not None else None
-            )
-        })
+        self.render_json(
+            {
+                'last_edited_version_number': (
+                    metadata_version_history.last_edited_version_number
+                ),
+                'last_edited_committer_username': user_services.get_username(
+                    metadata_version_history.last_edited_committer_id
+                ),
+                'metadata_dict_in_previous_version': (
+                    metadata_in_previous_version.to_dict()
+                    if metadata_in_previous_version is not None
+                    else None
+                ),
+            }
+        )

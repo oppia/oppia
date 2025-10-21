@@ -29,27 +29,35 @@ class CreateExpressionParserTests(test_utils.GenericTestBase):
 
     def test_expression_parser_is_produced_correctly(self) -> None:
         cmd_token_list = []
+
         def mock_check_call(
             cmd_tokens: list[str], **unused_kwargs: str
         ) -> None:  # pylint: disable=unused-argument
             cmd_token_list.append(cmd_tokens)
 
         libraries_installed = []
+
         def mock_install_npm_library(
-            library_name: str, library_version: str, path: str) -> None:
+            library_name: str, library_version: str, path: str
+        ) -> None:
             libraries_installed.append([library_name, library_version, path])
 
-        swap_check_call = self.swap(
-            subprocess, 'check_call', mock_check_call)
+        swap_check_call = self.swap(subprocess, 'check_call', mock_check_call)
         swap_install_npm_library = self.swap(
-            common, 'install_npm_library', mock_install_npm_library)
+            common, 'install_npm_library', mock_install_npm_library
+        )
 
         expression_parser_definition = os.path.join(
-            'core', 'templates', 'expressions', 'parser.pegjs')
+            'core', 'templates', 'expressions', 'parser.pegjs'
+        )
         expression_parser_js = os.path.join(
-            'core', 'templates', 'expressions', 'parser.js')
-        cmd = [os.path.join(common.NODE_MODULES_PATH, 'pegjs', 'bin', 'pegjs'),
-            expression_parser_definition, expression_parser_js]
+            'core', 'templates', 'expressions', 'parser.js'
+        )
+        cmd = [
+            os.path.join(common.NODE_MODULES_PATH, 'pegjs', 'bin', 'pegjs'),
+            expression_parser_definition,
+            expression_parser_js,
+        ]
 
         with swap_check_call, swap_install_npm_library:
             create_expression_parser.main(args=[])

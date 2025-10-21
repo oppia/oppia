@@ -38,62 +38,70 @@ The root folder MUST be named 'oppia'.
 
 NOTE: You can replace 'it' with 'fit' or 'describe' with 'fdescribe' to run a
 single test or test suite.
-""")
+"""
+)
 
 _PARSER.add_argument(
     '--skip-install',
     help='If true, skips installing dependencies. The default value is false.',
-    action='store_true')
+    action='store_true',
+)
 _PARSER.add_argument(
     '--skip-build',
     help='If true, skips building files. The default value is false.',
-    action='store_true')
+    action='store_true',
+)
 _PARSER.add_argument(
-    '--sharding-instances', type=int, default=3,
+    '--sharding-instances',
+    type=int,
+    default=3,
     help='Sets the number of parallel browsers to open while sharding. '
-         'Sharding must be disabled (either by passing in false to --sharding '
-         'or 1 to --sharding-instances) if running any tests in isolation '
-         '(fit or fdescribe).')
+    'Sharding must be disabled (either by passing in false to --sharding '
+    'or 1 to --sharding-instances) if running any tests in isolation '
+    '(fit or fdescribe).',
+)
 _PARSER.add_argument(
     '--prod_env',
     help='Run the tests in prod mode. Static resources are served from '
-         'build directory and use cache slugs.',
-    action='store_true')
+    'build directory and use cache slugs.',
+    action='store_true',
+)
 _PARSER.add_argument(
-    '--suite', default='full',
+    '--suite',
+    default='full',
     help='Performs test for different suites, here suites are the '
-         'name of the test files present in core/tests/webdriverio_desktop/ '
-         'and core/test/webdriverio/ dirs. e.g. for the file '
-         'core/tests/webdriverio/accessibility.js use --suite=accessibility. '
-         'For performing a full test, no argument is required.')
+    'name of the test files present in core/tests/webdriverio_desktop/ '
+    'and core/test/webdriverio/ dirs. e.g. for the file '
+    'core/tests/webdriverio/accessibility.js use --suite=accessibility. '
+    'For performing a full test, no argument is required.',
+)
 _PARSER.add_argument(
     '--chrome_driver_version',
-    help='Uses the specified version of the chrome driver')
+    help='Uses the specified version of the chrome driver',
+)
 _PARSER.add_argument(
     '--debug_mode',
     help='Runs the webdriverio test in debugging mode. Follow the instruction '
-         'provided in following URL to run e2e tests in debugging mode: '
-         'https://webdriver.io/docs/debugging/',
-    action='store_true')
+    'provided in following URL to run e2e tests in debugging mode: '
+    'https://webdriver.io/docs/debugging/',
+    action='store_true',
+)
 _PARSER.add_argument(
     '--server_log_level',
     help='Sets the log level for the appengine server. The default value is '
-         'set to error.',
+    'set to error.',
     default='error',
-    choices=['critical', 'error', 'warning', 'info'])
+    choices=['critical', 'error', 'warning', 'info'],
+)
 _PARSER.add_argument(
-    '--source_maps',
-    help='Build webpack with source maps.',
-    action='store_true')
+    '--source_maps', help='Build webpack with source maps.', action='store_true'
+)
 _PARSER.add_argument(
-    '--mobile',
-    help='Run e2e test in mobile viewport.',
-    action='store_true')
+    '--mobile', help='Run e2e test in mobile viewport.', action='store_true'
+)
 
 
-MOBILE_SUITES = [
-    'contributorDashboard'
-]
+MOBILE_SUITES = ['contributorDashboard']
 
 
 def install_third_party_libraries(skip_install: bool) -> None:
@@ -127,43 +135,51 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
         if constants.EMULATOR_MODE:
             stack.enter_context(servers.managed_firebase_auth_emulator())
             stack.enter_context(
-                servers.managed_cloud_datastore_emulator(clear_datastore=True))
+                servers.managed_cloud_datastore_emulator(clear_datastore=True)
+            )
 
         app_yaml_path = 'app.yaml' if args.prod_env else 'app_dev.yaml'
-        stack.enter_context(servers.managed_dev_appserver(
-            app_yaml_path,
-            port=common.GAE_PORT_FOR_E2E_TESTING,
-            log_level=args.server_log_level,
-            # Automatic restart can be disabled since we don't expect code
-            # changes to happen while the e2e tests are running.
-            automatic_restart=False,
-            skip_sdk_update_check=True,
-            env={
-                **os.environ,
-                'PORTSERVER_ADDRESS': common.PORTSERVER_SOCKET_FILEPATH,
-                'PIP_NO_DEPS': 'True'
-            }))
+        stack.enter_context(
+            servers.managed_dev_appserver(
+                app_yaml_path,
+                port=common.GAE_PORT_FOR_E2E_TESTING,
+                log_level=args.server_log_level,
+                # Automatic restart can be disabled since we don't expect code
+                # changes to happen while the e2e tests are running.
+                automatic_restart=False,
+                skip_sdk_update_check=True,
+                env={
+                    **os.environ,
+                    'PORTSERVER_ADDRESS': common.PORTSERVER_SOCKET_FILEPATH,
+                    'PIP_NO_DEPS': 'True',
+                },
+            )
+        )
 
         if (args.mobile) and (args.suite not in MOBILE_SUITES):
             print(
-                f'The {args.suite} suite should not be run ' +
-                'in the mobile viewport'
-                )
+                f'The {args.suite} suite should not be run '
+                + 'in the mobile viewport'
+            )
             sys.exit(1)
 
-        proc = stack.enter_context(servers.managed_webdriverio_server(
+        proc = stack.enter_context(
+            servers.managed_webdriverio_server(
                 suite_name=args.suite,
                 dev_mode=dev_mode,
                 debug_mode=args.debug_mode,
                 chrome_version=args.chrome_driver_version,
                 sharding_instances=args.sharding_instances,
                 mobile=args.mobile,
-                stdout=subprocess.PIPE))
+                stdout=subprocess.PIPE,
+            )
+        )
 
         print(
             'Servers have come up.\n'
             'Note: You can view screenshots of failed tests '
-            'in ../webdriverio-screenshots/')
+            'in ../webdriverio-screenshots/'
+        )
 
         output_lines = []
         while True:

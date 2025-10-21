@@ -111,16 +111,17 @@
 
     <div class="results-footer">
       <div class="question-player-results-footer" *ngIf="showActionButtonsFooter()">
-        <span *ngFor="let actionButton of questionPlayerConfig.resultActionButtons"
-              (click)="performAction(actionButton)">
-          <div class="action-button-inner {{getActionButtonInnerClass(actionButton.type)}}"
-               role="button"
-               tabindex="0"
-               *ngIf="!(actionButton.type === 'RETRY_SESSION') && !(actionButton.type === 'DASHBOARD' && !userIsLoggedIn) && !(actionButton.type === 'REVIEW_LOWEST_SCORED_SKILL' && getWorstSkillIds().length === 0)">
-            <span [innerHTML]="getActionButtonIconHtml(actionButton.type)"></span>
-            <span class="action-button-text" translate="{{actionButton.i18nId}}"></span>
-          </div>
-        </span>
+        <ng-container *ngFor="let actionButton of questionPlayerConfig.resultActionButtons">
+          <span *ngIf="!(actionButton.type === 'RETRY_SESSION') && !(actionButton.type === 'DASHBOARD' && !userIsLoggedIn) && !(actionButton.type === 'REVIEW_LOWEST_SCORED_SKILL' && getWorstSkillIds().length === 0)"
+                (click)="performAction(actionButton)">
+            <div class="action-button-inner {{getActionButtonInnerClass(actionButton.type)}}"
+                 role="button"
+                 tabindex="0">
+              <span [innerHTML]="getActionButtonIconHtml(actionButton.type)"></span>
+              <span class="action-button-text" translate="{{actionButton.i18nId}}"></span>
+            </div>
+          </span>
+        </ng-container>
       </div>
       <div class="question-player-results-footer" *ngIf="showActionButtonsFooter()">
         <span *ngFor="let actionButton of questionPlayerConfig.resultActionButtons"
@@ -457,8 +458,11 @@
   .oppia-question-player-container .question-player-results-footer {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
     padding-top: 2px;
+  }
+
+  .oppia-question-player-container .question-player-results-footer > span:last-child {
+    margin-left: auto;
   }
 
   .oppia-question-player-container .practice-questions-coming-soon-header {

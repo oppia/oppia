@@ -52,33 +52,53 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
         self.skill_id_2 = skill_services.get_new_skill_id()
 
         self.story_1 = story_domain.Story.create_default_story(
-            self.story_id_1, 'story_title', 'description', self.topic_id,
-            'story-frag-one')
+            self.story_id_1,
+            'story_title',
+            'description',
+            self.topic_id,
+            'story-frag-one',
+        )
         self.story_1.description = 'story_description'
 
         self.story_2 = story_domain.Story.create_default_story(
-            self.story_id_2, 'story_title', 'description', self.topic_id,
-            'story-frag-two')
+            self.story_id_2,
+            'story_title',
+            'description',
+            self.topic_id,
+            'story-frag-two',
+        )
         self.story_2.description = 'story_description'
 
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'public_topic_name', 'public', 'description',
-            'fragm')
+            self.topic_id, 'public_topic_name', 'public', 'description', 'fragm'
+        )
         self.topic.uncategorized_skill_ids.append(self.skill_id_1)
-        self.topic.subtopics.append(topic_domain.Subtopic(
-            1, 'subtopic_name', [self.skill_id_2], 'image.svg',
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
-            'subtopic-name'))
+        self.topic.subtopics.append(
+            topic_domain.Subtopic(
+                1,
+                'subtopic_name',
+                [self.skill_id_2],
+                'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                21131,
+                'subtopic-name',
+            )
+        )
         self.topic.next_subtopic_id = 2
         self.topic.thumbnail_filename = 'Image.svg'
-        self.topic.thumbnail_bg_color = (
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
+        self.topic.thumbnail_bg_color = constants.ALLOWED_THUMBNAIL_BG_COLORS[
+            'topic'
+        ][0]
         self.topic.canonical_story_references.append(
             topic_domain.StoryReference.create_default_story_reference(
-                self.story_id_1))
+                self.story_id_1
+            )
+        )
         self.topic.additional_story_references.append(
             topic_domain.StoryReference.create_default_story_reference(
-                self.story_id_2))
+                self.story_id_2
+            )
+        )
         self.topic.meta_tag_content = 'topic meta content'
         self.topic.page_title_fragment_for_web = 'topic page title'
         self.topic.skill_ids_for_diagnostic_test = [self.skill_id_2]
@@ -89,24 +109,31 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
 
         topic_services.publish_topic(self.topic_id, self.admin_id)
         topic_services.publish_story(
-            self.topic_id, self.story_id_1, self.admin_id)
+            self.topic_id, self.story_id_1, self.admin_id
+        )
         topic_services.publish_story(
-            self.topic_id, self.story_id_2, self.admin_id)
+            self.topic_id, self.story_id_2, self.admin_id
+        )
 
         self.save_new_skill(
-            self.skill_id_1, self.user_id, description='Skill Description 1')
+            self.skill_id_1, self.user_id, description='Skill Description 1'
+        )
         self.save_new_skill(
-            self.skill_id_2, self.user_id, description='Skill Description 2')
+            self.skill_id_2, self.user_id, description='Skill Description 2'
+        )
         skill_services.create_user_skill_mastery(
-            self.user_id, self.skill_id_1, 0.3)
+            self.user_id, self.skill_id_1, 0.3
+        )
         skill_services.create_user_skill_mastery(
-            self.user_id, self.skill_id_2, 0.5)
+            self.user_id, self.skill_id_2, 0.5
+        )
 
         self.math_classroom = self.save_new_valid_classroom()
 
 
 class TopicPageDataHandlerTests(
-        BaseTopicViewerControllerTests, test_utils.EmailTestBase):
+    BaseTopicViewerControllerTests, test_utils.EmailTestBase
+):
 
     def test_get_with_no_user_logged_in(self) -> None:
         self.math_classroom.topic_id_to_prerequisite_topic_ids = {
@@ -115,53 +142,61 @@ class TopicPageDataHandlerTests(
         classroom_config_services.update_classroom(self.math_classroom)
 
         json_response = self.get_json(
-            '%s/math/%s' % (feconf.TOPIC_DATA_HANDLER, 'public'))
+            '%s/math/%s' % (feconf.TOPIC_DATA_HANDLER, 'public')
+        )
         expected_dict = {
             'topic_name': 'public_topic_name',
             'topic_id': self.topic_id,
-            'canonical_story_dicts': [{
-                'id': self.story_1.id,
-                'title': self.story_1.title,
-                'description': self.story_1.description,
-                'node_titles': [],
-                'thumbnail_filename': None,
-                'thumbnail_bg_color': None,
-                'story_is_published': True,
-                'completed_node_titles': [],
-                'url_fragment': 'story-frag-one',
-                'all_node_dicts': []
-            }],
-            'additional_story_dicts': [{
-                'id': self.story_2.id,
-                'title': self.story_2.title,
-                'description': self.story_2.description,
-                'node_titles': [],
-                'thumbnail_filename': None,
-                'thumbnail_bg_color': None,
-                'story_is_published': True,
-                'completed_node_titles': [],
-                'url_fragment': 'story-frag-two',
-                'all_node_dicts': []
-            }],
+            'canonical_story_dicts': [
+                {
+                    'id': self.story_1.id,
+                    'title': self.story_1.title,
+                    'description': self.story_1.description,
+                    'node_titles': [],
+                    'thumbnail_filename': None,
+                    'thumbnail_bg_color': None,
+                    'story_is_published': True,
+                    'completed_node_titles': [],
+                    'url_fragment': 'story-frag-one',
+                    'all_node_dicts': [],
+                }
+            ],
+            'additional_story_dicts': [
+                {
+                    'id': self.story_2.id,
+                    'title': self.story_2.title,
+                    'description': self.story_2.description,
+                    'node_titles': [],
+                    'thumbnail_filename': None,
+                    'thumbnail_bg_color': None,
+                    'story_is_published': True,
+                    'completed_node_titles': [],
+                    'url_fragment': 'story-frag-two',
+                    'all_node_dicts': [],
+                }
+            ],
             'uncategorized_skill_ids': [self.skill_id_1],
-            'subtopics': [{
-                'thumbnail_filename': 'image.svg',
-                'thumbnail_bg_color': '#FFFFFF',
-                'thumbnail_size_in_bytes': 21131,
-                'skill_ids': [self.skill_id_2],
-                'id': 1,
-                'title': 'subtopic_name',
-                'url_fragment': 'subtopic-name'}],
+            'subtopics': [
+                {
+                    'thumbnail_filename': 'image.svg',
+                    'thumbnail_bg_color': '#FFFFFF',
+                    'thumbnail_size_in_bytes': 21131,
+                    'skill_ids': [self.skill_id_2],
+                    'id': 1,
+                    'title': 'subtopic_name',
+                    'url_fragment': 'subtopic-name',
+                }
+            ],
             'degrees_of_mastery': {
                 self.skill_id_1: None,
-                self.skill_id_2: None
+                self.skill_id_2: None,
             },
             'skill_descriptions': {
                 self.skill_id_1: 'Skill Description 1',
-                self.skill_id_2: 'Skill Description 2'
+                self.skill_id_2: 'Skill Description 2',
             },
             'practice_tab_is_displayed': False,
-            'classroom_name': 'math'
+            'classroom_name': 'math',
         }
 
         self.assertDictContainsSubset(expected_dict, json_response)
@@ -172,7 +207,8 @@ class TopicPageDataHandlerTests(
         classroom_config_services.update_classroom(self.math_classroom)
 
         json_response = self.get_json(
-            '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'public'))
+            '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'public')
+        )
 
         self.assertDictContainsSubset(expected_dict, json_response)
 
@@ -181,11 +217,11 @@ class TopicPageDataHandlerTests(
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
-                'testadmin@example.com'
+                'testadmin@example.com',
             ),
             (
                 platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
-                'system@example.com'
+                'system@example.com',
             ),
             (platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
         ]
@@ -197,59 +233,62 @@ class TopicPageDataHandlerTests(
         messages = self._get_sent_email_messages(admin_email_address)
         self.assertEqual(len(messages), 0)
         json_response = self.get_json(
-            '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'public'))
+            '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'public')
+        )
         messages = self._get_sent_email_messages(admin_email_address)
         expected_email_html_body = (
             'The deleted skills: %s are still'
-            ' present in topic with id %s' % (
-                self.skill_id_1, self.topic_id))
+            ' present in topic with id %s' % (self.skill_id_1, self.topic_id)
+        )
         self.assertEqual(len(messages), 1)
         self.assertIn(expected_email_html_body, messages[0].html)
         expected_dict = {
             'topic_name': 'public_topic_name',
             'topic_id': self.topic_id,
-            'canonical_story_dicts': [{
-                'id': self.story_1.id,
-                'title': self.story_1.title,
-                'description': self.story_1.description,
-                'node_titles': [],
-                'thumbnail_filename': None,
-                'thumbnail_bg_color': None,
-                'story_is_published': True,
-                'completed_node_titles': [],
-                'url_fragment': 'story-frag-one',
-                'all_node_dicts': []
-            }],
-            'additional_story_dicts': [{
-                'id': self.story_2.id,
-                'title': self.story_2.title,
-                'description': self.story_2.description,
-                'node_titles': [],
-                'thumbnail_filename': None,
-                'thumbnail_bg_color': None,
-                'story_is_published': True,
-                'completed_node_titles': [],
-                'url_fragment': 'story-frag-two',
-                'all_node_dicts': []
-            }],
+            'canonical_story_dicts': [
+                {
+                    'id': self.story_1.id,
+                    'title': self.story_1.title,
+                    'description': self.story_1.description,
+                    'node_titles': [],
+                    'thumbnail_filename': None,
+                    'thumbnail_bg_color': None,
+                    'story_is_published': True,
+                    'completed_node_titles': [],
+                    'url_fragment': 'story-frag-one',
+                    'all_node_dicts': [],
+                }
+            ],
+            'additional_story_dicts': [
+                {
+                    'id': self.story_2.id,
+                    'title': self.story_2.title,
+                    'description': self.story_2.description,
+                    'node_titles': [],
+                    'thumbnail_filename': None,
+                    'thumbnail_bg_color': None,
+                    'story_is_published': True,
+                    'completed_node_titles': [],
+                    'url_fragment': 'story-frag-two',
+                    'all_node_dicts': [],
+                }
+            ],
             'uncategorized_skill_ids': [self.skill_id_1],
-            'subtopics': [{
-                'thumbnail_filename': 'image.svg',
-                'thumbnail_bg_color': '#FFFFFF',
-                'thumbnail_size_in_bytes': 21131,
-                'skill_ids': [self.skill_id_2],
-                'id': 1,
-                'title': 'subtopic_name',
-                'url_fragment': 'subtopic-name'}],
-            'degrees_of_mastery': {
-                self.skill_id_1: 0.3,
-                self.skill_id_2: 0.5
-            },
-            'skill_descriptions': {
-                self.skill_id_2: 'Skill Description 2'
-            },
+            'subtopics': [
+                {
+                    'thumbnail_filename': 'image.svg',
+                    'thumbnail_bg_color': '#FFFFFF',
+                    'thumbnail_size_in_bytes': 21131,
+                    'skill_ids': [self.skill_id_2],
+                    'id': 1,
+                    'title': 'subtopic_name',
+                    'url_fragment': 'subtopic-name',
+                }
+            ],
+            'degrees_of_mastery': {self.skill_id_1: 0.3, self.skill_id_2: 0.5},
+            'skill_descriptions': {self.skill_id_2: 'Skill Description 2'},
             'practice_tab_is_displayed': False,
-            'classroom_name': None
+            'classroom_name': None,
         }
         self.assertDictContainsSubset(expected_dict, json_response)
 
@@ -257,40 +296,56 @@ class TopicPageDataHandlerTests(
 
     def test_get_with_meta_tag_content(self) -> None:
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'topic_with_meta',
-            'topic-with-meta', 'description', 'fragm')
+            self.topic_id,
+            'topic_with_meta',
+            'topic-with-meta',
+            'description',
+            'fragm',
+        )
         self.topic.meta_tag_content = 'meta content'
         topic_services.save_new_topic(self.admin_id, self.topic)
         topic_services.publish_topic(self.topic_id, self.admin_id)
         json_response = self.get_json(
-            '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'topic-with-meta'))
+            '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'topic-with-meta')
+        )
         expected_meta_tag_content = 'meta content'
         self.assertEqual(
-            expected_meta_tag_content, json_response['meta_tag_content'])
+            expected_meta_tag_content, json_response['meta_tag_content']
+        )
 
     def test_get_with_page_title_fragment_for_web(self) -> None:
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'topic_with_page_title_fragment_for_web',
-            'topic-page-title', 'description', 'topic page title')
+            self.topic_id,
+            'topic_with_page_title_fragment_for_web',
+            'topic-page-title',
+            'description',
+            'topic page title',
+        )
         topic_services.save_new_topic(self.admin_id, self.topic)
         topic_services.publish_topic(self.topic_id, self.admin_id)
         json_response = self.get_json(
-            '%s/staging/%s' % (
-                feconf.TOPIC_DATA_HANDLER, 'topic-page-title'))
+            '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'topic-page-title')
+        )
         expected_page_title_fragment_for_web = 'topic page title'
         self.assertEqual(
             expected_page_title_fragment_for_web,
-            json_response['page_title_fragment_for_web'])
+            json_response['page_title_fragment_for_web'],
+        )
 
     def test_get_with_no_skills_ids(self) -> None:
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'topic_with_no_skills',
-            'topic-with-no-skills', 'description', 'fragm')
+            self.topic_id,
+            'topic_with_no_skills',
+            'topic-with-no-skills',
+            'description',
+            'fragm',
+        )
         topic_services.save_new_topic(self.admin_id, self.topic)
         topic_services.publish_topic(self.topic_id, self.admin_id)
         json_response = self.get_json(
-            '%s/staging/%s' % (
-                feconf.TOPIC_DATA_HANDLER, 'topic-with-no-skills'))
+            '%s/staging/%s'
+            % (feconf.TOPIC_DATA_HANDLER, 'topic-with-no-skills')
+        )
         expected_dict = {
             'topic_name': 'topic_with_no_skills',
             'topic_id': self.topic_id,
@@ -301,7 +356,7 @@ class TopicPageDataHandlerTests(
             'degrees_of_mastery': {},
             'skill_descriptions': {},
             'practice_tab_is_displayed': False,
-            'classroom_name': None
+            'classroom_name': None,
         }
         self.assertDictContainsSubset(expected_dict, json_response)
 
@@ -311,15 +366,17 @@ class TopicPageDataHandlerTests(
         self.skill_id_1 = skill_services.get_new_skill_id()
         self.skill_id_2 = skill_services.get_new_skill_id()
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'new_topic', 'new-topic', 'description',
-            'fragm')
+            self.topic_id, 'new_topic', 'new-topic', 'description', 'fragm'
+        )
         self.topic.uncategorized_skill_ids.append(self.skill_id_1)
         self.topic.thumbnail_filename = 'Image.svg'
-        self.topic.thumbnail_bg_color = (
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
+        self.topic.thumbnail_bg_color = constants.ALLOWED_THUMBNAIL_BG_COLORS[
+            'topic'
+        ][0]
         self.topic.practice_tab_is_displayed = True
         subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title 1', 'url-frag-one')
+            1, 'Subtopic Title 1', 'url-frag-one'
+        )
         subtopic_1.skill_ids = [self.skill_id_2]
         subtopic_1.url_fragment = 'sub-one-frag'
         self.topic.subtopics = [subtopic_1]
@@ -328,21 +385,27 @@ class TopicPageDataHandlerTests(
         topic_services.save_new_topic(self.admin_id, self.topic)
         topic_services.publish_topic(self.topic_id, self.admin_id)
         self.save_new_skill(
-            self.skill_id_1, self.admin_id, description='Skill Description 1')
+            self.skill_id_1, self.admin_id, description='Skill Description 1'
+        )
         for index in range(number_of_questions):
             question_id = question_services.get_new_question_id()
             content_id_generator = translation_domain.ContentIdGenerator()
             default_dest_state_name = '%s' % index
             self.save_new_question(
-                question_id, self.admin_id,
+                question_id,
+                self.admin_id,
                 self._create_valid_question_data(
-                    default_dest_state_name, content_id_generator),
+                    default_dest_state_name, content_id_generator
+                ),
                 [self.skill_id_1],
-                content_id_generator.next_content_id_index)
+                content_id_generator.next_content_id_index,
+            )
             question_services.create_new_question_skill_link(
-                self.admin_id, question_id, self.skill_id_1, 0.5)
+                self.admin_id, question_id, self.skill_id_1, 0.5
+            )
         json_response = self.get_json(
-            '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'new-topic'))
+            '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'new-topic')
+        )
         expected_dict = {
             'topic_name': 'new_topic',
             'topic_id': self.topic_id,
@@ -352,13 +415,11 @@ class TopicPageDataHandlerTests(
             'subtopics': [subtopic_1.to_dict()],
             'degrees_of_mastery': {
                 self.skill_id_1: None,
-                self.skill_id_2: None
+                self.skill_id_2: None,
             },
-            'skill_descriptions': {
-                self.skill_id_1: 'Skill Description 1'
-            },
+            'skill_descriptions': {self.skill_id_1: 'Skill Description 1'},
             'practice_tab_is_displayed': True,
-            'classroom_name': None
+            'classroom_name': None,
         }
         self.assertDictContainsSubset(expected_dict, json_response)
         self.logout()
@@ -369,15 +430,17 @@ class TopicPageDataHandlerTests(
         self.skill_id_1 = skill_services.get_new_skill_id()
         self.skill_id_2 = skill_services.get_new_skill_id()
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'new_topic', 'new-topic', 'description',
-            'fragm')
+            self.topic_id, 'new_topic', 'new-topic', 'description', 'fragm'
+        )
         self.topic.uncategorized_skill_ids.append(self.skill_id_1)
         self.topic.thumbnail_filename = 'Image.svg'
-        self.topic.thumbnail_bg_color = (
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
+        self.topic.thumbnail_bg_color = constants.ALLOWED_THUMBNAIL_BG_COLORS[
+            'topic'
+        ][0]
         self.topic.practice_tab_is_displayed = True
         subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title 1', 'url-frag-one')
+            1, 'Subtopic Title 1', 'url-frag-one'
+        )
         subtopic_1.skill_ids = [self.skill_id_2]
         subtopic_1.url_fragment = 'sub-one-frag'
         self.topic.subtopics = [subtopic_1]
@@ -386,21 +449,27 @@ class TopicPageDataHandlerTests(
         topic_services.save_new_topic(self.admin_id, self.topic)
         topic_services.publish_topic(self.topic_id, self.admin_id)
         self.save_new_skill(
-            self.skill_id_1, self.admin_id, description='Skill Description 1')
+            self.skill_id_1, self.admin_id, description='Skill Description 1'
+        )
         for index in range(number_of_questions):
             default_dest_state_name = '%s' % index
             question_id = question_services.get_new_question_id()
             content_id_generator = translation_domain.ContentIdGenerator()
             self.save_new_question(
-                question_id, self.admin_id,
+                question_id,
+                self.admin_id,
                 self._create_valid_question_data(
-                    default_dest_state_name, content_id_generator),
+                    default_dest_state_name, content_id_generator
+                ),
                 [self.skill_id_1],
-                content_id_generator.next_content_id_index)
+                content_id_generator.next_content_id_index,
+            )
             question_services.create_new_question_skill_link(
-                self.admin_id, question_id, self.skill_id_1, 0.5)
+                self.admin_id, question_id, self.skill_id_1, 0.5
+            )
         json_response = self.get_json(
-            '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'new-topic'))
+            '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'new-topic')
+        )
         expected_dict = {
             'topic_name': 'new_topic',
             'topic_id': self.topic_id,
@@ -410,36 +479,39 @@ class TopicPageDataHandlerTests(
             'subtopics': [subtopic_1.to_dict()],
             'degrees_of_mastery': {
                 self.skill_id_1: None,
-                self.skill_id_2: None
+                self.skill_id_2: None,
             },
             'skill_descriptions': {
                 self.skill_id_1: 'Skill Description 1',
             },
             'practice_tab_is_displayed': True,
-            'classroom_name': None
+            'classroom_name': None,
         }
         self.assertDictContainsSubset(expected_dict, json_response)
         self.logout()
 
     def test_get_with_twenty_or_more_questions_with_multiple_skills(
-        self
+        self,
     ) -> None:
         number_of_skills = 3
         number_of_questions = [1, 2, 2]
         self.topic_id = 'new_topic'
-        skill_ids = (
-            [skill_services.get_new_skill_id() for _ in range(
-                number_of_skills)])
+        skill_ids = [
+            skill_services.get_new_skill_id() for _ in range(number_of_skills)
+        ]
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'new_topic', 'new-topic', 'description', 'fragm')
+            self.topic_id, 'new_topic', 'new-topic', 'description', 'fragm'
+        )
         for index in range(number_of_skills):
             self.topic.uncategorized_skill_ids.append(skill_ids[index])
         self.topic.thumbnail_filename = 'Image.svg'
-        self.topic.thumbnail_bg_color = (
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
+        self.topic.thumbnail_bg_color = constants.ALLOWED_THUMBNAIL_BG_COLORS[
+            'topic'
+        ][0]
         self.topic.practice_tab_is_displayed = True
         subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title 1', 'url-frag-one')
+            1, 'Subtopic Title 1', 'url-frag-one'
+        )
         subtopic_1.skill_ids = ['skill_id_1']
         subtopic_1.url_fragment = 'sub-one-frag'
         self.topic.subtopics = [subtopic_1]
@@ -449,55 +521,61 @@ class TopicPageDataHandlerTests(
         topic_services.publish_topic(self.topic_id, self.admin_id)
         for i in range(number_of_skills):
             self.save_new_skill(
-                skill_ids[i], self.admin_id,
-                description='Skill Description')
+                skill_ids[i], self.admin_id, description='Skill Description'
+            )
         for i in range(number_of_skills):
             for j in range(number_of_questions[i]):
                 question_id = question_services.get_new_question_id()
                 content_id_generator = translation_domain.ContentIdGenerator()
                 default_dest_state_name = '%s' % j
                 self.save_new_question(
-                    question_id, self.admin_id,
+                    question_id,
+                    self.admin_id,
                     self._create_valid_question_data(
-                        default_dest_state_name, content_id_generator),
+                        default_dest_state_name, content_id_generator
+                    ),
                     [skill_ids[i]],
-                    content_id_generator.next_content_id_index)
+                    content_id_generator.next_content_id_index,
+                )
                 question_services.create_new_question_skill_link(
-                    self.admin_id, question_id, skill_ids[i], 0.5)
+                    self.admin_id, question_id, skill_ids[i], 0.5
+                )
 
         json_response = self.get_json(
-            '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'new-topic'))
+            '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'new-topic')
+        )
         expected_dict = {
             'topic_name': 'new_topic',
             'topic_id': self.topic_id,
             'canonical_story_dicts': [],
             'additional_story_dicts': [],
             'practice_tab_is_displayed': True,
-            'classroom_name': None
+            'classroom_name': None,
         }
         self.assertDictContainsSubset(expected_dict, json_response)
         self.logout()
 
-    def test_get_with_lesser_questions_with_fifty_or_more_skills(
-        self
-    ) -> None:
+    def test_get_with_lesser_questions_with_fifty_or_more_skills(self) -> None:
         number_of_skills = 60
         number_of_questions = [0] * 60
         number_of_questions[46] = 2
         self.topic_id = 'new_topic'
-        skill_ids = (
-            [skill_services.get_new_skill_id() for _ in range(
-                number_of_skills)])
+        skill_ids = [
+            skill_services.get_new_skill_id() for _ in range(number_of_skills)
+        ]
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'new_topic', 'new-topic', 'description', 'fragm')
+            self.topic_id, 'new_topic', 'new-topic', 'description', 'fragm'
+        )
         for index in range(number_of_skills):
             self.topic.uncategorized_skill_ids.append(skill_ids[index])
         self.topic.thumbnail_filename = 'Image.svg'
-        self.topic.thumbnail_bg_color = (
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
+        self.topic.thumbnail_bg_color = constants.ALLOWED_THUMBNAIL_BG_COLORS[
+            'topic'
+        ][0]
         self.topic.practice_tab_is_displayed = False
         subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title 1', 'url-frag-one')
+            1, 'Subtopic Title 1', 'url-frag-one'
+        )
         subtopic_1.skill_ids = ['skill_id_1']
         subtopic_1.url_fragment = 'sub-one-frag'
         self.topic.subtopics = [subtopic_1]
@@ -507,31 +585,36 @@ class TopicPageDataHandlerTests(
         topic_services.publish_topic(self.topic_id, self.admin_id)
         for i in range(number_of_skills):
             self.save_new_skill(
-                skill_ids[i], self.admin_id,
-                description='Skill Description')
+                skill_ids[i], self.admin_id, description='Skill Description'
+            )
         for i in range(number_of_skills):
             for j in range(number_of_questions[i]):
                 default_dest_state_name = '%s' % j
                 question_id = question_services.get_new_question_id()
                 content_id_generator = translation_domain.ContentIdGenerator()
                 self.save_new_question(
-                    question_id, self.admin_id,
+                    question_id,
+                    self.admin_id,
                     self._create_valid_question_data(
-                        default_dest_state_name, content_id_generator),
+                        default_dest_state_name, content_id_generator
+                    ),
                     [skill_ids[i]],
-                    content_id_generator.next_content_id_index)
+                    content_id_generator.next_content_id_index,
+                )
                 question_services.create_new_question_skill_link(
-                    self.admin_id, question_id, skill_ids[i], 0.5)
+                    self.admin_id, question_id, skill_ids[i], 0.5
+                )
 
         json_response = self.get_json(
-            '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'new-topic'))
+            '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'new-topic')
+        )
         expected_dict = {
             'topic_name': 'new_topic',
             'topic_id': self.topic_id,
             'canonical_story_dicts': [],
             'additional_story_dicts': [],
             'practice_tab_is_displayed': False,
-            'classroom_name': None
+            'classroom_name': None,
         }
         self.assertDictContainsSubset(expected_dict, json_response)
         self.logout()
@@ -543,19 +626,22 @@ class TopicPageDataHandlerTests(
         number_of_questions[20] = 3
         number_of_questions[29] = 10
         self.topic_id = 'new_topic'
-        skill_ids = (
-            [skill_services.get_new_skill_id() for _ in range(
-                number_of_skills)])
+        skill_ids = [
+            skill_services.get_new_skill_id() for _ in range(number_of_skills)
+        ]
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'new_topic', 'new-topic', 'description', 'fragm')
+            self.topic_id, 'new_topic', 'new-topic', 'description', 'fragm'
+        )
         for index in range(number_of_skills):
             self.topic.uncategorized_skill_ids.append(skill_ids[index])
         self.topic.thumbnail_filename = 'Image.svg'
-        self.topic.thumbnail_bg_color = (
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
+        self.topic.thumbnail_bg_color = constants.ALLOWED_THUMBNAIL_BG_COLORS[
+            'topic'
+        ][0]
         self.topic.practice_tab_is_displayed = True
         subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title 1', 'url-frag-one')
+            1, 'Subtopic Title 1', 'url-frag-one'
+        )
         subtopic_1.skill_ids = ['skill_id_1']
         subtopic_1.url_fragment = 'sub-one-frag'
         self.topic.subtopics = [subtopic_1]
@@ -565,31 +651,36 @@ class TopicPageDataHandlerTests(
         topic_services.publish_topic(self.topic_id, self.admin_id)
         for i in range(number_of_skills):
             self.save_new_skill(
-                skill_ids[i], self.admin_id,
-                description='Skill Description')
+                skill_ids[i], self.admin_id, description='Skill Description'
+            )
         for i in range(number_of_skills):
             for j in range(number_of_questions[i]):
                 default_dest_state_name = '%s' % j
                 question_id = question_services.get_new_question_id()
                 content_id_generator = translation_domain.ContentIdGenerator()
                 self.save_new_question(
-                    question_id, self.admin_id,
+                    question_id,
+                    self.admin_id,
                     self._create_valid_question_data(
-                        default_dest_state_name, content_id_generator),
+                        default_dest_state_name, content_id_generator
+                    ),
                     [skill_ids[i]],
-                    content_id_generator.next_content_id_index)
+                    content_id_generator.next_content_id_index,
+                )
                 question_services.create_new_question_skill_link(
-                    self.admin_id, question_id, skill_ids[i], 0.5)
+                    self.admin_id, question_id, skill_ids[i], 0.5
+                )
 
         json_response = self.get_json(
-            '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'new-topic'))
+            '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'new-topic')
+        )
         expected_dict = {
             'topic_name': 'new_topic',
             'topic_id': self.topic_id,
             'canonical_story_dicts': [],
             'additional_story_dicts': [],
             'practice_tab_is_displayed': True,
-            'classroom_name': None
+            'classroom_name': None,
         }
         self.assertDictContainsSubset(expected_dict, json_response)
         self.logout()
@@ -618,7 +709,7 @@ class TopicNameHandlerTest(test_utils.GenericTestBase):
             self.topic_name,
             self.topic_url_fragment,
             description=self.description,
-            page_title_frag=self.topic_name
+            page_title_frag=self.topic_name,
         )
         topic_services.save_new_topic(self.admin_id, topic)
 
@@ -626,7 +717,8 @@ class TopicNameHandlerTest(test_utils.GenericTestBase):
         """Test that the handler returns True when topic name exists."""
         self.login(self.NEW_USER_EMAIL)
         response = self.get_json(
-            '%s/%s' % (feconf.TOPIC_NAME_HANDLER, self.topic_name))
+            '%s/%s' % (feconf.TOPIC_NAME_HANDLER, self.topic_name)
+        )
         self.assertEqual(response['topic_name_exists'], True)
         self.logout()
 
@@ -634,13 +726,15 @@ class TopicNameHandlerTest(test_utils.GenericTestBase):
         """Test that the handler returns False when topic name doesn't exist."""
         self.login(self.NEW_USER_EMAIL)
         response = self.get_json(
-            '%s/%s' % (feconf.TOPIC_NAME_HANDLER, 'nonexistent_topic'))
+            '%s/%s' % (feconf.TOPIC_NAME_HANDLER, 'nonexistent_topic')
+        )
         self.assertEqual(response['topic_name_exists'], False)
         self.logout()
 
     def test_get_with_guest_user(self) -> None:
         """Test that guest users can check topic name existence."""
         response = self.get_json(
-            '%s/%s' % (feconf.TOPIC_NAME_HANDLER, self.topic_name))
+            '%s/%s' % (feconf.TOPIC_NAME_HANDLER, self.topic_name)
+        )
         self.assertEqual(response['topic_name_exists'], True)
         self.logout()

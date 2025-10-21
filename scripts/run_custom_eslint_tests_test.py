@@ -32,8 +32,10 @@ class RunCustomEslintTestsTests(test_utils.GenericTestBase):
         super().setUp()
 
         self.print_arr: list[str] = []
+
         def mock_print(msg: str) -> None:
             self.print_arr.append(msg)
+
         self.print_swap = self.swap(builtins, 'print', mock_print)
 
         node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
@@ -45,23 +47,28 @@ class RunCustomEslintTestsTests(test_utils.GenericTestBase):
         self.cmd_token_list: list[list[str]] = []
 
         self.sys_exit_code: int = 0
+
         def mock_sys_exit(err_code: int) -> None:
             self.sys_exit_code = err_code
+
         self.swap_sys_exit = self.swap(sys, 'exit', mock_sys_exit)
 
     def test_custom_eslint_tests_failed_due_to_internal_error(self) -> None:
         class MockTask:
-            def communicate( # pylint: disable=missing-docstring
-                self) -> tuple[bytes, bytes]:
+            def communicate(  # pylint: disable=missing-docstring
+                self,
+            ) -> tuple[bytes, bytes]:
                 return (
                     b'All files | 100 | 100 | 100 | 100 | ',
-                    b'Path not found.')
+                    b'Path not found.',
+                )
 
         def mock_popen(
             cmd_tokens: list[str], **unused_kwargs: str
         ) -> MockTask:  # pylint: disable=unused-argument
             self.cmd_token_list.append(cmd_tokens)
             return MockTask()
+
         swap_popen = self.swap(subprocess, 'Popen', mock_popen)
 
         with swap_popen, self.print_swap, self.swap_sys_exit:
@@ -73,17 +80,21 @@ class RunCustomEslintTestsTests(test_utils.GenericTestBase):
 
     def test_custom_eslint_tests_failed(self) -> None:
         class MockTask:
-            def communicate( # pylint: disable=missing-docstring
-                self) -> tuple[bytes, bytes]:
+            def communicate(  # pylint: disable=missing-docstring
+                self,
+            ) -> tuple[bytes, bytes]:
                 return (
-                    b'1 in 125 tests failing.\n' +
-                    b'All files | 100 | 100 | 100 | 100 | ', b'')
+                    b'1 in 125 tests failing.\n'
+                    + b'All files | 100 | 100 | 100 | 100 | ',
+                    b'',
+                )
 
         def mock_popen(
             cmd_tokens: list[str], **unused_kwargs: str
         ) -> MockTask:  # pylint: disable=unused-argument
             self.cmd_token_list.append(cmd_tokens)
             return MockTask()
+
         swap_popen = self.swap(subprocess, 'Popen', mock_popen)
 
         with swap_popen, self.print_swap, self.swap_sys_exit:
@@ -95,17 +106,21 @@ class RunCustomEslintTestsTests(test_utils.GenericTestBase):
 
     def test_custom_eslint_tests_passed(self) -> None:
         class MockTask:
-            def communicate( # pylint: disable=missing-docstring
-                self) -> tuple[bytes, bytes]:
+            def communicate(  # pylint: disable=missing-docstring
+                self,
+            ) -> tuple[bytes, bytes]:
                 return (
-                    b'All tests passed\n' +
-                    b'All files | 100 | 100 | 100 | 100 | ', b'')
+                    b'All tests passed\n'
+                    + b'All files | 100 | 100 | 100 | 100 | ',
+                    b'',
+                )
 
         def mock_popen(
             cmd_tokens: list[str], **unused_kwargs: str
         ) -> MockTask:  # pylint: disable=unused-argument
             self.cmd_token_list.append(cmd_tokens)
             return MockTask()
+
         swap_popen = self.swap(subprocess, 'Popen', mock_popen)
 
         with swap_popen, self.print_swap, self.swap_sys_exit:
@@ -117,17 +132,21 @@ class RunCustomEslintTestsTests(test_utils.GenericTestBase):
 
     def test_incomplete_eslint_coverage_raises_exception(self) -> None:
         class MockTask:
-            def communicate( # pylint: disable=missing-docstring
-                self) -> tuple[bytes, bytes]:
+            def communicate(  # pylint: disable=missing-docstring
+                self,
+            ) -> tuple[bytes, bytes]:
                 return (
-                    b'All tests passed\n' +
-                    b'All files | 100 | 98 | 100 | 100 | ', b'')
+                    b'All tests passed\n'
+                    + b'All files | 100 | 98 | 100 | 100 | ',
+                    b'',
+                )
 
         def mock_popen(
             cmd_tokens: list[str], **unused_kwargs: str
         ) -> MockTask:  # pylint: disable=unused-argument
             self.cmd_token_list.append(cmd_tokens)
             return MockTask()
+
         swap_popen = self.swap(subprocess, 'Popen', mock_popen)
         error_msg = 'Eslint test coverage is not 100%'
 

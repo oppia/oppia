@@ -25,16 +25,20 @@ from typing import Optional, Sequence
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
 FULL_STACK_TEST_VIDEO_RECORDING_DIR = os.path.join(
-    CURR_DIR, '..', 'oppia_full_stack_test_video_recordings')
+    CURR_DIR, '..', 'oppia_full_stack_test_video_recordings'
+)
 FULL_STACK_TEST_SCREENSHOT_DIR = os.path.join(
-    CURR_DIR, '..', 'oppia_full_stack_test_screenshots')
+    CURR_DIR, '..', 'oppia_full_stack_test_screenshots'
+)
 FULL_STACK_TEST_DOWNLOAD_DIR = os.path.join(
-    CURR_DIR, '..', 'oppia_acceptance_test_downloads')
+    CURR_DIR, '..', 'oppia_acceptance_test_downloads'
+)
 
 _PARSER = argparse.ArgumentParser(
     description="""
 Deletes temporary and installed files.
-""")
+"""
+)
 
 
 def delete_directory_tree(directory_path: str) -> None:
@@ -89,5 +93,5 @@ def main(args: Optional[Sequence[str]] = None) -> None:
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
 # it will only be called when clean.py is used as a script.
-if __name__ == '__main__': # pragma: no cover
+if __name__ == '__main__':  # pragma: no cover
     main()

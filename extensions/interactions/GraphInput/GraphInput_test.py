@@ -20,7 +20,9 @@ from __future__ import annotations
 
 from core.tests import test_utils
 
-from extensions.interactions.GraphInput import GraphInput # pylint: disable=unused-import # isort: skip
+from extensions.interactions.GraphInput import (  # pylint: disable=unused-import # isort: skip
+    GraphInput,
+)
 
 
 class GraphInputTests(test_utils.GenericTestBase):
