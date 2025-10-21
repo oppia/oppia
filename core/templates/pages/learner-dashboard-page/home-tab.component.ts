@@ -120,21 +120,13 @@ export class HomeTabComponent {
         const completedNodes = story.getCompletedNodeTitles();
         const remainingPublished =
           publishedNodesCount - completedNodes.length - 1;
-        console.log({
-          storyId: story.getId(),
-          publishedNodes: publishedNodesCount,
-          completedNodes: completedNodes.length,
-          remainingPublished,
-        });
 
         if (
           remainingPublished > 0 &&
           remainingPublished < publishedNodesCount
         ) {
           this.storySummariesWithAvailableNodes.add(story.getId());
-          console.log(this.storySummariesWithAvailableNodes);
         }
-
         if (!this.hasMultipleUnfinishedPublished) {
           this.hasMultipleUnfinishedPublished =
             publishedNodesCount > 1 && remainingPublished > 0;

@@ -23,7 +23,6 @@ import {
 } from './chapter-progress-loader.service';
 import {StoryViewerBackendApiService} from 'domain/story_viewer/story-viewer-backend-api.service';
 import {UserService} from 'services/user.service';
-import {of} from 'rxjs';
 import {ChapterProgressSummary} from 'domain/exploration/chapter-progress-summary.model';
 
 describe('ChapterProgressLoaderService', () => {
@@ -85,7 +84,7 @@ describe('ChapterProgressLoaderService', () => {
     });
 
     it('should not fetch progress if story already loaded', async () => {
-      service['loadedStoryIds'].add('story1');
+      service.loadedStoryIds.add('story1');
       await service.loadChapterProgressForStory('story1', ['exp1']);
       expect(
         storyViewerBackendApiService.fetchProgressInStoriesChapters
@@ -103,15 +102,14 @@ describe('ChapterProgressLoaderService', () => {
 
   describe('computeLessonProgress', () => {
     it('should compute progress correctly', () => {
-      service['chapterProgressByExpId'].set('exp1', mockChapterProgress);
+      service.chapterProgressByExpId.set('exp1', mockChapterProgress);
       const progress = service.computeLessonProgress('exp1');
-      // visitedCheckpoints - 1 = 2, totalCheckpoints = 5 => 40%
       expect(progress).toBe(40);
       expect(service.getLessonProgress('exp1')).toBe(40);
     });
 
     it('should return 100 if chapter complete', () => {
-      service['chapterProgressByExpId'].set('exp2', {
+      service.chapterProgressByExpId.set('exp2', {
         ...mockChapterProgress,
         isChapterComplete: true,
       });
@@ -127,7 +125,7 @@ describe('ChapterProgressLoaderService', () => {
 
   describe('getLessonProgress', () => {
     it('should return cached progress', () => {
-      service['lessonProgress']['exp1'] = 75;
+      service.lessonProgress.exp1 = 75;
       expect(service.getLessonProgress('exp1')).toBe(75);
     });
 
@@ -138,7 +136,7 @@ describe('ChapterProgressLoaderService', () => {
 
   describe('isChapterCompleted', () => {
     it('should return true if chapter is complete', () => {
-      service['chapterProgressByExpId'].set('exp1', {
+      service.chapterProgressByExpId.set('exp1', {
         ...mockChapterProgress,
         isChapterComplete: true,
       });
@@ -146,7 +144,7 @@ describe('ChapterProgressLoaderService', () => {
     });
 
     it('should return false if chapter is not complete', () => {
-      service['chapterProgressByExpId'].set('exp1', {
+      service.chapterProgressByExpId.set('exp1', {
         ...mockChapterProgress,
         isChapterComplete: false,
       });
@@ -160,14 +158,14 @@ describe('ChapterProgressLoaderService', () => {
 
   describe('getAllProgress', () => {
     it('should return all cached lesson progress', () => {
-      service['lessonProgress'] = {exp1: 20, exp2: 50};
+      service.lessonProgress = {exp1: 20, exp2: 50};
       const allProgress: LessonProgressData = service.getAllProgress();
       expect(allProgress).toEqual({exp1: 20, exp2: 50});
     });
   });
 
   it('should return cached lesson progress if available', () => {
-    service['lessonProgress']['exp1'] = 50;
+    service.lessonProgress.exp1 = 50;
 
     const progress = service.computeLessonProgress('exp1');
 

@@ -30,10 +30,9 @@ export interface LessonProgressData {
   providedIn: 'root',
 })
 export class ChapterProgressLoaderService {
-  private lessonProgress: LessonProgressData = {};
-  private chapterProgressByExpId: Map<string, ChapterProgressSummary> =
-    new Map();
-  private loadedStoryIds: Set<string> = new Set();
+  lessonProgress: LessonProgressData = {};
+  chapterProgressByExpId: Map<string, ChapterProgressSummary> = new Map();
+  loadedStoryIds: Set<string> = new Set();
 
   constructor(
     private storyViewerBackendApiService: StoryViewerBackendApiService,
