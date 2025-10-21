@@ -30,11 +30,7 @@ describe('ChapterProgressLoaderService', () => {
   let storyViewerBackendApiService: jasmine.SpyObj<StoryViewerBackendApiService>;
   let userService: jasmine.SpyObj<UserService>;
 
-  const mockChapterProgress = new ChapterProgressSummary({
-    totalCheckpoints: 5,
-    visitedCheckpoints: 3,
-    isChapterComplete: false,
-  });
+  const mockChapterProgress = new ChapterProgressSummary(5, 3, false);
 
   beforeEach(() => {
     const storyViewerSpy = jasmine.createSpyObj(
@@ -109,10 +105,10 @@ describe('ChapterProgressLoaderService', () => {
     });
 
     it('should return 100 if chapter complete', () => {
-      service.chapterProgressByExpId.set('exp2', {
-        ...mockChapterProgress,
-        isChapterComplete: true,
-      });
+      service.chapterProgressByExpId.set(
+        'exp2',
+        new ChapterProgressSummary(5, 3, true)
+      );
       const progress = service.computeLessonProgress('exp2');
       expect(progress).toBe(100);
     });
