@@ -319,10 +319,11 @@ describe('LessonCardComponent', () => {
     );
   });
 
-  it('should set story to CollectionSummary and its non-url values to the respective fields', () => {
+  it('should set story to CollectionSummary and its non-url values to the respective fields', fakeAsync(() => {
     component.story = CollectionSummary.createFromBackendDict(sampleCollection);
 
     fixture.detectChanges();
+    tick();
 
     expect(component.desc).toEqual(sampleCollection.objective);
     expect(component.imgColor).toEqual(sampleCollection.thumbnail_bg_color);
@@ -330,13 +331,14 @@ describe('LessonCardComponent', () => {
 
     expect(component.progress).toEqual(0);
     expect(component.lessonTopic).toEqual('Collections');
-  });
+  }));
 
-  it('should set story to LearnerExplorationSummary and its non-url values to the respective fields', () => {
+  it('should set story to LearnerExplorationSummary and its non-url values to the respective fields', fakeAsync(() => {
     component.story =
       LearnerExplorationSummary.createFromBackendDict(sampleExploration);
 
     fixture.detectChanges();
+    tick();
 
     expect(component.desc).toEqual(sampleExploration.objective);
     expect(component.imgColor).toEqual(sampleExploration.thumbnail_bg_color);
@@ -344,7 +346,7 @@ describe('LessonCardComponent', () => {
 
     expect(component.progress).toEqual(0);
     expect(component.lessonTopic).toEqual('Community Lesson');
-  });
+  }));
 
   it('should set story to complete StorySummary and its non-url values to the respective fields', fakeAsync(() => {
     chapterProgressLoaderService.computeLessonProgress.and.returnValue(100);
@@ -376,13 +378,14 @@ describe('LessonCardComponent', () => {
     expect(component.lessonTopic).toEqual(incompleteTopic.topic_name);
   }));
 
-  it('should set story to CollectionSummary and set its imgUrl correctly', () => {
+  it('should set story to CollectionSummary and set its imgUrl correctly', fakeAsync(() => {
     component.story = CollectionSummary.createFromBackendDict(sampleCollection);
 
     fixture.detectChanges();
+    tick();
 
     expect(component.imgUrl).toBe('/assets/images/subjects/Algebra.svg');
-  });
+  }));
 
   it('should set story to StorySummary and set its lessonUrl correctly', fakeAsync(() => {
     component.story = StorySummary.createFromBackendDict(sampleTopic);
