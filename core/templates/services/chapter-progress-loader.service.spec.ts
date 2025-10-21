@@ -132,18 +132,18 @@ describe('ChapterProgressLoaderService', () => {
 
   describe('isChapterCompleted', () => {
     it('should return true if chapter is complete', () => {
-      service.chapterProgressByExpId.set('exp1', {
-        ...mockChapterProgress,
-        isChapterComplete: true,
-      });
+      service.chapterProgressByExpId.set(
+        'exp1',
+        new ChapterProgressSummary(5, 5, true)
+      );
       expect(service.isChapterCompleted('exp1')).toBeTrue();
     });
 
     it('should return false if chapter is not complete', () => {
-      service.chapterProgressByExpId.set('exp1', {
-        ...mockChapterProgress,
-        isChapterComplete: false,
-      });
+      service.chapterProgressByExpId.set(
+        'exp1',
+        new ChapterProgressSummary(5, 3, false)
+      );
       expect(service.isChapterCompleted('exp1')).toBeFalse();
     });
 
