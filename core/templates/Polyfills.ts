@@ -20,7 +20,7 @@ import 'globalthis/auto';
 import 'proxy-polyfill';
 import '@webcomponents/custom-elements';
 
-// Add a String.prototype.trim() polyfill for IE8
+// Add a String.prototype.trim() polyfill for IE8.
 if (typeof String.prototype.trim !== 'function') {
   String.prototype.trim = function () {
     return this.replace(/^\s+|\s+$/g, '');
@@ -30,7 +30,7 @@ if (typeof String.prototype.trim !== 'function') {
 // Add an Object.create() polyfill for IE8.
 if (typeof Object.create !== 'function') {
   (function () {
-    // Using interface to define a constructable function for IE8 polyfill
+    // Using interface to define a constructable function for IE8 polyfill.
     interface Constructor {
       new (): object;
       prototype: object;
