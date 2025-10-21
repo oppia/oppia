@@ -230,8 +230,13 @@ export class LessonCardComponent implements OnInit {
     currentStory: StoryNode
   ): string {
     const explorationId = currentStory.getExplorationId();
-    if (!classroomUrl || !topicUrl || explorationId === null) {
-      throw new Error('Class and/or topic does not exist');
+    if (!classroomUrl || !topicUrl || !explorationId) {
+      console.error('Missing required URL parameters:', {
+        classroomUrl,
+        topicUrl,
+        explorationId,
+      });
+      return '#';
     }
     let resultUrl = this.urlInterpolationService.interpolateUrl(
       '/explore/<exp_id>',
