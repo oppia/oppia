@@ -338,7 +338,12 @@ describe('LessonCardComponent', () => {
       [],
       true,
       1,
-      'note_to_reviewer'
+      'note_to_reviewer',
+      null,
+      'public',
+      null,
+      1,
+      'en'
     );
     component.story = storySummary;
 
