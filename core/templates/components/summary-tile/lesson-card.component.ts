@@ -148,34 +148,7 @@ export class LessonCardComponent implements OnInit {
     }
     // TODO(#18384): Returns next unplayed node from the earliest completed node. Does not account for if played out of order.
     this.allNodes = storyModel.getAllNodes();
-    if (!this.allNodes || this.allNodes.length === 0) {
-      console.warn('Story has no nodes. Marking as completed.', {
-        storyId: storyModel.getId(),
-        storyTitle: storyModel.getTitle(),
-      });
-      this.progress = 100;
-      this.lessonUrl = '#';
-      this.title = ' ';
-      this.lessonTopic = this.topic;
-      this.statusIsPublished = true;
-      return;
-    }
-
-    if (nextStory < 0 || nextStory >= this.allNodes.length) {
-      console.error('Invalid nextStory index:', {
-        nextStory,
-        totalNodes: this.allNodes.length,
-        completedStories,
-      });
-      return;
-    }
-
-    const currentStoryNode = this.allNodes[nextStory];
-    if (!currentStoryNode) {
-      console.error('currentStoryNode is undefined at index:', nextStory);
-      return;
-    }
-
+    const currentStoryNode = storyModel.getAllNodes()[nextStory];
     this.storyNode = currentStoryNode;
     this.lessonUrl = this.getStorySummaryLessonUrl(
       storyModel.getClassroomUrlFragment(),

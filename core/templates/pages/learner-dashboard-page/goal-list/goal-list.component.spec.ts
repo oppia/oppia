@@ -27,6 +27,7 @@ import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
 import {StorySummary} from 'domain/story/story-summary.model';
 import {StoryNode} from 'domain/story/story-node.model';
+import {ChapterProgressLoaderService} from 'services/chapter-progress-loader.service';
 
 describe('GoalListComponent', () => {
   let component: GoalListComponent;
@@ -621,11 +622,6 @@ describe('GoalListComponent', () => {
   });
 
   describe('getChapterProgress', () => {
-    interface ChapterProgressLoaderService {
-      getLessonProgress: (explorationId: string) => number | null;
-      computeLessonProgress: (explorationId: string) => number;
-    }
-
     let chapterProgressLoaderService: jasmine.SpyObj<ChapterProgressLoaderService>;
 
     beforeEach(() => {

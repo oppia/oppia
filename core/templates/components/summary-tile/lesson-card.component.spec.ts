@@ -319,6 +319,41 @@ describe('LessonCardComponent', () => {
     );
   });
 
+  it('should log an error to the console if initialization fails', async () => {
+    const consoleErrorSpy = spyOn(console, 'error');
+    const mockError = new Error('Mock initialization failure');
+
+    const storySummary = new StorySummary(
+      'id',
+      'title',
+      'description',
+      'topic_id',
+      'topic_name',
+      'topic_url_fragment',
+      'classroom_url_fragment',
+      'story_url_fragment',
+      'thumbnail_filename',
+      'thumbnail_bg_color',
+      [],
+      [],
+      true,
+      1,
+      'note_to_reviewer'
+    );
+    component.story = storySummary;
+
+    spyOn(component, 'setStorySummary').and.callFake(async () => {
+      throw mockError;
+    });
+
+    await component.ngOnInit();
+
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      'Error initializing lesson card:',
+      mockError
+    );
+  });
+
   it('should set story to CollectionSummary and its non-url values to the respective fields', fakeAsync(() => {
     component.story = CollectionSummary.createFromBackendDict(sampleCollection);
 
