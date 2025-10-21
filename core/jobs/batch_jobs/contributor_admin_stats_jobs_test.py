@@ -1712,6 +1712,39 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
             ]
         )
 
+    def test_skip_generation_if_users_are_deleted(self) -> None:
+        suggestion_models.GeneralSuggestionModel(
+            id=1,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id=self.target_id_2,
+            target_version_at_submission=self.target_version_at_submission,
+            status=suggestion_models.STATUS_ACCEPTED,
+            author_id='pid_1',
+            final_reviewer_id='reviewer_2',
+            change_cmd=self.change_cmd,
+            score_category=self.score_category,
+            language_code='hi',
+            edited_by_reviewer=True,
+        ).put()
+
+        suggestion_models.GeneralSuggestionModel(
+            id=2,
+            suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            target_type=feconf.ENTITY_TYPE_SKILL,
+            target_id=self.target_id,
+            target_version_at_submission=self.target_version_at_submission,
+            status=suggestion_models.STATUS_IN_REVIEW,
+            author_id='pid_2',
+            final_reviewer_id='reviewer_2',
+            change_cmd=self.change_cmd,
+            score_category=self.score_category,
+            language_code=None,
+            edited_by_reviewer=False,
+        ).put()
+
+        self.assert_job_output_is_empty()
+
 
 class AuditGenerateContributorAdminStatsJobTests(ContributorDashboardTest):
 
@@ -1898,6 +1931,39 @@ class AuditGenerateContributorAdminStatsJobTests(ContributorDashboardTest):
             ]
         )
 
+    def test_skip_audit_if_users_are_deleted(self) -> None:
+        suggestion_models.GeneralSuggestionModel(
+            id=1,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id=self.target_id_2,
+            target_version_at_submission=self.target_version_at_submission,
+            status=suggestion_models.STATUS_ACCEPTED,
+            author_id='pid_1',
+            final_reviewer_id='reviewer_2',
+            change_cmd=self.change_cmd,
+            score_category=self.score_category,
+            language_code='hi',
+            edited_by_reviewer=True,
+        ).put()
+
+        suggestion_models.GeneralSuggestionModel(
+            id=2,
+            suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            target_type=feconf.ENTITY_TYPE_SKILL,
+            target_id=self.target_id,
+            target_version_at_submission=self.target_version_at_submission,
+            status=suggestion_models.STATUS_IN_REVIEW,
+            author_id='pid_2',
+            final_reviewer_id='reviewer_2',
+            change_cmd=self.change_cmd,
+            score_category=self.score_category,
+            language_code=None,
+            edited_by_reviewer=False,
+        ).put()
+
+        self.assert_job_output_is_empty()
+
 
 class AuditAndLogIncorretDataInContributorAdminStatsJobTests(
     ContributorDashboardTest
@@ -2043,7 +2109,6 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
     JOB_CLASS = contributor_admin_stats_jobs.ValidateTotalContributionStatsJob
 
     def test_empty_storage(self) -> None:
-        # No models at all → job should emit nothing.
         self.assert_job_output_is_empty()
 
     def test_successful_validation_emits_one_translation_and_one_question(
@@ -2053,7 +2118,6 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
         # kinds.
         models_to_put: List[Any] = []
 
-        # 1) TopicModel.
         topic = self.create_model(
             topic_models.TopicModel,
             id=self.TOPIC_ID,
@@ -2073,7 +2137,6 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
         )
         models_to_put.append(topic)
 
-        # 2) TranslationContributionStatsModel.
         contrib = self.create_model(
             suggestion_models.TranslationContributionStatsModel,
             id=1,
@@ -2114,7 +2177,6 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
         skill_opportunity_model_1.update_timestamps()
         models_to_put.append(skill_opportunity_model_1)
 
-        # 3) Two GeneralSuggestionModels for translation.
         for status, edited in [
             ('accepted', False),
             ('accepted', True),
@@ -2137,7 +2199,6 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
             )
             models_to_put.append(sugg)
 
-        # 4) TranslationSubmitterTotalContributionStatsModel.
         total = self.create_model(
             suggestion_models.TranslationSubmitterTotalContributionStatsModel,
             id=f'{self.LANGUAGE_CODE}.{self.CONTRIBUTOR_USER_ID}',
@@ -2164,7 +2225,6 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
         total.update_timestamps()
         models_to_put.append(total)
 
-        # 5) QuestionContributionStatsModel.
         q_contrib = self.create_model(
             suggestion_models.QuestionContributionStatsModel,
             id=2,
@@ -2179,7 +2239,6 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
         q_contrib.update_timestamps()
         models_to_put.append(q_contrib)
 
-        # 6) Two GeneralSuggestionModels for questions.
         for status, edited in [
             ('accepted', False),
             ('accepted', True),
@@ -2202,7 +2261,6 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
             )
             models_to_put.append(qsugg)
 
-        # 7) QuestionSubmitterTotalContributionStatsModel.
         q_total = self.create_model(
             suggestion_models.QuestionSubmitterTotalContributionStatsModel,
             id=self.CONTRIBUTOR_USER_ID,
@@ -2225,10 +2283,8 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
         q_total.update_timestamps()
         models_to_put.append(q_total)
 
-        # 8) Persist everything at once.
         self.put_multi(models_to_put)
 
-        # 9) Run and verify one SUCCESS line per model type.
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult(
@@ -2240,6 +2296,102 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
             ]
         )
 
+    def test_skip_validation_if_users_are_deleted(
+        self,
+    ) -> None:
+        # Here we use type Any because this list contains models of various
+        # kinds.
+        models_to_put: List[Any] = []
+
+        topic = self.create_model(
+            topic_models.TopicModel,
+            id=self.TOPIC_ID,
+            name='t',
+            canonical_name='t',
+            description='d',
+            story_reference_schema_version=1,
+            uncategorized_skill_ids=['skill1'],
+            subtopic_schema_version=1,
+            next_subtopic_id=1,
+            language_code='en',
+            url_fragment='t',
+            canonical_story_references=[
+                {'story_id': 'story1', 'story_is_published': False}
+            ],
+            page_title_fragment_for_web='fragm',
+        )
+        models_to_put.append(topic)
+
+        exp_opportunity_model_x = self.create_model(
+            opportunity_models.ExplorationOpportunitySummaryModel,
+            id='expX',
+            topic_id='topicx',
+            chapter_title='irelevant',
+            content_count=1,
+            story_id='storyx',
+            story_title='story title',
+            topic_name='namex',
+        )
+        exp_opportunity_model_x.update_timestamps()
+        models_to_put.append(exp_opportunity_model_x)
+
+        skill_opportunity_model_1 = self.create_model(
+            opportunity_models.SkillOpportunityModel,
+            id='expY',
+            skill_description='A skill description',
+            question_count=1,
+        )
+        skill_opportunity_model_1.update_timestamps()
+        models_to_put.append(skill_opportunity_model_1)
+
+        for status, edited in [
+            ('accepted', False),
+            ('accepted', True),
+            ('rejected', False),
+        ]:
+            sugg = self.create_model(
+                suggestion_models.GeneralSuggestionModel,
+                suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                target_type=feconf.ENTITY_TYPE_EXPLORATION,
+                target_id='expX',
+                target_version_at_submission=1,
+                status=status,
+                author_id="pid_1",
+                final_reviewer_id='rev',
+                change_cmd={},
+                score_category='translation.X',
+                language_code=self.LANGUAGE_CODE,
+                edited_by_reviewer=edited,
+                created_on=datetime.datetime.utcnow(),
+            )
+            models_to_put.append(sugg)
+
+        for status, edited in [
+            ('accepted', False),
+            ('accepted', True),
+            ('rejected', False),
+        ]:
+            qsugg = self.create_model(
+                suggestion_models.GeneralSuggestionModel,
+                suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                target_type=feconf.ENTITY_TYPE_EXPLORATION,
+                target_id='expY',
+                target_version_at_submission=1,
+                status=status,
+                author_id="pid_1",
+                final_reviewer_id='rev',
+                change_cmd={},
+                score_category='question.X',
+                language_code=None,
+                edited_by_reviewer=edited,
+                created_on=datetime.datetime.utcnow(),
+            )
+            models_to_put.append(qsugg)
+
+        self.put_multi(models_to_put)
+
+        self.assert_job_output_is_empty()
+
     def test_failed_validation_for_translation_triggers_all_failure_conditions(
         self,
     ) -> None:
@@ -2247,7 +2399,6 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
         # kinds.
         models_to_put: List[Any] = []
 
-        # 1) Create a TranslationContributionStatsModel for topic 'topic1'.
         bad_contrib = self.create_model(
             suggestion_models.TranslationContributionStatsModel,
             contributor_user_id='user123',
@@ -2291,7 +2442,6 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
         exp_opportunity_model_2.update_timestamps()
         models_to_put.append(exp_opportunity_model_2)
 
-        # 2) Create two GeneralSuggestionModels with mixed outcomes.
         gs1 = self.create_model(
             suggestion_models.GeneralSuggestionModel,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -2328,7 +2478,6 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
         )
         models_to_put.extend([gs1, gs2])
 
-        # 3) Build a TranslationSubmitterTotalContributionStatsModel.
         bad_total = self.create_model(
             suggestion_models.TranslationSubmitterTotalContributionStatsModel,
             id='zz.user123',
@@ -2351,17 +2500,13 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
         bad_total.update_timestamps()
         models_to_put.append(bad_total)
 
-        # 4) Persist everything at once.
         self.put_multi(models_to_put)
 
-        # 5) Run the job and assert that it flags exactly one invalid total.
         self.assert_job_output_is(
             [
-                # Count of invalid totals.
                 job_run_result.JobRunResult(
                     stdout='Invalid Total Translation Submitter Models FAILED: 1'
                 ),
-                # The detailed validation error log itself.
                 job_run_result.JobRunResult(
                     stderr=(
                         'ERROR: \"\nValidation failed for '

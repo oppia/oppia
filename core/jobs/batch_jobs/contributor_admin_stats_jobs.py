@@ -196,8 +196,6 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
             shortlisted_question_suggestions
             | 'Group by user'
             >> beam.Map(lambda stats: (stats.author_id, stats))
-            | 'Group by user'
-            >> beam.Map(lambda stats: (stats.author_id, stats))
         )
 
         translation_contribution_stats = (
@@ -274,6 +272,8 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
                     value['translation_general_suggestions_stats'],
                 )
             )
+            | 'Filter total translation contribution stats'
+            >> beam.Filter(lambda res: res is not None)
         )
 
         translation_submitter_total_stats_models = (
@@ -314,6 +314,8 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
                     value['question_general_suggestions_stats'],
                 )
             )
+            | 'Filter total question contribution stats'
+            >> beam.Filter(lambda res: res is not None)
         )
 
         question_submitter_total_stats_models = (
@@ -423,8 +425,11 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         translation_general_suggestions_stats: Iterable[
             suggestion_models.GeneralSuggestionModel
         ],
-    ) -> result.Result[
-        suggestion_models.TranslationSubmitterTotalContributionStatsModel, str
+    ) -> Optional[
+        result.Result[
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel,
+            str,
+        ]
     ]:
         """Transforms TranslationContributionStatsModel and
         GeneralSuggestionModel to
@@ -449,6 +454,11 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         # The key for sorting is defined separately because of a mypy bug.
         # A [no-any-return] is thrown if key is defined in the sort() method
         # instead. Reference: https://github.com/python/mypy/issues/9590.
+        language_code, contributor_user_id = keys
+        if contributor_user_id[:4] == 'pid_':
+            # No need to generate total contribution stats if user is deleted.
+            return None
+
         by_created_on = lambda m: m.created_on
         translation_general_suggestions_sorted_stats = sorted(
             translation_general_suggestions_stats, key=by_created_on
@@ -483,7 +493,6 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
             counts['accepted'] + counts['accepted_with_edits']
         ) - (2 * (counts['rejected']))
 
-        language_code, contributor_user_id = keys
         entity_id = '%s.%s' % (language_code, contributor_user_id)
 
         for stat in translation_contribution_stats:
@@ -664,8 +673,10 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         question_general_suggestions_stats: Iterable[
             suggestion_models.GeneralSuggestionModel
         ],
-    ) -> result.Result[
-        suggestion_models.QuestionSubmitterTotalContributionStatsModel, str
+    ) -> Optional[
+        result.Result[
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel, str
+        ]
     ]:
         """Transforms QuestionContributionStatsModel and GeneralSuggestionModel
         to QuestionSubmitterTotalContributionStatsModel.
@@ -687,6 +698,10 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         # The key for sorting is defined separately because of a mypy bug.
         # A [no-any-return] is thrown if key is defined in the sort() method
         # instead. Reference: https://github.com/python/mypy/issues/9590.
+        if contributor_user_id[:4] == 'pid_':
+            # No need to generate total contribution stats if user is deleted.
+            return None
+
         by_created_on = lambda m: m.created_on
         question_general_suggestions_sorted_stats = sorted(
             question_general_suggestions_stats, key=by_created_on
@@ -1513,6 +1528,8 @@ class ValidateTotalContributionStatsJob(base_jobs.JobBase):
                     suggestion_model_name='Translation GeneralSuggestionModel',
                 )
             )
+            | 'Filter non-none translation groups'
+            >> beam.Filter(lambda r: r is not None)
         )
 
         valid_translation_groups = (
@@ -1554,6 +1571,8 @@ class ValidateTotalContributionStatsJob(base_jobs.JobBase):
                     suggestion_model_name='Question GeneralSuggestionModel',
                 )
             )
+            | 'Filter non-none question groups'
+            >> beam.Filter(lambda r: r is not None)
         )
 
         valid_question_groups = (
@@ -1772,7 +1791,7 @@ class ValidateTotalContributionStatsJob(base_jobs.JobBase):
                     ],
                 ],
             ],
-        ) -> result.Result[Union[tuple, str]]:
+        ) -> Optional[result.Result[Union[tuple, str]]]:
             """Check for missing total contribution stats models.
 
             Args:
@@ -1789,6 +1808,9 @@ class ValidateTotalContributionStatsJob(base_jobs.JobBase):
                 logs if the group contains no total model.
             """
             key, group = kv
+            if key[0][:4] == 'pid_' or key[:4] == 'pid_':
+                # Skip the check for deleted users.
+                return None
 
             # Here we use cast because we are narrowing down the type of
             # totals to interpret fallback alike.
