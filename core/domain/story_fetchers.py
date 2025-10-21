@@ -568,8 +568,8 @@ def get_user_progress_in_story_chapters(
                 visited_checkpoints = (
                     all_checkpoints.index(most_recently_visited_checkpoint) + 1
                 )
-        story_id = None
-        node_id = None
+        story_id: Optional[str] = None
+        node_id: Optional[str] = None
         for story in all_valid_stories:
             for node in story.story_contents.nodes:
                 if node.exploration_id == exp_id:
