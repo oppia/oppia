@@ -312,7 +312,6 @@ describe('LessonCardComponent', () => {
     fixture = TestBed.createComponent(LessonCardComponent);
     component = fixture.componentInstance;
 
-    // Default mock implementation
     chapterProgressLoaderService.getLessonProgress.and.returnValue(0);
     chapterProgressLoaderService.computeLessonProgress.and.returnValue(0);
     chapterProgressLoaderService.loadChapterProgressForStory.and.returnValue(
@@ -348,7 +347,6 @@ describe('LessonCardComponent', () => {
   });
 
   it('should set story to complete StorySummary and its non-url values to the respective fields', fakeAsync(() => {
-    // Mock 100% progress for completed story
     chapterProgressLoaderService.computeLessonProgress.and.returnValue(100);
 
     component.story = StorySummary.createFromBackendDict(sampleTopic);
@@ -365,7 +363,6 @@ describe('LessonCardComponent', () => {
   }));
 
   it('should set story to incomplete StorySummary and its non-url values to the respective fields', fakeAsync(() => {
-    // Mock 50% progress for incomplete story
     chapterProgressLoaderService.computeLessonProgress.and.returnValue(50);
 
     component.story = StorySummary.createFromBackendDict(incompleteTopic);
@@ -411,7 +408,6 @@ describe('LessonCardComponent', () => {
   }));
 
   it('should set story to StorySummary and not throw error for undefined topic_url_fragment', fakeAsync(() => {
-    // Updated test: should not throw error but set fallback URL
     component.story = StorySummary.createFromBackendDict(undefinedTopic);
     fixture.detectChanges();
     tick();
