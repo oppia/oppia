@@ -826,3 +826,126 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(SystemExit, '^1$'):
             with self.swap_mock_set_constants_to_default:
                 run_e2e_tests.main(args=['--mobile', '--suite', 'collections'])
+
+    def test_run_tests_skips_emulator_block_when_emulator_mode_false(
+        self,
+    ) -> None:
+        class FakeProc:
+            """Fake process that exits immediately with no output."""
+
+            def __init__(self):
+                self.stdout = self
+                self.returncode = 0
+
+            def readline(self) -> bytes:
+                return b''  # simulate no output
+
+            def poll(self) -> int:
+                return self.returncode  # terminate immediately
+
+        # Patch EMULATOR_MODE to False so the block is skipped
+        with self.swap(run_e2e_tests.constants, 'EMULATOR_MODE', False):
+            self.exit_stack.enter_context(
+                self.swap(
+                    common, 'is_oppia_server_already_running', lambda *_: False
+                )
+            )
+            self.exit_stack.enter_context(
+                self.swap(
+                    run_e2e_tests,
+                    'install_third_party_libraries',
+                    lambda _: None,
+                )
+            )
+            self.exit_stack.enter_context(
+                self.swap(build, 'build_js_files', lambda *_, **__: None)
+            )
+            # Mock all servers
+            for server in [
+                'managed_redis_server',
+                'managed_elasticsearch_dev_server',
+                'managed_dev_appserver',
+                'managed_webdriverio_server',
+                'managed_cloud_datastore_emulator',
+            ]:
+                self.exit_stack.enter_context(
+                    self.swap(
+                        servers,
+                        server,
+                        lambda *a, **k: contextlib.nullcontext(FakeProc()),
+                    )
+                )
+
+            args = run_e2e_tests._PARSER.parse_args(args=[])
+            with self.swap_mock_set_constants_to_default:
+                output_lines, return_code = run_e2e_tests.run_tests(args)
+
+        self.assertEqual(output_lines, [])
+        self.assertEqual(return_code, 0)
+
+    def test_run_tests_loops_until_process_ends(self) -> None:
+        class FakeStdout:
+            def __init__(self):
+                # b'' at the end signals process finished
+                self.lines = [b'line1\n', b'line2\n', b'']
+                self.index = 0
+
+            def readline(self) -> bytes:
+                if self.index < len(self.lines):
+                    line = self.lines[self.index]
+                    self.index += 1
+                    return line
+                return b''
+
+        class FakeProc:
+            def __init__(self):
+                self.stdout = FakeStdout()
+                self.returncode = 0
+                self.poll_call_count = 0
+
+            def poll(self) -> int | None:
+                # Return None for first two calls, then 0
+                self.poll_call_count += 1
+                return None if self.poll_call_count < 3 else 0
+
+        fake_proc = FakeProc()
+
+        with self.swap(run_e2e_tests.constants, 'EMULATOR_MODE', False):
+            self.exit_stack.enter_context(
+                self.swap(
+                    common, 'is_oppia_server_already_running', lambda *_: False
+                )
+            )
+            self.exit_stack.enter_context(
+                self.swap(
+                    run_e2e_tests,
+                    'install_third_party_libraries',
+                    lambda _: None,
+                )
+            )
+            self.exit_stack.enter_context(
+                self.swap(build, 'build_js_files', lambda *_, **__: None)
+            )
+
+            for server in [
+                'managed_redis_server',
+                'managed_elasticsearch_dev_server',
+                'managed_dev_appserver',
+                'managed_webdriverio_server',
+                'managed_cloud_datastore_emulator',
+            ]:
+                self.exit_stack.enter_context(
+                    self.swap(
+                        servers,
+                        server,
+                        lambda *a, **k: contextlib.nullcontext(fake_proc),
+                    )
+                )
+
+            args = run_e2e_tests._PARSER.parse_args(args=[])
+            with self.swap_mock_set_constants_to_default:
+                output_lines, return_code = run_e2e_tests.run_tests(args)
+
+        expected_lines = [b'line1', b'line2']
+        self.assertEqual(output_lines, expected_lines)
+        self.assertEqual(return_code, 0)

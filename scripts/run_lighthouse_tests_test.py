@@ -782,3 +782,199 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                                             '--record_screen',
                                         ]
                                     )
+
+    def test_main_runs_with_non_dockerized_env_and_accessibility_mode(
+        self,
+    ) -> None:
+        mock_args = ['--mode', 'accessibility']
+
+        mock_entities = {'topic_id': '123'}
+        mock_pages_config = {
+            'topic': 'http://localhost:8181/topic_editor/{{topic_id}}'
+        }
+
+        def mock_run_puppeteer_script(record: bool = False) -> dict[str, str]:
+            self.print_arr.append('run_lighthouse_puppeteer_script_called')
+            return mock_entities
+
+        def mock_get_lighthouse_pages_config() -> dict[str, str]:
+            self.print_arr.append('get_lighthouse_pages_config_called')
+            return mock_pages_config
+
+        def mock_run_lighthouse_checks(lighthouse_mode: str) -> None:
+            self.print_arr.append('run_lighthouse_checks_called')
+
+        swap_build_main = self.swap(build, 'main', lambda *a, **k: None)
+        swap_ng_compile = self.swap(common, 'run_ng_compilation', lambda: None)
+        swap_webpack = self.swap(
+            run_lighthouse_tests, 'run_webpack_compilation', lambda: None
+        )
+        swap_redis = self.swap(
+            servers,
+            'managed_redis_server',
+            lambda: MockCompilerContextManager(),
+        )
+        swap_elasticsearch = self.swap(
+            servers,
+            'managed_elasticsearch_dev_server',
+            lambda: MockCompilerContextManager(),
+        )
+        swap_devserver = self.swap(
+            servers,
+            'managed_dev_appserver',
+            lambda *a, **k: MockCompilerContextManager(),
+        )
+        swap_env = self.swap(feconf, 'OPPIA_IS_DOCKERIZED', False)
+        swap_constants = self.swap(constants, 'EMULATOR_MODE', False)
+        swap_run_puppeteer = self.swap(
+            run_lighthouse_tests,
+            'run_lighthouse_puppeteer_script',
+            mock_run_puppeteer_script,
+        )
+        swap_get_pages_config = self.swap(
+            run_lighthouse_tests,
+            'get_lighthouse_pages_config',
+            mock_get_lighthouse_pages_config,
+        )
+        swap_run_lh_checks = self.swap(
+            run_lighthouse_tests,
+            'run_lighthouse_checks',
+            mock_run_lighthouse_checks,
+        )
+
+        with (
+            self.print_swap,
+            swap_build_main,
+            swap_ng_compile,
+            swap_webpack,
+            swap_redis,
+            swap_elasticsearch,
+            swap_devserver,
+            swap_env,
+            swap_constants,
+            swap_run_puppeteer,
+            swap_get_pages_config,
+            swap_run_lh_checks,
+        ):
+            run_lighthouse_tests.main(mock_args)
+
+        self.assertIn('run_lighthouse_puppeteer_script_called', self.print_arr)
+        self.assertIn('get_lighthouse_pages_config_called', self.print_arr)
+        self.assertIn('run_lighthouse_checks_called', self.print_arr)
+
+    def test_main_runs_with_dockerized_env_and_performance_mode(self) -> None:
+        mock_args = ['--mode', 'performance']
+
+        mock_entities = {'story_id': '55'}
+        mock_pages_config = {
+            'story': 'http://localhost:8181/story_editor/{{story_id}}'
+        }
+
+        def mock_run_puppeteer_script(record: bool = False) -> dict[str, str]:
+            self.print_arr.append('run_lighthouse_puppeteer_script_called')
+            return mock_entities
+
+        def mock_get_lighthouse_pages_config() -> dict[str, str]:
+            self.print_arr.append('get_lighthouse_pages_config_called')
+            return mock_pages_config
+
+        def mock_run_lighthouse_checks(lighthouse_mode: str) -> None:
+            self.print_arr.append('run_lighthouse_checks_called')
+
+        swap_env = self.swap(feconf, 'OPPIA_IS_DOCKERIZED', True)
+        swap_build_main = self.swap(
+            build,
+            'main',
+            lambda *a, **k: (_ for _ in ()).throw(
+                Exception('build_should_not_run')
+            ),
+        )
+        swap_redis = self.swap(
+            servers,
+            'managed_redis_server',
+            lambda: (_ for _ in ()).throw(Exception('redis_should_not_run')),
+        )
+        swap_run_puppeteer = self.swap(
+            run_lighthouse_tests,
+            'run_lighthouse_puppeteer_script',
+            mock_run_puppeteer_script,
+        )
+        swap_get_pages_config = self.swap(
+            run_lighthouse_tests,
+            'get_lighthouse_pages_config',
+            mock_get_lighthouse_pages_config,
+        )
+        swap_run_lh_checks = self.swap(
+            run_lighthouse_tests,
+            'run_lighthouse_checks',
+            mock_run_lighthouse_checks,
+        )
+        swap_constants = self.swap(constants, 'EMULATOR_MODE', False)
+
+        with (
+            self.print_swap,
+            swap_env,
+            swap_constants,
+            swap_build_main,
+            swap_redis,
+            swap_run_puppeteer,
+            swap_get_pages_config,
+            swap_run_lh_checks,
+        ):
+            run_lighthouse_tests.main(mock_args)
+
+        self.assertIn('run_lighthouse_puppeteer_script_called', self.print_arr)
+        self.assertIn('get_lighthouse_pages_config_called', self.print_arr)
+        self.assertIn('run_lighthouse_checks_called', self.print_arr)
+        self.assertNotIn('build_should_not_run', self.print_arr)
+        self.assertNotIn('redis_should_not_run', self.print_arr)
+
+    def test_run_lighthouse_puppeteer_script_creates_directory_when_not_exists(
+        self,
+    ) -> None:
+        mock_dir_path = os.path.join(os.getcwd(), '..', 'lhci-puppeteer-video')
+
+        calls: list[str] = []
+
+        def mock_exists(path: str) -> bool:
+            if path == mock_dir_path:
+                calls.append('exists_checked')
+                return False
+            return True
+
+        def mock_mkdir(path: str) -> None:
+            if path == mock_dir_path:
+                calls.append('mkdir_called')
+
+        class MockProcess:
+            def __init__(self, *_, **__):
+                self.returncode = 0
+
+            def communicate(self):
+                return (b"topic:123\n", b"")
+
+        swap_exists = self.swap(os.path, 'exists', mock_exists)
+        swap_mkdir = self.swap(os, 'mkdir', mock_mkdir)
+        swap_popen = self.swap(subprocess, 'Popen', MockProcess)
+        swap_get_entity = self.swap(
+            run_lighthouse_tests,
+            'get_entity',
+            lambda line: ('topic', '123') if 'topic' in line else None,
+        )
+        swap_node_bin = self.swap(common, 'NODE_BIN_PATH', '/usr/bin/node')
+
+        with (
+            self.print_swap,
+            swap_exists,
+            swap_mkdir,
+            swap_popen,
+            swap_get_entity,
+            swap_node_bin,
+        ):
+            entities = run_lighthouse_tests.run_lighthouse_puppeteer_script(
+                record=True
+            )
+
+        self.assertIn('exists_checked', calls)
+        self.assertIn('mkdir_called', calls)
+        self.assertEqual(entities, {'topic': '123'})

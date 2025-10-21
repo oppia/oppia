@@ -23,10 +23,12 @@ import os
 import shutil
 import subprocess
 import sys
+import argparse
 
 from core import feconf
 from core.tests import test_utils
 from scripts import common
+from unittest import mock
 
 from typing import Dict, List, Optional, Tuple
 
@@ -784,3 +786,126 @@ class PrePushHookTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.print_arr, ['Python dependencies consistency check succeeded.']
         )
+
+    def test_changed_branch_does_not_switch_when_same_branch(self):
+        with mock.patch.object(
+            subprocess, 'check_output', autospec=True
+        ) as mock_check_output:
+            mock_check_output.return_value = 'feature-branch'
+
+            cb = pre_push_hook.ChangedBranch('feature-branch')
+
+            self.assertTrue(cb.is_same_branch)
+            self.assertEqual(cb.old_branch, 'feature-branch')
+            self.assertEqual(cb.new_branch, 'feature-branch')
+
+            mock_check_output.reset_mock()
+
+            with cb:
+                pass
+
+            mock_check_output.assert_not_called()
+
+    def test_main_skips_linter_when_files_to_lint_is_empty(self):
+        with mock.patch.object(
+            argparse.ArgumentParser, 'parse_args'
+        ) as mock_parse_args, mock.patch.object(
+            pre_push_hook.git_changes_utils,
+            'get_local_git_repository_remote_name',
+        ) as mock_get_remote_name, mock.patch.object(
+            pre_push_hook.git_changes_utils, 'get_refs'
+        ) as mock_get_refs, mock.patch.object(
+            pre_push_hook.git_changes_utils, 'get_changed_files'
+        ) as mock_get_changed_files, mock.patch.object(
+            pre_push_hook, 'has_uncommitted_files'
+        ) as mock_has_uncommitted_files, mock.patch.object(
+            pre_push_hook, 'check_for_backend_python_library_inconsistencies'
+        ) as mock_check_libs, mock.patch.object(
+            pre_push_hook, 'start_linter'
+        ) as mock_start_linter, mock.patch.object(
+            pre_push_hook, 'execute_mypy_checks'
+        ) as mock_mypy, mock.patch.object(
+            pre_push_hook, 'run_script_and_get_returncode'
+        ) as mock_run_script, mock.patch(
+            'sys.exit'
+        ) as mock_exit:
+
+            mock_parse_args.return_value = mock.Mock(
+                install=False, remote=None, url=None
+            )
+            mock_get_remote_name.return_value = 'origin'
+            mock_get_refs.return_value = 'dummy_refs'
+            mock_get_changed_files.return_value = {
+                'feature-branch': (['modified1.py'], [])
+            }
+            mock_has_uncommitted_files.return_value = False
+            mock_check_libs.return_value = None
+            mock_start_linter.return_value = 0
+            mock_mypy.return_value = 0
+            mock_run_script.return_value = 0
+
+            mock_changed_branch = mock.MagicMock()
+            mock_changed_branch.__enter__.return_value = None
+            mock_changed_branch.__exit__.return_value = None
+            with mock.patch.object(
+                pre_push_hook, 'ChangedBranch', return_value=mock_changed_branch
+            ):
+                # Act
+                pre_push_hook.main([])
+
+            mock_start_linter.assert_not_called()
+            mock_exit.assert_not_called()
+            mock_run_script.assert_called()
+
+    def test_main_skips_mypy_when_dockerized(self):
+        with mock.patch(
+            'scripts.pre_push_hook.argparse.ArgumentParser.parse_args'
+        ) as mock_parse_args, mock.patch(
+            'scripts.pre_push_hook.git_changes_utils.get_changed_files'
+        ) as mock_get_changed_files, mock.patch(
+            'scripts.pre_push_hook.has_uncommitted_files', return_value=False
+        ), mock.patch(
+            'scripts.pre_push_hook.ChangedBranch'
+        ) as mock_changed_branch, mock.patch(
+            'scripts.pre_push_hook.start_linter', return_value=0
+        ) as mock_start_linter, mock.patch(
+            'scripts.pre_push_hook.execute_mypy_checks'
+        ) as mock_execute_mypy, mock.patch(
+            'scripts.pre_push_hook.run_script_and_get_returncode',
+            return_value=0,
+        ), mock.patch(
+            'scripts.pre_push_hook.does_diff_include_ts_files',
+            return_value=False,
+        ), mock.patch(
+            'scripts.pre_push_hook.does_diff_include_ci_config_or_test_files',
+            return_value=False,
+        ), mock.patch(
+            'scripts.pre_push_hook.git_changes_utils.get_js_or_ts_files_from_diff',
+            return_value=[],
+        ), mock.patch(
+            'scripts.pre_push_hook.git_changes_utils.get_python_dot_test_files_from_diff',
+            return_value=[],
+        ), mock.patch(
+            'scripts.pre_push_hook.check_for_backend_python_library_inconsistencies'
+        ), mock.patch.object(
+            feconf, 'OPPIA_IS_DOCKERIZED', new=True
+        ):
+
+            # Simulate command-line arguments
+            mock_parse_args.return_value.remote = None
+            mock_parse_args.return_value.url = None
+            mock_parse_args.return_value.install = False
+
+            # Simulate changed files to lint
+            mock_get_changed_files.return_value = {
+                'feature-branch': (['file1.py'], ['file1.py'])
+            }
+
+            # Call main
+            pre_push_hook.main()
+
+            # Ensure MyPy check was skipped
+            mock_execute_mypy.assert_not_called()
+
+            # Ensure linter ran normally
+            mock_start_linter.assert_called_once_with(['file1.py'])
