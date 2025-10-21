@@ -109,6 +109,11 @@ export class ChapterProgressLoaderService {
     const totalCheckpoints = chapterProgress.totalCheckpoints;
     const visitedCheckpoints = chapterProgress.visitedCheckpoints - 1;
 
+    if (chapterProgress.isChapterComplete) {
+      this.lessonProgress[explorationId] = 100;
+      return 100;
+    }
+
     const progress =
       totalCheckpoints > 0
         ? Math.floor((visitedCheckpoints / totalCheckpoints) * 100)
@@ -130,5 +135,10 @@ export class ChapterProgressLoaderService {
    */
   getAllProgress(): LessonProgressData {
     return this.lessonProgress;
+  }
+
+  isChapterCompleted(explorationId: string): boolean {
+    const chapterProgress = this.chapterProgressByExpId.get(explorationId);
+    return chapterProgress?.isChapterComplete ?? false;
   }
 }
