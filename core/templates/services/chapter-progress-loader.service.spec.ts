@@ -31,9 +31,9 @@ describe('ChapterProgressLoaderService', () => {
   let userService: jasmine.SpyObj<UserService>;
 
   const mockChapterProgress: ChapterProgressSummary = {
-    totalCheckpoints: 5,
-    visitedCheckpoints: 3,
-    isChapterComplete: false,
+    _totalCheckpointsCount: 5,
+    _visitedCheckpointsCount: 3,
+    _isChapterComplete: false,
   };
 
   beforeEach(() => {

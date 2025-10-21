@@ -40,7 +40,7 @@ export class ChapterProgressLoaderService {
   ) {}
 
   /**
-   * Fetch and cache chapter progress for a single story's chapters.
+   * Fetch and cache chapter progress for a story's chapters.
    * This loads the checkpoint progress data from the backend.
    * @param storyId - The story ID
    * @param explorationIds - Array of exploration IDs in this story (chapters)
