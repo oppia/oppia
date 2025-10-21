@@ -621,7 +621,12 @@ describe('GoalListComponent', () => {
   });
 
   describe('getChapterProgress', () => {
-    let chapterProgressLoaderService: jasmine.SpyObj<any>;
+    interface ChapterProgressLoaderService {
+      getLessonProgress: (explorationId: string) => number | null;
+      computeLessonProgress: (explorationId: string) => number;
+    }
+
+    let chapterProgressLoaderService: jasmine.SpyObj<ChapterProgressLoaderService>;
 
     beforeEach(() => {
       chapterProgressLoaderService = jasmine.createSpyObj(
