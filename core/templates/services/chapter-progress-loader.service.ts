@@ -107,7 +107,15 @@ export class ChapterProgressLoaderService {
 
     const totalCheckpoints = chapterProgress.totalCheckpoints;
     const visitedCheckpoints = chapterProgress.visitedCheckpoints - 1;
-
+    console.log(
+      'Computing progress for',
+      explorationId,
+      {
+        totalCheckpoints,
+        visitedCheckpoints,
+      },
+      chapterProgress._isChapterComplete
+    );
     if (chapterProgress.isChapterComplete) {
       this.lessonProgress[explorationId] = 100;
       return 100;

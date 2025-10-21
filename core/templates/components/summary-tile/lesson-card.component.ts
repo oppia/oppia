@@ -50,6 +50,7 @@ export class LessonCardComponent implements OnInit {
   lessonTopic!: string;
   statusIsPublished!: boolean;
   storyNode!: StoryNode;
+  allNodes!: StoryNode[];
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -60,13 +61,17 @@ export class LessonCardComponent implements OnInit {
     private chapterProgressLoaderService: ChapterProgressLoaderService
   ) {}
 
-  ngOnInit(): void {
-    if (this.story instanceof StorySummary) {
-      this.setStorySummary(this.story);
-    } else if (this.story instanceof CollectionSummary) {
-      this.setCollectionSummary(this.story);
-    } else {
-      this.setExplorationSummary(this.story);
+  async ngOnInit(): Promise<void> {
+    try {
+      if (this.story instanceof StorySummary) {
+        await this.setStorySummary(this.story);
+      } else if (this.story instanceof CollectionSummary) {
+        this.setCollectionSummary(this.story);
+      } else {
+        this.setExplorationSummary(this.story);
+      }
+    } catch (error) {
+      console.error('Error initializing lesson card:', error);
     }
   }
 
@@ -142,12 +147,41 @@ export class LessonCardComponent implements OnInit {
       }
     }
     // TODO(#18384): Returns next unplayed node from the earliest completed node. Does not account for if played out of order.
-    this.storyNode = storyModel.getAllNodes()[nextStory];
+    this.allNodes = storyModel.getAllNodes();
+    if (!this.allNodes || this.allNodes.length === 0) {
+      console.warn('Story has no nodes. Marking as completed.', {
+        storyId: storyModel.getId(),
+        storyTitle: storyModel.getTitle(),
+      });
+      this.progress = 100;
+      this.lessonUrl = '#';
+      this.title = ' ';
+      this.lessonTopic = this.topic;
+      this.statusIsPublished = true;
+      return;
+    }
+
+    if (nextStory < 0 || nextStory >= this.allNodes.length) {
+      console.error('Invalid nextStory index:', {
+        nextStory,
+        totalNodes: this.allNodes.length,
+        completedStories,
+      });
+      return;
+    }
+
+    const currentStoryNode = this.allNodes[nextStory];
+    if (!currentStoryNode) {
+      console.error('currentStoryNode is undefined at index:', nextStory);
+      return;
+    }
+
+    this.storyNode = currentStoryNode;
     this.lessonUrl = this.getStorySummaryLessonUrl(
       storyModel.getClassroomUrlFragment(),
       storyModel.getTopicUrlFragment(),
       storyModel.getUrlFragment(),
-      storyModel.getAllNodes()[nextStory]
+      currentStoryNode
     );
 
     this.title = `Chapter ${nextStory + 1}: ${storyModel.getNodeTitles()[nextStory]}`;
