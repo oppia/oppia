@@ -428,4 +428,23 @@ describe('Home tab Component', () => {
     fixture.detectChanges();
     expect(component.getTotalInProgressLessons()).toBe(4);
   });
+
+  it('should get publishedNotesCount when isSerialChapterLearnerFeature is turned ON', () => {
+    mockPlatformFeatureService.status.SerialChapterLaunchLearnerView.isEnabled =
+      true;
+    spyOn(
+      component,
+      'isSerialChapterFeatureLearnerFlagEnabled'
+    ).and.returnValue(true);
+
+    expect(component.isSerialChapterFeatureLearnerFlagEnabled()).toBeTrue();
+
+    const storySummaries =
+      component.currentGoals[0].getCanonicalStorySummaryDicts();
+    const story = storySummaries[1];
+    expect(story.getCompletedNodeTitles().length).toBeGreaterThan(0);
+    expect(story.getNodeTitles().length).toBeGreaterThan(
+      story.getCompletedNodeTitles().length
+    );
+  });
 });
