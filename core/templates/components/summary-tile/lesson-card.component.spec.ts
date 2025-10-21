@@ -323,28 +323,21 @@ describe('LessonCardComponent', () => {
     const consoleErrorSpy = spyOn(console, 'error');
     const mockError = new Error('Mock initialization failure');
 
-    const storySummary = new StorySummary(
-      'id',
-      'title',
-      'description',
-      'topic_id',
-      'topic_name',
-      'topic_url_fragment',
-      'classroom_url_fragment',
-      'story_url_fragment',
-      'thumbnail_filename',
-      'thumbnail_bg_color',
-      [],
-      [],
-      true,
-      1,
-      'note_to_reviewer',
-      null,
-      'public',
-      null,
-      1,
-      'en'
-    );
+    const storySummary = StorySummary.createFromBackendDict({
+      id: 'id',
+      title: 'title',
+      node_titles: ['node1'],
+      thumbnail_filename: 'thumb.svg',
+      thumbnail_bg_color: '#fff',
+      description: 'description',
+      story_is_published: true,
+      completed_node_titles: [],
+      url_fragment: 'story-url',
+      all_node_dicts: [],
+      topic_name: 'topic_name',
+      topic_url_fragment: 'topic_url',
+      classroom_url_fragment: 'classroom_url',
+    });
     component.story = storySummary;
 
     spyOn(component, 'setStorySummary').and.callFake(async () => {
