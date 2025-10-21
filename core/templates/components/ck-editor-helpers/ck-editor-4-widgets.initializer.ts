@@ -34,21 +34,39 @@ export interface RteComponentSpecs {
   isComplex: boolean;
   isBlockElement: boolean;
   requiresFs: boolean;
+  requiresInternet?: boolean;
   tooltip: string;
 }
 
 export interface RteHelperService {
-  createCustomizationArgDictFromAttrs: (attrs) => Record<string, string>;
+  createCustomizationArgDictFromAttrs: (
+    attrs: Record<string, unknown>
+  ) => Record<string, string>;
   getRichTextComponents: () => RteComponentSpecs[];
-  isInlineComponent: (string) => boolean;
+  isInlineComponent: (arg0: string) => boolean;
   openCustomizationModal: (
-    componentIsNewlyCreated,
-    componentId,
-    customizationArgSpecs,
-    attrsCustomizationArgsDict,
-    onSubmitCallback,
-    onDismissCallback
+    componentIsNewlyCreated: boolean,
+    componentId: string,
+    customizationArgSpecs: {
+      name: string;
+      default_value: unknown;
+      default_value_obtainable_from_highlight: boolean;
+    }[],
+    attrsCustomizationArgsDict: Record<string, unknown>,
+    onSubmitCallback: (customizationArgsDict: Record<string, unknown>) => void,
+    onDismissCallback: (widgetShouldBeRemoved: boolean) => void
   ) => void;
+}
+
+interface WidgetDefinition {
+  wrapper: CKEDITOR.dom.element;
+  data: Record<string, unknown>;
+  element: CKEDITOR.dom.element;
+  id: number;
+  initialSnapshot: unknown;
+  isReady: () => boolean;
+  setData: (key: string, value: unknown) => void;
+  editor: CKEDITOR.editor;
 }
 
 import {Injectable} from '@angular/core';
@@ -117,7 +135,7 @@ export class CkEditorInitializerService {
               inline: isInline,
               template: componentTemplate,
               draggable: false,
-              edit: function () {
+              edit: function (this: WidgetDefinition) {
                 // The following check allows the editing of the RTE components
                 // only in editor pages.
                 if (!pageContextService.canAddOrEditComponents()) {
@@ -129,7 +147,7 @@ export class CkEditorInitializerService {
                 // Save this for creating the widget later.
                 var container = this.wrapper.getParent(true);
                 var that = this;
-                var customizationArgs = {};
+                var customizationArgs: Record<string, unknown> = {};
                 customizationArgSpecs.forEach(function (spec) {
                   customizationArgs[spec.name] =
                     that.data[spec.name] || spec.default_value;
@@ -142,7 +160,7 @@ export class CkEditorInitializerService {
                   componentId,
                   customizationArgSpecs,
                   customizationArgs,
-                  function (customizationArgsDict) {
+                  function (customizationArgsDict: Record<string, unknown>) {
                     that.data.isCopied = false;
                     for (var arg in customizationArgsDict) {
                       if (customizationArgsDict.hasOwnProperty(arg)) {
@@ -179,7 +197,7 @@ export class CkEditorInitializerService {
                       editor.fire('saveSnapshot');
                     }
                   },
-                  function (widgetShouldBeRemoved) {
+                  function (widgetShouldBeRemoved: boolean) {
                     if (widgetShouldBeRemoved || that.data.isCopied) {
                       const defaultValueObtainableFromHighlight =
                         customizationArgSpecs.some(function (spec) {
@@ -246,7 +264,7 @@ export class CkEditorInitializerService {
                     tagName
                 );
               },
-              data: function () {
+              data: function (this: WidgetDefinition) {
                 var that = this;
                 // Set attributes of component according to data values.
                 customizationArgSpecs.forEach(function (spec) {
@@ -278,35 +296,39 @@ export class CkEditorInitializerService {
 
                   capital.join('');
                   const customEl = that.element.getChild(0).$;
-                  customEl[capital.join('') + 'WithValue'] =
+                  (customEl as Record<string, unknown>)[
+                    capital.join('') + 'WithValue'
+                  ] = htmlEscaperService.objToEscapedJson(
+                    that.data[spec.name] !== undefined
+                      ? that.data[spec.name]
+                      : ''
+                  );
+                  const childElement = that.element.getChild(
+                    0
+                  ) as CKEDITOR.dom.element;
+                  childElement.setAttribute(
+                    spec.name + '-with-value',
                     htmlEscaperService.objToEscapedJson(
                       that.data[spec.name] !== undefined
                         ? that.data[spec.name]
                         : ''
-                    );
-                  that.element
-                    .getChild(0)
-                    .setAttribute(
-                      spec.name + '-with-value',
-                      htmlEscaperService.objToEscapedJson(
-                        that.data[spec.name] !== undefined
-                          ? that.data[spec.name]
-                          : ''
-                      )
-                    );
+                    )
+                  );
                 });
               },
-              init: function () {
+              init: function (this: WidgetDefinition) {
                 editor.fire('lockSnapshot', {
                   dontUpdate: true,
                 });
                 var that = this;
-                that.initialSnapshot = editor.getSnapshot();
+                (
+                  that as WidgetDefinition & {initialSnapshot: unknown}
+                ).initialSnapshot = editor.getSnapshot();
                 // On init, read values from component attributes and save them.
                 customizationArgSpecs.forEach(function (spec) {
-                  var value = that.element
-                    .getChild(0)
-                    .getAttribute(spec.name + '-with-value');
+                  var value = (
+                    that.element.getChild(0) as CKEDITOR.dom.element
+                  ).getAttribute(spec.name + '-with-value');
                   if (value) {
                     that.setData(
                       spec.name,
