@@ -621,6 +621,19 @@ describe('GoalListComponent', () => {
   });
 
   describe('getChapterProgress', () => {
+    let chapterProgressLoaderService: jasmine.SpyObj<any>;
+
+    beforeEach(() => {
+      chapterProgressLoaderService = jasmine.createSpyObj(
+        'ChapterProgressLoaderService',
+        ['getLessonProgress', 'computeLessonProgress']
+      );
+      Object.defineProperty(component, 'chapterProgressLoaderService', {
+        value: chapterProgressLoaderService,
+        writable: true,
+      });
+    });
+
     it('should return 0 when explorationId is null or undefined', () => {
       const storyNode = StoryNode.createFromBackendDict({
         id: 'node_null',
@@ -648,10 +661,7 @@ describe('GoalListComponent', () => {
     it('should return progress from chapterProgressLoaderService when explorationId exists', () => {
       const storyNode = StoryNode.createFromBackendDict(sampleStoryNode);
 
-      spyOn(
-        component['chapterProgressLoaderService'],
-        'getLessonProgress'
-      ).and.returnValue(75);
+      chapterProgressLoaderService.getLessonProgress.and.returnValue(75);
 
       const progress = component.getChapterProgress(storyNode);
       expect(progress).toBe(75);
@@ -660,10 +670,7 @@ describe('GoalListComponent', () => {
     it('should return 0 when lessonProgress is null or undefined', () => {
       const storyNode = StoryNode.createFromBackendDict(sampleStoryNode);
 
-      spyOn(
-        component['chapterProgressLoaderService'],
-        'getLessonProgress'
-      ).and.returnValue(null);
+      chapterProgressLoaderService.computeLessonProgress.and.returnValue(0);
 
       const progress = component.getChapterProgress(storyNode);
       expect(progress).toBe(0);
@@ -672,10 +679,9 @@ describe('GoalListComponent', () => {
     it('should compute lesson progress correctly using chapterProgressLoaderService', () => {
       const storyNode = StoryNode.createFromBackendDict(sampleStoryNode);
       const explorationId = storyNode.getExplorationId();
-
       if (explorationId) {
         const mockProgress = 42;
-        spyOn(component['chapterProgressLoaderService'], 'getLessonProgress')
+        chapterProgressLoaderService.getLessonProgress
           .withArgs(explorationId)
           .and.returnValue(mockProgress);
 
