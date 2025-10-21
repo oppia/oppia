@@ -30,11 +30,11 @@ describe('ChapterProgressLoaderService', () => {
   let storyViewerBackendApiService: jasmine.SpyObj<StoryViewerBackendApiService>;
   let userService: jasmine.SpyObj<UserService>;
 
-  const mockChapterProgress: ChapterProgressSummary = {
-    _totalCheckpointsCount: 5,
-    _visitedCheckpointsCount: 3,
-    _isChapterComplete: false,
-  };
+  const mockChapterProgress = new ChapterProgressSummary({
+    totalCheckpoints: 5,
+    visitedCheckpoints: 3,
+    isChapterComplete: false,
+  });
 
   beforeEach(() => {
     const storyViewerSpy = jasmine.createSpyObj(
