@@ -22,6 +22,7 @@ import subprocess
 import sys
 import time
 
+from core.constants import constants
 from core.tests import test_utils
 from scripts import (
     build,
@@ -833,18 +834,17 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         class FakeProc:
             """Fake process that exits immediately with no output."""
 
-            def __init__(self):
+            def __init__(self) -> None:
                 self.stdout = self
                 self.returncode = 0
 
-            def readline(self) -> bytes:
-                return b''  # simulate no output
+            def readline(self) -> bytes:  # pylint: disable=missing-docstring
+                return b''
 
-            def poll(self) -> int:
-                return self.returncode  # terminate immediately
+            def poll(self) -> int:  # pylint: disable=missing-docstring
+                return self.returncode
 
-        # Patch EMULATOR_MODE to False so the block is skipped
-        with self.swap(run_e2e_tests.constants, 'EMULATOR_MODE', False):
+        with self.swap(constants, 'EMULATOR_MODE', False):
             self.exit_stack.enter_context(
                 self.swap(
                     common, 'is_oppia_server_already_running', lambda *_: False
@@ -860,7 +860,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             self.exit_stack.enter_context(
                 self.swap(build, 'build_js_files', lambda *_, **__: None)
             )
-            # Mock all servers
             for server in [
                 'managed_redis_server',
                 'managed_elasticsearch_dev_server',
@@ -876,7 +875,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     )
                 )
 
-            args = run_e2e_tests._PARSER.parse_args(args=[])
+            args = run_e2e_tests._PARSER.parse_args(
+                args=[]
+            )  # pylint: disable=protected-access
             with self.swap_mock_set_constants_to_default:
                 output_lines, return_code = run_e2e_tests.run_tests(args)
 
@@ -885,12 +886,13 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
     def test_run_tests_loops_until_process_ends(self) -> None:
         class FakeStdout:
-            def __init__(self):
-                # b'' at the end signals process finished
+            """Fake stdout stream for simulating process output lines."""
+
+            def __init__(self) -> None:
                 self.lines = [b'line1\n', b'line2\n', b'']
                 self.index = 0
 
-            def readline(self) -> bytes:
+            def readline(self) -> bytes:  # pylint: disable=missing-docstring
                 if self.index < len(self.lines):
                     line = self.lines[self.index]
                     self.index += 1
@@ -898,19 +900,20 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 return b''
 
         class FakeProc:
-            def __init__(self):
+            """Fake process object to simulate polling behavior."""
+
+            def __init__(self) -> None:
                 self.stdout = FakeStdout()
                 self.returncode = 0
                 self.poll_call_count = 0
 
-            def poll(self) -> int | None:
-                # Return None for first two calls, then 0
+            def poll(self) -> int | None:  # pylint: disable=missing-docstring
                 self.poll_call_count += 1
                 return None if self.poll_call_count < 3 else 0
 
         fake_proc = FakeProc()
 
-        with self.swap(run_e2e_tests.constants, 'EMULATOR_MODE', False):
+        with self.swap(constants, 'EMULATOR_MODE', False):
             self.exit_stack.enter_context(
                 self.swap(
                     common, 'is_oppia_server_already_running', lambda *_: False
@@ -942,7 +945,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     )
                 )
 
-            args = run_e2e_tests._PARSER.parse_args(args=[])
+            args = run_e2e_tests._PARSER.parse_args(
+                args=[]
+            )  # pylint: disable=protected-access
             with self.swap_mock_set_constants_to_default:
                 output_lines, return_code = run_e2e_tests.run_tests(args)
 

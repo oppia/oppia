@@ -793,7 +793,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             'topic': 'http://localhost:8181/topic_editor/{{topic_id}}'
         }
 
-        def mock_run_puppeteer_script(record: bool = False) -> dict[str, str]:
+        def mock_run_puppeteer_script(_record: bool = False) -> dict[str, str]:
             self.print_arr.append('run_lighthouse_puppeteer_script_called')
             return mock_entities
 
@@ -801,7 +801,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             self.print_arr.append('get_lighthouse_pages_config_called')
             return mock_pages_config
 
-        def mock_run_lighthouse_checks(lighthouse_mode: str) -> None:
+        def mock_run_lighthouse_checks(_lighthouse_mode: str) -> None:
             self.print_arr.append('run_lighthouse_checks_called')
 
         swap_build_main = self.swap(build, 'main', lambda *a, **k: None)
@@ -812,12 +812,12 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         swap_redis = self.swap(
             servers,
             'managed_redis_server',
-            lambda: MockCompilerContextManager(),
+            lambda: MockCompilerContextManager(),  # pylint: disable=unnecessary-lambda
         )
         swap_elasticsearch = self.swap(
             servers,
             'managed_elasticsearch_dev_server',
-            lambda: MockCompilerContextManager(),
+            lambda: MockCompilerContextManager(),  # pylint: disable=unnecessary-lambda
         )
         swap_devserver = self.swap(
             servers,
@@ -870,7 +870,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             'story': 'http://localhost:8181/story_editor/{{story_id}}'
         }
 
-        def mock_run_puppeteer_script(record: bool = False) -> dict[str, str]:
+        def mock_run_puppeteer_script(_record: bool = False) -> dict[str, str]:
             self.print_arr.append('run_lighthouse_puppeteer_script_called')
             return mock_entities
 
@@ -878,7 +878,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             self.print_arr.append('get_lighthouse_pages_config_called')
             return mock_pages_config
 
-        def mock_run_lighthouse_checks(lighthouse_mode: str) -> None:
+        def mock_run_lighthouse_checks(_lighthouse_mode: str) -> None:
             self.print_arr.append('run_lighthouse_checks_called')
 
         swap_env = self.swap(feconf, 'OPPIA_IS_DOCKERIZED', True)
@@ -947,11 +947,15 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                 calls.append('mkdir_called')
 
         class MockProcess:
-            def __init__(self, *_, **__):
-                self.returncode = 0
+            def __init__(
+                self, *args: object, **kwargs: object
+            ) -> None:  # pylint: disable=unused-argument
+                self.returncode: int = 0
 
-            def communicate(self):
-                return (b"topic:123\n", b"")
+            def communicate(
+                self,
+            ) -> tuple[bytes, bytes]:  # pylint: disable=missing-docstring
+                return (b'topic:123\n', b'')
 
         swap_exists = self.swap(os.path, 'exists', mock_exists)
         swap_mkdir = self.swap(os, 'mkdir', mock_mkdir)

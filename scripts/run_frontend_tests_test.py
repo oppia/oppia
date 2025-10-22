@@ -615,7 +615,9 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         def mock_install_main() -> None:
             install_called.append(True)
 
-        def mock_build_main(args: list[str]) -> None:
+        def mock_build_main(
+            args: list[str],
+        ) -> None:  # pylint: disable=unused-argument
             pass
 
         with self.swap(
@@ -646,16 +648,18 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         def mock_get_remote_name() -> str:
             return 'remote'
 
-        def mock_get_refs() -> list:
+        def mock_get_refs() -> list[git_changes_utils.GitRef]:
             return git_refs
 
-        def mock_get_changed_files(refs, remote_name):
+        def mock_get_changed_files(
+            _refs: list[str], _remote_name: str
+        ) -> dict[str, tuple[list[bytes], list[bytes]]]:
             return {'branch1': ([], [b'file1.js', b'file2.ts'])}
 
-        def mock_get_staged_acmrt_files() -> list:
+        def mock_get_staged_acmrt_files() -> list[bytes]:
             return [b'file1.js', b'file2.ts']
 
-        def mock_get_file_spec(file_path: str) -> None:
+        def mock_get_file_spec(_file_path: str) -> None:
             return None
 
         with self.swap(
@@ -689,7 +693,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
 
     def test_stdout_line_with_web_server_logs_skipped(self) -> None:
         class MockFile:
-            def __init__(self):
+            def __init__(self) -> None:
                 self.lines = [
                     b'[web-server]: some log\n',
                     b'Executed tests. Trying to get the Angular injector..\n',
@@ -697,7 +701,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                 ]
                 self.index = 0
 
-            def readline(self) -> bytes:
+            def readline(self) -> bytes:  # pylint: disable=missing-docstring
                 if self.index < len(self.lines):
                     line = self.lines[self.index]
                     self.index += 1
@@ -705,17 +709,19 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                 return b''
 
         class MockTask:
-            def __init__(self):
+            def __init__(self) -> None:
                 self.stdout = MockFile()
                 self.returncode = 0
 
-            def poll(self):
+            def poll(self) -> int:  # pylint: disable=missing-docstring
                 return 0
 
-            def wait(self):
+            def wait(self) -> None:  # pylint: disable=missing-docstring
                 return None
 
-        def mock_popen(*args, **kwargs):
+        def mock_popen(
+            cmd: list[str], stdout: int
+        ) -> MockTask:  # pylint: disable=unused-argument
             return MockTask()
 
         self.cmd_token_list = []
@@ -723,11 +729,10 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         with self.swap(subprocess, 'Popen', mock_popen), self.print_swap:
             run_frontend_tests.main(args=['--skip_install'])
 
-        printed_lines = [
-            line.decode('utf-8')
-            for line in self.print_arr
-            if isinstance(line, bytes)
-        ]
+        printed_lines: list[str] = []
+        for line in self.print_arr:
+            if isinstance(line, bytes):
+                printed_lines.append(line.decode('utf-8'))
         printed_lines += [
             line for line in self.print_arr if isinstance(line, str)
         ]
@@ -737,13 +742,13 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             for line in printed_lines
         )
 
-    def test_angular_injector_message_not_printed(self):
+    def test_angular_injector_message_not_printed(self) -> None:
         class MockFile:
-            def __init__(self):
+            def __init__(self) -> None:
                 self.lines = [b'Test line 1\n', b'Test line 2\n']
                 self.index = 0
 
-            def readline(self):
+            def readline(self) -> bytes:  # pylint: disable=missing-docstring
                 if self.index < len(self.lines):
                     line = self.lines[self.index]
                     self.index += 1
@@ -751,20 +756,22 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                 return b''
 
         class MockTask:
-            def __init__(self):
+            def __init__(self) -> None:
                 self.stdout = MockFile()
                 self.returncode = 0
 
-            def poll(self):
+            def poll(self) -> int:  # pylint: disable=missing-docstring
                 return 0
 
-            def wait(self):
+            def wait(self) -> None:  # pylint: disable=missing-docstring
                 return None
 
-        def mock_Popen(cmd, stdout):
+        def mock_popen(
+            cmd: list[str], stdout: int
+        ) -> MockTask:  # pylint: disable=unused-argument
             return MockTask()
 
-        with self.swap(subprocess, 'Popen', mock_Popen), self.print_swap:
+        with self.swap(subprocess, 'Popen', mock_popen), self.print_swap:
             run_frontend_tests.main(args=['--skip_install'])
 
         angular_msg = (
