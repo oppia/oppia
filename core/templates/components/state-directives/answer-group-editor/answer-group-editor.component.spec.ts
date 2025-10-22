@@ -36,6 +36,10 @@ import {ExternalSaveService} from 'services/external-save.service';
 import {AnswerGroupEditor} from './answer-group-editor.component';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 
+type Outcome = Parameters<
+  AnswerGroupEditor['sendOnSaveAnswerGroupFeedback']
+>[0];
+
 class MockPlatformFeatureService {
   status = {
     ExplorationEditorCanTagMisconceptions: {
@@ -155,8 +159,8 @@ describe('Answer Group Editor Component', () => {
         skillId: '',
         misconceptionId: 0,
       });
-      component.sendOnSaveAnswerGroupCorrectnessLabel({} as any);
-      component.sendOnSaveAnswerGroupFeedback({} as any);
+      component.sendOnSaveAnswerGroupCorrectnessLabel({} as unknown as Outcome);
+      component.sendOnSaveAnswerGroupFeedback({} as unknown as Outcome);
 
       externalSaveEmitter.emit();
       tick();
@@ -183,8 +187,8 @@ describe('Answer Group Editor Component', () => {
       component.ngOnInit();
       component.activeRuleIndex = 1;
       alertsService.addMessage('info', 'Some other message', 0);
-      component.sendOnSaveAnswerGroupDest({} as any);
-      component.sendOnSaveAnswerGroupDestIfStuck({} as any);
+      component.sendOnSaveAnswerGroupDest({} as unknown as Outcome);
+      component.sendOnSaveAnswerGroupDestIfStuck({} as unknown as Outcome);
 
       externalSaveEmitter.emit();
       tick();

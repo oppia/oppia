@@ -170,7 +170,7 @@ describe('Rule Editor Component', () => {
   }));
 
   it('should set component properties on initialization', () => {
-    component.rule = new Rule('', {} as any, {} as any);
+    component.rule = new Rule('', {}, {});
 
     stateInteractionIdService.savedMemento = 'TextInput';
 
@@ -187,7 +187,7 @@ describe('Rule Editor Component', () => {
     'should set change validity on form valid' + ' change event',
     fakeAsync(() => {
       const eventBusGroup = new EventBusGroup(eventBusService);
-      component.rule = new Rule('', {} as any, {} as any);
+      component.rule = new Rule('', {}, {});
 
       expect(component.isInvalid).toBe(undefined);
 
@@ -262,7 +262,7 @@ describe('Rule Editor Component', () => {
       let componentRule = new Rule(
         'Equals',
         {x: 'TranslatableSetOfNormalizedString'},
-        {} as any
+        {}
       );
 
       component.rule = componentRule;
@@ -315,7 +315,7 @@ describe('Rule Editor Component', () => {
       varName: 'varName',
     };
 
-    component.rule = new Rule('', {varName: 2}, {} as any);
+    component.rule = new Rule('', {varName: 2}, {});
 
     spyOn(component.onCancelRuleEdit, 'emit');
 
@@ -326,7 +326,7 @@ describe('Rule Editor Component', () => {
   });
 
   it('should save rule when user clicks save button', () => {
-    component.rule = new Rule('', {} as any, {} as any);
+    component.rule = new Rule('', {}, {});
 
     spyOn(component.onSaveRule, 'emit').and.stub();
     spyOn(
@@ -352,7 +352,7 @@ describe('Rule Editor Component', () => {
           label: '',
         },
       ]);
-      component.rule = new Rule('Equals', {} as any, {} as any);
+      component.rule = new Rule('Equals', {}, {});
 
       component.currentInteractionId = 'ItemSelectionInput';
 
@@ -392,8 +392,8 @@ describe('Rule Editor Component', () => {
 
       component.rule = new Rule(
         'IsEqualToOrderingWithOneItemAtIncorrectPosition',
-        {} as any,
-        {} as any
+        {},
+        {}
       );
 
       component.currentInteractionId = 'DragAndDropSortInput';
@@ -432,7 +432,7 @@ describe('Rule Editor Component', () => {
           label: '',
         },
       ]);
-      component.rule = new Rule('IsEqualToOrdering', {} as any, {} as any);
+      component.rule = new Rule('IsEqualToOrdering', {}, {});
 
       component.currentInteractionId = 'DragAndDropSortInput';
       component.onSelectNewRuleType('IsEqualToOrdering');
@@ -467,7 +467,7 @@ describe('Rule Editor Component', () => {
           label: '',
         },
       ]);
-      component.rule = new Rule('HasElementXAtPositionY', {} as any, {} as any);
+      component.rule = new Rule('HasElementXAtPositionY', {}, {});
       component.currentInteractionId = 'DragAndDropSortInput';
 
       component.onSelectNewRuleType('HasElementXAtPositionY');
@@ -482,7 +482,7 @@ describe('Rule Editor Component', () => {
       ' choices are empty',
     fakeAsync(() => {
       spyOn(responsesService, 'getAnswerChoices').and.returnValue([]);
-      component.rule = new Rule('MatchesExactlyWith', {} as any, {} as any);
+      component.rule = new Rule('MatchesExactlyWith', {}, {});
       component.currentInteractionId = 'AlgebraicExpressionInput';
 
       component.onSelectNewRuleType('MatchesExactlyWith');

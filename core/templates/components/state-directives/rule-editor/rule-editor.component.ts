@@ -29,7 +29,11 @@ import {
 } from '@angular/core';
 import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
-import {EventBusGroup, EventBusService} from 'app-events/event-bus.service';
+import {
+  EventBusGroup,
+  EventBusService,
+  Newable,
+} from 'app-events/event-bus.service';
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import {ResponsesService} from 'pages/exploration-editor-page/editor-tab/services/responses.service';
 import {PopulateRuleContentIdsService} from 'pages/exploration-editor-page/services/populate-rule-content-ids.service';
@@ -38,7 +42,6 @@ import DEFAULT_OBJECT_VALUES from '../../../../../extensions/objects/object_defa
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {Rule} from 'domain/exploration/rule.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 interface SelectItem {
   type: string;
@@ -94,9 +97,12 @@ export class RuleEditorComponent
       return '';
     }
 
-    let ruleDescription = (INTERACTION_SPECS as Record<string, any>)[
-      this.currentInteractionId as string
-    ].rule_descriptions[this.rule.type];
+    let ruleDescription = (
+      INTERACTION_SPECS as Record<
+        string,
+        {rule_descriptions: Record<string, string>}
+      >
+    )[this.currentInteractionId as string].rule_descriptions[this.rule.type];
 
     let PATTERN = /\{\{\s*(\w+)\s*\|\s*(\w+)\s*\}\}/;
     let finalInputArray = ruleDescription.split(PATTERN);
@@ -223,7 +229,7 @@ export class RuleEditorComponent
     let oldRuleInputs = cloneDeep(this.rule.inputs) || {};
     let oldRuleInputTypes = cloneDeep(this.rule.inputTypes) || {};
 
-    this.rule.type = newRuleType as any;
+    this.rule.type = newRuleType ?? '';
     this.rule.inputs = {};
     this.rule.inputTypes = {};
 
@@ -240,11 +246,12 @@ export class RuleEditorComponent
         break;
       }
       let varName = match[1];
-      let varType = null;
+      let varType: string | null = null;
       if (match[2]) {
         varType = match[2].substring(1);
       }
-      (this.rule.inputTypes as any)[varName] = varType;
+      (this.rule.inputTypes as Record<string, string | null>)[varName] =
+        varType;
 
       // TODO(sll): Find a more robust way of doing this. For example,
       // we could associate a particular varName with answerChoices
@@ -252,13 +259,18 @@ export class RuleEditorComponent
       // default value from answerChoices, but other variables would
       // take their default values from the DEFAULT_OBJECT_VALUES dict.
       const defaultValue =
-        varType !== null ? (DEFAULT_OBJECT_VALUES as any)[varType] : null;
+        varType !== null
+          ? (DEFAULT_OBJECT_VALUES as Record<string, unknown>)[varType]
+          : null;
       if (isEqual(defaultValue, [])) {
-        (this.rule.inputs as any)[varName] = [];
+        (this.rule.inputs as Record<string, unknown>)[varName] = [];
       } else if (answerChoices && answerChoices.length > 0) {
-        (this.rule.inputs as any)[varName] = cloneDeep(answerChoices[0].val);
+        (this.rule.inputs as Record<string, unknown>)[varName] = cloneDeep(
+          answerChoices[0].val
+        );
       } else {
-        (this.rule.inputs as any)[varName] = cloneDeep(defaultValue);
+        (this.rule.inputs as Record<string, unknown>)[varName] =
+          cloneDeep(defaultValue);
       }
 
       tmpRuleDescription = tmpRuleDescription.replace(PATTERN, ' ');
@@ -267,9 +279,10 @@ export class RuleEditorComponent
     for (let key in this.rule.inputs) {
       if (
         oldRuleInputs.hasOwnProperty(key) &&
-        oldRuleInputTypes[key] === (this.rule.inputTypes as any)[key]
+        oldRuleInputTypes[key] ===
+          (this.rule.inputTypes as Record<string, string>)[key]
       ) {
-        (this.rule.inputs as any)[key] = oldRuleInputs[key];
+        (this.rule.inputs as Record<string, unknown>)[key] = oldRuleInputs[key];
       }
     }
 
@@ -299,12 +312,17 @@ export class RuleEditorComponent
      */
     if (this.isEditingRuleInline) {
       this.modalId = Symbol();
-      this.eventBusGroup.on(ObjectFormValidityChangeEvent as any, event => {
-        const e = event as any;
-        if (e.message.modalId === this.modalId) {
-          this.isInvalid = e.message.value;
+      this.eventBusGroup.on(
+        ObjectFormValidityChangeEvent as unknown as Newable<ObjectFormValidityChangeEvent>,
+        event => {
+          const e = event as unknown as {
+            message: {modalId: symbol; value: boolean};
+          };
+          if (e.message.modalId === this.modalId) {
+            this.isInvalid = e.message.value;
+          }
         }
-      });
+      );
     }
     this.currentInteractionId =
       this.stateInteractionIdService.savedMemento !== null
@@ -320,19 +338,21 @@ export class RuleEditorComponent
     // List-of-sets-of-translatable-html-content-ids-editor
     // could not able to assign this.rule.inputTypes.x default values.
     if (this.rule.inputTypes.x === 'ListOfSetsOfTranslatableHtmlContentIds') {
+      const ruleInputX = this.rule.inputs.x as unknown[];
       if (
-        (this.rule.inputs.x as any)[0] === undefined ||
-        (this.rule.inputs.x as any)[0]?.length === 0
+        ruleInputX[0] === undefined ||
+        (ruleInputX[0] as unknown[])?.length === 0
       ) {
-        let box: any[] = [];
+        let box: unknown[] = [];
         this.ruleDescriptionChoices.map(choice => {
           box.push([choice.val]);
         });
-        (this.rule.inputs as any).x = box;
+        (this.rule.inputs as Record<string, unknown>).x = box;
       }
     } else if (this.rule.inputTypes.x === 'TranslatableHtmlContentId') {
-      if ((this.rule.inputs as any).x === null) {
-        (this.rule.inputs as any).x = this.ruleDescriptionChoices[0].val;
+      if ((this.rule.inputs as Record<string, unknown>).x === null) {
+        (this.rule.inputs as Record<string, unknown>).x =
+          this.ruleDescriptionChoices[0].val;
       }
     }
   }

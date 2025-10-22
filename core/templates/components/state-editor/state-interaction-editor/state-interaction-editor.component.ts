@@ -114,9 +114,12 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
 
   getCurrentInteractionName(): string {
     return this.stateInteractionIdService.savedMemento
-      ? (INTERACTION_SPECS as Record<string, any>)[
-          this.stateInteractionIdService.savedMemento
-        ].name
+      ? (
+          INTERACTION_SPECS as Record<
+            string,
+            {name: string; is_terminal: boolean}
+          >
+        )[this.stateInteractionIdService.savedMemento].name
       : '';
   }
 
@@ -206,9 +209,12 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
       this.stateInteractionIdService.savedMemento;
     if (hasInteractionIdChanged) {
       if (
-        (INTERACTION_SPECS as Record<string, any>)[
-          this.stateInteractionIdService.displayed
-        ].is_terminal
+        (
+          INTERACTION_SPECS as Record<
+            string,
+            {name: string; is_terminal: boolean}
+          >
+        )[this.stateInteractionIdService.displayed].is_terminal
       ) {
         this.updateDefaultTerminalStateContentIfEmpty();
       }
@@ -348,7 +354,8 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
         this.responsesService.onInitializeAnswerGroups.emit({
           interactionId: stateData.interaction.id ?? '',
           answerGroups: stateData.interaction.answerGroups ?? [],
-          defaultOutcome: stateData.interaction.defaultOutcome ?? (null as any),
+          defaultOutcome:
+            stateData.interaction.defaultOutcome ?? ({} as Outcome),
           confirmedUnclassifiedAnswers:
             stateData.interaction.confirmedUnclassifiedAnswers ?? [],
         });

@@ -29,7 +29,7 @@ import {
   StateEditorService,
 } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import {Rule} from 'domain/exploration/rule.model';
+import {Rule, RuleInputs, RuleInputTypes} from 'domain/exploration/rule.model';
 import isEqual from 'lodash/isEqual';
 import {ResponsesService} from 'pages/exploration-editor-page/editor-tab/services/responses.service';
 import {TrainingDataEditorPanelService} from 'pages/exploration-editor-page/editor-tab/training-panel/training-data-editor-panel.service';
@@ -42,7 +42,6 @@ import {ExternalSaveService} from 'services/external-save.service';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {BaseTranslatableObject} from 'interactions/rule-input-defs';
 import {PlatformFeatureService} from 'services/platform-feature.service';
-import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 interface TaggedMisconception {
   skillId: string;
@@ -222,9 +221,12 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
   addNewRule(): void {
     // Build an initial blank set of inputs for the initial rule.
     let interactionId = this.getCurrentInteractionId();
-    let ruleDescriptions = (INTERACTION_SPECS as Record<string, any>)[
-      interactionId as string
-    ].rule_descriptions;
+    let ruleDescriptions = (
+      INTERACTION_SPECS as Record<
+        string,
+        {rule_descriptions: Record<string, string>}
+      >
+    )[interactionId as string].rule_descriptions;
     let ruleTypes = Object.keys(ruleDescriptions);
     if (ruleTypes.length === 0) {
       // This should never happen. An interaction must have at least
@@ -236,11 +238,15 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
     let description = ruleDescriptions[ruleType];
 
     let PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
-    let inputs: Record<string, any> = {};
-    const inputTypes: Record<string, any> = {};
+    let inputs: Record<string, unknown> = {};
+    const inputTypes: Record<string, string> = {};
     while (description.match(PATTERN)) {
-      let varName = description.match(PATTERN)![1];
-      let varType = description.match(PATTERN)![2];
+      const match = description.match(PATTERN);
+      if (!match) {
+        break;
+      }
+      let varName = match[1];
+      let varType = match[2];
       if (varType) {
         varType = varType.substring(1);
       }
@@ -257,7 +263,11 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
     // TODO(bhenning): Should use functionality in ruleEditor.js, but
     // move it to ResponsesService in StateResponses.js to properly
     // form a new rule.
-    const rule = Rule.createNew(ruleType, inputs, inputTypes);
+    const rule = Rule.createNew(
+      ruleType,
+      inputs as RuleInputs,
+      inputTypes as RuleInputTypes
+    );
     this.rules.push(rule);
     this.changeActiveRuleIndex(this.rules.length - 1);
   }
@@ -340,9 +350,10 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
           this.rules.map(rule => rule.type).join(', ')
       );
     }
-    // Use type assertion to allow index access, and ensure interactionId is not null
-    return (INTERACTION_SPECS as Record<string, any>)[interactionId as string]
-      .is_trainable;
+    // Use type assertion to allow index access, and ensure interactionId is not null.
+    return (INTERACTION_SPECS as Record<string, {is_trainable: boolean}>)[
+      interactionId as string
+    ].is_trainable;
   }
 
   openTrainingDataEditor(): void {

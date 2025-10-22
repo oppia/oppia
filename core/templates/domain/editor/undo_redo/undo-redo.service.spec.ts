@@ -18,7 +18,24 @@
 
 import {TestBed} from '@angular/core/testing';
 import {UndoRedoService} from './undo-redo.service';
-import {Change} from 'domain/editor/undo_redo/change.model';
+import {
+  Change,
+  DomainObject as RealDomainObject,
+} from 'domain/editor/undo_redo/change.model';
+
+// Define test interfaces that satisfy the BackendChangeObject and DomainObject types.
+// Using a simple collection change as it's one of the simplest change types.
+interface BackendChangeObject {
+  cmd: 'edit_collection_property';
+  property_name: 'title';
+  new_value: string;
+  old_value: string;
+}
+
+// Using a minimal object that can pass as DomainObject for testing.
+interface DomainObject {
+  [key: string]: unknown;
+}
 
 describe('UndoRedoService', () => {
   let undoRedoService: UndoRedoService;
@@ -30,12 +47,17 @@ describe('UndoRedoService', () => {
     undoRedoService = TestBed.inject(UndoRedoService);
   });
 
-  const createBackendChangeObject = (value: string): any => {
-    return {property_name: value} as any;
+  const createBackendChangeObject = (value: string): BackendChangeObject => {
+    return {
+      cmd: 'edit_collection_property',
+      property_name: 'title',
+      new_value: value,
+      old_value: 'old_' + value,
+    };
   };
 
   const createChangeDomainObject = (
-    backendObj: any,
+    backendObj: BackendChangeObject,
     applyFunc: () => void = () => {},
     reverseFunc: () => void = () => {}
   ) => {
@@ -46,14 +68,17 @@ describe('UndoRedoService', () => {
     const applyFunc = jasmine.createSpy('applyChange');
     expect(undoRedoService.hasChanges()).toBeFalse();
 
-    const fakeDomainObject: any = {domain_property_name: 'fake value'};
+    const fakeDomainObject: DomainObject = {domain_property_name: 'fake value'};
     const backendChangeObject = createBackendChangeObject('value');
     const changeDomainObject = createChangeDomainObject(
       backendChangeObject,
       applyFunc
     );
 
-    undoRedoService.applyChange(changeDomainObject, fakeDomainObject);
+    undoRedoService.applyChange(
+      changeDomainObject,
+      fakeDomainObject as unknown as RealDomainObject
+    );
     expect(undoRedoService.hasChanges()).toBeTrue();
     expect(applyFunc).toHaveBeenCalledWith(
       backendChangeObject,
@@ -66,16 +91,23 @@ describe('UndoRedoService', () => {
     const reverseFunc = jasmine.createSpy('reverseChange');
     expect(undoRedoService.hasChanges()).toBeFalse();
 
-    const fakeDomainObject: any = {domain_property_name: 'fake value'};
+    const fakeDomainObject: DomainObject = {domain_property_name: 'fake value'};
     const backendChangeObject = createBackendChangeObject('value');
     const changeDomainObject = createChangeDomainObject(
       backendChangeObject,
       applyFunc,
       reverseFunc
     );
-    undoRedoService.applyChange(changeDomainObject, fakeDomainObject);
+    undoRedoService.applyChange(
+      changeDomainObject,
+      fakeDomainObject as unknown as RealDomainObject
+    );
 
-    expect(undoRedoService.undoChange(fakeDomainObject)).toBeTrue();
+    expect(
+      undoRedoService.undoChange(
+        fakeDomainObject as unknown as RealDomainObject
+      )
+    ).toBeTrue();
     expect(undoRedoService.hasChanges()).toBeFalse();
     expect(reverseFunc).toHaveBeenCalledWith(
       backendChangeObject,
@@ -88,7 +120,7 @@ describe('UndoRedoService', () => {
     const reverseFunc = jasmine.createSpy('reverseChange');
     expect(undoRedoService.hasChanges()).toBeFalse();
 
-    const fakeDomainObject: any = {domain_property_name: 'fake value'};
+    const fakeDomainObject: DomainObject = {domain_property_name: 'fake value'};
     const backendChangeObject = createBackendChangeObject('value');
     const changeDomainObject = createChangeDomainObject(
       backendChangeObject,
@@ -96,33 +128,51 @@ describe('UndoRedoService', () => {
       reverseFunc
     );
 
-    undoRedoService.applyChange(changeDomainObject, fakeDomainObject);
-    undoRedoService.undoChange(fakeDomainObject);
-    expect(undoRedoService.redoChange(fakeDomainObject)).toBeTrue();
+    undoRedoService.applyChange(
+      changeDomainObject,
+      fakeDomainObject as unknown as RealDomainObject
+    );
+    undoRedoService.undoChange(fakeDomainObject as unknown as RealDomainObject);
+    expect(
+      undoRedoService.redoChange(
+        fakeDomainObject as unknown as RealDomainObject
+      )
+    ).toBeTrue();
     expect(undoRedoService.hasChanges()).toBeTrue();
     expect(applyFunc.calls.count()).toEqual(2);
   });
 
   it('should not undo anything if no changes are applied', () => {
-    const fakeDomainObject: any = {domain_property_name: 'fake value'};
-    expect(undoRedoService.undoChange(fakeDomainObject)).toBeFalse();
+    const fakeDomainObject: DomainObject = {domain_property_name: 'fake value'};
+    expect(
+      undoRedoService.undoChange(
+        fakeDomainObject as unknown as RealDomainObject
+      )
+    ).toBeFalse();
   });
 
   it('should not redo anything if no changes are undone', () => {
-    const fakeDomainObject: any = {domain_property_name: 'fake value'};
-    expect(undoRedoService.redoChange(fakeDomainObject)).toBeFalse();
+    const fakeDomainObject: DomainObject = {domain_property_name: 'fake value'};
+    expect(
+      undoRedoService.redoChange(
+        fakeDomainObject as unknown as RealDomainObject
+      )
+    ).toBeFalse();
   });
 
   it('should clear changes without undoing them', () => {
     const applyFunc = jasmine.createSpy('applyChange');
-    const fakeDomainObject: any = {domain_property_name: 'fake value'};
+    const fakeDomainObject: DomainObject = {domain_property_name: 'fake value'};
     const backendChangeObject = createBackendChangeObject('value');
     const changeDomainObject = createChangeDomainObject(
       backendChangeObject,
       applyFunc
     );
 
-    undoRedoService.applyChange(changeDomainObject, fakeDomainObject);
+    undoRedoService.applyChange(
+      changeDomainObject,
+      fakeDomainObject as unknown as RealDomainObject
+    );
     expect(undoRedoService.getChangeCount()).toEqual(1);
 
     undoRedoService.clearChanges();

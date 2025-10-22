@@ -47,19 +47,36 @@ import {GenerateContentIdService} from 'services/generate-content-id.service';
 class MockNgbModal {
   modal: string = '';
   success: boolean = true;
-  open(content: any, options: any): any {
+  open(
+    content: unknown,
+    options: {
+      backdrop?: string | boolean;
+      keyboard?: boolean;
+      windowClass?: string;
+    }
+  ): {
+    result: {
+      componentInstance?: Record<string, unknown>;
+      then: (
+        successCallback: (result?: unknown) => void,
+        cancelCallback?: () => void
+      ) => unknown;
+    };
+  } {
     if (this.modal === 'add_interaction') {
       return {
         result: {
           componentInstance: {},
           then: (
-            successCallback: (result: any) => void,
-            cancelCallback: () => void
+            successCallback: (result?: unknown) => void,
+            cancelCallback?: () => void
           ) => {
             if (this.success) {
               successCallback({});
             } else {
-              cancelCallback();
+              if (cancelCallback) {
+                cancelCallback();
+              }
             }
           },
         },
@@ -67,11 +84,16 @@ class MockNgbModal {
     } else if (this.modal === 'delete_interaction') {
       return {
         result: {
-          then: (successCallback: () => void, errorCallback: () => void) => {
+          then: (
+            successCallback: (result?: unknown) => void,
+            errorCallback?: () => void
+          ) => {
             if (this.success) {
               successCallback();
             } else {
-              errorCallback();
+              if (errorCallback) {
+                errorCallback();
+              }
             }
             return {
               then: (callback: () => void) => {
@@ -82,6 +104,13 @@ class MockNgbModal {
         },
       };
     }
+    // Default return for other cases.
+    return {
+      result: {
+        componentInstance: {},
+        then: () => {},
+      },
+    };
   }
 }
 
@@ -188,7 +217,7 @@ describe('State Interaction component', () => {
         'id',
         'some',
         SubtitledHtml.createDefault('', 'content_id'),
-        new Interaction([], [], {} as any, null, [], 'id', null),
+        new Interaction([], [], {}, null, [], 'id', null),
         [],
         false,
         true,
@@ -224,7 +253,9 @@ describe('State Interaction component', () => {
       explorationHtmlFormatterService,
       'getInteractionHtml'
     ).and.returnValue('htmlValue');
-    (stateInteractionIdService as any).savedMemento = 'interactionID';
+    (
+      stateInteractionIdService as unknown as {savedMemento: string}
+    ).savedMemento = 'interactionID';
 
     component.toggleInteractionEditor();
 
@@ -238,34 +269,62 @@ describe('State Interaction component', () => {
   it('should delete interaction when user click on delete btn', fakeAsync(() => {
     mockNgbModal.modal = 'delete_interaction';
 
-    spyOn(stateSolutionService as any, 'saveDisplayedValue').and.stub();
-    spyOn(mockNgbModal, 'open').and.callFake((dlg, opt) => {
-      return {
-        result: Promise.resolve('success'),
-      } as NgbModalRef;
-    });
-
-    component.deleteInteraction();
-    tick();
-
-    expect((stateSolutionService as any).saveDisplayedValue).toHaveBeenCalled();
-  }));
-
-  it('should not delete interaction when user click on cancel btn', fakeAsync(() => {
-    mockNgbModal.modal = 'delete_interaction';
-
-    spyOn(stateSolutionService as any, 'saveDisplayedValue').and.stub();
-    spyOn(mockNgbModal, 'open').and.callFake((dlg, opt) => {
-      return {
-        result: Promise.reject('success'),
-      } as NgbModalRef;
-    });
+    spyOn(
+      stateSolutionService as {saveDisplayedValue: () => void},
+      'saveDisplayedValue'
+    ).and.stub();
+    spyOn(mockNgbModal, 'open').and.callFake(
+      (
+        dlg: unknown,
+        opt: {
+          backdrop?: string | boolean;
+          keyboard?: boolean;
+          windowClass?: string;
+        }
+      ) => {
+        return {
+          result: Promise.resolve('success'),
+        } as NgbModalRef;
+      }
+    );
 
     component.deleteInteraction();
     tick();
 
     expect(
-      (stateSolutionService as any).saveDisplayedValue
+      (stateSolutionService as {saveDisplayedValue: () => void})
+        .saveDisplayedValue
+    ).toHaveBeenCalled();
+  }));
+
+  it('should not delete interaction when user click on cancel btn', fakeAsync(() => {
+    mockNgbModal.modal = 'delete_interaction';
+
+    spyOn(
+      stateSolutionService as {saveDisplayedValue: () => void},
+      'saveDisplayedValue'
+    ).and.stub();
+    spyOn(mockNgbModal, 'open').and.callFake(
+      (
+        dlg: unknown,
+        opt: {
+          backdrop?: string | boolean;
+          keyboard?: boolean;
+          windowClass?: string;
+        }
+      ) => {
+        return {
+          result: Promise.reject('success'),
+        } as NgbModalRef;
+      }
+    );
+
+    component.deleteInteraction();
+    tick();
+
+    expect(
+      (stateSolutionService as {saveDisplayedValue: () => void})
+        .saveDisplayedValue
     ).not.toHaveBeenCalled();
   }));
 
@@ -276,12 +335,16 @@ describe('State Interaction component', () => {
       () => {}
     );
     mockNgbModal.modal = 'add_interaction';
-    (stateContentService as any).savedMemento = new SubtitledHtml(
-      'html',
-      'contentID'
-    );
-    (stateCustomizationArgsService as any).savedMemento = {
-      useFractionForDivision: false,
+    (stateContentService as {savedMemento: SubtitledHtml}).savedMemento =
+      new SubtitledHtml('html', 'contentID');
+    (
+      stateCustomizationArgsService as unknown as {
+        savedMemento: Record<string, {value: boolean | string[]}>;
+      }
+    ).savedMemento = {
+      useFractionForDivision: {
+        value: false,
+      },
       allowedVariables: {
         value: ['work', 'done'],
       },
@@ -290,12 +353,21 @@ describe('State Interaction component', () => {
     component.interactionIsDisabled = false;
     component.updateDefaultTerminalStateContentIfEmpty();
 
-    spyOn(mockNgbModal, 'open').and.callFake((dlg, opt) => {
-      return {
-        componentInstance: {},
-        result: Promise.reject('reject'),
-      } as NgbModalRef;
-    });
+    spyOn(mockNgbModal, 'open').and.callFake(
+      (
+        dlg: unknown,
+        opt: {
+          backdrop?: string | boolean;
+          keyboard?: boolean;
+          windowClass?: string;
+        }
+      ) => {
+        return {
+          componentInstance: {},
+          result: Promise.reject('reject'),
+        } as NgbModalRef;
+      }
+    );
     spyOn(editabilityService, 'isEditable').and.returnValue(true);
     spyOn(pageContextService, 'isExplorationLinkedToStory').and.returnValue(
       true
@@ -362,19 +434,93 @@ describe('State Interaction component', () => {
     }
   );
 
+  it('should close modal when user click cancel', fakeAsync(() => {
+    const mockEventEmitter = new EventEmitter();
+    generateContentIdService.init(
+      () => 1,
+      () => {}
+    );
+    mockNgbModal.modal = 'add_interaction';
+    (stateContentService as {savedMemento: SubtitledHtml}).savedMemento =
+      new SubtitledHtml('html', 'contentID');
+    (
+      stateCustomizationArgsService as unknown as {
+        savedMemento: Record<string, unknown>;
+      }
+    ).savedMemento = {
+      useFractionForDivision: {
+        value: false,
+      },
+      allowedVariables: {
+        value: ['work', 'done'],
+      },
+    };
+    component.interactionId = 'EndExploration';
+    component.interactionIsDisabled = false;
+    component.updateDefaultTerminalStateContentIfEmpty();
+
+    spyOn(mockNgbModal, 'open').and.callFake(
+      (
+        dlg: unknown,
+        opt: {
+          backdrop?: string | boolean;
+          keyboard?: boolean;
+          windowClass?: string;
+        }
+      ) => {
+        return {
+          componentInstance: {},
+          result: Promise.reject('reject'),
+        } as NgbModalRef;
+      }
+    );
+    spyOn(editabilityService, 'isEditable').and.returnValue(true);
+    spyOn(pageContextService, 'isExplorationLinkedToStory').and.returnValue(
+      true
+    );
+    spyOn(stateEditorService.onHandleCustomArgsUpdate, 'emit').and.stub();
+
+    component.openInteractionCustomizerModal();
+    tick();
+    mockEventEmitter.emit();
+
+    component.interactionIsDisabled = true;
+    tick();
+    component.openInteractionCustomizerModal();
+  }));
+
   it('should save interaction when user click save', fakeAsync(() => {
-    (stateInteractionIdService as any).displayed = 'EndExploration';
-    (stateInteractionIdService as any).savedMemento = 'InteractiveMap';
+    (
+      stateInteractionIdService as unknown as {
+        displayed: string;
+        savedMemento: string;
+      }
+    ).displayed = 'EndExploration';
+    (
+      stateInteractionIdService as unknown as {
+        displayed: string;
+        savedMemento: string;
+      }
+    ).savedMemento = 'InteractiveMap';
     component.DEFAULT_TERMINAL_STATE_CONTENT = 'HTML Content';
-    (stateContentService as any).savedMemento = SubtitledHtml.createDefault(
-      '',
-      'contentID'
-    );
-    (stateContentService as any).displayed = SubtitledHtml.createDefault(
-      '',
-      'contentID2'
-    );
-    (stateCustomizationArgsService as any).savedMemento = {
+    (
+      stateContentService as unknown as {
+        savedMemento: SubtitledHtml;
+        displayed: SubtitledHtml;
+      }
+    ).savedMemento = SubtitledHtml.createDefault('', 'contentID');
+    (
+      stateContentService as unknown as {
+        savedMemento: SubtitledHtml;
+        displayed: SubtitledHtml;
+      }
+    ).displayed = SubtitledHtml.createDefault('', 'contentID2');
+    (
+      stateCustomizationArgsService as unknown as {
+        savedMemento: Record<string, {value: number}>;
+        displayed: Record<string, {value: string[]}>;
+      }
+    ).savedMemento = {
       latitude: {
         value: 35,
       },
@@ -385,22 +531,39 @@ describe('State Interaction component', () => {
         value: 8,
       },
     };
-    (stateCustomizationArgsService as any).displayed = {
+    (
+      stateCustomizationArgsService as unknown as {
+        savedMemento: Record<string, {value: number}>;
+        displayed: Record<string, {value: string[]}>;
+      }
+    ).displayed = {
       recommendedExplorationIds: {
         value: ['null'],
       },
     };
 
     mockNgbModal.modal = 'add_interaction';
-    spyOn(mockNgbModal, 'open').and.callFake((dlg, opt) => {
-      return {
-        componentInstance: {},
-        result: Promise.resolve('success'),
-      } as NgbModalRef;
-    });
+    spyOn(mockNgbModal, 'open').and.callFake(
+      (
+        dlg: unknown,
+        opt: {
+          backdrop?: string | boolean;
+          keyboard?: boolean;
+          windowClass?: string;
+        }
+      ) => {
+        return {
+          componentInstance: {},
+          result: Promise.resolve('success'),
+        } as NgbModalRef;
+      }
+    );
 
     spyOn(interactionDetailsCacheService, 'set').and.stub();
-    spyOn(stateContentService, 'saveDisplayedValue').and.stub();
+    spyOn(
+      stateContentService as unknown as {saveDisplayedValue: () => void},
+      'saveDisplayedValue'
+    ).and.stub();
     spyOn(editabilityService, 'isEditable').and.returnValue(true);
     spyOn(pageContextService, 'isExplorationLinkedToStory').and.returnValue(
       true
@@ -412,13 +575,16 @@ describe('State Interaction component', () => {
     tick();
 
     expect(stateEditorService.onHandleCustomArgsUpdate.emit).toHaveBeenCalled();
-    expect((stateContentService as any).saveDisplayedValue).toHaveBeenCalled();
+    expect(
+      (stateContentService as unknown as {saveDisplayedValue: () => void})
+        .saveDisplayedValue
+    ).toHaveBeenCalled();
     expect(component.onSaveInteractionData.emit).toHaveBeenCalled();
   }));
 
   it('should through error when state is undefined', () => {
     expect(() => {
-      component.throwError(undefined as any);
+      component.throwError(undefined as unknown as State);
     }).toThrowError('Expected stateData to be defined but received undefined');
   });
 });
