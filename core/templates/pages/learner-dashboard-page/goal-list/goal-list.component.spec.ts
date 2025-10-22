@@ -21,6 +21,7 @@ import {FormsModule} from '@angular/forms';
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 import {GoalListComponent} from './goal-list.component';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
@@ -176,10 +177,22 @@ describe('GoalListComponent', () => {
     },
   };
 
+  class MockPlatformFeatureService {
+    status = {
+      SerialChapterLaunchLearnerView: {
+        isEnabled: false,
+      },
+    };
+  }
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
+
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [FormsModule, HttpClientTestingModule],
-      providers: [AssetsBackendApiService],
+      providers: [
+        {provide: PlatformFeatureService, useValue: mockPlatformFeatureService},
+        AssetsBackendApiService,
+      ],
       declarations: [GoalListComponent, MockTranslatePipe],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -381,6 +394,229 @@ describe('GoalListComponent', () => {
       const storyId = 'story_5';
       component.expandedStories[storyId] = true;
       expect(component.isExpanded(storyId)).toBeTrue();
+    });
+  });
+
+  describe('getStartButtonClass', () => {
+    let storySummary: StorySummary;
+    let storyNode: StoryNode;
+
+    beforeEach(() => {
+      component.allCurrentNodes = [0, 1, 0];
+      storySummary = component.goalTopic.getCanonicalStorySummaryDicts()[0];
+      storyNode = storySummary.getAllNodes()[0] as StoryNode;
+    });
+
+    it('should (getStartButtonClass) return default if serial feature disabled', () => {
+      spyOn(
+        component,
+        'isSerialChapterFeatureLearnerFlagEnabled'
+      ).and.returnValue(false);
+      expect(component.getStartButtonClass(storySummary, 0)).toBe(
+        'oppia-learner-dash-button--default'
+      );
+    });
+
+    it('should (getStartButtonClass) return disabled if node unpublished', () => {
+      spyOn(
+        component,
+        'isSerialChapterFeatureLearnerFlagEnabled'
+      ).and.returnValue(true);
+      spyOn(storyNode, 'getPublishedStatus').and.returnValue(false);
+
+      expect(component.getStartButtonClass(storySummary, 0)).toBe(
+        'oppia-learner-dash-button--disabled'
+      );
+    });
+
+    it('should (getStartButtonClass) return default if story is not expanded', () => {
+      spyOn(
+        component,
+        'isSerialChapterFeatureLearnerFlagEnabled'
+      ).and.returnValue(true);
+      spyOn(storyNode, 'getPublishedStatus').and.returnValue(true);
+      spyOn(component, 'isExpanded').and.returnValue(false);
+
+      const className = component.getStartButtonClass(storySummary, 0);
+      expect(className).toBe('oppia-learner-dash-button--default');
+    });
+
+    it('should (getStartButtonClass) return inverse-incomplete if story expanded but node not current', () => {
+      spyOn(
+        component,
+        'isSerialChapterFeatureLearnerFlagEnabled'
+      ).and.returnValue(true);
+      const nodes = storySummary.getAllNodes();
+      spyOn(nodes[1], 'getPublishedStatus').and.returnValue(true);
+      spyOn(component, 'isExpanded').and.returnValue(true);
+      component.allCurrentNodes = [0, 1, 0];
+
+      const className = component.getStartButtonClass(storySummary, 1);
+      expect(className).toBe(
+        'oppia-learner-dash-button--inverse oppia-learner-dash-button--incomplete-goal'
+      );
+    });
+
+    it('should (getStartButtonClass) return default if story expanded and node is current', () => {
+      spyOn(
+        component,
+        'isSerialChapterFeatureLearnerFlagEnabled'
+      ).and.returnValue(true);
+      spyOn(storyNode, 'getPublishedStatus').and.returnValue(true);
+      spyOn(component, 'isExpanded').and.returnValue(true);
+      component.allCurrentNodes = [0, 1, 0];
+
+      const className = component.getStartButtonClass(storySummary, 0);
+      expect(className).toBe('oppia-learner-dash-button--default');
+    });
+
+    it('should (getStartButtonClass) return default when story expanded and checking the exact current playable node', () => {
+      spyOn(
+        component,
+        'isSerialChapterFeatureLearnerFlagEnabled'
+      ).and.returnValue(true);
+      const nodes = storySummary.getAllNodes();
+      spyOn(nodes[1], 'getPublishedStatus').and.returnValue(true);
+      spyOn(component, 'isExpanded').and.returnValue(true);
+      component.allCurrentNodes = [1, 1, 0];
+
+      const className = component.getStartButtonClass(storySummary, 1);
+      expect(className).toBe('oppia-learner-dash-button--default');
+    });
+  });
+
+  describe('getStartButtonHref', () => {
+    let storySummary: StorySummary;
+    let storyNode: StoryNode;
+
+    beforeEach(() => {
+      component.allCurrentNodes = [0, 1, 0];
+      storySummary = component.goalTopic.getCanonicalStorySummaryDicts()[0];
+      storyNode = storySummary.getAllNodes()[0] as StoryNode;
+    });
+
+    it('should (getStartButtonHref) return lesson url if serial feature disabled', () => {
+      spyOn(
+        component,
+        'isSerialChapterFeatureLearnerFlagEnabled'
+      ).and.returnValue(false);
+      spyOn(component, 'getNodeLessonUrl').and.returnValue('/lesson/exp_1');
+
+      expect(component.getStartButtonHref(storySummary, 0)).toBe(
+        '/lesson/exp_1'
+      );
+    });
+
+    it('should (getStartButtonHref) return null if node unpublished', () => {
+      spyOn(
+        component,
+        'isSerialChapterFeatureLearnerFlagEnabled'
+      ).and.returnValue(true);
+      spyOn(storyNode, 'getPublishedStatus').and.returnValue(false);
+
+      expect(component.getStartButtonHref(storySummary, 0)).toBeNull();
+    });
+
+    it('should (getStartButtonHref) return lesson URL if story is expanded', () => {
+      spyOn(
+        component,
+        'isSerialChapterFeatureLearnerFlagEnabled'
+      ).and.returnValue(true);
+      spyOn(storyNode, 'getPublishedStatus').and.returnValue(true);
+      spyOn(component, 'isExpanded').and.returnValue(true);
+      spyOn(component, 'getNodeLessonUrl').and.returnValue('/lesson/exp_1');
+
+      const href = component.getStartButtonHref(storySummary, 0);
+      expect(href).toBe('/lesson/exp_1');
+    });
+
+    it('should (getStartButtonHref) return null if story not expanded and checking non-current node', () => {
+      spyOn(
+        component,
+        'isSerialChapterFeatureLearnerFlagEnabled'
+      ).and.returnValue(true);
+      const nodes = storySummary.getAllNodes();
+      spyOn(nodes[1], 'getPublishedStatus').and.returnValue(true);
+      spyOn(component, 'isExpanded').and.returnValue(false);
+      component.allCurrentNodes = [0, 1, 0];
+
+      const href = component.getStartButtonHref(storySummary, 1);
+      expect(href).toBeNull();
+    });
+
+    it('should (getStartButtonHref) return lesson URL if story not expanded but checking current node', () => {
+      spyOn(
+        component,
+        'isSerialChapterFeatureLearnerFlagEnabled'
+      ).and.returnValue(true);
+      spyOn(storyNode, 'getPublishedStatus').and.returnValue(true);
+      spyOn(component, 'isExpanded').and.returnValue(false);
+      spyOn(component, 'getNodeLessonUrl').and.returnValue('/lesson/exp_1');
+      component.allCurrentNodes = [0, 1, 0];
+
+      const href = component.getStartButtonHref(storySummary, 0);
+      expect(href).toBe('/lesson/exp_1');
+    });
+
+    it('should (getStartButtonHref) return lesson URL when story expanded and node matches current playable node', () => {
+      spyOn(
+        component,
+        'isSerialChapterFeatureLearnerFlagEnabled'
+      ).and.returnValue(true);
+      const nodes = storySummary.getAllNodes();
+      spyOn(nodes[1], 'getPublishedStatus').and.returnValue(true);
+      spyOn(component, 'isExpanded').and.returnValue(true);
+      spyOn(component, 'getNodeLessonUrl').and.returnValue('/lesson/exp_2');
+      component.allCurrentNodes = [1, 1, 0];
+
+      const href = component.getStartButtonHref(storySummary, 1);
+      expect(href).toBe('/lesson/exp_2');
+    });
+  });
+
+  describe('getStartButtonLabel', () => {
+    let storySummary: StorySummary;
+    let storyNode: StoryNode;
+
+    beforeEach(() => {
+      component.allCurrentNodes = [0, 1, 0];
+      storySummary = component.goalTopic.getCanonicalStorySummaryDicts()[0];
+      storyNode = storySummary.getAllNodes()[0] as StoryNode;
+    });
+
+    it('should (getStartButtonLabel) return start label if serial feature disabled', () => {
+      spyOn(
+        component,
+        'isSerialChapterFeatureLearnerFlagEnabled'
+      ).and.returnValue(false);
+
+      expect(component.getStartButtonLabel(storySummary, 0)).toBe(
+        'I18N_LEARNER_DASHBOARD_CARD_BUTTON_START'
+      );
+    });
+
+    it('should (getStartButtonLabel) return coming soon if node unpublished', () => {
+      spyOn(
+        component,
+        'isSerialChapterFeatureLearnerFlagEnabled'
+      ).and.returnValue(true);
+      spyOn(storyNode, 'getPublishedStatus').and.returnValue(false);
+
+      expect(component.getStartButtonLabel(storySummary, 0)).toBe(
+        'I18N_LEARNER_STORY_TILE_COMING_SOON'
+      );
+    });
+
+    it('should (getStartButtonLabel) return start if node published', () => {
+      spyOn(
+        component,
+        'isSerialChapterFeatureLearnerFlagEnabled'
+      ).and.returnValue(true);
+      spyOn(storyNode, 'getPublishedStatus').and.returnValue(true);
+
+      expect(component.getStartButtonLabel(storySummary, 0)).toBe(
+        'I18N_LEARNER_DASHBOARD_CARD_BUTTON_START'
+      );
     });
   });
 });

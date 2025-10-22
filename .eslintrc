@@ -8,7 +8,6 @@
     "prettier"
   ],
   "plugins": [
-    "angular",
     "html",
     "unused-imports",
     "@typescript-eslint",
@@ -22,7 +21,6 @@
       // frontend tests there is no loss of precision.
       "files": ["*Spec.js","*.spec.ts"],
       "rules": {
-        "angular/di": "off",
         "no-loss-of-precision": "off"
       }
     },
@@ -158,35 +156,13 @@
     "oppia/comment-style": "error",
     "oppia/disallow-flags": "error",
     "oppia/disallow-httpclient": "error",
-    "oppia/disallow-angularjs-properties": "error",
     "oppia/import-lodash": "error",
     "oppia/no-multiple-component": "error",
     "oppia/no-multiline-disable": "error",
-    "oppia/directive-scope": "error",
     "oppia/no-testonly": "error",
-    "oppia/sorted-dependencies": "error",
     "oppia/test-message-style": "error",
-    "oppia/dependency-checks": "error",
     "oppia/no-test-blockers": "error",
-    "oppia/no-inject": "error",
     "oppia/no-bypass-security-phrase": "error",
-    "angular/di": [
-      "error",
-      "array"
-    ],
-    "angular/di-unused": "error",
-    "angular/directive-restrict": [
-      "error",
-      {
-        "restrict": "E"
-      }
-    ],
-    "angular/no-inline-template": [
-      "error",
-      {
-        "allowSimple": true
-      }
-    ],
     "array-bracket-spacing": [
       "error",
       "never"
