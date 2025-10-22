@@ -136,8 +136,34 @@
   }
 
   @media screen and (max-width: 700px) {
-  .oppia-editor-card-section {
+    .oppia-editor-card-section {
       padding: 20px 10px;
+    }
+
+    .e2e-test-answer-body ::ng-deep .form-justify {
+        margin-bottom: 0 !important;
+    }
+    .e2e-test-answer-body ::ng-deep .form-group.oppia-rule-editor-span {
+        top: 0 !important;
+    }
+
+    .e2e-test-answer-body ::ng-deep .position-relative {
+        flex-wrap: wrap !important;
+        display: flex !important;
+    }
+    .e2e-test-answer-body ::ng-deep .form-justify {
+        flex-basis: 100% !important;
+    }
+    .e2e-test-answer-body ::ng-deep .oppia-rule-save-cancel-buttons {
+        flex-basis: 100% !important;
+        margin-top: 15px;
+    }
+    
+    .e2e-test-answer-body ::ng-deep .oppia-rule-save-cancel-buttons .float-right {
+        float: none !important;
+        display: flex;
+        justify-content: flex-end;
+        width: 100%;
     }
   }
 
