@@ -30,12 +30,12 @@ describe('UndoRedoService', () => {
     undoRedoService = TestBed.inject(UndoRedoService);
   });
 
-  const createBackendChangeObject = (value: string) => {
-    return {property_name: value};
+  const createBackendChangeObject = (value: string): any => {
+    return {property_name: value} as any;
   };
 
   const createChangeDomainObject = (
-    backendObj: Record<string, unknown>,
+    backendObj: any,
     applyFunc: () => void = () => {},
     reverseFunc: () => void = () => {}
   ) => {
@@ -46,7 +46,7 @@ describe('UndoRedoService', () => {
     const applyFunc = jasmine.createSpy('applyChange');
     expect(undoRedoService.hasChanges()).toBeFalse();
 
-    const fakeDomainObject = {domain_property_name: 'fake value'};
+    const fakeDomainObject: any = {domain_property_name: 'fake value'};
     const backendChangeObject = createBackendChangeObject('value');
     const changeDomainObject = createChangeDomainObject(
       backendChangeObject,
@@ -66,7 +66,7 @@ describe('UndoRedoService', () => {
     const reverseFunc = jasmine.createSpy('reverseChange');
     expect(undoRedoService.hasChanges()).toBeFalse();
 
-    const fakeDomainObject = {domain_property_name: 'fake value'};
+    const fakeDomainObject: any = {domain_property_name: 'fake value'};
     const backendChangeObject = createBackendChangeObject('value');
     const changeDomainObject = createChangeDomainObject(
       backendChangeObject,
@@ -88,7 +88,7 @@ describe('UndoRedoService', () => {
     const reverseFunc = jasmine.createSpy('reverseChange');
     expect(undoRedoService.hasChanges()).toBeFalse();
 
-    const fakeDomainObject = {domain_property_name: 'fake value'};
+    const fakeDomainObject: any = {domain_property_name: 'fake value'};
     const backendChangeObject = createBackendChangeObject('value');
     const changeDomainObject = createChangeDomainObject(
       backendChangeObject,
@@ -104,18 +104,18 @@ describe('UndoRedoService', () => {
   });
 
   it('should not undo anything if no changes are applied', () => {
-    const fakeDomainObject = {domain_property_name: 'fake value'};
+    const fakeDomainObject: any = {domain_property_name: 'fake value'};
     expect(undoRedoService.undoChange(fakeDomainObject)).toBeFalse();
   });
 
   it('should not redo anything if no changes are undone', () => {
-    const fakeDomainObject = {domain_property_name: 'fake value'};
+    const fakeDomainObject: any = {domain_property_name: 'fake value'};
     expect(undoRedoService.redoChange(fakeDomainObject)).toBeFalse();
   });
 
   it('should clear changes without undoing them', () => {
     const applyFunc = jasmine.createSpy('applyChange');
-    const fakeDomainObject = {domain_property_name: 'fake value'};
+    const fakeDomainObject: any = {domain_property_name: 'fake value'};
     const backendChangeObject = createBackendChangeObject('value');
     const changeDomainObject = createChangeDomainObject(
       backendChangeObject,

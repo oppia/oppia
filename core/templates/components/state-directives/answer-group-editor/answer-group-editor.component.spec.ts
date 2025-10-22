@@ -121,14 +121,14 @@ describe('Answer Group Editor Component', () => {
     spyOn(responsesService, 'getActiveRuleIndex').and.returnValue(1);
     spyOn(responsesService, 'getAnswerChoices').and.returnValue(answerChoices);
 
-    expect(component.rulesMemento).toBe(undefined);
-    expect(component.activeRuleIndex).toBe(undefined);
-    expect(component.editAnswerGroupForm).toBe(undefined);
-    expect(component.answerChoices).toEqual(undefined);
+    expect(component.rulesMemento).toBeNull();
+    expect(component.activeRuleIndex).toBeUndefined();
+    expect(component.editAnswerGroupForm).toEqual({});
+    expect(component.answerChoices).toBeUndefined();
 
     component.ngOnInit();
 
-    expect(component.rulesMemento).toBe(null);
+    expect(component.rulesMemento).toBeNull();
     expect(component.activeRuleIndex).toBe(1);
     expect(component.editAnswerGroupForm).toEqual({});
     expect(component.answerChoices).toEqual(answerChoices);
@@ -151,9 +151,12 @@ describe('Answer Group Editor Component', () => {
 
       component.ngOnInit();
       component.activeRuleIndex = 1;
-      component.sendOnSaveTaggedMisconception(null);
-      component.sendOnSaveAnswerGroupCorrectnessLabel(null);
-      component.sendOnSaveAnswerGroupFeedback(null);
+      component.sendOnSaveTaggedMisconception({
+        skillId: '',
+        misconceptionId: 0,
+      });
+      component.sendOnSaveAnswerGroupCorrectnessLabel({} as any);
+      component.sendOnSaveAnswerGroupFeedback({} as any);
 
       externalSaveEmitter.emit();
       tick();
@@ -180,8 +183,8 @@ describe('Answer Group Editor Component', () => {
       component.ngOnInit();
       component.activeRuleIndex = 1;
       alertsService.addMessage('info', 'Some other message', 0);
-      component.sendOnSaveAnswerGroupDest(null);
-      component.sendOnSaveAnswerGroupDestIfStuck(null);
+      component.sendOnSaveAnswerGroupDest({} as any);
+      component.sendOnSaveAnswerGroupDestIfStuck({} as any);
 
       externalSaveEmitter.emit();
       tick();
@@ -536,7 +539,7 @@ describe('Answer Group Editor Component', () => {
 
     component.isEditable = false;
 
-    expect(component.openRuleEditor(null)).toBe(undefined);
+    expect(component.openRuleEditor(0)).toBe(undefined);
     expect(component.changeActiveRuleIndex).not.toHaveBeenCalled();
   });
 
@@ -558,7 +561,7 @@ describe('Answer Group Editor Component', () => {
 
     component.isEditable = true;
 
-    component.openRuleEditor(null);
+    component.openRuleEditor(0);
 
     expect(component.rulesMemento).toEqual([rule1]);
     expect(component.changeActiveRuleIndex).toHaveBeenCalled();

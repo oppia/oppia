@@ -45,15 +45,15 @@ import {InteractionDetailsCacheService} from 'pages/exploration-editor-page/edit
 import {GenerateContentIdService} from 'services/generate-content-id.service';
 
 class MockNgbModal {
-  modal: string;
+  modal: string = '';
   success: boolean = true;
-  open(content, options) {
+  open(content: any, options: any): any {
     if (this.modal === 'add_interaction') {
       return {
         result: {
           componentInstance: {},
           then: (
-            successCallback: (result) => void,
+            successCallback: (result: any) => void,
             cancelCallback: () => void
           ) => {
             if (this.success) {
@@ -187,12 +187,12 @@ describe('State Interaction component', () => {
         'shivam',
         'id',
         'some',
-        null,
-        new Interaction([], [], null, null, [], 'id', null),
-        null,
-        null,
+        SubtitledHtml.createDefault('', 'content_id'),
+        new Interaction([], [], {} as any, null, [], 'id', null),
+        [],
+        false,
         true,
-        true
+        null
       );
 
       component.ngOnInit();
@@ -207,7 +207,7 @@ describe('State Interaction component', () => {
   it('should show interaction when interaction is made', () => {
     const interactionCustomizationArgsValue = {
       placeholder: {
-        value: null,
+        value: '',
       },
       rows: {
         value: 0,
@@ -224,7 +224,7 @@ describe('State Interaction component', () => {
       explorationHtmlFormatterService,
       'getInteractionHtml'
     ).and.returnValue('htmlValue');
-    stateInteractionIdService.savedMemento = 'interactionID';
+    (stateInteractionIdService as any).savedMemento = 'interactionID';
 
     component.toggleInteractionEditor();
 
@@ -238,7 +238,7 @@ describe('State Interaction component', () => {
   it('should delete interaction when user click on delete btn', fakeAsync(() => {
     mockNgbModal.modal = 'delete_interaction';
 
-    spyOn(stateSolutionService, 'saveDisplayedValue').and.stub();
+    spyOn(stateSolutionService as any, 'saveDisplayedValue').and.stub();
     spyOn(mockNgbModal, 'open').and.callFake((dlg, opt) => {
       return {
         result: Promise.resolve('success'),
@@ -248,13 +248,13 @@ describe('State Interaction component', () => {
     component.deleteInteraction();
     tick();
 
-    expect(stateSolutionService.saveDisplayedValue).toHaveBeenCalled();
+    expect((stateSolutionService as any).saveDisplayedValue).toHaveBeenCalled();
   }));
 
   it('should not delete interaction when user click on cancel btn', fakeAsync(() => {
     mockNgbModal.modal = 'delete_interaction';
 
-    spyOn(stateSolutionService, 'saveDisplayedValue').and.stub();
+    spyOn(stateSolutionService as any, 'saveDisplayedValue').and.stub();
     spyOn(mockNgbModal, 'open').and.callFake((dlg, opt) => {
       return {
         result: Promise.reject('success'),
@@ -264,7 +264,9 @@ describe('State Interaction component', () => {
     component.deleteInteraction();
     tick();
 
-    expect(stateSolutionService.saveDisplayedValue).not.toHaveBeenCalled();
+    expect(
+      (stateSolutionService as any).saveDisplayedValue
+    ).not.toHaveBeenCalled();
   }));
 
   it('should close modal when user click cancel', fakeAsync(() => {
@@ -274,11 +276,14 @@ describe('State Interaction component', () => {
       () => {}
     );
     mockNgbModal.modal = 'add_interaction';
-    stateContentService.savedMemento = new SubtitledHtml('html', 'contentID');
-    stateCustomizationArgsService.savedMemento = {
+    (stateContentService as any).savedMemento = new SubtitledHtml(
+      'html',
+      'contentID'
+    );
+    (stateCustomizationArgsService as any).savedMemento = {
       useFractionForDivision: false,
       allowedVariables: {
-        value: ['wrok', 'done'],
+        value: ['work', 'done'],
       },
     };
     component.interactionId = 'EndExploration';
@@ -358,18 +363,18 @@ describe('State Interaction component', () => {
   );
 
   it('should save interaction when user click save', fakeAsync(() => {
-    stateInteractionIdService.displayed = 'EndExploration';
-    stateInteractionIdService.savedMemento = 'InteractiveMap';
+    (stateInteractionIdService as any).displayed = 'EndExploration';
+    (stateInteractionIdService as any).savedMemento = 'InteractiveMap';
     component.DEFAULT_TERMINAL_STATE_CONTENT = 'HTML Content';
-    stateContentService.savedMemento = SubtitledHtml.createDefault(
+    (stateContentService as any).savedMemento = SubtitledHtml.createDefault(
       '',
       'contentID'
     );
-    stateContentService.displayed = SubtitledHtml.createDefault(
+    (stateContentService as any).displayed = SubtitledHtml.createDefault(
       '',
       'contentID2'
     );
-    stateCustomizationArgsService.savedMemento = {
+    (stateCustomizationArgsService as any).savedMemento = {
       latitude: {
         value: 35,
       },
@@ -380,7 +385,7 @@ describe('State Interaction component', () => {
         value: 8,
       },
     };
-    stateCustomizationArgsService.displayed = {
+    (stateCustomizationArgsService as any).displayed = {
       recommendedExplorationIds: {
         value: ['null'],
       },
@@ -407,13 +412,13 @@ describe('State Interaction component', () => {
     tick();
 
     expect(stateEditorService.onHandleCustomArgsUpdate.emit).toHaveBeenCalled();
-    expect(stateContentService.saveDisplayedValue).toHaveBeenCalled();
+    expect((stateContentService as any).saveDisplayedValue).toHaveBeenCalled();
     expect(component.onSaveInteractionData.emit).toHaveBeenCalled();
   }));
 
   it('should through error when state is undefined', () => {
     expect(() => {
-      component.throwError(undefined);
+      component.throwError(undefined as any);
     }).toThrowError('Expected stateData to be defined but received undefined');
   });
 });

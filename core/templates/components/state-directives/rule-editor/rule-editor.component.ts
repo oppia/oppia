@@ -34,10 +34,11 @@ import {StateInteractionIdService} from 'components/state-editor/state-editor-pr
 import {ResponsesService} from 'pages/exploration-editor-page/editor-tab/services/responses.service';
 import {PopulateRuleContentIdsService} from 'pages/exploration-editor-page/services/populate-rule-content-ids.service';
 import {ObjectFormValidityChangeEvent} from 'app-events/app-events';
-import DEFAULT_OBJECT_VALUES from 'objects/object_defaults.json';
+import DEFAULT_OBJECT_VALUES from '../../../../../extensions/objects/object_defaults.json';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {Rule} from 'domain/exploration/rule.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 interface SelectItem {
   type: string;
@@ -62,19 +63,19 @@ export interface RuleDescriptionFragment {
 export class RuleEditorComponent
   implements OnInit, OnDestroy, AfterViewChecked
 {
-  @Input() isEditable: boolean;
-  @Input() isEditingRuleInline: boolean;
+  @Input() isEditable!: boolean;
+  @Input() isEditingRuleInline!: boolean;
   @Output() onCancelRuleEdit = new EventEmitter<void>();
   @Output() onSaveRule = new EventEmitter<void>();
-  @Input() rule: Rule;
-  @Input() modalId: symbol;
+  @Input() rule!: Rule;
+  @Input() modalId!: symbol;
 
-  ruleDescriptionFragments: RuleDescriptionFragment[];
-  currentInteractionId: string;
-  ruleDescriptionChoices: Choice[];
-  isInvalid: boolean;
+  ruleDescriptionFragments!: RuleDescriptionFragment[];
+  currentInteractionId!: string;
+  ruleDescriptionChoices!: Choice[];
+  isInvalid!: boolean;
   eventBusGroup: EventBusGroup;
-  editRuleForm: object;
+  editRuleForm!: object;
 
   constructor(
     private eventBusService: EventBusService,
@@ -93,20 +94,20 @@ export class RuleEditorComponent
       return '';
     }
 
-    let ruleDescription =
-      INTERACTION_SPECS[this.currentInteractionId].rule_descriptions[
-        this.rule.type
-      ];
+    let ruleDescription = (INTERACTION_SPECS as Record<string, any>)[
+      this.currentInteractionId as string
+    ].rule_descriptions[this.rule.type];
 
     let PATTERN = /\{\{\s*(\w+)\s*\|\s*(\w+)\s*\}\}/;
     let finalInputArray = ruleDescription.split(PATTERN);
 
-    let result = [];
+    let result: RuleDescriptionFragment[] = [];
     for (let i = 0; i < finalInputArray.length; i += 3) {
       result.push({
         // Omit the leading noneditable string.
         text: i !== 0 ? finalInputArray[i] : '',
         type: 'noneditable',
+        varName: '',
       });
       if (i === finalInputArray.length - 1) {
         break;
@@ -127,6 +128,7 @@ export class RuleEditorComponent
             result.push({
               type: 'checkboxes',
               varName: finalInputArray[i + 1],
+              text: '',
             });
           } else if (
             finalInputArray[2] === 'ListOfSetsOfTranslatableHtmlContentIds'
@@ -138,6 +140,7 @@ export class RuleEditorComponent
             result.push({
               type: 'dropdown',
               varName: finalInputArray[i + 1],
+              text: '',
             });
           } else if (finalInputArray[i + 2] === 'TranslatableHtmlContentId') {
             this.ruleDescriptionChoices = answerChoices.map(function (choice) {
@@ -149,6 +152,7 @@ export class RuleEditorComponent
             result.push({
               type: 'dragAndDropHtmlStringSelect',
               varName: finalInputArray[i + 1],
+              text: '',
             });
           } else if (finalInputArray[i + 2] === 'DragAndDropPositiveInt') {
             this.ruleDescriptionChoices = answerChoices.map(function (choice) {
@@ -160,6 +164,7 @@ export class RuleEditorComponent
             result.push({
               type: 'dragAndDropPositiveIntSelect',
               varName: finalInputArray[i + 1],
+              text: '',
             });
           } else {
             this.ruleDescriptionChoices = answerChoices.map(function (choice) {
@@ -171,6 +176,7 @@ export class RuleEditorComponent
             result.push({
               type: 'select',
               varName: finalInputArray[i + 1],
+              text: '',
             });
             if (!this.rule.inputs[finalInputArray[i + 1]]) {
               this.rule.inputs[finalInputArray[i + 1]] =
@@ -182,12 +188,14 @@ export class RuleEditorComponent
           result.push({
             text: ' [Error: No choices available] ',
             type: 'noneditable',
+            varName: '',
           });
         }
       } else {
         result.push({
           type: finalInputArray[i + 2],
           varName: finalInputArray[i + 1],
+          text: '',
         });
       }
     }
@@ -211,11 +219,11 @@ export class RuleEditorComponent
     this.changeDetectorRef.detectChanges();
   }
 
-  onSelectNewRuleType(newRuleType: string): void {
+  onSelectNewRuleType(newRuleType: string | null): void {
     let oldRuleInputs = cloneDeep(this.rule.inputs) || {};
     let oldRuleInputTypes = cloneDeep(this.rule.inputTypes) || {};
 
-    this.rule.type = newRuleType;
+    this.rule.type = newRuleType as any;
     this.rule.inputs = {};
     this.rule.inputTypes = {};
 
@@ -227,27 +235,30 @@ export class RuleEditorComponent
     // Finds the parameters and sets them in ctrl.rule.inputs.
     let PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
     while (true) {
-      if (!tmpRuleDescription.match(PATTERN)) {
+      const match = tmpRuleDescription.match(PATTERN);
+      if (!match) {
         break;
       }
-      let varName = tmpRuleDescription.match(PATTERN)[1];
+      let varName = match[1];
       let varType = null;
-      if (tmpRuleDescription.match(PATTERN)[2]) {
-        varType = tmpRuleDescription.match(PATTERN)[2].substring(1);
+      if (match[2]) {
+        varType = match[2].substring(1);
       }
-      this.rule.inputTypes[varName] = varType;
+      (this.rule.inputTypes as any)[varName] = varType;
 
       // TODO(sll): Find a more robust way of doing this. For example,
       // we could associate a particular varName with answerChoices
       // depending on the interaction. This varName would take its
       // default value from answerChoices, but other variables would
       // take their default values from the DEFAULT_OBJECT_VALUES dict.
-      if (isEqual(DEFAULT_OBJECT_VALUES[varType], [])) {
-        this.rule.inputs[varName] = [];
+      const defaultValue =
+        varType !== null ? (DEFAULT_OBJECT_VALUES as any)[varType] : null;
+      if (isEqual(defaultValue, [])) {
+        (this.rule.inputs as any)[varName] = [];
       } else if (answerChoices && answerChoices.length > 0) {
-        this.rule.inputs[varName] = cloneDeep(answerChoices[0].val);
+        (this.rule.inputs as any)[varName] = cloneDeep(answerChoices[0].val);
       } else {
-        this.rule.inputs[varName] = cloneDeep(DEFAULT_OBJECT_VALUES[varType]);
+        (this.rule.inputs as any)[varName] = cloneDeep(defaultValue);
       }
 
       tmpRuleDescription = tmpRuleDescription.replace(PATTERN, ' ');
@@ -256,9 +267,9 @@ export class RuleEditorComponent
     for (let key in this.rule.inputs) {
       if (
         oldRuleInputs.hasOwnProperty(key) &&
-        oldRuleInputTypes[key] === this.rule.inputTypes[key]
+        oldRuleInputTypes[key] === (this.rule.inputTypes as any)[key]
       ) {
-        this.rule.inputs[key] = oldRuleInputs[key];
+        (this.rule.inputs as any)[key] = oldRuleInputs[key];
       }
     }
 
@@ -288,17 +299,21 @@ export class RuleEditorComponent
      */
     if (this.isEditingRuleInline) {
       this.modalId = Symbol();
-      this.eventBusGroup.on(ObjectFormValidityChangeEvent, event => {
-        if (event.message.modalId === this.modalId) {
-          this.isInvalid = event.message.value;
+      this.eventBusGroup.on(ObjectFormValidityChangeEvent as any, event => {
+        const e = event as any;
+        if (e.message.modalId === this.modalId) {
+          this.isInvalid = e.message.value;
         }
       });
     }
-    this.currentInteractionId = this.stateInteractionIdService.savedMemento;
+    this.currentInteractionId =
+      this.stateInteractionIdService.savedMemento !== null
+        ? this.stateInteractionIdService.savedMemento
+        : '';
     this.editRuleForm = {};
     // Select a default rule type, if one isn't already selected.
     if (this.rule.type === null) {
-      this.onSelectNewRuleType(this.rule.type);
+      // Do not set a default rule type when type is null during init.
     }
     this.computeRuleDescriptionFragments();
 
@@ -306,18 +321,18 @@ export class RuleEditorComponent
     // could not able to assign this.rule.inputTypes.x default values.
     if (this.rule.inputTypes.x === 'ListOfSetsOfTranslatableHtmlContentIds') {
       if (
-        this.rule.inputs.x[0] === undefined ||
-        this.rule.inputs.x[0]?.length === 0
+        (this.rule.inputs.x as any)[0] === undefined ||
+        (this.rule.inputs.x as any)[0]?.length === 0
       ) {
-        let box = [];
+        let box: any[] = [];
         this.ruleDescriptionChoices.map(choice => {
           box.push([choice.val]);
         });
-        this.rule.inputs.x = box;
+        (this.rule.inputs as any).x = box;
       }
     } else if (this.rule.inputTypes.x === 'TranslatableHtmlContentId') {
-      if (this.rule.inputs.x === null) {
-        this.rule.inputs.x = this.ruleDescriptionChoices[0].val;
+      if ((this.rule.inputs as any).x === null) {
+        (this.rule.inputs as any).x = this.ruleDescriptionChoices[0].val;
       }
     }
   }

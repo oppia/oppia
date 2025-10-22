@@ -42,6 +42,7 @@ import {ExternalSaveService} from 'services/external-save.service';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {BaseTranslatableObject} from 'interactions/rule-input-defs';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 interface TaggedMisconception {
   skillId: string;
@@ -53,13 +54,13 @@ interface TaggedMisconception {
   templateUrl: './answer-group-editor.component.html',
 })
 export class AnswerGroupEditor implements OnInit, OnDestroy {
-  @Input() displayFeedback: boolean;
-  @Input() taggedSkillMisconceptionId: string;
-  @Input() isEditable: boolean;
-  @Input() outcome: Outcome;
-  @Input() rules: Rule[];
-  @Input() suppressWarnings: boolean;
-  @Input() addState: (value: string) => void;
+  @Input() displayFeedback!: boolean;
+  @Input() taggedSkillMisconceptionId!: string;
+  @Input() isEditable!: boolean;
+  @Input() outcome!: Outcome;
+  @Input() rules!: Rule[];
+  @Input() suppressWarnings!: boolean;
+  @Input() addState!: (value: string) => void;
   @Output() onSaveAnswerGroupRules = new EventEmitter<Rule[]>();
   @Output() onSaveAnswerGroupCorrectnessLabel = new EventEmitter<Outcome>();
   @Output() onSaveNextContentIdIndex = new EventEmitter();
@@ -68,12 +69,12 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
   @Output() onSaveAnswerGroupFeedback = new EventEmitter<Outcome>();
   @Output() onSaveTaggedMisconception = new EventEmitter<TaggedMisconception>();
 
-  rulesMemento: Rule[];
+  rulesMemento: Rule[] | null = null;
   directiveSubscriptions = new Subscription();
-  originalContentIdToContent: object;
-  activeRuleIndex: number;
-  answerChoices: AnswerChoice[];
-  editAnswerGroupForm: object;
+  originalContentIdToContent: Record<string, unknown> = {};
+  activeRuleIndex!: number;
+  answerChoices!: AnswerChoice[];
+  editAnswerGroupForm: Record<string, unknown> = {};
   tagMisconceptionsFeatureFlagIsEnabled: boolean = false;
 
   constructor(
@@ -221,7 +222,9 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
   addNewRule(): void {
     // Build an initial blank set of inputs for the initial rule.
     let interactionId = this.getCurrentInteractionId();
-    let ruleDescriptions = INTERACTION_SPECS[interactionId].rule_descriptions;
+    let ruleDescriptions = (INTERACTION_SPECS as Record<string, any>)[
+      interactionId as string
+    ].rule_descriptions;
     let ruleTypes = Object.keys(ruleDescriptions);
     if (ruleTypes.length === 0) {
       // This should never happen. An interaction must have at least
@@ -233,11 +236,11 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
     let description = ruleDescriptions[ruleType];
 
     let PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
-    let inputs = {};
-    const inputTypes = {};
+    let inputs: Record<string, any> = {};
+    const inputTypes: Record<string, any> = {};
     while (description.match(PATTERN)) {
-      let varName = description.match(PATTERN)[1];
-      let varType = description.match(PATTERN)[2];
+      let varName = description.match(PATTERN)![1];
+      let varType = description.match(PATTERN)![2];
       if (varType) {
         varType = varType.substring(1);
       }
@@ -272,8 +275,10 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
 
   cancelActiveRuleEdit(): void {
     this.rules.splice(0, this.rules.length);
-    for (let i = 0; i < this.rulesMemento.length; i++) {
-      this.rules.push(this.rulesMemento[i]);
+    if (this.rulesMemento) {
+      for (let i = 0; i < this.rulesMemento.length; i++) {
+        this.rules.push(this.rulesMemento[i]);
+      }
     }
     this.saveRules();
   }
@@ -335,7 +340,9 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
           this.rules.map(rule => rule.type).join(', ')
       );
     }
-    return INTERACTION_SPECS[interactionId].is_trainable;
+    // Use type assertion to allow index access, and ensure interactionId is not null
+    return (INTERACTION_SPECS as Record<string, any>)[interactionId as string]
+      .is_trainable;
   }
 
   openTrainingDataEditor(): void {
@@ -352,8 +359,8 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
    * @returns {Object} A Mapping of content ids (string) to content
    *   (string).
    */
-  getTranslatableRulesContentIdToContentMap(): object {
-    const contentIdToContentMap = {};
+  getTranslatableRulesContentIdToContentMap(): Record<string, unknown> {
+    const contentIdToContentMap: Record<string, unknown> = {};
     this.rules.forEach(rule => {
       Object.keys(rule.inputs).forEach(ruleName => {
         const ruleInput = rule.inputs[ruleName];
@@ -361,9 +368,10 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
         // BaseTranslatableObject having dict structure with contentId
         // as a key.
         if (ruleInput && ruleInput.hasOwnProperty('contentId')) {
-          contentIdToContentMap[
-            (ruleInput as BaseTranslatableObject).contentId
-          ] = ruleInput;
+          const contentId = (ruleInput as BaseTranslatableObject).contentId;
+          if (contentId !== null) {
+            contentIdToContentMap[contentId] = ruleInput;
+          }
         }
       });
     });

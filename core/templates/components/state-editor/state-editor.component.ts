@@ -192,7 +192,8 @@ export class StateEditorComponent implements OnInit, OnDestroy {
     this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
     this.interactionIdIsSet = false;
     this.servicesInitialized = false;
-    this.stateName = this.stateEditorService.getActiveStateName();
+    const safeStateName = this.stateEditorService.getActiveStateName() ?? '';
+    this.stateName = safeStateName;
     this.directiveSubscriptions.add(
       this.stateInteractionIdService.onInteractionIdChanged.subscribe(
         newInteractionId => {
@@ -209,49 +210,54 @@ export class StateEditorComponent implements OnInit, OnDestroy {
           );
         }
         this.stateData = stateData;
-        this.stateName = this.stateEditorService.getActiveStateName();
+        this.stateName = safeStateName;
         this.stateEditorService.setInteraction(stateData.interaction);
-        this.stateEditorService.setLinkedSkillId(stateData.linkedSkillId);
+        this.stateEditorService.setLinkedSkillId(stateData.linkedSkillId ?? '');
         if (!this.stateEditorService.isInQuestionMode()) {
           this.stateEditorService.setInapplicableSkillMisconceptionIds(
-            stateData.inapplicableSkillMisconceptionIds
+            stateData.inapplicableSkillMisconceptionIds ?? []
           );
         }
-        this.stateContentService.init(this.stateName, stateData.content);
+        this.stateContentService.init(safeStateName, stateData.content);
         this.stateLinkedSkillIdService.init(
-          this.stateName,
-          stateData.linkedSkillId
+          safeStateName,
+          stateData.linkedSkillId ?? ''
         );
         this.stateHintsService.init(
-          this.stateName,
-          stateData.interaction.hints
+          safeStateName,
+          stateData.interaction.hints ?? []
         );
         this.stateInteractionIdService.init(
-          this.stateName,
-          stateData.interaction.id
+          safeStateName,
+          stateData.interaction.id ?? ''
         );
         this.stateCustomizationArgsService.init(
-          this.stateName,
-          stateData.interaction.customizationArgs
+          safeStateName,
+          stateData.interaction.customizationArgs ?? {}
         );
         this.stateNameService.init();
         this.stateParamChangesService.init(
-          this.stateName,
-          stateData.paramChanges
+          safeStateName,
+          stateData.paramChanges ?? []
+        );
+        this.stateNameService.init();
+        this.stateParamChangesService.init(
+          safeStateName,
+          stateData.paramChanges ?? []
         );
         this.stateSolicitAnswerDetailsService.init(
-          this.stateName,
-          stateData.solicitAnswerDetails
+          safeStateName,
+          stateData.solicitAnswerDetails ?? false
         );
         this.stateCardIsCheckpointService.init(
-          this.stateName,
-          stateData.cardIsCheckpoint
+          safeStateName,
+          stateData.cardIsCheckpoint ?? false
         );
         this.stateSolutionService.init(
-          this.stateName,
-          stateData.interaction.solution
+          safeStateName,
+          stateData.interaction.solution ?? null
         );
-        this.updateInteractionVisibility(stateData.interaction.id);
+        this.updateInteractionVisibility(stateData.interaction.id ?? '');
         this.servicesInitialized = true;
       })
     );

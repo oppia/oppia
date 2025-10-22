@@ -144,7 +144,7 @@ describe('Rule Editor Component', () => {
     component.rule = new Rule(
       'HasElementXAtPositionY',
       {
-        x: null,
+        x: '',
         y: 1,
       },
       {
@@ -170,11 +170,11 @@ describe('Rule Editor Component', () => {
   }));
 
   it('should set component properties on initialization', () => {
-    component.rule = new Rule(null, null, null);
+    component.rule = new Rule('', {} as any, {} as any);
 
     stateInteractionIdService.savedMemento = 'TextInput';
 
-    expect(component.currentInteractionId).toBe(undefined);
+    expect(component.currentInteractionId).toBeUndefined();
     expect(component.editRuleForm).toEqual(undefined);
 
     component.ngOnInit();
@@ -187,7 +187,7 @@ describe('Rule Editor Component', () => {
     'should set change validity on form valid' + ' change event',
     fakeAsync(() => {
       const eventBusGroup = new EventBusGroup(eventBusService);
-      component.rule = new Rule(null, null, null);
+      component.rule = new Rule('', {} as any, {} as any);
 
       expect(component.isInvalid).toBe(undefined);
 
@@ -232,8 +232,7 @@ describe('Rule Editor Component', () => {
         'Equals',
         {x: 'c'},
         {
-          contentId: null,
-          normalizedStrSet: '',
+          x: 'TranslatableSetOfNormalizedString',
         }
       );
 
@@ -263,7 +262,7 @@ describe('Rule Editor Component', () => {
       let componentRule = new Rule(
         'Equals',
         {x: 'TranslatableSetOfNormalizedString'},
-        null
+        {} as any
       );
 
       component.rule = componentRule;
@@ -285,8 +284,7 @@ describe('Rule Editor Component', () => {
         'MatchesExactlyWith',
         {x: 'AlgebraicExpression'},
         {
-          contentId: null,
-          normalizedStrSet: '',
+          x: 'AlgebraicExpression',
         }
       );
       component.rule.inputs = {
@@ -313,11 +311,11 @@ describe('Rule Editor Component', () => {
 
   it('should cancel edit when user clicks cancel button', () => {
     const item = {
-      type: null,
+      type: '',
       varName: 'varName',
     };
 
-    component.rule = new Rule(null, {varName: 2}, null);
+    component.rule = new Rule('', {varName: 2}, {} as any);
 
     spyOn(component.onCancelRuleEdit, 'emit');
 
@@ -328,7 +326,7 @@ describe('Rule Editor Component', () => {
   });
 
   it('should save rule when user clicks save button', () => {
-    component.rule = new Rule(null, null, null);
+    component.rule = new Rule('', {} as any, {} as any);
 
     spyOn(component.onSaveRule, 'emit').and.stub();
     spyOn(
@@ -354,7 +352,7 @@ describe('Rule Editor Component', () => {
           label: '',
         },
       ]);
-      component.rule = new Rule('Equals', null, null);
+      component.rule = new Rule('Equals', {} as any, {} as any);
 
       component.currentInteractionId = 'ItemSelectionInput';
 
@@ -365,14 +363,17 @@ describe('Rule Editor Component', () => {
         {
           text: '',
           type: 'noneditable',
+          varName: '',
         },
         {
           type: 'checkboxes',
           varName: 'x',
+          text: '',
         },
         {
           text: '',
           type: 'noneditable',
+          varName: '',
         },
       ] as RuleDescriptionFragment[]);
     })
@@ -391,8 +392,8 @@ describe('Rule Editor Component', () => {
 
       component.rule = new Rule(
         'IsEqualToOrderingWithOneItemAtIncorrectPosition',
-        null,
-        null
+        {} as any,
+        {} as any
       );
 
       component.currentInteractionId = 'DragAndDropSortInput';
@@ -406,14 +407,17 @@ describe('Rule Editor Component', () => {
         {
           text: '',
           type: 'noneditable',
+          varName: '',
         },
         {
           type: 'dropdown',
           varName: 'x',
+          text: '',
         },
         {
           text: '',
           type: 'noneditable',
+          varName: '',
         },
       ] as RuleDescriptionFragment[]);
     })
@@ -428,7 +432,7 @@ describe('Rule Editor Component', () => {
           label: '',
         },
       ]);
-      component.rule = new Rule('IsEqualToOrdering', null, null);
+      component.rule = new Rule('IsEqualToOrdering', {} as any, {} as any);
 
       component.currentInteractionId = 'DragAndDropSortInput';
       component.onSelectNewRuleType('IsEqualToOrdering');
@@ -438,14 +442,17 @@ describe('Rule Editor Component', () => {
         {
           text: '',
           type: 'noneditable',
+          varName: '',
         },
         {
           type: 'dropdown',
           varName: 'x',
+          text: '',
         },
         {
           text: '',
           type: 'noneditable',
+          varName: '',
         },
       ] as RuleDescriptionFragment[]);
     })
@@ -460,7 +467,7 @@ describe('Rule Editor Component', () => {
           label: '',
         },
       ]);
-      component.rule = new Rule('HasElementXAtPositionY', null, null);
+      component.rule = new Rule('HasElementXAtPositionY', {} as any, {} as any);
       component.currentInteractionId = 'DragAndDropSortInput';
 
       component.onSelectNewRuleType('HasElementXAtPositionY');
@@ -475,7 +482,7 @@ describe('Rule Editor Component', () => {
       ' choices are empty',
     fakeAsync(() => {
       spyOn(responsesService, 'getAnswerChoices').and.returnValue([]);
-      component.rule = new Rule('MatchesExactlyWith', null, null);
+      component.rule = new Rule('MatchesExactlyWith', {} as any, {} as any);
       component.currentInteractionId = 'AlgebraicExpressionInput';
 
       component.onSelectNewRuleType('MatchesExactlyWith');
@@ -485,14 +492,17 @@ describe('Rule Editor Component', () => {
         {
           text: '',
           type: 'noneditable',
+          varName: '',
         },
         {
           text: ' [Error: No choices available] ',
           type: 'noneditable',
+          varName: '',
         },
         {
           text: '',
           type: 'noneditable',
+          varName: '',
         },
       ] as RuleDescriptionFragment[]);
     })
