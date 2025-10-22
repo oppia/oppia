@@ -24,10 +24,10 @@
             <!--TODO(#18384): Resume state, can only check if node is completed or not.-->
           <a *ngIf="story.getAllNodes().length !== story.getCompletedNodeTitles().length && !isExpanded(story.getId())"
              class="oppia-learner-dash-button-sm oppia-learner-dash-button--goals-list align-self-end e2e-test-start-lesson-button"
-             [ngClass]="story.getAllNodes()[allCurrentNodes[i]]?.getPublishedStatus() ? 'oppia-learner-dash-button--default' : 'oppia-learner-dash-button--disabled'"
-             [attr.href]="story.getAllNodes()[allCurrentNodes[i]]?.getPublishedStatus() ?
-             getNodeLessonUrl(story, story.getAllNodes()[allCurrentNodes[i]]) : null">
-             {{ story.getAllNodes()[allCurrentNodes[i]]?.getPublishedStatus() ? ('I18N_LEARNER_DASHBOARD_CARD_BUTTON_START' | translate) : ('I18N_LEARNER_STORY_TILE_COMING_SOON' | translate) }}
+             [ngClass]="getStartButtonClass(story, allCurrentNodes[i])"
+             [attr.href]="getStartButtonHref(story, allCurrentNodes[i])"
+            >
+              {{ getStartButtonLabel(story, allCurrentNodes[i]) | translate }}
           </a>
         </div>
       </div>
@@ -45,10 +45,10 @@
             </div>
             <a *ngIf="!story.isNodeCompleted(storyNode.getTitle())"
                class="oppia-learner-dash-button-sm oppia-learner-dash-button--goals-list"
-               [ngClass]="allCurrentNodes[i] === j ? (storyNode.getPublishedStatus()  ? 'oppia-learner-dash-button--default' : 'oppia-learner-dash-button--disabled')
-               : (storyNode.getPublishedStatus()  ? 'oppia-learner-dash-button--inverse oppia-learner-dash-button--incomplete-goal' : 'oppia-learner-dash-button--disabled')"
-               [attr.href]="storyNode.getPublishedStatus()  ? getNodeLessonUrl(story, storyNode) : null">
-                {{ storyNode.getPublishedStatus()  ? ('I18N_LEARNER_DASHBOARD_CARD_BUTTON_START' | translate) : ('I18N_LEARNER_STORY_TILE_COMING_SOON' | translate) }}
+               [ngClass]="getStartButtonClass(story, j)"
+               [attr.href]="getStartButtonHref(story, j)"
+              >
+                {{ getStartButtonLabel(story, j) | translate }}
             </a>
           </div>
           <div class="goal-list-story-node-line-container">

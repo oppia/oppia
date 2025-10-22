@@ -37,6 +37,7 @@ import {ThreadDataBackendApiService} from 'pages/exploration-editor-page/feedbac
 import {UserService} from 'services/user.service';
 import {UserInfo} from 'domain/user/user-info.model';
 import {OverlayModule} from '@angular/cdk/overlay';
+import cloneDeep from 'lodash/cloneDeep';
 import {
   MatSnackBar,
   MatSnackBarModule,
@@ -286,7 +287,7 @@ describe('Translation Suggestion Review Modal Component', function () {
     beforeEach(() => {
       component.subheading = subheading;
       component.reviewable = reviewable;
-      component.suggestionIdToContribution = angular.copy(
+      component.suggestionIdToContribution = cloneDeep(
         suggestionIdToContribution
       );
       component.editedContent = editedContent;
@@ -426,7 +427,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       component.initialSuggestionId = 'suggestion_1';
       component.subheading = subheading;
       component.reviewable = reviewable;
-      component.suggestionIdToContribution = angular.copy(
+      component.suggestionIdToContribution = cloneDeep(
         suggestionIdToContribution
       );
       component.editedContent = editedContent;
@@ -781,7 +782,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       component.initialSuggestionId = 'suggestion_1';
       component.subheading = subheading;
       component.reviewable = reviewable;
-      component.suggestionIdToContribution = angular.copy(
+      component.suggestionIdToContribution = cloneDeep(
         suggestionIdToContribution
       );
       mockPlatformFeatureService.status.CdAllowUndoingTranslationReview.isEnabled =
@@ -878,7 +879,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       component.initialSuggestionId = 'suggestion_1';
       component.subheading = subheading;
       component.reviewable = reviewable;
-      component.suggestionIdToContribution = angular.copy(
+      component.suggestionIdToContribution = cloneDeep(
         suggestionIdToContribution
       );
       component.editedContent = editedContent;
@@ -1477,7 +1478,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       component.initialSuggestionId = 'suggestion_1';
       component.subheading = subheading;
       component.reviewable = reviewable;
-      component.suggestionIdToContribution = angular.copy(
+      component.suggestionIdToContribution = cloneDeep(
         suggestionIdToContribution
       );
       mockPlatformFeatureService.status.CdAllowUndoingTranslationReview.isEnabled =
@@ -1643,7 +1644,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       component.initialSuggestionId = 'suggestion_1';
       component.subheading = subheading;
       component.reviewable = reviewable;
-      component.suggestionIdToContribution = angular.copy(
+      component.suggestionIdToContribution = cloneDeep(
         suggestionIdToContribution
       );
     });
@@ -1853,7 +1854,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       component.initialSuggestionId = 'suggestion_1';
       component.subheading = subheading;
       component.reviewable = reviewable;
-      component.suggestionIdToContribution = angular.copy(
+      component.suggestionIdToContribution = cloneDeep(
         suggestionIdToContribution
       );
     });
@@ -2040,7 +2041,7 @@ describe('Translation Suggestion Review Modal Component', function () {
     });
 
     it('should correctly set variables if there is only one item', () => {
-      component.suggestionIdToContribution = angular.copy(
+      component.suggestionIdToContribution = cloneDeep(
         suggestionIdToContributionOne
       );
       component.ngOnInit();
@@ -2052,7 +2053,7 @@ describe('Translation Suggestion Review Modal Component', function () {
     });
 
     it('should correctly set variables if there are multiple items', () => {
-      component.suggestionIdToContribution = angular.copy(
+      component.suggestionIdToContribution = cloneDeep(
         suggestionIdToContribution
       );
       component.ngOnInit();
@@ -2064,7 +2065,7 @@ describe('Translation Suggestion Review Modal Component', function () {
     });
 
     it('should successfully navigate between items', () => {
-      component.suggestionIdToContribution = angular.copy(
+      component.suggestionIdToContribution = cloneDeep(
         suggestionIdToContribution
       );
       component.ngOnInit();
@@ -2115,7 +2116,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       'should close the modal if the opportunity is' +
         ' deleted when navigating forward',
       () => {
-        component.suggestionIdToContribution = angular.copy(
+        component.suggestionIdToContribution = cloneDeep(
           suggestionIdToContribution
         );
         component.ngOnInit();
@@ -2132,7 +2133,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       'should close the modal if the opportunity is' +
         ' deleted when navigating backward',
       () => {
-        component.suggestionIdToContribution = angular.copy(
+        component.suggestionIdToContribution = cloneDeep(
           suggestionIdToContribution
         );
         component.ngOnInit();
@@ -2225,7 +2226,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       component.initialSuggestionId = 'suggestion_2';
       component.subheading = subheading;
       component.reviewable = reviewable;
-      component.suggestionIdToContribution = angular.copy(
+      component.suggestionIdToContribution = cloneDeep(
         suggestionIdToContribution
       );
       component.editedContent = editedContent;

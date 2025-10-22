@@ -95,17 +95,17 @@
         </span>
       </div>
       <div (click)="showAllChapters()"
-           *ngIf="showButton && (chaptersDisplayed < nodeCount) && !isSerialChapterFeatureFlagEnabled()"
+           *ngIf="showButton && (chaptersDisplayed < nodeCount) && !isSerialChapterFeatureLearnerFlagEnabled()"
            class="view-button">
         <span class="fas fa-caret-down down-caret-position"></span>
       </div>
       <div (click)="hideExtraChapters()"
-           *ngIf="showButton && (chaptersDisplayed === nodeCount) && !isSerialChapterFeatureFlagEnabled()"
+           *ngIf="showButton && (chaptersDisplayed === nodeCount) && !isSerialChapterFeatureLearnerFlagEnabled()"
            class="view-button">
         <span class="fas fa-caret-up up-caret-position"></span>
       </div>
     </div>
-    <div class="chapters-container-box chapter-container" *ngIf="checkTabletView() && !isSerialChapterFeatureFlagEnabled()">
+    <div class="chapters-container-box chapter-container" *ngIf="checkTabletView() && !isSerialChapterFeatureLearnerFlagEnabled()">
       <div *ngFor="let title of nodeTitles;let idx = index">
         <div class="story-details-box chapter-specific-box" *ngIf="idx < chaptersDisplayed">
           <div class="chapter-icon">
@@ -124,7 +124,7 @@
         </div>
       </div>
     </div>
-    <div class="chapters-container-box chapter-container" *ngIf="checkTabletView() && isSerialChapterFeatureFlagEnabled()">
+    <div class="chapters-container-box chapter-container" *ngIf="checkTabletView() && isSerialChapterFeatureLearnerFlagEnabled()">
       <div class="chapters-list">
         <div class="tablet-view chapters-heading">
           <div class="heading-label">Available</div>
@@ -145,6 +145,9 @@
                   {{ nodeTitlesTranslationKeys[idx] | translate }}
                 </span>
               </a>
+              <div class="classroom-new-chapter" *ngIf="isNewChapterLabelVisible(node) && isSerialChapterFeatureLearnerFlagEnabled()">
+                <p class="classroom-status">New</p>
+              </div>
             </div>
           </div>
         </div>
@@ -156,7 +159,7 @@
         </div>
         <hr class="tablet-view heading-separator">
         <div *ngFor="let node of nodes;let idx = index">
-          <div class="story-details-box chapter-specific-box coming-soon-chapters" *ngIf="node.getStatus() === 'Ready To Publish'" title="'I18N_LEARNER_STORY_TILE_COMING_SOON_TOOLTIP' | translate">
+          <div class="story-details-box chapter-specific-box coming-soon-chapters" *ngIf="node.getStatus() === 'Ready To Publish'" [attr.title]="isSerialChapterFeatureLearnerFlagEnabled() ? ('I18N_LEARNER_STORY_TILE_COMING_SOON_TOOLTIP' | translate) : null">
             <div class="chapter-icon">
               <span class="chapter-icon-number">{{ idx + 1 }}</span>
             </div>
@@ -174,7 +177,7 @@
         </div>
       </div>
     </div>
-    <div class="chapter-details" *ngIf="!checkTabletView() && !isSerialChapterFeatureFlagEnabled()">
+    <div class="chapter-details" *ngIf="!checkTabletView() && !isSerialChapterFeatureLearnerFlagEnabled()">
       <div class="chapter-title"
            *ngFor="let title of nodeTitles;let idx = index">
         <div *ngIf="storySummary.isNodeCompleted(title)" class="fas fa-check completed-icon">
@@ -203,7 +206,7 @@
         <span class="fas fa-caret-up up-caret-position"></span>
       </div>
     </div>
-    <div class="chapter-details" *ngIf="!checkTabletView() && isSerialChapterFeatureFlagEnabled()">
+    <div class="chapter-details" *ngIf="!checkTabletView() && isSerialChapterFeatureLearnerFlagEnabled()">
       <div class="chapters-list">
         <div class="chapters-heading">
           <div class="heading-label">Available</div>
@@ -223,6 +226,9 @@
                 {{ nodeTitlesTranslationKeys[idx] | translate }}
               </span>
             </a>
+            <div class="classroom-new-chapter" *ngIf="isNewChapterLabelVisible(node) && isSerialChapterFeatureLearnerFlagEnabled()">
+              <p class="classroom-status">New</p>
+            </div>
           </div>
         </div>
       </div>
@@ -235,7 +241,7 @@
         <div class="chapter-title coming-soon-chapters"
            *ngFor="let node of nodes;let idx = index">
           <div [ngClass]="{'pending-chapter': !storySummary.isNodeCompleted(node.getTitle()) && isPreviousChapterCompleted(idx), 'incomplete-chapter': !storySummary.isNodeCompleted(node.getTitle()), 'complete-chapter': storySummary.isNodeCompleted(node.getTitle())}"
-              *ngIf="node.getStatus() === 'Ready To Publish'" title="'I18N_LEARNER_STORY_TILE_COMING_SOON_TOOLTIP' | translate">
+              *ngIf="node.getStatus() === 'Ready To Publish'" [attr.title]="isSerialChapterFeatureLearnerFlagEnabled() ? ('I18N_LEARNER_STORY_TILE_COMING_SOON_TOOLTIP' | translate) : null">
             <a [href]="getChapterUrl(node.getTitle())" rel="noopener" class="disabled-link">
               <span class="chapter-identifier" [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTER' | translate">
               </span>&nbsp;<span class="chapter-identifier">{{ idx + 1 }}:</span>&nbsp;<span dir="auto" *ngIf="!isHackyNodeTitleTranslationDisplayed(idx)">{{ node.getTitle() }}</span>

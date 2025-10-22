@@ -86,7 +86,7 @@
 
   <div *ngIf="redesignFeatureFlag">
      <!--TODO(#18384): Hides recommendations if no classroom topics in-progress (isNonemptyObject(untrackedTopics) not sure what this does)-->
-    <div class="oppia-learner-dash-section" *ngIf="getTotalInProgressLessons() > 0 && storySummariesWithAvailableNodes.size > 0">
+    <div class="oppia-learner-dash-section" *ngIf="getTotalInProgressLessons() > 0 ">
       <p class="oppia-learner-dash-section-heading">
         {{ 'I18N_LEARNER_DASHBOARD_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate }}
       </p>
@@ -134,7 +134,7 @@
       </ng-container>
       <oppia-card-display *ngIf="totalLessonsInPlaylists.length !== 0" [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_SAVED_SECTION'" [numCards]="totalLessonsInPlaylists.length">
         <ng-container *ngFor="let lesson of totalLessonsInPlaylists">
-          <lesson-card [story]="lesson"></lesson-card>
+          <lesson-card [story]="lesson" [isSavedSection]="true"></lesson-card>
         </ng-container>
       </oppia-card-display>
     </div>

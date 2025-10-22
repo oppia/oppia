@@ -26,14 +26,14 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
 import {EntityTranslationsService} from 'services/entity-translations.services';
-import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
+import {EntityTranslation} from 'domain/translation/entity-translation.model';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {FeatureStatusChecker} from 'domain/feature-flag/feature-status-summary.model';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {EntityVoiceovers} from 'domain/voiceover/entity-voiceovers.model';
 import {Voiceover} from 'domain/exploration/voiceover.model';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
+import {TranslatedContent} from 'domain/exploration/translated-content.model';
 
 class MockNgbModal {
   open() {
