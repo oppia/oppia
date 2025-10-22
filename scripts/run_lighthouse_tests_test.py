@@ -947,14 +947,18 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                 calls.append('mkdir_called')
 
         class MockProcess:
+            """Mock subprocess.Popen for testing."""
+
             def __init__(
-                self, *args: object, **kwargs: object
-            ) -> None:  # pylint: disable=unused-argument
+                self,
+                *args: object,
+                **kwargs: object,  # Here we use object because subprocess.Popen can receive arbitrary arguments.  # pylint: disable=unused-argument
+            ) -> None:
                 self.returncode: int = 0
 
-            def communicate(
+            def communicate(  # pylint: disable=missing-docstring
                 self,
-            ) -> tuple[bytes, bytes]:  # pylint: disable=missing-docstring
+            ) -> tuple[bytes, bytes]:
                 return (b'topic:123\n', b'')
 
         swap_exists = self.swap(os.path, 'exists', mock_exists)

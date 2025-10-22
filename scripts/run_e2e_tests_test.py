@@ -875,9 +875,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     )
                 )
 
-            args = run_e2e_tests._PARSER.parse_args(
+            args = run_e2e_tests._PARSER.parse_args(  # pylint: disable=protected-access
                 args=[]
-            )  # pylint: disable=protected-access
+            )
             with self.swap_mock_set_constants_to_default:
                 output_lines, return_code = run_e2e_tests.run_tests(args)
 
@@ -945,9 +945,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     )
                 )
 
-            args = run_e2e_tests._PARSER.parse_args(
+            args = run_e2e_tests._PARSER.parse_args(  # pylint: disable=protected-access
                 args=[]
-            )  # pylint: disable=protected-access
+            )
             with self.swap_mock_set_constants_to_default:
                 output_lines, return_code = run_e2e_tests.run_tests(args)
 
