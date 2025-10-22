@@ -124,7 +124,6 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES,
     FeatureNames.SHOW_REGENERATED_VOICEOVERS_TO_LEARNERS,
     FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS,
-    FeatureNames.ENABLE_WORKED_EXAMPLES_RTE_COMPONENT,
 ]
 
 # Names of features in prod stage, the corresponding feature flag instances must
@@ -140,6 +139,7 @@ PROD_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS,
     FeatureNames.LABEL_ACCENT_TO_VOICE_ARTIST,
     FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
+    FeatureNames.ENABLE_WORKED_EXAMPLES_RTE_COMPONENT,
 ]
 
 # Names of features that should not be used anymore, e.g. features that are
@@ -316,7 +316,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
         (
             'Allows creators to add worked examples to the review material '
             'section of skills and explanation of the study guides.',
-            feature_flag_domain.ServerMode.TEST,
+            feature_flag_domain.ServerMode.PROD,
         )
     ),
     FeatureNames.SHOW_REGENERATED_VOICEOVERS_TO_LEARNERS.value: (
