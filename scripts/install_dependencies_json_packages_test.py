@@ -539,11 +539,12 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         def mock_return_json(
             _path: str,
         ) -> install_dependencies_json_packages.DependenciesDict:
+            # Here we use MyPy ignore because we are intentionally testing an unsupported downloadFormat; this is a mock for testing only.
             return {
                 'frontendDependencies': {
                     'unsupportedDep': {
                         'version': '1.0.0',
-                        'downloadFormat': 'tar',
+                        'downloadFormat': 'tar',  # type: ignore[typeddict-item]
                         'url': 'https://example.com/dep.tar',
                         'rootDirPrefix': 'unsupported-',
                         'targetDirPrefix': 'unsupported-',
@@ -554,10 +555,14 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         def mock_validate_dependencies(_path: str) -> None:
             check_function_calls['validate_dependencies_is_called'] = True
 
-        def mock_download_files(*_args, **_kwargs) -> None:
+        # Here we use type Any because these are mocks; we do not care about the actual
+        # types of arguments, only that the functions are called.
+        def mock_download_files(*_args: Any, **_kwargs: Any) -> None:
             check_function_calls['download_files_is_called'] = True
 
-        def mock_download_and_unzip_files(*_args, **_kwargs) -> None:
+        # Here we use type Any because these are mocks; we do not care about the actual
+        # types of arguments, only that the functions are called.
+        def mock_download_and_unzip_files(*_args: Any, **_kwargs: Any) -> None:
             check_function_calls['download_and_unzip_files_is_called'] = True
 
         return_json_swap = self.swap(
