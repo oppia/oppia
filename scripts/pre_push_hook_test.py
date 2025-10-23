@@ -922,7 +922,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             }
 
             mock_changed_branch.return_value.git_status_first_line = (
-                '## feature-branch'
+                b'## feature-branch'
             )
             mock_changed_branch.return_value.current_branch = 'feature-branch'
 
