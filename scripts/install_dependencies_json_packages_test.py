@@ -233,6 +233,59 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             self.check_function_calls, self.expected_check_function_calls
         )
 
+    def test_download_and_unzip_files_with_exception_and_tmp_unzip_missing(
+        self,
+    ) -> None:
+        exists_arr = []
+        self.check_function_calls['url_open_is_called'] = False
+        self.expected_check_function_calls['url_open_is_called'] = True
+        self.expected_check_function_calls['remove_is_called'] = False
+
+        def mock_exists(path: str) -> bool:
+            if path == install_dependencies_json_packages.TMP_UNZIP_PATH:
+                exists_arr.append(True)
+            else:
+                exists_arr.append(False)
+            return False
+
+        zipfile_call_count = {'count': 0}
+
+        def mock_zipfile_init(_self, _path, _mode):
+            zipfile_call_count['count'] += 1
+            if zipfile_call_count['count'] == 1:
+                raise Exception('Test unzip failure')
+            return None
+
+        def mock_url_open(_req: object) -> BinaryIO:
+            self.check_function_calls['url_open_is_called'] = True
+            file_obj = install_dependencies_json_packages.open_file(
+                install_dependencies_json_packages.TMP_UNZIP_PATH, 'rb', None
+            )
+            return file_obj
+
+        def mock_remove(_path: str) -> None:
+            self.check_function_calls["remove_is_called"] = True
+
+        exists_swap = self.swap(os.path, 'exists', mock_exists)
+        zipfile_swap = self.swap(zipfile.ZipFile, '__init__', mock_zipfile_init)
+        url_open_swap = self.swap(
+            install_dependencies_json_packages, 'url_open', mock_url_open
+        )
+        remove_swap = self.swap(os, 'remove', mock_remove)
+
+        with exists_swap, zipfile_swap, url_open_swap, remove_swap:
+            with self.dir_exists_swap, self.url_retrieve_swap, self.rename_swap, self.unzip_swap:
+                with self.extract_swap:
+                    install_dependencies_json_packages.download_and_unzip_files(
+                        'http://src', 'target dir', 'zip root', 'target root'
+                    )
+
+        self.assertEqual(
+            self.check_function_calls, self.expected_check_function_calls
+        )
+        self.assertEqual(zipfile_call_count['count'], 2)
+        self.assertEqual(exists_arr, [False, True])
+
     def test_get_file_contents(self) -> None:
         temp_file = tempfile.NamedTemporaryFile().name
         actual_text = 'Testing install third party file.'
@@ -467,6 +520,73 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         with validate_swap, return_json_swap, download_files_swap:
             with unzip_files_swap:
                 install_dependencies_json_packages.main()
+        self.assertEqual(check_function_calls, expected_check_function_calls)
+
+    def test_download_dependencies_with_unsupported_download_format(
+        self,
+    ) -> None:
+        """Tests that no functions are called when downloadFormat is unsupported."""
+        check_function_calls = {
+            'validate_dependencies_is_called': False,
+            'download_files_is_called': False,
+            'download_and_unzip_files_is_called': False,
+        }
+
+        def mock_return_json(
+            _path: str,
+        ) -> install_dependencies_json_packages.DependenciesDict:
+            return {
+                'frontendDependencies': {
+                    'unsupportedDep': {
+                        'version': '1.0.0',
+                        'downloadFormat': 'tar',
+                        'url': 'https://example.com/dep.tar',
+                        'rootDirPrefix': 'unsupported-',
+                        'targetDirPrefix': 'unsupported-',
+                    },
+                }
+            }
+
+        def mock_validate_dependencies(_path: str) -> None:
+            check_function_calls['validate_dependencies_is_called'] = True
+
+        def mock_download_files(*_args, **_kwargs) -> None:
+            check_function_calls['download_files_is_called'] = True
+
+        def mock_download_and_unzip_files(*_args, **_kwargs) -> None:
+            check_function_calls['download_and_unzip_files_is_called'] = True
+
+        # Swaps
+        return_json_swap = self.swap(
+            install_dependencies_json_packages, 'return_json', mock_return_json
+        )
+        validate_swap = self.swap(
+            install_dependencies_json_packages,
+            'validate_dependencies',
+            mock_validate_dependencies,
+        )
+        download_files_swap = self.swap(
+            install_dependencies_json_packages,
+            'download_files',
+            mock_download_files,
+        )
+        unzip_files_swap = self.swap(
+            install_dependencies_json_packages,
+            'download_and_unzip_files',
+            mock_download_and_unzip_files,
+        )
+
+        with (
+            validate_swap
+        ), return_json_swap, download_files_swap, unzip_files_swap:
+            install_dependencies_json_packages.main()
+
+        expected_check_function_calls = {
+            'validate_dependencies_is_called': True,
+            'download_files_is_called': False,
+            'download_and_unzip_files_is_called': False,
+        }
+
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_url_open(self) -> None:
