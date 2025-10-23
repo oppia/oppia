@@ -29,7 +29,7 @@ from urllib import request as urlrequest
 
 from core.tests import test_utils
 
-from typing import BinaryIO, Final, NoReturn, Tuple
+from typing import Any, BinaryIO, Final, NoReturn, Tuple
 
 from . import common, install_dependencies_json_packages
 
@@ -250,12 +250,16 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
 
         zipfile_call_count = {'count': 0}
 
-        def mock_zipfile_init(_self, _path, _mode):
+        # Here we use type Any because this is a mock of zipfile.ZipFile.__init__,
+        # and the actual type of _self is not relevant for the test.
+        def mock_zipfile_init(_self: Any, _path: str, _mode: str) -> None:
             zipfile_call_count['count'] += 1
             if zipfile_call_count['count'] == 1:
                 raise Exception('Test unzip failure')
-            return None
 
+        # Here we use object because this mock function may receive various request-like
+        # objects during testing, and we only need to check that urlopen is called, not
+        # to inspect specific attributes or methods of the request.
         def mock_url_open(_req: object) -> BinaryIO:
             self.check_function_calls['url_open_is_called'] = True
             file_obj = install_dependencies_json_packages.open_file(
@@ -264,7 +268,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             return file_obj
 
         def mock_remove(_path: str) -> None:
-            self.check_function_calls["remove_is_called"] = True
+            self.check_function_calls['remove_is_called'] = True
 
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         zipfile_swap = self.swap(zipfile.ZipFile, '__init__', mock_zipfile_init)
@@ -556,7 +560,6 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         def mock_download_and_unzip_files(*_args, **_kwargs) -> None:
             check_function_calls['download_and_unzip_files_is_called'] = True
 
-        # Swaps
         return_json_swap = self.swap(
             install_dependencies_json_packages, 'return_json', mock_return_json
         )

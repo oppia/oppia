@@ -1,15 +1,18 @@
-<!-- This file is using single quotes which is not allowed. -->
+<!-- This properties in style tag is properly indented -->
 <!DOCTYPE html>
 <html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
   <head>
     @require('../../base-components/header.template.html', {"title": "Oppia"})
+    <style>
+      body { background-color: powderblue; } /* This line is now properly indented */
+    </style>
   </head>
   <body>
     <service-bootstrap></service-bootstrap>
     <div ng-controller="Base">
-      <base-content> 
-<!-- Single quotes are not allowed -->
-        <content style = 'color:white;'>
+      <base-content>
+
+        <content>
           <classroom-page></classroom-page>
         </content>
 

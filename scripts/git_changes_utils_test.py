@@ -1038,7 +1038,9 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         def mock_get_branch() -> str:
             return 'branch1'
 
-        def mock_start_subprocess_for_result(unused_cmd_tokens):
+        def mock_start_subprocess_for_result(
+            unused_cmd_tokens: List[str],
+        ) -> Tuple[bytes, bytes]:
             return (b'local_sha1 local_ref', b'')
 
         with self.swap(
@@ -1065,7 +1067,9 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         def mock_get_branch() -> str:
             return 'branch1'
 
-        def mock_start_subprocess_for_result(unused_cmd_tokens):
+        def mock_start_subprocess_for_result(
+            unused_cmd_tokens: List[str],
+        ) -> Tuple[bytes, bytes]:
             return (b'local_sha1 local_ref\nremote_sha1 remote_ref', b'')
 
         with self.swap(sys.stdin, 'isatty', lambda: True), self.swap(
@@ -1083,7 +1087,9 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         def mock_get_branch() -> str:
             return 'branch1'
 
-        def mock_start_subprocess_for_result(unused_cmd_tokens):
+        def mock_start_subprocess_for_result(
+            unused_cmd_tokens: List[str],
+        ) -> Tuple[bytes, bytes]:
             return (b'local_sha1 local_ref', b'')
 
         with tempfile.NamedTemporaryFile() as temp_stdin_file:
