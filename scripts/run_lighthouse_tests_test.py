@@ -949,10 +949,11 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         class MockProcess:
             """Mock subprocess.Popen for testing."""
 
-            def __init__(
+            # Here we use object because subprocess.Popen can receive arbitrary arguments.
+            def __init__(  # pylint: disable=unused-argument
                 self,
                 *args: object,
-                **kwargs: object,  # Here we use object because subprocess.Popen can receive arbitrary arguments.  # pylint: disable=unused-argument
+                **kwargs: object,
             ) -> None:
                 self.returncode: int = 0
 

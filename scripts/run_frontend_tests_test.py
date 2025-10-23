@@ -616,8 +616,8 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             install_called.append(True)
 
         def mock_build_main(
-            args: list[str],
-        ) -> None:  # pylint: disable=unused-argument
+            args: list[str],  # pylint: disable=unused-argument
+        ) -> None:
             pass
 
         with self.swap(
@@ -720,8 +720,8 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                 return None
 
         def mock_popen(
-            cmd: list[str], stdout: int
-        ) -> MockTask:  # pylint: disable=unused-argument
+            cmd: list[str], stdout: int  # pylint: disable=unused-argument
+        ) -> MockTask:
             return MockTask()
 
         self.cmd_token_list = []
@@ -767,8 +767,8 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                 return None
 
         def mock_popen(
-            cmd: list[str], stdout: int
-        ) -> MockTask:  # pylint: disable=unused-argument
+            cmd: list[str], stdout: int  # pylint: disable=unused-argument
+        ) -> MockTask:
             return MockTask()
 
         with self.swap(subprocess, 'Popen', mock_popen), self.print_swap:
