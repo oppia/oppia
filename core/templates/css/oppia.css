@@ -1767,6 +1767,19 @@ pre.oppia-pre-wrapped-text {
   text-align: left;
 }
 
+/* Ensure inline links inserted by the RTE keep a visible gap after them.
+   This avoids cases where custom inline elements (e.g. <oppia-noninteractive-link>)
+   collapse surrounding whitespace and cause adjacent text to appear jammed.
+   We scope to RTE viewer/output classes so this only affects rendered content.
+*/
+.oppia-rte-viewer oppia-noninteractive-link,
+.oppia-rte-output-display oppia-noninteractive-link,
+.oppia-rte-content oppia-noninteractive-link {
+  display: inline;
+  /* small gap that is visually consistent across browsers */
+  margin-right: 0.25em;
+}
+
 .oppia-rte-keyboard-accessibility-text {
   color: #757575;
   font-size: 12px;
