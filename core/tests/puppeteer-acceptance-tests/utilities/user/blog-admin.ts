@@ -47,8 +47,8 @@ export class BlogAdmin extends BaseUser {
     role: BlogRoles
   ): Promise<void> {
     await this.page.select('select#label-target-update-form-role-select', role);
-    await this.type(roleUpdateUsernameInput, username);
-    await this.clickOn(updateRoleButtonSelector);
+    await this.typeInInputField(roleUpdateUsernameInput, username);
+    await this.clickOnElementWithSelector(updateRoleButtonSelector);
 
     await this.expectElementToBeClickable(updateRoleButtonSelector, false);
   }
@@ -58,8 +58,8 @@ export class BlogAdmin extends BaseUser {
    */
   async removeBlogEditorRoleFromUsername(username: string): Promise<void> {
     await this.goto(blogAdminUrl);
-    await this.type(blogEditorUsernameInput, username);
-    await this.clickOn(removeRoleButtonSelector);
+    await this.typeInInputField(blogEditorUsernameInput, username);
+    await this.clickOnElementWithSelector(removeRoleButtonSelector);
 
     await this.expectElementToBeClickable(removeRoleButtonSelector, false);
   }
@@ -72,8 +72,8 @@ export class BlogAdmin extends BaseUser {
     await this.expectElementToBeVisible(maximumTagLimitInput);
     await this.clearAllTextFrom(maximumTagLimitInput);
 
-    await this.type(maximumTagLimitInput, limit.toString());
-    await this.clickOn(LABEL_FOR_SAVE_BUTTON);
+    await this.typeInInputField(maximumTagLimitInput, limit.toString());
+    await this.clickOnElementWithText(LABEL_FOR_SAVE_BUTTON);
 
     await this.expectActionStatusMessageToBe(
       'Data saved successfully.',

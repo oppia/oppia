@@ -117,7 +117,7 @@ if MYPY:  # pragma: no cover
         TranslatableSetOfUnicodeStringDict,
         TranslatableUnicodeStringDict,
         TranslatableHtmlDict,
-        TranslatableSetOfNormalizedStringDict
+        TranslatableSetOfNormalizedStringDict,
     ]
 
     AllowedDefaultValueTypes = Union[
@@ -137,7 +137,7 @@ if MYPY:  # pragma: no cover
         FractionDict,
         NumberWithUnitsDict,
         domain.GraphDict,
-        TranslatableObjectDefaultValueTypes
+        TranslatableObjectDefaultValueTypes,
     ]
 
     # Here we use type Any because here we are defining type variable for schema
@@ -199,7 +199,8 @@ class BaseObject:
         """
         raise NotImplementedError(
             'The get_schema() method is missing from the derived class. It '
-            'should be implemented in the derived class.')
+            'should be implemented in the derived class.'
+        )
 
 
 class Boolean(BaseObject):
@@ -215,9 +216,7 @@ class Boolean(BaseObject):
         Returns:
             dict. The object schema.
         """
-        return {
-            'type': 'bool'
-        }
+        return {'type': 'bool'}
 
     @classmethod
     def normalize(cls, raw: Optional[Union[str, bool]]) -> bool:
@@ -252,9 +251,7 @@ class Real(BaseObject):
         Returns:
             dict. The object schema.
         """
-        return {
-            'type': 'float'
-        }
+        return {'type': 'float'}
 
 
 class Int(BaseObject):
@@ -270,9 +267,7 @@ class Int(BaseObject):
         Returns:
             dict. The object schema.
         """
-        return {
-            'type': 'int'
-        }
+        return {'type': 'int'}
 
 
 class UnicodeString(BaseObject):
@@ -325,20 +320,18 @@ class SubtitledUnicode(BaseObject):
         """
         return {
             'type': 'dict',
-            'properties': [{
-                'name': 'content_id',
-                'schema': {
-                    # The default content id is none. However, it should be
-                    # populated before being saved (SubtitledUnicode in
-                    # state_domain has validation checks for this).
-                    'type': 'unicode_or_none'
-                }
-            }, {
-                'name': 'unicode_str',
-                'schema': {
-                    'type': 'unicode'
-                }
-            }]
+            'properties': [
+                {
+                    'name': 'content_id',
+                    'schema': {
+                        # The default content id is none. However, it should be
+                        # populated before being saved (SubtitledUnicode in
+                        # state_domain has validation checks for this).
+                        'type': 'unicode_or_none'
+                    },
+                },
+                {'name': 'unicode_str', 'schema': {'type': 'unicode'}},
+            ],
         }
 
 
@@ -357,20 +350,18 @@ class SubtitledHtml(BaseObject):
         """
         return {
             'type': 'dict',
-            'properties': [{
-                'name': 'content_id',
-                'schema': {
-                    # The default content id is none. However, it should be
-                    # populated before being saved (SubtitledHtml in
-                    # state_domain has validation checks for this).
-                    'type': 'unicode_or_none'
-                }
-            }, {
-                'name': 'html',
-                'schema': {
-                    'type': 'html'
-                }
-            }]
+            'properties': [
+                {
+                    'name': 'content_id',
+                    'schema': {
+                        # The default content id is none. However, it should be
+                        # populated before being saved (SubtitledHtml in
+                        # state_domain has validation checks for this).
+                        'type': 'unicode_or_none'
+                    },
+                },
+                {'name': 'html', 'schema': {'type': 'html'}},
+            ],
         }
 
 
@@ -389,10 +380,7 @@ class NonnegativeInt(BaseObject):
         """
         return {
             'type': 'int',
-            'validators': [{
-                'id': 'is_at_least',
-                'min_value': 0
-            }]
+            'validators': [{'id': 'is_at_least', 'min_value': 0}],
         }
 
 
@@ -411,10 +399,7 @@ class PositiveInt(BaseObject):
         """
         return {
             'type': 'int',
-            'validators': [{
-                'id': 'is_at_least',
-                'min_value': 1
-            }]
+            'validators': [{'id': 'is_at_least', 'min_value': 1}],
         }
 
 
@@ -456,7 +441,8 @@ class CodeString(BaseObject):
         """
         if '\t' in raw:
             raise TypeError(
-                'Unexpected tab characters in code string: %s' % raw)
+                'Unexpected tab characters in code string: %s' % raw
+            )
         normalized_value: str = schema_utils.normalize_against_schema(
             raw, cls.get_schema()
         )
@@ -477,19 +463,24 @@ class CodeEvaluation(BaseObject):
         """
         return {
             'type': 'dict',
-            'properties': [{
-                'name': 'code',
-                'schema': UnicodeString.get_schema(),
-            }, {
-                'name': 'output',
-                'schema': UnicodeString.get_schema(),
-            }, {
-                'name': 'evaluation',
-                'schema': UnicodeString.get_schema(),
-            }, {
-                'name': 'error',
-                'schema': UnicodeString.get_schema(),
-            }]
+            'properties': [
+                {
+                    'name': 'code',
+                    'schema': UnicodeString.get_schema(),
+                },
+                {
+                    'name': 'output',
+                    'schema': UnicodeString.get_schema(),
+                },
+                {
+                    'name': 'evaluation',
+                    'schema': UnicodeString.get_schema(),
+                },
+                {
+                    'name': 'error',
+                    'schema': UnicodeString.get_schema(),
+                },
+            ],
         }
 
 
@@ -506,10 +497,7 @@ class ListOfCodeEvaluation(BaseObject):
         Returns:
             dict. The object schema.
         """
-        return {
-            'type': 'list',
-            'items': CodeEvaluation.get_schema()
-        }
+        return {'type': 'list', 'items': CodeEvaluation.get_schema()}
 
 
 class CoordTwoDim(BaseObject):
@@ -545,10 +533,7 @@ class ListOfCoordTwoDim(BaseObject):
         Returns:
             dict. The object schema.
         """
-        return {
-            'type': 'list',
-            'items': CoordTwoDim.get_schema()
-        }
+        return {'type': 'list', 'items': CoordTwoDim.get_schema()}
 
 
 class ListOfUnicodeString(BaseObject):
@@ -563,10 +548,7 @@ class ListOfUnicodeString(BaseObject):
         Returns:
             dict. The object schema.
         """
-        return {
-            'type': 'list',
-            'items': UnicodeString.get_schema()
-        }
+        return {'type': 'list', 'items': UnicodeString.get_schema()}
 
 
 class SetOfUnicodeString(BaseObject):
@@ -585,9 +567,7 @@ class SetOfUnicodeString(BaseObject):
         return {
             'type': 'list',
             'items': UnicodeString.get_schema(),
-            'validators': [{
-                'id': 'is_uniquified'
-            }]
+            'validators': [{'id': 'is_uniquified'}],
         }
 
 
@@ -606,9 +586,7 @@ class NormalizedString(BaseObject):
         """
         return {
             'type': 'unicode',
-            'post_normalizers': [{
-                'id': 'normalize_spaces'
-            }]
+            'post_normalizers': [{'id': 'normalize_spaces'}],
         }
 
 
@@ -616,7 +594,8 @@ class SetOfNormalizedString(BaseObject):
     """Class for sets of NormalizedStrings."""
 
     description = (
-        'A set (a list with unique elements) of whitespace-collapsed strings.')
+        'A set (a list with unique elements) of whitespace-collapsed strings.'
+    )
     default_value: List[str] = []
 
     @classmethod
@@ -629,9 +608,7 @@ class SetOfNormalizedString(BaseObject):
         return {
             'type': 'list',
             'items': NormalizedString.get_schema(),
-            'validators': [{
-                'id': 'is_uniquified'
-            }]
+            'validators': [{'id': 'is_uniquified'}],
         }
 
 
@@ -641,7 +618,7 @@ class MathExpressionContent(BaseObject):
     description = 'The Math Expression to be displayed.'
     default_value: MathExpressionContentDict = {
         'raw_latex': '',
-        'svg_filename': ''
+        'svg_filename': '',
     }
 
     @classmethod
@@ -653,19 +630,18 @@ class MathExpressionContent(BaseObject):
         """
         return {
             'type': 'dict',
-            'properties': [{
-                'name': 'raw_latex',
-                'description': 'Latex value',
-                'schema': {
-                    'type': 'unicode'
-                }
-            }, {
-                'name': 'svg_filename',
-                'description': 'SVG filename',
-                'schema': {
-                    'type': 'unicode'
-                }
-            }]
+            'properties': [
+                {
+                    'name': 'raw_latex',
+                    'description': 'Latex value',
+                    'schema': {'type': 'unicode'},
+                },
+                {
+                    'name': 'svg_filename',
+                    'description': 'SVG filename',
+                    'schema': {'type': 'unicode'},
+                },
+            ],
         }
 
 
@@ -683,15 +659,9 @@ class SanitizedUrl(BaseObject):
         """
         return {
             'type': 'unicode',
-            'validators': [{
-                'id': 'is_nonempty'
-            }],
-            'ui_config': {
-                'placeholder': 'https://www.example.com'
-            },
-            'post_normalizers': [{
-                'id': 'sanitize_url'
-            }]
+            'validators': [{'id': 'is_nonempty'}],
+            'ui_config': {'placeholder': 'https://www.example.com'},
+            'post_normalizers': [{'id': 'sanitize_url'}],
         }
 
 
@@ -709,9 +679,7 @@ class SkillSelector(BaseObject):
         """
         return {
             'type': 'unicode',
-            'ui_config': {
-                'placeholder': 'Search for skill'
-            }
+            'ui_config': {'placeholder': 'Search for skill'},
         }
 
 
@@ -720,7 +688,8 @@ class MusicPhrase(BaseObject):
 
     description = (
         'A musical phrase that contains zero or more notes, rests, '
-        'and time signature.')
+        'and time signature.'
+    )
     default_value: List[MusicPhraseDict] = []
 
     # The maximum number of notes allowed in a music phrase.
@@ -728,10 +697,7 @@ class MusicPhrase(BaseObject):
 
     _FRACTION_PART_SCHEMA = {
         'type': 'int',
-        'validators': [{
-            'id': 'is_at_least',
-            'min_value': 1
-        }]
+        'validators': [{'id': 'is_at_least', 'min_value': 1}],
     }
 
     @classmethod
@@ -745,33 +711,52 @@ class MusicPhrase(BaseObject):
             'type': 'list',
             'items': {
                 'type': 'dict',
-                'properties': [{
-                    'name': 'readableNoteName',
-                    'schema': {
-                        'type': 'unicode',
-                        'choices': [
-                            'C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5',
-                            'D5', 'E5', 'F5', 'G5', 'A5'
-                        ]
-                    }
-                }, {
-                    'name': 'noteDuration',
-                    'schema': {
-                        'type': 'dict',
-                        'properties': [{
-                            'name': 'num',
-                            'schema': cls._FRACTION_PART_SCHEMA
-                        }, {
-                            'name': 'den',
-                            'schema': cls._FRACTION_PART_SCHEMA
-                        }]
-                    }
-                }],
+                'properties': [
+                    {
+                        'name': 'readableNoteName',
+                        'schema': {
+                            'type': 'unicode',
+                            'choices': [
+                                'C4',
+                                'D4',
+                                'E4',
+                                'F4',
+                                'G4',
+                                'A4',
+                                'B4',
+                                'C5',
+                                'D5',
+                                'E5',
+                                'F5',
+                                'G5',
+                                'A5',
+                            ],
+                        },
+                    },
+                    {
+                        'name': 'noteDuration',
+                        'schema': {
+                            'type': 'dict',
+                            'properties': [
+                                {
+                                    'name': 'num',
+                                    'schema': cls._FRACTION_PART_SCHEMA,
+                                },
+                                {
+                                    'name': 'den',
+                                    'schema': cls._FRACTION_PART_SCHEMA,
+                                },
+                            ],
+                        },
+                    },
+                ],
             },
-            'validators': [{
-                'id': 'has_length_at_most',
-                'max_value': cls._MAX_NOTES_IN_PHRASE,
-            }]
+            'validators': [
+                {
+                    'id': 'has_length_at_most',
+                    'max_value': cls._MAX_NOTES_IN_PHRASE,
+                }
+            ],
         }
 
 
@@ -791,29 +776,26 @@ class ListOfTabs(BaseObject):
             'type': 'list',
             'items': {
                 'type': 'dict',
-                'properties': [{
-                    'name': 'title',
-                    'description': 'Tab title',
-                    'schema': {
-                        'type': 'unicode',
-                        'validators': [{
-                            'id': 'is_nonempty'
-                        }]
-                    }
-                }, {
-                    'name': 'content',
-                    'description': 'Tab content',
-                    'schema': {
-                        'type': 'html',
-                        'ui_config': {
-                            'hide_complex_extensions': True
-                        }
-                    }
-                }]
+                'properties': [
+                    {
+                        'name': 'title',
+                        'description': 'Tab title',
+                        'schema': {
+                            'type': 'unicode',
+                            'validators': [{'id': 'is_nonempty'}],
+                        },
+                    },
+                    {
+                        'name': 'content',
+                        'description': 'Tab content',
+                        'schema': {
+                            'type': 'html',
+                            'ui_config': {'hide_complex_extensions': True},
+                        },
+                    },
+                ],
             },
-            'ui_config': {
-                'add_element_text': 'Add new tab'
-            }
+            'ui_config': {'add_element_text': 'Add new tab'},
         }
 
 
@@ -907,34 +889,24 @@ class Graph(BaseObject):
         'isDirected': False,
         'isLabeled': False,
         'isWeighted': False,
-        'vertices': []
+        'vertices': [],
     }
 
     _VERTEX_SCHEMA = {
         'type': 'dict',
-        'properties': [{
-            'name': 'x',
-            'schema': Real.get_schema()
-        }, {
-            'name': 'y',
-            'schema': Real.get_schema()
-        }, {
-            'name': 'label',
-            'schema': UnicodeString.get_schema()
-        }]
+        'properties': [
+            {'name': 'x', 'schema': Real.get_schema()},
+            {'name': 'y', 'schema': Real.get_schema()},
+            {'name': 'label', 'schema': UnicodeString.get_schema()},
+        ],
     }
     _EDGE_SCHEMA = {
         'type': 'dict',
-        'properties': [{
-            'name': 'src',
-            'schema': Int.get_schema()
-        }, {
-            'name': 'dst',
-            'schema': Int.get_schema()
-        }, {
-            'name': 'weight',
-            'schema': Int.get_schema()
-        }]
+        'properties': [
+            {'name': 'src', 'schema': Int.get_schema()},
+            {'name': 'dst', 'schema': Int.get_schema()},
+            {'name': 'weight', 'schema': Int.get_schema()},
+        ],
     }
 
     @classmethod
@@ -946,28 +918,19 @@ class Graph(BaseObject):
         """
         return {
             'type': 'dict',
-            'properties': [{
-                'name': 'vertices',
-                'schema': {
-                    'type': 'list',
-                    'items': cls._VERTEX_SCHEMA
-                }
-            }, {
-                'name': 'edges',
-                'schema': {
-                    'type': 'list',
-                    'items': cls._EDGE_SCHEMA
-                }
-            }, {
-                'name': 'isLabeled',
-                'schema': Boolean.get_schema()
-            }, {
-                'name': 'isDirected',
-                'schema': Boolean.get_schema()
-            }, {
-                'name': 'isWeighted',
-                'schema': Boolean.get_schema()
-            }]
+            'properties': [
+                {
+                    'name': 'vertices',
+                    'schema': {'type': 'list', 'items': cls._VERTEX_SCHEMA},
+                },
+                {
+                    'name': 'edges',
+                    'schema': {'type': 'list', 'items': cls._EDGE_SCHEMA},
+                },
+                {'name': 'isLabeled', 'schema': Boolean.get_schema()},
+                {'name': 'isDirected', 'schema': Boolean.get_schema()},
+                {'name': 'isWeighted', 'schema': Boolean.get_schema()},
+            ],
         }
 
     @classmethod
@@ -1002,12 +965,12 @@ class Graph(BaseObject):
 
             if raw['isDirected']:
                 edge_pairs = [
-                    (edge['src'], edge['dst']) for edge in raw['edges']]
+                    (edge['src'], edge['dst']) for edge in raw['edges']
+                ]
             else:
-                edge_pairs = (
-                    [(edge['src'], edge['dst']) for edge in raw['edges']] +
-                    [(edge['dst'], edge['src']) for edge in raw['edges']]
-                )
+                edge_pairs = [
+                    (edge['src'], edge['dst']) for edge in raw['edges']
+                ] + [(edge['dst'], edge['src']) for edge in raw['edges']]
             assert len(set(edge_pairs)) == len(edge_pairs)
 
         except Exception as e:
@@ -1032,8 +995,11 @@ class GraphProperty(BaseObject):
         return {
             'type': 'unicode',
             'choices': [
-                'strongly_connected', 'weakly_connected', 'acyclic', 'regular'
-            ]
+                'strongly_connected',
+                'weakly_connected',
+                'acyclic',
+                'regular',
+            ],
         }
 
 
@@ -1050,10 +1016,7 @@ class ListOfGraph(BaseObject):
         Returns:
             dict. The object schema.
         """
-        return {
-            'type': 'list',
-            'items': Graph.get_schema()
-        }
+        return {'type': 'list', 'items': Graph.get_schema()}
 
 
 class NormalizedRectangle2D(BaseObject):
@@ -1061,7 +1024,8 @@ class NormalizedRectangle2D(BaseObject):
 
     description = (
         'A rectangle normalized so that the coordinates are within the range '
-        '[0,1].')
+        '[0,1].'
+    )
 
     @classmethod
     def get_schema(cls) -> SchemaDictType:
@@ -1073,11 +1037,7 @@ class NormalizedRectangle2D(BaseObject):
         return {
             'type': 'list',
             'len': 2,
-            'items': {
-                'type': 'list',
-                'len': 2,
-                'items': Real.get_schema()
-            }
+            'items': {'type': 'list', 'len': 2, 'items': Real.get_schema()},
         }
 
     @classmethod
@@ -1095,6 +1055,7 @@ class NormalizedRectangle2D(BaseObject):
         Raises:
             TypeError. Cannot convert to the NormalizedRectangle2D schema.
         """
+
         def clamp(value: float) -> float:
             """Clamps a number to range [0, 1].
 
@@ -1116,7 +1077,8 @@ class NormalizedRectangle2D(BaseObject):
 
         except Exception as e:
             raise TypeError(
-                'Cannot convert to Normalized Rectangle %s' % raw) from e
+                'Cannot convert to Normalized Rectangle %s' % raw
+            ) from e
 
         return raw
 
@@ -1139,13 +1101,10 @@ class ImageRegion(BaseObject):
         """
         return {
             'type': 'dict',
-            'properties': [{
-                'name': 'regionType',
-                'schema': UnicodeString.get_schema()
-            }, {
-                'name': 'area',
-                'schema': NormalizedRectangle2D.get_schema()
-            }]
+            'properties': [
+                {'name': 'regionType', 'schema': UnicodeString.get_schema()},
+                {'name': 'area', 'schema': NormalizedRectangle2D.get_schema()},
+            ],
         }
 
 
@@ -1163,25 +1122,28 @@ class ImageWithRegions(BaseObject):
         """
         return {
             'type': 'dict',
-            'properties': [{
-                'name': 'imagePath',
-                'schema': Filepath.get_schema()
-            }, {
-                'name': 'labeledRegions',
-                'schema': {
-                    'type': 'list',
-                    'items': {
-                        'type': 'dict',
-                        'properties': [{
-                            'name': 'label',
-                            'schema': UnicodeString.get_schema()
-                        }, {
-                            'name': 'region',
-                            'schema': ImageRegion.get_schema()
-                        }]
-                    }
-                }
-            }]
+            'properties': [
+                {'name': 'imagePath', 'schema': Filepath.get_schema()},
+                {
+                    'name': 'labeledRegions',
+                    'schema': {
+                        'type': 'list',
+                        'items': {
+                            'type': 'dict',
+                            'properties': [
+                                {
+                                    'name': 'label',
+                                    'schema': UnicodeString.get_schema(),
+                                },
+                                {
+                                    'name': 'region',
+                                    'schema': ImageRegion.get_schema(),
+                                },
+                            ],
+                        },
+                    },
+                },
+            ],
         }
 
 
@@ -1199,20 +1161,23 @@ class ClickOnImage(BaseObject):
         """
         return {
             'type': 'dict',
-            'properties': [{
-                'name': 'clickPosition',
-                'schema': {
-                    'type': 'list',
-                    'items': Real.get_schema(),
-                    'len': 2
-                }
-            }, {
-                'name': 'clickedRegions',
-                'schema': {
-                    'type': 'list',
-                    'items': UnicodeString.get_schema()
-                }
-            }]
+            'properties': [
+                {
+                    'name': 'clickPosition',
+                    'schema': {
+                        'type': 'list',
+                        'items': Real.get_schema(),
+                        'len': 2,
+                    },
+                },
+                {
+                    'name': 'clickedRegions',
+                    'schema': {
+                        'type': 'list',
+                        'items': UnicodeString.get_schema(),
+                    },
+                },
+            ],
         }
 
 
@@ -1244,7 +1209,7 @@ class Fraction(BaseObject):
         'isNegative': False,
         'wholeNumber': 0,
         'numerator': 0,
-        'denominator': 1
+        'denominator': 1,
     }
 
     @classmethod
@@ -1256,21 +1221,12 @@ class Fraction(BaseObject):
         """
         return {
             'type': 'dict',
-            'properties': [{
-                'name': 'isNegative',
-                'schema': {
-                    'type': 'bool'
-                }
-            }, {
-                'name': 'wholeNumber',
-                'schema': NonnegativeInt.get_schema()
-            }, {
-                'name': 'numerator',
-                'schema': NonnegativeInt.get_schema()
-            }, {
-                'name': 'denominator',
-                'schema': PositiveInt.get_schema()
-            }]
+            'properties': [
+                {'name': 'isNegative', 'schema': {'type': 'bool'}},
+                {'name': 'wholeNumber', 'schema': NonnegativeInt.get_schema()},
+                {'name': 'numerator', 'schema': NonnegativeInt.get_schema()},
+                {'name': 'denominator', 'schema': PositiveInt.get_schema()},
+            ],
         }
 
 
@@ -1294,18 +1250,11 @@ class Units(BaseObject):
             'type': 'list',
             'items': {
                 'type': 'dict',
-                'properties': [{
-                    'name': 'unit',
-                    'schema': {
-                        'type': 'unicode'
-                    }
-                }, {
-                    'name': 'exponent',
-                    'schema': {
-                        'type': 'int'
-                    }
-                }]
-            }
+                'properties': [
+                    {'name': 'unit', 'schema': {'type': 'unicode'}},
+                    {'name': 'exponent', 'schema': {'type': 'int'}},
+                ],
+            },
         }
 
 
@@ -1317,7 +1266,7 @@ class NumberWithUnits(BaseObject):
         'type': 'real',
         'real': 0.0,
         'fraction': Fraction.default_value,
-        'units': Units.default_value
+        'units': Units.default_value,
     }
 
     @classmethod
@@ -1329,23 +1278,12 @@ class NumberWithUnits(BaseObject):
         """
         return {
             'type': 'dict',
-            'properties': [{
-                'name': 'type',
-                'schema': {
-                    'type': 'unicode'
-                }
-            }, {
-                'name': 'real',
-                'schema': {
-                    'type': 'float'
-                }
-            }, {
-                'name': 'fraction',
-                'schema': Fraction.get_schema()
-            }, {
-                'name': 'units',
-                'schema': Units.get_schema()
-            }]
+            'properties': [
+                {'name': 'type', 'schema': {'type': 'unicode'}},
+                {'name': 'real', 'schema': {'type': 'float'}},
+                {'name': 'fraction', 'schema': Fraction.get_schema()},
+                {'name': 'units', 'schema': Units.get_schema()},
+            ],
         }
 
 
@@ -1387,9 +1325,7 @@ class AlgebraicExpression(BaseObject):
         """
         return {
             'type': 'unicode',
-            'validators': [{
-                'id': 'is_valid_algebraic_expression'
-            }]
+            'validators': [{'id': 'is_valid_algebraic_expression'}],
         }
 
 
@@ -1409,10 +1345,7 @@ class OskCharacters(BaseObject):
         Returns:
             dict. The object schema.
         """
-        return {
-            'type': 'unicode',
-            'choices': constants.VALID_ALLOWED_VARIABLES
-        }
+        return {'type': 'unicode', 'choices': constants.VALID_ALLOWED_VARIABLES}
 
 
 class AlgebraicIdentifier(BaseObject):
@@ -1433,7 +1366,7 @@ class AlgebraicIdentifier(BaseObject):
         """
         return {
             'type': 'unicode',
-            'choices': constants.VALID_ALGEBRAIC_IDENTIFIERS
+            'choices': constants.VALID_ALGEBRAIC_IDENTIFIERS,
         }
 
 
@@ -1441,7 +1374,8 @@ class SetOfAlgebraicIdentifier(BaseObject):
     """Class for sets of AlgebraicIdentifiers."""
 
     description = (
-        'A set (a list with unique elements) of algebraic identifiers.')
+        'A set (a list with unique elements) of algebraic identifiers.'
+    )
     default_value: List[str] = []
 
     @classmethod
@@ -1454,9 +1388,7 @@ class SetOfAlgebraicIdentifier(BaseObject):
         return {
             'type': 'list',
             'items': AlgebraicIdentifier.get_schema(),
-            'validators': [{
-                'id': 'is_uniquified'
-            }]
+            'validators': [{'id': 'is_uniquified'}],
         }
 
 
@@ -1477,9 +1409,7 @@ class MathEquation(BaseObject):
         """
         return {
             'type': 'unicode',
-            'validators': [{
-                'id': 'is_valid_math_equation'
-            }]
+            'validators': [{'id': 'is_valid_math_equation'}],
         }
 
 
@@ -1500,10 +1430,9 @@ class NumericExpression(BaseObject):
         """
         return {
             'type': 'unicode',
-            'validators': [{
-                'id': 'is_valid_math_expression',
-                'algebraic': False
-            }]
+            'validators': [
+                {'id': 'is_valid_math_expression', 'algebraic': False}
+            ],
         }
 
 
@@ -1513,7 +1442,8 @@ class PositionOfTerms(BaseObject):
     """
 
     description = (
-        'The position of terms relative to the equals sign in a math equation.')
+        'The position of terms relative to the equals sign in a math equation.'
+    )
     default_value = 'both'
 
     @classmethod
@@ -1525,7 +1455,7 @@ class PositionOfTerms(BaseObject):
         """
         return {
             'type': 'unicode',
-            'choices': ['lhs', 'rhs', 'both', 'irrelevant']
+            'choices': ['lhs', 'rhs', 'both', 'irrelevant'],
         }
 
 
@@ -1547,10 +1477,7 @@ class RatioExpression(BaseObject):
         return {
             'type': 'list',
             'items': PositiveInt.get_schema(),
-            'validators': [{
-                'id': 'has_length_at_least',
-                'min_value': 2
-            }]
+            'validators': [{'id': 'has_length_at_least', 'min_value': 2}],
         }
 
 
@@ -1564,7 +1491,8 @@ class AllowedVariables(BaseObject):
     description = (
         'Shortcut variables that the learner can access in the '
         'on-screen keyboard. (The order of these variables will be reflected '
-        'in the learner\'s keyboard)')
+        'in the learner\'s keyboard)'
+    )
     default_value: List[str] = []
 
     @classmethod
@@ -1577,9 +1505,7 @@ class AllowedVariables(BaseObject):
         return {
             'type': 'list',
             'items': OskCharacters.get_schema(),
-            'validators': [{
-                'id': 'is_uniquified'
-            }]
+            'validators': [{'id': 'is_uniquified'}],
         }
 
 
@@ -1613,9 +1539,7 @@ class SetOfTranslatableHtmlContentIds(BaseObject):
         return {
             'type': 'list',
             'items': TranslatableHtmlContentId.get_schema(),
-            'validators': [{
-                'id': 'is_uniquified'
-            }]
+            'validators': [{'id': 'is_uniquified'}],
         }
 
 
@@ -1633,7 +1557,7 @@ class ListOfSetsOfTranslatableHtmlContentIds(BaseObject):
         """
         return {
             'type': 'list',
-            'items': SetOfTranslatableHtmlContentIds.get_schema()
+            'items': SetOfTranslatableHtmlContentIds.get_schema(),
         }
 
 
@@ -1676,10 +1600,11 @@ class BaseTranslatableObject(BaseObject):
         if cls._value_key_name is None or cls._value_schema is None:
             raise NotImplementedError(
                 'The _value_key_name and _value_schema for this class must '
-                'both be set.')
-        normalized_value: Union[
-            str, List[str]
-        ] = schema_utils.normalize_against_schema(value, cls._value_schema)
+                'both be set.'
+            )
+        normalized_value: Union[str, List[str]] = (
+            schema_utils.normalize_against_schema(value, cls._value_schema)
+        )
         return normalized_value
 
     @classmethod
@@ -1696,19 +1621,23 @@ class BaseTranslatableObject(BaseObject):
         if cls._value_key_name is None or cls._value_schema is None:
             raise NotImplementedError(
                 'The _value_key_name and _value_schema for this class must '
-                'both be set.')
+                'both be set.'
+            )
         return {
             'type': 'dict',
-            'properties': [{
-                'name': 'contentId',
-                # The default content id is none. However, it should be
-                # populated before being saved. The normalize() method has
-                # validation checks for this.
-                'schema': {'type': 'unicode'}
-            }, {
-                'name': cls._value_key_name,
-                'schema': copy.deepcopy(cls._value_schema),
-            }]
+            'properties': [
+                {
+                    'name': 'contentId',
+                    # The default content id is none. However, it should be
+                    # populated before being saved. The normalize() method has
+                    # validation checks for this.
+                    'schema': {'type': 'unicode'},
+                },
+                {
+                    'name': cls._value_key_name,
+                    'schema': copy.deepcopy(cls._value_schema),
+                },
+            ],
         }
 
 
@@ -1776,8 +1705,8 @@ class JsonEncodedInString(BaseObject):
             Exception. Given arg is not of type str.
         """
         if not isinstance(raw, str):
-            raise Exception('Expected string received %s of type %s' % (
-                raw, type(raw))
+            raise Exception(
+                'Expected string received %s of type %s' % (raw, type(raw))
             )
 
         return json.loads(raw)

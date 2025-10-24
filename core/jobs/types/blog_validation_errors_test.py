@@ -23,14 +23,15 @@ from core.jobs.types import base_validation_errors_test, blog_validation_errors
 from core.platform import models
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import blog_models
 
 (blog_models,) = models.Registry.import_models([models.Names.BLOG])
 
 
 class DuplicateBlogTitleErrorTests(
-        base_validation_errors_test.AuditErrorsTestBase):
+    base_validation_errors_test.AuditErrorsTestBase
+):
 
     def test_message(self) -> None:
         blog_post_model = blog_models.BlogPostModel(
@@ -38,18 +39,21 @@ class DuplicateBlogTitleErrorTests(
             title='Sample Title',
             content='<p>hello</p>,',
             author_id='user',
-            url_fragment='url_fragment_1')
+            url_fragment='url_fragment_1',
+        )
 
         error = blog_validation_errors.DuplicateBlogTitleError(blog_post_model)
 
         self.assertEqual(
             error.stderr,
             'DuplicateBlogTitleError in BlogPostModel(id="validblogid1"):'
-            ' title=%s is not unique' % utils.quoted(blog_post_model.title))
+            ' title=%s is not unique' % utils.quoted(blog_post_model.title),
+        )
 
 
 class DuplicateBlogUrlErrorTests(
-        base_validation_errors_test.AuditErrorsTestBase):
+    base_validation_errors_test.AuditErrorsTestBase
+):
 
     def test_message(self) -> None:
         blog_post_model = blog_models.BlogPostModel(
@@ -57,39 +61,45 @@ class DuplicateBlogUrlErrorTests(
             title='Sample Title',
             content='<p>hello</p>,',
             author_id='user',
-            url_fragment='url_fragment_1')
+            url_fragment='url_fragment_1',
+        )
 
         error = blog_validation_errors.DuplicateBlogUrlError(blog_post_model)
 
         self.assertEqual(
             error.stderr,
             'DuplicateBlogUrlError in BlogPostModel(id="validblogid1"): url=%s'
-            ' is not unique' % utils.quoted(blog_post_model.url_fragment))
+            ' is not unique' % utils.quoted(blog_post_model.url_fragment),
+        )
 
 
 class DuplicateBlogAuthorModelErrorTests(
-        base_validation_errors_test.AuditErrorsTestBase):
+    base_validation_errors_test.AuditErrorsTestBase
+):
 
     def test_message(self) -> None:
         author_details_model = blog_models.BlogAuthorDetailsModel(
             id='id1',
             displayed_author_name='user one',
             author_id='user',
-            author_bio='')
+            author_bio='',
+        )
 
         error = blog_validation_errors.DuplicateBlogAuthorModelError(
-            author_details_model)
+            author_details_model
+        )
 
         self.assertEqual(
             error.stderr,
             'DuplicateBlogAuthorModelError in BlogAuthorDetailsModel(id="id1"):'
-            ' author id=%s is not unique' % utils.quoted(
-                author_details_model.author_id)
+            ' author id=%s is not unique'
+            % utils.quoted(author_details_model.author_id),
         )
 
 
 class InconsistentLastUpdatedTimestampsErrorTests(
-        base_validation_errors_test.AuditErrorsTestBase):
+    base_validation_errors_test.AuditErrorsTestBase
+):
 
     def test_message(self) -> None:
         model = blog_models.BlogPostModel(
@@ -100,19 +110,23 @@ class InconsistentLastUpdatedTimestampsErrorTests(
             url_fragment='url_fragment_1',
             created_on=self.NOW,
             last_updated=self.YEAR_AGO,
-            published_on=self.YEAR_AGO)
+            published_on=self.YEAR_AGO,
+        )
         error = blog_validation_errors.InconsistentLastUpdatedTimestampsError(
-            model)
+            model
+        )
 
         self.assertEqual(
             error.stderr,
             'InconsistentLastUpdatedTimestampsError in BlogPostModel'
-            '(id="validblogid1"): created_on=%r is later than last_updated=%r' %
-            (self.NOW, self.YEAR_AGO))
+            '(id="validblogid1"): created_on=%r is later than last_updated=%r'
+            % (self.NOW, self.YEAR_AGO),
+        )
 
 
 class InconsistentPublishLastUpdatedTimestampsErrorTests(
-        base_validation_errors_test.AuditErrorsTestBase):
+    base_validation_errors_test.AuditErrorsTestBase
+):
 
     def test_message(self) -> None:
         model = blog_models.BlogPostModel(
@@ -123,20 +137,23 @@ class InconsistentPublishLastUpdatedTimestampsErrorTests(
             url_fragment='url_fragment_1',
             created_on=self.YEAR_AGO,
             last_updated=self.YEAR_AGO,
-            published_on=self.NOW)
-        error = (
-            blog_validation_errors
-            .InconsistentPublishLastUpdatedTimestampsError(model))
+            published_on=self.NOW,
+        )
+        error = blog_validation_errors.InconsistentPublishLastUpdatedTimestampsError(
+            model
+        )
 
         self.assertEqual(
             error.stderr,
             'InconsistentPublishLastUpdatedTimestampsError in BlogPostModel'
             '(id="validblogid1"): published_on=%r is later than last_updated=%r'
-            % (self.NOW, self.YEAR_AGO))
+            % (self.NOW, self.YEAR_AGO),
+        )
 
 
 class ModelMutatedDuringJobErrorTests(
-        base_validation_errors_test.AuditErrorsTestBase):
+    base_validation_errors_test.AuditErrorsTestBase
+):
 
     def test_message_for_published_on(self) -> None:
         model = blog_models.BlogPostModel(
@@ -147,15 +164,18 @@ class ModelMutatedDuringJobErrorTests(
             url_fragment='url_fragment_1',
             created_on=self.YEAR_AGO,
             last_updated=self.NOW,
-            published_on=self.YEAR_LATER)
+            published_on=self.YEAR_LATER,
+        )
         error = blog_validation_errors.ModelMutatedDuringJobErrorForPublishedOn(
-            model)
+            model
+        )
 
         self.assertEqual(
             error.stderr,
             'ModelMutatedDuringJobErrorForPublishedOn in BlogPostModel('
             'id="validblogid1"): published_on=%r is later than the audit job\'s'
-            ' start time' % (model.published_on))
+            ' start time' % (model.published_on),
+        )
 
     def test_message_for_last_updated(self) -> None:
         model = blog_models.BlogPostModel(
@@ -166,12 +186,15 @@ class ModelMutatedDuringJobErrorTests(
             url_fragment='url_fragment_1',
             created_on=self.YEAR_AGO,
             last_updated=self.YEAR_LATER,
-            published_on=self.YEAR_AGO)
+            published_on=self.YEAR_AGO,
+        )
         error = blog_validation_errors.ModelMutatedDuringJobErrorForLastUpdated(
-            model)
+            model
+        )
 
         self.assertEqual(
             error.stderr,
             'ModelMutatedDuringJobErrorForLastUpdated in BlogPostModel('
             'id="validblogid1"): last_updated=%r is later than the audit job\'s'
-            ' start time' % (model.last_updated))
+            ' start time' % (model.last_updated),
+        )

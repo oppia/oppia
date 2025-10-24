@@ -34,8 +34,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import suggestion_models
 
-(suggestion_models, ) = models.Registry.import_models([
-    models.Names.SUGGESTION])
+(suggestion_models,) = models.Registry.import_models([models.Names.SUGGESTION])
 
 
 # TODO(#15613): Here we use MyPy ignore because of the incomplete typing of
@@ -49,7 +48,8 @@ class CopyMissingTranslationImages(beam.PTransform):  # type: ignore[misc]
     def expand(self, pipeline: beam.Pipeline) -> Tuple[
         beam.PCollection[Tuple[str, beam.PCollection[str]]],
         beam.PCollection[
-            Tuple[str, Dict[str, beam.PCollection[Union[str, bool]]]]]
+            Tuple[str, Dict[str, beam.PCollection[Union[str, bool]]]]
+        ],
     ]:
         """Compute the copy operations to perform.
 
@@ -62,26 +62,26 @@ class CopyMissingTranslationImages(beam.PTransform):  # type: ignore[misc]
         """
         translation_suggestion_model_pcoll = (
             pipeline
-            | 'Get all GeneralSuggestionModels' >> ndb_io.GetModels(
-                suggestion_models.GeneralSuggestionModel.get_all())
-            | 'Keep only translation suggestions' >> beam.Filter(
-                lambda model: model.suggestion_type ==
-                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+            | 'Get all GeneralSuggestionModels'
+            >> ndb_io.GetModels(
+                suggestion_models.GeneralSuggestionModel.get_all()
+            )
+            | 'Keep only translation suggestions'
+            >> beam.Filter(
+                lambda model: model.suggestion_type
+                == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
             )
         )
 
         translation_suggestion_models_by_suggestion_id = (
             translation_suggestion_model_pcoll
-            | 'Group by suggestion id' >> beam.GroupBy(
-                lambda model: model.id
-            )
+            | 'Group by suggestion id' >> beam.GroupBy(lambda model: model.id)
         )
 
         translation_suggestion_target_id_by_suggestion_id = (
             translation_suggestion_models_by_suggestion_id
-            | 'Map each model to its target id' >> beam.Map(
-                self._get_target_id_from_model
-            )
+            | 'Map each model to its target id'
+            >> beam.Map(self._get_target_id_from_model)
         )
 
         translation_suggestion_image_names_by_suggestion_id = (
@@ -93,8 +93,7 @@ class CopyMissingTranslationImages(beam.PTransform):  # type: ignore[misc]
         translation_suggestion_info_by_suggestion_id = (
             {
                 'target_id': translation_suggestion_target_id_by_suggestion_id,
-                'image_names':
-                    translation_suggestion_image_names_by_suggestion_id
+                'image_names': translation_suggestion_image_names_by_suggestion_id,
             }
             | 'Group as (model_id: {target_id: [[str]], image_names: [[str]]})'
             >> beam.CoGroupByKey()
@@ -113,27 +112,23 @@ class CopyMissingTranslationImages(beam.PTransform):  # type: ignore[misc]
         )
 
         src_path_exist_by_src_path = (
-            src_path_by_src_path | 'Check if source paths exist'
-            >> gcs_io.IsFile()
+            src_path_by_src_path
+            | 'Check if source paths exist' >> gcs_io.IsFile()
         )
 
         dst_path_exist_by_src_path = (
-            dst_path_by_src_path | 'Check if destination paths exist'
-            >> gcs_io.IsFile()
+            dst_path_by_src_path
+            | 'Check if destination paths exist' >> gcs_io.IsFile()
         )
 
-        copy_info_by_src_path = (
-            {
-                'dst': dst_path_by_src_path,
-                'src_exist': src_path_exist_by_src_path,
-                'dst_exist': dst_path_exist_by_src_path,
-            }
-            | (
-                'Group as {src: {dst: [str], src_exist: [bool], '
-                'dst_exist: [bool]}}'
-            )
-            >> beam.CoGroupByKey()
-        )
+        copy_info_by_src_path = {
+            'dst': dst_path_by_src_path,
+            'src_exist': src_path_exist_by_src_path,
+            'dst_exist': dst_path_exist_by_src_path,
+        } | (
+            'Group as {src: {dst: [str], src_exist: [bool], '
+            'dst_exist: [bool]}}'
+        ) >> beam.CoGroupByKey()
 
         copy_info_to_copy_by_src_path = (
             copy_info_by_src_path
@@ -152,7 +147,8 @@ class CopyMissingTranslationImages(beam.PTransform):  # type: ignore[misc]
     def _get_target_id_from_model(
         self,
         group: Tuple[
-            str, beam.PCollection[suggestion_models.GeneralSuggestionModel]]
+            str, beam.PCollection[suggestion_models.GeneralSuggestionModel]
+        ],
     ) -> Tuple[str, List[str]]:
         """Extract the target ID from a GeneralSuggestionModel object.
 
@@ -172,7 +168,8 @@ class CopyMissingTranslationImages(beam.PTransform):  # type: ignore[misc]
     def _get_image_names_from_model(
         self,
         group: Tuple[
-            str, beam.PCollection[suggestion_models.GeneralSuggestionModel]]
+            str, beam.PCollection[suggestion_models.GeneralSuggestionModel]
+        ],
     ) -> Tuple[str, List[str]]:
         """Extract image filenames from a GeneralSuggestionModel object.
 
@@ -202,22 +199,25 @@ class CopyMissingTranslationImages(beam.PTransform):  # type: ignore[misc]
             for translation_html_str in translation_html_lst:
                 assert isinstance(translation_html_str, str), (
                     'Unexpected translation_html_str type',
-                    type(translation_html_str), translation_html_str
+                    type(translation_html_str),
+                    translation_html_str,
                 )
                 translation_tree = bs4.BeautifulSoup(
-                    translation_html_str, 'html.parser')
+                    translation_html_str, 'html.parser'
+                )
                 image_nodes = translation_tree.findAll(
-                    name='oppia-noninteractive-image')
+                    name='oppia-noninteractive-image'
+                )
                 image_filenames += [
-                    html.unescape(
-                        node.get('filepath-with-value')).strip('"')
-                    for node in image_nodes]
+                    html.unescape(node.get('filepath-with-value')).strip('"')
+                    for node in image_nodes
+                ]
 
         return (model_id, image_filenames)
 
     def _make_path_pairs(
         self,
-        group: Tuple[str, Dict[str, beam.PCollection[beam.PCollection[str]]]]
+        group: Tuple[str, Dict[str, beam.PCollection[beam.PCollection[str]]]],
     ) -> List[Tuple[str, str]]:
         """Construct (src, dst) path pairs representing the copy operations to
         be performed.
@@ -313,17 +313,13 @@ class CopyMissingTranslationImagesJob(base_jobs.JobBase):
         """
         dst_to_copy_by_src, _ = (
             self.pipeline
-            | 'Plan copy operations'
-            >> CopyMissingTranslationImages()
+            | 'Plan copy operations' >> CopyMissingTranslationImages()
         )
 
-        results = (
-            dst_to_copy_by_src | 'Copy src to dst' >> gcs_io.CopyFile()
-        )
+        results = dst_to_copy_by_src | 'Copy src to dst' >> gcs_io.CopyFile()
 
-        return (
-            results
-            | 'Map as stdout' >> beam.Map(job_run_result.JobRunResult.as_stdout)
+        return results | 'Map as stdout' >> beam.Map(
+            job_run_result.JobRunResult.as_stdout
         )
 
 
@@ -363,8 +359,7 @@ class DebugMissingTranslationImagesJob(base_jobs.JobBase):
         """
         dst_to_copy_by_src, copy_info_by_src_path = (
             self.pipeline
-            | 'Plan copy operations'
-            >> CopyMissingTranslationImages()
+            | 'Plan copy operations' >> CopyMissingTranslationImages()
         )
 
         return (
@@ -389,11 +384,9 @@ class AuditMissingTranslationImagesJob(base_jobs.JobBase):
         """
         dst_to_copy_by_src, _ = (
             self.pipeline
-            | 'Plan copy operations'
-            >> CopyMissingTranslationImages()
+            | 'Plan copy operations' >> CopyMissingTranslationImages()
         )
 
-        return (
-            dst_to_copy_by_src
-            | 'Map as stdout' >> beam.Map(job_run_result.JobRunResult.as_stdout)
+        return dst_to_copy_by_src | 'Map as stdout' >> beam.Map(
+            job_run_result.JobRunResult.as_stdout
         )

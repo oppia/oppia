@@ -32,7 +32,7 @@ from typing import Dict, List, Optional, Sequence, Tuple, TypedDict, Union
 
 UnionSummaryDictType = Union[
     summary_services.DisplayableExplorationSummaryDict,
-    summary_services.DisplayableCollectionSummaryDict
+    summary_services.DisplayableCollectionSummaryDict,
 ]
 
 
@@ -40,7 +40,7 @@ def get_matching_activity_dicts(
     query_string: str,
     categories: List[str],
     language_codes: List[str],
-    search_offset: Optional[int]
+    search_offset: Optional[int],
 ) -> Tuple[Sequence[UnionSummaryDictType], Optional[int]]:
     """Given the details of a query and a search offset, returns a list of
     activity dicts that satisfy the query.
@@ -76,17 +76,25 @@ def get_matching_activity_dicts(
     if not search_offset:
         collection_ids, _ = (
             collection_services.get_collection_ids_matching_query(
-                query_string, categories, language_codes))
+                query_string, categories, language_codes
+            )
+        )
 
     exp_ids, new_search_offset = (
         exp_services.get_exploration_ids_matching_query(
-            query_string, categories, language_codes, offset=search_offset))
+            query_string, categories, language_codes, offset=search_offset
+        )
+    )
     activity_list: List[UnionSummaryDictType] = []
-    for collection_summary_dict in summary_services.get_displayable_collection_summary_dicts_matching_ids(  # pylint: disable=line-too-long
+    for (
+        collection_summary_dict
+    ) in summary_services.get_displayable_collection_summary_dicts_matching_ids(  # pylint: disable=line-too-long
         collection_ids
     ):
         activity_list.append(collection_summary_dict)
-    for exp_summary_dict in summary_services.get_displayable_exp_summary_dicts_matching_ids(  # pylint: disable=line-too-long
+    for (
+        exp_summary_dict
+    ) in summary_services.get_displayable_exp_summary_dicts_matching_ids(  # pylint: disable=line-too-long
         exp_ids
     ):
         activity_list.append(exp_summary_dict)
@@ -95,7 +103,8 @@ def get_matching_activity_dicts(
         logging.exception(
             '%s activities were fetched to load the library page. '
             'You may be running up against the default query limits.'
-            % feconf.DEFAULT_QUERY_LIMIT)
+            % feconf.DEFAULT_QUERY_LIMIT
+        )
     return activity_list, new_search_offset
 
 
@@ -122,15 +131,20 @@ class LibraryIndexHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     def get(self) -> None:
         """Handles GET requests."""
         # TODO(sll): Support index pages for other language codes.
-        summary_dicts_by_category = summary_services.get_library_groups([
-            constants.DEFAULT_LANGUAGE_CODE])
+        summary_dicts_by_category = summary_services.get_library_groups(
+            [constants.DEFAULT_LANGUAGE_CODE]
+        )
         top_rated_activity_summary_dicts = (
             summary_services.get_top_rated_exploration_summary_dicts(
                 [constants.DEFAULT_LANGUAGE_CODE],
-                feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS_FOR_LIBRARY_PAGE))
+                feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS_FOR_LIBRARY_PAGE,
+            )
+        )
         featured_activity_summary_dicts = (
             summary_services.get_featured_activity_summary_dicts(
-                [constants.DEFAULT_LANGUAGE_CODE]))
+                [constants.DEFAULT_LANGUAGE_CODE]
+            )
+        )
 
         preferred_language_codes = [constants.DEFAULT_LANGUAGE_CODE]
         if self.user_id:
@@ -142,31 +156,40 @@ class LibraryIndexHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             # 'protractor_id' key on a TypedDict dictionary, and addition
             # of any new key on typedDict is prohibited by MyPy.
             summary_dicts_by_category.insert(
-                0, {
+                0,
+                {
                     'activity_summary_dicts': top_rated_activity_summary_dicts,
                     'categories': [],
                     'header_i18n_id': (
-                        feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS),
+                        feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS
+                    ),
                     'has_full_results_page': True,
                     'full_results_url': feconf.LIBRARY_TOP_RATED_URL,
                     'protractor_id': 'top-rated',  # type: ignore[typeddict-item]
-                })
+                },
+            )
         if featured_activity_summary_dicts:
             summary_dicts_by_category.insert(
-                0, {
+                0,
+                {
                     'activity_summary_dicts': featured_activity_summary_dicts,
                     'categories': [],
                     'header_i18n_id': (
-                        feconf.LIBRARY_CATEGORY_FEATURED_ACTIVITIES),
+                        feconf.LIBRARY_CATEGORY_FEATURED_ACTIVITIES
+                    ),
                     'has_full_results_page': False,
                     'full_results_url': None,
-                })
+                },
+            )
 
-        self.values.update({
-            'activity_summary_dicts_by_category': (
-                summary_dicts_by_category),
-            'preferred_language_codes': preferred_language_codes,
-        })
+        self.values.update(
+            {
+                'activity_summary_dicts_by_category': (
+                    summary_dicts_by_category
+                ),
+                'preferred_language_codes': preferred_language_codes,
+            }
+        )
         self.render_json(self.values)
 
 
@@ -180,8 +203,7 @@ class LibraryGroupIndexHandlerNormalizedRequestDict(TypedDict):
 
 class LibraryGroupIndexHandler(
     base.BaseHandler[
-        Dict[str, str],
-        LibraryGroupIndexHandlerNormalizedRequestDict
+        Dict[str, str], LibraryGroupIndexHandlerNormalizedRequestDict
     ]
 ):
     """Provides data for categories such as top rated and recently published."""
@@ -195,8 +217,8 @@ class LibraryGroupIndexHandler(
                     'type': 'basestring',
                     'choices': [
                         feconf.LIBRARY_GROUP_RECENTLY_PUBLISHED,
-                        feconf.LIBRARY_GROUP_TOP_RATED
-                    ]
+                        feconf.LIBRARY_GROUP_TOP_RATED,
+                    ],
                 }
             }
         }
@@ -214,7 +236,9 @@ class LibraryGroupIndexHandler(
         if group_name == feconf.LIBRARY_GROUP_RECENTLY_PUBLISHED:
             recently_published_summary_dicts = (
                 summary_services.get_recently_published_exp_summary_dicts(
-                    feconf.RECENTLY_PUBLISHED_QUERY_LIMIT_FULL_PAGE))
+                    feconf.RECENTLY_PUBLISHED_QUERY_LIMIT_FULL_PAGE
+                )
+            )
             if recently_published_summary_dicts:
                 activity_list = recently_published_summary_dicts
                 header_i18n_id = feconf.LIBRARY_CATEGORY_RECENTLY_PUBLISHED
@@ -223,7 +247,9 @@ class LibraryGroupIndexHandler(
             top_rated_activity_summary_dicts = (
                 summary_services.get_top_rated_exploration_summary_dicts(
                     [constants.DEFAULT_LANGUAGE_CODE],
-                    feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS_FULL_PAGE))
+                    feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS_FULL_PAGE,
+                )
+            )
             if top_rated_activity_summary_dicts:
                 activity_list = top_rated_activity_summary_dicts
                 header_i18n_id = feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS
@@ -233,11 +259,13 @@ class LibraryGroupIndexHandler(
             user_settings = user_services.get_user_settings(self.user_id)
             preferred_language_codes = user_settings.preferred_language_codes
 
-        self.values.update({
-            'activity_list': activity_list,
-            'header_i18n_id': header_i18n_id,
-            'preferred_language_codes': preferred_language_codes,
-        })
+        self.values.update(
+            {
+                'activity_list': activity_list,
+                'header_i18n_id': header_i18n_id,
+                'preferred_language_codes': preferred_language_codes,
+            }
+        )
         self.render_json(self.values)
 
 
@@ -253,10 +281,7 @@ class SearchHandlerNormalizedRequestDict(TypedDict):
 
 
 class SearchHandler(
-    base.BaseHandler[
-        Dict[str, str],
-        SearchHandlerNormalizedRequestDict
-    ]
+    base.BaseHandler[Dict[str, str], SearchHandlerNormalizedRequestDict]
 ):
     """Provides data for activity search results."""
 
@@ -264,42 +289,34 @@ class SearchHandler(
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
-            'q': {
-                'schema': {
-                    'type': 'basestring'
-                },
-                'default_value': ''
-            },
+            'q': {'schema': {'type': 'basestring'}, 'default_value': ''},
             'category': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'is_search_query_string'
-                    }, {
-                        'id': 'is_regex_matched',
-                        'regex_pattern': '[\\-\\w+()"\\s]*'
-                    }]
+                    'validators': [
+                        {'id': 'is_search_query_string'},
+                        {
+                            'id': 'is_regex_matched',
+                            'regex_pattern': '[\\-\\w+()"\\s]*',
+                        },
+                    ],
                 },
-                'default_value': ''
+                'default_value': '',
             },
             'language_code': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'is_search_query_string'
-                    }, {
-                        'id': 'is_regex_matched',
-                        'regex_pattern': '[\\-\\w+()"\\s]*'
-                    }]
+                    'validators': [
+                        {'id': 'is_search_query_string'},
+                        {
+                            'id': 'is_regex_matched',
+                            'regex_pattern': '[\\-\\w+()"\\s]*',
+                        },
+                    ],
                 },
-                'default_value': ''
+                'default_value': '',
             },
-            'offset': {
-                'schema': {
-                    'type': 'int'
-                },
-                'default_value': None
-            }
+            'offset': {'schema': {'type': 'int'}, 'default_value': None},
         }
     }
 
@@ -329,12 +346,15 @@ class SearchHandler(
         search_offset = self.normalized_request.get('offset')
 
         activity_list, new_search_offset = get_matching_activity_dicts(
-            query_string, categories, language_codes, search_offset)
+            query_string, categories, language_codes, search_offset
+        )
 
-        self.values.update({
-            'activity_list': activity_list,
-            'search_cursor': new_search_offset,
-        })
+        self.values.update(
+            {
+                'activity_list': activity_list,
+                'search_cursor': new_search_offset,
+            }
+        )
 
         self.render_json(self.values)
 
@@ -362,8 +382,7 @@ class ExplorationSummariesHandlerNormalizedRequestDict(TypedDict):
 
 class ExplorationSummariesHandler(
     base.BaseHandler[
-        Dict[str, str],
-        ExplorationSummariesHandlerNormalizedRequestDict
+        Dict[str, str], ExplorationSummariesHandlerNormalizedRequestDict
     ]
 ):
     """Returns summaries corresponding to ids of public explorations. This
@@ -375,17 +394,12 @@ class ExplorationSummariesHandler(
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'stringified_exp_ids': {
-                'schema': {
-                    'type': 'custom',
-                    'obj_type': 'JsonEncodedInString'
-                }
+                'schema': {'type': 'custom', 'obj_type': 'JsonEncodedInString'}
             },
             'include_private_explorations': {
-                'schema': {
-                    'type': 'bool'
-                },
-                'default_value': False
-            }
+                'schema': {'type': 'bool'},
+                'default_value': False,
+            },
         }
     }
 
@@ -395,29 +409,31 @@ class ExplorationSummariesHandler(
         assert self.normalized_request is not None
         exp_ids = self.normalized_request['stringified_exp_ids']
         include_private_exps = self.normalized_request.get(
-            'include_private_explorations')
+            'include_private_explorations'
+        )
 
         editor_user_id = self.user_id if include_private_exps else None
         if not editor_user_id:
             include_private_exps = False
 
-        if (
-                not isinstance(exp_ids, list) or
-                not all(isinstance(exp_id, str) for exp_id in exp_ids)
+        if not isinstance(exp_ids, list) or not all(
+            isinstance(exp_id, str) for exp_id in exp_ids
         ):
             raise self.NotFoundException
 
         if include_private_exps:
             summaries = (
                 summary_services.get_displayable_exp_summary_dicts_matching_ids(
-                    exp_ids, user=self.user))
+                    exp_ids, user=self.user
+                )
+            )
         else:
             summaries = (
                 summary_services.get_displayable_exp_summary_dicts_matching_ids(
-                    exp_ids))
-        self.values.update({
-            'summaries': summaries
-        })
+                    exp_ids
+                )
+            )
+        self.values.update({'summaries': summaries})
         self.render_json(self.values)
 
 
@@ -431,8 +447,7 @@ class CollectionSummariesHandlerNormalizedRequestDict(TypedDict):
 
 class CollectionSummariesHandler(
     base.BaseHandler[
-        Dict[str, str],
-        CollectionSummariesHandlerNormalizedRequestDict
+        Dict[str, str], CollectionSummariesHandlerNormalizedRequestDict
     ]
 ):
     """Returns collection summaries corresponding to collection ids."""
@@ -442,10 +457,7 @@ class CollectionSummariesHandler(
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'stringified_collection_ids': {
-                'schema': {
-                    'type': 'custom',
-                    'obj_type': 'JsonEncodedInString'
-                }
+                'schema': {'type': 'custom', 'obj_type': 'JsonEncodedInString'}
             }
         }
     }
@@ -454,13 +466,10 @@ class CollectionSummariesHandler(
     def get(self) -> None:
         """Handles GET requests."""
         assert self.normalized_request is not None
-        collection_ids = (
-            self.normalized_request['stringified_collection_ids'])
+        collection_ids = self.normalized_request['stringified_collection_ids']
 
-        summaries = (
-            summary_services.get_displayable_collection_summary_dicts_matching_ids( # pylint: disable=line-too-long
-                collection_ids))
-        self.values.update({
-            'summaries': summaries
-        })
+        summaries = summary_services.get_displayable_collection_summary_dicts_matching_ids(  # pylint: disable=line-too-long
+            collection_ids
+        )
+        self.values.update({'summaries': summaries})
         self.render_json(self.values)

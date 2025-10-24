@@ -32,18 +32,21 @@ class MultipleIncorrectSubmissions(base.BaseExplorationIssueSpec):
     in the same card and quits the exploration.
     """
 
-    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{
-        'name': 'state_name',
-        'description': 'State name',
-        'schema': {
-            'type': 'unicode',
+    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [
+        {
+            'name': 'state_name',
+            'description': 'State name',
+            'schema': {
+                'type': 'unicode',
+            },
+            'default_value': '',
         },
-        'default_value': ''
-    }, {
-        'name': 'num_times_answered_incorrectly',
-        'description': 'Number of times incorrect answers were submitted',
-        'schema': {
-            'type': 'int',
+        {
+            'name': 'num_times_answered_incorrectly',
+            'description': 'Number of times incorrect answers were submitted',
+            'schema': {
+                'type': 'int',
+            },
+            'default_value': 0,
         },
-        'default_value': 0
-    }]
+    ]

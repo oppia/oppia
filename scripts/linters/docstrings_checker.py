@@ -50,9 +50,10 @@ def get_setters_property_name(node: astroid.FunctionDef) -> Optional[str]:
     """
     decorator_nodes = node.decorators.nodes if node.decorators else []
     for decorator_node in decorator_nodes:
-        if (isinstance(decorator_node, astroid.Attribute) and
-            decorator_node.attrname == 'setter' and
-            isinstance(decorator_node.expr, astroid.Name)
+        if (
+            isinstance(decorator_node, astroid.Attribute)
+            and decorator_node.attrname == 'setter'
+            and isinstance(decorator_node.expr, astroid.Name)
         ):
             decorator_name: Optional[str] = decorator_node.expr.name
             return decorator_name
@@ -60,7 +61,7 @@ def get_setters_property_name(node: astroid.FunctionDef) -> Optional[str]:
 
 
 def get_setters_property(
-    node: astroid.FunctionDef
+    node: astroid.FunctionDef,
 ) -> Optional[astroid.FunctionDef]:
     """Get the property node for the given setter node.
 
@@ -119,8 +120,9 @@ def possible_exc_types(node: astroid.NodeNG) -> Set[str]:
         inferred = utils.safe_infer(node.exc)
         if inferred:
             excs = [inferred.name]
-    elif (isinstance(node.exc, astroid.Call) and
-          isinstance(node.exc.func, astroid.Name)):
+    elif isinstance(node.exc, astroid.Call) and isinstance(
+        node.exc.func, astroid.Name
+    ):
         target = utils.safe_infer(node.exc.func)
         if isinstance(target, astroid.ClassDef):
             excs = [target.name]
@@ -130,9 +132,11 @@ def possible_exc_types(node: astroid.NodeNG) -> Set[str]:
                     continue
 
                 val = utils.safe_infer(ret.value)
-                if (val and isinstance(val, (
-                        astroid.Instance, astroid.ClassDef)) and
-                        utils.inherit_from_std_ex(val)):
+                if (
+                    val
+                    and isinstance(val, (astroid.Instance, astroid.ClassDef))
+                    and utils.inherit_from_std_ex(val)
+                ):
                     excs.append(val.name)
     elif node.exc is None:
         handler = node.parent
@@ -142,13 +146,15 @@ def possible_exc_types(node: astroid.NodeNG) -> Set[str]:
         if handler and handler.type:
             inferred_excs = astroid.unpack_infer(handler.type)
             excs = [
-                exc.name for exc in inferred_excs
-                if exc is not astroid.Uninferable]
+                exc.name
+                for exc in inferred_excs
+                if exc is not astroid.Uninferable
+            ]
 
     try:
         return set(
-            exc for exc in excs if not utils.node_ignores_exception(
-                node, exc))
+            exc for exc in excs if not utils.node_ignores_exception(node, exc)
+        )
     except astroid.InferenceError:
         return set()
 
@@ -195,16 +201,20 @@ class GoogleDocstring(_check_docs_utils.GoogleDocstring):  # type: ignore[misc]
             [.] )? \s*                  # optional type declaration
         \s*  (.*)                       # beginning of optional description
     """.format(
-        type=re_multiple_type,
-    ), flags=re.X | re.S | re.M)
+            type=re_multiple_type,
+        ),
+        flags=re.X | re.S | re.M,
+    )
 
     re_returns_line = re.compile(
         r"""
         \s* (({type}|\S*).)?              # identifier
         \s* (.*)                          # beginning of description
     """.format(
-        type=re_multiple_type,
-    ), flags=re.X | re.S | re.M)
+            type=re_multiple_type,
+        ),
+        flags=re.X | re.S | re.M,
+    )
 
     re_yields_line = re_returns_line
 
@@ -213,5 +223,7 @@ class GoogleDocstring(_check_docs_utils.GoogleDocstring):  # type: ignore[misc]
         \s* ({type}|\S*)?[.:]                    # identifier
         \s* (.*)                         # beginning of description
     """.format(
-        type=re_multiple_type,
-    ), flags=re.X | re.S | re.M)
+            type=re_multiple_type,
+        ),
+        flags=re.X | re.S | re.M,
+    )
