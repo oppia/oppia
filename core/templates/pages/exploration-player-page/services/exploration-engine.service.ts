@@ -59,9 +59,9 @@ import isEqual from 'lodash/isEqual';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {LearnerAnswerInfoService} from './learner-answer-info.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
-import {forEach} from 'angular';
 import {ComputeGraphService} from 'services/compute-graph.service';
 import {StateGraphLayoutService} from 'components/graph-services/graph-layout.service';
+import forEach from 'lodash/forEach';
 
 @Injectable({
   providedIn: 'root',
