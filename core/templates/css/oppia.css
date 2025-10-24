@@ -1772,18 +1772,6 @@ pre.oppia-pre-wrapped-text {
    collapse surrounding whitespace and cause adjacent text to appear jammed.
    We scope to RTE viewer/output classes so this only affects rendered content.
 */
-/* Base selector placed before more specific selectors to satisfy linting
-  rule 'no-descending-specificity'. */
-oppia-noninteractive-link {
-  display: inline;
-}
-.oppia-rte-viewer oppia-noninteractive-link,
-.oppia-rte-output-display oppia-noninteractive-link,
-.oppia-rte-content oppia-noninteractive-link {
-  display: inline;
-  /* small gap that is visually consistent across browsers */
-  margin-right: 0.25em;
-}
 
 .oppia-rte-keyboard-accessibility-text {
   color: #757575;
@@ -2922,7 +2910,9 @@ mat-card.preview-conversation-skin-supplemental-card {
 }
 
 oppia-noninteractive-link {
-  margin-right: -4px;
+  display: inline;
+  /* small gap that is visually consistent across browsers */
+  margin-right: 0.25em;
 }
 
 .oppia-activity-summary-tile {
