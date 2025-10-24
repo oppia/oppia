@@ -82,7 +82,6 @@ export class SchemaBasedHtmlEditorComponent
 
   updateValue(value: string): void {
     this.ngZone.run(() => {
-      this.localValue = value;
       this.onChange(value);
     });
   }
