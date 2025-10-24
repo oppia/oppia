@@ -1772,6 +1772,11 @@ pre.oppia-pre-wrapped-text {
    collapse surrounding whitespace and cause adjacent text to appear jammed.
    We scope to RTE viewer/output classes so this only affects rendered content.
 */
+/* Base selector placed before more specific selectors to satisfy linting
+  rule 'no-descending-specificity'. */
+oppia-noninteractive-link {
+  display: inline;
+}
 .oppia-rte-viewer oppia-noninteractive-link,
 .oppia-rte-output-display oppia-noninteractive-link,
 .oppia-rte-content oppia-noninteractive-link {
