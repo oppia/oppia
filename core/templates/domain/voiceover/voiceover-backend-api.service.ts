@@ -285,6 +285,26 @@ export class VoiceoverBackendApiService {
     });
   }
 
+  async regenerateVoiceoverOnExplorationUpdateAsync(
+    explorationID: string,
+    explorationVersion: number,
+    explorationTitle: string
+  ): Promise<void> {
+    this.http
+      .post<void>(
+        this.urlInterpolationService.interpolateUrl(
+          VoiceoverDomainConstants.REGENERATE_VOICEOVER_ON_EXP_UPDATE_URL,
+          {
+            exploration_id: explorationID,
+            exploration_version: String(explorationVersion),
+            exploration_title: explorationTitle,
+          }
+        ),
+        {}
+      )
+      .toPromise();
+  }
+
   async fetchFilenamesForVoiceArtistAsync(
     voiceArtistId: string,
     languageCode: string

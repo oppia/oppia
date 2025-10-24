@@ -327,7 +327,7 @@ def get_topics_by_ids(
 
 
 def get_multiple_topics_by_ids_and_version(
-    topic_ids_and_versions: List[Tuple[str, Optional[int]]]
+    topic_ids_and_versions: List[Tuple[str, Optional[int]]],
 ) -> List[Optional[topic_domain.Topic]]:
     """Returns a list of topics matching the IDs and versions provided.
 
@@ -342,10 +342,10 @@ def get_multiple_topics_by_ids_and_version(
         be None.
     """
     topic_models_list = topic_models.TopicModel.get_version_multi(
-        topic_ids_and_versions)
+        topic_ids_and_versions
+    )
     return [
-        get_topic_from_model(topic_model)
-        if topic_model is not None else None
+        get_topic_from_model(topic_model) if topic_model is not None else None
         for topic_model in topic_models_list
     ]
 

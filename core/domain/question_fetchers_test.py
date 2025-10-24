@@ -267,28 +267,35 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         content_id_generator = translation_domain.ContentIdGenerator()
 
         self.save_new_question(
-            question_id1, self.editor_id,
+            question_id1,
+            self.editor_id,
             self._create_valid_question_data(
-                'Question 1', content_id_generator),
+                'Question 1', content_id_generator
+            ),
             [skill_id],
-            content_id_generator.next_content_id_index
+            content_id_generator.next_content_id_index,
         )
         self.save_new_question(
-            question_id2, self.editor_id,
+            question_id2,
+            self.editor_id,
             self._create_valid_question_data(
-                'Question 2', content_id_generator),
+                'Question 2', content_id_generator
+            ),
             [skill_id],
-            content_id_generator.next_content_id_index
+            content_id_generator.next_content_id_index,
         )
         # Link each question to the skill.
         question_services.create_new_question_skill_link(
-            self.editor_id, question_id1, skill_id, 0.3)
+            self.editor_id, question_id1, skill_id, 0.3
+        )
         question_services.create_new_question_skill_link(
-            self.editor_id, question_id2, skill_id, 0.3)
+            self.editor_id, question_id2, skill_id, 0.3
+        )
 
         # Fetch all questions.
         questions = question_fetchers.get_all_questions(
-            offset=0, question_count=10)
+            offset=0, question_count=10
+        )
         returned_question_ids = [q.id for q in questions if q is not None]
         self.assertIn(question_id1, returned_question_ids)
         self.assertIn(question_id2, returned_question_ids)
@@ -303,18 +310,22 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
             qid = question_services.get_new_question_id()
             question_ids.append(qid)
             self.save_new_question(
-                qid, self.editor_id,
+                qid,
+                self.editor_id,
                 self._create_valid_question_data(
-                    f'Question {i+1}', content_id_generator),
+                    f'Question {i+1}', content_id_generator
+                ),
                 [skill_id],
-                content_id_generator.next_content_id_index
+                content_id_generator.next_content_id_index,
             )
             question_services.create_new_question_skill_link(
-                self.editor_id, qid, skill_id, 0.3)
+                self.editor_id, qid, skill_id, 0.3
+            )
 
         # Use an offset of 1 and fetch only 1 question.
         questions = question_fetchers.get_all_questions(
-            offset=1, question_count=1)
+            offset=1, question_count=1
+        )
         self.assertEqual(len(questions), 1)
         # The returned question should be the first one created.
         self.assertEqual(questions[0].id, question_ids[0])
@@ -325,18 +336,22 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         question_id = question_services.get_new_question_id()
         content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
-            question_id, self.editor_id,
+            question_id,
+            self.editor_id,
             self._create_valid_question_data(
-                'Single Question', content_id_generator),
+                'Single Question', content_id_generator
+            ),
             [skill_id],
-            content_id_generator.next_content_id_index
+            content_id_generator.next_content_id_index,
         )
         question_services.create_new_question_skill_link(
-            self.editor_id, question_id, skill_id, 0.3)
+            self.editor_id, question_id, skill_id, 0.3
+        )
 
         # Use an offset greater than the number of questions available.
         questions = question_fetchers.get_all_questions(
-            offset=100, question_count=10)
+            offset=100, question_count=10
+        )
         self.assertEqual(questions, [])
 
     def test_get_all_questions_respects_question_count_limit(self) -> None:
@@ -349,18 +364,22 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
             qid = question_services.get_new_question_id()
             question_ids.append(qid)
             self.save_new_question(
-                qid, self.editor_id,
+                qid,
+                self.editor_id,
                 self._create_valid_question_data(
-                    f'Question {i+1}', content_id_generator),
+                    f'Question {i+1}', content_id_generator
+                ),
                 [skill_id],
-                content_id_generator.next_content_id_index
+                content_id_generator.next_content_id_index,
             )
             question_services.create_new_question_skill_link(
-                self.editor_id, qid, skill_id, 0.3)
+                self.editor_id, qid, skill_id, 0.3
+            )
 
         # Fetch only 2 questions even though more exist.
         questions = question_fetchers.get_all_questions(
-            offset=0, question_count=2)
+            offset=0, question_count=2
+        )
         self.assertEqual(len(questions), 2)
 
     def test_get_all_questions_with_zero_count_returns_empty(self) -> None:
@@ -369,15 +388,17 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         content_id_generator = translation_domain.ContentIdGenerator()
 
         self.save_new_question(
-            question_id, self.editor_id,
+            question_id,
+            self.editor_id,
             self._create_valid_question_data('Question', content_id_generator),
             [skill_id],
-            content_id_generator.next_content_id_index
+            content_id_generator.next_content_id_index,
         )
         question_services.create_new_question_skill_link(
-            self.editor_id, question_id, skill_id, 0.3)
+            self.editor_id, question_id, skill_id, 0.3
+        )
 
         questions = question_fetchers.get_all_questions(
             offset=0, question_count=0
-            )
+        )
         self.assertEqual(questions, [])

@@ -24,11 +24,12 @@ import os
 
 from core import feconf, schema_utils, utils
 from core.constants import constants
-from core.domain import exp_domain
+from core.domain import exp_domain, exp_services
 from core.domain import platform_parameter_list as param_list
 from core.domain import (
     state_domain,
     translation_domain,
+    translation_fetchers,
     user_services,
     voiceover_domain,
     voiceover_regeneration_services,
@@ -41,10 +42,22 @@ from typing import Dict, List, Sequence, Tuple
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import email_models, exp_models, voiceover_models
+    from mypy_imports import (
+        email_models,
+        exp_models,
+        translation_models,
+        voiceover_models,
+    )
 
-(exp_models, email_models, voiceover_models) = models.Registry.import_models(
-    [models.Names.EXPLORATION, models.Names.EMAIL, models.Names.VOICEOVER]
+(exp_models, email_models, voiceover_models, translation_models) = (
+    models.Registry.import_models(
+        [
+            models.Names.EXPLORATION,
+            models.Names.EMAIL,
+            models.Names.VOICEOVER,
+            models.Names.TRANSLATION,
+        ]
+    )
 )
 
 
@@ -1335,7 +1348,7 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
             'send_email_to_voiceover_admins_and_tech_leads_after_regeneration',
             self.mock_send_email_to_voiceover_admins_and_tech_leads,
         ):
-            voiceover_services.regenerate_voiceover_for_updated_exploration(
+            voiceover_services.regenerate_voiceovers_for_updated_exploration(
                 exploration_id=exploration_id,
                 exploration_title=exploration_title,
                 exploration_version=exploration_version,
@@ -1403,7 +1416,7 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
             'send_email_to_voiceover_admins_and_tech_leads_after_regeneration',
             self.mock_send_email_to_voiceover_admins_and_tech_leads,
         ):
-            voiceover_services.regenerate_voiceover_for_updated_exploration(
+            voiceover_services.regenerate_voiceovers_for_updated_exploration(
                 exploration_id=exploration_id,
                 exploration_title=exploration_title,
                 exploration_version=exploration_version,
@@ -1437,7 +1450,7 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
         )
 
         with self.assertRaisesRegex(Exception, error):
-            voiceover_services.regenerate_voiceover_for_updated_exploration(
+            voiceover_services.regenerate_voiceovers_for_updated_exploration(
                 exploration_id=exploration_id,
                 exploration_title=exploration_title,
                 exploration_version=exploration_version,
@@ -1500,7 +1513,7 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
             'send_email_to_voiceover_admins_and_tech_leads_after_regeneration',
             self.mock_send_email_to_voiceover_admins_and_tech_leads,
         ):
-            voiceover_services.regenerate_voiceover_for_updated_exploration(
+            voiceover_services.regenerate_voiceovers_for_updated_exploration(
                 exploration_id=exploration_id,
                 exploration_title=exploration_title,
                 exploration_version=exploration_version,
@@ -1659,7 +1672,7 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
             'regenerate_voiceovers_of_exploration',
             mock_regenerate_voiceovers_of_exploration,
         ):
-            voiceover_services.regenerate_voiceover_for_updated_exploration(
+            voiceover_services.regenerate_voiceovers_for_updated_exploration(
                 exploration_id=exploration_id,
                 exploration_title=exploration_title,
                 exploration_version=exploration_version,
@@ -1691,3 +1704,351 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
                 == 'Report on Automatic Voiceovers Generated for Test Exploration'
             ):
                 self.assertEqual(email_model.html_body, expected_html_body)
+
+    def _create_exploration_and_arabic_translation(
+        self, exploration_id: str, language_code: str
+    ) -> None:
+        """Creates a new exploration with a translation in Arabic.
+
+        Args:
+            exploration_id: str. The ID of the exploration to create.
+            language_code: str. The language code for the translation.
+        """
+        exploration = exp_domain.Exploration.create_default_exploration(
+            exploration_id,
+            title='A Title',
+            category='A Category',
+            objective='An Objective',
+        )
+        exploration.states['Introduction'].content.html = 'First Card!'
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
+        self.set_interaction_for_state(
+            exploration.states['Introduction'],
+            'TextInput',
+            content_id_generator,
+        )
+        exploration.states[
+            feconf.DEFAULT_INIT_STATE_NAME
+        ].interaction.answer_groups = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'Second',
+                    None,
+                    state_domain.SubtitledHtml(
+                        'feedback_1', '<p>state outcome html</p>'
+                    ),
+                    False,
+                    [],
+                    None,
+                    None,
+                ),
+                [
+                    state_domain.RuleSpec(
+                        'Equals',
+                        {
+                            'x': {
+                                'contentId': 'rule_input_Equals',
+                                'normalizedStrSet': ['Test'],
+                            }
+                        },
+                    )
+                ],
+                [],
+                None,
+            )
+        ]
+        exploration.add_state('Second', 'content_2', 'content-3')
+
+        exp_services.save_new_exploration(exploration_id, exploration)
+
+        arabic_translation = 'المحتوى المترجم'
+        translations_mapping: Dict[str, feconf.TranslatedContentDict] = {
+            'content_0': {
+                'content_value': arabic_translation,
+                'content_format': 'html',
+                'needs_update': False,
+            },
+            'content_1': {
+                'content_value': arabic_translation,
+                'content_format': 'html',
+                'needs_update': True,
+            },
+            'rule_input_Equals': {
+                'content_value': arabic_translation,
+                'content_format': 'html',
+                'needs_update': False,
+            },
+            'feedback_1': {
+                'content_value': arabic_translation,
+                'content_format': 'html',
+                'needs_update': False,
+            },
+        }
+
+        translation_models.EntityTranslationsModel.create_new(
+            feconf.TranslatableEntityType.EXPLORATION.value,
+            exploration_id,
+            exploration.version,
+            language_code,
+            translations_mapping,
+        ).put()
+
+    def test_should_regenerate_voiceover_for_arabic_language(self) -> None:
+        language_accent_code = 'ar-AE'
+        language_code = 'ar'
+        exploration_id = 'exp_id_1'
+        exploration_version = 1
+        self.signup('tester@org.com', 'tester')
+        author_id = self.get_user_id_from_email('tester@org.com')
+        date_time = datetime.datetime.utcnow().isoformat()
+
+        self._create_exploration_and_arabic_translation(
+            exploration_id, language_code
+        )
+
+        entity_translation = translation_fetchers.get_entity_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            exploration_id,
+            exploration_version,
+            language_code,
+        )
+        entity_voiceovers = (
+            voiceover_services.get_voiceovers_for_given_language_accent_code(
+                feconf.ENTITY_TYPE_EXPLORATION,
+                exploration_id,
+                exploration_version,
+                language_accent_code,
+            )
+        )
+
+        self.assertEqual(entity_translation.language_code, language_code)
+        self.assertEqual(entity_voiceovers.voiceovers_mapping, {})
+
+        with self.swap(
+            voiceover_services,
+            'send_email_to_voiceover_admins_and_tech_leads_after_regeneration',
+            self.mock_send_email_to_voiceover_admins_and_tech_leads,
+        ):
+            (
+                voiceover_services.regenerate_voiceovers_of_exploration_for_given_language_accent(
+                    exploration_id, language_accent_code, author_id, date_time
+                )
+            )
+
+        entity_voiceovers = (
+            voiceover_services.get_voiceovers_for_given_language_accent_code(
+                feconf.ENTITY_TYPE_EXPLORATION,
+                exploration_id,
+                exploration_version,
+                language_accent_code,
+            )
+        )
+
+        self.assertEqual(
+            entity_voiceovers.language_accent_code, language_accent_code
+        )
+        self.assertNotEqual(entity_voiceovers.voiceovers_mapping, {})
+        self.assertDictEqual(
+            entity_voiceovers.automated_voiceovers_audio_offsets_msecs,
+            {
+                'content_0': [
+                    {'token': 'This', 'audio_offset_msecs': 0.0},
+                    {'token': 'is', 'audio_offset_msecs': 100.0},
+                    {'token': 'a', 'audio_offset_msecs': 200.0},
+                    {'token': 'test', 'audio_offset_msecs': 300.0},
+                    {'token': 'text', 'audio_offset_msecs': 400.0},
+                ],
+                'feedback_1': [
+                    {'token': 'This', 'audio_offset_msecs': 0.0},
+                    {'token': 'is', 'audio_offset_msecs': 100.0},
+                    {'token': 'a', 'audio_offset_msecs': 200.0},
+                    {'token': 'test', 'audio_offset_msecs': 300.0},
+                    {'token': 'text', 'audio_offset_msecs': 400.0},
+                ],
+            },
+        )
+
+    def test_should_raise_exception_when_language_accent_code_is_not_supported(
+        self,
+    ) -> None:
+        language_accent_code = 'ar-non-existent'
+        exploration_id = 'exp_id_1'
+        self.signup('tester@org.com', 'tester')
+        author_id = self.get_user_id_from_email('tester@org.com')
+        date_time = datetime.datetime.utcnow().isoformat()
+
+        with self.assertRaisesRegex(
+            Exception, 'Invalid language accent code: %s' % language_accent_code
+        ):
+            (
+                voiceover_services.regenerate_voiceovers_of_exploration_for_given_language_accent(
+                    exploration_id, language_accent_code, author_id, date_time
+                )
+            )
+
+    def test_should_regenerate_voiceover_for_english_language(self) -> None:
+        language_accent_code = 'en-US'
+        language_code = 'en'
+        exploration_id = 'exp_id_1'
+        exploration_version = 1
+        self.signup('tester@org.com', 'tester')
+        author_id = self.get_user_id_from_email('tester@org.com')
+        date_time = datetime.datetime.utcnow().isoformat()
+
+        self._create_exploration_and_arabic_translation(
+            exploration_id, language_code
+        )
+
+        entity_voiceovers = (
+            voiceover_services.get_voiceovers_for_given_language_accent_code(
+                feconf.ENTITY_TYPE_EXPLORATION,
+                exploration_id,
+                exploration_version,
+                language_accent_code,
+            )
+        )
+        self.assertEqual(entity_voiceovers.voiceovers_mapping, {})
+
+        with self.swap(
+            voiceover_services,
+            'send_email_to_voiceover_admins_and_tech_leads_after_regeneration',
+            self.mock_send_email_to_voiceover_admins_and_tech_leads,
+        ):
+            (
+                voiceover_services.regenerate_voiceovers_of_exploration_for_given_language_accent(
+                    exploration_id, language_accent_code, author_id, date_time
+                )
+            )
+
+        entity_voiceovers = (
+            voiceover_services.get_voiceovers_for_given_language_accent_code(
+                feconf.ENTITY_TYPE_EXPLORATION,
+                exploration_id,
+                exploration_version,
+                language_accent_code,
+            )
+        )
+
+        self.assertEqual(
+            entity_voiceovers.language_accent_code, language_accent_code
+        )
+        self.assertNotEqual(entity_voiceovers.voiceovers_mapping, {})
+        self.assertEqual(
+            entity_voiceovers.automated_voiceovers_audio_offsets_msecs,
+            {
+                'content_0': [
+                    {'token': 'This', 'audio_offset_msecs': 0.0},
+                    {'token': 'is', 'audio_offset_msecs': 100.0},
+                    {'token': 'a', 'audio_offset_msecs': 200.0},
+                    {'token': 'test', 'audio_offset_msecs': 300.0},
+                    {'token': 'text', 'audio_offset_msecs': 400.0},
+                ],
+                'feedback_1': [
+                    {'token': 'This', 'audio_offset_msecs': 0.0},
+                    {'token': 'is', 'audio_offset_msecs': 100.0},
+                    {'token': 'a', 'audio_offset_msecs': 200.0},
+                    {'token': 'test', 'audio_offset_msecs': 300.0},
+                    {'token': 'text', 'audio_offset_msecs': 400.0},
+                ],
+            },
+        )
+
+    def test_should_regenerate_voiceover_when_exploration_is_curated(
+        self,
+    ) -> None:
+        language_code = 'ar'
+        exploration_id = 'exp_id_1'
+        exploration_version = 1
+        self.signup('tester@org.com', 'tester')
+        author_id = self.get_user_id_from_email('tester@org.com')
+        date_time = datetime.datetime.utcnow().isoformat()
+
+        self._create_exploration_and_arabic_translation(
+            exploration_id, language_code
+        )
+        entity_voiceovers_list = (
+            voiceover_services.get_entity_voiceovers_for_given_exploration(
+                exploration_id,
+                feconf.ENTITY_TYPE_EXPLORATION,
+                exploration_version,
+            )
+        )
+
+        self.assertEqual(len(entity_voiceovers_list), 0)
+
+        with self.swap(
+            voiceover_services,
+            'send_email_to_voiceover_admins_and_tech_leads_after_regeneration',
+            self.mock_send_email_to_voiceover_admins_and_tech_leads,
+        ):
+            (
+                voiceover_services.regenerate_voiceovers_on_exploration_curation(
+                    exploration_id, date_time, author_id
+                )
+            )
+
+        entity_voiceovers_list = (
+            voiceover_services.get_entity_voiceovers_for_given_exploration(
+                exploration_id,
+                feconf.ENTITY_TYPE_EXPLORATION,
+                exploration_version,
+            )
+        )
+        # The entity_voiceovers_list should have a length of 3 because the setup
+        # method supports three language accents for Oppia's voiceover
+        # autogeneration: 'en-US', 'en-IN', and 'ar-AE'.
+        self.assertEqual(len(entity_voiceovers_list), 3)
+
+    def test_should_generate_voiceover_for_translated_content(self) -> None:
+        language_code = 'ar'
+        exploration_id = 'exp_id_1'
+        exploration_version = 1
+        language_accent_code = 'ar-AE'
+        translation_content = 'المحتوى المترجم'
+        content_id = 'content_id_0'
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            exploration_id,
+            title='A Title',
+            category='A Category',
+            objective='An Objective',
+        )
+        exploration.states['Introduction'].content.html = 'First Card!'
+        exp_services.save_new_exploration(exploration_id, exploration)
+
+        entity_voiceovers = (
+            voiceover_services.get_voiceovers_for_given_language_accent_code(
+                feconf.ENTITY_TYPE_EXPLORATION,
+                exploration_id,
+                exploration_version,
+                language_accent_code,
+            )
+        )
+        self.assertEqual(entity_voiceovers.voiceovers_mapping, {})
+
+        with self.swap(
+            voiceover_services,
+            'send_email_to_voiceover_admins_and_tech_leads_after_regeneration',
+            self.mock_send_email_to_voiceover_admins_and_tech_leads,
+        ):
+            (
+                voiceover_services.generate_voiceover_from_translated_content(
+                    exploration_id,
+                    exploration_version,
+                    translation_content,
+                    content_id,
+                    language_code,
+                )
+            )
+
+        entity_voiceovers = (
+            voiceover_services.get_voiceovers_for_given_language_accent_code(
+                feconf.ENTITY_TYPE_EXPLORATION,
+                exploration_id,
+                exploration_version,
+                language_accent_code,
+            )
+        )
+        self.assertNotEqual(entity_voiceovers.voiceovers_mapping, {})
