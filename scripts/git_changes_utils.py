@@ -394,11 +394,18 @@ def get_changed_files(
         for ref in ref_list
         if (ref.local_ref.startswith('refs/heads/') or ref.local_ref == 'HEAD')
     ]
-    # Get branch name from e.g. local_ref='refs/heads/lint_hook'.
-    branches = [ref.local_ref.split('/')[-1] for ref in ref_heads_only]
+    # Get branch name from e.g. local_ref='refs/heads/lint_hook' or
+    # 'refs/heads/fix/welcome-space'. Use maxsplit=2 so branch names that
+    # contain slashes (e.g. 'fix/welcome-space') are preserved instead of
+    # only taking the final segment.
+    branches = [ref.local_ref.split('/', 2)[-1] for ref in ref_heads_only]
     hashes = [ref.local_sha1 for ref in ref_heads_only]
+    # Preserve the full remote branch name after the refs/.../ prefix. For
+    # example remote_ref='refs/heads/fix/welcome-space' should map to
+    # remote_branch 'origin/fix/welcome-space'. Using split('/', 2)[-1]
+    # extracts 'fix/welcome-space'.
     remote_branches = [
-        '%s/%s' % (remote, ref.remote_ref.split('/')[-1])
+        '%s/%s' % (remote, ref.remote_ref.split('/', 2)[-1])
         for ref in ref_heads_only
         if ref.remote_ref
     ]
