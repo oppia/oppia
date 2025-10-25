@@ -25,9 +25,11 @@ from core.domain import search_services , platform_parameter_services
 from core.platform.search import elastic_search_services
 from core.tests import test_utils
 from core import feconf
-
+from core.platform import models
 
 from typing import Any, Dict, List
+
+secrets_services=models.Registry.import_search_services()
 
 class ElasticSearchPureUnitTests(unittest.TestCase):
     
@@ -46,7 +48,7 @@ class ElasticSearchPureUnitTests(unittest.TestCase):
         with unittest.mock.patch.object(
             platform_parameter_services,
             'get_platform_parameter_value',
-            lambda param_name:{
+            lambda param_name: {
                 'es_cloud_id': 'test_cloud_id',
                 'es_username': 'test_username',
 
@@ -54,7 +56,7 @@ class ElasticSearchPureUnitTests(unittest.TestCase):
         ):
             # Mock secrets service
             with unittest.mock.patch.object(
-                elastic_search_services.secrets_services,
+                secrets_services,
                 'get_secret',
                 lambda secret_name: 'test_password'
             ):
@@ -62,7 +64,6 @@ class ElasticSearchPureUnitTests(unittest.TestCase):
                 with unittest.mock.patch('elasticsearch.Elasticsearch') as mock_es:
                     mock_es.return_value = unittest.mock.Mock()
                     
-
                     client = elastic_search_services.ES.get_client()
                     self.assertIsNotNone(client)
                     
