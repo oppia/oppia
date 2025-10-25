@@ -13,7 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-trap "rm /app/oppia/node_modules/@angular/compiler-cli/ngcc/__ngcc_lock_file__" EXIT
+cleanup() {
+    if [ -f "/app/oppia/node_modules/@angular/compiler-cli/ngcc/__ngcc_lock_file__" ]; then
+        rm "/app/oppia/node_modules/@angular/compiler-cli/ngcc/__ngcc_lock_file__"
+    fi
+}
+trap cleanup EXIT
 
 ng_build_cmd="npx ng build"
 if [ "$prod_env" = "true" ]; then
