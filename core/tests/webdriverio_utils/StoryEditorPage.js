@@ -606,6 +606,10 @@ var StoryEditorPage = function () {
     await richTextInstructions(editor);
     await action.click('Chapter node editor', nodeOutlineEditor);
     await action.click('Chapter node editor', nodeOutlineEditor);
+    await waitFor.elementToBeClickable(
+      nodeOutlineSaveButton,
+      'Save button taking too long to enable.'
+    );
     await action.click('Node outline save button', nodeOutlineSaveButton);
     await action.click('Finalize outline', nodeOutlineFinalizeCheckbox);
   };
