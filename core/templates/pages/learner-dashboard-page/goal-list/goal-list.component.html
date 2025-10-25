@@ -1,63 +1,65 @@
 <ng-container *ngFor="let story of goalTopic.canonicalStorySummaryDicts; let i = index">
-  <div class="oppia-learner-dash-section goal-list-container">
-    <div class="goal-list-stretch w-100">
-      <img class="goal-list-img" [src]="imgUrl" alt="" >
-      <div class="goal-list-stretch flex-grow-1">
-        <div class="goal-list-details flex-grow-1">
-          <p class="goal-list-title e2e-test-goal-title">
-            {{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_LIST_STORY_TITLE_NEW' | translate: { topic: goalTopic.getName(), story: story.getTitle() } }}
-          </p>
-          <div class="goal-list-center">
-            <p class="goal-list-progress-text">
-              {{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_LIST_STORY_PROGRESS' | translate: {current: story.getCompletedNodeTitles().length, total: story.getNodeTitles().length} }}
+  <ng-container *ngIf="story.getAllNodes().length > 0">
+    <div class="oppia-learner-dash-section goal-list-container">
+      <div class="goal-list-stretch w-100">
+        <img class="goal-list-img" [src]="imgUrl" alt="" >
+        <div class="goal-list-stretch flex-grow-1">
+          <div class="goal-list-details flex-grow-1">
+            <p class="goal-list-title e2e-test-goal-title">
+              {{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_LIST_STORY_TITLE_NEW' | translate: { topic: goalTopic.getName(), story: story.getTitle() } }}
             </p>
-            <div class="goal-list-progress-bar">
-              <div [ngStyle]="{'width': getStoryProgress(story) + '%'}"> </div>
-            </div>
-          </div>
-        </div>
-        <div class="goal-list-options">
-          <div class="goal-list-center">
-            <ng-content></ng-content>
-            <oppia-content-toggle-button (contentToggleEmitter)="handleToggleState($event, story.getId())"> </oppia-content-toggle-button>
-          </div>
-            <!--TODO(#18384): Resume state, can only check if node is completed or not.-->
-          <a *ngIf="story.getAllNodes().length !== story.getCompletedNodeTitles().length && !isExpanded(story.getId())"
-             class="oppia-learner-dash-button-sm oppia-learner-dash-button--goals-list align-self-end e2e-test-start-lesson-button"
-             [ngClass]="getStartButtonClass(story, allCurrentNodes[i])"
-             [attr.href]="getStartButtonHref(story, allCurrentNodes[i])"
-            >
-              {{ getStartButtonLabel(story, allCurrentNodes[i]) | translate }}
-          </a>
-        </div>
-      </div>
-    </div>
-    <div *ngIf="isExpanded(story.getId())" class="goal-list-story-nodes">
-      <ng-container *ngFor="let storyNode of story.getAllNodes(); let j = index">
-        <div class="d-flex flex-column">
-          <div class="goal-list-story-node-line-container">
-            <div *ngIf="j !== 0" class="goal-list-story-node-line"></div>
-          </div>
-          <div class="goal-list-center justify-content-between">
             <div class="goal-list-center">
-              <circle-progress [percent]="story.isNodeCompleted(storyNode.getTitle()) ? 100 : 0"> </circle-progress>
-              <p class="mb-0"> {{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_LIST_NODE_TITLE' | translate: {number: (j + 1), title: storyNode.getTitle()} }} </p>
+              <p class="goal-list-progress-text">
+                {{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_LIST_STORY_PROGRESS' | translate: {current: story.getCompletedNodeTitles().length, total: story.getNodeTitles().length} }}
+              </p>
+              <div class="goal-list-progress-bar">
+                <div [ngStyle]="{'width': getStoryProgress(story) + '%'}"> </div>
+              </div>
             </div>
-            <a *ngIf="!story.isNodeCompleted(storyNode.getTitle())"
-               class="oppia-learner-dash-button-sm oppia-learner-dash-button--goals-list"
-               [ngClass]="getStartButtonClass(story, j)"
-               [attr.href]="getStartButtonHref(story, j)"
+          </div>
+          <div class="goal-list-options">
+            <div class="goal-list-center">
+              <ng-content></ng-content>
+              <oppia-content-toggle-button (contentToggleEmitter)="handleToggleState($event, story.getId())"> </oppia-content-toggle-button>
+            </div>
+              <!--TODO(#18384): Resume state, can only check if node is completed or not.-->
+            <a *ngIf="story.getAllNodes().length !== story.getCompletedNodeTitles().length && !isExpanded(story.getId())"
+               class="oppia-learner-dash-button-sm oppia-learner-dash-button--goals-list align-self-end e2e-test-start-lesson-button"
+               [ngClass]="getStartButtonClass(story, allCurrentNodes[i])"
+               [attr.href]="getStartButtonHref(story, allCurrentNodes[i])"
               >
-                {{ getStartButtonLabel(story, j) | translate }}
+                {{ getStartButtonLabel(story, allCurrentNodes[i]) | translate }}
             </a>
           </div>
-          <div class="goal-list-story-node-line-container">
-            <div *ngIf="j !== story.getAllNodes().length - 1" class="goal-list-story-node-line"></div>
-          </div>
         </div>
-      </ng-container>
+      </div>
+      <div *ngIf="isExpanded(story.getId())" class="goal-list-story-nodes">
+        <ng-container *ngFor="let storyNode of story.getAllNodes(); let j = index">
+          <div class="d-flex flex-column">
+            <div class="goal-list-story-node-line-container">
+              <div *ngIf="j !== 0" class="goal-list-story-node-line"></div>
+            </div>
+            <div class="goal-list-center justify-content-between">
+              <div class="goal-list-center">
+                <circle-progress [percent]="story.isNodeCompleted(storyNode.getTitle()) ? 100 : 0"> </circle-progress>
+                <p class="mb-0"> {{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_LIST_NODE_TITLE' | translate: {number: (j + 1), title: storyNode.getTitle()} }} </p>
+              </div>
+              <a *ngIf="!story.isNodeCompleted(storyNode.getTitle())"
+                 class="oppia-learner-dash-button-sm oppia-learner-dash-button--goals-list"
+                 [ngClass]="getStartButtonClass(story, j)"
+                 [attr.href]="getStartButtonHref(story, j)"
+                >
+                  {{ getStartButtonLabel(story, j) | translate }}
+              </a>
+            </div>
+            <div class="goal-list-story-node-line-container">
+              <div *ngIf="j !== story.getAllNodes().length - 1" class="goal-list-story-node-line"></div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
     </div>
-  </div>
+  </ng-container>
 </ng-container>
 
 <style>
