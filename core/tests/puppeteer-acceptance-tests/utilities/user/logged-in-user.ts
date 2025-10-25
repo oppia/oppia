@@ -729,23 +729,27 @@ export class LoggedInUser extends BaseUser {
 
       await this.clickOnElementWithSelector(submitButtonSelector);
 
-      // Wait for the submitted message to appear and check its text.
-      await this.page.waitForSelector(submittedMessageSelector);
-      const submittedMessageElement = await this.page.$(
-        submittedMessageSelector
+      // Fix for flaky test (#23488). This uses a single, atomic page.$eval()
+      // call to prevent a race condition where the element could be removed
+      // from the DOM before its text was read. Using textContent is also
+      // more reliable than innerText for automated tests.
+      // Explicitly wait for the submitted message to be visible on the page.
+      await this.page.waitForSelector(submittedMessageSelector, {
+        visible: true,
+      });
+      // Now that we know it's visible, we can safely get its text content.
+      const submittedMessageText = await this.page.$eval(
+        submittedMessageSelector,
+        (el: Element) => el.textContent
       );
-      const submittedMessageText = await this.page.evaluate(
-        el => el.innerText,
-        submittedMessageElement
-      );
-      if (submittedMessageText !== 'Thank you for the feedback!') {
+      if (submittedMessageText.trim() !== 'Thank you for the feedback!') {
         throw new Error(
           `Unexpected submitted message text: ${submittedMessageText}`
         );
       }
     } catch (error) {
       const newError = new Error(`Failed to rate exploration: ${error}`);
-      newError.stack = error.stack;
+      newError.stack = (error as Error).stack;
       throw newError;
     }
   }
@@ -1034,7 +1038,7 @@ export class LoggedInUser extends BaseUser {
       const newError = new Error(
         `Failed to add lesson to 'Play Later' list: ${error}`
       );
-      newError.stack = error.stack;
+      newError.stack = (error as Error).stack;
       throw newError;
     }
   }
@@ -1160,7 +1164,7 @@ export class LoggedInUser extends BaseUser {
       const newError = new Error(
         `Failed to play lesson from dashboard: ${error}`
       );
-      newError.stack = error.stack;
+      newError.stack = (error as Error).stack;
       throw newError;
     }
   }
@@ -1213,7 +1217,7 @@ export class LoggedInUser extends BaseUser {
       const newError = new Error(
         `Failed to remove lesson from 'Play Later' list: ${error}`
       );
-      newError.stack = error.stack;
+      newError.stack = (error as Error).stack;
       throw newError;
     }
   }
@@ -1255,7 +1259,7 @@ export class LoggedInUser extends BaseUser {
       const newError = new Error(
         `Failed to verify presence of lesson in 'Play Later' list: ${error}`
       );
-      newError.stack = error.stack;
+      newError.stack = (error as Error).stack;
       throw newError;
     }
   }
@@ -1573,7 +1577,7 @@ export class LoggedInUser extends BaseUser {
       const newError = new Error(
         `Failed to update email preferences: ${error}`
       );
-      newError.stack = error.stack;
+      newError.stack = (error as Error).stack;
       throw newError;
     }
   }
@@ -1599,7 +1603,7 @@ export class LoggedInUser extends BaseUser {
       const newError = new Error(
         `Failed to navigate to Profile tab from Preferences page: ${error}`
       );
-      newError.stack = error.stack;
+      newError.stack = (error as Error).stack;
       throw newError;
     }
   }
@@ -1650,7 +1654,7 @@ export class LoggedInUser extends BaseUser {
       showMessage('Profile picture is different from the default one.');
     } catch (error) {
       const newError = new Error(`Failed to check profile picture: ${error}`);
-      newError.stack = error.stack;
+      newError.stack = (error as Error).stack;
       throw newError;
     }
   }
@@ -1679,7 +1683,7 @@ export class LoggedInUser extends BaseUser {
       }
     } catch (error) {
       const newError = new Error(`Failed to check bio: ${error}`);
-      newError.stack = error.stack;
+      newError.stack = (error as Error).stack;
       throw newError;
     }
   }
@@ -1706,7 +1710,7 @@ export class LoggedInUser extends BaseUser {
       }
     } catch (error) {
       const newError = new Error(`Failed to check interests: ${error}`);
-      newError.stack = error.stack;
+      newError.stack = (error as Error).stack;
       throw newError;
     }
   }
@@ -1746,7 +1750,7 @@ export class LoggedInUser extends BaseUser {
       }
     } catch (error) {
       const newError = new Error(`Failed to export account: ${error}`);
-      newError.stack = error.stack;
+      newError.stack = (error as Error).stack;
       throw newError;
     }
   }
@@ -2272,7 +2276,7 @@ export class LoggedInUser extends BaseUser {
       });
       showMessage('Tutorial pop-up closed successfully.');
     } catch (error) {
-      showMessage(`welcome modal not found: ${error.message}`);
+      showMessage(`welcome modal not found: ${(error as Error).message}`);
     }
   }
 
@@ -2369,7 +2373,7 @@ export class LoggedInUser extends BaseUser {
       const newError = new Error(
         `Failed to verify concept card with WorkedExample: ${error}`
       );
-      newError.stack = error.stack;
+      newError.stack = (error as Error).stack;
       throw newError;
     }
   }
