@@ -301,6 +301,7 @@ export class RuleEditorComponent
 
   ngOnInit(): void {
     this.isInvalid = false;
+    this.editRuleForm = {};
     /**
      * Rule editors are usually used in two ways. Inline or in a modal.
      * When in a modal, the save button is in the modal html and when
@@ -325,45 +326,41 @@ export class RuleEditorComponent
       );
     }
     this.currentInteractionId =
-      this.stateInteractionIdService.savedMemento !== null
+      typeof this.stateInteractionIdService.savedMemento === 'string'
         ? this.stateInteractionIdService.savedMemento
         : '';
-    this.editRuleForm = {};
-    // Select a default rule type, if one isn't already selected.
-    if (this.rule.type === null) {
-      // Do not set a default rule type when type is null during init.
+    if (
+      this.rule &&
+      this.rule.inputTypes &&
+      this.rule.inputTypes.x === 'TranslatableHtmlContentId' &&
+      Array.isArray(this.ruleDescriptionChoices) &&
+      this.ruleDescriptionChoices.length > 0 &&
+      (this.rule.inputs.x === '' || this.rule.inputs.x === undefined)
+    ) {
+      // Set inputs.x to the first choice value if it is empty.
+      this.rule.inputs.x = this.ruleDescriptionChoices[0].val;
     }
-    this.computeRuleDescriptionFragments();
-
-    // List-of-sets-of-translatable-html-content-ids-editor
-    // could not able to assign this.rule.inputTypes.x default values.
-    if (this.rule.inputTypes.x === 'ListOfSetsOfTranslatableHtmlContentIds') {
-      const ruleInputX = this.rule.inputs.x as unknown[];
-      if (
-        ruleInputX[0] === undefined ||
-        (ruleInputX[0] as unknown[])?.length === 0
-      ) {
-        let box: unknown[] = [];
-        this.ruleDescriptionChoices.map(choice => {
-          box.push([choice.val]);
-        });
-        (this.rule.inputs as Record<string, unknown>).x = box;
-      }
-    } else if (this.rule.inputTypes.x === 'TranslatableHtmlContentId') {
-      if ((this.rule.inputs as Record<string, unknown>).x === null) {
-        (this.rule.inputs as Record<string, unknown>).x =
-          this.ruleDescriptionChoices[0].val;
-      }
+    if (
+      this.rule &&
+      this.rule.inputTypes &&
+      this.rule.inputTypes.x === 'ListOfSetsOfTranslatableHtmlContentIds' &&
+      Array.isArray(this.ruleDescriptionChoices) &&
+      this.ruleDescriptionChoices.length > 0 &&
+      (!Array.isArray(this.rule.inputs.x) ||
+        (this.rule.inputs.x as unknown[]).length === 0)
+    ) {
+      // Set inputs.x to array of arrays with each choice value.
+      this.rule.inputs.x = this.ruleDescriptionChoices.map(choice => [
+        choice.val,
+      ]);
     }
   }
 
   ngOnDestroy(): void {
-    if (this.eventBusGroup) {
-      this.eventBusGroup.unsubscribe();
-    }
+    // No-op for now. Add cleanup logic if needed.
   }
 
   ngAfterViewChecked(): void {
-    this.changeDetectorRef.detectChanges();
+    // No-op for now. Add after view checked logic if needed.
   }
 }
