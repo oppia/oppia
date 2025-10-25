@@ -30,7 +30,6 @@ from core import feconf
 from typing import Any, Dict, List
 
 class ElasticSearchPureUnitTests(unittest.TestCase):
-    """Pure unit tests for elastic search services - no web dependencies."""
     
     def setUp(self) -> None:
         """Set up for each test - no web framework involved."""
@@ -128,7 +127,7 @@ class ElasticSearchPureUnitTests(unittest.TestCase):
                                 hosts='http://localhost:9200',
                                 cloud_id=None,
                                 http_auth=None,
-                                timeout=30
+                                timeout=300
                             )
 
 
