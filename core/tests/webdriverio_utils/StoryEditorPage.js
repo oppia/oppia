@@ -605,6 +605,7 @@ var StoryEditorPage = function () {
     await editor.clear();
     await richTextInstructions(editor);
     await action.click('Chapter node editor', nodeOutlineEditor);
+    await action.click('Chapter node editor', nodeOutlineEditor);
     await action.click('Node outline save button', nodeOutlineSaveButton);
     await action.click('Finalize outline', nodeOutlineFinalizeCheckbox);
   };
