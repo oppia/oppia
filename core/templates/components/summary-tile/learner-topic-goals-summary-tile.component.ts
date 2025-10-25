@@ -20,12 +20,13 @@ import {Component, OnInit} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {Input} from '@angular/core';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {ChapterLabelVisibilityService} from 'services/chapter-label-visibility.service';
 import {AppConstants} from 'app.constants';
 import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
 import {UrlService} from 'services/contextual/url.service';
 import {StoryNode} from 'domain/story/story-node.model';
 import {StorySummary} from 'domain/story/story-summary.model';
-
+import {PlatformFeatureService} from 'services/platform-feature.service';
 @Component({
   selector: 'oppia-learner-topic-goals-summary-tile',
   templateUrl: './learner-topic-goals-summary-tile.component.html',
@@ -38,6 +39,7 @@ export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
   @Input() displayArea!: string;
   @Input() topicName!: string;
   incompleteStoryNodes!: StoryNode[];
+  storyNode!: StoryNode;
   storySummaryToDisplay!: StorySummary;
   storyName!: string;
   storyProgress!: number;
@@ -51,11 +53,14 @@ export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
   isStoryChapterDisplayed: boolean = false;
   cardIsHovered: boolean = false;
   openInNewWindow: boolean = false;
+  statusIsPublished!: boolean;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private assetsBackendApiService: AssetsBackendApiService,
-    private urlService: UrlService
+    private chapterLabelVisibilityService: ChapterLabelVisibilityService,
+    private urlService: UrlService,
+    private platformFeatureService: PlatformFeatureService
   ) {}
 
   getAllIncompleteStoryNodes(): StoryNode[] {
@@ -142,6 +147,12 @@ export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
         this.storySummaryToDisplay.getAllNodes().length;
       let completedNodesCount =
         this.storySummaryToDisplay.getCompletedNodeTitles().length;
+      const allNodes = this.storySummaryToDisplay.getAllNodes();
+      if (allNodes.length > completedNodesCount) {
+        this.storyNode = allNodes[completedNodesCount];
+      }
+
+      this.statusIsPublished = this.storyNode?.getPublishedStatus();
       this.storyProgress = Math.floor(
         (completedNodesCount / totalStoryNodesCount) * 100
       );
@@ -153,5 +164,23 @@ export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
       return '-webkit-filter: blur(2px); filter: blur(2px);';
     }
     return 'height: 144px; width: 192px;';
+  }
+
+  isSerialChapterFeatureLearnerFlagEnabled(): boolean {
+    return this.platformFeatureService.status.SerialChapterLaunchLearnerView
+      .isEnabled;
+  }
+
+  isNewChapterLabelVisible(): boolean {
+    return this.chapterLabelVisibilityService.isNewChapterLabelVisible(
+      this.storyNodeToDisplay,
+      this.storySummaryToDisplay
+    );
+  }
+
+  onStoryClick(event: Event): void {
+    if (!this.statusIsPublished) {
+      event.preventDefault();
+    }
   }
 }

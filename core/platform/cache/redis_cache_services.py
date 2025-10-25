@@ -29,11 +29,11 @@ from typing import Dict, List, Optional
 # generic (e.g., StrictRedis[str]) to represent the runtime behavior
 # controlled by the `decode_responses` argument, and mypy 1.0+ now
 # requires these explicit type arguments.
-OPPIA_REDIS_CLIENT = redis.StrictRedis( # type: ignore[type-arg]
+OPPIA_REDIS_CLIENT = redis.StrictRedis(  # type: ignore[type-arg]
     host=feconf.REDISHOST,
     port=feconf.REDISPORT,
     db=feconf.OPPIA_REDIS_DB_INDEX,
-    decode_responses=True
+    decode_responses=True,
 )
 
 # Redis client for the Cloud NDB cache.
@@ -41,10 +41,10 @@ OPPIA_REDIS_CLIENT = redis.StrictRedis( # type: ignore[type-arg]
 # generic (e.g., StrictRedis[str]) to represent the runtime behavior
 # controlled by the `decode_responses` argument, and mypy 1.0+ now
 # requires these explicit type arguments.
-CLOUD_NDB_REDIS_CLIENT = redis.StrictRedis( # type: ignore[type-arg]
+CLOUD_NDB_REDIS_CLIENT = redis.StrictRedis(  # type: ignore[type-arg]
     host=feconf.REDISHOST,
     port=feconf.REDISPORT,
-    db=feconf.CLOUD_NDB_REDIS_DB_INDEX
+    db=feconf.CLOUD_NDB_REDIS_DB_INDEX,
 )
 
 
@@ -62,7 +62,7 @@ def get_memory_cache_stats() -> caching_domain.MemoryCacheStats:
     memory_stats = caching_domain.MemoryCacheStats(
         redis_full_profile['total.allocated'],
         redis_full_profile['peak.allocated'],
-        redis_full_profile['keys.count']
+        redis_full_profile['keys.count'],
     )
 
     return memory_stats

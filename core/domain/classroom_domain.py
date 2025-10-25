@@ -30,6 +30,7 @@ class ClassroomDict(TypedDict):
     course_details: str
     topic_list_intro: str
 
+
 # TODO(#17246): Currently, the classroom data is stored in the config model and
 # we are planning to migrate the storage into a new Classroom model. After the
 # successful migration, this file should be deleted.
@@ -44,7 +45,7 @@ class Classroom:
         url_fragment: str,
         topic_ids: List[str],
         course_details: str,
-        topic_list_intro: str
+        topic_list_intro: str,
     ) -> None:
         """Constructs a Classroom domain object.
 
@@ -74,5 +75,5 @@ class Classroom:
             'url_fragment': self.url_fragment,
             'topic_ids': self.topic_ids,
             'course_details': self.course_details,
-            'topic_list_intro': self.topic_list_intro
+            'topic_list_intro': self.topic_list_intro,
         }

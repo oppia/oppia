@@ -60,7 +60,7 @@ from core.jobs.types import job_run_result
 
 import apache_beam as beam
 
-from typing import Dict, List, Tuple, Type # isort: skip
+from typing import Dict, List, Tuple, Type  # isort: skip
 
 
 class JobMetaclass(type):
@@ -76,10 +76,10 @@ class JobMetaclass(type):
     _JOB_REGISTRY: Dict[str, Type[JobBase]] = {}
 
     def __new__(
-            mcs: Type[JobMetaclass],
-            name: str,
-            bases: Tuple[type, ...],
-            namespace: Dict[str, str]
+        mcs: Type[JobMetaclass],
+        name: str,
+        bases: Tuple[type, ...],
+        namespace: Dict[str, str],
     ) -> JobMetaclass:
         """Creates a new job class with type `JobMetaclass`.
 
@@ -110,8 +110,10 @@ class JobMetaclass(type):
         """
         if name in mcs._JOB_REGISTRY:
             collision = mcs._JOB_REGISTRY[name]
-            raise TypeError('%s name is already used by %s.%s' % (
-                name, collision.__module__, name))
+            raise TypeError(
+                '%s name is already used by %s.%s'
+                % (name, collision.__module__, name)
+            )
 
         job_cls = super(JobMetaclass, mcs).__new__(mcs, name, bases, namespace)
 

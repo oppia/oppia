@@ -31,6 +31,7 @@ from typing import Callable, List
 def test_function(unused_arg: str) -> Callable[[], None]:
     def task_func() -> None:
         pass
+
     return task_func
 
 
@@ -51,6 +52,7 @@ class ConcurrentTaskUtilsTests(test_utils.GenericTestBase):
                     in the same line of output.
             """
             self.task_stdout.append(' '.join(str(arg) for arg in args))
+
         self.print_swap = self.swap(builtins, 'print', mock_print)
 
 
@@ -58,20 +60,20 @@ class TaskResultTests(ConcurrentTaskUtilsTests):
     """Tests for TaskResult class."""
 
     def test_all_messages_with_success_message(self) -> None:
-        output_object = concurrent_task_utils.TaskResult(
-            'Test', False, [], [])
+        output_object = concurrent_task_utils.TaskResult('Test', False, [], [])
         self.assertEqual(output_object.trimmed_messages, [])
         self.assertEqual(
-            output_object.get_report(), ['SUCCESS  Test check passed'])
+            output_object.get_report(), ['SUCCESS  Test check passed']
+        )
         self.assertFalse(output_object.failed)
         self.assertEqual(output_object.name, 'Test')
 
     def test_all_messages_with_failed_message(self) -> None:
-        output_object = concurrent_task_utils.TaskResult(
-            'Test', True, [], [])
+        output_object = concurrent_task_utils.TaskResult('Test', True, [], [])
         self.assertEqual(output_object.trimmed_messages, [])
         self.assertEqual(
-            output_object.get_report(), ['FAILED  Test check failed'])
+            output_object.get_report(), ['FAILED  Test check failed']
+        )
         self.assertTrue(output_object.failed)
         self.assertEqual(output_object.name, 'Test')
 
@@ -81,7 +83,8 @@ class CreateTaskTests(ConcurrentTaskUtilsTests):
 
     def test_create_task_with_success(self) -> None:
         task = concurrent_task_utils.create_task(
-            test_function, True, self.semaphore, errors_to_retry_on=[])
+            test_function, True, self.semaphore, errors_to_retry_on=[]
+        )
         self.assertTrue(isinstance(task, concurrent_task_utils.TaskThread))
 
 
@@ -90,8 +93,13 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
 
     def test_task_thread_with_success(self) -> None:
         task = concurrent_task_utils.TaskThread(
-            test_function('unused_arg'), False, self.semaphore, name='test',
-            report_enabled=True, errors_to_retry_on=[])
+            test_function('unused_arg'),
+            False,
+            self.semaphore,
+            name='test',
+            report_enabled=True,
+            errors_to_retry_on=[],
+        )
         self.semaphore.acquire()
         task.start_time = time.time()
         with self.print_swap:
@@ -102,8 +110,13 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
 
     def test_task_thread_with_exception(self) -> None:
         task = concurrent_task_utils.TaskThread(
-            test_function, True, self.semaphore, name='test',
-            report_enabled=True, errors_to_retry_on=[])
+            test_function,
+            True,
+            self.semaphore,
+            name='test',
+            report_enabled=True,
+            errors_to_retry_on=[],
+        )
         self.semaphore.acquire()
         task.start_time = time.time()
         with self.print_swap:
@@ -112,15 +125,16 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
         self.assertIn(
             'test_function() missing 1 required '
             'positional argument: \'unused_arg\'',
-            self.task_stdout
+            self.task_stdout,
         )
 
     def test_task_thread_with_verbose_mode_enabled(self) -> None:
         class HelperTests:
             def test_show(self) -> concurrent_task_utils.TaskResult:
                 return concurrent_task_utils.TaskResult('name', True, [], [])
+
             def test_perform_all_check(
-                self
+                self,
             ) -> List[concurrent_task_utils.TaskResult]:
                 return [self.test_show()]
 
@@ -128,9 +142,13 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
             return HelperTests()
 
         task = concurrent_task_utils.TaskThread(
-            test_func().test_perform_all_check, True,
-            self.semaphore, name='test', report_enabled=True,
-            errors_to_retry_on=[])
+            test_func().test_perform_all_check,
+            True,
+            self.semaphore,
+            name='test',
+            report_enabled=True,
+            errors_to_retry_on=[],
+        )
         self.semaphore.acquire()
         task.start_time = time.time()
         with self.print_swap:
@@ -139,15 +157,16 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
         self.assertRegex(
             self.task_stdout[0],
             r'\d+:\d+:\d+ Report from name check\n-+\nFAILED  '
-            'name check failed')
+            'name check failed',
+        )
 
     def test_task_thread_with_task_report_disabled(self) -> None:
         class HelperTests:
             def test_show(self) -> concurrent_task_utils.TaskResult:
-                return concurrent_task_utils.TaskResult(
-                    '', False, [], ['msg'])
+                return concurrent_task_utils.TaskResult('', False, [], ['msg'])
+
             def test_perform_all_check(
-                self
+                self,
             ) -> List[concurrent_task_utils.TaskResult]:
                 return [self.test_show()]
 
@@ -155,9 +174,13 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
             return HelperTests()
 
         task = concurrent_task_utils.TaskThread(
-            test_func().test_perform_all_check, True,
-            self.semaphore, name='test', report_enabled=False,
-            errors_to_retry_on=[])
+            test_func().test_perform_all_check,
+            True,
+            self.semaphore,
+            name='test',
+            report_enabled=False,
+            errors_to_retry_on=[],
+        )
         self.semaphore.acquire()
         task.start_time = time.time()
         with self.print_swap:
@@ -172,8 +195,12 @@ class ExecuteTasksTests(ConcurrentTaskUtilsTests):
 
     def test_execute_task_with_single_task(self) -> None:
         task = concurrent_task_utils.create_task(
-            test_function('unused_arg'), False, self.semaphore, name='test',
-            errors_to_retry_on=[])
+            test_function('unused_arg'),
+            False,
+            self.semaphore,
+            name='test',
+            errors_to_retry_on=[],
+        )
         with self.print_swap:
             concurrent_task_utils.execute_tasks([task], self.semaphore)
         expected_output = [s for s in self.task_stdout if 'FINISHED' in s]
@@ -183,8 +210,11 @@ class ExecuteTasksTests(ConcurrentTaskUtilsTests):
         task_list = []
         for _ in range(6):
             task = concurrent_task_utils.create_task(
-                test_function('unused_arg'), False, self.semaphore,
-                errors_to_retry_on=[])
+                test_function('unused_arg'),
+                False,
+                self.semaphore,
+                errors_to_retry_on=[],
+            )
             task_list.append(task)
         with self.print_swap:
             concurrent_task_utils.execute_tasks(task_list, self.semaphore)
@@ -195,14 +225,15 @@ class ExecuteTasksTests(ConcurrentTaskUtilsTests):
         task_list = []
         for _ in range(6):
             task = concurrent_task_utils.create_task(
-                test_function, True, self.semaphore, errors_to_retry_on=[])
+                test_function, True, self.semaphore, errors_to_retry_on=[]
+            )
             task_list.append(task)
         with self.print_swap:
             concurrent_task_utils.execute_tasks(task_list, self.semaphore)
         self.assertIn(
             'test_function() missing 1 required '
             'positional argument: \'unused_arg\'',
-            self.task_stdout
+            self.task_stdout,
         )
 
 
@@ -222,7 +253,7 @@ class TaskRetryBehaviorTests(ConcurrentTaskUtilsTests):
                     name='mock_task',
                     failed=False,
                     trimmed_messages=[],
-                    messages=['Success']
+                    messages=['Success'],
                 )
             ]
 
@@ -232,7 +263,7 @@ class TaskRetryBehaviorTests(ConcurrentTaskUtilsTests):
             semaphore=self.semaphore,
             name='retryable_task',
             report_enabled=False,
-            errors_to_retry_on=['Error -11']
+            errors_to_retry_on=['Error -11'],
         )
         task.start_time = time.time()
         task.start()
@@ -246,6 +277,7 @@ class TaskRetryBehaviorTests(ConcurrentTaskUtilsTests):
 
     def test_create_task_with_non_retryable_errors(self) -> None:
         """Tests that retries only occur for specific errors ('Error -11')."""
+
         def mock_func() -> None:
             raise Exception('Non-retryable error')
 
@@ -255,7 +287,7 @@ class TaskRetryBehaviorTests(ConcurrentTaskUtilsTests):
             semaphore=self.semaphore,
             name='non_retryable_task',
             report_enabled=False,
-            errors_to_retry_on=['Error -11']
+            errors_to_retry_on=['Error -11'],
         )
         task.start_time = time.time()
         task.start()
@@ -281,7 +313,7 @@ class TaskRetryBehaviorTests(ConcurrentTaskUtilsTests):
             semaphore=self.semaphore,
             name='retryable_task_exceeds_max',
             report_enabled=False,
-            errors_to_retry_on=['Error -11']
+            errors_to_retry_on=['Error -11'],
         )
         task.start_time = time.time()
         task.start()
@@ -310,7 +342,7 @@ class TaskRetryBehaviorTests(ConcurrentTaskUtilsTests):
                     name='mock_task',
                     failed=False,
                     trimmed_messages=[],
-                    messages=['Success']
+                    messages=['Success'],
                 )
             ]
 
@@ -320,7 +352,7 @@ class TaskRetryBehaviorTests(ConcurrentTaskUtilsTests):
             semaphore=self.semaphore,
             name='partial_error_retry_task',
             report_enabled=False,
-            errors_to_retry_on=['Error -11', 'Connection timeout']
+            errors_to_retry_on=['Error -11', 'Connection timeout'],
         )
         task.start_time = time.time()
         task.start()
@@ -346,7 +378,7 @@ class TaskRetryBehaviorTests(ConcurrentTaskUtilsTests):
                     name='mock_task',
                     failed=False,
                     trimmed_messages=[],
-                    messages=['Success']
+                    messages=['Success'],
                 )
             ]
 
@@ -356,7 +388,7 @@ class TaskRetryBehaviorTests(ConcurrentTaskUtilsTests):
             semaphore=self.semaphore,
             name='all_errors_retry_task',
             report_enabled=False,
-            errors_to_retry_on=['Error -11', 'Connection timeout']
+            errors_to_retry_on=['Error -11', 'Connection timeout'],
         )
         task.start_time = time.time()
         task.start()

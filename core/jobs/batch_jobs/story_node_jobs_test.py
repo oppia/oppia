@@ -29,72 +29,78 @@ from core.platform import models
 from typing import Final, Type
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import story_models, topic_models
 
-(story_models, topic_models) = models.Registry.import_models([
-    models.Names.STORY, models.Names.TOPIC])
+(story_models, topic_models) = models.Registry.import_models(
+    [models.Names.STORY, models.Names.TOPIC]
+)
 
 
 class PopulateStoryNodeJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS: Type[
+    JOB_CLASS: Type[story_node_jobs.PopulateStoryNodeJob] = (
         story_node_jobs.PopulateStoryNodeJob
-    ] = story_node_jobs.PopulateStoryNodeJob
+    )
 
     STORY_1_ID: Final = 'story_1_id'
     STORY_2_ID: Final = 'story_2_id'
     TOPIC_1_ID: Final = 'topic_1_id'
 
     story_contents_dict_1 = {
-        'nodes': [{
-            'id': 'node_1',
-            'title': 'title_1',
-            'description': 'description_1',
-            'thumbnail_filename': 'thumbnail_filename_1.svg',
-            'thumbnail_bg_color': '#F8BF74',
-            'thumbnail_size_in_bytes': None,
-            'destination_node_ids': [],
-            'acquired_skill_ids': [],
-            'prerequisite_skill_ids': [],
-            'outline': 'outline',
-            'outline_is_finalized': True,
-            'exploration_id': 'exp_id_1'
-        }, {
-            'id': 'node_2',
-            'title': 'title_2',
-            'description': 'description_2',
-            'thumbnail_filename': 'thumbnail_filename_2.svg',
-            'thumbnail_bg_color': '#F8FF74',
-            'thumbnail_size_in_bytes': None,
-            'destination_node_ids': [],
-            'acquired_skill_ids': [],
-            'prerequisite_skill_ids': [],
-            'outline': 'outline',
-            'outline_is_finalized': True,
-            'exploration_id': 'exp_id_2'
-        }],
+        'nodes': [
+            {
+                'id': 'node_1',
+                'title': 'title_1',
+                'description': 'description_1',
+                'thumbnail_filename': 'thumbnail_filename_1.svg',
+                'thumbnail_bg_color': '#F8BF74',
+                'thumbnail_size_in_bytes': None,
+                'destination_node_ids': [],
+                'acquired_skill_ids': [],
+                'prerequisite_skill_ids': [],
+                'outline': 'outline',
+                'outline_is_finalized': True,
+                'exploration_id': 'exp_id_1',
+            },
+            {
+                'id': 'node_2',
+                'title': 'title_2',
+                'description': 'description_2',
+                'thumbnail_filename': 'thumbnail_filename_2.svg',
+                'thumbnail_bg_color': '#F8FF74',
+                'thumbnail_size_in_bytes': None,
+                'destination_node_ids': [],
+                'acquired_skill_ids': [],
+                'prerequisite_skill_ids': [],
+                'outline': 'outline',
+                'outline_is_finalized': True,
+                'exploration_id': 'exp_id_2',
+            },
+        ],
         'initial_node_id': 'node_1',
-        'next_node_id': 'node_3'
+        'next_node_id': 'node_3',
     }
 
     story_contents_dict_2 = {
-        'nodes': [{
-            'id': 'node_11',
-            'title': 'title_11',
-            'description': 'description_11',
-            'thumbnail_filename': 'thumbnail_filename_11.svg',
-            'thumbnail_bg_color': '#F8BF74',
-            'thumbnail_size_in_bytes': None,
-            'destination_node_ids': [],
-            'acquired_skill_ids': [],
-            'prerequisite_skill_ids': [],
-            'outline': 'outline',
-            'outline_is_finalized': True,
-            'exploration_id': 'exp_id_11'
-        }],
+        'nodes': [
+            {
+                'id': 'node_11',
+                'title': 'title_11',
+                'description': 'description_11',
+                'thumbnail_filename': 'thumbnail_filename_11.svg',
+                'thumbnail_bg_color': '#F8BF74',
+                'thumbnail_size_in_bytes': None,
+                'destination_node_ids': [],
+                'acquired_skill_ids': [],
+                'prerequisite_skill_ids': [],
+                'outline': 'outline',
+                'outline_is_finalized': True,
+                'exploration_id': 'exp_id_11',
+            }
+        ],
         'initial_node_id': 'node_11',
-        'next_node_id': 'node_22'
+        'next_node_id': 'node_22',
     }
 
     TOPIC_SNAPSHOT_1_DATE: Final = datetime.datetime(2023, 6, 12, 23, 0, 0, 0)
@@ -118,7 +124,7 @@ class PopulateStoryNodeJobTests(job_test_utils.JobTestBase):
             story_contents=self.story_contents_dict_1,
             corresponding_topic_id=self.TOPIC_1_ID,
             url_fragment='urlfragment-1',
-            version=2
+            version=2,
         )
         story_model_2 = self.create_model(
             story_models.StoryModel,
@@ -131,7 +137,7 @@ class PopulateStoryNodeJobTests(job_test_utils.JobTestBase):
             story_contents=self.story_contents_dict_2,
             corresponding_topic_id=self.TOPIC_1_ID,
             url_fragment='urlfragment-2',
-            version=1
+            version=1,
         )
         topic_model = self.create_model(
             topic_models.TopicModel,
@@ -141,133 +147,137 @@ class PopulateStoryNodeJobTests(job_test_utils.JobTestBase):
             language_code='en',
             description='description',
             url_fragment='/fragm',
-            canonical_story_references=[{
-                'story_id': self.STORY_1_ID,
-                'story_is_published': True
-            }, {
-                'story_id': self.STORY_2_ID,
-                'story_is_published': False
-            }],
+            canonical_story_references=[
+                {'story_id': self.STORY_1_ID, 'story_is_published': True},
+                {'story_id': self.STORY_2_ID, 'story_is_published': False},
+            ],
             next_subtopic_id=1,
             page_title_fragment_for_web='fragm',
             story_reference_schema_version=1,
             subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
-            version=2
+            version=2,
         )
         story_1_snapshot_metadata_model_1 = self.create_model(
             story_models.StorySnapshotMetadataModel,
             id='%s-1' % self.STORY_1_ID,
-            commit_cmds=[{
-                'cmd': 'add_story_node',
-                'node_id': 'node_1'
-            }],
+            commit_cmds=[{'cmd': 'add_story_node', 'node_id': 'node_1'}],
             commit_type=feconf.COMMIT_TYPE_CREATE,
             committer_id='user_1',
-            created_on=self.STORY_1_SHAPSHOT_1_DATE
+            created_on=self.STORY_1_SHAPSHOT_1_DATE,
         )
         story_1_snapshot_metadata_model_2 = self.create_model(
             story_models.StorySnapshotMetadataModel,
             id='%s-2' % self.STORY_1_ID,
-            commit_cmds=[{
-                'cmd': 'update_story_node_property',
-                'node_id': 'node_1',
-                'property_name': 'description',
-                'old_value': 'desc',
-                'new_value': 'description'
-            }, {
-                'cmd': 'add_story_node',
-                'node_id': 'node_2'
-            }],
+            commit_cmds=[
+                {
+                    'cmd': 'update_story_node_property',
+                    'node_id': 'node_1',
+                    'property_name': 'description',
+                    'old_value': 'desc',
+                    'new_value': 'description',
+                },
+                {'cmd': 'add_story_node', 'node_id': 'node_2'},
+            ],
             commit_type=feconf.COMMIT_TYPE_EDIT,
             committer_id='user_1',
-            created_on=self.STORY_1_SHAPSHOT_2_DATE
+            created_on=self.STORY_1_SHAPSHOT_2_DATE,
         )
         story_2_snapshot_metadata_model_1 = self.create_model(
             story_models.StorySnapshotMetadataModel,
             id='%s-1' % self.STORY_2_ID,
-            commit_cmds=[{
-                'cmd': 'add_story_node',
-                'node_id': 'node_11'
-            }],
+            commit_cmds=[{'cmd': 'add_story_node', 'node_id': 'node_11'}],
             commit_type=feconf.COMMIT_TYPE_CREATE,
             committer_id='user_1',
-            created_on=self.STORY_2_SHAPSHOT_1_DATE
+            created_on=self.STORY_2_SHAPSHOT_1_DATE,
         )
         topic_snapshot_metadata_model_1 = self.create_model(
             topic_models.TopicSnapshotMetadataModel,
             id='%s-1' % self.TOPIC_1_ID,
-            commit_cmds=[{
-                'cmd': 'add_canonical_story',
-                'story_id': self.STORY_1_ID
-            }, {
-                'cmd': 'add_canonical_story',
-                'story_id': self.STORY_2_ID
-            }],
+            commit_cmds=[
+                {'cmd': 'add_canonical_story', 'story_id': self.STORY_1_ID},
+                {'cmd': 'add_canonical_story', 'story_id': self.STORY_2_ID},
+            ],
             commit_type=feconf.COMMIT_TYPE_CREATE,
             committer_id='user_1',
-            created_on=self.TOPIC_SNAPSHOT_1_DATE
+            created_on=self.TOPIC_SNAPSHOT_1_DATE,
         )
         topic_snapshot_metadata_model_2 = self.create_model(
             topic_models.TopicSnapshotMetadataModel,
             id='%s-2' % self.TOPIC_1_ID,
-            commit_cmds=[{
-                'cmd': 'publish_story',
-                'story_id': self.STORY_1_ID
-            }],
+            commit_cmds=[{'cmd': 'publish_story', 'story_id': self.STORY_1_ID}],
             commit_type=feconf.COMMIT_TYPE_EDIT,
             committer_id='user_1',
-            created_on=self.TOPIC_SNAPSHOT_2_DATE
+            created_on=self.TOPIC_SNAPSHOT_2_DATE,
         )
 
         self.put_multi(
-            [story_model_1, story_model_2, topic_model,
-            story_1_snapshot_metadata_model_1,
-            story_1_snapshot_metadata_model_2,
-            story_2_snapshot_metadata_model_1,
-            topic_snapshot_metadata_model_1,
-            topic_snapshot_metadata_model_2])
-
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(
-                stdout='TOPIC MODELS WHOSE STORIES ARE UPDATED SUCCESS: 1'
-            )
-        ])
-        updated_story_model_1 = story_models.StoryModel.get(
-            self.STORY_1_ID
+            [
+                story_model_1,
+                story_model_2,
+                topic_model,
+                story_1_snapshot_metadata_model_1,
+                story_1_snapshot_metadata_model_2,
+                story_2_snapshot_metadata_model_1,
+                topic_snapshot_metadata_model_1,
+                topic_snapshot_metadata_model_2,
+            ]
         )
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout='TOPIC MODELS WHOSE STORIES ARE UPDATED SUCCESS: 1'
+                )
+            ]
+        )
+        updated_story_model_1 = story_models.StoryModel.get(self.STORY_1_ID)
         story_1_nodes = updated_story_model_1.story_contents['nodes']
 
         self.assertEqual(story_1_nodes[0]['status'], 'Published')
         self.assertEqual(story_1_nodes[0]['unpublishing_reason'], None)
-        self.assertEqual(story_1_nodes[0]['first_publication_date_msecs'], (
-            utils.get_time_in_millisecs(self.TOPIC_SNAPSHOT_2_DATE)))
-        self.assertEqual(story_1_nodes[0]['planned_publication_date_msecs'], (
-            utils.get_time_in_millisecs(self.TOPIC_SNAPSHOT_2_DATE)))
-        self.assertEqual(story_1_nodes[0]['last_modified_msecs'], (
-            utils.get_time_in_millisecs(self.STORY_1_SHAPSHOT_2_DATE)))
+        self.assertEqual(
+            story_1_nodes[0]['first_publication_date_msecs'],
+            (utils.get_time_in_millisecs(self.TOPIC_SNAPSHOT_2_DATE)),
+        )
+        self.assertEqual(
+            story_1_nodes[0]['planned_publication_date_msecs'],
+            (utils.get_time_in_millisecs(self.TOPIC_SNAPSHOT_2_DATE)),
+        )
+        self.assertEqual(
+            story_1_nodes[0]['last_modified_msecs'],
+            (utils.get_time_in_millisecs(self.STORY_1_SHAPSHOT_2_DATE)),
+        )
 
         self.assertEqual(story_1_nodes[1]['status'], 'Published')
         self.assertEqual(story_1_nodes[1]['unpublishing_reason'], None)
-        self.assertEqual(story_1_nodes[1]['first_publication_date_msecs'], (
-            utils.get_time_in_millisecs(self.STORY_1_SHAPSHOT_2_DATE)))
-        self.assertEqual(story_1_nodes[1]['planned_publication_date_msecs'], (
-            utils.get_time_in_millisecs(self.STORY_1_SHAPSHOT_2_DATE)))
-        self.assertEqual(story_1_nodes[1]['last_modified_msecs'], (
-            utils.get_time_in_millisecs(self.STORY_1_SHAPSHOT_2_DATE)))
-
-        updated_story_model_2 = story_models.StoryModel.get(
-            self.STORY_2_ID
+        self.assertEqual(
+            story_1_nodes[1]['first_publication_date_msecs'],
+            (utils.get_time_in_millisecs(self.STORY_1_SHAPSHOT_2_DATE)),
         )
+        self.assertEqual(
+            story_1_nodes[1]['planned_publication_date_msecs'],
+            (utils.get_time_in_millisecs(self.STORY_1_SHAPSHOT_2_DATE)),
+        )
+        self.assertEqual(
+            story_1_nodes[1]['last_modified_msecs'],
+            (utils.get_time_in_millisecs(self.STORY_1_SHAPSHOT_2_DATE)),
+        )
+
+        updated_story_model_2 = story_models.StoryModel.get(self.STORY_2_ID)
         story_2_nodes = updated_story_model_2.story_contents['nodes']
 
         self.assertEqual(story_2_nodes[0]['status'], 'Draft')
         self.assertEqual(story_2_nodes[0]['unpublishing_reason'], None)
-        self.assertEqual(story_2_nodes[0]['first_publication_date_msecs'], (
-            None))
-        self.assertEqual(story_2_nodes[0]['planned_publication_date_msecs'], (
-            None))
-        self.assertEqual(story_2_nodes[0]['last_modified_msecs'], (
-            utils.get_time_in_millisecs(self.STORY_2_SHAPSHOT_1_DATE)))
+        self.assertEqual(
+            story_2_nodes[0]['first_publication_date_msecs'], (None)
+        )
+        self.assertEqual(
+            story_2_nodes[0]['planned_publication_date_msecs'], (None)
+        )
+        self.assertEqual(
+            story_2_nodes[0]['last_modified_msecs'],
+            (utils.get_time_in_millisecs(self.STORY_2_SHAPSHOT_1_DATE)),
+        )
 
     def test_topic_with_no_story_reference_raises_error(self) -> None:
         story_model_1 = self.create_model(
@@ -281,7 +291,7 @@ class PopulateStoryNodeJobTests(job_test_utils.JobTestBase):
             story_contents=self.story_contents_dict_1,
             corresponding_topic_id=self.TOPIC_1_ID,
             url_fragment='urlfragment-1',
-            version=1
+            version=1,
         )
         topic_model = self.create_model(
             topic_models.TopicModel,
@@ -296,31 +306,30 @@ class PopulateStoryNodeJobTests(job_test_utils.JobTestBase):
             page_title_fragment_for_web='fragm',
             story_reference_schema_version=1,
             subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
-            version=1
+            version=1,
         )
         story_snapshot_metadata_model = self.create_model(
             story_models.StorySnapshotMetadataModel,
             id='%s-1' % self.STORY_1_ID,
-            commit_cmds=[{
-                'cmd': 'add_story_node',
-                'node_id': 'node_1'
-            }],
+            commit_cmds=[{'cmd': 'add_story_node', 'node_id': 'node_1'}],
             commit_type=feconf.COMMIT_TYPE_CREATE,
             committer_id='user_1',
-            created_on=self.STORY_1_SHAPSHOT_1_DATE
+            created_on=self.STORY_1_SHAPSHOT_1_DATE,
         )
         self.put_multi(
-            [story_model_1, topic_model,
-             story_snapshot_metadata_model])
+            [story_model_1, topic_model, story_snapshot_metadata_model]
+        )
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(
-                stderr=(
-                    'TOPIC MODELS WHOSE STORIES ARE UPDATED ERROR: '
-                    '\"(\'story_1_id\', StopIteration())\": 1'
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stderr=(
+                        'TOPIC MODELS WHOSE STORIES ARE UPDATED ERROR: '
+                        '\"(\'story_1_id\', StopIteration())\": 1'
+                    )
                 )
-            )
-        ])
+            ]
+        )
 
     def test_story_with_wrong_commit_history_raises_error(self) -> None:
         story_model_1 = self.create_model(
@@ -334,7 +343,7 @@ class PopulateStoryNodeJobTests(job_test_utils.JobTestBase):
             story_contents=self.story_contents_dict_1,
             corresponding_topic_id=self.TOPIC_1_ID,
             url_fragment='urlfragment-1',
-            version=1
+            version=1,
         )
         topic_model = self.create_model(
             topic_models.TopicModel,
@@ -344,113 +353,119 @@ class PopulateStoryNodeJobTests(job_test_utils.JobTestBase):
             language_code='en',
             description='description',
             url_fragment='/fragm',
-            canonical_story_references=[{
-                'story_id': self.STORY_1_ID,
-                'story_is_published': True
-            }],
+            canonical_story_references=[
+                {'story_id': self.STORY_1_ID, 'story_is_published': True}
+            ],
             next_subtopic_id=1,
             page_title_fragment_for_web='fragm',
             story_reference_schema_version=1,
             subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
-            version=1
+            version=1,
         )
         story_snapshot_metadata_model = self.create_model(
             story_models.StorySnapshotMetadataModel,
             id='%s-1' % self.STORY_1_ID,
-            commit_cmds=[{
-                'cmd': 'add_story_node',
-                'node_id': 'node_2'
-            }],
+            commit_cmds=[{'cmd': 'add_story_node', 'node_id': 'node_2'}],
             commit_type=feconf.COMMIT_TYPE_CREATE,
             committer_id='user_1',
-            created_on=self.STORY_1_SHAPSHOT_1_DATE
+            created_on=self.STORY_1_SHAPSHOT_1_DATE,
         )
         topic_snapshot_metadata_model = self.create_model(
             topic_models.TopicSnapshotMetadataModel,
             id='%s-1' % self.TOPIC_1_ID,
-            commit_cmds=[{
-                'cmd': 'add_canonical_story',
-                'story_id': self.STORY_1_ID
-            }],
+            commit_cmds=[
+                {'cmd': 'add_canonical_story', 'story_id': self.STORY_1_ID}
+            ],
             commit_type=feconf.COMMIT_TYPE_CREATE,
             committer_id='user_1',
-            created_on=self.TOPIC_SNAPSHOT_1_DATE
+            created_on=self.TOPIC_SNAPSHOT_1_DATE,
         )
         self.put_multi(
-            [story_model_1, topic_model,
-             story_snapshot_metadata_model,
-             topic_snapshot_metadata_model])
+            [
+                story_model_1,
+                topic_model,
+                story_snapshot_metadata_model,
+                topic_snapshot_metadata_model,
+            ]
+        )
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(
-                stderr=(
-                    'TOPIC MODELS WHOSE STORIES ARE UPDATED ERROR: \"('
-                    '\'story_1_id\', Exception(\'Node was not created.\''
-                    '))\": 1'
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stderr=(
+                        'TOPIC MODELS WHOSE STORIES ARE UPDATED ERROR: \"('
+                        '\'story_1_id\', Exception(\'Node was not created.\''
+                        '))\": 1'
+                    )
                 )
-            )
-        ])
+            ]
+        )
 
 
 class AuditPopulateStoryNodeJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS: Type[
+    JOB_CLASS: Type[story_node_jobs.AuditPopulateStoryNodeJob] = (
         story_node_jobs.AuditPopulateStoryNodeJob
-    ] = story_node_jobs.AuditPopulateStoryNodeJob
+    )
 
     STORY_1_ID: Final = 'story_1_id'
     STORY_2_ID: Final = 'story_2_id'
     TOPIC_1_ID: Final = 'topic_1_id'
 
     story_contents_dict_1 = {
-        'nodes': [{
-            'id': 'node_1',
-            'title': 'title_1',
-            'description': 'description_1',
-            'thumbnail_filename': 'thumbnail_filename_1.svg',
-            'thumbnail_bg_color': '#F8BF74',
-            'thumbnail_size_in_bytes': None,
-            'destination_node_ids': [],
-            'acquired_skill_ids': [],
-            'prerequisite_skill_ids': [],
-            'outline': 'outline',
-            'outline_is_finalized': True,
-            'exploration_id': 'exp_id_1'
-        }, {
-            'id': 'node_2',
-            'title': 'title_2',
-            'description': 'description_2',
-            'thumbnail_filename': 'thumbnail_filename_2.svg',
-            'thumbnail_bg_color': '#F8FF74',
-            'thumbnail_size_in_bytes': None,
-            'destination_node_ids': [],
-            'acquired_skill_ids': [],
-            'prerequisite_skill_ids': [],
-            'outline': 'outline',
-            'outline_is_finalized': True,
-            'exploration_id': 'exp_id_2'
-        }],
+        'nodes': [
+            {
+                'id': 'node_1',
+                'title': 'title_1',
+                'description': 'description_1',
+                'thumbnail_filename': 'thumbnail_filename_1.svg',
+                'thumbnail_bg_color': '#F8BF74',
+                'thumbnail_size_in_bytes': None,
+                'destination_node_ids': [],
+                'acquired_skill_ids': [],
+                'prerequisite_skill_ids': [],
+                'outline': 'outline',
+                'outline_is_finalized': True,
+                'exploration_id': 'exp_id_1',
+            },
+            {
+                'id': 'node_2',
+                'title': 'title_2',
+                'description': 'description_2',
+                'thumbnail_filename': 'thumbnail_filename_2.svg',
+                'thumbnail_bg_color': '#F8FF74',
+                'thumbnail_size_in_bytes': None,
+                'destination_node_ids': [],
+                'acquired_skill_ids': [],
+                'prerequisite_skill_ids': [],
+                'outline': 'outline',
+                'outline_is_finalized': True,
+                'exploration_id': 'exp_id_2',
+            },
+        ],
         'initial_node_id': 'node_1',
-        'next_node_id': 'node_3'
+        'next_node_id': 'node_3',
     }
 
     story_contents_dict_2 = {
-        'nodes': [{
-            'id': 'node_11',
-            'title': 'title_11',
-            'description': 'description_11',
-            'thumbnail_filename': 'thumbnail_filename_11.svg',
-            'thumbnail_bg_color': '#F8BF74',
-            'thumbnail_size_in_bytes': None,
-            'destination_node_ids': [],
-            'acquired_skill_ids': [],
-            'prerequisite_skill_ids': [],
-            'outline': 'outline',
-            'outline_is_finalized': True,
-            'exploration_id': 'exp_id_11'
-        }],
+        'nodes': [
+            {
+                'id': 'node_11',
+                'title': 'title_11',
+                'description': 'description_11',
+                'thumbnail_filename': 'thumbnail_filename_11.svg',
+                'thumbnail_bg_color': '#F8BF74',
+                'thumbnail_size_in_bytes': None,
+                'destination_node_ids': [],
+                'acquired_skill_ids': [],
+                'prerequisite_skill_ids': [],
+                'outline': 'outline',
+                'outline_is_finalized': True,
+                'exploration_id': 'exp_id_11',
+            }
+        ],
         'initial_node_id': 'node_11',
-        'next_node_id': 'node_22'
+        'next_node_id': 'node_22',
     }
 
     TOPIC_SNAPSHOT_1_DATE: Final = datetime.datetime(2023, 6, 12, 23, 0, 0, 0)
@@ -474,7 +489,7 @@ class AuditPopulateStoryNodeJobTests(job_test_utils.JobTestBase):
             story_contents=self.story_contents_dict_1,
             corresponding_topic_id=self.TOPIC_1_ID,
             url_fragment='urlfragment-1',
-            version=2
+            version=2,
         )
         story_model_2 = self.create_model(
             story_models.StoryModel,
@@ -487,7 +502,7 @@ class AuditPopulateStoryNodeJobTests(job_test_utils.JobTestBase):
             story_contents=self.story_contents_dict_2,
             corresponding_topic_id=self.TOPIC_1_ID,
             url_fragment='urlfragment-2',
-            version=1
+            version=1,
         )
         topic_model = self.create_model(
             topic_models.TopicModel,
@@ -497,97 +512,89 @@ class AuditPopulateStoryNodeJobTests(job_test_utils.JobTestBase):
             language_code='en',
             description='description',
             url_fragment='/fragm',
-            canonical_story_references=[{
-                'story_id': self.STORY_1_ID,
-                'story_is_published': True
-            }, {
-                'story_id': self.STORY_2_ID,
-                'story_is_published': False
-            }],
+            canonical_story_references=[
+                {'story_id': self.STORY_1_ID, 'story_is_published': True},
+                {'story_id': self.STORY_2_ID, 'story_is_published': False},
+            ],
             next_subtopic_id=1,
             page_title_fragment_for_web='fragm',
             story_reference_schema_version=1,
             subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
-            version=2
+            version=2,
         )
         story_1_snapshot_metadata_model_1 = self.create_model(
             story_models.StorySnapshotMetadataModel,
             id='%s-1' % self.STORY_1_ID,
-            commit_cmds=[{
-                'cmd': 'add_story_node',
-                'node_id': 'node_1'
-            }],
+            commit_cmds=[{'cmd': 'add_story_node', 'node_id': 'node_1'}],
             commit_type=feconf.COMMIT_TYPE_CREATE,
             committer_id='user_1',
-            created_on=self.STORY_1_SHAPSHOT_1_DATE
+            created_on=self.STORY_1_SHAPSHOT_1_DATE,
         )
         story_1_snapshot_metadata_model_2 = self.create_model(
             story_models.StorySnapshotMetadataModel,
             id='%s-2' % self.STORY_1_ID,
-            commit_cmds=[{
-                'cmd': 'update_story_node_property',
-                'node_id': 'node_1',
-                'property_name': 'description',
-                'old_value': 'desc',
-                'new_value': 'description'
-            }, {
-                'cmd': 'add_story_node',
-                'node_id': 'node_2'
-            }],
+            commit_cmds=[
+                {
+                    'cmd': 'update_story_node_property',
+                    'node_id': 'node_1',
+                    'property_name': 'description',
+                    'old_value': 'desc',
+                    'new_value': 'description',
+                },
+                {'cmd': 'add_story_node', 'node_id': 'node_2'},
+            ],
             commit_type=feconf.COMMIT_TYPE_EDIT,
             committer_id='user_1',
-            created_on=self.STORY_1_SHAPSHOT_2_DATE
+            created_on=self.STORY_1_SHAPSHOT_2_DATE,
         )
         story_2_snapshot_metadata_model_1 = self.create_model(
             story_models.StorySnapshotMetadataModel,
             id='%s-1' % self.STORY_2_ID,
-            commit_cmds=[{
-                'cmd': 'add_story_node',
-                'node_id': 'node_11'
-            }],
+            commit_cmds=[{'cmd': 'add_story_node', 'node_id': 'node_11'}],
             commit_type=feconf.COMMIT_TYPE_CREATE,
             committer_id='user_1',
-            created_on=self.STORY_2_SHAPSHOT_1_DATE
+            created_on=self.STORY_2_SHAPSHOT_1_DATE,
         )
         topic_snapshot_metadata_model_1 = self.create_model(
             topic_models.TopicSnapshotMetadataModel,
             id='%s%s' % (self.TOPIC_1_ID, '-1'),
-            commit_cmds=[{
-                'cmd': 'add_canonical_story',
-                'story_id': self.STORY_1_ID
-            }, {
-                'cmd': 'add_canonical_story',
-                'story_id': self.STORY_2_ID
-            }],
+            commit_cmds=[
+                {'cmd': 'add_canonical_story', 'story_id': self.STORY_1_ID},
+                {'cmd': 'add_canonical_story', 'story_id': self.STORY_2_ID},
+            ],
             commit_type=feconf.COMMIT_TYPE_CREATE,
             committer_id='user_1',
-            created_on=self.TOPIC_SNAPSHOT_1_DATE
+            created_on=self.TOPIC_SNAPSHOT_1_DATE,
         )
         topic_snapshot_metadata_model_2 = self.create_model(
             topic_models.TopicSnapshotMetadataModel,
             id='%s-2' % self.TOPIC_1_ID,
-            commit_cmds=[{
-                'cmd': 'publish_story',
-                'story_id': self.STORY_1_ID
-            }],
+            commit_cmds=[{'cmd': 'publish_story', 'story_id': self.STORY_1_ID}],
             commit_type=feconf.COMMIT_TYPE_EDIT,
             committer_id='user_1',
-            created_on=self.TOPIC_SNAPSHOT_2_DATE
+            created_on=self.TOPIC_SNAPSHOT_2_DATE,
         )
 
         self.put_multi(
-            [story_model_1, story_model_2, topic_model,
-            story_1_snapshot_metadata_model_1,
-            story_1_snapshot_metadata_model_2,
-            story_2_snapshot_metadata_model_1,
-            topic_snapshot_metadata_model_1,
-            topic_snapshot_metadata_model_2])
+            [
+                story_model_1,
+                story_model_2,
+                topic_model,
+                story_1_snapshot_metadata_model_1,
+                story_1_snapshot_metadata_model_2,
+                story_2_snapshot_metadata_model_1,
+                topic_snapshot_metadata_model_1,
+                topic_snapshot_metadata_model_2,
+            ]
+        )
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(
-                stdout='TOPIC MODELS WHOSE STORIES ARE UPDATED SUCCESS: 1'
-            )
-        ])
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout='TOPIC MODELS WHOSE STORIES ARE UPDATED SUCCESS: 1'
+                )
+            ]
+        )
 
     def test_topic_with_no_story_reference_raises_error(self) -> None:
         story_model_1 = self.create_model(
@@ -601,7 +608,7 @@ class AuditPopulateStoryNodeJobTests(job_test_utils.JobTestBase):
             story_contents=self.story_contents_dict_1,
             corresponding_topic_id=self.TOPIC_1_ID,
             url_fragment='urlfragment-1',
-            version=1
+            version=1,
         )
         topic_model = self.create_model(
             topic_models.TopicModel,
@@ -616,31 +623,30 @@ class AuditPopulateStoryNodeJobTests(job_test_utils.JobTestBase):
             page_title_fragment_for_web='fragm',
             story_reference_schema_version=1,
             subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
-            version=1
+            version=1,
         )
         story_snapshot_metadata_model = self.create_model(
             story_models.StorySnapshotMetadataModel,
             id='%s-1' % self.STORY_1_ID,
-            commit_cmds=[{
-                'cmd': 'add_story_node',
-                'node_id': 'node_1'
-            }],
+            commit_cmds=[{'cmd': 'add_story_node', 'node_id': 'node_1'}],
             commit_type=feconf.COMMIT_TYPE_CREATE,
             committer_id='user_1',
-            created_on=self.STORY_1_SHAPSHOT_1_DATE
+            created_on=self.STORY_1_SHAPSHOT_1_DATE,
         )
         self.put_multi(
-            [story_model_1, topic_model,
-             story_snapshot_metadata_model])
+            [story_model_1, topic_model, story_snapshot_metadata_model]
+        )
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(
-                stderr=(
-                    'TOPIC MODELS WHOSE STORIES ARE UPDATED ERROR: \"(\''
-                    'story_1_id\', StopIteration())\": 1'
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stderr=(
+                        'TOPIC MODELS WHOSE STORIES ARE UPDATED ERROR: \"(\''
+                        'story_1_id\', StopIteration())\": 1'
+                    )
                 )
-            )
-        ])
+            ]
+        )
 
     def test_story_with_wrong_commit_history_raises_error(self) -> None:
         story_model_1 = self.create_model(
@@ -654,7 +660,7 @@ class AuditPopulateStoryNodeJobTests(job_test_utils.JobTestBase):
             story_contents=self.story_contents_dict_1,
             corresponding_topic_id=self.TOPIC_1_ID,
             url_fragment='urlfragment-1',
-            version=1
+            version=1,
         )
         topic_model = self.create_model(
             topic_models.TopicModel,
@@ -664,48 +670,49 @@ class AuditPopulateStoryNodeJobTests(job_test_utils.JobTestBase):
             language_code='en',
             description='description',
             url_fragment='/fragm',
-            canonical_story_references=[{
-                'story_id': self.STORY_1_ID,
-                'story_is_published': True
-            }],
+            canonical_story_references=[
+                {'story_id': self.STORY_1_ID, 'story_is_published': True}
+            ],
             next_subtopic_id=1,
             page_title_fragment_for_web='fragm',
             story_reference_schema_version=1,
             subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
-            version=1
+            version=1,
         )
         story_snapshot_metadata_model = self.create_model(
             story_models.StorySnapshotMetadataModel,
             id='%s-1' % self.STORY_1_ID,
-            commit_cmds=[{
-                'cmd': 'add_story_node',
-                'node_id': 'node_2'
-            }],
+            commit_cmds=[{'cmd': 'add_story_node', 'node_id': 'node_2'}],
             commit_type=feconf.COMMIT_TYPE_CREATE,
             committer_id='user_1',
-            created_on=self.STORY_1_SHAPSHOT_1_DATE
+            created_on=self.STORY_1_SHAPSHOT_1_DATE,
         )
         topic_snapshot_metadata_model = self.create_model(
             topic_models.TopicSnapshotMetadataModel,
             id='%s-1' % self.TOPIC_1_ID,
-            commit_cmds=[{
-                'cmd': 'add_canonical_story',
-                'story_id': self.STORY_1_ID
-            }],
+            commit_cmds=[
+                {'cmd': 'add_canonical_story', 'story_id': self.STORY_1_ID}
+            ],
             commit_type=feconf.COMMIT_TYPE_CREATE,
             committer_id='user_1',
-            created_on=self.TOPIC_SNAPSHOT_1_DATE
+            created_on=self.TOPIC_SNAPSHOT_1_DATE,
         )
         self.put_multi(
-            [story_model_1, topic_model,
-             story_snapshot_metadata_model,
-             topic_snapshot_metadata_model])
+            [
+                story_model_1,
+                topic_model,
+                story_snapshot_metadata_model,
+                topic_snapshot_metadata_model,
+            ]
+        )
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(
-                stderr=(
-                    'TOPIC MODELS WHOSE STORIES ARE UPDATED ERROR: \"(\''
-                    'story_1_id\', Exception(\'Node was not created.\'))\": 1'
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stderr=(
+                        'TOPIC MODELS WHOSE STORIES ARE UPDATED ERROR: \"(\''
+                        'story_1_id\', Exception(\'Node was not created.\'))\": 1'
+                    )
                 )
-            )
-        ])
+            ]
+        )

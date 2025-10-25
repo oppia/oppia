@@ -177,6 +177,11 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
         this.changeDetectorRef.detectChanges();
         this.setLanguageAccentConfigsAfterVoiceoverLoad();
         this.updateActiveContent();
+        this.automaticVoiceoverHighlightService.setAutomatedVoiceoversAudioOffsets(
+          this.activeEntityVoiceoversInstance
+            ?.automatedVoiceoversAudioOffsetsMsecs || {}
+        );
+        this.automaticVoiceoverHighlightService.getSentencesToHighlightForTimeRanges();
       })
     );
 

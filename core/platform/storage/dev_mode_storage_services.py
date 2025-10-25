@@ -55,10 +55,10 @@ def get(unused_bucket_name: str, filepath: str) -> bytes:
 
 
 def commit(
-        unused_bucket_name: str,
-        filepath: str,
-        raw_bytes: Union[bytes, str],
-        mimetype: Optional[str]
+    unused_bucket_name: str,
+    filepath: str,
+    raw_bytes: Union[bytes, str],
+    mimetype: Optional[str],
 ) -> None:
     """Commits bytes to the relevant file.
 
@@ -71,7 +71,8 @@ def commit(
     # TODO(#13500): Refactor this method that only bytes are passed
     # into raw_bytes.
     blob = cloud_storage_emulator.EmulatorBlob(
-        filepath, raw_bytes, content_type=mimetype)
+        filepath, raw_bytes, content_type=mimetype
+    )
     CLIENT.upload_blob(filepath, blob)
 
 
@@ -86,7 +87,7 @@ def delete(unused_bucket_name: str, filepath: str) -> None:
 
 
 def copy(
-        unused_bucket_name: str, source_assets_path: str, dest_assets_path: str
+    unused_bucket_name: str, source_assets_path: str, dest_assets_path: str
 ) -> None:
     """Copies images from source_path.
 
@@ -104,13 +105,13 @@ def copy(
     if src_blob is None:
         raise ValueError(
             'Source asset does not exist at %s.' % source_assets_path,
-            source_assets_path
+            source_assets_path,
         )
     CLIENT.copy_blob(src_blob, dest_assets_path)
 
 
 def listdir(
-        unused_bucket_name: str, dir_name: str
+    unused_bucket_name: str, dir_name: str
 ) -> List[cloud_storage_emulator.EmulatorBlob]:
     """Lists all files in a directory.
 

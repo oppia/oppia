@@ -291,6 +291,10 @@ export const FILEPATHS = {
     __dirname,
     '../../data/profile-pictures/profile.svg'
   ),
+  PROFILE_PHOTO_HIRES: path.resolve(
+    __dirname,
+    '../../data/profile-pictures/profile-1920.png'
+  ),
   BANNER_BMP: path.resolve(__dirname, '../../data/banners/banner.bmp'),
   BANNER_GIF: path.resolve(__dirname, '../../data/banners/banner.gif'),
   BANNER_JPG: path.resolve(__dirname, '../../data/banners/banner.jpg'),

@@ -36,13 +36,14 @@ from core.platform import models
 from core.tests import test_utils
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import secrets_services, translation_models
 
 secrets_services = models.Registry.import_secrets_services()
 
-(translation_models,) = models.Registry.import_models([
-    models.Names.TRANSLATION])
+(translation_models,) = models.Registry.import_models(
+    [models.Names.TRANSLATION]
+)
 
 
 class InitializeAndroidTestDataTests(test_utils.GenericTestBase):
@@ -51,14 +52,13 @@ class InitializeAndroidTestDataTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         classroom_id = classroom_config_services.get_new_classroom_id()
-        self.save_new_valid_classroom(
-            classroom_id=classroom_id
-        )
+        self.save_new_valid_classroom(classroom_id=classroom_id)
 
     def test_initialize_topic_is_published(self) -> None:
         android_services.initialize_android_test_data()
         self.assertTrue(
-            topic_services.does_topic_with_name_exist('Android test'))
+            topic_services.does_topic_with_name_exist('Android test')
+        )
         topic = topic_fetchers.get_topic_by_name('Android test', strict=True)
         topic_rights = topic_fetchers.get_topic_rights(topic.id, strict=True)
 
@@ -70,10 +70,12 @@ class InitializeAndroidTestDataTests(test_utils.GenericTestBase):
         topic = topic_fetchers.get_topic_by_name('Android test', strict=True)
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         story = story_fetchers.get_story_by_url_fragment(
-            'android-end-to-end-testing')
+            'android-end-to-end-testing'
+        )
         assert story is not None
         skill = skill_fetchers.get_skill_by_description(
-            'Dummy Skill for Android')
+            'Dummy Skill for Android'
+        )
         assert skill is not None
         skill.validate()
         story.validate()
@@ -88,15 +90,18 @@ class InitializeAndroidTestDataTests(test_utils.GenericTestBase):
         android_services.initialize_android_test_data()
         topic = topic_fetchers.get_topic_by_name('Android test', strict=True)
         story = story_fetchers.get_story_by_url_fragment(
-            'android-end-to-end-testing')
+            'android-end-to-end-testing'
+        )
         assert story is not None
         self.get_custom_response(
-            '/assetsdevhandler/topic/%s/assets/thumbnail/test_svg.svg' %
-            topic.id, 'image/svg+xml'
+            '/assetsdevhandler/topic/%s/assets/thumbnail/test_svg.svg'
+            % topic.id,
+            'image/svg+xml',
         )
         self.get_custom_response(
-            '/assetsdevhandler/story/%s/assets/thumbnail/test_svg.svg' %
-            story.id, 'image/svg+xml'
+            '/assetsdevhandler/story/%s/assets/thumbnail/test_svg.svg'
+            % story.id,
+            'image/svg+xml',
         )
 
     def test_exploration_assets_are_loaded(self) -> None:
@@ -107,49 +112,56 @@ class InitializeAndroidTestDataTests(test_utils.GenericTestBase):
                 'explorations',
                 'android_interactions',
                 'assets',
-                'image'
+                'image',
             )
         )
         for filename in filelist:
             self.get_custom_response(
                 '/assetsdevhandler/exploration/26/assets/image/%s' % filename,
-                'image/png'
+                'image/png',
             )
 
     def test_reinitialize_topic_is_published(self) -> None:
         android_services.initialize_android_test_data()
         old_topic = topic_fetchers.get_topic_by_name(
-            'Android test', strict=True)
+            'Android test', strict=True
+        )
         old_topic_last_updated = old_topic.last_updated
         android_services.initialize_android_test_data()
         self.assertTrue(
-            topic_services.does_topic_with_name_exist('Android test'))
+            topic_services.does_topic_with_name_exist('Android test')
+        )
         new_topic = topic_fetchers.get_topic_by_name(
-            'Android test', strict=True)
+            'Android test', strict=True
+        )
         new_topic_rights = topic_fetchers.get_topic_rights(
-            new_topic.id, strict=True)
+            new_topic.id, strict=True
+        )
         self.assertTrue(new_topic_rights.topic_is_published)
         assert new_topic.last_updated is not None
         assert old_topic_last_updated is not None
         self.assertGreater(new_topic.last_updated, old_topic_last_updated)
 
     def test_reinitialize_topic_is_published_when_exploration_does_not_exist(
-        self
+        self,
     ) -> None:
         android_services.initialize_android_test_data()
 
         exp_services.delete_exploration('committer', '26')
         android_services.initialize_android_test_data()
         self.assertTrue(
-            topic_services.does_topic_with_name_exist('Android test'))
+            topic_services.does_topic_with_name_exist('Android test')
+        )
         new_topic = topic_fetchers.get_topic_by_name(
-            'Android test', strict=True)
+            'Android test', strict=True
+        )
         new_topic_rights = topic_fetchers.get_topic_rights(
-            new_topic.id, strict=True)
+            new_topic.id, strict=True
+        )
         self.assertTrue(new_topic_rights.topic_is_published)
 
     def test_reinitialize_topic_is_published_when_translation_does_not_exist(
-            self
+        self,
     ) -> None:
         android_services.initialize_android_test_data()
         test_exploration = exp_fetchers.get_exploration_by_id('26', strict=True)
@@ -158,18 +170,21 @@ class InitializeAndroidTestDataTests(test_utils.GenericTestBase):
                 feconf.TranslatableEntityType(feconf.ENTITY_TYPE_EXPLORATION),
                 '26',
                 test_exploration.version,
-                'pt'
+                'pt',
             )
         )
         if entity_translation_model:
             entity_translation_model.delete()
         android_services.initialize_android_test_data()
         self.assertTrue(
-            topic_services.does_topic_with_name_exist('Android test'))
+            topic_services.does_topic_with_name_exist('Android test')
+        )
         new_topic = topic_fetchers.get_topic_by_name(
-            'Android test', strict=True)
+            'Android test', strict=True
+        )
         new_topic_rights = topic_fetchers.get_topic_rights(
-            new_topic.id, strict=True)
+            new_topic.id, strict=True
+        )
         self.assertTrue(new_topic_rights.topic_is_published)
 
 
@@ -179,7 +194,8 @@ class AndroidBuildSecretTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.swap_webhook_secrets_return_none = self.swap_to_always_return(
-            secrets_services, 'get_secret', None)
+            secrets_services, 'get_secret', None
+        )
         self.swap_webhook_secrets_return_secret = self.swap_with_checks(
             secrets_services,
             'get_secret',
@@ -187,14 +203,15 @@ class AndroidBuildSecretTests(test_utils.GenericTestBase):
             expected_args=[
                 ('ANDROID_BUILD_SECRET',),
                 ('ANDROID_BUILD_SECRET',),
-            ]
+            ],
         )
 
     def test_cloud_secrets_return_none_logs_exception(self) -> None:
         with self.swap_webhook_secrets_return_none:
             with self.capture_logging(min_level=logging.WARNING) as logs:
                 self.assertFalse(
-                    android_services.verify_android_build_secret('secret'))
+                    android_services.verify_android_build_secret('secret')
+                )
                 self.assertEqual(
                     ['Android build secret is not available.'], logs
                 )
@@ -202,6 +219,8 @@ class AndroidBuildSecretTests(test_utils.GenericTestBase):
     def test_cloud_secrets_return_secret_passes(self) -> None:
         with self.swap_webhook_secrets_return_secret:
             self.assertTrue(
-                android_services.verify_android_build_secret('secret'))
+                android_services.verify_android_build_secret('secret')
+            )
             self.assertFalse(
-                android_services.verify_android_build_secret('not-secret'))
+                android_services.verify_android_build_secret('not-secret')
+            )

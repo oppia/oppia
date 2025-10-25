@@ -25,12 +25,12 @@ from core.platform import models
 from typing import Dict, List, Mapping, Optional, Sequence, cast
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import base_models, datastore_services
 
-(base_models, user_models) = models.Registry.import_models([
-    models.Names.BASE_MODEL, models.Names.USER
-])
+(base_models, user_models) = models.Registry.import_models(
+    [models.Names.BASE_MODEL, models.Names.USER]
+)
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -77,8 +77,9 @@ class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         return 'topic-%s-%s' % (topic_id, version)
 
     @staticmethod
-    def get_model_association_to_user(
-    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
         """The history of commits is not relevant for the purposes of Takeout
         since commits don't contain relevant data corresponding to users.
         """
@@ -90,9 +91,10 @@ class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         because the history of commits isn't deemed as useful for users since
         commit logs don't contain relevant data corresponding to those users.
         """
-        return dict(super(cls, cls).get_export_policy(), **{
-            'topic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
-        })
+        return dict(
+            super(cls, cls).get_export_policy(),
+            **{'topic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE},
+        )
 
 
 class TopicModel(base_models.VersionedModel):
@@ -110,68 +112,80 @@ class TopicModel(base_models.VersionedModel):
     # The name of the topic.
     name = datastore_services.StringProperty(required=True, indexed=True)
     # The canonical name of the topic, created by making `name` lowercase.
-    canonical_name = (
-        datastore_services.StringProperty(required=True, indexed=True))
+    canonical_name = datastore_services.StringProperty(
+        required=True, indexed=True
+    )
     # The abbreviated name of the topic.
-    abbreviated_name = (
-        datastore_services.StringProperty(indexed=True, default=''))
+    abbreviated_name = datastore_services.StringProperty(
+        indexed=True, default=''
+    )
     # The thumbnail filename of the topic.
     thumbnail_filename = datastore_services.StringProperty(indexed=True)
     # The thumbnail background color of the topic.
     thumbnail_bg_color = datastore_services.StringProperty(indexed=True)
     # The thumbnail size in bytes of the topic.
-    thumbnail_size_in_bytes = (
-        datastore_services.IntegerProperty(indexed=True))
+    thumbnail_size_in_bytes = datastore_services.IntegerProperty(indexed=True)
     # The description of the topic.
     description = datastore_services.TextProperty(indexed=False)
     # This consists of the list of objects referencing canonical stories that
     # are part of this topic.
-    canonical_story_references = (
-        datastore_services.JsonProperty(repeated=True, indexed=False))
+    canonical_story_references = datastore_services.JsonProperty(
+        repeated=True, indexed=False
+    )
     # This consists of the list of objects referencing additional stories that
     # are part of this topic.
-    additional_story_references = (
-        datastore_services.JsonProperty(repeated=True, indexed=False))
+    additional_story_references = datastore_services.JsonProperty(
+        repeated=True, indexed=False
+    )
     # The schema version for the story reference object on each of the above 2
     # lists.
     story_reference_schema_version = datastore_services.IntegerProperty(
-        required=True, indexed=True)
+        required=True, indexed=True
+    )
     # This consists of the list of uncategorized skill ids that are not part of
     # any subtopic.
-    uncategorized_skill_ids = (
-        datastore_services.StringProperty(repeated=True, indexed=True))
+    uncategorized_skill_ids = datastore_services.StringProperty(
+        repeated=True, indexed=True
+    )
     # The list of subtopics that are part of the topic.
     subtopics = datastore_services.JsonProperty(repeated=True, indexed=False)
     # The schema version of the subtopic dict.
-    subtopic_schema_version = (
-        datastore_services.IntegerProperty(required=True, indexed=True))
+    subtopic_schema_version = datastore_services.IntegerProperty(
+        required=True, indexed=True
+    )
     # The id for the next subtopic.
     next_subtopic_id = datastore_services.IntegerProperty(required=True)
     # The ISO 639-1 code for the language this topic is written in.
-    language_code = (
-        datastore_services.StringProperty(required=True, indexed=True))
+    language_code = datastore_services.StringProperty(
+        required=True, indexed=True
+    )
     # The url fragment of the topic.
-    url_fragment = (
-        datastore_services.StringProperty(required=True, indexed=True))
+    url_fragment = datastore_services.StringProperty(
+        required=True, indexed=True
+    )
     # Whether to show practice tab in the Topic viewer page.
     practice_tab_is_displayed = datastore_services.BooleanProperty(
-        required=True, default=False)
+        required=True, default=False
+    )
     # The content of the meta tag in the Topic viewer page.
     meta_tag_content = datastore_services.StringProperty(
-        indexed=True, default='')
+        indexed=True, default=''
+    )
     # The page title fragment used in the Topic viewer web page.
     # For example, if the full Topic viewer web page title is
     # 'Learn Fractions | Add, Subtract, Multiply and Divide | Oppia'
     # the page title fragment field represents the middle value 'Add, Subtract,
     # Multiply and Divide'.
     page_title_fragment_for_web = datastore_services.StringProperty(
-        required=True, indexed=True)
+        required=True, indexed=True
+    )
     # A diagnostic test contains a set of questions covering multiple topics and
     # based on the user's performance in the test, a topic is recommended to
     # them. Now, this field is used for listing the skill IDs from which the
     # questions should be fetched for the diagnostic test.
     skill_ids_for_diagnostic_test = datastore_services.StringProperty(
-        repeated=True, indexed=True)
+        repeated=True, indexed=True
+    )
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -187,9 +201,7 @@ class TopicModel(base_models.VersionedModel):
             dict(str, BaseModel). Additional models needed for
             the commit process. Contains the TopicRightsModel.
         """
-        return {
-            'rights_model': TopicRightsModel.get_by_id(self.id)
-        }
+        return {'rights_model': TopicRightsModel.get_by_id(self.id)}
 
     def compute_models_to_commit(
         self,
@@ -200,7 +212,7 @@ class TopicModel(base_models.VersionedModel):
         # We expect Mapping because we want to allow models that inherit
         # from BaseModel as the values, if we used Dict this wouldn't
         # be allowed.
-        additional_models: Mapping[str, base_models.BaseModel]
+        additional_models: Mapping[str, base_models.BaseModel],
     ) -> base_models.ModelsToPutDict:
         """Record the event to the commit log after the model commit.
 
@@ -230,22 +242,26 @@ class TopicModel(base_models.VersionedModel):
             commit_type,
             commit_message,
             commit_cmds,
-            additional_models
+            additional_models,
         )
 
         # Here we use cast because we are narrowing down the type from
         # BaseModel to TopicRightsModel.
-        topic_rights = cast(
-            TopicRightsModel, additional_models['rights_model']
-        )
+        topic_rights = cast(TopicRightsModel, additional_models['rights_model'])
         if topic_rights.topic_is_published:
             status = constants.ACTIVITY_STATUS_PUBLIC
         else:
             status = constants.ACTIVITY_STATUS_PRIVATE
 
         topic_commit_log_entry = TopicCommitLogEntryModel.create(
-            self.id, self.version, committer_id, commit_type,
-            commit_message, commit_cmds, status, False
+            self.id,
+            self.version,
+            committer_id,
+            commit_type,
+            commit_message,
+            commit_cmds,
+            status,
+            False,
         )
         topic_commit_log_entry.topic_id = self.id
         return {
@@ -267,9 +283,9 @@ class TopicModel(base_models.VersionedModel):
             TopicModel|None. The topic model of the topic or None if not
             found.
         """
-        return cls.get_all().filter(
-            cls.canonical_name == topic_name.lower()
-        ).get()
+        return (
+            cls.get_all().filter(cls.canonical_name == topic_name.lower()).get()
+        )
 
     @classmethod
     def get_by_url_fragment(cls, url_fragment: str) -> Optional[TopicModel]:
@@ -287,42 +303,42 @@ class TopicModel(base_models.VersionedModel):
         return cls.get_all().filter(cls.url_fragment == url_fragment).get()
 
     @staticmethod
-    def get_model_association_to_user(
-    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
-            'name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'canonical_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'abbreviated_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'thumbnail_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'thumbnail_bg_color': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'thumbnail_size_in_bytes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'canonical_story_references':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'additional_story_references':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'story_reference_schema_version':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'uncategorized_skill_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'subtopics': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'subtopic_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'next_subtopic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'meta_tag_content': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'page_title_fragment_for_web': (
-                base_models.EXPORT_POLICY.NOT_APPLICABLE),
-            'practice_tab_is_displayed':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'skill_ids_for_diagnostic_test':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE
-        })
+        return dict(
+            super(cls, cls).get_export_policy(),
+            **{
+                'name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'canonical_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'abbreviated_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'thumbnail_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'thumbnail_bg_color': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'thumbnail_size_in_bytes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'canonical_story_references': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'additional_story_references': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'story_reference_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'uncategorized_skill_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'subtopics': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'subtopic_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'next_subtopic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'meta_tag_content': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'page_title_fragment_for_web': (
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE
+                ),
+                'practice_tab_is_displayed': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'skill_ids_for_diagnostic_test': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            },
+        )
 
 
 class TopicSummaryModel(base_models.BaseModel):
@@ -337,46 +353,57 @@ class TopicSummaryModel(base_models.BaseModel):
     # The name of the topic.
     name = datastore_services.StringProperty(required=True, indexed=True)
     # The canonical name of the topic, created by making `name` lowercase.
-    canonical_name = (
-        datastore_services.StringProperty(required=True, indexed=True))
+    canonical_name = datastore_services.StringProperty(
+        required=True, indexed=True
+    )
     # The ISO 639-1 code for the language this topic is written in.
-    language_code = (
-        datastore_services.StringProperty(required=True, indexed=True))
+    language_code = datastore_services.StringProperty(
+        required=True, indexed=True
+    )
     # The description of the topic.
     description = datastore_services.TextProperty(indexed=False)
     # The url fragment of the topic.
-    url_fragment = (
-        datastore_services.StringProperty(required=True, indexed=True))
+    url_fragment = datastore_services.StringProperty(
+        required=True, indexed=True
+    )
 
     # Time when the topic model was last updated (not to be
     # confused with last_updated, which is the time when the
     # topic *summary* model was last updated).
-    topic_model_last_updated = (
-        datastore_services.DateTimeProperty(required=True, indexed=True))
+    topic_model_last_updated = datastore_services.DateTimeProperty(
+        required=True, indexed=True
+    )
     # Time when the topic model was created (not to be confused
     # with created_on, which is the time when the topic *summary*
     # model was created).
-    topic_model_created_on = (
-        datastore_services.DateTimeProperty(required=True, indexed=True))
+    topic_model_created_on = datastore_services.DateTimeProperty(
+        required=True, indexed=True
+    )
     # The number of canonical stories that are part of this topic.
-    canonical_story_count = (
-        datastore_services.IntegerProperty(required=True, indexed=True))
+    canonical_story_count = datastore_services.IntegerProperty(
+        required=True, indexed=True
+    )
     # The number of additional stories that are part of this topic.
-    additional_story_count = (
-        datastore_services.IntegerProperty(required=True, indexed=True))
+    additional_story_count = datastore_services.IntegerProperty(
+        required=True, indexed=True
+    )
     # The total number of skills in the topic (including those that are
     # uncategorized).
-    total_skill_count = (
-        datastore_services.IntegerProperty(required=True, indexed=True))
+    total_skill_count = datastore_services.IntegerProperty(
+        required=True, indexed=True
+    )
     # The total number of published chapters in the topic.
-    total_published_node_count = (
-        datastore_services.IntegerProperty(required=True, indexed=True))
+    total_published_node_count = datastore_services.IntegerProperty(
+        required=True, indexed=True
+    )
     # The number of skills that are not part of any subtopic.
-    uncategorized_skill_count = (
-        datastore_services.IntegerProperty(required=True, indexed=True))
+    uncategorized_skill_count = datastore_services.IntegerProperty(
+        required=True, indexed=True
+    )
     # The number of subtopics of the topic.
-    subtopic_count = (
-        datastore_services.IntegerProperty(required=True, indexed=True))
+    subtopic_count = datastore_services.IntegerProperty(
+        required=True, indexed=True
+    )
     # The thumbnail filename of the topic.
     thumbnail_filename = datastore_services.StringProperty(indexed=True)
     # The thumbnail background color of the topic.
@@ -389,7 +416,8 @@ class TopicSummaryModel(base_models.BaseModel):
     # whenever a story in this topic is updated, which occurs
     # in `topic_services.compute_summary_of_topic()`.
     published_story_exploration_mapping = datastore_services.JsonProperty(
-        required=True)
+        required=True
+    )
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -397,37 +425,37 @@ class TopicSummaryModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user(
-    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
         """Model does not contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
-            'name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'canonical_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'topic_model_last_updated':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'topic_model_created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'canonical_story_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'additional_story_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'total_skill_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'total_published_node_count':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'uncategorized_skill_count':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'subtopic_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'thumbnail_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'thumbnail_bg_color': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'published_story_exploration_mapping':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE
-        })
+        return dict(
+            super(cls, cls).get_export_policy(),
+            **{
+                'name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'canonical_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'description': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'topic_model_last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'topic_model_created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'canonical_story_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'additional_story_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'total_skill_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'total_published_node_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'uncategorized_skill_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'subtopic_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'thumbnail_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'thumbnail_bg_color': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'published_story_exploration_mapping': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            },
+        )
 
 
 class TopicRightsSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
@@ -463,9 +491,12 @@ class TopicRightsSnapshotContentModel(base_models.BaseSnapshotContentModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return TopicRightsSnapshotMetadataModel.query(
-            TopicRightsSnapshotMetadataModel.content_user_ids == user_id
-        ).get(keys_only=True) is not None
+        return (
+            TopicRightsSnapshotMetadataModel.query(
+                TopicRightsSnapshotMetadataModel.content_user_ids == user_id
+            ).get(keys_only=True)
+            is not None
+        )
 
 
 class TopicRightsModel(base_models.VersionedModel):
@@ -483,7 +514,8 @@ class TopicRightsModel(base_models.VersionedModel):
 
     # Whether this topic is published.
     topic_is_published = datastore_services.BooleanProperty(
-        indexed=True, required=True, default=False)
+        indexed=True, required=True, default=False
+    )
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -502,9 +534,10 @@ class TopicRightsModel(base_models.VersionedModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.query(
-            cls.manager_ids == user_id
-        ).get(keys_only=True) is not None
+        return (
+            cls.query(cls.manager_ids == user_id).get(keys_only=True)
+            is not None
+        )
 
     @classmethod
     def get_by_user(cls, user_id: str) -> Sequence[TopicRightsModel]:
@@ -528,7 +561,7 @@ class TopicRightsModel(base_models.VersionedModel):
         # We expect Mapping because we want to allow models that inherit
         # from BaseModel as the values, if we used Dict this wouldn't
         # be allowed.
-        additional_models: Mapping[str, base_models.BaseModel]
+        additional_models: Mapping[str, base_models.BaseModel],
     ) -> base_models.ModelsToPutDict:
         """Record the event to the commit log after the model commit.
 
@@ -558,7 +591,7 @@ class TopicRightsModel(base_models.VersionedModel):
             commit_type,
             commit_message,
             commit_cmds,
-            additional_models
+            additional_models,
         )
 
         if self.topic_is_published:
@@ -576,12 +609,13 @@ class TopicRightsModel(base_models.VersionedModel):
             version=None,
             post_commit_status=status,
             post_commit_community_owned=False,
-            post_commit_is_private=not self.topic_is_published
+            post_commit_is_private=not self.topic_is_published,
         )
 
         snapshot_metadata_model = models_to_put['snapshot_metadata_model']
-        snapshot_metadata_model.content_user_ids = list(sorted(set(
-            self.manager_ids)))
+        snapshot_metadata_model.content_user_ids = list(
+            sorted(set(self.manager_ids))
+        )
 
         commit_cmds_user_ids = set()
         for commit_cmd in commit_cmds:
@@ -597,7 +631,8 @@ class TopicRightsModel(base_models.VersionedModel):
                 assert isinstance(user_id_attribute, str)
                 commit_cmds_user_ids.add(user_id_attribute)
         snapshot_metadata_model.commit_cmds_user_ids = list(
-            sorted(commit_cmds_user_ids))
+            sorted(commit_cmds_user_ids)
+        )
 
         return {
             'snapshot_metadata_model': models_to_put['snapshot_metadata_model'],
@@ -607,32 +642,33 @@ class TopicRightsModel(base_models.VersionedModel):
         }
 
     @staticmethod
-    def get_model_association_to_user(
-    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
         """Model is exported as one instance shared across users since multiple
         users contribute to topics and their rights.
         """
         return (
-            base_models
-            .MODEL_ASSOCIATION_TO_USER
-            .ONE_INSTANCE_SHARED_ACROSS_USERS)
+            base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_SHARED_ACROSS_USERS
+        )
 
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data to export corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
-            'manager_ids': base_models.EXPORT_POLICY.EXPORTED,
-            'topic_is_published': base_models.EXPORT_POLICY.NOT_APPLICABLE
-        })
+        return dict(
+            super(cls, cls).get_export_policy(),
+            **{
+                'manager_ids': base_models.EXPORT_POLICY.EXPORTED,
+                'topic_is_published': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            },
+        )
 
     @classmethod
     def get_field_name_mapping_to_takeout_keys(cls) -> Dict[str, str]:
         """Defines the mapping of field names to takeout keys since this model
         is exported as one instance shared across users.
         """
-        return {
-            'manager_ids': 'managed_topic_ids'
-        }
+        return {'manager_ids': 'managed_topic_ids'}
 
     @classmethod
     def export_data(cls, user_id: str) -> Dict[str, List[str]]:
@@ -649,6 +685,4 @@ class TopicRightsModel(base_models.VersionedModel):
         managed_topics = cls.get_all().filter(cls.manager_ids == user_id)
         managed_topic_ids = [right.id for right in managed_topics]
 
-        return {
-            'managed_topic_ids': managed_topic_ids
-        }
+        return {'managed_topic_ids': managed_topic_ids}

@@ -94,7 +94,6 @@ import { SkillRightsBackendApiService } from 'domain/skill/skill-rights-backend-
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
 import { LearnerAnswerDetailsBackendApiService } from 'domain/statistics/learner-answer-details-backend-api.service';
 import { PlaythroughBackendApiService } from 'domain/statistics/playthrough-backend-api.service';
-import { StateTopAnswersStatsObjectFactory } from 'domain/statistics/state-top-answers-stats-object.factory';
 import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
 import { StoryUpdateService } from 'domain/story/story-update.service';
 import { StoryValidationService } from 'domain/story/story-validation.service';
@@ -800,7 +799,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['StateSolutionService', StateSolutionService],
   ['StateTopAnswersStatsBackendApiService',
     StateTopAnswersStatsBackendApiService],
-  ['StateTopAnswersStatsObjectFactory', StateTopAnswersStatsObjectFactory],
   ['StateTopAnswersStatsService', StateTopAnswersStatsService],
   ['StateTutorialFirstTimeService', StateTutorialFirstTimeService],
   ['TutorialEventsBackendApiService',

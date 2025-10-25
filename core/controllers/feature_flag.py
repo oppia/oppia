@@ -35,17 +35,14 @@ class FeatureFlagsEvaluationHandler(
     @acl_decorators.open_access
     def get(self) -> None:
         """Handles GET requests. Evaluates and returns all feature flags."""
-        result_dict = (
-            feature_flag_services.evaluate_all_feature_flag_configs(
-                self.user_id)
+        result_dict = feature_flag_services.evaluate_all_feature_flag_configs(
+            self.user_id
         )
 
         self.render_json(result_dict)
 
 
-class FeatureFlagDummyHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class FeatureFlagDummyHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Dummy handler for testing e2e feature gating flow."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -58,10 +55,13 @@ class FeatureFlagDummyHandler(
         # i.e. it's only visible when the dummy_feature_flag_for_e2e_tests
         # is enabled.
         dummy_feature_flag_for_e2e_tests = (
-            feature_flag_list.FeatureNames
-            .DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value)
-        self.render_json({
-            'msg': 'ok',
-            'is_enabled': feature_flag_services.is_feature_flag_enabled(
-                dummy_feature_flag_for_e2e_tests, self.user_id)
-        })
+            feature_flag_list.FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value
+        )
+        self.render_json(
+            {
+                'msg': 'ok',
+                'is_enabled': feature_flag_services.is_feature_flag_enabled(
+                    dummy_feature_flag_for_e2e_tests, self.user_id
+                ),
+            }
+        )

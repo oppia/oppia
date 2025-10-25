@@ -63,7 +63,7 @@ class AuthorsBlogPostDict(TypedDict):
 
 
 def _get_blog_card_summary_dicts_for_homepage(
-    summaries: List[blog_domain.BlogPostSummary]
+    summaries: List[blog_domain.BlogPostSummary],
 ) -> List[BlogCardSummaryDict]:
     """Creates summary dicts for use in blog homepage.
 
@@ -78,9 +78,11 @@ def _get_blog_card_summary_dicts_for_homepage(
     for summary in summaries:
         summary_dict = summary.to_dict()
         user_settings = user_services.get_user_settings(
-            summary_dict['author_id'], strict=False)
+            summary_dict['author_id'], strict=False
+        )
         author_details = blog_services.get_blog_author_details(
-            summary_dict['author_id'])
+            summary_dict['author_id']
+        )
         if user_settings:
             card_summary_dict: BlogCardSummaryDict = {
                 'id': summary_dict['id'],
@@ -92,7 +94,7 @@ def _get_blog_card_summary_dicts_for_homepage(
                 'url_fragment': summary_dict['url_fragment'],
                 'published_on': summary_dict['published_on'],
                 'last_updated': summary_dict['last_updated'],
-                'displayed_author_name': author_details.displayed_author_name
+                'displayed_author_name': author_details.displayed_author_name,
             }
         else:
             card_summary_dict = {
@@ -105,7 +107,7 @@ def _get_blog_card_summary_dicts_for_homepage(
                 'url_fragment': summary_dict['url_fragment'],
                 'published_on': summary_dict['published_on'],
                 'last_updated': summary_dict['last_updated'],
-                'displayed_author_name': author_details.displayed_author_name
+                'displayed_author_name': author_details.displayed_author_name,
             }
         summary_dicts.append(card_summary_dict)
     return summary_dicts
@@ -141,15 +143,18 @@ def _get_matching_blog_card_summary_dicts(
     """
     blog_post_ids, new_search_offset = (
         blog_services.get_blog_post_ids_matching_query(
-            query_string, tags, size, offset=search_offset))
-    blog_post_summaries = (
-        blog_services.get_blog_post_summary_models_by_ids(blog_post_ids))
+            query_string, tags, size, offset=search_offset
+        )
+    )
+    blog_post_summaries = blog_services.get_blog_post_summary_models_by_ids(
+        blog_post_ids
+    )
     if len(blog_post_summaries) == feconf.DEFAULT_QUERY_LIMIT:
         logging.error(
             '%s blog post summaries were fetched to load the search/filter by '
             'result page. You may be running up against the default query '
-            'limits.'
-            % feconf.DEFAULT_QUERY_LIMIT)
+            'limits.' % feconf.DEFAULT_QUERY_LIMIT
+        )
     return blog_post_summaries, new_search_offset
 
 
@@ -163,8 +168,7 @@ class BlogHomepageDataHandlerNormalizedRequestDict(TypedDict):
 
 class BlogHomepageDataHandler(
     base.BaseHandler[
-        Dict[str, str],
-        BlogHomepageDataHandlerNormalizedRequestDict
+        Dict[str, str], BlogHomepageDataHandlerNormalizedRequestDict
     ]
 ):
     """Provides blog cards data and default tags data for the blog homepage."""
@@ -174,9 +178,7 @@ class BlogHomepageDataHandler(
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'offset': {
-                'schema': {
-                    'type': 'basestring'
-                },
+                'schema': {'type': 'basestring'},
             }
         }
     }
@@ -187,39 +189,44 @@ class BlogHomepageDataHandler(
         assert self.normalized_request is not None
         offset = int(self.normalized_request['offset'])
         published_post_summaries = (
-            blog_services.get_published_blog_post_summaries(offset))
+            blog_services.get_published_blog_post_summaries(offset)
+        )
         published_post_summary_dicts = []
         if published_post_summaries:
             published_post_summary_dicts = (
                 _get_blog_card_summary_dicts_for_homepage(
-                    published_post_summaries))
+                    published_post_summaries
+                )
+            )
         # Total number of published blog posts is calculated only when we load
         # the blog home page for the first time (search offset will be 0).
         # It is not required to load other subsequent pages as the value is
         # already loaded in the frontend.
         if offset != 0:
-            self.values.update({
-                'blog_post_summary_dicts': published_post_summary_dicts,
-            })
+            self.values.update(
+                {
+                    'blog_post_summary_dicts': published_post_summary_dicts,
+                }
+            )
             self.render_json(self.values)
         else:
             number_of_published_blog_post_summaries = (
-                blog_services
-                .get_total_number_of_published_blog_post_summaries()
+                blog_services.get_total_number_of_published_blog_post_summaries()
             )
             list_of_default_tags = constants.LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST
-            self.values.update({
-                'no_of_blog_post_summaries': (
-                    number_of_published_blog_post_summaries),
-                'blog_post_summary_dicts': published_post_summary_dicts,
-                'list_of_default_tags': list_of_default_tags
-            })
+            self.values.update(
+                {
+                    'no_of_blog_post_summaries': (
+                        number_of_published_blog_post_summaries
+                    ),
+                    'blog_post_summary_dicts': published_post_summary_dicts,
+                    'list_of_default_tags': list_of_default_tags,
+                }
+            )
             self.render_json(self.values)
 
 
-class BlogPostDataHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class BlogPostDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Provides blog post data for the blog post page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -227,14 +234,16 @@ class BlogPostDataHandler(
         'blog_post_url': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'has_length_at_most',
-                    'max_value': MAX_CHARS_IN_BLOG_POST_URL
-                },
-                {
-                    'id': 'has_length_at_least',
-                    'min_value': constants.BLOG_POST_ID_LENGTH
-                }]
+                'validators': [
+                    {
+                        'id': 'has_length_at_most',
+                        'max_value': MAX_CHARS_IN_BLOG_POST_URL,
+                    },
+                    {
+                        'id': 'has_length_at_least',
+                        'min_value': constants.BLOG_POST_ID_LENGTH,
+                    },
+                ],
             },
         }
     }
@@ -255,15 +264,19 @@ class BlogPostDataHandler(
         if not blog_post:
             raise self.NotFoundException(
                 Exception(
-                    'The blog post page with the given url doesn\'t exist.'))
+                    'The blog post page with the given url doesn\'t exist.'
+                )
+            )
         user_settings = user_services.get_user_settings(
-            blog_post.author_id, strict=False)
+            blog_post.author_id, strict=False
+        )
         if user_settings:
             author_username = user_settings.username
         else:
             author_username = 'author account deleted'
         author_details = blog_services.get_blog_author_details(
-            blog_post.author_id)
+            blog_post.author_id
+        )
         blog_post_dict = blog_post.to_dict()
         authors_blog_post_dict: AuthorsBlogPostDict = {
             'id': blog_post_dict['id'],
@@ -274,17 +287,15 @@ class BlogPostDataHandler(
             'url_fragment': blog_post_dict['url_fragment'],
             'published_on': blog_post_dict['published_on'],
             'last_updated': blog_post_dict['last_updated'],
-            'displayed_author_name': author_details.displayed_author_name
+            'displayed_author_name': author_details.displayed_author_name,
         }
         # We fetch 1 more than the required blog post summaries as the result
         # might contain the blog post which is currently being viewed.
-        summaries, _ = (
-            _get_matching_blog_card_summary_dicts(
-                '',
-                authors_blog_post_dict['tags'],
-                MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST + 1,
-                None
-            )
+        summaries, _ = _get_matching_blog_card_summary_dicts(
+            '',
+            authors_blog_post_dict['tags'],
+            MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST + 1,
+            None,
         )
 
         if len(summaries) < MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST + 1:
@@ -297,57 +308,57 @@ class BlogPostDataHandler(
                     blog_post.author_id, size
                 )
             )
-            summaries.extend(list(
-                filter(
-                    lambda i: i.id not in summary_ids, resultant_summaries
+            summaries.extend(
+                list(
+                    filter(
+                        lambda i: i.id not in summary_ids, resultant_summaries
+                    )
                 )
-            ))
+            )
         if len(summaries) < MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST + 1:
             summary_ids = [summary.id for summary in summaries]
             # We fetch more blog post summaries than the deficit as the result
             # might contain the blog post summaries which are already fetched.
             size = MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST + len(summaries)
             resultant_summaries = (
-                blog_services.get_published_blog_post_summaries(0, size))
-            summaries.extend(list(
-                filter(
-                    lambda i: i.id not in summary_ids, resultant_summaries
+                blog_services.get_published_blog_post_summaries(0, size)
+            )
+            summaries.extend(
+                list(
+                    filter(
+                        lambda i: i.id not in summary_ids, resultant_summaries
+                    )
                 )
-            ))
+            )
 
         for summary in summaries[:MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST]:
             if summary.id == authors_blog_post_dict['id']:
                 summaries.remove(summary)
                 break
 
-        self.values.update({
-            'author_username': author_username,
-            'blog_post_dict': authors_blog_post_dict,
-            'summary_dicts': _get_blog_card_summary_dicts_for_homepage(
-                summaries[:MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST])
-        })
+        self.values.update(
+            {
+                'author_username': author_username,
+                'blog_post_dict': authors_blog_post_dict,
+                'summary_dicts': _get_blog_card_summary_dicts_for_homepage(
+                    summaries[:MAX_POSTS_TO_RECOMMEND_AT_END_OF_BLOG_POST]
+                ),
+            }
+        )
         self.render_json(self.values)
 
 
-class AuthorsPageHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
+class AuthorsPageHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Provides blog cards data and author data for the authors page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
-        'author_username': {
-            'schema': {
-                'type': 'basestring'
-            }
-        }
+        'author_username': {'schema': {'type': 'basestring'}}
     }
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'offset': {
-                'schema': {
-                    'type': 'basestring'
-                },
+                'schema': {'type': 'basestring'},
             }
         },
     }
@@ -365,41 +376,41 @@ class AuthorsPageHandler(
         assert self.normalized_request is not None
         offset = int(self.normalized_request['offset'])
 
-        user_settings = (
-            user_services.get_user_settings_from_username(author_username)
+        user_settings = user_services.get_user_settings_from_username(
+            author_username
         )
         if user_settings is None:
             raise Exception(
-                'No user settings found for the given author_username: %s' %
-                author_username
+                'No user settings found for the given author_username: %s'
+                % author_username
             )
 
         author_details = blog_services.get_blog_author_details(
-            user_settings.user_id).to_dict()
-        num_of_published_blog_post_summaries = (
-                blog_services
-                .get_total_number_of_published_blog_post_summaries_by_author(
-                    user_settings.user_id
-                )
-            )
+            user_settings.user_id
+        ).to_dict()
+        num_of_published_blog_post_summaries = blog_services.get_total_number_of_published_blog_post_summaries_by_author(
+            user_settings.user_id
+        )
         blog_post_summaries = (
             blog_services.get_published_blog_post_summaries_by_user_id(
                 user_settings.user_id,
                 feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_AUTHOR_PROFILE_PAGE,
-                offset
+                offset,
             )
         )
         blog_post_summary_dicts = []
         if blog_post_summaries:
-            blog_post_summary_dicts = (
-                _get_blog_card_summary_dicts_for_homepage(
-                    blog_post_summaries))
+            blog_post_summary_dicts = _get_blog_card_summary_dicts_for_homepage(
+                blog_post_summaries
+            )
 
-        self.values.update({
-            'author_details': author_details,
-            'no_of_blog_post_summaries': num_of_published_blog_post_summaries,
-            'summary_dicts': blog_post_summary_dicts
-        })
+        self.values.update(
+            {
+                'author_details': author_details,
+                'no_of_blog_post_summaries': num_of_published_blog_post_summaries,
+                'summary_dicts': blog_post_summary_dicts,
+            }
+        )
         self.render_json(self.values)
 
 
@@ -414,10 +425,7 @@ class BlogPostSearchHandlerNormalizedRequestDict(TypedDict):
 
 
 class BlogPostSearchHandler(
-    base.BaseHandler[
-        Dict[str, str],
-        BlogPostSearchHandlerNormalizedRequestDict
-    ]
+    base.BaseHandler[Dict[str, str], BlogPostSearchHandlerNormalizedRequestDict]
 ):
     """Provides blog cards for blog search page based on query provided and
     applied tag filters.
@@ -427,30 +435,21 @@ class BlogPostSearchHandler(
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
-            'q': {
-                'schema': {
-                    'type': 'basestring'
-                },
-                'default_value': ''
-            },
+            'q': {'schema': {'type': 'basestring'}, 'default_value': ''},
             'tags': {
                 'schema': {
                     'type': 'basestring',
-                    'validators': [{
-                        'id': 'is_search_query_string'
-                    }, {
-                        'id': 'is_regex_matched',
-                        'regex_pattern': '[\\-\\w+()"\\s]*'
-                    }]
+                    'validators': [
+                        {'id': 'is_search_query_string'},
+                        {
+                            'id': 'is_regex_matched',
+                            'regex_pattern': '[\\-\\w+()"\\s]*',
+                        },
+                    ],
                 },
-                'default_value': ''
+                'default_value': '',
             },
-            'offset': {
-                'schema': {
-                    'type': 'int'
-                },
-                'default_value': None
-            }
+            'offset': {'schema': {'type': 'int'}, 'default_value': None},
         }
     }
 
@@ -475,17 +474,20 @@ class BlogPostSearchHandler(
                 query_string,
                 tags,
                 feconf.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE,
-                search_offset
+                search_offset,
             )
         )
-        blog_post_summary_dicts = (
-            _get_blog_card_summary_dicts_for_homepage(blog_post_summaries))
+        blog_post_summary_dicts = _get_blog_card_summary_dicts_for_homepage(
+            blog_post_summaries
+        )
         list_of_default_tags = constants.LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST
 
-        self.values.update({
-            'blog_post_summaries_list': blog_post_summary_dicts,
-            'search_offset': new_search_offset,
-            'list_of_default_tags': list_of_default_tags,
-        })
+        self.values.update(
+            {
+                'blog_post_summaries_list': blog_post_summary_dicts,
+                'search_offset': new_search_offset,
+                'list_of_default_tags': list_of_default_tags,
+            }
+        )
 
         self.render_json(self.values)

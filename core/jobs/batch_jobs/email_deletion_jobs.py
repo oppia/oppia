@@ -30,9 +30,9 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import email_models, feedback_models, user_models
 
-(email_models, feedback_models, user_models) = models.Registry.import_models([
-    models.Names.EMAIL, models.Names.FEEDBACK, models.Names.USER
-])
+(email_models, feedback_models, user_models) = models.Registry.import_models(
+    [models.Names.EMAIL, models.Names.FEEDBACK, models.Names.USER]
+)
 
 
 class DeleteUnneededEmailRelatedModelsJob(base_jobs.JobBase):
@@ -43,74 +43,93 @@ class DeleteUnneededEmailRelatedModelsJob(base_jobs.JobBase):
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         deleted_user_ids_collection = (
             self.pipeline
-            | 'Get all deleted user models' >> ndb_io.GetModels(
-                user_models.DeletedUserModel.get_all())
-            | 'Extract user IDs' >> beam.Map(
-                lambda deleted_user_model: deleted_user_model.id)
+            | 'Get all deleted user models'
+            >> ndb_io.GetModels(user_models.DeletedUserModel.get_all())
+            | 'Extract user IDs'
+            >> beam.Map(lambda deleted_user_model: deleted_user_model.id)
         )
         deleted_user_ids = beam.pvalue.AsIter(deleted_user_ids_collection)
 
         sent_email_models_to_delete = (
             self.pipeline
-            | 'Get all sent email models' >> ndb_io.GetModels(
-                email_models.SentEmailModel.get_all())
-            | 'Filter sent email models that belong to deleted users' >> (
+            | 'Get all sent email models'
+            >> ndb_io.GetModels(email_models.SentEmailModel.get_all())
+            | 'Filter sent email models that belong to deleted users'
+            >> (
                 beam.Filter(
                     lambda model, ids: (
-                        model.sender_id in ids or model.recipient_id in ids),
-                    ids=deleted_user_ids
-                ))
+                        model.sender_id in ids or model.recipient_id in ids
+                    ),
+                    ids=deleted_user_ids,
+                )
+            )
         )
         sent_email_models_to_delete_result = (
             sent_email_models_to_delete
-            | 'Count sent email models to be deleted' >> (
-                job_result_transforms.CountObjectsToJobRunResult('SENT EMAILS'))
+            | 'Count sent email models to be deleted'
+            >> (job_result_transforms.CountObjectsToJobRunResult('SENT EMAILS'))
         )
 
         bulk_email_models_to_delete = (
             self.pipeline
-            | 'Get all bulk email models' >> ndb_io.GetModels(
-                email_models.BulkEmailModel.get_all())
-            | 'Filter bulk email models that belong to deleted users' >> (
+            | 'Get all bulk email models'
+            >> ndb_io.GetModels(email_models.BulkEmailModel.get_all())
+            | 'Filter bulk email models that belong to deleted users'
+            >> (
                 beam.Filter(
                     lambda model, ids: model.sender_id in ids,
-                    ids=deleted_user_ids
-                ))
+                    ids=deleted_user_ids,
+                )
+            )
         )
         bulk_email_models_to_delete_result = (
             bulk_email_models_to_delete
-            | 'Count bulk email models to be deleted' >> (
-                job_result_transforms.CountObjectsToJobRunResult('BULK EMAILS'))
+            | 'Count bulk email models to be deleted'
+            >> (job_result_transforms.CountObjectsToJobRunResult('BULK EMAILS'))
         )
 
         unsent_feedback_email_models_to_delete = (
             self.pipeline
-            | 'Get all unsent feedback models' >> ndb_io.GetModels(
-                feedback_models.UnsentFeedbackEmailModel.get_all())
-            | 'Filter unsent feedback models that belong to deleted users' >> (
+            | 'Get all unsent feedback models'
+            >> ndb_io.GetModels(
+                feedback_models.UnsentFeedbackEmailModel.get_all()
+            )
+            | 'Filter unsent feedback models that belong to deleted users'
+            >> (
                 beam.Filter(
-                    lambda model, ids: model.id in ids, ids=deleted_user_ids))
+                    lambda model, ids: model.id in ids, ids=deleted_user_ids
+                )
+            )
         )
         unsent_feedback_email_models_to_delete_result = (
             unsent_feedback_email_models_to_delete
-            | 'Count unsent feedback email models to be deleted' >> (
+            | 'Count unsent feedback email models to be deleted'
+            >> (
                 job_result_transforms.CountObjectsToJobRunResult(
-                    'FEEDBACK EMAILS'))
+                    'FEEDBACK EMAILS'
+                )
+            )
         )
 
         user_bulk_emails_models_to_delete = (
             self.pipeline
-            | 'Get all user bulk email models' >> ndb_io.GetModels(
-                user_models.UserBulkEmailsModel.get_all())
-            | 'Filter user bulk email models that belong to deleted users' >> (
+            | 'Get all user bulk email models'
+            >> ndb_io.GetModels(user_models.UserBulkEmailsModel.get_all())
+            | 'Filter user bulk email models that belong to deleted users'
+            >> (
                 beam.Filter(
-                    lambda model, ids: model.id in ids, ids=deleted_user_ids))
+                    lambda model, ids: model.id in ids, ids=deleted_user_ids
+                )
+            )
         )
         user_bulk_emails_models_to_delete_result = (
             user_bulk_emails_models_to_delete
-            | 'Count user bulk email models to be deleted' >> (
+            | 'Count user bulk email models to be deleted'
+            >> (
                 job_result_transforms.CountObjectsToJobRunResult(
-                    'USER BULK EMAILS'))
+                    'USER BULK EMAILS'
+                )
+            )
         )
 
         unused_models_deletion = (
@@ -118,7 +137,7 @@ class DeleteUnneededEmailRelatedModelsJob(base_jobs.JobBase):
                 sent_email_models_to_delete,
                 bulk_email_models_to_delete,
                 unsent_feedback_email_models_to_delete,
-                user_bulk_emails_models_to_delete
+                user_bulk_emails_models_to_delete,
             )
             | 'Merge models' >> beam.Flatten()
             | 'Extract keys' >> beam.Map(lambda model: model.key)
@@ -126,11 +145,8 @@ class DeleteUnneededEmailRelatedModelsJob(base_jobs.JobBase):
         )
 
         return (
-            (
-                sent_email_models_to_delete_result,
-                bulk_email_models_to_delete_result,
-                unsent_feedback_email_models_to_delete_result,
-                user_bulk_emails_models_to_delete_result,
-            )
-            | 'Merge results' >> beam.Flatten()
-        )
+            sent_email_models_to_delete_result,
+            bulk_email_models_to_delete_result,
+            unsent_feedback_email_models_to_delete_result,
+            user_bulk_emails_models_to_delete_result,
+        ) | 'Merge results' >> beam.Flatten()
