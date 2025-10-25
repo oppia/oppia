@@ -60,10 +60,10 @@ class ElasticSearchClient:
                     )
                 )
                 # For Production case where we have cloud_id this is used.
-                if es_cloud_id:
-                    self._client=elasticsearch.Elasticsearch(
+                if es_cloud_id :
+                    self._client = elasticsearch.Elasticsearch(
                         hosts=None,
-                        cloud_id=es_cloud_id,
+                        cloud_id = es_cloud_id,
                         http_auth=(
                             es_username,
                             secrets_services.get_secret('ES_PASSWORD'),
@@ -72,31 +72,31 @@ class ElasticSearchClient:
                     )
                 else:    
                 #This Reassigns cloud_id to have values from local_env
-                    es_cloud_id=feconf.ES_CLOUD_ID 
-                    es_username=feconf.ES_USERNAME
-                    es_password=feconf.ES_PASSWORD
+                    es_cloud_id = feconf.ES_CLOUD_ID 
+                    es_username = feconf.ES_USERNAME
+                    es_password = feconf.ES_PASSWORD
                     #If cloud Id is assigned in local feconf.  
                     if es_cloud_id:
-                        self._client=elasticsearch.Elasticsearch(
+                        self._client = elasticsearch.Elasticsearch(
                             hosts=None,
-                            cloud_id=es_cloud_id,
-                            http_auth=(
+                            cloud_id = es_cloud_id,
+                            http_auth = (
                                 es_username,
                                 es_password
                             ),
-                            timeout=300
+                            timeout = 300
                         )
                     #Else we use the localhost enviourment and no cloud_id and username    
                     else:
                         self._client = elasticsearch.Elasticsearch(
-                            hosts=(
+                            hosts = (
                                 ('http://%s:%s' % (feconf.ES_HOST, feconf.ES_LOCALHOST_PORT))
                                 if not es_cloud_id
                                 else None
                                 ),
-                            cloud_id=None,
-                            http_auth=None,
-                            timeout=300
+                            cloud_id = None,
+                            http_auth = None,
+                            timeout = 300
                         )
 
         return self._client

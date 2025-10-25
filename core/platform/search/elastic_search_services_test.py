@@ -18,12 +18,14 @@
 
 from __future__ import annotations
 
-from core.domain import search_services,platform_parameter_services
+import unittest
+import unittest.mock
+
+from core.domain import search_services , platform_parameter_services
 from core.platform.search import elastic_search_services
 from core.tests import test_utils
 from core import feconf
-import unittest
-import unittest.mock
+
 
 from typing import Any, Dict, List
 
@@ -70,7 +72,7 @@ class ElasticSearchPureUnitTests(unittest.TestCase):
                         hosts=None,
                         cloud_id='test_cloud_id',
                         http_auth=('test_username', 'test_password'),
-                        request_timeout=300
+                        timeout=300
                     )
 
     def test_creates_elastic_search_client_with_local_config(self) -> None:
@@ -98,7 +100,7 @@ class ElasticSearchPureUnitTests(unittest.TestCase):
                                 hosts=None,
                                 cloud_id='local-cloud-id',
                                 http_auth=('local_username', 'local-password'),
-                                request_timeout=300
+                                timeout=300
                             )
 
     def test_creates_elastic_search_client_with_local_docker_config(self) -> None:
@@ -126,7 +128,7 @@ class ElasticSearchPureUnitTests(unittest.TestCase):
                                 hosts='http://localhost:9200',
                                 cloud_id=None,
                                 http_auth=None,
-                                request_timeout=30
+                                timeout=30
                             )
 
 
