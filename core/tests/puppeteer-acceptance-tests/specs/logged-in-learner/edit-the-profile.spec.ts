@@ -31,8 +31,8 @@ describe('Logged-In Learner', function () {
 
   beforeAll(async function () {
     loggedInLearner = await UserFactory.createNewUser(
-      'learner8',
-      'learner8@example.com'
+      'learner',
+      'learner@example.com'
     );
 
     explorationEditor = await UserFactory.createNewUser(
@@ -50,7 +50,7 @@ describe('Logged-In Learner', function () {
     await loggedInLearner.clickOnProfileDropdown();
 
     await loggedInLearner.expectProfileDropdownToContainElementWithContent(
-      'learner8'
+      'learner'
     );
     await loggedInLearner.expectProfileDropdownToContainElementWithContent(
       'Learner Dashboard'
@@ -77,14 +77,21 @@ describe('Logged-In Learner', function () {
   });
 
   it('should be able to change the profile photo', async function () {
+    // Should be able to update profile photo with all supported formats.
     await loggedInLearner.updateProfilePicture(FILEPATHS.PROFILE_PHOTO_SVG);
     await loggedInLearner.updateProfilePicture(FILEPATHS.PROFILE_PHOTO_PNG);
     await loggedInLearner.updateProfilePicture(FILEPATHS.PROFILE_PHOTO_JPEG);
     await loggedInLearner.updateProfilePicture(FILEPATHS.PROFILE_PHOTO_JPG);
     await loggedInLearner.updateProfilePicture(FILEPATHS.PROFILE_PHOTO_GIF);
 
+    // Should not be able to update profile photo with unsupported formats.
     await loggedInLearner.expectProfilePhotoDoNotUpdate(
       FILEPATHS.PROFILE_PHOTO_BMP
+    );
+
+    // Should not be able to update profile photo with large images.
+    await loggedInLearner.expectProfilePhotoDoNotUpdate(
+      FILEPATHS.PROFILE_PHOTO_HIRES
     );
   });
 

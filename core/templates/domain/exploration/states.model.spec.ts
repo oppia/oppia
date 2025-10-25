@@ -412,6 +412,16 @@ describe('States', () => {
     );
   });
 
+  it('should return all State objects using getStates()', () => {
+    const states = States.createFromBackendDict(statesDict);
+    const stateObjects = states.getStates();
+    expect(Array.isArray(stateObjects)).toBe(true);
+    expect(stateObjects.length).toBe(Object.keys(statesDict).length);
+    expect(stateObjects[0]).toEqual(
+      State.createFromBackendDict('first state', newState2)
+    );
+  });
+
   it(
     "should correctly set any states' interaction.defaultOutcomes that " +
       'point to a deleted or renamed state name',

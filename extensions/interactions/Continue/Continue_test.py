@@ -19,8 +19,9 @@
 from __future__ import annotations
 
 from core.tests import test_utils
-
-from extensions.interactions.Continue import Continue # pylint: disable=unused-import # isort: skip
+from extensions.interactions.Continue import (  # pylint: disable=unused-import
+    Continue,
+)
 
 
 class ContinueTests(test_utils.GenericTestBase):

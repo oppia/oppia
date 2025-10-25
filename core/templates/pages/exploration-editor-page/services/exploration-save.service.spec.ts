@@ -45,6 +45,9 @@ import {ExplorationTagsService} from './exploration-tags.service';
 import {ExplorationTitleService} from './exploration-title.service';
 import {ExplorationWarningsService} from './exploration-warnings.service';
 import {RouterService} from './router.service';
+import {PlatformFeatureService} from '../../../services/platform-feature.service';
+import {PageContextService} from '../../../services/page-context.service';
+import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
 
 class MockNgbModal {
   open() {
@@ -55,6 +58,14 @@ class MockNgbModal {
 class MockrouterService {
   savePendingChanges() {}
   onRefreshVersionHistory = new EventEmitter();
+}
+
+class MockPlatformFeatureService {
+  status = {
+    EnableBackgroundVoiceoverSynthesis: {
+      isEnabled: true,
+    },
+  };
 }
 
 describe(
@@ -122,6 +133,10 @@ describe(
           {
             provide: RouterService,
             useClass: MockrouterService,
+          },
+          {
+            provide: PlatformFeatureService,
+            useClass: MockPlatformFeatureService,
           },
           {
             provide: WindowRef,
@@ -301,6 +316,10 @@ describe(
           {
             provide: RouterService,
             useClass: MockrouterService,
+          },
+          {
+            provide: PlatformFeatureService,
+            useClass: MockPlatformFeatureService,
           },
           {
             provide: WindowRef,
@@ -517,6 +536,10 @@ describe(
             useClass: MockrouterService,
           },
           {
+            provide: PlatformFeatureService,
+            useClass: MockPlatformFeatureService,
+          },
+          {
             provide: WindowRef,
             useValue: {
               nativeWindow: {
@@ -587,6 +610,8 @@ describe('Exploration save service ' + 'while saving changes', () => {
   let explorationWarningsService: ExplorationWarningsService;
   let mockConnectionServiceEmitter = new EventEmitter<boolean>();
   let alertsService: AlertsService;
+  let pageContextService: PageContextService;
+  let voiceoverBackendApiService: VoiceoverBackendApiService;
   let changeListServiceSpy: jasmine.Spy;
   class MockInternetConnectivityService {
     onInternetStateChange = mockConnectionServiceEmitter;
@@ -818,6 +843,9 @@ describe('Exploration save service ' + 'while saving changes', () => {
               errorCb({error: {error: 'errorMessage'}});
             },
             discardDraftAsync() {},
+            data: {
+              version: 1,
+            },
           },
         },
         FocusManagerService,
@@ -837,6 +865,10 @@ describe('Exploration save service ' + 'while saving changes', () => {
         {
           provide: RouterService,
           useClass: MockrouterService,
+        },
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService,
         },
         {
           provide: WindowRef,
@@ -867,6 +899,8 @@ describe('Exploration save service ' + 'while saving changes', () => {
     explorationDiffService = TestBed.inject(ExplorationDiffService);
     explorationStatesService = TestBed.inject(ExplorationStatesService);
     explorationWarningsService = TestBed.inject(ExplorationWarningsService);
+    pageContextService = TestBed.inject(PageContextService);
+    voiceoverBackendApiService = TestBed.inject(VoiceoverBackendApiService);
 
     changeListServiceSpy = spyOn(changeListService, 'discardAllChanges');
     changeListServiceSpy.and.returnValue(Promise.resolve(null));
@@ -892,6 +926,14 @@ describe('Exploration save service ' + 'while saving changes', () => {
     let sampleStates = States.createFromBackendDict(statesBackendDict);
     spyOn(routerService, 'savePendingChanges').and.returnValue();
     spyOn(explorationStatesService, 'getStates').and.returnValue(sampleStates);
+    spyOn(pageContextService, 'isExplorationLinkedToStory').and.returnValue(
+      true
+    );
+    let regenerateVoiceoverSpy = spyOn(
+      voiceoverBackendApiService,
+      'regenerateVoiceoverOnExplorationUpdateAsync'
+    );
+    spyOn(explorationRightsService, 'isPrivate').and.returnValue(true);
     spyOn(explorationDiffService, 'getDiffGraphData').and.returnValue({
       nodes: {
         nodes: {
@@ -926,6 +968,7 @@ describe('Exploration save service ' + 'while saving changes', () => {
     flush();
 
     expect(modalSpy).toHaveBeenCalled();
+    expect(regenerateVoiceoverSpy).toHaveBeenCalled();
   }));
 
   it(

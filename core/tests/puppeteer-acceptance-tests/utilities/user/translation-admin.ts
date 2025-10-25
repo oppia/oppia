@@ -75,13 +75,13 @@ export class TranslationAdmin extends BaseUser {
     languageCode: string
   ): Promise<void> {
     await this.expectElementToBeVisible(addContributorUsernameInput);
-    await this.type(addContributorUsernameInput, username);
+    await this.typeInInputField(addContributorUsernameInput, username);
     await this.select(
       addContributonRightsCategorySelect,
       translationRightValue
     );
     await this.select(addContributonRightsLanguageDropdown, languageCode);
-    await this.clickOn(addContributionRightsSubmitButton);
+    await this.clickOnElementWithSelector(addContributionRightsSubmitButton);
 
     await this.expectActionStatusMessageToBe(
       'Success.',
@@ -97,13 +97,13 @@ export class TranslationAdmin extends BaseUser {
     languageCode: string
   ): Promise<void> {
     await this.expectElementToBeVisible(removeContributorUsernameInput);
-    await this.type(removeContributorUsernameInput, username);
+    await this.typeInInputField(removeContributorUsernameInput, username);
     await this.select(
       removeContributonRightsCategorySelect,
       translationRightValue
     );
     await this.select(removeContributonRightsLanguageSelect, languageCode);
-    await this.clickOn(removeContributionRightsSubmitButton);
+    await this.clickOnElementWithSelector(removeContributionRightsSubmitButton);
 
     await this.expectActionStatusMessageToBe('Success.', 'Processing query...');
   }
@@ -114,8 +114,8 @@ export class TranslationAdmin extends BaseUser {
   async viewContributionRightsForUser(username: string): Promise<void> {
     await this.expectElementToBeVisible(viewContributorFilterMethodSelect);
     await this.select(viewContributorFilterMethodSelect, usernameMethodValue);
-    await this.type(viewContributerUsernameInput, username);
-    await this.clickOn(viewContributorSubmitButton);
+    await this.typeInInputField(viewContributerUsernameInput, username);
+    await this.clickOnElementWithSelector(viewContributorSubmitButton);
 
     await this.waitForNetworkIdle();
     await this.expectElementToBeVisible(userRightsTableSelector);
@@ -131,7 +131,7 @@ export class TranslationAdmin extends BaseUser {
     await this.select(viewContributorFilterMethodSelect, roleMethodValue);
     await this.select(viewContributorCategorySelect, translationRightValue);
     await this.select(viewContributorLanguageSelect, languageCode);
-    await this.clickOn(viewContributorSubmitButton);
+    await this.clickOnElementWithSelector(viewContributorSubmitButton);
 
     await this.waitForNetworkIdle();
     await this.expectElementToBeVisible(viewLanguageRoleUserResult);

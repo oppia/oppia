@@ -35,54 +35,61 @@ class CodeRepl(base.BaseInteraction):
 
     # Language options 'lua', 'scheme', 'coffeescript', 'javascript', and
     # 'ruby' have been removed for possible later re-release.
-    _customization_arg_specs = [{
-        'name': 'language',
-        'description': 'Programming language',
-        'schema': {
-            'type': 'unicode',
-            'choices': [
-                'python',
-            ]
-        },
-        'default_value': 'python'
-    }, {
-        'name': 'placeholder',
-        'description': 'Initial code displayed',
-        'schema': {
-            'type': 'unicode',
-            'ui_config': {
-                'coding_mode': 'none',
+    _customization_arg_specs = [
+        {
+            'name': 'language',
+            'description': 'Programming language',
+            'schema': {
+                'type': 'unicode',
+                'choices': [
+                    'python',
+                ],
             },
+            'default_value': 'python',
         },
-        'default_value': '# Type your code here.'
-    }, {
-        'name': 'preCode',
-        'description': 'Code to prepend to the learner\'s submission',
-        'schema': {
-            'type': 'unicode',
-            'ui_config': {
-                'coding_mode': 'none',
+        {
+            'name': 'placeholder',
+            'description': 'Initial code displayed',
+            'schema': {
+                'type': 'unicode',
+                'ui_config': {
+                    'coding_mode': 'none',
+                },
             },
+            'default_value': '# Type your code here.',
         },
-        'default_value': ''
-    }, {
-        'name': 'postCode',
-        'description': 'Code to append after the learner\'s submission',
-        'schema': {
-            'type': 'unicode',
-            'ui_config': {
-                'coding_mode': 'none',
+        {
+            'name': 'preCode',
+            'description': 'Code to prepend to the learner\'s submission',
+            'schema': {
+                'type': 'unicode',
+                'ui_config': {
+                    'coding_mode': 'none',
+                },
             },
+            'default_value': '',
         },
-        'default_value': ''
-    }]
+        {
+            'name': 'postCode',
+            'description': 'Code to append after the learner\'s submission',
+            'schema': {
+                'type': 'unicode',
+                'ui_config': {
+                    'coding_mode': 'none',
+                },
+            },
+            'default_value': '',
+        },
+    ]
 
-    _answer_visualization_specs = [{
-        'id': 'FrequencyTable',
-        'options': {
-            'column_headers': ['Answer', 'Count'],
-            'title': 'Top 10 answers',
-        },
-        'calculation_id': 'Top10AnswerFrequencies',
-        'addressed_info_is_supported': True,
-    }]
+    _answer_visualization_specs = [
+        {
+            'id': 'FrequencyTable',
+            'options': {
+                'column_headers': ['Answer', 'Count'],
+                'title': 'Top 10 answers',
+            },
+            'calculation_id': 'Top10AnswerFrequencies',
+            'addressed_info_is_supported': True,
+        }
+    ]

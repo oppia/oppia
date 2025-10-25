@@ -28,7 +28,9 @@ class TranslatableObjectRegistryUnitTests(test_utils.GenericTestBase):
         """Tests the normal behavior of get_object_class()."""
         retrieved_class = (
             translatable_object_registry.Registry.get_object_class(
-                'TranslatableHtml'))
+                'TranslatableHtml'
+            )
+        )
         self.assertEqual(retrieved_class.__name__, 'TranslatableHtml')
 
     def test_nontranslatable_class_is_not_gettable(self) -> None:
@@ -41,18 +43,21 @@ class TranslatableObjectRegistryUnitTests(test_utils.GenericTestBase):
             # TODO(#13059): Here we use MyPy ignore because after we fully type
             # the codebase we plan to get rid of the tests that intentionally
             # test wrong inputs that we can normally catch by typing.
-            translatable_object_registry.Registry.get_object_class( # type: ignore[call-overload]
-                'Int')
+            translatable_object_registry.Registry.get_object_class(  # type: ignore[call-overload]
+                'Int'
+            )
 
     def test_fake_class_is_not_gettable(self) -> None:
         """Tests that trying to retrieve a fake class raises an error."""
         with self.assertRaisesRegex(
-            TypeError, 'not a valid translatable object class'):
+            TypeError, 'not a valid translatable object class'
+        ):
             # TODO(#13059): Here we use MyPy ignore because after we fully type
             # the codebase we plan to get rid of the tests that intentionally
             # test wrong inputs that we can normally catch by typing.
-            translatable_object_registry.Registry.get_object_class( # type: ignore[call-overload]
-                'FakeClass')
+            translatable_object_registry.Registry.get_object_class(  # type: ignore[call-overload]
+                'FakeClass'
+            )
 
     def test_base_objects_are_not_gettable(self) -> None:
         """Tests that the base objects exist but are not included in the
@@ -60,26 +65,37 @@ class TranslatableObjectRegistryUnitTests(test_utils.GenericTestBase):
         """
         assert getattr(objects, 'BaseObject')
         with self.assertRaisesRegex(
-            TypeError, 'not a valid translatable object class'):
+            TypeError, 'not a valid translatable object class'
+        ):
             # TODO(#13059): Here we use MyPy ignore because after we fully type
             # the codebase we plan to get rid of the tests that intentionally
             # test wrong inputs that we can normally catch by typing.
-            translatable_object_registry.Registry.get_object_class( # type: ignore[call-overload]
-                'BaseObject')
+            translatable_object_registry.Registry.get_object_class(  # type: ignore[call-overload]
+                'BaseObject'
+            )
 
         assert getattr(objects, 'BaseTranslatableObject')
         with self.assertRaisesRegex(
-            TypeError, 'not a valid translatable object class'):
+            TypeError, 'not a valid translatable object class'
+        ):
             # TODO(#13059): Here we use MyPy ignore because after we fully type
             # the codebase we plan to get rid of the tests that intentionally
             # test wrong inputs that we can normally catch by typing.
-            translatable_object_registry.Registry.get_object_class( # type: ignore[call-overload]
-                'BaseTranslatableObject')
+            translatable_object_registry.Registry.get_object_class(  # type: ignore[call-overload]
+                'BaseTranslatableObject'
+            )
 
     def test_get_translatable_object_classes(self) -> None:
         """Tests the normal behavior of get_translatable_object_classes()."""
         class_names_to_classes = (
-            translatable_object_registry.Registry.get_all_class_names())
-        self.assertEqual(class_names_to_classes, [
-            'TranslatableHtml', 'TranslatableSetOfNormalizedString',
-            'TranslatableSetOfUnicodeString', 'TranslatableUnicodeString'])
+            translatable_object_registry.Registry.get_all_class_names()
+        )
+        self.assertEqual(
+            class_names_to_classes,
+            [
+                'TranslatableHtml',
+                'TranslatableSetOfNormalizedString',
+                'TranslatableSetOfUnicodeString',
+                'TranslatableUnicodeString',
+            ],
+        )

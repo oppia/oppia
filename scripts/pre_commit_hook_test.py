@@ -37,6 +37,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.print_arr: List[str] = []
+
         def mock_print(msg: str) -> None:
             self.print_arr.append(msg)
 
@@ -45,27 +46,30 @@ class PreCommitHookTests(test_utils.GenericTestBase):
     def test_install_hook_with_existing_symlink(self) -> None:
         def mock_islink(unused_file: str) -> bool:
             return True
+
         def mock_exists(unused_file: str) -> bool:
             return True
+
         def mock_start_subprocess_for_result(
-            unused_cmd_tokens: List[str]
+            unused_cmd_tokens: List[str],
         ) -> Tuple[str, None]:
             return ('Output', None)
 
         islink_swap = self.swap(os.path, 'islink', mock_islink)
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         subprocess_swap = self.swap(
-            pre_commit_hook, 'start_subprocess_for_result',
-            mock_start_subprocess_for_result)
+            pre_commit_hook,
+            'start_subprocess_for_result',
+            mock_start_subprocess_for_result,
+        )
 
         with islink_swap, exists_swap, subprocess_swap, self.print_swap:
             pre_commit_hook.install_hook()
         self.assertTrue('Symlink already exists' in self.print_arr)
-        self.assertIn(
-            'pre-commit hook file is now executable!', self.print_arr)
+        self.assertIn('pre-commit hook file is now executable!', self.print_arr)
 
     def test_install_hook_with_error_in_making_pre_push_executable(
-        self
+        self,
     ) -> None:
 
         def mock_islink(unused_file: str) -> bool:
@@ -75,82 +79,99 @@ class PreCommitHookTests(test_utils.GenericTestBase):
             return True
 
         def mock_start_subprocess_for_result(
-            unused_cmd_tokens: List[str]
+            unused_cmd_tokens: List[str],
         ) -> Tuple[str, str]:
             return ('Output', 'Error')
 
         islink_swap = self.swap(os.path, 'islink', mock_islink)
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         subprocess_swap = self.swap(
-            pre_commit_hook, 'start_subprocess_for_result',
-            mock_start_subprocess_for_result)
+            pre_commit_hook,
+            'start_subprocess_for_result',
+            mock_start_subprocess_for_result,
+        )
 
         with islink_swap, exists_swap, subprocess_swap, self.print_swap:
             with self.assertRaisesRegex(ValueError, 'Error'):
                 pre_commit_hook.install_hook()
         self.assertTrue('Symlink already exists' in self.print_arr)
         self.assertFalse(
-            'pre-commit hook file is now executable!' in self.print_arr)
+            'pre-commit hook file is now executable!' in self.print_arr
+        )
 
     def test_install_hook_with_creation_of_symlink(self) -> None:
-        check_function_calls = {
-            'symlink_is_called': False
-        }
+        check_function_calls = {'symlink_is_called': False}
+
         def mock_islink(unused_file: str) -> bool:
             return False
+
         def mock_exists(unused_file: str) -> bool:
             return False
+
         def mock_start_subprocess_for_result(
-            unused_cmd_tokens: List[str]
+            unused_cmd_tokens: List[str],
         ) -> Tuple[str, None]:
             return ('Output', None)
+
         def mock_symlink(unused_path: str, unused_file: str) -> None:
             check_function_calls['symlink_is_called'] = True
 
         islink_swap = self.swap(os.path, 'islink', mock_islink)
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         subprocess_swap = self.swap(
-            pre_commit_hook, 'start_subprocess_for_result',
-            mock_start_subprocess_for_result)
+            pre_commit_hook,
+            'start_subprocess_for_result',
+            mock_start_subprocess_for_result,
+        )
         symlink_swap = self.swap(os, 'symlink', mock_symlink)
 
-        with islink_swap, exists_swap, subprocess_swap, self.print_swap, (
-            symlink_swap):
+        with (
+            islink_swap
+        ), exists_swap, subprocess_swap, self.print_swap, symlink_swap:
             pre_commit_hook.install_hook()
         self.assertTrue(check_function_calls['symlink_is_called'])
         self.assertTrue(
-            'Created symlink in .git/hooks directory' in self.print_arr)
+            'Created symlink in .git/hooks directory' in self.print_arr
+        )
         self.assertTrue(
-            'pre-commit hook file is now executable!' in self.print_arr)
+            'pre-commit hook file is now executable!' in self.print_arr
+        )
 
     def test_install_hook_with_error_in_creation_of_symlink(self) -> None:
         check_function_calls = {
             'symlink_is_called': False,
-            'copy_is_called': False
+            'copy_is_called': False,
         }
         expected_check_function_calls = {
             'symlink_is_called': True,
-            'copy_is_called': True
+            'copy_is_called': True,
         }
+
         def mock_islink(unused_file: str) -> bool:
             return False
+
         def mock_exists(unused_file: str) -> bool:
             return False
+
         def mock_start_subprocess_for_result(
-            unused_cmd_tokens: List[str]
+            unused_cmd_tokens: List[str],
         ) -> Tuple[str, None]:
             return ('Output', None)
+
         def mock_symlink(unused_path: str, unused_file: str) -> None:
             check_function_calls['symlink_is_called'] = True
             raise OSError
+
         def mock_copy(unused_type: str, unused_file: str) -> None:
             check_function_calls['copy_is_called'] = True
 
         islink_swap = self.swap(os.path, 'islink', mock_islink)
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         subprocess_swap = self.swap(
-            pre_commit_hook, 'start_subprocess_for_result',
-            mock_start_subprocess_for_result)
+            pre_commit_hook,
+            'start_subprocess_for_result',
+            mock_start_subprocess_for_result,
+        )
         symlink_swap = self.swap(os, 'symlink', mock_symlink)
         copy_swap = self.swap(shutil, 'copy', mock_copy)
 
@@ -160,31 +181,39 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         self.assertEqual(check_function_calls, expected_check_function_calls)
         self.assertTrue('Copied file to .git/hooks directory' in self.print_arr)
         self.assertTrue(
-            'pre-commit hook file is now executable!' in self.print_arr)
+            'pre-commit hook file is now executable!' in self.print_arr
+        )
 
     def test_install_hook_with_broken_symlink(self) -> None:
         check_function_calls = {
             'unlink_is_called': False,
-            'symlink_is_called': False
+            'symlink_is_called': False,
         }
+
         def mock_islink(unused_file: str) -> bool:
             return True
+
         def mock_exists(unused_file: str) -> bool:
             return False
+
         def mock_start_subprocess_for_result(
-            unused_cmd_tokens: List[str]
+            unused_cmd_tokens: List[str],
         ) -> Tuple[str, None]:
             return ('Output', None)
+
         def mock_unlink(unused_file: str) -> None:
             check_function_calls['unlink_is_called'] = True
+
         def mock_symlink(unused_path: str, unused_file: str) -> None:
             check_function_calls['symlink_is_called'] = True
 
         islink_swap = self.swap(os.path, 'islink', mock_islink)
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         subprocess_swap = self.swap(
-            pre_commit_hook, 'start_subprocess_for_result',
-            mock_start_subprocess_for_result)
+            pre_commit_hook,
+            'start_subprocess_for_result',
+            mock_start_subprocess_for_result,
+        )
         unlink_swap = self.swap(os, 'unlink', mock_unlink)
         symlink_swap = self.swap(os, 'symlink', mock_symlink)
 
@@ -195,191 +224,228 @@ class PreCommitHookTests(test_utils.GenericTestBase):
         self.assertTrue(check_function_calls['symlink_is_called'])
         self.assertTrue('Removing broken symlink' in self.print_arr)
         self.assertTrue(
-            'pre-commit hook file is now executable!' in self.print_arr)
+            'pre-commit hook file is now executable!' in self.print_arr
+        )
 
     def test_start_subprocess_for_result(self) -> None:
         process = subprocess.Popen(
-            ['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            ['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        )
+
         def mock_popen(  # pylint: disable=unused-argument
             unused_cmd_tokens: List[str],
             stdout: int = subprocess.PIPE,
-            stderr: int = subprocess.PIPE
+            stderr: int = subprocess.PIPE,
         ) -> psutil.Popen:
             return process
 
         with self.swap(subprocess, 'Popen', mock_popen):
             self.assertEqual(
                 pre_commit_hook.start_subprocess_for_result(['cmd']),
-                (b'test\n', b''))
+                (b'test\n', b''),
+            )
 
     def test_does_diff_include_package_lock_file_with_package_lock_in_diff(
-        self
+        self,
     ) -> None:
         def mock_start_subprocess_for_result(
-            unused_cmd_tokens: List[str]
+            unused_cmd_tokens: List[str],
         ) -> Tuple[bytes, None]:
             return (b'package-lock.json\nfile.1py\nfile2.ts', None)
 
         with self.swap(
-            pre_commit_hook, 'start_subprocess_for_result',
-            mock_start_subprocess_for_result
+            pre_commit_hook,
+            'start_subprocess_for_result',
+            mock_start_subprocess_for_result,
         ):
             self.assertTrue(
-                pre_commit_hook.does_diff_include_package_lock_file())
+                pre_commit_hook.does_diff_include_package_lock_file()
+            )
 
     def test_does_diff_include_package_lock_file_with_no_package_lock_in_diff(
-        self
+        self,
     ) -> None:
         def mock_start_subprocess_for_result(
-            unused_cmd_tokens: List[str]
+            unused_cmd_tokens: List[str],
         ) -> Tuple[bytes, None]:
             return (b'file.1py\nfile2.ts', None)
 
         with self.swap(
-            pre_commit_hook, 'start_subprocess_for_result',
-            mock_start_subprocess_for_result):
+            pre_commit_hook,
+            'start_subprocess_for_result',
+            mock_start_subprocess_for_result,
+        ):
             self.assertFalse(
-                pre_commit_hook.does_diff_include_package_lock_file())
+                pre_commit_hook.does_diff_include_package_lock_file()
+            )
 
     def test_does_diff_include_package_lock_file_with_error(self) -> None:
         def mock_start_subprocess_for_result(
-            unused_cmd_tokens: List[str]
+            unused_cmd_tokens: List[str],
         ) -> Tuple[bytes, bytes]:
             return (b'file.1py\nfile2.ts', b'Error')
 
         subprocess_swap = self.swap(
-            pre_commit_hook, 'start_subprocess_for_result',
-            mock_start_subprocess_for_result)
+            pre_commit_hook,
+            'start_subprocess_for_result',
+            mock_start_subprocess_for_result,
+        )
         with subprocess_swap, self.assertRaisesRegex(ValueError, 'Error'):
             pre_commit_hook.does_diff_include_package_lock_file()
 
     def test_does_current_folder_contain_have_package_lock_file(self) -> None:
         def mock_isfile(unused_path: str) -> bool:
             return True
+
         with self.swap(os.path, 'isfile', mock_isfile):
             self.assertTrue(
-                pre_commit_hook
-                .does_current_folder_contain_have_package_lock_file())
+                pre_commit_hook.does_current_folder_contain_have_package_lock_file()
+            )
 
     def test_check_changes_in_config_with_no_invalid_changes(self) -> None:
         def mock_check_output(cmd_tokens: List[str]) -> bytes:
             if pre_commit_hook.FECONF_FILEPATH in cmd_tokens:
                 return (
                     b'-TESTS_DATA_DIR = os.path.join(\'.\', \'dir1\')\n'
-                    b'+TESTS_DATA_DIR = os.path.join(\'.\', \'dir2\')\n')
+                    b'+TESTS_DATA_DIR = os.path.join(\'.\', \'dir2\')\n'
+                )
             return (
                 b'-  "DASHBOARD_TYPE_CREATOR": "creator",\n'
-                b'+  "DASHBOARD_TYPE_CREATOR": "creator-change",\n')
+                b'+  "DASHBOARD_TYPE_CREATOR": "creator-change",\n'
+            )
+
         with self.swap(subprocess, 'check_output', mock_check_output):
             pre_commit_hook.check_changes_in_config()
 
     def test_check_changes_with_no_config_file_changed(self) -> None:
         self.assertTrue(pre_commit_hook.check_changes('filetype'))
 
-    def test_check_changes_in_config_with_invalid_feconf_changes(
-        self
-    ) -> None:
+    def test_check_changes_in_config_with_invalid_feconf_changes(self) -> None:
         def mock_check_output(cmd_tokens: List[str]) -> bytes:
             if pre_commit_hook.FECONF_FILEPATH in cmd_tokens:
                 return (
                     b'-SYSTEM_EMAIL_NAME = \'sys@email.com\'\n+'
-                    b'+SYSTEM_EMAIL_NAME = \'sys-change@email.com\'\n')
+                    b'+SYSTEM_EMAIL_NAME = \'sys-change@email.com\'\n'
+                )
             return (
                 b'-  "DASHBOARD_TYPE_CREATOR": "creator",\n'
-                b'+  "DASHBOARD_TYPE_CREATOR": "creator-change",\n')
+                b'+  "DASHBOARD_TYPE_CREATOR": "creator-change",\n'
+            )
+
         check_output_swap = self.swap(
-            subprocess, 'check_output', mock_check_output)
+            subprocess, 'check_output', mock_check_output
+        )
         with check_output_swap, self.assertRaisesRegex(
             Exception,
-            'Changes to %s made for deployment cannot be committed.' % (
-                pre_commit_hook.FECONF_FILEPATH)):
+            'Changes to %s made for deployment cannot be committed.'
+            % (pre_commit_hook.FECONF_FILEPATH),
+        ):
             pre_commit_hook.check_changes_in_config()
 
     def test_check_changes_in_config_with_invalid_constants_changes(
-        self
+        self,
     ) -> None:
         def mock_check_output(cmd_tokens: List[str]) -> bytes:
             if pre_commit_hook.FECONF_FILEPATH in cmd_tokens:
                 return (
                     b'-TESTS_DATA_DIR = os.path.join(\'.\', \'dir1\')\n'
-                    b'+TESTS_DATA_DIR = os.path.join(\'.\', \'dir2\')\n')
+                    b'+TESTS_DATA_DIR = os.path.join(\'.\', \'dir2\')\n'
+                )
             return (
                 b'-  "FIREBASE_CONFIG_API_KEY": "fake-api-key",\n'
-                b'+  "FIREBASE_CONFIG_API_KEY": "changed-api-key",\n')
+                b'+  "FIREBASE_CONFIG_API_KEY": "changed-api-key",\n'
+            )
+
         check_output_swap = self.swap(
-            subprocess, 'check_output', mock_check_output)
+            subprocess, 'check_output', mock_check_output
+        )
         with check_output_swap, self.assertRaisesRegex(
             Exception,
-            'Changes to %s made for deployment cannot be committed.' % (
-                pre_commit_hook.CONSTANTS_FILEPATH)):
+            'Changes to %s made for deployment cannot be committed.'
+            % (pre_commit_hook.CONSTANTS_FILEPATH),
+        ):
             pre_commit_hook.check_changes_in_config()
 
     def test_main_with_errors(self) -> None:
-        check_function_calls = {
-            'check_changes_in_config_is_called': False
-        }
+        check_function_calls = {'check_changes_in_config_is_called': False}
+
         def mock_func() -> bool:
             return True
+
         def mock_check_changes_in_config() -> None:
             check_function_calls['check_changes_in_config_is_called'] = True
+
         package_lock_swap = self.swap(
-            pre_commit_hook, 'does_diff_include_package_lock_file', mock_func)
+            pre_commit_hook, 'does_diff_include_package_lock_file', mock_func
+        )
         package_lock_in_current_folder_swap = self.swap(
             pre_commit_hook,
             'does_current_folder_contain_have_package_lock_file',
-            mock_func)
+            mock_func,
+        )
         check_config_swap = self.swap(
-            pre_commit_hook, 'check_changes_in_config',
-            mock_check_changes_in_config)
+            pre_commit_hook,
+            'check_changes_in_config',
+            mock_check_changes_in_config,
+        )
         with package_lock_swap, package_lock_in_current_folder_swap:
             with check_config_swap, self.print_swap, self.assertRaisesRegex(
-                SystemExit, '1'):
+                SystemExit, '1'
+            ):
                 pre_commit_hook.main(args=[])
         self.assertTrue(
-            '-----------COMMIT ABORTED-----------' in self.print_arr)
+            '-----------COMMIT ABORTED-----------' in self.print_arr
+        )
         self.assertTrue(
-            check_function_calls['check_changes_in_config_is_called'])
+            check_function_calls['check_changes_in_config_is_called']
+        )
 
     def test_main_with_install_arg(self) -> None:
-        check_function_calls = {
-            'install_hook_is_called': False
-        }
+        check_function_calls = {'install_hook_is_called': False}
+
         def mock_install_hook() -> None:
             check_function_calls['install_hook_is_called'] = True
-        with self.swap(
-            pre_commit_hook, 'install_hook', mock_install_hook):
+
+        with self.swap(pre_commit_hook, 'install_hook', mock_install_hook):
             pre_commit_hook.main(args=['--install'])
 
     def test_main_without_install_arg_and_errors(self) -> None:
         check_function_calls = {
             'check_changes_in_config_is_called': False,
-            'check_npx_subprocess_is_called': False
+            'check_npx_subprocess_is_called': False,
         }
+
         def mock_func() -> bool:
             return False
+
         def mock_check_changes_in_config() -> None:
             check_function_calls['check_changes_in_config_is_called'] = True
+
         def mock_npx_subprocess(  # pylint: disable=unused-argument
-                cmds: List[str], check: bool) -> None:
+            cmds: List[str], check: bool
+        ) -> None:
             self.assertTrue(cmds[0].endswith('npx'))
             self.assertEqual(cmds[1], 'lint-staged')
             check_function_calls['check_npx_subprocess_is_called'] = True
 
         package_lock_swap = self.swap(
-            pre_commit_hook, 'does_diff_include_package_lock_file', mock_func)
+            pre_commit_hook, 'does_diff_include_package_lock_file', mock_func
+        )
         package_lock_in_current_folder_swap = self.swap(
             pre_commit_hook,
             'does_current_folder_contain_have_package_lock_file',
-            mock_func)
+            mock_func,
+        )
         check_config_swap = self.swap(
-            pre_commit_hook, 'check_changes_in_config',
-            mock_check_changes_in_config)
-        npx_subprocess_swap = self.swap(
-            subprocess, 'run', mock_npx_subprocess)
+            pre_commit_hook,
+            'check_changes_in_config',
+            mock_check_changes_in_config,
+        )
+        npx_subprocess_swap = self.swap(subprocess, 'run', mock_npx_subprocess)
         with package_lock_swap, package_lock_in_current_folder_swap:
             with check_config_swap, npx_subprocess_swap:
                 pre_commit_hook.main(args=[])
         self.assertTrue(
-            check_function_calls['check_changes_in_config_is_called'])
-        self.assertTrue(
-            check_function_calls['check_npx_subprocess_is_called'])
+            check_function_calls['check_changes_in_config_is_called']
+        )
+        self.assertTrue(check_function_calls['check_npx_subprocess_is_called'])

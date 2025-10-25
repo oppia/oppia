@@ -26,7 +26,7 @@ import {ExplorationDataService} from './exploration-data.service';
 import {AutosaveInfoModalsService} from './autosave-info-modals.service';
 import {AlertsService} from 'services/alerts.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
+import {TranslatedContent} from 'domain/exploration/translated-content.model';
 import {VoiceoverBackendDict} from 'domain/exploration/voiceover.model';
 
 class MockWindowRef {

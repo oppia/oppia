@@ -19,8 +19,9 @@
 from __future__ import annotations
 
 from core.tests import test_utils
-
-from extensions.interactions.InteractiveMap import InteractiveMap # pylint: disable=unused-import # isort: skip
+from extensions.interactions.InteractiveMap import (  # pylint: disable=unused-import
+    InteractiveMap,
+)
 
 
 class InteractiveMapTests(test_utils.GenericTestBase):
