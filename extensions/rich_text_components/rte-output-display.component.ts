@@ -338,6 +338,98 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       temporaryDivElement,
       sentenceRegex
     ) as HTMLDivElement;
+    // Ensure there's a visible space between adjacent inline elements
+    // (for example when two spans or an <a> and a <span> are adjacent).
+    // We avoid modifying preformatted blocks (<pre>) to preserve intentional
+    // whitespace. This DOM-level normalization is safer than regex on HTML
+    // and fixes edge-cases where adjacent inline tags have no intervening
+    // text node, causing words to be concatenated.
+    const INLINE_TAGS = new Set([
+      'SPAN',
+      'A',
+      'STRONG',
+      'EM',
+      'CODE',
+      'B',
+      'I',
+      'IMG',
+      'OPPIA-NONINTERACTIVE-LINK',
+      'OPPIA-NONINTERACTIVE-IMAGE',
+    ]);
+
+    const shouldSkip = (node: Node) => {
+      return node.nodeType === 1 && (node as Element).tagName === 'PRE';
+    };
+
+    const normalizeSpacingRecursive = (parent: Node) => {
+      if (shouldSkip(parent)) {
+        return;
+      }
+
+      // Iterate using a while loop because we may insert nodes which change
+      // the live NodeList length.
+      let i = 1;
+      while (i < parent.childNodes.length) {
+        const prev = parent.childNodes[i - 1];
+        const curr = parent.childNodes[i];
+
+        // If both are element nodes and inline-like, ensure a text node
+        // containing a single space exists between them.
+        if (
+          prev.nodeType === Node.ELEMENT_NODE &&
+          curr.nodeType === Node.ELEMENT_NODE &&
+          INLINE_TAGS.has((prev as Element).tagName) &&
+          INLINE_TAGS.has((curr as Element).tagName)
+        ) {
+          // Insert a text node with a single space before curr.
+          parent.insertBefore(document.createTextNode(' '), curr);
+          i += 2; // skip over the inserted text node and curr
+          continue;
+        }
+
+        // If previous is an element and current is a text node, ensure the
+        // text node starts with whitespace.
+        if (
+          prev.nodeType === Node.ELEMENT_NODE &&
+          curr.nodeType === Node.TEXT_NODE &&
+          INLINE_TAGS.has((prev as Element).tagName)
+        ) {
+          if (!/^\s/.test(curr.nodeValue || '')) {
+            parent.insertBefore(document.createTextNode(' '), curr);
+            i += 2;
+            continue;
+          }
+        }
+
+        // If previous is a text node and current is an element, ensure the
+        // previous text node ends with whitespace.
+        if (
+          prev.nodeType === Node.TEXT_NODE &&
+          curr.nodeType === Node.ELEMENT_NODE &&
+          INLINE_TAGS.has((curr as Element).tagName)
+        ) {
+          if (!/\s$/.test(prev.nodeValue || '')) {
+            // Append a space text node right before curr.
+            parent.insertBefore(document.createTextNode(' '), curr);
+            i += 2;
+            continue;
+          }
+        }
+
+        i++;
+      }
+
+      // Recurse into element children.
+      for (let j = 0; j < parent.childNodes.length; j++) {
+        const child = parent.childNodes[j];
+        if (child.nodeType === Node.ELEMENT_NODE) {
+          normalizeSpacingRecursive(child);
+        }
+      }
+    };
+
+    normalizeSpacingRecursive(finalDivElement);
+
     // eslint-disable-next-line oppia/no-inner-html
     return finalDivElement.innerHTML;
   }
