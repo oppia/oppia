@@ -462,6 +462,13 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     // the sentence during voiceover playback.
     if (this.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()) {
       this.rteString = this.wrapSentencesInSpansForHighlighting(this.rteString);
+    } else {
+      // Even when the automatic voiceover regeneration feature is disabled,
+      // ensure spacing between inline elements is preserved. This handles
+      // cases where newline removal or earlier transformations produced
+      // adjacent inline tags with no whitespace and prevents words from
+      // concatenating in the editor.
+      this.rteString = this.normalizeSpacingInHtml(this.rteString);
     }
 
     let domparser = new DOMParser();
@@ -511,6 +518,91 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
           }
         });
     });
+  }
+
+  // Normalizes spacing in arbitrary HTML by ensuring a single space exists
+  // between adjacent inline elements, and avoids changing <pre> blocks.
+  private normalizeSpacingInHtml(htmlString: string): string {
+    const temporaryDivElement = document.createElement('div');
+    // eslint-disable-next-line oppia/no-inner-html
+    temporaryDivElement.innerHTML = htmlString;
+
+    const INLINE_TAGS = new Set([
+      'SPAN',
+      'A',
+      'STRONG',
+      'EM',
+      'CODE',
+      'B',
+      'I',
+      'IMG',
+      'OPPIA-NONINTERACTIVE-LINK',
+      'OPPIA-NONINTERACTIVE-IMAGE',
+    ]);
+
+    const shouldSkip = (node: Node) => {
+      return node.nodeType === 1 && (node as Element).tagName === 'PRE';
+    };
+
+    const normalizeSpacingRecursive = (parent: Node) => {
+      if (shouldSkip(parent)) {
+        return;
+      }
+
+      let i = 1;
+      while (i < parent.childNodes.length) {
+        const prev = parent.childNodes[i - 1];
+        const curr = parent.childNodes[i];
+
+        if (
+          prev.nodeType === Node.ELEMENT_NODE &&
+          curr.nodeType === Node.ELEMENT_NODE &&
+          INLINE_TAGS.has((prev as Element).tagName) &&
+          INLINE_TAGS.has((curr as Element).tagName)
+        ) {
+          parent.insertBefore(document.createTextNode(' '), curr);
+          i += 2;
+          continue;
+        }
+
+        if (
+          prev.nodeType === Node.ELEMENT_NODE &&
+          curr.nodeType === Node.TEXT_NODE &&
+          INLINE_TAGS.has((prev as Element).tagName)
+        ) {
+          if (!/^\s/.test(curr.nodeValue || '')) {
+            parent.insertBefore(document.createTextNode(' '), curr);
+            i += 2;
+            continue;
+          }
+        }
+
+        if (
+          prev.nodeType === Node.TEXT_NODE &&
+          curr.nodeType === Node.ELEMENT_NODE &&
+          INLINE_TAGS.has((curr as Element).tagName)
+        ) {
+          if (!/\s$/.test(prev.nodeValue || '')) {
+            parent.insertBefore(document.createTextNode(' '), curr);
+            i += 2;
+            continue;
+          }
+        }
+
+        i++;
+      }
+
+      for (let j = 0; j < parent.childNodes.length; j++) {
+        const child = parent.childNodes[j];
+        if (child.nodeType === Node.ELEMENT_NODE) {
+          normalizeSpacingRecursive(child);
+        }
+      }
+    };
+
+    normalizeSpacingRecursive(temporaryDivElement);
+    // eslint-disable-next-line oppia/no-inner-html
+    return temporaryDivElement.innerHTML;
   }
 
   isAutomaticVoiceoverRegenerationFromExpFeatureEnabled(): boolean {
