@@ -1,6 +1,6 @@
 Thanks for your interest in contributing to the Oppia project, and making it easier for students to learn online in an effective and enjoyable way!
 
-There are lots of ways to help out and become an Oppia contributor, from joining our team of lesson creators to fixing a bug in the [codebase](https://github.com/oppia/oppia/). Don't worry if you're new to "open source", or if you're still a student -- many of our contributors are, too, and we'd be happy to provide mentorship and support if this is your first time contributing to an open source project. The main thing is that you care deeply about helping people around the world to learn things better, and that you're responsible and reliable.
+There are many ways to help out and become an Oppia contributor, from joining our team of lesson creators to fixing a bug in the [codebase](https://github.com/oppia/oppia/). Don't worry if you're new to open source or if you're still a student—many of our contributors are, too. We're happy to provide mentorship and support if this is your first time contributing to an open-source project. The most important thing is caring deeply about helping people around the world learn more effectively and being responsible and reliable.
 
 To make it easier to get started, we've catalogued some of the different ways to help out. Please feel free to take a look through them, and see if any interest you:
 
