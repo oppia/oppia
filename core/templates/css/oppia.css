@@ -298,6 +298,30 @@ html {
   */
   scroll-behavior: auto !important;
 }
+/* Override Bootstrap 5's .row rule */
+.row > * {
+  padding-right: 0 !important;
+  padding-left: 0 !important;
+  margin-top: 0 !important;
+}
+
+.row {
+  --bs-gutter-x: 0;
+  --bs-gutter-y: 0;
+}
+
+.nav-link {
+  display: block;
+  padding: 0.5rem 1rem;           
+}
+
+.btn-close{
+  width: auto;
+  height: auto;
+  padding: 0.25em !important;
+  line-height: 1;
+  font-weight: 700;
+}
 
 body {
   background-color: #e8e7e3;
