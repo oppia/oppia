@@ -300,9 +300,9 @@ html {
 }
 /* Override Bootstrap 5's .row rule */
 .row > * {
+  margin-top: 0 !important;
   padding-left: 0 !important;
   padding-right: 0 !important;
-  margin-top: 0 !important;
 }
 
 .row {
