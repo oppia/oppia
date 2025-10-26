@@ -300,8 +300,8 @@ html {
 }
 /* Override Bootstrap 5's .row rule */
 .row > * {
-  padding-right: 0 !important;
   padding-left: 0 !important;
+  padding-right: 0 !important;
   margin-top: 0 !important;
 }
 
@@ -310,17 +310,12 @@ html {
   --bs-gutter-y: 0;
 }
 
-.nav-link {
-  display: block;
-  padding: 0.5rem 1rem;           
-}
-
-.btn-close{
-  width: auto;
-  height: auto;
-  padding: 0.25em !important;
-  line-height: 1;
+.btn-close {
   font-weight: 700;
+  height: auto;
+  line-height: 1;
+  padding: 0.25em !important;
+  width: auto;
 }
 
 body {
@@ -814,6 +809,7 @@ textarea {
 .nav-link {
   display: block;
   font-size: 14px;
+  padding: 0.5rem 1rem;
   position: relative;
 }
 .oppia-navbar-nav > .nav-link {
