@@ -255,10 +255,11 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
 
           if (sentence === currentSentenceToMatch) {
             if (spanNodeList.length > 0) {
-              let spaceElement = document.createElement('span');
-              // eslint-disable-next-line oppia/no-inner-html
-              spaceElement.innerHTML = ' ';
-              spanNodeList.push(spaceElement);
+              // Use a plain text node for spacing. Using an extra span for a
+              // single space can be ignored by some rendering/whitespace
+              // normalization; a text node ensures the browser treats it as
+              // a real whitespace character between nodes.
+              spanNodeList.push(document.createTextNode(' '));
             }
             spanNodeList.push(spanTagElement);
             spanTagElement = document.createElement('span');
@@ -359,7 +360,11 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     // There is no other via user input to get <p></p>, so this wouldn't
     // affect any other data.
     this.rteString = this.rteString.replace(/<p><\/p>/g, '<p>&nbsp;</p>');
-    this.rteString = this.rteString.replace(/\n/g, '');
+    // Preserve meaningful spacing: replace newlines with a single space
+    // instead of removing them. Removing newlines can collapse whitespace
+    // between inline elements (for example between a link tag and following
+    // text), causing paragraphs or sentences to join without a space.
+    this.rteString = this.rteString.replace(/\n/g, ' ');
 
     // The following line wraps each sentence in a span tag to highlight
     // the sentence during voiceover playback.
