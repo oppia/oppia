@@ -22,6 +22,9 @@ import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {PlayerPositionService} from '../../services/player-position.service';
 import './flag-lesson-modal.component.css';
 import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
+import {PageContextService} from 'services/page-context.service';
+import {LearnerLocalNavBackendApiService} from 'pages/exploration-player-page/services/learner-local-nav-backend-api.service';
+import {AlertsService} from 'services/alerts.service';
 
 export interface FlagExplorationModalResult {
   report_type: boolean;
@@ -41,11 +44,15 @@ export class NewFlagExplorationModalComponent {
   flagMessage!: string;
   flagMessageTextareaIsShown: boolean = false;
   flag: boolean = false;
+  thankYouModalIsShown: boolean = false;
 
   constructor(
     @Optional() private ngbActiveModal: NgbActiveModal,
     @Optional() private bottomSheetRef: MatBottomSheetRef,
     private focusManagerService: FocusManagerService,
+    private pageContextService: PageContextService,
+    private learnerLocalNavBackendApiService: LearnerLocalNavBackendApiService,
+    private alertsService: AlertsService,
     private playerPositionService: PlayerPositionService
   ) {}
 
@@ -57,20 +64,23 @@ export class NewFlagExplorationModalComponent {
   }
 
   submitReport(): void {
+    const explorationId = this.pageContextService.getExplorationId();
     if (this.flagMessageTextareaIsShown) {
-      if (this.bottomSheetRef) {
-        this.bottomSheetRef.dismiss({
-          report_type: this.flag,
-          report_text: this.flagMessage,
-          state: this.playerPositionService.getCurrentStateName(),
-        });
-      } else if (this.ngbActiveModal) {
-        this.ngbActiveModal.close({
-          report_type: this.flag,
-          report_text: this.flagMessage,
-          state: this.playerPositionService.getCurrentStateName(),
-        });
-      }
+      const result: FlagExplorationModalResult = {
+        report_type: this.flag,
+        report_text: this.flagMessage,
+        state: this.playerPositionService.getCurrentStateName(),
+      };
+      this.learnerLocalNavBackendApiService
+        .postReportAsync(explorationId, result)
+        .then(
+          () => {},
+          error => {
+            this.alertsService.addWarning(error);
+          }
+        );
+
+      this.thankYouModalIsShown = true;
     }
   }
 

@@ -36,6 +36,7 @@ import {KeyboardShortcutService} from 'services/keyboard-shortcut.service';
 import {PageTitleService} from 'services/page-title.service';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {MobileMenuService} from 'pages/exploration-player-page/services/mobile-menu.service';
 import {ContentTranslationManagerService} from '../services/content-translation-manager.service';
 import {ContentTranslationLanguageService} from '../services/content-translation-language.service';
 import {PlayerTranscriptService} from '../services/player-transcript.service';
@@ -97,6 +98,7 @@ describe('New Lesson Player Page', () => {
   let explorationPermissionsBackendApiService: ExplorationPermissionsBackendApiService;
   let entityVoiceoversService: EntityVoiceoversService;
   let urlService: UrlService;
+  let mobileMenuService: MobileMenuService;
   let translateService: TranslateService;
   let ngbModal: NgbModal;
   let i18nService: I18nService;
@@ -128,6 +130,7 @@ describe('New Lesson Player Page', () => {
     fixture = TestBed.createComponent(NewLessonPlayerPageComponent);
     componentInstance = fixture.componentInstance;
     pageContextService = TestBed.inject(PageContextService);
+    mobileMenuService = TestBed.inject(MobileMenuService);
     keyboardShortcutService = TestBed.inject(KeyboardShortcutService);
     metaTagCustomizationService = TestBed.inject(MetaTagCustomizationService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
@@ -154,6 +157,16 @@ describe('New Lesson Player Page', () => {
 
   it('should create', () => {
     expect(componentInstance).toBeDefined();
+  });
+
+  it('should return sidebar expanded state from mobileMenuService', () => {
+    spyOn(mobileMenuService, 'getSidebarIsExpanded').and.returnValue(true);
+    expect(componentInstance.getSidebarIsExpanded()).toBe(true);
+
+    (mobileMenuService.getSidebarIsExpanded as jasmine.Spy).and.returnValue(
+      false
+    );
+    expect(componentInstance.getSidebarIsExpanded()).toBe(false);
   });
 
   it('should initialize component successfully', fakeAsync(() => {
