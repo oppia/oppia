@@ -270,20 +270,21 @@ export class OpportunitiesListComponent {
           pageNumber,
           this.more
         );
+        this.activePageNumber = pageNumber;
       });
     } else {
       this.visibleOpportunities = this.opportunities.slice(
         startIndex,
         endIndex
       );
+      this.userIsOnLastPage = this.calculateUserIsOnLastPage(
+        this.opportunities,
+        this.OPPORTUNITIES_PAGE_SIZE,
+        pageNumber,
+        this.more
+      );
+      this.activePageNumber = pageNumber;
     }
-    this.userIsOnLastPage = this.calculateUserIsOnLastPage(
-      this.opportunities,
-      this.OPPORTUNITIES_PAGE_SIZE,
-      pageNumber,
-      this.more
-    );
-    this.activePageNumber = pageNumber;
   }
 
   calculateUserIsOnLastPage(
