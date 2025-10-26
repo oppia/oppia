@@ -926,7 +926,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             )
             mock_changed_branch.return_value.current_branch = 'feature-branch'
 
-            pre_push_hook.main()
+            pre_push_hook.main([])
 
             mock_execute_mypy.assert_not_called()
 
