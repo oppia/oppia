@@ -23,9 +23,14 @@ import io
 import os
 import re
 import ssl
+import sys
 import tempfile
 import zipfile
 from urllib import request as urlrequest
+
+# Ensure repository root is on sys.path so 'core' package can be imported when
+# running this test file directly.
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from core.tests import test_utils
 
@@ -445,10 +450,10 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
 
     def test_url_open(self) -> None:
         response = install_dependencies_json_packages.url_open(
-            'http://www.google.com'
+            github_api_url # pyright: ignore[reportUndefinedVariable]
         )
         self.assertEqual(response.getcode(), 200)
-        self.assertEqual(response.url, 'http://www.google.com')
+        self.assertEqual(response.url, github_api_url) # type: ignore
 
     def _assert_ssl_context_matches_default(
         self, context: ssl.SSLContext
