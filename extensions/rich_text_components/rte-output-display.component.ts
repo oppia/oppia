@@ -361,6 +361,29 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       return node.nodeType === 1 && (node as Element).tagName === 'PRE';
     };
 
+    // Remove comment nodes (Angular's bindings can leave comment nodes like
+    // <!--bindings=...-->). They don't affect rendering but can split text
+    // nodes and interfere with whitespace normalization, so remove them
+    // except inside <pre> blocks where comments might be significant.
+    const removeCommentNodesRecursive = (parent: Node) => {
+      if (shouldSkip(parent)) {
+        return;
+      }
+      for (let k = 0; k < parent.childNodes.length; k++) {
+        const child = parent.childNodes[k];
+        if (child.nodeType === Node.COMMENT_NODE) {
+          parent.removeChild(child);
+          k--;
+          continue;
+        }
+        if (child.nodeType === Node.ELEMENT_NODE) {
+          removeCommentNodesRecursive(child);
+        }
+      }
+    };
+
+    removeCommentNodesRecursive(temporaryDivElement);
+
     const normalizeSpacingRecursive = (parent: Node) => {
       if (shouldSkip(parent)) {
         return;
