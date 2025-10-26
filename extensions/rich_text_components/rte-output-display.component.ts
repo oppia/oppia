@@ -344,17 +344,38 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     // whitespace. This DOM-level normalization is safer than regex on HTML
     // and fixes edge-cases where adjacent inline tags have no intervening
     // text node, causing words to be concatenated.
-    const INLINE_TAGS = new Set([
-      'SPAN',
-      'A',
-      'STRONG',
-      'EM',
-      'CODE',
-      'B',
-      'I',
-      'IMG',
-      'OPPIA-NONINTERACTIVE-LINK',
-      'OPPIA-NONINTERACTIVE-IMAGE',
+    // Treat common block-level tags specially and assume other tags are
+    // inline-like. This is more robust than an explicit whitelist of
+    // inline tags because custom Oppia tags may be inline and were
+    // previously missed. We only avoid inserting spaces between block
+    // elements to prevent accidental layout changes.
+    const BLOCK_TAGS = new Set([
+      'DIV',
+      'P',
+      'PRE',
+      'OL',
+      'UL',
+      'LI',
+      'TABLE',
+      'TBODY',
+      'TR',
+      'TD',
+      'TH',
+      'H1',
+      'H2',
+      'H3',
+      'H4',
+      'H5',
+      'H6',
+      'BLOCKQUOTE',
+      'SECTION',
+      'HEADER',
+      'FOOTER',
+      'NAV',
+      'ASIDE',
+      // Common Oppia noninteractive components that are block-level.
+      'OPPIA-NONINTERACTIVE-COLLAPSIBLE',
+      'OPPIA-NONINTERACTIVE-WORKEDEXAMPLE',
     ]);
 
     const shouldSkip = (node: Node) => {
@@ -401,8 +422,9 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         if (
           prev.nodeType === Node.ELEMENT_NODE &&
           curr.nodeType === Node.ELEMENT_NODE &&
-          INLINE_TAGS.has((prev as Element).tagName) &&
-          INLINE_TAGS.has((curr as Element).tagName)
+          // Insert a space only when neither element is a block-level tag.
+          !BLOCK_TAGS.has((prev as Element).tagName) &&
+          !BLOCK_TAGS.has((curr as Element).tagName)
         ) {
           // Insert a text node with a single space before curr.
           parent.insertBefore(document.createTextNode(' '), curr);
@@ -415,7 +437,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         if (
           prev.nodeType === Node.ELEMENT_NODE &&
           curr.nodeType === Node.TEXT_NODE &&
-          INLINE_TAGS.has((prev as Element).tagName)
+          !BLOCK_TAGS.has((prev as Element).tagName)
         ) {
           if (!/^\s/.test(curr.nodeValue || '')) {
             parent.insertBefore(document.createTextNode(' '), curr);
@@ -429,7 +451,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         if (
           prev.nodeType === Node.TEXT_NODE &&
           curr.nodeType === Node.ELEMENT_NODE &&
-          INLINE_TAGS.has((curr as Element).tagName)
+          !BLOCK_TAGS.has((curr as Element).tagName)
         ) {
           if (!/\s$/.test(prev.nodeValue || '')) {
             // Append a space text node right before curr.
@@ -550,17 +572,38 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     // eslint-disable-next-line oppia/no-inner-html
     temporaryDivElement.innerHTML = htmlString;
 
-    const INLINE_TAGS = new Set([
-      'SPAN',
-      'A',
-      'STRONG',
-      'EM',
-      'CODE',
-      'B',
-      'I',
-      'IMG',
-      'OPPIA-NONINTERACTIVE-LINK',
-      'OPPIA-NONINTERACTIVE-IMAGE',
+    // Treat common block-level tags specially and assume other tags are
+    // inline-like. This is more robust than an explicit whitelist of
+    // inline tags because custom Oppia tags may be inline and were
+    // previously missed. We only avoid inserting spaces between block
+    // elements to prevent accidental layout changes.
+    const BLOCK_TAGS = new Set([
+      'DIV',
+      'P',
+      'PRE',
+      'OL',
+      'UL',
+      'LI',
+      'TABLE',
+      'TBODY',
+      'TR',
+      'TD',
+      'TH',
+      'H1',
+      'H2',
+      'H3',
+      'H4',
+      'H5',
+      'H6',
+      'BLOCKQUOTE',
+      'SECTION',
+      'HEADER',
+      'FOOTER',
+      'NAV',
+      'ASIDE',
+      // Common Oppia noninteractive components that are block-level.
+      'OPPIA-NONINTERACTIVE-COLLAPSIBLE',
+      'OPPIA-NONINTERACTIVE-WORKEDEXAMPLE',
     ]);
 
     const shouldSkip = (node: Node) => {
@@ -580,8 +623,8 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         if (
           prev.nodeType === Node.ELEMENT_NODE &&
           curr.nodeType === Node.ELEMENT_NODE &&
-          INLINE_TAGS.has((prev as Element).tagName) &&
-          INLINE_TAGS.has((curr as Element).tagName)
+          !BLOCK_TAGS.has((prev as Element).tagName) &&
+          !BLOCK_TAGS.has((curr as Element).tagName)
         ) {
           parent.insertBefore(document.createTextNode(' '), curr);
           i += 2;
@@ -591,7 +634,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         if (
           prev.nodeType === Node.ELEMENT_NODE &&
           curr.nodeType === Node.TEXT_NODE &&
-          INLINE_TAGS.has((prev as Element).tagName)
+          !BLOCK_TAGS.has((prev as Element).tagName)
         ) {
           if (!/^\s/.test(curr.nodeValue || '')) {
             parent.insertBefore(document.createTextNode(' '), curr);
@@ -603,7 +646,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         if (
           prev.nodeType === Node.TEXT_NODE &&
           curr.nodeType === Node.ELEMENT_NODE &&
-          INLINE_TAGS.has((curr as Element).tagName)
+          !BLOCK_TAGS.has((curr as Element).tagName)
         ) {
           if (!/\s$/.test(prev.nodeValue || '')) {
             parent.insertBefore(document.createTextNode(' '), curr);
