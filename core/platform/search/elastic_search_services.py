@@ -49,12 +49,12 @@ class ElasticSearchClient:
         """Creates and returns elastic search client."""
         if self._client is None:
             with datastore_services.get_ndb_context():
-                es_cloud_id = (
+                es_cloud_id:Optional[str]= (
                     platform_parameter_services.get_platform_parameter_value(
                         platform_parameter_list.ParamName.ES_CLOUD_ID.value
                     )
                 )
-                es_username = (
+                es_username:Optional[str]= (
                     platform_parameter_services.get_platform_parameter_value(
                         platform_parameter_list.ParamName.ES_USERNAME.value
                     )
@@ -70,12 +70,12 @@ class ElasticSearchClient:
                         ),
                         timeout=300
                     )
-                else:    
-                    #This Reassigns cloud_id to have values from local_env
-                    es_cloud_id = feconf.ES_CLOUD_ID 
+                else:
+                    # This reassigns cloud_id to use values from the local environment.
+                    es_cloud_id = feconf.ES_CLOUD_ID
                     es_username = feconf.ES_USERNAME
                     es_password = feconf.ES_PASSWORD
-                    #If cloud Id is assigned in local feconf.  
+                    # If cloud Id is assigned in local feconf.
                     if es_cloud_id:
                         self._client = elasticsearch.Elasticsearch(
                             hosts=None,
@@ -86,7 +86,7 @@ class ElasticSearchClient:
                             ),
                             timeout=300
                         )
-                    #Else we use the localhost enviourment and no cloud_id and username    
+                    # Else we use the localhost enviourment and no cloud_id and username.
                     else:
                         self._client = elasticsearch.Elasticsearch(
                             hosts=(

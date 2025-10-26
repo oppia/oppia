@@ -29,13 +29,14 @@ from core.platform import models
 
 from typing import Any, Dict, List
 
-secrets_services=models.Registry.import_search_services()
+secrets_services= models.Registry.import_search_services()
 
 class ElasticSearchPureUnitTests(unittest.TestCase):
-    
+
+
     def setUp(self) -> None:
         """Set up for each test - no web framework involved."""
-        # Clear the elasticsearch client before each test
+        # Clear the elasticsearch client before each test.
         elastic_search_services.ES._client = None
 
     def tearDown(self) -> None:
@@ -44,30 +45,30 @@ class ElasticSearchPureUnitTests(unittest.TestCase):
 
     def test_creates_elastic_search_client_with_cloud_config(self) -> None:
         """Tests elastic search client with cloud config."""
-        # Mock platform parameters
+        if not secrets_services:
+            self.skipTest('Skipping test related to cloud-config - no secret services available in this environment')
+            return 
+        # Mock platform parameters.
         with unittest.mock.patch.object(
             platform_parameter_services,
             'get_platform_parameter_value',
             lambda param_name: {
                 'es_cloud_id': 'test_cloud_id',
                 'es_username': 'test_username',
-
             }.get(param_name, None)
         ):
-            # Mock secrets service
+            # Mock secrets service.
             with unittest.mock.patch.object(
                 secrets_services,
                 'get_secret',
                 lambda secret_name: 'test_password'
             ):
-                # Mock the actual Elasticsearch constructor to avoid real connections
+                # Mock the actual Elasticsearch constructor to avoid real connections.
                 with unittest.mock.patch('elasticsearch.Elasticsearch') as mock_es:
                     mock_es.return_value = unittest.mock.Mock()
-                    
                     client = elastic_search_services.ES.get_client()
                     self.assertIsNotNone(client)
-                    
-                    # Verify Elasticsearch was called with correct cloud parameters
+                    # Verify Elasticsearch was called with correct cloud parameters.
                     mock_es.assert_called_once_with(
                         hosts=None,
                         cloud_id='test_cloud_id',
@@ -77,25 +78,22 @@ class ElasticSearchPureUnitTests(unittest.TestCase):
 
     def test_creates_elastic_search_client_with_local_config(self) -> None:
         """Test Creates Elastic Search Client with feconf local config."""
-        # Mock feconf values
+        # Mock feconf values.
         with unittest.mock.patch.object(feconf, 'ES_CLOUD_ID', 'local-cloud-id'):
             with unittest.mock.patch.object(feconf, 'ES_USERNAME', 'local_username'):
                 with unittest.mock.patch.object(feconf, 'ES_PASSWORD', 'local-password'):
-                    # Mock platform parameters to return None
+                    # Mock platform parameters.
                     with unittest.mock.patch.object(
                         platform_parameter_services,
                         'get_platform_parameter_value',
                         lambda param_name: None
                     ):
-                        # Mock the actual Elasticsearch constructor
+                        # Mock the actual Elasticsearch constructor.
                         with unittest.mock.patch('elasticsearch.Elasticsearch') as mock_es:
                             mock_es.return_value = unittest.mock.Mock()
-                            
-                            # FIX: Use ES instance, not ElasticSearchClient class
                             client = elastic_search_services.ES.get_client()
                             self.assertIsNotNone(client)
-                            
-                            # Verify Elasticsearch was called with correct local cloud parameters
+                            # Verify Elasticsearch was called with correct local cloud parameters.
                             mock_es.assert_called_once_with(
                                 hosts=None,
                                 cloud_id='local-cloud-id',
@@ -105,25 +103,22 @@ class ElasticSearchPureUnitTests(unittest.TestCase):
 
     def test_creates_elastic_search_client_with_local_docker_config(self) -> None:
         """Test Creates Elastic Search Client with local docker Config."""
-        # Mock feconf values for local docker
+        # Mock feconf values for local docker.
         with unittest.mock.patch.object(feconf, 'ES_CLOUD_ID', None):
             with unittest.mock.patch.object(feconf, 'ES_USERNAME', None):
                 with unittest.mock.patch.object(feconf, 'ES_PASSWORD', None):
-                    # Mock platform parameters to return None
+                    # Mock platform parameters.
                     with unittest.mock.patch.object(
                         platform_parameter_services,
                         'get_platform_parameter_value',
                         lambda param_name: None
                     ):
-                        # Mock the actual Elasticsearch constructor
+                        # Mock the actual elasticsearch constructor.
                         with unittest.mock.patch('elasticsearch.Elasticsearch') as mock_es:
                             mock_es.return_value = unittest.mock.Mock()
-                            
-                            # FIX: Use ES instance, not ElasticSearchClient class
                             client = elastic_search_services.ES.get_client()
                             self.assertIsNotNone(client)
-                            
-                            # Verify Elasticsearch was called with correct local docker parameters
+                            # Verify Elasticsearch was called with correct local docker parameters.
                             mock_es.assert_called_once_with(
                                 hosts='http://localhost:9200',
                                 cloud_id=None,
