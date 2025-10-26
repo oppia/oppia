@@ -96,26 +96,27 @@ export class HomeTabComponent {
     }
 
     // TODO(#18384): Test cases - current lesson is last lesson.
-    for (let i = 0; i < this.continueWhereYouLeftOffList.length; i++) {
-      let currentStorySummary =
-        this.continueWhereYouLeftOffList[i].getCanonicalStorySummaryDicts();
-      for (let j = 0; j < currentStorySummary.length; j++) {
-        const publishedNodes = currentStorySummary[j]
+    for (const topic of this.partiallyLearntTopicsList) {
+      const storySummaries = topic.getCanonicalStorySummaryDicts();
+
+      for (const story of storySummaries) {
+        const publishedNodes = story
           .getAllNodes()
           .filter(node => node.getPublishedStatus());
-
-        const completedNodes = currentStorySummary[j].getCompletedNodeTitles();
+        const completedNodes = story.getCompletedNodeTitles();
         const remainingPublished =
-          publishedNodes.length - completedNodes.length;
-        if (this.hasMultipleUnfinishedPublished !== true) {
-          this.hasMultipleUnfinishedPublished =
-            publishedNodes.length > 1 && remainingPublished > 0;
+          publishedNodes.length - completedNodes.length - 1;
+
+        if (
+          remainingPublished > 0 &&
+          remainingPublished < publishedNodes.length
+        ) {
+          this.storySummariesWithAvailableNodes.add(story.getId());
         }
 
-        if (publishedNodes.length - 1 > completedNodes.length) {
-          this.storySummariesWithAvailableNodes.add(
-            currentStorySummary[j].getId()
-          );
+        if (!this.hasMultipleUnfinishedPublished) {
+          this.hasMultipleUnfinishedPublished =
+            publishedNodes.length > 1 && remainingPublished > 0;
         }
       }
     }
