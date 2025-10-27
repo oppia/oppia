@@ -22,11 +22,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {
-  FetchExplorationBackendResponse,
-  ReadOnlyExplorationBackendApiService,
-} from 'domain/exploration/read-only-exploration-backend-api.service';
-import {PageContextService} from 'services/page-context.service';
 import {ExplorationEngineService} from './exploration-engine.service';
 import {PlayerTranscriptService} from './player-transcript.service';
 
@@ -38,26 +33,36 @@ export class CheckpointProgressService {
   visitedCheckpointStateNames: string[] = [];
 
   constructor(
-    private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
-    private pageContextService: PageContextService,
     private playerTranscriptService: PlayerTranscriptService,
     private explorationEngineService: ExplorationEngineService
   ) {}
 
-  async fetchCheckpointCount(): Promise<number> {
-    const explorationId = this.pageContextService.getExplorationId();
-    return this.readOnlyExplorationBackendApiService
-      .fetchExplorationAsync(explorationId, null)
-      .then((response: FetchExplorationBackendResponse) => {
-        const expStates = response.exploration.states;
-        let count = 0;
-        for (let [, value] of Object.entries(expStates)) {
-          if (value.card_is_checkpoint) {
-            count++;
-          }
-        }
-        return count;
-      });
+  getCheckpointStates(): number[] {
+    const depthGraph = this.explorationEngineService.extractDepthGraph();
+    const expStates = this.explorationEngineService
+      .getExploration()
+      .states.getStates();
+    let checkpointIndexes: number[] = [];
+    for (let value of expStates) {
+      if (value.cardIsCheckpoint && value.name !== null) {
+        checkpointIndexes.push(depthGraph[value.name]);
+      }
+    }
+    checkpointIndexes.sort((a, b) => a - b);
+    return checkpointIndexes;
+  }
+
+  fetchCheckpointCount(): number {
+    const expStates = this.explorationEngineService
+      .getExploration()
+      .states.getStates();
+    let count = 0;
+    for (let value of expStates) {
+      if (value.cardIsCheckpoint) {
+        count++;
+      }
+    }
+    return count;
   }
 
   getMostRecentlyReachedCheckpointIndex(): number {
