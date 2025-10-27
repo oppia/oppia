@@ -39,7 +39,7 @@ describe('InteractiveCodeReplComponent', () => {
   let currentInteractionService: CurrentInteractionService;
 
   class mockInteractionAttributesExtractorService {
-    getValuesFromAttributes(interactionId, attributes) {
+    getValuesFromAttributes(interactionId: any, attributes: any) {
       return {
         language: attributes.languageWithValue,
         placeholder: attributes.placeholderWithValue,
@@ -57,8 +57,11 @@ describe('InteractiveCodeReplComponent', () => {
   }
 
   let mockCurrentInteractionService = {
-    onSubmit: (answer, rulesService) => {},
-    registerCurrentInteraction: (submitAnswerFn, validateExpressionFn) => {
+    onSubmit: (answer: any, rulesService: any) => {},
+    registerCurrentInteraction: (
+      submitAnswerFn: any,
+      validateExpressionFn: any
+    ) => {
       submitAnswerFn();
     },
   };
@@ -205,37 +208,33 @@ describe('InteractiveCodeReplComponent', () => {
     }).toThrowError('module test not found');
   });
 
-  it(
-    'should customize editor with editor options when the exploration player' +
-      ' loads',
-    () => {
-      let cm = {
-        replaceSelection: spaces => {
-          expect(spaces).toBe('  ');
-          expect(spaces.length).toBe(2);
-        },
-        getDoc: () => {
-          return {
-            setCursor: pos => {
-              expect(pos).toBe(2);
-            },
-            getCursor: loc => {
-              if (loc === 'head') {
-                return 2;
-              }
-            },
-          };
-        },
-        getOption: opt => {
-          if (opt === 'indentUnit') {
-            return 2;
-          }
-        },
-      } as unknown as CodeMirror.Editor;
+  it('should customize editor with editor options when the exploration player loads', () => {
+    let cm = {
+      replaceSelection: (spaces: string) => {
+        expect(spaces).toBe('  ');
+        expect(spaces.length).toBe(2);
+      },
+      getDoc: () => {
+        return {
+          setCursor: (pos: number) => {
+            expect(pos).toBe(2);
+          },
+          getCursor: (loc: string) => {
+            if (loc === 'head') {
+              return 2;
+            }
+          },
+        };
+      },
+      getOption: (opt: string) => {
+        if (opt === 'indentUnit') {
+          return 2;
+        }
+      },
+    } as unknown as CodeMirror.Editor;
 
-      component.editorOptions.extraKeys.Tab(cm);
-    }
-  );
+    component.editorOptions.extraKeys.Tab(cm);
+  });
 
   it('should run code and submit code when user submits code', fakeAsync(() => {
     spyOn(Sk, 'importMainWithBody').and.returnValue({});
@@ -263,7 +262,6 @@ describe('InteractiveCodeReplComponent', () => {
     // This throws "Argument of type '() => Promise<never>' is not assignable
     // to parameter of type 'never'" We need to suppress this error because the
     // the error case needs to be tested.
-    // @ts-expect-error
     spyOn(Sk.misceval, 'asyncToPromise').and.callFake(() => {
       return Promise.reject('Error');
     });

@@ -255,7 +255,7 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/diagnostic-test-player-page/diagnostic-test-player.component.spec.ts',
     'core/templates/pages/exploration-editor-page/editor-tab/state-name-editor/state-name-editor.component.spec.ts',
     'core/templates/pages/exploration-editor-page/editor-tab/state-version-history/state-version-history.component.spec.ts',
-    'core/templates/pages/exploration-editor-page/editor-tab/templates/modal-templates/customize-interaction-modal.component.ts',
+    # 'core/templates/pages/exploration-editor-page/editor-tab/templates/modal-templates/customize-interaction-modal.component.ts',
     'core/templates/pages/exploration-editor-page/editor-tab/templates/modal-templates/teach-oppia-modal.component.spec.ts',
     'core/templates/pages/exploration-editor-page/editor-tab/training-panel/training-modal.component.ts',
     'core/templates/pages/exploration-editor-page/history-tab/services/compare-versions.service.spec.ts',
