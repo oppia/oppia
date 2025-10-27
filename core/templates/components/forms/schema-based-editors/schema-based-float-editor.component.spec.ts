@@ -35,10 +35,6 @@ import {NumberConversionService} from 'services/number-conversion.service';
 class MockFocusManagerService {
   setFocusWithoutScroll(value: string) {}
 
-  generateFocusLabel(): string {
-    return 'FocusLabel';
-  }
-
   setFocus(value: string) {}
 }
 
@@ -105,7 +101,6 @@ describe('Schema based float editor component', function () {
     expect(component.localValue).toBe(0.0);
     expect(component.localStringValue).toBe('');
     expect(component.checkRequireNonnegativeInputValue).toBe(true);
-    expect(component.labelForErrorFocusTarget).toBe('FocusLabel');
     expect(component.minValue).toBe(0);
 
     tick();
