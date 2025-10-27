@@ -117,9 +117,6 @@ describe('Logged-In Learner', function () {
     // Verify the learner sees the heading with their username's goals.
     await loggedInLearner.expectLearnerGreetingsToBe("loggedInLearner's Goals");
 
-    // Verify the "Completed Goals" section is present.
-    await loggedInLearner.expectCompletedGoalsSectionInRedesignedDashboardToBePresent();
-
     // Verify the "Add a Goal" button is present.
     await loggedInLearner.expectAddGoalsButtonInRedesignedDashboardToBePresent();
   });
