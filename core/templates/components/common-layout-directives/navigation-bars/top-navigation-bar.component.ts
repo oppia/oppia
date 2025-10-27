@@ -99,6 +99,10 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   isBlogAdmin: boolean = false;
   isBlogPostEditor: boolean = false;
   userIsLoggedIn: boolean = false;
+
+  // AJT
+  userStatusLoaded: boolean = false;
+
   currentUrl!: string;
   userMenuIsShown: boolean = false;
   inClassroomPage: boolean = false;
@@ -312,6 +316,8 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
             AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH
           );
       }
+      // AJT
+      this.userStatusLoaded = true;
     });
 
     for (var i = 0; i < this.NAV_ELEMENTS_ORDER.length; i++) {

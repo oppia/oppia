@@ -521,11 +521,10 @@
             <span [innerHTML]="'I18N_TOPNAV_LOGOUT' | translate"></span>
           </a>
         </li>
-      </ul>
+      </ul>  
     </li>
-
     <li ngbDropdown
-        *ngIf="!userIsLoggedIn && username !== '' && !pageIsIframed"
+        *ngIf="userStatusLoaded && !userIsLoggedIn && username !== '' && !pageIsIframed"
         class="nav-item oppia-navbar-clickable-dropdown dropdown">
       <div class="oppia-navbar-button-container dropdown oppia-navbar-button-container-extra-info sinin">
         <button ngbDropdownToggle
