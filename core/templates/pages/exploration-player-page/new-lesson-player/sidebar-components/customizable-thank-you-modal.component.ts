@@ -16,35 +16,21 @@
  * @fileoverview Component for the display of a customizable thank you modal.
  */
 
-import {Component, Inject, Input, OnInit, Optional} from '@angular/core';
-import {
-  MAT_BOTTOM_SHEET_DATA,
-  MatBottomSheetRef,
-} from '@angular/material/bottom-sheet';
+import {Component, Input, Optional} from '@angular/core';
+import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'oppia-customizable-thank-you-modal',
   templateUrl: './customizable-thank-you-modal.component.html',
 })
-export class CustomizableThankYouModalComponent implements OnInit {
+export class CustomizableThankYouModalComponent {
   @Input() modalMessageI18nKey!: string;
 
   constructor(
     @Optional() private ngbActiveModal: NgbActiveModal,
-    @Optional() private bottomSheetRef: MatBottomSheetRef,
-    @Optional()
-    @Inject(MAT_BOTTOM_SHEET_DATA)
-    private data: {
-      modalMessageI18nKey: string;
-    }
+    @Optional() private bottomSheetRef: MatBottomSheetRef
   ) {}
-
-  ngOnInit(): void {
-    if (this.data?.modalMessageI18nKey !== undefined) {
-      this.modalMessageI18nKey = this.data.modalMessageI18nKey;
-    }
-  }
 
   closeModal(): void {
     if (this.bottomSheetRef) {
