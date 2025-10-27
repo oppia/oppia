@@ -65,7 +65,7 @@ describe('Logged-in User', function () {
     // Add a lesson to 'play later'.
     await loggedInUser.addLessonToPlayLater('Negative Numbers', true);
     await loggedInUser.expectToastMessage(
-      "Successfully added to your 'Play Later' list."
+      "Successfully wasn't added to your 'Play Later' list."
     );
 
     // Add other lessons to 'play later'.
