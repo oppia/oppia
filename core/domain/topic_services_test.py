@@ -1606,6 +1606,15 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
     def test_cannot_have_empty_diagnostic_skills_when_topic_is_already_published_wants_to_be_updated(self) ->None:
         # Test which doesnt allows the diagnostic skill to be empty when the topic is already published and the diagnostic skill needs to be updated.
         existing_skill_id= self.skill_id_1
+        change_list_add_subtopic_skill=[topic_domain.TopicChange({
+            'cmd':topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+            'old_subtopic_id':None,
+            'new_subtopic_id':1,
+            'skill_id':self.skill_id_1
+        })]
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin,self.TOPIC_ID,change_list_add_subtopic_skill,'Add skill to subtopic'
+        )
 
         change_list_add_diagnostic=[topic_domain.TopicChange({
             'cmd':topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
@@ -1626,9 +1635,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         })]
         with self.assertRaisesRegex(
             utils.ValidationError,
-            "Published topic cannot have empty diagnostic_skill"
+            'Published topic cannot have empty diagnostic test skills.'
         ):
-            topic_services.update_topic_and_subtopic_pages(self.user_id,self.TOPIC_ID,change_list_empty_diagnostic,'Update diagnostic skills to be empty when topic is published.')
+            topic_services.update_topic_and_subtopic_pages(self.user_id_admin,self.TOPIC_ID,change_list_empty_diagnostic,'Update diagnostic skills to be empty when topic is published.')
 
     def test_simultaneous_subtopic_and_subtopic_page_changes(self) -> None:
         # Change the subtopic title first and then the subtopic page contents.
