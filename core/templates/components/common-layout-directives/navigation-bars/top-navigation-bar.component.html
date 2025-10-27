@@ -523,9 +523,12 @@
         </li>
       </ul>  
     </li>
+
+    <!-- Shows login dropdown menu only after user authentication status is determined. -->
     <li ngbDropdown
         *ngIf="userStatusLoaded && !userIsLoggedIn && username !== '' && !pageIsIframed"
         class="nav-item oppia-navbar-clickable-dropdown dropdown">
+        
       <div class="oppia-navbar-button-container dropdown oppia-navbar-button-container-extra-info sinin">
         <button ngbDropdownToggle
                 class="btn dropdown-toggle oppia-navbar-button e2e-mobile-test-login sinin"

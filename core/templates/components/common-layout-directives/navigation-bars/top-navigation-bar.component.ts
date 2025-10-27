@@ -100,7 +100,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   isBlogPostEditor: boolean = false;
   userIsLoggedIn: boolean = false;
 
-  // AJT
+  // Whether the user authentication status has been loaded from the backend.
   userStatusLoaded: boolean = false;
 
   currentUrl!: string;
@@ -316,7 +316,8 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
             AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH
           );
       }
-      // AJT
+
+      // Mark user authentication status as loaded once the check is complete.
       this.userStatusLoaded = true;
     });
 
