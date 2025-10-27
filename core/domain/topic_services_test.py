@@ -1599,6 +1599,24 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summary.name, 'New Name')
         self.assertEqual(topic_summary.version, 4)
 
+    def test_cannot_have_empty_diagnostic_skills_when_topic_is_already_published_wants_to_be_updated(self)->None:
+        # Test which doesnt allows the diagnostic skill to be empty when the topic is already published and the diagnostic skill needs to be updated.
+        topic_services.publish_topic(self.TOPIC_ID,self.user_id)
+        changeList=[topic_domain.TopicChange({
+            'cmd':topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+            'property_name':(
+                topic_domain.TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST
+            ),
+            'old_value':['test_skill_id'],
+            'new_value':[]
+        })]
+
+        with self.assertRaisesRegex(
+            Exception,
+            "Published topic cannot have empty diagnostic_skill"
+        ):
+            topic_services.update_topic_and_subtopic_pages(self.user_id,self.TOPIC_ID,changeList,"Commit Message")
+
     def test_simultaneous_subtopic_and_subtopic_page_changes(self) -> None:
         # Change the subtopic title first and then the subtopic page contents.
         changelist = [

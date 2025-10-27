@@ -690,6 +690,13 @@ def apply_change_list(
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # UpdateTopicPropertySkillIdsForDiagnosticTestCmd.
+
+                    # Checks if changes is not causing already published topic to have empty diagnostic test skill.
+                    topic_rights=topic_fetchers.get_topic_rights(topic.id,strict=True)
+                    if topic_rights.topic_is_published and change.new_value == []:
+                        raise utils.ValidationError(
+                            "Published topic cannot have empty diagnostic_skill."
+                        )
                     update_skill_ids_for_diagnostic_test_cmd = cast(
                         topic_domain.UpdateTopicPropertySkillIdsForDiagnosticTestCmd,  # pylint: disable=line-too-long
                         change,
