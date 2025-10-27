@@ -300,9 +300,9 @@ html {
 }
 /* Override Bootstrap 5's .row rule */
 .row > * {
-  margin-top: 0 !important;
-  padding-left: 0 !important;
-  padding-right: 0 !important;
+  margin-top: 0;
+  padding-left: 0;
+  padding-right: 0;
 }
 
 .row {
@@ -2255,7 +2255,9 @@ oppia-parameter {
   margin-top: 18.7px;
 }
 .modal-header {
+  align-items: unset;
   border-bottom: 1px solid #e5e5e5;
+  justify-content: space-between;
   min-height: 16.42857143px;
   padding: 15px;
 }
