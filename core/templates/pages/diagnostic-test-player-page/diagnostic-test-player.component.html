@@ -45,7 +45,7 @@
         <span><i>{{ getProgressText() }}</i></span>
       </div>
     </div>
-    <div class="oppia-new-question-player-card">
+    <div class="oppia-new-question-player-card" *ngIf="isNewLessonPlayerEnabled()">
       <div class="oppia-progress-percentage-container">
         <p>{{ getProgressText() }}</p>
       </div>
