@@ -94,7 +94,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
 
   @Output() graphChange: EventEmitter<GraphAnswer> = new EventEmitter();
   usingMobileDevice: boolean = false;
-  helpText: string = '';
+  helpText: string | null = '';
   _MODES = {
     MOVE: 0,
     ADD_EDGE: 1,
@@ -108,20 +108,20 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   SELECT_COLOR = 'orange';
   DEFAULT_COLOR = 'black';
   state = {
-    currentMode: this._MODES.MOVE,
+    currentMode: this._MODES.MOVE as number | null,
     // Vertex, edge, mode button, label currently being hovered over.
-    hoveredVertex: null,
-    hoveredEdge: null,
+    hoveredVertex: null as number | null,
+    hoveredEdge: null as number | null,
     hoveredModeButton: null,
     // If in ADD_EDGE mode, source vertex of the new edge, if it
     // exists.
-    addEdgeVertex: null,
+    addEdgeVertex: null as number | null,
     // Currently dragged vertex.
-    currentlyDraggedVertex: null,
+    currentlyDraggedVertex: null as number | null,
     // Selected vertex for editing label.
-    selectedVertex: null,
+    selectedVertex: null as number | null,
     // Selected edge for editing weight.
-    selectedEdge: null,
+    selectedEdge: null as number | null,
     // Mouse position in SVG coordinates.
     mouseX: 0,
     mouseY: 0,
@@ -133,7 +133,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     mouseDragStartY: 0,
   };
 
-  selectedEdgeWeightValue: number | string;
+  selectedEdgeWeightValue: string | number;
   buttons: GraphButton[] = [];
   private vizContainer: SVGSVGElement[];
   componentSubscriptions: Subscription = new Subscription();

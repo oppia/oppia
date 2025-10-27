@@ -191,7 +191,7 @@ describe('GraphVizComponent', () => {
               value: 527,
             },
           },
-          getAttribute: attr => {
+          getAttribute: (attr: string) => {
             if (attr === 'height') {
               return 250;
             }
@@ -243,7 +243,7 @@ describe('GraphVizComponent', () => {
               value: 120,
             },
           },
-          getAttribute: attr => {
+          getAttribute: (attr: string) => {
             if (attr === 'height') {
               return 250;
             }
@@ -723,7 +723,7 @@ describe('GraphVizComponent', () => {
               value: 120,
             },
           },
-          getAttribute: attr => {
+          getAttribute: (attr: string) => {
             if (attr === 'height') {
               return 250;
             }
@@ -738,7 +738,7 @@ describe('GraphVizComponent', () => {
           },
           createSVGPoint: () => {
             return {
-              matrixTransform: matrix => {
+              matrixTransform: (matrix: any) => {
                 return {
                   x: 775,
                   y: 307,
@@ -2184,7 +2184,7 @@ describe('GraphVizComponent', () => {
       component.selectedEdgeWeightValue = 0;
       spyOnProperty(component, 'selectedEdgeWeight', 'set').and.callThrough();
 
-      component.selectedEdgeWeight = null;
+      component.selectedEdgeWeight = null as unknown as string;
 
       expect(component.selectedEdgeWeightValue).toBe('');
     }
