@@ -883,6 +883,10 @@ class PrePushHookTests(test_utils.GenericTestBase):
         with mock.patch.object(
             feconf, 'OPPIA_IS_DOCKERIZED', new=True
         ), mock.patch(
+            'scripts.git_changes_utils.get_refs', return_value=('abc123', 'refs/heads/feature-branch')
+        ), mock.patch(
+            'scripts.common.get_current_branch_name', return_value='feature-branch'
+        ), mock.patch(
             'scripts.pre_push_hook.argparse.ArgumentParser.parse_args'
         ) as mock_parse_args, mock.patch(
             'scripts.pre_push_hook.git_changes_utils.get_changed_files'
@@ -890,7 +894,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             'scripts.pre_push_hook.has_uncommitted_files', return_value=False
         ), mock.patch(
             'scripts.pre_push_hook.ChangedBranch'
-        ) as mock_changed_branch, mock.patch(
+        ) as _mock_changed_branch, mock.patch(
             'scripts.pre_push_hook.start_linter', return_value=0
         ) as mock_start_linter, mock.patch(
             'scripts.pre_push_hook.execute_mypy_checks'
@@ -920,11 +924,6 @@ class PrePushHookTests(test_utils.GenericTestBase):
             mock_get_changed_files.return_value = {
                 'feature-branch': (['file1.py'], ['file1.py'])
             }
-
-            mock_changed_branch.return_value.git_status_first_line = (
-                b'## feature-branch'
-            )
-            mock_changed_branch.return_value.current_branch = 'feature-branch'
 
             pre_push_hook.main([])
 
