@@ -925,7 +925,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
                 'feature-branch': (['file1.py'], ['file1.py'])
             }
 
-            pre_push_hook.main([])
+            pre_push_hook.main()
 
             mock_execute_mypy.assert_not_called()
 
