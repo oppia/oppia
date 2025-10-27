@@ -172,6 +172,10 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       const latexText = JSON.parse(decodedMathContent)?.raw_latex;
       return this.parseAndConvertLatex(latexText);
     }
+    // Default to empty string for any unhandled node types. This prevents
+    // callers from receiving `undefined` which can lead to runtime issues
+    // when concatenating or comparing returned values.
+    return '';
   }
 
   // The method recursively traverses the node and wraps span tags around
