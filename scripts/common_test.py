@@ -39,7 +39,7 @@ from core import feconf, utils
 from core.tests import test_utils
 from scripts import servers
 
-import yaml # type: ignore
+import yaml
 from typing import Generator, List, Literal, NoReturn, Tuple
 
 from . import common

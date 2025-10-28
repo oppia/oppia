@@ -23,14 +23,9 @@ import io
 import os
 import re
 import ssl
-import sys
 import tempfile
 import zipfile
 from urllib import request as urlrequest
-
-# Ensure repository root is on sys.path so 'core' package can be imported when
-# running this test file directly.
-sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from core.tests import test_utils
 
@@ -449,11 +444,14 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_url_open(self) -> None:
+        # Use a URL that Oppia's CI environment is expected to have access to.
+        github_api_url = (
+            'https://api.github.com/repos/oppia/oppia/releases/latest')
         response = install_dependencies_json_packages.url_open(
-            github_api_url # pyright: ignore[reportUndefinedVariable]
+            github_api_url
         )
         self.assertEqual(response.getcode(), 200)
-        self.assertEqual(response.url, github_api_url) # type: ignore
+        self.assertEqual(response.url, github_api_url)
 
     def _assert_ssl_context_matches_default(
         self, context: ssl.SSLContext
