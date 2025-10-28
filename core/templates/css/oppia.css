@@ -311,11 +311,20 @@ html {
 }
 
 .btn-close {
-  font-weight: 700;
-  height: auto;
-  line-height: 1;
-  padding: 0.25em !important;
+  float: right;
   width: auto;
+  height: auto;
+  opacity: 0.7;
+  color: #000;
+}
+button.btn-close {
+  -webkit-appearance: none;
+  padding: 5px;
+  cursor: pointer;
+  border: 0;
+}
+.modal-header .btn-close {
+  margin-top: -2px;
 }
 
 body {
@@ -2261,7 +2270,9 @@ oppia-parameter {
   min-height: 16.42857143px;
   padding: 15px;
 }
-
+.modal-header .btn-close {
+  margin: 0;
+}
 .fade.in {
   opacity: 1;
 }
