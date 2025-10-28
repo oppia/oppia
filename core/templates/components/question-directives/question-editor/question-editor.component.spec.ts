@@ -146,6 +146,7 @@ describe('Question Editor Component', () => {
         solicit_answer_details: false,
         card_is_checkpoint: false,
         linked_skill_id: null,
+        inapplicable_skill_misconception_ids: [],
       },
       next_content_id_index: 1,
       inapplicable_skill_misconception_ids: [],

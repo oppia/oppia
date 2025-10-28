@@ -89,13 +89,13 @@ export class QuestionUpdateService {
   _getParameterFromChangeDict(
     changeDict: BackendChangeObject,
     paramName: string
-  ): string | string[] {
-    return changeDict[paramName];
+  ): string | string[] | number | StateBackendDict {
+    return (changeDict as {[key: string]: any})[paramName];
   }
 
   _getNewPropertyValueFromChangeDict(
     changeDict: BackendChangeObject
-  ): string | string[] {
+  ): string | string[] | number | StateBackendDict {
     return this._getParameterFromChangeDict(changeDict, 'new_value');
   }
 
@@ -161,12 +161,21 @@ export class QuestionUpdateService {
       QuestionDomainConstants.QUESTION_PROPERTY_NEXT_CONTENT_ID_INDEX,
       newValue,
       oldValue,
-      (changeDict, question) => {
-        var newValue = this._getNewPropertyValueFromChangeDict(changeDict);
-        question.setNextContentIdIndex(newValue);
+      (changeDict: BackendChangeObject, question: Question) => {
+        const newValue = this._getNewPropertyValueFromChangeDict(changeDict);
+        if (typeof newValue === 'number') {
+          question.setNextContentIdIndex(newValue);
+        } else {
+          throw new Error('Expected number, got ' + typeof newValue);
+        }
       },
-      (changeDict, question) => {
-        question.setNextContentIdIndex(changeDict.old_value);
+      (changeDict: BackendChangeObject, question: Question) => {
+        const oldValue = this._getParameterFromChangeDict(changeDict, 'old_value');
+        if (typeof oldValue === 'number') {
+          question.setNextContentIdIndex(oldValue);
+        } else {
+          throw new Error('Expected number, got ' + typeof oldValue);
+        }
       }
     );
   }

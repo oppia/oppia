@@ -31,7 +31,7 @@ import {PlatformParameterFilterType} from 'domain/platform-parameter/platform-pa
 import {PlatformParameter} from 'domain/platform-parameter/platform-parameter.model';
 import {CsrfTokenService} from 'services/csrf-token.service';
 import {SkillSummary} from 'domain/skill/skill-summary.model';
-import {Story} from 'domain/story/story.model';
+import {Story, StoryBackendDict} from 'domain/story/story.model';
 import {AdminPageConstants} from 'pages/admin-page/admin-page.constants';
 
 describe('Admin backend api service', () => {
@@ -58,8 +58,8 @@ describe('Admin backend api service', () => {
         id: 'VqgPTpt7JyJy',
         topic_model_last_updated: 1591196558882.2,
         language_code: 'en',
-        thumbnail_filename: null,
-        thumbnail_bg_color: null,
+        thumbnail_filename: '',
+        thumbnail_bg_color: '',
         total_published_node_count: 0,
         can_edit_topic: true,
         is_published: false,
@@ -125,7 +125,7 @@ describe('Admin backend api service', () => {
         description: 'description',
         notes: '',
         story_contents: {
-          initial_node_id: null,
+          initial_node_id: '',
           nodes: [],
           next_node_id: 'node_1',
         },

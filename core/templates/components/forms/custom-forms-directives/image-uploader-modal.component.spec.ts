@@ -144,7 +144,7 @@ describe('Image Uploader Modal', () => {
     const fileReaderMock = {
       readAsDataURL: jasmine
         .createSpy('readAsDataURL')
-        .and.callFake(function () {
+        .and.callFake(function (this: FileReader) {
           const event = {
             target: {result: 'base64ImageData'},
           } as ProgressEvent<FileReader>;
@@ -297,9 +297,11 @@ describe('Image Uploader Modal', () => {
     const file = new File([], 'invalid.png');
     const reader = new FileReader();
 
-    spyOn(reader, 'readAsDataURL').and.callFake(function () {
-      const errorEvent = new ProgressEvent('error');
-      this.onerror(errorEvent);
+    spyOn(reader, 'readAsDataURL').and.callFake(function (this: FileReader) {
+      const errorEvent = new ProgressEvent('error') as ProgressEvent<FileReader>;
+      if (this.onerror) {
+        this.onerror(errorEvent);
+      }
     });
 
     spyOn(window, 'FileReader').and.returnValue(reader);

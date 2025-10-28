@@ -37,7 +37,7 @@ import {RouterTestingModule} from '@angular/router/testing';
 class MockUserService {
   getUserInfoAsync() {
     return Promise.resolve({
-      isLoggedIn: () => false,
+      isLoggedIn: () => false as boolean,
     });
   }
 }

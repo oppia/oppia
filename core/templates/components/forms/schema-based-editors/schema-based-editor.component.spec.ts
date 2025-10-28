@@ -61,12 +61,13 @@ describe('Schema based editor component', function () {
       return value;
     };
     component.registerOnChange(mockFunction);
-    component.registerOnTouched();
+    const onTouchedSpy = jasmine.createSpy('onTouched');
+    component.registerOnTouched(onTouchedSpy);
 
     expect(component).toBeDefined();
     expect(component.validate(new FormControl(1))).toEqual(null);
-    expect(component.onChange).toEqual(mockFunction);
-    expect(component.onChange(19)).toEqual(19);
+    expect((component as any).onChange).toEqual(mockFunction);
+    expect((component as any).onChange(19)).toEqual(19);
   }));
 
   it('should write value', () => {
@@ -123,11 +124,13 @@ describe('Schema based editor component', function () {
   });
 
   it('should set disabled state when setDisabledState is called', () => {
-    component.setDisabledState(true);
-    expect(component.disabled).toBeTrue();
+    if (component.setDisabledState) {
+      component.setDisabledState(true);
+      expect(component.disabled).toBeTrue();
 
-    component.setDisabledState(false);
-    expect(component.disabled).toBeFalse();
+      component.setDisabledState(false);
+      expect(component.disabled).toBeFalse();
+    }
   });
 
   it('should return null when validate is called without form', () => {
