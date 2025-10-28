@@ -31,6 +31,7 @@ import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {CollectionSummary} from 'domain/collection/collection-summary.model';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 describe('Home tab Component', () => {
   let component: HomeTabComponent;
@@ -40,6 +41,14 @@ describe('Home tab Component', () => {
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let mockResizeEmitter: EventEmitter<void>;
   let siteAnalyticsService: SiteAnalyticsService;
+  class MockPlatformFeatureService {
+    status = {
+      SerialChapterLaunchLearnerView: {
+        isEnabled: false,
+      },
+    };
+  }
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
 
   beforeEach(async(() => {
     mockResizeEmitter = new EventEmitter();
@@ -55,6 +64,7 @@ describe('Home tab Component', () => {
             getResizeEvent: () => mockResizeEmitter,
           },
         },
+        {provide: PlatformFeatureService, useValue: mockPlatformFeatureService},
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -417,5 +427,24 @@ describe('Home tab Component', () => {
 
     fixture.detectChanges();
     expect(component.getTotalInProgressLessons()).toBe(4);
+  });
+
+  it('should get publishedNotesCount when isSerialChapterLearnerFeature is turned ON', () => {
+    mockPlatformFeatureService.status.SerialChapterLaunchLearnerView.isEnabled =
+      true;
+    spyOn(
+      component,
+      'isSerialChapterFeatureLearnerFlagEnabled'
+    ).and.returnValue(true);
+
+    expect(component.isSerialChapterFeatureLearnerFlagEnabled()).toBeTrue();
+
+    const storySummaries =
+      component.currentGoals[0].getCanonicalStorySummaryDicts();
+    const story = storySummaries[1];
+    expect(story.getCompletedNodeTitles().length).toBeGreaterThan(0);
+    expect(story.getNodeTitles().length).toBeGreaterThan(
+      story.getCompletedNodeTitles().length
+    );
   });
 });

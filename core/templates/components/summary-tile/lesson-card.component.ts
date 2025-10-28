@@ -27,6 +27,7 @@ import {StorySummary} from 'domain/story/story-summary.model';
 import {StoryNode} from 'domain/story/story-node.model';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {ChapterLabelVisibilityService} from 'services/chapter-label-visibility.service';
+import {ChapterProgressLoaderService} from 'services/chapter-progress-loader.service';
 
 @Component({
   selector: 'lesson-card',
@@ -49,26 +50,32 @@ export class LessonCardComponent implements OnInit {
   lessonTopic!: string;
   statusIsPublished!: boolean;
   storyNode!: StoryNode;
+  allNodes!: StoryNode[];
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private assetsBackendApiService: AssetsBackendApiService,
     private chapterLabelVisibilityService: ChapterLabelVisibilityService,
     private urlService: UrlService,
-    private platformFeatureService: PlatformFeatureService
+    private platformFeatureService: PlatformFeatureService,
+    private chapterProgressLoaderService: ChapterProgressLoaderService
   ) {}
 
-  ngOnInit(): void {
-    if (this.story instanceof StorySummary) {
-      this.setStorySummary(this.story);
-    } else if (this.story instanceof CollectionSummary) {
-      this.setCollectionSummary(this.story);
-    } else {
-      this.setExplorationSummary(this.story);
+  async ngOnInit(): Promise<void> {
+    try {
+      if (this.story instanceof StorySummary) {
+        await this.setStorySummary(this.story);
+      } else if (this.story instanceof CollectionSummary) {
+        this.setCollectionSummary(this.story);
+      } else {
+        this.setExplorationSummary(this.story);
+      }
+    } catch (error) {
+      console.error('Error initializing lesson card:', error);
     }
   }
 
-  setStorySummary(storyModel: StorySummary): void {
+  async setStorySummary(storyModel: StorySummary): Promise<void> {
     const completedStories = storyModel.getCompletedNodeTitles().length;
     this.desc = storyModel.getTitle();
     this.imgColor = storyModel.getThumbnailBgColor();
@@ -140,21 +147,45 @@ export class LessonCardComponent implements OnInit {
       }
     }
     // TODO(#18384): Returns next unplayed node from the earliest completed node. Does not account for if played out of order.
-    this.storyNode = storyModel.getAllNodes()[nextStory];
+    this.allNodes = storyModel.getAllNodes();
+    const currentStoryNode = storyModel.getAllNodes()[nextStory];
+    this.storyNode = currentStoryNode;
     this.lessonUrl = this.getStorySummaryLessonUrl(
       storyModel.getClassroomUrlFragment(),
       storyModel.getTopicUrlFragment(),
       storyModel.getUrlFragment(),
-      storyModel.getAllNodes()[nextStory]
+      currentStoryNode
     );
 
     this.title = `Chapter ${nextStory + 1}: ${storyModel.getNodeTitles()[nextStory]}`;
     this.statusIsPublished = storyModel
       .getAllNodes()
       [nextStory].getPublishedStatus();
-    this.progress = Math.floor(
-      (completedStories / storyModel.getNodeTitles().length) * 100
-    );
+    this.progress = 0;
+    if (this.storyNode) {
+      const explorationId = this.storyNode.getExplorationId();
+      if (explorationId) {
+        this.progress =
+          this.chapterProgressLoaderService.getLessonProgress(explorationId);
+
+        if (this.progress === 0) {
+          const explorationIds = storyModel
+            .getAllNodes()
+            .map(node => node.getExplorationId())
+            .filter(id => id !== null) as string[];
+
+          await this.chapterProgressLoaderService.loadChapterProgressForStory(
+            storyModel.getId(),
+            explorationIds
+          );
+
+          this.progress =
+            this.chapterProgressLoaderService.computeLessonProgress(
+              explorationId
+            );
+        }
+      }
+    }
     this.lessonTopic = this.topic;
   }
 
@@ -206,8 +237,13 @@ export class LessonCardComponent implements OnInit {
     currentStory: StoryNode
   ): string {
     const explorationId = currentStory.getExplorationId();
-    if (!classroomUrl || !topicUrl || explorationId === null) {
-      throw new Error('Class and/or topic does not exist');
+    if (!classroomUrl || !topicUrl || !explorationId) {
+      console.error('Missing required URL parameters:', {
+        classroomUrl,
+        topicUrl,
+        explorationId,
+      });
+      return '#';
     }
     let resultUrl = this.urlInterpolationService.interpolateUrl(
       '/explore/<exp_id>',
