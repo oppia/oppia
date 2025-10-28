@@ -21,6 +21,7 @@ import {AppConstants} from 'app.constants';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {UrlService} from 'services/contextual/url.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {ChapterProgressLoaderService} from 'services/chapter-progress-loader.service';
 import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
 import {StorySummary} from 'domain/story/story-summary.model';
 import {StoryNode} from 'domain/story/story-node.model';
@@ -41,7 +42,8 @@ export class GoalListComponent implements OnInit {
     private assetsBackendApiService: AssetsBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
-    private platformFeatureService: PlatformFeatureService
+    private platformFeatureService: PlatformFeatureService,
+    private chapterProgressLoaderService: ChapterProgressLoaderService
   ) {}
 
   ngOnInit(): void {
@@ -60,6 +62,21 @@ export class GoalListComponent implements OnInit {
     return (
       (story.getCompletedNodeTitles().length / story.getNodeTitles().length) *
       100
+    );
+  }
+
+  getChapterProgress(storyNode: StoryNode): number {
+    const explorationId = storyNode.getExplorationId();
+    if (!explorationId) {
+      return 0;
+    }
+    const lessonProgress =
+      this.chapterProgressLoaderService.getLessonProgress(explorationId);
+    if (lessonProgress) {
+      return lessonProgress;
+    }
+    return this.chapterProgressLoaderService.computeLessonProgress(
+      explorationId
     );
   }
 
