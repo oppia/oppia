@@ -312,20 +312,20 @@ html {
 
 .btn-close {
   float: right;
-  width: auto;
   height: auto;
   opacity: 0.7;
+  width: auto;
   color: #000;
 }
 button.btn-close {
-  -webkit-appearance: none;
-  padding: 5px;
-  cursor: pointer;
   border: 0;
+  cursor: pointer;
+  padding: 5px;
+  -webkit-appearance: none;
 }
 .modal-header .btn-close {
-  margin-top: -2px;
   height: 5px;
+  margin-top: -2px;
   width: 3px;
 }
 
@@ -2271,9 +2271,6 @@ oppia-parameter {
   justify-content: space-between;
   min-height: 16.42857143px;
   padding: 15px;
-}
-.modal-header .btn-close {
-  margin: 0;
 }
 .fade.in {
   opacity: 1;
