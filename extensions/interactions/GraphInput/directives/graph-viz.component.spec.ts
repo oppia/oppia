@@ -2184,7 +2184,7 @@ describe('GraphVizComponent', () => {
       component.selectedEdgeWeightValue = 0;
       spyOnProperty(component, 'selectedEdgeWeight', 'set').and.callThrough();
 
-      component.selectedEdgeWeight = null as unknown as string;
+      component.selectedEdgeWeight = null;
 
       expect(component.selectedEdgeWeightValue).toBe('');
     }

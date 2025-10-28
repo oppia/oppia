@@ -175,7 +175,7 @@ TS_STRICT_EXCLUDE_PATHS = [
     # 'extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts',
     # 'extensions/interactions/DragAndDropSortInput/drag-and-drop-sort-input-interactions.module.ts',
     # 'extensions/interactions/GraphInput/directives/graph-viz.component.spec.ts',
-    'extensions/interactions/GraphInput/directives/graph-viz.component.ts',
+    # 'extensions/interactions/GraphInput/directives/graph-viz.component.ts',
     'extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.spec.ts',
     'extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts',
     'extensions/interactions/ItemSelectionInput/item-selection-input-interactions.module.ts',
