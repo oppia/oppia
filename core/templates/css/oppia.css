@@ -325,6 +325,8 @@ button.btn-close {
 }
 .modal-header .btn-close {
   margin-top: -2px;
+  height: 5px;
+  width: 3px;
 }
 
 body {
