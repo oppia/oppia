@@ -27,6 +27,7 @@ import {Subscription} from 'rxjs';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 import './home-tab.component.css';
 
@@ -73,8 +74,14 @@ export class HomeTabComponent {
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private windowDimensionService: WindowDimensionsService,
     private urlInterpolationService: UrlInterpolationService,
-    private siteAnalyticsService: SiteAnalyticsService
+    private siteAnalyticsService: SiteAnalyticsService,
+    private platformFeatureService: PlatformFeatureService
   ) {}
+
+  isSerialChapterFeatureLearnerFlagEnabled(): boolean {
+    return this.platformFeatureService.status.SerialChapterLaunchLearnerView
+      .isEnabled;
+  }
 
   ngOnInit(): void {
     this.width = this.widthConst * this.currentGoals.length;
@@ -96,26 +103,33 @@ export class HomeTabComponent {
     }
 
     // TODO(#18384): Test cases - current lesson is last lesson.
-    for (let i = 0; i < this.continueWhereYouLeftOffList.length; i++) {
-      let currentStorySummary =
-        this.continueWhereYouLeftOffList[i].getCanonicalStorySummaryDicts();
-      for (let j = 0; j < currentStorySummary.length; j++) {
-        const publishedNodes = currentStorySummary[j]
-          .getAllNodes()
-          .filter(node => node.getPublishedStatus());
+    for (const topic of this.partiallyLearntTopicsList) {
+      const storySummaries = topic.getCanonicalStorySummaryDicts();
 
-        const completedNodes = currentStorySummary[j].getCompletedNodeTitles();
-        const remainingPublished =
-          publishedNodes.length - completedNodes.length;
-        if (this.hasMultipleUnfinishedPublished !== true) {
-          this.hasMultipleUnfinishedPublished =
-            publishedNodes.length > 1 && remainingPublished > 0;
+      for (const story of storySummaries) {
+        let publishedNodesCount: number;
+        if (this.isSerialChapterFeatureLearnerFlagEnabled()) {
+          const publishedNodes = story
+            .getAllNodes()
+            .filter(node => node.getPublishedStatus());
+          publishedNodesCount = publishedNodes.length;
+        } else {
+          publishedNodesCount = story.getAllNodes().length;
         }
 
-        if (publishedNodes.length - 1 > completedNodes.length) {
-          this.storySummariesWithAvailableNodes.add(
-            currentStorySummary[j].getId()
-          );
+        const completedNodes = story.getCompletedNodeTitles();
+        const remainingPublished =
+          publishedNodesCount - completedNodes.length - 1;
+
+        if (
+          remainingPublished > 0 &&
+          remainingPublished < publishedNodesCount
+        ) {
+          this.storySummariesWithAvailableNodes.add(story.getId());
+        }
+        if (!this.hasMultipleUnfinishedPublished) {
+          this.hasMultipleUnfinishedPublished =
+            publishedNodesCount > 1 && remainingPublished > 0;
         }
       }
     }

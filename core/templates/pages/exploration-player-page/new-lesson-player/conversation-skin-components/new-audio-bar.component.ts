@@ -31,13 +31,12 @@ import {PlayerPositionService} from 'pages/exploration-player-page/services/play
 import {VoiceoverPlayerService} from 'pages/exploration-player-page/services/voiceover-player.service';
 import {Subscription} from 'rxjs';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
-import {AudioBarStatusService} from 'services/audio-bar-status.service';
 import {AudioPlayerService} from 'services/audio-player.service';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
-import {LocalStorageService} from 'services/local-storage.service';
 import {PageContextService} from 'services/page-context.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {MobileMenuService} from 'pages/exploration-player-page/services/mobile-menu.service';
 
 @Component({
   selector: 'oppia-new-audio-bar',
@@ -60,7 +59,7 @@ export class NewAudioBarComponent {
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
-    private audioBarStatusService: AudioBarStatusService,
+    private mobileMenuService: MobileMenuService,
     private audioPlayerService: AudioPlayerService,
     private audioPreloaderService: AudioPreloaderService,
     private pageContextService: PageContextService,
@@ -69,7 +68,6 @@ export class NewAudioBarComponent {
     private siteAnalyticsService: SiteAnalyticsService,
     private entityVoiceoversService: EntityVoiceoversService,
     private voiceoverPlayerService: VoiceoverPlayerService,
-    private localStorageService: LocalStorageService,
     private stateEditorService: StateEditorService,
     private cdRef: ChangeDetectorRef
   ) {}
@@ -117,6 +115,10 @@ export class NewAudioBarComponent {
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
+  }
+
+  getSidebarIsExpanded(): boolean {
+    return this.mobileMenuService.getSidebarIsExpanded();
   }
 
   ngAfterContentChecked(): void {
