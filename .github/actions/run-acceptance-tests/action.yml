@@ -19,6 +19,7 @@ runs:
   steps:
     - name: Run ${{ inputs.mobile && 'Mobile' || 'Desktop' }} Acceptance Test ${{ inputs.test-suite }}
       id: run-acceptance-test
+      shell: bash
       # We use xvfb-run to create a virtual screen to run tests without headless mode.
       # Numbers in 1920x1080x24 represents screen width, height and color depth respectively.
       run: >
