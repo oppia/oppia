@@ -311,17 +311,17 @@ html {
 }
 
 .btn-close {
+  color: #000;
   float: right;
   height: auto;
   opacity: 0.7;
   width: auto;
-  color: #000;
 }
 button.btn-close {
+  -webkit-appearance: none;
   border: 0;
   cursor: pointer;
   padding: 5px;
-  -webkit-appearance: none;
 }
 .modal-header .btn-close {
   height: 5px;
