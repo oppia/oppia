@@ -42,7 +42,7 @@ class BlogPostModelDataDict(TypedDict):
     url_fragment: str
     tags: List[str]
     thumbnail_filename: str
-    published_on: float
+    published_on: float | None
 
 
 class BlogAuthorDetailsModelDict(TypedDict):
