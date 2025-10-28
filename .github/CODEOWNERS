@@ -305,6 +305,7 @@
 
 # Global frontend services
 /core/templates/services/alerts.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/chapter-progress-loader.service*.ts @oppia/lace-frontend-reviewers 
 /core/templates/services/chapter-label-visibility.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/date-time-format.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/extension-tag-assembler.service*.ts @oppia/lace-frontend-reviewers
