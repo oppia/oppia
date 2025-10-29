@@ -3151,19 +3151,6 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Function to verify the completed goals section in the redesigned learner dashboard is present or not.
-   * @param {boolean} visible - Whether the section should be visible or not.
-   */
-  async expectCompletedGoalsSectionInRedesignedDashboardToBePresent(
-    visible: boolean = true
-  ): Promise<void> {
-    await this.expectElementToBeVisible(
-      completedGoalsContainerSelector,
-      visible
-    );
-  }
-
-  /**
    * Function to verify the add goals button in the redesigned learner dashboard is present or not.
    * @param {boolean} visible - Whether the button should be visible or not.
    */
