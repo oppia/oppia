@@ -101,7 +101,7 @@
         </div>
       </mat-card>
     </footer>
-    <div *ngIf="windowIsNarrow && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS">
+    <div *ngIf="windowIsNarrow && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS && !isShowRedesignedLearnerDashboardActive()">
       <mat-card class="oppia-learner-dashboard-progress-button-menu d-flex justify-content-around">
         <div class="oppia-learner-dashboard-progress-button-menu-options" [ngStyle]="activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.SKILL_PROFICIENCY && {'border-bottom': '2px solid #00645C'}" (click)="setActiveSubsection(LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.SKILL_PROFICIENCY)">
           <p [innerHTML]="'I18N_DASHBOARD_SKILL_PROFICIENCY' | translate">
