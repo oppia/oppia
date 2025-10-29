@@ -21,7 +21,7 @@ import {Injectable} from '@angular/core';
 import {ImagesData} from 'services/image-local-storage.service';
 
 import {TranslateTextBackendApiService} from './translate-text-backend-api.service';
-import {TranslatableTexts} from 'domain/opportunity/translatable-texts.model';
+import {StateNamesToContentIdMapping, TranslatableTexts} from 'domain/opportunity/translatable-texts.model';
 import {
   TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
   TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING,
@@ -36,10 +36,7 @@ export interface TranslatableItem {
   contentType: string;
   interactionId?: string;
   ruleType?: string;
-}
-
-export interface StateWiseContentItem extends TranslatableItem {
-  content: string | string[];
+  content: string | string[]
 }
 
 export type Status = 'pending' | 'submitted';
@@ -65,7 +62,7 @@ export class TranslateTextService {
   STARTING_INDEX = -1;
   PENDING = 'pending';
   SUBMITTED = 'submitted';
-  stateWiseContents: {[stateName: string]: {[contentId: string]: StateWiseContentItem}} = {};
+  stateWiseContents: StateNamesToContentIdMapping;
   stateWiseContentIds: {[stateName: string]: string[]} = {};
   stateNamesList: string[] = [];
   stateAndContent: StateAndContent[] = [];
