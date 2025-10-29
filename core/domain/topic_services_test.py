@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import logging
 import os
-import datetime
+
 
 from core import feature_flag_list, feconf, utils
 from core.constants import constants
@@ -33,9 +33,6 @@ from core.domain import (
     story_domain,
     story_fetchers,
     story_services,
-    state_domain,
-    skill_services,
-    skill_domain,
     study_guide_domain,
     study_guide_services,
     subtopic_page_domain,
@@ -1623,7 +1620,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'new_value':[existing_skill_id]
         })]
         topic_services.update_topic_and_subtopic_pages(
-            self.user_id_admin,self.TOPIC_ID,change_list_add_diagnostic,"Add skill to diagnostic test"
+            self.user_id_admin,self.TOPIC_ID,change_list_add_diagnostic,'Add skill to diagnostic test'
         )
         topic_services.publish_topic(self.TOPIC_ID,self.user_id_admin)
 
