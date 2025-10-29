@@ -36,7 +36,6 @@ export interface TranslatableItem {
   contentType: string;
   interactionId?: string;
   ruleType?: string;
-  content: string | string[];
 }
 
 export type Status = 'pending' | 'submitted';
