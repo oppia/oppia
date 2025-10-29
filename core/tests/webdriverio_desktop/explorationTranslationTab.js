@@ -58,19 +58,6 @@ describe('Exploration translation and voiceover tab', function () {
       'featureFlagEnabler'
     );
 
-    // The below lines enable the enable_voiceover_contribution flag in
-    // prod mode.
-    // They should be removed after the enable_voiceover_contribution flag is
-    // deprecated.
-    await adminPage.get();
-    await adminPage.addRole('featureFlagEnabler', 'release coordinator');
-    await releaseCoordinatorPage.getFeaturesTab();
-
-    var voiceoverContributionFlag =
-      await releaseCoordinatorPage.getVoiceoverContributionFeatureElement();
-    await releaseCoordinatorPage.enableFeature(voiceoverContributionFlag);
-    await users.logout();
-
     await users.login('user@editorTab.com');
     await workflow.createExploration(true);
 
