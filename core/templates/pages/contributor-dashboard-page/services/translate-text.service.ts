@@ -38,6 +38,10 @@ export interface TranslatableItem {
   ruleType?: string;
 }
 
+export interface StateWiseContentItem extends TranslatableItem {
+  content: string | string[];
+}
+
 export type Status = 'pending' | 'submitted';
 
 export class StateAndContent {
@@ -61,7 +65,7 @@ export class TranslateTextService {
   STARTING_INDEX = -1;
   PENDING = 'pending';
   SUBMITTED = 'submitted';
-  stateWiseContents: {[stateName: string]: {[contentId: string]: any}} = {};
+  stateWiseContents: {[stateName: string]: {[contentId: string]: StateWiseContentItem}} = {};
   stateWiseContentIds: {[stateName: string]: string[]} = {};
   stateNamesList: string[] = [];
   stateAndContent: StateAndContent[] = [];

@@ -90,7 +90,7 @@ export class QuestionUpdateService {
     changeDict: BackendChangeObject,
     paramName: string
   ): string | string[] | number | StateBackendDict {
-    return (changeDict as {[key: string]: any})[paramName];
+    return changeDict[paramName];
   }
 
   _getNewPropertyValueFromChangeDict(

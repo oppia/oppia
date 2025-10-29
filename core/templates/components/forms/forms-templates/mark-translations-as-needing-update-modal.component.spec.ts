@@ -55,12 +55,12 @@ class MockPlatformFeatureService {
   };
 }
 
-export class MockNgbModalRef implements Partial<NgbModalRef>{
+export class MockNgbModalRef implements Partial<NgbModalRef> {
   componentInstance = {
     contentId: null,
     contentValue: null,
   };
-  result: Promise<any> = Promise.resolve();
+  result: Promise<void> = Promise.resolve();
 }
 
 describe('Mark Translations As Needing Update Modal Component', () => {

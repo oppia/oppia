@@ -31,7 +31,7 @@ import {PlatformParameterFilterType} from 'domain/platform-parameter/platform-pa
 import {PlatformParameter} from 'domain/platform-parameter/platform-parameter.model';
 import {CsrfTokenService} from 'services/csrf-token.service';
 import {SkillSummary} from 'domain/skill/skill-summary.model';
-import {Story, StoryBackendDict} from 'domain/story/story.model';
+import {Story} from 'domain/story/story.model';
 import {AdminPageConstants} from 'pages/admin-page/admin-page.constants';
 
 describe('Admin backend api service', () => {
