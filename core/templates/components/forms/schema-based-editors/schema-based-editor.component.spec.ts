@@ -66,8 +66,9 @@ describe('Schema based editor component', function () {
 
     expect(component).toBeDefined();
     expect(component.validate(new FormControl(1))).toEqual(null);
-    expect(component['onChange']).toEqual(mockFunction);
-    expect((component['onChange'])(19)).toEqual(19);
+    component.writeValue(19);
+    expect(component.localValue).toEqual(19);
+    expect(mockFunction).toHaveBeenCalledWith(19);
   }));
 
   it('should write value', () => {
