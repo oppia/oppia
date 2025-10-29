@@ -1,6 +1,7 @@
 <button mat-button
         class="oppia-learner-confirm-button e2e-test-continue-to-next-card-button oppia-autofocus"
         (click)="clickContinueButton.emit()"
+        (keydown.enter)="clickContinueButton.emit()"
         aria-label="Continue">
   <div *ngIf="!isLearnAgainButton">
     <span class="e2e-test-next-card-button">{{ 'I18N_PLAYER_CONTINUE_BUTTON' | translate | uppercase }}</span>

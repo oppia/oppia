@@ -34,6 +34,15 @@ import {SidebarStatusService} from 'services/sidebar-status.service';
 import {BackgroundMaskService} from 'services/stateful/background-mask.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {BaseContentComponent} from './base-content.component';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+
+class MockPlatformFeatureService {
+  status = {
+    NewLessonPlayer: {
+      isEnabled: false,
+    },
+  };
+}
 
 describe('Base Content Component', () => {
   // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
@@ -49,8 +58,10 @@ describe('Base Content Component', () => {
   let hash: string = 'test_hash';
   let backgroundMaskService: BackgroundMaskService;
   let bottomNavbarStatusService: BottomNavbarStatusService;
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
   let windowRef: WindowRef;
   let loaderService: LoaderService;
+  let urlService: UrlService;
   let keyboardShortcutService: KeyboardShortcutService;
   let sidebarStatusService: SidebarStatusService;
   let cookieService: CookieService;
@@ -59,6 +70,10 @@ describe('Base Content Component', () => {
   class MockUrlService {
     isIframed(): boolean {
       return isIframed;
+    }
+
+    getPathname(): string {
+      return '/lesson/123';
     }
   }
 
@@ -111,6 +126,10 @@ describe('Base Content Component', () => {
           useClass: MockRouteService,
         },
         {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService,
+        },
+        {
           provide: WindowRef,
           useClass: MockWindowRef,
         },
@@ -140,6 +159,7 @@ describe('Base Content Component', () => {
     componentInstance = fixture.componentInstance;
     loaderService = TestBed.inject(LoaderService);
     loaderService = loaderService as jasmine.SpyObj<LoaderService>;
+    urlService = TestBed.inject(UrlService);
     keyboardShortcutService = TestBed.inject(KeyboardShortcutService);
     keyboardShortcutService =
       keyboardShortcutService as jasmine.SpyObj<KeyboardShortcutService>;
@@ -178,6 +198,13 @@ describe('Base Content Component', () => {
     expect(windowRef.nativeWindow.location.href).toEqual(
       'https://oppiatestserver.appspot.com' + pathname + search + hash
     );
+  });
+
+  it('should return true for isNewLessonPlayerEnabled when feature is enabled and pathname includes lesson', () => {
+    mockPlatformFeatureService.status.NewLessonPlayer.isEnabled = true;
+    spyOn(urlService, 'getPathname').and.returnValue('/lesson/123');
+    const result = componentInstance.isNewLessonPlayerEnabled();
+    expect(result).toBeTrue();
   });
 
   it('should get sidebar status', () => {
