@@ -1,5 +1,5 @@
 <h2>Add Exploration</h2>
-<form class="d-flex align-items-center oppia-new-exploration-form" (submit)="createNewExploration()">
+<form class="d-flex flex-wrap align-items-center oppia-new-exploration-form" (submit)="createNewExploration()">
   <input class="form-control"
          aria-label="New Exploration"
          [(ngModel)]="newExplorationTitle"
@@ -13,7 +13,7 @@
   </button>
 </form>
 or
-<form class="d-flex align-items-center oppia-add-existing-exploration-form oppia-typeahead-form"
+<form class="d-flex flex-wrap align-items-center oppia-add-existing-exploration-form oppia-typeahead-form"
       [ngClass]="{'has-error': searchQueryHasError}"
       (submit)="addExploration()">
   <input class="form-control e2e-test-add-exploration-input"

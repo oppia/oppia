@@ -1,4 +1,4 @@
-<div class="d-flex align-items-center oppia-form-inline protractor-test-dest-if-stuck-bubble">
+<div class="d-flex flex-wrap align-items-center oppia-form-inline protractor-test-dest-if-stuck-bubble">
   <div class="oppia-rule-details-header">
     <strong tabindex="0">(Optional) If the learner is really stuck, direct them to ...</strong>
     <div ngbTooltip="{{ 'I18N_DEST_IF_STUCK_INFO_TOOLTIP' | translate }}"
@@ -36,9 +36,6 @@
 </div>
 
 <style>
-  .oppia-form-inline {
-    margin-bottom: 10px;
-  }
   .oppia-form-group {
     font-size: 1.1em;
   }
@@ -46,7 +43,7 @@
     cursor: pointer;
     float: right;
   }
-  .form-select .oppia-form-control {
+  .form-select.oppia-form-control {
     width: 200px;
   }
   .oppia-form-error-text {
