@@ -502,6 +502,31 @@ def save_entity_voiceovers(
     entity_voiceovers_model.put()
 
 
+def get_updated_language_accents(
+    old_language_codes_mapping, new_language_codes_mapping
+):
+    initial_language_accent_set = set()
+    updated_language_accent_set = set()
+
+    for accent_mapping in old_language_codes_mapping.values():
+        for (
+            language_accent_code,
+            supports_autogeneration,
+        ) in accent_mapping.items():
+            if supports_autogeneration:
+                initial_language_accent_set.add(language_accent_code)
+
+    for accent_mapping in new_language_codes_mapping.values():
+        for (
+            language_accent_code,
+            supports_autogeneration,
+        ) in accent_mapping.items():
+            if supports_autogeneration:
+                updated_language_accent_set.add(language_accent_code)
+
+    return updated_language_accent_set - initial_language_accent_set
+
+
 def save_language_accent_support(
     language_codes_mapping: Dict[str, Dict[str, bool]],
 ) -> None:
@@ -528,6 +553,13 @@ def save_language_accent_support(
             id=voiceover_models.VOICEOVER_AUTOGENERATION_POLICY_ID
         )
     )
+
+    # 1. find the language accent which is updated.
+    updated_language_accent_codes = get_updated_language_accents(
+        voiceover_autogeneration_policy_model.language_codes_mapping,
+        language_codes_mapping,
+    )
+    # 2. regenerate voiceovers for that language accent code for all curated explorations.
 
     voiceover_autogeneration_policy_model.language_codes_mapping = (
         language_codes_mapping
