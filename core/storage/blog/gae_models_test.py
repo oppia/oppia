@@ -184,7 +184,7 @@ class BlogPostModelTest(test_utils.GenericTestBase):
             content=self.CONTENT,
             title=self.TITLE,
             published_on=None,
-            url_fragment='url-fragment-two',
+            url_fragment='sample-url-fragment',
             tags=self.TAGS,
             thumbnail_filename=self.THUMBNAIL,
         )
