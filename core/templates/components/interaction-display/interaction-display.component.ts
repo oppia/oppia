@@ -22,12 +22,25 @@ import {
   ComponentFactoryResolver,
   Input,
   SimpleChange,
+  Type,
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
 import camelCaseFromHyphen from 'utility/string-utility';
 
 import {TAG_TO_INTERACTION_MAPPING} from 'interactions/tag-to-interaction-mapping';
+import {InteractionAnswer} from 'interactions/answer-defs';
+
+// Scope type for bracketed bindings consumed by dynamically created
+// interaction components (e.g., [last-answer], [saved-solution]).
+export interface InteractionParentScope {
+  lastAnswer: InteractionAnswer | null;
+  savedSolution?: InteractionAnswer | null;
+}
+
+// Narrow helper types for bracketed bindings that some interactions expose.
+type WithLastAnswer = {lastAnswer: InteractionAnswer | null};
+type WithSavedSolution = {savedSolution: InteractionAnswer | null};
 
 @Component({
   selector: 'oppia-interaction-display',
@@ -41,9 +54,11 @@ export class InteractionDisplayComponent {
   // This property contains the list of classes that needs to be applied to
   // parent container of the created interaction.
   @Input() classStr!: string;
-  // TODO(#13015): Remove use of unknown as a type.
-  // The passed htmlData sometimes accesses property from parent scope.
-  @Input() parentScope!: Record<string, unknown> | undefined;
+  // The passed htmlData sometimes accesses properties from the parent scope.
+  // These properties are injected into the dynamically created interaction via
+  // bracketed attributes like [last-answer] and [saved-solution] that get
+  // resolved against this scope.
+  @Input() parentScope?: InteractionParentScope;
 
   @ViewChild('interactionContainer', {
     read: ViewContainerRef,
@@ -64,15 +79,17 @@ export class InteractionDisplayComponent {
       let domparser = new DOMParser();
       let dom = domparser.parseFromString(this.htmlData, 'text/html');
 
+      const first = dom.body.firstElementChild;
       if (
-        dom.body.firstElementChild &&
-        (TAG_TO_INTERACTION_MAPPING as Record<string, unknown>)[
-          dom.body.firstElementChild.tagName
-        ]
+        first &&
+        Object.prototype.hasOwnProperty.call(
+          TAG_TO_INTERACTION_MAPPING,
+          first.tagName
+        )
       ) {
         type TagKeys = keyof typeof TAG_TO_INTERACTION_MAPPING;
-        const tag = dom.body.firstElementChild.tagName as TagKeys;
-        let interaction = TAG_TO_INTERACTION_MAPPING[tag];
+        const tag = first.tagName as TagKeys;
+        const interaction = TAG_TO_INTERACTION_MAPPING[tag] as Type<unknown>;
 
         const componentFactory =
           this.componentFactoryResolver.resolveComponentFactory(interaction);
@@ -82,11 +99,9 @@ export class InteractionDisplayComponent {
         let attributes = dom.body.firstElementChild.attributes;
 
         Array.from(attributes).forEach(attribute => {
-          let attributeNameInCamelCase = camelCaseFromHyphen(attribute.name);
+          const attributeNameInCamelCase = camelCaseFromHyphen(attribute.name);
 
-          let attributeValue = attribute.value;
-
-          // Properties enclosed with [] needs to be resolved from parent scope.
+          // Properties enclosed with [] need to be resolved from parent scope.
           // NOTE TO DEVELOPERS: The variables in this case are keyed by the
           // attribute name and not the attribute value, so when passing down
           // scoped variables (eg in codebase: lastAnswer, savedSolution) make
@@ -94,23 +109,28 @@ export class InteractionDisplayComponent {
           // that it should be bound to and not the value (seems like the value
           // is irrelevant for this usecase).
           if (/[\])}[{(]/g.test(attribute.name)) {
-            if (this.parentScope) {
-              attributeValue = (this.parentScope as Record<string, unknown>)[
-                attributeNameInCamelCase
-              ] as string;
-            } else {
-              attributeValue = '';
+            // Handle only known bracketed bindings explicitly.
+            if (attributeNameInCamelCase === 'lastAnswer') {
+              const value = this.parentScope?.lastAnswer ?? null;
+              if ('lastAnswer' in (componentRef.instance as object)) {
+                (componentRef.instance as WithLastAnswer).lastAnswer = value;
+              }
+            } else if (attributeNameInCamelCase === 'savedSolution') {
+              const value =
+                this.parentScope?.savedSolution !== undefined
+                  ? this.parentScope?.savedSolution ?? null
+                  : null;
+              if ('savedSolution' in (componentRef.instance as object)) {
+                (componentRef.instance as WithSavedSolution).savedSolution =
+                  value;
+              }
             }
           } else {
             componentRef.location.nativeElement.setAttribute(
               attribute.name,
-              attributeValue
+              attribute.value
             );
           }
-
-          (componentRef.instance as Record<string, unknown>)[
-            attributeNameInCamelCase
-          ] = attributeValue as unknown;
         });
 
         componentRef.changeDetectorRef.detectChanges();

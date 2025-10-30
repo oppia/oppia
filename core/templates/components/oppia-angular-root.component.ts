@@ -106,6 +106,7 @@ import {NoninteractiveTabs} from 'rich_text_components/Tabs/directives/oppia-non
 // @ts-ignore
 import {NoninteractiveVideo} from 'rich_text_components/Video/directives/oppia-noninteractive-video.component';
 import {CkEditorInitializerService} from './ck-editor-helpers/ck-editor-4-widgets.initializer';
+import {RteHelperService as CkEditorRteHelperService} from './ck-editor-helpers/ck-editor-4-widgets.initializer';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {MetaTagCustomizationService} from 'services/contextual/meta-tag-customization.service';
 import {AppConstants} from 'app.constants';
@@ -189,7 +190,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static pageTitleService: PageTitleService;
   static profilePageBackendApiService: ProfilePageBackendApiService;
   static rteElementsAreInitialized: boolean = false;
-  static rteHelperService: unknown;
+  static rteHelperService: RteHelperService;
   static ratingComputationService: RatingComputationService;
   static reviewTestBackendApiService: ReviewTestBackendApiService;
   static storyViewerBackendApiService: StoryViewerBackendApiService;
@@ -217,8 +218,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     if (OppiaAngularRootComponent.rteElementsAreInitialized) {
       return;
     }
-    OppiaAngularRootComponent.rteHelperService = this
-      .rteHelperService as RteHelperService;
+    OppiaAngularRootComponent.rteHelperService = this.rteHelperService;
     registerCustomElements(this.injector);
     OppiaAngularRootComponent.rteElementsAreInitialized = true;
   }
@@ -229,7 +229,11 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     }
     this.ngZone.runOutsideAngular(() => {
       CkEditorInitializerService.ckEditorInitializer(
-        OppiaAngularRootComponent.rteHelperService as unknown as import('./ck-editor-helpers/ck-editor-4-widgets.initializer').RteHelperService,
+        // The RteHelperService class doesn't fully implement the
+        // CkEditorRteHelperService interface (missing
+        // createCustomizationArgDictFromAttrs), but it provides the methods
+        // actually used by CkEditor.
+        OppiaAngularRootComponent.rteHelperService as unknown as CkEditorRteHelperService,
         this.htmlEscaperService,
         this.pageContextService,
         this.ngZone

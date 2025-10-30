@@ -219,15 +219,17 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     // Clear previous modifications before pushing new ones.
     this.skillLinkageModificationsArray = [];
     this.linkedSkillsWithDifficulty.forEach(linkedSkillWithDifficulty => {
-      let task: string | null = null;
+      let task = '';
       if (this.questionIsBeingUpdated) {
-        task = this.isSkillDifficultyChanged ? 'update_difficulty' : 'update';
+        // When updating an existing question, always use update_difficulty.
+        task = 'update_difficulty';
       } else if (this.isSkillDifficultyChanged) {
+        // When creating a new question with modified difficulties.
         task = 'update_difficulty';
       }
       this.skillLinkageModificationsArray.push({
         id: linkedSkillWithDifficulty.getId(),
-        task: task ?? '',
+        task: task,
         difficulty: linkedSkillWithDifficulty.getDifficulty(),
       });
     });
@@ -571,19 +573,20 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
         )
         .then(
           response => {
-            if (
-              this.skillLinkageModificationsArray &&
-              this.skillLinkageModificationsArray.length > 0
-            ) {
-              const modifiedArray = this.skillLinkageModificationsArray.map(
-                item => ({
-                  ...item,
-                  task: null as unknown as string,
-                })
+            // Filter for valid tasks only. When creating a new question, skills are
+            // already linked via createQuestionAsync; only apply additional modifications
+            // with explicit 'add', 'remove', or 'update_difficulty' tasks.
+            const validModifications =
+              this.skillLinkageModificationsArray.filter(
+                item =>
+                  item.task === 'add' ||
+                  item.task === 'remove' ||
+                  item.task === 'update_difficulty'
               );
+            if (validModifications.length > 0) {
               this.editableQuestionBackendApiService.editQuestionSkillLinksAsync(
                 response.questionId,
-                modifiedArray as SkillLinkageModificationsArray[]
+                validModifications
               );
             }
             this.questionsListService.resetPageNumber();

@@ -36,6 +36,7 @@ import {DocumentAttributeCustomizationService} from 'services/contextual/documen
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {I18nService} from 'i18n/i18n.service';
 import {MockI18nService} from 'tests/unit-test-utils';
+import {PageContextService} from 'services/page-context.service';
 
 let component: OppiaAngularRootComponent;
 let fixture: ComponentFixture<OppiaAngularRootComponent>;
@@ -49,7 +50,11 @@ class MockWindowRef {
       },
     },
     history: {
-      pushState(data: unknown, title: string, url?: string | null) {},
+      pushState(
+        data: object | null,
+        unused: string,
+        url?: string | URL | null
+      ) {},
     },
   };
 }
@@ -102,9 +107,7 @@ describe('OppiaAngularRootComponent', function () {
       MetaTagCustomizationService
     ) as MetaTagCustomizationService;
     emitSpy = spyOn(component.initialized, 'emit');
-    spyOn(metaTagCustomizationService, 'addOrReplaceMetaTags').and.returnValue(
-      undefined
-    );
+    spyOn(metaTagCustomizationService, 'addOrReplaceMetaTags').and.stub();
     i18nService = TestBed.inject(I18nService);
   }));
 
@@ -114,8 +117,8 @@ describe('OppiaAngularRootComponent', function () {
       OppiaAngularRootComponent
     ).componentInstance;
     (
-      OppiaAngularRootComponent as unknown as {
-        pageContextService: unknown;
+      OppiaAngularRootComponent as {
+        pageContextService: PageContextService | undefined;
       }
     ).pageContextService = undefined;
     spyOn(customElements, 'get').and.callFake(() => WordCount);
@@ -145,8 +148,8 @@ describe('OppiaAngularRootComponent', function () {
 
   it('should set OppiaAngularRootComponent.pageContextService if not set', () => {
     (
-      OppiaAngularRootComponent as unknown as {
-        pageContextService: unknown;
+      OppiaAngularRootComponent as {
+        pageContextService: PageContextService | undefined;
       }
     ).pageContextService = undefined;
     expect(OppiaAngularRootComponent.pageContextService).toBeUndefined();

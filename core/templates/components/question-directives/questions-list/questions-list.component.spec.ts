@@ -74,21 +74,14 @@ class MockUrlInterpolationService {
   }
 }
 
-// Helper type to access component's private services in tests without using 'any'.
-interface ComponentPrivateDeps {
-  focusManagerService: {setFocus: (...args: unknown[]) => unknown};
-  imageLocalStorageService: {
-    flushStoredImagesData: (...args: unknown[]) => unknown;
-    getStoredImagesData: (...args: unknown[]) => unknown;
-  };
-  topicEditorStateService: {
-    toggleQuestionEditor: (...args: unknown[]) => unknown;
-  };
-  utilsService: {isEquivalent: (...args: unknown[]) => boolean};
-}
-
-const asPrivates = (comp: QuestionsListComponent): ComponentPrivateDeps =>
-  comp as unknown as ComponentPrivateDeps;
+// Helper to access component's private services in tests via bracket notation.
+// TypeScript allows bracket notation to access private members for testing purposes.
+// This approach uses a single cast to Record<string, any> which is standard practice
+// for accessing private members in Angular component tests.
+const getPrivate = <T>(comp: QuestionsListComponent, key: string): T => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (comp as any)[key] as T;
+};
 
 describe('Questions List Component', () => {
   let component: QuestionsListComponent;
@@ -497,15 +490,29 @@ describe('Questions List Component', () => {
 
   it('should create question with proper skill linkage initialization', () => {
     component.selectedSkillId = 'skillId2';
-    spyOn(asPrivates(component).focusManagerService, 'setFocus');
+    spyOn(
+      getPrivate<{setFocus: (focusLabel: string) => void}>(
+        component,
+        'focusManagerService'
+      ),
+      'setFocus'
+    );
     spyOn(component, 'populateMisconceptions');
     spyOn(
-      asPrivates(component).imageLocalStorageService,
+      getPrivate<{flushStoredImagesData: () => void}>(
+        component,
+        'imageLocalStorageService'
+      ),
       'flushStoredImagesData'
     );
     spyOn(pageContextService, 'setImageSaveDestinationToLocalStorage');
     spyOn(
-      asPrivates(component).topicEditorStateService,
+      getPrivate<{
+        toggleQuestionEditor: (
+          isOpen: boolean,
+          newQuestionIsBeingCreated?: boolean
+        ) => void;
+      }>(component, 'topicEditorStateService'),
       'toggleQuestionEditor'
     );
 
@@ -661,9 +668,13 @@ describe('Questions List Component', () => {
 
   it('should handle skill misconception IDs that do not start with selected skill ID', () => {
     component.misconceptionIdsForSelectedSkill = [1];
-    spyOn(asPrivates(component).utilsService, 'isEquivalent').and.returnValue(
-      true
-    );
+    spyOn(
+      getPrivate<{isEquivalent: (a: unknown, b: unknown) => boolean}>(
+        component,
+        'utilsService'
+      ),
+      'isEquivalent'
+    ).and.returnValue(true);
 
     const result = component.showUnaddressedSkillMisconceptionWarning([
       'skillId1-1',
@@ -672,7 +683,10 @@ describe('Questions List Component', () => {
 
     expect(result).toBe(true);
     expect(
-      asPrivates(component).utilsService.isEquivalent
+      getPrivate<{isEquivalent: (a: unknown, b: unknown) => boolean}>(
+        component,
+        'utilsService'
+      ).isEquivalent
     ).toHaveBeenCalledWith([1, undefined], [1]);
   });
 
@@ -760,17 +774,17 @@ describe('Questions List Component', () => {
       component.skillLinkageModificationsArray = [
         {
           id: '1',
-          task: 'update',
+          task: 'update_difficulty',
           difficulty: 1,
         },
         {
           id: '2',
-          task: 'update',
+          task: 'update_difficulty',
           difficulty: 2,
         },
         {
           id: '1',
-          task: 'update',
+          task: 'update_difficulty',
           difficulty: 1,
         },
       ];
@@ -796,22 +810,24 @@ describe('Questions List Component', () => {
       component.saveAndPublishQuestion('Commit');
       tick();
 
+      // When creating a new question, skills are already linked via createQuestionAsync.
+      // Additional skill linkage modifications with valid tasks should be applied.
       expect(
         editableQuestionBackendApiService.editQuestionSkillLinksAsync
       ).toHaveBeenCalledWith('qId', [
         {
           id: '1',
-          task: null,
+          task: 'update_difficulty',
           difficulty: 1,
         },
         {
           id: '2',
-          task: null,
+          task: 'update_difficulty',
           difficulty: 2,
         },
         {
           id: '1',
-          task: null,
+          task: 'update_difficulty',
           difficulty: 1,
         },
       ]);
@@ -843,11 +859,19 @@ describe('Questions List Component', () => {
       'getUnaddressedMisconceptionNames'
     ).and.returnValue([]);
     spyOn(
-      asPrivates(component).imageLocalStorageService,
+      getPrivate<{
+        getStoredImagesData: () => Array<{
+          filename: string;
+          imageBlob: Blob | null;
+        }>;
+      }>(component, 'imageLocalStorageService'),
       'getStoredImagesData'
     ).and.returnValue(mockImageData);
     spyOn(
-      asPrivates(component).imageLocalStorageService,
+      getPrivate<{flushStoredImagesData: () => void}>(
+        component,
+        'imageLocalStorageService'
+      ),
       'flushStoredImagesData'
     );
     spyOn(
@@ -863,10 +887,18 @@ describe('Questions List Component', () => {
     tick();
 
     expect(
-      asPrivates(component).imageLocalStorageService.getStoredImagesData
+      getPrivate<{
+        getStoredImagesData: () => Array<{
+          filename: string;
+          imageBlob: Blob | null;
+        }>;
+      }>(component, 'imageLocalStorageService').getStoredImagesData
     ).toHaveBeenCalled();
     expect(
-      asPrivates(component).imageLocalStorageService.flushStoredImagesData
+      getPrivate<{flushStoredImagesData: () => void}>(
+        component,
+        'imageLocalStorageService'
+      ).flushStoredImagesData
     ).toHaveBeenCalled();
   }));
 
@@ -1198,11 +1230,19 @@ describe('Questions List Component', () => {
     component.questionId = 'testQuestionId';
     spyOn(questionUndoRedoService, 'clearChanges');
     spyOn(
-      asPrivates(component).topicEditorStateService,
+      getPrivate<{
+        toggleQuestionEditor: (
+          isOpen: boolean,
+          newQuestionIsBeingCreated?: boolean
+        ) => void;
+      }>(component, 'topicEditorStateService'),
       'toggleQuestionEditor'
     );
     spyOn(
-      asPrivates(component).imageLocalStorageService,
+      getPrivate<{flushStoredImagesData: () => void}>(
+        component,
+        'imageLocalStorageService'
+      ),
       'flushStoredImagesData'
     );
 
@@ -1211,10 +1251,18 @@ describe('Questions List Component', () => {
     expect(questionUndoRedoService.clearChanges).toHaveBeenCalled();
     expect(component.editorIsOpen).toBe(true);
     expect(
-      asPrivates(component).topicEditorStateService.toggleQuestionEditor
+      getPrivate<{
+        toggleQuestionEditor: (
+          isOpen: boolean,
+          newQuestionIsBeingCreated?: boolean
+        ) => void;
+      }>(component, 'topicEditorStateService').toggleQuestionEditor
     ).toHaveBeenCalledWith(true);
     expect(
-      asPrivates(component).imageLocalStorageService.flushStoredImagesData
+      getPrivate<{flushStoredImagesData: () => void}>(
+        component,
+        'imageLocalStorageService'
+      ).flushStoredImagesData
     ).toHaveBeenCalled();
   });
 
@@ -1644,7 +1692,7 @@ describe('Questions List Component', () => {
       component.skillLinkageModificationsArray = [
         {
           id: '1',
-          task: 'update',
+          task: 'update_difficulty',
           difficulty: 1,
         },
       ];
@@ -1687,12 +1735,12 @@ describe('Questions List Component', () => {
     component.skillLinkageModificationsArray = [
       {
         id: '1',
-        task: 'update',
+        task: 'update_difficulty',
         difficulty: 1,
       },
       {
         id: '2',
-        task: 'update',
+        task: 'update_difficulty',
         difficulty: 2,
       },
     ];
@@ -1804,14 +1852,14 @@ describe('Questions List Component', () => {
     component.skillLinkageModificationsArray = [];
     component.isSkillDifficultyChanged = false;
 
-    // Call the real method; with no change it should compute update not update_difficulty.
+    // Call the real method. When updating an existing question, we always use update_difficulty.
     component.changeLinkedSkillDifficulty();
 
     expect(component.isSkillDifficultyChanged).toBeFalse();
     expect(component.skillLinkageModificationsArray).toEqual([
       {
         id: 'skillId1',
-        task: 'update',
+        task: 'update_difficulty',
         difficulty: 0.7,
       },
     ]);
@@ -1863,9 +1911,13 @@ describe('Questions List Component', () => {
   it('should handle showUnaddressedSkillMisconceptionWarning with no matching ids', () => {
     component.selectedSkillId = 'skillId1';
     component.misconceptionIdsForSelectedSkill = [1, 2];
-    spyOn(asPrivates(component).utilsService, 'isEquivalent').and.returnValue(
-      false
-    );
+    spyOn(
+      getPrivate<{isEquivalent: (a: unknown, b: unknown) => boolean}>(
+        component,
+        'utilsService'
+      ),
+      'isEquivalent'
+    ).and.returnValue(false);
     const result = component.showUnaddressedSkillMisconceptionWarning([
       'skillId2-3',
       'skillId2-4',

@@ -17,27 +17,44 @@
  */
 
 import {
+  Component,
   ComponentFactoryResolver,
   ComponentRef,
   SimpleChange,
+  ViewChild,
   ViewContainerRef,
 } from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {InteractionDisplayComponent} from './interaction-display.component';
 
+@Component({
+  // Host component used to obtain a real ViewContainerRef for tests.
+  template: '<ng-template #vc></ng-template>',
+})
+class HostComponent {
+  @ViewChild('vc', {read: ViewContainerRef, static: true})
+  vcr!: ViewContainerRef;
+}
+
 describe('Interaction display', () => {
   let fixture: ComponentFixture<InteractionDisplayComponent>;
   let componentInstance: InteractionDisplayComponent;
   let componentFactoryResolver: ComponentFactoryResolver;
+  let hostFixture: ComponentFixture<HostComponent>;
+  let hostVcr: ViewContainerRef;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [InteractionDisplayComponent],
+      declarations: [InteractionDisplayComponent, HostComponent],
     }).compileComponents();
 
     fixture = TestBed.createComponent(InteractionDisplayComponent);
     componentInstance = fixture.componentInstance;
     componentFactoryResolver = TestBed.inject(ComponentFactoryResolver);
+    hostFixture = TestBed.createComponent(HostComponent);
+    // Trigger initial lifecycle so @ViewChild resolves.
+    hostFixture.detectChanges();
+    hostVcr = hostFixture.componentInstance.vcr;
   }));
 
   it('should create', () => {
@@ -65,11 +82,10 @@ describe('Interaction display', () => {
       },
     };
 
-    componentInstance.viewContainerRef = {
-      createComponent: null,
-    } as unknown as ViewContainerRef;
+    // Use a real ViewContainerRef from HostComponent to avoid unsafe casts.
+    componentInstance.viewContainerRef = hostVcr;
     spyOn(componentFactoryResolver, 'resolveComponentFactory');
-    spyOn(componentInstance.viewContainerRef, 'createComponent')
+    spyOn(hostVcr, 'createComponent')
       // Unknown type is used here because the type of the component
       // is not known. This is because the component is dynamically
       // created.
@@ -106,15 +122,14 @@ describe('Interaction display', () => {
       },
     };
 
-    componentInstance.viewContainerRef = {
-      createComponent: null,
-    } as unknown as ViewContainerRef;
+    // Use a real ViewContainerRef from HostComponent to avoid unsafe casts.
+    componentInstance.viewContainerRef = hostVcr;
     componentInstance.parentScope = {
       lastAnswer,
     };
 
     spyOn(componentFactoryResolver, 'resolveComponentFactory');
-    spyOn(componentInstance.viewContainerRef, 'createComponent')
+    spyOn(hostVcr, 'createComponent')
       // Unknown type is used here because the type of the component
       // is not known. This is because the component is dynamically
       // created.
@@ -138,9 +153,8 @@ describe('Interaction display', () => {
   });
 
   it('should rebuild interaction if htmlData is updated', () => {
-    componentInstance.viewContainerRef = {
-      clear: () => {},
-    } as ViewContainerRef;
+    // Use the real ViewContainerRef from HostComponent.
+    componentInstance.viewContainerRef = hostVcr;
     spyOn(componentInstance, 'buildInteraction');
 
     componentInstance.ngOnChanges({
