@@ -21,19 +21,15 @@ var forms = require('../webdriverio_utils/forms.js');
 var general = require('../webdriverio_utils/general.js');
 var users = require('../webdriverio_utils/users.js');
 var workflow = require('../webdriverio_utils/workflow.js');
-var AdminPage = require('../webdriverio_utils/AdminPage.js');
 
 var CreatorDashboardPage = require('../webdriverio_utils/CreatorDashboardPage.js');
 var ExplorationEditorPage = require('../webdriverio_utils/ExplorationEditorPage.js');
-var ReleaseCoordinatorPage = require('../webdriverio_utils/ReleaseCoordinatorPage.js');
 
 describe('Exploration translation and voiceover tab', function () {
-  var adminPage = null;
   var creatorDashboardPage = null;
   var explorationEditorMainTab = null;
   var explorationEditorPage = null;
   var explorationEditorTranslationTab = null;
-  var releaseCoordinatorPage = null;
 
   beforeAll(async function () {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
@@ -41,9 +37,6 @@ describe('Exploration translation and voiceover tab', function () {
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorTranslationTab = explorationEditorPage.getTranslationTab();
     explorationPreviewTab = explorationEditorPage.getPreviewTab();
-    adminPage = new AdminPage.AdminPage();
-    releaseCoordinatorPage =
-      new ReleaseCoordinatorPage.ReleaseCoordinatorPage();
 
     await users.createUser('voiceArtist@translationTab.com', 'userVoiceArtist');
     await users.createUser('user@editorTab.com', 'userEditor');
