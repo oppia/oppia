@@ -77,9 +77,9 @@ export class TranslateTextService {
     private translateTextBackendApiService: TranslateTextBackendApiService
   ) {}
 
-  private _getNextText(): string | string[] {
+  private _getNextText(): string | string[] | null {
     if (this.stateAndContent.length === 0) {
-      return '';
+      return null;
     }
     this.activeIndex += 1;
     this.activeStateName = this.stateAndContent[this.activeIndex].stateName;
@@ -88,9 +88,9 @@ export class TranslateTextService {
     return this.activeContentText;
   }
 
-  private _getPreviousText(): string | string[] {
+  private _getPreviousText(): string | string[] | null {
     if (this.stateAndContent.length === 0 || this.activeIndex <= 0) {
-      return '';
+      return null;
     }
     this.activeIndex -= 1;
     this.activeStateName = this.stateAndContent[this.activeIndex].stateName;
