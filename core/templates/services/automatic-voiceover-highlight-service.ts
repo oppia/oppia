@@ -179,7 +179,14 @@ export class AutomaticVoiceoverHighlightService {
     // core/platform/azure_speech_synthesis/azure_speech_synthesis_services.py.
     // It ensures that sentences from the frontend match those from the backend.
     if (sentence.includes(' - ')) {
-      sentence = sentence.replace(/-/g, mathSymbolPronunciations['-']);
+      if (sentence.includes('-')) {
+        const pattern = /(\d+)\s*-\s*(\d+)/g;
+        const pronunciation = mathSymbolPronunciations['-'];
+
+        sentence = sentence.replace(pattern, (_match, num1, num2) => {
+          return `${num1} ${pronunciation} ${num2}`;
+        });
+      }
     }
 
     if (sentence.includes(' + ')) {
