@@ -161,11 +161,10 @@ export class GoalListComponent implements OnInit {
   getStartButtonClass(story: StorySummary, nodeIndex: number): string {
     const node = story.getAllNodes()[nodeIndex];
 
-    if (!this.isSerialChapterFeatureLearnerFlagEnabled()) {
-      return 'oppia-learner-dash-button--default';
-    }
-
-    if (!node.getPublishedStatus()) {
+    if (
+      !node.getPublishedStatus() &&
+      this.isSerialChapterFeatureLearnerFlagEnabled()
+    ) {
       return 'oppia-learner-dash-button--disabled';
     }
 
