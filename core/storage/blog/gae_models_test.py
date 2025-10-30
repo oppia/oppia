@@ -178,9 +178,10 @@ class BlogPostModelTest(test_utils.GenericTestBase):
         self.assertEqual(user_data, test_data)
 
     def test_export_data_published_on_none(self) -> None:
+        user_id = 'user_2'
         blog_post_model = blog_models.BlogPostModel(
             id='blog_two',
-            author_id=self.USER_ID,
+            author_id=user_id,
             content=self.CONTENT,
             title=self.TITLE,
             published_on=None,
@@ -190,7 +191,7 @@ class BlogPostModelTest(test_utils.GenericTestBase):
         )
         blog_post_model.update_timestamps()
         blog_post_model.put()
-        user_data = blog_models.BlogPostModel.export_data(self.USER_ID)
+        user_data = blog_models.BlogPostModel.export_data(user_id)
         test_data = {
             'blog_two': {
                 'title': self.TITLE,
