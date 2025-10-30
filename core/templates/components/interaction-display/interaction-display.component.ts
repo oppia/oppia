@@ -39,8 +39,12 @@ export interface InteractionParentScope {
 }
 
 // Narrow helper types for bracketed bindings that some interactions expose.
-type WithLastAnswer = {lastAnswer: InteractionAnswer | null};
-type WithSavedSolution = {savedSolution: InteractionAnswer | null};
+interface WithLastAnswer {
+  lastAnswer: InteractionAnswer | null;
+}
+interface WithSavedSolution {
+  savedSolution: InteractionAnswer | null;
+}
 
 @Component({
   selector: 'oppia-interaction-display',

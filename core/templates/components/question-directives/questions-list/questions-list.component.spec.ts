@@ -76,11 +76,12 @@ class MockUrlInterpolationService {
 
 // Helper to access component's private services in tests via bracket notation.
 // TypeScript allows bracket notation to access private members for testing purposes.
-// This approach uses a single cast to Record<string, any> which is standard practice
-// for accessing private members in Angular component tests.
+// We use a double cast through unknown to access private members, which is necessary
+// for testing purposes when accessing private properties that don't have an index signature.
 const getPrivate = <T>(comp: QuestionsListComponent, key: string): T => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (comp as any)[key] as T;
+  // We need to use bracket notation to access private members in tests.
+  // eslint-disable-next-line dot-notation
+  return (comp as unknown as Record<string, unknown>)[key] as T;
 };
 
 describe('Questions List Component', () => {
@@ -860,10 +861,10 @@ describe('Questions List Component', () => {
     ).and.returnValue([]);
     spyOn(
       getPrivate<{
-        getStoredImagesData: () => Array<{
+        getStoredImagesData: () => {
           filename: string;
           imageBlob: Blob | null;
-        }>;
+        }[];
       }>(component, 'imageLocalStorageService'),
       'getStoredImagesData'
     ).and.returnValue(mockImageData);
@@ -888,10 +889,10 @@ describe('Questions List Component', () => {
 
     expect(
       getPrivate<{
-        getStoredImagesData: () => Array<{
+        getStoredImagesData: () => {
           filename: string;
           imageBlob: Blob | null;
-        }>;
+        }[];
       }>(component, 'imageLocalStorageService').getStoredImagesData
     ).toHaveBeenCalled();
     expect(
