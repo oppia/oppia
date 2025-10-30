@@ -293,7 +293,8 @@ def convert_plaintext_to_ssml_content(
         # Update the content to pronounce `/` correctly in the given language.
         if ' / ' in content:
             content = content.replace(
-                '/', MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronunciations['÷']
+                ' / ',
+                MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronunciations['÷'],
             )
 
         # Update the content to pronounce `÷` correctly in the given language.
