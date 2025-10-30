@@ -264,13 +264,13 @@ def convert_plaintext_to_ssml_content(
         # Updates the content to pronounce `-` correctly in the given language.
         if ' - ' in content:
             pattern = re.compile(r'(\d+)\s*-\s*(\d+)')
-            pronunciation = (
-                MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronunciations['-']
-            )
 
-            def replacer(match):
+            def replacer(match: re.Match) -> str:
                 num1, num2 = match.groups()
-                return f"{num1} {pronunciation} {num2}"
+                pronunciation = (
+                    MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronunciations['-']
+                )
+                return '%s %s %s' % (num1, pronunciation, num2)
 
             content = pattern.sub(replacer, content)
 
