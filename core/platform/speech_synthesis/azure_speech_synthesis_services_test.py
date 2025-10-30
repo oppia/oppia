@@ -400,6 +400,19 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
             self._get_ssml_content(expected_main_content, language_accent_code),
         )
 
+        plaintext = 'Hello - welcome to Oppia!'
+        expected_main_content = 'Hello - welcome to Oppia!'
+
+        ssml_content = (
+            azure_speech_synthesis_services.convert_plaintext_to_ssml_content(
+                plaintext, language_accent_code
+            )
+        )
+        self.assertEqual(
+            ssml_content,
+            self._get_ssml_content(expected_main_content, language_accent_code),
+        )
+
         plaintext = 'Find the value of 5 + 3.'
         expected_main_content = (
             'Find the value of 5 <say-as interpret-as="math">plus</say-as> 3.'

@@ -130,7 +130,7 @@ def process_factorial_in_text(
         str. The processed text with factorial expressions replaced by their
         corresponding words or phrases.
     """
-    pronounciation = math_symbol_pronunciations['!'] + ' '
+    pronounciation = math_symbol_pronunciations.get('!', '') + ' '
     return re.sub(r'(\d+)!', pronounciation + r'\1', text)
 
 
@@ -263,9 +263,16 @@ def convert_plaintext_to_ssml_content(
     for content in content_list:
         # Updates the content to pronounce `-` correctly in the given language.
         if ' - ' in content:
-            content = content.replace(
-                '-', MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronunciations['-']
+            pattern = re.compile(r'(\d+)\s*-\s*(\d+)')
+            pronunciation = (
+                MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronunciations['-']
             )
+
+            def replacer(match):
+                num1, num2 = match.groups()
+                return f"{num1} {pronunciation} {num2}"
+
+            content = pattern.sub(replacer, content)
 
         # Update the content to pronounce `*` correctly in the given language.
         if ' * ' in content:
