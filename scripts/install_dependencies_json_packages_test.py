@@ -25,10 +25,11 @@ import re
 import ssl
 import tempfile
 import zipfile
-from typing import BinaryIO, Final, NoReturn, Tuple
 from urllib import request as urlrequest
 
 from core.tests import test_utils
+
+from typing import BinaryIO, Final, NoReturn, Tuple
 
 from . import common, install_dependencies_json_packages
 
