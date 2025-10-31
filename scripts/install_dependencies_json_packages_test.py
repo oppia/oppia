@@ -25,11 +25,10 @@ import re
 import ssl
 import tempfile
 import zipfile
+from typing import BinaryIO, Final, NoReturn, Tuple
 from urllib import request as urlrequest
 
 from core.tests import test_utils
-
-from typing import BinaryIO, Final, NoReturn, Tuple
 
 from . import common, install_dependencies_json_packages
 
@@ -267,10 +266,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             print_arr.append(msg)
 
         print_swap = self.swap(builtins, 'print', mock_print)
-        # Note: The test assertion is changed from '1A' to "1" to match the
-        # actual SystemExit code and fix the C0016 punctuation lint error.
         with print_swap, self.assertRaisesRegex(SystemExit, '1'):
-            # This might be the intended error source for the test.
             install_dependencies_json_packages.test_dependencies_syntax(
                 'zip',
                 {
@@ -397,7 +393,6 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                         'version': '1.12.1',
                         'downloadFormat': 'files',
                         'url': 'https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1',
-                        # This key might not be valid for 'files' format.
                         'rootDirPrefix': 'jqueryui-',
                         'targetDirPrefix': 'jqueryui-',
                         'files': ['jquery-ui.min.js'],
@@ -411,9 +406,8 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         def mock_download_files(
             unused_source_url_root: str,
             unused_target_dir: str,
-            unused_source_filenames: list[str],
+            unused_source_filenames: str,
         ) -> None:
-            # Corrected type hint.
             check_function_calls['download_files_is_called'] = True
 
         def mock_download_and_unzip_files(
