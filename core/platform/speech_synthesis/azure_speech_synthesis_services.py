@@ -265,7 +265,7 @@ def convert_plaintext_to_ssml_content(
         if ' - ' in content:
             pattern = re.compile(r'(\d+)\s*-\s*(\d+)')
 
-            def replacer(match: re.Match) -> str:
+            def replacer(match: re.Match[str]) -> str:
                 num1, num2 = match.groups()
                 pronunciation = (
                     MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronunciations['-']

@@ -430,8 +430,8 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
 
         plaintext = 'Find the value of 15 / 5.'
         expected_main_content = (
-            'Find the value of 15 <say-as interpret-as="math">divided by'
-            '</say-as> 5.'
+            'Find the value of 15<say-as interpret-as="math">divided by'
+            '</say-as>5.'
         )
 
         ssml_content = (
