@@ -59,11 +59,6 @@ THIRD_PARTY_GENERATED_OUT_DIR = os.path.join(
     'build', 'third_party', 'generated', ''
 )
 
-THIRD_PARTY_JS_RELATIVE_FILEPATH = os.path.join('js', 'third_party.js')
-MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH = os.path.join(
-    'js', 'third_party.min.js'
-)
-
 THIRD_PARTY_CSS_RELATIVE_FILEPATH = os.path.join('css', 'third_party.css')
 MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH = os.path.join(
     'css', 'third_party.min.css'
@@ -127,7 +122,6 @@ JS_FILEPATHS_NOT_TO_BUILD = (
 # need cache invalidation.
 FILEPATHS_NOT_TO_RENAME = (
     '*.py',
-    'third_party/generated/js/third_party.min.js.map',
     'third_party/generated/webfonts/*',
     '*.bundle.js',
     '*.bundle.js.map',
@@ -340,39 +334,6 @@ def _join_files(source_paths: List[str], target_file_stream: TextIO) -> None:
     for source_path in source_paths:
         with utils.open_file(source_path, 'r') as source_file:
             write_to_file_stream(target_file_stream, source_file.read())
-
-
-def _minify_and_create_sourcemap(
-    source_path: str, target_file_path: str
-) -> None:
-    """Minifies and generates source map for a JS file. This function is only
-    meant to be used with third_party.min.js.
-
-    Args:
-        source_path: str. Path to JS file to minify.
-        target_file_path: str. Path to location of the minified file.
-    """
-    print('Minifying and creating sourcemap for %s' % source_path)
-    source_map_properties = 'includeSources,url=\'third_party.min.js.map\''
-    # TODO(#18260): Change this when we permanently move to
-    # the Dockerized Setup.
-    if feconf.OPPIA_IS_DOCKERIZED:
-        subprocess.check_call(
-            'node /app/oppia/node_modules/uglify-js/bin/uglifyjs'
-            ' /app/oppia/third_party/generated/js/third_party.js'
-            ' -c -m --source-map includeSources,url=\'third_party.min.js.map\''
-            ' -o /app/oppia/third_party/generated/js/third_party.min.js',
-            shell=True,
-        )
-    else:
-        cmd = '%s %s %s -c -m --source-map %s -o %s ' % (
-            common.NODE_BIN_PATH,
-            UGLIFY_FILE,
-            source_path,
-            source_map_properties,
-            target_file_path,
-        )
-        subprocess.check_call(cmd, shell=True)
 
 
 def _generate_copy_tasks_for_fonts(
@@ -662,26 +623,17 @@ def minify_third_party_libs(third_party_directory_path: str) -> None:
     """Minify third_party.js and third_party.css and remove un-minified
     files.
     """
-    third_party_js_filepath = os.path.join(
-        third_party_directory_path, THIRD_PARTY_JS_RELATIVE_FILEPATH
-    )
+
     third_party_css_filepath = os.path.join(
         third_party_directory_path, THIRD_PARTY_CSS_RELATIVE_FILEPATH
     )
 
-    minified_third_party_js_filepath = os.path.join(
-        third_party_directory_path, MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH
-    )
     minified_third_party_css_filepath = os.path.join(
         third_party_directory_path, MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH
     )
 
-    _minify_and_create_sourcemap(
-        third_party_js_filepath, minified_third_party_js_filepath
-    )
     _minify_css(third_party_css_filepath, minified_third_party_css_filepath)
     # Clean up un-minified third_party.js and third_party.css.
-    safe_delete_file(third_party_js_filepath)
     safe_delete_file(third_party_css_filepath)
 
 
@@ -692,9 +644,6 @@ def build_third_party_libs(third_party_directory_path: str) -> None:
 
     print('Building third party libs at %s' % third_party_directory_path)
 
-    third_party_js_filepath = os.path.join(
-        third_party_directory_path, THIRD_PARTY_JS_RELATIVE_FILEPATH
-    )
     third_party_css_filepath = os.path.join(
         third_party_directory_path, THIRD_PARTY_CSS_RELATIVE_FILEPATH
     )
@@ -703,9 +652,6 @@ def build_third_party_libs(third_party_directory_path: str) -> None:
     )
 
     dependency_filepaths = get_dependencies_filepaths()
-    common.ensure_directory_exists(os.path.dirname(third_party_js_filepath))
-    with utils.open_file(third_party_js_filepath, 'w+') as third_party_js_file:
-        _join_files(dependency_filepaths['js'], third_party_js_file)
 
     common.ensure_directory_exists(os.path.dirname(third_party_css_filepath))
     with utils.open_file(
@@ -1362,10 +1308,6 @@ def _verify_hashes(
     hash_final_filename = _insert_hash(
         HASHES_JSON_FILENAME, file_hashes[HASHES_JSON_FILENAME]
     )
-    third_party_js_final_filename = _insert_hash(
-        MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH,
-        file_hashes[MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH],
-    )
     third_party_css_final_filename = _insert_hash(
         MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH,
         file_hashes[MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH],
@@ -1374,9 +1316,6 @@ def _verify_hashes(
     _ensure_files_exist(
         [
             os.path.join(ASSETS_OUT_DIR, hash_final_filename),
-            os.path.join(
-                THIRD_PARTY_GENERATED_OUT_DIR, third_party_js_final_filename
-            ),
             os.path.join(
                 THIRD_PARTY_GENERATED_OUT_DIR, third_party_css_final_filename
             ),

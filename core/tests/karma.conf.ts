@@ -4,10 +4,6 @@ var argv = require('yargs').positional('terminalEnabled', {
 }).argv;
 var path = require('path');
 var webpack = require('webpack');
-var generatedJs = 'third_party/generated/js/third_party.js';
-if (argv.prodEnv) {
-  generatedJs = 'third_party/generated/js/third_party.min.js';
-}
 
 // Here we are checking if the specs_to_run flag is provided or not. If it is
 // provided, we are splitting the comma separated string into an array of
@@ -62,9 +58,6 @@ module.exports = function (config) {
       // Since jquery, angular-mocks and math-expressions
       // are not bundled, they will be treated separately.
       'third_party/static/jquery-3.5.1/jquery.min.js',
-      'third_party/static/angularjs-1.8.2/angular.js',
-      'third_party/static/angularjs-1.8.2/angular-mocks.js',
-      generatedJs,
       // Note that unexpected errors occur ("Cannot read property 'num' of
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
       // and extensions/... are switched. The test framework may be flaky.
@@ -113,12 +106,6 @@ module.exports = function (config) {
       // Note that these files should contain only directive templates, and no
       // Jinja expressions. They should also be specified within the 'files'
       // list above.
-      'core/templates/**/*_directive.html': ['ng-html2js'],
-      'core/templates/**/*.directive.html': ['ng-html2js'],
-      'core/templates/**/*.component.html': ['ng-html2js'],
-      'core/templates/**/*.template.html': ['ng-html2js'],
-      'extensions/interactions/**/*.directive.html': ['ng-html2js'],
-      'extensions/interactions/**/*.component.html': ['ng-html2js'],
       'extensions/interactions/*.json': ['json_fixtures'],
       'core/tests/data/*.json': ['json_fixtures'],
     },
@@ -171,22 +158,10 @@ module.exports = function (config) {
       'karma-coverage-istanbul-reporter',
       'karma-jasmine',
       'karma-chrome-launcher',
-      'karma-ng-html2js-preprocessor',
       'karma-json-fixtures-preprocessor',
       'karma-coverage',
       'karma-webpack',
     ],
-    ngHtml2JsPreprocessor: {
-      moduleName: 'directiveTemplates',
-      // Key ngHtml2JsPreprocessor adds the html inside $templateCache,
-      // the key that we use for that cache needs to be exactly the same as
-      // the templateUrl in directive JS. The stripPrefix and prependPrefix are
-      // used for modifying the $templateCache keys.
-      // If the key starts with core/ we need to get rid of that.
-      stripPrefix: 'core/',
-      // Every key must start with /.
-      prependPrefix: '/',
-    },
     jsonFixturesPreprocessor: {
       variableName: '__fixtures__',
     },

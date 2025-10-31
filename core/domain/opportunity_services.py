@@ -19,18 +19,21 @@
 from __future__ import annotations
 
 import collections
+import datetime
 import logging
 
-from core import feconf
+from core import feature_flag_list, feconf
 from core.constants import constants
 from core.domain import (
     exp_domain,
     exp_fetchers,
+    feature_flag_services,
     opportunity_domain,
     question_fetchers,
     story_domain,
     story_fetchers,
     suggestion_services,
+    taskqueue_services,
     topic_domain,
     topic_fetchers,
     translation_services,
@@ -267,6 +270,22 @@ def create_exp_opportunity_summary(
         )
     )
 
+    # Asynchronously regenerates voiceovers for exploration contents in English
+    # and other available translations when the exploration is linked to a
+    # story.
+    if feature_flag_services.is_feature_flag_enabled(
+        feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS.value,
+        None,
+    ):
+        taskqueue_services.defer(
+            feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+                'FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_CURATION'
+            ],
+            taskqueue_services.QUEUE_NAME_VOICEOVER_REGENERATION,
+            exploration.id,
+            datetime.datetime.utcnow().isoformat(),
+            feconf.SYSTEM_COMMITTER_ID,
+        )
     return exploration_opportunity_summary
 
 
