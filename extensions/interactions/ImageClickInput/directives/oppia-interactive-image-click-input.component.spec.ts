@@ -35,6 +35,8 @@ import {CurrentInteractionService} from 'pages/exploration-player-page/services/
 import {AppConstants} from 'app.constants';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
+import {GraphAnswer} from 'interactions/answer-defs';
 
 describe('InteractiveImageClickInput', () => {
   let fixture: ComponentFixture<InteractiveImageClickInput>;
@@ -51,7 +53,10 @@ describe('InteractiveImageClickInput', () => {
     'img_20210616_110856_oxqveyuhr3_height_778_width_441.svg';
 
   class mockInteractionAttributesExtractorService {
-    getValuesFromAttributes(interactionId, attributes) {
+    getValuesFromAttributes(
+      interactionId: InteractionSpecsKey,
+      attributes: Record<string, string>
+    ) {
       return {
         imageAndRegions: {
           value: JSON.parse(attributes.imageAndRegionsWithValue),
@@ -64,10 +69,16 @@ describe('InteractiveImageClickInput', () => {
   }
 
   let mockCurrentInteractionService = {
-    onSubmit: (answer, rulesService) => {
+    onSubmit: (
+      answer: GraphAnswer,
+      rulesService: CurrentInteractionService
+    ) => {
       expect(answer).toEqual({clickPosition: [1, 2], clickedRegions: []});
     },
-    registerCurrentInteraction: (submitAnswer, validateExpressionFn) => {},
+    registerCurrentInteraction: (
+      submitAnswer: Function,
+      validateExpressionFn: Function
+    ) => {},
   };
 
   beforeEach(async(() => {
@@ -396,8 +407,9 @@ describe('InteractiveImageClickInput', () => {
       ' in exploration player',
     () => {
       spyOn(component, 'updateCurrentlyHoveredRegions').and.callThrough();
-      component.lastAnswer.clickPosition = [0.4, 0.4];
-
+      if (component.lastAnswer !== null) {
+        component.lastAnswer.clickPosition = [0.4, 0.4];
+      }
       component.ngOnInit();
 
       expect(component.interactionIsActive).toBe(false);
@@ -631,7 +643,7 @@ describe('InteractiveImageClickInput', () => {
       clientY: 100,
     });
 
-    component.el = {
+    (component as any).el = {
       nativeElement: {
         querySelectorAll: () => [imageElement],
       },
@@ -682,9 +694,10 @@ describe('InteractiveImageClickInput', () => {
         260
       );
       let evt = new MouseEvent('Mousemove');
-      component.lastAnswer.clickPosition = [0.4, 0.4];
-      component.ngOnInit();
-
+      if (component.lastAnswer !== null) {
+        component.lastAnswer.clickPosition = [0.4, 0.4];
+        component.ngOnInit();
+      }
       expect(component.interactionIsActive).toBe(false);
       expect(component.mouseX).toBe(0.4);
       expect(component.mouseY).toBe(0.4);

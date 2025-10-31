@@ -63,7 +63,7 @@ interface ImagePoint {
 export class InteractiveImageClickInput implements OnInit, OnDestroy {
   @Input() imageAndRegionsWithValue: string;
   @Input() highlightRegionsOnHoverWithValue: string;
-  @Input() lastAnswer: ImageClickAnswer;
+  @Input() lastAnswer: ImageClickAnswer | null;
   imageAndRegions: ImageWithRegions;
   highlightRegionsOnHover: boolean = false;
   componentSubscriptions = new Subscription();
