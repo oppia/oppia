@@ -19,8 +19,10 @@
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {MaterialModule} from 'modules/material.module';
 import {FormsModule} from '@angular/forms';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 
+import {PlatformFeatureService} from 'services/platform-feature.service';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
@@ -32,6 +34,15 @@ describe('Learner Topic Goals Summary Tile Component', () => {
   let component: LearnerTopicGoalsSummaryTileComponent;
   let fixture: ComponentFixture<LearnerTopicGoalsSummaryTileComponent>;
 
+  class MockPlatformFeatureService {
+    status = {
+      SerialChapterLaunchLearnerView: {
+        isEnabled: false,
+      },
+    };
+  }
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
+
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
@@ -40,8 +51,11 @@ describe('Learner Topic Goals Summary Tile Component', () => {
         FormsModule,
         HttpClientTestingModule,
       ],
-      declarations: [LearnerTopicGoalsSummaryTileComponent],
-      providers: [UrlInterpolationService],
+      declarations: [LearnerTopicGoalsSummaryTileComponent, MockTranslatePipe],
+      providers: [
+        {provide: PlatformFeatureService, useValue: mockPlatformFeatureService},
+        UrlInterpolationService,
+      ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
@@ -179,4 +193,22 @@ describe('Learner Topic Goals Summary Tile Component', () => {
       expect(component.getStoryNodeLink()).toBe(storyNodeLink);
     }
   );
+
+  it('should prevent default when story is not published', () => {
+    component.statusIsPublished = false;
+    const mockEvent = jasmine.createSpyObj('event', ['preventDefault']);
+
+    component.onStoryClick(mockEvent);
+
+    expect(mockEvent.preventDefault).toHaveBeenCalled();
+  });
+
+  it('should not prevent default when story is published', () => {
+    component.statusIsPublished = true;
+    const mockEvent = jasmine.createSpyObj('event', ['preventDefault']);
+
+    component.onStoryClick(mockEvent);
+
+    expect(mockEvent.preventDefault).not.toHaveBeenCalled();
+  });
 });

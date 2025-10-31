@@ -132,8 +132,8 @@ class EntityTranslationFetchersTests(test_utils.GenericTestBase):
 
     def test_get_entity_translation_returns_empty_if_not_found(self) -> None:
         """Test fetching translations that do not exist
-         returns an empty object.
-         """
+        returns an empty object.
+        """
         result = translation_fetchers.get_entity_translation(
             feconf.TranslatableEntityType.EXPLORATION, 'nonexistent', 1, 'hi'
         )
@@ -145,55 +145,75 @@ class EntityTranslationFetchersTests(test_utils.GenericTestBase):
         exp_id_2 = 'exp2'
 
         translation_models.EntityTranslationsModel.create_new(
-            'exploration', exp_id_1, 1, 'hi',
-            {'content_1': {
-                'content_format': 'html',
-                'content_value': 'Translation 1',
-                'needs_update': False}}
+            'exploration',
+            exp_id_1,
+            1,
+            'hi',
+            {
+                'content_1': {
+                    'content_format': 'html',
+                    'content_value': 'Translation 1',
+                    'needs_update': False,
+                }
+            },
         ).put()
 
         translation_models.EntityTranslationsModel.create_new(
-            'exploration', exp_id_2, 1, 'hi',
-            {'content_2': {
-                'content_format': 'html',
-                'content_value': 'Translation 2',
-                'needs_update': False}}
+            'exploration',
+            exp_id_2,
+            1,
+            'hi',
+            {
+                'content_2': {
+                    'content_format': 'html',
+                    'content_value': 'Translation 2',
+                    'needs_update': False,
+                }
+            },
         ).put()
 
         translation_models.EntityTranslationsModel.create_new(
-            'exploration', exp_id_1, 2, 'hi',
-            {'content_1': {
-                'content_format': 'html',
-                'content_value': 'Updated Translation 1',
-                'needs_update': False}}
+            'exploration',
+            exp_id_1,
+            2,
+            'hi',
+            {
+                'content_1': {
+                    'content_format': 'html',
+                    'content_value': 'Updated Translation 1',
+                    'needs_update': False,
+                }
+            },
         ).put()
 
-        results = translation_fetchers.get_multiple_entity_translations([
-            {
-                'entity_type': feconf.TranslatableEntityType.EXPLORATION,
-                'entity_id': exp_id_1,
-                'entity_version': 1,
-                'language_code': 'hi'
-            },
-            {
-                'entity_type': feconf.TranslatableEntityType.EXPLORATION,
-                'entity_id': exp_id_1,
-                'entity_version': 2,
-                'language_code': 'hi'
-            },
-            {
-                'entity_type': feconf.TranslatableEntityType.EXPLORATION,
-                'entity_id': exp_id_2,
-                'entity_version': 1,
-                'language_code': 'hi'
-            },
-            {
-                'entity_type': feconf.TranslatableEntityType.EXPLORATION,
-                'entity_id': 'nonexistent',
-                'entity_version': 1,
-                'language_code': 'hi'
-            }
-        ])
+        results = translation_fetchers.get_multiple_entity_translations(
+            [
+                {
+                    'entity_type': feconf.TranslatableEntityType.EXPLORATION,
+                    'entity_id': exp_id_1,
+                    'entity_version': 1,
+                    'language_code': 'hi',
+                },
+                {
+                    'entity_type': feconf.TranslatableEntityType.EXPLORATION,
+                    'entity_id': exp_id_1,
+                    'entity_version': 2,
+                    'language_code': 'hi',
+                },
+                {
+                    'entity_type': feconf.TranslatableEntityType.EXPLORATION,
+                    'entity_id': exp_id_2,
+                    'entity_version': 1,
+                    'language_code': 'hi',
+                },
+                {
+                    'entity_type': feconf.TranslatableEntityType.EXPLORATION,
+                    'entity_id': 'nonexistent',
+                    'entity_version': 1,
+                    'language_code': 'hi',
+                },
+            ]
+        )
 
         self.assertEqual(len(results), 4)
 
@@ -211,7 +231,7 @@ class EntityTranslationFetchersTests(test_utils.GenericTestBase):
         self.assertEqual(results[1].entity_version, 2)
         self.assertEqual(
             results[1].translations['content_1'].content_value,
-            'Updated Translation 1'
+            'Updated Translation 1',
         )
 
         self.assertIsNotNone(results[2])
@@ -219,31 +239,42 @@ class EntityTranslationFetchersTests(test_utils.GenericTestBase):
         self.assertEqual(results[2].entity_id, exp_id_2)
         self.assertEqual(results[2].entity_version, 1)
         self.assertEqual(
-            results[2].translations['content_2'].content_value,
-            'Translation 2'
+            results[2].translations['content_2'].content_value, 'Translation 2'
         )
 
         self.assertIsNone(results[3])
 
     def test_get_entity_translations_with_different_languages(self) -> None:
-        """Test fetching translations in multiple 
+        """Test fetching translations in multiple
         languages for the same entity.
         """
         exp_id = 'exp_lang'
         translation_models.EntityTranslationsModel.create_new(
-            'exploration', exp_id, 1, 'hi',
-            {'content_1': {
-                'content_format': 'html',
-                'content_value': 'नमस्ते',
-                'needs_update': False}}
+            'exploration',
+            exp_id,
+            1,
+            'hi',
+            {
+                'content_1': {
+                    'content_format': 'html',
+                    'content_value': 'नमस्ते',
+                    'needs_update': False,
+                }
+            },
         ).put()
 
         translation_models.EntityTranslationsModel.create_new(
-            'exploration', exp_id, 1, 'fr',
-            {'content_1': {
-                'content_format': 'html',
-                'content_value': 'Bonjour',
-                'needs_update': False}}
+            'exploration',
+            exp_id,
+            1,
+            'fr',
+            {
+                'content_1': {
+                    'content_format': 'html',
+                    'content_value': 'Bonjour',
+                    'needs_update': False,
+                }
+            },
         ).put()
 
         hi_result = translation_fetchers.get_entity_translation(
@@ -266,11 +297,17 @@ class EntityTranslationFetchersTests(test_utils.GenericTestBase):
         """Test fetching translations where needs_update flag is set."""
         exp_id = 'exp_update'
         translation_models.EntityTranslationsModel.create_new(
-            'exploration', exp_id, 1, 'hi',
-            {'content_1': {
-                'content_format': 'html',
-                'content_value': 'पुराना',
-                'needs_update': True}}
+            'exploration',
+            exp_id,
+            1,
+            'hi',
+            {
+                'content_1': {
+                    'content_format': 'html',
+                    'content_value': 'पुराना',
+                    'needs_update': True,
+                }
+            },
         ).put()
 
         result = translation_fetchers.get_entity_translation(

@@ -19,8 +19,9 @@ from __future__ import annotations
 import datetime
 import uuid
 
-from core import feconf
+from core import feature_flag_list, feconf
 from core.domain import (
+    opportunity_services,
     rights_domain,
     rights_manager,
     state_domain,
@@ -457,6 +458,107 @@ class RegenerateAutomaticVoiceoverHandlerTests(test_utils.GenericTestBase):
         )
         self.assertTrue(response_dict['filename'].startswith('content_0-en-US'))
 
+        self.logout()
+
+
+class RegenerateVoiceoverOnExpUpdateHandlerTests(test_utils.GenericTestBase):
+    """Test to regenerate voiceover on exploration update."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.VOICEOVER_ADMIN_EMAIL, self.VOICEOVER_ADMIN_USERNAME)
+        self.set_voiceover_admin([self.VOICEOVER_ADMIN_USERNAME])
+        self.voiceover_admin_id = self.get_user_id_from_email(
+            self.VOICEOVER_ADMIN_EMAIL
+        )
+        self.voiceover_admin = user_services.get_user_actions_info(
+            self.voiceover_admin_id
+        )
+
+        self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
+        self.voice_artist_id = self.get_user_id_from_email(
+            self.VOICE_ARTIST_EMAIL
+        )
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
+
+        self.exploration = self.save_new_valid_exploration(
+            'exp_id', self.owner_id, title='Exploration 1'
+        )
+        rights_manager.publish_exploration(self.owner, self.exploration.id)
+        rights_manager.assign_role_for_exploration(
+            self.voiceover_admin,
+            self.exploration.id,
+            self.voice_artist_id,
+            rights_domain.ROLE_VOICE_ARTIST,
+        )
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS]
+    )
+    def test_should_be_able_to_regenerate_voiceovers(self) -> None:
+        self.login(self.VOICE_ARTIST_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        deferred_calls = []
+
+        def mock_defer(
+            function_id: str,
+            queue_name: str,
+            exploration_id: str,
+            exploration_title: str,
+            exploration_version: int,
+            committer_id: str,
+            datetime_str: str,
+        ) -> None:
+            deferred_calls.append(
+                {
+                    'function_id': function_id,
+                    'queue_name': queue_name,
+                    'exploration_id': exploration_id,
+                    'exploration_title': exploration_title,
+                    'exploration_version': exploration_version,
+                    'committer_id': committer_id,
+                    'datetime_str': datetime_str,
+                }
+            )
+
+        exploration_id = self.exploration.id
+        exploration_version = self.exploration.version
+        exploration_title = self.exploration.title
+
+        handler_url = '/regenerate_voiceover_on_exp_update/%s/%s/%s' % (
+            exploration_id,
+            exploration_version,
+            exploration_title,
+        )
+
+        with (
+            self.swap(
+                opportunity_services,
+                'is_exploration_available_for_contribution',
+                lambda _: True,
+            ),
+            self.swap(taskqueue_services, 'defer', mock_defer),
+        ):
+            self.post_json(handler_url, {}, csrf_token=csrf_token)
+
+        self.assertEqual(len(deferred_calls), 1)
+        args = deferred_calls[0]
+
+        expected_func_name = (
+            feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+                'FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_UPDATE'
+            ]
+        )
+
+        self.assertEqual(args['function_id'], expected_func_name)
+        self.assertEqual(args['queue_name'], 'voiceover-regeneration')
+        self.assertEqual(args['exploration_id'], exploration_id)
+        self.assertEqual(args['exploration_title'], exploration_title)
+        self.assertEqual(args['exploration_version'], exploration_version)
+        self.assertEqual(args['committer_id'], feconf.SYSTEM_COMMITTER_ID)
         self.logout()
 
 

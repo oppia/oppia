@@ -31,7 +31,7 @@ import {ContentTranslationManagerService} from './content-translation-manager.se
 import {PlayerTranscriptService} from './player-transcript.service';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {EntityTranslationsService} from 'services/entity-translations.services';
-import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
+import {EntityTranslation} from 'domain/translation/entity-translation.model';
 import {ImagePreloaderService} from './image-preloader.service';
 import {ExtensionTagAssemblerService} from 'services/extension-tag-assembler.service';
 import {PageContextService} from 'services/page-context.service';

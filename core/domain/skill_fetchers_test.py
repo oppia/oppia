@@ -325,30 +325,37 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
         """Test fetching multiple skills with specific versions."""
         skill_1_id = skill_services.get_new_skill_id()
         self.save_new_skill(
-            skill_1_id, self.USER_ID, description='Original Skill 1')
+            skill_1_id, self.USER_ID, description='Original Skill 1'
+        )
 
         skill_2_id = skill_services.get_new_skill_id()
         self.save_new_skill(
-            skill_2_id, self.USER_ID, description='Original Skill 2')
+            skill_2_id, self.USER_ID, description='Original Skill 2'
+        )
 
         changelist = [
-            skill_domain.SkillChange({
-                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
-                'property_name': skill_domain.SKILL_PROPERTY_DESCRIPTION,
-                'old_value': 'Original Skill 1',
-                'new_value': 'Updated Skill 1'
-            })
+            skill_domain.SkillChange(
+                {
+                    'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                    'property_name': skill_domain.SKILL_PROPERTY_DESCRIPTION,
+                    'old_value': 'Original Skill 1',
+                    'new_value': 'Updated Skill 1',
+                }
+            )
         ]
         skill_services.update_skill(
-            self.user_id_admin, skill_1_id, changelist, 'Update skill 1')
+            self.user_id_admin, skill_1_id, changelist, 'Update skill 1'
+        )
 
-        results = skill_fetchers.get_multiple_skills_by_ids_and_version([
-            (skill_1_id, 1),
-            (skill_1_id, 2),
-            (skill_2_id, 1),
-            (skill_1_id, None),
-            ('nonexistent', 1),
-        ])
+        results = skill_fetchers.get_multiple_skills_by_ids_and_version(
+            [
+                (skill_1_id, 1),
+                (skill_1_id, 2),
+                (skill_2_id, 1),
+                (skill_1_id, None),
+                ('nonexistent', 1),
+            ]
+        )
 
         self.assertEqual(len(results), 5)
 
@@ -379,15 +386,15 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(results[4])
 
     def test_get_multiple_skills_by_ids_and_version_with_invalid_version(
-        self
+        self,
     ) -> None:
         """Test fetching skills with invalid version numbers."""
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id, self.USER_ID)
 
-        results = skill_fetchers.get_multiple_skills_by_ids_and_version([
-            (skill_id, 999)
-        ])
+        results = skill_fetchers.get_multiple_skills_by_ids_and_version(
+            [(skill_id, 999)]
+        )
         self.assertEqual(len(results), 1)
         self.assertIsNone(results[0])
 
@@ -397,9 +404,9 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
         self.save_new_skill(skill_id, self.USER_ID)
         skill_services.delete_skill(self.USER_ID, skill_id)
 
-        results = skill_fetchers.get_multiple_skills_by_ids_and_version([
-            (skill_id, 1)
-        ])
+        results = skill_fetchers.get_multiple_skills_by_ids_and_version(
+            [(skill_id, 1)]
+        )
         self.assertEqual(len(results), 1)
         self.assertIsNone(results[0])
 
@@ -409,24 +416,27 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(results, [])
 
     def test_get_multiple_skills_by_ids_and_version_schema_versions(
-        self
+        self,
     ) -> None:
         """Test fetching skills maintains correct schema versions."""
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id, self.USER_ID)
 
-        results = skill_fetchers.get_multiple_skills_by_ids_and_version([
-            (skill_id, 1)
-        ])
+        results = skill_fetchers.get_multiple_skills_by_ids_and_version(
+            [(skill_id, 1)]
+        )
         self.assertEqual(len(results), 1)
         self.assertIsNotNone(results[0])
         assert results[0] is not None
         self.assertEqual(
             results[0].skill_contents_schema_version,
-            feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION)
+            feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
+        )
         self.assertEqual(
             results[0].misconceptions_schema_version,
-            feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION)
+            feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
+        )
         self.assertEqual(
             results[0].rubric_schema_version,
-            feconf.CURRENT_RUBRIC_SCHEMA_VERSION)
+            feconf.CURRENT_RUBRIC_SCHEMA_VERSION,
+        )

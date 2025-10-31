@@ -48,6 +48,7 @@ export enum FeatureNames {
   EnableTranslationOppsWithNewOppModels = 'enable_translation_opps_with_new_opp_models',
   EnableWorkedExamplesRteComponent = 'enable_worked_examples_rte_component',
   ShowRegeneratedVoiceoversToLearners = 'show_regenerated_voiceovers_to_learners',
+  EnableBackgroundVoiceoverSynthesis = 'enable_background_voiceover_synthesis',
 }
 
 export interface FeatureStatusSummaryBackendDict {

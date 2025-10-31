@@ -6268,6 +6268,7 @@ export default {
   "MIN_CHARS_IN_BLOG_POST_TITLE": 5,
   "MAX_CHARS_IN_BLOG_POST_SUMMARY": 300,
   "MAX_CHARS_IN_LEARNER_GROUP_TITLE": 36,
+  "MAX_CHARS_IN_LEARNER_GROUP_DESCRIPTION": 250,
   "STORY_ID_LENGTH": 12,
   // This represents the maximum number of characters in the URL fragment for
   // story in the story page URL. E.g.
