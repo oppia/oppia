@@ -27,6 +27,7 @@ from core.constants import constants
 from core.platform import models
 
 from typing import (
+    Any,
     Dict,
     Final,
     List,
@@ -2942,7 +2943,7 @@ class UserContributionRightsModel(base_models.BaseModel):
 
     @classmethod
     def save_contribution_rights(
-        cls, user_contribution_rights: object
+        cls, user_contribution_rights: Any
     ) -> None:
         """Saves a UserContributionRights domain object to the datastore
         using an "upsert" approach to preserve timestamps.
