@@ -7,7 +7,7 @@
                                 (onSelectionChange)="onSelectNewRuleType($event)">
       </oppia-rule-type-selector>
 
-      <span *ngFor="let item of ruleDescriptionFragments" class="mb-3 oppia-rule-editor-span e2e-test-answer-description-fragment">
+      <span *ngFor="let item of ruleDescriptionFragments" class="oppia-rule-editor-span e2e-test-answer-description-fragment">
         <span *ngIf="item.type == 'select'" class="text-dark">
           <span *ngIf="ruleDescriptionChoices.length === 1">
             {{ ruleDescriptionChoices[0].val | convertToPlainText | truncate }}
@@ -83,7 +83,7 @@
     justify-content: center;
   }
 
-  .mb-3.oppia-rule-editor-span {
+  .oppia-rule-editor-span {
     display: block;
     margin: 0;
     margin-right: 5px;
