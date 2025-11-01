@@ -229,7 +229,7 @@ jobs:
         uses: ./.github/actions/run-acceptance-tests
         with:
           test-suite: ${{ matrix.suite.name }}
-          mobile: true
+          mobile: false
           screen-recording: false
 
       # Mobile Test

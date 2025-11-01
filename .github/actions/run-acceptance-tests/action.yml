@@ -1,5 +1,6 @@
 name: Run Acceptance Test
 description: Runs the acceptance tests using python installation.
+
 inputs:
   test-suite:
     description: Acceptance test suite to run.
@@ -14,6 +15,7 @@ inputs:
     type: boolean
   modified-suite-name:
     description: A unique suite name without spaces to use in the artifacts uploads. If not provided, the test data will not be uploaded.
+
 runs:
   using: "composite"
   steps:
@@ -24,18 +26,22 @@ runs:
       # Numbers in 1920x1080x24 represents screen width, height and color depth respectively.
       run: >
         set -o pipefail;
-        VIDEO_RECORDING_IS_ENABLED=1
+        VIDEO_RECORDING_IS_ENABLED=${{ inputs.screen-recording && '1' || '0' }}
         xvfb-run -a --server-args="-screen 0, 1920x1080x24"
         python -m scripts.run_acceptance_tests
-        --skip-build --suite=${{ matrix.suite.name }} --prod_env --server_log_level=info
+        --skip-build
+        --suite=${{ inputs.test-suite }}
+        ${{ inputs.mobile && '--mobile' || '' }}
+        --prod_env
+        --server_log_level=info
         | tee acceptance_test_${{ inputs.modified-suite-name || '' }}.log
 
     - name: Upload test logs
       # We need to pass always() because if not, GitHub will implicitly use success(),
       # which requires all previous jobs/steps to have succeeded. This is not what we want.
       # Reference: https://docs.github.com/en/actions/reference/workflows-and-actions/expressions#status-check-functions
-      # Quote: “A default status check of success() is applied unless you *include* one of these functions.”
-      if: ${{ always() && steps.deskrun-acceptance-test.outcome == 'failure' && inputs.modified-suite-name != '' }}
+      # Quote: "A default status check of success() is applied unless you *include* one of these functions."
+      if: ${{ always() && steps.run-acceptance-test.outcome == 'failure' && inputs.modified-suite-name != '' }}
       uses: actions/upload-artifact@v4
       with:
         name: acceptance-test-logs-${{ inputs.modified-suite-name }}
@@ -45,7 +51,7 @@ runs:
       # We need to pass always() because if not, GitHub will implicitly use success(),
       # which requires all previous jobs/steps to have succeeded. This is not what we want.
       # Reference: https://docs.github.com/en/actions/reference/workflows-and-actions/expressions#status-check-functions
-      # Quote: “A default status check of success() is applied unless you *include* one of these functions.”
+      # Quote: "A default status check of success() is applied unless you *include* one of these functions."
       if: ${{ always() && steps.run-acceptance-test.outcome == 'failure' && inputs.modified-suite-name != '' }}
       uses: actions/upload-artifact@v4
       with:
@@ -56,7 +62,7 @@ runs:
       # We need to pass always() because if not, GitHub will implicitly use success(),
       # which requires all previous jobs/steps to have succeeded. This is not what we want.
       # Reference: https://docs.github.com/en/actions/reference/workflows-and-actions/expressions#status-check-functions
-      # Quote: “A default status check of success() is applied unless you *include* one of these functions.”
+      # Quote: "A default status check of success() is applied unless you *include* one of these functions."
       if: ${{ always() && steps.run-acceptance-test.outcome == 'failure' && inputs.modified-suite-name != '' }}
       uses: actions/upload-artifact@v4
       with:
@@ -69,7 +75,7 @@ runs:
       # We need to pass always() because if not, GitHub will implicitly use success(),
       # which requires all previous jobs/steps to have succeeded. This is not what we want.
       # Reference: https://docs.github.com/en/actions/reference/workflows-and-actions/expressions#status-check-functions
-      # Quote: “A default status check of success() is applied unless you *include* one of these functions.”
+      # Quote: "A default status check of success() is applied unless you *include* one of these functions."
       if: ${{ always() && steps.run-acceptance-test.outcome == 'failure' && inputs.modified-suite-name != '' }}
       uses: actions/upload-artifact@v4
       with:
