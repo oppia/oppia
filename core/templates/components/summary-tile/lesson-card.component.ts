@@ -44,6 +44,7 @@ export class LessonCardComponent implements OnInit {
   desc!: string;
   imgColor!: string;
   imgUrl!: string;
+  isCommunityLesson?: boolean;
   lessonUrl!: string;
   progress!: number;
   title!: string;
@@ -67,8 +68,12 @@ export class LessonCardComponent implements OnInit {
         await this.setStorySummary(this.story);
       } else if (this.story instanceof CollectionSummary) {
         this.setCollectionSummary(this.story);
+        this.statusIsPublished = true;
+        this.isCommunityLesson = true;
       } else {
         this.setExplorationSummary(this.story);
+        this.statusIsPublished = true;
+        this.isCommunityLesson = true;
       }
     } catch (error) {
       console.error('Error initializing lesson card:', error);
