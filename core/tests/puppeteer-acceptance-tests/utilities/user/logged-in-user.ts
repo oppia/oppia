@@ -532,7 +532,6 @@ export class LoggedInUser extends BaseUser {
           throw error;
         }
       }
-      await this.clickOnElementWithText('Stories');
 
       await this.page.waitForSelector(progressTabSectionInLearnerDashboard, {
         visible: true,

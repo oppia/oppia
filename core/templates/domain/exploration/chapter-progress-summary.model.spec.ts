@@ -23,6 +23,7 @@ describe('Chapter Progress Summary', () => {
     const chapterProgressSummaryDict = {
       total_checkpoints_count: 6,
       visited_checkpoints_count: 4,
+      is_chapter_complete: false,
     };
 
     let chapterProgressSummary = ChapterProgressSummary.createFromBackendDict(
@@ -31,5 +32,6 @@ describe('Chapter Progress Summary', () => {
 
     expect(chapterProgressSummary.totalCheckpoints).toEqual(6);
     expect(chapterProgressSummary.visitedCheckpoints).toEqual(4);
+    expect(chapterProgressSummary.isChapterComplete).toBeFalse();
   });
 });
