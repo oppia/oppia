@@ -5,7 +5,6 @@ var argv = require('yargs').positional('terminalEnabled', {
 var path = require('path');
 var webpack = require('webpack');
 
-import type * as webpackType from 'webpack';
 // Here we are checking if the specs_to_run flag is provided or not. If it is
 // provided, we are splitting the comma separated string into an array of
 // strings. We are then creating a regex pattern to match the spec files
@@ -35,7 +34,7 @@ if (argv.specs_to_run !== undefined) {
   );
 }
 
-const webpackPlugins: webpackType.WebpackPluginInstance[] = [];
+const webpackPlugins: InstanceType<typeof webpack.DefinePlugin>[] = [];
 if (argv.specs_to_run !== undefined) {
   webpackPlugins.push(
     new webpack.ContextReplacementPlugin(
@@ -53,7 +52,10 @@ let jasmineSeed = Math.floor(Math.random() * 1000);
 // eslint-disable-next-line no-console
 console.log(`Seed for Frontend Test Execution Order ${jasmineSeed}`);
 
-module.exports = function (config: any) {
+/**
+ * @param {import('karma').Config & { set: (config: import('karma').ConfigOptions) => void }} config
+ */
+module.exports = function (config) {
   config.set({
     basePath: '../../',
     frameworks: ['jasmine'],
