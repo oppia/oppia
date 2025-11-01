@@ -38,16 +38,15 @@ from typing import (
     Union,
     overload,
 )
-
 MYPY = False
 if MYPY:  # pragma: no cover
+    from core.domain import user_domain
     from mypy_imports import base_models, datastore_services
 
 (base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
-
 
 class UserSettingsModel(base_models.BaseModel):
     """Settings and preferences for a particular user.
@@ -2940,9 +2939,10 @@ class UserContributionRightsModel(base_models.BaseModel):
     can_submit_questions = datastore_services.BooleanProperty(
         default=False, indexed=True
     )
+
     @classmethod
     def save_contribution_rights(
-        cls, user_contribution_rights: 'user_domain.UserContributionRights'
+        cls, user_contribution_rights: 'UserContributionRights'
     ) -> None:
         """Saves a UserContributionRights domain object to the datastore
         using an "upsert" approach to preserve timestamps.
