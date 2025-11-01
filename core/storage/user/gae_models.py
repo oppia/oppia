@@ -37,10 +37,10 @@ from typing import (
     TypedDict,
     Union,
     overload,
+
 )
 MYPY = False
 if MYPY:  # pragma: no cover
-    from core.domain import user_domain
     from mypy_imports import base_models, datastore_services
 
 (base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
@@ -2942,7 +2942,7 @@ class UserContributionRightsModel(base_models.BaseModel):
 
     @classmethod
     def save_contribution_rights(
-        cls, user_contribution_rights: 'UserContributionRights'
+        cls, user_contribution_rights: object
     ) -> None:
         """Saves a UserContributionRights domain object to the datastore
         using an "upsert" approach to preserve timestamps.
