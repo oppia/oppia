@@ -30,6 +30,8 @@ import {ChangeDetectorRef, EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import 'third-party-imports/skulpt.import';
 import {CodemirrorComponent} from '@ctrl/ngx-codemirror';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
+import {InteractionAnswer} from 'domain/exploration/AnswerStatsObjectFactory';
 
 describe('InteractiveCodeReplComponent', () => {
   let component: InteractiveCodeReplComponent;
@@ -39,7 +41,10 @@ describe('InteractiveCodeReplComponent', () => {
   let currentInteractionService: CurrentInteractionService;
 
   class mockInteractionAttributesExtractorService {
-    getValuesFromAttributes(interactionId: any, attributes: any) {
+    getValuesFromAttributes(
+      interactionId: InteractionSpecsKey,
+      attributes: Record<string, string>
+    ) {
       return {
         language: attributes.languageWithValue,
         placeholder: attributes.placeholderWithValue,
@@ -57,10 +62,13 @@ describe('InteractiveCodeReplComponent', () => {
   }
 
   let mockCurrentInteractionService = {
-    onSubmit: (answer: any, rulesService: any) => {},
+    onSubmit: (
+      answer: InteractionAnswer,
+      rulesService: CurrentInteractionService
+    ) => {},
     registerCurrentInteraction: (
-      submitAnswerFn: any,
-      validateExpressionFn: any
+      submitAnswerFn: Function,
+      validateExpressionFn: Function
     ) => {
       submitAnswerFn();
     },

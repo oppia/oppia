@@ -36,7 +36,6 @@ import {AppConstants} from 'app.constants';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
-import {GraphAnswer} from 'interactions/answer-defs';
 
 describe('InteractiveImageClickInput', () => {
   let fixture: ComponentFixture<InteractiveImageClickInput>;
@@ -70,7 +69,7 @@ describe('InteractiveImageClickInput', () => {
 
   let mockCurrentInteractionService = {
     onSubmit: (
-      answer: GraphAnswer,
+      answer: ImageClickAnswer,
       rulesService: CurrentInteractionService
     ) => {
       expect(answer).toEqual({clickPosition: [1, 2], clickedRegions: []});
@@ -643,11 +642,13 @@ describe('InteractiveImageClickInput', () => {
       clientY: 100,
     });
 
-    (component as any).el = {
-      nativeElement: {
-        querySelectorAll: () => [imageElement],
+    Object.defineProperty(component, 'el', {
+      value: {
+        nativeElement: {
+          querySelectorAll: () => [imageElement],
+        },
       },
-    };
+    });
 
     spyOn(document, 'querySelector').and.returnValue(dotElement);
 

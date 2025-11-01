@@ -738,7 +738,7 @@ describe('GraphVizComponent', () => {
           },
           createSVGPoint: () => {
             return {
-              matrixTransform: (matrix: any) => {
+              matrixTransform: (matrix: DOMMatrixInit) => {
                 return {
                   x: 775,
                   y: 307,

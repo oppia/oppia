@@ -44,19 +44,21 @@ import {EdgeCentre, GraphDetailService} from './graph-detail.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
 const debounce = (delay = 5): MethodDecorator => {
-  return function (
-    target: Object,
+  return (
+    target: object,
     propertyKey: string | symbol,
-    descriptor: TypedPropertyDescriptor<any>
-  ): TypedPropertyDescriptor<any> | void {
-    const original = descriptor.value;
+    descriptor: PropertyDescriptor
+  ): void => {
+    const original = descriptor.value as (...args: unknown[]) => unknown;
     const key = `__timeout__${String(propertyKey)}`;
 
-    descriptor.value = function (this: any, ...args: any[]) {
-      clearTimeout(this[key]);
+    descriptor.value = function (
+      this: Record<string, unknown>,
+      ...args: unknown[]
+    ) {
+      clearTimeout(this[key] as number);
       this[key] = setTimeout(() => original.apply(this, args), delay);
     };
-    return descriptor;
   };
 };
 
@@ -301,7 +303,7 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     pt.y = event.clientY;
     const ctm = this.vizContainer[0].getScreenCTM();
     if (!ctm) {
-      return; // Can't transform if CTM is not available
+      return;
     }
     const svgp = pt.matrixTransform(ctm.inverse());
     this.state.mouseX = svgp.x;
@@ -742,8 +744,12 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     this.graph.edges = this.graph.edges
       .filter(edge => edge.src !== index && edge.dst !== index)
       .map(edge => {
-        if (edge.src > index) edge.src--;
-        if (edge.dst > index) edge.dst--;
+        if (edge.src > index) {
+          edge.src--;
+        }
+        if (edge.dst > index) {
+          edge.dst--;
+        }
         return edge;
       });
 
