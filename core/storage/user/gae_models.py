@@ -2940,6 +2940,7 @@ class UserContributionRightsModel(base_models.BaseModel):
     can_submit_questions = datastore_services.BooleanProperty(
         default=False, indexed=True
     )
+    
     @classmethod
     def save_contribution_rights(
         cls, user_contribution_rights: 'user_domain.UserContributionRights'
