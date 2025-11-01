@@ -39,6 +39,7 @@ from typing import (
     Union,
     overload,
 
+
 )
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -2943,6 +2944,8 @@ class UserContributionRightsModel(base_models.BaseModel):
 
     @classmethod
     def save_contribution_rights(
+        # Here we use type Any because we cannot import UserContributionRights
+        # from core.domain in core.storage due to import restrictions.
         cls, user_contribution_rights: Any
     ) -> None:
         """Saves a UserContributionRights domain object to the datastore
