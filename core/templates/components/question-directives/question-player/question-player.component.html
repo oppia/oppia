@@ -17,6 +17,11 @@
         </p>
       </div>
       <oppia-progress-bar [progressPercentage]="currentProgress"></oppia-progress-bar>
+      <oppia-score-tracker 
+        [correctAnswers]="correctAnswers" 
+        [totalAnswered]="totalAnswered"
+        [lastAnswerCorrect]="lastAnswerCorrect">
+      </oppia-score-tracker>
     </div>
 
     <div class="oppia-question-player-card" *ngIf="!isNewLessonPlayerEnabled()">
@@ -34,6 +39,11 @@
         <div class="oppia-question-player-progress">
           <div class="current-progress" [ngStyle]="{'width': currentProgress + '%'}"></div>
         </div>
+        <oppia-score-tracker 
+          [correctAnswers]="correctAnswers" 
+          [totalAnswered]="totalAnswered"
+          [lastAnswerCorrect]="lastAnswerCorrect">
+        </oppia-score-tracker>
       </div>
       <div *ngIf="!questionsLoading && totalQuestions === 0">
         <h4 class="practice-questions-coming-soon-header">Coming Soon!</h4>

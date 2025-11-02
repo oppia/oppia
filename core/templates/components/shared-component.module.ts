@@ -230,6 +230,7 @@ import {CheckpointBarComponent} from 'pages/exploration-player-page/new-lesson-p
 import {SaveProgressModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/save-progress-modal.component';
 import {CheckpointCelebrationFooterComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/checkpoint-celebration-footer.component';
 import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/new-ratings-and-recommendations.component';
+import {ScoreTrackerComponent} from './score-tracker/score-tracker.component';
 @NgModule({
   imports: [
     BackgroundBannerModule,
@@ -347,6 +348,7 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     ResponseHeaderComponent,
     RubricsEditorComponent,
     ScoreRingComponent,
+    ScoreTrackerComponent,
     SelectSkillModalComponent,
     SharingLinksComponent,
     ShareLessonModalComponent,
@@ -468,6 +470,7 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     ProgressBarComponent,
     EndChapterConfettiComponent,
     NewEndChapterConfettiComponent,
+    ScoreTrackerComponent,
     CreateNewSkillModalComponent,
     SaveProgressModalComponent,
     CreateActivityModalComponent,
@@ -711,6 +714,7 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     QuestionDifficultySelectorComponent,
     QuestionEditorSaveModalComponent,
     ScoreRingComponent,
+    ScoreTrackerComponent,
     StateSkillEditorComponent,
     SelectSkillModalComponent,
     SharingLinksComponent,

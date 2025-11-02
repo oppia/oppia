@@ -77,11 +77,18 @@ export class QuestionPlayerEngineService {
     new EventEmitter();
   private _questionSessionCompletedEventEmitter = new EventEmitter<object>();
   private _resultsPageIsLoadedEventEmitter = new EventEmitter<boolean>();
+  private _scoreUpdateEventEmitter = new EventEmitter<{
+    correctAnswers: number;
+    totalAnswered: number;
+    lastAnswerCorrect: boolean;
+  }>();
   private answerIsBeingProcessed: boolean = false;
   private questions: Question[] = [];
   private nextIndex: number = null;
   currentIndex: number = null;
   questionPlayerState: QuestionPlayerState = {};
+  private correctAnswersCount: number = 0;
+  private totalAnsweredCount: number = 0;
 
   constructor(
     private alertsService: AlertsService,
@@ -158,6 +165,7 @@ export class QuestionPlayerEngineService {
   ): void {
     this.pageContextService.setQuestionPlayerIsOpen();
     this.setAnswerIsBeingProcessed(false);
+    this.resetScoreTracking();
     let currentIndex = questionObjects.length;
     let randomIndex;
 
@@ -495,6 +503,41 @@ export class QuestionPlayerEngineService {
       timestamp: this._getCurrentTime(),
       taggedSkillMisconceptionId: taggedSkillMisconceptionId,
     });
+
+    // Update score tracking
+    this.updateScoreTracking(isCorrect);
+  }
+
+  /**
+   * Updates the score tracking counters and emits a score update event.
+   *
+   * This method is called after each answer submission to track the learner's progress
+   * in real-time. It increments the total answered count and, if the answer is correct,
+   * also increments the correct answers count. Then it emits an event with the updated
+   * score data so the UI can reflect the current performance.
+   *
+   * @param {boolean} isCorrect - Whether the submitted answer was correct.
+   */
+  updateScoreTracking(isCorrect: boolean): void {
+    this.totalAnsweredCount += 1;
+    if (isCorrect) {
+      this.correctAnswersCount += 1;
+    }
+    this._scoreUpdateEventEmitter.emit({
+      correctAnswers: this.correctAnswersCount,
+      totalAnswered: this.totalAnsweredCount,
+      lastAnswerCorrect: isCorrect,
+    });
+  }
+
+  /**
+   * Resets the score tracking counters to zero.
+   *
+   * This should be called when starting a new question session.
+   */
+  resetScoreTracking(): void {
+    this.correctAnswersCount = 0;
+    this.totalAnsweredCount = 0;
   }
 
   /**
@@ -727,5 +770,13 @@ export class QuestionPlayerEngineService {
 
   get onTotalQuestionsReceived(): EventEmitter<number> {
     return this._totalQuestionsReceivedEventEmitter;
+  }
+
+  get onScoreUpdate(): EventEmitter<{
+    correctAnswers: number;
+    totalAnswered: number;
+    lastAnswerCorrect: boolean;
+  }> {
+    return this._scoreUpdateEventEmitter;
   }
 }

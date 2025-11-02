@@ -112,6 +112,10 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
   canCreateCollections!: boolean;
   componentSubscription = new Subscription();
   questionsLoading!: boolean;
+  // Score tracking properties
+  correctAnswers: number = 0;
+  totalAnswered: number = 0;
+  lastAnswerCorrect: boolean | null = null;
 
   constructor(
     private pageContextService: PageContextService,
@@ -576,6 +580,15 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
             this.pageContextService.removeCustomEntityContext();
           }
         )
+      );
+
+      // Subscribe to score updates
+      this.componentSubscription.add(
+        this.questionPlayerEngineService.onScoreUpdate.subscribe(scoreData => {
+          this.correctAnswers = scoreData.correctAnswers;
+          this.totalAnswered = scoreData.totalAnswered;
+          this.lastAnswerCorrect = scoreData.lastAnswerCorrect;
+        })
       );
 
       this.location.onUrlChange(() => {
