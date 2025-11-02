@@ -49,6 +49,7 @@ if MYPY:  # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
 
+
 class UserSettingsModel(base_models.BaseModel):
     """Settings and preferences for a particular user.
     Instances of this class are keyed by the user id.
@@ -423,6 +424,7 @@ class UserSettingsModel(base_models.BaseModel):
             have the given role ID.
         """
         return cls.query(cls.roles == role).fetch()
+
 
 class CompletedActivitiesModel(base_models.BaseModel):
     """Keeps track of all the explorations and collections completed by the
@@ -1351,6 +1353,7 @@ class UserSubscribersModel(base_models.BaseModel):
             **{'subscriber_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE},
         )
 
+
 class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
     """A list of recent changes corresponding to things a user subscribes to.
 
@@ -1407,6 +1410,7 @@ class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
                 'job_queued_msec': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             },
         )
+
 
 class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
     """User-specific statistics keyed by user id.
@@ -2420,6 +2424,7 @@ class UserQueryModel(base_models.BaseModel):
         )
         return (query_models, next_cursor_str, more_results)
 
+
 class UserBulkEmailsModel(base_models.BaseModel):
     """Model to store IDs BulkEmailModel sent to a user.
 
@@ -2474,6 +2479,7 @@ class UserBulkEmailsModel(base_models.BaseModel):
                 'sent_email_model_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
             },
         )
+
 
 class UserGroupModel(base_models.BaseModel):
     """Model for storing user-groups and the users associated.
@@ -3307,6 +3313,7 @@ class PseudonymizedUserModel(base_models.BaseModel):
 
         raise Exception('New id generator is producing too many collisions.')
 
+
 class DeletedUsernameModel(base_models.BaseModel):
     """Model for storing deleted username hashes. The username hash is stored
     in the ID of this model.
@@ -3339,6 +3346,7 @@ class DeletedUsernameModel(base_models.BaseModel):
         """
         empty_dict: Dict[str, base_models.EXPORT_POLICY] = {}
         return dict(super(cls, cls).get_export_policy(), **empty_dict)
+
 
 class LearnerGroupUserDetailsDict(TypedDict):
     """Dictionary for user details of a particular learner group to export."""
@@ -3493,6 +3501,7 @@ class LearnerGroupsUserModel(base_models.BaseModel):
 
         cls.update_timestamps_multi(learner_groups_user_models_to_put)
         cls.put_multi(learner_groups_user_models_to_put)
+
 
 class PinnedOpportunityModel(base_models.BaseModel):
     """Model for storing pinned opportunities in the
