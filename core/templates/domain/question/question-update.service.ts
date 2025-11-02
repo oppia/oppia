@@ -170,7 +170,10 @@ export class QuestionUpdateService {
         }
       },
       (changeDict: BackendChangeObject, question: Question) => {
-        const oldValue = this._getParameterFromChangeDict(changeDict, 'old_value');
+        const oldValue = this._getParameterFromChangeDict(
+          changeDict,
+          'old_value'
+        );
         if (typeof oldValue === 'number') {
           question.setNextContentIdIndex(oldValue);
         } else {

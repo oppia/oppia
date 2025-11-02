@@ -21,7 +21,10 @@ import {Injectable} from '@angular/core';
 import {ImagesData} from 'services/image-local-storage.service';
 
 import {TranslateTextBackendApiService} from './translate-text-backend-api.service';
-import {StateNamesToContentIdMapping, TranslatableTexts} from 'domain/opportunity/translatable-texts.model';
+import {
+  StateNamesToContentIdMapping,
+  TranslatableTexts,
+} from 'domain/opportunity/translatable-texts.model';
 import {
   TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
   TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING,
@@ -249,7 +252,8 @@ export class TranslateTextService {
       )
       .then(
         () => {
-          this.stateAndContent[this.activeIndex].status = this.SUBMITTED as Status;
+          this.stateAndContent[this.activeIndex].status = this
+            .SUBMITTED as Status;
           this.stateAndContent[this.activeIndex].translation = translation;
           successCallback();
         },

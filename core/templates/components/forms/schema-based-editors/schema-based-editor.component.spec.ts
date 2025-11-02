@@ -57,7 +57,9 @@ describe('Schema based editor component', function () {
   });
 
   it('should set component properties on initialization', fakeAsync(() => {
-    let mockFunction = jasmine.createSpy('mockFunction', (value: SchemaDefaultValue) => value).and.callThrough();
+    let mockFunction = jasmine
+      .createSpy('mockFunction', (value: SchemaDefaultValue) => value)
+      .and.callThrough();
     component.registerOnChange(mockFunction);
     const onTouchedSpy = jasmine.createSpy('onTouched');
     component.registerOnTouched(onTouchedSpy);
