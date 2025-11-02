@@ -998,23 +998,27 @@ class LogType(enum.Enum):
     WARNING = 'WARNING'
     DEBUG = 'DEBUG'
 
-    class COLOR:
-        """ANSI color codes used for terminal log colorization."""
 
-        # Blue color for informational messages.
-        INFO = '\033[94m'
+class COLOR:
+    """ANSI color codes used for terminal log colorization."""
 
-        # Green color for success messages.
-        SUCCESS = '\033[92m'
+    # Blue color for informational messages.
+    INFO = '\033[94m'
 
-        # Yellow color for warnings.
-        WARNING = '\033[93m'
+    # Green color for success messages.
+    SUCCESS = '\033[92m'
 
-        # Red color for errors.
-        ERROR = '\033[91m'
+    # Yellow color for warnings.
+    WARNING = '\033[93m'
 
-        # Reset color.
-        END = '\033[0m'
+    # Red color for errors.
+    ERROR = '\033[91m'
+
+    # Reset color.
+    END = '\033[0m'
+
+
+LogType.COLOR = COLOR
 
 
 def log_to_terminal(
@@ -1028,7 +1032,6 @@ def log_to_terminal(
     DEBUG, and INFO.
     """
     if not isinstance(message_type, LogType):
-        # Infer message type if it's not a valid LogType.
         lower_msg = message.lower()
         if 'error' in lower_msg:
             message_type = LogType.ERROR
@@ -1041,8 +1044,6 @@ def log_to_terminal(
         else:
             message_type = LogType.INFO
 
-    # Access colors through the nested class directly (not enum instance)
     color = getattr(LogType.COLOR, message_type.name, LogType.COLOR.INFO)
     end_color = LogType.COLOR.END
-
     write_stdout_safe(f'{color}{message}{end_color}\n')
