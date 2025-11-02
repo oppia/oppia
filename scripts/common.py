@@ -1044,6 +1044,7 @@ def log_to_terminal(
         else:
             message_type = LogType.INFO
 
-    color = getattr(LogType.COLOR, message_type.name, LogType.COLOR.INFO)
-    end_color = LogType.COLOR.END
+    color_class = getattr(LogType, "COLOR", COLOR)
+    color = getattr(color_class, message_type.name, color_class.INFO)
+    end_color = color_class.END
     write_stdout_safe(f'{color}{message}{end_color}\n')
