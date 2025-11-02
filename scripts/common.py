@@ -1027,7 +1027,8 @@ def log_to_terminal(
     message text. Supported types: ERROR, WARNING, SUCCESS,
     DEBUG, and INFO.
     """
-    if message_type is None:
+    if not isinstance(message_type, LogType):
+        # Infer message type if it's not a valid LogType.
         lower_msg = message.lower()
         if 'error' in lower_msg:
             message_type = LogType.ERROR
@@ -1040,7 +1041,8 @@ def log_to_terminal(
         else:
             message_type = LogType.INFO
 
-    color = getattr(LogType.COLOR, message_type.name, '')
+    # Access colors through the nested class directly (not enum instance)
+    color = getattr(LogType.COLOR, message_type.name, LogType.COLOR.INFO)
     end_color = LogType.COLOR.END
 
     write_stdout_safe(f'{color}{message}{end_color}\n')
