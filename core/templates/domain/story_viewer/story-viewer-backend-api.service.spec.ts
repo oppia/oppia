@@ -201,14 +201,17 @@ describe('Story viewer backend API service', () => {
       {
         total_checkpoints_count: 6,
         visited_checkpoints_count: 5,
+        is_chapter_complete: false,
       },
       {
         total_checkpoints_count: 3,
         visited_checkpoints_count: 0,
+        is_chapter_complete: false,
       },
       {
         total_checkpoints_count: 4,
         visited_checkpoints_count: 4,
+        is_chapter_complete: true,
       },
     ];
 
