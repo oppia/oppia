@@ -1018,6 +1018,7 @@ class COLOR:
     END = '\033[0m'
 
 
+# Here we use MyPy ignore because COLOR is added dynamically to LogType at runtime.
 LogType.COLOR = COLOR  # type: ignore[attr-defined]
 
 
@@ -1045,7 +1046,7 @@ def log_to_terminal(
             message_type = LogType.INFO
 
     color = getattr(
-        LogType.COLOR, message_type.name, LogType.COLOR.INFO  # type: ignore[attr-defined]
+        LogType.COLOR, message_type.name, LogType.COLOR.INFO  # type: ignore[attr-defined]  # Here we use MyPy ignore because LogType.COLOR is dynamically attached to the enum.
     )
-    end_color = LogType.COLOR.END  # type: ignore[attr-defined]
+    end_color = LogType.COLOR.END  # type: ignore[attr-defined]  # Here we use MyPy ignore because LogType.COLOR is dynamically attached to the enum.
     write_stdout_safe(f'{color}{message}{end_color}\n')
