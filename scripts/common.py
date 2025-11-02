@@ -998,15 +998,12 @@ class LogType(enum.Enum):
     WARNING = 'WARNING'
     DEBUG = 'DEBUG'
 
-
-_LOG_COLORS = {
-    LogType.INFO: '\033[94m',
-    LogType.SUCCESS: '\033[92m',
-    LogType.WARNING: '\033[93m',
-    LogType.ERROR: '\033[91m',
-    None: ''
-}
-_END_COLOR = '\033[0m'
+    class COLOR:
+        INFO = '\033[94m'      # Blue
+        SUCCESS = '\033[92m'   # Green
+        WARNING = '\033[93m'   # Yellow
+        ERROR = '\033[91m'     # Red
+        END = '\033[0m'        # Reset color
 
 
 def log_to_terminal(
@@ -1032,8 +1029,7 @@ def log_to_terminal(
         else:
             message_type = LogType.INFO
 
-    if message_type not in _LOG_COLORS:
-        message_type = LogType.INFO
+    color = getattr(LogType.COLOR, message_type.name, '')
+    end_color = LogType.COLOR.END
 
-    color = _LOG_COLORS[message_type]
-    write_stdout_safe(f'{color}{message}{_END_COLOR}\n')
+    write_stdout_safe(f'{color}{message}{end_color}\n')
