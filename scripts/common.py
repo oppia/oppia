@@ -1044,11 +1044,12 @@ def log_to_terminal(
             message_type = LogType.DEBUG
         else:
             message_type = LogType.INFO
-    # Here to use MyPy ignore because LogType.COLOR is dynamically attached to the enum.
+    # Here we use MyPy ignore because LogType.COLOR is dynamically attached to the enum.
     color = getattr(
         LogType.COLOR, message_type.name, LogType.COLOR.INFO  # type: ignore[attr-defined]
     )
 
     # Here we use MyPy ignore because LogType.COLOR is dynamically attached to the enum.
     end_color = LogType.COLOR.END  # type: ignore[attr-defined]
+
     write_stdout_safe(f'{color}{message}{end_color}\n')
