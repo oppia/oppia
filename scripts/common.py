@@ -998,25 +998,23 @@ class LogType(enum.Enum):
     WARNING = 'WARNING'
     DEBUG = 'DEBUG'
 
-
     class COLOR:
-    """ANSI color codes used for terminal log colorization."""
+        """ANSI color codes used for terminal log colorization."""
 
-    # Blue color for informational messages.
-    INFO = '\033[94m'
+        # Blue color for informational messages.
+        INFO = '\033[94m'
 
-    # Green color for success messages.
-    SUCCESS = '\033[92m'
+        # Green color for success messages.
+        SUCCESS = '\033[92m'
 
-    # Yellow color for warnings.
-    WARNING = '\033[93m'
+        # Yellow color for warnings.
+        WARNING = '\033[93m'
 
-    # Red color for errors.
-    ERROR = '\033[91m'
+        # Red color for errors.
+        ERROR = '\033[91m'
 
-    # Reset color.
-    END = '\033[0m'
-
+        # Reset color.
+        END = '\033[0m'
 
 
 def log_to_terminal(
