@@ -2974,7 +2974,8 @@ class UserContributionRightsModel(base_models.BaseModel):
             user_contribution_rights.can_submit_questions
         )
 
-        # Call .put() from BaseModel to correctly handle timestamps.
+        # Call update_timestamps() and .put() from BaseModel to correctly handle timestamps.
+        model_instance.update_timestamps()
         model_instance.put()
 
     @staticmethod
