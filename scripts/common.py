@@ -1018,7 +1018,7 @@ class COLOR:
     END = '\033[0m'
 
 
-LogType.COLOR = COLOR
+LogType.COLOR = COLOR  # type: ignore[attr-defined]
 
 
 def log_to_terminal(
@@ -1044,7 +1044,8 @@ def log_to_terminal(
         else:
             message_type = LogType.INFO
 
-    color_class = getattr(LogType, "COLOR", COLOR)
-    color = getattr(color_class, message_type.name, color_class.INFO)
-    end_color = color_class.END
+    color = getattr(
+        LogType.COLOR, message_type.name, LogType.COLOR.INFO  # type: ignore[attr-defined]
+    )
+    end_color = LogType.COLOR.END  # type: ignore[attr-defined]
     write_stdout_safe(f'{color}{message}{end_color}\n')
