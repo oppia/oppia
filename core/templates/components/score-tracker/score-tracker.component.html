@@ -1,0 +1,27 @@
+<div class="score-tracker-container" [attr.aria-label]="'Score: ' + correctAnswers + ' correct out of ' + totalAnswered + ' answered'">
+  <div class="score-label">
+    <span class="score-title">Score</span>
+  </div>
+  <div class="score-display">
+    <div class="score-bar-container">
+      <div class="score-bar-background">
+        <div 
+          class="score-bar-fill" 
+          [ngStyle]="{'width': scorePercentage + '%', 'background-color': getScoreColor()}"
+          [ngClass]="getFeedbackClass()">
+        </div>
+      </div>
+    </div>
+    <div class="score-text">
+      <span class="score-value" [ngStyle]="{'color': getScoreColor()}">{{correctAnswers}}</span>
+      <span class="score-separator">/</span>
+      <span class="score-total">{{totalAnswered}}</span>
+    </div>
+  </div>
+  <div class="feedback-indicator" *ngIf="showFeedback && lastAnswerCorrect !== null">
+    <span class="feedback-icon" [ngClass]="{'correct': lastAnswerCorrect, 'incorrect': !lastAnswerCorrect}">
+      {{lastAnswerCorrect ? '✓' : '✗'}}
+    </span>
+    <span class="feedback-text">{{lastAnswerCorrect ? 'Correct!' : 'Try again'}}</span>
+  </div>
+</div>
