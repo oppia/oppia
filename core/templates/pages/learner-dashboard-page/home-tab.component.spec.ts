@@ -83,7 +83,6 @@ describe('Home tab Component', () => {
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
-    loaderService = TestBed.inject(LoaderService);
 
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
 
@@ -473,7 +472,6 @@ describe('Home tab Component Loader visibility tests', () => {
   let mockPlatformFeatureService = new MockPlatformFeatureService();
 
   beforeEach(async(() => {
-    mockResizeEmitter = new EventEmitter();
     TestBed.configureTestingModule({
       imports: [MaterialModule, FormsModule, HttpClientTestingModule],
       declarations: [MockTranslatePipe, HomeTabComponent],
