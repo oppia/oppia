@@ -775,6 +775,27 @@ describe('GraphVizComponent', () => {
     ).toEqual({x: 775, y: 307, label: ''});
   });
 
+  it('should return early in mousemoveGraphSVG if getScreenCTM() returns null', () => {
+    const event = new MouseEvent('mousemove', {clientX: 10, clientY: 20});
+    component.interactionIsActive = true;
+
+    const svgPoint = {
+      x: 0,
+      y: 0,
+      matrixTransform: jasmine.createSpy('matrixTransform'),
+    };
+    const fakeSvg = {
+      createSVGPoint: () => svgPoint,
+      getScreenCTM: () => null,
+    } as unknown as SVGSVGElement;
+
+    component['vizContainer'] = [fakeSvg];
+
+    component.mousemoveGraphSVG(event);
+
+    expect(svgPoint.matrixTransform).not.toHaveBeenCalled();
+  });
+
   it(
     'should not change position of vertex when interaction is not' + ' active',
     () => {
