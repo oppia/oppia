@@ -20,6 +20,13 @@
 import {NgZone} from '@angular/core';
 import {PageContextService} from 'services/page-context.service';
 import {HtmlEscaperService} from 'services/html-escaper.service';
+import {CustomizationArgsForRteType} from 'services/rte-helper-modal.component';
+
+export interface CustomizationArgSpec {
+  name: string;
+  default_value: string | number | boolean | object;
+  default_value_obtainable_from_highlight: boolean;
+}
 
 export interface RteComponentSpecs {
   backendId: string;
@@ -40,32 +47,33 @@ export interface RteComponentSpecs {
 
 export interface RteHelperService {
   createCustomizationArgDictFromAttrs: (
-    attrs: Record<string, unknown>
+    attrs: Record<string, string>
   ) => Record<string, string>;
   getRichTextComponents: () => RteComponentSpecs[];
   isInlineComponent: (arg0: string) => boolean;
   openCustomizationModal: (
     componentIsNewlyCreated: boolean,
     componentId: string,
-    customizationArgSpecs: {
-      name: string;
-      default_value: unknown;
-      default_value_obtainable_from_highlight: boolean;
-    }[],
-    attrsCustomizationArgsDict: Record<string, unknown>,
-    onSubmitCallback: (customizationArgsDict: Record<string, unknown>) => void,
+    customizationArgSpecs: CustomizationArgSpec[],
+    attrsCustomizationArgsDict: Partial<CustomizationArgsForRteType>,
+    onSubmitCallback: (
+      customizationArgsDict: Partial<CustomizationArgsForRteType>
+    ) => void,
     onDismissCallback: (widgetShouldBeRemoved: boolean) => void
   ) => void;
 }
 
 interface WidgetDefinition {
   wrapper: CKEDITOR.dom.element;
-  data: Record<string, unknown>;
+  data: Record<string, string | number | boolean | object>;
   element: CKEDITOR.dom.element;
   id: number;
-  initialSnapshot: unknown;
+  initialSnapshot: string;
   isReady: () => boolean;
-  setData: (key: string, value: unknown) => void;
+  setData: (
+    key: string,
+    value: string | number | boolean | object | undefined
+  ) => void;
   editor: CKEDITOR.editor;
 }
 
@@ -147,7 +155,8 @@ export class CkEditorInitializerService {
                 // Save this for creating the widget later.
                 var container = this.wrapper.getParent(true);
                 var that = this;
-                var customizationArgs: Record<string, unknown> = {};
+                var customizationArgs: Partial<CustomizationArgsForRteType> =
+                  {};
                 customizationArgSpecs.forEach(function (spec) {
                   customizationArgs[spec.name] =
                     that.data[spec.name] || spec.default_value;
@@ -160,7 +169,9 @@ export class CkEditorInitializerService {
                   componentId,
                   customizationArgSpecs,
                   customizationArgs,
-                  function (customizationArgsDict: Record<string, unknown>) {
+                  function (
+                    customizationArgsDict: Partial<CustomizationArgsForRteType>
+                  ) {
                     that.data.isCopied = false;
                     for (var arg in customizationArgsDict) {
                       if (customizationArgsDict.hasOwnProperty(arg)) {
@@ -296,7 +307,9 @@ export class CkEditorInitializerService {
 
                   capital.join('');
                   const customEl = that.element.getChild(0).$;
-                  (customEl as Record<string, unknown>)[
+                  // Custom elements in Angular can have dynamic properties set.
+                  // The property name is constructed from the spec name (e.g., 'urlWithValue').
+                  (customEl as HTMLElement & Record<string, string>)[
                     capital.join('') + 'WithValue'
                   ] = htmlEscaperService.objToEscapedJson(
                     that.data[spec.name] !== undefined
@@ -322,7 +335,7 @@ export class CkEditorInitializerService {
                 });
                 var that = this;
                 (
-                  that as WidgetDefinition & {initialSnapshot: unknown}
+                  that as WidgetDefinition & {initialSnapshot: string}
                 ).initialSnapshot = editor.getSnapshot();
                 // On init, read values from component attributes and save them.
                 customizationArgSpecs.forEach(function (spec) {
