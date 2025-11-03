@@ -692,7 +692,7 @@ def apply_change_list(
                     # UpdateTopicPropertySkillIdsForDiagnosticTestCmd.
 
                     # Checks if changes is not causing already published topic to have empty diagnostic test skill.
-                    topic_rights= topic_fetchers.get_topic_rights(topic.id, strict=True)
+                    topic_rights = topic_fetchers.get_topic_rights(topic.id, strict=True)
                     if topic_rights.topic_is_published and change.new_value is None:
                         raise utils.ValidationError(
                             'Published topic cannot have empty diagnostic test skills.'

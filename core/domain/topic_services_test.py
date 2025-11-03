@@ -21,7 +21,6 @@ from __future__ import annotations
 import logging
 import os
 
-
 from core import feature_flag_list, feconf, utils
 from core.constants import constants
 from core.domain import (
