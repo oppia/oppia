@@ -102,6 +102,12 @@ export class BlogPostSearchService {
 
     return items;
   }
+    resetSearchState(): void {
+    this._searchOffset = 0;
+    this._lastQuery = '';
+    this._lastSelectedTags = [];
+    this._isCurrentlyFetchingResults = false;
+  }
 
   getQueryUrl(searchUrlQueryString: string): string {
     return '?q=' + searchUrlQueryString;

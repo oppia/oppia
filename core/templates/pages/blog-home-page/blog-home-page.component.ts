@@ -49,6 +49,8 @@ export class BlogHomePageComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  private filterWasUsed:boolean=false
+
   MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE!: number;
   MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE_SEARCH!: number;
   searchBarPlaceholder!: string;
@@ -96,6 +98,7 @@ export class BlogHomePageComponent implements OnInit {
       BlogHomePageConstants.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE;
     if (this.urlService.getUrlParams().hasOwnProperty('q')) {
       this.searchPageIsActive = true;
+      this.filterWasUsed=true
       this.updateSearchFieldsBasedOnUrlQuery();
     } else {
       this.loadInitialBlogHomePageData();
@@ -161,6 +164,16 @@ export class BlogHomePageComponent implements OnInit {
   }
 
   loadInitialBlogHomePageData(): void {
+    if (this.filterWasUsed) {
+      this.blogPostSearchService.resetSearchState()
+      this.page = 1
+      this.firstPostOnPageNum = 1
+      this.blogPostSummaries = []
+      this.filterWasUsed = false
+      this.totalBlogPosts = 0
+      this.showBlogPostCardsLoadingScreen = false
+      this.filterWasUsed = false
+    }
     this.blogHomePageBackendApiService.fetchBlogHomePageDataAsync('0').then(
       (data: BlogHomePageData) => {
         if (data.numOfPublishedBlogPosts) {
