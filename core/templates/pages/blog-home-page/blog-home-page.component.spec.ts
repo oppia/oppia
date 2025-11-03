@@ -186,7 +186,7 @@ describe('Blog home page component', () => {
 
     component.ngOnInit();
 
-    expect(component.filterWasUsed).toBe(true);
+    expect((component as any)['filterWasUsed']).toBe(true);
     expect(component.searchPageIsActive).toBe(true);
     expect(component.updateSearchFieldsBasedOnUrlQuery).toHaveBeenCalled();
   });
@@ -195,11 +195,11 @@ describe('Blog home page component', () => {
     (component as any).filterWasUsed = true;
     component.page = 3;
     component.firstPostOnPageNum = 21;
-    component.blogPostSummaries = [{'id': 1,title:'Test'}] as any;
+    component.blogPostSummaries = [{'id': 1, title: 'Test'}] as any;
     component.totalBlogPosts = 50;
-    component.showBlogPostCardsLoadingScreen = true
-    
-    const resetSearchStateSpy = spyOn(searchService , 'resetSearchState');
+    component.showBlogPostCardsLoadingScreen = true;
+
+    const resetSearchStateSpy = spyOn(searchService, 'resetSearchState');
 
     component.loadInitialBlogHomePageData();
 

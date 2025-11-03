@@ -149,17 +149,17 @@ describe('Blog Post Search Service', () => {
 
   describe('resetSearchState', () => {
     it('should reset all search services state properties', () => {
-      searchService._searchOffset = 15;
-      searchService._lastQuery = 'search query';
-      searchService._lastSelectedTags = ['community', 'news'];
-      searchService._isCurrentlyFetchingResults = true;
+      (searchService as any)['_searchOffset'] = 15;
+      (searchService as any)['_lastQuery'] = 'search query';
+      (searchService as any)['_lastSelectedTags'] = ['community', 'news'];
+      (searchService as any)['_isCurrentlyFetchingResults'] = true;
 
       searchService.resetSearchState();
 
-      expect(searchService._searchOffset).toBe(0);
-      expect(searchService._lastQuery).toBe('');
-      expect(searchService._lastSelectedTags).toEqual([]);
-      expect(searchService._isCurrentlyFetchingResults).toBe(false);
+      expect((searchService as any)['_searchOffset']).toBe(0);
+      expect((searchService as any)['_lastQuery']).toBe('');
+      expect((searchService as any)['_lastSelectedTags']).toEqual([]);
+      expect((searchService as any)['_isCurrentlyFetchingResults']).toBe(false);
     });
   });
 

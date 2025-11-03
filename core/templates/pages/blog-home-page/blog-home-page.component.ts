@@ -98,7 +98,7 @@ export class BlogHomePageComponent implements OnInit {
       BlogHomePageConstants.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE;
     if (this.urlService.getUrlParams().hasOwnProperty('q')) {
       this.searchPageIsActive = true;
-      this.filterWasUsed= true;
+      this.filterWasUsed = true;
       this.updateSearchFieldsBasedOnUrlQuery();
     } else {
       this.loadInitialBlogHomePageData();
