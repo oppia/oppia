@@ -31,7 +31,7 @@ import 'third-party-imports/skulpt.import';
 import {CodemirrorComponent} from '@ctrl/ngx-codemirror';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
-import {InteractionAnswer} from 'domain/exploration/AnswerStatsObjectFactory';
+import {InteractionAnswer} from 'interactions/answer-defs';
 
 describe('InteractiveCodeReplComponent', () => {
   let component: InteractiveCodeReplComponent;
