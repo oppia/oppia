@@ -4,7 +4,7 @@
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
 
-.home-tab .oppia-loading-fullpage{
+.home-tab .oppia-loading-fullpage {
   width: 80vw !important;
 }
 
@@ -12,9 +12,6 @@
   opacity: 0;
   pointer-events: none;
   position: relative;
-}
-
-.home-tab .loading-content {
   transition: opacity 0.3s ease-in-out;
 }
 
