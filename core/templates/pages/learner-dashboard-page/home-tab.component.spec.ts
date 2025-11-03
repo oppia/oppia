@@ -30,7 +30,7 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {HomeTabComponent} from './home-tab.component';
-import {Component, EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
+import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
@@ -46,7 +46,6 @@ describe('Home tab Component', () => {
   let urlInterpolationService: UrlInterpolationService;
   let windowDimensionsService: WindowDimensionsService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
-  let loaderService: LoaderService;
   let mockResizeEmitter: EventEmitter<void>;
   let siteAnalyticsService: SiteAnalyticsService;
   class MockPlatformFeatureService {
@@ -464,7 +463,6 @@ describe('Home tab Component Loader visibility tests', () => {
   let fixture: ComponentFixture<HomeTabComponent>;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let loaderService: LoaderService;
-  let mockResizeEmitter: EventEmitter<void>;
   class MockPlatformFeatureService {
     status = {
       SerialChapterLaunchLearnerView: {
