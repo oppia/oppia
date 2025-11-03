@@ -390,7 +390,7 @@
 	"I18N_CORRECT_FEEDBACK": "صحيح!",
 	"I18N_COUNT_OF_LESSONS": "{lessonCountValue, plural, =1 {درس} other {دروس أخرى}}",
 	"I18N_CREATED_LEARNER_GROUP_LINK_MESSAGE": "رابط مجموعتك",
-	"I18N_CREATE_ACCOUNT": "أنشئ حسابًا",
+	"I18N_CREATE_ACCOUNT": "إنشاء حساب",
 	"I18N_CREATE_ACTIVITY_QUESTION": "ماذا تريد أن تنشئ؟",
 	"I18N_CREATE_ACTIVITY_TITLE": "إنشاء نشاط",
 	"I18N_CREATE_COLLECTION": "إنشاء مجموعة",
