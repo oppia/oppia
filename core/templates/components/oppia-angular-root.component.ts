@@ -234,18 +234,20 @@ export class OppiaAngularRootComponent implements AfterViewInit {
               tooltip: component.tooltip,
               requiresInternet: component.requiresInternet,
               // Map to a mutable array with the exact shape expected by CKEditor initializer.
-              customizationArgSpecs: component.customizationArgSpecs.map(
-                spec => ({
-                  name: (spec as {name: string}).name,
-                  // This property isn't used by the initializer but is part of its type.
-                  value: '',
-                  default_value: (spec as {default_value: string})
-                    .default_value,
-                  default_value_obtainable_from_highlight: (
-                    spec as {default_value_obtainable_from_highlight: boolean}
-                  ).default_value_obtainable_from_highlight,
-                })
-              ),
+              customizationArgSpecs: (
+                component.customizationArgSpecs as readonly {
+                  name: string;
+                  default_value: string;
+                  default_value_obtainable_from_highlight: boolean;
+                }[]
+              ).map(spec => ({
+                name: spec.name,
+                // This property isn't used by the initializer but is part of its type.
+                value: '',
+                default_value: spec.default_value,
+                default_value_obtainable_from_highlight:
+                  spec.default_value_obtainable_from_highlight,
+              })),
             })),
         isInlineComponent: (componentId: string) =>
           OppiaAngularRootComponent.rteHelperService.isInlineComponent(
