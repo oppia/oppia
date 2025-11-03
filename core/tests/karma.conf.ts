@@ -4,7 +4,7 @@ var argv = require('yargs').positional('terminalEnabled', {
 }).argv;
 var path = require('path');
 var webpack = require('webpack');
-import * as karma from 'karma';
+var karma = require('karma');
 
 // Here we are checking if the specs_to_run flag is provided or not. If it is
 // provided, we are splitting the comma separated string into an array of
@@ -53,7 +53,7 @@ let jasmineSeed = Math.floor(Math.random() * 1000);
 // eslint-disable-next-line no-console
 console.log(`Seed for Frontend Test Execution Order ${jasmineSeed}`);
 
-module.exports = function (config: karma.Config) {
+module.exports = function (config: InstanceType<typeof karma.Config>) {
   config.set({
     basePath: '../../',
     frameworks: ['jasmine'],
@@ -117,7 +117,6 @@ module.exports = function (config: karma.Config) {
       // This throws "Type '{ jasmine: { random: true; seed: number; }; }' is not assignable to type 'ClientOptions'".
       // We need to suppress this error because Karma actually supports the 'jasmine' property at runtime,
       // but its TypeScript type definitions in '@types/karma' are outdated and do not include it.
-      // @ts-expect-error
       jasmine: {
         random: true,
         seed: jasmineSeed,
