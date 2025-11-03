@@ -178,7 +178,7 @@ describe('Blog home page component', () => {
 
   it('should make sure that filterWasUsed flag is set true if there is a query parameter in the url', () => {
     const mockUrlParams = {
-      q: 'search query',  
+      q: 'search query',
       tags: '["Community"]'
     };
     spyOn(urlService, 'getUrlParams').and.returnValue(mockUrlParams);
@@ -186,22 +186,22 @@ describe('Blog home page component', () => {
 
     component.ngOnInit();
 
-    expect(component['filterWasUsed']).toBe(true);
+    expect(component.filterWasUsed).toBe(true);
     expect(component.searchPageIsActive).toBe(true);
     expect(component.updateSearchFieldsBasedOnUrlQuery).toHaveBeenCalled();
-  })
+  });
 
   it('should reset all component state when filterWasUsed is set true and loadInitialHomePageData is called', () => {
-    (component as any).filterWasUsed = true
+    (component as any).filterWasUsed = true;
     component.page = 3;
     component.firstPostOnPageNum = 21;
-    component.blogPostSummaries = [{'id':1,title:'Test'}] as BlogPostSummary[];
+    component.blogPostSummaries = [{'id': 1,title:'Test'}] as any;
     component.totalBlogPosts = 50;
     component.showBlogPostCardsLoadingScreen = true
     
-    const resetSearchStateSpy = spyOn(searchService , 'resetSearchState')
+    const resetSearchStateSpy = spyOn(searchService , 'resetSearchState');
 
-    component.loadInitialBlogHomePageData()
+    component.loadInitialBlogHomePageData();
 
     expect(resetSearchStateSpy).toHaveBeenCalled();
     expect(component.page).toBe(1);
@@ -210,7 +210,7 @@ describe('Blog home page component', () => {
     expect((component as any).filterWasUsed).toBe(false);
     expect(component.totalBlogPosts).toBe(0);
     expect(component.showBlogPostCardsLoadingScreen).toBe(false);
-  })
+  });
 
   it('should handle search query change with language param in URL with empty search query and tag list', () => {
     spyOn(component, 'loadInitialBlogHomePageData');
