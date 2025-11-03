@@ -789,7 +789,9 @@ describe('GraphVizComponent', () => {
       getScreenCTM: () => null,
     } as unknown as SVGSVGElement;
 
-    (component as unknown as { vizContainer: SVGSVGElement[] }).vizContainer = [fakeSvg];
+    (component as unknown as {vizContainer: SVGSVGElement[]}).vizContainer = [
+      fakeSvg,
+    ];
 
     component.mousemoveGraphSVG(event);
 
