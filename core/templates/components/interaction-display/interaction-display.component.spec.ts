@@ -158,4 +158,259 @@ describe('Interaction display', () => {
 
     expect(componentInstance.buildInteraction).toHaveBeenCalled();
   });
+
+  it('should not rebuild interaction if htmlData has not changed', () => {
+    componentInstance.viewContainerRef = hostVcr;
+    spyOn(componentInstance, 'buildInteraction');
+
+    componentInstance.ngOnChanges({
+      htmlData: new SimpleChange('sameValue', 'sameValue', false),
+    });
+
+    expect(componentInstance.buildInteraction).not.toHaveBeenCalled();
+  });
+
+  it('should not rebuild interaction if viewContainerRef is not initialized', () => {
+    spyOn(componentInstance, 'buildInteraction');
+
+    componentInstance.ngOnChanges({
+      htmlData: new SimpleChange('previousValue', 'newValue', true),
+    });
+
+    expect(componentInstance.buildInteraction).not.toHaveBeenCalled();
+  });
+
+  it('should not build interaction when htmlData is empty', () => {
+    componentInstance.htmlData = '';
+    componentInstance.viewContainerRef = hostVcr;
+    spyOn(hostVcr, 'createComponent');
+
+    componentInstance.buildInteraction();
+
+    expect(hostVcr.createComponent).not.toHaveBeenCalled();
+  });
+
+  it('should not build interaction when tag is not in mapping', () => {
+    componentInstance.htmlData = '<unknown-tag></unknown-tag>';
+    componentInstance.viewContainerRef = hostVcr;
+    spyOn(hostVcr, 'createComponent');
+
+    componentInstance.buildInteraction();
+
+    expect(hostVcr.createComponent).not.toHaveBeenCalled();
+  });
+
+  it('should handle savedSolution bracketed binding', () => {
+    let savedSolution = 'saved-solution-value';
+    componentInstance.htmlData =
+      '<oppia-interactive-text-input ' +
+      '[saved-solution]="savedSolution"></oppia-interactive-text-input>';
+
+    let setAttributeSpy = jasmine.createSpy('setAttribute');
+    let mockComponentRef = {
+      changeDetectorRef: {
+        detectChanges: () => {},
+      },
+      location: {
+        nativeElement: {
+          setAttribute: setAttributeSpy,
+        },
+      },
+      instance: {
+        savedSolution: '',
+      },
+    };
+
+    componentInstance.viewContainerRef = hostVcr;
+    componentInstance.parentScope = {
+      lastAnswer: null,
+      savedSolution,
+    };
+
+    spyOn(componentFactoryResolver, 'resolveComponentFactory');
+    spyOn(hostVcr, 'createComponent').and.returnValue(
+      mockComponentRef as ComponentRef<unknown>
+    );
+
+    componentInstance.buildInteraction();
+
+    expect(mockComponentRef.instance.savedSolution).toEqual(savedSolution);
+  });
+
+  it('should handle savedSolution as null when undefined in parentScope', () => {
+    componentInstance.htmlData =
+      '<oppia-interactive-text-input ' +
+      '[saved-solution]="savedSolution"></oppia-interactive-text-input>';
+
+    let mockComponentRef = {
+      changeDetectorRef: {
+        detectChanges: () => {},
+      },
+      location: {
+        nativeElement: {
+          setAttribute: jasmine.createSpy('setAttribute'),
+        },
+      },
+      instance: {
+        savedSolution: 'initial-value',
+      },
+    };
+
+    componentInstance.viewContainerRef = hostVcr;
+    componentInstance.parentScope = {
+      lastAnswer: null,
+      // Saved Solution is intentionally undefined.
+    };
+
+    spyOn(componentFactoryResolver, 'resolveComponentFactory');
+    spyOn(hostVcr, 'createComponent').and.returnValue(
+      mockComponentRef as ComponentRef<unknown>
+    );
+
+    componentInstance.buildInteraction();
+
+    expect(mockComponentRef.instance.savedSolution).toBeNull();
+  });
+
+  it('should handle savedSolution as null when parentScope is undefined', () => {
+    componentInstance.htmlData =
+      '<oppia-interactive-text-input ' +
+      '[saved-solution]="savedSolution"></oppia-interactive-text-input>';
+
+    let mockComponentRef = {
+      changeDetectorRef: {
+        detectChanges: () => {},
+      },
+      location: {
+        nativeElement: {
+          setAttribute: jasmine.createSpy('setAttribute'),
+        },
+      },
+      instance: {
+        savedSolution: 'initial-value',
+      },
+    };
+
+    componentInstance.viewContainerRef = hostVcr;
+    // Parent Scope is intentionally undefined.
+
+    spyOn(componentFactoryResolver, 'resolveComponentFactory');
+    spyOn(hostVcr, 'createComponent').and.returnValue(
+      mockComponentRef as ComponentRef<unknown>
+    );
+
+    componentInstance.buildInteraction();
+
+    expect(mockComponentRef.instance.savedSolution).toBeNull();
+  });
+
+  it('should not set lastAnswer if instance does not have that property', () => {
+    componentInstance.htmlData =
+      '<oppia-interactive-text-input ' +
+      '[last-answer]="lastAnswer"></oppia-interactive-text-input>';
+
+    let mockComponentRef = {
+      changeDetectorRef: {
+        detectChanges: () => {},
+      },
+      location: {
+        nativeElement: {
+          setAttribute: jasmine.createSpy('setAttribute'),
+        },
+      },
+      instance: {},
+    };
+
+    componentInstance.viewContainerRef = hostVcr;
+    componentInstance.parentScope = {
+      lastAnswer: 'some-answer',
+    };
+
+    spyOn(componentFactoryResolver, 'resolveComponentFactory');
+    spyOn(hostVcr, 'createComponent').and.returnValue(
+      mockComponentRef as ComponentRef<unknown>
+    );
+
+    componentInstance.buildInteraction();
+
+    expect('lastAnswer' in mockComponentRef.instance).toBeFalse();
+  });
+
+  it('should not set savedSolution if instance does not have that property', () => {
+    componentInstance.htmlData =
+      '<oppia-interactive-text-input ' +
+      '[saved-solution]="savedSolution"></oppia-interactive-text-input>';
+
+    let mockComponentRef = {
+      changeDetectorRef: {
+        detectChanges: () => {},
+      },
+      location: {
+        nativeElement: {
+          setAttribute: jasmine.createSpy('setAttribute'),
+        },
+      },
+      instance: {},
+    };
+
+    componentInstance.viewContainerRef = hostVcr;
+    componentInstance.parentScope = {
+      lastAnswer: null,
+      savedSolution: 'some-solution',
+    };
+
+    spyOn(componentFactoryResolver, 'resolveComponentFactory');
+    spyOn(hostVcr, 'createComponent').and.returnValue(
+      mockComponentRef as ComponentRef<unknown>
+    );
+
+    componentInstance.buildInteraction();
+
+    expect('savedSolution' in mockComponentRef.instance).toBeFalse();
+  });
+
+  it('should handle lastAnswer as null when parentScope is undefined', () => {
+    componentInstance.htmlData =
+      '<oppia-interactive-text-input ' +
+      '[last-answer]="lastAnswer"></oppia-interactive-text-input>';
+
+    let mockComponentRef = {
+      changeDetectorRef: {
+        detectChanges: () => {},
+      },
+      location: {
+        nativeElement: {
+          setAttribute: jasmine.createSpy('setAttribute'),
+        },
+      },
+      instance: {
+        lastAnswer: 'initial-value',
+      },
+    };
+
+    componentInstance.viewContainerRef = hostVcr;
+    // Parent Scope is intentionally undefined.
+
+    spyOn(componentFactoryResolver, 'resolveComponentFactory');
+    spyOn(hostVcr, 'createComponent').and.returnValue(
+      mockComponentRef as ComponentRef<unknown>
+    );
+
+    componentInstance.buildInteraction();
+
+    expect(mockComponentRef.instance.lastAnswer).toBeNull();
+  });
+
+  it('should clear viewContainerRef when htmlData changes', () => {
+    componentInstance.viewContainerRef = hostVcr;
+    spyOn(hostVcr, 'clear');
+    spyOn(componentInstance, 'buildInteraction');
+
+    componentInstance.ngOnChanges({
+      htmlData: new SimpleChange('oldValue', 'newValue', false),
+    });
+
+    expect(hostVcr.clear).toHaveBeenCalled();
+    expect(componentInstance.buildInteraction).toHaveBeenCalled();
+  });
 });
