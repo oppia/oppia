@@ -87,7 +87,12 @@ describe('Interaction display', () => {
       // Unknown type is used here because the type of the component
       // is not known. This is because the component is dynamically
       // created.
-      .and.returnValue(mockComponentRef as ComponentRef<unknown>);
+      .and.returnValue(
+        mockComponentRef as ComponentRef<{
+          lastAnswer?: string | null;
+          savedSolution?: string | null;
+        }>
+      );
 
     componentInstance.buildInteraction();
 
@@ -129,7 +134,12 @@ describe('Interaction display', () => {
       // Unknown type is used here because the type of the component
       // is not known. This is because the component is dynamically
       // created.
-      .and.returnValue(mockComponentRef as ComponentRef<unknown>);
+      .and.returnValue(
+        mockComponentRef as ComponentRef<{
+          lastAnswer?: string | null;
+          savedSolution?: string | null;
+        }>
+      );
 
     componentInstance.buildInteraction();
 
@@ -229,7 +239,10 @@ describe('Interaction display', () => {
 
     spyOn(componentFactoryResolver, 'resolveComponentFactory');
     spyOn(hostVcr, 'createComponent').and.returnValue(
-      mockComponentRef as ComponentRef<unknown>
+      mockComponentRef as ComponentRef<{
+        lastAnswer?: string | null;
+        savedSolution?: string | null;
+      }>
     );
 
     componentInstance.buildInteraction();
@@ -264,7 +277,10 @@ describe('Interaction display', () => {
 
     spyOn(componentFactoryResolver, 'resolveComponentFactory');
     spyOn(hostVcr, 'createComponent').and.returnValue(
-      mockComponentRef as ComponentRef<unknown>
+      mockComponentRef as ComponentRef<{
+        lastAnswer?: string | null;
+        savedSolution?: string | null;
+      }>
     );
 
     componentInstance.buildInteraction();
@@ -296,7 +312,10 @@ describe('Interaction display', () => {
 
     spyOn(componentFactoryResolver, 'resolveComponentFactory');
     spyOn(hostVcr, 'createComponent').and.returnValue(
-      mockComponentRef as ComponentRef<unknown>
+      mockComponentRef as ComponentRef<{
+        lastAnswer?: string | null;
+        savedSolution?: string | null;
+      }>
     );
 
     componentInstance.buildInteraction();
@@ -328,7 +347,10 @@ describe('Interaction display', () => {
 
     spyOn(componentFactoryResolver, 'resolveComponentFactory');
     spyOn(hostVcr, 'createComponent').and.returnValue(
-      mockComponentRef as ComponentRef<unknown>
+      mockComponentRef as ComponentRef<{
+        lastAnswer?: string | null;
+        savedSolution?: string | null;
+      }>
     );
 
     componentInstance.buildInteraction();
@@ -361,7 +383,10 @@ describe('Interaction display', () => {
 
     spyOn(componentFactoryResolver, 'resolveComponentFactory');
     spyOn(hostVcr, 'createComponent').and.returnValue(
-      mockComponentRef as ComponentRef<unknown>
+      mockComponentRef as ComponentRef<{
+        lastAnswer?: string | null;
+        savedSolution?: string | null;
+      }>
     );
 
     componentInstance.buildInteraction();
@@ -393,7 +418,10 @@ describe('Interaction display', () => {
 
     spyOn(componentFactoryResolver, 'resolveComponentFactory');
     spyOn(hostVcr, 'createComponent').and.returnValue(
-      mockComponentRef as ComponentRef<unknown>
+      mockComponentRef as ComponentRef<{
+        lastAnswer?: string | null;
+        savedSolution?: string | null;
+      }>
     );
 
     componentInstance.buildInteraction();

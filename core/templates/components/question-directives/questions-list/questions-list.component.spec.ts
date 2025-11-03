@@ -76,12 +76,12 @@ class MockUrlInterpolationService {
 
 // Helper to access component's private services in tests via bracket notation.
 // TypeScript allows bracket notation to access private members for testing purposes.
-// We use a double cast through unknown to access private members, which is necessary
-// for testing purposes when accessing private properties that don't have an index signature.
+// We use Reflect.get to access private members in tests where needed to avoid unsafe casts,
+// which is necessary for testing private properties that don't have an index signature.
 const getPrivate = <T>(comp: QuestionsListComponent, key: string): T => {
   // We need to use bracket notation to access private members in tests.
   // eslint-disable-next-line dot-notation
-  return (comp as unknown as Record<string, unknown>)[key] as T;
+  return Reflect.get(comp as object, key) as T;
 };
 
 describe('Questions List Component', () => {
@@ -581,8 +581,8 @@ describe('Questions List Component', () => {
 
   it('should initialize undefined arrays in changeLinkedSkillDifficulty', () => {
     component.questionIsBeingUpdated = false;
-    component.newQuestionSkillIds = undefined as unknown as string[];
-    component.newQuestionSkillDifficulties = undefined as unknown as number[];
+    Reflect.set(component as object, 'newQuestionSkillIds', undefined);
+    Reflect.set(component as object, 'newQuestionSkillDifficulties', undefined);
     component.linkedSkillsWithDifficulty = [
       SkillDifficulty.create('skillId1', 'Skill 1', 0.9),
     ];
@@ -670,10 +670,9 @@ describe('Questions List Component', () => {
   it('should handle skill misconception IDs that do not start with selected skill ID', () => {
     component.misconceptionIdsForSelectedSkill = [1];
     spyOn(
-      getPrivate<{isEquivalent: (a: unknown, b: unknown) => boolean}>(
-        component,
-        'utilsService'
-      ),
+      getPrivate<{
+        isEquivalent: (a: Object | null, b: Object | null) => boolean;
+      }>(component, 'utilsService'),
       'isEquivalent'
     ).and.returnValue(true);
 
@@ -684,10 +683,9 @@ describe('Questions List Component', () => {
 
     expect(result).toBe(true);
     expect(
-      getPrivate<{isEquivalent: (a: unknown, b: unknown) => boolean}>(
-        component,
-        'utilsService'
-      ).isEquivalent
+      getPrivate<{
+        isEquivalent: (a: Object | null, b: Object | null) => boolean;
+      }>(component, 'utilsService').isEquivalent
     ).toHaveBeenCalledWith([1, undefined], [1]);
   });
 
@@ -1499,7 +1497,7 @@ describe('Questions List Component', () => {
   });
 
   it('should return false for showSolutionCheckpoint when question is null', () => {
-    component.question = null as unknown as Question;
+    Reflect.set(component as object, 'question', null);
     expect(component.showSolutionCheckpoint()).toBe(false);
   });
 
@@ -1913,10 +1911,9 @@ describe('Questions List Component', () => {
     component.selectedSkillId = 'skillId1';
     component.misconceptionIdsForSelectedSkill = [1, 2];
     spyOn(
-      getPrivate<{isEquivalent: (a: unknown, b: unknown) => boolean}>(
-        component,
-        'utilsService'
-      ),
+      getPrivate<{
+        isEquivalent: (a: Object | null, b: Object | null) => boolean;
+      }>(component, 'utilsService'),
       'isEquivalent'
     ).and.returnValue(false);
     const result = component.showUnaddressedSkillMisconceptionWarning([

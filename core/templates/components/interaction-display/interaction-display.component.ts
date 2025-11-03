@@ -46,6 +46,10 @@ interface WithSavedSolution {
   savedSolution: InteractionAnswer | null;
 }
 
+// Common surface that dynamic interaction components may expose and that
+// this component interacts with via bracketed bindings.
+type InteractionComponentInstance = Partial<WithLastAnswer & WithSavedSolution>;
+
 @Component({
   selector: 'oppia-interaction-display',
   templateUrl: './interaction-display.component.html',
@@ -93,7 +97,9 @@ export class InteractionDisplayComponent {
       ) {
         type TagKeys = keyof typeof TAG_TO_INTERACTION_MAPPING;
         const tag = first.tagName as TagKeys;
-        const interaction = TAG_TO_INTERACTION_MAPPING[tag] as Type<unknown>;
+        const interaction = TAG_TO_INTERACTION_MAPPING[
+          tag
+        ] as Type<InteractionComponentInstance>;
 
         const componentFactory =
           this.componentFactoryResolver.resolveComponentFactory(interaction);
@@ -120,10 +126,12 @@ export class InteractionDisplayComponent {
                 (componentRef.instance as WithLastAnswer).lastAnswer = value;
               }
             } else if (attributeNameInCamelCase === 'savedSolution') {
-              const value =
-                this.parentScope?.savedSolution !== undefined
-                  ? this.parentScope?.savedSolution ?? null
-                  : null;
+              const hasSavedSolution =
+                this.parentScope !== undefined &&
+                'savedSolution' in (this.parentScope as object);
+              const value = hasSavedSolution
+                ? this.parentScope?.savedSolution ?? null
+                : null;
               if ('savedSolution' in (componentRef.instance as object)) {
                 (componentRef.instance as WithSavedSolution).savedSolution =
                   value;

@@ -100,6 +100,11 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {UrlService} from 'services/contextual/url.service';
 import {I18nService} from 'i18n/i18n.service';
 import {RteHelperService} from 'services/rte-helper.service';
+import {
+  CustomizationArgsForRteType,
+  CustomizationArgsSpecsType,
+  RteComponentId,
+} from 'services/rte-helper-modal.component';
 import {NoninteractiveWorkedexample} from 'rich_text_components/Workedexample/directives/oppia-noninteractive-workedexample.component';
 
 const componentMap = {
@@ -178,7 +183,6 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static ratingComputationService: RatingComputationService;
   static reviewTestBackendApiService: ReviewTestBackendApiService;
   static storyViewerBackendApiService: StoryViewerBackendApiService;
-  static ajsValueProvider: (key: string, value: unknown) => void;
   static injector: Injector;
 
   constructor(
@@ -212,12 +216,63 @@ export class OppiaAngularRootComponent implements AfterViewInit {
       OppiaAngularRootComponent.pageContextService = this.pageContextService;
     }
     this.ngZone.runOutsideAngular(() => {
+      // Adapter to satisfy the CkEditorRteHelperService interface without
+      // unsafe casting; delegates to the injected RteHelperService.
+      const rteHelperAdapter: CkEditorRteHelperService = {
+        createCustomizationArgDictFromAttrs: (attrs: Record<string, string>) =>
+          attrs ?? {},
+        getRichTextComponents: () =>
+          OppiaAngularRootComponent.rteHelperService
+            .getRichTextComponents()
+            .map(component => ({
+              backendId: component.backendId,
+              id: component.id,
+              iconDataUrl: component.iconDataUrl,
+              isComplex: component.isComplex,
+              isBlockElement: component.isBlockElement,
+              requiresFs: component.requiresFs,
+              tooltip: component.tooltip,
+              requiresInternet: component.requiresInternet,
+              // Map to a mutable array with the exact shape expected by CKEditor initializer.
+              customizationArgSpecs: component.customizationArgSpecs.map(
+                spec => ({
+                  name: (spec as {name: string}).name,
+                  // This property isn't used by the initializer but is part of its type.
+                  value: '',
+                  default_value: (spec as {default_value: string})
+                    .default_value,
+                  default_value_obtainable_from_highlight: (
+                    spec as {default_value_obtainable_from_highlight: boolean}
+                  ).default_value_obtainable_from_highlight,
+                })
+              ),
+            })),
+        isInlineComponent: (componentId: string) =>
+          OppiaAngularRootComponent.rteHelperService.isInlineComponent(
+            componentId as (typeof AppConstants.INLINE_RTE_COMPONENTS)[number]
+          ),
+        openCustomizationModal: (
+          componentIsNewlyCreated: boolean,
+          componentId: RteComponentId,
+          customizationArgSpecs: CustomizationArgsSpecsType,
+          attrsCustomizationArgsDict: CustomizationArgsForRteType,
+          onSubmitCallback?: (
+            arg0: Partial<CustomizationArgsForRteType>
+          ) => void,
+          onDismissCallback?: (reason: boolean | 'cancel') => void
+        ) =>
+          OppiaAngularRootComponent.rteHelperService.openCustomizationModal(
+            componentIsNewlyCreated,
+            componentId,
+            customizationArgSpecs,
+            attrsCustomizationArgsDict,
+            onSubmitCallback,
+            onDismissCallback
+          ),
+      };
+
       CkEditorInitializerService.ckEditorInitializer(
-        // The RteHelperService class doesn't fully implement the
-        // CkEditorRteHelperService interface (missing
-        // createCustomizationArgDictFromAttrs), but it provides the methods
-        // actually used by CkEditor.
-        OppiaAngularRootComponent.rteHelperService as unknown as CkEditorRteHelperService,
+        rteHelperAdapter,
         this.htmlEscaperService,
         this.pageContextService,
         this.ngZone
