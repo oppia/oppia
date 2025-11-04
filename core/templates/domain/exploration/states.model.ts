@@ -133,6 +133,10 @@ export class States {
     return Object.keys(this._states);
   }
 
+  getStates(): State[] {
+    return Object.values(this._states);
+  }
+
   getFinalStateNames(): string[] {
     let finalStateNames = [];
     for (let stateName in this._states) {

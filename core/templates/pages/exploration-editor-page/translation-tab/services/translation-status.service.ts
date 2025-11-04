@@ -23,11 +23,11 @@ import {TranslationLanguageService} from 'pages/exploration-editor-page/translat
 import {TranslationTabActiveModeService} from 'pages/exploration-editor-page/translation-tab/services/translation-tab-active-mode.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {AppConstants} from 'app.constants';
-import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
+import {EntityTranslation} from 'domain/translation/entity-translation.model';
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
-import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
+import {TranslatedContent} from 'domain/exploration/translated-content.model';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 

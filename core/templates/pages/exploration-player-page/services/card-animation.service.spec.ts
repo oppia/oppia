@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for CardAnimationService.
  */
 
-import {TestBed, fakeAsync, tick} from '@angular/core/testing';
+import {TestBed, fakeAsync, flush, tick} from '@angular/core/testing';
 import {CardAnimationService} from './card-animation.service';
 import {FocusManagerService} from '../../../services/stateful/focus-manager.service';
 import {PlayerTranscriptService} from './player-transcript.service';
@@ -147,66 +147,60 @@ describe('CardAnimationService', () => {
     expect(playerPositionService.setDisplayedCardIndex).toHaveBeenCalledWith(4);
   }));
 
-  it('should call scrollTo if cardNavigationControl is partially out of view', fakeAsync(() => {
-    const mockCardNavigationControl = document.createElement('div');
-    mockCardNavigationControl.getBoundingClientRect = () => ({
-      top: 100,
-      height: 100,
-      bottom: 200,
-      left: 0,
-      right: 0,
-      width: 100,
-      x: 0,
-      y: 0,
-      toJSON: () => {},
-    });
+  it('should scroll to bottom and trigger smooth scrolling', fakeAsync(() => {
+    spyOnProperty(document.body, 'scrollHeight', 'get').and.returnValue(1200);
+    spyOnProperty(
+      document.documentElement,
+      'scrollHeight',
+      'get'
+    ).and.returnValue(1000);
 
-    spyOn(document, 'querySelector').and.returnValue(mockCardNavigationControl);
-    spyOnProperty(window, 'scrollY', 'get').and.returnValue(50);
-    spyOnProperty(window, 'innerHeight', 'get').and.returnValue(120);
+    let frameCount = 0;
+    spyOn(window, 'requestAnimationFrame').and.callFake(
+      (callback: FrameRequestCallback) => {
+        frameCount++;
+        if (frameCount < 100) {
+          setTimeout(() => callback(performance.now()), 0);
+        }
+        return frameCount;
+      }
+    );
 
-    const scrollSpy = spyOn(window, 'scrollTo');
+    const scrollToSpy = spyOn(window, 'scrollTo');
 
     service.scrollToBottom();
     tick(150);
+    flush();
 
-    expect(scrollSpy).toHaveBeenCalled();
+    expect(scrollToSpy).toHaveBeenCalled();
   }));
 
-  it('should not scroll if cardNavigationControl is already visible', fakeAsync(() => {
-    const mockCardNavigationControl = document.createElement('div');
-    mockCardNavigationControl.getBoundingClientRect = () => ({
-      top: 100,
-      height: 100,
-      bottom: 200,
-      left: 0,
-      right: 0,
-      width: 100,
-      x: 0,
-      y: 0,
-      toJSON: () => {},
-    });
+  it('should use documentElement scrollHeight if greater than body scrollHeight', fakeAsync(() => {
+    spyOnProperty(document.body, 'scrollHeight', 'get').and.returnValue(800);
+    spyOnProperty(
+      document.documentElement,
+      'scrollHeight',
+      'get'
+    ).and.returnValue(1200);
 
-    spyOn(document, 'querySelector').and.returnValue(mockCardNavigationControl);
-    spyOnProperty(window, 'scrollY', 'get').and.returnValue(200);
-    spyOnProperty(window, 'innerHeight', 'get').and.returnValue(200);
+    let frameCount = 0;
+    spyOn(window, 'requestAnimationFrame').and.callFake(
+      (callback: FrameRequestCallback) => {
+        frameCount++;
+        if (frameCount < 100) {
+          setTimeout(() => callback(performance.now()), 0);
+        }
+        return frameCount;
+      }
+    );
 
-    const scrollSpy = spyOn(window, 'scrollTo');
-
-    service.scrollToBottom();
-    tick(150);
-
-    expect(scrollSpy).not.toHaveBeenCalled();
-  }));
-
-  it('should not scroll if cardNavigationControl is missing', fakeAsync(() => {
-    spyOn(document, 'querySelector').and.returnValue(null);
-    const scrollSpy = spyOn(window, 'scrollTo');
+    const scrollToSpy = spyOn(window, 'scrollTo');
 
     service.scrollToBottom();
     tick(150);
+    flush();
 
-    expect(scrollSpy).not.toHaveBeenCalled();
+    expect(scrollToSpy).toHaveBeenCalled();
   }));
 
   it('should call callback and focus after transition', fakeAsync(() => {

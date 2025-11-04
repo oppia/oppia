@@ -19,8 +19,9 @@ from __future__ import annotations
 import datetime
 import uuid
 
-from core import feconf
+from core import feature_flag_list, feconf
 from core.domain import (
+    opportunity_services,
     rights_domain,
     rights_manager,
     state_domain,
@@ -122,162 +123,6 @@ class VoiceoverLanguageCodesMappingHandlerTests(test_utils.GenericTestBase):
             'Expected dict, received en-US',
         )
 
-        self.logout()
-
-
-class VoiceArtistMetadataHandlerTests(test_utils.GenericTestBase):
-    """The class validates functionality related to voice artist metadata model."""
-
-    def setUp(self) -> None:
-        super().setUp()
-        self.signup(self.VOICEOVER_ADMIN_EMAIL, self.VOICEOVER_ADMIN_USERNAME)
-        self.set_voiceover_admin([self.VOICEOVER_ADMIN_USERNAME])
-        auth_id = 'someUser'
-        self.voice_artist_username = 'username'
-        user_settings = user_services.create_new_user(
-            auth_id, 'user@example.com'
-        )
-        self.voice_artist_id = user_settings.user_id
-        user_services.set_username(
-            self.voice_artist_id, self.voice_artist_username
-        )
-
-        self.voiceover1: state_domain.VoiceoverDict = {
-            'filename': 'filename1.mp3',
-            'file_size_bytes': 3000,
-            'needs_update': False,
-            'duration_secs': 6.1,
-        }
-        self.voiceover2: state_domain.VoiceoverDict = {
-            'filename': 'filename2.mp3',
-            'file_size_bytes': 3500,
-            'needs_update': False,
-            'duration_secs': 5.9,
-        }
-        self.voiceover3: state_domain.VoiceoverDict = {
-            'filename': 'filename3.mp3',
-            'file_size_bytes': 3500,
-            'needs_update': False,
-            'duration_secs': 5.0,
-        }
-
-        self.language_code_to_accent: Dict[str, str] = {
-            'en': 'en-US',
-            'hi': 'hi-IN',
-        }
-
-        self.content_id_to_voiceovers_mapping: (
-            voiceover_domain.ContentIdToVoiceoverMappingType
-        ) = {
-            'content_1': {'en': (self.voice_artist_id, self.voiceover1)},
-            'content_2': {'hi': (self.voice_artist_id, self.voiceover2)},
-            'content_3': {'ar': (self.voice_artist_id, self.voiceover1)},
-        }
-
-        exploration_voice_artist_link_model = voiceover_services.create_exploration_voice_artists_link_model_instance(
-            exploration_id='exploration_id',
-            content_id_to_voiceovers_mapping=(
-                self.content_id_to_voiceovers_mapping
-            ),
-        )
-        exploration_voice_artist_link_model.put()
-
-        voiceover_services.update_voice_artist_metadata(
-            voice_artist_id=self.voice_artist_id,
-            language_code_to_accent=(self.language_code_to_accent),
-        )
-
-    def test_get_voice_artist_data_for_voiceover_admin_page(self) -> None:
-        self.login(self.VOICEOVER_ADMIN_EMAIL, is_super_admin=True)
-
-        expected_voice_artist_id_to_language_mapping = {
-            self.voice_artist_id: {'en': 'en-US', 'hi': 'hi-IN', 'ar': ''}
-        }
-        expected_voice_artist_id_to_voice_artist_name = {
-            self.voice_artist_id: self.voice_artist_username
-        }
-        json_response = self.get_json(feconf.VOICE_ARTIST_METADATA_HANDLER)
-
-        self.assertDictEqual(
-            json_response['voice_artist_id_to_language_mapping'],
-            expected_voice_artist_id_to_language_mapping,
-        )
-        self.assertDictEqual(
-            json_response['voice_artist_id_to_voice_artist_name'],
-            expected_voice_artist_id_to_voice_artist_name,
-        )
-        self.logout()
-
-    def test_should_update_voice_artist_language_mapping(self) -> None:
-        self.login(self.VOICEOVER_ADMIN_EMAIL, is_super_admin=True)
-        csrf_token = self.get_new_csrf_token()
-
-        initial_voice_artist_id_to_language_mapping = {
-            self.voice_artist_id: {'en': 'en-US', 'hi': 'hi-IN', 'ar': ''}
-        }
-        voice_artist_id_to_language_mapping = (
-            voiceover_services.get_all_voice_artist_language_accent_mapping()
-        )
-
-        self.assertDictEqual(
-            voice_artist_id_to_language_mapping,
-            initial_voice_artist_id_to_language_mapping,
-        )
-
-        payload = {
-            'voice_artist_id': self.voice_artist_id,
-            'language_code': 'ar',
-            'language_accent_code': 'ar-EG',
-        }
-        self.put_json(
-            feconf.VOICE_ARTIST_METADATA_HANDLER, payload, csrf_token=csrf_token
-        )
-
-        final_voice_artist_id_to_language_mapping = {
-            self.voice_artist_id: {'en': 'en-US', 'hi': 'hi-IN', 'ar': 'ar-EG'}
-        }
-        voice_artist_id_to_language_mapping = (
-            voiceover_services.get_all_voice_artist_language_accent_mapping()
-        )
-
-        self.assertDictEqual(
-            voice_artist_id_to_language_mapping,
-            final_voice_artist_id_to_language_mapping,
-        )
-        self.logout()
-
-    def test_get_exp_id_to_filenames_for_given_voice_artist(self) -> None:
-        self.login(self.VOICEOVER_ADMIN_EMAIL, is_super_admin=True)
-
-        handler_url = '%s/%s/%s' % (
-            feconf.GET_SAMPLE_VOICEOVERS_FOR_VOICE_ARTIST,
-            self.voice_artist_id,
-            'en',
-        )
-
-        expected_exp_id_to_filenames = {'exploration_id': ['filename1.mp3']}
-
-        json_response = self.get_json(handler_url)
-
-        self.assertDictEqual(
-            json_response['exploration_id_to_filenames'],
-            expected_exp_id_to_filenames,
-        )
-
-        handler_url = '%s/%s/%s' % (
-            feconf.GET_SAMPLE_VOICEOVERS_FOR_VOICE_ARTIST,
-            self.voice_artist_id,
-            'hi',
-        )
-
-        expected_exp_id_to_filenames = {'exploration_id': ['filename2.mp3']}
-
-        json_response = self.get_json(handler_url)
-
-        self.assertDictEqual(
-            json_response['exploration_id_to_filenames'],
-            expected_exp_id_to_filenames,
-        )
         self.logout()
 
 
@@ -457,6 +302,107 @@ class RegenerateAutomaticVoiceoverHandlerTests(test_utils.GenericTestBase):
         )
         self.assertTrue(response_dict['filename'].startswith('content_0-en-US'))
 
+        self.logout()
+
+
+class RegenerateVoiceoverOnExpUpdateHandlerTests(test_utils.GenericTestBase):
+    """Test to regenerate voiceover on exploration update."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.VOICEOVER_ADMIN_EMAIL, self.VOICEOVER_ADMIN_USERNAME)
+        self.set_voiceover_admin([self.VOICEOVER_ADMIN_USERNAME])
+        self.voiceover_admin_id = self.get_user_id_from_email(
+            self.VOICEOVER_ADMIN_EMAIL
+        )
+        self.voiceover_admin = user_services.get_user_actions_info(
+            self.voiceover_admin_id
+        )
+
+        self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
+        self.voice_artist_id = self.get_user_id_from_email(
+            self.VOICE_ARTIST_EMAIL
+        )
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
+
+        self.exploration = self.save_new_valid_exploration(
+            'exp_id', self.owner_id, title='Exploration 1'
+        )
+        rights_manager.publish_exploration(self.owner, self.exploration.id)
+        rights_manager.assign_role_for_exploration(
+            self.voiceover_admin,
+            self.exploration.id,
+            self.voice_artist_id,
+            rights_domain.ROLE_VOICE_ARTIST,
+        )
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS]
+    )
+    def test_should_be_able_to_regenerate_voiceovers(self) -> None:
+        self.login(self.VOICE_ARTIST_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        deferred_calls = []
+
+        def mock_defer(
+            function_id: str,
+            queue_name: str,
+            exploration_id: str,
+            exploration_title: str,
+            exploration_version: int,
+            committer_id: str,
+            datetime_str: str,
+        ) -> None:
+            deferred_calls.append(
+                {
+                    'function_id': function_id,
+                    'queue_name': queue_name,
+                    'exploration_id': exploration_id,
+                    'exploration_title': exploration_title,
+                    'exploration_version': exploration_version,
+                    'committer_id': committer_id,
+                    'datetime_str': datetime_str,
+                }
+            )
+
+        exploration_id = self.exploration.id
+        exploration_version = self.exploration.version
+        exploration_title = self.exploration.title
+
+        handler_url = '/regenerate_voiceover_on_exp_update/%s/%s/%s' % (
+            exploration_id,
+            exploration_version,
+            exploration_title,
+        )
+
+        with (
+            self.swap(
+                opportunity_services,
+                'is_exploration_available_for_contribution',
+                lambda _: True,
+            ),
+            self.swap(taskqueue_services, 'defer', mock_defer),
+        ):
+            self.post_json(handler_url, {}, csrf_token=csrf_token)
+
+        self.assertEqual(len(deferred_calls), 1)
+        args = deferred_calls[0]
+
+        expected_func_name = (
+            feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+                'FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_UPDATE'
+            ]
+        )
+
+        self.assertEqual(args['function_id'], expected_func_name)
+        self.assertEqual(args['queue_name'], 'voiceover-regeneration')
+        self.assertEqual(args['exploration_id'], exploration_id)
+        self.assertEqual(args['exploration_title'], exploration_title)
+        self.assertEqual(args['exploration_version'], exploration_version)
+        self.assertEqual(args['committer_id'], feconf.SYSTEM_COMMITTER_ID)
         self.logout()
 
 

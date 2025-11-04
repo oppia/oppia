@@ -20,14 +20,12 @@ from __future__ import annotations
 
 import multiprocessing
 import os
-import re
 import shutil
 import subprocess
 
 from core.tests import test_utils
 from scripts import concurrent_task_utils
 
-import esprima
 from typing import Final, List, Tuple
 
 from . import js_ts_linter, run_lint_checks
@@ -41,20 +39,9 @@ LINTER_TESTS_DIR: Final = os.path.join(
 )
 VALID_JS_FILEPATH: Final = os.path.join(LINTER_TESTS_DIR, 'valid.js')
 VALID_TS_FILEPATH: Final = os.path.join(LINTER_TESTS_DIR, 'valid.ts')
+INVALID_TS_FILEPATH: Final = os.path.join(LINTER_TESTS_DIR, 'invalid.ts')
 VALID_BACKEND_API_SERVICE_FILEPATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'valid-backend-api.service.ts'
-)
-INVALID_SORTED_DEPENDENCIES_FILEPATH: Final = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_sorted_dependencies.ts'
-)
-INVALID_CONSTANT_IN_TS_FILEPATH: Final = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_constant_in_ts_file.ts'
-)
-INVALID_CONSTANT_FILEPATH: Final = os.path.join(
-    LINTER_TESTS_DIR, 'invalid.constants.ts'
-)
-INVALID_CONSTANT_AJS_FILEPATH: Final = os.path.join(
-    LINTER_TESTS_DIR, 'invalid.constants.ajs.ts'
 )
 VALID_IGNORED_SERVICE_PATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'valid_ignored.service.ts'
@@ -62,12 +49,6 @@ VALID_IGNORED_SERVICE_PATH: Final = os.path.join(
 VALID_UNLISTED_SERVICE_PATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'valid_unlisted.service.ts'
 )
-
-# Note: Almost all test functions have a subprocess call. This call is to mock
-# the compile function used in js_ts_linter. The tests require fewer files to
-# be compiled instead of all files as done in js_ts_linter. Mocking the
-# compile method reduces the compile time as fewer files are compiled
-# thereby making the tests run faster.
 
 
 class Ret:
@@ -79,6 +60,21 @@ class Ret:
     def communicate(self) -> Tuple[str, bytes]:
         """Return some error."""
         return '', 'Some error'.encode('utf-8')
+
+
+class MockProcess:
+    """Mock process that properly simulates subprocess.Popen behavior."""
+
+    def __init__(
+        self, returncode: int = 1, stdout: bytes = b'', stderr: bytes = b''
+    ) -> None:
+        self.returncode = returncode
+        self._stdout = stdout
+        self._stderr = stderr
+
+    def communicate(self) -> Tuple[bytes, bytes]:
+        """Return mock communication result with proper types."""
+        return self._stdout, self._stderr
 
 
 class JsTsLintTests(test_utils.LinterTestBase):
@@ -114,114 +110,6 @@ class JsTsLintTests(test_utils.LinterTestBase):
             with self.assertRaisesRegex(Exception, 'Some error'):
                 js_ts_linter.compile_all_ts_files()
 
-    def test_validate_and_parse_js_and_ts_files_with_exception(self) -> None:
-        def mock_parse_script(
-            unused_file_content: str, comment: str
-        ) -> None:  # pylint: disable=unused-argument
-            raise Exception('Exception raised from parse_script()')
-
-        compile_all_ts_files_swap = self.swap(
-            js_ts_linter, 'compile_all_ts_files', lambda: None
-        )
-        esprima_swap = self.swap(esprima, 'parseScript', mock_parse_script)
-
-        with esprima_swap, compile_all_ts_files_swap, self.assertRaisesRegex(
-            Exception, re.escape('Exception raised from parse_script()')
-        ):
-            js_ts_linter.JsTsLintChecksManager(
-                [], [VALID_JS_FILEPATH], FILE_CACHE
-            ).perform_all_lint_checks()
-
-    def test_check_constants_declaration(self) -> None:
-        def mock_compile_all_ts_files() -> None:
-            cmd = (
-                './node_modules/typescript/bin/tsc -outDir %s'
-                'scripts/linters/test_files/ -allowJS %s '
-                '-lib %s -noImplicitUseStrict %s -skipLibCheck '
-                '%s -target %s -typeRoots %s %s %s typings/*'
-            ) % (
-                js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH,
-                'true',
-                'es2017,dom',
-                'true',
-                'true',
-                'es5',
-                './node_modules/@types',
-                INVALID_CONSTANT_AJS_FILEPATH,
-                INVALID_CONSTANT_FILEPATH,
-            )
-            subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
-
-        compile_all_ts_files_swap = self.swap(
-            js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files
-        )
-
-        with compile_all_ts_files_swap:
-            lint_task_report = js_ts_linter.JsTsLintChecksManager(
-                [], [INVALID_CONSTANT_FILEPATH], FILE_CACHE
-            ).perform_all_lint_checks()
-        shutil.rmtree(
-            js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True
-        )
-        expected_messages = [
-            'Please ensure that the constant ADMIN_TABS is initialized '
-            'from the value from the corresponding Angular constants file '
-            '(the *.constants.ts file). Please create one in the Angular '
-            'constants file if it does not exist there.'
-        ]
-        self.validate(lint_task_report, expected_messages, 1)
-
-    def test_check_duplicate_constant_declaration_in_separate_files(
-        self,
-    ) -> None:
-        def mock_compile_all_ts_files() -> None:
-            cmd = (
-                './node_modules/typescript/bin/tsc -outDir %s'
-                'scripts/linters/test_files/ -allowJS %s '
-                '-lib %s -noImplicitUseStrict %s -skipLibCheck '
-                '%s -target %s -typeRoots %s %s typings/*'
-            ) % (
-                js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH,
-                'true',
-                'es2017,dom',
-                'true',
-                'true',
-                'es5',
-                './node_modules/@types',
-                INVALID_CONSTANT_IN_TS_FILEPATH,
-            )
-            subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
-
-        compile_all_ts_files_swap = self.swap(
-            js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files
-        )
-
-        with compile_all_ts_files_swap:
-            lint_task_report = js_ts_linter.JsTsLintChecksManager(
-                [],
-                [
-                    INVALID_CONSTANT_IN_TS_FILEPATH,
-                    INVALID_CONSTANT_IN_TS_FILEPATH,
-                ],
-                FILE_CACHE,
-            ).perform_all_lint_checks()
-        shutil.rmtree(
-            js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True
-        )
-        expected_messages = [
-            'The constant \'ADMIN_ROLE_HANDLER_URL\' is already declared in',
-            'Please import the file where the constant is declared '
-            'or rename the constant.',
-        ]
-        self.validate(lint_task_report, expected_messages, 1)
-
-    def test_third_party_linter(self) -> None:
-        lint_task_report = js_ts_linter.ThirdPartyJsTsLintChecksManager(
-            [INVALID_SORTED_DEPENDENCIES_FILEPATH]
-        ).perform_all_lint_checks()
-        expected_messages = ['Unused injected value IMPORT_STATEMENT']
-        self.validate(lint_task_report, expected_messages, 1)
-
     def test_third_party_linter_with_stderr(self) -> None:
         process = subprocess.Popen(['test'], stdout=subprocess.PIPE)
 
@@ -240,7 +128,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
         with popen_swap, communicate_swap:
             with self.assertRaisesRegex(Exception, 'Invalid'):
                 js_ts_linter.ThirdPartyJsTsLintChecksManager(
-                    [INVALID_SORTED_DEPENDENCIES_FILEPATH]
+                    [VALID_TS_FILEPATH]
                 ).perform_all_lint_checks()
 
     def test_third_party_linter_with_invalid_eslint_path(self) -> None:
@@ -255,7 +143,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
             'its dependencies.',
         ):
             js_ts_linter.ThirdPartyJsTsLintChecksManager(
-                [INVALID_SORTED_DEPENDENCIES_FILEPATH]
+                [VALID_TS_FILEPATH]
             ).perform_all_lint_checks()
 
     def test_third_party_linter_with_success_message(self) -> None:
@@ -392,3 +280,151 @@ class JsTsLintTests(test_utils.LinterTestBase):
                 third_party, js_ts_linter.ThirdPartyJsTsLintChecksManager
             )
         )
+
+    def test_eslint_integration_with_invalid_ts_file(self) -> None:
+        """Test ESLint integration using invalid.ts file (tests trimming through public interface)."""
+        mock_eslint_output = f"""
+    {INVALID_TS_FILEPATH}
+    25:3  error  Duplicate identifier 'duplicateVariable'  @typescript-eslint/no-redeclare
+    26:3  error  Duplicate identifier 'duplicateVariable'  @typescript-eslint/no-redeclare
+    24:3  error  'unusedVariable' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+    ✖ 3 problems (3 errors, 0 warnings)
+    1 error and 0 warnings potentially fixable with the `--fix` option.
+
+    """
+
+        def mock_exists(unused_path: str) -> bool:
+            return True
+
+        def mock_popen(  # pylint: disable=unused-argument
+            *args: str, **kwargs: str
+        ) -> MockProcess:
+            return MockProcess(
+                returncode=1,
+                stdout=mock_eslint_output.encode('utf-8'),
+                stderr=b'',
+            )
+
+        exists_swap = self.swap(os.path, 'exists', mock_exists)
+        popen_swap = self.swap(subprocess, 'Popen', mock_popen)
+
+        with exists_swap, popen_swap:
+            lint_task_report = js_ts_linter.ThirdPartyJsTsLintChecksManager(
+                [INVALID_TS_FILEPATH]
+            ).perform_all_lint_checks()
+
+        self.assertTrue(lint_task_report[0].failed)
+        self.assertEqual(lint_task_report[0].name, 'ESLint')
+
+        trimmed_output = ''.join(lint_task_report[0].trimmed_messages)
+        # The 'error' keywords should be removed from lines with line numbers.
+        self.assertIn('25:3    Duplicate identifier', trimmed_output)
+        self.assertIn('26:3    Duplicate identifier', trimmed_output)
+        self.assertIn('24:3    \'unusedVariable\'', trimmed_output)
+        # Footer might not be removed if conditions aren't met exactly.
+        self.assertIn('Duplicate identifier', trimmed_output)
+
+    def test_eslint_integration_footer_removal_with_exact_conditions(
+        self,
+    ) -> None:
+        """Test ESLint footer removal with exact conditions through public interface."""
+        # Create output that meets ALL footer removal conditions exactly:
+        # 1. At least 4 lines
+        # 2. Last line is empty
+        # 3. Second to last line is empty
+        # 4. Third to last ends with '`--fix` option.'
+        # 5. Fourth to last starts with '\u2716'.
+        mock_eslint_output_lines = [
+            f'{INVALID_TS_FILEPATH}',
+            '  25:3  error  Duplicate identifier  @typescript-eslint/no-redeclare',
+            '  24:3  error  Variable never used  @typescript-eslint/no-unused-vars',
+            '\u2716 2 problems (2 errors, 0 warnings)',
+            '  1 error and 0 warnings potentially fixable with the `--fix` option.',
+            '',
+            '',
+        ]
+        mock_eslint_output = '\n'.join(mock_eslint_output_lines)
+
+        def mock_exists(unused_path: str) -> bool:
+            return True
+
+        def mock_popen(  # pylint: disable=unused-argument
+            *args: str, **kwargs: str
+        ) -> MockProcess:
+            return MockProcess(
+                returncode=1,
+                stdout=mock_eslint_output.encode('utf-8'),
+                stderr=b'',
+            )
+
+        exists_swap = self.swap(os.path, 'exists', mock_exists)
+        popen_swap = self.swap(subprocess, 'Popen', mock_popen)
+
+        with exists_swap, popen_swap:
+            lint_task_report = js_ts_linter.ThirdPartyJsTsLintChecksManager(
+                [INVALID_TS_FILEPATH]
+            ).perform_all_lint_checks()
+
+        trimmed_output = ''.join(lint_task_report[0].trimmed_messages)
+        self.assertNotIn('\u2716 2 problems', trimmed_output)
+        self.assertNotIn(
+            'potentially fixable with the `--fix` option.', trimmed_output
+        )
+        self.assertIn('25:3    Duplicate identifier', trimmed_output)
+        self.assertIn('24:3    Variable never used', trimmed_output)
+
+    def test_eslint_integration_no_footer_removal(self) -> None:
+        """Test ESLint when footer removal conditions are not met."""
+        mock_eslint_output = f"""
+    {INVALID_TS_FILEPATH}
+    25:3  error  Duplicate identifier  @typescript-eslint/no-redeclare
+    X 1 problem (1 error, 0 warnings)
+    """
+
+        def mock_exists(unused_path: str) -> bool:
+            return True
+
+        def mock_popen(  # pylint: disable=unused-argument
+            *args: str, **kwargs: str
+        ) -> MockProcess:
+            return MockProcess(
+                returncode=1,
+                stdout=mock_eslint_output.encode('utf-8'),
+                stderr=b'',
+            )
+
+        exists_swap = self.swap(os.path, 'exists', mock_exists)
+        popen_swap = self.swap(subprocess, 'Popen', mock_popen)
+
+        with exists_swap, popen_swap:
+            lint_task_report = js_ts_linter.ThirdPartyJsTsLintChecksManager(
+                [INVALID_TS_FILEPATH]
+            ).perform_all_lint_checks()
+
+        trimmed_output = ''.join(lint_task_report[0].trimmed_messages)
+        self.assertIn('X 1 problem', trimmed_output)
+        self.assertIn('25:3    Duplicate identifier', trimmed_output)
+
+    def test_eslint_integration_empty_output_simulation(self) -> None:
+        """Test ESLint with empty output through public interface."""
+
+        def mock_exists(unused_path: str) -> bool:
+            return True
+
+        def mock_popen(  # pylint: disable=unused-argument
+            *args: str, **kwargs: str
+        ) -> MockProcess:
+            return MockProcess(returncode=0, stdout=b'', stderr=b'')
+
+        exists_swap = self.swap(os.path, 'exists', mock_exists)
+        popen_swap = self.swap(subprocess, 'Popen', mock_popen)
+
+        with exists_swap, popen_swap:
+            lint_task_report = js_ts_linter.ThirdPartyJsTsLintChecksManager(
+                [INVALID_TS_FILEPATH]
+            ).perform_all_lint_checks()
+
+        self.assertFalse(lint_task_report[0].failed)
+        self.assertEqual(lint_task_report[0].name, 'ESLint')
+        self.assertEqual(lint_task_report[0].trimmed_messages, [])
