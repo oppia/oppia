@@ -148,6 +148,14 @@ describe('Story Preview tab', () => {
     component.ngOnDestroy();
   });
 
+  it('should get status of Serial Chapter Launch Learner Feature flag', () => {
+    expect(component.isSerialChapterFeatureLearnerFlagEnabled()).toEqual(false);
+
+    mockPlatformFeatureService.status.SerialChapterLaunchLearnerView.isEnabled =
+      true;
+    expect(component.isSerialChapterFeatureLearnerFlagEnabled()).toEqual(true);
+  });
+
   it('should set initialize the variables', () => {
     component.ngOnInit();
     expect(component.story).toEqual(story);
