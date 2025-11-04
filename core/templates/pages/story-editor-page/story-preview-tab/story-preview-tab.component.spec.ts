@@ -24,6 +24,7 @@ import {Story} from 'domain/story/story.model';
 import {StoryPreviewTabComponent} from './story-preview-tab.component';
 import {StoryEditorStateService} from '../services/story-editor-state.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 class MockStoryEditorNavigationService {
   activeTab!: 'story_preview';
@@ -32,6 +33,16 @@ class MockStoryEditorNavigationService {
   getChapterIndex!: () => null;
   navigateToStoryEditor!: () => {};
 }
+
+class MockPlatformFeatureService {
+  status = {
+    SerialChapterLaunchLearnerView: {
+      isEnabled: false,
+    },
+  };
+}
+let mockPlatformFeatureService = new MockPlatformFeatureService();
+
 describe('Story Preview tab', () => {
   let component: StoryPreviewTabComponent;
   let fixture: ComponentFixture<StoryPreviewTabComponent>;
@@ -44,6 +55,7 @@ describe('Story Preview tab', () => {
       imports: [HttpClientTestingModule],
       declarations: [StoryPreviewTabComponent, MockTranslatePipe],
       providers: [
+        {provide: PlatformFeatureService, useValue: mockPlatformFeatureService},
         {
           StoryEditorNavigationService,
           provide: [
