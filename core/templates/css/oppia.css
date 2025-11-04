@@ -332,7 +332,9 @@ button.btn-close {
   margin-top: -2px;
   width: 3px;
 }
-
+.modal-footer{
+  flex-wrap: unset;
+}
 body {
   background-color: #e8e7e3;
   color: rgba(0,0,0,0.87);
