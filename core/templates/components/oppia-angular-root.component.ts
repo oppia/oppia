@@ -219,8 +219,9 @@ export class OppiaAngularRootComponent implements AfterViewInit {
       // Adapter to satisfy the CkEditorRteHelperService interface without
       // unsafe casting; delegates to the injected RteHelperService.
       const rteHelperAdapter: CkEditorRteHelperService = {
-        createCustomizationArgDictFromAttrs: (attrs: Record<string, string>) =>
-          attrs ?? {},
+        createCustomizationArgDictFromAttrs: (
+          attrs: Record<string, string> | null | undefined
+        ) => attrs ?? {},
         getRichTextComponents: () =>
           OppiaAngularRootComponent.rteHelperService
             .getRichTextComponents()

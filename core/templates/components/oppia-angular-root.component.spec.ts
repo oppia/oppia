@@ -170,4 +170,75 @@ describe('OppiaAngularRootComponent', function () {
       previousContextService
     );
   });
+
+  it('should initialize the RTE helper adapter correctly', () => {
+    spyOn(
+      OppiaAngularRootComponent.rteHelperService,
+      'getRichTextComponents'
+    ).and.returnValue([
+      {
+        backendId: 'TestComponent',
+        id: 'test',
+        iconDataUrl: '/test.png',
+        isComplex: false,
+        isBlockElement: false,
+        requiresFs: false,
+        tooltip: 'Test',
+        requiresInternet: false,
+        customizationArgSpecs: [
+          {
+            name: 'test_arg',
+            default_value: 'default',
+            default_value_obtainable_from_highlight: false,
+          },
+        ],
+      },
+    ]);
+    spyOn(
+      OppiaAngularRootComponent.rteHelperService,
+      'isInlineComponent'
+    ).and.returnValue(true);
+    spyOn(
+      OppiaAngularRootComponent.rteHelperService,
+      'openCustomizationModal'
+    ).and.stub();
+
+    const ckEditorSpy = spyOn(
+      CkEditorInitializerService,
+      'ckEditorInitializer'
+    ).and.callFake(
+      (rteHelperAdapter, htmlEscaperService, pageContextService, ngZone) => {
+        // Test the adapter methods.
+        expect(
+          rteHelperAdapter.createCustomizationArgDictFromAttrs({test: 'value'})
+        ).toEqual({test: 'value'});
+        expect(
+          rteHelperAdapter.createCustomizationArgDictFromAttrs(null)
+        ).toEqual({});
+
+        const components = rteHelperAdapter.getRichTextComponents();
+        expect(components.length).toBe(1);
+        expect(components[0].backendId).toBe('TestComponent');
+        expect(components[0].customizationArgSpecs[0].name).toBe('test_arg');
+        expect(components[0].customizationArgSpecs[0].value).toBe('');
+
+        expect(rteHelperAdapter.isInlineComponent('test')).toBeTrue();
+
+        rteHelperAdapter.openCustomizationModal(
+          true,
+          'test',
+          [],
+          {},
+          () => {},
+          () => {}
+        );
+        expect(
+          OppiaAngularRootComponent.rteHelperService.openCustomizationModal
+        ).toHaveBeenCalled();
+      }
+    );
+
+    component.ngAfterViewInit();
+    expect(ckEditorSpy).toHaveBeenCalled();
+  });
 });
