@@ -180,16 +180,22 @@ oppia-library-page .community-library-breadcrumbs-container i {
   width: 100%;
 }
 .oppia-library-carousel-tiles {
-  /*The height is adjusted to hide the scrollbars*/
-  height: 290px;
+  /* Allow full tile height — no clipping */
+  height: auto; /* grow as needed */
   left: 0;
   margin: 0;
-  overflow: hidden;
+  min-height: 320px; /* slightly taller than 290px */
+  overflow: visible; /* let full tile show */
   padding: 0;
   position: relative;
   top: 0;
   white-space: nowrap;
 }
+.oppia-library-carousel {
+  height: auto !important;
+  overflow: visible !important;
+}
+
 oppia-library-page .oppia-mobile-activity-cards-container {
   overflow-y: hidden;
 }
@@ -212,13 +218,7 @@ oppia-library-page .height-toggle-btn-container {
 oppia-library-page .button-alignment-div {
   width: 350px;
 }
-.oppia-library-carousel {
-  float: left;
-  height: 282px;
-  max-width: 848px;
-  overflow: hidden;
-  position: relative;
-}
+
 .oppia-library-container {
   background-color: #afd2eb;
   min-height: 100vh;
@@ -226,10 +226,7 @@ oppia-library-page .button-alignment-div {
   position: relative;
   width: 100%;
 }
-.oppia-library-container-inner {
-  position: relative;
-  z-index: 3;
-}
+
 
 .left-carousel-btn {
   position: relative;
@@ -734,4 +731,23 @@ oppia-library-page .oppia-exp-summary-tiles-container {
     margin-right: 2vw;
     max-width: 96vw;
   }
+}
+
+
+/* Make sure the library container grows naturally */
+oppia-library-page .oppia-library-container {
+  height: auto !important;
+  min-height: auto !important;
+  overflow-y: visible !important;
+}
+
+oppia-library-page .oppia-library-container-inner {
+  height: auto !important;
+  overflow: visible !important;
+  position: relative;
+}
+
+oppia-library-page .oppia-library-group {
+  height: auto !important;
+  overflow: visible !important;
 }
