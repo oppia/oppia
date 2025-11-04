@@ -210,7 +210,7 @@
             (click)="clearChanges(platformParameter); shiftToReadMode(platformParameter)">
       Cancel
     </button>
-    <div class="save-button-container" (mouseover)="setWarningsAreShown(true)" (mouseleave)="setWarningsAreShown(false)">
+    <div class="save-button-container w-auto" (mouseover)="setWarningsAreShown(true)" (mouseleave)="setWarningsAreShown(false)">
       <button class="btn btn-primary"
               (click)="updateParameterRulesAsync(platformParameter) && shiftToReadMode(platformParameter)"
               [disabled]="!isPlatformParamChanged(platformParameter) || getWarnings(platformParameter).length > 0">

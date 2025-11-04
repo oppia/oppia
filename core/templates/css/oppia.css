@@ -299,6 +299,10 @@ html {
   scroll-behavior: auto !important;
 }
 /* Override Bootstrap 5's .row rule */
+.container {
+  max-width: 1140px !important;
+}
+
 .row > * {
   margin-top: 0;
   padding-left: 0;
