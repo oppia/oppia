@@ -17,23 +17,23 @@
  */
 
 export interface LearnerAnswerInfoBackendDict {
-  id: string;
+  id: string  ;
   answer: string;
   answer_details: string;
-  created_on: number;
+  created_on: number ;
 }
 
 export class LearnerAnswerInfo {
-  _id: string;
+  _id: string | null = null ;
   _answer: string;
   _answerDetails: string;
-  _createdOn: number;
+  _createdOn: number | null = null ;
 
   constructor(
-    learnerAnswerInfoId: string,
+    learnerAnswerInfoId: string | null = null ,
     answer: string,
     answerDetails: string,
-    createdOn: number
+    createdOn: number | null  = null
   ) {
     this._id = learnerAnswerInfoId;
     this._answer = answer;
@@ -59,7 +59,7 @@ export class LearnerAnswerInfo {
     );
   }
 
-  getId(): string {
+  getId(): string | null  {
     return this._id;
   }
 
@@ -72,6 +72,6 @@ export class LearnerAnswerInfo {
   }
 
   getCreatedOn(): number {
-    return this._createdOn;
+    return this._createdOn!;
   }
 }

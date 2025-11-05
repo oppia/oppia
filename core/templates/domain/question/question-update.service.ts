@@ -45,8 +45,8 @@ export class QuestionUpdateService {
     question: Question,
     command: string,
     params: ApplyParams | BackendChangeObject,
-    apply: Function,
-    reverse: Function
+    apply: (changeDict: BackendChangeObject, question: Question) => void ,
+    reverse: (changeDict: BackendChangeObject, question: Question) => void
   ): void {
     let changeDict = cloneDeep(params);
     changeDict.cmd = command;
@@ -69,8 +69,8 @@ export class QuestionUpdateService {
     propertyName: string,
     newValue: StateBackendDict | string | string[] | number,
     oldValue: StateBackendDict | string | string[] | number,
-    apply: Function,
-    reverse: Function
+    apply: (changeDict: BackendChangeObject, question: Question) => void ,
+    reverse: (changeDict: BackendChangeObject, question: Question) => void
   ): void {
     this._applyChange(
       question,
@@ -90,7 +90,7 @@ export class QuestionUpdateService {
     changeDict: BackendChangeObject,
     paramName: string
   ): string | string[] {
-    return changeDict[paramName];
+    return changeDict[paramName as keyof BackendChangeObject] as string | string[];
   }
 
   _getNewPropertyValueFromChangeDict(
@@ -161,12 +161,12 @@ export class QuestionUpdateService {
       QuestionDomainConstants.QUESTION_PROPERTY_NEXT_CONTENT_ID_INDEX,
       newValue,
       oldValue,
-      (changeDict, question) => {
-        var newValue = this._getNewPropertyValueFromChangeDict(changeDict);
-        question.setNextContentIdIndex(newValue);
+      (changeDict: BackendChangeObject, question: Question) => {
+        const newValue = this._getNewPropertyValueFromChangeDict(changeDict) as unknown as number ;
+        question.setNextContentIdIndex(newValue );
       },
       (changeDict, question) => {
-        question.setNextContentIdIndex(changeDict.old_value);
+        question.setNextContentIdIndex((changeDict as any).old_value);
       }
     );
   }

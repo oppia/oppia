@@ -18,7 +18,7 @@
 
 import {TestBed} from '@angular/core/testing';
 import {UndoRedoService} from './undo-redo.service';
-import {Change} from 'domain/editor/undo_redo/change.model';
+import {Change} from './change.model';
 
 describe('UndoRedoService', () => {
   let undoRedoService: UndoRedoService;

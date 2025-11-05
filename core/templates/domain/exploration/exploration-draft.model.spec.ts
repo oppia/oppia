@@ -19,7 +19,7 @@
 import {
   ExplorationDraft,
   ExplorationChange,
-} from 'domain/exploration/exploration-draft.model';
+} from 'domain/exploration/exploration-draft.model.spec.ts';
 
 describe('ExplorationDraft model', () => {
   describe('exploration draft model', () => {
