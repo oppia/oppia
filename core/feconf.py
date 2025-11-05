@@ -1066,8 +1066,6 @@ VOICEOVER_ADMIN_DATA_HANDLER_URL = '/voiceover_admin_data_handler'
 VOICEOVER_LANGUAGE_CODES_MAPPING_HANDLER_URL = (
     '/voiceover_language_codes_mapping'
 )
-VOICE_ARTIST_METADATA_HANDLER = '/voice_artist_metadata_handler'
-GET_SAMPLE_VOICEOVERS_FOR_VOICE_ARTIST = '/get_sample_voiceovers'
 REGENERATE_AUTOMATIC_VOICEOVER_HANDLER_URL = (
     '/regenerate_automatic_voiceover/<exploration_id>'
 )

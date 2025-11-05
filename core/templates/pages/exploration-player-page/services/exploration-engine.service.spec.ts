@@ -51,6 +51,8 @@ import {PlayerTranscriptService} from './player-transcript.service';
 import {StatsReportingService} from './stats-reporting.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {ContentTranslationManagerService} from './content-translation-manager.service';
+import {ComputeGraphService} from 'services/compute-graph.service';
+import {StateGraphLayoutService} from 'components/graph-services/graph-layout.service';
 
 class MockPlatformFeatureService {
   status = {
@@ -75,6 +77,8 @@ describe('Exploration engine service ', () => {
   let mockPlatformFeatureService = new MockPlatformFeatureService();
   let playerTranscriptService: PlayerTranscriptService;
   let readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService;
+  let computeGraphService: ComputeGraphService;
+  let stateGraphLayoutService: StateGraphLayoutService;
   let statsReportingService: StatsReportingService;
   let urlService: UrlService;
   let textInputService: TextInputRulesService;
@@ -385,6 +389,8 @@ describe('Exploration engine service ', () => {
     answerClassificationService = TestBed.inject(AnswerClassificationService);
     audioPreloaderService = TestBed.inject(AudioPreloaderService);
     pageContextService = TestBed.inject(PageContextService);
+    computeGraphService = TestBed.inject(ComputeGraphService);
+    stateGraphLayoutService = TestBed.inject(StateGraphLayoutService);
     contentTranslationLanguageService = TestBed.inject(
       ContentTranslationLanguageService
     );
@@ -547,6 +553,107 @@ describe('Exploration engine service ', () => {
         () => {}
       );
     }).toThrowError('Initial state name cannot be null.');
+  });
+
+  it("should return the exploration object when calling 'getExploration'", () => {
+    let initSuccessCb = jasmine.createSpy('success');
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      false
+    );
+
+    explorationEngineService.init(
+      explorationDict,
+      1,
+      null,
+      true,
+      ['en'],
+      [],
+      initSuccessCb
+    );
+
+    const exploration = explorationEngineService.getExploration();
+    expect(exploration).toBeDefined();
+    expect(exploration.getInitialState().name).toBe('Start');
+  });
+
+  it("should return initial state name when calling 'getInitialStateName'", () => {
+    let initSuccessCb = jasmine.createSpy('success');
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      false
+    );
+
+    explorationEngineService.init(
+      explorationDict,
+      1,
+      null,
+      true,
+      ['en'],
+      [],
+      initSuccessCb
+    );
+    expect(explorationEngineService.getInitialStateName()).toBe('Start');
+  });
+
+  describe('extractDepthGraph and getMaxStateDepth', () => {
+    let mockGraphData;
+    let mockComputedNodes;
+
+    beforeEach(() => {
+      mockGraphData = {
+        nodes: [{id: 'Start'}, {id: 'Mid'}, {id: 'End'}],
+        links: [
+          {source: 'Start', target: 'Mid'},
+          {source: 'Mid', target: 'End'},
+        ],
+        initStateId: 'Start',
+        finalStateIds: ['End'],
+      };
+      mockComputedNodes = [
+        {id: 'Start', depth: 0},
+        {id: 'Mid', depth: 1},
+        {id: 'End', depth: 2},
+      ];
+      spyOn(explorationEngineService, 'getInitialStateName').and.returnValue(
+        'Start'
+      );
+      spyOn(explorationEngineService, 'getExploration').and.returnValue({
+        states: explorationDict.states,
+      });
+      spyOn(computeGraphService, 'compute').and.returnValue(mockGraphData);
+      spyOn(stateGraphLayoutService, 'computeLayout').and.returnValue(
+        mockComputedNodes
+      );
+    });
+
+    it('should extract correct depth graph', () => {
+      const depthGraph = explorationEngineService.extractDepthGraph();
+      expect(depthGraph).toEqual({
+        Start: 0,
+        Mid: 1,
+        End: 2,
+      });
+    });
+
+    it('should return correct max state depth', () => {
+      const maxDepth = explorationEngineService.getMaxStateDepth();
+      expect(maxDepth).toBe(2);
+    });
+
+    it('should return 0 if depth graph is empty', () => {
+      spyOn(explorationEngineService, 'extractDepthGraph').and.returnValue({});
+      const maxDepth = explorationEngineService.getMaxStateDepth();
+      expect(maxDepth).toBe(0);
+    });
+
+    it('should handle non-consecutive depths', () => {
+      spyOn(explorationEngineService, 'extractDepthGraph').and.returnValue({
+        Start: 0,
+        Mid: 3,
+        End: 2,
+      });
+      const maxDepth = explorationEngineService.getMaxStateDepth();
+      expect(maxDepth).toBe(3);
+    });
   });
 
   describe('on submitting answer ', () => {
