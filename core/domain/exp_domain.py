@@ -63,6 +63,8 @@ from typing import (
     overload,
 )
 
+from core.domain import validation_services
+
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
 
@@ -1838,43 +1840,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 'Invalid language_code: %s' % self.language_code
             )
 
-        if not isinstance(self.tags, list):
-            raise utils.ValidationError(
-                'Expected \'tags\' to be a list, received %s' % self.tags
-            )
-        for tag in self.tags:
-            if not isinstance(tag, str):
-                raise utils.ValidationError(
-                    'Expected each tag in \'tags\' to be a string, received '
-                    '\'%s\'' % tag
-                )
-
-            if not tag:
-                raise utils.ValidationError('Tags should be non-empty.')
-
-            if not re.match(constants.TAG_REGEX, tag):
-                raise utils.ValidationError(
-                    'Tags should only contain lowercase letters and spaces, '
-                    'received \'%s\'' % tag
-                )
-
-            if (
-                tag[0] not in string.ascii_lowercase
-                or tag[-1] not in string.ascii_lowercase
-            ):
-                raise utils.ValidationError(
-                    'Tags should not start or end with whitespace, received '
-                    ' \'%s\'' % tag
-                )
-
-            if re.search(r'\s\s+', tag):
-                raise utils.ValidationError(
-                    'Adjacent whitespace in tags should be collapsed, '
-                    'received \'%s\'' % tag
-                )
-
-        if len(set(self.tags)) != len(self.tags):
-            raise utils.ValidationError('Some tags duplicate each other')
+        validation_services.Validators.validate_tags(self.tags, 'tags')
 
         if not isinstance(self.blurb, str):
             raise utils.ValidationError(
@@ -6411,42 +6377,7 @@ class ExplorationSummary:
                 'Invalid language_code: %s' % self.language_code
             )
 
-        if not isinstance(self.tags, list):
-            raise utils.ValidationError(
-                'Expected \'tags\' to be a list, received %s' % self.tags
-            )
-        for tag in self.tags:
-            if not isinstance(tag, str):
-                raise utils.ValidationError(
-                    'Expected each tag in \'tags\' to be a string, received '
-                    '\'%s\'' % tag
-                )
-
-            if not tag:
-                raise utils.ValidationError('Tags should be non-empty.')
-
-            if not re.match(constants.TAG_REGEX, tag):
-                raise utils.ValidationError(
-                    'Tags should only contain lowercase letters and spaces, '
-                    'received \'%s\'' % tag
-                )
-
-            if (
-                tag[0] not in string.ascii_lowercase
-                or tag[-1] not in string.ascii_lowercase
-            ):
-                raise utils.ValidationError(
-                    'Tags should not start or end with whitespace, received '
-                    '\'%s\'' % tag
-                )
-
-            if re.search(r'\s\s+', tag):
-                raise utils.ValidationError(
-                    'Adjacent whitespace in tags should be collapsed, '
-                    'received \'%s\'' % tag
-                )
-        if len(set(self.tags)) != len(self.tags):
-            raise utils.ValidationError('Some tags duplicate each other')
+        validation_services.Validators.validate_tags(self.tags, 'tags')
 
         if not isinstance(self.ratings, dict):
             raise utils.ValidationError(

@@ -26,6 +26,8 @@ from core.constants import constants
 
 from typing import Dict, List, Optional, TypedDict
 
+from core.domain import validation_services
+
 
 # TODO(#15105): Refactor UserSettings to limit the number of Optional
 # fields used in UserSettingsDict.
@@ -319,14 +321,8 @@ class UserSettings:
             )
         if not self.email:
             raise utils.ValidationError('No user email specified.')
-        if (
-            '@' not in self.email
-            or self.email.startswith('@')
-            or self.email.endswith('@')
-        ):
-            raise utils.ValidationError(
-                'Invalid email address: %s' % self.email
-            )
+
+        validation_services.Validators.validate_email(self.email)
 
         if not isinstance(self.creator_dashboard_display_pref, str):
             raise utils.ValidationError(

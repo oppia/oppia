@@ -24,6 +24,8 @@ from core.platform import models
 
 from typing import Dict, List, Optional, Union
 
+from core.domain import validation_services
+
 (email_models,) = models.Registry.import_models([models.Names.EMAIL])
 
 MYPY = False
@@ -31,28 +33,6 @@ if MYPY:  # pragma: no cover
     from mypy_imports import email_services
 
 email_services = models.Registry.import_email_services()
-
-
-def _is_email_valid(email_address: str) -> bool:
-    """Determines whether an email address is valid.
-
-    Args:
-        email_address: str. Email address to check.
-
-    Returns:
-        bool. Whether the specified email address is valid.
-    """
-    if not isinstance(email_address, str):
-        return False
-
-    stripped_address = email_address.strip()
-    if not stripped_address:
-        return False
-    # Regex for a valid email.
-    # Matches any characters before the "@" sign, a series of characters until
-    # a ".", and then a series of characters after the period.
-    regex = r'^.+@[a-zA-Z0-9-.]+\.([a-zA-Z]+|[0-9]+)$'
-    return bool(re.search(regex, email_address))
 
 
 def _is_sender_email_valid(sender_email: str) -> bool:
@@ -67,13 +47,13 @@ def _is_sender_email_valid(sender_email: str) -> bool:
     """
     split_sender_email = sender_email.split(' ')
     if len(split_sender_email) < 2:
-        return _is_email_valid(sender_email)
+        return validation_services.Validators.is_email_valid(sender_email)
 
     email_address = split_sender_email[-1]
     if not email_address.startswith('<') or not email_address.endswith('>'):
         return False
 
-    return _is_email_valid(email_address[1:-1])
+    return validation_services.Validators.is_email_valid(email_address[1:-1])
 
 
 def send_mail(
@@ -126,7 +106,7 @@ def send_mail(
     if not server_can_send_emails:
         raise Exception('This app cannot send emails to users.')
 
-    if not _is_email_valid(recipient_email):
+    if not validation_services.Validators.is_email_valid(recipient_email):
         raise ValueError(
             'Malformed recipient email address: %s' % recipient_email
         )
@@ -210,7 +190,7 @@ def send_bulk_mail(
         raise Exception('This app cannot send emails to users.')
 
     for recipient_email in recipient_emails:
-        if not _is_email_valid(recipient_email):
+        if not validation_services.Validators.is_email_valid(recipient_email):
             raise ValueError(
                 'Malformed recipient email address: %s' % recipient_email
             )

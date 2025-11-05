@@ -62,6 +62,8 @@ from typing import (
     overload,
 )
 
+from core.domain import validation_services
+
 MYPY = False
 if MYPY:  # pragma: no cover
     from extensions.interactions import base
@@ -3617,10 +3619,7 @@ class SubtitledHtml:
         if not isinstance(self.html, str):
             raise utils.ValidationError('Invalid content HTML: %s' % self.html)
 
-        self.html = html_cleaner.clean(self.html)
-
-        html_cleaner.validate_rte_tags(self.html)
-        html_cleaner.validate_tabs_and_collapsible_rte_tags(self.html)
+        validation_services.Validators.validate_html_content(self.html)
 
     @classmethod
     def create_default_subtitled_html(cls, content_id: str) -> SubtitledHtml:
