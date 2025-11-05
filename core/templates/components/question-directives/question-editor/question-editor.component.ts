@@ -80,6 +80,11 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
   ) {}
 
   saveInteractionAnswerGroups(newAnswerGroups: AnswerGroup[]): void {
+    // Defensive check: Ensure answer groups array exists.
+    if (!newAnswerGroups) {
+      return;
+    }
+
     this._updateQuestion(() => {
       this.stateEditorService.setInteractionAnswerGroups(
         cloneDeep(newAnswerGroups)
@@ -88,6 +93,11 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
   }
 
   saveInteractionDefaultOutcome(newOutcome: Outcome): void {
+    // Defensive check: Ensure outcome exists.
+    if (!newOutcome) {
+      return;
+    }
+
     this._updateQuestion(() => {
       this.stateEditorService.setInteractionDefaultOutcome(
         cloneDeep(newOutcome)
@@ -96,6 +106,11 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
   }
 
   saveInteractionData(displayedValue: InteractionData): void {
+    // Defensive check: Ensure displayedValue and its properties exist.
+    if (!displayedValue || !displayedValue.customizationArgs) {
+      return;
+    }
+
     this._updateQuestion(() => {
       this.stateEditorService.setInteractionId(
         cloneDeep(displayedValue.interactionId)

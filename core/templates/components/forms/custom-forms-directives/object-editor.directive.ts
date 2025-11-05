@@ -193,6 +193,10 @@ export class ObjectEditorComponent
     // Angular can call writeValue before we create the component. Hence a
     // check to see if component has been created.
     if (this.componentRef) {
+      // Defensive check: Ensure component instance exists before setting value.
+      if (!this.componentRef.instance) {
+        return;
+      }
       this.componentRef.instance.value = this._value;
       this.onChange(this._value);
       this.valueChange.emit(this._value);
@@ -273,6 +277,14 @@ export class ObjectEditorComponent
         componentFactory
       ) as ComponentRef<ObjectEditor>;
 
+      // Defensive check: Ensure component instance was created successfully.
+      if (!componentRef || !componentRef.instance) {
+        this.loggerService.error(
+          'Failed to create component instance for editor: ' + editorName
+        );
+        return;
+      }
+
       componentRef.instance.alwaysEditable = this.alwaysEditable;
       componentRef.instance.initArgs = this.initArgs;
       componentRef.instance.isEditable = this.isEditable;
@@ -291,6 +303,10 @@ export class ObjectEditorComponent
       if (componentRef.instance.valueChanged) {
         this.componentSubscriptions.add(
           componentRef.instance.valueChanged.subscribe(newValue => {
+            // Defensive check: Handle undefined/null values.
+            if (newValue === undefined || newValue === null) {
+              return;
+            }
             // Changes to array are not caught if the array reference doesn't
             // change. This is a hack for change detection.
             if (Array.isArray(newValue)) {

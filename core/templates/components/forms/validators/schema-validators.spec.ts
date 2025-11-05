@@ -60,12 +60,13 @@ describe('Schema validators', () => {
       testCases.forEach(testCase => {
         control.setValue(testCase.controlValue);
         const errorsReturned = filter(control);
+        const testCaseStr = testCase ? JSON.stringify(testCase) : 'undefined';
         if (testCase.expectedResult === true) {
-          expect(errorsReturned).toBe(null, testCase.toString());
+          expect(errorsReturned).toBe(null, testCaseStr);
           return;
         }
         expect(errorsReturned?.hasLengthAtLeast)
-          .withContext(testCase.toString())
+          .withContext(testCaseStr)
           .toBeDefined();
       });
     });
@@ -105,12 +106,13 @@ describe('Schema validators', () => {
       testCases.forEach(testCase => {
         control.setValue(testCase.controlValue);
         const errorsReturned = filter(control);
+        const testCaseStr = testCase ? JSON.stringify(testCase) : 'undefined';
         if (testCase.expectedResult === true) {
-          expect(errorsReturned).toBe(null, testCase.toString());
+          expect(errorsReturned).toBe(null, testCaseStr);
           return;
         }
         expect(errorsReturned?.hasLengthAtMost)
-          .withContext(testCase.toString())
+          .withContext(testCaseStr)
           .toBeDefined();
       });
     });
@@ -151,12 +153,13 @@ describe('Schema validators', () => {
       testCases.forEach(testCase => {
         control.setValue(testCase.controlValue);
         const errorsReturned = filter(control);
+        const testCaseStr = testCase ? JSON.stringify(testCase) : 'undefined';
         if (testCase.expectedResult === true) {
-          expect(errorsReturned).toBe(null, testCase.toString());
+          expect(errorsReturned).toBe(null, testCaseStr);
           return;
         }
         expect(errorsReturned?.isAtLeast)
-          .withContext(testCase.toString())
+          .withContext(testCaseStr)
           .toBeDefined();
       });
     });
@@ -183,13 +186,12 @@ describe('Schema validators', () => {
       testCases.forEach(testCase => {
         control.setValue(testCase.controlValue);
         const errorsReturned = filter(control);
+        const testCaseStr = testCase ? JSON.stringify(testCase) : 'undefined';
         if (testCase.expectedResult === true) {
-          expect(errorsReturned).toBe(null, testCase.toString());
+          expect(errorsReturned).toBe(null, testCaseStr);
           return;
         }
-        expect(errorsReturned?.isAtMost)
-          .withContext(testCase.toString())
-          .toBeDefined();
+        expect(errorsReturned?.isAtMost).withContext(testCaseStr).toBeDefined();
       });
     });
   });
@@ -233,16 +235,15 @@ describe('Schema validators', () => {
       testCases.forEach(testCase => {
         control.setValue(testCase.controlValue);
         const errorsReturned = filter(control);
+        const testCaseStr = testCase ? JSON.stringify(testCase) : 'undefined';
         if (testCase.expectedResult === true) {
-          expect(errorsReturned).toBe(null, testCase.toString());
+          expect(errorsReturned).toBe(null, testCaseStr);
           return;
         }
         if (errorsReturned === null) {
           throw new Error(testCase.controlValue);
         }
-        expect(errorsReturned.isFloat)
-          .withContext(testCase.toString())
-          .toBeDefined();
+        expect(errorsReturned.isFloat).withContext(testCaseStr).toBeDefined();
       });
     });
   });
@@ -263,12 +264,13 @@ describe('Schema validators', () => {
       testCases.forEach(testCase => {
         control.setValue(testCase.controlValue);
         const errorsReturned = filter(control);
+        const testCaseStr = testCase ? JSON.stringify(testCase) : 'undefined';
         if (testCase.expectedResult === true) {
-          expect(errorsReturned).toBe(null, testCase.toString());
+          expect(errorsReturned).toBe(null, testCaseStr);
           return;
         }
         expect(errorsReturned?.isInteger)
-          .withContext(testCase.toString())
+          .withContext(testCaseStr)
           .toBeDefined();
       });
     });
@@ -288,12 +290,13 @@ describe('Schema validators', () => {
       testCases.forEach(testCase => {
         control.setValue(testCase.controlValue);
         const errorsReturned = filter(control);
+        const testCaseStr = testCase ? JSON.stringify(testCase) : 'undefined';
         if (testCase.expectedResult === true) {
-          expect(errorsReturned).toBe(null, testCase.toString());
+          expect(errorsReturned).toBe(null, testCaseStr);
           return;
         }
         expect(errorsReturned?.isNonempty)
-          .withContext(testCase.toString())
+          .withContext(testCaseStr)
           .toBeDefined();
       });
     });
@@ -425,9 +428,8 @@ describe('Schema validators', () => {
       ];
       testCases.forEach(testCase => {
         control.setValue(testCase.controlValue);
-        expect(filter(control))
-          .withContext(testCase.toString())
-          .toEqual(errorMsg);
+        const testCaseStr = testCase ? JSON.stringify(testCase) : 'undefined';
+        expect(filter(control)).withContext(testCaseStr).toEqual(errorMsg);
       });
     });
 

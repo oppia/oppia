@@ -101,14 +101,28 @@ export class InteractionDisplayComponent {
           tag
         ] as Type<InteractionComponentInstance>;
 
+        if (!interaction) {
+          return;
+        }
+
         const componentFactory =
           this.componentFactoryResolver.resolveComponentFactory(interaction);
         const componentRef =
           this.viewContainerRef.createComponent(componentFactory);
 
-        let attributes = dom.body.firstElementChild.attributes;
+        const firstElement = dom.body.firstElementChild;
+        if (!firstElement) {
+          return;
+        }
+
+        let attributes = firstElement.attributes;
 
         Array.from(attributes).forEach(attribute => {
+          // Guard against undefined/null attribute properties.
+          if (!attribute || !attribute.name) {
+            return;
+          }
+
           const attributeNameInCamelCase = camelCaseFromHyphen(attribute.name);
 
           // Properties enclosed with [] need to be resolved from parent scope.
@@ -138,10 +152,26 @@ export class InteractionDisplayComponent {
               }
             }
           } else {
-            componentRef.location.nativeElement.setAttribute(
-              attribute.name,
-              attribute.value
-            );
+            // For non-bracketed attributes, set them on the component instance
+            // if it has a matching property, otherwise set as DOM attribute.
+            if (attributeNameInCamelCase in (componentRef.instance as object)) {
+              // Set property on component instance with safe value handling.
+              const value = attribute.value;
+              if (value !== undefined && value !== null) {
+                (componentRef.instance as Record<string, string>)[
+                  attributeNameInCamelCase
+                ] = value;
+              }
+            } else if (
+              attribute.value !== undefined &&
+              attribute.value !== null
+            ) {
+              // Only set DOM attribute if value is defined.
+              componentRef.location.nativeElement.setAttribute(
+                attribute.name,
+                attribute.value
+              );
+            }
           }
         });
 
@@ -152,12 +182,14 @@ export class InteractionDisplayComponent {
   }
 
   ngOnChanges(changes: {htmlData: SimpleChange}): void {
-    if (
-      changes.htmlData.currentValue !== changes.htmlData.previousValue &&
-      this.viewContainerRef
-    ) {
-      this.viewContainerRef.clear();
-      this.buildInteraction();
+    if (changes.htmlData) {
+      if (
+        changes.htmlData.currentValue !== changes.htmlData.previousValue &&
+        this.viewContainerRef
+      ) {
+        this.viewContainerRef.clear();
+        this.buildInteraction();
+      }
     }
   }
 }

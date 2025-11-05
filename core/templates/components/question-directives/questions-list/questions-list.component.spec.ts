@@ -69,7 +69,25 @@ class MockNgbModal {
 }
 
 class MockUrlInterpolationService {
-  interpolateUrl(value: string) {
+  interpolateUrl(
+    value: string,
+    interpolationValues?: Record<string, string | null>
+  ): string {
+    // Defensive check: ensure all interpolation values are valid strings.
+    if (interpolationValues) {
+      for (const key in interpolationValues) {
+        if (
+          interpolationValues[key] === null ||
+          interpolationValues[key] === undefined
+        ) {
+          console.warn(
+            `Warning: interpolateUrl received null/undefined for key '${key}'`
+          );
+          // Return a safe default URL instead of throwing an error.
+          return '/assets/images/default-thumbnail.svg';
+        }
+      }
+    }
     return value;
   }
 }
