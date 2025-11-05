@@ -739,4 +739,121 @@ describe('Answer Group Editor Component', () => {
       outcome
     );
   });
+
+  it('should handle cancelActiveRuleEdit and restore rules from memento', () => {
+    const originalRule = new Rule('Original', {x: 'test'}, {x: 'String'});
+    component.rules = [new Rule('Modified', {x: 'new'}, {x: 'String'})];
+    component.rulesMemento = [originalRule];
+    component.activeRuleIndex = 0;
+
+    component.cancelActiveRuleEdit();
+
+    expect(component.rules.length).toBe(1);
+    expect(component.rules[0].type).toBe('Original');
+    expect(component.activeRuleIndex).toBe(-1);
+  });
+
+  it('should handle saveRules and emit events', () => {
+    spyOn(component.onSaveAnswerGroupRules, 'emit');
+    spyOn(component.onSaveNextContentIdIndex, 'emit');
+    component.rules = [new Rule('Test', {x: 'value'}, {x: 'String'})];
+    component.rulesMemento = [new Rule('Old', {}, {})];
+    component.activeRuleIndex = 0;
+
+    component.saveRules();
+
+    expect(component.onSaveAnswerGroupRules.emit).toHaveBeenCalledWith(
+      component.rules
+    );
+    expect(component.onSaveNextContentIdIndex.emit).toHaveBeenCalled();
+    expect(component.rulesMemento).toBeNull();
+    expect(component.activeRuleIndex).toBe(-1);
+  });
+
+  it('should throw error in isCurrentInteractionTrainable for invalid interaction', () => {
+    stateInteractionIdService.savedMemento = 'InvalidInteractionId';
+
+    expect(() => component.isCurrentInteractionTrainable()).toThrowError();
+  });
+
+  it('should return correct trainability for valid interaction', () => {
+    stateInteractionIdService.savedMemento = 'TextInput';
+
+    const result = component.isCurrentInteractionTrainable();
+
+    expect(typeof result).toBe('boolean');
+  });
+
+  it('should handle addNewRule with trimmed varType', () => {
+    // Use TextInput which has rule_descriptions.
+    stateInteractionIdService.savedMemento = 'TextInput';
+    component.rules = [];
+
+    component.addNewRule();
+
+    expect(component.rules.length).toBeGreaterThan(0);
+    expect(component.activeRuleIndex).toBe(0);
+    expect(component.rulesMemento).toEqual([]);
+  });
+
+  it('should handle deleteRule and warn when no rules left', () => {
+    component.rules = [new Rule('Test', {x: 'value'}, {x: 'String'})];
+    spyOn(alertsService, 'addWarning');
+
+    component.deleteRule(0);
+
+    expect(component.rules.length).toBe(0);
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'All answer groups must have at least one rule.'
+    );
+  });
+
+  it('should handle deleteRule without warning when rules remain', () => {
+    component.rules = [
+      new Rule('Test1', {x: 'value1'}, {x: 'String'}),
+      new Rule('Test2', {x: 'value2'}, {x: 'String'}),
+    ];
+    spyOn(alertsService, 'addWarning');
+
+    component.deleteRule(0);
+
+    expect(component.rules.length).toBe(1);
+    expect(alertsService.addWarning).not.toHaveBeenCalled();
+  });
+
+  it('should open training data editor', () => {
+    spyOn(trainingDataEditorPanelService, 'openTrainingDataEditor');
+
+    component.openTrainingDataEditor();
+
+    expect(
+      trainingDataEditorPanelService.openTrainingDataEditor
+    ).toHaveBeenCalled();
+  });
+
+  it('should check if ML is enabled', () => {
+    stateInteractionIdService.savedMemento = 'TextInput';
+
+    const result = component.isMLEnabled();
+
+    expect(typeof result).toBe('boolean');
+  });
+
+  it('should check if rule editor is open', () => {
+    component.activeRuleIndex = -1;
+    expect(component.isRuleEditorOpen()).toBe(false);
+
+    component.activeRuleIndex = 0;
+    expect(component.isRuleEditorOpen()).toBe(true);
+  });
+
+  it('should change active rule index', () => {
+    spyOn(responsesService, 'changeActiveRuleIndex');
+    spyOn(responsesService, 'getActiveRuleIndex').and.returnValue(2);
+
+    component.changeActiveRuleIndex(2);
+
+    expect(responsesService.changeActiveRuleIndex).toHaveBeenCalledWith(2);
+    expect(component.activeRuleIndex).toBe(2);
+  });
 });

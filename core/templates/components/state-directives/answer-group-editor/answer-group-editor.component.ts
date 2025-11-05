@@ -248,7 +248,9 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
       let varName = match[1];
       let varType = match[2];
       if (varType) {
-        varType = varType.substring(1);
+        // Remove leading '|' and trim whitespace so getDefaultInputValue
+        // receives canonical type names like 'UnicodeString'.
+        varType = varType.substring(1).trim();
       }
 
       inputTypes[varName] = varType;
