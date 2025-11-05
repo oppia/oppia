@@ -570,4 +570,173 @@ describe('Answer Group Editor Component', () => {
     expect(component.rulesMemento).toEqual([rule1]);
     expect(component.changeActiveRuleIndex).toHaveBeenCalled();
   });
+
+  it('should return correct default values for different input types', () => {
+    expect(component.getDefaultInputValue('Null')).toBeNull();
+    expect(component.getDefaultInputValue('Boolean')).toBe(false);
+    expect(component.getDefaultInputValue('Real')).toBe(0);
+    expect(component.getDefaultInputValue('Int')).toBe(0);
+    expect(component.getDefaultInputValue('NonnegativeInt')).toBe(0);
+    expect(component.getDefaultInputValue('PositiveInt')).toBe(1);
+    expect(component.getDefaultInputValue('CodeString')).toBe('');
+    expect(component.getDefaultInputValue('UnicodeString')).toBe('');
+    expect(component.getDefaultInputValue('NormalizedString')).toBe('');
+    expect(component.getDefaultInputValue('MathExpressionContent')).toBe('');
+    expect(component.getDefaultInputValue('Html')).toBe('');
+    expect(component.getDefaultInputValue('SanitizedUrl')).toBe('');
+    expect(component.getDefaultInputValue('Filepath')).toBe('');
+
+    const codeEval = component.getDefaultInputValue(
+      'CodeEvaluation'
+    ) as unknown as Record<string, unknown>;
+    expect(codeEval.code).toBe('');
+    expect(codeEval.error).toBe('');
+
+    const coord = component.getDefaultInputValue('CoordTwoDim') as number[];
+    expect(coord).toEqual([0, 0]);
+
+    expect(
+      Array.isArray(component.getDefaultInputValue('ListOfUnicodeString'))
+    ).toBeTrue();
+    expect(
+      Array.isArray(component.getDefaultInputValue('SetOfAlgebraicIdentifier'))
+    ).toBeTrue();
+    expect(
+      Array.isArray(component.getDefaultInputValue('SetOfUnicodeString'))
+    ).toBeTrue();
+    expect(
+      Array.isArray(component.getDefaultInputValue('SetOfNormalizedString'))
+    ).toBeTrue();
+    expect(
+      Array.isArray(component.getDefaultInputValue('MusicPhrase'))
+    ).toBeTrue();
+
+    const checkedProof = component.getDefaultInputValue(
+      'CheckedProof'
+    ) as unknown as Record<string, unknown>;
+    expect(checkedProof.assumptions_string).toBe('');
+    expect(checkedProof.correct).toBe(false);
+
+    const graph = component.getDefaultInputValue('Graph') as unknown as Record<
+      string,
+      unknown
+    >;
+    expect(graph.edges).toEqual([]);
+    expect(graph.vertices).toEqual([]);
+    expect(graph.isDirected).toBe(false);
+
+    const normRect = component.getDefaultInputValue(
+      'NormalizedRectangle2D'
+    ) as number[][];
+    expect(normRect).toEqual([
+      [0, 0],
+      [0, 0],
+    ]);
+
+    const imageRegion = component.getDefaultInputValue(
+      'ImageRegion'
+    ) as unknown as Record<string, unknown>;
+    expect(imageRegion.regionType).toBe('');
+
+    const imageWithRegions = component.getDefaultInputValue(
+      'ImageWithRegions'
+    ) as unknown as Record<string, unknown>;
+    expect(imageWithRegions.imagePath).toBe('');
+    expect(Array.isArray(imageWithRegions.labeledRegions)).toBeTrue();
+
+    const clickOnImage = component.getDefaultInputValue(
+      'ClickOnImage'
+    ) as unknown as Record<string, unknown>;
+    expect(Array.isArray(clickOnImage.clickPosition)).toBeTrue();
+    expect(Array.isArray(clickOnImage.clickedRegions)).toBeTrue();
+
+    const transSetNorm = component.getDefaultInputValue(
+      'TranslatableSetOfNormalizedString'
+    ) as unknown as Record<string, unknown>;
+    expect(transSetNorm.contentId).toBeNull();
+    expect(Array.isArray(transSetNorm.normalizedStrSet)).toBeTrue();
+
+    const transSetUni = component.getDefaultInputValue(
+      'TranslatableSetOfUnicodeString'
+    ) as unknown as Record<string, unknown>;
+    expect(transSetUni.contentId).toBeNull();
+    expect(Array.isArray(transSetUni.normalizedStrSet)).toBeTrue();
+  });
+
+  it('should get translatable rules content ID to content map', () => {
+    component.rules = [
+      new Rule(
+        'Equals',
+        {
+          x: {contentId: 'content_1', normalizedStrSet: ['test']},
+        } as unknown as Record<string, unknown>,
+        {x: 'TranslatableSetOfNormalizedString'}
+      ),
+    ];
+
+    const map = component.getTranslatableRulesContentIdToContentMap();
+    expect(map['content_1']).toEqual({
+      contentId: 'content_1',
+      normalizedStrSet: ['test'],
+    });
+  });
+
+  it('should get current interaction name', () => {
+    stateInteractionIdService.savedMemento = 'TextInput';
+    expect(component.getCurrentInteractionId()).toBe('TextInput');
+  });
+
+  it('should check if in question mode', () => {
+    spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(true);
+    expect(component.isInQuestionMode()).toBeTrue();
+  });
+
+  it('should get answer choices', () => {
+    const choices = [{val: 'a', label: 'A'}];
+    spyOn(responsesService, 'getAnswerChoices').and.returnValue(choices);
+    expect(component.getAnswerChoices()).toEqual(choices);
+  });
+
+  it('should send events for saving tagged misconception', () => {
+    spyOn(component.onSaveTaggedMisconception, 'emit');
+    const event = {skillId: 'skill1', misconceptionId: 1};
+    component.sendOnSaveTaggedMisconception(event);
+    expect(component.onSaveTaggedMisconception.emit).toHaveBeenCalledWith(
+      event
+    );
+  });
+
+  it('should send events for saving correctness label', () => {
+    spyOn(component.onSaveAnswerGroupCorrectnessLabel, 'emit');
+    const outcome = {dest: 'dest1'} as unknown as Outcome;
+    component.sendOnSaveAnswerGroupCorrectnessLabel(outcome);
+    expect(
+      component.onSaveAnswerGroupCorrectnessLabel.emit
+    ).toHaveBeenCalledWith(outcome);
+  });
+
+  it('should send events for saving feedback', () => {
+    spyOn(component.onSaveAnswerGroupFeedback, 'emit');
+    const outcome = {dest: 'dest1'} as unknown as Outcome;
+    component.sendOnSaveAnswerGroupFeedback(outcome);
+    expect(component.onSaveAnswerGroupFeedback.emit).toHaveBeenCalledWith(
+      outcome
+    );
+  });
+
+  it('should send events for saving destination', () => {
+    spyOn(component.onSaveAnswerGroupDest, 'emit');
+    const outcome = {dest: 'dest1'} as unknown as Outcome;
+    component.sendOnSaveAnswerGroupDest(outcome);
+    expect(component.onSaveAnswerGroupDest.emit).toHaveBeenCalledWith(outcome);
+  });
+
+  it('should send events for saving destination if stuck', () => {
+    spyOn(component.onSaveAnswerGroupDestIfStuck, 'emit');
+    const outcome = {dest: 'dest1'} as unknown as Outcome;
+    component.sendOnSaveAnswerGroupDestIfStuck(outcome);
+    expect(component.onSaveAnswerGroupDestIfStuck.emit).toHaveBeenCalledWith(
+      outcome
+    );
+  });
 });

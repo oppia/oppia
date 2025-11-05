@@ -507,4 +507,44 @@ describe('Rule Editor Component', () => {
       ] as RuleDescriptionFragment[]);
     })
   );
+
+  it('should handle onSelectionChangeHtmlSelect', () => {
+    component.rule = new Rule('Equals', {x: 1}, {x: 'Int'});
+    const item = {type: 'select', varName: 'x'};
+
+    component.onSelectionChangeHtmlSelect(5, item);
+
+    expect(component.rule.inputs.x).toBe(5);
+  });
+
+  it('should handle cancelThisEdit', () => {
+    spyOn(component.onCancelRuleEdit, 'emit');
+
+    component.cancelThisEdit();
+
+    expect(component.onCancelRuleEdit.emit).toHaveBeenCalled();
+  });
+
+  it('should handle saveThisRule', () => {
+    component.rule = new Rule('Equals', {x: 'test'}, {x: 'UnicodeString'});
+    spyOn(populateRuleContentIdsService, 'populateNullRuleContentIds');
+    spyOn(component.onSaveRule, 'emit');
+
+    component.saveThisRule();
+
+    expect(
+      populateRuleContentIdsService.populateNullRuleContentIds
+    ).toHaveBeenCalledWith(component.rule);
+    expect(component.onSaveRule.emit).toHaveBeenCalled();
+  });
+
+  it('should compute rule description fragments when rule type is null', () => {
+    component.rule = new Rule(null, {}, {});
+    component.currentInteractionId = 'TextInput';
+
+    const result = component.computeRuleDescriptionFragments();
+
+    expect(result).toBe('');
+    expect(component.ruleDescriptionFragments).toEqual([]);
+  });
 });
