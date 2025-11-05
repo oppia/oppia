@@ -27,7 +27,7 @@ import {
 } from '@angular/core/testing';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import {Rule} from 'domain/exploration/rule.model';
+import {Rule, RuleInputs} from 'domain/exploration/rule.model';
 import {ParameterizeRuleDescriptionPipe} from 'filters/parameterize-rule-description.pipe';
 import {ResponsesService} from 'pages/exploration-editor-page/editor-tab/services/responses.service';
 import {TrainingDataEditorPanelService} from 'pages/exploration-editor-page/editor-tab/training-panel/training-data-editor-panel.service';
@@ -669,13 +669,13 @@ describe('Answer Group Editor Component', () => {
         'Equals',
         {
           x: {contentId: 'content_1', normalizedStrSet: ['test']},
-        } as unknown as Record<string, unknown>,
+        } as RuleInputs,
         {x: 'TranslatableSetOfNormalizedString'}
       ),
     ];
 
     const map = component.getTranslatableRulesContentIdToContentMap();
-    expect(map['content_1']).toEqual({
+    expect(map.content_1).toEqual({
       contentId: 'content_1',
       normalizedStrSet: ['test'],
     });

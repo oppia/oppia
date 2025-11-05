@@ -538,8 +538,8 @@ describe('Rule Editor Component', () => {
     expect(component.onSaveRule.emit).toHaveBeenCalled();
   });
 
-  it('should compute rule description fragments when rule type is null', () => {
-    component.rule = new Rule(null, {}, {});
+  it('should compute rule description fragments when rule type is empty', () => {
+    component.rule = new Rule('', {}, {});
     component.currentInteractionId = 'TextInput';
 
     const result = component.computeRuleDescriptionFragments();
