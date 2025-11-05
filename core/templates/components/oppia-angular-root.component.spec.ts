@@ -266,8 +266,10 @@ describe('OppiaAngularRootComponent', function () {
         requiresInternet: false,
         customizationArgSpecs: [],
       },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      null as any,
+      // Intentionally null to test filtering.
+      null as unknown as ReturnType<
+        typeof OppiaAngularRootComponent.rteHelperService.getRichTextComponents
+      >[0],
       {
         backendId: 'AnotherValid',
         id: 'another',
@@ -277,8 +279,8 @@ describe('OppiaAngularRootComponent', function () {
         requiresFs: true,
         tooltip: 'Another',
         requiresInternet: true,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        customizationArgSpecs: null as any,
+        // Intentionally null to test null handling.
+        customizationArgSpecs: null as unknown as [],
       },
     ]);
 
@@ -287,11 +289,11 @@ describe('OppiaAngularRootComponent', function () {
       'ckEditorInitializer'
     ).and.callFake(rteHelperAdapter => {
       const components = rteHelperAdapter.getRichTextComponents();
-      // Should filter out the null component
+      // Should filter out the null component.
       expect(components.length).toBe(2);
       expect(components[0].backendId).toBe('ValidComponent');
       expect(components[1].backendId).toBe('AnotherValid');
-      // Should handle null customizationArgSpecs
+      // Should handle null customizationArgSpecs.
       expect(components[1].customizationArgSpecs).toEqual([]);
     });
 
