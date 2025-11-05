@@ -158,8 +158,12 @@ export class CkEditorInitializerService {
                 var customizationArgs: Partial<CustomizationArgsForRteType> =
                   {};
                 customizationArgSpecs.forEach(function (spec) {
-                  customizationArgs[spec.name] =
-                    that.data[spec.name] || spec.default_value;
+                  (
+                    customizationArgs as Record<
+                      string,
+                      string | number | boolean | object
+                    >
+                  )[spec.name] = that.data[spec.name] || spec.default_value;
                 });
 
                 const componentIsNewlyCreated: boolean = !that.isReady();
@@ -172,10 +176,23 @@ export class CkEditorInitializerService {
                   function (
                     customizationArgsDict: Partial<CustomizationArgsForRteType>
                   ) {
-                    that.data.isCopied = false;
+                    (
+                      that.data as Record<
+                        string,
+                        string | number | boolean | object
+                      >
+                    ).isCopied = false;
                     for (var arg in customizationArgsDict) {
                       if (customizationArgsDict.hasOwnProperty(arg)) {
-                        that.setData(arg, customizationArgsDict[arg]);
+                        that.setData(
+                          arg,
+                          (
+                            customizationArgsDict as Record<
+                              string,
+                              string | number | boolean | object | undefined
+                            >
+                          )[arg]
+                        );
                       }
                     }
                     /**
@@ -209,13 +226,26 @@ export class CkEditorInitializerService {
                     }
                   },
                   function (widgetShouldBeRemoved: boolean) {
-                    if (widgetShouldBeRemoved || that.data.isCopied) {
+                    if (
+                      widgetShouldBeRemoved ||
+                      (
+                        that.data as Record<
+                          string,
+                          string | number | boolean | object
+                        >
+                      ).isCopied
+                    ) {
                       const defaultValueObtainableFromHighlight =
                         customizationArgSpecs.some(function (spec) {
                           return spec.default_value_obtainable_from_highlight;
                         });
 
-                      that.data.isCopied = false;
+                      (
+                        that.data as Record<
+                          string,
+                          string | number | boolean | object
+                        >
+                      ).isCopied = false;
                       var newWidgetSelector =
                         '[data-cke-widget-id="' + that.id + '"]';
                       if (newWidgetSelector === null) {
