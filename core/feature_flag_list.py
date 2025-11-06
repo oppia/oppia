@@ -132,12 +132,8 @@ PROD_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS,
     FeatureNames.IS_IMPROVEMENTS_TAB_ENABLED,
     FeatureNames.LEARNER_GROUPS_ARE_ENABLED,
-    FeatureNames.ENABLE_VOICEOVER_CONTRIBUTION,
-    FeatureNames.AUTO_UPDATE_EXP_VOICE_ARTIST_LINK,
-    FeatureNames.ADD_VOICEOVER_WITH_ACCENT,
     FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS,
     FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS,
-    FeatureNames.LABEL_ACCENT_TO_VOICE_ARTIST,
     FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
     FeatureNames.ENABLE_WORKED_EXAMPLES_RTE_COMPONENT,
 ]
@@ -152,6 +148,10 @@ DEPRECATED_FEATURE_NAMES: List[FeatureNames] = [
     FeatureNames.DIAGNOSTIC_TEST,
     FeatureNames.END_CHAPTER_CELEBRATION,
     FeatureNames.CHECKPOINT_CELEBRATION,
+    FeatureNames.ENABLE_VOICEOVER_CONTRIBUTION,
+    FeatureNames.AUTO_UPDATE_EXP_VOICE_ARTIST_LINK,
+    FeatureNames.LABEL_ACCENT_TO_VOICE_ARTIST,
+    FeatureNames.ADD_VOICEOVER_WITH_ACCENT,
 ]
 
 FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
@@ -217,33 +217,11 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             feature_flag_domain.ServerMode.TEST,
         )
     ),
-    FeatureNames.ADD_VOICEOVER_WITH_ACCENT.value: (
-        (
-            'The flag allows voice artists to add voiceovers in a specific '
-            'accent for the given language.',
-            feature_flag_domain.ServerMode.PROD,
-        )
-    ),
     FeatureNames.CD_ALLOW_UNDOING_TRANSLATION_REVIEW.value: (
         (
             'This flag allows translation reviewers to undo translation '
             'suggestion review on the contributor dashboard.',
             feature_flag_domain.ServerMode.TEST,
-        )
-    ),
-    FeatureNames.ENABLE_VOICEOVER_CONTRIBUTION.value: (
-        (
-            'The flag controls whether voiceover contributions from the '
-            'voiceover tab of the exploration editor page is enabled or '
-            'disabled during voiceover migration.',
-            feature_flag_domain.ServerMode.PROD,
-        )
-    ),
-    FeatureNames.AUTO_UPDATE_EXP_VOICE_ARTIST_LINK.value: (
-        (
-            'The flag allows auto-updating of the exploration voice artists '
-            'link model after an exploration update.',
-            feature_flag_domain.ServerMode.PROD,
         )
     ),
     FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS.value: (
@@ -281,13 +259,6 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'The flag enables the automatic regeneration of voiceovers '
             'directly from the exploration editor page.',
             feature_flag_domain.ServerMode.TEST,
-        )
-    ),
-    FeatureNames.LABEL_ACCENT_TO_VOICE_ARTIST.value: (
-        (
-            'The flag enables the voice artist accent labeling feature '
-            'on the voiceover admin page.',
-            feature_flag_domain.ServerMode.PROD,
         )
     ),
     FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS.value: (

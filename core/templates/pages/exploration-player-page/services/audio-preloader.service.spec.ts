@@ -34,26 +34,12 @@ import {
 import {InteractionAnswer} from '../../../../../extensions/interactions/answer-defs';
 import {AudioPreloaderService} from './audio-preloader.service';
 import {PageContextService} from '../../../services/page-context.service';
-import {PlatformFeatureService} from '../../../services/platform-feature.service';
 import {LoggerService} from '../../../services/contextual/logger.service';
 import {UrlInterpolationService} from '../../../domain/utilities/url-interpolation.service';
 import {
   Voiceover,
   VoiceoverBackendDict,
 } from '../../../domain/exploration/voiceover.model';
-
-class MockPlatformFeatureService {
-  get status(): object {
-    return {
-      EnableVoiceoverContribution: {
-        isEnabled: true,
-      },
-      AddVoiceoverWithAccent: {
-        isEnabled: false,
-      },
-    };
-  }
-}
 
 describe('Audio preloader service', () => {
   let httpTestingController: HttpTestingController;
@@ -62,12 +48,7 @@ describe('Audio preloader service', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [
-        {
-          provide: PlatformFeatureService,
-          useClass: MockPlatformFeatureService,
-        },
-      ],
+      providers: [],
     }).compileComponents();
     httpTestingController = TestBed.inject(HttpTestingController);
   }));

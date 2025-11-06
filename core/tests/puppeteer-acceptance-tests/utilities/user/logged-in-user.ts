@@ -532,7 +532,6 @@ export class LoggedInUser extends BaseUser {
           throw error;
         }
       }
-      await this.clickOnElementWithText('Stories');
 
       await this.page.waitForSelector(progressTabSectionInLearnerDashboard, {
         visible: true,
@@ -3147,6 +3146,19 @@ export class LoggedInUser extends BaseUser {
   ): Promise<void> {
     await this.expectElementToBeVisible(
       continueFromWhereLeftOffSectionInRedesignedDashboardSelector,
+      visible
+    );
+  }
+
+  /**
+   * Function to verify the add goals button in the redesigned learner dashboard is present or not.
+   * @param {boolean} visible - Whether the button should be visible or not.
+   */
+  async expectAddGoalsButtonInRedesignedDashboardToBePresent(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(
+      addGoalsButtonInRedesignedLearnerDashboard,
       visible
     );
   }
