@@ -30,7 +30,7 @@ from core.tests import test_utils
 from typing import Dict, List, Set, Union, cast
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import base_models, datastore_services
 
 (base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
@@ -1047,13 +1047,15 @@ class BaseModelTests(test_utils.GenericTestBase):
         model2 = TestVersionedModel(id='model_id2')
         model2.commit(feconf.SYSTEM_COMMITTER_ID, 'First commit', [])
 
-        results = TestVersionedModel.get_version_multi([
-            ('model_id1', 1),
-            ('model_id1', 2),
-            ('model_id2', 1),
-            ('model_id1', None),
-            ('nonexistent', 1),
-        ])
+        results = TestVersionedModel.get_version_multi(
+            [
+                ('model_id1', 1),
+                ('model_id1', 2),
+                ('model_id2', 1),
+                ('model_id1', None),
+                ('nonexistent', 1),
+            ]
+        )
 
         self.assertEqual(len(results), 5)
 
@@ -1084,9 +1086,7 @@ class BaseModelTests(test_utils.GenericTestBase):
         model = TestVersionedModel(id='model_id1')
         model.commit(feconf.SYSTEM_COMMITTER_ID, 'First commit', [])
 
-        results = TestVersionedModel.get_version_multi([
-            ('model_id1', 999)
-        ])
+        results = TestVersionedModel.get_version_multi([('model_id1', 999)])
         self.assertEqual(len(results), 1)
         self.assertIsNone(results[0])
 
@@ -1096,9 +1096,7 @@ class BaseModelTests(test_utils.GenericTestBase):
         model.commit(feconf.SYSTEM_COMMITTER_ID, 'First commit', [])
         model.delete(feconf.SYSTEM_COMMITTER_ID, 'Delete model')
 
-        results = TestVersionedModel.get_version_multi([
-            ('model_id1', 1)
-        ])
+        results = TestVersionedModel.get_version_multi([('model_id1', 1)])
         self.assertEqual(len(results), 1)
         self.assertIsNone(results[0])
 
@@ -1115,13 +1113,12 @@ class BaseModelTests(test_utils.GenericTestBase):
             model.commit(
                 feconf.SYSTEM_COMMITTER_ID,
                 'Commit %d' % (i + 1),
-                [{'cmd': 'create_new'}])
+                [{'cmd': 'create_new'}],
+            )
 
-        results = TestVersionedModel.get_version_multi([
-            ('model_id1', 1),
-            ('model_id1', 2),
-            ('model_id1', 3)
-        ])
+        results = TestVersionedModel.get_version_multi(
+            [('model_id1', 1), ('model_id1', 2), ('model_id1', 3)]
+        )
 
         self.assertEqual(len(results), 3)
         for i, result in enumerate(results, start=1):
@@ -1140,11 +1137,9 @@ class BaseModelTests(test_utils.GenericTestBase):
         model.description = 'Version 2 content'
         model.commit(feconf.SYSTEM_COMMITTER_ID, 'Second commit', [])
 
-        results = TestVersionedModel.get_version_multi([
-            ('model_id1', 1),
-            ('model_id1', 1),
-            ('model_id1', 2)
-        ])
+        results = TestVersionedModel.get_version_multi(
+            [('model_id1', 1), ('model_id1', 1), ('model_id1', 2)]
+        )
 
         self.assertEqual(len(results), 3)
 

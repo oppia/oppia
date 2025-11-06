@@ -46,7 +46,6 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import
     blog_validation_jobs,
     collection_info_jobs,
     contributor_admin_stats_jobs,
-    delete_voiceover_models_data_job,
     dummy_jobs,
     email_deletion_jobs,
     exp_migration_jobs,
