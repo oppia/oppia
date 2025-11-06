@@ -107,7 +107,7 @@
           </select>
         </span>
       </div>
-      <oppia-opportunities-list *ngIf="activeExplorationId === null && isReviewTranslationsTab() && !isAccomplishmentsTabActive()"
+      <oppia-opportunities-list *ngIf="topicReady && activeExplorationId === null && isReviewTranslationsTab() && !isAccomplishmentsTabActive()"
                                 [loadOpportunities]="loadReviewableTranslationOpportunities.bind(this)"
                                 (clickActionButton)="onClickReviewableTranslations($event)"
                                 (clickPinButton)="pinReviewableTranslationOpportunity($event)"
