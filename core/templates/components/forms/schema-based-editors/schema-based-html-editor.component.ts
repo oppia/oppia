@@ -16,7 +16,7 @@
  * @fileoverview Component for a schema-based editor for HTML.
  */
 
-import {Component, forwardRef, Input, OnInit} from '@angular/core';
+import {Component, forwardRef, Input, OnInit, NgZone} from '@angular/core';
 import {
   NG_VALUE_ACCESSOR,
   NG_VALIDATORS,
@@ -45,6 +45,7 @@ import {
 export class SchemaBasedHtmlEditorComponent
   implements ControlValueAccessor, OnInit, Validator
 {
+  constructor(private ngZone: NgZone) {}
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -80,8 +81,7 @@ export class SchemaBasedHtmlEditorComponent
   ngOnInit(): void {}
 
   updateValue(value: string): void {
-    this.onChange(value);
-    setTimeout(() => {
+    this.ngZone.run(() => {
       this.onChange(value);
     });
   }
