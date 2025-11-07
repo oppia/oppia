@@ -109,10 +109,9 @@ def mark_topic_to_learn(user_id: str, topic_id: str) -> bool:
         save_learner_goals(learner_goals)
         return goals_limit_exceeded
     else:
-        raise Exception(
-            'The topic id %s is already present in the learner goals'
-            % (topic_id)
-        )
+        # Instead of raising an exception, we should just return False
+        # to indicate that the topic was not added (since it already exists)
+        return False
 
 
 def remove_topics_from_learn_goal(
