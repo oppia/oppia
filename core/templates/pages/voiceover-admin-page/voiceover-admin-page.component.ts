@@ -101,6 +101,10 @@ export class VoiceoverAdminPageComponent implements OnInit {
     end: new FormControl(null),
   });
 
+  responseData: string =
+    'This exploration only contains translations in the following languages: Bengali and Arabic. None of these are eligible for automatic voiceovers.';
+  isExplorationDataResponseContainerShown: boolean = true;
+
   ngOnInit(): void {
     this.voiceoverBackendApiService
       .fetchVoiceoverAdminDataAsync()
@@ -338,5 +342,9 @@ export class VoiceoverAdminPageComponent implements OnInit {
       }
     );
     modalRef.componentInstance.cloudTaskRun = cloudTaskRun;
+  }
+
+  closeExpDataResponseContainer(): void {
+    this.isExplorationDataResponseContainerShown = false;
   }
 }

@@ -93,6 +93,65 @@
   </div>
 </mat-card>
 
+<mat-card class="oppia-page-card oppia-long-text-card">
+  <h3>Autogenerate Voiceovers for Exploration</h3>
+
+  <div class="exploration-data-request-container">
+    <div class="exploration-data-request-input-container">
+      <span class="exploration-id-label">Exploration ID: </span>
+      <input class="exploration-id-input" type="text" />
+      <button class="btn btn-primary exploration-data-request-button">Get Data</button>
+    </div>
+
+    <div class="exploration-data-request-info-container">
+      <p>Enter the exploration ID to retrieve the Exploration data.</p>
+      <p>This functionality is currently disabled because no language-accent pairs currently support autogeneration.</p>
+    </div>
+  </div>
+
+  <div class="exploration-data-response-container" *ngIf="isExplorationDataResponseContainerShown">
+    <div class="exploration-data-response-row-container">
+      <span class="exploration-id-label">Exploration ID: </span>
+      <span>K645IfRNzpKy</span>
+      <button class="btn btn-secondary exploration-data-close-button" (click)="closeExpDataResponseContainer()">Close</button>
+    </div>
+
+    <div class="exploration-data-response-row-container">
+      <span class="exploration-title-label">Title:</span>
+      <span>Exploration title</span>
+    </div>
+
+    <div class="exploration-data-response-row-container">
+      <span class="language-accent-code-label">Language Accent Code:</span>
+      <div>
+        <mat-form-field>
+          <mat-label>Language Accent pair</mat-label>
+          <mat-select>
+            <mat-option>
+              First option
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div>
+      <p>{{responseData}}</p>
+      <p>
+        <i>
+          <strong>Note:</strong> This process incurs a cost. Assuming this exploration contains 10,000 characters in English, the total cost of regenerating voiceovers is approximately $0.16 USD.
+        </i>
+      </p>
+    </div>
+
+    <div>
+      <button class="btn btn-primary generate-voiceover-button">Generate Button</button>
+    </div>
+  </div>
+
+
+</mat-card>
+
 <mat-card class="oppia-page-card oppia-long-text-card automatic-voiceover-regeneration-record-card">
   <h3>Lesson-level voiceover regeneration status</h3>
 
@@ -181,6 +240,25 @@
 </mat-card>
 
 <style>
+  .generate-voiceover-button {
+    color: #fff;
+    float: right;
+  }
+  .exploration-id-label, .exploration-title-label,  .language-accent-code-label {
+    width: 30%;
+    font-weight: bold;
+  }
+  .exploration-data-request-button {
+    margin-left: 10px;
+  }
+  .exploration-data-request-input-container, .exploration-data-response-row-container {
+    align-items: center;
+    display: flex;
+    margin-bottom: 5px;
+  }
+  .exploration-data-close-button {
+    margin-left: 52%;
+  }
   .error-icon {
     color: red;
   }
