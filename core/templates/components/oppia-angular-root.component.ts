@@ -221,52 +221,35 @@ export class OppiaAngularRootComponent implements AfterViewInit {
       const rteHelperAdapter: CkEditorRteHelperService = {
         createCustomizationArgDictFromAttrs: (
           attrs: Record<string, string> | null | undefined
-        ) => {
-          // Defensive check: ensure attrs is a valid object before returning.
-          if (!attrs || typeof attrs !== 'object') {
-            return {};
-          }
-          return attrs;
-        },
+        ) => attrs ?? {},
         getRichTextComponents: () =>
           OppiaAngularRootComponent.rteHelperService
             .getRichTextComponents()
-            .map(component => {
-              // Defensive check: ensure component and its properties exist.
-              if (!component) {
-                return null;
-              }
-
-              // Safely handle customizationArgSpecs.
-              const argSpecs = component.customizationArgSpecs || [];
-
-              return {
-                backendId: component.backendId,
-                id: component.id,
-                iconDataUrl: component.iconDataUrl,
-                isComplex: component.isComplex,
-                isBlockElement: component.isBlockElement,
-                requiresFs: component.requiresFs,
-                tooltip: component.tooltip,
-                requiresInternet: component.requiresInternet,
-                // Map to a mutable array with the exact shape expected by CKEditor initializer.
-                customizationArgSpecs: (
-                  argSpecs as readonly {
-                    name: string;
-                    default_value: string;
-                    default_value_obtainable_from_highlight: boolean;
-                  }[]
-                ).map(spec => ({
-                  name: spec?.name || '',
-                  // This property isn't used by the initializer but is part of its type.
-                  value: '',
-                  default_value: spec?.default_value || '',
-                  default_value_obtainable_from_highlight:
-                    spec?.default_value_obtainable_from_highlight || false,
-                })),
-              };
-            })
-            .filter(component => component !== null),
+            .map(component => ({
+              backendId: component.backendId,
+              id: component.id,
+              iconDataUrl: component.iconDataUrl,
+              isComplex: component.isComplex,
+              isBlockElement: component.isBlockElement,
+              requiresFs: component.requiresFs,
+              tooltip: component.tooltip,
+              requiresInternet: component.requiresInternet,
+              // Map to a mutable array with the exact shape expected by CKEditor initializer.
+              customizationArgSpecs: (
+                component.customizationArgSpecs as readonly {
+                  name: string;
+                  default_value: string;
+                  default_value_obtainable_from_highlight: boolean;
+                }[]
+              ).map(spec => ({
+                name: spec.name,
+                // This property isn't used by the initializer but is part of its type.
+                value: '',
+                default_value: spec.default_value,
+                default_value_obtainable_from_highlight:
+                  spec.default_value_obtainable_from_highlight,
+              })),
+            })),
         isInlineComponent: (componentId: string) =>
           OppiaAngularRootComponent.rteHelperService.isInlineComponent(
             componentId as (typeof AppConstants.INLINE_RTE_COMPONENTS)[number]

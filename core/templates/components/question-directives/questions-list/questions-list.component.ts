@@ -133,10 +133,9 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
 
   createQuestion(): void {
     if (this.alertsService.warnings.length > 0) {
-      const warningContent =
-        this.alertsService.warnings[0]?.content || 'Unknown warning';
       this.loggerService.error(
-        'Could not create new question due to warnings: ' + warningContent
+        'Could not create new question due to warnings: ' +
+          this.alertsService.warnings[0].content
       );
       return;
     }
@@ -614,20 +613,10 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     } else {
       if (this.questionUndoRedoService.hasChanges()) {
         if (commitMessage) {
-          // Defensive check: Ensure question and getVersion method exist.
-          const questionVersion = this.question?.getVersion?.();
-          if (questionVersion === undefined || questionVersion === null) {
-            this.loggerService.error(
-              'Cannot save question: version is undefined'
-            );
-            this.questionIsBeingSaved = false;
-            return;
-          }
-
           this.editableQuestionBackendApiService
             .updateQuestionAsync(
               this.questionId,
-              String(questionVersion),
+              String(this.question.getVersion()),
               commitMessage,
               this.questionUndoRedoService.getCommittableChangeList()
             )

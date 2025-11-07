@@ -215,14 +215,6 @@ describe('OppiaAngularRootComponent', function () {
         expect(
           rteHelperAdapter.createCustomizationArgDictFromAttrs(null)
         ).toEqual({});
-        expect(
-          rteHelperAdapter.createCustomizationArgDictFromAttrs(undefined)
-        ).toEqual({});
-        expect(
-          rteHelperAdapter.createCustomizationArgDictFromAttrs(
-            'not an object' as unknown as Record<string, string>
-          )
-        ).toEqual({});
 
         const components = rteHelperAdapter.getRichTextComponents();
         expect(components.length).toBe(1);
@@ -245,57 +237,6 @@ describe('OppiaAngularRootComponent', function () {
         ).toHaveBeenCalled();
       }
     );
-
-    component.ngAfterViewInit();
-    expect(ckEditorSpy).toHaveBeenCalled();
-  });
-
-  it('should filter out null components in getRichTextComponents', () => {
-    spyOn(
-      OppiaAngularRootComponent.rteHelperService,
-      'getRichTextComponents'
-    ).and.returnValue([
-      {
-        backendId: 'ValidComponent',
-        id: 'valid',
-        iconDataUrl: '/valid.png',
-        isComplex: false,
-        isBlockElement: false,
-        requiresFs: false,
-        tooltip: 'Valid',
-        requiresInternet: false,
-        customizationArgSpecs: [],
-      },
-      // Intentionally null to test filtering.
-      null as unknown as ReturnType<
-        typeof OppiaAngularRootComponent.rteHelperService.getRichTextComponents
-      >[0],
-      {
-        backendId: 'AnotherValid',
-        id: 'another',
-        iconDataUrl: '/another.png',
-        isComplex: true,
-        isBlockElement: true,
-        requiresFs: true,
-        tooltip: 'Another',
-        requiresInternet: true,
-        // Intentionally null to test null handling.
-        customizationArgSpecs: null as unknown as [],
-      },
-    ]);
-
-    const ckEditorSpy = spyOn(
-      CkEditorInitializerService,
-      'ckEditorInitializer'
-    ).and.callFake(rteHelperAdapter => {
-      const components = rteHelperAdapter.getRichTextComponents();
-      // Should filter out the null component.
-      expect(components.length).toBe(2);
-      expect(components[0].backendId).toBe('ValidComponent');
-      expect(components[1].backendId).toBe('AnotherValid');
-      // Should handle null customizationArgSpecs.
-      expect(components[1].customizationArgSpecs).toEqual([]);
-    });
 
     component.ngAfterViewInit();
     expect(ckEditorSpy).toHaveBeenCalled();
