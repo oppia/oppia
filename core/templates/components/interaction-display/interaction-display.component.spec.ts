@@ -441,4 +441,106 @@ describe('Interaction display', () => {
     expect(hostVcr.clear).toHaveBeenCalled();
     expect(componentInstance.buildInteraction).toHaveBeenCalled();
   });
+
+  it('should handle null or missing firstElement after component creation', () => {
+    // Test the defensive check: if (!firstElement) return (after createComponent);
+    componentInstance.htmlData =
+      '<oppia-interactive-text-input></oppia-interactive-text-input>';
+    componentInstance.viewContainerRef = hostVcr;
+
+    let mockComponentRef = {
+      changeDetectorRef: {
+        detectChanges: () => {},
+      },
+      location: {
+        nativeElement: {
+          setAttribute: jasmine.createSpy('setAttribute'),
+        },
+      },
+      instance: {},
+    };
+
+    spyOn(componentFactoryResolver, 'resolveComponentFactory');
+    spyOn(hostVcr, 'createComponent').and.returnValue(
+      mockComponentRef as ComponentRef<{
+        lastAnswer?: string | null;
+        savedSolution?: string | null;
+      }>
+    );
+
+    // Spy on DOM parser to return an element without firstElementChild on second access.
+    const originalParse = DOMParser.prototype.parseFromString;
+    spyOn(DOMParser.prototype, 'parseFromString').and.callFake(function (
+      this: DOMParser,
+      ...args
+    ) {
+      const result = originalParse.apply(
+        this,
+        args as [string, DOMParserSupportedType]
+      );
+      // Mock body.firstElementChild to be null on second access.
+      const originalFirst = result.body.firstElementChild;
+      let accessCount = 0;
+      Object.defineProperty(result.body, 'firstElementChild', {
+        get: () => {
+          accessCount++;
+          // Return null on second access (after component creation).
+          return accessCount === 1 ? originalFirst : null;
+        },
+        configurable: true,
+      });
+      return result;
+    });
+
+    componentInstance.buildInteraction();
+
+    // Component should be created but attribute processing should be skipped.
+    expect(hostVcr.createComponent).toHaveBeenCalled();
+  });
+
+  it('should skip null or undefined attributes when processing', () => {
+    componentInstance.htmlData =
+      '<oppia-interactive-text-input test-attr="value"></oppia-interactive-text-input>';
+    componentInstance.viewContainerRef = hostVcr;
+
+    let setAttributeSpy = jasmine.createSpy('setAttribute');
+    let mockComponentRef = {
+      changeDetectorRef: {
+        detectChanges: () => {},
+      },
+      location: {
+        nativeElement: {
+          setAttribute: setAttributeSpy,
+        },
+      },
+      instance: {},
+    };
+
+    spyOn(componentFactoryResolver, 'resolveComponentFactory');
+    spyOn(hostVcr, 'createComponent').and.returnValue(
+      mockComponentRef as ComponentRef<{
+        lastAnswer?: string | null;
+        savedSolution?: string | null;
+      }>
+    );
+
+    // Mock Array.from to include a null attribute in the list.
+    const originalArrayFrom = Array.from;
+    spyOn(Array, 'from').and.callFake(
+      (arrayLike: ArrayLike<Attr> | Iterable<Attr>) => {
+        const result = originalArrayFrom(arrayLike);
+        // Add a null attribute to test the defensive check.
+        result.push(null as unknown as Attr);
+        // Add an attribute without a name.
+        result.push({value: 'test'} as Attr);
+        return result;
+      }
+    );
+
+    componentInstance.buildInteraction();
+
+    // The null attribute and attribute without name should be skipped.
+    // Only the valid attribute should be processed.
+    expect(setAttributeSpy).toHaveBeenCalled();
+  });
 });

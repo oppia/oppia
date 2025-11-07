@@ -1013,6 +1013,55 @@ describe('Questions List Component', () => {
     })
   );
 
+  it('should handle null question version defensively when saving', fakeAsync(() => {
+    // Create a question object without getVersion method.
+    const questionWithoutVersion = {
+      getUnaddressedMisconceptionNames: () => [],
+    } as unknown as Question;
+    component.question = questionWithoutVersion;
+    component.questionIsBeingUpdated = true;
+
+    spyOn(
+      questionValidationService,
+      'getValidationErrorMessage'
+    ).and.returnValue('');
+    spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
+    spyOn(loggerService, 'error');
+
+    component.saveAndPublishQuestion('Test commit');
+    tick();
+
+    expect(loggerService.error).toHaveBeenCalledWith(
+      'Cannot save question: version is undefined'
+    );
+    expect(component.questionIsBeingSaved).toBe(false);
+  }));
+
+  it('should handle undefined question version when saving', fakeAsync(() => {
+    // Create a question object with getVersion returning undefined.
+    const questionWithUndefinedVersion = {
+      getUnaddressedMisconceptionNames: () => [],
+      getVersion: () => undefined,
+    } as unknown as Question;
+    component.question = questionWithUndefinedVersion;
+    component.questionIsBeingUpdated = true;
+
+    spyOn(
+      questionValidationService,
+      'getValidationErrorMessage'
+    ).and.returnValue('');
+    spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
+    spyOn(loggerService, 'error');
+
+    component.saveAndPublishQuestion('Test commit');
+    tick();
+
+    expect(loggerService.error).toHaveBeenCalledWith(
+      'Cannot save question: version is undefined'
+    );
+    expect(component.questionIsBeingSaved).toBe(false);
+  }));
+
   it(
     "should show 'confirm question modal exit' modal when user " +
       'clicks cancel',
