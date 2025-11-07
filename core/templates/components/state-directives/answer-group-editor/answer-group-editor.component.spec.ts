@@ -856,4 +856,245 @@ describe('Answer Group Editor Component', () => {
     expect(responsesService.changeActiveRuleIndex).toHaveBeenCalledWith(2);
     expect(component.activeRuleIndex).toBe(2);
   });
+
+  it('should handle saveRules with modified translatable content', () => {
+    component.rules = [
+      new Rule(
+        'Equals',
+        {
+          x: {contentId: 'content_1', normalizedStrSet: ['modified']},
+        } as RuleInputs,
+        {x: 'TranslatableSetOfNormalizedString'}
+      ),
+    ];
+    component.originalContentIdToContent = {
+      content_1: {contentId: 'content_1', normalizedStrSet: ['original']},
+    };
+    spyOn(component.onSaveAnswerGroupRules, 'emit');
+    spyOn(component.onSaveNextContentIdIndex, 'emit');
+
+    component.saveRules();
+
+    expect(component.onSaveAnswerGroupRules.emit).toHaveBeenCalledWith(
+      component.rules
+    );
+    expect(component.onSaveNextContentIdIndex.emit).toHaveBeenCalled();
+  });
+
+  it('should handle saveRules with unmodified translatable content', () => {
+    component.rules = [
+      new Rule(
+        'Equals',
+        {
+          x: {contentId: 'content_1', normalizedStrSet: ['same']},
+        } as RuleInputs,
+        {x: 'TranslatableSetOfNormalizedString'}
+      ),
+    ];
+    component.originalContentIdToContent = {
+      content_1: {contentId: 'content_1', normalizedStrSet: ['same']},
+    };
+    spyOn(component.onSaveAnswerGroupRules, 'emit');
+    spyOn(component.onSaveNextContentIdIndex, 'emit');
+
+    component.saveRules();
+
+    expect(component.onSaveAnswerGroupRules.emit).toHaveBeenCalledWith(
+      component.rules
+    );
+    expect(component.onSaveNextContentIdIndex.emit).toHaveBeenCalled();
+  });
+
+  it('should handle saveRules when originalContentIdToContent is undefined', () => {
+    component.rules = [new Rule('Test', {x: 'value'}, {x: 'String'})];
+    component.originalContentIdToContent = undefined as unknown as Record<
+      string,
+      unknown
+    >;
+    spyOn(component.onSaveAnswerGroupRules, 'emit');
+    spyOn(component.onSaveNextContentIdIndex, 'emit');
+
+    component.saveRules();
+
+    expect(component.onSaveAnswerGroupRules.emit).toHaveBeenCalledWith(
+      component.rules
+    );
+    expect(component.onSaveNextContentIdIndex.emit).toHaveBeenCalled();
+  });
+
+  it('should handle cancelActiveRuleEdit when rulesMemento is null', () => {
+    component.rules = [new Rule('Test', {x: 'value'}, {x: 'String'})];
+    component.rulesMemento = null;
+    spyOn(component.onSaveAnswerGroupRules, 'emit');
+
+    component.cancelActiveRuleEdit();
+
+    expect(component.rules.length).toBe(0);
+  });
+
+  it('should get empty content map when rules have no translatable inputs', () => {
+    component.rules = [
+      new Rule('Equals', {x: 'simple_value'} as RuleInputs, {x: 'String'}),
+    ];
+
+    const map = component.getTranslatableRulesContentIdToContentMap();
+
+    expect(Object.keys(map).length).toBe(0);
+  });
+
+  it('should get content map with null contentId filtered out', () => {
+    component.rules = [
+      new Rule(
+        'Equals',
+        {
+          x: {contentId: null, normalizedStrSet: ['test']},
+        } as RuleInputs,
+        {x: 'TranslatableSetOfNormalizedString'}
+      ),
+    ];
+
+    const map = component.getTranslatableRulesContentIdToContentMap();
+
+    expect(Object.keys(map).length).toBe(0);
+  });
+
+  it('should handle openRuleEditor and initialize originalContentIdToContent', () => {
+    component.isEditable = true;
+    component.rules = [
+      new Rule(
+        'Equals',
+        {
+          x: {contentId: 'content_1', normalizedStrSet: ['test']},
+        } as RuleInputs,
+        {x: 'TranslatableSetOfNormalizedString'}
+      ),
+    ];
+    spyOn(component, 'changeActiveRuleIndex');
+
+    component.openRuleEditor(0);
+
+    expect(component.originalContentIdToContent.content_1).toBeDefined();
+    expect(component.rulesMemento).toEqual(component.rules);
+    expect(component.changeActiveRuleIndex).toHaveBeenCalledWith(0);
+  });
+
+  it('should handle addNewRule with complex rule input patterns', () => {
+    stateInteractionIdService.savedMemento = 'NumericInput';
+    component.rules = [];
+
+    component.addNewRule();
+
+    expect(component.rules.length).toBeGreaterThan(0);
+    expect(component.rules[0].inputs).toBeDefined();
+  });
+
+  it('should handle addNewRule with rule having multiple variables', () => {
+    stateInteractionIdService.savedMemento = 'TextInput';
+    component.rules = [];
+
+    component.addNewRule();
+
+    expect(component.rules.length).toBe(1);
+    expect(component.rulesMemento).toEqual([]);
+  });
+
+  it('should initialize tagMisconceptionsFeatureFlagIsEnabled from platform service', () => {
+    mockPlatformFeatureService.status.ExplorationEditorCanTagMisconceptions.isEnabled =
+      true;
+
+    component.ngOnInit();
+
+    expect(component.tagMisconceptionsFeatureFlagIsEnabled).toBe(true);
+  });
+
+  it('should set tagMisconceptionsFeatureFlagIsEnabled to false when disabled', () => {
+    mockPlatformFeatureService.status.ExplorationEditorCanTagMisconceptions.isEnabled =
+      false;
+
+    component.ngOnInit();
+
+    expect(component.tagMisconceptionsFeatureFlagIsEnabled).toBe(false);
+  });
+
+  it('should return default value for unknown varType', () => {
+    const result = component.getDefaultInputValue('UnknownType');
+
+    expect(result).toBeNull();
+  });
+
+  it('should get default value for NonnegativeInt', () => {
+    expect(component.getDefaultInputValue('NonnegativeInt')).toBe(0);
+  });
+
+  it('should get default value for CodeString', () => {
+    expect(component.getDefaultInputValue('CodeString')).toBe('');
+  });
+
+  it('should get default value for Real', () => {
+    expect(component.getDefaultInputValue('Real')).toBe(0);
+  });
+
+  it('should get default value for ListOfUnicodeString', () => {
+    expect(component.getDefaultInputValue('ListOfUnicodeString')).toEqual([]);
+  });
+
+  it('should get default value for SetOfAlgebraicIdentifier', () => {
+    expect(component.getDefaultInputValue('SetOfAlgebraicIdentifier')).toEqual(
+      []
+    );
+  });
+
+  it('should get default value for SetOfUnicodeString', () => {
+    expect(component.getDefaultInputValue('SetOfUnicodeString')).toEqual([]);
+  });
+
+  it('should handle getTranslatableRulesContentIdToContentMap with multiple rules', () => {
+    component.rules = [
+      new Rule(
+        'Equals',
+        {
+          x: {contentId: 'content_1', normalizedStrSet: ['test1']},
+        } as RuleInputs,
+        {x: 'TranslatableSetOfNormalizedString'}
+      ),
+      new Rule(
+        'Equals',
+        {
+          y: {contentId: 'content_2', normalizedStrSet: ['test2']},
+        } as RuleInputs,
+        {y: 'TranslatableSetOfNormalizedString'}
+      ),
+    ];
+
+    const map = component.getTranslatableRulesContentIdToContentMap();
+
+    expect(map.content_1).toBeDefined();
+    expect(map.content_2).toBeDefined();
+  });
+
+  it('should handle getTranslatableRulesContentIdToContentMap with mixed inputs', () => {
+    component.rules = [
+      new Rule(
+        'Equals',
+        {
+          x: {contentId: 'content_1', normalizedStrSet: ['test']},
+          y: 'simple_string',
+        } as RuleInputs,
+        {x: 'TranslatableSetOfNormalizedString', y: 'String'}
+      ),
+    ];
+
+    const map = component.getTranslatableRulesContentIdToContentMap();
+
+    expect(map.content_1).toBeDefined();
+    expect(Object.keys(map).length).toBe(1);
+  });
+
+  it('should unsubscribe from all subscriptions on destroy', () => {
+    spyOn(component.directiveSubscriptions, 'unsubscribe');
+
+    component.ngOnDestroy();
+
+    expect(component.directiveSubscriptions.unsubscribe).toHaveBeenCalled();
+  });
 });
