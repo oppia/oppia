@@ -128,7 +128,7 @@
           </div>
           <div class="chapter-card-inputs oppia-mobile-collapsible-card-content" *ngIf="chapterOutlineIsShown">
             Outline Finalized
-            <i *ngIf="!outlineIsFinalized" (click)="finalizeOutline()" class="far fa-square md-18 e2e-test-finalize-outline" aria-label="Finalize outline"></i>
+            <i *ngIf="!outlineIsFinalized" [class.disabled-icon]="!editableOutline || editableOutline.trim().length === 0" (click)="canFinalize() && finalizeOutline()" class="far fa-square md-18 e2e-test-finalize-outline" aria-label="Finalize outline"></i>
             <i *ngIf="outlineIsFinalized" (click)="unfinalizeOutline()" class="fas fa-check-square md-18" aria-label="Unfinalize outline"></i>
             <div tabindex="-1" (blur)="toggleChapterOutlineButtons()" (click)="toggleChapterOutlineButtons()">
               <schema-based-editor id="storyNodeOutline"
@@ -452,6 +452,11 @@
     font-weight: bold;
     margin-top: 12px;
     text-align: left;
+  }
+  .disabled-icon {
+    opacity: 0.4;
+    pointer-events: none;
+    cursor: not-allowed;
   }
   .skill-header {
     border-bottom: 2px solid #000;
