@@ -37,7 +37,7 @@
         </span>
       </a>
     </div>
-    <div *ngIf="emptySkillProficiency" class="empty-skill-proficiency-section">
+    <div *ngIf="topicsInSkillProficiency.length === 0" class="empty-skill-proficiency-section">
       <p class="empty-skill-proficiency" [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_SKILL_PROFICIENCY' | translate">
       </p>
       <a id="setting-a-goal-link" (click)="changeActiveSection()" tabindex="0" (keydown.enter)="changeActiveSection()">
