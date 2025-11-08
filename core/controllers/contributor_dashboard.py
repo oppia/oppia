@@ -318,6 +318,9 @@ class ReviewableOpportunitiesHandler(
         # Default value is None, since this is a GET request handler, which
         # means all request parameters come in as strings.
         topic_name = self.normalized_request.get('topic_name', None)
+        # Treat the string 'undefined' as if it were None
+        if topic_name == 'undefined':
+            topic_name = None
         language = self.normalized_request.get('language_code')
         opportunity_dicts: List[
             opportunity_domain.PartialExplorationOpportunitySummaryDict
@@ -363,6 +366,10 @@ class ReviewableOpportunitiesHandler(
         # 3. Fetch all exploration opportunity summaries for the resulting set
         #    of explorations.
         # 4. Move any pinned summaries to the top.
+
+        # Treat the string 'undefined' as if it were None
+        if topic_name == 'undefined':
+            topic_name = None
 
         pinned_opportunity_summary = None
         if topic_name is None:
@@ -453,6 +460,9 @@ class LessonsPinningHandler(
         assert self.normalized_payload is not None
         assert self.user_id is not None
         topic_name = self.normalized_payload.get('topic_id')
+        # Treat the string 'undefined' as if it were None
+        if topic_name == 'undefined':
+            topic_name = None
         language_code = self.normalized_payload.get('language_code')
         opportunity_id = self.normalized_payload.get('opportunity_id')
         if language_code and topic_name:
