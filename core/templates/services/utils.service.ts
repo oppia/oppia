@@ -157,6 +157,20 @@ export class UtilsService {
       // Continue to the next validation strategy.
     }
 
+    // Allow only safe relative URLs that start with a single '/', and contain
+    // only safe characters (no colon/backslash and no control chars). Allow an
+    // optional query or fragment.
+    const SAFE_PATH_REGEX = /^\/[a-zA-Z0-9/_\-\.]*([?][^#]*)?(#[^]*)?$/;
+    if (
+      urlString.charAt(0) !== '/' ||
+      urlString.charAt(1) === '/' ||
+      urlString.includes(':') ||
+      urlString.includes('\\') ||
+      !SAFE_PATH_REGEX.test(urlString)
+    ) {
+      return '/';
+    }
+
     try {
       // Throws an exception if the URL is truly malformed in some way.
       new URL(urlString, document.baseURI);
@@ -165,12 +179,6 @@ export class UtilsService {
       return '/';
     }
 
-    if (urlString.charAt(0) !== '/' || urlString.charAt(1) === '/') {
-      // The URL is not a relative path, so reject it and return '/' instead.
-      return '/';
-    } else {
-      // The URL is a safe, relative path.
-      return urlString;
-    }
+    return urlString;
   }
 }
