@@ -321,7 +321,9 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
       this.explorationId &&
       (this.editableThumbnailBgColor || this.editableThumbnailFilename) &&
       this.outlineIsFinalized &&
-      this.plannedPublicationDate
+      this.plannedPublicationDate &&
+      this.acquiredSkillIds &&
+      this.acquiredSkillIds.length > 0
     ) {
       this.storyEditorStateService.setCurrentNodeAsPublishable(true);
     } else {

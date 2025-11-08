@@ -362,6 +362,11 @@
             <i class="fa fa-check todo-completed" *ngIf="plannedPublicationDate"></i>
             <span class="checklist-item-name">Planned Publication Date</span>
           </div>
+          <div class="todo-item-container">
+            <i class="fa fa-exclamation-triangle" *ngIf="!acquiredSkillIds || acquiredSkillIds.length === 0"></i>
+            <i class="fa fa-check todo-completed" *ngIf="acquiredSkillIds && acquiredSkillIds.length > 0"></i>
+            <span class="checklist-item-name">Acquired Skill</span>
+          </div>
         </div>
       </mat-card>
     </div>
