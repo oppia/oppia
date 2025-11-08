@@ -202,6 +202,9 @@ describe('Utils Service', () => {
       ['///', '/'],
       ['%', '/'],
       ['a', '/'],
+      ['/directory-traversal/../abc', '/'],
+      ['/dashboard?query=javascript:', '/'],
+      ['/dashboard#javascript:', '/'],
       ['/', '/'],
       ['/learner-dashboard', '/learner-dashboard'],
     ];

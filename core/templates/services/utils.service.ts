@@ -144,41 +144,44 @@ export class UtilsService {
       return '/';
     }
 
-    try {
-      // Throws an exception when the URL does not have a scheme.
-      const url = new URL(urlString);
-
-      // Does this URL originate from this website?
-      if (url.origin !== new URL(document.URL, document.baseURI).origin) {
-        // This is an external URL, so reject it and return '/' instead.
-        return '/';
-      }
-    } catch (_) {
-      // Continue to the next validation strategy.
-    }
-
-    // Allow only safe relative URLs that start with a single '/', and contain
-    // only safe characters (no colon/backslash and no control chars). Allow an
-    // optional query or fragment.
-    const SAFE_PATH_REGEX = /^\/[a-zA-Z0-9/_\-\.]*([?][^#]*)?(#[^]*)?$/;
     if (
-      urlString.charAt(0) !== '/' ||
-      urlString.charAt(1) === '/' ||
-      urlString.includes(':') ||
-      urlString.includes('\\') ||
-      !SAFE_PATH_REGEX.test(urlString)
+      !urlString.startsWith('/') ||
+      urlString.startsWith('//') ||
+      urlString.includes('..')
     ) {
       return '/';
     }
 
+    let url: URL;
     try {
-      // Throws an exception if the URL is truly malformed in some way.
-      new URL(urlString, document.baseURI);
+      url = new URL(urlString, document.baseURI);
     } catch (_) {
-      // This is a truly malformed URL, so reject it and return '/' instead.
+      // The URL is malformed.
       return '/';
     }
 
-    return urlString;
+    // Only allow redirects that stay on the same origin.
+    const expectedOrigin = new URL(document.URL, document.baseURI).origin;
+    if (url.origin !== expectedOrigin) {
+      return '/';
+    }
+
+    // Disallow suspicious characters in fragment or query (for defense-in-
+    // depth).
+    if (
+      url.search.includes('javascript:') ||
+      url.hash.includes('javascript:')
+    ) {
+      return '/';
+    }
+
+    // Allow only safe characters in the path/query/fragment.
+    const SAFE_PATH_REGEX = /^\/[a-zA-Z0-9/_\-\.]*([?][^#]*)?(#[^]*)?$/;
+    const fullPath = url.pathname + url.search + url.hash;
+    if (!SAFE_PATH_REGEX.test(fullPath)) {
+      return '/';
+    }
+
+    return fullPath;
   }
 }
