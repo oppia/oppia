@@ -45,7 +45,7 @@ describe('Changes in Human Readable Form Component', () => {
     let prev;
     do {
       prev = htmlStr;
-      htmlStr = htmlStr.replace.replace(/<\!--[\s\S]*?-->/gm, '');
+      htmlStr = htmlStr.replace(/<\!--[\s\S]*?-->/gm, '');
     } while (htmlStr !== prev);
 
     // Remove marker.
