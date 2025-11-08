@@ -42,7 +42,7 @@ describe('Changes in Human Readable Form Component', () => {
         // Removes Unecessary white spaces and new lines.
         .replace(/^\s+|\r\n|\n|\r|(>)\s+(<)|\s+$/gm, '$1$2')
         // Removes Comments.
-        .replace(/<\!--.*?-->/gm, '')
+        .replace(/<\!--[\s\S]*?-->/gm, '')
         // Removes marker.
         .replace(/::marker/, '')
     );
