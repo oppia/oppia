@@ -336,7 +336,7 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
   }
 
   canFinalize(): boolean {
-    return this.editableOutline && this.editableOutline.trim().length > 0;
+    return this.editableOutline?.trim().length > 0;
   }
 
   finalizeOutline(): void {
