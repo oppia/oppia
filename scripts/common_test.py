@@ -1551,9 +1551,6 @@ class PrintColoredTracebackTests(test_utils.GenericTestBase):
 
     def test_print_colored_traceback_outputs_red_traceback(self) -> None:
         """Checks that the traceback is printed in red and includes the exception text."""
-        import io
-        import contextlib
-
         # Capture stdout instead of stderr, since print_colored_traceback writes there.
         captured_output = io.StringIO()
         with contextlib.redirect_stdout(captured_output):
