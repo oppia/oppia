@@ -501,10 +501,14 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         return;
       }
 
-      let i = 1;
-      while (i < parent.childNodes.length) {
-        const prev = parent.childNodes[i - 1];
-        const curr = parent.childNodes[i];
+      // Convert live NodeList to static array to prevent race conditions.
+      const children = Array.from(parent.childNodes);
+      const spacesToInsert: Array<{beforeNode: Node}> = [];
+
+      // First pass: identify where spaces are needed (doesn't modify DOM).
+      for (let i = 1; i < children.length; i++) {
+        const prev = children[i - 1];
+        const curr = children[i];
 
         if (
           prev.nodeType === Node.ELEMENT_NODE &&
@@ -512,40 +516,31 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
           !BLOCK_TAGS.has((prev as Element).tagName) &&
           !BLOCK_TAGS.has((curr as Element).tagName)
         ) {
-          parent.insertBefore(document.createTextNode(' '), curr);
-          i += 2;
-          continue;
-        }
-
-        if (
+          spacesToInsert.push({beforeNode: curr});
+        } else if (
           prev.nodeType === Node.ELEMENT_NODE &&
           curr.nodeType === Node.TEXT_NODE &&
-          !BLOCK_TAGS.has((prev as Element).tagName)
+          !BLOCK_TAGS.has((prev as Element).tagName) &&
+          !/^\s/.test(curr.nodeValue || '')
         ) {
-          if (!/^\s/.test(curr.nodeValue || '')) {
-            parent.insertBefore(document.createTextNode(' '), curr);
-            i += 2;
-            continue;
-          }
-        }
-
-        if (
+          spacesToInsert.push({beforeNode: curr});
+        } else if (
           prev.nodeType === Node.TEXT_NODE &&
           curr.nodeType === Node.ELEMENT_NODE &&
-          !BLOCK_TAGS.has((curr as Element).tagName)
+          !BLOCK_TAGS.has((curr as Element).tagName) &&
+          !/\s$/.test(prev.nodeValue || '')
         ) {
-          if (!/\s$/.test(prev.nodeValue || '')) {
-            parent.insertBefore(document.createTextNode(' '), curr);
-            i += 2;
-            continue;
-          }
+          spacesToInsert.push({beforeNode: curr});
         }
-
-        i++;
       }
 
-      for (let j = 0; j < parent.childNodes.length; j++) {
-        const child = parent.childNodes[j];
+      // Second pass: insert all spaces after iteration completes.
+      spacesToInsert.forEach(({beforeNode}) => {
+        parent.insertBefore(document.createTextNode(' '), beforeNode);
+      });
+
+      // Recursively process children (use static array, not live NodeList).
+      for (const child of children) {
         if (child.nodeType === Node.ELEMENT_NODE) {
           normalizeSpacingRecursive(child);
         }
