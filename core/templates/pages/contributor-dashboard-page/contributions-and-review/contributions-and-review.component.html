@@ -107,7 +107,7 @@
           </select>
         </span>
       </div>
-      <lazy-loading *ngIf="!topicReady"></lazy-loading>
+      <lazy-loading *ngIf="activeExplorationId === null && isReviewTranslationsTab() && !isAccomplishmentsTabActive() && !topicReady"></lazy-loading>
       <oppia-opportunities-list *ngIf="activeExplorationId === null && isReviewTranslationsTab() && !isAccomplishmentsTabActive() && topicReady"
                                 [loadOpportunities]="loadReviewableTranslationOpportunities.bind(this)"
                                 (clickActionButton)="onClickReviewableTranslations($event)"
