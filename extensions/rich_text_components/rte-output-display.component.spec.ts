@@ -102,6 +102,15 @@ describe('RTE display component', () => {
     ).and.returnValue(new EventEmitter<string>());
   }));
 
+  afterEach(() => {
+    // Ensure component is properly destroyed to clear any intervals.
+    if (component) {
+      component.ngOnDestroy();
+    }
+    fixture.destroy();
+    TestBed.resetTestingModule();
+  });
+
   // NOTE: Debugging might be a bit confusing sometimes, especially if this the
   // first time you are looking at component tests that test html. To access
   // the html of the component, you can do so by using
