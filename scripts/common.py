@@ -1053,3 +1053,69 @@ def log_to_terminal(
     end_color = LogType.COLOR.END  # type: ignore[attr-defined]
 
     write_stdout_safe(f'{color}{message}{end_color}\n')
+
+
+def print_colored_traceback() -> None:
+    """Prints the most recent exception traceback in red color."""
+    import traceback  # pylint: disable=import-outside-toplevel
+
+    exc_type, exc_value, exc_tb = sys.exc_info()
+    if exc_type is None:
+        return
+    traceback_text = ''.join(
+        traceback.format_exception(exc_type, exc_value, exc_tb)
+    )
+    write_stdout_safe(
+        f'{LogType.COLOR.ERROR}{traceback_text}{LogType.COLOR.END}'
+    )
+
+
+def _color_excepthook(exc_type, exc_value, exc_tb):
+    import traceback
+    traceback_text = ''.join(
+        traceback.format_exception(exc_type, exc_value, exc_tb)
+    )
+    sys.stderr.write(
+        f'{LogType.COLOR.ERROR}{traceback_text}{LogType.COLOR.END}'
+    )
+
+# To register Oppia's colored exception and warning hooks globally.
+sys.excepthook = _color_excepthook
+
+import warnings
+
+def _color_warning(message, category, filename, lineno, file=None, line=None):
+    sys.stderr.write(
+        f'{LogType.COLOR.WARNING}{category.__name__}: {message}{LogType.COLOR.END}\n'
+    )
+warnings.showwarning = _color_warning
+
+
+# --- To Add Oppia test output colorization for ERROR/FAIL/SUCCESS lines ---
+_original_stderr_write = sys.stderr.write
+
+def _colorize_stderr_write(text):
+    """Intercepts text written to stderr and colorizes Oppia test output."""
+    if isinstance(text, str):
+        lower_text = text.lower()
+
+        # 🔴 Red for errors, failed, exceptions, etc.
+        if (
+            text.startswith("ERROR:")
+            or text.startswith("FAIL:")
+            or "exception" in lower_text
+            or "failed" in lower_text
+        ):
+            text = f"{LogType.COLOR.ERROR}{text}{LogType.COLOR.END}"
+
+        # 🟢 Green for success, OK, etc.
+        elif (
+            text.startswith("SUCCESS")
+            or text.strip() == "OK"
+            or "success" in lower_text
+        ):
+            text = f"{LogType.COLOR.SUCCESS}{text}{LogType.COLOR.END}"
+
+    _original_stderr_write(text)
+
+sys.stderr.write = _colorize_stderr_write

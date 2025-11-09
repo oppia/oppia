@@ -184,4 +184,9 @@ def main(args: Optional[List[str]] = None) -> None:
 
 
 if __name__ == '__main__':  # pragma: no cover
-    main()
+    try:
+        main()
+    except Exception:
+        # Use Oppia's colored traceback instead of the default.
+        common.print_colored_traceback()
+        sys.exit(1)

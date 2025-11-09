@@ -1544,3 +1544,27 @@ class LogToTerminalTests(unittest.TestCase):
         self.assertIn('unexpected message', output)
         # Default color is INFO (blue).
         self.assertIn('\033[94m', output)
+
+
+class PrintColoredTracebackTests(test_utils.GenericTestBase):
+    """Tests for the print_colored_traceback function in common.py."""
+
+    def test_print_colored_traceback_outputs_red_traceback(self) -> None:
+        """Checks that the traceback is printed in red and includes the exception text."""
+        import io
+        import contextlib
+
+        # Capture stdout instead of stderr, since print_colored_traceback writes there.
+        captured_output = io.StringIO()
+        with contextlib.redirect_stdout(captured_output):
+            try:
+                raise ValueError('color test exception')
+            except Exception:
+                common.print_colored_traceback()
+
+        output = captured_output.getvalue()
+
+        # Assert that red color and reset codes are printed.
+        self.assertIn('\033[91m', output)
+        self.assertIn('\033[0m', output)
+        self.assertIn('ValueError: color test exception', output)
