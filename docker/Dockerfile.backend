@@ -1,4 +1,3 @@
-# The platform flag is added because of https://stackoverflow.com/a/71611002
 FROM --platform=linux/amd64 python:3.10.16-slim-bullseye AS backend
 
 ENV OPPIA_IS_DOCKERIZED="true"
@@ -27,10 +26,12 @@ RUN pip install pip-tools==7.5.0 setuptools==80.9.0 cmake
 WORKDIR /app/vm_deps
 
 # Installing Google Cloud SDK
-RUN wget -O /app/vm_deps/gcloud-sdk.tar.gz https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-500.0.0-linux-x86_64.tar.gz && \
+RUN wget -O /app/vm_deps/gcloud-sdk.tar.gz https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-469.0.0-linux-x86_64.tar.gz && \
+    cd /app/vm_deps && \
     tar -xzf gcloud-sdk.tar.gz && \
-    ./google-cloud-sdk/install.sh --quiet && \
-    ./google-cloud-sdk/bin/gcloud components install beta cloud-datastore-emulator app-engine-python app-engine-python-extras && \
+    ./google-cloud-sdk/install.sh --quiet --usage-reporting=false --command-completion=false --path-update=true && \
+    ./google-cloud-sdk/bin/gcloud components update --quiet && \
+    ./google-cloud-sdk/bin/gcloud components install beta cloud-datastore-emulator app-engine-python app-engine-python-extras --quiet && \
     rm gcloud-sdk.tar.gz
 
 # Install DSAdmin

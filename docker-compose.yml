@@ -1,5 +1,6 @@
 services:
   angular-build:
+    platform: linux/arm64
     build:
       context: .
       dockerfile: ./docker/Dockerfile.frontend
@@ -15,6 +16,7 @@ services:
     entrypoint: bash /app/oppia/docker/angular-build.entrypoint.sh
 
   webpack-compiler:
+    platform: linux/arm64
     build:
       context: .
       dockerfile: ./docker/Dockerfile.frontend
@@ -30,6 +32,7 @@ services:
     entrypoint: bash /app/oppia/docker/webpack-compiler.entrypoint.sh
 
   dev-server:
+    platform: linux/arm64
     build:
       context: .
       dockerfile: ./docker/Dockerfile.backend
@@ -78,6 +81,7 @@ services:
     entrypoint: bash /app/oppia/docker/dev-server.entrypoint.sh
 
   datastore:
+    platform: linux/arm64
     build:
       context: .
       dockerfile: ./docker/Dockerfile.backend
@@ -101,6 +105,7 @@ services:
 
   firebase:
     image: node:16.13.0-alpine
+    platform: linux/arm64
     container_name: oppia-firebase-emulator
     ports:
       - "9099:9099"
@@ -110,9 +115,6 @@ services:
       - node_modules:/app/oppia/node_modules
       - firebase_emulator_cache:/app/firebase_emulator_cache
       - ./docker/firebase.entrypoint.sh:/app/oppia/docker/firebase.entrypoint.sh
-    # TODO(#18638): The firebase service depends on the packages from node_modules that are being
-    # installed in the Frontend Stage of Dockerfile. In future, we can remove the dependency
-    # on Frontend Stage and install the required packages in this service itself.
     depends_on:
       - angular-build
     healthcheck:
@@ -126,6 +128,7 @@ services:
 
   redis:
     image: redis:6.2.4
+    platform: linux/arm64
     container_name: oppia-redis
     environment:
       - PATH=/usr/local/bin/
@@ -141,6 +144,7 @@ services:
 
   elasticsearch:
     image: elasticsearch:7.17.27
+    platform: linux/arm64
     container_name: oppia-elasticsearch
     ports:
       - "9200:9200"
