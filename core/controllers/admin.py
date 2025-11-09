@@ -2283,7 +2283,7 @@ class AdminHandler(
                     story.corresponding_topic_id,
                 )
 
-        # Link the generated nodes and old nodes if they exist
+        # Link the generated nodes and old nodes if they exist.
         graph_change_list = []
         existing_node_ids = [
             node.id
@@ -2307,7 +2307,7 @@ class AdminHandler(
                     }
                 )
             )
-        # Link the new nodes among themselves
+        # Link the new nodes among themselves.
         for i, node_id in enumerate(new_node_ids):
             if i < len(new_node_ids) - 1:
                 next_node_id = new_node_ids[i + 1]
