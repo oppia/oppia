@@ -220,6 +220,17 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
           return [node];
         }
 
+        // If there's only one child and it's the same type, just return the processed child
+        // to avoid unnecessary nesting
+        if (
+          updatedChildNodes.length === 1 &&
+          updatedChildNodes[0].nodeType === Node.ELEMENT_NODE &&
+          (updatedChildNodes[0] as Element).tagName ===
+            currentNodeName.toUpperCase()
+        ) {
+          return updatedChildNodes;
+        }
+
         let currentElementReplicaNodes = [];
         updatedChildNodes.forEach(child => {
           let tempElementNode = document.createElement(currentNodeName);
@@ -272,6 +283,13 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
           } else {
             nextSentenceOffset += currentText;
           }
+        }
+
+        // If there's remaining content in spanTagElement that wasn't matched,
+        // we still need to add it to spanNodeList to avoid losing trailing
+        // text that doesn't end with punctuation.
+        if (spanTagElement.childNodes.length > 0) {
+          spanNodeList.push(spanTagElement);
         }
 
         let nodeTemp = node.cloneNode();
@@ -342,142 +360,6 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       temporaryDivElement,
       sentenceRegex
     ) as HTMLDivElement;
-    // Ensure there's a visible space between adjacent inline elements
-    // (for example when two spans or an <a> and a <span> are adjacent).
-    // We avoid modifying preformatted blocks (<pre>) to preserve intentional
-    // whitespace. This DOM-level normalization is safer than regex on HTML
-    // and fixes edge-cases where adjacent inline tags have no intervening
-    // text node, causing words to be concatenated.
-    // Treat common block-level tags specially and assume other tags are
-    // inline-like. This is more robust than an explicit whitelist of
-    // inline tags because custom Oppia tags may be inline and were
-    // previously missed. We only avoid inserting spaces between block
-    // elements to prevent accidental layout changes.
-    const BLOCK_TAGS = new Set([
-      'DIV',
-      'P',
-      'PRE',
-      'OL',
-      'UL',
-      'LI',
-      'TABLE',
-      'TBODY',
-      'TR',
-      'TD',
-      'TH',
-      'H1',
-      'H2',
-      'H3',
-      'H4',
-      'H5',
-      'H6',
-      'BLOCKQUOTE',
-      'SECTION',
-      'HEADER',
-      'FOOTER',
-      'NAV',
-      'ASIDE',
-      // Common Oppia noninteractive components that are block-level.
-      'OPPIA-NONINTERACTIVE-COLLAPSIBLE',
-      'OPPIA-NONINTERACTIVE-WORKEDEXAMPLE',
-    ]);
-
-    const shouldSkip = (node: Node) => {
-      return node.nodeType === 1 && (node as Element).tagName === 'PRE';
-    };
-
-    // Remove comment nodes (Angular's bindings can leave comment nodes like
-    // <!--bindings=...-->). They don't affect rendering but can split text
-    // nodes and interfere with whitespace normalization, so remove them
-    // except inside <pre> blocks where comments might be significant.
-    const removeCommentNodesRecursive = (parent: Node) => {
-      if (shouldSkip(parent)) {
-        return;
-      }
-      for (let k = 0; k < parent.childNodes.length; k++) {
-        const child = parent.childNodes[k];
-        if (child.nodeType === Node.COMMENT_NODE) {
-          parent.removeChild(child);
-          k--;
-          continue;
-        }
-        if (child.nodeType === Node.ELEMENT_NODE) {
-          removeCommentNodesRecursive(child);
-        }
-      }
-    };
-
-    removeCommentNodesRecursive(temporaryDivElement);
-
-    const normalizeSpacingRecursive = (parent: Node) => {
-      if (shouldSkip(parent)) {
-        return;
-      }
-
-      // Iterate using a while loop because we may insert nodes which change
-      // the live NodeList length.
-      let i = 1;
-      while (i < parent.childNodes.length) {
-        const prev = parent.childNodes[i - 1];
-        const curr = parent.childNodes[i];
-
-        // If both are element nodes and inline-like, ensure a text node
-        // containing a single space exists between them.
-        if (
-          prev.nodeType === Node.ELEMENT_NODE &&
-          curr.nodeType === Node.ELEMENT_NODE &&
-          // Insert a space only when neither element is a block-level tag.
-          !BLOCK_TAGS.has((prev as Element).tagName) &&
-          !BLOCK_TAGS.has((curr as Element).tagName)
-        ) {
-          // Insert a text node with a single space before curr.
-          parent.insertBefore(document.createTextNode(' '), curr);
-          i += 2; // skip over the inserted text node and curr
-          continue;
-        }
-
-        // If previous is an element and current is a text node, ensure the
-        // text node starts with whitespace.
-        if (
-          prev.nodeType === Node.ELEMENT_NODE &&
-          curr.nodeType === Node.TEXT_NODE &&
-          !BLOCK_TAGS.has((prev as Element).tagName)
-        ) {
-          if (!/^\s/.test(curr.nodeValue || '')) {
-            parent.insertBefore(document.createTextNode(' '), curr);
-            i += 2;
-            continue;
-          }
-        }
-
-        // If previous is a text node and current is an element, ensure the
-        // previous text node ends with whitespace.
-        if (
-          prev.nodeType === Node.TEXT_NODE &&
-          curr.nodeType === Node.ELEMENT_NODE &&
-          !BLOCK_TAGS.has((curr as Element).tagName)
-        ) {
-          if (!/\s$/.test(prev.nodeValue || '')) {
-            // Append a space text node right before curr.
-            parent.insertBefore(document.createTextNode(' '), curr);
-            i += 2;
-            continue;
-          }
-        }
-
-        i++;
-      }
-
-      // Recurse into element children.
-      for (let j = 0; j < parent.childNodes.length; j++) {
-        const child = parent.childNodes[j];
-        if (child.nodeType === Node.ELEMENT_NODE) {
-          normalizeSpacingRecursive(child);
-        }
-      }
-    };
-
-    normalizeSpacingRecursive(finalDivElement);
 
     // eslint-disable-next-line oppia/no-inner-html
     return finalDivElement.innerHTML;
