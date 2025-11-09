@@ -221,7 +221,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         }
 
         // If there's only one child and it's the same type, just return the processed child
-        // to avoid unnecessary nesting
+        // to avoid unnecessary nesting.
         if (
           updatedChildNodes.length === 1 &&
           updatedChildNodes[0].nodeType === Node.ELEMENT_NODE &&
