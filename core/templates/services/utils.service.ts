@@ -144,19 +144,13 @@ export class UtilsService {
       return '/';
     }
 
+    // Starting with a slash, and not allowing a double slash, forces staying
+    // on the same origin. Disallowing '..' prevents directory traversal.
     if (
       !urlString.startsWith('/') ||
       urlString.startsWith('//') ||
       urlString.includes('..')
     ) {
-      return '/';
-    }
-
-    let url: URL;
-    try {
-      url = new URL(urlString, document.baseURI);
-    } catch (_) {
-      // The URL is malformed.
       return '/';
     }
 
