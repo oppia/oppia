@@ -229,12 +229,12 @@ describe('Utils Service', () => {
 
     beforeEach(function () {
       originalUrl = document.URL;
-      // Mock document.URL
+      // Mock the document.URL property.
       Object.defineProperty(document, 'URL', {
         writable: true,
         value: 'https://cdn.example.com/images/pic.png',
       });
-      // Mock document.baseURI
+      // Mock the document.baseURI property.
       Object.defineProperty(document, 'baseURI', {
         writable: true,
         value: 'https://example.com',
