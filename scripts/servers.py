@@ -290,7 +290,7 @@ def managed_elasticsearch_dev_server() -> Iterator[psutil.Process]:
         # -q is the quiet flag.
         '-q',
     ]
-    # Override the default path to ElasticSearch config files.
+    # Inherit system environment variables and override the ElasticSearch config path.
     es_env = os.environ.copy()
     es_env.update({
         'ES_PATH_CONF': common.ES_PATH_CONFIG_DIR,
