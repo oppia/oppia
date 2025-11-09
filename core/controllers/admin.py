@@ -2283,55 +2283,55 @@ class AdminHandler(
                     story.corresponding_topic_id,
                 )
 
-        # Link the generated nodes and old nodes if they exist.
-        graph_change_list = []
-        old_dest_ids: List[str] = []
-        existing_node_ids = [
-            node.id
-            for node in story.story_contents.nodes
-            if node.id not in new_node_ids
-        ]
-        existing_node_ids.sort(key=lambda x: int(x.replace('node_', '')))
+            # Link the generated nodes and old nodes if they exist.
+            graph_change_list = []
+            old_dest_ids: List[str] = []
+            existing_node_ids = [
+                node.id
+                for node in story.story_contents.nodes
+                if node.id not in new_node_ids
+            ]
+            existing_node_ids.sort(key=lambda x: int(x.replace('node_', '')))
 
-        last_existing_node_id = None
-        if existing_node_ids:
-            last_existing_node_id = existing_node_ids[-1]
-        if last_existing_node_id and new_node_ids:
-            graph_change_list.append(
-                story_domain.StoryChange(
-                    {
-                        'cmd': 'update_story_node_property',
-                        'property_name': story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS,
-                        'new_value': [new_node_ids[0]],
-                        'node_id': last_existing_node_id,
-                        'old_value': old_dest_ids,
-                    }
-                )
-            )
-        # Link the new nodes among themselves.
-        for i, node_id in enumerate(new_node_ids):
-            if i < len(new_node_ids) - 1:
-                next_node_id = new_node_ids[i + 1]
+            last_existing_node_id = None
+            if existing_node_ids:
+                last_existing_node_id = existing_node_ids[-1]
+            if last_existing_node_id and new_node_ids:
                 graph_change_list.append(
                     story_domain.StoryChange(
                         {
                             'cmd': 'update_story_node_property',
                             'property_name': story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS,
-                            'new_value': [next_node_id],
-                            'node_id': node_id,
+                            'new_value': [new_node_ids[0]],
+                            'node_id': last_existing_node_id,
                             'old_value': old_dest_ids,
                         }
                     )
                 )
+            # Link the new nodes among themselves.
+            for i, node_id in enumerate(new_node_ids):
+                if i < len(new_node_ids) - 1:
+                    next_node_id = new_node_ids[i + 1]
+                    graph_change_list.append(
+                        story_domain.StoryChange(
+                            {
+                                'cmd': 'update_story_node_property',
+                                'property_name': story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS,
+                                'new_value': [next_node_id],
+                                'node_id': node_id,
+                                'old_value': old_dest_ids,
+                            }
+                        )
+                    )
 
-        if graph_change_list:
-            topic_services.update_story_and_topic_summary(
-                self.user_id,
-                story_id,
-                graph_change_list,
-                'add node links',
-                story.corresponding_topic_id,
-            )
+            if graph_change_list:
+                topic_services.update_story_and_topic_summary(
+                    self.user_id,
+                    story_id,
+                    graph_change_list,
+                    'add node links',
+                    story.corresponding_topic_id,
+                )
 
             # Ensure the story is published at the end of chapter generation.
             story = story_fetchers.get_story_by_id(story_id)
