@@ -26,6 +26,8 @@ import sys
 
 from typing import List, Optional
 
+from scripts import common
+
 INSTALLATION_TOOL_VERSIONS = {
     'pip': '25.2',
     'pip-tools': '7.5.0',
@@ -106,7 +108,9 @@ def install_dev_dependencies() -> None:
     """Install dev dependencies from COMPILED_REQUIREMENTS_DEV_FILE_PATH."""
     subprocess.run(
         [
-            'pip-sync',
+            common.CURRENT_PYTHON_BIN,
+            '-m',
+            'piptools.scripts.sync',
             COMPILED_REQUIREMENTS_DEV_FILE_PATH,
             '--pip-args',
             '--require-hashes --no-deps',
@@ -145,7 +149,9 @@ def compile_pip_requirements(requirements_path: str, compiled_path: str) -> str:
     # passed here. We account for that later below when computing the diff.
     subprocess.run(
         [
-            'pip-compile',
+            common.CURRENT_PYTHON_BIN,
+            '-m',
+            'piptools.scripts.compile',
             '--no-emit-index-url',
             '--quiet',
             '--strip-extras',

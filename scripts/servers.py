@@ -39,6 +39,7 @@ from typing import (
     List,
     Optional,
     Sequence,
+    Tuple,
     Union,
 )
 
@@ -229,6 +230,12 @@ def managed_dev_appserver(
             )
         )
         common.wait_for_port_to_be_in_use(port)
+        # Poll the health check endpoint to ensure the server is fully ready
+        # before handing control back to callers. This avoids flakiness where
+        # subsequent WebdriverIO tests attempt to hit the login page before
+        # the dev server has completed its startup sequence.
+        health_check_url = f'http://127.0.0.1:{port}/_ah/health'
+        common.wait_for_url(health_check_url, timeout_secs=180, expected_status_codes=(200,))
         yield proc
 
 
@@ -666,6 +673,59 @@ def get_chromedriver_version() -> str:
     return chromedriver_version
 
 
+def _resolve_chrome_binary() -> Tuple[str, str]:
+    """Returns the absolute path to the chrome executable and its directory."""
+
+    chrome_path = shutil.which('google-chrome')
+    if chrome_path is None and common.is_mac_os():
+        macos_path = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+        if os.path.isfile(macos_path):
+            chrome_path = macos_path
+
+    if chrome_path is None:
+        for candidate in common.CHROME_PATHS:
+            if os.path.isfile(candidate):
+                chrome_path = candidate
+                break
+
+    if chrome_path is None:
+        raise FileNotFoundError(
+            'Google Chrome binary was not found. Checked PATH and: %s' % ', '.join(common.CHROME_PATHS)
+        )
+
+    chrome_dir = os.path.dirname(chrome_path)
+    return chrome_path, chrome_dir
+
+
+def _log_chrome_diagnostics() -> None:
+    """Prints chrome binary metadata to aid debugging flaky installs."""
+
+    chrome_path, chrome_dir = _resolve_chrome_binary()
+    print('Chrome binary located at: %s' % chrome_path)
+
+    try:
+        version_output = subprocess.check_output(
+            [chrome_path, '--version'], encoding='utf-8'
+        ).strip()
+        print('Chrome version: %s' % version_output)
+    except (subprocess.CalledProcessError, OSError) as err:
+        raise RuntimeError(
+            'Failed to execute "%s --version" for diagnostics: %s'
+            % (chrome_path, err)
+        ) from err
+
+    try:
+        directory_listing = subprocess.check_output(
+            ['ls', '-la', chrome_dir], encoding='utf-8'
+        ).strip()
+        print('Chrome directory listing (%s):\n%s' % (chrome_dir, directory_listing))
+    except (subprocess.CalledProcessError, OSError) as err:
+        print(
+            'Warning: Unable to list Chrome directory "%s": %s'
+            % (chrome_dir, err)
+        )
+
+
 @contextlib.contextmanager
 def managed_portserver() -> Iterator[psutil.Process]:
     """Returns context manager to start/stop the portserver gracefully.
@@ -765,6 +825,8 @@ def managed_webdriverio_server(
     """
     if sharding_instances <= 0:
         raise ValueError('Sharding instance should be larger than 0')
+
+    _log_chrome_diagnostics()
 
     if chrome_version is None:
         chrome_version = get_chromedriver_version()

@@ -24,6 +24,9 @@ var waitFor = require('./waitFor.js');
 var action = require('./action.js');
 var AdminPage = require('./AdminPage.js');
 
+var LOGIN_PAGE_MAX_ATTEMPTS = 3;
+var LOGIN_PAGE_RETRY_WAIT_MSECS = 2000;
+
 var _createFirebaseAccount = async function (email, isSuperAdmin = false) {
   // The Firebase Admin SDK stores all emails in lower case. To ensure that the
   // developer email used to sign in is consistent with these accounts, we
@@ -59,16 +62,49 @@ var _createFirebaseAccount = async function (email, isSuperAdmin = false) {
 var login = async function (email, useManualNavigation = true) {
   if (useManualNavigation) {
     await browser.url(general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX);
-    waitFor.pageToFullyLoad();
+    await waitFor.pageToFullyLoad();
   }
 
   var loginPage = $('.e2e-test-login-page');
-  await waitFor.presenceOf(loginPage, 'Login page did not load');
+  var attemptNumber = 0;
+  while (true) {
+    attemptNumber += 1;
+    try {
+      await waitFor.presenceOf(loginPage, 'Login page did not load');
+      await waitFor.visibilityOf(
+        loginPage,
+        'Login page container is not visible'
+      );
+      break;
+    } catch (error) {
+      if (attemptNumber >= LOGIN_PAGE_MAX_ATTEMPTS) {
+        throw error;
+      }
+      if (useManualNavigation) {
+        await browser.url(
+          general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX
+        );
+      } else {
+        await browser.refresh();
+      }
+      await waitFor.pageToFullyLoad();
+      // eslint-disable-next-line oppia/e2e-practices
+      await browser.pause(LOGIN_PAGE_RETRY_WAIT_MSECS);
+    }
+  }
 
   var emailInput = $('.e2e-test-sign-in-email-input');
+  await waitFor.visibilityOf(
+    emailInput,
+    'Sign in email input is not visible on the login page'
+  );
   await action.setValue('Email input', emailInput, email);
 
   var signInButton = $('.e2e-test-sign-in-button');
+  await waitFor.elementToBeClickable(
+    signInButton,
+    'Sign in button is not clickable'
+  );
 
   await waitFor.clientSideRedirection(
     async () => {
