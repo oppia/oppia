@@ -532,16 +532,14 @@ class ManagedProcessTests(test_utils.TestBase):
             popen_calls[0].program_args,
             '%s/bin/elasticsearch -q' % common.ES_PATH,
         )
-        self.assertEqual(
-            popen_calls[0].kwargs,
-            {
-                'shell': True,
-                'env': {
-                    'ES_JAVA_OPTS': '-Xms100m -Xmx500m',
-                    'ES_PATH_CONF': common.ES_PATH_CONFIG_DIR,
-                },
-            },
-        )
+        self.assertEqual(popen_calls[0].kwargs['shell'], True)
+
+        env_vars = popen_calls[0].kwargs['env']
+
+        self.assertEqual(env_vars['ES_JAVA_OPTS'], '-Xms100m -Xmx500m')
+        self.assertEqual(env_vars['ES_PATH_CONF'], common.ES_PATH_CONFIG_DIR)
+
+        self.assertIn('PATH', env_vars)
 
     def test_start_server_removes_elasticsearch_data(self) -> None:
         check_function_calls = {'shutil_rmtree_is_called': False}

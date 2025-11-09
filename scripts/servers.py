@@ -291,11 +291,12 @@ def managed_elasticsearch_dev_server() -> Iterator[psutil.Process]:
         '-q',
     ]
     # Override the default path to ElasticSearch config files.
-    es_env = {
+    es_env = os.environ.copy()
+    es_env.update({
         'ES_PATH_CONF': common.ES_PATH_CONFIG_DIR,
         # Set the minimum heap size to 100 MB and maximum to 500 MB.
         'ES_JAVA_OPTS': '-Xms100m -Xmx500m',
-    }
+    })
     # OK to use shell=True here because we are passing string literals and
     # constants, so there is no risk of a shell-injection attack.
     proc_context = managed_process(
