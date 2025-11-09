@@ -207,7 +207,7 @@ fdescribe('Utils Service', () => {
       ['/dashboard?query=javascript:', '/'],
       ['/dashboard#javascript:', '/'],
       ['/', '/'],
-      ['صباح الخير', '/'],
+      ['/صباح الخير', '/'],
       ['/learner-dashboard', '/learner-dashboard'],
     ];
 

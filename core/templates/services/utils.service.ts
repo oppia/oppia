@@ -154,13 +154,7 @@ export class UtilsService {
       return '/';
     }
 
-    let url: URL;
-    try {
-      url = new URL(urlString, document.baseURI);
-    } catch (_) {
-      // The URL is malformed.
-      return '/';
-    }
+    let url: URL = new URL(urlString, document.baseURI);
 
     // Only allow redirects that stay on the same origin.
     const expectedOrigin = new URL(document.URL, document.baseURI).origin;
