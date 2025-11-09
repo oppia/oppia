@@ -24,6 +24,7 @@ import {
   Directive,
   ElementRef,
   Input,
+  OnDestroy,
   OnInit,
   SimpleChanges,
   TemplateRef,
@@ -54,7 +55,9 @@ type PortalTree = (TemplatePortal<unknown> | PortalTree)[];
   templateUrl: './rte-output-display.component.html',
   styleUrls: [],
 })
-export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
+export class RteOutputDisplayComponent
+  implements OnInit, AfterViewInit, OnDestroy
+{
   // Native HTML elements.
   @ViewChild('p') pTagPortal: TemplateRef<unknown>;
   @ViewChild('h1') h1TagPortal: TemplateRef<unknown>;
@@ -102,6 +105,9 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
 
   // The index is used to assign a unique ID to each sentence of the lesson content.
   index = 1;
+
+  // Track the interval ID so we can clear it on component destruction.
+  private highlightIntervalId: number | undefined;
 
   // Parent tags eligible for voiceover highlighting. Text within these tags
   // is split into sentences and wrapped in span tags. Tags like i, strong, etc.,
@@ -503,7 +509,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
 
       // Convert live NodeList to static array to prevent race conditions.
       const children = Array.from(parent.childNodes);
-      const spacesToInsert: Array<{beforeNode: Node}> = [];
+      const spacesToInsert: {beforeNode: Node}[] = [];
 
       // First pass: identify where spaces are needed (doesn't modify DOM).
       for (let i = 1; i < children.length; i++) {
@@ -587,9 +593,17 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
 
     // The below lines runs on every 200ms to highlight the sentence being
     // played in the audio player.
-    setInterval(() => {
+    this.highlightIntervalId = window.setInterval(() => {
       this.highlightSentenceDuringVoiceoverPlay();
     }, 100);
+  }
+
+  ngOnDestroy(): void {
+    // Clear the highlight interval to prevent memory leaks and hanging tests.
+    if (this.highlightIntervalId !== undefined) {
+      clearInterval(this.highlightIntervalId);
+      this.highlightIntervalId = undefined;
+    }
   }
 
   isManualVoiceoverAvailableForActiveContent(): boolean {
