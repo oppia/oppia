@@ -2303,6 +2303,8 @@ class AdminHandler(
                         'property_name': story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS,
                         'new_value': [new_node_ids[0]],
                         'node_id': last_existing_node_id,
+                        # Here use cast because an empty list literal [] cannot infer its type
+                        # and mypy rejects List[nothing]; we need List[str] for old_value.
                         'old_value': cast(List[str], []),
                     }
                 )
@@ -2318,6 +2320,8 @@ class AdminHandler(
                             'property_name': story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS,
                             'new_value': [next_node_id],
                             'node_id': node_id,
+                            # Here use cast because an empty list literal [] cannot infer its type
+                            # and mypy rejects List[nothing]; we need List[str] for old_value.
                             'old_value': cast(List[str], []),
                         }
                     )
