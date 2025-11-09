@@ -31,6 +31,7 @@ import subprocess
 import sys
 import time
 import warnings
+import types
 from http import client
 from urllib import error as urlerror
 from urllib import request as urlrequest
@@ -39,7 +40,7 @@ from core import feconf
 from scripts import servers
 
 import certifi
-from typing import Dict, Final, Generator, List, Optional, Tuple, Union
+from typing import Dict, Final, Generator, List, Optional, Tuple, Union, TextIO
 
 # Add third_party to path. Some scripts access feconf even before
 # python_libs is added to path.
@@ -1067,39 +1068,48 @@ def print_colored_traceback() -> None:
         traceback.format_exception(exc_type, exc_value, exc_tb)
     )
     write_stdout_safe(
-        f'{LogType.COLOR.ERROR}{traceback_text}{LogType.COLOR.END}'
+        f'{LogType.COLOR.ERROR}{traceback_text}{LogType.COLOR.END}' # type: ignore[attr-defined]
     )
 
 
-def _color_excepthook(exc_type, exc_value, exc_tb):
+def _color_excepthook(
+    exc_type: type[BaseException],
+    exc_value: BaseException,
+    exc_tb: Optional[types.TracebackType]
+) -> None:
     """Handles uncaught exceptions and prints them in red color."""
     import traceback
     traceback_text = ''.join(
         traceback.format_exception(exc_type, exc_value, exc_tb)
     )
     sys.stderr.write(
-        f'{LogType.COLOR.ERROR}{traceback_text}{LogType.COLOR.END}'
+        f'{LogType.COLOR.ERROR}{traceback_text}{LogType.COLOR.END}\n'  # type: ignore[attr-defined]
     )
 
 
 # To register Oppia's colored exception and warning hooks globally.
 sys.excepthook = _color_excepthook
 
-
-def _color_warning(message, category, filename, lineno, file=None, line=None):  # pylint: disable=unused-argument
+def _color_warning(
+    message: str,
+    category: type[Warning],
+    filename: str,
+    lineno: int,
+    file: Optional[TextIO] = None,
+    line: Optional[str] = None
+) -> None:
     """Prints warnings in yellow color for better visibility."""
     sys.stderr.write(
-        f'{LogType.COLOR.WARNING}{category.__name__}: {message}{LogType.COLOR.END}\n'
+        f'{LogType.COLOR.WARNING}{category.__name__}: {message}{LogType.COLOR.END}\n'  # type: ignore[attr-defined]
     )
 
 
-warnings.showwarning = _color_warning
-
+warnings.showwarning = _color_warning  # type: ignore[assignment]
 
 _original_stderr_write = sys.stderr.write
 
 
-def _colorize_stderr_write(text):
+def _colorize_stderr_write(text: str) -> int:
     """Intercepts text written to stderr and colorizes Oppia test output."""
     if isinstance(text, str):
         lower_text = text.lower()
@@ -1111,7 +1121,7 @@ def _colorize_stderr_write(text):
             or 'exception' in lower_text
             or 'failed' in lower_text
         ):
-            text = f'{LogType.COLOR.ERROR}{text}{LogType.COLOR.END}'
+            text = f'{LogType.COLOR.ERROR}{text}{LogType.COLOR.END}'  # type: ignore[attr-defined]
 
         # Green for success, OK, etc.
         elif (
@@ -1119,9 +1129,9 @@ def _colorize_stderr_write(text):
             or text.strip() == 'OK'
             or 'success' in lower_text
         ):
-            text = f'{LogType.COLOR.SUCCESS}{text}{LogType.COLOR.END}'
+            text = f'{LogType.COLOR.SUCCESS}{text}{LogType.COLOR.END}'  # type: ignore[attr-defined]
 
-    _original_stderr_write(text)
+    return _original_stderr_write(text)
 
 
-sys.stderr.write = _colorize_stderr_write
+sys.stderr.write = _colorize_stderr_write  # type: ignore[assignment]
