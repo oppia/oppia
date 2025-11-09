@@ -404,21 +404,11 @@ def get_changed_files(
     # example remote_ref='refs/heads/fix/welcome-space' should map to
     # remote_branch 'origin/fix/welcome-space'. Using split('/', 2)[-1]
     # extracts 'fix/welcome-space'.
-    remote_branches = []
-    for ref in ref_heads_only:
-        if not ref.remote_ref:
-            continue
-        # remote_ref may look like 'refs/heads/branch' or
-        # 'refs/remotes/<remote>/<branch>'. Extract only the branch name
-        # portion (without duplicating the remote name).
-        if ref.remote_ref.startswith('refs/remotes/'):
-            parts = ref.remote_ref.split('/', 3)
-            branch_part = parts[3] if len(parts) > 3 else parts[-1]
-        elif ref.remote_ref.startswith('refs/heads/'):
-            branch_part = ref.remote_ref.split('/', 2)[-1]
-        else:
-            branch_part = ref.remote_ref.split('/')[-1]
-        remote_branches.append('%s/%s' % (remote, branch_part))
+    remote_branches = [
+        '%s/%s' % (remote, ref.remote_ref.split('/', 2)[-1])
+        for ref in ref_heads_only
+        if ref.remote_ref
+    ]
     collected_files = {}
     # Git allows that multiple branches get pushed simultaneously with the "all"
     # flag. Therefore we need to loop over the ref_list provided.
