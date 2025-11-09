@@ -344,15 +344,20 @@ body {
   color: rgba(0,0,0,0.87);
   font-family: "Roboto", Arial, sans-serif;
   /*
-    A font-size of 1.6em sets the default font-size on Oppia to 16px, though
-    this will scale depending on the user's font-size preferences set via
-    their browser preferences.
+  A font-size of 1.6em sets the default font-size on Oppia to 16px, though
+  this will scale depending on the user's font-size preferences set via
+  their browser preferences.
   */
   font-size: 1.6em;
   height: 100%;
   margin: 0 auto;
   overflow-x: hidden;
   padding: 0;
+  /* 
+   Match Bootstrap 4 default body alignment ensures text starts left-aligned
+   instead of relying on --bs-body-text-align in Bootstrap 5 
+  */
+  text-align: left;
   width: 100%;
 }
 
