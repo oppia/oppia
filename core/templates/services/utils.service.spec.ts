@@ -224,8 +224,8 @@ describe('Utils Service', () => {
   });
 
   describe('verifying origin of URL when returning a safe URL', () => {
-    let originalUrl;
-    let originalBaseUri;
+    let originalUrl: string;
+    let originalBaseUri: string;
 
     beforeEach(function () {
       originalUrl = document.URL;
