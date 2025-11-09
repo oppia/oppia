@@ -18,7 +18,7 @@
 
 import {UtilsService} from 'services/utils.service';
 
-fdescribe('Utils Service', () => {
+describe('Utils Service', () => {
   let uts: UtilsService = new UtilsService();
 
   it('should check if an object is empty', () => {
