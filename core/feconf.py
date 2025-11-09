@@ -1073,6 +1073,10 @@ REGENERATE_VOICEOVER_ON_EXP_UPDATE_URL = (
     '/regenerate_voiceover_on_exp_update/<exploration_id>/'
     '<exploration_version>/<exploration_title>'
 )
+REGENERATE_VOICEOVERS_FOR_EXPLORATION_URL = (
+    '/regenerate_voiceovers_for_exploration/'
+    '<exploration_id>/<language_accent_code>'
+)
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'
