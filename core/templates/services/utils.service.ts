@@ -154,6 +154,8 @@ export class UtilsService {
       return '/';
     }
 
+    let url = new URL(urlString, document.baseURI);
+
     // Only allow redirects that stay on the same origin.
     const expectedOrigin = new URL(document.URL, document.baseURI).origin;
     if (url.origin !== expectedOrigin) {
