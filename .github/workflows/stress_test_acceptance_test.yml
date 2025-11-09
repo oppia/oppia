@@ -26,13 +26,26 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
+    env:
+      NUM_RUNS: ${{ inputs.num_runs }}
     steps:
-      - name: Generate matrix
+      - name: Sanitize and generate matrix
         id: set-matrix
+        shell: bash
         run: |
-          NUM_RUNS=${{ inputs.num_runs }}
-          MATRIX=$(seq 1 $NUM_RUNS | jq -R . | jq -s -c .)
-          echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
+          # Ensure num_runs is numeric and within safe bounds
+          if ! [[ "$NUM_RUNS" =~ ^[0-9]+$ ]]; then
+            echo "Error: num_runs must be an integer" >&2
+            exit 1
+          fi
+
+          if [ "$NUM_RUNS" -gt 128 ]; then
+            echo "Error: num_runs exceeds 128" >&2
+            exit 1
+          fi          
+
+          MATRIX=$(seq 1 "$NUM_RUNS" | jq -R . | jq -s -c .)
+          echo "matrix=$MATRIX" >> "$GITHUB_OUTPUT"
 
   build:
     name: Build the app, and store build files as an artifact
@@ -54,7 +67,17 @@ jobs:
         run: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
         mobile: [false, true]
     name: (${{ matrix.mobile && 'M' || 'D' }}) ${{ inputs.test_suite }}
+    env:
+      TEST_SUITE: ${{ inputs.test_suite }}
     steps:
+      - name: Sanitize test_suite input
+        run: |
+          if [[ "$TEST_SUITE" =~ [^a-zA-Z/-] ]]; then
+          echo "TEST_SUITE contains invalid characters (only alphabets, slashes, and dashes allowed)."
+          exit 1
+          else
+          echo "TEST_SUITE is valid."
+          fi
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
       - name: Merge develop and set up dependencies
