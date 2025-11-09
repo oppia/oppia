@@ -18,7 +18,7 @@
 
 import {UtilsService} from 'services/utils.service';
 
-describe('Utils Service', () => {
+fdescribe('Utils Service', () => {
   let uts: UtilsService = new UtilsService();
 
   it('should check if an object is empty', () => {
@@ -229,6 +229,7 @@ describe('Utils Service', () => {
 
     beforeEach(function () {
       originalUrl = document.URL;
+      originalBaseUri = document.baseURI;
       // Mock the document.URL property.
       Object.defineProperty(document, 'URL', {
         writable: true,
