@@ -35,7 +35,6 @@ from urllib import request as urlrequest
 
 from core import feconf
 
-import certifi
 from typing import (
     Dict,
     Final,
@@ -725,6 +724,8 @@ def wait_for_url(
         allotted time.
     """
 
+    import certifi
+    
     deadline = time.time() + timeout_secs
     last_error: Optional[BaseException] = None
     ssl_context = None
@@ -853,6 +854,8 @@ def url_open(
     Returns:
         urlopen. The 'urlopen' object.
     """
+    import certifi
+    
     context = ssl.create_default_context(cafile=certifi.where())
     return urlrequest.urlopen(source_url, context=context)
 
