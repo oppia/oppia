@@ -99,6 +99,18 @@ export class QuestionUpdateService {
     return this._getParameterFromChangeDict(changeDict, 'new_value');
   }
 
+  _getNextContentIdIndexFromChangeDict(
+    changeDict: BackendChangeObject, 
+    valueKey: 'new_value' | 'old_value'
+  ): number {
+    const value = this._getParameterFromChangeDict(changeDict, valueKey);
+    if (typeof value === 'number') {
+      return value;
+    } else {
+      throw new Error('Expected number, got ' + typeof value);
+    }
+  }
+
   _getElementsInFirstSetButNotInSecond(
     setA: Set<string>,
     setB: Set<string>
@@ -162,24 +174,13 @@ export class QuestionUpdateService {
       newValue,
       oldValue,
       (changeDict: BackendChangeObject, question: Question) => {
-        const newValue = this._getNewPropertyValueFromChangeDict(changeDict);
-        if (typeof newValue === 'number') {
-          question.setNextContentIdIndex(newValue);
-        } else {
-          throw new Error('Expected number, got ' + typeof newValue);
-        }
+        const newValue = this._getNextContentIdIndexFromChangeDict(changeDict, 'new_value');
+        question.setNextContentIdIndex(newValue);
       },
       (changeDict: BackendChangeObject, question: Question) => {
-        const oldValue = this._getParameterFromChangeDict(
-          changeDict,
-          'old_value'
-        );
-        if (typeof oldValue === 'number') {
-          question.setNextContentIdIndex(oldValue);
-        } else {
-          throw new Error('Expected number, got ' + typeof oldValue);
-        }
-      }
+        const oldValue = this._getNextContentIdIndexFromChangeDict(changeDict, 'old_value');
+        question.setNextContentIdIndex(oldValue);
+    }
     );
   }
 
