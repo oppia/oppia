@@ -100,7 +100,7 @@ export class QuestionUpdateService {
   }
 
   _getNextContentIdIndexFromChangeDict(
-    changeDict: BackendChangeObject, 
+    changeDict: BackendChangeObject,
     valueKey: 'new_value' | 'old_value'
   ): number {
     const value = this._getParameterFromChangeDict(changeDict, valueKey);
@@ -174,13 +174,19 @@ export class QuestionUpdateService {
       newValue,
       oldValue,
       (changeDict: BackendChangeObject, question: Question) => {
-        const newValue = this._getNextContentIdIndexFromChangeDict(changeDict, 'new_value');
+        const newValue = this._getNextContentIdIndexFromChangeDict(
+          changeDict,
+          'new_value'
+        );
         question.setNextContentIdIndex(newValue);
       },
       (changeDict: BackendChangeObject, question: Question) => {
-        const oldValue = this._getNextContentIdIndexFromChangeDict(changeDict, 'old_value');
+        const oldValue = this._getNextContentIdIndexFromChangeDict(
+          changeDict,
+          'old_value'
+        );
         question.setNextContentIdIndex(oldValue);
-    }
+      }
     );
   }
 
