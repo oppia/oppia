@@ -752,6 +752,8 @@
 	"I18N_FOOTER_GET_STARTED": "入門",
 	"I18N_FOOTER_NEWSLETTER_EMAIL": "電子郵件地址",
 	"I18N_FOOTER_NEWSLETTER_HEADING": "訂閱我們的電子報",
+	"I18N_FOOTER_NEWSLETTER_INVALID": "請輸入有效的電子郵件地址",
+	"I18N_FOOTER_NEWSLETTER_REQUIRED": "需提供電子郵件",
 	"I18N_FOOTER_NEWSLETTER_TEXT": "歡迎成為 Oppia 社群的一員！我們每兩週一次的電子報能讓您知悉新功能、課程內容，以及 Oppia 如何在全世界產生影響。",
 	"I18N_FOOTER_NEWSLETTER_WARNING": "您已經用過此電子郵件地址註冊",
 	"I18N_FOOTER_OPPIA_FOUNDATION": "Oppia 基金會",

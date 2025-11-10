@@ -309,6 +309,8 @@
 	"I18N_FOOTER_GET_STARTED": "Inizia",
 	"I18N_FOOTER_NEWSLETTER_EMAIL": "Indirizzo email",
 	"I18N_FOOTER_NEWSLETTER_HEADING": "Iscriviti alla nostra newsletter",
+	"I18N_FOOTER_NEWSLETTER_INVALID": "Inserisci un indirizzo email valido",
+	"I18N_FOOTER_NEWSLETTER_REQUIRED": "L'email è obbligatoria",
 	"I18N_FOOTER_NEWSLETTER_TEXT": "Entra a far parte della community di Oppia! La nostra newsletter bisettimanale ti tiene informato su nuove funzionalità, lezioni e su come Oppia sta avendo un impatto globale.",
 	"I18N_FOOTER_NEWSLETTER_WARNING": "Ti sei già registrato con questo indirizzo di posta elettronica",
 	"I18N_FOOTER_OPPIA_FOUNDATION": "La Fondazione Oppia",
