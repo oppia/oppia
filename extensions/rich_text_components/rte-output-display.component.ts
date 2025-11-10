@@ -301,19 +301,20 @@ export class RteOutputDisplayComponent
         let nodeTemp = node.cloneNode();
 
         for (let spanNode of spanNodeList) {
+          // If it's a text node (used for spacing), just append it without an ID
+          if (spanNode.nodeType === Node.TEXT_NODE) {
+            nodeTemp.appendChild(spanNode);
+            continue;
+          }
+
           let textInsideSpanTag = '';
 
           for (let tempChildNode of spanNode.childNodes) {
             textInsideSpanTag += this.getReadableTextFromNode(tempChildNode);
           }
 
-          if (textInsideSpanTag === ' ') {
-            nodeTemp.appendChild(spanNode);
-            continue;
-          }
-
           let elementId = `highlightBlock${this.index}`;
-          spanNode.id = elementId;
+          (spanNode as Element).id = elementId;
           this.index++;
 
           nodeTemp.appendChild(spanNode);
