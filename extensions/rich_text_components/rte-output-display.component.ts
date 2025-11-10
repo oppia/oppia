@@ -301,7 +301,7 @@ export class RteOutputDisplayComponent
         let nodeTemp = node.cloneNode();
 
         for (let spanNode of spanNodeList) {
-          // If it's a text node (used for spacing), just append it without an ID
+          // If it's a text node (used for spacing), just append it without an ID.
           if (spanNode.nodeType === Node.TEXT_NODE) {
             nodeTemp.appendChild(spanNode);
             continue;
