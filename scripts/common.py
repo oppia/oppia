@@ -51,8 +51,6 @@ from typing import (
 _THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
 sys.path.insert(0, _THIRD_PARTY_PATH)
 
-from core import utils  # pylint: disable=wrong-import-position
-
 AFFIRMATIVE_CONFIRMATIONS = ['y', 'ye', 'yes']
 
 CURRENT_PYTHON_BIN = sys.executable
@@ -610,6 +608,8 @@ def create_readme(dir_path: str, readme_content: str) -> None:
             be created.
         readme_content: str. The content to be written in the README.
     """
+    from core import utils  # pylint: disable=wrong-import-position
+    
     with utils.open_file(os.path.join(dir_path, 'README.md'), 'w') as f:
         f.write(readme_content)
 
@@ -639,6 +639,8 @@ def inplace_replace_file(
         ValueError. Wrong number of replacements.
         Exception. The content failed to get replaced.
     """
+    from core import utils  # pylint: disable=wrong-import-position
+    
     new_filename = '%s.new' % filename
     shutil.copyfile(filename, new_filename)
     new_contents = []
