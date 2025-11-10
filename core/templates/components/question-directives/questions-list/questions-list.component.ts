@@ -768,6 +768,6 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
-    this.questionsListService.resetPageNumber()
+    this.questionsListService.resetPageNumber();
   }
 }
