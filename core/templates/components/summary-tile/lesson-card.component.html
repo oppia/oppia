@@ -24,12 +24,12 @@
     <div class="align-items-center d-flex justify-content-between mt-2">
       <circle-progress [percent]="progress"> </circle-progress>
       <a [href]="lessonUrl"
-         *ngIf="statusIsPublished || isSavedSection || !isSerialChapterFeatureLearnerFlagEnabled()"
+         *ngIf="statusIsPublished || isSavedSection || isCommunityLesson || !isSerialChapterFeatureLearnerFlagEnabled()"
          class="align-items-center d-inline-flex justify-content-center lesson-card-button text-decoration-none e2e-test-resume-lesson-btn"
          target="_self">
         {{ getButtonTranslationKey() | translate }}
       </a>
-      <span *ngIf="isSerialChapterFeatureLearnerFlagEnabled() && !statusIsPublished && !isSavedSection"
+      <span *ngIf="isSerialChapterFeatureLearnerFlagEnabled() && !statusIsPublished && !isSavedSection && !isCommunityLesson"
             class="align-items-center d-inline-flex justify-content-center lesson-card-button upcoming"
             [attr.title]="isSerialChapterFeatureLearnerFlagEnabled() ? ('I18N_LEARNER_STORY_TILE_COMING_SOON_TOOLTIP' | translate) : null" >
             {{ 'I18N_LEARNER_STORY_TILE_COMING_SOON' | translate }}
