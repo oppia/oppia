@@ -81,9 +81,7 @@ var login = async function (email, useManualNavigation = true) {
         throw error;
       }
       if (useManualNavigation) {
-        await browser.url(
-          general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX
-        );
+        await browser.url(general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX);
       } else {
         await browser.refresh();
       }
