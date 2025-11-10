@@ -73,7 +73,7 @@ jobs:
       - name: Sanitize test_suite input
         run: |
           if [[ "$TEST_SUITE" =~ [^a-zA-Z/-] ]]; then
-          echo "TEST_SUITE contains invalid characters (only alphabets, slashes, and dashes allowed)."
+          echo "TEST_SUITE contains invalid characters (only letters, slashes, and dashes allowed)."
           exit 1
           else
           echo "TEST_SUITE is valid."
