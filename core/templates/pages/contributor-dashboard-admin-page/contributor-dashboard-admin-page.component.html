@@ -187,9 +187,8 @@
         </label>
         <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
           <select id="remove-contribution-rights-language-select"
-                  [(ngModel)]="formData.removeContributionReviewer.languageCode" [ngModelOptions]="{standalone: true}"
-                  class="form-control e2e-test-form-language-select"
-                  ng-options="language.id as language.description for language in languageCodesAndDescriptions">
+            [(ngModel)]="formData.removeContributionReviewer.languageCode"
+            [ngModelOptions]="{standalone: true}" class="form-control e2e-test-form-language-select">
             <option *ngFor="let language of languageCodesAndDescriptions" [value]="language.id">
               {{ language.description }}
             </option>

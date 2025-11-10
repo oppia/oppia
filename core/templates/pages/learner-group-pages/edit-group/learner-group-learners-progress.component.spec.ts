@@ -76,9 +76,9 @@ describe('LearnerGroupLearnersProgressComponent', () => {
     outline_is_finalized: false,
     thumbnail_bg_color: '#a33f40',
     status: 'Published',
-    planned_publication_date_msecs: 100.0,
-    last_modified_msecs: 100.0,
-    first_publication_date_msecs: 200.0,
+    planned_publication_date_msecs: 100,
+    last_modified_msecs: 100,
+    first_publication_date_msecs: 200,
     unpublishing_reason: null,
   };
   const sampleStorySummaryBackendDict = {
@@ -244,6 +244,7 @@ describe('LearnerGroupLearnersProgressComponent', () => {
     const chapterProgressSummaryDict = {
       total_checkpoints_count: 6,
       visited_checkpoints_count: 4,
+      is_chapter_complete: false,
     };
     const chaptersProgress = ChapterProgressSummary.createFromBackendDict(
       chapterProgressSummaryDict

@@ -22,22 +22,18 @@ import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
 import {AnswerStats} from 'domain/exploration/answer-stats.model';
 import {AnswerStatsBackendDict} from 'domain/exploration/visualization-info.model';
-import {StateBackendDict} from 'domain/state/StateObjectFactory';
+import {StateBackendDict} from 'domain/state/state.model';
 import {Rule} from 'domain/exploration/rule.model';
-import {StateTopAnswersStats} from 'domain/statistics/state-top-answers-stats-object.factory';
+import {StateTopAnswersStats} from 'domain/statistics/state-top-answers-stats.model';
 import {StateTopAnswersStatsService} from 'services/state-top-answers-stats.service';
 import {StateTopAnswersStatsBackendApiService} from 'services/state-top-answers-stats-backend-api.service';
-import {
-  States,
-  StatesObjectFactory,
-} from 'domain/exploration/StatesObjectFactory';
+import {States} from 'domain/exploration/states.model';
 
 const joC = jasmine.objectContaining;
 
 describe('StateTopAnswersStatsService', () => {
   let stateTopAnswersStatsBackendApiService: StateTopAnswersStatsBackendApiService;
   let stateTopAnswersStatsService: StateTopAnswersStatsService;
-  let statesObjectFactory: StatesObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({imports: [HttpClientTestingModule]});
@@ -46,7 +42,6 @@ describe('StateTopAnswersStatsService', () => {
       StateTopAnswersStatsBackendApiService
     );
     stateTopAnswersStatsService = TestBed.get(StateTopAnswersStatsService);
-    statesObjectFactory = TestBed.get(StatesObjectFactory);
   });
 
   const expId = '7';
@@ -109,19 +104,12 @@ describe('StateTopAnswersStatsService', () => {
       solution: null,
     },
     classifier_model_id: null,
-    recorded_voiceovers: {
-      voiceovers_mapping: {
-        content: {},
-        default_outcome: {},
-        feedback_1: {},
-      },
-    },
     solicit_answer_details: false,
     card_is_checkpoint: false,
   };
 
   const makeStates = (statesBackendDict = {Hola: stateBackendDict}): States => {
-    return statesObjectFactory.createFromBackendDict(statesBackendDict);
+    return States.createFromBackendDict(statesBackendDict);
   };
 
   const spyOnBackendApiFetchStatsAsync = (

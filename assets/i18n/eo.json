@@ -416,6 +416,5 @@
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Instrui per Oppia",
 	"I18N_TOPNAV_TOPICS_AND_SKILLS_DASHBOARD": "Stirpanelo pri Temoj kaj Kapabloj",
 	"I18N_TOTAL_SUBSCRIBERS_TEXT": "Vi havas <[totalSubscribers]> abonantojn entute.",
-	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Malaboni",
-	"I18N_WORKED_EXAMPLE": "Solvita Ekzemplo"
+	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Malaboni"
 }

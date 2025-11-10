@@ -2,7 +2,7 @@
 
   <div class="oppia-about-hero-section">
     <div class="oppia-about-hero-section-content">
-      <h2 class="oppia-about-hero-title">
+      <h2 class="oppia-about-hero-title e2e-test-about-us-title">
         {{ 'I18N_ABOUT_PAGE_HERO_SECTION_TITLE' | translate }}
       </h2>
       <p class="oppia-about-hero-subtext">
@@ -14,7 +14,7 @@
   <div class="oppia-about-foundation-section">
     <div class="oppia-about-foundation-section-right">
       <div class="oppia-about-foundation-section-products">
-        <p class="oppia-about-title-new">
+        <p class="oppia-about-title-new e2e-test-about-page-title-new">
           {{ 'I18N_ABOUT_PAGE_FOUNDATION_SECTION_TITLE' | translate }}
         </p>
         <p class="oppia-about-section-subtext-new">
@@ -116,7 +116,7 @@
       </div>
     </div>
     <div class="oppia-about-platform-section-right">
-      <p class="oppia-about-title-new">
+      <p class="oppia-about-title-new e2e-test-about-page-title-new">
         {{ 'I18N_ABOUT_PAGE_PLATFORM_SECTION_TITLE' | translate }}
       </p>
       <div class="oppia-about-platform-content">
@@ -131,13 +131,13 @@
         <oppia-primary-button
           buttonHref="/learn"
           (onClickPrimaryButton)="onClickExploreLessonsButton()"
-          [customClasses]="['oppia-about-platform-button', 'oppia-about-platform-subtext']"
+          [customClasses]="['oppia-about-platform-button', 'oppia-about-platform-subtext', 'e2e-test-about-page-explore-lessons-button']"
           buttonText="{{ 'I18N_ACTION_EXPLORE_LESSONS' | translate }}">
         </oppia-primary-button>
         <oppia-primary-button
           buttonHref="/android"
           (onClickPrimaryButton)="onClickGetAndroidAppButton()"
-          [customClasses]="['oppia-about-platform-button', 'oppia-about-secondary-button', 'oppia-about-platform-subtext']"
+          [customClasses]="['oppia-about-platform-button', 'oppia-about-secondary-button', 'oppia-about-platform-subtext', 'e2e-test-about-page-android-button']"
           buttonText="{{ 'I18N_ACTION_GET_ANDRIOD_APP' | translate }}">
         </oppia-primary-button>
       </div>
@@ -146,7 +146,7 @@
 
   <div class="oppia-about-partnerships-section">
     <div class="oppia-about-partnerships-top">
-      <p class="oppia-about-title-new">
+      <p class="oppia-about-title-new e2e-test-about-page-title-new">
         {{ 'I18N_ABOUT_PAGE_PARTNERSHIPS_SECTION_TITLE' | translate }}
       </p>
       <p class="oppia-about-section-subtext-new">
@@ -217,7 +217,7 @@
 
   <div class="oppia-about-impact-section">
     <div class="oppia-about-impact-section-top">
-      <p class="oppia-about-title-new">
+      <p class="oppia-about-title-new e2e-test-about-page-title-new">
         {{ 'I18N_ABOUT_PAGE_IMPACT_SECTION_TITLE' | translate }}
       </p>
       <div class="oppia-about-impact-desktop-content oppia-about-impact-content">
@@ -234,7 +234,7 @@
       <div class="oppia-about-impact-section-stats" >
         <div class="oppia-about-impact-section-stat-container">
           <div class="oppia-about-impact-section-stat">
-            <p class="oppia-about-impact-section-stat-title">
+            <p class="oppia-about-impact-section-stat-title e2e-test-about-oppia-impact-stat-title">
               {{ 'I18N_ABOUT_PAGE_IMPACT_SECTION_STAT1_TITLE' | translate }}
             </p>
           </div>
@@ -244,7 +244,7 @@
         </div>
         <div class="oppia-about-impact-section-stat-container">
           <div class="oppia-about-impact-section-stat">
-            <p class="oppia-about-impact-section-stat-title">
+            <p class="oppia-about-impact-section-stat-title e2e-test-about-oppia-impact-stat-title">
               {{ 'I18N_ABOUT_PAGE_IMPACT_SECTION_STAT2_TITLE' | translate }}
             </p>
           </div>
@@ -254,7 +254,7 @@
         </div>
         <div class="oppia-about-impact-section-stat-container">
           <div class="oppia-about-impact-section-stat">
-            <p class="oppia-about-impact-section-stat-title">
+            <p class="oppia-about-impact-section-stat-title e2e-test-about-oppia-impact-stat-title">
               {{ 'I18N_ABOUT_PAGE_IMPACT_SECTION_STAT3_TITLE' | translate }}
             </p>
           </div>
@@ -264,7 +264,7 @@
         </div>
         <div class="oppia-about-impact-section-stat-container">
           <div class="oppia-about-impact-section-stat">
-            <p class="oppia-about-impact-section-stat-title">
+            <p class="oppia-about-impact-section-stat-title e2e-test-about-oppia-impact-stat-title">
               {{ 'I18N_ABOUT_PAGE_IMPACT_SECTION_STAT4_TITLE' | translate }}
             </p>
           </div>
@@ -276,7 +276,7 @@
     </div>
 
     <div class="oppia-about-impact-charts-container">
-      <div class="oppia-about-impact-chart-container">
+      <div class="oppia-about-impact-chart-container e2e-test-about-impact-chart-container">
         <p class="oppia-about-section-subtext-new"
            [innerHTML]="'I18N_ABOUT_PAGE_IMPACT_SECTION_TOP_10_COUNTRIES_TEXT_WEBSITE' | translate">
         </p>
@@ -290,7 +290,7 @@
           </oppia-bar-chart>
         </div>
       </div>
-      <div class="oppia-about-impact-chart-container">
+      <div class="oppia-about-impact-chart-container e2e-test-about-impact-chart-container">
         <p class="oppia-about-section-subtext-new"
            [innerHTML]="'I18N_ABOUT_PAGE_IMPACT_SECTION_TOP_10_COUNTRIES_TEXT_ANDROID' | translate">
         </p>

@@ -21,8 +21,8 @@ import {ChangeDetectorRef, NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
-import {MisconceptionObjectFactory} from 'domain/skill/MisconceptionObjectFactory';
-import {Skill, SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
+import {Misconception} from 'domain/skill/misconception.model';
+import {Skill} from 'domain/skill/skill.model';
 import {SkillEditorStateService} from '../services/skill-editor-state.service';
 import {AddMisconceptionModalComponent} from './add-misconception-modal.component';
 
@@ -40,9 +40,7 @@ describe('Add Misconception Modal Component', function () {
   let component: AddMisconceptionModalComponent;
   let fixture: ComponentFixture<AddMisconceptionModalComponent>;
   let ngbActiveModal: NgbActiveModal;
-  let misconceptionObjectFactory: MisconceptionObjectFactory;
   let skillEditorStateService: SkillEditorStateService;
-  let skillObjectFactory: SkillObjectFactory;
   let skillObject: Skill;
 
   beforeEach(waitForAsync(() => {
@@ -64,9 +62,7 @@ describe('Add Misconception Modal Component', function () {
   beforeEach(() => {
     fixture = TestBed.createComponent(AddMisconceptionModalComponent);
     component = fixture.componentInstance;
-    misconceptionObjectFactory = TestBed.inject(MisconceptionObjectFactory);
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
-    skillObjectFactory = TestBed.inject(SkillObjectFactory);
     ngbActiveModal = TestBed.inject(NgbActiveModal);
 
     let misconceptionDict1 = {
@@ -92,12 +88,11 @@ describe('Add Misconception Modal Component', function () {
         html: 'test explanation',
         content_id: 'explanation',
       },
-      worked_examples: [],
       recorded_voiceovers: {
         voiceovers_mapping: {},
       },
     };
-    skillObject = skillObjectFactory.createFromBackendDict({
+    skillObject = Skill.createFromBackendDict({
       id: 'skill1',
       description: 'test description 1',
       misconceptions: [misconceptionDict1, misconceptionDict2],
@@ -134,7 +129,7 @@ describe('Add Misconception Modal Component', function () {
     component.saveMisconception();
 
     expect(ngbActiveModal.close).toHaveBeenCalledWith({
-      misconception: misconceptionObjectFactory.create(3, '', '', '', true),
+      misconception: Misconception.create(3, '', '', '', true),
     });
   });
 

@@ -20,35 +20,25 @@ import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {TestBed, waitForAsync} from '@angular/core/testing';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {QuestionBackendDict, Question} from 'domain/question/question.model';
 import {
-  QuestionBackendDict,
-  QuestionObjectFactory,
-} from 'domain/question/QuestionObjectFactory';
-import {
-  MisconceptionObjectFactory,
+  Misconception,
   MisconceptionSkillMap,
-} from 'domain/skill/MisconceptionObjectFactory';
+} from 'domain/skill/misconception.model';
 import {ResponsesService} from 'pages/exploration-editor-page/editor-tab/services/responses.service';
 import {QuestionValidationService} from './question-validation.service';
-import {AnswerGroupObjectFactory} from 'domain/exploration/AnswerGroupObjectFactory';
-import {
-  Outcome,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {Rule} from 'domain/exploration/rule.model';
 
 describe('Question Validation Service', () => {
-  let misconceptionObjectFactory: MisconceptionObjectFactory;
   let mockMisconceptionObject: MisconceptionSkillMap;
   let mockQuestionDict: QuestionBackendDict;
-  let questionObjectFactory: QuestionObjectFactory;
   let qvs: QuestionValidationService;
   let rs: ResponsesService;
   let ses: StateEditorService;
   let shouldHideDefaultAnswerGroupSpy: jasmine.Spy;
   let goodDefaultOutcome: Outcome;
-  let oof: OutcomeObjectFactory;
-  let agof: AnswerGroupObjectFactory;
   let createAnswerGroupByRules: (rules: Rule[]) => AnswerGroup;
 
   beforeEach(waitForAsync(() => {
@@ -60,17 +50,15 @@ describe('Question Validation Service', () => {
   }));
 
   beforeEach(() => {
-    misconceptionObjectFactory = TestBed.inject(MisconceptionObjectFactory);
     qvs = TestBed.inject(QuestionValidationService);
     rs = TestBed.inject(ResponsesService);
     ses = TestBed.inject(StateEditorService);
-    questionObjectFactory = TestBed.inject(QuestionObjectFactory);
     spyOn(qvs, 'getInteractionValidationErrorMessage').and.returnValue(null);
     spyOn(ses, 'isCurrentSolutionValid').and.returnValue(true);
     shouldHideDefaultAnswerGroupSpy = spyOn(rs, 'shouldHideDefaultAnswerGroup');
     shouldHideDefaultAnswerGroupSpy.and.returnValue(false);
     createAnswerGroupByRules = rules =>
-      agof.createNew(rules, goodDefaultOutcome, [], null);
+      AnswerGroup.createNew(rules, goodDefaultOutcome, [], null);
   });
 
   beforeEach(() => {
@@ -163,15 +151,6 @@ describe('Question Validation Service', () => {
           id: 'TextInput',
         },
         param_changes: [],
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content_1: {},
-            content_2: {},
-            content_3: {},
-            content_4: {},
-            content_5: {},
-          },
-        },
         solicit_answer_details: false,
       },
       language_code: 'en',
@@ -181,20 +160,8 @@ describe('Question Validation Service', () => {
     } as unknown as QuestionBackendDict;
     mockMisconceptionObject = {
       abc: [
-        misconceptionObjectFactory.create(
-          1,
-          'misc1',
-          'notes1',
-          'feedback1',
-          true
-        ),
-        misconceptionObjectFactory.create(
-          2,
-          'misc2',
-          'notes2',
-          'feedback1',
-          false
-        ),
+        Misconception.create(1, 'misc1', 'notes1', 'feedback1', true),
+        Misconception.create(2, 'misc2', 'notes2', 'feedback1', false),
       ],
     };
   });
@@ -204,7 +171,7 @@ describe('Question Validation Service', () => {
     interaction.answer_groups[0].outcome.labelled_as_correct = false;
     expect(
       qvs.isQuestionValid(
-        questionObjectFactory.createFromBackendDict(mockQuestionDict),
+        Question.createFromBackendDict(mockQuestionDict),
         mockMisconceptionObject
       )
     ).toBeFalse();
@@ -215,7 +182,7 @@ describe('Question Validation Service', () => {
     interaction.answer_groups[1].tagged_skill_misconception_id = null;
     expect(
       qvs.isQuestionValid(
-        questionObjectFactory.createFromBackendDict(mockQuestionDict),
+        Question.createFromBackendDict(mockQuestionDict),
         mockMisconceptionObject
       )
     ).toBeFalse();
@@ -225,7 +192,7 @@ describe('Question Validation Service', () => {
     ses.isCurrentSolutionValid = () => false;
     expect(
       qvs.isQuestionValid(
-        questionObjectFactory.createFromBackendDict(mockQuestionDict),
+        Question.createFromBackendDict(mockQuestionDict),
         mockMisconceptionObject
       )
     ).toBeFalse();
@@ -234,11 +201,8 @@ describe('Question Validation Service', () => {
   it('should return an error message if interaction has errors', () => {
     const originalSpy = qvs.getInteractionValidationErrorMessage as jasmine.Spy;
     originalSpy.and.callThrough();
-    const question =
-      questionObjectFactory.createFromBackendDict(mockQuestionDict);
-    oof = TestBed.inject(OutcomeObjectFactory);
-    agof = TestBed.inject(AnswerGroupObjectFactory);
-    goodDefaultOutcome = oof.createFromBackendDict({
+    const question = Question.createFromBackendDict(mockQuestionDict);
+    goodDefaultOutcome = Outcome.createFromBackendDict({
       dest: null,
       dest_if_really_stuck: null,
       feedback: {
@@ -287,15 +251,14 @@ describe('Question Validation Service', () => {
     expect(errorMessage).toBe(
       'Learner answer 1 from Oppia response 2 will never be matched' +
         " because it is preceded by a 'Equals' answer" +
-        ' with a matching input.'
+        ' with a matching input'
     );
 
     originalSpy.and.returnValue(null);
   });
 
   it('should return true if validation is successful', () => {
-    let question =
-      questionObjectFactory.createFromBackendDict(mockQuestionDict);
+    let question = Question.createFromBackendDict(mockQuestionDict);
     expect(qvs.isQuestionValid(question, mockMisconceptionObject)).toBeTrue();
   });
 
@@ -305,8 +268,7 @@ describe('Question Validation Service', () => {
 
   describe('getValidationErrorMessage()', () => {
     it('should return null when there are no errors', () => {
-      const question =
-        questionObjectFactory.createFromBackendDict(mockQuestionDict);
+      const question = Question.createFromBackendDict(mockQuestionDict);
       expect(qvs.getValidationErrorMessage(question)).toBeNull();
     });
 
@@ -316,8 +278,7 @@ describe('Question Validation Service', () => {
       // error because the object is initialized in the beforeEach().
       // @ts-ignore
       interaction.default_outcome.feedback.html = '';
-      const question =
-        questionObjectFactory.createFromBackendDict(mockQuestionDict);
+      const question = Question.createFromBackendDict(mockQuestionDict);
 
       expect(qvs.getValidationErrorMessage(question)).toEqual(
         "Please enter feedback for the '[All other answers]' outcome."
@@ -334,8 +295,7 @@ describe('Question Validation Service', () => {
         // error because the object is initialized in the beforeEach().
         // @ts-ignore
         interaction.default_outcome.feedback.html = '';
-        const question =
-          questionObjectFactory.createFromBackendDict(mockQuestionDict);
+        const question = Question.createFromBackendDict(mockQuestionDict);
 
         expect(qvs.getValidationErrorMessage(question)).toBeNull();
       }
@@ -344,8 +304,7 @@ describe('Question Validation Service', () => {
     it('should return error message if no answer is marked correct', () => {
       const interaction = mockQuestionDict.question_state_data.interaction;
       interaction.answer_groups[0].outcome.labelled_as_correct = false;
-      const question =
-        questionObjectFactory.createFromBackendDict(mockQuestionDict);
+      const question = Question.createFromBackendDict(mockQuestionDict);
 
       expect(qvs.getValidationErrorMessage(question)).toEqual(
         'At least one answer should be marked correct'
@@ -355,8 +314,7 @@ describe('Question Validation Service', () => {
     it('should return error message if no solution', () => {
       const interaction = mockQuestionDict.question_state_data.interaction;
       interaction.solution = null;
-      const question =
-        questionObjectFactory.createFromBackendDict(mockQuestionDict);
+      const question = Question.createFromBackendDict(mockQuestionDict);
 
       expect(qvs.getValidationErrorMessage(question)).toEqual(
         'A solution must be specified'
@@ -366,8 +324,7 @@ describe('Question Validation Service', () => {
     it('should return error message if no hint', () => {
       const interaction = mockQuestionDict.question_state_data.interaction;
       interaction.hints = [];
-      const question =
-        questionObjectFactory.createFromBackendDict(mockQuestionDict);
+      const question = Question.createFromBackendDict(mockQuestionDict);
 
       expect(qvs.getValidationErrorMessage(question)).toEqual(
         'At least 1 hint should be specified'
@@ -377,8 +334,7 @@ describe('Question Validation Service', () => {
     it('should return error message if no interaction', () => {
       const interaction = mockQuestionDict.question_state_data.interaction;
       interaction.id = null;
-      const question =
-        questionObjectFactory.createFromBackendDict(mockQuestionDict);
+      const question = Question.createFromBackendDict(mockQuestionDict);
 
       expect(qvs.getValidationErrorMessage(question)).toEqual(
         'An interaction must be specified'
@@ -388,8 +344,7 @@ describe('Question Validation Service', () => {
     it('should return error message if no question content', () => {
       const questionContent = mockQuestionDict.question_state_data.content;
       questionContent.html = '';
-      const question =
-        questionObjectFactory.createFromBackendDict(mockQuestionDict);
+      const question = Question.createFromBackendDict(mockQuestionDict);
 
       expect(qvs.getValidationErrorMessage(question)).toEqual(
         'Please enter a question.'

@@ -27,19 +27,14 @@ import {
   StateEditorService,
 } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import {StateRecordedVoiceoversService} from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
 import {StateSolutionService} from 'components/state-editor/state-editor-properties-services/state-solution.service';
-import {StateWrittenTranslationsService} from 'components/state-editor/state-editor-properties-services/state-written-translations.service';
-import {AnswerGroupObjectFactory} from 'domain/exploration/AnswerGroupObjectFactory';
-import {OutcomeObjectFactory} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
-import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {Rule} from 'domain/exploration/rule.model';
-import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
+import {StateObjectsBackendDict} from 'domain/exploration/states.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {SubtitledUnicodeObjectFactory} from 'domain/exploration/SubtitledUnicodeObjectFactory';
-import {NumberWithUnitsObjectFactory} from 'domain/objects/NumberWithUnitsObjectFactory';
-import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
+import {EntityTranslation} from 'domain/translation/entity-translation.model';
 import {ParameterizeRuleDescriptionPipe} from 'filters/parameterize-rule-description.pipe';
 import {ConvertToPlainTextPipe} from 'filters/string-utility-filters/convert-to-plain-text.pipe';
 import {WrapTextWithEllipsisPipe} from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
@@ -49,7 +44,7 @@ import {TextInputRulesService} from 'interactions/TextInput/directives/text-inpu
 import {AngularNameService} from 'pages/exploration-editor-page/services/angular-name.service';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {StateEditorRefreshService} from 'pages/exploration-editor-page/services/state-editor-refresh.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {ExplorationImprovementsTaskRegistryService} from 'services/exploration-improvements-task-registry.service';
@@ -59,11 +54,9 @@ import {TranslationTabActiveContentIdService} from '../services/translation-tab-
 import {TranslationTabActiveModeService} from '../services/translation-tab-active-mode.service';
 import {StateTranslationComponent} from './state-translation.component';
 import {RouterService} from 'pages/exploration-editor-page/services/router.service';
-import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
+import {TranslatedContent} from 'domain/exploration/translated-content.model';
 import {Hint} from 'domain/exploration/hint-object.model';
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
-import {PlatformFeatureService} from 'services/platform-feature.service';
-import {FeatureStatusChecker} from 'domain/feature-flag/feature-status-summary.model';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 
 const DEFAULT_OBJECT_VALUES = require('objects/object_defaults.json');
 
@@ -71,19 +64,6 @@ class MockNgbModal {
   open() {
     return {
       result: Promise.resolve(),
-    };
-  }
-}
-
-class MockPlatformFeatureService {
-  get status(): object {
-    return {
-      EnableVoiceoverContribution: {
-        isEnabled: true,
-      },
-      AddVoiceoverWithAccent: {
-        isEnabled: false,
-      },
     };
   }
 }
@@ -122,18 +102,13 @@ class MockConvertToPlainTextPipe {
 describe('State translation component', () => {
   let component: StateTranslationComponent;
   let fixture: ComponentFixture<StateTranslationComponent>;
-  let answerGroupObjectFactory: AnswerGroupObjectFactory;
   let ckEditorCopyContentService: CkEditorCopyContentService;
   let entityTranslationsService: EntityTranslationsService;
   let explorationStatesService: ExplorationStatesService;
-  let outcomeObjectFactory: OutcomeObjectFactory;
   let stateEditorService: StateEditorService;
-  let stateRecordedVoiceoversService: StateRecordedVoiceoversService;
-  let subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory;
   let translationLanguageService: TranslationLanguageService;
   let translationTabActiveContentIdService: TranslationTabActiveContentIdService;
   let translationTabActiveModeService: TranslationTabActiveModeService;
-  let platformFeatureService: PlatformFeatureService;
 
   let explorationState1 = {
     Introduction: {
@@ -251,31 +226,12 @@ describe('State translation component', () => {
       linked_skill_id: null,
       param_changes: [],
       solicit_answer_details: false,
-      recorded_voiceovers: {
-        voiceovers_mapping: {},
-      },
     },
   } as StateObjectsBackendDict;
 
-  let recordedVoiceovers = {
-    voiceovers_mapping: {
-      content: {},
-      default_outcome: {},
-      content_1: {},
-      feedback_1: {},
-      hint_1: {},
-      solution: {},
-      solution_1: {},
-      ca_placeholder: {},
-      ca_fakePlaceholder: {},
-      rule_input_4: {},
-      rule_input_5: {},
-    },
-  };
-
   let refreshStateTranslationEmitter = new EventEmitter();
 
-  class MockContextService {
+  class MockPageContextService {
     getExplorationId() {
       return 'expId';
     }
@@ -295,21 +251,17 @@ describe('State translation component', () => {
         WrapTextWithEllipsisPipe,
         ConvertToPlainTextPipe,
         AngularNameService,
-        {provide: ContextService, useClass: MockContextService},
+        {provide: PageContextService, useClass: MockPageContextService},
         ContinueValidationService,
         ContinueRulesService,
         ExplorationImprovementsTaskRegistryService,
         ExplorationStatesService,
         ExternalSaveService,
-        NumberWithUnitsObjectFactory,
         TextInputRulesService,
-        OutcomeObjectFactory,
         StateCustomizationArgsService,
         StateInteractionIdService,
         StateEditorRefreshService,
-        StateRecordedVoiceoversService,
         StateSolutionService,
-        StateWrittenTranslationsService,
         ReadOnlyExplorationBackendApiService,
         StateEditorService,
         TranslationLanguageService,
@@ -327,10 +279,6 @@ describe('State translation component', () => {
           provide: WrapTextWithEllipsisPipe,
           useClass: MockWrapTextWithEllipsisPipe,
         },
-        {
-          provide: PlatformFeatureService,
-          useClass: MockPlatformFeatureService,
-        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -340,17 +288,9 @@ describe('State translation component', () => {
     fixture = TestBed.createComponent(StateTranslationComponent);
     component = fixture.componentInstance;
 
-    answerGroupObjectFactory = TestBed.inject(AnswerGroupObjectFactory);
     ckEditorCopyContentService = TestBed.inject(CkEditorCopyContentService);
-    outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
     stateEditorService = TestBed.inject(StateEditorService);
     explorationStatesService = TestBed.inject(ExplorationStatesService);
-    stateRecordedVoiceoversService = TestBed.inject(
-      StateRecordedVoiceoversService
-    );
-    subtitledUnicodeObjectFactory = TestBed.inject(
-      SubtitledUnicodeObjectFactory
-    );
     translationLanguageService = TestBed.inject(TranslationLanguageService);
     translationTabActiveContentIdService = TestBed.inject(
       TranslationTabActiveContentIdService
@@ -358,12 +298,7 @@ describe('State translation component', () => {
     translationTabActiveModeService = TestBed.inject(
       TranslationTabActiveModeService
     );
-    platformFeatureService = TestBed.inject(PlatformFeatureService);
     explorationStatesService.init(explorationState1, false);
-    stateRecordedVoiceoversService.init(
-      'Introduction',
-      RecordedVoiceovers.createFromBackendDict(recordedVoiceovers)
-    );
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
     entityTranslationsService.init('exp1', 'exploration', 5);
     entityTranslationsService.entityTranslation =
@@ -392,11 +327,6 @@ describe('State translation component', () => {
     ).and.returnValue(true);
 
     explorationStatesService.init(explorationState1, false);
-    stateRecordedVoiceoversService.init(
-      'Introduction',
-      RecordedVoiceovers.createFromBackendDict(recordedVoiceovers)
-    );
-
     component.isTranslationTabBusy = false;
     component.stateName = 'Introduction';
 
@@ -421,48 +351,6 @@ describe('State translation component', () => {
         expect(
           translationTabActiveContentIdService.setActiveContent
         ).toHaveBeenCalledWith('content_1', 'html');
-      });
-
-      it('should get disabled voiceover contribution feature flag data', () => {
-        spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
-          EnableVoiceoverContribution: {
-            isEnabled: false,
-          },
-        } as FeatureStatusChecker);
-
-        expect(component.isVoiceoverContributionEnabled()).toBeFalse();
-      });
-
-      it('should get enabled voiceover contribution feature flag data', () => {
-        spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
-          EnableVoiceoverContribution: {
-            isEnabled: true,
-          },
-        } as FeatureStatusChecker);
-
-        expect(component.isVoiceoverContributionEnabled()).toBeTrue();
-      });
-
-      it('should disable voiceover with accent feature flag data', () => {
-        spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
-          AddVoiceoverWithAccent: {
-            isEnabled: false,
-          },
-        } as FeatureStatusChecker);
-
-        expect(
-          component.isVoiceoverContributionWithAccentEnabled()
-        ).toBeFalse();
-      });
-
-      it('should enable voiceover with accent feature flag data', () => {
-        spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
-          AddVoiceoverWithAccent: {
-            isEnabled: true,
-          },
-        } as FeatureStatusChecker);
-
-        expect(component.isVoiceoverContributionWithAccentEnabled()).toBeTrue();
       });
 
       it(
@@ -729,11 +617,10 @@ describe('State translation component', () => {
       });
 
       it('should get subtitled Unicode data translation', () => {
-        let subtitledObject =
-          subtitledUnicodeObjectFactory.createFromBackendDict({
-            content_id: 'content_1',
-            unicode_str: 'This is the unicode',
-          });
+        let subtitledObject = SubtitledUnicode.createFromBackendDict({
+          content_id: 'content_1',
+          unicode_str: 'This is the unicode',
+        });
         expect(component.getRequiredUnicode(subtitledObject)).toBe(
           'This is the unicode'
         );
@@ -756,7 +643,7 @@ describe('State translation component', () => {
       it('should get summary default outcome when outcome is linear', () => {
         expect(
           component.summarizeDefaultOutcome(
-            outcomeObjectFactory.createNew('unused', '1', 'Feedback Text', []),
+            Outcome.createNew('unused', '1', 'Feedback Text', []),
             'Continue',
             0,
             'true'
@@ -770,12 +657,7 @@ describe('State translation component', () => {
         () => {
           expect(
             component.summarizeDefaultOutcome(
-              outcomeObjectFactory.createNew(
-                'unused',
-                '1',
-                'Feedback Text',
-                []
-              ),
+              Outcome.createNew('unused', '1', 'Feedback Text', []),
               'TextInput',
               1,
               'true'
@@ -790,12 +672,7 @@ describe('State translation component', () => {
         () => {
           expect(
             component.summarizeDefaultOutcome(
-              outcomeObjectFactory.createNew(
-                'unused',
-                '1',
-                'Feedback Text',
-                []
-              ),
+              Outcome.createNew('unused', '1', 'Feedback Text', []),
               'TextInput',
               0,
               'true'
@@ -813,14 +690,10 @@ describe('State translation component', () => {
       it('should get summary answer group', () => {
         expect(
           component.summarizeAnswerGroup(
-            answerGroupObjectFactory.createNew(
+            AnswerGroup.createNew(
               [],
-              outcomeObjectFactory.createNew(
-                'unused',
-                '1',
-                'Feedback text',
-                []
-              ),
+              Outcome.createNew('unused', '1', 'Feedback text', []),
+              Outcome.createNew('unused', '1', 'Feedback text', []),
               null,
               '0'
             ),
@@ -841,8 +714,6 @@ describe('State translation component', () => {
   let entityTranslationsService: EntityTranslationsService;
   let explorationStatesService: ExplorationStatesService;
   let stateEditorService: StateEditorService;
-  let stateRecordedVoiceoversService: StateRecordedVoiceoversService;
-  let subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory;
   let translationLanguageService: TranslationLanguageService;
   let translationTabActiveContentIdService: TranslationTabActiveContentIdService;
   let translationTabActiveModeService: TranslationTabActiveModeService;
@@ -960,32 +831,13 @@ describe('State translation component', () => {
       linked_skill_id: null,
       param_changes: [],
       solicit_answer_details: false,
-      recorded_voiceovers: {
-        voiceovers_mapping: {},
-      },
     },
   } as StateObjectsBackendDict;
-
-  let recordedVoiceovers = {
-    voiceovers_mapping: {
-      content: {},
-      default_outcome: {},
-      content_1: {},
-      feedback_1: {},
-      hint_1: {},
-      solution: {},
-      solution_1: {},
-      ca_placeholder: {},
-      ca_fakePlaceholder: {},
-      rule_input_4: {},
-      rule_input_5: {},
-    },
-  };
 
   let refreshStateTranslationEmitter = new EventEmitter();
   let showTranslationTabBusyModalEmitter = new EventEmitter();
 
-  class MockContextService {
+  class MockPageContextService {
     getExplorationId() {
       return 'expId';
     }
@@ -1005,21 +857,17 @@ describe('State translation component', () => {
         WrapTextWithEllipsisPipe,
         ConvertToPlainTextPipe,
         AngularNameService,
-        {provide: ContextService, useClass: MockContextService},
+        {provide: PageContextService, useClass: MockPageContextService},
         ContinueValidationService,
         ContinueRulesService,
         ExplorationImprovementsTaskRegistryService,
         ExplorationStatesService,
         ExternalSaveService,
-        NumberWithUnitsObjectFactory,
         TextInputRulesService,
-        OutcomeObjectFactory,
         StateCustomizationArgsService,
         StateInteractionIdService,
         StateEditorRefreshService,
-        StateRecordedVoiceoversService,
         StateSolutionService,
-        StateWrittenTranslationsService,
         ReadOnlyExplorationBackendApiService,
         StateEditorService,
         TranslationLanguageService,
@@ -1037,10 +885,6 @@ describe('State translation component', () => {
           provide: WrapTextWithEllipsisPipe,
           useClass: MockWrapTextWithEllipsisPipe,
         },
-        {
-          provide: PlatformFeatureService,
-          useClass: MockPlatformFeatureService,
-        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -1053,12 +897,6 @@ describe('State translation component', () => {
     ckEditorCopyContentService = TestBed.inject(CkEditorCopyContentService);
     stateEditorService = TestBed.inject(StateEditorService);
     explorationStatesService = TestBed.inject(ExplorationStatesService);
-    stateRecordedVoiceoversService = TestBed.inject(
-      StateRecordedVoiceoversService
-    );
-    subtitledUnicodeObjectFactory = TestBed.inject(
-      SubtitledUnicodeObjectFactory
-    );
     translationLanguageService = TestBed.inject(TranslationLanguageService);
     translationTabActiveContentIdService = TestBed.inject(
       TranslationTabActiveContentIdService
@@ -1067,10 +905,6 @@ describe('State translation component', () => {
       TranslationTabActiveModeService
     );
     explorationStatesService.init(explorationState1, false);
-    stateRecordedVoiceoversService.init(
-      'Introduction',
-      RecordedVoiceovers.createFromBackendDict(recordedVoiceovers)
-    );
 
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
     entityTranslationsService.init('exp1', 'exploration', 5);
@@ -1099,10 +933,6 @@ describe('State translation component', () => {
     ).and.returnValue(false);
 
     explorationStatesService.init(explorationState1, false);
-    stateRecordedVoiceoversService.init(
-      'Introduction',
-      RecordedVoiceovers.createFromBackendDict(recordedVoiceovers)
-    );
     spyOnProperty(
       stateEditorService,
       'onShowTranslationTabBusyModal'
@@ -1267,11 +1097,10 @@ describe('State translation component', () => {
           'This is the html'
         );
 
-        let subtitledObjectBack =
-          subtitledUnicodeObjectFactory.createFromBackendDict({
-            content_id: 'content_1',
-            unicode_str: 'This is the unicode',
-          });
+        let subtitledObjectBack = SubtitledUnicode.createFromBackendDict({
+          content_id: 'content_1',
+          unicode_str: 'This is the unicode',
+        });
         expect(component.getSubtitledContentSummary(subtitledObjectBack)).toBe(
           'This is the unicode'
         );
@@ -1297,8 +1126,6 @@ describe('State translation component', () => {
   let entityTranslationsService: EntityTranslationsService;
   let explorationStatesService: ExplorationStatesService;
   let stateEditorService: StateEditorService;
-  let stateRecordedVoiceoversService: StateRecordedVoiceoversService;
-  let subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory;
   let translationLanguageService: TranslationLanguageService;
   let translationTabActiveContentIdService: TranslationTabActiveContentIdService;
   let translationTabActiveModeService: TranslationTabActiveModeService;
@@ -1417,9 +1244,6 @@ describe('State translation component', () => {
       linked_skill_id: null,
       param_changes: [],
       solicit_answer_details: false,
-      recorded_voiceovers: {
-        voiceovers_mapping: {},
-      },
     },
   } as StateObjectsBackendDict;
 
@@ -1484,31 +1308,12 @@ describe('State translation component', () => {
       linked_skill_id: null,
       param_changes: [],
       solicit_answer_details: false,
-      recorded_voiceovers: {
-        voiceovers_mapping: {},
-      },
     },
   } as StateObjectsBackendDict;
 
-  let recordedVoiceovers = {
-    voiceovers_mapping: {
-      content: {},
-      default_outcome: {},
-      content_1: {},
-      feedback_1: {},
-      hint_1: {},
-      solution: {},
-      solution_1: {},
-      ca_placeholder: {},
-      ca_fakePlaceholder: {},
-      rule_input_4: {},
-      rule_input_5: {},
-    },
-  };
-
   let refreshStateTranslationEmitter = new EventEmitter();
 
-  class MockContextService {
+  class MockPageContextService {
     getExplorationId() {
       return 'expId';
     }
@@ -1528,21 +1333,17 @@ describe('State translation component', () => {
         WrapTextWithEllipsisPipe,
         ConvertToPlainTextPipe,
         AngularNameService,
-        {provide: ContextService, useClass: MockContextService},
+        {provide: PageContextService, useClass: MockPageContextService},
         ContinueValidationService,
         ContinueRulesService,
         ExplorationImprovementsTaskRegistryService,
         ExplorationStatesService,
         ExternalSaveService,
-        NumberWithUnitsObjectFactory,
         TextInputRulesService,
-        OutcomeObjectFactory,
         StateCustomizationArgsService,
         StateInteractionIdService,
         StateEditorRefreshService,
-        StateRecordedVoiceoversService,
         StateSolutionService,
-        StateWrittenTranslationsService,
         ReadOnlyExplorationBackendApiService,
         StateEditorService,
         TranslationLanguageService,
@@ -1560,10 +1361,6 @@ describe('State translation component', () => {
           provide: WrapTextWithEllipsisPipe,
           useClass: MockWrapTextWithEllipsisPipe,
         },
-        {
-          provide: PlatformFeatureService,
-          useClass: MockPlatformFeatureService,
-        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -1576,12 +1373,6 @@ describe('State translation component', () => {
     ckEditorCopyContentService = TestBed.inject(CkEditorCopyContentService);
     stateEditorService = TestBed.inject(StateEditorService);
     explorationStatesService = TestBed.inject(ExplorationStatesService);
-    stateRecordedVoiceoversService = TestBed.inject(
-      StateRecordedVoiceoversService
-    );
-    subtitledUnicodeObjectFactory = TestBed.inject(
-      SubtitledUnicodeObjectFactory
-    );
     translationLanguageService = TestBed.inject(TranslationLanguageService);
     translationTabActiveContentIdService = TestBed.inject(
       TranslationTabActiveContentIdService
@@ -1591,10 +1382,6 @@ describe('State translation component', () => {
     );
     routerService = TestBed.inject(RouterService);
     explorationStatesService.init(explorationState1, false);
-    stateRecordedVoiceoversService.init(
-      'Introduction',
-      RecordedVoiceovers.createFromBackendDict(recordedVoiceovers)
-    );
 
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
     entityTranslationsService.init('exp1', 'exploration', 5);
@@ -1624,10 +1411,6 @@ describe('State translation component', () => {
     ).and.returnValue(true);
 
     explorationStatesService.init(explorationState2, false);
-    stateRecordedVoiceoversService.init(
-      'Introduction',
-      RecordedVoiceovers.createFromBackendDict(recordedVoiceovers)
-    );
 
     component.isTranslationTabBusy = false;
     component.stateName = 'Introduction';
@@ -1737,7 +1520,7 @@ describe('State translation component', () => {
       translationTabActiveModeService,
       'isTranslationModeActive'
     ).and.returnValue(true);
-    let subtitledObject = subtitledUnicodeObjectFactory.createFromBackendDict({
+    let subtitledObject = SubtitledUnicode.createFromBackendDict({
       content_id: 'content_1',
       unicode_str: 'This is the unicode',
     });
@@ -1763,7 +1546,7 @@ describe('State translation component', () => {
       new EntityTranslation('entityId', 'entityType', 'entityVersion', 'hi', {
         content_0: new TranslatedContent('Translated unicode', 'unicode', true),
       });
-    let subtitledObject = subtitledUnicodeObjectFactory.createFromBackendDict({
+    let subtitledObject = SubtitledUnicode.createFromBackendDict({
       content_id: 'content_1',
       unicode_str: 'This is the unicode',
     });
@@ -1789,7 +1572,7 @@ describe('State translation component', () => {
       new EntityTranslation('entityId', 'entityType', 'entityVersion', 'hi', {
         content_1: new TranslatedContent('Translated UNICODE', 'unicode', true),
       });
-    let subtitledObject = subtitledUnicodeObjectFactory.createFromBackendDict({
+    let subtitledObject = SubtitledUnicode.createFromBackendDict({
       content_id: 'content_1',
       unicode_str: 'This is the unicode',
     });
@@ -2011,11 +1794,9 @@ describe('State translation component', () => {
   let ckEditorCopyContentService: CkEditorCopyContentService;
   let explorationStatesService: ExplorationStatesService;
   let stateEditorService: StateEditorService;
-  let stateRecordedVoiceoversService: StateRecordedVoiceoversService;
   let translationLanguageService: TranslationLanguageService;
   let translationTabActiveContentIdService: TranslationTabActiveContentIdService;
   let translationTabActiveModeService: TranslationTabActiveModeService;
-  let subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory;
   let explorationHtmlFormatterService: ExplorationHtmlFormatterService;
   let explorationState1 = {
     Introduction: {
@@ -2133,9 +1914,6 @@ describe('State translation component', () => {
       linked_skill_id: null,
       param_changes: [],
       solicit_answer_details: false,
-      recorded_voiceovers: {
-        voiceovers_mapping: {},
-      },
     },
   } as StateObjectsBackendDict;
 
@@ -2169,31 +1947,12 @@ describe('State translation component', () => {
       linked_skill_id: null,
       param_changes: [],
       solicit_answer_details: false,
-      recorded_voiceovers: {
-        voiceovers_mapping: {},
-      },
     },
   } as StateObjectsBackendDict;
 
-  let recordedVoiceovers = {
-    voiceovers_mapping: {
-      content: {},
-      default_outcome: {},
-      content_1: {},
-      feedback_1: {},
-      hint_1: {},
-      solution: {},
-      solution_1: {},
-      ca_placeholder: {},
-      ca_fakePlaceholder: {},
-      rule_input_4: {},
-      rule_input_5: {},
-    },
-  };
-
   let refreshStateTranslationEmitter = new EventEmitter();
 
-  class MockContextService {
+  class MockPageContextService {
     getExplorationId() {
       return 'expId';
     }
@@ -2214,21 +1973,17 @@ describe('State translation component', () => {
         ExplorationHtmlFormatterService,
         ConvertToPlainTextPipe,
         AngularNameService,
-        {provide: ContextService, useClass: MockContextService},
+        {provide: PageContextService, useClass: MockPageContextService},
         ContinueValidationService,
         ContinueRulesService,
         ExplorationImprovementsTaskRegistryService,
         ExplorationStatesService,
         ExternalSaveService,
-        NumberWithUnitsObjectFactory,
         TextInputRulesService,
-        OutcomeObjectFactory,
         StateCustomizationArgsService,
         StateInteractionIdService,
         StateEditorRefreshService,
-        StateRecordedVoiceoversService,
         StateSolutionService,
-        StateWrittenTranslationsService,
         ReadOnlyExplorationBackendApiService,
         StateEditorService,
         TranslationLanguageService,
@@ -2246,10 +2001,6 @@ describe('State translation component', () => {
           provide: WrapTextWithEllipsisPipe,
           useClass: MockWrapTextWithEllipsisPipe,
         },
-        {
-          provide: PlatformFeatureService,
-          useClass: MockPlatformFeatureService,
-        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -2262,9 +2013,6 @@ describe('State translation component', () => {
     ckEditorCopyContentService = TestBed.inject(CkEditorCopyContentService);
     stateEditorService = TestBed.inject(StateEditorService);
     explorationStatesService = TestBed.inject(ExplorationStatesService);
-    stateRecordedVoiceoversService = TestBed.inject(
-      StateRecordedVoiceoversService
-    );
     translationLanguageService = TestBed.inject(TranslationLanguageService);
     translationTabActiveContentIdService = TestBed.inject(
       TranslationTabActiveContentIdService
@@ -2273,15 +2021,8 @@ describe('State translation component', () => {
       TranslationTabActiveModeService
     );
     explorationStatesService.init(explorationState1, false);
-    stateRecordedVoiceoversService.init(
-      'Introduction',
-      RecordedVoiceovers.createFromBackendDict(recordedVoiceovers)
-    );
     explorationHtmlFormatterService = TestBed.inject(
       ExplorationHtmlFormatterService
-    );
-    subtitledUnicodeObjectFactory = TestBed.inject(
-      SubtitledUnicodeObjectFactory
     );
     spyOnProperty(
       stateEditorService,
@@ -2300,22 +2041,6 @@ describe('State translation component', () => {
     ).and.returnValue(true);
 
     explorationStatesService.init(explorationState4, false);
-    stateRecordedVoiceoversService.init(
-      'Introduction',
-      RecordedVoiceovers.createFromBackendDict({
-        voiceovers_mapping: {
-          content: {},
-          default_outcome: {},
-          content_1: {},
-          feedback_1: {},
-          hint_1: {},
-          solution: {},
-          solution_1: {},
-          ca_0: {},
-          ca_1: {},
-        },
-      })
-    );
     // Because the customization arguments we are passing for testing are
     // invalid, we will skip getInteractionHtml(), which would error
     // otherwise.
@@ -2332,7 +2057,7 @@ describe('State translation component', () => {
     ).and.returnValue({
       testCa: {
         value: {
-          unicode: subtitledUnicodeObjectFactory.createDefault('', 'ca_0'),
+          unicode: SubtitledUnicode.createDefault('', 'ca_0'),
           html: [SubtitledHtml.createDefault('', 'ca_1')],
         },
       },

@@ -17,7 +17,7 @@
  * associated with a given skill.
  */
 
-import {Question} from './QuestionObjectFactory';
+import {Question} from './question.model';
 
 export class DiagnosticTestQuestionsModel {
   private _mainQuestion: Question;

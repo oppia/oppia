@@ -27,12 +27,12 @@ import {
 import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
-import {QuestionBackendDict} from 'domain/question/QuestionObjectFactory';
-import {InteractionRulesService} from 'pages/exploration-player-page/services/answer-classification.service';
-import {Interaction} from 'domain/exploration/InteractionObjectFactory';
+import {QuestionBackendDict} from 'domain/question/question.model';
+import {InteractionRulesService} from '../../../pages/exploration-player-page/services/answer-classification.service';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
-import {ExplorationPlayerStateService} from 'pages/exploration-player-page/services/exploration-player-state.service';
-import {ExplorationPlayerConstants} from 'pages/exploration-player-page/exploration-player-page.constants.ts';
+import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
+import {ExplorationPlayerConstants} from '../../../pages/exploration-player-page/current-lesson-player/exploration-player-page.constants.ts';
 import {UrlService} from 'services/contextual/url.service';
 import {SkillEditorStateService} from '../services/skill-editor-state.service';
 import {SkillPreviewTabComponent} from './skill-preview-tab.component';
@@ -41,7 +41,6 @@ import {StateCard} from 'domain/state_card/state-card.model';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
-import {AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
 const questionDict = {
   id: 'question_id',
   question_state_data: {
@@ -136,7 +135,7 @@ describe('Skill Preview Tab Component', () => {
   let urlService: UrlService;
   let skillEditorStateService: SkillEditorStateService;
   let currentInteractionService: CurrentInteractionService;
-  let explorationPlayerStateService: ExplorationPlayerStateService;
+  let conversationFlowService: ConversationFlowService;
   let mockOnSkillChangeEmitter = new EventEmitter();
   let mockInteractionRule: InteractionRulesService;
   let questionPlayerEngineService: QuestionPlayerEngineService;
@@ -157,8 +156,7 @@ describe('Skill Preview Tab Component', () => {
     ),
     [],
     null as unknown as RecordedVoiceovers,
-    '',
-    null as unknown as AudioTranslationLanguageService
+    ''
   );
 
   beforeEach(waitForAsync(() => {
@@ -169,7 +167,7 @@ describe('Skill Preview Tab Component', () => {
         SkillEditorStateService,
         UrlService,
         CurrentInteractionService,
-        ExplorationPlayerStateService,
+        ConversationFlowService,
         QuestionPlayerEngineService,
         {
           provide: QuestionBackendApiService,
@@ -231,9 +229,7 @@ describe('Skill Preview Tab Component', () => {
     urlService = TestBed.inject(UrlService);
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
     currentInteractionService = TestBed.inject(CurrentInteractionService);
-    explorationPlayerStateService = TestBed.inject(
-      ExplorationPlayerStateService
-    );
+    conversationFlowService = TestBed.inject(ConversationFlowService);
     questionPlayerEngineService = TestBed.inject(QuestionPlayerEngineService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     questionPlayerEngineService =
@@ -294,8 +290,7 @@ describe('Skill Preview Tab Component', () => {
       ),
       [],
       null as unknown as RecordedVoiceovers,
-      '',
-      null as unknown as AudioTranslationLanguageService
+      ''
     );
 
     expect(component.isCurrentSupplementalCardNonEmpty()).toBeTrue();
@@ -328,8 +323,7 @@ describe('Skill Preview Tab Component', () => {
       ),
       [],
       null as unknown as RecordedVoiceovers,
-      '',
-      null as unknown as AudioTranslationLanguageService
+      ''
     );
 
     expect(component.displayedCard.isInteractionInline()).toBeFalse();
@@ -370,7 +364,7 @@ describe('Skill Preview Tab Component', () => {
   });
 
   it('should trigger feedback when an answer is submitted', fakeAsync(() => {
-    spyOn(explorationPlayerStateService.onOppiaFeedbackAvailable, 'emit');
+    spyOn(conversationFlowService.onOppiaFeedbackAvailable, 'emit');
 
     component.ngOnInit();
     currentInteractionService.onSubmit('answer', mockInteractionRule);

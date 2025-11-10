@@ -77,8 +77,8 @@ export class ImageUploaderModalComponent extends ConfirmOrCancelModal {
     return this.imageUploaderParameters.imageName === 'Thumbnail';
   }
 
-  imageNotUploaded(): boolean {
-    return !this.uploadedImage;
+  isImageUploaded(): boolean {
+    return !!this.uploadedImage;
   }
 
   areInvalidTagsOrAttrsPresent(): boolean {

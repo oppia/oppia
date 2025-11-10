@@ -19,8 +19,8 @@
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
-import {ContextService} from 'services/context.service';
-import {ExplorationPlayerConstants} from 'pages/exploration-player-page/exploration-player-page.constants';
+import {PageContextService} from 'services/page-context.service';
+import {ExplorationPlayerConstants} from 'pages/exploration-player-page/current-lesson-player/exploration-player-page.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 interface SessionStateStats {
@@ -49,7 +49,7 @@ type StatsReportingUrlsKey =
 })
 export class StatsReportingBackendApiService {
   constructor(
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService
   ) {}
@@ -82,7 +82,7 @@ export class StatsReportingBackendApiService {
           '\nThe event being recorded: ' +
           urlIdentifier +
           '\nExploration ID: ' +
-          this.contextService.getExplorationId();
+          this.pageContextService.getExplorationId();
         if (currentStateName) {
           additionalInfo += '\nCurrent State name: ' + currentStateName;
         }
@@ -319,7 +319,7 @@ export class StatsReportingBackendApiService {
 
   async recordExplorationCompletedAsync(
     clientTimeSpentInSecs: number,
-    collectionId: string,
+    collectionId: string | null,
     params: Object,
     sessionId: string,
     stateName: string,
@@ -395,7 +395,7 @@ export class StatsReportingBackendApiService {
 
   async recordMaybeLeaveEventAsync(
     clientTimeSpentInSecs: number,
-    collectionId: string,
+    collectionId: string | null,
     params: Object,
     sessionId: string,
     stateName: string,

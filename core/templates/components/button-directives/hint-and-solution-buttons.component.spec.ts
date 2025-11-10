@@ -28,14 +28,10 @@ import {
 import {NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
-import {
-  Interaction,
-  InteractionObjectFactory,
-} from 'domain/exploration/InteractionObjectFactory';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {StateCard} from 'domain/state_card/state-card.model';
-import {AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
-import {ExplorationPlayerStateService} from 'pages/exploration-player-page/services/exploration-player-state.service';
+import {ExplorationModeService} from 'pages/exploration-player-page/services/exploration-mode.service';
 import {HintAndSolutionModalService} from 'pages/exploration-player-page/services/hint-and-solution-modal.service';
 import {HintsAndSolutionManagerService} from 'pages/exploration-player-page/services/hints-and-solution-manager.service';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
@@ -50,15 +46,13 @@ describe('HintAndSolutionButtonsComponent', () => {
   let fixture: ComponentFixture<HintAndSolutionButtonsComponent>;
   let playerPositionService: PlayerPositionService;
   let hintsAndSolutionManagerService: HintsAndSolutionManagerService;
-  let interactionObjectFactory: InteractionObjectFactory;
   let playerTranscriptService: PlayerTranscriptService;
   let hintAndSolutionModalService: HintAndSolutionModalService;
-  let explorationPlayerStateService: ExplorationPlayerStateService;
+  let explorationModeService: ExplorationModeService;
   let statsReportingService: StatsReportingService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
 
   let newCard: StateCard;
-  let audioTranslationLanguageService: AudioTranslationLanguageService;
 
   const defaultInteractionBackendDict = {
     id: 'TextInput',
@@ -137,16 +131,10 @@ describe('HintAndSolutionButtonsComponent', () => {
       HintsAndSolutionManagerService
     );
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
-    interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
     hintAndSolutionModalService = TestBed.inject(HintAndSolutionModalService);
-    explorationPlayerStateService = TestBed.inject(
-      ExplorationPlayerStateService
-    );
+    explorationModeService = TestBed.inject(ExplorationModeService);
     statsReportingService = TestBed.inject(StatsReportingService);
-    audioTranslationLanguageService = TestBed.inject(
-      AudioTranslationLanguageService
-    );
 
     spyOn(playerPositionService, 'onNewCardOpened').and.returnValue(
       new EventEmitter<StateCard>()
@@ -170,12 +158,9 @@ describe('HintAndSolutionButtonsComponent', () => {
       'State 2',
       '<p>Content</p>',
       '<interaction></interaction>',
-      interactionObjectFactory.createFromBackendDict(
-        defaultInteractionBackendDict
-      ),
+      Interaction.createFromBackendDict(defaultInteractionBackendDict),
       RecordedVoiceovers.createEmpty(),
-      'content',
-      audioTranslationLanguageService
+      'content'
     );
   });
 
@@ -184,16 +169,14 @@ describe('HintAndSolutionButtonsComponent', () => {
       JSON.stringify(defaultInteractionBackendDict)
     );
     interactionDict.solution = null;
-    const interaction =
-      interactionObjectFactory.createFromBackendDict(interactionDict);
+    const interaction = Interaction.createFromBackendDict(interactionDict);
     const card = StateCard.createNewCard(
       'Card 1',
       'Content html',
       'Interaction html',
       interaction,
       RecordedVoiceovers.createEmpty(),
-      'content',
-      audioTranslationLanguageService
+      'content'
     );
     spyOn(component, 'resetLocalHintsArray');
 
@@ -204,7 +187,7 @@ describe('HintAndSolutionButtonsComponent', () => {
   });
 
   it('should reset hints when solution exists', () => {
-    const interaction = interactionObjectFactory.createFromBackendDict(
+    const interaction = Interaction.createFromBackendDict(
       defaultInteractionBackendDict
     );
     const card = StateCard.createNewCard(
@@ -213,8 +196,7 @@ describe('HintAndSolutionButtonsComponent', () => {
       'Interaction html',
       interaction,
       RecordedVoiceovers.createEmpty(),
-      'content',
-      audioTranslationLanguageService
+      'content'
     );
     spyOn(component, 'resetLocalHintsArray');
 
@@ -256,8 +238,7 @@ describe('HintAndSolutionButtonsComponent', () => {
         '<interaction></interaction>',
         {} as Interaction,
         RecordedVoiceovers.createEmpty(),
-        'content',
-        audioTranslationLanguageService
+        'content'
       );
       spyOn(hintsAndSolutionManagerService, 'getNumHints').and.returnValue(1);
 
@@ -356,7 +337,7 @@ describe('HintAndSolutionButtonsComponent', () => {
         'State 1',
         '<p>Content</p>',
         '<interaction></interaction>',
-        interactionObjectFactory.createFromBackendDict({
+        Interaction.createFromBackendDict({
           id: 'EndExploration',
           answer_groups: [],
           default_outcome: null,
@@ -366,8 +347,7 @@ describe('HintAndSolutionButtonsComponent', () => {
           solution: null,
         }),
         RecordedVoiceovers.createEmpty(),
-        'content',
-        audioTranslationLanguageService
+        'content'
       );
 
       expect(component.isHintButtonVisible(0)).toBe(false);
@@ -443,9 +423,7 @@ describe('HintAndSolutionButtonsComponent', () => {
         hintsAndSolutionManagerService,
         'isSolutionConsumed'
       ).and.returnValue(true);
-      spyOn(explorationPlayerStateService, 'isInQuestionMode').and.returnValue(
-        false
-      );
+      spyOn(explorationModeService, 'isInQuestionMode').and.returnValue(false);
       spyOn(statsReportingService, 'recordSolutionHit');
       spyOn(playerPositionService, 'getCurrentStateName').and.returnValue(
         'state1'
@@ -470,9 +448,7 @@ describe('HintAndSolutionButtonsComponent', () => {
     spyOn(hintsAndSolutionManagerService, 'isSolutionConsumed').and.returnValue(
       true
     );
-    spyOn(explorationPlayerStateService, 'isInQuestionMode').and.returnValue(
-      false
-    );
+    spyOn(explorationModeService, 'isInQuestionMode').and.returnValue(false);
     spyOn(statsReportingService, 'recordSolutionHit');
     spyOn(playerPositionService, 'getCurrentStateName').and.returnValue(
       'state1'

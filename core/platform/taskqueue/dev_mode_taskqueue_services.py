@@ -35,10 +35,10 @@ GOOGLE_APP_ENGINE_PORT = os.environ['PORT'] if 'PORT' in os.environ else '8181'
 # Here we use type Any because the payload here has no constraints, so that's
 # why payload is annotated with 'Dict[str, Any]' type.
 def _task_handler(
-        url: str,
-        payload: Dict[str, Any],
-        queue_name: str,
-        task_name: Optional[str] = None
+    url: str,
+    payload: Dict[str, Any],
+    queue_name: str,
+    task_name: Optional[str] = None,
 ) -> None:
     """Makes a POST request to the task URL.
 
@@ -64,7 +64,8 @@ def _task_handler(
         complete_url,
         json=payload,
         headers=headers,
-        timeout=feconf.DEFAULT_TASKQUEUE_TIMEOUT_SECONDS)
+        timeout=feconf.DEFAULT_TASKQUEUE_TIMEOUT_SECONDS,
+    )
 
 
 CLIENT = cloud_tasks_emulator.Emulator(task_handler=_task_handler)
@@ -73,12 +74,12 @@ CLIENT = cloud_tasks_emulator.Emulator(task_handler=_task_handler)
 # Here we use type Any because the payload here has no constraints, so that's
 # why payload is annotated with 'Dict[str, Any]' type.
 def create_http_task(
-        queue_name: str,
-        url: str,
-        payload: Optional[Dict[str, Any]] = None,
-        scheduled_for: Optional[datetime.datetime] = None,
-        task_name: Optional[str] = None
-) -> None:
+    queue_name: str,
+    url: str,
+    payload: Optional[Dict[str, Any]] = None,
+    scheduled_for: Optional[datetime.datetime] = None,
+    task_name: Optional[str] = None,
+) -> cloud_tasks_emulator.Task:
     """Creates a Task in the corresponding queue that will be executed when
     the 'scheduled_for' countdown expires using the cloud tasks emulator.
 
@@ -90,7 +91,14 @@ def create_http_task(
         scheduled_for: datetime|None. The naive datetime object for the
             time to execute the task. Pass in None for immediate execution.
         task_name: str|None. Optional. The name of the task.
+
+    Returns:
+        Task. The task that was created.
     """
-    CLIENT.create_task(
-        queue_name, url, payload=payload, scheduled_for=scheduled_for,
-        task_name=task_name)
+    return CLIENT.create_task(
+        queue_name,
+        url,
+        payload=payload,
+        scheduled_for=scheduled_for,
+        task_name=task_name,
+    )

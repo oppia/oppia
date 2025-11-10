@@ -21,10 +21,7 @@ import {Injectable} from '@angular/core';
 
 import {LoggerService} from 'services/contextual/logger.service';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {
-  SubtitledUnicodeObjectFactory,
-  SubtitledUnicode,
-} from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model';
 import {SchemaConstants} from 'components/forms/schema-based-editors/schema.constants';
 
 interface BoolSchema {
@@ -104,10 +101,7 @@ export type SchemaDefaultValue =
   providedIn: 'root',
 })
 export class SchemaDefaultValueService {
-  constructor(
-    private logger: LoggerService,
-    private subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory
-  ) {}
+  constructor(private logger: LoggerService) {}
 
   // TODO(#20448): Rewrite this to take validators into account, so that
   // we always start with a valid value.
@@ -127,7 +121,7 @@ export class SchemaDefaultValueService {
         content_id: null,
       });
     } else if (schemaIsSubtitledUnicode) {
-      return this.subtitledUnicodeObjectFactory.createFromBackendDict({
+      return SubtitledUnicode.createFromBackendDict({
         unicode_str: '',
         content_id: null,
       });

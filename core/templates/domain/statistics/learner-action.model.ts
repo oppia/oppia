@@ -137,7 +137,7 @@ export class LearnerAction {
       default:
         throw new Error(
           'Backend dict does not match any known action type: ' +
-            angular.toJson(learnerActionBackendDict)
+            JSON.stringify(learnerActionBackendDict)
         );
     }
   }

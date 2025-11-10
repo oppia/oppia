@@ -10,10 +10,9 @@
               [disabled]="!isSkillSaveable()">
         <span *ngIf="!isSaveInProgress()">
           <span title="Publish Changes">
-            <i class="fas fa-save md-18 md-dark oppia-save-publish-button-icon"
-               alt="Publish Changes">
+            <i class="fas fa-save md-18 md-dark oppia-save-publish-button-icon">
             </i>
-            <span class="oppia-save-publish-button-label float-left">Publish Changes</span>
+            <span class="oppia-save-publish-button-label float-left e2e-test-publish-skill-changes-button">Publish Changes</span>
             <span class="d-none d-md-block float-left oppia-changes-count-text e2e-test-changes-count-text"
                   *ngIf="getChangeListCount() > 0">
               ({{getChangeListCount()}})
@@ -81,7 +80,7 @@
         </div>
       </div>
       <div class="skill-nav-dropdown-container save-options-dropdown">
-        <div class="skill-nav-skill-nav-dropdown-options"
+        <div class="skill-nav-skill-nav-dropdown-options e2e-test-skill-edit-options-container"
              *ngIf="showSkillEditOptions">
           <div class="skill-nav-dropdown-option"
                (click)="saveChanges()">
@@ -90,7 +89,7 @@
           </div>
         </div>
         <div class="skill-nav-dropdown-content right-container">
-          <div class="skill-nav-dropdown-text"
+          <div class="skill-nav-dropdown-text e2e-test-mobile-discard-changes-direct"
                (click)="discardChanges()">
             Discard Changes
             <span *ngIf="getChangeListCount() > 0">

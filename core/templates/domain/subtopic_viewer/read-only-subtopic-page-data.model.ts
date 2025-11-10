@@ -18,14 +18,22 @@
  */
 
 import {
+  StudyGuideSection,
+  StudyGuideSectionBackendDict,
+} from 'domain/topic/study-guide-sections.model';
+import {
   SubtopicPageContentsBackendDict,
   SubtopicPageContents,
 } from 'domain/topic/subtopic-page-contents.model';
 import {SubtopicBackendDict, Subtopic} from 'domain/topic/subtopic.model';
 
+// Remove null from sections type and deprecate page_contents
+// once study guides become standard.
 export interface SubtopicDataBackendDict {
   subtopic_title: string;
-  page_contents: SubtopicPageContentsBackendDict;
+  sections: StudyGuideSectionBackendDict[] | null;
+  page_contents: SubtopicPageContentsBackendDict | null;
+  current_subtopic_id: number;
   next_subtopic_dict: SubtopicBackendDict | null;
   prev_subtopic_dict: SubtopicBackendDict | null;
   topic_id: string;
@@ -36,7 +44,9 @@ export class ReadOnlySubtopicPageData {
   parentTopicId: string;
   parentTopicName: string;
   subtopicTitle: string;
-  pageContents: SubtopicPageContents;
+  sections: StudyGuideSection[] | null;
+  pageContents: SubtopicPageContents | null;
+  currentSubtopicId: number;
   nextSubtopic: Subtopic | null;
   prevSubtopic: Subtopic | null;
 
@@ -44,14 +54,18 @@ export class ReadOnlySubtopicPageData {
     parentTopicId: string,
     parentTopicName: string,
     subtopicTitle: string,
-    pageContents: SubtopicPageContents,
+    currentSubtopicId: number,
     nextSubtopic: Subtopic | null,
-    prevSubtopic: Subtopic | null
+    prevSubtopic: Subtopic | null,
+    sections: StudyGuideSection[] | null,
+    pageContents: SubtopicPageContents | null
   ) {
     this.parentTopicId = parentTopicId;
     this.parentTopicName = parentTopicName;
     this.subtopicTitle = subtopicTitle;
+    this.sections = sections;
     this.pageContents = pageContents;
+    this.currentSubtopicId = currentSubtopicId;
     this.nextSubtopic = nextSubtopic;
     this.prevSubtopic = prevSubtopic;
   }
@@ -68,8 +82,16 @@ export class ReadOnlySubtopicPageData {
     return this.subtopicTitle;
   }
 
-  getPageContents(): SubtopicPageContents {
+  getPageContents(): SubtopicPageContents | null {
     return this.pageContents;
+  }
+
+  getSections(): StudyGuideSection[] | null {
+    return this.sections;
+  }
+
+  getCurrentSubtopicId(): number {
+    return this.currentSubtopicId;
   }
 
   getNextSubtopic(): Subtopic | null {
@@ -89,15 +111,30 @@ export class ReadOnlySubtopicPageData {
     let prevSubtopic = subtopicDataBackendDict.prev_subtopic_dict
       ? Subtopic.create(subtopicDataBackendDict.prev_subtopic_dict, {})
       : null;
+    let sections: StudyGuideSection[] = [];
+    let pageContents: SubtopicPageContents =
+      SubtopicPageContents.createDefault();
+    if (subtopicDataBackendDict.sections) {
+      sections = subtopicDataBackendDict.sections.map(section =>
+        StudyGuideSection.createFromBackendDict(section)
+      );
+    }
+    if (subtopicDataBackendDict.page_contents) {
+      pageContents = SubtopicPageContents.createFromBackendDict(
+        subtopicDataBackendDict.page_contents
+      );
+    } else {
+      throw new Error('Neither sections nor page_contents provided.');
+    }
     return new ReadOnlySubtopicPageData(
       subtopicDataBackendDict.topic_id,
       subtopicDataBackendDict.topic_name,
       subtopicDataBackendDict.subtopic_title,
-      SubtopicPageContents.createFromBackendDict(
-        subtopicDataBackendDict.page_contents
-      ),
+      subtopicDataBackendDict.current_subtopic_id,
       nextSubtopic,
-      prevSubtopic
+      prevSubtopic,
+      sections,
+      pageContents
     );
   }
 }

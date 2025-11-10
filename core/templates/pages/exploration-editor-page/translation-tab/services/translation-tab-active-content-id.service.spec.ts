@@ -19,25 +19,13 @@
 import {EventEmitter} from '@angular/core';
 import {TestBed} from '@angular/core/testing';
 import {TranslationTabActiveContentIdService} from 'pages/exploration-editor-page/translation-tab/services/translation-tab-active-content-id.service';
-import {StateRecordedVoiceoversService} from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
 
 describe('Translation tab active content id service', () => {
   let ttacis: TranslationTabActiveContentIdService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [
-        {
-          provide: StateRecordedVoiceoversService,
-          useValue: {
-            displayed: {
-              getAllContentIds: () => {
-                return ['content', 'feedback_1'];
-              },
-            },
-          },
-        },
-      ],
+      providers: [],
     });
 
     ttacis = TestBed.inject(TranslationTabActiveContentIdService);
@@ -47,12 +35,6 @@ describe('Translation tab active content id service', () => {
     expect(ttacis.getActiveContentId()).toBeNull();
     ttacis.setActiveContent('content', 'html');
     expect(ttacis.getActiveContentId()).toBe('content');
-  });
-
-  it('should throw error on setting invalid content id', () => {
-    expect(() => {
-      ttacis.setActiveContent('feedback_2', 'html');
-    }).toThrowError('Invalid active content id: feedback_2');
   });
 
   it('should return data format correctly', () => {

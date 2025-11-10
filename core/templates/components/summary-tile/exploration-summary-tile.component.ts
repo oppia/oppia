@@ -35,6 +35,7 @@ import {
 } from 'services/i18n-language-code.service';
 
 import './exploration-summary-tile.component.css';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 @Component({
   selector: 'oppia-exploration-summary-tile',
@@ -48,7 +49,6 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   @Input() collectionId!: string;
   @Input() explorationId!: string;
   @Input() explorationTitle!: string;
-  @Input() storyNodeId!: string;
   @Input() lastUpdatedMsec!: number;
   @Input() numViews!: string;
   @Input() objective!: string;
@@ -98,6 +98,7 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
     private ratingComputationService: RatingComputationService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
+    private platformFeatureService: PlatformFeatureService,
     private windowRef: WindowRef,
     private dateTimeFormatService: DateTimeFormatService,
     private userService: UserService,
@@ -216,24 +217,10 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
       let parentExplorationIds = this.parentExplorationIds;
 
       let collectionIdToAdd = this.collectionId;
-      let storyIdToAdd = null;
-      let storyNodeIdToAdd = null;
       // Replace the collection ID with the one in the URL if it exists
       // in urlParams.
       if (parentExplorationIds && urlParams.hasOwnProperty('collection_id')) {
         collectionIdToAdd = urlParams.collection_id;
-      } else if (
-        this.urlService.getPathname().match(/\/story\/(\w|-){12}/g) &&
-        this.storyNodeId
-      ) {
-        storyIdToAdd = this.urlService.getStoryIdFromViewerUrl();
-        storyNodeIdToAdd = this.storyNodeId;
-      } else if (
-        urlParams.hasOwnProperty('story_id') &&
-        urlParams.hasOwnProperty('node_id')
-      ) {
-        storyIdToAdd = urlParams.story_id;
-        storyNodeIdToAdd = this.storyNodeId;
       }
 
       if (collectionIdToAdd) {
@@ -251,10 +238,6 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
             parentExplorationIds[i]
           );
         }
-      }
-      if (storyIdToAdd && storyNodeIdToAdd) {
-        result = this.urlService.addField(result, 'story_id', storyIdToAdd);
-        result = this.urlService.addField(result, 'node_id', storyNodeIdToAdd);
       }
       return result;
     }
@@ -279,6 +262,14 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
       this.i18nLanguageCodeService.isHackyTranslationAvailable(
         this.expObjectiveTranslationKey
       ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
+  }
+
+  isInNewLessonPlayer(): boolean {
+    const url = this.urlService.getPathname().split('/');
+    return (
+      url.includes('lesson') &&
+      this.platformFeatureService.status.NewLessonPlayer.isEnabled
     );
   }
 }

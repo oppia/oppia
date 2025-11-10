@@ -47,7 +47,7 @@ import {
   ImagePreloaderService,
 } from 'pages/exploration-player-page/services/image-preloader.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {AppConstants} from 'app.constants';
@@ -84,7 +84,7 @@ export class NoninteractiveImage implements OnInit, OnChanges {
   isTryAgainShown: boolean = false;
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private htmlEscaperService: HtmlEscaperService,
     private imageLocalStorageService: ImageLocalStorageService,
     private imagePreloaderService: ImagePreloaderService,
@@ -129,7 +129,7 @@ export class NoninteractiveImage implements OnInit, OnChanges {
     // preloader service beforehand.
     if (
       this.imagePreloaderService.inExplorationPlayer() &&
-      this.contextService.getEntityType() !== AppConstants.ENTITY_TYPE.SKILL
+      this.pageContextService.getEntityType() !== AppConstants.ENTITY_TYPE.SKILL
     ) {
       const loadingIndicatorSize = this.dimensions.height < 124 ? 24 : 120;
       this.loadingIndicatorStyle = {
@@ -150,7 +150,7 @@ export class NoninteractiveImage implements OnInit, OnChanges {
         // target entity's images in the translatable content which needs
         // to be fetched from the server.
         if (
-          this.contextService.getImageSaveDestination() ===
+          this.pageContextService.getImageSaveDestination() ===
             AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE &&
           this.imageLocalStorageService.isInStorage(this.filepath)
         ) {
@@ -170,11 +170,11 @@ export class NoninteractiveImage implements OnInit, OnChanges {
             }
           }
         } else {
-          const entityType = this.contextService.getEntityType();
+          const entityType = this.pageContextService.getEntityType();
           if (entityType) {
             this.imageUrl = this.assetsBackendApiService.getImageUrlForPreview(
               entityType,
-              this.contextService.getEntityId(),
+              this.pageContextService.getEntityId(),
               this.filepath
             );
           }
@@ -182,13 +182,13 @@ export class NoninteractiveImage implements OnInit, OnChanges {
         // Unknown type is used because we don't know which type of error is
         // thrown.
       } catch (e: unknown) {
-        const entityType = this.contextService.getEntityType();
+        const entityType = this.pageContextService.getEntityType();
         if (entityType) {
           const additionalInfo =
             '\nEntity type: ' +
             entityType +
             '\nEntity ID: ' +
-            this.contextService.getEntityId() +
+            this.pageContextService.getEntityId() +
             '\nFilepath: ' +
             this.filepath;
           if (e instanceof Error) {

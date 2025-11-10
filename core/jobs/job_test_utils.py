@@ -23,8 +23,7 @@ import contextlib
 import datetime
 import re
 
-from core.jobs import base_jobs
-from core.jobs import job_options
+from core.jobs import base_jobs, job_options
 from core.jobs.types import job_run_result
 from core.platform import models
 from core.tests import test_utils
@@ -33,13 +32,11 @@ import apache_beam as beam
 from apache_beam import runners
 from apache_beam.testing import test_pipeline
 from apache_beam.testing import util as beam_testing_util
-
 from typing import Any, Iterator, Optional, Sequence, Type
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import datastore_services
+    from mypy_imports import base_models, datastore_services
 
 (base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
@@ -66,7 +63,8 @@ class PipelinedTestBase(test_utils.AppEngineTestBase):
         super().__init__(*args, **kwargs)
         self.pipeline = test_pipeline.TestPipeline(
             runner=runners.DirectRunner(),
-            options=job_options.JobOptions(namespace=self.namespace))
+            options=job_options.JobOptions(namespace=self.namespace),
+        )
         self._pipeline_context_stack: Optional[contextlib.ExitStack] = None
 
     def setUp(self) -> None:
@@ -101,7 +99,8 @@ class PipelinedTestBase(test_utils.AppEngineTestBase):
         """
         self._assert_pipeline_context_is_acquired()
         beam_testing_util.assert_that(
-            actual, beam_testing_util.equal_to(expected))
+            actual, beam_testing_util.equal_to(expected)
+        )
         self._exit_pipeline_context()
 
     def assert_pcoll_empty(self, actual: beam.PCollection) -> None:
@@ -126,9 +125,7 @@ class PipelinedTestBase(test_utils.AppEngineTestBase):
     # of models and those properties can be of type str, int, bool, Dict and
     # other types too. So, to allow every type of property we used Any here.
     def create_model(
-        self,
-        model_class: Type[base_models.SELF_BASE_MODEL],
-        **properties: Any
+        self, model_class: Type[base_models.SELF_BASE_MODEL], **properties: Any
     ) -> base_models.SELF_BASE_MODEL:
         """Helper method for creating valid models with common default values.
 
@@ -145,8 +142,9 @@ class PipelinedTestBase(test_utils.AppEngineTestBase):
             ValueError. A required property's default value is invalid.
         """
         property_values = {
-            p._name: p._default for p in model_class._properties.values() # pylint: disable=protected-access
-            if p._required # pylint: disable=protected-access
+            p._name: p._default  # pylint: disable=protected-access
+            for p in model_class._properties.values()  # pylint: disable=protected-access
+            if p._required  # pylint: disable=protected-access
         }
         property_values['created_on'] = self.YEAR_AGO
         property_values['last_updated'] = self.YEAR_AGO
@@ -169,7 +167,8 @@ class PipelinedTestBase(test_utils.AppEngineTestBase):
                 'for it to finish processing all of its data, after which '
                 'there is nothing left to inspect. If you need to make '
                 'multiple assertions, then split them into separate test '
-                'cases.')
+                'cases.'
+            )
 
     def _exit_pipeline_context(self) -> None:
         """Flushes the pipeline and waits for it to finish running."""
@@ -220,7 +219,8 @@ class JobTestBase(PipelinedTestBase):
             model_list: list(Model). The NDB models to put into the datastore.
         """
         datastore_services.update_timestamps_multi(
-            model_list, update_last_updated_time=False)
+            model_list, update_last_updated_time=False
+        )
         datastore_services.put_multi(model_list)
 
     def assert_job_output_is(self, expected: beam.PCollection) -> None:
@@ -263,22 +263,26 @@ def decorate_beam_errors() -> Iterator[None]:
                 r', unexpected elements (?P<unexpected>.*)'
                 r', missing elements (?P<missing>.*)'
                 r' \[(?P<context>while running .*)\]',
-                exception_message)
+                exception_message,
+            )
             or re.match(
                 r'.*'
                 r', unexpected elements (?P<unexpected>.*)'
                 r' \[(?P<context>while running .*)\]',
-                exception_message)
+                exception_message,
+            )
             or re.match(
                 r'.*'
                 r', missing elements (?P<missing>.*)'
                 r' \[(?P<context>while running .*)\]',
-                exception_message)
+                exception_message,
+            )
             or re.match(
                 r'.*'
                 r'\[\] == (?P<unexpected>.*)'
                 r' \[(?P<context>while running .*)\]',
-                exception_message)
+                exception_message,
+            )
         )
 
         if match:
@@ -290,15 +294,17 @@ def decorate_beam_errors() -> Iterator[None]:
         try:
             unexpected_elements = (
                 ast.literal_eval(unexpected_elements)
-                if unexpected_elements else None)
+                if unexpected_elements
+                else None
+            )
         except (SyntaxError, ValueError) as e:
             raise AssertionError(exception_message) from e
 
         missing_elements = groupdict.get('missing', None)
         try:
             missing_elements = (
-                ast.literal_eval(missing_elements)
-                if missing_elements else None)
+                ast.literal_eval(missing_elements) if missing_elements else None
+            )
         except (SyntaxError, ValueError) as e:
             raise AssertionError(exception_message) from e
 

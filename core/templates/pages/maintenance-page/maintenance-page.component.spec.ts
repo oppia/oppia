@@ -45,7 +45,7 @@ describe('Maintenance page', () => {
     fixture.detectChanges();
   });
 
-  it('should set document lang when $onInit is called', () => {
+  it('should set document lang when ngOnInit is called', () => {
     spyOn(
       documentAttributeCustomizationService,
       'addAttribute'

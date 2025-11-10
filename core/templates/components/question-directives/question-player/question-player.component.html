@@ -1,19 +1,32 @@
-<div class="oppia-question-player-container">
+<div class="oppia-question-player-container"
+     [ngClass]="{'oppia-new-question-player-container': isNewLessonPlayerEnabled()}">
   <!-- Question Player -->
-  <div class="oppia-question-player" *ngIf="!resultsLoaded">
+  <div class="oppia-question-player" *ngIf="!resultsLoaded"
+       [ngClass]="{'oppia-new-question-player': isNewLessonPlayerEnabled()}">
 
-    <h1 class="oppia-practice-session" tabindex="0">
+    <oppia-player-header *ngIf="isNewLessonPlayerEnabled()"></oppia-player-header>
+
+    <h1 class="oppia-practice-session" tabindex="0" *ngIf="!isNewLessonPlayerEnabled()">
       Practice Session
     </h1>
 
-    <div class="oppia-question-player-card">
+    <div class="oppia-new-question-player-card" *ngIf="isNewLessonPlayerEnabled()">
+      <div [hidden]="!(totalQuestions > 0)">
+        <p [attr.aria-label]="'Question ' + currentQuestion + ' out of ' + totalQuestions">
+          Question {{currentQuestion}}/{{totalQuestions}}
+        </p>
+      </div>
+      <oppia-progress-bar [progressPercentage]="currentProgress"></oppia-progress-bar>
+    </div>
+
+    <div class="oppia-question-player-card" *ngIf="!isNewLessonPlayerEnabled()">
       <span class="beta-label"
             matTooltip="This feature is only available in English for now"
             matTooltipClass="oppia-mat-tooltip-list">
         Beta
       </span>
-      <div [hidden]="!(totalQuestions > 0)">
-        <h2 class="oppia-question-player-header"
+      <div *ngIf="!questionsLoading && totalQuestions > 0">
+        <h2 class="oppia-question-player-header e2e-test-practice-question-header"
             tabindex="0"
             [attr.aria-label]="'Question ' + currentQuestion + ' out of ' + totalQuestions">
           Question {{currentQuestion}}/{{totalQuestions}}
@@ -22,14 +35,17 @@
           <div class="current-progress" [ngStyle]="{'width': currentProgress + '%'}"></div>
         </div>
       </div>
-      <div [hidden]="!(totalQuestions === 0)">
+      <div *ngIf="!questionsLoading && totalQuestions === 0">
         <h4 class="practice-questions-coming-soon-header">Coming Soon!</h4>
         <div class="practice-questions-coming-soon-text">There are no questions created yet for the selected subtopic(s). Please check back later!</div>
       </div>
     </div>
-    <div class="oppia-question-player-body">
+    <div class="oppia-question-player-body" *ngIf="!isNewLessonPlayerEnabled()">
       <oppia-conversation-skin [questionPlayerConfig]="questionPlayerConfig"></oppia-conversation-skin>
       <attribution-guide></attribution-guide>
+    </div>
+    <div class="oppia-new-question-player-body" *ngIf="isNewLessonPlayerEnabled()">
+      <oppia-new-conversation-skin [questionPlayerConfig]="questionPlayerConfig"></oppia-new-conversation-skin>
     </div>
   </div>
   <!-- End of Question Player -->
@@ -95,16 +111,17 @@
 
     <div class="results-footer">
       <div class="question-player-results-footer" *ngIf="showActionButtonsFooter()">
-        <span *ngFor="let actionButton of questionPlayerConfig.resultActionButtons"
-              (click)="performAction(actionButton)">
-          <div class="action-button-inner {{getActionButtonInnerClass(actionButton.type)}}"
-               role="button"
-               tabindex="0"
-               *ngIf="!(actionButton.type === 'RETRY_SESSION') && !(actionButton.type === 'DASHBOARD' && !userIsLoggedIn) && !(actionButton.type === 'REVIEW_LOWEST_SCORED_SKILL' && getWorstSkillIds().length === 0)">
-            <span [innerHTML]="getActionButtonIconHtml(actionButton.type)"></span>
-            <span class="action-button-text" translate="{{actionButton.i18nId}}"></span>
-          </div>
-        </span>
+        <ng-container *ngFor="let actionButton of questionPlayerConfig.resultActionButtons">
+          <span *ngIf="!(actionButton.type === 'RETRY_SESSION') && !(actionButton.type === 'DASHBOARD' && !userIsLoggedIn) && !(actionButton.type === 'REVIEW_LOWEST_SCORED_SKILL' && getWorstSkillIds().length === 0)"
+                (click)="performAction(actionButton)">
+            <div class="action-button-inner {{getActionButtonInnerClass(actionButton.type)}}"
+                 role="button"
+                 tabindex="0">
+              <span [innerHTML]="getActionButtonIconHtml(actionButton.type)"></span>
+              <span class="action-button-text" translate="{{actionButton.i18nId}}"></span>
+            </div>
+          </span>
+        </ng-container>
       </div>
       <div class="question-player-results-footer" *ngIf="showActionButtonsFooter()">
         <span *ngFor="let actionButton of questionPlayerConfig.resultActionButtons"
@@ -126,6 +143,14 @@
 </div>
 
 <style>
+  .oppia-new-question-player-body {
+    bottom: 0;
+    left: 0;
+    position: fixed;
+    right: 0;
+    z-index: 1010;
+  }
+
   .results-footer {
     margin-top: 30px;
   }
@@ -433,13 +458,16 @@
   .oppia-question-player-container .question-player-results-footer {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
     padding-top: 2px;
+  }
+
+  .oppia-question-player-container .question-player-results-footer > span:last-child {
+    margin-left: auto;
   }
 
   .oppia-question-player-container .practice-questions-coming-soon-header {
     color: #01645c;
-    font-family: Capriola, Roboto, Arial, sans-serif;
+    font-family: "Capriola", "Roboto", "Arial", sans-serif;
     font-size: 2em;
     margin-left: 0;
     padding-top: 12px;
@@ -507,5 +535,46 @@
     text-align: center;
   }
 }
+
+  .oppia-new-question-player-container {
+    max-width: 100vw;
+  }
+
+  .oppia-new-question-player-card p {
+    color: #c55f45;
+    font-family: "Capriola", sans-serif;
+    font-size: 18px;
+    font-weight: 400;
+    margin-right: 24px;
+  }
+
+  .oppia-new-question-player {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .oppia-new-question-player-card {
+    align-items: center;
+    background-color: #fff8e5;
+    display: flex;
+    height: 40px;
+    justify-content: center;
+    margin-top: 40px;
+    width: 100%;
+  }
+
+
+  @media(max-width: 768px) {
+    .oppia-new-question-player-card p {
+      font-size: 15px;
+    }
+  }
+
+  @media(max-width: 480px) {
+    .oppia-new-question-player-card p {
+      font-size: 13px;
+      margin-right: 12px;
+    }
+  }
 
 </style>

@@ -23,8 +23,10 @@ export const ClassroomDomainConstants = {
     '/classroom_data_handler/<classroom_url_fragment>',
   TOPIC_VIEWER_URL_TEMPLATE:
     '/learn/<classroom_url_fragment>/<topic_url_fragment>',
-  TOPIC_VIEWER_REVISION_URL_TEMPLATE:
-    '/learn/<classroom_url_fragment>/<topic_url_fragment>/revision',
+  TOPIC_VIEWER_STUDYGUIDE_URL_TEMPLATE:
+    '/learn/<classroom_url_fragment>/<topic_url_fragment>/studyguide',
+  TOPIC_VIEWER_PRACTICE_URL_TEMPLATE:
+    '/learn/<classroom_url_fragment>/<topic_url_fragment>/practice',
   TOPIC_VIEWER_STORY_URL_TEMPLATE:
     '/learn/<classroom_url_fragment>/<topic_url_fragment>/story',
   CLASSROOM_HANDLER_URL_TEMPLATE: '/classroom/<classroom_id>',

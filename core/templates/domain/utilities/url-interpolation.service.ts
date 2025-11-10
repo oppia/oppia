@@ -167,7 +167,7 @@ export class UrlInterpolationService {
         'Every parameter passed into interpolateUrl must have string values, ' +
           'but received: {' +
           nonStringParams
-            .map(([key, val]) => key + ': ' + angular.toJson(val))
+            .map(([key, val]) => key + ': ' + JSON.stringify(val))
             .join(', ') +
           '}'
       );

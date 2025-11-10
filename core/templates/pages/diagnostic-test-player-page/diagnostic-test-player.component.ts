@@ -32,6 +32,7 @@ import {Router} from '@angular/router';
 import {LoaderService} from 'services/loader.service';
 import {AlertsService} from 'services/alerts.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 @Component({
   selector: 'oppia-diagnostic-test-player',
@@ -58,6 +59,7 @@ export class DiagnosticTestPlayerComponent implements OnInit {
     private diagnosticTestPlayerStatusService: DiagnosticTestPlayerStatusService,
     private windowRef: WindowRef,
     private router: Router,
+    private platformFeatureService: PlatformFeatureService,
     private loaderService: LoaderService,
     private alertsService: AlertsService,
     private siteAnalyticsService: SiteAnalyticsService
@@ -198,5 +200,9 @@ export class DiagnosticTestPlayerComponent implements OnInit {
         );
       }
     }
+  }
+
+  isNewLessonPlayerEnabled(): boolean {
+    return this.platformFeatureService.status.NewLessonPlayer.isEnabled;
   }
 }

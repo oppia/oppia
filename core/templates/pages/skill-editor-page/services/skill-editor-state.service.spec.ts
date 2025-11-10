@@ -26,11 +26,7 @@ import {
 } from 'domain/skill/skill-rights.model';
 import {SkillRightsBackendApiService} from 'domain/skill/skill-rights-backend-api.service';
 import {SkillUpdateService} from 'domain/skill/skill-update.service';
-import {
-  Skill,
-  SkillBackendDict,
-  SkillObjectFactory,
-} from 'domain/skill/SkillObjectFactory';
+import {Skill, SkillBackendDict} from 'domain/skill/skill.model';
 import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
 
 const skillContentsDict = {
@@ -38,14 +34,9 @@ const skillContentsDict = {
     html: 'test explanation',
     content_id: 'explanation',
   },
-  worked_examples: [],
   recorded_voiceovers: {
     voiceovers_mapping: {
       explanation: {},
-      worked_example_q_1: {},
-      worked_example_e_1: {},
-      worked_example_q_2: {},
-      worked_example_e_2: {},
     },
   },
 };
@@ -219,7 +210,6 @@ describe('Skill editor state service', () => {
   let fakeSkillBackendApiService: FakeSkillBackendApiService;
   let fakeSkillRightsBackendApiService: FakeSkillRightsBackendApiService;
   let skillEditorStateService: SkillEditorStateService;
-  let skillObjectFactory: SkillObjectFactory;
   let skillRightsObject: SkillRightsBackendDict;
   let skillUpdateService: SkillUpdateService;
 
@@ -242,7 +232,6 @@ describe('Skill editor state service', () => {
     }).compileComponents();
 
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
-    skillObjectFactory = TestBed.inject(SkillObjectFactory);
     skillUpdateService = TestBed.inject(SkillUpdateService);
 
     skillRightsObject = {
@@ -254,7 +243,7 @@ describe('Skill editor state service', () => {
 
     fakeSkillBackendApiService.newBackendSkillObject = skillDict;
     fakeSkillBackendApiService.skillObject =
-      skillObjectFactory.createFromBackendDict(skillDict);
+      Skill.createFromBackendDict(skillDict);
   });
 
   it('should test getters', () => {
@@ -317,7 +306,7 @@ describe('Skill editor state service', () => {
 
     fakeSkillBackendApiService.newBackendSkillObject = skillDict2;
     fakeSkillBackendApiService.skillObject =
-      skillObjectFactory.createFromBackendDict(skillDict2);
+      Skill.createFromBackendDict(skillDict2);
 
     const expectedSkill = fakeSkillBackendApiService.skillObject;
     expect(previousSkill).not.toEqual(expectedSkill);

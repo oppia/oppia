@@ -25,7 +25,7 @@ import {PageTitleService} from 'services/page-title.service';
 import {LearnerGroupPagesConstants} from '../learner-group-pages.constants';
 import {LearnerGroupData} from 'domain/learner_group/learner-group.model';
 import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-backend-api.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 
 import './edit-learner-group-page.component.css';
 
@@ -48,11 +48,11 @@ export class EditLearnerGroupPageComponent implements OnInit, OnDestroy {
     private pageTitleService: PageTitleService,
     private translateService: TranslateService,
     private learnerGroupBackendApiService: LearnerGroupBackendApiService,
-    private contextService: ContextService
+    private pageContextService: PageContextService
   ) {}
 
   ngOnInit(): void {
-    this.learnerGroupId = this.contextService.getLearnerGroupId();
+    this.learnerGroupId = this.pageContextService.getLearnerGroupId();
     this.activeTab = this.EDIT_LEARNER_GROUP_TABS_I18N_IDS.OVERVIEW;
     if (this.learnerGroupId) {
       this.loaderService.showLoadingScreen('Loading');

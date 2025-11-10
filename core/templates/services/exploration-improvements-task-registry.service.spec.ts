@@ -34,7 +34,7 @@ import {IneffectiveFeedbackLoopTask} from 'domain/improvements/ineffective-feedb
 import {NeedsGuidingResponsesTask} from 'domain/improvements/needs-guiding-response-task.model';
 import {SuccessiveIncorrectAnswersTask} from 'domain/improvements/successive-incorrect-answers-task.model';
 import {ExplorationImprovementsConfig} from 'domain/improvements/exploration-improvements-config.model';
-import {StateBackendDict} from 'domain/state/StateObjectFactory';
+import {StateBackendDict} from 'domain/state/state.model';
 import {
   ExplorationStats,
   ExplorationStatsBackendDict,
@@ -47,14 +47,11 @@ import {
   CyclicStateTransitionsCustomizationArgs,
   MultipleIncorrectSubmissionsCustomizationArgs,
 } from 'domain/statistics/playthrough-issue.model';
-import {StatesObjectFactory} from 'domain/exploration/StatesObjectFactory';
+import {States} from 'domain/exploration/states.model';
 import {ExplorationImprovementsTaskRegistryService} from 'services/exploration-improvements-task-registry.service';
 
 describe('Exploration improvements task registrar service', () => {
   let taskRegistryService: ExplorationImprovementsTaskRegistryService;
-
-  let statesObjectFactory: StatesObjectFactory;
-
   let answerStatsBackendDict: AnswerStatsBackendDict;
   let cstPlaythroughIssueBackendDict: PlaythroughIssueBackendDict;
   let eqPlaythroughIssueBackendDict: PlaythroughIssueBackendDict;
@@ -74,8 +71,6 @@ describe('Exploration improvements task registrar service', () => {
       ExplorationImprovementsTaskRegistryService
     );
 
-    statesObjectFactory = TestBed.get(StatesObjectFactory);
-
     config = new ExplorationImprovementsConfig(
       expId,
       expVersion,
@@ -90,12 +85,6 @@ describe('Exploration improvements task registrar service', () => {
       content: {
         content_id: 'content',
         html: '',
-      },
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-          default_outcome: {},
-        },
       },
       interaction: {
         answer_groups: [],
@@ -234,7 +223,7 @@ describe('Exploration improvements task registrar service', () => {
     return ExplorationTaskModel.createFromBackendDict(dict) as T;
   };
   const makeStates = (map = statesBackendDict) => {
-    return statesObjectFactory.createFromBackendDict(map);
+    return States.createFromBackendDict(map);
   };
   const makeExpStats = (dict = expStatsBackendDict) => {
     return ExplorationStats.createFromBackendDict(dict);

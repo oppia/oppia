@@ -20,21 +20,12 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {EventEmitter} from '@angular/core';
 import {fakeAsync, TestBed} from '@angular/core/testing';
 
-import {
-  AnswerGroup,
-  AnswerGroupObjectFactory,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {AlertsService} from 'services/alerts.service';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
-import {
-  Interaction,
-  InteractionObjectFactory,
-} from 'domain/exploration/InteractionObjectFactory';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {LoggerService} from 'services/contextual/logger.service';
-import {
-  Outcome,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {ResponsesService} from 'pages/exploration-editor-page/editor-tab/services/responses.service';
 import {
   StateEditorService,
@@ -44,17 +35,14 @@ import {StateInteractionIdService} from 'components/state-editor/state-editor-pr
 import {StateSolutionService} from 'components/state-editor/state-editor-properties-services/state-solution.service';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {Rule} from 'domain/exploration/rule.model';
-import {Solution} from 'domain/exploration/SolutionObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
 
 describe('Responses Service', () => {
   let alertsService: AlertsService;
-  let answerGroupObjectFactory: AnswerGroupObjectFactory;
   let explorationHtmlFormatterService: ExplorationHtmlFormatterService;
   let interactionData: Interaction;
   let interactionDataWithRules: Interaction;
-  let interactionObjectFactory: InteractionObjectFactory;
   let loggerService: LoggerService;
-  let outcomeObjectFactory: OutcomeObjectFactory;
   let responsesService: ResponsesService;
   let savedMemento: Solution;
   let stateEditorService: StateEditorService;
@@ -65,27 +53,23 @@ describe('Responses Service', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
     });
-    answerGroupObjectFactory = TestBed.get(AnswerGroupObjectFactory);
     alertsService = TestBed.get(AlertsService);
     explorationHtmlFormatterService = TestBed.get(
       ExplorationHtmlFormatterService
     );
     loggerService = TestBed.get(LoggerService);
-    outcomeObjectFactory = TestBed.get(OutcomeObjectFactory);
     responsesService = TestBed.get(ResponsesService);
-    interactionObjectFactory = TestBed.get(InteractionObjectFactory);
     stateEditorService = TestBed.get(StateEditorService);
     stateInteractionIdService = TestBed.get(StateInteractionIdService);
     stateSolutionService = TestBed.get(StateSolutionService);
 
     savedMemento = new Solution(
-      explorationHtmlFormatterService,
       true,
       'This is the correct answer',
       new SubtitledHtml('', 'tesster')
     );
 
-    interactionData = interactionObjectFactory.createFromBackendDict({
+    interactionData = Interaction.createFromBackendDict({
       id: 'TextInput',
       answer_groups: [
         {
@@ -141,7 +125,7 @@ describe('Responses Service', () => {
       },
     });
 
-    interactionDataWithRules = interactionObjectFactory.createFromBackendDict({
+    interactionDataWithRules = Interaction.createFromBackendDict({
       id: 'TextInput',
       answer_groups: [
         {
@@ -248,7 +232,7 @@ describe('Responses Service', () => {
     responsesService.init(interactionData);
     stateEditorService.setInteraction(interactionData);
 
-    const updatedDefaultOutcome = outcomeObjectFactory.createNew(
+    const updatedDefaultOutcome = Outcome.createNew(
       'Hola',
       'new_id',
       'This is a new feedback text',
@@ -825,7 +809,7 @@ describe('Responses Service', () => {
     const callbackSpy = jasmine.createSpy('callback');
     responsesService.onInteractionIdChanged(newInteractionId, callbackSpy);
 
-    const expectedDefaultOutcomeCreated = outcomeObjectFactory.createNew(
+    const expectedDefaultOutcomeCreated = Outcome.createNew(
       'State',
       'default_outcome',
       '',
@@ -858,14 +842,14 @@ describe('Responses Service', () => {
     stateSolutionService.savedMemento = savedMemento;
 
     const updatedAnswerGroups = [
-      answerGroupObjectFactory.createNew(
+      AnswerGroup.createNew(
         [],
-        outcomeObjectFactory.createNew('Hola', '1', 'Feedback text', []),
+        Outcome.createNew('Hola', '1', 'Feedback text', []),
         ['Training data text'],
         '0'
       ),
     ];
-    const updatedDefaultOutcome = outcomeObjectFactory.createNew(
+    const updatedDefaultOutcome = Outcome.createNew(
       'State',
       'new_id',
       'This is a new feedback text',
@@ -901,14 +885,14 @@ describe('Responses Service', () => {
     stateSolutionService.savedMemento = savedMemento;
 
     const updatedAnswerGroups = [
-      answerGroupObjectFactory.createNew(
+      AnswerGroup.createNew(
         [],
-        outcomeObjectFactory.createNew('Hola', '1', 'Feedback text', []),
+        Outcome.createNew('Hola', '1', 'Feedback text', []),
         ['Training data text'],
         '0'
       ),
     ];
-    let updatedDefaultOutcome = outcomeObjectFactory.createNew(
+    let updatedDefaultOutcome = Outcome.createNew(
       'State',
       'new_id',
       'This is a new feedback text',
@@ -918,7 +902,7 @@ describe('Responses Service', () => {
     // Save first time.
     responsesService.save(updatedAnswerGroups, updatedDefaultOutcome, () => {});
 
-    updatedDefaultOutcome = outcomeObjectFactory.createNew(
+    updatedDefaultOutcome = Outcome.createNew(
       'Hola',
       'new_id',
       'This is a new feedback text',
@@ -945,6 +929,79 @@ describe('Responses Service', () => {
     );
   });
 
+  it('should get oppia short answer', () => {
+    const interaction = new Interaction(
+      [],
+      [],
+      {
+        choices: {
+          value: [new SubtitledHtml('This is a choice', 'id1')],
+        },
+      },
+      null,
+      [],
+      '0',
+      null
+    );
+    const solution = new Solution(
+      false,
+      'This is a correct answer!',
+      new SubtitledHtml('This is the explanation', 'solution')
+    );
+    const expectedShortAnswerHtml = {
+      prefix: 'One',
+      answer:
+        '<oppia-short-response-0 answer="&amp;quot;' +
+        'This is a correct answer!&amp;quot;" choices="' +
+        '[{&amp;quot;_html&amp;quot;:&amp;quot;This is a choice' +
+        '&amp;quot;,&amp;quot;_contentId&amp;quot;:' +
+        '&amp;quot;id1&amp;quot;}]"></oppia-short-response-0>',
+    };
+
+    spyOn(
+      explorationHtmlFormatterService,
+      'getShortAnswerHtml'
+    ).and.returnValue(expectedShortAnswerHtml.answer);
+
+    const shortAnswerResponse =
+      responsesService.getOppiaShortAnswerResponseHtml(interaction, solution);
+
+    expect(shortAnswerResponse).toEqual(expectedShortAnswerHtml);
+    expect(
+      explorationHtmlFormatterService.getShortAnswerHtml
+    ).toHaveBeenCalledWith(
+      solution.correctAnswer,
+      interaction.id,
+      interaction.customizationArgs
+    );
+  });
+
+  it("should throw an error if Interaction's id is null", () => {
+    const interaction = new Interaction(
+      [],
+      [],
+      {
+        choices: {
+          value: [new SubtitledHtml('This is a choice', '')],
+        },
+      },
+      null,
+      [],
+      null,
+      null
+    );
+
+    const solution = new Solution(
+      false,
+      'This is a correct answer!',
+      new SubtitledHtml('This is the explanation', 'solution')
+    );
+
+    expect(() => {
+      responsesService.getOppiaShortAnswerResponseHtml(interaction, solution);
+    }).toThrowError('Interaction id is possibly null.');
+  });
+
   it('should fetch EventEmitters', () => {
     let answerGroupsChangedEventEmitter = new EventEmitter();
     let initializeAnswerGroupsEventEmitter = new EventEmitter();
@@ -957,7 +1014,7 @@ describe('Responses Service', () => {
   });
 
   it('should throw error if background image are empty', fakeAsync(() => {
-    const updatedDefaultOutcome = outcomeObjectFactory.createNew(
+    const updatedDefaultOutcome = Outcome.createNew(
       'Hola',
       'new_id',
       'This is a new feedback text',

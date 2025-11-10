@@ -1,14 +1,26 @@
-<div class="modal-body oppia-long-text">
-  <div class="oppia-help-modal-header-container">
+<div class="modal-body oppia-long-text e2e-test-help-modal-container">
+  <div class="oppia-help-modal-header-container e2e-test-help-modal-header">
     <h1>Need Help?</h1>
   </div>
   <p>
     Check out the resources in our help center or
     take a tour of the exploration editor.
   </p>
-  <a href="https://oppia.github.io/#/" target="_blank" rel="noopener" class="btn oppia-help-modal-button oppia-help-dismiss" (click)="goToHelpCenter()">Visit the Help Center</a>
-  <button class="btn oppia-help-modal-button oppia-autofocus" (click)="beginEditorTutorial()">Take the Tour</button>
-  <button class="btn oppia-help-modal-button" (click)="beginTranslationTutorial()" autofocus>Translation Tour</button>
+  <a href="https://oppia.github.io/#/"
+     target="_blank" rel="noopener"
+     class="btn oppia-help-modal-button oppia-help-dismiss e2e-test-help-page-link"
+     (click)="goToHelpCenter()">
+     Visit the Help Center
+  </a>
+  <button class="btn oppia-help-modal-button oppia-autofocus e2e-test-tour-button"
+          (click)="beginEditorTutorial()">
+          Take the Tour
+  </button>
+  <button class="btn oppia-help-modal-button e2e-test-translation-tour-button"
+          (click)="beginTranslationTutorial()"
+          autofocus>
+          Translation Tour
+  </button>
 </div>
 <style>
   .oppia-help-modal-header-container {

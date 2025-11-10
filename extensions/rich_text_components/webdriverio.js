@@ -20,6 +20,8 @@
 // NOTE to devs: If this constant is renamed, make sure to edit
 // components_test.ComponentE2eTests.test_component_e2e_tests to search for the
 // correct constant name.
+// NOTE: The Workedexample line imports a dummy file that will be
+// deleted once e2e tests are no longer in use.
 var RICH_TEXT_COMPONENTS = {
   Collapsible: require('./Collapsible/webdriverio.js'),
   Image: require('./Image/webdriverio.js'),
@@ -27,7 +29,8 @@ var RICH_TEXT_COMPONENTS = {
   Math: require('./Math/webdriverio.js'),
   Skillreview: require('./Skillreview/webdriverio.js'),
   Tabs: require('./Tabs/webdriverio.js'),
-  Video: require('./Video/webdriverio.js')
+  Video: require('./Video/webdriverio.js'),
+  Workedexample: require('./Workedexample/webdriverio.js')
 };
 
 var getComponent = function(componentName) {

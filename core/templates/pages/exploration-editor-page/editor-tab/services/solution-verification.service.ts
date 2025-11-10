@@ -22,7 +22,7 @@ import {
   StateEditorService,
   // eslint-disable-next-line max-len
 } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import {Interaction} from 'domain/exploration/InteractionObjectFactory';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {InteractionAnswer} from 'interactions/answer-defs';
 import {AnswerClassificationService} from 'pages/exploration-player-page/services/answer-classification.service';
 import {InteractionRulesRegistryService} from 'services/interaction-rules-registry.service';

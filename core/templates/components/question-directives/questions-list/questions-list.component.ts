@@ -40,14 +40,11 @@ import {
   SkillSummaryBackendDict,
 } from 'domain/skill/skill-summary.model';
 import {
-  MisconceptionObjectFactory,
+  Misconception,
   MisconceptionSkillMap,
-} from 'domain/skill/MisconceptionObjectFactory';
-import {
-  Question,
-  QuestionObjectFactory,
-} from 'domain/question/QuestionObjectFactory';
-import {State} from 'domain/state/StateObjectFactory';
+} from 'domain/skill/misconception.model';
+import {Question} from 'domain/question/question.model';
+import {State} from 'domain/state/state.model';
 import {Rubric} from 'domain/skill/rubric.model';
 import {EditableQuestionBackendApiService} from 'domain/question/editable-question-backend-api.service';
 import {
@@ -56,7 +53,7 @@ import {
 } from 'components/skill-selector/select-skill-modal.component';
 import {ConfirmQuestionExitModalComponent} from '../modal-templates/confirm-question-exit-modal.component';
 import {QuestionEditorSaveModalComponent} from '../modal-templates/question-editor-save-modal.component';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {QuestionsListService} from 'services/questions-list.service';
@@ -112,18 +109,17 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
   skillLinkageModificationsArray: SkillLinkageModificationsArray[];
   directiveSubscriptions = new Subscription();
   MAX_SKILLS_PER_QUESTION: number = AppConstants.MAX_SKILLS_PER_QUESTION;
+  difficultyCount: number;
 
   constructor(
     private alertsService: AlertsService,
     private changeDetectorRef: ChangeDetectorRef,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private editableQuestionBackendApiService: EditableQuestionBackendApiService,
     private focusManagerService: FocusManagerService,
     private imageLocalStorageService: ImageLocalStorageService,
     private loggerService: LoggerService,
-    private misconceptionObjectFactory: MisconceptionObjectFactory,
     private ngbModal: NgbModal,
-    private questionObjectFactory: QuestionObjectFactory,
     private questionsListService: QuestionsListService,
     private questionUndoRedoService: QuestionUndoRedoService,
     private questionValidationService: QuestionValidationService,
@@ -161,10 +157,10 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     this.populateMisconceptions(this.newQuestionSkillIds);
 
     this.imageLocalStorageService.flushStoredImagesData();
-    this.contextService.setImageSaveDestinationToLocalStorage();
-    this.question = this.questionObjectFactory.createDefaultQuestion(
-      this.newQuestionSkillIds
-    );
+    this.pageContextService.setImageSaveDestinationToLocalStorage();
+
+    this.question = Question.createDefaultQuestion(this.newQuestionSkillIds);
+    this.questionUndoRedoService.clearChanges();
     this.questionId = this.question.getId();
     this.questionStateData = this.question.getStateData();
     this.questionIsBeingUpdated = false;
@@ -260,9 +256,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
             response.associated_skill_dicts.forEach(skillDict => {
               this.misconceptionsBySkill[skillDict.id] =
                 skillDict.misconceptions.map(misconception => {
-                  return this.misconceptionObjectFactory.createFromBackendDict(
-                    misconception
-                  );
+                  return Misconception.createFromBackendDict(misconception);
                 });
               this.associatedSkillSummaries.push(
                 ShortSkillSummary.create(skillDict.id, skillDict.description)
@@ -290,7 +284,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     this.topicEditorStateService.toggleQuestionEditor(true);
     this.imageLocalStorageService.flushStoredImagesData();
     if (this.newQuestionIsBeingCreated) {
-      this.contextService.setImageSaveDestinationToLocalStorage();
+      this.pageContextService.setImageSaveDestinationToLocalStorage();
     }
 
     this.windowRef.nativeWindow.location.hash = '/questions#' + this.questionId;
@@ -551,6 +545,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
               true,
               true
             );
+            this.questionUndoRedoService.clearChanges();
             this.editorIsOpen = false;
             this.questionIsBeingSaved = false;
             this.alertsService.addSuccessMessage(
@@ -621,7 +616,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
       })
       .result.then(
         () => {
-          this.contextService.resetImageSaveDestination();
+          this.pageContextService.resetImageSaveDestination();
           this.editorIsOpen = false;
           this.topicEditorStateService.toggleQuestionEditor(false);
           this.windowRef.nativeWindow.location.hash = null;
@@ -669,7 +664,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
 
   saveQuestion(): void {
     this.questionIsBeingSaved = true;
-    this.contextService.resetImageSaveDestination();
+    this.pageContextService.resetImageSaveDestination();
     this.windowRef.nativeWindow.location.hash = null;
     if (this.questionIsBeingUpdated) {
       this.ngbModal
@@ -684,7 +679,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
             ) {
               this.updateSkillLinkageAndQuestions(commitMessage);
             } else {
-              this.contextService.resetImageSaveDestination();
+              this.pageContextService.resetImageSaveDestination();
               this.saveAndPublishQuestion(commitMessage);
             }
             this.topicEditorStateService.toggleQuestionEditor(false);
@@ -695,7 +690,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
         );
     } else {
       this.topicEditorStateService.toggleQuestionEditor(false);
-      this.contextService.resetImageSaveDestination();
+      this.pageContextService.resetImageSaveDestination();
       this.saveAndPublishQuestion(null);
       this.skillEditorRoutingService.creatingNewQuestion(false);
     }
@@ -729,6 +724,9 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
           this.misconceptionIdsForSelectedSkill = responseObject.skill
             .getMisconceptions()
             .map(misconception => misconception.getId());
+          this.difficultyCount = responseObject.skill
+            .getRubrics()
+            .filter(r => r._explanations?.length > 0).length;
         });
     }
 

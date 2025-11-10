@@ -39,19 +39,17 @@ import {TranslationTabActiveModeService} from '../services/translation-tab-activ
 import {TranslatorOverviewComponent} from './translator-overview.component';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {ChangeListService} from '../../services/change-list.service';
-import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
-import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
+import {EntityTranslation} from 'domain/translation/entity-translation.model';
+import {TranslatedContent} from 'domain/exploration/translated-content.model';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
-import {PlatformFeatureService} from 'services/platform-feature.service';
-import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
 import {EntityVoiceovers} from '../../../../domain/voiceover/entity-voiceovers.model';
 import {Voiceover} from '../../../../domain/exploration/voiceover.model';
 import {LocalStorageService} from 'services/local-storage.service';
 import {VoiceoverPlayerService} from '../../../exploration-player-page/services/voiceover-player.service';
-
+import {VoiceoverLanguageManagementService} from 'services/voiceover-language-management-service';
 class MockNgbModal {
   open() {
     return {
@@ -60,7 +58,7 @@ class MockNgbModal {
   }
 }
 
-class MockContextService {
+class MockPageContextService {
   getExplorationId() {
     return 'expId';
   }
@@ -70,22 +68,9 @@ class MockContextService {
   }
 }
 
-class MockPlatformFeatureService {
-  get status(): object {
-    return {
-      EnableVoiceoverContribution: {
-        isEnabled: true,
-      },
-      AddVoiceoverWithAccent: {
-        isEnabled: false,
-      },
-    };
-  }
-}
-
 describe('Translator Overview component', () => {
   let component: TranslatorOverviewComponent;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let fixture: ComponentFixture<TranslatorOverviewComponent>;
   let explorationLanguageCodeService: ExplorationLanguageCodeService;
   let languageUtilService: LanguageUtilService;
@@ -102,9 +87,9 @@ describe('Translator Overview component', () => {
   let changeListService: ChangeListService;
   let windowRef: WindowRef;
   let entityTranslation: EntityTranslation;
-  let voiceoverBackendApiService: VoiceoverBackendApiService;
   let localStorageService: LocalStorageService;
   let voiceoverPlayerService: VoiceoverPlayerService;
+  let voiceoverLanguageManagementService: VoiceoverLanguageManagementService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -117,12 +102,8 @@ describe('Translator Overview component', () => {
           useClass: MockNgbModal,
         },
         {
-          provide: ContextService,
-          useClass: MockContextService,
-        },
-        {
-          provide: PlatformFeatureService,
-          useClass: MockPlatformFeatureService,
+          provide: PageContextService,
+          useClass: MockPageContextService,
         },
         WindowRef,
       ],
@@ -134,7 +115,7 @@ describe('Translator Overview component', () => {
     fixture = TestBed.createComponent(TranslatorOverviewComponent);
     component = fixture.componentInstance;
 
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     languageUtilService = TestBed.inject(LanguageUtilService);
     focusManagerService = TestBed.inject(FocusManagerService);
     explorationLanguageCodeService = TestBed.inject(
@@ -151,11 +132,15 @@ describe('Translator Overview component', () => {
     routerService = TestBed.inject(RouterService);
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
     entityVoiceoversService = TestBed.inject(EntityVoiceoversService);
-    voiceoverBackendApiService = TestBed.inject(VoiceoverBackendApiService);
     changeListService = TestBed.inject(ChangeListService);
     windowRef = TestBed.inject(WindowRef);
     localStorageService = TestBed.inject(LocalStorageService);
     voiceoverPlayerService = TestBed.inject(VoiceoverPlayerService);
+    voiceoverLanguageManagementService = TestBed.inject(
+      VoiceoverLanguageManagementService
+    );
+
+    spyOn(voiceoverLanguageManagementService, 'init').and.callThrough();
 
     spyOn(
       translationTabActiveModeService,
@@ -187,16 +172,12 @@ describe('Translator Overview component', () => {
         'hi-IN': true,
       },
     };
+    voiceoverLanguageManagementService.languageCodesMapping =
+      languageCodesMapping;
+    voiceoverLanguageManagementService.languageAccentMasterList =
+      languageAccentMasterList;
 
-    let voiceoverAdminDataResponse = {
-      languageAccentMasterList: languageAccentMasterList,
-      languageCodesMapping: languageCodesMapping,
-    };
     spyOn(translationLanguageService, 'setActiveLanguageAccentCode');
-    spyOn(
-      voiceoverBackendApiService,
-      'fetchVoiceoverAdminDataAsync'
-    ).and.resolveTo(Promise.resolve(voiceoverAdminDataResponse));
     spyOn(voiceoverPlayerService, 'setLanguageAccentCodesDescriptions');
 
     explorationLanguageCodeService.init(explorationLanguageCode);
@@ -351,7 +332,9 @@ describe('Translator Overview component', () => {
   });
 
   it('should initialize component properties after controller is initialized', () => {
-    spyOn(contextService, 'isExplorationLinkedToStory').and.returnValue(true);
+    spyOn(pageContextService, 'isExplorationLinkedToStory').and.returnValue(
+      true
+    );
     component.canShowTabModeSwitcher();
 
     expect(component.inTranslationMode).toBe(true);
@@ -377,12 +360,14 @@ describe('Translator Overview component', () => {
     });
 
     it('should show mode switcher if exploration is linked to story', () => {
-      spyOn(contextService, 'isExplorationLinkedToStory').and.returnValue(true);
+      spyOn(pageContextService, 'isExplorationLinkedToStory').and.returnValue(
+        true
+      );
       expect(component.canShowTabModeSwitcher()).toBeTrue;
     });
 
     it('should not show mode switcher if exploration is not linked to story', () => {
-      spyOn(contextService, 'isExplorationLinkedToStory').and.returnValue(
+      spyOn(pageContextService, 'isExplorationLinkedToStory').and.returnValue(
         false
       );
       expect(component.canShowTabModeSwitcher()).toBeFalse;
@@ -517,7 +502,8 @@ describe('Translator Overview component', () => {
         content_8: {
           manual: manualVoiceover2,
         },
-      }
+      },
+      {}
     );
     component.languageCode = 'en';
     let languageAccentMasterList = {

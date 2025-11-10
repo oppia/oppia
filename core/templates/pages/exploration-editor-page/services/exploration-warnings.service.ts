@@ -27,7 +27,7 @@ import {ExplorationInitStateNameService} from './exploration-init-state-name.ser
 import {ParameterMetadataService} from 'pages/exploration-editor-page/services/parameter-metadata.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {AppConstants} from 'app.constants';
-import {State} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 import {
   ComputeGraphService,
   GraphLink,
@@ -53,7 +53,7 @@ import {PencilCodeEditorValidationService} from 'interactions/PencilCodeEditor/d
 import {RatioExpressionInputValidationService} from 'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
 import {SetInputValidationService} from 'interactions/SetInput/directives/set-input-validation.service';
 import {TextInputValidationService} from 'interactions/TextInput/directives/text-input-validation.service';
-import {States} from 'domain/exploration/StatesObjectFactory';
+import {States} from 'domain/exploration/states.model';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 var Dequeue = require('dequeue');
@@ -538,17 +538,14 @@ export class ExplorationWarningsService {
     }
 
     if (Object.keys(this.stateWarnings).length) {
-      let errorString =
-        Object.keys(this.stateWarnings).length > 1 ? 'cards have' : 'card has';
-      this._warningsList.push({
-        type: AppConstants.WARNING_TYPES.ERROR,
-        message:
-          'The following ' +
-          errorString +
-          ' errors: ' +
-          Object.keys(this.stateWarnings).join(', ') +
-          '.',
-      });
+      for (const [key, value] of Object.entries(this.stateWarnings)) {
+        const formattedValue = value.join('; ') + '.';
+        const error = value.length > 1 ? 'Errors' : 'Error';
+        this._warningsList.push({
+          type: AppConstants.WARNING_TYPES.ERROR,
+          message: `${error} in ${key} interaction: \n${formattedValue}`,
+        });
+      }
     }
 
     let statesWithAnswerGroupsWithEmptyClassifiers =

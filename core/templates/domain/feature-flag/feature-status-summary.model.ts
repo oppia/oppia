@@ -24,9 +24,6 @@
  */
 export enum FeatureNames {
   DummyFeatureFlagForE2ETests = 'dummy_feature_flag_for_e2e_tests',
-  EndChapterCelebration = 'end_chapter_celebration',
-  CheckpointCelebration = 'checkpoint_celebration',
-  DiagnosticTest = 'diagnostic_test',
   SerialChapterLaunchCurriculumAdminView = 'serial_chapter_launch_curriculum_admin_view',
   SerialChapterLaunchLearnerView = 'serial_chapter_launch_learner_view',
   ShowTranslationSize = 'show_translation_size',
@@ -36,16 +33,18 @@ export enum FeatureNames {
   LearnerGroupsAreEnabled = 'learner_groups_are_enabled',
   CdAdminDashboardNewUi = 'cd_admin_dashboard_new_ui',
   NewLessonPlayer = 'new_lesson_player',
-  AddVoiceoverWithAccent = 'add_voiceover_with_accent',
   CdAllowUndoingTranslationReview = 'cd_allow_undoing_translation_review',
-  EnableVoiceoverContribution = 'enable_voiceover_contribution',
-  AutoUpdateExpVoiceArtistLink = 'auto_update_exp_voice_artist_link',
   ExplorationEditorCanModifyTranslations = 'exploration_editor_can_modify_translations',
   ExplorationEditorCanTagMisconceptions = 'exploration_editor_can_tag_misconceptions',
   EnableMultipleClassrooms = 'enable_multiple_classrooms',
   RedesignedTopicViewerPage = 'redesigned_topic_viewer_page',
   AutomaticVoiceoverRegenerationFromExp = 'automatic_voiceover_regeneration_from_exp',
-  LabelAccentToVoiceArtist = 'label_accent_to_voice_artist',
+  ShowVoiceoverTabForNonCuratedExplorations = 'show_voiceover_tab_for_non_curated_explorations',
+  ShowRestructuredStudyGuides = 'show_restructured_study_guides',
+  EnableTranslationOppsWithNewOppModels = 'enable_translation_opps_with_new_opp_models',
+  EnableWorkedExamplesRteComponent = 'enable_worked_examples_rte_component',
+  ShowRegeneratedVoiceoversToLearners = 'show_regenerated_voiceovers_to_learners',
+  EnableBackgroundVoiceoverSynthesis = 'enable_background_voiceover_synthesis',
 }
 
 export interface FeatureStatusSummaryBackendDict {

@@ -19,7 +19,9 @@
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {MaterialModule} from 'modules/material.module';
 import {FormsModule} from '@angular/forms';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {StorySummary} from 'domain/story/story-summary.model';
@@ -32,6 +34,15 @@ describe('Learner Story Summary Tile Component', () => {
   let fixture: ComponentFixture<LearnerStorySummaryTileComponent>;
   let urlInterpolationService: UrlInterpolationService;
 
+  class MockPlatformFeatureService {
+    status = {
+      SerialChapterLaunchLearnerView: {
+        isEnabled: false,
+      },
+    };
+  }
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
+
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
@@ -40,8 +51,11 @@ describe('Learner Story Summary Tile Component', () => {
         FormsModule,
         HttpClientTestingModule,
       ],
-      declarations: [LearnerStorySummaryTileComponent],
-      providers: [UrlInterpolationService],
+      declarations: [LearnerStorySummaryTileComponent, MockTranslatePipe],
+      providers: [
+        {provide: PlatformFeatureService, useValue: mockPlatformFeatureService},
+        UrlInterpolationService,
+      ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
@@ -97,9 +111,9 @@ describe('Learner Story Summary Tile Component', () => {
       outline_is_finalized: false,
       thumbnail_bg_color: '#a33f40',
       status: 'Published',
-      planned_publication_date_msecs: 100.0,
-      last_modified_msecs: 100.0,
-      first_publication_date_msecs: 200.0,
+      planned_publication_date_msecs: 100,
+      last_modified_msecs: 100,
+      first_publication_date_msecs: 200,
       unpublishing_reason: null,
     };
     const sampleStorySummaryBackendDict = {
@@ -147,9 +161,9 @@ describe('Learner Story Summary Tile Component', () => {
       outline_is_finalized: false,
       thumbnail_bg_color: '#a33f40',
       status: 'Published',
-      planned_publication_date_msecs: 100.0,
-      last_modified_msecs: 100.0,
-      first_publication_date_msecs: 200.0,
+      planned_publication_date_msecs: 100,
+      last_modified_msecs: 100,
+      first_publication_date_msecs: 200,
       unpublishing_reason: null,
     };
     const sampleStorySummaryBackendDict = {
@@ -215,5 +229,23 @@ describe('Learner Story Summary Tile Component', () => {
     fixture.detectChanges();
 
     expect(urlSpy).toHaveBeenCalled();
+  });
+
+  it('should prevent default when story is not published', () => {
+    component.statusIsPublished = false;
+    const mockEvent = jasmine.createSpyObj('event', ['preventDefault']);
+
+    component.onStoryClick(mockEvent);
+
+    expect(mockEvent.preventDefault).toHaveBeenCalled();
+  });
+
+  it('should not prevent default when story is published', () => {
+    component.statusIsPublished = true;
+    const mockEvent = jasmine.createSpyObj('event', ['preventDefault']);
+
+    component.onStoryClick(mockEvent);
+
+    expect(mockEvent.preventDefault).not.toHaveBeenCalled();
   });
 });

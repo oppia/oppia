@@ -27,11 +27,11 @@ import {
 } from '@angular/core/testing';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
-import {Solution} from 'domain/exploration/SolutionObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
+import {Solution} from 'domain/exploration/solution.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {QuestionUpdateService} from 'domain/question/question-update.service';
-import {QuestionObjectFactory} from 'domain/question/QuestionObjectFactory';
+import {Question} from 'domain/question/question.model';
 import {EditabilityService} from 'services/editability.service';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
 import {QuestionEditorComponent} from './question-editor.component';
@@ -39,7 +39,6 @@ import {QuestionEditorComponent} from './question-editor.component';
 describe('Question Editor Component', () => {
   let component: QuestionEditorComponent;
   let fixture: ComponentFixture<QuestionEditorComponent>;
-  let questionObjectFactory: QuestionObjectFactory;
   let editabilityService: EditabilityService;
   let stateEditorService: StateEditorService;
   let stateInteractionIdService: StateInteractionIdService;
@@ -52,7 +51,6 @@ describe('Question Editor Component', () => {
       imports: [HttpClientTestingModule],
       declarations: [QuestionEditorComponent],
       providers: [
-        QuestionObjectFactory,
         EditabilityService,
         StateEditorService,
         StateInteractionIdService,
@@ -67,14 +65,13 @@ describe('Question Editor Component', () => {
     fixture = TestBed.createComponent(QuestionEditorComponent);
     component = fixture.componentInstance;
 
-    questionObjectFactory = TestBed.inject(QuestionObjectFactory);
     stateEditorService = TestBed.inject(StateEditorService);
     stateInteractionIdService = TestBed.inject(StateInteractionIdService);
     editabilityService = TestBed.inject(EditabilityService);
     questionUpdateService = TestBed.inject(QuestionUpdateService);
     generateContentIdService = TestBed.inject(GenerateContentIdService);
 
-    question = questionObjectFactory.createFromBackendDict({
+    question = Question.createFromBackendDict({
       id: '1',
       question_state_data: {
         content: {
@@ -145,24 +142,6 @@ describe('Question Editor Component', () => {
           id: 'TextInput',
         },
         param_changes: [],
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {
-              en: {
-                filename: 'filename1.mp3',
-                file_size_bytes: 100000,
-                needs_update: false,
-                duration_secs: 10.0,
-              },
-              hi: {
-                filename: 'filename2.mp3',
-                file_size_bytes: 11000,
-                needs_update: false,
-                duration_secs: 0.11,
-              },
-            },
-          },
-        },
         classifier_model_id: null,
         solicit_answer_details: false,
         card_is_checkpoint: false,
@@ -372,7 +351,7 @@ describe('Question Editor Component', () => {
     // because of the need to test validations. This error is thrown because
     // the value of 'htmlFormatter' is null.
     // @ts-ignore
-    let solution = new Solution(null, null, null, null);
+    let solution = new Solution(null, null, null);
     component.saveSolution(solution);
 
     expect(stateEditorService.setInteractionSolution).toHaveBeenCalledWith(

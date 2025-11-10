@@ -65,27 +65,26 @@ export const AppConstants = {
   },
 
   STATE_ERROR_MESSAGES: {
-    ADD_INTERACTION: 'Please add an interaction to this card.',
-    STATE_UNREACHABLE: 'This card is unreachable.',
+    ADD_INTERACTION: 'Please add an interaction to this card',
+    STATE_UNREACHABLE: 'This card is unreachable',
     UNABLE_TO_END_EXPLORATION:
-      "There's no way to complete the exploration starting from this card. " +
-      'To fix this, make sure that the last card in the chain starting from' +
-      " this one has an 'End Exploration' question type.",
-    INCORRECT_SOLUTION: 'The current solution does not lead to another card.',
+      "There's no way to complete the exploration starting from this card -- " +
+      'ensure that the last card in the chain starting from' +
+      " this one has an 'End Exploration' question type",
+    INCORRECT_SOLUTION: 'The current solution does not lead to another card',
     UNRESOLVED_ANSWER:
-      'There is an answer among the top 10 which has no explicit feedback.',
+      'There is an answer among the top 10 which has no explicit feedback',
     INVALID_REDIRECTION:
       'Learner should not be directed back by more than' +
-      ' 3 cards in the lesson.',
+      ' 3 cards in the lesson',
   },
 
   CHECKPOINT_ERROR_MESSAGES: {
-    INIT_CARD: 'The first card of the lesson must be a checkpoint.',
-    TERMINAL_CARD:
-      'Checkpoints are not allowed on the last card of the lesson.',
+    INIT_CARD: 'The first card of the lesson must be a checkpoint',
+    TERMINAL_CARD: 'Checkpoints are not allowed on the last card of the lesson',
     CHECKPOINT_COUNT: 'Only a maximum of 8 checkpoints are allowed per lesson.',
     BYPASSABLE_CARD:
-      'Checkpoints must not be assigned to cards that can be bypassed.',
+      'Checkpoints must not be assigned to cards that can be bypassed',
   },
 
   EXPLORATION_SUMMARY_DATA_URL_TEMPLATE: '/explorationsummarieshandler/data',
@@ -125,7 +124,7 @@ export const AppConstants = {
   // length, in characters, for the name of each node label in the state graph.
   MAX_NODE_LABEL_LENGTH: 15,
 
-  // If an http request fails with the following error codes, a warning is
+  // If an $http request fails with the following error codes, a warning is
   // displayed.
   FATAL_ERROR_CODES: [400, 401, 404, 500],
 
@@ -147,10 +146,9 @@ export const AppConstants = {
   COMPONENT_NAME_RULE_INPUT: 'rule_input',
   COMPONENT_NAME_SOLUTION: 'solution',
   COMPONENT_NAME_EXPLANATION: 'explanation',
-  COMPONENT_NAME_WORKED_EXAMPLE: {
-    QUESTION: 'worked_example_question',
-    EXPLANATION: 'worked_example_explanation',
-  },
+
+  VOICEOVER_TYPE_AUTO: 'auto',
+  VOICEOVER_TYPE_MANUAL: 'manual',
 
   ACTION_TYPE_EXPLORATION_START: 'ExplorationStart',
   ACTION_TYPE_ANSWER_SUBMIT: 'AnswerSubmit',
@@ -177,6 +175,8 @@ export const AppConstants = {
   // process to follow for Angular constants (#6731).
   SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE:
     '/subtopic_page_editor_handler/data/<topic_id>/<subtopic_id>',
+  STUDY_GUIDE_EDITOR_DATA_URL_TEMPLATE:
+    '/study_guide_editor_handler/data/<topic_id>/<subtopic_id>',
   // This should be synchronized with SUBTOPIC_MASTERY_DATA_URL
   // in feconf.
   SUBTOPIC_MASTERY_DATA_URL_TEMPLATE: '/subtopic_mastery_handler/data',
@@ -333,7 +333,7 @@ export const AppConstants = {
   PARENTS_TEACHERS_PDF_GUIDE_LINK:
     'https://drive.google.com/file/d/1gMixZ2c0j5XAGPx4qDBDvRgiFvF6PMkk/view',
   TEACHER_STORY_TAGGED_BLOGS_LINK:
-    'https://www.oppia.org/blog/search/find?q=&tags=(%22Teacher%20story%22)',
+    '/blog/search/find?q=&tags=(%22Teacher%20story%22)',
   VOLUNTEER_EXPECTATIONS: [
     'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_EXPECTATION_1',
     'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_EXPECTATION_2',
@@ -427,4 +427,6 @@ export enum NavbarAndFooterGATrackingPages {
   ABOUT = 'About',
   VOLUNTEER = 'Volunteer',
   TEACH = 'Teach',
+  DONATE = 'Donate',
+  BLOG = 'Blog',
 }

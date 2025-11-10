@@ -161,6 +161,12 @@
 .oppia-top-navigation-bar .classroom-disabled {
   min-width: 300px;
 }
+.oppia-top-navigation-bar .two-columns {
+  min-width: 890px;
+}
+.oppia-top-navigation-bar .three-columns {
+  min-width: 1200px;
+}
 .oppia-top-navigation-bar .language-dropdown {
   max-height: 60vh;
   overflow-y: auto;
@@ -198,9 +204,13 @@
 
 .oppia-top-navigation-bar .learn-dropdown-menu .nav-item-left {
   border-right: 1px solid rgba(0, 0, 0, 0.051);
+  max-height: 90vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 32px;
-  width: 388px;
+  width: 890px;
 }
+
 
 .oppia-top-navigation-bar .learn-dropdown-menu .nav-item-right {
   min-width: 300px;
@@ -522,6 +532,31 @@
   margin-left: -15px;
   width: 150px;
 }
+
+@media screen and (max-width : 1212px) {
+
+  .oppia-top-navigation-bar .learn-dropdown-menu .nav-item-left {
+    width: 600px;
+  }
+
+  .oppia-top-navigation-bar .two-columns {
+    min-width: 890px;
+  }
+  .oppia-top-navigation-bar .three-columns {
+    min-width: 890px;
+  }
+}
+
+@media screen and (max-width : 925px) {
+  .oppia-top-navigation-bar .classroom-enabled {
+    min-width: 688px;
+  }
+
+  .oppia-top-navigation-bar .learn-dropdown-menu .nav-item-left {
+    width: 388px;
+  }
+}
+
 @media screen and (max-width: 880px) {
   .oppia-top-navigation-bar .oppia-logo-wide {
     margin-left: 0;

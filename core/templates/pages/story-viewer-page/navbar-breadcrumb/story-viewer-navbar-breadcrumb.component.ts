@@ -27,7 +27,7 @@ import {
   TranslationKeyType,
 } from 'services/i18n-language-code.service';
 import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-backend-api.service';
-import {ReadOnlyTopic} from 'domain/topic_viewer/read-only-topic-object.factory';
+import {ReadOnlyTopic} from 'domain/topic_viewer/read-only-topic.model';
 
 @Component({
   selector: 'oppia-story-viewer-navbar-breadcrumb',

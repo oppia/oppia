@@ -20,7 +20,7 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {TrainingPanelComponent} from './training-panel.component';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';

@@ -25,6 +25,10 @@ import {
   EntityVoiceovers,
   EntityVoiceoversBackendDict,
 } from './entity-voiceovers.model';
+import {
+  CloudTaskRun,
+  CloudTaskRunBackendDict,
+} from 'domain/cloud-task/cloud-task-run.model';
 
 interface VoiceoverAdminDataBackendDict {
   language_accent_master_list: {
@@ -37,24 +41,23 @@ interface VoiceoverAdminDataBackendDict {
       [languageAccentCode: string]: boolean;
     };
   };
+  autogeneratable_language_accent_codes: string[];
 }
 
 interface EntityVoiceoversBulkBackendDict {
   entity_voiceovers_list: EntityVoiceoversBackendDict[];
 }
 
-interface ExplorationIdToFilenamesBackendDict {
-  exploration_id_to_filenames: {
-    [explorationId: string]: string[];
-  };
-}
-
-export interface ExplorationIdToFilenames {
-  [explorationId: string]: string[];
+interface CloudTaskRunBackendResponseDict {
+  automatic_voiceover_regeneration_records: CloudTaskRunBackendDict[];
 }
 
 export interface LanguageAccentToDescription {
   [languageAccentCode: string]: string;
+}
+
+export interface LanguageAccentCodesToSupportsAutogeneration {
+  [languageAccentCode: string]: boolean;
 }
 
 export interface LanguageAccentMasterList {
@@ -70,32 +73,33 @@ export interface LanguageCodesMapping {
 export interface VoiceoverAdminDataResponse {
   languageAccentMasterList: LanguageAccentMasterList;
   languageCodesMapping: LanguageCodesMapping;
+  autoGeneratableLanguageAccentCodes: string[];
 }
 
-export interface VoiceArtistIdToLanguageMapping {
-  [voiceArtistId: string]: {
-    [languageCode: string]: string;
-  };
+interface TokensWithDurationBackendType {
+  token: string;
+  audio_offset_msecs: number;
 }
 
-export interface VoiceArtistIdToVoiceArtistName {
-  [voiceArtistId: string]: string;
+export interface TokensWithDurationType {
+  token: string;
+  audioOffsetMsecs: number;
 }
 
-interface VoiceArtistMetaDataBackendDict {
-  voice_artist_id_to_language_mapping: {
-    [voiceArtistId: string]: {
-      [languageCode: string]: string;
-    };
-  };
-  voice_artist_id_to_voice_artist_name: {
-    [voiceArtistId: string]: string;
-  };
+interface RegenerateVoiceoverBackendResponse {
+  filename: string;
+  duration_secs: number;
+  file_size_bytes: number;
+  needs_update: boolean;
+  sentence_tokens_with_durations: TokensWithDurationBackendType[];
 }
 
-export interface VoiceArtistMetadataResponse {
-  voiceArtistIdToLanguageMapping: VoiceArtistIdToLanguageMapping;
-  voiceArtistIdToVoiceArtistName: VoiceArtistIdToVoiceArtistName;
+export interface RegenerateVoiceoverResponse {
+  filename: string;
+  fileSizeBytes: number;
+  durationSecs: number;
+  needsUpdate: boolean;
+  sentenceTokenWithDurations: TokensWithDurationType[];
 }
 
 @Injectable({
@@ -119,6 +123,8 @@ export class VoiceoverBackendApiService {
             resolve({
               languageAccentMasterList: response.language_accent_master_list,
               languageCodesMapping: response.language_codes_mapping,
+              autoGeneratableLanguageAccentCodes:
+                response.autogeneratable_language_accent_codes,
             });
           },
           errorResponse => {
@@ -149,20 +155,44 @@ export class VoiceoverBackendApiService {
     });
   }
 
-  async fetchVoiceArtistMetadataAsync(): Promise<VoiceArtistMetadataResponse> {
+  async generateAutomaticVoiceoverAsync(
+    explorationID: string,
+    explorationVersion: number,
+    stateName: string,
+    contentId: string,
+    languageAccentCode: string
+  ): Promise<RegenerateVoiceoverResponse> {
     return new Promise((resolve, reject) => {
       this.http
-        .get<VoiceArtistMetaDataBackendDict>(
-          VoiceoverDomainConstants.VOICE_ARTIST_METADATA_HANDLER_URL
+        .put<RegenerateVoiceoverBackendResponse>(
+          this.urlInterpolationService.interpolateUrl(
+            VoiceoverDomainConstants.REGENERATE_AUTOMATIC_VOICEOVER_HANDLER_URL,
+            {exploration_id: explorationID}
+          ),
+          {
+            exploration_version: explorationVersion,
+            state_name: stateName,
+            content_id: contentId,
+            language_accent_code: languageAccentCode,
+          }
         )
         .toPromise()
         .then(
           response => {
             resolve({
-              voiceArtistIdToLanguageMapping:
-                response.voice_artist_id_to_language_mapping,
-              voiceArtistIdToVoiceArtistName:
-                response.voice_artist_id_to_voice_artist_name,
+              filename: response.filename,
+              durationSecs: response.duration_secs,
+              fileSizeBytes: response.file_size_bytes,
+              needsUpdate: response.needs_update,
+              sentenceTokenWithDurations:
+                response.sentence_tokens_with_durations.map(
+                  tokenWithDuration => {
+                    return {
+                      token: tokenWithDuration.token,
+                      audioOffsetMsecs: tokenWithDuration.audio_offset_msecs,
+                    };
+                  }
+                ),
             });
           },
           errorResponse => {
@@ -172,55 +202,24 @@ export class VoiceoverBackendApiService {
     });
   }
 
-  async updateVoiceArtistToLanguageAccentAsync(
-    voiceArtistId: string,
-    languageCode: string,
-    languageAccentCode: string
+  async regenerateVoiceoverOnExplorationUpdateAsync(
+    explorationID: string,
+    explorationVersion: number,
+    explorationTitle: string
   ): Promise<void> {
-    return new Promise((resolve, reject) => {
-      this.http
-        .put<void>(VoiceoverDomainConstants.VOICE_ARTIST_METADATA_HANDLER_URL, {
-          voice_artist_id: voiceArtistId,
-          language_code: languageCode,
-          language_accent_code: languageAccentCode,
-        })
-        .toPromise()
-        .then(
-          response => {
-            resolve(response);
-          },
-          errorResponse => {
-            reject(errorResponse?.error);
+    this.http
+      .post<void>(
+        this.urlInterpolationService.interpolateUrl(
+          VoiceoverDomainConstants.REGENERATE_VOICEOVER_ON_EXP_UPDATE_URL,
+          {
+            exploration_id: explorationID,
+            exploration_version: String(explorationVersion),
+            exploration_title: explorationTitle,
           }
-        );
-    });
-  }
-
-  async fetchFilenamesForVoiceArtistAsync(
-    voiceArtistId: string,
-    languageCode: string
-  ): Promise<ExplorationIdToFilenames> {
-    return new Promise((resolve, reject) => {
-      this.http
-        .get<ExplorationIdToFilenamesBackendDict>(
-          this.urlInterpolationService.interpolateUrl(
-            VoiceoverDomainConstants.GET_VOICEOVERS_FOR_VOICE_ARTIST_URL_TEMPLATE,
-            {
-              voice_artist_id: voiceArtistId,
-              language_code: languageCode,
-            }
-          )
-        )
-        .toPromise()
-        .then(
-          response => {
-            resolve(response.exploration_id_to_filenames);
-          },
-          errorResponse => {
-            reject(errorResponse?.error);
-          }
-        );
-    });
+        ),
+        {}
+      )
+      .toPromise();
   }
 
   async fetchEntityVoiceoversByLanguageCodeAsync(
@@ -255,6 +254,40 @@ export class VoiceoverBackendApiService {
               );
             }
             resolve(entityVoiceoversList);
+          },
+          errorResponse => {
+            reject(errorResponse?.error);
+          }
+        );
+    });
+  }
+
+  async fetchVoiceoverRegenerationRecordAsync(
+    stateDate: string,
+    endDate: string
+  ): Promise<CloudTaskRun[]> {
+    return new Promise((resolve, reject) => {
+      this.http
+        .get<CloudTaskRunBackendResponseDict>(
+          VoiceoverDomainConstants.AUTOMATIC_VOICEOVER_REGENERATION_RECORD_URL,
+          {
+            params: {
+              start_date: stateDate,
+              end_date: endDate,
+            },
+          }
+        )
+        .toPromise()
+        .then(
+          response => {
+            let cloudTaskRunList = [];
+
+            for (let cloudTaskRunBackendDict of response.automatic_voiceover_regeneration_records) {
+              cloudTaskRunList.push(
+                CloudTaskRun.createFromBackendDict(cloudTaskRunBackendDict)
+              );
+            }
+            resolve(cloudTaskRunList);
           },
           errorResponse => {
             reject(errorResponse?.error);

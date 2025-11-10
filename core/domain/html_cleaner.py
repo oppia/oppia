@@ -29,7 +29,7 @@ from core.domain import rte_component_registry
 
 import bleach
 import bs4
-from typing import Dict, Final, List, TypedDict, Union, cast
+from typing import Callable, Dict, Final, List, TypedDict, Union, cast
 
 
 class ComponentsDict(TypedDict):
@@ -67,7 +67,7 @@ def filter_a(tag: str, name: str, value: str) -> bool:
     return False
 
 
-ATTRS_ALLOWLIST: Final = {
+ATTRS_ALLOWLIST: Final[Dict[str, Union[List[str], Callable[..., bool]]]] = {
     'a': filter_a,
     'b': [],
     'blockquote': [],
@@ -106,7 +106,8 @@ def clean(user_submitted_html: str) -> str:
         and attributes.
     """
     oppia_custom_tags = (
-        rte_component_registry.Registry.get_tag_list_with_attrs())
+        rte_component_registry.Registry.get_tag_list_with_attrs()
+    )
 
     core_tags = ATTRS_ALLOWLIST.copy()
     core_tags.update(oppia_custom_tags)
@@ -114,8 +115,10 @@ def clean(user_submitted_html: str) -> str:
 
     # TODO(sll): Alert the caller if the input was changed due to this call.
     # TODO(sll): Add a log message if bad HTML is detected.
+
     return bleach.clean(
-        user_submitted_html, tags=tag_names, attributes=core_tags, strip=True)
+        user_submitted_html, tags=tag_names, attributes=core_tags, strip=True
+    )
 
 
 def strip_html_tags(html_string: str) -> str:
@@ -128,7 +131,10 @@ def strip_html_tags(html_string: str) -> str:
         str. The HTML string that results after all the tags and attributes are
         stripped out.
     """
-    return bleach.clean(html_string, tags=[], attributes={}, strip=True)
+    empty_attrs: Dict[str, List[str]] = {}
+    return bleach.clean(
+        html_string, tags=[], attributes=empty_attrs, strip=True
+    )
 
 
 def get_image_filenames_from_html_strings(html_strings: List[str]) -> List[str]:
@@ -155,13 +161,12 @@ def get_image_filenames_from_html_strings(html_strings: List[str]) -> List[str]:
                 str, rte_comp['customization_args']['filepath-with-value']
             )
             filenames.append(filename)
-        elif ('id' in rte_comp and
-              rte_comp['id'] == 'oppia-noninteractive-math'):
+        elif 'id' in rte_comp and rte_comp['id'] == 'oppia-noninteractive-math':
             # Here we use cast because the above 'elif' condition forces
             # 'math_content' customization arg to have type Dict[str, str].
             content_to_filename_dict = cast(
                 Dict[str, str],
-                rte_comp['customization_args']['math_content-with-value']
+                rte_comp['customization_args']['math_content-with-value'],
             )
             filename = content_to_filename_dict['svg_filename']
             filenames.append(filename)
@@ -184,7 +189,8 @@ def get_rte_components(html_string: str) -> List[ComponentsDict]:
     components: List[ComponentsDict] = []
     soup = bs4.BeautifulSoup(html_string, 'html.parser')
     oppia_custom_tag_attrs = (
-        rte_component_registry.Registry.get_tag_list_with_attrs())
+        rte_component_registry.Registry.get_tag_list_with_attrs()
+    )
     for tag_name, tag_attrs in oppia_custom_tag_attrs.items():
         component_tags = soup.find_all(name=tag_name)
         for component_tag in component_tags:
@@ -196,7 +202,7 @@ def get_rte_components(html_string: str) -> List[ComponentsDict]:
 
             component: ComponentsDict = {
                 'id': tag_name,
-                'customization_args': customization_args
+                'customization_args': customization_args,
             }
             components.append(component)
     return components
@@ -216,18 +222,41 @@ def is_html_empty(html_str: str) -> bool:
 
     html_val = utils.unescape_html(html_str)
     html_val = (
-        html_val.replace('<p>', '').replace('</p>', '').replace('<br>', '').
-        replace('<i>', '').replace('</i>', '').replace('<span>', '').
-        replace('</span>', '').replace('<b>', '').replace('</b>', '').
-        replace('<ol>', '').replace('</ol>', '').replace('<ul>', '').
-        replace('</ul>', '').replace('<h1>', '').replace('</h1>', '').
-        replace('<h2>', '').replace('</h2>', '').replace('<h3>', '').
-        replace('</h3>', '').replace('<h4>', '').replace('</h4>', '').
-        replace('<h5>', '').replace('</h5>', '').replace('<h6>', '').
-        replace('</h6>', '').replace('<li>', '').replace('</li>', '').
-        replace('&nbsp;', '').replace('<em>', '').replace('</em>', '').
-        replace('<strong>', '').replace('</strong>', '').replace('\"\"', '').
-        replace('\'\'', ''))
+        html_val.replace('<p>', '')
+        .replace('</p>', '')
+        .replace('<br>', '')
+        .replace('<i>', '')
+        .replace('</i>', '')
+        .replace('<span>', '')
+        .replace('</span>', '')
+        .replace('<b>', '')
+        .replace('</b>', '')
+        .replace('<ol>', '')
+        .replace('</ol>', '')
+        .replace('<ul>', '')
+        .replace('</ul>', '')
+        .replace('<h1>', '')
+        .replace('</h1>', '')
+        .replace('<h2>', '')
+        .replace('</h2>', '')
+        .replace('<h3>', '')
+        .replace('</h3>', '')
+        .replace('<h4>', '')
+        .replace('</h4>', '')
+        .replace('<h5>', '')
+        .replace('</h5>', '')
+        .replace('<h6>', '')
+        .replace('</h6>', '')
+        .replace('<li>', '')
+        .replace('</li>', '')
+        .replace('&nbsp;', '')
+        .replace('<em>', '')
+        .replace('</em>', '')
+        .replace('<strong>', '')
+        .replace('</strong>', '')
+        .replace('\"\"', '')
+        .replace('\'\'', '')
+    )
     if html_val.strip() == '':
         return True
 
@@ -292,8 +321,8 @@ def validate_rte_tags(
 
     Args:
         html_data: str. The RTE content of the state.
-        is_tag_nested_inside_tabs_or_collapsible: bool. True when we
-            validate tags inside `Tabs` or `Collapsible` tag.
+        is_tag_nested_inside_tabs_or_collapsible: bool. True when
+            we validate tags inside `Tabs` or `Collapsible` tag.
 
     Raises:
         ValidationError. Image does not have alt-with-value attribute.
@@ -350,8 +379,9 @@ def validate_rte_tags(
                 'Image tag does not have \'caption-with-value\' attribute.'
             )
 
-        caption_value = utils.unescape_html(
-            tag['caption-with-value'])[1:-1].replace('\\"', '')
+        caption_value = utils.unescape_html(tag['caption-with-value'])[
+            1:-1
+        ].replace('\\"', '')
         if len(caption_value.strip()) > 500:
             raise utils.ValidationError(
                 'Image tag \'caption-with-value\' attribute should not '
@@ -363,8 +393,9 @@ def validate_rte_tags(
                 'Image tag does not have \'filepath-with-value\' attribute.'
             )
 
-        filepath_value = utils.unescape_html(
-            tag['filepath-with-value'])[1:-1].replace('\\"', '')
+        filepath_value = utils.unescape_html(tag['filepath-with-value'])[
+            1:-1
+        ].replace('\\"', '')
         if is_html_empty(filepath_value):
             raise utils.ValidationError(
                 'Image tag \'filepath-with-value\' attribute should not '
@@ -373,40 +404,37 @@ def validate_rte_tags(
 
     for tag in soup.find_all('oppia-noninteractive-skillreview'):
         _raise_validation_errors_for_unescaped_html_tag(
-            tag,
-            'text-with-value',
-            'SkillReview'
+            tag, 'text-with-value', 'SkillReview'
         )
 
         _raise_validation_errors_for_unescaped_html_tag(
-            tag,
-            'skill_id-with-value',
-            'SkillReview'
+            tag, 'skill_id-with-value', 'SkillReview'
         )
 
     for tag in soup.find_all('oppia-noninteractive-video'):
 
         _raise_validation_errors_for_escaped_html_tag(
-            tag,
-            'start-with-value',
-            'Video'
+            tag, 'start-with-value', 'Video'
         )
 
         _raise_validation_errors_for_escaped_html_tag(
-            tag,
-            'end-with-value',
-            'Video'
+            tag, 'end-with-value', 'Video'
         )
 
         if not tag.has_attr('autoplay-with-value'):
             raise utils.ValidationError(
-                'Video tag does not have \'autoplay-with-value\' '
-                'attribute.'
+                'Video tag does not have \'autoplay-with-value\' attribute.'
             )
 
         if tag['autoplay-with-value'].strip() not in (
-            'true', 'false', '\'true\'', '\'false\'',
-            '\"true\"', '\"false\"', True, False
+            'true',
+            'false',
+            '\'true\'',
+            '\'false\'',
+            '\"true\"',
+            '\"false\"',
+            True,
+            False,
         ):
             raise utils.ValidationError(
                 'Video tag \'autoplay-with-value\' attribute should be '
@@ -414,22 +442,17 @@ def validate_rte_tags(
             )
 
         _raise_validation_errors_for_unescaped_html_tag(
-            tag,
-            'video_id-with-value',
-            'Video'
+            tag, 'video_id-with-value', 'Video'
         )
 
     for tag in soup.find_all('oppia-noninteractive-link'):
         if not tag.has_attr('text-with-value'):
             raise utils.ValidationError(
-                'Link tag does not have \'text-with-value\' '
-                'attribute.'
+                'Link tag does not have \'text-with-value\' attribute.'
             )
 
         _raise_validation_errors_for_unescaped_html_tag(
-            tag,
-            'url-with-value',
-            'Link'
+            tag, 'url-with-value', 'Link'
         )
 
         url = tag['url-with-value'].replace('&quot;', '').replace(' ', '')
@@ -456,8 +479,7 @@ def validate_rte_tags(
         math_content_list = json.loads(math_content_json)
         if 'raw_latex' not in math_content_list:
             raise utils.ValidationError(
-                'Math tag does not have \'raw_latex-with-value\' '
-                'attribute.'
+                'Math tag does not have \'raw_latex-with-value\' attribute.'
             )
 
         if is_html_empty(math_content_list['raw_latex']):
@@ -495,8 +517,8 @@ def validate_rte_tags(
         collapsible_tags = soup.find_all('oppia-noninteractive-collapsible')
         if len(collapsible_tags) > 0:
             raise utils.ValidationError(
-                'Collapsible tag should not be present inside another '
-                'Tabs or Collapsible tag.'
+                'Collapsible tag should not be present inside Tabs '
+                'or another Collapsible tag.'
             )
 
 
@@ -553,8 +575,7 @@ def validate_tabs_and_collapsible_rte_tags(html_data: str) -> None:
                 'No content attribute is present inside the tabs tag.'
             )
 
-        tab_content_json = utils.unescape_html(
-            tag['tab_contents-with-value'])
+        tab_content_json = utils.unescape_html(tag['tab_contents-with-value'])
         tab_content_list = json.loads(tab_content_json)
         if len(tab_content_list) == 0:
             raise utils.ValidationError(
@@ -563,13 +584,15 @@ def validate_tabs_and_collapsible_rte_tags(html_data: str) -> None:
 
         for tab_content in tab_content_list:
             _raise_validation_errors_for_empty_tabs_content(
-                tab_content, 'title')
+                tab_content, 'title'
+            )
             _raise_validation_errors_for_empty_tabs_content(
-                tab_content, 'content')
+                tab_content, 'content'
+            )
 
             validate_rte_tags(
                 tab_content['content'],
-                is_tag_nested_inside_tabs_or_collapsible=True
+                is_tag_nested_inside_tabs_or_collapsible=True,
             )
 
     collapsibles_tags = soup.find_all('oppia-noninteractive-collapsible')
@@ -579,19 +602,19 @@ def validate_tabs_and_collapsible_rte_tags(html_data: str) -> None:
                 'No content attribute present in collapsible tag.'
             )
 
-        collapsible_content_json = (
-            utils.unescape_html(tag['content-with-value'])
+        collapsible_content_json = utils.unescape_html(
+            tag['content-with-value']
         )
-        collapsible_content = json.loads(
-            collapsible_content_json).replace('\\"', '')
+        collapsible_content = json.loads(collapsible_content_json).replace(
+            '\\"', ''
+        )
         if is_html_empty(collapsible_content):
             raise utils.ValidationError(
                 'No collapsible content is present inside the tag.'
             )
 
         validate_rte_tags(
-            collapsible_content,
-            is_tag_nested_inside_tabs_or_collapsible=True
+            collapsible_content, is_tag_nested_inside_tabs_or_collapsible=True
         )
 
         if not tag.has_attr('heading-with-value'):
@@ -599,11 +622,12 @@ def validate_tabs_and_collapsible_rte_tags(html_data: str) -> None:
                 'No heading attribute present in collapsible tag.'
             )
 
-        collapsible_heading_json = (
-            utils.unescape_html(tag['heading-with-value'])
+        collapsible_heading_json = utils.unescape_html(
+            tag['heading-with-value']
         )
-        collapsible_heading = json.loads(
-            collapsible_heading_json).replace('\\"', '')
+        collapsible_heading = json.loads(collapsible_heading_json).replace(
+            '\\"', ''
+        )
         if is_html_empty(collapsible_heading):
             raise utils.ValidationError(
                 'Heading attribute inside the collapsible tag is empty.'

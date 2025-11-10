@@ -20,9 +20,9 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ChangeDetectorRef, NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {ConceptCard} from 'domain/skill/concept-card.model';
-import {Misconception} from 'domain/skill/MisconceptionObjectFactory';
+import {Misconception} from 'domain/skill/misconception.model';
 import {SkillUpdateService} from 'domain/skill/skill-update.service';
-import {Skill} from 'domain/skill/SkillObjectFactory';
+import {Skill} from 'domain/skill/skill.model';
 import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
 import {MisconceptionEditorComponent} from './misconception-editor.component';
 

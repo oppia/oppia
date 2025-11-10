@@ -36,7 +36,6 @@ describe('NormalizedStringEditorComponent', () => {
     }).compileComponents();
   }));
 
-  beforeEach(angular.mock.module('oppia'));
   beforeEach(() => {
     fixture = TestBed.createComponent(NormalizedStringEditorComponent);
     component = fixture.componentInstance;

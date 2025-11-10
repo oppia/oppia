@@ -29,10 +29,7 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
 import {ResponsesService} from '../services/responses.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import {
-  AnswerGroup,
-  AnswerGroupObjectFactory,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {AngularNameService} from 'pages/exploration-editor-page/services/angular-name.service';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {ExplorationWarningsService} from 'pages/exploration-editor-page/services/exploration-warnings.service';
@@ -41,7 +38,7 @@ import {AnswerClassificationService} from 'pages/exploration-player-page/service
 import {TrainingDataService} from './training-data.service';
 import cloneDeep from 'lodash/cloneDeep';
 import {InteractionAnswer} from 'interactions/answer-defs';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {AlgebraicExpressionInputRulesService} from 'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-rules.service';
 import {CodeReplRulesService} from 'interactions/CodeRepl/directives/code-repl-rules.service';
 import {ContinueRulesService} from 'interactions/Continue/directives/continue-rules.service';
@@ -102,7 +99,6 @@ export class TrainingModalComponent
     private stateEditorService: StateEditorService,
     private graphDataService: GraphDataService,
     private explorationWarningsService: ExplorationWarningsService,
-    private answerGroupObjectFactory: AnswerGroupObjectFactory,
     private trainingDataService: TrainingDataService,
     private angularNameService: AngularNameService,
     private answerClassificationService: AnswerClassificationService,
@@ -153,7 +149,7 @@ export class TrainingModalComponent
     let index = this.classification.answerGroupIndex;
     if (index > this.responsesService.getAnswerGroupCount()) {
       let newOutcome = this.classification.newOutcome;
-      let newAnswerGroup = this.answerGroupObjectFactory.createNew(
+      let newAnswerGroup = AnswerGroup.createNew(
         [],
         cloneDeep(newOutcome),
         [this.unhandledAnswer],

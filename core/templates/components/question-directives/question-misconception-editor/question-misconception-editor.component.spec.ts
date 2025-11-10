@@ -33,9 +33,9 @@ import {
 import {ExternalSaveService} from 'services/external-save.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {
+  Misconception,
   MisconceptionSkillMap,
-  MisconceptionObjectFactory,
-} from 'domain/skill/MisconceptionObjectFactory';
+} from 'domain/skill/misconception.model';
 
 class MockNgbModalRef {
   componentInstance = {
@@ -49,7 +49,6 @@ describe('Question Misconception Editor Component', () => {
   let ngbModal: NgbModal;
   let stateEditorService: StateEditorService;
 
-  let misconceptionObjectFactory: MisconceptionObjectFactory;
   let mockMisconceptionObject: MisconceptionSkillMap;
   let outcome = {
     feedback: {
@@ -72,26 +71,13 @@ describe('Question Misconception Editor Component', () => {
     component = fixture.componentInstance;
     ngbModal = TestBed.inject(NgbModal);
     stateEditorService = TestBed.inject(StateEditorService);
-    misconceptionObjectFactory = TestBed.inject(MisconceptionObjectFactory);
 
     component.isEditable = true;
     component.outcome = outcome;
     mockMisconceptionObject = {
       abc: [
-        misconceptionObjectFactory.create(
-          1,
-          'misc1',
-          'notes1',
-          'feedback1',
-          true
-        ),
-        misconceptionObjectFactory.create(
-          2,
-          'misc2',
-          'notes2',
-          'feedback1',
-          true
-        ),
+        Misconception.create(1, 'misc1', 'notes1', 'feedback1', true),
+        Misconception.create(2, 'misc2', 'notes2', 'feedback1', true),
       ],
     };
     spyOn(stateEditorService, 'getMisconceptionsBySkill').and.callFake(() => {
