@@ -1565,3 +1565,84 @@ class PrintColoredTracebackTests(test_utils.GenericTestBase):
         self.assertIn('\033[91m', output)
         self.assertIn('\033[0m', output)
         self.assertIn('ValueError: color test exception', output)
+
+
+class ColorFunctionsTests(test_utils.GenericTestBase):
+    """Extra coverage tests for color-related functions in common.py."""
+
+    def test_color_excepthook_handles_value_error(self) -> None:
+        """Ensures _color_excepthook runs and outputs traceback in red."""
+        captured_output = io.StringIO()
+        with contextlib.redirect_stderr(captured_output):
+            try:
+                raise ValueError('hook test error')
+            except ValueError:
+                exc_type, exc_value, exc_tb = sys.exc_info()
+                assert exc_type is not None and exc_value is not None and exc_tb is not None
+                common._color_excepthook(exc_type, exc_value, exc_tb)  # pylint: disable=protected-access
+
+        output = captured_output.getvalue()
+        self.assertIn('\033[91m', output)
+        self.assertIn('ValueError: hook test error', output)
+
+    def test_colorize_stderr_write_all_branches(self) -> None:
+        """Covers error, success, and neutral branches."""
+        buf = io.StringIO()
+        original_write = common._original_stderr_write  # pylint: disable=protected-access
+        # Here we use MyPy ignore because TextIO.write uses Arg(str, 's') in its type signature,
+        # which is incompatible with Callable[[str], int] even though it works correctly at runtime.
+        common._original_stderr_write = buf.write  # type: ignore[assignment]  # pylint: disable=protected-access
+
+        try:
+            common._colorize_stderr_write('ERROR: Something failed')  # pylint: disable=protected-access
+            common._colorize_stderr_write('SUCCESS: All good')  # pylint: disable=protected-access
+            common._colorize_stderr_write('just a normal line')  # pylint: disable=protected-access
+        finally:
+            common._original_stderr_write = original_write  # pylint: disable=protected-access
+
+        result = buf.getvalue()
+        self.assertIn('ERROR:', result)
+        self.assertIn('SUCCESS:', result)
+        self.assertIn('just a normal line', result)
+
+    def test_color_warning_prints_yellow_warning(self) -> None:
+        """Covers _color_warning output."""
+        captured_output = io.StringIO()
+        with contextlib.redirect_stderr(captured_output):
+            common._color_warning('Test warning message', UserWarning, 'fake_file.py', 42)  # pylint: disable=protected-access
+
+        output = captured_output.getvalue()
+        self.assertIn('\033[93m', output)
+        self.assertIn('UserWarning: Test warning message', output)
+
+
+class ExtraColorCoverageTests(test_utils.GenericTestBase):
+    """Tests to cover color and stderr utilities in scripts.common."""
+
+    def test_print_colored_traceback_when_no_exception(self) -> None:
+        """Covers the branch when no exception is active."""
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            common.print_colored_traceback()
+        # It should print nothing.
+        self.assertEqual(buf.getvalue(), '')
+
+    def test_colorize_stderr_write_all_branches(self) -> None:
+        """Covers error, success, and neutral branches."""
+        buf = io.StringIO()
+        original_write = common._original_stderr_write  # pylint: disable=protected-access
+        # Here we use MyPy ignore because TextIO.write uses Arg(str, 's') in its type signature,
+        # which is incompatible with Callable[[str], int] even though it works correctly at runtime.
+        common._original_stderr_write = buf.write  # type: ignore[assignment]  # pylint: disable=protected-access
+
+        try:
+            common._colorize_stderr_write('ERROR: Something failed')  # pylint: disable=protected-access
+            common._colorize_stderr_write('SUCCESS: All good')  # pylint: disable=protected-access
+            common._colorize_stderr_write('just a normal line')  # pylint: disable=protected-access
+        finally:
+            common._original_stderr_write = original_write  # pylint: disable=protected-access
+
+        result = buf.getvalue()
+        self.assertIn('ERROR:', result)
+        self.assertIn('SUCCESS:', result)
+        self.assertIn('just a normal line', result)
