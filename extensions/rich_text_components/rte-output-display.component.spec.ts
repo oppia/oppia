@@ -303,7 +303,7 @@ describe('RTE display component', () => {
     let rteString = '<p>Hi world! I am a content creator.</p>';
     let expectedOutputWrappedString =
       '<p><span id="highlightBlock1">Hi world!</span>' +
-      '<span> </span>' +
+      ' ' +
       '<span id="highlightBlock2">I am a content creator.</span></p>';
 
     spyOn(
