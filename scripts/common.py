@@ -34,22 +34,17 @@ from urllib import error as urlerror
 from urllib import request as urlrequest
 
 from core import feconf
+from scripts import servers
 
-from typing import (
-    Dict,
-    Final,
-    Generator,
-    Iterable,
-    List,
-    Optional,
-    Tuple,
-    Union,
-)
+import certifi
+from typing import Dict, Final, Generator, List, Optional, Tuple, Union
 
 # Add third_party to path. Some scripts access feconf even before
 # python_libs is added to path.
 _THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
 sys.path.insert(0, _THIRD_PARTY_PATH)
+
+from core import utils  # pylint: disable=wrong-import-position
 
 AFFIRMATIVE_CONFIRMATIONS = ['y', 'ye', 'yes']
 
@@ -608,8 +603,6 @@ def create_readme(dir_path: str, readme_content: str) -> None:
             be created.
         readme_content: str. The content to be written in the README.
     """
-    from core import utils  # pylint: disable=wrong-import-position
-    
     with utils.open_file(os.path.join(dir_path, 'README.md'), 'w') as f:
         f.write(readme_content)
 
@@ -639,8 +632,6 @@ def inplace_replace_file(
         ValueError. Wrong number of replacements.
         Exception. The content failed to get replaced.
     """
-    from core import utils  # pylint: disable=wrong-import-position
-    
     new_filename = '%s.new' % filename
     shutil.copyfile(filename, new_filename)
     new_contents = []
@@ -704,53 +695,6 @@ def wait_for_port_to_be_in_use(port_number: int) -> None:
             'https://github.com/oppia/oppia/wiki/Troubleshooting#low-ram'
         )
         sys.exit(1)
-
-
-def wait_for_url(
-    url: str,
-    timeout_secs: int = 120,
-    expected_status_codes: Iterable[int] = (200, 302),
-    sleep_interval_secs: float = 1.0,
-) -> None:
-    """Waits until the given URL responds with an expected HTTP status.
-
-    Args:
-        url: str. The URL to poll.
-        timeout_secs: int. Maximum time to wait before failing.
-        expected_status_codes: iterable(int). HTTP status codes considered a
-            successful response.
-        sleep_interval_secs: float. Delay between subsequent attempts.
-
-    Raises:
-        RuntimeError. The URL failed to return an expected status within the
-        allotted time.
-    """
-
-    import certifi
-    
-    deadline = time.time() + timeout_secs
-    last_error: Optional[BaseException] = None
-    ssl_context = None
-    if url.startswith('https://'):
-        ssl_context = ssl.create_default_context(cafile=certifi.where())
-
-    while time.time() < deadline:
-        try:
-            request = urlrequest.Request(url, headers={'User-Agent': 'OppiaHealthCheck/1.0'})
-            with urlrequest.urlopen(  # type: ignore[call-arg]
-                request, timeout=sleep_interval_secs, context=ssl_context
-            ) as response:
-                status_code = response.getcode()
-                if status_code in expected_status_codes:
-                    return
-        except (urlerror.URLError, ssl.SSLError, OSError) as err:
-            last_error = err
-        time.sleep(sleep_interval_secs)
-
-    raise RuntimeError(
-        'URL %s failed to respond with status in %s after %s seconds. Last error: %s'
-        % (url, list(expected_status_codes), timeout_secs, last_error)
-    )
 
 
 def wait_for_port_to_not_be_in_use(port_number: int) -> bool:
@@ -856,8 +800,6 @@ def url_open(
     Returns:
         urlopen. The 'urlopen' object.
     """
-    import certifi
-    
     context = ssl.create_default_context(cafile=certifi.where())
     return urlrequest.urlopen(source_url, context=context)
 
@@ -959,9 +901,6 @@ def setup_chrome_bin_env_variable() -> None:
 
 def run_ng_compilation() -> None:
     """Runs angular compilation."""
-    # Import here to avoid circular dependency with servers module.
-    from scripts import servers
-    
     max_tries = 2
     ng_bundles_dir_name = 'dist/oppia-angular'
     for _ in range(max_tries):
