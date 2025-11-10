@@ -34,7 +34,6 @@ from urllib import error as urlerror
 from urllib import request as urlrequest
 
 from core import feconf
-from scripts import servers
 
 import certifi
 from typing import (
@@ -955,6 +954,9 @@ def setup_chrome_bin_env_variable() -> None:
 
 def run_ng_compilation() -> None:
     """Runs angular compilation."""
+    # Import here to avoid circular dependency with servers module.
+    from scripts import servers
+    
     max_tries = 2
     ng_bundles_dir_name = 'dist/oppia-angular'
     for _ in range(max_tries):
