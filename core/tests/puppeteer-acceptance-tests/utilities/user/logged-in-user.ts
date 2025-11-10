@@ -2268,7 +2268,7 @@ export class LoggedInUser extends BaseUser {
       await this.page.waitForNetworkIdle();
       await this.page.waitForSelector(dismissWelcomeModalSelector, {
         visible: true,
-        timeout: 10000,
+        timeout: 5000,
       });
       await this.clickOnElementWithSelector(dismissWelcomeModalSelector);
       await this.page.waitForSelector(dismissWelcomeModalSelector, {

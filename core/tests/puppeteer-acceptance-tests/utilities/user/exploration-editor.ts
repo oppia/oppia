@@ -2731,6 +2731,7 @@ export class ExplorationEditor extends BaseUser {
    */
   async dismissWelcomeModal(): Promise<void> {
     try {
+      await this.page.waitForNetworkIdle();
       await this.page.waitForSelector(dismissWelcomeModalSelector, {
         visible: true,
         timeout: 5000,
