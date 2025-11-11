@@ -22,7 +22,9 @@ import functools
 import logging
 import time
 
-from google.api_core import exceptions as google_api_exceptions  # type: ignore[attr-defined]
+# Here we use MyPy ignore because the 'google.api_core' module is dynamically
+# loaded, and MyPy cannot normally detect the 'exceptions' attribute.
+from google.api_core import exceptions as google_api_exceptions  # type: ignore[attr-defined] # isort: skip
 from google.cloud import datastore
 from typing import Any, Callable, TypeVar
 
@@ -36,8 +38,6 @@ MAX_RETRIES = 5
 INITIAL_RETRY_DELAY_SECS = 1.0
 
 
-# Here we use type Any because the method `wrapper` is used as a decorator for
-# other functions, and these functions can have almost any types of arguments.
 def run_in_transaction_wrapper(
     transactional_fn: Callable[..., T],
 ) -> Callable[..., T]:
@@ -50,6 +50,8 @@ def run_in_transaction_wrapper(
         Callable. The wrapped function.
     """
 
+    # Here we use type Any because this function is a generic wrapper for
+    # other functions, which can have almost any types of arguments.
     @functools.wraps(transactional_fn)
     def wrapper(*args: Any, **kwargs: Any) -> T:
         """Wrapper for the transactional function.
@@ -59,9 +61,9 @@ def run_in_transaction_wrapper(
 
         Raises:
             Exception. The exception raised by the transactional function
-                after all retries are exhausted.
-            google_api_exceptions.ServiceUnavailable. The exception raised by the
-                transactional function after all retries are exhausted.
+                if it is not a ServiceUnavailable error.
+            google_api_exceptions.ServiceUnavailable. Raised if the transaction
+                fails due to a transient error after all retries are exhausted.
         """
         # Implement exponential backoff for retries.
         for i in range(MAX_RETRIES):

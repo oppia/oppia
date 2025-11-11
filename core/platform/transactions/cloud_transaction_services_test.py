@@ -21,7 +21,9 @@ from unittest import mock
 from core.platform.transactions import cloud_transaction_services
 from core.tests import test_utils
 
-from google.api_core import exceptions as google_api_exceptions  # type: ignore[attr-defined]
+# Here we use MyPy ignore because the 'google.api_core' module is dynamically
+# loaded, and MyPy cannot normally detect the 'exceptions' attribute.
+from google.api_core import exceptions as google_api_exceptions  # type: ignore[attr-defined] # isort: skip
 
 
 class CloudTransactionServicesTests(test_utils.GenericTestBase):
