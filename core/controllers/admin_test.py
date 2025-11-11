@@ -28,6 +28,7 @@ from core.domain import (
     classroom_config_services,
     collection_services,
     exp_domain,
+    exp_fetchers,
     exp_services,
     fs_services,
     opportunity_services,
@@ -2145,18 +2146,10 @@ class GenerateDummyChaptersTest(test_utils.GenericTestBase):
         topic_services.save_new_topic(
             self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), topic
         )
+
         story = story_domain.Story.create_default_story(
             'story_id', 'story_title', 'description', 'topic', 'storyurl'
         )
-        story_change_list = [
-            story_domain.StoryChange(
-                {
-                    'cmd': 'add_story_node',
-                    'node_id': 'node_1',
-                    'title': 'existing chapter 1',
-                }
-            )
-        ]
         story_services.save_new_story(
             self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), story
         )
@@ -2165,6 +2158,38 @@ class GenerateDummyChaptersTest(test_utils.GenericTestBase):
             'topic',
             'story_id',
         )
+
+        exp_id = exp_fetchers.get_new_exploration_id()
+        exploration = exp_domain.Exploration.create_default_exploration(
+            exp_id, 'dummy existing exp', category='Math', objective='obj'
+        )
+        exp_services.save_new_exploration(
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL),
+            exploration,
+        )
+        rights_manager.publish_exploration(
+            self.get_user(self.CURRICULUM_ADMIN_EMAIL), exp_id
+        )
+
+        story_change_list = [
+            story_domain.StoryChange(
+                {
+                    'cmd': 'add_story_node',
+                    'node_id': 'node_1',
+                    'title': 'existing chapter 1',
+                }
+            ),
+            story_domain.StoryChange(
+                {
+                    'cmd': 'update_story_node_property',
+                    'property_name': story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID,
+                    'node_id': 'node_1',
+                    'new_value': exp_id,
+                    'old_value': None,
+                }
+            ),
+        ]
+
         topic_services.update_story_and_topic_summary(
             self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL),
             'story_id',
@@ -2175,6 +2200,11 @@ class GenerateDummyChaptersTest(test_utils.GenericTestBase):
 
         story = story_fetchers.get_story_by_id('story_id')
         story.story_contents.next_node_id = 'node_2'
+        story_services.save_story(
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL),
+            story,
+            'set next node id',
+        )
 
         self.post_json(
             '/adminhandler',
@@ -2183,6 +2213,7 @@ class GenerateDummyChaptersTest(test_utils.GenericTestBase):
                 'story_id': 'story_id',
                 'num_dummy_chapters_to_generate': 3,
             },
+            csrf_token=csrf_token,
         )
 
         updated_story = story_fetchers.get_story_by_id('story_id')
@@ -2198,7 +2229,6 @@ class GenerateDummyChaptersTest(test_utils.GenericTestBase):
         node_4 = node('node_4')
 
         self.assertEqual(node_1.destination_node_ids, ['node_2'])
-
         self.assertEqual(node_2.destination_node_ids, ['node_3'])
         self.assertEqual(node_3.destination_node_ids, ['node_4'])
         self.assertEqual(node_4.destination_node_ids, [])
