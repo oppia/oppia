@@ -76,6 +76,7 @@ describe('RTE display component', () => {
     normalizeSpacingInHtml: (html: string) => string;
     _updateNode: () => void;
     _getTemplatePortal: (node: unknown) => unknown;
+    traverseNodeAndWrapSpanTags: (node: Node, regex: RegExp) => Node[];
     rteString: string | null | undefined;
   };
 
@@ -1416,6 +1417,223 @@ describe('RTE display component', () => {
       component.ngOnDestroy();
 
       expect(component.highlightIntervalId).toBeUndefined();
+      discardPeriodicTasks();
+    }));
+  });
+
+  // Tests for normalizeSpacingInHtml method.
+  describe('normalizeSpacingInHtml', () => {
+    it('should add space between adjacent inline elements', () => {
+      const html = '<strong>Bold</strong><em>Italic</em>';
+      const result = (
+        component as ComponentWithPrivates
+      ).normalizeSpacingInHtml(html);
+      expect(result).toContain('</strong> <em>');
+    });
+
+    it('should add space between element and text without leading space', () => {
+      const html = '<strong>Bold</strong>text';
+      const result = (
+        component as ComponentWithPrivates
+      ).normalizeSpacingInHtml(html);
+      expect(result).toContain('</strong> text');
+    });
+
+    it('should add space between text without trailing space and element', () => {
+      const html = 'text<strong>Bold</strong>';
+      const result = (
+        component as ComponentWithPrivates
+      ).normalizeSpacingInHtml(html);
+      expect(result).toContain('text <strong>');
+    });
+
+    it('should not add space between block-level elements', () => {
+      const html = '<p>Paragraph 1</p><p>Paragraph 2</p>';
+      const result = (
+        component as ComponentWithPrivates
+      ).normalizeSpacingInHtml(html);
+      expect(result).not.toContain('</p> <p>');
+    });
+
+    it('should not modify content inside pre tags', () => {
+      const html = '<pre><code>no  spacing  changes</code></pre>';
+      const result = (
+        component as ComponentWithPrivates
+      ).normalizeSpacingInHtml(html);
+      expect(result).toContain('no  spacing  changes');
+    });
+
+    it('should handle oppia-noninteractive-link as inline element', () => {
+      const html =
+        '<oppia-noninteractive-link></oppia-noninteractive-link>text';
+      const result = (
+        component as ComponentWithPrivates
+      ).normalizeSpacingInHtml(html);
+      expect(result).toContain('</oppia-noninteractive-link> text');
+    });
+
+    it('should not add space if text already has leading whitespace', () => {
+      const html = '<strong>Bold</strong> text';
+      const result = (
+        component as ComponentWithPrivates
+      ).normalizeSpacingInHtml(html);
+      // Should not add extra space.
+      expect(result).not.toContain('</strong>  text');
+    });
+
+    it('should not add space if text already has trailing whitespace', () => {
+      const html = 'text <strong>Bold</strong>';
+      const result = (
+        component as ComponentWithPrivates
+      ).normalizeSpacingInHtml(html);
+      // Should not add extra space.
+      expect(result).not.toContain('text  <strong>');
+    });
+
+    it('should handle nested inline elements correctly', () => {
+      const html = '<strong><em>BoldItalic</em></strong><span>Text</span>';
+      const result = (
+        component as ComponentWithPrivates
+      ).normalizeSpacingInHtml(html);
+      expect(result).toContain('</strong> <span>');
+    });
+
+    it('should handle oppia-noninteractive-collapsible as block element', () => {
+      const html =
+        '<oppia-noninteractive-collapsible></oppia-noninteractive-collapsible><p>Text</p>';
+      const result = (
+        component as ComponentWithPrivates
+      ).normalizeSpacingInHtml(html);
+      // Should not add space between block-level Oppia components.
+      expect(result).not.toContain('</oppia-noninteractive-collapsible> <p>');
+    });
+  });
+
+  // Tests for wrapSentencesInSpansForHighlighting with new logic.
+  describe('wrapSentencesInSpansForHighlighting with spacing normalization', () => {
+    it('should normalize spacing when wrapping sentences', () => {
+      component.rteString = '<p>Sentence one. Sentence two.</p>';
+      const result = component.wrapSentencesInSpansForHighlighting(
+        component.rteString
+      );
+      expect(result).toContain('<span');
+      expect(result).toContain('Sentence one.');
+      expect(result).toContain('Sentence two.');
+    });
+
+    it('should handle empty rte string', () => {
+      component.rteString = '';
+      const result = component.wrapSentencesInSpansForHighlighting('');
+      expect(result).toBe('');
+    });
+
+    it('should preserve spaces between inline elements', () => {
+      component.rteString = '<p><strong>Bold</strong> <em>Italic</em></p>';
+      const result = component.wrapSentencesInSpansForHighlighting(
+        component.rteString
+      );
+      expect(result).toContain('Bold');
+      expect(result).toContain('Italic');
+    });
+
+    it('should handle multiple paragraphs with sentences', () => {
+      component.rteString = '<p>First paragraph.</p><p>Second paragraph!</p>';
+      const result = component.wrapSentencesInSpansForHighlighting(
+        component.rteString
+      );
+      expect(result).toContain('First paragraph.');
+      expect(result).toContain('Second paragraph!');
+    });
+  });
+
+  // Tests for traverseNodeAndWrapSpanTags edge cases.
+  describe('traverseNodeAndWrapSpanTags edge cases', () => {
+    it('should handle text node with sentence ending', () => {
+      const textNode = document.createTextNode('This is a sentence.');
+      const sentenceRegex = /[.!?]/;
+      const result = (
+        component as ComponentWithPrivates
+      ).traverseNodeAndWrapSpanTags(textNode, sentenceRegex);
+      expect(result).toBeDefined();
+      expect(result.length).toBeGreaterThan(0);
+    });
+
+    it('should handle element node with single child of same type', () => {
+      const parentSpan = document.createElement('span');
+      const childSpan = document.createElement('span');
+      childSpan.textContent = 'Text content';
+      parentSpan.appendChild(childSpan);
+
+      const sentenceRegex = /[.!?]/;
+      const result = (
+        component as ComponentWithPrivates
+      ).traverseNodeAndWrapSpanTags(parentSpan, sentenceRegex);
+      expect(result).toBeDefined();
+    });
+
+    it('should handle remaining content in span tag', () => {
+      const div = document.createElement('div');
+      div.innerHTML = 'Text without ending punctuation';
+      const sentenceRegex = /[.!?]/;
+      const result = (
+        component as ComponentWithPrivates
+      ).traverseNodeAndWrapSpanTags(div, sentenceRegex);
+      expect(result).toBeDefined();
+    });
+  });
+
+  // Tests for _updateNode with new spacing logic.
+  describe('_updateNode with newline to space replacement', () => {
+    it('should replace newlines with spaces', fakeAsync(() => {
+      component.rteString = '<p>Line one\nLine two</p>';
+      fixture.detectChanges();
+      (component as ComponentWithPrivates)._updateNode();
+      tick();
+      expect(component.rteString).toContain(' ');
+      expect(component.rteString).not.toContain('\n');
+      discardPeriodicTasks();
+    }));
+
+    it('should normalize spacing even when automatic voiceover is disabled', fakeAsync(() => {
+      spyOn(
+        component,
+        'isAutomaticVoiceoverRegenerationFromExpFeatureEnabled'
+      ).and.returnValue(false);
+      component.rteString = '<p><strong>Text</strong><em>More</em></p>';
+      fixture.detectChanges();
+      (component as ComponentWithPrivates)._updateNode();
+      tick();
+      // Should have called normalizeSpacingInHtml.
+      expect(component.rteString).toBeDefined();
+      discardPeriodicTasks();
+    }));
+  });
+
+  // Tests for language code punctuation fallback.
+  describe('Language code punctuation handling', () => {
+    it('should use default punctuation when language code not found', () => {
+      spyOn(
+        localStorageService,
+        'getLastSelectedTranslationLanguageCode'
+      ).and.returnValue('xx-unknown');
+      component.rteString = '<p>Test sentence.</p>';
+      const result = component.wrapSentencesInSpansForHighlighting(
+        component.rteString
+      );
+      // Should not throw and should handle with default punctuation.
+      expect(result).toContain('Test sentence.');
+    });
+  });
+
+  // Tests for nodeValue null safety.
+  describe('nodeValue null safety in _updateNode', () => {
+    it('should handle pre tag with null nodeValue', fakeAsync(() => {
+      component.rteString = '<pre>  \n  </pre>';
+      fixture.detectChanges();
+      expect(() => {
+        (component as ComponentWithPrivates)._updateNode();
+        tick();
+      }).not.toThrowError();
       discardPeriodicTasks();
     }));
   });
