@@ -2125,7 +2125,6 @@ class GenerateDummyChaptersTest(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        csrf_token = self.get_new_csrf_token()
         topic = topic_domain.Topic.create_default_topic(
             'topic', 'topic_name', 'topicurl', 'description', 'fragm'
         )
@@ -2184,7 +2183,6 @@ class GenerateDummyChaptersTest(test_utils.GenericTestBase):
                 'story_id': 'story_id',
                 'num_dummy_chapters_to_generate': 3,
             },
-            csrf_token=csrf_token,
         )
 
         updated_story = story_fetchers.get_story_by_id('story_id')
@@ -2234,7 +2232,6 @@ class GenerateDummyChaptersTest(test_utils.GenericTestBase):
                 'story_id': 'story_id',
                 'num_dummy_chapters_to_generate': 2,
             },
-            csrf_token=csrf_token,
         )
 
         updated_story = story_fetchers.get_story_by_id('story_id')
