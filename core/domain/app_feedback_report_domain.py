@@ -994,9 +994,10 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
 
         Returns:
             bool. Whether the given code is valid. Valid codes are alphabetic
-            string that may contain a number of single hyphens.
+            strings (typically 2 letters long) that may optionally include a
+            hyphen followed by another alphabetic string.
         """
-        regex_string = r'^([a-z]+[-]?[a-z]+)+$'
+        regex_string = r'^[a-z]+[-]?[a-z]+$'
         return re.compile(regex_string).match(code.lower())
 
     @classmethod
@@ -1275,9 +1276,10 @@ class AndroidAppContext(AppContext):
 
         Returns:
             bool. Whether the given code is valid. Valid codes are alphabetic
-            string that may contain a number of single hyphens.
+            strings (typically 2 letters long) that may optionally include a
+            hyphen followed by another alphabetic string.
         """
-        regex_string = r'^([a-z]+[-]?[a-z]+)+$'
+        regex_string = r'^[a-z]+[-]?[a-z]+$'
         return re.compile(regex_string).match(code)
 
     @classmethod
