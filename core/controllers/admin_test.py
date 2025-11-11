@@ -2137,6 +2137,71 @@ class GenerateDummyChaptersTest(test_utils.GenericTestBase):
         )
         story.story_contents.next_node_id = 'node_4'
 
+    def test_chapter_linkage_after_dummy_generation(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        topic = topic_domain.Topic.create_default_topic(
+            'topic', 'topic_name', 'topicurl', 'description', 'fragm'
+        )
+        topic_services.save_new_topic(
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), topic
+        )
+        story = story_domain.Story.create_default_story(
+            'story_id', 'story_title', 'description', 'topic', 'storyurl'
+        )
+        story_change_list = [
+            story_domain.StoryChange(
+                {
+                    'cmd': 'add_story_node',
+                    'node_id': 'node_1',
+                    'title': 'existing chapter 1',
+                }
+            )
+        ]
+        story_services.save_new_story(
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), story
+        )
+        topic_services.update_story_and_topic_summary(
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL),
+            'story_id',
+            story_change_list,
+            'add existing node',
+            story.corresponding_topic_id,
+        )
+
+        story = story_fetchers.get_story_by_id('story_id')
+        story.story_contents.next_node_id = 'node_2'
+        story_services.save_story(
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL),
+            story,
+            'set next node id',
+        )
+
+        self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_chapters',
+                'story_id': 'story_id',
+                'num_dummy_chapters_to_generate': 3,
+            },
+            csrf_token=csrf_token,
+        )
+
+        updated_story = story_fetchers.get_story_by_id('story_id')
+
+        node_1 = updated_story.story_contents.get_node('node_1')
+        self.assertEqual(node_1.destination_node_ids, ['node_2'])
+
+        node_2 = updated_story.story_contents.get_node('node_2')
+        node_3 = updated_story.story_contents.get_node('node_3')
+        node_4 = updated_story.story_contents.get_node('node_4')
+
+        self.assertEqual(node_2.destination_node_ids, ['node_3'])
+        self.assertEqual(node_3.destination_node_ids, ['node_4'])
+        self.assertEqual(node_4.destination_node_ids, [])
+        self.logout()
+
         def reload_exploration(user_id: str, exploration_id: str) -> None:
             if constants.DEV_MODE:
                 logging.info(

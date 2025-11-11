@@ -2157,7 +2157,7 @@ class AdminHandler(
             exp_ids_to_publish = []
 
             for i in range(num_dummy_chapters_to_generate):
-                title = f'dummy exp title {i + 1 + len(exp_ids)}'
+                title = f'dummy exp title {i + 1}'
                 new_exp_id = exp_fetchers.get_new_exploration_id()
 
                 exploration = exp_domain.Exploration.create_default_exploration(
