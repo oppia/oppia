@@ -2168,7 +2168,7 @@ class GenerateDummyChaptersTest(test_utils.GenericTestBase):
             exploration,
         )
         rights_manager.publish_exploration(
-            self.get_user(self.CURRICULUM_ADMIN_EMAIL), exp_id
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), exp_id
         )
 
         story_change_list = [
@@ -2200,7 +2200,7 @@ class GenerateDummyChaptersTest(test_utils.GenericTestBase):
 
         story = story_fetchers.get_story_by_id('story_id')
         story.story_contents.next_node_id = 'node_2'
-        story_services.save_story(
+        story_services.save_new_story(
             self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL),
             story,
             'set next node id',
