@@ -18,10 +18,10 @@ from __future__ import annotations
 
 from unittest import mock
 
-from google.api_core import exceptions as google_api_exceptions
-
 from core.platform.transactions import cloud_transaction_services
 from core.tests import test_utils
+
+from google.api_core import exceptions as google_api_exceptions  # type: ignore[attr-defined]
 
 
 class CloudTransactionServicesTests(test_utils.GenericTestBase):
@@ -79,7 +79,8 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
         mock_context_manager.__enter__.side_effect = [
             google_api_exceptions.ServiceUnavailable('Test error 1'),
             google_api_exceptions.ServiceUnavailable('Test error 2'),
-            None,  # This is the successful 3rd call.
+            # This is the successful 3rd call.
+            None,
         ]
         mock_context_manager.__exit__ = mock.MagicMock()
 
