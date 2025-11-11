@@ -892,6 +892,7 @@ def _regenerate_voiceovers_for_given_contents(
     language_code_to_contents_mapping: Dict[str, Dict[str, str]],
     date_time: str,
     author_id: str,
+    specific_language_accent_code: Optional[str] = None,
 ) -> None:
     """Private helper method to regenerate voiceovers for specified contents
     of an exploration.
@@ -966,6 +967,12 @@ def _regenerate_voiceovers_for_given_contents(
         )
 
         for language_accent_code in language_accent_codes:
+            if (
+                specific_language_accent_code is not None
+                and language_accent_code != specific_language_accent_code
+            ):
+                continue
+
             language_accents_used_for_voiceover_regeneration.append(
                 language_accent_codes_to_descriptions.get(
                     language_accent_code, ''
@@ -1229,6 +1236,7 @@ def regenerate_voiceovers_of_exploration_for_given_language_accent(
         language_code_to_contents_mapping,
         date_time,
         author_id,
+        language_accent_code,
     )
 
 

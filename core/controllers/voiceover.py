@@ -321,7 +321,7 @@ class ExplorationDataForVoiceoverRegenerationHandler(
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {
         'exploration_id': {'schema': {'type': 'basestring'}}
     }
-    HANDLER_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.can_access_voiceover_admin_page
     def get(self, exploration_id: str) -> None:
@@ -366,7 +366,7 @@ class ExplorationDataForVoiceoverRegenerationHandler(
 
             entity_translations = (
                 translation_fetchers.get_all_entity_translations_for_entity(
-                    feconf.ENTITY_TYPE_EXPLORATION,
+                    feconf.TranslatableEntityType.EXPLORATION,
                     exploration_id,
                     exploration.version,
                 )
