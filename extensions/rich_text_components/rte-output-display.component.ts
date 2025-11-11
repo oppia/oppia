@@ -59,34 +59,34 @@ export class RteOutputDisplayComponent
   implements OnInit, AfterViewInit, OnDestroy
 {
   // Native HTML elements.
-  @ViewChild('p') pTagPortal: TemplateRef<unknown>;
-  @ViewChild('h1') h1TagPortal: TemplateRef<unknown>;
-  @ViewChild('span') spanTagPortal: TemplateRef<unknown>;
-  @ViewChild('ol') olTagPortal: TemplateRef<unknown>;
-  @ViewChild('li') liTagPortal: TemplateRef<unknown>;
-  @ViewChild('ul') ulTagPortal: TemplateRef<unknown>;
-  @ViewChild('pre') preTagPortal: TemplateRef<unknown>;
-  @ViewChild('strong') strongTagPortal: TemplateRef<unknown>;
-  @ViewChild('blockquote') blockquoteTagPortal: TemplateRef<unknown>;
-  @ViewChild('em') emTagPortal: TemplateRef<unknown>;
-  @ViewChild('text') textTagPortal: TemplateRef<unknown>;
+  @ViewChild('p') pTagPortal!: TemplateRef<unknown>;
+  @ViewChild('h1') h1TagPortal!: TemplateRef<unknown>;
+  @ViewChild('span') spanTagPortal!: TemplateRef<unknown>;
+  @ViewChild('ol') olTagPortal!: TemplateRef<unknown>;
+  @ViewChild('li') liTagPortal!: TemplateRef<unknown>;
+  @ViewChild('ul') ulTagPortal!: TemplateRef<unknown>;
+  @ViewChild('pre') preTagPortal!: TemplateRef<unknown>;
+  @ViewChild('strong') strongTagPortal!: TemplateRef<unknown>;
+  @ViewChild('blockquote') blockquoteTagPortal!: TemplateRef<unknown>;
+  @ViewChild('em') emTagPortal!: TemplateRef<unknown>;
+  @ViewChild('text') textTagPortal!: TemplateRef<unknown>;
   // Oppia Non interactive.
-  @ViewChild('collapsible') collapsibleTagPortal: TemplateRef<unknown>;
-  @ViewChild('image') imageTagPortal: TemplateRef<unknown>;
-  @ViewChild('link') linkTagPortal: TemplateRef<unknown>;
-  @ViewChild('math') mathTagPortal: TemplateRef<unknown>;
-  @ViewChild('skillreview') skillreviewTagPortal: TemplateRef<unknown>;
-  @ViewChild('svgdiagram') svgdiagramTagPortal: TemplateRef<unknown>;
-  @ViewChild('tabs') tabsTagPortal: TemplateRef<unknown>;
-  @ViewChild('video') videoTagPortal: TemplateRef<unknown>;
-  @ViewChild('workedexample') workedexampleTagPortal: TemplateRef<unknown>;
-  @Input() rteString: string;
+  @ViewChild('collapsible') collapsibleTagPortal!: TemplateRef<unknown>;
+  @ViewChild('image') imageTagPortal!: TemplateRef<unknown>;
+  @ViewChild('link') linkTagPortal!: TemplateRef<unknown>;
+  @ViewChild('math') mathTagPortal!: TemplateRef<unknown>;
+  @ViewChild('skillreview') skillreviewTagPortal!: TemplateRef<unknown>;
+  @ViewChild('svgdiagram') svgdiagramTagPortal!: TemplateRef<unknown>;
+  @ViewChild('tabs') tabsTagPortal!: TemplateRef<unknown>;
+  @ViewChild('video') videoTagPortal!: TemplateRef<unknown>;
+  @ViewChild('workedexample') workedexampleTagPortal!: TemplateRef<unknown>;
+  @Input() rteString: string = '';
   @Input() altTextIsDisplayed: boolean = false;
   node: OppiaRteNode | string = '';
   show = false;
   portalTree: PortalTree = [];
 
-  highlightIdToSentenceText = {};
+  highlightIdToSentenceText: Record<string, string> = {};
   wrapped = false;
   previousHighlightedElementId!: string | undefined;
   // The background color of the sentence being played in the audio player.
@@ -107,7 +107,7 @@ export class RteOutputDisplayComponent
   index = 1;
 
   // Track the interval ID so we can clear it on component destruction.
-  private highlightIntervalId: number | undefined;
+  public highlightIntervalId: number | undefined;
 
   // Parent tags eligible for voiceover highlighting. Text within these tags
   // is split into sentences and wrapped in span tags. Tags like i, strong, etc.,
@@ -176,7 +176,10 @@ export class RteOutputDisplayComponent
       );
       const decodedMathContent = this.decodeHtmlEntities(encodedMathContent);
       const latexText = JSON.parse(decodedMathContent)?.raw_latex;
-      return this.parseAndConvertLatex(latexText);
+      if (latexText) {
+        return this.parseAndConvertLatex(latexText);
+      }
+      return '';
     }
     // Default to empty string for any unhandled node types. This prevents
     // callers from receiving `undefined` which can lead to runtime issues
@@ -204,7 +207,8 @@ export class RteOutputDisplayComponent
     } else {
       let updatedChildNodes: Node[] = [];
 
-      node.childNodes.forEach(childNode => {
+      const childNodesArray = Array.from(node.childNodes);
+      childNodesArray.forEach(childNode => {
         updatedChildNodes = updatedChildNodes.concat(
           this.traverseNodeAndWrapSpanTags(childNode, sentenceRegex)
         );
@@ -237,7 +241,7 @@ export class RteOutputDisplayComponent
           return updatedChildNodes;
         }
 
-        let currentElementReplicaNodes = [];
+        let currentElementReplicaNodes: HTMLElement[] = [];
         updatedChildNodes.forEach(child => {
           let tempElementNode = document.createElement(currentNodeName);
           tempElementNode.appendChild(child);
@@ -256,7 +260,7 @@ export class RteOutputDisplayComponent
 
         let currentSentenceToMatch = sentencesInEarliestParentTag.shift();
 
-        let spanNodeList = [];
+        let spanNodeList: Node[] = [];
         let spanTagElement = document.createElement('span');
         let nextSentenceOffset = '';
 
@@ -309,7 +313,8 @@ export class RteOutputDisplayComponent
 
           let textInsideSpanTag = '';
 
-          for (let tempChildNode of spanNode.childNodes) {
+          const childNodesArray = Array.from(spanNode.childNodes);
+          for (let tempChildNode of childNodesArray) {
             textInsideSpanTag += this.getReadableTextFromNode(tempChildNode);
           }
 
@@ -347,10 +352,15 @@ export class RteOutputDisplayComponent
     // Sentences in the lesson content are separated using punctuation marks
     // specific to the language.
     // The following line retrieves the punctuation marks for the current language.
+    const punctuationMap =
+      AppConstants.LANGUAGE_CODE_TO_SENTENCE_ENDING_PUNCTUATION_MARKS as Record<
+        string,
+        string
+      >;
     const punctuationsForCurrentLanguage =
-      AppConstants.LANGUAGE_CODE_TO_SENTENCE_ENDING_PUNCTUATION_MARKS[
-        languageCode
-      ];
+      punctuationMap[languageCode] ||
+      punctuationMap[AppConstants.DEFAULT_LANGUAGE_CODE] ||
+      '.!?';
 
     // The regex below is used to split sentences from the lesson content.
     const sentenceRegex = new RegExp(
@@ -448,7 +458,8 @@ export class RteOutputDisplayComponent
               continue;
             }
             if (preNode.childNodes[i].nodeType === 3) {
-              if (preNode.childNodes[i].nodeValue.replace(/\s/g, '') === '') {
+              const nodeValue = preNode.childNodes[i].nodeValue;
+              if (nodeValue && nodeValue.replace(/\s/g, '') === '') {
                 preNode.removeChild(preNode.childNodes[i]);
                 i--;
               }
@@ -775,9 +786,12 @@ export class RteOutputDisplayComponent
       // appear when rte text changes.
       const textNodes: Text[] = [];
 
-      for (const node of this.elementRef.nativeElement.childNodes) {
+      const childNodesArray = Array.from(
+        this.elementRef.nativeElement.childNodes
+      );
+      for (const node of childNodesArray) {
         if ((node as Node).nodeType === Node.TEXT_NODE) {
-          textNodes.push(node);
+          textNodes.push(node as Text);
         }
       }
 
