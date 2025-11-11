@@ -2170,11 +2170,6 @@ class GenerateDummyChaptersTest(test_utils.GenericTestBase):
 
         story = story_fetchers.get_story_by_id('story_id')
         story.story_contents.next_node_id = 'node_2'
-        story_services.save_story(
-            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL),
-            story,
-            'set next node id',
-        )
 
         self.post_json(
             '/adminhandler',
@@ -2187,12 +2182,12 @@ class GenerateDummyChaptersTest(test_utils.GenericTestBase):
 
         updated_story = story_fetchers.get_story_by_id('story_id')
 
-        node_1 = updated_story.story_contents.get_node('node_1')
+        node_1 = updated_story.story_contents.get_node_index('node_1')
         self.assertEqual(node_1.destination_node_ids, ['node_2'])
 
-        node_2 = updated_story.story_contents.get_node('node_2')
-        node_3 = updated_story.story_contents.get_node('node_3')
-        node_4 = updated_story.story_contents.get_node('node_4')
+        node_2 = updated_story.story_contents.get_node_index('node_2')
+        node_3 = updated_story.story_contents.get_node_index('node_3')
+        node_4 = updated_story.story_contents.get_node_index('node_4')
 
         self.assertEqual(node_2.destination_node_ids, ['node_3'])
         self.assertEqual(node_3.destination_node_ids, ['node_4'])
