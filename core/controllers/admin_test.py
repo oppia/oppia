@@ -2167,9 +2167,9 @@ class GenerateDummyChaptersTest(test_utils.GenericTestBase):
             self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL),
             exploration,
         )
-        rights_manager.publish_exploration(
-            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), exp_id
-        )
+        user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        user_actions = user_services.get_user_actions_info(user_id)
+        rights_manager.publish_exploration(user_actions, exp_id)
 
         story_change_list = [
             story_domain.StoryChange(
