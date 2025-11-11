@@ -71,6 +71,14 @@ describe('RTE display component', () => {
   let localStorageService: LocalStorageService;
   let audioplayerService: AudioPlayerService;
 
+  // Type helper for accessing private/protected members in tests.
+  type ComponentWithPrivates = RteOutputDisplayComponent & {
+    normalizeSpacingInHtml: (html: string) => string;
+    _updateNode: () => void;
+    _getTemplatePortal: (node: unknown) => unknown;
+    rteString: string | null | undefined;
+  };
+
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [RichTextComponentsModule, HttpClientTestingModule],
@@ -718,72 +726,96 @@ describe('RTE display component', () => {
 
   it('should normalize spacing between inline elements', () => {
     const input = '<p>time.<em>Incidentally</em></p>';
-    const output = (component as any).normalizeSpacingInHtml(input);
+    const output = (component as ComponentWithPrivates).normalizeSpacingInHtml(
+      input
+    );
     expect(output).toContain('time. <em>');
   });
 
   it('should insert space between adjacent inline elements', () => {
     const input = '<span>Hi</span><a href="#">there</a>';
-    const output = (component as any).normalizeSpacingInHtml(input);
+    const output = (component as ComponentWithPrivates).normalizeSpacingInHtml(
+      input
+    );
     expect(output).toContain('>Hi</span> <a');
   });
 
   it('should insert space between inline element and following text', () => {
     const input = '<em>bold</em>text';
-    const output = (component as any).normalizeSpacingInHtml(input);
+    const output = (component as ComponentWithPrivates).normalizeSpacingInHtml(
+      input
+    );
     expect(output).toContain('>bold</em> text');
   });
 
   it('should insert space between text and following inline element', () => {
     const input = 'text<strong>bold</strong>';
-    const output = (component as any).normalizeSpacingInHtml(input);
+    const output = (component as ComponentWithPrivates).normalizeSpacingInHtml(
+      input
+    );
     expect(output).toContain('text <strong>');
   });
 
   it('should not insert space between block elements', () => {
     const input = '<p>para1</p><p>para2</p>';
-    const output = (component as any).normalizeSpacingInHtml(input);
+    const output = (component as ComponentWithPrivates).normalizeSpacingInHtml(
+      input
+    );
     expect(output).not.toContain('</p> <p>');
   });
 
   it('should skip spacing normalization inside PRE blocks', () => {
     const input = '<pre><code>line1\nline2</code></pre>';
-    const output = (component as any).normalizeSpacingInHtml(input);
+    const output = (component as ComponentWithPrivates).normalizeSpacingInHtml(
+      input
+    );
     expect(output).toBe(input);
   });
 
   it('should handle nested inline elements correctly', () => {
     const input = '<span>outer<em>inner</em>text</span>';
-    const output = (component as any).normalizeSpacingInHtml(input);
+    const output = (component as ComponentWithPrivates).normalizeSpacingInHtml(
+      input
+    );
     // normalizeSpacingInHtml adds spaces between inline elements.
     expect(output).toBe('<span>outer <em>inner</em> text</span>');
   });
 
   it('should preserve existing spaces', () => {
     const input = '<span>word1</span> <span>word2</span>';
-    const output = (component as any).normalizeSpacingInHtml(input);
+    const output = (component as ComponentWithPrivates).normalizeSpacingInHtml(
+      input
+    );
     expect(output).toBe(input);
   });
 
   it('should handle empty elements', () => {
     const input = '<span></span><em>test</em>';
-    const output = (component as any).normalizeSpacingInHtml(input);
+    const output = (component as ComponentWithPrivates).normalizeSpacingInHtml(
+      input
+    );
     expect(output).toContain('></span> <em>');
   });
 
   it('should handle undefined rteString gracefully in _updateNode', () => {
-    (component as any).rteString = undefined;
-    expect(() => (component as any)._updateNode()).not.toThrow();
+    (component as ComponentWithPrivates).rteString = undefined;
+    expect(() =>
+      (component as ComponentWithPrivates)._updateNode()
+    ).not.toThrowError();
   });
 
   it('should handle null rteString gracefully in _updateNode', () => {
-    (component as any).rteString = null;
-    expect(() => (component as any)._updateNode()).not.toThrow();
+    (component as ComponentWithPrivates).rteString = null;
+    expect(() =>
+      (component as ComponentWithPrivates)._updateNode()
+    ).not.toThrowError();
   });
 
   it('should handle empty rteString gracefully in _updateNode', () => {
     component.rteString = '';
-    expect(() => (component as any)._updateNode()).not.toThrow();
+    expect(() =>
+      (component as ComponentWithPrivates)._updateNode()
+    ).not.toThrowError();
   });
 
   it('should return correct values from decodeHtmlEntities', () => {
@@ -939,7 +971,7 @@ describe('RTE display component', () => {
         'getActiveEntityVoiceovers'
       ).and.returnValue({
         automatedVoiceoversAudioOffsetsMsecs: mockOffsets,
-      } as any);
+      } as Partial<EntityVoiceovers>);
       spyOn(
         automaticVoiceoverHighlightService,
         'setAutomatedVoiceoversAudioOffsets'
@@ -963,7 +995,9 @@ describe('RTE display component', () => {
       spyOn(
         entityVoiceoversService,
         'getActiveEntityVoiceovers'
-      ).and.returnValue({automatedVoiceoversAudioOffsetsMsecs: {}} as any);
+      ).and.returnValue({
+        automatedVoiceoversAudioOffsetsMsecs: {},
+      } as Partial<EntityVoiceovers>);
       spyOn(
         automaticVoiceoverHighlightService,
         'setAutomatedVoiceoversAudioOffsets'
@@ -1269,7 +1303,7 @@ describe('RTE display component', () => {
       fixture.detectChanges();
 
       // Should not throw error.
-      expect(() => component.ngOnChanges(changes)).not.toThrow();
+      expect(() => component.ngOnChanges(changes)).not.toThrowError();
       tick();
       discardPeriodicTasks();
     }));
