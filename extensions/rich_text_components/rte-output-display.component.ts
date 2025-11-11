@@ -168,12 +168,18 @@ export class RteOutputDisplayComponent
       node.nodeName === 'OPPIA-NONINTERACTIVE-LINK'
     ) {
       const encodedText = (node as Element).getAttribute('text-with-value');
+      if (!encodedText) {
+        return '';
+      }
       const decodedText = this.decodeHtmlEntities(encodedText);
       return JSON.parse(decodedText);
     } else if (node.nodeName === 'OPPIA-NONINTERACTIVE-MATH') {
       const encodedMathContent = (node as Element).getAttribute(
         'math_content-with-value'
       );
+      if (!encodedMathContent) {
+        return '';
+      }
       const decodedMathContent = this.decodeHtmlEntities(encodedMathContent);
       const latexText = JSON.parse(decodedMathContent)?.raw_latex;
       if (latexText) {
@@ -429,7 +435,10 @@ export class RteOutputDisplayComponent
       throw e;
     }
     const dfs = (node: OppiaRteNode | TextNode) => {
-      node.portal = this._getTemplatePortal(node);
+      const portal = this._getTemplatePortal(node);
+      if (portal) {
+        node.portal = portal;
+      }
       if (!('children' in node)) {
         return;
       }
@@ -659,11 +668,11 @@ export class RteOutputDisplayComponent
         return;
       }
 
-      let previousHighlightedElement = document.getElementById(
-        this.previousHighlightedElementId
-      );
+      const previousHighlightedElement = this.previousHighlightedElementId
+        ? document.getElementById(this.previousHighlightedElementId)
+        : null;
 
-      let currentElementIdToHighlight =
+      const currentElementIdToHighlight =
         this.automaticVoiceoverHighlightService.getCurrentSentenceIdToHighlight(
           this.audioPlayerService.getCurrentTimeInSecs()
         );
@@ -678,7 +687,7 @@ export class RteOutputDisplayComponent
         return;
       }
 
-      let currentElementToHighlight = document.getElementById(
+      const currentElementToHighlight = document.getElementById(
         currentElementIdToHighlight
       );
 
@@ -696,9 +705,9 @@ export class RteOutputDisplayComponent
     } else {
       // Removes the highlight from the previous sentence when the audio is
       // paused.
-      let previousHighlightedElement = document.getElementById(
-        this.previousHighlightedElementId
-      );
+      const previousHighlightedElement = this.previousHighlightedElementId
+        ? document.getElementById(this.previousHighlightedElementId)
+        : null;
       if (previousHighlightedElement) {
         previousHighlightedElement.style.backgroundColor = '';
       }
@@ -736,26 +745,34 @@ export class RteOutputDisplayComponent
 
   private _getTemplatePortal(
     node: OppiaRteNode | TextNode
-  ): TemplatePortal<unknown> {
+  ): TemplatePortal<unknown> | undefined {
     if ('value' in node) {
       return new TemplatePortal(this.textTagPortal, this._viewContainerRef, {
         $implicit: node,
       });
     }
     if (node.nodeType === 'component') {
-      return new TemplatePortal(
-        this[node.selector.split('oppia-noninteractive-')[1] + 'TagPortal'],
-        this._viewContainerRef,
-        {$implicit: node.attrs}
-      );
+      const portalKey = (node.selector.split('oppia-noninteractive-')[1] +
+        'TagPortal') as keyof this;
+      const portal = this[portalKey];
+      if (portal) {
+        return new TemplatePortal(
+          portal as unknown as TemplateRef<unknown>,
+          this._viewContainerRef,
+          {$implicit: node.attrs}
+        );
+      }
     }
-    if (this[node.selector + 'TagPortal'] !== undefined) {
+    const portalKey = (node.selector + 'TagPortal') as keyof this;
+    const portal = this[portalKey];
+    if (portal !== undefined) {
       return new TemplatePortal(
-        this[node.selector + 'TagPortal'],
+        portal as unknown as TemplateRef<unknown>,
         this._viewContainerRef,
         {$implicit: node}
       );
     }
+    return undefined;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -795,7 +812,12 @@ export class RteOutputDisplayComponent
         }
       }
 
-      textNodes.forEach(node => node.parentElement.removeChild(node));
+      textNodes.forEach(node => {
+        const parentElement = node.parentElement;
+        if (parentElement) {
+          parentElement.removeChild(node);
+        }
+      });
 
       this._updateNode();
 
