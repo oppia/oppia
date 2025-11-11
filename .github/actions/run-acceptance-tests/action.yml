@@ -1,9 +1,9 @@
 name: Run Acceptance Test
-description: Runs the acceptance tests using python installation.
+description: Runs a specific acceptance test.
 
 inputs:
   test-suite:
-    description: Acceptance test suite to run.
+    description: 'The acceptance test suite to run(e.g. "interested-donor/make-a-donation").'
     required: true
   mobile:
     description: Whether to run the tests on mobile or desktop.
