@@ -1,0 +1,86 @@
+name: Run a specific acceptance test
+description: Runs a specific acceptance test-suite that is given as an input.
+
+inputs:
+  test-suite:
+    description: 'The acceptance test suite to run(e.g. "interested-donor/make-a-donation").'
+    required: true
+  mobile:
+    description: Whether to run the tests on mobile or desktop.
+    required: true
+    type: choice
+    options:
+      - mobile
+      - desktop
+  screen-recording:
+    description: Whether to record the screen during the test.
+    required: true
+    type: boolean
+  modified-suite-name:
+    description: A unique suite name without spaces to use in the artifacts uploads. If not provided, the test data will not be uploaded.
+
+runs:
+  using: "composite"
+  steps:
+    - name: Run ${{ inputs.mobile && 'Mobile' || 'Desktop' }} Acceptance Test ${{ inputs.test-suite }}
+      id: run-acceptance-test
+      shell: bash
+      # We use xvfb-run to create a virtual screen to run tests without headless mode.
+      # Numbers in 1920x1080x24 represents screen width, height and color depth respectively.
+      run: >
+        set -o pipefail;
+        VIDEO_RECORDING_IS_ENABLED=${{ inputs.screen-recording && '1' || '0' }}
+        xvfb-run -a --server-args="-screen 0, 1920x1080x24"
+        python -m scripts.run_acceptance_tests
+        --skip-build
+        --suite=${{ inputs.test-suite }}
+        ${{ inputs.mobile && '--mobile' || '' }}
+        --prod_env
+        --server_log_level=info
+        | tee acceptance_test_${{ inputs.modified-suite-name || '' }}.log
+
+    - name: Upload test logs
+      # We need to pass always() because if not, GitHub will implicitly use success(),
+      # which requires all previous jobs/steps to have succeeded. This is not what we want.
+      # Reference: https://docs.github.com/en/actions/reference/workflows-and-actions/expressions#status-check-functions
+      # Quote: "A default status check of success() is applied unless you *include* one of these functions."
+      if: ${{ always() && steps.run-acceptance-test.outcome == 'failure' && inputs.modified-suite-name != '' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: acceptance-test-logs-${{ inputs.modified-suite-name }}
+        path: acceptance_test_${{ inputs.modified-suite-name }}.log
+
+    - name: Upload test failure screenshots
+      # We need to pass always() because if not, GitHub will implicitly use success(),
+      # which requires all previous jobs/steps to have succeeded. This is not what we want.
+      # Reference: https://docs.github.com/en/actions/reference/workflows-and-actions/expressions#status-check-functions
+      # Quote: "A default status check of success() is applied unless you *include* one of these functions."
+      if: ${{ always() && steps.run-acceptance-test.outcome == 'failure' && inputs.modified-suite-name != '' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: acceptance-test-failure-screenshot-${{ inputs.modified-suite-name }}
+        path: /home/runner/work/oppia/oppia_full_stack_test_failure_screenshots/acceptance
+
+    - name: Upload test diff screenshots
+      # We need to pass always() because if not, GitHub will implicitly use success(),
+      # which requires all previous jobs/steps to have succeeded. This is not what we want.
+      # Reference: https://docs.github.com/en/actions/reference/workflows-and-actions/expressions#status-check-functions
+      # Quote: "A default status check of success() is applied unless you *include* one of these functions."
+      if: ${{ always() && steps.run-acceptance-test.outcome == 'failure' && inputs.modified-suite-name != '' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: diff-snapshots-${{ inputs.modified-suite-name }}
+        # Note: The path must be kept in sync with the one specified in
+        # core/tests/puppeteer-acceptance-tests/utilities/common/puppeteer-utils.ts
+        path: /home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/diff-snapshots
+
+    - name: Upload test recordings
+      # We need to pass always() because if not, GitHub will implicitly use success(),
+      # which requires all previous jobs/steps to have succeeded. This is not what we want.
+      # Reference: https://docs.github.com/en/actions/reference/workflows-and-actions/expressions#status-check-functions
+      # Quote: "A default status check of success() is applied unless you *include* one of these functions."
+      if: ${{ always() && steps.run-acceptance-test.outcome == 'failure' && inputs.modified-suite-name != '' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: acceptance-test-video-${{ inputs.modified-suite-name }}
+        path: /home/runner/work/oppia/oppia_full_stack_test_video_recordings/acceptance/${{ inputs.mobile && 'mobile' || 'desktop' }}
