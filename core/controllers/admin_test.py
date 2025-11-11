@@ -2160,6 +2160,11 @@ class GenerateDummyChaptersTest(test_utils.GenericTestBase):
         story_services.save_new_story(
             self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), story
         )
+        topic_services.add_canonical_story(
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL),
+            'topic',
+            'story_id',
+        )
         topic_services.update_story_and_topic_summary(
             self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL),
             'story_id',
