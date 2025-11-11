@@ -16,6 +16,10 @@
 
 from __future__ import annotations
 
+from unittest import mock
+
+from google.api_core import exceptions as google_api_exceptions
+
 from core.platform.transactions import cloud_transaction_services
 from core.tests import test_utils
 
@@ -58,3 +62,52 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
         self.assertEqual(result, 3)
         self.assertTrue(calls_made['enter_context'])
         self.assertTrue(calls_made['exit_context'])
+
+    def test_run_in_transaction_retries_on_service_unavailable_error(
+        self,
+    ) -> None:
+        """Tests that the transaction retries and succeeds."""
+
+        # 1. Define a simple function to run in the transaction.
+        def mock_transactional_function() -> str:
+            return 'SUCCESS'
+
+        # 2. Create a mock for the CONTEXT MANAGER (the object returned by transaction()).
+        mock_context_manager = mock.MagicMock()
+
+        # 3. Configure its __enter__ method to fail TWICE, then succeed.
+        mock_context_manager.__enter__.side_effect = [
+            google_api_exceptions.ServiceUnavailable('Test error 1'),
+            google_api_exceptions.ServiceUnavailable('Test error 2'),
+            None,  # This is the successful 3rd call.
+        ]
+        mock_context_manager.__exit__ = mock.MagicMock()
+
+        # 4. Create a mock for the CLIENT.transaction METHOD itself.
+        mock_transaction_method = mock.MagicMock(
+            return_value=mock_context_manager
+        )
+
+        # 5. Get the wrapped function from the service.
+        wrapped_function = (
+            cloud_transaction_services.run_in_transaction_wrapper(
+                mock_transactional_function
+            )
+        )
+
+        # 6. Swap the real method with our mock using a 'with' statement.
+        with self.swap(
+            cloud_transaction_services.CLIENT,
+            'transaction',
+            mock_transaction_method,
+        ):
+            # 7. Assert that the function now SUCCEEDS (it does not raise an error).
+            # We mock 'time.sleep' so the test runs instantly.
+            with mock.patch('time.sleep'):
+                result = wrapped_function()
+
+        # 8. Check that the function returned the correct value.
+        self.assertEqual(result, 'SUCCESS')
+        # Check that the transaction method was called 3 TIMES (1 original + 2 retries).
+        self.assertEqual(mock_transaction_method.call_count, 3)
+        self.assertEqual(mock_context_manager.__enter__.call_count, 3)
