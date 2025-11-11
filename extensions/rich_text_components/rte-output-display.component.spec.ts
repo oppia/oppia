@@ -755,7 +755,7 @@ describe('RTE display component', () => {
   it('should handle nested inline elements correctly', () => {
     const input = '<span>outer<em>inner</em>text</span>';
     const output = (component as any).normalizeSpacingInHtml(input);
-    // normalizeSpacingInHtml adds spaces between inline elements
+    // normalizeSpacingInHtml adds spaces between inline elements.
     expect(output).toBe('<span>outer <em>inner</em> text</span>');
   });
 
@@ -1040,7 +1040,7 @@ describe('RTE display component', () => {
         'getCurrentSentenceIdToHighlight'
       ).and.returnValue('highlightBlock1');
 
-      // Create a mock element to verify highlighting
+      // Create a mock element to verify highlighting.
       const mockElement = document.createElement('span');
       mockElement.id = 'highlightBlock1';
       mockElement.textContent = 'Test sentence.';
@@ -1051,11 +1051,11 @@ describe('RTE display component', () => {
 
       component.highlightSentenceDuringVoiceoverPlay();
 
-      // Verify the method was called with correct ID
+      // Verify the method was called with correct ID.
       expect(getElementSpy).toHaveBeenCalledWith('highlightBlock1');
-      // Verify the element was highlighted
+      // Verify the element was highlighted.
       expect(mockElement.style.backgroundColor).toBe('rgb(243, 209, 64)');
-      // Verify state was updated
+      // Verify state was updated.
       expect(component.previousHighlightedElementId).toBe('highlightBlock1');
     }));
 
@@ -1067,12 +1067,12 @@ describe('RTE display component', () => {
       spyOn(component, 'isInPlayerOrPreviewPage').and.returnValue(true);
       spyOn(audioplayerService, 'isPlaying').and.returnValue(false);
 
-      // Create a mock element that's currently highlighted
+      // Create a mock element that's currently highlighted.
       const mockElement = document.createElement('span');
       mockElement.id = 'highlightBlock1';
       mockElement.style.backgroundColor = 'rgb(243, 209, 64)';
 
-      // Set up component state as if element was previously highlighted
+      // Set up component state as if element was previously highlighted.
       component.previousHighlightedElementId = 'highlightBlock1';
 
       const getElementSpy = spyOn(document, 'getElementById').and.returnValue(
@@ -1081,10 +1081,10 @@ describe('RTE display component', () => {
 
       component.highlightSentenceDuringVoiceoverPlay();
 
-      // Verify highlight was cleared
+      // Verify highlight was cleared.
       expect(getElementSpy).toHaveBeenCalledWith('highlightBlock1');
       expect(mockElement.style.backgroundColor).toBe('');
-      // Verify state was reset
+      // Verify state was reset.
       expect(component.previousHighlightedElementId).toBeUndefined();
     }));
 
@@ -1100,7 +1100,7 @@ describe('RTE display component', () => {
         'getCurrentSentenceIdToHighlight'
       ).and.returnValue('highlightBlock2');
 
-      // Create mock elements
+      // Create mock elements.
       const previousElement = document.createElement('span');
       previousElement.id = 'highlightBlock1';
       previousElement.style.backgroundColor = 'rgb(243, 209, 64)';
@@ -1108,7 +1108,7 @@ describe('RTE display component', () => {
       const currentElement = document.createElement('span');
       currentElement.id = 'highlightBlock2';
 
-      // Set up component state
+      // Set up component state.
       component.previousHighlightedElementId = 'highlightBlock1';
 
       spyOn(document, 'getElementById').and.callFake((id: string) => {
@@ -1119,11 +1119,11 @@ describe('RTE display component', () => {
 
       component.highlightSentenceDuringVoiceoverPlay();
 
-      // Verify previous highlight was removed
+      // Verify previous highlight was removed.
       expect(previousElement.style.backgroundColor).toBe('');
-      // Verify new element was highlighted
+      // Verify new element was highlighted.
       expect(currentElement.style.backgroundColor).toBe('rgb(243, 209, 64)');
-      // Verify state was updated
+      // Verify state was updated.
       expect(component.previousHighlightedElementId).toBe('highlightBlock2');
     }));
 
@@ -1205,7 +1205,7 @@ describe('RTE display component', () => {
           isFirstChange: () => true,
         },
       };
-      // Initialize the view first to ensure template portals are available
+      // Initialize the view first to ensure template portals are available.
       fixture.detectChanges();
       component.ngOnChanges(changes);
       tick();
@@ -1234,7 +1234,7 @@ describe('RTE display component', () => {
           isFirstChange: () => true,
         },
       };
-      // Initialize the view first to ensure template portals are available
+      // Initialize the view first to ensure template portals are available.
       fixture.detectChanges();
       component.ngOnChanges(changes);
       tick();
@@ -1243,5 +1243,311 @@ describe('RTE display component', () => {
       expect(normalizeSpy).not.toHaveBeenCalled();
       discardPeriodicTasks();
     }));
+
+    it('should handle node with null parentElement gracefully', fakeAsync(() => {
+      const changes: SimpleChanges = {
+        rteString: {
+          previousValue: '',
+          currentValue: '<p>Test</p>',
+          firstChange: true,
+          isFirstChange: () => true,
+        },
+      };
+
+      // Create a text node with null parent
+      const orphanNode = document.createTextNode('orphan');
+      Object.defineProperty(orphanNode, 'parentElement', {
+        value: null,
+        writable: false,
+      });
+
+      spyOn(component.elementRef.nativeElement, 'childNodes').and.returnValue([
+        orphanNode,
+      ]);
+
+      component.rteString = '<p>Test</p>';
+      fixture.detectChanges();
+
+      // Should not throw error.
+      expect(() => component.ngOnChanges(changes)).not.toThrow();
+      tick();
+      discardPeriodicTasks();
+    }));
+  });
+
+  describe('getReadableTextFromNode edge cases', () => {
+    it('should return empty string when OPPIA-NONINTERACTIVE-LINK has no text-with-value attribute', () => {
+      const linkNode = document.createElement('oppia-noninteractive-link');
+      // Don't set the text-with-value attribute
+      expect(component.getReadableTextFromNode(linkNode)).toBe('');
+    });
+
+    it('should return empty string when OPPIA-NONINTERACTIVE-SKILLREVIEW has no text-with-value attribute', () => {
+      const skillNode = document.createElement(
+        'oppia-noninteractive-skillreview'
+      );
+      // Don't set the text-with-value attribute
+      expect(component.getReadableTextFromNode(skillNode)).toBe('');
+    });
+
+    it('should return empty string when OPPIA-NONINTERACTIVE-MATH has no math_content-with-value attribute', () => {
+      const mathNode = document.createElement('oppia-noninteractive-math');
+      // Don't set the math_content-with-value attribute
+      expect(component.getReadableTextFromNode(mathNode)).toBe('');
+    });
+
+    it('should return empty string when OPPIA-NONINTERACTIVE-MATH has invalid latex', () => {
+      const mathNode = document.createElement('oppia-noninteractive-math');
+      mathNode.setAttribute('math_content-with-value', '&quot;invalid&quot;');
+      expect(component.getReadableTextFromNode(mathNode)).toBe('');
+    });
+
+    it('should return empty string when math content has no raw_latex', () => {
+      const mathNode = document.createElement('oppia-noninteractive-math');
+      mathNode.setAttribute(
+        'math_content-with-value',
+        '{&quot;svg_filename&quot;: &quot;test.svg&quot;}'
+      );
+      expect(component.getReadableTextFromNode(mathNode)).toBe('');
+    });
+  });
+
+  describe('ngOnDestroy', () => {
+    it('should clear highlight interval to prevent memory leaks', fakeAsync(() => {
+      component.highlightIntervalId = window.setInterval(() => {}, 100);
+      const intervalId = component.highlightIntervalId;
+      expect(intervalId).toBeDefined();
+
+      component.ngOnDestroy();
+
+      expect(component.highlightIntervalId).toBeUndefined();
+      // Verify interval was actually cleared
+      discardPeriodicTasks();
+    }));
+
+    it('should handle ngOnDestroy when highlightIntervalId is undefined', () => {
+      component.highlightIntervalId = undefined;
+      expect(() => component.ngOnDestroy()).not.toThrow();
+    });
+  });
+
+  describe('_getTemplatePortal edge cases', () => {
+    it('should return undefined when portal does not exist for component node', () => {
+      const node = {
+        nodeType: 'component' as const,
+        selector: 'oppia-noninteractive-unknown',
+        attrs: {},
+      };
+
+      fixture.detectChanges();
+      const result = (component as any)._getTemplatePortal(node);
+      expect(result).toBeUndefined();
+    });
+
+    it('should return undefined when portal does not exist for regular node', () => {
+      const node = {
+        nodeType: 'element' as const,
+        selector: 'unknown',
+        children: [],
+      };
+
+      fixture.detectChanges();
+      const result = (component as any)._getTemplatePortal(node);
+      expect(result).toBeUndefined();
+    });
+
+    it('should handle component node with oppia-noninteractive prefix correctly', () => {
+      const node = {
+        nodeType: 'component' as const,
+        selector: 'oppia-noninteractive-math',
+        attrs: {test: 'value'},
+      };
+
+      fixture.detectChanges();
+      const result = (component as any)._getTemplatePortal(node);
+      expect(result).toBeDefined();
+    });
+  });
+
+  describe('highlightSentenceDuringVoiceoverPlay additional edge cases', () => {
+    it('should handle case when element to highlight does not exist', fakeAsync(() => {
+      spyOn(
+        component,
+        'isManualVoiceoverAvailableForActiveContent'
+      ).and.returnValue(false);
+      spyOn(component, 'isInPlayerOrPreviewPage').and.returnValue(true);
+      spyOn(audioplayerService, 'isPlaying').and.returnValue(true);
+      spyOn(
+        automaticVoiceoverHighlightService,
+        'getCurrentSentenceIdToHighlight'
+      ).and.returnValue('nonexistent_id');
+
+      spyOn(document, 'getElementById').and.returnValue(null);
+
+      // Should not throw error when element doesn't exist.
+      expect(() =>
+        component.highlightSentenceDuringVoiceoverPlay()
+      ).not.toThrow();
+    }));
+
+    it('should handle case when previousHighlightedElement does not exist but previousHighlightedElementId is set', fakeAsync(() => {
+      spyOn(
+        component,
+        'isManualVoiceoverAvailableForActiveContent'
+      ).and.returnValue(false);
+      spyOn(component, 'isInPlayerOrPreviewPage').and.returnValue(true);
+      spyOn(audioplayerService, 'isPlaying').and.returnValue(false);
+
+      component.previousHighlightedElementId = 'nonexistent_id';
+      spyOn(document, 'getElementById').and.returnValue(null);
+
+      // Should not throw error when previous element doesn't exist.
+      expect(() =>
+        component.highlightSentenceDuringVoiceoverPlay()
+      ).not.toThrow();
+      expect(component.previousHighlightedElementId).toBeUndefined();
+    }));
+
+    it('should not highlight when currentElementIdToHighlight is empty', fakeAsync(() => {
+      spyOn(
+        component,
+        'isManualVoiceoverAvailableForActiveContent'
+      ).and.returnValue(false);
+      spyOn(component, 'isInPlayerOrPreviewPage').and.returnValue(true);
+      spyOn(audioplayerService, 'isPlaying').and.returnValue(true);
+      spyOn(
+        automaticVoiceoverHighlightService,
+        'getCurrentSentenceIdToHighlight'
+      ).and.returnValue('');
+
+      const getElementSpy = spyOn(document, 'getElementById');
+
+      component.highlightSentenceDuringVoiceoverPlay();
+
+      // getElementById should be called with empty string
+      expect(getElementSpy).toHaveBeenCalledWith('');
+    }));
+  });
+
+  describe('isInPlayerOrPreviewPage', () => {
+    it('should return true when in exploration player page', () => {
+      spyOn(pageContextService, 'isInExplorationPlayerPage').and.returnValue(
+        true
+      );
+      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+        false
+      );
+      expect(component.isInPlayerOrPreviewPage()).toBe(true);
+    });
+
+    it('should return true when in exploration editor preview tab', () => {
+      spyOn(pageContextService, 'isInExplorationPlayerPage').and.returnValue(
+        false
+      );
+      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+        true
+      );
+      spyOn(pageContextService, 'getEditorTabContext').and.returnValue(
+        'preview'
+      );
+      expect(component.isInPlayerOrPreviewPage()).toBe(true);
+    });
+
+    it('should return false when in exploration editor non-preview tab', () => {
+      spyOn(pageContextService, 'isInExplorationPlayerPage').and.returnValue(
+        false
+      );
+      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+        true
+      );
+      spyOn(pageContextService, 'getEditorTabContext').and.returnValue(
+        'editor'
+      );
+      expect(component.isInPlayerOrPreviewPage()).toBe(false);
+    });
+
+    it('should return false when not in player or editor page', () => {
+      spyOn(pageContextService, 'isInExplorationPlayerPage').and.returnValue(
+        false
+      );
+      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+        false
+      );
+      expect(component.isInPlayerOrPreviewPage()).toBe(false);
+    });
+  });
+
+  describe('isManualVoiceoverAvailableForActiveContent edge cases', () => {
+    it('should return false when manual voiceover needs update', () => {
+      const voiceover = {
+        filename: 'a.mp3',
+        file_size_bytes: 200000,
+        needs_update: true,
+        duration_secs: 10.0,
+      };
+      let contentIdToVoiceoversMapping = {
+        content0: {
+          manual: voiceover,
+          auto: undefined,
+        },
+      };
+      const entityVoiceoversBackendDict = {
+        entity_id: 'exp_1',
+        entity_type: 'exploration',
+        entity_version: 1,
+        language_accent_code: 'en-US',
+        voiceovers_mapping: contentIdToVoiceoversMapping,
+        automated_voiceovers_audio_offsets_msecs: {},
+      };
+      const entityVoiceovers = EntityVoiceovers.createFromBackendDict(
+        entityVoiceoversBackendDict
+      );
+
+      spyOn(component, 'getActiveContentId').and.returnValue('content0');
+      spyOn(
+        entityVoiceoversService,
+        'getActiveEntityVoiceovers'
+      ).and.returnValue(entityVoiceovers);
+
+      expect(component.isManualVoiceoverAvailableForActiveContent()).toBe(
+        false
+      );
+    });
+
+    it('should return false when manual voiceover does not exist', () => {
+      const voiceover = {
+        filename: 'a.mp3',
+        file_size_bytes: 200000,
+        needs_update: false,
+        duration_secs: 10.0,
+      };
+      let contentIdToVoiceoversMapping = {
+        content0: {
+          manual: undefined,
+          auto: voiceover,
+        },
+      };
+      const entityVoiceoversBackendDict = {
+        entity_id: 'exp_1',
+        entity_type: 'exploration',
+        entity_version: 1,
+        language_accent_code: 'en-US',
+        voiceovers_mapping: contentIdToVoiceoversMapping,
+        automated_voiceovers_audio_offsets_msecs: {},
+      };
+      const entityVoiceovers = EntityVoiceovers.createFromBackendDict(
+        entityVoiceoversBackendDict
+      );
+
+      spyOn(component, 'getActiveContentId').and.returnValue('content0');
+      spyOn(
+        entityVoiceoversService,
+        'getActiveEntityVoiceovers'
+      ).and.returnValue(entityVoiceovers);
+
+      expect(component.isManualVoiceoverAvailableForActiveContent()).toBe(
+        false
+      );
+    });
   });
 });
