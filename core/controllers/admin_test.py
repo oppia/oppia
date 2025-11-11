@@ -2213,7 +2213,6 @@ class GenerateDummyChaptersTest(test_utils.GenericTestBase):
                 'story_id': 'story_id',
                 'num_dummy_chapters_to_generate': 3,
             },
-            csrf_token=csrf_token,
         )
 
         updated_story = story_fetchers.get_story_by_id('story_id')
