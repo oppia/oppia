@@ -2183,7 +2183,7 @@ class GenerateDummyChaptersTest(test_utils.GenericTestBase):
         updated_story = story_fetchers.get_story_by_id('story_id')
         contents = updated_story.story_contents
 
-        def node(node_id: str):
+        def node(node_id: str) -> story_domain.StoryNode:
             idx = contents.get_node_index(node_id)
             return contents.nodes[idx]
 
