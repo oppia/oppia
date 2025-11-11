@@ -31,7 +31,7 @@ import {
 } from '@angular/core/testing';
 import {ImageEditorComponent} from './image-editor.component';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ImagePreloaderService} from 'pages/exploration-player-page/services/image-preloader.service';
 import {AppConstants} from 'app.constants';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
@@ -39,24 +39,21 @@ import {AlertsService} from 'services/alerts.service';
 import {SimpleChanges} from '@angular/core';
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
-let gifshot = require('gifshot');
+import {GifFramesService} from '../../../core/templates/third-party-imports/gif-frames.import';
 
-declare global {
-  interface Window {
-    GifFrames: Function;
-  }
-}
+let gifshot = require('gifshot');
 
 describe('ImageEditor', () => {
   let component: ImageEditorComponent;
   let fixture: ComponentFixture<ImageEditorComponent>;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let imagePreloaderService: ImagePreloaderService;
   let imageUploadHelperService: ImageUploadHelperService;
   let imageLocalStorageService: ImageLocalStorageService;
   let alertsService: AlertsService;
   let svgSanitizerService: SvgSanitizerService;
   let httpTestingController: HttpTestingController;
+  let gifFrames: GifFramesService;
   let dimensionsOfImage = {
     width: 450,
     height: 350,
@@ -386,6 +383,7 @@ describe('ImageEditor', () => {
           useClass: MockImageUploadHelperService,
         },
         ImageLocalStorageService,
+        GifFramesService,
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -398,11 +396,12 @@ describe('ImageEditor', () => {
     imageUploadHelperService = TestBed.inject(ImageUploadHelperService);
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
     imagePreloaderService = TestBed.inject(ImagePreloaderService);
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     fixture = TestBed.createComponent(ImageEditorComponent);
     component = fixture.componentInstance;
-    spyOn(contextService, 'getEntityId').and.returnValue('2');
-    spyOn(contextService, 'getEntityType').and.returnValue('question');
+    gifFrames = TestBed.inject(GifFramesService);
+    spyOn(pageContextService, 'getEntityId').and.returnValue('2');
+    spyOn(pageContextService, 'getEntityType').and.returnValue('question');
     // This throws "Argument of type 'mockImageObject' is not assignable to
     // parameter of type 'HTMLImageElement'.". We need to suppress this
     // error because 'HTMLImageElement' has around 250 more properties.
@@ -586,7 +585,7 @@ describe('ImageEditor', () => {
     'should reset file path editor and delete file when user clicks' +
       "'Delete this image'",
     () => {
-      spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+      spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
       );
       spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(true);
@@ -613,7 +612,7 @@ describe('ImageEditor', () => {
   );
 
   it('should reset file path editor', () => {
-    spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+    spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
     );
     spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(false);
@@ -1894,7 +1893,9 @@ describe('ImageEditor', () => {
         },
       })
     );
-    spyOn(window, 'GifFrames').and.resolveTo([
+
+    // Replace gifFrames with a spy that returns a resolved promise.
+    spyOn(gifFrames, 'getFrames').and.resolveTo([
       {
         getImage: () => {
           return {
@@ -1910,6 +1911,7 @@ describe('ImageEditor', () => {
         },
       },
     ] as never);
+
     // This throws an error "Type '{ lastModified: number; name:
     // string; size: number; type: string; }' is missing the following
     // properties from type 'File': arrayBuffer, slice, stream, text"
@@ -2265,7 +2267,7 @@ describe('ImageEditor', () => {
       spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
         func(obj);
       });
-      spyOn(window, 'GifFrames').and.resolveTo([
+      spyOn(gifFrames, 'getFrames').and.resolveTo([
         {
           getImage: () => {
             return {
@@ -2284,7 +2286,7 @@ describe('ImageEditor', () => {
 
       spyOn(component, 'saveImage').and.callThrough();
       spyOn(component, 'validateProcessedFilesize').and.stub();
-      spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+      spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
         AppConstants.IMAGE_SAVE_DESTINATION_SERVER
       );
       // This throws an error "Type '{ lastModified: number; name:
@@ -2375,7 +2377,7 @@ describe('ImageEditor', () => {
       spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
         func(obj);
       });
-      spyOn(window, 'GifFrames').and.resolveTo([
+      spyOn(gifFrames, 'getFrames').and.resolveTo([
         {
           getImage: () => {
             return {
@@ -2393,7 +2395,7 @@ describe('ImageEditor', () => {
       ] as never);
       spyOn(component, 'saveImage').and.callThrough();
       spyOn(component, 'validateProcessedFilesize').and.stub();
-      spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+      spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
       );
       // This throws an error "Type '{ lastModified: number; name:
@@ -2434,7 +2436,7 @@ describe('ImageEditor', () => {
           },
         },
       });
-      spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+      spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
       );
       spyOn(component, 'setSavedImageFilename').and.callThrough();
@@ -2479,7 +2481,7 @@ describe('ImageEditor', () => {
           },
         })
       );
-      spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+      spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
       );
       spyOn(component, 'saveImage').and.callThrough();
@@ -2652,7 +2654,7 @@ describe('ImageEditor', () => {
           },
         })
       );
-      spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+      spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
       );
       spyOn(component, 'saveImage').and.callThrough();

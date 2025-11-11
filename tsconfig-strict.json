@@ -43,9 +43,6 @@
       "google-analytics.initializer": [
         "core/templates/google-analytics.initializer"
       ],
-      "hybrid-router-module-provider": [
-        "core/templates/hybrid-router-module-provider"
-      ],
       "i18n/*": [
         "core/templates/i18n/*"
       ],
@@ -81,11 +78,6 @@
       "./node_modules/@types"
     ]
   },
-  "exclude": [
-    "extensions/objects/**/*.spec.ts",
-    "core/templates/**/*.spec.ts",
-    "extensions/interactions/**/*.spec.ts"
-  ],
   "include": [
     "core",
     "extensions",

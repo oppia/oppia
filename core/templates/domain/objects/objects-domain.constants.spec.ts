@@ -17,7 +17,7 @@
  */
 
 import {all, create} from 'mathjs';
-import {getCurrencyUnits} from './NumberWithUnitsObjectFactory';
+import {getCurrencyUnits} from './number-with-units.model';
 import {ObjectsDomainConstants} from './objects-domain.constants';
 
 describe('ObjectsDomainConstants', () => {

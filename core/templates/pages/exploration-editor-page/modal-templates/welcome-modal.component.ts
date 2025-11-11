@@ -18,7 +18,7 @@
 import {Component, Input, OnInit, ViewChild, ElementRef} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
@@ -39,7 +39,7 @@ export class WelcomeModalComponent
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private siteAnalyticsService: SiteAnalyticsService,
     private urlInterpolationService: UrlInterpolationService
   ) {
@@ -47,7 +47,7 @@ export class WelcomeModalComponent
   }
 
   ngOnInit(): void {
-    this.explorationId = this.contextService.getExplorationId();
+    this.explorationId = this.pageContextService.getExplorationId();
     this.siteAnalyticsService.registerTutorialModalOpenEvent(
       this.explorationId
     );

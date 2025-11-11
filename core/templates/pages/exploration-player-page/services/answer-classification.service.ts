@@ -20,17 +20,18 @@ import {Injectable} from '@angular/core';
 
 import {AlertsService} from 'services/alerts.service';
 import {AnswerClassificationResult} from 'domain/classifier/answer-classification-result.model';
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
-import {ExplorationPlayerConstants} from 'pages/exploration-player-page/exploration-player-page.constants';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
+import {ExplorationPlayerConstants} from 'pages/exploration-player-page/current-lesson-player/exploration-player-page.constants';
 import {InteractionAnswer, TextInputAnswer} from 'interactions/answer-defs';
-import {Interaction} from 'domain/exploration/InteractionObjectFactory';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {InteractionSpecsService} from 'services/interaction-specs.service';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
-import {State} from 'domain/state/StateObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
+import {State} from 'domain/state/state.model';
 import {
   InteractionRuleInputs,
   TranslatableSetOfNormalizedString,
 } from 'interactions/rule-input-defs';
+import isEqual from 'lodash/isEqual';
 
 export interface InteractionRulesService {
   [ruleName: string]: (
@@ -158,7 +159,7 @@ export class AnswerClassificationService {
           continue;
         }
         for (const trainingDatum of answerGroup.trainingData) {
-          if (angular.equals(answer, trainingDatum)) {
+          if (isEqual(answer, trainingDatum)) {
             return new AnswerClassificationResult(
               answerGroup.outcome,
               i,

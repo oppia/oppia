@@ -48,7 +48,9 @@ describe('Logged-out User', function () {
       );
     explorationId2 =
       await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
-        'positive-numbers'
+        'positive-numbers',
+        'Algebra',
+        false
       );
 
     await curriculumAdmin.createAndPublishTopic(

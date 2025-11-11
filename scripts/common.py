@@ -19,7 +19,6 @@ from __future__ import annotations
 import contextlib
 import errno
 import getpass
-from http import client
 import io
 import os
 import platform
@@ -30,12 +29,14 @@ import ssl
 import subprocess
 import sys
 import time
+from http import client
 from urllib import error as urlerror
 from urllib import request as urlrequest
 
 from core import feconf
 from scripts import servers
 
+import certifi
 from typing import Dict, Final, Generator, List, Optional, Tuple, Union
 
 # Add third_party to path. Some scripts access feconf even before
@@ -71,7 +72,7 @@ YARN_VERSION = '1.22.15'
 #    the upgrade to develop.
 # 7. If any tests fail, DO NOT upgrade to this newer version of the redis cli.
 REDIS_CLI_VERSION = '6.2.4'
-ELASTICSEARCH_VERSION = '7.17.0'
+ELASTICSEARCH_VERSION = '7.17.27'
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
 CURR_DIR = os.path.abspath(os.getcwd())
@@ -83,49 +84,56 @@ GOOGLE_CLOUD_SDK_HOME = (
     '/app/vm_deps/google-cloud-sdk'
     if feconf.OPPIA_IS_DOCKERIZED
     else os.path.join(
-        OPPIA_TOOLS_DIR_ABS_PATH,
-        'google-cloud-sdk-500.0.0',
-        'google-cloud-sdk'
+        OPPIA_TOOLS_DIR_ABS_PATH, 'google-cloud-sdk-500.0.0', 'google-cloud-sdk'
     )
 )
 GOOGLE_APP_ENGINE_SDK_HOME = os.path.join(
-    GOOGLE_CLOUD_SDK_HOME, 'platform', 'google_appengine')
+    GOOGLE_CLOUD_SDK_HOME, 'platform', 'google_appengine'
+)
 GOOGLE_CLOUD_SDK_BIN = os.path.join(GOOGLE_CLOUD_SDK_HOME, 'bin')
-WEBPACK_BIN_PATH = (
-    os.path.join(CURR_DIR, 'node_modules', 'webpack', 'bin', 'webpack.js'))
-NG_BIN_PATH = (
-    os.path.join(CURR_DIR, 'node_modules', '.bin', 'ng'))
-DEV_APPSERVER_PATH = (
-    os.path.join(GOOGLE_CLOUD_SDK_BIN, 'dev_appserver.py'))
+WEBPACK_BIN_PATH = os.path.join(
+    CURR_DIR, 'node_modules', 'webpack', 'bin', 'webpack.js'
+)
+NG_BIN_PATH = os.path.join(CURR_DIR, 'node_modules', '.bin', 'ng')
+DEV_APPSERVER_PATH = os.path.join(GOOGLE_CLOUD_SDK_BIN, 'dev_appserver.py')
 GCLOUD_PATH = os.path.join(GOOGLE_CLOUD_SDK_BIN, 'gcloud')
-NODE_PATH = '/usr' if feconf.OPPIA_IS_DOCKERIZED else os.path.join(
-    OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
+NODE_PATH = (
+    '/usr'
+    if feconf.OPPIA_IS_DOCKERIZED
+    else os.path.join(OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
+)
 NODE_MODULES_PATH = os.path.join(CURR_DIR, 'node_modules')
 FRONTEND_DIR = os.path.join(CURR_DIR, 'core', 'templates')
 YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, 'yarn-%s' % YARN_VERSION)
 FIREBASE_PATH = os.path.join(
-    NODE_MODULES_PATH, 'firebase-tools', 'lib', 'bin', 'firebase.js')
+    NODE_MODULES_PATH, 'firebase-tools', 'lib', 'bin', 'firebase.js'
+)
 OS_NAME = platform.system()
 ARCHITECTURE = platform.machine()
 REDIS_SERVER_PATH = os.path.join(
-    OPPIA_TOOLS_DIR, 'redis-cli-%s' % REDIS_CLI_VERSION,
-    'src', 'redis-server')
+    OPPIA_TOOLS_DIR, 'redis-cli-%s' % REDIS_CLI_VERSION, 'src', 'redis-server'
+)
 REDIS_CLI_PATH = os.path.join(
-    OPPIA_TOOLS_DIR, 'redis-cli-%s' % REDIS_CLI_VERSION,
-    'src', 'redis-cli')
+    OPPIA_TOOLS_DIR, 'redis-cli-%s' % REDIS_CLI_VERSION, 'src', 'redis-cli'
+)
 # Directory for storing/fetching data related to the Cloud Datastore emulator.
-CLOUD_DATASTORE_EMULATOR_DATA_DIR = (
-    os.path.join(CURR_DIR, os.pardir, 'cloud_datastore_emulator_cache'))
+CLOUD_DATASTORE_EMULATOR_DATA_DIR = os.path.join(
+    CURR_DIR, os.pardir, 'cloud_datastore_emulator_cache'
+)
 # Directory for storing/fetching data related to the Firebase emulator.
-FIREBASE_EMULATOR_CACHE_DIR = (
-    os.path.join(CURR_DIR, os.pardir, 'firebase_emulator_cache'))
+FIREBASE_EMULATOR_CACHE_DIR = os.path.join(
+    CURR_DIR, os.pardir, 'firebase_emulator_cache'
+)
 
 ES_PATH = os.path.join(
-    OPPIA_TOOLS_DIR, 'elasticsearch-%s' % ELASTICSEARCH_VERSION)
+    OPPIA_TOOLS_DIR, 'elasticsearch-%s' % ELASTICSEARCH_VERSION
+)
 ES_PATH_CONFIG_DIR = os.path.join(
-    OPPIA_TOOLS_DIR, 'elasticsearch-%s' % ELASTICSEARCH_VERSION, 'config')
+    OPPIA_TOOLS_DIR, 'elasticsearch-%s' % ELASTICSEARCH_VERSION, 'config'
+)
 ES_PATH_DATA_DIR = os.path.join(
-    OPPIA_TOOLS_DIR, 'elasticsearch-%s' % ELASTICSEARCH_VERSION, 'data')
+    OPPIA_TOOLS_DIR, 'elasticsearch-%s' % ELASTICSEARCH_VERSION, 'data'
+)
 
 RELEASE_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)$'
 RELEASE_MAINTENANCE_BRANCH_REGEX = r'release-maintenance-(\d+\.\d+\.\d+)$'
@@ -133,6 +141,7 @@ HOTFIX_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)-hotfix-[1-9]+$'
 TEST_BRANCH_REGEX = r'test-[A-Za-z0-9-]*$'
 USER_PREFERENCES: Dict[str, Optional[str]] = {'open_new_tab_in_browser': None}
 
+DEV_PROJECT_ID = 'dev-project-id'
 FECONF_PATH = os.path.join('core', 'feconf.py')
 CONSTANTS_FILE_PATH = os.path.join('assets', 'constants.ts')
 APP_DEV_YAML_PATH = os.path.join('app_dev.yaml')
@@ -157,29 +166,34 @@ WEBPACK_DEV_CONFIG = 'webpack.dev.config.ts'
 WEBPACK_DEV_SOURCE_MAPS_CONFIG = 'webpack.dev.sourcemap.config.ts'
 WEBPACK_PROD_CONFIG = 'webpack.prod.config.ts'
 WEBPACK_PROD_SOURCE_MAPS_CONFIG = 'webpack.prod.sourcemap.config.ts'
-ANALYTICS_CONSTANTS_FILE_PATH = (
-    os.path.join('assets', 'analytics-constants.json'))
+ANALYTICS_CONSTANTS_FILE_PATH = os.path.join(
+    'assets', 'analytics-constants.json'
+)
 
 PORTSERVER_SOCKET_FILEPATH = os.path.join(os.getcwd(), 'portserver.socket')
 
 WEBDRIVER_HOME_PATH = os.path.join(NODE_MODULES_PATH, 'webdriver-manager')
-WEBDRIVER_MANAGER_BIN_PATH = (
-    os.path.join(WEBDRIVER_HOME_PATH, 'bin', 'webdriver-manager'))
-WEBDRIVER_PROVIDER_PATH = (
-    os.path.join(WEBDRIVER_HOME_PATH, 'dist', 'lib', 'provider'))
-GECKO_PROVIDER_FILE_PATH = (
-    os.path.join(WEBDRIVER_PROVIDER_PATH, 'geckodriver.js'))
-CHROME_PROVIDER_FILE_PATH = (
-    os.path.join(WEBDRIVER_PROVIDER_PATH, 'chromedriver.js'))
+WEBDRIVER_MANAGER_BIN_PATH = os.path.join(
+    WEBDRIVER_HOME_PATH, 'bin', 'webdriver-manager'
+)
+WEBDRIVER_PROVIDER_PATH = os.path.join(
+    WEBDRIVER_HOME_PATH, 'dist', 'lib', 'provider'
+)
+GECKO_PROVIDER_FILE_PATH = os.path.join(
+    WEBDRIVER_PROVIDER_PATH, 'geckodriver.js'
+)
+CHROME_PROVIDER_FILE_PATH = os.path.join(
+    WEBDRIVER_PROVIDER_PATH, 'chromedriver.js'
+)
 
-PROTRACTOR_BIN_PATH = (
-    os.path.join(NODE_MODULES_PATH, 'protractor', 'bin', 'protractor'))
-PROTRACTOR_CONFIG_FILE_PATH = (
-    os.path.join('core', 'tests', 'protractor.conf.js'))
-WEBDRIVERIO_CONFIG_FILE_PATH = (
-    os.path.join('core', 'tests', 'wdio.conf.js'))
-NODEMODULES_WDIO_BIN_PATH = (
-    os.path.join(NODE_MODULES_PATH, '.bin', 'wdio'))
+PROTRACTOR_BIN_PATH = os.path.join(
+    NODE_MODULES_PATH, 'protractor', 'bin', 'protractor'
+)
+PROTRACTOR_CONFIG_FILE_PATH = os.path.join(
+    'core', 'tests', 'protractor.conf.js'
+)
+WEBDRIVERIO_CONFIG_FILE_PATH = os.path.join('core', 'tests', 'wdio.conf.js')
+NODEMODULES_WDIO_BIN_PATH = os.path.join(NODE_MODULES_PATH, '.bin', 'wdio')
 
 DIRS_TO_ADD_TO_SYS_PATH = [
     GOOGLE_APP_ENGINE_SDK_HOME,
@@ -201,89 +215,12 @@ CHROME_PATHS = [
     # WSL.
     '/mnt/c/Program Files (x86)/Google/Chrome/Application/chrome.exe',
     # Mac OS.
-    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
 ]
 
-ACCEPTANCE_TESTS_SUITE_NAMES = [
-    'blog-admin/assign-roles-to-users-and-change-tag-properties',
-    'blog-editor/create-and-delete-draft-blog-post',
-    'blog-editor/create-and-publish-a-blog-post-with-required-details',
-    'blog-editor/try-to-publish-a-duplicate-blog-post-and-get-blocked',
-    'curriculum-admin/create-publish-unpublish-and-delete-topic-and-skill',
-    'curriculum-admin/create-edit-and-delete-classroom',
-    'exploration-editor/create-exploration-and-change-basic-settings',
-    'exploration-editor/manage-exploration-misconceptions',
-    'exploration-editor/modify-translations-through-modal',
-    'exploration-editor/load-complete-and-restart-exploration-preview',
-    'exploration-editor/publish-the-exploration-with-an-interaction',
-    'exploration-editor/save-draft-publish-and-discard-the-changes',
-    'exploration-editor/verify-statistics-and-previous-explorations',
-    'logged-in-user/subscribe-to-creator-and-view-all-'
-    'explorations-by-that-creator',
-    'logged-in-user/create-and-delete-account',
-    'logged-in-user/save-an-exploration-to-play-later',
-    'logged-in-user/restart-or-continue-exploration-on-revisit',
-    'logged-in-user/edit-profile-preferences-and-export-their-account',
-    'logged-in-user/set-language-to-rtl-and-navigate-through-site',
-    'logged-in-user/give-feedback-rate-and-report-an-exploration',
-    'logged-in-user/manage-goals-progress-and-lessons-from-learner-dashboard',
-    'logged-in-user/deny-access-to-pages-without-additional-roles',
-    'logged-out-user/check-all-user-flow-of-donor',
-    'logged-out-user/check-all-user-flow-of-parent-teacher',
-    'logged-out-user/check-all-user-flow-of-partner',
-    'logged-out-user/check-all-user-flow-of-volunteer',
-    'logged-out-user/click-all-buttons-on-about-page',
-    'logged-out-user/click-all-buttons-on-contact-us-page',
-    'logged-out-user/click-all-buttons-on-donation-thanks-page',
-    'logged-out-user/click-all-buttons-on-navbar',
-    'logged-out-user/click-all-buttons-on-partnerships-page',
-    'logged-out-user/click-all-buttons-on-teach-page',
-    'logged-out-user/click-all-buttons-on-volunteer-page',
-    'logged-out-user/click-all-links-in-oppia-footer',
-    'logged-out-user/click-all-links-on-creator-guidelines-page',
-    'logged-out-user/click-all-links-on-get-started-page',
-    'logged-out-user/click-all-links-on-privacy-policy-page',
-    'logged-out-user/click-all-links-on-terms-page',
-    'logged-out-user/click-all-buttons-on-donate-page',
-    'logged-out-user/visit-classroom-index-page',
-    'logged-out-user/browse-and-search-for-lessons-in-community-library',
-    'logged-out-user/select-and-play-topic-from-classroom-page',
-    'logged-out-user/choose-what-to-do-from-the-last-card-of-an-exploration',
-    'logged-out-user/play-through-lesson-while-getting-feedback-and-hints',
-    'logged-out-user/share-and-give-feedback-for-exploration-'
-    'but-not-report-and-rate-it',
-    'logged-out-user/use-keyboard-shortcuts-to-navigate-and-shift-focus',
-    'logged-out-user/change-site-language-and-engage-with-original-exploration',
-    'logged-out-user/sign-in-and-save-exploration-progress',
-    'logged-out-user/track-and-resume-exploration-progress-via-url',
-    'logged-out-user/play-lesson-in-different-languages-and-listen-'
-    'to-voiceovers',
-    'logged-out-user/deny-access-to-dashboards-and-actions-without-login',
-    'logged-out-user/subscribe-to-newsletter-and-click-all-buttons',
-    'moderator/edit-featured-activities-list',
-    'moderator/view-recent-commits-and-feedback-messages',
-    'practice-question-admin/add-and-remove-contribution-rights',
-    'release-coordinator/run-a-beam-job-and-copy-the-output',
-    'release-coordinator/update-promo-bar-message',
-    'release-coordinator/flush-and-get-profile-of-redis-cache',
-    'release-coordinator/edit-feature-rollout-configuration',
-    'super-admin/edit-user-roles',
-    'super-admin/load-dummy-data-in-dev-mode',
-    'super-admin/edit-platform-parameters',
-    'super-admin/use-misc-tab-features',
-    'topic-manager/edit-and-preview-a-subtopic',
-    'topic-manager/edit-and-preview-a-topic',
-    'translation-admin/add-and-remove-translation-rights',
-    'topic-manager/create-and-delete-subtopic-and-story',
-    'topic-manager/browse-skills-on-topics-and-skills-dashboard',
-    'topic-manager/browse-topics-on-topics-and-skills-dashboard',
-    'topic-manager/create-and-delete-questions-in-skill-editor',
-    'topic-manager/assign-unassign-and-merge-skills',
-    'topic-manager/cannot-do-curriculum-admin-actions',
-    'topic-manager/edit-and-republish-a-skill',
-    'topic-manager/edit-preview-and-save-a-chapter',
-    'voiceover-admin/add-voiceover-artist-to-an-exploration'
-]
+ACCEPTANCE_TEST_CONFIG_FILE_PATH = os.path.join(
+    CURR_DIR, 'core', 'tests', 'ci-test-suite-configs', 'acceptance.json'
+)
 
 GAE_PORT_FOR_E2E_TESTING: Final = 8181
 ELASTICSEARCH_SERVER_PORT: Final = 9200
@@ -318,11 +255,13 @@ NODE_BIN_PATH = os.path.join(NODE_PATH, 'bin', 'node')
 NPX_BIN_PATH = os.path.join(NODE_PATH, 'bin', 'npx')
 
 # Add path for node which is required by the node_modules.
-os.environ['PATH'] = os.pathsep.join([
-    os.path.dirname(NODE_BIN_PATH),
-    os.path.join(YARN_PATH, 'bin'),
-    os.environ['PATH'],
-])
+os.environ['PATH'] = os.pathsep.join(
+    [
+        os.path.dirname(NODE_BIN_PATH),
+        os.path.join(YARN_PATH, 'bin'),
+        os.environ['PATH'],
+    ]
+)
 
 
 def run_cmd(cmd_tokens: List[str]) -> str:
@@ -336,7 +275,8 @@ def run_cmd(cmd_tokens: List[str]) -> str:
         str. The output of the command.
     """
     return subprocess.check_output(
-        cmd_tokens, stderr=subprocess.STDOUT, encoding='utf-8').strip()
+        cmd_tokens, stderr=subprocess.STDOUT, encoding='utf-8'
+    ).strip()
 
 
 def ensure_directory_exists(d: str) -> None:
@@ -354,9 +294,9 @@ def require_cwd_to_be_oppia(allow_deploy_dir: bool = False) -> None:
     is_oppia_dir = os.getcwd().endswith('oppia')
 
     current_dirname = os.path.basename(os.path.normpath(os.getcwd()))
-    is_deploy_dir = (
-        current_dirname.startswith('deploy-') and
-        os.path.isdir(os.path.join(os.getcwd(), os.pardir, 'oppia')))
+    is_deploy_dir = current_dirname.startswith('deploy-') and os.path.isdir(
+        os.path.join(os.getcwd(), os.pardir, 'oppia')
+    )
 
     if is_oppia_dir or (allow_deploy_dir and is_deploy_dir):
         return
@@ -369,7 +309,8 @@ def open_new_tab_in_browser_if_possible(url: str) -> None:
     if USER_PREFERENCES['open_new_tab_in_browser'] is None:
         print(
             '\nDo you want the url to be opened in the browser? '
-            'Confirm by entering y/ye/yes.')
+            'Confirm by entering y/ye/yes.'
+        )
         USER_PREFERENCES['open_new_tab_in_browser'] = input()
     if USER_PREFERENCES['open_new_tab_in_browser'] not in ['y', 'ye', 'yes']:
         print('Please open the following link in browser: %s' % url)
@@ -387,15 +328,16 @@ def open_new_tab_in_browser_if_possible(url: str) -> None:
     # first position and copying over the browsers before and after
     # the selected browser in the same order as they were present.
     ordered_browser_cmds = (
-        [browser_cmds[default_index]] + browser_cmds[:default_index] +
-        browser_cmds[default_index + 1:])
+        [browser_cmds[default_index]]
+        + browser_cmds[:default_index]
+        + browser_cmds[default_index + 1 :]
+    )
     for cmd in ordered_browser_cmds:
         if subprocess.call(['which', cmd]) == 0:
             subprocess.check_call([cmd, url])
             return
     print('******************************************************************')
-    print(
-        'WARNING: Unable to open browser. Please manually open the following')
+    print('WARNING: Unable to open browser. Please manually open the following')
     print('URL in a browser window, then press Enter to confirm.')
     print('')
     print('    %s' % url)
@@ -422,24 +364,25 @@ def get_remote_alias(remote_urls: List[str]) -> str:
     if remote_alias is None:
         raise Exception(
             'ERROR: There is no existing remote alias for the %s repo.'
-            % ', '.join(remote_urls))
+            % ', '.join(remote_urls)
+        )
 
     return remote_alias
 
 
 def verify_local_repo_is_clean() -> None:
     """Checks that the local Git repo is clean."""
-    git_status_output = subprocess.check_output(
-        ['git', 'status']
-    ).strip().split(b'\n')
+    git_status_output = (
+        subprocess.check_output(['git', 'status']).strip().split(b'\n')
+    )
 
     branch_is_clean_message_1 = b'nothing to commit, working directory clean'
     branch_is_clean_message_2 = b'nothing to commit, working tree clean'
     if (
-            not branch_is_clean_message_1 in git_status_output and
-            not branch_is_clean_message_2 in git_status_output):
-        raise Exception(
-            'ERROR: This script should be run from a clean branch.')
+        not branch_is_clean_message_1 in git_status_output
+        and not branch_is_clean_message_2 in git_status_output
+    ):
+        raise Exception('ERROR: This script should be run from a clean branch.')
 
 
 def get_current_branch_name() -> str:
@@ -448,14 +391,16 @@ def get_current_branch_name() -> str:
     Returns:
         str. The name of current branch.
     """
-    git_status_output = subprocess.check_output(
-        ['git', 'status'], encoding='utf-8'
-    ).strip().split('\n')
+    git_status_output = (
+        subprocess.check_output(['git', 'status'], encoding='utf-8')
+        .strip()
+        .split('\n')
+    )
     branch_message_prefix = 'On branch '
     git_status_first_line = git_status_output[0]
     assert git_status_first_line.startswith(branch_message_prefix)
     # Standard output is in bytes, we need to decode the line to print it.
-    return git_status_first_line[len(branch_message_prefix):]
+    return git_status_first_line[len(branch_message_prefix) :]
 
 
 def update_branch_with_upstream() -> None:
@@ -478,9 +423,9 @@ def get_current_release_version_number(release_branch_name: str) -> str:
     """
     release_match = re.match(RELEASE_BRANCH_REGEX, release_branch_name)
     release_maintenance_match = re.match(
-        RELEASE_MAINTENANCE_BRANCH_REGEX, release_branch_name)
-    hotfix_match = re.match(
-        HOTFIX_BRANCH_REGEX, release_branch_name)
+        RELEASE_MAINTENANCE_BRANCH_REGEX, release_branch_name
+    )
+    hotfix_match = re.match(HOTFIX_BRANCH_REGEX, release_branch_name)
     if release_match:
         return release_match.group(1)
     elif release_maintenance_match:
@@ -498,8 +443,7 @@ def is_current_branch_a_hotfix_branch() -> bool:
         bool. Whether the current branch is hotfix branch.
     """
     current_branch_name = get_current_branch_name()
-    return bool(
-        re.match(HOTFIX_BRANCH_REGEX, current_branch_name))
+    return bool(re.match(HOTFIX_BRANCH_REGEX, current_branch_name))
 
 
 def is_current_branch_a_release_branch() -> bool:
@@ -511,9 +455,9 @@ def is_current_branch_a_release_branch() -> bool:
     current_branch_name = get_current_branch_name()
     release_match = bool(re.match(RELEASE_BRANCH_REGEX, current_branch_name))
     release_maintenance_match = bool(
-        re.match(RELEASE_MAINTENANCE_BRANCH_REGEX, current_branch_name))
-    hotfix_match = bool(
-        re.match(HOTFIX_BRANCH_REGEX, current_branch_name))
+        re.match(RELEASE_MAINTENANCE_BRANCH_REGEX, current_branch_name)
+    )
+    hotfix_match = bool(re.match(HOTFIX_BRANCH_REGEX, current_branch_name))
     return release_match or release_maintenance_match or hotfix_match
 
 
@@ -531,8 +475,9 @@ def verify_current_branch_name(expected_branch_name: str) -> None:
     """Checks that the user is on the expected branch."""
     if get_current_branch_name() != expected_branch_name:
         raise Exception(
-            'ERROR: This script can only be run from the "%s" branch.' %
-            expected_branch_name)
+            'ERROR: This script can only be run from the "%s" branch.'
+            % expected_branch_name
+        )
 
 
 def is_port_in_use(port: int) -> bool:
@@ -545,7 +490,8 @@ def is_port_in_use(port: int) -> bool:
         bool. True if port is open else False.
     """
     with contextlib.closing(
-        socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
+        socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    ) as s:
         return bool(not s.connect_ex(('localhost', port)))
 
 
@@ -602,8 +548,9 @@ def install_npm_library(library_name: str, version: str, path: str) -> None:
     print('Checking whether %s is installed in %s' % (library_name, path))
     if not os.path.exists(os.path.join(NODE_MODULES_PATH, library_name)):
         print('Installing %s' % library_name)
-        subprocess.check_call([
-            'yarn', 'add', '%s@%s' % (library_name, version)])
+        subprocess.check_call(
+            ['yarn', 'add', '%s@%s' % (library_name, version)]
+        )
 
 
 def ask_user_to_confirm(message: str) -> None:
@@ -623,7 +570,7 @@ def ask_user_to_confirm(message: str) -> None:
 
 
 def get_personal_access_token() -> str:
-    """"Returns the personal access token for the GitHub id of user.
+    """Returns the personal access token for the GitHub id of user.
 
     Returns:
         str. The personal access token for the GitHub id of user.
@@ -634,13 +581,16 @@ def get_personal_access_token() -> str:
     personal_access_token = getpass.getpass(
         prompt=(
             'Please provide personal access token for your github ID. '
-            'You can create one at https://github.com/settings/tokens: '))
+            'You can create one at https://github.com/settings/tokens: '
+        )
+    )
 
     if personal_access_token is None:
         raise Exception(
             'No personal access token provided, please set up a personal '
             'access token at https://github.com/settings/tokens and re-run '
-            'the script')
+            'the script'
+        )
     return personal_access_token
 
 
@@ -661,7 +611,7 @@ def inplace_replace_file(
     filename: str,
     regex_pattern: str,
     replacement_string: str,
-    expected_number_of_replacements: Optional[int] = None
+    expected_number_of_replacements: Optional[int] = None,
 ) -> None:
     """Replace the file content in-place with regex pattern. The pattern is used
     to replace the file's content line by line. The old file is kept as-is until
@@ -691,7 +641,8 @@ def inplace_replace_file(
         with utils.open_file(filename, 'r') as old_file:
             for line in old_file:
                 new_line, number_of_replacements = regex.subn(
-                    replacement_string, line)
+                    replacement_string, line
+                )
                 new_contents.append(new_line)
                 total_number_of_replacements += number_of_replacements
 
@@ -700,13 +651,14 @@ def inplace_replace_file(
                 new_file.write(line)
 
         if (
-            expected_number_of_replacements is not None and
-            total_number_of_replacements != expected_number_of_replacements
+            expected_number_of_replacements is not None
+            and total_number_of_replacements != expected_number_of_replacements
         ):
             raise ValueError(
-                'Wrong number of replacements. Expected %s. Performed %s.' % (
+                'Wrong number of replacements. Expected %s. Performed %s.'
+                % (
                     expected_number_of_replacements,
-                    total_number_of_replacements
+                    total_number_of_replacements,
                 )
             )
 
@@ -726,17 +678,22 @@ def wait_for_port_to_be_in_use(port_number: int) -> None:
         port_number: int. The port number to wait.
     """
     waited_seconds = 0
-    while (not is_port_in_use(port_number)
-           and waited_seconds < MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS):
+    while (
+        not is_port_in_use(port_number)
+        and waited_seconds < MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS
+    ):
         time.sleep(1)
         waited_seconds += 1
-    if (waited_seconds == MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS
-            and not is_port_in_use(port_number)):
+    if (
+        waited_seconds == MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS
+        and not is_port_in_use(port_number)
+    ):
         print('Failed to start server on port %s, exiting ...' % port_number)
         print(
             'This may be because you do not have enough available '
             'memory. Please refer to '
-            'https://github.com/oppia/oppia/wiki/Troubleshooting#low-ram')
+            'https://github.com/oppia/oppia/wiki/Troubleshooting#low-ram'
+        )
         sys.exit(1)
 
 
@@ -751,8 +708,10 @@ def wait_for_port_to_not_be_in_use(port_number: int) -> bool:
         bool. Whether the port closed in time.
     """
     waited_seconds = 0
-    while (is_port_in_use(port_number)
-           and waited_seconds < MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS):
+    while (
+        is_port_in_use(port_number)
+        and waited_seconds < MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS
+    ):
         time.sleep(1)
         waited_seconds += 1
     return not is_port_in_use(port_number)
@@ -814,7 +773,8 @@ def write_stdout_safe(string: Union[str, bytes]) -> None:
     while num_bytes_written < len(string_bytes):
         try:
             num_bytes_written += os.write(
-                sys.stdout.fileno(), string_bytes[num_bytes_written:])
+                sys.stdout.fileno(), string_bytes[num_bytes_written:]
+            )
         # The os.write might not be supported, thus we need
         # to try sys.stdout.write.
         except io.UnsupportedOperation:
@@ -829,9 +789,26 @@ def write_stdout_safe(string: Union[str, bytes]) -> None:
             raise
 
 
+def url_open(
+    source_url: Union[str, urlrequest.Request],
+) -> urlrequest._UrlopenRet:
+    """Opens a URL and returns the response.
+
+    Args:
+        source_url: Union[str, Request]. The URL.
+
+    Returns:
+        urlopen. The 'urlopen' object.
+    """
+    context = ssl.create_default_context(cafile=certifi.where())
+    return urlrequest.urlopen(source_url, context=context)
+
+
 def url_retrieve(
-        url: str, output_path: str, max_attempts: int = 2,
-        enforce_https: bool = True
+    url: str,
+    output_path: str,
+    max_attempts: int = 2,
+    enforce_https: bool = True,
 ) -> None:
     """Retrieve a file from a URL and write the file to the file system.
 
@@ -855,15 +832,17 @@ def url_retrieve(
             enforce_https is True.
     """
     if enforce_https and not url.startswith('https://'):
-        raise Exception(
-            'The URL %s should use HTTPS.' % url)
+        raise Exception('The URL %s should use HTTPS.' % url)
 
     # Try downloading using curl initially.
     print('Downloading %s to %s using curl...' % (url, output_path))
     curl_task = subprocess.Popen(
-    # The -L flag is for following redirects.
+        # The -L flag is for following redirects.
         ['curl', '-L', url, '--output', output_path],
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='utf-8')
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        encoding='utf-8',
+    )
     with curl_task:
         out, err = curl_task.communicate()
     if curl_task.returncode == 0:
@@ -885,12 +864,16 @@ def url_retrieve(
                 with open(output_path, 'wb') as output_file:
                     output_file.write(response.read())
         except (
-            urlerror.URLError, ssl.SSLError,
-            client.IncompleteRead, ConnectionResetError
+            urlerror.URLError,
+            ssl.SSLError,
+            client.IncompleteRead,
+            ConnectionResetError,
         ) as exception:
             failures += 1
-            print('Attempt %d of %d failed when downloading %s.' % (
-                failures, max_attempts, url))
+            print(
+                'Attempt %d of %d failed when downloading %s.'
+                % (failures, max_attempts, url)
+            )
             print('Error in common.url_retrieve: %s' % exception)
             if failures >= max_attempts:
                 raise exception
@@ -940,15 +923,15 @@ def set_constants_to_default() -> None:
         prod_env=False,
         emulator_mode=True,
         maintenance_mode=False,
-        version_info_must_be_set=False
-        )
+        version_info_must_be_set=False,
+    )
 
 
 def modify_constants(
     prod_env: bool = False,
     emulator_mode: bool = True,
     maintenance_mode: bool = False,
-    version_info_must_be_set: bool = True
+    version_info_must_be_set: bool = True,
 ) -> None:
     """Modify constants.ts and feconf.py.
 
@@ -959,68 +942,67 @@ def modify_constants(
             the maintenance mode.
         version_info_must_be_set: bool. Whether the version info must be set.
     """
-    dev_mode_variable = (
-        '"DEV_MODE": false' if prod_env else '"DEV_MODE": true')
+    dev_mode_variable = '"DEV_MODE": false' if prod_env else '"DEV_MODE": true'
     inplace_replace_file(
         CONSTANTS_FILE_PATH,
         r'"DEV_MODE": (true|false)',
         dev_mode_variable,
-        expected_number_of_replacements=1
+        expected_number_of_replacements=1,
     )
     emulator_mode_variable = (
-        '"EMULATOR_MODE": true' if emulator_mode else '"EMULATOR_MODE": false')
+        '"EMULATOR_MODE": true' if emulator_mode else '"EMULATOR_MODE": false'
+    )
     inplace_replace_file(
         CONSTANTS_FILE_PATH,
         r'"EMULATOR_MODE": (true|false)',
         emulator_mode_variable,
-        expected_number_of_replacements=1
+        expected_number_of_replacements=1,
     )
 
-    enable_maintenance_mode_variable = (
-        'ENABLE_MAINTENANCE_MODE = %s' % str(maintenance_mode))
+    enable_maintenance_mode_variable = 'ENABLE_MAINTENANCE_MODE = %s' % str(
+        maintenance_mode
+    )
     inplace_replace_file(
         FECONF_PATH,
         r'ENABLE_MAINTENANCE_MODE = (True|False)',
         enable_maintenance_mode_variable,
-        expected_number_of_replacements=1
+        expected_number_of_replacements=1,
     )
 
     if feconf.OPPIA_IS_DOCKERIZED:
         return
 
     if prod_env or version_info_must_be_set is False:
-        branch_name_variable = (
-            '"BRANCH_NAME": "%s"'
-            % (
-                subprocess.check_output(
-                    ['git', 'rev-parse', '--abbrev-ref', 'HEAD'],
-                    encoding='utf-8'
-                ).strip().split('\n', maxsplit=1)[0]
-                if version_info_must_be_set else ''
+        branch_name_variable = '"BRANCH_NAME": "%s"' % (
+            subprocess.check_output(
+                ['git', 'rev-parse', '--abbrev-ref', 'HEAD'], encoding='utf-8'
             )
+            .strip()
+            .split('\n', maxsplit=1)[0]
+            if version_info_must_be_set
+            else ''
         )
         inplace_replace_file(
             CONSTANTS_FILE_PATH,
             r'"BRANCH_NAME": ".*"',
             branch_name_variable,
-            expected_number_of_replacements=1
+            expected_number_of_replacements=1,
         )
 
-        short_commit_hash_variable = (
-            '"SHORT_COMMIT_HASH": "%s"'
-            % (
-                subprocess.check_output(
-                    ['git', 'rev-parse', '--short', 'HEAD'],
-                    encoding='utf-8'
-                ).strip().split('\n', maxsplit=1)[0]
-                if version_info_must_be_set else ''
+        short_commit_hash_variable = '"SHORT_COMMIT_HASH": "%s"' % (
+            subprocess.check_output(
+                ['git', 'rev-parse', '--short', 'HEAD'], encoding='utf-8'
             )
+            .strip()
+            .split('\n', maxsplit=1)[0]
+            if version_info_must_be_set
+            else ''
         )
         inplace_replace_file(
             CONSTANTS_FILE_PATH,
             r'"SHORT_COMMIT_HASH": ".*"',
             short_commit_hash_variable,
-            expected_number_of_replacements=1
+            expected_number_of_replacements=1,
         )
 
 
@@ -1036,14 +1018,14 @@ def is_oppia_server_already_running() -> bool:
             print(
                 'There is already a server running on localhost:%s. '
                 'Please terminate it before running the end-to-end tests. '
-                'Exiting.' % port)
+                'Exiting.' % port
+            )
             return True
     return False
 
 
 def start_subprocess_for_result(cmd: List[str]) -> Tuple[bytes, bytes]:
     """Starts subprocess and returns (stdout, stderr)."""
-    task = subprocess.Popen(
-        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    task = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = task.communicate()
     return out, err

@@ -23,13 +23,13 @@ import {
 } from '@angular/common/http/testing';
 import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {UserExplorationPermissionsService} from 'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import {ExplorationPermissions} from 'domain/exploration/exploration-permissions.model';
 
 describe('User Exploration Permissions Service', () => {
   let ueps: UserExplorationPermissionsService;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let httpTestingController: HttpTestingController;
 
   let sampleExplorationId = 'sample-exploration';
@@ -52,11 +52,11 @@ describe('User Exploration Permissions Service', () => {
 
     httpTestingController = TestBed.inject(HttpTestingController);
     ueps = TestBed.inject(UserExplorationPermissionsService);
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     permissionsResponse = ExplorationPermissions.createFromBackendDict(
       samplePermissionsData
     );
-    spyOn(contextService, 'getExplorationId').and.returnValue(
+    spyOn(pageContextService, 'getExplorationId').and.returnValue(
       sampleExplorationId
     );
     UserExplorationPermissionsService.permissionsPromise = null;

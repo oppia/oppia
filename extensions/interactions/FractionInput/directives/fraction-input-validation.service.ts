@@ -24,9 +24,10 @@ import {BaseInteractionValidationService} from 'interactions/base-interaction-va
 import {AppConstants} from 'app.constants';
 import {Warning} from 'services/alerts.service';
 import {FractionInputCustomizationArgs} from 'interactions/customization-args-defs';
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {Rule} from 'domain/exploration/rule.model';
+import isEqual from 'lodash/isEqual';
 
 interface FractionWarning {
   type: string;
@@ -57,7 +58,7 @@ export class FractionInputValidationService {
         ' from Oppia response ' +
         (i + 1) +
         ' is invalid: input should be an ' +
-        'integer.',
+        'integer',
     };
   }
 
@@ -168,7 +169,7 @@ export class FractionInputValidationService {
               var fractionDict = rule.inputs.f as FractionAnswer;
               var fractionInSimplestForm =
                 Fraction.fromDict(fractionDict).convertToSimplestForm();
-              if (!angular.equals(fractionDict, fractionInSimplestForm)) {
+              if (!isEqual(fractionDict, fractionInSimplestForm)) {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
                   message:
@@ -177,7 +178,7 @@ export class FractionInputValidationService {
                     ' from Oppia response ' +
                     (i + 1) +
                     ' will never be matched because it is not ' +
-                    'in simplest form.',
+                    'in simplest form',
                 });
               }
             }
@@ -223,7 +224,7 @@ export class FractionInputValidationService {
               var fractionDict = rule.inputs.f as FractionAnswer;
               var fractionInSimplestForm =
                 Fraction.fromDict(fractionDict).convertToSimplestForm();
-              if (!angular.equals(fractionDict, fractionInSimplestForm)) {
+              if (!isEqual(fractionDict, fractionInSimplestForm)) {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
                   message:
@@ -232,7 +233,7 @@ export class FractionInputValidationService {
                     ' from Oppia response ' +
                     (i + 1) +
                     ' will never be matched because it is not ' +
-                    'in simplest form.',
+                    'in simplest form',
                 });
               }
             }
@@ -242,7 +243,7 @@ export class FractionInputValidationService {
               var fractionDict = rule.inputs.f as FractionAnswer;
               var fractionInSimplestForm =
                 Fraction.fromDict(fractionDict).convertToSimplestForm();
-              if (!angular.equals(fractionDict, fractionInSimplestForm)) {
+              if (!isEqual(fractionDict, fractionInSimplestForm)) {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
                   message:
@@ -251,7 +252,7 @@ export class FractionInputValidationService {
                     ' from Oppia response ' +
                     (i + 1) +
                     ' will never be matched because it is not ' +
-                    'in simplest form.',
+                    'in simplest form',
                 });
               }
             }
@@ -263,7 +264,7 @@ export class FractionInputValidationService {
               var fractionDict = rule.inputs.f as FractionAnswer;
               var fractionInSimplestForm =
                 Fraction.fromDict(fractionDict).convertToSimplestForm();
-              if (!angular.equals(fractionDict, fractionInSimplestForm)) {
+              if (!isEqual(fractionDict, fractionInSimplestForm)) {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
                   message:
@@ -272,7 +273,7 @@ export class FractionInputValidationService {
                     ' from Oppia response ' +
                     (i + 1) +
                     ' will never be matched because it is not ' +
-                    'in simplest form.',
+                    'in simplest form',
                 });
               }
             }
@@ -284,7 +285,7 @@ export class FractionInputValidationService {
               var fractionDict = rule.inputs.f as FractionAnswer;
               var fractionInSimplestForm =
                 Fraction.fromDict(fractionDict).convertToSimplestForm();
-              if (!angular.equals(fractionDict, fractionInSimplestForm)) {
+              if (!isEqual(fractionDict, fractionInSimplestForm)) {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
                   message:
@@ -293,7 +294,7 @@ export class FractionInputValidationService {
                     ' from Oppia response ' +
                     (i + 1) +
                     ' will never be matched because it is not ' +
-                    'in simplest form.',
+                    'in simplest form',
                 });
               }
             }
@@ -335,7 +336,7 @@ export class FractionInputValidationService {
                   ' from Oppia response ' +
                   (i + 1) +
                   ' is invalid: denominator ' +
-                  'should be greater than zero.',
+                  'should be greater than zero',
               });
             }
             matchedDenominator.denominator = rule.inputs.x as number;
@@ -401,8 +402,7 @@ export class FractionInputValidationService {
                   'is made redundant by answer ' +
                   (ranges[k].ruleIndex + 1) +
                   ' from Oppia response ' +
-                  (ranges[k].answerGroupIndex + 1) +
-                  '.',
+                  (ranges[k].answerGroupIndex + 1),
               });
             }
           }
@@ -428,8 +428,7 @@ export class FractionInputValidationService {
                   'is made redundant by answer ' +
                   (matchedDenominators[k].ruleIndex + 1) +
                   ' from Oppia response ' +
-                  (matchedDenominators[k].answerGroupIndex + 1) +
-                  '.',
+                  (matchedDenominators[k].answerGroupIndex + 1),
               });
             }
           }

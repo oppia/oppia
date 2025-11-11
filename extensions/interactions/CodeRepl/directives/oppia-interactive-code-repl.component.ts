@@ -256,9 +256,10 @@ export class InteractiveCodeReplComponent
           line: preCodeNumLines,
           ch: 0,
         },
-        angular.extend({}, markOptions, {
+        {
+          ...markOptions,
           inclusiveRight: false,
-        })
+        }
       );
 
       for (var i = 0; i < preCodeNumLines; i++) {

@@ -34,11 +34,7 @@ import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {ConceptCard} from 'domain/skill/concept-card.model';
 import {SkillUpdateService} from 'domain/skill/skill-update.service';
-import {
-  Skill,
-  SkillBackendDict,
-  SkillObjectFactory,
-} from 'domain/skill/SkillObjectFactory';
+import {Skill, SkillBackendDict} from 'domain/skill/skill.model';
 import {UrlService} from 'services/contextual/url.service';
 import {LocalStorageService} from 'services/local-storage.service';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
@@ -47,6 +43,7 @@ import {SkillEditorStalenessDetectionService} from './services/skill-editor-stal
 import {SkillEditorStateService} from './services/skill-editor-state.service';
 import {SkillEditorPageComponent} from './skill-editor-page.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {QuestionUndoRedoService} from 'domain/editor/undo_redo/question-undo-redo.service';
 
 class MockNgbModalRef {
   componentInstance!: {
@@ -78,13 +75,13 @@ describe('Skill editor page', () => {
   let fixture: ComponentFixture<SkillEditorPageComponent>;
   let localStorageService: LocalStorageService;
   let preventPageUnloadEventService: PreventPageUnloadEventService;
+  let questionUndoRedoService: QuestionUndoRedoService;
   let skillEditorRoutingService: SkillEditorRoutingService;
   let skillEditorStalenessDetectionService: SkillEditorStalenessDetectionService;
   let skillEditorStateService: SkillEditorStateService;
   let undoRedoService: UndoRedoService;
   let ngbModal: NgbModal;
   let urlService: UrlService;
-  let skillObjectFactory: SkillObjectFactory;
   let skill: Skill;
   let windowRef: WindowRef;
 
@@ -94,6 +91,7 @@ describe('Skill editor page', () => {
       declarations: [SkillEditorPageComponent],
       providers: [
         PreventPageUnloadEventService,
+        QuestionUndoRedoService,
         UndoRedoService,
         UrlService,
         SkillEditorStateService,
@@ -123,8 +121,8 @@ describe('Skill editor page', () => {
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
     undoRedoService = TestBed.inject(UndoRedoService);
     urlService = TestBed.inject(UrlService);
-    skillObjectFactory = TestBed.inject(SkillObjectFactory);
     windowRef = TestBed.inject(WindowRef);
+    questionUndoRedoService = TestBed.inject(QuestionUndoRedoService);
   });
 
   beforeEach(() => {
@@ -133,14 +131,9 @@ describe('Skill editor page', () => {
         html: 'test explanation',
         content_id: 'explanation',
       },
-      worked_examples: [],
       recorded_voiceovers: {
         voiceovers_mapping: {
           explanation: {},
-          worked_example_q_1: {},
-          worked_example_e_1: {},
-          worked_example_q_2: {},
-          worked_example_e_2: {},
         },
       },
     };
@@ -178,7 +171,7 @@ describe('Skill editor page', () => {
       superseding_skill_id: '2',
       next_misconception_id: 3,
     };
-    skill = skillObjectFactory.createFromBackendDict(skillDict);
+    skill = Skill.createFromBackendDict(skillDict);
     spyOn(skillEditorStateService, 'getSkill').and.returnValue(skill);
     localStorageService.removeOpenedEntityEditorBrowserTabsInfo(
       EntityEditorBrowserTabsInfoDomainConstants.OPENED_SKILL_EDITOR_BROWSER_TABS
@@ -205,6 +198,100 @@ describe('Skill editor page', () => {
     component.ngOnInit();
     expect(skillEditorStateService.loadSkill).toHaveBeenCalledWith('skill_1');
   }));
+
+  it('should clear changes and navigate immediately if there are no unsaved changes', () => {
+    spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(false);
+    const clearSpy = spyOn(questionUndoRedoService, 'clearChanges');
+    const navigateFn = jasmine.createSpy('navigateFn');
+
+    component.navigationWithConfirmation(navigateFn);
+
+    expect(clearSpy).toHaveBeenCalled();
+    expect(navigateFn).toHaveBeenCalled();
+  });
+
+  it('should not navigate if user cancels the modal confirmation', fakeAsync(() => {
+    spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
+    const navigateFn = jasmine.createSpy('navigateFn');
+
+    spyOn(ngbModal, 'open').and.callFake(() => {
+      return {
+        componentInstance: {},
+        result: Promise.reject(),
+      } as NgbModalRef;
+    });
+
+    component.navigationWithConfirmation(navigateFn);
+    tick();
+
+    expect(navigateFn).not.toHaveBeenCalled();
+  }));
+
+  it('should clear changes, reset creation flag, and navigate if user confirms', fakeAsync(() => {
+    spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
+    const clearSpy = spyOn(questionUndoRedoService, 'clearChanges');
+    const navigateFn = jasmine.createSpy('navigateFn');
+
+    spyOn(ngbModal, 'open').and.callFake(() => {
+      return {
+        componentInstance: {},
+        result: Promise.resolve(),
+      } as NgbModalRef;
+    });
+
+    component.navigationWithConfirmation(navigateFn);
+    tick();
+
+    expect(clearSpy).toHaveBeenCalled();
+    expect(skillEditorRoutingService.questionIsBeingCreated).toBeFalse();
+    expect(navigateFn).toHaveBeenCalled();
+  }));
+
+  it('should navigate to Main tab with confirmation when current tab is questions', () => {
+    spyOn(skillEditorRoutingService, 'getActiveTabName').and.returnValue(
+      'questions'
+    );
+    spyOn(component, 'navigationWithConfirmation').and.callFake(fn => fn());
+    const navSpy = spyOn(skillEditorRoutingService, 'navigateToMainTab');
+
+    component.selectMainTab();
+
+    expect(navSpy).toHaveBeenCalled();
+  });
+
+  it('should navigate to Main tab directly when current tab is not questions', () => {
+    spyOn(skillEditorRoutingService, 'getActiveTabName').and.returnValue(
+      'preview'
+    );
+    const navSpy = spyOn(skillEditorRoutingService, 'navigateToMainTab');
+
+    component.selectMainTab();
+
+    expect(navSpy).toHaveBeenCalled();
+  });
+
+  it('should navigate to Preview tab with confirmation when current tab is questions', () => {
+    spyOn(skillEditorRoutingService, 'getActiveTabName').and.returnValue(
+      'questions'
+    );
+    spyOn(component, 'navigationWithConfirmation').and.callFake(fn => fn());
+    const navSpy = spyOn(skillEditorRoutingService, 'navigateToPreviewTab');
+
+    component.selectPreviewTab();
+
+    expect(navSpy).toHaveBeenCalled();
+  });
+
+  it('should navigate to Preview tab directly when current tab is not questions', () => {
+    spyOn(skillEditorRoutingService, 'getActiveTabName').and.returnValue(
+      'main'
+    );
+    const navSpy = spyOn(skillEditorRoutingService, 'navigateToPreviewTab');
+
+    component.selectPreviewTab();
+
+    expect(navSpy).toHaveBeenCalled();
+  });
 
   it(
     'should addListener by passing getChangeCount to ' +

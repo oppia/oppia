@@ -77,7 +77,7 @@
 </ng-template>
 
 <div class="oppia-translation-page-statename">
-  <strong tabindex="0" [attr.aria-label]="'State name:' + stateName">{{ stateName }}</strong>
+  <strong class="e2e-test-state-name-text" tabindex="0" [attr.aria-label]="'State name:' + stateName">{{ stateName }}</strong>
 </div>
 <div class="oppia-page-card oppia-state-translation-page">
   <div class="translation-nav" joyrideStep="translationTabCardOptions" [stepContent]="TranslationTabCardOptions">
@@ -361,16 +361,7 @@
   <div joyrideStep="translationTabReRecordingOverview" [stepContent]="TranslationTabReRecordingOverview"></div>
   <div joyrideStep="translationTabTutorialComplete" [stepContent]="TranslationTabTutorialComplete"></div>
   <div *ngIf="isVoiceoverModeActive()" id="tutorialTranslationAudioBar" class="oppia-audio-translation-bar">
-    <div *ngIf="!isVoiceoverContributionEnabled()">
-      <p class="voiceover-disabled-text-class">
-        The functionality for adding voiceovers is temporarily disabled due to maintenance. Try again later.
-      </p>
-    </div>
-    <div *ngIf="isVoiceoverContributionEnabled()">
-      <oppia-audio-translation-bar *ngIf="!isVoiceoverContributionWithAccentEnabled()" [isTranslationTabBusy]="isTranslationTabBusy">
-      </oppia-audio-translation-bar>
-      <oppia-voiceover-card *ngIf="isVoiceoverContributionWithAccentEnabled()"></oppia-voiceover-card>
-    </div>
+    <oppia-voiceover-card></oppia-voiceover-card>
   </div>
   <div *ngIf="!isVoiceoverModeActive()">
     <oppia-state-translation-editor></oppia-state-translation-editor>
@@ -525,7 +516,7 @@
   .oppia-rte-editor-focused:focus > oppia-noninteractive-tabs > div {
     outline: solid 2px #009688;
   }
-  .oppia-rte-editor-focused:focus > oppia-noninteractive-collapsible > uib-accordion > div {
+  .oppia-rte-editor-focused:focus > oppia-noninteractive-collapsible > ngb-accordion > div {
     outline: solid 2px #009688;
   }
   .oppia-rte-editor-focused:focus > oppia-noninteractive-image > figure {

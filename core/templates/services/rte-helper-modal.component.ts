@@ -23,14 +23,16 @@ import {AppConstants} from 'app.constants';
 import cloneDeep from 'lodash/cloneDeep';
 import {AlertsService} from 'services/alerts.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ExternalRteSaveService} from 'services/external-rte-save.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 import {ServicesConstants} from 'services/services.constants';
-import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {Subscription} from 'rxjs';
+import {HtmlLengthService} from 'services/html-length.service';
+
+const CALCULATION_TYPE_CHARACTER = 'character';
 
 const typedCloneDeep = <T>(obj: T): T => cloneDeep(obj);
 
@@ -117,12 +119,27 @@ export class RteHelperModalComponent {
   public customizationArgsForm: FormGroup;
   customizationArgsFormSubscription: Subscription;
   COMPONENT_ID_COLLAPSIBLE = 'collapsible';
+  COMPONENT_ID_COLLAPSIBLE_HEADING = 'collapsible_heading';
+  COMPONENT_ID_COLLAPSIBLE_CONTENT = 'collapsible_content';
+  COMPONENT_ID_WORKEDEXAMPLE = 'workedexample';
   COMPONENT_ID_IMAGE = 'image';
   COMPONENT_ID_LINK = 'link';
   COMPONENT_ID_MATH = 'math';
   COMPONENT_ID_SKILLREVIEW = 'skillreview';
   COMPONENT_ID_TABS = 'tabs';
+  COMPONENT_ID_TABS_HEADING = 'tabs_heading';
+  COMPONENT_ID_TABS_CONTENT = 'tabs_content';
   COMPONENT_ID_VIDEO = 'video';
+  // Character limit for various RTE components.
+  CHARACTER_LIMITS = {
+    collapsible_heading: 200,
+    collapsible_content: 500,
+    link: 200,
+    tabs_heading: 200,
+    tabs_content: 500,
+    workedexample: 1500,
+    default: 500,
+  };
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -130,14 +147,13 @@ export class RteHelperModalComponent {
     private alertsService: AlertsService,
     private fb: FormBuilder,
     private assetsBackendApiService: AssetsBackendApiService,
-    private contextService: ContextService,
-    private focusManagerService: FocusManagerService,
+    private pageContextService: PageContextService,
     private imageLocalStorageService: ImageLocalStorageService,
-    private imageUploadHelperService: ImageUploadHelperService
+    private imageUploadHelperService: ImageUploadHelperService,
+    private htmlLengthService: HtmlLengthService
   ) {}
 
   ngOnInit(): void {
-    this.focusManagerService.setFocus('tmpFocusPoint');
     for (let i = 0; i < this.customizationArgSpecs.length; i++) {
       const caName = this.customizationArgSpecs[i].name;
       if (caName === 'math_content') {
@@ -273,12 +289,54 @@ export class RteHelperModalComponent {
           );
           break;
         } else {
+          // Check content length.
+          if (
+            this.isContentLengthExceeded(
+              value[0][tabIndex].content,
+              this.COMPONENT_ID_TABS_CONTENT
+            )
+          ) {
+            this.updateRteErrorMessage(
+              `The content of tab ${tabIndex + 1} is too long. Please use at most ${this.getCharacterLimit(this.COMPONENT_ID_TABS_CONTENT)} characters.`
+            );
+            break;
+          }
+
+          // Check title length.
+          if (
+            this.isContentLengthExceeded(
+              value[0][tabIndex].title,
+              this.COMPONENT_ID_TABS_HEADING
+            )
+          ) {
+            this.updateRteErrorMessage(
+              `The title of tab ${tabIndex + 1} is too long. Please use at most ${this.getCharacterLimit(this.COMPONENT_ID_TABS_HEADING)} characters.`
+            );
+            break;
+          }
+
           this.updateRteErrorMessage('');
         }
       }
     } else if (this.componentId === this.COMPONENT_ID_LINK) {
       let url: string = value[0];
       let text: string = value[1];
+
+      // Check URL and text lengths.
+      if (this.isContentLengthExceeded(url, this.COMPONENT_ID_LINK)) {
+        this.updateRteErrorMessage(
+          `The URL is too long. Please use at most ${this.getCharacterLimit(this.COMPONENT_ID_LINK)} characters.`
+        );
+        return;
+      }
+
+      if (this.isContentLengthExceeded(text, this.COMPONENT_ID_LINK)) {
+        this.updateRteErrorMessage(
+          `The link text is too long. Please use at most ${this.getCharacterLimit(this.COMPONENT_ID_LINK)} characters.`
+        );
+        return;
+      }
+
       if (!text.trim()) {
         value[1] = url;
         text = url;
@@ -311,7 +369,90 @@ export class RteHelperModalComponent {
           }
         }
       }
+    } else if (this.componentId === this.COMPONENT_ID_COLLAPSIBLE) {
+      // Check heading and content lengths for collapsible components.
+      if (
+        value[0] &&
+        this.isContentLengthExceeded(
+          value[0],
+          this.COMPONENT_ID_COLLAPSIBLE_HEADING
+        )
+      ) {
+        this.updateRteErrorMessage(
+          `The heading is too long. Please use at most ${this.getCharacterLimit(this.COMPONENT_ID_COLLAPSIBLE_HEADING)} characters.`
+        );
+        return;
+      }
+
+      if (
+        value[1] &&
+        this.isContentLengthExceeded(
+          value[1],
+          this.COMPONENT_ID_COLLAPSIBLE_CONTENT
+        )
+      ) {
+        this.updateRteErrorMessage(
+          `The content is too long. Please use at most ${this.getCharacterLimit(this.COMPONENT_ID_COLLAPSIBLE_CONTENT)} characters.`
+        );
+        return;
+      }
+    } else if (this.componentId === this.COMPONENT_ID_WORKEDEXAMPLE) {
+      if (
+        value[0] &&
+        this.isContentLengthExceeded(value[0], this.COMPONENT_ID_WORKEDEXAMPLE)
+      ) {
+        this.updateRteErrorMessage(
+          `The question is too long. Please use at most ${this.getCharacterLimit(this.COMPONENT_ID_WORKEDEXAMPLE)} characters.`
+        );
+        return;
+      } else if (value[0] === '') {
+        this.updateRteErrorMessage(
+          'Please ensure the worked example has a question.'
+        );
+      }
+
+      if (
+        value[1] &&
+        this.isContentLengthExceeded(value[1], this.COMPONENT_ID_WORKEDEXAMPLE)
+      ) {
+        this.updateRteErrorMessage(
+          `The answer is too long. Please use at most ${this.getCharacterLimit(this.COMPONENT_ID_WORKEDEXAMPLE)} characters.`
+        );
+        return;
+      } else if (value[1] === '') {
+        this.updateRteErrorMessage(
+          'Please ensure the worked example has an answer.'
+        );
+      }
     }
+  }
+
+  /**
+   * Checks if the HTML content length exceeds the character limit for the specified component.
+   * @param content The HTML content to check
+   * @param componentId The ID of the component
+   * @returns True if the content length exceeds the limit, false otherwise
+   */
+  isContentLengthExceeded(content: string, componentId: string): boolean {
+    if (!content) {
+      return false;
+    }
+
+    return Boolean(
+      this.htmlLengthService.computeHtmlLength(
+        content,
+        CALCULATION_TYPE_CHARACTER
+      ) > this.getCharacterLimit(componentId)
+    );
+  }
+
+  /**
+   * Returns the character limit for the specified component type.
+   * @param componentId The ID of the component
+   * @returns The character limit for the component
+   */
+  getCharacterLimit(componentId: string): number {
+    return this.CHARACTER_LIMITS[componentId] || this.CHARACTER_LIMITS.default;
   }
 
   isErrorMessageNonempty(): boolean {
@@ -371,7 +512,7 @@ export class RteHelperModalComponent {
 
       let maxAllowedFileSize;
       if (
-        this.contextService.getEntityType() ===
+        this.pageContextService.getEntityType() ===
         AppConstants.ENTITY_TYPE.BLOG_POST
       ) {
         const ONE_MB_IN_BYTES = 1 * 1024 * 1024;
@@ -392,7 +533,7 @@ export class RteHelperModalComponent {
         return;
       }
       if (
-        this.contextService.getImageSaveDestination() ===
+        this.pageContextService.getImageSaveDestination() ===
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
       ) {
         this.imageLocalStorageService.saveImage(svgFileName, svgFile);
@@ -409,8 +550,8 @@ export class RteHelperModalComponent {
         .saveMathExpressionImage(
           resampledFile,
           svgFileName,
-          this.contextService.getEntityType(),
-          this.contextService.getEntityId()
+          this.pageContextService.getEntityType(),
+          this.pageContextService.getEntityId()
         )
         .then(
           response => {

@@ -20,11 +20,11 @@
 import {Injectable} from '@angular/core';
 
 import {AnswerStats} from 'domain/exploration/answer-stats.model';
-import {States} from 'domain/exploration/StatesObjectFactory';
+import {States} from 'domain/exploration/states.model';
 import {AnswerClassificationService} from 'pages/exploration-player-page/services/answer-classification.service';
 import {InteractionRulesRegistryService} from 'services/interaction-rules-registry.service';
 import {StateTopAnswersStatsBackendApiService} from 'services/state-top-answers-stats-backend-api.service';
-import {State} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 
 export class AnswerStatsEntry {
   constructor(

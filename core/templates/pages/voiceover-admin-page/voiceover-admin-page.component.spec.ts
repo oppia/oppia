@@ -20,7 +20,9 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {
   ComponentFixture,
+  discardPeriodicTasks,
   fakeAsync,
+  flush,
   TestBed,
   tick,
 } from '@angular/core/testing';
@@ -33,8 +35,8 @@ import {MaterialModule} from 'modules/material.module';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {MatTableModule} from '@angular/material/table';
-import {PlatformFeatureService} from 'services/platform-feature.service';
-import {FeatureStatusChecker} from 'domain/feature-flag/feature-status-summary.model';
+import {LanguageUtilService} from 'domain/utilities/language-util.service';
+import {CloudTaskRun} from 'domain/cloud-task/cloud-task-run.model';
 
 class MockNgbModal {
   open() {
@@ -44,22 +46,12 @@ class MockNgbModal {
   }
 }
 
-class MockPlatformFeatureService {
-  get status(): object {
-    return {
-      LabelAccentToVoiceArtist: {
-        isEnabled: true,
-      },
-    };
-  }
-}
-
 describe('Voiceover Admin Page component ', () => {
   let component: VoiceoverAdminPageComponent;
   let fixture: ComponentFixture<VoiceoverAdminPageComponent>;
   let voiceoverBackendApiService: VoiceoverBackendApiService;
   let ngbModal: NgbModal;
-  let platformFeatureService: PlatformFeatureService;
+  let languageUtilService: LanguageUtilService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -79,10 +71,6 @@ describe('Voiceover Admin Page component ', () => {
           provide: NgbModal,
           useClass: MockNgbModal,
         },
-        {
-          provide: PlatformFeatureService,
-          useClass: MockPlatformFeatureService,
-        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -90,7 +78,7 @@ describe('Voiceover Admin Page component ', () => {
     component = fixture.componentInstance;
     voiceoverBackendApiService = TestBed.inject(VoiceoverBackendApiService);
     ngbModal = TestBed.inject(NgbModal);
-    platformFeatureService = TestBed.inject(PlatformFeatureService);
+    languageUtilService = TestBed.inject(LanguageUtilService);
   });
 
   it('should initialize the component', fakeAsync(() => {
@@ -112,28 +100,10 @@ describe('Voiceover Admin Page component ', () => {
       languageAccentMasterList: languageAccentMasterList,
       languageCodesMapping: languageCodesMapping,
     };
-    let voiceArtistMetadataInfo = {
-      voiceArtistIdToLanguageMapping: {
-        voiceArtist1: {
-          en: 'en-US',
-        },
-        voiceArtist2: {
-          hi: 'hi-IN',
-        },
-      },
-      voiceArtistIdToVoiceArtistName: {
-        voiceArtist1: 'Voice Artist 1',
-        voiceArtist2: 'Voice Artist 2',
-      },
-    };
     spyOn(
       voiceoverBackendApiService,
       'fetchVoiceoverAdminDataAsync'
     ).and.returnValue(Promise.resolve(voiceoverAdminDataResponse));
-    spyOn(
-      voiceoverBackendApiService,
-      'fetchVoiceArtistMetadataAsync'
-    ).and.returnValue(Promise.resolve(voiceArtistMetadataInfo));
 
     expect(
       voiceoverBackendApiService.fetchVoiceoverAdminDataAsync
@@ -142,12 +112,11 @@ describe('Voiceover Admin Page component ', () => {
 
     component.ngOnInit();
     tick();
+    flush();
+    discardPeriodicTasks();
 
     expect(
       voiceoverBackendApiService.fetchVoiceoverAdminDataAsync
-    ).toHaveBeenCalled();
-    expect(
-      voiceoverBackendApiService.fetchVoiceArtistMetadataAsync
     ).toHaveBeenCalled();
     expect(component.availableLanguageAccentDescriptionsToCodes).toEqual({
       'Hindi (India)': 'hi-IN',
@@ -167,6 +136,10 @@ describe('Voiceover Admin Page component ', () => {
     component.languageAccentCodeToLanguageCode = {
       'en-US': 'en',
       'hi-IN': 'hi',
+    };
+    component.languageAccentCodesToSupportsAutogeneration = {
+      'en-US': false,
+      'hi-IN': true,
     };
     component.languageCodesMapping = {};
     component.supportedLanguageAccentCodesToDescriptions = {};
@@ -276,85 +249,151 @@ describe('Voiceover Admin Page component ', () => {
     expect(component.languageAccentDropdownIsShown).toBeFalse();
   });
 
-  it('should be able to add accent for voiceovers', fakeAsync(() => {
-    component.languageAccentMasterList = {
-      hi: {
-        'hi-IN': 'Hindi (India)',
-      },
+  it('should check whether given language accent supports cloud auto regeneration', () => {
+    component.cloudSupportedLanguageAccentCodes = ['en-US', 'hi-IN'];
+    expect(
+      component.isAutogenerationSupportedByCloudService('en-US')
+    ).toBeTrue();
+    expect(
+      component.isAutogenerationSupportedByCloudService('en-IN')
+    ).toBeFalse();
+  });
+
+  it('should be able to update cloud supported language accent codes', fakeAsync(() => {
+    component.languageCodesMapping = {
       en: {
-        'en-US': 'English (United States)',
+        'en-US': false,
+        'en-IN': false,
+      },
+      hi: {
+        'hi-IN': true,
       },
     };
-    component.voiceArtistIdToVoiceArtistName = {
-      voiceArtistId: 'Voice Artist',
+    component.languageAccentCodeToLanguageCode = {
+      'en-US': 'en',
+      'hi-IN': 'hi',
+      'en-IN': 'en',
     };
-    component.voiceArtistIdToLanguageMapping = {
-      voiceArtistId: {
-        en: '',
-      },
+    component.supportedLanguageAccentCodesToDescriptions = {
+      'en-US': 'English (United States)',
+      'en-IN': 'English (India)',
+      'hi-IN': 'Hindi (India)',
     };
+    component.languageAccentCodesToSupportsAutogeneration = {
+      'en-US': false,
+      'en-IN': false,
+      'hi-IN': true,
+    };
+
+    spyOn(component, 'saveUpdatedLanguageAccentSupport').and.returnValue(
+      Promise.resolve()
+    );
     spyOn(ngbModal, 'open').and.returnValue({
       componentInstance: {},
-      result: Promise.resolve('en-US'),
+      result: Promise.resolve(),
     } as NgbModalRef);
+    spyOn(languageUtilService, 'getAudioLanguageDescription').and.returnValue(
+      'English'
+    );
 
-    component.addLanguageAccentForVoiceArtist('voiceArtistId', 'en');
+    component.updateSupportsAutogenerationField('en-US', true);
     tick();
 
-    expect(ngbModal.open).toHaveBeenCalled();
-    expect(component.voiceArtistIdToLanguageMapping.voiceArtistId.en).toEqual(
-      'en-US'
-    );
+    expect(component.languageCodesMapping).toEqual({
+      en: {
+        'en-US': true,
+        'en-IN': false,
+      },
+      hi: {
+        'hi-IN': true,
+      },
+    });
   }));
 
-  it('should not add accent for voiceovers when confirm modal is cancelled', fakeAsync(() => {
-    component.languageAccentMasterList = {
-      hi: {
-        'hi-IN': 'Hindi (India)',
-      },
+  it('should not update cloud supported language accent codes when modal is cancelled', () => {
+    component.languageCodesMapping = {
       en: {
-        'en-US': 'English (United States)',
+        'en-US': true,
+        'en-IN': false,
+      },
+      hi: {
+        'hi-IN': true,
       },
     };
-    component.voiceArtistIdToVoiceArtistName = {
-      voiceArtistId: 'Voice Artist',
+    component.languageAccentCodeToLanguageCode = {
+      'en-US': 'en',
+      'hi-IN': 'hi',
+      'en-IN': 'en',
     };
-    component.voiceArtistIdToLanguageMapping = {
-      voiceArtistId: {
-        en: '',
-      },
+    component.supportedLanguageAccentCodesToDescriptions = {
+      'en-US': 'English (United States)',
+      'en-IN': 'English (India)',
     };
+    component.languageAccentCodesToSupportsAutogeneration = {
+      'en-US': true,
+      'en-IN': false,
+    };
+
+    spyOn(component, 'saveUpdatedLanguageAccentSupport').and.returnValue(
+      Promise.resolve()
+    );
     spyOn(ngbModal, 'open').and.returnValue({
       componentInstance: {},
       result: Promise.reject(),
     } as NgbModalRef);
-
-    component.addLanguageAccentForVoiceArtist('voiceArtistId', 'en');
-    tick();
-
-    expect(ngbModal.open).toHaveBeenCalled();
-    expect(component.voiceArtistIdToLanguageMapping.voiceArtistId.en).toEqual(
-      ''
+    spyOn(languageUtilService, 'getAudioLanguageDescription').and.returnValue(
+      'English (United States)'
     );
-  }));
 
-  it('should disable voice artist accent labeling feature flag', () => {
-    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
-      LabelAccentToVoiceArtist: {
-        isEnabled: false,
+    component.updateSupportsAutogenerationField('en-US', false);
+
+    expect(component.languageCodesMapping).toEqual({
+      en: {
+        'en-US': true,
+        'en-IN': false,
       },
-    } as FeatureStatusChecker);
-
-    expect(component.isLabelingVoiceArtistFeatureEnabled()).toBeFalse();
+      hi: {
+        'hi-IN': true,
+      },
+    });
   });
 
-  it('should enable voice artist accent labeling feature flag', () => {
-    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
-      LabelAccentToVoiceArtist: {
-        isEnabled: true,
-      },
-    } as FeatureStatusChecker);
+  it('should be able to fetch voiceover regeneration records', fakeAsync(() => {
+    component.range.value.start = new Date('2025-01-01T00:00:00Z');
+    component.range.value.end = new Date('2025-01-01T00:00:00Z');
+    component.cloudTaskRunList = [];
 
-    expect(component.isLabelingVoiceArtistFeatureEnabled()).toBeTrue();
+    let cloudTaskRun = [
+      CloudTaskRun.createFromBackendDict({
+        id: '123',
+        cloud_task_name: 'Test Task',
+        latest_job_state: 'RUNNING',
+        function_id: 'function_456',
+        exception_messages_for_failed_runs: ['Error 1', 'Error 2'],
+        current_retry_attempt: 1,
+        last_updated: new Date('2025-01-01T00:00:00Z'),
+        created_on: new Date('2025-01-01T00:00:00Z'),
+      }),
+    ];
+    spyOn(
+      voiceoverBackendApiService,
+      'fetchVoiceoverRegenerationRecordAsync'
+    ).and.returnValue(Promise.resolve(cloudTaskRun));
+
+    component.fetchVoiceoverRegenerationRecord();
+    tick();
+    flush();
+
+    expect(component.cloudTaskRunList).toEqual(cloudTaskRun);
+  }));
+
+  it('should be able to open cloud regeneration record modal', () => {
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {},
+      result: Promise.resolve(),
+    } as NgbModalRef);
+
+    component.openCloudTaskRunDetailModal('cloudTaskRunId');
+    expect(ngbModal.open).toHaveBeenCalled();
   });
 });

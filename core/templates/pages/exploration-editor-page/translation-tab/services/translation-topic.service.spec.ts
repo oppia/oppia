@@ -16,77 +16,64 @@
  * @fileoverview Unit test for the Translation topic service.
  */
 
-import {
-  ContributionOpportunitiesService,
-  // eslint-disable-next-line max-len
-} from 'pages/contributor-dashboard-page/services/contribution-opportunities.service';
+import {ContributionOpportunitiesService} from 'pages/contributor-dashboard-page/services/contribution-opportunities.service';
 import {EventEmitter} from '@angular/core';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {LoggerService} from 'services/contextual/logger.service';
-import {
-  TranslationTopicService,
-  // eslint-disable-next-line max-len
-} from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
-import {fakeAsync, TestBed} from '@angular/core/testing';
+import {TranslationTopicService} from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
+import {fakeAsync, TestBed, tick} from '@angular/core/testing';
 
 describe('Translation topic service', () => {
-  let $flushPendingTasks: () => void;
-  let $q = null;
-
   let loggerService: LoggerService;
   let translationTopicService: TranslationTopicService;
   let contributionOpportunitiesService: ContributionOpportunitiesService;
 
-  beforeEach(
-    angular.mock.inject(function ($injector) {
-      $flushPendingTasks = $injector.get('$flushPendingTasks');
-      $q = $injector.get('$q');
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [
+        LoggerService,
+        TranslationTopicService,
+        ContributionOpportunitiesService,
+      ],
+    });
 
-      TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule],
-      });
+    loggerService = TestBed.inject(LoggerService);
+    translationTopicService = TestBed.inject(TranslationTopicService);
+    contributionOpportunitiesService = TestBed.inject(
+      ContributionOpportunitiesService
+    );
 
-      loggerService = TestBed.get(LoggerService);
-      translationTopicService = TestBed.get(TranslationTopicService);
-      contributionOpportunitiesService = TestBed.get(
-        ContributionOpportunitiesService
-      );
-      spyOn(
-        contributionOpportunitiesService,
-        'getTranslatableTopicNamesAsync'
-      ).and.returnValue($q.resolve(['Topic 1', 'Topic 2']));
-    })
-  );
+    spyOn(
+      contributionOpportunitiesService,
+      'getTranslatableTopicNamesAsync'
+    ).and.returnValue(Promise.resolve(['Topic 1', 'Topic 2']));
+  });
 
   describe('Translation topic service', () => {
-    it('should correctly set and get topic names', fakeAsync(async () => {
+    it('should correctly set and get topic names', fakeAsync(() => {
       translationTopicService.setActiveTopicName('Topic 1');
-      $flushPendingTasks();
+      tick();
       expect(translationTopicService.getActiveTopicName()).toBe('Topic 1');
     }));
 
-    it('should not allow invalid topic names to be set', () => {
+    it('should not allow invalid topic names to be set', fakeAsync(() => {
       const logErrorSpy = spyOn(loggerService, 'error').and.callThrough();
 
       translationTopicService.setActiveTopicName('Topic 3');
-      $flushPendingTasks();
+      tick();
       expect(translationTopicService.getActiveTopicName()).toBeUndefined();
       expect(logErrorSpy).toHaveBeenCalledWith(
         'Invalid active topic name: Topic 3'
       );
 
-      // This throws "Argument of type 'null' is not assignable to parameter
-      // of type 'string'" We need to suppress this error because of the need
-      // to test validations. This error is thrown because the topic name is
-      // null.
-      // @ts-ignore
       translationTopicService.setActiveTopicName(null);
-      $flushPendingTasks();
+      tick();
       expect(translationTopicService.getActiveTopicName()).toBeUndefined();
-    });
+    }));
 
     it('should emit the new topic name', () => {
-      let newTopicEventEmitter = new EventEmitter();
+      const newTopicEventEmitter = new EventEmitter();
       expect(translationTopicService.onActiveTopicChanged).toEqual(
         newTopicEventEmitter
       );

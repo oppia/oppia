@@ -24,14 +24,14 @@ import {HelpModalComponent} from './modal-templates/help-modal.component';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import {ParamChangesObjectFactory} from 'domain/exploration/ParamChangesObjectFactory';
+import {ParamChanges} from 'domain/exploration/param-changes.model';
 import {
   ParamSpecsBackendDict,
-  ParamSpecsObjectFactory,
-} from 'domain/exploration/ParamSpecsObjectFactory';
+  ParamSpecs,
+} from 'domain/exploration/param-specs.model';
 import {AlertsService} from 'services/alerts.service';
 import {BottomNavbarStatusService} from 'services/bottom-navbar-status.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {EditabilityService} from 'services/editability.service';
 import {ExplorationFeaturesBackendApiService} from 'services/exploration-features-backend-api.service';
 import {ExplorationFeaturesService} from 'services/exploration-features.service';
@@ -70,11 +70,11 @@ import {UserExplorationPermissionsService} from './services/user-exploration-per
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {ExplorationNextContentIdIndexService} from './services/exploration-next-content-id-index.service';
 import {VersionHistoryService} from './services/version-history.service';
-import {ExplorationBackendDict} from 'domain/exploration/ExplorationObjectFactory';
+import {ExplorationBackendDict} from 'domain/exploration/exploration.model';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
-import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
-import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
+import {TranslatedContent} from 'domain/exploration/translated-content.model';
+import {EntityTranslation} from 'domain/translation/entity-translation.model';
 import {EntityBulkTranslationsBackendApiService} from './services/entity-bulk-translations-backend-api.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {ExplorationChange} from 'domain/exploration/exploration-draft.model';
@@ -143,7 +143,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     private autosaveInfoModalsService: AutosaveInfoModalsService,
     private bottomNavbarStatusService: BottomNavbarStatusService,
     private changeListService: ChangeListService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     public editabilityService: EditabilityService,
     private entityBulkTranslationsBackendApiService: EntityBulkTranslationsBackendApiService,
     private entityTranslationsService: EntityTranslationsService,
@@ -172,8 +172,6 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     private loaderService: LoaderService,
     private ngbModal: NgbModal,
     private pageTitleService: PageTitleService,
-    private paramChangesObjectFactory: ParamChangesObjectFactory,
-    private paramSpecsObjectFactory: ParamSpecsObjectFactory,
     private platformFeatureService: PlatformFeatureService,
     private preventPageUnloadEventService: PreventPageUnloadEventService,
     private routerService: RouterService,
@@ -231,14 +229,14 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
         }
       }),
       this.explorationFeaturesBackendApiService.fetchExplorationFeaturesAsync(
-        this.contextService.getExplorationId()
+        this.pageContextService.getExplorationId()
       ),
       this.threadDataBackendApiService.getFeedbackThreadsAsync(),
       this.userService.getUserInfoAsync(),
     ]).then(async ([explorationData, featuresData, _, userInfo]) => {
       if ((explorationData as ExplorationData).exploration_is_linked_to_story) {
         this.explorationIsLinkedToStory = true;
-        this.contextService.setExplorationIsLinkedToStory();
+        this.pageContextService.setExplorationIsLinkedToStory();
       }
 
       this.explorationFeaturesService.init(explorationData, featuresData);
@@ -252,14 +250,18 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
         'exploration',
         explorationData.version
       );
-      this.contextService.setExplorationVersion(explorationData.version);
+      this.pageContextService.setExplorationVersion(explorationData.version);
 
+      const languageCode =
+        this.entityVoiceoversService.languageCode ||
+        explorationData.language_code;
       this.entityVoiceoversService.init(
         this.explorationId,
         'exploration',
         explorationData.version,
-        explorationData.language_code
+        languageCode
       );
+      this.entityVoiceoversService.fetchEntityVoiceovers();
 
       this.explorationTitleService.init(explorationData.title);
       this.explorationCategoryService.init(
@@ -276,14 +278,12 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
         (explorationData as ExplorationData).tags
       );
       this.explorationParamSpecsService.init(
-        this.paramSpecsObjectFactory.createFromBackendDict(
+        ParamSpecs.createFromBackendDict(
           explorationData.param_specs as ParamSpecsBackendDict
         )
       );
       this.explorationParamChangesService.init(
-        this.paramChangesObjectFactory.createFromBackendList(
-          explorationData.param_changes
-        )
+        ParamChanges.createFromBackendList(explorationData.param_changes)
       );
       this.explorationAutomaticTextToSpeechService.init(
         explorationData.auto_tts_enabled
@@ -455,6 +455,14 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
       this.stateEditorRefreshService.onRefreshStateEditor.emit();
       this.explorationEditorPageHasInitialized = true;
     });
+  }
+
+  isVoiceoverTabEnabled(): boolean {
+    if (this.pageContextService.isExplorationLinkedToStory()) {
+      return true;
+    }
+    return this.platformFeatureService.status
+      .ShowVoiceoverTabForNonCuratedExplorations.isEnabled;
   }
 
   populateEntityTranslationsWithDraftChanges(
@@ -656,7 +664,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
   }
 
   showUserHelpModal(): void {
-    let explorationId = this.contextService.getExplorationId();
+    let explorationId = this.pageContextService.getExplorationId();
     this.siteAnalyticsService.registerClickHelpButtonEvent(explorationId);
     let EDITOR_TUTORIAL_MODE = 'editor';
     let TRANSLATION_TUTORIAL_MODE = 'translation';
@@ -780,7 +788,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
      *********************************************************/
     this.loaderService.showLoadingScreen('Loading');
 
-    this.explorationId = this.contextService.getExplorationId();
+    this.explorationId = this.pageContextService.getExplorationId();
     this.explorationUrl = '/create/' + this.explorationId;
     this.explorationDownloadUrl =
       '/createhandler/download/' + this.explorationId;
@@ -790,8 +798,8 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     this.areExplorationWarningsVisible = false;
 
     // The initExplorationPage function is written separately since it
-    // is also called in this.directiveSubscriptions.add when some
-    // external events are triggered.
+    // is also called in directiveSubscriptions when some external events are
+    // triggered.
     this.initExplorationPage();
     this.improvementsTabIsEnabled = false;
 

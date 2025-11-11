@@ -22,26 +22,24 @@ import {
   CurrentInteractionService,
   OnSubmitFn,
   ValidityCheckFn,
-} from 'pages/exploration-player-page/services/current-interaction.service';
-import {UrlService} from 'services/contextual/url.service';
-import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
-import {PlayerTranscriptService} from 'pages/exploration-player-page/services/player-transcript.service';
-import {StateCard} from 'domain/state_card/state-card.model';
-import {ContextService} from 'services/context.service';
+} from './current-interaction.service';
+import {UrlService} from '../../../services/contextual/url.service';
+import {PlayerPositionService} from './player-position.service';
+import {PlayerTranscriptService} from './player-transcript.service';
+import {StateCard} from '../../../domain/state_card/state-card.model';
+import {PageContextService} from '../../../services/page-context.service';
 import {InteractionRulesService} from './answer-classification.service';
-import {Interaction} from 'domain/exploration/InteractionObjectFactory';
-import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
-import {AudioTranslationLanguageService} from './audio-translation-language.service';
+import {Interaction} from '../../../domain/exploration/interaction.model';
+import {RecordedVoiceovers} from '../../../domain/exploration/recorded-voiceovers.model';
 
 describe('Current Interaction Service', () => {
   let urlService: UrlService;
   let currentInteractionService: CurrentInteractionService;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let DUMMY_ANSWER = 'dummy_answer';
   let playerTranscriptService: PlayerTranscriptService;
   let playerPositionService: PlayerPositionService;
   let interactionRulesService: InteractionRulesService;
-  let audioTranslationLanguageService: AudioTranslationLanguageService;
   const displayedCard = new StateCard(
     '',
     '',
@@ -49,14 +47,13 @@ describe('Current Interaction Service', () => {
     {} as Interaction,
     [],
     {} as RecordedVoiceovers,
-    '',
-    {} as AudioTranslationLanguageService
+    ''
   );
 
-  // This mock is required since ContextService is used in
+  // This mock is required since PageContextService is used in
   // CurrentInteractionService to obtain the explorationId. So, in the
   // tests also we need to create a mock environment of exploration editor
-  // since ContextService will error if it is used outside the context
+  // since PageContextService will error if it is used outside the context
   // of an exploration.
   beforeEach(() => {
     urlService = TestBed.inject(UrlService);
@@ -66,7 +63,7 @@ describe('Current Interaction Service', () => {
     currentInteractionService = TestBed.inject(CurrentInteractionService);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
     playerPositionService = TestBed.inject(PlayerPositionService);
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
   });
 
   it('should properly register onSubmitFn and submitAnswerFn', () => {
@@ -163,12 +160,11 @@ describe('Current Interaction Service', () => {
         '<oppia-text-input-html></oppia-text-input-html>',
         interaction,
         recordedVoiceovers,
-        '',
-        audioTranslationLanguageService
+        ''
       )
     );
-    spyOn(contextService, 'getExplorationId').and.returnValue('abc');
-    spyOn(contextService, 'getPageContext').and.returnValue('learner');
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('abc');
+    spyOn(pageContextService, 'getPageContext').and.returnValue('learner');
 
     let additionalInfo =
       '\nUndefined submit answer debug logs:' +
@@ -228,5 +224,31 @@ describe('Current Interaction Service', () => {
     spyOn(displayedCard, 'showNoResponseError').and.returnValue(true);
 
     expect(currentInteractionService.showNoResponseError()).toBeTrue();
+  });
+  it('should update answer validity using updateAnswerIsValid', () => {
+    spyOn(currentInteractionService, 'getDisplayedCard').and.returnValue(
+      displayedCard
+    );
+    spyOn(displayedCard, 'updateAnswerIsValid');
+
+    currentInteractionService.updateAnswerIsValid(true);
+    expect(displayedCard.updateAnswerIsValid).toHaveBeenCalledWith(true);
+
+    currentInteractionService.updateAnswerIsValid(false);
+    expect(displayedCard.updateAnswerIsValid).toHaveBeenCalledWith(false);
+  });
+
+  it('should check invalid response error visibility', () => {
+    spyOn(currentInteractionService, 'getDisplayedCard').and.returnValue(
+      displayedCard
+    );
+    spyOn(displayedCard, 'showInvalidResponseError').and.returnValues(
+      true,
+      false
+    );
+
+    expect(currentInteractionService.showInvalidResponseError()).toBeTrue();
+    expect(currentInteractionService.showInvalidResponseError()).toBeFalse();
+    expect(displayedCard.showInvalidResponseError).toHaveBeenCalledTimes(2);
   });
 });

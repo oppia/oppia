@@ -10,36 +10,36 @@
           <a href="/learn">{{ 'I18N_CLASSROOM_NAVIGATION_LINKS_INTRO' | translate }}</a>
           <p>{{ 'I18N_CLASSROOM_NAVIGATION_LINKS_DESCRIPTION' | translate }}</p>
         </div>
-        <div *ngFor="let classroom of classroomSummaries" class="classroom-nav-item-container">
-          <div class="classroom-item" (click)="registerClassroomCardClickEvent(classroom.name)">
-            <div class="classroom-text-container">
-              <a class="classroom-name e2e-mobile-test-classroom-link"
-                 [href]="'/learn/' + classroom.url_fragment"
-                 *ngIf="!isHackyClassroomNameTranslationDisplayed(classroom.name)"
-                 >
-                 {{ classroom.name }}
-              </a>
-              <a class="classroom-name e2e-mobile-test-classroom-link"
-                 [href]="'/learn/' + classroom.url_fragment"
-                 *ngIf="isHackyClassroomNameTranslationDisplayed(classroom.name)"
-                 >
-                 {{ getClassroomNameTranslationkey(classroom.name) | translate }}
-              </a>
-              <p class="classroom-intro-text">{{ 'I18N_CLASSROOM_FOUNDATION_TEXT' | translate:{ classroomName: classroom.name } }}</p>
-            </div>
-            <div class="classroom-thumbnail">
-              <img alt="Classroom thumbnail image"
-                   [src]="getClassroomThumbnail(classroom.classroom_id, classroom.thumbnail_filename)">
+        <div class="classroom-grid"
+             [attr.data-classroom-count]="classroomSummaries.length"
+             [ngClass]="{
+               'classroom-grid-one-columns': classroomSummaries.length === 1,
+               'classroom-grid-two-columns': classroomSummaries.length === 2
+             }"
+        >
+          <div *ngFor="let classroom of classroomSummaries" class="classroom-nav-item-container">
+            <div class="classroom-item" (click)="registerClassroomCardClickEvent(classroom.name)">
+              <div class="classroom-text-container">
+                <a class="classroom-name e2e-mobile-test-classroom-link"
+                   [href]="'/learn/' + classroom.url_fragment"
+                   *ngIf="!isHackyClassroomNameTranslationDisplayed(classroom.name)"
+                  >
+                  {{ classroom.name }}
+                </a>
+                <a class="classroom-name e2e-mobile-test-classroom-link"
+                   [href]="'/learn/' + classroom.url_fragment"
+                   *ngIf="isHackyClassroomNameTranslationDisplayed(classroom.name)"
+                  >
+                  {{ getClassroomNameTranslationkey(classroom.name) | translate }}
+                </a>
+                <p class="classroom-intro-text">{{ 'I18N_CLASSROOM_FOUNDATION_TEXT' | translate:{ classroomName: classroom.name } }}</p>
+              </div>
+              <div class="classroom-thumbnail">
+                <img alt="Classroom thumbnail image"
+                     [src]="getClassroomThumbnail(classroom.classroom_id, classroom.thumbnail_filename)">
+              </div>
             </div>
           </div>
-        </div>
-        <div class="nav-item-bottom-link classrooms-page-link" *ngIf="classroomSummaries.length > 1">
-          <a class="underline nav-item-bottom-link" tabindex="0" href="/learn">
-            <span class="link">
-              {{ 'I18N_TOPNAV_LEARN_LINK_1' | translate }}
-            </span>
-            <span class="fas fa-arrow-right oppia-navbar-arrow-right"></span>
-          </a>
         </div>
       </div>
     </div>
@@ -47,13 +47,29 @@
 </div>
 
 <style>
+  .classroom-grid {
+    display: grid;
+    gap: 30px;
+    grid-auto-flow: row;
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .classroom-grid-one-columns {
+      grid-template-columns: repeat(1, 1fr);
+  }
+
+  .classroom-grid-two-columns {
+      grid-template-columns: repeat(2, 1fr);
+  }
+
   .classroom-item {
     align-items: start;
     display: flex;
     flex-direction: row;
     height: 70px;
     justify-content: space-between;
-    width: 332px;
+    padding-right: 25px;
+    width: 260px;
   }
 
   .classroom-item .classroom-text-container {
@@ -159,8 +175,21 @@
     0% {
       background-position: 200% 0;
     }
+
     100% {
       background-position: -200% 0;
+    }
+  }
+
+  @media screen and (max-width : 1212px) {
+    .classroom-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media screen and (max-width : 925px) {
+    .classroom-grid {
+      grid-template-columns: repeat(1, 1fr);
     }
   }
 
@@ -171,14 +200,14 @@
     }
 
     .multiple-classroom-nav-links {
-        margin-top: 12px;
+      margin-top: 12px;
     }
 
     .multiple-classroom-nav-links .multiple-classrooms-intro,
     .multiple-classroom-nav-links .classroom-item {
-        left: 0;
-        padding-left: 12px;
-        width: 90vw;
+      left: 0;
+      padding-left: 12px;
+      width: 90vw;
     }
 
     .skeleton-loader {

@@ -25,7 +25,7 @@ import {
 } from '@angular/core';
 import {Subscription} from 'rxjs';
 
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {
@@ -36,8 +36,7 @@ import {CheckpointCelebrationUtilityService} from 'pages/exploration-player-page
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import {PlatformFeatureService} from 'services/platform-feature.service';
-import {ExplorationPlayerStateService} from 'pages/exploration-player-page/services/exploration-player-state.service';
+import {ExplorationModeService} from 'pages/exploration-player-page/services/exploration-mode.service';
 
 import './checkpoint-celebration-modal.component.css';
 
@@ -87,19 +86,18 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
   autoMessageDismissalTimeout: NodeJS.Timeout | undefined;
 
   constructor(
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private checkpointCelebrationUtilityService: CheckpointCelebrationUtilityService,
     private playerPositionService: PlayerPositionService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private urlInterpolationService: UrlInterpolationService,
     private windowDimensionsService: WindowDimensionsService,
-    private platformFeatureService: PlatformFeatureService,
-    private explorationPlayerStateService: ExplorationPlayerStateService
+    private explorationModeService: ExplorationModeService
   ) {}
 
   ngOnInit(): void {
-    this.explorationId = this.contextService.getExplorationId();
+    this.explorationId = this.pageContextService.getExplorationId();
     this.oppiaAvatarImageUrl =
       this.urlInterpolationService.getStaticCopyrightedImageUrl(
         '/avatar/oppia_avatar_100px.svg'
@@ -185,8 +183,7 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
     if (
       newStateName === this.currentStateName ||
       newStateName === this.mostRecentlyReachedCheckpointStateName ||
-      !this.platformFeatureService.status.CheckpointCelebration.isEnabled ||
-      !this.explorationPlayerStateService.isInStoryChapterMode()
+      !this.explorationModeService.isInStoryChapterMode()
     ) {
       return;
     }
@@ -328,9 +325,6 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
   }
 
   openLessonInfoModal(): void {
-    if (!this.platformFeatureService.status.CheckpointCelebration.isEnabled) {
-      return;
-    }
     this.checkpointCelebrationUtilityService.openLessonInformationModal();
   }
 

@@ -18,13 +18,13 @@
 
 import {Injectable} from '@angular/core';
 
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {
   Warning,
   BaseInteractionValidationService,
 } from 'interactions/base-interaction-validation.service';
 import {GraphInputCustomizationArgs} from 'interactions/customization-args-defs';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {GraphAnswer} from 'interactions/answer-defs';
 
 import {AppConstants} from 'app.constants';

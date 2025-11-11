@@ -18,8 +18,7 @@
 
 from __future__ import annotations
 
-from core.domain import moderator_services
-from core.domain import platform_parameter_list
+from core.domain import moderator_services, platform_parameter_list
 from core.tests import test_utils
 
 
@@ -47,7 +46,8 @@ class FlagExplorationEmailEnqueueTaskTests(test_utils.EmailTestBase):
         self.no_user = None
 
         self.exploration = self.save_new_default_exploration(
-            'A', self.editor_id, title='Title')
+            'A', self.editor_id, title='Title'
+        )
         self.owner_ids = [self.editor_id]
 
         self.report_text = 'AD'
@@ -56,7 +56,19 @@ class FlagExplorationEmailEnqueueTaskTests(test_utils.EmailTestBase):
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, email_footer),
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'moderator')
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'moderator'),
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com',
+            ),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com',
+            ),
+            (
+                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                'noreply@example.com',
+            ),
         ]
     )
     def test_that_flag_exploration_emails_are_correct(self) -> None:
@@ -74,7 +86,8 @@ class FlagExplorationEmailEnqueueTaskTests(test_utils.EmailTestBase):
             '- The Oppia Team<br>'
             '<br>'
             'You can change your email preferences via the '
-            '<a href="http://localhost:8181/preferences">Preferences</a> page.')
+            '<a href="http://localhost:8181/preferences">Preferences</a> page.'
+        )
 
         expected_email_text_body = (
             'Hello Moderator,\n'
@@ -86,10 +99,12 @@ class FlagExplorationEmailEnqueueTaskTests(test_utils.EmailTestBase):
             'Thanks!\n'
             '- The Oppia Team\n'
             '\n'
-            'You can change your email preferences via the Preferences page.')
+            'You can change your email preferences via the Preferences page.'
+        )
 
         moderator_services.enqueue_flag_exploration_email_task(
-            self.exploration.id, self.report_text, self.new_user_id)
+            self.exploration.id, self.report_text, self.new_user_id
+        )
 
         self.process_and_flush_pending_tasks()
 

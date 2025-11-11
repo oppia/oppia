@@ -69,6 +69,7 @@ describe('InteractiveNumericInput', () => {
       rulesService: CurrentInteractionService
     ) => {},
     updateCurrentAnswer: (answer: InteractionAnswer) => {},
+    updateAnswerIsValid: (isValid: boolean) => {},
     showNoResponseError: (): boolean => false,
     registerCurrentInteraction: (
       submitAnswerFn: Function,
@@ -222,11 +223,15 @@ describe('InteractiveNumericInput', () => {
       true
     );
     const onSubmitSpy = spyOn(currentInteractionService, 'onSubmit');
+    spyOn(currentInteractionService, 'updateAnswerIsValid');
 
     component.ngOnInit();
     component.requireNonnegativeInput = false;
     component.submitAnswer('');
 
+    expect(currentInteractionService.updateAnswerIsValid).toHaveBeenCalledWith(
+      false
+    );
     expect(component.errorMessageI18nKey).toBe(
       'I18N_INTERACTIONS_NUMERIC_INPUT_NO_RESPONSE'
     );

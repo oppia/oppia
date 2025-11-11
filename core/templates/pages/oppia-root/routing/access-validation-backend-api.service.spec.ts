@@ -82,7 +82,7 @@ describe('Access validation backend api service', () => {
         classroom +
         '/' +
         topic +
-        '/revision/' +
+        '/studyguide/' +
         subtopic
     );
 
@@ -95,7 +95,7 @@ describe('Access validation backend api service', () => {
         classroom +
         '/' +
         topic +
-        '/revision/' +
+        '/studyguide/' +
         subtopic
     );
     expect(req.request.method).toEqual('GET');

@@ -42,6 +42,7 @@ export class CkEditorCopyContentService {
     'oppia-noninteractive-tabs',
     'oppia-noninteractive-video',
     'oppia-noninteractive-skillreview',
+    'oppia-noninteractive-workedexample',
   ]);
 
   private copyEventEmitter = new EventEmitter<CkEditorCopyEvent>();

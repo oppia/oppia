@@ -20,6 +20,7 @@ import {EventEmitter, Injectable} from '@angular/core';
 
 import {PlayerTranscriptService} from 'pages/exploration-player-page/services/player-transcript.service';
 import {StateCard} from 'domain/state_card/state-card.model';
+import {ReplaySubject} from 'rxjs';
 
 export interface HelpCardEventResponse {
   helpCardHtml: string;
@@ -39,7 +40,7 @@ export class PlayerPositionService {
     new EventEmitter<HelpCardEventResponse>();
 
   private _newCardOpenedEventEmitter = new EventEmitter<StateCard>();
-  private _loadedMostRecentCheckpointEmitter = new EventEmitter<void>();
+  private _loadedMostRecentCheckpointEmitter = new ReplaySubject<void>(1);
 
   // The following property is initialized using the class methods.
   // and we need to do non-null assertion. For more information, see
@@ -103,6 +104,17 @@ export class PlayerPositionService {
   }
 
   /**
+   * Checks whether the currently displayed card is the last card in the transcript.
+   *
+   * @returns {boolean} `true` if the current card is the last card; otherwise, `false`.
+   */
+  isCurrentCardAtEndOfTranscript(): boolean {
+    return this.playerTranscriptService.isLastCard(
+      this.getDisplayedCardIndex()
+    );
+  }
+
+  /**
    * This function is used to get whether the learner has just
    * submitted an answer.
    * @return {boolean} Whether the learner has just submitted an answer.
@@ -123,7 +135,7 @@ export class PlayerPositionService {
     return this._newCardOpenedEventEmitter;
   }
 
-  get onLoadedMostRecentCheckpoint(): EventEmitter<void> {
+  get onLoadedMostRecentCheckpoint(): ReplaySubject<void> {
     return this._loadedMostRecentCheckpointEmitter;
   }
 

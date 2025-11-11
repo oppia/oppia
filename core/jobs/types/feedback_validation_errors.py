@@ -22,13 +22,13 @@ from core.jobs.types import base_validation_errors
 from core.platform import models
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import feedback_models
 
 (feedback_models,) = models.Registry.import_models([models.Names.FEEDBACK])
 
 
-class InvalidEntityTypeError(base_validation_errors.BaseAuditError):
+class InvalidEntityTypeError(base_validation_errors.BaseValidationError):
     """Error class for models that have invalid entity type."""
 
     def __init__(

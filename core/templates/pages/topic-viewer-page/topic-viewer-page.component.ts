@@ -21,10 +21,10 @@ import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
 
 import {AppConstants} from 'app.constants';
-import {ReadOnlyTopic} from 'domain/topic_viewer/read-only-topic-object.factory';
+import {ReadOnlyTopic} from 'domain/topic_viewer/read-only-topic.model';
 import {StorySummary} from 'domain/story/story-summary.model';
 import {Subtopic, SkillIdToDescriptionMap} from 'domain/topic/subtopic.model';
-import {DegreesOfMastery} from 'domain/topic_viewer/read-only-topic-object.factory';
+import {DegreesOfMastery} from 'domain/topic_viewer/read-only-topic.model';
 import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-backend-api.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {AlertsService} from 'services/alerts.service';
@@ -74,7 +74,7 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    if (this.urlService.getPathname().endsWith('revision')) {
+    if (this.urlService.getPathname().endsWith('studyguide')) {
       this.activeTab = 'subtopics';
     } else if (this.urlService.getPathname().endsWith('practice')) {
       this.activeTab = 'practice';
@@ -176,7 +176,7 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
     } else if (newActiveTabName === 'practice') {
       this.setUrlAccordingToActiveTab('practice');
     } else {
-      this.setUrlAccordingToActiveTab('revision');
+      this.setUrlAccordingToActiveTab('studyguide');
     }
     this.activeTab = newActiveTabName;
   }
@@ -193,7 +193,7 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
       this.windowRef.nativeWindow.history.pushState(
         {},
         '',
-        getCurrentLocation.replace('revision', newTabName)
+        getCurrentLocation.replace('studyguide', newTabName)
       );
     } else {
       this.windowRef.nativeWindow.history.pushState(
@@ -202,5 +202,9 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
         getCurrentLocation.replace(this.activeTab, newTabName)
       );
     }
+  }
+
+  isPracticeTabEnabled(): boolean {
+    return this.practiceTabIsDisplayed;
   }
 }

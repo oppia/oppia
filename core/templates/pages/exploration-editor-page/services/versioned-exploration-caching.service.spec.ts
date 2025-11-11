@@ -40,9 +40,6 @@ describe('Versioned exploration caching service', () => {
         Introduction: {
           param_changes: [],
           classifier_model_id: null,
-          recorded_voiceovers: {
-            voiceovers_mapping: {},
-          },
           solicit_answer_details: true,
           card_is_checkpoint: true,
           linked_skill_id: null,

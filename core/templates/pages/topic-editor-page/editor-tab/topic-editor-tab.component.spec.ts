@@ -42,7 +42,7 @@ import {EntityCreationService} from 'pages/topic-editor-page/services/entity-cre
 import {TopicEditorRoutingService} from '../services/topic-editor-routing.service';
 import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
 import {TopicEditorTabComponent} from './topic-editor-tab.component';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {RearrangeSkillsInSubtopicsModalComponent} from '../modal-templates/rearrange-skills-in-subtopics-modal.component';
 import {ChangeSubtopicAssignmentModalComponent} from '../modal-templates/change-subtopic-assignment-modal.component';
 import {SavePendingChangesModalComponent} from 'components/save-pending-changes/save-pending-changes-modal.component';
@@ -61,7 +61,7 @@ class MockNgbModal {
   }
 }
 
-class MockContextService {
+class MockPageContextService {
   getExplorationId() {
     return 'explorationId';
   }
@@ -143,8 +143,8 @@ describe('Topic editor tab directive', () => {
           useClass: MockNgbModal,
         },
         {
-          provide: ContextService,
-          useClass: MockContextService,
+          provide: PageContextService,
+          useClass: MockPageContextService,
         },
         {
           provide: ImageUploadHelperService,

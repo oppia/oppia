@@ -23,7 +23,7 @@ import {
 } from 'domain/suggestion/suggestion.model';
 import {ThreadMessage} from 'domain/feedback_message/ThreadMessage.model';
 import {ThreadMessageSummary} from 'domain/feedback_message/ThreadMessageSummary.model';
-import {FeedbackThreadBackendDict} from 'domain/feedback_thread/FeedbackThreadObjectFactory';
+import {FeedbackThreadBackendDict} from 'domain/feedback_thread/feedback-thread.model';
 
 export class SuggestionThread {
   status: string;

@@ -215,7 +215,6 @@ describe('Exploration Summary Tile Component', () => {
     component.collectionId = '1';
     component.explorationId = '1';
     component.explorationTitle = 'Title';
-    component.storyNodeId = '1';
     component.numViews = '100';
     component.objective = 'objective';
     component.category = 'category';
@@ -541,62 +540,6 @@ describe('Exploration Summary Tile Component', () => {
 
       expect(result).toBe('/explore/1?collection_id=1&parent=1&parent=2');
       expect(urlParamsSpy).toHaveBeenCalled();
-      expect(addFieldSpy).toHaveBeenCalled();
-    })
-  );
-
-  it(
-    'should return the url for the exploration' +
-      ' given explorationId and storyId',
-    fakeAsync(() => {
-      const urlParamsSpy = spyOn(urlService, 'getUrlParams').and.returnValue(
-        {}
-      );
-      const urlPathSpy = spyOn(urlService, 'getPathname').and.returnValue(
-        '/story/fhfhvhgvhvvh'
-      );
-      const storyIdSpy = spyOn(
-        urlService,
-        'getStoryIdFromViewerUrl'
-      ).and.returnValue('1');
-      const addFieldSpy = spyOn(urlService, 'addField').and.callThrough();
-
-      const result = component.getExplorationLink();
-
-      tick();
-      fixture.detectChanges();
-
-      expect(result).toBe(
-        '/explore/1?collection_id=1&parent=1&parent=2&story_id=1&node_id=1'
-      );
-      expect(urlParamsSpy).toHaveBeenCalled();
-      expect(urlPathSpy).toHaveBeenCalled();
-      expect(storyIdSpy).toHaveBeenCalled();
-      expect(addFieldSpy).toHaveBeenCalled();
-    })
-  );
-
-  it(
-    'should return the url for the exploration' + ' given nodeId and storyId',
-    fakeAsync(() => {
-      const urlParamsSpy = spyOn(urlService, 'getUrlParams').and.returnValue({
-        story_id: '1',
-        node_id: '1',
-      });
-      const urlPathSpy = spyOn(urlService, 'getPathname').and.returnValue(
-        '/story/fhfhvhgvhvvh'
-      );
-      const addFieldSpy = spyOn(urlService, 'addField').and.callThrough();
-
-      component.storyNodeId = '';
-      const result = component.getExplorationLink();
-
-      tick();
-      fixture.detectChanges();
-
-      expect(result).toBe('/explore/1?collection_id=1&parent=1&parent=2');
-      expect(urlParamsSpy).toHaveBeenCalled();
-      expect(urlPathSpy).toHaveBeenCalled();
       expect(addFieldSpy).toHaveBeenCalled();
     })
   );

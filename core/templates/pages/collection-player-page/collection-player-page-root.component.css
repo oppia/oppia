@@ -36,7 +36,7 @@ html, body {
 }
 /* To avoid double shadows caused by overlaying preview card
 over the blank preview card */
-.exploration-summary-tile md-card {
+.exploration-summary-tile mat-card {
   box-shadow: none;
 }
 .mobile-path-segment {

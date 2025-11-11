@@ -85,35 +85,10 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
           distinctUntilChanged()
         )
         .subscribe(newValue => {
-          const INVALID_CHARS_REGEX = /[^\d\s\/-]/g;
-          const INVALID_CHARS_LENGTH_REGEX = /\d{8,}/;
-          // Accepts incomplete fraction inputs
-          // (see examples above except last).
-          const PARTIAL_FRACTION_REGEX =
-            /^\s*(-?\s*((\d*\s*\d+\s*\/?\s*)|\d+)\s*)?$/;
-          // Accepts complete fraction inputs.
-          const FRACTION_REGEX = /^\s*-?\s*((\d*\s*\d+\s*\/\s*\d+)|\d+)\s*$/;
-          if (INVALID_CHARS_LENGTH_REGEX.test(newValue)) {
-            this.errorMessageI18nKey =
-              ObjectsDomainConstants.FRACTION_PARSING_ERROR_I18N_KEYS.INVALID_CHARS_LENGTH;
-            this.isValid = false;
-          } else if (INVALID_CHARS_REGEX.test(newValue)) {
-            this.errorMessageI18nKey =
-              ObjectsDomainConstants.FRACTION_PARSING_ERROR_I18N_KEYS.INVALID_CHARS;
-            this.isValid = false;
-          } else if (
-            !(
-              FRACTION_REGEX.test(newValue) ||
-              PARTIAL_FRACTION_REGEX.test(newValue)
-            )
-          ) {
-            this.errorMessageI18nKey =
-              ObjectsDomainConstants.FRACTION_PARSING_ERROR_I18N_KEYS.INVALID_FORMAT;
-            this.isValid = false;
-          } else {
-            this.errorMessageI18nKey = '';
-            this.isValid = true;
-          }
+          this.answer = newValue;
+          this.currentInteractionService.updateCurrentAnswer(this.answer);
+          this.isValid = true;
+          this.errorMessageI18nKey = '';
           this.currentInteractionService.updateViewWithNewAnswer();
         })
     );
@@ -164,43 +139,78 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
 
   submitAnswer(): void {
     const answer: string = this.answer;
-    try {
-      const fraction = Fraction.fromRawInputString(answer);
-      // To check if the input fraction is in simplest form, the string
-      // representation of the input fraction and the simplified fraction is
-      // compared. Just comparing 'fraction' and
-      // 'fraction.convertToSimplestForm()' will not work, since both are
-      // objects that cannot be compared directly.
-      if (
-        this.requireSimplestForm &&
-        !(fraction.toString() === fraction.convertToSimplestForm().toString())
-      ) {
-        this.errorMessageI18nKey = 'I18N_INTERACTIONS_FRACTIONS_SIMPLEST_FORM';
-        this.isValid = false;
-      } else if (!this.allowImproperFraction && fraction.isImproperFraction()) {
-        this.errorMessageI18nKey =
-          'I18N_INTERACTIONS_FRACTIONS_PROPER_FRACTION';
-        this.isValid = false;
-      } else if (
-        !this.allowNonzeroIntegerPart &&
-        fraction.hasNonzeroIntegerPart()
-      ) {
-        this.errorMessageI18nKey = 'I18N_INTERACTIONS_FRACTIONS_NON_MIXED';
-        this.isValid = false;
-      } else {
-        this.currentInteractionService.onSubmit(
-          fraction,
-          this.fractionInputRulesService
-        );
-      }
-    } catch (parsingError) {
-      if (parsingError instanceof Error) {
-        this.errorMessageI18nKey = parsingError.message;
-      } else {
-        throw parsingError;
-      }
+    this.isValid = true;
+    this.errorMessageI18nKey = '';
+
+    const INVALID_CHARS_REGEX = /[^\d\s\/-]/g;
+    const INVALID_CHARS_LENGTH_REGEX = /\d{8,}/;
+    // Accepts incomplete fraction inputs
+    // (see examples above except last).
+    const PARTIAL_FRACTION_REGEX = /^\s*(-?\s*((\d*\s*\d+\s*\/?\s*)|\d+)\s*)?$/;
+    // Accepts complete fraction inputs.
+    const FRACTION_REGEX = /^\s*-?\s*((\d*\s*\d+\s*\/\s*\d+)|\d+)\s*$/;
+    if (INVALID_CHARS_LENGTH_REGEX.test(answer)) {
+      this.errorMessageI18nKey =
+        ObjectsDomainConstants.FRACTION_PARSING_ERROR_I18N_KEYS.INVALID_CHARS_LENGTH;
       this.isValid = false;
+    } else if (INVALID_CHARS_REGEX.test(answer)) {
+      this.errorMessageI18nKey =
+        ObjectsDomainConstants.FRACTION_PARSING_ERROR_I18N_KEYS.INVALID_CHARS;
+      this.isValid = false;
+    } else if (
+      !(FRACTION_REGEX.test(answer) || PARTIAL_FRACTION_REGEX.test(answer))
+    ) {
+      this.errorMessageI18nKey =
+        ObjectsDomainConstants.FRACTION_PARSING_ERROR_I18N_KEYS.INVALID_FORMAT;
+      this.isValid = false;
+    } else {
+      this.errorMessageI18nKey = '';
+      this.isValid = true;
     }
+    if (this.isValid) {
+      try {
+        const fraction = Fraction.fromRawInputString(answer);
+        // To check if the input fraction is in simplest form, the string
+        // representation of the input fraction and the simplified fraction is
+        // compared. Just comparing 'fraction' and
+        // 'fraction.convertToSimplestForm()' will not work, since both are
+        // objects that cannot be compared directly.
+        if (
+          this.requireSimplestForm &&
+          !(fraction.toString() === fraction.convertToSimplestForm().toString())
+        ) {
+          this.errorMessageI18nKey =
+            'I18N_INTERACTIONS_FRACTIONS_SIMPLEST_FORM';
+          this.isValid = false;
+        } else if (
+          !this.allowImproperFraction &&
+          fraction.isImproperFraction()
+        ) {
+          this.errorMessageI18nKey =
+            'I18N_INTERACTIONS_FRACTIONS_PROPER_FRACTION';
+          this.isValid = false;
+        } else if (
+          !this.allowNonzeroIntegerPart &&
+          fraction.hasNonzeroIntegerPart()
+        ) {
+          this.errorMessageI18nKey = 'I18N_INTERACTIONS_FRACTIONS_NON_MIXED';
+          this.isValid = false;
+        } else {
+          this.currentInteractionService.onSubmit(
+            fraction,
+            this.fractionInputRulesService
+          );
+        }
+      } catch (parsingError) {
+        if (parsingError instanceof Error) {
+          this.errorMessageI18nKey = parsingError.message;
+        } else {
+          throw parsingError;
+        }
+        this.isValid = false;
+      }
+    }
+    this.currentInteractionService.updateAnswerIsValid(this.isAnswerValid());
   }
 
   isAnswerValid(): boolean {
@@ -209,7 +219,6 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
 
   answerValueChanged(): void {
     this.answerChanged.next(this.answer);
-    this.currentInteractionService.updateCurrentAnswer(this.answer);
   }
 
   getPlaceholderText(): string {

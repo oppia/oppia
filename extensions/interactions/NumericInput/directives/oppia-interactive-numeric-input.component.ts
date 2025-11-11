@@ -59,7 +59,7 @@ export class InteractiveNumericInput implements OnInit {
     private interactionAttributesExtractorService: InteractionAttributesExtractorService
   ) {}
 
-  private isAnswerValid(): boolean {
+  isAnswerValid(): boolean {
     if (typeof this.answer === 'string') {
       return false;
     }
@@ -81,6 +81,7 @@ export class InteractiveNumericInput implements OnInit {
       this.currentInteractionService.showNoResponseError()
     ) {
       this.errorMessageI18nKey = 'I18N_INTERACTIONS_NUMERIC_INPUT_NO_RESPONSE';
+      this.currentInteractionService.updateAnswerIsValid(false);
       return;
     }
 
@@ -90,6 +91,7 @@ export class InteractiveNumericInput implements OnInit {
         this.numericInputRulesService
       );
     }
+    this.currentInteractionService.updateAnswerIsValid(this.isAnswerValid());
   }
 
   private getAttributesObject() {
@@ -104,6 +106,7 @@ export class InteractiveNumericInput implements OnInit {
     }
     this.answer = answer;
     this.errorMessageI18nKey = '';
+    this.currentInteractionService.updateAnswerIsValid(this.isAnswerValid());
     this.currentInteractionService.updateCurrentAnswer(this.answer);
     this.changeDetectorRef.detectChanges();
   }

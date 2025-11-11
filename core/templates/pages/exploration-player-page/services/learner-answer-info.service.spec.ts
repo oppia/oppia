@@ -17,26 +17,20 @@
  */
 
 import {TestBed} from '@angular/core/testing';
-import {AnswerClassificationResult} from 'domain/classifier/answer-classification-result.model';
-import {OutcomeObjectFactory} from 'domain/exploration/OutcomeObjectFactory';
-import {
-  State,
-  StateBackendDict,
-  StateObjectFactory,
-} from 'domain/state/StateObjectFactory';
-import {LearnerAnswerDetailsBackendApiService} from 'domain/statistics/learner-answer-details-backend-api.service';
+import {AnswerClassificationResult} from '../../../domain/classifier/answer-classification-result.model';
+import {Outcome} from '../../../domain/exploration/outcome.model';
+import {State, StateBackendDict} from '../../../domain/state/state.model';
+import {LearnerAnswerDetailsBackendApiService} from '../../../domain/statistics/learner-answer-details-backend-api.service';
 import {
   AnswerClassificationService,
   InteractionRulesService,
-} from 'pages/exploration-player-page/services/answer-classification.service';
-import {LearnerAnswerInfoService} from 'pages/exploration-player-page/services/learner-answer-info.service';
-import {ExplorationPlayerConstants} from 'pages/exploration-player-page/exploration-player-page.constants';
-import {TextInputRulesService} from 'interactions/TextInput/directives/text-input-rules.service';
+} from './answer-classification.service';
+import {LearnerAnswerInfoService} from './learner-answer-info.service';
+import {ExplorationPlayerConstants} from '../current-lesson-player/exploration-player-page.constants';
+import {TextInputRulesService} from '../../../../../extensions/interactions/TextInput/directives/text-input-rules.service';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 
 describe('Learner answer info service', () => {
-  let sof: StateObjectFactory;
-  let oof: OutcomeObjectFactory;
   let stateDict: StateBackendDict;
   let firstState: State;
   let secondState: State;
@@ -57,14 +51,6 @@ describe('Learner answer info service', () => {
       content: {
         content_id: 'content',
         html: 'content',
-      },
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-          default_outcome: {},
-          feedback_1: {},
-          feedback_2: {},
-        },
       },
       interaction: {
         id: 'TextInput',
@@ -177,16 +163,14 @@ describe('Learner answer info service', () => {
       classifier_model_id: '',
     };
 
-    sof = TestBed.get(StateObjectFactory);
-    oof = TestBed.get(OutcomeObjectFactory);
     learnerAnswerInfoService = TestBed.get(LearnerAnswerInfoService);
     answerClassificationService = TestBed.get(AnswerClassificationService);
     ladbas = TestBed.get(LearnerAnswerDetailsBackendApiService);
     DEFAULT_OUTCOME_CLASSIFICATION =
       ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION;
-    firstState = sof.createFromBackendDict('new state', stateDict);
-    secondState = sof.createFromBackendDict('fake state', stateDict);
-    thirdState = sof.createFromBackendDict('demo state', stateDict);
+    firstState = State.createFromBackendDict('new state', stateDict);
+    secondState = State.createFromBackendDict('fake state', stateDict);
+    thirdState = State.createFromBackendDict('demo state', stateDict);
     tirs = TestBed.get(TextInputRulesService);
 
     spyOn(
@@ -194,7 +178,7 @@ describe('Learner answer info service', () => {
       'getMatchingClassificationResult'
     ).and.returnValue(
       new AnswerClassificationResult(
-        oof.createNew('default', 'default_outcome', '', []),
+        Outcome.createNew('default', 'default_outcome', '', []),
         2,
         0,
         DEFAULT_OUTCOME_CLASSIFICATION

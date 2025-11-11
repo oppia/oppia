@@ -20,7 +20,7 @@ import {Component, Input, OnInit} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 
 @Component({
   selector: 'oppia-add-audio-translation-modal',
@@ -50,7 +50,7 @@ export class AddAudioTranslationModalComponent
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private ngbActiveModal: NgbActiveModal
   ) {
     super(ngbActiveModal);
@@ -79,7 +79,7 @@ export class AddAudioTranslationModalComponent
     if (this.isAudioTranslationValid()) {
       this.saveButtonText = this.BUTTON_TEXT_SAVING;
       this.saveInProgress = true;
-      let explorationId = this.contextService.getExplorationId();
+      let explorationId = this.pageContextService.getExplorationId();
       let file = this.uploadedFile;
       if (file) {
         Promise.resolve(

@@ -30,7 +30,7 @@ import {fabric} from 'fabric';
 import {ImagePreloaderService} from 'pages/exploration-player-page/services/image-preloader.service';
 import {AlertsService} from 'services/alerts.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {DeviceInfoService} from 'services/contextual/device-info.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
@@ -208,7 +208,7 @@ export class SvgEditorComponent implements OnInit {
     private alertsService: AlertsService,
     private assetsBackendApiService: AssetsBackendApiService,
     private changeDetectorRef: ChangeDetectorRef,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private deviceInfoService: DeviceInfoService,
     private imageLocalStorageService: ImageLocalStorageService,
     private imagePreloaderService: ImagePreloaderService,
@@ -218,9 +218,10 @@ export class SvgEditorComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.imageSaveDestination = this.contextService.getImageSaveDestination();
-    this.entityId = this.contextService.getEntityId();
-    this.entityType = this.contextService.getEntityType();
+    this.imageSaveDestination =
+      this.pageContextService.getImageSaveDestination();
+    this.entityId = this.pageContextService.getEntityId();
+    this.entityType = this.pageContextService.getEntityType();
     const domReady = new Promise((resolve, reject) => {
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', resolve);

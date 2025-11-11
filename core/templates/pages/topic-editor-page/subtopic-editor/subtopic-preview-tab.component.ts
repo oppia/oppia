@@ -25,6 +25,10 @@ import {Subscription} from 'rxjs';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {TopicEditorRoutingService} from '../services/topic-editor-routing.service';
 import {TopicEditorStateService} from '../services/topic-editor-state.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {StudyGuide} from 'domain/topic/study-guide.model';
+import {StudyGuideSection} from 'domain/topic/study-guide-sections.model';
+import {PageContextService} from 'services/page-context.service';
 
 @Component({
   selector: 'oppia-subtopic-preview-tab',
@@ -45,7 +49,9 @@ export class SubtopicPreviewTab {
   // 'null' if there is no thumbnail background color.
   editableThumbnailBgColor!: string | null;
   subtopicPage!: SubtopicPage;
+  studyGuide!: StudyGuide;
   pageContents!: SubtopicPageContents;
+  sections!: StudyGuideSection[];
   htmlData!: string;
   thumbnailIsShown!: boolean;
   THUMBNAIL: string = 'thumbnail';
@@ -54,7 +60,9 @@ export class SubtopicPreviewTab {
   constructor(
     private topicEditorRoutingService: TopicEditorRoutingService,
     private topicEditorStateService: TopicEditorStateService,
-    private windowDimensionsService: WindowDimensionsService
+    private windowDimensionsService: WindowDimensionsService,
+    private platformFeatureService: PlatformFeatureService,
+    private pageContextService: PageContextService
   ) {}
 
   private _initEditor(): void {
@@ -63,18 +71,25 @@ export class SubtopicPreviewTab {
     this.subtopic = this.topic.getSubtopicById(this.subtopicId);
 
     if (this.topic.getId() && this.subtopic) {
-      this.topicEditorStateService.loadSubtopicPage(
-        this.topic.getId(),
-        this.subtopicId
-      );
+      if (this.isShowRestructuredStudyGuidesFeatureEnabled()) {
+        this.topicEditorStateService.loadStudyGuide(
+          this.topic.getId(),
+          this.subtopicId
+        );
+        this.studyGuide = this.topicEditorStateService.getStudyGuide();
+        this.sections = this.studyGuide.getSections();
+      } else {
+        this.topicEditorStateService.loadSubtopicPage(
+          this.topic.getId(),
+          this.subtopicId
+        );
+        this.subtopicPage = this.topicEditorStateService.getSubtopicPage();
+        this.pageContents = this.subtopicPage.getPageContents();
+        this.htmlData = this.pageContents.getHtml();
+      }
       this.editableTitle = this.subtopic.getTitle();
       this.editableThumbnailFilename = this.subtopic.getThumbnailFilename();
       this.editableThumbnailBgColor = this.subtopic.getThumbnailBgColor();
-      this.subtopicPage = this.topicEditorStateService.getSubtopicPage();
-      this.pageContents = this.subtopicPage.getPageContents();
-      if (this.pageContents) {
-        this.htmlData = this.pageContents.getHtml();
-      }
     }
   }
 
@@ -84,14 +99,29 @@ export class SubtopicPreviewTab {
     );
   }
 
+  isShowRestructuredStudyGuidesFeatureEnabled(): boolean {
+    return this.platformFeatureService.status.ShowRestructuredStudyGuides
+      .isEnabled;
+  }
+
   ngOnInit(): void {
-    this.directiveSubscriptions.add(
-      this.topicEditorStateService.onSubtopicPageLoaded.subscribe(() => {
-        this.subtopicPage = this.topicEditorStateService.getSubtopicPage();
-        this.pageContents = this.subtopicPage.getPageContents();
-        this.htmlData = this.pageContents.getHtml();
-      })
-    );
+    this.pageContextService.setSubtopicPreviewIsOpen();
+    if (this.isShowRestructuredStudyGuidesFeatureEnabled()) {
+      this.directiveSubscriptions.add(
+        this.topicEditorStateService.onStudyGuideLoaded.subscribe(() => {
+          this.studyGuide = this.topicEditorStateService.getStudyGuide();
+          this.sections = this.studyGuide.getSections();
+        })
+      );
+    } else {
+      this.directiveSubscriptions.add(
+        this.topicEditorStateService.onSubtopicPageLoaded.subscribe(() => {
+          this.subtopicPage = this.topicEditorStateService.getSubtopicPage();
+          this.pageContents = this.subtopicPage.getPageContents();
+          this.htmlData = this.pageContents.getHtml();
+        })
+      );
+    }
 
     this.directiveSubscriptions.add(
       this.topicEditorStateService.onTopicInitialized.subscribe(() =>
@@ -110,6 +140,7 @@ export class SubtopicPreviewTab {
   }
 
   ngOnDestroy(): void {
+    this.pageContextService.setSubtopicPreviewIsClosed();
     this.directiveSubscriptions.unsubscribe();
   }
 }

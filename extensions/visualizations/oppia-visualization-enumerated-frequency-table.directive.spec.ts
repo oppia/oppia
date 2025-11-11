@@ -31,6 +31,17 @@ import {AnswerStats} from 'domain/exploration/answer-stats.model';
 // @ts-ignore
 import {RichTextComponentsModule} from 'rich_text_components/rich-text-components.module';
 import {OppiaVisualizationEnumeratedFrequencyTableComponent} from './oppia-visualization-enumerated-frequency-table.directive';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+
+class MockPlatformFeatureService {
+  get status(): object {
+    return {
+      AutomaticVoiceoverRegenerationFromExp: {
+        isEnabled: false,
+      },
+    };
+  }
+}
 
 describe('oppiaVisualizationEnumeratedFrequencyTable', () => {
   let component: OppiaVisualizationEnumeratedFrequencyTableComponent;
@@ -40,7 +51,12 @@ describe('oppiaVisualizationEnumeratedFrequencyTable', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule, RichTextComponentsModule],
       declarations: [OppiaVisualizationEnumeratedFrequencyTableComponent],
-      providers: [],
+      providers: [
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService,
+        },
+      ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));

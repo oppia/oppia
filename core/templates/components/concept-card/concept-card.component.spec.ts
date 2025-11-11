@@ -29,7 +29,6 @@ import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {ConceptCardBackendApiService} from 'domain/skill/concept-card-backend-api.service';
 import {ConceptCard} from 'domain/skill/concept-card.model';
-import {WorkedExample} from 'domain/skill/worked-example.model';
 import {ConceptCardComponent} from './concept-card.component';
 
 describe('Concept card component', () => {
@@ -38,7 +37,6 @@ describe('Concept card component', () => {
   let conceptCardBackendApiService: ConceptCardBackendApiService;
   let conceptCard = new ConceptCard(
     new SubtitledHtml('', '1'),
-    [new WorkedExample({} as SubtitledHtml, {} as SubtitledHtml)],
     RecordedVoiceovers.createEmpty()
   );
   let conceptCardObjects = [conceptCard];
@@ -85,23 +83,4 @@ describe('Concept card component', () => {
       'Oops, it looks like this skill has been deleted.'
     );
   }));
-
-  it('should tell if work example is last', () => {
-    componentInstance.numberOfWorkedExamplesShown = 1;
-    componentInstance.currentConceptCard = conceptCard;
-
-    expect(componentInstance.isLastWorkedExample()).toBeTrue();
-  });
-
-  it('should show more worked examples', () => {
-    let numberOfWorkedExamplesShown = 1;
-
-    componentInstance.numberOfWorkedExamplesShown = numberOfWorkedExamplesShown;
-    componentInstance.showMoreWorkedExamples();
-
-    expect(componentInstance.explanationIsShown).toBeFalse();
-    expect(componentInstance.numberOfWorkedExamplesShown).toEqual(
-      numberOfWorkedExamplesShown + 1
-    );
-  });
 });

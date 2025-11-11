@@ -230,7 +230,7 @@ describe('Topic viewer page', () => {
     expect(topicViewerPageComponent.activeTab).toBe('story');
   }));
 
-  it('should set revision tab correctly', fakeAsync(() => {
+  it('should set study tab correctly', fakeAsync(() => {
     spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
       topicUrlFragment
     );
@@ -238,7 +238,7 @@ describe('Topic viewer page', () => {
       'math'
     );
     spyOn(urlService, 'getPathname').and.returnValue(
-      `/learn/math/${topicUrlFragment}/revision`
+      `/learn/math/${topicUrlFragment}/studyguide`
     );
     topicViewerPageComponent.ngOnInit();
     var req = httpTestingController.expectOne(
@@ -319,7 +319,7 @@ describe('Topic viewer page', () => {
       spyOn(windowRef.nativeWindow.history, 'pushState');
       topicViewerPageComponent.activeTab = 'subtopics';
       spyOn(windowRef.nativeWindow.location, 'toString').and.returnValue(
-        'http://localhost/test_path/revision'
+        'http://localhost/test_path/studyguide'
       );
 
       topicViewerPageComponent.setActiveTab('story');
@@ -340,7 +340,7 @@ describe('Topic viewer page', () => {
       spyOn(windowRef.nativeWindow.history, 'pushState');
       topicViewerPageComponent.activeTab = 'subtopics';
       spyOn(windowRef.nativeWindow.location, 'toString').and.returnValue(
-        'http://localhost/test_path/revision'
+        'http://localhost/test_path/studyguide'
       );
 
       topicViewerPageComponent.setActiveTab('practice');
@@ -369,9 +369,19 @@ describe('Topic viewer page', () => {
       expect(windowRef.nativeWindow.history.pushState).toHaveBeenCalledWith(
         {},
         '',
-        'http://localhost/test_path/revision'
+        'http://localhost/test_path/studyguide'
       );
       expect(topicViewerPageComponent.activeTab).toBe('subtopics');
     }
   );
+
+  it('should return true when practice tab is enabled', () => {
+    topicViewerPageComponent.practiceTabIsDisplayed = true;
+    expect(topicViewerPageComponent.isPracticeTabEnabled()).toBeTrue();
+  });
+
+  it('should return false when practice tab is disabled', () => {
+    topicViewerPageComponent.practiceTabIsDisplayed = false;
+    expect(topicViewerPageComponent.isPracticeTabEnabled()).toBeFalse();
+  });
 });

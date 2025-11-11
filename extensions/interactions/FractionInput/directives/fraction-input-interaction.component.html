@@ -1,15 +1,15 @@
 <form autocomplete="off" [attr.disabled]="!isValid ? true : null" role="form" class="form-horizontal fraction-input-interaction">
-  <!-- This ng-form is needed for submitting answer on hitting enter. -->
+  <!-- This form is needed for submitting the answer on hitting enter. -->
   <input type="text"
          name="answer"
          [(ngModel)]="answer"
          (ngModelChange)="answerValueChanged()"
-         class="form-control"
+         class="form-control e2e-test-fraction-input e2e-test-float-form-input"
          (keyup.enter)="submitAnswer()"
          [oppiaFocusOn]="labelForFocusTarget"
          placeholder="{{customPlaceholder !== '' ? customPlaceholder : getPlaceholderText() | translate}}">
 
-  <div *ngIf="errorMessageI18nKey" class="oppia-form-error-container">
+  <div *ngIf="errorMessageI18nKey" class="oppia-form-error-container e2e-test-form-error-container">
     {{errorMessageI18nKey | translate}}
   </div>
 </form>

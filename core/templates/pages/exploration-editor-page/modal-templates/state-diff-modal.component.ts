@@ -20,7 +20,7 @@ import {Input, OnInit} from '@angular/core';
 import {Component} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import {State} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 import {HistoryTabYamlConversionService} from '../services/history-tab-yaml-conversion.service';
 import {EntityTranslationsService} from 'services/entity-translations.services';
 

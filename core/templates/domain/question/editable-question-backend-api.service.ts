@@ -20,14 +20,10 @@
 import {Injectable} from '@angular/core';
 
 import {HttpClient} from '@angular/common/http';
-import {
-  QuestionObjectFactory,
-  QuestionBackendDict,
-  Question,
-} from 'domain/question/QuestionObjectFactory';
+import {QuestionBackendDict, Question} from 'domain/question/question.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {QuestionDomainConstants} from 'domain/question/question-domain.constants';
-import {SkillBackendDict} from 'domain/skill/SkillObjectFactory';
+import {SkillBackendDict} from 'domain/skill/skill.model.ts';
 import {BackendChangeObject} from 'domain/editor/undo_redo/change.model';
 import cloneDeep from 'lodash/cloneDeep';
 
@@ -69,7 +65,6 @@ export interface ImageData {
 export class EditableQuestionBackendApiService {
   constructor(
     private http: HttpClient,
-    private questionObjectFactory: QuestionObjectFactory,
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
@@ -132,10 +127,9 @@ export class EditableQuestionBackendApiService {
         .toPromise()
         .then(
           response => {
-            let questionObject =
-              this.questionObjectFactory.createFromBackendDict(
-                response.question_dict
-              );
+            let questionObject = Question.createFromBackendDict(
+              response.question_dict
+            );
             let skillDicts = cloneDeep(response.associated_skill_dicts);
             successCallback({
               questionObject: questionObject,

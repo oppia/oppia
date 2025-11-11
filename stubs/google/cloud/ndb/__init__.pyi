@@ -1,22 +1,40 @@
 from .context import Context as Context
 from .query import (
-    AND as AND, OR as OR, Query as Query, Node as Node,
-    ConjunctionNode as ConjunctionNode, DisjunctionNode as DisjunctionNode,
-    FilterNode as FilterNode)
+    AND as AND,
+    OR as OR,
+    Query as Query,
+    Node as Node,
+    ConjunctionNode as ConjunctionNode,
+    DisjunctionNode as DisjunctionNode,
+    FilterNode as FilterNode,
+    PropertyOrder as PropertyOrder,
+)
 from google.cloud import datastore
 from redis import StrictRedis
 
 from typing import (
-    Any, Callable, Dict, Generic, Iterable, Iterator, List, Literal, Optional,
-    Sequence, Type, TypeVar, Tuple, Union, overload)
+    Any,
+    Callable,
+    Dict,
+    Generic,
+    Iterable,
+    Iterator,
+    List,
+    Literal,
+    Optional,
+    Sequence,
+    Type,
+    TypeVar,
+    Tuple,
+    Union,
+    overload,
+)
 
 TYPE_MODEL = TypeVar('TYPE_MODEL', bound='Model')
 
 class Client:
     def context(
-        self,
-        namespace: Optional[str],
-        global_cache: Optional[RedisCache]
+        self, namespace: Optional[str], global_cache: Optional[RedisCache]
     ) -> Context: ...
 
 # Model Stubs
@@ -36,43 +54,44 @@ class Model(type):
     @classmethod
     def get_by_id(
         cls: Type[TYPE_MODEL], id: str, **ctx_options: Any
-    ) -> TYPE_MODEL:...
+    ) -> TYPE_MODEL: ...
     def _pre_put_hook(self) -> None: ...
     @classmethod
-    def _lookup_model(cls, kind: Optional[str]) -> TYPE_MODEL: ...
+    def _lookup_model(cls: Type[TYPE_MODEL], kind: Optional[str]) -> TYPE_MODEL: ...
     @classmethod
     def _get_kind(cls) -> str: ...
 
-
 def get_context(**kwds: Any) -> Context: ...
 def get_multi(
-    keys: List[Key], **ctx_options: Any) -> List[Optional[TYPE_MODEL]]: ...
-def put_multi(
-    entities: (List[TYPE_MODEL]), **ctx_options: Any) -> List[str]: ...
+    keys: List[Key], **ctx_options: Any
+) -> List[Optional[TYPE_MODEL]]: ...
+def put_multi(entities: List[TYPE_MODEL], **ctx_options: Any) -> List[str]: ...
 def delete_multi(keys: Sequence[Key], **ctx_options: Any) -> List[None]: ...
-
 
 # Property Stubs
 class Property(object):
     _name: str
     _repeated: bool
     def __init__(
-        self, name: Optional[str] = ..., indexed: Optional[bool] = ...,
-        repeated: Optional[bool] = ..., required: Optional[bool] = ...,
+        self,
+        name: Optional[str] = ...,
+        indexed: Optional[bool] = ...,
+        repeated: Optional[bool] = ...,
+        required: Optional[bool] = ...,
         default: Optional[Any] = ...,
         choices: Union[List[Any], Tuple[Any, ...], None] = ...,
         validator: Optional[Callable[..., Any]] = ...,
-        verbose_name: Optional[str] = ...
+        verbose_name: Optional[str] = ...,
     ) -> None: ...
-    def __eq__(self, value: Any) -> bool: ...
-    def __ne__(self, value: Any) -> bool: ...
-    def __lt__(self, value: Any) -> bool: ...
-    def __le__(self, value: Any) -> bool: ...
-    def __gt__(self, value: Any) -> bool: ...
-    def __ge__(self, value: Any) -> bool: ...
+    def __eq__(self, value: object) -> FilterNode: ...  # type: ignore[override]
+    def __ne__(self, value: object) -> FilterNode: ...  # type: ignore[override]
+    def __lt__(self, value: object) -> FilterNode: ...
+    def __le__(self, value: object) -> FilterNode: ...
+    def __gt__(self, value: object) -> FilterNode: ...
+    def __ge__(self, value: object) -> FilterNode: ...
     IN: Any = ...
-    def __neg__(self) -> Any: ...
-    def __pos__(self) -> Any: ...
+    def __neg__(self) -> PropertyOrder: ...
+    def __pos__(self) -> PropertyOrder: ...
     def __get__(self, entity: Any, unused_cls: Optional[Any] = ...) -> Any: ...
     def __set__(self, entity: Any, value: Any) -> None: ...
     def __delete__(self, entity: Any) -> None: ...
@@ -81,38 +100,41 @@ class BooleanProperty(Property): ...
 
 class DateTimeProperty(Property):
     def __init__(
-        self, name: Optional[str] = ..., auto_now: bool = ...,
-        auto_now_add: bool = ..., **kwds: Any
+        self,
+        name: Optional[str] = ...,
+        auto_now: bool = ...,
+        auto_now_add: bool = ...,
+        **kwds: Any
     ) -> None: ...
 
 class DateProperty(DateTimeProperty): ...
-
 class ComputedProperty(Property): ...
-
 class IntegerProperty(Property): ...
-
 class FloatProperty(Property): ...
 
 class JsonProperty(Property):
     def __init__(
-        self, name: Optional[str] = ..., compressed: bool = ...,
-        json_type: Optional[Any] = ..., **kwds: Any
+        self,
+        name: Optional[str] = ...,
+        compressed: bool = ...,
+        json_type: Optional[Any] = ...,
+        **kwds: Any
     ) -> None: ...
 
 class UserProperty(Property):
     def __init__(
-        self, name: Optional[str] = ..., auto_current_user: bool = ...,
-        auto_current_user_add: bool = ..., **kwds: Any
+        self,
+        name: Optional[str] = ...,
+        auto_current_user: bool = ...,
+        auto_current_user_add: bool = ...,
+        **kwds: Any
     ) -> None: ...
 
 class TextProperty(Property): ...
-
 class StringProperty(TextProperty): ...
 
 class Cursor:
-    def __init__(
-        self, urlsafe: Optional[str]
-    ) -> None: ...
+    def __init__(self, urlsafe: Optional[str]) -> None: ...
     def urlsafe(self) -> bytes: ...
 
 # Key Stubs

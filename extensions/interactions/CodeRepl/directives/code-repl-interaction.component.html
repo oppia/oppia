@@ -1,6 +1,6 @@
 <div class="code-repl-container">
   <div>
-    <!-- This ng-form is needed for submitting answer on hitting enter. -->
+    <!-- This form is needed for submitting answer on hitting enter. -->
     <form (ngSubmit)="runAndSubmitCode(code)">
       <div class="code-repl-input-box">
         <ngx-codemirror [options]="editorOptions"
@@ -26,10 +26,10 @@
   <hr>
 
   <div *ngIf="fullError">
-    <pre class="code-repl-terminal-error">{{ fullError }}</pre>
+    <pre class="code-repl-terminal-error e2e-test-form-error-container">{{ fullError }}</pre>
   </div>
   <div *ngIf="!fullError">
-    <pre *ngIf="output" class="code-repl-terminal">{{ output }}</pre>
+    <pre *ngIf="output" class="code-repl-terminal e2e-test-code-output">{{ output }}</pre>
     <pre *ngIf="!output" class="code-repl-terminal">[No terminal output]</pre>
   </div>
 </div>

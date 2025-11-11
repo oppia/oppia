@@ -17,13 +17,13 @@
  */
 
 import {fakeAsync, TestBed, tick} from '@angular/core/testing';
+import {HttpClientModule} from '@angular/common/http';
 
 import {Subscription} from 'rxjs';
 import {Story} from 'domain/story/story.model';
 import {StoryBackendDict} from 'domain/story/story.model';
 import {EditableStoryBackendApiService} from 'domain/story/editable-story-backend-api.service';
 import {StoryEditorStateService} from 'pages/story-editor-page/services/story-editor-state.service';
-import {importAllAngularServices} from 'tests/unit-test-utils.ajs';
 import {AlertsService} from 'services/alerts.service';
 import {StoryUpdateService} from 'domain/story/story-update.service';
 
@@ -45,7 +45,6 @@ class MockEditableStoryBackendApiService {
               language_code: 'en',
               version: 1,
               misconception_count: 0,
-              worked_examples_count: 0,
               skill_model_created_on: 0,
               skill_model_last_updated: 0,
             },
@@ -99,8 +98,6 @@ describe('Story editor state service', () => {
   var secondBackendStoryObject: StoryBackendDict;
   var testSubscriptions: Subscription;
 
-  importAllAngularServices();
-
   const storyInitializedSpy = jasmine.createSpy('storyInitialized');
   const storyReinitializedSpy = jasmine.createSpy('storyReinitialized');
 
@@ -147,6 +144,7 @@ describe('Story editor state service', () => {
     };
 
     TestBed.configureTestingModule({
+      imports: [HttpClientModule],
       providers: [
         {
           provide: EditableStoryBackendApiService,
@@ -411,7 +409,7 @@ describe('Story editor state service', () => {
     );
   }));
 
-  it('should warn user when user attepts to publish story before it loads', fakeAsync(() => {
+  it('should warn user when user attempts to publish story before it loads', fakeAsync(() => {
     storyEditorStateService.loadStory('storyId_0');
     tick(1000);
 
@@ -580,7 +578,7 @@ describe('Story editor state service', () => {
 
   it(
     "should warn user when user updates the storie's URL to an URL" +
-      ' that already exits',
+      ' that already exists',
     fakeAsync(() => {
       spyOn(alertsService, 'addWarning');
       var newStory = Story.createFromBackendDict(secondBackendStoryObject);
@@ -739,7 +737,6 @@ describe('Story editor state service', () => {
         language_code: 'en',
         version: 1,
         misconception_count: 0,
-        worked_examples_count: 0,
         skill_model_created_on: 0,
         skill_model_last_updated: 0,
       },

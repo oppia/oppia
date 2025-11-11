@@ -21,13 +21,13 @@ import {FormsModule} from '@angular/forms';
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 import {GoalListComponent} from './goal-list.component';
-import {ContentToggleButtonComponent} from '../content-toggle-button/content-toggle-button.component';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
 import {StorySummary} from 'domain/story/story-summary.model';
 import {StoryNode} from 'domain/story/story-node.model';
-import {By} from '@angular/platform-browser';
+import {ChapterProgressLoaderService} from 'services/chapter-progress-loader.service';
 
 describe('GoalListComponent', () => {
   let component: GoalListComponent;
@@ -56,9 +56,9 @@ describe('GoalListComponent', () => {
     outline_is_finalized: false,
     thumbnail_bg_color: '#a33f40',
     status: 'Published',
-    planned_publication_date_msecs: 100.0,
-    last_modified_msecs: 100.0,
-    first_publication_date_msecs: 200.0,
+    planned_publication_date_msecs: 100,
+    last_modified_msecs: 100,
+    first_publication_date_msecs: 200,
     unpublishing_reason: null,
   };
 
@@ -75,9 +75,9 @@ describe('GoalListComponent', () => {
     outline_is_finalized: false,
     thumbnail_bg_color: '#a33f40',
     status: 'Published',
-    planned_publication_date_msecs: 100.0,
-    last_modified_msecs: 100.0,
-    first_publication_date_msecs: 200.0,
+    planned_publication_date_msecs: 100,
+    last_modified_msecs: 100,
+    first_publication_date_msecs: 200,
     unpublishing_reason: null,
   };
 
@@ -94,9 +94,9 @@ describe('GoalListComponent', () => {
     outline_is_finalized: false,
     thumbnail_bg_color: '#a33f40',
     status: 'Published',
-    planned_publication_date_msecs: 100.0,
-    last_modified_msecs: 100.0,
-    first_publication_date_msecs: 200.0,
+    planned_publication_date_msecs: 100,
+    last_modified_msecs: 100,
+    first_publication_date_msecs: 200,
     unpublishing_reason: null,
   };
 
@@ -178,10 +178,22 @@ describe('GoalListComponent', () => {
     },
   };
 
+  class MockPlatformFeatureService {
+    status = {
+      SerialChapterLaunchLearnerView: {
+        isEnabled: false,
+      },
+    };
+  }
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
+
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [FormsModule, HttpClientTestingModule],
-      providers: [AssetsBackendApiService],
+      providers: [
+        {provide: PlatformFeatureService, useValue: mockPlatformFeatureService},
+        AssetsBackendApiService,
+      ],
       declarations: [GoalListComponent, MockTranslatePipe],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -341,29 +353,342 @@ describe('GoalListComponent', () => {
     expect(currentNode).toEqual(2);
   });
 
-  it('should set displayAllNodes to true with handleToggleState', () => {
-    expect(component.displayAllNodes).toBeFalse();
-    component.handleToggleState(true);
+  describe('expandedStories', () => {
+    it('should return false if story is not in expandedStories', () => {
+      const storyId = 'story_1';
+      expect(component.isExpanded(storyId)).toBeFalse();
+    });
 
-    fixture.detectChanges();
+    it('should return true after toggling a story once', () => {
+      const storyId = 'story_2';
+      component.handleToggleState(true, storyId);
+      expect(component.isExpanded(storyId)).toBeTrue();
+    });
 
-    expect(component.displayAllNodes).toBeTrue();
+    it('should return false after toggling a story twice', () => {
+      const storyId = 'story_3';
+      component.handleToggleState(true, storyId);
+      component.handleToggleState(false, storyId);
+      expect(component.isExpanded(storyId)).toBeFalse();
+    });
+
+    it('should keep expanded state independent for different stories', () => {
+      const storyA = 'story_A';
+      const storyB = 'story_B';
+
+      component.handleToggleState(true, storyA);
+      expect(component.isExpanded(storyA)).toBeTrue();
+      expect(component.isExpanded(storyB)).toBeFalse();
+
+      component.handleToggleState(true, storyB);
+      expect(component.isExpanded(storyA)).toBeTrue();
+      expect(component.isExpanded(storyB)).toBeTrue();
+    });
+
+    it('should return false for story explicitly set to false', () => {
+      const storyId = 'story_4';
+      component.expandedStories[storyId] = false;
+      expect(component.isExpanded(storyId)).toBeFalse();
+    });
+
+    it('should return true for story explicitly set to true', () => {
+      const storyId = 'story_5';
+      component.expandedStories[storyId] = true;
+      expect(component.isExpanded(storyId)).toBeTrue();
+    });
   });
 
-  it('should set displayAllNodes false when handleToggleState', () => {
-    expect(component.displayAllNodes).toBeFalse();
-    fixture.whenRenderingDone().then(() => {
-      spyOn(component, 'handleToggleState').and.callThrough();
+  describe('getStartButtonClass', () => {
+    let storySummary: StorySummary;
+    let storyNode: StoryNode;
 
-      const button = fixture.debugElement.query(
-        By.directive(ContentToggleButtonComponent)
-      ).componentInstance;
-      button.toggle();
+    beforeEach(() => {
+      component.allCurrentNodes = [0, 1, 0];
+      storySummary = component.goalTopic.getCanonicalStorySummaryDicts()[0];
+      storyNode = storySummary.getAllNodes()[0] as StoryNode;
+    });
 
-      fixture.detectChanges();
+    it('should (getStartButtonClass) return default if serial feature disabled', () => {
+      spyOn(
+        component,
+        'isSerialChapterFeatureLearnerFlagEnabled'
+      ).and.returnValue(false);
+      expect(component.getStartButtonClass(storySummary, 0)).toBe(
+        'oppia-learner-dash-button--default'
+      );
+    });
 
-      expect(component.handleToggleState).toHaveBeenCalled();
-      expect(component.displayAllNodes).toBeTrue();
+    it('should (getStartButtonClass) return disabled if node unpublished', () => {
+      spyOn(
+        component,
+        'isSerialChapterFeatureLearnerFlagEnabled'
+      ).and.returnValue(true);
+      spyOn(storyNode, 'getPublishedStatus').and.returnValue(false);
+
+      expect(component.getStartButtonClass(storySummary, 0)).toBe(
+        'oppia-learner-dash-button--disabled'
+      );
+    });
+
+    it('should (getStartButtonClass) return default if story is not expanded', () => {
+      spyOn(
+        component,
+        'isSerialChapterFeatureLearnerFlagEnabled'
+      ).and.returnValue(true);
+      spyOn(storyNode, 'getPublishedStatus').and.returnValue(true);
+      spyOn(component, 'isExpanded').and.returnValue(false);
+
+      const className = component.getStartButtonClass(storySummary, 0);
+      expect(className).toBe('oppia-learner-dash-button--default');
+    });
+
+    it('should (getStartButtonClass) return inverse-incomplete if story expanded but node not current', () => {
+      spyOn(
+        component,
+        'isSerialChapterFeatureLearnerFlagEnabled'
+      ).and.returnValue(true);
+      const nodes = storySummary.getAllNodes();
+      spyOn(nodes[1], 'getPublishedStatus').and.returnValue(true);
+      spyOn(component, 'isExpanded').and.returnValue(true);
+      component.allCurrentNodes = [0, 1, 0];
+
+      const className = component.getStartButtonClass(storySummary, 1);
+      expect(className).toBe(
+        'oppia-learner-dash-button--inverse oppia-learner-dash-button--incomplete-goal'
+      );
+    });
+
+    it('should (getStartButtonClass) return default if story expanded and node is current', () => {
+      spyOn(
+        component,
+        'isSerialChapterFeatureLearnerFlagEnabled'
+      ).and.returnValue(true);
+      spyOn(storyNode, 'getPublishedStatus').and.returnValue(true);
+      spyOn(component, 'isExpanded').and.returnValue(true);
+      component.allCurrentNodes = [0, 1, 0];
+
+      const className = component.getStartButtonClass(storySummary, 0);
+      expect(className).toBe('oppia-learner-dash-button--default');
+    });
+
+    it('should (getStartButtonClass) return default when story expanded and checking the exact current playable node', () => {
+      spyOn(
+        component,
+        'isSerialChapterFeatureLearnerFlagEnabled'
+      ).and.returnValue(true);
+      const nodes = storySummary.getAllNodes();
+      spyOn(nodes[1], 'getPublishedStatus').and.returnValue(true);
+      spyOn(component, 'isExpanded').and.returnValue(true);
+      component.allCurrentNodes = [1, 1, 0];
+
+      const className = component.getStartButtonClass(storySummary, 1);
+      expect(className).toBe('oppia-learner-dash-button--default');
+    });
+  });
+
+  describe('getStartButtonHref', () => {
+    let storySummary: StorySummary;
+    let storyNode: StoryNode;
+
+    beforeEach(() => {
+      component.allCurrentNodes = [0, 1, 0];
+      storySummary = component.goalTopic.getCanonicalStorySummaryDicts()[0];
+      storyNode = storySummary.getAllNodes()[0] as StoryNode;
+    });
+
+    it('should (getStartButtonHref) return lesson url if serial feature disabled', () => {
+      spyOn(
+        component,
+        'isSerialChapterFeatureLearnerFlagEnabled'
+      ).and.returnValue(false);
+      spyOn(component, 'getNodeLessonUrl').and.returnValue('/lesson/exp_1');
+
+      expect(component.getStartButtonHref(storySummary, 0)).toBe(
+        '/lesson/exp_1'
+      );
+    });
+
+    it('should (getStartButtonHref) return null if node unpublished', () => {
+      spyOn(
+        component,
+        'isSerialChapterFeatureLearnerFlagEnabled'
+      ).and.returnValue(true);
+      spyOn(storyNode, 'getPublishedStatus').and.returnValue(false);
+
+      expect(component.getStartButtonHref(storySummary, 0)).toBeNull();
+    });
+
+    it('should (getStartButtonHref) return lesson URL if story is expanded', () => {
+      spyOn(
+        component,
+        'isSerialChapterFeatureLearnerFlagEnabled'
+      ).and.returnValue(true);
+      spyOn(storyNode, 'getPublishedStatus').and.returnValue(true);
+      spyOn(component, 'isExpanded').and.returnValue(true);
+      spyOn(component, 'getNodeLessonUrl').and.returnValue('/lesson/exp_1');
+
+      const href = component.getStartButtonHref(storySummary, 0);
+      expect(href).toBe('/lesson/exp_1');
+    });
+
+    it('should (getStartButtonHref) return null if story not expanded and checking non-current node', () => {
+      spyOn(
+        component,
+        'isSerialChapterFeatureLearnerFlagEnabled'
+      ).and.returnValue(true);
+      const nodes = storySummary.getAllNodes();
+      spyOn(nodes[1], 'getPublishedStatus').and.returnValue(true);
+      spyOn(component, 'isExpanded').and.returnValue(false);
+      component.allCurrentNodes = [0, 1, 0];
+
+      const href = component.getStartButtonHref(storySummary, 1);
+      expect(href).toBeNull();
+    });
+
+    it('should (getStartButtonHref) return lesson URL if story not expanded but checking current node', () => {
+      spyOn(
+        component,
+        'isSerialChapterFeatureLearnerFlagEnabled'
+      ).and.returnValue(true);
+      spyOn(storyNode, 'getPublishedStatus').and.returnValue(true);
+      spyOn(component, 'isExpanded').and.returnValue(false);
+      spyOn(component, 'getNodeLessonUrl').and.returnValue('/lesson/exp_1');
+      component.allCurrentNodes = [0, 1, 0];
+
+      const href = component.getStartButtonHref(storySummary, 0);
+      expect(href).toBe('/lesson/exp_1');
+    });
+
+    it('should (getStartButtonHref) return lesson URL when story expanded and node matches current playable node', () => {
+      spyOn(
+        component,
+        'isSerialChapterFeatureLearnerFlagEnabled'
+      ).and.returnValue(true);
+      const nodes = storySummary.getAllNodes();
+      spyOn(nodes[1], 'getPublishedStatus').and.returnValue(true);
+      spyOn(component, 'isExpanded').and.returnValue(true);
+      spyOn(component, 'getNodeLessonUrl').and.returnValue('/lesson/exp_2');
+      component.allCurrentNodes = [1, 1, 0];
+
+      const href = component.getStartButtonHref(storySummary, 1);
+      expect(href).toBe('/lesson/exp_2');
+    });
+  });
+
+  describe('getStartButtonLabel', () => {
+    let storySummary: StorySummary;
+    let storyNode: StoryNode;
+
+    beforeEach(() => {
+      component.allCurrentNodes = [0, 1, 0];
+      storySummary = component.goalTopic.getCanonicalStorySummaryDicts()[0];
+      storyNode = storySummary.getAllNodes()[0] as StoryNode;
+    });
+
+    it('should (getStartButtonLabel) return start label if serial feature disabled', () => {
+      spyOn(
+        component,
+        'isSerialChapterFeatureLearnerFlagEnabled'
+      ).and.returnValue(false);
+
+      expect(component.getStartButtonLabel(storySummary, 0)).toBe(
+        'I18N_LEARNER_DASHBOARD_CARD_BUTTON_START'
+      );
+    });
+
+    it('should (getStartButtonLabel) return coming soon if node unpublished', () => {
+      spyOn(
+        component,
+        'isSerialChapterFeatureLearnerFlagEnabled'
+      ).and.returnValue(true);
+      spyOn(storyNode, 'getPublishedStatus').and.returnValue(false);
+
+      expect(component.getStartButtonLabel(storySummary, 0)).toBe(
+        'I18N_LEARNER_STORY_TILE_COMING_SOON'
+      );
+    });
+
+    it('should (getStartButtonLabel) return start if node published', () => {
+      spyOn(
+        component,
+        'isSerialChapterFeatureLearnerFlagEnabled'
+      ).and.returnValue(true);
+      spyOn(storyNode, 'getPublishedStatus').and.returnValue(true);
+
+      expect(component.getStartButtonLabel(storySummary, 0)).toBe(
+        'I18N_LEARNER_DASHBOARD_CARD_BUTTON_START'
+      );
+    });
+  });
+
+  describe('getChapterProgress', () => {
+    let chapterProgressLoaderService: jasmine.SpyObj<ChapterProgressLoaderService>;
+
+    beforeEach(() => {
+      chapterProgressLoaderService = jasmine.createSpyObj(
+        'ChapterProgressLoaderService',
+        ['getLessonProgress', 'computeLessonProgress']
+      );
+      Object.defineProperty(component, 'chapterProgressLoaderService', {
+        value: chapterProgressLoaderService,
+        writable: true,
+      });
+    });
+
+    it('should return 0 when explorationId is null or undefined', () => {
+      const storyNode = StoryNode.createFromBackendDict({
+        id: 'node_null',
+        thumbnail_filename: 'image.png',
+        title: 'Title',
+        description: 'Description',
+        prerequisite_skill_ids: [],
+        acquired_skill_ids: [],
+        destination_node_ids: [],
+        outline: 'Outline',
+        exploration_id: null,
+        outline_is_finalized: false,
+        thumbnail_bg_color: '#a33f40',
+        status: 'Published',
+        planned_publication_date_msecs: 100,
+        last_modified_msecs: 100,
+        first_publication_date_msecs: 200,
+        unpublishing_reason: null,
+      });
+
+      const progress = component.getChapterProgress(storyNode);
+      expect(progress).toBe(0);
+    });
+
+    it('should return progress from chapterProgressLoaderService when explorationId exists', () => {
+      const storyNode = StoryNode.createFromBackendDict(sampleStoryNode);
+
+      chapterProgressLoaderService.getLessonProgress.and.returnValue(75);
+
+      const progress = component.getChapterProgress(storyNode);
+      expect(progress).toBe(75);
+    });
+
+    it('should return 0 when lessonProgress is null or undefined', () => {
+      const storyNode = StoryNode.createFromBackendDict(sampleStoryNode);
+
+      chapterProgressLoaderService.computeLessonProgress.and.returnValue(0);
+
+      const progress = component.getChapterProgress(storyNode);
+      expect(progress).toBe(0);
+    });
+
+    it('should compute lesson progress correctly using chapterProgressLoaderService', () => {
+      const storyNode = StoryNode.createFromBackendDict(sampleStoryNode);
+      const explorationId = storyNode.getExplorationId();
+      if (explorationId) {
+        const mockProgress = 42;
+        chapterProgressLoaderService.getLessonProgress
+          .withArgs(explorationId)
+          .and.returnValue(mockProgress);
+
+        const result = component.getChapterProgress(storyNode);
+        expect(result).toBe(mockProgress);
+      }
     });
   });
 });

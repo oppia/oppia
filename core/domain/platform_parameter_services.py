@@ -23,11 +23,9 @@ import json
 import logging
 import os
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import platform_parameter_domain
-from core.domain import platform_parameter_list
+from core.domain import platform_parameter_domain, platform_parameter_list
 from core.domain import platform_parameter_registry as registry
 
 from typing import Dict, Final, List
@@ -35,10 +33,22 @@ from typing import Dict, Final, List
 DATA_TYPE_TO_SCHEMA_TYPE: Dict[str, str] = {
     'number': 'float',
     'string': 'unicode',
-    'bool': 'bool'
+    'bool': 'bool',
 }
 
-PACKAGE_JSON_FILE_PATH: Final = os.path.join(os.getcwd(), 'package.json')
+# We use a relative path here because functions in this file are used within
+# the oppia-beam-job library in Apache Beam, and the root of the execution
+# cannot be assumed to be at oppia/ (since, in that environment, all the Oppia
+# code is a library in Python's site-packages).
+#
+# Note that os.path.abspath(__file__) provides the path of the current
+# platform_parameter_services.py module.
+PACKAGE_JSON_FILE_PATH: Final = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)),
+    os.pardir,
+    os.pardir,
+    'package.json',
+)
 
 
 class PlatformParameterNotFoundException(Exception):
@@ -48,7 +58,7 @@ class PlatformParameterNotFoundException(Exception):
 
 
 def create_evaluation_context_for_client(
-    client_context_dict: platform_parameter_domain.ClientSideContextDict
+    client_context_dict: platform_parameter_domain.ClientSideContextDict,
 ) -> platform_parameter_domain.EvaluationContext:
     """Returns context instance for evaluation, using the information
     provided by clients.
@@ -60,16 +70,13 @@ def create_evaluation_context_for_client(
         EvaluationContext. The context for evaluation.
     """
     return platform_parameter_domain.EvaluationContext.from_dict(
-        client_context_dict,
-        {
-            'server_mode': get_server_mode()
-        }
+        client_context_dict, {'server_mode': get_server_mode()}
     )
 
 
-def get_all_platform_parameters_dicts() -> List[
-    platform_parameter_domain.PlatformParameterDict
-]:
+def get_all_platform_parameters_dicts() -> (
+    List[platform_parameter_domain.PlatformParameterDict]
+):
     """Returns dict representations of all platform parameters. This method
     is used for providing detailed platform parameters information to the
     release-coordinator page.
@@ -95,14 +102,18 @@ def get_server_mode() -> platform_parameter_domain.ServerMode:
     """
     # TODO(release-scripts#137): Remove once project ID is verified on all
     # servers.
-    logging.info('Logging project ID for debugging: %s' % (
-        os.environ['GOOGLE_CLOUD_PROJECT']))
+    logging.info(
+        'Logging project ID for debugging: %s'
+        % (os.environ.get('GOOGLE_CLOUD_PROJECT', 'no-project-id-specified'))
+    )
     return (
         platform_parameter_domain.ServerMode.DEV
         if constants.DEV_MODE
-        else platform_parameter_domain.ServerMode.PROD
-        if feconf.ENV_IS_OPPIA_ORG_PRODUCTION_SERVER
-        else platform_parameter_domain.ServerMode.TEST
+        else (
+            platform_parameter_domain.ServerMode.PROD
+            if feconf.ENV_IS_OPPIA_ORG_PRODUCTION_SERVER
+            else platform_parameter_domain.ServerMode.TEST
+        )
     )
 
 
@@ -114,8 +125,9 @@ def _create_evaluation_context_for_server() -> (
     Returns:
         EvaluationContext. The context for evaluation.
     """
-    current_app_version = json.load(utils.open_file(
-        PACKAGE_JSON_FILE_PATH, 'r'))['version']
+    current_app_version = json.load(
+        utils.open_file(PACKAGE_JSON_FILE_PATH, 'r')
+    )['version']
     # We want to make sure that the branch is the release branch.
     if not constants.BRANCH_NAME == '' and 'release' in constants.BRANCH_NAME:
         # We only need current app version so we can drop the 'release' part.
@@ -127,8 +139,9 @@ def _create_evaluation_context_for_server() -> (
         if 'hotfix' in current_app_version:
             split_via_hotfix = current_app_version.split('-hotfix')
             current_app_version = (
-                split_via_hotfix[0].replace('-', '.') +
-                '-hotfix' + split_via_hotfix[1]
+                split_via_hotfix[0].replace('-', '.')
+                + '-hotfix'
+                + split_via_hotfix[1]
             )
         else:
             current_app_version = current_app_version.replace('-', '.')
@@ -138,14 +151,13 @@ def _create_evaluation_context_for_server() -> (
             'platform_type': 'Web',
             'app_version': current_app_version,
         },
-        {
-            'server_mode': get_server_mode()
-        }
+        {'server_mode': get_server_mode()},
     )
 
 
 def get_platform_parameter_value(
-    parameter_name: str) -> platform_parameter_domain.PlatformDataTypes:
+    parameter_name: str,
+) -> platform_parameter_domain.PlatformDataTypes:
     """Returns the value of the platform parameter.
 
     Args:
@@ -160,10 +172,12 @@ def get_platform_parameter_value(
     """
     all_platform_params_dicts = get_all_platform_parameters_dicts()
     all_platform_params_names_set = set(
-        param['name'] for param in all_platform_params_dicts)
+        param['name'] for param in all_platform_params_dicts
+    )
     if parameter_name not in all_platform_params_names_set:
         raise PlatformParameterNotFoundException(
-            'Unknown platform parameter: %s.' % parameter_name)
+            'Unknown platform parameter: %s.' % parameter_name
+        )
 
     context = _create_evaluation_context_for_server()
     param = registry.Registry.get_platform_parameter(parameter_name)
@@ -186,12 +200,16 @@ def get_platform_parameter_schema(param_name: str) -> Dict[str, str]:
     parameter = registry.Registry.get_platform_parameter(param_name)
     if DATA_TYPE_TO_SCHEMA_TYPE.get(parameter.data_type) is not None:
         schema_type = copy.deepcopy(
-            DATA_TYPE_TO_SCHEMA_TYPE[parameter.data_type])
+            DATA_TYPE_TO_SCHEMA_TYPE[parameter.data_type]
+        )
         return {'type': schema_type}
     else:
         raise Exception(
             'The %s platform parameter has a data type of %s which is not '
-            'valid. Please use one of these data types instead: %s.' % (
-                parameter.name, parameter.data_type,
-                platform_parameter_domain.PlatformDataTypes)
+            'valid. Please use one of these data types instead: %s.'
+            % (
+                parameter.name,
+                parameter.data_type,
+                platform_parameter_domain.PlatformDataTypes,
+            )
         )

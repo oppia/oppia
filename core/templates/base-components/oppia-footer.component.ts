@@ -39,6 +39,7 @@ import './oppia-footer.component.css';
 export class OppiaFooterComponent {
   emailAddress: string | null = null;
   name: string | null = null;
+  newsletterTouched: boolean = false;
   siteFeedbackFormUrl: string = AppConstants.SITE_FEEDBACK_FORM_URL;
   currentYear: number = new Date().getFullYear();
   PAGES_REGISTERED_WITH_FRONTEND = AppConstants.PAGES_REGISTERED_WITH_FRONTEND;
@@ -48,6 +49,10 @@ export class OppiaFooterComponent {
   SHORT_COMMIT_HASH = AppConstants.SHORT_COMMIT_HASH;
 
   versionInformationIsShown: boolean = this.router.url === '/about';
+
+  subscriptionProcessing: boolean = false;
+  emailDuplicated: boolean = false;
+  emailsSubscribed: Set<string> = new Set();
 
   constructor(
     private alertsService: AlertsService,
@@ -64,39 +69,69 @@ export class OppiaFooterComponent {
   }
 
   validateEmailAddress(): boolean {
+    if (!this.emailAddress) {
+      return false;
+    }
     let regex = new RegExp(AppConstants.EMAIL_REGEX);
     return regex.test(String(this.emailAddress));
   }
 
+  disableNewsletterSubscription(): boolean {
+    if (!this.subscriptionProcessing) {
+      return !this.validateEmailAddress();
+    }
+    return this.subscriptionProcessing;
+  }
+
+  isAlreadySubscribed(email: string): boolean {
+    return this.emailsSubscribed.has(email);
+  }
+
+  clearNewsletterWarning(): void {
+    this.emailDuplicated = false;
+  }
+
   subscribeToMailingList(): void {
+    this.newsletterTouched = true;
+    if (!this.validateEmailAddress()) {
+      return;
+    }
     // Convert null or empty string to null for consistency.
     const userName = this.name ? String(this.name) : null;
-    this.mailingListBackendApiService
-      .subscribeUserToMailingList(
-        String(this.emailAddress),
-        userName,
-        AppConstants.MAILING_LIST_WEB_TAG
-      )
-      .then(status => {
-        if (status) {
-          this.alertsService.addInfoMessage('Done!', 1000);
-          this.ngbModal.open(ThanksForSubscribingModalComponent, {
-            backdrop: 'static',
-            size: 'xl',
-          });
-        } else {
+    if (this.isAlreadySubscribed(String(this.emailAddress))) {
+      this.emailDuplicated = true;
+    } else {
+      this.subscriptionProcessing = true;
+      this.emailsSubscribed.add(String(this.emailAddress));
+      this.mailingListBackendApiService
+        .subscribeUserToMailingList(
+          String(this.emailAddress),
+          userName,
+          AppConstants.MAILING_LIST_WEB_TAG
+        )
+        .then(status => {
+          if (status) {
+            this.alertsService.addInfoMessage('Done!', 1000);
+            this.ngbModal.open(ThanksForSubscribingModalComponent, {
+              backdrop: 'static',
+              size: 'xl',
+            });
+          } else {
+            this.alertsService.addInfoMessage(
+              AppConstants.MAILING_LIST_UNEXPECTED_ERROR_MESSAGE,
+              10000
+            );
+          }
+          this.subscriptionProcessing = false;
+        })
+        .catch(errorResponse => {
           this.alertsService.addInfoMessage(
             AppConstants.MAILING_LIST_UNEXPECTED_ERROR_MESSAGE,
             10000
           );
-        }
-      })
-      .catch(errorResponse => {
-        this.alertsService.addInfoMessage(
-          AppConstants.MAILING_LIST_UNEXPECTED_ERROR_MESSAGE,
-          10000
-        );
-      });
+          this.subscriptionProcessing = false;
+        });
+    }
   }
 
   navigateToAboutPage(): void {

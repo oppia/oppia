@@ -198,7 +198,10 @@ export class SvgSanitizerService {
       if (tagsToBeRemoved.indexOf(nodeTagName) !== -1) {
         node.remove();
       } else {
-        for (let i = 0; i < node.attributes.length; i++) {
+        // Reverse iteration ensures no attributes are skipped when removing them.
+        // In a forward loop, removing an attribute shifts the next one, causing misses.
+        // This approach makes sure that all unwanted attributes are properly checked and removed.
+        for (let i = node.attributes.length - 1; i >= 0; i--) {
           const nodeAttrName: string = node.attributes[i].name;
           // Check if the tag name and attribute combination matches any value
           // in attrsToBeRemoved. If so, remove that attribute from the node.

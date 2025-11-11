@@ -24,6 +24,7 @@ import {Story} from 'domain/story/story.model';
 import {StoryPreviewTabComponent} from './story-preview-tab.component';
 import {StoryEditorStateService} from '../services/story-editor-state.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 class MockStoryEditorNavigationService {
   activeTab!: 'story_preview';
@@ -32,6 +33,16 @@ class MockStoryEditorNavigationService {
   getChapterIndex!: () => null;
   navigateToStoryEditor!: () => {};
 }
+
+class MockPlatformFeatureService {
+  status = {
+    SerialChapterLaunchLearnerView: {
+      isEnabled: false,
+    },
+  };
+}
+let mockPlatformFeatureService = new MockPlatformFeatureService();
+
 describe('Story Preview tab', () => {
   let component: StoryPreviewTabComponent;
   let fixture: ComponentFixture<StoryPreviewTabComponent>;
@@ -44,6 +55,7 @@ describe('Story Preview tab', () => {
       imports: [HttpClientTestingModule],
       declarations: [StoryPreviewTabComponent, MockTranslatePipe],
       providers: [
+        {provide: PlatformFeatureService, useValue: mockPlatformFeatureService},
         {
           StoryEditorNavigationService,
           provide: [
@@ -83,9 +95,9 @@ describe('Story Preview tab', () => {
             thumbnail_filename: 'img.png',
             thumbnail_bg_color: '#a33f40',
             status: 'Published',
-            planned_publication_date_msecs: 10.0,
-            last_modified_msecs: 20.0,
-            first_publication_date_msecs: 10.0,
+            planned_publication_date_msecs: 10,
+            last_modified_msecs: 20,
+            first_publication_date_msecs: 10,
             unpublishing_reason: null,
           },
           {
@@ -101,9 +113,9 @@ describe('Story Preview tab', () => {
             thumbnail_filename: 'img2.png',
             thumbnail_bg_color: '#a33f40',
             status: 'Published',
-            planned_publication_date_msecs: 10.0,
-            last_modified_msecs: 20.0,
-            first_publication_date_msecs: 10.0,
+            planned_publication_date_msecs: 10,
+            last_modified_msecs: 20,
+            first_publication_date_msecs: 10,
             unpublishing_reason: null,
           },
         ],
@@ -134,6 +146,14 @@ describe('Story Preview tab', () => {
 
   afterEach(() => {
     component.ngOnDestroy();
+  });
+
+  it('should get status of Serial Chapter Launch Learner Feature flag', () => {
+    expect(component.isSerialChapterFeatureLearnerFlagEnabled()).toEqual(false);
+
+    mockPlatformFeatureService.status.SerialChapterLaunchLearnerView.isEnabled =
+      true;
+    expect(component.isSerialChapterFeatureLearnerFlagEnabled()).toEqual(true);
   });
 
   it('should set initialize the variables', () => {

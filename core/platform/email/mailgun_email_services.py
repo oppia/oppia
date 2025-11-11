@@ -20,15 +20,18 @@ from __future__ import annotations
 
 import logging
 
-from core import feconf
-from core.domain import email_services
+from core.domain import (
+    email_services,
+    platform_parameter_list,
+    platform_parameter_services,
+)
 from core.platform import models
 
 import requests
 from typing import Dict, List, Optional, Union
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import secrets_services
 
 secrets_services = models.Registry.import_secrets_services()
@@ -43,11 +46,13 @@ def send_email_to_recipients(
     subject: str,
     plaintext_body: str,
     html_body: str,
+    cc: Optional[List[str]] = None,
     bcc: Optional[List[str]] = None,
     reply_to: Optional[str] = None,
     recipient_variables: Optional[
-        Dict[str, Dict[str, Union[str, float]]]] = None,
-    attachments: Optional[List[Dict[str, str]]] = None
+        Dict[str, Dict[str, Union[str, float]]]
+    ] = None,
+    attachments: Optional[List[Dict[str, str]]] = None,
 ) -> bool:
     """Send POST HTTP request to mailgun api. This method is adopted from
     the requests library's post method.
@@ -62,6 +67,7 @@ def send_email_to_recipients(
         plaintext_body: str. The plaintext body of the email. Must be utf-8.
         html_body: str. The HTML body of the email. Must fit in a datastore
             entity. Must be utf-8.
+        cc: list(str)|None. Optional argument. List of cc emails.
         bcc: list(str)|None. Optional argument. List of bcc emails.
         reply_to: str|None. Optional argument. Reply address formatted like
             “reply+<reply_id>@<incoming_email_domain_name>
@@ -84,32 +90,55 @@ def send_email_to_recipients(
 
     Raises:
         Exception. The mailgun api key is not stored in
-            feconf.MAILGUN_API_KEY.
+            MAILGUN_API_KEY cloud secret.
         Exception. The mailgun domain name is not stored in
-            feconf.MAILGUN_DOMAIN_NAME.
+            MAILGUN_DOMAIN_NAME platform param.
 
     Returns:
         bool. Whether the emails are sent successfully.
     """
     mailgun_api_key: Optional[str] = secrets_services.get_secret(
-        'MAILGUN_API_KEY')
+        'MAILGUN_API_KEY'
+    )
     if mailgun_api_key is None:
         email_msg = email_services.convert_email_to_loggable_string(
-            sender_email, recipient_emails, subject, plaintext_body, html_body,
-            bcc, reply_to, recipient_variables
+            sender_email,
+            recipient_emails,
+            subject,
+            plaintext_body,
+            html_body,
+            cc,
+            bcc,
+            reply_to,
+            recipient_variables,
         )
         raise Exception(
             'Mailgun API key is not available. '
-            'Here is the email that failed sending: %s' % email_msg)
+            'Here is the email that failed sending: %s' % email_msg
+        )
 
-    if not feconf.MAILGUN_DOMAIN_NAME:
+    mailgun_domain_name = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.MAILGUN_DOMAIN_NAME.value
+        )
+    )
+    if not mailgun_domain_name:
         email_msg = email_services.convert_email_to_loggable_string(
-            sender_email, recipient_emails, subject, plaintext_body, html_body,
-            bcc, reply_to, recipient_variables
+            sender_email,
+            recipient_emails,
+            subject,
+            plaintext_body,
+            html_body,
+            cc,
+            bcc,
+            reply_to,
+            recipient_variables,
         )
         raise Exception(
             'Mailgun domain name is not set. '
-            'Here is the email that failed sending: %s' % email_msg)
+            'Here is the email that failed sending: %s' % email_msg
+        )
+    assert isinstance(mailgun_domain_name, str)
 
     # To send bulk emails we pass list of recipients in 'to' paarameter of
     # post data. Maximum limit of recipients per request is 1000.
@@ -117,16 +146,22 @@ def send_email_to_recipients(
     # https://documentation.mailgun.com/docs/mailgun/user-manual/
     # sending-messages/#batch-sending.
     recipient_email_lists = [
-        recipient_emails[i:i + 1000]
-        for i in range(0, len(recipient_emails), 1000)]
+        recipient_emails[i : i + 1000]
+        for i in range(0, len(recipient_emails), 1000)
+    ]
     for email_list in recipient_email_lists:
-        data = {
+        data: Dict[
+            str, Union[str, List[str], Dict[str, Dict[str, Union[str, float]]]]
+        ] = {
             'from': sender_email,
             'subject': subject,
             'text': plaintext_body,
             'html': html_body,
-            'to': email_list[0] if len(email_list) == 1 else email_list
+            'to': email_list[0] if len(email_list) == 1 else email_list,
         }
+
+        if cc:
+            data['cc'] = cc[0] if len(cc) == 1 else cc
 
         if bcc:
             data['bcc'] = bcc[0] if len(bcc) == 1 else bcc
@@ -139,22 +174,28 @@ def send_email_to_recipients(
         # sending individual emails).
         data['recipient_variables'] = recipient_variables or {}
         server = 'https://api.mailgun.net/v3/%s/messages' % (
-            feconf.MAILGUN_DOMAIN_NAME
+            mailgun_domain_name
         )
 
-       # Adding attachments to the email.
-        files = [(
-            'attachment',
-            (attachment['filename'], open(attachment['path'], 'rb')))
-            for attachment in attachments
-        ] if attachments else []
+        # Adding attachments to the email.
+        files = (
+            [
+                (
+                    'attachment',
+                    (attachment['filename'], open(attachment['path'], 'rb')),
+                )
+                for attachment in attachments
+            ]
+            if attachments
+            else []
+        )
 
         response = requests.post(
             server,
             auth=('api', mailgun_api_key),
             data=data,
             files=(files or None),
-            timeout=TIMEOUT_SECS
+            timeout=TIMEOUT_SECS,
         )
 
         for _, (_, file_obj) in files:
@@ -163,7 +204,8 @@ def send_email_to_recipients(
         if response.status_code != 200:
             logging.error(
                 'Failed to send email: %s - %s.'
-                % (response.status_code, response.text))
+                % (response.status_code, response.text)
+            )
             return False
 
     return True
