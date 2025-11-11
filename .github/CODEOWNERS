@@ -435,7 +435,6 @@
 /core/README.md @oppia/dev-workflow-reviewers
 /core/templates/css/README.md @oppia/dev-workflow-reviewers
 /extensions/README.md @oppia/dev-workflow-reviewers
-/LOCAL_CI_GUIDE.md @oppia/dev-workflow-reviewers
 /scripts/README.md @oppia/dev-workflow-reviewers
 
 # Skill project.

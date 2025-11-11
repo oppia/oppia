@@ -317,18 +317,18 @@ describe('RTE display component', () => {
 
   it('should clear interval on component destruction when interval exists', fakeAsync(() => {
     spyOn(window, 'clearInterval');
-    // Simulate an active interval by setting a dummy interval ID
-    component['highlightIntervalId'] = 12345;
+    // Simulate an active interval by setting a dummy interval ID.
+    component.highlightIntervalId = 12345;
 
     component.ngOnDestroy();
 
     expect(clearInterval).toHaveBeenCalledWith(12345);
-    expect(component['highlightIntervalId']).toBeUndefined();
+    expect(component.highlightIntervalId).toBeUndefined();
   }));
 
   it('should handle ngOnDestroy gracefully when no interval exists', fakeAsync(() => {
     spyOn(window, 'clearInterval');
-    component['highlightIntervalId'] = undefined;
+    component.highlightIntervalId = undefined;
 
     component.ngOnDestroy();
 
