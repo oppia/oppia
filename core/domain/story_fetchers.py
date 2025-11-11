@@ -525,10 +525,13 @@ def get_user_progress_in_story_chapters(
         list(StoryChapterProgressSummaryDict). The list of the progress
         summaries of the user corresponding to all stories chapters.
     """
+    all_valid_stories = [
+        story for story in get_stories_by_ids(story_ids) if story is not None
+    ]
     all_valid_story_nodes: List[story_domain.StoryNode] = []
-    for story in get_stories_by_ids(story_ids):
-        if story is not None:
-            all_valid_story_nodes.extend(story.story_contents.nodes)
+    for story in all_valid_stories:
+        all_valid_story_nodes.extend(story.story_contents.nodes)
+
     exp_ids = [
         node.exploration_id
         for node in all_valid_story_nodes
@@ -539,6 +542,12 @@ def get_user_progress_in_story_chapters(
     exp_user_data_models = user_models.ExplorationUserDataModel.get_multi(
         user_id_exp_id_combinations
     )
+
+    completed_node_ids_by_story = {}
+    for story_id in story_ids:
+        completed_node_ids_by_story[story_id] = get_completed_node_ids(
+            user_id, story_id
+        )
 
     all_chapters_progress: List[
         story_domain.StoryChapterProgressSummaryDict
@@ -559,11 +568,29 @@ def get_user_progress_in_story_chapters(
                 visited_checkpoints = (
                     all_checkpoints.index(most_recently_visited_checkpoint) + 1
                 )
+        found_story_id: Optional[str] = None
+        found_node_id: Optional[str] = None
+        for story in all_valid_stories:
+            for node in story.story_contents.nodes:
+                if node.exploration_id == exp_id:
+                    found_story_id = story.id
+                    found_node_id = node.id
+                    break
+            if found_story_id:
+                break
+
+        is_completed = (
+            found_story_id is not None
+            and found_node_id
+            in completed_node_ids_by_story.get(found_story_id, [])
+        )
+
         all_chapters_progress.append(
             {
                 'exploration_id': exp_id,
                 'visited_checkpoints_count': visited_checkpoints,
                 'total_checkpoints_count': len(all_checkpoints),
+                'is_chapter_complete': is_completed,
             }
         )
 

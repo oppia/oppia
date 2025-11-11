@@ -27,6 +27,7 @@ import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
 import {StorySummary} from 'domain/story/story-summary.model';
 import {StoryNode} from 'domain/story/story-node.model';
+import {ChapterProgressLoaderService} from 'services/chapter-progress-loader.service';
 
 describe('GoalListComponent', () => {
   let component: GoalListComponent;
@@ -617,6 +618,77 @@ describe('GoalListComponent', () => {
       expect(component.getStartButtonLabel(storySummary, 0)).toBe(
         'I18N_LEARNER_DASHBOARD_CARD_BUTTON_START'
       );
+    });
+  });
+
+  describe('getChapterProgress', () => {
+    let chapterProgressLoaderService: jasmine.SpyObj<ChapterProgressLoaderService>;
+
+    beforeEach(() => {
+      chapterProgressLoaderService = jasmine.createSpyObj(
+        'ChapterProgressLoaderService',
+        ['getLessonProgress', 'computeLessonProgress']
+      );
+      Object.defineProperty(component, 'chapterProgressLoaderService', {
+        value: chapterProgressLoaderService,
+        writable: true,
+      });
+    });
+
+    it('should return 0 when explorationId is null or undefined', () => {
+      const storyNode = StoryNode.createFromBackendDict({
+        id: 'node_null',
+        thumbnail_filename: 'image.png',
+        title: 'Title',
+        description: 'Description',
+        prerequisite_skill_ids: [],
+        acquired_skill_ids: [],
+        destination_node_ids: [],
+        outline: 'Outline',
+        exploration_id: null,
+        outline_is_finalized: false,
+        thumbnail_bg_color: '#a33f40',
+        status: 'Published',
+        planned_publication_date_msecs: 100,
+        last_modified_msecs: 100,
+        first_publication_date_msecs: 200,
+        unpublishing_reason: null,
+      });
+
+      const progress = component.getChapterProgress(storyNode);
+      expect(progress).toBe(0);
+    });
+
+    it('should return progress from chapterProgressLoaderService when explorationId exists', () => {
+      const storyNode = StoryNode.createFromBackendDict(sampleStoryNode);
+
+      chapterProgressLoaderService.getLessonProgress.and.returnValue(75);
+
+      const progress = component.getChapterProgress(storyNode);
+      expect(progress).toBe(75);
+    });
+
+    it('should return 0 when lessonProgress is null or undefined', () => {
+      const storyNode = StoryNode.createFromBackendDict(sampleStoryNode);
+
+      chapterProgressLoaderService.computeLessonProgress.and.returnValue(0);
+
+      const progress = component.getChapterProgress(storyNode);
+      expect(progress).toBe(0);
+    });
+
+    it('should compute lesson progress correctly using chapterProgressLoaderService', () => {
+      const storyNode = StoryNode.createFromBackendDict(sampleStoryNode);
+      const explorationId = storyNode.getExplorationId();
+      if (explorationId) {
+        const mockProgress = 42;
+        chapterProgressLoaderService.getLessonProgress
+          .withArgs(explorationId)
+          .and.returnValue(mockProgress);
+
+        const result = component.getChapterProgress(storyNode);
+        expect(result).toBe(mockProgress);
+      }
     });
   });
 });
