@@ -1312,7 +1312,7 @@ describe('RTE display component', () => {
 
       expect(() =>
         component.highlightSentenceDuringVoiceoverPlay()
-      ).not.toThrow();
+      ).not.toThrowError();
     }));
 
     it('should handle null previous element when clearing highlight', fakeAsync(() => {
@@ -1328,7 +1328,7 @@ describe('RTE display component', () => {
 
       expect(() =>
         component.highlightSentenceDuringVoiceoverPlay()
-      ).not.toThrow();
+      ).not.toThrowError();
       expect(component.previousHighlightedElementId).toBeUndefined();
     }));
 
@@ -1340,7 +1340,11 @@ describe('RTE display component', () => {
       };
 
       fixture.detectChanges();
-      const result = (component as any)._getTemplatePortal(node);
+      const result = (
+        component as unknown as {
+          _getTemplatePortal: (node: unknown) => unknown;
+        }
+      )._getTemplatePortal(node);
       expect(result).toBeUndefined();
     });
 
@@ -1366,7 +1370,7 @@ describe('RTE display component', () => {
       component.rteString = '<p>Test</p>';
       fixture.detectChanges();
 
-      expect(() => component.ngOnChanges(changes)).not.toThrow();
+      expect(() => component.ngOnChanges(changes)).not.toThrowError();
       tick();
       discardPeriodicTasks();
     }));
