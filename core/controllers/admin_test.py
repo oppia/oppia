@@ -2139,7 +2139,6 @@ class GenerateDummyChaptersTest(test_utils.GenericTestBase):
 
     def test_chapter_linkage_after_dummy_generation(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        csrf_token = self.get_new_csrf_token()
 
         topic = topic_domain.Topic.create_default_topic(
             'topic', 'topic_name', 'topicurl', 'description', 'fragm'
