@@ -24,7 +24,6 @@ import {
   Directive,
   ElementRef,
   Input,
-  OnDestroy,
   OnInit,
   SimpleChanges,
   TemplateRef,
@@ -55,38 +54,36 @@ type PortalTree = (TemplatePortal<unknown> | PortalTree)[];
   templateUrl: './rte-output-display.component.html',
   styleUrls: [],
 })
-export class RteOutputDisplayComponent
-  implements OnInit, AfterViewInit, OnDestroy
-{
+export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   // Native HTML elements.
-  @ViewChild('p') pTagPortal!: TemplateRef<unknown>;
-  @ViewChild('h1') h1TagPortal!: TemplateRef<unknown>;
-  @ViewChild('span') spanTagPortal!: TemplateRef<unknown>;
-  @ViewChild('ol') olTagPortal!: TemplateRef<unknown>;
-  @ViewChild('li') liTagPortal!: TemplateRef<unknown>;
-  @ViewChild('ul') ulTagPortal!: TemplateRef<unknown>;
-  @ViewChild('pre') preTagPortal!: TemplateRef<unknown>;
-  @ViewChild('strong') strongTagPortal!: TemplateRef<unknown>;
-  @ViewChild('blockquote') blockquoteTagPortal!: TemplateRef<unknown>;
-  @ViewChild('em') emTagPortal!: TemplateRef<unknown>;
-  @ViewChild('text') textTagPortal!: TemplateRef<unknown>;
+  @ViewChild('p') pTagPortal: TemplateRef<unknown>;
+  @ViewChild('h1') h1TagPortal: TemplateRef<unknown>;
+  @ViewChild('span') spanTagPortal: TemplateRef<unknown>;
+  @ViewChild('ol') olTagPortal: TemplateRef<unknown>;
+  @ViewChild('li') liTagPortal: TemplateRef<unknown>;
+  @ViewChild('ul') ulTagPortal: TemplateRef<unknown>;
+  @ViewChild('pre') preTagPortal: TemplateRef<unknown>;
+  @ViewChild('strong') strongTagPortal: TemplateRef<unknown>;
+  @ViewChild('blockquote') blockquoteTagPortal: TemplateRef<unknown>;
+  @ViewChild('em') emTagPortal: TemplateRef<unknown>;
+  @ViewChild('text') textTagPortal: TemplateRef<unknown>;
   // Oppia Non interactive.
-  @ViewChild('collapsible') collapsibleTagPortal!: TemplateRef<unknown>;
-  @ViewChild('image') imageTagPortal!: TemplateRef<unknown>;
-  @ViewChild('link') linkTagPortal!: TemplateRef<unknown>;
-  @ViewChild('math') mathTagPortal!: TemplateRef<unknown>;
-  @ViewChild('skillreview') skillreviewTagPortal!: TemplateRef<unknown>;
-  @ViewChild('svgdiagram') svgdiagramTagPortal!: TemplateRef<unknown>;
-  @ViewChild('tabs') tabsTagPortal!: TemplateRef<unknown>;
-  @ViewChild('video') videoTagPortal!: TemplateRef<unknown>;
-  @ViewChild('workedexample') workedexampleTagPortal!: TemplateRef<unknown>;
-  @Input() rteString: string = '';
+  @ViewChild('collapsible') collapsibleTagPortal: TemplateRef<unknown>;
+  @ViewChild('image') imageTagPortal: TemplateRef<unknown>;
+  @ViewChild('link') linkTagPortal: TemplateRef<unknown>;
+  @ViewChild('math') mathTagPortal: TemplateRef<unknown>;
+  @ViewChild('skillreview') skillreviewTagPortal: TemplateRef<unknown>;
+  @ViewChild('svgdiagram') svgdiagramTagPortal: TemplateRef<unknown>;
+  @ViewChild('tabs') tabsTagPortal: TemplateRef<unknown>;
+  @ViewChild('video') videoTagPortal: TemplateRef<unknown>;
+  @ViewChild('workedexample') workedexampleTagPortal: TemplateRef<unknown>;
+  @Input() rteString: string;
   @Input() altTextIsDisplayed: boolean = false;
   node: OppiaRteNode | string = '';
   show = false;
   portalTree: PortalTree = [];
 
-  highlightIdToSentenceText: Record<string, string> = {};
+  highlightIdToSentenceText = {};
   wrapped = false;
   previousHighlightedElementId!: string | undefined;
   // The background color of the sentence being played in the audio player.
@@ -105,9 +102,6 @@ export class RteOutputDisplayComponent
 
   // The index is used to assign a unique ID to each sentence of the lesson content.
   index = 1;
-
-  // Track the interval ID so we can clear it on component destruction.
-  public highlightIntervalId: number | undefined;
 
   // Parent tags eligible for voiceover highlighting. Text within these tags
   // is split into sentences and wrapped in span tags. Tags like i, strong, etc.,
@@ -168,29 +162,16 @@ export class RteOutputDisplayComponent
       node.nodeName === 'OPPIA-NONINTERACTIVE-LINK'
     ) {
       const encodedText = (node as Element).getAttribute('text-with-value');
-      if (!encodedText) {
-        return '';
-      }
       const decodedText = this.decodeHtmlEntities(encodedText);
       return JSON.parse(decodedText);
     } else if (node.nodeName === 'OPPIA-NONINTERACTIVE-MATH') {
       const encodedMathContent = (node as Element).getAttribute(
         'math_content-with-value'
       );
-      if (!encodedMathContent) {
-        return '';
-      }
       const decodedMathContent = this.decodeHtmlEntities(encodedMathContent);
       const latexText = JSON.parse(decodedMathContent)?.raw_latex;
-      if (latexText) {
-        return this.parseAndConvertLatex(latexText);
-      }
-      return '';
+      return this.parseAndConvertLatex(latexText);
     }
-    // Default to empty string for any unhandled node types. This prevents
-    // callers from receiving `undefined` which can lead to runtime issues
-    // when concatenating or comparing returned values.
-    return '';
   }
 
   // The method recursively traverses the node and wraps span tags around
@@ -198,13 +179,14 @@ export class RteOutputDisplayComponent
   traverseNodeAndWrapSpanTags(
     node: Node,
     sentenceRegex: RegExp
-  ): Node[] | HTMLElement {
+  ): Node[] | HTMLElement | Text[] | Node {
     const currentNodeName = node.nodeName;
 
     if (node.nodeType === Node.TEXT_NODE) {
       const textContent = node.textContent || '';
       const sentences = textContent.split(sentenceRegex);
       let textNodesForSentences: Text[] = [];
+
       for (let sentence of sentences) {
         textNodesForSentences.push(document.createTextNode(sentence));
       }
@@ -212,8 +194,7 @@ export class RteOutputDisplayComponent
     } else {
       let updatedChildNodes: Node[] = [];
 
-      const childNodesArray = Array.from(node.childNodes);
-      childNodesArray.forEach(childNode => {
+      node.childNodes.forEach(childNode => {
         updatedChildNodes = updatedChildNodes.concat(
           this.traverseNodeAndWrapSpanTags(childNode, sentenceRegex)
         );
@@ -235,18 +216,7 @@ export class RteOutputDisplayComponent
           return [node];
         }
 
-        // If there's only one child and it's the same type, just return the processed child
-        // to avoid unnecessary nesting.
-        if (
-          updatedChildNodes.length === 1 &&
-          updatedChildNodes[0].nodeType === Node.ELEMENT_NODE &&
-          (updatedChildNodes[0] as Element).tagName ===
-            currentNodeName.toUpperCase()
-        ) {
-          return updatedChildNodes;
-        }
-
-        let currentElementReplicaNodes: HTMLElement[] = [];
+        let currentElementReplicaNodes = [];
         updatedChildNodes.forEach(child => {
           let tempElementNode = document.createElement(currentNodeName);
           tempElementNode.appendChild(child);
@@ -265,7 +235,7 @@ export class RteOutputDisplayComponent
 
         let currentSentenceToMatch = sentencesInEarliestParentTag.shift();
 
-        let spanNodeList: Node[] = [];
+        let spanNodeList = [];
         let spanTagElement = document.createElement('span');
         let nextSentenceOffset = '';
 
@@ -285,11 +255,10 @@ export class RteOutputDisplayComponent
 
           if (sentence === currentSentenceToMatch) {
             if (spanNodeList.length > 0) {
-              // Use a plain text node for spacing. Using an extra span for a
-              // single space can be ignored by some rendering/whitespace
-              // normalization; a text node ensures the browser treats it as
-              // a real whitespace character between nodes.
-              spanNodeList.push(document.createTextNode(' '));
+              let spaceElement = document.createElement('span');
+              // eslint-disable-next-line oppia/no-inner-html
+              spaceElement.innerHTML = ' ';
+              spanNodeList.push(spaceElement);
             }
             spanNodeList.push(spanTagElement);
             spanTagElement = document.createElement('span');
@@ -300,29 +269,24 @@ export class RteOutputDisplayComponent
           }
         }
 
-        // If there's remaining content in spanTagElement that wasn't matched,
-        // we still need to add it to spanNodeList to avoid losing trailing
-        // text that doesn't end with punctuation.
-        if (spanTagElement.childNodes.length > 0) {
-          spanNodeList.push(spanTagElement);
-        }
-
-        let nodeTemp = node.cloneNode() as HTMLElement;
+        let nodeTemp = node.cloneNode();
 
         for (let spanNode of spanNodeList) {
-          // If it's a text node (used for spacing), just append it without an ID.
-          if (spanNode.nodeType === Node.TEXT_NODE) {
+          let textInsideSpanTag = '';
+
+          for (let tempChildNode of spanNode.childNodes) {
+            textInsideSpanTag += this.getReadableTextFromNode(tempChildNode);
+          }
+
+          if (textInsideSpanTag === ' ') {
             nodeTemp.appendChild(spanNode);
             continue;
           }
-          let textInsideSpanTag = '';
-          const childNodesArray = Array.from(spanNode.childNodes);
-          for (let tempChildNode of childNodesArray) {
-            textInsideSpanTag += this.getReadableTextFromNode(tempChildNode);
-          }
+
           let elementId = `highlightBlock${this.index}`;
-          (spanNode as Element).id = elementId;
+          spanNode.id = elementId;
           this.index++;
+
           nodeTemp.appendChild(spanNode);
           this.highlightIdToSentenceText[elementId] = textInsideSpanTag;
         }
@@ -353,15 +317,10 @@ export class RteOutputDisplayComponent
     // Sentences in the lesson content are separated using punctuation marks
     // specific to the language.
     // The following line retrieves the punctuation marks for the current language.
-    const punctuationMap =
-      AppConstants.LANGUAGE_CODE_TO_SENTENCE_ENDING_PUNCTUATION_MARKS as Record<
-        string,
-        string
-      >;
     const punctuationsForCurrentLanguage =
-      punctuationMap[languageCode] ||
-      punctuationMap[AppConstants.DEFAULT_LANGUAGE_CODE] ||
-      '.!?';
+      AppConstants.LANGUAGE_CODE_TO_SENTENCE_ENDING_PUNCTUATION_MARKS[
+        languageCode
+      ];
 
     // The regex below is used to split sentences from the lesson content.
     const sentenceRegex = new RegExp(
@@ -378,7 +337,6 @@ export class RteOutputDisplayComponent
       temporaryDivElement,
       sentenceRegex
     ) as HTMLDivElement;
-
     // eslint-disable-next-line oppia/no-inner-html
     return finalDivElement.innerHTML;
   }
@@ -401,23 +359,12 @@ export class RteOutputDisplayComponent
     // There is no other via user input to get <p></p>, so this wouldn't
     // affect any other data.
     this.rteString = this.rteString.replace(/<p><\/p>/g, '<p>&nbsp;</p>');
-    // Preserve meaningful spacing: replace newlines with a single space
-    // instead of removing them. Removing newlines can collapse whitespace
-    // between inline elements (for example between a link tag and following
-    // text), causing paragraphs or sentences to join without a space.
-    this.rteString = this.rteString.replace(/\n/g, ' ');
+    this.rteString = this.rteString.replace(/\n/g, '');
 
     // The following line wraps each sentence in a span tag to highlight
     // the sentence during voiceover playback.
     if (this.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()) {
       this.rteString = this.wrapSentencesInSpansForHighlighting(this.rteString);
-    } else {
-      // Even when the automatic voiceover regeneration feature is disabled,
-      // ensure spacing between inline elements is preserved. This handles
-      // cases where newline removal or earlier transformations produced
-      // adjacent inline tags with no whitespace and prevents words from
-      // concatenating in the editor.
-      this.rteString = this.normalizeSpacingInHtml(this.rteString);
     }
 
     let domparser = new DOMParser();
@@ -430,10 +377,7 @@ export class RteOutputDisplayComponent
       throw e;
     }
     const dfs = (node: OppiaRteNode | TextNode) => {
-      const portal = this._getTemplatePortal(node);
-      if (portal) {
-        node.portal = portal;
-      }
+      node.portal = this._getTemplatePortal(node);
       if (!('children' in node)) {
         return;
       }
@@ -462,8 +406,7 @@ export class RteOutputDisplayComponent
               continue;
             }
             if (preNode.childNodes[i].nodeType === 3) {
-              const nodeValue = preNode.childNodes[i].nodeValue;
-              if (nodeValue && nodeValue.replace(/\s/g, '') === '') {
+              if (preNode.childNodes[i].nodeValue.replace(/\s/g, '') === '') {
                 preNode.removeChild(preNode.childNodes[i]);
                 i--;
               }
@@ -471,107 +414,6 @@ export class RteOutputDisplayComponent
           }
         });
     });
-  }
-
-  // Normalizes spacing in arbitrary HTML by ensuring a single space exists
-  // between adjacent inline elements, and avoids changing <pre> blocks.
-  private normalizeSpacingInHtml(htmlString: string): string {
-    const temporaryDivElement = document.createElement('div');
-    // eslint-disable-next-line oppia/no-inner-html
-    temporaryDivElement.innerHTML = htmlString;
-
-    // Treat common block-level tags specially and assume other tags are
-    // inline-like. This is more robust than an explicit whitelist of
-    // inline tags because custom Oppia tags may be inline and were
-    // previously missed. We only avoid inserting spaces between block
-    // elements to prevent accidental layout changes.
-    const BLOCK_TAGS = new Set([
-      'DIV',
-      'P',
-      'PRE',
-      'OL',
-      'UL',
-      'LI',
-      'TABLE',
-      'TBODY',
-      'TR',
-      'TD',
-      'TH',
-      'H1',
-      'H2',
-      'H3',
-      'H4',
-      'H5',
-      'H6',
-      'BLOCKQUOTE',
-      'SECTION',
-      'HEADER',
-      'FOOTER',
-      'NAV',
-      'ASIDE',
-      // Common Oppia noninteractive components that are block-level.
-      'OPPIA-NONINTERACTIVE-COLLAPSIBLE',
-      'OPPIA-NONINTERACTIVE-WORKEDEXAMPLE',
-    ]);
-
-    const shouldSkip = (node: Node) => {
-      return node.nodeType === 1 && (node as Element).tagName === 'PRE';
-    };
-
-    const normalizeSpacingRecursive = (parent: Node) => {
-      if (shouldSkip(parent)) {
-        return;
-      }
-
-      // Convert live NodeList to static array to prevent race conditions.
-      const children = Array.from(parent.childNodes);
-      const spacesToInsert: {beforeNode: Node}[] = [];
-
-      // First pass: identify where spaces are needed (doesn't modify DOM).
-      for (let i = 1; i < children.length; i++) {
-        const prev = children[i - 1];
-        const curr = children[i];
-
-        if (
-          prev.nodeType === Node.ELEMENT_NODE &&
-          curr.nodeType === Node.ELEMENT_NODE &&
-          !BLOCK_TAGS.has((prev as Element).tagName) &&
-          !BLOCK_TAGS.has((curr as Element).tagName)
-        ) {
-          spacesToInsert.push({beforeNode: curr});
-        } else if (
-          prev.nodeType === Node.ELEMENT_NODE &&
-          curr.nodeType === Node.TEXT_NODE &&
-          !BLOCK_TAGS.has((prev as Element).tagName) &&
-          !/^\s/.test(curr.nodeValue || '')
-        ) {
-          spacesToInsert.push({beforeNode: curr});
-        } else if (
-          prev.nodeType === Node.TEXT_NODE &&
-          curr.nodeType === Node.ELEMENT_NODE &&
-          !BLOCK_TAGS.has((curr as Element).tagName) &&
-          !/\s$/.test(prev.nodeValue || '')
-        ) {
-          spacesToInsert.push({beforeNode: curr});
-        }
-      }
-
-      // Second pass: insert all spaces after iteration completes.
-      spacesToInsert.forEach(({beforeNode}) => {
-        parent.insertBefore(document.createTextNode(' '), beforeNode);
-      });
-
-      // Recursively process children (use static array, not live NodeList).
-      for (const child of children) {
-        if (child.nodeType === Node.ELEMENT_NODE) {
-          normalizeSpacingRecursive(child);
-        }
-      }
-    };
-
-    normalizeSpacingRecursive(temporaryDivElement);
-    // eslint-disable-next-line oppia/no-inner-html
-    return temporaryDivElement.innerHTML;
   }
 
   isAutomaticVoiceoverRegenerationFromExpFeatureEnabled(): boolean {
@@ -609,17 +451,9 @@ export class RteOutputDisplayComponent
 
     // The below lines runs on every 200ms to highlight the sentence being
     // played in the audio player.
-    this.highlightIntervalId = window.setInterval(() => {
+    setInterval(() => {
       this.highlightSentenceDuringVoiceoverPlay();
     }, 100);
-  }
-
-  ngOnDestroy(): void {
-    // Clear the highlight interval to prevent memory leaks and hanging tests.
-    if (this.highlightIntervalId !== undefined) {
-      clearInterval(this.highlightIntervalId);
-      this.highlightIntervalId = undefined;
-    }
   }
 
   isManualVoiceoverAvailableForActiveContent(): boolean {
@@ -663,11 +497,11 @@ export class RteOutputDisplayComponent
         return;
       }
 
-      const previousHighlightedElement = this.previousHighlightedElementId
-        ? document.getElementById(this.previousHighlightedElementId)
-        : null;
+      let previousHighlightedElement = document.getElementById(
+        this.previousHighlightedElementId
+      );
 
-      const currentElementIdToHighlight =
+      let currentElementIdToHighlight =
         this.automaticVoiceoverHighlightService.getCurrentSentenceIdToHighlight(
           this.audioPlayerService.getCurrentTimeInSecs()
         );
@@ -682,7 +516,7 @@ export class RteOutputDisplayComponent
         return;
       }
 
-      const currentElementToHighlight = document.getElementById(
+      let currentElementToHighlight = document.getElementById(
         currentElementIdToHighlight
       );
 
@@ -700,9 +534,9 @@ export class RteOutputDisplayComponent
     } else {
       // Removes the highlight from the previous sentence when the audio is
       // paused.
-      const previousHighlightedElement = this.previousHighlightedElementId
-        ? document.getElementById(this.previousHighlightedElementId)
-        : null;
+      let previousHighlightedElement = document.getElementById(
+        this.previousHighlightedElementId
+      );
       if (previousHighlightedElement) {
         previousHighlightedElement.style.backgroundColor = '';
       }
@@ -740,34 +574,26 @@ export class RteOutputDisplayComponent
 
   private _getTemplatePortal(
     node: OppiaRteNode | TextNode
-  ): TemplatePortal<unknown> | undefined {
+  ): TemplatePortal<unknown> {
     if ('value' in node) {
       return new TemplatePortal(this.textTagPortal, this._viewContainerRef, {
         $implicit: node,
       });
     }
     if (node.nodeType === 'component') {
-      const portalKey = (node.selector.split('oppia-noninteractive-')[1] +
-        'TagPortal') as keyof this;
-      const portal = this[portalKey];
-      if (portal) {
-        return new TemplatePortal(
-          portal as unknown as TemplateRef<unknown>,
-          this._viewContainerRef,
-          {$implicit: node.attrs}
-        );
-      }
-    }
-    const portalKey = (node.selector + 'TagPortal') as keyof this;
-    const portal = this[portalKey];
-    if (portal !== undefined) {
       return new TemplatePortal(
-        portal as unknown as TemplateRef<unknown>,
+        this[node.selector.split('oppia-noninteractive-')[1] + 'TagPortal'],
+        this._viewContainerRef,
+        {$implicit: node.attrs}
+      );
+    }
+    if (this[node.selector + 'TagPortal'] !== undefined) {
+      return new TemplatePortal(
+        this[node.selector + 'TagPortal'],
         this._viewContainerRef,
         {$implicit: node}
       );
     }
-    return undefined;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -798,21 +624,13 @@ export class RteOutputDisplayComponent
       // appear when rte text changes.
       const textNodes: Text[] = [];
 
-      const childNodesArray = Array.from(
-        this.elementRef.nativeElement.childNodes
-      );
-      for (const node of childNodesArray) {
+      for (const node of this.elementRef.nativeElement.childNodes) {
         if ((node as Node).nodeType === Node.TEXT_NODE) {
-          textNodes.push(node as Text);
+          textNodes.push(node);
         }
       }
 
-      textNodes.forEach(node => {
-        const parentElement = node.parentElement;
-        if (parentElement) {
-          parentElement.removeChild(node);
-        }
-      });
+      textNodes.forEach(node => node.parentElement.removeChild(node));
 
       this._updateNode();
 
