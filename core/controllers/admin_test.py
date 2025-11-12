@@ -2126,6 +2126,7 @@ class GenerateDummyChaptersTest(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
         topic = topic_domain.Topic.create_default_topic(
             'topic', 'topic_name', 'topicurl', 'description', 'fragm'
         )
@@ -2136,102 +2137,6 @@ class GenerateDummyChaptersTest(test_utils.GenericTestBase):
             'story_id', 'story_title', 'description', 'topic', 'storyurl'
         )
         story.story_contents.next_node_id = 'node_4'
-
-    def test_chapter_linkage_after_dummy_generation(self) -> None:
-        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        csrf_token = self.get_new_csrf_token()
-
-        topic = topic_domain.Topic.create_default_topic(
-            'topic', 'topic_name', 'topicurl', 'description', 'fragm'
-        )
-        topic_services.save_new_topic(
-            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), topic
-        )
-
-        story = story_domain.Story.create_default_story(
-            'story_id', 'story_title', 'description', 'topic', 'storyurl'
-        )
-        story_services.save_new_story(
-            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), story
-        )
-        topic_services.add_canonical_story(
-            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL),
-            'topic',
-            'story_id',
-        )
-
-        exp_id = exp_fetchers.get_new_exploration_id()
-        exploration = exp_domain.Exploration.create_default_exploration(
-            exp_id, 'dummy existing exp', category='Math', objective='obj'
-        )
-        exp_services.save_new_exploration(
-            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL),
-            exploration,
-        )
-        user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
-        user_actions = user_services.get_user_actions_info(user_id)
-        rights_manager.publish_exploration(user_actions, exp_id)
-
-        story_change_list = [
-            story_domain.StoryChange(
-                {
-                    'cmd': 'add_story_node',
-                    'node_id': 'node_1',
-                    'title': 'existing chapter 1',
-                }
-            ),
-            story_domain.StoryChange(
-                {
-                    'cmd': 'update_story_node_property',
-                    'property_name': story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID,
-                    'node_id': 'node_1',
-                    'new_value': exp_id,
-                    'old_value': None,
-                }
-            ),
-        ]
-
-        topic_services.update_story_and_topic_summary(
-            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL),
-            'story_id',
-            story_change_list,
-            'add existing node',
-            story.corresponding_topic_id,
-        )
-
-        story = story_fetchers.get_story_by_id('story_id')
-        story.story_contents.next_node_id = 'node_2'
-        story_services.save_new_story(
-            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), story
-        )
-
-        self.post_json(
-            '/adminhandler',
-            {
-                'action': 'generate_dummy_chapters',
-                'story_id': 'story_id',
-                'num_dummy_chapters_to_generate': 3,
-            },
-            csrf_token=csrf_token,
-        )
-
-        updated_story = story_fetchers.get_story_by_id('story_id')
-        contents = updated_story.story_contents
-
-        def node(node_id: str) -> story_domain.StoryNode:
-            idx = contents.get_node_index(node_id)
-            return contents.nodes[idx]
-
-        node_1 = node('node_1')
-        node_2 = node('node_2')
-        node_3 = node('node_3')
-        node_4 = node('node_4')
-
-        self.assertEqual(node_1.destination_node_ids, ['node_2'])
-        self.assertEqual(node_2.destination_node_ids, ['node_3'])
-        self.assertEqual(node_3.destination_node_ids, ['node_4'])
-        self.assertEqual(node_4.destination_node_ids, [])
-        self.logout()
 
         def reload_exploration(user_id: str, exploration_id: str) -> None:
             if constants.DEV_MODE:
@@ -2266,6 +2171,7 @@ class GenerateDummyChaptersTest(test_utils.GenericTestBase):
                 'story_id': 'story_id',
                 'num_dummy_chapters_to_generate': 2,
             },
+            csrf_token=csrf_token,
         )
 
         updated_story = story_fetchers.get_story_by_id('story_id')
@@ -2276,6 +2182,70 @@ class GenerateDummyChaptersTest(test_utils.GenericTestBase):
         self.assertIn('dummy chapter 5', chapter_titles)
         self.assertIn('dummy chapter 6', chapter_titles)
         self.assertNotEqual(len(story.story_contents.nodes), 3)
+        self.logout()
+
+    def test_chapter_linkage_after_dummy_generation(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        topic = topic_domain.Topic.create_default_topic(
+            'topic', 'topic_name', 'topicurl', 'description', 'fragm'
+        )
+        topic_services.save_new_topic(
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), topic
+        )
+
+        story = story_domain.Story.create_default_story(
+            'story_id', 'story_title', 'description', 'topic', 'storyurl'
+        )
+        story_services.save_new_story(
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), story
+        )
+        topic_services.add_canonical_story(
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL),
+            'topic',
+            'story_id',
+        )
+
+        story = story_fetchers.get_story_by_id('story_id')
+        self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_chapters',
+                'story_id': 'story_id',
+                'num_dummy_chapters_to_generate': 3,
+            },
+            csrf_token=csrf_token,
+        )
+
+        self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_chapters',
+                'story_id': 'story_id',
+                'num_dummy_chapters_to_generate': 2,
+            },
+            csrf_token=csrf_token,
+        )
+
+        updated_story = story_fetchers.get_story_by_id('story_id')
+        contents = updated_story.story_contents
+
+        def node(node_id: str) -> story_domain.StoryNode:
+            idx = contents.get_node_index(node_id)
+            return contents.nodes[idx]
+
+        node_1 = node('node_1')
+        node_2 = node('node_2')
+        node_3 = node('node_3')
+        node_4 = node('node_4')
+        node_5 = node('node_5')
+
+        self.assertEqual(node_1.destination_node_ids, ['node_2'])
+        self.assertEqual(node_2.destination_node_ids, ['node_3'])
+        self.assertEqual(node_3.destination_node_ids, ['node_4'])
+        self.assertEqual(node_4.destination_node_ids, ['node_5'])
+        self.assertEqual(node_5.destination_node_ids, [])
         self.logout()
 
     def test_raises_error_if_not_curriculum_admin(  # pylint: disable=line-too-long
