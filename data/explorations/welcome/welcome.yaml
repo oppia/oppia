@@ -330,8 +330,7 @@ states:
       html: <p>Hi, welcome to Oppia! <oppia-noninteractive-link text-with-value="&amp;quot;Oppia&amp;quot;"
         url-with-value="&amp;quot;https://oppia.github.io&amp;quot;"></oppia-noninteractive-link>
         is a tool that helps you create interactive learning activities that can be
-        continually improved over time.<br><br>Incidentally, do you know where the
-        name 'Oppia' comes from?<br></p>
+        continually improved over time. Incidentally, do you know where the name 'Oppia' comes from?</p>
     interaction:
       answer_groups:
       - outcome:

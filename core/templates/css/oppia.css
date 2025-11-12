@@ -208,6 +208,7 @@ why they need to be overriden.  */
   padding: 0.25rem;
 }
 
+
 .mat-button.oppia-learner-confirm-button,
 .mat-button.oppia-learner-got-it-button,
 .mat-button.oppia-learner-hint-solution-button {
@@ -1766,6 +1767,20 @@ pre.oppia-pre-wrapped-text {
   position: relative;
   text-align: left;
 }
+
+/* Fixes introduced:
+   - Fixed unwanted line break in the Welcome demo so the paragraph reads correctly:
+     “...continually improved over time. Incidentally, do you know where the name ‘Oppia’ comes from?”
+   - Added a scoped CSS rule for elements to include a small right margin (0.25em) so inline links don’t visually collide with adjacent text.
+*/
+
+/* Fix missing space between inline RTE links and adjacent text */
+.oppia-rte-viewer oppia-noninteractive-link::after,
+.oppia-rte-editor oppia-noninteractive-link::after {
+  content: " ";
+  display: inline;
+}
+
 
 /* Ensure inline links inserted by the RTE keep a visible gap after them.
    This avoids cases where custom inline elements (e.g. <oppia-noninteractive-link>)
