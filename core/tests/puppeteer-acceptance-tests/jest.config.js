@@ -30,6 +30,6 @@ module.exports = {
   bail: 0,
   transformIgnorePatterns: ['node_modules/(?!expect/)'],
   moduleNameMapper: {
-    '/^expect$/': 'expect/build/index.js',
+    '/^expect$/': 'expect/build/index.js', //making sure it's running the correct expect function
   },
 };
