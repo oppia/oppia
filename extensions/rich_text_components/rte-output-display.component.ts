@@ -198,14 +198,13 @@ export class RteOutputDisplayComponent
   traverseNodeAndWrapSpanTags(
     node: Node,
     sentenceRegex: RegExp
-  ): Node[] | HTMLElement | Text[] | Node {
+  ): Node[] | HTMLElement {
     const currentNodeName = node.nodeName;
 
     if (node.nodeType === Node.TEXT_NODE) {
       const textContent = node.textContent || '';
       const sentences = textContent.split(sentenceRegex);
       let textNodesForSentences: Text[] = [];
-
       for (let sentence of sentences) {
         textNodesForSentences.push(document.createTextNode(sentence));
       }
@@ -308,7 +307,7 @@ export class RteOutputDisplayComponent
           spanNodeList.push(spanTagElement);
         }
 
-        let nodeTemp = node.cloneNode();
+        let nodeTemp = node.cloneNode() as HTMLElement;
 
         for (let spanNode of spanNodeList) {
           // If it's a text node (used for spacing), just append it without an ID.
@@ -316,18 +315,14 @@ export class RteOutputDisplayComponent
             nodeTemp.appendChild(spanNode);
             continue;
           }
-
           let textInsideSpanTag = '';
-
           const childNodesArray = Array.from(spanNode.childNodes);
           for (let tempChildNode of childNodesArray) {
             textInsideSpanTag += this.getReadableTextFromNode(tempChildNode);
           }
-
           let elementId = `highlightBlock${this.index}`;
           (spanNode as Element).id = elementId;
           this.index++;
-
           nodeTemp.appendChild(spanNode);
           this.highlightIdToSentenceText[elementId] = textInsideSpanTag;
         }
