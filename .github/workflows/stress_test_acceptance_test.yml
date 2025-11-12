@@ -69,7 +69,7 @@ jobs:
       matrix:
         run: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
         viewport-type: ['desktop', 'mobile']
-    name: (${{ matrix.viewport-type }}) ${{ inputs.test_suite }}
+    name: "[${{ matrix.viewport-type == 'mobile' && 'Mob' || 'Desk'}}] ${{ inputs.test_suite }}"
     env:
       TEST_SUITE: ${{ inputs.test_suite }}
     steps:

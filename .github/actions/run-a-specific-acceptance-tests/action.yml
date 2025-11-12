@@ -17,11 +17,17 @@ inputs:
     required: true
     type: boolean
   modified-suite-name-for-uploads:
-    description: A unique suite name without spaces to use for the artifacts uploads. If not provided, the test data will not be uploaded.
+    description: A unique suite name without spaces and forward-slashes to use for the artifacts uploads. If not provided, the test data will not be uploaded.
 
 runs:
   using: "composite"
   steps:
+    - name: Check if modified-suite-name-for-uploads contains invalid characters.
+      run: |
+        if [[ ! "${{ inputs.modified-suite-name-for-uploads }}" =~ ^[a-zA-Z0-9_-]+$ ]]; then
+          echo "Modified suite name for uploads contains one of the invalid characters ('/', '\', '_')"
+          exit 1
+        fi
     - name: Run ${{ inputs.viewport-type == 'mobile' && 'Mobile' || 'Desktop' }} Acceptance Test ${{ inputs.test-suite }}
       id: run-acceptance-test
       shell: bash
