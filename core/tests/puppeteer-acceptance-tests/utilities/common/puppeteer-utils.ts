@@ -1063,16 +1063,16 @@ export class BaseUser {
           : path.join(testPath, dirName, 'diff-snapshots'),
       });
     } catch (error) {
-      var ErrorMessage = error.message;
+      var errorMessage = error.message;
       if (__dirname.startsWith('/home/runner')) {
-        ErrorMessage +=
+        errorMessage +=
           '\r\nDownload the artifact folder diff-snapshots from the github workflow to check the screenshot(s).';
       }
-      ErrorMessage +=
+      errorMessage +=
         '\r\nPlease update the screenshots if the UI changed. If the screenshot(s) is failing constantly with ' +
         'the same percentage, consider updating the screenshot(s).\r\nTo update the screenshots(s), delete the old screenshot(s)' +
-        ' and replace it with the screenshot(s) from the folder diff-snapshot. The new screenshot(s) should not ends "-diff".';
-      throw new Error(ErrorMessage);
+        ' and replace it with the screenshot(s) from the folder diff-snapshot. The new screenshot(s) should not end with "-diff".';
+      throw new Error(errorMessage);
     }
   }
 
