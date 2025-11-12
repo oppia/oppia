@@ -22,11 +22,12 @@ import functools
 import logging
 import time
 
+from google.cloud import datastore
+from typing import Any, Callable, TypeVar
+
 # Here we use MyPy ignore because the 'google.api_core' module is dynamically
 # loaded, and MyPy cannot normally detect the 'exceptions' attribute.
 from google.api_core import exceptions as google_api_exceptions  # type: ignore[attr-defined] # isort: skip
-from google.cloud import datastore
-from typing import Any, Callable, TypeVar
 
 CLIENT = datastore.Client()
 
