@@ -28,7 +28,6 @@ from core.domain import (
     classroom_config_services,
     collection_services,
     exp_domain,
-    exp_fetchers,
     exp_services,
     fs_services,
     opportunity_services,
