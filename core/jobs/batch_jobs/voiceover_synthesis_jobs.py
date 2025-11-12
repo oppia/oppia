@@ -105,6 +105,17 @@ class GenerateVoiceoversFn(beam.DoFn):  # type: ignore[misc]
             EntityVoiceoversModel. The generated entity voiceover models.
             str. The status string for the voiceover generation process.
         """
+        entity_id = combined_models[0]
+        data_dict = combined_models[1]
+
+        if not data_dict['exploration']:
+            logging.warning(
+                'Exploration model not found for exploration ID: %s',
+                entity_id,
+            )
+            return
+
+        logging.info('Generating voiceovers for exploration ID: %s', entity_id)
         # Here we use cast because we are narrowing down the type of
         # exploration field in combined_models to Exploration model.
         exploration_model = cast(
@@ -131,6 +142,11 @@ class GenerateVoiceoversFn(beam.DoFn):  # type: ignore[misc]
                 entity_voiceover_models=entity_voiceover_models,
                 voiceover_policy_model=autogeneration_policy_model,
             )
+        )
+
+        logging.info(
+            'Completed generating voiceovers for exploration ID: %s',
+            entity_id,
         )
 
         # Yield entity voiceovers to main output.
@@ -214,6 +230,9 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
             exploration = exp_fetchers.get_exploration_from_model(
                 exploration_model, False
             )
+            logging.info(
+                'Converted exploration model to exploration domain object.'
+            )
 
             # Converting EntityTranslationsModels to domain objects.
             for entity_translation_model in list(entity_translation_models):
@@ -222,6 +241,10 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
                         entity_translation_model
                     )
                 )
+            logging.info(
+                'Converted entity translation models to '
+                'entity translation domain objects.'
+            )
 
             # Converting EntityVoiceoversModels to domain objects.
             for entity_voiceover_model in list(entity_voiceover_models):
@@ -232,6 +255,10 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
                         entity_voiceover_model
                     )
                 )
+            logging.info(
+                'Converted entity voiceover models to '
+                'entity voiceover domain objects.'
+            )
 
             # Extracting language codes mapping from the autogeneration policy
             # model.
@@ -325,6 +352,13 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
                     'Generating voiceovers for Entityvoiceover with ID: %s.\n'
                     % entity_voiceovers_id
                 )
+                logging.info(
+                    'Generating voiceovers for Entityvoiceover with ID: %s.',
+                    entity_voiceovers_id,
+                )
+
+                number_of_content_ids = len(content_ids_to_content_values)
+                number_of_characters = 0
 
                 for (
                     content_id,
@@ -352,6 +386,8 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
                                 entity_id, voiceover_filename
                             )
 
+                        number_of_characters += len(content_html)
+
                         entity_voiceovers.add_voiceover(
                             content_id, feconf.VoiceoverType.AUTO, voiceover
                         )
@@ -362,6 +398,10 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
                         logs_during_voiceover_generation += (
                             'Generated voiceover for content_id: %s.\n'
                             % content_id
+                        )
+                        logging.info(
+                            'Generated voiceover for content_id: %s.',
+                            content_id,
                         )
                     except Exception as error:
                         logs_during_voiceover_generation += (
@@ -376,6 +416,21 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
                 entity_voiceovers.validate()
                 entity_voiceovers_id_to_domain_object[entity_voiceovers_id] = (
                     entity_voiceovers
+                )
+
+                logs_during_voiceover_generation += (
+                    'Completed voiceover generation for entity ID: %s. '
+                    'Total content IDs processed: %d. '
+                    'Total characters processed: %d.\n'
+                    % (
+                        entity_voiceovers_id,
+                        number_of_content_ids,
+                        number_of_characters,
+                    )
+                )
+                logging.info(
+                    'Completed voiceover generation for entity ID: %s.'
+                    % entity_voiceovers_id
                 )
 
         # List of EntityVoiceoversModel instances to be stored in the datastore.

@@ -465,9 +465,14 @@ class VoiceoverSynthesisJobRunTests(VoiceoverSynthesisBaseClass):
             'Generated voiceover for content_id: default_outcome_1.\n'
             'Generated voiceover for content_id: ca_placeholder_2.\n'
             'Generated voiceover for content_id: content_3.\n'
+            'Completed voiceover generation for entity ID: exploration-exploration_id_1-2-en-US. '
+            'Total content IDs processed: 4. Total characters processed: 101.\n'
             'Generating voiceovers for Entityvoiceover with ID: exploration-exploration_id_1-2-hi-IN.\n'
             'Generated voiceover for content_id: content_0.\n'
+            'Completed voiceover generation for entity ID: exploration-exploration_id_1-2-hi-IN. '
+            'Total content IDs processed: 1. Total characters processed: 41.\n'
         )
+
         expected_output_2 = (
             'Exploration ID: exploration_id_2.\n'
             'Generating voiceovers for Entityvoiceover with ID: exploration-exploration_id_2-2-en-US.\n'
@@ -475,8 +480,12 @@ class VoiceoverSynthesisJobRunTests(VoiceoverSynthesisBaseClass):
             'Generated voiceover for content_id: default_outcome_1.\n'
             'Generated voiceover for content_id: ca_placeholder_2.\n'
             'Generated voiceover for content_id: content_3.\n'
+            'Completed voiceover generation for entity ID: exploration-exploration_id_2-2-en-US. '
+            'Total content IDs processed: 4. Total characters processed: 103.\n'
             'Generating voiceovers for Entityvoiceover with ID: exploration-exploration_id_2-2-pt-BR.\n'
             'Generated voiceover for content_id: content_0.\n'
+            'Completed voiceover generation for entity ID: exploration-exploration_id_2-2-pt-BR. '
+            'Total content IDs processed: 1. Total characters processed: 53.\n'
         )
 
         expected_output = [
@@ -510,8 +519,10 @@ class VoiceoverSynthesisJobRunTests(VoiceoverSynthesisBaseClass):
             'Error for exploration_id: exploration_id_1, content_id: default_outcome_1, language_accent_code: en-US: Failed to generate voiceovers.\n'
             'Error for exploration_id: exploration_id_1, content_id: ca_placeholder_2, language_accent_code: en-US: Failed to generate voiceovers.\n'
             'Error for exploration_id: exploration_id_1, content_id: content_3, language_accent_code: en-US: Failed to generate voiceovers.\n'
+            'Completed voiceover generation for entity ID: exploration-exploration_id_1-2-en-US. Total content IDs processed: 4. Total characters processed: 0.\n'
             'Generating voiceovers for Entityvoiceover with ID: exploration-exploration_id_1-2-hi-IN.\n'
             'Error for exploration_id: exploration_id_1, content_id: content_0, language_accent_code: hi-IN: Failed to generate voiceovers.\n'
+            'Completed voiceover generation for entity ID: exploration-exploration_id_1-2-hi-IN. Total content IDs processed: 1. Total characters processed: 0.\n'
         )
         expected_output_2 = (
             'Exploration ID: exploration_id_2.\n'
@@ -520,8 +531,10 @@ class VoiceoverSynthesisJobRunTests(VoiceoverSynthesisBaseClass):
             'Error for exploration_id: exploration_id_2, content_id: default_outcome_1, language_accent_code: en-US: Failed to generate voiceovers.\n'
             'Error for exploration_id: exploration_id_2, content_id: ca_placeholder_2, language_accent_code: en-US: Failed to generate voiceovers.\n'
             'Error for exploration_id: exploration_id_2, content_id: content_3, language_accent_code: en-US: Failed to generate voiceovers.\n'
+            'Completed voiceover generation for entity ID: exploration-exploration_id_2-2-en-US. Total content IDs processed: 4. Total characters processed: 0.\n'
             'Generating voiceovers for Entityvoiceover with ID: exploration-exploration_id_2-2-pt-BR.\n'
             'Error for exploration_id: exploration_id_2, content_id: content_0, language_accent_code: pt-BR: Failed to generate voiceovers.\n'
+            'Completed voiceover generation for entity ID: exploration-exploration_id_2-2-pt-BR. Total content IDs processed: 1. Total characters processed: 0.\n'
         )
 
         with self.swap(
@@ -557,9 +570,14 @@ class VoiceoverSynthesisAuditJobRunTests(VoiceoverSynthesisBaseClass):
             'Generated voiceover for content_id: default_outcome_1.\n'
             'Generated voiceover for content_id: ca_placeholder_2.\n'
             'Generated voiceover for content_id: content_3.\n'
+            'Completed voiceover generation for entity ID: exploration-exploration_id_1-2-en-US. '
+            'Total content IDs processed: 4. Total characters processed: 101.\n'
             'Generating voiceovers for Entityvoiceover with ID: exploration-exploration_id_1-2-hi-IN.\n'
             'Generated voiceover for content_id: content_0.\n'
+            'Completed voiceover generation for entity ID: exploration-exploration_id_1-2-hi-IN. '
+            'Total content IDs processed: 1. Total characters processed: 41.\n'
         )
+
         expected_output_2 = (
             'Exploration ID: exploration_id_2.\n'
             'Generating voiceovers for Entityvoiceover with ID: exploration-exploration_id_2-2-en-US.\n'
@@ -567,8 +585,12 @@ class VoiceoverSynthesisAuditJobRunTests(VoiceoverSynthesisBaseClass):
             'Generated voiceover for content_id: default_outcome_1.\n'
             'Generated voiceover for content_id: ca_placeholder_2.\n'
             'Generated voiceover for content_id: content_3.\n'
+            'Completed voiceover generation for entity ID: exploration-exploration_id_2-2-en-US. '
+            'Total content IDs processed: 4. Total characters processed: 103.\n'
             'Generating voiceovers for Entityvoiceover with ID: exploration-exploration_id_2-2-pt-BR.\n'
             'Generated voiceover for content_id: content_0.\n'
+            'Completed voiceover generation for entity ID: exploration-exploration_id_2-2-pt-BR. '
+            'Total content IDs processed: 1. Total characters processed: 53.\n'
         )
 
         expected_output = [
