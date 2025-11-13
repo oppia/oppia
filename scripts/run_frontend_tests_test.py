@@ -238,8 +238,9 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                             '--specs_to_run='
                             'home-page.component.spec.ts,'
                             'about-page.component.ts,'
-                            'test-module.js'
-                        ])
+                            'test-module.js',
+                        ]
+                    )
         cmd = [
             common.NODE_BIN_PATH,
             '--max-old-space-size=4096',
