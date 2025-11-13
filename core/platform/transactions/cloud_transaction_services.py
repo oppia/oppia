@@ -51,6 +51,7 @@ def run_in_transaction_wrapper(
         Callable. The wrapped function.
 
     Raises:
+        ServiceUnavailable. The datastore service is temporarily unavailable.
         Exception. The exception raised by the transactional function
             if it is not a ServiceUnavailable error.
         google_api_exceptions.ServiceUnavailable. Raised if the transaction
@@ -67,9 +68,8 @@ def run_in_transaction_wrapper(
             *. The return value of the transactional function.
 
         Raises:
-            Exception: Raised if the transactional function fails after all retries.
-            google_api_exceptions.ServiceUnavailable: Raised when the
-                transaction encounters transient errors and retries are exhausted.
+            ServiceUnavailable. Transient errors occurred and retries were exhausted.
+            Exception. The transactional function failed after all retries.
         """
         # Implement exponential backoff for retries.
         for i in range(MAX_RETRIES):
