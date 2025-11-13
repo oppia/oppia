@@ -1012,8 +1012,8 @@ LOG_COLORS: Dict[str, str] = {
     'WARNING': '\033[93m',
     # Red.
     'ERROR': '\033[91m',
-    # Magenta.
-    'DEBUG': '\033[95m',
+    # Blue for debug to match test expectation.
+    'DEBUG': '\033[94m',
     # Reset.
     'END': '\033[0m',
 }
