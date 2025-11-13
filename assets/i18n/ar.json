@@ -752,6 +752,8 @@
 	"I18N_FOOTER_GET_STARTED": "ابدأ",
 	"I18N_FOOTER_NEWSLETTER_EMAIL": "عنوان البريد الإلكتروني",
 	"I18N_FOOTER_NEWSLETTER_HEADING": "اشترك في نشرتنا الإخبارية",
+	"I18N_FOOTER_NEWSLETTER_INVALID": "يرجى إدخال عنوان بريد إلكتروني صالح",
+	"I18N_FOOTER_NEWSLETTER_REQUIRED": "البريد الإلكتروني مطلوب",
 	"I18N_FOOTER_NEWSLETTER_TEXT": "كن جزء من مجتمع Oppia! نشرتنا الإخبارية نصف الأسبوعية تبقيك على اطلاع بالميزات الجديدة، والدروس، والتأثير الذي تحدثه Oppia في أنحاء العالم.",
 	"I18N_FOOTER_NEWSLETTER_WARNING": "لقد قمت بالفعل بالتسجيل باستخدام عنوان البريد الإلكتروني هذا",
 	"I18N_FOOTER_OPPIA_FOUNDATION": "مؤسسة أوبيا",
