@@ -40,7 +40,7 @@ from core import feconf
 from scripts import servers
 
 import certifi
-from typing import Callable, Dict, Final, Generator, List, Optional, TextIO, Tuple, Union, cast
+from typing import Dict, Final, Generator, List, Optional, TextIO, Tuple, Union
 
 # Add third_party to path. Some scripts access feconf even before
 # python_libs is added to path.
@@ -1001,20 +1001,21 @@ class LogType(enum.Enum):
     DEBUG = 'DEBUG'
 
 
-# Static color mapping
+# Static color mapping.
+# Each color corresponds to a log type for improved CI readability.
 LOG_COLORS: Dict[str, str] = {
-    # Blue
-    'INFO': '\033[94m', 
-     # Green    
-    'SUCCESS': '\033[92m', 
-    # Yellow
-    'WARNING': '\033[93m', 
-    # Red 
+    # Blue.
+    'INFO': '\033[94m',
+    # Green.
+    'SUCCESS': '\033[92m',
+    # Yellow.
+    'WARNING': '\033[93m',
+    # Red.
     'ERROR': '\033[91m',
-     # Magenta   
+    # Magenta.
     'DEBUG': '\033[95m',
-    # Reset   
-    'END': '\033[0m',       
+    # Reset.
+    'END': '\033[0m',
 }
 
 
@@ -1087,6 +1088,7 @@ def _color_warning(  # pylint: disable=unused-argument
         f'{LOG_COLORS["WARNING"]}{category.__name__}: {message}{LOG_COLORS["END"]}\n'
     )
 
+
 warnings.showwarning = _color_warning
 
 _original_stderr_write = sys.stderr.write
@@ -1112,4 +1114,9 @@ def _colorize_stderr_write(text: str) -> int:
     return _original_stderr_write(text)
 
 
-setattr(sys.stderr, 'write', cast(Callable[[str], int], _colorize_stderr_write))
+def install_colorized_stderr() -> None:
+    """Replace sys.stderr.write with the colorized version safely."""
+    setattr(sys.stderr, 'write', _colorize_stderr_write)
+
+
+install_colorized_stderr()
