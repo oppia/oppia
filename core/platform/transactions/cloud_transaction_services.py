@@ -91,7 +91,7 @@ def run_in_transaction_wrapper(
                 time.sleep(INITIAL_RETRY_DELAY_SECS * (2**i))
             except Exception as e:
                 raise e
-        # after
+
         raise Exception('Transaction failed after %s retries.' % MAX_RETRIES)
 
     return wrapper
