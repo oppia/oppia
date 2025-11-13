@@ -185,4 +185,3 @@ def main(args: Optional[List[str]] = None) -> None:
 
 if __name__ == '__main__':  # pragma: no cover
     main()
-    

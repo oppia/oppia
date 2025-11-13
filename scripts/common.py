@@ -40,7 +40,7 @@ from core import feconf
 from scripts import servers
 
 import certifi
-from typing import Dict, Final, Generator, List, Optional, TextIO, Tuple, Union, Callable, cast
+from typing import Callable, Dict, Final, Generator, List, Optional, TextIO, Tuple, Union, cast
 
 # Add third_party to path. Some scripts access feconf even before
 # python_libs is added to path.
@@ -1001,14 +1001,20 @@ class LogType(enum.Enum):
     DEBUG = 'DEBUG'
 
 
-# Static color mapping (no dynamic assignment to enum)
+# Static color mapping
 LOG_COLORS: Dict[str, str] = {
-    'INFO': '\033[94m',     # Blue
-    'SUCCESS': '\033[92m',  # Green
-    'WARNING': '\033[93m',  # Yellow
-    'ERROR': '\033[91m',    # Red
-    'DEBUG': '\033[95m',    # Magenta
-    'END': '\033[0m',       # Reset
+    # Blue
+    'INFO': '\033[94m', 
+     # Green    
+    'SUCCESS': '\033[92m', 
+    # Yellow
+    'WARNING': '\033[93m', 
+    # Red 
+    'ERROR': '\033[91m',
+     # Magenta   
+    'DEBUG': '\033[95m',
+    # Reset   
+    'END': '\033[0m',       
 }
 
 
@@ -1106,4 +1112,4 @@ def _colorize_stderr_write(text: str) -> int:
     return _original_stderr_write(text)
 
 
-setattr(sys.stderr, "write", cast(Callable[[str], int], _colorize_stderr_write))
+setattr(sys.stderr, 'write', cast(Callable[[str], int], _colorize_stderr_write))
