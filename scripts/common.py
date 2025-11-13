@@ -40,7 +40,7 @@ from core import feconf
 from scripts import servers
 
 import certifi
-from typing import Dict, Final, Generator, List, Optional, TextIO, Tuple, Union
+from typing import Dict, Final, Generator, List, Optional, TextIO, Tuple, Union, Callable, cast
 
 # Add third_party to path. Some scripts access feconf even before
 # python_libs is added to path.
@@ -1001,39 +1001,22 @@ class LogType(enum.Enum):
     DEBUG = 'DEBUG'
 
 
-class COLOR:
-    """ANSI color codes used for terminal log colorization."""
-
-    # Blue color for informational messages.
-    INFO = '\033[94m'
-
-    # Green color for success messages.
-    SUCCESS = '\033[92m'
-
-    # Yellow color for warnings.
-    WARNING = '\033[93m'
-
-    # Red color for errors.
-    ERROR = '\033[91m'
-
-    # Reset color.
-    END = '\033[0m'
-
-
-# Here we use MyPy ignore because COLOR is added dynamically to LogType at runtime.
-LogType.COLOR = COLOR  # type: ignore[attr-defined]
+# Static color mapping (no dynamic assignment to enum)
+LOG_COLORS: Dict[str, str] = {
+    'INFO': '\033[94m',     # Blue
+    'SUCCESS': '\033[92m',  # Green
+    'WARNING': '\033[93m',  # Yellow
+    'ERROR': '\033[91m',    # Red
+    'DEBUG': '\033[95m',    # Magenta
+    'END': '\033[0m',       # Reset
+}
 
 
 def log_to_terminal(
     message: str,
     message_type: Optional[LogType] = None
 ) -> None:
-    """Logs a message to the terminal with color formatting.
-
-    If no message_type is provided, it is inferred from the
-    message text. Supported types: ERROR, WARNING, SUCCESS,
-    DEBUG, and INFO.
-    """
+    """Logs a message to the terminal with color formatting."""
     if not isinstance(message_type, LogType):
         lower_msg = message.lower()
         if 'error' in lower_msg:
@@ -1046,14 +1029,9 @@ def log_to_terminal(
             message_type = LogType.DEBUG
         else:
             message_type = LogType.INFO
-    # Here we use MyPy ignore because LogType.COLOR is dynamically attached to the enum.
-    color = getattr(
-        LogType.COLOR, message_type.name, LogType.COLOR.INFO  # type: ignore[attr-defined]
-    )
 
-    # Here we use MyPy ignore because LogType.COLOR is dynamically attached to the enum.
-    end_color = LogType.COLOR.END  # type: ignore[attr-defined]
-
+    color = LOG_COLORS.get(message_type.name, LOG_COLORS['INFO'])
+    end_color = LOG_COLORS['END']
     write_stdout_safe(f'{color}{message}{end_color}\n')
 
 
@@ -1067,9 +1045,8 @@ def print_colored_traceback() -> None:
     traceback_text = ''.join(
         traceback.format_exception(exc_type, exc_value, exc_tb)
     )
-    # Here we use MyPy ignore because LogType.COLOR is dynamically attached to the enum.
     write_stdout_safe(
-        f'{LogType.COLOR.ERROR}{traceback_text}{LogType.COLOR.END}'  # type: ignore[attr-defined]
+        f'{LOG_COLORS["ERROR"]}{traceback_text}{LOG_COLORS["END"]}'
     )
 
 
@@ -1083,9 +1060,8 @@ def _color_excepthook(
     traceback_text = ''.join(
         traceback.format_exception(exc_type, exc_value, exc_tb)
     )
-    # Here we use MyPy ignore because LogType.COLOR is dynamically attached to the enum.
     sys.stderr.write(
-        f'{LogType.COLOR.ERROR}{traceback_text}{LogType.COLOR.END}\n'  # type: ignore[attr-defined]
+        f'{LOG_COLORS["ERROR"]}{traceback_text}{LOG_COLORS["END"]}\n'
     )
 
 
@@ -1093,7 +1069,7 @@ sys.excepthook = _color_excepthook
 
 
 def _color_warning(  # pylint: disable=unused-argument
-    message: str,
+    message: Union[Warning, str],
     category: type[Warning],
     filename: str,
     lineno: int,
@@ -1101,15 +1077,11 @@ def _color_warning(  # pylint: disable=unused-argument
     line: Optional[str] = None
 ) -> None:
     """Prints warnings in yellow color for better visibility."""
-    # Here we use MyPy ignore because LogType.COLOR is dynamically attached to the enum at runtime.
     sys.stderr.write(
-        f'{LogType.COLOR.WARNING}{category.__name__}: {message}{LogType.COLOR.END}\n'  # type: ignore[attr-defined]
+        f'{LOG_COLORS["WARNING"]}{category.__name__}: {message}{LOG_COLORS["END"]}\n'
     )
 
-
-# Here we use MyPy ignore because warnings.showwarning is dynamically replaced with a custom function at runtime.
-warnings.showwarning = _color_warning  # type: ignore[assignment]
-
+warnings.showwarning = _color_warning
 
 _original_stderr_write = sys.stderr.write
 
@@ -1118,28 +1090,20 @@ def _colorize_stderr_write(text: str) -> int:
     """Intercepts text written to stderr and colorizes Oppia test output."""
     if isinstance(text, str):
         lower_text = text.lower()
-
-        # Red for errors, failed, exceptions, etc.
         if (
             text.startswith('ERROR:')
             or text.startswith('FAIL:')
             or 'exception' in lower_text
             or 'failed' in lower_text
         ):
-            # Here we use MyPy ignore because LogType.COLOR is dynamically attached to the enum.
-            text = f'{LogType.COLOR.ERROR}{text}{LogType.COLOR.END}'  # type: ignore[attr-defined]
-
-        # Green for success, OK, etc.
+            text = f'{LOG_COLORS["ERROR"]}{text}{LOG_COLORS["END"]}'
         elif (
             text.startswith('SUCCESS')
             or text.strip() == 'OK'
             or 'success' in lower_text
         ):
-            # Here we use MyPy ignore because LogType.COLOR is dynamically attached to the enum.
-            text = f'{LogType.COLOR.SUCCESS}{text}{LogType.COLOR.END}'  # type: ignore[attr-defined]
-
+            text = f'{LOG_COLORS["SUCCESS"]}{text}{LOG_COLORS["END"]}'
     return _original_stderr_write(text)
 
 
-# Here we use MyPy ignore because stderr.write is being overridden dynamically to colorize output.
-sys.stderr.write = _colorize_stderr_write  # type: ignore[assignment]
+setattr(sys.stderr, "write", cast(Callable[[str], int], _colorize_stderr_write))
