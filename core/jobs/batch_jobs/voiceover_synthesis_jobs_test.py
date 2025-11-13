@@ -556,8 +556,8 @@ class VoiceoverSynthesisJobRunTests(VoiceoverSynthesisBaseClass):
 
 class VoiceoverSynthesisAuditJobRunTests(VoiceoverSynthesisBaseClass):
 
-    JOB_CLASS: Type[voiceover_synthesis_jobs.VoiceoverSynthesisJobAuditJob] = (
-        voiceover_synthesis_jobs.VoiceoverSynthesisJobAuditJob
+    JOB_CLASS: Type[voiceover_synthesis_jobs.VoiceoverSynthesisAuditJob] = (
+        voiceover_synthesis_jobs.VoiceoverSynthesisAuditJob
     )
 
     def test_should_regenerate_voiceover_successfully(self) -> None:

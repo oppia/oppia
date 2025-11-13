@@ -106,14 +106,6 @@ class GenerateVoiceoversFn(beam.DoFn):  # type: ignore[misc]
             str. The status string for the voiceover generation process.
         """
         entity_id = combined_models[0]
-        data_dict = combined_models[1]
-
-        if not data_dict['exploration']:
-            logging.warning(
-                'Exploration model not found for exploration ID: %s',
-                entity_id,
-            )
-            return
 
         logging.info('Generating voiceovers for exploration ID: %s', entity_id)
         # Here we use cast because we are narrowing down the type of
@@ -499,6 +491,12 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
             >> ndb_io.GetModels(
                 translation_models.EntityTranslationsModel.get_all()
             )
+            | 'Filter out entity translations for curated explorations'
+            >> beam.Filter(
+                lambda model: self.is_exploration_curated(
+                    exploration_id=model.entity_id
+                )
+            )
         )
 
         entity_voiceovers_models = (
@@ -506,6 +504,12 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
             | 'Get all entity voiceover models'
             >> ndb_io.GetModels(
                 voiceover_models.EntityVoiceoversModel.get_all()
+            )
+            | 'Filter out entity voiceovers for curated explorations'
+            >> beam.Filter(
+                lambda model: self.is_exploration_curated(
+                    exploration_id=model.entity_id
+                )
             )
         )
 
@@ -564,7 +568,7 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
         )
 
 
-class VoiceoverSynthesisJobAuditJob(VoiceoverSynthesisJob):
+class VoiceoverSynthesisAuditJob(VoiceoverSynthesisJob):
     """Audit job for VoiceoverSynthesisJob."""
 
     DATASTORE_UPDATES_ALLOWED = False
