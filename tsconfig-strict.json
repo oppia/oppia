@@ -55,6 +55,9 @@
       "pages/*": [
         "core/templates/pages/*"
       ],
+      "rich_text_components/*": [
+        "extensions/rich_text_components/*"
+      ],
       "services/*": [
         "core/templates/services/*"
       ],

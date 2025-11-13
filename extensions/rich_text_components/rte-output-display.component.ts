@@ -515,11 +515,14 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   }
 
   removePreviousHighlightedElement(): void {
-    let previousHighlightedElement = document.getElementById(
-      this.previousHighlightedElementId
-    );
-    if (previousHighlightedElement) {
-      previousHighlightedElement.style.backgroundColor = '';
+    const previousHighlightedElementId = this.previousHighlightedElementId;
+    if (previousHighlightedElementId) {
+      const previousHighlightedElement = document.getElementById(
+        previousHighlightedElementId
+      );
+      if (previousHighlightedElement) {
+        previousHighlightedElement.style.backgroundColor = '';
+      }
     }
     this.previousHighlightedElementId = undefined;
   }
