@@ -128,11 +128,6 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     return this.translationTabActiveModeService.isVoiceoverModeActive();
   }
 
-  isVoiceoverContributionEnabled(): boolean {
-    return this.platformFeatureService.status.EnableVoiceoverContribution
-      .isEnabled;
-  }
-
   getRequiredHtml(subtitledHtml: SubtitledHtml): string {
     if (this.translationTabActiveModeService.isTranslationModeActive()) {
       return subtitledHtml.html;

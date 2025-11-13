@@ -110,6 +110,13 @@ oppia-exploration-summary-tile .exploration-summary-btn span {
   font-size: 16px;
 }
 
+oppia-exploration-summary-tile .oppia-exploration-dashboard-card .layout-row {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  max-width: 100%;
+}
 @media (max-width: 480px) {
   oppia-exploration-summary-tile .exploration-summary-btn {
     font-size: 13px;
@@ -123,4 +130,5 @@ oppia-exploration-summary-tile .exploration-summary-btn span {
   oppia-exploration-summary-tile .exploration-summary-btn span {
     font-size: 13px;
   }
+
 }
