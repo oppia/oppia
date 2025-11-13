@@ -68,9 +68,10 @@ def run_in_transaction_wrapper(
 
         Raises:
             Exception. The exception raised by the transactional function
-                if it is not a ServiceUnavailable error.
-            google_api_exceptions.ServiceUnavailable. Raised if the transaction
-                fails due to a transient error after all retries are exhausted.
+                after all retries are exhausted.
+            google_api_exceptions.ServiceUnavailable. Raised when the
+                transaction encounters transient errors and retries are
+                exhausted.
         """
         # Implement exponential backoff for retries.
         for i in range(MAX_RETRIES):
