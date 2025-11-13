@@ -40,7 +40,7 @@ INITIAL_RETRY_DELAY_SECS = 1.0
 
 
 def run_in_transaction_wrapper(
-    transactional_fn: Callable[..., T]
+    transactional_fn: Callable[..., T],
 ) -> Callable[..., T]:
     """Wrapper for transactional functions that retries on transient errors.
 
@@ -49,7 +49,7 @@ def run_in_transaction_wrapper(
 
     Returns:
         Callable. The wrapped function.
-    
+
     Raises:
         Exception. The exception raised by the transactional function
             if it is not a ServiceUnavailable error.
@@ -88,12 +88,10 @@ def run_in_transaction_wrapper(
                     raise e
 
                 # Wait before the next retry, with exponential backoff.
-                time.sleep(INITIAL_RETRY_DELAY_SECS * (2 ** i))
+                time.sleep(INITIAL_RETRY_DELAY_SECS * (2**i))
             except Exception as e:
                 raise e
 
-        raise Exception(
-            'Transaction failed after %s retries.' % MAX_RETRIES
-        )
+        raise Exception('Transaction failed after %s retries.' % MAX_RETRIES)
 
     return wrapper
