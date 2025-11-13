@@ -1,7 +1,32 @@
-FROM node:16.13.0-slim AS frontend
+# FROM node:16.13.0-slim AS frontend
+
+# WORKDIR /app/oppia
+
+# RUN apt-get update -y && apt-get install -y \
+#     chromium \
+#     curl \
+#     git \
+#     ca-certificates && \
+#     apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# # Installing packages from the package.json file.
+# COPY package.json .
+# COPY scripts/linters/custom_eslint_checks ./scripts/linters/custom_eslint_checks
+
+# COPY yarn.lock .
+# RUN npm install -g yarn@1.22.15 --force
+# RUN yarn install --pure-lockfile
+
+# # Clean up temporary files
+# RUN rm -rf /tmp/* /var/tmp/*
+
+
+
+FROM node:16-bullseye-slim AS frontend
 
 WORKDIR /app/oppia
 
+# install OS dependencies
 RUN apt-get update -y && apt-get install -y \
     chromium \
     curl \
@@ -9,13 +34,17 @@ RUN apt-get update -y && apt-get install -y \
     ca-certificates && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Installing packages from the package.json file.
+# copy manifests early for dependency install
 COPY package.json .
 COPY scripts/linters/custom_eslint_checks ./scripts/linters/custom_eslint_checks
-
 COPY yarn.lock .
+
+# install yarn (no legacy flag yet)
 RUN npm install -g yarn@1.22.15 --force
 RUN yarn install --pure-lockfile
 
-# Clean up temporary files
+# only enable legacy provider for runtime/build stage
+ENV NODE_OPTIONS="--openssl-legacy-provider"
+
+# clean up temporary files
 RUN rm -rf /tmp/* /var/tmp/*

@@ -56,40 +56,40 @@ type PortalTree = (TemplatePortal<unknown> | PortalTree)[];
 })
 export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   // Native HTML elements.
-  @ViewChild('p') pTagPortal: TemplateRef<unknown>;
-  @ViewChild('h1') h1TagPortal: TemplateRef<unknown>;
-  @ViewChild('span') spanTagPortal: TemplateRef<unknown>;
-  @ViewChild('ol') olTagPortal: TemplateRef<unknown>;
-  @ViewChild('li') liTagPortal: TemplateRef<unknown>;
-  @ViewChild('ul') ulTagPortal: TemplateRef<unknown>;
-  @ViewChild('pre') preTagPortal: TemplateRef<unknown>;
-  @ViewChild('strong') strongTagPortal: TemplateRef<unknown>;
-  @ViewChild('blockquote') blockquoteTagPortal: TemplateRef<unknown>;
-  @ViewChild('em') emTagPortal: TemplateRef<unknown>;
-  @ViewChild('text') textTagPortal: TemplateRef<unknown>;
+  @ViewChild('p') pTagPortal!: TemplateRef<unknown>;
+  @ViewChild('h1') h1TagPortal!: TemplateRef<unknown>;
+  @ViewChild('span') spanTagPortal!: TemplateRef<unknown>;
+  @ViewChild('ol') olTagPortal!: TemplateRef<unknown>;
+  @ViewChild('li') liTagPortal!: TemplateRef<unknown>;
+  @ViewChild('ul') ulTagPortal!: TemplateRef<unknown>;
+  @ViewChild('pre') preTagPortal!: TemplateRef<unknown>;
+  @ViewChild('strong') strongTagPortal!: TemplateRef<unknown>;
+  @ViewChild('blockquote') blockquoteTagPortal!: TemplateRef<unknown>;
+  @ViewChild('em') emTagPortal!: TemplateRef<unknown>;
+  @ViewChild('text') textTagPortal!: TemplateRef<unknown>;
   // Oppia Non interactive.
-  @ViewChild('collapsible') collapsibleTagPortal: TemplateRef<unknown>;
-  @ViewChild('image') imageTagPortal: TemplateRef<unknown>;
-  @ViewChild('link') linkTagPortal: TemplateRef<unknown>;
-  @ViewChild('math') mathTagPortal: TemplateRef<unknown>;
-  @ViewChild('skillreview') skillreviewTagPortal: TemplateRef<unknown>;
-  @ViewChild('svgdiagram') svgdiagramTagPortal: TemplateRef<unknown>;
-  @ViewChild('tabs') tabsTagPortal: TemplateRef<unknown>;
-  @ViewChild('video') videoTagPortal: TemplateRef<unknown>;
-  @ViewChild('workedexample') workedexampleTagPortal: TemplateRef<unknown>;
-  @Input() rteString: string;
+  @ViewChild('collapsible') collapsibleTagPortal!: TemplateRef<unknown>;
+  @ViewChild('image') imageTagPortal!: TemplateRef<unknown>;
+  @ViewChild('link') linkTagPortal!: TemplateRef<unknown>;
+  @ViewChild('math') mathTagPortal!: TemplateRef<unknown>;
+  @ViewChild('skillreview') skillreviewTagPortal!: TemplateRef<unknown>;
+  @ViewChild('svgdiagram') svgdiagramTagPortal!: TemplateRef<unknown>;
+  @ViewChild('tabs') tabsTagPortal!: TemplateRef<unknown>;
+  @ViewChild('video') videoTagPortal!: TemplateRef<unknown>;
+  @ViewChild('workedexample') workedexampleTagPortal!: TemplateRef<unknown>;
+  @Input() rteString: string | null = null;
   @Input() altTextIsDisplayed: boolean = false;
   node: OppiaRteNode | string = '';
   show = false;
   portalTree: PortalTree = [];
 
-  highlightIdToSentenceText = {};
+  highlightIdToSentenceText: Record<string, string> = {};
   wrapped = false;
-  previousHighlightedElementId!: string | undefined;
+  previousHighlightedElementId: string | undefined;
   // The background color of the sentence being played in the audio player.
   backgroundColorOfHighlightedSentence = '#f3d140';
 
-  customOppiaTags = [
+  customOppiaTags: readonly string[] = [
     'OPPIA-NONINTERACTIVE-COLLAPSIBLE',
     'OPPIA-NONINTERACTIVE-IMAGE',
     'OPPIA-NONINTERACTIVE-LINK',
@@ -106,7 +106,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   // Parent tags eligible for voiceover highlighting. Text within these tags
   // is split into sentences and wrapped in span tags. Tags like i, strong, etc.,
   // do not require special handling.
-  acceptedTagsForVoiceoverHighlighting = ['P', 'LI'];
+  acceptedTagsForVoiceoverHighlighting: readonly string[] = ['P', 'LI'];
 
   constructor(
     private _viewContainerRef: ViewContainerRef,
@@ -124,7 +124,10 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   ) {}
 
   // The function decodes the HTML escape characters in the string.
-  decodeHtmlEntities(str: string): string {
+  decodeHtmlEntities(str: string | null | undefined): string {
+    if (!str) {
+      return '';
+    }
     const textarea = document.createElement('textarea');
     // eslint-disable-next-line oppia/no-inner-html
     textarea.innerHTML = str;
@@ -136,7 +139,10 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   It replaces LaTeX commands with their corresponding symbols or
   representations. For example, it converts \frac{a}{b} to a/b.
   */
-  parseAndConvertLatex(latexExpr: string): string {
+  parseAndConvertLatex(latexExpr: string | null | undefined): string {
+    if (!latexExpr) {
+      return '';
+    }
     const readable = latexExpr
       .replace(/\\frac{(.+?)}{(.+?)}/g, '$1/$2')
       .replace(/\\times/g, '×')
@@ -150,28 +156,43 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   }
 
   // The method returns the readable text from the node.
-  getReadableTextFromNode(node: Node): string {
+  getReadableTextFromNode(node: Node | null): string {
+    if (!node) {
+      return '';
+    }
     if (
       node.nodeType === Node.TEXT_NODE ||
       node.nodeName === 'STRONG' ||
       node.nodeName === 'EM'
     ) {
-      return node.textContent || '';
+      return node.textContent ?? '';
     } else if (
       node.nodeName === 'OPPIA-NONINTERACTIVE-SKILLREVIEW' ||
       node.nodeName === 'OPPIA-NONINTERACTIVE-LINK'
     ) {
       const encodedText = (node as Element).getAttribute('text-with-value');
       const decodedText = this.decodeHtmlEntities(encodedText);
-      return JSON.parse(decodedText);
+
+      try {
+        return decodedText ? JSON.parse(decodedText) : '';
+      } catch (error) {
+        return '';
+      }
     } else if (node.nodeName === 'OPPIA-NONINTERACTIVE-MATH') {
       const encodedMathContent = (node as Element).getAttribute(
         'math_content-with-value'
       );
       const decodedMathContent = this.decodeHtmlEntities(encodedMathContent);
-      const latexText = JSON.parse(decodedMathContent)?.raw_latex;
-      return this.parseAndConvertLatex(latexText);
+
+      try {
+        const latexText = JSON.parse(decodedMathContent || '{}')?.raw_latex;
+        return this.parseAndConvertLatex(latexText);
+      } catch (error) {
+        return '';
+      }
     }
+
+    return '';
   }
 
   // The method recursively traverses the node and wraps span tags around
@@ -179,121 +200,119 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   traverseNodeAndWrapSpanTags(
     node: Node,
     sentenceRegex: RegExp
-  ): Node[] | HTMLElement | Text[] | Node {
+  ): Node | Node[] {
     const currentNodeName = node.nodeName;
 
     if (node.nodeType === Node.TEXT_NODE) {
-      const textContent = node.textContent || '';
+      const textContent = node.textContent ?? '';
       const sentences = textContent.split(sentenceRegex);
-      let textNodesForSentences: Text[] = [];
+      return sentences.map(sentence => document.createTextNode(sentence));
+    }
 
-      for (let sentence of sentences) {
-        textNodesForSentences.push(document.createTextNode(sentence));
+    let updatedChildNodes: Node[] = [];
+
+    Array.from(node.childNodes).forEach(childNode => {
+      const processedChild = this.traverseNodeAndWrapSpanTags(
+        childNode,
+        sentenceRegex
+      );
+
+      if (Array.isArray(processedChild)) {
+        updatedChildNodes = updatedChildNodes.concat(processedChild);
+      } else {
+        updatedChildNodes.push(processedChild);
       }
-      return textNodesForSentences;
-    } else {
-      let updatedChildNodes: Node[] = [];
+    });
 
-      node.childNodes.forEach(childNode => {
-        updatedChildNodes = updatedChildNodes.concat(
-          this.traverseNodeAndWrapSpanTags(childNode, sentenceRegex)
-        );
+    if (node.nodeName === 'DIV') {
+      const wrapper = document.createElement('div');
+      updatedChildNodes.forEach(child => {
+        wrapper.appendChild(child);
+      });
+      return wrapper;
+    }
+
+    if (!this.acceptedTagsForVoiceoverHighlighting.includes(currentNodeName)) {
+      if (this.customOppiaTags.includes(currentNodeName)) {
+        return [node];
+      }
+
+      const currentElementReplicaNodes: HTMLElement[] = [];
+      updatedChildNodes.forEach(child => {
+        const tempElementNode = document.createElement(currentNodeName);
+        tempElementNode.appendChild(child);
+        currentElementReplicaNodes.push(tempElementNode);
+      });
+      return currentElementReplicaNodes;
+    }
+
+    let textContent = '';
+    updatedChildNodes.forEach(tempChildNode => {
+      textContent += `${this.getReadableTextFromNode(tempChildNode)} `;
+    });
+
+    const sentencesInEarliestParentTag = textContent
+      .split(sentenceRegex)
+      .filter(sentence => sentence !== '');
+
+    let currentSentenceToMatch = sentencesInEarliestParentTag.shift() ?? '';
+
+    const spanNodeList: HTMLElement[] = [];
+    let spanTagElement = document.createElement('span');
+    let nextSentenceOffset = '';
+
+    updatedChildNodes.forEach(childNode => {
+      const currentText = this.getReadableTextFromNode(childNode);
+      let sentence = (nextSentenceOffset + currentText)
+        .split(' ')
+        .join('')
+        .trim();
+      const currentSentenceNormalized = currentSentenceToMatch
+        .split(' ')
+        .join('')
+        .trim();
+
+      spanTagElement.appendChild(childNode);
+
+      if (sentence === currentSentenceNormalized) {
+        if (spanNodeList.length > 0) {
+          const spaceElement = document.createElement('span');
+          // eslint-disable-next-line oppia/no-inner-html
+          spaceElement.innerHTML = ' ';
+          spanNodeList.push(spaceElement);
+        }
+        spanNodeList.push(spanTagElement);
+        spanTagElement = document.createElement('span');
+        nextSentenceOffset = '';
+        currentSentenceToMatch = sentencesInEarliestParentTag.shift() ?? '';
+      } else {
+        nextSentenceOffset += currentText;
+      }
+    });
+
+    const nodeTemp = node.cloneNode(false) as HTMLElement;
+
+    spanNodeList.forEach(spanNode => {
+      let textInsideSpanTag = '';
+
+      Array.from(spanNode.childNodes).forEach(tempChildNode => {
+        textInsideSpanTag += this.getReadableTextFromNode(tempChildNode);
       });
 
-      if (node.nodeName === 'DIV') {
-        let wrapper = document.createElement('div');
-        updatedChildNodes.forEach(child => {
-          wrapper.appendChild(child);
-        });
-        return wrapper;
+      if (textInsideSpanTag === ' ') {
+        nodeTemp.appendChild(spanNode);
+        return;
       }
 
-      if (
-        !this.acceptedTagsForVoiceoverHighlighting.includes(currentNodeName)
-      ) {
-        // No changes are required for custom Oppia tags.
-        if (this.customOppiaTags.includes(currentNodeName)) {
-          return [node];
-        }
+      const elementId = `highlightBlock${this.index}`;
+      spanNode.id = elementId;
+      this.index++;
 
-        let currentElementReplicaNodes = [];
-        updatedChildNodes.forEach(child => {
-          let tempElementNode = document.createElement(currentNodeName);
-          tempElementNode.appendChild(child);
-          currentElementReplicaNodes.push(tempElementNode);
-        });
-        return currentElementReplicaNodes;
-      } else {
-        // The earliest parent tag that contains texts that should be voiceovered.
-        let textContent = '';
+      nodeTemp.appendChild(spanNode);
+      this.highlightIdToSentenceText[elementId] = textInsideSpanTag;
+    });
 
-        for (let tempChildNode of updatedChildNodes) {
-          textContent += this.getReadableTextFromNode(tempChildNode) + ' ';
-        }
-
-        const sentencesInEarliestParentTag = textContent.split(sentenceRegex);
-
-        let currentSentenceToMatch = sentencesInEarliestParentTag.shift();
-
-        let spanNodeList = [];
-        let spanTagElement = document.createElement('span');
-        let nextSentenceOffset = '';
-
-        for (let childNode of updatedChildNodes) {
-          let currentText = this.getReadableTextFromNode(childNode);
-
-          let sentence = nextSentenceOffset + currentText;
-
-          // Removing spaces to avoid ambiguity in sentence matching.
-          sentence = sentence.split(' ').join('').trim();
-          currentSentenceToMatch = currentSentenceToMatch
-            ?.split(' ')
-            ?.join('')
-            ?.trim();
-
-          spanTagElement.appendChild(childNode);
-
-          if (sentence === currentSentenceToMatch) {
-            if (spanNodeList.length > 0) {
-              let spaceElement = document.createElement('span');
-              // eslint-disable-next-line oppia/no-inner-html
-              spaceElement.innerHTML = ' ';
-              spanNodeList.push(spaceElement);
-            }
-            spanNodeList.push(spanTagElement);
-            spanTagElement = document.createElement('span');
-            nextSentenceOffset = '';
-            currentSentenceToMatch = sentencesInEarliestParentTag.shift();
-          } else {
-            nextSentenceOffset += currentText;
-          }
-        }
-
-        let nodeTemp = node.cloneNode();
-
-        for (let spanNode of spanNodeList) {
-          let textInsideSpanTag = '';
-
-          for (let tempChildNode of spanNode.childNodes) {
-            textInsideSpanTag += this.getReadableTextFromNode(tempChildNode);
-          }
-
-          if (textInsideSpanTag === ' ') {
-            nodeTemp.appendChild(spanNode);
-            continue;
-          }
-
-          let elementId = `highlightBlock${this.index}`;
-          spanNode.id = elementId;
-          this.index++;
-
-          nodeTemp.appendChild(spanNode);
-          this.highlightIdToSentenceText[elementId] = textInsideSpanTag;
-        }
-
-        return nodeTemp;
-      }
-    }
+    return nodeTemp;
   }
 
   /**
@@ -310,17 +329,26 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     this.highlightIdToSentenceText = {};
     this.previousHighlightedElementId = undefined;
 
-    let languageCode =
-      this.localStorageService.getLastSelectedTranslationLanguageCode() ||
+    const languageCode =
+      this.localStorageService.getLastSelectedTranslationLanguageCode() ??
       AppConstants.DEFAULT_LANGUAGE_CODE;
 
     // Sentences in the lesson content are separated using punctuation marks
     // specific to the language.
     // The following line retrieves the punctuation marks for the current language.
+    const punctuationMap =
+      AppConstants.LANGUAGE_CODE_TO_SENTENCE_ENDING_PUNCTUATION_MARKS as Record<
+        string,
+        string
+      >;
+
     const punctuationsForCurrentLanguage =
-      AppConstants.LANGUAGE_CODE_TO_SENTENCE_ENDING_PUNCTUATION_MARKS[
-        languageCode
-      ];
+      punctuationMap[languageCode] ??
+      punctuationMap[AppConstants.DEFAULT_LANGUAGE_CODE];
+
+    if (!punctuationsForCurrentLanguage) {
+      return htmlString;
+    }
 
     // The regex below is used to split sentences from the lesson content.
     const sentenceRegex = new RegExp(
@@ -333,10 +361,18 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     // eslint-disable-next-line oppia/no-inner-html
     temporaryDivElement.innerHTML = htmlString;
 
-    const finalDivElement = this.traverseNodeAndWrapSpanTags(
+    const traversalResult = this.traverseNodeAndWrapSpanTags(
       temporaryDivElement,
       sentenceRegex
-    ) as HTMLDivElement;
+    );
+
+    const finalDivElement = Array.isArray(traversalResult)
+      ? (() => {
+          const container = document.createElement('div');
+          traversalResult.forEach(child => container.appendChild(child));
+          return container;
+        })()
+      : (traversalResult as HTMLDivElement);
     // eslint-disable-next-line oppia/no-inner-html
     return finalDivElement.innerHTML;
   }
@@ -406,8 +442,10 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
               continue;
             }
             if (preNode.childNodes[i].nodeType === 3) {
-              if (preNode.childNodes[i].nodeValue.replace(/\s/g, '') === '') {
-                preNode.removeChild(preNode.childNodes[i]);
+              const textNode = preNode.childNodes[i];
+              const nodeValue = textNode.nodeValue ?? '';
+              if (nodeValue.replace(/\s/g, '') === '') {
+                preNode.removeChild(textNode);
                 i--;
               }
             }
@@ -497,26 +535,31 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         return;
       }
 
-      let previousHighlightedElement = document.getElementById(
-        this.previousHighlightedElementId
-      );
+      const previousHighlightedElementId = this.previousHighlightedElementId;
+      const previousHighlightedElement = previousHighlightedElementId
+        ? document.getElementById(previousHighlightedElementId)
+        : null;
 
-      let currentElementIdToHighlight =
+      const currentElementIdToHighlight =
         this.automaticVoiceoverHighlightService.getCurrentSentenceIdToHighlight(
           this.audioPlayerService.getCurrentTimeInSecs()
         );
 
+      if (!currentElementIdToHighlight) {
+        return;
+      }
+
       // If previous highlighted sentence and current sentence are same, then
       // do not highlight the sentence again.
       if (
-        this.previousHighlightedElementId === currentElementIdToHighlight &&
+        previousHighlightedElementId === currentElementIdToHighlight &&
         previousHighlightedElement?.textContent ===
           this.highlightIdToSentenceText[currentElementIdToHighlight]
       ) {
         return;
       }
 
-      let currentElementToHighlight = document.getElementById(
+      const currentElementToHighlight = document.getElementById(
         currentElementIdToHighlight
       );
 
@@ -534,9 +577,10 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     } else {
       // Removes the highlight from the previous sentence when the audio is
       // paused.
-      let previousHighlightedElement = document.getElementById(
-        this.previousHighlightedElementId
-      );
+      const previousHighlightedElementId = this.previousHighlightedElementId;
+      const previousHighlightedElement = previousHighlightedElementId
+        ? document.getElementById(previousHighlightedElementId)
+        : null;
       if (previousHighlightedElement) {
         previousHighlightedElement.style.backgroundColor = '';
       }
@@ -553,9 +597,11 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         this.pageContextService.getEditorTabContext() ===
           ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.PREVIEW)
     ) {
-      return this.voiceoverPlayerService.getActiveContentId();
+      return this.voiceoverPlayerService.getActiveContentId() ?? '';
     } else {
-      return this.translationTabActiveContentIdService.getActiveContentId();
+      return (
+        this.translationTabActiveContentIdService.getActiveContentId() ?? ''
+      );
     }
   }
 
@@ -580,20 +626,66 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         $implicit: node,
       });
     }
+
+    const template = this.getTemplateForSelector(node.selector);
+
+    if (!template) {
+      throw new Error(
+        `No template portal found for selector: ${node.selector}`
+      );
+    }
+
     if (node.nodeType === 'component') {
-      return new TemplatePortal(
-        this[node.selector.split('oppia-noninteractive-')[1] + 'TagPortal'],
-        this._viewContainerRef,
-        {$implicit: node.attrs}
-      );
+      return new TemplatePortal(template, this._viewContainerRef, {
+        $implicit: node.attrs,
+      });
     }
-    if (this[node.selector + 'TagPortal'] !== undefined) {
-      return new TemplatePortal(
-        this[node.selector + 'TagPortal'],
-        this._viewContainerRef,
-        {$implicit: node}
-      );
+
+    return new TemplatePortal(template, this._viewContainerRef, {
+      $implicit: node,
+    });
+  }
+
+  private getTemplateForSelector(
+    selector: string
+  ): TemplateRef<unknown> | undefined {
+    const templateMap: Record<string, TemplateRef<unknown> | undefined> = {
+      p: this.pTagPortal,
+      h1: this.h1TagPortal,
+      span: this.spanTagPortal,
+      ol: this.olTagPortal,
+      li: this.liTagPortal,
+      ul: this.ulTagPortal,
+      pre: this.preTagPortal,
+      strong: this.strongTagPortal,
+      blockquote: this.blockquoteTagPortal,
+      em: this.emTagPortal,
+      collapsible: this.collapsibleTagPortal,
+      image: this.imageTagPortal,
+      link: this.linkTagPortal,
+      math: this.mathTagPortal,
+      skillreview: this.skillreviewTagPortal,
+      svgdiagram: this.svgdiagramTagPortal,
+      tabs: this.tabsTagPortal,
+      video: this.videoTagPortal,
+      workedexample: this.workedexampleTagPortal,
+      'oppia-noninteractive-collapsible': this.collapsibleTagPortal,
+      'oppia-noninteractive-image': this.imageTagPortal,
+      'oppia-noninteractive-link': this.linkTagPortal,
+      'oppia-noninteractive-math': this.mathTagPortal,
+      'oppia-noninteractive-skillreview': this.skillreviewTagPortal,
+      'oppia-noninteractive-svgdiagram': this.svgdiagramTagPortal,
+      'oppia-noninteractive-tabs': this.tabsTagPortal,
+      'oppia-noninteractive-video': this.videoTagPortal,
+      'oppia-noninteractive-workedexample': this.workedexampleTagPortal,
+    };
+
+    if (selector.startsWith('oppia-noninteractive-')) {
+      const key = selector.replace('oppia-noninteractive-', '');
+      return templateMap[key] ?? templateMap[selector];
     }
+
+    return templateMap[selector];
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -630,7 +722,12 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         }
       }
 
-      textNodes.forEach(node => node.parentElement.removeChild(node));
+      textNodes.forEach(node => {
+        const parentElement = node.parentElement;
+        if (parentElement) {
+          parentElement.removeChild(node);
+        }
+      });
 
       this._updateNode();
 
@@ -638,11 +735,14 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       // feature will not work.
       if (this.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()) {
         const activeContentId = this.getActiveContentId();
-        this.automaticVoiceoverHighlightService.setActiveContentId(
-          activeContentId
-        );
+        if (activeContentId) {
+          this.automaticVoiceoverHighlightService.setActiveContentId(
+            activeContentId
+          );
+        }
         this.automaticVoiceoverHighlightService.languageCode =
-          this.localStorageService.getLastSelectedTranslationLanguageCode();
+          this.localStorageService.getLastSelectedTranslationLanguageCode() ??
+          AppConstants.DEFAULT_LANGUAGE_CODE;
         this.automaticVoiceoverHighlightService.setHighlightIdToSentenceMap(
           this.highlightIdToSentenceText
         );

@@ -75,7 +75,7 @@ import {TranslatableSetOfUnicodeStringEditorComponent} from './templates/transla
 import {ParameterNameEditorComponent} from './templates/parameter-name-editor.component';
 
 import {TranslateModule} from '@ngx-translate/core';
-import {RichTextComponentsModule} from 'rich_text_components/rich-text-components.module';
+import {RichTextComponentsModule} from '../rich_text_components/rich-text-components.module';
 
 @NgModule({
   imports: [

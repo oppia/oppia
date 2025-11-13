@@ -305,21 +305,20 @@ describe('ImageEditor', () => {
 
   // This is used to generate a mock Image file from the data URI
   // present above.
-  let localConvertImageDataToImageFile = dataURI => {
-    var byteString = atob(dataURI.split(',')[1]);
-    var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
-    var ab = new ArrayBuffer(byteString.length);
-    var ia = new Uint8Array(ab);
-    for (var i = 0; i < byteString.length; i++) {
-      ia[i] = byteString.charCodeAt(i);
+  let localConvertImageDataToImageFile = (dataURI: string): Blob => {
+    const byteString = atob(dataURI.split(',')[1]);
+    const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+    const arrayBuffer = new ArrayBuffer(byteString.length);
+    const uintArray = new Uint8Array(arrayBuffer);
+    for (let i = 0; i < byteString.length; i++) {
+      uintArray[i] = byteString.charCodeAt(i);
     }
-    var blob = new Blob([ab], {type: mimeString});
-    return blob;
+    return new Blob([arrayBuffer], {type: mimeString});
   };
 
   class MockImageUploadHelperService {
-    convertImageDataToImageFile(dataURI) {
-      return dataURI;
+    convertImageDataToImageFile(dataURI: string): Blob | null {
+      return localConvertImageDataToImageFile(dataURI);
     }
 
     generateImageFilename(
@@ -341,37 +340,85 @@ describe('ImageEditor', () => {
   }
 
   class MockReaderObject {
-    onload = null;
-    result = null;
+    onload: (() => void) | null = null;
+    result: string | ArrayBuffer | null = null;
     constructor() {
-      this.onload = () => {
-        return 'Fake onload executed';
-      };
+      this.onload = () => {};
     }
 
-    readAsDataURL(file) {
-      this.onload();
+    readAsDataURL(_file: Blob | File): string {
+      this.onload?.();
       return 'The file is loaded';
     }
   }
 
   class MockImageObject {
-    source = null;
-    onload = null;
+    source: string | null = null;
+    onload: (() => void) | null = null;
     constructor() {
-      this.onload = () => {
-        return 'Fake onload executed';
-      };
+      this.onload = () => {};
     }
 
-    set src(url) {
-      this.onload();
+    set src(_url: string) {
+      this.onload?.();
     }
 
-    addEventListener(txt, func, bool) {
-      func();
+    addEventListener(
+      _event: string,
+      callback: () => void,
+      _useCapture?: boolean
+    ): void {
+      callback();
     }
   }
+
+  interface MockEventTarget {
+    offsetLeft: number;
+    offsetTop: number;
+    offsetParent: HTMLElement | null;
+    classList: {
+      contains: (_className: string) => boolean;
+    };
+  }
+
+  const DEFAULT_EVENT_TARGET: MockEventTarget = {
+    offsetLeft: 0,
+    offsetTop: 0,
+    offsetParent: null,
+    classList: {
+      contains: (_className: string): boolean => false,
+    },
+  };
+
+  const createCanvasStub = (dataUrl: string): HTMLCanvasElement => {
+    const contextStub: Partial<CanvasRenderingContext2D> = {
+      drawImage: (
+        _image: CanvasImageSource,
+        _dx: number,
+        _dy: number,
+        _dw?: number,
+        _dh?: number
+      ): void => {},
+      getImageData: (
+        _sx: number,
+        _sy: number,
+        _sw: number,
+        _sh: number
+      ): ImageData => new ImageData(new Uint8ClampedArray(4), 1, 1),
+      putImageData: (
+        _imageData: ImageData,
+        _dx: number,
+        _dy: number
+      ): void => {},
+    };
+    return {
+      width: 0,
+      height: 0,
+      getContext: (_contextId: string) =>
+        contextStub as CanvasRenderingContext2D,
+      toDataURL: (_type?: string, _quality?: any) => dataUrl,
+    } as unknown as HTMLCanvasElement;
+  };
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -406,7 +453,6 @@ describe('ImageEditor', () => {
     // parameter of type 'HTMLImageElement'.". We need to suppress this
     // error because 'HTMLImageElement' has around 250 more properties.
     // We have only defined the properties we need in 'mockImageObject'.
-    // @ts-expect-error
     spyOn(window, 'Image').and.returnValues(new MockImageObject(), {
       src: null,
     });
@@ -414,7 +460,6 @@ describe('ImageEditor', () => {
     // parameter of type 'HTMLImageElement'.". We need to suppress this
     // error because 'HTMLImageElement' has around 250 more properties.
     // We have only defined the properties we need in 'mockReaderObject'.
-    // @ts-expect-error
     spyOn(window, 'FileReader').and.returnValue(new MockReaderObject());
 
     component.ngOnInit();
@@ -648,7 +693,7 @@ describe('ImageEditor', () => {
   });
 
   it('should return false if file is not uploaded', () => {
-    component.data.metadata.savedImageFilename = null;
+    component.data.metadata.savedImageFilename = undefined;
 
     expect(component.validate(component.data)).toBe(false);
   });
@@ -684,16 +729,9 @@ describe('ImageEditor', () => {
   it('should update crop area while user is dragging the crop area', () => {
     spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(468);
     spyOnProperty(MouseEvent.prototype, 'offsetY').and.returnValue(216);
-    spyOnProperty(MouseEvent.prototype, 'target').and.returnValue({
-      offsetLeft: 0,
-      offsetTop: 0,
-      offsetParent: null,
-      classList: {
-        contains: text => {
-          return false;
-        },
-      },
-    });
+    spyOnProperty(MouseEvent.prototype, 'target').and.returnValue(
+      DEFAULT_EVENT_TARGET
+    );
     component.userIsDraggingCropArea = true;
     component.cropArea = {
       x1: 20,
@@ -736,16 +774,6 @@ describe('ImageEditor', () => {
     () => {
       spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(468);
       spyOnProperty(MouseEvent.prototype, 'offsetY').and.returnValue(216);
-      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue({
-        offsetLeft: 0,
-        offsetTop: 0,
-        offsetParent: null,
-        classList: {
-          contains: text => {
-            return false;
-          },
-        },
-      });
       component.userIsDraggingCropArea = false;
       component.userIsResizingCropArea = true;
       component.cropArea = {
@@ -780,16 +808,6 @@ describe('ImageEditor', () => {
     () => {
       spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(468);
       spyOnProperty(MouseEvent.prototype, 'offsetY').and.returnValue(216);
-      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue({
-        offsetLeft: 0,
-        offsetTop: 0,
-        offsetParent: null,
-        classList: {
-          contains: text => {
-            return false;
-          },
-        },
-      });
       component.userIsDraggingCropArea = false;
       component.userIsResizingCropArea = true;
       component.cropArea = {
@@ -824,16 +842,6 @@ describe('ImageEditor', () => {
     () => {
       spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(468);
       spyOnProperty(MouseEvent.prototype, 'offsetY').and.returnValue(216);
-      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue({
-        offsetLeft: 0,
-        offsetTop: 0,
-        offsetParent: null,
-        classList: {
-          contains: text => {
-            return false;
-          },
-        },
-      });
       component.userIsDraggingCropArea = false;
       component.userIsResizingCropArea = true;
       component.cropArea = {
@@ -868,16 +876,6 @@ describe('ImageEditor', () => {
     () => {
       spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(468);
       spyOnProperty(MouseEvent.prototype, 'offsetY').and.returnValue(216);
-      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue({
-        offsetLeft: 0,
-        offsetTop: 0,
-        offsetParent: null,
-        classList: {
-          contains: text => {
-            return false;
-          },
-        },
-      });
       component.userIsDraggingCropArea = false;
       component.userIsResizingCropArea = true;
       component.cropArea = {
@@ -912,16 +910,9 @@ describe('ImageEditor', () => {
     () => {
       spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(468);
       spyOnProperty(MouseEvent.prototype, 'offsetY').and.returnValue(216);
-      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue({
-        offsetLeft: 0,
-        offsetTop: 0,
-        offsetParent: null,
-        classList: {
-          contains: text => {
-            return false;
-          },
-        },
-      });
+      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue(
+        DEFAULT_EVENT_TARGET
+      );
       component.userIsDraggingCropArea = false;
       component.userIsResizingCropArea = true;
       component.cropArea = {
@@ -956,16 +947,9 @@ describe('ImageEditor', () => {
     () => {
       spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(468);
       spyOnProperty(MouseEvent.prototype, 'offsetY').and.returnValue(216);
-      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue({
-        offsetLeft: 0,
-        offsetTop: 0,
-        offsetParent: null,
-        classList: {
-          contains: text => {
-            return false;
-          },
-        },
-      });
+      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue(
+        DEFAULT_EVENT_TARGET
+      );
       component.userIsDraggingCropArea = false;
       component.userIsResizingCropArea = true;
       component.cropArea = {
@@ -1000,16 +984,9 @@ describe('ImageEditor', () => {
     () => {
       spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(468);
       spyOnProperty(MouseEvent.prototype, 'offsetY').and.returnValue(216);
-      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue({
-        offsetLeft: 0,
-        offsetTop: 0,
-        offsetParent: null,
-        classList: {
-          contains: text => {
-            return false;
-          },
-        },
-      });
+      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue(
+        DEFAULT_EVENT_TARGET
+      );
       component.userIsDraggingCropArea = false;
       component.userIsResizingCropArea = true;
       component.cropArea = {
@@ -1044,16 +1021,9 @@ describe('ImageEditor', () => {
     () => {
       spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(468);
       spyOnProperty(MouseEvent.prototype, 'offsetY').and.returnValue(216);
-      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue({
-        offsetLeft: 0,
-        offsetTop: 0,
-        offsetParent: null,
-        classList: {
-          contains: text => {
-            return false;
-          },
-        },
-      });
+      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue(
+        DEFAULT_EVENT_TARGET
+      );
       component.userIsDraggingCropArea = false;
       component.userIsResizingCropArea = true;
       component.cropArea = {
@@ -1088,16 +1058,9 @@ describe('ImageEditor', () => {
     () => {
       spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(360);
       spyOnProperty(MouseEvent.prototype, 'offsetY').and.returnValue(420);
-      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue({
-        offsetLeft: 0,
-        offsetTop: 0,
-        offsetParent: null,
-        classList: {
-          contains: text => {
-            return false;
-          },
-        },
-      });
+      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue(
+        DEFAULT_EVENT_TARGET
+      );
       component.userIsDraggingCropArea = false;
       component.userIsResizingCropArea = false;
       component.cropArea = {
@@ -1131,16 +1094,9 @@ describe('ImageEditor', () => {
     () => {
       spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(660);
       spyOnProperty(MouseEvent.prototype, 'offsetY').and.returnValue(420);
-      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue({
-        offsetLeft: 0,
-        offsetTop: 0,
-        offsetParent: null,
-        classList: {
-          contains: text => {
-            return false;
-          },
-        },
-      });
+      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue(
+        DEFAULT_EVENT_TARGET
+      );
       component.userIsDraggingCropArea = false;
       component.userIsResizingCropArea = false;
       component.cropArea = {
@@ -1174,16 +1130,9 @@ describe('ImageEditor', () => {
     () => {
       spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(360);
       spyOnProperty(MouseEvent.prototype, 'offsetY').and.returnValue(560);
-      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue({
-        offsetLeft: 0,
-        offsetTop: 0,
-        offsetParent: null,
-        classList: {
-          contains: text => {
-            return false;
-          },
-        },
-      });
+      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue(
+        DEFAULT_EVENT_TARGET
+      );
       component.userIsDraggingCropArea = false;
       component.userIsResizingCropArea = false;
       component.cropArea = {
@@ -1217,16 +1166,9 @@ describe('ImageEditor', () => {
     () => {
       spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(660);
       spyOnProperty(MouseEvent.prototype, 'offsetY').and.returnValue(560);
-      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue({
-        offsetLeft: 0,
-        offsetTop: 0,
-        offsetParent: null,
-        classList: {
-          contains: text => {
-            return false;
-          },
-        },
-      });
+      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue(
+        DEFAULT_EVENT_TARGET
+      );
       component.userIsDraggingCropArea = false;
       component.userIsResizingCropArea = false;
       component.cropArea = {
@@ -1260,16 +1202,9 @@ describe('ImageEditor', () => {
     () => {
       spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(390);
       spyOnProperty(MouseEvent.prototype, 'offsetY').and.returnValue(420);
-      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue({
-        offsetLeft: 0,
-        offsetTop: 0,
-        offsetParent: null,
-        classList: {
-          contains: text => {
-            return false;
-          },
-        },
-      });
+      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue(
+        DEFAULT_EVENT_TARGET
+      );
       component.userIsDraggingCropArea = false;
       component.userIsResizingCropArea = false;
       component.cropArea = {
@@ -1301,16 +1236,9 @@ describe('ImageEditor', () => {
     () => {
       spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(360);
       spyOnProperty(MouseEvent.prototype, 'offsetY').and.returnValue(500);
-      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue({
-        offsetLeft: 0,
-        offsetTop: 0,
-        offsetParent: null,
-        classList: {
-          contains: text => {
-            return false;
-          },
-        },
-      });
+      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue(
+        DEFAULT_EVENT_TARGET
+      );
       component.userIsDraggingCropArea = false;
       component.userIsResizingCropArea = false;
       component.cropArea = {
@@ -1342,16 +1270,9 @@ describe('ImageEditor', () => {
     () => {
       spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(660);
       spyOnProperty(MouseEvent.prototype, 'offsetY').and.returnValue(500);
-      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue({
-        offsetLeft: 0,
-        offsetTop: 0,
-        offsetParent: null,
-        classList: {
-          contains: text => {
-            return false;
-          },
-        },
-      });
+      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue(
+        DEFAULT_EVENT_TARGET
+      );
       component.userIsDraggingCropArea = false;
       component.userIsResizingCropArea = false;
       component.cropArea = {
@@ -1383,16 +1304,9 @@ describe('ImageEditor', () => {
     () => {
       spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(400);
       spyOnProperty(MouseEvent.prototype, 'offsetY').and.returnValue(560);
-      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue({
-        offsetLeft: 0,
-        offsetTop: 0,
-        offsetParent: null,
-        classList: {
-          contains: text => {
-            return false;
-          },
-        },
-      });
+      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue(
+        DEFAULT_EVENT_TARGET
+      );
       component.userIsDraggingCropArea = false;
       component.userIsResizingCropArea = false;
       component.cropArea = {
@@ -1426,16 +1340,9 @@ describe('ImageEditor', () => {
     () => {
       spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(400);
       spyOnProperty(MouseEvent.prototype, 'offsetY').and.returnValue(500);
-      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue({
-        offsetLeft: 0,
-        offsetTop: 0,
-        offsetParent: null,
-        classList: {
-          contains: text => {
-            return false;
-          },
-        },
-      });
+      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue(
+        DEFAULT_EVENT_TARGET
+      );
       component.userIsDraggingCropArea = false;
       component.userIsResizingCropArea = false;
       component.cropArea = {
@@ -1469,16 +1376,9 @@ describe('ImageEditor', () => {
     () => {
       spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(200);
       spyOnProperty(MouseEvent.prototype, 'offsetY').and.returnValue(200);
-      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue({
-        offsetLeft: 0,
-        offsetTop: 0,
-        offsetParent: null,
-        classList: {
-          contains: text => {
-            return false;
-          },
-        },
-      });
+      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue(
+        DEFAULT_EVENT_TARGET
+      );
       component.userIsDraggingCropArea = false;
       component.userIsResizingCropArea = false;
       component.cropArea = {
@@ -1510,16 +1410,9 @@ describe('ImageEditor', () => {
     () => {
       spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(468);
       spyOnProperty(MouseEvent.prototype, 'offsetY').and.returnValue(216);
-      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue({
-        offsetLeft: 0,
-        offsetTop: 0,
-        offsetParent: null,
-        classList: {
-          contains: text => {
-            return false;
-          },
-        },
-      });
+      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue(
+        DEFAULT_EVENT_TARGET
+      );
       component.cropArea = {
         x1: 360,
         y1: 420,
@@ -1555,16 +1448,9 @@ describe('ImageEditor', () => {
     () => {
       spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(400);
       spyOnProperty(MouseEvent.prototype, 'offsetY').and.returnValue(560);
-      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue({
-        offsetLeft: 0,
-        offsetTop: 0,
-        offsetParent: null,
-        classList: {
-          contains: text => {
-            return false;
-          },
-        },
-      });
+      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue(
+        DEFAULT_EVENT_TARGET
+      );
       component.cropArea = {
         x1: 360,
         y1: 420,
@@ -1732,28 +1618,30 @@ describe('ImageEditor', () => {
       jasmine.createSpy('createElement').and.returnValue({
         width: 0,
         height: 0,
-        getContext: txt => {
-          return {
-            drawImage: (txt, x, y) => {
-              return;
-            },
-            getImageData: (x, y, width, height) => {
-              return 'data';
-            },
-            putImageData: (data, x, y) => {
-              return;
-            },
-          };
-        },
-        toDataURL: (str, x) => {
-          return component.data.metadata.uploadedImageData;
-        },
-      })
+        getContext: (_contextId: string) =>
+          ({
+            drawImage: (_image: unknown, _dx: number, _dy: number): void => {},
+            getImageData: (
+              _sx: number,
+              _sy: number,
+              _sw: number,
+              _sh: number
+            ) => 'data',
+            putImageData: (
+              _imageData: unknown,
+              _dx: number,
+              _dy: number
+            ): void => {},
+          }) as unknown as CanvasRenderingContext2D,
+        toDataURL: (_type: string, _quality?: number) =>
+          String(component.data.metadata.uploadedImageData ?? ''),
+      } as unknown as HTMLCanvasElement)
     );
     let dataSvg = component.data.metadata;
     component.data = {mode: component.MODE_EMPTY, metadata: {}, crop: true};
+    const uploadedImageDataString = String(dataSvg.uploadedImageData ?? '');
     spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl').and.returnValue(
-      dataSvg.uploadedImageData
+      uploadedImageDataString
     );
     spyOn(
       svgSanitizerService,
@@ -1762,9 +1650,9 @@ describe('ImageEditor', () => {
     spyOn(
       svgSanitizerService,
       'removeAllInvalidTagsAndAttributes'
-    ).and.returnValue(dataSvg.uploadedImageData.toString());
+    ).and.returnValue(uploadedImageDataString);
 
-    component.onFileChanged(dataSvg.uploadedFile);
+    component.onFileChanged(dataSvg.uploadedFile as unknown as File);
 
     expect(component.data).toEqual({
       mode: 2,
@@ -1820,23 +1708,24 @@ describe('ImageEditor', () => {
       jasmine.createSpy('createElement').and.returnValue({
         width: 0,
         height: 0,
-        getContext: txt => {
-          return {
-            drawImage: (txt, x, y) => {
-              return;
-            },
-            getImageData: (x, y, width, height) => {
-              return 'data';
-            },
-            putImageData: (data, x, y) => {
-              return;
-            },
-          };
-        },
-        toDataURL: (str, x) => {
-          return component.data.metadata.uploadedImageData;
-        },
-      })
+        getContext: (_contextId: string) =>
+          ({
+            drawImage: (_image: unknown, _dx: number, _dy: number): void => {},
+            getImageData: (
+              _sx: number,
+              _sy: number,
+              _sw: number,
+              _sh: number
+            ) => 'data',
+            putImageData: (
+              _imageData: unknown,
+              _dx: number,
+              _dy: number
+            ): void => {},
+          }) as unknown as CanvasRenderingContext2D,
+        toDataURL: (_type: string, _quality?: number) =>
+          String(component.data.metadata.uploadedImageData ?? ''),
+      } as unknown as HTMLCanvasElement)
     );
     // This throws an error "Type '{ lastModified: number; name:
     // string; size: number; type: string; }' is missing the following
@@ -1875,23 +1764,24 @@ describe('ImageEditor', () => {
       jasmine.createSpy('createElement').and.returnValue({
         width: 0,
         height: 0,
-        getContext: txt => {
-          return {
-            drawImage: (txt, x, y) => {
-              return;
-            },
-            getImageData: (x, y, width, height) => {
-              return 'data';
-            },
-            putImageData: (data, x, y) => {
-              return;
-            },
-          };
-        },
-        toDataURL: (str, x) => {
-          return component.data.metadata.uploadedImageData;
-        },
-      })
+        getContext: (_contextId: string) =>
+          ({
+            drawImage: (_image: unknown, _dx: number, _dy: number): void => {},
+            getImageData: (
+              _sx: number,
+              _sy: number,
+              _sw: number,
+              _sh: number
+            ) => 'data',
+            putImageData: (
+              _imageData: unknown,
+              _dx: number,
+              _dy: number
+            ): void => {},
+          }) as unknown as CanvasRenderingContext2D,
+        toDataURL: (_type: string, _quality?: number) =>
+          String(component.data.metadata.uploadedImageData ?? ''),
+      } as unknown as HTMLCanvasElement)
     );
 
     // Replace gifFrames with a spy that returns a resolved promise.
@@ -2057,17 +1947,17 @@ describe('ImageEditor', () => {
         jasmine.createSpy('createElement').and.returnValue({
           width: 0,
           height: 0,
-          getContext: txt => {
-            return {
-              drawImage: (txt, x, y) => {
-                return;
-              },
-            };
-          },
-          toDataURL: (str, x) => {
-            return component.data.metadata.uploadedImageData;
-          },
-        })
+          getContext: (_contextId: string) =>
+            ({
+              drawImage: (
+                _image: unknown,
+                _dx: number,
+                _dy: number
+              ): void => {},
+            }) as unknown as CanvasRenderingContext2D,
+          toDataURL: (_type: string, _quality?: number) =>
+            String(component.data.metadata.uploadedImageData ?? ''),
+        } as unknown as HTMLCanvasElement)
       );
       component.imageResizeRatio = 0.2;
 
@@ -2186,9 +2076,10 @@ describe('ImageEditor', () => {
 
       let dimensions = {width: 490, height: 327};
 
-      let resampledFile = localConvertImageDataToImageFile(
-        component.data.metadata.uploadedImageData
+      const uploadedImageData = String(
+        component.data.metadata.uploadedImageData ?? ''
       );
+      let resampledFile = localConvertImageDataToImageFile(uploadedImageData);
 
       component.postImageToServer(dimensions, resampledFile, 'gif');
       tick(200);
@@ -2223,9 +2114,10 @@ describe('ImageEditor', () => {
       });
 
       let dimensions = {width: 490, height: 327};
-      let resampledFile = localConvertImageDataToImageFile(
-        component.data.metadata.uploadedImageData
+      const uploadedImageData = String(
+        component.data.metadata.uploadedImageData ?? ''
       );
+      let resampledFile = localConvertImageDataToImageFile(uploadedImageData);
 
       component.postImageToServer(dimensions, resampledFile, 'gif');
       tick(200);
@@ -2236,7 +2128,7 @@ describe('ImageEditor', () => {
       expect(req.request.method).toEqual('POST');
       req.flush(null, {
         status: 500,
-        statusText: null,
+        statusText: undefined,
       });
 
       flushMicrotasks();
@@ -2254,16 +2146,9 @@ describe('ImageEditor', () => {
     fakeAsync(() => {
       spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(360);
       spyOnProperty(MouseEvent.prototype, 'offsetY').and.returnValue(420);
-      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue({
-        offsetLeft: 0,
-        offsetTop: 0,
-        offsetParent: null,
-        classList: {
-          contains: text => {
-            return false;
-          },
-        },
-      });
+      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue(
+        DEFAULT_EVENT_TARGET
+      );
       spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
         func(obj);
       });
@@ -2320,16 +2205,6 @@ describe('ImageEditor', () => {
   it('should not save uploaded gif when file size over 100 KB', done => {
     spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(360);
     spyOnProperty(MouseEvent.prototype, 'offsetY').and.returnValue(420);
-    spyOnProperty(MouseEvent.prototype, 'target').and.returnValue({
-      offsetLeft: 0,
-      offsetTop: 0,
-      offsetParent: null,
-      classList: {
-        contains: text => {
-          return false;
-        },
-      },
-    });
     spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
       func({
         image: btoa('data:image/gif;base64,' + Array(102410).join('a')),
@@ -2364,16 +2239,9 @@ describe('ImageEditor', () => {
       spyOn(alertsService, 'addWarning');
       spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(360);
       spyOnProperty(MouseEvent.prototype, 'offsetY').and.returnValue(420);
-      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue({
-        offsetLeft: 0,
-        offsetTop: 0,
-        offsetParent: null,
-        classList: {
-          contains: text => {
-            return false;
-          },
-        },
-      });
+      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue(
+        DEFAULT_EVENT_TARGET
+      );
       spyOn(gifshot, 'createGIF').and.callFake((obj, func) => {
         func(obj);
       });
@@ -2426,16 +2294,9 @@ describe('ImageEditor', () => {
     () => {
       spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(360);
       spyOnProperty(MouseEvent.prototype, 'offsetY').and.returnValue(420);
-      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue({
-        offsetLeft: 0,
-        offsetTop: 0,
-        offsetParent: null,
-        classList: {
-          contains: text => {
-            return false;
-          },
-        },
-      });
+      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue(
+        DEFAULT_EVENT_TARGET
+      );
       spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
       );
@@ -2455,31 +2316,24 @@ describe('ImageEditor', () => {
     () => {
       spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(360);
       spyOnProperty(MouseEvent.prototype, 'offsetY').and.returnValue(420);
-      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue({
-        offsetLeft: 0,
-        offsetTop: 0,
-        offsetParent: null,
-        classList: {
-          contains: text => {
-            return false;
-          },
-        },
-      });
+      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue(
+        DEFAULT_EVENT_TARGET
+      );
       spyOn(document, 'createElement').and.callFake(
         jasmine.createSpy('createElement').and.returnValue({
           width: 0,
           height: 0,
-          getContext: txt => {
-            return {
-              drawImage: (txt, x, y) => {
-                return;
-              },
-            };
-          },
-          toDataURL: (str, x) => {
-            return component.data.metadata.uploadedImageData;
-          },
-        })
+          getContext: (_contextId: string) =>
+            ({
+              drawImage: (
+                _image: unknown,
+                _dx: number,
+                _dy: number
+              ): void => {},
+            }) as unknown as CanvasRenderingContext2D,
+          toDataURL: (_type: string, _quality?: number) =>
+            String(component.data.metadata.uploadedImageData ?? ''),
+        } as unknown as HTMLCanvasElement)
       );
       spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
@@ -2503,31 +2357,20 @@ describe('ImageEditor', () => {
   it('should not save uploaded png when file size is over 100 KB', () => {
     spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(360);
     spyOnProperty(MouseEvent.prototype, 'offsetY').and.returnValue(420);
-    spyOnProperty(MouseEvent.prototype, 'target').and.returnValue({
-      offsetLeft: 0,
-      offsetTop: 0,
-      offsetParent: null,
-      classList: {
-        contains: text => {
-          return false;
-        },
-      },
-    });
+    spyOnProperty(MouseEvent.prototype, 'target').and.returnValue(
+      DEFAULT_EVENT_TARGET
+    );
     spyOn(document, 'createElement').and.callFake(
       jasmine.createSpy('createElement').and.returnValue({
         width: 0,
         height: 0,
-        getContext: txt => {
-          return {
-            drawImage: (txt, x, y) => {
-              return;
-            },
-          };
-        },
-        toDataURL: (str, x) => {
-          return component.data.metadata.uploadedImageData;
-        },
-      })
+        getContext: (_contextId: string) =>
+          ({
+            drawImage: (_image: unknown, _dx: number, _dy: number): void => {},
+          }) as unknown as CanvasRenderingContext2D,
+        toDataURL: (_type: string, _quality?: number) =>
+          String(component.data.metadata.uploadedImageData ?? ''),
+      } as unknown as HTMLCanvasElement)
     );
     spyOn(component, 'saveImage');
     component.data.metadata = {
@@ -2565,31 +2408,24 @@ describe('ImageEditor', () => {
     () => {
       spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(360);
       spyOnProperty(MouseEvent.prototype, 'offsetY').and.returnValue(420);
-      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue({
-        offsetLeft: 0,
-        offsetTop: 0,
-        offsetParent: null,
-        classList: {
-          contains: text => {
-            return false;
-          },
-        },
-      });
+      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue(
+        DEFAULT_EVENT_TARGET
+      );
       spyOn(document, 'createElement').and.callFake(
         jasmine.createSpy('createElement').and.returnValue({
           width: 0,
           height: 0,
-          getContext: txt => {
-            return {
-              drawImage: (txt, x, y) => {
-                return;
-              },
-            };
-          },
-          toDataURL: (str, x) => {
-            return component.data.metadata.uploadedImageData;
-          },
-        })
+          getContext: (_contextId: string) =>
+            ({
+              drawImage: (
+                _image: unknown,
+                _dx: number,
+                _dy: number
+              ): void => {},
+            }) as unknown as CanvasRenderingContext2D,
+          toDataURL: (_type: string, _quality?: number) =>
+            String(component.data.metadata.uploadedImageData ?? ''),
+        } as unknown as HTMLCanvasElement)
       );
       spyOn(component, 'saveImage');
       component.data.metadata = {
@@ -2628,31 +2464,24 @@ describe('ImageEditor', () => {
     () => {
       spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(360);
       spyOnProperty(MouseEvent.prototype, 'offsetY').and.returnValue(420);
-      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue({
-        offsetLeft: 0,
-        offsetTop: 0,
-        offsetParent: null,
-        classList: {
-          contains: text => {
-            return false;
-          },
-        },
-      });
+      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue(
+        DEFAULT_EVENT_TARGET
+      );
       spyOn(document, 'createElement').and.callFake(
         jasmine.createSpy('createElement').and.returnValue({
           width: 0,
           height: 0,
-          getContext: txt => {
-            return {
-              drawImage: (txt, x, y) => {
-                return;
-              },
-            };
-          },
-          toDataURL: (str, x) => {
-            return component.data.metadata.uploadedImageData;
-          },
-        })
+          getContext: (_contextId: string) =>
+            ({
+              drawImage: (
+                _image: unknown,
+                _dx: number,
+                _dy: number
+              ): void => {},
+            }) as unknown as CanvasRenderingContext2D,
+          toDataURL: (_type: string, _quality?: number) =>
+            String(component.data.metadata.uploadedImageData ?? ''),
+        } as unknown as HTMLCanvasElement)
       );
       spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
@@ -2682,31 +2511,24 @@ describe('ImageEditor', () => {
       spyOn(alertsService, 'addWarning');
       spyOnProperty(MouseEvent.prototype, 'offsetX').and.returnValue(360);
       spyOnProperty(MouseEvent.prototype, 'offsetY').and.returnValue(420);
-      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue({
-        offsetLeft: 0,
-        offsetTop: 0,
-        offsetParent: null,
-        classList: {
-          contains: text => {
-            return false;
-          },
-        },
-      });
+      spyOnProperty(MouseEvent.prototype, 'target').and.returnValue(
+        DEFAULT_EVENT_TARGET
+      );
       spyOn(document, 'createElement').and.callFake(
         jasmine.createSpy('createElement').and.returnValue({
           width: 0,
           height: 0,
-          getContext: txt => {
-            return {
-              drawImage: (txt, x, y) => {
-                return;
-              },
-            };
-          },
-          toDataURL: (str, x) => {
-            return component.data.metadata.uploadedImageData;
-          },
-        })
+          getContext: (_contextId: string) =>
+            ({
+              drawImage: (
+                _image: unknown,
+                _dx: number,
+                _dy: number
+              ): void => {},
+            }) as unknown as CanvasRenderingContext2D,
+          toDataURL: (_type: string, _quality?: number) =>
+            String(component.data.metadata.uploadedImageData ?? ''),
+        } as unknown as HTMLCanvasElement)
       );
       // This throws an error "Type '{ lastModified: number; name:
       // string; size: number; type: string; }' is missing the following
@@ -2736,7 +2558,7 @@ describe('ImageEditor', () => {
       ' is save image',
     () => {
       spyOn(alertsService, 'addWarning');
-      component.data.metadata.uploadedFile = null;
+      component.data.metadata.uploadedFile = undefined;
 
       component.saveUploadedFile();
 
@@ -2751,7 +2573,7 @@ describe('ImageEditor', () => {
       ' is save image',
     () => {
       spyOn(alertsService, 'addWarning');
-      component.data.metadata.uploadedFile = null;
+      component.data.metadata.uploadedFile = undefined;
 
       component.saveUploadedFile();
 
