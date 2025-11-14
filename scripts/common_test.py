@@ -1589,12 +1589,11 @@ class ColorFunctionsTests(test_utils.GenericTestBase):
         """Covers error, success, and neutral branches."""
         buf = io.StringIO()
         original_write = common._original_stderr_write  # pylint: disable=protected-access
-        # Here we use MyPy ignore because TextIO.write uses Arg(str, 's') in its type signature,
-        # which is incompatible with Callable[[str], int] even though it works correctly at runtime.
-        # MyPy flags this assignment because TextIO.write expects Arg(str, 's'),
-        # which is slightly incompatible with Callable[[str], int] at runtime.
-        # This override is safe and only used to capture stderr during tests.
-        common._original_stderr_write = buf.write  # type: ignore[assignment]  # pylint: disable=protected-access
+
+        def _write_wrapper(s: str) -> int:
+            return buf.write(s)
+
+        common._original_stderr_write = _write_wrapper  # pylint: disable=protected-access
 
         try:
             common._colorize_stderr_write('ERROR: Something failed')  # pylint: disable=protected-access
@@ -1635,11 +1634,10 @@ class ExtraColorCoverageTests(test_utils.GenericTestBase):
         buf = io.StringIO()
         original_write = common._original_stderr_write  # pylint: disable=protected-access
 
-        # Here we use MyPy ignore because TextIO.write expects Arg(str, 's') in its
-        # type signature, which MyPy flags as incompatible with Callable[[str], int],
-        # even though it works correctly at runtime. This override is safe and only
-        # used for capturing stderr during tests.
-        common._original_stderr_write = buf.write  # type: ignore[assignment]  # pylint: disable=protected-access
+        def _write_wrapper(s: str) -> int:
+            return buf.write(s)
+
+        common._original_stderr_write = _write_wrapper  # pylint: disable=protected-access
 
         try:
             common._colorize_stderr_write('ERROR: Something failed')  # pylint: disable=protected-access
