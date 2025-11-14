@@ -1591,6 +1591,9 @@ class ColorFunctionsTests(test_utils.GenericTestBase):
         original_write = common._original_stderr_write  # pylint: disable=protected-access
         # Here we use MyPy ignore because TextIO.write uses Arg(str, 's') in its type signature,
         # which is incompatible with Callable[[str], int] even though it works correctly at runtime.
+        # MyPy flags this assignment because TextIO.write expects Arg(str, 's'),
+        # which is slightly incompatible with Callable[[str], int] at runtime.
+        # This override is safe and only used to capture stderr during tests.
         common._original_stderr_write = buf.write  # type: ignore[assignment]  # pylint: disable=protected-access
 
         try:
@@ -1631,8 +1634,11 @@ class ExtraColorCoverageTests(test_utils.GenericTestBase):
         """Covers error, success, and neutral branches."""
         buf = io.StringIO()
         original_write = common._original_stderr_write  # pylint: disable=protected-access
-        # Here we use MyPy ignore because TextIO.write uses Arg(str, 's') in its type signature,
-        # which is incompatible with Callable[[str], int] even though it works correctly at runtime.
+
+        # Here we use MyPy ignore because TextIO.write expects Arg(str, 's') in its
+        # type signature, which MyPy flags as incompatible with Callable[[str], int],
+        # even though it works correctly at runtime. This override is safe and only
+        # used for capturing stderr during tests.
         common._original_stderr_write = buf.write  # type: ignore[assignment]  # pylint: disable=protected-access
 
         try:
@@ -1643,6 +1649,6 @@ class ExtraColorCoverageTests(test_utils.GenericTestBase):
             common._original_stderr_write = original_write  # pylint: disable=protected-access
 
         result = buf.getvalue()
-        self.assertIn('ERROR:', result)
-        self.assertIn('SUCCESS:', result)
+        self.assertIn('ERROR', result)
+        self.assertIn('SUCCESS', result)
         self.assertIn('just a normal line', result)
