@@ -14,7 +14,15 @@ on:
         description: 'Number of times to run the acceptance tests (Max: 128).'
         required: true
         default: '10'
-        type: string
+        type: choice
+        options:
+          - '1'
+          - '2'
+          - '5'
+          - '10'
+          - '20'
+          - '50'
+          - '100'
       test_suite:
         description: 'Name of acceptance test suite to run (e.g. "interested-donor/make-a-donation").'
         required: true
@@ -32,21 +40,10 @@ jobs:
     env:
       NUM_RUNS: ${{ inputs.num_runs }}
     steps:
-      - name: Sanitize and generate matrix
+      - name: Generate Matrix
         id: set-matrix
         shell: bash
         run: |
-          # Ensure num_runs is numeric and within safe bounds
-          if ! [[ "$NUM_RUNS" =~ ^[0-9]+$ ]]; then
-            echo "Error: num_runs must be an integer" >&2
-            exit 1
-          fi
-
-          if [ "$NUM_RUNS" -gt 128 ]; then
-            echo "Error: num_runs exceeds 128" >&2
-            exit 1
-          fi
-
           MATRIX=$(seq 1 "$NUM_RUNS" | jq -R . | jq -s -c .)
           echo "matrix=$MATRIX" >> "$GITHUB_OUTPUT"
 

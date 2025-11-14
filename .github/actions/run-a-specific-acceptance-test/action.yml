@@ -1,12 +1,12 @@
 name: Run a specific acceptance test
-description: Runs a specific acceptance test-suite that is given as an input.
+description: Runs a specific acceptance test suite that is given as an input.
 
 inputs:
   test-suite:
-    description: 'The acceptance test suite to run(e.g. "interested-donor/make-a-donation").'
+    description: 'The acceptance test suite to run (e.g. "interested-donor/make-a-donation").'
     required: true
   viewport-type:
-    description: Whether to run the tests on mobile or desktop.
+    description: "The viewport type to use for running the tests."
     required: true
     type: choice
     options:
@@ -23,9 +23,10 @@ runs:
   using: "composite"
   steps:
     - name: Check if modified-suite-name-for-uploads contains invalid characters.
+      shell: bash
       run: |
         if [[ ! "${{ inputs.modified-suite-name-for-uploads }}" =~ ^[a-zA-Z0-9_-]+$ ]]; then
-          echo "Modified suite name for uploads contains one of the invalid characters ('/', '\', '_')"
+          echo "The modified suite name should contain only the following characters: letters, digits, underscore and hyphen."
           exit 1
         fi
     - name: Run ${{ inputs.viewport-type == 'mobile' && 'Mobile' || 'Desktop' }} Acceptance Test ${{ inputs.test-suite }}
@@ -53,10 +54,10 @@ runs:
       if: ${{ always() && steps.run-acceptance-test.outcome == 'failure' && inputs.modified-suite-name-for-uploads != '' }}
       uses: actions/upload-artifact@v4
       with:
-        name: acceptance-test-logs-${{ inputs.modified-suite-name-for-uploads }}
+        name: test-logs_${{ inputs.modified-suite-name-for-uploads }}
         path: acceptance_test_${{ inputs.modified-suite-name-for-uploads }}.log
 
-    - name: Upload test failure screenshots
+    - name: Upload screenshots taken on test failure
       # We need to pass always() because if not, GitHub will implicitly use success(),
       # which requires all previous jobs/steps to have succeeded. This is not what we want.
       # Reference: https://docs.github.com/en/actions/reference/workflows-and-actions/expressions#status-check-functions
@@ -64,7 +65,7 @@ runs:
       if: ${{ always() && steps.run-acceptance-test.outcome == 'failure' && inputs.modified-suite-name-for-uploads != '' }}
       uses: actions/upload-artifact@v4
       with:
-        name: acceptance-test-failure-screenshot-${{ inputs.modified-suite-name-for-uploads }}
+        name: failure-point-snapshots_${{ inputs.modified-suite-name-for-uploads }}
         path: /home/runner/work/oppia/oppia_full_stack_test_failure_screenshots/acceptance
 
     - name: Upload test diff screenshots
@@ -75,7 +76,7 @@ runs:
       if: ${{ always() && steps.run-acceptance-test.outcome == 'failure' && inputs.modified-suite-name-for-uploads != '' }}
       uses: actions/upload-artifact@v4
       with:
-        name: diff-snapshots-${{ inputs.modified-suite-name-for-uploads }}
+        name: diff-snapshots_${{ inputs.modified-suite-name-for-uploads }}
         # Note: The path must be kept in sync with the one specified in
         # core/tests/puppeteer-acceptance-tests/utilities/common/puppeteer-utils.ts
         path: /home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/diff-snapshots
@@ -88,5 +89,5 @@ runs:
       if: ${{ always() && steps.run-acceptance-test.outcome == 'failure' && inputs.modified-suite-name-for-uploads != '' }}
       uses: actions/upload-artifact@v4
       with:
-        name: acceptance-test-video-${{ inputs.modified-suite-name-for-uploads }}
+        name: video-recordings_${{ inputs.modified-suite-name-for-uploads }}
         path: /home/runner/work/oppia/oppia_full_stack_test_video_recordings/acceptance/${{ inputs.viewport-type == 'mobile' && 'mobile' || 'desktop' }}
