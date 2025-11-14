@@ -16,7 +16,13 @@
  * @fileoverview Unit tests for for HomeTabComponent.
  */
 
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {
+  async,
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+} from '@angular/core/testing';
 import {AppConstants} from 'app.constants';
 import {MaterialModule} from 'modules/material.module';
 import {FormsModule} from '@angular/forms';
@@ -32,6 +38,7 @@ import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {CollectionSummary} from 'domain/collection/collection-summary.model';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {LoaderService} from 'services/loader.service';
 
 describe('Home tab Component', () => {
   let component: HomeTabComponent;
@@ -76,6 +83,7 @@ describe('Home tab Component', () => {
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
 
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
@@ -446,5 +454,176 @@ describe('Home tab Component', () => {
     expect(story.getNodeTitles().length).toBeGreaterThan(
       story.getCompletedNodeTitles().length
     );
+  });
+});
+
+describe('Home tab Component Loader visibility tests', () => {
+  let component: HomeTabComponent;
+  let fixture: ComponentFixture<HomeTabComponent>;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
+  let loaderService: LoaderService;
+  class MockPlatformFeatureService {
+    status = {
+      SerialChapterLaunchLearnerView: {
+        isEnabled: false,
+      },
+    };
+  }
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
+
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      imports: [MaterialModule, FormsModule, HttpClientTestingModule],
+      declarations: [MockTranslatePipe, HomeTabComponent],
+      providers: [
+        {provide: PlatformFeatureService, useValue: mockPlatformFeatureService},
+      ],
+      schemas: [NO_ERRORS_SCHEMA],
+    }).compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(HomeTabComponent);
+    component = fixture.componentInstance;
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+    loaderService = TestBed.inject(LoaderService);
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true
+    );
+  });
+
+  it('should set allCardsLoaded to true immediately when totalLessonCards is 0', () => {
+    component.currentGoals = [];
+    component.goalTopics = [];
+    component.incompleteExplorationsList = [];
+    component.incompleteCollectionsList = [];
+    component.partiallyLearntTopicsList = [];
+    component.totalLessonsInPlaylists = [];
+    component.untrackedTopics = {};
+    component.username = 'testuser';
+    component.allCardsLoaded = false;
+    component.loadingMessage = 'Loading';
+    const hideLoadingScreenSpy = spyOn(loaderService, 'hideLoadingScreen');
+
+    component.ngOnInit();
+
+    expect(component.totalLessonCards).toEqual(0);
+    expect(component.allCardsLoaded).toBeTrue();
+    expect(component.loadingMessage).toEqual('');
+    expect(hideLoadingScreenSpy).toHaveBeenCalled();
+  });
+
+  it('should set allCardsLoaded to true after timeout when not all cards are loaded', fakeAsync(() => {
+    const sampleExploration = {
+      last_updated_msec: 1591296737470.528,
+      community_owned: false,
+      objective: 'Test Objective',
+      id: '44LKoKLlIbGe',
+      num_views: 0,
+      thumbnail_icon_url: '/subjects/Algebra.svg',
+      human_readable_contributors_summary: {},
+      language_code: 'en',
+      thumbnail_bg_color: '#cc4b00',
+      created_on_msec: 1591296635736.666,
+      ratings: {1: 0, 2: 0, 3: 0, 4: 0, 5: 0},
+      status: 'public',
+      tags: [],
+      activity_type: 'exploration',
+      category: 'Algebra',
+      title: 'Test Title',
+    };
+
+    component.currentGoals = [];
+    component.goalTopics = [];
+    component.incompleteExplorationsList = [
+      LearnerExplorationSummary.createFromBackendDict(sampleExploration),
+    ];
+    component.incompleteCollectionsList = [];
+    component.partiallyLearntTopicsList = [];
+    component.totalLessonsInPlaylists = [];
+    component.untrackedTopics = {};
+    component.username = 'testuser';
+    component.allCardsLoaded = false;
+    const hideLoadingScreenSpy = spyOn(loaderService, 'hideLoadingScreen');
+
+    component.ngOnInit();
+
+    expect(component.allCardsLoaded).toBeFalse();
+    expect(component.totalLessonCards).toBeGreaterThan(0);
+    tick(10100);
+    expect(component.allCardsLoaded).toBeTrue();
+    expect(component.loadingMessage).toEqual('');
+    expect(hideLoadingScreenSpy).toHaveBeenCalled();
+  }));
+
+  it('should not call hideLoadingScreen in timeout if cards are already loaded', fakeAsync(() => {
+    const sampleExploration = {
+      last_updated_msec: 1591296737470.528,
+      community_owned: false,
+      objective: 'Test Objective',
+      id: '44LKoKLlIbGe',
+      num_views: 0,
+      thumbnail_icon_url: '/subjects/Algebra.svg',
+      human_readable_contributors_summary: {},
+      language_code: 'en',
+      thumbnail_bg_color: '#cc4b00',
+      created_on_msec: 1591296635736.666,
+      ratings: {1: 0, 2: 0, 3: 0, 4: 0, 5: 0},
+      status: 'public',
+      tags: [],
+      activity_type: 'exploration',
+      category: 'Algebra',
+      title: 'Test Title',
+    };
+
+    component.currentGoals = [];
+    component.goalTopics = [];
+    component.incompleteExplorationsList = [
+      LearnerExplorationSummary.createFromBackendDict(sampleExploration),
+    ];
+    component.incompleteCollectionsList = [];
+    component.partiallyLearntTopicsList = [];
+    component.totalLessonsInPlaylists = [];
+    component.untrackedTopics = {};
+    component.username = 'testuser';
+    const hideLoadingScreenSpy = spyOn(loaderService, 'hideLoadingScreen');
+
+    component.ngOnInit();
+
+    component.allCardsLoaded = true;
+    const callCountBeforeTimeout = hideLoadingScreenSpy.calls.count();
+    tick(10100);
+    expect(hideLoadingScreenSpy.calls.count()).toEqual(callCountBeforeTimeout);
+  }));
+
+  it('should increment loadedLessonCards and hide loading screen when all lessons are loaded', () => {
+    component.loadedLessonCards = 4;
+    component.totalLessonCards = 5;
+    component.allCardsLoaded = false;
+    component.loadingMessage = 'Loading';
+    const hideLoadingScreenSpy = spyOn(loaderService, 'hideLoadingScreen');
+
+    component.onLessonLoaded();
+
+    expect(component.loadedLessonCards).toEqual(5);
+    expect(component.allCardsLoaded).toBeTrue();
+    expect(component.loadingMessage).toEqual('');
+    expect(hideLoadingScreenSpy).toHaveBeenCalled();
+  });
+
+  it('should increment loadedLessonCards without hiding loading screen when not all lessons are loaded', () => {
+    component.loadedLessonCards = 2;
+    component.totalLessonCards = 5;
+    component.allCardsLoaded = false;
+    component.loadingMessage = 'Loading';
+    const hideLoadingScreenSpy = spyOn(loaderService, 'hideLoadingScreen');
+
+    component.onLessonLoaded();
+
+    expect(component.loadedLessonCards).toEqual(3);
+    expect(component.allCardsLoaded).toBeFalse();
+    expect(component.loadingMessage).toEqual('Loading');
+    expect(hideLoadingScreenSpy).not.toHaveBeenCalled();
   });
 });

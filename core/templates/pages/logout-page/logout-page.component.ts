@@ -50,10 +50,11 @@ export class LogoutPageComponent implements OnInit {
     const searchParams = new URLSearchParams(
       this.windowRef.nativeWindow.location.search
     );
-    const redirectUrl = searchParams.get('redirect_url') ?? '/';
-    this.windowRef.nativeWindow.location.assign(
-      this.utilsService.getSafeReturnUrl(redirectUrl)
+
+    const redirectUrl = this.utilsService.getSafeReturnUrl(
+      searchParams.get('redirect_url') ?? '/'
     );
+    this.windowRef.nativeWindow.location.assign(redirectUrl);
   }
 
   private onSignOutError(error: firebase.auth.Error): void {
