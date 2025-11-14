@@ -292,6 +292,9 @@ def managed_elasticsearch_dev_server() -> Iterator[psutil.Process]:
         '-E',
         # Disable security for the local ElasticSearch server.
         'xpack.security.enabled=false',
+        # Elasticsearch 8 uses stricter default disk watermarks than ES 7.
+        # We override them to 95% to match our old ES 7 behavior and prevent
+        # unexpected shard relocation or indices becoming read-only after upgrade.
         # https://www.elastic.co/guide/en/elasticsearch/reference/8.17/modules-cluster.html#disk-based-shard-allocation
         '-E',
         'cluster.routing.allocation.disk.watermark.low=95%',
