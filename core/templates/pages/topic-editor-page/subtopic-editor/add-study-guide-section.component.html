@@ -8,7 +8,7 @@
     <div class="oppia-rule-details-header">
       <div class="section-heading-and-content-section">
         <strong>Heading</strong>
-        <schema-based-editor class="e2e-test-add-study-guide-section-modal-heading-field"
+        <schema-based-editor class="e2e-test-add-study-guide-section-modal-heading-field study-guide-heading-field"
                              [schema]="getHeadingSchema()"
                              [localValue]="tempSectionHeadingPlaintext"
                              (localValueChange)="this.updateLocalHeading($event)">
@@ -23,7 +23,7 @@
         </schema-based-editor>
       </div>
       <div *ngIf="isSectionContentLengthExceeded()" class="oppia-length-validation-error e2e-test-add-study-guide-section-content-length-error">
-        The content length is too long. Please use at most 1000 characters.
+        The content length is too long. Please use at most {{ studyGuideSectionCharacterLimit }} characters.
       </div>
     </div>
   </form>

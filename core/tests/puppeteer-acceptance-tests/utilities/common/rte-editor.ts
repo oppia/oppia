@@ -19,9 +19,11 @@
 import puppeteer from 'puppeteer';
 
 const rteTextAreaSelector = '.e2e-test-rte';
-const ckeBtnOnClass = 'cke_button_on';
 const paragraphFormatOptionSelector = 'a[title*="Format"]';
 const bodyFocusedSelector = '.cke_focus';
+const customizeInteractionModalHeaderSelector =
+  '.e2e-test-rte-helper-modal-header';
+const saveRTEButtonSelector = '.e2e-test-save-state-content';
 
 export class RTEEditor {
   parentPage: puppeteer.Page;
@@ -53,15 +55,9 @@ export class RTEEditor {
     }
 
     // Check if element is active or not to use in post check.
-    const isActive = await optionElement.evaluate(
-      (el: Element, cls: string) => {
-        return el.classList.contains(cls);
-      },
-      ckeBtnOnClass
-    );
     const initialInnerHTML = await this.parentPage.evaluate(
       (selector: string) => {
-        // We are using innerHTML so, we can also track option changes.
+        0;
         // eslint-disable-next-line oppia/no-inner-html
         return document.querySelector(selector)?.innerHTML;
       },
@@ -70,39 +66,55 @@ export class RTEEditor {
 
     await optionElement.click();
 
-    if (title.includes('Indent')) {
+    try {
       await this.parentPage.waitForFunction(
-        (selector: string, innerHTML: string) => {
-          // We are using innerHTML so, we can also track option changes.
+        (selector: string, innerHTML: string, ele2Selector: string) => {
+          const element = document.querySelector(selector);
           // eslint-disable-next-line oppia/no-inner-html
-          return document.querySelector(selector)?.innerHTML !== innerHTML;
+          const classChanged = element?.innerHTML !== innerHTML;
+          const headerElement = document.querySelector(ele2Selector);
+
+          return classChanged || headerElement;
         },
         {},
-        rteTextAreaSelector,
-        initialInnerHTML ?? ''
+        optionSelector,
+        initialInnerHTML ?? '',
+        customizeInteractionModalHeaderSelector
       );
-    } else {
-      try {
-        await this.parentPage.waitForFunction(
-          (selector: string, cls: string, present: boolean) => {
-            const element = document.querySelector(selector);
-            return element?.classList.contains(cls) === present;
-          },
-          {},
-          optionSelector,
-          ckeBtnOnClass,
-          !isActive
-        );
-      } catch (error) {
-        await this.parentPage.evaluate((selector: string) => {
-          const element = document.querySelector(selector);
-          // Log the class list for debugging purposes.
-          // eslint-disable-next-line no-console
-          console.log(`[debug] Class List: ${element?.classList}`);
-        }, optionSelector);
-        throw error;
-      }
+    } catch (error) {
+      await this.parentPage.evaluate((selector: string) => {
+        const element = document.querySelector(selector);
+        // eslint-disable-next-line no-console
+        console.log(`[debug] Class List: ${element?.classList}`);
+      }, optionSelector);
+      throw error;
     }
+  }
+
+  /**
+   * Clears the content of the editor.
+   * Requires the editor to be visible. Does not save the content.
+   */
+  async clearAll(): Promise<void> {
+    const textAreaElement = await this.context.waitForSelector(
+      rteTextAreaSelector,
+      {visible: true}
+    );
+
+    if (!textAreaElement) {
+      throw new Error('Text area element not found.');
+    }
+
+    await textAreaElement.click({clickCount: 3});
+    await this.parentPage.keyboard.press('Backspace');
+
+    await this.parentPage.waitForFunction(
+      (element: Element) => {
+        return element?.textContent === '';
+      },
+      {},
+      textAreaElement
+    );
   }
 
   /**
@@ -164,4 +176,81 @@ export class RTEEditor {
       `${rteTextAreaSelector}${bodyFocusedSelector}`
     );
   }
+
+  /**
+   * Updates the content of the editor and saves it.
+   * After calling this function, the editor is closed,
+   * so it should not be used anymore.
+   * @param {string} content - The content to update the editor with.
+   */
+  async updateAndSaveContent(content: string): Promise<void> {
+    await this.parentPage.waitForSelector(rteTextAreaSelector, {visible: true});
+    await this.parentPage.type(rteTextAreaSelector, content);
+    await this.parentPage.click(saveRTEButtonSelector);
+    await this.parentPage.waitForSelector(rteTextAreaSelector, {
+      hidden: true,
+    });
+  }
 }
+
+export const RTE_BUTTON_TITLES = {
+  BOLD: {
+    EN: 'Bold',
+    HI: 'बोल्ड',
+  },
+  ITALIC: {
+    EN: 'Italic',
+    HI: 'इटैलिक',
+  },
+  NUM_LIST: {
+    EN: 'Numbered List',
+    HI: 'अंकीय सूची',
+  },
+  BULLETED_LIST: {
+    EN: 'Bulleted List',
+    HI: 'बुलॅट सूची',
+  },
+  PRE: {
+    EN: 'Pre',
+    HI: 'Pre',
+  },
+  BLOCK_QUOTE: {
+    HI: 'ब्लॉक-कोट',
+  },
+  INCR_INDENT: {
+    EN: 'Increase Indent',
+    HI: 'इन्डॅन्ट बढ़ायें',
+  },
+  DECR_INDENT: {
+    EN: 'Decrease Indent',
+    HI: 'इन्डॅन्ट कम करें',
+  },
+  COLLAPSIBLE: {
+    EN: 'collapsible',
+    HI: 'collapsible',
+  },
+  IMAGE: {
+    EN: 'image',
+    HI: 'image',
+  },
+  LINK: {
+    EN: 'link',
+    HI: 'link',
+  },
+  MATH_FORMULA: {
+    EN: 'mathematical formula',
+    HI: 'mathematical formula',
+  },
+  CONCEPT_CARD: {
+    EN: 'Concept Card',
+    HI: 'Concept Card',
+  },
+  TABS: {
+    EN: 'Insert tabs',
+    HI: 'Insert tabs',
+  },
+  VIDEO: {
+    EN: 'Insert video',
+    HI: 'Insert video',
+  },
+};

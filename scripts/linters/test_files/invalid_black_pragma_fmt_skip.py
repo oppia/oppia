@@ -18,6 +18,7 @@
 used by scripts/linters/python_linter_test.
 """
 
+
 class FakeClass:
     """This is a fake docstring for prohibited Black pragma purposes.""" # fmt: skip
 

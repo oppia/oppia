@@ -51,7 +51,8 @@ def _require_valid_version(
         raise base.BaseHandler.InvalidInputException(
             'Trying to update version %s of skill from version %s, '
             'which is too old. Please reload the page and try again.'
-            % (skill_version, version_from_payload))
+            % (skill_version, version_from_payload)
+        )
 
 
 def check_can_edit_skill_description(user: user_domain.UserActionsInfo) -> bool:
@@ -78,10 +79,12 @@ class SkillRightsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         'skill_id': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.ENTITY_ID_REGEX
-                }]
+                'validators': [
+                    {
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                    }
+                ],
             }
         }
     }
@@ -98,12 +101,15 @@ class SkillRightsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
         user_actions_info = user_services.get_user_actions_info(self.user_id)
         can_edit_skill_description = check_can_edit_skill_description(
-            user_actions_info)
+            user_actions_info
+        )
 
-        self.values.update({
-            'can_edit_skill_description': can_edit_skill_description,
-            'skill_id': skill_id
-        })
+        self.values.update(
+            {
+                'can_edit_skill_description': can_edit_skill_description,
+                'skill_id': skill_id,
+            }
+        )
 
         self.render_json(self.values)
 
@@ -130,10 +136,12 @@ class EditableSkillDataHandler(
         'skill_id': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.ENTITY_ID_REGEX
-                }]
+                'validators': [
+                    {
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                    }
+                ],
             }
         }
     }
@@ -143,29 +151,24 @@ class EditableSkillDataHandler(
             'version': {
                 'schema': {
                     'type': 'int',
-                    'validators': [{
-                        'id': 'is_at_least',
-                        'min_value': 1
-                    }]
+                    'validators': [{'id': 'is_at_least', 'min_value': 1}],
                 }
             },
             'commit_message': {
-                'schema': {
-                    'type': 'basestring'
-                },
-                'default_value': None
+                'schema': {'type': 'basestring'},
+                'default_value': None,
             },
             'change_dicts': {
                 'schema': {
                     'type': 'list',
                     'items': {
                         'type': 'object_dict',
-                        'object_class': skill_domain.SkillChange
-                    }
+                        'object_class': skill_domain.SkillChange,
+                    },
                 }
-            }
+            },
         },
-        'DELETE': {}
+        'DELETE': {},
     }
 
     @acl_decorators.open_access
@@ -182,7 +185,8 @@ class EditableSkillDataHandler(
 
         if skill is None:
             raise self.NotFoundException(
-                Exception('The skill with the given id doesn\'t exist.'))
+                Exception('The skill with the given id doesn\'t exist.')
+            )
 
         topics = topic_fetchers.get_all_topics()
         grouped_skill_summary_dicts = {}
@@ -205,16 +209,20 @@ class EditableSkillDataHandler(
                 assigned_skill_topic_data_dict[topic.name] = subtopic_name
 
             skill_summaries = skill_services.get_multi_skill_summaries(
-                skill_ids_in_topic)
+                skill_ids_in_topic
+            )
             skill_summary_dicts = [
-                summary.to_dict() for summary in skill_summaries]
+                summary.to_dict() for summary in skill_summaries
+            ]
             grouped_skill_summary_dicts[topic.name] = skill_summary_dicts
 
-        self.values.update({
-            'skill': skill.to_dict(),
-            'assigned_skill_topic_data_dict': assigned_skill_topic_data_dict,
-            'grouped_skill_summaries': grouped_skill_summary_dicts
-        })
+        self.values.update(
+            {
+                'skill': skill.to_dict(),
+                'assigned_skill_topic_data_dict': assigned_skill_topic_data_dict,
+                'grouped_skill_summaries': grouped_skill_summary_dicts,
+            }
+        )
 
         self.render_json(self.values)
 
@@ -236,30 +244,33 @@ class EditableSkillDataHandler(
         skill = skill_fetchers.get_skill_by_id(skill_id, strict=False)
         if skill is None:
             raise self.NotFoundException(
-                Exception('The skill with the given id doesn\'t exist.'))
+                Exception('The skill with the given id doesn\'t exist.')
+            )
 
         version = self.normalized_payload['version']
         _require_valid_version(version, skill.version)
 
         commit_message = self.normalized_payload.get('commit_message')
-        if (commit_message is not None and
-                len(commit_message) > constants.MAX_COMMIT_MESSAGE_LENGTH):
+        if (
+            commit_message is not None
+            and len(commit_message) > constants.MAX_COMMIT_MESSAGE_LENGTH
+        ):
             raise self.InvalidInputException(
                 'Commit messages must be at most %s characters long.'
-                % constants.MAX_COMMIT_MESSAGE_LENGTH)
+                % constants.MAX_COMMIT_MESSAGE_LENGTH
+            )
 
         change_list = self.normalized_payload['change_dicts']
         try:
             skill_services.update_skill(
-                self.user_id, skill_id, change_list, commit_message)
+                self.user_id, skill_id, change_list, commit_message
+            )
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
         skill_dict = skill_fetchers.get_skill_by_id(skill_id).to_dict()
 
-        self.values.update({
-            'skill': skill_dict
-        })
+        self.values.update({'skill': skill_dict})
 
         self.render_json(self.values)
 
@@ -278,7 +289,8 @@ class EditableSkillDataHandler(
         if skill_services.skill_has_associated_questions(skill_id):
             raise self.InvalidInputException(
                 'Please delete all questions associated with this skill '
-                'first.')
+                'first.'
+            )
 
         skill_services.remove_skill_from_all_topics(self.user_id, skill_id)
         skill_services.delete_skill(self.user_id, skill_id)
@@ -296,7 +308,7 @@ class SkillDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         'comma_separated_skill_ids': {
             'schema': {
                 'type': 'object_dict',
-                'validation_method': domain_objects_validator.validate_skill_ids
+                'validation_method': domain_objects_validator.validate_skill_ids,
             }
         }
     }
@@ -320,9 +332,7 @@ class SkillDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             raise self.NotFoundException(e)
 
         skill_dicts = [skill.to_dict() for skill in skills]
-        self.values.update({
-            'skills': skill_dicts
-        })
+        self.values.update({'skills': skill_dicts})
 
         self.render_json(self.values)
 
@@ -343,9 +353,7 @@ class FetchSkillsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         skills = skill_fetchers.get_multi_skills(list(skill_ids), strict=False)
 
         skill_dicts = [skill.to_dict() for skill in skills]
-        self.values.update({
-            'skills': skill_dicts
-        })
+        self.values.update({'skills': skill_dicts})
 
         self.render_json(self.values)
 
@@ -358,10 +366,12 @@ class SkillDescriptionHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         'skill_description': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'has_length_at_most',
-                    'max_value': android_validation_constants.MAX_CHARS_IN_SKILL_DESCRIPTION  # pylint: disable=line-too-long
-                }]
+                'validators': [
+                    {
+                        'id': 'has_length_at_most',
+                        'max_value': android_validation_constants.MAX_CHARS_IN_SKILL_DESCRIPTION,  # pylint: disable=line-too-long
+                    }
+                ],
             }
         }
     }
@@ -375,11 +385,15 @@ class SkillDescriptionHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         Args:
             skill_description: str. Skill description.
         """
-        self.values.update({
-            'skill_description_exists': (
-                skill_services.does_skill_with_description_exist(
-                    skill_description))
-        })
+        self.values.update(
+            {
+                'skill_description_exists': (
+                    skill_services.does_skill_with_description_exist(
+                        skill_description
+                    )
+                )
+            }
+        )
         self.render_json(self.values)
 
 
@@ -395,10 +409,12 @@ class DiagnosticTestSkillAssignmentHandler(
         'skill_id': {
             'schema': {
                 'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.ENTITY_ID_REGEX
-                }]
+                'validators': [
+                    {
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                    }
+                ],
             }
         }
     }
@@ -412,9 +428,13 @@ class DiagnosticTestSkillAssignmentHandler(
         Args:
             skill_id: str. The skill ID.
         """
-        self.values.update({
-            'topic_names': (
-                skill_services
-                .get_topic_names_with_given_skill_in_diagnostic_test(skill_id))
-        })
+        self.values.update(
+            {
+                'topic_names': (
+                    skill_services.get_topic_names_with_given_skill_in_diagnostic_test(
+                        skill_id
+                    )
+                )
+            }
+        )
         self.render_json(self.values)

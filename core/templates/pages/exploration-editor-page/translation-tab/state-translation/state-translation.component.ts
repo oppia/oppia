@@ -52,7 +52,7 @@ import {BaseTranslatableObject} from 'interactions/rule-input-defs';
 import {Hint} from 'domain/exploration/hint-object.model';
 import {Solution} from 'domain/exploration/solution.model';
 import {EntityTranslationsService} from 'services/entity-translations.services';
-import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
+import {TranslatedContent} from 'domain/exploration/translated-content.model';
 import {TranslationLanguageService} from '../services/translation-language.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 
@@ -126,11 +126,6 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
 
   isVoiceoverModeActive(): boolean {
     return this.translationTabActiveModeService.isVoiceoverModeActive();
-  }
-
-  isVoiceoverContributionEnabled(): boolean {
-    return this.platformFeatureService.status.EnableVoiceoverContribution
-      .isEnabled;
   }
 
   getRequiredHtml(subtitledHtml: SubtitledHtml): string {

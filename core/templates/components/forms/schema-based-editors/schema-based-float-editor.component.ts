@@ -147,8 +147,6 @@ export class SchemaBasedFloatEditorComponent
     this.hasLoaded = false;
     this.userIsCurrentlyTyping = false;
     this.userHasFocusedAtLeastOnce = false;
-    this.labelForErrorFocusTarget =
-      this.focusManagerService.generateFocusLabel();
     if (this.localValue === undefined) {
       this.localValue = 0.0;
     }

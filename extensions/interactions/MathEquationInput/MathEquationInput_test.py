@@ -20,7 +20,9 @@ from __future__ import annotations
 
 from core.tests import test_utils
 
-from extensions.interactions.MathEquationInput import MathEquationInput # pylint: disable=unused-import, line-too-long # isort: skip
+from extensions.interactions.MathEquationInput import (  # pylint: disable=unused-import, line-too-long # isort: skip
+    MathEquationInput,
+)
 
 
 class MathEquationInputTests(test_utils.GenericTestBase):

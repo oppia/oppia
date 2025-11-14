@@ -32,7 +32,7 @@ import elasticsearch
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import datastore_services, secrets_services
 
 secrets_services = models.Registry.import_secrets_services()
@@ -51,18 +51,31 @@ class ElasticSearchClient:
             with datastore_services.get_ndb_context():
                 es_cloud_id = (
                     platform_parameter_services.get_platform_parameter_value(
-                        platform_parameter_list.ParamName.ES_CLOUD_ID.value))
+                        platform_parameter_list.ParamName.ES_CLOUD_ID.value
+                    )
+                )
                 es_username = (
                     platform_parameter_services.get_platform_parameter_value(
-                        platform_parameter_list.ParamName.ES_USERNAME.value))
+                        platform_parameter_list.ParamName.ES_USERNAME.value
+                    )
+                )
                 self._client = elasticsearch.Elasticsearch(
-                    ('%s:%s' % (feconf.ES_HOST, feconf.ES_LOCALHOST_PORT))
-                    if es_cloud_id == '' else None,
+                    (
+                        ('%s:%s' % (feconf.ES_HOST, feconf.ES_LOCALHOST_PORT))
+                        if es_cloud_id == ''
+                        else None
+                    ),
                     cloud_id=es_cloud_id,
                     http_auth=(
-                        (es_username, secrets_services.get_secret(
-                            'ES_PASSWORD'))
-                        if es_cloud_id else None), timeout=30)
+                        (
+                            es_username,
+                            secrets_services.get_secret('ES_PASSWORD'),
+                        )
+                        if es_cloud_id
+                        else None
+                    ),
+                    timeout=30,
+                )
 
         return self._client
 
@@ -116,11 +129,10 @@ def _fetch_response_from_elastic_search(
     num_docs_to_fetch = size + 1
     try:
         response = ES.get_client().search(
-            body=query_definition, index=index_name,
-            params={
-                'size': num_docs_to_fetch,
-                'from': offset
-            })
+            body=query_definition,
+            index=index_name,
+            params={'size': num_docs_to_fetch, 'from': offset},
+        )
     except elasticsearch.NotFoundError:
         # The index does not exist yet. Create it and return an empty result.
         _create_index(index_name)
@@ -181,12 +193,14 @@ def add_documents_to_index(
     for document in documents:
         try:
             response = ES.get_client().index(
-                index_name, document, id=document['id'])
+                index_name, document, id=document['id']
+            )
         except elasticsearch.NotFoundError:
             # The index does not exist yet. Create it and repeat the operation.
             _create_index(index_name)
             response = ES.get_client().index(
-                index_name, document, id=document['id'])
+                index_name, document, id=document['id']
+            )
 
         if response is None or response['_shards']['failed'] > 0:
             raise SearchException('Failed to add document to index.')
@@ -208,7 +222,8 @@ def delete_documents_from_index(doc_ids: List[str], index_name: str) -> None:
     for doc_id in doc_ids:
         try:
             document_exists_in_index = ES.get_client().exists(
-                index_name, doc_id)
+                index_name, doc_id
+            )
         except elasticsearch.NotFoundError:
             # The index does not exist yet. Create it and set
             # document_exists_in_index to False.
@@ -229,14 +244,7 @@ def clear_index(index_name: str) -> None:
     # More details on clearing an index can be found here:
     # https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.delete_by_query
     # https://stackoverflow.com/questions/57778438/delete-all-documents-from-elasticsearch-index-in-python-3-x
-    ES.get_client().delete_by_query(
-        index_name,
-        {
-            'query':
-                {
-                    'match_all': {}
-                }
-        })
+    ES.get_client().delete_by_query(index_name, {'query': {'match_all': {}}})
 
 
 def search(
@@ -296,20 +304,24 @@ def search(
                 'filter': [],
             }
         },
-        'sort': [{
-            'rank': {
-                'order': 'desc',
-                'missing': '_last',
-                'unmapped_type': 'float',
+        'sort': [
+            {
+                'rank': {
+                    'order': 'desc',
+                    'missing': '_last',
+                    'unmapped_type': 'float',
+                }
             }
-        }],
+        ],
     }
     if query_string:
-        query_definition['query']['bool']['must'] = [{
-            'multi_match': {
-                'query': query_string,
+        query_definition['query']['bool']['must'] = [
+            {
+                'multi_match': {
+                    'query': query_string,
+                }
             }
-        }]
+        ]
     if categories:
         category_string = ' '.join(['"%s"' % cat for cat in categories])
         query_definition['query']['bool']['filter'].append(
@@ -377,20 +389,24 @@ def blog_post_summaries_search(
                 'filter': [],
             }
         },
-        'sort': [{
-            'rank': {
-                'order': 'desc',
-                'missing': '_last',
-                'unmapped_type': 'float',
+        'sort': [
+            {
+                'rank': {
+                    'order': 'desc',
+                    'missing': '_last',
+                    'unmapped_type': 'float',
+                }
             }
-        }],
+        ],
     }
     if query_string:
-        query_definition['query']['bool']['must'] = [{
-            'multi_match': {
-                'query': query_string,
+        query_definition['query']['bool']['must'] = [
+            {
+                'multi_match': {
+                    'query': query_string,
+                }
             }
-        }]
+        ]
     if tags:
         for tag in tags:
             query_definition['query']['bool']['filter'].append(
