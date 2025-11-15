@@ -107,10 +107,10 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
         correct_index_name = 'index1'
 
         def mock_delete_by_query(
-            index: str, query: Dict[str, Dict[str, Dict[str, str]]]
+            index: str, body: Dict[str, Dict[str, Dict[str, str]]]
         ) -> None:
             self.assertEqual(index, correct_index_name)
-            self.assertEqual(query, {'query': {'match_all': {}}})
+            self.assertEqual(body, {'query': {'match_all': {}}})
 
         es_client = elastic_search_services.ES.get_client()
         swap_delete_by_query = self.swap(
