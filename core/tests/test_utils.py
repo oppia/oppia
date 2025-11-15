@@ -639,7 +639,7 @@ class ElasticSearchStub:
                 'index': index,
                 'index_uuid': 'RaNdOmStRiNgOfAlPhAs',
             }
-            meta = type('Meta', (), {'status': 404})()
+            meta = type('Meta', (), {'status': 400})()
             body = {'error': error_data, 'status': 400}
             raise elasticsearch.RequestError(
                 f'resource_already_exists_exception: index [{index}/RaNdOmStRiNgOfAlPhAs] already exists',
