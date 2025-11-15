@@ -98,7 +98,7 @@ class Elasticsearch(object):
     def delete_by_query(
         self,
         index: Any,
-        query: Any,
+        body: Any,
         *,
         _source: Optional[Any] = ...,
         _source_excludes: Optional[Any] = ...,
