@@ -200,11 +200,11 @@
 
   </div>
 
-  <div *ngIf="fetchingrenegenratedVoiceoverData">
+  <div *ngIf="fetchingregeneratedVoiceoverData">
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>
   </div>
 
-  <div *ngIf="!fetchingrenegenratedVoiceoverData && !cloudTaskRunList.length">
+  <div *ngIf="!fetchingregeneratedVoiceoverData && !cloudTaskRunList.length">
     <p class="info-text">
       <i>No records found for the selected date range.</i>
     </p>
@@ -282,7 +282,7 @@
     margin-bottom: 5px;
   }
   .exploration-data-close-button {
-    margin-left: 52%;
+    margin-left: 50%;
   }
   .exploration-data-response-message-container {
     color: #ff0000;

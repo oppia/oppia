@@ -420,15 +420,21 @@ class RegenerateVoiceoversForExplorationHandler(
         """Regenerates the automatic voiceover for the specified exploration in
         the selected language and accent.
         """
-        # Check committer ID.
 
-        (
-            voiceover_services.regenerate_voiceovers_of_exploration_for_given_language_accent(
+        if opportunity_services.is_exploration_available_for_contribution(
+            exploration_id
+        ) and feature_flag_services.is_feature_flag_enabled(
+            feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS.value,
+            None,
+        ):
+            taskqueue_services.defer(
+                feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+                    'FUNCTION_ID_REGENERATE_VOICEOVERS_OF_EXPLORATION_FOR_GIVEN_LANGUAGE_ACCENT'
+                ],
+                taskqueue_services.QUEUE_NAME_VOICEOVER_REGENERATION,
                 exploration_id,
                 language_accent_code,
-                feconf.SYSTEM_COMMITTER_ID,
-                datetime.datetime.utcnow(),
+                self.user_id,
+                datetime.datetime.utcnow().isoformat(),
             )
-        )
-
         self.render_json(self.values)

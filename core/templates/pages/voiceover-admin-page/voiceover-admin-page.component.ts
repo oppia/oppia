@@ -96,7 +96,7 @@ export class VoiceoverAdminPageComponent implements OnInit {
   cloudTaskRunIdToIndex: {[cloudTaskRunId: string]: number} = {};
 
   voiceArtistsDataCount: number = 0;
-  fetchingrenegenratedVoiceoverData: boolean = false;
+  fetchingregeneratedVoiceoverData: boolean = false;
 
   range = new FormGroup({
     start: new FormControl(null),
@@ -317,8 +317,8 @@ export class VoiceoverAdminPageComponent implements OnInit {
   }
 
   fetchVoiceoverRegenerationRecord(): void {
-    this.fetchingrenegenratedVoiceoverData =
-      !this.fetchingrenegenratedVoiceoverData;
+    this.fetchingregeneratedVoiceoverData =
+      !this.fetchingregeneratedVoiceoverData;
 
     let startDate = this.range.value.start;
     let startDateText = startDate ? startDate.toISOString() : '';
@@ -328,18 +328,21 @@ export class VoiceoverAdminPageComponent implements OnInit {
 
     this.voiceoverBackendApiService
       .fetchVoiceoverRegenerationRecordAsync(startDateText, endDateText)
-      .then(response => {
-        this.cloudTaskRunList = response;
+      .then(
+        response => {
+          this.cloudTaskRunList = response;
+          this.fetchingregeneratedVoiceoverData = false;
 
-        for (let i = 0; i < this.cloudTaskRunList.length; i++) {
-          this.cloudTaskRunIdToIndex[this.cloudTaskRunList[i].id] = i;
+          for (let i = 0; i < this.cloudTaskRunList.length; i++) {
+            this.cloudTaskRunIdToIndex[this.cloudTaskRunList[i].id] = i;
+          }
+
+          this.cdr.detectChanges();
+        },
+        () => {
+          this.fetchingregeneratedVoiceoverData = false;
         }
-
-        this.cdr.detectChanges();
-      })
-      .finally(() => {
-        this.fetchingrenegenratedVoiceoverData = false;
-      });
+      );
   }
 
   openCloudTaskRunDetailModal(cloudTaskRunId: string): void {
@@ -377,10 +380,6 @@ export class VoiceoverAdminPageComponent implements OnInit {
         this.isExplorationDataResponseContainerShown = true;
         this.autogeneratableLanguageAccentCodes =
           response.explorationData?.autogeneratableLanguageAccentCodes || [];
-        console.log(this.languageAccentCodesToDescriptionsMasterList);
-        console.log(
-          response.explorationData?.autogeneratableLanguageAccentCodes
-        );
         this.cdr.detectChanges();
       });
   }
@@ -390,10 +389,6 @@ export class VoiceoverAdminPageComponent implements OnInit {
   ): void {
     this.selectedLanguageAccentForExplorationVoiceoverRegeneration =
       languageAccentCode;
-    console.log(
-      'value updated to ',
-      this.selectedLanguageAccentForExplorationVoiceoverRegeneration
-    );
   }
 
   generateVoiceoversForExploration(): void {
