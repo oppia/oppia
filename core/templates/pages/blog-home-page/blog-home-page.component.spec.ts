@@ -195,7 +195,7 @@ describe('Blog home page component', () => {
     component['filterWasUsed'] = true;
     component.page = 3;
     component.firstPostOnPageNum = 21;
-    component.blogPostSummaries = [{'id':1,title:'Test'}] as BlogPostSummary[];
+    component.blogPostSummaries = [{'id':1,title:'Test'}] as any;
     component.totalBlogPosts = 50;
     component.showBlogPostCardsLoadingScreen = true;
 
