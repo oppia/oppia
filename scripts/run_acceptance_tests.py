@@ -190,13 +190,12 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
             # otherwise it returns the return code of the process (an int).
             if proc.poll() is not None:
                 break
-
+                
         if failed_tests:
-            print("\nAggregated Failures:")
-            for fail in failed_tests:
-                print(fail)
-            with open('aggregated_failures.txt', 'w') as f:
-                f.write('\n'.join(failed_tests))
+            throw new Error(
+              "\n".join(failed_tests) +
+                '\r\nDownload the artifact folder diff-snapshots from the github workflow to check the screenshot(s).'
+            );
 
         return_value = output_lines, proc.returncode
     return return_value
