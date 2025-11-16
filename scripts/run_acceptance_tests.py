@@ -167,6 +167,7 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
         print('Servers have come up.\n')
 
         output_lines = []
+        failed_tests = []
         while True:
             # Keep reading lines until an empty string is returned. Empty
             # strings signal that the process has ended.
@@ -179,10 +180,23 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
                 output_lines.append(line.rstrip())
                 # Replaces non-ASCII characters with '?'.
                 common.write_stdout_safe(line.decode('ascii', errors='replace'))
+                decoded_line = line.decode('ascii', errors='replace')
+                if (
+                    'SNAPSHOT MISMATCH' in decoded_line
+                    or 'Test failed' in decoded_line
+                ):
+                    failed_tests.append(decoded_line)
             # The poll() method returns None while the process is running,
             # otherwise it returns the return code of the process (an int).
             if proc.poll() is not None:
                 break
+
+        if failed_tests:
+            print("\nAggregated Failures:")
+            for fail in failed_tests:
+                print(fail)
+            with open('aggregated_failures.txt', 'w') as f:
+                f.write('\n'.join(failed_tests))
 
         return_value = output_lines, proc.returncode
     return return_value
