@@ -3619,7 +3619,7 @@ class SubtitledHtml:
         if not isinstance(self.html, str):
             raise utils.ValidationError('Invalid content HTML: %s' % self.html)
 
-        validation_services.Validators.validate_html_content(self.html)
+        validation_services.validate_html_content(self.html)
 
     @classmethod
     def create_default_subtitled_html(cls, content_id: str) -> SubtitledHtml:

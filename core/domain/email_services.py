@@ -47,13 +47,13 @@ def _is_sender_email_valid(sender_email: str) -> bool:
     """
     split_sender_email = sender_email.split(' ')
     if len(split_sender_email) < 2:
-        return validation_services.Validators.is_email_valid(sender_email)
+        return validation_services.is_email_valid(sender_email)
 
     email_address = split_sender_email[-1]
     if not email_address.startswith('<') or not email_address.endswith('>'):
         return False
 
-    return validation_services.Validators.is_email_valid(email_address[1:-1])
+    return validation_services.is_email_valid(email_address[1:-1])
 
 
 def send_mail(
@@ -106,7 +106,7 @@ def send_mail(
     if not server_can_send_emails:
         raise Exception('This app cannot send emails to users.')
 
-    if not validation_services.Validators.is_email_valid(recipient_email):
+    if not validation_services.is_email_valid(recipient_email):
         raise ValueError(
             'Malformed recipient email address: %s' % recipient_email
         )
@@ -190,7 +190,7 @@ def send_bulk_mail(
         raise Exception('This app cannot send emails to users.')
 
     for recipient_email in recipient_emails:
-        if not validation_services.Validators.is_email_valid(recipient_email):
+        if not validation_services.is_email_valid(recipient_email):
             raise ValueError(
                 'Malformed recipient email address: %s' % recipient_email
             )

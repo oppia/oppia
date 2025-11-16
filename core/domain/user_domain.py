@@ -322,7 +322,7 @@ class UserSettings:
         if not self.email:
             raise utils.ValidationError('No user email specified.')
 
-        validation_services.Validators.validate_email(self.email)
+        validation_services.validate_email(self.email)
 
         if not isinstance(self.creator_dashboard_display_pref, str):
             raise utils.ValidationError(

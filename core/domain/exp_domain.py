@@ -1840,7 +1840,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 'Invalid language_code: %s' % self.language_code
             )
 
-        validation_services.Validators.validate_tags(self.tags, 'tags')
+        validation_services.validate_tags(self.tags, 'tags')
 
         if not isinstance(self.blurb, str):
             raise utils.ValidationError(
@@ -6377,7 +6377,7 @@ class ExplorationSummary:
                 'Invalid language_code: %s' % self.language_code
             )
 
-        validation_services.Validators.validate_tags(self.tags, 'tags')
+        validation_services.validate_tags(self.tags, 'tags')
 
         if not isinstance(self.ratings, dict):
             raise utils.ValidationError(
