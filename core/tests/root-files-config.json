@@ -1,5 +1,6 @@
 {
   "RUN_NO_TESTS_ROOT_FILES": [
+    "AGENTS.md",
     ".github/CODEOWNERS",
     ".github/CODE_OF_CONDUCT.md",
     ".github/CONTRIBUTING.md",
