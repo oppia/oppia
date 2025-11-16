@@ -21,8 +21,8 @@ RUN curl -L -o google-chrome.deb https://github.com/webnicer/chrome-downloads/ra
 RUN apt-get install -y ./google-chrome.deb
 RUN rm google-chrome.deb
 
-RUN pip install --upgrade pip==25.2
-RUN pip install pip-tools==7.5.0 setuptools==80.9.0 cmake
+RUN pip install --upgrade pip==25.3
+RUN pip install pip-tools==7.5.2 setuptools==80.9.0 cmake
 
 WORKDIR /app/vm_deps
 
