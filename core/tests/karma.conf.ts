@@ -50,6 +50,14 @@ let jasmineSeed = Math.floor(Math.random() * 1000);
 console.log(`Seed for Frontend Test Execution Order ${jasmineSeed}`);
 
 module.exports = function (config) {
+  // Build reporters array by merging with any pre-existing reporters (if present).
+  // This keeps original behavior and just appends junit.
+  const baseReporters = ['progress', 'coverage-istanbul'];
+  const reporters = (config && config.reporters) || baseReporters;
+  if (!reporters.includes('junit')) {
+    reporters.push('junit');
+  }
+
   config.set({
     basePath: '../../',
     frameworks: ['jasmine'],
@@ -116,7 +124,23 @@ module.exports = function (config) {
       },
     },
     crossOriginAttribute: true,
-    reporters: ['progress', 'coverage-istanbul'],
+
+    // Reporters now include junit in addition to the existing ones.
+    reporters: reporters,
+
+    // JUnit reporter config: write junit xml to test_results/karma-junit.xml
+    junitReporter: {
+      // directory where to put the results
+      // the path is relative to the basePath (../../ in this config)
+      outputDir: 'test_results',
+      // if included, will be the file name (prefix is not used because useBrowserName=false)
+      outputFile: 'karma-junit.xml',
+      // do not append browser name to the file
+      useBrowserName: false,
+      // optional: suite name for the test suite
+      suite: '',
+    },
+
     coverageIstanbulReporter: {
       reports: ['html', 'json', 'lcovonly'],
       dir: '../karma_coverage_reports/',
@@ -161,6 +185,8 @@ module.exports = function (config) {
       'karma-json-fixtures-preprocessor',
       'karma-coverage',
       'karma-webpack',
+      // Add junit reporter plugin so karma can emit junit xml
+      'karma-junit-reporter',
     ],
     jsonFixturesPreprocessor: {
       variableName: '__fixtures__',

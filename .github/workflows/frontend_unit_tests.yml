@@ -15,6 +15,7 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
   cancel-in-progress: true
+
 jobs:
   generate-job-strategy-matrix:
     name: Generate job strategy matrix
@@ -36,6 +37,7 @@ jobs:
             JOB_STRATEGY_MATRIX=$(node -e "let r=[]; for(let i = 1; i <= ${{ env.standard-test-runs }}; i++) { r.push(i) }; console.log(JSON.stringify(r));")
             echo "job-strategy-matrix=$JOB_STRATEGY_MATRIX" >> $GITHUB_OUTPUT
           fi
+
   frontend-karma-tests:
     name: Run all tests
     needs: generate-job-strategy-matrix
@@ -48,8 +50,10 @@ jobs:
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
+
       - name: Merge develop and set up dependencies
         uses: ./.github/actions/merge-develop-and-set-up-dependencies
+
       - name: Describe filesystem
         run: |
           pwd
@@ -57,19 +61,39 @@ jobs:
           ls /home/runner/work/oppia
           ls /home/runner/work/oppia/oppia
           echo $GITHUB_WORKSPACE
+
       - name: Suppress ENOSPC error from chokidar file watcher. See https://stackoverflow.com/a/32600959.
         run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
+
+      # Ensure the directory for junit output exists so karma can write into it.
+      - name: Ensure test results dir exists
+        run: mkdir -p test_results
+
       - name: Run frontend tests (attempt ${{ matrix.num_runs }})
         id: run_frontend_tests
         run: python -m scripts.run_frontend_tests --check_coverage
+
+      - name: Upload frontend junit test results
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          # include matrix run for easier correlation
+          name: frontend-test-results-${{ matrix.num_runs }}
+          # Use a glob so we catch the xml regardless of small path differences.
+          path: |
+            **/test_results/karma-junit.xml
+            test_results/karma-junit.xml
+
       - name: Upload frontend coverage reports as an artifact
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
           name: frontend-coverage-${{ matrix.num_runs }}
           path: /home/runner/work/oppia/karma_coverage_reports
+
     permissions:
       pull-requests: write
+
   report-failure:
     name: Report failure
     needs: frontend-karma-tests

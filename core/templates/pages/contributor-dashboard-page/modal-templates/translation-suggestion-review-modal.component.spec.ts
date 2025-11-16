@@ -141,18 +141,12 @@ describe('Translation Suggestion Review Modal Component', function () {
 
     component.contentContainer = new ElementRef({offsetHeight: 150});
     component.translationContainer = new ElementRef({offsetHeight: 150});
-    component.contentPanel = new RteOutputDisplayComponent(
-      null,
-      null,
-      new ElementRef({offsetHeight: 200}),
-      null
-    );
-    component.translationPanel = new RteOutputDisplayComponent(
-      null,
-      null,
-      new ElementRef({offsetHeight: 200}),
-      null
-    );
+    component.contentPanel = {
+      elementRef: new ElementRef({offsetHeight: 200}),
+    } as unknown as RteOutputDisplayComponent;
+    component.translationPanel = {
+      elementRef: new ElementRef({offsetHeight: 200}),
+    } as unknown as RteOutputDisplayComponent;
     component.initialSuggestionId = 'suggestion_1';
     component.suggestionIdToContribution = {
       suggestion_1: {

@@ -279,29 +279,26 @@ describe('Base Content Component', () => {
   });
 
   it('should be able to acknowledge cookies', () => {
-    spyOn(window, 'Date')
-      .withArgs()
-      // This throws "Argument of type 'Date' is not assignable to parameter of
-      // type 'string'.". We need to suppress this error because DateConstructor
-      // cannot be mocked without it.
-      // @ts-expect-error
-      .and.returnValue(new oldDate(NOW_MILLIS))
-      // This throws "Expected 0 arguments, but got 1.". We need to suppress
-      // this error because we pass an argument to the Date constructor in the
-      // component code.
-      // @ts-expect-error
-      .withArgs(ONE_YEAR_FROM_NOW_MILLIS)
-      .and.callThrough();
-    spyOn(cookieService, 'put');
-    componentInstance.acknowledgeCookies();
-    expect(cookieService.put).toHaveBeenCalledWith(
-      'OPPIA_COOKIES_ACKNOWLEDGED',
-      String(NOW_MILLIS),
-      {
-        expires: new oldDate(ONE_YEAR_FROM_NOW_MILLIS),
-        secure: true,
-        sameSite: 'none',
-      }
-    );
+    jasmine.clock().install();
+    const mockedNow = new Date(NOW_MILLIS);
+
+    try {
+      jasmine.clock().mockDate(mockedNow);
+      spyOn(cookieService, 'put');
+
+      componentInstance.acknowledgeCookies();
+
+      expect(cookieService.put).toHaveBeenCalledWith(
+        'OPPIA_COOKIES_ACKNOWLEDGED',
+        String(NOW_MILLIS),
+        {
+          expires: new Date(NOW_MILLIS + componentInstance.ONE_YEAR_IN_MSECS),
+          secure: true,
+          sameSite: 'none',
+        }
+      );
+    } finally {
+      jasmine.clock().uninstall();
+    }
   });
 });
