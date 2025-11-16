@@ -1,0 +1,486 @@
+// Copyright 2014 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for the States.
+ */
+
+import {TestBed} from '@angular/core/testing';
+
+import {CamelCaseToHyphensPipe} from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import {State} from 'domain/state/state.model';
+import {States} from 'domain/exploration/states.model';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
+
+describe('States', () => {
+  let statesDict = null;
+  let newState = null;
+  let newState2 = null;
+  let secondState = null;
+  let statesWithCyclicOutcomeDict = null;
+  let stateDictToDelete = null;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [CamelCaseToHyphensPipe],
+    });
+    spyOnProperty(State, 'NEW_STATE_TEMPLATE', 'get').and.returnValue({
+      classifier_model_id: null,
+      content: {
+        content_id: 'content',
+        html: '',
+      },
+      interaction: {
+        answer_groups: [],
+        confirmed_unclassified_answers: [],
+        customization_args: {
+          rows: {
+            value: 1,
+          },
+          placeholder: {
+            value: new SubtitledUnicode('Type your answer here.', ''),
+          },
+          catchMisspellings: {
+            value: false,
+          },
+        },
+        default_outcome: {
+          dest: '(untitled state)',
+          dest_if_really_stuck: null,
+          feedback: {
+            content_id: 'default_outcome',
+            html: '',
+          },
+          param_changes: [],
+          labelled_as_correct: false,
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null,
+        },
+        hints: [],
+        solution: null,
+        id: 'TextInput',
+      },
+      linked_skill_id: null,
+      param_changes: [],
+      solicit_answer_details: false,
+    });
+
+    newState = {
+      classifier_model_id: null,
+      content: {
+        content_id: 'content_7',
+        html: '',
+      },
+      interaction: {
+        id: 'EndExploration',
+        answer_groups: [],
+        confirmed_unclassified_answers: [],
+        customization_args: {
+          recommendedExplorationIds: {value: []},
+        },
+        default_outcome: {
+          dest: 'new state',
+          dest_if_really_stuck: null,
+          feedback: {
+            content_id: 'default_outcome_8',
+            html: '',
+          },
+          param_changes: [],
+          labelled_as_correct: false,
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null,
+        },
+        hints: [],
+      },
+      linked_skill_id: null,
+      param_changes: [],
+      solicit_answer_details: false,
+    };
+
+    newState2 = {
+      classifier_model_id: null,
+      content: {
+        content_id: 'content_5',
+        html: '',
+      },
+      interaction: {
+        answer_groups: [],
+        confirmed_unclassified_answers: [],
+        customization_args: {
+          rows: {
+            value: 1,
+          },
+          placeholder: {
+            value: new SubtitledUnicode('Type your answer here.', ''),
+          },
+          catchMisspellings: {
+            value: false,
+          },
+        },
+        default_outcome: {
+          dest: 'new state',
+          dest_if_really_stuck: null,
+          feedback: {
+            content_id: 'default_outcome_6',
+            html: '',
+          },
+          param_changes: [],
+          labelled_as_correct: false,
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null,
+        },
+        hints: [],
+        id: 'TextInput',
+      },
+      linked_skill_id: null,
+      param_changes: [],
+      solicit_answer_details: false,
+    };
+
+    secondState = {
+      content: {
+        content_id: 'content',
+        html: 'more content',
+      },
+      interaction: {
+        answer_groups: [],
+        confirmed_unclassified_answers: [],
+        customization_args: {
+          placeholder: {
+            value: {
+              content_id: 'ca_placeholder_0',
+              unicode_str: '',
+            },
+          },
+          rows: {value: 1},
+          catchMisspellings: {
+            value: false,
+          },
+        },
+        default_outcome: {
+          dest: 'new state',
+          dest_if_really_stuck: null,
+          feedback: {
+            content_id: 'default_outcome',
+            html: '',
+          },
+          labelled_as_correct: false,
+          param_changes: [],
+        },
+        hints: [],
+        solution: {
+          answer_is_exclusive: false,
+          correct_answer: 'answer',
+          explanation: {
+            content_id: 'solution',
+            html: '<p>This is an explanation.</p>',
+          },
+        },
+        id: 'TextInput',
+      },
+      linked_skill_id: null,
+      param_changes: [],
+      solicit_answer_details: false,
+    };
+
+    statesDict = {
+      'first state': newState2,
+    };
+
+    statesWithCyclicOutcomeDict = {
+      'first state': {
+        content: {
+          content_id: 'content',
+          html: 'content',
+        },
+        interaction: {
+          id: 'MultipleChoiceInput',
+          customization_args: {
+            choices: {value: []},
+            showChoicesInShuffledOrder: {value: false},
+          },
+          answer_groups: [
+            {
+              outcome: {
+                dest: 'second state',
+                dest_if_really_stuck: 'second state',
+                feedback: {
+                  content_id: 'feedback_1',
+                  html: '',
+                },
+                labelled_as_correct: false,
+                param_changes: [],
+                refresher_exploration_id: null,
+              },
+              rule_specs: [
+                {
+                  rule_type: 'Equals',
+                  inputs: {x: 10},
+                },
+              ],
+            },
+          ],
+          default_outcome: {
+            dest: 'second state',
+            dest_if_really_stuck: 'second state',
+            feedback: {
+              content_id: 'default_outcome',
+              html: '',
+            },
+            labelled_as_correct: false,
+            param_changes: [],
+          },
+          hints: [],
+          solution: null,
+        },
+        param_changes: [],
+        solicit_answer_details: false,
+      },
+      'second state': {
+        content: {
+          content_id: 'content',
+          html: 'content',
+        },
+        interaction: {
+          id: 'MultipleChoiceInput',
+          customization_args: {
+            choices: {value: []},
+            showChoicesInShuffledOrder: {value: false},
+          },
+          answer_groups: [
+            {
+              outcome: {
+                dest: 'first state',
+                dest_if_really_stuck: 'first state',
+                feedback: {
+                  content_id: 'feedback_1',
+                  html: '',
+                },
+                labelled_as_correct: false,
+                param_changes: [],
+                refresher_exploration_id: null,
+              },
+              rule_specs: [
+                {
+                  rule_type: 'Equals',
+                  inputs: {x: 10},
+                },
+              ],
+            },
+          ],
+          default_outcome: {
+            dest: 'first state',
+            dest_if_really_stuck: 'first state',
+            feedback: {
+              content_id: 'default_outcome',
+              html: '',
+            },
+            labelled_as_correct: false,
+            param_changes: [],
+          },
+          hints: [],
+          solution: null,
+        },
+        param_changes: [],
+        solicit_answer_details: false,
+      },
+    };
+
+    stateDictToDelete = {
+      'first state': {
+        content: {
+          content_id: 'content',
+          html: 'content',
+        },
+        interaction: {
+          answer_groups: [
+            {
+              outcome: {
+                dest: 'second state',
+                dest_if_really_stuck: null,
+                feedback: {
+                  content_id: 'feedback_1',
+                  html: '<p>Good.</p>',
+                },
+                labelled_as_correct: false,
+                param_changes: [],
+                refresher_exploration_id: null,
+              },
+              rule_specs: [
+                {
+                  rule_type: 'Equals',
+                  inputs: {x: 20},
+                },
+              ],
+            },
+          ],
+          confirmed_unclassified_answers: [],
+          customization_args: {
+            placeholder: {
+              value: {
+                content_id: 'ca_placeholder_3',
+                unicode_str: '',
+              },
+            },
+            rows: {value: 1},
+            catchMisspellings: {
+              value: false,
+            },
+          },
+          default_outcome: {
+            dest: 'new state',
+            dest_if_really_stuck: null,
+            feedback: {
+              content_id: 'default_outcome',
+              html: '<p>Feedback</p>',
+            },
+            labelled_as_correct: false,
+            param_changes: [],
+          },
+          hints: [
+            {
+              hint_content: {
+                content_id: 'hint_1',
+                html: '<p>Here is a hint.</p>',
+              },
+            },
+            {
+              hint_content: {
+                content_id: 'hint_2',
+                html: '<p>Here is another hint.</p>',
+              },
+            },
+          ],
+          id: 'TextInput',
+        },
+        linked_skill_id: null,
+        param_changes: [],
+        solicit_answer_details: false,
+      },
+      'second state': secondState,
+    };
+  });
+
+  it(
+    'should create a new state given a state name and set ' +
+      'that state to a terminal state',
+    () => {
+      let newStates = States.createFromBackendDict(statesDict);
+      newStates.addState('new state', 'content_5', 'default_outcome_6');
+      expect(newStates.hasState('new state')).toBe(true);
+      expect(newStates.getStateNames()).toEqual(['first state', 'new state']);
+      expect(Object.keys(newStates.getStateObjects()).length).toBe(2);
+
+      newStates.setState(
+        'new state',
+        State.createFromBackendDict('new state', newState)
+      );
+      expect(newStates.getState('new state')).toEqual(
+        State.createFromBackendDict('new state', newState)
+      );
+    }
+  );
+
+  it('should correctly retrieve the terminal states', () => {
+    let newStates = States.createFromBackendDict(statesDict);
+
+    newStates.setState(
+      'first state',
+      State.createFromBackendDict('first state', newState)
+    );
+    expect(newStates.getFinalStateNames()).toEqual['new state'];
+  });
+
+  it('should correctly delete a state', () => {
+    let states = States.createFromBackendDict(stateDictToDelete);
+    states.deleteState('first state');
+    expect(states).toEqual(
+      States.createFromBackendDict({
+        'second state': secondState,
+      })
+    );
+  });
+
+  it('should return all State objects using getStates()', () => {
+    const states = States.createFromBackendDict(statesDict);
+    const stateObjects = states.getStates();
+    expect(Array.isArray(stateObjects)).toBe(true);
+    expect(stateObjects.length).toBe(Object.keys(statesDict).length);
+    expect(stateObjects[0]).toEqual(
+      State.createFromBackendDict('first state', newState2)
+    );
+  });
+
+  it(
+    "should correctly set any states' interaction.defaultOutcomes that " +
+      'point to a deleted or renamed state name',
+    () => {
+      let states = States.createFromBackendDict(statesWithCyclicOutcomeDict);
+      states.renameState('first state', 'third state');
+      states.deleteState('second state');
+      expect(states).toEqual(
+        States.createFromBackendDict({
+          'third state': {
+            content: {
+              content_id: 'content',
+              html: 'content',
+            },
+            interaction: {
+              id: 'MultipleChoiceInput',
+              customization_args: {
+                choices: {value: []},
+                showChoicesInShuffledOrder: {value: false},
+              },
+              answer_groups: [
+                {
+                  outcome: {
+                    dest: 'third state',
+                    dest_if_really_stuck: 'third state',
+                    feedback: {
+                      content_id: 'feedback_1',
+                      html: '',
+                    },
+                    labelled_as_correct: false,
+                    param_changes: [],
+                    refresher_exploration_id: null,
+                  },
+                  rule_specs: [
+                    {
+                      rule_type: 'Equals',
+                      inputs: {x: 10},
+                    },
+                  ],
+                },
+              ],
+              default_outcome: {
+                dest: 'third state',
+                dest_if_really_stuck: 'third state',
+                feedback: {
+                  content_id: 'default_outcome',
+                  html: '',
+                },
+                labelled_as_correct: false,
+                param_changes: [],
+              },
+              hints: [],
+              solution: null,
+            },
+            param_changes: [],
+            solicit_answer_details: false,
+          },
+        })
+      );
+    }
+  );
+});

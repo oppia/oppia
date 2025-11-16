@@ -57,7 +57,7 @@ describe('Curriculum Admin', function () {
     // Setup taking longer than 300000 ms.
   }, 480000);
 
-  it('should create a study guide with multiple sections containing workedexamples.', async function () {
+  it('should create a study guide with multiple sections.', async function () {
     await curriculumAdmin.createSubtopicWithStudyGuideForTopic(
       'subtopic1',
       'abcd',
@@ -72,6 +72,7 @@ describe('Curriculum Admin', function () {
     );
     await curriculumAdmin.saveTopicDraft('Addition and Subtraction');
     await curriculumAdmin.checkAddSectionModalShowsLengthError();
+    await curriculumAdmin.scrollToBottomOfPage();
     await curriculumAdmin.expectScreenshotToMatch(
       'sectionContentLengthError',
       __dirname
@@ -82,10 +83,18 @@ describe('Curriculum Admin', function () {
       'Section content',
       1
     );
+    await curriculumAdmin.scrollToTopOfPage();
     await curriculumAdmin.expectScreenshotToMatch(
       'subtopicWithTwoSections',
-      __dirname
+      __dirname,
+      undefined,
+      {
+        fullPage: true,
+      }
     );
+  }, 600000); // Test takes longer than 5mins.
+
+  it('should add sections with workedexamples.', async function () {
     await curriculumAdmin.addSubtopicStudyGuideSectionWithWorkedExample(
       'Section heading 2',
       'Section content 2',
@@ -94,27 +103,50 @@ describe('Curriculum Admin', function () {
       '1'
     );
     await curriculumAdmin.expandStudyGuideSectionTile(0);
+    await curriculumAdmin.scrollToTopOfPage();
     await curriculumAdmin.expectScreenshotToMatch(
       'sectionTileOneExpanded',
-      __dirname
+      __dirname,
+      undefined,
+      {
+        fullPage: true,
+      }
     );
     await curriculumAdmin.expandStudyGuideSectionTile(2);
+    await curriculumAdmin.scrollToTopOfPage();
     await curriculumAdmin.expectScreenshotToMatch(
       'sectionTileThreeExpanded',
-      __dirname
+      __dirname,
+      undefined,
+      {
+        fullPage: true,
+      }
     );
     await curriculumAdmin.openSectionHeadingEditor();
+    await curriculumAdmin.scrollToTopOfPage();
     await curriculumAdmin.expectScreenshotToMatch(
       'sectionTileThreeHeadingEditable',
-      __dirname
+      __dirname,
+      undefined,
+      {
+        fullPage: true,
+      }
     );
     await curriculumAdmin.openSectionContentEditor();
+    await curriculumAdmin.scrollToTopOfPage();
     await curriculumAdmin.expectScreenshotToMatch(
       'sectionTileThreeContentEditable',
-      __dirname
+      __dirname,
+      undefined,
+      {
+        fullPage: true,
+      }
     );
     await curriculumAdmin.deleteStudyGuideSection(1);
     await curriculumAdmin.saveTopicDraft('Addition and Subtraction');
+  });
+
+  it('should preview a study guide.', async function () {
     await curriculumAdmin.previewStudyGuide();
     await curriculumAdmin.expectSubtopicStudyGuideToHaveTitleAndSections(
       'subtopic1',

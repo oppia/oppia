@@ -114,7 +114,11 @@ describe('Logged-In Learner', function () {
     await loggedInLearner.navigateToLearnerDashboardUsingProfileDropdown();
     await loggedInLearner.navigateToGoalsSection();
 
+    // Verify the learner sees the heading with their username's goals.
     await loggedInLearner.expectLearnerGreetingsToBe("loggedInLearner's Goals");
+
+    // Verify the "Add a Goal" button is present.
+    await loggedInLearner.expectAddGoalsButtonInRedesignedDashboardToBePresent();
   });
 
   it('should be able to add a goal', async function () {
@@ -122,7 +126,7 @@ describe('Logged-In Learner', function () {
     await loggedInLearner.expectRedesignedGoalsSectionToContainHeading(
       'In Progress'
     );
-    await loggedInLearner.expectToolTipMessage(
+    await loggedInLearner.expectToastMessage(
       "Successfully added to your 'Current Goals' list."
     );
   });

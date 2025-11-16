@@ -63,9 +63,11 @@ export class StudyGuideSectionEditorComponent implements OnInit {
   STUDY_GUIDE_SECTION_CONTENT_FORM_SCHEMA: HtmlFormSchema = {
     type: 'html',
     ui_config: {
-      rte_components: 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS',
+      rte_component_config_id: 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS',
     },
   };
+  studyGuideSectionCharacterLimit: number =
+    AppConstants.STUDY_GUIDE_SECTION_CHARACTER_LIMIT;
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -89,7 +91,7 @@ export class StudyGuideSectionEditorComponent implements OnInit {
       this.STUDY_GUIDE_SECTION_CONTENT_FORM_SCHEMA = {
         type: 'html',
         ui_config: {
-          rte_components: 'ALL_COMPONENTS',
+          rte_component_config_id: 'ALL_COMPONENTS',
           rows: 100,
         },
       };
@@ -125,7 +127,7 @@ export class StudyGuideSectionEditorComponent implements OnInit {
       this.htmlLengthService.computeHtmlLength(
         this.container.sectionContentHtml,
         CALCULATION_TYPE_CHARACTER
-      ) > AppConstants.STUDY_GUIDE_SECTION_CHARACTER_LIMIT
+      ) > this.studyGuideSectionCharacterLimit
     );
   }
 
@@ -165,6 +167,7 @@ export class StudyGuideSectionEditorComponent implements OnInit {
         this.container.sectionContentHtml,
         Number(subtopicId)
       );
+      this.topicEditorStateService.setStudyGuide(studyGuide);
     }
   }
 

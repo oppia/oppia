@@ -52,8 +52,6 @@ describe('Voiceover Submitter', function () {
       [ROLES.RELEASE_COORDINATOR]
     );
 
-    // Enable required feature flags.
-    await releaseCoordinator.enableFeatureFlag('enable_voiceover_contribution');
     await releaseCoordinator.enableFeatureFlag(
       'show_voiceover_tab_for_non_curated_explorations'
     );
@@ -69,7 +67,6 @@ describe('Voiceover Submitter', function () {
       'voiceoverSubmitter',
       'voiceover_submitter@example.com',
       [ROLES.VOICEOVER_SUBMITTER],
-      null,
       explorationId
     );
   }, 600000);
@@ -129,7 +126,7 @@ describe('Voiceover Submitter', function () {
     await voiceoverSubmitter.navigateToPreviewTab();
     await voiceoverSubmitter.expandVoiceoverBar();
     await voiceoverSubmitter.expectVoiceoverPlayButtonToBe('disabled');
-  });
+  }, 450000);
 
   it('should not be able to upload a non-audio file', async function () {
     await voiceoverSubmitter.navigateToTranslationsTab();

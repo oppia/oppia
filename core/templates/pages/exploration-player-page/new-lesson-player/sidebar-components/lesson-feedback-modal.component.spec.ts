@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//      http://www.apache.org/licenses/LICENSE-2.0
+//      [http://www.apache.org/licenses/LICENSE-2.0](http://www.apache.org/licenses/LICENSE-2.0)
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS-IS" BASIS,
@@ -21,7 +21,7 @@ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {FormsModule} from '@angular/forms';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
-import {Directive, Input} from '@angular/core';
+import {Directive, Input, CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
 import {FeedbackPopupBackendApiService} from '../../../../pages/exploration-player-page/services/feedback-popup-backend-api.service';
 import {UserService} from '../../../../services/user.service';
 import {PlayerPositionService} from '../../../../pages/exploration-player-page/services/player-position.service';
@@ -39,292 +39,361 @@ class MockFocusOnDirective {
 describe('LessonFeedbackModalComponent', () => {
   let component: LessonFeedbackModalComponent;
   let fixture: ComponentFixture<LessonFeedbackModalComponent>;
-  let ngbActiveModal: NgbActiveModal;
-  let bottomSheetRef: MatBottomSheetRef;
-  let focusManagerService: FocusManagerService;
-  let userService: UserService;
-  let feedbackPopupBackendApiService: FeedbackPopupBackendApiService;
 
-  const mockUserInfo = {
-    isLoggedIn: () => true,
-  };
+  describe('with MatBottomSheetRef', () => {
+    let bottomSheetRef: jasmine.SpyObj<MatBottomSheetRef>;
+    let focusManagerService: jasmine.SpyObj<FocusManagerService>;
+    let userService: jasmine.SpyObj<UserService>;
+    let feedbackPopupBackendApiService: jasmine.SpyObj<FeedbackPopupBackendApiService>;
+    let playerPositionService: jasmine.SpyObj<PlayerPositionService>;
 
-  const mockUserInfoLoggedOut = {
-    isLoggedIn: () => false,
-  };
-
-  class MockUserService {
-    getUserInfoAsync(): Promise<typeof mockUserInfo> {
-      return Promise.resolve(mockUserInfo);
-    }
-  }
-
-  class MockPlayerPositionService {
-    getCurrentStateName(): string {
-      return 'test_state';
-    }
-  }
-
-  class MockFocusManagerService {
-    setFocus(elementId: string): void {}
-  }
-
-  class MockFeedbackPopupBackendApiService {
-    submitFeedbackAsync(
-      title: string,
-      text: string,
-      includeAuthor: boolean,
-      state: string
-    ): Promise<void> {
-      return Promise.resolve();
-    }
-  }
-
-  class MockMatBottomSheetRef {
-    dismiss(): void {}
-  }
-
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, FormsModule],
-      declarations: [
-        LessonFeedbackModalComponent,
-        MockTranslatePipe,
-        MockFocusOnDirective,
-      ],
-      providers: [
-        NgbActiveModal,
-        {
-          provide: FocusManagerService,
-          useClass: MockFocusManagerService,
-        },
-        {
-          provide: UserService,
-          useClass: MockUserService,
-        },
-        {
-          provide: PlayerPositionService,
-          useClass: MockPlayerPositionService,
-        },
-        {
-          provide: FeedbackPopupBackendApiService,
-          useClass: MockFeedbackPopupBackendApiService,
-        },
-        {
-          provide: MatBottomSheetRef,
-          useClass: MockMatBottomSheetRef,
-        },
-      ],
-    }).compileComponents();
-  }));
-
-  beforeEach(() => {
-    fixture = TestBed.createComponent(LessonFeedbackModalComponent);
-    component = fixture.componentInstance;
-    ngbActiveModal = TestBed.inject(NgbActiveModal);
-    bottomSheetRef = TestBed.inject(MatBottomSheetRef);
-    focusManagerService = TestBed.inject(FocusManagerService);
-    userService = TestBed.inject(UserService);
-    feedbackPopupBackendApiService = TestBed.inject(
-      FeedbackPopupBackendApiService
-    );
-  });
-
-  it('should create', () => {
-    expect(component).toBeDefined();
-  });
-
-  it('should initialize component with logged in user', async () => {
-    spyOn(focusManagerService, 'setFocus');
-    spyOn(Math, 'random').and.returnValue(0.123456789);
-
-    await component.ngOnInit();
-
-    expect(component.isLoggedIn).toBeTrue();
-    expect(component.feedbackModalId).toContain('feedbackPopover');
-    expect(component.feedbackTitle).toBe(
-      'Feedback when the user was at card "test_state"'
-    );
-    expect(focusManagerService.setFocus).toHaveBeenCalledWith(
-      component.feedbackModalId
-    );
-  });
-
-  it('should initialize component with logged out user', async () => {
-    spyOn(userService, 'getUserInfoAsync').and.returnValue(
-      Promise.resolve(mockUserInfoLoggedOut)
-    );
-    spyOn(focusManagerService, 'setFocus');
-
-    await component.ngOnInit();
-
-    expect(component.isLoggedIn).toBeFalse();
-    expect(focusManagerService.setFocus).toHaveBeenCalled();
-  });
-
-  it('should save feedback with NgbActiveModal when user is logged in and not anonymized', async () => {
-    component.feedbackText = 'test feedback';
-    component.isLoggedIn = true;
-    component.isSubmitterAnonymized = false;
-    // Ensure bottomSheetRef is null so ngbActiveModal is used.
-    const componentRef = component as unknown as {
-      bottomSheetRef: MatBottomSheetRef | null;
+    const mockUserInfo = {
+      isLoggedIn: () => true,
     };
-    componentRef.bottomSheetRef = null;
 
-    spyOn(
-      feedbackPopupBackendApiService,
-      'submitFeedbackAsync'
-    ).and.returnValue(Promise.resolve());
-    spyOn(ngbActiveModal, 'close');
-
-    await component.saveFeedback();
-
-    expect(
-      feedbackPopupBackendApiService.submitFeedbackAsync
-    ).toHaveBeenCalledWith(
-      component.feedbackTitle,
-      'test feedback',
-      true,
-      'test_state'
-    );
-    expect(ngbActiveModal.close).toHaveBeenCalled();
-  });
-
-  it('should save feedback with MatBottomSheetRef when user is logged in and not anonymized', async () => {
-    component.feedbackText = 'test feedback';
-    component.isLoggedIn = true;
-    component.isSubmitterAnonymized = false;
-    // Mock the component to use bottomSheetRef instead of ngbActiveModal.
-    const componentRef = component as unknown as {
-      ngbActiveModal: NgbActiveModal | null;
+    const mockUserInfoLoggedOut = {
+      isLoggedIn: () => false,
     };
-    componentRef.ngbActiveModal = null;
 
-    spyOn(
-      feedbackPopupBackendApiService,
-      'submitFeedbackAsync'
-    ).and.returnValue(Promise.resolve());
-    spyOn(bottomSheetRef, 'dismiss');
+    beforeEach(waitForAsync(() => {
+      const bottomSheetRefSpy = jasmine.createSpyObj('MatBottomSheetRef', [
+        'dismiss',
+      ]);
+      const focusManagerSpy = jasmine.createSpyObj('FocusManagerService', [
+        'setFocus',
+      ]);
+      const userServiceSpy = jasmine.createSpyObj('UserService', [
+        'getUserInfoAsync',
+      ]);
+      const feedbackBackendSpy = jasmine.createSpyObj(
+        'FeedbackPopupBackendApiService',
+        ['submitFeedbackAsync']
+      );
+      const playerPositionSpy = jasmine.createSpyObj('PlayerPositionService', [
+        'getCurrentStateName',
+      ]);
 
-    await component.saveFeedback();
+      TestBed.configureTestingModule({
+        imports: [HttpClientTestingModule, FormsModule],
+        declarations: [
+          LessonFeedbackModalComponent,
+          MockTranslatePipe,
+          MockFocusOnDirective,
+        ],
+        providers: [
+          {provide: MatBottomSheetRef, useValue: bottomSheetRefSpy},
+          {provide: FocusManagerService, useValue: focusManagerSpy},
+          {provide: UserService, useValue: userServiceSpy},
+          {provide: PlayerPositionService, useValue: playerPositionSpy},
+          {
+            provide: FeedbackPopupBackendApiService,
+            useValue: feedbackBackendSpy,
+          },
+        ],
+        schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      }).compileComponents();
 
-    expect(
-      feedbackPopupBackendApiService.submitFeedbackAsync
-    ).toHaveBeenCalledWith(
-      component.feedbackTitle,
-      'test feedback',
-      true,
-      'test_state'
-    );
-    expect(bottomSheetRef.dismiss).toHaveBeenCalled();
+      bottomSheetRef = TestBed.inject(
+        MatBottomSheetRef
+      ) as jasmine.SpyObj<MatBottomSheetRef>;
+      focusManagerService = TestBed.inject(
+        FocusManagerService
+      ) as jasmine.SpyObj<FocusManagerService>;
+      userService = TestBed.inject(UserService) as jasmine.SpyObj<UserService>;
+      feedbackPopupBackendApiService = TestBed.inject(
+        FeedbackPopupBackendApiService
+      ) as jasmine.SpyObj<FeedbackPopupBackendApiService>;
+      playerPositionService = TestBed.inject(
+        PlayerPositionService
+      ) as jasmine.SpyObj<PlayerPositionService>;
+    }));
+
+    beforeEach(() => {
+      fixture = TestBed.createComponent(LessonFeedbackModalComponent);
+      component = fixture.componentInstance;
+
+      userService.getUserInfoAsync.and.returnValue(
+        Promise.resolve(mockUserInfo)
+      );
+      playerPositionService.getCurrentStateName.and.returnValue('test_state');
+    });
+
+    it('should create', () => {
+      expect(component).toBeDefined();
+    });
+
+    it('should initialize component with logged in user', async () => {
+      spyOn(Math, 'random').and.returnValue(0.123456789);
+
+      await component.ngOnInit();
+
+      expect(component.isLoggedIn).toBeTrue();
+      expect(component.feedbackModalId).toContain('feedbackPopover');
+      expect(component.feedbackTitle).toBe(
+        'Feedback when the user was at card "test_state"'
+      );
+      expect(focusManagerService.setFocus).toHaveBeenCalledWith(
+        component.feedbackModalId
+      );
+    });
+
+    it('should initialize component with logged out user', async () => {
+      userService.getUserInfoAsync.and.returnValue(
+        Promise.resolve(mockUserInfoLoggedOut)
+      );
+
+      await component.ngOnInit();
+
+      expect(component.isLoggedIn).toBeFalse();
+      expect(focusManagerService.setFocus).toHaveBeenCalled();
+    });
+
+    it('should save feedback and show thank you modal when feedback text is provided', () => {
+      component.ngOnInit();
+
+      component.feedbackText = 'test feedback';
+      component.isLoggedIn = true;
+      component.isSubmitterAnonymized = false;
+      feedbackPopupBackendApiService.submitFeedbackAsync.and.returnValue(
+        Promise.resolve()
+      );
+
+      component.saveFeedback();
+
+      expect(
+        feedbackPopupBackendApiService.submitFeedbackAsync
+      ).toHaveBeenCalledWith(
+        component.feedbackTitle,
+        'test feedback',
+        true,
+        'test_state'
+      );
+      expect(component.thankYouModalIsShown).toBe(true);
+    });
+
+    it('should save feedback anonymously when user is logged in but anonymized', () => {
+      component.ngOnInit();
+
+      component.feedbackText = 'test feedback';
+      component.isLoggedIn = true;
+      component.isSubmitterAnonymized = true;
+      feedbackPopupBackendApiService.submitFeedbackAsync.and.returnValue(
+        Promise.resolve()
+      );
+
+      component.saveFeedback();
+
+      expect(
+        feedbackPopupBackendApiService.submitFeedbackAsync
+      ).toHaveBeenCalledWith(
+        component.feedbackTitle,
+        'test feedback',
+        false,
+        'test_state'
+      );
+      expect(component.thankYouModalIsShown).toBe(true);
+    });
+
+    it('should save feedback anonymously when user is logged out', () => {
+      component.ngOnInit();
+
+      component.feedbackText = 'test feedback';
+      component.isLoggedIn = false;
+      component.isSubmitterAnonymized = false;
+      feedbackPopupBackendApiService.submitFeedbackAsync.and.returnValue(
+        Promise.resolve()
+      );
+
+      component.saveFeedback();
+
+      expect(
+        feedbackPopupBackendApiService.submitFeedbackAsync
+      ).toHaveBeenCalledWith(
+        component.feedbackTitle,
+        'test feedback',
+        false,
+        'test_state'
+      );
+      expect(component.thankYouModalIsShown).toBe(true);
+    });
+
+    it('should show thank you modal without saving when feedback text is empty', () => {
+      component.ngOnInit();
+
+      component.feedbackText = '';
+
+      component.saveFeedback();
+
+      expect(
+        feedbackPopupBackendApiService.submitFeedbackAsync
+      ).not.toHaveBeenCalled();
+      expect(component.thankYouModalIsShown).toBe(true);
+    });
+
+    it('should show thank you modal without saving when feedback text is null', () => {
+      component.ngOnInit();
+
+      const nullValue: string = null as unknown as string;
+      component.feedbackText = nullValue;
+
+      component.saveFeedback();
+
+      expect(
+        feedbackPopupBackendApiService.submitFeedbackAsync
+      ).not.toHaveBeenCalled();
+      expect(component.thankYouModalIsShown).toBe(true);
+    });
+
+    it('should close modal with MatBottomSheetRef', () => {
+      component.closeModal();
+
+      expect(bottomSheetRef.dismiss).toHaveBeenCalledWith('cancel');
+    });
   });
 
-  it('should save feedback anonymously when user is logged in but anonymized', async () => {
-    component.feedbackText = 'test feedback';
-    component.isLoggedIn = true;
-    component.isSubmitterAnonymized = true;
-    const componentRef = component as unknown as {
-      bottomSheetRef: MatBottomSheetRef | null;
+  describe('with NgbActiveModal', () => {
+    let ngbActiveModal: jasmine.SpyObj<NgbActiveModal>;
+    let userService: jasmine.SpyObj<UserService>;
+    let playerPositionService: jasmine.SpyObj<PlayerPositionService>;
+
+    const mockUserInfo = {
+      isLoggedIn: () => true,
     };
-    componentRef.bottomSheetRef = null;
 
-    spyOn(
-      feedbackPopupBackendApiService,
-      'submitFeedbackAsync'
-    ).and.returnValue(Promise.resolve());
-    spyOn(ngbActiveModal, 'close');
+    beforeEach(waitForAsync(() => {
+      const ngbActiveModalSpy = jasmine.createSpyObj('NgbActiveModal', [
+        'dismiss',
+      ]);
+      const focusManagerSpy = jasmine.createSpyObj('FocusManagerService', [
+        'setFocus',
+      ]);
+      const userServiceSpy = jasmine.createSpyObj('UserService', [
+        'getUserInfoAsync',
+      ]);
+      const feedbackBackendSpy = jasmine.createSpyObj(
+        'FeedbackPopupBackendApiService',
+        ['submitFeedbackAsync']
+      );
+      const playerPositionSpy = jasmine.createSpyObj('PlayerPositionService', [
+        'getCurrentStateName',
+      ]);
 
-    await component.saveFeedback();
+      TestBed.configureTestingModule({
+        imports: [HttpClientTestingModule, FormsModule],
+        declarations: [
+          LessonFeedbackModalComponent,
+          MockTranslatePipe,
+          MockFocusOnDirective,
+        ],
+        providers: [
+          {provide: NgbActiveModal, useValue: ngbActiveModalSpy},
+          {provide: FocusManagerService, useValue: focusManagerSpy},
+          {provide: UserService, useValue: userServiceSpy},
+          {provide: PlayerPositionService, useValue: playerPositionSpy},
+          {
+            provide: FeedbackPopupBackendApiService,
+            useValue: feedbackBackendSpy,
+          },
+        ],
+        schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      }).compileComponents();
 
-    expect(
-      feedbackPopupBackendApiService.submitFeedbackAsync
-    ).toHaveBeenCalledWith(
-      component.feedbackTitle,
-      'test feedback',
-      false,
-      'test_state'
-    );
+      ngbActiveModal = TestBed.inject(
+        NgbActiveModal
+      ) as jasmine.SpyObj<NgbActiveModal>;
+      userService = TestBed.inject(UserService) as jasmine.SpyObj<UserService>;
+      playerPositionService = TestBed.inject(
+        PlayerPositionService
+      ) as jasmine.SpyObj<PlayerPositionService>;
+    }));
+
+    beforeEach(() => {
+      fixture = TestBed.createComponent(LessonFeedbackModalComponent);
+      component = fixture.componentInstance;
+
+      userService.getUserInfoAsync.and.returnValue(
+        Promise.resolve(mockUserInfo)
+      );
+      playerPositionService.getCurrentStateName.and.returnValue('test_state');
+    });
+
+    it('should create', () => {
+      expect(component).toBeDefined();
+    });
+
+    it('should close modal with NgbActiveModal when bottomSheetRef is not available', () => {
+      component.closeModal();
+
+      expect(ngbActiveModal.dismiss).toHaveBeenCalledWith('cancel');
+    });
   });
 
-  it('should save feedback anonymously when user is logged out', async () => {
-    component.feedbackText = 'test feedback';
-    component.isLoggedIn = false;
-    component.isSubmitterAnonymized = false;
-    const componentRef = component as unknown as {
-      bottomSheetRef: MatBottomSheetRef | null;
+  describe('without any modal services', () => {
+    let userService: jasmine.SpyObj<UserService>;
+    let playerPositionService: jasmine.SpyObj<PlayerPositionService>;
+
+    const mockUserInfo = {
+      isLoggedIn: () => true,
     };
-    componentRef.bottomSheetRef = null;
 
-    spyOn(
-      feedbackPopupBackendApiService,
-      'submitFeedbackAsync'
-    ).and.returnValue(Promise.resolve());
-    spyOn(ngbActiveModal, 'close');
+    beforeEach(waitForAsync(() => {
+      const focusManagerSpy = jasmine.createSpyObj('FocusManagerService', [
+        'setFocus',
+      ]);
+      const userServiceSpy = jasmine.createSpyObj('UserService', [
+        'getUserInfoAsync',
+      ]);
+      const feedbackBackendSpy = jasmine.createSpyObj(
+        'FeedbackPopupBackendApiService',
+        ['submitFeedbackAsync']
+      );
+      const playerPositionSpy = jasmine.createSpyObj('PlayerPositionService', [
+        'getCurrentStateName',
+      ]);
 
-    await component.saveFeedback();
+      TestBed.configureTestingModule({
+        imports: [HttpClientTestingModule, FormsModule],
+        declarations: [
+          LessonFeedbackModalComponent,
+          MockTranslatePipe,
+          MockFocusOnDirective,
+        ],
+        providers: [
+          {provide: FocusManagerService, useValue: focusManagerSpy},
+          {provide: UserService, useValue: userServiceSpy},
+          {provide: PlayerPositionService, useValue: playerPositionSpy},
+          {
+            provide: FeedbackPopupBackendApiService,
+            useValue: feedbackBackendSpy,
+          },
+        ],
+        schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      }).compileComponents();
 
-    expect(
-      feedbackPopupBackendApiService.submitFeedbackAsync
-    ).toHaveBeenCalledWith(
-      component.feedbackTitle,
-      'test feedback',
-      false,
-      'test_state'
-    );
-  });
+      userService = TestBed.inject(UserService) as jasmine.SpyObj<UserService>;
+      playerPositionService = TestBed.inject(
+        PlayerPositionService
+      ) as jasmine.SpyObj<PlayerPositionService>;
+    }));
 
-  it('should not save feedback when feedback text is empty', () => {
-    component.feedbackText = '';
+    beforeEach(() => {
+      fixture = TestBed.createComponent(LessonFeedbackModalComponent);
+      component = fixture.componentInstance;
 
-    spyOn(feedbackPopupBackendApiService, 'submitFeedbackAsync');
-    spyOn(ngbActiveModal, 'close');
-    spyOn(bottomSheetRef, 'dismiss');
+      userService.getUserInfoAsync.and.returnValue(
+        Promise.resolve(mockUserInfo)
+      );
+      playerPositionService.getCurrentStateName.and.returnValue('test_state');
+    });
 
-    component.saveFeedback();
+    it('should create', () => {
+      expect(component).toBeDefined();
+    });
 
-    expect(
-      feedbackPopupBackendApiService.submitFeedbackAsync
-    ).not.toHaveBeenCalled();
-    expect(ngbActiveModal.close).toHaveBeenCalled();
-    expect(bottomSheetRef.dismiss).not.toHaveBeenCalled();
-  });
-
-  it('should not save feedback when feedback text is null', () => {
-    const nullValue: string = null as unknown as string;
-    component.feedbackText = nullValue;
-
-    spyOn(feedbackPopupBackendApiService, 'submitFeedbackAsync');
-    spyOn(ngbActiveModal, 'close');
-    spyOn(bottomSheetRef, 'dismiss');
-
-    component.saveFeedback();
-
-    expect(
-      feedbackPopupBackendApiService.submitFeedbackAsync
-    ).not.toHaveBeenCalled();
-    expect(ngbActiveModal.close).toHaveBeenCalled();
-    expect(bottomSheetRef.dismiss).not.toHaveBeenCalled();
-  });
-
-  it('should close modal with MatBottomSheetRef', () => {
-    spyOn(bottomSheetRef, 'dismiss');
-
-    component.closeModal();
-
-    expect(bottomSheetRef.dismiss).toHaveBeenCalledWith('cancel');
-  });
-
-  it('should close modal with NgbActiveModal when bottomSheetRef is not available', () => {
-    // Mock the component to use ngbActiveModal instead of bottomSheetRef.
-    const componentRef = component as unknown as {
-      bottomSheetRef: MatBottomSheetRef | null;
-    };
-    componentRef.bottomSheetRef = null;
-    spyOn(ngbActiveModal, 'dismiss');
-
-    component.closeModal();
-
-    expect(ngbActiveModal.dismiss).toHaveBeenCalledWith('cancel');
+    it('should not throw error when closeModal is called without modal services', () => {
+      expect(() => {
+        component.closeModal();
+      }).not.toThrowError();
+    });
   });
 });

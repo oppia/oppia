@@ -23,19 +23,20 @@ import {AnswerClassificationResult} from 'domain/classifier/answer-classificatio
 import {
   Exploration,
   ExplorationBackendDict,
-  ExplorationObjectFactory,
-} from 'domain/exploration/ExplorationObjectFactory';
+} from 'domain/exploration/exploration.model';
 import {ParamChange} from 'domain/exploration/param-change.model';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {Outcome} from 'domain/exploration/outcome.model';
-import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
+import {StateObjectsBackendDict} from 'domain/exploration/states.model';
 import {State} from 'domain/state/state.model';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {ExpressionInterpolationService} from 'expressions/expression-interpolation.service';
 import {TextInputCustomizationArgs} from 'interactions/customization-args-defs';
 import {AlertsService} from 'services/alerts.service';
+import {LoggerService} from 'services/contextual/logger.service';
 import {PageContextService} from 'services/page-context.service';
 import {UrlService} from 'services/contextual/url.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
@@ -58,6 +59,9 @@ import isEqual from 'lodash/isEqual';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {LearnerAnswerInfoService} from './learner-answer-info.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {ComputeGraphService} from 'services/compute-graph.service';
+import {StateGraphLayoutService} from 'components/graph-services/graph-layout.service';
+import forEach from 'lodash/forEach';
 
 @Injectable({
   providedIn: 'root',
@@ -85,20 +89,23 @@ export class ExplorationEngineService {
     private audioPreloaderService: AudioPreloaderService,
     private contentTranslationLanguageService: ContentTranslationLanguageService,
     private pageContextService: PageContextService,
+    private computeGraphService: ComputeGraphService,
+    private stateGraphLayoutService: StateGraphLayoutService,
     private contentTranslationManagerService: ContentTranslationManagerService,
     private entityTranslationsService: EntityTranslationsService,
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
-    private explorationObjectFactory: ExplorationObjectFactory,
     private expressionInterpolationService: ExpressionInterpolationService,
     private focusManagerService: FocusManagerService,
     private imagePreloaderService: ImagePreloaderService,
     private learnerParamsService: LearnerParamsService,
     private learnerAnswerInfoService: LearnerAnswerInfoService,
+    private loggerService: LoggerService,
     private playerTranscriptService: PlayerTranscriptService,
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private statsReportingService: StatsReportingService,
     private stateEditorService: StateEditorService,
     private translateService: TranslateService,
+    private urlInterpolationService: UrlInterpolationService,
     private platformFeatureService: PlatformFeatureService,
     private urlService: UrlService
   ) {
@@ -218,6 +225,37 @@ export class ExplorationEngineService {
       outcome.feedback.html,
       envs
     );
+  }
+
+  extractDepthGraph(): {[stateName: string]: number} {
+    const graphData = this.computeGraphService.compute(
+      this.getInitialStateName(),
+      this.getExploration().states
+    );
+    const computedNodes = this.stateGraphLayoutService.computeLayout(
+      graphData.nodes,
+      graphData.links,
+      graphData.initStateId,
+      graphData.finalStateIds
+    );
+
+    let depthGraph: {[stateName: string]: number} = {};
+    forEach(computedNodes, node => {
+      depthGraph[node.id] = node.depth;
+    });
+
+    return depthGraph;
+  }
+
+  getMaxStateDepth(): number {
+    const depthGraph = this.extractDepthGraph();
+    let maxDepth = 0;
+    for (let stateName in depthGraph) {
+      if (depthGraph[stateName] > maxDepth) {
+        maxDepth = depthGraph[stateName];
+      }
+    }
+    return maxDepth;
   }
 
   /**
@@ -386,6 +424,10 @@ export class ExplorationEngineService {
     successCallback(initialCard, nextFocusLabel);
   }
 
+  getInitialStateName(): string {
+    return this.exploration.getInitialState().name;
+  }
+
   /**
    * Initializes exploration parameters.
    *
@@ -499,8 +541,11 @@ export class ExplorationEngineService {
     displayableLanguageCodes: string[],
     successCallback: (stateCard: StateCard, label: string) => void
   ): void {
-    this.exploration =
-      this.explorationObjectFactory.createFromBackendDict(explorationDict);
+    this.exploration = Exploration.createFromBackendDict(
+      explorationDict,
+      this.loggerService,
+      this.urlInterpolationService
+    );
     this.answerIsBeingProcessed = false;
     let initStateName = this.exploration.getInitialState().name;
     if (initStateName === null) {
@@ -583,6 +628,10 @@ export class ExplorationEngineService {
    */
   getStateFromStateName(stateName: string): State {
     return this.exploration.getState(stateName);
+  }
+
+  getExploration(): Exploration {
+    return this.exploration;
   }
 
   /**

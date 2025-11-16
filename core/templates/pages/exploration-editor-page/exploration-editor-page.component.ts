@@ -70,11 +70,11 @@ import {UserExplorationPermissionsService} from './services/user-exploration-per
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {ExplorationNextContentIdIndexService} from './services/exploration-next-content-id-index.service';
 import {VersionHistoryService} from './services/version-history.service';
-import {ExplorationBackendDict} from 'domain/exploration/ExplorationObjectFactory';
+import {ExplorationBackendDict} from 'domain/exploration/exploration.model';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
-import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
-import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
+import {TranslatedContent} from 'domain/exploration/translated-content.model';
+import {EntityTranslation} from 'domain/translation/entity-translation.model';
 import {EntityBulkTranslationsBackendApiService} from './services/entity-bulk-translations-backend-api.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {ExplorationChange} from 'domain/exploration/exploration-draft.model';

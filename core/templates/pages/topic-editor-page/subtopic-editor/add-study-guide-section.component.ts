@@ -44,13 +44,15 @@ export class AddStudyGuideSectionModalComponent extends ConfirmOrCancelModal {
   SECTION_FORM_CONTENT_SCHEMA: HtmlFormSchema = {
     type: 'html',
     ui_config: {
-      rte_components: 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS',
+      rte_component_config_id: 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS',
     },
   };
   SECTION_FORM_HEADING_SCHEMA: HtmlFormSchema = {
     type: 'unicode',
     ui_config: {},
   };
+  studyGuideSectionCharacterLimit: number =
+    AppConstants.STUDY_GUIDE_SECTION_CHARACTER_LIMIT;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -65,7 +67,7 @@ export class AddStudyGuideSectionModalComponent extends ConfirmOrCancelModal {
       this.SECTION_FORM_CONTENT_SCHEMA = {
         type: 'html',
         ui_config: {
-          rte_components: 'ALL_COMPONENTS',
+          rte_component_config_id: 'ALL_COMPONENTS',
           rows: 100,
         },
       };
@@ -99,7 +101,7 @@ export class AddStudyGuideSectionModalComponent extends ConfirmOrCancelModal {
       this.htmlLengthService.computeHtmlLength(
         this.tempSectionContentHtml,
         CALCULATION_TYPE_CHARACTER
-      ) > AppConstants.STUDY_GUIDE_SECTION_CHARACTER_LIMIT
+      ) > this.studyGuideSectionCharacterLimit
     );
   }
 

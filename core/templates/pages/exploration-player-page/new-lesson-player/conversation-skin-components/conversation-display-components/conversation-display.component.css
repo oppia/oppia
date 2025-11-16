@@ -179,7 +179,7 @@ oppia-conversation-display .conversation-skin-inline-interaction {
 oppia-conversation-display .conversation-skin-inline-interaction .form-control {
   border: none;
   outline: none;
-  padding: 0;
+  resize: none;
 }
 
 oppia-conversation-display input.form-control:focus {
@@ -382,4 +382,10 @@ oppia-conversation-display .oppia-mcq-question-description-text {
 oppia-conversation-display .conversation-skin-oppia-completed-state-card {
   margin-top: 35px;
   padding: 32px;
+}
+
+@media (min-width: 1024px) {
+  oppia-conversation-display .supplemental-history-response {
+    width: 75%;
+  }
 }

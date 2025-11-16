@@ -97,7 +97,7 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
   OUTLINE_SCHEMA = {
     type: 'html',
     ui_config: {
-      rte_components: 'ALL_COMPONENTS',
+      rte_component_config_id: 'ALL_COMPONENTS',
       startupFocusEnabled: false,
       rows: 100,
     },
@@ -321,7 +321,9 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
       this.explorationId &&
       (this.editableThumbnailBgColor || this.editableThumbnailFilename) &&
       this.outlineIsFinalized &&
-      this.plannedPublicationDate
+      this.plannedPublicationDate &&
+      this.acquiredSkillIds &&
+      this.acquiredSkillIds.length > 0
     ) {
       this.storyEditorStateService.setCurrentNodeAsPublishable(true);
     } else {
@@ -333,9 +335,21 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
     this.storyEditorStateService.onViewStoryNodeEditor.emit(nodeId);
   }
 
+  canFinalize(): boolean {
+    return this.editableOutline?.trim().length > 0;
+  }
+
   finalizeOutline(): void {
-    this.storyUpdateService.finalizeStoryNodeOutline(this.story, this.nodeId);
-    this.outlineIsFinalized = true;
+    if (!this.editableOutline || this.editableOutline.trim().length === 0) {
+      this.storyUpdateService.unfinalizeStoryNodeOutline(
+        this.story,
+        this.nodeId
+      );
+      this.outlineIsFinalized = false;
+    } else {
+      this.storyUpdateService.finalizeStoryNodeOutline(this.story, this.nodeId);
+      this.outlineIsFinalized = true;
+    }
     this.updateCurrentNodeIsPublishable();
   }
 

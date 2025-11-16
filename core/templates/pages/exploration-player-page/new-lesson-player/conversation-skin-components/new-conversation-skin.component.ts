@@ -60,6 +60,7 @@ import {CardAnimationService} from 'pages/exploration-player-page/services/card-
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
 import {DiagnosticTestTopicTrackerModel} from 'pages/diagnostic-test-player-page/diagnostic-test-topic-tracker.model';
 import {ExplorationEngineService} from 'pages/exploration-player-page/services/exploration-engine.service';
+import {MobileMenuService} from 'pages/exploration-player-page/services/mobile-menu.service';
 
 @Component({
   selector: 'oppia-new-conversation-skin',
@@ -131,7 +132,8 @@ export class NewConversationSkinComponent {
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private checkpointProgressService: CheckpointProgressService,
     private conversationFlowService: ConversationFlowService,
-    private chapterProgressService: ChapterProgressService
+    private chapterProgressService: ChapterProgressService,
+    private mobileMenuService: MobileMenuService
   ) {}
 
   ngOnInit(): void {
@@ -187,11 +189,24 @@ export class NewConversationSkinComponent {
           this.playerTranscriptService.resetNumberOfIncorrectSubmissions();
           this.conversationFlowService.setNextCardIfStuck(null);
           this.continueToReviseStateButtonIsVisible = false;
+          let pathnameArray = this.urlService.getPathname().split('/');
 
-          this.checkpointCelebrationIsShown = true;
-          setTimeout(() => {
-            this.checkpointCelebrationIsShown = false;
-          }, 5000);
+          if (
+            pathnameArray.includes('lesson') &&
+            !pathnameArray.includes('embed')
+          ) {
+            const stateData =
+              this.explorationEngineService.getStateFromStateName(
+                newCard.getStateName()
+              );
+
+            if (stateData.cardIsCheckpoint) {
+              this.checkpointCelebrationIsShown = true;
+              setTimeout(() => {
+                this.checkpointCelebrationIsShown = false;
+              }, 5000);
+            }
+          }
 
           this.conversationFlowService.triggerIfLearnerStuckAction(true, () => {
             this.continueToReviseStateButtonIsVisible = true;
@@ -430,6 +445,10 @@ export class NewConversationSkinComponent {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
+  getSidebarIsExpanded(): boolean {
+    return this.mobileMenuService.getSidebarIsExpanded();
+  }
+
   getExplorationLink(): string {
     return this.explorationRecommendationsService.getExplorationLink(
       this.conversationFlowService.getRecommendedExplorationSummaries()
@@ -573,6 +592,9 @@ export class NewConversationSkinComponent {
   }
 
   isCheckpointCelebrationFooterEnabled(): boolean {
+    if (!this.pageContextService.isInExplorationPlayerPage()) {
+      return false;
+    }
     const prevSessionStatesProgress =
       this.playerTranscriptService.getPrevSessionStatesProgress();
     const firstStateName = this.playerTranscriptService.getCard(0);
@@ -599,10 +621,6 @@ export class NewConversationSkinComponent {
     );
   }
 
-  isProgressClearanceMessageShown(): boolean {
-    return this.conversationFlowService.getShowProgressClearanceMessage();
-  }
-
   // Returns whether the screen is wide enough to fit two
   // cards (e.g., the tutor and supplemental cards) side-by-side.
   canWindowShowTwoCards(): boolean {
@@ -626,5 +644,13 @@ export class NewConversationSkinComponent {
 
   getIsInStoryMode(): boolean {
     return this.explorationModeService.isInStoryChapterMode();
+  }
+
+  isInLessonPlayer(): boolean {
+    const pathnameArray = this.urlService.getPathname().split('/');
+    if (pathnameArray[1] === 'lesson') {
+      return true;
+    }
+    return false;
   }
 }

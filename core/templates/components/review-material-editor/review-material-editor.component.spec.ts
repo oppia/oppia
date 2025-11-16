@@ -76,7 +76,7 @@ describe('Review Material Editor Component', () => {
     expect(component.HTML_SCHEMA).toEqual({
       type: 'html',
       ui_config: {
-        rte_components: 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS',
+        rte_component_config_id: 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS',
       },
     });
     expect(component.editableExplanation).toBe('Explanation');
@@ -119,19 +119,15 @@ describe('Review Material Editor Component', () => {
   });
 
   it('should return true if there are more than 2 workedexamples', () => {
-    expect(
-      component.checkExtraWorkedexample(
-        '<oppia-noninteractive-workedexample>aasdfasdf</oppia-noninteractive-workedexample><oppia-noninteractive-workedexample>aasdfasdf</oppia-noninteractive-workedexample><oppia-noninteractive-workedexample>aasdfasdf</oppia-noninteractive-workedexample>'
-      )
-    ).toEqual(true);
+    component.editableExplanation =
+      '<oppia-noninteractive-workedexample>aasdfasdf</oppia-noninteractive-workedexample><oppia-noninteractive-workedexample>aasdfasdf</oppia-noninteractive-workedexample><oppia-noninteractive-workedexample>aasdfasdf</oppia-noninteractive-workedexample>';
+    expect(component.checkExtraWorkedexample()).toEqual(true);
   });
 
   it('should return false if there are 2 or fewer workedexamples', () => {
-    expect(
-      component.checkExtraWorkedexample(
-        '<oppia-noninteractive-workedexample>example1</oppia-noninteractive-workedexample><oppia-noninteractive-workedexample>example2</oppia-noninteractive-workedexample>'
-      )
-    ).toEqual(false);
+    component.editableExplanation =
+      '<oppia-noninteractive-workedexample>example1</oppia-noninteractive-workedexample><oppia-noninteractive-workedexample>example2</oppia-noninteractive-workedexample>';
+    expect(component.checkExtraWorkedexample()).toEqual(false);
   });
 
   it('should get schema', () => {
@@ -144,7 +140,7 @@ describe('Review Material Editor Component', () => {
     expect(schema).toEqual({
       type: 'html',
       ui_config: {
-        rte_components: 'ALL_COMPONENTS',
+        rte_component_config_id: 'ALL_COMPONENTS',
       },
     });
   });
@@ -166,16 +162,6 @@ describe('Review Material Editor Component', () => {
     expect(component.editableExplanation).toEqual('Same Explanation');
   });
 
-  it('should not update editableExplanation if extra worked examples are found', () => {
-    component.editableExplanation = 'Old Explanation';
-    const htmlWithExtraWorkedExamples =
-      '<oppia-noninteractive-workedexample>1</oppia-noninteractive-workedexample><oppia-noninteractive-workedexample>2</oppia-noninteractive-workedexample><oppia-noninteractive-workedexample>3</oppia-noninteractive-workedexample>';
-
-    component.updateLocalExp(htmlWithExtraWorkedExamples);
-
-    expect(component.editableExplanation).toEqual('Old Explanation');
-  });
-
   it('should get schema with SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS when feature is enabled', () => {
     platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled =
       true;
@@ -185,7 +171,7 @@ describe('Review Material Editor Component', () => {
     expect(schema).toEqual({
       type: 'html',
       ui_config: {
-        rte_components: 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS',
+        rte_component_config_id: 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS',
       },
     });
   });
