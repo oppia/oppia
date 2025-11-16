@@ -77,6 +77,7 @@ export type ModalUserInteractions = (
 export class BaseUser {
   page!: Page;
   pages: Page[] = [];
+  static failedSnapshots: string[] = [];
   browserObject!: Browser;
   userHasAcceptedCookies: boolean = false;
   email: string | null = null;
@@ -1061,7 +1062,12 @@ export class BaseUser {
             '\r\nDownload the artifact folder diff-snapshots from the github workflow to check the screenshot(s).'
         );
       } else {
-        throw new Error(error.message);
+        BaseUser.failedSnapshots.push(
+          `Snapshot mismatch: ${imageName} - ${error.message}`
+        );
+        showMessage(
+          `Snapshot mismatch for ${imageName}. Details: ${error.message}`
+        );
       }
     }
   }
