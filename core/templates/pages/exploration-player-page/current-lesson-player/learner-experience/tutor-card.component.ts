@@ -152,7 +152,8 @@ export class TutorCardComponent {
   skipClickListener: Function | null = null;
   username!: string | null;
   _viewHasLoadedOnce: boolean = false;
-
+  completedChaptersCount: number = 0;
+  shouldShowProgressBar: boolean = false;
   constructor(
     private audioBarStatusService: AudioBarStatusService,
     private audioPlayerService: AudioPlayerService,
@@ -207,7 +208,7 @@ export class TutorCardComponent {
     }
   }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.inStoryMode = this.explorationModeService.isInStoryChapterMode();
     this._editorPreviewMode =
       this.pageContextService.isInExplorationEditorPage();
@@ -225,6 +226,11 @@ export class TutorCardComponent {
       this.urlInterpolationService.getStaticCopyrightedImageUrl(
         '/avatar/oppia_avatar_100px.svg'
       );
+      await this.chapterProgressService.updateCompletedChaptersCount(true);
+      this.completedChaptersCount =
+        this.chapterProgressService.getCompletedChaptersCount();
+      this.shouldShowProgressBar =
+        this.setNextMilestoneAndCheckIfProgressBarIsShown();
 
     this.directiveSubscriptions.add(
       this.conversationFlowService.onOppiaFeedbackAvailable.subscribe(() => {
@@ -244,6 +250,7 @@ export class TutorCardComponent {
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
+    this.shouldShowProgressBar = false
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -320,21 +327,19 @@ export class TutorCardComponent {
   generateMilestoneMessage(): string {
     const milestoneMessageIsToBeDisplayed =
       this.chapterProgressService.getChapterCompletedForTheFirstTime();
-    const completedChaptersCount =
-      this.chapterProgressService.getCompletedChaptersCount();
     if (
       !this.inStoryMode ||
       !milestoneMessageIsToBeDisplayed ||
-      !completedChaptersCount ||
+      !this.completedChaptersCount ||
       !MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS.includes(
-        completedChaptersCount
+        this.completedChaptersCount
       )
     ) {
       return '';
     }
     let chapterCountMessageIndex =
       MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS.indexOf(
-        completedChaptersCount
+        this.completedChaptersCount
       ) + 1;
     let milestoneMessageTranslationKey =
       'I18N_END_CHAPTER_MILESTONE_MESSAGE_' + chapterCountMessageIndex;
@@ -353,18 +358,16 @@ export class TutorCardComponent {
 
     let milestoneMessageIsToBeDisplayed =
       this.chapterProgressService.getChapterCompletedForTheFirstTime();
-    const completedChaptersCount =
-      this.chapterProgressService.getCompletedChaptersCount();
 
     if (
       !milestoneMessageIsToBeDisplayed &&
       MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS.includes(
-        completedChaptersCount
+        this.completedChaptersCount
       )
     ) {
       let chapterCountIndex =
         MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS.indexOf(
-          completedChaptersCount
+          this.completedChaptersCount
         );
       this.nextMilestoneChapterCount =
         MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS[chapterCountIndex + 1];
@@ -372,7 +375,7 @@ export class TutorCardComponent {
     }
 
     for (let milestoneCount of MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS) {
-      if (milestoneCount > completedChaptersCount) {
+      if (milestoneCount > this.completedChaptersCount) {
         this.nextMilestoneChapterCount = milestoneCount;
         return true;
       }
@@ -384,21 +387,17 @@ export class TutorCardComponent {
   isMilestoneReachedAndMilestoneMessageToBeDisplayed(): boolean {
     let milestoneMessageIsToBeDisplayed =
       this.chapterProgressService.getChapterCompletedForTheFirstTime();
-    const completedChaptersCount =
-      this.chapterProgressService.getCompletedChaptersCount();
 
     return (
       milestoneMessageIsToBeDisplayed &&
       MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS.includes(
-        completedChaptersCount
+        this.completedChaptersCount
       )
     );
   }
 
   isCompletedChaptersCountGreaterThanLastMilestone(): boolean {
-    const completedChaptersCount =
-      this.chapterProgressService.getCompletedChaptersCount();
-    return completedChaptersCount > 50;
+    return this.completedChaptersCount > 50;
   }
 
   getStaticImageUrl(imagePath: string): string {
