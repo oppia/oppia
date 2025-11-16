@@ -147,21 +147,21 @@ describe('Blog Post Search Service', () => {
     );
   });
 
-  describe('resetSearchState', () => {
-    it('should reset all search services state properties', () => {
-      searchService._searchOffset = 15;
-      searchService._lastQuery = 'search query';
-      searchService._lastSelectedTags = ['community', 'news'];
-      searchService._isCurrentlyFetchingResults = true;
+  describe('resetSearchState',()=>{
+    it('should reset all search services state properties',()=>{
+      searchService['_searchOffset'] = 15;
+      searchService['_lastQuery'] = 'search query';
+      searchService['_lastSelectedTags'] = ['community', 'news'];
+      searchService['_isCurrentlyFetchingResults'] = true;
 
       searchService.resetSearchState();
 
-      expect(searchService._searchOffset.toBe(0));
-      expect(searchService._lastQuery).toBe('');
-      expect(searchService._lastSelectedTags).toEqual([]);
-      expect(searchService._isCurrentlyFetchingResults).toBe(false);
-    });
-  });
+      expect(searchService['_searchOffset']).toBe(0);
+      expect(searchService['_lastQuery']).toBe('');
+      expect(searchService['_lastSelectedTags']).toEqual([]);
+      expect(searchService['_isCurrentlyFetchingResults']).toBe(false);
+    })
+  })
 
   describe('executeSearchQuery', () => {
     let successHandler: jasmine.Spy<jasmine.Func>;
