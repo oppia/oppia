@@ -767,7 +767,7 @@ class ElasticSearchStub:
         )
 
     def mock_delete_by_query(
-        self, index: str, query: Dict[str, Dict[str, Dict[str, str]]]
+        self, index: str, body: Dict[str, Dict[str, Dict[str, str]]]
     ) -> DeletedDocumentDict:
         """Deletes documents from an index based on the given query.
 
@@ -786,8 +786,8 @@ class ElasticSearchStub:
             AssertionError. The query is not in the correct form.
             elasticsearch.NotFoundError. The given index name was not found.
         """
-        assert list(query.keys()) == ['query']
-        assert query['query'] == {'match_all': {}}
+        assert list(body.keys()) == ['query']
+        assert body['query'] == {'match_all': {}}
         if index not in self._DB:
             self._generate_index_not_found_error(index)
         index_size = len(self._DB[index])
