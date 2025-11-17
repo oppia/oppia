@@ -148,7 +148,7 @@
     "@angular/platform-browser": "^14.3.0",
     "@angular/platform-browser-dynamic": "^14.3.0",
     "@angular/router": "^14.3.0",
-    "@angular/youtube-player": "^11.2.10",
+    "@angular/youtube-player": "^12.2.13",
     "@asymmetrik/ngx-leaflet": "^8.1.0",
     "@ctrl/ngx-codemirror": "^4.1.1",
     "@ng-bootstrap/ng-bootstrap": "^13.1.1",
