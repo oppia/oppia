@@ -57,6 +57,12 @@
   var onChangeExpId = function() {
     var inputField = document.querySelector('.e2e-test-exploration-id-input-field');
     var newExplorationId = inputField ? inputField.value : '';
+    if (!/^[a-zA-Z0-9_-]+$/.test(newExplorationId)) {
+      alert(
+        'Invalid exploration ID. Only letters, numbers, underscores and ' +
+        'dashes are allowed.');
+      return;
+    }
 
     var iframes = document.querySelectorAll('div > iframe');
     iframes.forEach(function(iframe) {
