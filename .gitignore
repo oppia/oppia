@@ -80,4 +80,3 @@ debug.log
 
 # Puppeteer acceptance tests.
 jest-runtime-config.json
-my_learning_guide/
