@@ -30,6 +30,7 @@ const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
 describe('Logged-in User', function () {
+  jest.setTimeout(600000000);
   let loggedInUser: LoggedInUser & LoggedOutUser;
   let curriculumAdmin: CurriculumAdmin & TopicManager & ExplorationEditor;
   let releaseCoordinator: ReleaseCoordinator;
@@ -61,17 +62,50 @@ describe('Logged-in User', function () {
     );
 
     await curriculumAdmin.createAndPublishTopic(
+      'Addition',
+      'Addition subtopics',
+      'Addition skills'
+    );
+    await curriculumAdmin.createAndPublishTopic(
+      'Subtraction',
+      'Subtraction subtopics',
+      'Subtraction skills'
+    );
+    await curriculumAdmin.createAndPublishTopic(
+      'Multiplication',
+      'Multiplication subtopics',
+      'Multiplication skills'
+    );
+    await curriculumAdmin.createAndPublishTopic(
+      'Division',
+      'Division subtopics',
+      'Division skills'
+    );
+    await curriculumAdmin.createAndPublishTopic(
+      'Percentage',
+      'Percentage subtopics',
+      'Percentage skills'
+    );
+    await curriculumAdmin.createAndPublishTopic(
       'Place Values',
       'Place Values subtopics',
       'Place Values skills'
     );
     await curriculumAdmin.addTopicToClassroom('Math', 'Place Values');
+    await curriculumAdmin.addTopicToClassroom('Math', 'Addition');
+    await curriculumAdmin.addTopicToClassroom('Math', 'Subtraction');
+    await curriculumAdmin.addTopicToClassroom('Math', 'Multiplication');
+    await curriculumAdmin.addTopicToClassroom('Math', 'Division');
+    await curriculumAdmin.addTopicToClassroom('Math', 'Percentage');
     await curriculumAdmin.publishClassroom('Math');
 
     const placeValueChapters = [
       'What are the Place Values',
       'Find the Value of a Number',
       'Comparing Numbers',
+      'Rounding Numbers part 1',
+      'Rounding Numbers part 2',
+      'Extra chapter',
     ];
 
     for (const chapter of placeValueChapters) {
@@ -97,7 +131,27 @@ describe('Logged-in User', function () {
       'loggedInUser1',
       'logged_in_user1@example.com'
     );
-  }, 480000);
+  });
 
-  it('', async function () {});
+  it('should be able to see Home tab', async function () {
+    await loggedInUser.navigateToLearnerDashboard();
+
+    await loggedInUser.expectLearnerGreetingsToBe('Welcome, loggedInUser1!');
+
+    await loggedInUser.expectElementsToBePresent(
+      ['Learn Something New'],
+      'tabSection'
+    );
+    await loggedInUser.expectElementsToBePresent(
+      ["Topics available in Oppia's Classroom"],
+      'cardDisplay'
+    );
+    await loggedInUser.expectClassroomButtonOnRedesignedLearnerDashboardToBePresent(
+      true
+    );
+  });
+
+  afterAll(async function () {
+    await UserFactory.closeAllBrowsers();
+  });
 });

@@ -233,6 +233,27 @@ const continueFromWhereLeftOffSectionInRedesignedDashboardSelector =
   '.e2e-test-continue-where-you-left-off';
 const learnSomethingNewSectionSelector =
   '.e2e-test-learn-something-new-section';
+const classroomButtonOnRedesignedLearnerDashboard =
+  '.e2e-test-learner-dash-classroom-button';
+const learnerDashSelectors: Record<string, Record<string, string>> = {
+  tabSection: {
+    content: '.e2e-test-learner-dash-section',
+    heading: '.e2e-test-learner-dash-section-heading',
+  },
+  cardDisplay: {
+    content: '.e2e-test-card-display',
+    heading: '.e2e-test-card-display-heading',
+  },
+  topicCard: {
+    content: '.e2e-test-learner-topic-summary-tile',
+    heading: '.e2e-test-learner-topic-summary-tile-title',
+  },
+  lessonCard: {
+    content: '.e2e-test-lesson-card',
+    heading: '.e2e-test-lesson-card-title',
+    button: '.e2e-test-lesson-card-button',
+  },
+};
 
 // Learner Dashboard > Progress section selectors.
 const completedLessonsSectionSelector =
@@ -1879,6 +1900,27 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Verifies elements' existence.
+   * @param {string[]} expectedTexts - Text content expected in elements.
+   * @param {string} selector - Selector type.
+   * @param {ParentNode} root - Page or element type we're verifying.
+   */
+  async expectElementsToBePresent(
+    expectedTexts: string[],
+    selector: string,
+    root: puppeteer.Page | puppeteer.ElementHandle | undefined = this.page
+  ): Promise<void> {
+    await this.page.waitForSelector(learnerDashSelectors[selector].heading);
+    const allElements = await root?.$$(learnerDashSelectors[selector].heading);
+    const sectionHeadingTexts = await Promise.all(
+      allElements.map(
+        async card => await card.evaluate(el => el.textContent?.trim())
+      )
+    );
+    expect(sectionHeadingTexts).toEqual(expectedTexts);
+  }
+
+  /**
    * Adds goals from the goals section in the learner dashboard.
    * @param {string[]} goals - The goals to add.
    */
@@ -3133,6 +3175,19 @@ export class LoggedInUser extends BaseUser {
   ): Promise<void> {
     await this.expectElementToBeVisible(
       learnSomethingNewSectionSelector,
+      visible
+    );
+  }
+
+  /**
+   * Function to verify the Or Explore All Lessons in Classroom section in the redesigned learner dashboard is present or not.
+   * @param {boolean} visible - Whether the section should be visible or not.
+   */
+  async expectClassroomButtonOnRedesignedLearnerDashboardToBePresent(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(
+      classroomButtonOnRedesignedLearnerDashboard,
       visible
     );
   }
