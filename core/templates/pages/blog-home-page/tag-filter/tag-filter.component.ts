@@ -27,7 +27,7 @@ import {
 } from '@angular/core';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {MatAutocompleteTrigger} from '@angular/material/autocomplete';
-import {FormControl} from '@angular/forms';
+import {UntypedFormControl} from '@angular/forms';
 import {
   debounceTime,
   distinctUntilChanged,
@@ -54,7 +54,7 @@ export class TagFilterComponent implements OnInit {
   @Output() selectionsChange: EventEmitter<string[]> = new EventEmitter();
 
   separatorKeysCodes: number[] = [ENTER, COMMA];
-  tagFilter = new FormControl('');
+  tagFilter = new UntypedFormControl('');
   searchDropDownTags: string[] = [];
   filteredTags!: Observable<string[]>;
 

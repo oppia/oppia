@@ -28,7 +28,7 @@ import {ExternalRteSaveService} from 'services/external-rte-save.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 import {ServicesConstants} from 'services/services.constants';
-import {FormBuilder, FormGroup} from '@angular/forms';
+import {UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
 import {Subscription} from 'rxjs';
 import {HtmlLengthService} from 'services/html-length.service';
 
@@ -116,7 +116,7 @@ export class RteHelperModalComponent {
   errorMessage: string;
   tmpCustomizationArgs: CustomizationArgsNameAndValueArray = [];
   @ViewChild('schemaForm') schemaForm!: NgForm;
-  public customizationArgsForm: FormGroup;
+  public customizationArgsForm: UntypedFormGroup;
   customizationArgsFormSubscription: Subscription;
   COMPONENT_ID_COLLAPSIBLE = 'collapsible';
   COMPONENT_ID_COLLAPSIBLE_HEADING = 'collapsible_heading';
@@ -145,7 +145,7 @@ export class RteHelperModalComponent {
     private ngbActiveModal: NgbActiveModal,
     private externalRteSaveService: ExternalRteSaveService,
     private alertsService: AlertsService,
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private assetsBackendApiService: AssetsBackendApiService,
     private pageContextService: PageContextService,
     private imageLocalStorageService: ImageLocalStorageService,

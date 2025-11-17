@@ -24,7 +24,7 @@ import {
   ViewChild,
   ElementRef,
 } from '@angular/core';
-import {FormBuilder, FormGroup} from '@angular/forms';
+import {UntypedFormBuilder, UntypedFormGroup} from '@angular/forms';
 
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 
@@ -60,7 +60,7 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
   statusMessage!: string;
   activeTab!: string;
   memoryCacheProfile!: MemoryCacheProfile;
-  promoBarConfigForm!: FormGroup;
+  promoBarConfigForm!: UntypedFormGroup;
   memoryCacheDataFetched: boolean = false;
   submitButtonDisabled: boolean = false;
   directiveSubscriptions = new Subscription();
@@ -96,7 +96,7 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
   TAB_ID_MISC: string = ReleaseCoordinatorPageConstants.TAB_ID_MISC;
 
   constructor(
-    private formBuilder: FormBuilder,
+    private formBuilder: UntypedFormBuilder,
     private backendApiService: ReleaseCoordinatorBackendApiService,
     private promoBarBackendApiService: PromoBarBackendApiService,
     private cdr: ChangeDetectorRef,

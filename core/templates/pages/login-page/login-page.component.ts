@@ -17,7 +17,7 @@
  */
 
 import {Component, OnInit} from '@angular/core';
-import {FormControl, FormGroup, Validators} from '@angular/forms';
+import {UntypedFormControl, UntypedFormGroup, Validators} from '@angular/forms';
 import firebase from 'firebase/app';
 
 import {AppConstants} from 'app.constants';
@@ -32,8 +32,8 @@ import {WindowRef} from 'services/contextual/window-ref.service';
   templateUrl: './login-page.component.html',
 })
 export class LoginPageComponent implements OnInit {
-  email = new FormControl('', [Validators.email]);
-  formGroup = new FormGroup({email: this.email});
+  email = new UntypedFormControl('', [Validators.email]);
+  formGroup = new UntypedFormGroup({email: this.email});
 
   constructor(
     private alertsService: AlertsService,

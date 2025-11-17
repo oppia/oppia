@@ -17,7 +17,7 @@
  */
 
 import {Component, Inject, OnDestroy, OnInit} from '@angular/core';
-import {FormControl} from '@angular/forms';
+import {UntypedFormControl} from '@angular/forms';
 import {MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import {of, Subscription} from 'rxjs';
 import {catchError, first} from 'rxjs/operators';
@@ -32,7 +32,7 @@ import {AlertsService} from 'services/alerts.service';
   templateUrl: './view-beam-job-output-dialog.component.html',
 })
 export class ViewBeamJobOutputDialogComponent implements OnInit, OnDestroy {
-  selectedTab = new FormControl(0);
+  selectedTab = new UntypedFormControl(0);
   // Output is null if the job has not finished yet.
   output: BeamJobRunResult | null = null;
   // This property is initialized using Angular lifecycle hooks
