@@ -30,6 +30,9 @@ import {
   TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING,
 } from 'domain/exploration/written-translation.model';
 
+const PENDING = 'pending';
+const SUBMITTED = 'submitted';
+
 export interface TranslatableItem {
   translation: string | string[];
   status: Status;
@@ -74,7 +77,7 @@ export class TranslateTextService {
   activeContentId: string = '';
   activeStateName: string = '';
   activeContentText: string | string[] = '';
-  activeContentStatus?: Status;
+  activeContentStatus: Status;
 
   constructor(
     private translateTextBackendApiService: TranslateTextBackendApiService
@@ -157,7 +160,7 @@ export class TranslateTextService {
     this.activeContentId = '';
     this.activeStateName = '';
     this.activeContentText = [];
-    this.activeContentStatus = this.PENDING as Status;
+    this.activeContentStatus = PENDING;
     this.activeExpId = expId;
     this.translateTextBackendApiService
       .getTranslatableTextsAsync(expId, languageCode)
@@ -179,7 +182,7 @@ export class TranslateTextService {
                 stateName,
                 contentId,
                 translatableItem.content,
-                this.PENDING as Status,
+                PENDING,
                 this._isSetDataFormat(translatableItem.dataFormat) ? [] : '',
                 translatableItem.dataFormat,
                 translatableItem.contentType,
@@ -205,7 +208,7 @@ export class TranslateTextService {
 
   getTextToTranslate(): TranslatableItem {
     const text = this._getNextText();
-    const {status = this.PENDING as Status, translation = ''} = {
+    const {status = PENDING, translation = ''} = {
       ...this.stateAndContent[this.activeIndex],
     };
     return this._getUpdatedTextToTranslate(
@@ -218,7 +221,7 @@ export class TranslateTextService {
 
   getPreviousTextToTranslate(): TranslatableItem {
     const text = this._getPreviousText();
-    const {status = this.PENDING as Status, translation = ''} = {
+    const {status = PENDING, translation = ''} = {
       ...this.stateAndContent[this.activeIndex],
     };
     return this._getUpdatedTextToTranslate(
@@ -252,8 +255,7 @@ export class TranslateTextService {
       )
       .then(
         () => {
-          this.stateAndContent[this.activeIndex].status = this
-            .SUBMITTED as Status;
+          this.stateAndContent[this.activeIndex].status = SUBMITTED;
           this.stateAndContent[this.activeIndex].translation = translation;
           successCallback();
         },
