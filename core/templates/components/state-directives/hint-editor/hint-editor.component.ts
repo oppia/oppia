@@ -24,7 +24,7 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import {UntypedFormControl, UntypedFormGroup} from '@angular/forms';
+import {FormControl, FormGroup} from '@angular/forms';
 import {Subscription} from 'rxjs';
 import cloneDeep from 'lodash/cloneDeep';
 import {PageContextService} from 'services/page-context.service';
@@ -55,7 +55,7 @@ export class HintEditorComponent implements OnInit, OnDestroy {
   @Input() indexPlusOne!: number;
   hintEditorIsOpen!: boolean;
   hintMemento!: Hint;
-  editHintForm!: UntypedFormGroup;
+  editHintForm!: FormGroup;
   HINT_FORM_SCHEMA!: HintFormSchema;
   isEditable: boolean = false;
   directiveSubscriptions = new Subscription();
@@ -102,8 +102,8 @@ export class HintEditorComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.editHintForm = new UntypedFormGroup({
-      schemaBasedEditor: new UntypedFormControl(''),
+    this.editHintForm = new FormGroup({
+      schemaBasedEditor: new FormControl(''),
     });
 
     this.directiveSubscriptions.add(

@@ -23,7 +23,7 @@ import {Subscription} from 'rxjs';
 import {AppConstants} from 'app.constants';
 import cloneDeep from 'lodash/cloneDeep';
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {UntypedFormControl} from '@angular/forms';
+import {FormControl} from '@angular/forms';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {TopicEditorStateService} from '../services/topic-editor-state.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
@@ -97,7 +97,7 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   maxCharsInPageTitleFragmentForWeb!: number;
   maxCharsInMetaTagContent!: number;
   minCharsInPageTitleFragmentForWeb!: number;
-  skillForDiagnosticTestFormControl = new UntypedFormControl(null);
+  skillForDiagnosticTestFormControl = new FormControl(null);
   classroomUrlFragment: string | null = null;
   classroomName: string | null = null;
   curriculumAdminUsernames: string[] = [];

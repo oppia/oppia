@@ -18,7 +18,7 @@
 
 import {ComponentFixture, TestBed, async} from '@angular/core/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {AngularFireAuth} from '@angular/fire/auth';
+import {AngularFireAuth} from '@angular/fire/compat/auth';
 import {CookieModule} from 'ngx-cookie';
 import {
   OppiaAngularRootComponent,

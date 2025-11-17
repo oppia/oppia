@@ -20,11 +20,7 @@ import {HttpClientModule, HTTP_INTERCEPTORS} from '@angular/common/http';
 import {APP_INITIALIZER, NgModule} from '@angular/core';
 
 // Modules.
-import {
-  BrowserModule,
-  HAMMER_GESTURE_CONFIG,
-  HammerGestureConfig,
-} from '@angular/platform-browser';
+import {BrowserModule} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {AppRoutingModule} from './routing/app.routing.module';
 
@@ -40,11 +36,6 @@ import {RequestInterceptor} from 'services/request-interceptor.service';
 import {CookieModule} from 'ngx-cookie';
 import {ToastrModule} from 'ngx-toastr';
 import {AppErrorHandlerProvider} from 'pages/oppia-root/app-error-handler';
-// This throws "TS2307". We need to
-// suppress this error because hammer come from hammerjs
-// dependency. We can't import it directly.
-// @ts-ignore
-import * as hammer from 'hammerjs';
 
 // Config for ToastrModule (helps in flashing messages and alerts).
 export const toastrConfig = {
@@ -61,20 +52,6 @@ export const toastrConfig = {
   tapToDismiss: true,
   titleClass: 'toast-title',
 };
-
-export class HammerConfig extends HammerGestureConfig {
-  overrides = {
-    swipe: {direction: hammer.DIRECTION_HORIZONTAL},
-    pinch: {enable: false},
-    rotate: {enable: false},
-  };
-
-  options = {
-    cssProps: {
-      userSelect: true,
-    },
-  };
-}
 
 @NgModule({
   imports: [
@@ -98,10 +75,6 @@ export class HammerConfig extends HammerGestureConfig {
       useFactory: platformFeatureInitFactory,
       deps: [PlatformFeatureService],
       multi: true,
-    },
-    {
-      provide: HAMMER_GESTURE_CONFIG,
-      useClass: HammerConfig,
     },
   ],
   bootstrap: [LightweightOppiaRootComponent],

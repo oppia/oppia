@@ -475,8 +475,11 @@ const addThumbnailToTopic = async function (page, topicName) {
 };
 
 const main = async function () {
-  process.env.FIREBASE_AUTH_EMULATOR_HOST = 'firebase:9099';
+  // Configure the Firebase Admin SDK to communicate with the emulator.
   FirebaseAdmin.initializeApp({projectId: 'dev-project-id'});
+  const auth = FirebaseAdmin.auth(app);
+  auth.connectAuthEmulator('localhost:9099');
+
   // Change headless to false to see the puppeteer actions.
   const browser = await puppeteer.launch({
     headless: true,

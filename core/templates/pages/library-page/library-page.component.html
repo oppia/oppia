@@ -27,6 +27,7 @@
         <i class="fa fa-angle-left"></i>
       </button>
       <div class="carousel-container"
+           swipeDetector
            (swipeleft)="moveClassroomCarouselToNextSlide()"
            (swiperight)="moveClassroomCarouselToPreviousSlide()">
         <div class="classrooms-card-container"
@@ -178,6 +179,7 @@
             </div>
 
             <div class="oppia-library-carousel"
+                 swipeDetector
                  (swiperight)="scroll(idx, true)"
                  (swipeleft)="scroll(idx, false)">
               <div class="oppia-library-carousel-tiles">

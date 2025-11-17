@@ -37,7 +37,7 @@
     </div>
     <div class="oppia-base-container e2e-test-base-container"
          [ngClass]="{'oppia-sidebar-menu-open': isSidebarShown(), 'oppia-sidebar-menu-closed': !isSidebarShown()}"
-         (swipeleft)="closeSidebarOnSwipe()">
+         swipeDetector (swipeleft)="closeSidebarOnSwipe()">
       <div class="oppia-content-container e2e-test-content-container">
         <div id="wrapper">
           <div class="oppia-main-body">

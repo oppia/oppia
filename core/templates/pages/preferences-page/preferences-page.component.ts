@@ -46,7 +46,7 @@ import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 require('cropperjs/dist/cropper.min.css');
 
 import './preferences-page.component.css';
-import {UntypedFormControl, UntypedFormGroup} from '@angular/forms';
+import {FormControl, FormGroup} from '@angular/forms';
 
 interface AudioLangaugeChoice {
   id: string;
@@ -93,7 +93,7 @@ export class PreferencesPageComponent {
   PAGES_REGISTERED_WITH_FRONTEND = AppConstants.PAGES_REGISTERED_WITH_FRONTEND;
 
   subscriptionList: SubscriptionSummary[] = [];
-  preferencesForm!: UntypedFormGroup;
+  preferencesForm!: FormGroup;
 
   @ViewChild('firstRadio') firstRadio!: ElementRef;
 
@@ -261,40 +261,32 @@ export class PreferencesPageComponent {
               AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH
             );
         }
-        this.preferencesForm = new UntypedFormGroup({
-          profilePicturePngDataUrl: new UntypedFormControl(
-            profilePicturePngDataUrl
-          ),
-          profilePictureWebpDataUrl: new UntypedFormControl(
-            profilePictureWebpDataUrl
-          ),
-          userBio: new UntypedFormControl(preferencesData.user_bio),
-          defaultDashboard: new UntypedFormControl(
-            preferencesData.default_dashboard
-          ),
-          subjectInterests: new UntypedFormControl(
-            preferencesData.subject_interests
-          ),
-          preferredLanguageCodes: new UntypedFormControl(
+        this.preferencesForm = new FormGroup({
+          profilePicturePngDataUrl: new FormControl(profilePicturePngDataUrl),
+          profilePictureWebpDataUrl: new FormControl(profilePictureWebpDataUrl),
+          userBio: new FormControl(preferencesData.user_bio),
+          defaultDashboard: new FormControl(preferencesData.default_dashboard),
+          subjectInterests: new FormControl(preferencesData.subject_interests),
+          preferredLanguageCodes: new FormControl(
             preferencesData.preferred_language_codes
           ),
-          preferredSiteLanguageCode: new UntypedFormControl(
+          preferredSiteLanguageCode: new FormControl(
             preferencesData.preferred_site_language_code
           ),
-          preferredAudioLanguageCode: new UntypedFormControl(
+          preferredAudioLanguageCode: new FormControl(
             preferencesData.preferred_audio_language_code
           ),
-          emailPreferences: new UntypedFormGroup({
-            canReceiveEmailUpdates: new UntypedFormControl(
+          emailPreferences: new FormGroup({
+            canReceiveEmailUpdates: new FormControl(
               preferencesData.can_receive_email_updates
             ),
-            canReceiveEditorRoleEmail: new UntypedFormControl(
+            canReceiveEditorRoleEmail: new FormControl(
               preferencesData.can_receive_editor_role_email
             ),
-            canReceiveFeedbackMessageEmail: new UntypedFormControl(
+            canReceiveFeedbackMessageEmail: new FormControl(
               preferencesData.can_receive_feedback_message_email
             ),
-            canReceiveSubscriptionEmail: new UntypedFormControl(
+            canReceiveSubscriptionEmail: new FormControl(
               preferencesData.can_receive_subscription_email
             ),
           }),
@@ -383,7 +375,7 @@ export class PreferencesPageComponent {
         }
         if (returnData.bulk_email_signup_message_should_be_shown) {
           const formGrp = this.preferencesForm.controls
-            .emailPreferences as UntypedFormGroup;
+            .emailPreferences as FormGroup;
           formGrp.controls.canReceiveEmailUpdates.setValue(false);
           this.showEmailSignupLink = true;
         } else {

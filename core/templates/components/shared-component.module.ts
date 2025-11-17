@@ -22,11 +22,9 @@ import 'zone.js';
 import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
 import {AngularFireModule} from '@angular/fire';
-import {
-  AngularFireAuth,
-  AngularFireAuthModule,
-  USE_EMULATOR,
-} from '@angular/fire/auth';
+import {AngularFireAuth, USE_EMULATOR} from '@angular/fire/compat/auth';
+import {provideFirebaseApp, initializeApp} from '@angular/fire/app';
+import {provideAuth, getAuth} from '@angular/fire/auth';
 import {CustomFormsComponentsModule} from './forms/custom-forms-directives/custom-form-components.module';
 import {DynamicContentModule} from './interaction-display/dynamic-content.module';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
@@ -56,6 +54,7 @@ import {StateSkillEditorComponent} from 'components/state-editor/state-skill-edi
 import {SelectSkillModalComponent} from './skill-selector/select-skill-modal.component';
 import {SharingLinksComponent} from './common-layout-directives/common-elements/sharing-links.component';
 import {SkillSelectorComponent} from './skill-selector/skill-selector.component';
+import {SwipeDetectorDirective} from '../directives/swipe-detector.directive';
 import {ProfileLinkImageComponent} from 'components/profile-link-directives/profile-link-image.component';
 import {ProfileLinkTextComponent} from 'components/profile-link-directives/profile-link-text.component';
 import {AudioFileUploaderComponent} from './forms/custom-forms-directives/audio-file-uploader.component';
@@ -255,8 +254,8 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     JoyrideModule.forRoot(),
     RecommendationsModule,
     StringUtilityPipesModule,
-    AngularFireModule.initializeApp(AuthService.firebaseConfig),
-    AngularFireAuthModule,
+    provideFirebaseApp(() => initializeApp(AuthService.firebaseConfig)),
+    provideAuth(() => getAuth()),
     MatProgressSpinnerModule,
     NgbModalModule,
     TranslateModule,
@@ -356,6 +355,7 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     StorySummaryTileComponent,
     SubtopicSummaryTileComponent,
     SummaryListHeaderComponent,
+    SwipeDetectorDirective,
     TakeBreakModalComponent,
     ThumbnailUploaderComponent,
     EditThumbnailModalComponent,
@@ -610,6 +610,7 @@ import {NewRatingsAndRecommendationsComponent} from 'pages/exploration-player-pa
     ExplorationTitleEditorComponent,
     ExplorationObjectiveEditorComponent,
     ConfirmTranslationExitModalComponent,
+    SwipeDetectorDirective,
   ],
 })
 export class SharedComponentsModule {}

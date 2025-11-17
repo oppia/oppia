@@ -18,7 +18,7 @@
 
 import {Injectable, Optional} from '@angular/core';
 import {FirebaseOptions} from '@angular/fire';
-import {AngularFireAuth} from '@angular/fire/auth';
+import {AngularFireAuth} from '@angular/fire/compat/auth';
 import firebase from 'firebase/app';
 import 'firebase/auth';
 import {md5} from 'hash-wasm';

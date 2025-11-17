@@ -25,7 +25,7 @@ import {
   Output,
   ViewChild,
 } from '@angular/core';
-import {UntypedFormControl} from '@angular/forms';
+import {FormControl} from '@angular/forms';
 import {MatChipList} from '@angular/material/chips';
 import cloneDeep from 'lodash/cloneDeep';
 import {Observable} from 'rxjs';
@@ -47,7 +47,7 @@ export class MultiSelectionFieldComponent {
   @Input() validationErrorMessage = '';
   @Input() allowLowercaseOnly: boolean = false;
 
-  formCtrl = new UntypedFormControl();
+  formCtrl = new FormControl();
   filteredSelections: Observable<string[] | string[]>;
   readOnlySelections: string[] = [];
 

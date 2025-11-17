@@ -26,7 +26,7 @@ import {
 } from '@angular/core';
 import {
   ControlValueAccessor,
-  UntypedFormControl,
+  FormControl,
   NG_VALUE_ACCESSOR,
 } from '@angular/forms';
 import {MatChipList} from '@angular/material/chips';
@@ -51,7 +51,7 @@ export class SubjectInterestsComponent implements ControlValueAccessor {
   selectable = true;
   removable = true;
   separatorKeysCodes: number[] = [ENTER];
-  formCtrl = new UntypedFormControl();
+  formCtrl = new FormControl();
   filteredSubjectInterests: Observable<string[]>;
   allSubjectInterests: string[] = [];
   // These properties are initialized using Angular lifecycle hooks

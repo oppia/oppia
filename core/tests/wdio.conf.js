@@ -269,10 +269,10 @@ exports.config = {
       browser.setWindowSize(1285, 1000);
     }
 
-
     // Configure the Firebase Admin SDK to communicate with the emulator.
-    process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099';
     FirebaseAdmin.initializeApp({projectId: 'dev-project-id'});
+    const auth = FirebaseAdmin.auth(app);
+    auth.connectAuthEmulator('localhost:9099');
 
     // Navigate to the splash page so that tests can begin on an Angular page.
     browser.url('http://localhost:8181');

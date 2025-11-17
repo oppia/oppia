@@ -27,7 +27,7 @@ import {
 } from '@angular/core';
 import {
   ControlValueAccessor,
-  UntypedFormControl,
+  FormControl,
   NG_VALUE_ACCESSOR,
 } from '@angular/forms';
 import {MatChipList} from '@angular/material/chips';
@@ -58,7 +58,7 @@ export class PreferredLanguagesComponent
   selectable = true;
   removable = true;
   separatorKeysCodes: number[] = [ENTER];
-  formCtrl = new UntypedFormControl();
+  formCtrl = new FormControl();
   filteredChoices: LanguageIdAndText[] = [];
   searchQuery: string = '';
 

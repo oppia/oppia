@@ -18,7 +18,7 @@
  */
 
 import {Component, NgZone, OnDestroy, OnInit} from '@angular/core';
-import {UntypedFormControl} from '@angular/forms';
+import {FormControl} from '@angular/forms';
 import {MatDialog} from '@angular/material/dialog';
 import {
   BehaviorSubject,
@@ -63,7 +63,7 @@ export class BeamJobsTabComponent implements OnInit, OnDestroy {
     'action',
   ];
 
-  jobNameControl = new UntypedFormControl('');
+  jobNameControl = new FormControl('');
 
   dataIsReady = false;
   // This property is initialized using Angular lifecycle hooks
