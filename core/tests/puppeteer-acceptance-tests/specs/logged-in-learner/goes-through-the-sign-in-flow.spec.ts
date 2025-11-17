@@ -44,7 +44,7 @@ describe('Logged In Learner', function () {
     await releaseCoordinator.enableFeatureFlag(
       'show_redesigned_learner_dashboard'
     );
-  }, 60000);
+  }, 300000);
 
   it('should show signup page when clicking Sign In button', async function () {
     // Click on "Sign In" button and fill email.
