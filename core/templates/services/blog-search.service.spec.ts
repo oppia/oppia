@@ -148,7 +148,7 @@ describe('Blog Post Search Service', () => {
   });
 
   describe('resetSearchState', () => {
-    it('should reset all search services state properties',()=>{
+    it('should reset all search services state properties', ()=>{
       searchService['_searchOffset'] = 15;
       searchService['_lastQuery'] = 'search query';
       searchService['_lastSelectedTags'] = ['community', 'news'];
