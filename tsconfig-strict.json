@@ -4,7 +4,6 @@
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "downlevelIteration": true,
-    "emitDecoratorMetadata": true,
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "lib": [

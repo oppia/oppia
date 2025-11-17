@@ -26,7 +26,7 @@
 // https://github.com/angular/angular/issues/29281
 
 import 'reflect-metadata';
-import 'zone.js/dist/zone';
+import 'zone.js';
 import 'zone.js/dist/long-stack-trace-zone';
 import 'zone.js/dist/proxy.js';
 import 'zone.js/dist/sync-test';

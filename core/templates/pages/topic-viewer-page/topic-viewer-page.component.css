@@ -48,7 +48,7 @@ topic-viewer-page .oppia-topic-viewer-tabs-container {
   z-index: 1000;
 }
 
-topic-viewer-page .oppia-topic-viewer-container /deep/ .oppia-background-banner {
+topic-viewer-page .oppia-topic-viewer-container ::ng-deep .oppia-background-banner {
   margin-top: -50px;
 }
 
