@@ -298,6 +298,7 @@
 /core/templates/directives/focus-on.directive*.ts @oppia/lace-frontend-reviewers
 /core/templates/directives/headroom.directive.ts @oppia/lace-frontend-reviewers
 /core/templates/directives/ng-init.directive.ts @oppia/lace-frontend-reviewers
+/core/templates/directives/swipe-detector.directive.ts @oppia/lace-frontend-reviewers
 /core/templates/domain/promo_bar/ @oppia/lace-frontend-reviewers
 /core/templates/filters/ @oppia/lace-frontend-reviewers
 /core/templates/services/attribution.service*.ts @oppia/lace-frontend-reviewers

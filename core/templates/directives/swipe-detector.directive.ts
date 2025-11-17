@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview A directive to detect swipe events.
+ */
+
 import {Directive, EventEmitter, HostListener, Output} from '@angular/core';
 
 @Directive({
