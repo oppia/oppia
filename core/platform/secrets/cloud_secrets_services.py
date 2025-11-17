@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import functools
+import logging
 
 from core.constants import constants
 from core.platform import models
@@ -55,6 +56,8 @@ def get_secret(name: str) -> Optional[str]:
         str. The value of the secret.
     """
     oppia_project_id = app_identity_services.get_application_id()
+    logging.info('Retrieved project ID: %s', oppia_project_id)
+
     secret_name = f'projects/{oppia_project_id}/secrets/{name}/versions/latest'
     try:
         response = CLIENT.access_secret_version(request={'name': secret_name})
