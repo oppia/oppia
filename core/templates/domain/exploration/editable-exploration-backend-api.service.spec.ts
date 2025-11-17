@@ -2,7 +2,7 @@
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// you may obtain a copy of the License at
+// You may obtain a copy of the License at
 //
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
@@ -30,7 +30,8 @@ describe('EditableExplorationBackendApiService', () => {
   let editableExplorationBackendApiService: EditableExplorationBackendApiService;
   let readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService;
   let httpTestingController: HttpTestingController;
-  let sampleDataResults;
+  // CORRIGÉ (TS7034, TS7005): Ajout du type 'any'
+  let sampleDataResults: any;
   let csrfService: CsrfTokenService;
 
   beforeEach(() => {
@@ -160,7 +161,8 @@ describe('EditableExplorationBackendApiService', () => {
   it('should update an exploration after fetching it from the backend', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
-    let exploration;
+    // CORRIGÉ (TS2532, TS2345): Ajout du type 'any'
+    let exploration: any;
 
     editableExplorationBackendApiService
       .fetchExplorationAsync('0')
@@ -199,7 +201,8 @@ describe('EditableExplorationBackendApiService', () => {
   it('should not cache exploration from backend into read only service', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
-    let exploration;
+    // CORRIGÉ (TS2532, TS2345): Ajout du type 'any'
+    let exploration: any;
 
     readOnlyExplorationBackendApiService
       .loadLatestExplorationAsync('0')
@@ -241,7 +244,8 @@ describe('EditableExplorationBackendApiService', () => {
   it('should delete exploration from the backend', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
-    let exploration;
+    // CORRIGÉ (TS2532, TS2345): Ajout du type 'any'
+    let exploration: any;
 
     editableExplorationBackendApiService
       .fetchExplorationAsync('0')
@@ -482,7 +486,8 @@ describe('EditableExplorationBackendApiService', () => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
 
-    let exploration;
+    // CORRIGÉ (TS2532): Ajout du type 'any'
+    let exploration: any;
 
     editableExplorationBackendApiService
       .fetchExplorationAsync('0')

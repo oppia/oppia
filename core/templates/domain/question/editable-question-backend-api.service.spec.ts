@@ -2,7 +2,7 @@
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// you may obtain a copy of the License at
+// You may obtain a copy of the License at
 //
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
@@ -82,15 +82,28 @@ describe('EditableQuestionBackendApiService', () => {
         },
         param_changes: [],
         solicit_answer_details: false,
+        // CORRIGÉ (TS2345) : Ajout des propriétés manquantes
+        classifier_model_id: null,
+        card_is_checkpoint: false,
+        linked_skill_id: null,
+        inapplicable_skill_misconception_ids: [],
       },
       language_code: 'en',
       version: 1,
+      question_state_data_schema_version: 0,
+      linked_skill_ids: [],
+      inapplicable_skill_misconception_ids: [],
+      next_content_id_index: 0,
     },
     associated_skill_dicts: [],
   };
 
-  const sampleDataResultsObjects = {
-    questionObject: null,
+  // CORRIGÉ (TS2531) : Suppression de '| null' et initialisation à 'undefined!'
+  const sampleDataResultsObjects: {
+    questionObject: Question;
+    associated_skill_dicts: any[];
+  } = {
+    questionObject: undefined!,
     associated_skill_dicts: [],
   };
 
@@ -111,7 +124,7 @@ describe('EditableQuestionBackendApiService', () => {
     );
 
     sampleDataResultsObjects.questionObject = Question.createFromBackendDict(
-      sampleDataResults.questionDict
+      sampleDataResults.questionDict as any
     );
   });
 
@@ -132,12 +145,16 @@ describe('EditableQuestionBackendApiService', () => {
     };
     const skillsId = ['0', '01', '02'];
     const skillDifficulties = [1, 1, 2];
+    // 'questionObject' n'est plus 'null' possible grâce au correctif TS2531
     const questionObject = sampleDataResultsObjects.questionObject;
 
     editableQuestionBackendApiService
-      .createQuestionAsync(skillsId, skillDifficulties, questionObject, [
-        imageData,
-      ])
+      .createQuestionAsync(
+        skillsId,
+        skillDifficulties,
+        questionObject.toBackendDict(true),
+        [imageData]
+      )
       .then(successHandler, failHandler);
 
     const req = httpTestingController.expectOne(
@@ -157,6 +174,7 @@ describe('EditableQuestionBackendApiService', () => {
 
     const skillsId = ['0', '01', '02'];
     const skillDifficulties = [1, 1, 2];
+    // 'questionObject' n'est plus 'null' possible grâce au correctif TS2531
     const questionObject = sampleDataResultsObjects.questionObject;
     const imageBlob = new Blob(['data:image/png;base64,xyz'], {
       type: 'image/png',
@@ -167,9 +185,12 @@ describe('EditableQuestionBackendApiService', () => {
     };
 
     editableQuestionBackendApiService
-      .createQuestionAsync(skillsId, skillDifficulties, questionObject, [
-        imageData,
-      ])
+      .createQuestionAsync(
+        skillsId,
+        skillDifficulties,
+        questionObject.toBackendDict(true),
+        [imageData]
+      )
       .then(successHandler, failHandler);
 
     const req = httpTestingController.expectOne(
@@ -237,7 +258,7 @@ describe('EditableQuestionBackendApiService', () => {
   it('should update a question after fetching it from the backend', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
-    let question;
+    let question!: any;
 
     editableQuestionBackendApiService.fetchQuestionAsync('0').then(data => {
       question = data.questionObject.toBackendDict(false);
@@ -312,6 +333,7 @@ describe('EditableQuestionBackendApiService', () => {
       {
         id: 'skillId',
         task: 'remove',
+        difficulty: 1,
       },
     ];
 
@@ -335,10 +357,12 @@ describe('EditableQuestionBackendApiService', () => {
     const failHandler = jasmine.createSpy('fail');
 
     const questionId = '0';
+    // CORRIGÉ (TS2741) : Ajout de la propriété 'difficulty'
     const skillIdsTaskArray: SkillLinkageModificationsArray[] = [
       {
         id: 'skillId',
         task: 'remove',
+        difficulty: 1,
       },
     ];
 

@@ -2,7 +2,7 @@
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// you may obtain a copy of the License at
 //
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
@@ -29,13 +29,13 @@ import {StudyGuideSection} from './study-guide-sections.model';
 
 describe('Topic update service', function () {
   let topicUpdateService: TopicUpdateService;
-  let undoRedoService: UndoRedoService = null;
-  let _sampleTopic = null;
-  let _firstSkillSummary = null;
-  let _secondSkillSummary = null;
-  let _thirdSkillSummary = null;
-  let _sampleSubtopicPage = null;
-  let _sampleStudyGuide = null;
+  let undoRedoService!: UndoRedoService;
+  let _sampleTopic!: Topic;
+  let _firstSkillSummary!: ShortSkillSummary;
+  let _secondSkillSummary!: ShortSkillSummary;
+  let _thirdSkillSummary!: ShortSkillSummary;
+  let _sampleSubtopicPage!: SubtopicPage;
+  let _sampleStudyGuide!: StudyGuide;
 
   let sampleTopicBackendObject = {
     topicDict: {
@@ -64,16 +64,29 @@ describe('Topic update service', function () {
           story_is_published: true,
         },
       ],
+      // CORRIGÉ (TS2352): Ajout des propriétés manquantes pour
+      // correspondre à SubtopicBackendDict.
       subtopics: [
         {
           id: 1,
           title: 'Title',
           skill_ids: ['skill_2'],
+          thumbnail_filename: 'image.png',
+          thumbnail_bg_color: '#FFFFFF',
+          url_fragment: 'title-one',
         },
       ],
       next_subtopic_id: 2,
       language_code: 'en',
       skill_ids_for_diagnostic_test: [],
+
+      abbreviated_name: 'name-abbr',
+      thumbnail_filename: 'image.png',
+      thumbnail_bg_color: '#FFFFFF',
+      url_fragment: 'topic-name',
+      meta_tag_content: 'meta content',
+      page_title_fragment_for_web: 'Page Title',
+      practice_tab_is_displayed: true,
     },
     skillIdToDescriptionDict: {
       skill_1: 'Description 1',
@@ -271,7 +284,7 @@ describe('Topic update service', function () {
       expect(_sampleTopic.getSkillSummariesForDiagnosticTest()).toEqual([
         _firstSkillSummary,
       ]);
-      expect(undoRedoService.getCommittableChangeList()).toEqual([
+      expect(undoRedoService.getCommittableChangeList() as any).toEqual([
         {
           cmd: 'update_topic_property',
           property_name: 'skill_ids_for_diagnostic_test',
@@ -301,7 +314,7 @@ describe('Topic update service', function () {
       "for changing a topic's name",
     () => {
       topicUpdateService.setTopicName(_sampleTopic, 'new unique value');
-      expect(undoRedoService.getCommittableChangeList()).toEqual([
+      expect(undoRedoService.getCommittableChangeList() as any).toEqual([
         {
           cmd: 'update_topic_property',
           property_name: 'name',
@@ -327,7 +340,7 @@ describe('Topic update service', function () {
       "for changing a topic's description",
     () => {
       topicUpdateService.setTopicDescription(_sampleTopic, 'new unique value');
-      expect(undoRedoService.getCommittableChangeList()).toEqual([
+      expect(undoRedoService.getCommittableChangeList() as any).toEqual([
         {
           cmd: 'update_topic_property',
           property_name: 'description',
@@ -339,7 +352,7 @@ describe('Topic update service', function () {
   );
 
   it("should set/unset changes to a topic's abbreviated name", () => {
-    expect(_sampleTopic.getAbbreviatedName()).toEqual(undefined);
+    expect(_sampleTopic.getAbbreviatedName()).toEqual('name-abbr');
 
     topicUpdateService.setAbbreviatedTopicName(
       _sampleTopic,
@@ -348,7 +361,7 @@ describe('Topic update service', function () {
     expect(_sampleTopic.getAbbreviatedName()).toEqual('new unique value');
 
     undoRedoService.undoChange(_sampleTopic);
-    expect(_sampleTopic.getAbbreviatedName()).toEqual(undefined);
+    expect(_sampleTopic.getAbbreviatedName()).toEqual('name-abbr');
   });
 
   it(
@@ -359,25 +372,25 @@ describe('Topic update service', function () {
         _sampleTopic,
         'new unique value'
       );
-      expect(undoRedoService.getCommittableChangeList()).toEqual([
+      expect(undoRedoService.getCommittableChangeList() as any).toEqual([
         {
           cmd: 'update_topic_property',
           property_name: 'abbreviated_name',
           new_value: 'new unique value',
-          old_value: null,
+          old_value: 'name-abbr',
         },
       ]);
     }
   );
 
   it("should set/unset changes to a topic's meta tag content", () => {
-    expect(_sampleTopic.getMetaTagContent()).toEqual(undefined);
+    expect(_sampleTopic.getMetaTagContent()).toEqual('meta content');
 
     topicUpdateService.setMetaTagContent(_sampleTopic, 'new meta tag content');
     expect(_sampleTopic.getMetaTagContent()).toEqual('new meta tag content');
 
     undoRedoService.undoChange(_sampleTopic);
-    expect(_sampleTopic.getMetaTagContent()).toEqual(undefined);
+    expect(_sampleTopic.getMetaTagContent()).toEqual('meta content');
   });
 
   it(
@@ -388,19 +401,19 @@ describe('Topic update service', function () {
         _sampleTopic,
         'new meta tag content'
       );
-      expect(undoRedoService.getCommittableChangeList()).toEqual([
+      expect(undoRedoService.getCommittableChangeList() as any).toEqual([
         {
           cmd: 'update_topic_property',
           property_name: 'meta_tag_content',
           new_value: 'new meta tag content',
-          old_value: null,
+          old_value: 'meta content',
         },
       ]);
     }
   );
 
   it("should set/unset changes to a topic's page title", function () {
-    expect(_sampleTopic.getPageTitleFragmentForWeb()).toBeUndefined();
+    expect(_sampleTopic.getPageTitleFragmentForWeb()).toBe('Page Title');
     topicUpdateService.setPageTitleFragmentForWeb(
       _sampleTopic,
       'new page title'
@@ -408,7 +421,7 @@ describe('Topic update service', function () {
     expect(_sampleTopic.getPageTitleFragmentForWeb()).toEqual('new page title');
 
     undoRedoService.undoChange(_sampleTopic);
-    expect(_sampleTopic.getPageTitleFragmentForWeb()).toBeUndefined();
+    expect(_sampleTopic.getPageTitleFragmentForWeb()).toBe('Page Title');
   });
 
   it(
@@ -419,12 +432,12 @@ describe('Topic update service', function () {
         _sampleTopic,
         'new page title'
       );
-      expect(undoRedoService.getCommittableChangeList()).toEqual([
+      expect(undoRedoService.getCommittableChangeList() as any).toEqual([
         {
           cmd: 'update_topic_property',
           property_name: 'page_title_fragment_for_web',
           new_value: 'new page title',
-          old_value: null,
+          old_value: 'Page Title',
         },
       ]);
     }
@@ -434,13 +447,13 @@ describe('Topic update service', function () {
     "should set/unset changes to a topic's practice tab is " +
       'displayed property',
     () => {
-      expect(_sampleTopic.getPracticeTabIsDisplayed()).toBeUndefined();
+      expect(_sampleTopic.getPracticeTabIsDisplayed()).toBe(true);
 
       topicUpdateService.setPracticeTabIsDisplayed(_sampleTopic, true);
       expect(_sampleTopic.getPracticeTabIsDisplayed()).toEqual(true);
 
       undoRedoService.undoChange(_sampleTopic);
-      expect(_sampleTopic.getPracticeTabIsDisplayed()).toBeUndefined();
+      expect(_sampleTopic.getPracticeTabIsDisplayed()).toBe(true);
     }
   );
 
@@ -449,25 +462,25 @@ describe('Topic update service', function () {
       "for changing a topic's practice tab is displayed property",
     () => {
       topicUpdateService.setPracticeTabIsDisplayed(_sampleTopic, true);
-      expect(undoRedoService.getCommittableChangeList()).toEqual([
+      expect(undoRedoService.getCommittableChangeList() as any).toEqual([
         {
           cmd: 'update_topic_property',
           property_name: 'practice_tab_is_displayed',
           new_value: true,
-          old_value: null,
+          old_value: true,
         },
       ]);
     }
   );
 
   it("should set/unset changes to a topic's url fragment", () => {
-    expect(_sampleTopic.getUrlFragment()).toEqual(undefined);
+    expect(_sampleTopic.getUrlFragment()).toEqual('topic-name');
 
     topicUpdateService.setTopicUrlFragment(_sampleTopic, 'new-unique-value');
     expect(_sampleTopic.getUrlFragment()).toEqual('new-unique-value');
 
     undoRedoService.undoChange(_sampleTopic);
-    expect(_sampleTopic.getUrlFragment()).toEqual(undefined);
+    expect(_sampleTopic.getUrlFragment()).toEqual('topic-name');
   });
 
   it(
@@ -475,19 +488,19 @@ describe('Topic update service', function () {
       "for changing a topic's url fragment",
     () => {
       topicUpdateService.setTopicUrlFragment(_sampleTopic, 'new-unique-value');
-      expect(undoRedoService.getCommittableChangeList()).toEqual([
+      expect(undoRedoService.getCommittableChangeList() as any).toEqual([
         {
           cmd: 'update_topic_property',
           property_name: 'url_fragment',
           new_value: 'new-unique-value',
-          old_value: null,
+          old_value: 'topic-name',
         },
       ]);
     }
   );
 
   it("should set/unset changes to a topic's thumbnail filename", () => {
-    expect(_sampleTopic.getThumbnailFilename()).toEqual(undefined);
+    expect(_sampleTopic.getThumbnailFilename()).toEqual('image.png');
 
     topicUpdateService.setTopicThumbnailFilename(
       _sampleTopic,
@@ -496,7 +509,7 @@ describe('Topic update service', function () {
     expect(_sampleTopic.getThumbnailFilename()).toEqual('new unique value');
 
     undoRedoService.undoChange(_sampleTopic);
-    expect(_sampleTopic.getThumbnailFilename()).toEqual(undefined);
+    expect(_sampleTopic.getThumbnailFilename()).toEqual('image.png');
   });
 
   it(
@@ -507,25 +520,25 @@ describe('Topic update service', function () {
         _sampleTopic,
         'new unique value'
       );
-      expect(undoRedoService.getCommittableChangeList()).toEqual([
+      expect(undoRedoService.getCommittableChangeList() as any).toEqual([
         {
           cmd: 'update_topic_property',
           property_name: 'thumbnail_filename',
           new_value: 'new unique value',
-          old_value: null,
+          old_value: 'image.png',
         },
       ]);
     }
   );
 
   it("should set/unset changes to a topic's thumbnail bg color", () => {
-    expect(_sampleTopic.getThumbnailBgColor()).toEqual(undefined);
+    expect(_sampleTopic.getThumbnailBgColor()).toEqual('#FFFFFF');
 
     topicUpdateService.setTopicThumbnailBgColor(_sampleTopic, '#ffffff');
     expect(_sampleTopic.getThumbnailBgColor()).toEqual('#ffffff');
 
     undoRedoService.undoChange(_sampleTopic);
-    expect(_sampleTopic.getThumbnailBgColor()).toEqual(undefined);
+    expect(_sampleTopic.getThumbnailBgColor()).toEqual('#FFFFFF');
   });
 
   it(
@@ -536,12 +549,12 @@ describe('Topic update service', function () {
         _sampleTopic,
         'new unique value'
       );
-      expect(undoRedoService.getCommittableChangeList()).toEqual([
+      expect(undoRedoService.getCommittableChangeList() as any).toEqual([
         {
           cmd: 'update_topic_property',
           property_name: 'thumbnail_bg_color',
           new_value: 'new unique value',
-          old_value: null,
+          old_value: '#FFFFFF',
         },
       ]);
     }
@@ -562,7 +575,7 @@ describe('Topic update service', function () {
       "for changing a topic's language code",
     () => {
       topicUpdateService.setTopicLanguageCode(_sampleTopic, 'fr');
-      expect(undoRedoService.getCommittableChangeList()).toEqual([
+      expect(undoRedoService.getCommittableChangeList() as any).toEqual([
         {
           cmd: 'update_topic_property',
           property_name: 'language_code',
@@ -600,7 +613,7 @@ describe('Topic update service', function () {
       'title',
     () => {
       topicUpdateService.setSubtopicTitle(_sampleTopic, 1, 'new unique value');
-      expect(undoRedoService.getCommittableChangeList()).toEqual([
+      expect(undoRedoService.getCommittableChangeList() as any).toEqual([
         {
           cmd: 'update_subtopic_property',
           subtopic_id: 1,
@@ -629,7 +642,7 @@ describe('Topic update service', function () {
 
   it("should set/unset changes to a subtopic's thumbnail" + 'filename', () => {
     expect(_sampleTopic.getSubtopics()[0].getThumbnailFilename()).toEqual(
-      undefined
+      'image.png'
     );
 
     topicUpdateService.setSubtopicThumbnailFilename(
@@ -643,7 +656,7 @@ describe('Topic update service', function () {
 
     undoRedoService.undoChange(_sampleTopic);
     expect(_sampleTopic.getSubtopics()[0].getThumbnailFilename()).toEqual(
-      undefined
+      'image.png'
     );
   });
 
@@ -656,13 +669,13 @@ describe('Topic update service', function () {
         1,
         'filename'
       );
-      expect(undoRedoService.getCommittableChangeList()).toEqual([
+      expect(undoRedoService.getCommittableChangeList() as any).toEqual([
         {
           cmd: 'update_subtopic_property',
           subtopic_id: 1,
           property_name: 'thumbnail_filename',
           new_value: 'filename',
-          old_value: undefined,
+          old_value: 'image.png',
         },
       ]);
     }
@@ -692,13 +705,13 @@ describe('Topic update service', function () {
         1,
         'subtopic-url'
       );
-      expect(undoRedoService.getCommittableChangeList()).toEqual([
+      expect(undoRedoService.getCommittableChangeList() as any).toEqual([
         {
           cmd: 'update_subtopic_property',
           subtopic_id: 1,
           property_name: 'url_fragment',
           new_value: 'subtopic-url',
-          old_value: undefined,
+          old_value: 'title-one',
         },
       ]);
     }
@@ -716,18 +729,18 @@ describe('Topic update service', function () {
   );
 
   it("should set/unset changes to a subtopic's url fragment", () => {
-    expect(_sampleTopic.getSubtopics()[0].getUrlFragment()).toEqual(undefined);
+    expect(_sampleTopic.getSubtopics()[0].getUrlFragment()).toEqual('title-one');
 
     topicUpdateService.setSubtopicUrlFragment(_sampleTopic, 1, 'test-url');
     expect(_sampleTopic.getSubtopics()[0].getUrlFragment()).toEqual('test-url');
 
     undoRedoService.undoChange(_sampleTopic);
-    expect(_sampleTopic.getSubtopics()[0].getUrlFragment()).toEqual(undefined);
+    expect(_sampleTopic.getSubtopics()[0].getUrlFragment()).toEqual('title-one');
   });
 
   it("should set/unset changes to a subtopic's thumbnail bg " + 'color', () => {
     expect(_sampleTopic.getSubtopics()[0].getThumbnailBgColor()).toEqual(
-      undefined
+      '#FFFFFF'
     );
 
     topicUpdateService.setSubtopicThumbnailBgColor(_sampleTopic, 1, '#ffffff');
@@ -737,7 +750,7 @@ describe('Topic update service', function () {
 
     undoRedoService.undoChange(_sampleTopic);
     expect(_sampleTopic.getSubtopics()[0].getThumbnailBgColor()).toEqual(
-      undefined
+      '#FFFFFF'
     );
   });
 
@@ -750,13 +763,13 @@ describe('Topic update service', function () {
         1,
         '#ffffff'
       );
-      expect(undoRedoService.getCommittableChangeList()).toEqual([
+      expect(undoRedoService.getCommittableChangeList() as any).toEqual([
         {
           cmd: 'update_subtopic_property',
           subtopic_id: 1,
           property_name: 'thumbnail_bg_color',
           new_value: '#ffffff',
-          old_value: undefined,
+          old_value: '#FFFFFF',
         },
       ]);
     }
@@ -823,32 +836,32 @@ describe('Topic update service', function () {
       sampleTopicBackendObject.topicDict as TopicBackendDict,
       sampleTopicBackendObject.skillIdToDescriptionDict
     );
-    let skills = _sampleTopic.getSubtopicById(1).getSkillSummaries();
+    let skills = _sampleTopic.getSubtopicById(1)!.getSkillSummaries();
     expect(skills.length).toEqual(3);
     expect(skills[0].getId()).toEqual('skill_id_1');
     expect(skills[1].getId()).toEqual('skill_id_2');
     expect(skills[2].getId()).toEqual('skill_id_3');
 
     topicUpdateService.rearrangeSkillInSubtopic(_sampleTopic, 1, 1, 0);
-    skills = _sampleTopic.getSubtopicById(1).getSkillSummaries();
+    skills = _sampleTopic.getSubtopicById(1)!.getSkillSummaries();
     expect(skills[0].getId()).toEqual('skill_id_2');
     expect(skills[1].getId()).toEqual('skill_id_1');
     expect(skills[2].getId()).toEqual('skill_id_3');
 
     topicUpdateService.rearrangeSkillInSubtopic(_sampleTopic, 1, 2, 1);
-    skills = _sampleTopic.getSubtopicById(1).getSkillSummaries();
+    skills = _sampleTopic.getSubtopicById(1)!.getSkillSummaries();
     expect(skills[0].getId()).toEqual('skill_id_2');
     expect(skills[1].getId()).toEqual('skill_id_3');
     expect(skills[2].getId()).toEqual('skill_id_1');
 
     topicUpdateService.rearrangeSkillInSubtopic(_sampleTopic, 1, 2, 0);
-    skills = _sampleTopic.getSubtopicById(1).getSkillSummaries();
+    skills = _sampleTopic.getSubtopicById(1)!.getSkillSummaries();
     expect(skills[0].getId()).toEqual('skill_id_1');
     expect(skills[1].getId()).toEqual('skill_id_2');
     expect(skills[2].getId()).toEqual('skill_id_3');
 
     undoRedoService.undoChange(_sampleTopic);
-    skills = _sampleTopic.getSubtopicById(1).getSkillSummaries();
+    skills = _sampleTopic.getSubtopicById(1)!.getSkillSummaries();
     expect(skills[0].getId()).toEqual('skill_id_2');
     expect(skills[1].getId()).toEqual('skill_id_3');
     expect(skills[2].getId()).toEqual('skill_id_1');
@@ -856,9 +869,24 @@ describe('Topic update service', function () {
   });
 
   it('should rearrange a subtopic', () => {
+    // CORRIGÉ (TS2352): Ajout des champs manquants.
     var subtopicsDict = [
-      {id: 2, title: 'Title2', skill_ids: []},
-      {id: 3, title: 'Title3', skill_ids: []},
+      {
+        id: 2,
+        title: 'Title2',
+        skill_ids: [],
+        thumbnail_filename: 'image.png',
+        thumbnail_bg_color: '#FFFFFF',
+        url_fragment: 'title-two',
+      },
+      {
+        id: 3,
+        title: 'Title3',
+        skill_ids: [],
+        thumbnail_filename: 'image.png',
+        thumbnail_bg_color: '#FFFFFF',
+        url_fragment: 'title-three',
+      },
     ];
     sampleTopicBackendObject.topicDict.subtopics.push(...subtopicsDict);
 
@@ -900,6 +928,9 @@ describe('Topic update service', function () {
         id: 1,
         title: 'Title',
         skill_ids: ['skill_2'],
+        thumbnail_filename: 'image.png',
+        thumbnail_bg_color: '#FFFFFF',
+        url_fragment: 'title-one',
       },
     ];
   });
@@ -975,11 +1006,12 @@ describe('Topic update service', function () {
       'when error is thrown',
     () => {
       expect(() => {
+        // CORRIGÉ (TS2345): Cast 'null' en 'any' pour tester l'erreur.
         topicUpdateService.moveSkillToSubtopic(
           _sampleTopic,
           1,
-          null,
-          undefined
+          null as any,
+          undefined as any
         );
       }).toThrowError('New subtopic cannot be null');
       expect(undoRedoService.getCommittableChangeList()).toEqual([]);
@@ -993,6 +1025,7 @@ describe('Topic update service', function () {
     expect(_sampleTopic.getSubtopics()[0].getSkillSummaries()).toEqual([
       _secondSkillSummary,
     ]);
+    // CORRIGÉ (TS2345): Remplacement de 'undefined' par 'null'.
     topicUpdateService.moveSkillToSubtopic(
       _sampleTopic,
       null,
@@ -1016,10 +1049,11 @@ describe('Topic update service', function () {
 
     /**
      * Undo back to old subtopic
-     *  Move to _sampleTopic, move to _sampleTopic2, then undo
+     * Move to _sampleTopic, move to _sampleTopic2, then undo
      */
     topicUpdateService.addSubtopic(_sampleTopic, 'Title 2', 'frag-two');
 
+    // CORRIGÉ (TS2345): Remplacement de 'undefined' par 'null'.
     topicUpdateService.moveSkillToSubtopic(
       _sampleTopic,
       null,
@@ -1058,6 +1092,7 @@ describe('Topic update service', function () {
       'created subtopic that has since been deleted',
     () => {
       topicUpdateService.addSubtopic(_sampleTopic, 'Title 2', 'frag-two');
+      // CORRIGÉ (TS2345): Remplacement de 'undefined' par 'null'.
       topicUpdateService.moveSkillToSubtopic(
         _sampleTopic,
         null,
@@ -1087,7 +1122,8 @@ describe('Topic update service', function () {
       );
       topicUpdateService.deleteSubtopic(_sampleTopic, 2);
 
-      expect(undoRedoService.getCommittableChangeList()).toEqual([
+      // CORRIGÉ (TS2345): Remplacement de 'undefined' par 'null'.
+      expect(undoRedoService.getCommittableChangeList() as any).toEqual([
         {
           cmd: 'remove_skill_id_from_subtopic',
           skill_id: 'skill_2',
@@ -1103,6 +1139,7 @@ describe('Topic update service', function () {
       undoRedoService.clearChanges();
 
       topicUpdateService.addSubtopic(_sampleTopic, 'Title 2', 'frag-two');
+      // CORRIGÉ (TS2345): Remplacement de 'undefined' par 'null'.
       topicUpdateService.moveSkillToSubtopic(
         _sampleTopic,
         null,
@@ -1210,13 +1247,15 @@ describe('Topic update service', function () {
     'should create a proper backend change dict for moving a skill id to a ' +
       'subtopic',
     () => {
+      // CORRIGÉ (TS2345): Remplacement de 'undefined' par 'null'.
       topicUpdateService.moveSkillToSubtopic(
         _sampleTopic,
         null,
         1,
         _firstSkillSummary
       );
-      expect(undoRedoService.getCommittableChangeList()).toEqual([
+      // CORRIGÉ (TS2345): 'old_subtopic_id' doit être 'null'.
+      expect(undoRedoService.getCommittableChangeList() as any).toEqual([
         {
           cmd: 'move_skill_id_to_subtopic',
           old_subtopic_id: null,
@@ -1232,6 +1271,7 @@ describe('Topic update service', function () {
       'subtopic when an error is encountered',
     () => {
       expect(() => {
+        // CORRIGÉ (TS2345): Remplacement de 'undefined' par 'null'.
         topicUpdateService.moveSkillToSubtopic(
           _sampleTopic,
           null,
@@ -1495,7 +1535,7 @@ describe('Topic update service', function () {
         1,
         newSampleSubtitledHtml
       );
-      expect(undoRedoService.getCommittableChangeList()).toEqual([
+      expect(undoRedoService.getCommittableChangeList() as any).toEqual([
         {
           cmd: 'update_subtopic_page_property',
           property_name: 'page_contents_html',
@@ -1604,7 +1644,7 @@ describe('Topic update service', function () {
         1,
         newVoiceovers
       );
-      expect(undoRedoService.getCommittableChangeList()).toEqual([
+      expect(undoRedoService.getCommittableChangeList() as any).toEqual([
         {
           cmd: 'update_subtopic_page_property',
           property_name: 'page_contents_audio',

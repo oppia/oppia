@@ -34,7 +34,7 @@ export class TruncateInputBasedOnInteractionAnswerTypePipe
     interactionId: string,
     length: number
   ): string {
-    let answerType = INTERACTION_SPECS[interactionId].answer_type;
+    let answerType = INTERACTION_SPECS[interactionId as keyof typeof INTERACTION_SPECS].answer_type;
     let actualInputToTruncate = '';
     let inputUpdate;
 
@@ -56,9 +56,9 @@ export class TruncateInputBasedOnInteractionAnswerTypePipe
     }
 
     if (answerType === 'NormalizedString') {
-      actualInputToTruncate = inputUpdate.code;
+      actualInputToTruncate = (inputUpdate as any).code;
     } else if (answerType === 'CodeEvaluation') {
-      actualInputToTruncate = inputUpdate.code;
+      actualInputToTruncate = (inputUpdate as any).code;
     } else {
       throw new Error('Unknown interaction answer type');
     }
