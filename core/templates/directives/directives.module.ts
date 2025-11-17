@@ -35,7 +35,6 @@ import {NgInitDirective} from './ng-init.directive';
     MathJaxDirective,
     NgInitDirective,
   ],
-  entryComponents: [],
   exports: [
     FocusOnDirective,
     HeadroomDirective,

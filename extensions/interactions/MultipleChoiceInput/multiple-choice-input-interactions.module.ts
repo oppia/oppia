@@ -39,11 +39,6 @@ import {RichTextComponentsModule} from 'rich_text_components/rich-text-component
     ResponseMultipleChoiceInputComponent,
     ShortResponseMultipleChoiceInputComponent,
   ],
-  entryComponents: [
-    InteractiveMultipleChoiceInputComponent,
-    ResponseMultipleChoiceInputComponent,
-    ShortResponseMultipleChoiceInputComponent,
-  ],
   exports: [
     InteractiveMultipleChoiceInputComponent,
     ResponseMultipleChoiceInputComponent,

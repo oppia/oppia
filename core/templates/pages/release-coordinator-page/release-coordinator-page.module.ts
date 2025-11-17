@@ -83,15 +83,5 @@ import {RouterModule} from '@angular/router';
     ViewBeamJobOutputDialogComponent,
     FeaturesTabComponent,
   ],
-  entryComponents: [
-    CancelBeamJobDialogComponent,
-    DeleteUserGroupConfirmModalComponent,
-    ReleaseCoordinatorNavbarComponent,
-    ReleaseCoordinatorPageComponent,
-    ReleaseCoordinatorPageRootComponent,
-    StartNewBeamJobDialogComponent,
-    ViewBeamJobOutputDialogComponent,
-    FeaturesTabComponent,
-  ],
 })
 export class ReleaseCoordinatorPageModule {}

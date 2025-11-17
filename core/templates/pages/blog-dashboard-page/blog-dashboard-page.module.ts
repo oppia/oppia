@@ -53,10 +53,6 @@ import {RteHelperService} from 'services/rte-helper.service';
     BlogAuthorDetailsEditorComponent,
     BlogDashboardPageRootComponent,
   ],
-  entryComponents: [
-    BlogDashboardPageComponent,
-    BlogAuthorDetailsEditorComponent,
-  ],
   providers: [RteHelperService],
 })
 export class BlogDashboardPageModule {}

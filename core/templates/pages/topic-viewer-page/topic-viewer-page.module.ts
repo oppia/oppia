@@ -64,6 +64,5 @@ import {TopicViewerAccessGuard} from './topic-viewer-page-auth.guard';
     TopicViewerPageComponent,
     PracticeSessionConfirmationModal,
   ],
-  entryComponents: [TopicViewerPageComponent, PracticeSessionConfirmationModal],
 })
 export class TopicViewerPageModule {}

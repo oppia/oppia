@@ -51,10 +51,5 @@ import {ClassroomSummaryTileComponent} from './classroom-tile/classroom-summary-
     ClassroomsPageComponent,
     ClassroomSummaryTileComponent,
   ],
-  entryComponents: [
-    ClassroomsPageRootComponent,
-    ClassroomsPageComponent,
-    ClassroomSummaryTileComponent,
-  ],
 })
 export class ClassroomsPageModule {}

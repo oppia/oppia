@@ -31,11 +31,6 @@ import {ShortResponseImageClickInput} from './directives/oppia-short-response-im
     ResponseImageClickInput,
     ShortResponseImageClickInput,
   ],
-  entryComponents: [
-    InteractiveImageClickInput,
-    ResponseImageClickInput,
-    ShortResponseImageClickInput,
-  ],
   exports: [
     InteractiveImageClickInput,
     ResponseImageClickInput,

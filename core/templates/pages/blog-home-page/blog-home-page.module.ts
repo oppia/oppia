@@ -52,10 +52,5 @@ import {SharedBlogComponentsModule} from 'pages/blog-dashboard-page/shared-blog-
     BlogHomePageRootComponent,
     TagFilterComponent,
   ],
-  entryComponents: [
-    BlogHomePageComponent,
-    BlogHomePageRootComponent,
-    TagFilterComponent,
-  ],
 })
 export class BlogHomePageModule {}

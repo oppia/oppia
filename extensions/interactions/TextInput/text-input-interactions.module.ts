@@ -40,11 +40,6 @@ import {TranslateModule} from '@ngx-translate/core';
     ResponseTextInputComponent,
     ShortResponseTextInputComponent,
   ],
-  entryComponents: [
-    InteractiveTextInputComponent,
-    ResponseTextInputComponent,
-    ShortResponseTextInputComponent,
-  ],
   exports: [
     InteractiveTextInputComponent,
     ResponseTextInputComponent,

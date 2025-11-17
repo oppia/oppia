@@ -41,6 +41,5 @@ import {toastrConfig} from 'pages/oppia-root/app.module';
     ToastrModule.forRoot(toastrConfig),
   ],
   declarations: [ErrorPageComponent, ErrorPageRootComponent],
-  entryComponents: [ErrorPageComponent, ErrorPageRootComponent],
 })
 export class ErrorPageModule {}

@@ -42,7 +42,6 @@ import {SkillCardComponent} from './skill-card.component';
     }),
   ],
   declarations: [SkillCardComponent],
-  entryComponents: [SkillCardComponent],
   exports: [SkillCardComponent],
 })
 export class SkillCardModule {}

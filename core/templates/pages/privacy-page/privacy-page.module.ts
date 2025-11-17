@@ -26,6 +26,5 @@ import {PrivacyPageRoutingModule} from './privacy-page-routing.module';
 @NgModule({
   imports: [CommonModule, SharedComponentsModule, PrivacyPageRoutingModule],
   declarations: [PrivacyPageRootComponent, PrivacyPageComponent],
-  entryComponents: [PrivacyPageRootComponent, PrivacyPageComponent],
 })
 export class PrivacyPageModule {}

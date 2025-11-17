@@ -49,13 +49,5 @@ import {RouterModule} from '@angular/router';
     PreferredSiteLanguageSelectorComponent,
     SubjectInterestsComponent,
   ],
-  entryComponents: [
-    EditProfilePictureModalComponent,
-    PreferencesPageComponent,
-    PreferencesPageRootComponent,
-    PreferredLanguagesComponent,
-    PreferredSiteLanguageSelectorComponent,
-    SubjectInterestsComponent,
-  ],
 })
 export class PreferencesPageModule {}

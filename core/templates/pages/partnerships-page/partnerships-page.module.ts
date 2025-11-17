@@ -32,6 +32,5 @@ import {NgbCarouselModule} from '@ng-bootstrap/ng-bootstrap';
     NgbCarouselModule,
   ],
   declarations: [PartnershipsPageComponent, PartnershipsPageRootComponent],
-  entryComponents: [PartnershipsPageComponent, PartnershipsPageRootComponent],
 })
 export class PartnershipsPageModule {}

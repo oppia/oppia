@@ -65,15 +65,5 @@ import {UpdateClassroomsOrderModalComponent} from './modals/update-classrooms-or
     TopicsDependencyGraphModalComponent,
     UpdateClassroomsOrderModalComponent,
   ],
-  entryComponents: [
-    ClassroomAdminNavbarComponent,
-    ClassroomAdminPageComponent,
-    ClassroomEditorConfirmModalComponent,
-    DeleteClassroomConfirmModalComponent,
-    CreateNewClassroomModalComponent,
-    DeleteTopicFromClassroomModalComponent,
-    TopicsDependencyGraphModalComponent,
-    UpdateClassroomsOrderModalComponent,
-  ],
 })
 export class ClassroomAdminPageModule {}

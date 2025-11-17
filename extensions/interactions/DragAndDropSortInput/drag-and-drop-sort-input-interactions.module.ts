@@ -46,11 +46,6 @@ import {RichTextComponentsModule} from 'rich_text_components/rich-text-component
     ResponseDragAndDropSortInputComponent,
     ShortResponseDragAndDropSortInputComponent,
   ],
-  entryComponents: [
-    InteractiveDragAndDropSortInputComponent,
-    ResponseDragAndDropSortInputComponent,
-    ShortResponseDragAndDropSortInputComponent,
-  ],
   exports: [
     InteractiveDragAndDropSortInputComponent,
     ResponseDragAndDropSortInputComponent,

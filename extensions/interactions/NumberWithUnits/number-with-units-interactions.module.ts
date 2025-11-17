@@ -34,12 +34,6 @@ import {SharedComponentsModule} from 'components/shared-component.module';
     ResponseNumberWithUnitsComponent,
     ShortResponseNumberWithUnitsComponent,
   ],
-  entryComponents: [
-    HelpModalNumberWithUnitsComponent,
-    InteractiveNumberWithUnitsComponent,
-    ResponseNumberWithUnitsComponent,
-    ShortResponseNumberWithUnitsComponent,
-  ],
   exports: [
     HelpModalNumberWithUnitsComponent,
     InteractiveNumberWithUnitsComponent,

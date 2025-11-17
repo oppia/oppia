@@ -25,7 +25,6 @@ import {NgModule} from '@angular/core';
   imports: [CommonModule],
   providers: [],
   declarations: [],
-  entryComponents: [],
   exports: [],
 })
 export class ExtensionsModule {}

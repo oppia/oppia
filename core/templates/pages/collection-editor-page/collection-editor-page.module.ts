@@ -67,19 +67,5 @@ import {toastrConfig} from 'pages/oppia-root/app.module';
     CollectionStatisticsTabComponent,
     CollectionEditorPageRootComponent,
   ],
-  entryComponents: [
-    CollectionNodeCreatorComponent,
-    CollectionEditorNavbarBreadcrumbComponent,
-    CollectionEditorNavbarComponent,
-    CollectionEditorPageComponent,
-    CollectionEditorPrePublishModalComponent,
-    CollectionEditorSaveModalComponent,
-    CollectionEditorTabComponent,
-    CollectionDetailsEditorComponent,
-    CollectionHistoryTabComponent,
-    CollectionNodeEditorComponent,
-    CollectionSettingsTabComponent,
-    CollectionStatisticsTabComponent,
-  ],
 })
 export class CollectionEditorPageModule {}

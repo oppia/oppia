@@ -33,11 +33,6 @@ import {SharedComponentsModule} from 'components/shared-component.module';
     ResponseFractionInput,
     ShortResponseFractionInput,
   ],
-  entryComponents: [
-    InteractiveFractionInputComponent,
-    ResponseFractionInput,
-    ShortResponseFractionInput,
-  ],
   exports: [
     InteractiveFractionInputComponent,
     ResponseFractionInput,

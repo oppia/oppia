@@ -42,7 +42,6 @@ import {LessonCardComponent} from './lesson-card.component';
     }),
   ],
   declarations: [LessonCardComponent],
-  entryComponents: [LessonCardComponent],
   exports: [LessonCardComponent],
 })
 export class LessonCardModule {}

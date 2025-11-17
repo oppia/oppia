@@ -35,6 +35,5 @@ import {RouterModule} from '@angular/router';
     ]),
   ],
   declarations: [ErrorIframedPageRootComponent],
-  entryComponents: [ErrorIframedPageRootComponent],
 })
 export class ErrorIframedPageModule {}

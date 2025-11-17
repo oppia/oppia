@@ -35,11 +35,6 @@ import {TranslateModule} from '@ngx-translate/core';
     ResponseNumericInput,
     ShortResponseNumericInput,
   ],
-  entryComponents: [
-    InteractiveNumericInput,
-    ResponseNumericInput,
-    ShortResponseNumericInput,
-  ],
   exports: [
     InteractiveNumericInput,
     ResponseNumericInput,

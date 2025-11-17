@@ -64,15 +64,5 @@ import {ContributorDashboardAdminPageComponent} from './contributor-dashboard-ad
     ContributorDashboardAdminPageComponent,
     ContributorDashboardAdminPageRootComponent,
   ],
-  entryComponents: [
-    CdAdminTranslationRoleEditorModal,
-    CdAdminQuestionRoleEditorModal,
-    ContributorDashboardAdminNavbarComponent,
-    ContributorAdminDashboardPageComponent,
-    ContributorDashboardAdminPageComponent,
-    ContributorAdminStatsTable,
-    TopicFilterComponent,
-    UsernameInputModal,
-  ],
 })
 export class ContributorDashboardAdminPageModule {}

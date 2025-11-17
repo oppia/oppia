@@ -36,6 +36,5 @@ import {I18nModule} from 'i18n/i18n.module';
     I18nModule,
   ],
   declarations: [AndroidPageComponent, AndroidPageRootComponent],
-  entryComponents: [AndroidPageComponent, AndroidPageRootComponent],
 })
 export class AndroidPageModule {}

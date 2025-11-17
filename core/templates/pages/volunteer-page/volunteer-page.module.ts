@@ -32,6 +32,5 @@ import {VolunteerPageRoutingModule} from './volunteer-page-routing.module';
     NgbModule,
   ],
   declarations: [VolunteerPageComponent, VolunteerPageRootComponent],
-  entryComponents: [VolunteerPageComponent, VolunteerPageRootComponent],
 })
 export class VolunteerPageModule {}

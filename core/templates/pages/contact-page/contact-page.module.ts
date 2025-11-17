@@ -26,6 +26,5 @@ import {ContactPageRoutingModule} from './contact-page-routing.module';
 @NgModule({
   imports: [CommonModule, SharedComponentsModule, ContactPageRoutingModule],
   declarations: [ContactPageComponent, ContactPageRootComponent],
-  entryComponents: [ContactPageComponent, ContactPageRootComponent],
 })
 export class ContactPageModule {}

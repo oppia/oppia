@@ -70,7 +70,6 @@ import {RouterModule} from '@angular/router';
     RouterModule,
     SharedPipesModule,
   ],
-
   declarations: [
     AlertMessageComponent,
     BaseContentComponent,
@@ -93,31 +92,12 @@ import {RouterModule} from '@angular/router';
     ClassroomNavigationLinksComponent,
     LanguageBannerComponent,
   ],
-
-  entryComponents: [
-    AlertMessageComponent,
-    BaseContentComponent,
-    PrimaryButtonComponent,
-    CreateActivityButtonComponent,
-    LoadingMessageComponent,
-    OppiaAngularRootComponent,
-    OppiaFooterComponent,
-    PromoBarComponent,
-    SideNavigationBarComponent,
-    SocialButtonsComponent,
-    TopNavigationBarComponent,
-    ThanksForSubscribingModalComponent,
-    WarningsAndAlertsComponent,
-    ClassroomNavigationLinksComponent,
-  ],
-
   exports: [
     // Modules.
     CookieModule,
     DirectivesModule,
     I18nModule,
     SharedPipesModule,
-
     // Components and Directives.
     AlertMessageComponent,
     BaseContentComponent,

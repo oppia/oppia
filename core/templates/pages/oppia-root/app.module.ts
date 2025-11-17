@@ -97,7 +97,6 @@ export class MyHammerConfig extends HammerGestureConfig {
     ToastrModule.forRoot(toastrConfig),
   ],
   declarations: [OppiaRootComponent],
-  entryComponents: [OppiaRootComponent],
   providers: [
     AngularFireAuth,
     {

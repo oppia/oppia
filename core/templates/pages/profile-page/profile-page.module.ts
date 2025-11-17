@@ -41,10 +41,5 @@ import {RouterModule} from '@angular/router';
     ProfilePageComponent,
     ProfilePageRootComponent,
   ],
-  entryComponents: [
-    ProfilePageNavbarComponent,
-    ProfilePageComponent,
-    ProfilePageRootComponent,
-  ],
 })
 export class ProfilePageModule {}

@@ -32,6 +32,5 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
     NgbModule,
   ],
   declarations: [TeachPageComponent, TeachPageRootComponent],
-  entryComponents: [TeachPageComponent, TeachPageRootComponent],
 })
 export class TeachPageModule {}

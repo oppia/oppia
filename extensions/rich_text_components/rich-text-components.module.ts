@@ -74,18 +74,6 @@ import {NoninteractiveWorkedexample} from './Workedexample/directives/oppia-noni
     RteOutputDisplayComponent,
     OppiaRteTextNodeDirective,
   ],
-  entryComponents: [
-    NoninteractiveCollapsible,
-    NoninteractiveImage,
-    NoninteractiveLink,
-    NoninteractiveMath,
-    NoninteractiveSkillreview,
-    NoninteractiveTabs,
-    NoninteractiveVideo,
-    NoninteractiveWorkedexample,
-    OppiaNoninteractiveSkillreviewConceptCardModalComponent,
-    RteOutputDisplayComponent,
-  ],
   exports: [
     ConceptCardComponent,
     NoninteractiveCollapsible,

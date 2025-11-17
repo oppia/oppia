@@ -32,11 +32,6 @@ import {MaterialModule} from 'modules/material.module';
     OppiaShortResponseContinueComponent,
     OppiaInteractiveContinue,
   ],
-  entryComponents: [
-    OppiaResponseContinueComponent,
-    OppiaShortResponseContinueComponent,
-    OppiaInteractiveContinue,
-  ],
   exports: [
     OppiaResponseContinueComponent,
     OppiaShortResponseContinueComponent,

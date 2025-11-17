@@ -29,7 +29,6 @@ import {SharedComponentsModule} from 'components/shared-component.module';
 @NgModule({
   imports: [CommonModule, MatCardModule, SharedComponentsModule],
   declarations: [StoriesListComponent, SubtopicsListComponent],
-  entryComponents: [StoriesListComponent, SubtopicsListComponent],
   exports: [StoriesListComponent, SubtopicsListComponent],
 })
 export class TopicPlayerViewerCommonModule {}

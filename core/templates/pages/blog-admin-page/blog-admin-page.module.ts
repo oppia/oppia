@@ -52,6 +52,5 @@ import {BlogAdminAuthGuard} from './blog-admin-auth.guard';
     BlogAdminPageComponent,
     BlogAdminPageRootComponent,
   ],
-  entryComponents: [BlogAdminNavbarComponent, BlogAdminPageComponent],
 })
 export class BlogAdminPageModule {}

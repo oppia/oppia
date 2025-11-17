@@ -86,7 +86,6 @@ export class HammerConfig extends HammerGestureConfig {
     ToastrModule.forRoot(toastrConfig),
   ],
   declarations: [LightweightOppiaRootComponent],
-  entryComponents: [LightweightOppiaRootComponent],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,

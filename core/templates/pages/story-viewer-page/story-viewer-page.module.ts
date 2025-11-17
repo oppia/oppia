@@ -33,11 +33,5 @@ import {StoryViewerPageRoutingModule} from './story-viewer-page-routing.module';
     StoryViewerPageComponent,
     StoryViewerPageRootComponent,
   ],
-  entryComponents: [
-    StoryViewerNavbarBreadcrumbComponent,
-    StoryViewerNavbarPreLogoActionComponent,
-    StoryViewerPageComponent,
-    StoryViewerPageRootComponent,
-  ],
 })
 export class StoryViewerPageModule {}

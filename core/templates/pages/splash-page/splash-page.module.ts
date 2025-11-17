@@ -35,6 +35,5 @@ import {SplashPageRoutingModule} from './splash-page-routing.module';
     SplashPageRoutingModule,
   ],
   declarations: [SplashPageComponent, SplashPageRootComponent],
-  entryComponents: [SplashPageComponent, SplashPageRootComponent],
 })
 export class SplashPageModule {}

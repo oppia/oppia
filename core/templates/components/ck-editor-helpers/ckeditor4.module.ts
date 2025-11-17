@@ -27,7 +27,6 @@ import {TranslateModule} from '@ngx-translate/core';
 @NgModule({
   imports: [CommonModule, TranslateModule],
   declarations: [CkEditor4RteComponent],
-  entryComponents: [CkEditor4RteComponent],
   exports: [CkEditor4RteComponent],
 })
 export class OppiaCkEditor4Module {}

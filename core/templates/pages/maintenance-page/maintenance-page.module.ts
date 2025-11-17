@@ -41,7 +41,6 @@ import {CommonModule} from '@angular/common';
     ]),
   ],
   declarations: [MaintenancePageComponent, MaintenancePageRootComponent],
-  entryComponents: [MaintenancePageComponent],
   bootstrap: [MaintenancePageComponent],
 })
 export class MaintenancePageModule {}

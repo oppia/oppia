@@ -30,11 +30,6 @@ import {MaterialModule} from 'modules/material.module';
     ResponseEndExplorationComponent,
     ShortResponseEndExplorationComponent,
   ],
-  entryComponents: [
-    InteractiveEndExplorationComponent,
-    ResponseEndExplorationComponent,
-    ShortResponseEndExplorationComponent,
-  ],
   exports: [
     InteractiveEndExplorationComponent,
     ResponseEndExplorationComponent,

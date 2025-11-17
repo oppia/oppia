@@ -35,12 +35,6 @@ import {CommonModule} from '@angular/common';
     ResponePencilCodeEditor,
     ShortResponePencilCodeEditor,
   ],
-  entryComponents: [
-    PencilCodeEditor,
-    PencilCodeResetConfirmation,
-    ResponePencilCodeEditor,
-    ShortResponePencilCodeEditor,
-  ],
   exports: [
     PencilCodeEditor,
     PencilCodeResetConfirmation,

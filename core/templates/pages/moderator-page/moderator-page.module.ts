@@ -42,6 +42,5 @@ import {ModeratorAuthGuard} from './moderator-auth.guard';
     ]),
   ],
   declarations: [ModeratorPageComponent, ModeratorPageRootComponent],
-  entryComponents: [ModeratorPageComponent],
 })
 export class ModeratorPageModule {}

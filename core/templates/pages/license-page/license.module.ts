@@ -26,6 +26,5 @@ import {NgModule} from '@angular/core';
 @NgModule({
   imports: [CommonModule, SharedComponentsModule, LicensePageRoutingModule],
   declarations: [LicensePageComponent, LicensePageRootComponent],
-  entryComponents: [LicensePageComponent, LicensePageRootComponent],
 })
 export class LicensePageModule {}

@@ -44,6 +44,5 @@ import {SharedLearnerGroupComponentsModule} from 'pages/learner-group-pages/shar
     CreateLearnerGroupPageRootComponent,
     CreateLearnerGroupPageComponent,
   ],
-  entryComponents: [CreateLearnerGroupPageComponent],
 })
 export class CreateLearnerGroupPageModule {}

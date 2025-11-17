@@ -40,11 +40,6 @@ import {ObjectComponentsModule} from '../../../extensions/objects/object-compone
     ResponseMusicNotesInput,
     ShortResponseMusicNotesInput,
   ],
-  entryComponents: [
-    MusicNotesInputComponent,
-    ResponseMusicNotesInput,
-    ShortResponseMusicNotesInput,
-  ],
   exports: [
     MusicNotesInputComponent,
     ResponseMusicNotesInput,

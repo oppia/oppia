@@ -22,7 +22,6 @@ import {BackgroundBannerComponent} from 'components/common-layout-directives/com
 
 @NgModule({
   declarations: [BackgroundBannerComponent],
-  entryComponents: [BackgroundBannerComponent],
   exports: [BackgroundBannerComponent],
 })
 export class BackgroundBannerModule {}

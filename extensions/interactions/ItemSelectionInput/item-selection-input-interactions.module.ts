@@ -41,11 +41,6 @@ import {RichTextComponentsModule} from 'rich_text_components/rich-text-component
     ResponseItemSelectionInputComponent,
     ShortResponseItemSelectionInputComponent,
   ],
-  entryComponents: [
-    InteractiveItemSelectionInputComponent,
-    ResponseItemSelectionInputComponent,
-    ShortResponseItemSelectionInputComponent,
-  ],
   exports: [
     InteractiveItemSelectionInputComponent,
     ResponseItemSelectionInputComponent,

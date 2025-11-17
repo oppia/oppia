@@ -31,10 +31,6 @@ import {SharedComponentsModule} from 'components/shared-component.module';
     SwitchContentLanguageRefreshRequiredModalComponent,
     LessonInformationCardModalComponent,
   ],
-  entryComponents: [
-    SwitchContentLanguageRefreshRequiredModalComponent,
-    LessonInformationCardModalComponent,
-  ],
   exports: [
     SwitchContentLanguageRefreshRequiredModalComponent,
     LessonInformationCardModalComponent,
