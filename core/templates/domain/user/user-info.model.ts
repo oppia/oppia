@@ -24,6 +24,7 @@ export enum UserRoles {
   TRANSLATION_ADMIN = 'TRANSLATION_ADMIN',
   TRANSLATION_COORDINATOR = 'TRANSLATION_COORDINATOR',
   VOICEOVER_ADMIN = 'VOICEOVER_ADMIN',
+  RELEASE_COORDINATOR = 'RELEASE_COORDINATOR',
 }
 
 export interface UserInfoBackendDict {
@@ -125,6 +126,10 @@ export class UserInfo {
 
   isCurriculumAdmin(): boolean {
     return this._isCurriculumAdmin;
+  }
+
+  isReleaseCoordinator(): boolean {
+    return this._roles.includes(UserRoles.RELEASE_COORDINATOR);
   }
 
   isTranslationAdmin(): boolean {

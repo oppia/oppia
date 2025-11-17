@@ -689,6 +689,11 @@ describe('TopNavigationBarComponent', () => {
       isSuperAdmin: () => false,
       isBlogAdmin: () => false,
       isBlogPostEditor: () => false,
+      isTranslationAdmin: () => false,
+      isTranslationCoordinator: () => false,
+      isQuestionAdmin: () => false,
+      isQuestionCoordinator: () => false,
+      isReleaseCoordinator: () => false,
       isLoggedIn: () => true,
       getUsername: () => null,
     };
