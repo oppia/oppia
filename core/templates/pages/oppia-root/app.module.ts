@@ -42,7 +42,7 @@ import {RequestInterceptor} from 'services/request-interceptor.service';
 import {CookieModule} from 'ngx-cookie';
 import {ToastrModule} from 'ngx-toastr';
 import {AngularFireAuth, USE_EMULATOR} from '@angular/fire/compat/auth';
-import {AngularFireModule} from '@angular/fire';
+import {AngularFireModule} from '@angular/fire/compat';
 import {AuthService} from 'services/auth.service';
 import {AppErrorHandlerProvider} from './app-error-handler';
 import {I18nModule} from 'i18n/i18n.module';

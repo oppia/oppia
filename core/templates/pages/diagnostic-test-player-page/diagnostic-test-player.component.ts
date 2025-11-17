@@ -68,8 +68,11 @@ export class DiagnosticTestPlayerComponent implements OnInit {
   ngOnInit(): void {
     this.loaderService.showLoadingScreen('Loading');
 
+    const params = new URLSearchParams(
+      this.windowRef.nativeWindow.location.search
+    );
     const searchParams = Object.fromEntries(
-      new URLSearchParams(this.windowRef.nativeWindow.location.search)
+      params as unknown as Iterable<readonly [string, string]>
     );
 
     if (!searchParams.hasOwnProperty('classroom')) {

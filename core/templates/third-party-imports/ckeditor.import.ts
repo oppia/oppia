@@ -16,5 +16,10 @@
  * @fileoverview This file imports the ckeditor library.
  */
 
-window.CKEDITOR_BASEPATH = '/third_party/static/ckeditor-4.12.1/';
-require('static/ckeditor-4.12.1/ckeditor.js');
+// We check if the 'window' object exists. This is a reliable way to check
+// if the code is running in a browser environment (client-side) vs.
+// a Node.js environment (server-side for SSR).
+if (typeof window !== 'undefined') {
+  window.CKEDITOR_BASEPATH = '/third_party/static/ckeditor-4.12.1/';
+  require('static/ckeditor-4.12.1/ckeditor.js');
+}

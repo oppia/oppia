@@ -27,7 +27,7 @@ import {AppConstants} from 'app.constants';
 import {MisconceptionSkillMap} from 'domain/skill/misconception.model';
 import {Question} from 'domain/question/question.model';
 import {QuestionUndoRedoService} from 'domain/editor/undo_redo/question-undo-redo.service';
-import {Skill} from 'domain/skill/skill.model.ts';
+import {Skill} from 'domain/skill/skill.model';
 import {State} from 'domain/state/state.model';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {ConfirmQuestionExitModalComponent} from 'components/question-directives/modal-templates/confirm-question-exit-modal.component';

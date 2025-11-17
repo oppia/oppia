@@ -17,14 +17,18 @@
  */
 
 import {Injectable, Optional} from '@angular/core';
-import {FirebaseOptions} from '@angular/fire';
 import {AngularFireAuth} from '@angular/fire/compat/auth';
 import firebase from 'firebase/app';
+import {InjectionToken} from '@angular/core';
+import {FIREBASE_OPTIONS} from '@angular/fire/compat';
 import 'firebase/auth';
 import {md5} from 'hash-wasm';
 
 import {AppConstants} from 'app.constants';
 import {AuthBackendApiService} from 'services/auth-backend-api.service';
+
+type FirebaseOptions =
+  typeof FIREBASE_OPTIONS extends InjectionToken<infer T> ? T : never;
 
 abstract class AuthServiceImpl {
   abstract getRedirectResultAsync(): Promise<firebase.auth.UserCredential | null>;

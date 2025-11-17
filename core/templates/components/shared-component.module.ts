@@ -21,7 +21,7 @@ import 'zone.js';
 // Modules.
 import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
-import {AngularFireModule} from '@angular/fire';
+import {AngularFireModule} from '@angular/fire/compat';
 import {AngularFireAuth, USE_EMULATOR} from '@angular/fire/compat/auth';
 import {provideFirebaseApp, initializeApp} from '@angular/fire/app';
 import {provideAuth, getAuth} from '@angular/fire/auth';

@@ -23,5 +23,5 @@ import 'codemirror/mode/python/python';
 import 'codemirror/mode/yaml/yaml';
 import 'diff_match_patch';
 import 'codemirror/addon/merge/merge';
-import 'codemirror-v5.17.0/addon/merge/merge.css';
-import 'codemirror-v5.17.0/lib/codemirror.css';
+import 'codemirror/addon/merge/merge.css';
+import 'codemirror/lib/codemirror.css';

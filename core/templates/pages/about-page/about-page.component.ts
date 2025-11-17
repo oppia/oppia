@@ -194,7 +194,9 @@ export class AboutPageComponent implements OnInit, OnDestroy {
     const searchParams = new URLSearchParams(
       this.windowRef.nativeWindow.location.search
     );
-    const params = Object.fromEntries(searchParams.entries());
+    const params = Object.fromEntries(
+      searchParams as unknown as Iterable<readonly [string, string]>
+    );
     if (params.hasOwnProperty('thanks')) {
       this.openThanksForDonatingModal();
     }

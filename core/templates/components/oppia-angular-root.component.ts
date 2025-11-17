@@ -68,7 +68,10 @@ import {
   EventEmitter,
   Injector,
   NgZone,
+  Inject,
+  PLATFORM_ID,
 } from '@angular/core';
+import {isPlatformBrowser} from '@angular/common';
 import {createCustomElement} from '@angular/elements';
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
 import {PageContextService} from 'services/page-context.service';
@@ -79,10 +82,6 @@ import {RatingComputationService} from 'components/ratings/rating-computation/ra
 import {ReviewTestBackendApiService} from 'domain/review_test/review-test-backend-api.service';
 import {StoryViewerBackendApiService} from 'domain/story_viewer/story-viewer-backend-api.service';
 import {ServicesConstants} from 'services/services.constants';
-// Relative path used as an work around to get the angular compiler and webpack
-// build to not complain.
-// TODO(#16309): Fix relative imports.
-import '../third-party-imports/ckeditor.import';
 
 import {NoninteractiveCollapsible} from 'rich_text_components/Collapsible/directives/oppia-noninteractive-collapsible.component';
 import {NoninteractiveImage} from 'rich_text_components/Image/directives/oppia-noninteractive-image.component';
@@ -176,8 +175,10 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   static storyViewerBackendApiService: StoryViewerBackendApiService;
   static ajsValueProvider: (string, unknown) => void;
   static injector: Injector;
+  isBrowser: boolean;
 
   constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
     private classroomBackendApiService: ClassroomBackendApiService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private htmlEscaperService: HtmlEscaperService,
@@ -195,11 +196,16 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     private injector: Injector,
     private pageContextService: PageContextService
   ) {
+    this.isBrowser = isPlatformBrowser(this.platformId);
+
     if (OppiaAngularRootComponent.rteElementsAreInitialized) {
       return;
     }
     OppiaAngularRootComponent.rteHelperService = this.rteHelperService;
-    registerCustomElements(this.injector);
+    // Only register custom elements (DOM_reliant) in the browser.
+    if (this.isBrowser) {
+      registerCustomElements(this.injector);
+    }
     OppiaAngularRootComponent.rteElementsAreInitialized = true;
   }
 
@@ -207,14 +213,17 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     if (!OppiaAngularRootComponent.pageContextService) {
       OppiaAngularRootComponent.pageContextService = this.pageContextService;
     }
-    this.ngZone.runOutsideAngular(() => {
-      CkEditorInitializerService.ckEditorInitializer(
-        OppiaAngularRootComponent.rteHelperService,
-        this.htmlEscaperService,
-        this.pageContextService,
-        this.ngZone
-      );
-    });
+    // Only call the initializer service in the browser.
+    if (this.isBrowser) {
+      this.ngZone.runOutsideAngular(() => {
+        CkEditorInitializerService.ckEditorInitializer(
+          OppiaAngularRootComponent.rteHelperService,
+          this.htmlEscaperService,
+          this.pageContextService,
+          this.ngZone
+        );
+      });
+    }
     OppiaAngularRootComponent.classroomBackendApiService =
       this.classroomBackendApiService;
     OppiaAngularRootComponent.i18nLanguageCodeService =
