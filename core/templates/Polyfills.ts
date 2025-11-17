@@ -19,6 +19,9 @@
 import 'globalthis/auto';
 import 'proxy-polyfill';
 import '@webcomponents/custom-elements';
+// Load `$localize` onto the global scope - used if i18n tags appear in Angular
+// templates.
+import '@angular/localize/init';
 
 // Add a String.prototype.trim() polyfill for IE8.
 if (typeof String.prototype.trim !== 'function') {
