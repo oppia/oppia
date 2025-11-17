@@ -1,4 +1,4 @@
-FROM node:16.13.0-slim AS frontend
+FROM node:20.19.5-slim AS frontend
 
 WORKDIR /app/oppia
 

@@ -15,7 +15,7 @@
 
 #!/bin/bash
 # Check if node is installed. If it is, skip installation.
-if [ -d "../oppia_tools/node-16.13.0" ]; then
+if [ -d "../oppia_tools/node-20.19.5" ]; then
     echo "Node.js is already installed. Skipping the installation."
     exit 0
 fi
@@ -26,33 +26,33 @@ echo "Installing Node.js..."
 
 if [ "$(getconf LONG_BIT)" = "64" ] || [ "$(uname -m)" = "x86_64" ]; then
     if [ "$OS_NAME" = "Darwin" ]; then
-        node_file_name="node-v16.13.0-darwin-x64"
+        node_file_name="node-v20.19.5-darwin-x64"
     elif [ "$OS_NAME" = "Linux" ]; then
-        node_file_name="node-v16.13.0-linux-x64"
+        node_file_name="node-v20.19.5-linux-x64"
     else
         echo "System's Operating System is not compatible."
         exit 1
     fi
 else
-    node_file_name="node-v16.13.0"
+    node_file_name="node-v20.19.5"
 fi
-curl -o node-download "https://nodejs.org/dist/v16.13.0/$node_file_name.tar.gz"
+curl -o node-download "https://nodejs.org/dist/v20.19.5/$node_file_name.tar.gz"
 mkdir -p ../oppia_tools
 tar -xvf node-download -C ../oppia_tools
 rm node-download
 
 # Build node.js if it is installed using source code (more info https://github.com/nodejs/node/blob/v16.x/BUILDING.md#building-nodejs-1).
 # The process of building from source code is intended for non-x64 Linux/Darwin systems.
-if [ "$node_file_name" = "node-v16.13.0" ]; then
-    cd ../oppia_tools/node-16.13.0
+if [ "$node_file_name" = "node-v20.19.5" ]; then
+    cd ../oppia_tools/node-20.19.5
     ./configure
     make
 fi
 
-# Rename node directory to node-16.13.0.
+# Rename node directory to node-20.19.5.
 cd ../oppia_tools &&
-if [ "$node_file_name" != "node-v16.13.0" ]; then
-    mv $node_file_name node-16.13.0
+if [ "$node_file_name" != "node-v20.19.5" ]; then
+    mv $node_file_name node-20.19.5
 fi
 
 echo "Node.js installation completed."

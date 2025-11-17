@@ -906,8 +906,9 @@ class ManagedProcessTests(test_utils.TestBase):
         self.exit_stack.close()
 
         self.assertEqual(len(popen_calls), 1)
+        # The prod config does not require additional arguments to `ng build`.
         self.assertEqual(
-            popen_calls[0].program_args, '%s build --prod' % common.NG_BIN_PATH
+            popen_calls[0].program_args, '%s build' % common.NG_BIN_PATH
         )
 
     def test_managed_webpack_compiler_in_watch_mode_when_build_succeeds(

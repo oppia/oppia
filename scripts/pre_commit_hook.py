@@ -86,7 +86,7 @@ KEYS_UPDATED_IN_CONSTANTS: Final = [
 NPX_CMD: Final = (
     'npx'
     if feconf.OPPIA_IS_DOCKERIZED
-    else os.path.join(os.pardir, 'oppia_tools', 'node-16.13.0', 'bin', 'npx')
+    else os.path.join(os.pardir, 'oppia_tools', 'node-20.19.5', 'bin', 'npx')
 )
 
 

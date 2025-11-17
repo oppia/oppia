@@ -474,10 +474,9 @@ def managed_ng_build(
         OSError. First build never completed.
     """
     compiler_args = [common.NG_BIN_PATH, 'build']
-    if use_prod_env:
-        compiler_args.append('--prod')
     if watch_mode:
         compiler_args.append('--watch')
+        compiler_args.append('--configuration=development')
     with contextlib.ExitStack() as exit_stack:
         # OK to use shell=True here because we are passing string literals and
         # constants, so there is no risk of a shell-injection attack.

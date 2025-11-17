@@ -100,7 +100,7 @@ services:
     entrypoint: bash /app/oppia/docker/datastore.entrypoint.sh
 
   firebase:
-    image: node:16.13.0-alpine
+    image: node:20.19.5-alpine
     container_name: oppia-firebase-emulator
     ports:
       - "9099:9099"

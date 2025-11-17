@@ -180,9 +180,9 @@ run_tests.acceptance: ## Runs the acceptance tests for the parsed suite
 	$(MAKE) stop
 # Adding node to the path.
 	@if [ "$(OS_NAME)" = "Windows" ]; then \
-		export PATH=$(cd .. && pwd)/oppia_tools/node-16.13.0:$(FIXED_PATH); \
+		export PATH=$(cd .. && pwd)/oppia_tools/node-20.19.5:$(FIXED_PATH); \
 	else \
-		export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:$(FIXED_PATH); \
+		export PATH=$(shell cd .. && pwd)/oppia_tools/node-20.19.5/bin:$(FIXED_PATH); \
 	fi
 # Adding env variable for mobile view
 	@export MOBILE=${MOBILE:-false}
@@ -194,9 +194,9 @@ run_tests.acceptance: ## Runs the acceptance tests for the parsed suite
 	@if [ -d ./core/tests/puppeteer-acceptance-tests/build ]; then \
 		rm -rf ./core/tests/puppeteer-acceptance-tests/build; \
 	fi
-	../oppia_tools/node-16.13.0/bin/node ./node_modules/typescript/bin/tsc -p ./tsconfig.puppeteer-acceptance-tests.json
+	../oppia_tools/node-20.19.5/bin/node ./node_modules/typescript/bin/tsc -p ./tsconfig.puppeteer-acceptance-tests.json
 	cp -r ./core/tests/puppeteer-acceptance-tests/data ./core/tests/puppeteer-acceptance-tests/build/
-	SPEC_NAME=$(suite) ../oppia_tools/node-16.13.0/bin/node ./node_modules/.bin/jest --config="./core/tests/puppeteer-acceptance-tests/jest.config.js" ./core/tests/puppeteer-acceptance-tests/specs/$(suite).spec.ts
+	SPEC_NAME=$(suite) ../oppia_tools/node-20.19.5/bin/node ./node_modules/.bin/jest --config="./core/tests/puppeteer-acceptance-tests/jest.config.js" ./core/tests/puppeteer-acceptance-tests/specs/$(suite).spec.ts
 	@echo '------------------------------------------------------'
 	@echo '  Acceptance test has been executed successfully....'
 	@echo '------------------------------------------------------'
@@ -214,9 +214,9 @@ run_tests.e2e: ## Runs the e2e tests for the parsed suite
 	$(MAKE) stop
 # Adding node to the path.
 	@if [ "$(OS_NAME)" = "Windows" ]; then \
-		export PATH=$(cd .. && pwd)/oppia_tools/node-16.13.0:$(FIXED_PATH); \
+		export PATH=$(cd .. && pwd)/oppia_tools/node-20.19.5:$(FIXED_PATH); \
 	else \
-		export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:$(FIXED_PATH); \
+		export PATH=$(shell cd .. && pwd)/oppia_tools/node-20.19.5/bin:$(FIXED_PATH); \
 	fi
 # Adding env variable for the mobile view
 	@export MOBILE=${MOBILE:-false}
@@ -227,7 +227,7 @@ run_tests.e2e: ## Runs the e2e tests for the parsed suite
 	@echo '------------------------------------------------------'
 	@echo '  Starting e2e test for the suite: $(suite)'
 	@echo '------------------------------------------------------'
-	../oppia_tools/node-16.13.0/bin/node ./node_modules/.bin/wdio ./core/tests/wdio.conf.js --suite $(suite) $(CHROME_VERSION) --params.devMode=True --capabilities[0].maxInstances=${sharding_instances} DEBUG=${DEBUG:-false}
+	../oppia_tools/node-20.19.5/bin/node ./node_modules/.bin/wdio ./core/tests/wdio.conf.js --suite $(suite) $(CHROME_VERSION) --params.devMode=True --capabilities[0].maxInstances=${sharding_instances} DEBUG=${DEBUG:-false}
 	@echo '------------------------------------------------------'
 	@echo '  e2e test has been executed successfully....'
 	@echo '------------------------------------------------------'
@@ -272,5 +272,5 @@ run_tests.lighthouse_performance: ## Runs the lighthouse performance tests for t
 	@echo '-----------------------------------------------------------------------'
 	$(MAKE) stop
 
-install_node: ## Installs node-16.13.0 in the oppia_tools directory
+install_node: ## Installs node-20.19.5 in the oppia_tools directory
 	sh ./docker/install_node.sh
