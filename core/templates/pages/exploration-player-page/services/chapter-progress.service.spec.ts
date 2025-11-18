@@ -60,19 +60,19 @@ describe('ChapterProgressService', () => {
     expect(chapterProgressService.getCompletedChaptersCount()).toBe(5);
   }));
 
-  it('updateFunction should handel API errors', () => {
+  it('should updateFunction should handel API errors', fakeAsync(() => {
     learnerDashboardBackendApiService.fetchLearnerCompletedChaptersCountDataAsync.and.returnValue(
       Promise.reject(new Error('API Failed'))
     );
 
-    let errorCaught = false
+    let errorCaught = false;
     chapterProgressService.updateCompletedChaptersCount().catch(() => {
-      errorCaught = true 
-    })
-    tick()
+      errorCaught = true;
+    });
+    tick();
 
-    expect(errorCaught).toBe(true)
-  } )
+    expect(errorCaught).toBe(true);
+  }));
 
   it('should check for first time chapter completion', fakeAsync(() => {
     learnerDashboardBackendApiService.fetchLearnerCompletedChaptersCountDataAsync.and.returnValue(

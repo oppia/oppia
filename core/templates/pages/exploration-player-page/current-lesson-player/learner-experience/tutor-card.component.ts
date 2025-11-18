@@ -250,7 +250,7 @@ export class TutorCardComponent {
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
-    this.shouldShowProgressBar = false
+    this.shouldShowProgressBar = false;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
