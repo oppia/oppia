@@ -901,8 +901,7 @@ describe('TopNavigationBarComponent', () => {
         component.isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable()
       ).toBeFalse();
 
-      mockPlatformFeatureService.status.ShowFeedbackUpdatesInProfilePicDropdownMenu.isEnabled =
-        true;
+      mockPlatformFeatureService.status.ShowFeedbackUpdatesInProfilePicDropdownMenu.isEnabled = true;
 
       expect(
         component.isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable()

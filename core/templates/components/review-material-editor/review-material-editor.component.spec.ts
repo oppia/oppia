@@ -163,8 +163,7 @@ describe('Review Material Editor Component', () => {
   });
 
   it('should get schema with SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS when feature is enabled', () => {
-    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled =
-      true;
+    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled = true;
 
     const schema = component.getSchema();
 

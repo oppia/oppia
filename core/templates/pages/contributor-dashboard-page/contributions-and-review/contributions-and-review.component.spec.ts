@@ -555,8 +555,7 @@ describe('Contributions and review component', () => {
         more: false,
       })
     );
-    mockPlatformFeatureService.status.ContributorDashboardAccomplishments.isEnabled =
-      true;
+    mockPlatformFeatureService.status.ContributorDashboardAccomplishments.isEnabled = true;
 
     fixture.detectChanges();
   }));

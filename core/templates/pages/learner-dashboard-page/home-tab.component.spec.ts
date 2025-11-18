@@ -438,8 +438,7 @@ describe('Home tab Component', () => {
   });
 
   it('should get publishedNotesCount when isSerialChapterLearnerFeature is turned ON', () => {
-    mockPlatformFeatureService.status.SerialChapterLaunchLearnerView.isEnabled =
-      true;
+    mockPlatformFeatureService.status.SerialChapterLaunchLearnerView.isEnabled = true;
     spyOn(
       component,
       'isSerialChapterFeatureLearnerFlagEnabled'

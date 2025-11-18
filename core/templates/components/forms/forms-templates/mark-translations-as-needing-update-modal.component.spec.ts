@@ -121,8 +121,7 @@ describe('Mark Translations As Needing Update Modal Component', () => {
   });
 
   it('should check feature flag when initialized', () => {
-    mockPlatformFeatureService.status.ExplorationEditorCanModifyTranslations.isEnabled =
-      true;
+    mockPlatformFeatureService.status.ExplorationEditorCanModifyTranslations.isEnabled = true;
     expect(component.modifyTranslationsFeatureFlagIsEnabled).toBeFalse();
 
     component.ngOnInit();

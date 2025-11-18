@@ -180,8 +180,7 @@ describe('SubtopicPreviewTab', () => {
 
   describe('when ShowRestructuredStudyGuides feature is disabled', () => {
     beforeEach(() => {
-      platformFeatureService.status.ShowRestructuredStudyGuides.isEnabled =
-        false;
+      platformFeatureService.status.ShowRestructuredStudyGuides.isEnabled = false;
     });
 
     it('should initialize when subtopic preview tab is opened', () => {
@@ -265,8 +264,7 @@ describe('SubtopicPreviewTab', () => {
 
   describe('when ShowRestructuredStudyGuides feature is enabled', () => {
     beforeEach(() => {
-      platformFeatureService.status.ShowRestructuredStudyGuides.isEnabled =
-        true;
+      platformFeatureService.status.ShowRestructuredStudyGuides.isEnabled = true;
     });
 
     it('should initialize with study guide when subtopic preview tab is opened', () => {

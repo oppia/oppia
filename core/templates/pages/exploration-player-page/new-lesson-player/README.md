@@ -36,7 +36,6 @@ To test the **New Lesson Player**, follow these steps:
 
 1. ✅ **Enable** the `new_lesson_player` flag from the **Release Coordinator** page.
 2. ▶️ **Open any lesson** using one of the following methods:
-
    - 📄 **Manually change the URL** from `/explore` to `/lesson`
      - **Example:**  
        Change `http://localhost:8081/explore/6`  
@@ -57,7 +56,6 @@ To test the **New Lesson Player**, follow these steps:
 
 2. `/conversation-skin-components`  
    Includes components related to the **conversation skin**, such as:
-
    - Supplemental card
    - Input-response
    - Hints

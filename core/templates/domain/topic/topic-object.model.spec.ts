@@ -96,8 +96,8 @@ describe('Topic object factory', () => {
 
   it('should validate the topic', () => {
     _sampleTopic.setName('');
-    _sampleTopic.setAbbreviatedName(''),
-      _sampleTopic.addCanonicalStory('story_2');
+    (_sampleTopic.setAbbreviatedName(''),
+      _sampleTopic.addCanonicalStory('story_2'));
     _sampleTopic.getSubtopics()[0].addSkill('skill_1', '');
 
     expect(_sampleTopic.validate()).toEqual([
