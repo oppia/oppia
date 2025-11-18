@@ -32,6 +32,7 @@ import sys
 import time
 import types
 import warnings
+import traceback
 from http import client
 from urllib import error as urlerror
 from urllib import request as urlrequest
@@ -1106,7 +1107,6 @@ def _color_excepthook(
     exc_tb: Optional[types.TracebackType]
 ) -> None:
     """Handles uncaught exceptions and prints them in red color."""
-    import traceback  # pylint: disable=import-outside-toplevel
     traceback_text = ''.join(
         traceback.format_exception(exc_type, exc_value, exc_tb)
     )
