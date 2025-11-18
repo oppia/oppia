@@ -28,7 +28,7 @@ import {Interaction} from 'domain/exploration/interaction.model';
 import {Solution} from 'domain/exploration/solution.model';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model';
 import {SolutionValidityService} from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import {Subscription} from 'rxjs';
 
@@ -187,19 +187,19 @@ describe('Editor state service', () => {
   });
 
   it('should correctly set and get solicitAnswerDetails', () => {
-    expect(ecs.getSolicitAnswerDetails()).toBeFalse();
+    expect(ecs.getSolicitAnswerDetails()).toBe(false);
     ecs.setSolicitAnswerDetails(false);
-    expect(ecs.getSolicitAnswerDetails()).toBeFalse();
+    expect(ecs.getSolicitAnswerDetails()).toBe(false);
     ecs.setSolicitAnswerDetails(true);
-    expect(ecs.getSolicitAnswerDetails()).toEqual(true);
+    expect(ecs.getSolicitAnswerDetails()).toBe(true);
   });
 
   it('should correctly set and get cardIsCheckpoint', () => {
-    expect(ecs.getCardIsCheckpoint()).toBeFalse();
+    expect(ecs.getCardIsCheckpoint()).toBe(false);
     expect(ecs.setCardIsCheckpoint(false));
-    expect(ecs.getCardIsCheckpoint()).toBeFalse();
+    expect(ecs.getCardIsCheckpoint()).toBe(false);
     expect(ecs.setCardIsCheckpoint(true));
-    expect(ecs.getCardIsCheckpoint()).toBeTrue();
+    expect(ecs.getCardIsCheckpoint()).toBe(true);
   });
 
   it('should correctly set and get misconceptionsBySkill', () => {
@@ -338,55 +338,55 @@ describe('Editor state service', () => {
   );
 
   it('should return if exploration is curated or not', () => {
-    expect(ecs.isExplorationCurated()).toBeFalse();
+    expect(ecs.isExplorationCurated()).toBe(false);
     ecs.explorationIsCurated = true;
-    expect(ecs.isExplorationCurated()).toBeTrue();
+    expect(ecs.isExplorationCurated()).toBe(true);
     ecs.explorationIsCurated = false;
-    expect(ecs.isExplorationCurated()).toBeFalse();
+    expect(ecs.isExplorationCurated()).toBe(false);
   });
 
   it('should initialise state content editor', () => {
-    expect(ecs.stateContentEditorInitialised).toBeFalse();
+    expect(ecs.stateContentEditorInitialised).toBe(false);
     ecs.updateStateContentEditorInitialised();
-    expect(ecs.stateContentEditorInitialised).toBeTrue();
+    expect(ecs.stateContentEditorInitialised).toBe(true);
   });
 
   it('should initialise state interaction editor', () => {
-    expect(ecs.stateInteractionEditorInitialised).toBeFalse();
+    expect(ecs.stateInteractionEditorInitialised).toBe(false);
     ecs.updateStateInteractionEditorInitialised();
-    expect(ecs.stateInteractionEditorInitialised).toBeTrue();
+    expect(ecs.stateInteractionEditorInitialised).toBe(true);
   });
 
   it('should initialise state responses initialised', () => {
-    expect(ecs.stateResponsesInitialised).toBeFalse();
+    expect(ecs.stateResponsesInitialised).toBe(false);
     ecs.updateStateResponsesInitialised();
-    expect(ecs.stateResponsesInitialised).toBeTrue();
+    expect(ecs.stateResponsesInitialised).toBe(true);
   });
 
   it('should initialise state hints editor', () => {
-    expect(ecs.stateHintsEditorInitialised).toBeFalse();
+    expect(ecs.stateHintsEditorInitialised).toBe(false);
     ecs.updateStateHintsEditorInitialised();
-    expect(ecs.stateHintsEditorInitialised).toBeTrue();
+    expect(ecs.stateHintsEditorInitialised).toBe(true);
   });
 
   it('should initialise state solution editor', () => {
-    expect(ecs.stateSolutionEditorInitialised).toBeFalse();
+    expect(ecs.stateSolutionEditorInitialised).toBe(false);
     ecs.updateStateSolutionEditorInitialised();
-    expect(ecs.stateSolutionEditorInitialised).toBeTrue();
+    expect(ecs.stateSolutionEditorInitialised).toBe(true);
   });
 
   it('should initialise state editor', () => {
-    expect(ecs.stateEditorDirectiveInitialised).toBeFalse();
+    expect(ecs.stateEditorDirectiveInitialised).toBe(false);
     ecs.updateStateEditorDirectiveInitialised();
-    expect(ecs.stateEditorDirectiveInitialised).toBeTrue();
+    expect(ecs.stateEditorDirectiveInitialised).toBe(true);
   });
 
   it('should update current rule input is valid', () => {
-    expect(ecs.checkCurrentRuleInputIsValid()).toBeFalse();
+    expect(ecs.checkCurrentRuleInputIsValid()).toBe(false);
     ecs.updateCurrentRuleInputIsValid(true);
-    expect(ecs.checkCurrentRuleInputIsValid()).toBeTrue();
+    expect(ecs.checkCurrentRuleInputIsValid()).toBe(true);
     ecs.updateCurrentRuleInputIsValid(false);
-    expect(ecs.checkCurrentRuleInputIsValid()).toBeFalse();
+    expect(ecs.checkCurrentRuleInputIsValid()).toBe(false);
   });
 
   it('should get and set state names', () => {
@@ -401,31 +401,31 @@ describe('Editor state service', () => {
     // Registration status is true only when,
     // stateInteractionEditorInitialised, stateResponsesInitialised and
     // stateEditorDirectiveInitialised are true.
-    expect(ecs.stateInteractionEditorInitialised).toBeFalse();
-    expect(ecs.stateResponsesInitialised).toBeFalse();
-    expect(ecs.stateEditorDirectiveInitialised).toBeFalse();
-    expect(ecs.checkEventListenerRegistrationStatus()).toBeFalse();
+    expect(ecs.stateInteractionEditorInitialised).toBe(false);
+    expect(ecs.stateResponsesInitialised).toBe(false);
+    expect(ecs.stateEditorDirectiveInitialised).toBe(false);
+    expect(ecs.checkEventListenerRegistrationStatus()).toBe(false);
 
     // Set stateInteractionEditorInitialised as true.
     ecs.updateStateInteractionEditorInitialised();
-    expect(ecs.stateInteractionEditorInitialised).toBeTrue();
-    expect(ecs.stateResponsesInitialised).toBeFalse();
-    expect(ecs.stateEditorDirectiveInitialised).toBeFalse();
-    expect(ecs.checkEventListenerRegistrationStatus()).toBeFalse();
+    expect(ecs.stateInteractionEditorInitialised).toBe(true);
+    expect(ecs.stateResponsesInitialised).toBe(false);
+    expect(ecs.stateEditorDirectiveInitialised).toBe(false);
+    expect(ecs.checkEventListenerRegistrationStatus()).toBe(false);
 
     // Set stateResponsesInitialised as true.
     ecs.updateStateResponsesInitialised();
-    expect(ecs.stateInteractionEditorInitialised).toBeTrue();
-    expect(ecs.stateResponsesInitialised).toBeTrue();
-    expect(ecs.stateEditorDirectiveInitialised).toBeFalse();
-    expect(ecs.checkEventListenerRegistrationStatus()).toBeFalse();
+    expect(ecs.stateInteractionEditorInitialised).toBe(true);
+    expect(ecs.stateResponsesInitialised).toBe(true);
+    expect(ecs.stateEditorDirectiveInitialised).toBe(false);
+    expect(ecs.checkEventListenerRegistrationStatus()).toBe(false);
 
     // Set stateEditorDirectiveInitialised as true.
     ecs.updateStateEditorDirectiveInitialised();
-    expect(ecs.stateInteractionEditorInitialised).toBeTrue();
-    expect(ecs.stateResponsesInitialised).toBeTrue();
-    expect(ecs.stateEditorDirectiveInitialised).toBeTrue();
-    expect(ecs.checkEventListenerRegistrationStatus()).toBeTrue();
+    expect(ecs.stateInteractionEditorInitialised).toBe(true);
+    expect(ecs.stateResponsesInitialised).toBe(true);
+    expect(ecs.stateEditorDirectiveInitialised).toBe(true);
+    expect(ecs.checkEventListenerRegistrationStatus()).toBe(true);
   });
 
   it('should set interaction', () => {
@@ -547,11 +547,11 @@ describe('Editor state service', () => {
   });
 
   it('should set in question mode', () => {
-    expect(ecs.isInQuestionMode()).toBeFalse();
+    expect(ecs.isInQuestionMode()).toBe(false);
     ecs.setInQuestionMode(true);
-    expect(ecs.isInQuestionMode()).toBeTrue();
+    expect(ecs.isInQuestionMode()).toBe(true);
     ecs.setInQuestionMode(false);
-    expect(ecs.isInQuestionMode()).toBeFalse();
+    expect(ecs.isInQuestionMode()).toBe(false);
   });
 
   it('should set inapplicable skill misconception ids', () => {
@@ -566,18 +566,18 @@ describe('Editor state service', () => {
     // At present, we are not keeping track of the solution's validity. So, we
     // initialize the Solution Validity Service with the state. Upon,
     // initialization the solution validity is set as true.
-    expect(ecs.isCurrentSolutionValid()).toBeFalse();
+    expect(ecs.isCurrentSolutionValid()).toBe(false);
     solutionValidityService.init(['Hola']);
-    expect(ecs.isCurrentSolutionValid()).toBeTrue();
+    expect(ecs.isCurrentSolutionValid()).toBe(true);
   });
 
   it('should delete current solution validity', () => {
     ecs.activeStateName = 'Hola';
-    expect(ecs.isCurrentSolutionValid()).toBeFalse();
+    expect(ecs.isCurrentSolutionValid()).toBe(false);
     solutionValidityService.init(['Hola']);
-    expect(ecs.isCurrentSolutionValid()).toBeTrue();
+    expect(ecs.isCurrentSolutionValid()).toBe(true);
     ecs.deleteCurrentSolutionValidity();
-    expect(ecs.isCurrentSolutionValid()).toBeFalse();
+    expect(ecs.isCurrentSolutionValid()).toBe(false);
   });
 
   it(
@@ -585,11 +585,11 @@ describe('Editor state service', () => {
       ' if activeStateName is null',
     () => {
       ecs.activeStateName = null;
-      expect(ecs.isCurrentSolutionValid()).toBeFalse();
+      expect(ecs.isCurrentSolutionValid()).toBe(false);
       expect(() => {
         ecs.deleteCurrentSolutionValidity();
       }).toThrowError('Active State for this solution is not set');
-      expect(ecs.isCurrentSolutionValid()).toBeFalse();
+      expect(ecs.isCurrentSolutionValid()).toBe(false);
     }
   );
 

@@ -24,7 +24,7 @@ import {
   Interaction,
 } from 'domain/exploration/interaction.model';
 import {StateCard} from 'domain/state_card/state-card.model';
-import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
 import {Hint} from 'domain/exploration/hint-object.model';
 import {Solution} from 'domain/exploration/solution.model';
@@ -121,9 +121,9 @@ describe('State card object factory', () => {
 
     expect(_sampleCard1.getInteractionId()).toEqual('TextInput');
     expect(_sampleCard2.getInteractionId()).toBeNull();
-    expect(_sampleCard1.isTerminal()).toBeFalse();
-    expect(_sampleCard1.isInteractionInline()).toBeTrue();
-    expect(_sampleCard2.isInteractionInline()).toBeTrue();
+    expect(_sampleCard1.isTerminal()).toBe(false);
+    expect(_sampleCard1.isInteractionInline()).toBe(true);
+    expect(_sampleCard2.isInteractionInline()).toBe(true);
     expect(_sampleCard1.getInteractionInstructions()).toBeNull();
     expect(_sampleCard2.getInteractionInstructions()).toBeNull();
     expect(_sampleCard1.getInteractionCustomizationArgs()).toEqual({
@@ -247,18 +247,18 @@ describe('State card object factory', () => {
   });
 
   it('should check whether interaction supports hints', () => {
-    expect(_sampleCard1.doesInteractionSupportHints()).toBeTrue();
-    expect(_sampleCard2.doesInteractionSupportHints()).toBeFalse();
+    expect(_sampleCard1.doesInteractionSupportHints()).toBe(true);
+    expect(_sampleCard2.doesInteractionSupportHints()).toBe(false);
   });
 
   it('should mark and unmark interaction as completed', () => {
-    expect(_sampleCard1.isCompleted()).toBeFalse();
+    expect(_sampleCard1.isCompleted()).toBe(false);
 
     _sampleCard1.markAsCompleted();
-    expect(_sampleCard1.isCompleted()).toBeTrue();
+    expect(_sampleCard1.isCompleted()).toBe(true);
 
     _sampleCard1.markAsNotCompleted();
-    expect(_sampleCard1.isCompleted()).toBeFalse();
+    expect(_sampleCard1.isCompleted()).toBe(false);
   });
 
   it('should be able to get and set content html', () => {
@@ -293,8 +293,8 @@ describe('State card object factory', () => {
 
   it('should not show a "no response error" by default', () => {
     expect(_sampleCard1.getInteraction().currentAnswer).toBeNull();
-    expect(_sampleCard1.getInteraction().submitClicked).toBeFalse();
-    expect(_sampleCard1.showNoResponseError()).toBeFalse();
+    expect(_sampleCard1.getInteraction().submitClicked).toBe(false);
+    expect(_sampleCard1.showNoResponseError()).toBe(false);
   });
 
   it('should update current answer and toggle submit clicked to false', () => {
@@ -302,7 +302,7 @@ describe('State card object factory', () => {
     _sampleCard1.updateCurrentAnswer('answer');
 
     expect(_sampleCard1.getInteraction().currentAnswer).toEqual('answer');
-    expect(_sampleCard1.getInteraction().submitClicked).toBeFalse();
+    expect(_sampleCard1.getInteraction().submitClicked).toBe(false);
   });
 
   it('should not toggle submit clicked for "Continue" interaction', () => {
@@ -310,7 +310,7 @@ describe('State card object factory', () => {
 
     _sampleCard1.toggleSubmitClicked(true);
 
-    expect(_sampleCard1.getInteraction().submitClicked).toBeFalse();
+    expect(_sampleCard1.getInteraction().submitClicked).toBe(false);
   });
 
   it('should enable no response correctly', () => {
@@ -320,54 +320,54 @@ describe('State card object factory', () => {
     };
 
     simulateInteraction(null);
-    expect(_sampleCard1.showNoResponseError()).toBeTrue();
+    expect(_sampleCard1.showNoResponseError()).toBe(true);
 
     simulateInteraction([]);
-    expect(_sampleCard1.showNoResponseError()).toBeTrue();
+    expect(_sampleCard1.showNoResponseError()).toBe(true);
 
     simulateInteraction(['']);
-    expect(_sampleCard1.showNoResponseError()).toBeFalse();
+    expect(_sampleCard1.showNoResponseError()).toBe(false);
 
     simulateInteraction('');
-    expect(_sampleCard1.showNoResponseError()).toBeTrue();
+    expect(_sampleCard1.showNoResponseError()).toBe(true);
 
     simulateInteraction('ans');
-    expect(_sampleCard1.showNoResponseError()).toBeFalse();
+    expect(_sampleCard1.showNoResponseError()).toBe(false);
 
     simulateInteraction(0);
-    expect(_sampleCard1.showNoResponseError()).toBeFalse();
+    expect(_sampleCard1.showNoResponseError()).toBe(false);
 
     simulateInteraction(-1);
-    expect(_sampleCard1.showNoResponseError()).toBeFalse();
+    expect(_sampleCard1.showNoResponseError()).toBe(false);
   });
   it('should update answer validity using updateAnswerIsValid', () => {
-    expect(_sampleCard1.getInteraction().answerIsValid).toBeFalse();
+    expect(_sampleCard1.getInteraction().answerIsValid).toBe(false);
 
     _sampleCard1.updateAnswerIsValid(true);
-    expect(_sampleCard1.getInteraction().answerIsValid).toBeTrue();
+    expect(_sampleCard1.getInteraction().answerIsValid).toBe(true);
 
     _sampleCard1.updateAnswerIsValid(false);
-    expect(_sampleCard1.getInteraction().answerIsValid).toBeFalse();
+    expect(_sampleCard1.getInteraction().answerIsValid).toBe(false);
   });
 
   it('should show invalid response error when answer is invalid and submit clicked', () => {
     _sampleCard1.updateAnswerIsValid(false);
     _sampleCard1.getInteraction().submitClicked = true;
 
-    expect(_sampleCard1.showInvalidResponseError()).toBeTrue();
+    expect(_sampleCard1.showInvalidResponseError()).toBe(true);
   });
 
   it('should not show invalid response error when answer is valid', () => {
     _sampleCard1.updateAnswerIsValid(true);
     _sampleCard1.getInteraction().submitClicked = true;
 
-    expect(_sampleCard1.showInvalidResponseError()).toBeFalse();
+    expect(_sampleCard1.showInvalidResponseError()).toBe(false);
   });
 
   it('should not show invalid response error when submit not clicked', () => {
     _sampleCard1.updateAnswerIsValid(false);
     _sampleCard1.getInteraction().submitClicked = false;
 
-    expect(_sampleCard1.showInvalidResponseError()).toBeFalse();
+    expect(_sampleCard1.showInvalidResponseError()).toBe(false);
   });
 });
