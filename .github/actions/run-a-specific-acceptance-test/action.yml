@@ -47,33 +47,33 @@ runs:
         | tee acceptance_test_${{ inputs.modified-suite-name-for-uploads || '' }}.log
 
     - name: Upload test logs
-      # We need to pass always() because if not, GitHub will implicitly use success(),
+      # We need to pass !cancelled() because if not, GitHub will implicitly use success(),
       # which requires all previous jobs/steps to have succeeded. This is not what we want.
       # Reference: https://docs.github.com/en/actions/reference/workflows-and-actions/expressions#status-check-functions
       # Quote: "A default status check of success() is applied unless you *include* one of these functions."
-      if: ${{ always() && steps.run-acceptance-test.outcome == 'failure' && inputs.modified-suite-name-for-uploads != '' }}
+      if: ${{ !cancelled() && steps.run-acceptance-test.outcome == 'failure' && inputs.modified-suite-name-for-uploads != '' }}
       uses: actions/upload-artifact@v4
       with:
         name: test-logs_${{ inputs.modified-suite-name-for-uploads }}
         path: acceptance_test_${{ inputs.modified-suite-name-for-uploads }}.log
 
     - name: Upload screenshots taken on test failure
-      # We need to pass always() because if not, GitHub will implicitly use success(),
+      # We need to pass !cancelled() because if not, GitHub will implicitly use success(),
       # which requires all previous jobs/steps to have succeeded. This is not what we want.
       # Reference: https://docs.github.com/en/actions/reference/workflows-and-actions/expressions#status-check-functions
       # Quote: "A default status check of success() is applied unless you *include* one of these functions."
-      if: ${{ always() && steps.run-acceptance-test.outcome == 'failure' && inputs.modified-suite-name-for-uploads != '' }}
+      if: ${{ !cancelled() && steps.run-acceptance-test.outcome == 'failure' && inputs.modified-suite-name-for-uploads != '' }}
       uses: actions/upload-artifact@v4
       with:
         name: failure-point-snapshots_${{ inputs.modified-suite-name-for-uploads }}
         path: /home/runner/work/oppia/oppia_full_stack_test_failure_screenshots/acceptance
 
     - name: Upload test diff screenshots
-      # We need to pass always() because if not, GitHub will implicitly use success(),
+      # We need to pass !cancelled() because if not, GitHub will implicitly use success(),
       # which requires all previous jobs/steps to have succeeded. This is not what we want.
       # Reference: https://docs.github.com/en/actions/reference/workflows-and-actions/expressions#status-check-functions
       # Quote: "A default status check of success() is applied unless you *include* one of these functions."
-      if: ${{ always() && steps.run-acceptance-test.outcome == 'failure' && inputs.modified-suite-name-for-uploads != '' }}
+      if: ${{ !cancelled() && steps.run-acceptance-test.outcome == 'failure' && inputs.modified-suite-name-for-uploads != '' }}
       uses: actions/upload-artifact@v4
       with:
         name: diff-snapshots_${{ inputs.modified-suite-name-for-uploads }}
@@ -82,11 +82,11 @@ runs:
         path: /home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/diff-snapshots
 
     - name: Upload test recordings
-      # We need to pass always() because if not, GitHub will implicitly use success(),
+      # We need to pass !cancelled() because if not, GitHub will implicitly use success(),
       # which requires all previous jobs/steps to have succeeded. This is not what we want.
       # Reference: https://docs.github.com/en/actions/reference/workflows-and-actions/expressions#status-check-functions
       # Quote: "A default status check of success() is applied unless you *include* one of these functions."
-      if: ${{ always() && steps.run-acceptance-test.outcome == 'failure' && inputs.modified-suite-name-for-uploads != '' }}
+      if: ${{ !cancelled() && steps.run-acceptance-test.outcome == 'failure' && inputs.modified-suite-name-for-uploads != '' }}
       uses: actions/upload-artifact@v4
       with:
         name: video-recordings_${{ inputs.modified-suite-name-for-uploads }}
