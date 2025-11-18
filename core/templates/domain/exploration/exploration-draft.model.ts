@@ -24,7 +24,7 @@ import {WrittenTranslationsBackendDict} from 'domain/exploration/written-transla
 import {SubtitledHtmlBackendDict} from './subtitled-html.model';
 import {RecordedVoiceOverBackendDict} from './recorded-voiceovers.model';
 import {InteractionCustomizationArgsBackendDict} from 'interactions/customization-args-defs';
-import {TranslatedContentBackendDict} from './TranslatedContentObjectFactory';
+import {TranslatedContentBackendDict} from './translated-content.model';
 import {VoiceoverTypeToVoiceoversBackendDict} from './voiceover.model';
 
 export type ExplorationChange =

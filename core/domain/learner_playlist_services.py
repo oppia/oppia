@@ -25,7 +25,7 @@ from core.platform import models
 from typing import Final, List, Optional, Tuple
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import user_models
 
 (user_models,) = models.Registry.import_models([models.Names.USER])
@@ -36,7 +36,7 @@ MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT: Final = (
 
 
 def get_learner_playlist_from_model(
-    learner_playlist_model: user_models.LearnerPlaylistModel
+    learner_playlist_model: user_models.LearnerPlaylistModel,
 ) -> user_domain.LearnerPlaylist:
     """Returns the learner playlist domain object given the learner playlist
     model loaded from the datastore.
@@ -52,11 +52,12 @@ def get_learner_playlist_from_model(
     return user_domain.LearnerPlaylist(
         learner_playlist_model.id,
         learner_playlist_model.exploration_ids,
-        learner_playlist_model.collection_ids)
+        learner_playlist_model.collection_ids,
+    )
 
 
 def save_learner_playlist(
-    learner_playlist: user_domain.LearnerPlaylist
+    learner_playlist: user_domain.LearnerPlaylist,
 ) -> None:
     """Save a learner playlist domain object as an LearnerPlaylistModel entity
     in the datastore.
@@ -67,11 +68,12 @@ def save_learner_playlist(
     """
     learner_playlist_dict = {
         'exploration_ids': learner_playlist.exploration_ids,
-        'collection_ids': learner_playlist.collection_ids
+        'collection_ids': learner_playlist.collection_ids,
     }
 
-    learner_playlist_model = (user_models.LearnerPlaylistModel.get_by_id(
-        learner_playlist.id))
+    learner_playlist_model = user_models.LearnerPlaylistModel.get_by_id(
+        learner_playlist.id
+    )
     if learner_playlist_model is not None:
         learner_playlist_model.populate(**learner_playlist_dict)
         learner_playlist_model.update_timestamps()
@@ -84,7 +86,7 @@ def save_learner_playlist(
 def mark_exploration_to_be_played_later(
     user_id: str,
     exploration_id: str,
-    position_to_be_inserted: Optional[int] = None
+    position_to_be_inserted: Optional[int] = None,
 ) -> Tuple[bool, bool]:
     """Adds the exploration id to the learner playlist of the user at the given
     position. If the position is not specified, the exploration gets added at
@@ -109,16 +111,16 @@ def mark_exploration_to_be_played_later(
         explorations of the user.
     """
     learner_playlist_model = user_models.LearnerPlaylistModel.get(
-        user_id, strict=False)
+        user_id, strict=False
+    )
     if not learner_playlist_model:
-        learner_playlist_model = (
-            user_models.LearnerPlaylistModel(id=user_id))
+        learner_playlist_model = user_models.LearnerPlaylistModel(id=user_id)
 
     subscribed_exploration_ids = (
-        subscription_services.get_exploration_ids_subscribed_to(user_id))
+        subscription_services.get_exploration_ids_subscribed_to(user_id)
+    )
 
-    learner_playlist = get_learner_playlist_from_model(
-        learner_playlist_model)
+    learner_playlist = get_learner_playlist_from_model(learner_playlist_model)
 
     playlist_limit_exceeded = False
     exp_belongs_to_subscribed_explorations = False
@@ -134,13 +136,15 @@ def mark_exploration_to_be_played_later(
             if exploration_id not in learner_playlist.exploration_ids:
                 if exploration_ids_count < MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT:
                     learner_playlist.insert_exploration_id_at_given_position(
-                        exploration_id, position_to_be_inserted)
+                        exploration_id, position_to_be_inserted
+                    )
                 else:
                     playlist_limit_exceeded = True
             else:
                 learner_playlist.remove_exploration_id(exploration_id)
                 learner_playlist.insert_exploration_id_at_given_position(
-                    exploration_id, position_to_be_inserted)
+                    exploration_id, position_to_be_inserted
+                )
         save_learner_playlist(learner_playlist)
     else:
         exp_belongs_to_subscribed_explorations = True
@@ -151,7 +155,7 @@ def mark_exploration_to_be_played_later(
 def mark_collection_to_be_played_later(
     user_id: str,
     collection_id: str,
-    position_to_be_inserted: Optional[int] = None
+    position_to_be_inserted: Optional[int] = None,
 ) -> Tuple[bool, bool]:
     """Adds the collection id to the learner playlist of the user at the given
     position. If the position is not specified, the collection gets added at
@@ -176,16 +180,16 @@ def mark_collection_to_be_played_later(
         user.
     """
     learner_playlist_model = user_models.LearnerPlaylistModel.get(
-        user_id, strict=False)
+        user_id, strict=False
+    )
     if not learner_playlist_model:
-        learner_playlist_model = (
-            user_models.LearnerPlaylistModel(id=user_id))
+        learner_playlist_model = user_models.LearnerPlaylistModel(id=user_id)
 
     subscribed_collection_ids = (
-        subscription_services.get_collection_ids_subscribed_to(user_id))
+        subscription_services.get_collection_ids_subscribed_to(user_id)
+    )
 
-    learner_playlist = get_learner_playlist_from_model(
-        learner_playlist_model)
+    learner_playlist = get_learner_playlist_from_model(learner_playlist_model)
 
     playlist_limit_exceeded = False
     collection_belongs_to_subscribed_collections = False
@@ -201,13 +205,15 @@ def mark_collection_to_be_played_later(
             if collection_id not in learner_playlist.collection_ids:
                 if collection_ids_count < MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT:
                     learner_playlist.insert_collection_id_at_given_position(
-                        collection_id, position_to_be_inserted)
+                        collection_id, position_to_be_inserted
+                    )
                 else:
                     playlist_limit_exceeded = True
             else:
                 learner_playlist.remove_collection_id(collection_id)
                 learner_playlist.insert_collection_id_at_given_position(
-                    collection_id, position_to_be_inserted)
+                    collection_id, position_to_be_inserted
+                )
         save_learner_playlist(learner_playlist)
     else:
         collection_belongs_to_subscribed_collections = True
@@ -226,11 +232,13 @@ def remove_exploration_from_learner_playlist(
         exploration_id: str. The id of the exploration to be removed.
     """
     learner_playlist_model = user_models.LearnerPlaylistModel.get(
-        user_id, strict=False)
+        user_id, strict=False
+    )
 
     if learner_playlist_model:
         learner_playlist = get_learner_playlist_from_model(
-            learner_playlist_model)
+            learner_playlist_model
+        )
         if exploration_id in learner_playlist.exploration_ids:
             learner_playlist.remove_exploration_id(exploration_id)
             save_learner_playlist(learner_playlist)
@@ -247,11 +255,13 @@ def remove_collection_from_learner_playlist(
         collection_id: str. The id of the collection to be removed.
     """
     learner_playlist_model = user_models.LearnerPlaylistModel.get(
-        user_id, strict=False)
+        user_id, strict=False
+    )
 
     if learner_playlist_model:
         learner_playlist = get_learner_playlist_from_model(
-            learner_playlist_model)
+            learner_playlist_model
+        )
         if collection_id in learner_playlist.collection_ids:
             learner_playlist.remove_collection_id(collection_id)
             save_learner_playlist(learner_playlist)
@@ -269,11 +279,13 @@ def get_all_exp_ids_in_learner_playlist(user_id: str) -> List[str]:
         learner playlist of the user.
     """
     learner_playlist_model = user_models.LearnerPlaylistModel.get(
-        user_id, strict=False)
+        user_id, strict=False
+    )
 
     if learner_playlist_model:
         learner_playlist = get_learner_playlist_from_model(
-            learner_playlist_model)
+            learner_playlist_model
+        )
 
         return learner_playlist.exploration_ids
     else:
@@ -292,11 +304,13 @@ def get_all_collection_ids_in_learner_playlist(user_id: str) -> List[str]:
         learner playlist of the user.
     """
     learner_playlist_model = user_models.LearnerPlaylistModel.get(
-        user_id, strict=False)
+        user_id, strict=False
+    )
 
     if learner_playlist_model:
         learner_playlist = get_learner_playlist_from_model(
-            learner_playlist_model)
+            learner_playlist_model
+        )
 
         return learner_playlist.collection_ids
     else:

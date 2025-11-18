@@ -27,18 +27,24 @@ class GenerateRootFilesMappingTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.print_messages: list[str] = []
+
         def mock_print(msg: str) -> None:
             self.print_messages.append(msg)
-        self.print_swap = self.swap(
-            builtins, 'print', mock_print)
+
+        self.print_swap = self.swap(builtins, 'print', mock_print)
+
         def mock_compile_and_check_typescript(_tsconfig_filepath: str) -> None:
             return
+
         self.compile_and_check_typescript_swap = self.swap_with_checks(
-            run_typescript_checks, 'compile_and_check_typescript',
+            run_typescript_checks,
+            'compile_and_check_typescript',
             mock_compile_and_check_typescript,
             expected_args=[
-                (generate_root_files_mapping.TEST_DEPENDENCIES_TSCONFIG_FILEPATH,) # pylint: disable=line-too-long
-            ]
+                (
+                    generate_root_files_mapping.TEST_DEPENDENCIES_TSCONFIG_FILEPATH,
+                )  # pylint: disable=line-too-long
+            ],
         )
 
     def tearDown(self) -> None:
@@ -47,45 +53,61 @@ class GenerateRootFilesMappingTests(test_utils.GenericTestBase):
 
     def test_generate_root_files_mapping_success(self) -> None:
         process = subprocess.Popen(
-            ['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        def mock_subprocess_popen( # pylint: disable=unused-argument
-            cmd: list[str],
-            stdout: int, stderr: int
+            ['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        )
+
+        def mock_subprocess_popen(  # pylint: disable=unused-argument
+            cmd: list[str], stdout: int, stderr: int
         ) -> subprocess.Popen[bytes]:
-            self.assertEqual(cmd, [
-                common.NODE_BIN_PATH,
-                generate_root_files_mapping.ROOT_FILES_MAPPING_GENERATOR_FILEPATH # pylint: disable=line-too-long
-            ])
+            self.assertEqual(
+                cmd,
+                [
+                    common.NODE_BIN_PATH,
+                    generate_root_files_mapping.ROOT_FILES_MAPPING_GENERATOR_FILEPATH,  # pylint: disable=line-too-long
+                ],
+            )
             return process
+
         subprocess_popen_swap = self.swap(
-            subprocess, 'Popen', mock_subprocess_popen)
+            subprocess, 'Popen', mock_subprocess_popen
+        )
 
         with self.print_swap, self.compile_and_check_typescript_swap:
             with subprocess_popen_swap:
                 generate_root_files_mapping.main()
                 self.assertEqual(
-                    self.print_messages, [
+                    self.print_messages,
+                    [
                         'Generating root files mapping...',
                         'test\n',
-                        'Root files mapping generated successfully!'])
+                        'Root files mapping generated successfully!',
+                    ],
+                )
 
     def test_generate_root_files_mapping_failure(self) -> None:
         def mock_communicate() -> tuple[bytes, bytes]:
             return (b'', b'Error')
+
         process = subprocess.Popen(
-            ['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        def mock_subprocess_popen( # pylint: disable=unused-argument
-            cmd: list[str],
-            stdout: int, stderr: int
+            ['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        )
+
+        def mock_subprocess_popen(  # pylint: disable=unused-argument
+            cmd: list[str], stdout: int, stderr: int
         ) -> subprocess.Popen[bytes]:
-            self.assertEqual(cmd, [
-                common.NODE_BIN_PATH,
-                generate_root_files_mapping.ROOT_FILES_MAPPING_GENERATOR_FILEPATH # pylint: disable=line-too-long
-            ])
+            self.assertEqual(
+                cmd,
+                [
+                    common.NODE_BIN_PATH,
+                    generate_root_files_mapping.ROOT_FILES_MAPPING_GENERATOR_FILEPATH,  # pylint: disable=line-too-long
+                ],
+            )
             return process
+
         communicate_swap = self.swap(process, 'communicate', mock_communicate)
         subprocess_popen_swap = self.swap(
-            subprocess, 'Popen', mock_subprocess_popen)
+            subprocess, 'Popen', mock_subprocess_popen
+        )
 
         with self.compile_and_check_typescript_swap, communicate_swap:
             with subprocess_popen_swap:
