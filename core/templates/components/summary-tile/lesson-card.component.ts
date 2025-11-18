@@ -16,7 +16,7 @@
  * @fileoverview Component for a lesson
  */
 
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {UrlService} from 'services/contextual/url.service';
@@ -40,6 +40,7 @@ export class LessonCardComponent implements OnInit {
   @Input() isGoal?: boolean;
   @Input() isRecommendation?: boolean;
   @Input() isSavedSection?: boolean;
+  @Output() lessonLoaded = new EventEmitter<void>();
 
   desc!: string;
   imgColor!: string;
@@ -77,6 +78,8 @@ export class LessonCardComponent implements OnInit {
       }
     } catch (error) {
       console.error('Error initializing lesson card:', error);
+    } finally {
+      this.lessonLoaded.emit();
     }
   }
 
@@ -165,10 +168,10 @@ export class LessonCardComponent implements OnInit {
     this.title = `Chapter ${nextStory + 1}: ${storyModel.getNodeTitles()[nextStory]}`;
     this.statusIsPublished = storyModel
       .getAllNodes()
-      [nextStory].getPublishedStatus();
+      [nextStory]?.getPublishedStatus();
     this.progress = 0;
     if (this.storyNode) {
-      const explorationId = this.storyNode.getExplorationId();
+      const explorationId = this.storyNode?.getExplorationId();
       if (explorationId) {
         this.progress =
           this.chapterProgressLoaderService.getLessonProgress(explorationId);
@@ -176,7 +179,7 @@ export class LessonCardComponent implements OnInit {
         if (this.progress === 0) {
           const explorationIds = storyModel
             .getAllNodes()
-            .map(node => node.getExplorationId())
+            .map(node => node?.getExplorationId())
             .filter(id => id !== null) as string[];
 
           await this.chapterProgressLoaderService.loadChapterProgressForStory(
@@ -241,7 +244,7 @@ export class LessonCardComponent implements OnInit {
     storyUrl: string,
     currentStory: StoryNode
   ): string {
-    const explorationId = currentStory.getExplorationId();
+    const explorationId = currentStory?.getExplorationId();
     if (!classroomUrl || !topicUrl || !explorationId) {
       console.error('Missing required URL parameters:', {
         classroomUrl,
