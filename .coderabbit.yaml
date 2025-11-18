@@ -17,15 +17,15 @@ reviews:
   # By default, don't block the PR from merging. Leave that to reviewers.
   request_changes_workflow: false 
   # Paths to completely ignore from any review to reduce noise and focus the AI.
-  ignore_paths:
-    - "node_modules/**"
-    - "third_party/**"
-    - "**.min.js"
-    - "**.map"
-    - "**/*.d.ts"
-    - "dist/**"
-    - "build/**"
-    - "assets/**" # Binary or non-code files
+  path_filters:
+    - "!node_modules/**"
+    - "!third_party/**"
+    - "!dist/**"
+    - "!**.min.js"
+    - "!**.map"
+    - "!**/*.d.ts"
+    - "!build/**"
+    - "!assets/**" # Binary or non-code files
   tools:
     eslint:
       enabled: true
@@ -36,11 +36,7 @@ reviews:
   # (backend) and TypeScript/Angular (frontend).
   path_instructions:
     # 🎯 Python Backend (core/domain and platform logic)
-    - paths:
-        - "core/domain/**"
-        - "core/platform/**"
-        - "scripts/**"
-        - "**/*.py"
+    - path: "**/*.py"
       instructions: |
         - Ensure all Python code adheres strictly to PEP 8 standards.
         - Follow the style guidelines here: https://github.com/oppia/oppia/wiki/Coding-style-guide#python
@@ -57,11 +53,7 @@ reviews:
         - All new public functions must have comprehensive docstrings.
 
     # 🎯 TypeScript & Angular Frontend
-    - paths:
-        - "core/templates/pages/**"
-        - "extensions/**"
-        - "**/*.ts"
-        - "**/*.html"
+    - path: "**/*.ts"
       instructions: |
         - Enforce Angular best practices: check for changes that lead to poor
           performance (e.g., in change detection).
