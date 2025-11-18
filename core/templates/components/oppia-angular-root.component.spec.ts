@@ -26,6 +26,7 @@ import {
 } from './oppia-angular-root.component';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {Injector, NO_ERRORS_SCHEMA} from '@angular/core';
+import {PageContextService} from 'services/page-context.service';
 // This throws "TS2307". We need to
 // suppress this error because rte-text-components are not strictly typed yet.
 // @ts-ignore
@@ -36,7 +37,6 @@ import {DocumentAttributeCustomizationService} from 'services/contextual/documen
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {I18nService} from 'i18n/i18n.service';
 import {MockI18nService} from 'tests/unit-test-utils';
-import {PageContextService} from 'services/page-context.service';
 
 let component: OppiaAngularRootComponent;
 let fixture: ComponentFixture<OppiaAngularRootComponent>;
@@ -50,11 +50,7 @@ class MockWindowRef {
       },
     },
     history: {
-      pushState(
-        data: object | null,
-        unused: string,
-        url?: string | URL | null
-      ) {},
+      pushState(data: unknown, title: string, url?: string | null) {},
     },
   };
 }
@@ -107,21 +103,19 @@ describe('OppiaAngularRootComponent', function () {
       MetaTagCustomizationService
     ) as MetaTagCustomizationService;
     emitSpy = spyOn(component.initialized, 'emit');
-    spyOn(metaTagCustomizationService, 'addOrReplaceMetaTags').and.stub();
+    spyOn(metaTagCustomizationService, 'addOrReplaceMetaTags').and.returnValue(
+      undefined
+    );
     i18nService = TestBed.inject(I18nService);
   }));
 
   it('should only intialize rteElements once', () => {
     expect(OppiaAngularRootComponent.rteElementsAreInitialized).toBeTrue();
-    const _ = TestBed.createComponent(
+    const componentInstance = TestBed.createComponent(
       OppiaAngularRootComponent
     ).componentInstance;
-    (
-      OppiaAngularRootComponent as {
-        pageContextService: PageContextService | undefined;
-      }
-    ).pageContextService = undefined;
-    spyOn(customElements, 'get').and.callFake(() => WordCount);
+    expect(componentInstance).toBeDefined();
+    spyOn(customElements, 'get').and.callFake((_tagName: string) => WordCount);
     registerCustomElements(TestBed.inject(Injector));
   });
 
@@ -147,11 +141,10 @@ describe('OppiaAngularRootComponent', function () {
   });
 
   it('should set OppiaAngularRootComponent.pageContextService if not set', () => {
-    (
-      OppiaAngularRootComponent as {
-        pageContextService: PageContextService | undefined;
-      }
-    ).pageContextService = undefined;
+    OppiaAngularRootComponent.pageContextService =
+      TestBed.inject(PageContextService);
+    OppiaAngularRootComponent.pageContextService =
+      undefined as unknown as PageContextService;
     expect(OppiaAngularRootComponent.pageContextService).toBeUndefined();
 
     component.ngAfterViewInit();

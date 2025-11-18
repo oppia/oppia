@@ -87,29 +87,29 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
   @Input() untriagedSkillSummaries!: SkillSummary[];
   @Input() skillDescriptionsAreShown!: boolean;
 
-  associatedSkillSummaries!: ShortSkillSummary[];
-  deletedQuestionIds!: string[];
-  difficulty!: number;
-  difficultyCardIsShown!: boolean;
-  editorIsOpen!: boolean;
-  isSkillDifficultyChanged!: boolean;
-  linkedSkillsWithDifficulty!: SkillDifficulty[];
+  associatedSkillSummaries: ShortSkillSummary[] = [];
+  deletedQuestionIds: string[] = [];
+  difficulty: number = 0;
+  difficultyCardIsShown: boolean = false;
+  editorIsOpen: boolean = false;
+  isSkillDifficultyChanged: boolean = false;
+  linkedSkillsWithDifficulty: SkillDifficulty[] = [];
   misconceptionIdsForSelectedSkill!: number[];
-  misconceptionsBySkill!: MisconceptionSkillMap;
-  newQuestionIsBeingCreated!: boolean;
-  newQuestionSkillDifficulties!: number[];
-  newQuestionSkillIds!: string[];
+  misconceptionsBySkill: MisconceptionSkillMap = {};
+  newQuestionIsBeingCreated: boolean = false;
+  newQuestionSkillDifficulties: number[] = [];
+  newQuestionSkillIds: string[] = [];
   question!: Question;
-  questionId!: string;
-  questionIsBeingSaved!: boolean;
-  questionIsBeingUpdated!: boolean;
+  questionId: string = '';
+  questionIsBeingSaved: boolean = false;
+  questionIsBeingUpdated: boolean = false;
   questionStateData!: State;
   questionSummariesForOneSkill: QuestionSummaryForOneSkill[] = [];
-  showDifficultyChoices!: boolean;
-  skillLinkageModificationsArray!: SkillLinkageModificationsArray[];
+  showDifficultyChoices: boolean = false;
+  skillLinkageModificationsArray: SkillLinkageModificationsArray[] = [];
   directiveSubscriptions = new Subscription();
   MAX_SKILLS_PER_QUESTION: number = AppConstants.MAX_SKILLS_PER_QUESTION;
-  difficultyCount!: number;
+  difficultyCount: number = 0;
 
   constructor(
     private alertsService: AlertsService,
@@ -161,7 +161,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
 
     this.question = Question.createDefaultQuestion(this.newQuestionSkillIds);
     this.questionUndoRedoService.clearChanges();
-    this.questionId = this.question.getId() || '';
+    this.questionId = this.question.getId() ?? '';
     this.questionStateData = this.question.getStateData();
     this.questionIsBeingUpdated = false;
     this.newQuestionIsBeingCreated = true;
@@ -292,7 +292,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
             });
           }
           this.question = cloneDeep(response.questionObject);
-          this.questionId = this.question.getId() || '';
+          this.questionId = this.question.getId() ?? '';
           this.questionStateData = this.question.getStateData();
           this.questionIsBeingUpdated = true;
           this.newQuestionIsBeingCreated = false;
@@ -433,17 +433,11 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     }
 
     const interactionId = this.question.getStateData().interaction.id;
-    if (!interactionId) {
-      return false;
-    }
-
-    const interactionSpec =
-      INTERACTION_SPECS[interactionId as keyof typeof INTERACTION_SPECS];
-
-    return !!(
+    return Boolean(
       interactionId &&
-      interactionSpec &&
-      interactionSpec.can_have_solution === true
+        (INTERACTION_SPECS as Record<string, {can_have_solution: boolean}>)[
+          interactionId
+        ]?.can_have_solution
     );
   }
 
@@ -564,12 +558,15 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
         .filter((d): d is typeof d & {imageBlob: Blob} => d.imageBlob !== null)
         .map(d => ({...d, imageBlob: d.imageBlob as Blob}));
       this.imageLocalStorageService.flushStoredImagesData();
+      const filteredImagesData = imagesData.filter(
+        img => img.imageBlob !== null
+      ) as {filename: string; imageBlob: Blob}[];
       this.editableQuestionBackendApiService
         .createQuestionAsync(
           this.newQuestionSkillIds,
           this.newQuestionSkillDifficulties,
           this.question.toBackendDict(true),
-          imagesData
+          filteredImagesData
         )
         .then(
           response => {

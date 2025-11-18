@@ -140,7 +140,7 @@ export const registerCustomElements = (injector: Injector): void => {
     ServicesConstants.RTE_COMPONENT_SPECS
   ) as RteKey[]) {
     const rteElement = createCustomElement(
-      componentMap[rteKey].component_class,
+      componentMap[rteKey as keyof typeof componentMap].component_class,
       {injector}
     );
     // Check if the custom elements have been previously defined. We can't
@@ -151,14 +151,18 @@ export const registerCustomElements = (injector: Injector): void => {
     if (
       customElements.get(
         'oppia-noninteractive-ckeditor-' +
-          ServicesConstants.RTE_COMPONENT_SPECS[rteKey].frontend_id
+          ServicesConstants.RTE_COMPONENT_SPECS[
+            rteKey as keyof typeof ServicesConstants.RTE_COMPONENT_SPECS
+          ].frontend_id
       ) !== undefined
     ) {
       continue;
     }
     customElements.define(
       'oppia-noninteractive-ckeditor-' +
-        ServicesConstants.RTE_COMPONENT_SPECS[rteKey].frontend_id,
+        ServicesConstants.RTE_COMPONENT_SPECS[
+          rteKey as keyof typeof ServicesConstants.RTE_COMPONENT_SPECS
+        ].frontend_id,
       rteElement
     );
   }

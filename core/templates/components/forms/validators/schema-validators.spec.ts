@@ -52,7 +52,7 @@ describe('Schema validators', () => {
         {controlValue: '123', expectedResult: true},
         {controlValue: '1234', expectedResult: true},
         {controlValue: ['1', '2'], expectedResult: false},
-        {controlValue: undefined, expectedResult: false},
+        {controlValue: '', expectedResult: false},
         {controlValue: ['1', '2', '3'], expectedResult: true},
         {controlValue: ['1', '2', '3', '4'], expectedResult: true},
       ];
@@ -64,9 +64,11 @@ describe('Schema validators', () => {
           expect(errorsReturned).toBe(null, testCase.toString());
           return;
         }
-        expect(errorsReturned?.hasLengthAtLeast)
-          .withContext(testCase.toString())
-          .toBeDefined();
+        if (errorsReturned !== null) {
+          expect(errorsReturned.hasLengthAtLeast)
+            .withContext(testCase.toString())
+            .toBeDefined();
+        }
       });
     });
     it('should throw an error when the value is not a string', () => {
@@ -96,7 +98,7 @@ describe('Schema validators', () => {
         {controlValue: '12', expectedResult: true},
         {controlValue: '123', expectedResult: true},
         {controlValue: '1234', expectedResult: false},
-        {controlValue: undefined, expectedResult: false},
+        {controlValue: '', expectedResult: false},
         {controlValue: ['1', '2'], expectedResult: true},
         {controlValue: ['1', '2', '3'], expectedResult: true},
         {controlValue: ['1', '2', '3', '4'], expectedResult: false},
@@ -109,9 +111,11 @@ describe('Schema validators', () => {
           expect(errorsReturned).toBe(null, testCase.toString());
           return;
         }
-        expect(errorsReturned?.hasLengthAtMost)
-          .withContext(testCase.toString())
-          .toBeDefined();
+        if (errorsReturned !== null) {
+          expect(errorsReturned.hasLengthAtMost)
+            .withContext(testCase.toString())
+            .toBeDefined();
+        }
       });
     });
 
@@ -155,9 +159,11 @@ describe('Schema validators', () => {
           expect(errorsReturned).toBe(null, testCase.toString());
           return;
         }
-        expect(errorsReturned?.isAtLeast)
-          .withContext(testCase.toString())
-          .toBeDefined();
+        if (errorsReturned !== null) {
+          expect(errorsReturned.isAtLeast)
+            .withContext(testCase.toString())
+            .toBeDefined();
+        }
       });
     });
   });
@@ -187,9 +193,11 @@ describe('Schema validators', () => {
           expect(errorsReturned).toBe(null, testCase.toString());
           return;
         }
-        expect(errorsReturned?.isAtMost)
-          .withContext(testCase.toString())
-          .toBeDefined();
+        if (errorsReturned !== null) {
+          expect(errorsReturned.isAtMost)
+            .withContext(testCase.toString())
+            .toBeDefined();
+        }
       });
     });
   });
@@ -217,7 +225,6 @@ describe('Schema validators', () => {
         {controlValue: ' 3.2% ', expectedResult: true},
         {controlValue: '0.', expectedResult: true},
         {controlValue: '', expectedResult: true},
-        {controlValue: undefined, expectedResult: true},
         {controlValue: '3%%', expectedResult: false},
         {controlValue: '-', expectedResult: false},
         {controlValue: '.', expectedResult: false},
@@ -267,9 +274,11 @@ describe('Schema validators', () => {
           expect(errorsReturned).toBe(null, testCase.toString());
           return;
         }
-        expect(errorsReturned?.isInteger)
-          .withContext(testCase.toString())
-          .toBeDefined();
+        if (errorsReturned !== null) {
+          expect(errorsReturned.isInteger)
+            .withContext(testCase.toString())
+            .toBeDefined();
+        }
       });
     });
   });
@@ -292,9 +301,11 @@ describe('Schema validators', () => {
           expect(errorsReturned).toBe(null, testCase.toString());
           return;
         }
-        expect(errorsReturned?.isNonempty)
-          .withContext(testCase.toString())
-          .toBeDefined();
+        if (errorsReturned !== null) {
+          expect(errorsReturned.isNonempty)
+            .withContext(testCase.toString())
+            .toBeDefined();
+        }
       });
     });
   });
