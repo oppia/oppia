@@ -21,7 +21,6 @@ import 'zone.js';
 // Modules.
 import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
-import {AngularFireModule} from '@angular/fire/compat';
 import {AngularFireAuth, USE_EMULATOR} from '@angular/fire/compat/auth';
 import {provideFirebaseApp, initializeApp} from '@angular/fire/app';
 import {provideAuth, getAuth} from '@angular/fire/auth';
@@ -99,7 +98,6 @@ import {SearchBarModule} from 'pages/library-page/search-bar/search-bar.module';
 import {SubtopicSummaryTileComponent} from './summary-tile/subtopic-summary-tile.component';
 import {FilteredChoicesFieldComponent} from './filter-fields/filtered-choices-field/filtered-choices-field.component';
 import {MultiSelectionFieldComponent} from './filter-fields/multi-selection-field/multi-selection-field.component';
-import {ConceptCardComponent} from './concept-card/concept-card.component';
 import {ScoreRingComponent} from './score-ring/score-ring.component';
 import {CompletionGraphComponent} from './statistics-directives/completion-graph.component';
 import {TutorCardComponent} from 'pages/exploration-player-page/current-lesson-player/learner-experience/tutor-card.component';
@@ -164,8 +162,6 @@ import {VisualizationSortedTilesComponent} from 'visualizations/oppia-visualizat
 import {OppiaVisualizationClickHexbinsComponent} from 'visualizations/oppia-visualization-click-hexbins.directive';
 import {OppiaVisualizationFrequencyTableComponent} from 'visualizations/oppia-visualization-frequency-table.directive';
 import {OppiaVisualizationEnumeratedFrequencyTableComponent} from 'visualizations/oppia-visualization-enumerated-frequency-table.directive';
-import {RandomSelectorComponent} from 'value_generators/templates/random-selector.component';
-import {CopierComponent} from 'value_generators/templates/copier.component';
 import {UndoSnackbarComponent} from './custom-snackbar/undo-snackbar.component';
 import {TranslationModalComponent} from 'pages/contributor-dashboard-page/modal-templates/translation-modal.component';
 import {OppiaCkEditorCopyToolBarModule} from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.module';

@@ -27,7 +27,6 @@ import {
 } from '@angular/router';
 import {Browser, Frame, Target} from 'puppeteer';
 import {getRouteToModuleMapping} from './route-to-module-mapping-generator';
-import {glob} from 'glob';
 
 // A mapping of common modules that many tests use, so by default we will exclude them
 // from being collected. Each excluded module also has an array of globs where if specified

@@ -151,7 +151,7 @@
     "@angular/router": "13.4.0",
     "@angular/youtube-player": "^13.3.9",
     "@asymmetrik/ngx-leaflet": "^8.1.0",
-    "@ctrl/ngx-codemirror": "^4.1.1",
+    "@ctrl/ngx-codemirror": "^5.1.1",
     "@ng-bootstrap/ng-bootstrap": "12.1.2",
     "@ngx-translate/core": "^14.0.0",
     "@ngx-translate/http-loader": "^6.0.0",

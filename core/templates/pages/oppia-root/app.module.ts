@@ -20,11 +20,7 @@ import {HttpClientModule, HTTP_INTERCEPTORS} from '@angular/common/http';
 import {APP_INITIALIZER, NgModule} from '@angular/core';
 
 // Modules.
-import {
-  BrowserModule,
-  HammerGestureConfig,
-  HAMMER_GESTURE_CONFIG,
-} from '@angular/platform-browser';
+import {BrowserModule} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {AppRoutingModule} from './routing/app.routing.module';
 import {provideFirebaseApp, initializeApp} from '@angular/fire/app';
@@ -42,7 +38,6 @@ import {RequestInterceptor} from 'services/request-interceptor.service';
 import {CookieModule} from 'ngx-cookie';
 import {ToastrModule} from 'ngx-toastr';
 import {AngularFireAuth, USE_EMULATOR} from '@angular/fire/compat/auth';
-import {AngularFireModule} from '@angular/fire/compat';
 import {AuthService} from 'services/auth.service';
 import {AppErrorHandlerProvider} from './app-error-handler';
 import {I18nModule} from 'i18n/i18n.module';

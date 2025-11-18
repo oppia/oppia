@@ -22,26 +22,26 @@ import {Directive, EventEmitter, HostListener, Output} from '@angular/core';
   selector: '[swipeDetector]',
 })
 export class SwipeDetectorDirective {
-  // Define the outputs to match the old Hammer.js event names
+  // Define the outputs to match the old Hammer.js event names.
   @Output() swipeleft = new EventEmitter<void>();
   @Output() swiperight = new EventEmitter<void>();
 
   private startX: number = 0;
-  // Minimum horizontal distance in pixels
+  // Minimum horizontal distance in pixels.
   private SWIPE_THRESHOLD_PX: number = 50;
 
   @HostListener('touchstart', ['$event'])
-  onTouchStart(event: TouchEvent) {
-    // Only record the start of the touch
+  onTouchStart(event: TouchEvent): void {
+    // Only record the start of the touch.
     this.startX = event.touches[0].clientX;
   }
 
   @HostListener('touchend', ['$event'])
-  onTouchEnd(event: TouchEvent) {
+  onTouchEnd(event: TouchEvent): void {
     const endX = event.changedTouches[0].clientX;
     const diffX = endX - this.startX;
 
-    // Check if the movement exceeds the threshold
+    // Check if the movement exceeds the threshold.
     if (Math.abs(diffX) > this.SWIPE_THRESHOLD_PX) {
       if (diffX > 0) {
         this.swiperight.emit();
@@ -50,7 +50,7 @@ export class SwipeDetectorDirective {
       }
     }
 
-    // Reset the start position
+    // Reset the start position.
     this.startX = 0;
   }
 }
