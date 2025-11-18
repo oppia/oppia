@@ -30,9 +30,9 @@ import ssl
 import subprocess
 import sys
 import time
+import traceback
 import types
 import warnings
-import traceback
 from http import client
 from urllib import error as urlerror
 from urllib import request as urlrequest
@@ -1088,7 +1088,6 @@ def log_to_terminal(
 
 def print_colored_traceback() -> None:
     """Prints the most recent exception traceback in red color."""
-    import traceback  # pylint: disable=import-outside-toplevel
 
     exc_type, exc_value, exc_tb = sys.exc_info()
     if exc_type is None:
