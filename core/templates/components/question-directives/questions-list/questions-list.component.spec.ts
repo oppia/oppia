@@ -421,7 +421,7 @@ describe('Questions List Component', () => {
   it('should get selected skill id when a question is created', () => {
     // When modal is not shown, then newQuestionSkillIds get the values of
     // skillIds.
-    expect(component.newQuestionSkillIds).toBeUndefined();
+    expect(component.newQuestionSkillIds).toEqual([]);
 
     component.selectSkillModalIsShown = true;
     component.createQuestion();
@@ -471,7 +471,7 @@ describe('Questions List Component', () => {
       SkillDifficulty.create('skillId1', '', 1),
     ];
 
-    expect(component.misconceptionsBySkill).toBeUndefined();
+    expect(component.misconceptionsBySkill).toEqual({});
 
     component.createQuestion();
     tick();
