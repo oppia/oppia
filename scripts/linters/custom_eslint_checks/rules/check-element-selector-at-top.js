@@ -52,7 +52,7 @@ module.exports = {
 
     var checkLocator = function (selectorNode, inNestedSelector) {
       var locatorNode = selectorNode.arguments[0];
-      var upperScopeType = context.getScope().upper.type;
+      var upperScopeType = context.sourceCode.getScope(locatorNode).upper.type;
       if (['global', 'module'].includes(upperScopeType)) {
         return;
       }
