@@ -46,9 +46,9 @@ export class ChapterProgressService {
     this.completedChaptersCount = newCount;
   }
   catch (error) {
-    console.error('Error while updating chapter complete count', error)
+    console.error('Error while updating chapter complete count', error);
     throw error;
-  };
+  }
   }
 
   getCompletedChaptersCount(): number {
