@@ -229,6 +229,8 @@ describe('Tutor card component', () => {
       false
     );
     spyOn(urlService, 'isIframed').and.returnValue(isIframed);
+    spyOn(chapterProgressService,'updateCompletedChaptersCount').and.returnValue(Promise.resolve())
+    spyOn(chapterProgressService,'getCompletedChaptersCount').and.returnValue('1')
     spyOn(deviceInfoService, 'isMobileDevice').and.returnValue(true);
     spyOn(audioBarStatusService, 'isAudioBarExpanded').and.returnValue(true);
     spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValues(
@@ -251,6 +253,7 @@ describe('Tutor card component', () => {
     );
 
     componentInstance.ngOnInit();
+    tick()
     componentInstance.isAudioBarExpandedOnMobileDevice();
     mockOnOppiaFeedbackAvailableEventEmitter.emit();
     mockOnActiveCardChangedEventEmitter.emit();
