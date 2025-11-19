@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import os
 import logging
 import time
 
@@ -572,3 +573,32 @@ class VoiceoverSynthesisAuditJob(VoiceoverSynthesisJob):
     """Audit job for VoiceoverSynthesisJob."""
 
     DATASTORE_UPDATES_ALLOWED = False
+
+
+class AuditEnvVariableAccessFromBeamJob(base_jobs.JobBase):
+    """A one-off job to audit access to environment variables from within
+    Beam jobs.
+    """
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Returns a PCollection of job run result to audit access to environment
+        variables from within Beam jobs.
+
+        Returns:
+            beam.PCollection[job_run_result.JobRunResult]. A PCollection
+            containing job run results with the details of environment variable
+            access.
+        """
+
+        accessed_env_variables = (
+            self.pipeline
+            | 'Create dummy' >> beam.Create([None])
+            | 'Audit env variable access'
+            >> beam.Map(
+                lambda _: os.environ.get('GOOGLE_CLOUD_PROJECT', 'NOT SET')
+            )
+        )
+
+        return accessed_env_variables | 'Format results' >> beam.Map(
+            job_run_result.JobRunResult.as_stdout
+        )
