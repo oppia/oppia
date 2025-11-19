@@ -84,8 +84,15 @@ FRONTEND_TEST_CMDS: Final = [
     '-m',
     'scripts.run_frontend_tests',
     '--check_coverage',
+    '--skip_install',
 ]
-BACKEND_TEST_CMDS: Final = [PYTHON_CMD, '-m', 'scripts.run_backend_tests']
+BACKEND_TEST_CMDS: Final = [
+    PYTHON_CMD,
+    '-m',
+    'scripts.run_backend_tests',
+    '--ignore_coverage',
+    '--skip-install',
+]
 BACKEND_ASSOCIATED_TEST_FILE_CHECK_CMD: Final = [
     PYTHON_CMD,
     '-m',
@@ -353,6 +360,7 @@ def main(args: Optional[List[str]] = None) -> None:
                 continue
 
             if files_to_lint:
+                print('Running backend lint checks...')
                 lint_status = start_linter(files_to_lint)
                 if lint_status != 0:
                     print(
@@ -363,6 +371,7 @@ def main(args: Optional[List[str]] = None) -> None:
             # When using Docker, we run MYPY checks in docker/pre_push_hook.sh
             # itself.
             if not feconf.OPPIA_IS_DOCKERIZED:
+                print('Running mypy checks...')
                 mypy_check_status = execute_mypy_checks()
                 if mypy_check_status != 0:
                     print(
@@ -371,6 +380,7 @@ def main(args: Optional[List[str]] = None) -> None:
                     )
                     sys.exit(mypy_check_status)
 
+            print('Running backend-associated-test-file checks ...')
             backend_associated_test_file_check_status = (
                 run_script_and_get_returncode(
                     BACKEND_ASSOCIATED_TEST_FILE_CHECK_CMD
@@ -385,6 +395,7 @@ def main(args: Optional[List[str]] = None) -> None:
 
             typescript_checks_status = 0
             if does_diff_include_ts_files(files_to_lint):
+                print('Running TypeScript checks ...')
                 typescript_checks_status = run_script_and_get_returncode(
                     TYPESCRIPT_CHECKS_CMDS
                 )
@@ -394,6 +405,7 @@ def main(args: Optional[List[str]] = None) -> None:
 
             strict_typescript_checks_status = 0
             if does_diff_include_ts_files(files_to_lint):
+                print('Running strict TypeScript checks ...')
                 strict_typescript_checks_status = run_script_and_get_returncode(
                     STRICT_TYPESCRIPT_CHECKS_CMDS
                 )
@@ -411,6 +423,7 @@ def main(args: Optional[List[str]] = None) -> None:
                 files_to_lint
             )
             if js_or_ts_files:
+                print('Running frontend tests ...')
                 frontend_test_cmds = FRONTEND_TEST_CMDS.copy()
                 frontend_test_cmds.append('--allow_no_spec')
                 frontend_test_cmds.append(
@@ -422,6 +435,7 @@ def main(args: Optional[List[str]] = None) -> None:
             if frontend_status != 0:
                 print('Push aborted due to failing frontend tests.')
                 sys.exit(1)
+
             if does_diff_include_ci_config_or_test_files(files_to_lint):
                 ci_check_status = run_script_and_get_returncode(
                     TESTS_ARE_CAPTURED_IN_CI_CHECK_CMDS
@@ -432,12 +446,14 @@ def main(args: Optional[List[str]] = None) -> None:
                     'in ci check.'
                 )
                 sys.exit(1)
+
             python_test_files = (
                 git_changes_utils.get_python_dot_test_files_from_diff(
                     files_to_lint
                 )
             )
             if python_test_files:
+                print('Running backend tests ...')
                 backend_test_cmds = BACKEND_TEST_CMDS.copy()
                 backend_test_cmds.append(
                     '--test_targets=%s' % ','.join(python_test_files)

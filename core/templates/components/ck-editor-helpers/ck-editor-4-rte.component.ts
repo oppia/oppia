@@ -232,7 +232,11 @@ export class CkEditor4RteComponent
 
     // Check if there's meaningful content left after cleaning
     // Remove any remaining HTML tags to check for actual text content.
-    let textOnlyContent = validContent.replace(/<[^>]*>/g, '').trim();
+    // See https://stackoverflow.com/a/63875063
+    let tempDiv = document.createElement('div');
+    // eslint-disable-next-line oppia/no-inner-html
+    tempDiv.innerHTML = validContent;
+    let textOnlyContent = tempDiv.textContent?.trim() ?? '';
 
     // Remove all kinds of whitespace characters and HTML entities that aren't visible content.
     textOnlyContent = textOnlyContent
