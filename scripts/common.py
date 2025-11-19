@@ -30,7 +30,7 @@ import ssl
 import subprocess
 import sys
 import time
-import traceback
+import traceback as tb_mod
 import types
 import warnings
 from http import client
@@ -1093,7 +1093,7 @@ def print_colored_traceback() -> None:
     if exc_type is None:
         return
     traceback_text = ''.join(
-        traceback.format_exception(exc_type, exc_value, exc_tb)
+        tb_mod.format_exception(exc_type, exc_value, exc_tb)
     )
     write_stdout_safe(
         f'{LOG_COLORS["ERROR"]}{traceback_text}{LOG_COLORS["END"]}'
@@ -1107,7 +1107,7 @@ def _color_excepthook(
 ) -> None:
     """Handles uncaught exceptions and prints them in red color."""
     traceback_text = ''.join(
-        traceback.format_exception(exc_type, exc_value, exc_tb)
+        tb_mod.format_exception(exc_type, exc_value, exc_tb)
     )
     sys.stderr.write(
         f'{LOG_COLORS["ERROR"]}{traceback_text}{LOG_COLORS["END"]}\n'
