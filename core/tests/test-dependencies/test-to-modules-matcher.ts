@@ -27,7 +27,6 @@ import {
 } from '@angular/router';
 import {Browser, Frame, Target} from 'puppeteer';
 import {getRouteToModuleMapping} from './route-to-module-mapping-generator';
-import {glob} from 'glob';
 
 // A mapping of common modules that many tests use, so by default we will exclude them
 // from being collected. Each excluded module also has an array of globs where if specified
@@ -135,9 +134,8 @@ export class TestToModulesMatcher {
       }
       if (COMMON_MODULES_TO_EXCLUDE[module]) {
         let exclude = true;
-        for (const globPattern of COMMON_MODULES_TO_EXCLUDE[module]) {
-          const globMatcher = new glob.GlobSync(globPattern);
-          exclude = !globMatcher.minimatch.match(this.goldenFilePath);
+        for (const pattern of COMMON_MODULES_TO_EXCLUDE[module]) {
+          exclude = !this.goldenFilePath.includes(pattern.replace(/\*/g, ''));
           if (!exclude) {
             break;
           }
