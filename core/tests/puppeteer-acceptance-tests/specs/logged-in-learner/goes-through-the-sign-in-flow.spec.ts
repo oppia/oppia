@@ -78,7 +78,7 @@ describe('Logged In Learner', function () {
 
     // Verify error message with clear instructions is shown.
     await loggedInUser.expectUsernameError(
-      'Usernames can only have lowercase letters and numbers.'
+      'Usernames can only have alphanumeric characters.'
     );
 
     // Clear the invalid username and sign in with valid username.
@@ -105,6 +105,9 @@ describe('Logged In Learner', function () {
   });
 
   it('should land on navbar', async function () {
+    // Navigate to a page with navbar (learner dashboard).
+    await loggedInUser.navigateToLearnerDashboard();
+
     // Check if "Learn", "About", and "Get Involved" works properly.
     await loggedInUser.expectNavbarToWorkProperly();
 
