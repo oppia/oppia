@@ -19,27 +19,53 @@
  * LI.SI. Learner goes through the sign-in flow
  */
 
+import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
+import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
+
+const ROLES = testConstants.Roles;
 
 describe('Logged In Learner', function () {
   const loggedInUser: LoggedInUser & LoggedOutUser = Object.assign(
     new LoggedInUser(),
     new LoggedOutUser()
   );
+  let releaseCoordinator: ReleaseCoordinator;
+
+  beforeAll(async function () {
+    // Create release coordinator to enable redesigned learner dashboard.
+    releaseCoordinator = await UserFactory.createNewUser(
+      'releaseCoordinator',
+      'release_coordinator@example.com',
+      [ROLES.RELEASE_COORDINATOR]
+    );
+    await releaseCoordinator.enableFeatureFlag(
+      'show_redesigned_learner_dashboard'
+    );
+  }, 300000);
 
   it('should be able to login and see Learner Dashboard', async function () {
     // Click on "Sign In" button and fill email.
     await loggedInUser.openBrowser();
     await loggedInUser.navigateToSignUpPage();
 
-    // Verify the signup page is shown with username field.
+    // Verify the signup page is shown with email input field.
+    await loggedInUser.page.waitForSelector(
+      testConstants.SignInDetails.inputField,
+      {
+        visible: true,
+      }
+    );
+
+    // Enter email and navigate to username page.
+    await loggedInUser.enterEmail('logged_in_user@example.com');
+
+    // Verify username field is now visible.
     await loggedInUser.page.waitForSelector('input.e2e-test-username-input', {
       visible: true,
     });
-
-    await loggedInUser.enterEmail('logged_in_user@example.com');
 
     // Fill an invalid username and verify error message.
     await loggedInUser.typeInInputField(
