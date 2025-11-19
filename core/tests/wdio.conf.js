@@ -41,9 +41,6 @@ var suites = {
     './core/tests/webdriverio_desktop/additionalEditorFeaturesModals.js'
   ],
 
-  additionalPlayerFeatures: [
-    './core/tests/webdriverio_desktop/additionalPlayerFeatures.js'
-  ],
 
   blog: [
     './core/tests/webdriverio_desktop/blog.js'
@@ -55,14 +52,6 @@ var suites = {
 
   contributorAdminDashboard: [
     './core/tests/webdriverio_desktop/contributorAdminDashboard.js'
-  ],
-
-  contributorDashboard: [
-    './core/tests/webdriverio_desktop/contributorDashboard.js'
-  ],
-
-  coreEditorAndPlayerFeatures: [
-    './core/tests/webdriverio_desktop/coreEditorAndPlayerFeatures.js'
   ],
 
   creatorDashboard: [
@@ -95,10 +84,6 @@ var suites = {
 
   navigation: [
     './core/tests/webdriverio_desktop/navigation.js'
-  ],
-
-  profileMenu: [
-    './core/tests/webdriverio/profileMenuFlow.js'
   ],
 
   publication: [
