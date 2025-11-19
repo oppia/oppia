@@ -226,10 +226,20 @@ export class TutorCardComponent {
       this.urlInterpolationService.getStaticCopyrightedImageUrl(
         '/avatar/oppia_avatar_100px.svg'
       );
-      await this.chapterProgressService.updateCompletedChaptersCount(true);
-      this.completedChaptersCount =
+      try {
+        await this.chapterProgressService.updateCompletedChaptersCount(true);
+        this.completedChaptersCount =
         this.chapterProgressService.getCompletedChaptersCount();
-      this.shouldShowProgressBar =
+      } catch (error) {
+        if (error.status === 401){
+          console.error('User is logged out setting default chapters count')
+          this.completedChaptersCount = 0
+        } else {
+          console.error('Error loading the chapter count' , error)
+          this.completedChaptersCount = 0
+        }
+      }
+        this.shouldShowProgressBar =
         this.setNextMilestoneAndCheckIfProgressBarIsShown();
 
     this.directiveSubscriptions.add(
