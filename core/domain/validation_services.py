@@ -74,12 +74,15 @@ def is_email_valid(email_address: str) -> bool:
 
 def validate_html_content(
     html_content: str, rte_format: Optional[str] = None
-) -> None:
+) -> str:
     """Validates HTML content for safety and correctness.
 
     Args:
         html_content: str. The HTML content to validate.
         rte_format: str|None. The RTE format for validation.
+
+    Returns:
+        str. The cleaned HTML content.
 
     Raises:
         ValidationError. The HTML content is not a string.
@@ -105,6 +108,8 @@ def validate_html_content(
                 'Invalid HTML content for RTE format %s: %s'
                 % (rte_format, error_dict)
             )
+    
+    return cleaned_html
 
 
 def validate_tags(tags: List[str], field_name: str = 'tags') -> None:
