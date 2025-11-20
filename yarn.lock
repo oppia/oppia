@@ -3100,6 +3100,11 @@
     "@types/minimatch" "^5.1.2"
     "@types/node" "*"
 
+"@types/google-protobuf@^3.7.4":
+  version "3.15.12"
+  resolved "https://registry.yarnpkg.com/@types/google-protobuf/-/google-protobuf-3.15.12.tgz#eb2ba0eddd65712211a2b455dc6071d665ccf49b"
+  integrity sha512-40um9QqwHjRS92qnOaDpL7RmDK15NuZYo9HihiJRbYkMQZlWnuH8AdvbMy8/o6lgLmKbDUKa+OALCltHdbOTpQ==
+
 "@types/google.visualization@^0.0.55":
   version "0.0.55"
   resolved "https://registry.yarnpkg.com/@types/google.visualization/-/google.visualization-0.0.55.tgz#58ad73cdaf268b65ffd84b93442fa5988dc0887c"
@@ -6105,6 +6110,11 @@ concat-stream@^2.0.0:
     inherits "^2.0.3"
     readable-stream "^3.0.2"
     typedarray "^0.0.6"
+
+conditional-type-checks@^1.0.5:
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/conditional-type-checks/-/conditional-type-checks-1.0.6.tgz#8b857895d624cdb982bc970bd3b318093e44d213"
+  integrity sha512-3vyi+yNcmKq+xl1sTX7Ta+4pUvjusMYbC6FSbrS6YJV8TI51wiRn24u4bfdFVhDKKH5GtpKQzxW7bqXbPWllgQ==
 
 configstore@^4.0.0:
   version "4.0.0"
@@ -9899,6 +9909,11 @@ google-p12-pem@^3.1.3:
   dependencies:
     node-forge "^1.3.1"
 
+google-protobuf@^3.13.0:
+  version "3.21.4"
+  resolved "https://registry.yarnpkg.com/google-protobuf/-/google-protobuf-3.21.4.tgz#2f933e8b6e5e9f8edde66b7be0024b68f77da6c9"
+  integrity sha512-MnG7N936zcKTco4Jd2PX2U96Kf9PxygAPKBug+74LHzmHXmceN16MmRcdgZv+DGef/S9YvQAfRsNCn4cjf9yyQ==
+
 gopd@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/gopd/-/gopd-1.0.1.tgz#29ff76de69dac7489b7c0918a5788e56477c332c"
@@ -10143,10 +10158,10 @@ hash-stream-validation@^0.2.2:
   resolved "https://registry.yarnpkg.com/hash-stream-validation/-/hash-stream-validation-0.2.4.tgz#ee68b41bf822f7f44db1142ec28ba9ee7ccb7512"
   integrity sha512-Gjzu0Xn7IagXVkSu9cSFuK1fqzwtLwFhNhVL8IFJijRNMgUttFbBSIAzKuSIrsFMO1+g1RlsoN49zPIbwPDMGQ==
 
-hash-wasm@^4.4.1:
-  version "4.12.0"
-  resolved "https://registry.yarnpkg.com/hash-wasm/-/hash-wasm-4.12.0.tgz#f9f1a9f9121e027a9acbf6db5d59452ace1ef9bb"
-  integrity sha512-+/2B2rYLb48I/evdOIhP+K/DD2ca2fgBjp6O+GBEnCDk2e4rpeXIK8GvIyRPjTezgmWn9gmKwkQjjx6BtqDHVQ==
+hash-wasm@4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/hash-wasm/-/hash-wasm-4.1.0.tgz#e5c50207599fa4f74f740758a289eabd13d25090"
+  integrity sha512-dXzYEI2URJLaGLuyQ8nei9tmkGCZR7cozWPfl01zZBqxmuaxEAae1MZ14UY8j1R1puvGLgy4oZyxVO+QUjuMIA==
 
 hash.js@^1.0.0, hash.js@^1.0.3:
   version "1.1.7"

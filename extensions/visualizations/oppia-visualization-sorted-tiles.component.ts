@@ -19,7 +19,7 @@
 import {Component, Input, OnInit, ViewChildren} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {AnswerContentModalComponent} from 'components/common-layout-directives/common-elements/answer-content-modal.component';
-import {sumBy} from 'lodash/sumBy';
+import sumBy from 'lodash/sumBy';
 import {AnswerStats} from 'domain/exploration/answer-stats.model';
 import {UtilsService} from 'services/utils.service';
 

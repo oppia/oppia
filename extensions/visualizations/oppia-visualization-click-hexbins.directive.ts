@@ -29,8 +29,8 @@
 
 import {Component, Input, OnInit} from '@angular/core';
 import {hexbin, HexbinBin} from 'd3-hexbin';
-import {maxBy} from 'lodash/maxBy';
-import {sumBy} from 'lodash/sumBy';
+import maxBy from 'lodash/maxBy';
+import sumBy from 'lodash/sumBy';
 import {RGBColor, rgb} from 'd3-color';
 import {
   ImageDimensions,
@@ -78,7 +78,6 @@ export class OppiaVisualizationClickHexbinsComponent implements OnInit {
   hexbins: HexbinBin<ClickOnImageAnswer>[];
   hexagon: string;
   hexagonMesh: string;
-  colorScale: ScaleLinear<RGBColor, RGBColor>;
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
@@ -110,7 +109,7 @@ export class OppiaVisualizationClickHexbinsComponent implements OnInit {
     const minOpacity = 0.25;
     const maxOpacity = 0.75;
 
-    if ((this, maClicks === 0)) {
+    if (this.maxClicks === 0) {
       return rgb(255, 255, 255, minOpacity);
     }
 
@@ -121,7 +120,7 @@ export class OppiaVisualizationClickHexbinsComponent implements OnInit {
     return rgb(255, 255, 255, minOpacity + t * (maxOpacity - minOpacity));
   }
 
-  isTooltipVisible(): void {
+  isTooltipVisible(): boolean {
     return this.tooltipTarget !== null;
   }
 

@@ -18,7 +18,7 @@
  */
 
 import {Injectable} from '@angular/core';
-import {groupBy} from 'lodash/groupBy';
+import groupBy from 'lodash/groupBy';
 
 import {AnswerStats} from 'domain/exploration/answer-stats.model';
 import {States} from 'domain/exploration/states.model';
@@ -208,22 +208,22 @@ export class ExplorationImprovementsTaskRegistryService {
 
     for (const stateName of states.getStateNames()) {
       const playthroughIssuesByType = groupBy(
-        playthroughIssuesByStateName.get(stateName) || [],
+        playthroughIssuesByStateName[stateName] || [],
         p => p.issueType
       );
-      const cstPlaythroughIssues = playthroughIssuesByType.get(
+      const cstPlaythroughIssues = playthroughIssuesByType[
         PlaythroughIssueType.CyclicStateTransitions
-      ) as CstPlaythroughIssue[];
-      const eqPlaythroughIssues = playthroughIssuesByType.get(
+      ] as CstPlaythroughIssue[];
+      const eqPlaythroughIssues = playthroughIssuesByType[
         PlaythroughIssueType.EarlyQuit
-      ) as EqPlaythroughIssue[];
-      const misPlaythroughIssues = playthroughIssuesByType.get(
+      ] as EqPlaythroughIssue[];
+      const misPlaythroughIssues = playthroughIssuesByType[
         PlaythroughIssueType.MultipleIncorrectSubmissions
-      ) as MisPlaythroughIssue[];
+      ] as MisPlaythroughIssue[];
 
       this.registerNewStateTasks(
         stateName,
-        openTasksByStateName.get(stateName) || [],
+        openTasksByStateName[stateName] || [],
         resolvedTaskTypesByStateName.get(stateName) || [],
         topAnswersByStateName.get(stateName) || [],
         cstPlaythroughIssues || [],
