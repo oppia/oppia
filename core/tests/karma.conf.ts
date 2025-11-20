@@ -88,7 +88,6 @@ module.exports = function (config) {
     ],
     exclude: [
       'local_compiled_js/core/templates/**/*-e2e.js',
-      'local_compiled_js/extensions/**/protractor.js',
       'backend_prod_files/extensions/**',
       'core/tests/puppeteer-acceptance-tests/*',
     ],
