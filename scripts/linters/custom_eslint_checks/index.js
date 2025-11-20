@@ -18,7 +18,32 @@
 
 'use strict';
 
-var requireIndex = require('requireindex');
+const fs = require('fs');
+const path = require('path');
 
-// Import all rules in custom_eslint_checks/rules.
+/**
+ * Reads a directory and imports all JavaScript modules found within it,
+ * excluding 'index.js'.
+ * @param {string} dirPath The path to the directory to index.
+ * @returns {Object<string, Module>} An object where keys are filenames
+ *   (minus .js) and values are the required modules.
+ */
+function requireIndex(dirPath) {
+  const modules = {};
+  const resolvedDir = path.resolve(dirPath);
+
+  const files = fs.readdirSync(resolvedDir);
+
+  for (const file of files) {
+    // Only process JavaScript files that are not this index file itself.
+    if (file.endsWith('.js') && file !== 'index.js') {
+      const moduleName = path.basename(file, '.js');
+      modules[moduleName] = require(path.join(resolvedDir, file));
+    }
+  }
+
+  return modules;
+}
+
+// Import all rules in custom_eslint_checks/rules using the replacement function.
 module.exports.rules = requireIndex(__dirname + '/rules');
