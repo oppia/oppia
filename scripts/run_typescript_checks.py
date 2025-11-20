@@ -39,7 +39,6 @@ from . import build
 # @vojtechjelinek first.
 # pylint: disable=line-too-long, single-line-pragma
 TS_STRICT_EXCLUDE_PATHS = [
-    'core/templates/Polyfills.ts',
     'core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts',
     'core/templates/components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts',
     'core/templates/components/common-layout-directives/common-elements/answer-content-modal.component.spec.ts',

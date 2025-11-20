@@ -131,7 +131,6 @@
      {
       "files": ["*.js", "*.ts"],
       "excludedFiles": [
-        "Polyfills.ts",
         "ck-editor-copy-content.service.spec.ts",
         "mathjax.directive.ts",
         "math-expression-content-editor.component.ts",

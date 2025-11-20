@@ -172,20 +172,6 @@ ANALYTICS_CONSTANTS_FILE_PATH = os.path.join(
 
 PORTSERVER_SOCKET_FILEPATH = os.path.join(os.getcwd(), 'portserver.socket')
 
-WEBDRIVER_HOME_PATH = os.path.join(NODE_MODULES_PATH, 'webdriver-manager')
-WEBDRIVER_MANAGER_BIN_PATH = os.path.join(
-    WEBDRIVER_HOME_PATH, 'bin', 'webdriver-manager'
-)
-WEBDRIVER_PROVIDER_PATH = os.path.join(
-    WEBDRIVER_HOME_PATH, 'dist', 'lib', 'provider'
-)
-GECKO_PROVIDER_FILE_PATH = os.path.join(
-    WEBDRIVER_PROVIDER_PATH, 'geckodriver.js'
-)
-CHROME_PROVIDER_FILE_PATH = os.path.join(
-    WEBDRIVER_PROVIDER_PATH, 'chromedriver.js'
-)
-
 WEBDRIVERIO_CONFIG_FILE_PATH = os.path.join('core', 'tests', 'wdio.conf.js')
 NODEMODULES_WDIO_BIN_PATH = os.path.join(NODE_MODULES_PATH, '.bin', 'wdio')
 

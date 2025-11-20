@@ -543,7 +543,6 @@
 /core/domain/change_domain*.py @oppia/lace-backend-reviewers
 /core/templates/tests/ @oppia/lace-frontend-reviewers
 /core/templates/domain/utilities/ @oppia/lace-frontend-reviewers
-/core/templates/Polyfills.ts @oppia/lace-frontend-reviewers
 /extensions/extensions.module.ts @oppia/lace-frontend-reviewers
 /core/schema_utils*.py @oppia/lace-backend-reviewers
 /core/utils*.py @oppia/lace-backend-reviewers

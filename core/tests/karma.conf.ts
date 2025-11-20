@@ -1,9 +1,26 @@
-var argv = require('yargs').positional('terminalEnabled', {
-  type: 'boolean',
-  default: false,
-}).argv;
+// Copyright 2025 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Karma test configuration.
+ */
+
 var path = require('path');
 var webpack = require('webpack');
+
+const args = process.argv;
+const terminalEnabled = args.includes('--terminalEnabled');
 
 // Here we are checking if the specs_to_run flag is provided or not. If it is
 // provided, we are splitting the comma separated string into an array of
@@ -12,15 +29,16 @@ var webpack = require('webpack');
 // a context object which will be used in the webpack.ContextReplacementPlugin
 // to only run the spec files provided in the specs_to_run flag.
 var specsToRun = [];
-if (argv.specs_to_run !== undefined) {
-  specsToRun = argv.specs_to_run.split(',');
+const specsFlagIndex = args.indexOf('--specs_to_run');
+if (specsFlagIndex !== -1 && specsFlagIndex < args.length - 1) {
+  specsToRun = args[specsFlagIndex + 1].split(',');
 }
 
 const SPECS_PATTERN =
   /^(?!.*(puppeteer-acceptance-tests|((valid|invalid)[_-][\w\d.\-])|@nodelib|openapi3-ts|@bcoe)).*((\.s|S)pec\.ts$|(?<!services_sources)\/[\w\d.\-]*(component|controller|directive|service|Factory)\.ts$)(?<!combined-tests\.spec\.ts)(?<!state-content-editor\.directive\.spec\.ts)(?<!music-notes-input\.spec\.ts)(?<!state-interaction-editor\.directive\.spec\.ts)/;
 
 let context = SPECS_PATTERN;
-if (argv.specs_to_run !== undefined) {
+if (specsToRun.length) {
   context = specsToRun.reduce((context, file) => {
     if (!SPECS_PATTERN.test(file)) {
       return context;
@@ -32,7 +50,7 @@ if (argv.specs_to_run !== undefined) {
 }
 
 const webpackPlugins = [];
-if (argv.specs_to_run !== undefined) {
+if (specsToRun.length) {
   webpackPlugins.push(
     new webpack.ContextReplacementPlugin(
       /(:?)/,
@@ -134,7 +152,7 @@ module.exports = function (config) {
     browserConsoleLogOptions: {
       level: 'log',
       format: '%b %T: %m',
-      terminal: argv.terminalEnabled,
+      terminal: terminalEnabled,
     },
     // Continue running in the background after running tests.
     singleRun: true,
