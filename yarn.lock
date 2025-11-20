@@ -10143,7 +10143,7 @@ hash-stream-validation@^0.2.2:
   resolved "https://registry.yarnpkg.com/hash-stream-validation/-/hash-stream-validation-0.2.4.tgz#ee68b41bf822f7f44db1142ec28ba9ee7ccb7512"
   integrity sha512-Gjzu0Xn7IagXVkSu9cSFuK1fqzwtLwFhNhVL8IFJijRNMgUttFbBSIAzKuSIrsFMO1+g1RlsoN49zPIbwPDMGQ==
 
-hash-wasm@^4.12.0:
+hash-wasm@^4.4.1:
   version "4.12.0"
   resolved "https://registry.yarnpkg.com/hash-wasm/-/hash-wasm-4.12.0.tgz#f9f1a9f9121e027a9acbf6db5d59452ace1ef9bb"
   integrity sha512-+/2B2rYLb48I/evdOIhP+K/DD2ca2fgBjp6O+GBEnCDk2e4rpeXIK8GvIyRPjTezgmWn9gmKwkQjjx6BtqDHVQ==
@@ -14129,12 +14129,10 @@ ngx-infinite-scroll@^10.0.1:
     "@scarf/scarf" "^1.1.0"
     opencollective-postinstall "^2.0.2"
 
-ngx-joyride@2.5.0:
-  version "2.5.0"
-  resolved "https://registry.yarnpkg.com/ngx-joyride/-/ngx-joyride-2.5.0.tgz#21452ad0deadb4e49f11f5f940339e8e6e003bfa"
-  integrity sha512-C/J8C4uWZjKl9aMmRBt9egVjuIpwWFplJgBZDl1EfqNVTJkdEC51nt9DpAOuDwOgkbArhJ9sZIk3bZT4vkud/w==
-  dependencies:
-    tslib "^2.0.0"
+ngx-joyride@2.3.1:
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/ngx-joyride/-/ngx-joyride-2.3.1.tgz#5e1ef45d453bc6e7f98f3066feb80bbac8b37044"
+  integrity sha512-5Dlpa9qqagUSqarsUvZkw2+iyPhD5SWYoH9rVC5WRWIL9intT/3Td4PoTp9sQoGzgMKUbX+XDmExky02XD+t9Q==
 
 ngx-mat-select-search@^3.3.0:
   version "3.3.3"
