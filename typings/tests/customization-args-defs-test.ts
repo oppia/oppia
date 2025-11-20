@@ -16,7 +16,6 @@
  * @fileoverview Test for type definitions in customization-args-defs.ts.
  */
 
-import {IsExact, AssertTrue} from 'conditional-type-checks';
 import {
   AlgebraicExpressionInputCustomizationArgs,
   AlgebraicExpressionInputCustomizationArgsBackendDict,
@@ -73,6 +72,13 @@ import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
  * Note: there is a regex test in the backend in customization_args_util_test.py
  * that tests that all interaction ids are covered here.
  */
+
+type IsExact<T, U> =
+  (<G>() => G extends T ? 1 : 2) extends <G>() => G extends U ? 1 : 2
+    ? true
+    : false;
+
+type AssertTrue<T extends true> = T;
 
 // This generic type compares the customization argument frontend dict and
 // backend dict after replacing properties of the backend dict by properties in
