@@ -22,7 +22,7 @@ import datetime
 import types
 
 from core import feconf, utils
-from core.domain import exp_domain, exp_services
+from core.domain import exp_domain, exp_services, user_domain
 from core.platform import models
 from core.tests import test_utils
 
@@ -3542,6 +3542,59 @@ class UserContributionRightsModelTests(test_utils.GenericTestBase):
         user_models.UserContributionRightsModel.apply_deletion_policy(
             'fake_user_id'
         )
+
+def test_save_contribution_rights_creates_new_model_and_sets_timestamps(self) -> None:
+        """Tests that save_contribution_rights correctly creates a new model
+        and sets timestamps.
+        """
+        user_contribution_rights = user_domain.UserContributionRights(
+            'user_id_1', ['en'], [], True, False
+        )
+
+        user_models.UserContributionRightsModel.save_contribution_rights(
+            user_contribution_rights
+        )
+
+        model = user_models.UserContributionRightsModel.get_by_id('user_id_1')
+        self.assertIsNotNone(model)
+        self.assertTrue(model.can_review_questions)
+        self.assertEqual(model.can_review_translation_for_language_codes, ['en'])
+        self.assertIsNotNone(model.created_on)
+        self.assertIsNotNone(model.last_updated)
+        self.assertEqual(model.created_on, model.last_updated)
+
+def test_save_contribution_rights_updates_existing_model_and_timestamps(self) -> None:
+        """Tests that save_contribution_rights correctly updates an existing
+        model and updates timestamps.
+        """
+        user_contribution_rights = user_domain.UserContributionRights(
+            'user_id_2', ['en'], [], True, False
+        )
+
+        user_models.UserContributionRightsModel.save_contribution_rights(
+            user_contribution_rights
+        )
+        model_1 = user_models.UserContributionRightsModel.get_by_id('user_id_2')
+        self.assertIsNotNone(model_1)
+        created_on_first_save = model_1.created_on
+        last_updated_first_save = model_1.last_updated
+        self.assertTrue(model_1.can_review_questions)
+
+        self.mock_datetime_utcnow.set_datetime(
+            self.mock_datetime_utcnow.get_datetime() +
+            datetime.timedelta(seconds=1)
+        )
+
+        user_contribution_rights.can_review_questions = False
+        user_models.UserContributionRightsModel.save_contribution_rights(
+            user_contribution_rights
+        )
+
+        model_2 = user_models.UserContributionRightsModel.get_by_id('user_id_2')
+        self.assertIsNotNone(model_2)
+        self.assertFalse(model_2.can_review_questions)
+        self.assertEqual(model_2.created_on, created_on_first_save)
+        self.assertGreater(model_2.last_updated, last_updated_first_save)
 
 
 class PendingDeletionRequestModelTests(test_utils.GenericTestBase):

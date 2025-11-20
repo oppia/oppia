@@ -838,23 +838,13 @@ def _save_user_contribution_rights(
         user_contribution_rights: UserContributionRights. The
             UserContributionRights object of the user.
     """
-    # TODO(#8794): Add limitation on number of reviewers allowed in any
-    # category.
     user_contribution_rights.validate()
     _update_reviewer_counts_in_community_contribution_stats(
         user_contribution_rights
     )
-    user_models.UserContributionRightsModel(
-        id=user_contribution_rights.id,
-        can_review_translation_for_language_codes=(
-            user_contribution_rights.can_review_translation_for_language_codes
-        ),
-        can_review_voiceover_for_language_codes=(
-            user_contribution_rights.can_review_voiceover_for_language_codes
-        ),
-        can_review_questions=(user_contribution_rights.can_review_questions),
-        can_submit_questions=(user_contribution_rights.can_submit_questions),
-    ).put()
+    user_models.UserContributionRightsModel.save_contribution_rights(
+        user_contribution_rights
+    )
 
 
 def _update_user_contribution_rights(

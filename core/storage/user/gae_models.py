@@ -27,6 +27,7 @@ from core.constants import constants
 from core.platform import models
 
 from typing import (
+    Any,
     Dict,
     Final,
     List,
@@ -2940,6 +2941,42 @@ class UserContributionRightsModel(base_models.BaseModel):
     can_submit_questions = datastore_services.BooleanProperty(
         default=False, indexed=True
     )
+
+    @classmethod
+    def save_contribution_rights(
+        # Here we use type Any because we cannot import UserContributionRights
+        # from core.domain in core.storage due to import restrictions.
+        cls, user_contribution_rights: Any
+    ) -> None:
+        """Saves a UserContributionRights domain object to the datastore
+        using an "upsert" approach to preserve timestamps.
+        """
+        # Get existing model (or None if it doesn't exist).
+        model_instance = cls.get(
+            user_contribution_rights.id, strict=False
+        )
+
+        # If it doesn't exist, create a new one.
+        if model_instance is None:
+            model_instance = cls(id=user_contribution_rights.id)
+
+        # Update all properties from the domain object.
+        model_instance.can_review_translation_for_language_codes = (
+            user_contribution_rights.can_review_translation_for_language_codes
+        )
+        model_instance.can_review_voiceover_for_language_codes = (
+            user_contribution_rights.can_review_voiceover_for_language_codes
+        )
+        model_instance.can_review_questions = (
+            user_contribution_rights.can_review_questions
+        )
+        model_instance.can_submit_questions = (
+            user_contribution_rights.can_submit_questions
+        )
+
+        # Call update_timestamps() and .put() from BaseModel to correctly handle timestamps.
+        model_instance.update_timestamps()
+        model_instance.put()
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
