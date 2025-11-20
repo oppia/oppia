@@ -18,7 +18,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {merge} from 'd3-array';
 import {ExplorationImprovementsConfig} from 'domain/improvements/exploration-improvements-config.model';
 import {HighBounceRateTask} from 'domain/improvements/high-bounce-rate-task.model';
 import {NeedsGuidingResponsesTask} from 'domain/improvements/needs-guiding-response-task.model';
@@ -88,11 +87,11 @@ export class ExplorationImprovementsService {
 
     await this.explorationImprovementsBackendApiService.postTasksAsync(
       this.config.explorationId,
-      merge([
+      [
         this.openHbrTasks.filter(t => t.isObsolete()),
         hbrTasksStillOpen.filter(t => !this.openHbrTasks.includes(t)),
         this.ngrTasksOpenSinceInit.filter(t => t.isResolved()),
-      ])
+      ].flat()
     );
 
     this.openHbrTasks = hbrTasksStillOpen;

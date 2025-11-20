@@ -29,9 +29,9 @@
 
 import {Component, Input, OnInit} from '@angular/core';
 import {hexbin, HexbinBin} from 'd3-hexbin';
-import {max, sum} from 'd3-array';
+import {maxBy} from 'lodash/maxBy';
+import {sumBy} from 'lodash/sumBy';
 import {RGBColor, rgb} from 'd3-color';
-import {ScaleLinear, scaleLinear} from 'd3-scale';
 import {
   ImageDimensions,
   ImagePreloaderService,
@@ -72,6 +72,7 @@ export class OppiaVisualizationClickHexbinsComponent implements OnInit {
   imagePath: string;
   imageSize: ImageDimensions;
   imageUrl: string;
+  maxClicks: number;
   wrapperWidth: number;
   wrapperHeight: number;
   hexbins: HexbinBin<ClickOnImageAnswer>[];
@@ -93,7 +94,7 @@ export class OppiaVisualizationClickHexbinsComponent implements OnInit {
   }
 
   showTooltip(bin: Hexbin): void {
-    if (this.tooltipTarget && bin.length > 0) {
+    if (bin && bin.length > 0) {
       this.tooltipTarget = bin;
     }
   }
@@ -105,11 +106,23 @@ export class OppiaVisualizationClickHexbinsComponent implements OnInit {
   }
 
   getFillColor(b: Hexbin): RGBColor {
-    return this.colorScale(this.getNumClicks(b));
+    const numClicks = this.getNumClicks(b);
+    const minOpacity = 0.25;
+    const maxOpacity = 0.75;
+
+    if ((this, maClicks === 0)) {
+      return rgb(255, 255, 255, minOpacity);
+    }
+
+    // Normalize the input value (find t: 0 to 1)
+    const t = numClicks / this.maxClicks;
+
+    // Use t to set the opacity to the scaled value.
+    return rgb(255, 255, 255, minOpacity + t * (maxOpacity - minOpacity));
   }
 
   isTooltipVisible(): void {
-    this.tooltipTarget !== null;
+    return this.tooltipTarget !== null;
   }
 
   getTooltipNumClicks(): number {
@@ -117,7 +130,7 @@ export class OppiaVisualizationClickHexbinsComponent implements OnInit {
   }
 
   getNumClicks(bin: Hexbin): number {
-    return sum(bin, a => a.frequency);
+    return sumBy(bin, (a: ClickOnImageAnswer) => a.frequency);
   }
 
   ngOnInit(): void {
@@ -149,9 +162,8 @@ export class OppiaVisualizationClickHexbinsComponent implements OnInit {
       .radius(16);
 
     this.hexbins = hexbinGenerator(this.data);
-    this.colorScale = scaleLinear<RGBColor>()
-      .domain([0, max(this.hexbins, this.getNumClicks)])
-      .range([rgb(255, 255, 255, 0.25), rgb(255, 255, 255, 0.75)]);
+    const maxBin = maxBy(this.hexbins, this.getNumClicks);
+    this.maxClicks = maxBin ? this.getNumClicks(maxBin) : 0;
     this.imageUrl = imageUrl;
     this.wrapperWidth = wrapperWidth;
     this.wrapperHeight = wrapperHeight;

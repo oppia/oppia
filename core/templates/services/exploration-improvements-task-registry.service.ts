@@ -18,7 +18,7 @@
  */
 
 import {Injectable} from '@angular/core';
-import {group} from 'd3-array';
+import {groupBy} from 'lodash/groupBy';
 
 import {AnswerStats} from 'domain/exploration/answer-stats.model';
 import {States} from 'domain/exploration/states.model';
@@ -201,13 +201,13 @@ export class ExplorationImprovementsTaskRegistryService {
       ImprovementsConstants.TASK_TYPES.map(taskType => [taskType, []])
     );
 
-    const openTasksByStateName = group(openTasks, t => t.targetId);
-    const playthroughIssuesByStateName = group(playthroughIssues, p =>
+    const openTasksByStateName = groupBy(openTasks, t => t.targetId);
+    const playthroughIssuesByStateName = groupBy(playthroughIssues, p =>
       p.getStateNameWithIssue()
     );
 
     for (const stateName of states.getStateNames()) {
-      const playthroughIssuesByType = group(
+      const playthroughIssuesByType = groupBy(
         playthroughIssuesByStateName.get(stateName) || [],
         p => p.issueType
       );

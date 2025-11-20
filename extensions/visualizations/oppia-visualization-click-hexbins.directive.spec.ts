@@ -108,6 +108,8 @@ describe('Oppia click hexbins visualization', function () {
     component.showTooltip(tooltipTarget);
     tick();
 
+    expect(component.tooltipTarget).not.toBe(null);
+
     component.hideTooltip(tooltipTarget);
     tick();
 
@@ -115,7 +117,7 @@ describe('Oppia click hexbins visualization', function () {
     expect(component.getTooltipNumClicks()).toEqual(2);
   }));
 
-  it('should intialize component', fakeAsync(() => {
+  it('should initialize component', fakeAsync(() => {
     component.ngOnInit();
     tick();
 

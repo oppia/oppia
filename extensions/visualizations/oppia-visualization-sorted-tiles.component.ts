@@ -19,7 +19,7 @@
 import {Component, Input, OnInit, ViewChildren} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {AnswerContentModalComponent} from 'components/common-layout-directives/common-elements/answer-content-modal.component';
-import {sum} from 'd3-array';
+import {sumBy} from 'lodash/sumBy';
 import {AnswerStats} from 'domain/exploration/answer-stats.model';
 import {UtilsService} from 'services/utils.service';
 
@@ -86,7 +86,7 @@ export class VisualizationSortedTilesComponent implements OnInit {
 
   ngOnInit(): void {
     const data = this.data as AnswerStats[];
-    const totalFrequency = this.totalFrequency || sum(data, a => a.frequency);
+    const totalFrequency = this.totalFrequency || sumBy(data, a => a.frequency);
 
     this.isSelected = Array<boolean>(this.data.length).fill(false);
 
