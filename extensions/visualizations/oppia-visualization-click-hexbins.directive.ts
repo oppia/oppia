@@ -156,7 +156,7 @@ export class OppiaVisualizationClickHexbinsComponent implements OnInit {
     this.colorScale = scaleLinear<RGBColor>()
       .domain([0, max(this.hexbins, this.getNumClicks) || 0])
       .range([rgb(255, 255, 255, 0.25), rgb(255, 255, 255, 0.75)]);
-    this.imageUrl = imageUrl || '';
+    this.imageUrl = imageUrl;
     this.wrapperWidth = wrapperWidth;
     this.wrapperHeight = wrapperHeight;
     this.hexagon = hexbinGenerator.hexagon();

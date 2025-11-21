@@ -27,10 +27,10 @@ import {Injectable} from '@angular/core';
 import cloneDeep from 'lodash/cloneDeep';
 
 import {
-  Change,
-  TopicChange,
   BackendChangeObject,
+  Change,
   DomainObject,
+  TopicChange,
 } from 'domain/editor/undo_redo/change.model';
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
 import {TopicDomainConstants} from 'domain/topic/topic-domain.constants';

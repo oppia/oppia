@@ -281,13 +281,7 @@ describe('Base Content Component', () => {
   it('should be able to acknowledge cookies', () => {
     spyOn(window, 'Date')
       .withArgs()
-      // This throws "Argument of type 'Date' is not assignable to parameter of
-      // type 'string'.". We need to suppress this error because DateConstructor
-      // cannot be mocked without it.
       .and.returnValue(new oldDate(NOW_MILLIS))
-      // This throws "Expected 0 arguments, but got 1.". We need to suppress
-      // this error because we pass an argument to the Date constructor in the
-      // component code.
       .withArgs(ONE_YEAR_FROM_NOW_MILLIS)
       .and.callThrough();
     spyOn(cookieService, 'put');

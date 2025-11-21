@@ -38,7 +38,7 @@ from . import build
 # NOTE TO DEVELOPERS: do not add any new files to this list.
 # pylint: disable=line-too-long, single-line-pragma
 TS_STRICT_EXCLUDE_PATHS = [
-    '    core/templates/base-components/base-content.component.spec.ts',
+    'core/templates/base-components/base-content.component.spec.ts',
     'core/templates/base-components/footer-donate-volunteer.component.spec.ts',
     'core/templates/base-components/oppia-footer.component.spec.ts',
     'core/templates/components/button-directives/exploration-embed-button-modal.component.spec.ts',
