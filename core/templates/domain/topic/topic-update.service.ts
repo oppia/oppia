@@ -69,9 +69,9 @@ export class TopicUpdateService {
   // Creates a change using an apply function, reverse function, a change
   // command and related parameters. The change is applied to a given
   // topic.
-  // entity can be a topic object or a subtopic page object.
+  // The input entity can be a Topic, SubtopicPage, or StudyGuide object.
   private _applyChange(
-    entity: DomainObject,
+    entity: Topic | SubtopicPage | StudyGuide,
     command: string,
     params: Record<string, unknown>,
     apply: (
@@ -124,14 +124,8 @@ export class TopicUpdateService {
         new_value: cloneDeep(newValue),
         old_value: cloneDeep(oldValue) || null,
       },
-      apply as (
-        backendChangeObject: TopicChange,
-        domainObject: DomainObject
-      ) => void,
-      reverse as (
-        backendChangeObject: TopicChange,
-        domainObject: DomainObject
-      ) => void
+      apply,
+      reverse
     );
   }
 
@@ -153,14 +147,8 @@ export class TopicUpdateService {
         new_value: cloneDeep(newValue),
         old_value: cloneDeep(oldValue),
       },
-      apply as (
-        backendChangeObject: TopicChange,
-        domainObject: DomainObject
-      ) => void,
-      reverse as (
-        backendChangeObject: TopicChange,
-        domainObject: DomainObject
-      ) => void
+      apply,
+      reverse
     );
   }
 
@@ -182,14 +170,8 @@ export class TopicUpdateService {
         new_value: cloneDeep(newValue),
         old_value: cloneDeep(oldValue),
       },
-      apply as (
-        backendChangeObject: TopicChange,
-        domainObject: DomainObject
-      ) => void,
-      reverse as (
-        backendChangeObject: TopicChange,
-        domainObject: DomainObject
-      ) => void
+      apply,
+      reverse
     );
   }
 
@@ -211,14 +193,8 @@ export class TopicUpdateService {
         new_value: cloneDeep(newValue),
         old_value: cloneDeep(oldValue),
       },
-      apply as (
-        backendChangeObject: TopicChange,
-        domainObject: DomainObject
-      ) => void,
-      reverse as (
-        backendChangeObject: TopicChange,
-        domainObject: DomainObject
-      ) => void
+      apply,
+      reverse
     );
   }
 
@@ -510,20 +486,14 @@ export class TopicUpdateService {
       ((changeDict: TopicChange, topic: Topic) => {
         // ---- Apply ----
         topic.addSubtopic(title);
-      }) as (
-        backendChangeObject: TopicChange,
-        domainObject: DomainObject
-      ) => void,
+      }) as (backendChangeObject: TopicChange, domainObject: Topic) => void,
       ((changeDict: TopicChange, topic: Topic) => {
         // ---- Undo ----
         let subtopicId = this._getSubtopicIdFromChangeDict(
           changeDict
         ) as number;
         topic.deleteSubtopic(subtopicId, true);
-      }) as (
-        backendChangeObject: TopicChange,
-        domainObject: DomainObject
-      ) => void
+      }) as (backendChangeObject: TopicChange, domainObject: Topic) => void
     );
   }
 
@@ -655,17 +625,11 @@ export class TopicUpdateService {
       ((changeDict: TopicChange, topic: Topic) => {
         // ---- Apply ----
         topic.deleteSubtopic(subtopicId, newlyCreated);
-      }) as (
-        backendChangeObject: TopicChange,
-        domainObject: DomainObject
-      ) => void,
+      }) as (backendChangeObject: TopicChange, domainObject: Topic) => void,
       ((changeDict: TopicChange, topic: Topic) => {
         // ---- Undo ----
         throw new Error('A deleted subtopic cannot be restored');
-      }) as (
-        backendChangeObject: TopicChange,
-        domainObject: DomainObject
-      ) => void
+      }) as (backendChangeObject: TopicChange, domainObject: Topic) => void
     );
   }
 
@@ -675,7 +639,7 @@ export class TopicUpdateService {
    */
   moveSkillToSubtopic(
     topic: Topic,
-    oldSubtopicId: number,
+    oldSubtopicId: number | null,
     newSubtopicId: number,
     skillSummary: ShortSkillSummary
   ): void {
@@ -690,7 +654,7 @@ export class TopicUpdateService {
       topic,
       TopicDomainConstants.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
       {
-        old_subtopic_id: oldSubtopicId || null,
+        old_subtopic_id: oldSubtopicId,
         new_subtopic_id: newSubtopicId,
         skill_id: skillSummary.getId(),
       },
@@ -699,9 +663,9 @@ export class TopicUpdateService {
         if (!oldSubtopicId) {
           topic.removeUncategorizedSkill(skillSummary.getId());
         } else {
-          const subtopic = topic.getSubtopicById(oldSubtopicId);
-          if (subtopic) {
-            subtopic.removeSkill(skillSummary.getId());
+          const oldSubtopic = topic.getSubtopicById(oldSubtopicId);
+          if (oldSubtopic) {
+            oldSubtopic.removeSkill(skillSummary.getId());
           }
         }
         const newSubtopicForApply = topic.getSubtopicById(newSubtopicId);
@@ -711,10 +675,7 @@ export class TopicUpdateService {
             skillSummary.getDescription()
           );
         }
-      }) as (
-        backendChangeObject: TopicChange,
-        domainObject: DomainObject
-      ) => void,
+      }) as (backendChangeObject: TopicChange, domainObject: Topic) => void,
       ((changeDict: TopicChange, topic: Topic) => {
         // ---- Undo ----
         const newSubtopicForUndo = topic.getSubtopicById(newSubtopicId);
@@ -727,18 +688,15 @@ export class TopicUpdateService {
             skillSummary.getDescription()
           );
         } else {
-          const subtopic = topic.getSubtopicById(oldSubtopicId);
-          if (subtopic) {
-            subtopic.addSkill(
+          const oldSubtopic = topic.getSubtopicById(oldSubtopicId);
+          if (oldSubtopic) {
+            oldSubtopic.addSkill(
               skillSummary.getId(),
               skillSummary.getDescription()
             );
           }
         }
-      }) as (
-        backendChangeObject: TopicChange,
-        domainObject: DomainObject
-      ) => void
+      }) as (backendChangeObject: TopicChange, domainObject: Topic) => void
     );
   }
 
@@ -774,10 +732,7 @@ export class TopicUpdateService {
             skillSummary.getDescription()
           );
         }
-      }) as (
-        backendChangeObject: TopicChange,
-        domainObject: DomainObject
-      ) => void,
+      }) as (backendChangeObject: TopicChange, domainObject: Topic) => void,
       ((changeDict: TopicChange, topic: Topic) => {
         // ---- Undo ----
         const subtopic = topic.getSubtopicById(subtopicId);
@@ -788,10 +743,7 @@ export class TopicUpdateService {
           );
         }
         topic.removeUncategorizedSkill(skillSummary.getId());
-      }) as (
-        backendChangeObject: TopicChange,
-        domainObject: DomainObject
-      ) => void
+      }) as (backendChangeObject: TopicChange, domainObject: Topic) => void
     );
   }
 
@@ -1080,17 +1032,11 @@ export class TopicUpdateService {
       ((changeDict: TopicChange, topic: Topic) => {
         // ---- Apply ----
         topic.removeAdditionalStory(storyId);
-      }) as (
-        backendChangeObject: TopicChange,
-        domainObject: DomainObject
-      ) => void,
+      }) as (backendChangeObject: TopicChange, domainObject: Topic) => void,
       ((changeDict: TopicChange, topic: Topic) => {
         // ---- Undo ----
         topic.addAdditionalStory(storyId);
-      }) as (
-        backendChangeObject: TopicChange,
-        domainObject: DomainObject
-      ) => void
+      }) as (backendChangeObject: TopicChange, domainObject: Topic) => void
     );
   }
 
@@ -1108,17 +1054,11 @@ export class TopicUpdateService {
       ((changeDict: TopicChange, topic: Topic) => {
         // ---- Apply ----
         topic.removeCanonicalStory(storyId);
-      }) as (
-        backendChangeObject: TopicChange,
-        domainObject: DomainObject
-      ) => void,
+      }) as (backendChangeObject: TopicChange, domainObject: Topic) => void,
       ((changeDict: TopicChange, topic: Topic) => {
         // ---- Undo ----
         topic.addCanonicalStory(storyId);
-      }) as (
-        backendChangeObject: TopicChange,
-        domainObject: DomainObject
-      ) => void
+      }) as (backendChangeObject: TopicChange, domainObject: Topic) => void
     );
   }
 
@@ -1141,17 +1081,11 @@ export class TopicUpdateService {
       ((changeDict: TopicChange, topic: Topic) => {
         // ---- Apply ----
         topic.rearrangeCanonicalStory(fromIndex, toIndex);
-      }) as (
-        backendChangeObject: TopicChange,
-        domainObject: DomainObject
-      ) => void,
+      }) as (backendChangeObject: TopicChange, domainObject: Topic) => void,
       ((changeDict: TopicChange, topic: Topic) => {
         // ---- Undo ----
         topic.rearrangeCanonicalStory(toIndex, fromIndex);
-      }) as (
-        backendChangeObject: TopicChange,
-        domainObject: DomainObject
-      ) => void
+      }) as (backendChangeObject: TopicChange, domainObject: Topic) => void
     );
   }
 
@@ -1176,17 +1110,11 @@ export class TopicUpdateService {
       ((changeDict: TopicChange, topic: Topic) => {
         // ---- Apply ----
         topic.rearrangeSkillInSubtopic(subtopicId, fromIndex, toIndex);
-      }) as (
-        backendChangeObject: TopicChange,
-        domainObject: DomainObject
-      ) => void,
+      }) as (backendChangeObject: TopicChange, domainObject: Topic) => void,
       ((changeDict: TopicChange, topic: Topic) => {
         // ---- Undo ----
         topic.rearrangeSkillInSubtopic(subtopicId, toIndex, fromIndex);
-      }) as (
-        backendChangeObject: TopicChange,
-        domainObject: DomainObject
-      ) => void
+      }) as (backendChangeObject: TopicChange, domainObject: Topic) => void
     );
   }
 
@@ -1205,17 +1133,11 @@ export class TopicUpdateService {
       ((changeDict: TopicChange, topic: Topic) => {
         // ---- Apply ----
         topic.rearrangeSubtopic(fromIndex, toIndex);
-      }) as (
-        backendChangeObject: TopicChange,
-        domainObject: DomainObject
-      ) => void,
+      }) as (backendChangeObject: TopicChange, domainObject: Topic) => void,
       ((changeDict: TopicChange, topic: Topic) => {
         // ---- Undo ----
         topic.rearrangeSubtopic(toIndex, fromIndex);
-      }) as (
-        backendChangeObject: TopicChange,
-        domainObject: DomainObject
-      ) => void
+      }) as (backendChangeObject: TopicChange, domainObject: Topic) => void
     );
   }
 
@@ -1240,10 +1162,7 @@ export class TopicUpdateService {
           'uncategorized_skill_id'
         ) as string;
         topic.removeUncategorizedSkill(newSkillId);
-      }) as (
-        backendChangeObject: TopicChange,
-        domainObject: DomainObject
-      ) => void,
+      }) as (backendChangeObject: TopicChange, domainObject: Topic) => void,
       ((changeDict: TopicChange, topic: Topic) => {
         // ---- Undo ----
         let newSkillId = this._getParameterFromChangeDict(
@@ -1251,10 +1170,7 @@ export class TopicUpdateService {
           'uncategorized_skill_id'
         ) as string;
         topic.addUncategorizedSkill(newSkillId, skillSummary.getDescription());
-      }) as (
-        backendChangeObject: TopicChange,
-        domainObject: DomainObject
-      ) => void
+      }) as (backendChangeObject: TopicChange, domainObject: Topic) => void
     );
   }
 
