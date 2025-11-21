@@ -39,7 +39,6 @@ import {ShortSkillSummary} from 'core/templates/domain/skill/short-skill-summary
 import {SubtitledHtml} from 'core/templates/domain/exploration/subtitled-html.model';
 import {SubtopicPage} from 'core/templates/domain/topic/subtopic-page.model';
 import {RecordedVoiceovers} from 'core/templates/domain/exploration/recorded-voiceovers.model';
-import {Subtopic} from 'domain/topic/subtopic.model';
 import {StudyGuide} from './study-guide.model';
 import {StudyGuideSection} from './study-guide-sections.model';
 
