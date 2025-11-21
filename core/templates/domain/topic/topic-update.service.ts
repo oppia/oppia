@@ -42,23 +42,29 @@ import {RecordedVoiceovers} from 'core/templates/domain/exploration/recorded-voi
 import {StudyGuide} from './study-guide.model';
 import {StudyGuideSection} from './study-guide-sections.model';
 
-type TopicUpdateApply = (topicChange: TopicChange, topic: Topic) => void;
-type TopicUpdateReverse = (topicChange: TopicChange, topic: Topic) => void;
+type TopicUpdateApply = (
+  topicChange: TopicChange,
+  domainObject: DomainObject
+) => void;
+type TopicUpdateReverse = (
+  topicChange: TopicChange,
+  domainObject: DomainObject
+) => void;
 type SubtopicUpdateApply = (
   topicChange: TopicChange,
-  subtopicPage: SubtopicPage
+  domainObject: DomainObject
 ) => void;
 type SubtopicUpdateReverse = (
   topicChange: TopicChange,
-  subtopicPage: SubtopicPage
+  domainObject: DomainObject
 ) => void;
 type StudyGuideUpdateApply = (
   topicChange: TopicChange,
-  studyGuide: StudyGuide
+  domainObject: DomainObject
 ) => void;
 type StudyGuideUpdateReverse = (
   topicChange: TopicChange,
-  studyGuide: StudyGuide
+  domainObject: DomainObject
 ) => void;
 
 @Injectable({
@@ -124,8 +130,8 @@ export class TopicUpdateService {
         new_value: cloneDeep(newValue),
         old_value: cloneDeep(oldValue) || null,
       },
-      apply,
-      reverse
+      apply as any,
+      reverse as any
     );
   }
 
@@ -147,8 +153,8 @@ export class TopicUpdateService {
         new_value: cloneDeep(newValue),
         old_value: cloneDeep(oldValue),
       },
-      apply,
-      reverse
+      apply as any,
+      reverse as any
     );
   }
 
@@ -170,8 +176,8 @@ export class TopicUpdateService {
         new_value: cloneDeep(newValue),
         old_value: cloneDeep(oldValue),
       },
-      apply,
-      reverse
+      apply as any,
+      reverse as any
     );
   }
 
@@ -193,8 +199,8 @@ export class TopicUpdateService {
         new_value: cloneDeep(newValue),
         old_value: cloneDeep(oldValue),
       },
-      apply,
-      reverse
+      apply as any,
+      reverse as any
     );
   }
 
