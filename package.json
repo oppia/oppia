@@ -103,7 +103,7 @@
     "stylelint-order": "^5.0.0",
     "ts-jest": "^28.0.0",
     "ts-loader": "^8.0.0",
-    "ts-morph": "^13.0.0",
+    "ts-morph": "^22.0.0",
     "typescript": "~4.1.6",
     "uglify-js": "^3.5.8",
     "underscore-template-loader": "^1.0.0",
