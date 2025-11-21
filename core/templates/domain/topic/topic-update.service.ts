@@ -140,7 +140,7 @@ export class TopicUpdateService {
     propertyName: string,
     subtopicId: number,
     newValue: string,
-    oldValue: string,
+    oldValue: string | null,
     apply: TopicUpdateApply,
     reverse: TopicUpdateReverse
   ) {
@@ -814,7 +814,7 @@ export class TopicUpdateService {
       TopicDomainConstants.SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME,
       subtopicId,
       thumbnailFilename,
-      oldThumbnailFilename || '',
+      oldThumbnailFilename,
       (changeDict: TopicChange, topic: Topic) => {
         // ---- Apply ----
         let thumbnailFilename = this._getNewPropertyValueFromChangeDict(
@@ -829,7 +829,7 @@ export class TopicUpdateService {
         // ---- Undo ----
         let subtopic = topic.getSubtopicById(subtopicId);
         if (subtopic) {
-          subtopic.setThumbnailFilename(oldThumbnailFilename || '');
+          subtopic.setThumbnailFilename(oldThumbnailFilename);
         }
       }
     );
@@ -854,7 +854,7 @@ export class TopicUpdateService {
       TopicDomainConstants.SUBTOPIC_PROPERTY_URL_FRAGMENT,
       subtopicId,
       urlFragment,
-      oldUrlFragment || '',
+      oldUrlFragment,
       (changeDict: TopicChange, topic: Topic) => {
         // ---- Apply ----
         let newUrlFragment = this._getNewPropertyValueFromChangeDict(
@@ -869,7 +869,7 @@ export class TopicUpdateService {
         // ---- Undo ----
         let subtopic = topic.getSubtopicById(subtopicId);
         if (subtopic) {
-          subtopic.setUrlFragment(oldUrlFragment || '');
+          subtopic.setUrlFragment(oldUrlFragment);
         }
       }
     );
@@ -894,7 +894,7 @@ export class TopicUpdateService {
       TopicDomainConstants.SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR,
       subtopicId,
       thumbnailBgColor,
-      oldThumbnailBgColor || '',
+      oldThumbnailBgColor,
       (changeDict: TopicChange, topic: Topic) => {
         // ---- Apply ----
         let thumbnailBgColor = this._getNewPropertyValueFromChangeDict(
@@ -909,7 +909,7 @@ export class TopicUpdateService {
         // ---- Undo ----
         let subtopic = topic.getSubtopicById(subtopicId);
         if (subtopic) {
-          subtopic.setThumbnailBgColor(oldThumbnailBgColor || '');
+          subtopic.setThumbnailBgColor(oldThumbnailBgColor);
         }
       }
     );

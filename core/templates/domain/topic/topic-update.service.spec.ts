@@ -1246,7 +1246,7 @@ describe('Topic update service', function () {
           2,
           _secondSkillSummary
         );
-      }).toThrowError("Cannot read properties of null (reading 'addSkill')");
+      }).toThrowError("Subtopic with id 2 doesn't exist");
       expect(undoRedoService.getCommittableChangeList()).toEqual([]);
     }
   );

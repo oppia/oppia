@@ -93,7 +93,7 @@ export class Subtopic {
     return this._urlFragment;
   }
 
-  setUrlFragment(urlFragment: string): void {
+  setUrlFragment(urlFragment: string | null): void {
     this._urlFragment = urlFragment;
   }
 
@@ -175,7 +175,7 @@ export class Subtopic {
     }
   }
 
-  setThumbnailFilename(thumbnailFilename: string): void {
+  setThumbnailFilename(thumbnailFilename: string | null): void {
     this._thumbnailFilename = thumbnailFilename;
   }
 
@@ -184,7 +184,7 @@ export class Subtopic {
     return this._thumbnailFilename;
   }
 
-  setThumbnailBgColor(thumbnailBgColor: string): void {
+  setThumbnailBgColor(thumbnailBgColor: string | null): void {
     this._thumbnailBgColor = thumbnailBgColor;
   }
 

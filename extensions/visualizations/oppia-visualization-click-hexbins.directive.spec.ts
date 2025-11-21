@@ -108,11 +108,12 @@ describe('Oppia click hexbins visualization', function () {
     component.showTooltip(tooltipTarget);
     tick();
 
+    expect(component.getTooltipNumClicks()).toEqual(2);
+
     component.hideTooltip(tooltipTarget);
     tick();
 
     expect(component.tooltipTarget).toBe(null);
-    expect(component.getTooltipNumClicks()).toEqual(2);
   }));
 
   it('should intialize component', fakeAsync(() => {
