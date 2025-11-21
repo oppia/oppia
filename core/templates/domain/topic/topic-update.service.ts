@@ -537,7 +537,10 @@ export class TopicUpdateService {
         // ---- Apply ----
         const topic = domainObject as Topic;
         topic.addSubtopic(title);
-      }) as (backendChangeObject: TopicChange, domainObject: Topic) => void,
+      }) as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void,
       ((changeDict: TopicChange, domainObject: DomainObject) => {
         // ---- Undo ----
         const topic = domainObject as Topic;
@@ -545,7 +548,10 @@ export class TopicUpdateService {
           changeDict
         ) as number;
         topic.deleteSubtopic(subtopicId, true);
-      }) as (backendChangeObject: TopicChange, domainObject: Topic) => void
+      }) as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void
     );
   }
 
@@ -678,11 +684,17 @@ export class TopicUpdateService {
         // ---- Apply ----
         const topic = domainObject as Topic;
         topic.deleteSubtopic(subtopicId, newlyCreated);
-      }) as (backendChangeObject: TopicChange, domainObject: Topic) => void,
+      }) as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void,
       ((changeDict: TopicChange, domainObject: DomainObject) => {
         // ---- Undo ----
         throw new Error('A deleted subtopic cannot be restored');
-      }) as (backendChangeObject: TopicChange, domainObject: Topic) => void
+      }) as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void
     );
   }
 
@@ -729,7 +741,10 @@ export class TopicUpdateService {
             skillSummary.getDescription()
           );
         }
-      }) as (backendChangeObject: TopicChange, domainObject: Topic) => void,
+      }) as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void,
       ((changeDict: TopicChange, domainObject: DomainObject) => {
         // ---- Undo ----
         const newSubtopicForUndo = topic.getSubtopicById(newSubtopicId);
@@ -750,7 +765,10 @@ export class TopicUpdateService {
             );
           }
         }
-      }) as (backendChangeObject: TopicChange, domainObject: Topic) => void
+      }) as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void
     );
   }
 
@@ -787,7 +805,10 @@ export class TopicUpdateService {
             skillSummary.getDescription()
           );
         }
-      }) as (backendChangeObject: TopicChange, domainObject: Topic) => void,
+      }) as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void,
       ((changeDict: TopicChange, domainObject: DomainObject) => {
         // ---- Undo ----
         const topic = domainObject as Topic;
@@ -799,7 +820,10 @@ export class TopicUpdateService {
           );
         }
         topic.removeUncategorizedSkill(skillSummary.getId());
-      }) as (backendChangeObject: TopicChange, domainObject: Topic) => void
+      }) as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void
     );
   }
 
@@ -1103,12 +1127,18 @@ export class TopicUpdateService {
         // ---- Apply ----
         const topic = domainObject as Topic;
         topic.removeAdditionalStory(storyId);
-      }) as (backendChangeObject: TopicChange, domainObject: Topic) => void,
+      }) as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void,
       ((changeDict: TopicChange, domainObject: DomainObject) => {
         // ---- Undo ----
         const topic = domainObject as Topic;
         topic.addAdditionalStory(storyId);
-      }) as (backendChangeObject: TopicChange, domainObject: Topic) => void
+      }) as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void
     );
   }
 
@@ -1127,12 +1157,18 @@ export class TopicUpdateService {
         // ---- Apply ----
         const topic = domainObject as Topic;
         topic.removeCanonicalStory(storyId);
-      }) as (backendChangeObject: TopicChange, domainObject: Topic) => void,
+      }) as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void,
       ((changeDict: TopicChange, domainObject: DomainObject) => {
         // ---- Undo ----
         const topic = domainObject as Topic;
         topic.addCanonicalStory(storyId);
-      }) as (backendChangeObject: TopicChange, domainObject: Topic) => void
+      }) as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void
     );
   }
 
@@ -1156,12 +1192,18 @@ export class TopicUpdateService {
         // ---- Apply ----
         const topic = domainObject as Topic;
         topic.rearrangeCanonicalStory(fromIndex, toIndex);
-      }) as (backendChangeObject: TopicChange, domainObject: Topic) => void,
+      }) as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void,
       ((changeDict: TopicChange, domainObject: DomainObject) => {
         // ---- Undo ----
         const topic = domainObject as Topic;
         topic.rearrangeCanonicalStory(toIndex, fromIndex);
-      }) as (backendChangeObject: TopicChange, domainObject: Topic) => void
+      }) as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void
     );
   }
 
@@ -1187,12 +1229,18 @@ export class TopicUpdateService {
         // ---- Apply ----
         const topic = domainObject as Topic;
         topic.rearrangeSkillInSubtopic(subtopicId, fromIndex, toIndex);
-      }) as (backendChangeObject: TopicChange, domainObject: Topic) => void,
+      }) as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void,
       ((changeDict: TopicChange, domainObject: DomainObject) => {
         // ---- Undo ----
         const topic = domainObject as Topic;
         topic.rearrangeSkillInSubtopic(subtopicId, toIndex, fromIndex);
-      }) as (backendChangeObject: TopicChange, domainObject: Topic) => void
+      }) as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void
     );
   }
 
@@ -1212,12 +1260,18 @@ export class TopicUpdateService {
         // ---- Apply ----
         const topic = domainObject as Topic;
         topic.rearrangeSubtopic(fromIndex, toIndex);
-      }) as (backendChangeObject: TopicChange, domainObject: Topic) => void,
+      }) as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void,
       ((changeDict: TopicChange, domainObject: DomainObject) => {
         // ---- Undo ----
         const topic = domainObject as Topic;
         topic.rearrangeSubtopic(toIndex, fromIndex);
-      }) as (backendChangeObject: TopicChange, domainObject: Topic) => void
+      }) as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void
     );
   }
 
@@ -1243,7 +1297,10 @@ export class TopicUpdateService {
           'uncategorized_skill_id'
         ) as string;
         topic.removeUncategorizedSkill(newSkillId);
-      }) as (backendChangeObject: TopicChange, domainObject: Topic) => void,
+      }) as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void,
       ((changeDict: TopicChange, domainObject: DomainObject) => {
         // ---- Undo ----
         const topic = domainObject as Topic;
@@ -1252,7 +1309,10 @@ export class TopicUpdateService {
           'uncategorized_skill_id'
         ) as string;
         topic.addUncategorizedSkill(newSkillId, skillSummary.getDescription());
-      }) as (backendChangeObject: TopicChange, domainObject: Topic) => void
+      }) as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void
     );
   }
 
