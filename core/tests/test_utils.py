@@ -777,7 +777,7 @@ class ElasticSearchStub:
 
         Args:
             index: str. The name of the index to delete the documents from.
-            query: dict. The query that defines which documents to delete.
+            body: dict. The query that defines which documents to delete.
 
         Returns:
             dict. A dict representing the ElasticSearch response.
