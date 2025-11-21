@@ -29,6 +29,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import {
   BackendChangeObject,
   Change,
+  DomainObject,
   TopicChange,
 } from 'domain/editor/undo_redo/change.model';
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
@@ -75,11 +76,11 @@ export class TopicUpdateService {
     params: Record<string, unknown>,
     apply: (
       backendChangeObject: TopicChange,
-      domainObject: Topic | SubtopicPage | StudyGuide
+      domainObject: DomainObject
     ) => void,
     reverse: (
       backendChangeObject: TopicChange,
-      domainObject: Topic | SubtopicPage | StudyGuide
+      domainObject: DomainObject
     ) => void
   ) {
     let changeDict = cloneDeep(params);
@@ -88,11 +89,11 @@ export class TopicUpdateService {
       changeDict as unknown as TopicChange,
       apply as (
         backendChangeObject: BackendChangeObject,
-        domainObject: Topic | SubtopicPage | StudyGuide
+        domainObject: DomainObject
       ) => void,
       reverse as (
         backendChangeObject: BackendChangeObject,
-        domainObject: Topic | SubtopicPage | StudyGuide
+        domainObject: DomainObject
       ) => void
     );
     this.undoRedoService.applyChange(changeObj, entity);
