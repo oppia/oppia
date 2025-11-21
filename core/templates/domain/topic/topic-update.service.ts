@@ -681,7 +681,6 @@ export class TopicUpdateService {
       }) as (backendChangeObject: TopicChange, domainObject: Topic) => void,
       ((changeDict: TopicChange, domainObject: DomainObject) => {
         // ---- Undo ----
-        const topic = domainObject as Topic;
         throw new Error('A deleted subtopic cannot be restored');
       }) as (backendChangeObject: TopicChange, domainObject: Topic) => void
     );
@@ -1075,14 +1074,14 @@ export class TopicUpdateService {
       (changeDict: TopicChange, domainObject: DomainObject) => {
         // ---- Apply ----
         const subtopicpage = domainObject as SubtopicPage;
-        subtopicPage
+        subtopicpage
           .getPageContents()
           .setRecordedVoiceovers(newRecordedVoiceovers);
       },
       (changeDict: TopicChange, domainObject: DomainObject) => {
         // ---- Undo ----
         const subtopicpage = domainObject as SubtopicPage;
-        subtopicPage
+        subtopicpage
           .getPageContents()
           .setRecordedVoiceovers(oldRecordedVoiceovers);
       }
