@@ -130,8 +130,14 @@ export class TopicUpdateService {
         new_value: cloneDeep(newValue),
         old_value: cloneDeep(oldValue) || null,
       },
-      apply as any,
-      reverse as any
+      apply as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void,
+      reverse as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void
     );
   }
 
@@ -153,8 +159,14 @@ export class TopicUpdateService {
         new_value: cloneDeep(newValue),
         old_value: cloneDeep(oldValue),
       },
-      apply as any,
-      reverse as any
+      apply as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void,
+      reverse as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void
     );
   }
 
@@ -176,8 +188,14 @@ export class TopicUpdateService {
         new_value: cloneDeep(newValue),
         old_value: cloneDeep(oldValue),
       },
-      apply as any,
-      reverse as any
+      apply as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void,
+      reverse as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void
     );
   }
 
@@ -199,8 +217,14 @@ export class TopicUpdateService {
         new_value: cloneDeep(newValue),
         old_value: cloneDeep(oldValue),
       },
-      apply as any,
-      reverse as any
+      apply as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void,
+      reverse as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void
     );
   }
 
