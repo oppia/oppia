@@ -76,11 +76,11 @@ export class TopicUpdateService {
     params: Record<string, unknown>,
     apply: (
       backendChangeObject: TopicChange,
-      domainObject: DomainObject
+      domainObject: Topic | SubtopicPage | StudyGuide
     ) => void,
     reverse: (
       backendChangeObject: TopicChange,
-      domainObject: DomainObject
+      domainObject: Topic | SubtopicPage | StudyGuide
     ) => void
   ) {
     let changeDict = cloneDeep(params);
@@ -89,11 +89,11 @@ export class TopicUpdateService {
       changeDict as unknown as TopicChange,
       apply as (
         backendChangeObject: BackendChangeObject,
-        domainObject: DomainObject
+        domainObject: Topic | SubtopicPage | StudyGuide
       ) => void,
       reverse as (
         backendChangeObject: BackendChangeObject,
-        domainObject: DomainObject
+        domainObject: Topic | SubtopicPage | StudyGuide
       ) => void
     );
     this.undoRedoService.applyChange(changeObj, entity);
