@@ -704,29 +704,41 @@ export class TopicUpdateService {
         if (!oldSubtopicId) {
           topic.removeUncategorizedSkill(skillSummary.getId());
         } else {
-          oldSubtopic!.removeSkill(skillSummary.getId());
+          const subtopic = topic.getSubtopicById(oldSubtopicId);
+          if (subtopic) {
+            subtopic.removeSkill(skillSummary.getId());
+          }
         }
-        newSubtopic!.addSkill(
-          skillSummary.getId(),
-          skillSummary.getDescription()
-        );
+        const newSubtopicForApply = topic.getSubtopicById(newSubtopicId);
+        if (newSubtopicForApply) {
+          newSubtopicForApply.addSkill(
+            skillSummary.getId(),
+            skillSummary.getDescription()
+          );
+        }
       }) as (
         backendChangeObject: TopicChange,
         domainObject: DomainObject
       ) => void,
       ((changeDict: TopicChange, topic: Topic) => {
         // ---- Undo ----
-        newSubtopic!.removeSkill(skillSummary.getId());
+        const newSubtopicForUndo = topic.getSubtopicById(newSubtopicId);
+        if (newSubtopicForUndo) {
+          newSubtopicForUndo.removeSkill(skillSummary.getId());
+        }
         if (oldSubtopicId === null) {
           topic.addUncategorizedSkill(
             skillSummary.getId(),
             skillSummary.getDescription()
           );
         } else {
-          oldSubtopic!.addSkill(
-            skillSummary.getId(),
-            skillSummary.getDescription()
-          );
+          const subtopic = topic.getSubtopicById(oldSubtopicId);
+          if (subtopic) {
+            subtopic.addSkill(
+              skillSummary.getId(),
+              skillSummary.getDescription()
+            );
+          }
         }
       }) as (
         backendChangeObject: TopicChange,
@@ -757,7 +769,10 @@ export class TopicUpdateService {
       },
       ((changeDict: TopicChange, topic: Topic) => {
         // ---- Apply ----
-        subtopic!.removeSkill(skillSummary.getId());
+        const subtopic = topic.getSubtopicById(subtopicId);
+        if (subtopic) {
+          subtopic.removeSkill(skillSummary.getId());
+        }
         if (!topic.hasUncategorizedSkill(skillSummary.getId())) {
           topic.addUncategorizedSkill(
             skillSummary.getId(),
@@ -770,7 +785,13 @@ export class TopicUpdateService {
       ) => void,
       ((changeDict: TopicChange, topic: Topic) => {
         // ---- Undo ----
-        subtopic!.addSkill(skillSummary.getId(), skillSummary.getDescription());
+        const subtopic = topic.getSubtopicById(subtopicId);
+        if (subtopic) {
+          subtopic.addSkill(
+            skillSummary.getId(),
+            skillSummary.getDescription()
+          );
+        }
         topic.removeUncategorizedSkill(skillSummary.getId());
       }) as (
         backendChangeObject: TopicChange,
@@ -805,12 +826,16 @@ export class TopicUpdateService {
           changeDict
         ) as string;
         let subtopic = topic.getSubtopicById(subtopicId);
-        subtopic!.setThumbnailFilename(thumbnailFilename);
+        if (subtopic) {
+          subtopic.setThumbnailFilename(thumbnailFilename);
+        }
       },
       (changeDict: TopicChange, topic: Topic) => {
         // ---- Undo ----
         let subtopic = topic.getSubtopicById(subtopicId);
-        subtopic!.setThumbnailFilename(oldThumbnailFilename || '');
+        if (subtopic) {
+          subtopic.setThumbnailFilename(oldThumbnailFilename || '');
+        }
       }
     );
   }
@@ -841,12 +866,16 @@ export class TopicUpdateService {
           changeDict
         ) as string;
         let subtopic = topic.getSubtopicById(subtopicId);
-        subtopic!.setUrlFragment(newUrlFragment);
+        if (subtopic) {
+          subtopic.setUrlFragment(newUrlFragment);
+        }
       },
       (changeDict: TopicChange, topic: Topic) => {
         // ---- Undo ----
         let subtopic = topic.getSubtopicById(subtopicId);
-        subtopic!.setUrlFragment(oldUrlFragment || '');
+        if (subtopic) {
+          subtopic.setUrlFragment(oldUrlFragment || '');
+        }
       }
     );
   }
@@ -877,12 +906,16 @@ export class TopicUpdateService {
           changeDict
         ) as string;
         let subtopic = topic.getSubtopicById(subtopicId);
-        subtopic!.setThumbnailBgColor(thumbnailBgColor);
+        if (subtopic) {
+          subtopic.setThumbnailBgColor(thumbnailBgColor);
+        }
       },
       (changeDict: TopicChange, topic: Topic) => {
         // ---- Undo ----
         let subtopic = topic.getSubtopicById(subtopicId);
-        subtopic!.setThumbnailBgColor(oldThumbnailBgColor || '');
+        if (subtopic) {
+          subtopic.setThumbnailBgColor(oldThumbnailBgColor || '');
+        }
       }
     );
   }
@@ -909,12 +942,16 @@ export class TopicUpdateService {
           changeDict
         ) as string;
         let subtopic = topic.getSubtopicById(subtopicId);
-        subtopic!.setTitle(title);
+        if (subtopic) {
+          subtopic.setTitle(title);
+        }
       },
       (changeDict: TopicChange, topic: Topic) => {
         // ---- Undo ----
         let subtopic = topic.getSubtopicById(subtopicId);
-        subtopic!.setTitle(oldTitle);
+        if (subtopic) {
+          subtopic.setTitle(oldTitle);
+        }
       }
     );
   }

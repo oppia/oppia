@@ -114,7 +114,10 @@ export class OppiaVisualizationClickHexbinsComponent implements OnInit {
   }
 
   getTooltipNumClicks(): number {
-    return this.getNumClicks(this.tooltipTarget!);
+    if (this.tooltipTarget === null) {
+      return 0;
+    }
+    return this.getNumClicks(this.tooltipTarget);
   }
 
   getNumClicks(bin: Hexbin): number {
