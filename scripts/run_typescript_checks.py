@@ -39,16 +39,6 @@ from . import build
 # @vojtechjelinek first.
 # pylint: disable=line-too-long, single-line-pragma
 TS_STRICT_EXCLUDE_PATHS = [
-    'core/templates/Polyfills.ts',
-    'core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts',
-    'core/templates/components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts',
-    'core/templates/components/common-layout-directives/common-elements/answer-content-modal.component.spec.ts',
-    'core/templates/components/common-layout-directives/common-elements/confirm-or-cancel-modal.controller.spec.ts',
-    'core/templates/components/entity-creation-services/story-creation.service.spec.ts',
-    'core/templates/components/entity-creation-services/story-creation.service.ts',
-    'core/templates/components/entity-creation-services/story-creation-backend-api.service.spec.ts',
-    'core/templates/components/entity-creation-services/story-creation-backend-api.service.ts',
-    'core/templates/components/forms/custom-forms-directives/apply-validation.directive.ts',
     'core/templates/components/forms/custom-forms-directives/object-editor.directive.ts',
     'core/templates/components/forms/validators/is-float.filter.spec.ts',
     'core/templates/components/forms/validators/schema-validators.spec.ts',
