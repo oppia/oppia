@@ -6883,6 +6883,38 @@ export class LoggedOutUser extends BaseUser {
   async expectNextCardButtonTextToBe(buttonText: string): Promise<void> {
     await this.expectTextContentToBe(nextCardButton, buttonText);
   }
+
+  /**
+   * Waits for the username input field to be visible on the signup page.
+   */
+  async waitForUsernameInputToBeVisible(): Promise<void> {
+    await this.page.waitForSelector('input.e2e-test-username-input', {
+      visible: true,
+    });
+  }
+
+  /**
+   * Types an invalid username in the username input field and blurs it.
+   * @param {string} invalidUsername - The invalid username to type.
+   */
+  async typeInvalidUsernameInUsernameInput(
+    invalidUsername: string
+  ): Promise<void> {
+    await this.typeInInputField(
+      'input.e2e-test-username-input',
+      invalidUsername
+    );
+    await this.page.evaluate(selector => {
+      document.querySelector(selector).blur();
+    }, 'input.e2e-test-username-input');
+  }
+
+  /**
+   * Clears all text from the username input field.
+   */
+  async clearUsernameInput(): Promise<void> {
+    await this.clearAllTextFrom('input.e2e-test-username-input');
+  }
 }
 
 export let LoggedOutUserFactory = (): LoggedOutUser => new LoggedOutUser();

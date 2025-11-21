@@ -35,28 +35,12 @@ describe('Logged In Learner', function () {
   let releaseCoordinator: ReleaseCoordinator;
 
   beforeAll(async function () {
-    await new Promise(resolve => setTimeout(resolve, 10000));
-
     // Create release coordinator to enable redesigned learner dashboard.
-    let retries = 0;
-    const maxRetries = 5;
-    while (retries < maxRetries) {
-      try {
-        releaseCoordinator = await UserFactory.createNewUser(
-          'releaseCoordinator',
-          'release_coordinator@example.com',
-          [ROLES.RELEASE_COORDINATOR]
-        );
-        break;
-      } catch (error) {
-        retries++;
-        if (retries >= maxRetries) {
-          throw error;
-        }
-        await new Promise(resolve => setTimeout(resolve, 5000));
-      }
-    }
-
+    releaseCoordinator = await UserFactory.createNewUser(
+      'releaseCoordinator',
+      'release_coordinator@example.com',
+      [ROLES.RELEASE_COORDINATOR]
+    );
     await releaseCoordinator.enableFeatureFlag(
       'show_redesigned_learner_dashboard'
     );
@@ -71,18 +55,10 @@ describe('Logged In Learner', function () {
     await loggedInUser.enterEmail('logged_in_user@example.com');
 
     // Verify the signup page is shown with username field after entering email.
-    await loggedInUser.page.waitForSelector('input.e2e-test-username-input', {
-      visible: true,
-    });
+    await loggedInUser.waitForUsernameInputToBeVisible();
 
     // Fill an invalid username and verify error message.
-    await loggedInUser.typeInInputField(
-      'input.e2e-test-username-input',
-      'invalid@user!'
-    );
-    await loggedInUser.page.evaluate(selector => {
-      document.querySelector(selector).blur();
-    }, 'input.e2e-test-username-input');
+    await loggedInUser.typeInvalidUsernameInUsernameInput('invalid@user!');
 
     // Verify error message with clear instructions is shown.
     await loggedInUser.expectUsernameError(
@@ -90,7 +66,7 @@ describe('Logged In Learner', function () {
     );
 
     // Clear the invalid username and sign in with valid username.
-    await loggedInUser.clearAllTextFrom('input.e2e-test-username-input');
+    await loggedInUser.clearUsernameInput();
     await loggedInUser.signInWithUsername('loggedInUser');
 
     // Verify learner is redirected to Learner Dashboard.
@@ -111,7 +87,10 @@ describe('Logged In Learner', function () {
 
   it('should land on navbar', async function () {
     // User should still be logged in from previous test and on learner dashboard.
-    await loggedInUser.navigateToHomeSection();
+    // Navigate to learner dashboard to ensure we're on a page with navbar.
+    // In redesigned dashboard, mobile home section selector doesn't exist,
+    // so we navigate directly to the dashboard.
+    await loggedInUser.navigateToLearnerDashboard();
 
     // Check if "Learn", "About", and "Get Involved" works properly.
     await loggedInUser.expectNavbarToWorkProperly();
