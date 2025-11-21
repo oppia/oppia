@@ -26,7 +26,12 @@ import {Injectable} from '@angular/core';
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import {Change, TopicChange} from 'domain/editor/undo_redo/change.model';
+import {
+  Change,
+  TopicChange,
+  BackendChangeObject,
+  DomainObject,
+} from 'domain/editor/undo_redo/change.model';
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
 import {TopicDomainConstants} from 'domain/topic/topic-domain.constants';
 import {Topic} from 'domain/topic/topic-object.model';
@@ -67,23 +72,39 @@ export class TopicUpdateService {
   // topic.
   // entity can be a topic object or a subtopic page object.
   private _applyChange(
-    entity,
+    entity: DomainObject,
     command: string,
-    params,
-    apply: TopicUpdateApply | SubtopicUpdateApply | StudyGuideUpdateApply,
-    reverse:
-      | TopicUpdateReverse
-      | SubtopicUpdateReverse
-      | StudyGuideUpdateReverse
+    params: Record<string, unknown>,
+    apply: (
+      backendChangeObject: TopicChange,
+      domainObject: DomainObject
+    ) => void,
+    reverse: (
+      backendChangeObject: TopicChange,
+      domainObject: DomainObject
+    ) => void
   ) {
     let changeDict = cloneDeep(params);
     changeDict.cmd = command;
-    let changeObj = new Change(changeDict, apply, reverse);
+    let changeObj = new Change(
+      changeDict as unknown as TopicChange,
+      apply as (
+        backendChangeObject: BackendChangeObject,
+        domainObject: DomainObject
+      ) => void,
+      reverse as (
+        backendChangeObject: BackendChangeObject,
+        domainObject: DomainObject
+      ) => void
+    );
     this.undoRedoService.applyChange(changeObj, entity);
   }
 
-  private _getParameterFromChangeDict(changeDict, paramName: string) {
-    return changeDict[paramName];
+  private _getParameterFromChangeDict(
+    changeDict: TopicChange,
+    paramName: string
+  ): unknown {
+    return changeDict[paramName as keyof TopicChange];
   }
 
   // Applies a topic property change, specifically. See _applyChange()
@@ -104,8 +125,14 @@ export class TopicUpdateService {
         new_value: cloneDeep(newValue),
         old_value: cloneDeep(oldValue) || null,
       },
-      apply,
-      reverse
+      apply as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void,
+      reverse as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void
     );
   }
 
@@ -115,8 +142,8 @@ export class TopicUpdateService {
     subtopicId: number,
     newValue: string,
     oldValue: string,
-    apply: SubtopicUpdateApply,
-    reverse: SubtopicUpdateReverse
+    apply: TopicUpdateApply,
+    reverse: TopicUpdateReverse
   ) {
     this._applyChange(
       topic,
@@ -127,8 +154,14 @@ export class TopicUpdateService {
         new_value: cloneDeep(newValue),
         old_value: cloneDeep(oldValue),
       },
-      apply,
-      reverse
+      apply as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void,
+      reverse as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void
     );
   }
 
@@ -136,8 +169,8 @@ export class TopicUpdateService {
     subtopicPage: SubtopicPage,
     propertyName: string,
     subtopicId: number,
-    newValue,
-    oldValue,
+    newValue: unknown,
+    oldValue: unknown,
     apply: SubtopicUpdateApply,
     reverse: SubtopicUpdateReverse
   ): void {
@@ -150,8 +183,14 @@ export class TopicUpdateService {
         new_value: cloneDeep(newValue),
         old_value: cloneDeep(oldValue),
       },
-      apply,
-      reverse
+      apply as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void,
+      reverse as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void
     );
   }
 
@@ -159,8 +198,8 @@ export class TopicUpdateService {
     studyGuide: StudyGuide,
     propertyName: string,
     subtopicId: number,
-    newValue,
-    oldValue,
+    newValue: unknown,
+    oldValue: unknown,
     apply: StudyGuideUpdateApply,
     reverse: StudyGuideUpdateReverse
   ): void {
@@ -173,16 +212,22 @@ export class TopicUpdateService {
         new_value: cloneDeep(newValue),
         old_value: cloneDeep(oldValue),
       },
-      apply,
-      reverse
+      apply as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void,
+      reverse as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void
     );
   }
 
-  private _getNewPropertyValueFromChangeDict(changeDict) {
+  private _getNewPropertyValueFromChangeDict(changeDict: TopicChange): unknown {
     return this._getParameterFromChangeDict(changeDict, 'new_value');
   }
 
-  private _getSubtopicIdFromChangeDict(changeDict) {
+  private _getSubtopicIdFromChangeDict(changeDict: TopicChange): unknown {
     return this._getParameterFromChangeDict(changeDict, 'subtopic_id');
   }
 
@@ -200,12 +245,14 @@ export class TopicUpdateService {
       TopicDomainConstants.TOPIC_PROPERTY_NAME,
       name,
       oldName,
-      (changeDict, topic) => {
+      (changeDict: TopicChange, topic: Topic) => {
         // ---- Apply ----
-        let name = this._getNewPropertyValueFromChangeDict(changeDict);
+        let name = this._getNewPropertyValueFromChangeDict(
+          changeDict
+        ) as string;
         topic.setName(name);
       },
-      (changeDict, topic) => {
+      (changeDict: TopicChange, topic: Topic) => {
         // ---- Undo ----
         topic.setName(oldName);
       }
@@ -223,12 +270,14 @@ export class TopicUpdateService {
       TopicDomainConstants.TOPIC_PROPERTY_ABBREVIATED_NAME,
       abbreviatedName,
       oldAbbreviatedName,
-      (changeDict, topic) => {
+      (changeDict: TopicChange, topic: Topic) => {
         // ---- Apply ----
-        let name = this._getNewPropertyValueFromChangeDict(changeDict);
+        let name = this._getNewPropertyValueFromChangeDict(
+          changeDict
+        ) as string;
         topic.setAbbreviatedName(name);
       },
-      (changeDict, topic) => {
+      (changeDict: TopicChange, topic: Topic) => {
         // ---- Undo ----
         topic.setAbbreviatedName(oldAbbreviatedName);
       }
@@ -246,13 +295,14 @@ export class TopicUpdateService {
       TopicDomainConstants.TOPIC_PROPERTY_META_TAG_CONTENT,
       metaTagContent,
       oldMetaTagContent,
-      (changeDict, topic) => {
+      (changeDict: TopicChange, topic: Topic) => {
         // ---- Apply ----
-        let metaTagContent =
-          this._getNewPropertyValueFromChangeDict(changeDict);
+        let metaTagContent = this._getNewPropertyValueFromChangeDict(
+          changeDict
+        ) as string;
         topic.setMetaTagContent(metaTagContent);
       },
-      (changeDict, topic) => {
+      (changeDict: TopicChange, topic: Topic) => {
         // ---- Undo ----
         topic.setMetaTagContent(oldMetaTagContent);
       }
@@ -275,13 +325,14 @@ export class TopicUpdateService {
       TopicDomainConstants.TOPIC_PROPERTY_PRACTICE_TAB_IS_DISPLAYED,
       practiceTabIsDisplayed,
       oldPracticeTabIsDisplayed,
-      (changeDict, topic) => {
+      (changeDict: TopicChange, topic: Topic) => {
         // ---- Apply ----
-        let practiceTabIsDisplayed =
-          this._getNewPropertyValueFromChangeDict(changeDict);
+        let practiceTabIsDisplayed = this._getNewPropertyValueFromChangeDict(
+          changeDict
+        ) as boolean;
         topic.setPracticeTabIsDisplayed(practiceTabIsDisplayed);
       },
-      (changeDict, topic) => {
+      (changeDict: TopicChange, topic: Topic) => {
         // ---- Undo ----
         topic.setPracticeTabIsDisplayed(oldPracticeTabIsDisplayed);
       }
@@ -304,13 +355,14 @@ export class TopicUpdateService {
       TopicDomainConstants.TOPIC_PROPERTY_PAGE_TITLE_FRAGMENT_FOR_WEB,
       pageTitleFragmentForWeb,
       oldPageTitleFragmentForWeb,
-      (changeDict, topic) => {
+      (changeDict: TopicChange, topic: Topic) => {
         // ---- Apply ----
-        var pageTitleFragmentForWeb =
-          this._getNewPropertyValueFromChangeDict(changeDict);
+        var pageTitleFragmentForWeb = this._getNewPropertyValueFromChangeDict(
+          changeDict
+        ) as string;
         topic.setPageTitleFragmentForWeb(pageTitleFragmentForWeb);
       },
-      (changeDict, topic) => {
+      (changeDict: TopicChange, topic: Topic) => {
         // ---- Undo ----
         topic.setPageTitleFragmentForWeb(oldPageTitleFragmentForWeb);
       }
@@ -328,13 +380,14 @@ export class TopicUpdateService {
       TopicDomainConstants.TOPIC_PROPERTY_URL_FRAGMENT,
       urlFragment,
       oldUrlFragment,
-      (changeDict, topic) => {
+      (changeDict: TopicChange, topic: Topic) => {
         // ---- Apply ----
-        let newUrlFragment =
-          this._getNewPropertyValueFromChangeDict(changeDict);
+        let newUrlFragment = this._getNewPropertyValueFromChangeDict(
+          changeDict
+        ) as string;
         topic.setUrlFragment(newUrlFragment);
       },
-      (changeDict, topic) => {
+      (changeDict: TopicChange, topic: Topic) => {
         // ---- Undo ----
         topic.setUrlFragment(oldUrlFragment);
       }
@@ -352,13 +405,14 @@ export class TopicUpdateService {
       TopicDomainConstants.TOPIC_PROPERTY_THUMBNAIL_FILENAME,
       thumbnailFilename,
       oldThumbnailFilename,
-      (changeDict, topic) => {
+      (changeDict: TopicChange, topic: Topic) => {
         // ---- Apply ----
-        let thumbnailFilename =
-          this._getNewPropertyValueFromChangeDict(changeDict);
+        let thumbnailFilename = this._getNewPropertyValueFromChangeDict(
+          changeDict
+        ) as string;
         topic.setThumbnailFilename(thumbnailFilename);
       },
-      (changeDict, topic) => {
+      (changeDict: TopicChange, topic: Topic) => {
         // ---- Undo ----
         topic.setThumbnailFilename(oldThumbnailFilename);
       }
@@ -376,13 +430,14 @@ export class TopicUpdateService {
       TopicDomainConstants.TOPIC_PROPERTY_THUMBNAIL_BG_COLOR,
       thumbnailBgColor,
       oldThumbnailBgColor,
-      (changeDict, topic) => {
+      (changeDict: TopicChange, topic: Topic) => {
         // ---- Apply ----
-        let thumbnailBgColor =
-          this._getNewPropertyValueFromChangeDict(changeDict);
+        let thumbnailBgColor = this._getNewPropertyValueFromChangeDict(
+          changeDict
+        ) as string;
         topic.setThumbnailBgColor(thumbnailBgColor);
       },
-      (changeDict, topic) => {
+      (changeDict: TopicChange, topic: Topic) => {
         // ---- Undo ----
         topic.setThumbnailBgColor(oldThumbnailBgColor);
       }
@@ -400,12 +455,14 @@ export class TopicUpdateService {
       TopicDomainConstants.TOPIC_PROPERTY_DESCRIPTION,
       description,
       oldDescription,
-      (changeDict, topic) => {
+      (changeDict: TopicChange, topic: Topic) => {
         // ---- Apply ----
-        var description = this._getNewPropertyValueFromChangeDict(changeDict);
+        var description = this._getNewPropertyValueFromChangeDict(
+          changeDict
+        ) as string;
         topic.setDescription(description);
       },
-      (changeDict, topic) => {
+      (changeDict: TopicChange, topic: Topic) => {
         // ---- Undo ----
         topic.setDescription(oldDescription);
       }
@@ -423,12 +480,14 @@ export class TopicUpdateService {
       TopicDomainConstants.TOPIC_PROPERTY_LANGUAGE_CODE,
       languageCode,
       oldLanguageCode,
-      (changeDict, topic) => {
+      (changeDict: TopicChange, topic: Topic) => {
         // ---- Apply ----
-        let languageCode = this._getNewPropertyValueFromChangeDict(changeDict);
+        let languageCode = this._getNewPropertyValueFromChangeDict(
+          changeDict
+        ) as string;
         topic.setLanguageCode(languageCode);
       },
-      (changeDict, topic) => {
+      (changeDict: TopicChange, topic: Topic) => {
         // ---- Undo ----
         topic.setLanguageCode(oldLanguageCode);
       }
@@ -449,15 +508,23 @@ export class TopicUpdateService {
         title: title,
         url_fragment: urlFragment,
       },
-      (changeDict, topic) => {
+      ((changeDict: TopicChange, topic: Topic) => {
         // ---- Apply ----
         topic.addSubtopic(title);
-      },
-      (changeDict, topic) => {
+      }) as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void,
+      ((changeDict: TopicChange, topic: Topic) => {
         // ---- Undo ----
-        let subtopicId = this._getSubtopicIdFromChangeDict(changeDict);
-        topic.deleteSubtopic(subtopicId);
-      }
+        let subtopicId = this._getSubtopicIdFromChangeDict(
+          changeDict
+        ) as number;
+        topic.deleteSubtopic(subtopicId, true);
+      }) as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void
     );
   }
 
@@ -484,11 +551,13 @@ export class TopicUpdateService {
     if (newlyCreated) {
       // Get the current change list.
       let currentChangeList: Change[] = this.undoRedoService.getChangeList();
-      let indicesToDelete = [];
+      let indicesToDelete: number[] = [];
       // Loop over the current changelist and handle all the cases where
       // a skill moved into the subtopic or moved out of it.
       for (var i = 0; i < currentChangeList.length; i++) {
-        let changeDict = currentChangeList[i].getBackendChangeObject();
+        let changeDict = currentChangeList[
+          i
+        ].getBackendChangeObject() as TopicChange;
         if (
           changeDict.cmd === TopicDomainConstants.CMD_MOVE_SKILL_ID_TO_SUBTOPIC
         ) {
@@ -519,7 +588,7 @@ export class TopicUpdateService {
             // section, as a newly created subtopic wouldn't have any skills
             // of its own initially, and any skills moved into it have been
             // shifted to the uncategorized section.
-            changeDict.old_subtopic_id = null;
+            changeDict.old_subtopic_id = null as unknown as number;
           }
         } else if (
           changeDict.cmd ===
@@ -535,7 +604,9 @@ export class TopicUpdateService {
         currentChangeList[i].setBackendChangeObject(changeDict);
       }
       for (let i = 0; i < currentChangeList.length; i++) {
-        let backendChangeDict = currentChangeList[i].getBackendChangeObject();
+        let backendChangeDict = currentChangeList[
+          i
+        ].getBackendChangeObject() as TopicChange;
         // Check presence of member equivalent of hasOwnProperty
         // https://www.typescriptlang.org/docs/handbook/advanced-types.html
         if ('subtopic_id' in backendChangeDict) {
@@ -582,14 +653,20 @@ export class TopicUpdateService {
       {
         subtopic_id: subtopicId,
       },
-      (changeDict, topic) => {
+      ((changeDict: TopicChange, topic: Topic) => {
         // ---- Apply ----
         topic.deleteSubtopic(subtopicId, newlyCreated);
-      },
-      (changeDict, topic) => {
+      }) as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void,
+      ((changeDict: TopicChange, topic: Topic) => {
         // ---- Undo ----
         throw new Error('A deleted subtopic cannot be restored');
-      }
+      }) as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void
     );
   }
 
@@ -606,46 +683,55 @@ export class TopicUpdateService {
     if (!newSubtopicId) {
       throw new Error('New subtopic cannot be null');
     }
-    let oldSubtopic: Subtopic | null;
+    let oldSubtopic: Subtopic | null = null;
     if (oldSubtopicId) {
       oldSubtopic = topic.getSubtopicById(oldSubtopicId);
     }
     let newSubtopic = topic.getSubtopicById(newSubtopicId);
+    if (!newSubtopic) {
+      throw new Error(`Subtopic with id ${newSubtopicId} doesn't exist`);
+    }
     this._applyChange(
       topic,
       TopicDomainConstants.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
       {
-        old_subtopic_id: oldSubtopicId,
+        old_subtopic_id: oldSubtopicId || null,
         new_subtopic_id: newSubtopicId,
         skill_id: skillSummary.getId(),
       },
-      (changeDict, topic) => {
+      ((changeDict: TopicChange, topic: Topic) => {
         // ---- Apply ----
         if (!oldSubtopicId) {
           topic.removeUncategorizedSkill(skillSummary.getId());
         } else {
-          oldSubtopic.removeSkill(skillSummary.getId());
+          oldSubtopic!.removeSkill(skillSummary.getId());
         }
-        newSubtopic.addSkill(
+        newSubtopic!.addSkill(
           skillSummary.getId(),
           skillSummary.getDescription()
         );
-      },
-      (changeDict, topic) => {
+      }) as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void,
+      ((changeDict: TopicChange, topic: Topic) => {
         // ---- Undo ----
-        newSubtopic.removeSkill(skillSummary.getId());
+        newSubtopic!.removeSkill(skillSummary.getId());
         if (oldSubtopicId === null) {
           topic.addUncategorizedSkill(
             skillSummary.getId(),
             skillSummary.getDescription()
           );
         } else {
-          oldSubtopic.addSkill(
+          oldSubtopic!.addSkill(
             skillSummary.getId(),
             skillSummary.getDescription()
           );
         }
-      }
+      }) as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void
     );
   }
 
@@ -659,6 +745,9 @@ export class TopicUpdateService {
     skillSummary: ShortSkillSummary
   ): void {
     let subtopic = topic.getSubtopicById(subtopicId);
+    if (!subtopic) {
+      throw new Error(`Subtopic with id ${subtopicId} doesn't exist`);
+    }
     this._applyChange(
       topic,
       TopicDomainConstants.CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC,
@@ -666,21 +755,27 @@ export class TopicUpdateService {
         subtopic_id: subtopicId,
         skill_id: skillSummary.getId(),
       },
-      (changeDict, topic) => {
+      ((changeDict: TopicChange, topic: Topic) => {
         // ---- Apply ----
-        subtopic.removeSkill(skillSummary.getId());
+        subtopic!.removeSkill(skillSummary.getId());
         if (!topic.hasUncategorizedSkill(skillSummary.getId())) {
           topic.addUncategorizedSkill(
             skillSummary.getId(),
             skillSummary.getDescription()
           );
         }
-      },
-      (changeDict, topic) => {
+      }) as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void,
+      ((changeDict: TopicChange, topic: Topic) => {
         // ---- Undo ----
-        subtopic.addSkill(skillSummary.getId(), skillSummary.getDescription());
+        subtopic!.addSkill(skillSummary.getId(), skillSummary.getDescription());
         topic.removeUncategorizedSkill(skillSummary.getId());
-      }
+      }) as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void
     );
   }
 
@@ -703,16 +798,19 @@ export class TopicUpdateService {
       TopicDomainConstants.SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME,
       subtopicId,
       thumbnailFilename,
-      oldThumbnailFilename,
-      (changeDict, topic) => {
+      oldThumbnailFilename || '',
+      (changeDict: TopicChange, topic: Topic) => {
         // ---- Apply ----
-        let thumbnailFilename =
-          this._getNewPropertyValueFromChangeDict(changeDict);
-        subtopic.setThumbnailFilename(thumbnailFilename);
+        let thumbnailFilename = this._getNewPropertyValueFromChangeDict(
+          changeDict
+        ) as string;
+        let subtopic = topic.getSubtopicById(subtopicId);
+        subtopic!.setThumbnailFilename(thumbnailFilename);
       },
-      (changeDict, topic) => {
+      (changeDict: TopicChange, topic: Topic) => {
         // ---- Undo ----
-        subtopic.setThumbnailFilename(oldThumbnailFilename);
+        let subtopic = topic.getSubtopicById(subtopicId);
+        subtopic!.setThumbnailFilename(oldThumbnailFilename || '');
       }
     );
   }
@@ -736,16 +834,19 @@ export class TopicUpdateService {
       TopicDomainConstants.SUBTOPIC_PROPERTY_URL_FRAGMENT,
       subtopicId,
       urlFragment,
-      oldUrlFragment,
-      (changeDict, topic) => {
+      oldUrlFragment || '',
+      (changeDict: TopicChange, topic: Topic) => {
         // ---- Apply ----
-        let newUrlFragment =
-          this._getNewPropertyValueFromChangeDict(changeDict);
-        subtopic.setUrlFragment(newUrlFragment);
+        let newUrlFragment = this._getNewPropertyValueFromChangeDict(
+          changeDict
+        ) as string;
+        let subtopic = topic.getSubtopicById(subtopicId);
+        subtopic!.setUrlFragment(newUrlFragment);
       },
-      (changeDict, topic) => {
+      (changeDict: TopicChange, topic: Topic) => {
         // ---- Undo ----
-        subtopic.setUrlFragment(oldUrlFragment);
+        let subtopic = topic.getSubtopicById(subtopicId);
+        subtopic!.setUrlFragment(oldUrlFragment || '');
       }
     );
   }
@@ -769,16 +870,19 @@ export class TopicUpdateService {
       TopicDomainConstants.SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR,
       subtopicId,
       thumbnailBgColor,
-      oldThumbnailBgColor,
-      (changeDict, topic) => {
+      oldThumbnailBgColor || '',
+      (changeDict: TopicChange, topic: Topic) => {
         // ---- Apply ----
-        let thumbnailBgColor =
-          this._getNewPropertyValueFromChangeDict(changeDict);
-        subtopic.setThumbnailBgColor(thumbnailBgColor);
+        let thumbnailBgColor = this._getNewPropertyValueFromChangeDict(
+          changeDict
+        ) as string;
+        let subtopic = topic.getSubtopicById(subtopicId);
+        subtopic!.setThumbnailBgColor(thumbnailBgColor);
       },
-      (changeDict, topic) => {
+      (changeDict: TopicChange, topic: Topic) => {
         // ---- Undo ----
-        subtopic.setThumbnailBgColor(oldThumbnailBgColor);
+        let subtopic = topic.getSubtopicById(subtopicId);
+        subtopic!.setThumbnailBgColor(oldThumbnailBgColor || '');
       }
     );
   }
@@ -799,14 +903,18 @@ export class TopicUpdateService {
       subtopicId,
       title,
       oldTitle,
-      (changeDict, topic) => {
+      (changeDict: TopicChange, topic: Topic) => {
         // ---- Apply ----
-        let title = this._getNewPropertyValueFromChangeDict(changeDict);
-        subtopic.setTitle(title);
+        let title = this._getNewPropertyValueFromChangeDict(
+          changeDict
+        ) as string;
+        let subtopic = topic.getSubtopicById(subtopicId);
+        subtopic!.setTitle(title);
       },
-      (changeDict, topic) => {
+      (changeDict: TopicChange, topic: Topic) => {
         // ---- Undo ----
-        subtopic.setTitle(oldTitle);
+        let subtopic = topic.getSubtopicById(subtopicId);
+        subtopic!.setTitle(oldTitle);
       }
     );
   }
@@ -825,11 +933,11 @@ export class TopicUpdateService {
       subtopicId,
       newSubtitledHtml.toBackendDict(),
       oldSubtitledHtml.toBackendDict(),
-      (changeDict, subtopicPage) => {
+      (changeDict: TopicChange, subtopicPage: SubtopicPage) => {
         // ---- Apply ----
         subtopicPage.getPageContents().setSubtitledHtml(newSubtitledHtml);
       },
-      (changeDict, subtopicPage) => {
+      (changeDict: TopicChange, subtopicPage: SubtopicPage) => {
         // ---- Undo ----
         subtopicPage.getPageContents().setSubtitledHtml(oldSubtitledHtml);
       }
@@ -864,10 +972,10 @@ export class TopicUpdateService {
       oldSections.map(section => {
         return section.toBackendDict();
       }),
-      (changeDict, studyGuide) => {
+      (changeDict: TopicChange, studyGuide: StudyGuide) => {
         studyGuide.setSections(newSections);
       },
-      (changeDict, studyGuide) => {
+      (changeDict: TopicChange, studyGuide: StudyGuide) => {
         studyGuide.setSections(oldSections);
       }
     );
@@ -911,13 +1019,13 @@ export class TopicUpdateService {
       subtopicId,
       newRecordedVoiceovers.toBackendDict(),
       oldRecordedVoiceovers.toBackendDict(),
-      (changeDict, subtopicPage) => {
+      (changeDict: TopicChange, subtopicPage: SubtopicPage) => {
         // ---- Apply ----
         subtopicPage
           .getPageContents()
           .setRecordedVoiceovers(newRecordedVoiceovers);
       },
-      (changeDict, subtopicPage) => {
+      (changeDict: TopicChange, subtopicPage: SubtopicPage) => {
         // ---- Undo ----
         subtopicPage
           .getPageContents()
@@ -937,14 +1045,20 @@ export class TopicUpdateService {
       {
         story_id: storyId,
       },
-      (changeDict, topic) => {
+      ((changeDict: TopicChange, topic: Topic) => {
         // ---- Apply ----
         topic.removeAdditionalStory(storyId);
-      },
-      (changeDict, topic) => {
+      }) as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void,
+      ((changeDict: TopicChange, topic: Topic) => {
         // ---- Undo ----
         topic.addAdditionalStory(storyId);
-      }
+      }) as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void
     );
   }
 
@@ -959,14 +1073,20 @@ export class TopicUpdateService {
       {
         story_id: storyId,
       },
-      (changeDict, topic) => {
+      ((changeDict: TopicChange, topic: Topic) => {
         // ---- Apply ----
         topic.removeCanonicalStory(storyId);
-      },
-      (changeDict, topic) => {
+      }) as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void,
+      ((changeDict: TopicChange, topic: Topic) => {
         // ---- Undo ----
         topic.addCanonicalStory(storyId);
-      }
+      }) as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void
     );
   }
 
@@ -986,14 +1106,20 @@ export class TopicUpdateService {
         from_index: fromIndex,
         to_index: toIndex,
       },
-      (changeDict, topic) => {
+      ((changeDict: TopicChange, topic: Topic) => {
         // ---- Apply ----
         topic.rearrangeCanonicalStory(fromIndex, toIndex);
-      },
-      (changeDict, topic) => {
+      }) as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void,
+      ((changeDict: TopicChange, topic: Topic) => {
         // ---- Undo ----
         topic.rearrangeCanonicalStory(toIndex, fromIndex);
-      }
+      }) as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void
     );
   }
 
@@ -1015,14 +1141,20 @@ export class TopicUpdateService {
         from_index: fromIndex,
         to_index: toIndex,
       },
-      (changeDict, topic) => {
+      ((changeDict: TopicChange, topic: Topic) => {
         // ---- Apply ----
         topic.rearrangeSkillInSubtopic(subtopicId, fromIndex, toIndex);
-      },
-      (changeDict, topic) => {
+      }) as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void,
+      ((changeDict: TopicChange, topic: Topic) => {
         // ---- Undo ----
         topic.rearrangeSkillInSubtopic(subtopicId, toIndex, fromIndex);
-      }
+      }) as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void
     );
   }
 
@@ -1038,14 +1170,20 @@ export class TopicUpdateService {
         from_index: fromIndex,
         to_index: toIndex,
       },
-      (changeDict, topic) => {
+      ((changeDict: TopicChange, topic: Topic) => {
         // ---- Apply ----
         topic.rearrangeSubtopic(fromIndex, toIndex);
-      },
-      (changeDict, topic) => {
+      }) as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void,
+      ((changeDict: TopicChange, topic: Topic) => {
         // ---- Undo ----
         topic.rearrangeSubtopic(toIndex, fromIndex);
-      }
+      }) as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void
     );
   }
 
@@ -1063,22 +1201,28 @@ export class TopicUpdateService {
       {
         uncategorized_skill_id: skillSummary.getId(),
       },
-      (changeDict, topic) => {
+      ((changeDict: TopicChange, topic: Topic) => {
         // ---- Apply ----
         let newSkillId = this._getParameterFromChangeDict(
           changeDict,
           'uncategorized_skill_id'
-        );
+        ) as string;
         topic.removeUncategorizedSkill(newSkillId);
-      },
-      (changeDict, topic) => {
+      }) as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void,
+      ((changeDict: TopicChange, topic: Topic) => {
         // ---- Undo ----
         let newSkillId = this._getParameterFromChangeDict(
           changeDict,
           'uncategorized_skill_id'
-        );
+        ) as string;
         topic.addUncategorizedSkill(newSkillId, skillSummary.getDescription());
-      }
+      }) as (
+        backendChangeObject: TopicChange,
+        domainObject: DomainObject
+      ) => void
     );
   }
 
@@ -1109,12 +1253,12 @@ export class TopicUpdateService {
       TopicDomainConstants.TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST,
       newSkillIdsForDiagnosticTest,
       oldSkillIdsForDiagnosticTest,
-      (changeDict, topic) => {
+      (changeDict: TopicChange, topic: Topic) => {
         topic.setSkillSummariesForDiagnosticTest(
           newSkillSummariesForDiagnosticTest
         );
       },
-      (changeDict, topic) => {
+      (changeDict: TopicChange, topic: Topic) => {
         topic.setSkillSummariesForDiagnosticTest(
           oldSkillSummariesForDiagnosticTest
         );
