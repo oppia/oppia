@@ -40,11 +40,6 @@ describe('Oppia click hexbins visualization', function () {
   let assetsBackendApiService: AssetsBackendApiService;
   let bannerDe: DebugElement;
   let bannerEl: HTMLElement;
-  let tooltipTarget = {
-    x: 0,
-    y: 0,
-    length: 10,
-  } as Hexbin;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -72,8 +67,6 @@ describe('Oppia click hexbins visualization', function () {
     spyOn(assetsBackendApiService, 'getImageUrlForPreview').and.returnValue(
       'url'
     );
-
-    component.tooltipTarget = tooltipTarget;
     component.data = [
       {answer: {clickPosition: [0.03, 0.03], clickedRegions: []}, frequency: 2},
       {answer: {clickPosition: [0.5, 0.5], clickedRegions: []}, frequency: 1},
@@ -105,21 +98,49 @@ describe('Oppia click hexbins visualization', function () {
   it('should showTooltip', fakeAsync(() => {
     spyOn(component, 'getNumClicks').and.returnValue(2);
 
-    component.showTooltip(tooltipTarget);
+    const mockHexbin = Object.assign(
+      [
+        {
+          answer: {
+            clickPosition: [0.03, 0.03] as [number, number],
+            clickedRegions: ['region1'],
+          },
+          frequency: 2,
+        },
+      ],
+      {x: 0, y: 0}
+    ) as unknown as Hexbin;
+
+    component.showTooltip(mockHexbin);
     tick();
 
-    expect(component.tooltipTarget).not.toBe(null);
+    expect(component.tooltipTarget).not.toBeNull();
 
-    component.hideTooltip(tooltipTarget);
+    component.hideTooltip(mockHexbin);
     tick();
 
-    expect(component.tooltipTarget).toBe(null);
+    expect(component.tooltipTarget).toBeNull();
     expect(component.getTooltipNumClicks()).toEqual(2);
   }));
 
   it('should initialize component', fakeAsync(() => {
     component.ngOnInit();
     tick();
+
+    const mockHexbin = Object.assign(
+      [
+        {
+          answer: {
+            clickPosition: [0.03, 0.03] as [number, number],
+            clickedRegions: ['region1'],
+          },
+          frequency: 2,
+        },
+      ],
+      {x: 0, y: 0}
+    ) as unknown as Hexbin;
+
+    component.tooltipTarget = mockHexbin;
 
     expect(component.getTooltipStyle()).toEqual({
       left: '0px',

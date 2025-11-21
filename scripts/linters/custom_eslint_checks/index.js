@@ -28,7 +28,7 @@ const path = require('path');
  * @returns {Object<string, Module>} An object where keys are filenames
  *   (minus .js) and values are the required modules.
  */
-function requireIndex(dirPath) {
+const requireIndex = function (dirPath) {
   const modules = {};
   const resolvedDir = path.resolve(dirPath);
 
@@ -43,7 +43,7 @@ function requireIndex(dirPath) {
   }
 
   return modules;
-}
+};
 
 // Import all rules in custom_eslint_checks/rules using the replacement function.
 module.exports.rules = requireIndex(__dirname + '/rules');
