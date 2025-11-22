@@ -80,7 +80,8 @@ describe('Oppia click hexbins visualization', function () {
       {x: 0, y: 0}
     ) as Hexbin;
 
-    component.tooltipTarget = tooltipTarget;
+    // Make the tooltip hidden by default.
+    component.tooltipTarget = null;
     component.data = [
       {answer: {clickPosition: [0.03, 0.03], clickedRegions: []}, frequency: 2},
       {answer: {clickPosition: [0.5, 0.5], clickedRegions: []}, frequency: 1},
