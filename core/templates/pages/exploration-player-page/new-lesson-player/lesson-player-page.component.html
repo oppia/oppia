@@ -1,11 +1,11 @@
 <div class="lesson-player-page-container">
   <oppia-player-header></oppia-player-header>
+  <oppia-lesson-player-sidebar *ngIf="!pageIsIframed"></oppia-lesson-player-sidebar>
   <div *ngIf="isLoadingExploration" class="loader-container">
     <oppia-loading-message [message]="'Loading'"></oppia-loading-message>
   </div>
   <div class="oppia-new-player-content">
-    <oppia-lesson-player-sidebar *ngIf="!pageIsIframed"></oppia-lesson-player-sidebar>
-    <div class="oppia-new-player-main-content">
+    <div class="oppia-new-player-main-content" [ngClass]="{'expanded-sidebar': getSidebarIsExpanded()}">
       <oppia-new-audio-bar *ngIf="!pageIsIframed"></oppia-new-audio-bar>
       <div class="conversation-wrapper">
         <oppia-new-conversation-skin></oppia-new-conversation-skin>
@@ -13,4 +13,5 @@
     </div>
   </div>
   <oppia-on-screen-keyboard></oppia-on-screen-keyboard>
+  <attribution-guide></attribution-guide>
 </div>

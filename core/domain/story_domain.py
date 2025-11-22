@@ -2639,6 +2639,7 @@ class StoryChapterProgressSummaryDict(TypedDict):
     exploration_id: str
     visited_checkpoints_count: int
     total_checkpoints_count: int
+    is_chapter_complete: bool
 
 
 class StoryPublicationTimeliness:

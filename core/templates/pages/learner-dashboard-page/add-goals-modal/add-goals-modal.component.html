@@ -32,8 +32,10 @@
   }
 
   .oppia-learner-dash-button--modal {
+    flex: 1 1 auto;
     height: 44px;
-    width: 178px;
+    max-width: 178px;
+    min-width: 95px;
   }
 
   .oppia-learner-dash-button--modal.outline {
@@ -85,40 +87,23 @@
   }
 
 
-  @media screen and (max-width: 576px) {
-    .oppia-learner-dash-goals-modal-actions {
-      gap: 0;
-    }
-
+  @media screen and (max-width: 1024px) {
     .oppia-learner-dash-button--modal {
-      max-width: 45%;
-      width: 147px;
+      max-width: 85%;
     }
 
     .oppia-learner-dash-goals-modal-content {
-      align-items: center;
+      align-items: flex-start;
       display: flex;
       flex-direction: column;
       gap: 12px 0;
       height: fit-content;
-      padding: 12px;
+      padding: 20px 16px;
     }
-  }
 
-  @media screen and (max-width: 767px) {
     .oppia-learner-dash-goals-modal-actions {
       flex-grow: 1;
       justify-content: center;
-    }
-
-    .oppia-learner-dash-goals-modal-content {
-      gap: 16px 8px;
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-  @media screen and (max-width: 480px) {
-    .oppia-learner-dash-goals-modal-content {
-      padding: 20px 16px;
     }
 
     .oppia-learner-dash-goals-checkbox {
@@ -128,23 +113,13 @@
     }
   }
 
-@media screen and (max-width: 360px) {
-  .mat-dialog-actions .mat-button-base+.mat-button-base,
-  .mat-dialog-actions .mat-mdc-button-base+.mat-mdc-button-base {
-    margin-left: 0 !important;
-    margin-top: 8px;
+   @media screen and (max-width: 576px) {
+    .oppia-learner-dash-goals-modal-actions {
+      gap: 0 0;
+    }
+    .oppia-learner-dash-button--modal {
+      flex: 1 1 45%;
+    }
   }
-
-  .oppia-learner-dash-goals-modal-actions {
-    align-items: stretch;
-    gap: 0;
-  }
-
-  .oppia-learner-dash-button--modal {
-    max-width: none !important;
-    width: 100% !important;
-  }
-}
-
 
 </style>

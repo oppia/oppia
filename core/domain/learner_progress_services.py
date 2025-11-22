@@ -354,8 +354,18 @@ def mark_topic_as_learnt(user_id: str, topic_id: str) -> None:
     )
     completed_story_ids = get_all_completed_story_ids(user_id)
 
+    valid_story_ids = []
+    for story_id in all_story_ids_in_topic:
+        story = story_fetchers.get_story_by_id(story_id)
+        if (
+            story
+            and story.story_contents
+            and len(story.story_contents.nodes) > 0
+        ):
+            valid_story_ids.append(story_id)
+
     all_completed = all(
-        story_id in completed_story_ids for story_id in all_story_ids_in_topic
+        story_id in completed_story_ids for story_id in valid_story_ids
     )
 
     if not all_completed:

@@ -13,7 +13,7 @@
           *ngIf="avatarImageIsShown">
     <div class="oppia-rte-viewer oppia-learner-view-card-top-content"
           [ngClass]="getContentAudioHighlightClass()">
-      <div tabindex="0">
+      <div>
         <oppia-rte-output-display [rteString]="displayedCard.getContentHtml()">
         </oppia-rte-output-display>
       </div>
@@ -77,7 +77,7 @@
                                     [nextLessonLink]="nextLessonLink">
   </oppia-new-ratings-and-recommendations>
 
-  <ng-container *ngIf="displayedCardWasCompletedInPrevSession && !conceptCardIsBeingShown && (displayedCard.getInteractionId() != 'Continue')">
+  <ng-container *ngIf="displayedCardWasCompletedInPrevSession && !conceptCardIsBeingShown">
     <div class="conversation-skin-oppia-completed-state-card">
       <svg width="30" class="left-side-curve" height="24" viewBox="0 0 30 24" fill="none" xmlns="http://www.w3.org/2000/svg"
         [ngStyle]="isLanguageRTL() ? {'transform': 'scaleX(-1)'} : {}">
@@ -91,7 +91,7 @@
   </ng-container>
 </div>
 
-<oppia-hint-solution-and-concept-card-display></oppia-hint-solution-and-concept-card-display>
+<oppia-hint-solution-and-concept-card-display *ngIf="isInExplorationPlayerContext()"></oppia-hint-solution-and-concept-card-display>
 
 
 <!--

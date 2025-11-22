@@ -21,10 +21,12 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {TopicViewerDomainConstants} from 'domain/topic_viewer/topic-viewer-domain.constants';
 import {Input} from '@angular/core';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {ChapterLabelVisibilityService} from 'services/chapter-label-visibility.service';
 import {AppConstants} from 'app.constants';
 import {StorySummary} from 'domain/story/story-summary.model';
 import {StoryNode} from 'domain/story/story-node.model';
 import {UrlService} from 'services/contextual/url.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 @Component({
   selector: 'oppia-learner-story-summary-tile',
@@ -56,7 +58,9 @@ export class LearnerStorySummaryTileComponent implements OnInit {
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private assetsBackendApiService: AssetsBackendApiService,
-    private urlService: UrlService
+    private chapterLabelVisibilityService: ChapterLabelVisibilityService,
+    private urlService: UrlService,
+    private platformFeatureService: PlatformFeatureService
   ) {}
 
   getStoryLink(): string {
@@ -159,6 +163,18 @@ export class LearnerStorySummaryTileComponent implements OnInit {
       return '-webkit-filter: blur(2px); filter: blur(2px);';
     }
     return 'height: 144px; width: 192px;';
+  }
+
+  isSerialChapterFeatureLearnerFlagEnabled(): boolean {
+    return this.platformFeatureService.status.SerialChapterLaunchLearnerView
+      .isEnabled;
+  }
+
+  isNewChapterLabelVisible(): boolean {
+    return this.chapterLabelVisibilityService.isNewChapterLabelVisible(
+      this.storyNode,
+      this.storySummary
+    );
   }
 
   onStoryClick(event: Event): void {
