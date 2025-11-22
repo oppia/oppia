@@ -257,7 +257,8 @@ class StudyGuidePageContentsDict(TypedDict):
     """
 
     subtitled_html: state_domain.SubtitledHtmlDict
-    recorded_voiceovers: state_domain.RecordedVoiceoversDict
+    recorded_voiceovers: dict
+    written_translations: dict
 
 
 class StudyGuideAndroidDict(TypedDict):
@@ -357,6 +358,7 @@ class StudyGuide:
                     'html': concatenated_html,
                 },
                 'recorded_voiceovers': {},
+                'written_translations': {},
             },
             'page_contents_schema_version': self.sections_schema_version,
             'language_code': self.language_code,
