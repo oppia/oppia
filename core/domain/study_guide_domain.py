@@ -354,7 +354,8 @@ class StudyGuide:
                 'subtitled_html': {
                     'content_id': 'content',
                     'html': concatenated_html,
-                }
+                },
+                'recorded_voiceovers': {},
             },
             'page_contents_schema_version': self.sections_schema_version,
             'language_code': self.language_code,
