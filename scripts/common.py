@@ -30,7 +30,7 @@ import ssl
 import subprocess
 import sys
 import time
-import traceback as tb_mod
+import traceback
 import types
 import warnings
 from http import client
@@ -732,7 +732,7 @@ class CD:
         self.saved_path = os.getcwd()
         os.chdir(self.new_path)
 
-    def __exit__(self, etype: str, value: str, traceback: str) -> None:
+    def __exit__(self, etype: str, value: str, tb: str) -> None:
         assert self.saved_path is not None
         os.chdir(self.saved_path)
 
@@ -1064,8 +1064,7 @@ LOG_COLORS: Dict[str, str] = {
 
 
 def log_to_terminal(
-    message: str,
-    message_type: Optional[LogType] = None
+    message: str, message_type: Optional[LogType] = None
 ) -> None:
     """Logs a message to the terminal with color formatting."""
     if not isinstance(message_type, LogType):
@@ -1093,7 +1092,7 @@ def print_colored_traceback() -> None:
     if exc_type is None:
         return
     traceback_text = ''.join(
-        tb_mod.format_exception(exc_type, exc_value, exc_tb)
+        traceback.format_exception(exc_type, exc_value, exc_tb)
     )
     write_stdout_safe(
         f'{LOG_COLORS["ERROR"]}{traceback_text}{LOG_COLORS["END"]}'
@@ -1103,11 +1102,11 @@ def print_colored_traceback() -> None:
 def _color_excepthook(
     exc_type: type[BaseException],
     exc_value: BaseException,
-    exc_tb: Optional[types.TracebackType]
+    exc_tb: Optional[types.TracebackType],
 ) -> None:
     """Handles uncaught exceptions and prints them in red color."""
     traceback_text = ''.join(
-        tb_mod.format_exception(exc_type, exc_value, exc_tb)
+        traceback.format_exception(exc_type, exc_value, exc_tb)
     )
     sys.stderr.write(
         f'{LOG_COLORS["ERROR"]}{traceback_text}{LOG_COLORS["END"]}\n'
@@ -1123,7 +1122,7 @@ def _color_warning(  # pylint: disable=unused-argument
     filename: str,
     lineno: int,
     file: Optional[TextIO] = None,
-    line: Optional[str] = None
+    line: Optional[str] = None,
 ) -> None:
     """Prints warnings in yellow color for better visibility."""
     sys.stderr.write(
