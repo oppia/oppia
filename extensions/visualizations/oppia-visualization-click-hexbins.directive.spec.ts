@@ -40,11 +40,7 @@ describe('Oppia click hexbins visualization', function () {
   let assetsBackendApiService: AssetsBackendApiService;
   let bannerDe: DebugElement;
   let bannerEl: HTMLElement;
-  let tooltipTarget = {
-    x: 0,
-    y: 0,
-    length: 10,
-  } as Hexbin;
+  let tooltipTarget: Hexbin;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -72,6 +68,17 @@ describe('Oppia click hexbins visualization', function () {
     spyOn(assetsBackendApiService, 'getImageUrlForPreview').and.returnValue(
       'url'
     );
+
+    // Create a proper iterable mock for Hexbin (extends Array).
+    tooltipTarget = Object.assign(
+      [
+        {
+          answer: {clickPosition: [0.5, 0.5], clickedRegions: [] as string[]},
+          frequency: 2,
+        },
+      ],
+      {x: 0, y: 0}
+    ) as Hexbin;
 
     component.tooltipTarget = tooltipTarget;
     component.data = [
