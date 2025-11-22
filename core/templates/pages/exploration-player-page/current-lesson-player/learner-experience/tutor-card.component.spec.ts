@@ -281,7 +281,7 @@ describe('Tutor card component', () => {
 
   it('should set the chapterCount = 0 and throw error when user is unauthorized', fakeAsync(() => {
     const error401 = {status:401, message:'Unauthorized'}
-    spyOn(chapterProgressService,'updateCompletedChaptersCount').and.returnValue(Promise.reject(error401))
+    spyOn(chapterProgressService,'getCompletedChaptersCount').and.returnValue(Promise.reject(error401))
     spyOn(console,'error').and.stub()
 
     componentInstance.ngOnInit()
@@ -289,7 +289,6 @@ describe('Tutor card component', () => {
 
     expect(componentInstance.completedChaptersCount).toBe(0)
     expect(console.error).toHaveBeenCalledWith('User is logged out setting default chapters count')
-    expect(chapterProgressService.getCompletedChaptersCount).not.toHaveBeenCalled()
   }))
 
   it('should set default profile pictures when username is null', fakeAsync(() => {
