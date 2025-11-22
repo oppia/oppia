@@ -281,7 +281,7 @@ describe('Tutor card component', () => {
 
   it('should set the chapterCount = 0 and throw error when user is unauthorized', fakeAsync(() => {
     const error401 = {status:401, message:'Unauthorized'}
-    spyOn(chapterProgressService,'getCompletedChaptersCount').and.returnValue(Promise.reject(error401))
+    spyOn(chapterProgressService,'updateCompletedChaptersCount').and.returnValue(Promise.reject(error401))
     spyOn(console,'error').and.stub()
 
     componentInstance.ngOnInit()
