@@ -21,6 +21,7 @@ import json
 from core import feconf
 from core.controllers import acl_decorators, base
 from core.domain import (
+    cloud_task_services,
     email_manager,
     exp_fetchers,
     exp_services,
@@ -313,6 +314,14 @@ class DeferredTasksHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         )
         assert cloud_task_run_domain_instance is not None
         cloud_task_run_domain_instance.latest_job_state = 'RUNNING'
+
+        # If the given function ID corresponds to a voiceover regeneration task,
+        # the methods require a cloud task run ID to keep the status in sync.
+        # Therefore, the cloud task run ID is added to the payload arguments.
+        if cloud_task_services.is_voiceover_regeneration_task_function(
+            payload['fn_identifier']
+        ):
+            payload['args'].append(cloud_task_model_id)
 
         try:
             deferred_task_function = self.DEFERRED_TASK_FUNCTIONS[

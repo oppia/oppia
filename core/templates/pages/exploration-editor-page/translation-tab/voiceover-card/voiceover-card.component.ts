@@ -45,6 +45,7 @@ import {GraphDataService} from 'pages/exploration-editor-page/services/graph-dat
 import {
   LanguageAccentToDescription,
   VoiceoverBackendApiService,
+  LanguageAccentToContentStatusMap,
 } from 'domain/voiceover/voiceover-backend-api.service';
 import {ExplorationChangeEditVoiceovers} from 'domain/exploration/exploration-draft.model';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -56,6 +57,7 @@ import {ExplorationStatesService} from 'pages/exploration-editor-page/services/e
 import {AdminBackendApiService} from 'domain/admin/admin-backend-api.service';
 import {VoiceoverPlayerService} from 'pages/exploration-player-page/services/voiceover-player.service';
 import {AutomaticVoiceoverHighlightService} from 'services/automatic-voiceover-highlight-service';
+import {VoiceoverRegenerationTaskMappingService} from 'services/voiceover-regeneration-task-mapping-service';
 
 @Component({
   selector: 'oppia-voiceover-card',
@@ -104,6 +106,9 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
   manualVoiceoverIsLoading: boolean = false;
   automaticVoiceoverIsLoading: boolean = false;
 
+  private pollingSub!: Subscription;
+  voiceoverStatus: LanguageAccentToContentStatusMap = {};
+
   constructor(
     private audioPlayerService: AudioPlayerService,
     private adminBackendApiService: AdminBackendApiService,
@@ -126,7 +131,8 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
     private platformFeatureService: PlatformFeatureService,
     private explorationStatesService: ExplorationStatesService,
     private voiceoverPlayerService: VoiceoverPlayerService,
-    private automaticVoiceoverHighlightService: AutomaticVoiceoverHighlightService
+    private automaticVoiceoverHighlightService: AutomaticVoiceoverHighlightService,
+    private voiceoverRegenerationTaskMappingService: VoiceoverRegenerationTaskMappingService
   ) {}
 
   ngOnInit(): void {
@@ -134,6 +140,10 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
     this.languageAccentCode =
       this.localStorageService.getLastSelectedLanguageAccentCode() as string;
     this.languageAccentCodeIsSelected = this.languageAccentCode !== 'undefined';
+
+    this.voiceoverRegenerationTaskMappingService.init(
+      this.pageContextService.getExplorationId()
+    );
 
     if (this.entityVoiceoversService.isEntityVoiceoversLoaded()) {
       this.voiceoversAreLoaded = true;
@@ -190,6 +200,11 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
       .then(isVoiceoverAutogenerationEnabledByAdmins => {
         this.isVoiceoverAutogenerationEnabledByAdmins =
           isVoiceoverAutogenerationEnabledByAdmins;
+      });
+
+    this.pollingSub =
+      this.voiceoverRegenerationTaskMappingService.status$.subscribe(status => {
+        this.voiceoverStatus = status;
       });
 
     setInterval(() => {
@@ -833,5 +848,8 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
+    if (this.pollingSub) {
+      this.pollingSub.unsubscribe();
+    }
   }
 }

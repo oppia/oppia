@@ -21,6 +21,7 @@ import datetime
 from core import feature_flag_list, feconf
 from core.controllers import acl_decorators, base
 from core.domain import (
+    cloud_task_services,
     feature_flag_services,
     opportunity_services,
     taskqueue_services,
@@ -304,4 +305,36 @@ class RegenerateVoiceoverOnExpUpdateHandler(
                 feconf.SYSTEM_COMMITTER_ID,
                 datetime.datetime.utcnow().isoformat(),
             )
+        self.render_json(self.values)
+
+
+class VoiceoverRegenerationRequestToCloudTaskHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handler class to get voiceover regeneration task run mappings for a given
+    exploration.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {
+        'exploration_id': {'schema': {'type': 'basestring'}},
+        'exploration_version': {'schema': {'type': 'int'}},
+    }
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.can_play_exploration
+    def get(
+        self,
+        exploration_id: str,
+        exploration_version: int,
+    ) -> None:
+        self.values.update(
+            {
+                'voiceover_regeneration_task_run_mappings': (
+                    cloud_task_services.get_existing_voiceover_regeneration_requests_in_task_queue(
+                        exploration_id, exploration_version
+                    )
+                )
+            }
+        )
         self.render_json(self.values)
