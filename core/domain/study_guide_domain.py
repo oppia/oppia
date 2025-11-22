@@ -22,7 +22,16 @@ from core import feconf, utils
 from core.constants import constants
 from core.domain import change_domain, state_domain, translation_domain
 
-from typing import Callable, Final, List, Literal, Optional, TypedDict, Union
+from typing import (
+    Callable,
+    Dict,
+    Final,
+    List,
+    Literal,
+    Optional,
+    TypedDict,
+    Union,
+)
 
 STUDY_GUIDE_PROPERTY_SECTIONS: Final = 'sections'
 
@@ -257,8 +266,8 @@ class StudyGuidePageContentsDict(TypedDict):
     """
 
     subtitled_html: state_domain.SubtitledHtmlDict
-    recorded_voiceovers: dict
-    written_translations: dict
+    recorded_voiceovers: Dict
+    written_translations: Dict
 
 
 class StudyGuideAndroidDict(TypedDict):
