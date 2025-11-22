@@ -3291,6 +3291,223 @@ export class LoggedInUser extends BaseUser {
   async expectUsernameToBe(expectedUsername: string): Promise<void> {
     await this.expectTextContentToBe(usernameSelector, expectedUsername);
   }
+
+  /**
+   * Verifies that a lesson is present in the "Learn Something New" section.
+   * @param {string} lessonName - The name of the lesson to verify.
+   */
+  async expectLessonToBePresentInLearnSomethingNewSection(
+    lessonName: string
+  ): Promise<void> {
+    await this.page.waitForSelector(learnSomethingNewSectionSelector, {
+      visible: true,
+    });
+    await this.page.waitForSelector(lessonTitleSelector, {
+      visible: true,
+    });
+
+    const lessonTitles = await this.page.$$eval(
+      `${learnSomethingNewSectionSelector} ${lessonTitleSelector}`,
+      (elements: Element[]) => elements.map(el => el.textContent?.trim() ?? '')
+    );
+
+    if (!lessonTitles.includes(lessonName)) {
+      throw new Error(
+        `Lesson "${lessonName}" not found. Found: ${lessonTitles.join(', ')}`
+      );
+    }
+  }
+
+  /**
+   * Verifies that a lesson is present in the "Continue where you left off" section.
+   * @param {string} lessonName - The name of the lesson to verify.
+   */
+  async expectLessonToBePresentInContinueWhereLeftOffSection(
+    lessonName: string
+  ): Promise<void> {
+    await this.page.waitForSelector(
+      continueFromWhereLeftOffSectionInRedesignedDashboardSelector,
+      {
+        visible: true,
+      }
+    );
+    await this.page.waitForSelector(lessonTitleSelector, {
+      visible: true,
+    });
+
+    const lessonTitles = await this.page.$$eval(
+      `${continueFromWhereLeftOffSectionInRedesignedDashboardSelector} ${lessonTitleSelector}`,
+      (elements: Element[]) => elements.map(el => el.textContent?.trim() ?? '')
+    );
+
+    if (!lessonTitles.includes(lessonName)) {
+      throw new Error(
+        `Lesson "${lessonName}" not found. Found: ${lessonTitles.join(', ')}`
+      );
+    }
+  }
+
+  /**
+   * Verifies that a lesson shows progress (progress indicator is visible).
+   * @param {string} lessonTitle - The title of the lesson.
+   */
+  async expectLessonProgressToBeVisible(lessonTitle: string): Promise<void> {
+    await this.page.waitForSelector(lessonCardContainer);
+    const lessonCards = await this.page.$$(lessonCardContainer);
+
+    for (const lessonCard of lessonCards) {
+      const lessonTitleText = await lessonCard.$eval(
+        lessonTitleSelector,
+        el => el.textContent
+      );
+
+      if (!lessonTitleText || lessonTitleText !== lessonTitle) {
+        continue;
+      }
+
+      // Verify progress element exists and is visible.
+      const progressElement = await lessonCard.$(circleProgressElementSelector);
+      if (!progressElement) {
+        throw new Error(
+          `Progress indicator not found for lesson: ${lessonTitle}`
+        );
+      }
+      return;
+    }
+    throw new Error(`Lesson not found: ${lessonTitle}`);
+  }
+
+  /**
+   * Verifies the topic progress percentage in the Progress tab.
+   * @param {string} topicName - The name of the topic.
+   * @param {string} expectedProgress - The expected progress percentage (e.g., "50%", "100%").
+   */
+  async expectTopicProgressInProgressTabToBe(
+    topicName: string,
+    expectedProgress: string
+  ): Promise<void> {
+    await this.page.waitForSelector(progressTabSectionInLearnerDashboard, {
+      visible: true,
+    });
+
+    // Find the topic and verify its progress.
+    // This selector may need to be adjusted based on actual HTML structure.
+    const topicProgress = await this.page.evaluate(
+      (topic, expected) => {
+        const topicElements = Array.from(
+          document.querySelectorAll('.e2e-test-topic-progress, .topic-progress')
+        );
+        for (const element of topicElements) {
+          const topicNameElement = element.querySelector(
+            '.e2e-test-topic-name, .topic-name'
+          );
+          if (topicNameElement?.textContent?.trim().includes(topic)) {
+            const progressElement = element.querySelector(
+              '.e2e-test-progress-percentage, .progress-percentage, circle-progress'
+            );
+            const progress = progressElement?.textContent?.trim() ?? '';
+            return progress === expected || progress.includes(expected);
+          }
+        }
+        return false;
+      },
+      topicName,
+      expectedProgress
+    );
+
+    if (!topicProgress) {
+      throw new Error(
+        `Topic "${topicName}" progress is not "${expectedProgress}" in Progress tab.`
+      );
+    }
+  }
+
+  /**
+   * Verifies the story progress percentage in the Progress tab.
+   * @param {string} storyName - The name of the story.
+   * @param {string} expectedProgress - The expected progress percentage (e.g., "50%", "100%").
+   */
+  async expectStoryProgressInProgressTabToBe(
+    storyName: string,
+    expectedProgress: string
+  ): Promise<void> {
+    await this.page.waitForSelector(progressTabSectionInLearnerDashboard, {
+      visible: true,
+    });
+
+    // Find the story and verify its progress.
+    const storyProgress = await this.page.evaluate(
+      (story, expected, storySelector, completedStoriesSelector) => {
+        const storyElements = Array.from(
+          document.querySelectorAll(
+            '.e2e-test-story-progress, .story-progress, ' +
+              completedStoriesSelector
+          )
+        );
+        for (const element of storyElements) {
+          const storyNameElement = element.querySelector(
+            storySelector + ', .story-name'
+          );
+          if (storyNameElement?.textContent?.trim().includes(story)) {
+            const progressElement = element.querySelector(
+              '.e2e-test-progress-percentage, .progress-percentage, circle-progress'
+            );
+            const progress = progressElement?.textContent?.trim() ?? '';
+            return progress === expected || progress.includes(expected);
+          }
+        }
+        return false;
+      },
+      storyName,
+      expectedProgress,
+      storyNameSelector,
+      completedStoriesSectionSelector
+    );
+
+    if (!storyProgress) {
+      throw new Error(
+        `Story "${storyName}" progress is not "${expectedProgress}" in Progress tab.`
+      );
+    }
+  }
+
+  /**
+   * Verifies that the lessons part of a goal is marked as completed in the Goals tab.
+   * @param {string} goalName - The name of the goal.
+   */
+  async expectGoalLessonsToBeCompleted(goalName: string): Promise<void> {
+    await this.page.waitForSelector(goalContainerSelector, {
+      visible: true,
+    });
+
+    const goalCompleted = await this.page.evaluate(
+      (goal, goalContainerSel, goalTitleSel) => {
+        const goalContainers = Array.from(
+          document.querySelectorAll(goalContainerSel)
+        );
+        for (const container of goalContainers) {
+          const goalTitleElement = container.querySelector(goalTitleSel);
+          if (goalTitleElement?.textContent?.trim().includes(goal)) {
+            // Check if there's a completed indicator or checkmark.
+            const completedIndicator = container.querySelector(
+              '.e2e-test-completed-indicator, .completed, .checkmark'
+            );
+            return completedIndicator !== null;
+          }
+        }
+        return false;
+      },
+      goalName,
+      goalContainerSelector,
+      goalTitleSelector
+    );
+
+    if (!goalCompleted) {
+      throw new Error(
+        `Goal "${goalName}" lessons are not marked as completed in Goals tab.`
+      );
+    }
+  }
 }
 
 export let LoggedInUserFactory = (): LoggedInUser => new LoggedInUser();
