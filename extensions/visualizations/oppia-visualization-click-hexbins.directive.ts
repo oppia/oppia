@@ -109,8 +109,8 @@ export class OppiaVisualizationClickHexbinsComponent implements OnInit {
     return color || rgb(255, 255, 255, 0.25);
   }
 
-  isTooltipVisible(): void {
-    this.tooltipTarget !== null;
+  isTooltipVisible(): boolean {
+    return this.tooltipTarget !== null;
   }
 
   getTooltipNumClicks(): number {

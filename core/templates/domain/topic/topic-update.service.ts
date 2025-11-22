@@ -615,7 +615,7 @@ export class TopicUpdateService {
             // section, as a newly created subtopic wouldn't have any skills
             // of its own initially, and any skills moved into it have been
             // shifted to the uncategorized section.
-            changeDict.old_subtopic_id = null as unknown as number;
+            changeDict.old_subtopic_id = null;
           }
         } else if (
           changeDict.cmd ===

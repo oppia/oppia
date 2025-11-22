@@ -121,6 +121,16 @@ describe('Oppia click hexbins visualization', function () {
     expect(component.getTooltipNumClicks()).toEqual(0);
   });
 
+  it('should return false when tooltip is not visible', () => {
+    component.tooltipTarget = null;
+    expect(component.isTooltipVisible()).toBe(false);
+  });
+
+  it('should return true when tooltip is visible', () => {
+    component.tooltipTarget = tooltipTarget;
+    expect(component.isTooltipVisible()).toBe(true);
+  });
+
   it('should intialize component', fakeAsync(() => {
     component.ngOnInit();
     tick();
