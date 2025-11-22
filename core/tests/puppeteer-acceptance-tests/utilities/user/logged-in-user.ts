@@ -742,9 +742,12 @@ export class LoggedInUser extends BaseUser {
         submittedMessageSelector,
         (el: Element) => el.textContent
       );
-      if (submittedMessageText.trim() !== 'Thank you for the feedback!') {
+      if (
+        !submittedMessageText ||
+        submittedMessageText.trim() !== 'Thank you for the feedback!'
+      ) {
         throw new Error(
-          `Unexpected submitted message text: ${submittedMessageText}`
+          `Unexpected submitted message text: ${submittedMessageText ?? 'null'}`
         );
       }
     } catch (error) {
