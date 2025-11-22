@@ -150,8 +150,8 @@ export class OppiaVisualizationClickHexbinsComponent implements OnInit {
       .size([wrapperWidth, wrapperHeight])
       .radius(16);
 
-    // Per d3-hexbin documentation: "Only non-empty bins are returned; empty
-    // bins without points are not included in the returned array."
+    // Per d3-hexbin documentation: only non-empty bins are returned; empty
+    // bins without points are not included in the returned array.
     this.hexbins = hexbinGenerator(this.data);
     this.colorScale = scaleLinear<RGBColor>()
       .domain([0, max(this.hexbins, this.getNumClicks) || 0])
