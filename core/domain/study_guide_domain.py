@@ -257,6 +257,7 @@ class StudyGuidePageContentsDict(TypedDict):
     """
 
     subtitled_html: state_domain.SubtitledHtmlDict
+    recorded_voiceovers: state_domain.RecordedVoiceoversDict
 
 
 class StudyGuideAndroidDict(TypedDict):
