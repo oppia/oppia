@@ -3178,6 +3178,217 @@ export class LoggedInUser extends BaseUser {
       visible
     );
   }
+  /**
+   * Function to verify the number of elements matching a selector.
+   * @param {string} selector - The selector to match elements.
+   * @param {number} count - The expected number of elements.
+   */
+  async expectNumberOfElementsToBe(selector: string, count: number) {
+    const elements = await this.page.$$(selector);
+    expect(elements.length).toBe(count);
+  }
+
+  /**
+   * Navigate to any classroom using button in topics available in classroom section.
+   * Currently there is only math.
+   * @param {string} classroom - Classroom.
+   */
+  async navigateToClassroomFromLearnerDashboard(
+    classroom: string
+  ): Promise<void> {
+    await this.page.waitForSelector(
+      classroomButtonOnRedesignedLearnerDashboard
+    );
+    let targetHref = '';
+    const allClassroomButtonElements = await this.page.$$(
+      classroomButtonOnRedesignedLearnerDashboard
+    );
+    for (const buttonElement of allClassroomButtonElements) {
+      const buttonHref = await buttonElement.evaluate(ele =>
+        ele.getAttribute('href')
+      );
+      if (buttonHref?.includes(classroom)) {
+        targetHref = buttonHref;
+        await buttonElement.click();
+        await this.page.waitForNavigation({waitUntil: 'networkidle0'});
+        break;
+      }
+    }
+    if (!targetHref) {
+      throw new Error(`${classroom} is not a valid classroom`);
+    }
+  }
+
+  /**
+   * Finds child element in parent by matching text values.
+   * @param {puppeteer.Page | puppeteer.ElementHandle | undefined} parentElement - Element we're searching through.
+   * @param {Record<string, string>} selectors - Relevant selectors.
+   * @param {string} criteria - Title value to match.
+   */
+  async findElement(
+    parentElement: puppeteer.Page | puppeteer.ElementHandle | undefined,
+    selectors: Record<string, string>,
+    criteria: string
+  ): Promise<puppeteer.ElementHandle | undefined> {
+    let targetElement;
+    const allElements = await parentElement?.$$(selectors.content);
+    for (const h of allElements || []) {
+      const targetHeadingElement = await h.$(selectors.heading);
+      const targetHeadingText = await targetHeadingElement?.evaluate(ele =>
+        ele.textContent?.trim()
+      );
+      if (targetHeadingText === criteria) {
+        targetElement = h;
+        break;
+      }
+    }
+    if (!targetElement) {
+      throw new Error(
+        `Element with selectors: ${selectors.toString()} and criteria: ${criteria} is not found`
+      );
+    }
+    return targetElement;
+  }
+
+  /**
+   * Navigate directly to topic in math classroom using topic card.
+   * @param {string} topic - Classroom topic.
+   */
+  async navigateToTopicPageByCard(topic: string): Promise<void> {
+    await this.page.waitForFunction(
+      (c: string) => {
+        return Array.from(document.querySelectorAll(c))
+          .map(h => h.textContent?.trim())
+          .includes("Topics available in Oppia's Classroom");
+      },
+      {},
+      learnerDashSelectors.cardDisplay.heading
+    );
+
+    const topicsAvailableInClassroomElement = await this.findElement(
+      this.page,
+      learnerDashSelectors.cardDisplay,
+      "Topics available in Oppia's Classroom"
+    );
+
+    const topicCardElement = await this.findElement(
+      topicsAvailableInClassroomElement,
+      learnerDashSelectors.topicCard,
+      topic
+    );
+
+    if (topicCardElement) {
+      await topicCardElement.click();
+      await this.page.waitForNavigation({waitUntil: 'networkidle0'});
+    } else {
+      throw new Error(`${topic} is not a valid topic`);
+    }
+  }
+
+  /**
+   * Gets subsection element based on title. We need to differentiate parent elements
+   * in progress tab because the subsections are titled the same.
+   * @param {string} criteria - Subsection title value to match.
+   * @param {string} section - Overarching section.
+   */
+  async findSubsectionElement(
+    criteria: string,
+    section: string = 'N/A'
+  ): Promise<puppeteer.ElementHandle | undefined> {
+    let sectionElement: puppeteer.Page | puppeteer.ElementHandle | undefined =
+      this.page;
+    if (section === 'In Progress' || section === 'Completed') {
+      sectionElement = await this.findElement(
+        this.page,
+        learnerDashSelectors.tabSection,
+        section
+      );
+    }
+
+    const subsectionElement = await this.findElement(
+      sectionElement,
+      learnerDashSelectors.cardDisplay,
+      criteria
+    );
+
+    return subsectionElement;
+  }
+
+  /**
+   * Verifies lesson cards are in correct section.
+   * @param {puppeteer.Page | puppeteer.ElementHandle | undefined} parentElement - Element we're searching through.
+   * @param {string} criteria - Subsection title value to match.
+   * @param {string[]} expectedTitles - Lesson card titles expected.
+   * @param {string} section - Overarching section, only needed to differentiate same title subsections in progress tab.
+   */
+  async expectLessonCardsToBePresent(
+    criteria: string,
+    expectedTitles: string[],
+    section: string = 'N/A'
+  ): Promise<void> {
+    const subsectionElement = await this.findSubsectionElement(
+      criteria,
+      section
+    );
+
+    await this.expectElementsToBePresent(
+      expectedTitles,
+      'lessonCard',
+      subsectionElement
+    );
+  }
+
+  /**
+   * Verifies user is on correct lesson page.
+   * @param {string} lessonTitle - Lesson card title expected.
+   * @param {string} lessonId - Lesson card id expected.
+   */
+  async expectToBeOnLessonPage(
+    lessonTitle: string,
+    lessonId: string
+  ): Promise<void> {
+    expect(`/explore/${lessonId}`.toLowerCase()).toBe(
+      new URL(this.page.url()).pathname.toLowerCase()
+    );
+    showMessage(`Navigated to ${lessonTitle}`);
+  }
+
+  /**
+   * Navigates to lesson using lesson card.
+   * @param {string} criteria - Subsection title value to match.
+   * @param {string} lessonTitle - Lesson card title expected.
+   * @param {string} section - Overarching section, only needed to differentiate same title subsections in progress tab.
+   */
+  async navigateToLessonByCard(
+    criteria: string,
+    lessonTitle: string,
+    section: string = 'N/A'
+  ): Promise<void> {
+    const subsectionElement = await this.findSubsectionElement(
+      criteria,
+      section
+    );
+
+    const lessonCardElement = await this.findElement(
+      subsectionElement,
+      learnerDashSelectors.lessonCard,
+      lessonTitle
+    );
+
+    if (lessonCardElement) {
+      const lessonCardButtonElement = await lessonCardElement.$(
+        learnerDashSelectors.lessonCard.button
+      );
+      if (lessonCardButtonElement) {
+        await lessonCardButtonElement.click();
+        await this.page.waitForNavigation({waitUntil: 'networkidle0'});
+      }
+    } else {
+      throw new Error(
+        `${lessonTitle} is not a valid lesson in ${criteria} of ${section} section`
+      );
+    }
+  }
 
   /**
    * Function to verify the Or Explore All Lessons in Classroom section in the redesigned learner dashboard is present or not.

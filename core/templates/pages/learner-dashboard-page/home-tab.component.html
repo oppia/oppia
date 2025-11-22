@@ -130,7 +130,7 @@
         <ng-container *ngFor="let item of untrackedTopics | keyvalue">
           <oppia-card-display [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_CLASSROOM_SECTION'" [numCards]="item.value.length" [cardWidth]="226">
             <ng-container *ngFor="let topicSummaryTile of item.value">
-              <oppia-learner-topic-summary-tile [topicSummary]="topicSummaryTile" [redesignFeatureFlag]="redesignFeatureFlag">
+              <oppia-learner-topic-summary-tile class="e2e-test-learer-topic-summary-tile" [topicSummary]="topicSummaryTile" [redesignFeatureFlag]="redesignFeatureFlag">
               </oppia-learner-topic-summary-tile>
             </ng-container>
           </oppia-card-display>
