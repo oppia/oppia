@@ -1469,9 +1469,13 @@ class UrlRetrieveTests(CommonTests):
         )
 
     def test_url_open(self) -> None:
-        response = common.url_open('http://www.google.com')
+        # Use a URL that Oppia's CI environment is expected to have access to.
+        github_api_url = (
+            'https://api.github.com/repos/oppia/oppia/releases/latest'
+        )
+        response = common.url_open(github_api_url)
         self.assertEqual(response.getcode(), 200)
-        self.assertEqual(response.url, 'http://www.google.com')
+        self.assertEqual(response.url, github_api_url)
 
     def test_url_retrieve_tries_curl_at_outset(self) -> None:
         with tempfile.TemporaryDirectory() as tempdir:

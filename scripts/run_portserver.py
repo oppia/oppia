@@ -127,7 +127,9 @@ def sock_bind(
             continue
         try:
             sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            sock.bind(('', port))
+            # Restrict connections to originate from the local machine only.
+            ip_address = '::1' if family == socket.AF_INET6 else '127.0.0.1'
+            sock.bind((ip_address, port))
             if socket_type == socket.SOCK_STREAM:
                 sock.listen(1)
             port = sock.getsockname()[1]
