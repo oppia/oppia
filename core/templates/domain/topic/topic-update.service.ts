@@ -651,7 +651,12 @@ export class TopicUpdateService {
           }
         }
         if ('old_subtopic_id' in backendChangeDict) {
-          if (backendChangeDict.old_subtopic_id > subtopicId) {
+          // old_subtopic_id can be null (meaning "uncategorized section"),
+          // which should not be decremented.
+          if (
+            backendChangeDict.old_subtopic_id !== null &&
+            backendChangeDict.old_subtopic_id > subtopicId
+          ) {
             backendChangeDict.old_subtopic_id--;
           }
         }
