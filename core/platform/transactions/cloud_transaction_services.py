@@ -21,11 +21,12 @@ from __future__ import annotations
 import functools
 
 from core import utils
+
 from google.cloud import datastore
-from typing import Callable, Type, TypeVar
+from typing import Callable, TypeVar
 
 # TypeVar for the decorator to maintain function return type.
-R = TypeVar('R')
+ReturnType = TypeVar('ReturnType')
 
 
 class DatastoreClientSingleton(metaclass=utils.SingletonMeta):
@@ -53,7 +54,9 @@ def get_client() -> datastore.Client:
     return DatastoreClientSingleton().get_client()
 
 
-def run_in_transaction_wrapper(fn: Callable[..., R]) -> Callable[..., R]:
+def run_in_transaction_wrapper(
+    fn: Callable[..., ReturnType],
+) -> Callable[..., ReturnType]:
     """Runs a decorated function in a transaction. Either all of the operations
     in the transaction are applied, or none of them are applied.
 
@@ -61,27 +64,32 @@ def run_in_transaction_wrapper(fn: Callable[..., R]) -> Callable[..., R]:
     commit, since TransactionOptions.ALLOWED is used.
 
     Args:
-        fn: Callable[..., R]. The function to wrap in a transaction.
+        fn: Callable[..., ReturnType]. The function to wrap in a transaction.
 
     Returns:
-        Callable[..., R]. Function wrapped in transaction.
+        Callable[..., ReturnType]. Function wrapped in transaction.
 
     Raises:
         Exception. Whatever fn() raises.
         datastore_errors.TransactionFailedError. The transaction failed.
     """
 
+    # Here we use object because the wrapper needs to accept any argument types
+    # that the wrapped function accepts.
     @functools.wraps(fn)
-    def wrapper(*args: object, **kwargs: object) -> R:
+    def wrapper(*args: object, **kwargs: object) -> ReturnType:
         """Wrapper for the transaction.
 
         Args:
-            *args: object. Variable positional arguments.
+            *args: list(*). Variable positional arguments.
             **kwargs: object. Variable keyword arguments.
 
         Returns:
-            R. The return value from the wrapped function.
+            ReturnType. The return value from the wrapped function.
         """
+        # Here we use MyPy ignore because the datastore library's type stubs
+        # do not fully define the argument types that functions passed to
+        # transactions can accept.
         with get_client().transaction():
             return fn(*args, **kwargs)  # type: ignore[arg-type]
 

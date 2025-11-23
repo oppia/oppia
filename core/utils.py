@@ -80,15 +80,19 @@ class SingletonMeta(type):
     clients, or configuration objects.
     """
 
+    # Here we use object because the metaclass needs to store instances of any
+    # class type that uses it, and we cannot know the specific types at the
+    # metaclass definition level.
     _instances: Dict[type, object] = {}
 
-    def __call__(
-        cls, *args: Tuple[object, ...], **kwargs: Dict[str, object]
-    ) -> object:
+    # Here we use object because the metaclass needs to work with any class
+    # type that uses it as a metaclass, and we cannot know the specific return
+    # type at the metaclass level.
+    def __call__(cls, *args: object, **kwargs: Dict[str, object]) -> object:
         """Create or return the singleton instance of the class.
 
         Args:
-            *args: tuple. Positional arguments for class initialization.
+            *args: list(*). Positional arguments for class initialization.
             **kwargs: dict. Keyword arguments for class initialization.
 
         Returns:

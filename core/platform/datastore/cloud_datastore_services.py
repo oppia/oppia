@@ -27,12 +27,10 @@ from core.platform import models
 from google.cloud import ndb
 from typing import (
     ContextManager,
-    Dict,
     List,
     Optional,
     Sequence,
     Tuple,
-    Type,
     TypeVar,
     Union,
 )
@@ -193,20 +191,24 @@ def delete_multi(keys: Sequence[Key]) -> List[None]:
     return ndb.delete_multi(keys)
 
 
+# Here we use object because ndb.Query accepts various keyword arguments with
+# different types depending on the query operation being performed.
 def query_everything(**kwargs: object) -> Query:
     """Returns a query that targets every single entity in the datastore.
+
+    IMPORTANT: DO NOT USE THIS FUNCTION OUTSIDE OF UNIT TESTS. Querying
+    everything in the datastore is almost always a bad idea, ESPECIALLY in
+    production. Always prefer querying for specific models and combining them
+    afterwards.
 
     Args:
         **kwargs: object. Variable keyword arguments passed to ndb.Query.
 
     Returns:
         Query. A query targeting all entities.
-
-    IMPORTANT: DO NOT USE THIS FUNCTION OUTSIDE OF UNIT TESTS. Querying
-    everything in the datastore is almost always a bad idea, ESPECIALLY in
-    production. Always prefer querying for specific models and combining them
-    afterwards.
     """
+    # Here we use MyPy ignore because the ndb library's type stubs do not fully
+    # define all possible keyword argument types that ndb.Query can accept.
     return ndb.Query(**kwargs)  # type: ignore[arg-type]
 
 
