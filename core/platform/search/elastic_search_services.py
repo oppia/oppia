@@ -71,7 +71,7 @@ class ElasticSearchClient:
                     if es_cloud_id
                     else [f'http://{feconf.ES_HOST}:{feconf.ES_LOCALHOST_PORT}']
                 )
-                verify_certs = True if es_cloud_id else False
+                verify_certs = bool(es_cloud_id)
 
                 self._client = elasticsearch.Elasticsearch(
                     cloud_id=cloud_id,
