@@ -19,65 +19,92 @@
 from __future__ import annotations
 
 from core import feconf
+from core import utils
 from core.domain import caching_domain
 
 import redis
 from typing import Dict, List, Optional
 
-# Here we use MyPy ignore because redis.StrictRedis is a generic type but the
-# redis-py library's type stubs don't properly specify the type arguments,
-# leading to type-arg errors that we cannot fix without modifying the library.
-_oppia_redis_client: Optional[redis.StrictRedis] = None  # type: ignore[type-arg]
-# Here we use MyPy ignore because redis.StrictRedis is a generic type but the
-# redis-py library's type stubs don't properly specify the type arguments,
-# leading to type-arg errors that we cannot fix without modifying the library.
-_cloud_ndb_redis_client: Optional[redis.StrictRedis] = None  # type: ignore[type-arg]
+
+class OppiaRedisClient(metaclass=utils.SingletonMeta):
+    """Singleton wrapper for the Oppia Redis client."""
+
+    def __init__(self) -> None:
+        """Initialize the Oppia Redis client."""
+        # Here we use MyPy ignore because redis.StrictRedis is a generic type
+        # but the redis-py library's type stubs don't properly specify the type
+        # arguments, leading to type-arg errors that we cannot fix without
+        # modifying the library.
+        self._client: redis.StrictRedis = redis.StrictRedis(  # type: ignore[type-arg]
+            host=feconf.REDISHOST,
+            port=feconf.REDISPORT,
+            db=feconf.OPPIA_REDIS_DB_INDEX,
+            decode_responses=True,
+        )
+
+    # Here we use MyPy ignore because redis.StrictRedis is a generic type but
+    # the redis-py library's type stubs don't properly specify the type
+    # arguments, leading to type-arg errors that we cannot fix without
+    # modifying the library.
+    def get_client(self) -> redis.StrictRedis:  # type: ignore[type-arg]
+        """Return the Redis client instance.
+
+        Returns:
+            redis.StrictRedis. The Redis client instance.
+        """
+        return self._client
+
+
+class CloudNdbRedisClient(metaclass=utils.SingletonMeta):
+    """Singleton wrapper for the Cloud NDB Redis client."""
+
+    def __init__(self) -> None:
+        """Initialize the Cloud NDB Redis client."""
+        # Here we use MyPy ignore because redis.StrictRedis is a generic type
+        # but the redis-py library's type stubs don't properly specify the type
+        # arguments, leading to type-arg errors that we cannot fix without
+        # modifying the library.
+        self._client: redis.StrictRedis = redis.StrictRedis(  # type: ignore[type-arg]
+            host=feconf.REDISHOST,
+            port=feconf.REDISPORT,
+            db=feconf.CLOUD_NDB_REDIS_DB_INDEX,
+        )
+
+    # Here we use MyPy ignore because redis.StrictRedis is a generic type but
+    # the redis-py library's type stubs don't properly specify the type
+    # arguments, leading to type-arg errors that we cannot fix without
+    # modifying the library.
+    def get_client(self) -> redis.StrictRedis:  # type: ignore[type-arg]
+        """Return the Redis client instance.
+
+        Returns:
+            redis.StrictRedis. The Redis client instance.
+        """
+        return self._client
 
 
 # Here we use MyPy ignore because redis.StrictRedis is a generic type but the
 # redis-py library's type stubs don't properly specify the type arguments,
 # leading to type-arg errors that we cannot fix without modifying the library.
 def get_oppia_redis_client() -> redis.StrictRedis:  # type: ignore[type-arg]
-    """Get or create the Oppia Redis client lazily."""
-    # We use the global statement here to modify the module-level
-    # _oppia_redis_client variable for lazy initialization. This ensures a
-    # single shared Redis client instance across the application.
-    global _oppia_redis_client  # pylint: disable=global-statement
-    if _oppia_redis_client is None:
-        # Here we use MyPy ignore because redis.StrictRedis is a generic type
-        # but the redis-py library's type stubs don't properly specify the type
-        # arguments, leading to type-arg errors that we cannot fix without
-        # modifying the library.
-        _oppia_redis_client = redis.StrictRedis(  # type: ignore[type-arg]
-            host=feconf.REDISHOST,
-            port=feconf.REDISPORT,
-            db=feconf.OPPIA_REDIS_DB_INDEX,
-            decode_responses=True,
-        )
-    return _oppia_redis_client
+    """Get or create the Oppia Redis client lazily.
+
+    Returns:
+        redis.StrictRedis. The Oppia Redis client instance.
+    """
+    return OppiaRedisClient().get_client()
 
 
 # Here we use MyPy ignore because redis.StrictRedis is a generic type but the
 # redis-py library's type stubs don't properly specify the type arguments,
 # leading to type-arg errors that we cannot fix without modifying the library.
 def get_cloud_ndb_redis_client() -> redis.StrictRedis:  # type: ignore[type-arg]
-    """Get or create the Cloud NDB Redis client lazily."""
-    # We use the global statement here to modify the module-level
-    # _cloud_ndb_redis_client variable for lazy initialization. This ensures a
-    # single shared Redis client instance for Cloud NDB caching across the
-    # application.
-    global _cloud_ndb_redis_client  # pylint: disable=global-statement
-    if _cloud_ndb_redis_client is None:
-        # Here we use MyPy ignore because redis.StrictRedis is a generic type
-        # but the redis-py library's type stubs don't properly specify the type
-        # arguments, leading to type-arg errors that we cannot fix without
-        # modifying the library.
-        _cloud_ndb_redis_client = redis.StrictRedis(  # type: ignore[type-arg]
-            host=feconf.REDISHOST,
-            port=feconf.REDISPORT,
-            db=feconf.CLOUD_NDB_REDIS_DB_INDEX,
-        )
-    return _cloud_ndb_redis_client
+    """Get or create the Cloud NDB Redis client lazily.
+
+    Returns:
+        redis.StrictRedis. The Cloud NDB Redis client instance.
+    """
+    return CloudNdbRedisClient().get_client()
 
 
 def get_memory_cache_stats() -> caching_domain.MemoryCacheStats:

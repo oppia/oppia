@@ -71,6 +71,36 @@ TextModeTypes = Literal['r', 'w', 'a', 'x', 'r+', 'w+', 'a+']
 BinaryModeTypes = Literal['rb', 'wb', 'ab', 'xb', 'r+b', 'w+b', 'a+b', 'x+b']
 
 
+class SingletonMeta(type):
+    """Metaclass for creating singleton classes.
+
+    This metaclass ensures that only one instance of a class is created. It is
+    thread-safe and uses a dictionary to store instances per class type. This
+    is useful for managing shared resources like database connections, cache
+    clients, or configuration objects.
+    """
+
+    _instances: Dict[type, object] = {}
+
+    def __call__(
+        cls, *args: Tuple[object, ...], **kwargs: Dict[str, object]
+    ) -> object:
+        """Create or return the singleton instance of the class.
+
+        Args:
+            *args: tuple. Positional arguments for class initialization.
+            **kwargs: dict. Keyword arguments for class initialization.
+
+        Returns:
+            object. The singleton instance of the class.
+        """
+        if cls not in cls._instances:
+            cls._instances[cls] = super(SingletonMeta, cls).__call__(
+                *args, **kwargs
+            )
+        return cls._instances[cls]
+
+
 class InvalidInputException(Exception):
     """Error class for invalid input."""
 

@@ -21,17 +21,18 @@ from __future__ import annotations
 import contextlib
 import logging
 
+from core import utils
 from core.platform import models
 
 from google.cloud import ndb
 from typing import (
-    Any,
     ContextManager,
     Dict,
     List,
     Optional,
     Sequence,
     Tuple,
+    Type,
     TypeVar,
     Union,
 )
@@ -42,6 +43,9 @@ if MYPY:  # pragma: no cover
 
 transaction_services = models.Registry.import_transaction_services()
 
+
+# TypeVar for the singleton metaclass to maintain type information.
+T = TypeVar('T')
 
 Cursor = ndb.Cursor
 Model = ndb.Model
@@ -64,19 +68,30 @@ TYPE_MODEL_SUBCLASS = TypeVar(  # pylint: disable=invalid-name
 )
 MAX_GET_RETRIES = 3
 
-_client: Optional[ndb.Client] = None
+
+class NdbClientSingleton(metaclass=utils.SingletonMeta):
+    """Singleton wrapper for the NDB client."""
+
+    def __init__(self) -> None:
+        """Initialize the NDB client."""
+        self._client: ndb.Client = ndb.Client()
+
+    def get_client(self) -> ndb.Client:
+        """Return the NDB client instance.
+
+        Returns:
+            ndb.Client. The NDB client instance.
+        """
+        return self._client
 
 
 def get_client() -> ndb.Client:
-    """Get or create the NDB client lazily."""
-    # We use the global statement here to modify the module-level _client
-    # variable for lazy initialization. This ensures a single shared NDB client
-    # instance across the application, which is required for proper datastore
-    # connection management.
-    global _client  # pylint: disable=global-statement
-    if _client is None:
-        _client = ndb.Client()
-    return _client
+    """Get or create the NDB client lazily.
+
+    Returns:
+        ndb.Client. The NDB client instance.
+    """
+    return NdbClientSingleton().get_client()
 
 
 def get_ndb_context(
@@ -178,17 +193,21 @@ def delete_multi(keys: Sequence[Key]) -> List[None]:
     return ndb.delete_multi(keys)
 
 
-# Here we use type Any because it mimics the types defined in
-# the stubs for this library.
-def query_everything(**kwargs: Dict[str, Any]) -> Query:
+def query_everything(**kwargs: object) -> Query:
     """Returns a query that targets every single entity in the datastore.
+
+    Args:
+        **kwargs: object. Variable keyword arguments passed to ndb.Query.
+
+    Returns:
+        Query. A query targeting all entities.
 
     IMPORTANT: DO NOT USE THIS FUNCTION OUTSIDE OF UNIT TESTS. Querying
     everything in the datastore is almost always a bad idea, ESPECIALLY in
     production. Always prefer querying for specific models and combining them
     afterwards.
     """
-    return ndb.Query(**kwargs)
+    return ndb.Query(**kwargs)  # type: ignore[arg-type]
 
 
 def all_of(*nodes: ndb.Node) -> ndb.Node:
