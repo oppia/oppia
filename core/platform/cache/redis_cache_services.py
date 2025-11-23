@@ -24,28 +24,33 @@ from core.domain import caching_domain
 import redis
 from typing import Dict, List, Optional
 
-# Redis client for our own implementation of caching.
-# Here we use MyPy ignore because our stubs define StrictRedis as a
-# generic (e.g., StrictRedis[str]) to represent the runtime behavior
-# controlled by the `decode_responses` argument, and mypy 1.0+ now
-# requires these explicit type arguments.
-OPPIA_REDIS_CLIENT = redis.StrictRedis(  # type: ignore[type-arg]
-    host=feconf.REDISHOST,
-    port=feconf.REDISPORT,
-    db=feconf.OPPIA_REDIS_DB_INDEX,
-    decode_responses=True,
-)
+_oppia_redis_client: Optional[redis.StrictRedis] = None  # type: ignore[type-arg]
+_cloud_ndb_redis_client: Optional[redis.StrictRedis] = None  # type: ignore[type-arg]
 
-# Redis client for the Cloud NDB cache.
-# Here we use MyPy ignore because our stubs define StrictRedis as a
-# generic (e.g., StrictRedis[str]) to represent the runtime behavior
-# controlled by the `decode_responses` argument, and mypy 1.0+ now
-# requires these explicit type arguments.
-CLOUD_NDB_REDIS_CLIENT = redis.StrictRedis(  # type: ignore[type-arg]
-    host=feconf.REDISHOST,
-    port=feconf.REDISPORT,
-    db=feconf.CLOUD_NDB_REDIS_DB_INDEX,
-)
+
+def get_oppia_redis_client() -> redis.StrictRedis:  # type: ignore[type-arg]
+    """Get or create the Oppia Redis client lazily."""
+    global _oppia_redis_client
+    if _oppia_redis_client is None:
+        _oppia_redis_client = redis.StrictRedis(  # type: ignore[type-arg]
+            host=feconf.REDISHOST,
+            port=feconf.REDISPORT,
+            db=feconf.OPPIA_REDIS_DB_INDEX,
+            decode_responses=True,
+        )
+    return _oppia_redis_client
+
+
+def get_cloud_ndb_redis_client() -> redis.StrictRedis:  # type: ignore[type-arg]
+    """Get or create the Cloud NDB Redis client lazily."""
+    global _cloud_ndb_redis_client
+    if _cloud_ndb_redis_client is None:
+        _cloud_ndb_redis_client = redis.StrictRedis(  # type: ignore[type-arg]
+            host=feconf.REDISHOST,
+            port=feconf.REDISPORT,
+            db=feconf.CLOUD_NDB_REDIS_DB_INDEX,
+        )
+    return _cloud_ndb_redis_client
 
 
 def get_memory_cache_stats() -> caching_domain.MemoryCacheStats:
@@ -58,7 +63,7 @@ def get_memory_cache_stats() -> caching_domain.MemoryCacheStats:
         memory in bytes, peak memory usage in bytes, and the total number of
         keys stored as values.
     """
-    redis_full_profile = OPPIA_REDIS_CLIENT.memory_stats()
+    redis_full_profile = get_oppia_redis_client().memory_stats()
     memory_stats = caching_domain.MemoryCacheStats(
         redis_full_profile['total.allocated'],
         redis_full_profile['peak.allocated'],
@@ -70,8 +75,8 @@ def get_memory_cache_stats() -> caching_domain.MemoryCacheStats:
 
 def flush_caches() -> None:
     """Wipes the Redis caches clean."""
-    OPPIA_REDIS_CLIENT.flushdb()
-    CLOUD_NDB_REDIS_CLIENT.flushdb()
+    get_oppia_redis_client().flushdb()
+    get_cloud_ndb_redis_client().flushdb()
 
 
 def get_multi(keys: List[str]) -> List[Optional[str]]:
@@ -85,7 +90,7 @@ def get_multi(keys: List[str]) -> List[Optional[str]]:
         that are passed in.
     """
     assert isinstance(keys, list)
-    return OPPIA_REDIS_CLIENT.mget(keys)
+    return get_oppia_redis_client().mget(keys)
 
 
 def set_multi(key_value_mapping: Dict[str, str]) -> bool:
@@ -100,7 +105,7 @@ def set_multi(key_value_mapping: Dict[str, str]) -> bool:
         bool. Whether the set action succeeded.
     """
     assert isinstance(key_value_mapping, dict)
-    return OPPIA_REDIS_CLIENT.mset(key_value_mapping)
+    return get_oppia_redis_client().mset(key_value_mapping)
 
 
 def delete_multi(keys: List[str]) -> int:
@@ -114,4 +119,4 @@ def delete_multi(keys: List[str]) -> int:
     """
     for key in keys:
         assert isinstance(key, str)
-    return OPPIA_REDIS_CLIENT.delete(*keys)
+    return get_oppia_redis_client().delete(*keys)

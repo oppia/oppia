@@ -21,9 +21,17 @@ from __future__ import annotations
 import functools
 
 from google.cloud import datastore
-from typing import Any, Callable
+from typing import Any, Callable, Optional
 
-CLIENT = datastore.Client()
+_client: Optional[datastore.Client] = None
+
+
+def get_client() -> datastore.Client:
+    """Get or create the datastore client lazily."""
+    global _client
+    if _client is None:
+        _client = datastore.Client()
+    return _client
 
 
 # Here we use type Any because the method `wrapper` is used as a decorator for
@@ -49,7 +57,7 @@ def run_in_transaction_wrapper(fn: Callable[..., Any]) -> Callable[..., Any]:
     @functools.wraps(fn)
     def wrapper(*args: Any, **kwargs: Any) -> Any:
         """Wrapper for the transaction."""
-        with CLIENT.transaction():
+        with get_client().transaction():
             return fn(*args, **kwargs)
 
     return wrapper

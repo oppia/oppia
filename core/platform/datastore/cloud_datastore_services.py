@@ -64,7 +64,15 @@ TYPE_MODEL_SUBCLASS = TypeVar(  # pylint: disable=invalid-name
 )
 MAX_GET_RETRIES = 3
 
-CLIENT = ndb.Client()
+_client: Optional[ndb.Client] = None
+
+
+def get_client() -> ndb.Client:
+    """Get or create the NDB client lazily."""
+    global _client
+    if _client is None:
+        _client = ndb.Client()
+    return _client
 
 
 def get_ndb_context(
@@ -81,7 +89,7 @@ def get_ndb_context(
     # places we need a context but we are unsure if it exists.
     context = ndb.get_context(raise_context_error=False)
     return (
-        CLIENT.context(namespace=namespace, global_cache=global_cache)
+        get_client().context(namespace=namespace, global_cache=global_cache)
         if context is None
         else contextlib.nullcontext(enter_result=context)
     )
