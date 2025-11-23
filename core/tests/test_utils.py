@@ -823,7 +823,7 @@ class ElasticSearchStub:
             body: dict|None. A dictionary search definition that uses Query DSL.
             index: str|None. The name of the index to search.
             size: int|None. The number of results to fetch.
-            from_:int|None. The offset from which the results are to be fetched.
+            from_: int|None. The offset from which the results are to be fetched.
 
         Returns:
             dict. A dict representing the ElasticSearch response.
