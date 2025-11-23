@@ -65,22 +65,21 @@ class ElasticSearchClient:
                 # Use cloud setup if cloud_id is present, otherwise fall back to local.
                 # Only one of cloud_id or hosts can be used with the Elasticsearch v8 client.
 
-                if es_cloud_id:
-                    self._client = elasticsearch.Elasticsearch(
-                        cloud_id=es_cloud_id,
-                        basic_auth=(es_username, es_password),
-                        request_timeout=60,
-                        verify_certs=True,
-                    )
-                else:
-                    self._client = elasticsearch.Elasticsearch(
-                        hosts=[
-                            f'http://{feconf.ES_HOST}:{feconf.ES_LOCALHOST_PORT}'
-                        ],
-                        basic_auth=(es_username, es_password),
-                        request_timeout=60,
-                        verify_certs=False,
-                    )
+                cloud_id = es_cloud_id or None
+                hosts = (
+                    None
+                    if es_cloud_id
+                    else [f'http://{feconf.ES_HOST}:{feconf.ES_LOCALHOST_PORT}']
+                )
+                verify_certs = True if es_cloud_id else False
+
+                self._client = elasticsearch.Elasticsearch(
+                    cloud_id=cloud_id,
+                    hosts=hosts,
+                    basic_auth=(es_username, es_password),
+                    request_timeout=30,
+                    verify_certs=verify_certs,
+                )
 
         return self._client
 
