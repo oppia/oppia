@@ -24,10 +24,8 @@ import datetime
 import os
 import time
 import urllib
-from unittest import mock
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
 from core.tests import test_utils
 from core.tests.data import unicode_and_str_handler

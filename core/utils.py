@@ -31,7 +31,6 @@ import string
 import time
 import unicodedata
 import urllib.parse
-import urllib.request
 
 from core import feconf
 from core.constants import constants
