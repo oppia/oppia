@@ -69,7 +69,11 @@ _client: Optional[ndb.Client] = None
 
 def get_client() -> ndb.Client:
     """Get or create the NDB client lazily."""
-    global _client
+    # We use the global statement here to modify the module-level _client
+    # variable for lazy initialization. This ensures a single shared NDB client
+    # instance across the application, which is required for proper datastore
+    # connection management.
+    global _client  # pylint: disable=global-statement
     if _client is None:
         _client = ndb.Client()
     return _client

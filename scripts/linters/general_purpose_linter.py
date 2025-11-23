@@ -269,8 +269,8 @@ BAD_PATTERNS_PYTHON_REGEXP: List[BadPatternRegexpDict] = [
             '    ...\n'
         ),
         'excluded_files': (
-            # conftest.py needs to reference 'google.cloud.ndb' module paths
-            # directly in mock.patch() calls for pytest fixtures.
+            # The conftest.py file needs to reference 'google.cloud.ndb' module
+            # paths directly in mock.patch() calls for pytest fixtures.
             'conftest.py',
         ),
         'excluded_dirs': ('core/platform',),

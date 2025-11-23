@@ -28,7 +28,11 @@ _client: Optional[datastore.Client] = None
 
 def get_client() -> datastore.Client:
     """Get or create the datastore client lazily."""
-    global _client
+    # We use the global statement here to modify the module-level _client
+    # variable for lazy initialization. This ensures a single shared datastore
+    # client instance across the application, which is required for proper
+    # transaction management.
+    global _client  # pylint: disable=global-statement
     if _client is None:
         _client = datastore.Client()
     return _client

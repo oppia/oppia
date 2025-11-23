@@ -24,14 +24,30 @@ from core.domain import caching_domain
 import redis
 from typing import Dict, List, Optional
 
+# Here we use MyPy ignore because redis.StrictRedis is a generic type but the
+# redis-py library's type stubs don't properly specify the type arguments,
+# leading to type-arg errors that we cannot fix without modifying the library.
 _oppia_redis_client: Optional[redis.StrictRedis] = None  # type: ignore[type-arg]
+# Here we use MyPy ignore because redis.StrictRedis is a generic type but the
+# redis-py library's type stubs don't properly specify the type arguments,
+# leading to type-arg errors that we cannot fix without modifying the library.
 _cloud_ndb_redis_client: Optional[redis.StrictRedis] = None  # type: ignore[type-arg]
 
 
+# Here we use MyPy ignore because redis.StrictRedis is a generic type but the
+# redis-py library's type stubs don't properly specify the type arguments,
+# leading to type-arg errors that we cannot fix without modifying the library.
 def get_oppia_redis_client() -> redis.StrictRedis:  # type: ignore[type-arg]
     """Get or create the Oppia Redis client lazily."""
-    global _oppia_redis_client
+    # We use the global statement here to modify the module-level
+    # _oppia_redis_client variable for lazy initialization. This ensures a
+    # single shared Redis client instance across the application.
+    global _oppia_redis_client  # pylint: disable=global-statement
     if _oppia_redis_client is None:
+        # Here we use MyPy ignore because redis.StrictRedis is a generic type
+        # but the redis-py library's type stubs don't properly specify the type
+        # arguments, leading to type-arg errors that we cannot fix without
+        # modifying the library.
         _oppia_redis_client = redis.StrictRedis(  # type: ignore[type-arg]
             host=feconf.REDISHOST,
             port=feconf.REDISPORT,
@@ -41,10 +57,21 @@ def get_oppia_redis_client() -> redis.StrictRedis:  # type: ignore[type-arg]
     return _oppia_redis_client
 
 
+# Here we use MyPy ignore because redis.StrictRedis is a generic type but the
+# redis-py library's type stubs don't properly specify the type arguments,
+# leading to type-arg errors that we cannot fix without modifying the library.
 def get_cloud_ndb_redis_client() -> redis.StrictRedis:  # type: ignore[type-arg]
     """Get or create the Cloud NDB Redis client lazily."""
-    global _cloud_ndb_redis_client
+    # We use the global statement here to modify the module-level
+    # _cloud_ndb_redis_client variable for lazy initialization. This ensures a
+    # single shared Redis client instance for Cloud NDB caching across the
+    # application.
+    global _cloud_ndb_redis_client  # pylint: disable=global-statement
     if _cloud_ndb_redis_client is None:
+        # Here we use MyPy ignore because redis.StrictRedis is a generic type
+        # but the redis-py library's type stubs don't properly specify the type
+        # arguments, leading to type-arg errors that we cannot fix without
+        # modifying the library.
         _cloud_ndb_redis_client = redis.StrictRedis(  # type: ignore[type-arg]
             host=feconf.REDISHOST,
             port=feconf.REDISPORT,
