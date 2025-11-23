@@ -18,9 +18,13 @@ from __future__ import annotations
 
 import os
 import sys
+from unittest import mock
 
-# Set up environment variables BEFORE any imports that might use them
-# These tell Google Cloud clients to use local emulator/test mode
+import pytest
+from typing import Dict, Generator, List
+
+# Set up environment variables BEFORE any imports that might use them.
+# These tell Google Cloud clients to use local emulator/test mode.
 os.environ['DATASTORE_DATASET'] = 'dev-project-id'
 os.environ['DATASTORE_EMULATOR_HOST'] = 'localhost:8089'
 os.environ['DATASTORE_EMULATOR_HOST_PATH'] = 'localhost:8089/datastore'
@@ -30,7 +34,7 @@ os.environ['DATASTORE_USE_PROJECT_ID_AS_APP_ID'] = 'true'
 os.environ['GOOGLE_CLOUD_PROJECT'] = 'dev-project-id'
 os.environ['APPLICATION_ID'] = 'dev-project-id'
 
-# Add necessary paths BEFORE importing anything
+# Add necessary paths BEFORE importing anything.
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
 OPPIA_TOOLS_DIR_ABS_PATH = os.path.abspath(OPPIA_TOOLS_DIR)
@@ -43,7 +47,11 @@ GOOGLE_APP_ENGINE_SDK_HOME = os.path.join(
     GOOGLE_CLOUD_SDK_HOME, 'platform', 'google_appengine'
 )
 
-# Add required paths in the correct order
+# Add required paths so we can import from scripts module. We need to do this
+# at module load time (before importing scripts.common) because Python needs
+# to know where to find the scripts package. If we tried to import
+# scripts.common before adding these paths, Python would raise ImportError
+# because it doesn't know where the 'scripts' module is located.
 paths_to_insert = [
     GOOGLE_APP_ENGINE_SDK_HOME,
     CURR_DIR,
@@ -54,35 +62,56 @@ for path in reversed(paths_to_insert):
     if os.path.exists(path) and path not in sys.path:
         sys.path.insert(0, path)
 
+# Now we can import from the scripts module.
 from scripts import common  # pylint: disable=wrong-import-position
-from typing import Any  # pylint: disable=wrong-import-position
-from unittest import mock  # pylint: disable=wrong-import-position
-import pytest  # pylint: disable=wrong-import-position
 
 
-def pytest_configure(config: Any) -> None:
-    """Setup test environment before running tests."""
+def pytest_configure(
+    config: pytest.Config,  # pylint: disable=unused-argument
+) -> None:
+    """Setup test environment before running tests.
+
+    Args:
+        config: pytest.Config. Pytest config object (unused but required by
+            hook).
+    """
+    # pytest_configure runs when pytest starts. We add paths again here as a
+    # safety measure in case pytest or other code has modified sys.path, and
+    # to remove any coverage-related paths that might interfere with tests.
     for directory in common.DIRS_TO_ADD_TO_SYS_PATH:
         if os.path.exists(directory) and directory not in sys.path:
             sys.path.insert(0, directory)
     sys.path[:] = [path for path in sys.path if 'coverage' not in path]
 
 
-def pytest_collection_modifyitems(config: Any, items: Any) -> None:
-    """Modify test collection to work with Oppia's test structure."""
+def pytest_collection_modifyitems(
+    config: pytest.Config,  # pylint: disable=unused-argument
+    items: List[pytest.Item],  # pylint: disable=unused-argument
+) -> None:
+    """Modify test collection to work with Oppia's test structure.
+
+    Args:
+        config: pytest.Config. Pytest config object (unused but required by
+            hook).
+        items: List[pytest.Item]. Collected test items (unused but required by
+            hook).
+    """
     pass
 
 
 @pytest.fixture(autouse=True)
-def mock_redis_clients() -> Any:
+def mock_redis_clients() -> Generator[Dict[str, mock.MagicMock], None, None]:
     """Mock Redis clients to avoid requiring a running Redis server during
     tests.
 
     This fixture automatically applies to all tests and replaces the Redis
     client getter functions with mocks that simulate Redis behavior without
     needing an actual Redis server running.
+
+    Yields:
+        dict. Dictionary containing mocked Redis clients.
     """
-    # Create mock Redis clients with common Redis methods
+    # Create mock Redis clients with common Redis methods.
     mock_oppia_redis = mock.MagicMock()
     mock_oppia_redis.mget.return_value = []
     mock_oppia_redis.mset.return_value = True
@@ -97,7 +126,7 @@ def mock_redis_clients() -> Any:
     mock_cloud_ndb_redis = mock.MagicMock()
     mock_cloud_ndb_redis.flushdb.return_value = None
 
-    # Patch the getter functions in redis_cache_services
+    # Patch the getter functions in redis_cache_services.
     with mock.patch(
         'core.platform.cache.redis_cache_services.get_oppia_redis_client',
         return_value=mock_oppia_redis,
@@ -112,15 +141,17 @@ def mock_redis_clients() -> Any:
 
 
 @pytest.fixture(autouse=True)
-def mock_ndb_client() -> Any:
-    """Mock NDB client and context to avoid requiring datastore emulator during
-    tests.
+def mock_ndb_client() -> Generator[mock.MagicMock, None, None]:
+    """Mock NDB client and context to avoid requiring datastore emulator
+    during tests.
 
     This fixture automatically applies to all tests, and replaces the NDB
     client and context with mocks that simulate NDB behavior without needing
     an actual Datastore emulator running.
-    """
 
+    Yields:
+        MagicMock. Mocked NDB client instance.
+    """
     # Create a mock context that can be used as a context manager.
     mock_context = mock.MagicMock()
     mock_context.__enter__ = mock.MagicMock(return_value=mock_context)
@@ -145,13 +176,16 @@ def mock_ndb_client() -> Any:
         yield mock_ndb_client_instance
 
 
-@pytest.fixture(scope="session")
-def manage_emulators() -> Any:
+@pytest.fixture(scope='session')
+def manage_emulators() -> Generator[None, None, None]:
     """Manage emulator lifecycle for the entire test session.
 
     This fixture is a placeholder for future emulator management.
     Currently, emulators should be started externally before running tests,
     or tests should use the mocked services provided by other fixtures.
+
+    Yields:
+        None. Nothing is yielded as this is a placeholder.
     """
     # For now, we don't manage emulators in pytest.
     # Tests use mocked Redis and NDB clients from the autouse fixtures above.
@@ -160,27 +194,29 @@ def manage_emulators() -> Any:
 
 
 @pytest.fixture(autouse=True)
-def test_isolation(manage_emulators: Any) -> Any:
+def test_isolation() -> Generator[None, None, None]:
     """Ensure test isolation by cleaning up after each test.
 
-    This fixture depends on manage_emulators to ensure emulators are running,
-    then provides cleanup after each test to maintain isolation.
+    This fixture provides cleanup after each test to maintain isolation.
+
+    Yields:
+        None. Nothing is yielded before the test runs.
     """
-    # Setup: nothing needed before test
+    # Setup: nothing needed before test.
     yield
 
-    # Teardown: cleanup after test
-    # Note: Most cleanup is handled by test_utils.GenericTestBase.tearDown()
+    # Teardown: cleanup after test.
+    # Note: Most cleanup is handled by test_utils.GenericTestBase.tearDown().
     # This is just a hook for pytest-specific cleanup if needed later.
 
 
-@pytest.fixture(scope="session", autouse=True)
-def configure_test_environment() -> Any:
-    """Configure environment variables and paths for test session."""
-    import os
-    import sys
-    from scripts import common
+@pytest.fixture(scope='session', autouse=True)
+def configure_test_environment() -> Generator[None, None, None]:
+    """Configure environment variables and paths for test session.
 
+    Yields:
+        None. Nothing is yielded during the test session.
+    """
     # Add required paths (belt-and-suspenders with pytest_configure).
     for directory in common.DIRS_TO_ADD_TO_SYS_PATH:
         if os.path.exists(directory) and directory not in sys.path:
