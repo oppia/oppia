@@ -68,7 +68,8 @@
     iframes.forEach(function(iframe) {
       var currentSrc = iframe.getAttribute('src');
       if (currentSrc && currentSrc.includes(placeholderExplorationId)) {
-        var updatedSrc = currentSrc.replace(placeholderExplorationId, newExplorationId);
+        var updatedSrc = currentSrc.replace(
+          placeholderExplorationId, encodeURIComponent(newExplorationId));
         iframe.setAttribute('src', updatedSrc);
       }
     });
@@ -77,7 +78,7 @@
 
     var oppiaElements = document.querySelectorAll('oppia[oppia-id="idToBeReplaced"]');
     oppiaElements.forEach(function(element) {
-      element.setAttribute('oppia-id', newExplorationId);
+      element.setAttribute('oppia-id', encodeURIComponent(newExplorationId));
     });
 
     var results = document.querySelector('.e2e-test-results');
