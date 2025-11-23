@@ -207,9 +207,7 @@ def query_everything(**kwargs: object) -> Query:
     Returns:
         Query. A query targeting all entities.
     """
-    # Here we use MyPy ignore because the ndb library's type stubs do not fully
-    # define all possible keyword argument types that ndb.Query can accept.
-    return ndb.Query(**kwargs)  # type: ignore[arg-type]
+    return ndb.Query(**kwargs)
 
 
 def all_of(*nodes: ndb.Node) -> ndb.Node:

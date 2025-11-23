@@ -87,10 +87,7 @@ def run_in_transaction_wrapper(
         Returns:
             ReturnType. The return value from the wrapped function.
         """
-        # Here we use MyPy ignore because the datastore library's type stubs
-        # do not fully define the argument types that functions passed to
-        # transactions can accept.
         with get_client().transaction():
-            return fn(*args, **kwargs)  # type: ignore[arg-type]
+            return fn(*args, **kwargs)
 
     return wrapper
